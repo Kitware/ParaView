@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.8");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.9");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -170,14 +170,26 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
          << pvApp->GetMainView()->GetTriangleStripsCheck()->GetState()
          << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
-  // Default setting.
-
-//   // Keep track of how long each geometry filter takes to execute.
-//   pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent "
-//                          "{Execute Geometry}}", this->GeometryTclName);
-//   pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent "
-//                          "{Execute Geometry}}", this->GeometryTclName);
-
+  // Keep track of how long each geometry filter takes to execute.
+  vtkClientServerStream start;
+  start << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+        << "LogStartEvent" << "Execute Geometry" 
+        << vtkClientServerStream::End;
+  vtkClientServerStream end;
+  end << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+      << "LogEndEvent" << "Execute Geometry" 
+      << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke << this->GeometryID 
+                  << "AddObserver"
+                  << "StartEvent"
+                  << start
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke << this->GeometryID 
+                  << "AddObserver"
+                  << "EndEvent"
+                  << end
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -323,9 +335,9 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     vtkErrorMacro("bad return from IsA call");
     }
   return;
-#if 0
-  pm->GatherInformation(this->ClassNameInformation, this->VTKDataTclName);
+  pm->GatherInformation(this->ClassNameInformation, this->VTKDataID);
   char *className = this->ClassNameInformation->GetVTKClassName();
+  vtkClientServerID tempDataPiece = {0};
   if (!strcmp(className, "vtkPolyData"))
     {
     // Don't add anything if we are only using one processes.
@@ -335,26 +347,47 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
       {
       return;
       }  
-    pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
-    pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
-    if (atoi(pm->GetRootResult()) != 1)
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->VTKDataID << "UpdateInformation"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->VTKDataID << "GetMaximumNumberOfPieces"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer(); // Was a RootScript
+    int num =0;
+    pm->GetLastServerResult().GetArgument(0,0,&num);
+    if (num != 1)
       { // The source can already produce pieces.
       return;
       }
-
     // Transmit is more efficient, but has the possiblity of hanging.
     // It will hang if all procs do not  call execute.
     if (getenv("PV_LOCK_SAFE") != NULL)
       {
-      pm->ServerSimpleScript("vtkExtractPolyDataPiece pvTemp");
+      tempDataPiece = pm->NewStreamObject("vtkExtractPolyDataPiece");
       }
     else
       {
-      pm->ServerSimpleScript("vtkTransmitPolyDataPiece pvTemp");
-      pm->ServerSimpleScript(
-        "pvTemp AddObserver StartEvent {$Application LogStartEvent {Execute TransmitPData}}");
-      pm->ServerSimpleScript(
-        "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitPData}}");
+      tempDataPiece = pm->NewStreamObject("vtkTransmitPolyDataPiece");
+      vtkClientServerStream start;
+      start << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+            << "LogStartEvent" << "Execute TransmitPData" 
+            << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke << tempDataPiece 
+                      << "AddObserver"
+                      << "StartEvent"
+                      << start
+                      << vtkClientServerStream::End;
+      vtkClientServerStream end;
+      end << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+          << "LogEndEvent" << "Execute TransmitPData" 
+          << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke << tempDataPiece 
+                      << "AddObserver"
+                      << "EndEvent"
+                      << start
+                      << vtkClientServerStream::End;
       }
     }
   else if (!strcmp(className, "vtkUnstructuredGrid"))
@@ -365,10 +398,18 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     if (pm->GetNumberOfPartitions() == 1)
       {
       return;
-      }      
-    pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
-    pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
-    if (atoi(pm->GetRootResult()) != 1)
+      }
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->VTKDataID << "UpdateInformation"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->VTKDataID << "GetMaximumNumberOfPieces"
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer(); // Was a RootScript
+    int num =0;
+    pm->GetLastServerResult().GetArgument(0,0,&num);
+    if (num != 1)
       { // The source can already produce pieces.
       return;
       }
@@ -376,56 +417,69 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     // Transmit is more efficient, but has the possiblity of hanging.
     // It will hang if all procs do not  call execute.
     if (getenv("PV_LOCK_SAFE") != NULL)
-      {
-      pm->ServerSimpleScript("vtkExtractUnstructuredGridPiece pvTemp");
+      { 
+      tempDataPiece = pm->NewStreamObject("vtkExtractUnstructuredGridPiece");
       }
     else
       {
-      pm->ServerSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
-      pm->ServerSimpleScript(
-        "pvTemp AddObserver StartEvent {$Application LogStartEvent {Execute TransmitUGrid}}");
-      pm->ServerSimpleScript(
-        "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitUGrid}}");
+      tempDataPiece = pm->NewStreamObject("vtkTransmitUnstructuredGridPiece");
+      vtkClientServerStream start;
+      start << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+            << "LogStartEvent" << "Execute TransmitPData" 
+            << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke << tempDataPiece 
+                      << "AddObserver"
+                      << "StartEvent"
+                      << start
+                      << vtkClientServerStream::End;
+      vtkClientServerStream end;
+      end << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+          << "LogEndEvent" << "Execute TransmitPData" 
+          << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke << tempDataPiece 
+                      << "AddObserver"
+                      << "EndEvent"
+                      << start
+                      << vtkClientServerStream::End;
       }
     }
   else if (!strcmp(className, "vtkImageData"))
     {
     if (getenv("PV_LOCK_SAFE") == NULL)
-      {
-      pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
+      { 
+      tempDataPiece = pm->NewStreamObject("vtkStructuredCacheFilter");
       }
     }
   else if (!strcmp(className, "vtkStructuredGrid"))
     {
     if (getenv("PV_LOCK_SAFE") == NULL)
       {
-      pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
+      tempDataPiece = pm->NewStreamObject("vtkStructuredCacheFilter");
       }
     }
   else if (!strcmp(className, "vtkRectilinearGrid"))
     {
     if (getenv("PV_LOCK_SAFE") == NULL)
       {
-      pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
+      tempDataPiece = pm->NewStreamObject("vtkStructuredCacheFilter");
       }
     }
   else
     {
     return;
     }
-
-  // Connect the filter to the pipeline.
-  pm->ServerScript("pvTemp SetInput %s", this->VTKDataTclName);
-  // Set the output name to point to the new data object.
-  // This is a bit of a hack because we have to strip the '$' off of the current name.
-  pm->ServerScript("set %s [pvTemp GetOutput]", this->VTKDataTclName+1);
-  
-  this->Script("%s SetVTKDataTclName {%s}", this->GetTclName(),
-               this->VTKDataTclName);
-  
-  // Now delete Tcl's reference to the piece filter.
-  pm->ServerSimpleScript("pvTemp Delete");
-#endif
+  // Connect the filter to the pipeline.  
+  pm->GetStream() << vtkClientServerStream::Invoke << tempDataPiece 
+                  << "SetInput"
+                  << this->VTKDataID
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke << tempDataPiece 
+                  << "GetOutput"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
+  pm->GetLastServerResult().GetArgument(0, 0, &this->VTKDataID);
+  pm->DeleteStreamObject(tempDataPiece);
+  pm->SendStreamToServer();
 }
 
 

@@ -67,6 +67,9 @@ public:
   // Description:
   // A method for saving a widget into a VTK Tcl script.
   virtual void SaveInBatchScript(ofstream *file);
+  // Description:
+  // Return SourceID for Source, and OutputID for Output.
+  virtual vtkClientServerID GetObjectByName(const char*);
 
 protected:
   vtkPVSourceWidget();

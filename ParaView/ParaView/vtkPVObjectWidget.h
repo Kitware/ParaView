@@ -85,6 +85,9 @@ public:
   // parameters.
   vtkPVObjectWidget* ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+  // Description:
+  // Get an object from a widget by name
+  virtual vtkClientServerID GetObjectByName(const char*){ vtkClientServerID id = {0}; return id;}
 //ETX
 
 protected:
@@ -96,7 +99,7 @@ protected:
 
   vtkPVObjectWidget(const vtkPVObjectWidget&); // Not implemented
   void operator=(const vtkPVObjectWidget&); // Not implemented
-
+  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

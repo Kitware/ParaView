@@ -48,9 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 #include "vtkPVProcessModule.h"
-#include <string>
+#include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.12.4.2");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.12.4.3");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()

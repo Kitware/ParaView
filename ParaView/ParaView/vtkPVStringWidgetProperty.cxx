@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVStringWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.1.2.4");
+vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.1.2.5");
 
 vtkPVStringWidgetProperty::vtkPVStringWidgetProperty()
 {
@@ -61,30 +61,46 @@ vtkPVStringWidgetProperty::~vtkPVStringWidgetProperty()
   this->SetVTKCommand(NULL);
 }
 
+void vtkPVStringWidgetProperty::SetStringType(vtkPVSelectWidget::ElementTypes t)
+{
+  this->ElementType = t;
+}
+
+
 void vtkPVStringWidgetProperty::AcceptInternal()
 {
-  int fixme;
   vtkPVApplication *pvApp = this->GetWidget()->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
-  if (this->String[0] != '[')
+  if (this->String[0] == '[')
     {
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->VTKSourceID 
-                    << this->VTKCommand
-                    << this->String 
-                    << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    vtkErrorMacro("nasty [ used in string for vtkPVStringWidgetProperty");
+    return;
     }
-  else
+  
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->VTKSourceID 
+                  << this->VTKCommand;
+  switch(this->ElementType)
     {
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->VTKSourceID 
-                    << this->VTKCommand
-                    << this->String 
-                    << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    case vtkPVSelectWidget::INT:
+      pm->GetStream() << atoi(this->String);
+      break;
+    case vtkPVSelectWidget::FLOAT:
+      pm->GetStream() << atof(this->String);
+      break;
+    case vtkPVSelectWidget::STRING:
+      pm->GetStream() << this->String;
+      break;
+    case vtkPVSelectWidget::OBJECT:
+      {
+      pm->GetStream() << this->ObjectID;
+      }
+      break;
     }
+  
+  pm->GetStream() << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 }
 
 void vtkPVStringWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)

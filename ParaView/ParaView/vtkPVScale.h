@@ -148,6 +148,11 @@ public:
   // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
+  // Description:
+  // Call Set VariableName with the time passed to it.
+  // This is used as a script callback in AnimationMenuCallback.
+  void SetObjectVariableToPVTime(int time);
+  
 protected:
   vtkPVScale();
   ~vtkPVScale();

@@ -69,6 +69,20 @@ class vtkArrayMap;
 class VTK_EXPORT vtkPVSelectWidget : public vtkPVObjectWidget
 {
 public:
+  //BTX
+
+  // What type of elements are in the widget
+  // this is needed to pass the correct type to the
+  // clientserver stream in accept internal
+  // Description:
+  // Normally, SelectWidget executes a command of the form
+  // <ObjectID> Set<VariableName> <CurrentValue> where
+  // ObjectID usually corresponds to the underlying VTK
+  // object, VariableName is an ivar of that object and the
+  // CurrentValue is a value assigned in AddItem (vtkVal argument).
+  // This enum allows the type of CurrentValue to be known.
+  enum ElementTypes{ INT, FLOAT, STRING, OBJECT};
+  //ETX
   static vtkPVSelectWidget* New();
   vtkTypeRevisionMacro(vtkPVSelectWidget, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -136,21 +150,6 @@ public:
 //ETX
 
   // Description:
-  // Normally, SelectWidget executes a command of the form
-  // <ObjectTclName> Set<VariableName> <CurrentValue> where
-  // ObjectTclName usually corresponds to the underlying VTK
-  // object, VariableName is an ivar of that object and the
-  // CurrentValue is a value assigned in AddItem (vtkVal argument).
-  // If UseWidgetCommand is on, <CurrentValue> is instead obtained
-  // from the current sub-widget with a command of the form
-  // [<WidgetTclName> <CurrentCommand>] where <CurrentCommand> is
-  // a command assigned in AddItem (vtkVal). Note that this flag
-  // has to be set before any AddItem calls.
-  vtkSetMacro(UseWidgetCommand, int);
-  vtkGetMacro(UseWidgetCommand, int);
-  vtkBooleanMacro(UseWidgetCommand, int);
-
-  // Description:
   // Since sub widgets may hove their own objects ...
   virtual void SaveInBatchScript(ofstream *file);
 
@@ -196,8 +195,8 @@ protected:
   vtkCollection *WidgetProperties;
 
   int CurrentIndex;
-  int UseWidgetCommand;
-
+  ElementTypes ElementType;
+  
   vtkPVStringWidgetProperty *Property;
   
 //BTX

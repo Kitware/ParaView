@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.12.2.5");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.12.2.6");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -797,4 +797,21 @@ int vtkPVBoxWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }  
   return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVBoxWidget::GetObjectByName(const char* name)
+{
+  if(!strcmp(name, "Box"))
+    {
+    return this->BoxID;
+    }
+  if(!strcmp(name, "BoxTransform"))
+    {
+    return this->BoxTransformID;
+    }
+  if(!strcmp(name, "BoxMatrix"))
+    {
+    return this->BoxMatrixID;
+    }
 }

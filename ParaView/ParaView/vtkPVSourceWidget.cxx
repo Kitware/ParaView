@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.6.4.3");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.6.4.4");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
@@ -86,8 +86,6 @@ vtkPVSourceWidget::~vtkPVSourceWidget()
 //----------------------------------------------------------------------------
 void vtkPVSourceWidget::SaveInBatchScript(ofstream *file)
 {
-  char *result;
-  
   if (this->SourceID.ID)
     {
     return;
@@ -128,3 +126,19 @@ void vtkPVSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << "Output Tcl Name: " << (this->OutputID)
      << endl;
 }
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVSourceWidget::GetObjectByName(const char* name)
+{
+  if(!strcmp(name, "Output"))
+    {
+    return this->OutputID;
+    }
+  if(!strcmp(name, "Source"))
+    {
+    return this->SourceID;
+    }
+  vtkClientServerID id = {0};
+  return id;
+}
+

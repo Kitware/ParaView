@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.1.2.2");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
@@ -156,14 +156,16 @@ void vtkPVServerFileListing::List(const char* dirname, int save)
     // Look at this file.
     if(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
       {
-      directories.insert(data.cFileName);
+      if(strcmp(data.cFileName, "..") != 0 && strcmp(data.cFileName, ".") != 0)
+        {
+        directories.insert(data.cFileName);
+        }
       }
-    else if(data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL)
-      {
-      files.insert(data.cFileName);
-      }
-    else if((data.dwFileAttributes & FILE_ATTRIBUTE_READONLY) && !save &&
-            !(data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN))
+    else if((data.dwFileAttributes & FILE_ATTRIBUTE_NORMAL) ||
+            (!((data.dwFileAttributes & FILE_ATTRIBUTE_READONLY) && save) &&
+             !(data.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) &&
+             !(data.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM) &&
+             !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)))
       {
       files.insert(data.cFileName);
       }

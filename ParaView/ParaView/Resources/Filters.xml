@@ -151,7 +151,7 @@
   </Filter>
   <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <SelectCTHArrays input_menu="im" trace_name="ArraySelection" help="Select the volume fraction arrays for generating parts."/>
-  <SelectWidget variable="Clipping">
+  <SelectWidget variable="Clipping" type="int">
     <Item label="On" value="1">
       <ImplicitPlaneWidget use_label="0" trace_name="Plane" variable="ClipPlane" input_menu="im" help="Adjusts the parameters of the plane to clip with."/>
     </Item>
@@ -168,7 +168,7 @@
   </Filter>
   <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <SelectCTHArrays input_menu="im" trace_name="ArraySelection" help="Select the volume fraction arrays for generating parts."/>
-  <SelectWidget variable="Clipping">
+  <SelectWidget variable="Clipping" type="int">
     <Item label="On" value="1">
       <ImplicitPlaneWidget use_label="0" trace_name="Plane" variable="ClipPlane" input_menu="im" help="Adjusts the parameters of the plane to clip with."/>
     </Item>
@@ -526,8 +526,8 @@
     <Input name="Input" class="vtkPointSet"/>
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
-  <SelectWidget use_widget_command="1" label="Transform Widget" trace_name="Transform Widget" variable="Transform">
-    <Item label="Box" value="GetBoxTransformTclName">
+  <SelectWidget label="Transform Widget" trace_name="Transform Widget" variable="Transform" type="object">
+    <Item label="Box" value="BoxTransform">
       <BoxWidget use_label="0" trace_name="Box" help="Adjusts the parameters of the box to clip with."/>
     </Item>
   </SelectWidget>
@@ -582,11 +582,11 @@
 #endif
   <InputMenu id="im1" label="Input" help="Set the input to this filter." input_name="Input"/>
     <BoundsDisplay show_hide_frame="1" label="Input Bounds" trace_name="Input Bounds" input_menu="im1"/>
-    <SelectWidget use_widget_command="1" label="Cut Function" trace_name="Cut Function" variable="CutFunction">
-      <Item label="Plane" value="GetPlaneTclName">
+    <SelectWidget type="object" label="Cut Function" trace_name="Cut Function" variable="CutFunction">
+      <Item label="Plane" value="Plane">
         <ImplicitPlaneWidget trace_name="Plane" use_label="0" input_menu="im1" help="Adjusts the parameters of the plane to cut with."/>
       </Item>
-      <Item label="Sphere" value="GetSphereTclName">
+      <Item label="Sphere" value="Sphere">
         <SphereWidget trace_name="Sphere" use_label="0" help="Adjusts the parameters of the sphere to cut with."/>
       </Item>
     </SelectWidget>
@@ -598,8 +598,8 @@
   </Filter>
   <InputMenu id="im1" label="Input" help="Set the input to this filter." input_name="Input"/>
   <BoundsDisplay show_hide_frame="1" label="Input Bounds" trace_name="Input Bounds" input_menu="im1"/>
-  <SelectWidget use_widget_command="1" label="Clip Function" trace_name="Clip Function" variable="ClipFunction">
-    <Item label="Plane" value="GetPlaneTclName">
+  <SelectWidget type="object" label="Clip Function" trace_name="Clip Function" variable="ClipFunction">
+    <Item label="Plane" value="Plane">
       <ImplicitPlaneWidget use_label="0" trace_name="Plane" input_menu="im1" help="Adjusts the parameters of the plane to clip with."/>
     </Item>
     <Item label="Sphere" value="GetSphereTclName">
@@ -678,11 +678,11 @@
       <GroupRequirement quantity="Single"/>
     </Input>
   </Filter>
-  <SelectWidget use_widget_command="1" label="Probe object" variable="Input">
-    <Item label="Point" value="GetOutputTclName">
+  <SelectWidget type="object" label="Probe object" variable="Input">
+    <Item label="Point" value="Output">
       <PointSourceWidget trace_name="Point"/>
     </Item>
-    <Item label="Line" value="GetOutputTclName">
+    <Item label="Line" value="Output">
       <LineSourceWidget trace_name="Line"/>
     </Item>
   </SelectWidget>
@@ -695,11 +695,11 @@
   </Filter>
   <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <ArrayMenu input_name="Input" attribute_type="Vectors" trace_name="Vectors" label="Vectors" input_menu="im" number_of_components="3" help="Select the input vectors to use."/>
-  <SelectWidget use_widget_command="1" label="Seed" variable="Source">
-    <Item label="Point Cloud" value="GetOutputTclName">
+  <SelectWidget type="object" label="Seed" variable="Source">
+    <Item label="Point Cloud" value="Output">
       <PointSourceWidget trace_name="Point"/>
     </Item>
-    <Item label="Line" value="GetOutputTclName">
+    <Item label="Line" value="Output">
       <LineSourceWidget trace_name="Line"/>
     </Item>
   </SelectWidget>
@@ -731,7 +731,7 @@
     <Item name="BACKWARD" value="1"/>
     <Item name="BOTH" value="2"/>
   </SelectionList>
-  <SelectWidget variable="IntegratorType" trace_name="IntegrationType">
+  <SelectWidget type="int" variable="IntegratorType" trace_name="IntegrationType">
     <Item label="Runge-Kutta 2" value="0">
       <DummyWidget/>
     </Item>

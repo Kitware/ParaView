@@ -116,6 +116,11 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  // Description:
+  // Return a contained object by name as follows:
+  // Sphere == SphereID
+  vtkClientServerID GetObjectByName(const char* ){ return this->SphereID;}
+
 protected:
   vtkPVSphereWidget();
   ~vtkPVSphereWidget();

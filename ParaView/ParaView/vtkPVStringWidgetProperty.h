@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVStringWidgetProperty_h
 
 #include "vtkPVWidgetProperty.h"
+#include "vtkPVSelectWidget.h"
+#include "vtkClientServerID.h"
 
 class VTK_EXPORT vtkPVStringWidgetProperty : public vtkPVWidgetProperty
 {
@@ -58,16 +60,21 @@ public:
   vtkGetStringMacro(String);
   
   virtual void AcceptInternal();
-  
+  vtkSetMacro(ObjectID, vtkClientServerID);
   vtkSetStringMacro(VTKCommand);
-  
+  //BTX
+  void SetStringType(vtkPVSelectWidget::ElementTypes);
+  //ETX
 protected:
   vtkPVStringWidgetProperty();
   ~vtkPVStringWidgetProperty();
 
+  vtkClientServerID ObjectID;
   char *String;
   char *VTKCommand;
-  
+  //BTX
+  vtkPVSelectWidget::ElementTypes ElementType;
+  //ETX
 private:
   vtkPVStringWidgetProperty(const vtkPVStringWidgetProperty&); // Not implemented
   void operator=(const vtkPVStringWidgetProperty&); // Not implemented

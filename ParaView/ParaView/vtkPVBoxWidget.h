@@ -148,6 +148,14 @@ public:
   void UpdateBox(int update);
   void UpdateFromBox();
 
+  // Description:
+  // Return a contained object by name as follows:
+  // Box == BoxID
+  // BoxTransform == BoxTransformID
+  // BoxMatrix == BoxMatrixID
+  virtual vtkClientServerID GetObjectByName(const char*);
+
+
 protected:
   vtkPVBoxWidget();
   ~vtkPVBoxWidget();

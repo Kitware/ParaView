@@ -53,10 +53,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
 #include "vtkPVProcessModule.h"
-#include <string>
+#include <vtkstd/string>
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.8");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.9");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -75,7 +75,6 @@ vtkPVSelectWidget::vtkPVSelectWidget()
 
   this->CurrentIndex = -1;
   this->EntryLabel = 0;
-  this->UseWidgetCommand = 0;
 
   this->Property = NULL;
 }
@@ -205,7 +204,19 @@ void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
   // Command to update the UI.
   if (this->GetCurrentVTKValue())
     {
-    this->Property->SetString(this->GetCurrentVTKValue());
+    this->Property->SetStringType(this->ElementType);
+    if(this->ElementType == OBJECT)
+      { 
+      vtkPVWidgetProperty *pvwp;
+      pvwp = vtkPVWidgetProperty::SafeDownCast(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
+      vtkClientServerID id = vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget())
+        ->GetObjectByName(this->GetCurrentVTKValue());
+      this->Property->SetObjectID(id);
+      }
+    else
+      {
+      this->Property->SetString(this->GetCurrentVTKValue());
+      }
     this->Property->SetVTKSourceID(sourceId);
     this->Property->AcceptInternal();
     }
@@ -311,35 +322,14 @@ const char* vtkPVSelectWidget::GetVTKValue(int index)
     }
   
   const char* res = this->Values->GetString(index);
-  if ( this->UseWidgetCommand )
+  if (res && res[0] != '\0')
     {
-    vtkPVWidgetProperty *pvwp = (vtkPVWidgetProperty*)(this->WidgetProperties->GetItemAsObject(index));
-    if (pvwp)
-      {
-      vtkPVWidget *pvw = pvwp->GetWidget();
-      if (res && res[0] != '\0')
-        {
-        this->Script("%s %s", pvw->GetTclName(), res);
-        return Tcl_GetStringResult(this->Application->GetMainInterp());
-        }
-      else
-        {
-        return 0;
-        }
-      }
+    return res;
     }
   else
     {
-    if (res && res[0] != '\0')
-      {
-      return this->Values->GetString(index);
-      }
-    else
-      {
-      return 0;
-      }
+    return 0;
     }
-
   return 0;
 }
 
@@ -569,7 +559,7 @@ void vtkPVSelectWidget::CopyProperties(vtkPVWidget* clone,
   if (pvse)
     {
     pvse->SetLabel(this->EntryLabel);
-    pvse->SetUseWidgetCommand(this->UseWidgetCommand);
+    pvse->ElementType = this->ElementType;
     }
   else 
     {
@@ -616,11 +606,22 @@ int vtkPVSelectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SetLabel(this->VariableName);
     }
   
-  // Setup the UseWidgetCommand.
-  if(!element->GetScalarAttribute("use_widget_command",
-                                  &this->UseWidgetCommand))
+  const char* type = element->GetAttribute("type");
+  if(!strcmp(type, "int"))
     {
-    this->UseWidgetCommand = 0;
+    this->ElementType = INT;
+    }
+  else if(!strcmp(type, "float"))
+    {
+    this->ElementType = FLOAT;
+    }
+  else if(!strcmp(type, "string"))
+    {
+    this->ElementType = STRING;
+    }
+  else if(!strcmp(type, "object"))
+    {
+    this->ElementType = OBJECT;
     }
   
   // Extract the list of items.
@@ -683,5 +684,5 @@ vtkPVWidgetProperty* vtkPVSelectWidget::CreateAppropriateProperty()
 void vtkPVSelectWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "UseWidgetCommand: " << this->UseWidgetCommand << endl;
+  os << "ElementType" << this->ElementType;
 }

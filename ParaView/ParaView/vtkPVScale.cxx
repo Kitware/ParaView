@@ -52,10 +52,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 #include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
-
+#include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.17.2.6");
+vtkCxxRevisionMacro(vtkPVScale, "1.17.2.7");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -399,6 +399,19 @@ void vtkPVScale::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVScale::SetObjectVariableToPVTime(int time)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << (vtkstd::string("Set") +
+                      vtkstd::string(this->VariableName)).c_str()
+                  << time
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClient();
+}
+  
+//----------------------------------------------------------------------------
 void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   char script[500];
@@ -410,9 +423,8 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     }
   
   // I do not like setting the label like this but ...
-  int fixme;
-  sprintf(script, "%s Set%s $pvTime", 
-          this->ObjectID.ID, this->VariableName);
+  sprintf(script, "%s SetObjectVariableToPVTime $pvTime", 
+          this->GetTclName());
   ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
   ai->SetTimeStart(this->GetRangeMin());
   ai->SetTimeEnd(this->GetRangeMax());
