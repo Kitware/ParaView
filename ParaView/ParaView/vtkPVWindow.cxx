@@ -2323,7 +2323,7 @@ vtkPVSource *vtkPVWindow::ExtractGridCallback()
     }
   if (type == VTK_RECTILINEAR_GRID)
     {
-    return NULL;
+    return this->CreatePVSource("vtkExtractRectilinearGrid");
     }
   vtkErrorMacro("Unknown data type.");
   return NULL;
@@ -3210,6 +3210,12 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "<Filter class=\"vtkExtractEdges\" root=\"ExtractEdges\" input=\"vtkDataSet\" output=\"vtkPolyData\"/>\n"
 "\n"
 "<Filter class=\"vtkExtractGrid\" root=\"ExtractGrid\" input=\"vtkStructuredGrid\" output=\"vtkStructuredGrid\">\n"
+"  <Extent name=\"VOI\" help=\"Set the min/max values of the volume of interest (VOI)\"/>\n"
+"  <Vector name=\"SampleRate\" type=\"int\" length=\"3\" help=\"Set the sampling rate for each dimension\"/>\n"
+"  <Boolean name=\"IncludeBoundary\" help=\"Select whether to always include the boundary of the grid in the output\"/>\n"
+"</Filter>\n"
+"\n"
+"<Filter class=\"vtkExtractRectilinearGrid\" root=\"ExtractRGrid\" input=\"vtkRectilinearGrid\" output=\"vtkRectilinearGrid\">\n"
 "  <Extent name=\"VOI\" help=\"Set the min/max values of the volume of interest (VOI)\"/>\n"
 "  <Vector name=\"SampleRate\" type=\"int\" length=\"3\" help=\"Set the sampling rate for each dimension\"/>\n"
 "  <Boolean name=\"IncludeBoundary\" help=\"Select whether to always include the boundary of the grid in the output\"/>\n"
