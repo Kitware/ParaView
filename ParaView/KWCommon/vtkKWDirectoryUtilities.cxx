@@ -61,7 +61,7 @@ static inline int Chdir(const char* dir)
 #define _unlink unlink
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.17");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.18");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -532,7 +532,7 @@ const char* vtkKWDirectoryUtilities::GetFilenameExtension(
     }
   else
     {
-    char *dot = strrchr(filename, '.');
+    const char *dot = strrchr(filename, '.');
     if (dot)
       {
       strcpy(ext, dot + 1);
@@ -556,7 +556,7 @@ const char* vtkKWDirectoryUtilities::GetFilenameWithoutExtension(
     }
   else
     {
-    char *dot = strrchr(filename, '.');
+    const char *dot = strrchr(filename, '.');
     if (dot)
       {
       strncpy(name, filename, dot - filename);
