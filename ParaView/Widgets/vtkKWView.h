@@ -210,7 +210,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
 
   // Description::
   // Override Unregister since widgets have loops.
-  void UnRegister(vtkObject *o);
+  virtual void UnRegister(vtkObjectBase *o);
 
   // Description::
   // Set the title of this view.

@@ -57,7 +57,7 @@ public:
   typedef vtkAbstractList<DType> Superclass;
   typedef vtkVectorIterator<DType> IteratorType;
   
-  static vtkVector<DType> *New() { return new vtkVector<DType>(); }  
+  static vtkVector<DType> *New();
   virtual const char* GetClassName() const { return "vtkVector"; }
 
   // Description:

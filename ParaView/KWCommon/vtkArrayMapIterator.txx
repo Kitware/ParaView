@@ -25,6 +25,15 @@
 #include "vtkAbstractIterator.txx"
 #include "vtkArrayMap.h"
 
+template <class KeyType,class DataType>
+vtkArrayMapIterator<KeyType,DataType> *vtkArrayMapIterator<KeyType,DataType>::New()
+{ 
+#ifdef VTK_DEBUG_LEAKS
+  vtkDebugLeaks::ConstructClass("vtkArrayMapIterator");
+#endif
+  return new vtkArrayMapIterator<KeyType,DataType>(); 
+}
+
 template<class KeyType,class DataType>
 void vtkArrayMapIterator<KeyType,DataType>::InitTraversal()
 {

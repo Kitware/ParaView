@@ -74,8 +74,7 @@ public:
 
   virtual const char *GetClassName() const {return "vtkArrayMap";} 
 
-  static vtkArrayMap<KeyType,DataType> *New() 
-    { return new vtkArrayMap<KeyType,DataType>(); }  
+  static vtkArrayMap<KeyType,DataType> *New(); 
 
   // Description:
   // Return an iterator to the list. This iterator is allocated using

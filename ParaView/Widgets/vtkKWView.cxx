@@ -1141,7 +1141,7 @@ void vtkKWView::SetupBindings()
 }
 
 
-void vtkKWView::UnRegister(vtkObject *o)
+void vtkKWView::UnRegister(vtkObjectBase *o)
 {
   if (!this->DeletingChildren)
     {
@@ -1326,7 +1326,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.68 $");
+  this->ExtractRevision(os,"$Revision: 1.69 $");
 }
 
 void vtkKWView::SetupMemoryRendering(

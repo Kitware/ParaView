@@ -84,7 +84,7 @@ public:
   
   // Description::
   // Override Unregister since widgets have loops.
-  void UnRegister(vtkObject *o);
+  virtual void UnRegister(vtkObjectBase *o);
 
   // Description:
   // Get the net reference count of this widget. That is the

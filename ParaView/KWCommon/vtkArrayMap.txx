@@ -25,6 +25,15 @@
 #include "vtkAbstractMap.txx"
 #include "vtkArrayMapIterator.txx"
 
+template <class KeyType,class DataType>
+vtkArrayMap<KeyType,DataType> *vtkArrayMap<KeyType,DataType>::New()
+{ 
+#ifdef VTK_DEBUG_LEAKS
+  vtkDebugLeaks::ConstructClass("vtkArrayMap");
+#endif
+  return new vtkArrayMap<KeyType,DataType>(); 
+}
+
 // Description:
 // Sets the item at with specific key to data.
 // It overwrites the old item.
@@ -191,7 +200,6 @@ vtkArrayMap<KeyType,DataType>::NewIterator()
   it->InitTraversal();
   return it;
 }
-
 
 #if defined ( _MSC_VER )
 template <class KeyType,class DataType>

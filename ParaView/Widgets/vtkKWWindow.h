@@ -146,7 +146,7 @@ public:
   
   // Description::
   // Override Unregister since widgets have loops.
-  void UnRegister(vtkObject *o);
+  virtual void UnRegister(vtkObjectBase *o);
 
   // Description::
   // Add to the menu a list of recently used files. Specify a menu entry,

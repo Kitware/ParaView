@@ -95,8 +95,7 @@ public:
   int GoToLastItem();
 
 protected:
-  static vtkArrayMapIterator<KeyType,DataType> *New() 
-    { return new vtkArrayMapIterator<KeyType,DataType>(); }  
+  static vtkArrayMapIterator<KeyType,DataType> *New(); 
 
   vtkArrayMapIterator() {
     this->Index = 0; 

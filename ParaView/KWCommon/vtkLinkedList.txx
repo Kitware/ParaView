@@ -21,7 +21,18 @@
 #define __vtkLinkedList_txx
 
 #include "vtkLinkedList.h"
+
 #include "vtkLinkedListIterator.txx"
+#include "vtkDebugLeaks.h"
+
+template <class DType>
+vtkLinkedList<DType> *vtkLinkedList<DType>::New()
+{ 
+#ifdef VTK_DEBUG_LEAKS
+  vtkDebugLeaks::ConstructClass("vtkLinkedList");
+#endif
+  return new vtkLinkedList<DType>(); 
+}
 
 template <class DType>
 class vtkLinkedListNode 

@@ -764,7 +764,7 @@ void vtkKWWindow::InstallMenu(vtkKWMenu* menu)
 	       menu->GetWidgetName());  
 }
 
-void vtkKWWindow::UnRegister(vtkObject *o)
+void vtkKWWindow::UnRegister(vtkObjectBase *o)
 {
   if (!this->DeletingChildren)
     {
@@ -993,7 +993,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.90 $");
+  this->ExtractRevision(os,"$Revision: 1.91 $");
 }
 
 int vtkKWWindow::ExitDialog()

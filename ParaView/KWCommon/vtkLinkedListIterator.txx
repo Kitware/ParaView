@@ -25,6 +25,15 @@
 #include "vtkAbstractIterator.txx"
 #include "vtkLinkedList.h"
 
+template <class DType>
+vtkLinkedListIterator<DType> *vtkLinkedListIterator<DType>::New()
+{ 
+#ifdef VTK_DEBUG_LEAKS
+  vtkDebugLeaks::ConstructClass("vtkLinkedListIterator");
+#endif
+  return new vtkLinkedListIterator<DType>(); 
+}
+
 template<class DType>
 void vtkLinkedListIterator<DType>::InitTraversal()
 {

@@ -195,7 +195,7 @@ void vtkKWWidget::RemoveChild(vtkKWWidget *w)
 }
 
 
-void vtkKWWidget::UnRegister(vtkObject *o)
+void vtkKWWidget::UnRegister(vtkObjectBase *o)
 {
   if (!this->DeletingChildren)
     {
@@ -308,7 +308,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.31 $");
+  this->ExtractRevision(os,"$Revision: 1.32 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()

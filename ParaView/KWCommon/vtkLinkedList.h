@@ -58,7 +58,7 @@ public:
   typedef vtkAbstractList<DType> Superclass;
   typedef vtkLinkedListIterator<DType> IteratorType;
 
-  static vtkLinkedList<DType> *New() { return new vtkLinkedList<DType>(); }  
+  static vtkLinkedList<DType> *New();
   virtual const char* GetClassName() const { return "vtkLinkedList"; }
 
   // Description:

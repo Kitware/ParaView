@@ -99,8 +99,7 @@ public:
   int GoToLastItem();
 
 protected:
-  static vtkLinkedListIterator<DType> *New() 
-    { return new vtkLinkedListIterator<DType>(); }  
+  static vtkLinkedListIterator<DType> *New();
 
   vtkLinkedListIterator() {
     this->Pointer = 0; 

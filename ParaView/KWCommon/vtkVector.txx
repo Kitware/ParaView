@@ -24,6 +24,15 @@
 #include "vtkAbstractList.txx"
 #include "vtkVectorIterator.txx"
 
+template <class DType>
+vtkVector<DType> *vtkVector<DType>::New()
+{ 
+#ifdef VTK_DEBUG_LEAKS
+  vtkDebugLeaks::ConstructClass("vtkVector");
+#endif
+  return new vtkVector<DType>(); 
+}
+
 // Description:
 // Append an Item to the end of the vector
 template <class DType>

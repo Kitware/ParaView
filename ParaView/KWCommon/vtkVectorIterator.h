@@ -98,8 +98,7 @@ public:
   int GoToLastItem();
 
 protected:
-  static vtkVectorIterator<DType> *New() 
-    { return new vtkVectorIterator<DType>(); }  
+  static vtkVectorIterator<DType> *New(); 
 
   vtkVectorIterator() {
     this->Index = 0; 

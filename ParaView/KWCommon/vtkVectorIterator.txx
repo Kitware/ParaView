@@ -25,6 +25,15 @@
 #include "vtkAbstractIterator.txx"
 #include "vtkVector.h"
 
+template <class DType>
+vtkVectorIterator<DType> *vtkVectorIterator<DType>::New()
+{ 
+#ifdef VTK_DEBUG_LEAKS
+  vtkDebugLeaks::ConstructClass("vtkVectorIterator");
+#endif
+  return new vtkVectorIterator<DType>(); 
+}
+
 template<class DType>
 void vtkVectorIterator<DType>::InitTraversal()
 {
