@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.237");
+vtkCxxRevisionMacro(vtkPVApplication, "1.238");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1388,6 +1388,9 @@ void vtkPVApplication::Start(int argc, char*argv[])
   for ( cc = 0; cc < open_files.size(); cc ++ )
     {
     this->RunningParaViewScript = 1;
+    // Some scripts were hanging due to event loop issues.
+    // This update prevents such problems.
+    this->Script("update");
     ui->LoadScript(open_files[cc].c_str());
     this->RunningParaViewScript = 0;
     }
