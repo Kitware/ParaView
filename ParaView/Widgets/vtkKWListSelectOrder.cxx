@@ -20,13 +20,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWFrame.h"
+#include "vtkKWEvent.h"
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListSelectOrder );
-vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.7");
+vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWListSelectOrder::vtkKWListSelectOrder()
@@ -162,6 +163,7 @@ void vtkKWListSelectOrder::AddElement(vtkKWListBox* l1, vtkKWListBox* l2,
     l1->AppendUnique(element);
     }
   this->Modified();
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -248,6 +250,7 @@ void vtkKWListSelectOrder::ShiftItems(vtkKWListBox* l1, int down)
     }
   delete [] selection;
   this->Modified();
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -308,6 +311,7 @@ void vtkKWListSelectOrder::MoveList(vtkKWListBox* l1, vtkKWListBox* l2,
   delete [] selection;
   
   this->Modified();
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -363,6 +367,7 @@ void vtkKWListSelectOrder::RemoveItemsFromSourceList()
 {
   this->SourceList->DeleteAll();
   this->Modified();
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent, 0);
   this->DisplayEllipsis();
 }
 
@@ -371,6 +376,7 @@ void vtkKWListSelectOrder::RemoveItemsFromFinalList()
 {
   this->FinalList->DeleteAll();
   this->Modified();
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent, 0);
 }
 
 //----------------------------------------------------------------------------

@@ -37,6 +37,7 @@
 #include "vtkCommand.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWLabeledFrame.h"
+#include "vtkKWEvent.h"
 
 #define MAX_FILES_ON_THE_LIST 100
 
@@ -70,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.77");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.78");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -265,7 +266,8 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
   this->Script("pack %s -fill both -expand 1", this->FileListSelect->GetWidgetName());
   this->Script("pack %s -fill x", this->FileListPopup->GetWidgetName());
 
-  this->ListObserverTag = this->FileListSelect->AddObserver(vtkCommand::ModifiedEvent, 
+  this->ListObserverTag = this->FileListSelect->AddObserver(
+    vtkKWEvent::WidgetModifiedEvent, 
     this->Observer);
   frame->Delete();
 
