@@ -336,31 +336,18 @@ vtkPVRenderView::vtkPVRenderView()
   
   this->Interactive = 0;
   
-#ifdef WIN32
-  vtkWin32OpenGLRenderWindow *renderWindow;
-  vtkRenderer *renderer;
+  this->RenderWindow = vtkRenderWindow::New();
+  this->RenderWindow->SetDesiredUpdateRate(1.0);
+  this->Renderer = vtkRenderer::New();
+  this->RenderWindow->AddRenderer(this->Renderer);  
 
-  renderWindow = vtkWin32OpenGLRenderWindow::New();
-  // Win32 have SetupmemoryRendering.
-  // We are not going to run this app on win32 in parallel.
-  //renderWindow->SetOffScreenRendering(1);
-  renderer = vtkRenderer::New();
-  renderWindow->AddRenderer(renderer);
-
-  this->RenderWindowHack = renderWindow;
-  this->RendererHack = renderer;
-#else
   vtkMesaRenderWindow *mesaRenderWindow;
   vtkMesaRenderer *mesaRenderer;
-
+  
   mesaRenderWindow = vtkMesaRenderWindow::New();
   mesaRenderWindow->SetOffScreenRendering(1);
   mesaRenderer = vtkMesaRenderer::New();
   mesaRenderWindow->AddRenderer(mesaRenderer);
-
-  this->RenderWindowHack = mesaRenderWindow;
-  this->RendererHack = mesaRenderer;
-#endif 
 }
 
 //----------------------------------------------------------------------------
@@ -369,11 +356,6 @@ vtkPVRenderView::~vtkPVRenderView()
   this->Interactor->Delete();
   this->Interactor = NULL;
   this->SetInteractorStyle(NULL);
-  
-  this->RenderWindowHack->Delete();
-  this->RenderWindowHack = NULL;
-  this->RendererHack->Delete();
-  this->RendererHack = NULL;    
 }
 
 //----------------------------------------------------------------------------
@@ -382,9 +364,50 @@ void vtkPVRenderView::Clone(vtkPVApplication *pvApp)
   this->Application = pvApp;
   // Clone this object on every other process.
   pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
-  
+  pvApp->BroadcastScript("%s OffScreenRenderingOn", this->GetTclName());
+    
   // Create wants to set the application in the KW superclasses.
   this->Application = NULL;
+}
+
+//----------------------------------------------------------------------------
+// Should use superclass offscreen rendering stuf ?
+void vtkPVRenderView::OffScreenRenderingOn()
+{
+#ifndef WIN32  
+  this->Renderer->Delete();
+  this->Renderer = NULL;
+  this->RenderWindow->Delete();
+  this->RenderWindow = NULL;
+  
+  cerr << "Offscreen on" << endl;
+  
+  
+  vtkMesaRenderWindow *mesaRenderWindow;
+  vtkMesaRenderer *mesaRenderer;
+  
+  mesaRenderWindow = vtkMesaRenderWindow::New();
+  mesaRenderWindow->SetOffScreenRendering(1);
+  mesaRenderer = vtkMesaRenderer::New();
+  mesaRenderWindow->AddRenderer(mesaRenderer);
+  
+  this->RenderWindow = mesaRenderWindow;
+  this->Renderer = mesaRenderer;    
+#endif
+}
+  
+
+
+//----------------------------------------------------------------------------
+vtkRenderer *vtkPVRenderView::GetRenderer()
+{
+  return this->Renderer;
+}
+
+//----------------------------------------------------------------------------
+vtkRenderWindow *vtkPVRenderView::GetRenderWindow()
+{
+  return this->RenderWindow;
 }
 
 //----------------------------------------------------------------------------
@@ -424,7 +447,7 @@ void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
+void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 {
   char *local;
   const char *wname;
@@ -436,27 +459,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
     vtkErrorMacro("RenderView already created");
     return;
     }
-  
-#ifndef WIN32  
-  if (app->GetWidgetVisibility() == 0)
-    {
-    this->Renderer->Delete();
-    this->Renderer = NULL;
-    this->RenderWindow->Delete();
-    this->RenderWindow = NULL;
-    
-    vtkMesaRenderWindow *mesaRenderWindow;
-    vtkMesaRenderer *mesaRenderer;
-
-    mesaRenderWindow = vtkMesaRenderWindow::New();
-    mesaRenderWindow->SetOffScreenRendering(1);
-    mesaRenderer = vtkMesaRenderer::New();
-    mesaRenderWindow->AddRenderer(mesaRenderer);
-    
-    this->RenderWindow = mesaRenderWindow;
-    this->Renderer = mesaRenderer;    
-    }
-#endif
   
   // must set the application
   if (this->Application)
@@ -532,7 +534,7 @@ void vtkPVRenderView::Exposed()
 
 void vtkPVRenderView::Update()
 {
-  vtkActorCollection *ac = this->RendererHack->GetActors();
+  vtkActorCollection *ac = this->Renderer->GetActors();
   ac->InitTraversal();
   vtkActor *a;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -731,7 +733,7 @@ void vtkPVRenderView::TransmitBounds()
   pvApp = (vtkPVApplication*)(this->Application);
   controller = pvApp->GetController();
   
-  this->RendererHack->ComputeVisiblePropBounds(bounds);
+  this->Renderer->ComputeVisiblePropBounds(bounds);
 
   // Makes an assumption about how the tasks are setup (UI id is 0).
   controller->Send(bounds, 6, 0, 112);  
@@ -776,7 +778,7 @@ void vtkPVRenderView::AddCompositeHack(vtkKWComposite *c)
 {
   if (c->GetProp() != NULL)
     {
-    this->RendererHack->AddProp(c->GetProp());
+    this->Renderer->AddProp(c->GetProp());
     }
 }
 
@@ -809,8 +811,8 @@ void vtkPVRenderView::RenderHack()
   controller = pvApp->GetController();
   myId = controller->GetLocalProcessId();
   numProcs = controller->GetNumberOfProcesses();
-  ren = this->RendererHack;
-  renWin = this->RenderWindowHack;
+  ren = this->Renderer;
+  renWin = this->RenderWindow;
   
   // Makes an assumption about how the tasks are setup (UI id is 0).
   // Receive the camera information.
@@ -857,4 +859,9 @@ void vtkPVRenderView::RenderHack()
     controller->Send((char*)pdata, length, 0, 99);
     }
 }
+
+
+
+
+
 

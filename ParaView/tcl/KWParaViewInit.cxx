@@ -5,6 +5,9 @@ ClientData vtkColorByProcessNewCommand();
 int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkDummyRenderWindowInteractorNewCommand();
+int vtkGetRemoteGhostCellsCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkGetRemoteGhostCellsNewCommand();
 int vtkImageOutlineFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkImageOutlineFilterNewCommand();
@@ -29,6 +32,9 @@ ClientData vtkInteractorStyleSphereNewCommand();
 int vtkKWRenderViewCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWRenderViewNewCommand();
+int vtkParallelDecimateCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkParallelDecimateNewCommand();
 int vtkPVActorCompositeCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVActorCompositeNewCommand();
@@ -47,6 +53,9 @@ ClientData vtkPVConeSourceNewCommand();
 int vtkPVContourFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVContourFilterNewCommand();
+int vtkPVCutterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVCutterNewCommand();
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataNewCommand();
@@ -59,6 +68,9 @@ ClientData vtkPVElevationFilterNewCommand();
 int vtkPVExtentTranslatorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVExtentTranslatorNewCommand();
+int vtkPVGetRemoteGhostCellsCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVGetRemoteGhostCellsNewCommand();
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVGlyph3DNewCommand();
@@ -83,9 +95,15 @@ ClientData vtkPVImageSourceNewCommand();
 int vtkPVMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVMenuButtonNewCommand();
+int vtkPVParallelDecimateCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVParallelDecimateNewCommand();
 int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVPolyDataNewCommand();
+int vtkPVPolyDataNormalsCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVPolyDataNormalsNewCommand();
 int vtkPVPolyDataSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVPolyDataSourceNewCommand();
@@ -107,6 +125,9 @@ ClientData vtkPVSourceListNewCommand();
 int vtkPVSphereSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSphereSourceNewCommand();
+int vtkPVTubeFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVTubeFilterNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
@@ -142,6 +163,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkColorByProcessCommand);
   vtkTclCreateNew(interp,"vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
                   vtkDummyRenderWindowInteractorCommand);
+  vtkTclCreateNew(interp,"vtkGetRemoteGhostCells", vtkGetRemoteGhostCellsNewCommand,
+                  vtkGetRemoteGhostCellsCommand);
   vtkTclCreateNew(interp,"vtkImageOutlineFilter", vtkImageOutlineFilterNewCommand,
                   vtkImageOutlineFilterCommand);
   vtkTclCreateNew(interp,"vtkInteractorStyleCamera", vtkInteractorStyleCameraNewCommand,
@@ -158,6 +181,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkInteractorStyleSphereCommand);
   vtkTclCreateNew(interp,"vtkKWRenderView", vtkKWRenderViewNewCommand,
                   vtkKWRenderViewCommand);
+  vtkTclCreateNew(interp,"vtkParallelDecimate", vtkParallelDecimateNewCommand,
+                  vtkParallelDecimateCommand);
   vtkTclCreateNew(interp,"vtkPVActorComposite", vtkPVActorCompositeNewCommand,
                   vtkPVActorCompositeCommand);
   vtkTclCreateNew(interp,"vtkPVApplication", vtkPVApplicationNewCommand,
@@ -170,6 +195,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVConeSourceCommand);
   vtkTclCreateNew(interp,"vtkPVContourFilter", vtkPVContourFilterNewCommand,
                   vtkPVContourFilterCommand);
+  vtkTclCreateNew(interp,"vtkPVCutter", vtkPVCutterNewCommand,
+                  vtkPVCutterCommand);
   vtkTclCreateNew(interp,"vtkPVData", vtkPVDataNewCommand,
                   vtkPVDataCommand);
   vtkTclCreateNew(interp,"vtkPVDataSetToDataSetFilter", vtkPVDataSetToDataSetFilterNewCommand,
@@ -178,6 +205,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVElevationFilterCommand);
   vtkTclCreateNew(interp,"vtkPVExtentTranslator", vtkPVExtentTranslatorNewCommand,
                   vtkPVExtentTranslatorCommand);
+  vtkTclCreateNew(interp,"vtkPVGetRemoteGhostCells", vtkPVGetRemoteGhostCellsNewCommand,
+                  vtkPVGetRemoteGhostCellsCommand);
   vtkTclCreateNew(interp,"vtkPVGlyph3D", vtkPVGlyph3DNewCommand,
                   vtkPVGlyph3DCommand);
   vtkTclCreateNew(interp,"vtkPVImage", vtkPVImageNewCommand,
@@ -194,8 +223,12 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVImageSourceCommand);
   vtkTclCreateNew(interp,"vtkPVMenuButton", vtkPVMenuButtonNewCommand,
                   vtkPVMenuButtonCommand);
+  vtkTclCreateNew(interp,"vtkPVParallelDecimate", vtkPVParallelDecimateNewCommand,
+                  vtkPVParallelDecimateCommand);
   vtkTclCreateNew(interp,"vtkPVPolyData", vtkPVPolyDataNewCommand,
                   vtkPVPolyDataCommand);
+  vtkTclCreateNew(interp,"vtkPVPolyDataNormals", vtkPVPolyDataNormalsNewCommand,
+                  vtkPVPolyDataNormalsCommand);
   vtkTclCreateNew(interp,"vtkPVPolyDataSource", vtkPVPolyDataSourceNewCommand,
                   vtkPVPolyDataSourceCommand);
   vtkTclCreateNew(interp,"vtkPVPolyDataToPolyDataFilter", vtkPVPolyDataToPolyDataFilterNewCommand,
@@ -210,6 +243,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVSourceListCommand);
   vtkTclCreateNew(interp,"vtkPVSphereSource", vtkPVSphereSourceNewCommand,
                   vtkPVSphereSourceCommand);
+  vtkTclCreateNew(interp,"vtkPVTubeFilter", vtkPVTubeFilterNewCommand,
+                  vtkPVTubeFilterCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
   return TCL_OK;

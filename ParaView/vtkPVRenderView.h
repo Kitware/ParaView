@@ -63,7 +63,7 @@ public:
   
   // Description:
   // Create the TK widgets associated with the view.
-  void Create(vtkKWApplication *app, char *args);
+  void Create(vtkKWApplication *app, const char *args);
 
   // Description:
   // This is a parallel version of the superclasses method.
@@ -145,6 +145,13 @@ public:
   // Are we currently in interactive mode?
   int IsInteractive() { return this->Interactive; }
   
+  // Description:
+  // My version.
+  vtkRenderer *GetRenderer();
+  vtkRenderWindow *GetRenderWindow();
+
+  void OffScreenRenderingOn();
+  
 protected:
 
   vtkPVRenderView();
@@ -157,14 +164,13 @@ protected:
 
   int Interactive;
   
-  // For satellite renderers (from the old render slave).
-  // I cannot get the RenderView working with the superclass render window.
-  vtkRenderWindow *RenderWindowHack;
-  vtkRenderer *RendererHack;
+  //vtkRenderWindow *RenderWindow;
+  //vtkRenderer *Renderer;
 };
 
 
 #endif
+
 
 
 
