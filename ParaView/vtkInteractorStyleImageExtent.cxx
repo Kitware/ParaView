@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h" 
 #include "vtkCellPicker.h"
 #include "vtkSphereSource.h"
+#include "vtkCommand.h"
 
 //----------------------------------------------------------------------------
 vtkInteractorStyleImageExtent *vtkInteractorStyleImageExtent::New() 
