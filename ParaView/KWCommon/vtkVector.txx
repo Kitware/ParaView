@@ -84,7 +84,7 @@ int vtkVector<DType>::AppendItem(DType a)
     }
   
   this->Array[this->NumberOfItems] 
-    = static_cast<DType>( vtkContainerCreateMethod(a) );
+    = static_cast<DType>( ::vtkContainerCreateMethod(a) );
   
   this->NumberOfItems++;
   return VTK_OK;
@@ -147,7 +147,7 @@ int vtkVector<DType>::InsertItem(vtkIdType loc, DType a)
       }
     }
   this->Array[loc] 
-    = static_cast<DType>( vtkContainerCreateMethod(a) );
+    = static_cast<DType>( ::vtkContainerCreateMethod(a) );
   this->NumberOfItems++;
   return VTK_OK;
 }
@@ -177,9 +177,9 @@ int vtkVector<DType>::SetItem(vtkIdType loc, DType a)
 template <class DType>
 void vtkVector<DType>::SetItemNoCheck(vtkIdType loc, DType a)
 {
-  vtkContainerDeleteMethod(this->Array[loc]);
+  ::vtkContainerDeleteMethod(this->Array[loc]);
   this->Array[loc] 
-    = static_cast<DType>( vtkContainerCreateMethod(a) );
+    = static_cast<DType>( ::vtkContainerCreateMethod(a) );
 }
 
 // Description:
@@ -222,7 +222,7 @@ int vtkVector<DType>::RemoveItem(vtkIdType id)
       this->Array[i] = this->Array[i+1];
       }
     }
-  vtkContainerDeleteMethod(dt);
+  ::vtkContainerDeleteMethod(dt);
   return VTK_OK;
 }
   
@@ -257,7 +257,7 @@ int vtkVector<DType>::FindItem(DType a, vtkIdType &res)
   vtkIdType i;
   for (i = 0; i < this->NumberOfItems; ++i)
     {
-    if (vtkContainerCompareMethod(this->Array[i], a) == 0 )
+    if (::vtkContainerCompareMethod(this->Array[i], a) == 0 )
       {
       res = i;
       return VTK_OK;
@@ -275,7 +275,7 @@ int vtkVector<DType>::IsItemPresent(DType a)
   vtkIdType i;
   for (i = 0; i < this->NumberOfItems; ++i)
     {
-    if (vtkContainerCompareMethod(this->Array[i], a) == 0 )
+    if (::vtkContainerCompareMethod(this->Array[i], a) == 0 )
       {
       return 1;
       }
@@ -315,7 +315,7 @@ void vtkVector<DType>::RemoveAllItems()
     vtkIdType cc;
     for ( cc = 0; cc < this->NumberOfItems; cc ++ )
       {
-      vtkContainerDeleteMethod(this->Array[cc]);
+      ::vtkContainerDeleteMethod(this->Array[cc]);
       }
     delete [] this->Array;
     }
@@ -331,7 +331,7 @@ vtkVector<DType>::~vtkVector()
     vtkIdType cc;
     for ( cc = 0; cc < this->NumberOfItems; cc ++ )
       {
-      vtkContainerDeleteMethod(this->Array[cc]);
+      ::vtkContainerDeleteMethod(this->Array[cc]);
       }
     delete [] this->Array;
     }
