@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.40");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.40.2.1");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -246,7 +246,7 @@ void vtkPVArraySelection::SetLocalSelectionsFromReader()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::Reset()
+void vtkPVArraySelection::ResetInternal()
 {
   vtkKWCheckButton* checkButton;
   
@@ -320,19 +320,16 @@ void vtkPVArraySelection::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::Accept()
+void vtkPVArraySelection::AcceptInternal(vtkClientServerID id)
 {
+  this->Superclass::AcceptInternal(id);
+
   // Create new check buttons.
   if (!this->VTKReaderID.ID)
     {
     vtkErrorMacro("VTKReader has not been set.");
     }
 
-  if (this->ModifiedFlag == 0)
-    {
-    return;
-    }
-  
   this->SetLocalSelectionsFromReader();
   this->SetReaderSelectionsFromWidgets();
 }
@@ -370,8 +367,6 @@ void vtkPVArraySelection::SetReaderSelectionsFromWidgets()
                       << setArrayStatus.c_str()
                       << check->GetText() << check->GetState()
                       << vtkClientServerStream::End;
-      this->AddTraceEntry("$kw(%s) SetArrayStatus {%s} %d", this->GetTclName(),
-                          check->GetText(), check->GetState());
       }
     }
   it->Delete();

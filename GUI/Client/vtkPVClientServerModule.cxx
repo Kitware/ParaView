@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.71.2.3");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.71.2.4");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -288,7 +288,8 @@ void vtkPVClientServerModule::Initialize()
       {
       pvApp->Exit();
       }
-
+    cout << "Exit Client\n";
+    cout.flush();
     // Exiting:  CLean up.
     this->ReturnValue = pvApp->GetExitStatus();
     }
@@ -308,6 +309,17 @@ void vtkPVClientServerModule::Initialize()
     
     this->Controller->CreateOutputWindow();
     this->SocketController->ProcessRMIs();
+    if(this->RenderServerMode)
+      {
+      cout << "Exit Render Server.\n";
+      cout.flush();
+      }
+    else
+      {
+      cout << "Exit Data Server.\n";
+      cout.flush();
+      }
+      
     
     // Exiting.  Relay the break RMI to otehr processes.
     for (id = 1; id < numProcs; ++id)
@@ -547,6 +559,15 @@ void vtkPVClientServerModule::ConnectToRemote()
 void vtkPVClientServerModule::SetupWaitForConnection()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  this->SocketController = vtkSocketController::New();
+  this->SocketController->Initialize();
+  vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
+  
+  int port= pvApp->GetPort();
+  if(this->RenderServerMode)
+    {
+    port = pvApp->GetRenderServerPort();
+    }
   if ( this->ClientMode )
     {
     cout << "Waiting for server..." << endl;
@@ -559,15 +580,7 @@ void vtkPVClientServerModule::SetupWaitForConnection()
       }
     cout << "Waiting for client..." << endl;
     }
-  this->SocketController = vtkSocketController::New();
-  this->SocketController->Initialize();
-  vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
   
-  int port= pvApp->GetPort();
-  if(this->RenderServerMode)
-    {
-    port = pvApp->GetRenderServerPort();
-    }
   // Establish connection
   if (!comm->WaitForConnection(port))
     {
@@ -1234,6 +1247,11 @@ void vtkPVClientServerModule::SendLastClientServerResult()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToRenderServerInternal()
 {
+  if (this->ClientServerStream->GetNumberOfMessages() < 1)
+    {
+    return;
+    }
+
   if(!this->RenderServerMode)
     {
     this->SendStreamToServerInternal();
@@ -1249,6 +1267,11 @@ void vtkPVClientServerModule::SendStreamToRenderServerInternal()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToRenderServerRootInternal()
 {
+  if (this->ClientServerStream->GetNumberOfMessages() < 1)
+    {
+    return;
+    }
+
   if(!this->RenderServerMode)
     {
     this->SendStreamToServerRootInternal();
@@ -1264,6 +1287,10 @@ void vtkPVClientServerModule::SendStreamToRenderServerRootInternal()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToServerInternal()
 {
+  if (this->ClientServerStream->GetNumberOfMessages() < 1)
+    {
+    return;
+    }
   const unsigned char* data;
   size_t len;
   this->ClientServerStream->GetData(&data, &len);
@@ -1274,6 +1301,11 @@ void vtkPVClientServerModule::SendStreamToServerInternal()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToServerRootInternal()
 {
+  if (this->ClientServerStream->GetNumberOfMessages() < 1)
+    {
+    return;
+    }
+
   const unsigned char* data;
   size_t len;
   this->ClientServerStream->GetData(&data, &len);
