@@ -25,7 +25,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.10");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.11");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -71,7 +71,7 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
   if ( pvs )
     {
     double bounds[6];
-    double center[3];
+    double center[4];
     double dpoint1[3];
     double startpoint[4];
     double endpoint[4];
@@ -85,6 +85,7 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
       {
       center[cc] = (bounds[cc *2] + bounds[cc *2 + 1])/2;
       }
+    center[3] = 1;
 
     // Convert the center of bounds to display coordinate
     ren->SetWorldPoint(center);
