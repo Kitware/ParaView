@@ -1,3 +1,4 @@
+INCLUDE_REGULAR_EXPRESSION("^(vtk|kw).*$")
 SOURCE_FILES( KWWidgets_SRCS
 kwinit
 vtkKWLoadSaveDialog
