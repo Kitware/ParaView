@@ -250,6 +250,14 @@ SOURCE=.\vtkKWTextTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWToolbar.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWToolbarTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWView.cxx
 # End Source File
 # Begin Source File
@@ -815,6 +823,26 @@ SOURCE=.\vtkKWText.h
 # Begin Custom Build
 InputPath=.\vtkKWText.h
 InputName=vtkKWText
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWToolbar.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWToolbar.h
+InputName=vtkKWToolbar
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
