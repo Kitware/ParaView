@@ -70,10 +70,8 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->CancelFrame = vtkKWWidget::New();
   this->CancelFrame->SetParent(this->ButtonFrame);  
   this->OKButton = vtkKWWidget::New();
-  //this->OKButton->SetParent(this->ButtonFrame);
   this->OKButton->SetParent(this->OKFrame);
   this->CancelButton = vtkKWWidget::New();
-  //this->CancelButton->SetParent(this->ButtonFrame);
   this->CancelButton->SetParent(this->CancelFrame);
   this->Style = vtkKWMessageDialog::Message;
   this->Icon = vtkKWImageLabel::New();
@@ -189,10 +187,6 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 void vtkKWMessageDialog::SetText(const char *txt)
 {
   this->Label->SetLabel(txt);
-  /*
-  this->Script("%s configure -text {%s}",
-               this->Label->GetWidgetName(),txt);
-  */
 }
 
 int vtkKWMessageDialog::Invoke()
@@ -207,8 +201,8 @@ int vtkKWMessageDialog::Invoke()
     } 
   if ( this->GetDefault() != vtkKWMessageDialog::NoneDefault )
     {
-    this->SetBindAll("<Right>", "focus [ tk_focusNext %W ]");
-    this->SetBindAll("<Left>", "focus [ tk_focusPrev %W ]");
+    this->SetBind("<Right>", "focus [ tk_focusNext %W ]");
+    this->SetBind("<Left>", "focus [ tk_focusPrev %W ]");
     }
   
   if ( this->GetMasterWindow() )
@@ -259,7 +253,6 @@ void vtkKWMessageDialog::SetIcon( int ico )
 	       this->Icon->GetWidgetName());
   this->Script("pack %s -pady 17 -side left -fill y", 
 	       this->Icon->GetWidgetName());
-  //this->Script("bind %s <Button-1> { puts hi}", this->Icon->GetWidgetName());
 }
 
 void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,
