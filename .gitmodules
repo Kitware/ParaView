@@ -4,6 +4,9 @@
 [submodule "TclTk-8-2-3"]
 	path = TclTk8.2.3Win
 	url = git://paraview.org/ParaViewTclTk.git
+[submodule "TclTk-8-3-2"]
+	path = TclTk8.3.2Win
+	url = git://paraview.org/ParaViewTclTk.git
 [submodule "VTK"]
 	path = VTK
 	url = git://vtk.org/VTK.git
