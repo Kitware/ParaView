@@ -100,7 +100,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.152");
+vtkCxxRevisionMacro(vtkPVApplication, "1.153");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -522,7 +522,7 @@ int vtkPVApplication::CheckForArgument(int argc, char* argv[],
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
 { "--start-empty" , "-e", 
   "Start ParaView without any default modules.", 
-  "--disable-registry", "-g", 
+  "--disable-registry", "-dr", 
   "Do not use registry when running ParaView (for testing).", 
   "--use-rendering-group", "-p",
   "Use a subset of processes to render.",
@@ -708,7 +708,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-registry",
                                           index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-d",
+       vtkPVApplication::CheckForArgument(argc, argv, "-dr",
                                           index) == VTK_OK )
     {
     this->RegisteryLevel = 0;
