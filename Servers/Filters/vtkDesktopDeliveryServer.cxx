@@ -41,7 +41,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.12");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.13");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -344,7 +344,17 @@ void vtkDesktopDeliveryServer::ReadReducedImage()
     if (   (this->ReducedImageSize[0] != size[0])
         || (this->ReducedImageSize[1] != size[1]) )
       {
-      vtkWarningMacro("Coupled parallel render manager reports unexpected reduced image size");
+      vtkDebugMacro(<< "Coupled parallel render manager reports unexpected reduced image size\n"
+                      << "Expected size: " << this->ReducedImageSize[0] << " "
+                      << this->ReducedImageSize[1] << "\n"
+                      << "Reported size: " << size[0] << " " << size[1]);
+      if (   (this->ReducedImageSize[0] == this->FullImageSize[0])
+          && (this->ReducedImageSize[1] == this->FullImageSize[1]) )
+        {
+        vtkWarningMacro(<< "The coupled render manager has apparently resized the window.\n"
+                        << "Operation will still work normally, but the client may waste many cycles\n"
+                        << "resizing the resulting window.");
+        }
       this->ReducedImageSize[0] = size[0];
       this->ReducedImageSize[1] = size[1];
       }
