@@ -119,7 +119,7 @@ IF(USE_INCLUDED_TCLTK)
     ELSE (CMAKE_CONFIGURATION_TYPES)
       SET (CONFIG_TYPES .)
     ENDIF (CMAKE_CONFIGURATION_TYPES)
-    FOREACH (config "${CONFIG_TYPES}")
+    FOREACH (config ${CONFIG_TYPES})
       CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
                      ${ParaViewComplete_BINARY_DIR}/bin/${config}/tcl84.dll 
                      COPYONLY)
