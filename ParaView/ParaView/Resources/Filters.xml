@@ -93,7 +93,7 @@
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
   <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this on to remove seams when running in parallel." default_value="1"/>
-  <VectorEntry variable="Tolerance" trace_name="Tolerance" type="float" help="The tolerance in terms of fraction of bounding box length." default_value="0.0"/>
+  <VectorEntry variable="Tolerance" trace_name="Tolerance" type="float" help="The tolerance in terms of fraction of bounding box length." default_value="0.0" data_range="0 1"/>
   <VectorEntry label="Absolute tolerance" variable="AbsoluteTolerance" trace_name="AbsoluteTolerance" type="float" help="The tolerance in absolute terms." default_value="1.0"/>
   <LabeledToggle label="Tolerance is absolute" trace_name="ToleranceIsAbsolute" variable="ToleranceIsAbsolute" help="Turn this on to use the absolute tolerance." default_value="0"/>
   <LabeledToggle label="Convert lines to points" trace_name="ConvertLinesToPoints" variable="ConvertLinesToPoints" help="Turn on/off conversion of degenerate lines to points." default_value="1"/>
@@ -145,9 +145,9 @@
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Reduction target" trace_name="TargetReduction" variable="TargetReduction" type="float" help="Value between 0 and 1. Desired reduction of the total number of triangles." default_value="0.90"/>
+  <VectorEntry label="Reduction target" trace_name="TargetReduction" variable="TargetReduction" type="float" help="Value between 0 and 1. Desired reduction of the total number of triangles." default_value="0.90" data_range="0 1"/>
   <LabeledToggle label="Preserve topology" trace_name="PreserveTopology" variable="PreserveTopology" help="If off, better reduction can occur, but model may break up." default_value="0"/>
-  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists). Topology can be split along feature edges." default_value="15.0"/>
+  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists). Topology can be split along feature edges." default_value="15.0" data_range="0 180"/>
   <LabeledToggle label="Boundary deletable" trace_name="BoundaryVertexDeletion" variable="BoundaryVertexDeletion" help="If off, decimate will not remove points on the boundary." default_value="1"/>
 </Module>
 
@@ -339,7 +339,7 @@ help="Set the name of the array to hold the results of this computation" default
   <LabeledToggle label="Feature edges" trace_name="FeatureEdges" variable="FeatureEdges" help="Turn this off if you do not want to extract feature edges." default_value="1"/>
   <LabeledToggle label="Non-manifold edges" trace_name="NonManifoldEdges" variable="NonManifoldEdges" help="Turn this off if you do not want to extract non-manifold edges." default_value="1"/>
   <LabeledToggle variable="Coloring" trace_name="Coloring" help="Turn this off if you do not want to color the edges by type." default_value="1"/>
-  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists).." default_value="30.0"/>
+  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists).." default_value="30.0" data_range="0 180"/>
 </Module>
 
 <!--
@@ -374,7 +374,7 @@ help="Set the name of the array to hold the results of this computation" default
   <ArrayMenu input_name="Input" attribute_type="Scalars"
              label="Scalars" input_menu="im" number_of_components="1"
              help="Select the input scalars to process."/>
-  <VectorEntry variable="Dimensionality" type="int" help="Pick a value 2 for XY images, 3 for volumes." default_value="2"/>
+  <VectorEntry variable="Dimensionality" type="int" help="Pick a value 2 for XY images, 3 for volumes." default_value="2" data_range="2 3"/>
 </Module>
 
 <Module name="GradientMagnitude" menu_name="Gradient Magnitude" root_name="GradM" module_type="Filter">
@@ -466,7 +466,7 @@ help="Set the name of the array to hold the results of this computation" default
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="Points are duplicated along features over this angle (0->180)" default_value="30.0"/>
+  <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="Points are duplicated along features over this angle (0->180)" default_value="30.0" data_range="0 180"/>
   <LabeledToggle variable="Splitting" trace_name="Splitting" help="Turn on/off the splitting of sharp edges." default_value="1"/>
   <LabeledToggle variable="Consistency" trace_name="Consistency" help="Turn on/off the enforcement of consistent polygon ordering." default_value="1"/>
   <LabeledToggle label="Cell normals" trace_name="ComputeCellNormals" variable="ComputeCellNormals" help="Turn on/off the computation of cell normals." default_value="0"/>
@@ -502,7 +502,7 @@ help="Set the name of the array to hold the results of this computation" default
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Corner factor" trace_name="CornerFactor" variable="CornerFactor" type="float" help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)" default_value="0.2"/>
+  <VectorEntry label="Corner factor" trace_name="CornerFactor" variable="CornerFactor" type="float" help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)" default_value="0.2" data_range="0.001 0.5"/>
 </Module>
 
 <Module name="PartScalars" menu_name="Part Id Scalars" root_name="ColorParts" module_type="Filter" 
@@ -620,7 +620,7 @@ help="Set the name of the array to hold the results of this computation" default
              label="Vectors" input_menu="im" number_of_components="3"
              help="Select the input normals to process."/>
   <VectorEntry variable="Width" trace_name="Width" type="float" help="The half width of the ribbon (or minimum)." default_value="0.5"/>
-  <VectorEntry variable="Angle" trace_name="Angle" type="float" help="The offset angle of the ribbon from the line normal (0->360)." default_value="0.0"/>
+  <VectorEntry variable="Angle" trace_name="Angle" type="float" help="The offset angle of the ribbon from the line normal (0->360)." default_value="0.0" data_range="0 360"/>
   <VectorEntry label="Default normal" trace_name="DefaultNormal" variable="DefaultNormal" type="float" length="3" help="When this option is on, default normals will be calculated if the input contains no normals" default_value="0.0 0.0 1.0"/>
   <LabeledToggle label="Vary width" trace_name="VaryWidth" variable="VaryWidth" help="Turn on/off the variation of ribbon width with scalar value." default_value="0"/>
 </Module>
@@ -648,7 +648,7 @@ help="Set the name of the array to hold the results of this computation" default
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" type="float" help="Set the amount to shrink by" default_value="0.5"/>
+  <VectorEntry label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" type="float" help="Set the amount to shrink by" default_value="0.5" data_range="0 1"/>
 </Module>
 
 <!--
@@ -673,7 +673,7 @@ help="Set the name of the array to hold the results of this computation" default
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
   <VectorEntry label="Num. iterations" trace_name="NumberOfIterations" variable="NumberOfIterations" type="int" help="Number of iterations. More iterations produces better smoothing." default_value="20"/>
-  <VectorEntry variable="Convergence" trace_name="Convergence" type="float" help="Convergence criterion for the iteration process. Smaller numbers result in more smoothing iterations (0->1)." default_value="0.0"/>
+  <VectorEntry variable="Convergence" trace_name="Convergence" type="float" help="Convergence criterion for the iteration process. Smaller numbers result in more smoothing iterations (0->1)." default_value="0.0" data_range="0 1"/>
 </Module>
 
 <Module name="Stripper" menu_name="Triangle Strips" root_name="Strip" module_type="Filter" 
@@ -684,7 +684,7 @@ help="Set the name of the array to hold the results of this computation" default
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
-  <VectorEntry label="Max. length" trace_name="MaximumLength" variable="MaximumLength" type="int" help="Stop stripping after this many triangles." default_value="1000"/>
+  <VectorEntry label="Max. length" trace_name="MaximumLength" variable="MaximumLength" type="int" help="Stop stripping after this many triangles." default_value="1000" data_range="4 100000"/>
 </Module>
 
   <Module name="Subdivide" root_name="Subdivide" 

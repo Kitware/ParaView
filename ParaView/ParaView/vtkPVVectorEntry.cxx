@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.4");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.5");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -599,6 +599,11 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     {
     ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL);
     ai->SetCurrentProperty(this->Property);
+    if (this->UseWidgetRange)
+      {
+      ai->SetTimeStart(this->WidgetRange[0]);
+      ai->SetTimeEnd(this->WidgetRange[1]);
+      }
     ai->Update();
     }
   // What if there are more than one entry?
@@ -643,6 +648,8 @@ void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone,
       pvve->SubLabelTxts->SetString(i, this->SubLabelTxts->GetString(i));
       }
     pvve->SetDefaultValues(this->DefaultValues);
+    pvve->SetUseWidgetRange(this->UseWidgetRange);
+    pvve->SetWidgetRange(this->WidgetRange);
     }
   else 
     {
@@ -754,6 +761,13 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
                &this->DefaultValues[5]);
         break;
       }
+    }
+  
+  const char *range = element->GetAttribute("data_range");
+  if (range)
+    {
+    sscanf(range, "%f %f", &this->WidgetRange[0], &this->WidgetRange[1]);
+    this->UseWidgetRange = 1;
     }
   
   return 1;

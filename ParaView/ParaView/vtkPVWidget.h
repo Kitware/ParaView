@@ -247,6 +247,11 @@ public:
   virtual void SetProperty(vtkPVWidgetProperty *) {}
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
+  vtkSetMacro(UseWidgetRange, int);
+  vtkGetMacro(UseWidgetRange, int);
+  vtkSetVector2Macro(WidgetRange, double);
+  vtkGetVector2Macro(WidgetRange, double);
+  
 protected:
   vtkPVWidget();
   ~vtkPVWidget();
@@ -272,6 +277,8 @@ protected:
   vtkPVSource* PVSource;
 
 
+  int UseWidgetRange;
+  double WidgetRange[2];
 
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,

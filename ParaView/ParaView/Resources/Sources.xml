@@ -18,23 +18,28 @@
   <VectorEntry label="Tip resolution" trace_name="TipResolution"
                variable="TipResolution" type="int"
                help="Set the number of faces on the tip."
-               default_value="6"/>
+               default_value="6"
+               data_range="1 128"/>
   <VectorEntry label="Tip radius" trace_name="TipRadius"
                variable="TipRadius" type="float"
                help="Set the radius of the widest part of the tip."
-               default_value="0.1"/>
+               default_value="0.1"
+               data_range="0 10"/>
   <VectorEntry label="Tip length" trace_name="TipLength"
                variable="TipLength" type="float"
                help="Set the length of the tip (the whole arrow is length 1)"
-               default_value="0.35"/>
+               default_value="0.35"
+               data_range="0 1"/>
   <VectorEntry label="Shaft resolution" trace_name="ShaftResolution"
                variable="ShaftResolution" type="int"
                help="Set the number of faces on shaft"
-               default_value="6"/>
+               default_value="6"
+               data_range="1 128"/>
   <VectorEntry label="Shaft radius" trace_name="ShaftRadius"
                variable="ShaftRadius" type="float"
                help="Set the radius of the shaft"
-               default_value="0.03"/>
+               default_value="0.03"
+               data_range="0 5"/>
 </Module>
 
 <Module name="Axes" root_name="Axes" module_type="Source" 
@@ -60,7 +65,7 @@
         long_help="3D cone of a given radius and height." 
         short_help="Create a 3D cone of a given radius and height">
   <Source class="vtkConeSource"/>
-  <VectorEntry variable="Resolution" trace_name="Resolution" type="int" help="Set the number of faces on this cone" default_value="6"/>
+  <VectorEntry variable="Resolution" trace_name="Resolution" type="int" help="Set the number of faces on this cone" default_value="6" data_range="0 512"/>
   <VectorEntry variable="Radius" trace_name="Radius" type="float" help="Set the radius of the widest part of the cone" default_value="0.5"/>
   <VectorEntry variable="Height" trace_name="Height" type="float" help="Set the height of the cone" default_value="1.0"/>
   <LabeledToggle variable="Capping" trace_name="Capping" help="Set whether to draw the base of the cone" default_value="1"/>
@@ -70,7 +75,7 @@
         long_help="3D cylinder of a given radius and height." 
         short_help="Create a 3D cylinder of a given radius and height">
   <Source class="vtkCylinderSource"/>
-  <VectorEntry variable="Resolution" trace_name="Resolution" type="int" help="The number of facets used to define the cylinder." default_value="6"/>
+  <VectorEntry variable="Resolution" trace_name="Resolution" type="int" help="The number of facets used to define the cylinder." default_value="6" data_range="0 512"/>
   <VectorEntry variable="Height" trace_name="Height" type="float" help="The height of the cylinder (along the y axis)." default_value="1.0"/>
   <VectorEntry variable="Radius" trace_name="Radius" type="float" help="The radius of the cylinder." default_value="0.5"/>
   <VectorEntry variable="Center" trace_name="Center" type="float" length="3" help="Set the center of the cylinder." default_value="0.0 0.0 0.0"/>
@@ -115,12 +120,12 @@
   <Source class="vtkSphereSource"/>
   <VectorEntry variable="Center" trace_name="Center" type="float" length="3" help="Set the coordinates for the center of the sphere." default_value="0.0 0.0 0.0"/>
   <VectorEntry variable="Radius" trace_name="Radius" type="float" help="Set the radius of the sphere" default_value="0.5"/>
-  <VectorEntry label="Theta Resolution" trace_name="Theta Resolution" variable="ThetaResolution" type="int" help="Set the number of points in the longitude direction (ranging from Start Theta to End Theta)" default_value="8"/>
-  <VectorEntry label="Start Theta" trace_name="Start Theta" variable="StartTheta" type="float" help="Set the starting angle in the longitude direction" default_value="0.0"/>
-  <VectorEntry label="End Theta" trace_name="End Theta" variable="EndTheta" type="float" help="Set the ending angle in the longitude direction" default_value="360.0"/>
-  <VectorEntry label="Phi Resolution" trace_name="Phi Resolution" variable="PhiResolution" type="int" help="Set the number of points in the latitude direction (ranging from Start Phi to End Phi)" default_value="8"/>
-  <VectorEntry label="Start Phi" trace_name="Start Phi" variable="StartPhi" type="float" help="Set the starting angle in the latitude direction" default_value="0.0"/>
-  <VectorEntry label="End Phi" trace_name="End Phi" variable="EndPhi" type="float" help="Set the ending angle in the latitude direction" default_value="180.0"/>
+  <VectorEntry label="Theta Resolution" trace_name="Theta Resolution" variable="ThetaResolution" type="int" help="Set the number of points in the longitude direction (ranging from Start Theta to End Theta)" default_value="8" data_range="0 1024"/>
+  <VectorEntry label="Start Theta" trace_name="Start Theta" variable="StartTheta" type="float" help="Set the starting angle in the longitude direction" default_value="0.0" data_range="0 360"/>
+  <VectorEntry label="End Theta" trace_name="End Theta" variable="EndTheta" type="float" help="Set the ending angle in the longitude direction" default_value="360.0" data_range="0 360"/>
+  <VectorEntry label="Phi Resolution" trace_name="Phi Resolution" variable="PhiResolution" type="int" help="Set the number of points in the latitude direction (ranging from Start Phi to End Phi)" default_value="8" data_range="0 1024"/>
+  <VectorEntry label="Start Phi" trace_name="Start Phi" variable="StartPhi" type="float" help="Set the starting angle in the latitude direction" default_value="0.0" data_range="0 360"/>
+  <VectorEntry label="End Phi" trace_name="End Phi" variable="EndPhi" type="float" help="Set the ending angle in the latitude direction" default_value="180.0" data_range="0 360"/>
 </Module>
 
 <Module name="SuperquadricSource" menu_name="Superquadric" root_name="SQuad" module_type="Source" 
@@ -129,9 +134,9 @@
   <Source class="vtkSuperquadricSource"/>
   <VectorEntry variable="Center" trace_name="Center" type="float" length="3" help="Set the center of the superquadric" default_value="0.0 0.0 0.0"/>
   <VectorEntry variable="Scale" trace_name="Scale" type="float" length="3" help="Set the scale of the superquadric" default_value="1.0 1.0 1.0"/>
-  <VectorEntry label="Theta resolution" trace_name="ThetaResolution" variable="ThetaResolution" type="int" help="The number of points in the longitude direction." default_value="16"/>
-  <VectorEntry label="Phi resolution" variable="PhiResolution" trace_name="PhiResolution" type="int" help="The number of points in the latitude direction." default_value="16"/>
-  <VectorEntry variable="Thickness" trace_name="Thickness" type="float" help="Changing thickness maintains the outside diameter of the toroid." default_value="0.3333"/>
+  <VectorEntry label="Theta resolution" trace_name="ThetaResolution" variable="ThetaResolution" type="int" help="The number of points in the longitude direction." default_value="16" data_range="8 1024"/>
+  <VectorEntry label="Phi resolution" variable="PhiResolution" trace_name="PhiResolution" type="int" help="The number of points in the latitude direction." default_value="16" data_range="4 1024"/>
+  <VectorEntry variable="Thickness" trace_name="Thickness" type="float" help="Changing thickness maintains the outside diameter of the toroid." default_value="0.3333" data_range="0.0001 1"/>
   <VectorEntry label="Theta roundness" trace_name="ThetaRoundness" variable="ThetaRoundness" type="float" help="Values range from 0 (rectangular) to 1 (circular) to higher order." default_value="1.0"/>
   <VectorEntry label="Phi roundness" trace_name="PhiRoundness" variable="PhiRoundness" type="float" help="Values range from 0 (rectangular) to 1 (circular) to higher order." default_value="1.0"/>
   <VectorEntry variable="Size" trace_name="Size" type="float" help="Isotropic size" default_value="0.5"/>
