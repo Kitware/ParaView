@@ -57,6 +57,7 @@ class vtkPVCameraManipulator;
 
 //BTX
 template<class KeyType,class DataType> class vtkArrayMap;
+template<class KeyType,class DataType> class vtkArrayMapIterator;
 //ETX
 
 class VTK_EXPORT vtkPVInteractorStyleControl : public vtkKWWidget
@@ -77,6 +78,19 @@ public:
   // Add manipulator to the list of manipulators.
   void AddManipulator(const char*, vtkPVCameraManipulator*);
 
+  // Description:
+  // Update menus after adding manipulators.
+  void UpdateMenus();
+
+  // Description:
+  // Set the specific manipulator for a mouse button and key
+  // combination.
+  int SetManipulator(int pos, const char*);
+  int SetManipulator(int mouse, int key, const char*);
+  vtkPVCameraManipulator* GetManipulator(int pos);
+  vtkPVCameraManipulator* GetManipulator(int mouse, int key);
+  vtkPVCameraManipulator* GetManipulator(const char* name);
+
 protected:
   vtkPVInteractorStyleControl();
   ~vtkPVInteractorStyleControl();
@@ -87,6 +101,7 @@ protected:
 
 //BTX
   typedef vtkArrayMap<const char*,vtkPVCameraManipulator*> ManipulatorMap;
+  typedef vtkArrayMapIterator<const char*,vtkPVCameraManipulator*> ManipulatorMapIterator;
   vtkPVInteractorStyleControl::ManipulatorMap* Manipulators;
 //ETX
 

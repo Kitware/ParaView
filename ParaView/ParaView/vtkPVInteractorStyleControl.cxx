@@ -95,6 +95,86 @@ void vtkPVInteractorStyleControl::AddManipulator(const char* name,
   this->Manipulators->SetItem(name, object);
 }
 
+void vtkPVInteractorStyleControl::UpdateMenus()
+{
+  if ( this->Application )
+    {
+    vtkPVInteractorStyleControl::ManipulatorMapIterator* it 
+      = this->Manipulators->NewIterator();
+    int cc;
+    for ( cc = 0; cc < 9; cc ++ )
+      {
+      this->Menus[cc]->ClearEntries();
+      char command[100];
+      it->InitTraversal();
+      while ( !it->IsDoneWithTraversal() )
+	{
+	const char* name = 0;
+	it->GetKey(name);
+	sprintf(command, "InteractOption %d {%s}", cc, name);
+	this->Menus[cc]->AddEntryWithCommand(name, this, command);
+	it->GoToNextItem();
+	}
+      }
+    it->Delete();
+    }
+}
+
+
+int vtkPVInteractorStyleControl::SetManipulator(int pos, const char* name)
+{
+  if ( pos < 0 || pos > 8 )
+    {
+    vtkErrorMacro("There are only 9 possible menus");
+    return 0;
+    }
+  if ( !this->GetManipulator(name) ) 
+    {
+    vtkErrorMacro("Manipulator: " << name << " does not exist");
+    return 0;
+    }
+  this->Menus[pos]->SetValue(name);
+  return 1;
+}
+
+int vtkPVInteractorStyleControl::SetManipulator(int mouse, int key, const char* name)
+{
+  if ( mouse < 0 || mouse > 2 || key < 0 || key > 2 )
+    {
+    vtkErrorMacro("Setting manipulator to the wrong key or mouse");
+    return 0;
+    }
+  return this->SetManipulator(mouse + key * 3, name);
+}
+
+vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int pos)
+{
+  if ( pos < 0 || pos > 8 )
+    {
+    vtkErrorMacro("There are only 9 possible menus");
+    return 0;
+    }
+  const char* name = this->Menus[pos]->GetValue();
+  return this->GetManipulator(name);
+}
+
+vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int mouse, int key)
+{
+  if ( mouse < 0 || mouse > 2 || key < 0 || key > 2 )
+    {
+    vtkErrorMacro("Getting manipulator from the wrong key or mouse");
+    return 0;
+    }
+  return this->GetManipulator(mouse + key * 3);
+}
+
+vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(const char* name)
+{
+  vtkPVCameraManipulator* manipulator = 0;
+  this->Manipulators->GetItem(name, manipulator);
+  return manipulator;
+}
+
 void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
 {
   // must set the application
@@ -110,35 +190,24 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   this->Script("frame %s -borderwidth 0 -relief flat",wname);
   
   this->Frame->Create(app);
-  this->Frame->SetLabel("Interactor Styles Control");
+  this->Frame->SetLabel("Camera Manipulators Control");
 
   //vtkKWFrame *frame = vtkKWFrame::New();
   //frame->SetParent(this->Frame->GetFrame());
   //frame->Create(app, 0);
   
-  int cc, kk;
+  int cc;
 
   for ( cc = 0; cc < 6; cc ++ )
     {
     this->Labels[cc]->SetParent(this->Frame->GetFrame());
     this->Labels[cc]->Create(app, "");
     }
-  const char types[][10] = {
-    "Fly",
-    "Rotate",
-    "Move"
-  };
-    
+
   for ( cc = 0; cc < 9; cc ++ )
     {
     this->Menus[cc]->SetParent(this->Frame->GetFrame());
     this->Menus[cc]->Create(app, "");
-    char command[100];
-    for ( kk = 0; kk < 3; kk ++ )
-      {
-      sprintf(command, "InteractOption %d %d", cc, kk);
-      this->Menus[cc]->AddEntryWithCommand(types[kk], this, command);
-      }
     }
 
   this->Labels[0]->SetLabel("Left");
@@ -181,6 +250,7 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   //this->Script("pack %s -expand true -fill both", frame->GetWidgetName());
   //frame->Delete();
   this->Script("pack %s -expand true -fill both", this->Frame->GetWidgetName());
+  this->UpdateMenus();
 }
 
 
