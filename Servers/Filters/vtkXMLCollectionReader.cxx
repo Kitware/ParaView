@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.11");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.12");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -282,8 +282,8 @@ int vtkXMLCollectionReader::FillOutputPortInformation(int, vtkInformation *info)
 
 //----------------------------------------------------------------------------
 int vtkXMLCollectionReader::RequestDataObject(
-  vtkInformation *request, 
-  vtkInformationVector **inputVector, 
+  vtkInformation *vtkNotUsed(request), 
+  vtkInformationVector **vtkNotUsed(inputVector), 
   vtkInformationVector *outputVector)
 {
   // need to Parse the file first
