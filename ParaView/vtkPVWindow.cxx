@@ -1303,7 +1303,6 @@ void vtkPVWindow::ReadSourceInterfaces()
 {
   // Add special sources.
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVMethodInterface *mInt;
   vtkPVSourceInterface *sInt;  
 
   // ---- GenericDataSetReader ----.
