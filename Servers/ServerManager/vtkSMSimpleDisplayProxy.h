@@ -112,6 +112,14 @@ protected:
 
   virtual void GatherGeometryInformation();
 
+//BTX
+  // This is the least intrusive way of giving vtkPVComparativeVisManager
+  // access to the MapperProxy. It needs this proxy to extract and cache
+  // the input geometry
+  friend class vtkPVComparativeVisManager;
+  vtkGetObjectMacro(MapperProxy, vtkSMProxy);
+//ETX
+
   vtkSMProxy *GeometryFilterProxy;
   vtkSMProxy *UpdateSuppressorProxy;
   vtkSMProxy *MapperProxy; 
