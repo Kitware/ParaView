@@ -89,6 +89,19 @@ IF(VTK_USE_MPI)
 ENDIF(VTK_USE_MPI)
 
 
+# Some of the following tests require some extra variable (hidden from the user)
+# to be set: these variable are:
+# VTK_MPI_CLIENT_PREFLAGS
+# VTK_MPI_SERVER_PREFLAGS   #typically -nolocal for mpich implementation (so the machinefile will be properly read)
+# VTK_MPI_CLIENT_POSTFLAGS  #typically -tdx=2 -tdy=1 --host=amber5
+# VTK_MPI_SERVER_POSTFLAGS  
+# Then basically the command line is:
+# If this is the client:
+# ${VTK_MPIRUN_EXE} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS} ${VTK_MPI_CLIENT_PREFLAGS} executable --client ${VTK_MPI_POSTFLAGS} ${VTK_MPI_CLIENT_POSTFLAGS}
+# If this is the server:
+# ${VTK_MPIRUN_EXE} ${VTK_MPI_NUMPROC_FLAG} 2 ${VTK_MPI_PREFLAGS} ${VTK_MPI_SERVER_PREFLAGS} executable --server ${VTK_MPI_POSTFLAGS} ${VTK_MPI_SERVER_POSTFLAGS}
+# For more information you can also check for VTK_MPI_PREFLAGS / VTK_MPI_POSTFLAGS in VTK/CMakeLists.txt
+
 # Foreach test add the following:
 # 1. the test (possibly with mpirun)
 # 2. the test with compositing and possibly mpi
