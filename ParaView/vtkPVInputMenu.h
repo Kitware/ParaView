@@ -37,7 +37,7 @@ class VTK_EXPORT vtkPVInputMenu : public vtkKWOptionMenu
 {
 public:
   static vtkPVInputMenu* New();
-  vtkTypeMacro(vtkPVInputMenu, vtkPVInputMenu);
+  vtkTypeMacro(vtkPVInputMenu, vtkKWOptionMenu);
   
   // Description:
   // Set/Get the class type for this input menu
