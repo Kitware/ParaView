@@ -319,7 +319,6 @@ void vtkPVVectorEntry::Accept()
 //---------------------------------------------------------------------------
 void vtkPVVectorEntry::Reset()
 {
-  vtkKWEntry *entry;
   int count = 0;
 
   if ( ! this->ModifiedFlag)
@@ -331,8 +330,8 @@ void vtkPVVectorEntry::Reset()
   for( count = 0; count < this->Entries->GetNumberOfItems(); count ++ )
     {
     this->Script("%s SetEntryValue %d [lindex [%s Get%s] %d]",
-                 this->GetTclName(), count, this->ObjectTclName, this->VariableName, 
-                 count); 
+                 this->GetTclName(), count, this->ObjectTclName, 
+                 this->VariableName, count); 
     }
 
   this->ModifiedFlag = 0;
