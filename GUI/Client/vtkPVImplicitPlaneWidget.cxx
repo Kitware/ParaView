@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.33.2.1");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -344,6 +344,14 @@ void vtkPVImplicitPlaneWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "PlaneID: " << this->PlaneID;
   os << indent << "InputMenu: " << this->GetInputMenu();
+  os << indent << "LastAcceptedNormal: " 
+     << this->LastAcceptedNormal[0] << ","
+     << this->LastAcceptedNormal[1] << ","
+     << this->LastAcceptedNormal[2] << endl;
+  os << indent << "LastAcceptedCenter: " 
+     << this->LastAcceptedCenter[0] << ","
+     << this->LastAcceptedCenter[1] << ","
+     << this->LastAcceptedCenter[2] << endl;
 }
 
 //----------------------------------------------------------------------------

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.53.2.2");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.53.2.3");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -636,6 +636,8 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
                         this->GetTclName(), ai->GetTclName());
     }
   
+  this->Superclass::AnimationMenuCallback(ai);
+
   if (this->Entries->GetNumberOfItems() == 1)
     {
     ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL, this->GetTraceName());

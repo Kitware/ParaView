@@ -241,6 +241,12 @@ public:
   vtkGetMacro(UseWidgetRange, int);
   vtkSetVector2Macro(WidgetRange, double);
   vtkGetVector2Macro(WidgetRange, double);
+
+  // Description:
+  // Default implementation of method called when this widget is
+  // selected as the parameter to be animated. Disabled ResetRangeButton.
+  // Should be chained by subclasses.
+  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry*);
   
 protected:
   vtkPVWidget();

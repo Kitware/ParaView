@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.6.2.1");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.6.2.2");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -215,6 +215,8 @@ void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
                         this->GetTclName(), ai->GetTclName());
     }
   
+  this->Superclass::AnimationMenuCallback(ai);
+
   ai->SetLabelAndScript(this->Label->GetLabel(), NULL, this->GetTraceName());
 
   vtkSMProperty *prop = this->GetSMProperty();

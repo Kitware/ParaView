@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.39.2.1");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.39.2.2");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -464,6 +464,8 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) %d", 
       this->GetTclName(), ai->GetTclName(), mode);
     }
+
+  this->Superclass::AnimationMenuCallback(ai);
 
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMExtentDomain *dom = 0;

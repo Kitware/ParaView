@@ -24,6 +24,7 @@
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWOptionMenu.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWRange.h"
 #include "vtkKWText.h"
 #include "vtkObjectFactory.h"
@@ -76,7 +77,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.40.2.2");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.40.2.3");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -98,6 +99,8 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->MethodMenuButton = vtkKWMenuButton::New();
   this->StartTimeEntry = vtkKWLabeledEntry::New();
   this->EndTimeEntry = vtkKWLabeledEntry::New();
+  this->ResetRangeButton = vtkKWPushButton::New();
+  this->ResetRangeButtonState = 0;
   this->TimeEquationStyleEntry = vtkKWLabeledOptionMenu::New();
   this->TimeEquationPhaseEntry = vtkKWScale::New();
   this->TimeEquationFrequencyEntry = vtkKWThumbWheel::New();
@@ -245,6 +248,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 
   this->StartTimeEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->EndTimeEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
+  this->ResetRangeButton->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->TimeRange->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->DummyFrame->SetParent(this->TimeScriptEntryFrame->GetFrame());
 
@@ -307,6 +311,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 
   this->StartTimeEntry->Create(pvApp, 0);
   this->EndTimeEntry->Create(pvApp, 0);
+  this->ResetRangeButton->Create(pvApp, 0);
   this->TimeRange->Create(pvApp, 0);
   this->ScriptEditor->Create(pvApp, "-height 8");
   this->ScriptEditorScroll->Create(pvApp, "scrollbar", "-orient vertical");
@@ -314,6 +319,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 
   this->StartTimeEntry->SetLabel("Start value");
   this->EndTimeEntry->SetLabel("End value");
+  this->ResetRangeButton->SetLabel("Reset range");
 
   this->SourceMenuButton->SetBalloonHelpString(
     "Select the filter/source which will be modified by the current action.");
@@ -326,6 +332,9 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
     "This is the value of the property at the waveform peak or trough, "
     "depending on whether it is higher or lower than the value given "
     "for a phase of zero.");
+  this->ResetRangeButton->SetBalloonHelpString(
+    "This button resets the start and end values to appropriate "
+    "default values (based on the range of the parameter)");
   this->TimeEquationStyleEntry->SetBalloonHelpString(
     "Choose the waveform of the parameter value over time.\n"
     "Ramp: Interpolate linearly between the start and end value.\n"
@@ -419,6 +428,7 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 
   this->DummyFrame->Delete();
   this->EndTimeEntry->Delete();
+  this->ResetRangeButton->Delete();
   this->TimeEquationStyleEntry->Delete();
   this->TimeEquationPhaseEntry->Delete();
   this->TimeEquationFrequencyEntry->Delete();
@@ -449,6 +459,7 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
                 this->DummyFrame->GetWidgetName(),
                 this->ScriptEditorFrame->GetWidgetName(),
                 this->StartTimeEntry->GetWidgetName(),
+                this->ResetRangeButton->GetWidgetName(),
                 this->EndTimeEntry->GetWidgetName(),
                 this->TimeEquationStyleEntry->GetWidgetName(),
                 this->TimeEquationFrame->GetWidgetName()
@@ -460,6 +471,8 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
                   this->StartTimeEntry->GetWidgetName());
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
                   this->EndTimeEntry->GetWidgetName());
+    pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
+                  this->ResetRangeButton->GetWidgetName());
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
                   this->TimeEquationStyleEntry->GetWidgetName());
     if (this->TimeEquationStyle == 2)
@@ -584,6 +597,7 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
 
   this->StartTimeEntry->EnabledOff();
   this->EndTimeEntry->EnabledOff();
+  this->ResetRangeButton->EnabledOff();
   this->TimeEquationStyleEntry->EnabledOff();
   this->TimeEquationPhaseEntry->EnabledOff();
   this->TimeEquationFrequencyEntry->EnabledOff();
@@ -615,6 +629,10 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
     this->GetMethodMenuButton()->SetButtonText(this->GetCurrentMethod());
     this->StartTimeEntry->EnabledOn();
     this->EndTimeEntry->EnabledOn();
+    if (this->ResetRangeButtonState)
+      {
+      this->ResetRangeButton->EnabledOn();
+      }
     this->TimeEquationStyleEntry->EnabledOn();
     this->TimeEquationPhaseEntry->EnabledOn();
     this->TimeEquationFrequencyEntry->EnabledOn();
@@ -1278,6 +1296,16 @@ void vtkPVAnimationInterfaceEntry::UpdateEnableState()
   this->PropagateEnableState(this->ScriptEditor);
   this->PropagateEnableState(this->ScriptEditorFrame);
   this->PropagateEnableState(this->ScriptEditorScroll);
+
+  if (this->ResetRangeButtonState)
+    {
+    this->PropagateEnableState(this->ResetRangeButton);
+    }
+  else
+    {
+    this->ResetRangeButton->EnabledOff();
+    this->ResetRangeButton->UpdateEnableState();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1327,4 +1355,7 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CustomScript: " << this->CustomScript << endl;
   
   os << indent << "AnimationElement: " << this->AnimationElement << endl;
+
+  os << indent << "ResetRangeButtonState: " << this->ResetRangeButtonState << endl;
+  os << indent << "ResetRangeButton: " << this->ResetRangeButton << endl;
 }

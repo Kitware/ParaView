@@ -71,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.86");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.86.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -839,6 +839,8 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
       this->GetTclName(), ai->GetTclName());
     }
+
+  this->Superclass::AnimationMenuCallback(ai);
 
   ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
   ai->SetCurrentProperty(this->Property);

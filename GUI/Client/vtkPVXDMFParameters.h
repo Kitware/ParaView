@@ -93,6 +93,7 @@ public:
   // This method gets called when the user selects this widget to animate.
   // It sets up the script and animation parameters.
   void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, const char* name);
+  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai) {};
 
 
   //BTX

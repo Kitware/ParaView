@@ -146,7 +146,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.21.2.1");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.21.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -529,6 +529,8 @@ void vtkPVXDMFParameters::AnimationMenuCallback(
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) {%s}", 
       this->GetTclName(), ai->GetTclName(), name);
     }
+
+  this->Superclass::AnimationMenuCallback(ai);
 
   vtkPVXDMFParametersInternals::Parameter *p = 
     this->Internals->GetParameter(name);

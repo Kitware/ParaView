@@ -44,6 +44,11 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // We need to make the callback here so the animation selection
+  // can be traced properly.
+  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
  
 protected:
   vtkPVCutEntry();

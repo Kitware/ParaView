@@ -38,7 +38,7 @@ public:
   // Description:
   // We need to make the callback here so the animation selection
   // can be traced properly.
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
+  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
 
   // Description:
   // Gets called when the reset button is pressed.

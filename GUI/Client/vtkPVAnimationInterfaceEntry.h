@@ -33,6 +33,7 @@ class vtkPVAnimationInterfaceEntryObserver;
 class vtkKWText;
 class vtkPVWidgetProperty;
 class vtkKWLabeledOptionMenu;
+class vtkKWPushButton;
 class vtkKWScale;
 class vtkKWThumbWheel;
 class vtkSMProperty;
@@ -204,6 +205,15 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Widget who support resetting range should set this to true
+  // and bind the right method to ResetRangeButton in their
+  // AnimationMenuCallback.
+  vtkGetMacro(ResetRangeButtonState, int);
+  vtkSetMacro(ResetRangeButtonState, int);
+
+  vtkGetObjectMacro(ResetRangeButton, vtkKWPushButton);
+
 protected:
   vtkPVAnimationInterfaceEntry();
   ~vtkPVAnimationInterfaceEntry();
@@ -233,6 +243,9 @@ protected:
   vtkKWText*         ScriptEditor;
   vtkKWFrame*        ScriptEditorFrame;
   vtkKWWidget*       ScriptEditorScroll;
+
+  vtkKWPushButton*   ResetRangeButton;
+  int ResetRangeButtonState;
 
   vtkKWObject*       SaveStateObject;
   char*              SaveStateScript;

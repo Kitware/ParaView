@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.39.2.1");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.39.2.2");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -413,6 +413,8 @@ void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
                         this->GetTclName(), ai->GetTclName());
     }
   
+  this->Superclass::AnimationMenuCallback(ai);
+
   // I do not under stand why the trace name is used for the
   // menu entry, but Berk must know.
   ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());

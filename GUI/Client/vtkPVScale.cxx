@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.42.2.2");
+vtkCxxRevisionMacro(vtkPVScale, "1.42.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -536,6 +536,8 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
                         this->GetTclName(), ai->GetTclName());
     }
   
+  this->Superclass::AnimationMenuCallback(ai);
+
   ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL, this->GetTraceName());
   
   vtkSMProperty *prop = this->GetSMProperty();

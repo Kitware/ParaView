@@ -122,6 +122,9 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  vtkGetVector3Macro(LastAcceptedCenter, double);
+  vtkGetVector3Macro(LastAcceptedNormal, double);
  
 protected:
   vtkPVImplicitPlaneWidget();
