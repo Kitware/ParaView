@@ -1147,7 +1147,7 @@
         name="MaximumSpeed" 
         command="SetMaximumSpeed" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="1" > 
        <DoubleRangeDomain name="range" min="0"/>
      </DoubleVectorProperty>
    <!-- End BrownianPoints -->
@@ -1948,6 +1948,10 @@
           <DataTypeDomain name="input_type">
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
+          <InputArrayDomain name="input_array1" attribute_type="point"
+                            number_of_components="1" optional="1"/>
+          <InputArrayDomain name="input_array2" attribute_type="point"
+                            number_of_components="3" optional="1"/>
      </InputProperty>
 
      <InputProperty
@@ -1965,7 +1969,8 @@
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list" attribute_type="Scalars">
+           <ArrayListDomain name="array_list" attribute_type="Scalars"
+                            input_domain_name="input_array1">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1976,7 +1981,8 @@
         name="SelectInputVectors" 
         command="SelectInputVectors" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list" attribute_type="Vectors">
+           <ArrayListDomain name="array_list" attribute_type="Vectors"
+                            input_domain_name="input_array2">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1987,7 +1993,7 @@
         name="SetOrient" 
         command="SetOrient" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="1" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -1995,7 +2001,7 @@
         name="SetScaleMode" 
         command="SetScaleMode" 
         number_of_elements="1"
-        default_values="0" >
+        default_values="1" >
        <EnumerationDomain>
          <Entry value="0" text="scalar"/>
          <Entry value="1" text="vector"/>
@@ -2010,6 +2016,23 @@
         number_of_elements="1"
         default_values="1.0" >
        <DoubleRangeDomain name="range"/>
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+       <ArrayRangeDomain name="scalar_range">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="SelectInputScalars" function="ArraySelection"/>
+         </RequiredProperties>
+       </ArrayRangeDomain>
+       <ArrayRangeDomain name="vector_range">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+            <Property name="SelectInputVectors" function="ArraySelection"/>
+         </RequiredProperties>
+       </ArrayRangeDomain>
      </DoubleVectorProperty>
 
      <IntVectorProperty 

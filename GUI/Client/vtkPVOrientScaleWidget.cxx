@@ -15,7 +15,6 @@
 #include "vtkPVOrientScaleWidget.h"
 
 #include "vtkDataSetAttributes.h"
-#include "vtkKWApplication.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -24,18 +23,32 @@
 #include "vtkKWOptionMenu.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVSource.h"
-#include "vtkPVStringAndScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMArrayListDomain.h"
+#include "vtkSMArrayRangeDomain.h"
+#include "vtkSMBoundsDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.18");
 
-vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
+vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
+vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
+vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMOrientModeProperty,
+                     vtkSMProperty);
+vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScaleModeProperty,
+                     vtkSMProperty);
+vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScaleFactorProperty,
+                     vtkSMProperty);
 
 //----------------------------------------------------------------------------
 vtkPVOrientScaleWidget::vtkPVOrientScaleWidget()
@@ -72,21 +85,22 @@ vtkPVOrientScaleWidget::vtkPVOrientScaleWidget()
   this->ScaleFactorLabel->SetParent(this->ScaleFactorFrame);
   this->ScaleFactorEntry = vtkKWEntry::New();
   this->ScaleFactorEntry->SetParent(this->ScaleFactorFrame);
-  this->InputMenu = NULL;
   this->ScalarArrayName = NULL;
   this->VectorArrayName = NULL;
-  this->Property = NULL;
-  this->ScalarsCommand = NULL;
-  this->VectorsCommand = NULL;
-  this->OrientCommand = NULL;
-  this->ScaleModeCommand = NULL;
-  this->ScaleFactorCommand = NULL;
-  this->DefaultOrientMode = 0;
-  this->DefaultScaleMode = 0;
   this->CurrentScalars = 0;
   this->CurrentVectors = 0;
   this->CurrentOrientMode = 0;
   this->CurrentScaleMode = 0;
+  this->SMScalarPropertyName = 0;
+  this->SMVectorPropertyName = 0;
+  this->SMOrientModePropertyName = 0;
+  this->SMScaleModePropertyName = 0;
+  this->SMScaleFactorPropertyName = 0;
+  this->SMScalarProperty = 0;
+  this->SMVectorProperty = 0;
+  this->SMOrientModeProperty = 0;
+  this->SMScaleModeProperty = 0;
+  this->SMScaleFactorProperty = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -124,19 +138,18 @@ vtkPVOrientScaleWidget::~vtkPVOrientScaleWidget()
   this->ScaleFactorLabel = NULL;
   this->ScaleFactorEntry->Delete();
   this->ScaleFactorEntry = NULL;
-  this->SetInputMenu(NULL);
   this->SetScalarArrayName(NULL);
   this->SetVectorArrayName(NULL);
-  this->SetProperty(NULL);
-  this->SetScalarsCommand(NULL);
-  this->SetVectorsCommand(NULL);
-  this->SetOrientCommand(NULL);
-  this->SetScaleModeCommand(NULL);
-  this->SetScaleFactorCommand(NULL);
-  this->SetCurrentScalars(NULL);
-  this->SetCurrentVectors(NULL);
-  this->SetCurrentOrientMode(NULL);
-  this->SetCurrentScaleMode(NULL);
+  this->SetSMScalarPropertyName(NULL);
+  this->SetSMVectorPropertyName(NULL);
+  this->SetSMOrientModePropertyName(NULL);
+  this->SetSMScaleModePropertyName(NULL);
+  this->SetSMScaleFactorPropertyName(NULL);
+  this->SetSMScalarProperty(NULL);
+  this->SetSMVectorProperty(NULL);
+  this->SetSMOrientModeProperty(NULL);
+  this->SetSMScaleModeProperty(NULL);
+  this->SetSMScaleFactorProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -296,8 +309,6 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
 {
   int i, num;
   char methodAndArgs[1024];
-  vtkPVDataSetAttributesInformation *attrInfo;
-  vtkPVArrayInformation *ai;
   int scalarArrayFound = 0;
   int vectorArrayFound = 0;
   const char *firstScalar = NULL;
@@ -307,129 +318,115 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
   this->ScalarsMenu->ClearEntries();
   this->VectorsMenu->ClearEntries();
 
-  attrInfo = this->GetPointDataInformation();
-  if (attrInfo == NULL)
+  vtkSMProperty *scalarProp = this->GetSMScalarProperty();
+  vtkSMProperty *vectorProp = this->GetSMVectorProperty();
+  vtkSMArrayListDomain *scalarDom = 0;
+  vtkSMArrayListDomain *vectorDom = 0;
+  
+  if (scalarProp)
+    {
+    scalarDom = vtkSMArrayListDomain::SafeDownCast(
+      scalarProp->GetDomain("array_list"));
+    }
+  if (vectorProp)
+    {
+    vectorDom = vtkSMArrayListDomain::SafeDownCast(
+      vectorProp->GetDomain("array_list"));
+    }
+
+  if (!scalarProp || !vectorProp || !scalarDom || !vectorDom)
     {
     this->ScalarsMenu->SetValue("None");
     this->SetCurrentScalars("None");
     this->VectorsMenu->SetValue("None");
     this->SetCurrentVectors("None");
-    this->Property->SetString(0, "None");
-    this->Property->SetString(1, "None");
     return;
     }
 
-  num = attrInfo->GetNumberOfArrays();
-  for (i = 0; i < num; ++i)
+  if (scalarDom)
     {
-    ai = attrInfo->GetArrayInformation(i);
-    // If the array does not have a name, then we can do nothing with it.
-    if (ai->GetName())
+    num = scalarDom->GetNumberOfStrings();
+    for (i = 0; i < num; i++)
       {
-      if (ai->GetNumberOfComponents() == 1) // scalars
+      if (scalarDom->GetString(i))
         {
         sprintf(methodAndArgs, "ScalarsMenuEntryCallback");
-        this->ScalarsMenu->AddEntryWithCommand(ai->GetName(), 
+        this->ScalarsMenu->AddEntryWithCommand(scalarDom->GetString(i),
                                                this, methodAndArgs);
         if (firstScalar == NULL)
           {
-          firstScalar = ai->GetName();
+          firstScalar = scalarDom->GetString(i);
           }
         if (this->ScalarArrayName &&
-            strcmp(this->ScalarArrayName, ai->GetName()) == 0)
+            strcmp(this->ScalarArrayName, scalarDom->GetString(i)) == 0)
           {
           scalarArrayFound = 1;
           }
         }
-      if (ai->GetNumberOfComponents() == 3) // vectors
-        {
-        sprintf(methodAndArgs, "VectorsMenuEntryCallback");
-        this->VectorsMenu->AddEntryWithCommand(ai->GetName(), 
-                                               this, methodAndArgs);
-        if (firstVector == NULL)
-          {
-          firstVector = ai->GetName();
-          }
-        if (this->VectorArrayName &&
-            strcmp(this->VectorArrayName, ai->GetName()) == 0)
-          {
-          vectorArrayFound = 1;
-          }
-        }
       }
-    }
-
-  // If the filter has not specified a valid array, then use the default
-  // attribute.
-  if (scalarArrayFound == 0)
-    { // If the current value is not in the menu, then look for another to use.
-    // First look for a default attribute.
-    ai = attrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
-    if (ai == NULL || ai->GetName() == NULL)
-      { // lets just use the first in the menu.
+    if (!scalarArrayFound)
+      {
       if (firstScalar)
         {
-        ai = attrInfo->GetArrayInformation(firstScalar);
+        this->SetScalarArrayName(firstScalar);
+        this->ScalarsMenu->SetValue(firstScalar);
+        this->SetCurrentScalars(firstScalar);
+        this->ModifiedCallback();
         }
       else
         {
-        // Here we may want to keep the previous value.
         this->SetScalarArrayName(NULL);
         this->ScalarsMenu->SetValue("None");
         this->SetCurrentScalars("None");
         }
       }
-
-    if (ai)
+    else
       {
-      this->SetScalarArrayName(ai->GetName());
-
-      // In this case, the widget does not match the object.
-      this->ModifiedCallback();
+      this->ScalarsMenu->SetValue(this->ScalarArrayName);
       }
-    
-    // Now set the menu's value.
-    this->ScalarsMenu->SetValue(this->ScalarArrayName);
-    this->SetCurrentScalars(this->ScalarArrayName);
     }
-  if (vectorArrayFound == 0)
-    { // If the current value is not in the menu, then look for another to use.
-    // First look for a default attribute.
-    ai = attrInfo->GetAttributeInformation(vtkDataSetAttributes::VECTORS);
-    if (ai == NULL || ai->GetName() == NULL)
-      { // lets just use the first in the menu.
+  
+  if (vectorDom)
+    {
+    num = vectorDom->GetNumberOfStrings();
+    for (i = 0; i < num; i++)
+      {
+      if (vectorDom->GetString(i))
+        {
+        sprintf(methodAndArgs, "VectorsMenuEntryCallback");
+        this->VectorsMenu->AddEntryWithCommand(vectorDom->GetString(i),
+                                               this, methodAndArgs);
+        if (firstVector == NULL)
+          {
+          firstVector = vectorDom->GetString(i);
+          }
+        if (this->VectorArrayName &&
+            strcmp(this->VectorArrayName, vectorDom->GetString(i)) == 0)
+          {
+          vectorArrayFound = 1;
+          }
+        }
+      }
+    if (!vectorArrayFound)
+      {
       if (firstVector)
         {
-        ai = attrInfo->GetArrayInformation(firstVector);
+        this->SetVectorArrayName(firstVector);
+        this->VectorsMenu->SetValue(firstVector);
+        this->SetCurrentVectors(firstVector);
+        this->ModifiedCallback();
         }
       else
         {
-        // Here we may want to keep the previous value.
         this->SetVectorArrayName(NULL);
         this->VectorsMenu->SetValue("None");
         this->SetCurrentVectors("None");
         }
       }
-
-    if (ai)
+    else
       {
-      this->SetVectorArrayName(ai->GetName());
-
-      // In this case, the widget does not match the object.
-      this->ModifiedCallback();
+      this->VectorsMenu->SetValue(this->VectorArrayName);
       }
-    
-    // Now set the menu's value.
-    this->VectorsMenu->SetValue(this->VectorArrayName);
-    this->SetCurrentVectors(this->VectorArrayName);
-    }
-
-  if (!this->AcceptCalled &&
-      (this->ScalarArrayName || this->VectorArrayName))
-    {
-    // property stuff
-    this->Property->SetString(0, this->ScalarArrayName);
-    this->Property->SetString(1, this->VectorArrayName);
     }
 }
 
@@ -500,36 +497,46 @@ void vtkPVOrientScaleWidget::UpdateModeMenus()
     scaleMenu->SetState("Vector Components", 0);
     }
   
-  if (!this->AcceptCalled)
-    {
-    this->DefaultOrientMode = this->OrientModeMenu->GetMenu()->GetIndex(
-      this->OrientModeMenu->GetValue());
-    this->DefaultScaleMode = this->ScaleModeMenu->GetMenu()->GetIndex(
-      this->ScaleModeMenu->GetValue());
-    }
-  
   this->UpdateScaleFactor();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::UpdateScaleFactor()
 {
-  if (!this->InputMenu)
+  vtkSMProperty *prop = this->GetSMScaleFactorProperty();
+  vtkSMArrayRangeDomain *scalarRangeDom = 0;
+  vtkSMArrayRangeDomain *vectorRangeDom = 0;
+  vtkSMBoundsDomain *boundsDom = 0;
+
+  if (prop)
     {
-    return;
+    scalarRangeDom = vtkSMArrayRangeDomain::SafeDownCast(
+      prop->GetDomain("scalar_range"));
+    vectorRangeDom = vtkSMArrayRangeDomain::SafeDownCast(
+      prop->GetDomain("vector_range"));
+    boundsDom = vtkSMBoundsDomain::SafeDownCast(prop->GetDomain("bounds"));
     }
-  
-  vtkPVSource *input = this->InputMenu->GetCurrentValue();
-  if (!input)
+
+  if (!prop || !scalarRangeDom || !vectorRangeDom || !boundsDom)
     {
     return;
     }
   
   double bnds[6];
-  vtkPVDataInformation *dInfo = input->GetDataInformation();
-  dInfo->GetBounds(bnds);
-  vtkPVDataSetAttributesInformation *pdInfo = dInfo->GetPointDataInformation();
-  vtkPVArrayInformation *aInfo;
+  int exists, i;
+  for (i = 0; i < 3; i++)
+    {
+    bnds[2*i] = boundsDom->GetMinimum(i, exists);
+    if (!exists)
+      {
+      bnds[2*i] = 0;
+      }
+    bnds[2*i+1] = boundsDom->GetMaximum(i, exists);
+    if (!exists)
+      {
+      bnds[2*i+1] = 1;
+      }
+    }
   
   double maxBnds = bnds[1] - bnds[0];
   maxBnds = (bnds[3] - bnds[2] > maxBnds) ? (bnds[3] - bnds[2]) : maxBnds;
@@ -539,60 +546,69 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
   double absMaxRange = 0;
   const char* scaleMode = this->ScaleModeMenu->GetValue();
 
-  if (!strcmp(scaleMode, "Scalar"))
+  vtkSMStringVectorProperty *scalarProp =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetSMScalarProperty());
+  vtkSMStringVectorProperty *vectorProp =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetSMVectorProperty());
+  
+  if (!strcmp(scaleMode, "Scalar") && scalarProp)
     {
     const char *arrayName = this->ScalarsMenu->GetValue();
+    const char *propArrayName = scalarProp->GetElement(0);
+    scalarProp->SetElement(0, arrayName);
     if (arrayName)
       {
-      aInfo = pdInfo->GetArrayInformation(arrayName);
-      if (aInfo)
-        {
-        double *range = aInfo->GetComponentRange(0);
-        absMaxRange = fabs(range[0]);
-        absMaxRange = (fabs(range[1]) > absMaxRange) ? fabs(range[1]) :
-          absMaxRange;
-        }
+      double range[2];
+      range[0] = scalarRangeDom->GetMinimum(0, exists);
+      range[1] = scalarRangeDom->GetMaximum(0, exists);
+      absMaxRange = fabs(range[0]);
+      absMaxRange = (fabs(range[1]) > absMaxRange) ? fabs(range[1]) :
+        absMaxRange;
       }
+    scalarProp->SetElement(0, propArrayName);
     }
-  else if (!strcmp(scaleMode, "Vector Magnitude"))
+  else if (!strcmp(scaleMode, "Vector Magnitude") && vectorProp)
     {
     const char *arrayName = this->VectorsMenu->GetValue();
+    const char *propArrayName = vectorProp->GetElement(0);
+    vectorProp->SetElement(0, arrayName);
     if (arrayName)
       {
-      aInfo = pdInfo->GetArrayInformation(arrayName);
-      if (aInfo)
-        {
-        double *range = aInfo->GetComponentRange(-1);
-        absMaxRange = fabs(range[0]);
-        absMaxRange = (fabs(range[1]) > absMaxRange) ? fabs(range[1]) :
-          absMaxRange;
-        }
+      double range[2];
+      range[0] = vectorRangeDom->GetMinimum(3, exists);
+      range[1] = vectorRangeDom->GetMaximum(3, exists);
+      absMaxRange = fabs(range[0]);
+      absMaxRange = (fabs(range[1]) > absMaxRange) ? fabs(range[1]) :
+        absMaxRange;
       }
+    vectorProp->SetElement(0, propArrayName);
     }
-  else if (!strcmp(scaleMode, "Vector Components"))
+  else if (!strcmp(scaleMode, "Vector Components") && vectorProp)
     {
     const char *arrayName = this->VectorsMenu->GetValue();
+    const char *propArrayName = vectorProp->GetElement(0);
     if (arrayName)
       {
-      aInfo = pdInfo->GetArrayInformation(arrayName);
-      if (aInfo)
-        {
-        double *range0 = aInfo->GetComponentRange(0);
-        double *range1 = aInfo->GetComponentRange(1);
-        double *range2 = aInfo->GetComponentRange(2);
-        absMaxRange = fabs(range0[0]);
-        absMaxRange = (fabs(range0[1]) > absMaxRange) ? fabs(range0[1]) :
-          absMaxRange;
-        absMaxRange = (fabs(range1[0]) > absMaxRange) ? fabs(range1[0]) :
-          absMaxRange;
-        absMaxRange = (fabs(range1[1]) > absMaxRange) ? fabs(range1[1]) :
-          absMaxRange;
-        absMaxRange = (fabs(range2[0]) > absMaxRange) ? fabs(range2[0]) :
-          absMaxRange;
-        absMaxRange = (fabs(range2[1]) > absMaxRange) ? fabs(range2[1]) :
-          absMaxRange;
-        }
+      double range0[2], range1[2], range2[2];
+      range0[0] = vectorRangeDom->GetMinimum(0, exists);
+      range0[1] = vectorRangeDom->GetMaximum(0, exists);
+      range1[0] = vectorRangeDom->GetMinimum(1, exists);
+      range1[1] = vectorRangeDom->GetMaximum(1, exists);
+      range2[0] = vectorRangeDom->GetMinimum(2, exists);
+      range2[1] = vectorRangeDom->GetMaximum(2, exists);
+      absMaxRange = fabs(range0[0]);
+      absMaxRange = (fabs(range0[1]) > absMaxRange) ? fabs(range0[1]) :
+        absMaxRange;
+      absMaxRange = (fabs(range1[0]) > absMaxRange) ? fabs(range1[0]) :
+        absMaxRange;
+      absMaxRange = (fabs(range1[1]) > absMaxRange) ? fabs(range1[1]) :
+        absMaxRange;
+      absMaxRange = (fabs(range2[0]) > absMaxRange) ? fabs(range2[0]) :
+        absMaxRange;
+      absMaxRange = (fabs(range2[1]) > absMaxRange) ? fabs(range2[1]) :
+        absMaxRange;
       }
+    vectorProp->SetElement(0, propArrayName);
     }
   
   if (absMaxRange != 0)
@@ -601,14 +617,6 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
     }
 
   this->ScaleFactorEntry->SetValue(maxBnds);
-  if (!this->AcceptCalled)
-    {
-    float scalars[3];
-    scalars[0] = this->DefaultOrientMode;
-    scalars[1] = this->DefaultScaleMode;
-    scalars[2] = maxBnds;
-    this->Property->SetScalars(3, scalars);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -620,19 +628,11 @@ void vtkPVOrientScaleWidget::CopyProperties(
   vtkPVOrientScaleWidget *pvosw = vtkPVOrientScaleWidget::SafeDownCast(clone);
   if (pvosw)
     {
-    if (this->InputMenu)
-      {
-      vtkPVInputMenu *im = this->InputMenu->ClonePrototype(pvSource, map);
-      pvosw->SetInputMenu(im);
-      im->Delete();
-      }
-    pvosw->SetScalarsCommand(this->ScalarsCommand);
-    pvosw->SetVectorsCommand(this->VectorsCommand);
-    pvosw->SetOrientCommand(this->OrientCommand);
-    pvosw->SetScaleModeCommand(this->ScaleModeCommand);
-    pvosw->SetScaleFactorCommand(this->ScaleFactorCommand);
-    pvosw->SetDefaultOrientMode(this->DefaultOrientMode);
-    pvosw->SetDefaultScaleMode(this->DefaultScaleMode);
+    pvosw->SetSMScalarPropertyName(this->SMScalarPropertyName);
+    pvosw->SetSMVectorPropertyName(this->SMVectorPropertyName);
+    pvosw->SetSMOrientModePropertyName(this->SMOrientModePropertyName);
+    pvosw->SetSMScaleModePropertyName(this->SMScaleModePropertyName);
+    pvosw->SetSMScaleFactorPropertyName(this->SMScaleFactorPropertyName);
     }
   else
     {
@@ -671,39 +671,39 @@ int vtkPVOrientScaleWidget::ReadXMLAttributes(vtkPVXMLElement *element,
       return 0;
       }
     imw->AddDependent(this);
-    this->SetInputMenu(imw);
     imw->Delete();
     }
 
-  this->SetScalarsCommand(element->GetAttribute("scalars_command"));
-  this->SetVectorsCommand(element->GetAttribute("vectors_command"));
-  this->SetOrientCommand(element->GetAttribute("orient_command"));
-  this->SetScaleModeCommand(element->GetAttribute("scale_mode_command"));
-  this->SetScaleFactorCommand(element->GetAttribute("scale_factor_command"));
-  
-  const char *orient_mode = element->GetAttribute("default_orient_mode");
-  this->SetDefaultOrientMode(atoi(orient_mode));
-  const char *scale_mode = element->GetAttribute("default_scale_mode");
-  this->SetDefaultScaleMode(atoi(scale_mode));
+  const char *scalar_property = element->GetAttribute("scalar_property");
+  if (scalar_property)
+    {
+    this->SetSMScalarPropertyName(scalar_property);
+    }
+  const char *vector_property = element->GetAttribute("vector_property");
+  if (vector_property)
+    {
+    this->SetSMVectorPropertyName(vector_property);
+    }
+  const char *orient_mode_property =
+    element->GetAttribute("orient_mode_property");
+  if (orient_mode_property)
+    {
+    this->SetSMOrientModePropertyName(orient_mode_property);
+    }
+  const char *scale_mode_property =
+    element->GetAttribute("scale_mode_property");
+  if (scale_mode_property)
+    {
+    this->SetSMScaleModePropertyName(scale_mode_property);
+    }
+  const char *scale_factor_property =
+    element->GetAttribute("scale_factor_property");
+  if (scale_factor_property)
+    {
+    this->SetSMScaleFactorPropertyName(scale_factor_property);
+    }
   
   return 1;
-}
-
-//----------------------------------------------------------------------------
-vtkPVDataSetAttributesInformation* vtkPVOrientScaleWidget::GetPointDataInformation()
-{
-  if (!this->InputMenu)
-    {
-    return NULL;
-    }
-  
-  vtkPVSource *input = this->InputMenu->GetCurrentValue();
-  if (!input)
-    {
-    return NULL;
-    }
-  
-  return input->GetDataInformation()->GetPointDataInformation();
 }
 
 //----------------------------------------------------------------------------
@@ -764,22 +764,60 @@ void vtkPVOrientScaleWidget::OrientModeMenuCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVOrientScaleWidget::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVOrientScaleWidget::Accept()
 {
-  float scalars[3];
-  scalars[0] = this->OrientModeMenu->GetMenu()->GetIndex(
-    this->OrientModeMenu->GetValue());
-  scalars[1] = this->ScaleModeMenu->GetMenu()->GetIndex(
-    this->ScaleModeMenu->GetValue());
-  scalars[2] = this->ScaleFactorEntry->GetValueAsFloat();
-  
-  this->Property->SetVTKSourceID(sourceID);
-  this->Property->SetString(0, (char*)(this->ScalarsMenu->GetValue()));
-  this->Property->SetString(1, (char*)(this->VectorsMenu->GetValue()));
-  this->Property->SetScalars(3, scalars);
-  this->Property->AcceptInternal();
-  
+  int modFlag = this->GetModifiedFlag();
+
+  vtkSMStringVectorProperty *scalarProp =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetSMScalarProperty());
+  vtkSMStringVectorProperty *vectorProp =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetSMVectorProperty());
+  vtkSMIntVectorProperty *orientModeProp =
+    vtkSMIntVectorProperty::SafeDownCast(this->GetSMOrientModeProperty());
+  vtkSMIntVectorProperty *scaleModeProp =
+    vtkSMIntVectorProperty::SafeDownCast(this->GetSMScaleModeProperty());
+  vtkSMDoubleVectorProperty *scaleFactorProp =
+    vtkSMDoubleVectorProperty::SafeDownCast(this->GetSMScaleFactorProperty());
+
+  if (scalarProp)
+    {
+    scalarProp->SetElement(0, this->ScalarsMenu->GetValue());
+    }
+  if (vectorProp)
+    {
+    vectorProp->SetElement(0, this->VectorsMenu->GetValue());
+    }
+  if (orientModeProp)
+    {
+    orientModeProp->SetElement(0, this->OrientModeMenu->GetMenu()->GetIndex(
+      this->OrientModeMenu->GetValue()));
+    }
+  if (scaleModeProp)
+    {
+    scaleModeProp->SetElement(0, this->ScaleModeMenu->GetMenu()->GetIndex(
+      this->ScaleModeMenu->GetValue()));
+    }
+  if (scaleFactorProp)
+    {
+    scaleFactorProp->SetElement(0, this->ScaleFactorEntry->GetValueAsFloat());
+    }
+
   this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -789,55 +827,56 @@ void vtkPVOrientScaleWidget::ResetInternal()
     {
     return;
     }
-  
-  float *scalars = this->Property->GetScalars();
 
-  this->ScalarsMenu->SetValue(this->Property->GetString(0));
-  this->SetCurrentScalars(this->Property->GetString(0));
-  this->VectorsMenu->SetValue(this->Property->GetString(1));
-  this->SetCurrentVectors(this->Property->GetString(1));
-  this->OrientModeMenu->SetValue(
-    this->OrientModeMenu->GetEntryLabel((int)scalars[0]));
-  this->SetCurrentOrientMode(this->OrientModeMenu->GetValue());
-  this->ScaleModeMenu->SetValue(
-    this->ScaleModeMenu->GetEntryLabel((int)scalars[1]));
-  this->SetCurrentScaleMode(this->ScaleModeMenu->GetValue());
-  this->ScaleFactorEntry->SetValue(scalars[2]);
+  vtkSMStringVectorProperty *scalarProp =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetSMScalarProperty());
+  vtkSMStringVectorProperty *vectorProp =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetSMVectorProperty());
+  vtkSMIntVectorProperty *orientModeProp =
+    vtkSMIntVectorProperty::SafeDownCast(this->GetSMOrientModeProperty());
+  vtkSMIntVectorProperty *scaleModeProp =
+    vtkSMIntVectorProperty::SafeDownCast(this->GetSMScaleModeProperty());
+  vtkSMDoubleVectorProperty *scaleFactorProp =
+    vtkSMDoubleVectorProperty::SafeDownCast(this->GetSMScaleFactorProperty());
+
+  if (orientModeProp)
+    {
+    this->OrientModeMenu->SetValue(
+      this->OrientModeMenu->GetEntryLabel(orientModeProp->GetElement(0)));
+    this->SetCurrentOrientMode(this->OrientModeMenu->GetValue());
+    }
+  if (scaleModeProp)
+    {
+    this->ScaleModeMenu->SetValue(
+      this->ScaleModeMenu->GetEntryLabel(scaleModeProp->GetElement(0)));
+    this->SetCurrentScaleMode(this->ScaleModeMenu->GetValue());
+    }
+
+  if (!this->AcceptCalled)
+    {
+    this->Update();
+    return;
+    }
   
+  if (scalarProp)
+    {
+    this->ScalarsMenu->SetValue(scalarProp->GetElement(0));
+    this->SetCurrentScalars(scalarProp->GetElement(0));
+    }
+  if (vectorProp)
+    {
+    this->VectorsMenu->SetValue(vectorProp->GetElement(0));
+    this->SetCurrentVectors(vectorProp->GetElement(0));
+    }    
+  if (scaleFactorProp)
+    {
+    this->ScaleFactorEntry->SetValue(scaleFactorProp->GetElement(0));
+    }
+
   if (this->AcceptCalled)
     {
     this->ModifiedFlag = 0;
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVOrientScaleWidget::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVStringAndScalarListWidgetProperty::SafeDownCast(prop);
-  if (this->Property)
-    {
-    char *cmds[5];
-    cmds[0] = this->ScalarsCommand;
-    cmds[1] = this->VectorsCommand;
-    cmds[2] = this->OrientCommand;
-    cmds[3] = this->ScaleModeCommand;
-    cmds[4] = this->ScaleFactorCommand;
-    int numStrings[5] = {1, 1, 0, 0, 0};
-    int numScalars[5] = {0, 0, 1, 1, 1};
-    this->Property->SetVTKCommands(5, cmds, numStrings, numScalars);
-    }
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVOrientScaleWidget::GetProperty()
-{
-  return this->Property;
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVOrientScaleWidget::CreateAppropriateProperty()
-{
-  return vtkPVStringAndScalarListWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------
@@ -903,53 +942,140 @@ void vtkPVOrientScaleWidget::UpdateEnableState()
   this->PropagateEnableState(this->ScaleFactorFrame);
   this->PropagateEnableState(this->ScaleFactorLabel);
   this->PropagateEnableState(this->ScaleFactorEntry);
-
-  this->PropagateEnableState(this->InputMenu);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::SaveInBatchScript(ofstream* file)
 {
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
-
+  
+  if (sourceID.ID == 0 || !this->SMScalarPropertyName ||
+      !this->SMVectorPropertyName || !this->SMOrientModePropertyName ||
+      !this->SMScaleModePropertyName || !this->SMScaleFactorPropertyName)
+    {
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
+    }
+  
   *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-        << this->ScalarsCommand << "] SetElement 0 {" 
+        << this->SMScalarPropertyName << "] SetElement 0 {" 
         << this->ScalarsMenu->GetValue() << "}" << endl;
   *file << "  " << "[$pvTemp" << sourceID <<" GetProperty " 
-        << this->VectorsCommand << "] SetElement 0 {" 
+        << this->SMVectorPropertyName << "] SetElement 0 {" 
         << this->VectorsMenu->GetValue() << "}" << endl;
   *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-        << this->OrientCommand << "] SetElement 0 " 
+        << this->SMOrientModePropertyName << "] SetElement 0 " 
         << this->OrientModeMenu->GetMenu()->GetIndex(
           this->OrientModeMenu->GetValue())
         << endl;;
   *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-        << this->ScaleModeCommand << "] SetElement 0 " 
+        << this->SMScaleModePropertyName << "] SetElement 0 " 
         << this->ScaleModeMenu->GetMenu()->GetIndex(
           this->ScaleModeMenu->GetValue())
         << endl;
   *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-        << this->ScaleFactorCommand
+        << this->SMScaleFactorPropertyName
         << "] SetElement 0 " << this->ScaleFactorEntry->GetValueAsFloat()
         << endl;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkPVOrientScaleWidget::GetSMScalarProperty()
+{
+  if (this->SMScalarProperty)
+    {
+    return this->SMScalarProperty;
+    }
+
+  if (!this->GetPVSource() || !this->GetPVSource()->GetProxy())
+    {
+    return 0;
+    }
+
+  this->SetSMScalarProperty(this->GetPVSource()->GetProxy()->GetProperty(
+    this->GetSMScalarPropertyName()));
+
+  return this->SMScalarProperty;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkPVOrientScaleWidget::GetSMVectorProperty()
+{
+  if (this->SMVectorProperty)
+    {
+    return this->SMVectorProperty;
+    }
+
+  if (!this->GetPVSource() || !this->GetPVSource()->GetProxy())
+    {
+    return 0;
+    }
+
+  this->SetSMVectorProperty(this->GetPVSource()->GetProxy()->GetProperty(
+    this->GetSMVectorPropertyName()));
+
+  return this->SMVectorProperty;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkPVOrientScaleWidget::GetSMOrientModeProperty()
+{
+  if (this->SMOrientModeProperty)
+    {
+    return this->SMOrientModeProperty;
+    }
+
+  if (!this->GetPVSource() || !this->GetPVSource()->GetProxy())
+    {
+    return 0;
+    }
+
+  this->SetSMOrientModeProperty(this->GetPVSource()->GetProxy()->GetProperty(
+    this->GetSMOrientModePropertyName()));
+
+  return this->SMOrientModeProperty;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkPVOrientScaleWidget::GetSMScaleModeProperty()
+{
+  if (this->SMScaleModeProperty)
+    {
+    return this->SMScaleModeProperty;
+    }
+
+  if (!this->GetPVSource() || !this->GetPVSource()->GetProxy())
+    {
+    return 0;
+    }
+
+  this->SetSMScaleModeProperty(this->GetPVSource()->GetProxy()->GetProperty(
+    this->GetSMScaleModePropertyName()));
+
+  return this->SMScaleModeProperty;
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkPVOrientScaleWidget::GetSMScaleFactorProperty()
+{
+  if (this->SMScaleFactorProperty)
+    {
+    return this->SMScaleFactorProperty;
+    }
+
+  if (!this->GetPVSource() || !this->GetPVSource()->GetProxy())
+    {
+    return 0;
+    }
+
+  this->SetSMScaleFactorProperty(this->GetPVSource()->GetProxy()->GetProperty(
+    this->GetSMScaleFactorPropertyName()));
+
+  return this->SMScaleFactorProperty;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "InputMenu: " << this->InputMenu << endl;
-  os << indent << "ScalarsCommand: "
-     << (this->ScalarsCommand ? this->ScalarsCommand : "(none)") << endl;
-  os << indent << "VectorsCommand: "
-     << (this->VectorsCommand ? this->VectorsCommand : "(none)") << endl;
-  os << indent << "OrientCommand: "
-     << (this->OrientCommand ? this->OrientCommand : "(none)") << endl;
-  os << indent << "ScaleModeCommand: "
-     << (this->ScaleModeCommand ? this->ScaleModeCommand : "(none)") << endl;
-  os << indent << "ScaleFactorCommand: "
-     << (this->ScaleFactorCommand ? this->ScaleFactorCommand : "(none)")
-     << endl;
-  os << indent << "DefaultScaleMode: " << this->DefaultScaleMode << endl;
-  os << indent << "DefaultOrientMode: " << this->DefaultOrientMode << endl;
 }

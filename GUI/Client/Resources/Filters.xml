@@ -1914,13 +1914,11 @@ The Contour filter operates on any type of data set, but the input is required t
                input_name="Source"
                source_list="GlyphSources"/>
     <OrientScaleWidget trace_name="OrientScale" input_menu="im"
-                       scalars_command="SelectInputScalars"
-                       vectors_command="SelectInputVectors"
-                       orient_command="SetOrient"
-                       scale_mode_command="SetScaleMode"
-                       scale_factor_command="SetScaleFactor"
-                       default_orient_mode="1"
-                       default_scale_mode ="1"/>
+                       scalar_property="SelectInputScalars"
+                       vector_property="SelectInputVectors"
+                       orient_mode_property="SetOrient"
+                       scale_mode_property="SetScaleMode"
+                       scale_factor_property="SetScaleFactor"/>
     <ThumbWheel label="Max. Number of Glyphs"
                 trace_name="Max Glyphs"
                 property="MaximumNumberOfPoints"

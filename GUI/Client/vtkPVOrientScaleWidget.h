@@ -28,8 +28,7 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkKWOptionMenu;
 class vtkPVDataSetAttributesInformation;
-class vtkPVInputMenu;
-class vtkPVStringAndScalarListWidgetProperty;
+class vtkSMProperty;
 
 class VTK_EXPORT vtkPVOrientScaleWidget : public vtkPVWidget
 {
@@ -45,7 +44,7 @@ public:
   //BTX
   // Description:
   // Move widget state to vtk object or back.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   virtual void ResetInternal();
   //ETX
 
@@ -67,36 +66,9 @@ public:
   void VectorsMenuEntryCallback();
   
   // Description:
-  // This input menu supplies the data set.
-  virtual void SetInputMenu(vtkPVInputMenu*);
-  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
-  
-  // Description:
   // This is called to update the widget is something (InputMenu) changes.
   virtual void Update();
  
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty* prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-
-  // Description:
-  // Set the VTK commands.
-  vtkSetStringMacro(ScalarsCommand);
-  vtkSetStringMacro(VectorsCommand);
-  vtkSetStringMacro(OrientCommand);
-  vtkSetStringMacro(ScaleModeCommand);
-  vtkSetStringMacro(ScaleFactorCommand);
-
-  // Description:
-  // Set default widget values.
-  vtkSetMacro(DefaultOrientMode, int);
-  vtkSetMacro(DefaultScaleMode, int);
-  
   // Description:
   // Methods to set the widgets' values from a script.
   void SetOrientMode(char *mode);
@@ -139,22 +111,38 @@ protected:
   vtkKWLabel *ScaleFactorLabel;
   vtkKWEntry *ScaleFactorEntry;
 
-  vtkPVInputMenu *InputMenu;
   char *ScalarArrayName;
   char *VectorArrayName;
   vtkSetStringMacro(ScalarArrayName);
   vtkSetStringMacro(VectorArrayName);
 
-  vtkPVStringAndScalarListWidgetProperty *Property;
+  char *SMScalarPropertyName;
+  char *SMVectorPropertyName;
+  char *SMOrientModePropertyName;
+  char *SMScaleModePropertyName;
+  char *SMScaleFactorPropertyName;
 
-  char *ScalarsCommand;
-  char *VectorsCommand;
-  char *OrientCommand;
-  char *ScaleModeCommand;
-  char *ScaleFactorCommand;
+  void SetSMScalarProperty(vtkSMProperty *prop);
+  vtkSMProperty* GetSMScalarProperty();
+  void SetSMVectorProperty(vtkSMProperty *prop);
+  vtkSMProperty* GetSMVectorProperty();
+  void SetSMOrientModeProperty(vtkSMProperty *prop);
+  vtkSMProperty* GetSMOrientModeProperty();
+  void SetSMScaleModeProperty(vtkSMProperty *prop);
+  vtkSMProperty* GetSMScaleModeProperty();
+  void SetSMScaleFactorProperty(vtkSMProperty *prop);
+  vtkSMProperty* GetSMScaleFactorProperty();
 
-  int DefaultOrientMode;
-  int DefaultScaleMode;
+  vtkSetStringMacro(SMScalarPropertyName);
+  vtkGetStringMacro(SMScalarPropertyName);
+  vtkSetStringMacro(SMVectorPropertyName);
+  vtkGetStringMacro(SMVectorPropertyName);
+  vtkSetStringMacro(SMOrientModePropertyName);
+  vtkGetStringMacro(SMOrientModePropertyName);
+  vtkSetStringMacro(SMScaleModePropertyName);
+  vtkGetStringMacro(SMScaleModePropertyName);
+  vtkSetStringMacro(SMScaleFactorPropertyName);
+  vtkGetStringMacro(SMScaleFactorPropertyName);
 
   char *CurrentScalars;
   char *CurrentVectors;
@@ -173,7 +161,6 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement *element,
                         vtkPVXMLPackageParser *parser);
   
-  vtkPVDataSetAttributesInformation* GetPointDataInformation();
   void UpdateArrayMenus();
   void UpdateModeMenus();
   void UpdateScaleFactor();
@@ -181,6 +168,12 @@ protected:
 private:
   vtkPVOrientScaleWidget(const vtkPVOrientScaleWidget&); // Not implemented
   void operator=(const vtkPVOrientScaleWidget&); // Not implemented
+  
+  vtkSMProperty *SMScalarProperty;
+  vtkSMProperty *SMVectorProperty;
+  vtkSMProperty *SMOrientModeProperty;
+  vtkSMProperty *SMScaleModeProperty;
+  vtkSMProperty *SMScaleFactorProperty;
 };
 
 #endif
