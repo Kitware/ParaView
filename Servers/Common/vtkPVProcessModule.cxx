@@ -45,7 +45,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.10");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -413,6 +413,7 @@ void vtkPVProcessModule::SetGUIHelper(vtkProcessModuleGUIHelper* h)
 void vtkPVProcessModule::SetProcessEnvironmentVariable(int processId,
                                                        const char* var)
 {
+  (void)processId;
   char* envstr = vtkString::Duplicate(var);
   putenv(envstr);
 }
