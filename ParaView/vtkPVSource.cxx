@@ -1,12 +1,12 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVConeSource.h
+  Module:    vtkPVSource.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
 
-Copyright (c) 1998-1999 Kitware Inc. 469 Clifton Corporate Parkway,
+Copyright (c) 1998-2000 Kitware Inc. 469 Clifton Corporate Parkway,
 Clifton Park, NY, 12065, USA.
 
 All rights reserved. No part of this software may be reproduced, distributed,
@@ -26,44 +26,50 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVConeSource_h
-#define __vtkPVConeSource_h
-
-#include "vtkKWLabel.h"
-#include "vtkConeSource.h"
-#include "vtkShrinkPolyData.h"
-#include "vtkKWEntry.h"
-#include "vtkKWScale.h"
 #include "vtkPVSource.h"
+#include "vtkKWApplication.h"
+#include "vtkPVComposite.h"
+#include "vtkKWView.h"
+#include "vtkKWRenderView.h"
 
-class VTK_EXPORT vtkPVConeSource : public vtkPVSource
+int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
+			   int argc, char *argv[]);
+
+vtkPVSource::vtkPVSource()
 {
-public:
-  static vtkPVConeSource* New();
-  vtkTypeMacro(vtkPVConeSource,vtkPVSource);
-
-  void Create(vtkKWApplication *app, char *args);
-
-  vtkGetObjectMacro(ConeSource, vtkConeSource);
-    
-  void ConeParameterChanged();
+  this->CommandFunction = vtkPVSourceCommand;
   
-protected:
-  vtkPVConeSource();
-  ~vtkPVConeSource();
-  vtkPVConeSource(const vtkPVConeSource&) {};
-  void operator=(const vtkPVConeSource&) {};
-    
-  vtkKWLabel *Label;
-  vtkKWLabel *HeightLabel;
-  vtkKWEntry *HeightEntry;
-  vtkKWLabel *RadiusLabel;
-  vtkKWEntry *RadiusEntry;
-  vtkKWLabel *ResolutionLabel;
-  vtkKWEntry *ResolutionEntry;
-  vtkKWWidget *Accept;
+  this->Composite = NULL;
+}
 
-  vtkConeSource *ConeSource;
-};
+vtkPVSource::~vtkPVSource()
+{
+  this->SetComposite(NULL);
+}
 
-#endif
+vtkPVSource* vtkPVSource::New()
+{
+  return new vtkPVSource();
+}
+
+
+void vtkPVSource::SetComposite(vtkPVComposite *comp)
+{
+  if (this->Composite == comp)
+    {
+    return;
+    }
+  this->Modified();
+
+  if (this->Composite)
+    {
+    vtkPVComposite *tmp = this->Composite;
+    this->Composite = NULL;
+    tmp->UnRegister(this);
+    }
+  if (comp)
+    {
+    this->Composite = comp;
+    comp->Register(this);
+    }
+}

@@ -35,8 +35,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 vtkPVPolyDataComposite::vtkPVPolyDataComposite()
 { 
   this->Notebook = vtkKWNotebook::New();
-  this->PolyData = NULL;
-  this->ConeSource = vtkPVConeSource::New();
+  this->PVPolyData = NULL;
+  this->PVConeSource = NULL;
   
   this->NotebookCreated = 0;
 
@@ -56,9 +56,6 @@ vtkPVPolyDataComposite::~vtkPVPolyDataComposite()
   this->Notebook->SetParent(NULL);
   this->Notebook->Delete();
   this->Notebook = NULL;
-  
-  this->ConeSource->Delete();
-  this->ConeSource = NULL;
 }
 
 
@@ -87,7 +84,7 @@ vtkPVWindow* vtkPVPolyDataComposite::GetWindow()
 
 vtkProp* vtkPVPolyDataComposite::GetProp()
 {
-  return this->PolyData->GetProp();
+  return this->PVPolyData->GetProp();
 }
 
 vtkPVPolyDataComposite* vtkPVPolyDataComposite::GetComposite()
@@ -115,21 +112,27 @@ void vtkPVPolyDataComposite::CreateProperties(vtkKWApplication *app, char *args)
                this->Notebook->GetWidgetName());
   this->Notebook->Raise(this->Label1);
   
-  if (this->PolyData == NULL)
+  if (this->PVConeSource == NULL)
     {
-    this->PolyData = vtkPVPolyData::New();
-    this->ConeSource->SetConeSource();
-    this->PolyData->SetPolyData(this->ConeSource->GetOutput());
-    this->PolyData->SetComposite(this);
-    }
+    this->PVConeSource = vtkPVConeSource::New();
+    this->PVConeSource->SetConeSource();
+    this->PVConeSource->SetComposite(this);
+    } 
     
-  this->PolyData->SetParent(this->Notebook->GetFrame(this->Label1));
-  this->PolyData->Create(app, "");
-  this->Script("pack %s", this->PolyData->GetWidgetName());
+  if (this->PVPolyData == NULL)
+    {
+    this->PVPolyData = vtkPVPolyData::New();
+    this->PVPolyData->SetPolyData(this->PVConeSource->GetOutput());
+    this->PVPolyData->SetComposite(this);
+    }
   
-  this->ConeSource->SetParent(this->Notebook->GetFrame(this->Label2));
-  this->ConeSource->Create(app, "");
-  this->Script("pack %s", this->ConeSource->GetWidgetName());
+  this->PVPolyData->SetParent(this->Notebook->GetFrame(this->Label1));
+  this->PVPolyData->Create(app, "");
+  this->Script("pack %s", this->PVPolyData->GetWidgetName());
+  
+  this->PVConeSource->SetParent(this->Notebook->GetFrame(this->Label2));
+  this->PVConeSource->Create(app, "");
+  this->Script("pack %s", this->PVConeSource->GetWidgetName());
 }
 
 void vtkPVPolyDataComposite::SetPropertiesParent(vtkKWWidget *parent)
@@ -151,14 +154,4 @@ void vtkPVPolyDataComposite::SetTabLabels(char *label1, char *label2)
 {
   this->Label1 = label1;
   this->Label2 = label2;
-}
-
-vtkPVConeSource* vtkPVPolyDataComposite::GetConeSource()
-{
-  return this->ConeSource;
-}
-
-void vtkPVPolyDataComposite::SetPVPolyData(vtkPVPolyData *poly)
-{
-  this->PolyData = poly;
 }

@@ -26,8 +26,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkPVPolyData.h"
-#include "vtkPVPolyDataComposite.h"
-#include "vtkShrinkPolyData.h"
+#include "vtkPVComposite.h"
+#include "vtkPVShrinkPolyData.h"
 #include "vtkKWView.h"
 
 #include "vtkKWScale.h"
@@ -44,7 +44,7 @@ vtkPVPolyData::vtkPVPolyData()
 {
   this->CommandFunction = vtkPVPolyDataCommand;
 
-  this->PolyData = NULL;
+  this->Data = NULL;
 
   this->Label = vtkKWLabel::New();
   
@@ -53,7 +53,7 @@ vtkPVPolyData::vtkPVPolyData()
   this->Mapper = vtkPolyDataMapper::New();
   this->Actor = vtkActor::New();
   
-  this->Comp = vtkPVPolyDataComposite::New();
+  this->Composite = vtkPVComposite::New();
   
   this->ShrinkFactorScale = vtkKWScale::New();
   this->ShrinkFactorScale->SetParent(this);
@@ -87,9 +87,9 @@ vtkPVPolyData* vtkPVPolyData::New()
   return new vtkPVPolyData();
 }
 
-void vtkPVPolyData::SetupShrink()
+void vtkPVPolyData::SetupShrinkSlider()
 {
-  //1st need to set up slider to get % to shrink by
+  //set up slider to get amt to shrink by
   this->ShrinkFactorScale->Create(this->Application,
 				  "-showvalue 1 -resolution 0.1");
   this->ShrinkFactorScale->SetRange(0, 1);
@@ -103,36 +103,34 @@ void vtkPVPolyData::SetupShrink()
 
 void vtkPVPolyData::Shrink()
 {
-  vtkShrinkPolyData *shrink = vtkShrinkPolyData::New();
-  shrink->SetShrinkFactor(this->ShrinkFactorScale->GetValue());
-  shrink->SetInput((vtkPolyData*)this->PolyData);
+  vtkPVShrinkPolyData *shrink;
+  vtkPVPolyData *pd;
+  vtkPVComposite *newComp;
   
-  vtkPVPolyData *pd = vtkPVPolyData::New();
-  pd->PolyData = shrink->GetOutput();
-  pd->Mapper->SetInput(pd->PolyData);
-  pd->Actor->Update();
+  shrink = vtkPVShrinkPolyData::New();
+  shrink->GetShrink()->SetInput(this->GetPolyData());
   
-  vtkPVPolyDataComposite *comp = vtkPVPolyDataComposite::New();
-  pd->SetComposite(comp);
-  comp->SetTabLabels("PolyData", "ShrinkPolyData");
-  comp->GetConeSource()->SetShrinkInput(pd->PolyData);
-  comp->SetPVPolyData(pd);
+  pd = vtkPVPolyData::New();
+  pd->SetPolyData(shrink->GetShrink()->GetOutput());
+    
+  newComp = vtkPVComposite::New();
+  newComp->SetData(pd);
+  newComp->SetSource(shrink);
   
-  vtkPVWindow *window = this->Comp->GetWindow();
+  vtkPVWindow *window = this->Composite->GetWindow();
+  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
+  newComp->CreateProperties(this->Application, "");
+  this->Composite->GetView()->AddComposite(newComp);
+  this->Composite->GetProp()->VisibilityOff();
   
-  comp->SetPropertiesParent(window->GetDataPropertiesParent());
-  comp->CreateProperties(this->Application, "");
-  this->Comp->GetView()->AddComposite(comp);
-  this->Comp->GetView()->RemoveComposite(this->Comp);
+  newComp->SetWindow(window);
   
-  comp->SetWindow(window);
+  window->SetCurrentDataComposite(newComp);
   
-  window->SetCurrentDataComposite(comp);
-  
-  pd->Comp->GetView()->Render();
+  pd->Composite->GetView()->Render();
   
   pd->Delete();
-  comp->Delete();
+  newComp->Delete();
 }
 
 
@@ -157,10 +155,11 @@ void vtkPVPolyData::Create(vtkKWApplication *app, char *args)
   this->FiltersMenuButton->SetParent(this);
   this->FiltersMenuButton->Create(app, "");
   this->FiltersMenuButton->SetButtonText("Filters");
-  this->FiltersMenuButton->AddCommand("vtkShrinkPolyData", this, "SetupShrink");
+  this->FiltersMenuButton->AddCommand("vtkShrinkPolyData", this,
+				      "SetupShrinkSlider");
   this->Script("pack %s", this->FiltersMenuButton->GetWidgetName());
   
-  this->Mapper->SetInput(this->PolyData);
+  this->Mapper->SetInput(this->GetPolyData());
   this->Actor->SetMapper(this->Mapper);
 }
 
@@ -169,7 +168,34 @@ vtkProp* vtkPVPolyData::GetProp()
   return this->Actor;
 }
 
-void vtkPVPolyData::SetComposite(vtkPVPolyDataComposite *pvComp)
+void vtkPVPolyData::SetComposite(vtkPVComposite *comp)
 {
-  this->Comp = pvComp;
+  if (this->Composite == comp)
+    {
+    return;
+    }
+  this->Modified();
+
+  if (this->Composite)
+    {
+    vtkPVComposite *tmp = this->Composite;
+    this->Composite = NULL;
+    tmp->UnRegister(this);
+    }
+  if (comp)
+    {
+    this->Composite = comp;
+    comp->Register(this);
+    }
+}
+
+void vtkPVPolyData::SetPolyData(vtkPolyData *data)
+{
+  this->SetData(data);
+  this->Mapper->SetInput(data);
+}
+
+vtkPolyData *vtkPVPolyData::GetPolyData()
+{
+  return (vtkPolyData*)this->Data;
 }

@@ -46,7 +46,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWScale.h"
 
 #include "vtkPVComposite.h"
-#include "vtkPVPolyDataComposite.h"
+#include "vtkPVConeSource.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -72,16 +72,16 @@ vtkPVWindow::vtkPVWindow()
   this->CreateMenu = vtkKWWidget::New();
   this->Toolbar = vtkKWToolbar::New();
   this->ResetCameraButton = vtkKWWidget::New();
+  this->PreviousCompositeButton = vtkKWWidget::New();
+  this->NextCompositeButton = vtkKWWidget::New();
   this->CurrentDataComposite = NULL;
+  this->CompositeList = vtkKWCompositeCollection::New();
   
   this->MenuSource = vtkKWMenu::New();
   this->MenuSource->SetParent(this->Menu);
     
   this->DataPropertiesFrame = vtkKWNotebook::New();
   this->DataPropertiesFrameCreated = 0;
-  this->IsoScale = vtkKWScale::New();
-  this->XPlaneScale = vtkKWScale::New();
-  this->ZPlaneScale = vtkKWScale::New();
 }
 
 //----------------------------------------------------------------------------
@@ -91,6 +91,11 @@ vtkPVWindow::~vtkPVWindow()
   this->Toolbar = NULL;
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
+  this->PreviousCompositeButton->Delete();
+  this->PreviousCompositeButton = NULL;
+  this->NextCompositeButton->Delete();
+  this->NextCompositeButton = NULL;
+  
   if (this->CurrentDataComposite != NULL)
     {
     this->CurrentDataComposite->Delete();
@@ -104,18 +109,6 @@ vtkPVWindow::~vtkPVWindow()
   this->DataPropertiesFrame->SetParent(NULL);
   this->DataPropertiesFrame->Delete();
   this->DataPropertiesFrame = NULL;
-
-  this->IsoScale->SetParent(NULL);
-  this->IsoScale->Delete();
-  this->IsoScale = NULL;
-
-  this->XPlaneScale->SetParent(NULL);
-  this->XPlaneScale->Delete();
-  this->XPlaneScale = NULL;
-
-  this->ZPlaneScale->SetParent(NULL);
-  this->ZPlaneScale->Delete();
-  this->ZPlaneScale = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -185,7 +178,17 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->ResetCameraButton->SetCommand(this->MainView, "ResetCamera");
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
                this->ResetCameraButton->GetWidgetName());
-    
+  
+  this->PreviousCompositeButton->SetParent(this->Toolbar);
+  this->PreviousCompositeButton->Create(app, "button", "-text Previous");
+  this->PreviousCompositeButton->SetCommand(this, "PreviousComposite");
+  this->NextCompositeButton->SetParent(this->Toolbar);
+  this->NextCompositeButton->Create(app, "button", "-text Next");
+  this->NextCompositeButton->SetCommand(this, "NextComposite");
+  this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
+	       this->PreviousCompositeButton->GetWidgetName(),
+	       this->NextCompositeButton->GetWidgetName());
+  
   this->Script( "wm deiconify %s", this->GetWidgetName());
 
   char *rbv =
@@ -266,41 +269,14 @@ void vtkPVWindow::SetCurrentDataComposite(vtkPVComposite *comp)
     this->CurrentDataComposite = comp;
     comp->Select(this->MainView);
     comp->Register(this);
+    if (this->CompositeList->IsItemPresent(comp) == 0)
+      {
+      this->CompositeList->AddItem(comp);
+      }
     this->Script("pack %s -side top -anchor w -padx 2 -pady 2 -expand yes -fill x",
 		 comp->GetProperties()->GetWidgetName());
     }
 }
-
-
-void vtkPVWindow::SetCurrentDataComposite(vtkPVPolyDataComposite *pdcomp)
-{
-  if (pdcomp->GetPropertiesParent() != this->GetDataPropertiesParent())
-    {
-    vtkErrorMacro("CurrentComposites must use our DataPropertiesParent.");
-    return;
-    }
-  
-  if (this->CurrentDataComposite)
-    {
-    this->CurrentDataComposite->Deselect(this->MainView);
-    this->CurrentDataComposite->UnRegister(this);
-    this->CurrentDataComposite = NULL;
-    this->Script("catch {eval pack forget [pack slaves %s]}",
-		 this->GetDataPropertiesParent()->GetWidgetName());
-    }
-  
-  if (pdcomp)
-    {
-    this->CurrentDataComposite = pdcomp;
-    pdcomp->Select(this->MainView);
-    pdcomp->Register(this);
-    this->Script("pack %s -side top -anchor w -padx 2 -pady 2 -expand yes -fill x",
-		 pdcomp->GetProperties()->GetWidgetName());
-    }
-}
-
-
-
 
 //----------------------------------------------------------------------------
 // Setup a cone
@@ -345,16 +321,21 @@ void vtkPVWindow::SetupCone()
 void vtkPVWindow::NewCone()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVPolyDataComposite *pdcomp;
-  
-  pdcomp = vtkPVPolyDataComposite::New();
-  pdcomp->SetTabLabels("PolyData", "ConeSource");
-  pdcomp->SetPropertiesParent(this->GetDataPropertiesParent());
-  pdcomp->CreateProperties(pvApp, "");
-  this->MainView->AddComposite(pdcomp);
-  pdcomp->SetWindow(this);
-  this->SetCurrentDataComposite(pdcomp);
-  pdcomp->Delete();
+  vtkPVComposite *comp;
+  vtkPVConeSource *cone = vtkPVConeSource::New();
+  vtkPVPolyData *poly = vtkPVPolyData::New();
+
+  poly->SetPolyData(cone->GetConeSource()->GetOutput());
+
+  comp = vtkPVComposite::New();
+  comp->SetSource(cone);
+  comp->SetData(poly);
+  comp->SetPropertiesParent(this->GetDataPropertiesParent());
+  comp->CreateProperties(pvApp, "");
+  this->MainView->AddComposite(comp);
+  comp->SetWindow(this);
+  this->SetCurrentDataComposite(comp);
+  comp->Delete();
   
   this->MainView->ResetCamera();
   
@@ -365,7 +346,7 @@ void vtkPVWindow::NewCone()
 // Setup the pipeline
 void vtkPVWindow::NewVolume()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+/*  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *comp;
   
   comp = vtkPVComposite::New();
@@ -377,69 +358,8 @@ void vtkPVWindow::NewVolume()
   
   this->MainView->ResetCamera();
   this->MainView->Render();
+  */
 }
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::IsoValueChanged()
-{
-  int id, num;
-  float val;
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  
-  val = this->IsoScale->GetValue();
-  
-  // Tell each of the worker pipelines the new value.
-  num = pvApp->GetController()->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    pvApp->RemoteScript(id, "Iso SetValue 0 %f", val);
-    }
-    
-  this->MainView->Render();
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::XPlaneChanged()
-{
-  int id, num;
-  float val;
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  
-  val = this->XPlaneScale->GetValue();
-  
-  // Tell each of the worker pipelines the new value.
-  num = pvApp->GetController()->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    pvApp->RemoteScript(id, "ImagePlaneX SetPosition %d", (int)val);
-    }
-    
-  this->MainView->Render();
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::ZPlaneChanged()
-{
-  int id, num;
-  float val;
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  
-  val = this->ZPlaneScale->GetValue();
-  
-  // Tell each of the worker pipelines the new value.
-  num = pvApp->GetController()->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    pvApp->RemoteScript(id, "ImagePlaneZ SetPosition %d", (int)val);
-    }
-    
-  this->MainView->Render();
-}
-
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::NewWindow()
@@ -448,11 +368,6 @@ void vtkPVWindow::NewWindow()
   nw->Create(this->Application,"");
   this->Application->AddWindow(nw);  
   nw->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::SetupVolumeIso()
-{
 }
 
 //----------------------------------------------------------------------------
@@ -485,4 +400,48 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
     }
 
   vtkKWWindow::SerializeToken(is,token);
+}
+
+vtkPVComposite* vtkPVWindow::GetCurrentDataComposite()
+{
+  return this->CurrentDataComposite;
+}
+
+void vtkPVWindow::NextComposite()
+{
+  vtkPVComposite *composite = this->GetNextComposite();
+  if (composite != NULL)
+    {
+    this->GetCurrentDataComposite()->GetProp()->VisibilityOff();
+    this->SetCurrentDataComposite(composite);
+    this->GetCurrentDataComposite()->GetProp()->VisibilityOn();
+    }
+  
+  this->MainView->Render();
+}
+
+void vtkPVWindow::PreviousComposite()
+{
+  vtkPVComposite *composite = this->GetPreviousComposite();
+  if (composite != NULL)
+    {
+    this->GetCurrentDataComposite()->GetProp()->VisibilityOff();
+    this->SetCurrentDataComposite(composite);
+    this->GetCurrentDataComposite()->GetProp()->VisibilityOn();
+    }
+  
+  this->MainView->Render();
+}
+
+
+vtkPVComposite* vtkPVWindow::GetNextComposite()
+{
+  int pos = this->CompositeList->IsItemPresent(this->CurrentDataComposite);
+  return (vtkPVComposite*)this->CompositeList->GetItemAsObject(pos);
+}
+
+vtkPVComposite* vtkPVWindow::GetPreviousComposite()
+{
+  int pos = this->CompositeList->IsItemPresent(this->CurrentDataComposite);
+  return (vtkPVComposite*)this->CompositeList->GetItemAsObject(pos-2);
 }

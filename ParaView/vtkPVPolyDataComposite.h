@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkActor.h"
 #include "vtkKWLabel.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVConeSource.h"
+#include "vtkPVSource.h"
 
 class vtkPVWindow;
 
@@ -50,7 +50,7 @@ public:
   // Description:
   // Create the properties object, called by InitializeProperties.
   virtual void CreateProperties(vtkKWApplication *app, char *args);
-
+  
   void SetPropertiesParent(vtkKWWidget *parent);
   vtkKWWidget *GetPropertiesParent();
   vtkKWWidget *GetProperties();
@@ -64,18 +64,19 @@ public:
 
   void SetWindow(vtkPVWindow *window);
   vtkPVWindow *GetWindow();
-  
-  vtkPVConeSource *GetConeSource();
 
-  void SetPVPolyData(vtkPVPolyData* poly);
+  vtkSetObjectMacro(PVPolyData, vtkPVPolyData);
+  vtkGetObjectMacro(PVPolyData, vtkPVPolyData);
   
+  vtkSetObjectMacro(PVSource, vtkPVSource);
+  vtkGetObjectMacro(PVSource, vtkPVSource);
 protected:
   vtkPVPolyDataComposite();
   ~vtkPVPolyDataComposite();
   
   vtkKWNotebook *Notebook;
-  vtkPVPolyData *PolyData;
-  vtkPVConeSource *ConeSource;
+  vtkPVPolyData *PVPolyData;
+  vtkPVSource *PVSource;
   vtkActor *Actor;
   
   char *Label1;

@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ..\..\vtkbin\Debug\lib\vtktcl.lib ..\Widgets\Debug\vtkKWWidgetsTcl.lib ..\..\vtkbin\Debug\lib\vtkPatented.lib opengl32.lib ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib vtktcl.lib vtkCommon.lib vtkImaging.lib vtkGraphics0.lib vtkGraphics1.lib vtkGraphics2.lib vtkGraphics3.lib vtkGraphics4.lib vtkContrib.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /pdb:"d:/Kw/Debug/vtkKWParaViewTcl.pdb" /debug /machine:I386 /out:"Debug/vtkKWParaViewTcl.dll" /implib:"d:/Kw/Debug/vtkKWParaViewTcl.lib" /pdbtype:sept /libpath:"..\..\vtkbin\debug\lib" /libpath:"C:\program files\html help workshop\lib"
+# ADD LINK32 ..\..\vtkbin\Debug\lib\vtktcl.lib ..\Widgets\Debug\vtkKWWidgetsTcl.lib ..\..\vtkbin\Debug\lib\vtkPatented.lib opengl32.lib ..\..\vtk\pcmaker\tk82.lib ..\..\vtk\pcmaker\tcl82.lib vtktcl.lib vtkCommon.lib vtkImaging.lib vtkGraphics0.lib vtkGraphics1.lib vtkGraphics2.lib vtkGraphics3.lib vtkGraphics4.lib vtkContrib.lib htmlhelp.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /pdb:"../Debug/vtkKWParaViewTcl.pdb" /debug /machine:I386 /out:"Debug/vtkKWParaViewTcl.dll" /pdbtype:sept /libpath:"..\..\vtkbin\debug\lib" /libpath:"C:\program files\html help workshop\lib"
 # SUBTRACT LINK32 /pdb:none
 
 !ENDIF 
@@ -181,27 +181,27 @@ SOURCE=.\vtkPVCompositeTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImage.cxx
+SOURCE=.\vtkPVConeSource.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImagePlaneComponent.cxx
+SOURCE=.\vtkPVConeSourceTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImagePlaneComponentTcl.cxx
+SOURCE=.\vtkPVMenuButton.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImageReader.cxx
+SOURCE=.\vtkPVMenuButtonTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImageReaderTcl.cxx
+SOURCE=.\vtkPVPolyData.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImageTcl.cxx
+SOURCE=.\vtkPVPolyDataTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -221,11 +221,27 @@ SOURCE=.\vtkPVRenderViewTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVShrinkPolyData.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVShrinkPolyDataTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVSlave.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkPVSlaveTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVSource.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVSourceTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -454,15 +470,15 @@ InputName=vtkPVComposite
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImage.h
+SOURCE=.\vtkPVConeSource.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
 
 # Begin Custom Build
-InputPath=.\vtkPVImage.h
-InputName=vtkPVImage
+InputPath=.\vtkPVConeSource.h
+InputName=vtkPVConeSource
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -474,15 +490,15 @@ InputName=vtkPVImage
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImagePlaneComponent.h
+SOURCE=.\vtkPVMenuButton.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
 
 # Begin Custom Build
-InputPath=.\vtkPVImagePlaneComponent.h
-InputName=vtkPVImagePlaneComponent
+InputPath=.\vtkPVMenuButton.h
+InputName=vtkPVMenuButton
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -494,15 +510,15 @@ InputName=vtkPVImagePlaneComponent
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImageReader.h
+SOURCE=.\vtkPVPolyData.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
 
 # Begin Custom Build
-InputPath=.\vtkPVImageReader.h
-InputName=vtkPVImageReader
+InputPath=.\vtkPVPolyData.h
+InputName=vtkPVPolyData
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -554,6 +570,26 @@ InputName=vtkPVRenderView
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVShrinkPolyData.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVShrinkPolyData.h
+InputName=vtkPVShrinkPolyData
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVSlave.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -563,6 +599,26 @@ SOURCE=.\vtkPVSlave.h
 # Begin Custom Build
 InputPath=.\vtkPVSlave.h
 InputName=vtkPVSlave
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVSource.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVSource.h
+InputName=vtkPVSource
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

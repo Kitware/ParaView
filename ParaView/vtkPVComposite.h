@@ -37,12 +37,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVComposite_h
 
 #include "vtkKWComposite.h"
-#include "vtkOutlineSource.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkActor.h"
-#include "vtkKWLabel.h"
-#include "vtkPVImage.h"
-#include "vtkPVImageReader.h"
+#include "vtkPVSource.h"
+#include "vtkPVPolyData.h"
+
+class vtkPVWindow;
 
 class VTK_EXPORT vtkPVComposite : public vtkKWComposite
 {
@@ -60,18 +58,27 @@ public:
   void SetPropertiesParent(vtkKWWidget *parent);
   vtkKWWidget *GetPropertiesParent();
   vtkKWWidget *GetProperties();
-  
+
+  void SetData(vtkPVPolyData *data);
+  vtkGetObjectMacro(Data, vtkPVPolyData);
+
+  void SetSource(vtkPVSource *source);
+  vtkGetObjectMacro(Source, vtkPVSource);
+
   void Select(vtkKWView *);
   void Deselect(vtkKWView *);
-  
+
+  void SetWindow(vtkPVWindow *window);
+  vtkPVWindow *GetWindow();
+
 protected:
   vtkPVComposite();
   ~vtkPVComposite();
   
   vtkKWNotebook *Notebook;
-  vtkPVImage *Image;
-  vtkPVImageReader *ImageReader;
-  vtkActor *Actor;
+  vtkPVPolyData *Data;
+  vtkPVSource *Source;
+  vtkPVWindow *Window;
   
   int NotebookCreated;
 };

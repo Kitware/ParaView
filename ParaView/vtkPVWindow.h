@@ -36,7 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindow.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVComposite.h"
-#include "vtkPVPolyDataComposite.h"
+
 class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
@@ -55,8 +55,8 @@ public:
   // Open or close a polygonal dataset for viewing.
   virtual void NewWindow();
   virtual void Save();
-  virtual void NewVolume();
   virtual void NewCone();
+  virtual void NewVolume();
   
   // Description:
   // Chaining method to serialize an object and its superclasses.
@@ -72,12 +72,14 @@ public:
   void ShowDataProperties();
   vtkKWWidget *GetDataPropertiesParent();
   
-  void IsoValueChanged();
-  void XPlaneChanged();
-  void ZPlaneChanged();
-  
   void SetCurrentDataComposite(vtkPVComposite *comp);
-  void SetCurrentDataComposite(vtkPVPolyDataComposite *pdcomp);
+  vtkPVComposite *GetCurrentDataComposite();
+  vtkPVComposite *GetNextComposite();
+  vtkPVComposite *GetPreviousComposite();
+  
+  //tcl callbacks that use GetNextComposite and GetPreviousComposite
+  void NextComposite();
+  void PreviousComposite();
   
 protected:
   vtkPVWindow();
@@ -86,7 +88,6 @@ protected:
   void operator=(const vtkPVWindow&) {};
 
   void SetupCone();
-  void SetupVolumeIso();
   
   vtkPVRenderView *MainView;
   vtkKWWidget *RetrieveMenu;
@@ -94,6 +95,8 @@ protected:
   
   vtkKWToolbar *Toolbar;
   vtkKWWidget *ResetCameraButton;
+  vtkKWWidget *PreviousCompositeButton;
+  vtkKWWidget *NextCompositeButton;
 
   vtkKWMenu *MenuSource;
   
@@ -101,11 +104,8 @@ protected:
   int DataPropertiesFrameCreated;
   void CreateDataPropertiesFrame();
 
-  vtkKWComposite *CurrentDataComposite;
-  
-  vtkKWScale *IsoScale;
-  vtkKWScale *XPlaneScale;
-  vtkKWScale *ZPlaneScale;
+  vtkPVComposite *CurrentDataComposite;
+  vtkKWCompositeCollection *CompositeList;
 };
 
 

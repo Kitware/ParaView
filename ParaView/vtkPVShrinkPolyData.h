@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVConeSource.h
+  Module:    vtkPVShrinkPolyData.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,44 +26,39 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVConeSource_h
-#define __vtkPVConeSource_h
+#ifndef __vtkPVShrinkPolyData_h
+#define __vtkPVShrinkPolyData_h
 
 #include "vtkKWLabel.h"
-#include "vtkConeSource.h"
 #include "vtkShrinkPolyData.h"
 #include "vtkKWEntry.h"
 #include "vtkKWScale.h"
 #include "vtkPVSource.h"
 
-class VTK_EXPORT vtkPVConeSource : public vtkPVSource
+
+class VTK_EXPORT vtkPVShrinkPolyData : public vtkPVSource
 {
 public:
-  static vtkPVConeSource* New();
-  vtkTypeMacro(vtkPVConeSource,vtkPVSource);
+  static vtkPVShrinkPolyData* New();
+  vtkTypeMacro(vtkPVShrinkPolyData,vtkPVSource);
 
   void Create(vtkKWApplication *app, char *args);
+  
+  void ShrinkFactorChanged();
 
-  vtkGetObjectMacro(ConeSource, vtkConeSource);
-    
-  void ConeParameterChanged();
+  vtkGetObjectMacro(Shrink, vtkShrinkPolyData);
   
 protected:
-  vtkPVConeSource();
-  ~vtkPVConeSource();
-  vtkPVConeSource(const vtkPVConeSource&) {};
-  void operator=(const vtkPVConeSource&) {};
+  vtkPVShrinkPolyData();
+  ~vtkPVShrinkPolyData();
+  vtkPVShrinkPolyData(const vtkPVShrinkPolyData&) {};
+  void operator=(const vtkPVShrinkPolyData&) {};
     
   vtkKWLabel *Label;
-  vtkKWLabel *HeightLabel;
-  vtkKWEntry *HeightEntry;
-  vtkKWLabel *RadiusLabel;
-  vtkKWEntry *RadiusEntry;
-  vtkKWLabel *ResolutionLabel;
-  vtkKWEntry *ResolutionEntry;
   vtkKWWidget *Accept;
+  vtkKWScale *ShrinkFactorScale;
 
-  vtkConeSource *ConeSource;
+  vtkShrinkPolyData *Shrink;
 };
 
 #endif

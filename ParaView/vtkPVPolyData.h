@@ -36,8 +36,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVMenuButton.h"
 #include "vtkKWScale.h"
 #include "vtkActor.h"
+#include "vtkDataSet.h"
 
-class vtkPVPolyDataComposite;
+class vtkPVComposite;
 
 class VTK_EXPORT vtkPVPolyData : public vtkKWWidget
 {
@@ -49,13 +50,15 @@ public:
 
   vtkProp* GetProp();
 
-  vtkSetObjectMacro(PolyData, vtkPolyData);
-  vtkGetObjectMacro(PolyData, vtkPolyData);
+  void SetPolyData(vtkPolyData *data);
+  vtkPolyData *GetPolyData();
 
-  void SetupShrink();
-  void Shrink();
+  // Description:
+  // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
+  void SetComposite(vtkPVComposite *pvComp);
   
-  void SetComposite(vtkPVPolyDataComposite *pvComp);
+  void SetupShrinkSlider();
+  void Shrink();
   
 protected:
   vtkPVPolyData();
@@ -63,14 +66,16 @@ protected:
   vtkPVPolyData(const vtkPVPolyData&) {};
   void operator=(const vtkPVPolyData&) {};
 
+  vtkSetObjectMacro(Data, vtkDataSet);
+
   vtkKWLabel *Label;
   vtkPVMenuButton *FiltersMenuButton;
   vtkKWScale *ShrinkFactorScale;
   vtkKWWidget *Accept;
-  vtkPolyData *PolyData;
+  vtkDataSet *Data;
   vtkPolyDataMapper *Mapper;
   vtkActor *Actor;
-  vtkPVPolyDataComposite *Comp;
+  vtkPVComposite *Composite;
 };
 
 #endif

@@ -213,6 +213,5 @@ void vtkPVApplication::Exit()
       this->Controller->TriggerRMI(id, VTK_BREAK_RMI_TAG);
       }
     }
-  
   this->vtkKWApplication::Exit();
 }

@@ -30,12 +30,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabel.h"
 #include "vtkPVApplication.h"
 #include "vtkKWView.h"
+#include "vtkPVWindow.h"
 
 vtkPVComposite::vtkPVComposite()
 {
   this->Notebook = vtkKWNotebook::New();
-  this->Image = NULL;
-  this->ImageReader = vtkPVImageReader::New();
+  this->Data = NULL;
+  this->Source = NULL;
+  this->Window = NULL;
   
   this->NotebookCreated = 0;
 }
@@ -52,13 +54,35 @@ vtkPVComposite::~vtkPVComposite()
   this->Notebook->Delete();
   this->Notebook = NULL;
   
-  this->Image->Delete();
-  this->Image = NULL;
-  
-  this->ImageReader->Delete();
-  this->ImageReader = NULL;
+  this->SetData(NULL);
+  this->SetSource(NULL);
 }
 
+void vtkPVComposite::SetWindow(vtkPVWindow *window)
+{
+  if (this->Window == window)
+    {
+    return;
+    }
+  this->Modified();
+
+  if (this->Window)
+    {
+    vtkPVWindow *tmp = this->Window;
+    this->Window = NULL;
+    tmp->UnRegister(this);
+    }
+  if (window)
+    {
+    this->Window = window;
+    window->Register(this);
+    }
+}
+
+vtkPVWindow *vtkPVComposite::GetWindow()
+{
+  return this->Window;
+}
 
 void vtkPVComposite::Select(vtkKWView *view)
 {
@@ -70,11 +94,19 @@ void vtkPVComposite::Deselect(vtkKWView *view)
 
 vtkProp* vtkPVComposite::GetProp()
 {
-  return this->Image->GetProp();
+  return this->Data->GetProp();
 }
 
 void vtkPVComposite::CreateProperties(vtkKWApplication *app, char *args)
 { 
+  const char *dataPage, *sourcePage;
+
+  if (this->Data == NULL || this->Source == NULL)
+    {
+    vtkErrorMacro("You need to set the data and source before you create a composite");
+    return;
+    }
+
   this->SetApplication(app);
   
   if (this->NotebookCreated)
@@ -84,25 +116,21 @@ void vtkPVComposite::CreateProperties(vtkKWApplication *app, char *args)
   this->NotebookCreated = 1;
   
   this->Notebook->Create(app, args);
-  this->Notebook->AddPage("Image");
-  this->Notebook->AddPage("Image Reader");
+  sourcePage = this->Source->GetClassName();
+  this->Notebook->AddPage(sourcePage);
+  dataPage = this->Data->GetClassName();
+  this->Notebook->AddPage(dataPage);
   
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
-  this->Notebook->Raise("Image");
-  
-  if (this->Image == NULL)
-    {
-    this->Image = vtkPVImage::New();
-    }
-  
-  this->Image->SetParent(this->Notebook->GetFrame("Image"));
-  this->Image->Create(app, "");
-  this->Script("pack %s", this->Image->GetWidgetName());
+    
+  this->Data->SetParent(this->Notebook->GetFrame(dataPage));
+  this->Data->Create(app, "");
+  this->Script("pack %s", this->Data->GetWidgetName());
 
-  this->ImageReader->SetParent(this->Notebook->GetFrame("Image Reader"));
-  this->ImageReader->Create(app, "");
-  this->Script("pack %s", this->ImageReader->GetWidgetName());
+  this->Source->SetParent(this->Notebook->GetFrame(sourcePage));
+  this->Source->Create(app, "");
+  this->Script("pack %s", this->Source->GetWidgetName());
 }
 
 void vtkPVComposite::SetPropertiesParent(vtkKWWidget *parent)
@@ -118,4 +146,50 @@ vtkKWWidget *vtkPVComposite::GetPropertiesParent()
 vtkKWWidget *vtkPVComposite::GetProperties()
 {
   return this->Notebook;
+}
+
+void vtkPVComposite::SetSource(vtkPVSource *source)
+{
+  if (this->Source == source)
+    {
+    return;
+    }
+  this->Modified();
+
+  if (this->Source)
+    {
+    vtkPVSource *tmp = this->Source;
+    this->Source = NULL;
+    tmp->SetComposite(NULL);
+    tmp->UnRegister(this);
+    }
+  if (source)
+    {
+    this->Source = source;
+    source->Register(this);
+    source->SetComposite(this);
+    }
+}
+
+void vtkPVComposite::SetData(vtkPVPolyData *data)
+{
+  if (this->Data == data)
+    {
+    return;
+    }
+  this->Modified();
+
+  if (this->Data)
+    {
+    vtkPVPolyData *tmp = this->Data;
+    this->Data = NULL;
+    tmp->SetComposite(NULL);
+    tmp->UnRegister(this);
+    }
+  if (data)
+    {
+    this->Data = data;
+    data->Register(this);
+    data->SetComposite(this);
+    }
 }

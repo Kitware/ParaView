@@ -28,13 +28,34 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVConeSource.h"
 #include "vtkKWApplication.h"
+#include "vtkKWView.h"
+#include "vtkKWRenderView.h"
+#include "vtkPVComposite.h"
+
+int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
+			   int argc, char *argv[]);
 
 vtkPVConeSource::vtkPVConeSource()
 {
+  this->CommandFunction = vtkPVConeSourceCommand;
+  
   this->Label = vtkKWLabel::New();
+  this->Label->SetParent(this);
+  this->HeightLabel = vtkKWLabel::New();
+  this->HeightLabel->SetParent(this);
+  this->RadiusLabel = vtkKWLabel::New();
+  this->RadiusLabel->SetParent(this);
+  this->ResolutionLabel = vtkKWLabel::New();
+  this->ResolutionLabel->SetParent(this);
+  this->HeightEntry = vtkKWEntry::New();
+  this->HeightEntry->SetParent(this);
+  this->RadiusEntry = vtkKWEntry::New();
+  this->RadiusEntry->SetParent(this);
+  this->ResolutionEntry = vtkKWEntry::New();
+  this->ResolutionEntry->SetParent(this);
+  this->Accept = vtkKWWidget::New();
+  this->Accept->SetParent(this);
   this->ConeSource = vtkConeSource::New();
-  this->Shrink = vtkShrinkPolyData::New();
-  this->Cone = 0;
 }
 
 vtkPVConeSource::~vtkPVConeSource()
@@ -42,11 +63,25 @@ vtkPVConeSource::~vtkPVConeSource()
   this->Label->Delete();
   this->Label = NULL;
   
+  this->HeightLabel->Delete();
+  this->HeightLabel = NULL;
+  this->RadiusLabel->Delete();
+  this->RadiusLabel = NULL;
+  this->ResolutionLabel->Delete();
+  this->ResolutionLabel = NULL;
+  
+  this->HeightEntry->Delete();
+  this->HeightEntry = NULL;
+  this->RadiusEntry->Delete();
+  this->RadiusEntry = NULL;
+  this->ResolutionEntry->Delete();
+  this->ResolutionEntry = NULL;
+
+  this->Accept->Delete();
+  this->Accept = NULL;
+    
   this->ConeSource->Delete();
   this->ConeSource = NULL;
-  
-  this->Shrink->Delete();
-  this->Shrink = NULL;
 }
 
 vtkPVConeSource* vtkPVConeSource::New()
@@ -67,46 +102,43 @@ void vtkPVConeSource::Create(vtkKWApplication *app, char *args)
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
   
-  this->Label->SetParent(this);
   this->Label->Create(this->Application, "");
-  if (this->IsConeSource())
-    {
-    this->Label->SetLabel("vtkPVConeSource label");
-    }
-  else
-    {
-    this->Label->SetLabel("vtkShrinkPolyData label");
-    }
+  this->Label->SetLabel("vtkPVConeSource label");
   
   this->Script("pack %s", this->Label->GetWidgetName());
+  
+  this->RadiusLabel->Create(this->Application, "");
+  this->RadiusLabel->SetLabel("Radius:");
+  this->HeightLabel->Create(this->Application, "");
+  this->HeightLabel->SetLabel("Height:");
+  this->ResolutionLabel->Create(this->Application, "");
+  this->ResolutionLabel->SetLabel("Resolution:");
+  this->RadiusEntry->Create(this->Application, "");
+  this->RadiusEntry->SetValue(this->ConeSource->GetRadius(), 2);
+  this->HeightEntry->Create(this->Application, "");
+  this->HeightEntry->SetValue(this->ConeSource->GetHeight(), 2);
+  this->ResolutionEntry->Create(this->Application, "");
+  this->ResolutionEntry->SetValue(this->ConeSource->GetResolution());
+  this->Accept->Create(this->Application, "button",
+	                     "-text Accept");
+  this->Accept->SetCommand(this, "ConeParameterChanged");
+  this->Script("pack %s", this->Accept->GetWidgetName());
+  this->Script("pack %s %s %s %s %s %s %s", 
+               this->RadiusLabel->GetWidgetName(),
+               this->RadiusEntry->GetWidgetName(),
+               this->HeightLabel->GetWidgetName(),
+               this->HeightEntry->GetWidgetName(),
+               this->ResolutionLabel->GetWidgetName(),
+               this->ResolutionEntry->GetWidgetName(),
+               this->Accept->GetWidgetName());
 }
 
-vtkPolyData* vtkPVConeSource::GetOutput()
+void vtkPVConeSource::ConeParameterChanged()
 {
-  if (this->IsConeSource())
-    {
-    return this->ConeSource->GetOutput();
-    }
-  else
-    {
-    return this->Shrink->GetOutput();
-    }
+  this->ConeSource->SetRadius(this->RadiusEntry->GetValueAsFloat());
+  this->ConeSource->SetHeight(this->HeightEntry->GetValueAsFloat());
+  this->ConeSource->SetResolution(this->ResolutionEntry->GetValueAsInt());
+  
+  this->Composite->GetView()->Render();
 }
 
-void vtkPVConeSource::SetConeSource()
-{  
-  this->ConeSource->SetRadius(100.0);
-  this->ConeSource->SetHeight(100.0);
-  this->Cone = 1;
-}
-
-void vtkPVConeSource::SetShrinkInput(vtkPolyData *input)
-{
-  this->Shrink->SetInput(input);
-  this->Cone = 0;
-}
-
-int vtkPVConeSource::IsConeSource()
-{
-  return this->Cone;
-}

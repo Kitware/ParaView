@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVConeSource.h
+  Module:    vtkPVSource.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,44 +26,35 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVConeSource_h
-#define __vtkPVConeSource_h
+#ifndef __vtkPVSource_h
+#define __vtkPVSource_h
 
 #include "vtkKWLabel.h"
-#include "vtkConeSource.h"
-#include "vtkShrinkPolyData.h"
-#include "vtkKWEntry.h"
-#include "vtkKWScale.h"
-#include "vtkPVSource.h"
+#include "vtkSource.h"
 
-class VTK_EXPORT vtkPVConeSource : public vtkPVSource
+class vtkPVComposite;
+
+class VTK_EXPORT vtkPVSource : public vtkKWWidget
 {
 public:
-  static vtkPVConeSource* New();
-  vtkTypeMacro(vtkPVConeSource,vtkPVSource);
+  static vtkPVSource* New();
+  vtkTypeMacro(vtkPVSource,vtkKWWidget);
+  
+  // Description:
+  // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
+  void SetComposite(vtkPVComposite *comp);
 
-  void Create(vtkKWApplication *app, char *args);
-
-  vtkGetObjectMacro(ConeSource, vtkConeSource);
-    
-  void ConeParameterChanged();
+  // Description:
+  // Create a Tk widget
+  virtual void Create(vtkKWApplication *app, char *args) {};
   
 protected:
-  vtkPVConeSource();
-  ~vtkPVConeSource();
-  vtkPVConeSource(const vtkPVConeSource&) {};
-  void operator=(const vtkPVConeSource&) {};
+  vtkPVSource();
+  ~vtkPVSource();
+  vtkPVSource(const vtkPVSource&) {};
+  void operator=(const vtkPVSource&) {};
     
-  vtkKWLabel *Label;
-  vtkKWLabel *HeightLabel;
-  vtkKWEntry *HeightEntry;
-  vtkKWLabel *RadiusLabel;
-  vtkKWEntry *RadiusEntry;
-  vtkKWLabel *ResolutionLabel;
-  vtkKWEntry *ResolutionEntry;
-  vtkKWWidget *Accept;
-
-  vtkConeSource *ConeSource;
+  vtkPVComposite* Composite;
 };
 
 #endif
