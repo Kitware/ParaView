@@ -179,6 +179,8 @@ protected:
 
   int                                  UseIntermixIntersectingGeometry;
 
+  int                                  Use3DCursor;
+
 private:
   vtkKWVolumeComposite(const vtkKWVolumeComposite&); // Not implemented
   void operator=(const vtkKWVolumeComposite&); // Not implemented
