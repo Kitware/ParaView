@@ -142,7 +142,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.55");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.56");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1381,7 +1381,7 @@ void vtkPVAnimationInterface::Play()
   this->StopFlag = 0;
   do
     {
-    cout << "T: " << t << endl;
+    //cout << "T: " << t << endl;
     t = this->GetCurrentTime();
     if (t >= this->GetGlobalEnd())
       {

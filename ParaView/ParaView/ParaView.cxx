@@ -132,12 +132,23 @@ int MyMain(int argc, char *argv[])
     }
 
   // Create the process module for initializing the processes.
-  if (app->GetClientMode() || serverMode) // only root server processed args.
+  // Only the root server processes args.
+  if (app->GetUseTiledDisplay())
     {
     if (app->GetRenderModuleName() == NULL)
       { // I do not like this initialization here.
       // Think about moving it.
-      app->SetRenderModuleName("CompositeRenderModule");
+      app->SetRenderModuleName("MultiDisplayRenderModule");
+      }
+    vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
+    pm = processModule;
+    }
+  else if (app->GetClientMode() || serverMode) 
+    {
+    if (app->GetRenderModuleName() == NULL)
+      { // I do not like this initialization here.
+      // Think about moving it.
+      app->SetRenderModuleName("MPIRenderModule");
       }
     vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
     pm = processModule;
@@ -148,7 +159,7 @@ int MyMain(int argc, char *argv[])
     if (app->GetRenderModuleName() == NULL)
       { // I do not like this initialization here.
       // Think about moving it.
-      app->SetRenderModuleName("CompositeRenderModule");
+      app->SetRenderModuleName("MPIRenderModule");
       }
     vtkPVMPIProcessModule *processModule = vtkPVMPIProcessModule::New();
 #else 

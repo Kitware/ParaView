@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.13");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.14");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -168,12 +168,33 @@ void vtkPVRenderModuleResetCameraClippingRange(
   vtkObject *caller, unsigned long vtkNotUsed(event),void *clientData, void *)
 {
   float bds[6];
+  double range1[2];
+  double range2[2];
 
   vtkPVRenderModule *self = (vtkPVRenderModule *)clientData;
   vtkRenderer *ren = (vtkRenderer*)caller;
 
+  // Get default clipping range.
+  // Includes 3D widgets but not all processes.
+  ren->GetActiveCamera()->GetClippingRange(range1);
+
   self->ComputeVisiblePropBounds(bds);
   ren->ResetCameraClippingRange(bds);
+  // Get part clipping range.
+  // Includes all process partitions, but not 3d Widgets.
+  ren->GetActiveCamera()->GetClippingRange(range2);
+
+  // Merge
+  if (range1[0] < range2[0])
+    {
+    range2[0] = range1[0];
+    }
+  if (range1[1] > range2[1])
+    {
+    range2[1] = range1[1];
+    }
+  // Includes all process partitions and 3D Widgets.
+  ren->GetActiveCamera()->SetClippingRange(range2);
 }
 
 

@@ -61,10 +61,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the application right after construction.
-  virtual void SetPVApplication(vtkPVApplication *pvApp);
-  
-  // Description:
   // This methods can be used from a script.  
   // "Set" sets the value of the scale, and adds an entry to the trace.
   void SetCollectThreshold(float);

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.4");
 
 
 
@@ -112,105 +112,6 @@ vtkPVPartDisplay* vtkPVCompositeRenderModule::CreatePartDisplay()
 }
 
 
-
-//----------------------------------------------------------------------------
-void vtkPVCompositeRenderModule::SetPVApplication(vtkPVApplication *pvApp)
-{
-  this->Superclass::SetPVApplication(pvApp);
-  if (pvApp == NULL)
-    {
-    return;
-    }
-  // We had trouble with SGI/aliasing with compositing.
-  if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
-      (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1))
-    {
-    pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
-    }
-
-  if (pvApp->GetUseTiledDisplay())
-    {
-    // Thr original tiled display with duplicate polydata.
-    //this->Composite = NULL;
-    //pvApp->MakeTclObject("vtkTiledDisplayManager", "TDispManager1");
-    //int *tileDim = pvApp->GetTileDimensions();
-    //pvApp->BroadcastScript("TDispManager1 SetTileDimensions %d %d",
-    //                       tileDim[0], tileDim[1]);
-    //this->CompositeTclName = NULL;
-    //this->SetCompositeTclName("TDispManager1");
-
-    this->Composite = NULL;
-    pvApp->MakeTclObject("vtkPVTiledDisplayManager", "TDispManager1");
-    int *tileDim = pvApp->GetTileDimensions();
-    pvApp->BroadcastScript("TDispManager1 SetTileDimensions %d %d",
-                           tileDim[0], tileDim[1]);
-    pvApp->BroadcastScript("TDispManager1 InitializeSchedule");
-
-    this->CompositeTclName = NULL;
-    this->SetCompositeTclName("TDispManager1");
-    }
-  else if (pvApp->GetClientMode() || pvApp->GetServerMode())
-    {
-    this->Composite = NULL;
-    pvApp->MakeTclObject("vtkClientCompositeManager", "CCompositeManager1");
-    // Clean up this mess !!!!!!!!!!!!!
-    // Even a cast to vtkPVClientServerModule would be better than this.
-    // How can we syncronize the process modules and render modules?
-    pvApp->BroadcastScript("CCompositeManager1 SetClientController [[$Application GetProcessModule] GetSocketController]");
-    pvApp->BroadcastScript("CCompositeManager1 SetClientFlag [$Application GetClientMode]");
-
-    this->CompositeTclName = NULL;
-    this->SetCompositeTclName("CCompositeManager1");    
-    }
-  else
-    {
-    // Create the compositer.
-    this->Composite = static_cast<vtkPVTreeComposite*>
-      (pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
-
-    //this->Composite->RemoveObservers(vtkCommand::AbortCheckEvent);
-    //vtkCallbackCommand* abc = vtkCallbackCommand::New();
-    //abc->SetCallback(PVLODRenderModuleAbortCheck);
-    //abc->SetClientData(this);
-    //this->AbortCheckTag = 
-    //    this->Composite->AddObserver(vtkCommand::AbortCheckEvent, abc);
-    //abc->Delete();
-
-    // Try using a more efficient compositer (if it exists).
-    // This should be a part of a module.
-    pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} "
-                           "{TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
-
-    this->CompositeTclName = NULL;
-    this->SetCompositeTclName("TreeComp1");
-
-    // If we are using SGI pipes, create a new Controller/Communicator/Group
-    // to use for compositing.
-    if (pvApp->GetUseRenderingGroup())
-      {
-      int numPipes = pvApp->GetNumberOfPipes();
-      // I would like to create another controller with a subset of world, but...
-      // For now, I added it as a hack to the composite manager.
-      pvApp->BroadcastScript("%s SetNumberOfProcesses %d",
-                             this->CompositeTclName, numPipes);
-      }
-    }
-
-  pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
-                         this->RenderWindowTclName);
-  pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
-
-
-  if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") )
-    {
-    pvApp->BroadcastScript("%s EnableAbortOff", this->CompositeTclName);
-    }
-
-  if ( getenv("PV_OFFSCREEN") )
-    {
-    pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModule::StillRender()

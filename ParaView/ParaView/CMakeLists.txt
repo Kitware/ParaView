@@ -95,7 +95,11 @@ SET( ParaView_SRCS
   vtkPVLineSourceWidget.cxx
   vtkPVLineWidget.cxx
   vtkPVMPIProcessModule.cxx
+  vtkPVMPIRenderModule.cxx
+  vtkPVMPIRenderModuleUI.cxx
   vtkPVMinMax.cxx
+  vtkPVMultiDisplayRenderModule.cxx
+  vtkPVMultiDisplayRenderModuleUI.cxx
   vtkPVNavigationWindow.cxx
   vtkPVObjectWidget.cxx
   vtkPVPart.cxx
