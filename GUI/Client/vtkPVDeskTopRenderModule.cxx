@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.7");
 
 
 
@@ -94,11 +94,15 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->PVApplication->Register(this);
 
   this->RendererID = pm->NewStreamObject("vtkIceTRenderer");
+  this->Renderer2DID = pm->NewStreamObject("vtkRenderer");
   this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
   pm->SendStreamToClientAndServer();
   this->Renderer = 
     vtkRenderer::SafeDownCast(
       pm->GetObjectFromID(this->RendererID));
+  this->Renderer2D = 
+    vtkRenderer::SafeDownCast(
+      pm->GetObjectFromID(this->Renderer2DID));
   this->RenderWindow = 
     vtkRenderWindow::SafeDownCast(
       pm->GetObjectFromID(this->RenderWindowID));
@@ -109,8 +113,21 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     this->RenderWindow->StereoRenderOn();
     }
   
+  // We cannot erase the zbuffer.  We need it for picking.  
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->Renderer2DID << "EraseOff" 
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->Renderer2DID << "SetLayer" << 2 
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->RenderWindowID << "SetNumberOfLayers" << 3
+                  << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->RenderWindowID << "AddRenderer" << this->RendererID
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->RenderWindowID << "AddRenderer" << this->Renderer2DID
                   << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
   
