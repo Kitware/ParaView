@@ -43,16 +43,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWUserInterfaceNotebookManager.h"
 
 #include "vtkCollectionIterator.h"
+#include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWNotebook.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWWidgetCollection.h"
+#include "vtkLinkedList.txx"
+#include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.6");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.7");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -447,8 +451,9 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanel(
     return;
     }
 
-  // Get the pages parent, and check if there are labeled frame that can be
-  // switch from one page to the other (share the same parent)
+  // Get the pages parent, and check if there are widgets (here, labeled frame)
+  // that can be Drag&Dropped from one page to the other (since they share the 
+  // same parent)
 
   vtkKWWidget *parent = this->GetPagesParentWidget(panel);
   if (!parent)
@@ -456,25 +461,149 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanel(
     return;
     }
 
-  vtkCollectionIterator *it = parent->GetChildren()->NewIterator();
-  for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+  if (!this->Notebook)
     {
+    return;
+    }
+
+  vtkCollectionIterator *it = parent->GetChildren()->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    // Check if the widget is a labeled frame. If we did not find such a frame,
+    // check if it is a widget with a single labeled frame child (i.e. a 
+    // vtkKWWidget that uses a labeled frame but did not want to inherit from 
+    // vtkKWLabeledFrame)
+
+    vtkKWWidget *widget = 0;
     vtkKWLabeledFrame *frame = vtkKWLabeledFrame::SafeDownCast(it->GetObject());
-    if (!frame)
+    if (frame)
       {
-      vtkKWWidget *widget = vtkKWWidget::SafeDownCast(it->GetObject());
+      widget = frame;
+      }
+    else
+      {
+      widget = vtkKWWidget::SafeDownCast(it->GetObject());
       if (widget && widget->GetChildren()->GetNumberOfItems() == 1)
         {
         frame = vtkKWLabeledFrame::SafeDownCast(
           widget->GetChildren()->GetLastKWWidget());
         }
       }
-    if (frame)
+
+    // Enable Drag & Drop for that frame, the notebook is the drop target
+
+    if (widget && frame && !frame->GetEnableDragAndDrop())
       {
-      // cout << panel->GetName() << " : " << frame->GetLabel()->GetLabel() << endl;
+      frame->EnableDragAndDropOn();
+      frame->AddDragAndDropTarget(this->Notebook);
+      frame->SetDragAndDropEndCommand(
+        this->Notebook, this, "DragAndDropEndCallback");
       }
+
+    it->GoToNextItem();
     }
   it->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
+  int x, int y, 
+  vtkKWWidget *widget, vtkKWWidget *anchor, vtkKWWidget *target)
+{
+  if (!this->Notebook || this->Notebook != target)
+    {
+    return;
+    }
+
+  // If the target is a tab in the notebook, move the widget to the page
+
+  int page_id = this->Notebook->GetPageIdContainingCoordinatesInTab(x, y);
+  if (page_id >= 0)
+    {
+    if (page_id != this->Notebook->GetRaisedPageId())
+      {
+      this->Notebook->Script("pack %s -side top -in %s",
+                             widget->GetWidgetName(), 
+                             this->Notebook->GetFrame(page_id)->GetWidgetName());
+      }
+    return;
+    }
+
+  // If not, first try to find the panel which is the parent of the dragged 
+  // widget
+
+  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
+  vtkKWUserInterfaceManager::PanelSlot *panel_found = NULL;
+  vtkKWUserInterfaceManager::PanelsContainerIterator *panel_it = 
+    this->Panels->NewIterator();
+
+  panel_it->InitTraversal();
+  while (!panel_it->IsDoneWithTraversal())
+    {
+    if (panel_it->GetData(panel_slot) == VTK_OK && 
+        panel_slot->Panel->GetPagesParentWidget() == widget->GetParent())
+      {
+      panel_found = panel_slot;
+      break;
+      }
+    panel_it->GoToNextItem();
+    }
+  panel_it->Delete();
+
+  if (!panel_found)
+    {
+    return;
+    }
+ 
+  // Then browse the children of the panel to find the drop zone among the
+  // sibling of the dragged widget
+
+  vtkCollectionIterator *child_it = 
+    panel_found->Panel->GetPagesParentWidget()->GetChildren()->NewIterator();
+
+  child_it->InitTraversal(); 
+  while (!child_it->IsDoneWithTraversal())
+    {
+    // Check if the child is a labeled frame. If we did not find such a frame,
+    // check if it is a widget with a single labeled frame child (i.e. a 
+    // vtkKWWidget that uses a labeled frame but did not want to inherit from 
+    // vtkKWLabeledFrame)
+
+    vtkKWWidget *child = 0;
+    vtkKWLabeledFrame *child_frame = 
+      vtkKWLabeledFrame::SafeDownCast(child_it->GetObject());
+    if (child_frame)
+      {
+      child = child_frame;
+      }
+    else
+      {
+      child = vtkKWWidget::SafeDownCast(child_it->GetObject());
+      if (child && child->GetChildren()->GetNumberOfItems() == 1)
+        {
+        child_frame = vtkKWLabeledFrame::SafeDownCast(
+          child->GetChildren()->GetLastKWWidget());
+        }
+      }
+
+    // If the correct child was found, pack the dragged widget after it
+
+    if (child && child_frame && child != widget && child->IsMapped() &&
+        vtkKWTkUtilities::ContainsCoordinates(
+          child->GetApplication()->GetMainInterp(),
+          child->GetWidgetName(),
+          x, y))
+      {
+      this->Notebook->Script("pack %s -after %s",
+                             widget->GetWidgetName(), child->GetWidgetName());
+      break;
+      }
+
+    child_it->GoToNextItem();
+    }
+  child_it->Delete();
 }
 
 //----------------------------------------------------------------------------

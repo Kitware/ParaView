@@ -164,6 +164,12 @@ public:
   // method if the panel has a UIM set.
   virtual void UpdatePanel(vtkKWUserInterfacePanel *panel);
 
+  // Description:
+  // Drag and Drop callback
+  virtual void DragAndDropEndCallback(
+    int x, int y, 
+    vtkKWWidget *widget, vtkKWWidget *anchor, vtkKWWidget *target);
+
 protected:
   vtkKWUserInterfaceNotebookManager();
   ~vtkKWUserInterfaceNotebookManager();
