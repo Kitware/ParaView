@@ -28,11 +28,7 @@ class vtkKWPushButtonSetLabeled;
 class vtkKWPopupButtonLabeled;
 class vtkKWPushButton;
 class vtkKWScale;
-
-//BTX
-template<class DataType> class vtkLinkedList;
-template<class DataType> class vtkLinkedListIterator;
-//ETX
+class vtkKWMaterialPropertyWidgetInternals;
 
 class VTK_EXPORT vtkKWMaterialPropertyWidget : public vtkKWWidget
 {
@@ -105,23 +101,7 @@ public:
   // Callbacks for the buttons, scales and presets
   virtual void PropertyChangingCallback();
   virtual void PropertyChangedCallback();
-  virtual void PresetMaterialCallback(vtkIdType preset_idx);
-
-  //BTX
-  // Description:
-  // Preset structure
-  class Preset
-  {
-  public:
-    float Ambient;
-    float Diffuse;
-    float Specular;
-    float SpecularPower;
-    char *HelpString;
-
-    Preset() { this->HelpString = 0; };
-  };
-  //ETX
+  virtual void PresetMaterialCallback(int preset_idx);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -158,9 +138,24 @@ protected:
   // Presets
 
   //BTX
-  typedef vtkLinkedList<Preset*> PresetsContainer;
-  typedef vtkLinkedListIterator<Preset*> PresetsContainerIterator;
-  PresetsContainer *Presets;
+
+  class Preset
+  {
+  public:
+    float Ambient;
+    float Diffuse;
+    float Specular;
+    float SpecularPower;
+    char *HelpString;
+
+    Preset() { this->HelpString = 0; };
+  };
+
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWMaterialPropertyWidgetInternals *Internals;
+  friend class vtkKWMaterialPropertyWidgetInternals;
+
   //ETX
 
   // UI

@@ -33,9 +33,22 @@
 
 #include <kwsys/SystemTools.hxx>
 
+#include <vtkstd/list>
+
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.6");
+
+//----------------------------------------------------------------------------
+class vtkKWMaterialPropertyWidgetInternals
+{
+public:
+
+  typedef vtkstd::list<vtkKWMaterialPropertyWidget::Preset*> PresetsContainer;
+  typedef vtkstd::list<vtkKWMaterialPropertyWidget::Preset*>::iterator PresetsContainerIterator;
+
+  PresetsContainer Presets;
+};
 
 //----------------------------------------------------------------------------
 vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
@@ -57,7 +70,7 @@ vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
 
   // Presets
 
-  this->Presets = vtkKWMaterialPropertyWidget::PresetsContainer::New();
+  this->Internals = new vtkKWMaterialPropertyWidgetInternals;
   this->AddDefaultPresets();
 
   // UI
@@ -104,29 +117,26 @@ vtkKWMaterialPropertyWidget::~vtkKWMaterialPropertyWidget()
 
   // Delete all presets
 
-  vtkKWMaterialPropertyWidget::Preset *preset = NULL;
-  vtkKWMaterialPropertyWidget::PresetsContainerIterator *it = 
-    this->Presets->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(preset) == VTK_OK)
+    vtkKWMaterialPropertyWidgetInternals::PresetsContainerIterator it = 
+      this->Internals->Presets.begin();
+    vtkKWMaterialPropertyWidgetInternals::PresetsContainerIterator end = 
+      this->Internals->Presets.end();
+    for (; it != end; ++it)
       {
-      if (preset->HelpString)
+      if (*it)
         {
-        delete [] preset->HelpString;
+        if ((*it)->HelpString)
+          {
+          delete [] (*it)->HelpString;
+          }
+        delete (*it);
         }
-      delete preset;
       }
-    it->GoToNextItem();
+    delete this->Internals;
     }
-  it->Delete();
 
-  // Delete the container
-
-  this->Presets->Delete();
-  
   // Delete UI
 
   if (this->PopupButton)
@@ -193,6 +203,11 @@ vtkKWMaterialPropertyWidget::~vtkKWMaterialPropertyWidget()
 //----------------------------------------------------------------------------
 void vtkKWMaterialPropertyWidget::AddDefaultPresets()
 {
+  if (!this->Internals)
+    {
+    return;
+    }
+
   vtkKWMaterialPropertyWidget::Preset *preset;
 
   // Presets : Unshaded
@@ -204,7 +219,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->SpecularPower = 1.0;
   preset->HelpString = kwsys::SystemTools::DuplicateString(
     "Full ambient eliminating all directional shading.");
-  this->Presets->AppendItem(preset);
+  this->Internals->Presets.push_back(preset);
 
   // Presets : Dull
 
@@ -215,7 +230,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->SpecularPower = 1.0;
   preset->HelpString = kwsys::SystemTools::DuplicateString(
     "Dull material properties (no specular lighting)");
-  this->Presets->AppendItem(preset);
+  this->Internals->Presets.push_back(preset);
   
   // Presets : Smooth
 
@@ -226,7 +241,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->SpecularPower = 10.0;
   preset->HelpString = kwsys::SystemTools::DuplicateString(
     "Smooth material properties (moderate specular lighting");
-  this->Presets->AppendItem(preset);
+  this->Internals->Presets.push_back(preset);
   
   // Presets : Shiny
 
@@ -237,7 +252,7 @@ void vtkKWMaterialPropertyWidget::AddDefaultPresets()
   preset->SpecularPower = 40.0;
   preset->HelpString = kwsys::SystemTools::DuplicateString(
     "Shiny material properties (high specular lighting)");
-  this->Presets->AppendItem(preset);
+  this->Internals->Presets.push_back(preset);
 } 
 
 //----------------------------------------------------------------------------
@@ -606,40 +621,37 @@ void vtkKWMaterialPropertyWidget::CreatePresets()
 
   // Create all presets
 
-  vtkIdType key = 0;
-  vtkKWMaterialPropertyWidget::Preset *preset = NULL;
-  vtkKWMaterialPropertyWidget::PresetsContainerIterator *it = 
-    this->Presets->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  int rank = 0;
+  vtkKWMaterialPropertyWidgetInternals::PresetsContainerIterator it = 
+    this->Internals->Presets.begin();
+  vtkKWMaterialPropertyWidgetInternals::PresetsContainerIterator end = 
+    this->Internals->Presets.end();
+  for (; it != end; ++it, ++rank)
     {
-    if (it->GetData(preset) == VTK_OK && it->GetKey(key) == VTK_OK)
+    if (*it)
       {
-      vtkKWPushButton *pb = pbs->AddWidget(key);
-      if (preset->HelpString)
+      vtkKWPushButton *pb = pbs->AddWidget(rank);
+      if ((*it)->HelpString)
         {
-        pb->SetBalloonHelpString(preset->HelpString);
+        pb->SetBalloonHelpString((*it)->HelpString);
         }
       
       this->CreateImage(buffer, 
-                        preset->Ambient * 100.0, 
-                        preset->Diffuse * 100.0,
-                        preset->Specular * 100.0, 
-                        preset->SpecularPower, 
+                        (*it)->Ambient * 100.0, 
+                        (*it)->Diffuse * 100.0,
+                        (*it)->Specular * 100.0, 
+                        (*it)->SpecularPower, 
                         this->PresetSize);
 
       pb->SetImageOption(
         buffer, this->PresetSize, this->PresetSize, pixel_size);
       
       ostrstream preset_callback;
-      preset_callback << "PresetMaterialCallback " << key << ends;
+      preset_callback << "PresetMaterialCallback " << rank << ends;
       pb->SetCommand(this, preset_callback.str());
       preset_callback.rdbuf()->freeze(0);
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
   delete [] buffer;
 
@@ -728,15 +740,15 @@ void vtkKWMaterialPropertyWidget::PropertyChangedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMaterialPropertyWidget::PresetMaterialCallback(vtkIdType key)
+void vtkKWMaterialPropertyWidget::PresetMaterialCallback(int rank)
 {
-  vtkKWMaterialPropertyWidget::Preset *preset = NULL;
-  if (this->Presets->GetItem(key, preset) != VTK_OK)
-    {
-    return;
-    }
+  vtkKWMaterialPropertyWidgetInternals::PresetsContainerIterator it = 
+    this->Internals->Presets.begin();
+  vtkKWMaterialPropertyWidgetInternals::PresetsContainerIterator end = 
+    this->Internals->Presets.end();
+  for (; it != end && rank; ++it, --rank);
 
-  if (this->UpdatePropertyFromPreset(preset))
+  if (it != end && this->UpdatePropertyFromPreset(*it))
     {
     this->Update();
     this->InvokePropertyChangedCommand();
