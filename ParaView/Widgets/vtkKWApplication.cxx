@@ -62,7 +62,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.157");
+vtkCxxRevisionMacro(vtkKWApplication, "1.158");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -579,7 +579,6 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
         sprintf(tcl_library, "%s/lib/tcl%s", buffer, TCL_VERSION);
         if (vtkKWDirectoryUtilities::FileExists(tcl_library))
           {
-          cout << "tcl_library: " << tcl_library << endl;
           if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
                           TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
             {
@@ -606,10 +605,9 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
         if (!has_tklibpath_env)
           {
           char tk_library[1024] = "";
-          sprintf(tk_library, "%s/lib/tk%s", dir, TK_VERSION);
+          sprintf(tk_library, "%s/lib/tk%s", buffer, TK_VERSION);
           if (vtkKWDirectoryUtilities::FileExists(tk_library))
             {
-            cout << "tk_library: " << tk_library << endl;
             if (!Tcl_SetVar(interp, "tk_library", tk_library, 
                             TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
               {
