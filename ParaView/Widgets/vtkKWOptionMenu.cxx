@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.16");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.17");
 
 //-----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -201,6 +201,27 @@ void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
   this->Menu->Create(app,"menu","-tearoff 0");
 }
 
+//-----------------------------------------------------------------------------
+void vtkKWOptionMenu::IndicatorOn()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  this->Script("%s config -indicatoron 1", this->GetWidgetName());
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWOptionMenu::IndicatorOff()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  this->Script("%s config -indicatoron 0", this->GetWidgetName());
+}
 
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::PrintSelf(ostream& os, vtkIndent indent)

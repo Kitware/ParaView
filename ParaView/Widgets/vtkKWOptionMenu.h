@@ -96,6 +96,11 @@ public:
   // Set the current entry of this optionmenu
   void SetCurrentEntry(const char *name);
 
+  // Description
+  // Set the indicator On/Off. To be called after creation.
+  void IndicatorOn();
+  void IndicatorOff();
+
 protected:
   vtkKWOptionMenu();
   ~vtkKWOptionMenu();
