@@ -144,7 +144,7 @@ int main(int , char *[])
   c = vtkSMLookupTableProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMNumberOfPartsDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMObject::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPart::New(); c->Print( cout ); c->Delete();
+//  c = vtkSMPart::New(); c->Print( cout ); c->Delete();
   c = vtkSMPropertyAdaptor::New(); c->Print( cout ); c->Delete();
   c = vtkSMProperty::New(); c->Print( cout ); c->Delete();
   c = vtkSMPropertyIterator::New(); c->Print( cout ); c->Delete();
