@@ -46,8 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
-#include "vtkKWEventMap.h"
-#include "vtkKWGenericRenderWindowInteractor.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkProp.h"
@@ -62,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.31");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.32");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -105,10 +103,6 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   
   this->ParentWindow = NULL;
   
-  this->Interactor = vtkKWGenericRenderWindowInteractor::New();
-  this->Interactor->SetRenderWidget(this);
-  
-  this->EventMap = vtkKWEventMap::New();
   this->EventIdentifier = -1;
   
   this->InExpose = 0;
@@ -155,11 +149,6 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
   this->SetParentWindow(NULL);
   this->VTKWidget->Delete();
   
-  this->Interactor->SetRenderWidget(NULL);
-  this->Interactor->SetInteractorStyle(NULL);
-  this->Interactor->Delete();
-  this->EventMap->Delete();
-
   if (this->CornerAnnotation)
     {
     this->CornerAnnotation->Delete();
@@ -355,64 +344,6 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::MouseMove(int vtkNotUsed(num), int x, int y)
-{
-  this->Interactor->SetMoveEventInformationFlipY(x, y);
-  this->Interactor->MouseMoveEvent();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::AButtonPress(int num, int x, int y,
-                                     int ctrl, int shift)
-{
-  this->Script("focus %s", this->VTKWidget->GetWidgetName());
-  
-  this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift);
-  
-  switch (num)
-    {
-    case 1:
-      this->Interactor->LeftButtonPressEvent();
-      break;
-    case 2:
-      this->Interactor->MiddleButtonPressEvent();
-      break;
-    case 3:
-      this->Interactor->RightButtonPressEvent();
-      break;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::AButtonRelease(int num, int x, int y)
-{
-  this->Interactor->SetEventInformationFlipY(x, y, 0, 0);
-  
-  switch (num)
-    {
-    case 1:
-      this->Interactor->LeftButtonReleaseEvent();
-      break;
-    case 2:
-      this->Interactor->MiddleButtonReleaseEvent();
-      break;
-    case 3:
-      this->Interactor->RightButtonReleaseEvent();
-      break;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::AKeyPress(char key, int x, int y, int ctrl, int shift)
-{
-  this->Interactor->SetEventPositionFlipY(x, y);
-  this->Interactor->SetControlKey(ctrl);
-  this->Interactor->SetShiftKey(shift);
-  this->Interactor->SetKeyCode(key);
-  this->Interactor->KeyPressEvent();
-}
-
-//----------------------------------------------------------------------------
 void vtkKWRenderWidget::Exposed()
 {
   if (this->InExpose)
@@ -424,13 +355,6 @@ void vtkKWRenderWidget::Exposed()
   this->Script("update");
   this->Render();
   this->InExpose = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::Configure(int width, int height)
-{
-  this->Interactor->UpdateSize(width, height);
-  this->Interactor->ConfigureEvent();
 }
 
 //----------------------------------------------------------------------------
@@ -897,7 +821,6 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RenderMode: " << this->RenderMode << endl;
   os << indent << "RenderState: " << this->RenderState << endl;
   os << indent << "Renderer: " << this->Renderer << endl;
-  os << indent << "EventMap: " << this->EventMap << endl;
   os << indent << "CollapsingRenders: " << this->CollapsingRenders << endl;
   os << indent << "ScalarShift: " << this->ScalarShift << endl;
   os << indent << "ScalarScale: " << this->ScalarScale << endl;

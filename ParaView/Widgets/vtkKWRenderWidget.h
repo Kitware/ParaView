@@ -54,8 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkCamera;
 class vtkCornerAnnotation;
-class vtkKWEventMap;
-class vtkKWGenericRenderWindowInteractor;
 class vtkKWRenderWidgetObserver;
 class vtkKWWindow;
 class vtkProp;
@@ -138,12 +136,14 @@ public:
 
   // Description:
   // Event handlers and useful interactions
-  virtual void MouseMove(int num, int x, int y);
-  virtual void AButtonPress(int num, int x, int y, int ctrl, int shift);
-  virtual void AButtonRelease(int num, int x, int y);
-  virtual void AKeyPress(char key, int x, int y, int ctrl, int shift);
+  virtual void MouseMove(int /*num*/, int /*x*/, int /*y*/) {}
+  virtual void AButtonPress(int /*num*/, int /*x*/, int /*y*/, int /*ctrl*/,
+                            int /*shift*/) {}
+  virtual void AButtonRelease(int /*num*/, int /*x*/, int /*y*/) {}
+  virtual void AKeyPress(char /*key*/, int /*x*/, int /*y*/, int /*ctrl*/,
+                         int /*shift*/) {}
   virtual void Exposed();
-  virtual void Configure(int width, int height);
+  virtual void Configure(int /*width*/, int /*height*/) {}
   virtual void Enter(int /*x*/, int /*y*/) {}
 
   // Description:
@@ -190,10 +190,6 @@ public:
   virtual void SetCollapsingRenders(int);
   vtkBooleanMacro(CollapsingRenders, int);
   vtkGetMacro(CollapsingRenders, int);
-
-  // Description:
-  // Get the event map
-  vtkGetObjectMacro(EventMap, vtkKWEventMap);
 
   // Description:
   // This id is a hint that should be appended to the call data and
@@ -246,8 +242,6 @@ protected:
   vtkRenderWindow *RenderWindow;
   vtkKWWindow     *ParentWindow;
   
-  vtkKWGenericRenderWindowInteractor *Interactor;
-  vtkKWEventMap *EventMap;
   int EventIdentifier;
 
   int InExpose;

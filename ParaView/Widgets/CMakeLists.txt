@@ -19,7 +19,6 @@ vtkKWEvent.cxx
 vtkKWExtent.cxx 
 vtkKWFrame.cxx
 vtkKWGenericComposite.cxx 
-vtkKWGenericRenderWindowInteractor.cxx
 vtkKWImageLabel.cxx
 vtkKWLabel.cxx
 vtkKWLabeledCheckButton.cxx
