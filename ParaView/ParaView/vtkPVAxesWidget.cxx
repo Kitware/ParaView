@@ -29,7 +29,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.16");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -152,7 +152,6 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
       this->ParentRenderer->GetRenderWindow()->SetNumberOfLayers(2);
       }
     this->AxesActor->SetVisibility(1);
-    this->ParentRenderer->GetRenderWindow()->Render();
     // We need to copy the camera before the compositing observer is called.
     // Compositing temporarily changes the camera to display an image.
     this->ParentRenderer->AddObserver(vtkCommand::StartEvent,this->Observer,1);
@@ -172,7 +171,6 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
     if (this->ParentRenderer)
       {
       this->ParentRenderer->GetRenderWindow()->RemoveRenderer(this->Renderer);
-      this->ParentRenderer->GetRenderWindow()->Render();
       this->ParentRenderer->RemoveObserver(vtkCommand::StartEvent);
       }
     
