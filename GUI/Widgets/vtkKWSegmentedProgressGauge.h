@@ -33,10 +33,7 @@ public:
   // Standard New and type methods
   static vtkKWSegmentedProgressGauge *New();
   vtkTypeRevisionMacro(vtkKWSegmentedProgressGauge, vtkKWWidget);
-  
-  // Description:
-  // Print information about this object
-  void PrintSelf(ostream &os, vtkIndent);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Create a Tk widget

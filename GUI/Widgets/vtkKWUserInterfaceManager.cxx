@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.14");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.15");
 
 int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -374,4 +374,10 @@ void vtkKWUserInterfaceManager::HideAllPanels()
     it->GoToNextItem();
     }
   it->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceManager::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

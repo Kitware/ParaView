@@ -51,6 +51,7 @@ class VTK_EXPORT vtkKWUserInterfaceManager : public vtkKWObject
 {
 public:
   vtkTypeRevisionMacro(vtkKWUserInterfaceManager,vtkKWObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create the manager widget (i.e. the widget that will group and display

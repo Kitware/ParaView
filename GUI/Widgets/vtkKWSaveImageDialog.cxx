@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.25");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.26");
 
 int vtkKWSaveImageDialogCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -94,4 +94,10 @@ void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* args)
   this->Superclass::Create(app, args);
 
   this->SetTitle("Save As Image");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSaveImageDialog::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }
