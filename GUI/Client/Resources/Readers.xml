@@ -271,13 +271,6 @@
           file_description="Stereo Lithography">
     <Source class="vtkSTLReader"/>
   </Module>
-  <Module name="byureader"
-          class="vtkPVReaderModule" root_name="BYU"
-          module_type="Reader"
-          extensions=".g"
-          file_description="BYU Files">
-    <Source class="vtkBYUReader"/>
-  </Module>
   <Module name="gaussiancubereader"
           class="vtkPVAdvancedReaderModule"
           root_name="GaussianCube"
@@ -521,5 +514,12 @@
           extensions=".mhd .mha"
           file_description="Meta Image Data Files">
     <Source class="vtkMetaImageReader"/>
+  </Module>
+  <Module name="byureader"
+          class="vtkPVReaderModule" root_name="BYU"
+          module_type="Reader"
+          extensions=".g"
+          file_description="BYU Files">
+    <Source class="vtkBYUReader"/>
   </Module>
 </ModuleInterfaces>
