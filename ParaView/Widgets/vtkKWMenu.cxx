@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.34");
+vtkCxxRevisionMacro(vtkKWMenu, "1.35");
 
 
 
@@ -577,7 +577,8 @@ void vtkKWMenu::AddRadioButtonImage(int value,
       << " -value " << value 
       << " -variable " << buttonVar
       << ends;
-  this->AddGeneric("radiobutton", "", Object,
+  // Uses the imgname as label, so that the help string can work.
+  this->AddGeneric("radiobutton", imgname, Object,
                    MethodAndArgString, str.str(), help);
   delete [] str.str();
 }
