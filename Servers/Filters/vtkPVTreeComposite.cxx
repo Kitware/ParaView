@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.58");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.59");
 
 
 //=========================================================================
@@ -420,6 +420,7 @@ void vtkPVTreeComposite::InternalStartRender()
     cam->GetPosition(renInfoDouble.CameraPosition);
     cam->GetFocalPoint(renInfoDouble.CameraFocalPoint);
     cam->GetViewUp(renInfoDouble.CameraViewUp);
+    cam->GetWindowCenter(renInfoDouble.WindowCenter);
     renInfoDouble.CameraViewAngle = cam->GetViewAngle();
     cam->GetClippingRange(renInfoDouble.CameraClippingRange);
     if (cam->GetParallelProjection())
@@ -788,6 +789,7 @@ vtkPVTreeComposite::vtkPVTreeComposite()
 //-------------------------------------------------------------------------
 vtkPVTreeComposite::~vtkPVTreeComposite()
 {
+  this->SetRenderWindow(NULL);
   this->MPIController = NULL;
     
   // sanity check
