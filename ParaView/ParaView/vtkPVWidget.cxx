@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVWidget, "1.35");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -334,6 +334,7 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   clone->SetTraceNameState(this->TraceNameState);
   clone->SetBalloonHelpString(this->GetBalloonHelpString());
   clone->SetDebug(this->GetDebug());
+  clone->SuppressReset = this->SuppressReset;
   
   // Now copy the dependencies
   vtkPVWidget* dep;
@@ -393,6 +394,11 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     { 
     this->SetTraceName(trace_name); 
     this->SetTraceNameState(vtkPVWidget::XMLInitialized);
+    }
+
+  if(!element->GetScalarAttribute("suppress_reset", &this->SuppressReset))
+    {
+    this->SuppressReset = 0;
     }
 
   const char* deps = element->GetAttribute("dependents");
