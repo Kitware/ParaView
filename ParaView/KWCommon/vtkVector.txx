@@ -232,7 +232,7 @@ template <class DType>
 int vtkVector<DType>::GetItem(vtkIdType id, DType& ret) 
 {
   ret = 0;
-  if (id < this->NumberOfItems)
+  if (id < this->NumberOfItems && id >= 0)
     {
     ret = this->Array[id];
     return VTK_OK;
