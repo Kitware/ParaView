@@ -111,6 +111,7 @@ vtkPVSourcesNavigationWindow.cxx
 vtkPVSphereWidget.cxx
 vtkPVStringEntry.cxx
 vtkPVThresholdFilter.cxx
+vtkPVTiledDisplayManager.cxx
 vtkPVTimerLogDisplay.cxx
 vtkPVTraceFileDialog.cxx
 vtkPVTrackballMoveActor.cxx

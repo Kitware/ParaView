@@ -30,7 +30,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.1");
+vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.2");
 vtkStandardNewMacro(vtkPVCompositeUtilities);
 
 
@@ -177,7 +177,6 @@ vtkPVCompositeUtilities::NewUnsignedCharArray(int numTuples,
     vtkCompositeManager::ResizeUnsignedCharArray(best, 
                                       numComps, numTuples);
     this->UnsignedCharArrayCollection->AddItem(best);
-    best->Delete();
     }
   else
     {
@@ -613,6 +612,123 @@ void vtkPVCompositeUtilities::CompositeImagePair(vtkPVCompositeBuffer* inBuf1,
 
   //vtkTimerLog::MarkEndEvent("Composite Image Pair");
 }
+
+
+
+//----------------------------------------------------------------------------
+// We change this to work backwards so we can make it inplace. !!!!!!!     
+void vtkPVCompositeUtilities::MagnifyBuffer(vtkDataArray* localP, 
+                                            vtkDataArray* magP,
+                                            int inWinSize[2],
+                                            int factor)
+{
+  float *rowp, *subp;
+  float *pp1;
+  float *pp2;
+  int   x, y, xi, yi;
+  int   xInDim, yInDim;
+  // Local increments for input.
+  int   pInIncY; 
+  float *newLocalPData;
+  int numComp = localP->GetNumberOfComponents();
+  
+  xInDim = inWinSize[0];
+  yInDim = inWinSize[1];
+
+  newLocalPData = reinterpret_cast<float*>(magP->GetVoidPointer(0));
+  float* localPdata = reinterpret_cast<float*>(localP->GetVoidPointer(0));
+
+  if (localP->GetDataType() == VTK_UNSIGNED_CHAR)
+    {
+    if (numComp == 4)
+      {
+      // Get the last pixel.
+      rowp = localPdata;
+      pp2 = newLocalPData;
+      for (y = 0; y < yInDim; y++)
+        {
+        // Duplicate the row rowp N times.
+        for (yi = 0; yi < factor; ++yi)
+          {
+          pp1 = rowp;
+          for (x = 0; x < xInDim; x++)
+            {
+            // Duplicate the pixel p11 N times.
+            for (xi = 0; xi < factor; ++xi)
+              {
+              *pp2++ = *pp1;
+              }
+            ++pp1;
+            }
+          }
+        rowp += xInDim;
+        }
+      }
+    else if (numComp == 3)
+      { // RGB char pixel data.
+      // Get the last pixel.
+      pInIncY = numComp * xInDim;
+      unsigned char* crowp = reinterpret_cast<unsigned char*>(localPdata);
+      unsigned char* cpp2 = reinterpret_cast<unsigned char*>(newLocalPData);
+      unsigned char *cpp1, *csubp;
+      for (y = 0; y < yInDim; y++)
+        {
+        // Duplicate the row rowp N times.
+        for (yi = 0; yi < factor; ++yi)
+          {
+          cpp1 = crowp;
+          for (x = 0; x < xInDim; x++)
+            {
+            // Duplicate the pixel p11 N times.
+            for (xi = 0; xi < factor; ++xi)
+              {
+              csubp = cpp1;
+              *cpp2++ = *csubp++;
+              *cpp2++ = *csubp++;
+              *cpp2++ = *csubp;
+              }
+            cpp1 += numComp;
+            }
+          }
+        crowp += pInIncY;
+        }
+      }
+    }
+  else
+    {
+    // Get the last pixel.
+    pInIncY = numComp * xInDim;
+    rowp = localPdata;
+    pp2 = newLocalPData;
+    for (y = 0; y < yInDim; y++)
+      {
+      // Duplicate the row rowp N times.
+      for (yi = 0; yi < factor; ++yi)
+        {
+        pp1 = rowp;
+        for (x = 0; x < xInDim; x++)
+          {
+          // Duplicate the pixel p11 N times.
+          for (xi = 0; xi < factor; ++xi)
+            {
+            subp = pp1;
+            if (numComp == 4)
+              {
+              *pp2++ = *subp++;
+              }
+            *pp2++ = *subp++;
+            *pp2++ = *subp++;
+            *pp2++ = *subp;
+            }
+          pp1 += numComp;
+          }
+        }
+      rowp += pInIncY;
+      }
+    }
+  
+}
+  
 
 
 //----------------------------------------------------------------------------

@@ -27,6 +27,7 @@
 #include "vtkObject.h"
 
 class vtkCollection;
+class vtkDataArray;
 class vtkUnsignedCharArray;
 class vtkFloatArray;
 class vtkPVCompositeBuffer;
@@ -77,6 +78,11 @@ public:
   static void CompositeImagePair(vtkPVCompositeBuffer* inBuf1,
                                  vtkPVCompositeBuffer* inBuf2,
                                  vtkPVCompositeBuffer* outBuf);
+
+  static void MagnifyBuffer(vtkDataArray* in, vtkDataArray* out, 
+                            int inWinSize[2], int factor);
+
+
 protected:
   vtkPVCompositeUtilities();
   ~vtkPVCompositeUtilities();

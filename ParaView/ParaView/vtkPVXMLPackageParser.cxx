@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.20");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.21");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -539,7 +539,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
         }
       else
         {
-        vtkErrorMacro("Source missing class.");
+        vtkErrorMacro("Source missing class (" << menu_name << ")");
         return 0;
         }
       }

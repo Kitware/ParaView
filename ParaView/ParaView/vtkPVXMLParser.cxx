@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkPVXMLParser, "1.3");
+vtkCxxRevisionMacro(vtkPVXMLParser, "1.4");
 vtkStandardNewMacro(vtkPVXMLParser);
 
 //----------------------------------------------------------------------------
@@ -158,7 +158,7 @@ void vtkPVXMLParser::PrintXML(ostream& os)
 }
 
 //----------------------------------------------------------------------------
-vtkPVXMLElement* vtkPVXMLParser::GetRootElement()
+vtkPVXMLElement* vtkPVXMLParser::GetRootElement() 
 {
   return this->RootElement;
 }

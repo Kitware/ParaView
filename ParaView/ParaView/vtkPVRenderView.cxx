@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.235");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.236");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -529,11 +529,23 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 
   if (pvApp->GetUseTiledDisplay())
     {
+    // Thr original tiled display with duplicate polydata.
+    //this->Composite = NULL;
+    //pvApp->MakeTclObject("vtkTiledDisplayManager", "TDispManager1");
+    //int *tileDim = pvApp->GetTileDimensions();
+    //pvApp->BroadcastScript("TDispManager1 SetTileDimensions %d %d",
+    //                       tileDim[0], tileDim[1]);
+    //this->CompositeTclName = NULL;
+    //this->SetCompositeTclName("TDispManager1");
+
     this->Composite = NULL;
-    pvApp->MakeTclObject("vtkTiledDisplayManager", "TDispManager1");
+    pvApp->MakeTclObject("vtkPVTiledDisplayManager", "TDispManager1");
     int *tileDim = pvApp->GetTileDimensions();
     pvApp->BroadcastScript("TDispManager1 SetTileDimensions %d %d",
                            tileDim[0], tileDim[1]);
+    pvApp->BroadcastScript("TDispManager1 SetNumberOfProcesses %d",
+               pvApp->GetController()->GetNumberOfProcesses());
+    pvApp->BroadcastScript("TDispManager1 InitializeSchedule");
 
     this->CompositeTclName = NULL;
     this->SetCompositeTclName("TDispManager1");
@@ -2681,7 +2693,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.235 $");
+  this->ExtractRevision(os,"$Revision: 1.236 $");
 }
 
 //------------------------------------------------------------------------------

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputArrayRequirement);
-vtkCxxRevisionMacro(vtkPVInputArrayRequirement, "1.2");
+vtkCxxRevisionMacro(vtkPVInputArrayRequirement, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVInputArrayRequirement::vtkPVInputArrayRequirement()
@@ -185,8 +185,8 @@ int vtkPVInputArrayRequirement::GetIsValidField(int field,
   if (field == vtkDataSet::DATA_OBJECT_FIELD)
     {
     vtkErrorMacro("Field restriction not implemented yet.");
-    return 1;
     }  
+  return 1;
 }
 
 //----------------------------------------------------------------------------
