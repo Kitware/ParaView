@@ -15,7 +15,6 @@
 #include "vtkSMSourceProxy.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkDebugLeaks.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkSmartPointer.h"
@@ -26,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.6");
 
 struct vtkSMSourceProxyInternals
 {
@@ -47,83 +46,14 @@ vtkSMSourceProxy::vtkSMSourceProxy()
 
   this->HasMultipleInputs = 0;
 
-  vtkClientServerID nullID = { 0 };
-  this->ClientServerID = nullID;
-
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  if (!cm)
-    {
-    vtkErrorMacro("Can not fully initialize without a global "
-                  "CommunicationModule. This object will not be fully "
-                  "functional.");
-    return;
-    }
-  this->ClientServerID = cm->GetUniqueID();
-  vtkClientServerStream initStream;
-  initStream << vtkClientServerStream::Assign 
-             << this->ClientServerID << this
-             << vtkClientServerStream::End;
-  cm->SendStreamToServer(&initStream, 0);
-
-  // TODO revise this
-  // This is to make the LastResult stream release it's reference
-  // on this object.
-  //vtkSMProcessModule* pm = this->GetProcessModule();
-  //pm->ClearLastResult();
 }
 
 //---------------------------------------------------------------------------
 vtkSMSourceProxy::~vtkSMSourceProxy()
 {
   delete this->PInternals;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMSourceProxy::UnRegister(vtkObjectBase* obj)
-{
-  this->Superclass::UnRegister(obj);
-
-  // TODO revise this
-//   if (obj)
-//     {
-//     vtkDebugMacro(
-//       << "UnRegistered by "
-//       << obj->GetClassName() << " (" << obj << "), ReferenceCount = "
-//       << (this->ReferenceCount-1));
-//     }
-//   else
-//     {
-//     vtkDebugMacro(
-//       << "UnRegistered " << this->GetClassName() 
-//       << " by NULL, ReferenceCount = "
-//       << (this->ReferenceCount-1));
-//     }
-
-//   this->ReferenceCount--;
-//   if (this->ReferenceCount == 1)
-//     {
-//     vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-//     if (cm)
-//       {
-//       vtkClientServerStream deleteStream;
-//       deleteStream << vtkClientServerStream::Delete 
-//                    << this->ClientServerID 
-//                    << vtkClientServerStream::End;
-//       cm->SendStreamToServer(&deleteStream, 0);
-//       }
-//     else
-//       {
-//       vtkErrorMacro("There is not valid communication module assigned. "
-//                     "This object can not be cleanly destroyed.");
-//       }
-//     }
-//   else if (this->ReferenceCount <= 0)
-//     {
-// #ifdef VTK_DEBUG_LEAKS
-//     vtkDebugLeaks::DestructClass(this->GetClassName());
-// #endif
-//     delete this;
-//     }
+  this->SetNumberOfInputs(0);
+  delete[] this->Consumers;
 }
 
 //---------------------------------------------------------------------------
@@ -246,35 +176,41 @@ void vtkSMSourceProxy::SetNumberOfInputs(int num)
     }
   
   int idx;
-  vtkSMSourceProxy** inputs;
 
-  // Allocate new arrays.
-  inputs = new vtkSMSourceProxy* [num];
-
-  // Initialize with NULLs.
-  for (idx = 0; idx < num; ++idx)
+  // Remove extra inputs
+  for (idx = num; idx < this->NumberOfInputs; ++idx)
     {
-    inputs[idx] = NULL;
+    this->SetNthInput(idx, 0);
     }
 
-  // Copy old inputs
-  for (idx = 0; idx < num && idx < this->NumberOfInputs; ++idx)
-    {
-    inputs[idx] = this->Inputs[idx];
-    }
+  vtkSMSourceProxy** inputs = 0;
   
+  if ( num > 0 )
+    {
+    // Allocate new arrays.
+    inputs = new vtkSMSourceProxy* [num];
+    
+    // Initialize with NULLs.
+    for (idx = 0; idx < num; ++idx)
+      {
+      inputs[idx] = NULL;
+      }
+    
+    // Copy old inputs
+    for (idx = 0; idx < num && idx < this->NumberOfInputs; ++idx)
+      {
+      inputs[idx] = this->Inputs[idx];
+      }
+    }
+
   // delete the previous arrays
-  if (this->Inputs)
-    {
-    delete [] this->Inputs;
-    this->Inputs = NULL;
-    this->NumberOfInputs = 0;
-    }
-  
+  delete [] this->Inputs;
+  this->Inputs = NULL;
+
   // Set the new array
   this->Inputs = inputs;
-  
   this->NumberOfInputs = num;
+
   this->Modified();
 }
 
