@@ -34,7 +34,7 @@
 #define TIMER(s) if (this->Timing){ this->TimerLog->MarkStartEvent(s); }
 #define TIMERDONE(s) if (this->Timing){ this->TimerLog->MarkEndEvent(s); }
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.1.2.2");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.1.2.3");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -50,7 +50,6 @@ vtkDistributedDataFilter::vtkDistributedDataFilter()
   this->RetainKdtree = 0;
 
   this->Timing = 0;
-  this->MemInfo = 0;
   this->TimerLog = NULL;
 }
 
@@ -70,6 +69,7 @@ vtkDistributedDataFilter::~vtkDistributedDataFilter()
 
   if (this->TimerLog){
     this->TimerLog->Delete();
+    this->TimerLog = 0;
   }
 }
 
@@ -152,18 +152,11 @@ void vtkDistributedDataFilter::Execute()
   }
 
   if (this->Timing){
+    if (this->TimerLog == NULL) 
+      {
+      this->TimerLog = vtkTimerLog::New();
+      }
     if (this->TimerLog == NULL) this->TimerLog = vtkTimerLog::New();
-  }
-
-  if (this->MemInfo){
-    //#ifndef WIN32
-    //if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
-    //this->MemInfoReader->Update();
-    //cout << "vtkDistributedDataFilter, Execute()" << endl;
-    //this->MemInfoReader->PrintSelf(cout, 2);
-    //#else
-    cout << "Memory info not available." << endl;
-    //#endif
   }
 
   // Stage (1) - use vtkPKdTree to...
@@ -197,16 +190,6 @@ void vtkDistributedDataFilter::Execute()
     vtkErrorMacro("Unable to build k-d tree structure");
     return;
   }
-  if (this->MemInfo){
-    //#ifndef WIN32
-    //if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
-    //this->MemInfoReader->Update();
-    //cout << "vtkDistributedDataFilter, after build of k-d tree, tables,  and cell lists" << endl;
-    //this->MemInfoReader->PrintSelf(cout, 2);
-    //#else
-    cout << "Memory info not available." << endl;
-    //#endif
-  }
 
   // Stage (2) - Redistribute data, so that each process gets a ugrid
   //   containing the cells in it's assigned spatial regions
@@ -224,17 +207,6 @@ void vtkDistributedDataFilter::Execute()
 
   TIMERDONE("Redistribute data among processors");
 
-  if (this->MemInfo){
-    //#ifndef WIN32
-    //if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
-    //this->MemInfoReader->Update();
-    //cout << "vtkDistributedDataFilter, after redistribution of data set" << endl;
-    //this->MemInfoReader->PrintSelf(cout, 2);
-    //#else
-    cout << "Memory info not available." << endl;
-    //#endif
-  }
-
   if (fail){
     vtkErrorMacro("Unable to redistribute data");
   }
@@ -245,18 +217,6 @@ void vtkDistributedDataFilter::Execute()
     this->Kdtree->Delete();
     this->Kdtree = NULL;
   }
-  if (this->MemInfo){
-    //#ifndef WIN32
-    //if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
-    //this->MemInfoReader->Update();
-    //cout << "vtkDistributedDataFilter, Execute() completed" << endl;
-    //this->MemInfoReader->PrintSelf(cout, 2);
-    //#else
-    cout << "Memory info not available." << endl;
-    //#endif
-  }
-
-  return;
 }
 int vtkDistributedDataFilter::MPIRedistribute(vtkMPIController *mpiContr)
 {
@@ -295,10 +255,14 @@ int vtkDistributedDataFilter::MPIRedistribute(vtkMPIController *mpiContr)
     if (proc != me){
 
       packedGrids[proc] = this->MarshallDataSet(extractedGrid, yourSizeData[proc]);
-      extractedGrid->Delete();
+      extractedGrid->UnRegister(this);
     }
     else{
-
+      if ( mySubGrid )
+        {
+        mySubGrid->UnRegister(this);
+        mySubGrid = 0;
+        }
       mySubGrid = extractedGrid;
     }
   }
@@ -364,7 +328,7 @@ int vtkDistributedDataFilter::MPIRedistribute(vtkMPIController *mpiContr)
 
   if (mySubGrid){
     merged->MergeDataSet(mySubGrid);
-    mySubGrid->Delete();
+    mySubGrid->UnRegister(this);
   }
 
   // every process sends it's ugrid contribution to every other
@@ -757,8 +721,10 @@ void vtkDistributedDataFilter::ComputeFanIn(int *member,
 
   return;
 }
+
 void vtkDistributedDataFilter::PrintTiming(ostream& os, vtkIndent indent)
 {
+  (void)indent;
   vtkTimerLog::DumpLogWithIndents(&os, (float)0.0);
 }
 void vtkDistributedDataFilter::PrintSelf(ostream& os, vtkIndent indent)

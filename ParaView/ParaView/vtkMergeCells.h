@@ -50,7 +50,7 @@ public:
   //    Set the vtkUnstructuredGrid object that will become the
   //    union of the DataSets specified in MergeDataSet calls.
 
-  vtkSetObjectMacro(UnstructuredGrid, vtkUnstructuredGrid);
+  virtual void SetUnstructuredGrid(vtkUnstructuredGrid*);
   vtkGetObjectMacro(UnstructuredGrid, vtkUnstructuredGrid);
 
   // Description:
