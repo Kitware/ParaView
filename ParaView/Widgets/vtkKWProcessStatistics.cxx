@@ -17,7 +17,7 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.6");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.7");
 
 #ifdef __linux
 #include <sys/procfs.h>
@@ -185,7 +185,7 @@ int vtkKWProcessStatistics::QueryMemory()
     vtkErrorMacro("Problem opening /proc/meminfo");
     return 0;
     }
-  long temp;
+  unsigned long temp;
   char buffer[1024];
   fgets(buffer, sizeof(buffer), fd);
   fscanf(fd, "Mem: %ul %ul %ul %ul %ul %ul\n",
