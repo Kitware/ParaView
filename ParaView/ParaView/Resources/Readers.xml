@@ -340,7 +340,7 @@
   <VectorEntry variable="FileRange" label="Range of files" type="int"
                length="2" help="Range of files that are loaded" />
 
-  <Scale variable="TimeStep" type="int" label="Time step"
+  <Scale variable="TimeStep" type="int" label="Time step" trace_name="TimeStep"
                help="Set the current timestep." range_source="TimeStepRange" />
 
  </Module>
