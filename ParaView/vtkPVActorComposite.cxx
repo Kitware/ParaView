@@ -297,6 +297,12 @@ void vtkPVActorComposite::UpdateProperties()
   vtkPVApplication *pvApp = this->GetPVApplication();  
   vtkDataArray *array;
 
+  if (this->UpdateTime > this->PVData->GetVTKData()->GetMTime())
+    {
+    return;
+    }
+  this->UpdateTime.Modified();
+
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
   this->GetPVData()->GetBounds(bounds);
   this->GetPVData()->GetScalarRange(range);
@@ -317,6 +323,7 @@ void vtkPVActorComposite::UpdateProperties()
     
   this->AmbientScale->SetValue(this->GetActor()->GetProperty()->GetAmbient());
 
+  this->ColorMenu->ClearEntries();
   this->ColorMenu->AddEntryWithCommand("Property",
 	                               this, "ColorByProperty");
   if (this->GetPVData()->GetVTKData()->GetPointData()->GetScalars())
@@ -676,6 +683,7 @@ void vtkPVActorComposite::Deselect(vtkKWView *v)
 void vtkPVActorComposite::ShowProperties()
 {
   vtkKWWindow *pw = this->View->GetParentWindow();
+
   pw->ShowProperties();
   pw->GetMenuProperties()->CheckRadioButton(pw->GetMenuProperties(),
 					    "Radio", 100);
@@ -689,6 +697,9 @@ void vtkPVActorComposite::ShowProperties()
     this->InitializeProperties();
     }
   
+  // Make sure the widgets reflect any data changes.
+  this->UpdateProperties();
+
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->View->PackProperties();

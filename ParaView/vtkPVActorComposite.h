@@ -202,6 +202,9 @@ protected:
   
   // Here to create unique names.
   int InstanceCount;
+
+  // If the data changes, we need to change to.
+  vtkTimeStamp UpdateTime;
 };
 
 #endif
