@@ -1,17 +1,12 @@
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkColorByPart.h"
-#include "vtkDistributedDataFilter.h"
-#include "vtkExtractCells.h"
 #include "vtkGroup.h"
 #include "vtkHDF5RawImageReader.h"
 #include "vtkKWExtractGeometryByScalar.h"
-#include "vtkKdTree.h"
 #include "vtkMergeArrays.h"
-#include "vtkMergeCells.h"
 #include "vtkMultiOut.h"
 #include "vtkMultiOut2.h"
 #include "vtkMultiOut3.h"
-#include "vtkPKdTree.h"
 #include "vtkPVArrowSource.h"
 #include "vtkPVClipDataSet.h"
 #include "vtkPVConnectivityFilter.h"
@@ -30,29 +25,32 @@
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkPVWarpScalar.h"
 #include "vtkPVWarpVector.h"
-#include "vtkPlanesIntersection.h"
-#include "vtkPointsProjectedHull.h"
 #include "vtkStructuredCacheFilter.h"
 #include "vtkVRMLSource.h"
 #include "vtkXMLPVDWriter.h"
+
+#ifdef VTK_USE_MPI
+# include "vtkDistributedDataFilter.h"
+# include "vtkExtractCells.h"
+# include "vtkKdTree.h"
+# include "vtkMergeCells.h"
+# include "vtkPKdTree.h"
+# include "vtkPlanesIntersection.h"
+# include "vtkPointsProjectedHull.h"
+#endif
 
 int main()
 {
   vtkObject *c;
   c = vtkCleanUnstructuredGrid::New(); c->Print(cout); c->Delete();
   c = vtkColorByPart::New(); c->Print(cout); c->Delete();
-  c = vtkDistributedDataFilter::New(); c->Print(cout); c->Delete();
-  c = vtkExtractCells::New(); c->Print(cout); c->Delete();
   c = vtkGroup::New(); c->Print(cout); c->Delete();
   c = vtkHDF5RawImageReader::New(); c->Print(cout); c->Delete();
   c = vtkKWExtractGeometryByScalar::New(); c->Print(cout); c->Delete();
-  c = vtkKdTree::New(); c->Print(cout); c->Delete();
   c = vtkMergeArrays::New(); c->Print(cout); c->Delete();
-  c = vtkMergeCells::New(); c->Print(cout); c->Delete();
   c = vtkMultiOut::New(); c->Print(cout); c->Delete();
   c = vtkMultiOut2::New(); c->Print(cout); c->Delete();
   c = vtkMultiOut3::New(); c->Print(cout); c->Delete();
-  c = vtkPKdTree::New(); c->Print(cout); c->Delete();
   c = vtkPVArrowSource::New(); c->Print(cout); c->Delete();
   c = vtkPVClipDataSet::New(); c->Print(cout); c->Delete();
   c = vtkPVConnectivityFilter::New(); c->Print(cout); c->Delete();
@@ -71,10 +69,17 @@ int main()
   c = vtkPVUpdateSuppressor::New(); c->Print(cout); c->Delete();
   c = vtkPVWarpScalar::New(); c->Print(cout); c->Delete();
   c = vtkPVWarpVector::New(); c->Print(cout); c->Delete();
-  c = vtkPlanesIntersection::New(); c->Print(cout); c->Delete();
-  c = vtkPointsProjectedHull::New(); c->Print(cout); c->Delete();
   c = vtkStructuredCacheFilter::New(); c->Print(cout); c->Delete();
   c = vtkVRMLSource::New(); c->Print(cout); c->Delete();
   c = vtkXMLPVDWriter::New(); c->Print(cout); c->Delete();
+#ifdef VTK_USE_MPI
+  c = vtkDistributedDataFilter::New(); c->Print(cout); c->Delete();
+  c = vtkExtractCells::New(); c->Print(cout); c->Delete();
+  c = vtkKdTree::New(); c->Print(cout); c->Delete();
+  c = vtkMergeCells::New(); c->Print(cout); c->Delete();
+  c = vtkPKdTree::New(); c->Print(cout); c->Delete();
+  c = vtkPlanesIntersection::New(); c->Print(cout); c->Delete();
+  c = vtkPointsProjectedHull::New(); c->Print(cout); c->Delete();
+#endif
   return 0;
 }
