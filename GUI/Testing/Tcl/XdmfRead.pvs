@@ -44,12 +44,16 @@ $kw(vtkTemp18) SetCameraState 7.797 -2.031 2.139  1.162 1.000 -1.000  0.112 -0.5
 $kw(vtkTemp18) SetCameraState 1.624 -5.207 -5.932  1.162 1.000 -1.000  0.098 0.624 -0.776
 set kw(vtkTemp1228) [$kw(vtkTemp2) CreatePVSource ShrinkFilter]
 $kw(vtkTemp1228) AcceptCallback
+
 $kw(vtkTemp18) SetCameraState 9.056 1.841 -1.218  1.162 1.000 -1.000  -0.054 0.255 -0.966
 $kw(vtkTemp18) SetCameraState -1.828 -4.819 -5.501  1.162 1.000 -1.000  -0.474 0.678 -0.562
 $kw(vtkTemp18) SetCameraState 2.600 -0.066 -8.737  1.162 1.000 -1.000  -0.410 0.890 -0.199
 $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp582)
 set kw(vtkTemp1346) [$kw(vtkTemp2) CreatePVSource ShrinkFilter]
 $kw(vtkTemp1346) AcceptCallback
+
+[$kw(vtkTemp1346) GetPVOutput] SetInterpolateColorsFlag 1
+
 $kw(vtkTemp18) SetCameraState 9.004 1.696 -2.043  1.162 1.000 -1.000  -0.143 0.850 -0.508
 $kw(vtkTemp18) SetCameraState 0.597 -1.103 -8.637  1.162 1.000 -1.000  -0.467 0.861 -0.202
 $kw(vtkTemp2) ResetCameraCallback

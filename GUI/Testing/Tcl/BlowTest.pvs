@@ -27,6 +27,7 @@ $pvWarp AcceptCallback
 
 set warpOutput [$pvWarp GetPVOutput]
 $warpOutput SetVisibility 0
+$warpOutput SetInterpolateColorsFlag 1
 
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 $pvWindow SetCurrentPVSourceCallback $pvWarp

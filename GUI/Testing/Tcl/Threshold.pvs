@@ -42,6 +42,7 @@ $pv(vtkTemp229) SetMinValue 0.023000
 $pv(vtkTemp229) SetMaxValue 0.255880
 $pv(vtkTemp215) AcceptCallback
 [$pv(vtkTemp215) GetPVOutput] DrawSurface
+[$pv(vtkTemp215) GetPVOutput] SetInterpolateColorsFlag 1
 
 # Retrace
 update

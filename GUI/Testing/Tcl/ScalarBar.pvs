@@ -23,6 +23,7 @@ $kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
 set kw(vtkTemp285) [$kw(vtkTemp1) CreatePVSource DataSetTriangleFilter]
 $kw(vtkTemp285) AcceptCallback
 [$kw(vtkTemp285) GetPVOutput] DrawSurface
+[$kw(vtkTemp285) GetPVOutput] SetInterpolateColorsFlag 1
 
 set kw(vtkTemp321) [$kw(vtkTemp1) GetPVColorMap {scalars} 1]
 $kw(vtkTemp321) SetScalarBarVisibility 1

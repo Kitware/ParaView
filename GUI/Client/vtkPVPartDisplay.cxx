@@ -1,4 +1,4 @@
-/*=========================================================================
+/*=========================================================================Interpolate
 
   Program:   ParaView
   Module:    vtkPVPartDisplay.cxx
@@ -48,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.37");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.38");
 
 
 //----------------------------------------------------------------------------
@@ -57,7 +57,7 @@ vtkPVPartDisplay::vtkPVPartDisplay()
   this->PVApplication = NULL;
 
   this->DirectColorFlag = 1;
-  this->InterpolateColorsFlag = 1;
+  this->InterpolateColorsFlag = 0;
   this->Visibility = 1;
   this->Part = NULL;
   
@@ -284,6 +284,8 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // Now create the mapper.
   this->MapperID = pm->NewStreamObject("vtkPolyDataMapper");
   stream << vtkClientServerStream::Invoke << this->MapperID << "UseLookupTableScalarRangeOn" 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->MapperID << "InterpolateScalarsBeforeMappingOn" 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "GetPolyDataOutput" 
          <<  vtkClientServerStream::End;

@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.291");
+vtkCxxRevisionMacro(vtkPVData, "1.292");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -630,7 +630,7 @@ void vtkPVData::CreateProperties()
     
   this->InterpolateColorsCheck->SetParent(this->ColorFrame->GetFrame());
   this->InterpolateColorsCheck->Create(this->GetApplication(), "-text {Interpolate Colors}");
-  this->InterpolateColorsCheck->SetState(1);
+  this->InterpolateColorsCheck->SetState(0);
   this->InterpolateColorsCheck->SetBalloonHelpString(
     "Interpolate colors after mapping.");
   this->GetApplication()->Script(

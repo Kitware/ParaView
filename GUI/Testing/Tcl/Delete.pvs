@@ -12,7 +12,7 @@ if {[info exists argc]} {
         if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
             set rmui [$pv(vtkTemp43) GetRenderModuleUI]
             catch {$rmui SetCompositeThreshold 0}
-        }
+        }1
     }
 } 
 
@@ -55,6 +55,7 @@ $pv(vtkTemp999) SetPoint2 0 0 1
 set pv(vtkTemp229) [$pv(vtkTemp220) GetPVWidget {Input}]
 $pv(vtkTemp229) SetCurrentValue $pv(vtkTemp98)
 $pv(vtkTemp220) AcceptCallback
+[$pv(vtkTemp220) GetPVOutput] SetInterpolateColorsFlag 1
 
 # Retrace
 update

@@ -63,8 +63,11 @@ $pv(vtkTemp294) AcceptCallback
 
 set pv(vtkTemp327) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $pv(vtkTemp327) AcceptCallback
+[$pv(vtkTemp327) GetPVOutput] SetInterpolateColorsFlag 1
 $pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp207)
 $pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
+
+
 
 
 set pv(vtkTemp366) [$pv(vtkTemp1) CreatePVSource Clip]
@@ -80,6 +83,7 @@ $pv(vtkTemp395) AcceptCallback
 # Triangle filter to disabiguate quads.
 set pv(vtkTemp2244) [$pv(vtkTemp1) CreatePVSource TriangleFilter]
 $pv(vtkTemp2244) AcceptCallback
+[$pv(vtkTemp2244) GetPVOutput] SetInterpolateColorsFlag 1
 
 $pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp164)
 $pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
@@ -90,6 +94,8 @@ set pv(vtkTemp417) [$pv(vtkTemp418) GetPVWidget {Plane}]
 $pv(vtkTemp417) SetCenter 0.150 -0.650 0.500
 $pv(vtkTemp417) SetNormal 0 0 -1
 $pv(vtkTemp416) AcceptCallback
+[$pv(vtkTemp416) GetPVOutput] SetInterpolateColorsFlag 1
+
 $pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
@@ -103,6 +109,7 @@ set pv(vtkTemp463) [$pv(vtkTemp446) GetPVWidget {Cut Values}]
 $pv(vtkTemp463) RemoveAllValues
 $pv(vtkTemp463) AddValue 0.1
 $pv(vtkTemp446) AcceptCallback
+[$pv(vtkTemp446) GetPVOutput] SetInterpolateColorsFlag 1
 
 # Retrace
 #  update
