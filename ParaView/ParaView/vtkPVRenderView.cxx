@@ -104,7 +104,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.18");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.19");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -902,7 +902,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     this->GetPVWindow()->GetInterfaceSettingsFrame()->GetFrame());
   this->SourcesBrowserAlwaysShowName->Create(this->Application, "");
   this->SourcesBrowserAlwaysShowName->SetText(
-    "Source browsers display source names");
+    "Show source names in source browsers");
   this->SourcesBrowserAlwaysShowName->SetCommand(
     this, "SourcesBrowserAlwaysShowNameCallback");
   this->SourcesBrowserAlwaysShowName->SetBalloonHelpString(
@@ -2594,7 +2594,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.18 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.19 $");
 }
 
 //------------------------------------------------------------------------------
