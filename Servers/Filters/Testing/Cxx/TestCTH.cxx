@@ -19,6 +19,7 @@
 #include "vtkCTHOutlineFilter.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkActor.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -36,17 +37,17 @@ int main(int argc, char * argv[])
   vtkCTHData* data = fractal->GetOutput();
 
   // Just for coverage:
-  double origin[3];
-  data->GetTopLevelOrigin ( origin );
   data->Print( cout );
   
   vtkPlane *clipPlane = vtkPlane::New();
-  clipPlane->SetNormal ( 1, 1, 1);
-  clipPlane->SetOrigin ( origin );
+  clipPlane->SetNormal ( -1, -1, -1);
+  clipPlane->SetOrigin ( 0, 0, 0 );
 
   vtkCTHExtractAMRPart *extract = vtkCTHExtractAMRPart::New();
   extract->SetInput( fractal->GetOutput());
   extract->SetClipPlane (clipPlane);
+  extract->GetNumberOfVolumeArrayNames ();
+  extract->GetVolumeArrayName ( 0 );
   
   vtkCTHOutlineFilter *outline = vtkCTHOutlineFilter::New();
   outline->SetInput( fractal->GetOutput());
@@ -62,6 +63,8 @@ int main(int argc, char * argv[])
   
   vtkActor *actor = vtkActor::New();
   actor->SetMapper( mapper );
+  vtkProperty *p = actor->GetProperty ();
+  p->SetColor (0.5, 0.5, 0.5);
 
   vtkRenderer *ren = vtkRenderer::New();
   ren->AddActor( actor );
@@ -96,7 +99,5 @@ int main(int argc, char * argv[])
   renWin->Delete();
   iren->Delete();
 
-  return 0;
+  return !retVal;
 }
-
-
