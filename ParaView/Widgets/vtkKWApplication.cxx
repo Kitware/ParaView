@@ -70,7 +70,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.121");
+vtkCxxRevisionMacro(vtkKWApplication, "1.122");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -120,9 +120,11 @@ vtkKWApplication::vtkKWApplication()
 
   // setup tcl stuff
   this->MainInterp = Et_Interp;
-  if ( !this->MainInterp )
+  if (!this->MainInterp)
     {
-    vtkErrorMacro("Interpreter not set. This probably means that Tcl was not initialized properly...");
+    vtkErrorMacro(
+      "Interpreter not set. This probably means that Tcl was not "
+      "initialized properly...");
     return;
     }
 
@@ -134,7 +136,6 @@ vtkKWApplication::vtkKWApplication()
 
   if (vtkKWApplication::WidgetVisibility)
     {
-    //this->BalloonHelpWindow->SetParent(this->GetParentWindow());
     this->BalloonHelpWindow->Create(
       this, "toplevel", "-background black -borderwidth 1 -relief flat");
     this->BalloonHelpLabel->SetParent(this->BalloonHelpWindow);    
@@ -491,15 +492,27 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
 
 #ifdef USE_INSTALLED_TCLTK_PACKAGES
+
   Et_Interp = interp;
 
-  if (Tcl_Init(interp) == TCL_ERROR ||
-      Tk_Init(interp) == TCL_ERROR)
+  int status;
+
+  status = Tcl_Init(interp);
+  if (status != TCL_OK)
     {
-    // ??
+    cerr << "Tcl_Init error: " << Tcl_GetStringResult(interp) << endl;
+    return NULL;
     }
-  
+
+  status = Tk_Init(interp);
+  if (status != TCL_OK)
+    {
+    cerr << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
+    return NULL;
+    }
+
   Tcl_StaticPackage(interp, "Tk", Tk_Init, 0);
+
 #else
   Et_DoInit(interp);
 #endif
