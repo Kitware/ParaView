@@ -33,6 +33,7 @@ public:
   // Description:
   // Add a simple string.
   void AddString(const char* str);
+  void AddUniqueString(const char* str);
   
   //BTX
   // Description:

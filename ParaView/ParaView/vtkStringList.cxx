@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkStringList);
-vtkCxxRevisionMacro(vtkStringList, "1.11");
+vtkCxxRevisionMacro(vtkStringList, "1.12");
 
 //----------------------------------------------------------------------------
 vtkStringList::vtkStringList()
@@ -98,6 +98,17 @@ void vtkStringList::AddString(const char* str)
   strcpy(this->Strings[this->NumberOfStrings], str);
   this->NumberOfStrings += 1;  
 }
+
+//----------------------------------------------------------------------------
+void vtkStringList::AddUniqueString(const char* str)
+{
+  if ( this->GetIndex(str) >= 0 )
+    {
+    return;
+    }
+  this->AddString(str);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkStringList::AddFormattedString(const char* format, ...)
