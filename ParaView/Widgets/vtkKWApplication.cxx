@@ -749,12 +749,71 @@ void vtkKWApplication::SetBalloonHelpWidget( vtkKWWidget *widget )
 
 int vtkKWApplication::GetMessageDialogResponse(const char* dialogname)
 {
-  return 0;
+  char buffer[1024];
+  int retval = 0;
+  if ( this->GetRegisteryValue(3, "Dialogs", dialogname, buffer) )
+    {
+    retval = atoi(buffer);
+    }
+  return retval;
 }
 
-int vtkKWApplication::SetMessageDialogResponse(const char* dialogname, 
+void vtkKWApplication::SetMessageDialogResponse(const char* dialogname, 
 					       int response)
 {
-  dialogname = dialogname;
-  response = response;
+  this->SetRegisteryValue(3, "Dialogs", dialogname, "%d", response);
+}
+
+
+int vtkKWApplication::SetRegisteryValue(int level, const char* subkey, 
+					const char* key, 
+					const char* format, ...)
+{
+  if ( this->GetRegisteryLevel() < 0 ||
+       this->GetRegisteryLevel() < level )
+    {
+    return 0;
+    }
+  int res = 0;
+  char buffer[100];
+  char value[16000];
+  sprintf(buffer, "%s\\%s", 
+	  this->GetApplication()->GetApplicationVersionName(),
+	  subkey);
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(value, format, var_args);
+  va_end(var_args);
+  
+  vtkKWRegisteryUtilities *reg 
+    = this->GetRegistery(this->GetApplicationName());
+  res = reg->SetValue(buffer, key, value);
+  return res;
+}
+
+int vtkKWApplication::GetRegisteryValue(int level, const char* subkey, 
+					const char* key, char* value)
+{
+  int res = 0;
+  char buff[1024];
+  if ( !this->GetApplication() ||
+       this->GetRegisteryLevel() < 0 ||
+       this->GetRegisteryLevel() < level )
+    {
+    return 0;
+    }
+  char buffer[100];
+  sprintf(buffer, "%s\\%s", 
+	  this->GetApplicationVersionName(),
+	  subkey);
+
+  vtkKWRegisteryUtilities *reg 
+    = this->GetRegistery(this->GetApplicationName());
+  res = reg->ReadValue(buffer, key, buff);
+  if ( *buff && value )
+    {
+    *value = 0;
+    strcpy(value, buff);
+    }  
+  return res;
 }

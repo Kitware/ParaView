@@ -897,8 +897,10 @@ void vtkKWWindow::StoreRecentMenuToRegistery(char * vtkNotUsed(key))
       vtkKWWindowMenuEntry *vp = 0;
       if ( this->RecentFilesVector->GetItem(i, vp) == VTK_OK && vp )
 	{
-	this->SetRegisteryValue(1, "MRU", KeyNameP, vp->GetFullFile());
-	this->SetRegisteryValue(1, "MRU", CmdNameP, vp->GetCommand());
+	this->GetApplication()->SetRegisteryValue(
+	  1, "MRU", KeyNameP, vp->GetFullFile());
+	this->GetApplication()->SetRegisteryValue(
+	  1, "MRU", CmdNameP, vp->GetCommand());
 	}
       }
     }
@@ -943,9 +945,9 @@ void vtkKWWindow::AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target)
     {
     sprintf(KeyNameP, "File%d", i);
     sprintf(CmdNameP, "File%dCmd", i);
-    if ( this->GetRegisteryValue(1, "MRU", KeyNameP, File) )
+    if ( this->GetApplication()->GetRegisteryValue(1, "MRU", KeyNameP, File) )
       {
-      if ( this->GetRegisteryValue(1, "MRU", CmdNameP, Cmd) )
+      if ( this->GetApplication()->GetRegisteryValue(1, "MRU", CmdNameP, Cmd) )
 	{
 	if (strlen(File) > 1)
 	  {
@@ -991,7 +993,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.85 $");
+  this->ExtractRevision(os,"$Revision: 1.86 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1001,7 +1003,8 @@ int vtkKWWindow::ExitDialog()
   title << "Exit " << this->GetApplication()->GetApplicationName() << ends;
   char* ttl = title.str();
   ostrstream str;
-  str << "Are you sure you want to exit " << this->GetApplication()->GetApplicationName() << "?" << ends;
+  str << "Are you sure you want to exit " 
+      << this->GetApplication()->GetApplicationName() << "?" << ends;
   char* msg = str.str();
   
   int ret = vtkKWMessageDialog::PopupYesNo(
@@ -1140,7 +1143,7 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
   //this->PrintRecentFiles();
 }
 
-int vtkKWWindow::SetRegisteryValue(int level, const char* subkey, 
+int vtkKWWindow::SetWindowRegisteryValue(int level, const char* subkey, 
 				   const char* key, 
 				   const char* format, ...)
 {
@@ -1188,7 +1191,7 @@ int vtkKWWindow::DeleteRegisteryValue(int level, const char* subkey,
   return res;
 }
 
-int vtkKWWindow::GetRegisteryValue(int level, const char* subkey, 
+int vtkKWWindow::GetWindowRegisteryValue(int level, const char* subkey, 
 				   const char* key, char* value)
 {
   int res = 0;
@@ -1226,7 +1229,8 @@ float vtkKWWindow::GetFloatRegisteryValue(int level, const char* subkey,
     }
   float res = 0;
   char buffer[1024];
-  if ( this->GetRegisteryValue( level, subkey, key, buffer ) )
+  if ( this->GetApplication()->GetRegisteryValue( 
+	 level, subkey, key, buffer ) )
     {
     res = atof(buffer);
     }
@@ -1244,7 +1248,8 @@ int vtkKWWindow::GetIntRegisteryValue(int level, const char* subkey,
 
   int res = 0;
   char buffer[1024];
-  if ( this->GetRegisteryValue( level, subkey, key, buffer ) )
+  if ( this->GetApplication()->GetRegisteryValue( 
+	 level, subkey, key, buffer ) )
     {
     res = atoi(buffer);
     }
@@ -1255,14 +1260,15 @@ void vtkKWWindow::SaveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
   //  "OpenDirectory"
   if ( dialog->GetLastPath() )
     {
-    this->SetRegisteryValue(1, "RunTime", key, dialog->GetLastPath());
+    this->GetApplication()->SetRegisteryValue(
+      1, "RunTime", key, dialog->GetLastPath());
     }
 }
 
 void vtkKWWindow::RetrieveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
 {
   char buffer[1024];
-  if ( this->GetRegisteryValue(1, "RunTime", key, buffer) )
+  if ( this->GetApplication()->GetRegisteryValue(1, "RunTime", key, buffer) )
     {
     if ( *buffer )
       {
@@ -1273,8 +1279,8 @@ void vtkKWWindow::RetrieveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
 
 void vtkKWWindow::SaveColor(int level, const char* key, float rgb[3])
 {
-  this->SetRegisteryValue(level, "RunTime", key, "Color: %f %f %f",
-			  rgb[0], rgb[1], rgb[2]);
+  this->GetApplication()->SetRegisteryValue(
+    level, "RunTime", key, "Color: %f %f %f", rgb[0], rgb[1], rgb[2]);
 }
 
 void vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
@@ -1284,7 +1290,8 @@ void vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
   rgb[1] = -1;
   rgb[2] = -1;
 
-  if ( this->GetRegisteryValue(level, "RunTime", key, buffer) )
+  if ( this->GetApplication()->GetRegisteryValue(
+	 level, "RunTime", key, buffer) )
     {
     if ( *buffer )
       {      
@@ -1298,7 +1305,8 @@ int vtkKWWindow::BooleanRegisteryCheck(int level, const char* key,
 {
   char buffer[1024];
   int allset = 0;
-  if ( this->GetRegisteryValue(level, "RunTime", key, buffer) )
+  if ( this->GetApplication()->GetRegisteryValue(
+	 level, "RunTime", key, buffer) )
     {
     if ( !strncmp(buffer+1, trueval+1, strlen(trueval)-1) )
       {

@@ -211,8 +211,19 @@ public:
   // Description:
   // Set the message dialog response. Set 1 for ok/yes and -1 for 
   // cancel/no.
-  int SetMessageDialogResponse(const char* dialogname, int response);
-  
+  void SetMessageDialogResponse(const char* dialogname, int response);
+
+//BTX
+  //Description:
+  // Set or get the registery value for the application.
+  // When storing multiple arguments, separate with spaces.
+  // If the level is lower than current registery level, operation 
+  // will be successfull.
+  int SetRegisteryValue(int level, const char* subkey, const char* key, 
+			const char* format, ...);
+  int GetRegisteryValue(int level, const char* subkey, const char* key, 
+			char*value);
+//ETX
 protected:
   vtkKWApplication();
   ~vtkKWApplication();

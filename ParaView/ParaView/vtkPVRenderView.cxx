@@ -307,20 +307,20 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 // Here we are going to change only the satellite procs.
 void vtkPVRenderView::PrepareForDelete()
 {
-  vtkPVWindow* pvwindow = this->GetPVWindow();
-  if (pvwindow)
+  vtkPVApplication* pvapp = this->GetPVApplication();
+  if (pvapp)
     {
-    pvwindow->SetRegisteryValue(2, "RunTime", "UseStrips", "%d",
-				this->TriangleStripsCheck->GetState());
-    pvwindow->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
-				this->ImmediateModeCheck->GetState());
+    pvapp->SetRegisteryValue(2, "RunTime", "UseStrips", "%d",
+			     this->TriangleStripsCheck->GetState());
+    pvapp->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
+			     this->ImmediateModeCheck->GetState());
 #ifdef VTK_USE_MPI
-    pvwindow->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
-				this->InterruptRenderCheck->GetState());
-    pvwindow->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
-				this->CompositeWithFloatCheck->GetState());
-    pvwindow->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
-				this->CompositeWithRGBACheck->GetState());
+    pvapp->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
+			     this->InterruptRenderCheck->GetState());
+    pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
+			     this->CompositeWithFloatCheck->GetState());
+    pvapp->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
+			     this->CompositeWithRGBACheck->GetState());
 #endif
     }
 
@@ -477,6 +477,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->vtkKWView::CreateViewProperties();
 
   vtkPVWindow* pvwindow = this->GetPVWindow();
+  vtkPVApplication* pvapp = this->GetPVApplication();
   //this->RenderParametersFrame->ShowHideFrameOn();
   this->RenderParametersFrame->Create(this->Application);
   this->RenderParametersFrame->SetLabel("Advanced Render Parameters");
@@ -485,7 +486,8 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->TriangleStripsCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->TriangleStripsCheck->Create(this->Application, "-text \"Use Triangle Strips\"");
-  if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", "UseStrips", 0))
+  if (pvapp && pvwindow && 
+      pvapp->GetRegisteryValue(2, "RunTime", "UseStrips", 0))
     {
     this->TriangleStripsCheck->SetState(
       pvwindow->GetIntRegisteryValue(2, "RunTime", "UseStrips"));
@@ -499,8 +501,8 @@ void vtkPVRenderView::CreateViewProperties()
   
   this->ImmediateModeCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->ImmediateModeCheck->Create(this->Application, "-text \"Use Immediate Mode Rendering\"");
-  if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", 
-					      "UseImmediateMode", 0))
+  if (pvapp && pvwindow && 
+      pvapp->GetRegisteryValue(2, "RunTime", "UseImmediateMode", 0))
     {
     this->ImmediateModeCheck->SetState(
       pvwindow->GetIntRegisteryValue(2, "RunTime", "UseImmediateMode"));

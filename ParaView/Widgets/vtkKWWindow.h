@@ -239,9 +239,9 @@ public:
   // When storing multiple arguments, separate with spaces.
   // If the level is lower than current registery level, operation 
   // will be successfull.
-  int SetRegisteryValue(int level, const char* subkey, const char* key, 
+  int SetWindowRegisteryValue(int level, const char* subkey, const char* key, 
 			const char* format, ...);
-  int GetRegisteryValue(int level, const char* subkey, const char* key, 
+  int GetWindowRegisteryValue(int level, const char* subkey, const char* key, 
 			char*value);
   int DeleteRegisteryValue(int level, const char* subkey, const char* key);
   

@@ -976,17 +976,20 @@ void vtkPVWindow::OpenCallback()
 {
   char buffer[1024];
   // Retrieve old path from the registery
-  if ( !this->GetRegisteryValue(2, "RunTime", "OpenPath", buffer) )
+  if ( !this->GetApplication()->GetRegisteryValue(
+	 2, "RunTime", "OpenPath", buffer) )
   {
     sprintf(buffer, ".");
   }
   
   char *openFileName = NULL;
 
-  this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {%s}} %s}]", 
+  this->Script("set openFileName [tk_getOpenFile -initialdir {%s} "
+	       "-filetypes {{{ParaView Files} {%s}} %s}]", 
                buffer, this->FileExtensions, this->FileDescriptions);
 
-  openFileName = new char[strlen(this->GetPVApplication()->GetMainInterp()->result) + 1];
+  openFileName = new char[
+    strlen(this->GetPVApplication()->GetMainInterp()->result) + 1];
   strcpy(openFileName, this->GetPVApplication()->GetMainInterp()->result);
 
   if (strcmp(openFileName, "") == 0)
@@ -1020,7 +1023,8 @@ void vtkPVWindow::OpenCallback()
       }
     pth[pos] = '\0';
     // Store in the registery
-    this->SetRegisteryValue(2, "RunTime", "OpenPath", pth);
+    this->GetApplication()->SetRegisteryValue(
+      2, "RunTime", "OpenPath", pth);
     delete [] pth;
   }
   this->Open(openFileName);
