@@ -90,6 +90,8 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->ReductionEntry = vtkKWEntry::New();
 
+  this->VisibilityCheck = vtkKWCheckButton::New();
+  
   this->PVData = NULL;
   this->DataSetInput = NULL;
   this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
@@ -227,6 +229,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->ReductionEntry->Delete();
   this->ReductionEntry = NULL;
   
+  this->VisibilityCheck->Delete();
+  this->VisibilityCheck = NULL;
+  
   if (this->DeciTclName)
     {
     pvApp->BroadcastScript("%s Delete", this->DeciTclName);
@@ -325,6 +330,13 @@ void vtkPVActorComposite::CreateProperties()
                             this->ReductionEntry->GetWidgetName(),
                             this->GetTclName());
 
+  this->VisibilityCheck->SetParent(this->Properties);
+  this->VisibilityCheck->Create(this->Application, "-text Visibility");
+  this->Application->Script("%s configure -command {%s VisibilityCheckCallback}",
+                            this->VisibilityCheck->GetWidgetName(),
+                            this->GetTclName());
+  this->VisibilityCheck->SetState(1);
+
   this->Script("pack %s",
 	       this->NumCellsLabel->GetWidgetName());
   this->Script("pack %s",
@@ -349,8 +361,9 @@ void vtkPVActorComposite::CreateProperties()
                this->ScalarBarCheck->GetWidgetName());
   this->Script("pack %s",
                this->ReductionEntry->GetWidgetName());
+  this->Script("pack %s",
+               this->VisibilityCheck->GetWidgetName());
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::UpdateProperties()
@@ -773,6 +786,13 @@ void vtkPVActorComposite::Deselect(vtkKWView *v)
   this->vtkKWComposite::Deselect(v);
 
   this->Script("pack forget %s", this->Notebook->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::VisibilityCheckCallback()
+{
+  this->SetVisibility(this->VisibilityCheck->GetState());
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------

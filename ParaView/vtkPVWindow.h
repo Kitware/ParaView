@@ -36,7 +36,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindow.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
-#include "vtkPVSourceList.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 
 class vtkKWNotebook;
@@ -88,8 +87,8 @@ public:
   // tcl callbacks for changing the interactor style
   void UseCameraStyle();
   
-  vtkGetObjectMacro(SourceList, vtkPVSourceList);
-
+  vtkGetObjectMacro(SourcesMenu, vtkKWMenu);
+  
   // Description:
   // Callback from the reset camera button.
   void ResetCameraCallback();
@@ -145,12 +144,12 @@ protected:
   vtkPVRenderView *MainView;
   vtkKWMenu *CreateMenu;
   vtkKWMenu *FilterMenu;
+  vtkKWMenu *SourcesMenu;
   
   vtkInteractorStyleTrackballCamera *CameraStyle;
   
   vtkKWToolbar *Toolbar;
   vtkKWPushButton *ResetCameraButton;
-  vtkKWPushButton *SourceListButton;
   vtkKWPushButton *CameraStyleButton;
   vtkKWPushButton *CurrentSourceButton;
   vtkKWPushButton *CurrentActorButton;
@@ -162,7 +161,6 @@ protected:
   
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;
-  vtkPVSourceList *SourceList;
 
   // Used internally.  Down casts vtkKWApplication to vtkPVApplication
   vtkPVApplication *GetPVApplication();

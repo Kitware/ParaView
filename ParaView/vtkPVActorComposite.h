@@ -94,7 +94,8 @@ public:
   void SetVisibility(int v);
   int GetVisibility();
   vtkBooleanMacro(Visibility, int);
-    
+  void VisibilityCheckCallback();
+  
   // Description:
   // ONLY SET THIS IF YOU ARE A PVDATA!
   // The actor composite needs to know which PVData it belongs to.
@@ -202,6 +203,8 @@ protected:
 
   vtkKWCheckButton *DecimateCheck;
 
+  vtkKWCheckButton *VisibilityCheck;
+  
   // I merged the PVData object and the PVActorComposite.  
   // I do not know what this point is for.  It is probably obsolete.
   // ???The data object that owns this composite???

@@ -549,7 +549,10 @@ void vtkPVSource::AcceptCallback()
 {
   int i;
   vtkPVWindow *window;
-
+  char methodAndArg[256];
+  int numSources;
+  vtkPVSource *source;
+  
   window = this->GetWindow();
   
   // Call the commands to set ivars from widget values.
@@ -590,7 +593,17 @@ void vtkPVSource::AcceptCallback()
     window->GetMenuProperties(), "Radio", 2);
   this->UpdateProperties();
   this->GetView()->Render();
-  window->GetSourceList()->Update();
+
+  window->GetSourcesMenu()->DeleteAllMenuItems();
+  numSources = window->GetSources()->GetNumberOfItems();
+  
+  for (i = 0; i < numSources; i++)
+    {
+    source = (vtkPVSource*)window->GetSources()->GetItemAsObject(i);
+    sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
+    window->GetSourcesMenu()->AddCommand(source->GetName(), window,
+                                         methodAndArg);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -615,6 +628,9 @@ void vtkPVSource::DeleteCallback()
   vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
   vtkPVSource *prev;
   int i;
+  int numSources;
+  char methodAndArg[256];
+  vtkPVSource *source;
   
   if ( ! this->Initialized)
     {
@@ -657,10 +673,19 @@ void vtkPVSource::DeleteCallback()
 		 this->View->GetPropertiesParent()->GetWidgetName());
     }
       
-  // We need to remove this source from the Source List.    
-  this->GetWindow()->GetSourceList()->GetSources()->RemoveItem(this);
-  this->GetWindow()->GetSourceList()->Update();    
-
+  // We need to remove this source from the SourcesMenu
+  this->GetWindow()->GetSources()->RemoveItem(this);
+  this->GetWindow()->GetSourcesMenu()->DeleteAllMenuItems();
+  numSources = this->GetWindow()->GetSources()->GetNumberOfItems();
+  for (i = 0; i < numSources; i++)
+    {
+    source = (vtkPVSource*)this->GetWindow()->GetSources()->GetItemAsObject(i);
+    sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
+    this->GetWindow()->GetSourcesMenu()->AddCommand(source->GetName(),
+                                                    this->GetWindow(),
+                                                    methodAndArg);
+    }
+  
   // Remove all of the actors mappers. from the renderer.
   for (i = 0; i < this->NumberOfPVOutputs; ++i)
     {

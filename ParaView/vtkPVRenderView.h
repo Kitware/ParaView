@@ -165,7 +165,6 @@ protected:
   vtkSetStringMacro(RenderWindowTclName);  
   
   // We are going to switch between these properties parents.
-  vtkKWWidget *SourceListParent;
   vtkKWWidget *SourceParent;
   vtkKWWidget *ActorParent;
 };

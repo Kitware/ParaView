@@ -43,7 +43,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVSource.h"
 #include "vtkPVData.h"
-#include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
 
 #include "vtkPVSourceInterface.h"
@@ -76,9 +75,9 @@ vtkPVWindow::vtkPVWindow()
   this->CommandFunction = vtkPVWindowCommand;
   this->CreateMenu = vtkKWMenu::New();
   this->FilterMenu = vtkKWMenu::New();
+  this->SourcesMenu = vtkKWMenu::New();
   this->Toolbar = vtkKWToolbar::New();
   this->ResetCameraButton = vtkKWPushButton::New();
-  this->SourceListButton = vtkKWPushButton::New();
   this->CameraStyleButton = vtkKWPushButton::New();
   this->CurrentSourceButton = vtkKWPushButton::New();
   this->CurrentActorButton = vtkKWPushButton::New();
@@ -91,9 +90,6 @@ vtkPVWindow::vtkPVWindow()
   this->Sources = vtkKWCompositeCollection::New();
   
   this->ApplicationAreaFrame = vtkKWLabeledFrame::New();
-  this->SourceList = vtkPVSourceList::New();
-  this->SourceList->SetSources(this->Sources);
-  this->SourceList->SetParent(this->ApplicationAreaFrame->GetFrame());
   
   this->CameraStyle = vtkInteractorStyleTrackballCamera::New();
   
@@ -108,8 +104,6 @@ vtkPVWindow::~vtkPVWindow()
   this->Toolbar = NULL;
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
-  this->SourceListButton->Delete();
-  this->SourceListButton = NULL;
   this->CameraStyleButton->Delete();
   this->CameraStyleButton = NULL;
   this->CurrentSourceButton->Delete();
@@ -129,9 +123,6 @@ vtkPVWindow::~vtkPVWindow()
   this->GlyphButton->Delete();
   this->GlyphButton = NULL;
   
-  this->SourceList->Delete();
-  this->SourceList = NULL;
-  
   this->ApplicationAreaFrame->Delete();
   
   this->CameraStyle->Delete();
@@ -148,6 +139,9 @@ vtkPVWindow::~vtkPVWindow()
   
   this->FilterMenu->Delete();
   this->FilterMenu = NULL;  
+  
+  this->SourcesMenu->Delete();
+  this->SourcesMenu = NULL;
   
   this->SetCurrentPVData(NULL);
 }
@@ -196,6 +190,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->FilterMenu->Create(this->Application,"-tearoff 0");
   this->Menu->InsertCascade(3,"Filter",this->FilterMenu,0);  
   
+  this->SourcesMenu->SetParent(this->GetMenu());
+  this->SourcesMenu->Create(this->Application, "-tearoff 0");
+  this->Menu->InsertCascade(4, "Sources", this->SourcesMenu, 0);
+  
   // Create all of the menu items for sources with no inputs.
   this->SourceInterfaces->InitTraversal();
   while ( (sInt = (vtkPVSourceInterface*)(this->SourceInterfaces->GetNextItemAsObject())))
@@ -218,10 +216,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->ResetCameraButton->Create(app, "-text ResetCamera");
   this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
   
-  this->SourceListButton->SetParent(this->Toolbar);
-  this->SourceListButton->Create(app, "-text SourceList");
-  this->SourceListButton->SetCommand(this, "ShowWindowProperties");
-
   this->CurrentSourceButton->SetParent(this->Toolbar);
   this->CurrentSourceButton->Create(app, "-text Source");
   this->CurrentSourceButton->SetCommand(this, "ShowCurrentSourceProperties");
@@ -246,9 +240,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->GlyphButton->Create(app, "-text Glyph");
   this->GlyphButton->SetCommand(this, "GlyphCallback");
 
-  this->Script("pack %s %s %s %s %s %s %s %s -side left -pady 0 -fill none -expand no",
+    this->Script("pack %s %s %s %s %s %s %s -side left -pady 0 -fill none -expand no",
                this->ResetCameraButton->GetWidgetName(),
-               this->SourceListButton->GetWidgetName(),
                this->CurrentSourceButton->GetWidgetName(),
                this->CurrentActorButton->GetWidgetName(),
                this->CalculatorButton->GetWidgetName(),
@@ -278,9 +271,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
     SetParent(this->Notebook->GetFrame("Preferences"));
   this->ApplicationAreaFrame->Create(this->Application);
   this->ApplicationAreaFrame->SetLabel("Sources");
-  this->SourceList->Create(app, "");
-  this->Script("pack %s -side top -fill x -expand no",
-	       this->SourceList->GetWidgetName());
 
   this->Script("pack %s -side top -anchor w -expand yes -fill x -padx 2 -pady 2",
                this->ApplicationAreaFrame->GetWidgetName());
@@ -392,7 +382,7 @@ void vtkPVWindow::SavePipeline()
 
   *file << "<ParaView Version= 0.1>\n";
   // Loop through sources ...
-  sources = this->SourceList->GetSources();
+  sources = this->GetSources();
   sources->InitTraversal();
   while ( (pvs=(vtkPVSource*)(sources->GetNextItemAsObject())) )
     {
@@ -486,7 +476,6 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
   if (comp && this->Sources->IsItemPresent(comp) == 0)
     {
     this->Sources->AddItem(comp);
-    this->SourceList->Update();
     }
 }
 
