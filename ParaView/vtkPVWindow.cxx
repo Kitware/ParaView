@@ -1008,6 +1008,8 @@ void vtkPVWindow::ShowWindowProperties()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourceProperties()
 {
+  this->ShowProperties();
+  
   // We need to update the properties-menu radio button too!
   this->GetMenuProperties()->CheckRadioButton(
     this->GetMenuProperties(), "Radio", 2);
