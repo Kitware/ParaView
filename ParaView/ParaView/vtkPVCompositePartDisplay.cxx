@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.12");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.13");
 
 
 //----------------------------------------------------------------------------
@@ -125,14 +125,12 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     pm->SendStreamToClientAndServer();
     }
   else if (pvApp->GetUseTiledDisplay())
-    { // I would like to get this condition into the subclass.
-#ifdef USE_MPI
-    int fixme;
-    // It would be better to hide MPI in vtkPVDuplicatePolyData.
+    { 
+#ifdef VTK_USE_MPI
     this->CollectID = pm->NewStreamObject("vtkMPIDuplicatePolyData");
 #else
-    // We should never use a composite part display without MPI, but ...
-    this->CollectID = pm->NewStreamObject("vtkPVDuplicatePolyData");
+    // We should never use a composite part display without MPI. 
+    vtkErrorMacro("Do not use composite part display without MPI.");
 #endif    
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -182,14 +180,11 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     }
   else if (pvApp->GetUseTiledDisplay())
     { // This should be in subclass.
-    //int numProcs = pvApp->GetController()->GetNumberOfProcesses();
-    //int* dims = pvApp->GetTileDimensions();
-#ifdef USE_MPI
-    // It would be better to hide MPI in vtkPVDuplicatePolyData.
+#ifdef VTK_USE_MPI
     this->LODCollectID = pm->NewStreamObject("vtkMPIDuplicatePolyData");
 #else
-    // We should never use a composite part display without MPI, but ...
-    this->LODCollectID = pm->NewStreamObject("vtkPVDuplicatePolyData");
+    // We should never use a composite part display without MPI. 
+    vtkErrorMacro("Do not use composite part display without MPI.");
 #endif    
     pm->GetStream()
       << vtkClientServerStream::Invoke
