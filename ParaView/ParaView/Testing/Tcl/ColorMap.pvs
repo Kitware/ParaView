@@ -20,6 +20,8 @@ $kw(vtkTemp294) ChangeColorMapToGrayscale
 $kw(vtkTemp294) ChangeColorMapToRedBlue
 $kw(vtkTemp294) SetScalarBarVisibility 1
 $kw(vtkTemp294) DrawWireframe
+$kw(vtkTemp294) SetPointSize 3
+$kw(vtkTemp294) SetLineWidth 3
 $kw(vtkTemp294) DrawPoints
 $kw(vtkTemp294) DrawSurface
 $kw(vtkTemp294) SetInterpolationToFlat
