@@ -154,7 +154,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.20");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.21");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -644,13 +644,6 @@ void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
   vtkDataObject* geoData;
   vtkDataObject* deciData;
   vtkDataSet* data;
-
-  int hack = 1;
-  if (hack == 1)
-    {
-    Sleep(1500);
-    hack = 0;
-    }
 
   if (this->GetPVApplication()->GetClientMode())
     { // Client just receives information from the server.
