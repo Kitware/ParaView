@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.37");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.38");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -127,7 +127,7 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 
   // Create the container frame
 
-  this->Script("frame %s -relief flat -bd 0 -highlightthickness	0 %s", 
+  this->Script("frame %s -relief flat -bd 0 -highlightthickness 0 %s", 
                this->GetWidgetName(), args ? args : "");
 
   // Create the main frame
@@ -499,7 +499,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.37 $");
+  this->ExtractRevision(os,"$Revision: 1.38 $");
 }
 
 //----------------------------------------------------------------------------
@@ -507,7 +507,8 @@ void vtkKWChangeColorButton::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "Text: " << this->GetText() << endl;
+  os << indent << "Text: " << (this->Text?this->Text:"(none)") << endl;
+  os << indent << "DialogText: " << (this->DialogText?this->DialogText:"(none)") << endl;
 
   os << indent << "LabelAfterColor: " 
      << (this->LabelAfterColor ? "On\n" : "Off\n");
