@@ -104,7 +104,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.15");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.16");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -750,11 +750,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     {
     vtkWarningMacro(<< "Error creating photo (view properties)");
     }
-  this->Script(
-    "%s configure -bg [%s cget -bg] -image %s",
-    this->PropertiesButton->GetWidgetName(),
-    this->Label->GetWidgetName(),
-    viewprops.str());
+  this->Script("%s configure -image %s",
+               this->PropertiesButton->GetWidgetName(), viewprops.str());
   viewprops.rdbuf()->freeze(0);
 
   this->Script("pack %s %s -side left -anchor w -padx 2",
@@ -2567,7 +2564,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.15 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.16 $");
 }
 
 //------------------------------------------------------------------------------
