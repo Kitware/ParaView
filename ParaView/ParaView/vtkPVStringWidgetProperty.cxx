@@ -21,13 +21,14 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVStringWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.5");
+vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.6");
 
 vtkPVStringWidgetProperty::vtkPVStringWidgetProperty()
 {
   this->String = NULL;
   this->VTKCommand = NULL;
   this->ElementType = vtkPVSelectWidget::STRING;
+  this->ObjectID.ID = 0;
 }
 
 vtkPVStringWidgetProperty::~vtkPVStringWidgetProperty()
