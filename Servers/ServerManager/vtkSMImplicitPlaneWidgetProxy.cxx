@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.4");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -93,6 +93,15 @@ void vtkSMImplicitPlaneWidgetProxy::CreateVTKObjects(int numObjects)
 //----------------------------------------------------------------------------
 void vtkSMImplicitPlaneWidgetProxy::PlaceWidget(double bds[6])
 {
+  if (this->Bounds[0] == bds[0] &&
+    this->Bounds[1] == bds[1] &&
+    this->Bounds[2] == bds[2] &&
+    this->Bounds[3] == bds[3] &&
+    this->Bounds[4] == bds[4] &&
+    this->Bounds[5] == bds[5])
+    {
+    return;
+    }
   double normal[3];
   this->GetNormal(normal);
   this->Superclass::PlaceWidget(bds);
@@ -169,6 +178,8 @@ void vtkSMImplicitPlaneWidgetProxy::UpdateVTKObjects()
       << this->DrawPlane
       << vtkClientServerStream::End;
     }
+  this->SetLastNormal(this->Normal);
+  this->SetLastCenter(this->Center);
   if (str.GetNumberOfMessages() > 0)
     {
     pm->SendStream(this->Servers,str,0);

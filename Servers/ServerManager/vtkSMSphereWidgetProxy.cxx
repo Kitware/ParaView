@@ -22,13 +22,15 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.3");
 
 //----------------------------------------------------------------------------
 vtkSMSphereWidgetProxy::vtkSMSphereWidgetProxy()
 {
   this->Radius = 0.0;
   this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
+  this->LastRadius =0.0;
+  this->LastCenter[0] = this->LastCenter[1] = this->LastCenter[2] = 0.0;
   this->SetVTKClassName("vtkSphereWidget");
 }
 
@@ -49,21 +51,31 @@ void vtkSMSphereWidgetProxy::UpdateVTKObjects()
   for (cc=0; cc < numObjects; cc++)
     {
     vtkClientServerID id = this->GetID(cc);
-    str << vtkClientServerStream::Invoke << id
-        << "SetCenter" 
-        << this->Center[0]
-        << this->Center[1]
-        << this->Center[2]
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke << id
-        << "SetRadius" << this->Radius
-        << vtkClientServerStream::End;
+    if (this->Center[0] != this->LastCenter[0] ||
+        this->Center[1] != this->LastCenter[1] ||
+        this->Center[2] != this->LastCenter[2])
+      {
+      str << vtkClientServerStream::Invoke << id
+          << "SetCenter" 
+          << this->Center[0]
+          << this->Center[1]
+          << this->Center[2]
+          << vtkClientServerStream::End;
+      }
+    if (this->Radius != this->LastRadius)
+      {
+      str << vtkClientServerStream::Invoke << id
+          << "SetRadius" << this->Radius
+          << vtkClientServerStream::End;
+      }
     }
+  this->SetLastCenter(this->Center);
+  this->SetLastRadius(this->Radius);
   if (str.GetNumberOfMessages() > 0)
     {
     pm->SendStream(this->Servers,str,0);
+    this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
     }
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
 }
 
 //----------------------------------------------------------------------------
@@ -78,9 +90,10 @@ void vtkSMSphereWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,vo
   double val[3];
   widget->GetCenter(val); 
   this->SetCenter(val);
-    
+  this->SetLastCenter(val);
   double rad = widget->GetRadius();
   this->SetRadius(rad);
+  this->SetLastRadius(rad);
   
   this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
   this->Superclass::ExecuteEvent(wdg, event, p);
