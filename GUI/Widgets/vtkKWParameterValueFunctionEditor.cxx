@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.19");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.20");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -6343,6 +6343,10 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << this->SelectedPointTextColor[0] << ", " 
      << this->SelectedPointTextColor[1] << ", " 
      << this->SelectedPointTextColor[2] << ")" << endl;
+  os << indent << "ParameterCursorColor: ("
+     << this->ParameterCursorColor[0] << ", " 
+     << this->ParameterCursorColor[1] << ", " 
+     << this->ParameterCursorColor[2] << ")" << endl;
   os << indent << "ComputePointColorFromValue: "
      << (this->ComputePointColorFromValue ? "On" : "Off") << endl;
   os << indent << "ComputeHistogramColorFromValue: "
@@ -6359,6 +6363,31 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << (this->ShowSelectedPointIndex ? "On" : "Off") << endl;
   os << indent << "ShowHistogramLogModeOptionMenu: "
      << (this->ShowHistogramLogModeOptionMenu ? "On" : "Off") << endl;
+  os << indent << "ShowParameterCursor: "
+     << (this->ShowParameterCursor ? "On" : "Off") << endl;
+  os << indent << "DisplayedWholeParameterRange: ("
+     << this->DisplayedWholeParameterRange[0] << ", " 
+     << this->DisplayedWholeParameterRange[1] << ")" << endl;
+  os << indent << "PointStyle: " << this->PointStyle << endl;
+  os << indent << "FirstPointStyle: " << this->FirstPointStyle << endl;
+  os << indent << "LastPointStyle: " << this->LastPointStyle << endl;
+  os << indent << "FunctionLineStyle: " << this->FunctionLineStyle << endl;
+  os << indent << "FunctionLineWidth: " << this->FunctionLineWidth << endl;
+  os << indent << "ParameterCursorPosition: " 
+     << this->ParameterCursorPosition << endl;
+  os << indent << "PointGuidelineStyle: " << this->PointGuidelineStyle << endl;
+  os << indent << "PointOutlineWidth: " << this->PointOutlineWidth << endl;
+  os << indent << "PointPositionInValueRange: " << this->PointPositionInValueRange << endl;
+  os << indent << "ShowCanvasOutline: "
+     << (this->ShowCanvasOutline ? "On" : "Off") << endl;
+  os << indent << "ShowCanvasBackground: "
+     << (this->ShowCanvasBackground ? "On" : "Off") << endl;
+  os << indent << "ShowParameterTicks: "
+     << (this->ShowParameterTicks ? "On" : "Off") << endl;
+  os << indent << "ShowValueTicks: "
+     << (this->ShowValueTicks ? "On" : "Off") << endl;
+  os << indent << "ComputeValueTicksFromHistogram: "
+     << (this->ComputeValueTicksFromHistogram ? "On" : "Off") << endl;
 
   os << indent << "ParameterRange: ";
   if (this->ParameterRange)
@@ -6436,6 +6465,7 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
     {
     os << "None" << endl;
     }
+  os << indent << "SecondaryHistogram: ";
   if (this->SecondaryHistogram)
     {
     os << endl;

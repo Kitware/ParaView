@@ -50,7 +50,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.2");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -1959,8 +1959,6 @@ void vtkKWVolumePropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   
-  os << indent << "VolumeProperty: " << this->VolumeProperty << endl;
-  os << indent << "DataSet: " << this->DataSet << endl;
   os << indent << "SelectedComponent: " 
      << this->SelectedComponent << endl;
   os << indent << "DisableCommands: "
@@ -1977,11 +1975,74 @@ void vtkKWVolumePropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ShowGradientOpacityFunction ? "On" : "Off") << endl;
   os << indent << "ShowComponentWeights: "
      << (this->ShowComponentWeights ? "On" : "Off") << endl;
-  os << indent << "ScalarOpacityFunctionEditor: " 
-     << this->ScalarOpacityFunctionEditor << endl;
-  os << indent << "ScalarColorFunctionEditor: " 
-     << this->ScalarColorFunctionEditor << endl;
-  os << indent << "GradientOpacityFunctionEditor: " 
-     << this->GradientOpacityFunctionEditor << endl;
-  os << indent << "HistogramSet: " << this->HistogramSet << endl;
+  os << indent << "ScalarOpacityFunctionEditor: ";
+  if (this->ScalarOpacityFunctionEditor)
+    {
+    os << endl;
+    this->ScalarOpacityFunctionEditor->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+  os << indent << "ScalarColorFunctionEditor: ";
+  if (this->ScalarColorFunctionEditor)
+    {
+    os << endl;
+    this->ScalarColorFunctionEditor->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+  os << indent << "GradientOpacityFunctionEditor: ";
+  if (this->GradientOpacityFunctionEditor)
+    {
+    os << endl;
+    this->GradientOpacityFunctionEditor->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+  os << indent << "ScalarOpacityUnitDistanceScale: ";
+  if (this->ScalarOpacityUnitDistanceScale)
+    {
+    os << endl;
+    this->ScalarOpacityUnitDistanceScale->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+  os << indent << "VolumeProperty: ";
+  if (this->VolumeProperty)
+    {
+    os << endl;
+    this->VolumeProperty->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+  os << indent << "DataSet: ";
+  if (this->DataSet)
+    {
+    os << endl;
+    this->DataSet->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+  os << indent << "HistogramSet: ";
+  if (this->HistogramSet)
+    {
+    os << endl;
+    this->HistogramSet->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
 }

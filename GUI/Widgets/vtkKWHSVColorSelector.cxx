@@ -22,7 +22,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.1");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.2");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -1208,8 +1208,6 @@ void vtkKWHSVColorSelector::PrintSelf(
   os << indent << "ValueBoxWidth: "<< this->ValueBoxWidth << endl;
   os << indent << "HueSatCursorRadius: "
      << this->HueSatCursorRadius << endl;
-  os << indent << "HueSatWheelCanvas: "<< this->HueSatWheelCanvas << endl;
-  os << indent << "ValueBoxCanvas: "<< this->ValueBoxCanvas << endl;
   os << indent << "ValueCursorMargin: "<< this->ValueCursorMargin << endl;
   os << indent << "ModificationOnly: "
      << (this->ModificationOnly ? "On" : "Off") << endl;
@@ -1217,5 +1215,27 @@ void vtkKWHSVColorSelector::PrintSelf(
      << this->SelectedColor[0] << ", "
      << this->SelectedColor[1] << ", "
      << this->SelectedColor[2] << ") " << endl;
+  os << indent << "HideValue: "
+     << (this->HideValue ? "On" : "Off") << endl;
+  os << indent << "HueSatWheelCanvas: ";
+  if (this->HueSatWheelCanvas)
+    {
+    os << endl;
+    this->HueSatWheelCanvas->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+  os << indent << "ValueBoxCanvas: ";
+  if (this->ValueBoxCanvas)
+    {
+    os << endl;
+    this->ValueBoxCanvas->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
 }
 

@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.18");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.19");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -1387,12 +1387,6 @@ void vtkKWColorTransferFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ShowColorSpaceOptionMenu: "
      << (this->ShowColorSpaceOptionMenu ? "On" : "Off") << endl;
 
-  os << indent << "ColorTransferFunction: " 
-     << this->ColorTransferFunction << endl;
-
-  os << indent << "ColorRampTransferFunction: " 
-     << this->ColorRampTransferFunction << endl;
-
   os << indent << "ShowColorRamp: "
      << (this->ShowColorRamp ? "On" : "Off") << endl;
 
@@ -1400,6 +1394,26 @@ void vtkKWColorTransferFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ColorRampPosition: " << this->ColorRampPosition << endl;
   os << indent << "ColorRampOutlineStyle: " << this->ColorRampOutlineStyle << endl;
 
+  os << indent << "ColorTransferFunction: ";
+  if (this->ColorTransferFunction)
+    {
+    os << endl;
+    this->ColorTransferFunction->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+  os << indent << "ColorRampTransferFunction: ";
+  if (this->ColorRampTransferFunction)
+    {
+    os << endl;
+    this->ColorRampTransferFunction->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
   os << indent << "ColorSpaceOptionMenu: ";
   if (this->ColorSpaceOptionMenu)
     {

@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.18");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.19");
 
 
 int vtkKWPiecewiseFunctionEditorCommand(ClientData cd, Tcl_Interp *interp,
@@ -902,9 +902,6 @@ void vtkKWPiecewiseFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "PiecewiseFunction: " 
-     << this->PiecewiseFunction << endl;
-
   os << indent << "ShowValueEntry: "
      << (this->ShowValueEntry ? "On" : "Off") << endl;
 
@@ -919,6 +916,17 @@ void vtkKWPiecewiseFunctionEditor::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Window: " << this->Window << endl;
   os << indent << "Level: " << this->Level << endl;
+
+  os << indent << "PiecewiseFunction: ";
+  if (this->PiecewiseFunction)
+    {
+    os << endl;
+    this->PiecewiseFunction->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
 
   os << indent << "ValueEntry: ";
   if (this->ValueEntry)

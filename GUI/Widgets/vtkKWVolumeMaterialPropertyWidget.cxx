@@ -32,7 +32,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -446,13 +446,32 @@ void vtkKWVolumeMaterialPropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "VolumeProperty: " << this->VolumeProperty << endl;
   os << indent << "SelectedComponent: " 
      << this->SelectedComponent << endl;
   os << indent << "NumberOfComponents: " 
      << this->NumberOfComponents << endl;
   os << indent << "AllowEnableShading: "
      << (this->AllowEnableShading ? "On" : "Off") << endl;
-  os << indent << "ComponentSelectionWidget: " 
-     << this->ComponentSelectionWidget << endl;
+
+  os << indent << "VolumeProperty: ";
+  if (this->VolumeProperty)
+    {
+    os << endl;
+    this->VolumeProperty->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+
+  os << indent << "ComponentSelectionWidget: ";
+  if (this->ComponentSelectionWidget)
+    {
+    os << endl;
+    this->ComponentSelectionWidget->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
 }

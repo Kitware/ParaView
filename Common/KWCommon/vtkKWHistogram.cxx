@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.2");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -1291,8 +1291,17 @@ void vtkKWHistogram::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Range: " 
      << this->Range[0] << ", " << this->Range[1] << endl;
-  os << indent << "Bins: " << this->Bins << endl;
   os << indent << "LogMode: " << (this->LogMode ? "On" : "Off") << endl;
   os << indent << "MaximumNumberOfBins: " << this->MaximumNumberOfBins << endl;
+  os << indent << "DataSet: ";
+  if (this->Bins)
+    {
+    os << endl;
+    this->Bins->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
 }
 

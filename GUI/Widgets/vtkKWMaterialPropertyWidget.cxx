@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
@@ -908,9 +908,18 @@ void vtkKWMaterialPropertyWidget::PrintSelf(ostream& os, vtkIndent indent)
      << this->PropertyChangedEvent << endl;
   os << indent << "PropertyChangingEvent: " 
      << this->PropertyChangingEvent << endl;
-  os << indent << "PopupButton: " << this->PopupButton << endl;
   os << indent << "MaterialColor: "
      << this->MaterialColor[0] << " "
      << this->MaterialColor[1] << " "
      << this->MaterialColor[2] << endl;
+  os << indent << "PopupButton: ";
+  if (this->PopupButton)
+    {
+    os << endl;
+    this->PopupButton->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
 }
