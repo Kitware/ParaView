@@ -38,10 +38,14 @@ ENDFOREACH(name)
 
 
 
-IF (VTK_DATA_ROOT)
+IF (VTK_USE_DISPLAY)
   SET(ServersFiltersImage_SRCS
-    TestProjectedTetrahedra
     )
+  IF (VTK_DATA_ROOT)
+    SET(ServersFiltersImage_SRCS ${ServersFiltersImage_SRCS}
+      TestProjectedTetrahedra
+      )
+  ENDIF (VTK_DATA_ROOT)
   FOREACH(name ${ServersFiltersImage_SRCS})
     ADD_EXECUTABLE(${name} ${name}.cxx)
     ADD_TEST(${name} ${CXX_TEST_PATH}/${name} ${name}
@@ -51,4 +55,4 @@ IF (VTK_DATA_ROOT)
       )
     TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
   ENDFOREACH(name)
-ENDIF (VTK_DATA_ROOT)
+ENDIF (VTK_USE_DISPLAY)
