@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayInformation);
-vtkCxxRevisionMacro(vtkPVArrayInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVArrayInformation, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVArrayInformation::vtkPVArrayInformation()
@@ -324,7 +324,7 @@ int vtkPVArrayInformation::WriteMessage(unsigned char *msg)
     }
 
   // Short for name length.
-  *((short*)msg) = nameLength;
+  memcpy(msg, &nameLength, sizeof(nameLength));
   msg += sizeof(short); 
   length += sizeof(short);
   if (this->Name)
@@ -378,7 +378,7 @@ int vtkPVArrayInformation::CopyFromMessage(unsigned char *msg)
     }
 
   // Short for name length.
-  nameLength = *((short*)msg);
+  memcpy(&nameLength, msg, sizeof(nameLength));
   msg += sizeof(short); 
   length += sizeof(short);
 
