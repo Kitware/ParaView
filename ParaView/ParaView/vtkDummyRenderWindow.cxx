@@ -16,10 +16,12 @@
 
 =========================================================================*/
 #include "vtkDummyRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
 #include "vtkCommand.h"
 
 
-vtkCxxRevisionMacro(vtkDummyRenderWindow, "1.4");
+vtkCxxRevisionMacro(vtkDummyRenderWindow, "1.5");
 
 // Construct an instance of  vtkDummyRenderWindow with its screen size 
 // set to 300x300, borders turned on, positioned at (0,0), double 
