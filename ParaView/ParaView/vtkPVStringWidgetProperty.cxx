@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVStringWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.1.2.2");
 
 vtkPVStringWidgetProperty::vtkPVStringWidgetProperty()
 {
@@ -63,8 +63,16 @@ vtkPVStringWidgetProperty::~vtkPVStringWidgetProperty()
 
 void vtkPVStringWidgetProperty::AcceptInternal()
 {
-  this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(
-    "%s %s {%s}", this->VTKSourceTclName, this->VTKCommand, this->String);
+  if (this->String[0] != '[')
+    {
+    this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(
+      "%s %s {%s}", this->VTKSourceTclName, this->VTKCommand, this->String);
+    }
+  else
+    {
+    this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(
+      "%s %s %s", this->VTKSourceTclName, this->VTKCommand, this->String);
+    }
 }
 
 void vtkPVStringWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)

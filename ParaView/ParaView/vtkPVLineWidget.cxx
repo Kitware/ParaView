@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.3");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.4");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -577,11 +577,16 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     {
     this->Point1[i]->SetValue(val[i],5);
     }
+  this->GetPVApplication()->BroadcastScript(
+    "%s SetPoint1 %f %f %f", this->Widget3DTclName, val[0], val[1], val[2]);
+  
   widget->GetPoint2(val);
   for (i=0; i<3; i++)
     {
     this->Point2[i]->SetValue(val[i],5);
     }
+  this->GetPVApplication()->BroadcastScript(
+    "%s SetPoint2 %f %f %f", this->Widget3DTclName, val[0], val[1], val[2]);
   this->Superclass::ExecuteEvent(wdg, l, p);
 }
 

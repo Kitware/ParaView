@@ -141,7 +141,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.2");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.3");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1507,50 +1507,37 @@ void vtkPVWindow::MouseAction(int action,int button,
     {
     if (button == 1)
       {
-      // Send the same event to the satellite to synchronize the 3D widgets.
-      // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteLeftPress %d %d %d %d", 
+      this->Script("pvRenderWindowInteractor SatelliteLeftPress %d %d %d %d", 
                              x, y, control, shift);
       }
     else if (button == 2)
       {
-      // Send the same event to the satellite to synchronize the 3D widgets.
-      // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMiddlePress %d %d %d %d", 
+      this->Script("pvRenderWindowInteractor SatelliteMiddlePress %d %d %d %d", 
                              x, y, control, shift);
       }
     else if (button == 3)
       {
-      // Send the same event to the satellite to synchronize the 3D widgets.
-      // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteRightPress %d %d %d %d", 
+      this->Script("pvRenderWindowInteractor SatelliteRightPress %d %d %d %d", 
                              x, y, control, shift);
-      }    
+      }
     }
   else if ( action == 1 )
     {
     if (button == 1)
       {
-      // Send the same event to the satellite to synchronize the 3D widgets.
-      // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteLeftRelease %d %d %d %d", 
+      this->Script("pvRenderWindowInteractor SatelliteLeftRelease %d %d %d %d", 
                              x, y, control, shift);
       }
     else if (button == 2)
       {
-      // Send the same event to the satellite to synchronize the 3D widgets.
-      // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMiddleRelease %d %d %d %d", 
+      this->Script("pvRenderWindowInteractor SatelliteMiddleRelease %d %d %d %d", 
                              x, y, control, shift);
       }
     else if (button == 3)
       {
-      // Send the same event to the satellite to synchronize the 3D widgets.
-      // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteRightRelease %d %d %d %d", 
+      this->Script("pvRenderWindowInteractor SatelliteRightRelease %d %d %d %d", 
                              x, y, control, shift);
       }    
-
     vtkCamera* cam = this->MainView->GetRenderer()->GetActiveCamera();
     //float* parallelScale = cam->GetParallelScale();
     double* position      = cam->GetPosition();
@@ -1567,9 +1554,7 @@ void vtkPVWindow::MouseAction(int action,int button,
     }
   else
     {
-    // Send the same event to the satellite to synchronize the 3D widgets.
-    // Maybe I should itegrate this into the PV interactor.
-    pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMove %d %d", x, y);
+    this->Script("pvRenderWindowInteractor SatelliteMove %d %d", x, y);
     }
 }
 

@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkPVPointWidget;
 class vtkPVVectorEntry;
+class vtkPVWidgetProperty;
 
 class VTK_EXPORT vtkPVPointSourceWidget : public vtkPVSourceWidget
 {
@@ -119,6 +120,8 @@ protected:
 
   vtkPVVectorEntry* RadiusWidget;
   vtkPVVectorEntry* NumberOfPointsWidget;
+  vtkPVWidgetProperty *RadiusProperty;
+  vtkPVWidgetProperty *NumberOfPointsProperty;
 
   vtkPVPointSourceWidget(const vtkPVPointSourceWidget&); // Not implemented
   void operator=(const vtkPVPointSourceWidget&); // Not implemented
