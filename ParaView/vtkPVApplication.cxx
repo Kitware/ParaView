@@ -270,6 +270,7 @@ void vtkPVApplication::SendDataScalarRange(vtkDataSet *data)
   this->Controller->Send(range, 2, 0, 1966);
 }
 
+
 //----------------------------------------------------------------------------
 void vtkPVApplication::SendDataBounds(vtkDataSet *data)
 {
@@ -297,6 +298,29 @@ void vtkPVApplication::SendDataNumberOfCells(vtkDataSet *data)
   this->Controller->Send(&num, 1, 0, 1968);
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SendMapperColorRange(vtkPolyDataMapper *mapper)
+{
+  float range[2];
+  vtkScalars *colors;
+
+  if (this->Controller->GetLocalProcessId() == 0)
+    {
+    return;
+    }
+  colors = mapper->GetColors();
+  if (colors == NULL)
+    {
+    range[0] = VTK_LARGE_FLOAT;
+    range[1] = -VTK_LARGE_FLOAT;
+    }
+  else
+    {
+    colors->GetRange(range);
+    }
+  this->Controller->Send(range, 2, 0, 1969);
+}
 
 //============================================================================
 // Make instances of sources.

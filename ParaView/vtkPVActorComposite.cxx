@@ -79,7 +79,10 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   this->AmbientScale = vtkKWScale::New();
 
+  this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorMenu = vtkKWOptionMenu::New();
+
+  this->ResetColorRangeButton = vtkKWPushButton::New();
   
   this->PVData = NULL;
   this->DataSetInput = NULL;
@@ -167,8 +170,14 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->AmbientScale->Delete();
   this->AmbientScale = NULL;
   
+  this->ColorMenuLabel->Delete();
+  this->ColorMenu = NULL;
+  
   this->ColorMenu->Delete();
   this->ColorMenu = NULL;
+  
+  this->ResetColorRangeButton->Delete();
+  this->ResetColorRangeButton = NULL;
   
   this->SetInput(NULL);
   
@@ -242,9 +251,18 @@ void vtkPVActorComposite::CreateProperties()
   this->AmbientScale->SetResolution(0.1);
   this->AmbientScale->SetCommand(this, "AmbientChanged");
   
+  this->ColorMenuLabel->SetParent(this->Properties);
+  this->ColorMenuLabel->Create(this->Application, "");
+  this->ColorMenuLabel->SetLabel("Color by variable:");
+  
   this->ColorMenu->SetParent(this->Properties);
   this->ColorMenu->Create(this->Application, "");    
 
+  this->ResetColorRangeButton->SetParent(this->Properties);
+  this->ResetColorRangeButton->Create(this->Application, "");
+  this->ResetColorRangeButton->SetLabel("Reset Color Range");
+  this->ResetColorRangeButton->SetCommand(this, "ResetColorRange");
+  
   this->Script("pack %s",
 	       this->NumCellsLabel->GetWidgetName());
   this->Script("pack %s",
@@ -258,8 +276,12 @@ void vtkPVActorComposite::CreateProperties()
   this->Script("pack %s",
 	       this->ScalarRangeLabel->GetWidgetName());
   this->Script("pack %s",
+	       this->ColorMenuLabel->GetWidgetName());
+  this->Script("pack %s",
                this->ColorMenu->GetWidgetName());
-    
+  this->Script("pack %s",
+	       this->ResetColorRangeButton->GetWidgetName());
+  
   this->UpdateProperties();  
 }
 
@@ -356,6 +378,55 @@ void vtkPVActorComposite::UpdateProperties()
       }
     }
 
+}
+
+void vtkPVActorComposite::ResetColorRange()
+{
+  float range[2];
+  this->GetColorRange(range);
+  
+  this->Mapper->SetScalarRange(range);
+  this->GetView()->Render();
+}
+
+void vtkPVActorComposite::GetColorRange(float range[2])
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  float tmp[2];
+  int id, num;
+  
+  if (this->Mapper->GetColors() == NULL)
+    {
+    range[0] = 0.0;
+    range[1] = 1.0;
+    return;
+    }
+
+  pvApp->BroadcastScript("Application SendMapperColorRange %s", 
+			 this->MapperTclName);
+  
+  this->Mapper->GetColors()->GetRange(range);
+  
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    controller->Receive(tmp, 2, id, 1969);
+    if (tmp[0] < range[0])
+      {
+      range[0] = tmp[0];
+      }
+    if (tmp[1] > range[1])
+      {
+      range[1] = tmp[1];
+      }
+    }
+  
+  if (range[0] > range[1])
+    {
+    range[0] = 0.0;
+    range[1] = 1.0;
+    }
 }
 
 //----------------------------------------------------------------------------

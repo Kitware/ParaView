@@ -34,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWApplication.h"
 #include "vtkMultiProcessController.h"
+#include "vtkPolyDataMapper.h"
 
 class vtkPVSource;
 
@@ -110,6 +111,7 @@ public:
   void SendDataScalarRange(vtkDataSet *data);
   void SendDataBounds(vtkDataSet *data);
   void SendDataNumberOfCells(vtkDataSet *data);
+  void SendMapperColorRange(vtkPolyDataMapper *mapper);
   
 protected:
   vtkPVApplication();

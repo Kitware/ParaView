@@ -147,6 +147,14 @@ public:
   void ColorByCellScalars();
   void ColorByPointFieldComponent(char *name, int comp);
   void ColorByCellFieldComponent(char *name, int comp);
+
+  // Description:
+  // Get the color range from the mappers on all the processes.
+  void GetColorRange(float range[2]);
+  
+  // Description:
+  // Callback for the ResetColorRange button.
+  void ResetColorRange();
   
 protected:
 
@@ -166,7 +174,10 @@ protected:
   
   vtkKWScale *AmbientScale;
   
+  vtkKWLabel *ColorMenuLabel;
   vtkKWOptionMenu *ColorMenu;
+
+  vtkKWPushButton *ResetColorRangeButton;
   
   // the data object that owns this composite
   vtkPVData *PVData;
