@@ -51,7 +51,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.12");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.13");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -134,7 +134,7 @@ vtkClientCompositeManager::vtkClientCompositeManager()
   this->BaseArray = NULL;
 
   this->SquirtCompression = 0;
-  this->UseCompositing = 1;
+  this->UseCompositing = 0;
 }
 
   
