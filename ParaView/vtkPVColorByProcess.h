@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVElevationFilter.h
+  Module:    vtkPVColorByProcess.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,12 +26,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVElevationFilter_h
-#define __vtkPVElevationFilter_h
+#ifndef __vtkPVColorByProcess_h
+#define __vtkPVColorByProcess_h
 
 #include "vtkPVDataSetToDataSetFilter.h"
 #include "vtkKWLabel.h"
-#include "vtkElevationFilter.h"
+#include "vtkColorByProcess.h"
 #include "vtkKWEntry.h"
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
@@ -41,60 +41,33 @@ class vtkPVPolyData;
 class vtkPVImage;
 
 
-class VTK_EXPORT vtkPVElevationFilter : public vtkPVDataSetToDataSetFilter
+class VTK_EXPORT vtkPVColorByProcess : public vtkPVDataSetToDataSetFilter
 {
 public:
-  static vtkPVElevationFilter* New();
-  vtkTypeMacro(vtkPVElevationFilter, vtkPVDataSetToDataSetFilter);
+  static vtkPVColorByProcess* New();
+  vtkTypeMacro(vtkPVColorByProcess, vtkPVDataSetToDataSetFilter);
 
   // Description:
   // You have to clone this object before you create its UI.
   void CreateProperties();
 
   // Description:
-  // this method casts the fitler to an elevation filter.
-  vtkElevationFilter *GetElevation();
+  // this method casts the fitler to a vtkColorByProcess filter.
+  vtkColorByProcess *GetFilter();
   
   // Description:
   // A callback that gets called when the Accept button is pressed.
-  void ElevationParameterChanged();
+  void ParameterChanged();
   
   // Description:
-  // Filter parameters that get broadcast to all processes.
-  void SetLowPoint(float x, float y, float z);
-  void SetHighPoint(float x, float y, float z);
-  void SetScalarRange(float min, float max);
+  // This method sets the controller in the VTK filter.
+  void SetApplication(vtkKWApplication *app);
 
-  
 protected:
-  vtkPVElevationFilter();
-  ~vtkPVElevationFilter();
-  vtkPVElevationFilter(const vtkPVElevationFilter&) {};
-  void operator=(const vtkPVElevationFilter&) {};
-  
-  vtkKWLabel *LowPointLabel;
-  vtkKWLabel *HighPointLabel;
-  vtkKWLabel *RangeLabel;
-  vtkKWWidget *LowPointFrame;
-  vtkKWWidget *HighPointFrame;
-  vtkKWWidget *RangeFrame;
-  
-  vtkKWEntry *LowPointXEntry;
-  vtkKWEntry *LowPointYEntry;
-  vtkKWEntry *LowPointZEntry;
-  vtkKWEntry *HighPointXEntry;
-  vtkKWEntry *HighPointYEntry;
-  vtkKWEntry *HighPointZEntry;
-  vtkKWEntry *RangeMinEntry;
-  vtkKWEntry *RangeMaxEntry;
-  vtkKWLabel *LowPointXLabel;
-  vtkKWLabel *LowPointYLabel;
-  vtkKWLabel *LowPointZLabel;
-  vtkKWLabel *HighPointXLabel;
-  vtkKWLabel *HighPointYLabel;
-  vtkKWLabel *HighPointZLabel;
-  vtkKWLabel *RangeMinLabel;
-  vtkKWLabel *RangeMaxLabel;
+  vtkPVColorByProcess();
+  ~vtkPVColorByProcess();
+  vtkPVColorByProcess(const vtkPVColorByProcess&) {};
+  void operator=(const vtkPVColorByProcess&) {};
   
   vtkKWPushButton *Accept;
   vtkKWPushButton *SourceButton;

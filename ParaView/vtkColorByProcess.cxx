@@ -78,18 +78,18 @@ vtkColorByProcess::~vtkColorByProcess()
 //
 void vtkColorByProcess::Execute()
 {
-  int i, j, numPts;
+  int i, numPts;
   vtkScalars *newScalars;
-  float l, *x, s, v[3];
-  float diffVector[3], diffScalar;
+  float s;
   vtkDataSet *input = this->GetInput();
+  vtkDataSet *output = this->GetOutput();
 
   // Initialize
   //
   vtkDebugMacro(<<"Generating elevation scalars!");
 
   // First, copy the input to the output as a starting point
-  this->GetOutput()->CopyStructure( input );
+  output->CopyStructure( input );
 
   if ( ((numPts=input->GetNumberOfPoints()) < 1) )
     {
@@ -128,12 +128,12 @@ void vtkColorByProcess::Execute()
 
   // Update self
   //
-  this->GetOutput()->GetPointData()->CopyScalarsOff();
-  this->GetOutput()->GetPointData()->PassData(input->GetPointData());
+  output->GetPointData()->CopyScalarsOff();
+  output->GetPointData()->PassData(input->GetPointData());
 
-  this->GetOutput()->GetCellData()->PassData(input->GetCellData());
+  output->GetCellData()->PassData(input->GetCellData());
 
-  this->GetOutput()->GetPointData()->SetScalars(newScalars);
+  output->GetPointData()->SetScalars(newScalars);
   newScalars->Delete();
 }
 

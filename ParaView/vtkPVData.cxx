@@ -34,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkKWApplication.h"
 #include "vtkPVContourFilter.h"
+#include "vtkPVElevationFilter.h"
 #include "vtkPVAssignment.h"
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
@@ -136,6 +137,8 @@ int vtkPVData::Create(char *args)
   this->FiltersMenuButton->SetButtonText("Filters");
   this->FiltersMenuButton->AddCommand("vtkContourFilter", this,
 				      "Contour");
+  this->FiltersMenuButton->AddCommand("vtkElevationFilter", this,
+				      "Elevation");
   if (this->Data->GetPointData()->GetScalars() == NULL)
     {
     this->Script("%s entryconfigure 3 -state disabled",
@@ -184,9 +187,53 @@ void vtkPVData::Contour()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::Elevation()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVElevationFilter *elevation;
+  float bounds[6];
+
+  // This should go through the PVData who will collect the info.
+  this->GetBounds(bounds);
+  
+  elevation = vtkPVElevationFilter::New();
+  elevation->Clone(pvApp);
+  
+  elevation->SetInput(this);
+  
+  this->GetPVSource()->GetView()->AddComposite(elevation);
+  elevation->SetName("elevation");
+  
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  
+  elevation->SetLowPoint(bounds[0], 0.0, 0.0);
+  elevation->SetHighPoint(bounds[1], 0.0, 0.0);
+
+  window->SetCurrentSource(elevation);
+  window->GetSourceList()->Update();
+  
+  elevation->Delete();
+}
+
+//----------------------------------------------------------------------------
 vtkProp* vtkPVData::GetProp()
 {
   return this->Actor;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::GetBounds(float bounds[6])
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  pvApp->BroadcastScript("%s TransmitBounds", this->GetTclName());
+  // ...
+
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::TransmitBounds()
+{
 }
 
 //----------------------------------------------------------------------------

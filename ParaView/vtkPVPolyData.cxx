@@ -28,7 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVData.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVShrinkPolyData.h"
-#include "vtkPVElevationFilter.h"
+#include "vtkPVColorByProcess.h"
 #include "vtkPVConeSource.h"
 #include "vtkPVGlyph3D.h"
 #include "vtkKWView.h"
@@ -111,33 +111,27 @@ void vtkPVPolyData::Glyph()
   
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPVPolyData::Elevation()
+void vtkPVPolyData::ColorByProcess()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVElevationFilter *elevation;
-  float *bounds;
-
-  // This should go through the PVData who will collect the info.
-  bounds = this->GetPolyData()->GetBounds();
+  vtkPVColorByProcess *pvFilter;
   
-  elevation = vtkPVElevationFilter::New();
-  elevation->Clone(pvApp);
+  pvFilter = vtkPVColorByProcess::New();
+  pvFilter->Clone(pvApp);
   
-  elevation->SetInput(this);
+  pvFilter->SetInput(this);
   
-  this->GetPVSource()->GetView()->AddComposite(elevation);
-  elevation->SetName("elevation");
+  this->GetPVSource()->GetView()->AddComposite(pvFilter);
+  pvFilter->SetName("color by process");
   
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
   
-  elevation->SetLowPoint(bounds[0], 0.0, 0.0);
-  elevation->SetHighPoint(bounds[1], 0.0, 0.0);
-
-  window->SetCurrentSource(elevation);
+  window->SetCurrentSource(pvFilter);
   window->GetSourceList()->Update();
   
-  elevation->Delete();
+  pvFilter->Delete();
 }
 
 //----------------------------------------------------------------------------

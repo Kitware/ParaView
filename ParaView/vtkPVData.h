@@ -74,6 +74,7 @@ public:
   // Description:
   // General filters that can be applied to vtkDataSet.
   void Contour();
+  void Elevation();
 
   // Description:
   // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
@@ -97,6 +98,15 @@ public:
   // Description:
   // Uses the assignment to set the extent, then updates the data.
   virtual void Update();
+
+  // Description:
+  // This method collects the bounds from all processes.
+  void GetBounds(float bounds[6]);
+
+  // Description:
+  // A Helper method for GetBounds that needs to be wrapped.
+  // Do not call this method directly.
+  void TransmitBounds();
   
 protected:
   vtkPVData();

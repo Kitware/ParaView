@@ -97,6 +97,14 @@ SOURCE=.\tcl\KWParaViewInit.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkColorByProcess.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkColorByProcessTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkDummyRenderWindowInteractor.cxx
 # End Source File
 # Begin Source File
@@ -201,6 +209,14 @@ SOURCE=.\vtkPVAssignmentTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVColorByProcess.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVColorByProcessTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVConeSource.cxx
 # End Source File
 # Begin Source File
@@ -218,6 +234,14 @@ SOURCE=.\vtkPVContourFilterTcl.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVData.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVDataSetToDataSetFilter.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVDataSetToDataSetFilterTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -337,6 +361,10 @@ SOURCE=.\vtkPVSourceTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVSphereSource.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVWindow.cxx
 # End Source File
 # Begin Source File
@@ -347,6 +375,26 @@ SOURCE=.\vtkPVWindowTcl.cxx
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\vtkColorByProcess.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkColorByProcess.h
+InputName=vtkColorByProcess
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # Begin Source File
 
 SOURCE=.\vtkDummyRenderWindowInteractor.h
@@ -654,6 +702,26 @@ InputName=vtkPVAssignment
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVColorByProcess.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVColorByProcess.h
+InputName=vtkPVColorByProcess
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVConeSource.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -703,6 +771,26 @@ SOURCE=.\vtkPVData.h
 # Begin Custom Build
 InputPath=.\vtkPVData.h
 InputName=vtkPVData
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVDataSetToDataSetFilter.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVDataSetToDataSetFilter.h
+InputName=vtkPVDataSetToDataSetFilter
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -1000,6 +1088,30 @@ InputName=vtkPVSourceList
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVSphereSource.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVSphereSource.h
+InputName=vtkPVSphereSource
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVSphereSourceTcl.cxx
 # End Source File
 # Begin Source File
 

@@ -55,7 +55,7 @@ public:
   vtkPolyData *GetPolyData();
   
   void Shrink();
-  void Elevation();
+  void ColorByProcess();
   void Glyph();
   
 protected:

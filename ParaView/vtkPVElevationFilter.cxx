@@ -97,8 +97,9 @@ vtkPVElevationFilter::vtkPVElevationFilter()
   this->SourceButton = vtkKWPushButton::New();
   this->SourceButton->SetParent(this->Properties);
   
-  this->Elevation = vtkElevationFilter::New();
-
+  vtkElevationFilter *e = vtkElevationFilter::New();
+  this->SetFilter(e);
+  e->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -156,15 +157,18 @@ vtkPVElevationFilter::~vtkPVElevationFilter()
   
   this->SourceButton->Delete();
   this->SourceButton = NULL;
-  
-  this->Elevation->Delete();
-  this->Elevation = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVElevationFilter* vtkPVElevationFilter::New()
 {
   return new vtkPVElevationFilter();
+}
+
+//----------------------------------------------------------------------------
+vtkElevationFilter* vtkPVElevationFilter::GetElevation()
+{
+  return vtkElevationFilter::SafeDownCast(this->Filter);
 }
 
 //----------------------------------------------------------------------------
@@ -273,71 +277,12 @@ void vtkPVElevationFilter::CreateProperties()
 	       this->RangeFrame->GetWidgetName());
 }
 
-//----------------------------------------------------------------------------
-void vtkPVElevationFilter::SetOutput(vtkPVPolyData *pvd)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
-			   pvd->GetTclName());
-    }
-  
-  this->SetPVData(pvd);
-  pvd->SetPolyData(this->Elevation->GetPolyDataOutput());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVElevationFilter::SetOutput(vtkPVImage *pvd)
-{
-  vtkDataSet *ds;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
-			   pvd->GetTclName());
-    }
-  
-  this->SetPVData(pvd);
-  
-  ds = this->Elevation->GetOutput();
-  if ( ! ds->IsA("vtkImageData") )
-    {
-    vtkErrorMacro("Expecting an image.");
-    return;
-    }
-  
-  pvd->SetImageData((vtkImageData*)ds);
-}
-
-//----------------------------------------------------------------------------
-vtkPVData *vtkPVElevationFilter::GetOutput()
-{
-  return this->Output;
-}
-
-//----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVElevationFilter::GetPVPolyDataOutput()
-{
-  return vtkPVPolyData::SafeDownCast(this->Output);
-}
-
-//----------------------------------------------------------------------------
-vtkPVImage *vtkPVElevationFilter::GetPVImageOutput()
-{
-  return vtkPVImage::SafeDownCast(this->Output);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVElevationFilter::ElevationParameterChanged()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVPolyData *newData;
-  vtkPVAssignment *a;
   vtkPVWindow *window = this->GetWindow();
   float low[3], high[3], range[2];
-  vtkPVActorComposite *ac;
   
   low[0] = this->LowPointXEntry->GetValueAsFloat();
   low[1] = this->LowPointYEntry->GetValueAsFloat();
@@ -354,34 +299,11 @@ void vtkPVElevationFilter::ElevationParameterChanged()
 
   if (this->GetPVData() == NULL)
     { // This is the first time. Initialize data.
-    newData = vtkPVPolyData::New();
-    newData->Clone(pvApp);
-    this->SetOutput(newData);
-    a = this->GetInput()->GetAssignment();
-    newData->SetAssignment(a);
-    this->GetInput()->GetActorComposite()->VisibilityOff();
-    this->CreateDataPage();
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
+    this->InitializeData();
     }
   
   this->GetView()->Render();
   window->GetMainView()->SetSelectedComposite(this);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVElevationFilter::SetInput(vtkPVData *pvData)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
-			   pvData->GetTclName());
-    }  
-  
-  this->GetElevation()->SetInput(pvData->GetData());
-  this->Input = pvData;
 }
 
 
@@ -427,13 +349,3 @@ void vtkPVElevationFilter::SetScalarRange(float min, float max)
   this->GetElevation()->SetScalarRange(min, max);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVElevationFilter::GetSource()
-{
-  this->GetPVData()->GetActorComposite()->VisibilityOff();
-  this->GetWindow()->GetMainView()->
-    SetSelectedComposite(this->GetInput()->GetPVSource());
-  this->GetInput()->GetActorComposite()->VisibilityOn();
-  this->GetView()->Render();
-  this->GetWindow()->GetMainView()->ResetCamera();
-}
