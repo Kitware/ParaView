@@ -28,9 +28,9 @@
 class vtkStringList;
 class vtkKWOptionMenu;
 class vtkKWLabel;
-class vtkCollection;
 class vtkPVSource;
 class vtkPVStringWidgetProperty;
+class vtkPVWidgetCollection;
 class vtkKWLabeledFrame;
 class vtkStringList;
 
@@ -181,7 +181,7 @@ protected:
   // Using this list as an array of strings.
   vtkStringList *Labels;
   vtkStringList *Values;
-  vtkCollection *WidgetProperties;
+  vtkPVWidgetCollection *Widgets;
 
   int CurrentIndex;
   ElementTypes ElementType;

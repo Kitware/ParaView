@@ -15,7 +15,6 @@
 #include "vtkPVSelectWidget.h"
 
 #include "vtkArrayMap.txx"
-#include "vtkCollection.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWOptionMenu.h"
@@ -27,6 +26,7 @@
 #include "vtkStringList.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
+#include "vtkPVWidgetCollection.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollectionIterator.h"
 
@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.51");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.52");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -49,7 +49,7 @@ vtkPVSelectWidget::vtkPVSelectWidget()
 
   this->Labels = vtkStringList::New();
   this->Values = vtkStringList::New();
-  this->WidgetProperties = vtkCollection::New();
+  this->Widgets = vtkPVWidgetCollection::New();
 
   this->CurrentIndex = -1;
   this->EntryLabel = 0;
@@ -70,8 +70,8 @@ vtkPVSelectWidget::~vtkPVSelectWidget()
   this->Labels = NULL;
   this->Values->Delete();
   this->Values = NULL;
-  this->WidgetProperties->Delete();
-  this->WidgetProperties = NULL;
+  this->Widgets->Delete();
+  this->Widgets = NULL;
   this->SetEntryLabel(0);
   
   this->SetProperty(NULL);
@@ -109,17 +109,14 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side left", this->Menu->GetWidgetName());
 
   justifyFrame->Delete();
-  int len = this->WidgetProperties->GetNumberOfItems();
+  int len = this->Widgets->GetNumberOfItems();
   
   vtkPVWidget* widget;
-  vtkPVWidgetProperty *prop;
   
   int i;
   for(i=0; i<len; i++)
     {
-    prop =
-      static_cast<vtkPVWidgetProperty*>(this->WidgetProperties->GetItemAsObject(i));
-    widget = prop->GetWidget();
+    widget = static_cast<vtkPVWidget*>(this->Widgets->GetItemAsObject(i));
     if (!widget->GetApplication())
       {
       widget->Create(this->GetApplication());
@@ -170,9 +167,8 @@ int vtkPVSelectWidget::GetModifiedFlag()
 
   if (this->CurrentIndex >= 0)
     {
-    vtkPVWidgetProperty *pvwp;
-    pvwp = (vtkPVWidgetProperty*)this->WidgetProperties->GetItemAsObject(this->CurrentIndex);
-    return pvwp->GetWidget()->GetModifiedFlag();
+    vtkPVWidget *widget = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
+    return widget->GetModifiedFlag();
     }
   return 0;
 }
@@ -180,21 +176,19 @@ int vtkPVSelectWidget::GetModifiedFlag()
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
 {
-  vtkPVWidgetProperty *pvwp;
-  pvwp = vtkPVWidgetProperty::SafeDownCast(
-    this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-  if (!pvwp)
+  vtkPVWidget *widget = vtkPVWidget::SafeDownCast(
+    this->Widgets->GetItemAsObject(this->CurrentIndex));
+  if (!widget)
     {
     return;
     }
 
-  pvwp->GetWidget()->SaveInBatchScript(file);
+  widget->SaveInBatchScript(file);
  
   if(this->ElementType == OBJECT)
     { 
     // TODO Fix this hack.
-    vtkPVObjectWidget* ow = 
-      vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget()); 
+    vtkPVObjectWidget* ow = vtkPVObjectWidget::SafeDownCast(widget);
     if (strcmp(this->GetCurrentVTKValue(), "Output") == 0)
       {
       *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
@@ -239,9 +233,8 @@ void vtkPVSelectWidget::PostAccept()
 {
   if (this->CurrentIndex >= 0)
     {
-    vtkPVWidgetProperty *pvwp;
-    pvwp = (vtkPVWidgetProperty*)this->WidgetProperties->GetItemAsObject(this->CurrentIndex);
-    pvwp->GetWidget()->PostAccept();
+    vtkPVWidget *widget = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
+    widget->PostAccept();
     }
  }
 
@@ -259,11 +252,8 @@ void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
 
   if(this->ElementType == OBJECT)
     { 
-    vtkPVWidgetProperty *pvwp;
-    pvwp = vtkPVWidgetProperty::SafeDownCast(
-      this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-    vtkPVObjectWidget* ow = 
-      vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget()); 
+    vtkPVObjectWidget* ow = vtkPVObjectWidget::SafeDownCast(
+      this->Widgets->GetItemAsObject(this->CurrentIndex));
     if (ow)
       {
       vtkClientServerID id = 
@@ -282,9 +272,8 @@ void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
 
   if (this->CurrentIndex >= 0)
     {
-    vtkPVWidgetProperty *pvwp;
-    pvwp = (vtkPVWidgetProperty*)this->WidgetProperties->GetItemAsObject(this->CurrentIndex);
-    pvwp->GetWidget()->AcceptInternal(sourceId);
+    vtkPVWidget *widget = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
+    widget->AcceptInternal(sourceId);
     }
 
   this->ModifiedFlag = 0;
@@ -303,9 +292,8 @@ void vtkPVSelectWidget::Trace(ofstream *file)
 
   if (this->CurrentIndex >= 0)
     {
-    vtkPVWidgetProperty *pvwp;
-    pvwp = (vtkPVWidgetProperty*)this->WidgetProperties->GetItemAsObject(this->CurrentIndex);
-    pvwp->GetWidget()->Trace(file);
+    vtkPVWidget *widget = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
+    widget->Trace(file);
     }
 }
 
@@ -322,22 +310,16 @@ void vtkPVSelectWidget::ResetInternal()
       vtkClientServerID csid = this->Property->GetObjectID();
       for (i = 0; i < num; ++i)
         {
-        vtkPVWidgetProperty *pvwp;
-        pvwp = vtkPVWidgetProperty::SafeDownCast(
-          this->WidgetProperties->GetItemAsObject(i));
-        if (pvwp)
+        vtkPVObjectWidget *ow = vtkPVObjectWidget::SafeDownCast(
+          this->Widgets->GetItemAsObject(i));
+        if (ow)
           {
-          vtkPVObjectWidget* ow = 
-            vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget()); 
-          if (ow)
+          vtkClientServerID id = 
+            ow->GetObjectByName(this->GetVTKValue(i));
+          if (id == csid)
             {
-            vtkClientServerID id = 
-              ow->GetObjectByName(this->GetVTKValue(i));
-            if (id == csid)
-              {
-              index = i;
-              break;
-              }
+            index = i;
+            break;
             }
           }
         }
@@ -375,9 +357,8 @@ void vtkPVSelectWidget::ResetInternal()
 
   if (this->CurrentIndex >= 0)
     {
-    vtkPVWidgetProperty *pvwp;
-    pvwp = (vtkPVWidgetProperty*)(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-    pvwp->GetWidget()->ResetInternal();
+    vtkPVWidget *widget = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+    widget->ResetInternal();
     }
 }
 
@@ -429,10 +410,7 @@ void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw,
   char str[512];
 
   this->Labels->AddString(labelVal);
-  vtkPVWidgetProperty *prop = pvw->CreateAppropriateProperty();
-  prop->SetWidget(pvw);
-  this->WidgetProperties->AddItem(prop);
-  prop->Delete();
+  this->Widgets->AddItem(pvw);
 
   if (vtkVal)
     {
@@ -466,13 +444,7 @@ vtkPVWidget *vtkPVSelectWidget::GetPVWidget(const char* label)
   int idx;
 
   idx = this->FindIndex(label, this->Labels);
-  vtkPVWidgetProperty *prop =
-    (vtkPVWidgetProperty*)(this->WidgetProperties->GetItemAsObject(idx));
-  if (prop)
-    {
-    return prop->GetWidget();
-    }
-  return NULL;
+  return (vtkPVWidget*)(this->Widgets->GetItemAsObject(idx));
 }
 
 //-----------------------------------------------------------------------------
@@ -527,7 +499,6 @@ void vtkPVSelectWidget::AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimatio
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::SetCurrentIndex(int idx)
 {
-  vtkPVWidgetProperty *pvwp;
   vtkPVWidget *pvw;
   
   if (this->CurrentIndex == idx)
@@ -538,16 +509,14 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
   // Unpack the old widget.
   if (this->CurrentIndex >= 0)
     {
-    pvwp = (vtkPVWidgetProperty*)(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-    pvw = pvwp->GetWidget();
+    pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
     pvw->Deselect();
     this->Script("pack forget %s", pvw->GetWidgetName());
     }
   this->CurrentIndex = idx;
  
   // Pack the new widget.
-  pvwp = (vtkPVWidgetProperty*)(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-  pvw = pvwp->GetWidget();
+  pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
   this->Script("pack %s -side top -fill both -expand t", pvw->GetWidgetName());
   pvw->Reset();
   pvw->Select();
@@ -590,14 +559,12 @@ vtkPVWidget* vtkPVSelectWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
     const char* label;
     const char* value;
     vtkPVWidget* widget;
-    vtkPVWidgetProperty *prop;
     vtkPVWidget* clone;
     for(int i=0; i<len; i++)
       {
       label = this->Labels->GetString(i);
       value = this->Values->GetString(i);
-      prop = static_cast<vtkPVWidgetProperty*>(this->WidgetProperties->GetItemAsObject(i));
-      widget = prop->GetWidget();
+      widget = static_cast<vtkPVWidget*>(this->Widgets->GetItemAsObject(i));
       clone = widget->ClonePrototype(pvSource, map);
       clone->SetParent(pvSelect->GetFrame());
       pvSelect->AddItem(label, clone, value);
@@ -638,22 +605,20 @@ void vtkPVSelectWidget::CopyProperties(vtkPVWidget* clone,
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::Select()
 {
-  vtkPVWidgetProperty *pvwp;
-  pvwp = (vtkPVWidgetProperty*)(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-  if (pvwp)
+  vtkPVWidget *pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+  if (pvw)
     {
-    pvwp->GetWidget()->Select();
+    pvw->Select();
     }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::Deselect()
 {
-  vtkPVWidgetProperty *pvwp;
-  pvwp = (vtkPVWidgetProperty*)(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-  if (pvwp)
+  vtkPVWidget *pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+  if (pvw)
     {
-    pvwp->GetWidget()->Deselect();
+    pvw->Deselect();
     }
 }
 
@@ -764,15 +729,15 @@ void vtkPVSelectWidget::UpdateEnableState()
   this->PropagateEnableState(this->LabeledFrame);
   this->PropagateEnableState(this->Menu);
 
-  vtkCollectionIterator* it = this->WidgetProperties->NewIterator();
+  vtkCollectionIterator* it = this->Widgets->NewIterator();
   for ( it->InitTraversal();
     !it->IsDoneWithTraversal();
     it->GoToNextItem() )
     {
-    vtkPVWidgetProperty* prop = vtkPVWidgetProperty::SafeDownCast(it->GetObject());
-    if ( prop && prop->GetWidget() )
+    vtkPVWidget* widget = vtkPVWidget::SafeDownCast(it->GetObject());
+    if (widget)
       {
-      prop->GetWidget()->SetEnabled(this->Enabled);
+      widget->SetEnabled(this->Enabled);
       }
     }
   it->Delete();
