@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.12");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.13");
 
 struct vtkSMStringListDomainInternals
 {
@@ -58,6 +58,7 @@ const char* vtkSMStringListDomain::GetString(unsigned int idx)
 unsigned int vtkSMStringListDomain::AddString(const char* string)
 {
   this->SLInternals->Strings.push_back(string);
+  this->Modified();
   return this->SLInternals->Strings.size() - 1;
 }
 
@@ -75,6 +76,7 @@ void vtkSMStringListDomain::RemoveString(const char* string)
     if (strcmp(string, iter->c_str()) == 0)
       {
       this->SLInternals->Strings.erase(iter);
+      this->Modified();
       break;
       }
     }
@@ -85,6 +87,7 @@ void vtkSMStringListDomain::RemoveAllStrings()
 {
   this->SLInternals->Strings.erase(
     this->SLInternals->Strings.begin(), this->SLInternals->Strings.end());
+  this->Modified();
 }
 
 //---------------------------------------------------------------------------

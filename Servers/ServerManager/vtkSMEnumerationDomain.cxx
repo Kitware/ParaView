@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMEnumerationDomain);
-vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.6");
+vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.7");
 
 struct vtkSMEnumerationDomainInternals
 {
@@ -142,6 +142,7 @@ void vtkSMEnumerationDomain::AddEntry(const char* text, int value)
 {
   this->EInternals->Entries.push_back(
     vtkSMEnumerationDomainInternals::EntryType(text, value));
+  this->Modified();
 }
 
 //---------------------------------------------------------------------------
@@ -149,6 +150,7 @@ void vtkSMEnumerationDomain::RemoveAllEntries()
 {
   this->EInternals->Entries.erase(
     this->EInternals->Entries.begin(), this->EInternals->Entries.end());
+  this->Modified();
 }
 
 //---------------------------------------------------------------------------
