@@ -29,10 +29,11 @@
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkClientServerStream.h"
+#include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.1");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -103,7 +104,7 @@ vtkPVCompositePartDisplay::CreateCollectionFilter(vtkPVProcessModule* pm)
   pm->SendStream(vtkProcessModule::CLIENT);
   // if running in client mode
   // then set the server to be servermode
-  if(pm->GetClientMode())
+  if(pm->GetOptions()->GetClientMode())
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -112,7 +113,7 @@ vtkPVCompositePartDisplay::CreateCollectionFilter(vtkPVProcessModule* pm)
     pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
   // if running in render server mode
-  if(pm->GetRenderServerMode())
+  if(pm->GetOptions()->GetRenderServerMode())
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -149,7 +150,7 @@ vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVProcessModule *pm)
   //  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   //  }
   //else 
-  if (pm->GetUseTiledDisplay() || pm->GetCaveConfigurationFileName())
+  if (pm->GetOptions()->GetUseTiledDisplay() || pm->GetOptions()->GetCaveConfigurationFileName())
     { 
     this->CollectID = pm->NewStreamObject("vtkMPIMoveData");
     // Create a temporary input.
@@ -213,7 +214,7 @@ vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVProcessModule *pm)
   //  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   //  }
   //else 
-  if (pm->GetUseTiledDisplay() || pm->GetCaveConfigurationFileName())
+  if (pm->GetOptions()->GetUseTiledDisplay() || pm->GetOptions()->GetCaveConfigurationFileName())
     { // This should be in subclass.
     this->LODCollectID = pm->NewStreamObject("vtkMPIMoveData");
     // Create a temporary input.
@@ -291,7 +292,7 @@ vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVProcessModule *pm)
 
   // Special condition to signal the client.
   // Because both processes of the Socket controller think they are 0!!!!
-  if (pm->GetClientMode())
+  if (pm->GetOptions()->GetClientMode())
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke

@@ -40,6 +40,7 @@
 #include "vtkProcessModuleGUIHelper.h"
 #include "vtkPVServerInformation.h"
 #include "vtkInstantiator.h"
+#include "vtkPVOptions.h"
 
 // initialze the class variables
 int vtkPVProcessModule::GlobalLODFlag = 0;
@@ -47,34 +48,17 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.16");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.17");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
   this->MPIMToNSocketConnectionID.ID = 0;
-  this->MachinesFileName = 0;
-  this->RenderNodePort = 0;
-  this->ReverseConnection = 0;
   this->ProgressEnabled = 0;
-  this->HostName = 0;
-  this->Username = 0;
-  this->RenderServerHostName = 0;
-  this->RenderServerPort = 22221;
-  this->Port = 11111;
-  this->ServerMode = 0;
-  this->RenderServerMode = 0;
-  this->ClientMode = 0;
-  this->AlwaysSSH = 0;
   this->LogThreshold = 0;
   this->DemoPath = 0;
   this->GUIHelper = 0;
   this->ServerInformation = vtkPVServerInformation::New();
-  this->SetRenderServerHostName("localhost");
-  this->SetHostName("localhost");
-  this->UseStereoRendering = 0;
-  this->UseTiledDisplay = 0;
-  this->CaveConfigurationFileName = 0;
   this->UseTriangleStrips = 0;
   this->UseImmediateMode = 1;
 }
@@ -86,14 +70,9 @@ vtkPVProcessModule::~vtkPVProcessModule()
     {
     this->GUIHelper->Delete();
     }
-  this->SetRenderServerHostName(0);
-  this->SetMachinesFileName(0);
-  this->SetHostName(0);
-  this->SetUsername(0);
   this->SetDemoPath(0);
   this->FinalizeInterpreter();
   this->ServerInformation->Delete();
-  this->SetCaveConfigurationFileName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -219,40 +198,40 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "LogThreshold: " << this->LogThreshold << endl;
   os << indent << "MachinesFileName: " 
-     << (this->MachinesFileName?this->MachinesFileName:"(null)") << endl;
-  if (this->ClientMode)
+     << (this->Options->GetMachinesFileName()?this->Options->GetMachinesFileName():"(null)") << endl;
+  if (this->Options->GetClientMode())
     {
     os << indent << "Running as a client\n";
-    os << indent << "Port: " << this->Port << endl;
-    os << indent << "RenderNodePort: " << this->RenderNodePort << endl;
-    os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
-    os << indent << "Host: " << (this->HostName?this->HostName:"(none)") << endl;
-    os << indent << "Render Host: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
+    os << indent << "Port: " << this->Options->GetPort() << endl;
+    os << indent << "RenderNodePort: " << this->Options->GetRenderNodePort() << endl;
+    os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
+    os << indent << "Host: " << (this->Options->GetHostName()?this->Options->GetHostName():"(none)") << endl;
+    os << indent << "Render Host: " << (this->Options->GetRenderServerHostName()?this->Options->GetRenderServerHostName():"(none)") << endl;
     os << indent << "Username: " 
-       << (this->Username?this->Username:"(none)") << endl;
-    os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
-    os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
-    os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
+       << (this->Options->GetUsername()?this->Options->GetUsername():"(none)") << endl;
+    os << indent << "AlwaysSSH: " << this->Options->GetAlwaysSSH() << endl;
+    os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
+    os << indent << "UseStereoRendering: " << this->Options->GetUseStereoRendering() << endl;
     }
-  if (this->ServerMode)
+  if (this->Options->GetServerMode())
     {
     os << indent << "Running as a server\n";
-    os << indent << "Port: " << this->Port << endl;
-    os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
-    os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+    os << indent << "Port: " << this->Options->GetPort() << endl;
+    os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
+    os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
     }
-  if (this->RenderServerMode)
+  if (this->Options->GetRenderServerMode())
     {
-    if(this->ClientMode)
+    if(this->Options->GetClientMode())
       {
       os << indent << "Running as a client connectd to a render server\n";
       }
     else
       {
       os << indent << "Running as a render server\n";
-      os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
-      os << indent << "Port: " << this->Port << endl;
-      os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+      os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
+      os << indent << "Port: " << this->Options->GetPort() << endl;
+      os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
       }
     } 
   os << indent << "ProgressEnabled: " << this->ProgressEnabled << endl;
@@ -268,11 +247,11 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "ServerInformation: NULL\n";
     }
-  os << indent << "UseTiledDisplay: " << this->UseTiledDisplay << endl;
-  if (this->CaveConfigurationFileName)
+  os << indent << "UseTiledDisplay: " << this->Options->GetUseTiledDisplay() << endl;
+  if (this->Options->GetCaveConfigurationFileName())
     {
     os << indent << "CaveConfigurationFileName: " 
-       << this->CaveConfigurationFileName << endl;
+       << this->Options->GetCaveConfigurationFileName() << endl;
     }
   else
     {
@@ -441,6 +420,26 @@ void vtkPVProcessModule::SetGUIHelper(vtkProcessModuleGUIHelper* h)
 {
   this->GUIHelper = h;
   h->Register(this);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::GetRenderNodePort()
+{
+  if ( !this->Options )
+    {
+    return 0;
+    }
+  return this->Options->GetRenderNodePort();
+}
+
+//----------------------------------------------------------------------------
+char* vtkPVProcessModule::GetMachinesFileName()
+{
+  if ( !this->Options )
+    {
+    return 0;
+    }
+  return this->Options->GetMachinesFileName();
 }
 
 //----------------------------------------------------------------------------

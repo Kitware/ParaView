@@ -18,11 +18,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
+#include "vtkPVOptions.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.1");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -69,7 +70,7 @@ vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVProcessModule *pm)
     << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
-  if(pm->GetClientMode())
+  if(pm->GetOptions()->GetClientMode())
     {
     // We need this because the socket controller has no way of distinguishing
     // between processes.
@@ -98,7 +99,7 @@ vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVProcessModule *pm)
     }
 
   // if running in render server mode
-  if(pm->GetRenderServerMode())
+  if(pm->GetOptions()->GetRenderServerMode())
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke

@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.311");
+vtkCxxRevisionMacro(vtkPVApplication, "1.312");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -490,24 +490,11 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
     {  
     // copy all the command line settings from the application
     // to the process module
-    pm->SetAlwaysSSH(this->Options->GetAlwaysSSH());
-    pm->SetPort(this->Options->GetPort());
-    pm->SetHostName(this->Options->GetHostName());
-    pm->SetUsername(this->Options->GetUsername());
-    pm->SetRenderServerHostName(this->Options->GetRenderServerHostName());
-    pm->SetClientMode(this->Options->GetClientMode());
-    pm->SetRenderServerPort(this->Options->GetRenderServerPort());
-    pm->SetRenderServerMode(this->Options->GetRenderServerMode());
-    pm->SetRenderNodePort(this->Options->GetRenderNodePort());
-    pm->SetMachinesFileName(this->Options->GetMachinesFileName());
-    pm->SetReverseConnection(this->Options->GetReverseConnection());
-    pm->SetDemoPath(this->GetDemoPath());
-    pm->SetServerMode(this->Options->GetServerMode());
-    pm->SetUseStereoRendering(this->Options->GetUseStereoRendering());
+    pm->SetOptions(this->Options);
+
     pm->GetServerInformation()->SetTileDimensions(this->Options->GetTileDimensions());
     pm->GetServerInformation()->SetUseOffscreenRendering(this->Options->GetUseOffscreenRendering());
-    pm->SetUseTiledDisplay(this->Options->GetUseTiledDisplay());
-    pm->SetCaveConfigurationFileName(this->Options->GetCaveConfigurationFileName());
+    pm->SetDemoPath(this->GetDemoPath());
     // Juggle the compositing flag to let server in on the decision
     // whether to allow compositing / rendering on the server.
     // Put the flag on the process module.

@@ -27,9 +27,10 @@
 #include "vtkRenderWindow.h"
 #include "vtkFloatArray.h"
 #include "vtkTimerLog.h"
+#include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.3");
 
 //===========================================================================
 //***************************************************************************
@@ -216,7 +217,7 @@ void vtkPVRenderModule::SetProcessModule(vtkProcessModule *pm)
     vtkRenderWindow::SafeDownCast(
       pvm->GetObjectFromID(this->RenderWindowID));
 
-  if (pvm->GetUseStereoRendering())
+  if (pvm->GetOptions()->GetUseStereoRendering())
     {
     stream << vtkClientServerStream::Invoke << this->RenderWindowID 
       << "StereoCapableWindowOn" 

@@ -76,6 +76,15 @@ public:
 
 
   // Description:
+  // Some variables need to be overwritten
+  vtkSetStringMacro(HostName);
+  vtkSetStringMacro(Username);
+  vtkSetClampMacro(Port, int, 0, 65535);
+  vtkSetClampMacro(ServerMode, int, 0, 1);
+  vtkSetClampMacro(ClientMode, int, 0, 1);
+
+
+  // Description:
   // In case of unknown argument, set this variable with the unknown argument.
   vtkGetStringMacro(UnknownArgument);
 
@@ -140,10 +149,8 @@ protected:
   vtkSetStringMacro(BatchScriptName);
   char* BatchScriptName;
 
-  vtkSetStringMacro(Username);
   char* Username;
 
-  vtkSetStringMacro(HostName);
   char* HostName;
 
   vtkSetStringMacro(RenderServerHostName);

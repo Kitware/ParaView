@@ -24,11 +24,11 @@
 #include "vtkPVCompositePartDisplay.h"
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkClientServerStream.h"
-
+#include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void vtkPVCompositeRenderModule::StillRender()
   // local rendering
   //if (!this->PVApplication->GetUseRenderingGroup() &&
   if (((float)(totalMemory)/1000.0 < this->GetCompositeThreshold() ||
-       (!this->ProcessModule->GetClientMode() && pm->GetNumberOfPartitions()<2)))
+       (!this->ProcessModule->GetOptions()->GetClientMode() && pm->GetNumberOfPartitions()<2)))
     {
     localRender = 1;
     }
@@ -141,7 +141,7 @@ void vtkPVCompositeRenderModule::StillRender()
       << this->CompositeID << "SetImageReductionFactor" << 1
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT);
-    if (pm->GetClientMode() && !pm->GetUseTiledDisplay() )
+    if (pm->GetOptions()->GetClientMode() && !pm->GetOptions()->GetUseTiledDisplay() )
       {
       // No squirt if disabled, otherwise only lossless for still render.  
       int squirtLevel = 0;
@@ -253,7 +253,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   localRender = 0;
   //if (!this->PVApplication->GetUseRenderingGroup() &&
   if ( ((float)(tmpMemory)/1000.0 < this->GetCompositeThreshold() ||
-       ( ! pm->GetClientMode() && pm->GetNumberOfPartitions()<2)))
+       ( ! pm->GetOptions()->GetClientMode() && pm->GetNumberOfPartitions()<2)))
       
     {
     localRender = 1;
@@ -306,7 +306,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 
   // Handle squirt compression.
-  if (pm->GetClientMode() && !pm->GetUseTiledDisplay() )
+  if (pm->GetOptions()->GetClientMode() && !pm->GetOptions()->GetUseTiledDisplay() )
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -579,7 +579,7 @@ float vtkPVCompositeRenderModule::GetZBufferValue(int x, int y)
 
   // If client-server...
   vtkPVProcessModule* pm = this->ProcessModule;
-  if (pm->GetClientMode())
+  if (pm->GetOptions()->GetClientMode())
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke

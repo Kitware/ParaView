@@ -22,11 +22,11 @@
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVRenderModule.h"
-
+#include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPickDisplay);
-vtkCxxRevisionMacro(vtkPVPickDisplay, "1.1");
+vtkCxxRevisionMacro(vtkPVPickDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVProcessModule *pm)
 
   // A rather complex mess to set the correct server variable 
   // on all of the remote duplication filters.
-  if(pm->GetClientMode())
+  if(pm->GetOptions()->GetClientMode())
     {
     // We need this because the socket controller has no way of distinguishing
     // between processes.
@@ -124,8 +124,8 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVProcessModule *pm)
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT);
     }
-  // pm->ClientMode is only set when there is a server.
-  if(pm->GetClientMode())
+  // pm->GetOptions()->ClientMode is only set when there is a server.
+  if(pm->GetOptions()->GetClientMode())
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -134,7 +134,7 @@ void vtkPVPickDisplay::CreateParallelTclObjects(vtkPVProcessModule *pm)
     pm->SendStream(vtkProcessModule::DATA_SERVER);
     }
   // if running in render server mode
-  if(pm->GetRenderServerMode())
+  if(pm->GetOptions()->GetRenderServerMode())
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke

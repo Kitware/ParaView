@@ -39,6 +39,8 @@
 #include "vtkPVConfig.h"
 #include "vtkPVDemoPaths.h"
 
+#include "vtkPVOptions.h"
+
 
 int FindDemoPath(vtkPVClientServerModule*pm, char* argv0)
 {
@@ -173,6 +175,27 @@ int main(int argc, char *argv[])
 #endif
 #endif
   
+  int display_help = 0;
+  vtkPVOptions* options = vtkPVOptions::New();
+  if ( !options->Parse(argc, argv) )
+    {
+    cerr << "Problem parsing command line arguments" << endl;
+    if ( options->GetUnknownArgument() )
+      {
+      cerr << "Got unknown argument: " << options->GetUnknownArgument() << endl;
+      }
+    if ( options->GetErrorMessage() )
+      {
+      cerr << "Error: " << options->GetErrorMessage() << endl;
+      }
+    display_help = 1;
+    }
+  if ( display_help || options->GetHelpSelected() )
+    {
+    cerr << options->GetHelp() << endl;
+    options->Delete();
+    return 1;
+    }
 
 #ifdef VTK_USE_MPI
   // This is here to avoid false leak messages from vtkDebugLeaks when
@@ -191,12 +214,13 @@ int main(int argc, char *argv[])
 #endif
 
   vtkPVClientServerModule *pm = vtkPVClientServerModule::New();
+  pm->SetOptions(options);
   FindDemoPath(pm, argv[0]);
 
-  pm->SetServerMode(1);
-  pm->SetClientMode(0);
-  pm->SetHostName("localhost");
-  pm->SetPort(11111);
+  options->SetServerMode(1);
+  options->SetClientMode(0);
+  options->SetHostName("localhost");
+  options->SetPort(11111);
   pm->InitializeInterpreter();
   pm->GetProgressHandler()->SetServerMode(1);
   vtkProcessModule::SetProcessModule(pm);
@@ -221,6 +245,7 @@ int main(int argc, char *argv[])
 
   // free some memory
   vtkTimerLog::CleanupLog();
+  options->Delete();
 
 #ifdef VTK_USE_MPI
   MPI_Finalize();

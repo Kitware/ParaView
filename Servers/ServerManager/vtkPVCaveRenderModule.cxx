@@ -27,10 +27,11 @@
 #include "vtkClientServerStream.h"
 #include "vtkCaveRenderManager.h"
 #include "vtkMPIMToNSocketConnection.h"
+#include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModule);
-vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.4");
 
 
 
@@ -73,7 +74,7 @@ void vtkPVCaveRenderModule::SetProcessModule(vtkProcessModule *pm)
   this->CompositeID = this->ProcessModule->NewStreamObject("vtkCaveRenderManager");
   this->ProcessModule->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
-  if (this->ProcessModule->GetClientMode())
+  if (this->ProcessModule->GetOptions()->GetClientMode())
     {
     this->ProcessModule->GetStream()
       << vtkClientServerStream::Invoke
@@ -139,7 +140,7 @@ void vtkPVCaveRenderModule::SetProcessModule(vtkProcessModule *pm)
 void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
 {
   int idx;
-  const char* fileName = this->ProcessModule->GetCaveConfigurationFileName();
+  const char* fileName = this->ProcessModule->GetOptions()->GetCaveConfigurationFileName();
   ifstream *File = 0;
   if(!fileName)
     {

@@ -41,6 +41,8 @@ class vtkSocketController;
 class vtkKWApplication;
 class vtkProcessModuleGUIHelper;
 class vtkPVServerInformation;
+class vtkPVOptions;
+
 class VTK_EXPORT vtkPVProcessModule : public vtkProcessModule
 {
 public:
@@ -129,58 +131,6 @@ public:
   // Ivars copied from vtkPVApplication in SetProcessModule method
   
   // Description:
-  // This is used by the render server only.
-  vtkGetStringMacro(MachinesFileName);
-  vtkSetStringMacro(MachinesFileName);
-
-  // The the portb*c  for the client/render server socket connection.
-  vtkGetMacro(ReverseConnection,int);
-  vtkSetMacro(ReverseConnection,int);
-
-  //Description:
-  // The port used by the render node.
-  vtkGetMacro(RenderNodePort,int);
-  vtkSetMacro(RenderNodePort,int);
-  
-  // Description:
-  // Flag that differentiates between clinet and server programs.
-  vtkGetMacro(ClientMode, int);
-  vtkSetMacro(ClientMode, int);
-
-  // Description:
-  // Flag to determine if the render server is being used.
-  // If this is on and ClientMode is on, then the client
-  // will be connecting to both a render and data server.
-  // If this flag is on and ClientMode is off, then this is 
-  // a render server.
-  vtkGetMacro(RenderServerMode, int);
-  vtkSetMacro(RenderServerMode, int);
-
-  vtkGetMacro(ServerMode, int);
-  vtkSetMacro(ServerMode, int);
-  
-  vtkSetClampMacro(AlwaysSSH, int, 0, 1);
-  vtkBooleanMacro(AlwaysSSH, int);
-  vtkGetMacro(AlwaysSSH, int);  
-
-  // Description:
-  // The the port for the client/server socket connection.
-  vtkGetMacro(Port,int);
-  vtkSetMacro(Port,int);
-  vtkGetMacro(RenderServerPort,int);
-  vtkSetMacro(RenderServerPort,int);
-  vtkSetStringMacro(HostName);
-  vtkSetStringMacro(Username);
-  vtkSetStringMacro(RenderServerHostName);
-
-  // Description:
-  // Variable set by command line arguments --client or -c
-  // Client mode tries to connect to a server through a socket.
-  // The client does not have any local partitioned data.
-  vtkSetMacro(UseStereoRendering,int);
-  vtkGetMacro(UseStereoRendering,int);
-
-  // Description:
   // Server information was initially developed to query the
   // server whether it supports remote rendering.
   vtkPVServerInformation* GetServerInformation() { return this->ServerInformation;}
@@ -214,14 +164,24 @@ public:
   // Description:
   // This should be eliminated (server information instead) or should
   // be in render module.
-  vtkSetMacro(UseTiledDisplay,int);
-  vtkGetMacro(UseTiledDisplay,int);
-  vtkSetStringMacro(CaveConfigurationFileName);
-  vtkGetStringMacro(CaveConfigurationFileName);
   vtkSetMacro(UseTriangleStrips,int);
   vtkGetMacro(UseTriangleStrips,int);
   vtkSetMacro(UseImmediateMode,int);
   vtkGetMacro(UseImmediateMode,int);
+
+  // Description:
+  // Set and get the application options
+  vtkGetObjectMacro(Options, vtkPVOptions);
+  virtual void SetOptions(vtkPVOptions* op)
+    {
+    this->Options = op;
+    }
+
+  // Description:
+  // Propagate from the options so that it is available in CS
+  int GetRenderNodePort();
+  char* GetMachinesFileName();
+
 
 protected:
   vtkPVProcessModule();
@@ -234,28 +194,15 @@ protected:
   // of the vtkCollectPolydata filter.
   static int GlobalLODFlag;
   
-  char* MachinesFileName;
-  int RenderNodePort;
-  int ReverseConnection;
   int ProgressEnabled;
-  char* HostName; 
-  char* Username;
-  char* RenderServerHostName;
-  int RenderServerPort;
-  int Port;
-  int ServerMode;
-  int RenderServerMode;
-  int ClientMode;
-  int AlwaysSSH;
   float LogThreshold;
   char* DemoPath;
-  int UseStereoRendering;
   vtkPVServerInformation* ServerInformation;
   vtkProcessModuleGUIHelper* GUIHelper;
-  int UseTiledDisplay;
-  char* CaveConfigurationFileName;
   int UseTriangleStrips;
   int UseImmediateMode;
+
+  vtkPVOptions* Options;
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented

@@ -42,6 +42,7 @@
 #include "vtkUnsignedShortArray.h"
 #include "vtkCallbackCommand.h"
 #include "vtkKWRemoteExecute.h"
+#include "vtkPVOptions.h"
 #ifndef _WIN32
 #include <unistd.h>
 #endif
@@ -147,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.14");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.15");
 
 
 //----------------------------------------------------------------------------
@@ -157,15 +158,11 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->Controller = NULL;
   this->SocketController = NULL;
   this->RenderServerSocket = NULL;
-  this->ClientMode = 1;
-  this->RenderServerMode = 0;
 
   this->ArgumentCount = 0;
   this->Arguments = NULL;
   this->ReturnValue = 0;
 
-  this->Port = 0;
-  this->RenderServerPort = 0;
   this->MultiProcessMode = vtkPVClientServerModule::SINGLE_PROCESS_MODE;
   this->NumberOfProcesses = 2;
   this->GatherRenderServer = 0;
@@ -198,10 +195,6 @@ vtkPVClientServerModule::~vtkPVClientServerModule()
   this->ArgumentCount = 0;
   this->Arguments = NULL;
   this->ReturnValue = 0;
-
-  this->SetRenderServerHostName(0);
-  this->SetHostName(0);
-  this->SetUsername(0);
 
   this->RemoteExecution->Delete();
 }
@@ -252,7 +245,7 @@ void vtkPVClientServerModule::Initialize()
     return;
     } 
 
-  if (this->ClientMode)
+  if (this->Options->GetClientMode())
     {  
     if(!this->GUIHelper)
       {
@@ -297,7 +290,7 @@ void vtkPVClientServerModule::Initialize()
     this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
     this->NumberOfServerProcesses = numServerProcs;
    
-    if(this->RenderServerMode)
+    if(this->Options->GetRenderServerMode())
       { 
       // The client sends the connect id to data server
       this->RenderServerSocket->Send(&this->ConnectID, 1, 1, 8843);
@@ -417,7 +410,7 @@ void vtkPVClientServerModule::Initialize()
     
     this->Controller->CreateOutputWindow();
     this->SocketController->ProcessRMIs();
-    if(this->RenderServerMode)
+    if(this->Options->GetRenderServerMode())
       {
       cout << "Exit Render Server.\n";
       cout.flush();
@@ -455,15 +448,15 @@ void vtkPVClientServerModule::Initialize()
 int vtkPVClientServerModule::ShouldWaitForConnection()
 {  
   // if client mode then return reverse connection
-  if(this->ClientMode)
+  if(this->Options->GetClientMode())
     {
     // if in client mode, it should not wait for a connection
     // unless reverse is 1, so just return reverse connection value
-    return this->GetReverseConnection();
+    return this->Options->GetReverseConnection();
     }
   // if server mode, then by default wait for the connection
   // so return not getreverseconnection
-  return !this->GetReverseConnection();
+  return !this->Options->GetReverseConnection();
   
 }
 
@@ -492,12 +485,12 @@ int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
     runcommand += " ";
     }
   runcommand += "eval ${PARAVIEW_EXECUTABLE} --server --port=";
-  sprintf(numbuffer, "%d", this->Port);
+  sprintf(numbuffer, "%d", this->Options->GetPort());
   runcommand += numbuffer;
-  this->RemoteExecution->SetRemoteHost(this->HostName);
-  if ( this->Username && this->Username[0] )
+  this->RemoteExecution->SetRemoteHost(this->Options->GetHostName());
+  if ( this->Options->GetUsername() && this->Options->GetUsername()[0] )
     {
-    this->RemoteExecution->SetSSHUser(this->Username);
+    this->RemoteExecution->SetSSHUser(this->Options->GetUsername());
     }
   else
     {
@@ -518,7 +511,7 @@ int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
       cc = max_try;
       break;
       }
-    if (comm->ConnectTo(this->HostName, this->Port))
+    if (comm->ConnectTo(this->Options->GetHostName(), this->Options->GetPort()))
       {
       break;
       }
@@ -554,26 +547,26 @@ void vtkPVClientServerModule::ConnectToRemote()
   // Get the port from the command line arguments
   // Establish connection
   int start = 0;
-  if ( this->GetAlwaysSSH() )
+  if ( this->Options->GetAlwaysSSH() )
     {
     start = 1;
     }
-  int port = this->Port;
-  if(this->RenderServerMode && !this->ClientMode)
+  int port = this->Options->GetPort();
+  if(this->Options->GetRenderServerMode() && !this->Options->GetClientMode())
     {
-    port = this->RenderServerPort;
+    port = this->Options->GetRenderServerPort();
     }
-  cout << "Connect to " << this->HostName << ":" << port << endl;
-  while (!comm->ConnectTo(this->HostName, port))
+  cout << "Connect to " << this->Options->GetHostName() << ":" << port << endl;
+  while (!comm->ConnectTo(this->Options->GetHostName(), port))
     {  
     // Do not bother trying to start the client if reverse connection is specified.
     // only try the ConnectTo once if it is a server in reverse mode
-    if ( ! this->ClientMode)
+    if ( ! this->Options->GetClientMode())
       {  
       // This is the "reverse-connection" server condition.  
       // For now just fail if connection is not found.
       vtkErrorMacro("Server error: Could not connect to the client. " 
-                    << this->HostName << " " << port);
+                    << this->Options->GetHostName() << " " << port);
       comm->Delete();
       commRenderServer->Delete();
       if(this->GUIHelper)
@@ -599,7 +592,7 @@ void vtkPVClientServerModule::ConnectToRemote()
         }
       continue;
       }
-    if (this->ClientMode)
+    if (this->Options->GetClientMode())
       {
       if(!this->OpenConnectionDialog(&start))
         {
@@ -621,19 +614,19 @@ void vtkPVClientServerModule::ConnectToRemote()
       }
     }
   
-  if(this->ClientMode && this->RenderServerMode)
+  if(this->Options->GetClientMode() && this->Options->GetRenderServerMode())
     {
-    cout << "Connect to " << this->RenderServerHostName << ":" 
-         << this->RenderServerPort << endl;
-    if(commRenderServer->ConnectTo(this->RenderServerHostName, this->RenderServerPort))
+    cout << "Connect to " << this->Options->GetRenderServerHostName() << ":" 
+         << this->Options->GetRenderServerPort() << endl;
+    if(commRenderServer->ConnectTo(this->Options->GetRenderServerHostName(), this->Options->GetRenderServerPort()))
       {
       this->RenderServerSocket = vtkSocketController::New();
       this->RenderServerSocket->SetCommunicator(commRenderServer);
       }
     else
       {
-      vtkErrorMacro("Could not connect to render server on host: " << this->RenderServerHostName 
-                    << " Port: " << this->RenderServerPort); 
+      vtkErrorMacro("Could not connect to render server on host: " << this->Options->GetRenderServerHostName() 
+                    << " Port: " << this->Options->GetRenderServerPort()); 
       comm->Delete();
       commRenderServer->Delete();
       if(this->GUIHelper)
@@ -662,7 +655,7 @@ void vtkPVClientServerModule::ConnectToRemote()
 void vtkPVClientServerModule::SetupWaitForConnection()
 {
   int needTwoSockets = 0;
-  if(this->RenderServerMode && this->ClientMode)
+  if(this->Options->GetRenderServerMode() && this->Options->GetClientMode())
     {
     needTwoSockets = 1;
     this->RenderServerSocket = vtkSocketController::New();
@@ -677,24 +670,24 @@ void vtkPVClientServerModule::SetupWaitForConnection()
   if(needTwoSockets)
     {
     comm2 = vtkSocketCommunicator::New();
-    cout << "Listen on port: " << this->GetRenderServerPort() << endl;
-    sock2 = comm2->OpenSocket(this->GetRenderServerPort());
+    cout << "Listen on port: " << this->Options->GetRenderServerPort() << endl;
+    sock2 = comm2->OpenSocket(this->Options->GetRenderServerPort());
     }
-  int port= this->GetPort();
-  if((!needTwoSockets && this->RenderServerMode) ||
-     (!this->ClientMode && this->RenderServerMode))
+  int port= this->Options->GetPort();
+  if((!needTwoSockets && this->Options->GetRenderServerMode()) ||
+     (!this->Options->GetClientMode() && this->Options->GetRenderServerMode()))
     {
-    port = this->GetRenderServerPort();
+    port = this->Options->GetRenderServerPort();
     }
   cout << "Listen on port: " << port << endl;
   int sock = comm->OpenSocket(port);
-  if ( this->ClientMode )
+  if ( this->Options->GetClientMode() )
     {
     cout << "Waiting for server..." << endl;
     }
   else
     {
-    if( this->RenderServerMode )
+    if( this->Options->GetRenderServerMode() )
       {
       cout << "RenderServer: ";
       }
@@ -720,10 +713,10 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     }
   if(comm2)
     {
-    cout << "connected to port " << this->GetRenderServerPort() << "\n";
+    cout << "connected to port " << this->Options->GetRenderServerPort() << "\n";
     }
   
-  if ( this->ClientMode )
+  if ( this->Options->GetClientMode() )
     {
     cout << "Server connected." << endl;
     }
@@ -774,14 +767,14 @@ void vtkPVClientServerModule::Connect()
 void vtkPVClientServerModule::InitializeRenderServer()
 {
   // if this is not client and using render server, then exit
-  if(!(this->ClientMode && this->RenderServerMode))
+  if(!(this->Options->GetClientMode() && this->Options->GetRenderServerMode()))
     {
     return;
     }
   int connectingServer;
   int waitingServer;
   int numberOfRenderNodes = 0;
-  if(this->RenderServerMode == 1)
+  if(this->Options->GetRenderServerMode() == 1)
     {
     connectingServer = vtkProcessModule::DATA_SERVER;
     waitingServer = vtkProcessModule::RENDER_SERVER;
@@ -803,7 +796,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
   // if the data server is going to wait for the render server
   // then we have to tell the data server how many connections to make
   // if the render server is waiting, it already knows how many to make
-  if(this->RenderServerMode == 2)
+  if(this->Options->GetRenderServerMode() == 2)
     {
       // get the number of processes on the render server
       this->GatherInformationRenderServer(info, id);
@@ -838,7 +831,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
   this->SendStream(waitingServer);
 
   // Get the information about the connection after the call to SetupWaitForConnection
-  if(this->RenderServerMode == 1)
+  if(this->Options->GetRenderServerMode() == 1)
     {
       this->GatherInformationRenderServer(info, id);
       numberOfRenderNodes = info->GetNumberOfConnections();
@@ -916,7 +909,7 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
 // Only called by the client.
 void vtkPVClientServerModule::Exit()
 {
-  if ( ! this->ClientMode)
+  if ( ! this->Options->GetClientMode())
     {
     vtkErrorMacro("Not expecting server to call Exit.");
     return;
@@ -968,7 +961,7 @@ void vtkPVClientServerModule::Exit()
 // Eliminate it if possible. !!!!!!!!
 int vtkPVClientServerModule::GetPartitionId()
 {
-  if (this->ClientMode)
+  if (this->Options->GetClientMode())
     {
     return -1;
     }
@@ -983,7 +976,7 @@ int vtkPVClientServerModule::GetPartitionId()
 // This is used to determine which filters are available.
 int vtkPVClientServerModule::GetNumberOfPartitions()
 {
-  if (this->ClientMode)
+  if (this->Options->GetClientMode())
     {
     return this->NumberOfServerProcesses;
     }
@@ -1045,7 +1038,7 @@ vtkPVClientServerModule::GatherInformationInternal(const char* infoClassName,
 {
   vtkClientServerStream css;
   
-  if(this->GetClientMode())
+  if(this->Options->GetClientMode())
     {
     vtkSocketController* controller = this->SocketController;
     if(this->GatherRenderServer)
@@ -1157,11 +1150,11 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Controller: " << this->Controller << endl;;
   os << indent << "SocketController: " << this->SocketController << endl;;
   os << indent << "RenderServerSocket: " << this->RenderServerSocket << endl;;
-  os << indent << "ClientMode: " << this->ClientMode << endl;
-  os << indent << "RenderServerMode: " << this->RenderServerMode << endl;
+  os << indent << "ClientMode: " << this->Options->GetClientMode() << endl;
+  os << indent << "RenderServerMode(): " << this->Options->GetRenderServerMode() << endl;
   os << indent << "NumberOfProcesses: " << this->NumberOfProcesses << endl;
   os << indent << "MultiProcessMode: " << this->MultiProcessMode << endl;
-  os << indent << "RenderServerMode: " << this->RenderServerMode << endl;
+  os << indent << "RenderServerMode(): " << this->Options->GetRenderServerMode() << endl;
   os << indent << "NumberOfServerProcesses: " << this->NumberOfServerProcesses << endl;
   os << indent << "ConnectID: " << this->ConnectID << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
@@ -1173,7 +1166,7 @@ int vtkPVClientServerModule::GetDirectoryListing(const char* dir,
                                                  vtkStringList* files,
                                                  int save)
 {
-  if(this->ClientMode)
+  if(this->Options->GetClientMode())
     {
     return this->Superclass::GetDirectoryListing(dir, dirs, files, save);
     }
@@ -1195,7 +1188,7 @@ void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
 //----------------------------------------------------------------------------
 const vtkClientServerStream& vtkPVClientServerModule::GetLastDataServerResult()
 { 
-  if(!this->ClientMode)
+  if(!this->Options->GetClientMode())
     {
     vtkErrorMacro("GetLastDataServerResult() should not be called on the server.");
     this->LastServerResultStream->Reset();
@@ -1228,7 +1221,7 @@ const vtkClientServerStream& vtkPVClientServerModule::GetLastDataServerResult()
 //----------------------------------------------------------------------------
 const vtkClientServerStream& vtkPVClientServerModule::GetLastRenderServerResult()
 {
-  if(!this->ClientMode)
+  if(!this->Options->GetClientMode())
     {
     vtkErrorMacro("GetLastRenderServerResult() should not be called on the server.");
     this->LastServerResultStream->Reset();
@@ -1264,7 +1257,7 @@ vtkTypeUInt32 vtkPVClientServerModule::CreateSendFlag(vtkTypeUInt32 servers)
 
   // for RenderServer mode keep the bit vector the same
   // because all servers are different processes
-  if(this->RenderServerMode)
+  if(this->Options->GetRenderServerMode())
     {
     return servers;
     }
@@ -1296,7 +1289,7 @@ vtkTypeUInt32 vtkPVClientServerModule::CreateSendFlag(vtkTypeUInt32 servers)
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::SendStreamToClient(vtkClientServerStream& stream)
 { 
-  if(!this->ClientMode)
+  if(!this->Options->GetClientMode())
     {
     vtkErrorMacro("Attempt to call SendStreamToClient on server node.");
     return -1;
@@ -1311,7 +1304,7 @@ int vtkPVClientServerModule::SendStreamToClient(vtkClientServerStream& stream)
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::SendStreamToDataServer(vtkClientServerStream& stream)
 { 
-  if(!this->ClientMode)
+  if(!this->Options->GetClientMode())
     {
     vtkErrorMacro("Attempt to call SendStreamToDataServer on server node.");
     return -1;
@@ -1331,7 +1324,7 @@ int vtkPVClientServerModule::SendStreamToDataServer(vtkClientServerStream& strea
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::SendStreamToDataServerRoot(vtkClientServerStream& stream)
 {
-  if(!this->ClientMode)
+  if(!this->Options->GetClientMode())
     {
     vtkErrorMacro("Attempt to call SendStreamToDataServerRoot on server node.");
     return -1;
@@ -1355,7 +1348,7 @@ int vtkPVClientServerModule::SendStreamToRenderServer(vtkClientServerStream& str
     {
     return 0;
     }
-  if(!this->RenderServerMode)
+  if(!this->Options->GetRenderServerMode())
     {
     vtkErrorMacro("Attempt to call SendStreamToRenderServer when not in renderserver mode.");
     return -1;
@@ -1376,7 +1369,7 @@ int vtkPVClientServerModule::SendStreamToRenderServerRoot(vtkClientServerStream&
     {
     return 0;
     }
-  if(!this->RenderServerMode)
+  if(!this->Options->GetRenderServerMode())
     {
     vtkErrorMacro("Attempt to call SendStreamToRenderServerRoot when not in renderserver mode.");
     return -1;
