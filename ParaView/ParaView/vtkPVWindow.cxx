@@ -58,11 +58,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
+#include "vtkKWProgressGauge.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTclInteractor.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
@@ -119,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.379");
+vtkCxxRevisionMacro(vtkPVWindow, "1.380");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -130,6 +132,7 @@ vtkPVWindow::vtkPVWindow()
   this->Interaction = 0;
   this->NamesToSources = 0;
   this->SetWindowClass("ParaView");
+  this->SetTitle("Kitware ParaView");
 
   this->CommandFunction = vtkPVWindowCommand;
 
@@ -883,11 +886,22 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
           this->GetPVApplication()->GetMinorVersion());
   this->SetStatusText(version);
 
+  // Update status image (and gauge height to match)
+  
+  this->UpdateStatusImage();
+  this->ProgressGauge->SetHeight(
+    vtkKWTkUtilities::GetPhotoHeight(this->Application->GetMainInterp(), 
+                                     this->StatusImageName) - 2);
+
+  // Init menus
+
   if (pvApp->GetShowSplashScreen())
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (menus)...");
     }
   this->InitializeMenus(app);
+
+  // Init toolbars
 
   if (pvApp->GetShowSplashScreen())
     {
@@ -3349,9 +3363,9 @@ void vtkPVWindow::DisplayCommandPrompt()
     {
     this->TclInteractor = vtkKWTclInteractor::New();
     ostrstream title;
-    if (this->Application && *this->Application->GetApplicationName())
+    if (this->GetTitle())
       {
-      title << this->Application->GetApplicationName() << " : ";
+      title << this->GetTitle() << " : ";
       }
     title << "Command Prompt" << ends;
     this->TclInteractor->SetTitle(title.str());
@@ -3765,7 +3779,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.379 $");
+  this->ExtractRevision(os,"$Revision: 1.380 $");
 }
 
 //----------------------------------------------------------------------------

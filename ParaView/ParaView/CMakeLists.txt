@@ -92,6 +92,7 @@ vtkPVVectorEntry.cxx
 vtkPVWidget.cxx
 vtkPVWidgetCollection.cxx
 vtkPVWindow.cxx 
+vtkPVWindowResources.cxx 
 #vtkPVWizard.cxx
 vtkPVWorldPointPicker.cxx 
 vtkPVWriter.cxx
@@ -103,6 +104,7 @@ vtkStringList.cxx
 
 WRAP_EXCLUDE_FILES(
   vtkPVApplicationResources
+  vtkPVWindowResources
 )
 
 IF (VTK_USE_MPI)

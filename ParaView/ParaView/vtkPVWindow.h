@@ -647,6 +647,8 @@ protected:
 
   int Interaction;
 
+  void UpdateStatusImage();
+
 private:
 
 //BTX
