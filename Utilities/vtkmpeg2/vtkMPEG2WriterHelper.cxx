@@ -158,7 +158,7 @@ int vtkMPEG2WriterInternal::RemoveImage(const char* fname)
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPEG2WriterHelper);
-vtkCxxRevisionMacro(vtkMPEG2WriterHelper, "1.2");
+vtkCxxRevisionMacro(vtkMPEG2WriterHelper, "1.3");
 
 //---------------------------------------------------------------------------
 vtkMPEG2WriterHelper::vtkMPEG2WriterHelper()
@@ -536,8 +536,8 @@ void vtkMPEG2WriterInternal::ReadParmFile( )
   this->Structure->low_delay = 0;
   this->Structure->constrparms = 0;
   this->Structure->profile = 4;
-  this->Structure->level = 8;
-  this->Structure->prog_seq = 0;
+  this->Structure->level = 4;
+  this->Structure->prog_seq = 1;
   this->Structure->chroma_format = 1;
   this->Structure->video_format = 2;
   this->Structure->color_primaries = 5;
@@ -545,7 +545,7 @@ void vtkMPEG2WriterInternal::ReadParmFile( )
   this->Structure->matrix_coefficients = 4;
   this->Structure->display_horizontal_size = this->Dim[0];
   this->Structure->display_vertical_size = this->Dim[1];
-  this->Structure->dc_prec = 0;
+  this->Structure->dc_prec = 2;
   this->Structure->topfirst = 1;
   this->Structure->frame_pred_dct_tab[0] = this->Structure->frame_pred_dct_tab[1] = this->Structure->frame_pred_dct_tab[2] = 0;
   this->Structure->conceal_tab[0] = this->Structure->conceal_tab[1] = this->Structure->conceal_tab[2] = 0;
