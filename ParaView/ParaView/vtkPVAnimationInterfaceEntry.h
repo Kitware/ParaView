@@ -206,6 +206,8 @@ protected:
 
   int Dirty;
 
+  int CustomScript;
+
   unsigned long DeleteEventTag;
   vtkPVAnimationInterfaceEntryObserver* Observer;
 

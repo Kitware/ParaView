@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.12");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.13");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -364,6 +364,7 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
     this->ScriptEditorFrame->GetWidgetName(),
     this->StartTimeEntry->GetWidgetName(),
     this->EndTimeEntry->GetWidgetName());
+  this->CustomScript = 0;
   if ( i > 0)
     {
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
@@ -375,6 +376,7 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
     {
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
       this->ScriptEditorFrame->GetWidgetName());
+    this->CustomScript = 1;
     }
   else
     {
@@ -670,10 +672,12 @@ void vtkPVAnimationInterfaceEntry::SetupBinds()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetCustomScript(const char* script)
 {
+  this->CustomScript = 1;
   this->Dirty = 1;
   this->SetScript(script);
   this->AddTraceEntry("$kw(%s) SetCustomScript {%s}", this->GetTclName(),
     script);
+  this->GetMethodMenuButton()->SetButtonText("Script");
   this->Parent->UpdateNewScript();
   this->Parent->ShowEntryInFrame(this);
 }
@@ -771,6 +775,11 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
         {
         *file << "$kw(" << this->SaveStateObject->GetTclName() << ") " << this->SaveStateScript << endl;
         }
+      }
+    if ( this->CustomScript )
+      {
+      *file << "$kw(" << this->GetTclName() << ") SetCustomScript {" 
+        << this->Script << "}" << endl;
       }
     }
 }
