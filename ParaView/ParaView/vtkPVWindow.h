@@ -493,7 +493,9 @@ protected:
   int InitializeDefaultInterfaces;
 
   // Utility function which return the position of the first '.'
-  // from the right.
+  // from the right. Note that this returns a pointer offset
+  // from the original pointer. DO NOT DELETE THE ORIGINAL POINTER
+  // while using the extension.
   const char* ExtractFileExtension(const char* fname);
 
 private:

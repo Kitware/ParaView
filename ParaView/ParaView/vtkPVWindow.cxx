@@ -1879,16 +1879,21 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
 	"the event loop\n";
       *file << "wm withdraw .\n\n\n";
       int length = strlen(path);
-      if ( path[length-4] == '.')
+      char* newPath = new char[length+1];
+      strcpy(newPath, path);
+      // Remove the extension. The animation tool will add it's
+      // own interface.
+      if ( newPath[length-4] == '.')
         {
 	char* tmpStr = new char[length-3];
-	strncpy(tmpStr, path, length-4);
+	strncpy(tmpStr, newPath, length-4);
 	tmpStr[length-4] = '\0';
-	delete [] path;
-	path = tmpStr;
+	delete [] newPath;
+	newPath = tmpStr;
         }
-      this->AnimationInterface->SaveInTclScript(file, path, extension,
+      this->AnimationInterface->SaveInTclScript(file, newPath, extension,
 						writerName);
+      delete [] newPath;
       }
     delete [] path;
     *file << "vtkCommand DeleteAllObjects\n";
