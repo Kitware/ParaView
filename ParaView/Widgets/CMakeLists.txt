@@ -33,6 +33,7 @@ vtkKWSaveImageDialog
 vtkKWScale 
 vtkKWSerializer 
 vtkKWSplitFrame
+vtkKWTclInteractor
 vtkKWText 
 vtkKWToolbar 
 vtkKWWidget 

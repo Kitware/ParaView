@@ -61,7 +61,7 @@ class vtkKWInteractor;
 class vtkPVAnimationInterface;
 class vtkKWRotateCameraInteractor;
 class vtkKWCompositeCollection;
-
+class vtkKWTclInteractor;
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
@@ -251,8 +251,8 @@ public:
   void EnableFilterButtons();
 
   // Description:
-  // Load the tcl interactor
-  void LoadInteractor();
+  // Display the tcl interactor
+  void DisplayCommandPrompt();
   
 protected:
   vtkPVWindow();
@@ -317,10 +317,11 @@ protected:
   // will save out the window with all renderers.
   vtkPVAnimationInterface *AnimationInterface;
   
+  vtkKWTclInteractor *TclInteractor;
+  
 private:
   static const char* StandardSourceInterfaces;
   static const char* StandardFilterInterfaces;
-  static const char* InteractorScript;
 };
 
 
