@@ -22,7 +22,6 @@
 #define ET_HAVE_CUSTOM_MAINLOOP 0
 #define ET_TCL_LIBRARY "C:/Program Files/Tcl/lib/tcl8.2"
 #define ET_TK_LIBRARY "C:/Program Files/Tcl/lib/tk8.2"
-//#define ET_MAIN_SCRIPT "D:/Kw/vv.tcl"
 #define ET_EXTENSION 0
 #define ET_SHROUD_KEY 0
 #define ET_READ_STDIN 0
