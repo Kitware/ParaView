@@ -307,7 +307,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.26 $");
+  this->ExtractRevision(os,"$Revision: 1.27 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()
@@ -399,4 +399,25 @@ int vtkKWWidget::InitializeTrace()
   return 1;
 }  
 
-
+void vtkKWWidget::GetRGBColor(const char* color,
+			      int *rr, int *gg, int *bb)
+{
+  this->Script("winfo rgb %s %s",
+	       this->GetWidgetName(), color);
+  int r, g, b;
+  sscanf( this->Application->GetMainInterp()->result, "%d %d %d",
+	  &r, &g, &b );
+  *rr = static_cast<int>((static_cast<float>(r) / 65535.0)*255.0);
+  *gg = static_cast<int>((static_cast<float>(g) / 65535.0)*255.0);
+  *bb = static_cast<int>((static_cast<float>(b) / 65535.0)*255.0); 
+}
+  
+void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
+{
+  ostrstream str;
+  str << "lindex [ " << this->GetWidgetName() 
+      << " configure -bg ] end" << ends;
+  this->Script(str.str());
+  this->GetRGBColor(this->Application->GetMainInterp()->result, r, g, b);
+  str.rdbuf()->freeze(0);
+}

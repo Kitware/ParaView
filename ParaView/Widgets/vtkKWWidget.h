@@ -143,6 +143,12 @@ public:
   // Setting this string enables balloon help for this widget.
   virtual void SetBalloonHelpString(const char *str);
   vtkGetStringMacro(BalloonHelpString);
+
+  // Description:
+  // Get the RGB description of a TCL color
+  void GetRGBColor(const char* color, int *r, int *g, int *b);
+
+  void GetBackgroundColor(int *r, int *g, int *b);
   
   // Description:
   // Adjusts the placement of the baloon help
