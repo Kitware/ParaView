@@ -79,7 +79,7 @@ proc clip_run {} {
         return
     }
 
-    ChangeDemoText "Running Clip Demo:\n A sub-region of a dataset can be extracted by cutting\n or clipping with an arbitrary plane (all data types), specifying a threshold\n criteria to exclude cells (all data types) and/or specifying a\n VOI (volume of interest - structured data types only)\n "
+    ChangeDemoText "Running Clip Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only) "
 
     $clip(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
@@ -837,7 +837,7 @@ proc extract_run {} {
         return
     }
 
-    ChangeDemoText "Running Extract/Cut Demo:\n A sub-region of a dataset can be extracted by cutting\n or clipping with an arbitrary plane (all data types), specifying a threshold\n criteria to exclude cells (all data types) and/or specifying a\n VOI (volume of interest - structured data types only)"
+    ChangeDemoText "Running Extract/Cut Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only)"
 
     $extract(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
@@ -848,7 +848,8 @@ proc extract_run {} {
     $extract(vtkTemp1) ShowAnimationProperties
     set extract(vtkTemp106) [$extract(vtkTemp1) GetAnimationInterface]
     $extract(vtkTemp106) SetPVSource $extract(vtkTemp478)
-    $extract(vtkTemp106) SetLabelAndScript {X Axis} {[$extract(vtkTemp478) GetVTKSourceTclName] SetVOI [expr int($pvTime)] [expr int($pvTime)] 0 32 0 24; after 100}
+    $Application BroadcastSimpleScript "set extract_tcl_name [$extract(vtkTemp478) GetVTKSourceTclName]"
+    $extract(vtkTemp106) SetLabelAndScript {X Axis} {$extract_tcl_name SetVOI [expr int($pvTime)] [expr int($pvTime)] 0 32 0 24; after 100}
     $extract(vtkTemp106) SetCurrentTime 0.000000
     $extract(vtkTemp106) SetTimeEnd {56.000000}
     $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp478)
@@ -919,7 +920,7 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime 54.000000
     $extract(vtkTemp106) SetCurrentTime 55.000000
     $extract(vtkTemp106) SetCurrentTime 56.000000
-    $extract(vtkTemp106) SetLabelAndScript {Y Axis} {[$extract(vtkTemp478) GetVTKSourceTclName] SetVOI 0 56 [expr int($pvTime)] [expr int($pvTime)] 0 24; after 100}
+    $extract(vtkTemp106) SetLabelAndScript {Y Axis} {$extract_tcl_name SetVOI 0 56 [expr int($pvTime)] [expr int($pvTime)] 0 24; after 100}
     $extract(vtkTemp106) SetCurrentTime 0.000000
     $extract(vtkTemp106) SetTimeEnd {32.000000}
     $extract(vtkTemp106) SetCurrentTime 1.000000
@@ -954,7 +955,7 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime 30.000000
     $extract(vtkTemp106) SetCurrentTime 31.000000
     $extract(vtkTemp106) SetCurrentTime 32.000000
-    $extract(vtkTemp106) SetLabelAndScript {Z Axis} {[$extract(vtkTemp478) GetVTKSourceTclName] SetVOI 0 56 0 32 [expr int($pvTime)] [expr int($pvTime)]; after 100}
+    $extract(vtkTemp106) SetLabelAndScript {Z Axis} {$extract_tcl_name SetVOI 0 56 0 32 [expr int($pvTime)] [expr int($pvTime)]; after 100}
 
     if $pvDemoShouldStop {
         return
@@ -994,7 +995,8 @@ proc extract_run {} {
     $extract(vtkTemp615) SetVisibility 0
     $extract(vtkTemp598) SetVisibility 1
     $extract(vtkTemp106) SetPVSource $extract(vtkTemp598)
-    $extract(vtkTemp106) SetLabelAndScript {Cut Values} {[$extract(vtkTemp598) GetVTKSourceTclName] SetValue 0 $pvTime}
+    $Application BroadcastSimpleScript "set cut_tcl_name [$extract(vtkTemp598) GetVTKSourceTclName]"
+    $extract(vtkTemp106) SetLabelAndScript {Cut Values} {$cut_tcl_name SetValue 0 $pvTime}
     $extract(vtkTemp106) SetCurrentTime 0.000000
     $extract(vtkTemp106) SetCurrentTime -0.300000
     $extract(vtkTemp106) SetCurrentTime -0.600000
@@ -1059,7 +1061,7 @@ proc extract_run {} {
         return
     }
 
-    ChangeDemoText "Running Glyph Demo:\n Vectors fields can be inspected by applying glyphs\n (currently arrows -vector arrows-, cones and spheres) to the points\n in a dataset. The glyphs can be scaled by\n scalars, vector component or vector magnitude\n and can be oriented using a vector field."
+    ChangeDemoText "Running Glyph Demo:\n Vectors fields can be inspected by applying glyphs (currently arrows -vector arrows-, cones and spheres) to the points in a dataset. The glyphs can be scaled by scalars, vector component or vector magnitude and can be oriented using a vector field."
 
     $extract(vtkTemp703) SetVisibility 1
     $extract(vtkTemp780) SetVisibility 1
@@ -1183,7 +1185,7 @@ proc iso_run {} {
         return
     }
 
-    ChangeDemoText "Running Isosurface/Contour Demo :\n Contours and isosurfaces can be extracted from all data types\n using scalars or vector components. The results\n can be colored by any other variable or processed further.\n When possible, structured data contours/isosurfaces are\n extracted with fast and efficient algorithms\n which make use of the special data layout."
+    ChangeDemoText "Running Isosurface/Contour Demo :\n Contours and isosurfaces can be extracted from all data types using scalars or vector components. The results can be colored by any other variable or processed further. When possible, structured data contours/isosurfaces are extracted with fast and efficient algorithms which make use of the special data layout."
 
     $iso(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
@@ -1214,7 +1216,8 @@ proc iso_run {} {
     $iso(vtkTemp106) SetPVSource $iso(vtkTemp449)
     $iso(vtkTemp106) SetTimeEnd {0.600000}
     $iso(vtkTemp106) SetTimeStep {0.010000}
-    $iso(vtkTemp106) SetLabelAndScript {Contour Values} {[$iso(vtkTemp449) GetVTKSourceTclName] SetValue 0 $pvTime}
+    $Application BroadcastSimpleScript "set iso_tcl_name [$iso(vtkTemp449) GetVTKSourceTclName]"
+    $iso(vtkTemp106) SetLabelAndScript {Contour Values} {$iso_tcl_name SetValue 0 $pvTime}
 
     if $pvDemoShouldStop {
         return
@@ -1343,7 +1346,8 @@ proc iso_run {} {
 
 
     $iso(vtkTemp106) SetPVSource $iso(vtkTemp739)
-    $iso(vtkTemp106) SetLabelAndScript {Y Axis} {[$iso(vtkTemp739) GetVTKSourceTclName] SetVOI 0 29 [expr int($pvTime)] [expr int($pvTime)] 0 29}
+    $Application BroadcastSimpleScript "set iso_tcl_name [$iso(vtkTemp739) GetVTKSourceTclName]"
+    $iso(vtkTemp106) SetLabelAndScript {Y Axis} {$iso_tcl_name SetVOI 0 29 [expr int($pvTime)] [expr int($pvTime)] 0 29}
     $iso(vtkTemp106) SetCurrentTime 0.000000
     $iso(vtkTemp106) SetTimeEnd {29.000000}
     $iso(vtkTemp106) SetTimeStep {1.000000}
@@ -1506,7 +1510,7 @@ proc stream_run { } {
         return
     }
 
-    ChangeDemoText "Running Streamtraces Demo :\n Streamlines can be generated using constant step or adaptive\n integrators (currently, streamlines are not available\n in parallel, this feature is under development).\n The results can be displayed as points, lines, tubes,\n ribbons etc. and can be processed by a multitude of filters. "
+    ChangeDemoText "Running Streamtraces Demo :\n Streamlines can be generated using constant step or adaptive integrators (currently, streamlines are not available in parallel, this feature is under development). The results can be displayed as points, lines, tubes, ribbons etc. and can be processed by a multitude of filters. "
 
     # outline
     $streams(vtkTemp384) SetVisibility 1
@@ -3335,7 +3339,7 @@ proc threshold_run {} {
         return
     }
 
-    ChangeDemoText "Running Threshold Demo:\n A sub-region of a dataset can be extracted by cutting\n or clipping with an arbitrary plane (all data types), specifying a threshold\n criteria to exclude cells (all data types) and/or specifying a\n VOI (volume of interest - structured data types only)"
+    ChangeDemoText "Running Threshold Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only)"
 
     $threshold(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
@@ -3397,7 +3401,7 @@ proc warp_run {} {
         return
     }
 
-    ChangeDemoText "Running Warp Demo :\n The points in a dataset can be warped (displaced) with\n scalars (given a user defined displacement vector) or with\n vectors (unavailable for rectilinear grids)."
+    ChangeDemoText "Running Warp Demo :\n The points in a dataset can be warped (displaced) with scalars (given a user defined displacement vector) or with vectors (unavailable for rectilinear grids)."
 
     $warp(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
@@ -3457,9 +3461,9 @@ if $foundFiles {
     wm protocol .paraview WM_DELETE_WINDOW {ChangeDemoText "ParaView demo exiting.\nPlease wait.";set pvDemoShouldStop 1}
 
     toplevel .control
-    wm title .control "control panel"
+    wm title .control "demo control panel"
     frame .control.main -width 350 -height 200
-    label .control.main.info -text "ParaView demo initializing.\n Please wait."
+    label .control.main.info -text "ParaView demo initializing.\n Please wait."  -wraplength 300
     button .control.main.stop -text "Stop Demo" -command {ChangeDemoText "ParaView demo exiting.\nPlease wait.";.control.main.stop configure -state disable; set pvDemoShouldStop 1} -bg red
     pack .control.main
     place .control.main.info -rely 0 -relx 0.5 -anchor n
