@@ -135,7 +135,7 @@ public:
                             int /*shift*/) {}
   virtual void AButtonRelease(int /*num*/, int /*x*/, int /*y*/) {}
   virtual void AKeyPress(char /*key*/, int /*x*/, int /*y*/, int /*ctrl*/,
-                         int /*shift*/) {}
+                         int /*shift*/, char* /*keysym*/) {}
   virtual void Exposed();
   virtual void Configure(int /*width*/, int /*height*/) {}
   virtual void Enter(int /*x*/, int /*y*/) {}

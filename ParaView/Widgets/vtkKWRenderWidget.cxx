@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.51");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.52");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -368,13 +368,13 @@ void vtkKWRenderWidget::SetupInteractionBindings()
   this->Script("bind %s <Control-B3-Motion> {%s MouseMove 3 %%x %%y}",
                wname, tname);
 
-  this->Script("bind %s <KeyPress> {%s AKeyPress %%A %%x %%y 0 0}",
+  this->Script("bind %s <KeyPress> {%s AKeyPress %%A %%x %%y 0 0 %%K}",
                wname, tname);
   
-  this->Script("bind %s <Shift-KeyPress> {%s AKeyPress %%A %%x %%y 0 1}",
+  this->Script("bind %s <Shift-KeyPress> {%s AKeyPress %%A %%x %%y 0 1 %%K}",
                wname, tname);
   
-  this->Script("bind %s <Control-KeyPress> {%s AKeyPress %%A %%x %%y 1 0}", 
+  this->Script("bind %s <Control-KeyPress> {%s AKeyPress %%A %%x %%y 1 0 %%K}",
                wname, tname);
   
   this->Script("bind %s <Motion> {%s MouseMove 0 %%x %%y}", wname, tname);
