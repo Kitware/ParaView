@@ -22,6 +22,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVRenderModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVPart.h"
@@ -32,7 +33,7 @@
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.47");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.48");
 
 //===========================================================================
 //***************************************************************************
@@ -82,9 +83,9 @@ vtkPV3DWidget::vtkPV3DWidget()
 vtkPV3DWidget::~vtkPV3DWidget()
 {
   if (this->Widget3DID.ID)
-    {
+    {    
     vtkPVApplication *pvApp = this->GetPVApplication();
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();    
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
                     << "EnabledOff" << vtkClientServerStream::End;
     pm->DeleteStreamObject(this->Widget3DID);
@@ -158,14 +159,18 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
     this->Widget3D = 
       vtk3DWidget::SafeDownCast(pvApp->GetProcessModule()->GetObjectFromID(this->Widget3DID));
     }
-
-  this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
   
   // Only initialize observers on the UI process.
   if (this->Widget3DID.ID  != 0)
     {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    vtkPVProcessModule* pm = pvApp->GetProcessModule();    
+    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 
+                    << "SetCurrentRenderer" 
+                    << pvApp->GetRenderModule()->GetRendererID()
+                    << vtkClientServerStream::End;
+
     // Default/dummy interactor for satelite procs.
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 
                     << "SetInteractor" 
                     << this->PVSource->GetPVWindow()->GetInteractorID()
