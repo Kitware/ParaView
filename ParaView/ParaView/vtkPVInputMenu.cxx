@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.40");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.41");
 
 
 //----------------------------------------------------------------------------
@@ -357,6 +357,13 @@ void vtkPVInputMenu::AcceptInternal(const char* sourceTclName)
     this->Script("%s SetPVInput %d %s", this->PVSource->GetTclName(), 
                  this->GetPVInputIndex(),
                  this->CurrentValue->GetPVOutput()->GetTclName());
+    // Turn visibility of ne input off.
+    // We cannot put this in vtkPVSource::SetPVInput because
+    // it is too early.
+    if (this->PVSource->GetReplaceInput())
+      {
+      this->CurrentValue->SetVisibility(0);
+      }
     }
   else
     {

@@ -43,7 +43,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.7");
+vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.8");
 vtkStandardNewMacro(vtkPVTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
@@ -80,7 +80,7 @@ class vtkPVTiledDisplaySchedule
 public:
   vtkPVTiledDisplaySchedule();
   ~vtkPVTiledDisplaySchedule();
-  void PrintSelf(ostream& os, vtkIndent indent);
+  void Print(ostream& os, vtkIndent indent);
 
   void InitializeForTile(int tileId, int tileProcess, int numProcs, int zeroEmtpy);
   // Swaps processes if benefits global totals.
@@ -337,7 +337,7 @@ void vtkPVTiledDisplaySchedule::ComputeElementOtherProcessIds()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTiledDisplaySchedule::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVTiledDisplaySchedule::Print(ostream& os, vtkIndent indent)
 {
   int pIdx, eIdx;
   vtkPVTiledDisplayProcess* p;
@@ -1271,7 +1271,7 @@ void vtkPVTiledDisplayManager::PrintSelf(ostream& os, vtkIndent indent)
 
   if (this->Schedule)
     {
-    this->Schedule->PrintSelf(os, indent);
+    this->Schedule->Print(os, indent);
     }
 }
 

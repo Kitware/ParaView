@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.269");
+vtkCxxRevisionMacro(vtkPVSource, "1.270");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1772,6 +1772,15 @@ void vtkPVSource::SaveState(ofstream *file)
   int i, numWidgets;
   vtkPVWidget *widget;
 
+  // Detect if this source is in Glyph sourcesm and already exists.
+  if (this->GetTraceReferenceCommand())
+    {
+    *file << "set kw(" << this->GetTclName() << ") [$kw(" 
+          << this->GetTraceReferenceObject()->GetTclName() << ") " 
+          << this->GetTraceReferenceCommand() << "]\n";
+    return;
+    }
+
   // Detect special sources we do not handle yet.
   if (this->GetVTKSource() == NULL)
     {
@@ -2506,7 +2515,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.269 $");
+  this->ExtractRevision(os,"$Revision: 1.270 $");
 }
 
 //----------------------------------------------------------------------------

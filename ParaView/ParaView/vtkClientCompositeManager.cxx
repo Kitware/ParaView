@@ -50,7 +50,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.8");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.9");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -1782,6 +1782,7 @@ void vtkClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
        << this->TiledDimensions[0] << ", " << this->TiledDimensions[1] << endl;
     }
   
+  os << indent << "UseCompositing: " << this->UseCompositing << endl;
   os << indent << "UseChar: " << this->UseChar << endl;
   os << indent << "UseRGB: " << this->UseRGB << endl;
   os << indent << "ClientFlag: " << this->ClientFlag << endl;
