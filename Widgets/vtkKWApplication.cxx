@@ -144,8 +144,8 @@ void vtkKWApplication::SimpleScript(char *event)
   
   if (Tcl_GlobalEval(this->MainInterp, event) != TCL_OK)
     {
-    vtkErrorMacro("Error returned from tcl script.\n" <<
-		  this->MainInterp->result << endl);
+    vtkErrorMacro("\n    Script: \n" << event << "\n    Returned Error: \n"  
+		  << this->MainInterp->result << endl);
     }
 }
 

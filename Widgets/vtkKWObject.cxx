@@ -101,7 +101,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.5 $");
+  this->ExtractRevision(os,"$Revision: 1.6 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -166,7 +166,7 @@ const char *vtkKWObject::GetTclName()
   // otherwise we must register ourselves with tcl and get a name
   if (!this->GetApplication())
     {
-    vtkWarningMacro("attempt to create Tcl instance before application was set!");
+    vtkErrorMacro("attempt to create Tcl instance before application was set!");
     return NULL;
     }
 
