@@ -12,6 +12,64 @@
 <!--#include virtual="/ParaView/HTML/SideBar.html"-->
 
     <td width="550" valign="top" bgcolor="#FFFFFF">
+    <div align="left">
+    <font size=5>Download </font>ParaView via CVS access. To use ParaView,
+    you will also have to download and install VTK and CMake. (VTK serves 
+    as the visualization engine; CMake is the build environment.) There is 
+    currently no method to obtain ParaView as a packaged zip or tar file. 
+    Packaged releases will become available in the near future.
+    <p>
+    (Note: CVS is a source code revision control system used by many participants 
+    in the open-source community. To use CVS, you must have it installed on your 
+    system. You may wish to use the 
+    <a href="http://sources.redhat.com/cygwin/">Cygwin</a> tools on Windows
+    platforms, or <a href="http://www.wincvs.org">WinCVS</a> which provides 
+    a very nice GUI to CVS.
+    <p>
+    The current version of ParaView requires that you use the new VTK source 
+    tree and CMake build environment. (These changes are to be realized with the
+    release of VTK 4.0 in late 2001.) Do not use VTK 3.3 or earlier versions.
+    <p>
+    <hr>
+    <p>
+    <u><b>CMake</b></u> can be obtained via CVS using the following procedure.
+    <p>
+    <b>cvs -d :pserver:anonymous@public.kitware.com:/CMake/cvsroot login</b><br>
+    (respond with password cmake)
+    <p>
+    Follow this command by checking out the source code:<br>
+    <b>cvs -d :pserver:anonymous@public.kitware.com:/CMake/cvsroot co CMake</b>
+    <p>
+    If you are on a Windows system, CMake can also be downloaded and installed
+    using the self-extraction distribution found 
+    <a href="http://public.kitware.com/CMake/CMSetup.exe">here</a>.
+    <p>
+    <hr>
+    <p>
+    <u><b>VTK</b></u> can be obtained via CVS using the following procedure.
+    <p>
+    <b>cvs -d :pserver:anonymous@www.visualizationtoolkit.org:/vtk/cvsroot login</b><br>
+    (respond with password vtk)
+    <p>
+    Follow this command by checking out the source code:<br>
+    <b>cvs -d :pserver:anonymous@www.visualizationtoolkit.org:/vtk/cvsroot co VTK</b>
+    <p>
+    (Be careful that you don't check the new VTK CVS repository on top of an existing
+    VTK 3.3 or earlier release. Remember, in Windows "vtk" and "VTK" are the same 
+    directory name.)
+    <p>
+    <hr>
+    <p>
+    <u><b>ParaView</b></u> can be obtained via CVS using the following procedure.
+    <p>
+    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView login</b><br>
+    (respond with password paraview)
+    <p>
+    Follow this command by checking out the source code:<br>
+    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co ParaView</b>
+    <p>
+
+    </div>
     </td>
 </tr>
 
