@@ -9,6 +9,8 @@ SET(srcs
   structured_mesh.h
   )
 
+SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/spcthConfig.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/spcthConfig.h")
 INCLUDE_DIRECTORIES(
