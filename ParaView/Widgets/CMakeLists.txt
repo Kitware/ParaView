@@ -17,7 +17,6 @@ vtkKWCompositeCollection.cxx
 vtkKWCornerAnnotation.cxx 
 vtkKWDialog.cxx 
 vtkKWEntry.cxx 
-vtkKWEvent.cxx
 vtkKWExtent.cxx 
 vtkKWFrame.cxx
 vtkKWGenericComposite.cxx 
@@ -90,7 +89,6 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   ${VTK_TCL_HOME}/vtktcl.c
-  vtkKWEvent.cxx
   vtkKWTkUtilities.cxx
   WRAP_EXCLUDE
   )

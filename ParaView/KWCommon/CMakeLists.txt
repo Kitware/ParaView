@@ -5,6 +5,7 @@ SET( KWCommon_SRCS
 vtkContainer.cxx
 vtkKWArguments.cxx
 vtkKWDirectoryUtilities.cxx
+vtkKWEvent.cxx
 vtkKWIcon.cxx
 vtkKWMath.cxx
 vtkKWProcessStatistics.cxx
@@ -17,6 +18,7 @@ vtkString.cxx
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkContainer
+  vtkKWEvent.cxx
   vtkQueue
   WRAP_EXCLUDE
   )

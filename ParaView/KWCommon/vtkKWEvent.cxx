@@ -34,7 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkKWEvent.h"
-#include "vtkKWObject.h"
 #include "vtkCommand.h"
 
 static const char *vtkKWEventStrings[] = {
@@ -78,6 +77,7 @@ static const char *vtkKWEventStrings[] = {
   "FilterRedoEvent",
   "FilterRemoveMeshEvent",
   "FilterUndoEvent",
+  "GradientMagnitudesChangedEvent",
   "GradientOpacityFunctionChangedEvent",
   "GradientOpacityFunctionPresetApplyEvent",
   "GradientOpacityStateChangedEvent",

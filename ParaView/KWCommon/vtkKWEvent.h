@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWEvent_h
 
 
-#include "vtkKWObject.h"
+#include "vtkObject.h"
 
 class VTK_EXPORT vtkKWEvent
 {
@@ -87,6 +87,7 @@ class VTK_EXPORT vtkKWEvent
     FilterRedoEvent,
     FilterRemoveMeshEvent,
     FilterUndoEvent,
+    GradientMagnitudesChangedEvent,
     GradientOpacityFunctionChangedEvent,
     GradientOpacityFunctionPresetApplyEvent,
     GradientOpacityStateChangedEvent,
