@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.1.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -123,6 +123,7 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
     this->TimeScale = vtkPVScale::New();
     this->TimeScale->SetLabel("Timestep");
     this->TimeScale->SetPVSource(this);
+    this->TimeScale->RoundOn();
     this->TimeScale->SetRange(0, max);
     this->TimeScale->SetParent(this->GetParameterFrame()->GetFrame());
     this->TimeScale->SetModifiedCommand(this->GetTclName(), 
