@@ -411,8 +411,7 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
     numInputs = currentSource->GetNumberOfPVInputs();
     for (i = 0; i < numInputs; i++)
       {
-      source = inputs[i]->GetPVSource();
-      if (source)
+      if (inputs[i] && (source = inputs[i]->GetPVSource()) )
         {
         // Draw the name of the assembly.
         this->Script(

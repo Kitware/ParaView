@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkKWToolbar.h"
 #include "vtkOutlineFilter.h"
+#include "vtkContourFilter.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWDialog.h"
 #include "vtkKWNotebook.h"
@@ -1010,7 +1011,7 @@ void vtkPVWindow::WriteVTKFile(char *filename)
   pvApp->AddTraceEntry("$pv(%s) WriteVTKFile %s", this->GetTclName(),
                        filename);
  
-  pvApp->MakeTclObject("vtkDataSetWriter", "writer");
+  pvApp->BroadcastScript("vtkDataSetWriter writer");
   pvApp->BroadcastScript("writer SetFileName %s", filename);
   pvApp->BroadcastScript("writer SetInput %s",
                          this->GetCurrentPVData()->GetVTKDataTclName());
@@ -1605,9 +1606,6 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
 
   this->GetMainView()->AddComposite(calc);
   calc->CreateProperties();
-  calc->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
-                     "Set the input to this filter.", 
-                     this->GetSources());
   this->SetCurrentPVSource(calc);
 
   // Create the output.
@@ -1694,9 +1692,6 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
 
   this->GetMainView()->AddComposite(cutPlane);
   cutPlane->CreateProperties();
-  cutPlane->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
-                         "Set the input to this filter.",
-                         this->GetSources());
 
   this->SetCurrentPVSource(cutPlane);
 
@@ -1781,9 +1776,6 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   this->GetMainView()->AddComposite(threshold);
   threshold->CreateProperties();
   threshold->PackScalarsMenu();
-  threshold->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
-                         "Set the input to this filter.",
-                         this->GetSources());
   this->SetCurrentPVSource(threshold);
 
   // Create the output.
@@ -1871,9 +1863,6 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
 
   this->GetMainView()->AddComposite(clipPlane);
   clipPlane->CreateProperties();
-  clipPlane->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
-                         "Set the input to this filter.",
-                         this->GetSources());
   this->SetCurrentPVSource(clipPlane);
 
   // Create the output.
@@ -1916,7 +1905,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
-  vtkSource *s;
+  vtkContourFilter *s;
   vtkDataSet *d;
   vtkPVContour *contour;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1937,9 +1926,9 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   sprintf(tclName, "%s%d", "Contour", instanceCount);
   // Create the object through tcl on all processes.
 #ifdef VTK_USE_PATENTED
-  s = (vtkSource *)(pvApp->MakeTclObject("vtkKitwareContourFilter", tclName));
+  s = (vtkContourFilter *)(pvApp->MakeTclObject("vtkKitwareContourFilter", tclName));
 #else
-  s = (vtkSource *)(pvApp->MakeTclObject("vtkContourFilter", tclName));
+  s = (vtkContourFilter *)(pvApp->MakeTclObject("vtkContourFilter", tclName));
 #endif
   if (s == NULL)
     {
@@ -1947,6 +1936,9 @@ vtkPVSource *vtkPVWindow::ContourCallback()
     return NULL;
     }
   
+  // Get rid of the default contour at 0.
+  s->SetNumberOfContours(0);
+
   contour = vtkPVContour::New();
   contour->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   contour->SetApplication(pvApp);
@@ -1960,9 +1952,6 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   this->GetMainView()->AddComposite(contour);
   contour->CreateProperties();
   contour->PackScalarsMenu();
-  contour->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
-                         "Set the input to this filter.",
-                         this->GetSources());
   this->SetCurrentPVSource(contour);
 
   // Create the output.
@@ -2204,7 +2193,7 @@ void vtkPVWindow::ShowCurrentSourceProperties()
     return;
     }
   
-  this->GetCurrentPVSource()->UpdateParameterWidgets();
+  //this->GetCurrentPVSource()->UpdateParameterWidgets();
   this->Script("pack %s -side top -fill x",
                this->GetCurrentPVSource()->GetNotebook()->GetWidgetName());
   this->GetCurrentPVSource()->GetNotebook()->Raise("Source");

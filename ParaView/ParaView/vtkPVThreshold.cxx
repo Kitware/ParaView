@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkPVData.h"
 #include "vtkPVArraySelection.h"
+#include "vtkPVWindow.h"
+#include "vtkKWCompositeCollection.h"
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -101,6 +103,10 @@ void vtkPVThreshold::CreateProperties()
   float range[2];
   
   this->vtkPVSource::CreateProperties();
+
+  this->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+                     "Set the input to this filter.",
+                     this->GetPVWindow()->GetSources());
   
   this->AttributeModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->AttributeModeFrame->Create(pvApp, "frame", "");
@@ -184,6 +190,8 @@ void vtkPVThreshold::CreateProperties()
                this->UpperValueScale->GetWidgetName(),
                this->LowerValueScale->GetWidgetName(),
                this->AllScalarsCheck->GetWidgetName());
+
+  this->UpdateParameterWidgets();
 }
 
 void vtkPVThreshold::UpperValueCallback()

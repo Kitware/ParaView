@@ -210,7 +210,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     {
     sprintf(extentTclName, "%s%dTranslator", this->RootName,
 	    this->InstanceCount);
-    pvApp->MakeTclObject("vtkPVExtentTranslator", extentTclName);
+    pvApp->BroadcastScript("vtkPVExtentTranslator %s", extentTclName);
     pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
 			   extentTclName, pvs->GetVTKSourceTclName());
     pvApp->BroadcastScript("%s SetExtentTranslator %s",

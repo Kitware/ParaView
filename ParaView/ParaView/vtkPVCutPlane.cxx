@@ -49,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVVectorEntry.h"
+#include "vtkPVWindow.h"
+#include "vtkKWCompositeCollection.h"
 
 int vtkPVCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -122,6 +124,10 @@ void vtkPVCutPlane::CreateProperties()
 {
   this->vtkPVSource::CreateProperties();
  
+  this->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+                     "Set the input to this filter.",
+                     this->GetPVWindow()->GetSources());
+
   this->BoundsDisplay->SetParent(this->GetParameterFrame()->GetFrame());
   this->BoundsDisplay->Create(this->Application);
   this->BoundsDisplay->SetLabel("Input Bounds");

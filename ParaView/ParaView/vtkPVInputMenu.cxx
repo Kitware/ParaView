@@ -242,7 +242,7 @@ void vtkPVInputMenu::Accept()
     }
   else
     {
-    this->Script("%s Set%s {}", this->InputName, this->PVSource->GetTclName());
+    this->Script("%s Set%s {}", this->PVSource->GetTclName(), this->InputName);
     }
 
   this->vtkPVWidget::Accept();

@@ -172,6 +172,7 @@ void vtkPVGlyph3D::CreateProperties()
   // Set the default so Reset behaves properly.  There are other options.
   //this->GetPVWindow()->GetGlyphSources()->InitTraversal();
   //this->SetGlyphSource(((vtkPVSource*)(this->GetPVWindow()->GetGlyphSources()->GetNextItemAsObject()))->GetNthPVOutput(0));
+  // Now the input menu handles setting the default here.
                                       
   this->ScaleModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ScaleModeFrame->Create(pvApp, "frame", "");
@@ -268,6 +269,11 @@ void vtkPVGlyph3D::CreateProperties()
                this->ScaleCheck->GetWidgetName());
   this->Script("pack %s -side left -fill x -expand t",
                this->ScaleEntry->GetWidgetName());
+
+  // Make sure the Input menus reflect the actual values.
+  // This call is called too many times.  
+  // It does not hurt anything, but should be cleaned up.
+  this->UpdateParameterWidgets();
 }
 
 void vtkPVGlyph3D::ChangeScaleMode()

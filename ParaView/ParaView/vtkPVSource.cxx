@@ -185,7 +185,9 @@ vtkPVSource::~vtkPVSource()
 
   if (this->ChangeScalarsFilterTclName)
     {
-    this->GetPVApplication()->BroadcastScript("%s Delete", 
+    // I do not know why the change scalars is disapearing, 
+    // but this feature is going away soon anyway.  Just use a catch.
+    this->GetPVApplication()->BroadcastScript("catch {%s Delete}", 
                                 this->ChangeScalarsFilterTclName);
     delete [] this->ChangeScalarsFilterTclName;
     this->ChangeScalarsFilterTclName = NULL;
@@ -446,7 +448,7 @@ void vtkPVSource::CreateProperties()
   
   this->UpdateProperties();
   
-  this->UpdateParameterWidgets();
+  //this->UpdateParameterWidgets();
 }
 
 //----------------------------------------------------------------------------
@@ -510,7 +512,7 @@ void vtkPVSource::UpdateScalars()
     char tclName[256];
     sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
     this->SetChangeScalarsFilterTclName(tclName);
-    pvApp->MakeTclObject("vtkFieldDataToAttributeDataFilter",
+    pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
                          this->ChangeScalarsFilterTclName);
     pvApp->BroadcastScript("%s SetInput [%s GetInput]",
                            this->ChangeScalarsFilterTclName,
@@ -559,7 +561,6 @@ void vtkPVSource::UpdateVectors()
     char tclName[256];
     sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
     this->SetChangeScalarsFilterTclName(tclName);
-    // I don't know why we are not using "MakeTclObject".
     pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
                           this->ChangeScalarsFilterTclName);
     pvApp->BroadcastScript("%s SetInput [%s GetInput]",
@@ -832,9 +833,9 @@ void vtkPVSource::ResetCallback()
 //---------------------------------------------------------------------------
 void vtkPVSource::DeleteCallback()
 {
-  vtkPVData *ac;
-  vtkPVSource *prev;
   int i;
+  vtkPVData *ac;
+  vtkPVSource *prev = NULL;
   vtkPVWindow *window = this->GetPVWindow();
 
   // Just in case cursor was left in a funny state.
@@ -865,6 +866,21 @@ void vtkPVSource::DeleteCallback()
   this->GetPVApplication()->AddTraceEntry("$pv(%s) DeleteCallback",
                                           this->GetTclName());
 
+  // Get the input so we can make it visible and make it current.
+  if (this->GetNumberOfPVInputs() > 0)
+    {
+    prev = this->PVInputs[0]->GetPVSource();
+    // Just a sanity check
+    if (prev == NULL)
+      {
+      vtkErrorMacro("Expecting an input but none found.");
+      }
+    else
+      {
+      prev->VisibilityOn();
+      }
+    }
+
   // Remove this source from the inputs users collection.
   for (i = 0; i < this->GetNumberOfPVInputs(); i++)
     {
@@ -875,18 +891,21 @@ void vtkPVSource::DeleteCallback()
     }
     
   // Look for a source to make current.
-  prev = this->GetPVWindow()->GetPreviousPVSource();
-  this->GetPVWindow()->SetCurrentPVSource(prev);
-  if (prev)
+  if (prev == NULL)
     {
-    prev->GetPVOutput(0)->VisibilityOn();
-    prev->ShowProperties();
+    prev = this->GetPVWindow()->GetPreviousPVSource();
     }
-  else
+  this->GetPVWindow()->SetCurrentPVSource(prev);
+  if (prev == NULL)
     {
     // Unpack the properties.  This is required if prev is NULL.
     this->Script("catch {eval pack forget [pack slaves %s]}",
 		 this->View->GetPropertiesParent()->GetWidgetName());
+    }
+  else
+    {
+    //prev->GetPVOutput(0)->VisibilityOn();
+    //prev->ShowProperties();
     }
       
   // We need to remove this source from the SelectMenu
@@ -1165,16 +1184,18 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
     this->SetChangeScalarsFilterTclName(tclName);
     }
 
-  // I don't know why we are not using "MakeTclObject".
-  pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
-                        this->ChangeScalarsFilterTclName);
-  pvApp->BroadcastScript("%s SetInput %s",
-                         this->ChangeScalarsFilterTclName,
-                         pvd->GetVTKDataTclName());
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-                         this->VTKSourceTclName,
-                         this->ChangeScalarsFilterTclName);
-  
+  if (pvd)
+    {
+    pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
+                          this->ChangeScalarsFilterTclName);
+    pvApp->BroadcastScript("%s SetInput %s",
+                           this->ChangeScalarsFilterTclName,
+                           pvd->GetVTKDataTclName());
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
+                           this->VTKSourceTclName,
+                           this->ChangeScalarsFilterTclName);
+    }
+
   this->Modified();
 }
 
@@ -1850,19 +1871,12 @@ void vtkPVSource::AddModeListItem(char *name, int value)
   this->LastSelectionList->AddItem(name, value);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVSource::ChangeAcceptButtonColor()
 {
   this->Script("%s configure -background red1",
                this->AcceptButton->GetWidgetName());
 }
-
-// This is necessary because -xscrollcommand passes 2 arguments to the
-// method it calls, and entry widgets don't have a -command.
-void vtkPVSource::EntryChanged(float vtkNotUsed(f1), float vtkNotUsed(f2))
-{
-  this->ChangeAcceptButtonColor();
-}
-
 
 //----------------------------------------------------------------------------
 vtkPVWidget* vtkPVSource::GetPVWidget(const char *name)

@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkPVData.h"
 #include "vtkPVApplication.h"
+#include "vtkPVWindow.h"
+#include "vtkKWCompositeCollection.h"
 #include "vtkObjectFactory.h"
 
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -120,6 +122,10 @@ void vtkPVContour::CreateProperties()
   vtkPVApplication* pvApp = this->GetPVApplication();
   
   this->vtkPVSource::CreateProperties();
+
+  this->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+                     "Set the input to this filter.",
+                     this->GetPVWindow()->GetSources());
   
   this->ContourValuesLabel->SetParent(this->GetParameterFrame()->GetFrame());
   this->ContourValuesLabel->Create(pvApp, "");
@@ -217,6 +223,8 @@ void vtkPVContour::CreateProperties()
                this->ComputeNormalsCheck->GetWidgetName(),
                this->ComputeGradientsCheck->GetWidgetName(),
                this->ComputeScalarsCheck->GetWidgetName());
+
+  this->UpdateParameterWidgets();
 }
 
 void vtkPVContour::AddValueCallback()

@@ -70,10 +70,6 @@ public:
   void SetValue(const char* fileName);
   const char* GetValue() {return this->Entry->GetValue();}
 
-  // Description:
-  // Callback needed to detect modify.
-  void XScrollCallback(float vtkNotUsed(x), float vtkNotUsed(y));
-
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();

@@ -131,6 +131,6 @@ void vtkPVWidget::ModifiedCallback()
   this->ModifiedFlag = 1;
   if (this->PVSource)
     {
-    this->PVSource->EntryChanged(0, 0);
+    this->PVSource->ChangeAcceptButtonColor();
     }
 }

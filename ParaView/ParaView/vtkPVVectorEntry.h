@@ -64,11 +64,6 @@ public:
   // This accept call adds a line to the trace file if the widget has changed.
   virtual void Accept();
 
-  // Description:
-  // This is bound to the xscroll event in the entries.
-  // It indicates the widget has changed.
-  void XScrollCallback(float vtkNotUsed(x), float vtkNotUsed(y));
-
   vtkGetObjectMacro(Label, vtkKWLabel);
   vtkGetObjectMacro(SubLabels, vtkKWWidgetCollection);
   vtkGetObjectMacro(Entries, vtkKWWidgetCollection);

@@ -56,6 +56,7 @@ vtkPVVectorEntry* vtkPVVectorEntry::New()
   return new vtkPVVectorEntry;
 }
 
+//---------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
 {
   this->Label = vtkKWLabel::New();
@@ -66,6 +67,7 @@ vtkPVVectorEntry::vtkPVVectorEntry()
   this->PVSource = NULL;
 }
 
+//---------------------------------------------------------------------------
 vtkPVVectorEntry::~vtkPVVectorEntry()
 {
   this->Entries->Delete();
@@ -76,6 +78,7 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
   this->Label = NULL;
 }
 
+//---------------------------------------------------------------------------
 void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
                               int vectorLength, char **subLabels,
                               char *setCmd, char *getCmd,
@@ -141,7 +144,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
     entry = vtkKWEntry::New();
     entry->SetParent(this);
     entry->Create(pvApp, "-width 2");
-    this->Script("%s configure -xscrollcommand {%s XScrollCallback}",
+    this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                  entry->GetWidgetName(), this->GetTclName());
     if (help)
       { 
@@ -167,11 +170,8 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
   this->AcceptCommands->AddString(acceptCmd);
 }
 
-void vtkPVVectorEntry::XScrollCallback(float x, float y)
-{
-  this->ModifiedCallback();
-}
 
+//---------------------------------------------------------------------------
 void vtkPVVectorEntry::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -203,6 +203,7 @@ void vtkPVVectorEntry::Accept()
   this->vtkPVWidget::Accept();
 }
 
+//---------------------------------------------------------------------------
 vtkKWLabel* vtkPVVectorEntry::GetSubLabel(int idx)
 {
   if (idx > this->SubLabels->GetNumberOfItems())
@@ -212,6 +213,7 @@ vtkKWLabel* vtkPVVectorEntry::GetSubLabel(int idx)
   return ((vtkKWLabel*)this->SubLabels->GetItemAsObject(idx));
 }
 
+//---------------------------------------------------------------------------
 vtkKWEntry* vtkPVVectorEntry::GetEntry(int idx)
 {
   if (idx > this->Entries->GetNumberOfItems())
@@ -221,6 +223,7 @@ vtkKWEntry* vtkPVVectorEntry::GetEntry(int idx)
   return ((vtkKWEntry*)this->Entries->GetItemAsObject(idx));
 }
 
+//---------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char** values, int num)
 {
   int idx;
@@ -239,6 +242,7 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
   this->ModifiedCallback();
 }
 
+//---------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0)
 {
   char* vals[1];
@@ -246,6 +250,7 @@ void vtkPVVectorEntry::SetValue(char *v0)
   this->SetValue(vals, 1);
 }
 
+//---------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1)
 {
   char* vals[2];
@@ -254,6 +259,7 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1)
   this->SetValue(vals, 2);
 }
 
+//---------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2)
 {
   char* vals[3];
@@ -263,6 +269,7 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2)
   this->SetValue(vals, 3);
 }
 
+//---------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3)
 {
   char* vals[4];
@@ -273,6 +280,7 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3)
   this->SetValue(vals, 4);
 }
 
+//---------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3, char *v4)
 {
   char* vals[5];
@@ -284,6 +292,7 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3, char *v4
   this->SetValue(vals, 5);
 }
 
+//---------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, 
                                 char *v3, char *v4, char *v5)
 {

@@ -268,7 +268,6 @@ public:
   // Description:
   // Make the Accept button turn red when one of the parameters has changed.
   void ChangeAcceptButtonColor();
-  void EntryChanged(float f1, float f2);
   
   // Description:
   // Needed to clean up properly.

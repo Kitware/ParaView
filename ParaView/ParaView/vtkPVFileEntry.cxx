@@ -119,7 +119,7 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label, char *setCmd,
   
   // Now the entry
   this->Entry->Create(pvApp, "");
-  this->Script("%s configure -xscrollcommand {%s XScrollCallback}",
+  this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->Entry->GetWidgetName(), this->GetTclName());
   if (help)
     { 
@@ -155,12 +155,6 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label, char *setCmd,
   // The VTK objects do not yet have to have the same Tcl name!
   this->AcceptCommands->AddString("%s %s [%s GetValue]",
                                   tclName, setCmd, this->Entry->GetTclName());
-}
-
-
-void vtkPVFileEntry::XScrollCallback(float x, float y)
-{
-  this->ModifiedCallback();
 }
 
 

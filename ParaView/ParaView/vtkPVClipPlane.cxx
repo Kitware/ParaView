@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkKWLabel.h"
 #include "vtkPVApplication.h"
+#include "vtkPVWindow.h"
 #include "vtkPVData.h"
 #include "vtkPVVectorEntry.h"
 
@@ -122,6 +123,10 @@ void vtkPVClipPlane::CreateProperties()
 {
   this->vtkPVSource::CreateProperties();
  
+  this->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+                     "Set the input to this filter.",
+                     this->GetPVWindow()->GetSources());
+
   this->BoundsDisplay->SetParent(this->GetParameterFrame()->GetFrame());
   this->BoundsDisplay->Create(this->Application);
   this->BoundsDisplay->SetLabel("Input Bounds");

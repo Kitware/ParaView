@@ -246,8 +246,10 @@ void vtkPVProbe::CreateProperties()
   this->SelectedXEntry->SetParent(this->SelectedPointFrame);
   this->SelectedXEntry->Create(pvApp);
   this->SelectedXEntry->SetLabel("X:");
-  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->SelectedXEntry->GetEntry()->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -width 10",
+               this->SelectedXEntry->GetEntry()->GetWidgetName());
   this->SelectedXEntry->SetValue(point[0], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeXPosition}",
                this->SelectedXEntry->GetEntry()->GetWidgetName(),
@@ -256,8 +258,10 @@ void vtkPVProbe::CreateProperties()
   this->SelectedYEntry->SetParent(this->SelectedPointFrame);
   this->SelectedYEntry->Create(pvApp);
   this->SelectedYEntry->SetLabel("Y:");
-  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->SelectedYEntry->GetEntry()->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -width 10",
+               this->SelectedYEntry->GetEntry()->GetWidgetName());
   this->SelectedYEntry->SetValue(point[1], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeYPosition}",
                this->SelectedYEntry->GetEntry()->GetWidgetName(),
@@ -266,8 +270,10 @@ void vtkPVProbe::CreateProperties()
   this->SelectedZEntry->SetParent(this->SelectedPointFrame);
   this->SelectedZEntry->Create(pvApp);
   this->SelectedZEntry->SetLabel("Z:");
-  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->SelectedZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -width 10",
+               this->SelectedZEntry->GetEntry()->GetWidgetName());
   this->SelectedZEntry->SetValue(point[2], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeZPosition}",
                this->SelectedZEntry->GetEntry()->GetWidgetName(),
@@ -308,8 +314,10 @@ void vtkPVProbe::CreateProperties()
   this->End1XEntry->SetParent(this->EndPoint1Frame);
   this->End1XEntry->Create(pvApp);
   this->End1XEntry->SetLabel("X:");
-  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->End1XEntry->GetEntry()->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -width 10",
+               this->End1XEntry->GetEntry()->GetWidgetName());
   this->End1XEntry->SetValue(point[0], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeXPosition}",
                this->End1XEntry->GetEntry()->GetWidgetName(),
@@ -318,8 +326,10 @@ void vtkPVProbe::CreateProperties()
   this->End1YEntry->SetParent(this->EndPoint1Frame);
   this->End1YEntry->Create(pvApp);
   this->End1YEntry->SetLabel("Y:");
-  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->End1YEntry->GetEntry()->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -width 10",
+               this->End1YEntry->GetEntry()->GetWidgetName());
   this->End1YEntry->SetValue(point[1], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeYPosition}",
                this->End1YEntry->GetEntry()->GetWidgetName(),
@@ -328,8 +338,10 @@ void vtkPVProbe::CreateProperties()
   this->End1ZEntry->SetParent(this->EndPoint1Frame);
   this->End1ZEntry->Create(pvApp);
   this->End1ZEntry->SetLabel("Z:");
-  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->End1ZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -width 10",
+               this->End1ZEntry->GetEntry()->GetWidgetName());
   this->End1ZEntry->SetValue(point[2], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeZPosition}",
                this->End1ZEntry->GetEntry()->GetWidgetName(),
@@ -350,8 +362,10 @@ void vtkPVProbe::CreateProperties()
   this->End2XEntry->SetParent(this->EndPoint2Frame);
   this->End2XEntry->Create(pvApp);
   this->End2XEntry->SetLabel("X:");
-  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->End2XEntry->GetEntry()->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -width 10",
+               this->End2XEntry->GetEntry()->GetWidgetName());
   this->End2XEntry->SetValue(point[0], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeXPosition}",
                this->End2XEntry->GetEntry()->GetWidgetName(),
@@ -360,8 +374,10 @@ void vtkPVProbe::CreateProperties()
   this->End2YEntry->SetParent(this->EndPoint2Frame);
   this->End2YEntry->Create(pvApp);
   this->End2YEntry->SetLabel("Y:");
-  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->End2YEntry->GetEntry()->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -width 10",
+               this->End2YEntry->GetEntry()->GetWidgetName());
   this->End2YEntry->SetValue(point[1], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeYPosition}",
                this->End2YEntry->GetEntry()->GetWidgetName(),
@@ -370,8 +386,10 @@ void vtkPVProbe::CreateProperties()
   this->End2ZEntry->SetParent(this->EndPoint2Frame);
   this->End2ZEntry->Create(pvApp);
   this->End2ZEntry->SetLabel("Z:");
-  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->End2ZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
+  this->Script("%s configure -width 10",
+               this->End2ZEntry->GetEntry()->GetWidgetName());
   this->End2ZEntry->SetValue(point[2], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeZPosition}",
                this->End2ZEntry->GetEntry()->GetWidgetName(),
@@ -387,7 +405,7 @@ void vtkPVProbe::CreateProperties()
   this->DivisionsEntry->Create(pvApp);
   this->DivisionsEntry->SetLabel("Number of Line Divisions:");
   this->DivisionsEntry->SetValue(10);
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+  this->Script("bind %s <KeyPress> {%s ChangeAcceptButtonColor}",
                this->DivisionsEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   
   this->Script("grab release %s", this->ParameterFrame->GetWidgetName());
@@ -396,7 +414,7 @@ void vtkPVProbe::CreateProperties()
   
   sprintf(tclName, "XYPlot%d", this->InstanceCount);
   this->SetXYPlotTclName(tclName);
-  pvApp->MakeTclObject("vtkXYPlotActor", this->XYPlotTclName);
+  pvApp->BroadcastScript("vtkXYPlotActor %s", this->XYPlotTclName);
   this->Script("[%s GetPositionCoordinate] SetValue 0.05 0.05 0",
 	       this->XYPlotTclName);
   this->Script("[%s GetPosition2Coordinate] SetValue 0.8 0.3 0",
@@ -511,7 +529,6 @@ void vtkPVProbe::AcceptCallback()
       char tclName[256];
       sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
       this->SetChangeScalarsFilterTclName(tclName);
-      // I don't know why we are not using "MakeTclObject".
       pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
                              this->ChangeScalarsFilterTclName);
       pvApp->BroadcastScript("%s SetInput [%s GetPolyDataOutput]",

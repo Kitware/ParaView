@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
+#include "vtkPVWindow.h"
+#include "vtkKWCompositeCollection.h"
 #include "vtkObjectFactory.h"
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
@@ -221,6 +223,10 @@ void vtkPVArrayCalculator::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
   
+  this->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+                     "Set the input to this filter.",
+                     this->GetPVWindow()->GetSources());
+
   this->AttributeModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->AttributeModeFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x",
@@ -249,7 +255,6 @@ void vtkPVArrayCalculator::CreateProperties()
                                "SetResultArrayName", "GetResultArrayName",
                                "Set the name of the array to hold the results of this computation",
                                this->GetVTKSourceTclName());
-  this->ArrayNameEntry->SetValue("resultArray");
   this->Script("pack %s -side top -fill x",
                this->ArrayNameEntry->GetWidgetName());
   
