@@ -61,7 +61,9 @@ TARGET_LINK_LIBRARIES (vtkKWParaViewTCL vtkKWWidgetsTCL vtkCommonTCL
                        vtkParallelTCL
                        vtkPatentedTCL 
 		       vtkHybridTCL
-                       vtkIOTCL)
+                       vtkIOTCL
+                       ${TCL_LIBRARY} 
+                       ${TK_LIBRARY})
 
 LINK_LIBRARIES (
 vtkCommon 
@@ -73,6 +75,8 @@ vtkRendering
 vtkParallel
 vtkPatented
 vtkHybrid
+${TCL_LIBRARY}
+${TK_LIBRARY}
 )
 
 IF (TK_LIBRARY)

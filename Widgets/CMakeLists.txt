@@ -41,6 +41,7 @@ vtkKWVolumeComposite
 vtkKWWindow 
 vtkKWWindowCollection 
 vtkKWXtEmbeddedWidget 
+${VTK_SOURCE_DIR}/Wrapping/vtktcl
 )
 
 ABSTRACT_FILES(
@@ -48,13 +49,14 @@ vtkKWComposite
 vtkKWView 
 )
 
-WRAP_EXCLUDE_FILES(kwinit)
+WRAP_EXCLUDE_FILES(kwinit vtktcl)
 
 VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
 ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
 TARGET_LINK_LIBRARIES (vtkKWWidgetsTCL vtkCommonTCL vtkFilteringTCL   
                        vtkGraphicsTCL vtkImagingTCL vtkRenderingTCL vtkIOTCL
-		       vtkHybridTcl ${TCL_LIBRARY}  ${TK_LIBRARY})
+		       vtkHybridTCL vtkParallelTCL vtkPatentedTCL
+                       ${TCL_LIBRARY} ${TK_LIBRARY})
 
 LINK_LIBRARIES (
 vtkCommon 
@@ -64,7 +66,8 @@ vtkGraphics
 vtkIO
 vtkRendering
 vtkHybrid
-vtkKWWidgets
+vtkParallel
+vtkPatented
 ${TCL_LIBRARY}
 ${TK_LIBRARY}
 )
