@@ -642,9 +642,17 @@ void vtkPVData::Update()
     this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
                                 this->Assignment->GetNumberOfPieces(),
 				0);
+    if (myId == 1){
+    cerr << "- setting UpdateExtent of " << this->Data << " to " 
+	 << this->Assignment->GetPiece() << ", "
+	 << this->Assignment->GetNumberOfPieces() << ", 0\n";
     }
+    }
+  
 
+  if (myId==1) cerr << "- calling update on " << this->Data << endl;
   this->Data->Update();
+  if (myId==1) cerr << "- finished with update of " << this->Data << endl;
 }
 
 

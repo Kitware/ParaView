@@ -35,6 +35,9 @@ ClientData vtkParallelDecimateNewCommand();
 int vtkPVActorCompositeCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVActorCompositeNewCommand();
+int vtkPVAnimationCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVAnimationNewCommand();
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVApplicationNewCommand();
@@ -89,12 +92,18 @@ ClientData vtkPVImageMandelbrotSourceNewCommand();
 int vtkPVImageReaderCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageReaderNewCommand();
+int vtkPVImageShiftScaleCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVImageShiftScaleNewCommand();
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageSliceNewCommand();
 int vtkPVImageSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageSourceNewCommand();
+int vtkPVImageToImageFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVImageToImageFilterNewCommand();
 int vtkPVMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVMenuButtonNewCommand();
@@ -119,12 +128,18 @@ ClientData vtkPVSelectionListNewCommand();
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSourceNewCommand();
+int vtkPVSourceCollectionCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVSourceCollectionNewCommand();
 int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSourceListNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
+int vtkSingleContourFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkSingleContourFilterNewCommand();
 
 extern Tcl_HashTable vtkInstanceLookup;
 extern Tcl_HashTable vtkPointerLookup;
@@ -177,6 +192,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkParallelDecimateCommand);
   vtkTclCreateNew(interp,"vtkPVActorComposite", vtkPVActorCompositeNewCommand,
                   vtkPVActorCompositeCommand);
+  vtkTclCreateNew(interp,"vtkPVAnimation", vtkPVAnimationNewCommand,
+                  vtkPVAnimationCommand);
   vtkTclCreateNew(interp,"vtkPVApplication", vtkPVApplicationNewCommand,
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,"vtkPVAssignment", vtkPVAssignmentNewCommand,
@@ -213,10 +230,14 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVImageMandelbrotSourceCommand);
   vtkTclCreateNew(interp,"vtkPVImageReader", vtkPVImageReaderNewCommand,
                   vtkPVImageReaderCommand);
+  vtkTclCreateNew(interp,"vtkPVImageShiftScale", vtkPVImageShiftScaleNewCommand,
+                  vtkPVImageShiftScaleCommand);
   vtkTclCreateNew(interp,"vtkPVImageSlice", vtkPVImageSliceNewCommand,
                   vtkPVImageSliceCommand);
   vtkTclCreateNew(interp,"vtkPVImageSource", vtkPVImageSourceNewCommand,
                   vtkPVImageSourceCommand);
+  vtkTclCreateNew(interp,"vtkPVImageToImageFilter", vtkPVImageToImageFilterNewCommand,
+                  vtkPVImageToImageFilterCommand);
   vtkTclCreateNew(interp,"vtkPVMenuButton", vtkPVMenuButtonNewCommand,
                   vtkPVMenuButtonCommand);
   vtkTclCreateNew(interp,"vtkPVParallelDecimate", vtkPVParallelDecimateNewCommand,
@@ -233,9 +254,13 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVSelectionListCommand);
   vtkTclCreateNew(interp,"vtkPVSource", vtkPVSourceNewCommand,
                   vtkPVSourceCommand);
+  vtkTclCreateNew(interp,"vtkPVSourceCollection", vtkPVSourceCollectionNewCommand,
+                  vtkPVSourceCollectionCommand);
   vtkTclCreateNew(interp,"vtkPVSourceList", vtkPVSourceListNewCommand,
                   vtkPVSourceListCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
+  vtkTclCreateNew(interp,"vtkSingleContourFilter", vtkSingleContourFilterNewCommand,
+                  vtkSingleContourFilterCommand);
   return TCL_OK;
 }

@@ -108,7 +108,7 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
     return;
     }
 
-//  cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
+  // cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
   
   this->Controller->TriggerRMI(remoteId, str, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
 }
@@ -131,6 +131,7 @@ void vtkPVApplication::BroadcastSimpleScript(char *str)
 {
   int id, num;
   
+  //cerr << str << endl;
   num = this->Controller->GetNumberOfProcesses();
   for (id = 1; id < num; ++id)
     {

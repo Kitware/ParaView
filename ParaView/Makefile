@@ -26,11 +26,11 @@ vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
 vtkParallelDecimate \
 vtkPVActorComposite \
+vtkPVAnimation \
 vtkPVApplication \
 vtkPVAssignment \
 vtkPVColorByProcess \
 vtkPVCommandList \
-vtkPVConeSource \
 vtkPVContourFilter \
 vtkPVCutter \
 vtkPVData \
@@ -45,22 +45,22 @@ vtkPVImageData \
 vtkPVImageClip \
 vtkPVImageMandelbrotSource \
 vtkPVImageReader \
+vtkPVImageShiftScale \
 vtkPVImageSlice \
 vtkPVImageSource \
+vtkPVImageToImageFilter \
 vtkPVMenuButton \
 vtkPVParallelDecimate \
 vtkPVPolyData \
-vtkPVPolyDataNormals \
 vtkPVPolyDataSource \
 vtkPVPolyDataToPolyDataFilter \
 vtkPVRenderView \
 vtkPVSelectionList \
-vtkPVShrinkPolyData \
 vtkPVSource \
+vtkPVSourceCollection \
 vtkPVSourceList \
-vtkPVSphereSource \
-vtkPVTubeFilter \
-vtkPVWindow 
+vtkPVWindow \
+vtkSingleContourFilter 
 
 
 #------------------------------------------------------------------------------

@@ -165,7 +165,7 @@ void vtkPVSourceStartProgress(void *arg)
   vtkSource *vtkSource = me->GetVTKSource();
   static char str[200];
   
-  if (vtkSource)
+  if (vtkSource && me->GetWindow())
     {
     sprintf(str, "Processing %s", vtkSource->GetClassName());
     me->GetWindow()->SetStatusText(str);
@@ -177,14 +177,21 @@ void vtkPVSourceReportProgress(void *arg)
   vtkPVSource *me = (vtkPVSource*)arg;
   vtkSource *vtkSource = me->GetVTKSource();
 
-  me->GetWindow()->GetProgressGauge()->SetValue((int)(vtkSource->GetProgress() * 100));
+  if (me->GetWindow())
+    {
+    me->GetWindow()->GetProgressGauge()->SetValue((int)(vtkSource->GetProgress() * 100));
+    }
 }
 //----------------------------------------------------------------------------
 void vtkPVSourceEndProgress(void *arg)
 {
   vtkPVSource *me = (vtkPVSource*)arg;
-  me->GetWindow()->SetStatusText("");
-  me->GetWindow()->GetProgressGauge()->SetValue(0);
+  
+  if (me->GetWindow())
+    {
+    me->GetWindow()->SetStatusText("");
+    me->GetWindow()->GetProgressGauge()->SetValue(0);
+    }
 }
 //----------------------------------------------------------------------------
 void vtkPVSource::SetVTKSource(vtkSource *source)
@@ -1328,11 +1335,11 @@ void vtkPVSource::AcceptHelper(char *method, char *args)
 void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+
+  vtkDebugMacro("AcceptHelper2 " << name << ", " << method << ", " << args);
+
   pvApp->Script("%s %s %s", name, method, args);
-
-  vtkDebugMacro(<< name << " " << method << " " << args);
-
-  pvApp->BroadcastScript("%s %s %s", name, this->GetTclName(), method, args);
+  pvApp->BroadcastScript("%s %s %s", name,  method, args);
 }
 
 //----------------------------------------------------------------------------
@@ -1374,7 +1381,7 @@ void vtkPVSource::UpdateNavigationCanvas()
       tmp = NULL;
       result = this->Application->GetMainInterp()->result;
       sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
-      yMid = 0.5 * (bbox[1]+bbox[3]);
+      yMid = (int)(0.5 * (bbox[1]+bbox[3]));
 
       // Draw a line from input to source.
       this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
@@ -1396,8 +1403,8 @@ void vtkPVSource::UpdateNavigationCanvas()
   tmp = NULL;
   result = this->Application->GetMainInterp()->result;
   sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
-  yMid = 0.5 * (bbox[1]+bbox[3]);
-  xMid = 0.5 * (bbox[2] + 235);
+  yMid = (int)(0.5 * (bbox[1]+bbox[3]));
+  xMid = (int)(0.5 * (bbox[2] + 235));
 
   // Put the outputs in the canvas.
   outs = NULL;
