@@ -24,8 +24,8 @@
 
 # Release version number.
 TAG="HEAD"
-PARAVIEW_VERSION="1.4"
-VERSION="${PARAVIEW_VERSION}.0"
+PARAVIEW_VERSION="1.6"
+VERSION="${PARAVIEW_VERSION}.1"
 RELEASE="1"
 
 # Project configuration.
