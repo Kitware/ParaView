@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.28");
+vtkCxxRevisionMacro(vtkKWScale, "1.29");
 
 
 
@@ -131,7 +131,7 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("frame %s",wname);
+  this->Script("frame %s -padx 0 -pady 0 -bd 0", wname);
   this->ScaleWidget->Create(app,"scale","-orient horizontal -showvalue no"
                             " -borderwidth 2");
   this->Script("%s configure %s",this->ScaleWidget->GetWidgetName(),
@@ -203,20 +203,27 @@ void vtkKWScale::DisplayLabel(const char *name)
 
 void vtkKWScale::PackWidget()
 {
-  this->Script("pack %s -side %s -fill x -expand yes -pady 0 -padx 0",
-               this->ScaleWidget->GetWidgetName(),
-               (this->DisplayEntryAndLabelOnTop ? "bottom" : "left"));
+  if (this->DisplayEntryAndLabelOnTop)
+    {
+    this->Script("pack %s -side bottom -fill x -expand yes -pady 0 -padx 0",
+                 this->ScaleWidget->GetWidgetName());
+    }
+  else
+    {
+    this->Script("pack %s -side left -fill x -expand yes -pady 0 -padx 0",
+                 this->ScaleWidget->GetWidgetName());
+    }
 
   if (this->Entry)
     {
     if (this->DisplayEntryAndLabelOnTop)
       {
-      this->Script("pack %s -side right -padx 2", 
+      this->Script("pack %s -side right -padx 0", 
                    this->Entry->GetWidgetName());
       }
     else
       {
-      this->Script("pack %s -side right -padx 2 -after %s", 
+      this->Script("pack %s -side right -padx 0 -after %s", 
                    this->Entry->GetWidgetName(), 
                    this->ScaleWidget->GetWidgetName());
       }
@@ -226,11 +233,11 @@ void vtkKWScale::PackWidget()
     {
     if (this->DisplayEntryAndLabelOnTop)
       {
-      this->Script("pack %s -side left", this->Label->GetWidgetName());
+      this->Script("pack %s -side left -padx 0", this->Label->GetWidgetName());
       }
     else
       {
-      this->Script("pack %s -side left -padx 2 -before %s", 
+      this->Script("pack %s -side left -padx 0 -before %s", 
                    this->Label->GetWidgetName(), 
                    this->ScaleWidget->GetWidgetName());
       }

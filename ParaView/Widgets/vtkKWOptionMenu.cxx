@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.11");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.12");
 
 //-----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -174,7 +174,7 @@ void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
   // create the top level
   wname = this->GetWidgetName();
   
-  this->Script("menubutton %s -textvariable %sValue -indicatoron 1 -menu %s -relief raised -bd 2 -highlightthickness 2 -anchor c -direction flush %s", wname, wname, this->Menu->GetWidgetName(), args);
+  this->Script("menubutton %s -textvariable %sValue -indicatoron 1 -menu %s -relief raised -bd 2 -highlightthickness 0 -anchor c -direction flush %s", wname, wname, this->Menu->GetWidgetName(), args);
   this->Menu->Create(app,"menu","-tearoff 0");
 }
 
