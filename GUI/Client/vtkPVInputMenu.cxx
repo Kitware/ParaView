@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.55");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.56");
 
 
 //----------------------------------------------------------------------------
@@ -488,6 +488,10 @@ void vtkPVInputMenu::UpdateEnableState()
 //----------------------------------------------------------------------------
 int vtkPVInputMenu::GetNumberOfSources()
 {
+  if (!this->Sources)
+    {
+    return 0;
+    }
   return this->Sources->GetNumberOfItems();
 }
 
