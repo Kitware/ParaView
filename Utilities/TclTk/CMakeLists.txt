@@ -52,9 +52,6 @@ ELSE(UNIX)
     "Path to tcl include" FORCE)
   SET(TK_INCLUDE_PATH ${PV_TCL_DIR}/include CACHE INTERNAL
     "Path to tk include" FORCE)
-  SET(TCL_TK_COPY_SUPPORT_LIBRARY 1 CACHE INTERNAL "Very few users should worry about this option. If VTK is built against a static Tcl/Tk lib (see TCL_TK_STATIC) or a shared Tcl/Tk bundled inside a project with no library support files (ex: ParaView), this variable should be set to ON and both TCL_SUPPORT_LIBRARY_PATH and TK_SUPPORT_LIBRARY_PATH should point to the directories that hold those files (typically, lib/tcl8.4 and lib/tk8.4 for a typical Tcl/Tk installation, or tcl8.4.5/library and tk8.4.5/library for a Tcl/Tk source repository). Once this variable is set to ON, support files will automatically be copied to the build directory and the executables will try to use that location to initialize Tcl/Tk." FORCE)
-  SET(TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library CACHE INTERNAL "Path to the Tcl support library files. See TCL_TK_COPY_SUPPORT_LIBRARY help." FORCE)
-  SET(TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library CACHE INTERNAL "Path to the Tcl support library files. See TCL_TK_COPY_SUPPORT_LIBRARY help." FORCE)
   # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
   # directory so no paths are needed to run this.
   IF (CMAKE_CONFIGURATION_TYPES)
@@ -72,4 +69,17 @@ ELSE(UNIX)
       COPYONLY)
   ENDFOREACH (config)
 ENDIF(UNIX)
+#SET(TCL_TK_COPY_SUPPORT_LIBRARY 1 CACHE INTERNAL "Very few users should worry about this option. If VTK is built against a static Tcl/Tk lib (see TCL_TK_STATIC) or a shared Tcl/Tk bundled inside a project with no library support files (ex: ParaView), this variable should be set to ON and both TCL_SUPPORT_LIBRARY_PATH and TK_SUPPORT_LIBRARY_PATH should point to the directories that hold those files (typically, lib/tcl8.4 and lib/tk8.4 for a typical Tcl/Tk installation, or tcl8.4.5/library and tk8.4.5/library for a Tcl/Tk source repository). Once this variable is set to ON, support files will automatically be copied to the build directory and the executables will try to use that location to initialize Tcl/Tk." FORCE)
+#SET(TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library CACHE INTERNAL "Path to the Tcl support library files. See TCL_TK_COPY_SUPPORT_LIBRARY help." FORCE)
+#SET(TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library CACHE INTERNAL "Path to the Tcl support library files. See TCL_TK_COPY_SUPPORT_LIBRARY help." FORCE)
 
+SET(TCL_TK_COPY_SUPPORT_LIBRARY 1)
+SET(TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library)
+SET(TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library)
+
+INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkTclTkMacros.cmake)
+VTK_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR(
+  "${TCL_SUPPORT_LIBRARY_PATH}"
+  "${TK_SUPPORT_LIBRARY_PATH}"
+  "${ParaView_BINARY_DIR}"
+  "lib")
