@@ -54,7 +54,7 @@ ELSE(ParaViewComplete_BINARY_DIR)
     MARK_AS_ADVANCED(VTK_WRAP_HINTS)
   ELSE(USE_VTK_FILE)
     SET (PARAVIEW_CAN_BUILD 0)
-    MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_PATH to directory where vtkConfigure.h and UseVTK.cmake are found.")
+    MESSAGE("Warning. This project is supposed to work with VTK, which might be found on your system as different flavours: installed VTK, or (multiple) built VTK. Please, make sure that the VTK_INSTALL_PATH or VTK_BINARY_PATH setting reflect which VTK you are planning to use, then set one of the USE_INSTALLED_VTK or USE_BUILT_VTK to ON.")
   ENDIF (USE_VTK_FILE)
 ENDIF(ParaViewComplete_BINARY_DIR)
 
