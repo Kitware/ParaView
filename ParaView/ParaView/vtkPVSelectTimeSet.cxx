@@ -54,19 +54,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkTclUtil.h"
 
-#ifdef _MSC_VER
-#pragma warning (push, 3)
-#endif
-
-#include <string>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include <vtkstd/string>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.18");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.19");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,

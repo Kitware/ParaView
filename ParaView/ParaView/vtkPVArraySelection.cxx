@@ -57,23 +57,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkTclUtil.h"
 
-#ifdef _MSC_VER
-#pragma warning (push, 3)
-#endif
-
-#include <string>
-#include <set>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include <vtkstd/string>
+#include <vtkstd/set>
 
 typedef vtkstd::set<vtkstd::string> vtkPVArraySelectionArraySetBase;
 class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.27");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.28");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
