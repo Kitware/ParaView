@@ -47,6 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVStringWidgetProperty.h"
 
+class vtkPVFileEntryPropertyList;
+
 class VTK_EXPORT vtkPVFileEntryProperty : public vtkPVStringWidgetProperty
 {
 public:
@@ -63,12 +65,29 @@ public:
   // Set/get the time step
   vtkSetMacro(TimeStep, int);
   vtkGetMacro(TimeStep, int);
+
+  // Description:
+  // Add a file to the list of files.
+  void AddFile(const char* file);
+
+  // Description:
+  // Remove all files.
+  void RemoveAllFiles();
+
+  // Description:
+  // Get the number of files.
+  int GetNumberOfFiles();
+
+  // Description:
+  // Get the file with given index.
+  const char* GetFile(int idx);
   
 protected:
   vtkPVFileEntryProperty();
   ~vtkPVFileEntryProperty();
   
   int TimeStep;
+  vtkPVFileEntryPropertyList *Files;
   
 private:
   vtkPVFileEntryProperty(const vtkPVFileEntryProperty&); // Not implemented

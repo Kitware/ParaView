@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.35");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.36");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -393,21 +393,13 @@ int vtkPVReaderModule::GetNumberOfTimeSteps()
     {
     return 0;
     }
-  int range[2];
-  this->FileEntry->GetRange(range);
-  if(range[1] > range[0])
-    {
-    return range[1] - range[0] + 1;
-    }
-  return 0;
+  return this->FileEntry->GetNumberOfFiles();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVReaderModule::SetRequestedTimeStep(int step)
 {
-  int range[2];
-  this->FileEntry->GetRange(range);
-  this->FileEntry->SetTimeStep(range[0]+step);
+  this->FileEntry->SetTimeStep(step);
   this->AcceptCallback();
   this->GetPVApplication()->GetMainView()->EventuallyRender();
   this->Script("update");

@@ -87,7 +87,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.28");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.29");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -232,36 +232,48 @@ int vtkPVProcessModule::GetDirectoryListing(const char* dir,
   this->SendStreamToServerRoot();
 
   // Parse the listing.
-  dirs->RemoveAllItems();
-  files->RemoveAllItems();
+  if ( dirs )
+    {
+    dirs->RemoveAllItems();
+    }
+  if ( files )
+    {
+    files->RemoveAllItems();
+    }
   if(result.GetNumberOfMessages() == 2)
     {
     int i;
     // The first message lists directories.
-    for(i=0; i < result.GetNumberOfArguments(0); ++i)
+    if ( dirs )
       {
-      const char* d;
-      if(result.GetArgument(0, i, &d))
+      for(i=0; i < result.GetNumberOfArguments(0); ++i)
         {
-        dirs->AddString(d);
-        }
-      else
-        {
-        vtkErrorMacro("Error getting directory name from listing.");
+        const char* d;
+        if(result.GetArgument(0, i, &d))
+          {
+          dirs->AddString(d);
+          }
+        else
+          {
+          vtkErrorMacro("Error getting directory name from listing.");
+          }
         }
       }
 
     // The second message lists files.
-    for(i=0; i < result.GetNumberOfArguments(1); ++i)
+    if ( files )
       {
-      const char* f;
-      if(result.GetArgument(1, i, &f))
+      for(i=0; i < result.GetNumberOfArguments(1); ++i)
         {
-        files->AddString(f);
-        }
-      else
-        {
-        vtkErrorMacro("Error getting file name from listing.");
+        const char* f;
+        if(result.GetArgument(1, i, &f))
+          {
+          files->AddString(f);
+          }
+        else
+          {
+          vtkErrorMacro("Error getting file name from listing.");
+          }
         }
       }
     return 1;

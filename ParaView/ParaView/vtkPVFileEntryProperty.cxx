@@ -44,18 +44,85 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVFileEntry.h"
 
-vtkStandardNewMacro(vtkPVFileEntryProperty);
-vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.2");
+#include <vtkstd/string>
+#include <vtkstd/vector>
 
+vtkStandardNewMacro(vtkPVFileEntryProperty);
+vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.3");
+
+class vtkPVFileEntryPropertyList : vtkstd::vector<vtkstd::string>
+{
+  typedef vtkstd::vector<vtkstd::string> ListType;
+public:
+  void AddFile(const char* file)
+    {
+    ListType::iterator pos = this->begin();
+    while ( pos != this->end() )
+      {
+      if ( *pos == file )
+        {
+        break;
+        }
+      ++pos;
+      }
+    if ( pos == this->end() )
+      {
+      this->push_back(file);
+      }
+    }
+
+  int GetNumberOfItems()
+    {
+    return this->size();
+    }
+
+  const char* GetFile(int idx)
+    {
+    if ( idx < 0 || idx >= this->GetNumberOfItems() )
+      {
+      return 0;
+      }
+    return (this->begin() + idx)->c_str();
+    }
+
+  void RemoveFile(const char* file)
+    {
+    ListType::iterator pos = this->begin();
+    while ( pos != this->end() )
+      {
+      if ( *pos == file )
+        {
+        break;
+        }
+      ++pos;
+      }
+    if ( pos != this->end() )
+      {
+      this->erase(pos);
+      }
+    }
+
+  void RemoveAllFiles()
+    {
+    this->erase(this->begin(), this->end());
+    }
+};
+
+//----------------------------------------------------------------------------
 vtkPVFileEntryProperty::vtkPVFileEntryProperty()
 {
   this->TimeStep = 0;
+  this->Files = new vtkPVFileEntryPropertyList;
 }
 
+//----------------------------------------------------------------------------
 vtkPVFileEntryProperty::~vtkPVFileEntryProperty()
 {
+  delete this->Files;
+  this->Files = 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVFileEntryProperty::SetAnimationTime(float time)
 {
   vtkPVFileEntry *widget = vtkPVFileEntry::SafeDownCast(this->Widget);
@@ -64,10 +131,35 @@ void vtkPVFileEntryProperty::SetAnimationTime(float time)
     return;
     }
   
-  this->SetTimeStep(static_cast<int>(time) - widget->GetRange()[0]);
+  this->SetTimeStep(static_cast<int>(time));
   widget->Reset();
 }
 
+//----------------------------------------------------------------------------
+const char* vtkPVFileEntryProperty::GetFile(int idx)
+{
+  return this->Files->GetFile(idx);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVFileEntryProperty::AddFile(const char* file)
+{
+  this->Files->AddFile(file);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVFileEntryProperty::RemoveAllFiles()
+{
+  this->Files->RemoveAllFiles();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVFileEntryProperty::GetNumberOfFiles()
+{
+  return this->Files->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVFileEntryProperty::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

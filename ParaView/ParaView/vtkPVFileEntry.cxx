@@ -61,14 +61,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkStringList.h"
 #include "vtkKWListSelectOrder.h"
+#include "vtkCommand.h"
+#include "vtkKWPopupButton.h"
+#include "vtkKWLabeledFrame.h"
+
+//===========================================================================
+//***************************************************************************
+class vtkPVFileEntryObserver: public vtkCommand
+{
+public:
+  static vtkPVFileEntryObserver *New() 
+    {return new vtkPVFileEntryObserver;};
+
+  vtkPVFileEntryObserver()
+    {
+    this->FileEntry= 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+    void* calldata)
+    {
+    if ( this->FileEntry)
+      {
+      this->FileEntry->ExecuteEvent(wdg, event, calldata);
+      }
+    }
+
+  vtkPVFileEntry* FileEntry;
+};
+
+//***************************************************************************
+//===========================================================================
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.63");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.64");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
 {
+  this->Observer = vtkPVFileEntryObserver::New();
+  this->Observer->FileEntry = this;
   this->LabelWidget = vtkKWLabel::New();
   this->Entry = vtkKWEntry::New();
   //this->Entry->PullDownOn();
@@ -79,20 +112,28 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->TimestepFrame = vtkKWFrame::New();
   this->Timestep = vtkKWScale::New();
   this->TimeStep = 0;
-  this->Format = 0;
-  this->Prefix = 0;
-  this->Ext = 0;
-  this->Path = 0;
-  this->Range[0] = this->Range[1] = 0;
   
   this->Property = NULL;
 
+  this->Path = 0;
+
+  this->FileListPopup = vtkKWPopupButton::New();
+
   this->FileListSelect = vtkKWListSelectOrder::New();
+  this->ListObserverTag = 0;
+  this->IgnoreFileListEvents = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::~vtkPVFileEntry()
 {
+  if ( this->ListObserverTag )
+    {
+    this->FileListSelect->RemoveObservers(this->ListObserverTag);
+    }
+  this->Observer->FileEntry = 0;
+  this->Observer->Delete();
+  this->Observer = 0;
   this->BrowseButton->Delete();
   this->BrowseButton = NULL;
   this->Entry->Delete();
@@ -103,14 +144,14 @@ vtkPVFileEntry::~vtkPVFileEntry()
 
   this->Timestep->Delete();
   this->TimestepFrame->Delete();
-  this->SetFormat(0);
-  this->SetPrefix(0);
-  this->SetExt(0);
-  this->SetPath(0);
+  this->FileListPopup->Delete();
+  this->FileListPopup = 0;
   this->FileListSelect->Delete();
   this->FileListSelect = 0;
   
   this->SetProperty(NULL);
+
+  this->SetPath(0);
 }
 
 //----------------------------------------------------------------------------
@@ -220,7 +261,6 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
     }
   this->Script("pack %s -side left", this->BrowseButton->GetWidgetName());
   this->Script("pack %s -fill both -expand 1", frame->GetWidgetName());
-  frame->Delete();
 
   this->TimestepFrame->SetParent(this);
   this->TimestepFrame->Create(pvApp, 0);
@@ -236,9 +276,20 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
   this->Timestep->SetEndCommand(this, "TimestepChangedCallback");
   this->Timestep->SetEntryCommand(this, "TimestepChangedCallback");
 
-  this->FileListSelect->SetParent(this);
+  this->FileListPopup->SetParent(frame);
+  this->FileListPopup->Create(pvApp, 0);
+  this->FileListPopup->SetLabel("Timesteps");
+  this->FileListPopup->SetPopupTitle("Select Files For Time Series");
+  this->FileListPopup->SetCommand(this, "UpdateAvailableFiles");
+
+  this->FileListSelect->SetParent(this->FileListPopup->GetPopupFrame());
   this->FileListSelect->Create(pvApp, 0);
-  //this->Script("pack %s", this->FileListSelect->GetWidgetName());
+  this->Script("pack %s -fill both -expand 1", this->FileListSelect->GetWidgetName());
+  this->Script("pack %s -fill x", this->FileListPopup->GetWidgetName());
+
+  this->ListObserverTag = this->FileListSelect->AddObserver(vtkCommand::ModifiedEvent, 
+    this->Observer);
+  frame->Delete();
 }
 
 
@@ -252,20 +303,28 @@ void vtkPVFileEntry::EntryChangedCallback()
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::SetTimeStep(int ts)
 {
-  if ( ts < this->Range[0] || ts > this->Range[1] ||
-       (this->Range[0] == 0 && this->Range[1] == 0))
+  if ( ts >= this->Property->GetNumberOfFiles() && ts < 0 )
     {
     return;
     }
   this->TimeStep = ts;
-  if ( !(this->FileNameLength && this->Format && this->Path && this->Prefix && this->Ext) )
+  const char* fname = this->Property->GetFile(this->TimeStep);
+  if ( fname )
     {
-    return;
+    if ( fname[0] == '/' || 
+      (fname[1] == ':' && (fname[2] == '/' || fname[2] == '\\')) ||
+      (fname[0] == '\\' && fname[1] == '\\') )
+      {
+      this->SetValue(fname);
+      }
+    else
+      {
+      ostrstream str;
+      str << this->Path << "/" << fname << ends;
+      this->SetValue(str.str());
+      str.rdbuf()->freeze(0);
+      }
     }
-  char* name = new char [ this->FileNameLength ];
-  sprintf(name, this->Format, this->Path, this->Prefix, ts, this->Ext);
-  this->SetValue(name);
-  delete [] name;
 }
 
 //----------------------------------------------------------------------------
@@ -355,21 +414,18 @@ void vtkPVFileEntry::SetValue(const char* fileName)
   int already_set = 0;
   int cc;
 
-  if ( this->Prefix && this->Format && this->Path && this->Ext )
-    {
-    char* name = new char[ this->FileNameLength + 2 ];
-    // Things are already set. Let us check if this file uses same pattern
+  char* prefix = 0;
+  char* format = 0;
+  int range[2];
+  already_set = this->Property->GetNumberOfFiles();
 
-    for ( cc = this->Range[0]; cc <= this->Range[1]; cc ++ )
-      {
-      sprintf(name, this->Format, this->Path, this->Prefix, cc, this->Ext);
-      if ( vtkString::Equals(name, fileName) )
-        {
-        already_set = 1;
-        break;
-        }
-      }
-    delete [] name;
+  char* path   = new char [ strlen(fileName) + 1];
+  vtkKWDirectoryUtilities::GetFilenamePath(fileName, path);
+
+  if ( !this->Path || strcmp(this->Path, path) != 0 )
+    {
+    already_set = 0;
+    this->SetPath(path);
     }
 
   if ( already_set )
@@ -377,25 +433,30 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     // Already set, so just return
     this->InSetValue = 0;
     this->ModifiedCallback();
+    delete [] path;
     return;
     }
-  this->Range[0] = this->Range[1] = 0;
+
+  range[0] = range[1] = 0;
+
+  this->IgnoreFileListEvents = 1;
+
+  this->FileListSelect->RemoveItemsFromFinalList();
 
   // Have to regenerate prefix, pattern...
 
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* files = vtkStringList::New();
-  vtkStringList* dirs = vtkStringList::New();
-  char* path   = new char [ strlen(fileName) + 1];
   char* file   = new char [ strlen(fileName) + 1];
   char* ext    = new char [ strlen(fileName) + 1];
   char* number = new char [ strlen(fileName) + 1];
-  vtkKWDirectoryUtilities::GetFilenamePath(fileName, path);
   vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
   vtkKWDirectoryUtilities::GetFilenameExtension(fileName, ext);
 
   int in_ext = 1;
   int in_num = 0;
+
+  int fnameLength = 0;
 
   int h5Flag = 0;
   if (strcmp(ext, "h5") == 0)
@@ -425,11 +486,10 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       }
     file[cc] = 0;
     }
-  if ( path[0] && file[0] )
+
+  if ( path[0] )
     {
-    this->SetPath(path);
-    this->SetPrefix(file);
-    this->SetExt(ext);
+    prefix = file;
     number[ncnt] = 0;
     for ( cc = 0; cc < ncnt/2; cc ++ )
       {
@@ -437,16 +497,16 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       number[cc] = number[ncnt-cc-1];
       number[ncnt-cc-1] = tmp;
       }
-    char format[100];
+    char firstformat[100];
     char secondformat[100];
-    sprintf(format, "%%s/%%s%%0%dd.%%s", ncnt);
+    sprintf(firstformat, "%%s/%%s%%0%dd.%%s", ncnt);
     sprintf(secondformat, "%%s/%%s%%d.%%s");
     this->Entry->DeleteAllValues();
-    pm->GetDirectoryListing(path, dirs, files, 0);
+    pm->GetDirectoryListing(path, 0, files, 0);
     int cnt = 0;
     for ( cc = 0; cc < files->GetLength(); cc ++ )
       {
-      this->FileListSelect->AddElement(files->GetString(cc));
+      this->FileListSelect->AddSourceElement(files->GetString(cc));
       if ( vtkString::StartsWith(files->GetString(cc), file ) &&
         vtkString::EndsWith(files->GetString(cc), ext) )
         {
@@ -454,18 +514,17 @@ void vtkPVFileEntry::SetValue(const char* fileName)
         }
       }
     int med = atoi(number);
-    this->FileNameLength = (int)(strlen(fileName)) * 2;
-    char* rfname = new char[ this->FileNameLength ];
+    fnameLength = (int)(strlen(fileName)) * 2;
+    char* rfname = new char[ fnameLength ];
     int min = med+cnt;
     int max = med-cnt;
     int foundone = 0;
     for ( cc = med-cnt; cc < med+cnt; cc ++ )
       {
-      sprintf(rfname, format, path, file, cc, ext);
+      sprintf(rfname, firstformat, path, file, cc, ext);
       if ( files->GetIndex(rfname+strlen(path)+1) >= 0 )
         {
         this->Entry->AddValue(rfname);
-        //cout << "File: " << rfname << endl;
         if ( max < cc )
           {
           max = cc;
@@ -497,7 +556,6 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       if ( files->GetIndex(rfname+strlen(path)+1) >= 0 )
         {
         this->Entry->AddValue(rfname);
-        //cout << "File: " << rfname << endl;
         if ( smax < cc )
           {
           smax = cc;
@@ -524,50 +582,46 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     // If second range is bigger than first range, use second format
     if ( (smax - smin) >= (max - min) )
       {
-      this->SetFormat(secondformat);
+      format = secondformat;
       min = smin;
       max = smax;
       // cout << "Use second format" << endl;
       }
     else
       {
-      this->SetFormat(format);
+      format = firstformat;
       // cout << "Use first format" << endl;
       }
-    if ( min < max -1 )
-      {
-      this->Script("pack %s -side bottom -expand 1 -fill x", this->TimestepFrame->GetWidgetName());
-      this->Timestep->SetRange(min, max);
-      this->SetRange(min, max);
-      }
-    this->Timestep->SetValue(med);
-    this->TimeStep = med;
-    ostrstream str;
-    str << "set pvTemp" << this->GetPVSource()->GetVTKSourceID() << "_files {";
-    char* name = new char [ this->FileNameLength ];
+    char* name = new char [ fnameLength ];
+    char* shname = new char [ fnameLength ];
     for ( cc = min; cc <= max; cc ++ )
       {
-      sprintf(name, this->Format, this->Path, this->Prefix, cc, this->Ext);
-      if ( cc > min )
+      sprintf(name, format, path, prefix, cc, ext);
+      vtkKWDirectoryUtilities::GetFilenameName(name, shname);
+      if ( files->GetIndex(shname) >= 0 )
         {
-        str << " ";
+        this->FileListSelect->AddFinalElement(shname, 1);
         }
-      str << name;
       }
     delete [] name;
-    str << "}" << ends;
-    //cout << str.str() << endl;
-    this->Script(str.str());
-    str.rdbuf()->freeze(0);
+    delete [] shname;
     }
 
-  dirs->Delete();
+  if ( !this->FileListSelect->GetNumberOfElementsOnFinalList() )
+    {
+    vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
+    this->FileListSelect->AddFinalElement(file, 1);
+    }
+
   files->Delete();
   delete [] path;
   delete [] file;
   delete [] ext;
   delete [] number;
-  
+
+  this->UpdateTimeStep();
+
+  this->IgnoreFileListEvents = 0;
   this->InSetValue = 0;
   this->ModifiedCallback();
 }
@@ -609,15 +663,22 @@ void vtkPVFileEntry::AcceptInternal(vtkClientServerID sourceID)
       rm->SetLabelOnce(desc);
       }
     }
-
-  if (this->Range[1] - this->Range[1] > 0)
+  this->Property->RemoveAllFiles();
+  int cc;
+  for ( cc = 0; cc < this->FileListSelect->GetNumberOfElementsOnFinalList(); cc ++ )
     {
-    this->WidgetRange[0] = this->Range[0];
-    this->WidgetRange[1] = this->Range[1];
+    this->Property->AddFile(this->FileListSelect->GetElementFromFinalList(cc));
+    }
+
+  if ( this->Property->GetNumberOfFiles() > 0 )
+    {
+    this->WidgetRange[0] = 0;
+    this->WidgetRange[1] = this->FileListSelect->GetNumberOfElementsOnFinalList();
     this->UseWidgetRange = 1;
     }
   
   this->Property->AcceptInternal();
+  this->UpdateAvailableFiles();
   
   this->ModifiedFlag = 0;
 }
@@ -628,6 +689,26 @@ void vtkPVFileEntry::ResetInternal()
 {
   this->SetValue(this->Property->GetString());
   this->SetTimeStep(this->Property->GetTimeStep());
+
+  this->IgnoreFileListEvents = 1;
+  this->FileListSelect->RemoveItemsFromFinalList();
+  int cc;
+  for ( cc = 0; cc < this->Property->GetNumberOfFiles(); cc ++ )
+    {
+    this->FileListSelect->AddFinalElement(this->Property->GetFile(cc), 1);
+    }
+  const char* fileName = this->Entry->GetValue();
+  if ( fileName && fileName[0] )
+    {
+    char *file = new char[ strlen(fileName) + 1 ];
+    vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
+    this->FileListSelect->AddFinalElement(file, 1);
+    delete [] file;
+    }
+
+  this->IgnoreFileListEvents = 0;
+
+  this->UpdateAvailableFiles();
 
   this->ModifiedFlag = 0;
 }
@@ -693,13 +774,23 @@ const char* vtkPVFileEntry::GetValue()
 }
 
 //-----------------------------------------------------------------------------
+int vtkPVFileEntry::GetNumberOfFiles()
+{
+  return this->Property->GetNumberOfFiles();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file,
                                               vtkClientServerID sourceID)
 {
-  if (this->Range[0] < this->Range[1])
+  if ( this->Property->GetNumberOfFiles() > 1 )
     {
     *file << "\tset " << "pvTemp" << sourceID << "_files {";
-    *file << this->Script("concat $pvTemp%d_files", sourceID.ID);
+    int cc;
+    for ( cc = 0; cc < this->Property->GetNumberOfFiles(); cc ++ )
+      {
+      *file << "\"" << this->Property->GetFile(cc) << "\" ";
+      }
     *file << "}" << endl;
 
     *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName 
@@ -720,11 +811,7 @@ void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file,
 void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                                vtkPVAnimationInterfaceEntry *ai)
 {
-  if ( !(this->FileNameLength && this->Format && this->Path && this->Prefix && this->Ext) )
-    {
-    return;
-    }
-  if ( (this->Range[1] - this->Range[0]) > 0 )
+  if ( this->Property->GetNumberOfFiles() > 0 )
     {
     char methodAndArgs[500];
 
@@ -744,8 +831,8 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 
   ai->SetLabelAndScript(this->GetTraceName(), NULL);
   ai->SetCurrentProperty(this->Property);
-  ai->SetTimeStart(this->Range[0]);
-  ai->SetTimeEnd(this->Range[1]);
+  ai->SetTimeStart(0);
+  ai->SetTimeEnd(this->Property->GetNumberOfFiles()-1);
   ai->SetTypeToInt();
   ai->Update();
 }
@@ -776,9 +863,75 @@ vtkPVWidgetProperty* vtkPVFileEntry::CreateAppropriateProperty()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVFileEntry::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
+{
+  if ( event == vtkCommand::ModifiedEvent && !this->IgnoreFileListEvents )
+    {
+    this->UpdateTimeStep();
+    this->ModifiedCallback();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVFileEntry::UpdateTimeStep()
+{
+  const char* fileName = this->Entry->GetValue();
+  if ( !fileName )
+    {
+    return;
+    }
+  char* file = new char[ strlen(fileName) + 1 ];
+  vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
+  this->TimeStep = this->FileListSelect->GetElementIndexFromFinalList(file);
+  if ( this->TimeStep < 0 )
+    {
+    cout << "This should not have happended" << endl;
+    cout << "Cannot find \"" << file << "\" on the list" << endl;
+    int cc;
+    for ( cc = 0; cc < this->FileListSelect->GetNumberOfElementsOnFinalList(); cc ++ )
+      {
+      cout << "Element: " << this->FileListSelect->GetElementFromFinalList(cc) << endl;
+      }
+    abort();
+    }
+  delete [] file;
+  this->Timestep->SetValue(this->TimeStep);
+  if ( this->FileListSelect->GetNumberOfElementsOnFinalList() > 1 )
+    {
+    this->Script("pack %s -side bottom -expand 1 -fill x", 
+      this->TimestepFrame->GetWidgetName());
+    this->Timestep->SetRange(0, 
+      this->FileListSelect->GetNumberOfElementsOnFinalList()-1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVFileEntry::UpdateAvailableFiles()
+{
+  if ( !this->Path )
+    {
+    return;
+    }
+
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkStringList* files = vtkStringList::New();
+  pm->GetDirectoryListing(this->Path, 0, files, 0);
+
+
+  this->IgnoreFileListEvents = 1;
+  this->FileListSelect->RemoveItemsFromSourceList();
+  int cc;
+  for ( cc = 0; cc < files->GetLength(); cc ++ )
+    {
+    this->FileListSelect->AddSourceElement(files->GetString(cc));
+    }
+  this->IgnoreFileListEvents = 0;
+  files->Delete();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVFileEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << "Extension: " << (this->Extension?this->Extension:"none") << endl;
-  os << "Range: " << this->Range[0] << " " << this->Range[1] << endl;
 }

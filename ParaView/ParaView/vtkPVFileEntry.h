@@ -55,6 +55,8 @@ class vtkKWScale;
 class vtkKWFrame;
 class vtkPVFileEntryProperty;
 class vtkKWListSelectOrder;
+class vtkPVFileEntryObserver;
+class vtkKWPopupButton;
 
 //BTX
 template<class KeyType,class DataType> class vtkArrayMap;
@@ -148,7 +150,6 @@ public:
 
   // Description:
   // Get the range of files.
-  vtkGetVector2Macro(Range, int);
 
   // Description:
   // Set/get the property to use with this widget.
@@ -158,6 +159,14 @@ public:
   // Description:
   // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+
+  // Description:
+  // Get the number of files
+  virtual int GetNumberOfFiles();
+
+  // Description:
+  // For event handling.
+  void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
   
 protected:
   vtkPVFileEntry();
@@ -175,20 +184,13 @@ protected:
   vtkKWScale *Timestep;
   int TimeStep;
 
-  vtkKWListSelectOrder* FileListSelect;
-
-  vtkSetStringMacro(Format);
-  vtkSetStringMacro(Prefix);
   vtkSetStringMacro(Path);
-  vtkSetStringMacro(Ext);
-  vtkSetVector2Macro(Range, int);
-
-  char* Prefix;
-  char* Format;
   char* Path;
-  char* Ext;
-  int FileNameLength;
-  int Range[2];
+
+  int IgnoreFileListEvents;
+
+  vtkKWListSelectOrder* FileListSelect;
+  vtkKWPopupButton* FileListPopup;
 
   vtkPVFileEntryProperty *Property;
 
@@ -200,6 +202,12 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
     vtkPVXMLPackageParser* parser);
   
+  unsigned long ListObserverTag;
+  vtkPVFileEntryObserver* Observer;
+
+  void UpdateTimeStep();
+  void UpdateAvailableFiles();
+
 private:
   vtkPVFileEntry(const vtkPVFileEntry&); // Not implemented
   void operator=(const vtkPVFileEntry&); // Not implemented
