@@ -65,6 +65,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include <vtkstd/string>
 
+#define vtkABS(x) (((x)>0)?(x):-(x))
+
 // We need to:
 // Format min/max/resolution entries better.
 // Add callbacks to take the place of accept button.
@@ -142,7 +144,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.57");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.58");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -367,7 +369,7 @@ public:
     this->UpdateStartEndValueFromEntry();
     float max = this->TimeEnd;
     float min = this->TimeStart;
-    float range = (max - min);
+    float range = vtkABS(max - min);
 
     // formula is:
     // (((((time - tmin) / trange) / tstep) * range) + min) * step
@@ -377,7 +379,23 @@ public:
       {
       str << "round";
       }
-    str << "(($globalPVTime * " << range << ") + " << min << " ) ]" << ends;
+    str << "(((";
+    if ( max < min )
+      {
+      str << "1 - ";
+      }
+    str << "$globalPVTime) * " << range << ") + ";
+    if ( max < min )
+      {
+      str << max;
+      }
+    else
+      {
+      str << min;
+      }
+    str << " ) ]";
+    // add deug? ; puts $pvTime";
+    str << ends;
     this->SetTimeEquation(str.str());
     str.rdbuf()->freeze(0);
     return this->GetTimeEquation();
@@ -1099,6 +1117,7 @@ void vtkPVAnimationInterface::SetTimeStart(int idx, float t)
     entry->SetTimeStartValue(t);
     this->AddTraceEntry("$kw(%s) SetTimeStart %d %f", 
       this->GetTclName(), idx, t);
+    this->UpdateNewScript();
     }
 }
 
@@ -1111,6 +1130,7 @@ void vtkPVAnimationInterface::SetTimeEnd(int idx, float t)
     entry->SetTimeEndValue(t);
     this->AddTraceEntry("$kw(%s) SetTimeEnd %d %f", 
       this->GetTclName(), idx, t);
+    this->UpdateNewScript();
     }
 }
 
@@ -1138,18 +1158,19 @@ void vtkPVAnimationInterface::SetTimeEnd(float t)
 void vtkPVAnimationInterface::SetTimeSpan(int t)
 {
   this->AddTraceEntry("$kw(%s) SetTimeSpan %d", this->GetTclName(), t);
-  cout << "Set TimeSpan: " << t << endl;
+  //cout << "Set TimeSpan: " << t << endl;
   this->TimeSpan= t;
   this->TimeSpanEntry->SetValue(t);
   float range[2];
   this->TimeRange->GetWholeRange(range);
   this->TimeRange->SetWholeRange(range[0], t);
+  this->TimeRange->SetRange(range[0], t);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::TimeSpanEntryCallback()
 {
-  cout << "TimeSpanEntryCallback" << endl;
+  //cout << "TimeSpanEntryCallback" << endl;
   this->LastEntryIndex = -1;
   this->SetTimeSpan(static_cast<int>(this->TimeSpanEntry->GetValueAsFloat()));
 }
@@ -1270,7 +1291,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
   if (pvApp)
     {
     float ctime = static_cast<float>(this->GetCurrentTime()) / 
-      static_cast<float>(this->TimeSpan);
+      static_cast<float>(this->TimeSpan-1);
     pvApp->BroadcastScript("set globalPVTime %g", ctime);
     pvApp->BroadcastScript("catch {%s}", this->ScriptEditor->GetValue());
 
@@ -1396,7 +1417,6 @@ void vtkPVAnimationInterface::Play()
     t = this->GetCurrentTime();
     if (t >= this->GetGlobalEnd())
       {
-      cout << "We came to the end" << endl;
       this->SetCurrentTime(this->GetGlobalStart());
       t = this->GetCurrentTime();
       }
@@ -1996,8 +2016,8 @@ void vtkPVAnimationInterface::DeleteSourceItem(int item)
   this->AnimationEntries->InitTraversal();
   if ( item < 0 && item >= this->AnimationEntries->GetNumberOfItems() )
     {
-    cout << "Item " << item << " is not in the collection (" 
-      << this->AnimationEntries->GetNumberOfItems() << ")" << endl;
+    vtkErrorMacro(<< "Item " << item << " is not in the collection (" 
+      << this->AnimationEntries->GetNumberOfItems() << ")");
     return;
     }
   
@@ -2071,8 +2091,8 @@ vtkPVAnimationInterfaceEntry* vtkPVAnimationInterface::GetSourceEntry(int idx)
   this->AnimationEntries->InitTraversal();
   if ( idx < 0 && idx >= this->AnimationEntries->GetNumberOfItems() )
     {
-    cout << "Item " << idx << " is not in the collection (" 
-      << this->AnimationEntries->GetNumberOfItems() << ")" << endl;
+    vtkErrorMacro(<< "Item " << idx << " is not in the collection (" 
+      << this->AnimationEntries->GetNumberOfItems() << ")");
     return 0;
     }
 
@@ -2093,7 +2113,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
     {
     abort();
     }
-  cout << "UpdateNewScript" << endl;
+  //cout << "UpdateNewScript" << endl;
   ostrstream str;
   //str << "puts \"------------- start --------------\"" << endl;
   vtkCollectionIterator* it = this->AnimationEntriesIterator;
