@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.33");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -451,8 +451,6 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
 void vtkPVSelectWidget::SaveInBatchScriptForPart(ofstream *file, 
                                                  vtkClientServerID sourceID)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   ostrstream elem;
   if(this->ElementType == OBJECT)
     { 
