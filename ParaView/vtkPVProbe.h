@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWRadioButton.h"
 #include "vtkKWSelectPointInteractor.h"
 #include "vtkKWLabeledEntry.h"
 
@@ -72,6 +73,7 @@ public:
 
   // Description:
   // Methods to call when this pv source is selected/deselected
+  void Select(vtkKWView *view);
   void Deselect(vtkKWView *view);
 
   // Description:
@@ -128,7 +130,7 @@ protected:
   
   vtkKWLabel *DimensionalityLabel;
   vtkKWOptionMenu *DimensionalityMenu;
-  vtkKWPushButton *SelectPointButton;
+  vtkKWRadioButton *SelectPointButton;
   vtkKWWidget *ProbeFrame;
 
   vtkKWWidget *SelectedPointFrame;
@@ -163,6 +165,7 @@ protected:
   char *XYPlotTclName;
   vtkSetStringMacro(XYPlotTclName);
   int InstanceCount;
+  vtkKWInteractor *PreviousInteractor;
 };
 
 #endif

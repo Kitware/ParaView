@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceInterface.h"
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
+#include "vtkKWToolbar.h"
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -58,7 +59,7 @@ vtkPVProbe::vtkPVProbe()
 
   this->DimensionalityMenu = vtkKWOptionMenu::New();
   this->DimensionalityLabel = vtkKWLabel::New();
-  this->SelectPointButton = vtkKWPushButton::New();
+  this->SelectPointButton = vtkKWRadioButton::New();
   
   this->SelectedPointFrame = vtkKWWidget::New();
   this->SelectedPointLabel = vtkKWLabel::New();
@@ -100,6 +101,8 @@ vtkPVProbe::vtkPVProbe()
   // Create a unique id for creating tcl names.
   ++instanceCount;
   this->InstanceCount = instanceCount;
+  
+  this->PreviousInteractor = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -193,13 +196,6 @@ void vtkPVProbe::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
 
-  this->SetInteractor();
-  
-  this->PVProbeSource->GetBounds(bounds);
-  this->Interactor->SetBounds(bounds);
-  
-  this->Interactor->GetSelectedPoint(point);
-  
   frame = vtkKWWidget::New();
   frame->SetParent(this->GetParameterFrame()->GetFrame());
   frame->Create(pvApp, "frame", "");
@@ -218,16 +214,21 @@ void vtkPVProbe::CreateProperties()
                this->DimensionalityLabel->GetWidgetName(),
                this->DimensionalityMenu->GetWidgetName());
   
-  this->SelectPointButton->SetParent(this->GetParameterFrame()->GetFrame());
-  this->SelectPointButton->Create(pvApp, "-text \"3D Cursor\"");
+  this->SelectPointButton->SetParent(this->GetWindow()->GetInteractorToolbar());
+  this->SelectPointButton->Create(pvApp, "-indicatoron 0 -image PV3DCursorButton -selectimage PVActive3DCursorButton -bd 0");
+  this->SelectPointButton->SetBalloonHelpString("3D Cursor");
   this->SelectPointButton->SetCommand(this, "SetInteractor");
+  this->SetInteractor();
+
+  this->PVProbeSource->GetBounds(bounds);
+  this->Interactor->SetBounds(bounds);
+  this->Interactor->GetSelectedPoint(point);
   
   this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ProbeFrame->Create(pvApp, "frame", "");
   
-  this->Script("pack %s %s %s",
+  this->Script("pack %s %s",
                frame->GetWidgetName(),
-               this->SelectPointButton->GetWidgetName(),
                this->ProbeFrame->GetWidgetName());
   
   frame->Delete();
@@ -242,8 +243,8 @@ void vtkPVProbe::CreateProperties()
   this->SelectedXEntry->SetParent(this->SelectedPointFrame);
   this->SelectedXEntry->Create(pvApp);
   this->SelectedXEntry->SetLabel("X:");
-  this->Script("%s configure -width 10",
-               this->SelectedXEntry->GetEntry()->GetWidgetName());
+  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+               this->SelectedXEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->SelectedXEntry->SetValue(point[0], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeXPosition}",
                this->SelectedXEntry->GetEntry()->GetWidgetName(),
@@ -252,8 +253,8 @@ void vtkPVProbe::CreateProperties()
   this->SelectedYEntry->SetParent(this->SelectedPointFrame);
   this->SelectedYEntry->Create(pvApp);
   this->SelectedYEntry->SetLabel("Y:");
-  this->Script("%s configure -width 10",
-               this->SelectedYEntry->GetEntry()->GetWidgetName());
+  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+               this->SelectedYEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->SelectedYEntry->SetValue(point[1], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeYPosition}",
                this->SelectedYEntry->GetEntry()->GetWidgetName(),
@@ -262,8 +263,8 @@ void vtkPVProbe::CreateProperties()
   this->SelectedZEntry->SetParent(this->SelectedPointFrame);
   this->SelectedZEntry->Create(pvApp);
   this->SelectedZEntry->SetLabel("Z:");
-  this->Script("%s configure -width 10",
-               this->SelectedZEntry->GetEntry()->GetWidgetName());
+  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+               this->SelectedZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->SelectedZEntry->SetValue(point[2], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeZPosition}",
                this->SelectedZEntry->GetEntry()->GetWidgetName(),
@@ -304,8 +305,8 @@ void vtkPVProbe::CreateProperties()
   this->End1XEntry->SetParent(this->EndPoint1Frame);
   this->End1XEntry->Create(pvApp);
   this->End1XEntry->SetLabel("X:");
-  this->Script("%s configure -width 10",
-               this->End1XEntry->GetEntry()->GetWidgetName());
+  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+               this->End1XEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->End1XEntry->SetValue(point[0], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeXPosition}",
                this->End1XEntry->GetEntry()->GetWidgetName(),
@@ -314,8 +315,8 @@ void vtkPVProbe::CreateProperties()
   this->End1YEntry->SetParent(this->EndPoint1Frame);
   this->End1YEntry->Create(pvApp);
   this->End1YEntry->SetLabel("Y:");
-  this->Script("%s configure -width 10",
-               this->End1YEntry->GetEntry()->GetWidgetName());
+  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+               this->End1YEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->End1YEntry->SetValue(point[1], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeYPosition}",
                this->End1YEntry->GetEntry()->GetWidgetName(),
@@ -324,8 +325,8 @@ void vtkPVProbe::CreateProperties()
   this->End1ZEntry->SetParent(this->EndPoint1Frame);
   this->End1ZEntry->Create(pvApp);
   this->End1ZEntry->SetLabel("Z:");
-  this->Script("%s configure -width 10",
-               this->End1ZEntry->GetEntry()->GetWidgetName());
+  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+               this->End1ZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->End1ZEntry->SetValue(point[2], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeZPosition}",
                this->End1ZEntry->GetEntry()->GetWidgetName(),
@@ -346,8 +347,8 @@ void vtkPVProbe::CreateProperties()
   this->End2XEntry->SetParent(this->EndPoint2Frame);
   this->End2XEntry->Create(pvApp);
   this->End2XEntry->SetLabel("X:");
-  this->Script("%s configure -width 10",
-               this->End2XEntry->GetEntry()->GetWidgetName());
+  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+               this->End2XEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->End2XEntry->SetValue(point[0], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeXPosition}",
                this->End2XEntry->GetEntry()->GetWidgetName(),
@@ -356,8 +357,8 @@ void vtkPVProbe::CreateProperties()
   this->End2YEntry->SetParent(this->EndPoint2Frame);
   this->End2YEntry->Create(pvApp);
   this->End2YEntry->SetLabel("Y:");
-  this->Script("%s configure -width 10",
-               this->End2YEntry->GetEntry()->GetWidgetName());
+  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+               this->End2YEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->End2YEntry->SetValue(point[1], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeYPosition}",
                this->End2YEntry->GetEntry()->GetWidgetName(),
@@ -366,8 +367,8 @@ void vtkPVProbe::CreateProperties()
   this->End2ZEntry->SetParent(this->EndPoint2Frame);
   this->End2ZEntry->Create(pvApp);
   this->End2ZEntry->SetLabel("Z:");
-  this->Script("%s configure -width 10",
-               this->End2ZEntry->GetEntry()->GetWidgetName());
+  this->Script("%s configure -width 10 -xscrollcommand {%s EntryChanged}",
+               this->End2ZEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   this->End2ZEntry->SetValue(point[2], 4);
   this->Script("bind %s <KeyPress-Return> {%s ChangeZPosition}",
                this->End2ZEntry->GetEntry()->GetWidgetName(),
@@ -383,6 +384,8 @@ void vtkPVProbe::CreateProperties()
   this->DivisionsEntry->Create(pvApp);
   this->DivisionsEntry->SetLabel("Number of Line Divisions:");
   this->DivisionsEntry->SetValue(10);
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               this->DivisionsEntry->GetEntry()->GetWidgetName(), this->GetTclName());
   
   this->AcceptCommands->AddString("%s UpdateProbe",
                                   this->GetTclName());
@@ -399,20 +402,30 @@ void vtkPVProbe::CreateProperties()
   this->Script("[%s GetPosition2Coordinate] SetValue 0.8 0.3 0",
 	       this->XYPlotTclName);
   this->Script("%s SetNumberOfXLabels 5", this->XYPlotTclName);
+  this->Script("%s SetXTitle \"Line Divisions\"", this->XYPlotTclName);
+  this->Script("%s SetYTitle Scalars", this->XYPlotTclName);
 }
 
 void vtkPVProbe::SetInteractor()
 {
+  vtkPVRenderView *view = this->GetWindow()->GetMainView();
+  
   if (!this->Interactor)
     {
     this->Interactor = 
       vtkKWSelectPointInteractor::SafeDownCast(this->GetWindow()->
                                                GetSelectPointInteractor());
     this->Interactor->SetPVProbe(this);
+    this->Interactor->SetToolbarButton(this->SelectPointButton);
+    }
+
+  if (this->PreviousInteractor != view->GetInteractor() &&
+      view->GetInteractor() != this->Interactor)
+    {
+    this->PreviousInteractor = view->GetInteractor();
     }
   
-  this->GetWindow()->GetMainView()->SetInteractor(this->Interactor);
-  this->Interactor->SetCursorVisibility(1);
+  view->SetInteractor(this->Interactor);
 }
 
 void vtkPVProbe::AcceptCallback()
@@ -432,17 +445,7 @@ void vtkPVProbe::AcceptCallback()
       (vtkTclGetPointerFromObject(this->GetNthPVOutput(0)->GetVTKDataTclName(),
 				  "vtkPolyData", pvApp->GetMainInterp(),
 				  error));
-    this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
-		 this->GetPVRenderView()->GetRendererTclName(),
-		 this->XYPlotTclName);
-    
-    if (atoi(pvApp->GetMainInterp()->result) > 0)
-      {
-      this->Script("%s RemoveActor %s",
-		   this->GetPVRenderView()->GetRendererTclName(),
-		   this->XYPlotTclName);
-      }
-    
+
     vtkPointData *pd = probeOutput->GetPointData();
     
     int numArrays = pd->GetNumberOfArrays();
@@ -508,10 +511,9 @@ void vtkPVProbe::AcceptCallback()
     this->Script("%s AddActor %s",
 		 this->GetWindow()->GetMainView()->GetRendererTclName(),
 		 this->XYPlotTclName);
+    this->GetWindow()->GetMainView()->Render();
     }
 
-  this->Interactor->SetCursorVisibility(0);
-  
   this->Script("%s index end", window->GetMenu()->GetWidgetName());
   numMenus = atoi(pvApp->GetMainInterp()->result);
   
@@ -593,8 +595,20 @@ void vtkPVProbe::UpdateProbe()
 			   this->DivisionsEntry->GetValueAsInt());
     pvApp->BroadcastScript("%s SetInput [line GetOutput]",
                            this->GetVTKSourceTclName());
-    pvApp->BroadcastScript("line Delete");
+    pvApp->BroadcastScript("line Delete");  
     }
+  
+  this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
+               this->GetPVRenderView()->GetRendererTclName(),
+               this->XYPlotTclName);
+  
+  if (atoi(this->GetPVApplication()->GetMainInterp()->result) > 0)
+    {
+    this->Script("%s RemoveActor %s",
+                 this->GetPVRenderView()->GetRendererTclName(),
+                 this->XYPlotTclName);
+    this->GetPVRenderView()->Render();
+    }    
   
   pvApp->BroadcastScript("%s SetSource %s",
                          this->GetVTKSourceTclName(),
@@ -644,9 +658,28 @@ void vtkPVProbe::UpdateProbe()
   remoteProbeOutput->Delete();
 }
 
+void vtkPVProbe::Select(vtkKWView *view)
+{
+  vtkPVRenderView *renderView = this->GetWindow()->GetMainView();
+  
+  this->Script("pack %s -padx 2 -pady 2",
+               this->SelectPointButton->GetWidgetName());
+  if (this->PreviousInteractor != renderView->GetInteractor() &&
+      renderView->GetInteractor() != this->Interactor)
+    {
+    this->PreviousInteractor = renderView->GetInteractor();
+    }
+
+  if (this->Interactor)
+    {
+    this->Interactor->SetCursorVisibility(1);
+    }
+  
+  this->vtkPVSource::Select(view);
+}
+
 void vtkPVProbe::Deselect(vtkKWView *view)
 {
-  this->Interactor->SetCursorVisibility(0);
   this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
 	       this->GetPVRenderView()->GetRendererTclName(),
 	       this->XYPlotTclName);
@@ -656,7 +689,20 @@ void vtkPVProbe::Deselect(vtkKWView *view)
     this->Script("%s RemoveActor %s",
 		 this->GetPVRenderView()->GetRendererTclName(),
 		 this->XYPlotTclName);
+    this->GetPVRenderView()->Render();
     }
+  
+  this->Script("pack forget %s", this->SelectPointButton->GetWidgetName());
+  if (this->GetWindow()->GetMainView()->GetInteractor() == this->Interactor)
+    {
+    this->GetWindow()->GetMainView()->SetInteractor(this->PreviousInteractor);
+    }
+  
+  if (this->Interactor)
+    {
+    this->Interactor->SetCursorVisibility(0);
+    }
+  
   this->vtkPVSource::Deselect(view);
 }
 
@@ -665,8 +711,6 @@ void vtkPVProbe::DeleteCallback()
   vtkPVWindow *window = this->GetWindow();
   vtkPVApplication *pvApp = this->GetPVApplication();
   int i, numMenus;
-  
-  this->Interactor->SetCursorVisibility(0);
   
   this->Script("%s index end", window->GetMenu()->GetWidgetName());
   numMenus = atoi(pvApp->GetMainInterp()->result);
@@ -699,6 +743,7 @@ void vtkPVProbe::UsePoint()
   this->Script("pack %s %s",
                this->SelectedPointFrame->GetWidgetName(),
                this->PointDataLabel->GetWidgetName());
+  this->ChangeAcceptButtonColor();
 }
 
 void vtkPVProbe::UseLine()
@@ -721,6 +766,7 @@ void vtkPVProbe::UseLine()
     {
     this->SetCurrentEndPoint(2);
     }
+  this->ChangeAcceptButtonColor();
 }
 
 void vtkPVProbe::SetSelectedPoint(float point[3])

@@ -74,9 +74,8 @@ public:
   void MotionCallback(int x, int y);
   void Button1Motion(int x, int y);
   
-  void SetCursorVisibility(int value);
-
   void SetPVProbe(vtkPVProbe *probe);
+  void SetCursorVisibility(int value);
   
 protected:
   vtkKWSelectPointInteractor();

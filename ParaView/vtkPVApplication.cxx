@@ -59,6 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPickCenterButton.h"
 #include "vtkPVCalculatorButton.h"
 #include "vtkPVThresholdButton.h"
+#include "vtkPV3DCursor.h"
 #include "vtkTimerLog.h"
 #include "vtkProbeFilter.h"
 
@@ -430,6 +431,10 @@ void vtkPVApplication::CreateButtonPhotos()
                     PV_CALCULATOR_BUTTON_WIDTH, PV_CALCULATOR_BUTTON_HEIGHT);
   this->CreatePhoto("PVThresholdButton", PV_THRESHOLD_BUTTON,
                     PV_THRESHOLD_BUTTON_WIDTH, PV_THRESHOLD_BUTTON_HEIGHT);
+  this->CreatePhoto("PV3DCursorButton", PV_3D_CURSOR_BUTTON,
+                    PV_3D_CURSOR_BUTTON_WIDTH, PV_3D_CURSOR_BUTTON_HEIGHT);
+  this->CreatePhoto("PVActive3DCursorButton", PV_ACTIVE_3D_CURSOR_BUTTON,
+                    PV_ACTIVE_3D_CURSOR_BUTTON_WIDTH, PV_ACTIVE_3D_CURSOR_BUTTON_HEIGHT);
 }
 
 //----------------------------------------------------------------------------

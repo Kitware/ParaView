@@ -523,9 +523,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   button->Delete();
   button = NULL;
 
-//  this->SelectPointInteractor->SetParent(this->GetToolbarFrame());
   this->SelectPointInteractor->SetRenderView(this->GetMainView());
-//  this->SelectPointInteractor->Create(this->Application, "");
   
   this->Script("%s SetInteractor %s", this->GetMainView()->GetTclName(),
                this->FlyInteractor->GetTclName());

@@ -173,9 +173,10 @@ public:
   vtkGetObjectMacro(ContourButton, vtkKWPushButton);
   vtkGetObjectMacro(GlyphButton, vtkKWPushButton);
   vtkGetObjectMacro(ProbeButton, vtkKWPushButton);
+  vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
 
   // Description:
-  // Get a source interface from the calss name.
+  // Get a source interface from the class name.
   // Useful for writing scripts that create sources.
   vtkPVSourceInterface *GetSourceInterface(const char *className);
   
