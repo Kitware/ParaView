@@ -45,12 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkObjectFactory.h"
+#include "vtkBase64Utilities.h"
+#include "zlib.h"
 
 #include "icons.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.6");
+vtkCxxRevisionMacro(vtkKWIcon, "1.7");
 
 vtkKWIcon::vtkKWIcon()
 {
@@ -111,6 +113,73 @@ void vtkKWIcon::SetImageData(vtkImageData* id)
   flip->Delete();
 
 }
+
+void vtkKWIcon::SetImageData(const unsigned char* pixels, int width, int height, 
+                             int pixel_size, unsigned long buffer_length)
+{
+  unsigned long nb_of_raw_bytes = width * height * pixel_size;
+  const unsigned char *data_ptr = pixels;
+
+  // If the buffer_lenth has been provided, and if it's different than the
+  // expected size of the raw image buffer, than it might have been compressed
+  // using zlib and/or encoded in base64. In that case, decode and/or
+  // uncompress the buffer.
+
+  int base64 = 0;
+  unsigned char *base64_buffer = 0;
+
+  int zlib = 0;
+  unsigned char *zlib_buffer = 0;
+
+  if (buffer_length && buffer_length != nb_of_raw_bytes)
+    {
+    // Is it a base64 stream (i.e. not zlib for the moment) ?
+
+    if (data_ptr[0] != 0x78 || data_ptr[1] != 0xDA)
+      {
+      base64_buffer = new unsigned char [buffer_length];
+      buffer_length = vtkBase64Utilities::Decode(data_ptr, 0, 
+                                                 base64_buffer, buffer_length);
+      if (buffer_length == 0)
+        {
+        vtkGenericWarningMacro(<< "Error decoding base64 stream");
+        delete [] base64_buffer;
+        return;
+        }
+      base64 = 1;
+      data_ptr = base64_buffer;
+      }
+    
+    // Is it zlib ?
+
+    if (buffer_length != nb_of_raw_bytes &&
+        data_ptr[0] == 0x78 && data_ptr[1] == 0xDA)
+      {
+      unsigned long zlib_buffer_length = nb_of_raw_bytes;
+      zlib_buffer = new unsigned char [zlib_buffer_length];
+      if (uncompress(zlib_buffer, &zlib_buffer_length, 
+                     data_ptr, buffer_length) != Z_OK ||
+          zlib_buffer_length != nb_of_raw_bytes)
+        {
+        vtkGenericWarningMacro(<< "Error decoding zlib stream");
+        delete [] zlib_buffer;
+        if (base64)
+          {
+          delete [] base64_buffer;
+          }
+        return;
+        }
+      zlib = 1;
+      data_ptr = zlib_buffer;
+      }
+    }
+  if ( data_ptr )
+    {
+    this->SetData(data_ptr, width, height);
+    delete [] data_ptr;
+    }
+}
+
 
 void vtkKWIcon::SetData(const unsigned char* data, int width, int height)
 {

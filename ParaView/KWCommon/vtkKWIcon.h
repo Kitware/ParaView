@@ -69,6 +69,11 @@ public:
   // Select an icon based on the icon name.
   void SetImageData(int image);
 
+  // Description:
+  // Select an icon based on the icon name.
+  void SetImageData(const unsigned char* pixels, int width, int height, 
+                    int pixel_size, unsigned long buffer_length);
+
 //BTX
   // Description:
   // There are several predefined icons in the icons.h. Since we
