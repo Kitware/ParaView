@@ -124,7 +124,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.2");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.3");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -3884,7 +3884,7 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       this->LmkFolderWidgets->InsertItem(loc,newLmkFolder);
 
       //loop through all children to this container's LabeledFrame
-      vtkKWWidgetCollection *col = oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()->GetChildren();
+      col = oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()->GetChildren();
 
       vtkCollectionIterator *it = col->NewIterator();
       it->InitTraversal();
