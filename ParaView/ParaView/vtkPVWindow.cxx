@@ -143,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.488");
+vtkCxxRevisionMacro(vtkPVWindow, "1.489");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1117,16 +1117,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     // We need an application before we can read the interface.
     this->ReadSourceInterfaces();
     
-    // Create the extract grid button
-    vtkPVSource* extract = 0;
-    if (this->Prototypes->GetItem("ExtractGrid", extract) == VTK_OK)
-      {
-      extract->SetToolbarModule(1);
-      this->AddToolbarButton("ExtractGrid", "PVExtractGridButton", 0,
-                             "ExtractGridCallback",
-                             "Extract a subgrid from a structured data set.");
-      }
-
     vtkPVSource *pvs=0;
     // Create the sources that can be used for glyphing.
     // ===== Arrow
@@ -3763,6 +3753,17 @@ void vtkPVWindow::ReadSourceInterfaces()
     // Don't complain for now.  We can choose desired behavior later.
     // vtkWarningMacro("Could not find any directories for standard interface files.");
     }
+
+  // Create the extract grid button
+  vtkPVSource* extract = 0;
+  if (this->Prototypes->GetItem("ExtractGrid", extract) == VTK_OK)
+    {
+    extract->SetToolbarModule(1);
+    this->AddToolbarButton("ExtractGrid", "PVExtractGridButton", 0,
+                           "ExtractGridCallback",
+                           "Extract a subgrid from a structured data set.");
+    }
+
 
   char* str = getenv("PV_INTERFACE_PATH");
   if (str)
