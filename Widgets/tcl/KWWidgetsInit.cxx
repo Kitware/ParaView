@@ -38,6 +38,9 @@ ClientData vtkKWOptionMenuNewCommand();
 int vtkKWRadioButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWRadioButtonNewCommand();
+int vtkKWSaveImageDialogCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWSaveImageDialogNewCommand();
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWScaleNewCommand();
@@ -116,6 +119,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWOptionMenuCommand);
   vtkTclCreateNew(interp,"vtkKWRadioButton", vtkKWRadioButtonNewCommand,
                   vtkKWRadioButtonCommand);
+  vtkTclCreateNew(interp,"vtkKWSaveImageDialog", vtkKWSaveImageDialogNewCommand,
+                  vtkKWSaveImageDialogCommand);
   vtkTclCreateNew(interp,"vtkKWScale", vtkKWScaleNewCommand,
                   vtkKWScaleCommand);
   vtkTclCreateNew(interp,"vtkKWSerializer", vtkKWSerializerNewCommand,
