@@ -41,6 +41,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
+class vtkKWPushButton;
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
@@ -103,9 +104,9 @@ protected:
   vtkKWMenu *CreateMenu;
   
   vtkKWToolbar *Toolbar;
-  vtkKWWidget *ResetCameraButton;
-  vtkKWWidget *PreviousCompositeButton;
-  vtkKWWidget *NextCompositeButton;
+  vtkKWPushButton *ResetCameraButton;
+  vtkKWPushButton *PreviousCompositeButton;
+  vtkKWPushButton *NextCompositeButton;
 
   vtkKWMenu *MenuSource;
   

@@ -32,6 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 #include "vtkKWDialog.h"
 #include "vtkKWNotebook.h"
+#include "vtkKWPushButton.h"
 
 #include "vtkInteractorStylePlaneSource.h"
 #include "vtkInteractorStyleTrackballCamera.h"
@@ -70,9 +71,9 @@ vtkPVWindow::vtkPVWindow()
   this->RetrieveMenu = vtkKWMenu::New();
   this->CreateMenu = vtkKWMenu::New();
   this->Toolbar = vtkKWToolbar::New();
-  this->ResetCameraButton = vtkKWWidget::New();
-  this->PreviousCompositeButton = vtkKWWidget::New();
-  this->NextCompositeButton = vtkKWWidget::New();
+  this->ResetCameraButton = vtkKWPushButton::New();
+  this->PreviousCompositeButton = vtkKWPushButton::New();
+  this->NextCompositeButton = vtkKWPushButton::New();
   this->CurrentDataComposite = NULL;
   this->CompositeList = vtkKWCompositeCollection::New();
   
@@ -174,16 +175,16 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
                this->Toolbar->GetWidgetName());
   
   this->ResetCameraButton->SetParent(this->Toolbar);
-  this->ResetCameraButton->Create(app, "button", "-text ResetCamera");
+  this->ResetCameraButton->Create(app, "-text ResetCamera");
   this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
                this->ResetCameraButton->GetWidgetName());
   
   this->PreviousCompositeButton->SetParent(this->Toolbar);
-  this->PreviousCompositeButton->Create(app, "button", "-text Previous");
+  this->PreviousCompositeButton->Create(app, "-text Previous");
   this->PreviousCompositeButton->SetCommand(this, "PreviousComposite");
   this->NextCompositeButton->SetParent(this->Toolbar);
-  this->NextCompositeButton->Create(app, "button", "-text Next");
+  this->NextCompositeButton->Create(app, "-text Next");
   this->NextCompositeButton->SetCommand(this, "NextComposite");
   this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
 	       this->PreviousCompositeButton->GetWidgetName(),
