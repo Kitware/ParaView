@@ -18,11 +18,8 @@
 #include "vtkCellData.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
-#include "vtkPVConfig.h" // needed for PARAVIEW_BUILD_DEVELOPMENT
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
 #include "vtkCompositeDataSet.h"
 #include "vtkCompositeDataIterator.h"
-#endif
 #include "vtkDataArray.h"
 #include "vtkDataSet.h"
 #include "vtkImageData.h"
@@ -35,7 +32,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.21");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.22");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -143,7 +140,6 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
   this->SetName(dataInfo->GetName());
 }
 
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
 {
@@ -161,15 +157,6 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
   iter->Delete();
   this->DataSetType = data->GetDataObjectType();
 }
-#else
-class vtkCompositeDataSet
-{
-};
-//----------------------------------------------------------------------------
-void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet*)
-{
-}
-#endif
 
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
@@ -239,14 +226,12 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     return;
     }
 
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
   vtkCompositeDataSet* cds = vtkCompositeDataSet::SafeDownCast(object);
   if (cds)
     {
     this->CopyFromCompositeDataSet(cds);
     return;
     }
-#endif
 
   vtkErrorMacro("Cound not cast object to data set.");
 }

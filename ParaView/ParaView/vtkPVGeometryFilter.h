@@ -22,15 +22,11 @@
 
 #include "vtkPolyDataSource.h"
 
-#include "vtkPVConfig.h" // Needed for PARAVIEW_BUILD_DEVELOPMENT
-
 class vtkDataObject;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
 class vtkHierarchicalBoxDataSet;
 class vtkHierarchicalBoxOutlineFilter;
-#endif
 class vtkImageData;
 class vtkStructuredGrid;
 class vtkRectilinearGrid;
@@ -78,18 +74,14 @@ protected:
   void UnstructuredGridExecute(vtkUnstructuredGrid *input);
   void PolyDataExecute(vtkPolyData *input);
   void DataSetSurfaceExecute(vtkDataSet *input);
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
   void HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *input);
-#endif
 
   int OutlineFlag;
   int UseOutline;
   int UseStrips;
 
   vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
   vtkHierarchicalBoxOutlineFilter* HierarchicalBoxOutline;
-#endif
 
   int CheckAttributes(vtkDataObject* input);
 
