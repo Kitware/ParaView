@@ -126,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.565");
+vtkCxxRevisionMacro(vtkPVWindow, "1.566");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2667,16 +2667,16 @@ void vtkPVWindow::DisplayPluginWindow()
 {
   int res=0;
 
-  cout<<"Something"<<vtkstd::endl;
+  cout << "Something" << endl;
 
   res = this->PluginsDialog->Invoke();
   if(res)
     {
-    cout<<"Something OK"<<vtkstd::endl;
+    cout << "Something OK" << endl;
     }
   else
     {
-    cout<<"Something not OK"<<vtkstd::endl;
+    cout << "Something not OK" << endl;
     }
 }
 
