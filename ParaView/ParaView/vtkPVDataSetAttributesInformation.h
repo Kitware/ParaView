@@ -75,6 +75,7 @@ public:
   // (same name and number of components)to be in final.
   void AddInformation(vtkDataSetAttributes* da);
   void AddInformation(vtkPVDataSetAttributesInformation* info);
+  virtual void AddInformation(vtkPVInformation* info);
 
   // Description:
   // Remove all infommation. next add will be like a copy.

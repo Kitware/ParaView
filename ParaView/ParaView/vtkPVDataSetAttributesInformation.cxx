@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.8");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation::vtkPVDataSetAttributesInformation()
@@ -238,6 +238,22 @@ vtkPVDataSetAttributesInformation
   for (idx1  = 0; idx1 < 5; ++idx1)
     {
     this->AttributeIndices[idx1] = newAttributeIndices[idx1];
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetAttributesInformation::AddInformation(vtkPVInformation* info)
+{
+  vtkPVDataSetAttributesInformation* p =
+    vtkPVDataSetAttributesInformation::SafeDownCast(info);
+  if(p)
+    {
+    this->AddInformation(p);
+    }
+  else
+    {
+    vtkErrorMacro("AddInformation called with object of type "
+                  << (info? info->GetClassName():"<unknown>"));
     }
 }
 
