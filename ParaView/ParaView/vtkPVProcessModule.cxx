@@ -60,7 +60,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.33");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.34");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -390,7 +390,7 @@ void vtkPVProcessModule::InitializeInterpreter()
   this->InterpreterObserver = vtkCallbackCommand::New();
   this->InterpreterObserver->SetCallback(&vtkPVProcessModule::InterpreterCallbackFunction);
   this->InterpreterObserver->SetClientData(this);
-  this->Interpreter->AddObserver(vtkCommand::ErrorEvent,
+  this->Interpreter->AddObserver(vtkCommand::UserEvent,
                                  this->InterpreterObserver);
 
   // Assign standard IDs.
@@ -475,7 +475,11 @@ int vtkPVProcessModule::LoadModule(const char* name)
     << vtkClientServerStream::End;
   this->SendStreamToServer();
   int result = 0;
-  this->GetLastServerResult().GetArgument(0, 0, &result);
+  if(!this->GetLastServerResult().GetArgument(0, 0, &result))
+    {
+    vtkErrorMacro("LoadModule could not get result from server.");
+    return 0;
+    }
   return result;
 }
 

@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.4");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.5");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -244,7 +244,7 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
   if(!result)
     {
     vtkClientServerInterpreterErrorCallbackInfo info = {&css, message};
-    this->InvokeEvent(vtkCommand::ErrorEvent, &info);
+    this->InvokeEvent(vtkCommand::UserEvent, &info);
     }
 
   return result;
@@ -798,7 +798,7 @@ int vtkClientServerInterpreter::Load(const char* moduleName,
     {
     struct stat data;
     vtkstd::string fullPath = *p;
-    fullPath += moduleName;
+    fullPath += libName;
     if(stat(fullPath.c_str(), &data) == 0)
       {
       return this->LoadInternal(moduleName, fullPath.c_str());
