@@ -226,6 +226,14 @@ SOURCE=.\vtkKWOptionMenuTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWProgressGauge.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWProgressGaugeTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWPushButton.cxx
 # End Source File
 # Begin Source File
@@ -777,6 +785,35 @@ InputName=vtkKWOptionMenu
 # Begin Custom Build
 InputPath=.\vtkKWOptionMenu.h
 InputName=vtkKWOptionMenu
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWProgressGauge.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWProgressGauge.h
+InputName=vtkKWProgressGauge
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWProgressGauge.h
+InputName=vtkKWProgressGauge
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

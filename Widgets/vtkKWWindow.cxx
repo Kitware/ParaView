@@ -2263,6 +2263,14 @@ vtkKWWindow::vtkKWWindow()
   this->StatusImage->SetParent(this->StatusFrame);
   this->StatusImageName = NULL;
   
+  this->ProgressFrame = vtkKWWidget::New();
+  this->ProgressFrame->SetParent(this->StatusFrame);
+  this->ProgressGauge = vtkKWProgressGauge::New();
+  this->ProgressGauge->SetParent(this->ProgressFrame);
+
+
+  
+  
   this->CommandFunction = vtkKWWindowCommand;
 
   this->MenuEdit = NULL;
@@ -2285,6 +2293,9 @@ vtkKWWindow::~vtkKWWindow()
   this->StatusFrame->Delete();
   this->StatusImage->Delete();
   this->StatusLabel->Delete();
+  this->ProgressFrame->Delete();
+  this->ProgressGauge->Delete();
+  
   if (this->MenuEdit)
     {
     this->MenuEdit->Delete();
@@ -2506,7 +2517,14 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
                this->StatusLabel->GetWidgetName());
   this->Script("pack %s -side bottom -fill x -pady 2",
     this->StatusFrame->GetWidgetName());
-
+  this->ProgressFrame->Create(app, "frame", "-relief sunken -borderwidth 2");
+  this->ProgressGauge->SetLength(200);
+  this->ProgressGauge->SetHeight(30);
+  this->ProgressGauge->Create(app, "");
+  this->Script("pack %s -side right -padx 2 -fill y", 
+	       this->ProgressFrame->GetWidgetName());
+  this->Script("pack %s -side right -padx 2 -pady 2",
+               this->ProgressGauge->GetWidgetName());
   // To force the toolbar on top, I am create a separate "MiddleFrame" for the ViewFrame and PropertiesParent
   this->MiddleFrame->Create(app, "frame", "");
   this->Script("pack %s -side bottom -fill both -expand t",

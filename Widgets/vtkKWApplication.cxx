@@ -131,6 +131,7 @@ void vtkKWApplication::Script(char *format, ...)
 }
 void vtkKWApplication::SimpleScript(char *event)
 {
+//#define VTK_DEBUG_SCRIPT
 #ifdef VTK_DEBUG_SCRIPT
     vtkOutputWindow::GetInstance()->DisplayText(event);
     vtkOutputWindow::GetInstance()->DisplayText("\n");
