@@ -111,6 +111,8 @@ class vtkPVSourceCollection;
 class vtkPVTimerLogDisplay;
 class vtkPVXMLPackageParser;
 class vtkPolyDataMapper;
+class vtkCollection;
+class vtkPVColorMap;
 
 //BTX
 template <class key, class data> 
@@ -379,6 +381,11 @@ public:
   // Popup the vtk error message
   virtual void ErrorMessage(const char* message);
 
+  // Description:
+  // This method returns a color map for a specific global parameter
+  // (e.g. Temperature).
+  vtkPVColorMap* GetPVColorMap(const char* parameterName);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -495,6 +502,8 @@ protected:
 
   friend class vtkPVXMLPackageParser;
 //ETX
+
+  vtkCollection *PVColorMaps;
 
   // This can be used to disable the pop-up dialogs if necessary
   // (usually used from inside regression scripts)

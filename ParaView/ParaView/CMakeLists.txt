@@ -22,6 +22,7 @@ vtkPVArrayCalculator
 vtkPVArrayMenu 
 vtkPVArraySelection
 vtkPVBoundsDisplay
+vtkPVColorMap
 vtkPVComponentSelection
 vtkPVConnectivityFilter
 vtkPVContainerWidget

@@ -515,17 +515,9 @@ void vtkPVSource::Select()
 //----------------------------------------------------------------------------
 void vtkPVSource::Deselect(int doPackForget)
 {
-  vtkPVData *data;
-
   if (doPackForget)
     {
     this->Script("pack forget %s", this->Notebook->GetWidgetName());
-    }
-
-  data = this->GetPVOutput();
-  if (data)
-    {
-    data->SetScalarBarVisibility(0);
     }
 }
 

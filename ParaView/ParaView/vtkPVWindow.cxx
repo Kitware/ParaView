@@ -92,6 +92,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderWindow.h"
+#include "vtkCollection.h"
+#include "vtkPVColorMap.h"
 #include "vtkString.h"
 #include "vtkToolkits.h"
 
@@ -273,6 +275,8 @@ vtkPVWindow::vtkPVWindow()
   this->InitializeDefaultInterfaces = 1;
 
   this->MainView = 0;
+
+  this->PVColorMaps = vtkCollection::New();
 }
 
 //----------------------------------------------------------------------------
@@ -337,6 +341,9 @@ vtkPVWindow::~vtkPVWindow()
   this->Prototypes->Delete();
   this->ReaderList->Delete();
   this->Writers->Delete();
+
+  this->PVColorMaps->Delete();
+  this->PVColorMaps = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -2980,6 +2987,38 @@ void vtkPVWindow::ErrorMessage(const char* message)
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
 }
+
+
+//----------------------------------------------------------------------------
+vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
+{
+  vtkPVColorMap *cm;
+
+  if (parameterName == NULL || parameterName[0] == '\0')
+    {
+    vtkErrorMacro("Requesting color map for NULL parameter.");
+    return NULL;
+    }
+
+  this->PVColorMaps->InitTraversal();
+  while ( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
+    {
+    if (strcmp(parameterName, cm->GetName()) == 0)
+      {
+      return cm;
+      }
+    }
+
+  cm = vtkPVColorMap::New();
+  cm->SetPVApplication(this->GetPVApplication());
+  cm->SetPVRenderView(this->GetMainView());
+  cm->SetName(parameterName);
+  this->PVColorMaps->AddItem(cm);
+  cm->Delete();
+
+  return cm;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)

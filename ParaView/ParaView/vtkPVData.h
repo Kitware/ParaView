@@ -70,11 +70,11 @@ class vtkPVRenderView;
 class vtkPVSource;
 class vtkProp;
 class vtkProperty;
-class vtkScalarBarActor;
 class vtkPolyDataMapper;
 class vtkPVSource;
 class vtkKWView;
 class vtkKWWidget;
+class vtkPVColorMap;
 
 class VTK_EXPORT vtkPVData : public vtkKWObject
 {
@@ -250,10 +250,6 @@ public:
   // Description:
   // Needed to render.
   vtkPVRenderView *GetPVRenderView();
-
-  // Description:
-  // Get the name of the scalar bar actor.
-  vtkGetStringMacro(ScalarBarTclName);
   
   // Description:
   // Get the name of the cube axes actor.
@@ -312,6 +308,11 @@ public:
   // Returns true if CreateProperties() has been called.
   vtkGetMacro(PropertiesCreated, int);
 
+  // Description:
+  // This method returns the range of an arrays component.
+  // It gathers range from partitions on all processes.
+  void GetArrayComponentRange(float *range, int pointDataFlag,
+                              const char *arrayName, int component);
 
 protected:
   vtkPVData();
@@ -327,6 +328,9 @@ protected:
   vtkPVSource **PVConsumers;
   int NumberOfPVConsumers;
 
+  // If we are the last source to unregister a color map,
+  // this method will turn its scalar bar visibility off.
+  void SetPVColorMap(vtkPVColorMap *colorMap);
 
   //==================================================================
   // Internal versions that do not add to the trace.
@@ -415,8 +419,6 @@ protected:
   vtkKWWidget *ScalarBarCheckFrame;
   vtkKWCheckButton *ScalarBarCheck;
   vtkKWCheckButton *ScalarBarOrientationCheck;
-  char* ScalarBarTclName;
-  vtkSetStringMacro(ScalarBarTclName);
   
   // Stuff for setting the range of the color map.
   vtkKWWidget *ColorRangeFrame;
@@ -436,6 +438,8 @@ protected:
   int PreviousWasSolid;
 
   vtkPolyDataMapper *Mapper;
+
+  vtkPVColorMap *PVColorMap;
 
   vtkPVData(const vtkPVData&); // Not implemented
   void operator=(const vtkPVData&); // Not implemented

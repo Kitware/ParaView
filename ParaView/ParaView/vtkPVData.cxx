@@ -69,6 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkTreeComposite.h"
+#include "vtkPVColorMap.h"
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -109,7 +110,6 @@ vtkPVData::vtkPVData()
   this->GeometryTclName = NULL;
   this->CollectTclName = NULL;
   this->LODCollectTclName = NULL;
-  this->ScalarBarTclName = NULL;
   this->CubeAxesTclName = NULL;
 
   // Create a unique id for creating tcl names.
@@ -173,11 +173,15 @@ vtkPVData::vtkPVData()
   this->PreviousSpecular = 0;
   this->PreviousDiffuse = 1;
   this->PreviousWasSolid = 1;
+
+  this->PVColorMap = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVData::~vtkPVData()
 {
+  this->SetPVColorMap(NULL);
+
   // Get rid of the circular reference created by the extent translator.
   if (this->VTKDataTclName)
     {
@@ -268,15 +272,6 @@ vtkPVData::~vtkPVData()
   this->DisplayScalesFrame->Delete();
   this->DisplayScalesFrame = NULL;
 
-  if (this->ScalarBarTclName)
-    {
-    if ( pvApp )
-      {
-      pvApp->Script("%s Delete", this->ScalarBarTclName);
-      }
-    this->SetScalarBarTclName(NULL);
-    }
-  
   if (this->CubeAxesTclName)
     {
     if ( pvApp )
@@ -378,6 +373,34 @@ vtkPVData::~vtkPVData()
   this->Properties = NULL;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVData::SetPVColorMap(vtkPVColorMap *colorMap)
+{
+  if (this->PVColorMap == colorMap)
+    {
+    return;
+    }
+
+  if (this->PVColorMap)
+    {
+    // If no one is using the color map any more, 
+    // turn the scalar bar visibility off.
+    // Only the Window will hold a reference.
+    if (this->PVColorMap->GetReferenceCount() <= 2 )
+      {
+      this->PVColorMap->SetScalarBarVisibility(0);
+      }
+    this->PVColorMap->UnRegister(this);
+    this->PVColorMap = NULL;
+    }
+
+  this->PVColorMap = colorMap;
+  if (this->PVColorMap)
+    {
+    this->PVColorMap->Register(this);
+    }
+  this->UpdateProperties();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
@@ -422,7 +445,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
 
-
+  pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
   if (this->CollectTclName)
     {
@@ -435,20 +458,6 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 			   this->GeometryTclName);
     }
   
-  sprintf(tclName, "ScalarBar%d", this->InstanceCount);
-  this->SetScalarBarTclName(tclName);
-  this->Script("vtkScalarBarActor %s", this->GetScalarBarTclName());
-  this->Script("[%s GetPositionCoordinate] SetCoordinateSystemToNormalizedViewport",
-               this->GetScalarBarTclName());
-  this->Script("[%s GetPositionCoordinate] SetValue 0.87 0.25",
-               this->GetScalarBarTclName());
-  this->Script("%s SetOrientationToVertical",
-               this->GetScalarBarTclName());
-  this->Script("%s SetWidth 0.13", this->GetScalarBarTclName());
-  this->Script("%s SetHeight 0.5", this->GetScalarBarTclName());
-  
-  this->Script("%s SetLookupTable [%s GetLookupTable]",
-               this->GetScalarBarTclName(), this->MapperTclName);
   
   sprintf(tclName, "LODDeci%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkQuadricClustering %s", tclName);
@@ -485,11 +494,8 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
 
+  pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
-  this->Script("%s SetLookupTable [%s GetLookupTable]",
-               this->GetScalarBarTclName(), this->MapperTclName);
-  pvApp->BroadcastScript("%s SetLookupTable [%s GetLookupTable]", 
-                         this->LODMapperTclName, this->MapperTclName);
  
   // Make a new tcl object.
   sprintf(tclName, "Actor%d", this->InstanceCount);
@@ -1160,7 +1166,22 @@ void vtkPVData::UpdateProperties()
   char *currentColorBy;
   int currentColorByFound = 0;
   vtkPVWindow *window;
-  
+
+  if (this->PVColorMap)
+    {
+    float *range = this->PVColorMap->GetScalarRange();
+    this->ColorRangeMinEntry->SetValue(range[0], 5);
+    this->ColorRangeMaxEntry->SetValue(range[1], 5);
+    if (this->PVColorMap->GetScalarBarVisibility())
+      {
+      this->ScalarBarCheck->SetState(1);
+      }
+    else
+      {
+      this->ScalarBarCheck->SetState(0);
+      }
+    }
+
   if (this->UpdateTime > this->GetVTKData()->GetMTime())
     {
     return;
@@ -1385,19 +1406,12 @@ void vtkPVData::SetColorRange(float min, float max)
 //----------------------------------------------------------------------------
 void vtkPVData::SetColorRangeInternal(float min, float max)
 {
-  this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
-					    this->MapperTclName,
-					    min, max);
-  this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
-					    this->LODMapperTclName,
-					    min, max);
+  if (this->PVColorMap == NULL)
+    {
+    vtkErrorMacro("Color map is missing.");
+    }
 
-  // This is here in case process 0 has not geometry.  
-  // We have to explicitly build the color map.
-  this->Script("[%s GetLookupTable] SetTableRange %f %f", 
-               this->ScalarBarTclName, min, max);
-  this->Script("[%s GetLookupTable] Build", this->ScalarBarTclName);
-  this->Script("[%s GetLookupTable] Modified", this->ScalarBarTclName);
+  this->PVColorMap->SetScalarRange(min, max);
 
   this->ColorRangeMinEntry->SetValue(min, 5);
   this->ColorRangeMaxEntry->SetValue(max, 5);
@@ -1406,16 +1420,13 @@ void vtkPVData::SetColorRangeInternal(float min, float max)
 //----------------------------------------------------------------------------
 void vtkPVData::ResetColorRange()
 {
-  float range[2];
-  this->GetColorRange(range);
-  
-  // Avoid the bad range error
-  if (range[1] < range[0])
+  if (this->PVColorMap == NULL)
     {
-    range[1] = range[0];
+    vtkErrorMacro("Color map is missing.");
     }
 
-  this->SetColorRangeInternal(range[0], range[1]);
+  this->PVColorMap->ResetScalarRange();
+  this->UpdateProperties();
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -1438,39 +1449,6 @@ void vtkPVData::ColorRangeEntryCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::GetColorRange(float range[2])
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  float tmp[2];
-  int id, num;
-
-  pvApp->BroadcastScript("Application SendMapperColorRange %s", 
-                         this->MapperTclName);
-  pvApp->GetMapperColorRange(range, this->Mapper);
-    
-  num = controller->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    controller->Receive(tmp, 2, id, 1969);
-    if (tmp[0] < range[0])
-      {
-      range[0] = tmp[0];
-      }
-    if (tmp[1] > range[1])
-      {
-      range[1] = tmp[1];
-      }
-    }
-  
-  if (range[0] > range[1])
-    {
-    range[0] = 0.0;
-    range[1] = 1.0;
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVData::ColorByProperty()
 {
   this->AddTraceEntry("$kw(%s) ColorByProperty", this->GetTclName());
@@ -1489,8 +1467,7 @@ void vtkPVData::ColorByPropertyInternal()
   pvApp->BroadcastScript("%s SetColor %f %f %f", 
 			 this->PropertyTclName, color[0], color[1], color[2]);
   
-  // No scalars visible.  Turn off scalar bar.
-  this->SetScalarBarVisibility(0);
+  this->SetPVColorMap(NULL);
 
   this->Script("pack forget %s", this->ScalarBarFrame->GetWidgetName());
   this->Script("pack %s -side left",
@@ -1513,28 +1490,49 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
                                                              int comp)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  // I would like to make this an argument, but not right now.
+  int numComps;
+  vtkDataArray *a = this->VTKData->GetPointData()->GetArray(name);
+  if (a == NULL)
+    {
+    vtkErrorMacro("Could not find array.");
+    return;
+    }
+  numComps = a->GetNumberOfComponents();
 
+
+  this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name));
+  if (this->PVColorMap == NULL)
+    {
+    vtkErrorMacro("Could not get the color map.");
+    return;
+    }
+
+  pvApp->BroadcastScript("%s SetLookupTable %s", this->MapperTclName,
+                         this->PVColorMap->GetLookupTableTclName());
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
                          this->MapperTclName);
-  pvApp->BroadcastScript("%s ColorByArrayComponent {%s} %d",
-                         this->MapperTclName, name, comp);
+  pvApp->BroadcastScript("%s SelectColorArray {%s}",
+                         this->MapperTclName, name);
+  this->PVColorMap->SetVectorComponent(comp, numComps);
 
+  pvApp->BroadcastScript("%s SetLookupTable %s", this->LODMapperTclName,
+                         this->PVColorMap->GetLookupTableTclName());
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
                          this->LODMapperTclName);
-  pvApp->BroadcastScript("%s ColorByArrayComponent {%s} %d",
-                         this->LODMapperTclName, name, comp);
-
-  this->Script("%s SetTitle {%s}", this->GetScalarBarTclName(), name);
+  pvApp->BroadcastScript("%s SelectColorArray {%s}",
+                         this->LODMapperTclName, name);
   
-  this->ResetColorRange();
-
   this->Script("pack forget %s",
                this->ColorButton->GetWidgetName());
   this->Script("pack %s -after %s -fill x", this->ScalarBarFrame->GetWidgetName(),
                this->ColorFrame->GetWidgetName());
 
+  // Synchronize the UI with the new color map.
+  this->UpdateProperties();
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -1552,22 +1550,37 @@ void vtkPVData::ColorByCellFieldComponentInternal(const char *name,
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+  // I would like to make this an argument, but not right now.
+  int numComps;
+  vtkDataArray *a = this->VTKData->GetPointData()->GetArray(name);
+  if (a == NULL)
+    {
+    //vtkErrorMacro("Could not find array.");
+    return;
+    }
+  numComps = a->GetNumberOfComponents();
+
+
+  this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name));
+  if (this->PVColorMap == NULL)
+    {
+    vtkErrorMacro("Could not get the color map.");
+    return;
+    }
+
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
                          this->MapperTclName);
-  pvApp->BroadcastScript("%s ColorByArrayComponent {%s} %d",
-                         this->MapperTclName, name, comp);
+  pvApp->BroadcastScript("%s SelectColorArray {%s}",
+                         this->MapperTclName, name);
+  this->PVColorMap->SetVectorComponent(comp, numComps);
 
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
                          this->LODMapperTclName);
-  pvApp->BroadcastScript("%s ColorByArrayComponent {%s} %d",
-                         this->LODMapperTclName, name, comp);
-
-  this->Script("%s SetTitle {%s}", this->GetScalarBarTclName(), name);
+  pvApp->BroadcastScript("%s SelectColorArray {%s}",
+                         this->LODMapperTclName, name);
   
-  this->ResetColorRange();
-
   this->Script("pack forget %s",
                this->ColorButton->GetWidgetName());
   this->Script("pack %s -after %s -fill x", this->ScalarBarFrame->GetWidgetName(),
@@ -1829,8 +1842,10 @@ void vtkPVData::Initialize()
     char *arrayName = (char*)array->GetName();
     char tmp[350];
     sprintf(tmp, "Point %s", arrayName);
-    this->ColorByPointFieldComponentInternal(arrayName, 0);
+    // Order is important here because Internal method check for consistent
+    // menu value and arrays.
     this->ColorMenu->SetValue(tmp);
+    this->ColorByPointFieldComponentInternal(arrayName, 0);
     }
   else if ((array =
             this->Mapper->GetInput()->GetCellData()->GetScalars()) &&
@@ -1839,8 +1854,10 @@ void vtkPVData::Initialize()
     char *arrayName = (char*)array->GetName();
     char tmp[350];
     sprintf(tmp, "Cell %s", arrayName);
-    this->ColorByCellFieldComponentInternal(arrayName, 0);
+    // Order is important here because Internal method check for consistent
+    // menu value and arrays.
     this->ColorMenu->SetValue(tmp);
+    this->ColorByCellFieldComponentInternal(arrayName, 0);
     }
   else
     {
@@ -1994,20 +2011,9 @@ void vtkPVData::SetMode(int mode)
 //----------------------------------------------------------------------------
 void vtkPVData::SetScalarBarVisibility(int val)
 {
-  vtkRenderer *ren;
-  char *tclName;
-  
-  if (!this->GetView())
+  if (this->PVColorMap)
     {
-    return;
-    }
-  
-  ren = this->GetView()->GetRenderer();
-  tclName = this->GetPVRenderView()->GetRendererTclName();
-  
-  if (ren == NULL)
-    {
-    return;
+    this->PVColorMap->SetScalarBarVisibility(val);
     }
   
   if (this->ScalarBarCheck->GetState() != val)
@@ -2017,24 +2023,6 @@ void vtkPVData::SetScalarBarVisibility(int val)
     this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(), val);
     }
 
-  // I am going to add and remove it from the renderer instead of using visibility.
-  // Composites should really have multiple props.
-  
-  if (ren)
-    {
-    if (val)
-      {
-      this->Script("%s AddActor %s", tclName, this->GetScalarBarTclName());
-      // This is here in case process 0 has not geometry.  
-      // We have to explicitly build the color map.
-      this->Script("[%s GetLookupTable] Build", this->ScalarBarTclName);
-      this->Script("[%s GetLookupTable] Modified", this->ScalarBarTclName);
-      }
-    else
-      {
-      this->Script("%s RemoveActor %s", tclName, this->GetScalarBarTclName());
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -2096,45 +2084,6 @@ void vtkPVData::CubeAxesCheckCallback()
   this->GetPVRenderView()->EventuallyRender();  
 }
 
-//----------------------------------------------------------------------------
-void vtkPVData::ScalarBarOrientationCallback()
-{
-  int state = this->ScalarBarOrientationCheck->GetState();
-  
-  if (state)
-    {
-    this->Script("[%s GetPositionCoordinate] SetValue 0.87 0.25",
-                 this->GetScalarBarTclName());
-    this->Script("%s SetOrientationToVertical", this->GetScalarBarTclName());
-    this->Script("%s SetHeight 0.5", this->GetScalarBarTclName());
-    this->Script("%s SetWidth 0.13", this->GetScalarBarTclName());
-    this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToVertical", this->GetTclName());
-    }
-  else
-    {
-    this->Script("[%s GetPositionCoordinate] SetValue 0.25 0.13",
-                 this->GetScalarBarTclName());
-    this->Script("%s SetOrientationToHorizontal", this->GetScalarBarTclName());
-    this->Script("%s SetHeight 0.13", this->GetScalarBarTclName());
-    this->Script("%s SetWidth 0.5", this->GetScalarBarTclName());
-    this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToHorizontal", this->GetTclName());
-    }
-  this->GetPVRenderView()->EventuallyRender();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::SetScalarBarOrientationToVertical()
-{
-  this->ScalarBarOrientationCheck->SetState(1);
-  this->ScalarBarOrientationCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::SetScalarBarOrientationToHorizontal()
-{
-  this->ScalarBarOrientationCheck->SetState(0);
-  this->ScalarBarOrientationCallback();
-}
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetPointSize(int size)
@@ -2211,7 +2160,7 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 //----------------------------------------------------------------------------
 void vtkPVData::SaveInTclScript(ofstream *file)
 {
-  float range[2], position[2];
+  float range[2];
   const char* scalarMode;
   char* result;
   char* renTclName;
@@ -2263,7 +2212,7 @@ void vtkPVData::SaveInTclScript(ofstream *file)
 
     *file << renTclName << " AddActor " << this->PropTclName << "\n";
     }  
-  
+  /*
   if (this->ScalarBarCheck->GetState())
     {
     *file << "vtkScalarBarActor " << this->ScalarBarTclName << "\n\t"
@@ -2307,6 +2256,7 @@ void vtkPVData::SaveInTclScript(ofstream *file)
     *file << result << "}\n";
     *file << renTclName << " AddProp " << this->ScalarBarTclName << "\n";
     }
+  */
 
   if (this->CubeAxesCheck->GetState())
     {
@@ -2339,8 +2289,137 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PVSource: " << this->GetPVSource() << endl;
   os << indent << "PropTclName: " << (this->PropTclName?this->PropTclName:"none") << endl;
   os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
-  os << indent << "ScalarBarTclName: " << (this->ScalarBarTclName?this->ScalarBarTclName:"none") << endl;
+  if (this->PVColorMap)
+    {
+    os << indent << "PVColorMap: " << this->PVColorMap->GetName() << endl;
+    }
+  else
+    {
+    os << indent << "PVColorMap: NULL\n";
+    }
+
   os << indent << "VTKData: " << this->GetVTKData() << endl;
   os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
   os << indent << "View: " << this->GetView() << endl;
 }
+
+
+
+
+//-------}---------------------------------------------------------------------
+void vtkPVData::GetColorRange(float *range)
+{
+  float *tmp;
+  range[0] = 0.0;
+  range[1] = 1.0;
+  
+  if (this->PVColorMap == NULL)
+    {
+    vtkErrorMacro("Color map missing.");
+    return;
+    }
+  tmp = this->PVColorMap->GetScalarRange();
+  range[0] = tmp[0];
+  range[1] = tmp[1];
+}
+
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVData::ScalarBarOrientationCallback()
+{
+  int state = this->ScalarBarOrientationCheck->GetState();
+  
+  if (this->PVColorMap == NULL)
+    {
+    vtkErrorMacro("Color map missing.");
+    return;
+    }
+
+  if (state)
+    {
+    this->PVColorMap->SetScalarBarOrientationToVertical();
+    this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToVertical", this->GetTclName());
+    }
+  else
+    {
+    this->PVColorMap->SetScalarBarOrientationToHorizontal();
+    this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToHorizontal", this->GetTclName());
+    }
+  this->GetPVRenderView()->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetScalarBarOrientationToVertical()
+{
+  this->ScalarBarOrientationCheck->SetState(1);
+  this->ScalarBarOrientationCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetScalarBarOrientationToHorizontal()
+{
+  this->ScalarBarOrientationCheck->SetState(0);
+  this->ScalarBarOrientationCallback();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVData::GetArrayComponentRange(float *range, int pointDataFlag,
+                                       const char *arrayName, int component)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  int id, num;
+  vtkDataArray *array;
+  float temp[2];
+
+  range[0] = VTK_LARGE_FLOAT;
+  range[1] = -VTK_LARGE_FLOAT;
+
+  if (pointDataFlag)
+    {
+    array = this->VTKData->GetPointData()->GetArray(arrayName);
+    }
+  else
+    {
+    array = this->VTKData->GetCellData()->GetArray(arrayName);
+    }
+
+  if (array == NULL || array->GetName() == NULL)
+    {
+    return;
+    }
+
+  pvApp->BroadcastScript("Application SendDataArrayRange %s %d {%s} %d",
+                         this->GetVTKDataTclName(),
+                         pointDataFlag, array->GetName(), component);
+  
+  array->GetRange(range, 0);  
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; id++)
+    {
+    controller->Receive(temp, 2, id, 1976);
+    // try to protect against invalid ranges.
+    if (range[0] > range[1])
+      {
+      range[0] = temp[0];
+      range[1] = temp[1];
+      }
+    else if (temp[0] < temp[1])
+      {
+      if (temp[0] < range[0])
+        {
+        range[0] = temp[0];
+        }
+      if (temp[1] > range[1])
+        {
+        range[1] = temp[1];
+        }
+      }
+    }
+}
+
+
+

@@ -720,18 +720,42 @@ void vtkPVApplication::SendMapperColorRange(vtkPolyDataMapper *mapper)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SendDataArrayRange(vtkDataSet *data, char *arrayName)
+void vtkPVApplication::SendDataArrayRange(vtkDataSet *data, 
+                                          int pointDataFlag, 
+                                          char *arrayName,
+                                          int component)
 {
   float range[2];
-  
+  vtkDataArray *array;
+
   if (this->Controller->GetLocalProcessId() == 0)
     {
     return;
     }
   
-  data->GetPointData()->GetArray(arrayName)->GetRange(range, 0);
+  if (pointDataFlag)
+    {
+    array = data->GetPointData()->GetArray(arrayName);
+    }
+  else
+    {
+    array = data->GetCellData()->GetArray(arrayName);
+    }
+
+  if (array && component >= 0 && component < array->GetNumberOfComponents())
+    {
+    array->GetRange(range, component);
+    }
+  else
+    {
+    range[0] = VTK_LARGE_FLOAT;
+    range[1] = -VTK_LARGE_FLOAT;
+    }
+
   this->Controller->Send(range, 2, 0, 1976);
 }
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::CreateButtonPhotos()
