@@ -336,11 +336,11 @@ public:
   vtkBooleanMacro(HideParametersPage, int);
 
   // Description:
-  // If this is on, no Informations page (from vtkPVData) is displayed
+  // If this is on, no Information page (from vtkPVData) is displayed
   // for this source. Used by sources like Glyphs.
-  vtkSetMacro(HideInformationsPage, int);
-  vtkGetMacro(HideInformationsPage, int);
-  vtkBooleanMacro(HideInformationsPage, int);
+  vtkSetMacro(HideInformationPage, int);
+  vtkGetMacro(HideInformationPage, int);
+  vtkBooleanMacro(HideInformationPage, int);
 
   // Description:
   // Raise the current source page.
@@ -401,9 +401,9 @@ protected:
   // for this source.
   int HideParametersPage;
 
-  // If this is on, no Informations page (from vtkPVData) is displayed
+  // If this is on, no Information page (from vtkPVData) is displayed
   // for this source. Used by sources like Glyphs
-  int HideInformationsPage;
+  int HideInformationPage;
 
   vtkSource *VTKSource;
   char *VTKSourceTclName;

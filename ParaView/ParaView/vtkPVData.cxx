@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.158");
+vtkCxxRevisionMacro(vtkPVData, "1.159");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -123,7 +123,7 @@ vtkPVData::vtkPVData()
   this->InstanceCount = instanceCount;
     
   this->Properties = vtkKWFrame::New();
-  this->InformationsFrame = vtkKWFrame::New();
+  this->InformationFrame = vtkKWFrame::New();
 
   this->ScalarBarFrame = vtkKWLabeledFrame::New();
   this->ColorFrame = vtkKWLabeledFrame::New();
@@ -420,8 +420,8 @@ vtkPVData::~vtkPVData()
   this->Properties->Delete();
   this->Properties = NULL;
 
-  this->InformationsFrame->Delete();
-  this->InformationsFrame = NULL;
+  this->InformationFrame->Delete();
+  this->InformationFrame = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -1330,24 +1330,24 @@ void vtkPVData::CreateProperties()
                  this->Properties->GetWidgetName());
     }
 
-  // Informations page
+  // Information page
 
-  if (this->GetPVSource()->GetHideInformationsPage())
+  if (this->GetPVSource()->GetHideInformationPage())
     {
     // We use the parameters frame as a bogus parent.
     // This is not a problem since we never pack the
     // properties frame in this case.
-    this->InformationsFrame->SetParent(
+    this->InformationFrame->SetParent(
       this->GetPVSource()->GetParametersParent());
     }
   else
     {
-    this->InformationsFrame->SetParent(
-      this->GetPVSource()->GetNotebook()->GetFrame("Informations"));
+    this->InformationFrame->SetParent(
+      this->GetPVSource()->GetNotebook()->GetFrame("Information"));
     }
-  this->InformationsFrame->Create(this->Application, 1);
+  this->InformationFrame->Create(this->Application, 1);
 
-  this->StatsFrame->SetParent(this->InformationsFrame->GetFrame());
+  this->StatsFrame->SetParent(this->InformationFrame->GetFrame());
   this->StatsFrame->ShowHideFrameOn();
   this->StatsFrame->Create(this->Application);
   this->StatsFrame->SetLabel("Statistics");
@@ -1358,7 +1358,7 @@ void vtkPVData::CreateProperties()
   this->NumPointsLabel->SetParent(this->StatsFrame->GetFrame());
   this->NumPointsLabel->Create(this->Application, "");
   
-  this->BoundsDisplay->SetParent(this->InformationsFrame->GetFrame());
+  this->BoundsDisplay->SetParent(this->InformationFrame->GetFrame());
   this->BoundsDisplay->Create(this->Application);
   
   this->Script("pack %s -fill x", this->StatsFrame->GetWidgetName());
@@ -1370,10 +1370,10 @@ void vtkPVData::CreateProperties()
   this->Script("pack %s -fill x -expand t", 
                this->BoundsDisplay->GetWidgetName());
 
-  if (!this->GetPVSource()->GetHideInformationsPage())
+  if (!this->GetPVSource()->GetHideInformationPage())
     {
     this->Script("pack %s -fill both -expand yes -side top",
-                 this->InformationsFrame->GetWidgetName());
+                 this->InformationFrame->GetWidgetName());
     }
 
   // OK, all done
@@ -2786,7 +2786,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.158 $");
+  this->ExtractRevision(os,"$Revision: 1.159 $");
 }
 
 //----------------------------------------------------------------------------
