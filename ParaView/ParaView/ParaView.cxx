@@ -142,6 +142,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   vtkPVArgs pvArgs;
 
   unsigned int i;
+  int j;
   // parse a few of the command line arguments
   // a space delimites an argument except when it is inside a quote
 
@@ -181,9 +182,9 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   argv[0] = (char*)malloc(1024);
   ::GetModuleFileName(0, argv[0],1024);
 
-  for(i=1; i<argc; i++)
+  for(j=1; j<argc; j++)
     {
-      argv[i] = (char*)malloc(strlen(lpCmdLine)+10);
+    argv[j] = (char*)malloc(strlen(lpCmdLine)+10);
     }
   argv[argc] = 0;
 
@@ -244,9 +245,9 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   controller->Finalize();
   controller->Delete();
   
-  for(i=0; i<argc; i++)
+  for(j=0; j<argc; j++)
     {
-      free(argv[i]);
+    free(argv[j]);
     }
   free(argv);
 

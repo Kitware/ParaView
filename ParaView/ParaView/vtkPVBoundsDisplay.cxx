@@ -92,7 +92,7 @@ void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
     }
   this->SetApplication(app);
 
-  this->Script("frame %s  -bd 2 ", this->GetWidgetName());
+  this->Script("frame %s", this->GetWidgetName());
   this->Widget->SetParent(this);
   this->Widget->Create(app);
   this->Script("pack %s -side top -expand t -fill x", 

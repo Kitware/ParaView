@@ -1629,7 +1629,7 @@ vtkPVWidget* vtkPVSource::GetPVWidget(const char *name)
   while ( (o = this->Widgets->GetNextItemAsObject()) )
     {
     pvw = vtkPVWidget::SafeDownCast(o);
-    if (pvw && strcmp(pvw->GetTraceName(), name) == 0)
+    if (pvw && pvw->GetTraceName() && strcmp(pvw->GetTraceName(), name) == 0)
       {
       return pvw;
       }

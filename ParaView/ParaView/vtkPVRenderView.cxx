@@ -182,6 +182,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 
   this->Composite = 0;
 #ifdef VTK_USE_MPI
+  char *str;
   // Create the compositer.
   str = getenv("PV_DISABLE_COMPOSITE_INTERRUPTS");
   if ( str != NULL)
