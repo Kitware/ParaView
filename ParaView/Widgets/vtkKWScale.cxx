@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.69");
+vtkCxxRevisionMacro(vtkKWScale, "1.70");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -72,7 +72,7 @@ vtkKWScale::vtkKWScale()
   this->EntryCommand = NULL;
 
   this->DisableCommands = 0;
-  this->DisableScaleValueCallback = 0;
+  this->DisableScaleValueCallback = 1;
 
   this->SmartResize = 0;
 
