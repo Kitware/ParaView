@@ -1661,7 +1661,6 @@ void vtkPVSource::SerializeSelf(ostream& os, vtkIndent indent)
 //------------------------------------------------------------------------------
 void vtkPVSource::SerializeToken(istream& is, const char token[1024])
 {
-  int cc;
   if ( vtkString::Equals(token, "HideDisplayPage") )
     {
     int cor = 0;
@@ -1795,7 +1794,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.220 $");
+  this->ExtractRevision(os,"$Revision: 1.221 $");
 }
 
 //----------------------------------------------------------------------------
