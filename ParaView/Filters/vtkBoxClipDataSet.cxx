@@ -34,7 +34,7 @@
 #include <math.h>
 #include <stdio.h>
 
-vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.9");
+vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.10");
 vtkStandardNewMacro(vtkBoxClipDataSet);
 
 //----------------------------------------------------------------------------
@@ -873,20 +873,26 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
       break;
 
     case VTK_PIXEL: // 8
+      {
       static vtkIdType vtrip[2][3] = {{0,1,3},{0,3,2}};
       newCellId = newCellArray->InsertNextCell(3,vtrip[0]);
       newCellId = newCellArray->InsertNextCell(3,vtrip[1]);
+      }
       break;
 
     case VTK_QUAD: // 9
+      {
       static vtkIdType vtriq[2][3] = {{0,1,2},{0,2,3}};
       newCellId = newCellArray->InsertNextCell(3,vtriq[0]);
       newCellId = newCellArray->InsertNextCell(3,vtriq[1]);
+      }
       break;
 
     case VTK_TETRA: // 10
+      {
       static  vtkIdType tetra[4]={0,1,2,3};
       newCellId = newCellArray->InsertNextCell(ptstetra,tetra);
+      }
       break;  
 
     case VTK_VOXEL: // 11
@@ -1029,6 +1035,7 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
         break;
 
     case VTK_HEXAHEDRON: // 12
+      {
       // each face: search edge with smallest global index  
       // face 0 (0,1,5,4)
       idv[0]= 0;
@@ -1168,6 +1175,7 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
             break;
           }
         }
+      }
       break;      
     case VTK_WEDGE:
       if(npts == 6) //create 3 tetrahedra
@@ -1224,7 +1232,6 @@ void vtkBoxClipDataSet::CellGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *c
         fprintf(stdout," ERROR: this cell is not a wedge\n");
         }
       break;
-  
     case VTK_PYRAMID: //Create 2 tetrahedra
       if(npts== 5)
         {
