@@ -72,12 +72,16 @@ int vtkKWDialog::Invoke()
   // map the window
   this->Script("wm deiconify %s",this->GetWidgetName());
   this->Script("focus %s",this->GetWidgetName());
+  this->Script("grab %s",this->GetWidgetName());
+
   // do a grab
   // wait for the end
   while (!this->Done)
     {
     Tcl_DoOneEvent(0);    
     }
+  this->Script("grab release %s",this->GetWidgetName());
+
   return (this->Done-1);
 }
 
@@ -88,11 +92,14 @@ void vtkKWDialog::Display()
   // map the window
   this->Script("wm deiconify %s",this->GetWidgetName());
   this->Script("focus %s",this->GetWidgetName());
+  this->Script("grab %s",this->GetWidgetName());
 }
 
 void vtkKWDialog::Cancel()
 {
   this->Script("wm withdraw %s",this->GetWidgetName());
+  this->Script("grab release %s",this->GetWidgetName());
+
   this->Done = 1;  
   if (this->Command && strlen(this->Command) > 0)
     {
@@ -103,6 +110,7 @@ void vtkKWDialog::Cancel()
 void vtkKWDialog::OK()
 {
   this->Script("wm withdraw %s",this->GetWidgetName());
+  this->Script("grab release %s",this->GetWidgetName());
   this->Done = 2;  
   if (this->Command && strlen(this->Command) > 0)
     {
