@@ -373,39 +373,6 @@ The Elevation filter generates point scalar values for an input data set along a
 The line can be specified interactively using the 3D line widget. See section 7.4 for more information about this widget.
     </Documentation>
   </Module>
-<!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT-->
-  <Module name="CTHPartAMR"
-          menu_name="Extract AMR CTH Parts"
-          root_name="CTHPartAMR"
-          module_type="Filter"
-          long_help="Create a surface from a AMR CTH volume fraction."
-          short_help="Extract a part from a CTH dataset.">
-    <Filter class="vtkCTHExtractAMRPart">
-      <Input name="Input"
-             class="vtkCTHData">
-        <ArrayRequirement attribute="Cell" components="1"/>
-      </Input>
-    </Filter>
-    <InputMenu trace_name="Input" property="Input"
-               id="im" label="Input"
-               help="Set the input to this filter."
-               input_name="Input"/>
-    <SelectCTHArrays input_menu="im"
-                     trace_name="ArraySelection"
-                     help="Select the volume fraction arrays for generating parts."/>
-    <SelectWidget property="ClipPlane" label="Clip Plane"
-                  trace_name="Clipping">
-      <Item label="On" value="On">
-        <ImplicitPlaneWidget use_label="0" trace_name="Plane"
-                             input_menu="im"
-                             help="Adjusts the parameters of the plane to clip with."/>
-      </Item>
-      <Item label="Off" value="Off">
-        <DummyWidget trace_name="Dummy"/>
-      </Item>
-    </SelectWidget>
-  </Module>
-<!-- #endif -->
   <Module name="CTHPart"
           menu_name="Extract CTH Parts"
           root_name="CTHPart"
@@ -862,32 +829,6 @@ This filter computes the normals at the points in the data set. In the process o
 If this filter is run in parallel, the resulting data set will have seams along the processor boundaries unless the Piece invariant check box is marked.
     </Documentation>
   </Module>
-<!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
-  <Module name="CTHOutlineFilter"
-          menu_name="Outline (CTH AMR)"
-          root_name="CTHOutline"
-          module_type="Filter">
-    <Filter class="vtkCTHOutlineFilter">
-      <Input name="Input"
-             class="vtkCTHData"/>
-    </Filter>
-    <InputMenu trace_name="Input" label="Input" property="Input"
-               help="Set the input to this filter."
-               input_name="Input"/>
-  </Module>
-  <Module name="StructuredGridOutlineFilter"
-          menu_name="Outline (curvilinear)"
-          root_name="GOutline"
-            module_type="Filter">
-    <Filter class="vtkStructuredGridOutlineFilter">
-      <Input name="Input"
-             class="vtkStructuredGrid"/>
-    </Filter>
-    <InputMenu trace_name="Input" label="Input" property="Input"
-               help="Set the input to this filter."
-               input_name="Input"/>
-  </Module>
-<!-- #endif -->
   <Module name="OutlineFilter"
           menu_name="Outline"
           root_name="Outline"

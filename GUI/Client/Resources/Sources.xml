@@ -32,29 +32,6 @@ The output of the 2D Glyph source is polygonal data.
   </Documentation>
 </Module>
 
-<!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
-<Module name="CTHFractal" menu_name="CTHFractal" root_name="CTHFractal"
-        module_type="Source" 
-        long_help="Test source for CTH AMR" 
-        short_help="CTH AMR">
-  <Source class="vtkCTHFractal"/>
-<!-- should use widget that keeps values non-negative -->
-  <VectorEntry label="Dimension" trace_name="Dimension"
-               property="Dimensions" type="int"
-               help="XYZ cell dimensions of a block"/>
-  <VectorEntry label="FractalValue" trace_name="FractalValue"
-               property="FractalValue" type="float"
-               help="Map this value to 0.5 for use as a volume fraction."/>
-<!-- should use widget that keeps value non-negative -->
-  <VectorEntry label="MaximumLevel" trace_name="MaximumLevel"
-               property="MaximumLevel" type="int"
-               help="Determines how deep to refine the grid."/>
-  <LabeledToggle label="GhostLevels" trace_name="GhostLevels" 
-                 property="GhostLevels"
-                 help="Set whether to generate overlapping ghost levels." />
-</Module>
-<!-- #endif -->
-
 <Module name="VectorText" menu_name="3D Text" root_name="VectorText"
         module_type="Source" 
         long_help="3D geometric representation of a text string." 
