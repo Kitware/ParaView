@@ -48,7 +48,7 @@ public:
   int GetNumberOfOutputs();
   vtkDataSet *GetOutput(int idx);
   vtkDataSet *GetOutput() 
-    {return this->GetInput( 0 );}
+    {return this->GetOutput( 0 );}
   
   // Description:
   // By default copy the output update extent to the input
