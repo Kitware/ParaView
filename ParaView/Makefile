@@ -56,6 +56,7 @@ vtkPVSource \
 vtkPVSourceCollection \
 vtkPVSourceList \
 vtkPVWindow \
+vtkRunTimeContour \
 vtkSingleContourFilter 
 
 

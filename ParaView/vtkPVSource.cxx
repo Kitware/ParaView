@@ -1481,10 +1481,6 @@ void vtkPVSource::DeleteCallback()
     this->GetWindow()->GetMainView()->RemoveComposite(this);
     pvApp->Script("%s Delete", this->GetTclName());
     }
-  else
-    {
-    // disable the delete button
-    }
 }
 
 //----------------------------------------------------------------------------

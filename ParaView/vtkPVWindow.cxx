@@ -50,7 +50,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVActorComposite.h"
 #include "vtkPVAnimation.h"
 #include "vtkSuperquadricSource.h"
-
+#include "vtkRunTimeContour.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -143,6 +143,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CreateMenu->AddCommand("ImageReader", this, "CreateImageReader");
   this->CreateMenu->AddCommand("FractalVolume", this, "CreateFractalVolume");
   this->CreateMenu->AddCommand("STLReader", this, "CreateSTLReader");
+  this->CreateMenu->AddCommand("RunTimeContour", this, "CreateRunTimeContour");
   this->CreateMenu->AddCommand("Cone", this, "CreateCone");
   this->CreateMenu->AddCommand("Sphere", this, "CreateSphere");
   this->CreateMenu->AddCommand("Axes", this, "CreateAxes");
@@ -268,6 +269,38 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCone()
   pvs->AddLabeledEntry("Height:", "SetHeight", "GetHeight");
   pvs->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
   pvs->AddLabeledToggle("Capping:", "SetCapping", "GetCapping");
+  pvs->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
+  return vtkPVPolyDataSource::SafeDownCast(pvs);
+}
+
+//----------------------------------------------------------------------------
+vtkPVPolyDataSource *vtkPVWindow::CreateRunTimeContour()
+{
+  static int instanceCount = 0;
+  vtkPVSource *pvs;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  float range[2];
+  
+  // Create the pvSource. Clone the PVSource and the vtkSource.
+  // Link the PVSource to the vtkSource.
+  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkRunTimeContour",
+                            "RunTimeContour", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
+  
+  // Add the new Source to the View, and make it current.
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
+
+  ((vtkRunTimeContour*)pvs->GetVTKSource())->GetRange(range);
+  
+  // Add some source specific widgets.
+  // Normally these would be added in the create method.
+  pvs->AddScale("ContourValue", "SetContourValue", "GetContourValue", 
+		range[0], range[1], 0.1);
   pvs->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
@@ -532,7 +565,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSTLReader()
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
+  // Link the PVSource to the vtkSource.
   pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkSTLReader",
                             "STL", ++instanceCount);
   if (pvs == NULL) {return NULL;}
@@ -668,8 +701,7 @@ void vtkPVWindow::NewWindow()
 //----------------------------------------------------------------------------
 void vtkPVWindow::Save()
 {
-  //char *path;
-  //
+  // this is where we'll save out the camera parameters and this pipeline  
 }
 
 //----------------------------------------------------------------------------

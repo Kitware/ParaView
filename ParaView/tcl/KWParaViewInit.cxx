@@ -44,15 +44,9 @@ ClientData vtkPVApplicationNewCommand();
 int vtkPVAssignmentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVAssignmentNewCommand();
-int vtkPVColorByProcessCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVColorByProcessNewCommand();
 int vtkPVCommandListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVCommandListNewCommand();
-int vtkPVContourFilterCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVContourFilterNewCommand();
 int vtkPVCutterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVCutterNewCommand();
@@ -65,15 +59,9 @@ ClientData vtkPVDataSetToDataSetFilterNewCommand();
 int vtkPVDataSetToPolyDataFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataSetToPolyDataFilterNewCommand();
-int vtkPVElevationFilterCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVElevationFilterNewCommand();
 int vtkPVExtentTranslatorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVExtentTranslatorNewCommand();
-int vtkPVExtractEdgesCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVExtractEdgesNewCommand();
 int vtkPVGetRemoteGhostCellsCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVGetRemoteGhostCellsNewCommand();
@@ -137,6 +125,9 @@ ClientData vtkPVSourceListNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
+int vtkRunTimeContourCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkRunTimeContourNewCommand();
 int vtkSingleContourFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkSingleContourFilterNewCommand();
@@ -198,12 +189,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,"vtkPVAssignment", vtkPVAssignmentNewCommand,
                   vtkPVAssignmentCommand);
-  vtkTclCreateNew(interp,"vtkPVColorByProcess", vtkPVColorByProcessNewCommand,
-                  vtkPVColorByProcessCommand);
   vtkTclCreateNew(interp,"vtkPVCommandList", vtkPVCommandListNewCommand,
                   vtkPVCommandListCommand);
-  vtkTclCreateNew(interp,"vtkPVContourFilter", vtkPVContourFilterNewCommand,
-                  vtkPVContourFilterCommand);
   vtkTclCreateNew(interp,"vtkPVCutter", vtkPVCutterNewCommand,
                   vtkPVCutterCommand);
   vtkTclCreateNew(interp,"vtkPVData", vtkPVDataNewCommand,
@@ -212,12 +199,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVDataSetToDataSetFilterCommand);
   vtkTclCreateNew(interp,"vtkPVDataSetToPolyDataFilter", vtkPVDataSetToPolyDataFilterNewCommand,
                   vtkPVDataSetToPolyDataFilterCommand);
-  vtkTclCreateNew(interp,"vtkPVElevationFilter", vtkPVElevationFilterNewCommand,
-                  vtkPVElevationFilterCommand);
   vtkTclCreateNew(interp,"vtkPVExtentTranslator", vtkPVExtentTranslatorNewCommand,
                   vtkPVExtentTranslatorCommand);
-  vtkTclCreateNew(interp,"vtkPVExtractEdges", vtkPVExtractEdgesNewCommand,
-                  vtkPVExtractEdgesCommand);
   vtkTclCreateNew(interp,"vtkPVGetRemoteGhostCells", vtkPVGetRemoteGhostCellsNewCommand,
                   vtkPVGetRemoteGhostCellsCommand);
   vtkTclCreateNew(interp,"vtkPVGlyph3D", vtkPVGlyph3DNewCommand,
@@ -260,6 +243,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVSourceListCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
+  vtkTclCreateNew(interp,"vtkRunTimeContour", vtkRunTimeContourNewCommand,
+                  vtkRunTimeContourCommand);
   vtkTclCreateNew(interp,"vtkSingleContourFilter", vtkSingleContourFilterNewCommand,
                   vtkSingleContourFilterCommand);
   return TCL_OK;

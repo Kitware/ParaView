@@ -139,7 +139,7 @@ int vtkPVData::Create(char *args)
   this->FiltersMenuButton->SetParent(this);
   this->FiltersMenuButton->Create(this->Application, "-relief raised -bd 2");
   this->FiltersMenuButton->SetButtonText("Filters");
-  this->FiltersMenuButton->AddCommand("vtkContourFilter", this,
+  this->FiltersMenuButton->AddCommand("ContourFilter", this,
 				      "Contour");
   if (this->Data->GetPointData()->GetScalars() == NULL)
     {
@@ -152,13 +152,13 @@ int vtkPVData::Create(char *args)
 		 this->FiltersMenuButton->GetMenu()->GetWidgetName());
     }
   
-  this->FiltersMenuButton->AddCommand("vtkElevationFilter", this,
+  this->FiltersMenuButton->AddCommand("ElevationFilter", this,
 				      "Elevation");
-  this->FiltersMenuButton->AddCommand("vtkExtractEdges", this,
+  this->FiltersMenuButton->AddCommand("ExtractEdges", this,
 				      "ExtractEdges");
-  this->FiltersMenuButton->AddCommand("vtkColorByProcess", this,
+  this->FiltersMenuButton->AddCommand("ColorByProcess", this,
 				      "ColorByProcess");
-  this->FiltersMenuButton->AddCommand("vtkCutter", this, "Cutter");
+  this->FiltersMenuButton->AddCommand("Cutter", this, "Cutter");
   
   this->Script("pack %s", this->FiltersMenuButton->GetWidgetName());
   

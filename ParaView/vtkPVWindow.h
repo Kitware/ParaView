@@ -61,6 +61,7 @@ public:
   void CreateFractalVolume();
   vtkPVPolyDataSource *CreateCone();
   vtkPVPolyDataSource *CreateSTLReader();
+  vtkPVPolyDataSource *CreateRunTimeContour();
   vtkPVPolyDataSource *CreateSphere();
   vtkPVPolyDataSource *CreateAxes();
   vtkPVPolyDataSource *CreateCube();
