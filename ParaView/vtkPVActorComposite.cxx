@@ -273,13 +273,13 @@ vtkPVActorComposite::~vtkPVActorComposite()
     
   if (this->ScalarBarTclName)
     {
-    pvApp->BroadcastScript("%s Delete", this->ScalarBarTclName);
+    pvApp->Script("%s Delete", this->ScalarBarTclName);
     this->SetScalarBarTclName(NULL);
     }
   
   if (this->CubeAxesTclName)
     {
-    pvApp->BroadcastScript("%s Delete", this->CubeAxesTclName);
+    pvApp->Script("%s Delete", this->CubeAxesTclName);
     this->SetCubeAxesTclName(NULL);
     }
   
