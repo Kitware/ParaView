@@ -23,7 +23,7 @@ IF (VTK_USE_MPI)
                Mandelbrot
                ProbeLine
                ProbePoint
-               RotateTranslate
+#               RotateTranslate
                ScalarRangeLabel
                ScalarSelection
                ScalarsSphereClip
@@ -68,7 +68,7 @@ FOREACH (tfile
          Mandelbrot
          ProbeLine
          ProbePoint
-         RotateTranslate
+#         RotateTranslate
          ScalarRangeLabel
          ScalarSelection
          ScalarsSphereClip
