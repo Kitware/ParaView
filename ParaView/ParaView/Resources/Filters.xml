@@ -31,14 +31,6 @@
   </Filter>
 </Module>
 
-<Module name="AtomicTranslationTable" menu_name="Generate Atomic Colors and Radius" root_name="AtomTransTab" module_type="Filter" 
-        long_help="Generate atomic colors and radius based on atom types." 
-        short_help="Generate atomic colors and radius based on atom types.">
-  <Filter class="vtkAtomicTranslationTable" >
-    <Input name="Input" class="vtkDataSet" /> 
-  </Filter>
-</Module>
-
 <Module name="AppendPolyData" menu_name="Append Geometry" root_name="AppendGeo" module_type="Filter" 
         long_help="Takes an input of multiple poly data parts and output has only one part." 
         short_help="Append multiple parts into one.">
