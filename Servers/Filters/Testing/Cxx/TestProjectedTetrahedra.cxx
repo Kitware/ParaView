@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 
   renWin->Render();
 
-  int retVal = vtkTesting::Test(argc, argv, renWin, 10);
+  int retVal = vtkTesting::Test(argc, argv, renWin, 75);
   if (retVal == vtkRegressionTester::DO_INTERACTOR)
     {
     iren->Start();
