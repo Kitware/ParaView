@@ -52,6 +52,7 @@ SET( ParaViewExtraWrapper_SRCS
     )
 
 SET( ParaViewClientNotWrapped_SRCS
+  vtkPVAnimationBatchHelper.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
   vtkPVInteractorStyle.cxx

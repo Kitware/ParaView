@@ -29,6 +29,7 @@
 #include "vtkKWText.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVAnimationBatchHelper.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVRenderModule.h"
@@ -182,7 +183,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.135.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.135.2.2");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1659,6 +1660,8 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
 
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
 
+  vtkPVAnimationBatchHelper *helper = vtkPVAnimationBatchHelper::New();
+
   // Loop through all of the time steps.
   t = this->GetGlobalStart();
   timeIdx = 0;
@@ -1679,12 +1682,15 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
         }
       else
         {
-        vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
-        if (prop)
+        vtkSMDomain *dom = entry->GetCurrentSMDomain();
+        if (dom)
           {
           this->Script(entry->GetTimeEquation());
-          prop->SetAnimationTimeInBatch(
-            file, vtkKWObject::GetFloatResult(pvApp));
+          helper->SetAnimationValueInBatch(
+            file, entry->GetCurrentSMDomain(), entry->GetCurrentSMProperty(),
+            entry->GetPVSource()->GetVTKSourceID(0),
+            entry->GetAnimationElement(),
+            vtkKWObject::GetFloatResult(pvApp));
           }
         }
       }
@@ -1743,6 +1749,8 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
     ++timeIdx;
     ++t;
     }
+
+  helper->Delete();
 }
 
 

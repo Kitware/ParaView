@@ -135,6 +135,7 @@ protected:
   ~vtkSMProperty();
 
   //BTX
+  friend class vtkPVAnimationBatchHelper;
   friend class vtkSMProxyManager;
   friend class vtkSMProxy;
   friend class vtkSMSubPropertyIterator;
