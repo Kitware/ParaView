@@ -73,8 +73,7 @@ public:
   vtkPolyData *GetGeometryOutput();
   vtkPolyData *GetOutput() {return this->GetGeometryOutput();}
   void SetGeometryOutput(vtkPolyData *pd);
-  void GetOutput(vtkPolyData *pd) {return this->SetGeometryOutput(pd);}
-  
+  void SetOutput(vtkPolyData *pd) {return this->SetGeometryOutput(pd);}
   
   // Description:
   // Texture output is a second output the contains the texture map
