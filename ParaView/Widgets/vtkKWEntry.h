@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWApplication;
 class vtkKWListBox;
-class vtkKWEntryInternals;
 
 class VTK_EXPORT vtkKWEntry : public vtkKWWidget
 {
@@ -94,11 +93,6 @@ public:
   virtual void BindCommand(vtkKWObject *object, const char *command);
 
   // Description:
-  // When using popup menu, display it and hide it.
-  void DisplayPopupCallback();
-  void WithdrawPopupCallback();
-
-  // Description:
   // Add and delete values to put in the list.
   void AddValue(const char* value);
   void DeleteValue(int idx);
@@ -107,20 +101,12 @@ public:
   int GetNumberOfValues();
   void DeleteAllValues();
 
+
   // Description:
   // Make this entry a puldown combobox.
   vtkSetClampMacro(PullDown, int, 0, 1);
   vtkBooleanMacro(PullDown, int);
   vtkGetMacro(PullDown, int);
-
-  // Description:
-  // This method is called when one of the entries in pulldown is selected.
-  void ValueSelectedCallback();
-
-  // Description:
-  // Get the actuall Entry widget.
-  vtkGetObjectMacro(Entry, vtkKWWidget);
-
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -141,13 +127,8 @@ protected:
   int Width;
   int ReadOnly;
   int PullDown;
-  int PopupDisplayed;
 
   vtkKWWidget* Entry;
-  vtkKWWidget* TopLevel;
-  vtkKWListBox* List;
-
-  vtkKWEntryInternals* Internals;
 
 private:
   vtkKWEntry(const vtkKWEntry&); // Not implemented

@@ -65,6 +65,8 @@ protected:
   vtkKWBWidgets();
   ~vtkKWBWidgets();
 
+  static void Execute(Tcl_Interp*, const char* str, const char*);
+
 private:
   vtkKWBWidgets(const vtkKWBWidgets&);   // Not implemented.
   void operator=(const vtkKWBWidgets&);  // Not implemented.

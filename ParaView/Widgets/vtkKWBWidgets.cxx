@@ -38,13 +38,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkbwidgets.h"
+#include "vtkcombobox.h"
 #include "vtkKWTkUtilities.h"
 
 #include <vtkTk.h>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.12");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.13");
 
 int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -278,39 +279,27 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
     return;
     }
 
-  char* script = new char[strlen(bwidgets1)+1];
-  strcpy(script, bwidgets1);
-  if (Tcl_GlobalEval(interp, script) != TCL_OK)
-    {
-    vtkGenericWarningMacro(<< "BWidgets failed to initialize. Error:" 
-    << interp->result);
-    }
-  delete[] script;
-  
+  vtkKWBWidgets::Execute(interp, bwidgets1, "BWidgets");
+  vtkKWBWidgets::Execute(interp, bwidgets2, "BWidgets");
+  vtkKWBWidgets::Execute(interp, bwidgets3, "BWidgets");
+  vtkKWBWidgets::Execute(interp, bwidgets4, "BWidgets");
+  vtkKWBWidgets::Execute(interp, vtkcomboboxwidget1, "ComboBox");
+}
 
-  script = new char[strlen(bwidgets2)+1];
-  strcpy(script, bwidgets2);
-  if (Tcl_GlobalEval(interp, script) != TCL_OK)
+//----------------------------------------------------------------------------
+void vtkKWBWidgets::Execute(Tcl_Interp* interp, const char* str, const char* module)
+{
+  if ( strlen(str) > 64000 )
     {
-    vtkGenericWarningMacro(<< "BWidgets failed to initialize. Error:" 
-    << interp->result);
+    cout << "The size of tcl string for module " << module << " is " << strlen(str) 
+      << " (higher than 32000), so compilers that cannot "
+      "handle such a large strings might not compile this." << endl;
     }
-  delete[] script;
-
-  script = new char[strlen(bwidgets3)+1];
-  strcpy(script, bwidgets3);
+  char* script = new char[strlen(str)+1];
+  strcpy(script, str);
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
-    vtkGenericWarningMacro(<< "BWidgets failed to initialize. Error:" 
-    << interp->result);
-    }
-  delete[] script;
-
-  script = new char[strlen(bwidgets4)+1];
-  strcpy(script, bwidgets4);
-  if (Tcl_GlobalEval(interp, script) != TCL_OK)
-    {
-    vtkGenericWarningMacro(<< "BWidgets failed to initialize. Error:" 
+    vtkGenericWarningMacro(<< module << " failed to initialize. Error:" 
     << interp->result);
     }
   delete[] script;

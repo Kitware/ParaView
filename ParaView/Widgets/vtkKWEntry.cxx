@@ -54,26 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 //----------------------------------------------------------------------------
-//============================================================================
-class vtkKWEntryInternals
-{
-public:
-  vtkKWEntryInternals() 
-    {
-    this->Dirty = 1;
-    }
-  ~vtkKWEntryInternals() {}
-
-  typedef vtkstd::vector<vtkstd::string> VectorOfStrings;
-  VectorOfStrings Entries;
-  int Dirty;
-};
-//============================================================================
-//----------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.48");
+vtkCxxRevisionMacro(vtkKWEntry, "1.49");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -83,11 +65,6 @@ vtkKWEntry::vtkKWEntry()
   this->ReadOnly    = 0;
   this->PullDown    = 0;
   this->Entry       = 0;
-  this->TopLevel    = 0;
-  this->PopupDisplayed = 0;
-  this->List        = 0;
-
-  this->Internals = new vtkKWEntryInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -98,16 +75,6 @@ vtkKWEntry::~vtkKWEntry()
     {
     this->Entry->Delete();
     }
-  if ( this->TopLevel )
-    {
-    this->TopLevel->Delete();
-    }
-  if ( this->List )
-    {
-    this->List->Delete();
-    }
-
-  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -182,16 +149,6 @@ void vtkKWEntry::UpdateEnableState()
       }
     }
 #endif
-
-  if (this->TopLevel)
-    {
-    this->TopLevel->SetEnabled(this->Enabled);
-    }
-
-  if (this->List)
-    {
-    this->List->SetEnabled(this->Enabled);
-    }
 }
 
 
@@ -297,32 +254,8 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
 
   if ( this->PullDown )
     {
-    this->Script("frame %s -bd 0", wname);
-    this->Entry = vtkKWWidget::New();
-    this->Entry->SetParent(this);
-    this->Entry->Create(app, "entry", (args?args:""));
-    this->Script("pack %s -fill both -expand 1 -side left", this->Entry->GetWidgetName());
-    vtkKWLabel *label = vtkKWLabel::New();
-    label->SetParent(this);
-    label->Create(app, "-relief raised");
-    label->SetImageOption(vtkKWIcon::ICON_EXPAND);
-    this->Script("pack %s -fill y -expand 0 -side left", label->GetWidgetName());
-    label->SetBind(this, "<ButtonPress>", "DisplayPopupCallback");
-    label->Delete();
-    this->TopLevel = vtkKWWidget::New();
-    this->TopLevel->Create(app, "toplevel", "-bg black -bd 1 -relief flat");
-    //this->TopLevel->SetBind(this, "<Leave>", "WithdrawPopupCallback");
-    this->Script("wm transient %s %s", 
-                 this->TopLevel->GetWidgetName(), this->GetWidgetName());
-    this->Script("wm overrideredirect %s 1", 
-                 this->TopLevel->GetWidgetName());
-    this->Script("wm withdraw %s", 
-                 this->TopLevel->GetWidgetName());
-    this->List = vtkKWListBox::New();
-    this->List->SetParent(this->TopLevel);
-    this->List->Create(app, 0);
-    this->List->SetSingleClickCallback(this, "ValueSelectedCallback");
-    this->Script("pack %s -fill both -expand 1", this->List->GetWidgetName());
+    this->Script("combobox %s %s",wname, (args?args:""));
+    this->Entry = this;
     }
   else
     {
@@ -346,83 +279,6 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWEntry::DisplayPopupCallback()
-{
-  if (!this->Entry || !this->PullDown || !this->TopLevel )
-    {
-    return;
-    }
-  if ( this->PopupDisplayed )
-    {
-    this->WithdrawPopupCallback();
-    return;
-    }
-
-  // Get the position of the mouse, the position and size of the push button,
-  // the size of the scale.
-
-  this->Script("concat "
-               "[winfo rootx %s] [winfo rooty %s] [winfo width %s] [winfo height %s]",
-               this->GetWidgetName(), 
-               this->GetWidgetName(), 
-               this->GetWidgetName(),
-               this->GetWidgetName());
-  
-  int x, y, w, h;
-  sscanf(this->Application->GetMainInterp()->result, 
-         "%d %d %d %d", 
-         &x, &y, &w, &h);
-
-  y = y+h;
-
-  vtkKWEntryInternals::VectorOfStrings::size_type height_mtp
-    = this->Internals->Entries.size();
-  if ( height_mtp > 5 )
-    {
-    height_mtp = 5;
-    }
-
-  this->Script("wm geometry %s +%d+%d",
-               this->TopLevel->GetWidgetName(), x, y);
-
-  if ( this->Internals->Dirty )
-    {
-    this->List->DeleteAll();
-    vtkKWEntryInternals::VectorOfStrings::size_type cc;
-    for ( cc = 0; cc < this->Internals->Entries.size(); cc ++ )
-      {
-      this->List->AppendUnique(this->Internals->Entries[cc].c_str());
-      }
-    this->Internals->Dirty = 1;
-    }
-  this->Script("%s configure -width %d", this->List->GetWidgetName(), w);
-  this->Script("%s configure -height %d", this->List->GetWidgetName(), height_mtp);
-  
-  this->Script("update");
-  this->Script("wm deiconify %s", 
-               this->TopLevel->GetWidgetName());
-  this->Script("raise %s", 
-               this->TopLevel->GetWidgetName());
-  this->Script("%s configure -width %d -height %d", this->TopLevel->GetWidgetName(),
-      w, h*height_mtp+5);
-  this->PopupDisplayed = 1;
-  this->Script("after 5000 { %s WithdrawPopupCallback }", this->GetTclName());
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWEntry::WithdrawPopupCallback()
-{
-  if (!this->Entry || !this->PullDown || !this->TopLevel )
-    {
-    return;
-    }
-  this->Script("wm withdraw %s",
-               this->TopLevel->GetWidgetName());
-  this->PopupDisplayed = 0;
-  this->Script("after cancel { %s WithdrawPopupCallback }", this->GetTclName());
-}
-
-//----------------------------------------------------------------------------
 void vtkKWEntry::SetReadOnly(int ro)
 {
   this->ReadOnly = ro;
@@ -438,14 +294,6 @@ void vtkKWEntry::SetReadOnly(int ro)
     {
     this->Script("%s configure -state normal", this->Entry->GetWidgetName());
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWEntry::ValueSelectedCallback()
-{
-  this->SetValue(this->List->GetSelection());
-  this->WithdrawPopupCallback();
-  this->Script("event generate %s <Return>", this->Entry->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -489,48 +337,36 @@ void vtkKWEntry::AddValue(const char* value)
     {
     return;
     }
-  this->Internals->Entries.push_back(value);
-  this->Internals->Dirty = 1;
+  // Add to the combo
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetNumberOfValues()
 {
-  return static_cast<int>(this->Internals->Entries.size());
+  // Get the number of values in combo
+  return 1;
 }
 
 //----------------------------------------------------------------------------
 void vtkKWEntry::DeleteAllValues()
 {
-  this->Internals->Entries.empty();
-  this->Internals->Dirty = 1;
+  // Delete all values from combo
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWEntry::DeleteValue(int idx)
 {
-  if ( idx < (int)this->Internals->Entries.size() )
+  if ( idx >= (int)this->GetNumberOfValues() )
     {
     vtkErrorMacro("This entry has only: " 
-      << static_cast<int>(this->Internals->Entries.size()) 
+      << this->GetNumberOfValues()
       << " elements. Index " << idx << " is too high");
     return;
     }
-  vtkKWEntryInternals::VectorOfStrings::iterator it;
-  int cc = 0;
-  for ( it = this->Internals->Entries.begin(); 
-        it != this->Internals->Entries.end() && cc < idx; it ++ )
-    {
-    cc ++;
-    }
-  if ( cc == idx )
-    {
-    this->Internals->Entries.erase(it);
-    this->Internals->Dirty = 1;
-    this->Modified();
-    }
+  // Delete from combo
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -540,16 +376,18 @@ const char* vtkKWEntry::GetValueFromIndex(int idx)
     {
     return 0;
     }
-  return this->Internals->Entries[idx].c_str();
+  // Get value from index
+  return 0;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetValueIndex(const char* value)
 {
-  vtkKWEntryInternals::VectorOfStrings::size_type cc;
-  for ( cc = 0; cc < this->Internals->Entries.size(); cc ++ )
+  int cc;
+  for ( cc = 0; cc < this->GetNumberOfValues(); cc ++ )
     {
-    if ( this->Internals->Entries[cc] == value )
+    if ( this->GetValueFromIndex(cc) && 
+      strcmp(this->GetValueFromIndex(cc), value ) == 0 )
       {
       return int(cc);
       }
