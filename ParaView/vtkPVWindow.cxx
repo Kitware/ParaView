@@ -1036,7 +1036,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
   sInt->SetSourceClassName("vtkExtractPolyDataPiece");
-  sInt->SetRootName("Piece");
+  sInt->SetRootName("PDPiece");
   sInt->SetInputClassName("vtkPolyData");
   sInt->SetOutputClassName("vtkPolyData");
   // Method
@@ -1059,7 +1059,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
   sInt->SetSourceClassName("vtkExtractUnstructuredGridPiece");
-  sInt->SetRootName("Piece");
+  sInt->SetRootName("UGPiece");
   sInt->SetInputClassName("vtkUnstructuredGrid");
   sInt->SetOutputClassName("vtkUnstructuredGrid");
   // Method
