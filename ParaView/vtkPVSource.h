@@ -184,9 +184,8 @@ public:
   // Set the vtk source that will be a part of the pipeline.
   // The pointer to this class is used as little as possible.
   // (VTKSourceTclName is used instead.)
-  void SetVTKSource(vtkSource *source);
+  void SetVTKSource(vtkSource *source, const char *tclName);
   vtkGetObjectMacro(VTKSource, vtkSource);
-  vtkSetStringMacro(VTKSourceTclName);
   vtkGetStringMacro(VTKSourceTclName);
 
   // Description:

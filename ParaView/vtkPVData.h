@@ -82,13 +82,12 @@ public:
   // PVData is used as input a filter or output of a source.
   // We could change the object so that it creates its own data (durring initialization), 
   // but then we would have to tell it what type of data to create.
-  vtkSetObjectMacro(VTKData,vtkDataSet);  
+  void SetVTKData(vtkDataSet *data, const char *name);
   vtkGetObjectMacro(VTKData,vtkDataSet);  
 
   // Description:
   // The tcl name of the vtk data object.  This should be the primary method of 
   // manipulating the data since it exists on all processes.
-  void SetVTKDataTclName(const char *name);
   vtkGetStringMacro(VTKDataTclName);  
   
   // Description:

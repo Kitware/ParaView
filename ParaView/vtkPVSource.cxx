@@ -57,6 +57,7 @@ vtkPVSource::vtkPVSource()
   this->NumberOfPVInputs = 0;
   this->PVOutputs = NULL;
   this->NumberOfPVOutputs = 0;
+
   this->VTKSource = NULL;
   this->VTKSourceTclName = NULL;
 
@@ -117,7 +118,7 @@ vtkPVSource::~vtkPVSource()
   
   this->NumberOfPVInputs = 0;
 
-  this->SetVTKSource(NULL);
+  this->SetVTKSource(NULL, NULL);
 
   this->SetName(NULL);
   this->Properties->Delete();
@@ -201,30 +202,30 @@ void vtkPVSourceEndProgress(void *arg)
 }
 
 //----------------------------------------------------------------------------
-// Here to set the progress methods.
-// Disabled until we fix the recursive update problem.
-// Works best for one proc.
-void vtkPVSource::SetVTKSource(vtkSource *source)
+// Tcl does the reference counting, so we are not going to put an 
+// additional reference of the data.
+void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
 {
-  if (this->VTKSource == source)
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp == NULL)
     {
+    vtkErrorMacro("Set the application before you set the VTKDataTclName.");
     return;
     }
-  this->Modified();
-
-  // Get rid of old VTKSource reference.
-  if (this->VTKSource)
+  
+  if (this->VTKSourceTclName)
     {
-    // Be extra careful of circular references. (not important here...)
-    vtkSource *tmp = this->VTKSource;
+    pvApp->BroadcastScript("%s Delete", this->VTKSourceTclName);
+    delete [] this->VTKSourceTclName;
+    this->VTKSourceTclName = NULL;
     this->VTKSource = NULL;
-    // Should we unset the progress methods?
-    tmp->UnRegister(this);
     }
-  if (source)
+  if (tclName)
     {
+    this->VTKSourceTclName = new char[strlen(tclName) + 1];
+    strcpy(this->VTKSourceTclName, tclName);
     this->VTKSource = source;
-    source->Register(this);
     // Set up the progress methods.
     //source->SetStartMethod(vtkPVSourceStartProgress, this);
     //source->SetProgressMethod(vtkPVSourceReportProgress, this);
@@ -1916,6 +1917,8 @@ void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *pvd)
   
   if (this->PVOutputs[idx])
     {
+    // Manage backward pointer.
+    this->PVOutputs[idx]->SetPVSource(this);
     this->PVOutputs[idx]->UnRegister(this);
     this->PVOutputs[idx] = NULL;
     }
@@ -1924,14 +1927,10 @@ void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *pvd)
     {
     pvd->Register(this);
     this->PVOutputs[idx] = pvd;
+    // Manage backward pointer.
+    pvd->SetPVSource(this);
     }
 
-  // This is done in vtkPVSourceINterface::CreateCallback()
-  // Relay the change to the VTK objects.  
-  // This is where we will need a SetCommand from the interface ...
-  //pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
-  //			 pvd->GetVTKDataTclName());
-  
   this->Modified();
 }
 

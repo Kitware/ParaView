@@ -57,7 +57,7 @@ vtkPVData::vtkPVData()
 //----------------------------------------------------------------------------
 vtkPVData::~vtkPVData()
 {
-  this->SetVTKDataTclName(NULL);
+  this->SetVTKData(NULL, NULL);
   this->SetPVSource(NULL);
 
   if (this->ActorComposite)
@@ -88,7 +88,9 @@ void vtkPVData::SetApplication(vtkPVApplication *pvApp)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetVTKDataTclName(const char *tclName)
+// Tcl does the reference counting, so we are not going to put an 
+// additional reference of the data.
+void vtkPVData::SetVTKData(vtkDataSet *data, const char *tclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -100,14 +102,17 @@ void vtkPVData::SetVTKDataTclName(const char *tclName)
   
   if (this->VTKDataTclName)
     {
+    pvApp->BroadcastScript("%s Delete", this->VTKDataTclName);
     delete [] this->VTKDataTclName;
     this->VTKDataTclName = NULL;
+    this->VTKData = NULL;
     }
   if (tclName)
     {
     this->VTKDataTclName = new char[strlen(tclName) + 1];
     strcpy(this->VTKDataTclName, tclName);
-
+    this->VTKData = data;
+    
     // This is why we need a special method.  The actor comoposite can't set its input until
     // the data tcl name is set.  These dependancies on the order things are set
     // leads me to think there sould be one initialize method which sets all the variables.

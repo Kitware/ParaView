@@ -93,8 +93,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvs = vtkPVSource::New();
   pvs->SetApplication(pvApp);
   pvs->SetInterface(this);
-  pvs->SetVTKSource(s);
-  pvs->SetVTKSourceTclName(tclName);
+  pvs->SetVTKSource(s, tclName);
   pvs->SetName(tclName);
 
   pvd = vtkPVData::New();
@@ -102,11 +101,13 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   sprintf(tclName, "%sOutput%d", this->RootName, this->InstanceCount);
   // Create the object through tcl on all processes.
   d = (vtkDataSet *)(pvApp->MakeTclObject(this->OutputClassName, tclName));
-  pvd ->SetVTKData(d);
-  pvd->SetVTKDataTclName(tclName);
-  
+  pvd->SetVTKData(d, tclName);
+
+  // Connect the source and data.
   pvs->SetNthPVOutput(0, pvd);
-  pvd->SetPVSource(pvs);
+  // It would be nice to have the vtkPOSource set this up, but for multiple outputs,
+  // How do we know the method.
+  // Relay the connection to the VTK objects.  
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());   
   
