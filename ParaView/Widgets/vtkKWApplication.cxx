@@ -89,7 +89,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.150");
+vtkCxxRevisionMacro(vtkKWApplication, "1.151");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1976,15 +1976,12 @@ void vtkKWApplication::EmailFeedback()
 
   // Recipient To: (no SMTP: for Mozilla)
 
-  ostrstream recip_to_address;
-  recip_to_address << this->EmailFeedbackAddress << ends;
-
   MapiRecipDesc recip_to = 
     {
       0L,
       MAPI_TO,
       NULL,
-      recip_to_address.str(),
+      this->EmailFeedbackAddress,
       0L,
       NULL
     };
@@ -2028,19 +2025,22 @@ void vtkKWApplication::EmailFeedback()
 
   if (err != SUCCESS_SUCCESS)
     {
+    ostrstream msg;
+    msg << "Sorry, an error occurred while trying to email feedback. "
+        << "Please make sure that your default email client has been "
+        << "configured properly. The Microsoft Simple MAPI (Messaging "
+        << "Application Program Interface) is used to perform this "
+        << "operation and it might not be accessible as long as your "
+        << "default email client is not running simultaneously. If you "
+        << "continue to have problems please use your email client to "
+        << "send us feedback at " << this->EmailFeedbackAddress << "."
+        << ends;
+
     vtkKWMessageDialog::PopupMessage(
-      this, 0, 
-      email_subject.str(), 
-      "Sorry, an error occurred while trying to email feedback. "
-      "Please make sure that your default email client has been configured "
-      "properly. The Microsoft Simple MAPI (Messaging Application Program "
-      "Interface) is used to perform this operation and it might not be "
-      "accessible as long as your default email client is not running "
-      "simultaneously.",
-      vtkKWMessageDialog::ErrorIcon);
+      this, 0, email_subject.str(), msg.str(), vtkKWMessageDialog::ErrorIcon);
+    msg.rdbuf()->freeze(0);
     }
 
-  recip_to_address.rdbuf()->freeze(0);
   body.rdbuf()->freeze(0);
   email_subject.rdbuf()->freeze(0);
 
