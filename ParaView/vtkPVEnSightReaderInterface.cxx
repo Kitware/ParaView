@@ -72,6 +72,13 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
       return NULL;
       }
     pvApp->Script("%s SetCaseFileName [tk_getOpenFile]", tclName);
+
+    if (strcmp(reader6->GetCaseFileName(), "") == 0)
+      {
+      pvApp->BroadcastScript("%s Delete", tclName);
+      return NULL;
+      }
+    
     pvApp->BroadcastScript("%s SetCaseFileName %s", tclName,
 			   reader6->GetCaseFileName());
     reader6->Update();
@@ -87,6 +94,11 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
       return NULL;
       }
     pvApp->Script("%s SetCaseFileName [tk_getOpenFile]", tclName);
+    if (strcmp(readerGold->GetCaseFileName(), "") == 0)
+      {
+      pvApp->BroadcastScript("%s Delete", tclName);
+      return NULL;
+      }
     pvApp->BroadcastScript("%s SetCaseFileName %s", tclName,
 			   readerGold->GetCaseFileName());
     readerGold->Update();
