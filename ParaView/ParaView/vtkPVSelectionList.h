@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // When the button is pressed, the list is displayed in the form of a menu.
 // The user can select a new value from the menu.
 
-// This might do better as a subclass of vtkPVMenuButton.
 
 #ifndef __vtkPVSelectionList_h
 #define __vtkPVSelectionList_h
@@ -55,6 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMenuButton.h"
 
 class vtkStringList;
+class vtkKWOptionMenu;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkPVSelectionList : public vtkPVObjectWidget
 {
@@ -75,7 +76,7 @@ public:
   // Description:
   // Set the label of the menu.
   void SetLabel(const char *label);
-  const char *GetLabel() {return this->Label->GetLabel();}
+  const char *GetLabel();
 
   // Description:
   // Called when accept button is pushed.
@@ -106,7 +107,7 @@ protected:
   void operator=(const vtkPVSelectionList&) {};
 
   vtkKWLabel *Label;
-  vtkKWMenuButton *MenuButton;
+  vtkKWOptionMenu *Menu;
   char *Command;
 
   int CurrentValue;

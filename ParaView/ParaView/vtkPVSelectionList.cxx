@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVSelectionList.h"
 #include "vtkStringList.h"
+#include "vtkKWLabel.h"
+#include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
@@ -56,7 +58,7 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->CurrentName = NULL;
   
   this->Label = vtkKWLabel::New();
-  this->MenuButton = vtkKWMenuButton::New();
+  this->Menu = vtkKWOptionMenu::New();
 
   this->Names = vtkStringList::New();
 }
@@ -68,8 +70,8 @@ vtkPVSelectionList::~vtkPVSelectionList()
   
   this->Label->Delete();
   this->Label = NULL;
-  this->MenuButton->Delete();
-  this->MenuButton = NULL;
+  this->Menu->Delete();
+  this->Menu = NULL;
   this->Names->Delete();
   this->Names = NULL;
 }
@@ -104,9 +106,9 @@ int vtkPVSelectionList::Create(vtkKWApplication *app)
   this->Label->Create(app, "-width 18 -justify right");
   this->Script("pack %s -side left", this->Label->GetWidgetName());
 
-  this->MenuButton->SetParent(this);
-  this->MenuButton->Create(app, "");
-  this->Script("pack %s -side left", this->MenuButton->GetWidgetName());
+  this->Menu->SetParent(this);
+  this->Menu->Create(app, "");
+  this->Script("pack %s -side left", this->Menu->GetWidgetName());
 
   return 1;
 }
@@ -120,7 +122,10 @@ void vtkPVSelectionList::SetLabel(const char* label)
   this->Label->SetLabel(label);
 }
   
-
+const char *vtkPVSelectionList::GetLabel()
+{
+  return this->Label->GetLabel();
+}
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::Accept()
 {
@@ -164,11 +169,11 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
   this->Names->SetString(value, name);
 
   sprintf(tmp, "SelectCallback {%s} %d", name, value);
-  this->MenuButton->AddCommand(name, this, tmp);
+  this->Menu->AddEntryWithCommand(name, this, tmp);
   
   if (value == this->CurrentValue)
     {
-    this->MenuButton->SetButtonText(name);
+    this->Menu->SetValue(name);
     }
 }
 
@@ -196,7 +201,7 @@ void vtkPVSelectionList::SelectCallback(const char *name, int value)
   this->CurrentValue = value;
   this->SetCurrentName(name);
   
-  this->MenuButton->SetButtonText(name);
+//  this->Menu->SetButtonText(name);
   this->ModifiedCallback();
 }
 
