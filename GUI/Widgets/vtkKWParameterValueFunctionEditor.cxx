@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.24");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.25");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -89,6 +89,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->LastPointStyle              = vtkKWParameterValueFunctionEditor::PointStyleDefault;
   this->ShowCanvasOutline           = 1;
   this->CanvasOutlineStyle          = vtkKWParameterValueFunctionEditor::CanvasOutlineStyleAllSides;
+  this->ParameterCursorInteractionStyle          = vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleNone;
   this->ShowParameterTicks          = 0;
   this->ShowValueTicks              = 0;
   this->ComputeValueTicksFromHistogram = 0;
@@ -173,6 +174,8 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->FunctionChangingCommand     = NULL;
   this->VisibleRangeChangedCommand  = NULL;
   this->VisibleRangeChangingCommand = NULL;
+  this->ParameterCursorMovingCommand          = NULL;
+  this->ParameterCursorMovedCommand           = NULL;
 
   this->Canvas                      = vtkKWCanvas::New();
   this->ParameterRange              = vtkKWRange::New();
@@ -278,6 +281,18 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
     {
     delete [] this->VisibleRangeChangingCommand;
     this->VisibleRangeChangingCommand = NULL;
+    }
+
+  if (this->ParameterCursorMovingCommand)
+    {
+    delete [] this->ParameterCursorMovingCommand;
+    this->ParameterCursorMovingCommand = NULL;
+    }
+
+  if (this->ParameterCursorMovedCommand)
+    {
+    delete [] this->ParameterCursorMovedCommand;
+    this->ParameterCursorMovedCommand = NULL;
     }
 
   // GUI
@@ -1770,6 +1785,10 @@ void vtkKWParameterValueFunctionEditor::Bind()
     return;
     }
 
+  // Make sure we are clear
+
+  this->UnBind();
+
   ostrstream tk_cmd;
 
   // Canvas
@@ -1807,6 +1826,56 @@ void vtkKWParameterValueFunctionEditor::Bind()
     tk_cmd << canv << " bind " << VTK_KW_PVFE_TEXT_TAG 
            << " <ButtonRelease-1> {" << this->GetTclName() 
            << " EndInteractionCallback %%x %%y}" << endl;
+
+    // Parameter Cursor
+
+    if (this->ParameterCursorInteractionStyle & 
+        vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleDragWithLeftButton)
+      {
+      tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+             << " <ButtonPress-1> {" << this->GetTclName() 
+             << " ParameterCursorStartInteractionCallback %%x}" << endl;
+      tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+             << " <ButtonRelease-1> {" << this->GetTclName() 
+             << " ParameterCursorEndInteractionCallback}" << endl;
+      tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+             << " <B1-Motion> {" << this->GetTclName() 
+             << " ParameterCursorMoveCallback %%x}" << endl;
+      }
+
+    if (this->ParameterCursorInteractionStyle & 
+        vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleSetWithControlLeftButton)
+      {
+      tk_cmd << "bind " << canv
+             << " <Control-ButtonPress-1> {" 
+             << this->GetTclName() 
+             << " ParameterCursorStartInteractionCallback %%x ; " 
+             << this->GetTclName() 
+             << " ParameterCursorMoveCallback %%x}" << endl;
+      tk_cmd << "bind " << canv
+             << " <Control-ButtonRelease-1> {" << this->GetTclName() 
+             << " ParameterCursorEndInteractionCallback}" << endl;
+      tk_cmd << "bind " << canv
+             << " <Control-B1-Motion> {" << this->GetTclName() 
+             << " ParameterCursorMoveCallback %%x}" << endl;
+      }
+
+    if (this->ParameterCursorInteractionStyle & 
+        vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleSetWithRighButton)
+      {
+      tk_cmd << "bind " << canv
+             << " <ButtonPress-3> {"
+             << this->GetTclName() 
+             << " ParameterCursorStartInteractionCallback %%x ; " 
+             << this->GetTclName() 
+             << " ParameterCursorMoveCallback %%x}" << endl;
+      tk_cmd << "bind " << canv
+             << " <ButtonRelease-3> {" << this->GetTclName() 
+             << " ParameterCursorEndInteractionCallback}" << endl;
+      tk_cmd << "bind " << canv
+             << " <B3-Motion> {" << this->GetTclName() 
+             << " ParameterCursorMoveCallback %%x}" << endl;
+      }
 
     // Key bindings
 
@@ -1891,6 +1960,29 @@ void vtkKWParameterValueFunctionEditor::UnBind()
 
     tk_cmd << canv << " bind " << VTK_KW_PVFE_TEXT_TAG 
            << " <ButtonRelease-1> {}" << endl;
+
+    // Paameter Cursor
+
+    tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+           << " <ButtonPress-1> {}"  << endl;
+    tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+           << " <ButtonRelease-1> {}" << endl;
+    tk_cmd << canv << " bind " << VTK_KW_PVFE_PARAMETER_CURSOR_TAG
+           << " <B1-Motion> {}" << endl;
+
+    tk_cmd << "bind " << canv 
+           << " <Control-ButtonPress-1> {}" << endl;
+    tk_cmd << "bind " << canv
+           << " <Control-ButtonRelease-1> {}" << endl;
+    tk_cmd << "bind " << canv
+           << " <Control-B1-Motion> {}" << endl;
+
+    tk_cmd << "bind " << canv
+           << " <ButtonPress-3> {}" << endl;
+    tk_cmd << "bind " << canv
+           << " <ButtonRelease-3> {}" << endl;
+    tk_cmd << "bind " << canv
+           << " <B3-Motion> {}" << endl;
 
     // Key bindings
 
@@ -2715,6 +2807,38 @@ void vtkKWParameterValueFunctionEditor::SetParameterCursorPosition(double arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetParameterCursorInteractionStyle(
+  int arg)
+{
+  if (arg < 
+      vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleNone)
+    {
+    arg = 
+      vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleNone;
+    }
+  else 
+    if (arg >
+        vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleAll)
+    {
+    arg =vtkKWParameterValueFunctionEditor::ParameterCursorInteractionStyleAll;
+    }
+
+  if (this->ParameterCursorInteractionStyle == arg)
+    {
+    return;
+    }
+
+  this->ParameterCursorInteractionStyle = arg;
+
+  this->Modified();
+
+  if (this->Enabled)
+    {
+    this->Bind();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetShowParameterTicks(int arg)
 {
   if (this->ShowParameterTicks == arg)
@@ -3471,6 +3595,24 @@ void vtkKWParameterValueFunctionEditor::InvokeVisibleRangeChangingCommand()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::InvokeParameterCursorMovingCommand()
+{
+  this->InvokeCommand(this->ParameterCursorMovingCommand);
+
+  this->InvokeEvent(
+    vtkKWParameterValueFunctionEditor::ParameterCursorMovingEvent);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::InvokeParameterCursorMovedCommand()
+{
+  this->InvokeCommand(this->ParameterCursorMovedCommand);
+
+  this->InvokeEvent(
+    vtkKWParameterValueFunctionEditor::ParameterCursorMovedEvent);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::InvokeHistogramLogModeChangedCommand()
 {
   this->InvokeCommand(this->HistogramLogModeChangedCommand);
@@ -3547,6 +3689,20 @@ void vtkKWParameterValueFunctionEditor::SetVisibleRangeChangingCommand(
 {
   this->SetObjectMethodCommand(
     &this->VisibleRangeChangingCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetParameterCursorMovingCommand(
+  vtkKWObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->ParameterCursorMovingCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetParameterCursorMovedCommand(
+  vtkKWObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->ParameterCursorMovedCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
@@ -6373,6 +6529,67 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
 }
 
 //----------------------------------------------------------------------------
+void 
+vtkKWParameterValueFunctionEditor::ParameterCursorStartInteractionCallback(
+  int x)
+{
+  if (this->IsCreated() && this->ChangeMouseCursor)
+    {
+    this->Script("%s config -cursor hand2", this->Canvas->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void 
+vtkKWParameterValueFunctionEditor::ParameterCursorEndInteractionCallback()
+{
+  if (this->IsCreated() && this->ChangeMouseCursor)
+    {
+    this->Script("%s config -cursor {}", this->Canvas->GetWidgetName());
+    }
+
+  this->InvokeParameterCursorMovedCommand();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::ParameterCursorMoveCallback(int x)
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // If we are out of the canvas, clamp the coordinates
+
+  if (x < 0)
+    {
+    x = 0;
+    }
+  else if (x > this->CanvasWidth - 1)
+    {
+    x = this->CanvasWidth - 1;
+    }
+
+  // Get the real canvas coordinates
+
+  int c_x = atoi(
+    this->Script("%s canvasx %d", this->Canvas->GetWidgetName(), x));
+
+  // Get the corresponding parameter and move
+
+  double factors[2] = {0.0, 0.0};
+  this->GetCanvasScalingFactors(factors);
+  if (factors[0])
+    {
+    this->SetParameterCursorPosition((double)c_x / factors[0]);
+    }
+
+  // Invoke the commands/callbacks
+
+  this->InvokeParameterCursorMovingCommand();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::HistogramLogModeCallback(int mode)
 {
   if (this->Histogram)
@@ -6440,6 +6657,7 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << (this->RescaleBetweenEndPoints ? "On" : "Off") << endl;
   os << indent << "PointMarginToCanvas: " << this->PointMarginToCanvas << endl;
   os << indent << "CanvasOutlineStyle: " << this->CanvasOutlineStyle << endl;
+  os << indent << "ParameterCursorInteractionStyle: " << this->ParameterCursorInteractionStyle << endl;
   os << indent << "DisableAddAndRemove: "
      << (this->DisableAddAndRemove ? "On" : "Off") << endl;
   os << indent << "ChangeMouseCursor: "

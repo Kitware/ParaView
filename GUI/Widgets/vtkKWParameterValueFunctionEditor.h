@@ -403,6 +403,22 @@ public:
     { this->SetParameterCursorColor(rgb[0], rgb[1], rgb[2]); };
 
   // Description:
+  // Set the parameter cursor interaction style.
+  //BTX
+  enum 
+  {
+    ParameterCursorInteractionStyleNone                     = 0,
+    ParameterCursorInteractionStyleDragWithLeftButton       = 1,
+    ParameterCursorInteractionStyleSetWithRighButton        = 2,
+    ParameterCursorInteractionStyleSetWithControlLeftButton = 4,
+    ParameterCursorInteractionStyleAll                      = 7
+  };
+  //ETX
+  vtkBooleanMacro(ParameterCursorInteractionStyle, int);
+  virtual void SetParameterCursorInteractionStyle(int);
+  vtkGetMacro(ParameterCursorInteractionStyle, int);
+
+  // Description:
   // Show/Hide the parameter ticks
   vtkBooleanMacro(ShowParameterTicks, int);
   virtual void SetShowParameterTicks(int);
@@ -721,6 +737,9 @@ public:
   // VisibleRangeChangedCommand/VisibleRangeChangingCommand is called
   // when the visible range (parameter or value) is changing, or was changed
   // (at the end of the interaction).
+  // ParameterCursorMovingCommand/ParameterCursorMovedCommand is called when
+  // the parameter cursor is moving or was moved (at the end of the
+  // interaction).
   virtual void SetPointAddedCommand(
     vtkKWObject* object,const char *method);
   virtual void SetPointMovingCommand(
@@ -738,6 +757,10 @@ public:
   virtual void SetVisibleRangeChangedCommand(
     vtkKWObject* object, const char *method);
   virtual void SetVisibleRangeChangingCommand(
+    vtkKWObject* object, const char *method);
+  virtual void SetParameterCursorMovingCommand(
+    vtkKWObject* object, const char *method);
+  virtual void SetParameterCursorMovedCommand(
     vtkKWObject* object, const char *method);
 
   // Description:
@@ -758,7 +781,9 @@ public:
     VisibleParameterRangeChangedEvent,
     VisibleParameterRangeChangingEvent,
     VisibleRangeChangedEvent,
-    VisibleRangeChangingEvent
+    VisibleRangeChangingEvent,
+    ParameterCursorMovedEvent,
+    ParameterCursorMovingEvent
   };
   //ETX
 
@@ -837,6 +862,9 @@ public:
   virtual void StartInteractionCallback(int x, int y);
   virtual void MovePointCallback(int x, int y, int shift);
   virtual void EndInteractionCallback(int x, int y);
+  virtual void ParameterCursorStartInteractionCallback(int x);
+  virtual void ParameterCursorEndInteractionCallback();
+  virtual void ParameterCursorMoveCallback(int x);
   virtual void ParameterEntryCallback();
   virtual void HistogramLogModeCallback(int mode);
 
@@ -917,6 +945,7 @@ protected:
   int   SelectedPoint;
   int   ShowCanvasOutline;
   int   CanvasOutlineStyle;
+  int   ParameterCursorInteractionStyle;
   int   ShowCanvasBackground;
   int   ShowParameterCursor;
   int   ShowFunctionLine;
@@ -962,6 +991,8 @@ protected:
   char  *FunctionChangingCommand;
   char  *VisibleRangeChangedCommand;
   char  *VisibleRangeChangingCommand;
+  char  *ParameterCursorMovingCommand;
+  char  *ParameterCursorMovedCommand;
 
   virtual void InvokeCommand(const char *command);
   virtual void InvokePointCommand(
@@ -976,6 +1007,8 @@ protected:
   virtual void InvokeFunctionChangingCommand();
   virtual void InvokeVisibleRangeChangedCommand();
   virtual void InvokeVisibleRangeChangingCommand();
+  virtual void InvokeParameterCursorMovingCommand();
+  virtual void InvokeParameterCursorMovedCommand();
 
   // GUI
 
