@@ -43,11 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWApplication.h"
 #include "vtkKWScale.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.18");
+vtkCxxRevisionMacro(vtkKWExtent, "1.19");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -117,36 +118,55 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   wname = this->GetWidgetName();
   this->Script("frame %s -bd 0 %s", wname, (args ? args : ""));
 
-  this->XMinScale->Create(this->Application,"-length 190");
+  int nb_synced_widgets = 6;
+  const char *synced_widgets[6];
+  
+  this->XMinScale->Create(this->Application,"");
   this->XMinScale->SetCommand(this, "ExtentSelected");
   this->XMinScale->DisplayEntry();
   this->XMinScale->DisplayLabel("Minimum X (Units)");
-
+  this->XMinScale->DisplayEntryAndLabelOnTopOff();
+  synced_widgets[0] = this->XMinScale->GetLabel()->GetWidgetName();
+  
   this->XMaxScale->Create(this->Application,"");
   this->XMaxScale->SetCommand(this, "ExtentSelected");
   this->XMaxScale->DisplayEntry();
   this->XMaxScale->DisplayLabel("Maximum X (Units)");
+  this->XMaxScale->DisplayEntryAndLabelOnTopOff();
+  synced_widgets[1] = this->XMaxScale->GetLabel()->GetWidgetName();
 
   this->YMinScale->Create(this->Application,"");
   this->YMinScale->SetCommand(this, "ExtentSelected");
   this->YMinScale->DisplayEntry();
   this->YMinScale->DisplayLabel("Minimum Y (Units)");
+  this->YMinScale->DisplayEntryAndLabelOnTopOff();
+  synced_widgets[2] = this->YMinScale->GetLabel()->GetWidgetName();
 
   this->YMaxScale->Create(this->Application,"");
   this->YMaxScale->SetCommand(this, "ExtentSelected");
   this->YMaxScale->DisplayEntry();
   this->YMaxScale->DisplayLabel("Maximum Y (Units)");
+  this->YMaxScale->DisplayEntryAndLabelOnTopOff();
+  synced_widgets[3] = this->YMaxScale->GetLabel()->GetWidgetName();
 
   this->ZMinScale->Create(this->Application,"");
   this->ZMinScale->SetCommand(this, "ExtentSelected");
   this->ZMinScale->DisplayEntry();
   this->ZMinScale->DisplayLabel("Minimum Z (Units)");
+  this->ZMinScale->DisplayEntryAndLabelOnTopOff();
+  synced_widgets[4] = this->ZMinScale->GetLabel()->GetWidgetName();
 
   this->ZMaxScale->Create(this->Application,"");
   this->ZMaxScale->SetCommand(this, "ExtentSelected");
   this->ZMaxScale->DisplayEntry();
   this->ZMaxScale->DisplayLabel("Maximum Z (Units)");
+  this->ZMaxScale->DisplayEntryAndLabelOnTopOff();
+  synced_widgets[5] = this->ZMaxScale->GetLabel()->GetWidgetName();
 
+  vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
+    this->Application->GetMainInterp(),
+    6, synced_widgets, "-anchor w");
+  
   // Pack the label and the option menu
 
   this->Pack();
