@@ -18,7 +18,7 @@
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVWidgetProperty);
-vtkCxxRevisionMacro(vtkPVWidgetProperty, "1.5");
+vtkCxxRevisionMacro(vtkPVWidgetProperty, "1.6");
 
 vtkPVWidgetProperty::vtkPVWidgetProperty()
 {
@@ -59,14 +59,9 @@ void vtkPVWidgetProperty::SetWidget(vtkPVWidget *widget)
     return;
     }
   
-  if (this->Widget)
-    {
-    this->Widget->UnRegister(this);
-    }
   this->Widget = widget;
   if (this->Widget)
     {
-    this->Widget->Register(this);
     this->Widget->SetProperty(this);
     }
   this->Modified();

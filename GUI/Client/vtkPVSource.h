@@ -42,12 +42,11 @@ class vtkPVInputProperty;
 class vtkPVRenderView;
 class vtkPVSourceCollection;
 class vtkPVWidget;
-class vtkPVWidgetProperty;
+class vtkPVWidgetCollection;
 class vtkPVWindow;
 class vtkSMSourceProxy;
 class vtkSource;
 class vtkStringList;
-class vtkCollection;
 class vtkSMPart;
 class vtkPVDataInformation;
 class vtkPVNumberOfOutputsInformation;
@@ -222,7 +221,7 @@ public:
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
 
   //BTX
-  vtkGetObjectMacro(WidgetProperties, vtkCollection);
+  vtkGetObjectMacro(Widgets, vtkPVWidgetCollection);
   //ETX
   
   vtkGetObjectMacro(ParameterFrame, vtkKWFrame);
@@ -561,7 +560,7 @@ protected:
   vtkKWWidget *ButtonFrame;
   vtkKWFrame *ParameterFrame;
   
-  vtkCollection *WidgetProperties;
+  vtkPVWidgetCollection *Widgets;
 
   vtkKWPushButton *AcceptButton;
   vtkKWPushButton *ResetButton;

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.52");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.53");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -705,9 +705,19 @@ vtkKWWidget *vtkPVSelectWidget::GetFrame()
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::SetProperty(vtkPVWidgetProperty *prop)
 {
+  if (this->Property == prop)
+    {
+    return;
+    }
+  
+  if (this->Property)
+    {
+    this->Property->UnRegister(this);
+    }
   this->Property = vtkPVStringWidgetProperty::SafeDownCast(prop);
   if (this->Property)
     {
+    this->Property->Register(this);
     char *cmd = new char[strlen(this->VariableName)+4];
     sprintf(cmd, "Set%s", this->VariableName);
     this->Property->SetVTKCommand(cmd);

@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPVAnimationInterfaceEntry.h"
 
-#include "vtkCollection.h"
 #include "vtkCommand.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -33,6 +32,7 @@
 #include "vtkPVSource.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVWidget.h"
+#include "vtkPVWidgetCollection.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkString.h"
 #include "vtkKWThumbWheel.h"
@@ -77,7 +77,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.45");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -576,8 +576,8 @@ void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
 {
-  vtkCollection *pvwProps;
-  vtkPVWidgetProperty *pvwp;
+  vtkPVWidgetCollection *pvWidgets;
+  vtkPVWidget *pvw;
 
   // Remove all previous items form the menu.
   vtkKWMenu* menu = this->GetMethodMenuButton()->GetMenu();
@@ -598,12 +598,11 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
     return;
     }
 
-  pvwProps = this->GetPVSource()->GetWidgetProperties();
-  pvwProps->InitTraversal();
-  while ((pvwp =
-          static_cast<vtkPVWidgetProperty*>(pvwProps->GetNextItemAsObject())))
+  pvWidgets = this->GetPVSource()->GetWidgets();
+  pvWidgets->InitTraversal();
+  while ((pvw = static_cast<vtkPVWidget*>(pvWidgets->GetNextItemAsObject())))
     {
-    pvwp->GetWidget()->AddAnimationScriptsToMenu(menu, this);
+    pvw->AddAnimationScriptsToMenu(menu, this);
     }
   char methodAndArgs[1024];
   sprintf(methodAndArgs, "ScriptMethodCallback");

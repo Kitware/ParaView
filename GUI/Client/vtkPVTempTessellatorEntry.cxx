@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.10");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.11");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -76,6 +76,8 @@ vtkPVTempTessellatorEntry::vtkPVTempTessellatorEntry()
 
 vtkPVTempTessellatorEntry::~vtkPVTempTessellatorEntry()
 {
+  this->SetProperty(NULL);
+
   vtkTessellatorEntryData* d = this->Data;
 
   d->CriterionEnable->Delete();
@@ -84,7 +86,7 @@ vtkPVTempTessellatorEntry::~vtkPVTempTessellatorEntry()
   d->CriteriaInstructions->Delete();
   d->EditSubframe->Delete();
   d->CriteriaFrame->Delete();
-
+  
   delete d;
 
   this->SetPVSource(NULL);
@@ -537,7 +539,20 @@ void vtkPVTempTessellatorEntry::ResetInternal()
 
 void vtkPVTempTessellatorEntry::SetProperty( vtkPVWidgetProperty *prop )
 {
+  if (this->Data->Property == prop)
+    {
+    return;
+    }
+  
+  if (this->Data->Property)
+    {
+    this->Data->Property->UnRegister(this);
+    }
   this->Data->Property = vtkPVScalarListWidgetProperty::SafeDownCast( prop );
+  if (this->Data->Property)
+    {
+    this->Data->Property->Register(this);
+    }
 }
 
 const vtkPVWidgetProperty* vtkPVTempTessellatorEntry::GetProperty() const

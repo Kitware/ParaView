@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPVPLOT3DReaderModule.h"
 
-#include "vtkCollection.h"
 #include "vtkDataSet.h"
 #include "vtkErrorCode.h"
 #include "vtkPLOT3DReader.h"
@@ -27,6 +26,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVSelectionList.h"
 #include "vtkPVSourceCollection.h"
+#include "vtkPVWidgetCollection.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.27");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.28");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -104,22 +104,19 @@ void vtkPVPLOT3DReaderModule::UpdateEnableState()
     return;
     }
 
-  vtkPVWidgetProperty *pvwp = 0;
-  this->WidgetProperties->InitTraversal();
+  vtkPVWidget *pvw = 0;
+  this->Widgets->InitTraversal();
   int i;
-  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
+  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
-    pvwp =
-      static_cast<vtkPVWidgetProperty*>(this->WidgetProperties->GetNextItemAsObject());
-    vtkPVLabeledToggle* tog =
-      vtkPVLabeledToggle::SafeDownCast(pvwp->GetWidget());
+    pvw = static_cast<vtkPVWidget*>(this->Widgets->GetNextItemAsObject());
+    vtkPVLabeledToggle* tog = vtkPVLabeledToggle::SafeDownCast(pvw);
     if (tog)
       {
       tog->SetEnabled(0);
       }
 
-    vtkPVSelectionList* list =
-      vtkPVSelectionList::SafeDownCast(pvwp->GetWidget());
+    vtkPVSelectionList* list = vtkPVSelectionList::SafeDownCast(pvw);
     if (list)
       {
       list->SetEnabled(0);
