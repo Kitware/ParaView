@@ -15,6 +15,8 @@
 
 #include "vtkStreamingTessellator.h"
 #include "vtkSubdivisionAlgorithm.h"
+
+
 #undef UGLY_ASPECT_RATIO_HACK
 #undef DBG_MIDPTS
 
@@ -29,7 +31,7 @@
 #  define VTK_TESSELLATOR_INCR_SUBCASE_COUNT(cs,sc)
 #endif // PARAVIEW_DEBUG_TESSELLATOR
 
-vtkCxxRevisionMacro(vtkStreamingTessellator,"1.6");
+vtkCxxRevisionMacro(vtkStreamingTessellator,"1.7");
 vtkStandardNewMacro(vtkStreamingTessellator);
 
 void vtkStreamingTessellator::PrintSelf( ostream& os, vtkIndent indent )
@@ -65,6 +67,7 @@ vtkStreamingTessellator::vtkStreamingTessellator()
     this->EmbeddingDimension[i] = i;
     this->PointDimension[i] = i+3; // By default, FieldSize = 0
     }
+
 }
 
 vtkStreamingTessellator::~vtkStreamingTessellator()
@@ -245,6 +248,14 @@ bool compareHopfCrossStringDist( const double* a0, const double* a1, const doubl
     }
   return SqMagA < SqMagB;
 }
+
+
+  int vtkStreamingTessellator::BestTets( int* connOffsets, double** verts, int permOffset, int sgn ) const
+{
+  // Re-run vtkStreamingTessellatorGenerator.py with QualityThang=1
+  // to get this implemented (along with on-the-fly quality improvement)
+}
+
 
 void vtkStreamingTessellator::AdaptivelySample1Facet( double* v0, double* v1, int maxDepth ) const
 {

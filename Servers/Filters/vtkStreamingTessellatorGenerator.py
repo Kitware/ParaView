@@ -10,6 +10,8 @@
 
 import sys, re, math
 
+QualityThang = 0
+
 # This script writes some of the tessellator code along with
 # a few static variables containing configuration information
 # for tetrahedral decompositions.
@@ -46,7 +48,11 @@ vtkTessCase holds the tetrahedral decomposition of a simplex.
   def GetOffset( label ):
     if label == '':
       return -1
-    return vtkTessCase.AllCases[label].Offset
+    try:
+      val = vtkTessCase.AllCases[label].Offset
+    except:
+      val = -1
+    return val
   GetOffset = staticmethod( GetOffset )
 
   def __init__( self, label ):
@@ -286,7 +292,7 @@ def EndCase():
   currentBits = {}
   caseLabel = -1
 
-def __Unconditional( tets, perm, sign, indent='', label='' ):
+def __Unconditional( tets, perm, sign, indent='', label='', alternates=() ):
   global currentCaseCtr, currentCase, currentBits, caseLabel
 
   if PermutationIndices[ perm ][1] != sign:
@@ -296,14 +302,39 @@ def __Unconditional( tets, perm, sign, indent='', label='' ):
       sgnstr = '+'
     raise '%s %s (%d): Permutation(%s) and sign(%s) do not match!' % (currentCase, label, currentCaseCtr, str(perm), sgnstr)
 
+  tc = []
   if label == '':
-    tc = vtkTessCase( currentCase + '_%d' % currentCaseCtr )
-    currentCaseCtr += 1
+    label = currentCase + '_%d' % currentCaseCtr
   else:
-    tc = vtkTessCase( currentCase +  ', ' + label )
-  
-  tc.InsertTet( tets )
-  print >> genCode, '      %soutputTets.push( vtkStreamingTessellator::TetrahedralDecompositions + %d );' % (indent, tc.Offset)
+    label = currentCase +  ', ' + label
+
+  stuff = vtkTessCase( label )
+  tc.append( stuff )
+  stuff.InsertTet( tets )
+  if QualityThang:
+    altcount = 97
+    for a in alternates:
+      if label == '':
+        altlabel = currentCase + '_%d%c' % (currentCaseCtr,altcount)
+      else:
+        altlabel = label + ', %c' % altcount
+      stuff = vtkTessCase( altlabel )
+      stuff.InsertTet( a )
+      altcount += 1
+      tc.append( stuff )
+  currentCaseCtr += 1
+
+  if len(tc) > 1 and QualityThang:
+    altstring = '{ '
+    for stuff in tc:
+      altstring += str(stuff.Offset) + ', '
+    altstring += '-1 }'
+    print >> genCode, '      %s{' % indent
+    print >> genCode, '      %s  int alternates[] = %s;' % (indent, altstring)
+    print >> genCode, '      %s  outputTets.push( vtkStreamingTessellator::TetrahedralDecompositions + this->BestTets( alternates, permuted, %d, %d ) );' % ( indent, PermutationIndices[ perm ][0], sign )
+    print >> genCode, '      %s}' % indent
+  else:
+    print >> genCode, '      %soutputTets.push( vtkStreamingTessellator::TetrahedralDecompositions + %d );' % (indent, tc[0].Offset)
   print >> genCode, '      %soutputPerm.push( vtkStreamingTessellator::PermutationsFromIndex[%d] );' % (indent, PermutationIndices[ perm ][0])
   print >> genCode, '      %soutputSign.push( %d );' % (indent, sign)
   print >> genCode, '      %sVTK_TESSELLATOR_INCR_SUBCASE_COUNT(%d,%d);' % (indent,RMCases[ currentCase ][0],caseLabel)
@@ -318,7 +349,26 @@ def __Permuted( perm, sign, source, indent, label ):
       sgnstr = '+'
     raise '%s %s (%d): Permutation(%s) and sign(%s) do not match!' % (currentCase, label, currentCaseCtr, str(perm), sgnstr)
 
-  print >> genCode, '      %soutputTets.push( vtkStreamingTessellator::TetrahedralDecompositions + %d );' % (indent, vtkTessCase.GetOffset( currentCase + ', ' + source ))
+  # Create a list of all the possible tessellations
+  tc = []
+  stuff = vtkTessCase.GetOffset( currentCase + ', ' + source )
+  tc.append( stuff )
+  if QualityThang:
+    altcount = 97
+    stuff = vtkTessCase.GetOffset( currentCase + ', ' + source + ', %c' % altcount )
+    while stuff > 0:
+      tc.append( stuff )
+      altcount += 1
+      stuff = vtkTessCase.GetOffset( currentCase + ', ' + source + ', %c' % altcount )
+
+  if len(tc) > 1 and QualityThang:
+    altstring = str( tc ).replace( '[', '{' ).replace( ']', ', -1 }' )
+    print >> genCode, '      %s{' % indent
+    print >> genCode, '      %s  int alternates[] = %s;' % (indent, altstring)
+    print >> genCode, '      %s  outputTets.push( vtkStreamingTessellator::TetrahedralDecompositions + this->BestTets( alternates, permuted, %d, %d ) );' % ( indent, PermutationIndices[ perm ][0], sign )
+    print >> genCode, '      %s}' % indent
+  else:
+    print >> genCode, '      %soutputTets.push( vtkStreamingTessellator::TetrahedralDecompositions + %d );' % (indent, tc[0])
   print >> genCode, '      %soutputPerm.push( vtkStreamingTessellator::PermutationsFromIndex[%d] );' % (indent, PermutationIndices[ perm ][0])
   print >> genCode, '      %soutputSign.push( %d );' % (indent, sign)
   print >> genCode, '      %sVTK_TESSELLATOR_INCR_SUBCASE_COUNT(%d,%d);' % (indent,RMCases[ currentCase ][0],caseLabel)
@@ -331,14 +381,14 @@ def __BeginSubcase():
 def __EndSubcase():
   print >> genCode, '        }'
 
-def __SubCase( ctxt, tets, sgn ):
+def __SubCase( ctxt, tets, sgn, alternates=() ):
   global currentCaseCtr, currentCase, currentBits, caseLabel
   code = GetBitcodeFromConditional( ctxt, currentBits )
   print >> genCode, '        case %d: // %s' % ( code, ctxt )
   if sgn > 0:
-    __Unconditional( tets, (0,1,2,3), +1, '    ', ctxt )
+    __Unconditional( tets, (0,1,2,3), +1, '    ', ctxt, alternates )
   else:
-    __Unconditional( tets, (1,0,2,3), -1, '    ', ctxt )
+    __Unconditional( tets, (1,0,2,3), -1, '    ', ctxt, alternates )
   print >> genCode, '      %sbreak;' % '    '
 
 def __PrmCase( ctxt, csrc, perm, sgn ):
@@ -366,6 +416,20 @@ print >> genCode, \
 
 #include "vtkStreamingTessellator.h"
 #include "vtkSubdivisionAlgorithm.h"
+"""
+
+if QualityThang:
+  print >> genCode, """
+#include "vtkMeshQuality.h"
+#include "vtkPoints.h"
+#include "vtkTetra.h"
+
+// how's this for avoiding namespace conflicts?! 8-)
+static vtkTetra* argyle = 0;
+static vtkPoints* goCallTheCops;
+"""
+
+print >> genCode, """
 #undef UGLY_ASPECT_RATIO_HACK
 #undef DBG_MIDPTS
 
@@ -409,12 +473,21 @@ vtkStreamingTessellator::vtkStreamingTessellator()
   this->Algorithm = 0;
   this->Callback1 = 0;
   this->Callback2 = 0;
+  this->Callback3 = 0;
   this->MaximumNumberOfSubdivisions = 8;
   for ( int i=0; i<4; ++i )
     {
     this->EmbeddingDimension[i] = i;
     this->PointDimension[i] = i+3; // By default, FieldSize = 0
-    }
+    }"""
+if QualityThang:
+  print >> genCode, """
+  if ( ! argyle )
+    {
+    argyle = vtkTetra::New();
+    goCallTheCops = argyle->GetPoints();
+    }"""
+print >> genCode, """
 }
 
 vtkStreamingTessellator::~vtkStreamingTessellator()
@@ -595,7 +668,54 @@ bool compareHopfCrossStringDist( const double* a0, const double* a1, const doubl
     }
   return SqMagA < SqMagB;
 }
+"""
 
+if QualityThang:
+  print >> genCode, """
+int vtkStreamingTessellator::BestTets( int* connOffsets, double** verts, int permOffset, int sgn ) const
+{
+  int bestOffset = -1;
+  double bestQuality = 0.;
+  double currQuality;
+
+  while ( *connOffsets >= 0 )
+    {
+    int nTets = TetrahedralDecompositions[*connOffsets];
+    vtkIdType* conn = &TetrahedralDecompositions[*connOffsets +1];
+    int v;
+    currQuality = 0.;
+    for (v=0; v<nTets; ++v)
+      {
+      goCallTheCops->SetPoint( 0, verts[ vtkStreamingTessellator::PermutationsFromIndex[ permOffset ][ conn[sgn < 0 ? 1:0]] ] );
+      goCallTheCops->SetPoint( 1, verts[ vtkStreamingTessellator::PermutationsFromIndex[ permOffset ][ conn[sgn < 0 ? 0:1]] ] );
+      goCallTheCops->SetPoint( 2, verts[ vtkStreamingTessellator::PermutationsFromIndex[ permOffset ][ conn[2]] ] );
+      goCallTheCops->SetPoint( 3, verts[ vtkStreamingTessellator::PermutationsFromIndex[ permOffset ][ conn[3]] ] );
+      currQuality += vtkMeshQuality::TetFrobeniusNorm( argyle );
+      conn += 4;
+      }
+    currQuality /= nTets;
+    std::cout << currQuality << " " << *connOffsets << " ";
+    if ( bestQuality > currQuality || bestOffset < 0 )
+      {
+      bestQuality = currQuality;
+      bestOffset = *connOffsets;
+      }
+      ++connOffsets;
+    }
+    std::cout << "Choose " << bestOffset << "\\n";
+  return bestOffset;
+}
+"""
+else:
+  print >> genCode, """
+  int vtkStreamingTessellator::BestTets( int* connOffsets, double** verts, int permOffset, int sgn ) const
+{
+  // Re-run vtkStreamingTessellatorGenerator.py with QualityThang=1
+  // to get this implemented (along with on-the-fly quality improvement)
+}
+"""
+
+print >> genCode, """
 void vtkStreamingTessellator::AdaptivelySample1Facet( double* v0, double* v1, int maxDepth ) const
 {
   int edgeCode = 0;
@@ -1109,10 +1229,14 @@ __PrmCase( '1>2,2>3,4>3,4>1', '2>1,3>2,4>3,4>1', ( 2, 3, 0, 1 ), +1 )
 __PrmCase( '2>1,2>3,3>4,4>1', '2>1,3>2,4>3,4>1', ( 3, 2, 1, 0 ), +1 )
 __PrmCase( '2>1,3>2,3>4,1>4', '2>1,3>2,4>3,4>1', ( 2, 3, 1, 0 ), -1 )
 __PrmCase( '1>2,3>2,4>3,1>4', '2>1,3>2,4>3,4>1', ( 3, 2, 0, 1 ), -1 )
-# 4bu-beta: diagonal arbitrary, 6-8 used
+# 4bu-beta: diagonal arbitrary, 6-8 used, 5-7 alternate
 __SubCase( '2>1,3>2,3>4,4>1', [  6, 8, 1, 5,    6, 8, 7, 1, \
                                  6, 7, 0, 1,    8, 7, 3, 2, \
-                                 6, 8, 5, 2,    6, 8, 2, 7 ], +1 )
+                                 6, 8, 5, 2,    6, 8, 2, 7 ], +1, \
+                            ( [  7, 8, 1, 5,    6, 5, 7, 1, \
+                                 6, 7, 0, 1,    8, 7, 3, 2, \
+                                 7, 8, 5, 2,    6, 5, 2, 7 ], ) \
+                              )
 __PrmCase( '1>2,3>2,4>3,4>1', '2>1,3>2,3>4,4>1', ( 1, 0, 2, 3 ), -1 )
 __PrmCase( '1>2,2>3,4>3,1>4', '2>1,3>2,3>4,4>1', ( 1, 0, 3, 2 ), +1 )
 __PrmCase( '2>1,2>3,3>4,1>4', '2>1,3>2,3>4,4>1', ( 0, 1, 3, 2 ), -1 )
@@ -1224,13 +1348,26 @@ __SubCase( '1>2,3>4', [  5, 7, 1, 8,   5, 7, 0, 1, \
 __PrmCase( '2>1,4>3', '1>2,3>4', ( 1, 0, 2, 3 ), -1 )
 __SubCase( '1>2,4>3', [  0, 5, 6, 7,   0, 5, 7, 8, \
                          0, 5, 8, 1,   5, 7, 9, 6, \
-                         5, 7, 8, 9 ], +1 )
+                         5, 7, 8, 9 ], +1, \
+                    ( [  0, 5, 6, 8,   0, 6, 7, 8, \
+                         0, 5, 8, 1,   5, 8, 9, 6, \
+                         6, 7, 8, 9 ], ) \
+                         )
 __PrmCase( '2>1,3>4', '1>2,4>3', ( 1, 0, 2, 3 ), -1 )
 # 5-alpha
 __SubCase( '1=2,3>4', [ 10, 6, 0, 7,  10, 1, 5, 8, \
                         10, 0, 1, 7,  10, 7, 1, 8, \
                         10, 8, 5, 9,  10, 6, 7, 9, \
-                        10, 7, 8, 9,  10, 5, 6, 9 ], +1 ) 
+                        10, 7, 8, 9,  10, 5, 6, 9 ], +1, \
+                    ( [ 10, 6, 0, 7,  10, 1, 5, 8, \
+                        10, 0, 1, 7,  10, 7, 1, 8, \
+                         7, 8, 5, 9,  10, 6, 7, 5, \
+                        10, 7, 8, 5,   5, 9, 6, 7 ], \
+                      [ 10, 6, 0, 7,  10, 1, 5, 8, \
+                        10, 0, 1, 7,  10, 7, 1, 8, \
+                         6, 8, 5, 9,  10, 6, 7, 8, \
+                        10, 6, 8, 5,   8, 9, 6, 7 ], ) \
+                        ) 
 __PrmCase( '1=2,4>3', '1=2,3>4', ( 1, 0, 2, 3 ), -1 )
 __PrmCase( '3=4,1>2', '1=2,3>4', ( 1, 0, 3, 2 ), +1 )
 __PrmCase( '3=4,2>1', '1=2,3>4', ( 0, 1, 3, 2 ), -1 )
@@ -1246,16 +1383,14 @@ EndCase()
 BeginCase( '6' )
 __Unconditional( [ 7, 8, 9, 3,   6, 5, 2, 9, \
                    4, 1, 5, 8,   0, 4, 6, 7 ], (), +1 )
-# diagonal 6-8 used
+# diagonal 6-8, 5-7, or 4-9
 __Unconditional( [ 6, 4, 5, 8,   6, 5, 9, 8, \
-                   6, 9, 7, 8,   6, 7, 4, 8 ], (), +1 )
-# diagonal 5-7 used
-#__Unconditional( [ 5, 8, 9, 7,   5, 9, 6, 7, \
-#                   5, 6, 4, 7,   5, 4, 8, 7 ], (), +1 )
-# diagonal 4-9 used
-#__Unconditional( [ 4, 5, 6, 9,   4, 6, 7, 9, \
-#                   4, 7, 8, 9,   4, 8, 5, 9 ], (), +1 )
-
+                   6, 9, 7, 8,   6, 7, 4, 8 ], (), +1, '', '', \
+                 ([ 5, 8, 9, 7,   5, 9, 6, 7,   \
+                    5, 6, 4, 7,   5, 4, 8, 7 ], \
+                  [ 4, 5, 6, 9,   4, 6, 7, 9,   \
+                    4, 7, 8, 9,   4, 8, 5, 9 ]) \
+                   )
 EndCase()
 
 print >> genCode, \

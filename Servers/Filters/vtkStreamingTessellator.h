@@ -288,6 +288,8 @@ class VTK_EXPORT vtkStreamingTessellator : public vtkObject
     void AdaptivelySample2Facet( double* v1, double* v2, double* v3, int maxDepth, int move=7 ) const ;
     void AdaptivelySample1Facet( double* v1, double* v2, int maxDepth ) const ;
 
+    int BestTets( int*, double**, int, int ) const;
+
   private:
     vtkStreamingTessellator( const vtkStreamingTessellator& ); // Not implemented.
     void operator = ( const vtkStreamingTessellator& ); // Not implemented.
