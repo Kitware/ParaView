@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.131");
+vtkCxxRevisionMacro(vtkPVApplication, "1.132");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -296,8 +296,7 @@ vtkPVApplication::vtkPVApplication()
     }
   else
     {
-    // Disabled for the moment
-    this->ShowSplashScreen = 0;
+    this->ShowSplashScreen = 1;
     }
 }
 
