@@ -38,6 +38,7 @@ SET( ParaView_SRCS
   vtkPVConnectDialog.cxx
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx 
+  vtkPVCutEntry.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
   vtkPVData.cxx 
@@ -137,6 +138,7 @@ SET( ParaView_SRCS
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
   vtkPVTreeComposite.cxx 
+  vtkPVValueList.cxx
   vtkPVVectorEntry.cxx
   vtkPVWidget.cxx
   vtkPVWidgetCollection.cxx

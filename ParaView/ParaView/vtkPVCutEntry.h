@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVContourEntry.h
+  Module:    vtkPVCutEntry.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,57 +39,41 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVContourEntry maintains a list of floats for contouring.
+// .NAME vtkPVCutEntry maintains a list of floats for cutting.
 // .SECTION Description
 // This widget lets the user add or delete floats from a list.
-// It is used for contours.
+// It is used for cut plane offsets.
 
-#ifndef __vtkPVContourEntry_h
-#define __vtkPVContourEntry_h
+#ifndef __vtkPVCutEntry_h
+#define __vtkPVCutEntry_h
 
-#include "vtkPVValueList.h"
+#include "vtkPVContourEntry.h"
 
-class vtkPVArrayMenu;
+class vtkPVInputMenu;
 
-class VTK_EXPORT vtkPVContourEntry : public vtkPVValueList
+class VTK_EXPORT vtkPVCutEntry : public vtkPVContourEntry
 {
 public:
-  static vtkPVContourEntry* New();
-  vtkTypeRevisionMacro(vtkPVContourEntry, vtkPVValueList);
+  static vtkPVCutEntry* New();
+  vtkTypeRevisionMacro(vtkPVCutEntry, vtkPVContourEntry);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  // Description:
-  // We need to make the callback here so the animation selection
-  // can be traced properly.
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
-  // Gets called when the accept button is pressed.
-  virtual void AcceptInternal(const char* sourceTclName);
-
-  // Description:
-  // Gets called when the reset button is pressed.
-  virtual void ResetInternal(const char* sourceTclName);
-
   // Description:
   // This virtual method returns the scalar range of the selected
   // array for the input.
   virtual int GetValueRange(float range[2]);
 
   // Description:
-  // ArrayMenu is used to obtain the scalar range (it contains an array
-  // information object)
-  virtual void SetArrayMenu(vtkPVArrayMenu*);
-  vtkGetObjectMacro(ArrayMenu, vtkPVArrayMenu);
+  // This input menu supplies the data set.
+  virtual void SetInputMenu(vtkPVInputMenu*);
+  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
 
 protected:
-  vtkPVContourEntry();
-  ~vtkPVContourEntry();
+  vtkPVCutEntry();
+  ~vtkPVCutEntry();
   
-  vtkPVArrayMenu *ArrayMenu;
-
-  vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
-  void operator=(const vtkPVContourEntry&); // Not implemented
+  vtkPVCutEntry(const vtkPVCutEntry&); // Not implemented
+  void operator=(const vtkPVCutEntry&); // Not implemented
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
@@ -99,10 +83,8 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,      
                         vtkPVXMLPackageParser* parser);
 
-  // Description:
-  // The widget saves it state/command in the vtk tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, 
-                                        const char* sourceTclName);
+  vtkPVInputMenu *InputMenu;
+
 };
 
 #endif
