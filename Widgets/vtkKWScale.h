@@ -47,8 +47,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWScale_h
 #define __vtkKWScale_h
 
-#include "vtkKWEntry.h"
+#include "vtkKWWidget.h"
 class vtkKWApplication;
+class vtkKWEntry;
 
 class VTK_EXPORT vtkKWScale : public vtkKWWidget
 {

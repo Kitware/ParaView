@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVolume.h"
 #include "vtkVolumeProMapper.h"
 #include "vtkLODProp3D.h"
-
+#include "vtkKWProgressGauge.h"
 
 //------------------------------------------------------------------------------
 vtkKWVolumeComposite* vtkKWVolumeComposite::New()
@@ -500,5 +500,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.23 $");
+  this->ExtractRevision(os,"$Revision: 1.24 $");
 }

@@ -45,6 +45,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWMenu.h"
+#include "vtkKWProgressGauge.h"
+#include "vtkKWViewCollection.h"
+#include "vtkKWNotebook.h"
+#include "vtkKWSplitFrame.h"
 
 #include "KitwareLogo.h"
 
@@ -816,5 +821,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.27 $");
+  this->ExtractRevision(os,"$Revision: 1.28 $");
 }

@@ -49,7 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWExtent_h
 #define __vtkKWExtent_h
 
-#include "vtkKWScale.h"
+#include "vtkKWWidget.h"
+class vtkKWScale;
 class vtkKWApplication;
 
 class VTK_EXPORT vtkKWExtent : public vtkKWWidget

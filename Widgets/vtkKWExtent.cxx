@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWExtent.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkKWScale.h"
 
 
 //------------------------------------------------------------------------------

@@ -91,7 +91,7 @@ vtkKWActorComposite::~vtkKWActorComposite()
 
 void vtkKWActorComposite::SetInput(vtkPolyData *input)
 {
-  this->Mapper->SetInput(input);
+  this->Mapper->SetInput(input); 
 }
 
 void vtkKWActorComposite::CreateProperties()

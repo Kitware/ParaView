@@ -48,12 +48,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWWindow_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWApplication;
-#include "vtkKWProgressGauge.h"
-#include "vtkKWViewCollection.h"
-#include "vtkKWMenu.h"
-#include "vtkKWNotebook.h"
-#include "vtkKWSplitFrame.h"
+class vtkKWSplitFrame;
+class vtkKWNotebook;
+class vtkKWViewCollection;
+class vtkKWMenu;
+class vtkKWProgressGauge;
+class vtkKWView;
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
