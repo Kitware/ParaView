@@ -109,7 +109,7 @@ void vtkPVGetRemoteGhostCells::GhostLevelChanged()
     { // This is the first time. Create the data.
     this->InitializeData();
     }
-
+  
   window->GetMainView()->SetSelectedComposite(this);
   
   this->GetView()->Render();
@@ -125,7 +125,8 @@ void vtkPVGetRemoteGhostCells::SetGhostLevel(int level)
 			   level);
     }
   
-  this->GetRemoteGhostCells()->GetOutput()->SetUpdateGhostLevel(level);
+//  this->GetRemoteGhostCells()->GetOutput()->SetUpdateGhostLevel(level);
+  this->GetRemoteGhostCells()->SetGhostLevel(level);
 }
 
 //----------------------------------------------------------------------------
