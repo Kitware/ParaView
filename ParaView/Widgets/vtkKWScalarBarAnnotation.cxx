@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.2");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.3");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -752,7 +752,7 @@ void vtkKWScalarBarAnnotation::MaximumNumberOfColorsEndCallback()
     int old_v = 
       this->ScalarBarWidget->GetScalarBarActor()->GetMaximumNumberOfColors();
     this->ScalarBarWidget->GetScalarBarActor()->SetMaximumNumberOfColors(
-      this->MaximumNumberOfColorsThumbWheel->GetValue());
+      static_cast<int>(this->MaximumNumberOfColorsThumbWheel->GetValue()));
     if (old_v != 
         this->ScalarBarWidget->GetScalarBarActor()->GetMaximumNumberOfColors())
       {
@@ -774,7 +774,7 @@ void vtkKWScalarBarAnnotation::NumberOfLabelsEndCallback()
     int old_v = 
       this->ScalarBarWidget->GetScalarBarActor()->GetNumberOfLabels();
     this->ScalarBarWidget->GetScalarBarActor()->SetNumberOfLabels(
-      this->NumberOfLabelsScale->GetValue());
+      static_cast<int>(this->NumberOfLabelsScale->GetValue()));
     if (old_v != 
         this->ScalarBarWidget->GetScalarBarActor()->GetNumberOfLabels())
       {
