@@ -41,7 +41,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.14");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.15");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -275,6 +275,9 @@ void vtkDesktopDeliveryServer::PreRenderProcessing()
     this->ParallelRenderManager
       ->SetImageReductionFactor(this->ImageReductionFactor);
     this->ParallelRenderManager->AutoImageReductionFactorOff();
+
+    // Pass UseCompositing flag.
+    this->ParallelRenderManager->SetUseCompositing(this->UseCompositing);
     }
 }
 
