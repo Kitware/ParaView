@@ -25,7 +25,7 @@ proc CompareImage { view } {
       return 1
    }
    vtkWindowToImageFilter rt_w2if
-   rt_w2if SetInput [$view GetVTKWindow]
+   rt_w2if SetInput [$view GetRenderWindow]
    if {$threshold == -1} {
       set threshold 10
    }
