@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVRenderView.cxx
+  Module:    vtkPVRenderWindowInteractor.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,87 +26,35 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#include "vtkPVRenderView.h"
 #include "vtkPVRenderWindowInteractor.h"
+#include "vtkPVRenderView.h"
 #include "vtkObjectFactory.h"
 
 
 
 //------------------------------------------------------------------------------
-vtkPVRenderView* vtkPVRenderView::New()
+vtkPVRenderWindowInteractor* vtkPVRenderWindowInteractor::New()
 {
   // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVRenderView");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVRenderWindowInteractor");
   if(ret)
     {
-    return (vtkPVRenderView*)ret;
+    return (vtkPVRenderWindowInteractor*)ret;
     }
   // If the factory was unable to create the object, then create it here.
-  return new vtkPVRenderView;
+  return new vtkPVRenderWindowInteractor;
 }
 
 
-int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
-vtkPVRenderView::vtkPVRenderView()
+vtkPVRenderWindowInteractor::vtkPVRenderWindowInteractor()
 {
-  this->CommandFunction = vtkPVRenderViewCommand;
-  this->InteractorStyle = NULL;
-  this->Interactor = vtkPVRenderWindowInteractor::New();
+  //this->CommandFunction = vtkPVRenderWindowInteractorCommand;
 }
 
-vtkPVRenderView::~vtkPVRenderView()
+vtkPVRenderWindowInteractor::~vtkPVRenderWindowInteractor()
 {
-  this->Interactor->Delete();
-  this->Interactor = NULL;
-  this->SetInteractorStyle(NULL);
-}
-
-void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
-{
-  if (this->Interactor)
-    {
-    this->Interactor->SetRenderWindow(this->GetRenderer()->GetRenderWindow());
-    this->Interactor->SetInteractorStyle(style);
-    }
-  if (this->InteractorStyle)
-    {
-    this->InteractorStyle->UnRegister(this);
-    this->InteractorStyle = NULL;
-    }
-  if (style)
-    {
-    this->InteractorStyle = style;
-    style->Register(this);
-    }
-} 
-
-void vtkPVRenderView::AButtonPress(int num, int x, int y)
-{
-}
-
-void vtkPVRenderView::AButtonRelease(int num, int x, int y)
-{
-}
-
-void vtkPVRenderView::Button1Motion(int x, int y)
-{
-}
-
-void vtkPVRenderView::Button2Motion(int x, int y)
-{
-}
-
-void vtkPVRenderView::Button3Motion(int x, int y)
-{
-}
-
-void vtkPVRenderView::AKeyPress(char key, int x, int y)
-{
-  if (this->InteractorStyle)
-    {
-    this->InteractorStyle->OnChar(0, 0, key, 1);
-    }
 }
 
