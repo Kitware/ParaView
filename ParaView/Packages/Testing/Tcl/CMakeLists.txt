@@ -18,6 +18,7 @@ SET(PROJECT_TESTS SimplePackage
                   TestPolyDataIO
                   TestUnstructuredGridIO
                   TestStructuredGridIO
+                  TestRectilinearGridIO
                   TestImageDataIO    )
 
 IF(RUN_WITH_MPI)
