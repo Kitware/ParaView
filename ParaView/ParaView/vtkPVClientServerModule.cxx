@@ -79,6 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef _WIN32
 #include <unistd.h>
 #endif
+#include <vtkstd/string>
 
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
@@ -205,7 +206,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.29");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.30");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -225,6 +226,8 @@ vtkPVClientServerModule::vtkPVClientServerModule()
 
   this->Hostname = 0;
   this->Port = 0;
+  this->MultiProcessMode = vtkPVClientServerModule::SINGLE_PROCESS_MODE;
+  this->NumberOfProcesses = 2;
 
   this->RemoteExecution = vtkKWRemoteExecute::New();
 }
@@ -295,46 +298,42 @@ void vtkPVClientServerModule::Initialize()
     // Get the port from the command line arguments
     this->Port = pvApp->GetPort();
     // Establish connection
+    int start = 0;
     while (!comm->ConnectTo(this->Hostname, this->Port))
       {
-      char buffer[1024];
-      sprintf(buffer, "Cannot connect to the server %s:%d.\n"
-        "Do you want to start ParaView on the remote server?",
-        this->Hostname, this->Port);
-      this->Script("wm withdraw .");
-      int start = vtkKWMessageDialog::PopupYesNo(
-        this->Application, this->GetPVApplication()->GetMainWindow(),
-        "ParaView Connection Failed",
-        buffer,
-        vtkKWMessageDialog::YesDefault | vtkKWMessageDialog::WarningIcon
-      );
       if ( start )
         {
-        char* args[4];
-        args[0] = vtkString::Duplicate("ParaView");
-        args[1] = vtkString::Duplicate("--server");
-        args[2] = vtkString::Duplicate("--port=XXXXXX");
-        args[3] = 0;
-        sprintf(args[2], "--port=%d", this->Port);
-        cout << "Code missing for starting remote server" << endl;
+        char numbuffer[100];
+        vtkstd::string runcommand = "eval ${PARAVIEW_SETUP_SCRIPT} && ";
+        // Add mpi
+        if ( this->MultiProcessMode == vtkPVClientServerModule::MPI_MODE )
+          {
+          sprintf(numbuffer, "%d", this->NumberOfProcesses);
+          cout << "Running mpi with " << this->NumberOfProcesses << " servers " << endl;
+          runcommand += "mpirun -np ";
+          runcommand += numbuffer;
+          runcommand += " ";
+          }
+        runcommand += "ParaView --server --port=";
+        sprintf(numbuffer, "%d", this->Port);
+        runcommand += numbuffer;
         this->RemoteExecution->SetRemoteHost(this->Hostname);
-        this->RemoteExecution->RunRemoteCommand((const char**)args);
+        this->RemoteExecution->RunRemoteCommand(runcommand.c_str());
 #ifdef _WIN32
         Sleep(5000);
 #else
         sleep(5);
 #endif
-        int cc;
-        for ( cc = 0; cc < 4; cc ++ )
-          {
-          delete [] args[cc];
-          }
+        start = 0;
         continue;
         }
+      this->Script("wm withdraw .");
       vtkPVConnectDialog* dialog = 
         vtkPVConnectDialog::New();
       dialog->SetHostname(this->Hostname);
       dialog->SetPort(this->Port);
+      dialog->SetNumberOfProcesses(this->NumberOfProcesses);
+      dialog->SetMultiProcessMode(this->MultiProcessMode);
       dialog->Create(this->GetPVApplication(), 0);
       int res = dialog->Invoke();
       cout << "Res: " << res << endl;
@@ -342,6 +341,9 @@ void vtkPVClientServerModule::Initialize()
         {
         this->SetHostname(dialog->GetHostName());
         this->Port = dialog->GetPort();
+        this->NumberOfProcesses = dialog->GetNumberOfProcesses();
+        this->MultiProcessMode = dialog->GetMultiProcessMode();
+        start = 1;
         }
       dialog->Delete();
 

@@ -144,6 +144,15 @@ public:
   // Get a reference to a vtkDataObject from the server-side root node
   // given the Tcl name of the object.
   virtual vtkDataObject* ReceiveRootDataObject(const char* tclName);
+
+//BTX
+  enum 
+    {
+    SINGLE_PROCESS_MODE = 0,
+    MPI_MODE
+    };
+//ETX
+  
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();
@@ -160,7 +169,9 @@ protected:
   vtkSetStringMacro(Hostname);
   char* Hostname;
   int Port;
-  
+  int MultiProcessMode;
+  int NumberOfProcesses;
+
   vtkSetStringMacro(RootResult);
   vtkKWRemoteExecute* RemoteExecution;
   

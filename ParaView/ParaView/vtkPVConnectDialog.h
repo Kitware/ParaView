@@ -78,6 +78,11 @@ public:
   int GetPort();
   void MPICheckBoxCallback();
 
+  vtkSetMacro(MultiProcessMode, int);
+  vtkGetMacro(MultiProcessMode, int);
+  vtkSetMacro(NumberOfProcesses, int);
+  vtkGetMacro(NumberOfProcesses, int);
+
 
 protected:
   vtkPVConnectDialog();
@@ -93,6 +98,8 @@ protected:
   vtkSetStringMacro(HostnameString);
   char* HostnameString;
   int PortInt;
+  int MultiProcessMode;
+  int NumberOfProcesses;
  
   // Result from last RootScript.
   char* RootResult;

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.1");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.2");
 
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
 {
@@ -101,12 +101,22 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
   this->MPIMode->SetParent(frame);
   this->MPIMode->Create(app, 0);
   this->MPIMode->SetLabel("Use MPI");
+  if ( this->MultiProcessMode == 1 )
+    {
+    this->MPIMode->GetCheckButton()->SetState(1);
+    }
+  else
+    {
+    this->MPIMode->GetCheckButton()->SetState(0);
+    }
   this->MPIMode->GetCheckButton()->SetCommand(this, "MPICheckBoxCallback");
   this->MPINumberOfServers->SetParent(frame);
   this->MPINumberOfServers->PopupScaleOn();
   this->MPINumberOfServers->Create(app, 0);
   this->MPINumberOfServers->DisplayEntry();
   this->MPINumberOfServers->DisplayLabel("Number of processes");
+  this->MPINumberOfServers->SetRange(2, 10);
+  this->MPINumberOfServers->SetValue(this->NumberOfProcesses);
   this->Script("pack %s -side left -expand 1 -fill x", 
     this->MPIMode->GetWidgetName());
   this->Script("pack %s -side left -expand 1 -fill x", 
@@ -124,6 +134,15 @@ void vtkPVConnectDialog::OK()
 {
   this->SetHostnameString(this->Hostname->GetValue());
   this->PortInt = this->Port->GetValueAsInt();
+  this->NumberOfProcesses = static_cast<int>(this->MPINumberOfServers->GetValue());
+  if ( this->MPIMode->GetCheckButton()->GetState() )
+    {
+    this->MultiProcessMode = 1;
+    }
+  else
+    {
+    this->MultiProcessMode = 0;
+    }
   this->Superclass::OK();
 }
 
@@ -177,6 +196,8 @@ vtkPVConnectDialog::vtkPVConnectDialog()
 
   this->HostnameString = 0;
   this->PortInt = 0;
+  this->MultiProcessMode = 0;
+  this->NumberOfProcesses = 2;
 }
 
 vtkPVConnectDialog::~vtkPVConnectDialog()
