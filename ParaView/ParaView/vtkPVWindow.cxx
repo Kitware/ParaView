@@ -930,7 +930,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     this->ReadSourceInterfaces();
     
     // Create the extract grid button
-    this->AddToolbarButton("ExtractGrid", "PVExtractGridButton", 
+    this->AddToolbarButton("ExtractGrid", "PVExtractGridButton", 0,
                            "ExtractGridCallback",
                            "Extract a sub grid from a structured data set.");
 
@@ -1028,9 +1028,14 @@ void vtkPVWindow::AddPackageName(const char* name)
 // disabled/enabled in certain situations.
 void vtkPVWindow::AddToolbarButton(const char* buttonName, 
                                    const char* imageName, 
+				   const char* fileName,
                                    const char* command,
                                    const char* balloonHelp)
 {
+  if (fileName)
+    {
+    this->Script("image create photo %s -file {%s}", imageName, fileName);
+    }
   vtkKWPushButton* button = vtkKWPushButton::New();
   button->SetParent(this->Toolbar->GetFrame());
   ostrstream opts;

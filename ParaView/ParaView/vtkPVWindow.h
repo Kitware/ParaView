@@ -310,7 +310,8 @@ public:
 
   // Description:
   // Add a push button to the main toolbar.
-  void AddToolbarButton(const char* buttonName, const char* imageName, 
+  void AddToolbarButton(const char* buttonName, const char* imageName,
+                        const char* fileName, 
 			const char* command, const char* balloonHelp);
 
   // Description:
