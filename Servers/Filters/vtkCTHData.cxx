@@ -39,7 +39,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.16");
+vtkCxxRevisionMacro(vtkCTHData, "1.17");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -561,7 +561,6 @@ vtkIdType vtkCTHData::GetNumberOfPoints()
 //----------------------------------------------------------------------------
 int vtkCTHData::GetDataDimension()
 {
-  int fixme;
   return vtkStructuredData::GetDataDimension(this->DataDescription);
 }
 
