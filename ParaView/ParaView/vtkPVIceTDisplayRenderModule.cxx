@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.3.4.2");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.3.4.3");
 
 
 
@@ -244,7 +244,7 @@ void vtkPVIceTDisplayRenderModule::StillRender()
   vtkTimerLog::MarkStartEvent("Still Render");
   vtkPVApplication* pvApp = this->PVApplication;
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->RootScript("RenWin1 Render");
+  //pm->RootScript("RenWin1 Render");
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Still Render");
   */
@@ -269,7 +269,7 @@ void vtkPVIceTDisplayRenderModule::InteractiveRender()
   vtkTimerLog::MarkStartEvent("Interactive Render");
   vtkPVApplication* pvApp = this->PVApplication;
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->RootScript("RenWin1 Render");
+  //pm->RootScript("RenWin1 Render");
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Interactive Render");
   */
