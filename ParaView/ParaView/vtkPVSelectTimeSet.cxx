@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.33");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.34");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -157,7 +157,8 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SetTimeValue(float time)
 {
-  if (this->TimeValue != time) 
+  if (this->TimeValue != time ||
+      !strcmp(this->TimeLabel->GetLabel(), "No timesets available."))
     { 
     this->TimeValue = time; 
     
@@ -300,6 +301,7 @@ void vtkPVSelectTimeSet::ResetInternal()
     }
   else
     {
+    this->SetTimeValue(actualTimeValue);
     this->Script("pack %s -expand t -fill x", this->TreeFrame->GetWidgetName());
     }
 
@@ -465,6 +467,14 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
       }
     this->TimeSets->AddItem(timeSet);
     timeSet->Delete();
+    }
+  
+  if (this->Property->GetNumberOfScalars() == 0 &&
+      this->TimeSets->GetNumberOfItems() > 0)
+    {
+    vtkFloatArray *ts =
+      vtkFloatArray::SafeDownCast(this->TimeSets->GetItem(0));
+    this->Property->SetScalars(1, ts->GetPointer(0));
     }
 }
 
