@@ -51,17 +51,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
-#include "vtkPVScalarRangeLabel.h"
 #include "vtkPVSource.h"
-#include "vtkPVVectorEntry.h"
 #include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.29");
-
-vtkCxxSetObjectMacro(vtkPVContourEntry, ScalarRangeLabel,
-                     vtkPVScalarRangeLabel);
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.30");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -79,16 +74,9 @@ vtkPVContourEntry::vtkPVContourEntry()
   this->NewValueEntry = vtkKWEntry::New();
   this->AddValueButton = vtkKWPushButton::New();
   this->DeleteValueButton = vtkKWPushButton::New();
-  this->GenerateFrame = vtkKWWidget::New();
-  this->GenerateLabel = vtkKWLabel::New();
-  this->GenerateEntry = vtkKWEntry::New();
-  this->GenerateButton = vtkKWPushButton::New();
-  this->GenerateRange = vtkPVVectorEntry::New();
-  
+
   this->ContourValues->SetNumberOfContours(0);
   this->SuppressReset = 1;
-  
-  this->ScalarRangeLabel = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -110,19 +98,8 @@ vtkPVContourEntry::~vtkPVContourEntry()
   this->NewValueFrame = NULL;
   this->DeleteValueButton->Delete();
   this->DeleteValueButton = NULL;
-  this->GenerateFrame->Delete();
-  this->GenerateFrame = NULL;
-  this->GenerateLabel->Delete();
-  this->GenerateLabel = NULL;
-  this->GenerateEntry->Delete();
-  this->GenerateEntry = NULL;
-  this->GenerateButton->Delete();
-  this->GenerateButton = NULL;
-  this->GenerateRange->Delete();
-  this->GenerateRange = NULL;
-  
+
   this->SetPVSource(NULL);
-  this->SetScalarRangeLabel(NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -210,41 +187,6 @@ void vtkPVContourEntry::Create(vtkKWApplication *app)
 
   this->SetBalloonHelpString(this->BalloonHelpString);
 
-  char *className = this->PVSource->GetSourceClassName();
-  if (strcmp(className, "vtkPVKitwareContourFilter") != 0 ||
-      strcmp(className, "vtkPVContourFilter") != 0)
-    {
-    this->GenerateFrame->SetParent(this);
-    this->GenerateFrame->Create(app, "frame", "");
-    this->Script("pack %s", this->GenerateFrame->GetWidgetName());
-    
-    this->GenerateLabel->SetParent(this->GenerateFrame);
-    this->GenerateLabel->Create(app, "");
-    this->GenerateLabel->SetLabel("Number of Values to Generate");
-    
-    this->GenerateEntry->SetParent(this->GenerateFrame);
-    this->GenerateEntry->Create(app, "");
-    this->GenerateEntry->SetValue("");
-    this->Script("bind %s <KeyPress-Return> {%s GenerateValuesCallback}",
-                 this->GenerateEntry->GetWidgetName(), this->GetTclName());
-    
-    this->GenerateButton->SetParent(this->GenerateFrame);
-    this->GenerateButton->Create(app, "");
-    this->GenerateButton->SetLabel("Generate");
-    this->GenerateButton->SetCommand(this, "GenerateValuesCallback");
-    
-    this->Script("pack %s %s %s -side left",
-                 this->GenerateLabel->GetWidgetName(),
-                 this->GenerateEntry->GetWidgetName(),
-                 this->GenerateButton->GetWidgetName());
-    
-    this->GenerateRange->SetParent(this);
-    this->GenerateRange->Create(app);
-    this->GenerateRange->SetLabel("Generate Values in Range");
-
-    this->Script("pack %s", this->GenerateRange->GetWidgetName());
-    }
-  
   // Get the default values in the UI.
   this->Update();
 }
@@ -369,26 +311,6 @@ void vtkPVContourEntry::DeleteValueCallback()
     }
 
   this->NewValueEntry->SetValue("");
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::GenerateValuesCallback()
-{
-  if (!this->ScalarRangeLabel)
-    {
-    return;
-    }
-  
-  double *range = this->ScalarRangeLabel->GetRange();  
-  int numContours = this->GenerateEntry->GetValueAsInt();
-  double step = (range[1] - range[0]) / (float)(numContours-1);
-  
-  int i;
-  for (i = 0; i < numContours; i++)
-    {
-    this->AddValue(i*step+range[0]);
-    }
-  this->Update();
 }
 
 //-----------------------------------------------------------------------------
@@ -580,13 +502,6 @@ void vtkPVContourEntry::CopyProperties(vtkPVWidget* clone,
       {
       pvce->AddValue(this->ContourValues->GetValue(idx));
       }
-    if (this->ScalarRangeLabel)
-      {
-      vtkPVScalarRangeLabel *srl =
-        this->ScalarRangeLabel->ClonePrototype(pvSource, map);
-      pvce->SetScalarRangeLabel(srl);
-      srl->Delete();
-      }
     }
   else 
     {
@@ -616,26 +531,6 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     this->AddValue(atof(attr));
     }
 
-  const char* scalar_range = element->GetAttribute("scalar_range");
-  if (scalar_range)
-    {
-    vtkPVXMLElement *ime = element->LookupElement(scalar_range);
-    vtkPVWidget *w = this->GetPVWidgetFromParser(ime, parser);
-    vtkPVScalarRangeLabel *srl = vtkPVScalarRangeLabel::SafeDownCast(w);
-    if (!srl)
-      {
-      if (w)
-        {
-        w->Delete();
-        }
-      vtkErrorMacro("Couldn't get ScalarRangeLabel " << scalar_range);
-      return 0;
-      }
-    srl->AddDependent(this);
-    this->SetScalarRangeLabel(srl);
-    srl->Delete();
-    }
-  
   return 1;
 }
 
