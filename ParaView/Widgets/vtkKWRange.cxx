@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.15");
+vtkCxxRevisionMacro(vtkKWRange, "1.16");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -447,7 +447,7 @@ void vtkKWRange::Pack()
 //----------------------------------------------------------------------------
 void vtkKWRange::Bind()
 {
-  if (!this->IsCreated())
+  if (!this->IsAlive())
     {
     return;
     }
@@ -507,7 +507,7 @@ void vtkKWRange::Bind()
 //----------------------------------------------------------------------------
 void vtkKWRange::UnBind()
 {
-  if (!this->IsCreated())
+  if (!this->IsAlive())
     {
     return;
     }
