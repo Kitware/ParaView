@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.318");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.319");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2224,6 +2224,12 @@ void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double 
   this->OrientationAxes->SetOutlineColor(r, g, b);
   this->GetPVWindow()->SaveColor(2, "OrientationAxesOutline",
                                  this->OrientationAxes->GetOutlineColor());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetRenderWindowSize(int x, int y)
+{
+  this->GetRenderWindow()->SetSize(x,y);
 }
 
 //----------------------------------------------------------------------------
