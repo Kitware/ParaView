@@ -21,7 +21,7 @@
 #include "vtkHierarchicalDataSetInternal.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkHierarchicalDataIterator, "1.3");
+vtkCxxRevisionMacro(vtkHierarchicalDataIterator, "1.4");
 vtkStandardNewMacro(vtkHierarchicalDataIterator);
 
 class vtkHierarchicalDataIteratorInternal
@@ -134,7 +134,7 @@ int vtkHierarchicalDataIterator::IsDoneWithTraversal()
 //----------------------------------------------------------------------------
 vtkDataObject* vtkHierarchicalDataIterator::GetCurrentDataObject()
 {
-  if ( this->DataSet->Internal->DataSets.empty() )
+  if ( !this->DataSet || this->DataSet->Internal->DataSets.empty() )
     {
     return 0;
     }
