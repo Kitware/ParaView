@@ -22,6 +22,7 @@ vtkKWGenericComposite.cxx
 vtkKWGenericRenderWindowInteractor.cxx
 vtkKWImageLabel.cxx
 vtkKWLabel.cxx
+vtkKWLabeledCheckButton.cxx
 vtkKWLabeledCheckButtonSet.cxx 
 vtkKWLabeledEntry.cxx 
 vtkKWLabeledFrame.cxx 
