@@ -134,9 +134,10 @@ protected:
   ~vtkPVOrientScaleWidget();
 
   vtkKWLabeledFrame *LabeledFrame;
-  vtkKWWidget *ArrayMenuFrame;
+  vtkKWWidget *ScalarsFrame;
   vtkKWLabel *ScalarsLabel;
   vtkKWOptionMenu *ScalarsMenu;
+  vtkKWWidget *VectorsFrame;
   vtkKWLabel *VectorsLabel;
   vtkKWOptionMenu *VectorsMenu;
   vtkKWWidget *OrientModeFrame;

@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.2");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -68,16 +68,18 @@ vtkPVOrientScaleWidget::vtkPVOrientScaleWidget()
 {
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->LabeledFrame->SetParent(this);
-  this->ArrayMenuFrame = vtkKWWidget::New();
-  this->ArrayMenuFrame->SetParent(this->LabeledFrame->GetFrame());
+  this->ScalarsFrame = vtkKWWidget::New();
+  this->ScalarsFrame->SetParent(this->LabeledFrame->GetFrame());
   this->ScalarsLabel = vtkKWLabel::New();
-  this->ScalarsLabel->SetParent(this->ArrayMenuFrame);
+  this->ScalarsLabel->SetParent(this->ScalarsFrame);
   this->ScalarsMenu = vtkKWOptionMenu::New();
-  this->ScalarsMenu->SetParent(this->ArrayMenuFrame);
+  this->ScalarsMenu->SetParent(this->ScalarsFrame);
+  this->VectorsFrame = vtkKWWidget::New();
+  this->VectorsFrame->SetParent(this->LabeledFrame->GetFrame());
   this->VectorsLabel = vtkKWLabel::New();
-  this->VectorsLabel->SetParent(this->ArrayMenuFrame);
+  this->VectorsLabel->SetParent(this->VectorsFrame);
   this->VectorsMenu = vtkKWOptionMenu::New();
-  this->VectorsMenu->SetParent(this->ArrayMenuFrame);
+  this->VectorsMenu->SetParent(this->VectorsFrame);
   this->OrientModeFrame = vtkKWWidget::New();
   this->OrientModeFrame->SetParent(this->LabeledFrame->GetFrame());
   this->OrientModeLabel = vtkKWLabel::New();
@@ -113,12 +115,14 @@ vtkPVOrientScaleWidget::~vtkPVOrientScaleWidget()
 {
   this->LabeledFrame->Delete();
   this->LabeledFrame = NULL;
-  this->ArrayMenuFrame->Delete();
-  this->ArrayMenuFrame = NULL;
+  this->ScalarsFrame->Delete();
+  this->ScalarsFrame = NULL;
   this->ScalarsLabel->Delete();
   this->ScalarsLabel = NULL;
   this->ScalarsMenu->Delete();
   this->ScalarsMenu = NULL;
+  this->VectorsFrame->Delete();
+  this->VectorsFrame = NULL;
   this->VectorsLabel->Delete();
   this->VectorsLabel = NULL;
   this->VectorsMenu->Delete();
@@ -168,23 +172,24 @@ void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
   this->LabeledFrame->Create(app, "");
   this->LabeledFrame->SetLabel("Orient / Scale");
   
-  this->ArrayMenuFrame->Create(app, "frame", "");
-
-  this->ScalarsLabel->Create(app, "-width 12 -justify center"); 
+  this->ScalarsFrame->Create(app, "frame", "");
+  this->ScalarsLabel->Create(app, "-width 18 -justify center"); 
   this->ScalarsLabel->SetLabel("Scalars");
   this->ScalarsLabel->EnabledOff();
   this->ScalarsMenu->Create(app, "");
   this->ScalarsMenu->EnabledOff();
   
-  this->VectorsLabel->Create(app, "-width 12 -justify center");
+  this->VectorsFrame->Create(app, "frame", "");
+  this->VectorsLabel->Create(app, "-width 18 -justify center");
   this->VectorsLabel->SetLabel("Vectors");
   this->VectorsMenu->Create(app, "");
 
   this->Script("pack %s -side left", this->ScalarsLabel->GetWidgetName());
   this->Script("pack %s -side left -fill x -expand yes",
                this->ScalarsMenu->GetWidgetName());
-  this->Script("pack %s -side left", this->VectorsLabel->GetWidgetName());
-  this->Script("pack %s -side left -fill x -expand yes",
+  this->Script("pack %s -side left -pady {0 2}",
+               this->VectorsLabel->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand yes -pady {0 2}",
                this->VectorsMenu->GetWidgetName());
   
   this->OrientModeFrame->Create(app, "frame", "");
@@ -229,12 +234,13 @@ void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -side left -fill x -expand yes",
                this->ScaleFactorEntry->GetWidgetName());
   
-  this->Script("pack %s %s %s %s -side top -anchor w -fill x",
-               this->ArrayMenuFrame->GetWidgetName(),
+  this->Script("pack %s %s %s %s %s -side top -anchor w -fill x",
                this->OrientModeFrame->GetWidgetName(),
                this->ScaleModeFrame->GetWidgetName(),
-               this->ScaleFactorFrame->GetWidgetName());
-  this->Script("pack %s -side top -anchor w -fill x",
+               this->ScaleFactorFrame->GetWidgetName(),
+               this->ScalarsFrame->GetWidgetName(),
+               this->VectorsFrame->GetWidgetName());
+  this->Script("pack %s -side top -anchor w -fill x -pady 4",
                this->LabeledFrame->GetWidgetName());
 }
 
@@ -622,23 +628,14 @@ vtkPVDataSetAttributesInformation* vtkPVOrientScaleWidget::GetPointDataInformati
 
 void vtkPVOrientScaleWidget::ScalarsMenuEntryCallback(const char *arrayName)
 {
-//  if (!strcmp(this->ScaleModeMenu->GetValue(), "Scalar"))
-//    {
-    this->UpdateScaleFactor();
-//    }
+  this->UpdateScaleFactor();
     
   this->ModifiedCallback();
 }
 
 void vtkPVOrientScaleWidget::VectorsMenuEntryCallback(const char *arrayName)
 {
-//  const char *scaleEntry = this->ScaleModeMenu->GetValue();
-  
-//  if (!strcmp(scaleEntry, "Vector Magnitude") ||
-//      !strcmp(scaleEntry, "Vector Components"))
-//    {
-    this->UpdateScaleFactor();
-//    }
+  this->UpdateScaleFactor();
     
   this->ModifiedCallback();
 }
