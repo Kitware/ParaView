@@ -71,6 +71,8 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVRenderModuleUI.h"
 
+#include "vtkActor.h"
+
 // Just for the definition of VTK_POINT_DATA_FIELD ...
 #include "vtkFieldDataToAttributeDataFilter.h"
 
@@ -82,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.269");
+vtkCxxRevisionMacro(vtkPVData, "1.270");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2741,6 +2743,11 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           << " GetProperty ScalarVisibility] SetElements1 "  
           << part->GetPartDisplay()->GetMapper()->GetScalarVisibility()
           << endl;
+
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty ColorMode] SetElements1 "  
+          << part->GetPartDisplay()->GetMapper()->GetColorMode()
+          << endl;
     
     *file << "  [$pvTemp" << partD->GetGeometryID() 
           << " GetProperty Representation] SetElements1 "  
@@ -2795,7 +2802,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           << this->OpacityScale->GetValue() << endl;
     
     double propColor[3];
-    part->GetPartDisplay()->GetProperty()->GetColor(propColor);
+    part->GetPartDisplay()->GetProperty()->GetDiffuseColor(propColor);
     *file << "  [$pvTemp" << partD->GetGeometryID() 
           << " GetProperty Color] SetElements3 "  
           << propColor[0] << " " << propColor[1] << " " << propColor[2]
