@@ -3558,7 +3558,7 @@ if ![info exists DemoDir] {
         catch {$warp(vtkTemp450) DeleteCallback}
         catch {$warp(vtkTemp384) DeleteCallback}
 
-        $clip(vtkTemp24) EventuallyRender
+        catch {$clip(vtkTemp24) EventuallyRender}
 
         grab release .control.main.stop
         wm withdraw .control
