@@ -26,13 +26,17 @@ IF(USE_INCLUDED_TCLTK)
     ENDIF(RUN_CONFIGURE)
   
     SET(TCL_LIBRARY ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix/libtcl8.3.a 
-       CACHE FILEPATH
-     "Path to tcl library")
+       CACHE FILEPATH "Path to tcl library")
+    SET(TCL_STUB_LIBRARY 
+       ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix/libtclstub8.3.a 
+       CACHE FILEPATH "Path to tcl stub library")
     SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tcl8.3.2/generic 
         CACHE PATH "Path to tcl include")
     SET(TK_LIBRARY ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix/libtk8.3.a 
-       CACHE FILEPATH
-     "Path to tk library")
+       CACHE FILEPATH "Path to tk library")
+    SET(TK_STUB_LIBRARY 
+       ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix/libtkstub8.3.a 
+       CACHE FILEPATH "Path to tk stub library")
     SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tk8.3.2/generic 
         CACHE PATH "Path to tk include")
     IF (CMAKE_MAJOR_VERSION MATCHES [1-9][0-9]*)
@@ -55,13 +59,17 @@ IF(USE_INCLUDED_TCLTK)
   
   ELSE(UNIX)
     SET(TCL_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/lib/tcl83.lib
-        CACHE FILEPATH
-     "Path to tcl library")
+        CACHE FILEPATH "Path to tcl library")
+    SET(TCL_STUB_LIBRARY 
+       ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/lib/tclstub83.lib
+       CACHE FILEPATH "Path to tcl stub library")
     SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/include 
         CACHE PATH "Path to tcl include")
     SET(TK_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/lib/tk83.lib 
-       CACHE FILEPATH
-     "Path to tcl library")
+       CACHE FILEPATH "Path to tk library")
+    SET(TK_STUB_LIBRARY 
+       ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/lib/tkstub83.lib 
+       CACHE FILEPATH "Path to tk stub library")
     SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/include 
         CACHE PATH "Path to tcl include")
   # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
