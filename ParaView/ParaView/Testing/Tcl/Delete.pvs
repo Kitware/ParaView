@@ -30,6 +30,9 @@ $pv(vtkTemp110) SetValue 0.5 0 0
 set pv(vtkTemp115) [$pv(vtkTemp98) GetPVWidget {Radius}]
 $pv(vtkTemp115) SetValue 0.6
 $pv(vtkTemp98) AcceptCallback
+
+$pv(vtkTemp1) SetShowSourcesLongHelp 0
+
 set pv(vtkTemp197) [$pv(vtkTemp1) CreatePVSource ShrinkPolyData]
 set pv(vtkTemp206) [$pv(vtkTemp197) GetPVWidget {Input}]
 $pv(vtkTemp206) SetCurrentValue $pv(vtkTemp98)
