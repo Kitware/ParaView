@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.326");
+vtkCxxRevisionMacro(vtkPVSource, "1.327");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1421,8 +1421,16 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // Note has to be done here because tcl update causes render which
   // causes the filter to execute.
   pvd->UpdateProperties();
-
-  window->UpdateFilterMenu();
+  
+  vtkPVDataInformation *pvdi = this->GetDataInformation();
+  if (!pvdi->GetNumberOfCells() || !pvdi->GetNumberOfPoints())
+    {
+    window->DisableFilterMenu();
+    }
+  else
+    {
+    window->UpdateFilterMenu();
+    }
 }
 
 //----------------------------------------------------------------------------

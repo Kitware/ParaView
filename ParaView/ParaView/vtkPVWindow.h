@@ -345,6 +345,10 @@ public:
   // Description:
   // Re-populate the filter menu.
   void UpdateFilterMenu();
+  
+  // Description:
+  // Disable the filter menu and the menu buttons.
+  void DisableFilterMenu();
 
   // Description:
   // Experimenting with wizards. Has to cleaned up - Berk
