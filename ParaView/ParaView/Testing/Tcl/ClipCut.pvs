@@ -73,6 +73,7 @@ set pv(vtkTemp416) [$pv(vtkTemp1) CreatePVSource Cut]
 set pv(vtkTemp418) [$pv(vtkTemp416) GetPVWidget {Cut Function}]
 set pv(vtkTemp417) [$pv(vtkTemp418) GetPVWidget {Plane}]
 $pv(vtkTemp417) SetCenter 0.150 -0.650 0.500
+$pv(vtkTemp417) SetNormal 0 0 -1
 $pv(vtkTemp416) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourceProperties
