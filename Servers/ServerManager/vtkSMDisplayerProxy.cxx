@@ -27,7 +27,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.7");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -234,16 +234,6 @@ void vtkSMDisplayerProxy::UpdateVTKObjects()
   this->ActorProxy->UpdateVTKObjects();
   this->PropertyProxy->UpdateVTKObjects();
   this->MapperProxy->UpdateVTKObjects();
-
-  vtkClientServerStream stream;
-
-  stream << vtkClientServerStream::Invoke << this->ActorProxy->GetID(0)
-         << "Print" << vtkClientServerStream::End;
-  
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  cm->SendStreamToServers(&stream, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
 }
 
 //---------------------------------------------------------------------------
