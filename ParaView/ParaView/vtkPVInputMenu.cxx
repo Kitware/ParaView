@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.34.2.1");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.34.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu::vtkPVInputMenu()
@@ -374,8 +374,8 @@ void vtkPVInputMenu::Reset()
   // The list of possible inputs could have changed.
   this->AddSources(this->Sources);
 
-  // Set the current value.
-  // The catch is here because GlyphSource is initially NULL which causes an error.
+  // Set the current value.  The catch is here because GlyphSource is
+  // initially NULL which causes an error.
   this->Script("catch {%s SetCurrentValue [[%s Get%s] GetPVSource]}", 
                this->GetTclName(), 
                this->PVSource->GetTclName(), this->InputName);    
