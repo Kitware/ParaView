@@ -744,7 +744,7 @@ void SystemTools::ConvertToUnixSlashes(kwsys_stl::string& path)
   while((pos = path.find('\\', pos)) != kwsys_stl::string::npos)
     {
     // make sure we don't convert an escaped space to a unix slash
-    if(pos < path.size()-2)
+    if(pos < path.size()-1)
       {
       if(path[pos+1] != ' ')
         {
@@ -995,10 +995,11 @@ bool SystemTools::CopyFileAlways(const char* source, const char* destination)
     return false;
     }
 
-  if ( SystemTools::FileExists(destination) && !SystemTools::RemoveFile(destination) )
-    {
-    return false;
-    }
+  // try and remove the destination file so that read only destination files
+  // can be written to.
+  // If the remove fails continue so that files in read only directories
+  // that do not allow file removal can be modified.
+  SystemTools::RemoveFile(destination);
 
 #if defined(_WIN32) || defined(__CYGWIN__)
   kwsys_ios::ofstream fout(destination, 
@@ -2078,7 +2079,7 @@ kwsys_stl::string SystemTools::FileExistsInParentDirectories(const char* fname,
   SystemTools::ConvertToUnixSlashes(file);
   kwsys_stl::string dir = directory;
   SystemTools::ConvertToUnixSlashes(dir);
-  while ( 1 )
+  while ( !dir.empty() )
     {
     kwsys_stl::string path = dir + "/" + file;
     if ( SystemTools::FileExists(path.c_str()) )

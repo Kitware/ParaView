@@ -351,6 +351,7 @@ public:
   // Description:
   // Set for running the demo to make the gui a little faster.
   vtkSetMacro(InDemo, int);
+  vtkGetMacro(InDemo, int);
 
   // Description:
   // Adds manipulator to the list of available manipulators.

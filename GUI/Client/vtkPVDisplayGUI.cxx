@@ -44,6 +44,7 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkKWWidget.h"
+#include "vtkKWMenu.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
@@ -75,6 +76,7 @@
 #include "vtkVolumeProperty.h"
 #include "vtkDataSet.h"
 #include "vtkPVOptions.h"
+#include "vtkStdString.h"
 
 #define VTK_PV_OUTLINE_LABEL "Outline"
 #define VTK_PV_SURFACE_LABEL "Surface"
@@ -84,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.9.2.1");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.9.2.2");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1938,27 +1940,30 @@ void vtkPVDisplayGUI::VolumeRenderModeOff()
   if (this->VolumeRenderMode)
     {
     const char *colorSelection = this->VolumeScalarsMenu->GetValue();
-    char *str = new char[strlen(colorSelection) + 1];
-    strcpy(str, colorSelection);
+    // The command is more specific about what is the variable name and
+    // what is the number of vector entries.
+    int menuIdx = this->VolumeScalarsMenu->GetMenu()->GetIndex(colorSelection);
+    vtkStdString command(this->VolumeScalarsMenu->GetMenu()->GetItemCommand(menuIdx));
 
-    char *mode = strtok(str, " ");
-    char *name = strtok(NULL, " ");
-    char *numCompsStr = strtok(NULL, " ");
-    int numComps = 1;
-    if (numCompsStr)
+    // The form of the command is of the form
+    // vtkTemp??? VolumeRender???Field {Field Name} NumComponents
+    // The field name is between the first and last braces, and
+    // the number of components is at the end of the string.
+    vtkStdString::size_type firstbrace = command.find_first_of('{');
+    vtkStdString::size_type lastbrace = command.find_last_of('}');
+    vtkStdString name = command.substr(firstbrace+1, lastbrace-firstbrace-1);
+    vtkStdString numCompsStr = command.substr(command.find_last_of(' '));
+    int numComps;
+    sscanf(numCompsStr.c_str(), "%d", &numComps);
+
+    if (strncmp(colorSelection, "Point", 5) == 0)
       {
-      sscanf(numCompsStr, "(%d)", &numComps);
-      }
-    if (strcmp(mode, "Point") == 0)
-      {
-      this->ColorByPointField(name, numComps);
+      this->ColorByPointField(name.c_str(), numComps);
       }
     else
       {
-      this->ColorByCellField(name, numComps);
+      this->ColorByCellField(name.c_str(), numComps);
       }
-
-    delete[] str;
     }
   
   this->VolumeRenderMode = 0;
@@ -1985,27 +1990,30 @@ void vtkPVDisplayGUI::VolumeRenderModeOn()
     const char *colorSelection = this->ColorMenu->GetValue();
     if (strcmp(colorSelection, "Property") != 0)
       {
-      char *str = new char[strlen(colorSelection) + 1];
-      strcpy(str, colorSelection);
+      // The command is more specific about what is the variable name and
+      // what is the number of vector entries.
+      int menuIdx = this->ColorMenu->GetMenu()->GetIndex(colorSelection);
+      vtkStdString command(this->ColorMenu->GetMenu()->GetItemCommand(menuIdx));
 
-      char *mode = strtok(str, " ");
-      char *name = strtok(NULL, " ");
-      char *numCompsStr = strtok(NULL, " ");
-      int numComps = 1;
-      if (numCompsStr)
+      // The form of the command is of the form
+      // vtkTemp??? ColorBy???Field {Field Name} NumComponents
+      // The field name is between the first and last braces, and
+      // the number of components is at the end of the string.
+      vtkStdString::size_type firstbrace = command.find_first_of('{');
+      vtkStdString::size_type lastbrace = command.find_last_of('}');
+      vtkStdString name = command.substr(firstbrace+1, lastbrace-firstbrace-1);
+      vtkStdString numCompsStr = command.substr(command.find_last_of(' '));
+      int numComps;
+      sscanf(numCompsStr.c_str(), "%d", &numComps);
+
+      if (strncmp(colorSelection, "Point", 5) == 0)
         {
-        sscanf(numCompsStr, "(%d)", &numComps);
-        }
-      if (strcmp(mode, "Point") == 0)
-        {
-        this->VolumeRenderPointField(name, numComps);
+        this->VolumeRenderPointField(name.c_str(), numComps);
         }
       else
         {
-        this->VolumeRenderCellField(name, numComps);
+        this->VolumeRenderCellField(name.c_str(), numComps);
         }
-
-      delete[] str;
       }
     }
   

@@ -22,10 +22,12 @@
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
+#include "vtkPVSourceNotebook.h"
+#include "vtkPVGUIClientOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.16");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.16.6.1");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -35,6 +37,8 @@ vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
 {
   // Interface settings
 
+  this->AutoAccept = 0;
+  this->AutoAcceptCheckButton = 0;
   this->ShowSourcesDescriptionCheckButton = 0;
   this->ShowSourcesNameCheckButton = 0;
   this->ShowTraceFilesCheckButton = 0;
@@ -46,6 +50,12 @@ vtkPVApplicationSettingsInterface::~vtkPVApplicationSettingsInterface()
   this->SetWindow(NULL);
 
   // Interface settings
+
+  if (this->AutoAcceptCheckButton)
+    {
+    this->AutoAcceptCheckButton->Delete();
+    this->AutoAcceptCheckButton = NULL;
+    }
 
   if (this->ShowSourcesDescriptionCheckButton)
     {
@@ -85,6 +95,28 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   // Interface settings : continuing...
 
   frame = this->InterfaceSettingsFrame->GetFrame();
+
+  // --------------------------------------------------------------
+  // Interface settings : auto accept
+
+  if (!this->AutoAcceptCheckButton)
+    {
+    this->AutoAcceptCheckButton = vtkKWCheckButton::New();
+    }
+  this->AutoAcceptCheckButton->SetParent(frame);
+  this->AutoAcceptCheckButton->Create(app, 0);
+  this->AutoAcceptCheckButton->SetText("AutoAccept");
+  this->AutoAcceptCheckButton->SetCommand(
+    this, "AutoAcceptCallback");
+  this->AutoAcceptCheckButton->SetBalloonHelpString(
+    "Switch between manual accept and auto accept. "
+    "In auto accept mode filters automatically update "
+    "when a parameters is changed."
+    " This option is also available in the accept button pulldown menu.");
+  this->AutoAcceptCheckButton->SetState(this->AutoAccept);
+
+  tk_cmd << "pack " << this->AutoAcceptCheckButton->GetWidgetName()
+    << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
   // Interface settings : show source descriptions
@@ -158,6 +190,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   tk_cmd << "pack " << this->ShowTraceFilesCheckButton->GetWidgetName()
     << "  -side top -anchor w -expand no -fill none" << endl;
 
+
   // --------------------------------------------------------------
   // Interface settings : show most recent panels
 
@@ -213,6 +246,44 @@ void vtkPVApplicationSettingsInterface::Update()
     this->ShowSourcesNameCheckButton->SetState(
       app->GetSourcesBrowserAlwaysShowName());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplicationSettingsInterface::AutoAcceptCallback()
+{
+ if (!this->AutoAcceptCheckButton ||
+     !this->AutoAcceptCheckButton->IsCreated())
+   {
+   return;
+   }
+
+ int flag = this->AutoAcceptCheckButton->GetState() ? 1 : 0;
+ this->SetAutoAccept(flag);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplicationSettingsInterface::SetAutoAccept(int val)
+{
+  if (this->AutoAccept == val)
+    {
+    return;
+    }
+  this->AutoAccept = val;
+  vtkPVApplication *app =vtkPVApplication::SafeDownCast(this->GetApplication());
+  if (app)
+    {
+    app->GetMainView()->GetSourceNotebook()->SetAutoAccept(val);
+    }
+
+  if (!this->AutoAcceptCheckButton ||
+       !this->AutoAcceptCheckButton->IsCreated())
+    {
+    return;
+    }
+  this->AutoAcceptCheckButton->SetState(val);
+
+  // Let the PVSource notebook handle registry.
+  // This class does not even get created until the GUI is shown.
 }
 
 //----------------------------------------------------------------------------
@@ -305,4 +376,6 @@ void vtkPVApplicationSettingsInterface::UpdateEnableState()
 void vtkPVApplicationSettingsInterface::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "AutoAccept: " << this->AutoAccept << endl;
 }

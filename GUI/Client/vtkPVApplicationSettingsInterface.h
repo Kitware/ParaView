@@ -52,6 +52,7 @@ public:
 
   // Description:
   // Callback used when interaction has been performed.
+  virtual void AutoAcceptCallback();
   virtual void ShowSourcesDescriptionCallback();
   virtual void ShowSourcesNameCallback();
   virtual void ShowTraceFilesCallback();
@@ -65,6 +66,10 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Auto accept can be set by the accept button pull down method.
+  void SetAutoAccept(int val);
+
 protected:
   vtkPVApplicationSettingsInterface();
   ~vtkPVApplicationSettingsInterface();
@@ -72,6 +77,9 @@ protected:
   vtkKWCheckButton *ShowSourcesDescriptionCheckButton;
   vtkKWCheckButton *ShowSourcesNameCheckButton;
   vtkKWCheckButton *ShowTraceFilesCheckButton;
+  vtkKWCheckButton *AutoAcceptCheckButton;
+
+  int AutoAccept;
 
 private:
   vtkPVApplicationSettingsInterface(const vtkPVApplicationSettingsInterface&); // Not implemented
