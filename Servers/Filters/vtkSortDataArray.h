@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkSort.h
+  Module:    vtkSortDataArray.h
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -22,21 +22,21 @@
  * statement of authorship are reproduced on all copies.
  */
 
-// .NAME vtkSort - Provides several methods for sorting vtk arrays.
+// .NAME vtkSortDataArray - Provides several methods for sorting vtk arrays.
 
-#ifndef __vtkSort_h
-#define __vtkSort_h
+#ifndef __vtkSortDataArray_h
+#define __vtkSortDataArray_h
 
 #include "vtkObject.h"
 
 class vtkIdList;
 class vtkDataArray;
 
-class VTK_EXPORT vtkSort : public vtkObject
+class VTK_EXPORT vtkSortDataArray : public vtkObject
 {
 public:
-  vtkTypeRevisionMacro(vtkSort, vtkObject);
-  static vtkSort *New();
+  vtkTypeRevisionMacro(vtkSortDataArray, vtkObject);
+  static vtkSortDataArray *New();
   virtual void PrintSelf(ostream &os, vtkIndent indent);
 
   // Description:
@@ -54,12 +54,12 @@ public:
   static void Sort(vtkDataArray *keys, vtkDataArray *values);
 
 protected:
-  vtkSort();
-  virtual ~vtkSort();
+  vtkSortDataArray();
+  virtual ~vtkSortDataArray();
 
 private:
-  vtkSort(const vtkSort &);  // Not implemented.
-  void operator=(const vtkSort &);  // Not implemented.
+  vtkSortDataArray(const vtkSortDataArray &);  // Not implemented.
+  void operator=(const vtkSortDataArray &);  // Not implemented.
 };
 
-#endif //__vtkSort_h
+#endif //__vtkSortDataArray_h

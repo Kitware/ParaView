@@ -31,7 +31,7 @@
 #include "vtkFloatArray.h"
 #include "vtkCell.h"
 #include "vtkMath.h"
-#include "vtkSort.h"
+#include "vtkSortDataArray.h"
 
 #include <vtkstd/stack>
 #include <vtkstd/utility>
@@ -49,7 +49,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkCellCenterDepthSort, "1.1");
+vtkCxxRevisionMacro(vtkCellCenterDepthSort, "1.2");
 vtkStandardNewMacro(vtkCellCenterDepthSort);
 
 vtkCellCenterDepthSort::vtkCellCenterDepthSort()
@@ -246,6 +246,6 @@ vtkIdTypeArray *vtkCellCenterDepthSort::GetNextCells()
   this->CellPartitionDepths->SetArray(cellDepths + firstcell, numcells, 1);
   this->CellPartitionDepths->SetNumberOfTuples(numcells);
 
-  vtkSort::Sort(this->CellPartitionDepths, this->SortedCellPartition);
+  vtkSortDataArray::Sort(this->CellPartitionDepths, this->SortedCellPartition);
   return this->SortedCellPartition;
 }

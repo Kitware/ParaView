@@ -23,7 +23,7 @@
  */
 // -*- c++ -*- *******************************************************
 
-#include "vtkSort.h"
+#include "vtkSortDataArray.h"
 #include "vtkIntArray.h"
 #include "vtkMath.h"
 #include "vtkTimerLog.h"
@@ -47,7 +47,7 @@ int main(int, char *[])
 
   cout << "Sorting array" << endl;
   timer->StartTimer();
-  vtkSort::Sort(keys);
+  vtkSortDataArray::Sort(keys);
   timer->StopTimer();
 
   cout << "Time to sort array: " << timer->GetElapsedTime() << " sec" << endl;
@@ -64,7 +64,7 @@ int main(int, char *[])
 
   cout << "Sorting sorted array" << endl;
   timer->StartTimer();
-  vtkSort::Sort(keys);
+  vtkSortDataArray::Sort(keys);
   timer->StopTimer();
 
   cout << "Time to sort array: " << timer->GetElapsedTime() << " sec" << endl;
@@ -96,7 +96,7 @@ int main(int, char *[])
 
   cout << "Sorting arrays" << endl;
   timer->StartTimer();
-  vtkSort::Sort(keys, values);
+  vtkSortDataArray::Sort(keys, values);
   timer->StopTimer();
 
   cout << "Time to sort array: " << timer->GetElapsedTime() << " sec" << endl;
@@ -124,7 +124,7 @@ int main(int, char *[])
 
   cout << "Sorting sorted arrays" << endl;
   timer->StartTimer();
-  vtkSort::Sort(keys, values);
+  vtkSortDataArray::Sort(keys, values);
   timer->StopTimer();
 
   cout << "Time to sort array: " << timer->GetElapsedTime() << " sec" << endl;

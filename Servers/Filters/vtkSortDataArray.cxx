@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkSort.cxx
+  Module:    vtkSortDataArray.cxx
 
   Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
   All rights reserved.
@@ -22,7 +22,7 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include "vtkSort.h"
+#include "vtkSortDataArray.h"
 
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
@@ -33,18 +33,18 @@
 
 // -------------------------------------------------------------------------
 
-vtkStandardNewMacro(vtkSort);
-vtkCxxRevisionMacro(vtkSort,"1.1");
+vtkStandardNewMacro(vtkSortDataArray);
+vtkCxxRevisionMacro(vtkSortDataArray,"1.1");
 
-vtkSort::vtkSort()
+vtkSortDataArray::vtkSortDataArray()
 {
 }
 
-vtkSort::~vtkSort()
+vtkSortDataArray::~vtkSortDataArray()
 {
 }
 
-void vtkSort::PrintSelf(ostream &os, vtkIndent indent)
+void vtkSortDataArray::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }
@@ -183,9 +183,9 @@ static void arraysort11(vtkDataArray *keys, vtkDataArray *values)
     }
 }
 
-// vtkSort methods -------------------------------------------------------
+// vtkSortDataArray methods -------------------------------------------------------
 
-void vtkSort::Sort(vtkIdList *keys)
+void vtkSortDataArray::Sort(vtkIdList *keys)
 {
   vtkIdType *data = keys->GetPointer(0);
   vtkIdType numKeys = keys->GetNumberOfIds();
@@ -196,7 +196,7 @@ void vtkSort::Sort(vtkIdList *keys)
 // function look like a three argument function
 #define FUNC2TO3(func, arg1, arg2) func(arg1, arg2)
 
-void vtkSort::Sort(vtkDataArray *keys)
+void vtkSortDataArray::Sort(vtkDataArray *keys)
 {
   if (keys->GetNumberOfComponents() != 1)
     {
@@ -214,7 +214,7 @@ void vtkSort::Sort(vtkDataArray *keys)
     }
 }
 
-void vtkSort::Sort(vtkIdList *keys, vtkIdList *values)
+void vtkSortDataArray::Sort(vtkIdList *keys, vtkIdList *values)
 {
   vtkIdType size = keys->GetNumberOfIds();
   if (size != values->GetNumberOfIds())
@@ -226,17 +226,17 @@ void vtkSort::Sort(vtkIdList *keys, vtkIdList *values)
   arraysort00(keys->GetPointer(0), values->GetPointer(0), size, 1);
 }
 
-void vtkSort::Sort(vtkIdList *keys, vtkDataArray *values)
+void vtkSortDataArray::Sort(vtkIdList *keys, vtkDataArray *values)
 {
   arraysort01(keys->GetPointer(0), values, keys->GetNumberOfIds());
 }
 
-void vtkSort::Sort(vtkDataArray *keys, vtkIdList *values)
+void vtkSortDataArray::Sort(vtkDataArray *keys, vtkIdList *values)
 {
   arraysort10(keys, values->GetPointer(0), values->GetNumberOfIds(), 1);
 }
 
-void vtkSort::Sort(vtkDataArray *keys, vtkDataArray *values)
+void vtkSortDataArray::Sort(vtkDataArray *keys, vtkDataArray *values)
 {
   arraysort11(keys, values);
 }

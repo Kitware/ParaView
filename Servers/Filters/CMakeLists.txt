@@ -66,7 +66,7 @@ SET(Filters_SRCS
   vtkPVUpdateSuppressor.cxx
   vtkPVWarpScalar.cxx
   vtkPVWarpVector.cxx
-  vtkSort.cxx
+  vtkSortDataArray.cxx
   vtkTiledDisplaySchedule.cxx
   vtkVisibilitySort.cxx
   vtkVRMLSource.cxx
