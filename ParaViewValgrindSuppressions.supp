@@ -1792,37 +1792,23 @@
    fun:Tk_MainEx
    fun:main
 }
+
 {
    <insert a suppression name here>
    core:PThread
    fun:pthread_error
    fun:pthread_attr_setscope
    fun:_ZN16vtkMultiThreader19SingleMethodExecuteEv
-   fun:_ZN27vtkImageMultipleInputFilter11MultiThreadEPP12vtkImageDataS1_
-   fun:_ZN27vtkImageMultipleInputFilter11ExecuteDataEP13vtkDataObject
-   fun:_ZN9vtkSource10UpdateDataEP13vtkDataObject
-   fun:_ZN13vtkDataObject10UpdateDataEv
-   fun:_ZN12vtkImageData10UpdateDataEv
-   fun:_ZN13vtkDataObject6UpdateEv
-   fun:_ZN9vtkSource6UpdateEv
-   fun:_Z19vtkSourceCppCommandP9vtkSourceP10Tcl_InterpiPPc
-   fun:_Z24vtkImageSourceCppCommandP14vtkImageSourceP10Tcl_InterpiPPc
-   fun:_Z37vtkImageMultipleInputFilterCppCommandP27vtkImageMultipleInputFilterP10Tcl_InterpiPPc
-   fun:_Z32vtkImageTwoInputFilterCppCommandP22vtkImageTwoInputFilterP10Tcl_InterpiPPc
-   fun:_Z28vtkImageDifferenceCppCommandP18vtkImageDifferenceP10Tcl_InterpiPPc
-   fun:_Z25vtkImageDifferenceCommandPvP10Tcl_InterpiPPc
-   fun:TclInvokeStringCommand
-   fun:TclEvalObjvInternal
-   fun:TclExecuteByteCode
-   fun:TclCompEvalObj
-   fun:Tcl_EvalObjEx
-   fun:Tcl_IfObjCmd
-   fun:TclEvalObjvInternal
-   fun:Tcl_EvalEx
-   fun:Tcl_FSEvalFile
-   fun:Tcl_EvalFile
-   fun:Tk_MainEx
-   fun:main
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:TclCreateExecEnv
+   fun:Tcl_CreateInterp
 }
 
 {
@@ -1926,15 +1912,6 @@
 
 {
    <insert a suppression name here>
-   core:PThread
-   fun:pthread_error
-   fun:pthread_attr_setscope
-   fun:_ZN16vtkMultiThreader19SingleMethodExecuteEv
-   fun:_ZN21vtkImageToImageFilter11MultiThreadEP12vtkImageDataS1_
-}
-
-{
-   <insert a suppression name here>
    Memcheck:Overlap
    fun:strcpy
 }
@@ -1995,3 +1972,298 @@
    fun:Tcl_FindExecutable 
 }
 
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:Tcl_NewStringObj
+   fun:Tcl_EvalTokensStandard
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_SourceObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:NamespaceEvalCmd
+   fun:Tcl_NamespaceObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:TclObjInterpProc
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:NamespaceEvalCmd
+   fun:Tcl_NamespaceObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:Tcl_IfObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_SourceObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalObjv
+   fun:Tcl_EvalObjEx
+   fun:Tcl_UplevelObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:TclObjInterpProc
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalObjv
+   fun:Tcl_EvalObjEx
+   fun:Tcl_UplevelObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:TclObjInterpProc
+   fun:TclEvalObjvInternal
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc 
+   fun:TclpAlloc 
+   fun:Tcl_Alloc 
+   fun:SetCmdNameFromAny 
+   fun:Tcl_GetCommandFromObj 
+   fun:TclEvalObjvInternal 
+   fun:Tcl_EvalEx 
+   fun:Tcl_FSEvalFile 
+   fun:Tcl_EvalFile 
+   fun:Tk_MainEx 
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj_asjdfah
+   fun:_ZNSt24__default_alloc_templateILb1ELi0EE14_S_chunk_allocEjRi
+   fun:_ZNSt24__default_alloc_templateILb1ELi0EE9_S_refillEj
+   fun:_ZNSt24__default_alloc_templateILb1ELi0EE8allocateEj
+   fun:_ZNSt14__simple_allocISt13_Rb_tree_nodeISt4pairIKSsPFiP26vtkClientServerInterpreterP13vtkObjectBasePKcRK21vtkClientServerStreamRS9_EEESt24__default_alloc_templateILb1ELi0EEE8allocateEj
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:TclCreateProc
+   fun:Tcl_ProcObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_SourceObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:NamespaceEvalCmd
+   fun:Tcl_NamespaceObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:TclObjInterpProc
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:NamespaceEvalCmd
+   fun:Tcl_NamespaceObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:Tcl_IfObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_SourceObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalObjv
+   fun:Tcl_EvalObjEx
+   fun:Tcl_UplevelObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:TclObjInterpProc
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalObjv
+   fun:Tcl_EvalObjEx
+   fun:Tcl_UplevelObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:TclObjInterpProc
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:NewVar
+   fun:TclLookupSimpleVar
+   fun:TclObjLookupVar
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:Tcl_IfObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_EvalFile
+   fun:Tk_MainEx
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:Tcl_CreateCommand
+   fun:Tk_DestroyWindow
+   fun:DeleteWindowsExitProc
+   fun:Tcl_Finalize
+   fun:Tcl_Exit
+   fun:Tcl_ExitObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_EvalFile
+   fun:Tk_MainEx
+   fun:main
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:TkCreateMenuCmd
+   fun:TkCreateMainWindow
+   fun:CreateFrame
+   fun:TkCreateFrame
+   fun:Initialize
+   fun:Tk_Init
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:realloc
+   fun:TclpRealloc
+   fun:Tcl_Realloc
+   fun:Tcl_SetObjLength
+   fun:TclpNativeJoinPath
+   fun:Tcl_FSJoinPath
+   fun:Tcl_FSJoinToPath
+   fun:SetFsPathFromAny
+   fun:Tcl_ConvertToType
+   fun:Tcl_FSConvertToPathType
+   fun:CheckAccess
+   fun:Tcl_FileObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:Tcl_IfObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_EvalFile
+   fun:Tk_MainEx
+   fun:main
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:TclRegisterLiteral
+   fun:TclCompileScript
+   fun:TclSetByteCodeFromAny
+   fun:SetByteCodeFromAny
+   fun:TclProcCompileProc
+   fun:TclObjInterpProc
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_SourceObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:Tcl_ForeachObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_SourceObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:Tcl_CatchObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:Tcl_ExprObj
+   fun:Tcl_ExprBooleanObj
+   fun:Tcl_IfObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_Eval
+   fun:Tcl_GlobalEval
+   fun:Tcl_PkgRequireEx
+   fun:Tcl_PkgRequire
+   fun:Tcl_PackageObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_EvalObjEx
+   fun:Tcl_EvalObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:TclObjInterpProc
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+}
+
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:TclpAlloc
+   fun:Tcl_Alloc
+   fun:SetFsPathFromAny
+   fun:Tcl_ConvertToType
+   fun:Tcl_FSConvertToPathType
+   fun:CheckAccess
+   fun:Tcl_FileObjCmd
+   fun:TclEvalObjvInternal
+   fun:TclExecuteByteCode
+   fun:TclCompEvalObj
+   fun:Tcl_EvalObjEx
+   fun:Tcl_IfObjCmd
+   fun:TclEvalObjvInternal
+   fun:Tcl_EvalEx
+   fun:Tcl_FSEvalFile
+   fun:Tcl_EvalFile
+   fun:Tk_MainEx
+   fun:main
+}
