@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "Widgets_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "C:\program files\html help workshop\include" /I "..\..\vtk\common" /I "..\..\vtk\graphics" /I "..\..\vtk\imaging" /I "..\..\vtk\contrib" /I "..\..\vtk\pcmaker\xlib" /D "_DEBUG" /D "_USRDLL" /D "Widgets_EXPORTS" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "VTKDLL" /YX /FD /GZ /Zm1000 /c
+# ADD CPP /nologo /MD /W3 /Gm /GX /ZI /Od /I "C:\program files\html help workshop\include" /I "..\..\vtk\common" /I "..\..\vtk\graphics" /I "..\..\vtk\imaging" /I "..\..\vtk\contrib" /I "..\..\vtk\pcmaker\xlib" /D "_DEBUG" /D "_USRDLL" /D "Widgets_EXPORTS" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "VTKDLL" /YX /FD /GZ /Zm1000 /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -135,14 +135,6 @@ SOURCE=.\vtkKWCompositeCollectionTcl.cxx
 # Begin Source File
 
 SOURCE=.\vtkKWCompositeTcl.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkKWCornerAnnotation.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkKWCornerAnnotationTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -500,35 +492,6 @@ InputName=vtkKWCompositeCollection
 # Begin Custom Build
 InputPath=.\vtkKWCompositeCollection.h
 InputName=vtkKWCompositeCollection
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkKWCornerAnnotation.h
-
-!IF  "$(CFG)" == "Widgets - Win32 Release"
-
-# Begin Custom Build
-InputPath=.\vtkKWCornerAnnotation.h
-InputName=vtkKWCornerAnnotation
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkKWCornerAnnotation.h
-InputName=vtkKWCornerAnnotation
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
