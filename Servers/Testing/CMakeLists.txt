@@ -1,5 +1,5 @@
 IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
-  FOREACH(part Common Filters ServerManager StreamInterpreter)
+  FOREACH(part Common Filters ServerManager)
     ADD_TEST(HeaderTesting-PVServer-${part} ${PYTHON_EXECUTABLE}
       ${VTK_HEADER_TESTING_PY}
       "${PVServer_SOURCE_DIR}/${part}"
