@@ -86,7 +86,6 @@ class VTK_EXPORT vtkKWEvent
     Cursor3DZColorChangedEvent,
     DistanceVisibilityChangedEvent,
     EnableShadingEvent,
-    GradientMagnitudesChangedEvent,
     GradientOpacityFunctionChangedEvent,
     GradientOpacityFunctionPresetApplyEvent,
     GradientOpacityStateChangedEvent,
