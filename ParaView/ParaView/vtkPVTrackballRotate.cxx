@@ -22,7 +22,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.7");
+vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.8");
 vtkStandardNewMacro(vtkPVTrackballRotate);
 
 //-------------------------------------------------------------------------
@@ -44,9 +44,6 @@ vtkPVTrackballRotate::~vtkPVTrackballRotate()
 void vtkPVTrackballRotate::OnButtonDown(int x, int y, vtkRenderer *ren,
                                         vtkRenderWindowInteractor*)
 {
-  this->LastX = x;
-  this->LastY = y;
-
   this->ComputeDisplayCenter(ren);
 }
 
@@ -55,8 +52,6 @@ void vtkPVTrackballRotate::OnButtonDown(int x, int y, vtkRenderer *ren,
 void vtkPVTrackballRotate::OnButtonUp(int x, int y, vtkRenderer *,
                                     vtkRenderWindowInteractor *)
 {
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------
@@ -76,8 +71,8 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
   transform->Identity();
   transform->Translate(this->Center[0], this->Center[1], this->Center[2]);
   
-  float dx = this->LastX - x;
-  float dy = this->LastY - y;
+  float dx = rwi->GetLastEventPosition()[0] - x;
+  float dy = rwi->GetLastEventPosition()[1] - y;
   
   // azimuth
   camera->OrthogonalizeViewUp();
@@ -98,9 +93,6 @@ void vtkPVTrackballRotate::OnMouseMove(int x, int y, vtkRenderer *ren,
   
   rwi->Render();
   transform->Delete();
-
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------

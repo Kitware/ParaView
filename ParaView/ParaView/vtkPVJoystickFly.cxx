@@ -23,7 +23,7 @@
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.13");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.14");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -70,8 +70,6 @@ void vtkPVJoystickFly::OnButtonDown(int x, int y, vtkRenderer *ren,
     vtkErrorMacro("Renderer or Render Window Interactor are not defined");
     return;
     }
-  this->LastX = x;
-  this->LastY = y;
 
   double *range = ren->GetActiveCamera()->GetClippingRange();
   this->Fly(ren, rwi, range[1], (this->In?1:-1)*this->FlySpeed*.01);
@@ -90,10 +88,6 @@ void vtkPVJoystickFly::OnButtonUp(int, int, vtkRenderer*,
 void vtkPVJoystickFly::OnMouseMove(int x, int y, vtkRenderer*,
                                    vtkRenderWindowInteractor*)
 {
-  // Need to update the instance variables for mouse position. This
-  // will be called when update happens.
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------
@@ -128,8 +122,8 @@ void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
     {
     double *range = cam->GetClippingRange();
     double dist = 0.5 * (range[1] + range[0]);
-    float lastx = this->LastX;
-    float lasty = size[1] - this->LastY - 1;
+    float lastx = rwi->GetLastEventPosition()[0];
+    float lasty = size[1] - rwi->GetLastEventPosition()[1] - 1;
 
     // Compute a new render time if appropriate (delta time).
     if ( ! first )
@@ -256,12 +250,6 @@ void vtkPVJoystickFly::ComputeCameraAxes(vtkRenderer* ren)
 
   vtkMath::Cross(this->CameraYAxis, this->CameraZAxis, this->CameraXAxis);
 }
-
-//void vtkPVJoystickFly::SetFlySpeed(double d)
-//{
-//  this->FlySpeed = d;
-//  cout << this << ": Set flyspeed to " << d << endl;
-//}
 
 //-------------------------------------------------------------------------
 void vtkPVJoystickFly::PrintSelf(ostream& os, vtkIndent indent)

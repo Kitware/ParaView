@@ -20,7 +20,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballZoom, "1.4");
+vtkCxxRevisionMacro(vtkPVTrackballZoom, "1.5");
 vtkStandardNewMacro(vtkPVTrackballZoom);
 
 //-------------------------------------------------------------------------
@@ -50,8 +50,6 @@ void vtkPVTrackballZoom::OnButtonDown(int x, int y, vtkRenderer *ren,
     double *range = camera->GetClippingRange();
     this->ZoomScale = 1.5 * range[1] / (float)size[1];
     }
-  this->LastX = x;
-  this->LastY = y;
 }
 
 
@@ -59,15 +57,13 @@ void vtkPVTrackballZoom::OnButtonDown(int x, int y, vtkRenderer *ren,
 void vtkPVTrackballZoom::OnButtonUp(int x, int y, vtkRenderer *,
                                     vtkRenderWindowInteractor *)
 {
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballZoom::OnMouseMove(int x, int y, vtkRenderer *ren,
                                      vtkRenderWindowInteractor *rwi)
 {
-  double dy = this->LastY - y;
+  double dy = rwi->GetLastEventPosition()[1] - y;
   vtkCamera *camera = ren->GetActiveCamera();
   double pos[3], fp[3], *norm, k, tmp;
   
@@ -101,8 +97,6 @@ void vtkPVTrackballZoom::OnMouseMove(int x, int y, vtkRenderer *ren,
     }
 
   rwi->Render();
-  this->LastX = x;
-  this->LastY = y;
 }
 
 //-------------------------------------------------------------------------
