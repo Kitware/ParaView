@@ -159,6 +159,9 @@
   </Filter>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
+  <LabeledToggle label="Clip cells" trace_name="ClipCells" variable="ClipCells" help="Turn this on if you want cells clipped to spatial boundary regions."/>
+  <LabeledToggle label="Include all intersecting cells" trace_name="IncludeAllIntersectingCells" variable="IncludeAllIntersectingCells" help="Turn this on if you want all cells that intersect spatial boundaries."/>
+  <StringEntry variable="GlobalIdArrayName" trace_name="GlobalIdArrayName" help="Provide name of global node ID array so redistributed data does not duplicate node IDs" />
 </Module>
 
   <Module name="Dialate"  root_name="Dialate" 
