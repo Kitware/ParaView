@@ -39,7 +39,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.15");
+vtkCxxRevisionMacro(vtkCTHData, "1.16");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ vtkCTHData::vtkCTHData()
   this->Voxel = vtkVoxel::New();
   
   // This should be set up by user.
-  this->DataDescription = VTK_XYZ_GRID;
+  this->DataDescription = VTK_EMPTY;
   
   this->BlockOrigins = vtkFloatArray::New();
   this->BlockOrigins->SetNumberOfComponents(3);
@@ -106,6 +106,7 @@ void vtkCTHData::Initialize()
   this->Information->Set(vtkDataObject::DATA_PIECE_NUMBER(), -1);
   this->Information->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(), 0);
   this->Information->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(), 0);
+  this->DataDescription = VTK_EMPTY;
 }
 
 //----------------------------------------------------------------------------
@@ -240,8 +241,6 @@ void vtkCTHData::CellExtentToBounds(int level, int ext[6], double bds[6])
   bds[5] = this->TopLevelOrigin[2] + (double)(ext[5]+1) * spacing[2];
 }
 
-
-//----------------------------------------------------------------------------
 void vtkCTHData::SetBlockCellExtent(int blockId, int level, int *extent)
 {
   if (this->GetNumberOfBlocks() <= blockId)
@@ -249,6 +248,46 @@ void vtkCTHData::SetBlockCellExtent(int blockId, int level, int *extent)
     vtkErrorMacro("Bad block id.");
     return;
     }
+
+  int newDescription = VTK_XYZ_GRID;
+  // We could do this with a case statement, but the index would be cryptic.
+  int xtest = (extent[0] == extent[1]);
+  int ytest = (extent[2] == extent[3]);
+  int ztest = (extent[4] == extent[5]);
+  if (xtest && ytest && ztest)
+    {
+    newDescription = VTK_SINGLE_POINT;
+    }
+  if (!xtest && ytest && ztest)
+    {
+    newDescription = VTK_X_LINE;
+    }
+  if (xtest && !ytest && ztest)
+    {
+    newDescription = VTK_Y_LINE;
+    }
+  if (xtest && ytest && !ztest)
+    {
+    newDescription = VTK_Z_LINE;
+    }
+  if (!xtest && !ytest && ztest)
+    {
+    newDescription = VTK_XY_PLANE;
+    }
+  if (!xtest && ytest && !ztest)
+    {
+    newDescription = VTK_XZ_PLANE;
+    }
+  if (xtest && !ytest && !ztest)
+    {
+    newDescription = VTK_YZ_PLANE;
+    }
+
+  if (this->DataDescription != VTK_EMPTY && this->DataDescription != newDescription)
+    {
+    vtkErrorMacro("Grids have mixed dimensionality.");
+    }
+  this->DataDescription = newDescription;
 
   this->BlockLevels->InsertValue(blockId, level);
   // Dumb to convert to double.
@@ -307,9 +346,20 @@ void vtkCTHData::SetBlockPointExtent(int blockId, int level,
 void vtkCTHData::GetBlockPointExtent(int blockId, int ext[6])
 {
   this->GetBlockCellExtent(blockId, ext);
-  ++ext[1];
-  ++ext[3];
-  ++ext[5];
+  // Handle Lower dimensions.  Assume that cell dimension of 1 is a collapsed
+  // dimension.  Point dim equal 1 also.
+  if (ext[1] > ext[0])
+    {
+    ++ext[1];
+    }
+  if (ext[3] > ext[2])
+    {
+    ++ext[3];
+    }
+  if (ext[5] > ext[4])
+    {
+    ++ext[5];
+    }
 }
 //----------------------------------------------------------------------------
 int* vtkCTHData::GetBlockPointExtent(int blockId)
@@ -327,9 +377,21 @@ void vtkCTHData::GetBlockPointDimensions(int blockId, int dim[3])
     vtkErrorMacro("Block Cell Extent not defined");
     return;
     }
-  dim[0] = ce[1]-ce[0]+2;
-  dim[1] = ce[3]-ce[2]+2;
-  dim[2] = ce[5]-ce[4]+2;
+  // Handle Lower dimensions.  Assume that cell dimension of 1 is a collapsed
+  // dimension.  Point dim equal 1 also.
+  dim[0] = dim[1] = dim[2] = 1;
+  if (ce[1] > ce[0])
+    {
+    dim[0] = ce[1]-ce[0]+2;
+    }
+  if (ce[3] > ce[2])
+    {
+    dim[1] = ce[3]-ce[2]+2;
+    }
+  if (ce[5] > ce[4])
+    {
+    dim[2] = ce[5]-ce[4]+2;
+    }
 }
 //----------------------------------------------------------------------------
 int* vtkCTHData::GetBlockPointDimensions(int blockId)
@@ -434,8 +496,7 @@ void vtkCTHData::GetCellPoints(vtkIdType cellId, vtkIdList *ptIds)
 
   int *dims = this->GetBlockPointDimensions(blockId);
 
-  // Assumes 3d data.
-  vtkStructuredData::GetCellPoints(blockCellId,ptIds,VTK_XYZ_GRID,
+  vtkStructuredData::GetCellPoints(blockCellId,ptIds,this->DataDescription,
                                    dims);
 
   // Shift the ids;
@@ -500,6 +561,7 @@ vtkIdType vtkCTHData::GetNumberOfPoints()
 //----------------------------------------------------------------------------
 int vtkCTHData::GetDataDimension()
 {
+  int fixme;
   return vtkStructuredData::GetDataDimension(this->DataDescription);
 }
 
@@ -895,6 +957,13 @@ double *vtkCTHData::GetPoint(vtkIdType ptId)
   ptId = ptId - (blockId*pointsPerBlock);
   double *origin = this->GetBlockOrigin(blockId);
   double *spacing = this->GetBlockSpacing(blockId);
+
+  if (spacing == 0)
+    { // block out of range
+    x[0] = x[1] = x[2] = 0.0;
+    return x;
+    }
+   
   // hack
   int *dims = this->GetBlockPointDimensions(0);
 

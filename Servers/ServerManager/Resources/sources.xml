@@ -226,9 +226,18 @@
          name="GhostLevels"
          command="SetGhostLevels"
          number_of_elements="1"
-         default_values="0">
+         default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
+
+      <IntVectorProperty
+         name="TwoDimensional"
+         command="SetTwoDimensional"
+         number_of_elements="1"
+         default_values="1">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
    <!-- End CTHAMRFractal -->
    </SourceProxy>
 

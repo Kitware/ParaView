@@ -26,7 +26,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.11");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.12");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------
@@ -38,6 +38,7 @@ vtkCTHFractal::vtkCTHFractal()
   this->GhostLevels = 0;
 
   this->Levels = vtkIntArray::New();
+  this->TwoDimensional = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -52,17 +53,96 @@ vtkCTHFractal::~vtkCTHFractal()
 void vtkCTHFractal::SetBlockInfo(int blockId, int level, 
                                 int x0, int y0, int z0)
 {
-  int dim = this->Dimensions;
+  int ext[6];
+  
+  ext[0] = x0;
+  ext[2] = y0;
+  ext[4] = z0;
+  ext[1] = x0+this->Dimensions-1;
+  ext[3] = y0+this->Dimensions-1;
+  ext[5] = z0+this->Dimensions-1;
+  
   if (this->GhostLevels)
     {
-    this->GetOutput()->SetBlockCellExtent(blockId, level,
-                               x0-1, x0+dim, y0-1, y0+dim, z0-1, z0+dim);
+    ext[0] -= 1;
+    ext[2] -= 1;
+    ext[4] -= 1;
+    ext[1] += 1;
+    ext[3] += 1;
+    ext[5] += 1;
     }
-  else
+  if (this->TwoDimensional)
     {
-    this->GetOutput()->SetBlockCellExtent(blockId, level,
-                               x0, x0+dim-1, y0, y0+dim-1, z0, z0+dim-1);
+    ext[4] = ext[5] = 0;
     }
+  this->GetOutput()->SetBlockCellExtent(blockId, level,
+                             ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+}
+
+//----------------------------------------------------------------------------
+int vtkCTHFractal::TwoDTest(double bds[6], int level, int target) 
+{
+  // Test the 4 corners.  Refine if the blocks cross the border.
+  int v0, v1, v2, v3;
+  
+  if (level == target)
+    {
+    return 0;
+    }
+  
+  if (level < 2)
+    {
+    return 1;
+    }
+  
+  v0 = this->MandelbrotTest(bds[0], bds[2]);
+  v1 = this->MandelbrotTest(bds[1], bds[2]);
+  v2 = this->MandelbrotTest(bds[0], bds[3]);
+  v3 = this->MandelbrotTest(bds[1], bds[3]);
+  if (v0 && v1 && v2 && v3)
+    {
+    return 0;
+    }
+  if (!v0 && !v1 && !v2 && !v3)
+    {
+    return 0;
+    }
+  return 1;
+}
+
+int vtkCTHFractal::MandelbrotTest(double x, double y)
+{
+  unsigned short count = 0;
+  double v0, v1;
+  double cReal, cImag, zReal, zImag;
+  double zReal2, zImag2;
+
+  cReal = x;
+  cImag = y;
+  zReal = 0.0;
+  zImag = 0.0;
+
+  zReal2 = zReal * zReal;
+  zImag2 = zImag * zImag;
+  v0 = 0.0;
+  v1 = (zReal2 + zImag2);
+  while ( v1 < 4.0 && count < 100)
+    {
+    zImag = 2.0 * zReal * zImag + cImag;
+    zReal = zReal2 - zImag2 + cReal;
+    zReal2 = zReal * zReal;
+    zImag2 = zImag * zImag;
+    ++count;
+    v0 = v1;
+    v1 = (zReal2 + zImag2);
+    }
+
+  if (count == 100)
+    {
+    return 1;
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -258,35 +338,68 @@ void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output,
   ext[3] = y0+dim-1;
   ext[4] = z0;
   ext[5] = z0+dim-1;
+  
+  if (this->TwoDimensional)
+    {
+    ext[4] = ext[5] = 0;
+    }  
+  
   // Get the bounds of the proposed block.
   output->CellExtentToBounds(level, ext, bds);
 
-  if (this->LineTest(-1.64662,0.56383,1.16369, -1.05088,0.85595,0.87104, bds, level, this->MaximumLevel) ||
-      this->LineTest(-1.05088,0.85595,0.87104, -0.61430,1.00347,0.59553, bds, level, this->MaximumLevel) )
-    { // break block into eight.
-    ++level;
-    x0 = 2 * x0;
-    y0 = 2 * y0;
-    z0 = 2 * z0;
-    // Traverse the 8 new blocks.
-    this->Traverse(blockId, level, output, x0, y0, z0);
-    this->Traverse(blockId, level, output, x0+dim, y0, z0);
-    this->Traverse(blockId, level, output, x0, y0+dim, z0);
-    this->Traverse(blockId, level, output, x0+dim, y0+dim, z0);
-    this->Traverse(blockId, level, output, x0, y0, z0+dim);
-    this->Traverse(blockId, level, output, x0+dim, y0, z0+dim);
-    this->Traverse(blockId, level, output, x0, y0+dim, z0+dim);
-    this->Traverse(blockId, level, output, x0+dim, y0+dim, z0+dim);
+  if (this->TwoDimensional)
+    {
+    if (this->TwoDTest(bds, level, this->MaximumLevel))
+      {
+      ++level;
+      x0 = 2 * x0;
+      y0 = 2 * y0;
+      // Traverse the 4 new blocks.
+      this->Traverse(blockId, level, output, x0, y0, z0);
+      this->Traverse(blockId, level, output, x0+dim, y0, z0);
+      this->Traverse(blockId, level, output, x0, y0+dim, z0);
+      this->Traverse(blockId, level, output, x0+dim, y0+dim, z0);
+      }
+    else
+      {
+      if (output->InsertNextBlock() != blockId)
+        {
+        vtkErrorMacro("blockId wrong.")
+        return;
+        }
+      this->Levels->InsertValue(blockId, level);
+      this->SetBlockInfo(blockId++, level, x0, y0, z0);
+      }
     }
   else
-    {
-    if (output->InsertNextBlock() != blockId)
-      {
-      vtkErrorMacro("blockId wrong.")
-      return;
+    { // 3D
+    if (this->LineTest(-1.64662,0.56383,1.16369, -1.05088,0.85595,0.87104, bds, level, this->MaximumLevel) ||
+        this->LineTest(-1.05088,0.85595,0.87104, -0.61430,1.00347,0.59553, bds, level, this->MaximumLevel) )
+      { // break block into eight.
+      ++level;
+      x0 = 2 * x0;
+      y0 = 2 * y0;
+      z0 = 2 * z0;
+      // Traverse the 8 new blocks.
+      this->Traverse(blockId, level, output, x0, y0, z0);
+      this->Traverse(blockId, level, output, x0+dim, y0, z0);
+      this->Traverse(blockId, level, output, x0, y0+dim, z0);
+      this->Traverse(blockId, level, output, x0+dim, y0+dim, z0);
+      this->Traverse(blockId, level, output, x0, y0, z0+dim);
+      this->Traverse(blockId, level, output, x0+dim, y0, z0+dim);
+      this->Traverse(blockId, level, output, x0, y0+dim, z0+dim);
+      this->Traverse(blockId, level, output, x0+dim, y0+dim, z0+dim);
       }
-    this->Levels->InsertValue(blockId, level);
-    this->SetBlockInfo(blockId++, level, x0, y0, z0);
+    else
+      {
+      if (output->InsertNextBlock() != blockId)
+        {
+        vtkErrorMacro("blockId wrong.")
+        return;
+        }
+      this->Levels->InsertValue(blockId, level);
+      this->SetBlockInfo(blockId++, level, x0, y0, z0);
+      }
     }
 }
 
@@ -319,16 +432,16 @@ void vtkCTHFractal::AddTestArray()
     spacing = output->GetBlockSpacing(blockId);
     int x,y,z;
     int ext[6];
-    output->GetBlockPointExtent(blockId,ext);
-    for (z = ext[4]; z < ext[5]; ++z)
+    output->GetBlockCellExtent(blockId,ext);
+    for (z = ext[4]; z <= ext[5]; ++z)
       {
-      for (y = ext[2]; y < ext[3]; ++y)
+      for (y = ext[2]; y <= ext[3]; ++y)
         {
-        for (x = ext[0]; x < ext[1]; ++x)
+        for (x = ext[0]; x <= ext[1]; ++x)
           {
-//          *arrayPtr++ = origin[0] + spacing[0]*((float)x + 0.5)
-//                        + origin[1] + spacing[1]*((float)y + 0.5);
-          *arrayPtr++ = origin[1] + spacing[1]*((float)y + 0.5);
+          *arrayPtr++ = origin[0] + spacing[0]*((float)x + 0.5)
+                        + origin[1] + spacing[1]*((float)y + 0.5);
+//          *arrayPtr++ = origin[1] + spacing[1]*((float)y + 0.5);
 //                        + origin[2] + spacing[2]*((float)z + 0.5);
           }
         }
@@ -369,6 +482,10 @@ void vtkCTHFractal::AddFractalArray()
 
   // hack
   output->GetBlockPointDimensions(0, dims);
+  if (this->TwoDimensional)
+    {
+    dims[2] = 2;
+    }
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
     origin = output->GetBlockOrigin(blockId);
@@ -481,8 +598,7 @@ void vtkCTHFractal::AddGhostLevelArray()
   int numCellsPerBlock = output->GetNumberOfCellsPerBlock();
   vtkUnsignedCharArray* array = vtkUnsignedCharArray::New();
   int blockId;
-  // Hack
-  int *dims = output->GetBlockPointDimensions(0);
+  int dims[3];
   int i, j, k;
   unsigned char* ptr;
   int iLevel, jLevel, kLevel, tmp;
@@ -498,22 +614,27 @@ void vtkCTHFractal::AddGhostLevelArray()
 
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
-    for (k = 1; k < dims[2]; ++k)
+    output->GetBlockCellDimensions(blockId, dims);    
+    for (k = 0; k < dims[2]; ++k)
       {
-      kLevel = this->GhostLevels - k + 1;
+      kLevel = this->GhostLevels - k;
       tmp = k - dims[2] + 1 + this->GhostLevels;
       if (tmp > kLevel) { kLevel = tmp;}
-      for (j = 1; j < dims[1]; ++j)
+      if (this->TwoDimensional)
+        {
+        kLevel = 0;
+        }
+      for (j = 0; j < dims[1]; ++j)
         {
         jLevel = kLevel;
-        tmp = this->GhostLevels - j + 1;
+        tmp = this->GhostLevels - j;
         if (tmp > jLevel) { jLevel = tmp;}
         tmp = j - dims[1] + 1 + this->GhostLevels;
         if (tmp > jLevel) { jLevel = tmp;}
-        for (i = 1; i < dims[0]; ++i)
+        for (i = 0; i < dims[0]; ++i)
           {
           iLevel = jLevel;
-          tmp = this->GhostLevels - i + 1;
+          tmp = this->GhostLevels - i;
           if (tmp > iLevel) { iLevel = tmp;}
           tmp = i - dims[0] + 1 + this->GhostLevels;
           if (tmp > iLevel) { iLevel = tmp;}
@@ -545,6 +666,7 @@ void vtkCTHFractal::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Dimensions: " << this->Dimensions << endl;
+  os << indent << "TwoDimensional: " << this->TwoDimensional << endl;
   os << indent << "FractalValue: " << this->FractalValue << endl;
   os << indent << "MaximumLevel: " << this->MaximumLevel << endl;
   os << indent << "GhostLevels: " << this->GhostLevels << endl;

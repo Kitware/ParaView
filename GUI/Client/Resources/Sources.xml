@@ -54,6 +54,9 @@ The output of the 2D Glyph source is polygonal data.
   <LabeledToggle label="GhostLevels" trace_name="GhostLevels" 
                  property="GhostLevels"
                  help="Set whether to generate overlapping ghost levels." />
+  <LabeledToggle label="TwoDimensional" trace_name="TwoDimensional" 
+                 property="TwoDimensional"
+                 help="Generate a 2D AMR fractal." />
 </Module>
 <!-- #endif -->
 

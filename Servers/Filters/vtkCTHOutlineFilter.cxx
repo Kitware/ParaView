@@ -27,7 +27,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHOutlineFilter, "1.6");
+vtkCxxRevisionMacro(vtkCTHOutlineFilter, "1.7");
 vtkStandardNewMacro(vtkCTHOutlineFilter);
 
 //----------------------------------------------------------------------------
@@ -52,11 +52,10 @@ void vtkCTHOutlineFilter::Execute()
   double bounds[6];
   double *origin;
   double *spacing;
-  int *dimensions;
+  int ext[6];
   int ghostLevels;
   
-  // Hack
-  dimensions = input->GetBlockPointDimensions(0);
+  origin = input->GetTopLevelOrigin();
   ghostLevels = input->GetNumberOfGhostLevels();
 
   append->AddInput(outlineSource->GetOutput());
@@ -66,15 +65,31 @@ void vtkCTHOutlineFilter::Execute()
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
     this->UpdateProgress(static_cast<double>(blockId)/static_cast<double>(numBlocks));
-    origin = input->GetBlockOrigin(blockId);
-    spacing = input->GetBlockSpacing(blockId);
-    bounds[0] = origin[0] + spacing[0]*ghostLevels;
-    bounds[2] = origin[1] + spacing[1]*ghostLevels;
-    bounds[4] = origin[2] + spacing[2]*ghostLevels;
-
-    bounds[1] = origin[0] + spacing[0]*(dimensions[0]-1-ghostLevels);
-    bounds[3] = origin[1] + spacing[1]*(dimensions[1]-1-ghostLevels);
-    bounds[5] = origin[2] + spacing[2]*(dimensions[2]-1-ghostLevels);
+    spacing = input->GetBlockSpacing(blockId);    
+    input->GetBlockPointExtent(blockId, ext);
+    // Make sure a dimension is not collapsed before removing ghost levels.
+    if (ext[0] < ext[1])
+      {
+      ext[0] += ghostLevels;
+      ext[1] -= ghostLevels;
+      }
+    if (ext[2] < ext[3])
+      {
+      ext[2] += ghostLevels;
+      ext[3] -= ghostLevels;
+      }
+    if (ext[4] < ext[5])
+      {
+      ext[4] += ghostLevels;
+      ext[5] -= ghostLevels;
+      }
+               
+    bounds[0] = origin[0] + spacing[0]*ext[0];
+    bounds[1] = origin[0] + spacing[0]*ext[1];
+    bounds[2] = origin[1] + spacing[1]*ext[2];
+    bounds[3] = origin[1] + spacing[1]*ext[3];
+    bounds[4] = origin[2] + spacing[2]*ext[4];
+    bounds[5] = origin[2] + spacing[2]*ext[5];
   
     outlineSource->SetBounds(bounds);
     append->Update();

@@ -59,6 +59,12 @@ public:
   vtkGetMacro(GhostLevels, int);
   vtkBooleanMacro(GhostLevels, int);
 
+  // Description:
+  // Make a 2D data set to test.
+  vtkSetMacro(TwoDimensional, int);
+  vtkGetMacro(TwoDimensional, int);
+  vtkBooleanMacro(TwoDimensional, int);
+
 protected:
   vtkCTHFractal();
   ~vtkCTHFractal();
@@ -83,6 +89,9 @@ protected:
   void AddDepthArray();
   void AddGhostLevelArray();
 
+  int MandelbrotTest(double x, double y);
+  int TwoDTest(double bds[6], int level, int target);
+
 private:
   void InternalImageDataCopy(vtkCTHFractal *src);
 
@@ -91,6 +100,8 @@ private:
   float FractalValue;
   int GhostLevels;
   vtkIntArray *Levels;
+  int TwoDimensional;
+
 
 private:
   vtkCTHFractal(const vtkCTHFractal&);  // Not implemented.
