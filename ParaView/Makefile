@@ -40,8 +40,7 @@ vtkPVPolyData \
 vtkPVRenderView \
 vtkPVShrinkPolyData \
 vtkPVSource \
-vtkPVWindow \
-vtkPVMesaRenderWindow 
+vtkPVWindow 
 
 
 #------------------------------------------------------------------------------
