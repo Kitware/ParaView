@@ -94,7 +94,6 @@
 #include "vtkIceTRenderer.h"
 #include "vtkIceTRenderManager.h"
 #include "vtkPVDuplicatePolyData.h"
-//#include "vtkPVTiledDisplayManager.h"
 #include "vtkRedistributePolyData.h"
 //#include "vtkStructuredCacheFilter.h"
 #include "vtkWeightedRedistributePolyData.h"
@@ -188,7 +187,6 @@ int main(int , char *[])
   c = vtkIceTRenderer::New(); c->Print(cout); c->Delete();
   c = vtkIceTRenderManager::New(); c->Print(cout); c->Delete();
   c = vtkPVDuplicatePolyData::New(); c->Print(cout); c->Delete();
-//  c = vtkPVTiledDisplayManager::New(); c->Print(cout); c->Delete();
   c = vtkRedistributePolyData::New(); c->Print(cout); c->Delete();
 //  c = vtkStructuredCacheFilter::New(); c->Print(cout); c->Delete();
   c = vtkWeightedRedistributePolyData::New(); c->Print(cout); c->Delete();
