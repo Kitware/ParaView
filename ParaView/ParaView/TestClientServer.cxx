@@ -1,64 +1,216 @@
-#include <vtkMultiThreader.h>
-#include <TestClientServer.h>
-#include <vtkstd/string>
-#ifndef _WIN32
-#include <unistd.h>
-#include <sys/wait.h>
+#include "TestClientServer.h"
+
+#if !defined(_WIN32) || defined(__CYGWIN__)
+# include <unistd.h>
+# include <sys/wait.h>
 #endif
 
-void RunServer(void * p)
-{
-  vtkMultiThreader::ThreadInfo* info 
-    = static_cast< vtkMultiThreader::ThreadInfo*>(p);
-  char* path = static_cast<char*>(info->UserData);
-  vtkstd::string run = path;
-  run += " --server";
-  cout << "Running:" <<  run.c_str() << "\n";
-  cout.flush();
-  system(run.c_str());
-}
+#include <kwsys/Process.h>
+#include <kwsys/std/string>
+#include <kwsys/std/vector>
 
+void ReportCommand(const char* const* command, const char* name);
+int ReportStatus(kwsysProcess* process, const char* name);
 
-int main(int ac, char* av[])
+//----------------------------------------------------------------------------
+int main(int argc, char* argv[])
 {
-  vtkstd::string path = "\"";
-  path += PARAVIEW_BINARY_DIR;
-  path += "/bin";
+  // Allocate process managers.
+  kwsysProcess* server = kwsysProcess_New();
+  if(!server)
+    {
+    kwsys_std::cerr << "Cannot allocate kwsysProcess to run the server.\n";
+    return 1;
+    }
+  kwsysProcess* client = kwsysProcess_New();
+  if(!client)
+    {
+    kwsysProcess_Delete(server);
+    kwsys_std::cerr << "Cannot allocate kwsysProcess to run the client.\n";
+    return 1;
+    }
+
+  // Location of the paraview executable.
+  kwsys_std::string paraview = PARAVIEW_BINARY_DIR;
+  paraview += "/bin";
 #ifdef  CMAKE_INTDIR
-  path += "/" CMAKE_INTDIR;
+  paraview += "/" CMAKE_INTDIR;
 #endif
-  path += "/paraview\"";
-  vtkMultiThreader* thread = vtkMultiThreader::New();
-  thread->SetNumberOfThreads(2);
-  int id = 
-    thread->SpawnThread((vtkThreadFunctionType)RunServer, (void*)path.c_str());
+  paraview += "/paraview";
+
+  // Construct the server process command line.
+  kwsys_std::vector<const char*> serverCommand;
+  serverCommand.push_back(paraview.c_str());
+  serverCommand.push_back("--server");
+  serverCommand.push_back(0);
+  ReportCommand(&serverCommand[0], "server");
+  kwsysProcess_SetCommand(server, &serverCommand[0]);
+
+  // Construct the client process command line.
+  kwsys_std::vector<const char*> clientCommand;
+  clientCommand.push_back(paraview.c_str());
+  clientCommand.push_back("--client");
+  for(int i=1; i < argc; ++i)
+    {
+    clientCommand.push_back(argv[i]);
+    }
+  clientCommand.push_back(0);
+  ReportCommand(&clientCommand[0], "client");
+  kwsysProcess_SetCommand(client, &clientCommand[0]);
+
+  // Kill the processes if they are taking too long.
+  kwsysProcess_SetTimeout(server, 1400);
+  kwsysProcess_SetTimeout(client, 1400);
+
+  // Execute the server and then the client.
+  kwsysProcess_Execute(server);
 #ifdef _WIN32
   Sleep(1000);
 #else
   sleep(1);
 #endif
-  path += " --client";
-  for(int i =1; i < ac; ++i)
+  kwsysProcess_Execute(client);
+
+  // Report the output of the processes.
+  int clientPipe = 1;
+  int serverPipe = 1;
+  while(clientPipe || serverPipe)
     {
-    path += " \"";
-    path += av[i];
-    path += "\"";
+    char* data;
+    int length;
+    double timeout;
+
+    // Look for client output.
+    timeout = 0.1;
+    clientPipe = kwsysProcess_WaitForData(client, &data, &length, &timeout);
+    if(clientPipe == kwsysProcess_Pipe_STDOUT)
+      {
+      kwsys_std::cout.write(data, length);
+      kwsys_std::cout.flush();
+      }
+    else if(clientPipe == kwsysProcess_Pipe_STDERR)
+      {
+      kwsys_std::cerr.write(data, length);
+      kwsys_std::cout.flush();
+      }
+
+    // Look for server output.
+    timeout = 0.1;
+    serverPipe = kwsysProcess_WaitForData(client, &data, &length, &timeout);
+    if(serverPipe == kwsysProcess_Pipe_STDOUT)
+      {
+      kwsys_std::cout.write(data, length);
+      kwsys_std::cout.flush();
+      }
+    else if(serverPipe == kwsysProcess_Pipe_STDERR)
+      {
+      kwsys_std::cerr.write(data, length);
+      kwsys_std::cout.flush();
+      }
     }
-  cout << "Running:" <<  path.c_str() << "\n";
-  cout.flush();
-  int ret = system(path.c_str());
-#ifndef _WIN32
-  // Translate unix result.
-  if(ret == -1 || !WIFEXITED(ret))
+
+  // Wait for the client and server to exit.
+  kwsysProcess_WaitForExit(client, 0);
+  kwsysProcess_WaitForExit(server, 0);
+
+  // Get the results.
+  int serverResult = ReportStatus(server, "server");
+  int clientResult = ReportStatus(client, "client");
+
+  // Free process managers.
+  kwsysProcess_Delete(client);
+  kwsysProcess_Delete(server);
+
+  // Report the server return code if it is nonzero.  Otherwise report
+  // the client return code.
+  if(serverResult)
     {
-    ret = 1;
+    return serverResult;
     }
   else
     {
-    ret = WEXITSTATUS(ret);
+    return clientResult;
     }
-#endif
-  thread->TerminateThread(ret);
-  thread->Delete();
-  return ret;
+}
+
+//----------------------------------------------------------------------------
+void ReportCommand(const char* const* command, const char* name)
+{
+  kwsys_std::cout << "The " << name << " command is:\n";
+  for(const char* const * c = command; *c; ++c)
+    {
+    kwsys_std::cout << " \"" << *c << "\"";
+    }
+  kwsys_std::cout << "\n";
+}
+
+//----------------------------------------------------------------------------
+int ReportStatus(kwsysProcess* process, const char* name)
+{
+  int result = 1;
+  switch(kwsysProcess_GetState(process))
+    {
+    case kwsysProcess_State_Starting:
+      {
+      kwsys_std::cerr << "Never started " << name << " process.\n";
+      } break;
+    case kwsysProcess_State_Error:
+      {
+      kwsys_std::cerr << "Error executing " << name << " process: "
+           << kwsysProcess_GetErrorString(process)
+           << "\n";
+      } break;
+    case kwsysProcess_State_Exception:
+      {
+      kwsys_std::cerr << "The " << name
+                      << " process exited with an exception: ";
+      switch(kwsysProcess_GetExitException(process))
+        {
+        case kwsysProcess_Exception_None:
+          {
+          kwsys_std::cerr << "None";
+          } break;
+        case kwsysProcess_Exception_Fault:
+          {
+          kwsys_std::cerr << "Segmentation fault";
+          } break;
+        case kwsysProcess_Exception_Illegal:
+          {
+          kwsys_std::cerr << "Illegal instruction";
+          } break;
+        case kwsysProcess_Exception_Interrupt:
+          {
+          kwsys_std::cerr << "Interrupted by user";
+          } break;
+        case kwsysProcess_Exception_Numerical:
+          {
+          kwsys_std::cerr << "Numerical exception";
+          } break;
+        case kwsysProcess_Exception_Other:
+          {
+          kwsys_std::cerr << "Unknown";
+          } break;
+        }
+      kwsys_std::cerr << "\n";
+      } break;
+    case kwsysProcess_State_Executing:
+      {
+      kwsys_std::cerr << "Never terminated " << name << " process.\n";
+      } break;
+    case kwsysProcess_State_Exited:
+      {
+      result = kwsysProcess_GetExitValue(process);
+      kwsys_std::cout << "The " << name << " process exited with code "
+                      << result << "\n";
+      } break;
+    case kwsysProcess_State_Expired:
+      {
+      kwsys_std::cerr << "Killed " << name << " process due to timeout.\n";
+      } break;
+    case kwsysProcess_State_Killed:
+      {
+      kwsys_std::cerr << "Killed " << name << " process.\n";
+      } break;
+    }
+  return result;
 }
