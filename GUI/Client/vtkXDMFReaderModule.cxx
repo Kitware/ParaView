@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.17");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.18");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -459,27 +459,42 @@ void vtkXDMFReaderModule::SaveInBatchScript(ofstream *file)
     {
     return;
     }
-  this->Superclass::SaveInBatchScript(file);
-  int numSources, sourceIdx;
-  numSources = this->GetNumberOfVTKSources();
-  for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+  this->SaveFilterInBatchScript(file);
+
+  if ( this->Domain )
     {
-    if ( this->Domain )
-      {
-      *file << "\tpvTemp" << this->GetVTKSourceID(sourceIdx) << " SetDomainName {"
-       << this->Domain << "}" << endl;
-      *file << "\tpvTemp" << this->GetVTKSourceID(sourceIdx) << " UpdateInformation" << endl;
-      }
-    *file << "\tpvTemp" << this->GetVTKSourceID(sourceIdx) << " DisableAllGrids" << endl;
-    vtkXDMFReaderModuleInternal::GridListType::iterator mit;
-    for ( mit = this->Internals->GridList.begin(); 
-      mit != this->Internals->GridList.end(); 
-      ++mit )
-      {
-      *file << "\tpvTemp" << this->GetVTKSourceID(sourceIdx) << " EnableGrid {" << mit->first.c_str() << "}" << endl;
-      }
-    *file << "\tpvTemp" << this->GetVTKSourceID(sourceIdx) << " UpdateInformation" << endl;
+    *file << "  [$pvTemp" << this->GetVTKSourceID(0) 
+          << " GetProperty DomainName] SetElement 0 {"
+          << this->Domain << "}" << endl;
+    *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UpdateVTKObjects" << endl;
+    *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UpdateInformation" << endl;
     }
+  int numGrids=0;
+  vtkXDMFReaderModuleInternal::GridListType::iterator mit;
+  for ( mit = this->Internals->GridList.begin(); 
+        mit != this->Internals->GridList.end(); 
+        ++mit )
+    {
+    numGrids++;
+    }
+  *file << "  [$pvTemp" << this->GetVTKSourceID(0) 
+        << " GetProperty EnableGrid] SetNumberOfElements "
+        << numGrids << endl;
+  
+  numGrids = 0;
+  for ( mit = this->Internals->GridList.begin(); 
+        mit != this->Internals->GridList.end(); 
+        ++mit )
+    {
+    *file << "  [$pvTemp" << this->GetVTKSourceID(0) 
+          << " GetProperty EnableGrid] SetElement " << numGrids << " {" << mit->first.c_str() << "}" << endl;
+    numGrids++;
+    }
+  *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UpdateVTKObjects" << endl;
+
+  // Add the mapper, actor, scalar bar actor ...
+  this->GetPVOutput()->SaveInBatchScript(file);
+
 }
 
 //----------------------------------------------------------------------------
