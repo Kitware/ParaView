@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkToolkits.h"
 
 // Define the standard reader interfaces.
-const char* vtkPVWindow::StandardReaderInterfaces =
+const char* vtkPVInitialize::StandardReaderInterfaces =
 "<ModuleInterfaces>\n"
 "  <Module name=\"pvtkfile\" class=\"vtkPVDataSetReaderModule\" root_name=\"PVTKFile\"\n"
 "          output=\"vtkDataSet\" module_type=\"Reader\"\n"
@@ -109,7 +109,7 @@ const char* vtkPVWindow::StandardReaderInterfaces =
 "</ModuleInterfaces>\n";
 
 // Define the standard source interfaces.
-const char* vtkPVWindow::StandardSourceInterfaces =
+const char* vtkPVInitialize::StandardSourceInterfaces =
 "<ModuleInterfaces>\n"
 "\n"
 "<Module name=\"ArrowSource\" root_name=\"Arrow\" output=\"vtkPolyData\" module_type=\"Source\">\n"
@@ -282,7 +282,7 @@ const char* vtkPVWindow::StandardSourceInterfaces =
 "</ModuleInterfaces>\n";
 
 // Define the standard filter interfaces.
-const char* vtkPVWindow::StandardFilterInterfaces=
+const char* vtkPVInitialize::StandardFilterInterfaces=
 "<ModuleInterfaces>\n"
 "<Module name=\"Balance\" root_name=\"Balance\" input=\"vtkPolyData\" output=\"vtkPolyData\" module_type=\"Filter\">\n"
 "  <Filter type=\"vtkBalancedRedistributePolyData\"/>\n"
@@ -899,7 +899,7 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "</ModuleInterfaces>\n";
 
 // Define the standard manipulators.
-const char* vtkPVWindow::StandardManipulators=
+const char* vtkPVInitialize::StandardManipulators=
 "<ModuleInterfaces>\n"
 "  <Manipulator name=\"FlyIn\" types=\"3D\" class=\"vtkPVJoystickFlyIn\">\n"
 "    <Scale variable=\"FlySpeed\" resolution=\".1\" range=\"1 30\" help=\"Set the speed of fly-in camera manipulation.\"/>\n"
@@ -934,7 +934,7 @@ const char* vtkPVWindow::StandardManipulators=
 
 
 // Define the standard writers.
-const char* vtkPVWindow::StandardWriters=
+const char* vtkPVInitialize::StandardWriters=
 "<ModuleInterfaces>\n"
 "  <Writer input=\"vtkDataSet\"\n"
 "          class=\"vtkPVWriter\"\n"

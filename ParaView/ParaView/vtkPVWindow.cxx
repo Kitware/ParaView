@@ -54,12 +54,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
-#include "vtkKWListBox.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
-#include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWSplashScreen.h"
@@ -76,7 +74,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVData.h"
-#include "vtkPVDefaultModules.h"
 #include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -97,6 +94,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkString.h"
 #include "vtkToolkits.h"
+#include "vtkPVInitialize.h"
+#include "vtkPVSelectCustomReader.h"
+#include "vtkKWPushButton.h"
 
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.376");
+vtkCxxRevisionMacro(vtkPVWindow, "1.377");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1916,122 +1916,24 @@ int vtkPVWindow::Open(char *openFileName, int store)
       {
       vtkKWApplication* app = this->Application;
 
-      // Create
-      vtkKWDialog *dialog = vtkKWDialog::New();
-      dialog->Create(app, 0);
-      dialog->SetMasterWindow(this);
-      dialog->SetTitle("Open Data With...");
-      vtkKWLabel* label = vtkKWLabel::New();
-      label->SetParent(dialog);
-      ostrstream str1;
-      str1 << "Open " << openFileName << " with:" << ends;
-      label->SetLabel(str1.str());
-      label->Create(app, 0);
-      str1.rdbuf()->freeze(0);
-
-      vtkKWLabel* label1 = vtkKWLabel::New();
-      label1->SetParent(dialog);
-      label1->SetWidth(300);
-      label1->SetLineType(vtkKWLabel::MultiLine);
-      ostrstream str2;
-      str2 << "Opening file " << openFileName << " with a custom reader "
-           << "may results in unpredictable result such as ParaView may "
-           << "crash. Make sure to pick the right reader." << ends;
-      label1->SetLabel(str2.str());
-      label1->Create(app, 0);
-      str2.rdbuf()->freeze(0);
-
-      vtkKWListBox* listbox = vtkKWListBox::New();
-      listbox->SetParent(dialog);
-      listbox->Create(app, 0);
-      int num = 5;
-      if ( this->ReaderList->GetNumberOfItems() < num )
+      vtkPVSelectCustomReader* dialog = vtkPVSelectCustomReader::New();
+      vtkPVReaderModule* reader = dialog->SelectReader(this, openFileName);
+      if ( !reader || this->OpenWithReader(openFileName, reader, 1) != VTK_OK )
         {
-        num = this->ReaderList->GetNumberOfItems();
-        }
-      if ( num < 1 )
-        {
-        num = 1;
-        }
-      listbox->SetHeight(num);      
-      
-      vtkKWFrame* bframe = vtkKWFrame::New();
-      bframe->SetParent(dialog);
-      bframe->Create(app, 0);
-
-      vtkKWPushButton* button = vtkKWPushButton::New();
-      button->SetParent(bframe->GetFrame());
-      button->Create(app, 0);
-      button->SetLabel("Cancel");
-      button->SetCommand(dialog, "Cancel");
-
-      vtkKWPushButton* button1 = vtkKWPushButton::New();
-      button1->SetParent(bframe->GetFrame());
-      button1->Create(app, 0);
-      button1->SetLabel("OK");
-      button1->SetCommand(dialog, "OK");
-
-      this->Script("pack %s %s %s %s -padx 5 -pady 5 -side top", 
-                   label->GetWidgetName(),
-                   listbox->GetWidgetName(),
-                   label1->GetWidgetName(),
-                   bframe->GetWidgetName());
-      this->Script("pack %s %s -padx 5 -pady 5 -side left",
-                   button->GetWidgetName(),
-                   button1->GetWidgetName());
-
-      vtkLinkedListIterator<vtkPVReaderModule*>* it = 
-        this->ReaderList->NewIterator();
-      while(!it->IsDoneWithTraversal())
-        {
-        vtkPVReaderModule* rm = 0;
-        if ( it->GetData(rm) == VTK_OK && rm && rm->GetDescription() )
+        ostrstream error;
+        error << "Can not open file " << openFileName << " for reading." << ends;
+        if (this->UseMessageDialog)
           {
-          ostrstream str;
-          str << rm->GetDescription() << " Reader" << ends;
-          listbox->AppendUnique(str.str());
-          str.rdbuf()->freeze(0);
+          vtkKWMessageDialog::PopupMessage(
+            this->GetApplication(), this, "Open Error", error.str(), 
+            vtkKWMessageDialog::ErrorIcon | vtkKWMessageDialog::Beep);
           }
-        it->GoToNextItem();
-        }
-      it->Delete();
-      listbox->SetSelectionIndex(0);
-      listbox->SetDoubleClickCallback(dialog, "OK");
-
-      // invoke
-      int res = dialog->Invoke();
-      if ( res == 1 )
-        {
-        vtkPVReaderModule* reader = 0;
-        if ( this->ReaderList->GetItem(listbox->GetSelectionIndex(),
-                                       reader) == VTK_OK && reader )
+        else
           {
-          if ( this->OpenWithReader(openFileName, reader, 1) != VTK_OK )
-            {
-            ostrstream error;
-            error << "Can not open file " << openFileName << " for reading." << ends;
-            if (this->UseMessageDialog)
-              {
-              vtkKWMessageDialog::PopupMessage(
-                this->GetApplication(), this, "Open Error", error.str(), 
-                vtkKWMessageDialog::ErrorIcon | vtkKWMessageDialog::Beep);
-              }
-            else
-              {
-              vtkErrorMacro(<<error);
-              }
-            error.rdbuf()->freeze(0);
-            }
+          vtkErrorMacro(<<error);
           }
-        }
-
+        }      
       // Cleanup
-      bframe->Delete();
-      listbox->Delete();
-      button->Delete();
-      button1->Delete();
-      label->Delete();
-      label1->Delete();
       dialog->Delete();
       }    
     }
@@ -3517,11 +3419,9 @@ void vtkPVWindow::ReadSourceInterfaces()
   // Add special sources.
   
   // Setup our built in source interfaces.
-  this->ReadSourceInterfacesFromString(vtkPVWindow::StandardSourceInterfaces);
-  this->ReadSourceInterfacesFromString(vtkPVWindow::StandardFilterInterfaces);
-  this->ReadSourceInterfacesFromString(vtkPVWindow::StandardReaderInterfaces);
-  this->ReadSourceInterfacesFromString(vtkPVWindow::StandardManipulators);
-  this->ReadSourceInterfacesFromString(vtkPVWindow::StandardWriters);
+  vtkPVInitialize* initialize = vtkPVInitialize::New();
+  initialize->Initialize(this);
+  initialize->Delete();
   
   // A list of standard directories in which to find interfaces.  The
   // first directory in this list that is found is the only one used.
@@ -3852,7 +3752,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.376 $");
+  this->ExtractRevision(os,"$Revision: 1.377 $");
 }
 
 //----------------------------------------------------------------------------

@@ -466,6 +466,16 @@ public:
   vtkBooleanMacro(Interaction,int);
   vtkGetMacro(Interaction,int);
 
+  // Description:
+  // Read interface description from XML.
+  void ReadSourceInterfacesFromString(const char*);
+  
+  // Description:
+  // Accessor for the linked list. This is not available from Tcl,
+  // since vtkLinkedList is templated.
+  //BTX
+  vtkLinkedList<vtkPVReaderModule*>* GetReaderList() { return this->ReaderList; }
+  //ETX
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -582,7 +592,6 @@ protected:
 
   // Read interface description from XML.
   void ReadSourceInterfaces();
-  void ReadSourceInterfacesFromString(const char*);
   void ReadSourceInterfacesFromFile(const char*);
   int ReadSourceInterfacesFromDirectory(const char*);
 
@@ -634,11 +643,6 @@ protected:
   int Interaction;
 
 private:
-  static const char* StandardReaderInterfaces;
-  static const char* StandardSourceInterfaces;
-  static const char* StandardFilterInterfaces;
-  static const char* StandardManipulators;
-  static const char* StandardWriters;
 
 //BTX
   void SerializeSource(ostream& os, vtkIndent indent, vtkPVSource*,

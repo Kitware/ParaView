@@ -39,6 +39,7 @@ vtkPVFileEntry.cxx
 vtkPVGenericRenderWindowInteractor.cxx
 vtkPVGlyph3D.cxx 
 vtkPVImplicitPlaneWidget.cxx
+vtkPVInitialize.cxx
 vtkPVInputMenu.cxx 
 vtkPVInteractorStyle.cxx
 vtkPVInteractorStyleCenterOfRotation.cxx
@@ -67,6 +68,7 @@ vtkPVRenderGroupDialog.cxx
 vtkPVRenderView.cxx 
 vtkPVScalarRangeLabel.cxx 
 vtkPVScale.cxx 
+vtkPVSelectCustomReader.cxx
 vtkPVSelectWidget.cxx 
 vtkPVSelectionList.cxx
 vtkPVSelectTimeSet.cxx
