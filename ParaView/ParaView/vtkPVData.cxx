@@ -104,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.20");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.21");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2687,6 +2687,14 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   else
     {
     os << indent << "AxesWidget: none" << endl;
+    }
+  if(this->AxesWidgetCheck)
+    {
+    os << indent << "AxesWidgetCheck: " << this->AxesWidgetCheck << endl;
+    }
+  else
+    {
+    os << indent << "AxesWidgetCheck: none" << endl;
     }
   os << indent << "PVSource: " << this->GetPVSource() << endl;
   os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
