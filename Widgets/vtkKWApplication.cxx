@@ -118,14 +118,6 @@ vtkKWApplication::~vtkKWApplication()
 
   this->SetApplicationName(NULL);
   this->SetApplicationVersionName(NULL);
-
-  this->BalloonHelpWindow->Delete();
-  this->BalloonHelpWindow = NULL;
-  this->BalloonHelpLabel->Delete();
-  this->BalloonHelpLabel = NULL;
-  this->SetBalloonHelpPending(NULL);
-
-  this->EventNotifier->Delete();
 }
 
 void vtkKWApplication::Script(const char *format, ...)
@@ -232,6 +224,24 @@ void vtkKWApplication::Exit()
       }
     }
   
+  // remove the event notifier which otherwise would cause a ref count loop
+  if (this->EventNotifier)
+    {
+    this->EventNotifier->Delete();
+    this->EventNotifier = NULL;
+    }
+  this->SetBalloonHelpPending(NULL);
+  if (this->BalloonHelpWindow)
+    {
+    this->BalloonHelpWindow->Delete();
+    this->BalloonHelpWindow = NULL;
+    }
+  if (this->BalloonHelpLabel)
+    {
+    this->BalloonHelpLabel->Delete();
+    this->BalloonHelpLabel = NULL;
+    }
+  this->SetBalloonHelpPending(NULL);
   return;
 }
     
@@ -358,7 +368,7 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
     }
   
   this->BalloonHelpCancel();
-  this->Script("after 2000 {%s BalloonHelpDisplay %s}", 
+  this->Script("after 2000 {catch {%s BalloonHelpDisplay %s}}", 
                this->GetTclName(), widget->GetTclName());
   result = this->GetMainInterp()->result;
   this->SetBalloonHelpPending(result);
