@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.54");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.55");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -727,7 +727,15 @@ int vtkKWNotebook::AddPage(const char *title,
   this->Script(cmd.str());
   cmd.rdbuf()->freeze(0);
 
-  this->BindPage(page);
+  page->SetEnabled(this->Enabled);
+  if (this->Enabled)
+    {
+    this->BindPage(page);
+    }
+  else
+    {
+    this->UnBindPage(page);
+    }
 
   // Show the page. Set Visibility to Off first. If this page can really
   // be shown, Visibility will be set to On automatically.
