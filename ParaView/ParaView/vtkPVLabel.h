@@ -46,8 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVLabel_h
 
 #include "vtkPVObjectWidget.h"
-#include "vtkKWApplication.h"
-#include "vtkKWLabel.h"
+
+class vtkKWApplication;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkPVLabel : public vtkPVObjectWidget
 {
@@ -57,8 +58,8 @@ public:
 
   // Description:
   // Setting the label also sets the name.
-  void SetLabel(const char *str) {this->Label->SetLabel(str); this->SetTraceName(str);}
-  const char* GetLabel() { return this->Label->GetLabel();}
+  void SetLabel(const char *str);
+  const char* GetLabel();
 
   void Create(vtkKWApplication *pvApp);
   
@@ -86,7 +87,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVLabel* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+			     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:

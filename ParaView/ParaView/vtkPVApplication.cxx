@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVApplication.h"
+
 #include "vtkPVWindow.h"
 #include "vtkKWDialog.h"
 #include "vtkKWWindowCollection.h"
@@ -69,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProbeFilter.h"
 #include "vtkMapper.h"
 #include "vtkString.h"
-
+#include "vtkDataSet.h"
 #include "vtkIntArray.h"
 #include "vtkFloatArray.h"
 #include "vtkLongArray.h"

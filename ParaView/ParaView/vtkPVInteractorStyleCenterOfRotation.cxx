@@ -40,14 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVInteractorStyleCenterOfRotation.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkCommand.h"
 #include "vtkPVWorldPointPicker.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVWindow.h"
 #include "vtkKWEntry.h"
+#include "vtkPVRenderView.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.1");
+vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.2");
 vtkStandardNewMacro(vtkPVInteractorStyleCenterOfRotation);
 
 //-------------------------------------------------------------------------

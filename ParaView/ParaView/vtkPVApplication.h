@@ -47,14 +47,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVApplication_h
 
 #include "vtkKWApplication.h"
-#include "vtkMultiProcessController.h"
 
+class vtkDataSet;
+class vtkMapper;
+class vtkMultiProcessController;
+class vtkPVOutputWindow;
 class vtkPVSource;
+class vtkPVWindow;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
-class vtkMapper;
-class vtkPVWindow;
-class vtkPVOutputWindow;
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100

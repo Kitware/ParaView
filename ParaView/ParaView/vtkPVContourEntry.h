@@ -48,11 +48,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVContourEntry_h
 
 #include "vtkPVWidget.h"
-#include "vtkKWLabel.h"
 
 class vtkKWListBox;
 class vtkKWEntry;
 class vtkKWPushButton;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkPVContourEntry : public vtkPVWidget
 {
@@ -68,7 +68,7 @@ public:
   // Set the label.  The label can be used to get this widget
   // from a script.
   void SetLabel (const char* label);
-  const char* GetLabel() {return this->ContourValuesLabel->GetLabel();}
+  const char* GetLabel();
   
   // Description:
   // Gets called when the accept button is pressed.

@@ -48,12 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVSphereWidget_h
 #define __vtkPVSphereWidget_h
 
-#include "vtkPVWidget.h"
 #include "vtkPVObjectWidget.h"
 
 class vtkPVSource;
 class vtkPVVectorEntry;
-
 
 class VTK_EXPORT vtkPVSphereWidget : public vtkPVObjectWidget
 {

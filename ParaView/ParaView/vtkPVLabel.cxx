@@ -40,8 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVLabel.h"
-#include "vtkObjectFactory.h"
+
 #include "vtkArrayMap.txx"
+#include "vtkKWLabel.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
@@ -189,4 +191,16 @@ int vtkPVLabel::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLabel::SetLabel(const char *str)
+{
+  this->Label->SetLabel(str); this->SetTraceName(str);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVLabel::GetLabel()
+{ 
+  return this->Label->GetLabel();
 }

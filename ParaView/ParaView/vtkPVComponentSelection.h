@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVComponentSelection_h
 #define __vtkPVComponentSelection_h
 
-#include "vtkPVWidget.h"
 #include "vtkPVObjectWidget.h"
 
 class VTK_EXPORT vtkPVComponentSelection : public vtkPVObjectWidget

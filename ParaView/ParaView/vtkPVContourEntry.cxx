@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
 #include "vtkKWListBox.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
@@ -390,4 +391,10 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   this->SetLabel(label);
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVContourEntry::GetLabel() 
+{
+  return this->ContourValuesLabel->GetLabel();
 }

@@ -130,10 +130,6 @@ protected:
   // There is no initialize method.
   int Initialized;
 
-
-
-
-  
 //BTX 
 #ifdef VTK_USE_MPI 
   void SatelliteFinalAbortCheck();

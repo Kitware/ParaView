@@ -40,19 +40,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVXMLPackageParser.h"
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
-#include "vtkPVWidget.h"
+
 #include "vtkArrayMap.txx"
-#include "vtkParaViewInstantiator.h"
-#include "vtkPVSource.h"
-#include "vtkPVWindow.h"
-#include "vtkPVRenderView.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVReaderModule.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
+#include "vtkPVWidget.h"
+#include "vtkPVWindow.h"
+#include "vtkPVXMLElement.h"
+#include "vtkParaViewInstantiator.h"
+
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.3");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.4");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION

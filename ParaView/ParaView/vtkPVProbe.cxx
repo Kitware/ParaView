@@ -43,12 +43,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkIdTypeArray.h"
+#include "vtkKWCheckButton.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledEntry.h"
+#include "vtkKWOptionMenu.h"
 #include "vtkKWToolbar.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVArrayMenu.h"
+#include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
@@ -56,12 +63,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSource.h"
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
-#include "vtkPVArrayMenu.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWCheckButton.h"
-#include "vtkPVData.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkKWLabel.h"
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);

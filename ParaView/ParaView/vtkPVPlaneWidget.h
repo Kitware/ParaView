@@ -49,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVPlaneWidget_h
 #define __vtkPVPlaneWidget_h
 
-#include "vtkPVWidget.h"
 #include "vtkPVObjectWidget.h"
 
 class vtkPVSource;

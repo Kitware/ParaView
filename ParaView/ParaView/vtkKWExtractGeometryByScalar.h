@@ -49,7 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWExtractGeometryByScalar_h
 
 #include "vtkUnstructuredGridToUnstructuredGridFilter.h"
-#include "vtkIdList.h"
+
+class vtkIdList;
 
 class VTK_EXPORT vtkKWExtractGeometryByScalar : public vtkUnstructuredGridToUnstructuredGridFilter
 {

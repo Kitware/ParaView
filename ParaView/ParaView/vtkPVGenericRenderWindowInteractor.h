@@ -46,7 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVGenericRenderWindowInteractor_h
 
 #include "vtkGenericRenderWindowInteractor.h"
-#include "vtkPVRenderView.h"
+
+class vtkPVRenderView;
 
 class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkGenericRenderWindowInteractor
 {
