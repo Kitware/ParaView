@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.22");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.23");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -379,6 +379,10 @@ int vtkPVSelectCTHArrays::StringMatch(const char* arrayName)
   while (*p != '\0')
     {
     if (strncmp(p,"Fraction",8) == 0 || strncmp(p, "fraction", 8) == 0)
+      {
+      return 1;
+      }
+    else if (strncmp(p,"VOLM",4) == 0)
       {
       return 1;
       }
