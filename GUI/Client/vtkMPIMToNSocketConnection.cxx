@@ -23,7 +23,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.10");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.11");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -129,7 +129,7 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
     return;
     }
   unsigned int myId = this->Controller->GetLocalProcessId();
-  if(myId >= this->NumberOfConnections)
+  if(myId >= static_cast<unsigned int>(this->NumberOfConnections))
     {
       return;
     }
