@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVEnSightReaderModule.h
+  Module:    vtkPVEnSightMasterServerReader.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,53 +39,65 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVEnSightReaderModule - Module representing an "advanced" reader
+// .NAME vtkPVEnSightMasterServerReader - 
 // .SECTION Description
-// The class vtkPVEnSightReaderModule is used to represent an "advanced"
-// reader (or a pipeline which contains a reader). An advanced reader is
-// one which allows the user to pre-select certain attributes (for example,
-// list of arrays to be loaded) before reading the whole file.  This is
-// done by reading some header information during UpdateInformation.  The
-// main difference between vtkPVEnSightReaderModule and vtkPVReaderModule
-// is that the former does not automatically call Accept after the filename
-// is selected. Instead, it prompts the user for more selections. The file
-// is only fully loaded when the user presses Accept.
-//
-// .SECTION See also
-// vtkPVReadermodule vtkPVEnSightReaderModule vtkPVPLOT3DReaderModule
 
+#ifndef __vtkPVEnSightMasterServerReader_h
+#define __vtkPVEnSightMasterServerReader_h
 
+#include "vtkGenericEnSightReader.h"
 
-#ifndef __vtkPVEnSightReaderModule_h
-#define __vtkPVEnSightReaderModule_h
+class vtkMPIController;
+class vtkPVEnSightMasterServerReaderInternal;
 
-#include "vtkPVAdvancedReaderModule.h"
-
-class VTK_EXPORT vtkPVEnSightReaderModule : public vtkPVAdvancedReaderModule
+class VTK_EXPORT vtkPVEnSightMasterServerReader : public vtkGenericEnSightReader
 {
 public:
-  static vtkPVEnSightReaderModule* New();
-  vtkTypeRevisionMacro(vtkPVEnSightReaderModule, vtkPVAdvancedReaderModule);
+  static vtkPVEnSightMasterServerReader* New();
+  vtkTypeRevisionMacro(vtkPVEnSightMasterServerReader, vtkGenericEnSightReader);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // If the source is a vtkPVEnSightMasterServerReader, this sets the
-  // controller.  In either case, the superclass's implementation of
-  // this method is called.
-  virtual int ReadFileInformation(const char* fname);
+  // This class uses MPI communication mechanisms to verify the
+  // integrity of all case files in the master file.
+  vtkGetObjectMacro(Controller, vtkMPIController);
+  void SetController(vtkMPIController* controller);
   
+  // Description:
+  // Get the number of pieces in the file.  Valid after
+  // UpdateInformation.
+  vtkGetMacro(NumberOfPieces, int);
 protected:
-  vtkPVEnSightReaderModule();
-  ~vtkPVEnSightReaderModule();
-
-  // This method is called when the accept button is pressed for the
-  // first time.
-  virtual int InitializeData();
-  virtual void CreateProperties();
+  vtkPVEnSightMasterServerReader();
+  ~vtkPVEnSightMasterServerReader();
+  
+  virtual void ExecuteInformation();
+  virtual void Execute();
+  int ParseMasterServerFile();
+  
+  void SuperclassExecuteInformation();
+  void SuperclassExecuteData();
+  
+  // Special execute method called by Execute when an error has
+  // occurred.  It produces an empty output.
+  virtual void ExecuteError();
+  
+  // The MPI controller used to communicate with the instances in
+  // other processes.
+  vtkMPIController* Controller;
+  
+  // The number of pieces available in the file.
+  int NumberOfPieces;
+  
+  // Internal implementation details.
+  vtkPVEnSightMasterServerReaderInternal* Internal;
+  
+  // Whether an error occurred during ExecuteInformation.
+  int InformationError;
   
 private:
-  vtkPVEnSightReaderModule(const vtkPVEnSightReaderModule&); // Not implemented
-  void operator=(const vtkPVEnSightReaderModule&); // Not implemented
+  vtkPVEnSightMasterServerReader(const vtkPVEnSightMasterServerReader&); // Not implemented
+  void operator=(const vtkPVEnSightMasterServerReader&); // Not implemented
 };
 
 #endif

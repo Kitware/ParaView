@@ -32,8 +32,17 @@
   <Module name="ensight" class="vtkPVEnSightReaderModule"
           root_name="Ensight" 
           module_type="Reader"
-          extensions=".case .sos" file_description="EnSight Files">
+          extensions=".case" file_description="EnSight Files">
     <Source class="vtkGenericEnSightReader"/>
+    <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
+    <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
+    <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
+  </Module>
+  <Module name="ensightMS" class="vtkPVEnSightReaderModule"
+          root_name="Ensight" 
+          module_type="Reader"
+          extensions=".sos" file_description="EnSight Master Server Files">
+    <Source class="vtkPVEnSightMasterServerReader"/>
     <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
     <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>

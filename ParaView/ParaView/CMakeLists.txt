@@ -148,6 +148,10 @@ SET( ParaView_SRCS
   vtkXDMFReaderModule.cxx
   )
 
+IF(VTK_USE_MPI)
+  SET(ParaView_SRCS ${ParaView_SRCS} vtkPVEnSightMasterServerReader.cxx)
+ENDIF(VTK_USE_MPI)
+
 IF (VTK_USE_PATENTED)
   SET( ParaView_SRCS
     ${ParaView_SRCS}
@@ -163,10 +167,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkPVWindowResources
   WRAP_EXCLUDE
   )
-
-IF (VTK_USE_MPI)
-  SET( ParaView_SRCS ${ParaView_SRCS} vtkPVEnSightVerifier.cxx )
-ENDIF (VTK_USE_MPI)
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVObjectWidget

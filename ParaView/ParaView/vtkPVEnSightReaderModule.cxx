@@ -46,10 +46,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
+#include "vtkToolkits.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.42");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.43");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -87,4 +88,24 @@ int vtkPVEnSightReaderModule::InitializeData()
     pm->ServerScript("%s Update", this->GetVTKSourceTclName(i));
     }
   return this->Superclass::InitializeData();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVEnSightReaderModule::ReadFileInformation(const char* fname)
+{
+#ifdef VTK_USE_MPI
+  // If this is a vtkPVEnSightMasterServerReader, set the controller.
+  if(strcmp(this->SourceClassName, "vtkPVEnSightMasterServerReader") == 0)
+    {
+    int i;
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    int numSources = this->GetNumberOfVTKSources();
+    for(i=0; i < numSources; ++i)
+      {
+      pm->ServerScript("%s SetController [$Application GetController]",
+                       this->GetVTKSourceTclName(i));
+      }
+    }
+#endif
+  return this->Superclass::ReadFileInformation(fname);
 }
