@@ -55,6 +55,13 @@
           module_type="Reader"
           extensions=".case" file_description="EnSight Files">
     <Source class="vtkGenericEnSightReader"/>
+    <SelectionList label="Byte order" trace_name="ByteOrder"
+                   variable="ByteOrder"
+           help="Select the byte order of the binary file">
+      <Item name="big endian" value="0"/>
+      <Item name="little endian" value="1"/>
+    </SelectionList>
+    
     <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
     <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
