@@ -14,11 +14,12 @@
 #define ET_VERSION "3.8"
 #define ET_HAVE_APPINIT 0
 #define ET_HAVE_PREINIT 0
-#if !defined(_WIN32)
+// This should go out
+//#if !defined(_WIN32)
 # define ET_HAVE_MAIN 1
-#else
-# define ET_HAVE_MAIN 0
-#endif
+//#else
+//# define ET_HAVE_MAIN 0
+//#endif
 #define ET_HAVE_CUSTOM_MAINLOOP 0
 #define ET_TCL_LIBRARY "C:/Program Files/Tcl/lib/tcl8.2"
 #define ET_TK_LIBRARY "C:/Program Files/Tcl/lib/tk8.2"
