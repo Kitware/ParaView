@@ -146,6 +146,7 @@ class VTK_EXPORT vtkKWEvent
     RightMouseOptionChangedEvent,
     ScalarColorFunctionChangedEvent,
     ScalarColorFunctionPresetApplyEvent,
+    ScalarComponentWeightingChangedEvent,
     ScalarOpacityFunctionChangedEvent,
     ScalarOpacityFunctionPresetApplyEvent,
     ScaleBarVisibilityChangedEvent,

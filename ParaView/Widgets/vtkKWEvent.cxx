@@ -137,6 +137,7 @@ static const char *vtkKWEventStrings[] = {
   "RightMouseOptionChangedEvent",
   "ScalarColorFunctionChangedEvent",
   "ScalarColorFunctionPresetApplyEvent",
+  "ScalarComponentWeightingChangedEvent",
   "ScalarOpacityFunctionChangedEvent",
   "ScalarOpacityFunctionPresetApplyEvent",
   "ScaleBarVisibilityChangedEvent",
