@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.9");
+vtkCxxRevisionMacro(vtkKWWindow, "1.122.2.10");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -674,10 +674,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
                this->StatusImage->GetWidgetName(),
                this->StatusImageName);
 
-  this->Script("pack %s -side left -anchor c -ipadx 1 -ipady 1", 
+  this->Script("pack %s -side left -anchor c -ipadx 1 -ipady 1 -fill y", 
                this->StatusImage->GetWidgetName());
 
-  this->StatusLabel->Create(app,"-relief sunken -padx 3 -bd 1 -font \"Helvetica 10\" -anchor w");
+  this->StatusLabel->Create(app,"-relief sunken -padx 3 -bd 1 -anchor w");
   this->Script("pack %s -side left -padx 2 -expand yes -fill both",
                this->StatusLabel->GetWidgetName());
 
@@ -1299,7 +1299,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.122.2.9 $");
+  this->ExtractRevision(os,"$Revision: 1.122.2.10 $");
 }
 
 int vtkKWWindow::ExitDialog()
