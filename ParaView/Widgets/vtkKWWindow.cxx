@@ -132,7 +132,7 @@ vtkKWWindow::vtkKWWindow()
   this->WindowClass = NULL;
   this->SetWindowClass("KitwareWidget");
 
-  this->ExitingApplication = 0;
+  this->PromptBeforeClose = 1;
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -237,7 +237,7 @@ void vtkKWWindow::Exit()
 {  
   if ( this->ExitDialog() )
     {
-    this->ExitingApplication = 1;
+    this->PromptBeforeClose = 0;
     this->Application->Exit();
     }
 }
@@ -245,7 +245,7 @@ void vtkKWWindow::Exit()
 // invoke the apps close when selected
 void vtkKWWindow::Close()
 {
-  if ( ! this->ExitingApplication &&
+  if ( this->PromptBeforeClose &&
        this->Application->GetWindows()->GetNumberOfItems() <= 1 )
     {
     if ( !this->ExitDialog() )
@@ -819,7 +819,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.34 $");
+  this->ExtractRevision(os,"$Revision: 1.35 $");
 }
 
 int vtkKWWindow::ExitDialog()

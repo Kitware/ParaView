@@ -178,6 +178,11 @@ public:
   vtkSetStringMacro(WindowClass);
   vtkGetStringMacro(WindowClass);
 
+  //Description:
+  // Set/Get PromptBeforeClose
+  vtkSetMacro(PromptBeforeClose, int);
+  vtkGetMacro(PromptBeforeClose, int);
+  
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
@@ -213,7 +218,7 @@ protected:
 
   int SupportHelp;
   char *WindowClass;
-  int ExitingApplication;
+  int PromptBeforeClose;
 };
 
 

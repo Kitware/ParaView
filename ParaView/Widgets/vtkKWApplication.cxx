@@ -313,6 +313,7 @@ void vtkKWApplication::Exit()
   
   while (this->Windows && (win = this->Windows->GetNextKWWindow()))
     {
+    win->SetPromptBeforeClose(0);
     win->Close();
     if (this->Windows)
       {
