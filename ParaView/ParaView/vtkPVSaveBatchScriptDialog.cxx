@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.4");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.5");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -221,11 +221,15 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
   this->GeometryFileNameFrame->SetParent(this);
   this->GeometryFileNameFrame->Create(app, "frame", 0);
 
-  this->Script("pack %s %s %s %s -side top -expand 1 -fill x -padx 2",
+  this->Script("pack %s %s -side top -padx 2 -anchor w",
                this->OffScreenCheck->GetWidgetName(),
-               this->SaveImagesCheck->GetWidgetName(),
-               this->ImageFileNameFrame->GetWidgetName(),
+               this->SaveImagesCheck->GetWidgetName());
+  this->Script("pack %s -side top -expand 1 -fill x -padx 2",
+               this->ImageFileNameFrame->GetWidgetName());
+  this->Script("pack %s -side top -expand 0 -padx 2 -anchor w",
                this->SaveGeometryCheck->GetWidgetName());
+  this->Script("pack %s -side top -expand 1 -fill x -padx 2",
+               this->GeometryFileNameFrame->GetWidgetName());
 
   char* fileName = NULL;
   if (this->FilePath && this->FileRoot)
@@ -261,6 +265,10 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
   this->GeometryFileNameBrowseButton->Create(app, 0);
   this->GeometryFileNameBrowseButton->SetLabel("Browse");
   this->GeometryFileNameBrowseButton->SetCommand(this, "GeometryFileNameBrowseButtonCallback");
+
+  this->GeometryFileNameEntry->SetEnabled(0);
+  this->GeometryFileNameBrowseButton->SetEnabled(0);
+
   this->Script("pack %s -side right -expand 0 -padx 2",
                this->GeometryFileNameBrowseButton->GetWidgetName());
   this->Script("pack %s -side right -expand 1 -fill x -padx 2",
@@ -326,13 +334,13 @@ void vtkPVSaveBatchScriptDialog::SaveImagesCheckCallback()
 {
   if (this->SaveImagesCheck->GetState())
     {
-    this->Script("pack %s -after %s", 
-                 this->ImageFileNameFrame->GetWidgetName(),
-                 this->SaveImagesCheck->GetWidgetName());
+    this->ImageFileNameEntry->SetEnabled(1);
+    this->ImageFileNameBrowseButton->SetEnabled(1);
     }
   else
     {
-    this->Script("pack forget %s", this->ImageFileNameFrame->GetWidgetName());
+    this->ImageFileNameEntry->SetEnabled(0);
+    this->ImageFileNameBrowseButton->SetEnabled(0);
     }
 }
 
@@ -341,13 +349,13 @@ void vtkPVSaveBatchScriptDialog::SaveGeometryCheckCallback()
 {
   if (this->SaveGeometryCheck->GetState())
     {
-    this->Script("pack %s -after %s", 
-                 this->GeometryFileNameFrame->GetWidgetName(),
-                 this->SaveGeometryCheck->GetWidgetName());
+    this->GeometryFileNameEntry->SetEnabled(1);
+    this->GeometryFileNameBrowseButton->SetEnabled(1);
     }
   else
     {
-    this->Script("pack forget %s", this->GeometryFileNameFrame->GetWidgetName());
+    this->GeometryFileNameEntry->SetEnabled(0);
+    this->GeometryFileNameBrowseButton->SetEnabled(0);
     }
 }
 

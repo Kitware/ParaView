@@ -157,6 +157,7 @@ public:
   void SetColorSchemeToRedBlue();
   void SetColorSchemeToBlueRed();
   void SetColorSchemeToGrayscale();
+  void SetColorSchemeToRGBW();
 
   // Description:
   // Choose which component to color with.

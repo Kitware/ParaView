@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.308");
+vtkCxxRevisionMacro(vtkPVSource, "1.309");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -468,7 +468,15 @@ vtkPVDataInformation* vtkPVSource::GetDataInformation()
 //----------------------------------------------------------------------------
 void vtkPVSource::InvalidateDataInformation()
 {
+  vtkPVPart* part;
   this->DataInformationValid = 0;
+
+  // All parts get invalidated too.
+  this->Parts->InitTraversal();
+  while ( ( part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
+    {
+    part->InvalidateDataInformation();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1363,7 +1371,7 @@ void vtkPVSource::MarkSourcesForUpdate(int flag)
 
   if (flag)
     {
-    this->DataInformationValid = 0;
+    this->InvalidateDataInformation();
     this->PipelineModifiedTime.Modified();
     // Get rid of caches.
     int idx, numParts;
@@ -2385,9 +2393,6 @@ int vtkPVSource::InitializeData()
     pm->RootScript("%s GetNumberOfOutputs", sourceTclName);
     numOutputs = atoi(pm->GetRootResult());
 
-    // When ever the source executes, data information needs to be recomputed.
-    this->Script("%s AddObserver EndEvent {%s InvalidateDataInformation}", 
-                 sourceTclName, this->GetTclName());
     for (idx = 0; idx < numOutputs; ++idx)
       {
       ++outputCount;

@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.29");
+vtkCxxRevisionMacro(vtkKWEntry, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -129,6 +129,29 @@ float vtkKWEntry::GetValueAsFloat()
 {
   return atof(this->GetValue());
 }
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  if (this->Application == NULL)
+    {
+    return;
+    }
+
+  if (this->Enabled)
+    {
+    this->Script("%s configure -foreground black", this->GetWidgetName());
+    this->Script("%s configure -background white", this->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s configure -foreground grey60", this->GetWidgetName());
+    this->Script("%s configure -background grey75", this->GetWidgetName());
+    }
+}
+
 
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(const char *s)
@@ -254,7 +277,6 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
     }
 
   // Update enable state
-
   this->UpdateEnableState();
 }
 

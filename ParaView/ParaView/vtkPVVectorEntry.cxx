@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.33");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.34");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -557,7 +557,7 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     // I do not like setting the label like this but ...
     if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
       {
-      sprintf(script, "%s Set%s [expr int($pvTime)]", 
+      sprintf(script, "%s Set%s [expr round($pvTime)]", 
               this->ObjectTclName, this->VariableName);
       }
     else
@@ -577,7 +577,8 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "DataType: " << this->GetDataType() << endl;
   os << indent << "Entries: " << this->GetEntries() << endl;
-  os << indent << "ScriptValue: " << (this->ScriptValue?this->ScriptValue:"none") << endl;
+  os << indent << "ScriptValue: " 
+     << (this->ScriptValue?this->ScriptValue:"none") << endl;
   os << indent << "SubLabels: " << this->GetSubLabels() << endl;
   os << indent << "LabelWidget: " << this->LabelWidget << endl;
   os << indent << "ReadOnly: " << this->ReadOnly << endl;

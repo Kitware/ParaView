@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.3");
 
 
 
@@ -91,7 +91,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     // Clean up this mess !!!!!!!!!!!!!
     // Even a cast to vtkPVClientServerModule would be better than this.
     // How can we syncronize the process modules and render modules?
-    pvApp->BroadcastScript("CCompositeManager1 SetClientController [[$Application GetProcessModule] GetSocketController]");
+    pvApp->BroadcastScript("CCompositeManager1 SetClientController [$Application GetSocketController]");
     pvApp->BroadcastScript("CCompositeManager1 SetClientFlag [$Application GetClientMode]");
 
     this->CompositeTclName = NULL;

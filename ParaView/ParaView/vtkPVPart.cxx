@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.24");
+vtkCxxRevisionMacro(vtkPVPart, "1.25");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -83,6 +83,7 @@ vtkPVPart::vtkPVPart()
   this->Name = NULL;
 
   this->DataInformation = vtkPVDataInformation::New();
+  this->DataInformationValid;
   this->VTKDataTclName = NULL;
 
   // Used to be in vtkPVActorComposite
@@ -180,6 +181,22 @@ void vtkPVPart::SetPartDisplay(vtkPVPartDisplay* pDisp)
 }
 
 //----------------------------------------------------------------------------
+vtkPVDataInformation* vtkPVPart::GetDataInformation()
+{
+  if (this->DataInformationValid == 0)
+    {
+    this->GatherDataInformation();
+    }
+  return this->DataInformation;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPart::InvalidateDataInformation()
+{
+  this->DataInformationValid = 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPart::GatherDataInformation()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -187,6 +204,8 @@ void vtkPVPart::GatherDataInformation()
 
   pm->GatherInformation(this->DataInformation, 
                         this->GetVTKDataTclName());
+
+  this->DataInformationValid = 1;
 
   // Recompute total visibile memory size. !!!!!!!
   // This should really be in vtkPVPartDisplay when it gathers its informantion.

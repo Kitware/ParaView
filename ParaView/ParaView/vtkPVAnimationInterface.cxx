@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.70");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.71");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1381,9 +1381,12 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
   // Loop through all of the time steps.
   t = this->GetGlobalStart();
   timeIdx = 0;
-  while (t <= this->GetGlobalEnd())
+  while (t < this->GetGlobalEnd())
     {
-    *file << "set pvTime " << t << "\n";
+    float ctime = static_cast<float>(t) / 
+      static_cast<float>(this->NumberOfFrames-1);
+
+    *file << "set globalPVTime " << ctime << "\n";
     *file << this->GetScript() << endl;
     sprintf(countStr, "%05d", (int)(timeIdx));
     if (imageFileName)

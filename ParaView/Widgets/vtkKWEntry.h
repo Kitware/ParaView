@@ -135,6 +135,9 @@ protected:
 
   vtkKWEntryInternals* Internals;
 
+  // Also greys out the entry when disabled.
+  virtual void UpdateEnableState();
+
 private:
   vtkKWEntry(const vtkKWEntry&); // Not implemented
   void operator=(const vtkKWEntry&); // Not Implemented

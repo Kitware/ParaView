@@ -109,13 +109,17 @@ public:
   
   // Description:
   // Moving away from direct access to VTK data objects.
-  vtkPVDataInformation* GetDataInformation() {return this->DataInformation;}
+  vtkPVDataInformation* GetDataInformation();
   
   // Description:
   // This method collects data information from all processes.
   // This needs to be called before this parts information
   // is valid.
   void GatherDataInformation();
+
+  // Description:
+  // Called by source EndEvent to schedule another Gather.
+  void InvalidateDataInformation();
 
   // Description:
   // The name is just a string that will be used in the extract part UI.
@@ -139,6 +143,7 @@ protected:
   char *Name;
 
   vtkPVDataInformation *DataInformation;
+  int DataInformationValid;
   
   char *VTKDataTclName;
     

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.23");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.24");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -421,8 +421,8 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
   if (mode == 0)
     {
     sprintf(script, 
-            "%s Set%s [expr int($pvTime)] [expr int($pvTime)] %d %d %d %d", 
-            this->ObjectTclName,this->VariableName,ext[2],ext[3],ext[4],ext[5]);
+           "%s Set%s [expr int($pvTime)] [expr round($pvTime)] %d %d %d %d", 
+           this->ObjectTclName,this->VariableName,ext[2],ext[3],ext[4],ext[5]);
     ai->SetLabelAndScript("X Axis", script);
     ai->SetTimeStart(ext[0]);
     ai->SetTimeEnd(ext[1]);
@@ -430,8 +430,8 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
   else if (mode == 1)
     {
     sprintf(script, 
-            "%s Set%s %d %d [expr int($pvTime)] [expr int($pvTime)] %d %d", 
-            this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[4],ext[5]);
+           "%s Set%s %d %d [expr int($pvTime)] [expr int($pvTime)] %d %d", 
+           this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[4],ext[5]);
     ai->SetLabelAndScript("Y Axis", script);
     ai->SetTimeStart(ext[2]);
     ai->SetTimeEnd(ext[3]);
@@ -439,8 +439,8 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
   else if (mode == 2)
     {
     sprintf(script, 
-            "%s Set%s %d %d %d %d [expr int($pvTime)] [expr int($pvTime)]", 
-            this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[2],ext[3]);
+           "%s Set%s %d %d %d %d [expr int($pvTime)] [expr int($pvTime)]", 
+           this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[2],ext[3]);
     ai->SetLabelAndScript("Z Axis", script);
     ai->SetTimeStart(ext[4]);
     ai->SetTimeEnd(ext[5]);

@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.60");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.61");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -462,14 +462,20 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->PresetsMenuButton->Create(this->Application, "-indicator 0");
   this->PresetsMenuButton->SetBalloonHelpString("Select a preset color map.");
   this->PresetsMenuButton->AddCommand(
-    "Red to Blue", 
-    this, "SetColorSchemeToRedBlue", "Set Color Scheme to Red-Blue");
-  this->PresetsMenuButton->AddCommand(
     "Blue to Red", 
     this, "SetColorSchemeToBlueRed", "Set Color Scheme to Blue-Red");
   this->PresetsMenuButton->AddCommand(
+    "Red to Blue", 
+    this, "SetColorSchemeToRedBlue", "Set Color Scheme to Red-Blue");
+  this->PresetsMenuButton->AddCommand(
     "Grayscale", 
     this, "SetColorSchemeToGrayscale", "Set Color Scheme to Grayscale");
+  
+  // This was a molecular color map that we do not need.
+  // We may want to allow editing of individual color entries ...
+  //this->PresetsMenuButton->AddCommand(
+  //  "RGBW", 
+  //  this, "SetColorSchemeToRGBW", "Set Color Scheme to RGBW (Red Blue Green White)");
 
   this->PresetsMenuButton->SetImageOption(image_presets, 
                                           image_presets_width, 
@@ -1166,7 +1172,7 @@ void vtkPVColorMap::UpdateLookupTable()
                          this->StartHSV[1], this->EndHSV[1]);
   pvApp->BroadcastScript("%s SetValueRange %f %f", this->LookupTableTclName,
                          this->StartHSV[2], this->EndHSV[2]);
-  pvApp->BroadcastScript("%s Build",
+  pvApp->BroadcastScript("%s ForceBuild",
                          this->LookupTableTclName);
 
   if (this->MapWidth > 0 && this->MapHeight > 0)
@@ -1258,6 +1264,46 @@ void vtkPVColorMap::SetColorSchemeToGrayscale()
 
   this->UpdateLookupTable();
   this->AddTraceEntry("$kw(%s) SetColorSchemeToGrayscale", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetColorSchemeToRGBW()
+{
+  this->StartHSV[0] = 0.0;
+  this->StartHSV[1] = 0.0;
+  this->StartHSV[2] = 0.0;
+  this->EndHSV[0] = 0.0;
+  this->EndHSV[1] = 0.0;
+  this->EndHSV[2] = 1.0;
+
+  this->StartColorButton->SetColor(1.0, 0.0, 0.0);
+  this->EndColorButton->SetColor(1.0, 1.0, 1.0);
+  this->NumberOfColorsScale->SetValue(4);
+  this->NumberOfColors = 4;
+
+  // Try to keep interpolated colors consitent with this
+  // Special color map.
+  this->StartHSV[0] = 0.0;
+  this->StartHSV[1] = 1.0;
+  this->StartHSV[2] = 1.0;
+  this->EndHSV[0] = 0.6666;
+  this->EndHSV[1] = 0.0;
+  this->EndHSV[2] = 1.0;
+
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  pvApp->BroadcastScript("%s SetNumberOfTableValues 4", this->LookupTableTclName);
+  pvApp->BroadcastScript("%s SetTableValue 0 1 0 0 1", this->LookupTableTclName);
+  pvApp->BroadcastScript("%s SetTableValue 1 0 1 0 1", this->LookupTableTclName);
+  pvApp->BroadcastScript("%s SetTableValue 2 0 0 1 1", this->LookupTableTclName);
+  pvApp->BroadcastScript("%s SetTableValue 3 1 1 1 1", this->LookupTableTclName);
+
+  if (this->MapWidth > 0 && this->MapHeight > 0)
+    {
+    this->UpdateMap(this->MapWidth, this->MapHeight);
+    }
+
+  this->GetPVRenderView()->EventuallyRender();
+  this->AddTraceEntry("$kw(%s) SetColorSchemeToRGBW", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
