@@ -113,7 +113,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.9");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.10");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -288,6 +288,8 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
   this->Controller->SingleMethodExecute();
   this->Controller->Finalize();
 #else
+  argc = argc;
+  argv = argv;
   this->Controller = vtkDummyController::New();
   // This would be simpler if vtkDummyController::SingleMethodExecute
   // did its job correctly.
@@ -559,8 +561,8 @@ void vtkPVClientServerModule::GatherDataInformation(vtkDataSet *data)
     msg = NULL;
     }
   msg = tmp2->NewMessage(length);
-  this->SocketController->Send(&length, 1, 0, 398798);
-  this->SocketController->Send(msg, length, 0, 398799);
+  this->SocketController->Send(&length, 1, 1, 398798);
+  this->SocketController->Send(msg, length, 1, 398799);
   delete [] msg;
   msg = NULL;
   tmp->Delete();
