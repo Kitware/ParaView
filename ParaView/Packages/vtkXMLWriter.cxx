@@ -16,17 +16,18 @@
 
 =========================================================================*/
 #include "vtkXMLWriter.h"
-#include "vtkOutputStream.h"
 #include "vtkBase64OutputStream.h"
 #include "vtkByteSwap.h"
-#include "vtkDataCompressor.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkDataArray.h"
-#include "vtkPointData.h"
 #include "vtkCellData.h"
+#include "vtkDataArray.h"
+#include "vtkDataCompressor.h"
+#include "vtkDataSet.h"
+#include "vtkOutputStream.h"
+#include "vtkPointData.h"
 #include "vtkPoints.h"
+#include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkXMLWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLWriter, "1.3");
 vtkCxxSetObjectMacro(vtkXMLWriter, Compressor, vtkDataCompressor);
 
 //----------------------------------------------------------------------------
@@ -143,6 +144,17 @@ int vtkXMLWriter::GetDataSetMajorVersion()
 int vtkXMLWriter::GetDataSetMinorVersion()
 {
   return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkDataSet* vtkXMLWriter::GetInputAsDataSet()
+{
+  if(this->NumberOfInputs < 1)
+    {
+    return 0;
+    }
+  
+  return static_cast<vtkDataSet*>(this->Inputs[0]);
 }
 
 //----------------------------------------------------------------------------

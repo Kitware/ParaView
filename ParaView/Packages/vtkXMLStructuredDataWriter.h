@@ -58,9 +58,6 @@ protected:
   vtkXMLStructuredDataWriter();
   ~vtkXMLStructuredDataWriter();  
   
-  // Get the writer's input as a vtkDataSet.
-  vtkDataSet* GetInputAsDataSet();
-  
   // Writing drivers defined by subclasses.
   virtual void WritePrimaryElementAttributes();
   virtual void WriteAppendedPiece(int index, vtkIndent indent);

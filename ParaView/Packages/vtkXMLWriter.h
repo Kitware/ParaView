@@ -24,13 +24,14 @@
 
 #include "vtkProcessObject.h"
 
-class vtkDataArray;
-class vtkPointData;
 class vtkCellData;
-class vtkDataSetAttributes;
-class vtkPoints;
-class vtkOutputStream;
+class vtkDataArray;
 class vtkDataCompressor;
+class vtkDataSet;
+class vtkDataSetAttributes;
+class vtkOutputStream;
+class vtkPointData;
+class vtkPoints;
 
 class VTK_EXPORT vtkXMLWriter : public vtkProcessObject
 {
@@ -154,6 +155,7 @@ protected:
   virtual int GetDataSetMinorVersion();
   
   // Utility methods for subclasses.
+  vtkDataSet* GetInputAsDataSet();  
   void StartFile();
   virtual void WriteFileAttributes();
   void EndFile();

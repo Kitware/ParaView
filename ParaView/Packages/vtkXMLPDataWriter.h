@@ -58,8 +58,6 @@ protected:
   vtkXMLPDataWriter();
   ~vtkXMLPDataWriter();
   
-  vtkDataSet* GetInputAsDataSet();
-  
   virtual vtkXMLWriter* CreatePieceWriter()=0;
   
   int Write();
