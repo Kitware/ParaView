@@ -247,6 +247,224 @@ void vtkInteractorStyleImageExtent::GetSpotAxes(int spotId, double *v0,
 }
 
 //----------------------------------------------------------------------------
+void vtkInteractorStyleImageExtent::OnMouseMove(int ctrl, int shift, int x,
+						int y)
+{
+  if (this->Button == -1)
+    {
+    // HandleIndicator sets the CurrentSpotId and computes the size of the
+    // corresponding sphere.
+    this->HandleIndicator(x, y);
+    }
+
+  if (this->Button == 1 && this->CurrentSpotId != -1)
+    {
+    if (this->Constraint0 || this->Constraint1 || this->Constraint2)
+      {
+      this->TranslateZ(x - this->LastPos[0], y - this->LastPos[1]);
+      }
+    else
+      {
+      this->SetCallbackType("InteractiveRender");
+      (*this->CallbackMethod)(this);
+      }
+    }
+  else
+    {
+    this->vtkInteractorStyleExtent::OnMouseMove(ctrl, shift, x, y);
+    }
+
+  this->LastPos[0] = x;
+  this->LastPos[1] = y;
+}
+
+//----------------------------------------------------------------------------
+void vtkInteractorStyleImageExtent::TranslateZ(int vtkNotUsed(dx), int dy)
+{
+  int *ext = this->GetWholeExtent();
+  int *size = this->CurrentRenderer->GetSize();
+  
+  if (this->TranslateAxis == 1)
+    {
+    this->Extent[0] += (float)(dy) / (float)(size[1]) *
+      (float)(ext[1] - ext[0]);
+    if (this->Extent[0] > ext[1])
+      {
+      this->Extent[0] = ext[1];
+      }
+    else if (this->Extent[0] < ext[0])
+      {
+      this->Extent[0] = ext[0];
+      }
+    this->Extent[1] = this->Extent[0];
+    }
+  else if (this->TranslateAxis == 2)
+    {
+    this->Extent[2] += (float)(dy) / (float)(size[1]) *
+      (float)(ext[3] - ext[2]);
+    if (this->Extent[2] > ext[3])
+      {
+      this->Extent[2] = ext[3];
+      }
+    else if (this->Extent[2] < ext[2])
+      {
+      this->Extent[2] = ext[2];
+      }
+    this->Extent[3] = this->Extent[2];
+    }
+  else if (this->TranslateAxis == 3)
+    {
+    this->Extent[4] += (float)(dy) / (float)(size[1]) *
+      (float)(ext[5] - ext[4]);
+    if (this->Extent[4] > ext[5])
+      {
+      this->Extent[4] = ext[5];
+      }
+    else if (this->Extent[4] < ext[4])
+      {
+      this->Extent[4] = ext[4];
+      }
+    this->Extent[5] = this->Extent[4];
+    }
+  else if (this->TranslateAxis == -1)
+    {
+    this->Extent[0] -= (float)(dy) / (float)(size[1]) *
+      (float)(ext[1] - ext[0]);
+    if (this->Extent[0] > ext[1])
+      {
+      this->Extent[0] = ext[1];
+      }
+    else if (this->Extent[0] < ext[0])
+      {
+      this->Extent[0] = ext[0];
+      }
+    this->Extent[1] = this->Extent[0];
+    }
+  else if (this->TranslateAxis == -2)
+    {
+    this->Extent[2] -= (float)(dy) / (float)(size[1]) *
+      (float)(ext[3] - ext[2]);
+    if (this->Extent[2] > ext[3])
+      {
+      this->Extent[2] = ext[3];
+      }
+    else if (this->Extent[2] < ext[2])
+      {
+      this->Extent[2] = ext[2];
+      }
+    this->Extent[3] = this->Extent[2];
+    }
+  else if (this->TranslateAxis == -3)
+    {
+    this->Extent[4] -= (float)(dy) / (float)(size[1]) *
+      (float)(ext[5] - ext[4]);
+    if (this->Extent[4] > ext[5])
+      {
+      this->Extent[4] = ext[5];
+      }
+    else if (this->Extent[4] < ext[4])
+      {
+      this->Extent[4] = ext[4];
+      }
+    this->Extent[5] = this->Extent[4];
+    }
+
+  this->SetCallbackType("InteractiveRender");
+  (*this->CallbackMethod)(this->CallbackMethodArg);
+}
+
+//----------------------------------------------------------------------------
+void vtkInteractorStyleImageExtent::GetTranslateAxis()
+{
+  double axis0[3], axis1[3], axis2[3], negAxis0[3], negAxis1[3], negAxis2[3];
+  double vpn[3];
+  double dotX, dotY, dotZ, dotNegX, dotNegY, dotNegZ, magnitude;
+  int i;
+  
+  // Get the three axes.
+  this->GetSpotAxes(this->CurrentSpotId, axis0, axis1, axis2);
+  for (i = 0; i < 3; i++)
+    {
+    negAxis0[i] = -axis0[i];
+    negAxis1[i] = -axis1[i];
+    negAxis2[i] = -axis2[i];
+    }
+  this->CurrentRenderer->GetActiveCamera()->GetViewPlaneNormal(vpn);
+  
+  dotX = vtkMath::Dot(axis0, vpn);
+  dotY = vtkMath::Dot(axis1, vpn);
+  dotZ = vtkMath::Dot(axis2, vpn);
+  dotNegX = vtkMath::Dot(negAxis0, vpn);
+  dotNegY = vtkMath::Dot(negAxis1, vpn);
+  dotNegZ = vtkMath::Dot(negAxis2, vpn);
+  
+  magnitude = dotX;
+  this->TranslateAxis = 1;
+
+  if (dotY > magnitude)
+    {
+    magnitude = dotY;
+    this->TranslateAxis = 2;
+    }
+  if (dotZ > magnitude)
+    {
+    magnitude = dotZ;
+    this->TranslateAxis = 3;
+    }
+  if (dotNegX > magnitude)
+    {
+    magnitude = dotNegX;
+    this->TranslateAxis = -1;
+    }
+  if (dotNegY > magnitude)
+    {
+    magnitude = dotNegY;
+    this->TranslateAxis = -2;
+    }
+  if (dotNegZ > magnitude)
+    {
+    magnitude = dotNegZ;
+    this->TranslateAxis = -3;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkInteractorStyleImageExtent::OnMiddleButtonDown(int ctrl, int shift, 
+						       int X, int Y) 
+{
+  this->UpdateInternalState(ctrl, shift, X, Y);
+
+  this->FindPokedCamera(X, Y);
+
+  if (this->CurrentRenderer == NULL)
+    {
+    return;
+    }
+
+  this->Button = 1;
+  this->HandleIndicator(X, Y);
+  this->GetTranslateAxis();
+}
+
+//----------------------------------------------------------------------------
+void vtkInteractorStyleImageExtent::OnMiddleButtonUp(int ctrl, int shift, 
+						     int X, int Y) 
+{
+  //
+  this->UpdateInternalState(ctrl, shift, X, Y);
+  //
+  if (this->MiddleButtonReleaseMethod) 
+    {
+    (*this->MiddleButtonReleaseMethod)(this->MiddleButtonReleaseMethodArg);
+    }
+  else 
+    {
+    }
+  
+  this->Button = -1;
+}
+
+//----------------------------------------------------------------------------
 void vtkInteractorStyleImageExtent::PrintSelf(ostream& os, vtkIndent indent)
 {
   vtkInteractorStyleExtent::PrintSelf(os,indent);

@@ -73,6 +73,11 @@ public:
   vtkGetMacro(ConstrainSpheres, int);
   vtkBooleanMacro(ConstrainSpheres, int);
   
+  // only overriding the functionality of the middle mouse button
+  virtual void OnMouseMove  (int ctrl, int shift, int X, int Y);
+  virtual void OnMiddleButtonDown(int ctrl, int shift, int X, int Y);
+  virtual void OnMiddleButtonUp  (int ctrl, int shift, int X, int Y);
+  
 protected:
 
   vtkInteractorStyleImageExtent();
@@ -81,12 +86,17 @@ protected:
   void operator=(const vtkInteractorStyleImageExtent&) {};
 
   vtkImageData *ImageData;
+  // Constrain spheres to the corners of the extent?
   int ConstrainSpheres;
+  // Which axis to translate along in TranslateZ
+  int TranslateAxis;
   
   void GetWorldSpot(int spotId, float spot[3]); 
   void GetSpotAxes(int spotId, double *v0, 
                    double *v1, double *v2);
   int *GetWholeExtent();
+  void GetTranslateAxis();
+  void TranslateZ(int dx, int dy);
 };
 
 #endif

@@ -197,7 +197,7 @@ void vtkInteractorStyleExtent::SetExtent(int min0, int max0, int min1,
   if (changedFlag)
     {
     this->Modified();
-    // Not exactly the callback tytpe I was looking for ...
+    // Not exactly the callback type I was looking for ...
     // It should be changed to something else.
     this->SetCallbackType("InteractiveRender");
     (*this->CallbackMethod)(this->CallbackMethodArg);
@@ -274,6 +274,8 @@ void vtkInteractorStyleExtent::OnMouseMove(int vtkNotUsed(ctrl),
 {
   if (this->Button == -1)
     {
+    // HandleIndicator sets the CurrentSpotId and computes the size of the
+    // corresponding sphere.
     this->HandleIndicator(x, y);
     }
 
@@ -598,7 +600,7 @@ void vtkInteractorStyleExtent::ComputeDisplayToExtentMapping()
   d1[0] = (d1[0] - dOrigin[0]) * m1;
   d1[1] = (d1[1] - dOrigin[1]) * m1;
   d1[2] = (d1[2] - dOrigin[2]) * m1;
-  // The z value will be used to sort the axis.
+  // The z value will be used to sort the axes.
   d1[2] = d1[2] * d1[2];
   //vtkErrorMacro("d1 : " << d1[0] << ", " << d1[1] << ", " << d1[2]);
 
@@ -794,7 +796,6 @@ void vtkInteractorStyleExtent::OnMiddleButtonDown(int ctrl, int shift,
   this->UpdateInternalState(ctrl, shift, X, Y);
   //
   this->FindPokedCamera(X, Y);
-  //
   if (this->MiddleButtonPressMethod) 
     {
     (*this->MiddleButtonPressMethod)(this->MiddleButtonPressMethodArg);
@@ -809,7 +810,7 @@ void vtkInteractorStyleExtent::OnMiddleButtonUp(int ctrl, int shift,
                                                 int X, int Y) 
 {
   //
- this->UpdateInternalState(ctrl, shift, X, Y);
+  this->UpdateInternalState(ctrl, shift, X, Y);
   //
   if (this->MiddleButtonReleaseMethod) 
     {
@@ -825,9 +826,9 @@ void vtkInteractorStyleExtent::OnRightButtonDown(int ctrl, int shift,
                                                  int X, int Y) 
 {
   //
- this->UpdateInternalState(ctrl, shift, X, Y);
+  this->UpdateInternalState(ctrl, shift, X, Y);
   //
- this->FindPokedCamera(X, Y);
+  this->FindPokedCamera(X, Y);
   if (this->RightButtonPressMethod) 
     {
     (*this->RightButtonPressMethod)(this->RightButtonPressMethodArg);
@@ -838,10 +839,11 @@ void vtkInteractorStyleExtent::OnRightButtonDown(int ctrl, int shift,
 }
 
 //----------------------------------------------------------------------------
-void vtkInteractorStyleExtent::OnRightButtonUp(int ctrl, int shift, int X, int Y) 
+void vtkInteractorStyleExtent::OnRightButtonUp(int ctrl, int shift, int X,
+					       int Y)
 {
   //
- this->UpdateInternalState(ctrl, shift, X, Y);
+  this->UpdateInternalState(ctrl, shift, X, Y);
   //
   if (this->RightButtonReleaseMethod) 
     {

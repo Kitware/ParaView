@@ -158,11 +158,11 @@ protected:
   int Button;
   // Indicates which corner is highlighted.
   int ActiveCorner;
-
+  
   void HandleIndicator(int x, int y); 
   void TranslateXY(int dx, int dy);
   void ComputeDisplayToExtentMapping();
-
+  
   // methods implemented by the subclass
   virtual void GetWorldSpot(int spotId, float spot[3]) {}; 
   virtual void GetSpotAxes(int spotId, double *v0, 
