@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.1");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -108,4 +108,11 @@ void vtkPVLookmark::AddPVSource(vtkPVSource *pvs)
 void vtkPVLookmark::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "Name: " << this->GetName() << endl;
+  os << indent << "Comments: " << this->GetComments() << endl;
+  os << indent << "StateScript: " << this->GetStateScript() << endl;
+  os << indent << "ImageData: " << this->GetImageData() << endl;
+  os << indent << "CenterOfRotation: " << this->GetCenterOfRotation() << endl;
+  os << indent << "Dataset: " << this->GetDataset() << endl;
 }
