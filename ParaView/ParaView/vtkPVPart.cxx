@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.25.2.6");
+vtkCxxRevisionMacro(vtkPVPart, "1.25.2.7");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -349,30 +349,30 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
         "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitUGrid}}");
       }
     }
-//    else if((pm->RootScript("%s IsA vtkImageData", this->VTKDataTclName),
-//             atoi(pm->GetRootResult())))
-//      {
-//      if (getenv("PV_LOCK_SAFE") == NULL)
-//        {
-//        pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
-//        }
-//      }
-//    else if((pm->RootScript("%s IsA vtkStructuredGrid", this->VTKDataTclName),
-//             atoi(pm->GetRootResult())))
-//      {
-//      if (getenv("PV_LOCK_SAFE") == NULL)
-//        {
-//        pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
-//        }
-//      }
-//    else if((pm->RootScript("%s IsA vtkRectilinearGrid", this->VTKDataTclName),
-//             atoi(pm->GetRootResult())))
-//      {
-//      if (getenv("PV_LOCK_SAFE") == NULL)
-//        {
-//        pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
-//        }
-//      }
+    else if((pm->RootScript("%s IsA vtkImageData", this->VTKDataTclName),
+             atoi(pm->GetRootResult())))
+      {
+      if (getenv("PV_LOCK_SAFE") == NULL)
+        {
+        pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
+        }
+      }
+    else if((pm->RootScript("%s IsA vtkStructuredGrid", this->VTKDataTclName),
+             atoi(pm->GetRootResult())))
+      {
+      if (getenv("PV_LOCK_SAFE") == NULL)
+        {
+        pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
+        }
+      }
+    else if((pm->RootScript("%s IsA vtkRectilinearGrid", this->VTKDataTclName),
+             atoi(pm->GetRootResult())))
+      {
+      if (getenv("PV_LOCK_SAFE") == NULL)
+        {
+        pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
+        }
+      }
   else
     {
     return;
