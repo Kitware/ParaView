@@ -131,6 +131,7 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   this->LabeledFrame->SetParent(this);
+  this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app);
   if (strcmp(this->AttributeName, "Point") == 0)
     {

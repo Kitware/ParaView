@@ -253,6 +253,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   // Create the frame for this widget.
   this->Script("frame %s %s", this->GetWidgetName(), frameArgs);
 
+  this->ControlFrame->ShowHideFrameOn();
   this->ControlFrame->Create(this->Application);
   this->Script("pack %s -side top -expand t -fill x", 
                this->ControlFrame->GetWidgetName());
@@ -322,6 +323,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
                this->TimeEndEntry->GetEntry()->GetWidgetName(),
                this->GetTclName());
 
+  this->ActionFrame->ShowHideFrameOn();
   this->ActionFrame->Create(this->Application);
   this->ActionFrame->SetLabel("Action");
   this->Script("pack %s -side top -expand t -fill x", 

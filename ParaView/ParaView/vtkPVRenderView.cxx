@@ -427,6 +427,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 	       this->GetTclName());
   
   this->NavigationFrame->SetParent(this->GetPropertiesParent());
+  this->NavigationFrame->ShowHideFrameOn();
   this->NavigationFrame->Create(this->Application);
   this->NavigationFrame->SetLabel("Navigation");
   this->Script("pack %s -fill x -expand t -side top", this->NavigationFrame->GetWidgetName());
@@ -446,7 +447,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->vtkKWView::CreateViewProperties();
 
   vtkPVWindow* pvwindow = this->GetPVWindow();
-
+  //this->RenderParametersFrame->ShowHideFrameOn();
   this->RenderParametersFrame->Create(this->Application);
   this->RenderParametersFrame->SetLabel("Advanced Render Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",

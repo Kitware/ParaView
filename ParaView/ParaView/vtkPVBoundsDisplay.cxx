@@ -70,6 +70,7 @@ vtkPVBoundsDisplay::vtkPVBoundsDisplay()
 
   this->Widget = vtkKWBoundsDisplay::New();
   this->InputMenu = NULL;
+  this->ShowHideFrame = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -94,6 +95,7 @@ void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
 
   this->Script("frame %s", this->GetWidgetName());
   this->Widget->SetParent(this);
+  this->Widget->SetShowHideFrame( this->GetShowHideFrame() );
   this->Widget->Create(app);
   this->Script("pack %s -side top -expand t -fill x", 
                this->Widget->GetWidgetName());

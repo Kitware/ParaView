@@ -633,6 +633,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   this->ApplicationAreaFrame->
     SetParent(this->Notebook->GetFrame("Preferences"));
+  this->ApplicationAreaFrame->ShowHideFrameOn();
   this->ApplicationAreaFrame->Create(this->Application);
   this->ApplicationAreaFrame->SetLabel("Sources");
 

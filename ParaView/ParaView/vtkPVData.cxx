@@ -119,6 +119,7 @@ vtkPVData::vtkPVData()
   this->NumPointsLabel = vtkKWLabel::New();
   
   this->BoundsDisplay = vtkKWBoundsDisplay::New();
+  this->BoundsDisplay->ShowHideFrameOn();
   
   this->AmbientScale = vtkKWScale::New();
 
@@ -814,17 +815,21 @@ void vtkPVData::CreateProperties()
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());
   this->ScalarBarFrame->SetParent(this->Properties);
+  this->ScalarBarFrame->ShowHideFrameOn();
   this->ScalarBarFrame->Create(this->Application);
   this->ScalarBarFrame->SetLabel("Scalar Bar");
   this->ColorFrame->SetParent(this->Properties);
+  this->ColorFrame->ShowHideFrameOn();
   this->ColorFrame->Create(this->Application);
   this->ColorFrame->SetLabel("Color");
   this->DisplayStyleFrame->SetParent(this->Properties);
+  this->DisplayStyleFrame->ShowHideFrameOn();
   this->DisplayStyleFrame->Create(this->Application);
   this->DisplayStyleFrame->SetLabel("Display Style");
   this->StatsFrame->SetParent(this->Properties);
   this->StatsFrame->Create(this->Application, "frame", "");
   this->ViewFrame->SetParent(this->Properties);
+  this->ViewFrame->ShowHideFrameOn();
   this->ViewFrame->Create(this->Application);
   this->ViewFrame->SetLabel("View");
  

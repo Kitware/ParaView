@@ -107,6 +107,7 @@ int vtkPVSelectWidget::Create(vtkKWApplication *app)
   this->Script("frame %s", this->GetWidgetName());
 
   this->LabeledFrame->SetParent(this);
+  this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app);
   this->Script("pack %s -side left", this->LabeledFrame->GetWidgetName());
 

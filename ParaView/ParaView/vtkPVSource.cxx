@@ -419,6 +419,7 @@ void vtkPVSource::CreateProperties()
   this->Script("pack %s", this->DisplayNameLabel->GetWidgetName());
   
   this->ParameterFrame->SetParent(this->Properties);
+  this->ParameterFrame->ShowHideFrameOn();
   this->ParameterFrame->Create(this->Application);
   this->ParameterFrame->SetLabel("Parameters");
   this->Script("pack %s -fill x -expand t -side top", this->ParameterFrame->GetWidgetName());
@@ -1239,6 +1240,7 @@ vtkPVBoundsDisplay* vtkPVSource::AddBoundsDisplay(vtkPVInputMenu *inputMenu)
   // Format the label
   boundsDisplay = vtkPVBoundsDisplay::New();
   boundsDisplay->SetParent(this->GetParameterFrame()->GetFrame());
+  boundsDisplay->ShowHideFrameOn();
   boundsDisplay->Create(this->Application);
   // This assumes there will be no more than one bounds display per source.
   boundsDisplay->SetTraceName("BoundsDisplay");

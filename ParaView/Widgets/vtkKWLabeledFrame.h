@@ -72,9 +72,19 @@ public:
 
   // Description:
   // Show or hide the frame.
-  void ShowHideFrame();
+  void PerformShowHideFrame();
+
+  // Description:
+  // Globally enable or disable show/hide frame.
+  // By default it is globally disabled.
   static void AllowShowHideOn();
   static void AllowShowHideOff();
+
+  // Description:
+  // Set / get ShowHide for this object.
+  vtkSetMacro(ShowHideFrame, int);
+  vtkBooleanMacro(ShowHideFrame, int);
+  vtkGetMacro(ShowHideFrame, int);
 
 protected:
   vtkKWLabeledFrame();
@@ -89,6 +99,7 @@ protected:
   vtkKWIcon       *IconData;
   int Displayed;
   static int AllowShowHide;
+  int ShowHideFrame;
 private:
   vtkKWLabeledFrame(const vtkKWLabeledFrame&); // Not implemented
   void operator=(const vtkKWLabeledFrame&); // Not implemented

@@ -79,12 +79,19 @@ public:
   vtkSetObjectMacro(Widget, vtkKWBoundsDisplay);
   vtkGetObjectMacro(Widget, vtkKWBoundsDisplay);
 
+  // Description:
+  // Set / get ShowHide for this object.
+  vtkSetMacro(ShowHideFrame, int);
+  vtkBooleanMacro(ShowHideFrame, int);
+  vtkGetMacro(ShowHideFrame, int);
+
 protected:
   vtkPVBoundsDisplay();
   ~vtkPVBoundsDisplay();
   vtkPVBoundsDisplay(const vtkPVBoundsDisplay&) {};
   void operator=(const vtkPVBoundsDisplay&) {};
 
+  int ShowHideFrame;
   vtkKWBoundsDisplay *Widget;
   vtkPVInputMenu *InputMenu;
 };

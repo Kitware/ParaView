@@ -262,6 +262,7 @@ void vtkPVArrayCalculator::CreateProperties()
                this->ArrayNameEntry->GetWidgetName());
   
   this->CalculatorFrame->SetParent(this->GetParameterFrame()->GetFrame());
+  this->CalculatorFrame->ShowHideFrameOn();
   this->CalculatorFrame->Create(pvApp);
   this->CalculatorFrame->SetLabel("Calculator");
   this->Script("pack %s -fill x -expand t -side top",
