@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.22.2.1");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.22.2.2");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -107,12 +107,11 @@ void vtkPVCameraIcon::RestoreCamera()
 {
   if ( this->RenderView && this->Camera )
     {
-    vtkSMProxy* cameraProxy = this->RenderView->GetRenderModuleProxy()->
-      GetActiveCameraProxy();
+    vtkSMProxy* renModuleProxy = this->RenderView->GetRenderModuleProxy();
     vtkSMDoubleVectorProperty* dvp;
  
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraPosition"));
+      renModuleProxy->GetProperty("CameraPosition"));
     if (dvp)
       {
       dvp->SetElements(this->Camera->GetPosition());
@@ -123,7 +122,7 @@ void vtkPVCameraIcon::RestoreCamera()
       }
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraFocalPoint"));
+      renModuleProxy->GetProperty("CameraFocalPoint"));
     if (dvp)
       {
       dvp->SetElements(this->Camera->GetFocalPoint());
@@ -134,7 +133,7 @@ void vtkPVCameraIcon::RestoreCamera()
       }
   
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraViewUp"));
+      renModuleProxy->GetProperty("CameraViewUp"));
     if (dvp)
       {
       dvp->SetElements(this->Camera->GetViewUp());
@@ -145,7 +144,7 @@ void vtkPVCameraIcon::RestoreCamera()
       }
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraViewAngle"));
+      renModuleProxy->GetProperty("CameraViewAngle"));
     if (dvp)
       {
       dvp->SetElement(0, this->Camera->GetViewAngle());
@@ -156,7 +155,7 @@ void vtkPVCameraIcon::RestoreCamera()
       }
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraClippingRange"));
+      renModuleProxy->GetProperty("CameraClippingRange"));
     if (dvp)
       {
       dvp->SetElements(this->Camera->GetClippingRange());
@@ -167,7 +166,7 @@ void vtkPVCameraIcon::RestoreCamera()
       }
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraParallelScale"));
+      renModuleProxy->GetProperty("CameraParallelScale"));
     if (dvp)
       {
       dvp->SetElement(0, this->Camera->GetParallelScale());
@@ -176,7 +175,7 @@ void vtkPVCameraIcon::RestoreCamera()
       {
       vtkErrorMacro("Failed to find property CameraParallelScale.");
       }
-    cameraProxy->UpdateVTKObjects(); 
+    renModuleProxy->UpdateVTKObjects(); 
     this->RenderView->EventuallyRender();
     }
 }
@@ -193,13 +192,12 @@ void vtkPVCameraIcon::StoreCamera()
       }
     this->Camera = vtkCamera::New();
     
-    vtkSMProxy* cameraProxy = this->RenderView->GetRenderModuleProxy()->
-      GetActiveCameraProxy();
-    cameraProxy->UpdateInformation();
+    vtkSMProxy* renModuleProxy = this->RenderView->GetRenderModuleProxy();
+    renModuleProxy->UpdateInformation();
     vtkSMDoubleVectorProperty* dvp;
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraPositionInfo"));
+      renModuleProxy->GetProperty("CameraPositionInfo"));
     if (dvp)
       {
       this->Camera->SetPosition(dvp->GetElements());
@@ -210,7 +208,7 @@ void vtkPVCameraIcon::StoreCamera()
       }
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraFocalPointInfo"));
+      renModuleProxy->GetProperty("CameraFocalPointInfo"));
     if (dvp)
       {
       this->Camera->SetFocalPoint(dvp->GetElements());
@@ -221,7 +219,7 @@ void vtkPVCameraIcon::StoreCamera()
       }
   
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraViewUpInfo"));
+      renModuleProxy->GetProperty("CameraViewUpInfo"));
     if (dvp)
       {
       this->Camera->SetViewUp(dvp->GetElements());
@@ -232,7 +230,7 @@ void vtkPVCameraIcon::StoreCamera()
       }
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraViewAngleInfo"));
+      renModuleProxy->GetProperty("CameraViewAngleInfo"));
     if (dvp)
       {
       this->Camera->SetViewAngle(dvp->GetElement(0));
@@ -243,7 +241,7 @@ void vtkPVCameraIcon::StoreCamera()
       }
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraClippingRangeInfo"));
+      renModuleProxy->GetProperty("CameraClippingRangeInfo"));
     if (dvp)
       {
       this->Camera->SetClippingRange(dvp->GetElements());
@@ -254,7 +252,7 @@ void vtkPVCameraIcon::StoreCamera()
       }
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      cameraProxy->GetProperty("CameraParallelScaleInfo"));
+      renModuleProxy->GetProperty("CameraParallelScaleInfo"));
     if (dvp)
       {
       this->Camera->SetParallelScale(dvp->GetElement(0));

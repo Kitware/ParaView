@@ -37,7 +37,7 @@
 #include "vtkCamera.h"
 #include "vtkFloatArray.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.5");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.6");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -156,7 +156,7 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   // This is so as we don't change the active camera on the
   // servers as creation renderer (like IceT Tile renderer) fail if the active camera
   // on  the renderer is modified.
-  this->ActiveCameraProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->ActiveCameraProxy->SetServers(vtkProcessModule::CLIENT);
   this->RenderWindowProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->InteractorProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
@@ -166,50 +166,9 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     vtkProcessModule::GetProcessModule());
 
   // Set the active camera for the renderers.
-  /*
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-    << this->RendererProxy->GetID(0)
-    << "GetActiveCamera"
-    << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Assign
-    << this->ActiveCameraProxy->GetID(0)
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke
-    << this->Renderer2DProxy->GetID(0)
-    << "GetActiveCamera"
-    << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Assign
-    << this->ActiveCameraProxy->GetID(0)
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  pvm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
-
-  this->ActiveCameraProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
- // We can't use the Proxy Property since Camera is only create on the CLIENT.
-  vtkSMProxyProperty* pp1 = vtkSMProxyProperty::SafeDownCast(
-    this->RendererProxy->GetProperty("ActiveCamera"));
-  vtkSMProxyProperty* pp2 = vtkSMProxyProperty::SafeDownCast(
-    this->Renderer2DProxy->GetProperty("ActiveCamera"));
-  
-  if (!pp1)
-    {
-    vtkErrorMacro("Failed to find property ActiveCamera.");
-    return;
-    }
-
-  if (!pp2)
-    {
-    vtkErrorMacro("Failed to find property ActiveCamera.");
-    return;
-    }
-  pp1->RemoveAllProxies();
-  pp2->RemoveAllProxies();
-  pp1->AddProxy(this->ActiveCameraProxy);
-  pp2->AddProxy(this->ActiveCameraProxy);
-  */
-  // Need to fix the camera behaviour.
+  // We can't use the Proxy Property since Camera is only create on the CLIENT.
+  // Proxy properties don't take intersection of servers on which they are created 
+  // before setting as yet.
   vtkCamera *camera = vtkCamera::SafeDownCast(
     pvm->GetObjectFromID(this->ActiveCameraProxy->GetID(0)));
   if (!camera)

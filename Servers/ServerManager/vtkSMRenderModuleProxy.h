@@ -173,8 +173,6 @@ protected:
   friend class vtkSMInteractorObserverProxy;
   friend class vtkSMPointLabelDisplayProxy;
   
-  
-  friend class vtkPVCameraIcon; //needs access to Camera proxy.
   //ETX
   // Just a convienience method.
   int GetDisplayVisibility(vtkSMDisplayProxy* pDisp);

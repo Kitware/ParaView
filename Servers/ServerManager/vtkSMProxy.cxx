@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.33.2.2");
+vtkCxxRevisionMacro(vtkSMProxy, "1.33.2.3");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -503,9 +503,8 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
 void vtkSMProxy::UpdateInformation()
 {
   this->CreateVTKObjects(1);
-  int numObjects = this->Internals->IDs.size();
 
-  if (numObjects > 0)
+  if (this->ObjectsCreated)
     {
     vtkSMProxyInternals::PropertyInfoMap::iterator it;
     // Update all properties.
