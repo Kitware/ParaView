@@ -267,7 +267,9 @@ void vtkPV3DWidget::ActualPlaceWidget()
     data = this->PVSource->GetPVInput()->GetVTKData();
     }
   this->Widget3D->SetInput(data);
-  this->Widget3D->PlaceWidget();  
+  float bounds[6];
+  this->PVSource->GetPVInput()->GetBounds(bounds);
+  this->Widget3D->PlaceWidget(bounds);
 }
 
 //----------------------------------------------------------------------------
