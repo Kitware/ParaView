@@ -145,7 +145,7 @@ public:
 
   // Description:
   // Callback for Timesteps button
-  void UpdateAvailableFiles();
+  void UpdateAvailableFiles(int force = 0);
 
 protected:
   vtkPVFileEntry();

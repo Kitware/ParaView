@@ -38,6 +38,8 @@
 #include "vtkKWPopupButton.h"
 #include "vtkKWLabeledFrame.h"
 
+#define MAX_FILES_ON_THE_LIST 100
+
 //===========================================================================
 //***************************************************************************
 class vtkPVFileEntryObserver: public vtkCommand
@@ -68,7 +70,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.74");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.75");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -266,6 +268,8 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
   this->ListObserverTag = this->FileListSelect->AddObserver(vtkCommand::ModifiedEvent, 
     this->Observer);
   frame->Delete();
+
+  this->FileListSelect->SetEllipsisCommand(this, "UpdateAvailableFiles 1");
 }
 
 
@@ -483,7 +487,10 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     int cnt = 0;
     for ( cc = 0; cc < files->GetLength(); cc ++ )
       {
-      this->FileListSelect->AddSourceElement(files->GetString(cc));
+      if ( files->GetLength() < MAX_FILES_ON_THE_LIST)
+        {
+        this->FileListSelect->AddSourceElement(files->GetString(cc));
+        }
       if ( vtkString::StartsWith(files->GetString(cc), file ) &&
         vtkString::EndsWith(files->GetString(cc), ext) )
         {
@@ -562,26 +569,27 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       format = secondformat;
       min = smin;
       max = smax;
-      // cout << "Use second format" << endl;
       }
     else
       {
       format = firstformat;
-      // cout << "Use first format" << endl;
       }
-    char* name = new char [ fnameLength ];
-    char* shname = new char [ fnameLength ];
-    for ( cc = min; cc <= max; cc ++ )
+    if ( max - min < MAX_FILES_ON_THE_LIST )
       {
-      sprintf(name, format, path, prefix, cc, ext);
-      vtkKWDirectoryUtilities::GetFilenameName(name, shname);
-      if ( files->GetIndex(shname) >= 0 )
+      char* name = new char [ fnameLength ];
+      char* shname = new char [ fnameLength ];
+      for ( cc = min; cc <= max; cc ++ )
         {
-        this->FileListSelect->AddFinalElement(shname, 1);
+        sprintf(name, format, path, prefix, cc, ext);
+        vtkKWDirectoryUtilities::GetFilenameName(name, shname);
+        if ( files->GetIndex(shname) >= 0 )
+          {
+          this->FileListSelect->AddFinalElement(shname, 1);
+          }
         }
+      delete [] name;
+      delete [] shname;
       }
-    delete [] name;
-    delete [] shname;
     }
 
   if ( !this->FileListSelect->GetNumberOfElementsOnFinalList() )
@@ -910,7 +918,7 @@ void vtkPVFileEntry::UpdateTimeStep()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::UpdateAvailableFiles()
+void vtkPVFileEntry::UpdateAvailableFiles( int force )
 {
   if ( !this->Path )
     {
@@ -921,15 +929,17 @@ void vtkPVFileEntry::UpdateAvailableFiles()
   vtkStringList* files = vtkStringList::New();
   pm->GetDirectoryListing(this->Path, 0, files, 0);
 
-
-  this->IgnoreFileListEvents = 1;
-  this->FileListSelect->RemoveItemsFromSourceList();
-  int cc;
-  for ( cc = 0; cc < files->GetLength(); cc ++ )
+  if ( files->GetLength() < MAX_FILES_ON_THE_LIST || force )
     {
-    this->FileListSelect->AddSourceElement(files->GetString(cc));
+    this->IgnoreFileListEvents = 1;
+    this->FileListSelect->RemoveItemsFromSourceList();
+    int cc;
+    for ( cc = 0; cc < files->GetLength(); cc ++ )
+      {
+      this->FileListSelect->AddSourceElement(files->GetString(cc));
+      }
+    this->IgnoreFileListEvents = 0;
     }
-  this->IgnoreFileListEvents = 0;
   files->Delete();
 }
 
