@@ -67,6 +67,16 @@ public:
   vtkSetMacro(NumberOfProcesses, int);
   vtkGetMacro(NumberOfProcesses, int);
   
+  // Description:
+  // Set/get whether to mask points
+  vtkSetMacro(UseMaskPoints, int);
+  vtkGetMacro(UseMaskPoints, int);
+
+  // Description:
+  // Set/get flag to cause randomization of which points to mask.
+  void SetRandomMode(int mode);
+  int GetRandomMode();
+
 protected:
   vtkPVGlyphFilter();
   ~vtkPVGlyphFilter();
@@ -76,6 +86,7 @@ protected:
   vtkMaskPoints *MaskPoints;
   int MaximumNumberOfPoints;
   int NumberOfProcesses;
+  int UseMaskPoints;
   
 private:
   vtkPVGlyphFilter(const vtkPVGlyphFilter&);  // Not implemented.

@@ -1035,6 +1035,8 @@ help="Set the name of the array to hold the results of this computation"/>
     </SelectWidget>
   <ScaleFactorEntry label="Scale Factor" trace_name="Scale Factor" variable="ScaleFactor" type="float" help="Scale the glyphs by this constant" input_menu="im"/>
   <VectorEntry label="Max. Number of Glyphs" trace_name="Max Glyphs" variable="MaximumNumberOfPoints" type="int" help="Set the maximum number of points to glyph"/>
+  <LabeledToggle label="Mask Points" trace_name="MaskPoints" variable="UseMaskPoints" help="Create no more than specified maximum number of glyphs"/>
+  <LabeledToggle label="Random Masking" trace_name="RandomMask" variable="RandomMode" help="Choose points at random to mask"/>
   </Module>
   <Module name="Probe" class="vtkPVProbe" 
           root_name="Probe" button_image="PVProbeButton"

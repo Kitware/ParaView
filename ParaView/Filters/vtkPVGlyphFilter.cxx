@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.3");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.4");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 vtkPVGlyphFilter::vtkPVGlyphFilter()
@@ -31,6 +31,7 @@ vtkPVGlyphFilter::vtkPVGlyphFilter()
   this->MaskPoints = vtkMaskPoints::New();
   this->MaximumNumberOfPoints = 5000;
   this->NumberOfProcesses = 1;
+  this->UseMaskPoints = 1;
 }
 
 vtkPVGlyphFilter::~vtkPVGlyphFilter()
@@ -44,14 +45,34 @@ void vtkPVGlyphFilter::SetInput(vtkDataSet *input)
   this->Superclass::SetInput(this->MaskPoints->GetOutput());
 }
 
+void vtkPVGlyphFilter::SetRandomMode(int mode)
+{
+  this->MaskPoints->SetRandomMode(mode);
+}
+
+int vtkPVGlyphFilter::GetRandomMode()
+{
+  return this->MaskPoints->GetRandomMode();
+}
+
 void vtkPVGlyphFilter::Execute()
 {
-  vtkIdType numPts = this->MaskPoints->GetInput()->GetNumberOfPoints();
-  vtkIdType maxNumPts = this->MaximumNumberOfPoints / this->NumberOfProcesses;
-  maxNumPts = (maxNumPts < 1) ? 1 : maxNumPts;
-  this->MaskPoints->SetMaximumNumberOfPoints(maxNumPts);
-  this->MaskPoints->SetOnRatio(numPts / maxNumPts);
-  this->MaskPoints->Update();
+  if (this->UseMaskPoints)
+    {
+    this->Superclass::SetInput(this->MaskPoints->GetOutput());
+    vtkIdType numPts = this->MaskPoints->GetInput()->GetNumberOfPoints();
+    vtkIdType maxNumPts =
+      this->MaximumNumberOfPoints / this->NumberOfProcesses;
+    maxNumPts = (maxNumPts < 1) ? 1 : maxNumPts;
+    this->MaskPoints->SetMaximumNumberOfPoints(maxNumPts);
+    this->MaskPoints->SetOnRatio(numPts / maxNumPts);
+    this->MaskPoints->Update();
+    }
+  else
+    {
+    this->Superclass::SetInput(this->MaskPoints->GetInput());
+    }
+  
   this->Superclass::Execute();
 }
 
