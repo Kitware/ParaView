@@ -88,7 +88,6 @@ protected:
   vtkGetObjectMacro(Sources, vtkPVSourceCollection);
   virtual void SetSources(vtkPVSourceCollection*);
   vtkPVSourceCollection *Sources;
-  vtkPVSource* CurrentSource;
 
   int StartY;
   int LastY;

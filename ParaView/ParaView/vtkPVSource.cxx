@@ -924,6 +924,10 @@ void vtkPVSource::DeleteCallback()
         {
         break;
         }
+      else
+        {
+        prev = 0;
+        }
       it->GoToNextItem();
       }
     it->Delete();
@@ -1848,7 +1852,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.227 $");
+  this->ExtractRevision(os,"$Revision: 1.228 $");
 }
 
 //----------------------------------------------------------------------------

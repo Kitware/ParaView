@@ -61,7 +61,6 @@ vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 vtkPVSourceList::vtkPVSourceList()
 {
   this->Sources = NULL;
-  this->CurrentSource = 0;
 
   this->LastY = 0;
   this->CurrentY = 0;
@@ -153,16 +152,13 @@ void vtkPVSourceList::ToggleVisibility(int compIdx, int )
         comp->GetPVOutput(i)->VisibilityOn();
         }
       }
+    comp->GetPVWindow()->SetCurrentPVSourceCallback(comp);
     vtkPVRenderView* renderView 
       = vtkPVRenderView::SafeDownCast(comp->GetView());
     if ( renderView )
       {
       renderView->EventuallyRender();
       }
-    }
-  if ( this->CurrentSource )
-    {
-    this->CurrentSource->GetPVWindow()->SetCurrentPVSourceCallback(this->CurrentSource);
     }
 }
 
@@ -175,7 +171,6 @@ void vtkPVSourceList::EditColor(int )
 //----------------------------------------------------------------------------
 void vtkPVSourceList::ChildUpdate(vtkPVSource* current, int NoBind)
 {
-  this->CurrentSource = current;
   vtkPVSource *comp;
   int y, in;
   
@@ -338,14 +333,10 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current,
     this->Script("%s create rectangle %d %d %d %d -fill %s -outline {}",
                  this->Canvas->GetWidgetName(), 
                  bbox[0], bbox[1], bbox[2], bbox[3], "yellow");
-    result = this->Application->GetMainInterp()->result;
-    tmp = new char[strlen(result)+1];
-    strcpy(tmp,result);
+    tmp = vtkString::Duplicate(this->Application->GetMainInterp()->result);
     this->Script( "%s lower %s",this->Canvas->GetWidgetName(), tmp);
     delete [] tmp;
     tmp = NULL;
-
-    this->CurrentSource = comp;
     }
 
   return yNext;
