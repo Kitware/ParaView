@@ -1,4 +1,4 @@
-ADD_EXECUTABLE( Random Random.cxx )
-ADD_TEST(Random ${CXX_TEST_PATH}/Random)
+ADD_EXECUTABLE(TestRandom TestRandom.cxx)
+ADD_TEST(TestRandom ${CXX_TEST_PATH}/TestRandom)
 
-TARGET_LINK_LIBRARIES(Random vtkKWWidgetsTCL)
+TARGET_LINK_LIBRARIES(TestRandom vtkKWWidgetsTCL)
