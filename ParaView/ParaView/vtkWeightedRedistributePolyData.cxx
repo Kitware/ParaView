@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.11");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.12");
 
 //-------------------------------------------------------------------
 
@@ -275,10 +275,10 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
     int** rsSendTo[NUM_CELL_TYPES];
     vtkIdType** rsSendNum[NUM_CELL_TYPES];
 
-    int *sendToTemp;
-    vtkIdType *sendNumTemp;
+    int *sendToTemp = 0;
+    vtkIdType *sendNumTemp = 0;
 
-    int *order;
+    int *order = 0;
     int id2;
     for (type=0; type<NUM_CELL_TYPES; type++)
       {
@@ -663,8 +663,8 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
   else
     {
     // myId != 0
-    int schedLen1;
-    int schedLen2;
+    int schedLen1 = 0;
+    int schedLen2 = 0;
     this->Controller->Receive((int*)(&schedLen1), 1, 0, 
       SCHED_LEN_1_TAG); 
     this->Controller->Receive((int*)(&schedLen2), 1, 0, 

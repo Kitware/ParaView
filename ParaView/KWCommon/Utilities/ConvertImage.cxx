@@ -229,7 +229,7 @@ int main(int argc, char **argv)
 
     // Zlib
 
-    unsigned char *zlib_buffer;
+    unsigned char *zlib_buffer = 0;
     if (zlib)
       {
       unsigned long zlib_buffer_size = 
@@ -249,7 +249,7 @@ int main(int argc, char **argv)
   
     // Base64
 
-    unsigned char *base64_buffer;
+    unsigned char *base64_buffer = 0;
     if (base64)
       {
       base64_buffer = new unsigned char [nb_of_bytes * 2];

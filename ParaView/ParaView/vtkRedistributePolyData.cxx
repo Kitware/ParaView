@@ -94,7 +94,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.16");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.17");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -252,7 +252,7 @@ void vtkRedistributePolyData::Execute()
   // ... make sure output array info is initialized  ...
 
   int getArrayInfo = 0;
-  int sendArrayInfo;
+  int sendArrayInfo = 0;
 
   if (input->GetPointData()->GetNumberOfArrays() == 0 ) 
     {
@@ -2699,15 +2699,15 @@ void vtkRedistributePolyData::CompleteArrays(int recFrom)
 {
   int j;
 
-  int num;
-  vtkDataArray *array;
+  int num = 0;
+  vtkDataArray *array = 0;
   char *name;
-  int nameLength;
-  int type;
-  int numComps;
+  int nameLength = 0;
+  int type = 0;
+  int numComps = 0;
   int index;
-  int attributeType;
-  int copyFlag;
+  int attributeType = 0;
+  int copyFlag = 0;
 
   vtkPolyData* output = this->GetOutput();
 

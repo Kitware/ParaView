@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.23");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1229,8 +1229,9 @@ void vtkPVColorMap::SetScalarBarOrientation(int o)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::ExecuteEvent(vtkObject* wdg, unsigned long event,  
-                                 void* calldata)
+void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg), 
+                                 unsigned long event,  
+                                 void* vtkNotUsed(calldata))
 {
   switch ( event )
     {

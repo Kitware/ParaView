@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.7");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.8");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -134,10 +134,10 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
   // uncompress the buffer.
 
   int base64 = 0;
-  unsigned char *base64_buffer;
+  unsigned char *base64_buffer = 0;
 
   int zlib = 0;
-  unsigned char *zlib_buffer;
+  unsigned char *zlib_buffer = 0;
 
   if (buffer_length && buffer_length != nb_of_raw_bytes)
     {

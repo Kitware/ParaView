@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.387");
+vtkCxxRevisionMacro(vtkPVWindow, "1.388");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2263,7 +2263,7 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::ImportVTKScript(const char *name)
+void vtkPVWindow::ImportVTKScript(const char* vtkNotUsed(name))
 {
   vtkPVSourceCollection* col = this->GetSourceList("Sources");
   while ( col->GetNumberOfItems() > 0 )
@@ -3780,7 +3780,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.387 $");
+  this->ExtractRevision(os,"$Revision: 1.388 $");
 }
 
 //----------------------------------------------------------------------------

@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.23");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.24");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -1039,8 +1039,9 @@ void vtkPVEnSightReaderModule::AddCellVariable(const char* variableName)
 
 
 //----------------------------------------------------------------------------
-void vtkPVEnSightReaderModule::SaveInTclScript(ofstream *file, int interactiveFlag,
-                                               int vtkFlag)
+void vtkPVEnSightReaderModule::SaveInTclScript(ofstream *file, 
+                                               int vtkNotUsed(interactiveFlag),
+                                               int vtkNotUsed(vtkFlag))
 {
   vtkGenericEnSightReader *reader = 
     vtkGenericEnSightReader::SafeDownCast(this->GetVTKSource());

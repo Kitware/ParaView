@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.17");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18");
 
 
 
@@ -103,7 +103,7 @@ void vtkKWLabeledFrame::SetLabel(const char *text)
     }
 
   const char *ptr;
-  char *buffer;
+  char *buffer = 0;
 
   if (vtkKWLabeledFrame::LabelCase == VTK_KW_LABEL_CASE_USER_SPECIFIED)
     {
