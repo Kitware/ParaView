@@ -410,107 +410,11 @@ delivered open source. Hence ParaView is available as an open-source system.
     </table>
 
 <h1><A NAME="Compiling">Compiling ParaView Complete</a></h1>
-  ParaView uses the <a href="http://www.cmake.org">CMake</a> 
-  cross-platform build system. To compile ParaView, you will have to
-  install CMake. Binary and source distributions of CMake can be
-  found <a href="http://www.cmake.org/HTML/Download.html">here</a>.
-  If it exists for you platform, we highly recommend using a binary
-  distribution. CMake 1.4.5 or newer is required.<p>
-  The complete distribution of ParaView contains VTK and Tcl/Tk
-  8.3.2. You do not have to download VTK or Tcl/Tk separately to compile.
-  <p>
-  <b>Run CMake and Compile</b><br>
-  Once CMake is installed, you are ready to build ParaView. We highly
-  recommend reading the CMake documentation if you are not familiar with CMake:
-  <a href = "http://www.cmake.org/HTML/Documentation.html">http://www.cmake.org/HTML/Documentation.html</a>.
-  (You can skip the Developer's Guide.)
-  In summary, ParaView Complete build consists of:<ol>
-    <li> Running one of the CMake user interfaces </li>
-    <li> Changing configuration options  </li>
-    <li> Compiling (make on Unix, Visual Studio on Windows)</li>
-  </ol>
 
-  On Windows, you should use the CMakeSetup.exe application to setup
-  the VTK and ParaView build. On Unix/Linux, you should use the CMake wizard
-  (cmake -i) or the terminal interface (ccmake). See the CMake documentation
-  for details.
-  <p>
-  ParaView distribution is designed such that all the default build options
-  selected by CMake for VTK and ParaView are appropriate for building ParaView.
-  However you might have to tell CMake the location of some include files and
-  libraries (for example MPI libraries if you enabled MPI support).
-
-  <h3><a name="compcompun">Unix/Linux</a></h3><p>
-  The following instructions only apply to Unix/Linux systems.  
-
-  First we will give you the quick and dirty way to build ParaView:
-  <p>
-  <ol>
-    <li> untar the ParaViewComplete distribution
-    <li> cd ParaViewComplete06
-    <li> cmake -i (run cmake in wizard mode, where you have to answer questions about the build)<p>
-  or<p>
-        ccmake (run the terminal based interface to cmake where you interactively change build options)
-    <li> if necessary change build options
-    <li> make
-  </ol>
-
-  It is a very good idea to tell cmake what C and C++ compilers
-  you will be using. This can prevent many build problems.
-  On most systems you can pass this information to CMake in the 
-  following way:
-  <pre>
-  env CXX=/your/C++/compiler CC=/your/c/compiler cmake
-  </pre>
-  otherwise you must set CXX and CC in your environment and then
-  run ccmake (or cmake -i).<p>
-
-  If you are planning to build ParaView for multiple architectures then you can
-  either make a copy of the entire ParaView tree for each architecture and then
-  follow the instructions above. Or you can have one copy of the ParaView 
-  tree and compile it in a different manner (out-of-source). Instead of
-  running cmake from the ParaViewComplete06 directory, create a new directory 
-  where you have some free disk space (not in the ParaViewComplete tree), 
-  a possible name would be paraview06-solaris. cd into this directory and 
-  then run cmake similar to the following example:
-<pre>
-ls /home/joe_user
-ParaViewComplete06 paraview06-solaris paraview06-sgi
-
-cd paraview06-solaris
-ccmake /home/joe_user/ParaViewComplete06
-or
-cmake -i /home/joe_user/ParaViewComplete06
-</pre>
-This will create makefiles in the paraview06-solaris directory.  Then you can 
-run make in paraview06-solaris to compile ParaView.  Repeat this 
-process for each architecture you wish to build. Please note that on
-some platforms, it might be necessary to use the GNU Make to compile 
-out-of-source.
-This is due to the fact that the Tcl/Tk build process uses some
-features not available on all make distributions.<p>
-
-<h3><a name="compcompwin">Windows Installation</a></h3><p>
-The Windows build process uses the CMake GUI, CMakeSetup. After
-running CMake, you use the compiler make utility to compile as follows.
-<ol>
-  <li> Install ParaView distribution by unzipping into the appropriate
-      directory.
-      
-  <li> Execute CMakeSetup. This will pop-up a little
-      GUI that allows you to tailor the build. It then starts
-      building .dsw and .dsp files (Visual Studio 6), solution files 
-      (Visual Studio .NET ) or makefiles (nmake, Visual Studio 6 and .NET).
-      You'll have to tell CMakeSetup where you've placed your ParaView
-      source code, and where to build the object code and dll's (we'll call it
-      "paraviewbin").
-      
-  <li> When CMakeSetup completes, start up Visual Studio and load 
-  ParaViewComplete.dsw or ParaViewComplete.sln. Select the ALL_BUILD project, 
-  and build it.
-</ol>
-We recommend a 300MByte minimum swap size or you might have trouble
-during the link phase.<p>
+Please see <a href="Compiling.html">Compiling.html</a> or the online
+documentation <a
+href="http://www.paraview.org/HTML/Install.html">here</a> for
+instructions.
 
 <h1><A NAME="Execution">Execution</a></h1>
 For information about how to start and use ParaView, see the online
