@@ -157,7 +157,7 @@ protected:
   // by RemovePanel() and should be overloaded if the concrete implementation
   // of the manager needs to unmap/unpack widgets before everything is deleted.
   // Return 1 on success, 0 on error.
-  virtual int RemovePageWidgets(vtkKWUserInterfacePanel *panel) 
+  virtual int RemovePageWidgets(vtkKWUserInterfacePanel *) 
     { return 1; };
 
   int IdCounter;

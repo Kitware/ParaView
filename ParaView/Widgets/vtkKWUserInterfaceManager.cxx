@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //------------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.1");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.2");
 
 int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -66,7 +66,7 @@ vtkKWUserInterfaceManager::~vtkKWUserInterfaceManager()
 {
   // Delete all panels
 
-  vtkKWUserInterfaceManager::PanelSlot *panel;
+  vtkKWUserInterfaceManager::PanelSlot *panel = NULL;
   vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
     this->Panels->NewIterator();
 
@@ -90,7 +90,7 @@ vtkKWUserInterfaceManager::~vtkKWUserInterfaceManager()
 vtkKWUserInterfaceManager::PanelSlot* 
 vtkKWUserInterfaceManager::GetPanelSlot(vtkKWUserInterfacePanel *panel)
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot;
+  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
   vtkKWUserInterfaceManager::PanelSlot *found = NULL;
   vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
     this->Panels->NewIterator();
@@ -114,7 +114,7 @@ vtkKWUserInterfaceManager::GetPanelSlot(vtkKWUserInterfacePanel *panel)
 vtkKWUserInterfaceManager::PanelSlot* 
 vtkKWUserInterfaceManager::GetPanelSlot(int id)
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot;
+  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
   vtkKWUserInterfaceManager::PanelSlot *found = NULL;
   vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
     this->Panels->NewIterator();
@@ -181,7 +181,7 @@ void vtkKWUserInterfaceManager::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWUserInterfaceManager::SetEnabled(int arg)
 {
-  vtkKWUserInterfaceManager::PanelSlot *panel_slot;
+  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
   vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
     this->Panels->NewIterator();
 
@@ -257,7 +257,7 @@ int vtkKWUserInterfaceManager::RemovePanel(vtkKWUserInterfacePanel *panel)
 
   vtkKWUserInterfaceManager::PanelSlot *panel_slot = this->GetPanelSlot(panel);
 
-  int pos;
+  int pos = 0;
   if (this->Panels->FindItem(panel_slot, pos) != VTK_OK)
     {
     vtkErrorMacro("Error while removing a panel from the manager "

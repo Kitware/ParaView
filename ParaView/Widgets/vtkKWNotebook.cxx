@@ -84,7 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.31");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.32");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -167,7 +167,7 @@ vtkKWNotebook::~vtkKWNotebook()
 
   // Delete all pages
 
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
@@ -247,7 +247,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
 //------------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetPage(int id)
 {
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::Page *found = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
@@ -276,7 +276,7 @@ vtkKWNotebook::Page* vtkKWNotebook::GetPage(const char *title)
     return NULL;
     }
 
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::Page *found = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
@@ -307,7 +307,7 @@ vtkKWNotebook::Page* vtkKWNotebook::GetPage(const char *title, int tag)
     return NULL;
     }
 
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::Page *found = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
@@ -334,7 +334,7 @@ vtkKWNotebook::Page* vtkKWNotebook::GetPage(const char *title, int tag)
 //------------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetFirstVisiblePage()
 {
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::Page *found = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
@@ -365,7 +365,7 @@ unsigned int vtkKWNotebook::GetNumberOfPages()
 unsigned int vtkKWNotebook::GetNumberOfVisiblePages()
 {
   unsigned int count = 0;
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
   it->InitTraversal();
@@ -585,7 +585,7 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
     return 0;
     }
 
-  int pos;
+  int pos = 0;
   if (this->Pages->FindItem(page, pos) != VTK_OK)
     {
     vtkErrorMacro("Error while removing a page from the notebook "
@@ -638,7 +638,7 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
 //------------------------------------------------------------------------------
 void vtkKWNotebook::RemovePagesMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
   it->InitTraversal();
@@ -957,7 +957,7 @@ int vtkKWNotebook::GetPageVisibility(vtkKWNotebook::Page *page)
 //------------------------------------------------------------------------------
 void vtkKWNotebook::ShowPagesMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
   it->InitTraversal();
@@ -975,7 +975,7 @@ void vtkKWNotebook::ShowPagesMatchingTag(int tag)
 //------------------------------------------------------------------------------
 void vtkKWNotebook::HidePagesMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
   it->InitTraversal();
@@ -993,7 +993,7 @@ void vtkKWNotebook::HidePagesMatchingTag(int tag)
 //------------------------------------------------------------------------------
 void vtkKWNotebook::ShowPagesNotMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
   it->InitTraversal();
@@ -1011,7 +1011,7 @@ void vtkKWNotebook::ShowPagesNotMatchingTag(int tag)
 //------------------------------------------------------------------------------
 void vtkKWNotebook::HidePagesNotMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
   it->InitTraversal();
@@ -1461,7 +1461,7 @@ void vtkKWNotebook::SetShowIcons(int arg)
 
   ostrstream cmd;
 
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
@@ -1550,7 +1550,7 @@ void vtkKWNotebook::SetShowAllPagesWithSameTag(int arg)
 
   if (this->IsCreated() && this->ShowAllPagesWithSameTag)
     {
-    vtkKWNotebook::Page *page;
+    vtkKWNotebook::Page *page = NULL;
     vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
     it->InitTraversal();
@@ -1598,7 +1598,7 @@ void vtkKWNotebook::SetPagesCanBePinned(int arg)
 
   if (this->IsCreated() && !this->PagesCanBePinned)
     {
-    vtkKWNotebook::Page *page;
+    vtkKWNotebook::Page *page = NULL;
     vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
     it->InitTraversal();
