@@ -852,9 +852,9 @@ void vtkPVActorComposite::ResetColorRange()
   this->GetColorRange(range);
   
   // Avoid the bad range error
-  if (range[1] <= range[0])
+  if (range[1] < range[0])
     {
-    range[1] = range[0] * 1.001;
+    range[1] = range[0];
     }
 
   this->SetColorRange(range[0], range[1]);
@@ -1237,11 +1237,10 @@ void vtkPVActorComposite::SetScalarRange(float min, float max)
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   // Avoid the bad range error
-  if (max <= min)
+  if (max < min)
     {
-    max = min + 0.000001;
+    max = min;
     }
-
 
   pvApp->BroadcastScript("%s SetScalarRange %f %f", this->MapperTclName,
 			 min, max);
