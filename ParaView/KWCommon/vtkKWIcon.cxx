@@ -48,12 +48,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkBase64Utilities.h"
 #include "zlib.h"
 
-#include "icons.h"
+#include "Resources/icons.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.8");
+vtkCxxRevisionMacro(vtkKWIcon, "1.9");
 
+//----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
 {
   this->Data         = 0;
@@ -63,11 +64,13 @@ vtkKWIcon::vtkKWIcon()
   this->Internal     = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkKWIcon::~vtkKWIcon()
 {
   this->SetData(0,0,0);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWIcon::SetImageData(vtkImageData* id)
 {
   if (!id )
@@ -114,6 +117,7 @@ void vtkKWIcon::SetImageData(vtkImageData* id)
 
 }
 
+//----------------------------------------------------------------------------
 void vtkKWIcon::SetImageData(const unsigned char* pixels, int width, int height, 
                              int pixel_size, unsigned long buffer_length)
 {
@@ -189,6 +193,7 @@ void vtkKWIcon::SetImageData(const unsigned char* pixels, int width, int height,
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWIcon::SetData(const unsigned char* data, int width, int height)
 {
   if ( this->Data || this->InternalData )
@@ -212,6 +217,7 @@ void vtkKWIcon::SetData(const unsigned char* data, int width, int height)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWIcon::SetInternalData(const unsigned char* data, 
                                 int width, int height)
 {
@@ -235,6 +241,7 @@ void vtkKWIcon::SetInternalData(const unsigned char* data,
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWIcon::SetImageData(int image)
 {
   if ( this->Internal == image )
@@ -250,78 +257,153 @@ void vtkKWIcon::SetImageData(int image)
   switch( image )
     {
     case vtkKWIcon::ICON_ANNOTATE:
-      this->SetInternalData(image_annotate, image_annotate_width, 
-                    image_annotate_height);
+      this->SetImageData(
+        image_annotate, 
+        image_annotate_width, image_annotate_height,
+        image_annotate_pixel_size, 
+        image_annotate_buffer_length);
       break;
+
     case vtkKWIcon::ICON_CONTOURS:
-      this->SetInternalData(image_contours, image_contours_width, 
-                    image_contours_height);
+      this->SetImageData(
+        image_contours, 
+        image_contours_width, image_contours_height,
+        image_contours_pixel_size, 
+        image_contours_buffer_length);
       break;
+
     case vtkKWIcon::ICON_CUT:
-      this->SetInternalData(image_cut, image_cut_width, image_cut_height);
+      this->SetImageData(
+        image_cut, 
+        image_cut_width, image_cut_height,
+        image_cut_pixel_size, 
+        image_cut_buffer_length);
       break;
+
     case vtkKWIcon::ICON_ERROR:
-      this->SetInternalData(image_error, image_error_width, 
-                            image_error_height);
+      this->SetImageData(
+        image_error, 
+        image_error_width, image_error_height,
+        image_error_pixel_size, 
+        image_error_buffer_length);
       break;
-    case vtkKWIcon::ICON_EMPTY:
-      this->SetInternalData(image_empty, image_empty_width, 
-                            image_empty_height);
-      break;
-    case vtkKWIcon::ICON_FILTERS:
-      this->SetData(image_filters, image_filters_width, image_filters_height);
-      break;      
-    case vtkKWIcon::ICON_GENERAL:
-      this->SetData(image_general, image_general_width, image_general_height);
-      break;      
-    case vtkKWIcon::ICON_LAYOUT:
-      this->SetInternalData(image_layout, image_layout_width, 
-                            image_layout_height);
-      break;
-    case vtkKWIcon::ICON_MACROS:
-      this->SetInternalData(image_macros, image_macros_width, 
-                            image_macros_height);
-      break;      
-    case vtkKWIcon::ICON_MATERIAL:
-      this->SetInternalData(image_material, image_material_width, 
-                            image_material_height);
-      break;      
-    case vtkKWIcon::ICON_PREFERENCES:
-      this->SetInternalData(image_preferences, image_preferences_width, 
-                    image_preferences_height);
-      break;
-    case vtkKWIcon::ICON_QUESTION:
-      this->SetInternalData(image_question, image_question_width, 
-                    image_question_height);
-      break;
-    case vtkKWIcon::ICON_TRANSFER:
-      this->SetInternalData(image_transfer, image_transfer_width, 
-                    image_transfer_height);
-      break;
-    case vtkKWIcon::ICON_WARNING:
-      this->SetInternalData(image_warning, image_warning_width, 
-                            image_warning_height);
-      break;
-    case vtkKWIcon::ICON_SHRINK:
-      this->SetInternalData(image_shrink, image_shrink_width, 
-                            image_shrink_height);
-      break;
+
     case vtkKWIcon::ICON_EXPAND:
-      this->SetInternalData(image_expand, image_expand_width, 
-                            image_expand_height);
+      this->SetImageData(
+        image_expand, 
+        image_expand_width, image_expand_height,
+        image_expand_pixel_size, 
+        image_expand_buffer_length);
       break;
+
+    case vtkKWIcon::ICON_FILTERS:
+      this->SetImageData(
+        image_filters, 
+        image_filters_width, image_filters_height,
+        image_filters_pixel_size, 
+        image_filters_buffer_length);
+      break;      
+
+    case vtkKWIcon::ICON_GENERAL:
+      this->SetImageData(
+        image_general, 
+        image_general_width, image_general_height,
+        image_general_pixel_size, 
+        image_general_buffer_length);
+      break;      
+
+    case vtkKWIcon::ICON_HELPBUBBLE:
+      this->SetImageData(
+        image_helpbubble, 
+        image_helpbubble_width, image_helpbubble_height,
+        image_helpbubble_pixel_size, 
+        image_helpbubble_buffer_length);
+      break;      
+
+    case vtkKWIcon::ICON_LAYOUT:
+      this->SetImageData(
+        image_layout, 
+        image_layout_width, image_layout_height,
+        image_layout_pixel_size, 
+        image_layout_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_MACROS:
+      this->SetImageData(
+        image_macros, 
+        image_macros_width, image_macros_height,
+        image_macros_pixel_size, 
+        image_macros_buffer_length);
+      break;      
+
+    case vtkKWIcon::ICON_MATERIAL:
+      this->SetImageData(
+        image_material, 
+        image_material_width, image_material_height,
+        image_material_pixel_size, 
+        image_material_buffer_length);
+      break;      
+
+    case vtkKWIcon::ICON_PREFERENCES:
+      this->SetImageData(
+        image_preferences, 
+        image_preferences_width, image_preferences_height,
+        image_preferences_pixel_size, 
+        image_preferences_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_QUESTION:
+      this->SetImageData(
+        image_question, 
+        image_question_width, image_question_height,
+        image_question_pixel_size, 
+        image_question_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_SHRINK:
+      this->SetImageData(
+        image_shrink, 
+        image_shrink_width, image_shrink_height,
+        image_shrink_pixel_size, 
+        image_shrink_buffer_length);
+      break;
+
     case vtkKWIcon::ICON_SMALLERROR:
-      this->SetInternalData(image_smallerror, image_smallerror_width, 
-                            image_smallerror_height);
+      this->SetImageData(
+        image_smallerror, 
+        image_smallerror_width, image_smallerror_height,
+        image_smallerror_pixel_size, 
+        image_smallerror_buffer_length);
       break;
+
     case vtkKWIcon::ICON_SMALLERRORRED:
-      this->SetInternalData(image_smallerrorred, image_smallerrorred_width, 
-                            image_smallerrorred_height);
+      this->SetImageData(
+        image_smallerrorred, 
+        image_smallerrorred_width, image_smallerrorred_height,
+        image_smallerrorred_pixel_size, 
+        image_smallerrorred_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_TRANSFER:
+      this->SetImageData(
+        image_transfer, 
+        image_transfer_width, image_transfer_height,
+        image_transfer_pixel_size, 
+        image_transfer_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_WARNING:
+      this->SetImageData(
+        image_warning, 
+        image_warning_width, image_warning_height,
+        image_warning_pixel_size, 
+        image_warning_buffer_length);
       break;
     }
   this->Internal = image;
 }
 
+//----------------------------------------------------------------------------
 const unsigned char* vtkKWIcon::GetData()
 {
   if ( this->InternalData )

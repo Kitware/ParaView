@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWIcon_h
 
 #include "vtkObject.h"
+
 class vtkKWApplication;
 class vtkKWIcon;
 class vtkImageData;
@@ -70,7 +71,7 @@ public:
   void SetImageData(int image);
 
   // Description:
-  // Select an icon based on the icon name.
+  // Set an icon based on pixel data.
   void SetImageData(const unsigned char* pixels, int width, int height, 
                     int pixel_size, unsigned long buffer_length);
 
@@ -78,27 +79,27 @@ public:
   // Description:
   // There are several predefined icons in the icons.h. Since we
   // want to save space, we only incldue that file to vtkKWIcons.cxx.
-  // These constnats specify different icons.
+  // These constants specify different icons.
   enum { 
     ICON_NOICON = 0,
     ICON_ANNOTATE,
     ICON_CONTOURS,
     ICON_CUT,
     ICON_ERROR,
+    ICON_EXPAND,
     ICON_FILTERS,
     ICON_GENERAL,
+    ICON_HELPBUBBLE,
     ICON_LAYOUT,
     ICON_MACROS,
     ICON_MATERIAL,
     ICON_PREFERENCES,
     ICON_QUESTION,
-    ICON_TRANSFER,
-    ICON_WARNING,
     ICON_SHRINK,
-    ICON_EMPTY,
-    ICON_EXPAND,
     ICON_SMALLERROR,
     ICON_SMALLERRORRED,
+    ICON_TRANSFER,
+    ICON_WARNING,
     LAST_ICON
   };
 //ETX
@@ -122,6 +123,7 @@ public:
 protected:
   vtkKWIcon();
   ~vtkKWIcon();
+
   unsigned char* Data;
   int Width;
   int Height;
