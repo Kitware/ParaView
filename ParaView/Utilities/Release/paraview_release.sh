@@ -22,14 +22,16 @@
 # Run with no arguments for documentation.
 #
 
-PROJECT=paraview
-CVS_MODULE=ParaViewComplete
-
 # Release version number.
 TAG="ParaView-1-0"
 PARAVIEW_VERSION="1.0"
 VERSION="${PARAVIEW_VERSION}.0"
 RELEASE="1"
+
+# Project configuration.
+PROJECT="paraview"
+CVS_MODULE="ParaViewComplete"
+CVS_MODULE_DOCS="ParaViewReleaseDocs/${PARAVIEW_VERSION}"
 
 # CVSROOT setting used to check out ParaView.
 CVSROOT=":pserver:anonymous@www.paraview.org:/cvsroot/ParaView"
@@ -278,7 +280,7 @@ utilities()
     cvs_login || return 1
     (
         if [ -d "${RELEASE_UTILITIES}/CVS" ]; then
-            cd ${RELEASE_UTILITIES} && cvs -z3 -q update -dAP
+            cd ${RELEASE_UTILITIES} && cvs -z3 -q update -dAP -r ${TAG}
         else
             rm -rf CheckoutTemp &&
             mkdir CheckoutTemp &&
@@ -322,6 +324,24 @@ checkout()
         cd .. &&
         rm -rf CheckoutTemp
     ) >Logs/checkout.log 2>&1 || error_log Logs/checkout.log
+}
+
+#-----------------------------------------------------------------------------
+checkout_docs()
+{
+    [ -z "${DONE_checkout_docs}" ] || return 0 ; DONE_checkout_docs="yes"
+    config || return 1
+    echo "Exporting ${CVS_MODULE_DOCS} from cvs ..." &&
+    (
+        rm -rf ${PROJECT}-docs-${VERSION} &&
+        rm -rf CheckoutTemp &&
+        mkdir CheckoutTemp &&
+        cd CheckoutTemp &&
+        cvs -q -z3 -d $CVSROOT export -r HEAD ${CVS_MODULE_DOCS} &&
+        mv ${CVS_MODULE_DOCS} ../${PROJECT}-docs-${VERSION} &&
+        cd .. &&
+        rm -rf CheckoutTemp
+    ) >Logs/checkout_docs.log 2>&1 || error_log Logs/checkout_docs.log
 }
 
 #-----------------------------------------------------------------------------
@@ -419,25 +439,11 @@ build()
 }
 
 #-----------------------------------------------------------------------------
-tests()
-{
-    [ -z "${DONE_tests}" ] || return 0 ; DONE_tests="yes"
-    config || return 1
-    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/ParaView" ] || build || return 1
-    echo "Running tests ..." &&
-    (
-        cd "${PROJECT}-${VERSION}-${PLATFORM}/${TEST_SUBTREE}" &&
-        ${MAKE} test &&
-        touch "${PROJECT}-${VERSION}-${PLATFORM}/release.tests"
-    ) >Logs/tests.log 2>&1 || error_log Logs/tests.log
-}
-
-#-----------------------------------------------------------------------------
 install()
 {
     [ -z "${DONE_install}" ] || return 0 ; DONE_install="yes"
     config || return 1
-    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/release.tests" ] || tests || return 1
+    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/ParaView" ] || build || return 1
     echo "Running make install ..." &&
     (
         rm -rf Install &&
@@ -459,11 +465,25 @@ strip()
 }
 
 #-----------------------------------------------------------------------------
+install_docs()
+{
+    [ -z "${DONE_install_docs}" ] || return 0 ; DONE_install_docs="yes"
+    config || return 1
+    [ -d "${PROJECT}-docs-${VERSION}" ] || checkout_docs || return 1
+    [ -f "Install${PREFIX}/bin/ParaView" ] || install || return 1
+    echo "Copying release documentation ..." &&
+    (
+        mkdir -p Install${PREFIX}${DOC_DIR} &&
+        cp -R ${PROJECT}-docs-${VERSION}/* Install${PREFIX}${DOC_DIR}
+    ) >Logs/install_docs.log 2>&1 || error_log Logs/install_docs.log
+}
+
+#-----------------------------------------------------------------------------
 manifest()
 {
     [ -z "${DONE_manifest}" ] || return 0 ; DONE_manifest="yes"
     config || return 1
-    [ -f "Install${PREFIX}/bin/ParaView" ] || install || return 1
+    [ -f "Install${PREFIX}${DOC_DIR}/ParaView.chm" ] || install_docs || return 1
     echo "Writing MANIFEST ..." &&
     (
         mkdir -p Install${PREFIX}${DOC_DIR} &&
