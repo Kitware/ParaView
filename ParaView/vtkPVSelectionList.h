@@ -38,7 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWWidget.h"
 #include "vtkKWLabel.h"
-#include "vtkPVMenuButton.h"
+#include "vtkKWMenuButton.h"
 
 class vtkPVCommandList;
 
@@ -80,7 +80,7 @@ protected:
   vtkPVSelectionList(const vtkPVSelectionList&) {};
   void operator=(const vtkPVSelectionList&) {};
 
-  vtkPVMenuButton *MenuButton;
+  vtkKWMenuButton *MenuButton;
   char *Command;
 
   int CurrentValue;

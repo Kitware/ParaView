@@ -33,6 +33,7 @@ vtkKWLabeledEntry \
 vtkKWLabeledFrame \
 vtkKWListBox \
 vtkKWMenu \
+vtkKWMenuButton \
 vtkKWMessageDialog \
 vtkKWNotebook \
 vtkKWObject \

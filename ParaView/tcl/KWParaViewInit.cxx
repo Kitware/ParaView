@@ -86,9 +86,6 @@ ClientData vtkPVImageTextureFilterNewCommand();
 int vtkPVImageToImageFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageToImageFilterNewCommand();
-int vtkPVMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVMenuButtonNewCommand();
 int vtkPVMethodInterfaceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVMethodInterfaceNewCommand();
@@ -162,95 +159,93 @@ int VTK_EXPORT Vtkkwparaviewtcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
-  vtkTclCreateNew(interp,"vtkColorByProcess", vtkColorByProcessNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkColorByProcess", vtkColorByProcessNewCommand,
                   vtkColorByProcessCommand);
-  vtkTclCreateNew(interp,"vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
                   vtkDummyRenderWindowInteractorCommand);
-  vtkTclCreateNew(interp,"vtkGetRemoteGhostCells", vtkGetRemoteGhostCellsNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkGetRemoteGhostCells", vtkGetRemoteGhostCellsNewCommand,
                   vtkGetRemoteGhostCellsCommand);
-  vtkTclCreateNew(interp,"vtkImageOutlineFilter", vtkImageOutlineFilterNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkImageOutlineFilter", vtkImageOutlineFilterNewCommand,
                   vtkImageOutlineFilterCommand);
-  vtkTclCreateNew(interp,"vtkInteractorStyleCamera", vtkInteractorStyleCameraNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkInteractorStyleCamera", vtkInteractorStyleCameraNewCommand,
                   vtkInteractorStyleCameraCommand);
-  vtkTclCreateNew(interp,"vtkInteractorStyleGridExtent", vtkInteractorStyleGridExtentNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkInteractorStyleGridExtent", vtkInteractorStyleGridExtentNewCommand,
                   vtkInteractorStyleGridExtentCommand);
-  vtkTclCreateNew(interp,"vtkInteractorStyleImageExtent", vtkInteractorStyleImageExtentNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkInteractorStyleImageExtent", vtkInteractorStyleImageExtentNewCommand,
                   vtkInteractorStyleImageExtentCommand);
-  vtkTclCreateNew(interp,"vtkInteractorStylePlane", vtkInteractorStylePlaneNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkInteractorStylePlane", vtkInteractorStylePlaneNewCommand,
                   vtkInteractorStylePlaneCommand);
-  vtkTclCreateNew(interp,"vtkInteractorStylePlaneSource", vtkInteractorStylePlaneSourceNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkInteractorStylePlaneSource", vtkInteractorStylePlaneSourceNewCommand,
                   vtkInteractorStylePlaneSourceCommand);
-  vtkTclCreateNew(interp,"vtkInteractorStyleSphere", vtkInteractorStyleSphereNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkInteractorStyleSphere", vtkInteractorStyleSphereNewCommand,
                   vtkInteractorStyleSphereCommand);
-  vtkTclCreateNew(interp,"vtkParallelDecimate", vtkParallelDecimateNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkParallelDecimate", vtkParallelDecimateNewCommand,
                   vtkParallelDecimateCommand);
-  vtkTclCreateNew(interp,"vtkPVActorComposite", vtkPVActorCompositeNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVActorComposite", vtkPVActorCompositeNewCommand,
                   vtkPVActorCompositeCommand);
-  vtkTclCreateNew(interp,"vtkPVAnimation", vtkPVAnimationNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVAnimation", vtkPVAnimationNewCommand,
                   vtkPVAnimationCommand);
-  vtkTclCreateNew(interp,"vtkPVApplication", vtkPVApplicationNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVApplication", vtkPVApplicationNewCommand,
                   vtkPVApplicationCommand);
-  vtkTclCreateNew(interp,"vtkPVAssignment", vtkPVAssignmentNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVAssignment", vtkPVAssignmentNewCommand,
                   vtkPVAssignmentCommand);
-  vtkTclCreateNew(interp,"vtkPVCommandList", vtkPVCommandListNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVCommandList", vtkPVCommandListNewCommand,
                   vtkPVCommandListCommand);
-  vtkTclCreateNew(interp,"vtkPVCutter", vtkPVCutterNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVCutter", vtkPVCutterNewCommand,
                   vtkPVCutterCommand);
-  vtkTclCreateNew(interp,"vtkPVData", vtkPVDataNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVData", vtkPVDataNewCommand,
                   vtkPVDataCommand);
-  vtkTclCreateNew(interp,"vtkPVDataSetToDataSetFilter", vtkPVDataSetToDataSetFilterNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVDataSetToDataSetFilter", vtkPVDataSetToDataSetFilterNewCommand,
                   vtkPVDataSetToDataSetFilterCommand);
-  vtkTclCreateNew(interp,"vtkPVDataSetToPolyDataFilter", vtkPVDataSetToPolyDataFilterNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVDataSetToPolyDataFilter", vtkPVDataSetToPolyDataFilterNewCommand,
                   vtkPVDataSetToPolyDataFilterCommand);
-  vtkTclCreateNew(interp,"vtkPVExtentTranslator", vtkPVExtentTranslatorNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVExtentTranslator", vtkPVExtentTranslatorNewCommand,
                   vtkPVExtentTranslatorCommand);
-  vtkTclCreateNew(interp,"vtkPVGetRemoteGhostCells", vtkPVGetRemoteGhostCellsNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVGetRemoteGhostCells", vtkPVGetRemoteGhostCellsNewCommand,
                   vtkPVGetRemoteGhostCellsCommand);
-  vtkTclCreateNew(interp,"vtkPVGlyph3D", vtkPVGlyph3DNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVGlyph3D", vtkPVGlyph3DNewCommand,
                   vtkPVGlyph3DCommand);
-  vtkTclCreateNew(interp,"vtkPVImageData", vtkPVImageDataNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVImageData", vtkPVImageDataNewCommand,
                   vtkPVImageDataCommand);
-  vtkTclCreateNew(interp,"vtkPVImageClip", vtkPVImageClipNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVImageClip", vtkPVImageClipNewCommand,
                   vtkPVImageClipCommand);
-  vtkTclCreateNew(interp,"vtkPVImageSlice", vtkPVImageSliceNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVImageSlice", vtkPVImageSliceNewCommand,
                   vtkPVImageSliceCommand);
-  vtkTclCreateNew(interp,"vtkPVImageSource", vtkPVImageSourceNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVImageSource", vtkPVImageSourceNewCommand,
                   vtkPVImageSourceCommand);
-  vtkTclCreateNew(interp,"vtkPVImageTextureFilter", vtkPVImageTextureFilterNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVImageTextureFilter", vtkPVImageTextureFilterNewCommand,
                   vtkPVImageTextureFilterCommand);
-  vtkTclCreateNew(interp,"vtkPVImageToImageFilter", vtkPVImageToImageFilterNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVImageToImageFilter", vtkPVImageToImageFilterNewCommand,
                   vtkPVImageToImageFilterCommand);
-  vtkTclCreateNew(interp,"vtkPVMenuButton", vtkPVMenuButtonNewCommand,
-                  vtkPVMenuButtonCommand);
-  vtkTclCreateNew(interp,"vtkPVMethodInterface", vtkPVMethodInterfaceNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVMethodInterface", vtkPVMethodInterfaceNewCommand,
                   vtkPVMethodInterfaceCommand);
-  vtkTclCreateNew(interp,"vtkPVParallelDecimate", vtkPVParallelDecimateNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVParallelDecimate", vtkPVParallelDecimateNewCommand,
                   vtkPVParallelDecimateCommand);
-  vtkTclCreateNew(interp,"vtkPVPolyData", vtkPVPolyDataNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVPolyData", vtkPVPolyDataNewCommand,
                   vtkPVPolyDataCommand);
-  vtkTclCreateNew(interp,"vtkPVPolyDataSource", vtkPVPolyDataSourceNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVPolyDataSource", vtkPVPolyDataSourceNewCommand,
                   vtkPVPolyDataSourceCommand);
-  vtkTclCreateNew(interp,"vtkPVPolyDataToPolyDataFilter", vtkPVPolyDataToPolyDataFilterNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVPolyDataToPolyDataFilter", vtkPVPolyDataToPolyDataFilterNewCommand,
                   vtkPVPolyDataToPolyDataFilterCommand);
-  vtkTclCreateNew(interp,"vtkPVRenderView", vtkPVRenderViewNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVRenderView", vtkPVRenderViewNewCommand,
                   vtkPVRenderViewCommand);
-  vtkTclCreateNew(interp,"vtkPVRunTimeContour", vtkPVRunTimeContourNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVRunTimeContour", vtkPVRunTimeContourNewCommand,
                   vtkPVRunTimeContourCommand);
-  vtkTclCreateNew(interp,"vtkPVScalarBar", vtkPVScalarBarNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVScalarBar", vtkPVScalarBarNewCommand,
                   vtkPVScalarBarCommand);
-  vtkTclCreateNew(interp,"vtkPVSelectionList", vtkPVSelectionListNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVSelectionList", vtkPVSelectionListNewCommand,
                   vtkPVSelectionListCommand);
-  vtkTclCreateNew(interp,"vtkPVSource", vtkPVSourceNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVSource", vtkPVSourceNewCommand,
                   vtkPVSourceCommand);
-  vtkTclCreateNew(interp,"vtkPVSourceCollection", vtkPVSourceCollectionNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVSourceCollection", vtkPVSourceCollectionNewCommand,
                   vtkPVSourceCollectionCommand);
-  vtkTclCreateNew(interp,"vtkPVSourceList", vtkPVSourceListNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVSourceList", vtkPVSourceListNewCommand,
                   vtkPVSourceListCommand);
-  vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
-  vtkTclCreateNew(interp,"vtkRunTimeContour", vtkRunTimeContourNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkRunTimeContour", vtkRunTimeContourNewCommand,
                   vtkRunTimeContourCommand);
-  vtkTclCreateNew(interp,"vtkSingleContourFilter", vtkSingleContourFilterNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkSingleContourFilter", vtkSingleContourFilterNewCommand,
                   vtkSingleContourFilterCommand);
   return TCL_OK;
 }

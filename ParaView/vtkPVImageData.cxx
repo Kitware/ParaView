@@ -32,7 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageOutlineFilter.h"
 #include "vtkPVAssignment.h"
 #include "vtkGeometryFilter.h"
-#include "vtkPVMenuButton.h"
+#include "vtkKWMenuButton.h"
 #include "vtkPVActorComposite.h"
 
 int vtkPVImageDataCommand(ClientData cd, Tcl_Interp *interp,

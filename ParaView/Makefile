@@ -43,7 +43,6 @@ vtkPVImageSlice \
 vtkPVImageSource \
 vtkPVImageTextureFilter \
 vtkPVImageToImageFilter \
-vtkPVMenuButton \
 vtkPVMethodInterface \
 vtkPVParallelDecimate \
 vtkPVPolyData \

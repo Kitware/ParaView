@@ -41,7 +41,7 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->CurrentName = NULL;
   this->Command = NULL;
   
-  this->MenuButton = vtkPVMenuButton::New();
+  this->MenuButton = vtkKWMenuButton::New();
 
   this->Names = vtkPVCommandList::New();
 }

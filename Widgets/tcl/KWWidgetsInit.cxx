@@ -53,6 +53,9 @@ ClientData vtkKWListBoxNewCommand();
 int vtkKWMenuCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWMenuNewCommand();
+int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWMenuButtonNewCommand();
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWMessageDialogNewCommand();
@@ -141,81 +144,83 @@ int VTK_EXPORT Vtkkwwidgetstcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
 {
-  vtkTclCreateNew(interp,"vtkCornerAnnotation", vtkCornerAnnotationNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkCornerAnnotation", vtkCornerAnnotationNewCommand,
                   vtkCornerAnnotationCommand);
-  vtkTclCreateNew(interp,"vtkKWActorComposite", vtkKWActorCompositeNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWActorComposite", vtkKWActorCompositeNewCommand,
                   vtkKWActorCompositeCommand);
-  vtkTclCreateNew(interp,"vtkKWApplication", vtkKWApplicationNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWApplication", vtkKWApplicationNewCommand,
                   vtkKWApplicationCommand);
-  vtkTclCreateNew(interp,"vtkKWCallbackSpecification", vtkKWCallbackSpecificationNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWCallbackSpecification", vtkKWCallbackSpecificationNewCommand,
                   vtkKWCallbackSpecificationCommand);
-  vtkTclCreateNew(interp,"vtkKWChangeColorButton", vtkKWChangeColorButtonNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWChangeColorButton", vtkKWChangeColorButtonNewCommand,
                   vtkKWChangeColorButtonCommand);
-  vtkTclCreateNew(interp,"vtkKWCheckButton", vtkKWCheckButtonNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWCheckButton", vtkKWCheckButtonNewCommand,
                   vtkKWCheckButtonCommand);
-  vtkTclCreateNew(interp,"vtkKWCompositeCollection", vtkKWCompositeCollectionNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWCompositeCollection", vtkKWCompositeCollectionNewCommand,
                   vtkKWCompositeCollectionCommand);
-  vtkTclCreateNew(interp,"vtkKWCornerAnnotation", vtkKWCornerAnnotationNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWCornerAnnotation", vtkKWCornerAnnotationNewCommand,
                   vtkKWCornerAnnotationCommand);
-  vtkTclCreateNew(interp,"vtkKWDialog", vtkKWDialogNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWDialog", vtkKWDialogNewCommand,
                   vtkKWDialogCommand);
-  vtkTclCreateNew(interp,"vtkKWEntry", vtkKWEntryNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWEntry", vtkKWEntryNewCommand,
                   vtkKWEntryCommand);
-  vtkTclCreateNew(interp,"vtkKWEventNotifier", vtkKWEventNotifierNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWEventNotifier", vtkKWEventNotifierNewCommand,
                   vtkKWEventNotifierCommand);
-  vtkTclCreateNew(interp,"vtkKWExtent", vtkKWExtentNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWExtent", vtkKWExtentNewCommand,
                   vtkKWExtentCommand);
-  vtkTclCreateNew(interp,"vtkKWGenericComposite", vtkKWGenericCompositeNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWGenericComposite", vtkKWGenericCompositeNewCommand,
                   vtkKWGenericCompositeCommand);
-  vtkTclCreateNew(interp,"vtkKWLabel", vtkKWLabelNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWLabel", vtkKWLabelNewCommand,
                   vtkKWLabelCommand);
-  vtkTclCreateNew(interp,"vtkKWLabeledEntry", vtkKWLabeledEntryNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWLabeledEntry", vtkKWLabeledEntryNewCommand,
                   vtkKWLabeledEntryCommand);
-  vtkTclCreateNew(interp,"vtkKWLabeledFrame", vtkKWLabeledFrameNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWLabeledFrame", vtkKWLabeledFrameNewCommand,
                   vtkKWLabeledFrameCommand);
-  vtkTclCreateNew(interp,"vtkKWListBox", vtkKWListBoxNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWListBox", vtkKWListBoxNewCommand,
                   vtkKWListBoxCommand);
-  vtkTclCreateNew(interp,"vtkKWMenu", vtkKWMenuNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWMenu", vtkKWMenuNewCommand,
                   vtkKWMenuCommand);
-  vtkTclCreateNew(interp,"vtkKWMessageDialog", vtkKWMessageDialogNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWMenuButton", vtkKWMenuButtonNewCommand,
+                  vtkKWMenuButtonCommand);
+  vtkTclCreateNew(interp,(char *) "vtkKWMessageDialog", vtkKWMessageDialogNewCommand,
                   vtkKWMessageDialogCommand);
-  vtkTclCreateNew(interp,"vtkKWNotebook", vtkKWNotebookNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWNotebook", vtkKWNotebookNewCommand,
                   vtkKWNotebookCommand);
-  vtkTclCreateNew(interp,"vtkKWObject", vtkKWObjectNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWObject", vtkKWObjectNewCommand,
                   vtkKWObjectCommand);
-  vtkTclCreateNew(interp,"vtkKWOKCancelDialog", vtkKWOKCancelDialogNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWOKCancelDialog", vtkKWOKCancelDialogNewCommand,
                   vtkKWOKCancelDialogCommand);
-  vtkTclCreateNew(interp,"vtkKWOptionMenu", vtkKWOptionMenuNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWOptionMenu", vtkKWOptionMenuNewCommand,
                   vtkKWOptionMenuCommand);
-  vtkTclCreateNew(interp,"vtkKWProgressGauge", vtkKWProgressGaugeNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWProgressGauge", vtkKWProgressGaugeNewCommand,
                   vtkKWProgressGaugeCommand);
-  vtkTclCreateNew(interp,"vtkKWPushButton", vtkKWPushButtonNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWPushButton", vtkKWPushButtonNewCommand,
                   vtkKWPushButtonCommand);
-  vtkTclCreateNew(interp,"vtkKWRadioButton", vtkKWRadioButtonNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWRadioButton", vtkKWRadioButtonNewCommand,
                   vtkKWRadioButtonCommand);
-  vtkTclCreateNew(interp,"vtkKWSaveImageDialog", vtkKWSaveImageDialogNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWSaveImageDialog", vtkKWSaveImageDialogNewCommand,
                   vtkKWSaveImageDialogCommand);
-  vtkTclCreateNew(interp,"vtkKWScale", vtkKWScaleNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWScale", vtkKWScaleNewCommand,
                   vtkKWScaleCommand);
-  vtkTclCreateNew(interp,"vtkKWSerializer", vtkKWSerializerNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWSerializer", vtkKWSerializerNewCommand,
                   vtkKWSerializerCommand);
-  vtkTclCreateNew(interp,"vtkKWText", vtkKWTextNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWText", vtkKWTextNewCommand,
                   vtkKWTextCommand);
-  vtkTclCreateNew(interp,"vtkKWToolbar", vtkKWToolbarNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWToolbar", vtkKWToolbarNewCommand,
                   vtkKWToolbarCommand);
-  vtkTclCreateNew(interp,"vtkKWWidget", vtkKWWidgetNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWWidget", vtkKWWidgetNewCommand,
                   vtkKWWidgetCommand);
-  vtkTclCreateNew(interp,"vtkKWWidgetCollection", vtkKWWidgetCollectionNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWWidgetCollection", vtkKWWidgetCollectionNewCommand,
                   vtkKWWidgetCollectionCommand);
-  vtkTclCreateNew(interp,"vtkKWViewCollection", vtkKWViewCollectionNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWViewCollection", vtkKWViewCollectionNewCommand,
                   vtkKWViewCollectionCommand);
-  vtkTclCreateNew(interp,"vtkKWVolumeComposite", vtkKWVolumeCompositeNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWVolumeComposite", vtkKWVolumeCompositeNewCommand,
                   vtkKWVolumeCompositeCommand);
-  vtkTclCreateNew(interp,"vtkKWWindow", vtkKWWindowNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWWindow", vtkKWWindowNewCommand,
                   vtkKWWindowCommand);
-  vtkTclCreateNew(interp,"vtkKWWindowCollection", vtkKWWindowCollectionNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWWindowCollection", vtkKWWindowCollectionNewCommand,
                   vtkKWWindowCollectionCommand);
-  vtkTclCreateNew(interp,"vtkKWXtEmbeddedWidget", vtkKWXtEmbeddedWidgetNewCommand,
+  vtkTclCreateNew(interp,(char *) "vtkKWXtEmbeddedWidget", vtkKWXtEmbeddedWidgetNewCommand,
                   vtkKWXtEmbeddedWidgetCommand);
   return TCL_OK;
 }

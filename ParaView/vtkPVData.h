@@ -38,7 +38,7 @@ class vtkPVScalarBar;
 class vtkPVSource;
 class vtkPVAssignment;
 class vtkPVApplication;
-class vtkPVMenuButton;
+class vtkKWMenuButton;
 
 
 class VTK_EXPORT vtkPVData : public vtkKWWidget
@@ -153,7 +153,7 @@ protected:
   vtkPVData(const vtkPVData&) {};
   void operator=(const vtkPVData&) {};
   
-  vtkPVMenuButton *FiltersMenuButton;
+  vtkKWMenuButton *FiltersMenuButton;
   vtkDataSet *Data;
 
   vtkPVActorComposite *ActorComposite;

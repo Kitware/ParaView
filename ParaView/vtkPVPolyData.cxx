@@ -40,7 +40,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVAssignment.h"
 
 #include "vtkPVApplication.h"
-#include "vtkPVMenuButton.h"
+#include "vtkKWMenuButton.h"
 #include "vtkDataSetMapper.h"
 #include "vtkParallelDecimate.h"
 #include "vtkPVActorComposite.h"

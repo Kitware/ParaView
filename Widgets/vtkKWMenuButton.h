@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVMenuButton.h
+  Module:    vtkKWMenuButton.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,16 +26,16 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVMenuButton_h
-#define __vtkPVMenuButton_h
+#ifndef __vtkKWMenuButton_h
+#define __vtkKWMenuButton_h
 
 #include "vtkKWMenu.h"
 
-class VTK_EXPORT vtkPVMenuButton : public vtkKWWidget
+class VTK_EXPORT vtkKWMenuButton : public vtkKWWidget
 {
 public:
-  static vtkPVMenuButton* New();
-  vtkTypeMacro(vtkPVMenuButton, vtkKWWidget);
+  static vtkKWMenuButton* New();
+  vtkTypeMacro(vtkKWMenuButton, vtkKWWidget);
 
   // Description:
   // Create a Tk widget
@@ -53,10 +53,10 @@ public:
   vtkKWMenu* GetMenu();
   
 protected:
-  vtkPVMenuButton();
-  ~vtkPVMenuButton();
-  vtkPVMenuButton(const vtkPVMenuButton&) {};
-  void operator=(const vtkPVMenuButton&) {};
+  vtkKWMenuButton();
+  ~vtkKWMenuButton();
+  vtkKWMenuButton(const vtkKWMenuButton&) {};
+  void operator=(const vtkKWMenuButton&) {};
   
   vtkKWMenu *Menu;
 };

@@ -44,7 +44,7 @@ vtkPVScalarBar::vtkPVScalarBar()
   this->ScalarBar->SetWidth(0.06);
   
   this->DataNotebookButton = vtkKWPushButton::New();
-  this->OrientationMenu = vtkPVMenuButton::New();
+  this->OrientationMenu = vtkKWMenuButton::New();
   this->VisibilityButton = vtkKWCheckButton::New();
   this->TitleEntry = vtkKWLabeledEntry::New();
   this->WidthScale = vtkKWScale::New();

@@ -37,7 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkScalarBarActor.h"
 #include "vtkPVData.h"
 #include "vtkKWPushButton.h"
-#include "vtkPVMenuButton.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWScale.h"
@@ -116,7 +116,7 @@ protected:
   
   vtkScalarBarActor *ScalarBar;
   vtkKWPushButton *DataNotebookButton;
-  vtkPVMenuButton *OrientationMenu;
+  vtkKWMenuButton *OrientationMenu;
   vtkKWCheckButton *VisibilityButton;
   vtkKWLabeledEntry *TitleEntry;
   vtkKWScale *WidthScale;

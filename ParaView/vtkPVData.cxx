@@ -36,7 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVScalarBar.h"
-#include "vtkPVMenuButton.h"
+#include "vtkKWMenuButton.h"
 #include "vtkElevationFilter.h"
 #include "vtkSingleContourFilter.h"
 #include "vtkExtractEdges.h"
@@ -54,7 +54,7 @@ vtkPVData::vtkPVData()
   this->Data = NULL;
   this->PVSource = NULL;
   
-  this->FiltersMenuButton = vtkPVMenuButton::New();
+  this->FiltersMenuButton = vtkKWMenuButton::New();
   
   this->Assignment = NULL;
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVMenuButton.cxx
+  Module:    vtkKWMenuButton.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,39 +26,39 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#include "vtkPVMenuButton.h"
+#include "vtkKWMenuButton.h"
 #include "vtkObjectFactory.h"
 
-int vtkPVMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
+int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
 		      int argc, char *argv[]);
 
-vtkPVMenuButton::vtkPVMenuButton()
+vtkKWMenuButton::vtkKWMenuButton()
 {
-  this->CommandFunction = vtkPVMenuButtonCommand;
+  this->CommandFunction = vtkKWMenuButtonCommand;
   
   this->Menu = vtkKWMenu::New();
 }
 
-vtkPVMenuButton::~vtkPVMenuButton()
+vtkKWMenuButton::~vtkKWMenuButton()
 {
   this->Menu->Delete();
   this->Menu = NULL;
 }
 
 
-vtkPVMenuButton* vtkPVMenuButton::New()
+vtkKWMenuButton* vtkKWMenuButton::New()
 {
   // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVMenuButton");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWMenuButton");
   if(ret)
     {
-    return (vtkPVMenuButton*)ret;
+    return (vtkKWMenuButton*)ret;
     }
   // If the factory was unable to create the object, then create it here.
-  return new vtkPVMenuButton;
+  return new vtkKWMenuButton;
 }
 
-void vtkPVMenuButton::Create(vtkKWApplication *app, char *args)
+void vtkKWMenuButton::Create(vtkKWApplication *app, char *args)
 { 
   // must set the application
   if (this->Application)
@@ -76,20 +76,20 @@ void vtkPVMenuButton::Create(vtkKWApplication *app, char *args)
   
 }
 
-void vtkPVMenuButton::SetButtonText(const char *text)
+void vtkKWMenuButton::SetButtonText(const char *text)
 {
     this->Script("%s configure -text {%s}",
 		 this->GetWidgetName(), text);
 }
 
-void vtkPVMenuButton::AddCommand(const char* label, vtkKWObject* Object,
+void vtkKWMenuButton::AddCommand(const char* label, vtkKWObject* Object,
 				 const char* MethodAndArgString,
 				 const char* help)
 {
   this->Menu->AddCommand(label, Object, MethodAndArgString, help);
 }
 
-vtkKWMenu* vtkPVMenuButton::GetMenu()
+vtkKWMenu* vtkKWMenuButton::GetMenu()
 {
   return this->Menu;
 }
