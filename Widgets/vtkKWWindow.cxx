@@ -2833,3 +2833,10 @@ int vtkKWWindow::GetFileMenuIndex()
     }
   return clidx - 1;  
 }
+
+void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  vtkKWWidget::SerializeRevision(os,indent);
+  os << indent << "vtkKWWindow ";
+  this->ExtractRevision(os,"$Revision: 1.11 $");
+}

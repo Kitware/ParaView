@@ -71,6 +71,9 @@ public:
 
   vtkGetObjectMacro( VolumeProperty, vtkVolumeProperty );
 
+  // Description:
+  // Chaining method to serialize an object and its superclasses.
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
 protected:
   vtkKWVolumeComposite();

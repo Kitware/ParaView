@@ -56,6 +56,8 @@ vtkKWObject::vtkKWObject()
   this->TclName = NULL;
   this->Application = NULL;  
   this->CommandFunction = vtkKWObjectCommand;
+  this->NumberOfVersions = 0;
+  this->Versions = NULL;
 }
 
 vtkKWObject::~vtkKWObject()
@@ -64,6 +66,15 @@ vtkKWObject::~vtkKWObject()
     {
     delete [] this->TclName;
     }
+  for (int i = 0; i < this->NumberOfVersions; i++)
+    {
+    delete [] this->Versions[i*2];
+    delete [] this->Versions[i*2+1];    
+    }
+  if (this->Versions)
+    {
+    delete [] this->Versions;
+    }
 }
 
 
@@ -71,19 +82,33 @@ void vtkKWObject::Serialize(ostream& os, vtkIndent indent)
 {
   os << this->GetClassName() << endl;
   os << indent << "  {\n";
+  this->SerializeRevision(os, indent.GetNextIndent());
   this->SerializeSelf(os, indent.GetNextIndent());
   os << indent << "  }\n";
+}
+
+void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
+{
+  char rev[128];
+  sscanf(revIn,"$Revision: %s",rev);
+  os << rev << endl;
+}
+
+void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  os << indent << "vtkKWObject ";
+  this->ExtractRevision(os,"$Revision: 1.4 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
 {
   char token[1024];
-  // keep reading tokens until we find our token
-  do 
-    {    
-    vtkKWSerializer::GetNextToken(&is,token);
+  // get the class name
+  vtkKWSerializer::GetNextToken(&is,token);
+  if (strcmp(token,this->GetClassName()))
+    {
+    vtkDebugMacro("A class name mismatch has occured.");
     }
-  while (strcmp(token,this->GetClassName()));
   vtkKWSerializer::ReadNextToken(&is,"{",this);
 
   // for each token process it
@@ -100,6 +125,18 @@ void vtkKWObject::Serialize(istream& is)
       }
     }
   while (token[0] != '}');
+}
+
+void vtkKWObject::SerializeToken(istream& is, const char token[1024])
+{
+  char tmp[1024];
+  
+  if (!strcmp(token,"vtkKWObject"))
+    {
+    vtkKWSerializer::GetNextToken(&is,tmp);
+    this->AddVersion("vtkKWObject",tmp);
+    return;
+    }
 }
 
 const char *vtkKWObject::GetTclName()
@@ -178,3 +215,43 @@ void vtkKWObject::SetApplication (vtkKWApplication* arg)
     }
 }
 
+void vtkKWObject::AddVersion(const char *cname, const char *version)
+{
+  // allocate more space
+  int cnt;
+  
+  char **objs = new char *[2*(this->NumberOfVersions+1)];
+
+  // copy the old to the new
+  for (cnt = 0; cnt < this->NumberOfVersions*2; cnt++)
+    {
+    objs[cnt] = this->Versions[cnt];
+    }
+  if (this->Versions)
+    {
+    delete [] this->Versions;
+    }
+  this->Versions = objs;
+  char *classname = new char [strlen(cname)+1];
+  sprintf(classname,"%s",cname);
+  this->Versions[this->NumberOfVersions*2] = classname;
+
+  
+  // compute the revision, strip out extra junk
+  char *revision = new char [strlen(version)+1];
+  sprintf(revision,"%s",version);
+  this->Versions[this->NumberOfVersions*2+1] = revision;
+  this->NumberOfVersions++;
+}
+
+const char *vtkKWObject::GetVersion(const char *cname)
+{
+  for (int i = 0; i < this->NumberOfVersions; i++)
+    {
+    if (!strcmp(this->Versions[i*2],cname))
+      {
+      return this->Versions[i*2];
+      }
+    }
+  return NULL;
+}

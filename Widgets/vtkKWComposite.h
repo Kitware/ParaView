@@ -89,6 +89,10 @@ public:
   // overridden in a subclass for example to close dialogs.
   virtual void Close() {};
 
+  // Description:
+  // Chaining method to serialize an object and its superclasses.
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
+
 protected:
   vtkKWComposite();
   ~vtkKWComposite();

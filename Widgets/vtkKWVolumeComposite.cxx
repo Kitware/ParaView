@@ -250,3 +250,10 @@ vtkImageData *vtkKWVolumeComposite::GetInput()
 {
   return this->RayCastMapper->GetInput();
 }
+
+void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  vtkKWComposite::SerializeRevision(os,indent);
+  os << indent << "vtkKWVolumeComposite ";
+  this->ExtractRevision(os,"$Revision: 1.4 $");
+}

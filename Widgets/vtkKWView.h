@@ -238,6 +238,7 @@ public:
   // Chaining method to serialize an object and its superclasses.
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
   virtual void SerializeToken(istream& is,const char token[1024]);
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   // Description:
   // Change the color of the annotation text

@@ -152,3 +152,10 @@ void vtkKWComposite::Select(vtkKWView *v)
       }
     }
 }
+
+void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  vtkKWObject::SerializeRevision(os,indent);
+  os << indent << "vtkKWComposite ";
+  this->ExtractRevision(os,"$Revision: 1.5 $");
+}

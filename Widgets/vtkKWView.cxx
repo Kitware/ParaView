@@ -1050,3 +1050,9 @@ void vtkKWView::SerializeToken(istream& is, const char token[1024])
   vtkKWWidget::SerializeToken(is,token);
 }
 
+void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  vtkKWWidget::SerializeRevision(os,indent);
+  os << indent << "vtkKWView ";
+  this->ExtractRevision(os,"$Revision: 1.5 $");
+}

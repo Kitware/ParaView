@@ -142,6 +142,7 @@ protected:
   ~vtkKWWindow();
   vtkKWWindow(const vtkKWWindow&) {};
   void operator=(const vtkKWWindow&) {};
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   virtual void CreateStatusImage();
   int NumberOfMRUFiles;

@@ -94,6 +94,7 @@ protected:
   ~vtkKWWidget();
   vtkKWWidget(const vtkKWWidget&) {};
   void operator=(const vtkKWWidget&) {};
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   char *WidgetName;
   vtkKWWidget *Parent;

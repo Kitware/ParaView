@@ -77,10 +77,15 @@ public:
   // Description:
   // Chaining method to serialize an object and its superclasses.
   void Serialize(ostream& os, vtkIndent indent);
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
   void Serialize(istream& is);
   virtual void SerializeSelf(ostream& os, vtkIndent indent) {};
-  virtual void SerializeToken(istream& is, const char token[1024]) {};
-
+  virtual void SerializeToken(istream& is, const char token[1024]);
+  virtual const char *GetVersion(const char *);
+  virtual void AddVersion(const char *cname, const char *version);
+  void ExtractRevision(ostream& os,const char *revIn);
+  
+  
 //BTX
   // Description:
   // A convienience method to invoke some tcl script code and
@@ -89,7 +94,7 @@ public:
 
 private:
   char *TclName;
-
+  
 protected:
   vtkKWObject();
   ~vtkKWObject();
@@ -97,6 +102,9 @@ protected:
   void operator=(const vtkKWObject&) {};
 
   vtkKWApplication *Application;
+
+  char **Versions;
+  int   NumberOfVersions;
 
   // this instance variable holds the command functions for this class.
   int (*CommandFunction)(ClientData, Tcl_Interp *, int, char *[]);
