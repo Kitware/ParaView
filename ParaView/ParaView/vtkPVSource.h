@@ -463,6 +463,10 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Is the source grabbed.
+  vtkGetMacro(SourceGrabbed, int);
  
 protected:
   vtkPVSource();

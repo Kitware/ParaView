@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.342");
+vtkCxxRevisionMacro(vtkPVSource, "1.343");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -581,7 +581,14 @@ void vtkPVSource::UpdateEnableState()
 
   this->PropagateEnableState(this->AcceptButton);
   this->PropagateEnableState(this->ResetButton);
-  this->PropagateEnableState(this->DeleteButton);
+  if ( this->IsDeletable() )
+    {
+    this->PropagateEnableState(this->DeleteButton);
+    }
+  else
+    {
+    this->DeleteButton->SetEnabled(0);
+    }
   this->PropagateEnableState(this->DescriptionFrame);
   this->PropagateEnableState(this->NameLabel);
   this->PropagateEnableState(this->TypeLabel);
@@ -976,8 +983,6 @@ void vtkPVSource::GrabFocus()
 {
   this->SourceGrabbed = 1;
 
-  this->GetPVWindow()->DisableToolbarButtons();
-  this->GetPVWindow()->DisableMenus();
   this->GetPVRenderView()->UpdateNavigationWindow(this, 1);
 }
 
@@ -987,11 +992,10 @@ void vtkPVSource::UnGrabFocus()
 
   if ( this->SourceGrabbed )
     {
-    this->GetPVWindow()->EnableToolbarButtons();
-    this->GetPVWindow()->EnableMenus();
     this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
     }
   this->SourceGrabbed = 0;
+  this->GetPVWindow()->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -1413,16 +1417,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // causes the filter to execute.
   pvd->UpdateProperties();
   
-  vtkPVDataInformation *pvdi = this->GetDataInformation();
-  if (!pvdi->GetNumberOfCells() || !pvdi->GetNumberOfPoints())
-    {
-    window->DisableFilterMenu();
-    }
-  else
-    {
-    window->UpdateFilterMenu();
-    }
-
   this->GetPVApplication()->SendCleanupPendingProgress();
 }
 
@@ -1649,20 +1643,7 @@ void vtkPVSource::UpdateVTKSourceParameters()
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateProperties()
 {
-  // --------------------------------------
-  // Change the state of the delete button based on if there are any users.
-  // Only filters at the end of a pipeline can be deleted.
-  if ( this->IsDeletable() )
-      {
-      this->Script("%s configure -state normal",
-                   this->DeleteButton->GetWidgetName());
-      }
-    else
-      {
-      this->Script("%s configure -state disabled",
-                   this->DeleteButton->GetWidgetName());
-      }
-  
+  this->UpdateEnableState();
   this->UpdateDescriptionFrame();
 }
 

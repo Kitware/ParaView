@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.527");
+vtkCxxRevisionMacro(vtkPVWindow, "1.528");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -735,8 +735,6 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                             this->FilterMenu, 2,
                             "Choose a filter from a list of "
                             "VTK filters");  
-  this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL, 
-                       vtkKWMenu::Disabled);
 
   // Window menu:
 
@@ -1244,7 +1242,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   // Update the enable state
   this->UpdateEnableState();
-
 }
 
 //-----------------------------------------------------------------------------
@@ -3023,6 +3020,12 @@ void vtkPVWindow::UpdateFilterMenu()
       !this->CurrentPVSource->GetIsPermanent() && 
       !this->CurrentPVSource->GetHideDisplayPage() )
     {
+    vtkPVDataInformation *pvdi = this->CurrentPVSource->GetDataInformation();
+    if (!pvdi->GetNumberOfCells() || !pvdi->GetNumberOfPoints())
+      {
+      this->FilterMenu->SetEnabled(0);
+      return;
+      }
     // Build an ordered list of filters for the menu.
     vtkstd::map<vtkStdString, vtkStdString> filterKeys;
     vtkstd::map<vtkStdString, vtkPVSource*> filterValues;
@@ -3089,35 +3092,20 @@ void vtkPVWindow::UpdateFilterMenu()
   // If there are no sources, disable the menu.
     if (numFilters > 0)
       {
-      this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL, 
-                           vtkKWMenu::Normal);
+      this->PropagateEnableState(this->FilterMenu);
       }
     else
       {
-      this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL, 
-                           vtkKWMenu::Disabled);
+      this->FilterMenu->SetEnabled(0);
       }
     }
   else
     {
     // If there is no current data, disable the menu.
     this->DisableToolbarButtons();
-    this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL, 
-                         vtkKWMenu::Disabled);
+    this->FilterMenu->SetEnabled(0);
     }
   
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::DisableFilterMenu()
-{
-  if ( this->InDemo )
-    {
-    return;
-    }
-  this->DisableToolbarButtons();
-  this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL,
-                       vtkKWMenu::Disabled);
 }
 
 //-----------------------------------------------------------------------------
@@ -3198,15 +3186,13 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
   // Set variable.
   this->CurrentPVSource = pvs;
 
-  // Other stuff
-  this->UpdateFilterMenu();
-
   // This will update the parameters.  
   // I doubt the conditional is still necessary.
   if (pvs)
     {
     this->ShowCurrentSourceProperties();
     }
+  this->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -3324,44 +3310,6 @@ void vtkPVWindow::UpdateSelectMenu()
     this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
                                  "Select one of the glyph sources.");  
     }
-
-  // Disable or enable the menu.
-  this->EnableSelectMenu();
-}
-
-//-----------------------------------------------------------------------------
-// Disable or enable the select menu. Checks if there are any valid
-// entries in the menu, disables the menu if there none, enables it
-// otherwise.
-void vtkPVWindow::EnableSelectMenu()
-{
-  if ( this->InDemo )
-    {
-    return;
-    }
-  int numSources;
-  vtkPVSourceCollection* sources = this->GetSourceList("Sources");
-  if (sources)
-    {
-    numSources =  sources->GetNumberOfItems();
-    }
-  else
-    {
-    numSources = 0;
-    }
-
-  if (numSources == 0)
-    {
-    this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL, vtkKWMenu::Disabled);
-    this->GetMenuView()->SetState(VTK_PV_SOURCE_MENU_LABEL, 
-                                  vtkKWMenu::Disabled);
-    }
-  else
-    {
-    this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL, vtkKWMenu::Normal);
-    this->GetMenuView()->SetState(VTK_PV_SOURCE_MENU_LABEL, 
-                                  vtkKWMenu::Normal);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -3378,47 +3326,6 @@ void vtkPVWindow::DisableNavigationWindow()
     return;
     }
   this->MainView->GetNavigationFrame()->EnabledOn();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::DisableMenus()
-{
-  if ( this->InDemo )
-    {
-    return;
-    }
-  if (this->MenusDisabled)
-    {
-    return;
-    }
-  this->MenusDisabled = 1;
-
-  // First store the state of all menu items.
-  this->Menu->StoreMenuState(this->MenuState);
-
-  int numMenus = this->Menu->GetNumberOfItems();
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (int i = 0; i <= numMenus; i++)
-    {
-    this->Menu->SetState(i, vtkKWMenu::Disabled);
-    }
-}
-
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::EnableMenus()
-{
-  if ( this->InDemo )
-    {
-    return;
-    }
-  if (!this->MenusDisabled)
-    {
-    return;
-    }
-  // Now restore the state of all menu items
-  this->Menu->RestoreMenuState(this->MenuState);
-  this->MenusDisabled = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -3699,11 +3606,6 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
 
   if ( this->Prototypes->GetItem(moduleName, pvs) == VTK_OK ) 
     {
-    if (grabFocus)
-      {
-      this->DisableToolbarButtons();
-      this->DisableMenus();
-      }
 
     // Make the cloned source current only if it is going into
     // the Sources list.
@@ -3719,7 +3621,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     if (success != VTK_OK)
       {
       this->EnableToolbarButtons();
-      this->EnableMenus();
+      this->UpdateEnableState();
       vtkErrorMacro("Cloning operation for " << moduleName
                     << " failed.");
       return 0;
@@ -3728,7 +3630,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     if (!clone)
       {
       this->EnableToolbarButtons();
-      this->EnableMenus();
+      this->UpdateEnableState();
       return 0;
       }
     
@@ -3787,6 +3689,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     vtkErrorMacro("Prototype for " << moduleName << " could not be found.");
     }
   
+  this->UpdateEnableState();
   return clone;
 }
 
@@ -3915,8 +3818,8 @@ void vtkPVWindow::ReadSourceInterfacesFromString(const char* str)
   parser->Delete();
 
   this->UpdateSourceMenu();
-  this->UpdateFilterMenu();
   this->Toolbar->UpdateWidgets();
+  this->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -3931,8 +3834,8 @@ void vtkPVWindow::ReadSourceInterfacesFromFile(const char* file)
   parser->Delete();
 
   this->UpdateSourceMenu();
-  this->UpdateFilterMenu();
   this->Toolbar->UpdateWidgets();
+  this->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -4338,6 +4241,12 @@ void vtkPVWindow::UpdateEnableState()
     return;
     }
 
+  int source_grabbed = 0;
+  if ( this->CurrentPVSource && this->CurrentPVSource->GetSourceGrabbed() )
+    {
+    source_grabbed = 1;
+    }
+
   int enabled = this->Enabled;
   if ( this->AnimationInterface && this->AnimationInterface->GetInPlay() )
     {
@@ -4438,8 +4347,19 @@ void vtkPVWindow::UpdateEnableState()
     }
   it->Delete();
 
+  if ( source_grabbed )
+    {
+    this->Enabled = 0;
+    }
+  if ( this->Enabled )
+    {
+    this->EnableToolbarButtons();
+    }
+  else
+    {
+    this->DisableToolbarButtons();
+    }
   this->UpdateMenuState();
-
   this->Enabled = enabled;
 }
 
@@ -4448,66 +4368,47 @@ void vtkPVWindow::UpdateMenuState()
 {
   this->Superclass::UpdateMenuState();
 
-  int menu_state = this->Enabled ? vtkKWMenu::Normal : vtkKWMenu::Disabled;
-  if ( this->Menu )
-    {
-    this->Menu->SetEnabled(this->Enabled);
-    this->Menu->SetState(menu_state);
-    }
-  if ( this->MenuEdit )
-    {
-    this->MenuEdit->SetEnabled(this->Enabled);
-    this->MenuEdit->SetState(menu_state);
-    }
-  if ( this->MenuView )
-    {
-    this->MenuView->SetEnabled(this->Enabled);
-    this->MenuView->SetState(menu_state);
-    }
-  if ( this->MenuWindow )
-    {
-    this->MenuWindow->SetEnabled(this->Enabled);
-    this->MenuWindow->SetState(menu_state);
-    }
-  if ( this->MenuHelp )
-    {
-    this->MenuHelp->SetEnabled(this->Enabled);
-    this->MenuHelp->SetState(menu_state);
-    }
-  if ( this->PageMenu )
-    {
-    this->PageMenu->SetEnabled(this->Enabled);
-    this->PageMenu->SetState(menu_state);
-    }
-  if ( this->MenuFile )
-    {
-    this->MenuFile->SetEnabled(this->Enabled);
-    this->MenuFile->SetState(menu_state);
-    }
-  if ( this->SelectMenu ) 
-    { 
-    this->SelectMenu->SetEnabled(this->Enabled); 
-    this->SelectMenu->SetState(menu_state);
-    }
-  if ( this->GlyphMenu ) 
-    { 
-    this->GlyphMenu->SetEnabled(this->Enabled); 
-    this->GlyphMenu->SetState(menu_state);
-    }
-  if ( this->SourceMenu ) 
-    { 
-    this->SourceMenu->SetEnabled(this->Enabled); 
-    this->SourceMenu->SetState(menu_state);
-    }
-  if ( this->FilterMenu ) 
-    { 
-    this->FilterMenu->SetEnabled(this->Enabled);
-    this->FilterMenu->SetState(menu_state);
-    }
+  this->PropagateEnableState(this->Menu);
+  this->PropagateEnableState(this->MenuEdit);
+  this->PropagateEnableState(this->MenuView);
+  this->PropagateEnableState(this->MenuWindow);
+  this->PropagateEnableState(this->MenuHelp);
+  this->PropagateEnableState(this->PageMenu);
+  this->PropagateEnableState(this->MenuFile);
+  this->PropagateEnableState(this->GlyphMenu);
+  this->PropagateEnableState(this->SourceMenu);
   if ( this->Enabled )
     {
     this->UpdateSelectMenu();
-    this->UpdateFilterMenu();
+    }
+
+  if ( this->InDemo )
+    {
+    return;
+    }
+  // Disable or enable the select menu. Checks if there are any valid
+  // entries in the menu, disables the menu if there none, enables it
+  // otherwise.
+  vtkPVSourceCollection* sources = this->GetSourceList("Sources");
+  int menustate = (this->Enabled ? vtkKWMenu::Normal: vtkKWMenu::Disabled);
+  if (sources && sources->GetNumberOfItems())
+    {
+    this->PropagateEnableState(this->SelectMenu);
+    this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL,  menustate);
+    }
+  else
+    {
+    this->SelectMenu->SetEnabled(0);
+    this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL,  vtkKWMenu::Disabled);
+    }
+  this->UpdateFilterMenu();
+  if ( this->FilterMenu->GetEnabled() )
+    {
+    this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL,  menustate);
+    }
+  else
+    {
+    this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL,  vtkKWMenu::Disabled);
     }
 }
 

@@ -294,12 +294,6 @@ public:
   void UpdateSelectMenu();
 
   // Description:
-  // Ability to disable and enable the menus on the menu bar.
-  // Most of the manipulation is internal to window.
-  void DisableMenus();
-  void EnableMenus();
-
-  // Description:
   // Ability to disable and enable the filter buttons on the toolbar.
   // Most of the manipulation is internal to window.
   void DisableToolbarButtons();
@@ -315,10 +309,6 @@ public:
   // Re-populate the filter menu.
   void UpdateFilterMenu();
   
-  // Description:
-  // Disable the filter menu and the menu buttons.
-  void DisableFilterMenu();
-
   // Description:
   // Experimenting with wizards. Has to cleaned up - Berk
   void WizardCallback();
@@ -494,7 +484,7 @@ public:
   void SetProgress(const char* text, int val);
   void StartProgress();
   void EndProgress(int enabled);
-  
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -560,9 +550,6 @@ protected:
   
   // Get rid of all references we own.
   void PrepareForDelete();
-
-  // Disable or enable the select menu.
-  void EnableSelectMenu();
 
   vtkPVSource *CurrentPVSource;
 
