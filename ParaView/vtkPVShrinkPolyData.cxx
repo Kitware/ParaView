@@ -27,11 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVShrinkPolyData.h"
-#include "vtkPVApplication.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVPolyData.h"
-#include "vtkPVWindow.h"
-#include "vtkPVActorComposite.h"
+#include "vtkShrinkPolyData.h"
 
 int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -41,28 +37,9 @@ vtkPVShrinkPolyData::vtkPVShrinkPolyData()
 {
   this->CommandFunction = vtkPVShrinkPolyDataCommand;
   
-  this->Accept = vtkKWPushButton::New();
-  this->Accept->SetParent(this->Properties);
-  this->SourceButton = vtkKWPushButton::New();
-  this->SourceButton->SetParent(this->Properties);
-  this->ShrinkFactorScale = vtkKWScale::New();
-  this->ShrinkFactorScale->SetParent(this->Properties);
-
   vtkShrinkPolyData *shrink = vtkShrinkPolyData::New();
   this->SetPolyDataSource(shrink);
   shrink->Delete();
-}
-
-//----------------------------------------------------------------------------
-vtkPVShrinkPolyData::~vtkPVShrinkPolyData()
-{ 
-  this->Accept->Delete();
-  this->Accept = NULL;
-  this->SourceButton->Delete();
-  this->SourceButton = NULL;
-  
-  this->ShrinkFactorScale->Delete();
-  this->ShrinkFactorScale = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -75,83 +52,9 @@ vtkPVShrinkPolyData* vtkPVShrinkPolyData::New()
 void vtkPVShrinkPolyData::CreateProperties()
 {  
   // must set the application
-  this->vtkPVSource::CreateProperties();
+  this->vtkPVPolyDataSource::CreateProperties();
   
-  this->ShrinkFactorScale->Create(this->Application,
-				  "-showvalue 1");
-  this->ShrinkFactorScale->SetResolution(0.1);
-  this->ShrinkFactorScale->SetRange(0, 1);
-  this->ShrinkFactorScale->SetValue(this->GetShrink()->GetShrinkFactor());
-  
-  this->SourceButton->Create(this->Application, "-text GetSource");
-  this->SourceButton->SetCommand(this, "SelectInputSource");
-  this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "ShrinkFactorChanged");
-  this->Script("pack %s %s %s",
-	       this->SourceButton->GetWidgetName(),
-	       this->Accept->GetWidgetName(),
-	       this->ShrinkFactorScale->GetWidgetName());
+  this->AddSlider("Shrink Factor:", "SetShrinkFactor", "GetShrinkFactor",
+		  0.0, 1.0, 0.01);
 }
 
-//----------------------------------------------------------------------------
-// Functions to update the progress bar
-void StartShrinkPolyDataProgress(void *arg)
-{
-  vtkPVShrinkPolyData *me = (vtkPVShrinkPolyData*)arg;
-  me->GetWindow()->SetStatusText("Processing Shrink");
-}
-
-//----------------------------------------------------------------------------
-void ShrinkPolyDataProgress(void *arg)
-{
-  vtkPVShrinkPolyData *me = (vtkPVShrinkPolyData*)arg;
-  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetShrink()->GetProgress() * 100));
-}
-
-//----------------------------------------------------------------------------
-void EndShrinkPolyDataProgress(void *arg)
-{
-  vtkPVShrinkPolyData *me = (vtkPVShrinkPolyData*)arg;
-  me->GetWindow()->SetStatusText("");
-  me->GetWindow()->GetProgressGauge()->SetValue(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVShrinkPolyData::ShrinkFactorChanged()
-{
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVWindow *window = this->GetWindow();
-  
-  this->SetShrinkFactor(this->ShrinkFactorScale->GetValue());
-
-  if (this->GetPVData() == NULL)
-    { // This is the first time. Create the data.
-    this->GetShrink()->SetStartMethod(StartShrinkPolyDataProgress, this);
-    this->GetShrink()->SetProgressMethod(ShrinkPolyDataProgress, this);
-    this->GetShrink()->SetEndMethod(EndShrinkPolyDataProgress, this);
-    this->InitializeData();
-    window->GetSourceList()->Update();
-    }
-
-  window->GetMainView()->SetSelectedComposite(this);
-  this->GetView()->Render();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVShrinkPolyData::SetShrinkFactor(float factor)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetShrinkFactor %f", this->GetTclName(), 
-			   factor);
-    }
-  
-  this->GetShrink()->SetShrinkFactor(factor);
-}
-
-//----------------------------------------------------------------------------
-vtkShrinkPolyData *vtkPVShrinkPolyData::GetShrink()
-{
-  return vtkShrinkPolyData::SafeDownCast(this->PolyDataSource);
-}

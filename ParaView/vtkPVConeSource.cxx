@@ -27,11 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVConeSource.h"
-#include "vtkPVPolyData.h"
-#include "vtkPVApplication.h"
-#include "vtkPVAssignment.h"
-#include "vtkPVWindow.h"
-#include "vtkPVActorComposite.h"
+#include "vtkConeSource.h"
 
 int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -41,21 +37,9 @@ vtkPVConeSource::vtkPVConeSource()
 {
   this->CommandFunction = vtkPVConeSourceCommand;
   
-  this->Accept = vtkKWPushButton::New();
-  this->Accept->SetParent(this->Properties);
-
   vtkConeSource *source = vtkConeSource::New();  
   this->SetPolyDataSource(source);
   source->Delete();
-}
-
-//----------------------------------------------------------------------------
-vtkPVConeSource::~vtkPVConeSource()
-{
-  this->Accept->Delete();
-  this->Accept = NULL;
-    
-  this->SetPolyDataSource(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -68,82 +52,10 @@ vtkPVConeSource* vtkPVConeSource::New()
 void vtkPVConeSource::CreateProperties()
 {  
   this->vtkPVPolyDataSource::CreateProperties();
-  
-  this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "ConeParameterChanged");
-  this->Script("pack %s", this->Accept->GetWidgetName());
 
   this->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
   this->AddLabeledEntry("Height:", "SetHeight", "GetHeight");
   this->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  this->AddLabeledEntry("Angle:", "SetAngle", "GetAngle");
   this->AddLabeledToggle("Capping:", "SetCapping", "GetCapping");
-
 }
-
-//----------------------------------------------------------------------------
-// Functions to update the progress bar
-void StartConeSourceProgress(void *arg)
-{
-  vtkPVConeSource *me = (vtkPVConeSource*)arg;
-  me->GetWindow()->SetStatusText("Processing ConeSource");
-}
-
-//----------------------------------------------------------------------------
-void ConeSourceProgress(void *arg)
-{
-  vtkPVConeSource *me = (vtkPVConeSource*)arg;
-  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetConeSource()->GetProgress() * 100));
-}
-
-//----------------------------------------------------------------------------
-void EndConeSourceProgress(void *arg)
-{
-  vtkPVConeSource *me = (vtkPVConeSource*)arg;
-  me->GetWindow()->SetStatusText("");
-  me->GetWindow()->GetProgressGauge()->SetValue(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVConeSource::ConeParameterChanged()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVWindow *window = this->GetWindow();
- 
-  if (this->GetPVData() == NULL)
-    { // This is the first time, initialize data.  
-    this->GetConeSource()->SetStartMethod(StartConeSourceProgress, this);
-    this->GetConeSource()->SetProgressMethod(ConeSourceProgress, this);
-    this->GetConeSource()->SetEndMethod(EndConeSourceProgress, this);
-    this->InitializeData();
-    }
-  
-  if (window->GetPreviousSource() != NULL)
-    {
-    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
-    }
-  
-  window->GetMainView()->SetSelectedComposite(this);
-
-  // ####
-  int i;
-  for (i = 0; i < this->NumberOfAcceptCommands; ++i)
-    {
-    this->Script(this->AcceptCommands[i]);
-    }
-  // ####
-  
-    window->GetMainView()->ResetCamera();
-  this->GetView()->Render();
-  window->GetSourceList()->Update();
-}
-
-
-
-//----------------------------------------------------------------------------
-vtkConeSource *vtkPVConeSource::GetConeSource() 
-{
-  return vtkConeSource::SafeDownCast(this->PolyDataSource);
-}
-
 

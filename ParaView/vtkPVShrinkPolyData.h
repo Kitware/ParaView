@@ -29,10 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVShrinkPolyData_h
 #define __vtkPVShrinkPolyData_h
 
-#include "vtkKWLabel.h"
-#include "vtkShrinkPolyData.h"
-#include "vtkKWScale.h"
-#include "vtkKWPushButton.h"
 #include "vtkPVPolyDataToPolyDataFilter.h"
 
 class vtkPVPolyData;
@@ -48,28 +44,12 @@ public:
   // You have to clone this object before you create its UI.
   void CreateProperties();
   
-  // Description:
-  // This method is called when the accpt button is pressed.
-  void ShrinkFactorChanged();
-
-  // Description:
-  // This is used internally to cast the source to a vtkShrinkPolyData
-  vtkShrinkPolyData *GetShrink();
-
-  // Description:
-  // The methods execute on all processes.
-  void SetShrinkFactor(float factor);
-
 protected:
   vtkPVShrinkPolyData();
-  ~vtkPVShrinkPolyData();
+  ~vtkPVShrinkPolyData() {};
   vtkPVShrinkPolyData(const vtkPVShrinkPolyData&) {};
   void operator=(const vtkPVShrinkPolyData&) {};
   
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *SourceButton;
-  vtkKWScale *ShrinkFactorScale;
-
 };
 
 #endif

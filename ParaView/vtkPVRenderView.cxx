@@ -294,7 +294,7 @@ void vtkPVRenderViewEndRender(void *arg)
 
   if (numProcs > 1)
     {
-    pdata = new float[numPixels];
+    pdata = new float[4*numPixels];
     zdata = new float[numPixels];
     vtkTreeComposite(rv->GetRenderWindow(), controller, 1, zdata, pdata);
     

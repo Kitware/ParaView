@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVSource_h
 
 #include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkPVData.h"
 #include "vtkSource.h"
 #include "vtkKWComposite.h"
@@ -98,12 +99,18 @@ public:
   // Sources have no props.
   vtkProp *GetProp() {return NULL;}
   
-    // Description:
+  // Description:
+  // Called when the accept button is pressed.
+  virtual void AcceptCallback();
+  
+  // Description:
   // A method used to broadcast changes resulting from widgets.
   void AcceptHelper(char *method, char *args);
   void AddLabeledEntry(char *label, char *setCmd, char *getCmd);
   void AddLabeledToggle(char *label, char *setCmd, char *getCmd);
   void AddXYZEntry(char *label, char *setCmd, char *getCmd);
+  void AddSlider(char *label, char *setCmd, char *getCmd, 
+		 float min, float max, float resolution);
 
 protected:
   vtkPVSource();
@@ -121,12 +128,15 @@ protected:
   vtkPVData *Input;
   char *Name;
   vtkKWWidget *Properties;
+  vtkKWLabeledFrame *NavigationFrame;
+  vtkKWLabeledFrame *ParameterFrame;
   
   int DataCreated;
 
-
   vtkKWWidgetCollection *Widgets;
 
+  vtkKWPushButton *AcceptButton;
+  
 //BTX
   // List of strings
   int NumberOfAcceptCommands;

@@ -33,10 +33,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVConeSource_h
 #define __vtkPVConeSource_h
 
-#include "vtkConeSource.h"
-#include "vtkShrinkPolyData.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWPushButton.h"
 #include "vtkPVPolyDataSource.h"
 
 class vtkPVPolyData;
@@ -52,28 +48,11 @@ public:
   // You have to clone this object before you can create it.
   void CreateProperties();
 
-  // Description:
-  // Used internally to cast source to vtkConeSource.
-  // It may be wise to make it private.
-  vtkConeSource *GetConeSource();
-
-  // Description:
-  // Accept button callback.  It takes the Widget states and sets the 
-  // cone sources parameters.
-  void ConeParameterChanged();
-
-  // Description:
-  // A method needed by the auto UI.  
-  // It should be moved to a superclass.
-  vtkSource *GetVTKSource () { return this->PolyDataSource;}
-
 protected:
   vtkPVConeSource();
-  ~vtkPVConeSource();
+  ~vtkPVConeSource() {};
   vtkPVConeSource(const vtkPVConeSource&) {};
   void operator=(const vtkPVConeSource&) {};
-  
- vtkKWPushButton *Accept;
 };
 
 #endif

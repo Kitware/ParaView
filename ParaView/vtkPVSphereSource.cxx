@@ -27,11 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVSphereSource.h"
-#include "vtkPVPolyData.h"
-#include "vtkPVApplication.h"
-#include "vtkPVAssignment.h"
-#include "vtkPVWindow.h"
-#include "vtkPVActorComposite.h"
+#include "vtkSphereSource.h"
 
 int vtkPVSphereSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -41,20 +37,9 @@ vtkPVSphereSource::vtkPVSphereSource()
 {
   this->CommandFunction = vtkPVSphereSourceCommand;
   
-  this->Accept = vtkKWPushButton::New();
-  this->Accept->SetParent(this->Properties);
-
   vtkSphereSource *s = vtkSphereSource::New();  
   this->SetPolyDataSource(s);
   s->Delete();
-}
-
-//----------------------------------------------------------------------------
-vtkPVSphereSource::~vtkPVSphereSource()
-{
-
-  this->Accept->Delete();
-  this->Accept = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -68,10 +53,6 @@ void vtkPVSphereSource::CreateProperties()
 {  
   this->vtkPVPolyDataSource::CreateProperties();
 
-  this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "SphereParameterChanged");
-  this->Script("pack %s", this->Accept->GetWidgetName());
-  
   this->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
   this->AddXYZEntry("Center", "SetCenter", "GetCenter");
   this->AddLabeledEntry("Phi Resolution:", "SetPhiResolution", "GetPhiResolution");
@@ -80,76 +61,7 @@ void vtkPVSphereSource::CreateProperties()
   this->AddLabeledEntry("End Theta:", "SetEndTheta", "GetEndTheta");
   this->AddLabeledEntry("Start Phi:", "SetStartPhi", "GetStartPhi");
   this->AddLabeledEntry("End Phi:", "SetEndPhi", "GetEndPhi");
-
-
 }
-
-//----------------------------------------------------------------------------
-// Functions to update the progress bar
-void StartSphereSourceProgress(void *arg)
-{
-  vtkPVSphereSource *me = (vtkPVSphereSource*)arg;
-  me->GetWindow()->SetStatusText("Processing SphereSource");
-}
-
-//----------------------------------------------------------------------------
-void SphereSourceProgress(void *arg)
-{
-  vtkPVSphereSource *me = (vtkPVSphereSource*)arg;
-  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetSphereSource()->GetProgress() * 100));
-}
-
-//----------------------------------------------------------------------------
-void EndSphereSourceProgress(void *arg)
-{
-  vtkPVSphereSource *me = (vtkPVSphereSource*)arg;
-  me->GetWindow()->SetStatusText("");
-  me->GetWindow()->GetProgressGauge()->SetValue(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSphereSource::SphereParameterChanged()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVWindow *window = this->GetWindow();
- 
-  if (this->GetPVData() == NULL)
-    { // This is the first time, initialize data.
-    this->GetSphereSource()->SetStartMethod(StartSphereSourceProgress, this);
-    this->GetSphereSource()->SetProgressMethod(SphereSourceProgress, this);
-    this->GetSphereSource()->SetEndMethod(EndSphereSourceProgress, this);
-    this->InitializeData();
-    }
-  
-  if (window->GetPreviousSource() != NULL)
-    {
-    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
-    }
-  
-  window->GetMainView()->SetSelectedComposite(this);
-
-  // ####
-  int i;
-  for (i = 0; i < this->NumberOfAcceptCommands; ++i)
-    {
-    this->Script(this->AcceptCommands[i]);
-    }
-  // ####
-
-  window->GetMainView()->ResetCamera();
-  this->GetView()->Render();
-  window->GetSourceList()->Update();
-}
-
-
-//----------------------------------------------------------------------------
-vtkSphereSource *vtkPVSphereSource::GetSphereSource()
-{
-  return vtkSphereSource::SafeDownCast(this->PolyDataSource);
-}
-
-
-
 
 
 

@@ -48,12 +48,6 @@ vtkPVPolyDataSource::vtkPVPolyDataSource()
 }
 
 //----------------------------------------------------------------------------
-vtkPVPolyDataSource::~vtkPVPolyDataSource()
-{
-  this->SetPolyDataSource(NULL);
-}
-
-//----------------------------------------------------------------------------
 vtkPVPolyDataSource* vtkPVPolyDataSource::New()
 {
   return new vtkPVPolyDataSource();
@@ -81,26 +75,78 @@ vtkPVPolyData *vtkPVPolyDataSource::GetOutput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPolyDataSource::InitializeData()
+// Functions to update the progress bar
+void vtkPVSourceStartProgress(void *arg)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVPolyData *pvd;
-  vtkPVAssignment *a;
-  vtkPVActorComposite *ac;
+  vtkPVPolyDataSource *me = (vtkPVPolyDataSource*)arg;
+  vtkPolyDataSource *vtkSource = me->GetPolyDataSource();
+  static char str[200];
+  
+  if (vtkSource)
+    {
+    sprintf(str, "Processing %s", vtkSource->GetClassName());
+    me->GetWindow()->SetStatusText(str);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSourceReportProgress(void *arg)
+{
+  vtkPVPolyDataSource *me = (vtkPVPolyDataSource*)arg;
+  vtkPolyDataSource *vtkSource = me->GetPolyDataSource();
+
+  me->GetWindow()->GetProgressGauge()->SetValue((int)(vtkSource->GetProgress() * 100));
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSourceEndProgress(void *arg)
+{
+  vtkPVPolyDataSource *me = (vtkPVPolyDataSource*)arg;
+  me->GetWindow()->SetStatusText("");
+  me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPolyDataSource::AcceptCallback()
+{
   vtkPVWindow *window = this->GetWindow();
  
-  pvd = vtkPVPolyData::New();
-  pvd->Clone(pvApp);
-  a = vtkPVAssignment::New();
-  a->Clone(pvApp);
+  this->vtkPVSource::AcceptCallback();
   
-  pvd->SetAssignment(a);
-  this->SetOutput(pvd);
+  if (this->PolyDataSource == NULL)
+    {
+    vtkErrorMacro("Source has not been set.");
+    }
+
+  if (this->GetPVData() == NULL)
+    { // This is the first time, initialize data.  
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    vtkPVPolyData *pvd;
+    vtkPVAssignment *a;
+    vtkPVActorComposite *ac;
+
+    this->PolyDataSource->SetStartMethod(vtkPVSourceStartProgress, this);
+    this->PolyDataSource->SetProgressMethod(vtkPVSourceReportProgress, this);
+    this->PolyDataSource->SetEndMethod(vtkPVSourceEndProgress, this);
   
-  this->CreateDataPage();
+    pvd = vtkPVPolyData::New();
+    pvd->Clone(pvApp);
+    a = vtkPVAssignment::New();
+    a->Clone(pvApp);
+    
+    pvd->SetAssignment(a);
+    this->SetOutput(pvd);
+    
+    this->CreateDataPage();
   
-  ac = this->GetPVData()->GetActorComposite();
-  window->GetMainView()->AddComposite(ac);
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
+    window->GetMainView()->ResetCamera();
+    }
+
+  window->GetMainView()->SetSelectedComposite(this);  
+  this->GetView()->Render();
+  window->GetSourceList()->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -113,4 +159,18 @@ void vtkPVPolyDataSource::SelectInputSource()
   this->GetView()->Render();
   this->GetWindow()->GetMainView()->ResetCamera();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

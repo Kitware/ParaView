@@ -57,7 +57,7 @@ public:
   // This method gets called when the accept button is pressed
   // for the first time.  It creates a pvData and an actor composite
   // to display the data.
-  void InitializeData();
+  void AcceptCallback();
 
   // Description:
   // This method is called when the GetSource button is pressed.
@@ -70,13 +70,17 @@ public:
   void SetOutput(vtkPVPolyData *pvd);
   vtkPVPolyData *GetOutput();
   
+  // A method needed by the auto UI.  
+  // It should be moved to a superclass.
+  vtkSource *GetVTKSource () { return this->PolyDataSource;}
+  
 protected:
   vtkPVPolyDataSource();
-  ~vtkPVPolyDataSource();
+  ~vtkPVPolyDataSource() {};
   vtkPVPolyDataSource(const vtkPVPolyDataSource&) {};
   void operator=(const vtkPVPolyDataSource&) {};
   
-  vtkPolyDataSource *PolyDataSource;
+  vtkPolyDataSource *PolyDataSource;  
 };
 
 #endif

@@ -30,6 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
 #include "vtkKWView.h"
+#include "vtkKWScale.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVWindow.h"
 
@@ -49,6 +50,9 @@ vtkPVSource::vtkPVSource()
   
   this->DataCreated = 0;
 
+  this->NavigationFrame = vtkKWLabeledFrame::New();
+  this->ParameterFrame = vtkKWLabeledFrame::New();
+  this->AcceptButton = vtkKWPushButton::New();
   
   this->Widgets = vtkKWWidgetCollection::New();
   
@@ -73,11 +77,20 @@ vtkPVSource::~vtkPVSource()
     }
   this->SetName(NULL);
   this->Properties->Delete();
+  this->Properties = NULL;
 
+  this->NavigationFrame->Delete();
+  this->NavigationFrame = NULL;
+
+  this->ParameterFrame->Delete();
+  this->ParameterFrame = NULL;
 
   this->Widgets->Delete();
   this->Widgets = NULL;
 
+  this->AcceptButton->Delete();
+  this->AcceptButton = NULL;  
+  
   this->DeleteAcceptCommands();
 }
 
@@ -172,12 +185,30 @@ void vtkPVSource::CreateProperties()
   // invoke super
   this->vtkKWComposite::CreateProperties();  
 
+  // Set up the pages of the notebook.
   sourcePage = this->GetClassName();
   this->Notebook->AddPage(sourcePage);
   this->Properties->SetParent(this->Notebook->GetFrame(sourcePage));
   this->Properties->Create(this->Application,"frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());
+  
+  // Setup the source page of the notebook.
+  this->NavigationFrame->SetParent(this->Properties);
+  this->NavigationFrame->Create(this->Application);
+  this->NavigationFrame->SetLabel("Navigation");
+  this->Script("pack %s -fill x -expand t -side top", this->NavigationFrame->GetWidgetName());
+
+  this->ParameterFrame->SetParent(this->Properties);
+  this->ParameterFrame->Create(this->Application);
+  this->ParameterFrame->SetLabel("Parameters");
+  this->Script("pack %s -fill x -expand t -side top", this->ParameterFrame->GetWidgetName());
+
+  this->AcceptButton->SetParent(this->ParameterFrame->GetFrame());
+  this->AcceptButton->Create(this->Application, "-text Accept");
+  this->AcceptButton->SetCommand(this, "AcceptCallback");
+  this->Script("pack %s", this->AcceptButton->GetWidgetName());
+
 }
 
 //----------------------------------------------------------------------------
@@ -332,7 +363,7 @@ void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd)
 {
   vtkKWLabeledEntry *entry = vtkKWLabeledEntry::New();
   this->Widgets->AddItem(entry);
-  entry->SetParent(this->Properties);
+  entry->SetParent(this->ParameterFrame->GetFrame());
   entry->Create(this->Application);
   entry->SetLabel(label);
 
@@ -354,7 +385,7 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
   // First a frame to hold the other widgets.
   vtkKWWidget *frame = vtkKWWidget::New();
   this->Widgets->AddItem(frame);
-  frame->SetParent(this->Properties);
+  frame->SetParent(this->ParameterFrame->GetFrame());
   frame->Create(this->Application, "frame", "");
   this->Script("pack %s", frame->GetWidgetName());
 
@@ -399,7 +430,7 @@ void vtkPVSource::AddXYZEntry(char *label, char *setCmd, char *getCmd)
   // First a frame to hold the other widgets.
   frame = vtkKWWidget::New();
   this->Widgets->AddItem(frame);
-  frame->SetParent(this->Properties);
+  frame->SetParent(this->ParameterFrame->GetFrame());
   frame->Create(this->Application, "frame", "");
   this->Script("pack %s", frame->GetWidgetName());
 
@@ -471,7 +502,7 @@ void vtkPVSource::AddXYZEntry(char *label, char *setCmd, char *getCmd)
 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects are going to have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s {[%s GetValue] [%s GetValue] [%s GetValue]}",
+  this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
                           this->GetTclName(), setCmd, xEntry->GetTclName(),
                           yEntry->GetTclName(), zEntry->GetTclName());
 
@@ -482,13 +513,70 @@ void vtkPVSource::AddXYZEntry(char *label, char *setCmd, char *getCmd)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSource::AddSlider(char *label, char *setCmd, char *getCmd, 
+			    float min, float max, float resolution)
+{
+  vtkKWWidget *frame;
+  vtkKWLabel *labelWidget;
+  vtkKWScale *slider;
+
+  // First a frame to hold the other widgets.
+  frame = vtkKWWidget::New();
+  this->Widgets->AddItem(frame);
+  frame->SetParent(this->ParameterFrame->GetFrame());
+  frame->Create(this->Application, "frame", "");
+  this->Script("pack %s", frame->GetWidgetName());
+
+  // Now a label
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(label);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+
+  slider = vtkKWScale::New();
+  this->Widgets->AddItem(slider);
+  slider->SetParent(frame);
+  slider->Create(this->Application, "-showvalue 1");
+  slider->SetRange(min, max);
+  slider->SetResolution(resolution);
+  this->Script("pack %s -side left", slider->GetWidgetName());
+
+  // Get initial value from the vtk source.
+  this->Script("%s SetValue [[%s GetVTKSource] %s]", 
+               slider->GetTclName(), this->GetTclName(), getCmd); 
+
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects are going to have to have the same Tcl name!
+  this->AddAcceptCommand("%s AcceptHelper %s [%s GetValue]",
+			 this->GetTclName(), setCmd, slider->GetTclName());
+
+  frame->Delete();
+  labelWidget->Delete();
+  slider->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AcceptCallback()
+{
+  int i;
+
+  // Call the commands to set ivars from widget values.
+  for (i = 0; i < this->NumberOfAcceptCommands; ++i)
+    {
+    this->Script(this->AcceptCommands[i]);
+    }  
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSource::AcceptHelper(char *method, char *args)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   pvApp->Script("[%s GetVTKSource] %s %s", this->GetTclName(),
                 method, args);
 
-  vtkErrorMacro("[" << this->GetTclName() << " GetVTKSource] " 
+  vtkDebugMacro("[" << this->GetTclName() << " GetVTKSource] " 
                 << method << " " << args);
 
 

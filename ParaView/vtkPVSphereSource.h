@@ -33,14 +33,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVSphereSource_h
 #define __vtkPVSphereSource_h
 
-#include "vtkSphereSource.h"
-#include "vtkShrinkPolyData.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWLabeledEntry.h"
 #include "vtkPVPolyDataSource.h"
-
-class vtkPVPolyData;
-
 
 class VTK_EXPORT vtkPVSphereSource : public vtkPVPolyDataSource
 {
@@ -52,28 +45,11 @@ public:
   // You have to clone this object before you can create it.
   void CreateProperties();
 
-  // Description:
-  // Used internally to cast source to vtkSphereSource.
-  // It might be wise to protect this method.
-  vtkSphereSource *GetSphereSource();
-  
-  // Description:
-  // Accept button callback.  It takes the Widget states and sets the 
-  // sphere sources parameters.
-  void SphereParameterChanged();
-
-  // Description:
-  // A method needed by the auto UI.  
-  // It should be moved to a superclass.
-  vtkSource *GetVTKSource () { return this->PolyDataSource;}
-
 protected:
   vtkPVSphereSource();
-  ~vtkPVSphereSource();
+  ~vtkPVSphereSource() {};
   vtkPVSphereSource(const vtkPVSphereSource&) {};
   void operator=(const vtkPVSphereSource&) {};
-  
-  vtkKWPushButton *Accept;
 };
 
 #endif
