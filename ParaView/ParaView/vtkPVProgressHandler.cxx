@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.2");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.3");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -428,34 +428,34 @@ void vtkPVProgressHandler::CleanupPendingProgress(vtkPVApplication* app)
   int progress = -1;
   switch ( this->ProgressType )
     {
-  case vtkPVProgressHandler::SingleProcessMPI:
-  case vtkPVProgressHandler::ClientServerServerMPI:
-    while ( this->ReceiveProgressFromSatellite(&id, &progress) ) 
-      {
-      vtkClientServerID nid;
-      nid.ID = id;
-      vtkObjectBase* base = app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid);
-      if ( base )
+    case vtkPVProgressHandler::SingleProcessMPI:
+    case vtkPVProgressHandler::ClientServerServerMPI:
+      while ( this->ReceiveProgressFromSatellite(&id, &progress) ) 
         {
-        if ( vtkPVProgressHandler::SingleProcessMPI )
+        vtkClientServerID nid;
+        nid.ID = id;
+        vtkObjectBase* base = app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid);
+        if ( base )
           {
-          this->LocalDisplayProgress(app, base->GetClassName(), progress);
+          if ( this->ProgressType == vtkPVProgressHandler::SingleProcessMPI )
+            {
+            this->LocalDisplayProgress(app, base->GetClassName(), progress);
+            }
+          else
+            {
+            char buffer[1024];
+            buffer[0] = progress;
+            sprintf(buffer+1, "%s", base->GetClassName());
+            int len = strlen(buffer+1) + 2;
+            this->SocketController->Send(buffer, len, 1, PVAPPLICATION_PROGRESS_TAG);
+            }
           }
         else
           {
-          char buffer[1024];
-          buffer[0] = progress;
-          sprintf(buffer+1, "%s", base->GetClassName());
-          int len = strlen(buffer+1) + 2;
-          this->SocketController->Send(buffer, len, 1, PVAPPLICATION_PROGRESS_TAG);
+          vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
+          vtkPVApplication::Abort();
           }
         }
-      else
-        {
-        vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
-        vtkPVApplication::Abort();
-        }
-      }
     }
   this->ReceivingProgressReports = 0;
 }
