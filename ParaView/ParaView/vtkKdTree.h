@@ -223,8 +223,8 @@ public:
     //    region list is provided, the cell lists for all regions are
     //    created.
 
-    void CreateCellList(int DataSet, int *regionList, int listSize);
-    void CreateCellList(vtkDataSet *set, int *regionList, int listSize);
+    void CreateCellList(int DataSet, vtkIdType *regionList, int listSize);
+    void CreateCellList(vtkDataSet *set, vtkIdType *regionList, int listSize);
     void CreateCellList(vtkIdType *regionList, int listSize);
     void CreateCellList();
 
@@ -233,9 +233,9 @@ public:
     //    specified, assume DataSet 0.  If no region list is provided, 
     //    free memory used by all cell lists computed.
 
-    void DeleteCellList(int DataSet, int *regionList, int listSize);
-    void DeleteCellList(vtkDataSet *set, int *regionList, int listSize);
-    void DeleteCellList(int *regionList, int listSize);
+    void DeleteCellList(int DataSet, vtkIdType *regionList, int listSize);
+    void DeleteCellList(vtkDataSet *set, vtkIdType *regionList, int listSize);
+    void DeleteCellList(vtkIdType *regionList, int listSize);
     void DeleteCellList();
 
     // Description:
@@ -387,7 +387,7 @@ protected:
 
     struct _cellList{
       vtkDataSet *dataSet;
-      int *regionIds;
+      vtkIdType *regionIds;
       int nRegions;
       vtkIdList **cells;
     };
@@ -511,9 +511,9 @@ private:
 //BTX
     static void DeleteAllCellLists(struct vtkKdTree::_cellList *list);
     void DeleteSomeCellLists(struct vtkKdTree::_cellList *list, 
-              int ndelete, int *rlist, int listsize);
+              int ndelete, vtkIdType *rlist, int listsize);
 //ETX
-    static int OnList(int *list, int size, int n);
+    static int OnList(vtkIdType *list, int size, vtkIdType n);
 
     static vtkKdNode **_GetRegionsAtLevel(int level, 
                    vtkKdNode **nodes, vtkKdNode *kd);
