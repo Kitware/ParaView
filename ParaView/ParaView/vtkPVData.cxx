@@ -633,6 +633,13 @@ void vtkPVData::ForceUpdate(vtkPVApplication* pvApp)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::DeleteCallback()
+{
+  this->SetCubeAxesVisibility(0);
+  this->SetScalarBarVisibility(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVData::SetPVApplication(vtkPVApplication *pvApp)
 {
   this->CreateParallelTclObjects(pvApp);

@@ -771,6 +771,8 @@ void vtkPVSource::DeleteCallback()
   vtkPVData *ac;
   vtkPVSource *prev = NULL;
   vtkPVWindow *window = this->GetPVWindow();
+  
+  this->GetPVOutput()->DeleteCallback();
 
   // Just in case cursor was left in a funny state.
 #ifdef _WIN32

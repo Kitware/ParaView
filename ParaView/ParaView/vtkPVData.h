@@ -332,7 +332,11 @@ public:
   // process to render and to compute array ranges etc.
   vtkGetMacro(RenderOnlyLocally, int);
   vtkSetMacro(RenderOnlyLocally, int);
-
+  
+  // Description:
+  // Called by vtkPVSource::DeleteCallback().
+  void DeleteCallback();
+  
 protected:
   vtkPVData();
   ~vtkPVData();
