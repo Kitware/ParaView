@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.27.2.2");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.27.2.3");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -293,7 +293,7 @@ void vtkPVSourceList::EditColor(int )
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceList::ChildUpdate(vtkPVSource* current, int NoBind)
+void vtkPVSourceList::ChildUpdate(vtkPVSource* current)
 {
   vtkPVSource *comp;
   int y, in;
@@ -322,7 +322,7 @@ void vtkPVSourceList::ChildUpdate(vtkPVSource* current, int NoBind)
       {
       lasty = y;
       }
-    y = this->UpdateSource(comp, y, in, (current == comp), NoBind);
+    y = this->UpdateSource(comp, y, in, (current == comp));
     if ( current == comp )
       {
       thisy = y;
@@ -333,7 +333,7 @@ void vtkPVSourceList::ChildUpdate(vtkPVSource* current, int NoBind)
   if ( thisy == 0 )
     {
     lasty = y;
-    y = this->UpdateSource(current, y, in, 1, NoBind);
+    y = this->UpdateSource(current, y, in, 1);
     thisy = y;
     }
 
@@ -402,8 +402,7 @@ void vtkPVSourceList::UpdateVisibility(vtkPVSource *comp,
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current,
-                                  int noBind)
+int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in,int current)
 {
   int compIdx, x, yNext; 
   static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
@@ -439,25 +438,16 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current,
   x = in + image_icon_max_width + 4;
 
   // Draw the name of the assembly.
-  if (comp->GetDescription())
-    {
-    this->Script(
-      "%s create text %d %d -text {%s (%s)} -font %s -anchor w -tags x",
-      this->Canvas->GetWidgetName(), x, y, comp->GetDescription(), 
-      comp->GetName(), font);
-    }
-  else
-    {
-    this->Script(
-      "%s create text %d %d -text {%s} -font %s -anchor w -tags x",
-      this->Canvas->GetWidgetName(), x, y, comp->GetName(), font);
-    }
+  char *text = this->GetTextRepresentation(comp);
+  this->Script("%s create text %d %d -text {%s} -font %s -anchor w -tags x",
+               this->Canvas->GetWidgetName(), x, y, text, font);
+  delete [] text;
 
   // Make the name hot for picking.
   result = this->Application->GetMainInterp()->result;
   tmp = new char[strlen(result)+1];
   strcpy(tmp,result);
-  if ( !noBind )
+  if (this->CreateSelectionBindings)
     {
     this->Script("%s bind %s <ButtonPress-1> {%s Pick %d}",
                  this->Canvas->GetWidgetName(), tmp,

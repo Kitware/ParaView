@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.2");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.3");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -64,6 +64,8 @@ vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
   this->Canvas    = vtkKWWidget::New();
   this->ScrollBar = vtkKWWidget::New();
   this->PopupMenu = vtkKWMenu::New();
+  this->ShowNameAndDescription = 0;
+  this->CreateSelectionBindings = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -107,19 +109,19 @@ const char* vtkPVSourcesNavigationWindow::CreateCanvasItem(const char *format, .
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::ChildUpdate(vtkPVSource*,int)
+void vtkPVSourcesNavigationWindow::ChildUpdate(vtkPVSource*)
 {
   vtkErrorMacro(<< "Subclass should do this.");
   vtkErrorMacro(<< "I am " << this->GetClassName());
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::Update(vtkPVSource *currentSource, int nobind)
+void vtkPVSourcesNavigationWindow::Update(vtkPVSource *currentSource)
 {
   // Clear the canvas
   this->Script("%s delete all", this->Canvas->GetWidgetName());
 
-  this->ChildUpdate(currentSource, nobind);
+  this->ChildUpdate(currentSource);
 
   this->Reconfigure();
 }
@@ -264,6 +266,31 @@ void vtkPVSourcesNavigationWindow::SetHeight(int height)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::SetShowNameAndDescription(int val)
+{
+  if (this->ShowNameAndDescription == val)
+    {
+    return;
+    }
+
+  this->ShowNameAndDescription = val;
+  this->Modified();
+
+  if (this->Application)
+    {
+    vtkPVApplication* app = vtkPVApplication::SafeDownCast(this->Application);
+    if (app)
+      {
+      vtkPVWindow* window = app->GetMainWindow();
+      if (window)
+        {
+        this->Update(window->GetCurrentPVSource());
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::HighlightObject(const char* widget, int onoff)
 {
   this->Script("%s itemconfigure %s -fill %s", 
@@ -343,14 +370,39 @@ void vtkPVSourcesNavigationWindow::ExecuteCommandOnModule(
 }
 
 //-----------------------------------------------------------------------------
+char* vtkPVSourcesNavigationWindow::GetTextRepresentation(vtkPVSource* comp)
+{
+  char *buffer;
+  if (!comp->GetDescription())
+    {
+    buffer = new char [strlen(comp->GetName()) + 1];
+    sprintf(buffer, "%s", comp->GetName());
+    }
+  else
+    {
+    if (this->ShowNameAndDescription && comp->GetName() && *comp->GetName())
+      {
+      buffer = new char [strlen(comp->GetDescription())
+                        + 2
+                        + strlen(comp->GetName()) 
+                        + 1
+                        + 1];
+      sprintf(buffer, "%s (%s)", comp->GetDescription(), comp->GetName());
+      }
+    else
+      {
+      buffer = new char [strlen(comp->GetDescription()) + 1];
+      sprintf(buffer, "%s", comp->GetDescription());
+      }
+    }
+  return buffer;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Canvas: " << this->GetCanvas() << endl;
+  os << indent << "ShowNameAndDescription: " << this->ShowNameAndDescription << endl;
+ os << indent << "CreateSelectionBindings: " << this->CreateSelectionBindings << endl;
 }
-
-
-
-
-
-

@@ -77,7 +77,7 @@ public:
 
   // Description:
   // Regenerate the display and re-assign bindings.
-  void Update(vtkPVSource *currentSource, int nobind);
+  void Update(vtkPVSource *currentSource);
 
   // Description:
   // Highlight the object.
@@ -99,6 +99,21 @@ public:
   // This method is called when canvas size changes.
   virtual void Reconfigure();
  
+  // Description:
+  // Enable/disable the fact that the source name will be displayed
+  // even if the description is not empty.
+  virtual void SetShowNameAndDescription(int);
+  vtkGetMacro(ShowNameAndDescription, int);
+  vtkBooleanMacro(ShowNameAndDescription, int);
+ 
+  // Description:
+  // Enable/disable the fact that selection bindings are set for each entry
+  // in the canvas. It does *not* create these bindings, they will be 
+  // created or removed by the next call to Update() or ChildUpdate().
+  vtkSetMacro(CreateSelectionBindings, int);
+  vtkGetMacro(CreateSelectionBindings, int);
+  vtkBooleanMacro(CreateSelectionBindings, int);
+ 
 protected:
   vtkPVSourcesNavigationWindow();
   ~vtkPVSourcesNavigationWindow();
@@ -110,7 +125,7 @@ protected:
   // Description:
   // This method is called at beginning of the Update method. The
   // subclass is supposed to overwrite it.
-  virtual void ChildUpdate(vtkPVSource* currentSource, int NoBind);
+  virtual void ChildUpdate(vtkPVSource* currentSource);
 
   // Description:
   // This method is called at the end of Update method. If the
@@ -127,12 +142,20 @@ protected:
 //BTX
   const char* CreateCanvasItem(const char *format, ...);
 //ETX
-  
+
+  // Return the textual representation of the composite (i.e. its name and/or
+  // its description. Memory is allocated, a pointer is return, it's up to
+  // the caller to delete it.
+  char* GetTextRepresentation(vtkPVSource* comp);
+
   int Width;
   int Height;
   vtkKWWidget* Canvas;
   vtkKWWidget* ScrollBar;
   vtkKWMenu* PopupMenu;
+
+  int ShowNameAndDescription;
+  int CreateSelectionBindings;
 
 private:
   vtkPVSourcesNavigationWindow(const vtkPVSourcesNavigationWindow&); // Not implemented
@@ -141,5 +164,3 @@ private:
 
 
 #endif
-
-
