@@ -75,7 +75,6 @@ SET( KWWidgets_SRCS
   vtkKWSplashScreen.cxx
   vtkKWSplitFrame.cxx
   vtkKWTclInteractor.cxx
-  vtkKWTesting.cxx
   vtkKWText.cxx 
   vtkKWTextProperty.cxx
   vtkKWThumbWheel.cxx
@@ -208,6 +207,9 @@ ENDIF (VTK_USE_PATENTED AND VTK_WRAP_TCL)
 SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
 
 IF(BUILD_TESTING)
+  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
+    vtkKWTesting.cxx
+    )
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
 
