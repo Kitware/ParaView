@@ -45,6 +45,7 @@ SET( ParaView_SRCS
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSetFileEntry.cxx
   vtkPVDataSetReaderModule.cxx
+  ${CMAKE_CURRENT_SOURCE_DIR}/../Filters/vtkPVDuplicatePolyData.cxx
   vtkPVDummyWidget.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
@@ -181,10 +182,6 @@ IF (PARAVIEW_USE_ICE_T)
     ABSTRACT
     )
 ENDIF (PARAVIEW_USE_ICE_T)
-
-IF(NOT PARAVIEW_NO_HDF5)
-  SET(ParaView_SRCS ${ParaView_SRCS} vtkHDF5RawImageReader.cxx)
-ENDIF(NOT PARAVIEW_NO_HDF5)
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVApplicationResources
@@ -331,10 +328,6 @@ IF(UNIX)
   ENDIF(NOT APPLE)
 ENDIF(UNIX)
 
-
-IF(NOT PARAVIEW_NO_HDF5)
-  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${PARAVIEW_HDF5_LIBRARIES})
-ENDIF(NOT PARAVIEW_NO_HDF5)
 
 ADD_EXECUTABLE(ProcessXML ProcessXML.cxx)
 TARGET_LINK_LIBRARIES(ProcessXML vtkCommon)
