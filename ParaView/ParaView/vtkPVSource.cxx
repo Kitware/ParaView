@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.9");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.10");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1610,6 +1610,7 @@ void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
   pvw->SetTraceReferenceObject(this);
   sprintf(str, "GetPVWidget {%s}", pvw->GetTraceName());
   pvw->SetTraceReferenceCommand(str);
+  pvw->Select();
 }
 
 //----------------------------------------------------------------------------
@@ -2086,7 +2087,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.9 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.10 $");
 }
 
 //----------------------------------------------------------------------------

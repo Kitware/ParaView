@@ -108,9 +108,17 @@ public:
   void SetPoint2LabelTextName(const char* varname);
   void SetResolutionLabelTextName(const char* varname);
 
+  // Description:
+  // Labels for entries
   vtkGetStringMacro(Point1LabelText);
   vtkGetStringMacro(Point2LabelText);
   vtkGetStringMacro(ResolutionLabelText);
+
+  // Description:
+  // Determines whether the Resolution entry is shown.
+  vtkGetMacro(ShowResolution, int);
+  vtkSetMacro(ShowResolution, int);
+  vtkBooleanMacro(ShowResolution, int);
 
   // Description:
   // This method does the actual placing. It sets the first point at 
@@ -179,6 +187,8 @@ protected:
   char *Point1LabelText;
   char *Point2LabelText;
   char *ResolutionLabelText;
+
+  int ShowResolution;
 
 private:  
   vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.16.2.1");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.16.2.2");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -522,7 +522,10 @@ void vtkPVSelectWidget::Select()
 {
   vtkPVWidget *pvw;
   pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
-  pvw->Select();
+  if (pvw)
+    {
+    pvw->Select();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -530,7 +533,10 @@ void vtkPVSelectWidget::Deselect()
 {
   vtkPVWidget *pvw;
   pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
-  pvw->Deselect();
+  if (pvw)
+    {
+    pvw->Deselect();
+    }
 }
 
 //----------------------------------------------------------------------------

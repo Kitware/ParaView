@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.28.2.2");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.28.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -84,6 +84,8 @@ vtkPVLineWidget::vtkPVLineWidget()
   this->SetPoint1LabelTextName("Point 1");
   this->SetPoint2LabelTextName("Point 2");
   this->SetResolutionLabelTextName("Resolution");
+
+  this->ShowResolution = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -363,10 +365,10 @@ void vtkPVLineWidget::UpdateVTKObject()
 void vtkPVLineWidget::ActualPlaceWidget()
 {
   vtkDataSet* data = 0;
+  float bounds[6];
   if ( this->PVSource->GetPVInput() )
     {
     data = this->PVSource->GetPVInput()->GetVTKData();
-    float bounds[6];
     this->PVSource->GetPVInput()->GetBounds(bounds);
 
     this->SetPoint1((bounds[0]+bounds[1])/2, 
@@ -376,9 +378,14 @@ void vtkPVLineWidget::ActualPlaceWidget()
                     bounds[3], 
                     (bounds[4]+bounds[5])/2);
     }
+  else
+    {
+    bounds[0] = bounds[2] = bounds[4] = 0.0;
+    bounds[1] = bounds[3] = bounds[5] = 1.0;
+    }
   this->Widget3D->SetInput(data);
 
-  this->Widget3D->PlaceWidget();  
+  this->Widget3D->PlaceWidget(bounds);
   this->UpdateVTKObject();
 }
 
@@ -474,6 +481,7 @@ void vtkPVLineWidget::CopyProperties(vtkPVWidget* clone,
     pvlw->SetPoint1LabelTextName(this->GetPoint1LabelText());
     pvlw->SetPoint2LabelTextName(this->GetPoint2LabelText());
     pvlw->SetResolutionLabelTextName(this->GetResolutionLabelText());
+    pvlw->SetShowResolution(this->ShowResolution);
     }
   else 
     {
@@ -522,6 +530,13 @@ int vtkPVLineWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->SetResolutionLabelTextName(resolution_label);
     }
+
+  int showResolution;
+  if (element->GetScalarAttribute("show_resolution", &showResolution))
+    {
+    this->SetShowResolution(showResolution);
+    }
+
   return 1;
 }
 
@@ -609,9 +624,12 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
                this->Point2[0]->GetWidgetName(),
                this->Point2[1]->GetWidgetName(),
                this->Point2[2]->GetWidgetName());
-  this->Script("grid %s %s - - -sticky ew",
-               this->ResolutionLabel->GetWidgetName(),
-               this->ResolutionEntry->GetWidgetName());
+  if (this->ShowResolution)
+    {
+    this->Script("grid %s %s - - -sticky ew",
+                 this->ResolutionLabel->GetWidgetName(),
+                 this->ResolutionEntry->GetWidgetName());
+    }
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
                this->Frame->GetFrame()->GetWidgetName());
