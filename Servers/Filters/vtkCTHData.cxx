@@ -39,7 +39,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.22");
+vtkCxxRevisionMacro(vtkCTHData, "1.23");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -593,6 +593,7 @@ void vtkCTHData::CopyStructure(vtkDataSet *ds)
     }
   this->DataDescription = src->DataDescription;
   this->CopyInformation(src);
+  this->SetNumberOfGhostLevels(src->GetNumberOfGhostLevels());
 
   this->SetNumberOfBlocks(src->GetNumberOfBlocks());
   for (i = 0; i < src->GetNumberOfBlocks(); ++i)
