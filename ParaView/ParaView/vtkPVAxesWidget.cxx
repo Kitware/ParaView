@@ -29,7 +29,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.11");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -688,6 +688,12 @@ void vtkPVAxesWidget::SquareRenderer()
   double deltaX = vp[2] - vp[0];
   double newDeltaX = size[1] * deltaX / (double)size[0];
   vp[2] = vp[0] + newDeltaX;
+
+  if (vp[2] > 1)
+    {
+    vp[2] = 1;
+    vp[0] = vp[2] - newDeltaX;
+    }
   
   this->Renderer->SetViewport(vp);
   
