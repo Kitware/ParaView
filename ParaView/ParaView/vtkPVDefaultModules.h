@@ -220,6 +220,18 @@ const char* vtkPVInitialize::StandardReaderInterfaces =
 "  <ArraySelection attribute_name=\"Point\" />\n"
 "  <ArraySelection attribute_name=\"Cell\" />\n"
 " </Module>\n"
+" <Module name=\"HDF5RawImageReader\"\n"
+"         root_name=\"HDF5RawImageReader\"\n"
+"         output=\"vtkImageData\"\n"
+"         class=\"vtkPVAdvancedReaderModule\"\n"
+"         module_type=\"Reader\"\n"
+"         extensions=\".h5\"\n"
+"         file_description=\"HDF5 Raw ImageData Files\">\n"
+"  <Source class=\"vtkHDF5RawImageReader\"/>\n"
+"  <VectorEntry length=\"3\" variable=\"Stride\" trace_name=\"Stride\" type=\"int\" \n"
+"               help=\"Read a subset of data spaced by the stride.\"/>\n"
+"  <ArraySelection attribute_name=\"Point\"/>\n"
+" </Module>\n"
 "</ModuleInterfaces>\n";
 
 // Define the standard source interfaces.
