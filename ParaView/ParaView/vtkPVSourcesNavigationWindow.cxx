@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.4");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.5");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -282,7 +282,7 @@ void vtkPVSourcesNavigationWindow::SetAlwaysShowName(int val)
     if (app)
       {
       vtkPVWindow* window = app->GetMainWindow();
-      if (window)
+      if (window && window->GetCurrentPVSource())
         {
         this->Update(window->GetCurrentPVSource());
         }
