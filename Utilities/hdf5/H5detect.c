@@ -429,8 +429,9 @@ precision (detected_t *d)
  *-------------------------------------------------------------------------
  */
 static void
-sigsegv_handler(int UNUSED signo)
+sigsegv_handler(int signo)
 {
+    (void)signo;
     signal(SIGSEGV, sigsegv_handler);
     longjmp(jbuf_g, 1);
 }
@@ -454,8 +455,9 @@ sigsegv_handler(int UNUSED signo)
  *-------------------------------------------------------------------------
  */
 static void
-sigbus_handler(int UNUSED signo)
+sigbus_handler(int signo)
 {
+    (void)signo;
     signal(SIGBUS, sigbus_handler);
     longjmp(jbuf_g, 1);
 }
