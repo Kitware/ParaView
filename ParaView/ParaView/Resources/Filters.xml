@@ -917,13 +917,13 @@
                help="Set the input to this filter."
                input_name="Input"/>
     <!-- keeping vector entries with length > 1 -->
-    <VectorEntry label="Spacing"
-                 trace_name="DivisionSpacing"
-                 variable="DivisionSpacing"
-                 type="float"
+    <VectorEntry label="Divisions"
+                 trace_name="NumberOfDivisions"
+                 variable="NumberOfDivisions"
+                 type="int"
                  length="3"
-                 help="Set the spacing of the bins in each dimension"
-                 default_value="1.0 1.0 1.0"/>
+                 help="Set the number of bins in each dimension"
+                 default_value="50 50 50"/>
     <LabeledToggle label="Use input points"
                    trace_name="UseInputPoints"
                    variable="UseInputPoints"
