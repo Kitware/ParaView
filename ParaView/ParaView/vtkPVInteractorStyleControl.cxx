@@ -505,7 +505,6 @@ int vtkPVInteractorStyleControl::SetManipulator(int pos, const char* name)
     }
   if ( !this->GetManipulator(name) ) 
     {
-    vtkErrorMacro("Manipulator: " << name << " does not exist");
     return 0;
     }
   this->Menus[pos]->SetValue(name);
