@@ -26,6 +26,7 @@ SET(Filters_SRCS
   vtkPVGeometryFilter.cxx
   vtkPVXMLElement.cxx
   vtkPVXMLParser.cxx
+  vtkCellCenterDepthSort.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
   vtkCTHData.cxx
@@ -45,6 +46,7 @@ SET(Filters_SRCS
   vtkMazeSource.cxx
   vtkMergeArrays.cxx
   vtkPickFilter.cxx
+  vtkProjectedTetrahedraMapper.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
@@ -64,7 +66,9 @@ SET(Filters_SRCS
   vtkPVUpdateSuppressor.cxx
   vtkPVWarpScalar.cxx
   vtkPVWarpVector.cxx
+  vtkSort.cxx
   vtkTiledDisplaySchedule.cxx
+  vtkVisibilitySort.cxx
   vtkVRMLSource.cxx
   vtkXMLPVDWriter.cxx
   vtkDataSetSubdivisionAlgorithm.cxx
@@ -89,6 +93,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkCTHDataToPolyDataFilter.cxx
   vtkSubdivisionAlgorithm.cxx 
   vtkPVRenderViewProxy.cxx
+  vtkVisibilitySort.cxx
   ABSTRACT)
 
 IF(VTK_USE_MPI)
