@@ -32,7 +32,7 @@
 #include "vtkKWParameterValueFunctionEditor.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.4");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.5");
 
 //*****************************************************************************
 class vtkPVHorizontalAnimationInterfaceObserver : public vtkCommand
@@ -135,6 +135,8 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char
   this->ParentTree->SetExpanded(1);
   this->ParentTree->GetTimeLine()->SetParameterRangePosition(
     vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop);
+  this->ParentTree->GetTimeLine()->SetCanvasOutlineStyle(
+    vtkKWParameterValueFunctionEditor::CanvasOutlineStyleAllSides);
 }
 
 //-----------------------------------------------------------------------------

@@ -72,7 +72,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.2");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.3");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -662,6 +662,9 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
   this->TimeLine->SetAnimationCue(this);
   this->TimeLine->SetParent(this->TimeLineFrame);
   this->TimeLine->Create(app, 0);
+  this->TimeLine->SetCanvasOutlineStyle(
+    vtkKWParameterValueFunctionEditor::CanvasOutlineStyleHorizontalSides |
+    vtkKWParameterValueFunctionEditor::CanvasOutlineStyleBottomSide);
 
   this->Frame->SetParent(this);
   ostrstream frame_options;
