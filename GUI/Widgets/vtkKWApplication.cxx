@@ -61,10 +61,10 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.179");
+vtkCxxRevisionMacro(vtkKWApplication, "1.180");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
+extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
 
 int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -719,7 +719,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   if (vtkKWApplication::WidgetVisibility)
     {
-    Vtkkwwidgetstcl_Init(interp);
+    Kwwidgetstcl_Init(interp);
 
     vtkKWBWidgets::Initialize(interp);
     }

@@ -1,4 +1,17 @@
 PROJECT(KWCommon)
+
+#############################################################################
+# to use this library in your code you will need to SUBDIR into this
+# directory so that it gets built and then you will use the following variables
+# in your CMakeLists files to get the proper include paths and libraries
+SET (KWCommon_INCLUDE_PATH 
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  CACHE INTERNAL "include paths for KWCommon"
+  )
+
+SET (KWCommon_LIBRARIES KWCommon CACHE INTERNAL "libraries for KWCommon")
+#############################################################################
+
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
 SET( KWCommon_SRCS
@@ -44,13 +57,13 @@ IF(VTK_ZLIB_INCLUDE_DIRS)
   INCLUDE_DIRECTORIES(${VTK_ZLIB_INCLUDE_DIRS})
 ENDIF(VTK_ZLIB_INCLUDE_DIRS)
 
-ADD_LIBRARY(vtkKWCommon ${KWCommon_SRCS})
+ADD_LIBRARY(KWCommon ${KWCommon_SRCS})
 
 IF(KWSYS_NAMESPACE)
-  TARGET_LINK_LIBRARIES (vtkKWCommon ${KWSYS_NAMESPACE})
+  TARGET_LINK_LIBRARIES (KWCommon ${KWSYS_NAMESPACE})
 ENDIF(KWSYS_NAMESPACE)
 
-TARGET_LINK_LIBRARIES (vtkKWCommon
+TARGET_LINK_LIBRARIES (KWCommon
   vtkFiltering
   vtkGenericFiltering
   vtkGraphics
@@ -80,7 +93,7 @@ IF(BUILD_SHARED_LIBS)
   IF(NOT KW_INSTALL_LIB_DIR)
     SET(KW_INSTALL_LIB_DIR /lib)
   ENDIF(NOT KW_INSTALL_LIB_DIR)
-  INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkKWCommon)
+  INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} KWCommon)
 ENDIF(BUILD_SHARED_LIBS)
 
 IF(BUILD_TESTING)
