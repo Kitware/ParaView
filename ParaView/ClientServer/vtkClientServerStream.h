@@ -258,8 +258,13 @@ public:
 
   // Description:
   // Get a string describing the given type.  Returns "unknown" if the
-  // type value is invalid.
+  // type value is invalid.  If the type has multiple possible names,
+  // the second argument can be used to specify the index of the name
+  // to use.  The higher the index, the more shorthand the name.  If
+  // the index is too high, the last name is used.
   static const char* GetStringFromType(vtkClientServerStream::Types type);
+  static const char* GetStringFromType(vtkClientServerStream::Types type,
+                                       int index);
 
   // Description:
   // Get the type named by the given string.  Returns
@@ -273,8 +278,10 @@ public:
 
   // Description:
   // Get the command named by the given string.  Returns
-  // vtkClientServerStream::EndOfCommands if the string is not recognized.
-  static vtkClientServerStream::Commands GetCommandFromString(const char* name);
+  // vtkClientServerStream::EndOfCommands if the string is not
+  // recognized.
+  static
+  vtkClientServerStream::Commands GetCommandFromString(const char* name);
 
   // Description:
   // Print the contents of the stream in a human-readable form.
@@ -285,6 +292,17 @@ public:
   void PrintArgument(ostream&, int message, int argument) const;
   void PrintArgument(ostream&, int message, int argument, vtkIndent) const;
   void PrintArgumentValue(ostream&, int message, int argument) const;
+
+  // Description:
+  // Convert the stream to a string-based encoding.
+  const char* StreamToString() const;
+  void StreamToString(ostream& os) const;
+
+  // Description:
+  // Set the stream by parsing the given string.  The syntax of the
+  // string must be that produced by the StreamToString method.
+  // Returns 1 if the string is successfully parsed and 0 otherwise.
+  int StreamFromString(const char* str);
 
 protected:
   // Write arbitrary data to the stream.  Used internally.
@@ -328,6 +346,32 @@ protected:
   // PrintArgumentValue.
   void PrintArgumentInternal(ostream&, int message, int argument,
                              int annotate, vtkIndent) const;
+
+  // String writing routines.
+  void StreamToString(ostream& os, vtkIndent indent) const;
+  void MessageToString(ostream& os, int m) const;
+  void MessageToString(ostream& os, int m, vtkIndent indent) const;
+  void ArgumentToString(ostream& os, int m, int a) const;
+  void ArgumentToString(ostream& os, int m, int a, vtkIndent indent) const;
+  void ArgumentValueToString(ostream& os, int m, int a,
+                             vtkIndent indent) const;
+
+  // Allow strings without null terminators to be passed into the stream.
+  static vtkClientServerStream::Array InsertString(const char* begin,
+                                                   const char* end);
+
+  // String reading routines.
+  static vtkClientServerStream::Types GetTypeFromString(const char* begin,
+                                                        const char* end);
+  static
+  vtkClientServerStream::Commands GetCommandFromString(const char* begin,
+                                                       const char* end);
+
+  int StreamFromStringInternal(const char* begin, const char* end);
+  int AddMessageFromString(const char* begin, const char* end,
+                           const char** next);
+  int AddArgumentFromString(const char* begin, const char* end,
+                            const char** next);
 private:
   vtkClientServerStreamInternals* Internal;
   friend class vtkClientServerStreamInternals;

@@ -21,6 +21,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkTypeFromNative.h"
 
+#include <vtkstd/string>
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
@@ -46,6 +47,25 @@
   case uint64_##kind: { vtkTypeUInt64* T = 0; call; } break;   \
   case float32_##kind: { vtkTypeFloat32* T = 0; call; } break; \
   case float64_##kind: { vtkTypeFloat64* T = 0; call; } break
+
+//----------------------------------------------------------------------------
+// Type string parsing functions.
+#define VTK_CSS_VALUE_FROM_STRING(type, format) \
+  static int ValueFromString(const char* str, type* value) \
+  { return sscanf(str, "%" format, value)?1:0; }
+
+VTK_CSS_VALUE_FROM_STRING(vtkTypeInt8, VTK_TYPE_FORMAT_INT8)
+VTK_CSS_VALUE_FROM_STRING(vtkTypeInt16, VTK_TYPE_FORMAT_INT16)
+VTK_CSS_VALUE_FROM_STRING(vtkTypeInt32, VTK_TYPE_FORMAT_INT32)
+VTK_CSS_VALUE_FROM_STRING(vtkTypeInt64, VTK_TYPE_FORMAT_INT64)
+VTK_CSS_VALUE_FROM_STRING(vtkTypeUInt8, VTK_TYPE_FORMAT_UINT8)
+VTK_CSS_VALUE_FROM_STRING(vtkTypeUInt16, VTK_TYPE_FORMAT_UINT16)
+VTK_CSS_VALUE_FROM_STRING(vtkTypeUInt32, VTK_TYPE_FORMAT_UINT32)
+VTK_CSS_VALUE_FROM_STRING(vtkTypeUInt64, VTK_TYPE_FORMAT_UINT64)
+VTK_CSS_VALUE_FROM_STRING(vtkTypeFloat32, VTK_TYPE_FORMAT_FLOAT32)
+VTK_CSS_VALUE_FROM_STRING(vtkTypeFloat64, VTK_TYPE_FORMAT_FLOAT64)
+
+#undef VTK_CSS_VALUE_FROM_STRING
 
 //----------------------------------------------------------------------------
 // Visual Studio 6 does not provide output operators for __int64.  We need
@@ -148,6 +168,9 @@ public:
 
   // Whether the stream has been constructed improperly.
   int Invalid;
+
+  // Buffer for return value from StreamToString.
+  vtkstd::string String;
 
   // Access to protected members of vtkClientServerStream.
   static vtkClientServerStream& Write(vtkClientServerStream& css,
@@ -344,7 +367,15 @@ vtkClientServerStream::operator << (vtkClientServerStream::Array a)
   // Store the array type, then length, then data.
   *this << a.Type;
   this->Write(&a.Length, sizeof(a.Length));
-  return this->Write(a.Data, a.Size);
+  this->Write(a.Data, a.Size);
+
+  // Special case for InsertString.  We need to add the null terminator.
+  if(a.Type == vtkClientServerStream::string_value)
+    {
+    char n = 0;
+    this->Write(&n, 1);
+    }
+  return *this;
 }
 
 //----------------------------------------------------------------------------
@@ -435,6 +466,31 @@ vtkClientServerStream& vtkClientServerStream::operator << (const char* x)
   *this << vtkClientServerStream::string_value;
   this->Write(&length, sizeof(length));
   return this->Write(x, static_cast<size_t>(length));
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerStream::Array
+vtkClientServerStream::InsertString(const char* begin, const char* end)
+{
+  // Make sure the string does not end early.
+  const char* c = begin;
+  while(c < end && *c)
+    {
+    ++c;
+    }
+  end = c;
+
+  // Construct a fake array with a string type.  This will be handled
+  // by the insertion operator with a special case for InsertString to
+  // add the null terminator.
+  vtkClientServerStream::Array a =
+    {
+      vtkClientServerStream::string_value,
+      static_cast<vtkTypeUInt32>(end-begin+1),
+      static_cast<vtkTypeUInt32>(end-begin),
+      begin
+    };
+  return a;
 }
 
 //----------------------------------------------------------------------------
@@ -1569,24 +1625,25 @@ vtkClientServerStream::GetArgumentType(int message, int argument) const
 //----------------------------------------------------------------------------
 // Map from the vtkClientServerStream::Types enumeration to strings.
 // This must be kept in-sync with the enumeration.
-static const char* const vtkClientServerStreamTypeNames[] =
+static const char* const vtkClientServerStreamTypeNames[][4] =
 {
-  "int8_value", "int8_array",
-  "int16_value", "int16_array",
-  "int32_value", "int32_array",
-  "int64_value", "int64_array",
-  "uint8_value", "uint8_array",
-  "uint16_value", "uint16_array",
-  "uint32_value", "uint32_array",
-  "uint64_value", "uint64_array",
-  "float32_value", "float32_array",
-  "float64_value", "float64_array",
-  "string_value",
-  "id_value",
-  "vtk_object_pointer",
-  "LastResult",
-  "End",
-  0
+  {"int8_value","int8","i8",0}, {"int8_array","int8a","i8a",0},
+  {"int16_value","int16","i16",0}, {"int16_array","int16a","i16a",0},
+  {"int32_value","int32","i32",0}, {"int32_array","int32a","i32a",0},
+  {"int64_value","int64","i64",0}, {"int64_array","int64a","i64a",0},
+  {"uint8_value","uint8","u8",0}, {"uint8_array","uint8a","u8a",0},
+  {"uint16_value","uint16","u16",0}, {"uint16_array","uint16a","u16a",0},
+  {"uint32_value","uint32","u32",0}, {"uint32_array","uint32a","u32a",0},
+  {"uint64_value","uint64","u64",0}, {"uint64_array","uint64a","u64a",0},
+  {"float32_value","float32","f32",0}, {"float32_array","float32a","f32a",0},
+  {"float64_value","float64","f64",0}, {"float64_array","float32a","f32a",0},
+  {"string_value","string","str",0},
+  {"id_value","id",0,0},
+  {"vtk_object_pointer","obj",0,0},
+  {"stream_value","stream",0,0},
+  {"LastResult","result",0,0},
+  {"End",0,0,0},
+  {0,0,0,0}
 };
 
 //----------------------------------------------------------------------------
@@ -1594,11 +1651,36 @@ const char*
 vtkClientServerStream
 ::GetStringFromType(vtkClientServerStream::Types type)
 {
+  return vtkClientServerStream::GetStringFromType(type, 0);
+}
+
+//----------------------------------------------------------------------------
+const char*
+vtkClientServerStream
+::GetStringFromType(vtkClientServerStream::Types type, int index)
+{
   // Lookup the type if it is in range.
   if(type >= vtkClientServerStream::int8_value &&
      type <= vtkClientServerStream::End)
     {
-    return vtkClientServerStreamTypeNames[type];
+    if(index <= 0)
+      {
+      return vtkClientServerStreamTypeNames[type][0];
+      }
+    const char* const* names = vtkClientServerStreamTypeNames[type];
+    int i=1;
+    while(i < index && names[i])
+      {
+      ++i;
+      }
+    if(names[i])
+      {
+      return names[i];
+      }
+    else
+      {
+      return names[i-1];
+      }
     }
   else
     {
@@ -1610,13 +1692,29 @@ vtkClientServerStream
 vtkClientServerStream::Types
 vtkClientServerStream::GetTypeFromString(const char* name)
 {
+  return vtkClientServerStream::GetTypeFromString(name, 0);
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerStream::Types
+vtkClientServerStream::GetTypeFromString(const char* begin, const char* end)
+{
+  // Setup the ending position.
+  if(begin && (!end || end < begin))
+    {
+    end = begin+strlen(begin);
+    }
+
   // Find a string matching the given name.
   for(int t = vtkClientServerStream::int8_value;
-      name && t < vtkClientServerStream::End; ++t)
+      begin && t < vtkClientServerStream::End; ++t)
     {
-    if(strcmp(vtkClientServerStreamTypeNames[t], name) == 0)
+    for(const char* const* n = vtkClientServerStreamTypeNames[t]; *n; ++n)
       {
-      return static_cast<vtkClientServerStream::Types>(t);
+      if(strncmp(*n, begin, end-begin) == 0)
+        {
+        return static_cast<vtkClientServerStream::Types>(t);
+        }
       }
     }
   return vtkClientServerStream::End;
@@ -1653,11 +1751,25 @@ vtkClientServerStream
 vtkClientServerStream::Commands
 vtkClientServerStream::GetCommandFromString(const char* name)
 {
+  return vtkClientServerStream::GetCommandFromString(name, 0);
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerStream::Commands
+vtkClientServerStream::GetCommandFromString(const char* begin,
+                                            const char* end)
+{
+  // Setup the ending position.
+  if(begin && (!end || end < begin))
+    {
+    end = begin+strlen(begin);
+    }
+
   // Find a string matching the given name.
   for(int c = vtkClientServerStream::New;
-      name && c < vtkClientServerStream::EndOfCommands; ++c)
+      begin && c < vtkClientServerStream::EndOfCommands; ++c)
     {
-    if(strcmp(vtkClientServerStreamCommandNames[c], name) == 0)
+    if(strncmp(vtkClientServerStreamCommandNames[c], begin, end-begin) == 0)
       {
       return static_cast<vtkClientServerStream::Commands>(c);
       }
@@ -1724,24 +1836,62 @@ void vtkClientServerStream::PrintArgumentValue(ostream& os, int message,
 }
 
 //----------------------------------------------------------------------------
-// Function to print a value argument.
+// Function to convert a value to a string.
 template <class T>
-void vtkClientServerStreamPrintValue(const vtkClientServerStream* self,
-                                     ostream& os, vtkIndent indent,
-                                     int m, int a, int t, T*)
+void vtkClientServerStreamValueToString(const vtkClientServerStream* self,
+                                        ostream& os, int m, int a, T*)
 {
   typedef VTK_CSS_TYPENAME vtkClientServerTypeTraits<T>::PrintType PrintType;
   T arg;
   self->GetArgument(m, a, &arg);
-  vtkClientServerStream::Types type = self->GetArgumentType(m, a);
+  os << static_cast<PrintType>(arg);
+}
+
+//----------------------------------------------------------------------------
+// Function to convert an array to a string.
+template <class T>
+void vtkClientServerStreamArrayToString(const vtkClientServerStream* self,
+                                        ostream& os, int m, int a, T*)
+{
+  typedef VTK_CSS_TYPENAME vtkClientServerTypeTraits<T>::PrintType PrintType;
+  vtkTypeUInt32 length;
+  T arglocal[6];
+  T* arg = arglocal;
+  self->GetArgumentLength(m, a, &length);
+  if(length > 6)
+    {
+    arg = new T[length];
+    }
+  self->GetArgument(m, a, arg, length);
+  const char* comma = "";
+  for(vtkTypeUInt32 i=0; i < length; ++i)
+    {
+    os << comma << static_cast<PrintType>(arg[i]);
+    comma = ", ";
+    }
+  if(arg != arglocal)
+    {
+    delete [] arg;
+    }
+}
+
+//----------------------------------------------------------------------------
+// Function to print a value argument.
+template <class T>
+void vtkClientServerStreamPrintValue(const vtkClientServerStream* self,
+                                     ostream& os, vtkIndent indent,
+                                     int m, int a, int t, T* tt)
+{
   if(t)
     {
+    vtkClientServerStream::Types type = self->GetArgumentType(m, a);
     os << indent << "Argument " << a << " = " << self->GetStringFromType(type)
-       << " {" << static_cast<PrintType>(arg) << "}\n";
+       << " {";
     }
-  else
+  vtkClientServerStreamValueToString(self, os, m, a, tt);
+  if(t)
     {
-    os << static_cast<PrintType>(arg);
+    os << "}\n";
     }
 }
 
@@ -1750,30 +1900,19 @@ void vtkClientServerStreamPrintValue(const vtkClientServerStream* self,
 template <class T>
 void vtkClientServerStreamPrintArray(const vtkClientServerStream* self,
                                      ostream& os, vtkIndent indent,
-                                     int m, int a, int t, T*)
+                                     int m, int a, int t, T* tt)
 {
-  typedef VTK_CSS_TYPENAME vtkClientServerTypeTraits<T>::PrintType PrintType;
-  vtkTypeUInt32 length;
-  self->GetArgumentLength(m, a, &length);
-  T* arg = new T[length];
-  self->GetArgument(m, a, arg, length);
-  vtkClientServerStream::Types type = self->GetArgumentType(m, a);
   if(t)
     {
+    vtkClientServerStream::Types type = self->GetArgumentType(m, a);
     os << indent << "Argument " << a << " = "
        << self->GetStringFromType(type) << " {";
     }
-  const char* space = "";
-  for(vtkTypeUInt32 i=0; i < length; ++i)
-    {
-    os << space << static_cast<PrintType>(arg[i]);
-    space = " ";
-    }
+  vtkClientServerStreamArrayToString(self, os, m, a, tt);
   if(t)
     {
     os << "}\n";
     }
-  delete [] arg;
 }
 
 //----------------------------------------------------------------------------
@@ -1882,4 +2021,613 @@ void vtkClientServerStream::PrintArgumentInternal(ostream& os, int message,
         }
       } break;
     }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkClientServerStream::StreamToString() const
+{
+  ostrstream ostr;
+  this->StreamToString(ostr);
+  this->Internal->String = ostr.str();
+  ostr.rdbuf()->freeze(0);
+  return this->Internal->String.c_str();
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerStream::StreamToString(ostream& os) const
+{
+  vtkIndent indent;
+  this->StreamToString(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerStream::StreamToString(ostream& os,
+                                           vtkIndent indent) const
+{
+  for(int m=0; m < this->GetNumberOfMessages(); ++m)
+    {
+    os << indent;
+    this->MessageToString(os, m, indent);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerStream::MessageToString(ostream& os, int m) const
+{
+  vtkIndent indent;
+  this->MessageToString(os, m, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerStream::MessageToString(ostream& os, int m,
+                                            vtkIndent indent) const
+{
+  os << this->GetStringFromCommand(this->GetCommand(m));
+  for(int a=0; a < this->GetNumberOfArguments(m); ++a)
+    {
+    os << " ";
+    this->ArgumentToString(os, m, a, indent);
+    }
+  os << "\n";
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerStream::ArgumentToString(ostream& os, int m, int a) const
+{
+  vtkIndent indent;
+  this->ArgumentToString(os, m, a, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerStream::ArgumentToString(ostream& os, int m, int a,
+                                             vtkIndent indent) const
+{
+  vtkClientServerStream::Types type = this->GetArgumentType(m, a);
+
+  // Special case for strings: string0 == null, string() == ""
+  if(type == vtkClientServerStream::string_value)
+    {
+    const char* arg;
+    this->GetArgument(m, a, &arg);
+    if(!arg)
+      {
+      os << "string0";
+      return;
+      }
+    int needType = (*arg == 0)?1:0;
+    for(const char* c = arg; *c; ++c)
+      {
+      if(*c == '(' || *c == ')')
+        {
+        needType = 1;
+        break;
+        }
+      }
+    if(!needType)
+      {
+      this->ArgumentValueToString(os, m, a, indent);
+      return;
+      }
+    }
+
+  os << this->GetStringFromType(type, 1) << "(";
+  this->ArgumentValueToString(os, m, a, indent);
+  os << ")";
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerStream::ArgumentValueToString(ostream& os,
+                                                  int m, int a,
+                                                  vtkIndent indent) const
+{
+  switch(this->GetArgumentType(m, a))
+    {
+    VTK_CSS_TEMPLATE_MACRO(value, vtkClientServerStreamValueToString
+                           (this, os, m, a, T));
+    VTK_CSS_TEMPLATE_MACRO(array, vtkClientServerStreamArrayToString
+                           (this, os, m, a, T));
+    case vtkClientServerStream::string_value:
+      {
+      const char* arg;
+      this->GetArgument(m, a, &arg);
+      if(arg)
+        {
+        for(const char* c = arg; *c; ++c)
+          {
+          switch(*c)
+            {
+            case '\\': os << "\\\\"; break;
+            case '(': os << "\\("; break;
+            case ')': os << "\\)"; break;
+            default: os << *c; break;
+            }
+          }
+        }
+      } break;
+    case vtkClientServerStream::stream_value:
+      {
+      vtkClientServerStream arg;
+      int result = this->GetArgument(m, a, &arg);
+      if(result)
+        {
+        os << "\n";
+        arg.StreamToString(os, indent.GetNextIndent());
+        os << indent;
+        }
+      } break;
+    case vtkClientServerStream::id_value:
+      {
+      vtkClientServerID arg;
+      this->GetArgument(m, a, &arg);
+      os << arg.ID;
+      } break;
+    case vtkClientServerStream::vtk_object_pointer:
+      {
+      vtkObjectBase* arg;
+      this->GetArgument(m, a, &arg);
+      if(arg)
+        {
+        os << arg;
+        }
+      else
+        {
+        os << "0";
+        }
+      } break;
+    case vtkClientServerStream::LastResult: break;
+    default: break;
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerStream::StreamFromString(const char* str)
+{
+  this->Reset();
+  if(this->StreamFromStringInternal(str, str+strlen(str)))
+    {
+    return 1;
+    }
+  else
+    {
+    this->Reset();
+    return 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerStream::StreamFromStringInternal(const char* begin,
+                                                    const char* end)
+{
+  const char* position = begin;
+  while(1)
+    {
+    // Skip whitespace and newlines.
+    while(position < end && (*position == ' ' || *position == '\t' ||
+                             *position == '\r' || *position == '\n'))
+      {
+      ++position;
+      }
+    if(position == end)
+      {
+      break;
+      }
+
+    // Add this message.
+    if(!this->AddMessageFromString(position, end, &position))
+      {
+      return 0;
+      }
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerStream::AddMessageFromString(const char* begin,
+                                                const char* end,
+                                                const char** next)
+{
+  // Find the end of the command name.
+  const char* commandBegin = begin;
+  const char* commandEnd = commandBegin;
+  while(commandEnd < end && !(*commandEnd == ' ' || *commandEnd == '\t' ||
+                              *commandEnd == '\r' || *commandEnd == '\n'))
+    {
+    ++commandEnd;
+    }
+  vtkClientServerStream::Commands cmd =
+    this->GetCommandFromString(commandBegin, commandEnd);
+  if(cmd == vtkClientServerStream::EndOfCommands)
+    {
+    // We did not find a message.
+    return 0;
+    }
+
+  // Insert the command into the stream.
+  *this << cmd;
+
+  // Scan for arguments until the end of a line occurs outside an
+  // argument.
+  const char* position = commandEnd;
+  while(1)
+    {
+    // Skip whitespace.
+    while(position < end && *position == ' ' || *position == '\t')
+      {
+      ++position;
+      }
+
+    // Check for end-of-line.
+    if(position == end || *position == '\r' || *position == '\n')
+      {
+      break;
+      }
+
+    // Add the next argument.
+    if(!this->AddArgumentFromString(position, end, &position))
+      {
+      return 0;
+      }
+    }
+
+  // Insert the message ending token into the stream.
+  *this << vtkClientServerStream::End;
+
+  // Report where to continue scanning.
+  *next = position;
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerStreamPointerFromString(const char* begin, const char* end,
+                                           vtkObjectBase** value)
+{
+  // Copy the value to a null-terminated buffer.
+  char buffer[60];
+  char* ptr = buffer;
+  if(end-begin+1 > 60)
+    {
+    ptr = new char[end-begin+1];
+    }
+  strncpy(ptr, begin, end-begin);
+  ptr[end-begin] = 0;
+
+  // Try to convert the value.
+  int result = sscanf(ptr, "%p", value)? 1:0;
+
+  // Free the buffer.
+  if(ptr != buffer)
+    {
+    delete [] ptr;
+    }
+  return result;
+}
+
+//----------------------------------------------------------------------------
+template <class T>
+int vtkClientServerStreamValueFromString(const char* begin, const char* end,
+                                         T* value)
+{
+  // Copy the value to a null-terminated buffer.
+  char buffer[60];
+  char* ptr = buffer;
+  if(end-begin+1 > 60)
+    {
+    ptr = new char[end-begin+1];
+    }
+  strncpy(ptr, begin, end-begin);
+  ptr[end-begin] = 0;
+
+  // Try to convert the value.
+  int result = ValueFromString(ptr, value);
+
+  // Free the buffer.
+  if(ptr != buffer)
+    {
+    delete [] ptr;
+    }
+  return result;
+}
+
+//----------------------------------------------------------------------------
+template <class T>
+int vtkClientServerStreamValueFromString(vtkClientServerStream* self,
+                                         const char* begin, const char* end,
+                                         T*)
+{
+  T value;
+  if(vtkClientServerStreamValueFromString(begin, end, &value))
+    {
+    *self << value;
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+template <class T>
+int vtkClientServerStreamArrayFromString(vtkClientServerStream* self,
+                                         const char* begin, const char* end,
+                                         T*)
+{
+  // Count how many values will be read.
+  int length = 0;
+  int text = 0;
+  int comma = 0;
+  for(const char* c = begin; c < end; ++c)
+    {
+    switch(*c)
+      {
+      case ' ': break;
+      case '\t': break;
+      case '\r': break;
+      case '\n': break;
+      case ',': comma = 1; break;
+      default: text = 1; break;
+      }
+    if(comma)
+      {
+      if(text)
+        {
+        ++length;
+        }
+      text = 0;
+      comma = 0;
+      }
+    }
+  if(text)
+    {
+    ++length;
+    }
+
+  // Allocate the array.
+  T arraylocal[6];
+  T* ptr = arraylocal;
+  if(length > 6)
+    {
+    ptr = new T[length];
+    }
+
+  // Parse each value.
+  int result = 1;
+  int index = 0;
+  const char* valueBegin = begin;
+  while(result && valueBegin < end && index < length)
+    {
+    // Scan for the beginning of the value.
+    while(valueBegin < end && (*valueBegin == ' ' || *valueBegin == '\t' ||
+                               *valueBegin == '\r' || *valueBegin == '\n'))
+      {
+      ++valueBegin;
+      }
+
+    // Scan for the end of the value.
+    const char* valueEnd = valueBegin;
+    while(valueEnd < end && *valueEnd != ',' && *valueEnd != ' ' &&
+          *valueEnd != '\t' && *valueEnd != '\r' && *valueEnd != '\n')
+      {
+      ++valueEnd;
+      }
+
+    // Parse this value.
+    if(!vtkClientServerStreamValueFromString(valueBegin, valueEnd,
+                                             ptr+index))
+      {
+      result = 0;
+      }
+    ++index;
+
+    // Scan past the comma.
+    valueBegin = valueEnd;
+    while(valueBegin < end && *valueBegin != ',')
+      {
+      ++valueBegin;
+      }
+    if(valueBegin < end && *valueBegin == ',')
+      {
+      ++valueBegin;
+      }
+    }
+
+  // Make sure we got all the values.
+  if(index < length)
+    {
+    result = 0;
+    }
+
+  // Insert the array.
+  if(result)
+    {
+    *self << vtkClientServerStream::InsertArray(ptr, length);
+    }
+
+  // Free the array.
+  if(ptr != arraylocal)
+    {
+    delete [] ptr;
+    }
+
+  return result;
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerStream::AddArgumentFromString(const char* begin,
+                                                 const char* end,
+                                                 const char** next)
+{
+  // Find the end of the argument type.
+  const char* typeBegin = begin;
+  const char* typeEnd = typeBegin;
+  int done = 0;
+  while(!done && typeEnd < end)
+    {
+    switch(*typeEnd)
+      {
+      case '(':  done = 1; break;
+      case ' ':  done = 1; break;
+      case '\t': done = 1; break;
+      case '\r': done = 1; break;
+      case '\n': done = 1; break;
+      default:  ++typeEnd; break;
+      }
+    }
+
+  // If we did not find a paren, just assume it is a string argument.
+  if(*typeEnd != '(')
+    {
+    // Report where to continue scanning.
+    *next = typeEnd;
+
+    // Special case for strings: string0 == null
+    if((strncmp(typeBegin, "string0", typeEnd-typeBegin) == 0) ||
+       (strncmp(typeBegin, "str0", typeEnd-typeBegin) == 0))
+      {
+      // Insert the null string.
+      *this << static_cast<char*>(0);
+      return 1;
+      }
+
+    // Insert the string argument.
+    *this << vtkClientServerStream::InsertString(typeBegin, typeEnd);
+    return 1;
+    }
+
+  // Get the argument type.
+  vtkClientServerStream::Types type =
+    vtkClientServerStream::GetTypeFromString(typeBegin, typeEnd);
+  if(type == vtkClientServerStream::End)
+    {
+    // Unknown type!
+    return 0;
+    }
+
+  // Find the argument value boundaries.
+  const char* valueBegin = typeEnd+1;
+  const char* valueEnd = valueBegin;
+  int nesting = 1;
+  int hasComma = 0;
+  done = 0;
+  while(!done && valueEnd < end)
+    {
+    switch(*valueEnd)
+      {
+      case '\\': if(++valueEnd < end) { ++valueEnd; } break;
+      case '(': ++nesting; ++valueEnd; break;
+      case ')': if(--nesting == 0) { done = 1; } else { ++valueEnd; } break;
+      case ',': ++valueEnd; hasComma = 1; break;
+      default: ++valueEnd; break;
+      }
+    }
+
+  if(valueEnd == end)
+    {
+    // Unterminated argument value!
+    return 0;
+    }
+
+  // If the type is a scalar type and the value has a comma, convert
+  // the type to an array type.
+  switch(type)
+    {
+    case int8_value: if(hasComma) { type = int8_array; } break;
+    case int16_value: if(hasComma) { type = int16_array; } break;
+    case int32_value: if(hasComma) { type = int32_array; } break;
+    case int64_value: if(hasComma) { type = int64_array; } break;
+    case uint8_value: if(hasComma) { type = uint8_array; } break;
+    case uint16_value: if(hasComma) { type = uint16_array; } break;
+    case uint32_value: if(hasComma) { type = uint32_array; } break;
+    case uint64_value: if(hasComma) { type = uint64_array; } break;
+    case float32_value: if(hasComma) { type = float32_array; } break;
+    case float64_value: if(hasComma) { type = float64_array; } break;
+    default: break;
+    }
+
+  // Convert the value from a string to the proper type.
+  int result = 0;
+  switch(type)
+    {
+    VTK_CSS_TEMPLATE_MACRO(value,
+                           result = vtkClientServerStreamValueFromString
+                           (this, valueBegin, valueEnd, T));
+    VTK_CSS_TEMPLATE_MACRO(array,
+                           result = vtkClientServerStreamArrayFromString
+                           (this, valueBegin, valueEnd, T));
+    case vtkClientServerStream::string_value:
+      {
+      // Allocate a buffer for the string.
+      char buffer[128];
+      char* ptr = buffer;
+      if(valueEnd-valueBegin+1 > 128)
+        {
+        ptr = new char[valueEnd-valueEnd+1];
+        }
+
+      // Copy the string to the buffer removing escapes.
+      char* out = ptr;
+      for(const char* c = valueBegin; c < valueEnd; ++c)
+        {
+        switch(*c)
+          {
+          case '\\': if(++c < valueEnd) { *out++ = *c; }
+          default: *out++ = *c; break;
+          }
+        }
+      *out++ = 0;
+
+      // Insert the string argument.
+      *this << out;
+
+      // Free the buffer.
+      if(ptr != buffer)
+        {
+        delete [] ptr;
+        }
+
+      result = 1;
+      } break;
+    case vtkClientServerStream::stream_value:
+      {
+      vtkClientServerStream arg;
+      result = arg.StreamFromStringInternal(valueBegin, valueEnd);
+      if(result)
+        {
+        *this << arg;
+        }
+      } break;
+    case vtkClientServerStream::id_value:
+      {
+      // Convert the ID value from a string.
+      vtkClientServerID arg;
+      result = vtkClientServerStreamValueFromString(valueBegin, valueEnd,
+                                                    &arg.ID);
+      if(result)
+        {
+        *this << arg;
+        }
+      } break;
+    case vtkClientServerStream::vtk_object_pointer:
+      {
+      vtkObjectBase* arg;
+      result = vtkClientServerStreamPointerFromString(valueBegin, valueEnd,
+                                                      &arg);
+      if(result)
+        {
+        *this << arg;
+        }
+      } break;
+    case vtkClientServerStream::LastResult:
+      {
+      *this << vtkClientServerStream::LastResult;
+      result = 1;
+      } break;
+    default: break;
+    }
+
+  // Report where to continue scanning.
+  if(result)
+    {
+    *next = valueEnd+1;
+    }
+
+  return result;
 }
