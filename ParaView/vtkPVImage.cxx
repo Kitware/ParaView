@@ -196,13 +196,31 @@ void vtkPVImage::SetAssignment(vtkPVAssignment *a)
       }
     this->Assignment = a;
     a->Register(this);
-  
-    image->SetUpdateExtent(a->GetExtent());
     }
 }
 
 
 
+//----------------------------------------------------------------------------
+void vtkPVImage::Update()
+{
+  vtkImageData *image;
+
+  if (this->Data == NULL)
+    {
+    vtkErrorMacro("No data object to update.");
+    }
+
+  image = this->GetImageData();
+  image->UpdateInformation();
+  if (this->Assignment)
+    {
+    this->Assignment->SetWholeExtent(image->GetWholeExtent());
+    image->SetUpdateExtent(this->Assignment->GetExtent());
+    }
+
+  image->Update();
+}
 
 
 

@@ -39,7 +39,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWApplication.h"
 #include "vtkDataSetMapper.h"
 
-class vtkPVPolyDataMapper;
 class vtkPVAssignment;
 
 
@@ -71,12 +70,7 @@ public:
   void SetVisibility(int v);
   int GetVisibility();
   vtkBooleanMacro(Visibility, int);
-  
-  // Description:
-  // Since we are using a special (subclass) mapper,
-  // this method provides a safe downcast.
-  vtkPVPolyDataMapper *GetPVMapper();
-  
+    
   // Description:
   // The mapper needs to know what the assignment is.
   void SetAssignment(vtkPVAssignment *a);

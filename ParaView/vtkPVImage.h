@@ -70,6 +70,11 @@ public:
   // Like update extent, but an object tells which piece to assign this process.
   void SetAssignment(vtkPVAssignment *a);
 
+  // Description:
+  // Uses the assignment to set the extent, then updates the data.
+  void Update();
+  
+
 protected:
   vtkPVImage();
   ~vtkPVImage();

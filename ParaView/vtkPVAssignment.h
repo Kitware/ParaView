@@ -28,12 +28,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 // .NAME vtkKWAssignment - An object for assigning data to processors.
 // .SECTION Description
 // A vtkPVAssignment holds a data piece/extent specification for a process.
+// It is really just a parallel object wrapper for vtkPVExtentTranslator.
 
 #ifndef __vtkPVAssignment_h
 #define __vtkPVAssignment_h
 
 #include "vtkKWObject.h"
-#include "vtkExtentTranslator.h"
+#include "vtkPVExtentTranslator.h"
 #include "vtkPVImage.h"
 
 class vtkPVApplication;
@@ -51,10 +52,6 @@ public:
   // assignment based on processor id.
   void Clone(vtkPVApplication *app);
   
-  void SetPiece(int piece, int numPieces);
-  int GetPiece() {return this->Piece;}
-  int GetNumberOfPieces() {return this->NumberOfPieces;}
-
   // Description:
   // The original source supplies this input so we will
   // always know the whole extent.  Set broadcasts executes on all processes.
@@ -62,8 +59,18 @@ public:
   vtkPVImage *GetOriginalImage() {return this->OriginalImage;}
   
   // Description:
-  // The extent is computetd from then piece and whole extent.
+  // Get the underlying extent translator.
+  vtkGetObjectMacro(Translator, vtkPVExtentTranslator);
+
+  // Description:
+  // Convenience access to piece/extent.
+  int GetPiece() { return this->Translator->GetPiece();}
+  int GetNumberOfPieces() { return this->Translator->GetNumberOfPieces();}
   int *GetExtent();
+  
+  // Description:
+  // Only called locally.  It is not wrapped.
+  void SetWholeExtent(int *ext);
 
   // Description:
   // Casts to vtkPVApplication.
@@ -75,12 +82,8 @@ protected:
   vtkPVAssignment(const vtkPVAssignment&) {};
   void operator=(const vtkPVAssignment&) {};
   
-  int Piece;
-  int NumberOfPieces;
-
-  vtkExtentTranslator *Translator;  
+  vtkPVExtentTranslator *Translator;  
   vtkPVImage *OriginalImage;
-  int Extent[6];
 };
 
 #endif

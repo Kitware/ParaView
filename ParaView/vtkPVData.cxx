@@ -112,7 +112,7 @@ int vtkPVData::Create(char *args)
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
 
-  this->Data->Update();
+  this->Update();
   
   this->FiltersMenuButton->SetParent(this);
   this->FiltersMenuButton->Create(this->Application, "");
@@ -252,7 +252,22 @@ void vtkPVData::SetAssignment(vtkPVAssignment *a)
 }
 
   
+//----------------------------------------------------------------------------
+void vtkPVData::Update()
+{
+  if (this->Data == NULL)
+    {
+    vtkErrorMacro("No data object to update.");
+    }
 
+  if (this->Assignment)
+    {
+    this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
+                                this->Assignment->GetNumberOfPieces());
+    }
+
+  this->Data->Update();
+}
 
 
 

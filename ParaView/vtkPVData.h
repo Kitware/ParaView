@@ -84,6 +84,10 @@ public:
   // Description:
   // A generic way of getting the data.
   vtkGetObjectMacro(Data,vtkDataSet);
+
+  // Description:
+  // Uses the assignment to set the extent, then updates the data.
+  virtual void Update();
   
 protected:
   vtkPVData();

@@ -31,7 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 #include "vtkKWWindow.h"
 #include "vtkPVApplication.h"
-#include "vtkPVPolyDataMapper.h"
+#include "vtkPVAssignment.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
@@ -57,11 +57,6 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->Properties = vtkKWWidget::New();
   this->Label = vtkKWLabel::New();
   this->Name = NULL;
-
-  // We want to use a special mapper. (Get rid of supper classes mapper.)
-  this->Mapper->Delete();
-  this->Mapper = vtkPVPolyDataMapper::New();
-  this->Actor->SetMapper(this->Mapper);
 }
 
 //----------------------------------------------------------------------------
@@ -223,26 +218,8 @@ int vtkPVActorComposite::GetVisibility()
 
 
 //----------------------------------------------------------------------------
-vtkPVPolyDataMapper* vtkPVActorComposite::GetPVMapper()
-{
-  if (this->Mapper == NULL)
-    {
-    return NULL;
-    }
-  
-  if (this->Mapper->IsA("vtkPVPolyDataMapper"))
-    {  
-    return (vtkPVPolyDataMapper*)(this->Mapper);
-    }
-  else
-    {
-    vtkErrorMacro("Bad typecast");
-    return NULL;
-    } 
-}
-
-//----------------------------------------------------------------------------
 void vtkPVActorComposite::SetAssignment(vtkPVAssignment *a)
 {
-  this->GetPVMapper()->SetAssignment(a);
+  this->Mapper->SetPiece(a->GetPiece());
+  this->Mapper->SetNumberOfPieces(a->GetNumberOfPieces());
 }
