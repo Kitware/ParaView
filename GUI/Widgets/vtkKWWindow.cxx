@@ -23,7 +23,7 @@
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWMostRecentFilesUtilities.h"
+#include "vtkKWMostRecentFilesHelper.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWProgressGauge.h"
 #include "vtkKWSplitFrame.h"
@@ -42,7 +42,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.216");
+vtkCxxRevisionMacro(vtkKWWindow, "1.217");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -102,7 +102,7 @@ vtkKWWindow::vtkKWWindow()
 
   this->InExit                = 0;
 
-  this->MostRecentFilesUtilities = vtkKWMostRecentFilesUtilities::New();
+  this->MostRecentFilesHelper = vtkKWMostRecentFilesHelper::New();
 
   this->SetWindowClass("KitwareWidget");
   this->SetScriptExtension(".tcl");
@@ -170,7 +170,7 @@ vtkKWWindow::~vtkKWWindow()
   this->SetTitle(0);
   this->SetScriptExtension(0);
   this->SetScriptType(0);
-  this->MostRecentFilesUtilities->Delete();
+  this->MostRecentFilesHelper->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -238,7 +238,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->MenuFile->AddCommand("Close", this, "Close", 0);
   this->MenuFile->AddCommand("Exit", this, "Exit", 1);
 
-  this->MostRecentFilesUtilities->SetApplication(app);
+  this->MostRecentFilesHelper->SetApplication(app);
 
   // Menu : Window : Properties panel
 
@@ -977,7 +977,7 @@ void vtkKWWindow::AddRecentFilesMenu(
   const char *menuEntry, vtkKWObject *target, const char *label, int underline)
 {
   if (!this->IsCreated() || !label || !this->MenuFile || 
-      !this->MostRecentFilesUtilities)
+      !this->MostRecentFilesHelper)
     {
     return;
     }
@@ -985,7 +985,7 @@ void vtkKWWindow::AddRecentFilesMenu(
   // Create the menu if not done already
 
   vtkKWMenu *mrf_menu = 
-    this->MostRecentFilesUtilities->GetMostRecentFilesMenu();
+    this->MostRecentFilesHelper->GetMostRecentFilesMenu();
   if (!mrf_menu->IsCreated())
     {
     mrf_menu->SetParent(this->MenuFile);
@@ -1017,8 +1017,8 @@ void vtkKWWindow::AddRecentFilesMenu(
   // Fill the recent files vector with recent files stored in registry
   // this will also update the menu
 
-  this->MostRecentFilesUtilities->SetDefaultTargetObject(target);
-  this->MostRecentFilesUtilities->LoadMostRecentFilesFromRegistry();
+  this->MostRecentFilesHelper->SetDefaultTargetObject(target);
+  this->MostRecentFilesHelper->LoadMostRecentFilesFromRegistry();
 }
 
 //----------------------------------------------------------------------------
@@ -1026,10 +1026,10 @@ void vtkKWWindow::AddRecentFile(const char *name,
                                 vtkKWObject *target,
                                 const char *command)
 {  
-  if (this->MostRecentFilesUtilities)
+  if (this->MostRecentFilesHelper)
     {
-    this->MostRecentFilesUtilities->AddMostRecentFile(name, target, command);
-    this->MostRecentFilesUtilities->SaveMostRecentFilesToRegistry();
+    this->MostRecentFilesHelper->AddMostRecentFile(name, target, command);
+    this->MostRecentFilesHelper->SaveMostRecentFilesToRegistry();
     }
 }
 
@@ -1480,11 +1480,11 @@ void vtkKWWindow::UpdateMenuState()
 
   // Most Recent Files
 
-  if (this->MostRecentFilesUtilities)
+  if (this->MostRecentFilesHelper)
     {
-    this->MostRecentFilesUtilities->GetMostRecentFilesMenu()->SetEnabled(
+    this->MostRecentFilesHelper->GetMostRecentFilesMenu()->SetEnabled(
       this->Enabled);
-    this->MostRecentFilesUtilities->UpdateMostRecentFilesMenuStateInParent();
+    this->MostRecentFilesHelper->UpdateMostRecentFilesMenuStateInParent();
     }
 
   // Update the About entry, since the pretty name also depends on the

@@ -20,7 +20,7 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWWindow.h"
-#include "vtkKWDragAndDropTargets.h"
+#include "vtkKWDragAndDropHelper.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
 #include "vtkWindows.h"
@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.112");
+vtkCxxRevisionMacro(vtkKWWidget, "1.113");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -57,15 +57,15 @@ vtkKWWidget::vtkKWWidget()
 
   this->WidgetIsCreated          = 0;
 
-  this->DragAndDropTargets       = NULL;
+  this->DragAndDropHelper       = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWWidget::~vtkKWWidget()
 {
-  if (this->DragAndDropTargets)
+  if (this->DragAndDropHelper)
     {
-    this->DragAndDropTargets->Delete();
+    this->DragAndDropHelper->Delete();
     }
 
   if (this->BalloonHelpString)
@@ -172,9 +172,9 @@ int vtkKWWidget::Create(vtkKWApplication *app,
 
   this->SetApplication(app);
 
-  if (this->HasDragAndDropTargets())
+  if (this->HasDragAndDropHelper())
     {
-    this->GetDragAndDropTargets()->SetApplication(app);
+    this->GetDragAndDropHelper()->SetApplication(app);
     }
 
   this->WidgetIsCreated = 1;
@@ -1024,24 +1024,24 @@ void vtkKWWidget::UnpackChildren()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWidget::HasDragAndDropTargets()
+int vtkKWWidget::HasDragAndDropHelper()
 {
-  return this->DragAndDropTargets ? 1 : 0;
+  return this->DragAndDropHelper ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
-vtkKWDragAndDropTargets* vtkKWWidget::GetDragAndDropTargets()
+vtkKWDragAndDropHelper* vtkKWWidget::GetDragAndDropHelper()
 {
   // Lazy allocation. Create the drag and drop container only when it is needed
 
-  if (!this->DragAndDropTargets)
+  if (!this->DragAndDropHelper)
     {
-    this->DragAndDropTargets = vtkKWDragAndDropTargets::New();
-    this->DragAndDropTargets->SetApplication(this->GetApplication());
-    this->DragAndDropTargets->SetSource(this);
+    this->DragAndDropHelper = vtkKWDragAndDropHelper::New();
+    this->DragAndDropHelper->SetApplication(this->GetApplication());
+    this->DragAndDropHelper->SetSource(this);
     }
 
-  return this->DragAndDropTargets;
+  return this->DragAndDropHelper;
 }
 
 //----------------------------------------------------------------------------
@@ -1502,10 +1502,10 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TraceName: " 
      << (this->TraceName ? this->TraceName : "None") << endl;
   os << indent << "Enabled: " << (this->Enabled ? "On" : "Off") << endl;
-  os << indent << "DragAndDropTargets: ";
-  if (this->DragAndDropTargets)
+  os << indent << "DragAndDropHelper: ";
+  if (this->DragAndDropHelper)
     {
-    os << this->DragAndDropTargets << endl;
+    os << this->DragAndDropHelper << endl;
     }
   else
     {

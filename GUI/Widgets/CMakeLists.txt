@@ -30,7 +30,7 @@ SET( KWWidgets_SRCS
   vtkKWColorTransferFunctionEditor.cxx
   vtkKWCornerAnnotation.cxx 
   vtkKWDialog.cxx 
-  vtkKWDragAndDropTargets.cxx
+  vtkKWDragAndDropHelper.cxx
   vtkKWEntry.cxx 
   vtkKWEvent.cxx
   vtkKWEventMap.cxx
@@ -52,7 +52,7 @@ SET( KWWidgets_SRCS
   vtkKWMenu.cxx 
   vtkKWMenuButton.cxx 
   vtkKWMessageDialog.cxx 
-  vtkKWMostRecentFilesUtilities.cxx
+  vtkKWMostRecentFilesHelper.cxx
   vtkKWMultiColumnList.cxx
   vtkKWNotebook.cxx 
   vtkKWObject.cxx 

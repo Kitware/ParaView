@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWDragAndDropTargets.h
+  Module:    vtkKWDragAndDropHelper.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,25 +11,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWDragAndDropTargets - a set of drag and drop targets
+// .NAME vtkKWDragAndDropHelper - a set of drag and drop targets
 // .SECTION Description
 // This class is a container for a set of drag and drop targets.
 // It provides method to add basic drag and drop callbacks between a source
 // and one or more targets.
 
-#ifndef __vtkKWDragAndDropTargets_h
-#define __vtkKWDragAndDropTargets_h
+#ifndef __vtkKWDragAndDropHelper_h
+#define __vtkKWDragAndDropHelper_h
 
 #include "vtkKWObject.h"
 
 class vtkKWWidget;
-class vtkKWDragAndDropTargetsInternals;
+class vtkKWDragAndDropHelperInternals;
 
-class VTK_EXPORT vtkKWDragAndDropTargets : public vtkKWObject
+class VTK_EXPORT vtkKWDragAndDropHelper : public vtkKWObject
 {
 public:
-  static vtkKWDragAndDropTargets* New();
-  vtkTypeRevisionMacro(vtkKWDragAndDropTargets,vtkKWObject);
+  static vtkKWDragAndDropHelper* New();
+  vtkTypeRevisionMacro(vtkKWDragAndDropHelper,vtkKWObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -104,8 +104,8 @@ public:
   virtual void SetEndCommand(vtkKWObject *object, const char *method);
 
 protected:
-  vtkKWDragAndDropTargets();
-  ~vtkKWDragAndDropTargets();
+  vtkKWDragAndDropHelper();
+  ~vtkKWDragAndDropHelper();
 
   // Drag and Drop
 
@@ -129,8 +129,8 @@ protected:
 
   // PIMPL Encapsulation for STL containers
 
-  vtkKWDragAndDropTargetsInternals *Internals;
-  friend class vtkKWDragAndDropTargetsInternals;
+  vtkKWDragAndDropHelperInternals *Internals;
+  friend class vtkKWDragAndDropHelperInternals;
 
   TargetSlot* GetTarget(vtkKWWidget *target);
 
@@ -151,8 +151,8 @@ protected:
 
 private:
   
-  vtkKWDragAndDropTargets(const vtkKWDragAndDropTargets&); // Not implemented
-  void operator=(const vtkKWDragAndDropTargets&); // Not implemented
+  vtkKWDragAndDropHelper(const vtkKWDragAndDropHelper&); // Not implemented
+  void operator=(const vtkKWDragAndDropHelper&); // Not implemented
 };
 
 #endif

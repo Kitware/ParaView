@@ -68,7 +68,7 @@
 #include "vtkKWTclInteractor.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWDragAndDropTargets.h"
+#include "vtkKWDragAndDropHelper.h"
 
 #include "vtkXMLUtilities.h"
 #include "vtkXMLDataParser.h"
@@ -109,7 +109,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.16");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -836,32 +836,32 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetsAndCallbacks()
   for(i=numberOfLookmarkWidgets-1;i>=0;i--)
     {
     this->KWLookmarks->GetItem(i,lookmarkWidget);
-    lookmarkWidget->GetDragAndDropTargets()->SetEnable(1);
+    lookmarkWidget->GetDragAndDropHelper()->SetEnable(1);
     // for each lmk container
     for(j=numberOfLookmarkFolders-1;j>=0;j--)
       {
       this->LmkFolderWidgets->GetItem(j,lmkFolderWidget);
       // in this case, we'll have to get the label's grandfather to get the after widget which is the lookmarkFolder widget itself, but now the target area is limited to the label
-      if(!lookmarkWidget->GetDragAndDropTargets()->HasTarget(lmkFolderWidget->GetSeparatorFrame()->GetFrame()))
+      if(!lookmarkWidget->GetDragAndDropHelper()->HasTarget(lmkFolderWidget->GetSeparatorFrame()->GetFrame()))
         {
-        lookmarkWidget->GetDragAndDropTargets()->AddTarget(lmkFolderWidget->GetSeparatorFrame()->GetFrame());
-        lookmarkWidget->GetDragAndDropTargets()->SetTargetEndCommand(lmkFolderWidget->GetSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
-        lookmarkWidget->GetDragAndDropTargets()->SetTargetPerformCommand(lmkFolderWidget->GetSeparatorFrame()->GetFrame(), lmkFolderWidget, "DragAndDropPerformCommand");
+        lookmarkWidget->GetDragAndDropHelper()->AddTarget(lmkFolderWidget->GetSeparatorFrame()->GetFrame());
+        lookmarkWidget->GetDragAndDropHelper()->SetTargetEndCommand(lmkFolderWidget->GetSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
+        lookmarkWidget->GetDragAndDropHelper()->SetTargetPerformCommand(lmkFolderWidget->GetSeparatorFrame()->GetFrame(), lmkFolderWidget, "DragAndDropPerformCommand");
 //        lookmarkWidget->SetDragAndDropStartCommand(lmkFolderWidget->GetSeparatorFrame()->GetFrame(), lmkFolderWidget, "DragAndDropStartCallback");
 //        lookmarkWidget->SetDragAndDropStartCommand(lmkFolderWidget->GetSeparatorFrame()->GetFrame(), this, "DragAndDropStartCallback");
         }
-      if(!lookmarkWidget->GetDragAndDropTargets()->HasTarget(lmkFolderWidget->GetNestedSeparatorFrame()->GetFrame()))
+      if(!lookmarkWidget->GetDragAndDropHelper()->HasTarget(lmkFolderWidget->GetNestedSeparatorFrame()->GetFrame()))
         {
-        lookmarkWidget->GetDragAndDropTargets()->AddTarget(lmkFolderWidget->GetNestedSeparatorFrame()->GetFrame());
-        lookmarkWidget->GetDragAndDropTargets()->SetTargetEndCommand(lmkFolderWidget->GetNestedSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
-        lookmarkWidget->GetDragAndDropTargets()->SetTargetPerformCommand(lmkFolderWidget->GetNestedSeparatorFrame()->GetFrame(), lmkFolderWidget, "DragAndDropPerformCommand");
+        lookmarkWidget->GetDragAndDropHelper()->AddTarget(lmkFolderWidget->GetNestedSeparatorFrame()->GetFrame());
+        lookmarkWidget->GetDragAndDropHelper()->SetTargetEndCommand(lmkFolderWidget->GetNestedSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
+        lookmarkWidget->GetDragAndDropHelper()->SetTargetPerformCommand(lmkFolderWidget->GetNestedSeparatorFrame()->GetFrame(), lmkFolderWidget, "DragAndDropPerformCommand");
 //        lookmarkWidget->SetDragAndDropStartCommand(lmkFolderWidget->GetNestedSeparatorFrame()->GetFrame(), this, "DragAndDropStartCallback");
         }
-      if(!lookmarkWidget->GetDragAndDropTargets()->HasTarget(lmkFolderWidget->GetLabelFrame()->GetLabel()))
+      if(!lookmarkWidget->GetDragAndDropHelper()->HasTarget(lmkFolderWidget->GetLabelFrame()->GetLabel()))
         {
-        lookmarkWidget->GetDragAndDropTargets()->AddTarget(lmkFolderWidget->GetLabelFrame()->GetLabel());
-        lookmarkWidget->GetDragAndDropTargets()->SetTargetEndCommand(lmkFolderWidget->GetLabelFrame()->GetLabel(), this, "DragAndDropEndCommand");
-        lookmarkWidget->GetDragAndDropTargets()->SetTargetPerformCommand(lmkFolderWidget->GetLabelFrame()->GetLabel(), lmkFolderWidget, "DragAndDropPerformCommand");
+        lookmarkWidget->GetDragAndDropHelper()->AddTarget(lmkFolderWidget->GetLabelFrame()->GetLabel());
+        lookmarkWidget->GetDragAndDropHelper()->SetTargetEndCommand(lmkFolderWidget->GetLabelFrame()->GetLabel(), this, "DragAndDropEndCommand");
+        lookmarkWidget->GetDragAndDropHelper()->SetTargetPerformCommand(lmkFolderWidget->GetLabelFrame()->GetLabel(), lmkFolderWidget, "DragAndDropPerformCommand");
 //        lookmarkWidget->SetDragAndDropStartCommand(lmkFolderWidget->GetLabelFrame()->GetLabel(), lmkFolderWidget, "DragAndDropStartCallback");
         }
       }
@@ -871,22 +871,22 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetsAndCallbacks()
       this->KWLookmarks->GetItem(j,targetLmkWidget);
       if(targetLmkWidget != lookmarkWidget)
         {
-        if(!lookmarkWidget->GetDragAndDropTargets()->HasTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame()))
+        if(!lookmarkWidget->GetDragAndDropHelper()->HasTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame()))
           {
-          lookmarkWidget->GetDragAndDropTargets()->AddTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame());
-          lookmarkWidget->GetDragAndDropTargets()->SetTargetEndCommand(targetLmkWidget->GetSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
-          lookmarkWidget->GetDragAndDropTargets()->SetTargetPerformCommand(targetLmkWidget->GetSeparatorFrame()->GetFrame(), targetLmkWidget, "DragAndDropPerformCommand");
+          lookmarkWidget->GetDragAndDropHelper()->AddTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame());
+          lookmarkWidget->GetDragAndDropHelper()->SetTargetEndCommand(targetLmkWidget->GetSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
+          lookmarkWidget->GetDragAndDropHelper()->SetTargetPerformCommand(targetLmkWidget->GetSeparatorFrame()->GetFrame(), targetLmkWidget, "DragAndDropPerformCommand");
 //          lookmarkWidget->SetDragAndDropStartCommand(targetLmkWidget->GetSeparatorFrame()->GetFrame(), this, "DragAndDropStartCallback");
           }
         }
       }
 
     // add top frame as target for the widget
-    if(!lookmarkWidget->GetDragAndDropTargets()->HasTarget(this->TopDragAndDropTarget->GetFrame()))
+    if(!lookmarkWidget->GetDragAndDropHelper()->HasTarget(this->TopDragAndDropTarget->GetFrame()))
       {
-      lookmarkWidget->GetDragAndDropTargets()->AddTarget(this->TopDragAndDropTarget->GetFrame());
-      lookmarkWidget->GetDragAndDropTargets()->SetTargetEndCommand(this->TopDragAndDropTarget->GetFrame(), this, "DragAndDropEndCommand");
-      lookmarkWidget->GetDragAndDropTargets()->SetTargetPerformCommand(this->TopDragAndDropTarget->GetFrame(), this, "DragAndDropPerformCommand");
+      lookmarkWidget->GetDragAndDropHelper()->AddTarget(this->TopDragAndDropTarget->GetFrame());
+      lookmarkWidget->GetDragAndDropHelper()->SetTargetEndCommand(this->TopDragAndDropTarget->GetFrame(), this, "DragAndDropEndCommand");
+      lookmarkWidget->GetDragAndDropHelper()->SetTargetPerformCommand(this->TopDragAndDropTarget->GetFrame(), this, "DragAndDropPerformCommand");
 //      lookmarkWidget->SetDragAndDropStartCommand(this->TopDragAndDropTarget->GetFrame(), this->TopDragAndDropTarget->GetFrame(), "DragAndDropStartCallback");
       }
 
@@ -894,7 +894,7 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetsAndCallbacks()
   for(i=numberOfLookmarkFolders-1;i>=0;i--)
     {
     this->LmkFolderWidgets->GetItem(i,lmkFolderWidget);
-    lmkFolderWidget->GetDragAndDropTargets()->SetEnable(1);
+    lmkFolderWidget->GetDragAndDropHelper()->SetEnable(1);
     // must check to see if the widgets are descendants of this container widget if so dont add as target
     // for each lmk container, add its internal frame as target to this
     for(j=numberOfLookmarkFolders-1;j>=0;j--)
@@ -902,25 +902,25 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetsAndCallbacks()
       this->LmkFolderWidgets->GetItem(j,targetLmkFolder);
       if(targetLmkFolder!=lmkFolderWidget && !this->IsWidgetInsideFolder(lmkFolderWidget,targetLmkFolder))
         {
-        if(!lmkFolderWidget->GetDragAndDropTargets()->HasTarget(targetLmkFolder->GetSeparatorFrame()->GetFrame()))
+        if(!lmkFolderWidget->GetDragAndDropHelper()->HasTarget(targetLmkFolder->GetSeparatorFrame()->GetFrame()))
           {
-          lmkFolderWidget->GetDragAndDropTargets()->AddTarget(targetLmkFolder->GetSeparatorFrame()->GetFrame());
-          lmkFolderWidget->GetDragAndDropTargets()->SetTargetEndCommand(targetLmkFolder->GetSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
-          lmkFolderWidget->GetDragAndDropTargets()->SetTargetPerformCommand(targetLmkFolder->GetSeparatorFrame()->GetFrame(), targetLmkFolder, "DragAndDropPerformCommand");
+          lmkFolderWidget->GetDragAndDropHelper()->AddTarget(targetLmkFolder->GetSeparatorFrame()->GetFrame());
+          lmkFolderWidget->GetDragAndDropHelper()->SetTargetEndCommand(targetLmkFolder->GetSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
+          lmkFolderWidget->GetDragAndDropHelper()->SetTargetPerformCommand(targetLmkFolder->GetSeparatorFrame()->GetFrame(), targetLmkFolder, "DragAndDropPerformCommand");
 //          lmkFolderWidget->SetDragAndDropStartCommand(targetLmkFolder->GetSeparatorFrame()->GetFrame(), this, "DragAndDropStartCallback");
           }
-        if(!lmkFolderWidget->GetDragAndDropTargets()->HasTarget(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame()))
+        if(!lmkFolderWidget->GetDragAndDropHelper()->HasTarget(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame()))
           {
-          lmkFolderWidget->GetDragAndDropTargets()->AddTarget(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame());
-          lmkFolderWidget->GetDragAndDropTargets()->SetTargetEndCommand(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
-          lmkFolderWidget->GetDragAndDropTargets()->SetTargetPerformCommand(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame(), targetLmkFolder, "DragAndDropPerformCommand");
+          lmkFolderWidget->GetDragAndDropHelper()->AddTarget(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame());
+          lmkFolderWidget->GetDragAndDropHelper()->SetTargetEndCommand(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
+          lmkFolderWidget->GetDragAndDropHelper()->SetTargetPerformCommand(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame(), targetLmkFolder, "DragAndDropPerformCommand");
 //          lmkFolderWidget->SetDragAndDropStartCommand(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame(), this, "DragAndDropStartCallback");
           }
-        if(!lmkFolderWidget->GetDragAndDropTargets()->HasTarget(targetLmkFolder->GetLabelFrame()->GetLabel()))
+        if(!lmkFolderWidget->GetDragAndDropHelper()->HasTarget(targetLmkFolder->GetLabelFrame()->GetLabel()))
           {
-          lmkFolderWidget->GetDragAndDropTargets()->AddTarget(targetLmkFolder->GetLabelFrame()->GetLabel());
-          lmkFolderWidget->GetDragAndDropTargets()->SetTargetEndCommand(targetLmkFolder->GetLabelFrame()->GetLabel(), this, "DragAndDropEndCommand");
-          lmkFolderWidget->GetDragAndDropTargets()->SetTargetPerformCommand(targetLmkFolder->GetLabelFrame()->GetLabel(), targetLmkFolder, "DragAndDropPerformCommand");
+          lmkFolderWidget->GetDragAndDropHelper()->AddTarget(targetLmkFolder->GetLabelFrame()->GetLabel());
+          lmkFolderWidget->GetDragAndDropHelper()->SetTargetEndCommand(targetLmkFolder->GetLabelFrame()->GetLabel(), this, "DragAndDropEndCommand");
+          lmkFolderWidget->GetDragAndDropHelper()->SetTargetPerformCommand(targetLmkFolder->GetLabelFrame()->GetLabel(), targetLmkFolder, "DragAndDropPerformCommand");
           }
         }
       }
@@ -930,22 +930,22 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetsAndCallbacks()
       this->KWLookmarks->GetItem(j,targetLmkWidget);
       if(!this->IsWidgetInsideFolder(lmkFolderWidget,targetLmkWidget))
         {
-        if(!lmkFolderWidget->GetDragAndDropTargets()->HasTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame()))
+        if(!lmkFolderWidget->GetDragAndDropHelper()->HasTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame()))
           {
-          lmkFolderWidget->GetDragAndDropTargets()->AddTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame());
-          lmkFolderWidget->GetDragAndDropTargets()->SetTargetPerformCommand(targetLmkWidget->GetSeparatorFrame()->GetFrame(), targetLmkWidget, "DragAndDropPerformCommand");
+          lmkFolderWidget->GetDragAndDropHelper()->AddTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame());
+          lmkFolderWidget->GetDragAndDropHelper()->SetTargetPerformCommand(targetLmkWidget->GetSeparatorFrame()->GetFrame(), targetLmkWidget, "DragAndDropPerformCommand");
 //          lmkFolderWidget->SetDragAndDropStartCommand(targetLmkWidget->GetSeparatorFrame()->GetFrame(), this, "DragAndDropStartCallback");
-          lmkFolderWidget->GetDragAndDropTargets()->SetTargetEndCommand(targetLmkWidget->GetSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
+          lmkFolderWidget->GetDragAndDropHelper()->SetTargetEndCommand(targetLmkWidget->GetSeparatorFrame()->GetFrame(), this, "DragAndDropEndCommand");
           }
         }
       }
 
     // add top frame as target for the widget
-    if(!lmkFolderWidget->GetDragAndDropTargets()->HasTarget(this->TopDragAndDropTarget->GetFrame()))
+    if(!lmkFolderWidget->GetDragAndDropHelper()->HasTarget(this->TopDragAndDropTarget->GetFrame()))
       {
-      lmkFolderWidget->GetDragAndDropTargets()->AddTarget(this->TopDragAndDropTarget->GetFrame());
-      lmkFolderWidget->GetDragAndDropTargets()->SetTargetEndCommand(this->TopDragAndDropTarget->GetFrame(), this, "DragAndDropEndCommand");
-      lmkFolderWidget->GetDragAndDropTargets()->SetTargetPerformCommand(this->TopDragAndDropTarget->GetFrame(), this, "DragAndDropPerformCommand");
+      lmkFolderWidget->GetDragAndDropHelper()->AddTarget(this->TopDragAndDropTarget->GetFrame());
+      lmkFolderWidget->GetDragAndDropHelper()->SetTargetEndCommand(this->TopDragAndDropTarget->GetFrame(), this, "DragAndDropEndCommand");
+      lmkFolderWidget->GetDragAndDropHelper()->SetTargetPerformCommand(this->TopDragAndDropTarget->GetFrame(), this, "DragAndDropPerformCommand");
       }
     }
 }
@@ -2684,13 +2684,13 @@ void vtkPVLookmarkManager::RemoveItemAsDragAndDropTarget(vtkKWWidget *target)
       {
       targetLmkWidget = vtkKWLookmark::SafeDownCast(target);
       if(targetLmkWidget)
-        lmkFolderWidget->GetDragAndDropTargets()->RemoveTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame());
+        lmkFolderWidget->GetDragAndDropHelper()->RemoveTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame());
       targetLmkFolder = vtkKWLookmarkFolder::SafeDownCast(target);
       if(targetLmkFolder)
         {
-        lmkFolderWidget->GetDragAndDropTargets()->RemoveTarget(targetLmkFolder->GetSeparatorFrame()->GetFrame());
-        lmkFolderWidget->GetDragAndDropTargets()->RemoveTarget(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame());
-        lmkFolderWidget->GetDragAndDropTargets()->RemoveTarget(targetLmkFolder->GetLabelFrame()->GetLabel());
+        lmkFolderWidget->GetDragAndDropHelper()->RemoveTarget(targetLmkFolder->GetSeparatorFrame()->GetFrame());
+        lmkFolderWidget->GetDragAndDropHelper()->RemoveTarget(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame());
+        lmkFolderWidget->GetDragAndDropHelper()->RemoveTarget(targetLmkFolder->GetLabelFrame()->GetLabel());
         }
       }
     }
@@ -2702,13 +2702,13 @@ void vtkPVLookmarkManager::RemoveItemAsDragAndDropTarget(vtkKWWidget *target)
       {
       targetLmkWidget = vtkKWLookmark::SafeDownCast(target);
       if(targetLmkWidget)
-        lookmarkWidget->GetDragAndDropTargets()->RemoveTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame());
+        lookmarkWidget->GetDragAndDropHelper()->RemoveTarget(targetLmkWidget->GetSeparatorFrame()->GetFrame());
       targetLmkFolder = vtkKWLookmarkFolder::SafeDownCast(target);
       if(targetLmkFolder)
         {
-        lookmarkWidget->GetDragAndDropTargets()->RemoveTarget(targetLmkFolder->GetSeparatorFrame()->GetFrame());
-        lookmarkWidget->GetDragAndDropTargets()->RemoveTarget(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame());
-        lookmarkWidget->GetDragAndDropTargets()->RemoveTarget(targetLmkFolder->GetLabelFrame()->GetLabel());
+        lookmarkWidget->GetDragAndDropHelper()->RemoveTarget(targetLmkFolder->GetSeparatorFrame()->GetFrame());
+        lookmarkWidget->GetDragAndDropHelper()->RemoveTarget(targetLmkFolder->GetNestedSeparatorFrame()->GetFrame());
+        lookmarkWidget->GetDragAndDropHelper()->RemoveTarget(targetLmkFolder->GetLabelFrame()->GetLabel());
         }
       }
     }

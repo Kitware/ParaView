@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWMostRecentFilesUtilities.h
+  Module:    vtkKWMostRecentFilesHelper.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,25 +11,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWMostRecentFilesUtilities - a set of most recent files
+// .NAME vtkKWMostRecentFilesHelper - a set of most recent files
 // .SECTION Description
 // This class is basically a container for a set of most recent files.
 // It provides methods to manipulate them, load/save them from/to the
 // registry, and display them as entries in a menu.
 
-#ifndef __vtkKWMostRecentFilesUtilities_h
-#define __vtkKWMostRecentFilesUtilities_h
+#ifndef __vtkKWMostRecentFilesHelper_h
+#define __vtkKWMostRecentFilesHelper_h
 
 #include "vtkKWObject.h"
 
-class vtkKWMostRecentFilesUtilitiesInternals;
+class vtkKWMostRecentFilesHelperInternals;
 class vtkKWMenu;
 
-class VTK_EXPORT vtkKWMostRecentFilesUtilities : public vtkKWObject
+class VTK_EXPORT vtkKWMostRecentFilesHelper : public vtkKWObject
 {
 public:
-  static vtkKWMostRecentFilesUtilities* New();
-  vtkTypeRevisionMacro(vtkKWMostRecentFilesUtilities,vtkKWObject);
+  static vtkKWMostRecentFilesHelper* New();
+  vtkTypeRevisionMacro(vtkKWMostRecentFilesHelper,vtkKWObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -111,8 +111,8 @@ public:
   virtual void PopulateMostRecentFilesMenu(vtkKWMenu*, int max_nb);
 
 protected:
-  vtkKWMostRecentFilesUtilities();
-  ~vtkKWMostRecentFilesUtilities();
+  vtkKWMostRecentFilesHelper();
+  ~vtkKWMostRecentFilesHelper();
 
   char        *DefaultTargetCommand;
   vtkKWObject *DefaultTargetObject;
@@ -124,8 +124,8 @@ protected:
 
   // PIMPL Encapsulation for STL containers
 
-  vtkKWMostRecentFilesUtilitiesInternals *Internals;
-  friend class vtkKWMostRecentFilesUtilitiesInternals;
+  vtkKWMostRecentFilesHelperInternals *Internals;
+  friend class vtkKWMostRecentFilesHelperInternals;
 
   //ETX
 
@@ -147,8 +147,8 @@ private:
 
   vtkKWMenu   *MostRecentFilesMenu;
 
-  vtkKWMostRecentFilesUtilities(const vtkKWMostRecentFilesUtilities&); // Not implemented
-  void operator=(const vtkKWMostRecentFilesUtilities&); // Not implemented
+  vtkKWMostRecentFilesHelper(const vtkKWMostRecentFilesHelper&); // Not implemented
+  void operator=(const vtkKWMostRecentFilesHelper&); // Not implemented
 };
 
 #endif

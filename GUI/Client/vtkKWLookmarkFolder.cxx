@@ -23,7 +23,7 @@
 #include "vtkCollectionIterator.h"
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWDragAndDropTargets.h"
+#include "vtkKWDragAndDropHelper.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWLabel.h"
@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.3");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.4");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -52,9 +52,9 @@ vtkKWLookmarkFolder::vtkKWLookmarkFolder()
   this->NameField = vtkKWText::New();
   this->Checkbox = vtkKWCheckButton::New();
 
-  this->GetDragAndDropTargets()->SetStartCommand(
+  this->GetDragAndDropHelper()->SetStartCommand(
     this, "DragAndDropStartCallback");
-  this->GetDragAndDropTargets()->SetEndCommand(
+  this->GetDragAndDropHelper()->SetEndCommand(
     this, "DragAndDropEndCallback");
 }
 
@@ -142,7 +142,7 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
 //  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
   this->Script("pack %s -fill x -expand t -side left", this->LabelFrame->GetWidgetName());
 
-  this->GetDragAndDropTargets()->SetAnchor(
+  this->GetDragAndDropHelper()->SetAnchor(
     this->LabelFrame->GetLabel());
 
   this->SeparatorFrame->SetParent(this);
@@ -359,7 +359,7 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
       {
 //      lmkWidget->SetLookmarkState(onoff);
       int fr, fg, fb, br, bg, bb;
-      anchor = lmkWidget->GetDragAndDropTargets()->GetAnchor();
+      anchor = lmkWidget->GetDragAndDropHelper()->GetAnchor();
       anchor->GetForegroundColor(&fr, &fg, &fb);
       anchor->GetBackgroundColor(&br, &bg, &bb);
       anchor->SetForegroundColor(br, bg, bb);
@@ -374,7 +374,7 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
 //      if(lmkFolder->GetSelectionFlag() != onoff)
 //        {
         int fr, fg, fb, br, bg, bb;
-        anchor = lmkFolder->GetDragAndDropTargets()->GetAnchor();
+        anchor = lmkFolder->GetDragAndDropHelper()->GetAnchor();
         anchor->GetForegroundColor(&fr, &fg, &fb);
         anchor->GetBackgroundColor(&br, &bg, &bb);
         anchor->SetForegroundColor(br, bg, bb);

@@ -16,7 +16,7 @@
 
 #include "vtkCollectionIterator.h"
 #include "vtkKWApplication.h"
-#include "vtkKWDragAndDropTargets.h"
+#include "vtkKWDragAndDropHelper.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWLabel.h"
 #include "vtkKWNotebook.h"
@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.33");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.34");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -600,7 +600,7 @@ int vtkKWUserInterfaceNotebookManager::CanWidgetBeDragAndDropped(
       {
       if (anchor)
         {
-        *anchor = frame->GetDragAndDropTargets()->GetAnchor();
+        *anchor = frame->GetDragAndDropHelper()->GetAnchor();
         }
       return 1;
       }
@@ -680,19 +680,19 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanelDragAndDrop(
       {
       if (this->EnableDragAndDrop)
         {
-        if (!widget->GetDragAndDropTargets()->HasTarget(this->Notebook))
+        if (!widget->GetDragAndDropHelper()->HasTarget(this->Notebook))
           {
-          widget->GetDragAndDropTargets()->EnableOn();
-          widget->GetDragAndDropTargets()->SetAnchor(anchor);
-          widget->GetDragAndDropTargets()->SetTargetEndCommand(
+          widget->GetDragAndDropHelper()->EnableOn();
+          widget->GetDragAndDropHelper()->SetAnchor(anchor);
+          widget->GetDragAndDropHelper()->SetTargetEndCommand(
             this->Notebook, this, "DragAndDropEndCallback");
           }
         }
       else
         {
-        if (widget->GetDragAndDropTargets()->HasTarget(this->Notebook))
+        if (widget->GetDragAndDropHelper()->HasTarget(this->Notebook))
           {
-          widget->GetDragAndDropTargets()->RemoveTarget(this->Notebook);
+          widget->GetDragAndDropHelper()->RemoveTarget(this->Notebook);
           }
         }
       }
