@@ -160,7 +160,7 @@ protected:
   friend class vtkSMPartDisplay;
   friend class vtkSMLODPartDisplay;
   friend class vtkSMCompositePartDisplay;
-  friend class vtkSMPickDisplay;
+  friend class vtkSMPointLabelDisplay;
   friend class vtkSMPlotDisplay;
   friend class vtkSMCubeAxesDisplay;
   friend class vtkPVPointSourceWidget;

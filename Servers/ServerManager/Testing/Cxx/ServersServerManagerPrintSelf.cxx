@@ -23,7 +23,7 @@
 #include "vtkSMMultiDisplayPartDisplay.h"
 #include "vtkPVMultiDisplayRenderModule.h"
 #include "vtkSMPartDisplay.h"
-#include "vtkSMPickDisplay.h"
+#include "vtkSMPointLabelDisplay.h"
 #include "vtkSMPlotDisplay.h"
 #include "vtkPVSimpleRenderModule.h"
 #include "vtkRMObject.h"
@@ -106,7 +106,7 @@ int main(int , char *[])
   c = vtkSMMultiDisplayPartDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkPVMultiDisplayRenderModule::New(); c->Print( cout ); c->Delete();
   c = vtkSMPartDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPickDisplay::New(); c->Print( cout ); c->Delete();
+  c = vtkSMPointLabelDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkSMPlotDisplay::New(); c->Print( cout ); c->Delete();
   c = vtkPVSimpleRenderModule::New(); c->Print( cout ); c->Delete();
   c = vtkRMObject::New(); c->Print( cout ); c->Delete();
