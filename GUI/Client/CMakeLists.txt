@@ -60,6 +60,14 @@ SET( ParaViewClientNotWrapped_SRCS
 SET( ParaViewClient_SRCS
   vtkKWBoundsDisplay.cxx
   vtkPV3DWidget.cxx
+  vtkRMObject.cxx
+  vtkRM3DWidget.cxx
+  vtkRMBoxWidget.cxx
+  vtkRMImplicitPlaneWidget.cxx
+  vtkRMLineWidget.cxx
+  vtkRMPointWidget.cxx
+  vtkRMSphereWidget.cxx
+  vtkRMScalarBarWidget.cxx
   vtkPVAdvancedReaderModule.cxx
   vtkPVAnimationInterface.cxx
   vtkPVAnimationInterfaceEntry.cxx
@@ -223,6 +231,8 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 SET_SOURCE_FILES_PROPERTIES(
+  vtkRMObject.cxx
+  vtkRM3DWidget.cxx
   vtkPV3DWidget
   vtkPVDisplay
   vtkPVJoystickFly
