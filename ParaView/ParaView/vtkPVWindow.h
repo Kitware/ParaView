@@ -347,8 +347,7 @@ public:
 
   // Description:
   // Access to the animation interface for scripting.
-  vtkPVAnimationInterface* GetAnimationInterface() 
-    {return this->AnimationInterface;}
+  vtkGetObjectMacro(AnimationInterface, vtkPVAnimationInterface);
 
   // Description:
   // Add a prototype from which a module can be created.
