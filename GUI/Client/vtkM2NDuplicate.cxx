@@ -33,7 +33,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkM2NDuplicate, "1.2");
+vtkCxxRevisionMacro(vtkM2NDuplicate, "1.3");
 vtkStandardNewMacro(vtkM2NDuplicate);
 
 vtkCxxSetObjectMacro(vtkM2NDuplicate,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
@@ -150,7 +150,6 @@ void vtkM2NDuplicate::Execute()
         reader->Modified(); // For append loop
         reader->GetOutput()->Update();
         vtkPolyData* pd = reader->GetOutput();
-        vtkPolyData* output = this->GetOutput();
         output->CopyStructure(pd);
         output->GetPointData()->PassData(pd->GetPointData());
         output->GetCellData()->PassData(pd->GetCellData());
@@ -170,14 +169,14 @@ void vtkM2NDuplicate::Execute()
       return;
       }
     // Execute All to n and send to render server.
-    int numConnections=this->MPIMToNSocketConnection->GetNumberOfConnections();
-    int bufSize = 0;
-    char* buf = NULL;
+    bufSize = 0;
+    buf = NULL;
     vtkPolyData* input = this->GetInput();
 
     // If we are the data server and there are fewer render processes,
     // Perform the M to N operation.
 #ifdef VTK_USE_MPI
+    int numConnections=this->MPIMToNSocketConnection->GetNumberOfConnections();
     vtkAllToNRedistributePolyData* AllToN = NULL;
     if (controller && controller->GetNumberOfProcesses() > numConnections)
       {
@@ -322,7 +321,6 @@ void vtkM2NDuplicate::Execute()
     reader->Modified(); // For append loop
     reader->GetOutput()->Update();
     vtkPolyData* pd = reader->GetOutput();
-    vtkPolyData* output = this->GetOutput();
     output->CopyStructure(pd);
     output->GetPointData()->PassData(pd->GetPointData());
     output->GetCellData()->PassData(pd->GetCellData());

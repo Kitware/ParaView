@@ -33,7 +33,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkM2NCollect, "1.10");
+vtkCxxRevisionMacro(vtkM2NCollect, "1.11");
 vtkStandardNewMacro(vtkM2NCollect);
 
 vtkCxxSetObjectMacro(vtkM2NCollect,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
@@ -131,7 +131,6 @@ void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
     return;
     }
 
-  int numConnections = this->MPIMToNSocketConnection->GetNumberOfConnections();
   int bufSize = 0;
   char* buf = NULL;
 
@@ -140,6 +139,7 @@ void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
   // If we are the data server and there are fewer render processes,
   // Perform the M to N operation.
 #ifdef VTK_USE_MPI
+  int numConnections = this->MPIMToNSocketConnection->GetNumberOfConnections();
   vtkAllToNRedistributePolyData* AllToN = NULL;
   vtkMultiProcessController* controller = this->GetController();
   if (this->ServerMode && controller && 
