@@ -570,6 +570,8 @@ void vtkPVSource::Accept()
 {
   vtkPVWindow *window;
 
+  this->Script("update");
+
   window = this->GetPVWindow();
 
 #ifdef _WIN32
