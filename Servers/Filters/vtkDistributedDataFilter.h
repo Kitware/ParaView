@@ -163,6 +163,47 @@ public:
   vtkGetMacro(ClipCells, int);
   vtkSetMacro(ClipCells, int);
 
+//BTX
+  enum BoundaryModes {
+    ASSIGN_TO_ONE_REGION=0,
+    ASSIGN_TO_ALL_INTERSECTING_REGIONS=1,
+    SPLIT_BOUNDARY_CELLS=2
+  };
+//ETX
+
+  // Description:
+  // Handling of ClipCells and IncludeAllIntersectingCells.
+  void SetBoundaryMode(int mode);
+  void SetBoundaryModeToAssignToOneRegion()
+    { this->SetBoundaryMode(vtkDistributedDataFilter::ASSIGN_TO_ONE_REGION); }
+  void SetBoundaryModeToAssignToAllIntersectingRegions()
+    { this->SetBoundaryMode(
+      vtkDistributedDataFilter::ASSIGN_TO_ALL_INTERSECTING_REGIONS);
+    }
+  void SetBoundaryModeToSplitBoundaryCells()
+    { this->SetBoundaryMode(vtkDistributedDataFilter::SPLIT_BOUNDARY_CELLS); }
+  int GetBoundaryMode();
+  
+  // Description:
+  //   Ensure previous filters don't send up ghost cells
+  virtual void ComputeInputUpdateExtents( vtkDataObject *output );
+
+  // Description:
+  //  Turn on collection of timing data
+
+  vtkBooleanMacro(Timing, int);
+  vtkSetMacro(Timing, int);
+  vtkGetMacro(Timing, int);
+
+  // Description:
+  // Consider the MTime of the KdTree.
+  unsigned long GetMTime();
+
+protected:
+
+  vtkDistributedDataFilter();
+  ~vtkDistributedDataFilter();
+
   // Description:
   //  Another way to set ClipCells and IncludeAllIntersectingCells.
   //  AssignBoundaryCellsToOneRegion turns off both ClipCells and
@@ -204,26 +245,6 @@ public:
   void Execute();
   void SingleProcessExecute();
   void ExecuteInformation();
-
-  // Description:
-  //   Ensure previous filters don't send up ghost cells
-  virtual void ComputeInputUpdateExtents( vtkDataObject *output );
-
-  // Description:
-  //  Turn on collection of timing data
-
-  vtkBooleanMacro(Timing, int);
-  vtkSetMacro(Timing, int);
-  vtkGetMacro(Timing, int);
-
-  // Description:
-  // Consider the MTime of the KdTree.
-  unsigned long GetMTime();
-
-protected:
-
-  vtkDistributedDataFilter();
-  ~vtkDistributedDataFilter();
 
 private:
 
