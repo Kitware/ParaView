@@ -495,6 +495,11 @@ public:
   void CacheUpdate(int idx, int total);
   vtkClientServerID GetInteractorID(){ return this->InteractorID;}
 
+  // Description:
+  // Returns 1 is file exists on the server and is readable and 0
+  // otherwise.
+  int CheckIfFileIsReadable(const char* fname);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -571,9 +576,6 @@ protected:
 
   // Disable or enable the select menu.
   void EnableSelectMenu();
-
-  // Returns VTK_OK is file exists and is readable.
-  int CheckIfFileIsReadable(const char* fname);
 
   vtkPVSource *CurrentPVSource;
   vtkPVData *CurrentPVData;

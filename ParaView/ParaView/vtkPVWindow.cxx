@@ -145,7 +145,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.25");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.26");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1700,7 +1700,6 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
 }
 
 //-----------------------------------------------------------------------------
-// Try to open a file for reading, return error on failure.
 int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
@@ -1718,11 +1717,7 @@ int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
     {
     vtkErrorMacro("Error checking whether file is readable on server.");
     }
-  if(readable)
-    {
-    return VTK_OK;
-    }
-  return VTK_ERROR;
+  return readable;
 }
 
 
@@ -1814,7 +1809,7 @@ vtkKWApplicationSettingsInterface* vtkPVWindow::GetApplicationSettingsInterface(
 //-----------------------------------------------------------------------------
 int vtkPVWindow::Open(char *openFileName, int store)
 {
-  if (this->CheckIfFileIsReadable(openFileName) != VTK_OK)
+  if (!this->CheckIfFileIsReadable(openFileName))
     {
     ostrstream error;
     error << "Can not open file " << openFileName << " for reading." << ends;
@@ -3732,7 +3727,7 @@ int vtkPVWindow::OpenPackage()
 //-----------------------------------------------------------------------------
 int vtkPVWindow::OpenPackage(const char* openFileName)
 {
-  if ( this->CheckIfFileIsReadable(openFileName) != VTK_OK )
+  if ( !this->CheckIfFileIsReadable(openFileName) )
     {
     return VTK_ERROR;
     }
