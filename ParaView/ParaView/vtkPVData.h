@@ -346,35 +346,12 @@ public:
   vtkGetMacro(LODResolution, int);
 
   // Description:
-  // Set the collection threshold.  The units of this threshold are 
-  // in MegaBytes.  Defaults to 2 MB.  Threshold is compared against
-  // the size of the total (across all processes) data set size.
-  //
-  // I would like to change this into a global threshold,
-  // But there are update issues.  We do not know the
-  // memory size until the collect filters execute.
-  // We would need to set the collection flag
-  // before it executes.  
-  void SetCollectThreshold(float size);
-  vtkGetMacro(CollectThreshold, float)
-
-  // Description:
   // Moving away from direct access to VTK data objects.
   vtkPVDataInformation* GetDataInformation();
   
   // Description:
   // Called by source EndEvent to schedule another Gather.
   void InvalidateDataInformation();
-
-  // Description:
-  // These methods sum up results from all parts.
-  // They are used by the PVRenderView to decide when to 
-  // render locally versus use compositing.
-  unsigned long GetGeometryMemorySize();
-  unsigned long GetLODMemorySize();
-  int GetGeometryCollected();
-  int GetLODCollected();
-
 
 protected:
   vtkPVData();
@@ -488,18 +465,8 @@ protected:
   vtkPVColorMap *PVColorMap;
 
   int LODResolution;
-  float CollectThreshold;
 
   void UpdateActorControlResolutions();
-
-  // Used to be a part of data information,
-  // but updating these is different.
-  unsigned long GeometryMemorySize;
-  unsigned long LODMemorySize;
-  int GeometryCollected;
-  int LODCollected;
-  int GeometryInformationValid;
-  void UpdateGeometryInformation();
 
   vtkPVData(const vtkPVData&); // Not implemented
   void operator=(const vtkPVData&); // Not implemented

@@ -68,6 +68,18 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Enables or disables the collection filter.
+  void SetCollectionDecision(int val);
+  vtkGetMacro(CollectionDecision, int);
+  void SetLODCollectionDecision(int val);
+  vtkGetMacro(LODCollectionDecision, int);
+
+  // Description:
+  // Turns visibilioty on or off.
+  // When visibility is off, geometry data is released.
+  void SetVisibility(int v);
+
+  // Description:
   // This also creates the parallel vtk objects for the composite.
   // (actor, mapper, ...)
   void SetPVApplication(vtkPVApplication *pvApp);
@@ -158,21 +170,13 @@ public:
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
 
-  // Description:
-  // These methods give information about geometry.
-  // How much memory is used by the geometry to render
-  // (both full resolution and LOD) will determine
-  // Whether rendering will occur on client or server.
-  // It uses the collection filters to get its information.
-  unsigned long GetGeometryMemorySize();
-  unsigned long GetLODMemorySize();
-  int GetGeometryCollected();
-  int GetLODCollected();
-
 protected:
   vtkPVPart();
   ~vtkPVPart();
   
+  int CollectionDecision;
+  int LODCollectionDecision;
+
   // A part needs a name to show in the extract part filter.
   // We are also going to allow expresion matching.
   char *Name;

@@ -112,6 +112,9 @@ protected:
   void GetFiles(vtkStringList* files);
   int StringGreater(char* str1, char* str2);
 
+  // Get rid of backslashes.
+  void ConvertLastPath();
+
   //vtkDirectory*     DirectoryTool;
   char*             DirectoryToolTclName;
   vtkSetStringMacro(DirectoryToolTclName);

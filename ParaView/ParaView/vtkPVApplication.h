@@ -307,6 +307,17 @@ public:
   // The name of the trace file.
   vtkGetStringMacro(TraceFileName);
 
+  // Description:
+  // This is just a convenient spot to keep this flag.
+  // Render view uses this to descide whether to recompute the
+  // total memory size of visible geometry.  This is necessary
+  // to decide between collection vs. distributed rendering.
+  // When we create rendering modules, the render view will be
+  // integrated with the vtkPVProcessModule and vtkPVParts and
+  // this flag can be moved.
+  vtkSetMacro(TotalVisibleMemorySizeValid, int);
+  vtkGetMacro(TotalVisibleMemorySizeValid, int);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -386,6 +397,8 @@ protected:
   //ETX
 
   static vtkPVApplication* MainApplication;  
+
+  int TotalVisibleMemorySizeValid;
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented

@@ -114,7 +114,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.182");
+vtkCxxRevisionMacro(vtkPVApplication, "1.183");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -268,6 +268,9 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+
+  this->TotalVisibleMemorySizeValid = 0;
+
   this->AboutDialog = 0;
   this->Display3DWidgets = 0;
   this->ProcessId = 0;
@@ -1596,6 +1599,10 @@ void vtkPVApplication::ErrorExit()
 void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "TotalVisibleMemorySizeValid: " 
+     << this->TotalVisibleMemorySizeValid << endl;
+
   os << indent << "ProcessModule: " << this->ProcessModule << endl;;
   os << indent << "RunningParaViewScript: " 
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;

@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.4");
+vtkCxxRevisionMacro(vtkPVPart, "1.5");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -73,6 +73,9 @@ int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVPart::vtkPVPart()
 {
   this->CommandFunction = vtkPVPartCommand;
+
+  this->CollectionDecision = 1;
+  this->LODCollectionDecision = 1;
 
   this->Name = NULL;
 
@@ -400,38 +403,75 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->GetProcessModule()->InitializePVPartPartition(this);
 }
 
+
 //----------------------------------------------------------------------------
-unsigned long vtkPVPart::GetGeometryMemorySize()
+void vtkPVPart::SetCollectionDecision(int v)
 {
-  // I hate having to get this unsigned long value through tcl as an integer.
-  this->Script("%s GetMemorySize", this->CollectTclName);
-  return static_cast<unsigned long>(this->GetIntegerResult(this->Application));
+  vtkPVApplication* pvApp = this->GetPVApplication();
+
+  if (v == this->CollectionDecision)
+    {
+    return;
+    }
+  this->CollectionDecision = v;
+
+  if (this->CollectTclName)
+    {
+    if (this->CollectionDecision)
+      {
+      pvApp->BroadcastScript("%s SetPassThrough 0", this->CollectTclName);
+      }
+    else
+      {
+      pvApp->BroadcastScript("%s SetPassThrough 1", this->CollectTclName);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkPVPart::GetLODMemorySize()
+void vtkPVPart::SetLODCollectionDecision(int v)
 {
-  // I hate having to get this unsigned long value through tcl as an integer.
-  this->Script("%s GetMemorySize", this->LODCollectTclName);
-  return static_cast<unsigned long>(this->GetIntegerResult(this->Application));
+  vtkPVApplication* pvApp = this->GetPVApplication();
+
+  if (v == this->LODCollectionDecision)
+    {
+    return;
+    }
+  this->LODCollectionDecision = v;
+
+  if (this->LODCollectTclName)
+    {
+    if (this->LODCollectionDecision)
+      {
+      pvApp->BroadcastScript("%s SetPassThrough 0", this->LODCollectTclName);
+      }
+    else
+      {
+      pvApp->BroadcastScript("%s SetPassThrough 1", this->LODCollectTclName);
+      }
+    }
 }
 
-//----------------------------------------------------------------------------
-int vtkPVPart::GetGeometryCollected()
-{
-  // Although I might use the total memory size of all parts for the 
-  // local vs. compositing rendering decision, for now I will render 
-  // localy only if all the parts have collected. 
-  this->Script("%s GetCollected", this->CollectTclName);
-  return this->GetIntegerResult(this->Application);
-}
+
 
 //----------------------------------------------------------------------------
-int vtkPVPart::GetLODCollected()
+void vtkPVPart::SetVisibility(int v)
 {
-  this->Script("%s GetCollected", this->LODCollectTclName);
-  return this->GetIntegerResult(this->Application);
+  vtkPVApplication* pvApp = this->GetPVApplication();
+
+  if (this->GetPropTclName())
+    {
+    pvApp->BroadcastScript("%s SetVisibility %d", this->GetPropTclName(), v);
+    }
+  if (v == 0 && this->GetGeometryTclName())
+    {
+    pvApp->BroadcastScript("[%s GetInput] ReleaseData", this->GetMapperTclName());
+    }
+
+  // Recompute total visibile memory size.
+  pvApp->SetTotalVisibleMemorySizeValid(0);
 }
+
 
 
 //----------------------------------------------------------------------------
@@ -441,6 +481,9 @@ void vtkPVPart::GatherDataInformation()
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
 
   pm->GatherDataInformation(this->DataInformation, this->LODDeciTclName);
+
+  // Recompute total visibile memory size.
+  pvApp->SetTotalVisibleMemorySizeValid(0);
 
   // Look for a name defined in Field data.
   this->SetName(this->DataInformation->GetName());
@@ -547,10 +590,10 @@ void vtkPVPart::Update()
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   // The mapper has the assignment for this processor.
-  pvApp->BroadcastScript("%s SetUpdateExtent [%s GetPiece] [%s GetNumberOfPieces]", 
-                         this->VTKDataTclName, 
+  pvApp->BroadcastScript("[%s GetOutput] SetUpdateExtent [%s GetPiece] [%s GetNumberOfPieces]", 
+                         this->LODDeciTclName, 
                          this->MapperTclName, this->MapperTclName);
-  pvApp->BroadcastScript("%s Update", this->VTKDataTclName);
+  pvApp->BroadcastScript("%s Update", this->LODDeciTclName);
 }
 
 
@@ -656,6 +699,12 @@ void vtkPVPart::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CollectTclName: " << (this->CollectTclName?this->CollectTclName:"none") << endl;
   os << indent << "LODCollectTclName: " << (this->LODCollectTclName?this->LODCollectTclName:"none") << endl;
   os << indent << "LODDeciTclName: " << (this->LODDeciTclName?this->LODDeciTclName:"none") << endl;
+
+  os << indent << "CollectionDecision: " 
+     <<  this->CollectionDecision << endl;
+  os << indent << "LODCollectionDecision: " 
+     <<  this->LODCollectionDecision << endl;
+
 
   if (this->UpdateSuppressorTclName)
     {

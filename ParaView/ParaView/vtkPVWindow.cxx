@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.416");
+vtkCxxRevisionMacro(vtkPVWindow, "1.417");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -136,6 +136,11 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 //-----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {
+  this->TotalVisibleGeometryMemorySize = 0;
+  this->TotalVisibleLODMemorySize = 0;
+  this->CollectionDecision = 1;
+  this->LODCollectionDecision = 1;
+
   this->Interactor = 0;
 
   this->Interaction = 0;
@@ -365,6 +370,140 @@ vtkPVWindow::~vtkPVWindow()
     this->PVColorMaps = NULL;
     }
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::ComputeTotalVisibleMemorySize()
+{
+  vtkPVSourceCollection* col = this->GetSourceList("Sources");
+  vtkPVSource* pvs;
+  vtkPVData* pvd;
+  vtkPVDataInformation* pvdi;
+
+  this->TotalVisibleGeometryMemorySize = 0;
+  this->TotalVisibleLODMemorySize = 0;
+  col->InitTraversal();
+  while ( (pvs=col->GetNextPVSource()) )
+    {
+    if (pvs->GetVisibility())
+      {
+      pvd = pvs->GetPVOutput();
+      pvdi = pvd->GetDataInformation();
+      this->TotalVisibleGeometryMemorySize += pvdi->GetGeometryMemorySize();
+      this->TotalVisibleLODMemorySize += pvdi->GetLODMemorySize();
+      }
+    }
+
+}
+
+
+//-----------------------------------------------------------------------------
+unsigned long vtkPVWindow::GetTotalVisibleGeometryMemorySize()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (pvApp->GetTotalVisibleMemorySizeValid())
+    {
+    return this->TotalVisibleGeometryMemorySize;
+    }
+
+  this->ComputeTotalVisibleMemorySize();
+  return this->TotalVisibleGeometryMemorySize;
+}
+
+
+//-----------------------------------------------------------------------------
+int vtkPVWindow::MakeCollectionDecision()
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  int decision = 1;
+
+  if (pvApp->GetTotalVisibleMemorySizeValid())
+    {
+    return this->CollectionDecision;
+    }
+
+  this->ComputeTotalVisibleMemorySize();
+  pvApp->SetTotalVisibleMemorySizeValid(1);
+  if (this->TotalVisibleGeometryMemorySize > 
+      this->GetMainView()->GetCollectThreshold()*1000)
+    {
+    decision = 0;
+    }
+
+  if (decision == this->CollectionDecision)
+    {
+    return decision;
+    }
+  this->CollectionDecision = decision;
+    
+  vtkPVSourceCollection* col = this->GetSourceList("Sources");
+  vtkPVSource* pvs;
+  vtkPVData* pvd;
+  vtkPVPart* pvp;
+  int partIdx, numParts;
+
+  col->InitTraversal();
+  while ( (pvs=col->GetNextPVSource()) )
+    {
+    pvd = pvs->GetPVOutput();
+    numParts = pvd->GetNumberOfPVParts();
+    for (partIdx = 0; partIdx < numParts; ++partIdx)
+      {
+      pvp = pvd->GetPVPart(partIdx);
+      pvp->SetCollectionDecision(this->CollectionDecision);
+      }
+    }
+
+  return this->CollectionDecision;
+}
+
+
+//-----------------------------------------------------------------------------
+int vtkPVWindow::MakeLODCollectionDecision()
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  int decision = 1;
+
+  if (pvApp->GetTotalVisibleMemorySizeValid())
+    {
+    return this->LODCollectionDecision;
+    }
+
+  this->ComputeTotalVisibleMemorySize();
+  pvApp->SetTotalVisibleMemorySizeValid(1);
+  if (this->TotalVisibleLODMemorySize > 
+      this->GetMainView()->GetCollectThreshold()*1000)
+    {
+    decision = 0;
+    }
+
+  if (decision == this->LODCollectionDecision)
+    {
+    return decision;
+    }
+  this->LODCollectionDecision = decision;
+    
+  vtkPVSourceCollection* col = this->GetSourceList("Sources");
+  vtkPVSource* pvs;
+  vtkPVData* pvd;
+  vtkPVPart* pvp;
+  int partIdx, numParts;
+
+  col->InitTraversal();
+  while ( (pvs=col->GetNextPVSource()) )
+    {
+    pvd = pvs->GetPVOutput();
+    numParts = pvd->GetNumberOfPVParts();
+    for (partIdx = 0; partIdx < numParts; ++numParts)
+      {
+      pvp = pvd->GetPVPart(partIdx);
+      pvp->SetLODCollectionDecision(this->LODCollectionDecision);
+      }
+    }
+
+  return this->LODCollectionDecision;
+}
+
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::CloseNoPrompt()
@@ -3908,7 +4047,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.416 $");
+  this->ExtractRevision(os,"$Revision: 1.417 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -4282,6 +4421,7 @@ void vtkPVWindow::SetInteraction(int s)
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
   os << indent << "CenterXEntry: " << this->GetCenterXEntry() << endl;
   os << indent << "CenterYEntry: " << this->GetCenterYEntry() << endl;
   os << indent << "CenterZEntry: " << this->GetCenterZEntry() << endl;

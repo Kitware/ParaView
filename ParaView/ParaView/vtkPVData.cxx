@@ -96,7 +96,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.193");
+vtkCxxRevisionMacro(vtkPVData, "1.194");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -200,14 +200,7 @@ vtkPVData::vtkPVData()
   this->PVColorMap = NULL;
 
   this->LODResolution = 50;
-  this->CollectThreshold = 2.0;
   this->ColorSetByUser = 0;
-
-  this->GeometryMemorySize = 0;
-  this->LODMemorySize = 0;
-  this->GeometryCollected = 0;
-  this->LODCollected = 0;
-  this->GeometryInformationValid = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -390,7 +383,6 @@ vtkPVDataInformation* vtkPVData::GetDataInformation()
 void vtkPVData::InvalidateDataInformation()
 {
   this->DataInformationValid = 0;
-  this->GeometryInformationValid = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2078,14 +2070,7 @@ void vtkPVData::SetVisibilityInternal(int v)
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVPart(idx);
-    if (part->GetPropTclName())
-      {
-      pvApp->BroadcastScript("%s SetVisibility %d", part->GetPropTclName(), v);
-      }
-    if (v == 0 && part->GetGeometryTclName())
-      {
-      pvApp->BroadcastScript("[%s GetInput] ReleaseData", part->GetMapperTclName());
-      }
+    part->SetVisibility(v);
     }
 }
 
@@ -2106,7 +2091,6 @@ void vtkPVData::SetPVRenderView(vtkPVRenderView* view)
     {
     view->Register(this);
     this->SetLODResolution(view->GetLODResolution());
-    this->SetCollectThreshold(view->GetCollectThreshold());
     }
   if (this->PVRenderView)
     {
@@ -2497,17 +2481,9 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
   os << indent << "LODResolution: " << this->LODResolution << endl;
-  os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
   os << indent << "Visibility: " << this->Visibility << endl;
 
   os << indent << "NumberOfPVParts: " << this->GetNumberOfPVParts() << endl;
-  if (this->GeometryInformationValid)
-    {
-    os << indent << "GeometryMemorySize: " << this->GeometryMemorySize << endl;
-    os << indent << "LODMemorySize: " << this->LODMemorySize << endl;
-    os << indent << "GeometryCollected: " << this->GeometryCollected << endl;
-    os << indent << "LODCollected: " << this->LODCollected << endl;
-    }
 }
 
 //-------}---------------------------------------------------------------------
@@ -2953,117 +2929,13 @@ void vtkPVData::SetLODResolution(int dim)
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVData::SetCollectThreshold(float threshold)
-{
-  int idx, num;
-  vtkPVPart *part;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->CollectThreshold == threshold)
-    {
-    return;
-    }
-
-  this->GeometryInformationValid = 0;
-  this->CollectThreshold = threshold;
-
-  num = this->GetNumberOfPVParts();
-  for (idx = 0; idx < num; ++idx)
-    {
-    part = this->GetPVPart();  
-    // Threshold is only used whit vtkCollectPolyData.
-    // We need rendering modules ...
-    if (!pvApp->GetUseRenderingGroup() && !pvApp->GetUseTiledDisplay() && 
-        part->GetCollectTclName())
-      {
-      pvApp->BroadcastScript("%s SetThreshold %d", part->GetCollectTclName(),
-                             static_cast<unsigned long>(threshold*1000.0));
-      pvApp->BroadcastScript("%s SetThreshold %d", part->GetLODCollectTclName(),
-                             static_cast<unsigned long>(threshold*1000.0));
-      }
-    }
-}
-
-
-//----------------------------------------------------------------------------
-unsigned long vtkPVData::GetGeometryMemorySize()
-{
-  if ( ! this->GeometryInformationValid)
-    {
-    this->UpdateGeometryInformation();
-    }
-  return this->GeometryMemorySize;
-}
-
-//----------------------------------------------------------------------------
-unsigned long vtkPVData::GetLODMemorySize()
-{
-  if ( ! this->GeometryInformationValid)
-    {
-    this->UpdateGeometryInformation();
-    }
-  return this->LODMemorySize;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVData::GetGeometryCollected()
-{
-  if ( ! this->GeometryInformationValid)
-    {
-    this->UpdateGeometryInformation();
-    }
-  return this->GeometryCollected;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVData::GetLODCollected()
-{
-  if ( ! this->GeometryInformationValid)
-    {
-    this->UpdateGeometryInformation();
-    }
-  return this->LODCollected;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::UpdateGeometryInformation()
-{
-  int numParts, idx;
-  vtkPVPart *part;
-
-  this->GeometryMemorySize = 0;
-  this->LODMemorySize = 0;
-  this->GeometryCollected = 1;
-  this->LODCollected = 1;
-
-  numParts = this->GetNumberOfPVParts();
-  for (idx = 0; idx < numParts; ++idx)
-    {
-    part = this->GetPVPart(idx);
-    this->GeometryMemorySize += part->GetGeometryMemorySize();
-    this->LODMemorySize += part->GetLODMemorySize();
-    if ( ! part->GetGeometryCollected())
-      {
-      this->GeometryCollected = 0;
-      }
-    if ( ! part->GetLODCollected())
-      {
-      this->LODCollected = 0;
-      }
-    }
-
-  this->GeometryInformationValid = 1;
-}
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.193 $");
+  this->ExtractRevision(os,"$Revision: 1.194 $");
 }
 
 //----------------------------------------------------------------------------

@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.238");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.239");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1858,9 +1858,6 @@ void vtkPVRenderView::StartRender()
 
 int vtkPVRenderView::UpdateAllPVData(int interactive)
 {
-  int geometryCollectedFlag = 1;
-  int deciCollectedFlag = 1;
-  unsigned long geometryMemorySize = 0;
   vtkPVWindow* pvwindow = this->GetPVWindow();
   vtkPVApplication *pvApp = this->GetPVApplication();
   if ( !pvwindow || !pvApp )
@@ -1882,15 +1879,6 @@ int vtkPVRenderView::UpdateAllPVData(int interactive)
       if ( source->GetInitialized() && source->GetVisibility() )
         {
         data->ForceUpdate(pvApp);
-        if (data->GetLODCollected() == 0)
-          {
-          deciCollectedFlag = 0;
-          }
-        if (data->GetGeometryCollected() == 0)
-          {
-          geometryCollectedFlag = 0;
-          }
-        geometryMemorySize += data->GetGeometryMemorySize();
         }
       it->GoToNextItem();
       }
@@ -1899,13 +1887,15 @@ int vtkPVRenderView::UpdateAllPVData(int interactive)
 
 
   // We need to decide globally whether to use decimated geometry.  
-  if (interactive && geometryMemorySize > this->LODThreshold*1000)
+  if (interactive && 
+        this->GetPVWindow()->GetTotalVisibleGeometryMemorySize() > 
+        this->LODThreshold*1000)
     {
     pvApp->SetGlobalLODFlag(1);
-    return deciCollectedFlag;
+    return this->GetPVWindow()->MakeLODCollectionDecision();
     }
   pvApp->SetGlobalLODFlag(0);
-  return geometryCollectedFlag;
+  return this->GetPVWindow()->MakeCollectionDecision();
 }
 
 //----------------------------------------------------------------------------
@@ -2329,10 +2319,6 @@ void vtkPVRenderView::SetCollectThreshold(float threshold)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetCollectThresholdInternal(float threshold)
 {
-  vtkPVWindow *pvWin;
-  vtkPVSourceCollection *sources;
-  vtkPVSource *pvs;
-  vtkPVData *pvd;
   vtkPVApplication *pvApp;
   char str[256];
 
@@ -2341,20 +2327,9 @@ void vtkPVRenderView::SetCollectThresholdInternal(float threshold)
 
   this->CollectThreshold = threshold;
 
+  // This will cause collection to be re evaluated.
   pvApp = this->GetPVApplication();
-  pvWin = this->GetPVWindow();
-  if (pvWin == NULL)
-    {
-    vtkErrorMacro("Missing window.");
-    return;
-    }
-  sources = pvWin->GetSourceList("Sources");
-  sources->InitTraversal();
-  while ( (pvs = sources->GetNextPVSource()) )
-    {
-    pvd = pvs->GetPVOutput();
-    pvd->SetCollectThreshold(threshold);
-    }
+  pvApp->SetTotalVisibleMemorySizeValid(0);
 }
 
 
@@ -2680,7 +2655,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.238 $");
+  this->ExtractRevision(os,"$Revision: 1.239 $");
 }
 
 //------------------------------------------------------------------------------

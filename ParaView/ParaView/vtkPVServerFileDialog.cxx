@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.5");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.6");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -500,6 +500,9 @@ int vtkPVServerFileDialog::Invoke()
   this->Script("wm deiconify %s", this->GetWidgetName());
   this->Script("grab %s", this->GetWidgetName());
 
+  // Get rid of back slashes.
+  this->ConvertLastPath();
+
   this->Done = 0;
   while ( ! this->Done)
     {
@@ -508,6 +511,27 @@ int vtkPVServerFileDialog::Invoke()
   return this->ReturnValue;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVServerFileDialog::ConvertLastPath()
+{  
+  int max = 1000; 
+  char *p;
+
+  if (this->LastPath == NULL)
+    {
+    return;
+    }
+  p = this->LastPath;
+  while (*p != '\0' && max > 0)
+    {
+    if (*p == '\\')
+      {
+      *p = '/';
+      }
+    --max;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::LoadSaveCallback()
@@ -549,7 +573,7 @@ void vtkPVServerFileDialog::DownDirectoryCallback()
   idx = static_cast<int>(strlen(this->LastPath));
   newdir = new char[idx + 1];
   strcpy(newdir, this->LastPath);
-  while (newdir[idx] != '/' && newdir[idx] != '\\')
+  while (newdir[idx] != '/')
     {
     if ( idx <= 0)
       { // Already at lowest directory.
