@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.309.2.8");
+vtkCxxRevisionMacro(vtkPVSource, "1.309.2.9");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1315,9 +1315,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         }
       }
 
-
-    this->UnGrabFocus();
-
     // Set the current data of the window.
     if ( ! hideFlag)
       {
@@ -1352,6 +1349,9 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
 
     pvd->Initialize();
+    // This causes input to be checked for validity.
+    // I put it at the end so the InputFixedTypeRequirement will work.
+    this->UnGrabFocus();
     }
 
   window->GetMenuView()->CheckRadioButton(
