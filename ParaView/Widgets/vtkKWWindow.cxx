@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.115");
+vtkCxxRevisionMacro(vtkKWWindow, "1.116");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -613,10 +613,12 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->Script("image create photo");
   this->StatusImageName = vtkString::Duplicate(interp->result);
   this->CreateStatusImage();
-  this->StatusImage->Create(app,"label",
+  this->StatusImage->Create(app,"button",
                             "-relief sunken -bd 1 -fg #ffffff -bg #ffffff");
-  this->Script("%s configure -image %s", this->StatusImage->GetWidgetName(),
+  this->Script("%s configure -image %s", 
+               this->StatusImage->GetWidgetName(),
                this->StatusImageName);
+  this->StatusImage->SetCommand(this, "DisplayAbout");
   this->Script("pack %s -side left -ipadx 2 -ipady 2", 
                this->StatusImage->GetWidgetName());
 
@@ -1145,7 +1147,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.115 $");
+  this->ExtractRevision(os,"$Revision: 1.116 $");
 }
 
 int vtkKWWindow::ExitDialog()
