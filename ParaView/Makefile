@@ -32,6 +32,7 @@ vtkPVContour \
 vtkPVData \
 vtkPVDataSetReaderInterface \
 vtkPVEnSightReaderInterface \
+vtkPVInputMenu \
 vtkPVMethodInterface \
 vtkPVRenderView \
 vtkPVSelectionList \

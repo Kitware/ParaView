@@ -542,11 +542,11 @@ void vtkPVWindow::CalculatorCallback()
   calc->SetApplication(pvApp);
   calc->SetVTKSource(s, tclName);
   calc->SetNthPVInput(0, this->GetCurrentPVData());
-  calc->CreateProperties();
-  calc->SetName(tclName);
-  
+  calc->SetName(tclName);  
 
   this->GetMainView()->AddComposite(calc);
+  calc->CreateProperties();
+  calc->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(calc);
   this->GetMainView()->ShowSourceParent();
 
@@ -606,10 +606,11 @@ void vtkPVWindow::ThresholdCallback()
   threshold->SetApplication(pvApp);
   threshold->SetVTKSource(s, tclName);
   threshold->SetNthPVInput(0, this->GetCurrentPVData());
-  threshold->CreateProperties();
   threshold->SetName(tclName);
 
   this->GetMainView()->AddComposite(threshold);
+  threshold->CreateProperties();
+  threshold->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(threshold);
   this->GetMainView()->ShowSourceParent();
 
@@ -669,10 +670,11 @@ void vtkPVWindow::ContourCallback()
   contour->SetApplication(pvApp);
   contour->SetVTKSource(s, tclName);
   contour->SetNthPVInput(0, this->GetCurrentPVData());
-  contour->CreateProperties();
   contour->SetName(tclName);
 
   this->GetMainView()->AddComposite(contour);
+  contour->CreateProperties();
+  contour->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(contour);
   this->GetMainView()->ShowSourceParent();
 
@@ -716,6 +718,7 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 {
   // We need to update the properties-menu radio button too!
   
+  this->GetCurrentPVSource()->UpdateInputList();
   this->MainView->ShowSourceParent();
 }
 

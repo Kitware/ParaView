@@ -241,6 +241,14 @@ SOURCE=.\vtkPVArrayCalculatorTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVContour.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVContourTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVData.cxx
 # End Source File
 # Begin Source File
@@ -262,6 +270,10 @@ SOURCE=.\vtkPVEnSightReaderInterface.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVEnSightReaderInterfaceTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVInputMenu.cxx
 # End Source File
 # Begin Source File
 
@@ -761,6 +773,26 @@ InputName=vtkPVArrayCalculator
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVContour.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVContour.h
+InputName=vtkPVContour
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVData.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -810,6 +842,26 @@ SOURCE=.\vtkPVEnSightReaderInterface.h
 # Begin Custom Build
 InputPath=.\vtkPVEnSightReaderInterface.h
 InputName=vtkPVEnSightReaderInterface
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVInputMenu.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVInputMenu.h
+InputName=vtkPVInputMenu
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

@@ -40,6 +40,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabeledFrame.h"
 #include "vtkPVData.h"
 #include "vtkSource.h"
+#include "vtkPVInputMenu.h"
 
 class vtkPVWindow;
 class vtkStringList;
@@ -97,6 +98,12 @@ public:
   vtkPVData *GetNthPVOutput(int idx);
   vtkGetMacro(NumberOfPVOutputs, int);
   void SetNthPVOutput(int idx, vtkPVData *output);
+
+  // Description:
+  // Tcl callback to change the input to this source.
+  void CreateInputList(const char *inputType);
+  void UpdateInputList();
+  void ChangeInput(const char *inputTclName);
   
   // Description:
   // This just returns the application typecast correctly.
@@ -247,6 +254,9 @@ protected:
   vtkKWPushButton *AcceptButton;
   vtkKWPushButton *CancelButton;
   vtkKWPushButton *DeleteButton;
+  vtkPVInputMenu *InputMenu;
+  vtkKWLabel *InputMenuLabel;
+  vtkKWWidget *InputMenuFrame;
   
   vtkPVSelectionList *LastSelectionList;
 

@@ -27,6 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWCompositeCollection.h"
 
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
@@ -68,6 +69,9 @@ vtkPVSource::vtkPVSource()
   this->AcceptButton = vtkKWPushButton::New();
   this->CancelButton = vtkKWPushButton::New();
   this->DeleteButton = vtkKWPushButton::New();
+  this->InputMenuFrame = vtkKWWidget::New();
+  this->InputMenuLabel = vtkKWLabel::New();
+  this->InputMenu = vtkPVInputMenu::New();
   
   this->Widgets = vtkKWWidgetCollection::New();
   this->LastSelectionList = NULL;
@@ -142,6 +146,15 @@ vtkPVSource::~vtkPVSource()
   
   this->DeleteButton->Delete();
   this->DeleteButton = NULL;
+  
+  this->InputMenuLabel->Delete();
+  this->InputMenuLabel = NULL;
+  
+  this->InputMenu->Delete();
+  this->InputMenu = NULL;
+  
+  this->InputMenuFrame->Delete();
+  this->InputMenuFrame = NULL;
   
   if (this->LastSelectionList)
     {
@@ -292,7 +305,7 @@ void vtkPVSource::CreateProperties()
 {
   const char *sourcePage;
   vtkPVApplication *app = this->GetPVApplication();
-
+  
   // invoke super
   this->vtkKWComposite::CreateProperties();  
 
@@ -341,12 +354,85 @@ void vtkPVSource::CreateProperties()
   this->Script("pack %s -side left -fill x -expand t",
                this->DeleteButton->GetWidgetName());
 
+  if (this->GetNumberOfPVInputs() > 0)
+    {
+    this->InputMenuFrame->SetParent(this->ParameterFrame->GetFrame());
+    this->InputMenuFrame->Create(this->Application, "frame", "");
+    this->Script("pack %s -side top -fill x -expand t",
+                 this->InputMenuFrame->GetWidgetName());
+    
+    this->InputMenuLabel->SetParent(this->InputMenuFrame);
+    this->InputMenuLabel->Create(this->Application, "");
+    this->InputMenuLabel->SetLabel("Input: ");
+    
+    this->InputMenu->SetParent(this->InputMenuFrame);
+    this->InputMenu->Create(this->Application, "");
+    this->Script("pack %s %s -side left -fill x",
+                 this->InputMenuLabel->GetWidgetName(),
+                 this->InputMenu->GetWidgetName());
+    }
+  
   // Isolate events to this window untill accept or cancel is pressed.
   this->Script("grab set %s", this->ParameterFrame->GetWidgetName());
   
   this->UpdateProperties();
   
   this->UpdateParameterWidgets();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::CreateInputList(const char *inputType)
+{
+  if (this->NumberOfPVInputs == 0)
+    {
+    return;
+    }  
+  
+  this->InputMenu->SetInputType(inputType);
+
+  this->UpdateInputList();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::UpdateInputList()
+{
+  char* inputType = this->InputMenu->GetInputType();
+
+  if (inputType == NULL || this->NumberOfPVInputs == 0)
+    {
+    return;
+    }
+  
+  int i;
+  vtkKWCompositeCollection *sources = this->GetWindow()->GetSources();
+  vtkPVSource *currentSource;
+  char *tclName;
+  char methodAndArgs[256];
+  
+  this->InputMenu->ClearEntries();
+  for (i = 0; i < sources->GetNumberOfItems(); i++)
+    {
+    currentSource = (vtkPVSource*)sources->GetItemAsObject(i);
+    if (currentSource->GetNthPVOutput(0)->GetVTKData()->IsA(inputType))
+      {
+      tclName = currentSource->GetNthPVOutput(0)->GetVTKDataTclName();
+      sprintf(methodAndArgs, "ChangeInput %s",
+              currentSource->GetNthPVOutput(0)->GetTclName());
+      this->InputMenu->AddEntryWithCommand(tclName, this,
+                                           methodAndArgs);
+      }
+    }
+  this->InputMenu->SetValue(this->GetNthPVInput(0)->GetVTKDataTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::ChangeInput(const char *inputTclName)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  pvApp->BroadcastScript("%s SetNthPVInput 0 %s",
+                         this->GetTclName(),
+                         inputTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -843,6 +929,7 @@ void vtkPVSource::SelectSource(vtkPVSource *source)
   if (source)
     {
     this->GetWindow()->SetCurrentPVSource(source);
+    source->UpdateInputList();
     source->ShowProperties();
     source->GetNotebook()->Raise(0);
     }

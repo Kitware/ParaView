@@ -106,11 +106,10 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvs = vtkPVSource::New();
   pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetSourceParent());
   pvs->SetApplication(pvApp);
-  pvs->CreateProperties();
   pvs->SetInterface(this);
   pvs->SetVTKSource(s, tclName);
   pvs->SetName(tclName);  
-
+  
   // Set the input if necessary.
   if (this->InputClassName)
     {
@@ -120,6 +119,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 
   // Add the new Source to the View, and make it current.
   this->PVWindow->GetMainView()->AddComposite(pvs);
+  pvs->CreateProperties();
+  pvs->CreateInputList(this->InputClassName);
   this->PVWindow->SetCurrentPVSource(pvs);
   this->PVWindow->GetMainView()->ShowSourceParent();
 
@@ -133,7 +134,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 
   // Connect the source and data.
   pvs->SetNthPVOutput(0, pvd);
-  // It would be nice to have the vtkPOSource set this up, but for multiple outputs,
+  // It would be nice to have the vtkPVSource set this up, but for multiple outputs,
   // How do we know the method.
   // Relay the connection to the VTK objects.  
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
