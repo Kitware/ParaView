@@ -102,13 +102,13 @@ protected:
   vtkFloatArray *DepthValues;
   
   void DeleteArrays();
-  void AddArray(char *arrayName, char *fileName);
-  void AddArrayName(char *arrayName, char *fileName);
+  void AddArray(char *arrayName, char *fileName, unsigned long offset);
+  void AddArrayName(char *arrayName, char *fileName, unsigned long offset);
   int NumberOfArrays;
   int MaximumNumberOfArrays;
   char **ArrayNames;
   char **ArrayFileNames;  
-
+  unsigned long *ArrayOffsets;
 
   int IsFileName(char *name);
   char *MakeFileName(char *name);

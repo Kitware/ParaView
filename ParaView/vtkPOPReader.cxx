@@ -77,7 +77,8 @@ vtkPOPReader::vtkPOPReader()
   this->MaximumNumberOfArrays = 0;
   this->ArrayNames = NULL;
   this->ArrayFileNames = NULL;
-  
+  this->ArrayOffsets = NULL;
+
   this->DepthValues = vtkFloatArray::New();
 } 
 
@@ -121,31 +122,41 @@ void vtkPOPReader::DeleteArrays()
     delete [] this->ArrayFileNames;
     this->ArrayFileNames = NULL;
     }
+  if (this->ArrayOffsets)
+    {
+    delete [] this->ArrayOffsets;
+    this->ArrayOffsets = NULL;
+    }
 
   this->NumberOfArrays = 0;
   this->MaximumNumberOfArrays = 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkPOPReader::AddArray(char *arrayName, char *fileName)
+void vtkPOPReader::AddArray(char *arrayName, char *fileName, unsigned long offset)
 {
   if (this->NumberOfArrays == this->MaximumNumberOfArrays)
     {
     int idx;
     char **tmp1, **tmp2;
-    
+    unsigned long *tmp3;
+
     this->MaximumNumberOfArrays += 20;
     tmp1 = new char*[this->MaximumNumberOfArrays];
     tmp2 = new char*[this->MaximumNumberOfArrays];
+    tmp3 = new unsigned long[this->MaximumNumberOfArrays];
     for (idx = 0; idx < this->NumberOfArrays; ++idx)
       {
       tmp1[idx] = this->ArrayNames[idx];
       tmp2[idx] = this->ArrayFileNames[idx];
+      tmp3[idx] = this->ArrayOffsets[idx];
       }
     delete [] this->ArrayNames;
     this->ArrayNames = tmp1;
     delete [] this->ArrayFileNames;
     this->ArrayFileNames = tmp2;
+    delete [] this->ArrayOffsets;
+    this->ArrayOffsets = tmp3;
     }
   
   this->ArrayNames[this->NumberOfArrays] = new char[strlen(arrayName)+1];
@@ -153,6 +164,8 @@ void vtkPOPReader::AddArray(char *arrayName, char *fileName)
 
   this->ArrayFileNames[this->NumberOfArrays] = new char[strlen(fileName)+1];
   strcpy(this->ArrayFileNames[this->NumberOfArrays], fileName);
+
+  this->ArrayOffsets[this->NumberOfArrays] = offset;
 
   ++this->NumberOfArrays;
 }
@@ -182,6 +195,8 @@ void vtkPOPReader::Execute()
   int ext[6];
   int i;
 
+  cerr << "Executing POP reader.\n";
+
   output = this->GetOutput();
   
   // Set up the extent of the grid image.
@@ -209,10 +224,14 @@ void vtkPOPReader::Execute()
   ext[4] = 0;
   ext[5] = 1;
   image->SetUpdateExtent(ext);
+  cerr << "Executing to read grid.\n";
   image->Update();
+  cerr << "Executing to read grid: Done\n";
   
   // Create the grid points from the grid image.
   points = this->ReadPoints(image);
+
+  cerr << "Done creating points.\n";
 
   output->SetPoints(points);
   points->Delete();
@@ -233,12 +252,20 @@ void vtkPOPReader::Execute()
     if (this->ArrayFileNames[i] && this->ArrayNames[i])
       {
       reader->SetFileName(this->ArrayFileNames[i]);
+      reader->SetHeaderSize(this->ArrayOffsets[i] * 4 
+			    * this->Dimensions[0] * this->Dimensions[1]);
+      cerr << "Setting header size to: " << reader->GetHeaderSize() << endl;
       // Just in case.
-      reader->SetHeaderSize(0);
+      //reader->SetHeaderSize(0);
       output->GetUpdateExtent(ext);
       image = wrap->GetOutput();
       image->SetUpdateExtent(ext);
+      cerr << "Reading arrray.\n";
       image->Update();
+
+
+
+      cerr << "Reading arrray: Done\n";
       array = image->GetPointData()->GetScalars()->GetData();
       array->SetName(this->ArrayNames[i]);
       
@@ -250,6 +277,7 @@ void vtkPOPReader::Execute()
   reader = NULL;
   wrap->Delete();
   wrap = NULL;
+  cerr << "Finihsed Executing.\n";
 }
 
 
@@ -391,18 +419,20 @@ void vtkPOPReader::ReadInformationFile()
     else if (strcmp(str, "NumberOfArrays") == 0)
       {
       char str2[256];
+      unsigned long offset;
       *file >> num;
       for (i = 0; i < num; ++i)
         {
         *file >> str;
         *file >> str2;
+        *file >> offset;
         if (file->fail())
           {
           vtkErrorMacro("Error reading array name " << i);    
           delete file;
           return;
           }
-        this->AddArrayName(str, str2);
+        this->AddArrayName(str, str2, offset);
         }
       }
 
@@ -443,18 +473,18 @@ void vtkPOPReader::SetGridName(char *name)
 
 //----------------------------------------------------------------------------
 // This will append the full path onto the file name. (using the grid path/
-void vtkPOPReader::AddArrayName(char *name, char *fileName)
+void vtkPOPReader::AddArrayName(char *name, char *fileName, unsigned long offset)
 {
   char *tmp;
 
   if (fileName[0] == '/' || fileName[1] == ':')
     {
-    this->AddArray(name, fileName);
+    this->AddArray(name, fileName, offset);
     return;
     }
   
   tmp = this->MakeFileName(fileName);
-  this->AddArray(name, tmp);
+  this->AddArray(name, tmp, offset);
   delete [] tmp;
 }
 
