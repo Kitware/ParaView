@@ -2,11 +2,13 @@ PROJECT(ServerManager)
 
 SET( ServerManagerCommon_SRCS
   vtkSMApplication.cxx
-#  vtkSMCommunicationModule.cxx
+  vtkSMBooleanDomain.cxx
   vtkSMDomain.cxx
+  vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
-#  vtkSMSimpleCommunicationModule.cxx
+  vtkSMEnumerationDomain.cxx
   vtkSMInputProperty.cxx
+  vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLookupTableProxy.cxx
   vtkSMObject.cxx
@@ -36,7 +38,6 @@ SET( ServerManager_SRCS
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-#  vtkSMCommunicationModule.cxx
   vtkSMDomain.cxx
   vtkSMVectorProperty.cxx
   ABSTRACT
