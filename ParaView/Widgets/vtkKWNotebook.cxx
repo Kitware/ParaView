@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWImageLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetsConfigure.h"
 #include "vtkLinkedList.txx"
@@ -85,7 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.43");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.44");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -136,39 +137,61 @@ vtkKWNotebook::vtkKWNotebook()
 {
   this->CommandFunction = vtkKWNotebookCommand;
 
-  this->MinimumWidth   = 360;
-  this->MinimumHeight  = 600;
-  this->AlwaysShowTabs = 0;
-  this->ShowAllPagesWithSameTag = 0;
+  this->MinimumWidth             = 360;
+  this->MinimumHeight            = 600;
+  this->AlwaysShowTabs           = 0;
+  this->ShowAllPagesWithSameTag  = 0;
   this->ShowOnlyPagesWithSameTag = 0;
-  this->ShowOnlyMostRecentPages = 0;
-  this->NumberOfMostRecentPages = 4;
-  this->PagesCanBePinned = 0;
+  this->ShowOnlyMostRecentPages  = 0;
+  this->NumberOfMostRecentPages  = 4;
+  this->PagesCanBePinned         = 0;
+  this->EnablePageTabContextMenu = 0;
 #ifdef USE_NOTEBOOK_ICONS
-  this->ShowIcons      = 1;
+  this->ShowIcons                = 1;
 #else
-  this->ShowIcons      = 0;
+  this->ShowIcons                = 0;
 #endif
 
-  this->IdCounter      = 0;
-  this->CurrentId      = -1;
-  this->Expanding      = 0;
+  this->IdCounter       = 0;
+  this->CurrentId       = -1;
+  this->Expanding       = 0;
 
-  this->Body           = vtkKWWidget::New();
-  this->Mask           = vtkKWWidget::New();
-  this->TabsFrame      = vtkKWWidget::New();
+  this->Body            = vtkKWWidget::New();
+  this->Mask            = vtkKWWidget::New();
+  this->TabsFrame       = vtkKWWidget::New();
+  this->TabPopupMenu    = 0;
 
-  this->Pages          = vtkKWNotebook::PagesContainer::New();
-
+  this->Pages           = vtkKWNotebook::PagesContainer::New();
   this->MostRecentPages = vtkKWNotebook::PagesContainer::New();
+
 }
 
 //------------------------------------------------------------------------------
 vtkKWNotebook::~vtkKWNotebook()
 {
-  this->Body->Delete();
-  this->Mask->Delete();
-  this->TabsFrame->Delete();
+  if (this->Body)
+    {
+    this->Body->Delete();
+    this->Body = 0;
+    }
+
+  if (this->Mask)
+    {
+    this->Mask->Delete();
+    this->Mask = 0;
+    }
+
+  if (this->TabsFrame)
+    {
+    this->TabsFrame->Delete();
+    this->TabsFrame = 0;
+    }
+
+  if (this->TabPopupMenu)
+    {
+    this->TabPopupMenu->Delete();
+    this->TabPopupMenu = 0;
+    }
 
   // Delete all pages
 
@@ -608,7 +631,10 @@ int vtkKWNotebook::AddPage(const char *title,
       << "bind " << page->Label->GetWidgetName() << " <Button-1> {" 
       << this->GetTclName() << " Raise " << page->Id << "}" << endl
       << "bind " << page->Label->GetWidgetName() << " <Double-1> {" 
-      << this->GetTclName() << " PinPageToggleCallback " << page->Id << "}" 
+      << this->GetTclName() << " TogglePagePinned " << page->Id << "}" << endl
+      << "bind " << page->Label->GetWidgetName() << " <Button-3> {" 
+      << this->GetTclName() << " PageTabContextMenuCallback " << page->Id 
+      << " %%X %%Y}" 
       << endl;
 
   // Create the icon if any. We want to keep both the icon and the image label
@@ -1212,6 +1238,36 @@ int vtkKWNotebook::GetPageVisibility(vtkKWNotebook::Page *page)
 }
 
 //------------------------------------------------------------------------------
+void vtkKWNotebook::TogglePageVisibility(int id)
+{
+  this->TogglePageVisibility(this->GetPage(id));
+}
+
+//------------------------------------------------------------------------------
+void vtkKWNotebook::TogglePageVisibility(const char *title)
+{
+  this->TogglePageVisibility(this->GetPage(title));
+}
+
+//------------------------------------------------------------------------------
+void vtkKWNotebook::TogglePageVisibility(vtkKWNotebook::Page *page)
+{
+  if (page == NULL || !this->IsCreated())
+    {
+    return;
+    }
+  
+  if (page->Visibility)
+    {
+    this->HidePage(page);
+    }
+  else
+    {
+    this->ShowPage(page);
+    }
+}
+
+//------------------------------------------------------------------------------
 void vtkKWNotebook::ShowPagesMatchingTag(int tag)
 {
   vtkKWNotebook::Page *page = NULL;
@@ -1380,6 +1436,36 @@ void vtkKWNotebook::UnpinPage(vtkKWNotebook::Page *page)
 }
 
 //------------------------------------------------------------------------------
+void vtkKWNotebook::TogglePagePinned(int id)
+{
+  this->TogglePagePinned(this->GetPage(id));
+}
+
+//------------------------------------------------------------------------------
+void vtkKWNotebook::TogglePagePinned(const char *title)
+{
+  this->TogglePagePinned(this->GetPage(title));
+}
+
+//------------------------------------------------------------------------------
+void vtkKWNotebook::TogglePagePinned(vtkKWNotebook::Page *page)
+{
+  if (page == NULL || !this->IsCreated())
+    {
+    return;
+    }
+
+  if (page->Pinned)
+    {
+    this->UnpinPage(page);
+    }
+  else
+    {
+    this->PinPage(page);
+    }
+}
+
+//------------------------------------------------------------------------------
 unsigned int vtkKWNotebook::GetNumberOfPinnedPages()
 {
   unsigned int count = 0;
@@ -1401,23 +1487,68 @@ unsigned int vtkKWNotebook::GetNumberOfPinnedPages()
 }
 
 //------------------------------------------------------------------------------
-void vtkKWNotebook::PinPageToggleCallback(int id)
+void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
 {
-  vtkKWNotebook::Page *page = this->GetPage(id);
-
-  if (page == NULL || !this->PagesCanBePinned)
+  if (!this->IsCreated() || !this->EnablePageTabContextMenu)
     {
     return;
     }
 
-  if (page->Pinned)
+  vtkKWNotebook::Page *page = this->GetPage(id);
+
+  if (page == NULL || !page->Visibility)
     {
-    this->UnpinPage(page);
+    return;
     }
-  else
+
+  // Create the popup menu if it has not been done already
+
+  if (!this->TabPopupMenu)
     {
-    this->PinPage(page);
+    this->TabPopupMenu = vtkKWMenu::New();
+    this->TabPopupMenu->SetParent(this);
+    this->TabPopupMenu->TearOffOff();
+    this->TabPopupMenu->Create(this->Application, 0);
     }
+
+  this->TabPopupMenu->DeleteAllMenuItems();
+  char *var;
+  
+  // Visibility
+
+  var = this->TabPopupMenu->CreateCheckButtonVariable(this, "Show");
+  ostrstream visibility;
+  visibility << "TogglePageVisibility " << id << ends;
+  this->TabPopupMenu->AddCheckButton(
+    "Show", var, this, visibility.str(), "Show/Hide this notebook page");
+  this->TabPopupMenu->CheckCheckButton(
+    this, "Show", this->GetPageVisibility(page));
+  visibility.rdbuf()->freeze(0);
+  delete [] var;
+    
+  // Pin
+
+  if (this->PagesCanBePinned)
+    {
+    var = this->TabPopupMenu->CreateCheckButtonVariable(this, "Pin");
+    ostrstream pin;
+    pin << "TogglePagePinned " << id << ends;
+    this->TabPopupMenu->InsertCheckButton(
+      0, "Pin", var, this, pin.str(), "Pin/Unpin this notebook page");
+    this->TabPopupMenu->CheckCheckButton(this, "Pin", page->Pinned);
+    pin.rdbuf()->freeze(0);
+    delete [] var;
+
+    // If a page is pinned, it can not be hidden. Unpin it first :)
+
+    if (page->Pinned)
+      {
+      this->TabPopupMenu->SetState("Show", vtkKWMenu::Disabled);
+      }
+    }
+
+  this->Script("tk_popup %s %d %d", 
+               this->TabPopupMenu->GetWidgetName(), x, y);
 }
 
 //------------------------------------------------------------------------------
@@ -2112,5 +2243,8 @@ void vtkKWNotebook::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ShowIcons: " << (this->ShowIcons ? "On" : "Off")
      << endl;
   os << indent << "PagesCanBePinned: " << (this->PagesCanBePinned ? "On" : "Off")
+     << endl;
+  os << indent << "EnablePageTabContextMenu: " 
+     << (this->EnablePageTabContextMenu ? "On" : "Off")
      << endl;
 }

@@ -54,6 +54,7 @@ class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
 class vtkKWImageLabel;
+class vtkKWMenu;
 
 //BTX
 template<class DataType> class vtkLinkedList;
@@ -163,6 +164,8 @@ public:
   void SetPageVisibility(const char *title, int flag);
   int GetPageVisibility(int id);
   int GetPageVisibility(const char *title);
+  void TogglePageVisibility(int id);
+  void TogglePageVisibility(const char *title);
   int CanBeHidden(int id);
   int CanBeHidden(const char *title);
 
@@ -215,6 +218,8 @@ public:
   void PinPage(const char *title);
   void UnpinPage(int id);
   void UnpinPage(const char *title);
+  void TogglePagePinned(int id);
+  void TogglePagePinned(const char *title);
   
   // Description:
   // Allow pages to be pinned.
@@ -251,6 +256,12 @@ public:
   vtkBooleanMacro(ShowIcons, int);
   
   // Description:
+  // Enable the page tab context menu.
+  vtkSetMacro(EnablePageTabContextMenu, int);
+  vtkGetMacro(EnablePageTabContextMenu, int);
+  vtkBooleanMacro(EnablePageTabContextMenu, int);
+  
+  // Description:
   // Get the id of the visible page which tab contains a given pair of screen
   // coordinates (-1 if not found).
   int GetPageIdContainingCoordinatesInTab(int x, int y);
@@ -259,7 +270,7 @@ public:
   // Some callback routines.
   void ScheduleResize();
   void Resize();
-  void PinPageToggleCallback(int id);
+  void PageTabContextMenuCallback(int id, int x, int y);
   
 protected:
   vtkKWNotebook();
@@ -274,10 +285,12 @@ protected:
   int ShowOnlyMostRecentPages;
   int NumberOfMostRecentPages;
   int PagesCanBePinned;
+  int EnablePageTabContextMenu;
 
   vtkKWWidget *TabsFrame;
   vtkKWWidget *Body;
   vtkKWWidget *Mask;
+  vtkKWMenu   *TabPopupMenu;
 
   //BTX
 
@@ -335,7 +348,9 @@ protected:
   void HidePage(Page*);
   void PinPage(Page*);
   void UnpinPage(Page*);
+  void TogglePagePinned(Page*);
   int GetPageVisibility(Page*);
+  void TogglePageVisibility(Page*);
   int CanBeHidden(Page*);
   int GetPageTag(Page*);
   char* GetPageTitle(Page*);
