@@ -345,6 +345,14 @@ SOURCE=.\vtkPVMenuButtonTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVMethodInterface.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVMethodInterfaceTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVParallelDecimate.cxx
 # End Source File
 # Begin Source File
@@ -382,6 +390,14 @@ SOURCE=.\vtkPVRenderView.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVRenderViewTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVRunTimeContour.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVRunTimeContourTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -1110,6 +1126,26 @@ InputName=vtkPVMenuButton
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVMethodInterface.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVMethodInterface.h
+InputName=vtkPVMethodInterface
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVParallelDecimate.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -1199,6 +1235,26 @@ SOURCE=.\vtkPVRenderView.h
 # Begin Custom Build
 InputPath=.\vtkPVRenderView.h
 InputName=vtkPVRenderView
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVRunTimeContour.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVRunTimeContour.h
+InputName=vtkPVRunTimeContour
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

@@ -95,6 +95,7 @@ void vtkPVPolyData::Shrink()
 
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddScale("Shrink Factor:", "SetShrinkFactor", "GetShrinkFactor",
 		  0.0, 1.0, 0.01);
   f->UpdateParameterWidgets();
@@ -126,6 +127,7 @@ void vtkPVPolyData::TubeFilter()
 
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
   f->AddLabeledEntry("Number of Sides:", "SetNumberOfSides", "GetNumberOfSides");
   f->UpdateParameterWidgets();
@@ -157,6 +159,7 @@ void vtkPVPolyData::PolyDataNormals()
 
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddLabeledEntry("FeatureAngle:", "SetFeatureAngle", "GetFeatureAngle");
   f->AddLabeledToggle("Splitting:", "SetSplitting", "GetSplitting");
   f->AddLabeledToggle("Consistency:", "SetConsistency", "GetConsistency");
@@ -174,21 +177,24 @@ void vtkPVPolyData::PolyDataNormals()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Glyph()
 {
+  static int instanceCount = 0;
+  vtkPVGlyph3D *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVGlyph3D *glyph;
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  
-  glyph = vtkPVGlyph3D::New();
-  glyph->Clone(pvApp);
-  
-  glyph->SetInput(this);
-  glyph->SetName("glyph");
- 
-  this->GetPVSource()->GetView()->AddComposite(glyph);
-  
-  window->SetCurrentSource(glyph);
 
-  glyph->Delete();
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  f = vtkPVGlyph3D::SafeDownCast(
+          pvApp->MakePVSource("vtkPVGlyph3D",
+                              "vtkGlyph3D", 
+                              "Glyph", ++instanceCount));
+  if (f == NULL) {return;}
+  f->SetInput(this);
+ 
+  this->GetPVSource()->GetView()->AddComposite(f);
+  
+  window->SetCurrentSource(f);
+  f->AddInputList();
 }
 
 //----------------------------------------------------------------------------
@@ -214,6 +220,7 @@ void vtkPVPolyData::LoopSubdivision()
 
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddLabeledEntry("NumberOfSubdivisions:", "SetNumberOfSubdivisions", "GetNumberOfSubdivisions");
   f->UpdateParameterWidgets();
 
@@ -244,6 +251,7 @@ void vtkPVPolyData::Clean()
 
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddScale("Tolerance:","SetTolerance","GetTolerance",0,1,0.01);
   f->UpdateParameterWidgets();
 
@@ -275,6 +283,7 @@ void vtkPVPolyData::Triangulate()
 
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddLabeledToggle("Pass Verts:","SetPassVerts","GetPassVerts");
   f->AddLabeledToggle("Pass Lines:","SetPassLines","GetPassLines");
   f->UpdateParameterWidgets();
@@ -307,6 +316,7 @@ void vtkPVPolyData::Decimate()
 
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddScale("TargetReduction:","SetTargetReduction","GetTargetReduction",
               0.0,1.0,0.01);
   f->AddLabeledToggle("PreserveTopology:","SetPreserveTopology","GetPreserveTopology");
@@ -350,6 +360,7 @@ void vtkPVPolyData::QuadricClustering()
 
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddLabeledEntry("XDivisions","SetNumberOfXDivisions","GetNumberOfXDivisions");
   f->AddLabeledEntry("YDivisions","SetNumberOfYDivisions","GetNumberOfYDivisions");
   f->AddLabeledEntry("ZDivisions","SetNumberOfZDivisions","GetNumberOfZDivisions");
@@ -378,6 +389,7 @@ void vtkPVPolyData::GetGhostCells()
   this->GetPVSource()->GetView()->AddComposite(rgc);
   
   window->SetCurrentSource(rgc);
+  rgc->AddInputList();
 
   rgc->Delete();
 }
@@ -399,6 +411,7 @@ void vtkPVPolyData::ParallelDecimate()
   this->GetPVSource()->GetView()->AddComposite(paraDeci);
   
   window->SetCurrentSource(paraDeci);
+  paraDeci->AddInputList();
   
   paraDeci->Delete();
 }

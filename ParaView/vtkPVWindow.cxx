@@ -135,6 +135,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // create the top level
   this->MenuFile->InsertCommand(0,"New Window", this, "NewWindow");
   this->MenuFile->InsertCommand(2, "Save Camera", this, "Save");
+  this->MenuFile->InsertCommand(2, "Save", this, "SavePipeline");
 
   // Create the menu for creating data sources.  
   this->CreateMenu->SetParent(this->GetMenu());
@@ -284,7 +285,6 @@ vtkPVRunTimeContour *vtkPVWindow::CreateRunTimeContour()
   static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  float range[2];
   vtkKWPushButton *button = vtkKWPushButton::New();
   vtkKWScale *scale;
   char command[50];
@@ -801,6 +801,41 @@ void vtkPVWindow::Save()
 	  clippingRange[1]);
 
   fclose (cameraFile);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SavePipeline()
+{
+  ofstream *file;
+  vtkCollection *sources;
+  vtkPVSource *pvs;
+
+  file = new ofstream("pipeline.pv", ios::out);
+  if (file->fail())
+    {
+    vtkErrorMacro("Could not open file pipeline.pv");
+    delete file;
+    file = NULL;
+    return;
+    }
+
+  *file << "<ParaView Version= 0.1>\n";
+  // Loop through sources ...
+  sources = this->SourceList->GetSources();
+  sources->InitTraversal();
+  while ( (pvs=(vtkPVSource*)(sources->GetNextItemAsObject())) )
+    {
+    pvs->Save(file);
+    }
+  *file << "</ParaView>\n";
+
+  if (file)
+    {
+    file->close();
+    delete file;
+    file = NULL;
+    }
+
 }
 
 //----------------------------------------------------------------------------

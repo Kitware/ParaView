@@ -60,8 +60,6 @@ vtkPVMenuButton* vtkPVMenuButton::New()
 
 void vtkPVMenuButton::Create(vtkKWApplication *app, char *args)
 { 
-  char tmp[500];
-  
   // must set the application
   if (this->Application)
     {

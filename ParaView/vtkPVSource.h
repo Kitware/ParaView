@@ -179,6 +179,11 @@ public:
   vtkPVSelectionList *AddModeList(char *label, char *setCmd, char *getCmd,
                                   vtkKWObject *o = NULL);
   void AddModeListItem(char *name, int value);
+
+  // Description:
+  // This will add a selection list that allows the user to select an input.
+  // It does not work right now.  It does add a method interface however.
+  void AddInputList();
   
   // Description:
   // Set the vtk source that will be a part of the pipeline.
@@ -204,6 +209,10 @@ public:
   
   vtkGetObjectMacro(ParameterFrame, vtkKWLabeledFrame);
   
+  // Description:
+  // Used to save the source into a file.
+  void Save(ofstream *file);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -250,6 +259,13 @@ protected:
 
   vtkPVCommandList *AcceptCommands;
   vtkPVCommandList *CancelCommands;
+  // A more generic representation of an interface.
+  vtkCollection *Interface;
+
+  // Description:
+  // A convenience method for adding method interfaces.
+  void AddMethodInterface(char *var, int argType, int numArgs);
+
 };
 
 #endif

@@ -38,6 +38,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkPVSelectionList.h"
 #include "vtkPVCommandList.h"
+#include "vtkCollection.h"
+#include "vtkPVMethodInterface.h"
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -71,6 +73,7 @@ vtkPVSource::vtkPVSource()
   
   this->AcceptCommands = vtkPVCommandList::New();
   this->CancelCommands = vtkPVCommandList::New();
+  this->Interface = vtkCollection::New();
 }
 
 //----------------------------------------------------------------------------
@@ -137,6 +140,8 @@ vtkPVSource::~vtkPVSource()
   this->AcceptCommands = NULL;  
   this->CancelCommands->Delete();
   this->CancelCommands = NULL;
+  this->Interface->Delete();
+  this->Interface = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -362,6 +367,8 @@ void vtkPVSource::CreateProperties()
   
   // Every source has a name.
   this->AddLabeledEntry("Name:", "SetName", "GetName", this);
+  // Every Source has an output.
+  this->AddMethodInterface("Output", VTK_STRING, 1);
 
   this->UpdateNavigationCanvas();
   this->UpdateParameterWidgets();
@@ -520,6 +527,11 @@ int vtkPVSource::GetVisibility()
 vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd, 
                                                 vtkKWObject *o)
 {
+  if (o == NULL)
+    {
+    this->AddMethodInterface(setCmd+3, VTK_INT, 1);
+    }
+
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
   if (o)
@@ -575,6 +587,11 @@ vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char 
 vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
                                       char *ext, vtkKWObject *o)
 {
+  if (o == NULL)
+    {
+    this->AddMethodInterface(setCmd+3, VTK_STRING, 1);
+    }
+
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *entry;
@@ -653,6 +670,11 @@ vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
 vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd, char *getCmd,
                                         vtkKWObject *o)
 {
+  if (o == NULL)
+    {
+    this->AddMethodInterface(setCmd+3, VTK_STRING, 1);
+    }
+
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *entry;
@@ -710,6 +732,11 @@ vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd, char *getCmd,
 vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd,
                                          vtkKWObject *o)
 {
+  if (o == NULL)
+    {
+    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 1);
+    }
+
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *entry;
@@ -767,6 +794,11 @@ vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd
 void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
 				                          char *setCmd, char *getCmd, vtkKWObject *o)
 {
+  if (o == NULL)
+    {
+    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 2);
+    }
+
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *minEntry, *maxEntry;
@@ -854,6 +886,11 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
 void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
 				  char *setCmd, char *getCmd, vtkKWObject *o)
 {
+  if (o == NULL)
+    {
+    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 3);
+    }
+
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *xEntry, *yEntry, *zEntry;
@@ -964,6 +1001,11 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
                                   char *l4, char *setCmd, char *getCmd,
                                   vtkKWObject *o)
 {
+  if (o == NULL)
+    {
+    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 4);
+    }
+
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *xEntry, *yEntry, *zEntry, *wEntry;
@@ -1097,6 +1139,11 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
                                   char *setCmd, char *getCmd, vtkKWObject *o)
 
 {
+  if (o == NULL)
+    {
+    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 6);
+    }
+
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry  *uEntry, *vEntry, *wEntry, *xEntry, *yEntry, *zEntry;
@@ -1271,6 +1318,11 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
                                   float min, float max, float resolution,
                                   vtkKWObject *o)
 {
+  if (o == NULL)
+    {
+    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 1);
+    }
+
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWScale *slider;
@@ -1326,6 +1378,11 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
 vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd,
                                              vtkKWObject *o)
 {
+  if (o == NULL)
+    {
+    this->AddMethodInterface(setCmd+3, VTK_INT, 1);
+    }
+
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
 
@@ -1393,6 +1450,16 @@ void vtkPVSource::AddModeListItem(char *name, int value)
   this->LastSelectionList->AddItem(name, value);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVSource::AddInputList()
+{
+  // The type should be VTK_OBJECT maybe.
+  // Interface will specify the vtk source input, but UI will deal with 
+  // pvSource inputs.
+  this->AddMethodInterface("Input", VTK_STRING, 1);
+
+  // We are going to have to figure out how the user can select an input.
+}
 //----------------------------------------------------------------------------
 void vtkPVSource::AcceptCallback()
 {
@@ -1992,4 +2059,37 @@ vtkPVData *vtkPVSource::GetNthInput(int idx)
     }
   
   return (vtkPVData *)(this->Inputs[idx]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::Save(ofstream *file)
+{
+  vtkPVMethodInterface *m;
+
+  *file << "  <" << this->GetVTKSource()->GetClassName();
+  *file << "\n" << "    Name= " << this->GetVTKSourceTclName(); 
+  
+  this->Interface->InitTraversal();
+  while( (m=(vtkPVMethodInterface*)(this->Interface->GetNextItemAsObject())))
+    {
+    *file << "\n    " << m->GetVariableName() << "= ";
+    this->Script("%s Get%s", this->GetVTKSourceTclName(), m->GetVariableName());
+    *file << Tcl_GetStringResult(this->Application->GetMainInterp());
+    }
+  *file << " >\n";
+  *file << "  </" << this->GetVTKSource()->GetClassName() << ">\n";
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AddMethodInterface(char *var, int argType, int numArgs)
+{
+  vtkPVMethodInterface *mInterface = vtkPVMethodInterface::New();
+
+  mInterface->SetVariableName(var);
+  mInterface->SetArgumentType(argType);
+  mInterface->SetNumberOfArguments(numArgs);
+  this->Interface->AddItem(mInterface);
+  mInterface->Delete();
+  mInterface = NULL;
 }

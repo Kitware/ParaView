@@ -78,6 +78,7 @@ void vtkPVImageData::Clip()
   this->GetPVSource()->GetView()->AddComposite(clip);
   
   window->SetCurrentSource(clip);
+  clip->AddInputList();
   
   clip->Delete();
 }
@@ -127,6 +128,7 @@ void vtkPVImageData::Slice()
   // Add the new Source to the View, and make it current.
   this->GetPVSource()->GetView()->AddComposite(f);
   window->SetCurrentSource(f);
+  f->AddInputList();
 
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
@@ -155,6 +157,7 @@ void vtkPVImageData::ShiftScale()
 
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddLabeledEntry("Shift:", "SetShift", "GetShift");
   f->AddLabeledEntry("Scale:", "SetScale", "GetScale");
   f->UpdateParameterWidgets();
@@ -183,7 +186,6 @@ int vtkPVImageData::Create(char *args)
 //----------------------------------------------------------------------------
 void vtkPVImageData::SetData(vtkDataSet *data)
 {
-  vtkImageOutlineFilter *outline;
   vtkImageData *image = vtkImageData::SafeDownCast(data);
   int *ext;
   
@@ -237,7 +239,6 @@ void vtkPVImageData::SetAssignment(vtkPVAssignment *a)
     {
     this->GetImageData()->SetExtentTranslator(a->GetTranslator());
     }
-  
 }
 
 

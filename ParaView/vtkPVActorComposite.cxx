@@ -74,7 +74,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   this->PVData = NULL;
   this->DataSetInput = NULL;
-  this->Mode = VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE;
+  this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
 }
 
 //----------------------------------------------------------------------------

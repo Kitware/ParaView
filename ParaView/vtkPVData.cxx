@@ -203,6 +203,7 @@ void vtkPVData::Contour()
   
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddLabeledEntry("Value", "SetFirstValue", "GetFirstValue");
   f->AddLabeledToggle("ComputeNormals", "SetComputeNormals",
 		      "GetComputeNormals");
@@ -235,6 +236,7 @@ void vtkPVData::Cutter()
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
   
   window->SetCurrentSource(cutter);
+  cutter->AddInputList();
   
   cutter->Delete();
 }
@@ -265,6 +267,7 @@ void vtkPVData::Elevation()
   
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->AddVector3Entry("LowPoint", "X", "Y", "Z", "SetLowPoint", "GetLowPoint");
   f->AddVector3Entry("HighPoint", "X", "Y", "Z", "SetHighPoint",
 		     "GetHighPoint");
@@ -300,6 +303,7 @@ void vtkPVData::ExtractEdges()
   
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->UpdateParameterWidgets();
   
   // Clean up. (How about on the other processes?)
@@ -330,6 +334,7 @@ void vtkPVData::ColorByProcess()
   
   // Add some source specific widgets.
   // Normally these would be added in the CreateProperties method.
+  f->AddInputList();
   f->UpdateParameterWidgets();
   
   // Clean up. (How about on the other processes?)

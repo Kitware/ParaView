@@ -121,6 +121,11 @@ public:
   // Save the camera parameters.
   void Save();
 
+  // Description:
+  // Callback from the file menu.
+  // Save the pipeline.
+  void SavePipeline();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
