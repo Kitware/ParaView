@@ -113,7 +113,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.171");
+vtkCxxRevisionMacro(vtkPVApplication, "1.172");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -330,6 +330,11 @@ vtkPVApplication::vtkPVApplication()
 
   this->TraceFileName = 0;
   this->Argv0 = 0;
+
+  this->StartGUI = 1;
+
+  this->VTKScriptName = 0;
+  this->RunVTKScript = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -504,6 +509,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Start ParaView without any default modules.", 
   "--disable-registry", "-dr", 
   "Do not use registry when running ParaView (for testing).", 
+  "--run-vtk-script", "-rv", 
+  "Load and run the vtk script specified.", 
 #ifdef VTK_USE_MPI
   "--use-rendering-group", "-p",
   "Use a subset of processes to render.",
@@ -560,13 +567,23 @@ char* vtkPVApplication::CreateHelpString()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVApplication::IsParaViewScriptFile(const char* arg)
+int vtkPVApplication::CheckForExtension(const char* arg,
+                                        const char* ext)
 {
-  if (!arg || strlen(arg) < 4)
+  if (!ext)
     {
     return 0;
     }
-  if (strcmp(arg + strlen(arg) - 4,".pvs") == 0)
+  int extLen = strlen(ext);
+  if (extLen <= 0)
+    {
+    return 0;
+    }
+  if (!arg || strlen(arg) < extLen)
+    {
+    return 0;
+    }
+  if (strcmp(arg + strlen(arg) - extLen, ext) == 0)
     {
     return 1;
     }
@@ -651,6 +668,7 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
 int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 {
   int i;
+  int index=-1;
   
   vtkOutputWindow::GetInstance()->PromptUserOn();
 
@@ -660,9 +678,27 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->SetArgv0(argv[0]);
     }
 
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--run-vtk-script",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-rv",
+                                          index) == VTK_OK )
+    {
+    int i;
+    for (i=1; i < argc; i++)
+      {
+      if (vtkPVApplication::CheckForExtension(argv[i], ".tcl"))
+        {
+        this->RunVTKScript = 1;
+        this->SetVTKScriptName(argv[i]);
+        break;
+        }
+      }
+    return 0;
+    }
+
   for (i=1; i < argc; i++)
     {
-    if ( vtkPVApplication::IsParaViewScriptFile(argv[i]) )
+    if ( vtkPVApplication::CheckForExtension(argv[i], ".pvs") )
       {
       this->RunningParaViewScript = 1;
       break;
@@ -716,7 +752,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
         }
       }
     }
-  int index=-1;
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--help",
                                           index) == VTK_OK )
@@ -907,6 +942,14 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
+  if (this->RunVTKScript)
+    {
+    this->BroadcastScript("$Application LoadScript {%s}", 
+                          this->GetVTKScriptName());
+    this->Exit();
+    return;
+    }
+
   // Done in ParseCommandLineArguments also.
   // Which place should it be !!!
   vtkOutputWindow::GetInstance()->PromptUserOn();
@@ -1158,7 +1201,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   int i;
   for (i=1; i < argc; i++)
     {
-    if (vtkPVApplication::IsParaViewScriptFile(argv[i]))
+    if (vtkPVApplication::CheckForExtension(argv[i], ".pvs"))
       {
       this->RunningParaViewScript = 1;
       ui->LoadScript(argv[i]);

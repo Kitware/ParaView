@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.406");
+vtkCxxRevisionMacro(vtkPVWindow, "1.407");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2546,7 +2546,6 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
       {
       *file << "# prevent the tk window from showing up then start "
         "the event loop\n";
-      *file << "wm withdraw .\n\n\n";
       int length = vtkString::Length(path);
       char* newPath = vtkString::Duplicate(path);
       // Remove the extension. The animation tool will add it's
@@ -2572,10 +2571,10 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
     if (vtkFlag && interactiveFlag)
       {
       *file << "# enable user interface interactor\n"
-            << "iren SetUserMethod {wm deiconify .vtkInteract}\n"
+            << "iren AddObserver UserEvent {wm deiconify .vtkInteract}\n"
             << "iren Initialize\n\n"
             << "# prevent the tk window from showing up then start the event loop\n"
-            << "wm withdraw .\n";
+            << "compManager StartInteractor\n";
       }
     }
 
@@ -3832,7 +3831,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.406 $");
+  this->ExtractRevision(os,"$Revision: 1.407 $");
 }
 
 //----------------------------------------------------------------------------

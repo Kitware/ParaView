@@ -206,6 +206,13 @@ public:
   vtkSetMacro(RunningParaViewScript, int);
   vtkGetMacro(RunningParaViewScript, int);
 
+  // Description:
+  // Tells the process modules whether to start the main
+  // event loop. Mainly used by command line argument parsing code
+  // when an argument requires not starting the GUI
+  vtkSetMacro(StartGUI, int);
+  vtkGetMacro(StartGUI, int);
+
   //BTX
   static const char* const LoadComponentProc;
   //ETX
@@ -314,6 +321,14 @@ protected:
 
   int Display3DWidgets;
 
+  int StartGUI;
+
+  int RunVTKScript;
+
+  char* VTKScriptName;
+  vtkSetStringMacro(VTKScriptName);
+  vtkGetStringMacro(VTKScriptName);
+
   // Command line arguments.
   int ClientMode;
   int ServerMode;
@@ -345,7 +360,7 @@ protected:
 
   static int CheckForArgument(int argc, char* argv[], const char* arg,
                               int& index);
-  static int IsParaViewScriptFile(const char* arg);
+  static int CheckForExtension(const char* arg, const char* ext);
   char* CreateHelpString();
   int CheckForTraceFile(char* name, unsigned int len);
   void SaveTraceFile(const char* fname);

@@ -113,7 +113,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.10");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.11");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -215,8 +215,15 @@ void vtkPVClientServerModule::Initialize()
     pvApp->SetupTrapsForSignals(myId);   
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
 
-    pvApp->Script("wm withdraw .");
-    pvApp->Start(this->ArgumentCount,this->Arguments);
+    if (pvApp->GetStartGUI())
+      {
+      pvApp->Script("wm withdraw .");
+      pvApp->Start(this->ArgumentCount,this->Arguments);
+      }
+    else
+      {
+      pvApp->Exit();
+      }
 
     // Exiting:  CLean up.
     this->ReturnValue = pvApp->GetExitStatus();

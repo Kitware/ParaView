@@ -86,7 +86,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.5");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.6");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -151,8 +151,15 @@ void vtkPVMPIProcessModule::Initialize()
     pvApp->SetupTrapsForSignals(myId);   
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
 
-    pvApp->Script("wm withdraw .");
-    pvApp->Start(this->ArgumentCount,this->Arguments);
+    if (pvApp->GetStartGUI())
+      {
+      pvApp->Script("wm withdraw .");
+      pvApp->Start(this->ArgumentCount,this->Arguments);
+      }
+    else
+      {
+      pvApp->Exit();
+      }
     this->ReturnValue = pvApp->GetExitStatus();
     }
   else

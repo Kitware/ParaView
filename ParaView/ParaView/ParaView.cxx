@@ -84,12 +84,9 @@ int MyMain(int argc, char *argv[])
 
   // Create the application to parse the command line arguments.
   app = vtkPVApplication::New();
-  if (app->ParseCommandLineArguments(argc, argv))
+  if (myId == 0 && app->ParseCommandLineArguments(argc, argv))
     {
-    // Clean up for exit.
-    app->Delete();
-    Tcl_DeleteInterp(interp);  
-    return 1;
+    app->SetStartGUI(0);
     }
 
   // Create the process module for initializing the processes.
@@ -111,7 +108,6 @@ int MyMain(int argc, char *argv[])
   pm->SetApplication(app);
   app->SetProcessModule(pm);
 
-  // This initializes the processes and starts the application.
   retVal = pm->Start(argc, argv);
 
   // Clean up for exit.
