@@ -103,9 +103,17 @@ vtkKWApplication::vtkKWApplication()
   
   // add the application as $app
 
-  this->BalloonHelpWindow = vtkKWWidget::New();
-  this->BalloonHelpLabel = vtkKWWidget::New();
-  this->BalloonHelpLabel->SetParent(this->BalloonHelpWindow);
+  if (vtkKWApplication::WidgetVisibility)
+    {
+    this->BalloonHelpWindow = vtkKWWidget::New();
+    this->BalloonHelpLabel = vtkKWWidget::New();
+    this->BalloonHelpLabel->SetParent(this->BalloonHelpWindow);
+    }
+  else
+    {
+    this->BalloonHelpWindow = 0;
+    this->BalloonHelpLabel = 0;
+    }
   this->BalloonHelpPending = NULL;
   this->BalloonHelpDelay = 2;
 
