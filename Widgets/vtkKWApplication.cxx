@@ -391,7 +391,18 @@ void vtkKWApplication::Start(int argc, char *argv[])
 
 
 #ifdef _WIN32
-extern void ReadAValue(HKEY hKey,char *val,char *key, char *adefault);
+static void ReadAValue(HKEY hKey,char *val,char *key, char *adefault)
+{
+  DWORD dwType, dwSize;
+  
+  dwType = REG_SZ;
+  dwSize = 1023;
+  if(RegQueryValueEx(hKey,key, NULL, &dwType, 
+                     (BYTE *)val, &dwSize) != ERROR_SUCCESS)
+    {
+    strcpy(val,adefault);
+    }
+}
 #endif
 
 void vtkKWApplication::DisplayHelp()

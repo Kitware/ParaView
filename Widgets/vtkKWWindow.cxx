@@ -597,7 +597,7 @@ void vtkKWWindow::CreateStatusImage()
 
 
 #ifdef _WIN32
-void ReadAValue(HKEY hKey,char *val,char *key, char *adefault)
+static void ReadAValue(HKEY hKey,char *val,char *key, char *adefault)
 {
   DWORD dwType, dwSize;
   
@@ -816,5 +816,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.26 $");
+  this->ExtractRevision(os,"$Revision: 1.27 $");
 }
