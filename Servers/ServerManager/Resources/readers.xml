@@ -12,7 +12,8 @@
      <IntVectorProperty 
         name="TimestepAsIndex"
         command="SetTimestepAsIndex"
-        number_of_elements="1" />
+        number_of_elements="1" 
+        default_values="0"/>
    <!-- End PVDReader -->
    </SourceProxy>
                     
@@ -754,12 +755,14 @@
      <IntVectorProperty 
         name="FileRange"
         command="SetFileRange"
-        number_of_elements="2" />
+        number_of_elements="2" 
+        default_values="0 0"/>
 
      <IntVectorProperty 
         name="TimeStep"
         command="SetTimeStep"
-        number_of_elements="1">
+        number_of_elements="1"
+        default_values="0">
        <IntRangeDomain name="range"/>
      </IntVectorProperty>
 

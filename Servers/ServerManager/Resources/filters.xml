@@ -227,7 +227,8 @@
      <IntVectorProperty 
         name="OutputWholeExtent" 
         command="SetOutputWholeExtent" 
-        number_of_elements="6"> 
+        number_of_elements="6"
+        default_values="0 0 0 0 0 0"> 
        <ExtentDomain name="extent">
          <RequiredProperties>
             <Property name="Input" function="Input"/>
@@ -432,6 +433,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkCTHData"/>
+           </DataTypeDomain>
       </InputProperty>
    <!-- End CTHOutlineAMR -->
    </SourceProxy>
@@ -444,6 +448,9 @@
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkCTHData"/>
+          </DataTypeDomain>
      </InputProperty>
 
      <ProxyProperty name="ClipPlane" command="SetClipPlane">
@@ -1444,19 +1451,22 @@
      <IntVectorProperty
         name="OutputDimension"
         command="SetOutputDimension"
-        number_of_elements="1">
+        number_of_elements="1"
+        default_values="3">
        <IntRangeDomain name="range" min="1" max="3"/>
      </IntVectorProperty>
 
      <DoubleVectorProperty
         name="ChordError"
         command="SetChordError"
-        number_of_elements="1"/>
+        number_of_elements="1"
+        default_values="1e-3"/>
 
      <IntVectorProperty
         name="MaximumNumberOfSubdivisions"
         command="SetMaximumNumberOfSubdivisions"
-        number_of_elements="1">
+        number_of_elements="1"
+        default_values="8">
        <IntRangeDomain name="range" min="0" max="8"/>
      </IntVectorProperty>
    <!-- End TempTessellatorFilter -->
@@ -1830,7 +1840,8 @@
      <DoubleVectorProperty 
         name="ThresholdBetween" 
         command="ThresholdBetween"
-        number_of_elements="2">
+        number_of_elements="2"
+        default_values="0 0">
           <ArrayRangeDomain name="range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
@@ -2041,7 +2052,8 @@
      <IntVectorProperty 
         name="VOI" 
         command="SetVOI"
-        number_of_elements="6">
+        number_of_elements="6"
+        default_values="0 0 0 0 0 0">
        <ExtentDomain name="extent">
          <RequiredProperties>
             <Property name="Input" function="Input"/>

@@ -12,19 +12,22 @@
       <DoubleVectorProperty
          name="HueRange"
          command="SetHueRange"
-         number_of_elements="2" >
+         number_of_elements="2" 
+         default_values="0 0.66667">
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
          name="SaturationRange"
          command="SetSaturationRange"
-         number_of_elements="2" >
+         number_of_elements="2" 
+         default_values="1 1">
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
          name="ValueRange"
          command="SetValueRange"
-         number_of_elements="2" >
+         number_of_elements="2" 
+         default_values="1 1">
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -37,7 +40,8 @@
       <IntVectorProperty
          name="VectorComponent"
          command="SetVectorComponent"
-         number_of_elements="1" >
+         number_of_elements="1" 
+         default_values="0">
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -101,7 +105,8 @@
          name="DeepCopy"
          command="DeepCopy"
          number_of_elements="16" 
-         argument_is_array="1">
+         argument_is_array="1"
+         default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0">
       </DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>

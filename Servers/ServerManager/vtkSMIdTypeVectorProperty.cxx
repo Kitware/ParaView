@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.1");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.2");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
@@ -270,6 +270,12 @@ int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
         {
         this->SetElement(i, initVal[i]);
         }
+      }
+    else
+      {
+      vtkErrorMacro("No default value is specified for property: "
+                    << this->GetXMLName()
+                    << ". This might lead to stability problems");
       }
     delete[] initVal;
     }
