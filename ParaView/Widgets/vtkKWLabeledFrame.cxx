@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.16");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.17");
 
 
 
@@ -205,7 +205,8 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
   this->Script("pack %s -fill x -side top", this->Border->GetWidgetName());
   this->Script("pack %s -fill x -side top", this->Groove->GetWidgetName());
   this->Script("pack %s -fill x -side top", this->Border2->GetWidgetName());
-  this->Script("pack %s -fill both -expand yes",this->Frame->GetWidgetName());
+  this->Script("pack %s -padx 2 -pady 2 -fill both -expand yes",
+               this->Frame->GetWidgetName());
   this->Script("pack %s -anchor nw -side left -fill both -expand y",
                this->Label->GetWidgetName());
   this->Script("place %s -relx 0 -x 5 -y 0 -anchor nw",
