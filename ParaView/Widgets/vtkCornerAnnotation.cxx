@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.28");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.29");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -511,6 +511,16 @@ void vtkCornerAnnotation::ClearAllTexts()
   for (i = 0; i < 4; i++)
     {
     this->SetText(i, "");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkCornerAnnotation::CopyAllTextsFrom(vtkCornerAnnotation *ca)
+{
+  int i;
+  for (i = 0; i < 4; i++)
+    {
+    this->SetText(i, ca->GetText(i));
     }
 }
 
