@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.3");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.4");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1625,6 +1625,10 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
         // One component causes more trouble than it is worth.
         this->MapScalarsCheckVisible = 1;
         this->MapScalarsCheck->SetState( ! this->PVSource->GetPartDisplay()->GetDirectColorFlag());
+        }
+      else
+        { // Keep VTK from directly coloring single component arrays.
+        this->PVSource->GetPartDisplay()->SetDirectColorFlag(0);
         }
       }
     }
