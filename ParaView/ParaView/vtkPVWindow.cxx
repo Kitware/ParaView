@@ -908,10 +908,9 @@ void vtkPVWindow::PlayDemo()
     {
     fptr2.close();
     foundData=1;
-    this->Application->Script("set tmpPvDataDir %s/Data", loc);
+    this->Application->Script("set tmpPvDataDir [string map {\\\\ /} {%s/Data}]", loc);
     }
 
-  vtkDebugMacro(<<temp1);
   ifstream fptr(temp1, ios::in | PV_NOCREATE);
   if (!fptr.fail())
     {
@@ -936,7 +935,7 @@ void vtkPVWindow::PlayDemo()
 	{
 	fptr2.close();
 	foundData=1;
-	this->Application->Script("set tmpPvDataDir %s/Data", *dir);
+	this->Application->Script("set tmpPvDataDir [string map \\\\ /] %s/Data", dir);
 	}
       }
     }
@@ -951,11 +950,10 @@ void vtkPVWindow::PlayDemo()
       this->LoadScript(temp1);
       found=1;
       }
-    }
+    } 
 
   if (!found)
     {
-      vtkDebugMacro("Booo");
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->Create(this->Application,"");
     dlg->SetText(
