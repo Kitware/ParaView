@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.324");
+vtkCxxRevisionMacro(vtkPVApplication, "1.325");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1802,3 +1802,14 @@ int vtkPVApplication::GetGarbageCollectionGlobalDebugFlag()
   return vtkGarbageCollector::GetGlobalDebugFlag();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVApplication::DeferredGarbageCollectionPush()
+{
+  vtkGarbageCollector::DeferredCollectionPush();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::DeferredGarbageCollectionPop()
+{
+  vtkGarbageCollector::DeferredCollectionPop();
+}

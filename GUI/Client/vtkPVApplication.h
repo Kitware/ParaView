@@ -283,7 +283,11 @@ public:
   // Methods provided here to allow use from test scripts.
   void SetGarbageCollectionGlobalDebugFlag(int flag);
   int GetGarbageCollectionGlobalDebugFlag();
-  
+
+  // Description:
+  // Push/Pop deferred garbage collection.
+  void DeferredGarbageCollectionPush();
+  void DeferredGarbageCollectionPop();
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
