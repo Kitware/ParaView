@@ -96,7 +96,7 @@ protected:
   void RootAbortCheck();
   void RootFinalAbortCheck();
   void RootWaitForSatelliteToFinish(int satelliteId);
-  void RootSendFinalCompositeDescision();
+  void RootSendFinalCompositeDecision();
   
   // For the asynchronous receives.
   vtkMPIController *MPIController;

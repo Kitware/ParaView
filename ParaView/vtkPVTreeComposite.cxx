@@ -317,7 +317,7 @@ void vtkPVTreeComposite::RootFinalAbortCheck()
     }
 
   // Sends the final message to all satellites.
-  this->RootSendFinalCompositeDescision();
+  this->RootSendFinalCompositeDecision();
 }
 
 
@@ -365,7 +365,7 @@ void vtkPVTreeComposite::RootWaitForSatelliteToFinish(int satelliteId)
 
 //-------------------------------------------------------------------------
 // This method has simplified to the point that it could be eliminated.
-void vtkPVTreeComposite::RootSendFinalCompositeDescision()
+void vtkPVTreeComposite::RootSendFinalCompositeDecision()
 {
   int message;
   int idx, num;
@@ -565,15 +565,15 @@ int vtkPVTreeComposite::CheckForAbortComposite()
 }
 
 //-------------------------------------------------------------------------
-int vtkPVTreeComposite::RootWaitForSatelliteToFinish(int satelliteId)
-{
-  satelliteId = satelliteId;
-}
+//int vtkPVTreeComposite::RootWaitForSatelliteToFinish(int satelliteId)
+//{
+//  satelliteId = satelliteId;
+//}
 
 //----------------------------------------------------------------------------
-void vtkPVTreeComposite::RootSendFinalCompositeDescision()
-{
-}
+//void vtkPVTreeComposite::RootSendFinalCompositeDecision()
+//{
+//}
 
 
 

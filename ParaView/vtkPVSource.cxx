@@ -459,7 +459,7 @@ void vtkPVSource::CreateProperties()
   this->VectorOperationMenu->Create(this->Application, "");
   this->VectorOperationMenu->SetBalloonHelpString("Select which array to use as point vectors for this filter");
   
-  // Isolate events to this window untill accept or reset is pressed.
+  // Isolate events to this window until accept or reset is pressed.
   this->Script("grab set %s", this->ParameterFrame->GetWidgetName());
   
   this->UpdateProperties();
@@ -1118,7 +1118,7 @@ void vtkPVSource::UpdateProperties()
   vtkPVData *input;
   
   // --------------------------------------
-  // Change the state of the delete button based on if there are any useres.
+  // Change the state of the delete button based on if there are any users.
   // Only filters at the end of a pipeline can be deleted.
   if (this->GetPVOutput(0) &&
       this->GetPVOutput(0)->GetNumberOfPVConsumers() > 0)
