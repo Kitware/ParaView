@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.18");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.19");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1022,6 +1022,9 @@ void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+  this->ColorRangeMinEntry->SetValue(this->ScalarRange[0], 5);
+  this->ColorRangeMaxEntry->SetValue(this->ScalarRange[1], 5);
+
   if (this->ScalarRange[0] == min && this->ScalarRange[1] == max)
     {
     return;
@@ -1029,9 +1032,6 @@ void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
 
   this->ScalarRange[0] = min;
   this->ScalarRange[1] = max;
-
-  this->ColorRangeMinEntry->SetValue(this->ScalarRange[0], 5);
-  this->ColorRangeMaxEntry->SetValue(this->ScalarRange[1], 5);
 
   pvApp->BroadcastScript("%s SetTableRange %f %f", 
                          this->LookupTableTclName, min, max);
