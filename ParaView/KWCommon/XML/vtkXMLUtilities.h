@@ -85,9 +85,9 @@ public:
   // Description:
   // Write a vtkXMLDataElement to a file
   // Return 1 on success, 0 otherwise.
-  static void WriteElement(vtkXMLDataElement*, 
-                           const char *filename, 
-                           vtkIndent *indent = 0);
+  static int WriteElement(vtkXMLDataElement*, 
+                          const char *filename, 
+                          vtkIndent *indent = 0);
 
   // Description:
   // Read a vtkXMLDataElement from a file or stream

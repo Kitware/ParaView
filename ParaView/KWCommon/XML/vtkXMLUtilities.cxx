@@ -42,8 +42,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 #include "vtkXMLDataParser.h"
 
+#if !defined(_WIN32) || defined(__CYGWIN__)
+# include <unistd.h> /* unlink */
+#endif
+
 vtkStandardNewMacro(vtkXMLUtilities);
-vtkCxxRevisionMacro(vtkXMLUtilities, "1.7");
+vtkCxxRevisionMacro(vtkXMLUtilities, "1.8");
 
 #define  VTK_XML_UTILITIES_FACTORED_POOL_NAME "FactoredPool"
 #define  VTK_XML_UTILITIES_FACTORED_NAME      "Factored"
@@ -207,17 +211,26 @@ void vtkXMLUtilities::FlattenElement(vtkXMLDataElement *elem,
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLUtilities::WriteElement(vtkXMLDataElement *elem, 
-                                   const char *filename,
-                                   vtkIndent *indent)
+int vtkXMLUtilities::WriteElement(vtkXMLDataElement *elem, 
+                                  const char *filename,
+                                  vtkIndent *indent)
 {
   if (!filename)
     {
-    return;
+    return 0;
     }
 
   ofstream os(filename, ios::out);
   vtkXMLUtilities::FlattenElement(elem, os, indent);
+  
+  os.flush();
+  if (os.fail())
+    {
+    os.close();
+    unlink(filename);
+    return 0;
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
