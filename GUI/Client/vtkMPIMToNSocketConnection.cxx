@@ -23,7 +23,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.5");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.6");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -37,7 +37,7 @@ public:
     vtkstd::string HostName;
   };
   vtkstd::vector<NodeInformation> ServerInformation;
-  vtkstd::vector<std::string> MachineNames;
+  vtkstd::vector<vtkstd::string> MachineNames;
 };
 
 
