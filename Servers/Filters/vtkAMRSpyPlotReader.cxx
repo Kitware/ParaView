@@ -31,7 +31,7 @@
 
 #include "spcth_interface.h"
 
-vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.2");
+vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.3");
 vtkStandardNewMacro(vtkAMRSpyPlotReader);
 vtkCxxSetObjectMacro(vtkAMRSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -805,12 +805,6 @@ void vtkAMRSpyPlotReader::SetCellArrayStatus(const char* name, int status)
 }
 
 //------------------------------------------------------------------------------
-void vtkAMRSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-}
-
-//------------------------------------------------------------------------------
 void vtkAMRSpyPlotReader::MergeVectors(vtkDataSetAttributes* da)
 {
   int numArrays = da->GetNumberOfArrays();
@@ -1073,3 +1067,30 @@ int vtkAMRSpyPlotReader::MergeVectors(vtkDataSetAttributes* da,
   newArray->Delete();    
   return 1;
 }
+
+//------------------------------------------------------------------------------
+void vtkAMRSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+
+  os << "FileName: " << (this->FileName?this->FileName:"(none)") << endl;
+  os << "TimeStep: " << this->TimeStep << endl;
+  os << "TimeStepRange: " << this->TimeStepRange[0] << " " << this->TimeStepRange[1] << endl;
+  if ( this->PointDataArraySelection )
+    {
+    os << "PointDataArraySelection:" << endl;
+    this->PointDataArraySelection->PrintSelf(os, indent.GetNextIndent());
+    }
+  if ( this->CellDataArraySelection )
+    {
+    os << "CellDataArraySelection:" << endl;
+    this->CellDataArraySelection->PrintSelf(os, indent.GetNextIndent());
+    }
+  if ( this->Controller)
+    {
+    os << "Controller:" << endl;
+    this->Controller->PrintSelf(os, indent.GetNextIndent());
+    }
+}
+
+
