@@ -30,19 +30,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkTclUtil.h"
 #include "vtkToolkits.h"
-//#include "kwinit.h"
-
-extern "C" int Vtktcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkcontribtcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkgraphicstcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkimagingtcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkpatentedtcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
-
-extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
-
 
 // external global variable.
 vtkMultiProcessController *VTK_PV_UI_CONTROLLER = NULL;
@@ -65,68 +52,6 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
   
   self->SimpleScript((char*)remoteArg);
 }
-
-
-
-
-// The applications Initialize Tcl also initializes Tk and needs a DISPLAY env variable set.
-// This is a temporary solution.
-// Not used,  Transitioning to vtkKWApplication.
-Tcl_Interp *vtkPVInitializeTcl()
-{
-  Tcl_Interp *interp;
-  
-  interp = Tcl_CreateInterp();
-  // vtkKWApplication depends on this variable being set.
-  //Et_Interp = interp;
-  
-  // initialize VTK
-  Vtktcl_Init(interp);
-  
-  if (Tcl_Init(interp) == TCL_ERROR) 
-    {
-    cerr << "Init Tcl error\n";
-    }
-#ifndef WIN32
-  if (Vtkcommontcl_Init(interp) == TCL_ERROR) 
-    {
-    cerr << "Init Common error\n";
-    }
-    
-  if (Vtkgraphicstcl_Init(interp) == TCL_ERROR) 
-    {
-    cerr << "Init Graphics error\n";
-    }
-  if (Vtkimagingtcl_Init(interp) == TCL_ERROR) 
-    {
-    cerr << "Init Imaging error\n";
-    }
-  if (Vtkcontribtcl_Init(interp) == TCL_ERROR) 
-    {
-    cerr << "Init Contrib error\n";
-    }
-  if (Vtkpatentedtcl_Init(interp) == TCL_ERROR) 
-    {
-    cerr << "Init Patented error\n";
-    }
-  if (Vtkparalleltcl_Init(interp) == TCL_ERROR) 
-    {
-    cerr << "Init Parallel error\n";
-    }
-#endif
-
-  if (Vtkkwwidgetstcl_Init(interp) == TCL_ERROR) 
-    {
-    cerr << "Init KWWidgets error\n";
-    }
-  if (Vtkkwparaviewtcl_Init(interp) == TCL_ERROR) 
-    {
-    cerr << "Init KWParaView error\n";
-    }
-
-  return interp;
-}
-
 
 
 // Each process starts with this method.  One process is designated as "master" 
@@ -173,8 +98,6 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     {
     // The slaves try to connect.  In the future, we may not want to initialize Tk.
     //putenv("DISPLAY=:0.0");
-    //putenv("DISPLAY=www.kitware.com:2.0");
-    //putenv("DISPLAY=:3.0");
 
     vtkKWApplication::SetWidgetVisibility(0);
     Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
@@ -203,8 +126,6 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
 
 #ifdef _WIN32
 #include <windows.h>
-
-
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nShowCmd)
@@ -259,27 +180,18 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();
   controller->Initialize(&argc, (char***)(&argv));
-  
+
 #ifndef VTK_USE_MPI
   controller->SetNumberOfProcesses(1);
 #endif
+  
+  controller->CreateOutputWindow();
   
   pvArgs.argc = argc;
   pvArgs.argv = argv;
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
   controller->SingleMethodExecute();
 
-  //Process_Init((void *)(&pvArgs));
-  
-
-  // The old way with no controller.
-  //Tcl_Interp *interp = vtkPVApplication::InitializeTcl(argc,argv);
-  //vtkPVApplication *app = vtkPVApplication::New();
-  //app->SetController(controller);
-  //app->Script("wm withdraw .");
-  //app->Start(argc,argv);
-  //app->Delete();
-  
   controller->Delete();
   
   delete [] argv[0];
@@ -298,13 +210,17 @@ int main(int argc, char *argv[])
   pvArgs.argv = argv;
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();  
-//  controller->Initialize(argc, argv);
   controller->Initialize(&argc, &argv);
-  //controller->SetNumberOfProcesses(2);
+
+#ifndef VTK_USE_MPI
+  controller->SetNumberOfProcesses(1);
+#endif
+
+  controller->CreateOutputWindow();
+
 
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
   controller->SingleMethodExecute();
-  //Process_Init((void *)(&pvArgs));
   
   controller->Delete();
   
