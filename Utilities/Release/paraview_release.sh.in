@@ -2,7 +2,7 @@
 #=============================================================================
 #
 # Program:   ParaView
-# Module:    paraview_release.sh
+# Module:    paraview_release.sh.in
 # Language:  C++
 # Date:      $Date$
 # Version:   $Revision$
@@ -23,9 +23,9 @@
 #
 
 # Release version number.
-TAG="ParaView-1-8-2"
-VERSION="1.8.2"
-PARAVIEW_VERSION="1.8"
+TAG="ParaView-@PARAVIEW_VERSION_MAJOR@-@PARAVIEW_VERSION_MINOR@-@PARAVIEW_VERSION_PATCH@"
+VERSION="@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@"
+PARAVIEW_VERSION="@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@"
 RELEASE="1"
 
 # Project configuration.

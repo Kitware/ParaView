@@ -1,0 +1,31 @@
+# this script is designed to be run from a UNIX like shell under Windows 
+# and has some hard coded assumptions. Do not just randomly run this script 
+# without looking it over first.
+
+# Release version number.
+TAG="ParaView-@PARAVIEW_VERSION_MAJOR@-@PARAVIEW_VERSION_MINOR@-@PARAVIEW_VERSION_PATCH@"
+VERSION="@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@.@PARAVIEW_VERSION_PATCH@"
+CVS_MODULE="ParaView"
+
+SCPID="kitware@public.kitware.com"
+
+# CVSROOT setting used to check out ParaView.
+CVSROOT=":pserver:anoncvs@www.paraview.org:/cvsroot/ParaView"
+
+# build the NSI
+"@NSIS_MAKENSIS@" "@ParaView_BINARY_DIR@/Utilities/Release/ParaView.nsi"
+
+scp paraview-${VERSION}-win32.exe ${SCPID}:/projects/FTP/pub/paraview/v@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@
+
+# tag the tree
+cd "@ParaView_SOURCE_DIR@"
+cvs tag -F ${TAG}
+
+# build the winzip src file
+cd C:
+rm -rf ParaView
+cvs -d ${CVSROOT} export -r ${TAG} ParaView 
+
+cd ParaView
+"@WINZIP_WZZIP@" -r -P paraview-${VERSION}.zip
+scp paraview-${VERSION}.zip ${SCPID}:/projects/FTP/pub/paraview/v@PARAVIEW_VERSION_MAJOR@.@PARAVIEW_VERSION_MINOR@
