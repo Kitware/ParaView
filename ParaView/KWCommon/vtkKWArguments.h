@@ -32,6 +32,8 @@ public:
   vtkTypeRevisionMacro(vtkKWArguments,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  typedef vtkKWArgumentsInternal Internal;
+
   //BTX
   // These are prototypes for callbacks.
   typedef int(*CallbackType)(const char* argument, const char* value, 
@@ -103,7 +105,7 @@ protected:
   vtkSetStringMacro(Help);
   void GenerateHelp();
 
-  vtkKWArgumentsInternal* Internals;
+  Internal* Internals;
   char* Help;
 
   unsigned int LineLength;

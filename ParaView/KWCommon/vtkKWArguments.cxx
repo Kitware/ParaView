@@ -32,8 +32,22 @@
 
 //----------------------------------------------------------------------------
 //============================================================================
-class vtkKWArgumentsInternalVectorOfStrings : public vtkstd::vector<vtkstd::string> {};
-class vtkKWArgumentsInternalMapOfStrucs : public vtkstd::map<vtkstd::string,
+class vtkKWArgumentsString : public vtkstd::string 
+{
+public:
+  typedef vtkstd::string StdString;
+  vtkKWArgumentsString(): StdString() {}
+  vtkKWArgumentsString(const value_type* s): StdString(s) {}
+  vtkKWArgumentsString(const value_type* s, size_type n): StdString(s, n) {}
+  vtkKWArgumentsString(const StdString& s, size_type pos=0, size_type n=npos):
+    StdString(s, pos, n) {}
+};
+class vtkKWArgumentsVectorOfStrings : 
+  public vtkstd::vector<vtkKWArgumentsString> {};
+class vtkKWArgumentsSetOfStrings :
+  public vtkstd::set<vtkKWArgumentsString> {};
+class vtkKWArgumentsMapOfStrucs : 
+  public vtkstd::map<vtkKWArgumentsString,
     vtkKWArguments::CallbackStructure> {};
 class vtkKWArgumentsInternal
 {
@@ -45,8 +59,10 @@ public:
     this->LastArgument = 0;
     }
 
-  typedef vtkKWArgumentsInternalVectorOfStrings VectorOfStrings;
-  typedef vtkKWArgumentsInternalMapOfStrucs CallbacksMap;
+  typedef vtkKWArgumentsVectorOfStrings VectorOfStrings;
+  typedef vtkKWArgumentsMapOfStrucs CallbacksMap;
+  typedef vtkKWArgumentsString String;
+  typedef vtkKWArgumentsSetOfStrings SetOfStrings;
 
   VectorOfStrings Argv;
   CallbacksMap Callbacks;
@@ -61,12 +77,12 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.15");
+vtkCxxRevisionMacro(vtkKWArguments, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
 {
-  this->Internals = new vtkKWArgumentsInternal;
+  this->Internals = new vtkKWArguments::Internal;
   this->Help = 0;
   this->LineLength = 80;
 }
@@ -94,19 +110,19 @@ void vtkKWArguments::Initialize(int argc, char* argv[])
 //----------------------------------------------------------------------------
 int vtkKWArguments::Parse()
 {
-  vtkKWArgumentsInternal::VectorOfStrings::size_type cc;
-  vtkKWArgumentsInternal::VectorOfStrings matches;
+  vtkKWArguments::Internal::VectorOfStrings::size_type cc;
+  vtkKWArguments::Internal::VectorOfStrings matches;
   for ( cc = 0; cc < this->Internals->Argv.size(); cc ++ )
     {
     matches.clear();
-    vtkstd::string& arg = this->Internals->Argv[cc];
-    vtkKWArgumentsInternal::CallbacksMap::iterator it;
+    vtkKWArguments::Internal::String& arg = this->Internals->Argv[cc];
+    vtkKWArguments::Internal::CallbacksMap::iterator it;
 
     for ( it = this->Internals->Callbacks.begin();
       it != this->Internals->Callbacks.end();
       it ++ )
       {
-      const vtkstd::string& parg = it->first;
+      const vtkKWArguments::Internal::String& parg = it->first;
       vtkKWArguments::CallbackStructure *cs = &it->second;
       if (cs->ArgumentType == vtkKWArguments::NO_ARGUMENT ||
         cs->ArgumentType == vtkKWArguments::SPACE_ARGUMENT) 
@@ -123,9 +139,9 @@ int vtkKWArguments::Parse()
       }
     if ( matches.size() > 0 )
       {
-      vtkKWArgumentsInternal::VectorOfStrings::size_type kk;
-      vtkKWArgumentsInternal::VectorOfStrings::size_type maxidx = 0;
-      vtkstd::string::size_type maxlen = 0;
+      vtkKWArguments::Internal::VectorOfStrings::size_type kk;
+      vtkKWArguments::Internal::VectorOfStrings::size_type maxidx = 0;
+      vtkKWArguments::Internal::String::size_type maxlen = 0;
       for ( kk = 0; kk < matches.size(); kk ++ )
         {
         //cout << "Possible argument: " << matches[kk] << endl;
@@ -139,7 +155,7 @@ int vtkKWArguments::Parse()
       const char* value = 0;
       vtkKWArguments::CallbackStructure *cs 
         = &this->Internals->Callbacks[matches[maxidx]];
-      const vtkstd::string& sarg = matches[maxidx];
+      const vtkKWArguments::Internal::String& sarg = matches[maxidx];
       if ( cs->ArgumentType == NO_ARGUMENT )
         {
         }
@@ -194,9 +210,9 @@ int vtkKWArguments::Parse()
 //----------------------------------------------------------------------------
 void vtkKWArguments::GetRemainingArguments(int* argc, char*** argv)
 {
-  vtkKWArgumentsInternal::VectorOfStrings::size_type size 
+  vtkKWArguments::Internal::VectorOfStrings::size_type size 
     = this->Internals->Argv.size() - this->Internals->LastArgument + 1;
-  vtkKWArgumentsInternal::VectorOfStrings::size_type cc;
+  vtkKWArguments::Internal::VectorOfStrings::size_type cc;
 
   char** args = new char*[ size ];
   args[0] = new char[ this->Internals->Argv[0].size() + 1 ];
@@ -260,8 +276,8 @@ void vtkKWArguments::SetUnknownArgumentCallback(
 void vtkKWArguments::GenerateHelp()
 {
   ostrstream str;
-  vtkKWArgumentsInternal::CallbacksMap::iterator it;
-  typedef vtkstd::map<vtkstd::string, vtkstd::set<vtkstd::string> > MapArgs;
+  vtkKWArguments::Internal::CallbacksMap::iterator it;
+  typedef vtkstd::map<vtkKWArguments::Internal::String, vtkKWArguments::Internal::SetOfStrings > MapArgs;
   MapArgs mp;
   MapArgs::iterator mpit, smpit;
   for ( it = this->Internals->Callbacks.begin();
@@ -290,7 +306,7 @@ void vtkKWArguments::GenerateHelp()
       {
       mpit->second.insert(it->first);
       smpit = mp.find(it->first);
-      vtkstd::set<vtkstd::string>::iterator sit;
+      vtkKWArguments::Internal::SetOfStrings::iterator sit;
       for ( sit = smpit->second.begin(); sit != smpit->second.end(); sit++ )
         {
         mpit->second.insert(*sit);
@@ -303,15 +319,15 @@ void vtkKWArguments::GenerateHelp()
       }
     }
  
-  vtkstd::string::size_type maxlen = 0;
+  vtkKWArguments::Internal::String::size_type maxlen = 0;
   for ( mpit = mp.begin();
     mpit != mp.end();
     mpit ++ )
     {
-    vtkstd::set<vtkstd::string>::iterator sit;
+    vtkKWArguments::Internal::SetOfStrings::iterator sit;
     for ( sit = mpit->second.begin(); sit != mpit->second.end(); sit++ )
       {
-      vtkstd::string::size_type clen = sit->size();
+      vtkKWArguments::Internal::String::size_type clen = sit->size();
       switch ( this->Internals->Callbacks[*sit].ArgumentType )
         {
         case vtkKWArguments::NO_ARGUMENT:     clen += 0; break;
@@ -331,7 +347,7 @@ void vtkKWArguments::GenerateHelp()
     mpit != mp.end();
     mpit ++ )
     {
-    vtkstd::set<vtkstd::string>::iterator sit;
+    vtkKWArguments::Internal::SetOfStrings::iterator sit;
     for ( sit = mpit->second.begin(); sit != mpit->second.end(); sit++ )
       {
       str << endl;
@@ -354,7 +370,7 @@ void vtkKWArguments::GenerateHelp()
     int cnt = 0;
     while ( len > 0)
       {
-      vtkstd::string::size_type cc;
+      vtkKWArguments::Internal::String::size_type cc;
       for ( cc = 0; ptr[cc]; cc ++ )
         {
         if ( *ptr == ' ' || *ptr == '\t' )
@@ -371,7 +387,7 @@ void vtkKWArguments::GenerateHelp()
           }
         str << "\t";
         }
-      vtkstd::string::size_type skip = len;
+      vtkKWArguments::Internal::String::size_type skip = len;
       if ( skip > this->LineLength - maxlen )
         {
         skip = this->LineLength - maxlen;
