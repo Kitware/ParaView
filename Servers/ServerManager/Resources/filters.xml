@@ -911,7 +911,7 @@
    </SourceProxy>
 
 
-   <SourceProxy name="Cut" class="vtkKitwareCutter">
+   <SourceProxy name="Cut" class="vtkCutter">
      <ProxyProperty name="CutFunction" command="SetCutFunction"/>
 
      <DoubleVectorProperty
