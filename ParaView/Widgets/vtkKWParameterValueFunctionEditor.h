@@ -167,6 +167,7 @@ public:
   virtual void SelectPoint(int id);
   vtkGetMacro(SelectedPoint, int);
   virtual void ClearSelection();
+  virtual int HasSelection();
 
   // Description:
   // Merge all the points from another function editor.

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.8");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.9");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -290,7 +290,7 @@ int vtkKWColorTransferFunctionEditor::MoveFunctionPointToCanvasCoordinates(
   // If the point was selected and the new point does not match (which
   // should not happen anyway), reselect the new point
 
-  if (this->SelectedPoint >= 0 && this->SelectedPoint == id && id != new_id)
+  if (this->HasSelection() && this->SelectedPoint == id && id != new_id)
     {
     this->SelectPoint(new_id);
     }
@@ -346,7 +346,7 @@ int vtkKWColorTransferFunctionEditor::MoveFunctionPointToParameter(
   // If the point was selected and the new point does not match (which
   // should not happen anyway), reselect the new point
 
-  if (this->SelectedPoint >= 0 && this->SelectedPoint == id && id != new_id)
+  if (this->HasSelection() && this->SelectedPoint == id && id != new_id)
     {
     this->SelectPoint(new_id);
     }

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.10");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.11");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -1325,7 +1325,7 @@ void vtkKWParameterValueFunctionEditor::RedrawCanvasElements()
   // Try to save the selection before (eventually) creating new points
 
   int s_x = 0, s_y = 0;
-  if (nb_points_changed && this->SelectedPoint >= 0)
+  if (nb_points_changed && this->HasSelection() >= 0)
     {
     int item_id = atoi(
       this->Script("%s find withtag %s",canv,VTK_KW_RANGE_SELECTED_POINT_TAG));
@@ -1365,7 +1365,7 @@ void vtkKWParameterValueFunctionEditor::RedrawCanvasElements()
 
   // Try to restore the selection
 
-  if (nb_points_changed && this->SelectedPoint >= 0)
+  if (nb_points_changed && this->HasSelection() >= 0)
     {
     int p_x = 0, p_y = 0;
     for (i = 0; i < nb_points; i++)
@@ -1378,6 +1378,12 @@ void vtkKWParameterValueFunctionEditor::RedrawCanvasElements()
         }
       }
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::HasSelection()
+{
+  return (this->SelectedPoint >= 0);
 }
 
 //----------------------------------------------------------------------------
@@ -1420,11 +1426,10 @@ void vtkKWParameterValueFunctionEditor::SelectPoint(int id)
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::ClearSelection()
 {
-  if (this->SelectedPoint < 0)
+  if (!this->HasSelection())
     {
     return;
     }
-
 
   if (!this->IsCreated())
     {
@@ -1718,7 +1723,7 @@ int vtkKWParameterValueFunctionEditor::SynchronizeSingleSelection(
   
   // Make sure only one of those editors has a selected point from now
   
-  if (a->GetSelectedPoint() >= 0)
+  if (a->HasSelection() >= 0)
     {
     b->ClearSelection();
     }
@@ -2043,7 +2048,7 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
 void vtkKWParameterValueFunctionEditor::MovePointCallback(
   int x, int y, int shift)
 {
-  if (!this->IsCreated() || this->SelectedPoint < 0)
+  if (!this->IsCreated() || !this->HasSelection())
     {
     return;
     }
@@ -2193,7 +2198,7 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
 {
   this->UpdateInfoLabelWithRange();
 
-  if (this->SelectedPoint < 0)
+  if (!this->HasSelection())
     {
     return;
     }
