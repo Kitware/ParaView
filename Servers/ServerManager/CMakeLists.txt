@@ -50,6 +50,28 @@ SET( ServerManagerCommon_SRCS
   )
 
 SET( ServerManagerNonWrapped_SRCS
+  vtkPVCaveRenderModule.cxx
+  vtkPVCompositeRenderModule.cxx
+  vtkPVMultiDisplayRenderModule.cxx
+  vtkPVLODRenderModule.cxx
+  vtkPVMPIRenderModule.cxx
+  vtkPVSimpleRenderModule.cxx
+  vtkRMObject.cxx
+  vtkRMScalarBarWidget.cxx
+  vtkRM3DWidget.cxx
+  vtkRMBoxWidget.cxx
+  vtkRMImplicitPlaneWidget.cxx
+  vtkRMLineWidget.cxx
+  vtkRMPointWidget.cxx
+  vtkRMSphereWidget.cxx
+  vtkPVDisplay.cxx
+  vtkPVPartDisplay.cxx
+  vtkPVCompositePartDisplay.cxx
+  vtkPVLODPartDisplay.cxx
+  vtkPVMultiDisplayPartDisplay.cxx
+  vtkPVPickDisplay.cxx
+  vtkPVPlotDisplay.cxx
+
   vtkSMXMLParser.cxx
   )
 
@@ -59,11 +81,24 @@ SET( ServerManager_SRCS
   )
 
 SET_SOURCE_FILES_PROPERTIES(
+  vtkRM3DWidget.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMVectorProperty.cxx
+  vtkRMObject.cxx 
+  vtkPVDisplay.cxx
   ABSTRACT
   )
+
+IF (PARAVIEW_USE_ICE_T)
+  SET(ServerManager_SRCS 
+    ${ServerManager_SRCS}
+    vtkPVDeskTopRenderModule.cxx
+    vtkPVIceTDisplayRenderModule.cxx
+    vtkPVIceTRenderModule.cxx
+    )
+ENDIF (PARAVIEW_USE_ICE_T)
+
 
 INCLUDE_DIRECTORIES(
   ${VTK_BINARY_DIR}

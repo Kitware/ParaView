@@ -19,10 +19,13 @@
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkProcessModule.h"
+#include "vtkPVPartDisplay.h"
+#include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.6");
+vtkCxxRevisionMacro(vtkSMPart, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -34,6 +37,9 @@ vtkSMPart::vtkSMPart()
   this->DataInformationValid = 0;
 
   this->ClassNameInformation = vtkPVClassNameInformation::New();
+
+  this->PartDisplay = NULL;
+  this->Displays = vtkCollection::New();
 }
 
 //----------------------------------------------------------------------------
@@ -41,6 +47,10 @@ vtkSMPart::~vtkSMPart()
 {  
   this->DataInformation->Delete();
   this->ClassNameInformation->Delete();
+
+  this->SetPartDisplay(NULL);
+  this->Displays->Delete();
+  this->Displays = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -315,7 +325,70 @@ void vtkSMPart::CreateTranslatorIfNecessary()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPart::AddDisplay(vtkPVDisplay* disp)
+{
+  if (disp)
+    {
+    this->Displays->AddItem(disp);
+    }
+} 
+
+//----------------------------------------------------------------------------
+void vtkSMPart::SetPartDisplay(vtkPVPartDisplay* pDisp)
+{
+  if (this->PartDisplay)
+    {
+    this->Displays->RemoveItem(this->PartDisplay);
+    this->PartDisplay->UnRegister(this);
+    this->PartDisplay = NULL;
+    }
+  if (pDisp)
+    {
+    this->Displays->AddItem(pDisp);
+    this->PartDisplay = pDisp;
+    this->PartDisplay->Register(this);
+    this->PartDisplay->SetInput(this);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPart::Update()
+{
+  vtkCollectionIterator* sit = this->Displays->NewIterator();
+
+  for (sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem())
+    {
+    vtkPVDisplay* disp = vtkPVDisplay::SafeDownCast(sit->GetObject());
+    if (disp)
+      {
+      disp->Update();
+      }
+    }
+  sit->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPart::MarkForUpdate()
+{
+  vtkCollectionIterator* sit = this->Displays->NewIterator();
+
+  for (sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem())
+    {
+    vtkPVDisplay* disp = vtkPVDisplay::SafeDownCast(sit->GetObject());
+    if (disp)
+      {
+      disp->InvalidateGeometry();
+      }
+    }
+  sit->Delete();
+}
+
+//----------------------------------------------------------------------------
 void vtkSMPart::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
+
+
+
+
