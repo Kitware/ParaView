@@ -11,8 +11,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWSelectionFrame
+// .NAME vtkKWSelectionFrame - Selection Frame 
 // .SECTION Description
+// The selction frame is what contains a render widget.  
+// It is called a "selection frame" because in its title bar, you can 
+// select which render widget to display in it.
 
 #ifndef __vtkKWSelectionFrame_h
 #define __vtkKWSelectionFrame_h
