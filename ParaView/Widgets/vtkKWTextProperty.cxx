@@ -45,8 +45,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWEntry.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWOptionMenu.h"
+#include "vtkKWScale.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
@@ -116,7 +118,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.1.2.3");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.1.2.4");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -140,6 +142,9 @@ vtkKWTextProperty::vtkKWTextProperty()
   this->BoldCheckButton = vtkKWCheckButton::New();
   this->ItalicCheckButton = vtkKWCheckButton::New();
   this->ShadowCheckButton = vtkKWCheckButton::New();
+
+  this->ShowOpacity = 1;
+  this->OpacityScale = vtkKWScale::New();
 
   this->ShowHorizontalJustification = 1;
   this->HorizontalJustificationOptionMenu = vtkKWOptionMenu::New();
@@ -173,6 +178,9 @@ vtkKWTextProperty::~vtkKWTextProperty()
   this->ItalicCheckButton = NULL;
   this->ShadowCheckButton->Delete();
   this->ShadowCheckButton = NULL;
+
+  this->OpacityScale->Delete();
+  this->OpacityScale = NULL;
 
   this->HorizontalJustificationOptionMenu->Delete();
   this->HorizontalJustificationOptionMenu = NULL;
@@ -379,6 +387,20 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
                this->ItalicCheckButton->GetWidgetName(),
                this->ShadowCheckButton->GetWidgetName());
 
+  // Opacity
+
+  this->OpacityScale->SetParent(this);
+  this->OpacityScale->PopupScaleOn();
+  this->OpacityScale->SetResolution(0.01);
+  this->OpacityScale->SetRange(0.0, 1.0);
+  this->OpacityScale->Create(this->Application, "");
+  this->OpacityScale->DisplayEntry();
+  this->OpacityScale->GetEntry()->SetWidth(4);
+  this->OpacityScale->SetCommand(this, "OpacityScaleCallback");
+  this->OpacityScale->SetEndCommand(this, "OpacityScaleEndCallback");
+  this->OpacityScale->SetEntryCommand(this, "OpacityScaleEndCallback");
+  this->OpacityScale->SetBalloonHelpString("Select the text opacity.");
+
   // Copy button
 
   this->CopyButton->SetParent(this);
@@ -407,10 +429,11 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
 
   // Pack
 
-  this->Script("grid %s %s %s %s -sticky news -padx 1",
+  this->Script("grid %s %s %s %s %s -sticky news -padx 1",
                this->ChangeColorButton->GetWidgetName(),
                this->FontFamilyOptionMenu->GetWidgetName(),
                this->StylesFrame->GetWidgetName(),
+               this->OpacityScale->GetWidgetName(),
                this->CopyButton->GetWidgetName());
 
   // Update
@@ -424,6 +447,7 @@ void vtkKWTextProperty::UpdateInterface()
   this->UpdateColorButton();
   this->UpdateFontFamilyOptionMenu();
   this->UpdateStylesFrame();
+  this->UpdateOpacityScale();
   this->UpdateCopyButton();
 }
 
@@ -739,6 +763,103 @@ void vtkKWTextProperty::ShadowCheckButtonCallback()
 }
 
 // ----------------------------------------------------------------------------
+void vtkKWTextProperty::SetShowOpacity(int _arg)
+{
+  if (this->ShowOpacity == _arg)
+    {
+    return;
+    }
+  this->ShowOpacity = _arg;
+  this->Modified();
+
+  this->UpdateOpacityScale();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWTextProperty::SetOpacityNoTrace(float v) 
+{
+  if (this->TextProperty)
+    {
+    this->TextProperty->SetOpacity(v);
+    }
+
+  this->UpdateOpacityScale();
+
+  if (this->OnChangeCommand)
+    {
+    this->Script("eval %s", this->OnChangeCommand);
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWTextProperty::SetOpacity(float v) 
+{
+  this->SetOpacityNoTrace(v);
+  this->AddTraceEntry("$kw(%s) SetOpacity %f", this->GetTclName(), v);
+}
+
+// ----------------------------------------------------------------------------
+float vtkKWTextProperty::GetOpacity() 
+{
+  int use_actor_opacity = 0;
+  if (!this->TextProperty)
+    {
+    use_actor_opacity = 1;
+    }
+  else
+    {
+    // This test is done to maintain backward compatibility (see
+    // vtkOpenGL...TextMapper). The default vtkTextProperty opacity is
+    // -1 so that the mappers know that they have to use
+    // the actor's opacity instead.
+    if (this->TextProperty->GetOpacity() < 0.0)
+      {
+      use_actor_opacity = 1;
+      }
+    }
+
+  if (use_actor_opacity && this->Actor2D && this->Actor2D->GetProperty())
+    {
+    return this->Actor2D->GetProperty()->GetOpacity();
+    }
+  else if (this->TextProperty)
+    {
+    return this->TextProperty->GetOpacity();
+    }
+  return 0.0;
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWTextProperty::UpdateOpacityScale()
+{
+  if (this->OpacityScale->IsCreated() && this->TextProperty)
+    {
+    this->OpacityScale->SetValue(this->GetOpacity());
+    this->Script("grid %s %s",
+                 (this->ShowOpacity ? "" : "remove"), 
+                 this->OpacityScale->GetWidgetName());
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWTextProperty::OpacityScaleCallback() 
+{
+  if (this->OpacityScale->IsCreated())
+    {
+    this->SetOpacityNoTrace(this->OpacityScale->GetValue());
+    }
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWTextProperty::OpacityScaleEndCallback() 
+{
+  if (this->OpacityScale->IsCreated())
+    {
+    this->SetOpacity(this->OpacityScale->GetValue());
+    }
+}
+
+// ----------------------------------------------------------------------------
 void vtkKWTextProperty::SetShowHorizontalJustification(int _arg)
 {
   if (this->ShowHorizontalJustification == _arg)
@@ -796,6 +917,7 @@ void vtkKWTextProperty::CopyValuesFrom(vtkKWTextProperty *widget)
       this->SetBold(tprop->GetBold());
       this->SetItalic(tprop->GetItalic());
       this->SetShadow(tprop->GetShadow());
+      this->SetOpacity(widget->GetOpacity());
       }
     }
 }
@@ -830,6 +952,7 @@ void vtkKWTextProperty::SaveInTclScript(ofstream *file,
     *file << "\t" << name << " SetBold " << tprop->GetBold() << endl;
     *file << "\t" << name << " SetItalic " << tprop->GetItalic() << endl;
     *file << "\t" << name << " SetShadow " << tprop->GetShadow() << endl;
+    *file << "\t" << name << " SetOpacity " << this->GetOpacity() << endl;
     }
 }
 
@@ -860,6 +983,8 @@ void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ShowFontFamily ? "On" : "Off") << endl;
   os << indent << "ShowStyles: " 
      << (this->ShowStyles ? "On" : "Off") << endl;
+  os << indent << "ShowOpacity: " 
+     << (this->ShowOpacity ? "On" : "Off") << endl;
   os << indent << "ShowHorizontalJustification: " 
      << (this->ShowHorizontalJustification ? "On" : "Off") << endl;
   os << indent << "ShowVerticalJustification: " 

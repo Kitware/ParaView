@@ -56,6 +56,7 @@ class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
+class vtkKWScale;
 class vtkTextProperty;
 
 class VTK_EXPORT vtkKWTextProperty : public vtkKWWidget
@@ -83,31 +84,37 @@ public:
   vtkGetObjectMacro(Actor2D, vtkActor2D);
 
   // Description:
-  // Show color to be changed.
+  // Show color.
   void SetShowColor(int);
   vtkBooleanMacro(ShowColor, int);
   vtkGetMacro(ShowColor, int);
 
   // Description:
-  // Show font family to be changed.
+  // Show font family.
   void SetShowFontFamily(int);
   vtkBooleanMacro(ShowFontFamily, int);
   vtkGetMacro(ShowFontFamily, int);
 
   // Description:
-  // Show style to be changed.
+  // Show style.
   void SetShowStyles(int);
   vtkBooleanMacro(ShowStyles, int);
   vtkGetMacro(ShowStyles, int);
 
   // Description:
-  // Show horizontal justification to be changed.
+  // Show opacity.
+  void SetShowOpacity(int);
+  vtkBooleanMacro(ShowOpacity, int);
+  vtkGetMacro(ShowOpacity, int);
+
+  // Description:
+  // Show horizontal justification.
   void SetShowHorizontalJustification(int);
   vtkBooleanMacro(ShowHorizontalJustification, int);
   vtkGetMacro(ShowHorizontalJustification, int);
 
   // Description:
-  // Show vertical justification to be changed.
+  // Show vertical justification.
   void SetShowVerticalJustification(int);
   vtkBooleanMacro(ShowVerticalJustification, int);
   vtkGetMacro(ShowVerticalJustification, int);
@@ -143,6 +150,11 @@ public:
   void SetItalic(int);
   void ShadowCheckButtonCallback();
   void SetShadow(int);
+  void OpacityScaleCallback();
+  void OpacityScaleEndCallback();
+  void SetOpacity(float);
+  void SetOpacityNoTrace(float);
+  float GetOpacity();
 
   // Description:
   // Save out the text properties to a file.
@@ -159,6 +171,7 @@ protected:
   void UpdateBoldCheckButton();
   void UpdateItalicCheckButton();
   void UpdateShadowCheckButton();
+  void UpdateOpacityScale();
   void UpdateCopyButton();
 
   vtkTextProperty *TextProperty;
@@ -176,6 +189,9 @@ protected:
   vtkKWCheckButton *ItalicCheckButton;
   vtkKWCheckButton *ShadowCheckButton;
   
+  int ShowOpacity;
+  vtkKWScale *OpacityScale;
+
   int ShowHorizontalJustification;
   vtkKWOptionMenu *HorizontalJustificationOptionMenu;
 
