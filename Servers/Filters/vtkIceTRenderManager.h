@@ -16,6 +16,7 @@
  Copyright (c) Sandia Corporation
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
+
 // .NAME vtkIceTRenderManager - The Image Composition Engine for Tiles (ICE-T) component for VTK.
 //
 // .SECTION Description
@@ -54,7 +55,7 @@ class vtkPKdTree;
 class vtkIntArray;
 class vtkPerspectiveTransform;
 
-#include <GL/ice-t.h> // Needed for IceTContext
+class vtkIceTRenderManagerOpaqueContext;
 
 class VTK_EXPORT vtkIceTRenderManager : public vtkParallelRenderManager
 {
@@ -196,7 +197,7 @@ protected:
   virtual void PreRenderProcessing();
   virtual void PostRenderProcessing();
 
-  IceTContext Context;
+  vtkIceTRenderManagerOpaqueContext *Context;
   int ContextDirty;
   vtkTimeStamp ContextUpdateTime;
 

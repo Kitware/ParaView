@@ -32,6 +32,7 @@
 #include "vtkCamera.h"
 #include "vtkPerspectiveTransform.h"
 
+#include <GL/ice-t.h>
 #include <GL/ice-t_mpi.h>
 
 #include <vtkstd/algorithm>
@@ -46,11 +47,17 @@ struct IceTInformation {
 };
 const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 
+class vtkIceTRenderManagerOpaqueContext
+{
+public:
+  IceTContext Handle;
+};
+
 //******************************************************************
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.22");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.23");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -60,6 +67,8 @@ vtkCxxSetObjectMacro(vtkIceTRenderManager, TileViewportTransform,
 
 vtkIceTRenderManager::vtkIceTRenderManager()
 {
+  this->Context = new vtkIceTRenderManagerOpaqueContext;
+
   this->TileDimensions[0] = 1;
   this->TileDimensions[1] = 1;
   this->TileRanks = new int*[1];
@@ -102,6 +111,8 @@ vtkIceTRenderManager::~vtkIceTRenderManager()
   this->SetSortingKdTree(NULL);
   this->SetDataReplicationGroup(NULL);
   this->SetTileViewportTransform(NULL);
+
+  delete this->Context;
 }
 
 //-------------------------------------------------------------------------
@@ -135,7 +146,7 @@ void vtkIceTRenderManager::SetController(vtkMultiProcessController *controller)
 
   if (this->Controller)
     {
-    icetDestroyContext(this->Context);
+    icetDestroyContext(this->Context->Handle);
     }
 
   this->Superclass::SetController(controller);
@@ -146,7 +157,7 @@ void vtkIceTRenderManager::SetController(vtkMultiProcessController *controller)
     MPICommunicator = vtkMPICommunicator::SafeDownCast(communicator);
     MPI_Comm handle = *MPICommunicator->GetMPIComm()->GetHandle();
     IceTCommunicator icet_comm = icetCreateMPICommunicator(handle);
-    this->Context = icetCreateContext(icet_comm);
+    this->Context->Handle = icetCreateContext(icet_comm);
     icetDestroyMPICommunicator(icet_comm);
     vtkDebugMacro("Created new ICE-T context.");
 
@@ -171,7 +182,7 @@ void vtkIceTRenderManager::UpdateIceTContext()
 {
   vtkDebugMacro("UpdateIceTContext");
 
-  icetSetContext(this->Context);
+  icetSetContext(this->Context->Handle);
 
   if (this->ContextDirty || this->TilesDirty)
     {
@@ -497,7 +508,7 @@ void vtkIceTRenderManager::SetComposeOperation(ComposeOperationType operation)
 void vtkIceTRenderManager::SetDataReplicationGroupColor(int color)
 {
   // Just use ICE-T to figure out groups, since it can do that already.
-  icetSetContext(this->Context);
+  icetSetContext(this->Context->Handle);
 
   icetDataReplicationGroupColor(color);
 
@@ -530,7 +541,7 @@ double vtkIceTRenderManager::GetRenderTime()
   if (this->Controller)
     {
     double t;
-    icetSetContext(this->Context);
+    icetSetContext(this->Context->Handle);
     icetGetDoublev(ICET_RENDER_TIME, &t);
     return t;
     }
@@ -555,7 +566,7 @@ double vtkIceTRenderManager::GetBufferReadTime()
   if (this->Controller)
     {
     double t;
-    icetSetContext(this->Context);
+    icetSetContext(this->Context->Handle);
     icetGetDoublev(ICET_BUFFER_READ_TIME, &t);
     return t;
     }
@@ -572,7 +583,7 @@ double vtkIceTRenderManager::GetBufferWriteTime()
   if (this->Controller)
     {
     double t;
-    icetSetContext(this->Context);
+    icetSetContext(this->Context->Handle);
     icetGetDoublev(ICET_BUFFER_WRITE_TIME, &t);
     return t;
     }
@@ -589,7 +600,7 @@ double vtkIceTRenderManager::GetCompositeTime()
   if (this->Controller)
     {
     double t;
-    icetSetContext(this->Context);
+    icetSetContext(this->Context->Handle);
     icetGetDoublev(ICET_COMPOSITE_TIME, &t);
     return t;
     }
@@ -897,7 +908,7 @@ void vtkIceTRenderManager::PrintSelf(ostream &os, vtkIndent indent)
 
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "ICE-T Context: " << this->Context << endl;
+  os << indent << "ICE-T Context: " << this->Context->Handle << endl;
 
   os << indent << "Display: " << this->TileDimensions[0]
      << " X " << this->TileDimensions[1] << " with display ranks" << endl;
