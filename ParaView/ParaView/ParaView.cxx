@@ -137,24 +137,58 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nShowCmd)
 {
-  int argc, tmp, retVal=0;
-  char *argv[500];
+  int argc, retVal=0;
+  char **argv;
   vtkPVArgs pvArgs;
-
-  argv[0] = (char*)malloc(1024);
-  ::GetModuleFileName(0, argv[0],1024);
-  argv[1] = (char*)malloc(strlen(lpCmdLine)+10000);
-  argv[2] = (char*)malloc(strlen(lpCmdLine)+100);
-  argv[3] = (char*)malloc(strlen(lpCmdLine)+100);
-  argv[4] = (char*)malloc(strlen(lpCmdLine)+100);
-
-//  argv[1] = new char [strlen(lpCmdLine)+100];
 
   unsigned int i;
   // parse a few of the command line arguments
   // a space delimites an argument except when it is inside a quote
+
   argc = 1;
   int pos = 0;
+  for (i = 0; i < strlen(lpCmdLine); i++)
+    {
+    while (lpCmdLine[i] == ' ' && i < strlen(lpCmdLine))
+      {
+      i++;
+      }
+    if (lpCmdLine[i] == '\"')
+      {
+      i++;
+      while (lpCmdLine[i] != '\"' && i < strlen(lpCmdLine))
+        {
+        i++;
+        pos++;
+        }
+      argc++;
+      pos = 0;
+      }
+    else
+      {
+      while (lpCmdLine[i] != ' ' && i < strlen(lpCmdLine))
+        {
+        i++;
+        pos++;
+        }
+      argc++;
+      pos = 0;
+      }
+    }
+
+  argv = (char**)malloc(sizeof(char*)* (argc+1));
+
+  argv[0] = (char*)malloc(1024);
+  ::GetModuleFileName(0, argv[0],1024);
+
+  for(i=1; i<argc; i++)
+    {
+      argv[i] = (char*)malloc(strlen(lpCmdLine)+10);
+    }
+  argv[argc] = 0;
+
+  argc = 1;
+  pos = 0;
   for (i = 0; i < strlen(lpCmdLine); i++)
     {
     while (lpCmdLine[i] == ' ' && i < strlen(lpCmdLine))
@@ -187,10 +221,10 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       pos = 0;
       }
     }
+  argv[argc] = 0;
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();
-  tmp = 1;
-  controller->Initialize(&tmp, (char***)(&argv));
+  controller->Initialize(&argc, (char***)(&argv));
 
 #ifndef VTK_USE_MPI
   controller->SetNumberOfProcesses(1);
@@ -210,13 +244,12 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   controller->Finalize();
   controller->Delete();
   
-  free(argv[0]);
-  free(argv[1]);
-  free(argv[2]);
-  free(argv[3]);
-  free(argv[4]);
+  for(i=0; i<argc; i++)
+    {
+      free(argv[i]);
+    }
+  free(argv);
 
-//  delete [] argv[1];
   return retVal;;
 }
 #else
