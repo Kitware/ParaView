@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.22");
+vtkCxxRevisionMacro(vtkPVPart, "1.23");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -264,14 +264,6 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-
-  static int hack = 1;
-  if (hack)
-    {
-    Sleep(15000);
-    hack = 0;
-    }
-
 
   pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
   pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
