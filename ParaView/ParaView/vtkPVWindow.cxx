@@ -143,7 +143,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.479");
+vtkCxxRevisionMacro(vtkPVWindow, "1.480");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1600,8 +1600,10 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 
-  this->MenuHelp->AddSeparator();
-  this->MenuHelp->AddCommand("Play Demo", this, "PlayDemo", 0);
+  int menu_idx = this->GetHelpMenuIndex();
+  this->MenuHelp->InsertSeparator(menu_idx++);
+  this->MenuHelp->InsertCommand(
+    menu_idx, "Play Demo", this, "PlayDemo", 0);
 }
 
 
