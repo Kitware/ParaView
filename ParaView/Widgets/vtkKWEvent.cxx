@@ -95,6 +95,7 @@ static const char *vtkKWEventStrings[] = {
   "ErrorMessageEvent",
   "WarningMessageEvent",
   "ManipulatorModifiedEvent",
+  "WidgetModifiedEvent",
   "FinalBogusNotUsedEvent"
 };
 

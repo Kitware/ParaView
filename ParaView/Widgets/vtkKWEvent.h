@@ -106,6 +106,7 @@ class VTK_EXPORT vtkKWEvent
     ErrorMessageEvent,
     WarningMessageEvent,
     ManipulatorModifiedEvent,
+    WidgetModifiedEvent,
     // 
     FinalBogusNotUsedEvent
   };
