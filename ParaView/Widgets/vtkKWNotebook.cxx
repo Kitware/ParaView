@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.41");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.42");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -849,6 +849,11 @@ void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
   // trust Tk that much)
 
   this->ScheduleResize();
+
+  // Now the page has been raised so it should be put on top of the most recent
+  // pages
+
+  this->PutOnTopOfMostRecentPages(page);
 }
 
 //------------------------------------------------------------------------------
@@ -881,7 +886,7 @@ void vtkKWNotebook::ShowPageTab(vtkKWNotebook::Page *page)
       page->Visibility && 
       !page->TabFrame->IsPacked())
     {
-    this->EnqueueMostRecentPage(page);
+    this->AddToMostRecentPages(page);
 
     // Also, if we show only the most recent pages, the expected behaviour would
     // be to bring the page so that it is packed as the first one in the list.
@@ -1297,15 +1302,33 @@ void vtkKWNotebook::HidePagesNotMatchingTag(int tag)
 }
 
 //------------------------------------------------------------------------------
-int vtkKWNotebook::EnqueueMostRecentPage(vtkKWNotebook::Page *page)
+int vtkKWNotebook::AddToMostRecentPages(vtkKWNotebook::Page *page)
 {
-  if (page == NULL)
+  vtkIdType idx;
+  if (page == NULL || this->MostRecentPages->FindItem(page, idx) == VTK_OK)
     {
     return 0;
     }
 
   this->MostRecentPages->PrependItem(page);
   return 1;
+}
+
+//------------------------------------------------------------------------------
+int vtkKWNotebook::PutOnTopOfMostRecentPages(vtkKWNotebook::Page *page)
+{
+  if (page == NULL)
+    {
+    return 0;
+    }
+
+  vtkIdType idx;
+  if (this->MostRecentPages->FindItem(page, idx) == VTK_OK)
+    {
+    this->MostRecentPages->RemoveItem(idx);
+    }
+
+  return this->AddToMostRecentPages(page);
 }
 
 //------------------------------------------------------------------------------
@@ -1917,7 +1940,7 @@ void vtkKWNotebook::SetShowOnlyMostRecentPages(int arg)
           if (it->GetData(page) == VTK_OK && 
               !strcmp(slaves[i], page->TabFrame->GetWidgetName()))
             {
-            this->EnqueueMostRecentPage(page);
+            this->AddToMostRecentPages(page);
             break;
             }
           it->GoToNextItem();

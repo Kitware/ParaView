@@ -339,7 +339,9 @@ protected:
   int CanBeHidden(Page*);
   int GetPageTag(Page*);
   char* GetPageTitle(Page*);
-  int EnqueueMostRecentPage(Page*);
+
+  int AddToMostRecentPages(Page*);
+  int PutOnTopOfMostRecentPages(Page*);
 
   // Update the tab frame color of a page given a selection status
 
