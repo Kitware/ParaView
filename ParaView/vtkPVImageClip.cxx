@@ -29,6 +29,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVImage.h"
+#include "vtkPVWindow.h"
+#include "vtkPVActorComposite.h"
+#include "vtkPVAssignment.h"
 
 int vtkPVImageClipCommand(ClientData cd, Tcl_Interp *interp,
 			  int argc, char *argv[]);
@@ -211,11 +214,24 @@ void vtkPVImageClip::SetOutputWholeExtent(int xMin, int xMax,
   this->ImageClip->SetOutputWholeExtent(xMin, xMax, yMin, yMax, zMin, zMax);
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVImageClip::ExtentsChanged()
-{  
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVImage *pvi;
+  vtkPVActorComposite *ac;
+  vtkPVWindow *window = this->GetWindow();
+  vtkPVAssignment *a;
+  
+  pvi = vtkPVImage::New();
+  pvi->Clone(pvApp);
+  pvi->OutlineFlagOff();
+  
+  this->SetOutput(pvi);
+
+  a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+  this->SetAssignment(a);
+  
   this->ImageClip->SetOutputWholeExtent(this->ClipXMinEntry->GetValueAsInt(),
 					this->ClipXMaxEntry->GetValueAsInt(),
 					this->ClipYMinEntry->GetValueAsInt(),
@@ -225,5 +241,13 @@ void vtkPVImageClip::ExtentsChanged()
   this->ImageClip->Modified();
   this->ImageClip->Update();
   
+  window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+  
   this->GetView()->Render();
+  
+  this->CreateDataPage();
+  
+  ac = this->GetPVData()->GetActorComposite();
+  window->GetMainView()->AddComposite(ac);
+  window->GetMainView()->SetSelectedComposite(ac);
 }

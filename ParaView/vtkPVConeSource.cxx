@@ -32,6 +32,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWRenderView.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVApplication.h"
+#include "vtkPVAssignment.h"
+#include "vtkPVWindow.h"
 
 int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -129,7 +131,7 @@ void vtkPVConeSource::SetOutput(vtkPVPolyData *pd)
     {
     pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
 			   pd->GetTclName());
-    }  
+    }
 }
 
 
@@ -145,6 +147,18 @@ void vtkPVConeSource::ConeParameterChanged()
 {
   int id, num;
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVPolyData *pvd;
+  vtkPVAssignment *a;
+  vtkPVActorComposite *ac;
+  vtkPVWindow *window = this->GetWindow();
+  
+  pvd = vtkPVPolyData::New();
+  pvd->Clone(pvApp);
+  a = vtkPVAssignment::New();
+  a->Clone(pvApp);
+  
+  this->SetOutput(pvd);
+  this->SetAssignment(a);
   
   this->ConeSource->SetRadius(this->RadiusEntry->GetValueAsFloat());
   this->ConeSource->SetHeight(this->HeightEntry->GetValueAsFloat());
@@ -162,6 +176,12 @@ void vtkPVConeSource::ConeParameterChanged()
     }
   
   this->GetView()->Render();
+  
+  this->CreateDataPage();
+  
+  ac = this->GetPVData()->GetActorComposite();
+  window->GetMainView()->AddComposite(ac);
+  window->GetMainView()->SetSelectedComposite(ac);
 }
 
 //----------------------------------------------------------------------------

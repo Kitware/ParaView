@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkImageOutlineFilter.h"
 #include "vtkPVAssignment.h"
+#include "vtkGeometryFilter.h"
 
 int vtkPVImageCommand(ClientData cd, Tcl_Interp *interp,
 		      int argc, char *argv[]);
@@ -58,40 +59,27 @@ void vtkPVImage::Clip()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVImageClip *clip;
-  vtkPVImage *pvi;
   int ext[6];
 
-  
   clip = vtkPVImageClip::New();
   clip->Clone(pvApp);
-  pvi = vtkPVImage::New();
-  pvi->Clone(pvApp);
   
-  this->GetImageData()->GetExtent(ext);
+  this->GetImageData()->GetWholeExtent(ext);
   ext[5] = (ext[4] + ext[5])/2;
   ext[4] = ext[5];
   
   clip->SetInput(this);
-  clip->SetOutput(pvi);
   clip->SetOutputWholeExtent(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
   
   clip->SetName("clip");
   
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  clip->CreateProperties();
   this->GetPVSource()->GetView()->AddComposite(clip);
-  this->GetPVSource()->VisibilityOff();
   
   window->SetCurrentSource(clip);
   window->GetSourceList()->Update();
-
-  window->GetMainView()->ResetCamera();
-  window->GetMainView()->Render();
-  
-  this->GetPVSource()->GetView()->Render();
   
   clip->Delete();
-  pvi->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -99,17 +87,12 @@ void vtkPVImage::Slice()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVImageSlice *slice;
-  vtkPVImage *pvi;
   int *extents;
   
   slice = vtkPVImageSlice::New();
   slice->Clone(pvApp);
-  pvi = vtkPVImage::New();
-  pvi->Clone(pvApp);
-  
-  pvi->OutlineFlagOff();
+
   slice->SetInput(this);
-  slice->SetOutput(pvi);
   
   extents = this->GetImageData()->GetExtent();
   slice->SetDimensions(extents);
@@ -124,14 +107,10 @@ void vtkPVImage::Slice()
   slice->SetName("slice");
   
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  slice->CreateProperties();
   this->GetPVSource()->GetView()->AddComposite(slice);
-  this->GetPVSource()->VisibilityOff();
   
   window->SetCurrentSource(slice);
   window->GetSourceList()->Update();
-  
-  this->GetPVSource()->GetView()->Render();
   
   slice->Delete();
 }
@@ -154,8 +133,10 @@ int vtkPVImage::Create(char *args)
 void vtkPVImage::SetImageData(vtkImageData *image)
 {
   vtkImageOutlineFilter *outline;
+  vtkGeometryFilter *geometry;
 
   this->SetData(image);
+  this->ActorComposite->SetApplication(this->Application);
   
   // This should really be changed to switch mappers.  The flag
   // could them be turned on and off ...
@@ -165,13 +146,18 @@ void vtkPVImage::SetImageData(vtkImageData *image)
     outline = vtkImageOutlineFilter::New();
     outline->SetInput(image);
     this->Mapper->SetInput(outline->GetOutput());
+    this->ActorComposite->SetInput(outline->GetOutput());
     outline->Delete();
     }
   else
     {
-    this->Mapper->SetInput(image);
-    this->Data->Update();
+    image->UpdateInformation();
+    geometry = vtkGeometryFilter::New();
+    geometry->SetInput(image);
+    this->Mapper->SetInput(geometry->GetOutput());
     this->Mapper->SetScalarRange(this->Data->GetScalarRange());
+    this->ActorComposite->SetInput(geometry->GetOutput());
+    geometry->Delete();
     }
   
   this->Actor->SetMapper(this->Mapper);

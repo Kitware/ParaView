@@ -67,33 +67,22 @@ vtkPVPolyData* vtkPVPolyData::New()
 void vtkPVPolyData::Shrink()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  //shrink factor defaults to 0.5, which seems reasonable
+  // shrink factor defaults to 0.5, which seems reasonable
   vtkPVShrinkPolyData *shrink;
-  vtkPVPolyData *pvd;
-  vtkPVAssignment *a;
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
   
   shrink = vtkPVShrinkPolyData::New();
   shrink->Clone(pvApp);
-  pvd = vtkPVPolyData::New();
-  pvd->Clone(pvApp);
   
   shrink->SetInput(this);
-  shrink->SetOutput(pvd);
-  a = this->GetAssignment();
-  shrink->SetAssignment(a);
   
   shrink->SetName("shrink");
 
   this->GetPVSource()->GetView()->AddComposite(shrink);
-  // Turn this data object off so the next will will not be ocluded.
-  this->GetPVSource()->VisibilityOff();
 
   // The window here should probably be replaced with the view.
   window->SetCurrentSource(shrink);
   window->GetSourceList()->Update();
-  
-  this->GetPVSource()->GetView()->Render();
   
   shrink->Delete();
 }
@@ -104,15 +93,11 @@ void vtkPVPolyData::Glyph()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVConeSource *glyphCone;
   vtkPVGlyph3D *glyph;
-  vtkPVPolyData *pvd;
   vtkPVPolyData *glyphOut;
-  vtkPVAssignment *a;
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
 
   glyph = vtkPVGlyph3D::New();
   glyph->Clone(pvApp);
-  pvd = vtkPVPolyData::New();
-  pvd->Clone(pvApp);
 
   glyphCone = vtkPVConeSource::New();
   glyphCone->Clone(pvApp);
@@ -124,37 +109,27 @@ void vtkPVPolyData::Glyph()
   glyphCone->SetName("glyph source");
   
   glyph->SetInput(this);
-  glyph->SetOutput(pvd);
   glyph->SetSource(glyphOut);
   glyph->SetGlyphSource(glyphCone);
   glyph->SetScaleModeToDataScalingOff();
-  a = this->GetAssignment();
-  glyph->SetAssignment(a);
   
   glyphCone->VisibilityOff();
     
   glyph->SetName("glyph");
  
   this->GetPVSource()->GetView()->AddComposite(glyph);
-  this->GetPVSource()->VisibilityOff();
   
   window->SetCurrentSource(glyph);
   window->GetSourceList()->Update();
   
-  this->GetPVSource()->GetView()->Render();
-  
   glyphCone->Delete();
 }
 
-
-  
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Elevation()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVElevationFilter *elevation;
-  vtkPVPolyData *newData;
-  vtkPVAssignment *a;
   float *bounds;
 
   // This should go through the PVData who will collect the info.
@@ -162,26 +137,20 @@ void vtkPVPolyData::Elevation()
   
   elevation = vtkPVElevationFilter::New();
   elevation->Clone(pvApp);
-  newData = vtkPVPolyData::New();
-  newData->Clone(pvApp);
   
   elevation->SetInput(this);
-  elevation->SetOutput(newData);
-  a = this->GetAssignment();
-  elevation->SetAssignment(a);
   
   this->GetPVSource()->GetView()->AddComposite(elevation);
   elevation->SetName("elevation");
   
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  this->GetPVSource()->VisibilityOff();
   
-  window->SetCurrentSource(elevation);
-
   elevation->SetLowPoint(bounds[0], 0.0, 0.0);
   elevation->SetHighPoint(bounds[1], 0.0, 0.0);
+
+  window->SetCurrentSource(elevation);
+  window->GetSourceList()->Update();
   
-  this->GetPVSource()->GetView()->Render();
   elevation->Delete();
 }
 
@@ -209,6 +178,9 @@ void vtkPVPolyData::SetPolyData(vtkPolyData *data)
   this->SetData(data);
   this->Mapper->SetInput(data);
   this->Actor->SetMapper(this->Mapper);
+  
+  this->ActorComposite->SetApplication(this->Application);
+  this->ActorComposite->SetInput(data);
 }
 
 //----------------------------------------------------------------------------

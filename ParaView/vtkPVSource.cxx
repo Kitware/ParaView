@@ -45,6 +45,8 @@ vtkPVSource::vtkPVSource()
   this->Input = NULL;
   this->Output = NULL;
   this->Properties = vtkKWWidget::New();
+  
+  this->DataCreated = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -169,16 +171,9 @@ vtkProp* vtkPVSource::GetProp()
 //----------------------------------------------------------------------------
 void vtkPVSource::CreateProperties()
 { 
-  const char *dataPage, *sourcePage;
-  vtkPVData *data = this->GetPVData();
+  const char *sourcePage;
   vtkPVApplication *app = this->GetPVApplication();
 
-  if (data == NULL)
-    {
-    vtkErrorMacro("You need to set the data before you create a composite");
-    return;
-    }
-  
   // invoke super
   this->vtkKWComposite::CreateProperties();  
 
@@ -188,13 +183,30 @@ void vtkPVSource::CreateProperties()
   this->Properties->Create(this->Application,"frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());
-  
-  dataPage = data->GetClassName();
-  this->Notebook->AddPage(dataPage);
-  
-  data->SetParent(this->Notebook->GetFrame(dataPage));
-  data->Create("");
-  this->Script("pack %s", data->GetWidgetName());
+}
+
+void vtkPVSource::CreateDataPage()
+{
+  if (!this->DataCreated)
+    {
+    const char *dataPage;
+    vtkPVData *data = this->GetPVData();
+    
+    if (data == NULL)
+      {
+      vtkErrorMacro("must have data before creating data page");
+      return;
+      }
+    
+    dataPage = data->GetClassName();
+    this->Notebook->AddPage(dataPage);
+    
+    data->SetParent(this->Notebook->GetFrame(dataPage));
+    data->Create("");
+    this->Script("pack %s", data->GetWidgetName());
+    
+    this->DataCreated = 1;
+    }
 }
 
 void vtkPVSource::Select(vtkKWView *v)

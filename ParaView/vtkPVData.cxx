@@ -52,6 +52,8 @@ vtkPVData::vtkPVData()
   this->Mapper = vtkDataSetMapper::New();
   this->Actor = vtkActor::New();
   this->Assignment = NULL;
+  
+  this->ActorComposite = vtkPVActorComposite::New();
 }
 
 //----------------------------------------------------------------------------
@@ -69,6 +71,9 @@ vtkPVData::~vtkPVData()
   
   this->Actor->Delete();
   this->Actor = NULL;
+  
+  this->ActorComposite->Delete();
+  this->ActorComposite = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -131,19 +136,19 @@ void vtkPVData::Contour()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVContourFilter *contour;
-  vtkPVPolyData *pvd;
-  vtkPVAssignment *a;
+//  vtkPVPolyData *pvd;
+//  vtkPVAssignment *a;
   float *range;
   
   contour = vtkPVContourFilter::New();
   contour->Clone(pvApp);
-  pvd = vtkPVPolyData::New();
-  pvd->Clone(pvApp);
+//  pvd = vtkPVPolyData::New();
+//  pvd->Clone(pvApp);
   
   contour->SetInput(this);
-  contour->SetOutput(pvd);
-  a = this->GetAssignment();
-  contour->SetAssignment(a);
+//  contour->SetOutput(pvd);
+//  a = this->GetAssignment();
+//  contour->SetAssignment(a);
   
   range = this->Data->GetScalarRange();
   contour->SetValue(0, (range[1]-range[0])/2.0);
@@ -152,23 +157,27 @@ void vtkPVData::Contour()
 
   vtkPVWindow *window = vtkPVWindow::SafeDownCast(
     this->GetPVSource()->GetView()->GetParentWindow());
-  contour->CreateProperties();
   this->GetPVSource()->GetView()->AddComposite(contour);
-  this->GetPVSource()->VisibilityOff();
+//  this->GetPVSource()->VisibilityOff();
   
   window->SetCurrentSource(contour);
   window->GetSourceList()->Update();
   
-  this->GetPVSource()->GetView()->Render();
+//  this->GetPVSource()->GetView()->Render();
   
   contour->Delete();
-  pvd->Delete();
+//  pvd->Delete();
 }
 
 //----------------------------------------------------------------------------
 vtkProp* vtkPVData::GetProp()
 {
   return this->Actor;
+}
+
+vtkPVActorComposite* vtkPVData::GetActorComposite()
+{
+  return this->ActorComposite;
 }
 
 //----------------------------------------------------------------------------

@@ -29,7 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVImageReader_h
 #define __vtkPVImageReader_h
 
-#include "vtkKWWidget.h"
 #include "vtkKWLabel.h"
 #include "vtkImageReader.h"
 #include "vtkPVSource.h"
@@ -56,6 +55,7 @@ public:
   vtkGetObjectMacro(ImageReader, vtkImageReader);
   
   void ReadImage();
+  void ImageAccepted();
   
 protected:
   vtkPVImageReader();
@@ -64,6 +64,8 @@ protected:
   void operator=(const vtkPVImageReader&) {};
   
   vtkKWLabel *Label;
+  vtkKWWidget *Accept;
+  
   vtkImageReader *ImageReader;
 };
 

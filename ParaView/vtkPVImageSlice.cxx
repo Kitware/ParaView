@@ -30,6 +30,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVImage.h"
+#include "vtkPVWindow.h"
+#include "vtkPVActorComposite.h"
+#include "vtkPVAssignment.h"
 
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -135,8 +138,22 @@ void vtkPVImageSlice::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::SliceChanged()
 {
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVImage *pvi;
   int newSliceNum = this->SliceEntry->GetValueAsInt();
+  vtkPVWindow *window = this->GetWindow();
+  vtkPVActorComposite *ac;
+  vtkPVAssignment *a;
   
+  pvi = vtkPVImage::New();
+  pvi->Clone(pvApp);
+  pvi->OutlineFlagOff();
+  
+  this->SetOutput(pvi);
+  
+  a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+  this->SetAssignment(a);
+
   if (this->XDimension->GetState())
     {
     this->Slice->SetOutputWholeExtent(newSliceNum, newSliceNum,
@@ -165,7 +182,15 @@ void vtkPVImageSlice::SliceChanged()
   this->Slice->Modified();
   this->Slice->Update();
   
+  window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+  
   this->GetView()->Render();
+  
+  this->CreateDataPage();
+  
+  ac = this->GetPVData()->GetActorComposite();
+  window->GetMainView()->AddComposite(ac);
+  window->GetMainView()->SetSelectedComposite(ac);
 }
 
 //----------------------------------------------------------------------------

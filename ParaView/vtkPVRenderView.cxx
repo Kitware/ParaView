@@ -414,8 +414,6 @@ void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
 {
-  int id, num;
-  
   if (this->Application)
     {
     vtkErrorMacro("RenderView already created");

@@ -420,7 +420,10 @@ void vtkKWView::AddComposite(vtkKWComposite *c)
     return;
     }
   this->Composites->AddItem(c);
-  this->GetViewport()->AddProp(c->GetProp());
+  if (c->GetProp() != NULL)
+    {
+    this->GetViewport()->AddProp(c->GetProp());
+    }
 }
 void vtkKWView::RemoveComposite(vtkKWComposite *c)
 {
@@ -1008,5 +1011,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.19 $");
+  this->ExtractRevision(os,"$Revision: 1.20 $");
 }

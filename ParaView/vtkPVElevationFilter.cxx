@@ -32,6 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWRenderView.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVImage.h"
+#include "vtkPVWindow.h"
 
 int vtkPVElevationFilterCommand(ClientData cd, Tcl_Interp *interp,
 				int argc, char *argv[]);
@@ -321,7 +322,19 @@ vtkPVImage *vtkPVElevationFilter::GetPVImageOutput()
 //----------------------------------------------------------------------------
 void vtkPVElevationFilter::ElevationParameterChanged()
 {
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVPolyData *newData;
+  vtkPVAssignment *a;
+  vtkPVWindow *window = this->GetWindow();
   float low[3], high[3], range[2];
+  vtkPVActorComposite *ac;
+  
+  newData = vtkPVPolyData::New();
+  newData->Clone(pvApp);
+  
+  this->SetOutput(newData);
+  a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+  this->SetAssignment(a);
 
   low[0] = this->LowPointXEntry->GetValueAsFloat();
   low[1] = this->LowPointYEntry->GetValueAsFloat();
@@ -336,7 +349,16 @@ void vtkPVElevationFilter::ElevationParameterChanged()
   this->SetHighPoint(high[0], high[1], high[2]);
   this->SetScalarRange(range[0], range[1]);
   
+//  window->GetPreviousSource()->VisibilityOff();
+  window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+  
   this->GetView()->Render();
+  
+  this->CreateDataPage();
+  
+  ac = this->GetPVData()->GetActorComposite();
+  window->GetMainView()->AddComposite(ac);
+  window->GetMainView()->SetSelectedComposite(ac);
 }
 
 //----------------------------------------------------------------------------

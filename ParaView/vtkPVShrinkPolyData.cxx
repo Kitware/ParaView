@@ -30,6 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVPolyData.h"
+#include "vtkPVWindow.h"
 
 int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -110,12 +111,34 @@ vtkPVPolyData *vtkPVShrinkPolyData::GetOutput()
 
 //----------------------------------------------------------------------------
 void vtkPVShrinkPolyData::ShrinkFactorChanged()
-{  
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVPolyData *pvd;
+  vtkPVAssignment *a;
+  vtkPVWindow *window = this->GetWindow();
+  vtkPVActorComposite *ac;
+  
+  pvd = vtkPVPolyData::New();
+  pvd->Clone(pvApp);
+  
+  this->SetOutput(pvd);
+  a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+  this->SetAssignment(a);
+  
   this->Shrink->SetShrinkFactor(this->ShrinkFactorScale->GetValue());
   this->Shrink->Modified();
   this->Shrink->Update();
   
+//  window->GetPreviousSource()->VisibilityOff();
+  window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+  
   this->GetView()->Render();
+  
+  this->CreateDataPage();
+  
+  ac = this->GetPVData()->GetActorComposite();
+  window->GetMainView()->AddComposite(ac);
+  window->GetMainView()->SetSelectedComposite(ac);
 }
 
 
@@ -132,5 +155,3 @@ void vtkPVShrinkPolyData::SetInput(vtkPVPolyData *pvData)
   
   this->GetShrink()->SetInput(pvData->GetPolyData());
 }
-
-

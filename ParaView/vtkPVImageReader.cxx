@@ -29,12 +29,18 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageReader.h"
 #include "vtkPVApplication.h"
 #include "vtkPVImage.h"
+#include "vtkPVActorComposite.h"
+#include "vtkPVWindow.h"
+#include "vtkPVAssignment.h"
 
 //----------------------------------------------------------------------------
 vtkPVImageReader::vtkPVImageReader()
 {
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this->Properties);
+  this->Accept = vtkKWWidget::New();
+  this->Accept->SetParent(this->Properties);
+  
   this->ImageReader = vtkImageReader::New();
 }
 
@@ -62,6 +68,10 @@ void vtkPVImageReader::CreateProperties()
   this->Label->Create(this->Application, "");
   this->Label->SetLabel("vtkPVImageReader label");
   this->Script("pack %s", this->Label->GetWidgetName());
+  
+  this->Accept->Create(this->Application, "button", "-text Accept");
+  this->Accept->SetCommand(this, "ImageAccepted");
+  this->Script("pack %s", this->Accept->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -85,4 +95,31 @@ void vtkPVImageReader::ReadImage()
   this->ImageReader->SetDataExtent(0, 63, 0, 63, 1, 93);
   this->ImageReader->SetFilePrefix("../../vtkdata/headsq/quarter");
   this->ImageReader->SetDataSpacing(4, 4, 1.8);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageReader::ImageAccepted()
+{
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVImage *image;
+  vtkPVAssignment *a;
+  vtkPVActorComposite *ac;
+  vtkPVWindow *window = this->GetWindow();
+  
+  image = vtkPVImage::New();
+  image->Clone(pvApp);
+  a = vtkPVAssignment::New();
+  a->Clone(pvApp);
+  
+  a->BroadcastWholeExtent(this->GetImageReader()->GetOutput()->GetWholeExtent());
+  this->SetOutput(image);
+  this->SetAssignment(a);
+  
+  this->GetView()->Render();
+  
+  this->CreateDataPage();
+  
+  ac = this->GetPVData()->GetActorComposite();
+  window->GetMainView()->AddComposite(ac);
+  window->GetMainView()->SetSelectedComposite(ac);
 }

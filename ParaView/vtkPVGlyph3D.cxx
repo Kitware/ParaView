@@ -189,10 +189,32 @@ void vtkPVGlyph3D::ShowGlyphSource()
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::ScaleFactorChanged()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVPolyData *pvd;
+  vtkPVAssignment *a;
+  vtkPVWindow *window = this->GetWindow();
+  vtkPVActorComposite *ac;
+  
+  pvd = vtkPVPolyData::New();
+  pvd->Clone(pvApp);
+  
+  this->SetOutput(pvd);
+  a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+  this->SetAssignment(a);
+  
   this->Glyph->SetScaleFactor(this->ScaleFactorEntry->GetValueAsFloat());
   this->Glyph->Modified();
   this->Glyph->Update();
   
+//  window->GetPreviousSource()->VisibilityOff();
+  window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+  
   this->GetView()->Render();
+  
+  this->CreateDataPage();
+  
+  ac = this->GetPVData()->GetActorComposite();
+  window->GetMainView()->AddComposite(ac);
+  window->GetMainView()->SetSelectedComposite(ac);
 }
 

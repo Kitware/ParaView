@@ -16,6 +16,7 @@ vtkKWView
 
 CONCRETE = \
 vtkCornerAnnotation \
+vtkKWActorComposite \
 vtkKWApplication \
 vtkKWCallbackSpecification \
 vtkKWChangeColorButton \

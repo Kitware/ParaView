@@ -34,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVMenuButton.h"
 #include "vtkActor.h"
 #include "vtkDataSet.h"
+#include "vtkPVActorComposite.h"
 
 class vtkPVSource;
 class vtkPVAssignment;
@@ -57,6 +58,8 @@ public:
   virtual int Create(char *args);
   
   vtkProp* GetProp();
+  
+  vtkPVActorComposite* GetActorComposite();
   
   // Description:
   // General filters that can be applied to vtkDataSet.
@@ -95,6 +98,8 @@ protected:
   vtkDataSetMapper *Mapper;
   vtkActor *Actor;
 
+  vtkPVActorComposite *ActorComposite;
+  
   // This points to the source widget that owns this data widget.
   vtkPVSource *PVSource;
   vtkPVAssignment *Assignment;

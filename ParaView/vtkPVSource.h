@@ -75,6 +75,8 @@ public:
   // Create the properties object, called by InitializeProperties.
   virtual void CreateProperties();
   virtual void ShowProperties();
+
+  void CreateDataPage();
   
   // Description:
   // Casts to vtkPVApplication.
@@ -116,6 +118,8 @@ protected:
   vtkPVData *Input;
   char *Name;
   vtkKWWidget *Properties;
+  
+  int DataCreated;
 };
 
 #endif
