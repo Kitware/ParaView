@@ -25,6 +25,7 @@ SET (EXECUTABLE_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
 
 #########################################################################
 # prepare for a release 
+IF(WIN32)
 FIND_PROGRAM(NSIS_MAKENSIS NAMES makensis 
   PATHS [HKEY_LOCAL_MACHINE\\SOFTWARE\\NSIS]
   DOC "Where is makensis.exe located"
@@ -41,6 +42,7 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/Win32Release.sh.in
   ${ParaView_BINARY_DIR}/Utilities/Release/Win32Release.sh IMMEDIATE @ONLY)
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/paraview_release.sh.in
   ${ParaView_BINARY_DIR}/Utilities/Release/paraview_release.sh IMMEDIATE @ONLY)
+ENDIF(WIN32)
 
 # The client server wrapper macro needs this name for
 # BUILD_SHARED_LIBS so it can work both inside and outside the tree.
@@ -153,6 +155,10 @@ MARK_AS_ADVANCED(PARAVIEW_ENABLE_FPE)
 OPTION(PARAVIEW_EXPERIMENTAL_USER
   "Build ParaView with all experimental options" OFF)
 MARK_AS_ADVANCED(PARAVIEW_EXPERIMENTAL_USER)
+
+OPTION(PARAVIEW_ALWAYS_SECURE_CONNECTION
+  "Build ParaView with enforced secure connection (--connect-id)" OFF)
+MARK_AS_ADVANCED(PARAVIEW_ALWAYS_SECURE_CONNECTION)
 
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
   ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
