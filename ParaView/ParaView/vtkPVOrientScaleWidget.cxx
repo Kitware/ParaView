@@ -33,7 +33,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.12");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -792,6 +792,32 @@ void vtkPVOrientScaleWidget::SetScaleFactor(float factor)
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVOrientScaleWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->LabeledFrame);
+  this->PropagateEnableState(this->ScalarsFrame);
+  this->PropagateEnableState(this->ScalarsLabel);
+  this->PropagateEnableState(this->ScalarsMenu);
+  this->PropagateEnableState(this->VectorsFrame);
+  this->PropagateEnableState(this->VectorsLabel);
+  this->PropagateEnableState(this->VectorsMenu);
+  this->PropagateEnableState(this->OrientModeFrame);
+  this->PropagateEnableState(this->OrientModeLabel);
+  this->PropagateEnableState(this->OrientModeMenu);
+  this->PropagateEnableState(this->ScaleModeFrame);
+  this->PropagateEnableState(this->ScaleModeLabel);
+  this->PropagateEnableState(this->ScaleModeMenu);
+  this->PropagateEnableState(this->ScaleFactorFrame);
+  this->PropagateEnableState(this->ScaleFactorLabel);
+  this->PropagateEnableState(this->ScaleFactorEntry);
+
+  this->PropagateEnableState(this->InputMenu);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

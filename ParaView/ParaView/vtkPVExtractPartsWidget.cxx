@@ -15,6 +15,7 @@
 #include "vtkPVExtractPartsWidget.h"
 
 #include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
 #include "vtkKWLabel.h"
 #include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
@@ -29,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.14");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -328,6 +329,25 @@ vtkPVWidgetProperty* vtkPVExtractPartsWidget::GetProperty()
 vtkPVWidgetProperty* vtkPVExtractPartsWidget::CreateAppropriateProperty()
 {
   return vtkPVScalarListWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVExtractPartsWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->ButtonFrame);
+  this->PropagateEnableState(this->AllOnButton);
+  this->PropagateEnableState(this->AllOffButton);
+
+  this->PropagateEnableState(this->PartSelectionList);
+
+  vtkCollectionIterator* sit = this->PartLabelCollection->NewIterator();
+  for ( sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem() )
+    {
+    this->PropagateEnableState(vtkKWWidget::SafeDownCast(sit->GetObject()));
+    }
+  sit->Delete();
 }
 
 //----------------------------------------------------------------------------

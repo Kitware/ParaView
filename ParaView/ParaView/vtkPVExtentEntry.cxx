@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.32");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.33");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -575,6 +575,21 @@ vtkPVWidgetProperty* vtkPVExtentEntry::GetProperty()
 vtkPVWidgetProperty* vtkPVExtentEntry::CreateAppropriateProperty()
 {
   return vtkPVExtentWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVExtentEntry::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->LabeledFrame);
+  this->PropagateEnableState(this->InputMenu);
+
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->PropagateEnableState(this->MinMax[cc]);
+    }
 }
 
 //-----------------------------------------------------------------------------

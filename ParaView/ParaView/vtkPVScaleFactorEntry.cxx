@@ -21,7 +21,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.8");
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.9");
 
 vtkCxxSetObjectMacro(vtkPVScaleFactorEntry, InputMenu, vtkPVInputMenu);
 
@@ -141,6 +141,15 @@ void vtkPVScaleFactorEntry::SetInput(vtkPVSource *input)
   this->Input = input;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVScaleFactorEntry::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->InputMenu);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVScaleFactorEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.518");
+vtkCxxRevisionMacro(vtkPVWindow, "1.519");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -131,6 +131,7 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 //-----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {
+  this->InDemo = 0;
   this->Interactor = 0;
 
   this->InteractiveRenderEnabled = 0;
@@ -761,8 +762,6 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->GetMenuEdit()->InsertCommand(5, "Delete All Modules", this, 
                                      "DeleteAllSourcesCallback", 
                                      1, "Delete all modules in ParaView");
-  this->GetMenuEdit()->InsertCommand(8, "Check Disabled GUI",
-    this->GetApplication(), "SimpleScript {source ~/list_all_widgets.pvs}");
 }
 
 //-----------------------------------------------------------------------------
@@ -1625,6 +1624,7 @@ void vtkPVWindow::PlayDemo()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PlayDemo(int fromDashboard)
 {
+  this->InDemo = 1;
   const char* demoDataPath;
   const char* demoScriptPath;
   vtkPVApplication* pvApp = this->GetPVApplication();
@@ -1678,6 +1678,8 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
                       "is installed properly.");
       }
     }
+  this->InDemo = 0;
+  this->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -4279,6 +4281,11 @@ void vtkPVWindow::UpdateToolbarAspect()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateEnableState()
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
+
   this->Superclass::UpdateEnableState();
 
 
@@ -4363,6 +4370,16 @@ void vtkPVWindow::UpdateEnableState()
         }
       }
     }
+
+  vtkCollectionIterator* it = this->PVColorMaps->NewIterator();
+  it->InitTraversal();
+  while ( !it->IsDoneWithTraversal() )
+    {
+    this->PropagateEnableState(static_cast<vtkPVColorMap*>(it->GetObject()));
+    it->GoToNextItem();
+    }
+  it->Delete();
+
   this->UpdateMenuState();
 }
 

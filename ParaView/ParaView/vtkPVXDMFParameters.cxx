@@ -75,7 +75,16 @@ public:
     {
     // Clear out any old check buttons.
     parent->Script("catch {eval pack forget [pack slaves %s]}",
-                   parent->GetFrame()->GetFrame()->GetFrame()->GetWidgetName());
+      parent->GetFrame()->GetFrame()->GetFrame()->GetWidgetName());
+    vtkCollectionIterator* sit = this->GetWidgetsIterator();
+    for ( sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem() )
+      {
+      vtkKWScale* scale = (vtkKWScale*)sit->GetObject();
+      if ( scale )
+        {
+        scale->SetParent(0);
+        }
+      }
     this->Widgets->RemoveAllItems();
     ParametersMap::iterator it;
     vtkKWScale* scale;
@@ -136,7 +145,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.15");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -452,6 +461,21 @@ void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
     vtkPVXDMFParametersInternals::Parameter* p = this->Internals->GetParameter(label);
     *file << "\t" << "pvTemp" << this->VTKReaderID.ID << " SetParameterIndex {" << label << "} "
       << p->Value << endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXDMFParameters::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Frame);
+
+  vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
+  for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
+    {
+    vtkKWScale* scale = (vtkKWScale*)it->GetObject();
+    this->PropagateEnableState(scale);
     }
 }
 

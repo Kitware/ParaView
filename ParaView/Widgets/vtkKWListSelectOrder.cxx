@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListSelectOrder );
-vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.6");
+vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWListSelectOrder::vtkKWListSelectOrder()
@@ -414,6 +414,22 @@ void vtkKWListSelectOrder::SetEllipsisCommand(vtkKWObject* obj, const char* comm
   str << obj->GetTclName() << " " << command << ends;
   this->SetEllipsisCommand(str.str());
   str.rdbuf()->freeze(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWListSelectOrder::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->SourceList);
+  this->PropagateEnableState(this->FinalList);
+
+  this->PropagateEnableState(this->AddButton);
+  this->PropagateEnableState(this->AddAllButton);
+  this->PropagateEnableState(this->RemoveButton);
+  this->PropagateEnableState(this->RemoveAllButton);
+  this->PropagateEnableState(this->UpButton);
+  this->PropagateEnableState(this->DownButton);
 }
 
 //----------------------------------------------------------------------------

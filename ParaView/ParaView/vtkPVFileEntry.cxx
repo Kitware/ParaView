@@ -70,7 +70,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.76");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.77");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -936,6 +936,20 @@ void vtkPVFileEntry::UpdateAvailableFiles( int force )
     this->IgnoreFileListEvents = 0;
     }
   files->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVFileEntry::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->LabelWidget);
+  this->PropagateEnableState(this->BrowseButton);
+  this->PropagateEnableState(this->Entry);
+  this->PropagateEnableState(this->TimestepFrame);
+  this->PropagateEnableState(this->Timestep);
+  this->PropagateEnableState(this->FileListSelect);
+  this->PropagateEnableState(this->FileListPopup);
 }
 
 //----------------------------------------------------------------------------

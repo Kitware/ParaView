@@ -248,6 +248,7 @@ public:
   // Play the demo.
   void PlayDemo();
   void PlayDemo(int fromDashboard);
+  vtkSetMacro(InDemo, int);
 
   // Description:
   // Stuff for creating a log file for times.
@@ -649,6 +650,8 @@ protected:
   // To avoid disabling menus multiple times.
   int MenusDisabled;
   int ToolbarButtonsDisabled;
+
+  int InDemo;
 
   vtkPVApplicationSettingsInterface *ApplicationSettingsInterface;
   vtkKWUserInterfaceNotebookManager *UserInterfaceManager;

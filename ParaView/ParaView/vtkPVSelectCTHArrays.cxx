@@ -32,10 +32,11 @@
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
+#include "vtkCollectionIterator.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.8");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.9");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -440,6 +441,27 @@ int vtkPVSelectCTHArrays::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectCTHArrays::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->ButtonFrame);
+  this->PropagateEnableState(this->ShowAllLabel);
+  this->PropagateEnableState(this->ShowAllCheck);
+
+  this->PropagateEnableState(this->ArraySelectionList);
+
+  vtkCollectionIterator* sit = this->ArrayLabelCollection->NewIterator();
+  for ( sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem() )
+    {
+    this->PropagateEnableState(vtkKWWidget::SafeDownCast(sit->GetObject()));
+    }
+  sit->Delete();
+
+  this->PropagateEnableState(this->InputMenu);
 }
 
 //----------------------------------------------------------------------------

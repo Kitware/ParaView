@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.36");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.37");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -558,6 +558,30 @@ void vtkPVArraySelection::CreateServerSide()
                     << vtkClientServerStream::End;
     pm->SendStreamToServerRoot();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->LabeledFrame);
+  
+  this->PropagateEnableState(this->ButtonFrame);
+  this->PropagateEnableState(this->AllOnButton);
+  this->PropagateEnableState(this->AllOffButton);
+
+  this->PropagateEnableState(this->CheckFrame);
+  vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
+  for ( it->InitTraversal();
+    !it->IsDoneWithTraversal();
+    it->GoToNextItem() )
+    {
+    this->PropagateEnableState(vtkKWWidget::SafeDownCast(it->GetObject()));
+    }
+  it->Delete();
+  this->PropagateEnableState(this->NoArraysLabel);
+
 }
 
 //----------------------------------------------------------------------------

@@ -29,7 +29,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.18");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -376,6 +376,19 @@ void vtkPVPointSourceWidget::Update()
     {
     this->RadiusWidget->Update();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->PointWidget);
+
+  this->PropagateEnableState(this->RadiusWidget);
+  this->PropagateEnableState(this->NumberOfPointsWidget);
+
+  this->PropagateEnableState(this->InputMenu);
 }
 
 //-----------------------------------------------------------------------------

@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.13");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -159,6 +159,14 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
         << pt[0] << " " << pt[1] << " " << pt[2] << endl; 
   *file << "\t" << this->SourceID << " SetResolution " 
         << this->LineWidget->GetResolution() << endl; 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineSourceWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->LineWidget);
 }
 
 //----------------------------------------------------------------------------
