@@ -50,6 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
+//BTX
+template <class key, class data> 
+class vtkArrayMap;
+//ETX
 
 class VTK_EXPORT vtkKWMenu : public vtkKWWidget
 {
@@ -137,6 +141,7 @@ public:
   char* CreateRadioButtonVariable(vtkKWObject* Object, const char* varname);
   int   GetRadioButtonValue(vtkKWObject* Object, const char* varname);
   void  CheckRadioButton(vtkKWObject *Object, const char *varname, int id);
+  int  GetCheckedRadioButtonItem(vtkKWObject *Object, const char *varname);
   void  InsertRadioButton(int position, int value, const char* label, 
                           const char* buttonVar, vtkKWObject* Called, 
                           const char* MethodAndArgString, const char* help = 0);
@@ -174,7 +179,7 @@ public:
   int GetIndex(const char* menuname);
 
   // Description:
-  // Copies the label of the label of the item at the given position
+  // Copies the label of the item at the given position
   // to the given string ( with the given length ). Returns VTK_OK
   // if there is label, VTK_ERROR otherwise.
   int GetItemLabel(int position, char* label, int maxlen);
@@ -226,6 +231,18 @@ public:
 //BTX
   enum { Normal = 0, Active, Disabled, Unknown };
 //ETX
+
+//BTX
+  // Description:
+  // The following two methods allows one to store and restore
+  // the state of a menu. This can be used to, for example, to
+  // store the state, disable all the entries and then restore
+  // the menu to the previous. Note that only the state of menu
+  // entries with labels are stored.
+  void StoreMenuState(vtkArrayMap<const char*, int>* state);
+  void RestoreMenuState(vtkArrayMap<const char*, int>* state);
+//ETX
+
 protected:
   
   vtkKWMenu();

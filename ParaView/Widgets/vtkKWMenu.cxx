@@ -44,10 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
+#include "vtkArrayMap.txx"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.28.2.1");
+vtkCxxRevisionMacro(vtkKWMenu, "1.28.2.2");
 
 
 
@@ -358,6 +359,37 @@ int vtkKWMenu::GetRadioButtonValue(vtkKWObject* Object,
   res = this->GetIntegerResult(this->Application);
   delete [] rbv;
   return res;
+}
+    
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetCheckedRadioButtonItem(vtkKWObject* Object, 
+                                         const char* varname)
+{
+  char *rbv = this->CreateRadioButtonVariable(Object,varname);
+  int value = this->GetCheckButtonValue(Object,varname);
+
+  int numEntries = this->GetNumberOfItems();
+  for(int i = 0; i < numEntries; i++)
+    {
+    this->Script("%s type %d", this->GetWidgetName(), i);
+    if (!strcmp("radiobutton",
+                this->GetApplication()->GetMainInterp()->result))
+      {
+      this->Script("%s entrycget %i -variable", this->GetWidgetName(), i);
+      if (!strcmp(rbv, this->GetApplication()->GetMainInterp()->result))
+        {
+        this->Script("%s entrycget %i -value", this->GetWidgetName(), i);
+        if (this->GetIntegerResult(this->Application) == value)
+          {
+          delete [] rbv;
+          return i;
+          }
+        }
+      }
+    }
+
+  delete [] rbv;
+  return -1;
 }
     
 //----------------------------------------------------------------------------
@@ -727,6 +759,48 @@ void vtkKWMenu::SetEntryCommand(const char* item, vtkKWObject* object,
   this->SetEntryCommand(index, object, MethodAndArgString);
 }
 
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::StoreMenuState(vtkArrayMap<const char*, int>* state)
+{
+  state->RemoveAllItems();
+  int numEntries = this->GetNumberOfItems();
+  for(int i = 0; i < numEntries; i++)
+    {
+    char label[128];
+    if (this->GetItemLabel(i, label, 128) == VTK_OK)
+      {
+      state->SetItem(label, this->GetState(i));
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::RestoreMenuState(vtkArrayMap<const char*, int>* state)
+{
+  vtkArrayMapIterator<const char*, int>* it = state->NewIterator();
+
+  // Mark all sources as not visited.
+  while( !it->IsDoneWithTraversal() )
+    {    
+    int state;
+    const char* item;
+    if (it->GetKey(item) == VTK_OK && item && it->GetData(state) == VTK_OK)
+      {
+      if ( state == vtkKWMenu::Active )
+        {
+        this->SetState(item, vtkKWMenu::Normal);
+        }
+      else
+        {
+        this->SetState(item, state);
+        }
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+}
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::PrintSelf(ostream& os, vtkIndent indent)
