@@ -20,15 +20,15 @@
 #ifndef __vtkPVIceTRenderModule_h
 #define __vtkPVIceTRenderModule_h
 
-#include "vtkPVCompositeRenderModule.h"
+#include "vtkPVMultiDisplayRenderModule.h"
 
 class vtkCompositeRenderManager;
 
-class VTK_EXPORT vtkPVIceTRenderModule : public vtkPVCompositeRenderModule
+class VTK_EXPORT vtkPVIceTRenderModule : public vtkPVMultiDisplayRenderModule
 {
 public:
   static vtkPVIceTRenderModule* New();
-  vtkTypeRevisionMacro(vtkPVIceTRenderModule,vtkPVCompositeRenderModule);
+  vtkTypeRevisionMacro(vtkPVIceTRenderModule,vtkPVMultiDisplayRenderModule);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
