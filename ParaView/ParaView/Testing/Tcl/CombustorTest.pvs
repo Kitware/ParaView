@@ -171,6 +171,7 @@ for {set i 55} {$i < 56} {incr i 1} {
 }
 
 [$pvExtract GetPVOutput] DrawSurface
+update
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
