@@ -40,7 +40,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVBatchCompositeManager, "1.2");
+vtkCxxRevisionMacro(vtkPVBatchCompositeManager, "1.3");
 vtkStandardNewMacro(vtkPVBatchCompositeManager);
 
 
@@ -66,6 +66,8 @@ vtkPVBatchCompositeManager::vtkPVBatchCompositeManager()
   this->LocalPData = NULL;
   this->LocalZData = NULL;
   this->NumberOfProcesses = 0;
+  this->RendererSize[0] = 0;
+  this->RendererSize[1] = 0;
 }
 
   
