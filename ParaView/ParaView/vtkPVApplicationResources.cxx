@@ -204,8 +204,7 @@ void vtkPVApplication::CreatePhoto(char *name,
 
   // Otherwise try to find a file with the same name in the Resources dir
 
-  this->Script("image create photo %s -height %d -width %d",
-               name, height, width);
+  this->Script("image create photo %s", name);
 
   struct stat fs;
   char buffer[1024];
