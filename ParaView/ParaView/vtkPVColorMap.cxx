@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.63.2.4");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.63.2.5");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1165,25 +1165,24 @@ void vtkPVColorMap::UpdateLookupTable()
     {
     this->EndHSV[0] = this->StartHSV[0];
     }
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  pm->GetStream() << vtkClientServerStream::Invoke
                   << this->LookupTableID << "SetNumberOfTableValues"
                   << this->NumberOfColors
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  pm->GetStream() << vtkClientServerStream::Invoke
                   << this->LookupTableID << "SetHueRange"
                   << this->StartHSV[0] << this->EndHSV[0]
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  pm->GetStream() << vtkClientServerStream::Invoke
                   << this->LookupTableID << "SetSaturationRange"
                   << this->StartHSV[2] << this->EndHSV[2]
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  pm->GetStream() << vtkClientServerStream::Invoke
                   << this->LookupTableID << "SetValueRange"
                   << this->StartHSV[2] << this->EndHSV[2]
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
+  pm->GetStream() << vtkClientServerStream::Invoke
                   << this->LookupTableID << "ForceBuild"
-                  << this->StartHSV[2] << this->EndHSV[2]
                   << vtkClientServerStream::End;
 
   if (this->MapWidth > 0 && this->MapHeight > 0)
