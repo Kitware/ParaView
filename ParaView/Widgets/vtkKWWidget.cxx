@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.58");
+vtkCxxRevisionMacro(vtkKWWidget, "1.59");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -329,7 +329,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.58 $");
+  this->ExtractRevision(os,"$Revision: 1.59 $");
 }
 
 //------------------------------------------------------------------------------
@@ -509,13 +509,6 @@ int vtkKWWidget::GetConfigurationOptionAsInt(const char* option)
 }
 
 //------------------------------------------------------------------------------
-int vtkKWWidget::IsPacked()
-{
-  return !this->Application->EvaluateBooleanExpression(
-    "catch {pack info %s}", this->GetWidgetName());
-}
-
-//------------------------------------------------------------------------------
 int vtkKWWidget::IsAlive()
 {
   if (!this->IsCreated())
@@ -524,6 +517,19 @@ int vtkKWWidget::IsAlive()
     }
 
   return atoi(this->Script("winfo exists %s", this->GetWidgetName()));
+}
+
+//------------------------------------------------------------------------------
+int vtkKWWidget::IsPacked()
+{
+  return !this->Application->EvaluateBooleanExpression(
+    "catch {pack info %s}", this->GetWidgetName());
+}
+
+//------------------------------------------------------------------------------
+int vtkKWWidget::GetNumberOfPackedChildren()
+{
+  return atoi(this->Script("llength [pack slaves %s]", this->GetWidgetName()));
 }
 
 //------------------------------------------------------------------------------

@@ -174,12 +174,13 @@ public:
   int GetConfigurationOptionAsInt(const char* option);
   
   // Description:
-  // Query if widget is packed
-  int IsPacked();
-  
-  // Description:
   // Query if widget is "alive"
   int IsAlive();
+  
+  // Description:
+  // Query if widget is packed
+  int IsPacked();
+  int GetNumberOfPackedChildren();
   
   // Description:
   // Unpack widget, unpack siblings (slave's of parent widget)
