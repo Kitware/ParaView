@@ -368,6 +368,20 @@ ADD_TEST(VolumeRenderVox8Cell-ParaView
   -V ${PVClientTestData}/Baseline/VolumeRenderVox8Cell.png
   )
 
+IF (VTK_DATA_ROOT)
+  ADD_TEST(ByteOrder-ParaView 
+    ${PARAVIEW_EXECUTABLE} 
+    ${TIMEOUT}
+    ${PARAVIEW_MPI_RUN_ONE} 
+    --disable-registry
+    ${PVClientTests_SOURCE_DIR}/Tcl/ByteOrder.pvs
+    -D ${VTK_DATA_ROOT}
+    -C ${PVCompareImages}
+    -T ${ParaView_BINARY_DIR}/Testing/Temporary
+    -V ${PVClientTestData}/Baseline/ByteOrder.png
+    )
+ENDIF (VTK_DATA_ROOT)
+
 # Test the PVLocal plugin example.
 IF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.8)
   IF(BUILD_SHARED_LIBS)

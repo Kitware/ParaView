@@ -1,0 +1,29 @@
+$Application DisableTestErrors
+
+set kw(vtkTemp5) [$Application GetMainWindow]
+set kw(vtkTemp23) [$kw(vtkTemp5) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp23) $argv $argc
+
+set kw(vtkTemp604) [$kw(vtkTemp5) InitializeReadCustom "ensight" "$DataDir/Data/EnSight/naca.bin.case"]
+$kw(vtkTemp5) ReadFileInformation $kw(vtkTemp604) "$DataDir/Data/EnSight/naca.bin.case"
+$kw(vtkTemp5) FinalizeRead $kw(vtkTemp604) "$DataDir/Data/EnSight/naca.bin.case"
+set kw(vtkTemp621) [$kw(vtkTemp604) GetPVWidget {Filename}]
+$kw(vtkTemp621) SetValue "$DataDir/Data/EnSight/naca.bin.case"
+set kw(vtkTemp607) [$kw(vtkTemp604) GetPVWidget {ByteOrder}]
+$kw(vtkTemp607) SelectCallback {little endian} 1
+$kw(vtkTemp604) AcceptCallback
+
+$kw(vtkTemp607) SelectCallback {big endian} 0
+$kw(vtkTemp604) AcceptCallback
+
+set kw(vtkTemp39) [$kw(vtkTemp604) GetPVOutput]
+$kw(vtkTemp39) DrawSurface
+set kw(vtkTemp639) [$kw(vtkTemp5) GetPVColorMap {DENS} 1]
+$kw(vtkTemp639) SetScalarBarTitle {DENS}
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit

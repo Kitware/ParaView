@@ -241,7 +241,8 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
   for(i =1; i < argc; ++i)
     {
     int len = strlen(argv[i]) - 9;
-    if(len > 0 && strncmp(argv[i]+len, "Other.pvs", 9) == 0)
+    if(len > 0 && (strncmp(argv[i]+len, "Other.pvs", 9) == 0 ||
+                   strncmp(argv[i]+len, "ByteOrder.pvs", 13)))
       {
       this->AllowErrorInOutput = 1;
       }
