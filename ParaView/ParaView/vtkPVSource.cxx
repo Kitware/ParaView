@@ -1652,7 +1652,6 @@ void vtkPVSource::SerializeSelf(ostream& os, vtkIndent indent)
     vtkCollectionIterator* it = this->Widgets->NewIterator();
     it->InitTraversal();
     vtkIndent indentp = indent.GetNextIndent();
-    vtkIndent indentpp = indentp.GetNextIndent();
     os << indentp << "{" << endl;
     int cc =0;
     while( !it->IsDoneWithTraversal() )
@@ -1674,7 +1673,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.218 $");
+  this->ExtractRevision(os,"$Revision: 1.219 $");
 }
 
 //----------------------------------------------------------------------------
