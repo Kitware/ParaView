@@ -23,7 +23,10 @@ vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
 vtkKWRenderView \
 vtkPVApplication \
+vtkPVComposite \
+vtkPVImage \
 vtkPVImagePlaneComponent \
+vtkPVImageReader \
 vtkPVRenderSlave \
 vtkPVRenderView \
 vtkPVSlave \

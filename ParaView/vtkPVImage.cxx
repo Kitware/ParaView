@@ -1,0 +1,92 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkPVImage.cxx
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+Copyright (c) 1998-2000 Kitware Inc. 469 Clifton Corporate Parkway,
+Clifton Park, NY, 12065, USA.
+
+All rights reserved. No part of this software may be reproduced, distributed,
+or modified, in any form or by any means, without permission in writing from
+Kitware Inc.
+
+IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY FOR
+DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
+OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES THEREOF,
+EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
+"AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
+MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+=========================================================================*/
+#include "vtkPVImage.h"
+#include "vtkMath.h"
+
+vtkPVImage::vtkPVImage()
+{
+  this->Image = NULL;
+
+  this->Label = vtkKWLabel::New();  
+  
+  this->Outline = vtkOutlineSource::New();
+  this->Mapper = vtkPolyDataMapper::New();
+  this->Actor = vtkActor::New();
+
+  this->Outline->SetBounds(0, 255, 0, 255, 0, 92 * 1.8);
+  this->Mapper->SetInput(Outline->GetOutput());
+  this->Actor->SetMapper(Mapper);
+}
+
+vtkPVImage::~vtkPVImage()
+{
+  this->SetImage(NULL);
+  
+  this->Label->Delete();
+  this->Label = NULL;
+  
+  this->Outline->Delete();
+  this->Outline = NULL;
+  
+  this->Mapper->Delete();
+  this->Mapper = NULL;
+  
+  this->Actor->Delete();
+  this->Actor = NULL;
+}
+
+vtkPVImage* vtkPVImage::New()
+{
+  return new vtkPVImage();
+}
+
+void vtkPVImage::Create(vtkKWApplication *app, char *args)
+{
+  // must set the application
+  if (this->Application)
+    {
+    vtkErrorMacro("Label already created");
+    return;
+    }
+  this->SetApplication(app);
+  
+  // create the top level
+  this->Script("frame %s %s", this->GetWidgetName(), args);
+  
+  this->Label->SetParent(this);
+  this->Label->Create(this->Application, "");
+  this->Label->SetLabel("vtkPVImage label");
+  this->Script("pack %s", this->Label->GetWidgetName());
+}
+
+vtkProp* vtkPVImage::GetProp()
+{
+  return this->Actor;
+}
+
+

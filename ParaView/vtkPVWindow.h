@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWWindow.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVComposite.h"
 class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
@@ -53,6 +54,7 @@ public:
   // Open or close a polygonal dataset for viewing.
   virtual void NewWindow();
   virtual void Save();
+  virtual void NewVolume();
 
   // Description:
   // Chaining method to serialize an object and its superclasses.
@@ -65,11 +67,15 @@ public:
 
   // Description:
   // Properties menu call back.
-  void ShowMainNotebook();  
+  void ShowDataProperties();
+  vtkKWWidget *GetDataPropertiesParent();
   
   void IsoValueChanged();
   void XPlaneChanged();
   void ZPlaneChanged();
+  
+  void SetCurrentDataComposite(vtkPVComposite *comp);
+  
   
 protected:
   vtkPVWindow();
@@ -79,22 +85,22 @@ protected:
 
   void SetupCone();
   void SetupVolumeIso();
-  void CreateMainNotebook();
   
   vtkPVRenderView *MainView;
   vtkKWWidget *RetrieveMenu;
   vtkKWWidget *CreateMenu;
-
+  
   vtkKWToolbar *Toolbar;
   vtkKWWidget *ResetCameraButton;
 
   vtkKWMenu *MenuSource;
   
-  
-  
-  vtkKWNotebook *MainNotebook;
-  int MainNotebookCreated;
+  vtkKWNotebook *DataPropertiesFrame;
+  int DataPropertiesFrameCreated;
+  void CreateDataPropertiesFrame();
 
+  vtkPVComposite *CurrentDataComposite;
+  
   vtkKWScale *IsoScale;
   vtkKWScale *XPlaneScale;
   vtkKWScale *ZPlaneScale;

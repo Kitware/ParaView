@@ -25,6 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+
 #include "vtkPVApplication.h"
 #include "vtkKWToolbar.h"
 #include "vtkPVWindow.h"
@@ -44,6 +45,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkActor.h"
 #include "vtkKWScale.h"
 
+#include "vtkPVComposite.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -69,13 +71,13 @@ vtkPVWindow::vtkPVWindow()
   this->CreateMenu = vtkKWWidget::New();
   this->Toolbar = vtkKWToolbar::New();
   this->ResetCameraButton = vtkKWWidget::New();
-
+  this->CurrentDataComposite = NULL;
+  
   this->MenuSource = vtkKWMenu::New();
   this->MenuSource->SetParent(this->Menu);
-  
-  
-  this->MainNotebook = vtkKWNotebook::New();
-  this->MainNotebookCreated = 0;
+    
+  this->DataPropertiesFrame = vtkKWNotebook::New();
+  this->DataPropertiesFrameCreated = 0;
   this->IsoScale = vtkKWScale::New();
   this->XPlaneScale = vtkKWScale::New();
   this->ZPlaneScale = vtkKWScale::New();
@@ -88,14 +90,19 @@ vtkPVWindow::~vtkPVWindow()
   this->Toolbar = NULL;
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
+  if (this->CurrentDataComposite != NULL)
+    {
+    this->CurrentDataComposite->Delete();
+    this->CurrentDataComposite = NULL;
+    }
   
+  this->MenuSource->SetParent(NULL);
   this->MenuSource->Delete();
-  this->MenuSource->Delete();
+  this->MenuSource = NULL;
   
-  // Temporary stuff to delete.
-  this->MainNotebook->SetParent(NULL);
-  this->MainNotebook->Delete();
-  this->MainNotebook = NULL;
+  this->DataPropertiesFrame->SetParent(NULL);
+  this->DataPropertiesFrame->Delete();
+  this->DataPropertiesFrame = NULL;
 
   this->IsoScale->SetParent(NULL);
   this->IsoScale->Delete();
@@ -180,85 +187,92 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
     
   this->Script( "wm deiconify %s", this->GetWidgetName());
 
+  char *rbv =
+    this->GetMenuProperties()->CreateRadioButtonVariable(
+      this->GetMenuProperties(),"Radio");
+  this->GetMenuProperties()->AddRadioButton(11,"Data", rbv, this, "ShowDataProperties");
+  delete [] rbv;
+  
   // Setup an interactor style.
-  //this->SetupCone();
-  this->SetupVolumeIso();
-
+  vtkInteractorStyleCamera *style = vtkInteractorStyleCamera::New();
+  this->MainView->SetInteractorStyle(style);
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPVWindow::ShowMainNotebook()
+void vtkPVWindow::ShowDataProperties()
 {
-  // make sure we have an applicaiton
-  if (!this->Application)
+  if (this->DataPropertiesFrameCreated == 0)
     {
-    vtkErrorMacro("attempt to update properties without an application set");
+    this->CreateDataPropertiesFrame();
     }
-  
-  // make sure the variable is set, otherwise set it
-  this->GetMenuProperties()->CheckRadioButton(
-    this->GetMenuProperties(),"Radio",11);
-  
-  // unpack any current children
+
   this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->GetPropertiesParent()->GetWidgetName());
-
-  // do we need to create the Notebook ?
-  if ( ! this->MainNotebookCreated)
-    {
-    this->CreateMainNotebook();
-    }
-
-  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-               this->MainNotebook->GetWidgetName());
+	       this->GetPropertiesParent()->GetWidgetName());
+  this->Script("pack %s",
+	       this->DataPropertiesFrame->GetWidgetName());
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPVWindow::CreateMainNotebook()
+vtkKWWidget *vtkPVWindow::GetDataPropertiesParent()
+{
+  if (this->DataPropertiesFrameCreated == 0)
+    {
+    this->CreateDataPropertiesFrame();
+    }
+  
+  return this->DataPropertiesFrame->GetFrame("Only");
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::CreateDataPropertiesFrame()
 {
   vtkKWApplication *app = this->Application;
 
-  if (this->MainNotebookCreated)
-    {  
+  if (this->DataPropertiesFrameCreated)
+    {
     return;
     }
-  this->MainNotebookCreated = 1;
+  this->DataPropertiesFrameCreated = 1;
   
-  this->MainNotebook->SetParent(this->GetPropertiesParent());
-  this->MainNotebook->Create(this->Application,"");
-  this->MainNotebook->AddPage("Vol");
-  this->MainNotebook->AddPage("Iso");
-  this->MainNotebook->AddPage("Cut");
-  
-  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-               this->MainNotebook->GetWidgetName());
-  this->MainNotebook->Raise("Iso");  
-  
-  this->IsoScale->SetParent(this->MainNotebook->GetFrame("Iso"));
-  this->IsoScale->Create(this->Application, "");
-  this->IsoScale->SetRange(0, 2000);
-  this->IsoScale->SetValue(1120);
-  this->Script("pack %s -pady 2 -padx 2 -fill x -expand yes",
-               this->IsoScale->GetWidgetName());
-  this->IsoScale->SetCommand(this, "IsoValueChanged");
-  
-  this->XPlaneScale->SetParent(this->MainNotebook->GetFrame("Cut"));
-  this->XPlaneScale->Create(this->Application, "");
-  this->XPlaneScale->SetRange(0, 64);
-  this->XPlaneScale->SetValue(20);
-  this->Script("pack %s -pady 2 -padx 2 -fill x -expand yes",
-               this->XPlaneScale->GetWidgetName());
-  this->XPlaneScale->SetCommand(this, "XPlaneChanged");
-  
-  this->ZPlaneScale->SetParent(this->MainNotebook->GetFrame("Cut"));
-  this->ZPlaneScale->Create(this->Application, "");
-  this->ZPlaneScale->SetRange(0, 64);
-  this->ZPlaneScale->SetValue(20);
-  this->Script("pack %s -pady 2 -padx 2 -fill x -expand yes",
-               this->ZPlaneScale->GetWidgetName());
-  this->ZPlaneScale->SetCommand(this, "ZPlaneChanged");
-  
+  this->DataPropertiesFrame->SetParent(this->GetPropertiesParent());
+  this->DataPropertiesFrame->Create(this->Application,"-bd 0");
+  this->DataPropertiesFrame->AddPage("Only");
 }
+
+
+void vtkPVWindow::SetCurrentDataComposite(vtkPVComposite *comp)
+{
+  if (comp->GetPropertiesParent() != this->GetDataPropertiesParent())
+    {
+    vtkErrorMacro("CurrentComposites must use our DataPropertiesParent.");
+    return;
+    }
+  
+  if (this->CurrentDataComposite)
+    {
+    this->CurrentDataComposite->Deselect(this->MainView);
+    this->CurrentDataComposite->UnRegister(this);
+    this->CurrentDataComposite = NULL;
+    this->Script("catch {eval pack forget [pack slaves %s]}",
+		 this->GetDataPropertiesParent()->GetWidgetName());
+    }
+  
+  if (comp)
+    {
+    this->CurrentDataComposite = comp;
+    comp->Select(this->MainView);
+    comp->Register(this);
+    this->Script("pack %s -side top -anchor w -padx 2 -pady 2 -expand yes -fill x",
+		 comp->GetProperties()->GetWidgetName());
+    }
+}
+
+
+
+
 
 
 
@@ -305,93 +319,21 @@ void vtkPVWindow::SetupCone()
 
 //----------------------------------------------------------------------------
 // Setup the pipeline
-void vtkPVWindow::SetupVolumeIso()
+void vtkPVWindow::NewVolume()
 {
   int id, num;
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-
-  // Put the outline in the UI window.
+  vtkPVComposite *comp;
   
-  // We have two options for displaying this in the future:
-  // 1: Create an image outline filter that only updates information.
-  // 2: Create a distributed outline filter that uses piece hints.
-  vtkOutlineSource *outline = vtkOutlineSource::New();
-  outline->SetBounds(0, 255, 0, 255, 0, 92 * 1.8);
-  vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput(outline->GetOutput());
-  vtkActor *actor = vtkActor::New();
-  actor->SetMapper(mapper);
-  this->MainView->GetRenderer()->AddActor(actor);
-  actor->Delete();
-  mapper->Delete();
-  outline->Delete();
-  
-  
-  
-  // Setup the worker pipelines
-  num = pvApp->GetController()->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    pvApp->RemoteSimpleScript(id, "vtkImageReader ImageReader");
-
-    //pvApp->RemoteSimpleScript(id, "ImageReader SetFilePrefix {/home/lawcc/vtkdata/fullHead/headsq}");
-    //pvApp->RemoteSimpleScript(id, "ImageReader SetDataSpacing 1 1 1.8");
-    //pvApp->RemoteSimpleScript(id, "ImageReader SetDataExtent 0 255 0 255 1 93");
-
-    pvApp->RemoteSimpleScript(id, "ImageReader SetFilePrefix {/home/lawcc/vtkdata/headsq/quarter}");
-    pvApp->RemoteSimpleScript(id, "ImageReader SetDataSpacing 4 4 1.8");
-    pvApp->RemoteSimpleScript(id, "ImageReader SetDataExtent 0 63 0 63 1 93");
-
-    pvApp->RemoteSimpleScript(id, "ImageReader SetDataByteOrderToLittleEndian");
-    pvApp->RemoteSimpleScript(id, "vtkSynchronizedTemplates3D Iso");
-    pvApp->RemoteSimpleScript(id, "Iso SetInput [ImageReader GetOutput]");
-    pvApp->RemoteSimpleScript(id, "Iso SetValue 0 1150");
-    pvApp->RemoteScript(id, "[Iso GetOutput] SetUpdateExtent %d %d", id-1, num-1);
-    
-    pvApp->RemoteSimpleScript(id, "vtkPolyDataMapper IsoMapper");
-    pvApp->RemoteSimpleScript(id, "IsoMapper SetInput [Iso GetOutput]");
-    pvApp->RemoteSimpleScript(id, "IsoMapper ScalarVisibilityOff");
-    pvApp->RemoteSimpleScript(id, "vtkActor IsoActor");
-    pvApp->RemoteScript(id, "[IsoActor GetProperty] SetColor %f %f %f",
-			vtkMath::Random(), vtkMath::Random(), vtkMath::Random());
-    
-    pvApp->RemoteSimpleScript(id, "IsoActor SetMapper IsoMapper");
-    pvApp->RemoteSimpleScript(id, "[RenderSlave GetRenderer] AddActor IsoActor");
-    
-    // Z Plane geomtery
-    pvApp->RemoteSimpleScript(id, "vtkPVImagePlaneComponent ImagePlaneZ");
-    pvApp->RemoteSimpleScript(id, "ImagePlaneZ SetInput [ImageReader GetOutput]");
-    pvApp->RemoteScript(id, "ImagePlaneZ SetPiece %d %d", id-1, num-1);
-    pvApp->RemoteSimpleScript(id, "ImagePlaneZ SetPlaneExtent 0 63 0 63 20 20");
-    pvApp->RemoteSimpleScript(id, "[RenderSlave GetRenderer] AddActor [ImagePlaneZ GetActor]");
-
-    // X Plane geomtery
-    pvApp->RemoteSimpleScript(id, "vtkPVImagePlaneComponent ImagePlaneX");
-    pvApp->RemoteSimpleScript(id, "ImagePlaneX SetInput [ImageReader GetOutput]");
-    pvApp->RemoteScript(id, "ImagePlaneX SetPiece %d %d", id-1, num-1);
-    pvApp->RemoteSimpleScript(id, "ImagePlaneX SetPlaneExtent 20 20 0 63 0 92");
-    pvApp->RemoteSimpleScript(id, "[RenderSlave GetRenderer] AddActor [ImagePlaneX GetActor]");
-    }
-  
-  // Setup an interactor style
-  vtkInteractorStylePlaneSource *planeStyle = 
-                      vtkInteractorStylePlaneSource::New();
-  vtkInteractorStyle *style = vtkInteractorStyleCamera::New();
-
-  //this->MainView->SetInteractorStyle(planeStyle);
-  this->MainView->SetInteractorStyle(style);
-  style->Delete();
-  
-  // now add property options
-  char *rbv = 
-    this->GetMenuProperties()->CreateRadioButtonVariable(
-      this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(11,"Main", rbv, this, "ShowMainNotebook");
-  delete [] rbv;
-  
-  this->ShowMainNotebook();
+  comp = vtkPVComposite::New();
+  comp->SetPropertiesParent(this->GetDataPropertiesParent());
+  comp->CreateProperties(pvApp, "");
+  this->MainView->AddComposite(comp);
+  this->SetCurrentDataComposite(comp);
+  comp->Delete();
   
   this->MainView->ResetCamera();
+  this->MainView->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -465,10 +407,13 @@ void vtkPVWindow::NewWindow()
   nw->Delete();
 }
 
-
+//----------------------------------------------------------------------------
+void vtkPVWindow::SetupVolumeIso()
+{
+}
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::Save() 
+void vtkPVWindow::Save()
 {
   //char *path;
   //
@@ -498,9 +443,3 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
 
   vtkKWWindow::SerializeToken(is,token);
 }
-
-
-
-
-
-
