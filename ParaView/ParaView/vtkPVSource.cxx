@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.239");
+vtkCxxRevisionMacro(vtkPVSource, "1.240");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -407,9 +407,6 @@ vtkPVApplication* vtkPVSource::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVSource::CreateProperties()
 {
-  vtkPVApplication *app = this->GetPVApplication();
-  
-
   // If the user has not set the parameters parent.
   if (this->ParametersParent == NULL)
     {
@@ -2043,7 +2040,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.239 $");
+  this->ExtractRevision(os,"$Revision: 1.240 $");
 }
 
 //----------------------------------------------------------------------------
