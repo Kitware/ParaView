@@ -109,7 +109,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.291");
+vtkCxxRevisionMacro(vtkPVApplication, "1.292");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2322,12 +2322,17 @@ void vtkPVApplication::SendStringToClientAndServer(const char* str)
 //----------------------------------------------------------------------------
 void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
 {
+  (void)event;
+  (void)calldata;
+  // Placeholder for future events
+  /*
   switch ( event ) 
     {
   default:
     vtkPVApplication::Abort();
     break;
     }
+    */
 }
 
 
