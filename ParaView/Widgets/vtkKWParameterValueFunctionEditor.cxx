@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.3");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.4");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -257,7 +257,7 @@ int vtkKWParameterValueFunctionEditor::FunctionPointParameterIsLocked(int id)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::FunctionPointValueIsLocked(int id)
+int vtkKWParameterValueFunctionEditor::FunctionPointValueIsLocked(int)
 {
   return 0;
 }
@@ -1549,6 +1549,11 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
   this->GetFunctionPointAsCanvasCoordinates(this->SelectedPoint, c_x, c_y);
   this->LastSelectCanvasCoordinates[0] = c_x;
   this->LastSelectCanvasCoordinates[1] = c_y;
+
+  // Show the selected point description in the info label
+
+  this->InfoLabel->GetLabel()->SetImageDataName("");
+  this->UpdateInfoLabelWithFunctionPoint(this->SelectedPoint);
 }
 
 //----------------------------------------------------------------------------
