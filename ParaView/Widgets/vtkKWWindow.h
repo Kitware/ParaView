@@ -184,6 +184,11 @@ public:
   // Set/Get PromptBeforeClose
   vtkSetMacro(PromptBeforeClose, int);
   vtkGetMacro(PromptBeforeClose, int);
+
+  //Description:
+  // Set/Get Number of recent files in the menu.
+  vtkSetClampMacro(NumberOfRecentFiles, int, 4, 10);
+  vtkGetMacro(NumberOfRecentFiles, int);
   
 protected:
   vtkKWWindow();
@@ -196,6 +201,9 @@ protected:
 			      vtkKWObject *taret, 
 			      const char *command);
   void UpdateRecentMenu();
+  void StoreRecentMenuToRegistry(char *key);
+
+  int NumberOfRecentFiles;
   
   int ExitDialog();
 
