@@ -42,6 +42,9 @@ public:
   // are deleted.
   void Finalize();
 
+  // Description:
+  int ParseConfigurationFile(const char* fname, const char* dir);
+
 protected:
   vtkSMApplication();
   ~vtkSMApplication();

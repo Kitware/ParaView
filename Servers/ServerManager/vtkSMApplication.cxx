@@ -27,7 +27,7 @@
 #include "vtkSMGeneratedModules.h"
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.6");
+vtkCxxRevisionMacro(vtkSMApplication, "1.7");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -129,6 +129,27 @@ void vtkSMApplication::Initialize()
 //     }
   
   proxyM->Delete();
+}
+
+//---------------------------------------------------------------------------
+int vtkSMApplication::ParseConfigurationFile(const char* fname, const char* dir)
+{
+  vtkSMProxyManager* proxyM = this->GetProxyManager();
+  if (!proxyM)
+    {
+    vtkErrorMacro("No global proxy manager defined. Can not parse file");
+    return 0;
+    }
+
+  ostrstream tmppath;
+  tmppath << dir << "/" << fname << ends;
+  vtkSMXMLParser* parser = vtkSMXMLParser::New();
+  parser->SetFileName(tmppath.str());
+  delete[] tmppath.str();
+  int res = parser->Parse();
+  parser->ProcessConfiguration(proxyM);
+  parser->Delete();
+  return res;
 }
 
 //---------------------------------------------------------------------------
