@@ -33,7 +33,7 @@
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.9");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.10");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 //----------------------------------------------------------------------------
@@ -101,6 +101,7 @@ void vtkPVGeometryFilter::Execute()
       vtkPolyData *inCopy = vtkPolyData::New();
       vtkStripper *stripper = vtkStripper::New();
       inCopy->ShallowCopy(inPd);
+      inCopy->RemoveGhostCells(1);
       stripper->SetInput(inCopy);
       stripper->Update();
       out->CopyStructure(stripper->GetOutput());
@@ -113,6 +114,7 @@ void vtkPVGeometryFilter::Execute()
     else
       {
       out->ShallowCopy(inPd);
+      out->RemoveGhostCells(1);
       return;
       }
     }

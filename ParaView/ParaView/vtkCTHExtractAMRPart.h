@@ -34,6 +34,7 @@ class vtkAppendPolyData;
 class vtkImageData;
 class vtkFloatArray;
 class vtkDataArray;
+class vtkIdList;
 
 class VTK_EXPORT vtkCTHExtractAMRPart : public vtkCTHDataToPolyDataFilter
 {
@@ -83,9 +84,19 @@ protected:
   void ExecuteCellDataToPointData(vtkDataArray *cellVolumeFraction, 
                                   vtkFloatArray *pointVolumeFraction, int *dims);
 
+
+  void ExecuteCellDataToPointData2(vtkDataArray *cellVolumeFraction, 
+                            vtkFloatArray *pointVolumeFraction, vtkCTHData* data);
+  float ComputeSharedPoint(int blockId, int x, int y, int z, 
+                            float* pCell, vtkCTHData* output);
+  void FindPointCells(vtkCTHData* self, vtkIdType ptId, vtkIdList* idList);
+
+
+
   int Clipping;
   vtkPlane* ClipPlane;
   vtkStringList *VolumeArrayNames;
+  vtkIdList* IdList;
 
 private:
   void InternalImageDataCopy(vtkCTHExtractAMRPart *src);

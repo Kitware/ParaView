@@ -29,7 +29,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.1");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.2");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------
@@ -66,7 +66,141 @@ void vtkCTHFractal::SetBlockInfo(int blockId,
   this->GetOutput()->SetBlockSpacing(blockId, sx, sy, sz);
 }
 
+/*
+//----------------------------------------------------------------------------
+void vtkCTHFractal::Execute()
+{
+  int blockId = 0;
+  vtkCTHData* output = this->GetOutput();
 
+  // This is 10x10x10 in cells.
+  int dim = this->Dimensions;
+  float xOrigin = -1.75;
+  float yOrigin = -1.25;
+  float zOrigin = 0.0;
+  float xSize = 2.5;
+  float ySize = 2.5;
+  float zSize = 2.0;
+
+  float ox1, oy1, oz1;
+  float sx1, sy1, sz1;
+  float mx1, my1, mz1;
+
+
+  this->SetDimensions(dim+1, dim+1, dim+1);
+  // Each refinement adds seven (adds eight takes away 1).
+  output->SetNumberOfBlocks(8);
+
+  // Lowest resolution 8
+  sx1 = xSize / (2.0 * dim);
+  sy1 = ySize / (2.0 * dim);
+  sz1 = zSize / (2.0 * dim);
+  ox1 = xOrigin;
+  oy1 = yOrigin;
+  oz1 = zOrigin;
+
+  mx1 = ox1 + xSize / 2.0;
+  my1 = oy1 + ySize / 2.0;
+  mz1 = oz1 + zSize / 2.0;
+  
+  this->SetBlockInfo(blockId++, ox1, oy1, oz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, mx1, oy1, oz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, ox1, my1, oz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, mx1, my1, oz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, ox1, oy1, mz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, mx1, oy1, mz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, ox1, my1, mz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, mx1, my1, mz1, sx1, sy1, sz1);
+
+  this->AddFractalArray();
+  this->AddBlockIdArray();
+  this->AddDepthArray(sx1);
+
+  if (this->GhostLevels > 0)
+    {
+    this->AddGhostLevelArray();
+    }
+}
+*/
+
+/*
+//----------------------------------------------------------------------------
+void vtkCTHFractal::Execute()
+{
+  int blockId = 0;
+  vtkCTHData* output = this->GetOutput();
+
+  // This is 10x10x10 in cells.
+  int dim = this->Dimensions;
+  float xOrigin = -1.75;
+  float yOrigin = -1.25;
+  float zOrigin = 0.0;
+  float xSize = 2.5;
+  float ySize = 2.5;
+  float zSize = 2.0;
+
+  float ox1, oy1, oz1;
+  float sx1, sy1, sz1;
+  float mx1, my1, mz1;
+
+  float ox2, oy2, oz2;
+  float sx2, sy2, sz2;
+  float mx2, my2, mz2;
+
+  this->SetDimensions(dim+1, dim+1, dim+1);
+  // Each refinement adds seven (adds eight takes away 1).
+  output->SetNumberOfBlocks(15);
+
+  // Lowest resolution 8
+  sx1 = xSize / (2.0 * dim);
+  sy1 = ySize / (2.0 * dim);
+  sz1 = zSize / (2.0 * dim);
+  ox1 = xOrigin;
+  oy1 = yOrigin;
+  oz1 = zOrigin;
+
+  sx2 = 0.5 * sx1;
+  sy2 = 0.5 * sy1;
+  sz2 = 0.5 * sz1;
+
+  mx1 = ox1 + xSize / 2.0;
+  my1 = oy1 + ySize / 2.0;
+  mz1 = oz1 + zSize / 2.0;
+  
+  this->SetBlockInfo(blockId++, ox1, oy1, oz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, mx1, oy1, oz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, ox1, my1, oz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, mx1, my1, oz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, ox1, oy1, mz1, sx1, sy1, sz1);
+  this->SetBlockInfo(blockId++, mx1, oy1, mz1, sx1, sy1, sz1);
+  //this->SetBlockInfo(blockId++, ox1, my1, mz1, sx1, sy1, sz1);
+  // Refine -x, +y, +z
+  ox2 = ox1;
+  oy2 = my1;
+  oz2 = mz1;
+  mx2 = ox2 + xSize / 4.0;
+  my2 = oy2 + ySize / 4.0;
+  mz2 = oz2 + zSize / 4.0;
+    this->SetBlockInfo(blockId++, ox2, oy2, oz2, sx2, sy2, sz2);
+    this->SetBlockInfo(blockId++, mx2, oy2, oz2, sx2, sy2, sz2);
+    this->SetBlockInfo(blockId++, ox2, my2, oz2, sx2, sy2, sz2);
+    this->SetBlockInfo(blockId++, mx2, my2, oz2, sx2, sy2, sz2);
+    this->SetBlockInfo(blockId++, ox2, oy2, mz2, sx2, sy2, sz2);
+    this->SetBlockInfo(blockId++, mx2, oy2, mz2, sx2, sy2, sz2);
+    this->SetBlockInfo(blockId++, ox2, my2, mz2, sx2, sy2, sz2);
+    this->SetBlockInfo(blockId++, mx2, my2, mz2, sx2, sy2, sz2);
+  this->SetBlockInfo(blockId++, mx1, my1, mz1, sx1, sy1, sz1);
+
+  this->AddFractalArray();
+  this->AddBlockIdArray();
+  this->AddDepthArray(sx1);
+
+  if (this->GhostLevels > 0)
+    {
+    this->AddGhostLevelArray();
+    }
+}
+*/
 //----------------------------------------------------------------------------
 void vtkCTHFractal::Execute()
 {
@@ -403,7 +537,7 @@ void vtkCTHFractal::AddGhostLevelArray()
   int *dims = output->GetDimensions();
   int i, j, k;
   unsigned char* ptr;
-  int level, tmp;
+  int iLevel, jLevel, kLevel, tmp;
 
   array->SetNumberOfTuples(numCells);
   ptr = (unsigned char*)(array->GetVoidPointer(0));
@@ -416,33 +550,33 @@ void vtkCTHFractal::AddGhostLevelArray()
 
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
-    level = 0;
     for (k = 1; k < dims[2]; ++k)
       {
-      tmp = this->GhostLevels - k + 1;
-      if (tmp > level) { level = tmp;}
+      kLevel = this->GhostLevels - k + 1;
       tmp = k - dims[2] + 1 + this->GhostLevels;
-      if (tmp > level) { level = tmp;}
+      if (tmp > kLevel) { kLevel = tmp;}
       for (j = 1; j < dims[1]; ++j)
         {
+        jLevel = kLevel;
         tmp = this->GhostLevels - j + 1;
-        if (tmp > level) { level = tmp;}
+        if (tmp > jLevel) { jLevel = tmp;}
         tmp = j - dims[1] + 1 + this->GhostLevels;
-        if (tmp > level) { level = tmp;}
+        if (tmp > jLevel) { jLevel = tmp;}
         for (i = 1; i < dims[0]; ++i)
           {
+          iLevel = jLevel;
           tmp = this->GhostLevels - i + 1;
-          if (tmp > level) { level = tmp;}
+          if (tmp > iLevel) { iLevel = tmp;}
           tmp = i - dims[0] + 1 + this->GhostLevels;
-          if (tmp > level) { level = tmp;}
+          if (tmp > iLevel) { iLevel = tmp;}
 
-          if (tmp <= 0)
+          if (iLevel <= 0)
             {
             *ptr = 0;
             }
           else
             {
-            *ptr = tmp;
+            *ptr = iLevel;
             }
           ++ptr;
           }
@@ -450,6 +584,7 @@ void vtkCTHFractal::AddGhostLevelArray()
       }
     }
 
+  //array->SetName("Test");
   array->SetName("vtkGhostLevels");
   output->GetCellData()->AddArray(array);
   array->Delete();

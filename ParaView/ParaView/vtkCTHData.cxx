@@ -42,7 +42,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.1");
+vtkCxxRevisionMacro(vtkCTHData, "1.2");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -501,6 +501,7 @@ void vtkCTHData::GetCell(vtkIdType cellId, vtkGenericCell *cell)
   int *dims = this->GetDimensions();
   int d01 = dims[0]*dims[1];
   int cellsPerBlock = this->GetNumberOfCellsPerBlock();
+  int blockPointOffset;
   int blockId = cellId / cellsPerBlock;
   int blockCellId = cellId - (blockId*cellsPerBlock);
   float *origin = this->GetBlockOrigin(blockId);
@@ -580,6 +581,7 @@ void vtkCTHData::GetCell(vtkIdType cellId, vtkGenericCell *cell)
     }
 
   // Extract point coordinates and point ids
+  blockPointOffset = this->GetNumberOfPointsPerBlock() * blockId;
   for (npts=0,loc[2]=kMin; loc[2]<=kMax; loc[2]++)
     {
     x[2] = origin[2] + (loc[2]+this->Extent[4]) * spacing[2]; 
@@ -590,7 +592,7 @@ void vtkCTHData::GetCell(vtkIdType cellId, vtkGenericCell *cell)
         {
         x[0] = origin[0] + (loc[0]+this->Extent[0]) * spacing[0]; 
 
-        idx = loc[0] + loc[1]*dims[0] + loc[2]*d01;
+        idx = blockPointOffset + loc[0] + loc[1]*dims[0] + loc[2]*d01;
         cell->PointIds->SetId(npts,idx);
         cell->Points->SetPoint(npts++,x);
         }
@@ -1038,13 +1040,13 @@ void vtkCTHData::ComputeBounds()
     origin = this->GetBlockOrigin(blockId);
     spacing = this->GetBlockSpacing(blockId);
 
-    bds[0] = origin[0] + (this->Extent[0] * spacing[0]);
-    bds[2] = origin[1] + (this->Extent[2] * spacing[1]);
-    bds[4] = origin[2] + (this->Extent[4] * spacing[2]);
+    bds[0] = origin[0] + ((this->Extent[0]+this->NumberOfGhostLevels) * spacing[0]);
+    bds[2] = origin[1] + ((this->Extent[2]+this->NumberOfGhostLevels) * spacing[1]);
+    bds[4] = origin[2] + ((this->Extent[4]+this->NumberOfGhostLevels) * spacing[2]);
 
-    bds[1] = origin[0] + (this->Extent[1] * spacing[0]);
-    bds[3] = origin[1] + (this->Extent[3] * spacing[1]);
-    bds[5] = origin[2] + (this->Extent[5] * spacing[2]);
+    bds[1] = origin[0] + ((this->Extent[1]-this->NumberOfGhostLevels) * spacing[0]);
+    bds[3] = origin[1] + ((this->Extent[3]-this->NumberOfGhostLevels) * spacing[1]);
+    bds[5] = origin[2] + ((this->Extent[5]-this->NumberOfGhostLevels) * spacing[2]);
     if (blockId == 0)
       {
       this->Bounds[0] = bds[0];
@@ -1281,8 +1283,8 @@ void vtkCTHData::InternalCTHDataCopy(vtkCTHData *src)
   for (idx = 0; idx < 3; ++idx)
     {
     this->Dimensions[idx] = src->Dimensions[idx];
-    this->Extent[i] = src->Extent[i];
-    this->Extent[i+3] = src->Extent[i+3];
+    this->Extent[idx] = src->Extent[idx];
+    this->Extent[idx+3] = src->Extent[idx+3];
     }
   this->NumberOfGhostLevels = src->NumberOfGhostLevels;
 }
