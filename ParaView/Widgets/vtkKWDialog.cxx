@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.29");
+vtkCxxRevisionMacro(vtkKWDialog, "1.30");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -63,6 +63,7 @@ vtkKWDialog::vtkKWDialog()
   this->BeepType = 0;
   this->MasterWindow = 0;
   this->InvokeAtPointer = 0;
+  this->Grab = 1;
 }
 
 vtkKWDialog::~vtkKWDialog()
@@ -141,7 +142,10 @@ int vtkKWDialog::Invoke()
 
   this->Script("focus %s",this->GetWidgetName());
   this->Script("update idletasks");
-  this->Script("grab %s",this->GetWidgetName());
+  if ( this->Grab )
+    {
+    this->Script("grab %s",this->GetWidgetName());
+    }
   if ( this->Beep )
     {
     this->Script("bell");
@@ -153,7 +157,10 @@ int vtkKWDialog::Invoke()
     {
     Tcl_DoOneEvent(0);    
     }
-  this->Script("grab release %s",this->GetWidgetName());
+  if ( this->Grab )
+    {
+    this->Script("grab release %s",this->GetWidgetName());
+    }
 
   this->Application->SetDialogUp(0);
   return (this->Done-1);
