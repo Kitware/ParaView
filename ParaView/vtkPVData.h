@@ -102,6 +102,10 @@ public:
   void RemovePVSourceFromUsers(vtkPVSource *s);
   vtkPVSourceCollection *GetPVSourceUsers() {return this->PVSourceCollection;}
 
+  // Description:
+  // This methiod updates the piece that has been assinged to this process.
+  void Update();
+  
 protected:
   vtkPVData();
   ~vtkPVData();

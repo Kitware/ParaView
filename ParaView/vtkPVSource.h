@@ -266,6 +266,8 @@ protected:
 
   vtkKWWidget       *Properties;
   void              UpdateProperties();
+  void              UpdateScalarsMenu();
+
   vtkKWLabeledFrame *ParameterFrame;
   
   vtkKWWidgetCollection *Widgets;

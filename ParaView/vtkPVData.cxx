@@ -254,6 +254,17 @@ void vtkPVData::RemovePVSourceFromUsers(vtkPVSource *s)
   this->PVSourceCollection->RemoveItem(s);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVData::Update()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  // The mapper has the assignment for this processor.
+  pvApp->BroadcastScript("%s SetUpdateExtent [%s GetPiece] [%s GetNumberOfPieces]", 
+			 this->VTKDataTclName, 
+			 this->MapperTclName, this->MapperTclName);
+  pvApp->BroadcastScript("%s Update", this->VTKDataTclName);
+}
 
 
 

@@ -428,13 +428,21 @@ void vtkPVSource::CreateProperties()
   this->UpdateParameterWidgets();
 }
 
-void vtkPVSource::PackScalarsMenu()
+void vtkPVSource::UpdateScalarsMenu()
 {
   int i, defaultSet = 0;
-  vtkFieldData *fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetFieldData();
+  vtkFieldData *fd;
+  
+  if (this->GetNumberOfPVInputs() == 0)
+    {
+    return;
+    }
+  
+  fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetFieldData();
   
   if (fd)
     {
+    this->ScalarOperationMenu->ClearEntries();
     for (i = 0; i < fd->GetNumberOfArrays(); i++)
       {
       if (fd->GetArray(i)->GetNumberOfComponents() == 1)
@@ -449,7 +457,11 @@ void vtkPVSource::PackScalarsMenu()
         }
       }
     }
-  
+}
+
+void vtkPVSource::PackScalarsMenu()
+{
+  this->UpdateScalarsMenu();
   this->Script("pack %s %s -side left -fill x",
                this->ScalarOperationLabel->GetWidgetName(),
                this->ScalarOperationMenu->GetWidgetName());
@@ -896,6 +908,9 @@ void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateProperties()
 {
+  int num, idx;
+  vtkPVData *input;
+  
   // --------------------------------------
   // Change the state of the delete button based on if there are any useres.
   // Only filters at the end of a pipeline can be deleted.
@@ -912,6 +927,15 @@ void vtkPVSource::UpdateProperties()
       }
   
   this->GetWindow()->GetMainView()->UpdateNavigationWindow(this);
+  
+  // Make sure all the inputs are up to date.
+  num = this->GetNumberOfPVInputs();
+  for (idx = 0; idx < num; ++idx)
+    {
+    input = this->GetNthPVInput(idx);
+    input->Update();
+    }
+  this->UpdateScalarsMenu();  
 }
   
 //----------------------------------------------------------------------------
