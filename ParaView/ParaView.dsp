@@ -325,7 +325,23 @@ SOURCE=.\vtkPVPolyData.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVPolyDataSource.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVPolyDataSourceTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVPolyDataTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVPolyDataToPolyDataFilter.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVPolyDataToPolyDataFilterTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -991,6 +1007,46 @@ SOURCE=.\vtkPVPolyData.h
 # Begin Custom Build
 InputPath=.\vtkPVPolyData.h
 InputName=vtkPVPolyData
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVPolyDataSource.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVPolyDataSource.h
+InputName=vtkPVPolyDataSource
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVPolyDataToPolyDataFilter.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVPolyDataToPolyDataFilter.h
+InputName=vtkPVPolyDataToPolyDataFilter
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

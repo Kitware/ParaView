@@ -52,7 +52,7 @@ public:
   // Just like in vtk data objects, this method makes a data object
   // that is of the same type as the original.  It is used for creating
   // the output pvData in pvDataSetToDataSetFilters.
-  virtual vtkPVData *MakeObject() {vtkErrorMacro("No MakeObject");}
+  virtual vtkPVData *MakeObject(){vtkErrorMacro("No MakeObject");return NULL;}
   
   // Description:
   // This duplicates the object in the satellite processes.

@@ -47,7 +47,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
   Tcl_Interp *interp = vtkKWApplication::InitializeTcl(argc,argv);
   
   // Why is this here?  Doesn't the superclass initialize this?
-  if (vtkKWApplication::WidgetVisibility)
+  if (vtkKWApplication::GetWidgetVisibility())
     {
     Vtktkrenderwidget_Init(interp);
     }
