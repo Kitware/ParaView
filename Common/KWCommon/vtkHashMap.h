@@ -24,7 +24,7 @@
 // vtkAbstractMap
 
 #include "vtkAbstractMap.h"
-#include "vtkWIndows.h" // used for windows.h
+#include "vtkWindows.h" // used for windows.h
 #ifndef __vtkHashMap_h
 #define __vtkHashMap_h
 
