@@ -46,21 +46,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWChangeColorButton_h
 #define __vtkKWChangeColorButton_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWLabeledWidget.h"
 
-class vtkKWApplication;
-class vtkKWLabel;
-
-class VTK_EXPORT vtkKWChangeColorButton : public vtkKWWidget
+class VTK_EXPORT vtkKWChangeColorButton : public vtkKWLabeledWidget
 {
 public:
   static vtkKWChangeColorButton* New();
-  vtkTypeRevisionMacro(vtkKWChangeColorButton,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWChangeColorButton,vtkKWLabeledWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, const char *args);
+  // Create the widget
+  virtual void Create(vtkKWApplication *app, const char *args = 0);
 
   // Description:
   // Set/Get the current color
@@ -69,7 +66,7 @@ public:
   virtual float *GetColor() {return this->Color;};
 
   // Description:
-  // Set the label to be used on the button
+  // Set the label to be used on the button.
   vtkSetStringMacro(Text);
   vtkGetStringMacro(Text);
  
@@ -92,12 +89,15 @@ public:
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set or get enabled state.
+  // Set/Get the enabled state.
+  // Override to pass down to children.
   virtual void SetEnabled(int);
 
   // Description:
-  // Access to the label
-  vtkGetObjectMacro(Label, vtkKWLabel);
+  // Set the string that enables balloon help for this widget.
+  // Override to pass down to children.
+  virtual void SetBalloonHelpString(const char *str);
+  virtual void SetBalloonHelpJustification(int j);
 
   // Description:
   // Set the label to be placed after the color button. Default is before.
@@ -120,7 +120,6 @@ protected:
   vtkKWChangeColorButton();
   ~vtkKWChangeColorButton();
 
-  vtkKWLabel  *Label;
   vtkKWWidget *ColorButton;
   vtkKWWidget *MainFrame;
 
@@ -133,7 +132,10 @@ protected:
   void Bind();
   void UnBind();
   void UpdateColorButton();
-  void Pack();
+
+  // Pack or repack the widget
+
+  virtual void Pack();
 
 private:
   vtkKWChangeColorButton(const vtkKWChangeColorButton&); // Not implemented

@@ -47,15 +47,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.24");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.25");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
-                      int argc, char *argv[]);
+                                  int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkKWChangeColorButton::vtkKWChangeColorButton()
 {
   this->CommandFunction = vtkKWChangeColorButtonCommand;
+
   this->Command = NULL;
 
   this->Color[0] = 1.0;
@@ -68,7 +69,6 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
   this->Text = NULL;
   this->SetText("Set Color");
 
-  this->Label = vtkKWLabel::New();
   this->ColorButton = vtkKWWidget::New();
   this->MainFrame = vtkKWWidget::New();
 }
@@ -83,9 +83,17 @@ vtkKWChangeColorButton::~vtkKWChangeColorButton()
 
   this->SetText(0);
 
-  this->Label->Delete();
-  this->ColorButton->Delete();
-  this->MainFrame->Delete();
+  if (this->ColorButton)
+    {
+    this->ColorButton->Delete();
+    this->ColorButton = NULL;
+    }
+
+  if (this->MainFrame)
+    {
+    this->MainFrame->Delete();
+    this->MainFrame = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -106,6 +114,8 @@ void vtkKWChangeColorButton::SetColor(float r, float g, float b)
 //----------------------------------------------------------------------------
 void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 {
+  // Check if already created
+
   if (this->IsCreated())
     {
     vtkErrorMacro("Change color button already created");
@@ -113,8 +123,11 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
     }
 
   this->SetApplication(app);
+ 
+  // Do not call vtkKWLabeledWidget::Create() here since we have to create
+  // the Label in a special way.
 
-  // Create the top level
+  // Create the container frame
 
   this->Script("frame %s -relief flat -bd 0 -highlightthickness	0 %s", 
                this->GetWidgetName(), args ? args : "");
@@ -124,10 +137,10 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
   this->MainFrame->SetParent(this);
   this->MainFrame->Create(this->Application, "frame", "-relief raised -bd 2");
 
-  // Create the label
+  // Create the label.
 
   this->Label->SetParent(this->LabelOutsideButton ? this : this->MainFrame);
-  this->Label->Create(this->Application, 0);
+  this->Label->Create(app, "");
   this->Label->SetLabel(this->Text);
 
   // Create the color button
@@ -156,6 +169,13 @@ void vtkKWChangeColorButton::Pack()
     return;
     }
 
+  // Unpack everything
+
+  this->Label->UnpackSiblings();
+  this->MainFrame->UnpackSiblings();
+
+  // Repack everything
+
   if (this->LabelOutsideButton)
     {
     this->Script("pack %s -expand n -fill both -padx 2 -pady 2",
@@ -173,7 +193,7 @@ void vtkKWChangeColorButton::Pack()
                  this->LabelAfterColor ? 0 : 1);
     }
 
-  if (this->Text && strlen(this->Text) > 0)
+  if (this->ShowLabel)
     { 
     this->Script("grid %s -row 0 -column %d -sticky news", 
                  this->Label->GetWidgetName(),
@@ -185,6 +205,9 @@ void vtkKWChangeColorButton::Pack()
                  this->Label->GetParent()->GetWidgetName(),
                  this->LabelAfterColor ? 0 : 1);
     }
+
+  this->Script("grid rowconfigure %s 0 -weight 1", 
+               this->MainFrame->GetParent()->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -326,19 +349,15 @@ void vtkKWChangeColorButton::SetEnabled(int e)
 
   if (this->IsCreated())
     {
-    this->Label->SetEnabled(e);
     this->ColorButton->SetEnabled(e);
     }
 
-  // Then update internal Enabled ivar
+  // Then call superclass, which will call SetEnabled on the label and 
+  // update the internal Enabled ivar (although it is not of much use here)
 
-  if (this->Enabled == e)
-    {
-    return;
-    }
+  this->Superclass::SetEnabled(e);
 
-  this->Enabled = e;
-  this->Modified();
+  // Now given the state, bind or unbind
 
   if (this->IsCreated())
     {
@@ -351,6 +370,28 @@ void vtkKWChangeColorButton::SetEnabled(int e)
       {
       this->UnBind();
       }
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWChangeColorButton::SetBalloonHelpString(const char *string)
+{
+  this->Superclass::SetBalloonHelpString(string);
+
+  if (this->ColorButton)
+    {
+    this->ColorButton->SetBalloonHelpString(string);
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWChangeColorButton::SetBalloonHelpJustification(int j)
+{
+  this->Superclass::SetBalloonHelpJustification(j);
+
+  if (this->ColorButton)
+    {
+    this->ColorButton->SetBalloonHelpJustification(j);
     }
 }
 
@@ -448,7 +489,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.24 $");
+  this->ExtractRevision(os,"$Revision: 1.25 $");
 }
 
 //----------------------------------------------------------------------------
@@ -457,8 +498,6 @@ void vtkKWChangeColorButton::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Text: " << this->GetText() << endl;
-
-  os << indent << "Label: " << this->Label << endl;
 
   os << indent << "LabelAfterColor: " 
      << (this->LabelAfterColor ? "On\n" : "Off\n");
