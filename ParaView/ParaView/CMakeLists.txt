@@ -181,7 +181,7 @@ SET( ParaView_SRCS
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaView_SRCS
     ${ParaView_SRCS}
-    vtkIceTComposite.cxx
+    #vtkIceTComposite.cxx
     vtkIceTRenderer.cxx
     vtkIceTRenderManager.cxx
     vtkParallelRenderManager.cxx
@@ -189,6 +189,7 @@ IF (PARAVIEW_USE_ICE_T)
     vtkCompositeRenderManager.cxx
     vtkPVIceTDisplayRenderModuleUI.cxx
     vtkPVIceTDisplayRenderModule.cxx
+    vtkIceTClientCompositeManager.cxx
     )
   SET_SOURCE_FILES_PROPERTIES(
     vtkParallelRenderManager.cxx
@@ -240,7 +241,7 @@ IF(XDMF_FOUND)
   TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkXdmfTCL)
 ENDIF(XDMF_FOUND)
 IF(PARAVIEW_USE_ICE_T)
-  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${ICE_T_LIBRARY})
+  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL icet icet_mpi icet_strategies)
   INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
 ENDIF(PARAVIEW_USE_ICE_T)
 
@@ -271,14 +272,18 @@ IF(WIN32)
   SET(ParaViewBinary_SRCS ${ParaViewBinary_SRCS} ParaView.rc)
 ENDIF(WIN32)
 
-# Work-around for CMake 1.6 bug.  Executables added on UNIX with the
-# WIN32 marker do not use proper flags when linking to shared
-# libraries.  Just leave the WIN32 marker off for UNIX.
-IF(UNIX)
-  ADD_EXECUTABLE(paraview ${ParaViewBinary_SRCS})      
-ELSE(UNIX)
-  ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS})
-ENDIF(UNIX)
+ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS}) 
+IF(VTK_USE_CARBON)
+  FIND_PROGRAM(VTK_APPLE_RESOURCE Rez /Developer/Tools)
+  IF(VTK_APPLE_RESOURCE)
+    ADD_CUSTOM_COMMAND(
+      SOURCE paraview
+      COMMAND ${VTK_APPLE_RESOURCE}
+      ARGS Carbon.r -o ${EXECUTABLE_OUTPUT_PATH}/paraview
+      TARGET paraview
+      )
+  ENDIF(VTK_APPLE_RESOURCE)
+ENDIF(VTK_USE_CARBON)
 
 TARGET_LINK_LIBRARIES (paraview
   vtkKWParaViewTCL)
