@@ -342,8 +342,17 @@ proc auto_load {cmd {namespace {}}} {
     lappend nameList $cmd
     foreach name $nameList {
 	if {[info exists auto_index($name)]} {
-	    uplevel #0 $auto_index($name)
-	    return [expr {[info commands $name] != ""}]
+	    namespace eval :: $auto_index($name)
+	    # There's a couple of ways to look for a command of a given
+	    # name.  One is to use
+	    #    info commands $name
+	    # Unfortunately, if the name has glob-magic chars in it like *
+	    # or [], it may not match.  For our purposes here, a better
+	    # route is to use 
+	    #    namespace which -command $name
+	    if {[namespace which -command $name] ne ""} {
+		return 1
+	    }
 	}
     }
     if {![info exists auto_path]} {
@@ -355,15 +364,8 @@ proc auto_load {cmd {namespace {}}} {
     }
     foreach name $nameList {
 	if {[info exists auto_index($name)]} {
-	    uplevel #0 $auto_index($name)
-	    # There's a couple of ways to look for a command of a given
-	    # name.  One is to use
-	    #    info commands $name
-	    # Unfortunately, if the name has glob-magic chars in it like *
-	    # or [], it may not match.  For our purposes here, a better
-	    # route is to use 
-	    #    namespace which -command $name
-	    if { ![string equal [namespace which -command $name] ""] } {
+	    namespace eval :: $auto_index($name)
+	    if {[namespace which -command $name] ne ""} {
 		return 1
 	    }
 	}
@@ -516,10 +518,9 @@ proc auto_import {pattern} {
 
     foreach pattern $patternList {
         foreach name [array names auto_index $pattern] {
-            if {[string equal "" [info commands $name]]
-		    && [string equal [namespace qualifiers $pattern] \
-				     [namespace qualifiers $name]]} {
-                uplevel #0 $auto_index($name)
+            if {([namespace which -command $name] eq "")
+		    && ([namespace qualifiers $pattern] eq [namespace qualifiers $name])} {
+                namespace eval :: $auto_index($name)
             }
         }
     }
