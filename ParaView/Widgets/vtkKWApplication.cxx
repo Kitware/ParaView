@@ -72,7 +72,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.94");
+vtkCxxRevisionMacro(vtkKWApplication, "1.95");
 
 
 
@@ -157,7 +157,6 @@ vtkKWApplication::vtkKWApplication()
 
 vtkKWApplication::~vtkKWApplication()
 {
-  cout << "Fooo" << endl;
   if ( this->BalloonHelpWindow )
     {
     this->BalloonHelpWindow->Delete();
