@@ -130,6 +130,13 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   ctf->AddRGBPoint(0.0,   1.0, 1.0, 1.0);
   ctf->AddRGBPoint(255.0,   1.0, 1.0, 1.0);
   this->VolumeProperty->SetColor(ctf);
+  
+  vtkPiecewiseFunction *gof = vtkPiecewiseFunction::New();
+  gof->AddPoint(0,0.0);
+  gof->AddPoint(1,0.0);
+  gof->AddPoint(2,0.0);
+  gof->AddPoint(3,0.0);
+  this->VolumeProperty->SetGradientOpacity(gof);
 
   this->CommandFunction = vtkKWVolumeCompositeCommand;
 
@@ -147,6 +154,7 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
 
   pwf->Delete();
   ctf->Delete();
+  gof->Delete();
 }
 
 vtkKWVolumeComposite::~vtkKWVolumeComposite()
@@ -327,13 +335,11 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
   pwf->AddPoint(  0, 0.0);
   pwf->AddPoint(max, 1.0);
   
-  pwf = vtkPiecewiseFunction::New();
+  pwf = this->VolumeProperty->GetGradientOpacity();
   pwf->AddPoint(         0.0, 0.0);
   pwf->AddPoint(         1.0, 0.0);
   pwf->AddPoint( (max/ 50.0), 1.0);
   pwf->AddPoint(         max, 1.0);
-  this->VolumeProperty->SetGradientOpacity(pwf);
-  pwf->Delete();
   this->VolumeProMapper->GradientOpacityModulationOn();
 }
 
@@ -348,5 +354,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.8 $");
+  this->ExtractRevision(os,"$Revision: 1.9 $");
 }
