@@ -73,6 +73,9 @@ vtkPVPlaneWidget::vtkPVPlaneWidget()
   this->NormalZButton = vtkKWPushButton::New();
 
   this->PlaneTclName = NULL;
+
+  this->ObjectTclName = NULL;
+  this->VariableName = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -101,6 +104,9 @@ vtkPVPlaneWidget::~vtkPVPlaneWidget()
     this->GetPVApplication()->BroadcastScript("%s Delete", this->PlaneTclName);
     this->SetPlaneTclName(NULL);
     }
+
+  this->SetObjectTclName(NULL);
+  this->SetVariableName(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -326,6 +332,8 @@ void vtkPVPlaneWidget::Reset()
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::Accept()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   if ( this->CenterEntry->GetModifiedFlag())
     {
     this->CenterEntry->Accept();
@@ -336,10 +344,35 @@ void vtkPVPlaneWidget::Accept()
     this->NormalEntry->Accept();
     }
 
+  // Set this here to keep this widget like others.
+  if (this->ObjectTclName && this->VariableName && this->PlaneTclName)
+    {
+    pvApp->BroadcastScript("%s Set%s %s", this->ObjectTclName,
+                           this->VariableName, this->PlaneTclName);
+    }
   this->ModifiedFlag = 0;
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVPlaneWidget::SetObjectVariable(const char* objName, 
+                                         const char* varName)
+{
+  this->SetObjectTclName(objName);
+  this->SetVariableName(varName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlaneWidget::SaveInTclScript(ofstream *file)
+{
+  *file << "vtkPlane " << this->PlaneTclName << endl;
+
+  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
+        << " " << this->PlaneTclName << endl;
+
+  this->CenterEntry->SaveInTclScript(file);
+  this->NormalEntry->SaveInTclScript(file);
+}
 
 
 

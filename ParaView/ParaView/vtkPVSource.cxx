@@ -627,7 +627,7 @@ void vtkPVSource::Accept(int hideFlag)
       {
       if (this->ReplaceInput)
         {
-        input->SetVisibility(0);
+        input->SetVisibilityInternal(0);
         }
       }
     // The best test I could come up with to only reset
@@ -650,7 +650,7 @@ void vtkPVSource::Accept(int hideFlag)
       }
     else
       {
-      this->SetVisibility(0);
+      this->GetPVOutput()->SetVisibilityInternal(0);
       }
 
     // Remove the local grab
@@ -748,7 +748,7 @@ void vtkPVSource::DeleteCallback()
       }
     else
       {
-      prev->SetVisibility(1);
+      prev->GetPVOutput()->SetVisibilityInternal(1);
       }
     }
 
@@ -967,7 +967,7 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
   
   if (this->PVInputs[idx])
     {
-    this->PVInputs[idx]->SetVisibility(1);
+    this->PVInputs[idx]->SetVisibilityInternal(1);
     this->PVInputs[idx]->RemovePVConsumer(this);
     this->PVInputs[idx]->UnRegister(this);
     this->PVInputs[idx] = NULL;
@@ -977,7 +977,7 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
     {
     if (this->ReplaceInput)
       {
-      pvd->SetVisibility(0);
+      pvd->SetVisibilityInternal(0);
       }
     pvd->Register(this);
     pvd->AddPVConsumer(this);

@@ -202,7 +202,7 @@ void vtkPVArraySelection::Reset()
         checkButton = vtkKWCheckButton::New();
         checkButton->SetParent(this->CheckFrame);
         checkButton->Create(this->Application, "");
-        this->Script("%s SetText [%s GetNameOf%sArray %d]", 
+        this->Script("%s SetText [%s Get%sArrayName %d]", 
                      checkButton->GetTclName(), 
                      this->VTKReaderTclName, this->AttributeName, idx);
         this->Script("grid %s -row %d -sticky w", checkButton->GetWidgetName(), row);
@@ -240,12 +240,27 @@ void vtkPVArraySelection::Accept()
     vtkErrorMacro("VTKREader has not been set.");
     }
 
+  if (this->ModifiedFlag == 0)
+    {
+    return;
+    }
+
   this->ArrayCheckButtons->InitTraversal();
   while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    pvApp->BroadcastScript("%s Set%sArrayStatus {%s} %d", 
-                           this->VTKReaderTclName, this->AttributeName, 
-                           check->GetText(), check->GetState());
+    // This is only here to try to avoid extra lines in the trace file.
+    // We could make every check button a pv widget.
+    this->Script("%s Get%sArrayStatus {%s}", this->VTKReaderTclName,
+                 this->AttributeName, check->GetText());
+    if (this->GetIntegerResult(this->Application) != check->GetState())
+      {
+      pvApp->BroadcastScript("%s Set%sArrayStatus {%s} %d", 
+                             this->VTKReaderTclName, this->AttributeName, 
+                             check->GetText(), check->GetState());    
+
+      this->AddTraceEntry("$kw(%s) SetArrayStatus {%s} %d", this->GetTclName(), 
+                          check->GetText(), check->GetState());
+      }
     }
 }
 
@@ -294,6 +309,53 @@ void vtkPVArraySelection::AllOffCallback()
     {
     this->ModifiedCallback();
     }   
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::SetArrayStatus(const char *name, int status)
+{
+  vtkKWCheckButton *check;
+
+  this->ArrayCheckButtons->InitTraversal();
+  while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
+    {
+    if ( strcmp(check->GetText(), name) == 0)
+      {
+      check->SetState(status);
+      return;
+      }
+    }  
+  vtkErrorMacro("Could not find array: " << name);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::SaveInTclScript(ofstream *file)
+{
+  vtkKWCheckButton *check;
+  int state;
+
+  // Create new check buttons.
+  if (this->VTKReaderTclName == NULL)
+    {
+    vtkErrorMacro("VTKReader has not been set.");
+    }
+
+  this->ArrayCheckButtons->InitTraversal();
+  while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
+    {
+    this->Script("%s Get%sArrayStatus {%s}", this->VTKReaderTclName,
+                 this->AttributeName, check->GetText());
+    state = this->GetIntegerResult(this->Application);
+    // Since they default to on.
+    if (state == 0)
+      {
+      *file << "\t";
+      *file << this->VTKReaderTclName << " Set" << this->AttributeName << "ArrayStatus {" 
+            << check->GetText() << "} " << state << endl;
+       
+      }
+    }
 }
 
 

@@ -461,6 +461,32 @@ void vtkPVArrayMenu::Reset()
   this->Update();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::SaveInTclScript(ofstream *file)
+{
+  const char* attributeName;
+
+  attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
+
+  if (this->ArrayName)
+    {
+    *file << "\t";
+    *file << this->ObjectTclName << " Select" << this->InputName
+          << attributeName << " {" << this->ArrayName << "}\n";
+    }
+  else
+    {
+    *file << "\t";
+    *file << this->ObjectTclName << " Select" << this->InputName
+          << attributeName << " {}\n";
+    }
+  if (this->ShowComponentMenu)
+    {
+    *file << "\t";
+    *file << this->ObjectTclName << " Select" << this->InputName
+          << attributeName << "Component "  << this->SelectedComponent << endl;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::Update()
@@ -468,7 +494,6 @@ void vtkPVArrayMenu::Update()
   this->UpdateArrayMenu();
   this->vtkPVWidget::Update();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::UpdateArrayMenu()

@@ -1067,8 +1067,6 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
     this->AddRecentFile(NULL, openFileName, this, "OpenRecentFile");
     }
 
-  this->SetCurrentPVSource(pvs);
-
   return pvs;
 }
 

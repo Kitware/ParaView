@@ -330,3 +330,4 @@ void vtkPVInputMenu::Reset()
     this->ModifiedFlag = 1;
     }
 }
+

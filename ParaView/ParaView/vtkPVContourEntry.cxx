@@ -286,6 +286,25 @@ void vtkPVContourEntry::Accept()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVContourEntry::SaveInTclScript(ofstream *file)
+{
+  int i;
+  float value;
+  int numContours;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  numContours = this->ContourValuesList->GetNumberOfItems();
+
+  for (i = 0; i < numContours; i++)
+    {
+    value = atof(this->ContourValuesList->GetItem(i));
+    *file << "\t";
+    *file << this->PVSource->GetVTKSourceTclName() << " SetValue " 
+          << i << " " << value << endl;
+    }
+}
+
+//----------------------------------------------------------------------------
 // If we had access to the ContourValues object of the filter,
 // this would be much easier.  We would not have to rely on Tcl calls.
 void vtkPVContourEntry::Reset()

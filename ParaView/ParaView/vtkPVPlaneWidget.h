@@ -100,6 +100,18 @@ public:
   vtkGetObjectMacro(CenterEntry, vtkPVVectorEntry);
   vtkGetObjectMacro(NormalEntry, vtkPVVectorEntry);
 
+  // Description:
+  // This interface is the same as vtkPVObjectWidget, and it might make
+  // sense to make this class a subclass of vtkPVObject widget.
+  // In this case the object is the clip or cut filter, adn the
+  // variable is the name of the implicit function in the 
+  // filter: "ClipFunction" or "CutFunction"
+  void SetObjectVariable(const char *objectTclName, const char *var);
+
+  // Description:
+  // For saving the widget into a VTK tcl script.
+  void SaveInTclScript(ofstream *file);
+
 protected:
   vtkPVPlaneWidget();
   ~vtkPVPlaneWidget();
@@ -121,6 +133,11 @@ protected:
 
   char *PlaneTclName;
   vtkSetStringMacro(PlaneTclName);
+
+  char *ObjectTclName;
+  char *VariableName;
+  vtkSetStringMacro(ObjectTclName);
+  vtkSetStringMacro(VariableName);
 };
 
 #endif

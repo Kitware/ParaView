@@ -173,7 +173,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name,
 
   // If a name is specified, then we are creating a glyph source.  We do not want
   // to trace the creation of these sources.
-  if (name == NULL)
+  if (name == NULL && pvs->GetTraceInitialized() == 0)
     {  
     pvApp->AddTraceEntry("set kw(%s) [$kw(%s) CreatePVSource %s]", 
                          pvs->GetTclName(), this->PVWindow->GetTclName(),

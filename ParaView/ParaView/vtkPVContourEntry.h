@@ -96,6 +96,10 @@ public:
   void SetPVSource(vtkPVSource *pvs) { this->PVSource = pvs;}
   vtkPVSource *GetPVSource() { return this->PVSource;}
 
+  // Description:
+  // The widget saves it state/command in the vtk tcl script.
+  void SaveInTclScript(ofstream *file);
+
 protected:
   vtkPVContourEntry();
   ~vtkPVContourEntry();

@@ -103,15 +103,15 @@ void vtkPVClipPlane::CreateProperties()
   this->Script("pack %s -side top -fill x", planeWidget->GetWidgetName());
   planeWidget->SetTraceName("Plane");
   this->AddPVWidget(planeWidget);
+
+
   // This makes the assumption that the vtkClipDataSet filter 
   // has already been set.  In the future we could also implement 
   // the virtual method "SetVTKSource" to catch the condition when
   // the VTKSource is set after the properties are created.
   if (this->VTKSourceTclName != NULL)
     {
-    this->GetPVApplication()->BroadcastScript("%s SetClipFunction %s", 
-                                              this->VTKSourceTclName,
-                                              planeWidget->GetPlaneTclName());
+    planeWidget->SetObjectVariable(this->VTKSourceTclName, "ClipFunction");
     }
   else
     {

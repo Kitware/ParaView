@@ -144,6 +144,10 @@ public:
   virtual void Reset();
 
   // Description:
+  // The widget saves it state/command in the vtk tcl script.
+  void SaveInTclScript(ofstream *file);
+
+  // Description:
   // Set the menus value as a string.
   // Used by the Accept and Reset callbacks.
   // Can also be used from a script.

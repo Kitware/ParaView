@@ -1773,8 +1773,6 @@ void vtkPVData::CenterCamera()
 //----------------------------------------------------------------------------
 void vtkPVData::VisibilityCheckCallback()
 {
-  this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), 
-                      this->VisibilityCheck->GetState());
   this->SetVisibility(this->VisibilityCheck->GetState());
   this->GetPVRenderView()->EventuallyRender();
 }
@@ -1782,8 +1780,27 @@ void vtkPVData::VisibilityCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::SetVisibility(int v)
 {
+  if (this->VisibilityCheck->GetState() != v)
+    {
+    // Here incase this is called from a script.
+    this->AddTraceEntry("$kw(%s) SetVisibilityTraced %d", this->GetTclName(), v);
+    }
+
+  this->SetVisibilityInternal(v);
+}
+  
+//----------------------------------------------------------------------------
+void vtkPVData::SetVisibilityInternal(int v)
+{
   vtkPVApplication *pvApp;
   pvApp = (vtkPVApplication*)(this->Application);
+
+
+  if (this->VisibilityCheck->GetState() != v)
+    {
+    this->VisibilityCheck->SetState(v);
+    }
+
   if (this->PropTclName)
     {
     pvApp->BroadcastScript("%s SetVisibility %d", this->PropTclName, v);
@@ -1792,14 +1809,6 @@ void vtkPVData::SetVisibility(int v)
     {
     pvApp->BroadcastScript("[%s GetInput] ReleaseData", this->MapperTclName);
     }
-
-  if (this->VisibilityCheck->GetState() != v)
-    {
-    this->VisibilityCheck->SetState(v);
-    // Here incase this is called from a script.
-    this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
-    }
-
 }
   
 //----------------------------------------------------------------------------

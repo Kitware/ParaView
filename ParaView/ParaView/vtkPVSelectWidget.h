@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    vtkPVArraySelection.h
+  Program:   ParaView
+  Module:    vtkPVSelectWidget.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,88 +39,77 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVArraySelection - widget to select a set of data arrays.
+// .NAME vtkPVSelectWidget - Select different subwidgets.
 // .SECTION Description
-// vtkPVArraySelection is used for selecting which set of data arrays to 
-// load when a reader has the ability to selectively load arrays.
+// This widget has a selection menu which will pack different
+// pvWidgets associated with selection values.  There is also an object
+// varible assumed to have different string values for each of the entries.
+// This widget was made for selecting clip functions or clip by scalar values.
 
-#ifndef __vtkPVArraySelection_h
-#define __vtkPVArraySelection_h
 
-#include "vtkDataSet.h"
+#ifndef __vtkPVSelectWidget_h
+#define __vtkPVSelectWidget_h
+
+#include "vtkPVObjectWidget.h"
 #include "vtkKWLabel.h"
-#include "vtkPVWidget.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWMenuButton.h"
 
-class vtkKWRadioButton;
-class vtkPVData;
+class vtkStringList;
+class vtkKWOptionMenu;
+class vtkKWLabel;
 
-class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
+class VTK_EXPORT vtkPVSelectWidget : public vtkPVObjectWidget
 {
 public:
-  static vtkPVArraySelection* New();
-  vtkTypeMacro(vtkPVArraySelection, vtkPVWidget);
+  static vtkPVSelectWidget* New();
+  vtkTypeMacro(vtkPVSelectWidget, vtkPVObjectWidget);
   
   // Description:
-  // This specifies whether to ues Cell or Point data.
-  // Options are "Cell" or "Point".  Possible "Field" in the future.
-  vtkSetStringMacro(AttributeName);
-  vtkGetStringMacro(AttributeName);
+  // Creates common widgets.
+  // Returns 0 if there was an error.
+  int Create(vtkKWApplication *app);
 
   // Description:
-  // Create a Tk widget
-  void Create(vtkKWApplication *app);
+  // Add widgets to the possible selection.
+  void AddItem(const char* label, vtkPVWidget *pvw, const char* value);
+  
+  // Description:
+  // Set the label of the menu.
+  void SetLabel(const char *label);
+  const char *GetLabel();
 
   // Description:
-  // This is the name of the VTK reader.
-  vtkSetStringMacro(VTKReaderTclName);
-  vtkGetStringMacro(VTKReaderTclName);
-    
-  // Description:
-  // Methods for setting the value of the VTKReader from the widget.
-  // User internally when user hits Accept.
+  // Called when accept button is pushed.
+  // Adds to the trace file and sets the objects variable from UI.
   virtual void Accept();
 
   // Description:
-  // Methods for setting the value of the widget from the VTKReader.
-  // User internally when user hits Reset.
+  // Called when reset button is pushed.
+  // Sets UI current value from objects variable.
   virtual void Reset();
 
   // Description:
-  // Callback for the AllOn and AllOff buttons.
-  void AllOnCallback();
-  void AllOffCallback();
-
-  // Description:
-  // Access to change this widgets state from a script. Used for tracing.
-  void SetArrayStatus(const char *name, int status);
-
-  // Description:
-  // Save this widget to a file.  
-  virtual void SaveInTclScript(ofstream *file);
-  
+  // This is how the user can query the state of the selection.
+  // The value is the label of the widget item.
+  const char* GetCurrentValue();
+  void SetCurrentValue(const char* val);
+    
 protected:
-  vtkPVArraySelection();
-  ~vtkPVArraySelection();
-  vtkPVArraySelection(const vtkPVArraySelection&) {};
-  void operator=(const vtkPVArraySelection&) {};
+  vtkPVSelectWidget();
+  ~vtkPVSelectWidget();
+  vtkPVSelectWidget(const vtkPVSelectWidget&) {};
+  void operator=(const vtkPVSelectWidget&) {};
 
-  char* AttributeName;
-  char* VTKReaderTclName;
+  vtkKWLabeledFrame *LabeledFrame;
+  vtkKWOptionMenu *Menu;
 
-  vtkKWLabeledFrame* LabeledFrame;
+  // Using this list as an array of strings.
+  vtkStringList *Labels;
+  vtkStringList *Values;
+  vtkCollection *Widgets;
 
-  vtkKWWidget* ButtonFrame;
-  vtkKWPushButton* AllOnButton;
-  vtkKWPushButton* AllOffButton;
-
-  vtkKWWidget *CheckFrame;
-  vtkCollection* ArrayCheckButtons;
-
-  // Description:
-  // Stores the file name to descide when to rebuild the array check list.
-  vtkSetStringMacro(FileName);
-  char *FileName;
+  vtkSetMacro(CurrentLabel);
+  char *CurrentLabel;
 };
 
 #endif
