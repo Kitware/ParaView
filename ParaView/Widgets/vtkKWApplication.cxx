@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkArrayMap.txx"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWBWidgets.h"
+#include "vtkKWDirectoryUtilities.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
@@ -69,7 +70,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.115");
+vtkCxxRevisionMacro(vtkKWApplication, "1.116");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -87,7 +88,7 @@ vtkKWApplication::vtkKWApplication()
   this->MinorVersion = 0;
   this->ApplicationVersionName = vtkString::Duplicate("Kitware10");
   this->ApplicationReleaseName = vtkString::Duplicate("unknown");
-  this->ApplicationPath = NULL;
+  this->ApplicationInstallationDirectory = NULL;
 
   this->InExit = 0;
   this->DialogUp = 0;
@@ -124,8 +125,6 @@ vtkKWApplication::vtkKWApplication()
     vtkErrorMacro("Interpreter not set. This probably means that Tcl was not initialized properly...");
     return;
     }
-
-  this->SetApplicationPath(this->Script("info nameofexecutable"));
 
   //vtkTclGetObjectFromPointer(this->MainInterp, (void *)this, 
   //                           vtkKWApplicationCommand);
@@ -194,7 +193,7 @@ vtkKWApplication::~vtkKWApplication()
   this->SetApplicationName(NULL);
   this->SetApplicationVersionName(NULL);
   this->SetApplicationReleaseName(NULL);
-  this->SetApplicationPath(NULL);
+  this->SetApplicationInstallationDirectory(NULL);
 
   if (this->TraceFile)
     {
@@ -211,6 +210,38 @@ vtkKWApplication::~vtkKWApplication()
 void vtkKWApplication::SetApplication(vtkKWApplication*) 
 { 
   vtkErrorMacro( << "Do not set the Application on an Application" << endl); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::FindApplicationInstallationDirectory()
+{
+  const char *nameofexec = this->Script("info nameofexecutable");
+  if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
+    {
+    char directory[MAX_PATH];
+    vtkKWDirectoryUtilities::GetFilenamePath(nameofexec, directory);
+    this->SetApplicationInstallationDirectory(directory);
+    }
+  else
+    {
+    char setup_key[1024];
+    sprintf(setup_key, "%s\\Setup", this->GetApplicationVersionName());
+    vtkKWRegisteryUtilities *reg 
+      = this->GetRegistery(this->GetApplicationName());
+    char installed_path[MAX_PATH];
+    if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
+      {
+      this->SetApplicationInstallationDirectory(installed_path);
+      }
+    else
+      {
+      this->SetApplicationInstallationDirectory("");
+      vtkKWMessageDialog::PopupMessage( 
+        this, 0, "Startup Error", 
+        "The application installation directory was not found.", 
+        vtkKWMessageDialog::ErrorIcon);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -553,32 +584,14 @@ void vtkKWApplication::DoOneTclEvent()
 void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
 {
 #ifdef _WIN32
-  char temp[1024];
-  char loc[1024];
-  vtkKWRegisteryUtilities *reg = this->GetRegistery();
-  sprintf(temp, "%s\\Setup", this->GetApplicationVersionName());
-  if ( !reg )
+  ostrstream temp;
+  if (this->ApplicationInstallationDirectory)
     {
-    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
-    dlg->SetMasterWindow(master);
-    dlg->Create(this,"");
-    dlg->SetText(
-      "Internal error... Cannot get the registery.");
-    dlg->Invoke();  
-    dlg->Delete();
+    temp << this->ApplicationInstallationDirectory << "/";
     }
-  if ( reg->ReadValue( temp, "InstalledPath", loc ) )
-    {
-    sprintf(temp,"%s/%s.chm::/Introduction.htm",
-            loc,this->ApplicationName);
-    }
-  else
-    {
-    sprintf(temp,"%s.chm::/Introduction.htm",
-            this->ApplicationName);
-    }
+  temp << this->ApplicationName << ".chm::/Introduction.htm" << ends;
   
-  if ( !HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0) )
+  if (!HtmlHelp(NULL, temp.str(), HH_DISPLAY_TOPIC, 0))
     {
     vtkKWMessageDialog::PopupMessage(
       this, master,
@@ -588,6 +601,9 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
       "corrupted. Please reinstall this program.", 
       vtkKWMessageDialog::ErrorIcon);
     }
+
+  temp.rdbuf()->freeze(0);
+
 #else
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetMasterWindow(master);

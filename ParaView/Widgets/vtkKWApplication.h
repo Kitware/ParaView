@@ -130,8 +130,9 @@ public:
   vtkGetStringMacro(ApplicationReleaseName);
   
   // Description:
-  // Get the full path to the current executable/application
-  vtkGetStringMacro(ApplicationPath);
+  // Set/Get the directory in which the current application is supposed
+  // to be installed.
+  vtkGetStringMacro(ApplicationInstallationDirectory);
   
   // Description:
   // Load script from a file. Resturn if script was successful.
@@ -307,8 +308,9 @@ protected:
   int MajorVersion;
   int MinorVersion;
 
-  vtkSetStringMacro(ApplicationPath);
-  char *ApplicationPath;
+  vtkSetStringMacro(ApplicationInstallationDirectory);
+  char *ApplicationInstallationDirectory;
+  virtual void FindApplicationInstallationDirectory();
 
   int ApplicationExited;
 
