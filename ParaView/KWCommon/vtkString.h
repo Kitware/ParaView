@@ -130,6 +130,13 @@ public:
   static char* RemoveChars(const char* str, const char *toremove);
 
   // Description:
+  // Remove all but some characters from a string.
+  // RemoveAllButUpperHex remove all but 0->9, A->F
+  // Return a pointer to a new allocated string.
+  static char* RemoveAllButChars(const char* str, const char *tokeep);
+  static char* RemoveAllButUpperHex(const char* str);
+
+  // Description:
   // Return the number of occurence of a char.
   static unsigned int CountChar(const char* str, char c);
 
