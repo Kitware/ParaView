@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.20");
+vtkCxxRevisionMacro(vtkPVWriter, "1.21");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -70,7 +70,7 @@ void vtkPVWriter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVWriter::CanWriteData(vtkDataSet* data, int parallel, int numParts)
+int vtkPVWriter::CanWriteData(vtkDataObject* data, int parallel, int numParts)
 {
   if (data == NULL)
     {

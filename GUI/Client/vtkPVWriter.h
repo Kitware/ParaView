@@ -24,7 +24,7 @@
 
 #include "vtkKWObject.h"
 
-class vtkDataSet;
+class vtkDataObject;
 class vtkPVApplication;
 class vtkPVSource;
 
@@ -70,7 +70,7 @@ public:
   
   // Description:
   // Check whether this writer supports the given VTK data set's type.
-  virtual int CanWriteData(vtkDataSet* data, int parallel, int numParts);
+  virtual int CanWriteData(vtkDataObject* data, int parallel, int numParts);
   
   // Description:
   // This just returns the application typecast correctly.
