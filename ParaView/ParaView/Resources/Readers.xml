@@ -330,10 +330,7 @@
          class="vtkPVAdvancedReaderModule" module_type="Reader" 
          extensions=".e .ex2 .exo .gen .0 .00 .000" 
          file_description="Exodus">
-  <Source class="vtkPExodusReader"/>
-  <ArraySelection trace_name="point_array_sel" attribute_name="Cell" />
-  <ArraySelection trace_name="cell_array_sel" attribute_name="Point" />
-  <StringEntry variable="FilePrefix" extension="*" label="File prefix" 
+ <StringEntry variable="FilePrefix" extension="*" label="File prefix" 
                init_source="FilePrefix"
                trace_name="file_prefix"
                help="Set the file root. Used with file pattern to format a file name." />
@@ -349,7 +346,10 @@
 
   <Scale variable="TimeStep" type="int" label="Time step" trace_name="TimeStep"
                help="Set the current timestep." range_source="TimeStepRange" />
-
+  <Source class="vtkPExodusReader"/>
+  <ArraySelection trace_name="cell_array_sel" attribute_name="Cell" />
+  <ArraySelection trace_name="point_array_sel" attribute_name="Point" />
+  <ArraySelection trace_name="block_sel" attribute_name="Block"/>
  </Module>
 #endif
 #ifdef PARAVIEW_USE_SAF
