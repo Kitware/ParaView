@@ -635,8 +635,14 @@ void vtkPOPReader::ReadFlow()
   int idx, u, v, w;
   float *pf, *pu, *pv;
   float v0, v2, w0, u0, u2;
-  int uvInc0, uvInc1, wInc2;
+  float du, dv, dw;
+  int uvInc0, uvInc1, uvInc2;
   int vMin, vMax, wMax;
+  vtkPoints *pts;
+  float *pp;
+  int pfInc1, pfInc2;
+  float nv[3], axisW[3], axisV[3], axisU[3];
+  float tmp;
 
   if (this->UFlowFileName == NULL || this->VFlowFileName == NULL)
     {
@@ -644,6 +650,7 @@ void vtkPOPReader::ReadFlow()
     }
 
   output = this->GetOutput();
+  pts = output->GetPoints();
 
   ext[0] = ext[2] = ext[4] = 0;
   ext[1] = this->Dimensions[0]-1;
@@ -740,6 +747,7 @@ void vtkPOPReader::ReadFlow()
 
   uvInc0 = 1;
   uvInc1 = ext[1]-ext[0]+1;
+  uvInc2 = uvInc1 * (ext[3]-ext[2]+1);
   vMin = ext[2];
   vMax = ext[3];
   wMax = ext[5];
@@ -755,7 +763,8 @@ void vtkPOPReader::ReadFlow()
   fImage->SetScalarType(VTK_FLOAT);
   fImage->AllocateScalars();
 
-  wInc2 = (updateExt[1]-updateExt[0]+1)*(updateExt[3]-updateExt[2]+1)*3;
+  pfInc1 = 3*(updateExt[1]-updateExt[0]+1);
+  pfInc2 = (updateExt[1]-updateExt[0]+1)*(updateExt[3]-updateExt[2]+1)*3;
 
   // Central differences is good, but I do not like it for the
   // z/propagation direction (alternation).  Normal difference
@@ -763,50 +772,116 @@ void vtkPOPReader::ReadFlow()
   // I could always average the top and bottom versions...
 
   // Now do the computation from bottom to top.
-  
-  for (w = updateExt[5]; w >= updateExt[4]; --w)
+  // Since dw is uniform across a level, forget about traversing the points
+  // back to front.  Just do the first slice always.
+  pp = pts->GetPoint(0);  
+  for (v = updateExt[2]; v <= updateExt[3]; ++v)
     {
-    for (v = updateExt[2]; v <= updateExt[3]; ++v)
+    for (u = updateExt[0]; u <= updateExt[1]; ++u)
       {
       // Loose a little efficiency here, but ...
-      pf = (float*)fImage->GetScalarPointer(updateExt[0], v, w);
-      pu = (float*)uImage->GetScalarPointer(updateExt[0], v, w);
-      pv = (float*)vImage->GetScalarPointer(updateExt[0], v, w);
-      for (u = updateExt[0]; u <= updateExt[1]; ++u)
+      pf = (float*)fImage->GetScalarPointer(u, v, updateExt[5]);
+      pu = (float*)uImage->GetScalarPointer(u, v, updateExt[5]);
+      pv = (float*)vImage->GetScalarPointer(u, v, updateExt[5]);
+      // Find the coordinate transform (and deltas as a side effect).
+      // Except for dw, these are constant up a column.
+      // W is just the noramlize vector 0->p.
+      axisW[0] = pp[0];
+      axisW[1] = pp[1];
+      axisW[2] = pp[2];
+      vtkMath::Normalize(axisW);
+      // Ignore curvature of earth surface. Handle boundaries.
+      if (v == updateExt[2])
         {
-        // Find the five important values for this point.
+        axisV[0] = pp[0] - pp[pfInc1];
+        axisV[1] = pp[1] - pp[1+pfInc1];
+        axisV[2] = pp[2] - pp[2+pfInc1];
+        }
+      else
+        {
+        axisV[0] = pp[-pfInc1] - pp[0];
+        axisV[1] = pp[1-pfInc1] - pp[1];
+        axisV[2] = pp[2-pfInc1] - pp[2];
+        }
+      dv = vtkMath::Normalize(axisV);
+      // Last U axis.
+      if (u == updateExt[0])
+        {
+        axisU[0] =  pp[3] - pp[0];
+        axisU[1] =  pp[4] - pp[1];
+        axisU[2] =  pp[5] - pp[2];
+        }
+      else
+        {
+        axisU[0] =  pp[0] - pp[-3];
+        axisU[1] =  pp[1] - pp[-2];
+        axisU[2] =  pp[2] - pp[-1];
+        }
+      du = vtkMath::Normalize(axisU);
+
+      // Since the points are not used in the inner most loop,
+      // move to the next point here.      
+      pp += 3;     
+
+      // Now sum the w flow up the column.
+      w0 = 0.0;
+      for (w = updateExt[5]; w >= updateExt[4]; --w)
+        {
+        // Find dw (easy because we have the depth values in an array).
+        if (w == 0)
+          {
+          if (this->DepthValues->GetNumberOfTuples() <= 1)
+            {
+            dw = 0.0;
+            }
+          else
+            {
+            dw = this->DepthValues->GetValue(1) - this->DepthValues->GetValue(0);
+            }
+          }
+        else
+          {
+          dw = this->DepthValues->GetValue(w) - this->DepthValues->GetValue(w-1);
+          }
+
+        // Compute w componenet of flow ...
+        // Find the five important values for this point (have w0 already).
         // U is circular so does not have boundary checks.
-        v0 = v2 = w0 = 0.0;
+        v0 = v2 = 0.0;
         u0 = pu[-uvInc0];
         u2 = pu[uvInc0];
         if (v < vMax)
           {
-          v0 = pv[uvInc0];
+          v0 = pv[uvInc1];
           }
         if (v > vMin)
           {
           v2 = pv[-uvInc1];
           }
-        if (w < wMax)
-          {
-          w0 = pf[wInc2+2];
-          }
-        // Now fill the vector for this point.
-        pf[0] =  *pu;
-        pf[1] =  *pv;
-        pf[2] = w0 + 0.5 * (u0 - u2 + v0 - v2);
 
-        if (u == 878 && v == 891)
-          {
-          vtkErrorMacro(<< pf[2]);
-          }
+        // Now fill the vector for this point (uvw coords).
+        pf[0] =  *pu;  // i.e. u1
+        pf[1] =  *pv;  // i.e. v1
+        tmp = 0.5 * (((u0-u2)*dv*dw + (v0-v2)*du*dw)/(du*dv));
+        pf[2] = w0 + tmp;
+        //pf[2] = 0.0;
 
-        pf[2] = 0.0;
-        // Move to the next point.
-        pf += 3;
-        pu += 1;
-        pv += 1;
-        
+        // Before we transform and loose w1, 
+        // save it for summing in the next iteration.
+        w0 = pf[2];
+
+        // Now compute the vector in the new coordinate system.
+        nv[0] = axisU[0]*pf[0] + axisV[0]*pf[1] + axisW[0]*pf[2];
+        nv[1] = axisU[1]*pf[0] + axisV[1]*pf[1] + axisW[1]*pf[2];
+        nv[2] = axisU[2]*pf[0] + axisV[2]*pf[1] + axisW[2]*pf[2];
+        pf[0] = nv[0];
+        pf[1] = nv[1];
+        pf[2] = nv[2];
+
+        // Move up the column to the next point.
+        pf -= pfInc2;
+        pu -= uvInc2;
+        pv -= uvInc2;
         }
       }
     }
@@ -814,73 +889,6 @@ void vtkPOPReader::ReadFlow()
   // Delete 
   uImage->Delete();
   vImage->Delete();
-
-  // Now use points to perform the coordinate transformation.
-  vtkPoints *pts = output->GetPoints();
-  float *pp = pts->GetPoint(0);
-  int vInc = 3*(updateExt[1]-updateExt[0]+1);
-  float nv[3], axisW[3], axisV[3], axisU[3];
-  pv = (float*)fImage->GetScalarPointer();
-  for (w = updateExt[4]; w <= updateExt[5]; ++w)
-    {
-    for (v = updateExt[2]; v <= updateExt[3]; ++v)
-      {
-      for (u = updateExt[0]; u <= updateExt[1]; ++u)
-        {
-        // Find the coordinate transform.
-        // W is just the noramlize vector 0->p.
-        axisW[0] = pp[0];
-        axisW[1] = pp[1];
-        axisW[2] = pp[2];
-        vtkMath::Normalize(axisW);
-        // Ignore curvature of earth surface. Handle boundaries.
-        if (v == updateExt[2])
-          {
-          axisV[0] = pp[0] - pp[vInc];
-          axisV[1] = pp[1] - pp[1+vInc];
-          axisV[2] = pp[2] - pp[2+vInc];
-          }
-        else
-          {
-          axisV[0] = pp[-vInc] - pp[0];
-          axisV[1] = pp[1-vInc] - pp[1];
-          axisV[2] = pp[2-vInc] - pp[2];
-          }
-        vtkMath::Normalize(axisV);
-        // Last U axis.
-        if (u == updateExt[0])
-          {
-          axisU[0] =  pp[3] - pp[0];
-          axisU[1] =  pp[4] - pp[1];
-          axisU[2] =  pp[5] - pp[2];
-          }
-        else
-          {
-          axisU[0] =  pp[0] - pp[-3];
-          axisU[1] =  pp[1] - pp[-2];
-          axisU[2] =  pp[2] - pp[-1];
-          }
-        vtkMath::Normalize(axisU);
-        // Now compute the vector in the new coordinate system.
-        nv[0] = axisU[0]*pv[0] + axisV[0]*pv[1] + axisW[0]*pv[2];
-        nv[1] = axisU[1]*pv[0] + axisV[1]*pv[1] + axisW[1]*pv[2];
-        nv[2] = axisU[2]*pv[0] + axisV[2]*pv[1] + axisW[2]*pv[2];
-        pv[0] = nv[0];
-        pv[1] = nv[1];
-        pv[2] = nv[2];
-
-        //if (u == 190 && v == 260)
-        if (u == 150 && v == 150)
-          {
-          //vtkErrorMacro(<< pv[0] << ", " << pv[1] << ", " << pv[2]);
-          }
-
-        // Increment pointers to the next position.
-        pv += 3;
-        pp += 3;
-        }
-      }
-    }
 
   array = fImage->GetPointData()->GetScalars()->GetData();
   array->SetName("Flow");

@@ -72,7 +72,6 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->LODDeciTclName = NULL;
   this->MapperTclName = NULL;
   this->LODMapperTclName = NULL;
-  this->OutlineTclName = NULL;
   this->GeometryTclName = NULL;
   this->OutputPortTclName = NULL;
   this->AppendPolyDataTclName = NULL;
@@ -344,11 +343,6 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->VisibilityCheck->Delete();
   this->VisibilityCheck = NULL;
   
-  if (this->OutlineTclName)
-    {
-    pvApp->BroadcastScript("%s Delete", this->OutlineTclName);
-    this->SetOutlineTclName(NULL);
-    }  
   if (this->GeometryTclName)
     {
     pvApp->BroadcastScript("%s Delete", this->GeometryTclName);
@@ -1383,7 +1377,7 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
   this->GetPVRenderView()->EventuallyRender();
 }
 
-void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
+void vtkPVActorComposite::SaveInTclScript(ofstream *file, const char *sourceName)
 {
   char* charFound;
   int pos;
@@ -1393,16 +1387,21 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
   static int outputNum;
   int newReaderNum;
   char* result;
-  char* tclName;
   char* dataTclName;
-  
+  char* renTclName;
+  vtkPVSourceInterface *pvsInterface;
+
+  renTclName = this->GetPVRenderView()->GetRendererTclName();
+
   if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
     {
-    *file << "vtkImageOutlineFilter " << this->OutlineTclName << "\n\t"
-          << this->OutlineTclName << " SetInput [" << sourceName
+    // We no longer have an explicit outline filter.  Do the equivalent VTK pipeline.
+    *file << "vtkOutlineFilter Outline" << this->InstanceCount << "\n\t"
+          << "Outline" << this->InstanceCount << " SetInput [" << sourceName
           << " GetOutput";
-    if (strcmp(this->GetPVData()->GetPVSource()->GetInterface()->
-               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
+    pvsInterface = this->GetPVData()->GetPVSource()->GetInterface();
+    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
+                               "vtkGenericEnSightReader") == 0)
       {
       dataTclName = this->GetPVData()->GetVTKDataTclName();
       charFound = strrchr(dataTclName, 'O');
@@ -1425,16 +1424,17 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
       }
     
     *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
-          << this->MapperTclName << " SetInput ["
-          << this->OutlineTclName << " GetOutput]\n\t";
+          << this->MapperTclName << " SetInput [Outline"
+          << this->InstanceCount << " GetOutput]\n\t";
     }
   else if (this->Mode == VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
     {
     *file << "vtkDataSetSurfaceFilter " << this->GeometryTclName << "\n\t"
           << this->GeometryTclName << " SetInput [" << sourceName
           << " GetOutput";
-    if (strcmp(this->GetPVData()->GetPVSource()->GetInterface()->
-               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
+    pvsInterface = this->GetPVData()->GetPVSource()->GetInterface();
+    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
+                               "vtkGenericEnSightReader") == 0)
       {
       dataTclName = this->GetPVData()->GetVTKDataTclName();
       charFound = strrchr(dataTclName, 'O');
@@ -1465,8 +1465,9 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
     *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
           << this->MapperTclName << " SetInput [" << sourceName
           << " GetOutput";
-    if (strcmp(this->GetPVData()->GetPVSource()->GetInterface()->
-               GetSourceClassName(), "vtkGenericEnsightReader") == 0)
+    pvsInterface = this->GetPVData()->GetPVSource()->GetInterface();
+    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
+                               "vtkGenericEnSightReader") == 0)
       {
       dataTclName = this->GetPVData()->GetVTKDataTclName();
       charFound = strrchr(dataTclName, 'O');
@@ -1518,6 +1519,9 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
         << this->Property->GetInterpolationAsString() << "\n\t"
         << this->PropTclName << " SetVisibility "
         << this->Prop->GetVisibility() << "\n\n";
+
+  //*file << "\n";
+  //*file << renTclName << " AddActor " << this->PropTclName << "\n"
   
   if (this->ScalarBarCheck->GetState())
     {
@@ -1573,9 +1577,8 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
     *file << result << "\n\t"
           << this->CubeAxesTclName << " SetCamera [";
 
-    tclName = this->GetPVRenderView()->GetRendererTclName();
     
-    *file << tclName << " GetActiveCamera]\n\t"
+    *file << renTclName << " GetActiveCamera]\n\t"
           << this->CubeAxesTclName << " SetInertia 20\n\n";
     }
 }
