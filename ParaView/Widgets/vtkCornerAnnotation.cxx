@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.31");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.32");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -538,4 +538,5 @@ void vtkCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LevelShift: " << this->LevelShift << endl;
   os << indent << "LevelScale: " << this->LevelScale << endl;
   os << indent << "TextProperty: " << this->TextProperty << endl;
+  os << indent << "ShowSliceAndImage: " << this->ShowSliceAndImage << endl;
 }
