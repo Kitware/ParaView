@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.253");
+vtkCxxRevisionMacro(vtkPVApplication, "1.254");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2093,7 +2093,10 @@ void vtkPVApplication::SendPrepareProgress()
   stream << vtkClientServerStream::Invoke << pm->GetApplicationID()
     << "PrepareProgress" << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
-  this->ProgressEnabled = this->GetMainWindow()->GetEnabled();
+  if ( this->ProgressRequests == 0 )
+    {
+    this->ProgressEnabled = this->GetMainWindow()->GetEnabled();
+    }
   this->ProgressRequests ++;
 }
 
