@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.40");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.41");
 
 
 
@@ -136,7 +136,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
       this->OKButton->SetCommand(this, "OK");
       this->Script("pack %s -side left -expand yes",
                    this->OKButton->GetWidgetName());
-      this->Script("pack %s -side left -padx 4 -expand yes",
+      this->Script("pack %s -side left -padx 2 -expand yes",
                    this->OKFrame->GetWidgetName());
       break;
     case vtkKWMessageDialog::YesNo: 
@@ -158,7 +158,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
       this->Script("pack %s %s -side left -expand yes",
                    this->OKButton->GetWidgetName(),
                    this->CancelButton->GetWidgetName());
-      this->Script("pack %s %s -side left -padx 4 -expand yes",
+      this->Script("pack %s %s -side left -padx 2 -expand yes",
                    this->OKFrame->GetWidgetName(),
                    this->CancelFrame->GetWidgetName());
       break;
@@ -187,16 +187,16 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     }
     }
   
-  this->Script("pack %s -side bottom -fill x -pady 4",
-               this->ButtonFrame->GetWidgetName());
+  this->Script("pack %s -side top -fill x -padx 20 -pady 5",
+               this->Label->GetWidgetName());
   if ( this->GetDialogName() )
     {
     this->CheckButton->SetText("Do not show this dialog any more.");
-    this->Script("pack %s -side bottom -fill x -padx 20 -pady 10",
+    this->Script("pack %s -side top -fill x -padx 20 -pady 5",
                  this->CheckButton->GetWidgetName());
     }
-  this->Script("pack %s -side bottom -fill x -padx 20 -pady 10",
-               this->Label->GetWidgetName());
+  this->Script("pack %s -side top -fill x -pady 2",
+               this->ButtonFrame->GetWidgetName());
 
   this->Script("pack %s -side right -fill both -expand true -pady 4",
                this->MessageDialogFrame->GetWidgetName());
@@ -311,7 +311,7 @@ void vtkKWMessageDialog::SetIcon()
     }  
   
   this->Script("%s configure -anchor n "
-               "-pady 10 -padx 4 -borderwidth 4",
+               "-pady 5 -padx 4 -borderwidth 4",
                this->Icon->GetWidgetName());
   this->Script("pack %s -pady 17 -side left -fill y", 
                this->Icon->GetWidgetName());
