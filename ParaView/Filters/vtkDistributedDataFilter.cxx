@@ -92,7 +92,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.14");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.15");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -297,6 +297,7 @@ vtkPKdTree *vtkDistributedDataFilter::GetKdtree()
     {
     this->Kdtree = vtkPKdTree::New();
     this->Kdtree->SetController(this->Controller);
+    this->Kdtree->SetTiming(this->Timing);
     }
 
   return this->Kdtree;
@@ -419,7 +420,6 @@ void vtkDistributedDataFilter::SetDivideBoundaryCells(int val)
 //-------------------------------------------------------------------------
 // Execute
 //-------------------------------------------------------------------------
-
 void vtkDistributedDataFilter::ExecuteInformation()
 {
   vtkDataSet* input = this->GetInput();
@@ -481,6 +481,7 @@ void vtkDistributedDataFilter::Execute()
     {
     this->Kdtree = vtkPKdTree::New();
     this->Kdtree->SetController(this->Controller);
+    this->Kdtree->SetTiming(this->Timing);
     }
 
   // Stage (1) - use vtkPKdTree to...
@@ -681,7 +682,7 @@ void vtkDistributedDataFilter::Execute()
     }
 
   this->GetOutput()->ShallowCopy(finalGrid);
-  
+
   finalGrid->Delete();
 
   if (!this->RetainKdtree)
@@ -2484,10 +2485,12 @@ vtkUnstructuredGrid *
                              vtkDistributedDataFilter::TemporaryGlobalNodeIds);
 
     mc->MergeDataSet(myGrid);
-    mc->MergeDataSet(ghostCellsToGrid);
-
     myGrid->Delete();
+
+    mc->MergeDataSet(ghostCellsToGrid);
     ghostCellsToGrid->Delete();
+
+    mc->Finish();
     mc->Delete();
     }
   else
