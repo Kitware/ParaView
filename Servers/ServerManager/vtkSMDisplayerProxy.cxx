@@ -27,7 +27,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -59,14 +59,6 @@ vtkSMDisplayerProxy::vtkSMDisplayerProxy()
   // addition as well as doUpdate are disabled when adding
   // it to the root proxy. The only reason the property is
   // added to the root proxy is to expose it to the outside.
-
-  doubleVec = vtkSMDoubleVectorProperty::New();
-  doubleVec->SetCommand("SetColor");
-  doubleVec->SetNumberOfElements(3);
-  doubleVec->SetElements(ones);
-  this->AddProperty("Color", doubleVec, 0, 0);
-  this->PropertyProxy->AddProperty("Color", doubleVec);
-  doubleVec->Delete();
 
   intVec = vtkSMIntVectorProperty::New();
   intVec->SetCommand("SetInterpolation");
@@ -112,6 +104,13 @@ vtkSMDisplayerProxy::vtkSMDisplayerProxy()
   intVec->SetElement(0, 0);
   this->AddProperty("ScalarVisibility", intVec, 1, 0);
   intVec->Delete();
+
+  doubleVec = vtkSMDoubleVectorProperty::New();
+  doubleVec->SetCommand("SetColor");
+  doubleVec->SetNumberOfElements(3);
+  doubleVec->SetElements(ones);
+  this->AddProperty("Color", doubleVec, 1, 0);
+  doubleVec->Delete();
 
   intVec = vtkSMIntVectorProperty::New();
   intVec->SetCommand("SetRepresentation");
@@ -229,9 +228,41 @@ void vtkSMDisplayerProxy::UpdateVTKObjects()
   this->PushProperty("Representation", this->SelfID, 0);
   this->SetPropertyModifiedFlag("Representation", 0);
 
+  this->PushProperty("Color", this->SelfID, 0);
+  this->SetPropertyModifiedFlag("Color", 0);
+
   this->ActorProxy->UpdateVTKObjects();
   this->PropertyProxy->UpdateVTKObjects();
   this->MapperProxy->UpdateVTKObjects();
+
+  vtkClientServerStream stream;
+
+  stream << vtkClientServerStream::Invoke << this->ActorProxy->GetID(0)
+         << "Print" << vtkClientServerStream::End;
+  
+  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+  cm->SendStreamToServers(&stream, 
+                          this->GetNumberOfServerIDs(),
+                          this->GetServerIDs());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDisplayerProxy::SetColor(double r, double g, double b)
+{
+  vtkClientServerStream stream;
+
+  vtkClientServerID propertyID = this->PropertyProxy->GetID(0);
+  stream << vtkClientServerStream::Invoke 
+         << propertyID << "SetColor" << r << g << b 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << propertyID << "SetSpecularColor" << 1.0 << 1.0 << 1.0 
+         << vtkClientServerStream::End;
+
+  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+  cm->SendStreamToServers(&stream, 
+                          this->GetNumberOfServerIDs(),
+                          this->GetServerIDs());
 }
 
 //---------------------------------------------------------------------------

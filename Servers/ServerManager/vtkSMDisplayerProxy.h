@@ -60,6 +60,9 @@ public:
   // stream interface. Avoid directly calling this method.
   void SetRepresentation(int repr);
 
+  // Description:
+  void SetColor(double r, double g, double b);
+
 protected:
   vtkSMDisplayerProxy();
   ~vtkSMDisplayerProxy();
