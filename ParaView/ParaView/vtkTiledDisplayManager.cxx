@@ -41,7 +41,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.4.2.2");
+vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.4.2.3");
 vtkStandardNewMacro(vtkTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkTiledDisplayManager, RenderView, vtkObject);
@@ -597,6 +597,7 @@ void vtkTiledDisplayManager::PrintSelf(ostream& os, vtkIndent indent)
      << this->TileDimensions[1] << endl;
 
   os << indent << "Controller: (" << this->Controller << ")\n"; 
+  os << indent << "Scale: " << this->Scale << endl;
 }
 
 
