@@ -2543,3 +2543,10 @@
    obj:/lib/libc-2.3.3.so
    fun:__sysconf
 }
+{
+   <insert a suppression name here>
+   Memcheck:Overlap
+   fun:memcpy
+   obj:/usr/X11R6/lib/libXt.so.6.0
+   fun:_XtGetResources
+}

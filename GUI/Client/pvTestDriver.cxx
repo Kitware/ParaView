@@ -141,9 +141,19 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       fprintf(stderr, "Test With one mpi process.\n");
       }
     }
+  int i;
+  for(i =1; i < argc - 1; ++i)
+    {
+    if(strcmp(argv[i], "--timeout") == 0)
+      {
+      this->ArgStart = i+2;
+      this->TimeOut = atoi(argv[i+1]);
+      }
+    }
+  
   // check for the Other.pvs test
   // This test should allow error to be in the output of the test.
-  for(int i =1; i < argc; ++i)
+  for(i =1; i < argc; ++i)
     {
     int len = strlen(argv[i]) - 9;
     if(len > 0 && strncmp(argv[i]+len, "Other.pvs", 9) == 0)

@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.26");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.26.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -177,7 +177,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << this->CollectID << "SetMPIMToNSocketConnection" 
       << pm->GetMPIMToNSocketConnectionID()
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
     }
   else
     { 
