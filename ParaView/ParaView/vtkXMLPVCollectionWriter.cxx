@@ -43,14 +43,15 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVCollectionWriter);
-vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.3");
 
 class vtkXMLPVCollectionWriterInternals
 {
 public:
   vtkstd::vector< vtkSmartPointer<vtkXMLWriter> > Writers;
+  vtkstd::string FilePath;
   vtkstd::string FilePrefix;
-  vtkstd::string CreatePieceFileName(int index);
+  vtkstd::string CreatePieceFileName(int index, const char* path=0);
 };
 
 //----------------------------------------------------------------------------
@@ -132,7 +133,9 @@ int vtkXMLPVCollectionWriter::WriteInternal()
     if(vtkXMLWriter* w = this->Internal->Writers[i].GetPointer())
       {
       // Set the file name.
-      vtkstd::string fname = this->Internal->CreatePieceFileName(i);
+      vtkstd::string fname =
+        this->Internal->CreatePieceFileName(i,
+                                            this->Internal->FilePath.c_str());
       w->SetFileName(fname.c_str());
       
       // Copy settings to the writer.
@@ -373,21 +376,46 @@ void vtkXMLPVCollectionWriter::CreateWriters()
 //----------------------------------------------------------------------------
 void vtkXMLPVCollectionWriter::SplitFileName()
 {
-  // Set the prefix for output file names.
-  this->Internal->FilePrefix = this->FileName;
-  vtkstd::string::size_type pos = this->Internal->FilePrefix.find_last_of(".");
-  if(pos != vtkstd::string::npos)
+  vtkstd::string fileName = this->FileName;
+  vtkstd::string name;
+  
+  // Split the file name and extension from the path.
+  vtkstd::string::size_type pos = fileName.find_last_of("/\\");
+  if(pos != fileName.npos)
     {
-    this->Internal->FilePrefix = this->Internal->FilePrefix.substr(0, pos);
+    // Keep the slash in the file path.
+    this->Internal->FilePath = fileName.substr(0, pos+1);
+    name = fileName.substr(pos+1);
+    }
+  else
+    {
+    this->Internal->FilePath = "";
+    name = fileName;
+    }
+  
+  // Split the extension from the file name.
+  pos = name.find_last_of(".");
+  if(pos != name.npos)
+    {
+    this->Internal->FilePrefix = name.substr(0, pos);
+    }
+  else
+    {
+    this->Internal->FilePrefix = name;
     }
 }
 
 //----------------------------------------------------------------------------
 vtkstd::string
-vtkXMLPVCollectionWriterInternals::CreatePieceFileName(int index)
+vtkXMLPVCollectionWriterInternals::CreatePieceFileName(int index,
+                                                       const char* path)
 {
   vtkstd::string fname;
   ostrstream fn_with_warning_C4701;
+  if(path)
+    {
+    fn_with_warning_C4701 << path;
+    }
   fn_with_warning_C4701
     << this->FilePrefix.c_str() << "_" << index << "."
     << this->Writers[index]->GetDefaultFileExtension() << ends;
