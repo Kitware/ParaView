@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.16");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.17");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -88,7 +88,7 @@ vtkKWThumbWheel::vtkKWThumbWheel()
   this->EndCommand      = NULL;
   this->EntryCommand    = NULL;
 
-  this->ThumbWheel      = vtkKWWidget::New();
+  this->ThumbWheel      = vtkKWLabel::New();
   this->Entry           = NULL;
   this->Label           = NULL;
   this->TopLevel        = NULL;
@@ -218,7 +218,7 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app,
   params << " -bd " << VTK_KW_TW_BORDER_SIZE 
          << " -highlightthickness 0"
          << " -relief sunken" << ends;
-  this->ThumbWheel->Create(app, "label", params.str());
+  this->ThumbWheel->Create(app, params.str());
   params.rdbuf()->freeze(0);
 
   this->UpdateThumbWheelImage();

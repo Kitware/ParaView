@@ -15,6 +15,7 @@
 #include "vtkPVNavigationWindow.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWCanvas.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
@@ -27,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );
-vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.22");
+vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.23");
 
 //-----------------------------------------------------------------------------
 vtkPVNavigationWindow::vtkPVNavigationWindow()

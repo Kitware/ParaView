@@ -14,16 +14,17 @@
 #include "vtkKWSplashScreen.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWCanvas.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.17");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.18");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
 {
-  this->Canvas = vtkKWWidget::New();
+  this->Canvas = vtkKWCanvas::New();
   this->Canvas->SetParent(this);
 
   this->ImageName = NULL;
@@ -62,7 +63,7 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
 
   // Create and pack the canvas
 
-  this->Canvas->Create(app, "canvas", "-borderwidth 0 -highlightthickness 0");
+  this->Canvas->Create(app, "-borderwidth 0 -highlightthickness 0");
   this->Script("%s config %s", 
                this->Canvas->GetWidgetName(), args);
   this->Script("pack %s -side top -fill both -expand y",
@@ -122,7 +123,6 @@ void vtkKWSplashScreen::Show()
     {
     return;
     }
-  this->EnabledOn();
 
   // Update canvas size and message position
 
@@ -162,7 +162,6 @@ void vtkKWSplashScreen::Show()
 //----------------------------------------------------------------------------
 void vtkKWSplashScreen::Hide()
 {
-  this->EnabledOff();
   this->Script("wm withdraw %s", this->GetWidgetName());
 }
 
@@ -237,7 +236,7 @@ void vtkKWSplashScreen::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if ( this->Canvas ) { this->Canvas->SetEnabled(this->Enabled); }
+  this->PropagateEnableState(this->Canvas);
 }
 
 //----------------------------------------------------------------------------

@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.52");
+vtkCxxRevisionMacro(vtkKWEntry, "1.53");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -107,9 +107,13 @@ void vtkKWEntry::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->Entry && this->Entry != this)
+  if (this->Entry)
     {
-    this->Entry->SetEnabled(this->Enabled);
+    this->Entry->SetStateOption(this->Enabled);
+    if (this->Entry != this)
+      {
+      this->Entry->SetEnabled(this->Enabled);
+      }
     }
 
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)

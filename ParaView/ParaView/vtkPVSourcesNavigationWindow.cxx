@@ -15,6 +15,7 @@
 #include "vtkPVSourcesNavigationWindow.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWCanvas.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
@@ -26,14 +27,14 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.12");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.13");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
 {
   this->Width     = -1;
   this->Height    = -1;
-  this->Canvas    = vtkKWWidget::New();
+  this->Canvas    = vtkKWCanvas::New();
   this->ScrollBar = vtkKWWidget::New();
   this->PopupMenu = vtkKWMenu::New();
   this->AlwaysShowName = 0;
@@ -161,7 +162,7 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
 
   char* optstr = opts.str();
   this->Canvas->SetParent(this);
-  this->Canvas->Create(this->Application, "canvas", optstr); 
+  this->Canvas->Create(this->Application, optstr); 
   delete[] optstr;
 
   ostrstream command;

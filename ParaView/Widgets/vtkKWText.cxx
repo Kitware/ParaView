@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWText );
-vtkCxxRevisionMacro(vtkKWText, "1.19");
+vtkCxxRevisionMacro(vtkKWText, "1.20");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -83,6 +83,14 @@ void vtkKWText::Create(vtkKWApplication *app, const char *args)
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWText::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->SetStateOption(this->Enabled);
 }
 
 //----------------------------------------------------------------------------

@@ -19,7 +19,11 @@
 #define __vtkKWOKCancelDialog_h
 
 #include "vtkKWDialog.h"
+
 class vtkKWApplication;
+class vtkKWPushButton;
+class vtkKWLabel;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkKWOKCancelDialog : public vtkKWDialog
 {
@@ -40,10 +44,11 @@ protected:
   vtkKWOKCancelDialog();
   ~vtkKWOKCancelDialog();
 
-  vtkKWWidget *Message;
-  vtkKWWidget *ButtonFrame;
-  vtkKWWidget *OKButton;
-  vtkKWWidget *CancelButton;
+  vtkKWLabel *Message;
+  vtkKWFrame *ButtonFrame;
+  vtkKWPushButton *OKButton;
+  vtkKWPushButton *CancelButton;
+
 private:
   vtkKWOKCancelDialog(const vtkKWOKCancelDialog&); // Not implemented
   void operator=(const vtkKWOKCancelDialog&); // Not implemented

@@ -21,6 +21,7 @@
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
+class vtkKWFrame;
 class vtkKWPushButton;
 class vtkKWEntry;
 class vtkKWLabel;
@@ -87,14 +88,14 @@ protected:
 
   vtkKWWindow* MasterWindow;
 
-  vtkKWWidget *ButtonFrame;
+  vtkKWFrame      *ButtonFrame;
   vtkKWPushButton *DismissButton;
-  vtkKWWidget *CommandFrame;
-  vtkKWLabel *CommandLabel;
-  vtkKWEntry *CommandEntry;
-  vtkKWWidget *DisplayFrame;
-  vtkKWText *DisplayText;
-  vtkKWWidget *DisplayScrollBar;
+  vtkKWFrame      *CommandFrame;
+  vtkKWLabel      *CommandLabel;
+  vtkKWEntry      *CommandEntry;
+  vtkKWFrame      *DisplayFrame;
+  vtkKWText       *DisplayText;
+  vtkKWWidget     *DisplayScrollBar;
   
   char *Title;
   int TagNumber;

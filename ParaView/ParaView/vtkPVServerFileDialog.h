@@ -22,16 +22,18 @@
 
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkClientServerID.h" // Need vtkClientServerID.
+
+class vtkIntArray;
 class vtkKWApplication;
-class vtkPVApplication;
-class vtkKWPushButton;
+class vtkKWCanvas;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWListBox;
-class vtkKWWindow;
 class vtkKWMenuButton;
-class vtkIntArray;
+class vtkKWPushButton;
+class vtkKWWindow;
+class vtkPVApplication;
 class vtkStringList;
 
 class VTK_EXPORT vtkPVServerFileDialog : public vtkKWLoadSaveDialog
@@ -91,7 +93,7 @@ protected:
 
   vtkKWWidget*      TopFrame;
   vtkKWFrame*       MiddleFrame;
-  vtkKWWidget*      FileList;
+  vtkKWCanvas*      FileList;
   vtkKWWidget*      BottomFrame;
 
   vtkKWLabel*       DirectoryDisplay;

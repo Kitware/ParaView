@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.93");
+vtkCxxRevisionMacro(vtkKWWidget, "1.94");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -326,7 +326,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.93 $");
+  this->ExtractRevision(os,"$Revision: 1.94 $");
 }
 
 //----------------------------------------------------------------------------
@@ -467,19 +467,95 @@ void vtkKWWidget::SetEnabled(int e)
     }
   this->Enabled = e;
 
-  this->Modified();
-
   this->UpdateEnableState();
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWWidget::UpdateEnableState()
 {
-  if (this->IsAlive() && this->HasConfigurationOption("-state"))
+  // Use this piece of debug code to detect which widgets are created using
+  // the old fashion way (vtkKWWidget, then this->Script("%s foobar", ...),
+  // preventing the overriden UpdateEnableState() to be called
+
+#if 0
+  int is_widget = (this->IsCreated() &&
+                   this->HasConfigurationOption("-state") &&
+                   !strcmp(this->GetClassName(), "vtkKWWidget"));
+
+  /*
+    Enable this one to get a rough idea of how many vtkKWWidget are not
+    *qualified* enough (i.e., they are widgets with a -state option, like
+    a button, canvas, scale, but were created using vtkKWWidget instead of
+    a more qualified vtkKWPushButton, vtkKWCanvas, vtkKWScale, etc.). 
+    For speed reasons the -state flag is now updated *only* in subclasses
+    where that flag actually means something (like a button, a scale, etc.),
+    hence the vtkKWWidget listed here should be "qualified" to a meaningful
+    subclass.
+    Note that Listbox and Scale will show up but there is nothing
+    you can do about it, because the implementation of vtkKWListbox and
+    vtkKWScale use a vtkKWWidget internally to store the actual Tk "scale"
+    or "listbox", so that they can be embedded inside a frame, with label
+    around, etc.
+
+    Pipe the output of the application to a file, then sort this file and 
+    get the uniq entries:
+    paraview > state.txt
+    sort state.txt | uniq -c
+  */
+
+#if 1
+  if (is_widget)
+    {
+    cout << this->GetClassName() << " (" << this->GetType() << ")" << endl;
+    }
+#endif
+
+  /*
+    Enable this one to get more accurate info about the vtkKWWidget to change
+    (TclName, -text and -label option, etc).
+  */
+
+#if 0
+  if (is_widget)
+    {
+    cout << this->GetClassName() << " (" << this->GetType() << ")"
+         << " (" << this->GetTclName() << ")";
+    if (this->HasConfigurationOption("-text"))
+      {
+      res = this->Script("%s cget -text", this->GetWidgetName());
+      cout << " (-text: " << res << ")";
+      }
+    if (this->HasConfigurationOption("-label"))
+      {
+      res = this->Script("%s cget -label", this->GetWidgetName());
+      cout << " (-label: " << res << ")";
+      }
+    cout << endl;
+    }
+#endif
+
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::PropagateEnableState(vtkKWWidget* widget)
+{
+  if ( !widget || widget == this )
+    {
+    return;
+    }
+  widget->SetEnabled(this->Enabled);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetStateOption(int flag)
+{
+    if (this->IsAlive())
     {
     this->Script("%s configure -state %s", 
-                 this->GetWidgetName(), 
-                 (this->Enabled ? "normal" : "disabled"));
+                 this->GetWidgetName(), (flag ? "normal" : "disabled")); 
     }
 }
 
@@ -1527,16 +1603,6 @@ void vtkKWWidget::Configure(const char* opts)
     }
   this->Script("%s configure %s",
     this->GetWidgetName(), opts);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::PropagateEnableState(vtkKWWidget* widget)
-{
-  if ( !widget || widget == this )
-    {
-    return;
-    }
-  widget->SetEnabled(this->Enabled);
 }
 
 //----------------------------------------------------------------------------

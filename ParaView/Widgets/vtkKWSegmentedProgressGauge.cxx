@@ -11,17 +11,19 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkKWCanvas.h"
+#include "vtkKWFrame.h"
 #include "vtkKWSegmentedProgressGauge.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWSegmentedProgressGauge);
-vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.8");
+vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.9");
 
 vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
 {
-  this->ProgressFrame = vtkKWWidget::New();
+  this->ProgressFrame = vtkKWFrame::New();
   this->ProgressFrame->SetParent(this);
-  this->ProgressCanvas = vtkKWWidget::New();
+  this->ProgressCanvas = vtkKWCanvas::New();
   this->ProgressCanvas->SetParent(this->ProgressFrame);
   
   this->NumberOfSegments = 3;
@@ -64,9 +66,9 @@ void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app,
   wname = this->GetWidgetName();
   this->Script("frame %s %s", wname, args);
   
-  this->ProgressFrame->Create(app, "frame", "-bd 1 -relief sunken");
+  this->ProgressFrame->Create(app, "-bd 1 -relief sunken");
   
-  this->ProgressCanvas->Create(app, "canvas", "");
+  this->ProgressCanvas->Create(app, "");
   this->Script("%s configure -borderwidth 0 -highlightthickness 0 -background #008 -width %d -height %d",
                this->ProgressCanvas->GetWidgetName(),
                this->Width, this->Height);

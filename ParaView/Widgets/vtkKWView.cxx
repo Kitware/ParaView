@@ -27,6 +27,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWGenericComposite.h"
 #include "vtkKWIcon.h"
+#include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
@@ -85,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.124");
+vtkCxxRevisionMacro(vtkKWView, "1.125");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -122,7 +123,7 @@ vtkKWView::vtkKWView()
   this->Frame2->SetParent(this->Frame);
   this->ControlFrame = vtkKWWidget::New();
   this->ControlFrame->SetParent(this->Frame);
-  this->Label = vtkKWWidget::New();
+  this->Label = vtkKWLabel::New();
   this->Label->SetParent(this->Frame2);
   this->VTKWidget = vtkKWWidget::New();
   this->VTKWidget->SetParent(this->Frame);
@@ -145,7 +146,7 @@ vtkKWView::vtkKWView()
   this->HeaderEntryFrame = vtkKWWidget::New();
   this->HeaderButton = vtkKWCheckButton::New();
   this->HeaderColor = vtkKWChangeColorButton::New();
-  this->HeaderLabel = vtkKWWidget::New();
+  this->HeaderLabel = vtkKWLabel::New();
   this->HeaderEntry = vtkKWEntry::New();
 
   this->HeaderMapper = vtkTextMapper::New();
@@ -489,7 +490,7 @@ void vtkKWView::CreateViewProperties()
   this->Script("pack %s -side right -padx 2 -pady 4 -anchor ne",
                this->HeaderColor->GetWidgetName());
   this->HeaderLabel->SetParent(this->HeaderEntryFrame);
-  this->HeaderLabel->Create(app,"label","");
+  this->HeaderLabel->Create(app, "");
   this->HeaderLabel->SetTextOption("Header:");
   this->HeaderLabel->SetBalloonHelpString("Set the header text string");
   this->HeaderEntry->SetParent(this->HeaderEntryFrame);
@@ -1554,7 +1555,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.124 $");
+  this->ExtractRevision(os,"$Revision: 1.125 $");
 }
 
 //----------------------------------------------------------------------------

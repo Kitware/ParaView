@@ -20,6 +20,7 @@
 
 #include "vtkKWLabeledWidget.h"
 
+class vtkKWCanvas;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWPushButtonSet;
@@ -259,7 +260,7 @@ public:
 
   // Description:
   // Access to the canvas
-  vtkGetObjectMacro(Canvas, vtkKWWidget);
+  vtkGetObjectMacro(Canvas, vtkKWCanvas);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -306,7 +307,7 @@ protected:
   char  *EntriesCommand;
 
   vtkKWFrame         *CanvasFrame;
-  vtkKWWidget        *Canvas;
+  vtkKWCanvas        *Canvas;
   vtkKWEntry         *Entries[2];
   vtkKWPushButtonSet *ZoomButtons;
 

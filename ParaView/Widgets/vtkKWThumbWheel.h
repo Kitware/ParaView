@@ -268,7 +268,7 @@ protected:
 
   int         InteractionModes[3];
 
-  vtkKWWidget *ThumbWheel;
+  vtkKWLabel  *ThumbWheel;
   vtkKWEntry  *Entry;
   vtkKWLabel  *Label;
   vtkKWWidget *TopLevel;

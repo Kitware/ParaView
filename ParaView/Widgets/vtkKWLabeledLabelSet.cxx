@@ -25,7 +25,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWLabeledLabelSet);
-vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.7");
+vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.8");
 
 int vtkvtkKWLabeledLabelSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -163,8 +163,8 @@ int vtkKWLabeledLabelSet::AddLabeledLabel(int id,
 
   if (!this->IsCreated())
     {
-    vtkErrorMacro("The labeled label set must be created before any labeled "
-                  "label is added.");
+    vtkErrorMacro("The labeled label set must be created before any "
+                  "labeled label is added.");
     return 0;
     }
 

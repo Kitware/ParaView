@@ -25,6 +25,7 @@
 
 class vtkKWFrame;
 class vtkKWLabel;
+class vtkKWPushButton;
 class vtkKWWidget;
 
 class VTK_EXPORT vtkPVGhostLevelDialog : public vtkKWDialog
@@ -58,17 +59,17 @@ protected:
 
   int GhostLevel;
 
-  vtkKWWidget* Separator;
-  vtkKWLabel*  Label;
-  vtkKWFrame*  ButtonFrame;
+  vtkKWFrame* Separator;
+  vtkKWLabel* Label;
+  vtkKWFrame* ButtonFrame;
 
-  vtkKWWidget *SelFrame1;
-  vtkKWWidget *SelFrame2;
-  vtkKWWidget *SelFrame3;
+  vtkKWFrame *SelFrame1;
+  vtkKWFrame *SelFrame2;
+  vtkKWFrame *SelFrame3;
 
-  vtkKWWidget* SelButton1;
-  vtkKWWidget* SelButton2;
-  vtkKWWidget* SelButton3;
+  vtkKWPushButton* SelButton1;
+  vtkKWPushButton* SelButton2;
+  vtkKWPushButton* SelButton3;
 
 private:
   vtkPVGhostLevelDialog(const vtkPVGhostLevelDialog&); // Not implemented

@@ -16,13 +16,14 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVGhostLevelDialog );
-vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.4");
+vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.5");
 
 int vtkPVGhostLevelDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -35,28 +36,28 @@ vtkPVGhostLevelDialog::vtkPVGhostLevelDialog()
   this->Label->SetParent(this);
   this->Label->SetLabel("How many ghost levels would you like to save?");
   
-  this->Separator = vtkKWWidget::New();
+  this->Separator = vtkKWFrame::New();
   this->Separator->SetParent(this);
   
   this->ButtonFrame = vtkKWFrame::New();
   this->ButtonFrame->SetParent(this);
   
-  this->SelFrame1 = vtkKWWidget::New();
+  this->SelFrame1 = vtkKWFrame::New();
   this->SelFrame1->SetParent(this->ButtonFrame);
 
-  this->SelFrame2 = vtkKWWidget::New();
+  this->SelFrame2 = vtkKWFrame::New();
   this->SelFrame2->SetParent(this->ButtonFrame);
 
-  this->SelFrame3 = vtkKWWidget::New();
+  this->SelFrame3 = vtkKWFrame::New();
   this->SelFrame3->SetParent(this->ButtonFrame);
 
-  this->SelButton1 = vtkKWWidget::New();
+  this->SelButton1 = vtkKWPushButton::New();
   this->SelButton1->SetParent(this->SelFrame1);
 
-  this->SelButton2 = vtkKWWidget::New();
+  this->SelButton2 = vtkKWPushButton::New();
   this->SelButton2->SetParent(this->SelFrame2);
   
-  this->SelButton3 = vtkKWWidget::New();
+  this->SelButton3 = vtkKWPushButton::New();
   this->SelButton3->SetParent(this->SelFrame3);
 
   this->GhostLevel = 0;
@@ -86,28 +87,27 @@ void vtkPVGhostLevelDialog::Create(vtkKWApplication *app, const char *args)
 
   this->ButtonFrame->Create(this->Application, 0);
 
-  this->SelFrame1->Create(app,"frame","-borderwidth 3 -relief flat");
-  this->SelFrame2->Create(app,"frame","-borderwidth 3 -relief flat");
-  this->SelFrame3->Create(app,"frame","-borderwidth 3 -relief flat");
+  this->SelFrame1->Create(app, "-borderwidth 3 -relief flat");
+  this->SelFrame2->Create(app, "-borderwidth 3 -relief flat");
+  this->SelFrame3->Create(app, "-borderwidth 3 -relief flat");
 
-  this->SelButton1->Create(this->Application, "button", "-text 0");
+  this->SelButton1->Create(this->Application, "-text 0");
   this->SelButton1->SetCommand(this, "SetGhostLevel 0");
   this->Application->Script("pack %s -expand t", 
                             this->SelButton1->GetWidgetName());
 
-  this->SelButton2->Create(this->Application, "button", "-text 1");
+  this->SelButton2->Create(this->Application, "-text 1");
   this->SelButton2->SetCommand(this, "SetGhostLevel 1");
   this->Application->Script("pack %s -expand t", 
                             this->SelButton2->GetWidgetName());
 
-  this->SelButton3->Create(this->Application, "button", "-text 2");
+  this->SelButton3->Create(this->Application, "-text 2");
   this->SelButton3->SetCommand(this, "SetGhostLevel 2");
   this->Application->Script("pack %s -expand t", 
                             this->SelButton3->GetWidgetName());
 
   this->Separator->Create(this->Application, 
-                 "frame", 
-                 "-borderwidth 1 -height 3 -relief sunken");
+                          "-borderwidth 1 -height 3 -relief sunken");
 
   this->Label->Create(this->Application, "");
 

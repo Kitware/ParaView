@@ -24,9 +24,10 @@
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
+class vtkKWCanvas;
+class vtkKWMenu;
 class vtkKWWidget;
 class vtkPVSource;
-class vtkKWMenu;
 
 class VTK_EXPORT vtkPVSourcesNavigationWindow : public vtkKWWidget
 {
@@ -46,7 +47,7 @@ public:
 
   // Description:
   // Return the underlying canvas
-  vtkGetObjectMacro(Canvas, vtkKWWidget);
+  vtkGetObjectMacro(Canvas, vtkKWCanvas);
 
   // Description:
   // Regenerate the display and re-assign bindings.
@@ -132,7 +133,7 @@ protected:
 
   int Width;
   int Height;
-  vtkKWWidget* Canvas;
+  vtkKWCanvas* Canvas;
   vtkKWWidget* ScrollBar;
   vtkKWMenu* PopupMenu;
 

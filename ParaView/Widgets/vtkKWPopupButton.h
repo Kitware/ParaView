@@ -22,7 +22,7 @@
 
 #include "vtkKWPushButton.h"
 
-class vtkKWPushButton;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkKWPopupButton : public vtkKWPushButton
 {
@@ -39,7 +39,7 @@ public:
   // Access to sub-widgets.
   // The PopupFrame widget is the place to put your own sub-widgets.
   vtkGetObjectMacro(PopupTopLevel, vtkKWWidget);
-  vtkGetObjectMacro(PopupFrame, vtkKWWidget);
+  vtkGetObjectMacro(PopupFrame, vtkKWFrame);
   vtkGetObjectMacro(PopupCloseButton, vtkKWPushButton);
 
   // Description:
@@ -66,7 +66,7 @@ protected:
   ~vtkKWPopupButton();
 
   vtkKWWidget     *PopupTopLevel;
-  vtkKWWidget     *PopupFrame;
+  vtkKWFrame     *PopupFrame;
   vtkKWPushButton *PopupCloseButton;
 
   char* PopupTitle;

@@ -41,6 +41,7 @@ class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWGenericComposite;
 class vtkKWLabeledFrame;
+class vtkKWLabel;
 class vtkKWMenu;
 class vtkKWMenuButton;
 class vtkKWNotebook;
@@ -389,7 +390,7 @@ protected:
   vtkKWCompositeCollection *Composites;
   vtkKWWidget *PropertiesParent;
   vtkKWWidget *VTKWidget;
-  vtkKWWidget *Label;
+  vtkKWLabel *Label;
   int UseProgressGauge;
   vtkKWSegmentedProgressGauge *ProgressGauge;
   vtkKWWidget *Frame;
@@ -405,7 +406,7 @@ protected:
   vtkKWWidget            *HeaderEntryFrame;
   vtkKWChangeColorButton *HeaderColor;
   vtkKWCheckButton       *HeaderButton;
-  vtkKWWidget            *HeaderLabel;
+  vtkKWLabel             *HeaderLabel;
   vtkKWEntry             *HeaderEntry;
   vtkTextActor           *HeaderProp;
   vtkTextMapper          *HeaderMapper;

@@ -12,16 +12,15 @@
 
 =========================================================================*/
 #include "vtkKWApplication.h"
+#include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
 #include "vtkKWOKCancelDialog.h"
+#include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
-
-
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOKCancelDialog );
-vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.10");
-
-
+vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.11");
 
 
 int vtkKWOKCancelDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -30,13 +29,13 @@ int vtkKWOKCancelDialogCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWOKCancelDialog::vtkKWOKCancelDialog()
 {
   this->CommandFunction = vtkKWOKCancelDialogCommand;
-  this->Message = vtkKWWidget::New();
+  this->Message = vtkKWLabel::New();
   this->Message->SetParent(this);
-  this->ButtonFrame = vtkKWWidget::New();
+  this->ButtonFrame = vtkKWFrame::New();
   this->ButtonFrame->SetParent(this);
-  this->OKButton = vtkKWWidget::New();
+  this->OKButton = vtkKWPushButton::New();
   this->OKButton->SetParent(this->ButtonFrame);
-  this->CancelButton = vtkKWWidget::New();
+  this->CancelButton = vtkKWPushButton::New();
   this->CancelButton->SetParent(this->ButtonFrame);
 }
 
@@ -54,12 +53,12 @@ void vtkKWOKCancelDialog::Create(vtkKWApplication *app, const char *args)
   // invoke super method
   this->Superclass::Create(app,args);
   
-  this->Message->Create(app,"label","");
-  this->ButtonFrame->Create(app,"frame","");
-  this->OKButton->Create(app, "button", "-width 16");
+  this->Message->Create(app, "");
+  this->ButtonFrame->Create(app, "");
+  this->OKButton->Create(app, "-width 16");
   this->OKButton->SetCommand(this, "OK");
   this->OKButton->SetTextOption("OK");
-  this->CancelButton->Create(app,"button","-width 16");
+  this->CancelButton->Create(app, "-width 16");
   this->CancelButton->SetCommand(this, "Cancel");
   this->CancelButton->SetTextOption("Cancel");
   this->Script("pack %s %s -side left -padx 4 -expand yes",

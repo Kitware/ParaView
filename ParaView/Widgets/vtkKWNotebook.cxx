@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.60");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.61");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -238,7 +238,7 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
   this->Script("frame %s -width %d -height %d -bd 0 -relief flat %s",
                wname, this->MinimumWidth, this->MinimumHeight, args);
 
-  // Create the frame that stores the tabs "button"
+  // Create the frame that stores the tabs button
 
   this->TabsFrame->SetParent(this);
   this->TabsFrame->Create(app, "frame", "-bd 0 -relief flat");

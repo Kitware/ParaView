@@ -14,12 +14,13 @@
 #include "vtkKWChangeColorButton.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.42");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.43");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -42,8 +43,8 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
   this->DialogText = 0;
   this->SetText("Set Color...");
 
-  this->ColorButton = vtkKWWidget::New();
-  this->MainFrame = vtkKWWidget::New();
+  this->ColorButton = vtkKWLabel::New();
+  this->MainFrame = vtkKWFrame::New();
   
   this->ButtonDown = 0;
 }
@@ -111,11 +112,18 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
   // Create the main frame
 
   this->MainFrame->SetParent(this);
-  this->MainFrame->Create(this->Application, "frame", "-relief raised -bd 2");
+  this->MainFrame->Create(app, "-relief raised -bd 2");
 
   // Create the label.
 
-  this->Label->SetParent(this->LabelOutsideButton ? this : this->MainFrame);
+  if (this->LabelOutsideButton)
+    {
+    this->Label->SetParent(this);
+    }
+  else
+    {
+    this->Label->SetParent(this->MainFrame);
+    }
   this->Label->Create(app, "-padx 2 -pady 0 -highlightthickness 0 -bd 0");
   this->Label->SetLabel(this->Text);
 
@@ -123,8 +131,7 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 
   this->ColorButton->SetParent(this->MainFrame);
   this->ColorButton->Create(
-    this->Application, "label", 
-    "-bd 0 -highlightthickness 0 -padx 0 -pady 0 -width 2");
+    app, "-bd 0 -highlightthickness 0 -padx 0 -pady 0 -width 2");
 
   this->UpdateColorButton();
 
@@ -135,6 +142,10 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
   // Bind button presses
 
   this->Bind();
+
+  // Update enable state
+  
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -477,7 +488,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.42 $");
+  this->ExtractRevision(os,"$Revision: 1.43 $");
 }
 
 //----------------------------------------------------------------------------

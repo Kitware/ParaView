@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.185");
+vtkCxxRevisionMacro(vtkKWWindow, "1.186");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1698,14 +1698,9 @@ void vtkKWWindow::UpdateEnableState()
       }
     }
 
-
   // Update the menus
 
   this->UpdateMenuState();
-  if ( this->MenuRecentFiles )
-    {
-    this->MenuRecentFiles->SetEnabled(this->Enabled);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -1715,17 +1710,22 @@ void vtkKWWindow::UpdateMenuState()
 
   // Most Recent Files
 
-  if (this->MenuRecentFiles && this->MenuRecentFiles->IsCreated())
+  if (this->MenuRecentFiles)
     {
-    vtkKWMenu *parent = 
-      vtkKWMenu::SafeDownCast(this->MenuRecentFiles->GetParent());
-    if (parent)
+    this->MenuRecentFiles->SetEnabled(this->Enabled);
+    if (this->MenuRecentFiles->IsCreated())
       {
-      int index = parent->GetCascadeIndex(this->MenuRecentFiles);
-      if (index >= 0)
+      vtkKWMenu *parent = 
+        vtkKWMenu::SafeDownCast(this->MenuRecentFiles->GetParent());
+      if (parent)
         {
-        int nb_items = this->MenuRecentFiles->GetNumberOfItems();
-        parent->SetState(index,  nb_items ? menu_enabled :vtkKWMenu::Disabled);
+        int index = parent->GetCascadeIndex(this->MenuRecentFiles);
+        if (index >= 0)
+          {
+          int nb_items = this->MenuRecentFiles->GetNumberOfItems();
+          parent->SetState(
+            index,  nb_items ? menu_enabled :vtkKWMenu::Disabled);
+          }
         }
       }
     }

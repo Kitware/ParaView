@@ -15,12 +15,13 @@
 #include "vtkPVTraceFileDialog.h"
 
 #include "vtkKWFrame.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.5");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.6");
 
 int vtkPVTraceFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -28,10 +29,10 @@ int vtkPVTraceFileDialogCommand(ClientData cd, Tcl_Interp *interp,
 //-----------------------------------------------------------------------------
 vtkPVTraceFileDialog::vtkPVTraceFileDialog()
 {
-  this->SaveFrame = vtkKWWidget::New();
+  this->SaveFrame = vtkKWFrame::New();
   this->SaveFrame->SetParent(this->ButtonFrame);
 
-  this->SaveButton = vtkKWWidget::New();
+  this->SaveButton = vtkKWPushButton::New();
   this->SaveButton->SetParent(this->SaveFrame);
 
   this->SetStyleToOkCancel();
@@ -56,9 +57,9 @@ void vtkPVTraceFileDialog::Create(vtkKWApplication *app, const char *args)
   // invoke super method
   this->Superclass::Create(app,args);
 
-  this->SaveFrame->Create(app,"frame","-borderwidth 3 -relief flat");
+  this->SaveFrame->Create(app, "-borderwidth 3 -relief flat");
 
-  this->SaveButton->Create(app,"button","-text Save -width 16");
+  this->SaveButton->Create(app, "-text Save -width 16");
   this->SaveButton->SetCommand(this, "Save");
 
   this->Script("pack %s -side left -expand yes",

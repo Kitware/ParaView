@@ -20,6 +20,7 @@
 
 #include "vtkKWWidget.h"
 class vtkKWApplication;
+class vtkKWCanvas;
 
 class VTK_EXPORT vtkKWSplashScreen : public vtkKWWidget
 {
@@ -65,7 +66,7 @@ protected:
   vtkKWSplashScreen();
   ~vtkKWSplashScreen();
 
-  vtkKWWidget *Canvas;
+  vtkKWCanvas *Canvas;
   char *ImageName;
   int ProgressMessageVerticalOffset;
 

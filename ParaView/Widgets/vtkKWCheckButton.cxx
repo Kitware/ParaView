@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.26");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -238,6 +238,14 @@ void vtkKWCheckButton::SetImageOption(const char *image_name,
                                       const char *image_option)
 {
   this->Superclass::SetImageOption(image_name, image_option);
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWCheckButton::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->SetStateOption(this->Enabled);
 }
 
 //----------------------------------------------------------------------------

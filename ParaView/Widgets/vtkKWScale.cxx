@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.72");
+vtkCxxRevisionMacro(vtkKWScale, "1.73");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -215,11 +215,10 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
 
   // Create the scale
 
-  this->Scale->Create(
-    app, "scale", "-orient horizontal -showvalue no -bd 2");
-
+  this->Scale->SetApplication(app);
   this->Script(
-    "%s configure -resolution %g -highlightthickness 0 -from %g -to %g %s",
+    "scale %s -orient horizontal -showvalue no -bd 2 -highlightthickness 0"
+    " -resolution %g -from %g -to %g %s", 
     this->Scale->GetWidgetName(), 
     this->Resolution,
     this->Range[0], this->Range[1],
@@ -649,12 +648,14 @@ void vtkKWScale::RefreshValue()
     int was_disabled = !this->Scale->GetEnabled();
     if (was_disabled)
       {
+      this->Scale->SetStateOption(1);
       this->Scale->SetEnabled(1);
       }
     this->Script("%s set %g", 
                  this->Scale->GetWidgetName(), this->Value);
     if (was_disabled)
       {
+      this->Scale->SetStateOption(0);
       this->Scale->SetEnabled(0);
       }
     }
@@ -883,6 +884,7 @@ void vtkKWScale::UpdateEnableState()
 
   if (this->Scale)
     {
+    this->Scale->SetStateOption(this->Enabled);
     this->Scale->SetEnabled(this->Enabled);
     }
 

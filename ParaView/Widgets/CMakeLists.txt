@@ -8,6 +8,7 @@ vtkKWActorComposite.cxx
 vtkKWApplication.cxx 
 vtkKWApplicationSettingsInterface.cxx
 vtkKWBWidgets.cxx
+vtkKWCanvas.cxx 
 vtkKWChangeColorButton.cxx 
 vtkKWCheckButton.cxx 
 vtkKWCheckButtonSet.cxx 

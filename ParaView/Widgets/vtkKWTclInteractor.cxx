@@ -15,6 +15,7 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWEntry.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWText.h"
@@ -23,7 +24,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.18");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.19");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -33,14 +34,14 @@ vtkKWTclInteractor::vtkKWTclInteractor()
 {
   this->CommandFunction = vtkKWTclInteractorCommand;
   
-  this->ButtonFrame = vtkKWWidget::New();
+  this->ButtonFrame = vtkKWFrame::New();
   this->DismissButton = vtkKWPushButton::New();
 
-  this->CommandFrame = vtkKWWidget::New();
+  this->CommandFrame = vtkKWFrame::New();
   this->CommandLabel = vtkKWLabel::New();
   this->CommandEntry = vtkKWEntry::New();
   
-  this->DisplayFrame = vtkKWWidget::New();
+  this->DisplayFrame = vtkKWFrame::New();
   this->DisplayText = vtkKWText::New();
   this->DisplayScrollBar = vtkKWWidget::New();
   
@@ -138,7 +139,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
     }
   
   this->ButtonFrame->SetParent(this);
-  this->ButtonFrame->Create(app, "frame", "");
+  this->ButtonFrame->Create(app, "");
   this->Script("pack %s -side bottom -fill both -expand 0 -pady 2m",
                this->ButtonFrame->GetWidgetName());
   
@@ -154,7 +155,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
                wname, wname);
   
   this->CommandFrame->SetParent(this);
-  this->CommandFrame->Create(app, "frame", "");
+  this->CommandFrame->Create(app, "");
   
   this->CommandLabel->SetParent(this->CommandFrame);
   this->CommandLabel->Create(app, "");
@@ -171,7 +172,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   
   char scrollBarCommand[100];
   this->DisplayFrame->SetParent(this);
-  this->DisplayFrame->Create(app, "frame", "");
+  this->DisplayFrame->Create(app, "");
   this->DisplayText->SetParent(this->DisplayFrame);
   this->DisplayText->Create(app, "-setgrid true -width 60 -height 8 -wrap word -state disabled");
   this->DisplayScrollBar->SetParent(this->DisplayFrame);

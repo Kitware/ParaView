@@ -20,6 +20,8 @@
 
 #include "vtkKWLabeledWidget.h"
 
+class vtkKWFrame;
+
 class VTK_EXPORT vtkKWChangeColorButton : public vtkKWLabeledWidget
 {
 public:
@@ -101,8 +103,8 @@ protected:
   vtkKWChangeColorButton();
   ~vtkKWChangeColorButton();
 
-  vtkKWWidget *ColorButton;
-  vtkKWWidget *MainFrame;
+  vtkKWLabel  *ColorButton;
+  vtkKWFrame  *MainFrame;
 
   char        *Command;
   char        *Text;

@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.303");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.304");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -566,7 +566,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -fill x -side top -anchor nw",
                this->Frame2->GetWidgetName());
 
-  this->Label->Create(app,"label","-fg #fff -text {3D View} -bd 0");
+  this->Label->Create(app, "-fg #fff -text {3D View} -bd 0");
 
   this->Script("pack %s -side left -anchor w",
                this->Label->GetWidgetName());

@@ -26,6 +26,9 @@
 
 #include "vtkKWMessageDialog.h"
 
+class vtkKWPushButton;
+class vtkKWFrame;
+
 class VTK_EXPORT vtkPVTraceFileDialog : public vtkKWMessageDialog
 {
 public:
@@ -45,8 +48,8 @@ protected:
   vtkPVTraceFileDialog();
   ~vtkPVTraceFileDialog();
 
-  vtkKWWidget     *SaveButton;
-  vtkKWWidget     *SaveFrame;
+  vtkKWPushButton *SaveButton;
+  vtkKWFrame  *SaveFrame;
 
 private:
   vtkPVTraceFileDialog(const vtkPVTraceFileDialog&); // Not implemented

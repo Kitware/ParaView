@@ -176,6 +176,11 @@ public:
   //ETX
 
   // Description:
+  // Convenience method to Set/Get the -state option to "normal" (if true) or
+  // "disabled" (if false).
+  void SetStateOption(int flag);
+
+  // Description:
   // Query if widget is packed
   int IsPacked();
   int GetNumberOfPackedChildren();
@@ -403,7 +408,7 @@ protected:
   const char* ConvertInternalStringToTclString(
     const char *str, int no_curly_braces = 1);
 
-  void PropagateEnableState(vtkKWWidget* widget);
+  virtual void PropagateEnableState(vtkKWWidget* widget);
 
 private:
   vtkKWWidget(const vtkKWWidget&); // Not implemented

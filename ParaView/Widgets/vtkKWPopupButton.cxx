@@ -15,13 +15,14 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
+#include "vtkKWFrame.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.10");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.11");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -33,7 +34,7 @@ vtkKWPopupButton::vtkKWPopupButton()
 
   this->PopupTopLevel = vtkKWWidget::New();
 
-  this->PopupFrame = vtkKWWidget::New();
+  this->PopupFrame = vtkKWFrame::New();
 
   this->PopupCloseButton = vtkKWPushButton::New();
 
@@ -99,7 +100,7 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   // Create the frame
 
   this->PopupFrame->SetParent(PopupTopLevel);
-  this->PopupFrame->Create(app, "frame", "-bd 2 -relief flat");
+  this->PopupFrame->Create(app, "-bd 2 -relief flat");
 
   tk_cmd << "pack " << this->PopupFrame->GetWidgetName() 
          << " -side top -expand y -fill both" << endl;

@@ -22,8 +22,9 @@
 
 class vtkKWApplication;
 class vtkKWCheckButton;
-class vtkKWLabel;
 class vtkKWFrame;
+class vtkKWLabel;
+class vtkKWPushButton;
 
 class VTK_EXPORT vtkKWMessageDialog : public vtkKWDialog
 {
@@ -144,9 +145,9 @@ public:
 
   // Description:
   // Accessor for OK and cancel button
-  vtkGetObjectMacro(OKButton, vtkKWWidget);
-  vtkGetObjectMacro(CancelButton, vtkKWWidget);
-  vtkGetObjectMacro(OtherButton, vtkKWWidget);
+  vtkGetObjectMacro(OKButton, vtkKWPushButton);
+  vtkGetObjectMacro(CancelButton, vtkKWPushButton);
+  vtkGetObjectMacro(OtherButton, vtkKWPushButton);
 
   // Description::
   // Close this Dialog (for the third button)
@@ -175,9 +176,9 @@ protected:
   vtkKWFrame       *BottomFrame;
   vtkKWLabel       *Label;
   vtkKWFrame       *ButtonFrame;
-  vtkKWWidget      *OKButton;
-  vtkKWWidget      *CancelButton;  
-  vtkKWWidget      *OtherButton;  
+  vtkKWPushButton  *OKButton;
+  vtkKWPushButton  *CancelButton;  
+  vtkKWPushButton  *OtherButton;  
   vtkKWLabel       *Icon;
   vtkKWFrame       *OKFrame;
   vtkKWFrame       *CancelFrame;

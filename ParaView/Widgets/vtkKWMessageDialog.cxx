@@ -19,11 +19,12 @@
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
+#include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.60");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.61");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -52,11 +53,11 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->CancelFrame->SetParent(this->ButtonFrame);  
   this->OtherFrame = vtkKWFrame::New();
   this->OtherFrame->SetParent(this->ButtonFrame);  
-  this->OKButton = vtkKWWidget::New();
+  this->OKButton = vtkKWPushButton::New();
   this->OKButton->SetParent(this->OKFrame);
-  this->CancelButton = vtkKWWidget::New();
+  this->CancelButton = vtkKWPushButton::New();
   this->CancelButton->SetParent(this->CancelFrame);
-  this->OtherButton = vtkKWWidget::New();
+  this->OtherButton = vtkKWPushButton::New();
   this->OtherButton->SetParent(this->OtherFrame);
   this->Style = vtkKWMessageDialog::Message;
   this->Icon = vtkKWLabel::New();
@@ -142,7 +143,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   if (nb_buttons >= 1)
     {
     this->OKFrame->Create(app, "-borderwidth 3 -relief flat");
-    this->OKButton->Create(app,"button","-width 16");
+    this->OKButton->Create(app, "-width 16");
     this->OKButton->SetTextOption(this->OKButtonText);
     this->OKButton->SetCommand(this, "OK");
     this->Script("pack %s %s %s",
@@ -153,7 +154,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   if (nb_buttons >= 3)
     {
     this->OtherFrame->Create(app, "-borderwidth 3 -relief flat");
-    this->OtherButton->Create(app,"button", "-width 16");
+    this->OtherButton->Create(app, "-width 16");
     this->OtherButton->SetTextOption(this->OtherButtonText);
     this->OtherButton->SetCommand(this, "Other");
     this->Script("pack %s %s %s",
@@ -164,7 +165,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   if (nb_buttons >= 2)
     {
     this->CancelFrame->Create(app, "-borderwidth 3 -relief flat");
-    this->CancelButton->Create(app,"button", "-width 16");
+    this->CancelButton->Create(app, "-width 16");
     this->CancelButton->SetTextOption(this->CancelButtonText);
     this->CancelButton->SetCommand(this, "Cancel");
     this->Script("pack %s %s %s",

@@ -14,6 +14,7 @@
 #include "vtkKWRange.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWCanvas.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
@@ -25,7 +26,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.30");
+vtkCxxRevisionMacro(vtkKWRange, "1.31");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -98,7 +99,7 @@ vtkKWRange::vtkKWRange()
   this->EntriesCommand      = NULL;
 
   this->CanvasFrame         = vtkKWFrame::New();
-  this->Canvas              = vtkKWWidget::New();
+  this->Canvas              = vtkKWCanvas::New();
 
   for (i = 0; i < VTK_KW_RANGE_NB_ENTRIES; i++)
     {
@@ -189,9 +190,7 @@ void vtkKWRange::Create(vtkKWApplication *app, const char *args)
   this->CanvasFrame->Create(app, "");
 
   this->Canvas->SetParent(this->CanvasFrame);
-  this->Canvas->Create(app, 
-                       "canvas", 
-                       "-bd 0 -highlightthickness 0 -width 0 -height 0");
+  this->Canvas->Create(app, "-bd 0 -highlightthickness 0 -width 0 -height 0");
 
   this->Script("bind %s <Configure> {%s ConfigureCallback}",
                this->CanvasFrame->GetWidgetName(), this->GetTclName());

@@ -23,6 +23,9 @@
 
 #include "vtkKWWidget.h"
 
+class vtkKWFrame;
+class vtkKWCanvas;
+
 class VTK_EXPORT vtkKWSegmentedProgressGauge : public vtkKWWidget
 {
 public:
@@ -67,8 +70,8 @@ protected:
   vtkKWSegmentedProgressGauge();
   ~vtkKWSegmentedProgressGauge();
 
-  vtkKWWidget *ProgressFrame;
-  vtkKWWidget *ProgressCanvas;
+  vtkKWFrame *ProgressFrame;
+  vtkKWCanvas *ProgressCanvas;
 
   int NumberOfSegments;
   int Width;

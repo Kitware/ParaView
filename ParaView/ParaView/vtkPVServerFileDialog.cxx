@@ -17,6 +17,7 @@
 #include "vtkDirectory.h"
 #include "vtkIntArray.h"
 #include "vtkKWDirectoryUtilities.h"
+#include "vtkKWCanvas.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -38,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.28");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.29");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -106,7 +107,7 @@ vtkPVServerFileDialog::vtkPVServerFileDialog()
   
   this->TopFrame = vtkKWWidget::New();
   this->MiddleFrame = vtkKWFrame::New();
-  this->FileList = vtkKWWidget::New();
+  this->FileList = vtkKWCanvas::New();
   this->BottomFrame = vtkKWWidget::New();
 
   this->DirectoryDisplay = vtkKWLabel::New();
@@ -293,7 +294,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
                this->MiddleFrame->GetWidgetName());
 
   this->FileList->SetParent(this->MiddleFrame); 
-  this->FileList->Create(app, "canvas", "-background white -bd 2 -relief sunken"); 
+  this->FileList->Create(app, "-background white -bd 2 -relief sunken"); 
   this->Script("pack %s -fill both -expand 1",
                this->FileList->GetWidgetName());
 

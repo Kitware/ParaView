@@ -15,6 +15,7 @@
 #include "vtkPVSourceList.h"
 
 #include "vtkCollectionIterator.h"
+#include "vtkKWCanvas.h"
 #include "vtkKWEntry.h"
 #include "vtkKWMenu.h"
 #include "vtkKWTkUtilities.h"
@@ -28,7 +29,7 @@
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.33");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.34");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 

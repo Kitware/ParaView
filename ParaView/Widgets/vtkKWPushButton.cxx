@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.16");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWPushButton::vtkKWPushButton()
@@ -90,6 +90,14 @@ void vtkKWPushButton::SetLabelWidth(int width)
 int vtkKWPushButton::GetLabelWidth()
 {
   return this->GetConfigurationOptionAsInt("-width");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWPushButton::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->SetStateOption(this->Enabled);
 }
 
 //----------------------------------------------------------------------------
