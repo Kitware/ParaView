@@ -28,7 +28,7 @@
 #include "vtkMultiProcessController.h"
 
 
-vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.2");
+vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.3");
 vtkStandardNewMacro(vtkIntegrateAttributes);
 
 //-----------------------------------------------------------------------------
@@ -166,24 +166,15 @@ void vtkIntegrateAttributes::Execute()
         }
       }
     } 
-    
+
+  // Here is the trick:  The satellites need a point and vertex to 
+  // marshal the attributes.  Node zero needs to receive first...
   int localProcId = 0;  
   // Send results to process 0.
   if (this->Controller)
     {
     localProcId = this->Controller->GetLocalProcessId();
-    if (localProcId > 0)
-      {
-      double msg[5];
-      msg[0] = (double)(this->IntegrationDimension);
-      msg[1] = this->Sum;
-      msg[2] = this->SumCenter[0];
-      msg[3] = this->SumCenter[1];
-      msg[4] = this->SumCenter[2];
-      this->Controller->Send(msg, 5, 0, 28876);
-      this->Controller->Send(output, 0, 28877);
-      }
-    else          
+    if (localProcId == 0)
       {
       int numProcs = this->Controller->GetNumberOfProcesses();
       int id;
@@ -203,58 +194,72 @@ void vtkIntegrateAttributes::Execute()
                                        output->GetPointData());
           this->IntegrateSatelliteData(tmp->GetCellData(),
                                        output->GetCellData());
-          tmp->Delete();
-          tmp = 0;
           }
+        tmp->Delete();
+        tmp = 0;
         }
       }
     }        
     
-  // Only process 0 should have data.  Generate point.
-  // Other processes have no output.  
-  if (localProcId == 0)
-    { 
-    vtkPoints* newPoints = vtkPoints::New();
-    newPoints->SetNumberOfPoints(1);
-    // Get rid of the weight factors.
-    if (this->Sum != 0.0)
-      {
-      this->SumCenter[0] = this->SumCenter[0] / this->Sum;    
-      this->SumCenter[1] = this->SumCenter[1] / this->Sum;    
-      this->SumCenter[2] = this->SumCenter[2] / this->Sum;    
-      }
-    newPoints->InsertPoint(0, this->SumCenter);
-    output->SetPoints(newPoints);
-    newPoints->Delete();
-    newPoints = 0;
-        
-    output->Allocate(1);
-    vtkIdType vertexPtIds[1];
-    vertexPtIds[0] = 0;
-    output->InsertNextCell(VTK_VERTEX, 1, vertexPtIds);
-
-    // Create a new cell array for the total length, area or volume.
-    vtkDoubleArray* sumArray = vtkDoubleArray::New();
-    switch (this->IntegrationDimension)
-      {
-      case 1:
-        sumArray->SetName("Length");
-        break;
-      case 2:
-        sumArray->SetName("Area");
-        break;
-      case 3:
-        sumArray->SetName("Volume");
-        break;
-      }
-    sumArray->SetNumberOfTuples(1);
-    sumArray->SetValue(0, this->Sum);
-    output->GetCellData()->AddArray(sumArray);
-    sumArray->Delete();
-    cellPtIds->Delete();
+  // Generate point and vertex.  Add extra attributes for area too.
+  // Satellites do not need the area attribute, but it does not hurt.
+  double pt[3];
+  vtkPoints* newPoints = vtkPoints::New();
+  newPoints->SetNumberOfPoints(1);
+  // Get rid of the weight factors.
+  if (this->Sum != 0.0)
+    {
+    pt[0] = this->SumCenter[0] / this->Sum;    
+    pt[1] = this->SumCenter[1] / this->Sum;    
+    pt[2] = this->SumCenter[2] / this->Sum;    
     }
   else
     {
+    pt[0] = this->SumCenter[0];    
+    pt[1] = this->SumCenter[1];    
+    pt[2] = this->SumCenter[2];    
+    }    
+  newPoints->InsertPoint(0, pt);
+  output->SetPoints(newPoints);
+  newPoints->Delete();
+  newPoints = 0;
+      
+  output->Allocate(1);
+  vtkIdType vertexPtIds[1];
+  vertexPtIds[0] = 0;
+  output->InsertNextCell(VTK_VERTEX, 1, vertexPtIds);
+
+  // Create a new cell array for the total length, area or volume.
+  vtkDoubleArray* sumArray = vtkDoubleArray::New();
+  switch (this->IntegrationDimension)
+    {
+    case 1:
+      sumArray->SetName("Length");
+      break;
+    case 2:
+      sumArray->SetName("Area");
+      break;
+    case 3:
+      sumArray->SetName("Volume");
+      break;
+    }
+  sumArray->SetNumberOfTuples(1);
+  sumArray->SetValue(0, this->Sum);
+  output->GetCellData()->AddArray(sumArray);
+  sumArray->Delete();
+  cellPtIds->Delete();
+
+  if (localProcId > 0)
+    {
+    double msg[5];
+    msg[0] = (double)(this->IntegrationDimension);
+    msg[1] = this->Sum;
+    msg[2] = this->SumCenter[0];
+    msg[3] = this->SumCenter[1];
+    msg[4] = this->SumCenter[2];
+    this->Controller->Send(msg, 5, 0, 28876);
+    this->Controller->Send(output, 0, 28877);
+    // Done sending.  Reset output so satellites will have empty data.    
     output->Initialize();
     }
 }        
@@ -396,19 +401,27 @@ void vtkIntegrateAttributes::IntegrateSatelliteData(vtkDataSetAttributes* inda,
   int numArrays, i, numComponents, j;
   vtkDataArray* inArray;
   vtkDataArray* outArray;
-  numArrays = inda->GetNumberOfArrays();
+  numArrays = outda->GetNumberOfArrays();
   double vIn, vOut;
   for (i = 0; i < numArrays; ++i)
     {
-    // We could template for speed.
-    inArray = inda->GetArray(i);
     outArray = outda->GetArray(i);
-    numComponents = inArray->GetNumberOfComponents();
-    for (j = 0; j < numComponents; ++j)
+    numComponents = outArray->GetNumberOfComponents();
+    // Protect against arrays in a different order.
+    const char* name = outArray->GetName();
+    if (name && name[0] != '\0')
       {
-      vIn = inArray->GetComponent(0, j);
-      vOut = outArray->GetComponent(0, j);
-      outArray->SetComponent(0,j,vOut+vIn);
+      inArray = inda->GetArray(name);
+      if (inArray && inArray->GetNumberOfComponents() == numComponents)
+        {
+        // We could template for speed.
+        for (j = 0; j < numComponents; ++j)
+          {
+          vIn = inArray->GetComponent(0, j);
+          vOut = outArray->GetComponent(0, j);
+          outArray->SetComponent(0,j,vOut+vIn);
+          }
+        }
       }
     }
 }
@@ -503,32 +516,29 @@ void vtkIntegrateAttributes::IntegrateTriangle(vtkDataSet* input,
 {
   double pt1[3], pt2[3], pt3[3];
   double mid[3], v1[3], v2[3];
-  double base, height, k;
+  double cross[3];
+  double k;
   
   input->GetPoint(pt1Id,pt1);
   input->GetPoint(pt2Id,pt2);
   input->GetPoint(pt3Id,pt3);
 
-  // Compute the length of the base.
+  // Compute two legs.
   v1[0] = pt2[0] - pt1[0];
   v1[1] = pt2[1] - pt1[1];
   v1[2] = pt2[2] - pt1[2];
-  base = sqrt(v1[0]*v1[0] + v1[1]*v1[1] + v1[2]*v1[2]);
-  if (base == 0.0)
-    {
-    return;
-    }
-  // Compute the height
   v2[0] = pt3[0] - pt1[0];
   v2[1] = pt3[1] - pt1[1];
   v2[2] = pt3[2] - pt1[2];
-  k = vtkMath::Dot(v1, v2)/base;
-  v2[0] = v2[0] - v1[0]*k;
-  v2[1] = v2[1] - v1[1]*k;
-  v2[2] = v2[2] - v1[2]*k;
-  height = sqrt(v2[0]*v2[0] + v2[1]*v2[1] + v2[2]*v2[2]);
+
+  // Use the cross product to compute the area of the parallelogram.
+  vtkMath::Cross(v1,v2,cross);
+  k = sqrt(cross[0]*cross[0] + cross[1]*cross[1] + cross[2]*cross[2]) * 0.5;
   
-  k = base * height * 0.5;
+  if (k == 0.0)
+    {
+    return;
+    }
   this->Sum += k;
 
   // Compute the middle, which is really just another attribute.
