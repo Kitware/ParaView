@@ -36,7 +36,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 int SetApplicationIconCmd(ClientData clientdata, 
                           Tcl_Interp *interp, 
-                          int argc, char *argv[])
+                          int argc, 
+#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4 && TCL_RELEASE_LEVEL >= TCL_FINAL_RELEASE)
+                                 CONST84
+#endif
+                          char *argv[])
 {
 #ifdef _WIN32
   HWND winHandle;
@@ -45,6 +49,8 @@ int SetApplicationIconCmd(ClientData clientdata,
   HINSTANCE hInst = 0;
   int iconID, error, set_small;
   char cmd[1024];
+  char app_path[_MAX_PATH];
+  DWORD app_path_length;
 
   clientdata = 0; // To avoid warning: unreferenced formal parameter
 
@@ -67,6 +73,17 @@ int SetApplicationIconCmd(ClientData clientdata,
 
   sscanf(interp->result, "0x%x", (int*)&winHandle);
 
+  // If the app name is empty, try to find the current application name
+
+  if (!argv[1] || !*argv[1])
+    {
+    app_path_length = GetModuleFileName(NULL, app_path, _MAX_PATH);
+    if (app_path_length)
+      {
+      argv[1] = app_path;
+      }
+    }
+                                   
   // Get application instance
 
   hInst = LoadLibrary(argv[1]);
