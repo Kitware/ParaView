@@ -113,7 +113,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.174");
+vtkCxxRevisionMacro(vtkPVApplication, "1.175");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -579,7 +579,7 @@ int vtkPVApplication::CheckForExtension(const char* arg,
     {
     return 0;
     }
-  if (!arg || strlen(arg) < extLen)
+  if (!arg || static_cast<int>(strlen(arg)) < extLen)
     {
     return 0;
     }
