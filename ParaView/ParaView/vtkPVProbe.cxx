@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPVArraySelection.h"
+#include "vtkPVInputMenu.h"
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -61,8 +62,6 @@ vtkPVProbe::vtkPVProbe()
   this->CommandFunction = vtkPVProbeCommand;
 
   this->ScalarArrayMenu = vtkPVArrayMenu::New();
-  this->InputScalarsSelection = NULL;
-  this->InputScalarsComponentSelection = 0;
 
   this->DimensionalityMenu = vtkKWOptionMenu::New();
   this->DimensionalityLabel = vtkKWLabel::New();
@@ -182,7 +181,6 @@ vtkPVProbe::~vtkPVProbe()
 
   this->ScalarArrayMenu->Delete();
   this->ScalarArrayMenu = NULL;
-  this->SetInputScalarsSelection(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -246,7 +244,6 @@ void vtkPVProbe::CreateProperties()
   this->ScalarArrayMenu->ShowComponentMenuOn();
   this->ScalarArrayMenu->SetInputName("Input");
   this->ScalarArrayMenu->SetAttributeType(vtkDataSetAttributes::SCALARS);
-  this->ScalarArrayMenu->SetObjectTclName(this->GetTclName());
   this->ScalarArrayMenu->SetParent(this->ParameterFrame->GetFrame());
   this->ScalarArrayMenu->SetLabel("Scalars");
   this->ScalarArrayMenu->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
@@ -518,6 +515,8 @@ void vtkPVProbe::SetInteractor()
 void vtkPVProbe::AcceptCallback()
 {
   int i;
+  const char *arrayName = this->ScalarArrayMenu->GetValue();
+  int component;
 
   // This can't be an accept command because this calls SetInput for the
   // vtkProbeFilter, and vtkPVSource::AcceptCallback expects that the the
@@ -631,28 +630,27 @@ void vtkPVProbe::AcceptCallback()
     }
   else if (this->Dimensionality == 1)
     {
-    if (this->ScalarArrayMenu->GetArrayNumberOfComponents() > 1)
+    component = this->ScalarArrayMenu->GetSelectedComponent();
+    if (component > 1)
       {
       this->Script("%s SetYTitle {%s %d}", this->XYPlotTclName, 
-                   this->InputScalarsSelection, this->InputScalarsComponentSelection);
+                   arrayName, component);
       }
     else
       {
-      this->Script("%s SetYTitle {%s}", this->XYPlotTclName, this->InputScalarsSelection);
+      this->Script("%s SetYTitle {%s}", this->XYPlotTclName, arrayName);
       }
     this->Script("%s RemoveAllInputs", this->XYPlotTclName);
     this->Script("%s AddInput %s %s %d", this->XYPlotTclName,
                  this->GetPVOutput()->GetVTKDataTclName(), 
-                 this->InputScalarsSelection,
-                 this->InputScalarsComponentSelection);
+                 arrayName, component);
         
     // Color by the choosen array in the output.
-    this->GetPVOutput()->ColorByPointFieldComponent(this->InputScalarsSelection, 
-                                                    this->InputScalarsComponentSelection);
+    this->GetPVOutput()->ColorByPointFieldComponent(arrayName, component);
     // The menu's not changing, but It is going to replaced soon.
     // For now I will put this here.
     char tmp[256];
-    sprintf(tmp, "Point %s %d", this->InputScalarsSelection, this->InputScalarsComponentSelection);
+    sprintf(tmp, "Point %s %d", arrayName, component);
     this->GetPVOutput()->GetColorMenu()->SetValue(tmp);
 
     if (this->ShowXYPlotToggle->GetState())
@@ -663,18 +661,6 @@ void vtkPVProbe::AcceptCallback()
       }
     window->GetMainView()->Render();
     }
-}
-
-
-void vtkPVProbe::SelectInputScalars(const char *fieldName) 
-{
-  this->SetInputScalarsSelection(fieldName);
-}
-
-
-void vtkPVProbe::SelectInputScalarsComponent(int comp) 
-{
-  this->InputScalarsComponentSelection = comp;
 }
 
 
@@ -865,8 +851,10 @@ void vtkPVProbe::UseLine()
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->ProbeFrame->GetWidgetName());
 
-  this->Script("pack %s -side top -fill x -expand t",
-               this->ScalarArrayMenu->GetWidgetName());
+  this->Script("pack %s -side top -fill x -expand t -after %s",
+               this->ScalarArrayMenu->GetWidgetName(),
+               this->InputMenu->GetWidgetName());
+  this->ScalarArrayMenu->Update();
 
   this->Script("pack %s %s %s %s %s",
                this->EndPointMenuFrame->GetWidgetName(),

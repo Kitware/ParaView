@@ -170,7 +170,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   int numProcs, id;
   char tclName[100];
   
-  this->SetApplication(pvApp);
+  this->vtkKWActorComposite::SetApplication(pvApp);
   
   sprintf(tclName, "Geometry%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
@@ -365,7 +365,7 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->DisplayScalesFrame->Delete();
   this->DisplayScalesFrame = NULL;
   
-  this->SetInput(NULL);
+  this->SetInput((vtkPVData*)NULL);
     
   if (this->ScalarBarTclName)
     {
@@ -986,7 +986,7 @@ void vtkPVActorComposite::ColorByProperty()
 
 
 //----------------------------------------------------------------------------
-void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
+void vtkPVActorComposite::ColorByPointFieldComponent(const char *name, int comp)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -1015,7 +1015,7 @@ void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
+void vtkPVActorComposite::ColorByCellFieldComponent(const char *name, int comp)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 

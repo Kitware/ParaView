@@ -54,13 +54,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #else
-#if VTK_USE_MESA
-#include "vtkMesaRenderWindow.h"
-#include "vtkMesaRenderer.h"
-#endif
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkOpenGLRenderer.h"
 #endif
+
+#include "vtkDummyRenderWindow.h"
+#include "vtkDummyRenderer.h"
 
 #include "vtkTimerLog.h"
 #include "vtkPVActorComposite.h"
@@ -151,6 +150,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 {
   // Get rid of renderer created by the superclass
   this->Renderer->Delete();
+
   this->Renderer = (vtkRenderer*)pvApp->MakeTclObject("vtkRenderer", "Ren1");
   this->RendererTclName = NULL;
   this->SetRendererTclName("Ren1");

@@ -119,6 +119,7 @@ public:
   // The actor composite needs to know which PVData it belongs to.
   void SetInput(vtkPVData *data);
   vtkGetObjectMacro(PVData, vtkPVData);
+  void SetInput(vtkPolyData* d) {d=d; vtkErrorMacro("HiddenMethod");}
   
   // Description:
   // Parallel methods for computing the scalar range from the input,
@@ -128,6 +129,13 @@ public:
   // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
+
+  virtual void SetApplication(vtkPVApplication *pvApp)
+    {this->vtkKWActorComposite::SetApplication(pvApp);}
+  virtual void SetApplication(vtkKWApplication *a) 
+    {a=a;vtkErrorMacro("Hidden Method");}
+
+
   
   vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
   
@@ -234,8 +242,8 @@ public:
   // Description:
   // Callback methods when item chosen from ColorMenu
   void ColorByProperty();
-  void ColorByPointFieldComponent(char *name, int comp);
-  void ColorByCellFieldComponent(char *name, int comp);
+  void ColorByPointFieldComponent(const char *name, int comp);
+  void ColorByCellFieldComponent(const char *name, int comp);
 
   // Description:
   // Callback for color map menu.

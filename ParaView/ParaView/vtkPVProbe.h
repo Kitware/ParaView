@@ -129,14 +129,6 @@ public:
   // Description:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
-
-  // Description:
-  // Callbacks method for array menu.
-  void SelectInputScalars(const char *fieldName); 
-  vtkGetStringMacro(InputScalarsSelection);
-  void SelectInputScalarsComponent(int comp);
-  vtkGetMacro(InputScalarsComponentSelection, int);
-
   
 protected:
   vtkPVProbe();
@@ -184,10 +176,6 @@ protected:
 
   int InstanceCount;
   vtkKWInteractor* PreviousInteractor;
-
-  char* InputScalarsSelection;
-  vtkSetStringMacro(InputScalarsSelection);
-  int InputScalarsComponentSelection;
 };
 
 #endif

@@ -162,6 +162,7 @@ public:
   // Description:
   // Change the background color.
   void SetBackgroundColor(float r, float g, float b);
+  virtual void SetBackgroundColor(float *c) {this->SetBackgroundColor(c[0],c[1],c[2]);}
 
   // Description:
   // Close the view - called from the vtkkwwindow. This default method

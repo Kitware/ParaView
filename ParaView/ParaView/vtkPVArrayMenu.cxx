@@ -373,7 +373,7 @@ void vtkPVArrayMenu::Accept()
 
   if (this->InputName == NULL || this->ObjectTclName == NULL)
     {
-    vtkErrorMacro("Access names have not all been set.");
+    vtkDebugMacro("Access names have not all been set.");
     return;
     }
 
@@ -436,7 +436,7 @@ void vtkPVArrayMenu::Reset()
 
   if (this->InputName == NULL || this->ObjectTclName == NULL)
     {
-    vtkErrorMacro("Access names have not all been set.");
+    vtkDebugMacro("Access names have not all been set.");
     return;
     }
 

@@ -1,5 +1,7 @@
 SOURCE_FILES( ParaView_SRCS
 vtkCameraInteractor 
+vtkDummyRenderer
+vtkDummyRenderWindow
 vtkInteractor 
 vtkKWBoundsDisplay
 vtkKWCenterOfRotation 
