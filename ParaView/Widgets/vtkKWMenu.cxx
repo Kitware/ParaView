@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.28.2.3");
+vtkCxxRevisionMacro(vtkKWMenu, "1.28.2.4");
 
 
 
@@ -655,7 +655,7 @@ int vtkKWMenu::GetItemLabel(int position, char* label, int maxlen)
     }
   const char* lbl = 
     this->Script("%s entrycget %d -label", this->GetWidgetName(), position);
-  if (!label[0]) 
+  if (!lbl[0]) 
     {
     return VTK_ERROR;
     }
