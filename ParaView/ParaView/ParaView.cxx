@@ -31,6 +31,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkTclUtil.h"
 #include "vtkToolkits.h"
 
+#ifdef VTK_USE_MPI
+ #include <mpi.h>
+#endif
+
 // external global variable.
 vtkMultiProcessController *VTK_PV_UI_CONTROLLER = NULL;
 
@@ -65,6 +69,10 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   
   myId = controller->GetLocalProcessId();
   numProcs = controller->GetNumberOfProcesses();
+
+#ifdef MPIPROALLOC
+  vtkCommunicator::SetUseCopy(1);
+#endif
 
 #ifdef PV_USE_SGI_PIPES
   // assuming that the number of pipes is the same as the number of procs
