@@ -813,6 +813,10 @@ help="Set the name of the array to hold the results of this computation"/>
         <SphereWidget use_label="0" trace_name="Sphere"
             help="Adjusts the parameters of the sphere to clip with."/>
       </Item>
+      <Item label="Box" value="GetBoxTclName">
+        <BoxWidget use_label="0" trace_name="Box"
+            help="Adjusts the parameters of the box to clip with."/>
+      </Item>
       <Item label="Scalars">
         <ContainerWidget>
          <Item>

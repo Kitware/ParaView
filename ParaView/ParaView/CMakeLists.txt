@@ -24,6 +24,7 @@ SET( ParaView_SRCS
   vtkPVArraySelection.cxx
   vtkPVBatchCompositeManager.cxx
   vtkPVBoundsDisplay.cxx
+  vtkPVBoxWidget.cxx
   vtkPVCalculatorWidget.cxx
   vtkPVCameraIcon.cxx
   vtkPVCameraManipulator.cxx
