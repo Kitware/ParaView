@@ -631,7 +631,7 @@ void vtkPVActorComposite::ResetColorRange()
   // Avoid the bad range error
   if (range[1] <= range[0])
     {
-    range[1] = range[2] + 0.000001;
+    range[1] = range[0] + 0.000001;
     }
 
   this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
