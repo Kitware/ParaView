@@ -56,8 +56,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWIcon.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWSaveImageDialog.h"
+#include "vtkKWSegmentedProgressGauge.h"
 #include "vtkKWSerializer.h"
 #include "vtkKWUserInterfaceManager.h"
 #include "vtkKWWidgetCollection.h"
@@ -75,7 +77,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTextProperty.h"
 #include "vtkViewport.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkKWSegmentedProgressGauge.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -103,7 +104,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.101");
+vtkCxxRevisionMacro(vtkKWView, "1.102");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -156,7 +157,7 @@ vtkKWView::vtkKWView()
   this->UseProgressGauge = 0;
   this->ProgressGauge = vtkKWSegmentedProgressGauge::New();
   this->ProgressGauge->SetParent(this->Frame2);
-  
+
   this->AnnotationProperties = vtkKWFrame::New();
   this->HeaderFrame = vtkKWLabeledFrame::New();
   this->HeaderDisplayFrame = vtkKWWidget::New();
@@ -293,8 +294,7 @@ vtkKWView::~vtkKWView()
   delete [] this->StillUpdateRates;
   
   this->SetMenuEntryName(NULL);
-  this->SetMenuEntryHelp(NULL);
-  
+  this->SetMenuEntryHelp(NULL);  
 }
 
 //----------------------------------------------------------------------------
@@ -1518,7 +1518,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.101 $");
+  this->ExtractRevision(os,"$Revision: 1.102 $");
 }
 
 //----------------------------------------------------------------------------

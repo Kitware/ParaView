@@ -18,6 +18,7 @@ vtkKWEvent.cxx
 vtkKWExtent.cxx 
 vtkKWFrame.cxx
 vtkKWGenericComposite.cxx 
+vtkKWGenericRenderWindowInteractor.cxx
 vtkKWImageLabel.cxx
 vtkKWLabel.cxx
 vtkKWLabeledCheckButtonSet.cxx 
@@ -41,10 +42,12 @@ vtkKWProgressGauge.cxx
 vtkKWPushButton.cxx 
 vtkKWPushButtonSet.cxx 
 vtkKWRadioButton.cxx 
-vtkKWRadioButtonSet.cxx 
+vtkKWRadioButtonSet.cxx
+vtkKWRenderWidget.cxx 
 vtkKWSaveImageDialog.cxx 
 vtkKWScale.cxx 
 vtkKWSegmentedProgressGauge.cxx
+vtkKWSelectionFrame.cxx
 vtkKWSplashScreen.cxx
 vtkKWSplitFrame.cxx
 vtkKWTclInteractor.cxx
@@ -68,6 +71,7 @@ ${VTK_TCL_HOME}/vtktcl.c
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWComposite.cxx
+  vtkKWRenderWidget.cxx
   vtkKWView.cxx
   vtkKWUserInterfaceManager.cxx
   ABSTRACT

@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWApplication;
 class vtkKWEntry;
+class vtkKWLabel;
 class vtkKWPushButton;
 
 class VTK_EXPORT vtkKWScale : public vtkKWWidget
@@ -82,6 +83,12 @@ public:
   virtual void SetRange(float *range) { this->SetRange(range[0], range[1]); };
   vtkGetVector2Macro(Range, float);
 
+  // Description:
+  // Set/get whether to display the range of the scale
+  void SetDisplayRange(int flag);
+  vtkGetMacro(DisplayRange, int);
+  vtkBooleanMacro(DisplayRange, int);
+  
   // Description:
   // Display a label and/or a text entry box. These are optional.
   // Get the corresponding internal objects.
@@ -174,6 +181,7 @@ protected:
   int         DisplayEntryAndLabelOnTop;
   int         PopupScale;
   int         ExpandEntry;
+  int         DisplayRange;
   int         SmartResize;
 
   char        *Command;
@@ -193,6 +201,9 @@ protected:
   vtkKWWidget *TopLevel;
   vtkKWPushButton *PopupPushButton;
 
+  vtkKWLabel *RangeMinLabel;
+  vtkKWLabel *RangeMaxLabel;
+  
   char *NormalLabel;
   char *ShortLabel;
   int MediumWidth;

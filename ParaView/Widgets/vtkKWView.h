@@ -70,7 +70,9 @@ class vtkKWFrame;
 class vtkKWGenericComposite;
 class vtkKWLabeledFrame;
 class vtkKWMenu;
+class vtkKWMenuButton;
 class vtkKWNotebook;
+class vtkKWSegmentedProgressGauge;
 class vtkKWText;
 class vtkKWWindow;
 class vtkKWWindow;
@@ -81,7 +83,6 @@ class vtkTextMapper;
 class vtkViewport;
 class vtkViewport;
 class vtkWindow;
-class vtkKWSegmentedProgressGauge;
 
 class VTK_EXPORT vtkKWView : public vtkKWWidget
 {
