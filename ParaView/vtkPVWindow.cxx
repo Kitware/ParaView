@@ -46,12 +46,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVData.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
-#include "vtkSuperquadricSource.h"
-#include "vtkImageMandelbrotSource.h"
 
 #include "vtkPVSourceInterface.h"
 #include "vtkPVEnSightReaderInterface.h"
 #include "vtkPVDataSetReaderInterface.h"
+#include "vtkPVArrayCalculator.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -81,6 +80,8 @@ vtkPVWindow::vtkPVWindow()
   this->CameraStyleButton = vtkKWPushButton::New();
   this->CurrentSourceButton = vtkKWPushButton::New();
   this->CurrentActorButton = vtkKWPushButton::New();
+
+  this->CalculatorButton = vtkKWPushButton::New();
   
   this->Sources = vtkKWCompositeCollection::New();
   
@@ -110,6 +111,9 @@ vtkPVWindow::~vtkPVWindow()
   this->CurrentSourceButton = NULL;
   this->CurrentActorButton->Delete();
   this->CurrentActorButton = NULL;
+  
+  this->CalculatorButton->Delete();
+  this->CalculatorButton = NULL;
   
   this->SourceList->Delete();
   this->SourceList = NULL;
@@ -213,6 +217,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CurrentActorButton->SetCommand(this, "ShowCurrentActorProperties");
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
 	       this->CurrentActorButton->GetWidgetName());
+  
+  this->CalculatorButton->SetParent(this->Toolbar);
+  this->CalculatorButton->Create(app, "-text Calculator");
+  this->CalculatorButton->SetCommand(this, "CalculatorCallback");
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+               this->CalculatorButton->GetWidgetName());
   
   // This button doesn't do anything useful right now.  It was put in originally
   // so we could switch between interactor styles.
@@ -465,6 +475,72 @@ void vtkPVWindow::ResetCameraCallback()
 {
   this->MainView->ResetCamera();
   this->MainView->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::CalculatorCallback()
+{
+  static int instanceCount = 0;
+  char tclName[256];
+  vtkSource *s;
+  vtkDataSet *d;
+  vtkPVArrayCalculator *calc;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVData *pvd;
+  vtkPVData *current;
+  const char* outputDataType;
+  
+  // Before we do anything, let's see if we can determine the output type.
+  current = this->GetCurrentPVData();
+  if (current == NULL)
+    {
+    vtkErrorMacro("Cannot determine output type.");
+    return;
+    }
+  outputDataType = current->GetVTKData()->GetClassName();
+  
+  // Create the vtkSource.
+  sprintf(tclName, "%s%d", "Calculator", instanceCount);
+  // Create the object through tcl on all processes.
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkArrayCalculator", tclName));
+  if (s == NULL)
+    {
+    vtkErrorMacro("Could not get pointer from object.");
+    return;
+    }
+  
+  calc = vtkPVArrayCalculator::New();
+  calc->SetPropertiesParent(this->GetMainView()->GetSourceParent());
+  calc->SetApplication(pvApp);
+  calc->SetVTKSource(s, tclName);
+  calc->SetNthPVInput(0, this->GetCurrentPVData());
+  calc->CreateProperties();
+  calc->SetName(tclName);
+  
+
+  this->GetMainView()->AddComposite(calc);
+  this->SetCurrentPVSource(calc);
+  this->GetMainView()->ShowSourceParent();
+
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  sprintf(tclName, "%sOutput%d", "Calculator", instanceCount);
+  // Create the object through tcl on all processes.
+
+  d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
+  pvd->SetVTKData(d, tclName);
+
+  // Connect the source and data.
+  calc->SetNthPVOutput(0, pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", calc->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  
+//  calc->ShowProperties();
+  
+  calc->Delete();
+
+  ++instanceCount;
 }
 
 //----------------------------------------------------------------------------
@@ -1321,4 +1397,3 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 }
-

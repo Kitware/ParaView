@@ -290,7 +290,7 @@ vtkPVApplication* vtkPVSource::GetPVApplication()
 
 //----------------------------------------------------------------------------
 void vtkPVSource::CreateProperties()
-{ 
+{
   const char *sourcePage;
   vtkPVApplication *app = this->GetPVApplication();
 

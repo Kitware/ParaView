@@ -77,7 +77,7 @@ public:
   
   // Description:
   // The current data is the data object that will be used as input to the next filter.
-  // It is ussually the first output of the current source.  If the current source
+  // It is usually the last output of the current source.  If the current source
   // has more than one output, they can be selected through the UI.  The current data
   // determines which filters are displayed in the filter menu.
   void SetCurrentPVData(vtkPVData *data);
@@ -121,6 +121,9 @@ public:
   void SavePipeline();
 
   // Description:
+  // Callback from the calculator button.
+  void CalculatorCallback();
+  
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -140,6 +143,8 @@ protected:
   vtkKWPushButton *CurrentSourceButton;
   vtkKWPushButton *CurrentActorButton;
 
+  vtkKWPushButton *CalculatorButton;
+  
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;
   vtkPVSourceList *SourceList;

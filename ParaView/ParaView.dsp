@@ -97,11 +97,27 @@ SOURCE=.\tcl\KWParaViewInit.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkClipPlane.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkClipPlaneTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkColorByProcess.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkColorByProcessTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkCutPlane.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkCutPlaneTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -214,6 +230,14 @@ SOURCE=.\vtkPVApplication.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVApplicationTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVArrayCalculator.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVArrayCalculatorTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -333,6 +357,26 @@ SOURCE=.\vtkStringListTcl.cxx
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
+SOURCE=.\vtkClipPlane.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkClipPlane.h
+InputName=vtkClipPlane
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkColorByProcess.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -342,6 +386,26 @@ SOURCE=.\vtkColorByProcess.h
 # Begin Custom Build
 InputPath=.\vtkColorByProcess.h
 InputName=vtkColorByProcess
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkCutPlane.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkCutPlane.h
+InputName=vtkCutPlane
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -658,6 +722,26 @@ InputName=vtkPVApplication
 # Begin Custom Build
 InputPath=.\vtkPVApplication.h
 InputName=vtkPVApplication
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVArrayCalculator.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVArrayCalculator.h
+InputName=vtkPVArrayCalculator
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
