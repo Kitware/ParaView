@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.4");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.5");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1077,8 +1077,6 @@ void vtkPVData::CreateProperties()
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
 
-  this->Script("pack %s -fill x -expand t", this->ViewFrame->GetWidgetName());
-
   this->Script("grid %s %s -sticky wns",
                this->VisibilityCheck->GetWidgetName(),
                this->ResetCameraButton->GetWidgetName());
@@ -1116,8 +1114,6 @@ void vtkPVData::CreateProperties()
   this->ColorButton->SetText("Actor Color");
   this->ColorButton->SetCommand(this, "ChangeActorColor");
   
-  this->Script("pack %s -fill x -expand t", this->ColorFrame->GetWidgetName());
-
   this->Script("grid %s %s -sticky wns",
                this->ColorMenuLabel->GetWidgetName(),
                this->ColorMenu->GetWidgetName());
@@ -1203,8 +1199,6 @@ void vtkPVData::CreateProperties()
                this->LineWidthScale->GetEntry()->GetWidgetName());
   this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
 
-  this->Script("pack %s -fill x", this->DisplayStyleFrame->GetWidgetName());
-  
   this->Script("grid %s %s -sticky wns",
                this->RepresentationMenuLabel->GetWidgetName(),
                this->RepresentationMenu->GetWidgetName());
@@ -1338,14 +1332,19 @@ void vtkPVData::CreateProperties()
   this->Script("grid columnconfigure %s 3 -weight 2", 
                this->ActorControlFrame->GetFrame()->GetWidgetName());
 
-  this->Script("pack %s -fill x -expand yes -side top", 
-               this->ActorControlFrame->GetWidgetName());
-
   if (!this->GetPVSource()->GetHideDisplayPage())
     {
     this->Script("pack %s -fill both -expand yes -side top",
                  this->Properties->GetWidgetName());
     }
+
+  // Pack
+
+  this->Script("pack %s %s %s %s -fill x -expand t -pady 2", 
+               this->ViewFrame->GetWidgetName(),
+               this->ColorFrame->GetWidgetName(),
+               this->DisplayStyleFrame->GetWidgetName(),
+               this->ActorControlFrame->GetWidgetName());
 
   // Information page
 
@@ -1378,13 +1377,12 @@ void vtkPVData::CreateProperties()
   this->BoundsDisplay->SetParent(this->InformationFrame->GetFrame());
   this->BoundsDisplay->Create(this->Application);
   
-  this->Script("pack %s -fill x", this->StatsFrame->GetWidgetName());
-
   this->Script("pack %s %s -side top -anchor nw",
                this->NumCellsLabel->GetWidgetName(),
                this->NumPointsLabel->GetWidgetName());
 
-  this->Script("pack %s -fill x -expand t", 
+  this->Script("pack %s %s -fill x -expand t -pady 2", 
+               this->StatsFrame->GetWidgetName(),
                this->BoundsDisplay->GetWidgetName());
 
   if (!this->GetPVSource()->GetHideInformationPage())
@@ -2775,7 +2773,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.4 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.5 $");
 }
 
 //----------------------------------------------------------------------------

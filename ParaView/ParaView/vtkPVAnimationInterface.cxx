@@ -55,7 +55,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.28");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.28.2.1");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -255,8 +255,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   this->ControlFrame->ShowHideFrameOn();
   this->ControlFrame->Create(this->Application);
-  this->Script("pack %s -side top -expand t -fill x", 
-               this->ControlFrame->GetWidgetName());
   this->ControlFrame->SetLabel("Animation Control");
   this->ControlButtonFrame->Create(this->Application, "frame", "-bd 2");
   this->Script("pack %s -side top -expand t -fill x", 
@@ -326,8 +324,6 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->ActionFrame->ShowHideFrameOn();
   this->ActionFrame->Create(this->Application);
   this->ActionFrame->SetLabel("Action");
-  this->Script("pack %s -side top -expand t -fill x", 
-               this->ActionFrame->GetWidgetName());
 
   this->ScriptCheckButtonFrame->Create(this->Application, "frame", "");
   this->Script("pack %s -side top -expand t -fill x", 
@@ -377,6 +373,12 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
                this->SourceMenuButton->GetWidgetName(),
                this->MethodLabel->GetWidgetName(),
                this->MethodMenuButton->GetWidgetName());
+
+  // Pack frames
+
+  this->Script("pack %s %s -side top -expand t -fill x -pady 2", 
+               this->ControlFrame->GetWidgetName(),
+               this->ActionFrame->GetWidgetName());
 
   this->UpdateSourceMenu();
   this->UpdateMethodMenu();
