@@ -2750,5 +2750,425 @@
 
    </SourceProxy>
 
+  <SourceProxy name="GenericClip" class="vtkGenericClip">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkGenericDataSet"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            optional="1"/>
+     </InputProperty>
+
+     <ProxyProperty name="ClipFunction" command="SetClipFunction">
+           <ProxyGroupDomain name="groups">
+               <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+     </ProxyProperty>
+
+     <DoubleVectorProperty
+        name="InputBounds">
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="InsideOut" 
+        command="SetInsideOut" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list" attribute_type="Scalars">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty> 
+
+     <DoubleVectorProperty
+        name="Value"
+        command="SetValue"
+        number_of_elements="1"
+        default_values="0.0" >
+          <ArrayRangeDomain name="scalar_range">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+               <Property name="SelectInputScalars" function="ArraySelection"/>
+            </RequiredProperties>
+          </ArrayRangeDomain>         
+          <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+   <!-- End GenericClip -->
+   </SourceProxy>
+
+   <SourceProxy name="GenericContour" class="vtkGenericContourFilter">
+
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkGenericDataSet"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            number_of_components="1" optional="1"/>
+     </InputProperty>
+
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1"> 
+          <ArrayListDomain name="array_list" attribute_type="Scalars">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="ContourValues"
+        command="SetValue"
+        set_number_command="SetNumberOfContours"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
+          <ArrayRangeDomain name="scalar_range">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+               <Property name="SelectInputScalars" function="ArraySelection"/>
+            </RequiredProperties>
+          </ArrayRangeDomain>         
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="ComputeNormals" 
+        command="SetComputeNormals" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ComputeGradients" 
+        command="SetComputeGradients" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ComputeScalars" 
+        command="SetComputeScalars" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+   <!-- End GenericContour -->
+   </SourceProxy>
+
+ <SourceProxy name="GenericCut" class="vtkGenericCutter">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkGenericDataSet"/>
+          </DataTypeDomain>
+     </InputProperty>
+
+     <ProxyProperty name="CutFunction" command="SetCutFunction">
+           <ProxyGroupDomain name="groups">
+              <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+     </ProxyProperty>
+
+     <DoubleVectorProperty
+        name="InputBounds">
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+        name="ContourValues"
+        command="SetValue"
+        repeat_command="1"
+        set_number_command="SetNumberOfContours"
+        number_of_elements_per_command="1"
+        use_index="1">
+          <BoundsDomain name="bounds" mode="magnitude">
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </BoundsDomain>
+     </DoubleVectorProperty>
+   <!-- End GenericCut -->
+   </SourceProxy>
+
+  <SourceProxy name="GenericGeometryFilter" class="vtkGenericGeometryFilter">
+     <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkGenericDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+   <!-- End GenericGeometryFilter -->
+   </SourceProxy>
+
+ <SourceProxy name="GenericOutlineFilter" class="vtkGenericOutlineFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkGenericDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+   <!-- End  GenericOutlineFilter -->
+   </SourceProxy>
+
+ <SourceProxy name="GenericStreamTracer" class="vtkGenericStreamTracer">
+    <InputProperty
+       name="Input"
+       command="AddInput"
+       clean_command="RemoveAllInputs"
+       multiple_input="1">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkGenericDataSet"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            number_of_components="3"/>
+     </InputProperty>
+
+     <InputProperty
+        name="Source"
+        command="SetSource">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+           </ProxyGroupDomain>
+         <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+      </InputProperty>
+
+     <StringVectorProperty 
+        name="SelectInputVectors" 
+        command="SelectInputVectors" 
+        number_of_elements="1"> 
+           <ArrayListDomain name="array_list" attribute_type="Vectors">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </ArrayListDomain>
+     </StringVectorProperty>
+
+     <!-- This is a hack used to bypass the fact that ParaView
+          does not have special proxies for things like point sources.
+          It should be removed in the future -->
+     <DoubleVectorProperty
+        name="Radius"
+        number_of_elements="1"
+        default_values="0.1"
+        information_only="1">
+        <DoubleRangeDomain name="range"/>
+        <BoundsDomain name="bounds">
+          <RequiredProperties>
+             <Property name="Input" function="Input"/>
+          </RequiredProperties>
+        </BoundsDomain>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty
+        name="NumberOfPoints"
+        number_of_elements="1"
+        default_values="100"
+        information_only="1"/>
+
+     <IntVectorProperty 
+        name="MaximumPropagationUnit" 
+        command="SetMaximumPropagationUnit" 
+        number_of_elements="1"
+        default_values="1" >
+       <EnumerationDomain>
+         <Entry value="0" text="Time"/>
+         <Entry value="1" text="Length"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MaximumPropagation"
+        command="SetMaximumPropagation"
+        number_of_elements="1"
+        default_values="1.0" >
+       <DoubleRangeDomain name="range"/>
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="InitialIntegrationStepUnit" 
+        command="SetInitialIntegrationStepUnit" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumerationDomain>
+         <Entry value="0" text="Time"/>
+         <Entry value="1" text="Length"/>
+         <Entry value="2" text="Cell Length"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="InitialIntegrationStep"
+        command="SetInitialIntegrationStep"
+        number_of_elements="1"
+        default_values="0.5" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="IntegrationDirection" 
+        command="SetIntegrationDirection" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumerationDomain>
+         <Entry value="0" text="FORWARD"/>
+         <Entry value="1" text="BACKWARD"/>
+         <Entry value="2" text="BOTH"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="IntegratorType" 
+        command="SetIntegratorType" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumerationDomain>
+         <Entry value="0" text="Runge-Kutta 2"/>
+         <Entry value="1" text="Runge-Kutta 4"/>
+         <Entry value="2" text="Runge-Kutta 4-5"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MaximumError"
+        command="SetMaximumError"
+        number_of_elements="1"
+        default_values="0.000001" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="MinimumIntegrationStepUnit" 
+        command="SetMinimumIntegrationStepUnit" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumerationDomain>
+         <Entry value="0" text="Time"/>
+         <Entry value="1" text="Length"/>
+         <Entry value="2" text="Cell Length"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MinimumIntegrationStep"
+        command="SetMinimumIntegrationStep"
+        number_of_elements="1"
+        default_values="0.01" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="MaximumIntegrationStepUnit" 
+        command="SetMaximumIntegrationStepUnit" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumerationDomain>
+         <Entry value="0" text="Time"/>
+         <Entry value="1" text="Length"/>
+         <Entry value="2" text="Cell Length"/>
+       </EnumerationDomain>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MaximumIntegrationStep"
+        command="SetMaximumIntegrationStep"
+        number_of_elements="1"
+        default_values="0.01" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="MaximumNumberOfSteps" 
+        command="SetMaximumNumberOfSteps" 
+        number_of_elements="1"
+        default_values="2000" >
+       <IntRangeDomain name="range"/>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="TerminalSpeed"
+        command="SetTerminalSpeed"
+        number_of_elements="1"
+        default_values="0.000000000001" >
+       <DoubleRangeDomain name="range"/>
+     </DoubleVectorProperty>
+   <!-- End GenericStreamTracer -->
+   </SourceProxy>
+
+  <SourceProxy name="Tessellator" class="vtkGenericDataSetTessellator">
+     <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkGenericDataSet"/>
+           </DataTypeDomain>
+      </InputProperty>
+
+   <!-- End Tessellator -->
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

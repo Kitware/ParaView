@@ -2569,4 +2569,438 @@ This filter operates on any type of data set, provided it has point-centered vec
 The Extract Grid filter returns a subgrid of a structured input data set (uniform rectilinear, curvilinear, or nonuniform rectilinear). The VOI section of the interface provides six sliders for specifying the extents of the desired output along each of the I, J, and K axes. The Sample Rate thumb wheels control whether to subsample the input grid in each dimension. Values greater than 1 result in subsampling. For example, if the Sample Rate along the I axis is 2, then every other input point will be passed to the output. If the Sample Rate in any dimension is greater than 1, then selecting the Include boundary option will pass the values on the boundary of the data set to the output even if the boundary extent is not an even multiple of the sample rate. The output data set type of this filter is the same as the input type. This filter is available on the Toolbar.
     </Documentation>
   </Module>
+
+ <Module name="GenericClip"
+    root_name="GenericClip"
+    module_type="Filter"
+    button_help="Clip with an implicit plane, sphere or with scalars.Clipping does not reduce the dimensionality of the data set."
+    long_help="Clip with an implicit plane, sphere or with scalars. Clipping does not reduce the dimensionality of the data set.  This output data type of this filter is always an unstructured grid."
+    short_help="Clip with an implicit plane, sphere or with scalars.">
+    <Filter class="vtkGenericClip">
+      <Input name="Input"
+             class="vtkGenericDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im1"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <BoundsDisplay show_hide_frame="1"
+                   label="Input Bounds"
+                   property="InputBounds"
+                   trace_name="Input Bounds"
+                   input_menu="im1"/>
+    <SelectWidget label="Clip Function"
+                  trace_name="Clip Function"
+                  property="ClipFunction">
+      <Item label="Plane"
+            value="Plane">
+        <ImplicitPlaneWidget use_label="0"
+                             trace_name="Plane"
+                             input_menu="im1"
+                             help="Adjusts the parameters of the plane to clip with."/>
+      </Item>
+      <Item label="Sphere"
+            value="Sphere">
+        <SphereWidget use_label="0"
+                      trace_name="Sphere"
+                      input_menu="im1"
+                      help="Adjusts the parameters of the sphere to clip with."/>
+      </Item>
+      <Item label="Box"
+            value="Box">
+        <BoxWidget use_label="0"
+                   trace_name="Box"
+                   input_menu="im1"
+                   help="Adjusts the parameters of the box to clip with."/>
+      </Item>
+      <Item label="Scalars">
+        <ContainerWidget trace_name="ScalarClip">
+          <Item>
+            <ScalarRangeLabel property="Value" 
+                              trace_name="ScalarRange" 
+                              array_menu="it3.am1"/>
+          </Item>
+          <Item id="it3">
+          <ArrayMenu id="am1" property="SelectInputScalars"
+                     trace_name="Scalars"
+                     label="Scalars"
+                     help="Choose the clipping scalar array."
+                     input_menu="im1"/>
+          </Item>
+          <Item>
+            <!-- Value depends on scalar range of input -->
+            <VectorEntry label="Clip value"
+                         trace_name="Offset"
+                         type="float"
+                         property="Value"
+                         help="Choose the scalar value to clip with"/>
+          </Item>
+        </ContainerWidget>
+      </Item>
+    </SelectWidget>
+    <LabeledToggle label="Inside Out"
+                   trace_name="InsideOut"
+                   property="InsideOut"
+                   help="Switches which part to keep."/>
+    <Documentation>
+The Clip filter cuts away a portion of the input data set using a plane, a sphere, a box, or a scalar value. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget (plane, sphere, or box) is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 7.4.
+If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function. If Scalars is selected, then the user must specify a scalar array to clip according to. The clip filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. Regardless of the selection from the Clip Function menu, if the Inside Out option is checked, the opposite portions of the data set will be returned.
+This filter operates on all types of data sets, and it returns unstructured grid data on output. This filter is available on the toolbar.
+    </Documentation>
+  </Module>
+
+
+  <Module name="GenericContour"
+          root_name="GenericContour"
+          module_type="Filter"
+          replace_input="0"
+          button_help="Generate isolines or isosurfaces."
+          long_help="Generate isolines or isosurfaces using point scalars."
+          short_help="Generate isolines or isosurfaces.">
+
+    <Filter class="vtkGenericContourFilter">
+      <Input name="Input"
+             class="vtkGenericDataSet">
+        <ArrayRequirement attribute="Point" components="1"/>
+      </Input>
+    </Filter>
+
+    // Do not change the tracename of the input menu, it is used by vtkPVContour
+    <InputMenu trace_name="Input"
+               id="im"
+               label="Input"
+               input_name="Input"
+               property="Input"
+               help="Set the input to this filter." />
+    // Do not change the tracename of the array menu, it is used by vtkPVContour
+    <ArrayMenu id="am" property="SelectInputScalars"
+               label="Scalars"
+               trace_name="Scalars"
+               input_menu="im"
+               help="Choose which scalar array you want to contour."/>
+    <ScalarRangeLabel id="srl"
+                      property="ContourValues"
+                      trace_name="ScalarRangeLabel"
+                      array_menu="am"/>
+    <ContourEntry label="Contour Values"
+                  trace_name="Contour Values"
+                  array_menu="am" property="ContourValues"
+                  help="List of current contour values." />
+    <LabeledToggle label="Compute Normals"
+                   property="ComputeNormals"
+                   trace_name="Compute Normals"
+                   help="Select whether to compute normals" />
+    <LabeledToggle label="Compute Gradients"
+                   property="ComputeGradients"
+                   trace_name="Compute Gradients"
+                   help="Select whether to compute gradients"/>
+    <LabeledToggle label="Compute Scalars"
+                   property="ComputeScalars"
+                   trace_name="Compute Scalars"
+                   help="Select whether to compute scalars" />
+    <Documentation>
+The Contour filter computes isolines or isosurfaces using a selected point-centered scalar array. The available scalar arrays are listed in the Scalars menu. The scalar range of the selected array will be displayed.
+The interface for adding contour values is very similar to the one for selecting cut offsets (in the Cut filter). To add a single contour value, select the value from the New Value slider in the Add value portion of the interface and click the Add button, or press Enter. To instead add several evenly spaced contours, use the controls in the Generate range of values section. Select the number of contour values to generate using the Number of Values slider. The Range slider controls the interval in which to generate the contour values. Once the number of values and range have been selected, click the Generate button. The new values will be added to the Contour Values list. To delete a value from the Contour Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list. If no values are in the Contour Values list when Accept is pressed, the current value of the New Value slider will be used.
+In addition to selecting contour values, you can also select additional computations to perform. If any of Compute Normals, Compute Gradients, or Compute Scalars is selected, the appropriate computation will be performed, and a corresponding point-centered array will be added to the output.
+The Contour filter operates on any type of data set, but the input is required to have at least one point-centered scalar (single-component) array. The output of this filter is polygonal. This filter is available on the Toolbar.
+    </Documentation>
+  </Module>
+
+  <Module name="GenericCut"
+          root_name="GenericCut"
+          replace_input="0"
+          module_type="Filter"
+          button_help="Cut with an implicit plane or sphere. Cutting typically reduces the dimensionality of the data."
+          long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces."
+          short_help="Cut datasets with planes or spheres.">
+    <Filter class="vtkGenericCutter">
+      <Input name="Input"
+             class="vtkGenericDataSet"/>
+    </Filter>
+
+    <InputMenu trace_name="Input" property="Input"
+               id="im1"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <BoundsDisplay show_hide_frame="1"
+                   label="Input Bounds"
+                   property="InputBounds"
+                   trace_name="Input Bounds"
+                   input_menu="im1"/>
+    <SelectWidget label="Cut Function"
+                  trace_name="Cut Function"
+                  property="CutFunction">
+      <Item label="Plane"
+            value="Plane">
+      <ImplicitPlaneWidget trace_name="Plane"
+                           use_label="0"
+                           input_menu="im1"
+                           help="Adjusts the parameters of the plane to cut with."/>
+      </Item>
+      <Item label="Sphere"
+            value="Sphere">
+      <SphereWidget trace_name="Sphere"
+                    use_label="0"
+                    input_menu="im1"
+                    help="Adjusts the parameters of the sphere to cut with."/>
+      </Item>
+    </SelectWidget>
+    <CutEntry label="Cut Offset Values"
+              trace_name="Cut Values"
+              input_menu="im1" property="ContourValues"
+              animation_support="0"
+              help="List of current offset values. This can be used to create multiple cut planes/spheres with different centers. Each entry represents a new cut with center shifted by the offset value."/>
+    <Documentation>
+The Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The parameters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 7.4.
+By default, the cut lies on the specified plane or sphere. Using the Cut Offset Values portion of the interface, it is also possible to cut the data set at some offset from the original cut function. The Cut Offset Values are in the spatial units of the data set. To add a single offset, select the value from the New Value slider in the Add value portion of the interface and click the Add button, or press Enter. To instead add several evenly spaced offsets, use the controls in the Generate range of values section. Select the number of offsets to generate using the Number of Values slider. The Range slider controls the interval in which to generate the offsets. Once the number of values and range have been selected, click the Generate button. The new offsets will be added to the Offset Values list. To delete a value from the Cut Offset Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list.
+The Cut filter takes any type of data set as input. Use the Input menu to choose a data set to cut. The output of this filter is polygonal data. This filter is available on the Toolbar.
+    </Documentation>
+  </Module>
+
+ <Module name="GenericGeometryFilter" menu_name="GenericGeometryFilter" root_name="PolyData"
+         module_type="Filter"
+         long_help="Extract geometry from a higher-order dataset"
+         short_help="Extract geometry from a higher-order dataset">
+ 
+ <Filter class="vtkGenericGeometryFilter">
+      <Input name="Input"
+             class="vtkGenericDataSet"/>
+    </Filter>
+  <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+  <Documentation>
+Extract geometry from a higher-order dataset.
+  </Documentation>
+ </Module>
+
+ <Module name="GenericOutlineFilter"
+          menu_name="Generic Outline"
+          root_name="Outline"
+          module_type="Filter"
+          replace_input="0"
+          long_help="This filter generates a bounding box representation of the input."
+          short_help="Generates a bounding box.">
+    <Filter class="vtkGenericOutlineFilter">
+      <Input name="Input"
+             class="vtkGenericDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <Documentation>
+The Outline filter generates an axis-aligned bounding box for the input data set. The Input menu specifies the data set for which to create a bounding box. This filter operates on any type of data set and produces polygonal output.
+    </Documentation>
+  </Module>
+
+<Module name="GenericStreamTracer"
+          root_name="Stream"
+          menu_name="Generic Stream Tracer"
+          module_type="Filter"
+          replace_input="0"
+          button_help="Generate streamtraces from a collection of seed points."
+          long_help="Integrate streamlines in a vector field."
+          short_help="Integrate streamlines in a vector field.">
+    <Filter class="vtkGenericStreamTracer">
+      <Input name="Input"
+             class="vtkGenericDataSet"
+             quantity="Multiple">
+        <ArrayRequirement attribute="Point" components="3"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <ArrayMenu property="SelectInputVectors"
+               trace_name="Vectors"
+               label="Vectors"
+               input_menu="im"
+               help="Select the input vectors to use."/>
+    <SelectWidget trace_name="Seed"
+                  label="Seed"
+                  property="Source">
+      <Item label="Point Cloud"
+            value="Output">
+        <PointSourceWidget trace_name="Point"
+                           radius_scale_factor=".1"
+                           input_menu="im"
+                           default_number_of_points="100"
+                           show_entries="1"/>
+      </Item>
+      <Item label="Line"
+            value="Output">
+        <LineSourceWidget trace_name="Line"/>
+      </Item>
+    </SelectWidget>
+    <ContainerWidget pack_direction="left" trace_name="MaxProp">
+      <Item>
+        <SelectionList property="MaximumPropagationUnit"
+                       trace_name="MaximumPropagationUnit"
+                       label="Max. Propagation"
+                       option_width="15"
+                       help="Maximum propagation">
+          <Item name="Time"
+                value="0"/>
+          <Item name="Length"
+                value="1"/>
+        </SelectionList>
+      </Item>
+      <Item>
+        <ScaleFactorEntry label=""
+                          property="MaximumPropagation"
+                          trace_name="MaxPropLen"
+                          scale_factor="1.0"
+                          input_menu="im"
+                          help="Maximum propagation" />
+      </Item>
+    </ContainerWidget>
+    <ContainerWidget pack_direction="left" trace_name="InitLen">
+      <Item>
+        <SelectionList trace_name="InitialIntegrationStepUnit"
+                       property="InitialIntegrationStepUnit"
+                       label="Init. Step Len."
+                       option_width="15"
+                       help="Initial step length">
+          <Item name="Time"
+                value="0"/>
+          <Item name="Length"
+                value="1"/>
+          <Item name="Cell Length"
+                value="2"/>
+        </SelectionList>
+      </Item>
+      <Item>
+        <VectorEntry label=""
+                     property="InitialIntegrationStep"
+                     type="float"
+                     trace_name="InitLen"
+                     help="Initial step length"/>
+      </Item>
+    </ContainerWidget>
+    <SelectionList trace_name="IntegrationDirection"
+                   property="IntegrationDirection"
+                   label="Integration Direction"
+                   option_width="15">
+      <Item name="FORWARD"
+            value="0"/>
+      <Item name="BACKWARD"
+            value="1"/>
+      <Item name="BOTH"
+            value="2"/>
+    </SelectionList>
+    <SelectWidget label="Integrator Type"
+                  property="IntegratorType"
+                  trace_name="IntegrationType">
+      <Item label="Runge-Kutta 2" value="0">
+        <DummyWidget trace_name="Dummy1"/>
+      </Item>
+      <Item label="Runge-Kutta 4" value="1">
+        <DummyWidget trace_name="Dummy2"/>
+      </Item>
+      <Item label="Runge-Kutta 4-5" value="2">
+        <ContainerWidget trace_name="MinLen">
+      <Item>
+        <ContainerWidget pack_direction="left" trace_name="MinLen">
+          <Item>
+            <SelectionList property="MinimumIntegrationStepUnit"
+                           trace_name="MinimumIntegrationStepUnit"
+                           label="Min. Step Len."
+                           option_width="15"
+                           help="Minimum step length used in the integation">
+              <Item name="Time"
+                    value="0"/>
+              <Item name="Length"
+                    value="1"/>
+              <Item name="Cell Length"
+                    value="2"/>
+            </SelectionList>
+          </Item>
+          <Item>
+            <VectorEntry label=""
+                         property="MinimumIntegrationStep"
+                         type="float"
+                         trace_name="MinLen"
+                         help="Minimum step length  used in the integation"/>
+          </Item>
+        </ContainerWidget>
+      </Item>
+      <Item>
+        <ContainerWidget pack_direction="left" trace_name="MaxLen">
+          <Item>
+            <SelectionList property="MaximumIntegrationStepUnit"
+                           trace_name="MaximumIntegrationStepUnit"
+                           label="Max. Step Len."
+                           option_width="15"
+                           help="Maximum step length used in the integration">
+              <Item name="Time"
+                    value="0"/>
+              <Item name="Length"
+                    value="1"/>
+              <Item name="Cell Length"
+                    value="2"/>
+            </SelectionList>
+          </Item>
+          <Item>
+            <VectorEntry label=""
+                         property="MaximumIntegrationStep"
+                         type="float"
+                         trace_name="MaxLen"
+                         help="Maximum step length used in the integration"/>
+          </Item>
+        </ContainerWidget>
+      </Item>
+      <Item>
+      <VectorEntry label="Maximum Error"
+                   trace_name="MaximumError"
+                   property="MaximumError"
+                   type="float"
+                   help="Maximum error allowed in the integration"/>
+      </Item>
+      </ContainerWidget>
+      </Item>
+    </SelectWidget>
+    <VectorEntry label="Max. Steps"
+                 trace_name="MaximumNumberOfSteps"
+                 property="MaximumNumberOfSteps"
+                 type="int"
+                 help="Maximum number of steps."/>
+    <VectorEntry label="Term. Speed"
+                 trace_name="TerminalSpeed"
+                 property="TerminalSpeed"
+                 type="float"
+                 help="Terminal speed. The integration will be stopped if the speed (absolute value) is smaller than this threshold"/>
+    <Documentation>
+The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 7.4.
+The Max. Propagation entry box allows you to specify the maximum length of the streamlines. From the Max. Propagation menu, you can select the units to be either Time (the time a particle would travel with steady flow) or Length (in the data set's spatial coordinates).
+The Init. Step Len. menu and entry specify the initial step size for integration. (For non-adaptive integrators, Runge-Kutta 2 and 4, the initial step size is used throughout the integration.) The menu allows you to specify the units. Time and Length have the same meaning as for Max. Propagation. Cell Length specifies the step length as a number of cells.
+The Integration Direction menu determines in which direction(s) the stream trace will be generated: FORWARD, BACKWARD, or BOTH.
+The Integrator Type section of the interface determines which calculation to use for integration: Runge-Kutta 2, Runge-Kutta 4, or Runge-Kutta 4-5. If Runge-Kutta 4-5 is selected, controls are displayed for specifying the minimum and maximum step length and the maximum error. The controls for specifying Min. Step Len. and Max. Step Len. are the same as those for Init. Step Len. The Runge-Kutta 4-5 integrator tries to choose the step size so that the estimated error is less than the value of the Maximum Error entry.
+If the integration takes more than Max. Steps to complete, if the speed goes below Term. Speed, if Max. Propagation is reached, or if a boundary of the input data set is crossed, integration terminates.
+This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter is available on the Toolbar.
+    </Documentation>
+  </Module>
+
+<Module name="Tessellator" menu_name="Tessellator" root_name="UnstructuredGrid"
+         module_type="Filter"
+         long_help="Tessellate a higher-order dataset"
+         short_help="Tessellate a higher-order dataset">
+ 
+ <Filter class="vtkGenericDataSetTessellator">
+      <Input name="Input"
+             class="vtkGenericDataSet"/>
+    </Filter>
+   <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+  <Documentation>
+Tessellate a higher-order dataset.
+  </Documentation>
+ </Module>
+
 </ModuleInterfaces>
