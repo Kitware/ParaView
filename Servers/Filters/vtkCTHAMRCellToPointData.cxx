@@ -36,7 +36,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHAMRCellToPointData, "1.1");
+vtkCxxRevisionMacro(vtkCTHAMRCellToPointData, "1.2");
 vtkStandardNewMacro(vtkCTHAMRCellToPointData);
 
 //----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ void vtkCTHAMRCellToPointData::CreateOutputGeometry(vtkCTHData* input,
     }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 // Sort of stupid, but dims is the point dimesnions of input.
 // This assumes that ghost levels exist.  No boundary condition checks.
 template <class T>
@@ -178,7 +178,6 @@ void vtkCTHAMRExecuteCellDataToPointData(T* pCell,float* pPoint, int pDims[3])
 {
   int i, j, k;
   int jInc, kInc;
-  float* pPointStart = pPoint;
 
   // Increments are for the cell array.
   // This assumes one level of ghost cells on input.

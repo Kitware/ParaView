@@ -44,7 +44,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHAMRContour, "1.1");
+vtkCxxRevisionMacro(vtkCTHAMRContour, "1.2");
 vtkStandardNewMacro(vtkCTHAMRContour);
 
 //----------------------------------------------------------------------------
@@ -881,6 +881,12 @@ void vtkCTHAMRContour::PrintSelf(ostream& os, vtkIndent indent)
 
   this->ContourValues->PrintSelf(os,indent.GetNextIndent());
   os << indent << "IgnoreGhostLevels: " << this->IgnoreGhostLevels << endl;
+
+  if (this->InputScalarsSelection)
+    {
+    os << indent << "InputScalarsSelection: " 
+       << this->InputScalarsSelection << endl;
+    }
 }
 
 
