@@ -34,7 +34,7 @@
 #include <math.h>
 #include <stdio.h>
 
-vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.7");
+vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.8");
 vtkStandardNewMacro(vtkBoxClipDataSet);
 
 //----------------------------------------------------------------------------
@@ -129,7 +129,7 @@ void vtkBoxClipDataSet::Execute()
   vtkPoints     *newPoints;
   vtkPoints     *cellPts;
   vtkIdList     *cellIds;
-  vtkIntArray   *locs[2];
+  vtkIdTypeArray   *locs[2];
   vtkDebugMacro(<< "Clip by Box");
   vtkUnsignedCharArray *types[2];
 
@@ -174,7 +174,7 @@ void vtkBoxClipDataSet::Execute()
   conn[0]->InitTraversal();
   types[0] = vtkUnsignedCharArray::New();
   types[0]->Allocate(estimatedSize,estimatedSize/2);
-  locs[0] = vtkIntArray::New();
+  locs[0] = vtkIdTypeArray::New();
   locs[0]->Allocate(estimatedSize,estimatedSize/2);
 
   if ( this->GenerateClippedOutput )
@@ -185,7 +185,7 @@ void vtkBoxClipDataSet::Execute()
     conn[1]->InitTraversal();
     types[1] = vtkUnsignedCharArray::New();
     types[1]->Allocate(estimatedSize,estimatedSize/2);
-    locs[1] = vtkIntArray::New();
+    locs[1] = vtkIdTypeArray::New();
     locs[1]->Allocate(estimatedSize,estimatedSize/2);
     }
 

@@ -92,7 +92,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.16");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.17");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -3185,7 +3185,7 @@ void vtkDistributedDataFilter::FixGhostLevels(vtkUnstructuredGrid *ugrid)
 
   vtkCellArray *cellArray = ugrid->GetCells();
 
-  vtkIntArray *locs = ugrid->GetCellLocationsArray();
+  vtkIdTypeArray *locs = ugrid->GetCellLocationsArray();
   vtkIdTypeArray *cells = cellArray->GetData();
 
   int numLeveledCells = 0;
