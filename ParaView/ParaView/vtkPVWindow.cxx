@@ -83,7 +83,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
@@ -151,62 +150,12 @@ vtkPVWindow::vtkPVWindow()
   this->Toolbar = vtkKWToolbar::New();
 
   this->RotationManipulators = vtkCollection::New();
-
   this->RotateCameraStyle = vtkPVInteractorStyle::New();
-  vtkPVCameraManipulator *manipulator;
-  vtkPVCenterOfRotationManipulator *rotationManipulator;
-  // ----
-  rotationManipulator = vtkPVTrackballRotate::New();
-  rotationManipulator->SetButton(1);
-  this->RotateCameraStyle->AddManipulator(rotationManipulator);
-  this->RotationManipulators->AddItem(rotationManipulator);
-  rotationManipulator->Delete();
-  rotationManipulator = NULL;
-  // ----
-  rotationManipulator = vtkPVTrackballRoll::New();
-  rotationManipulator->SetButton(1);
-  rotationManipulator->ShiftOn();
-  this->RotateCameraStyle->AddManipulator(rotationManipulator);
-  this->RotationManipulators->AddItem(rotationManipulator);
-  rotationManipulator->Delete();
-  rotationManipulator = NULL;
-  // ----
-  manipulator = vtkPVTrackballPan::New();
-  manipulator->SetButton(2);
-  this->RotateCameraStyle->AddManipulator(manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-  manipulator = vtkPVTrackballZoom::New();
-  manipulator->SetButton(3);
-  this->RotateCameraStyle->AddManipulator(manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-  manipulator = vtkPVTrackballPan::New();
-  manipulator->SetButton(3);
-  manipulator->ShiftOn();
-  this->RotateCameraStyle->AddManipulator(manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-
-
   this->TranslateCameraStyle = vtkPVInteractorStyle::New();
-  // ----
-  manipulator = vtkPVTrackballPan::New();
-  manipulator->SetButton(1);
-  this->TranslateCameraStyle->AddManipulator(manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-  manipulator = vtkPVTrackballZoom::New();
-  manipulator->SetButton(3);
-  this->TranslateCameraStyle->AddManipulator(manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
   this->FlyStyle = vtkPVInteractorStyleFly::New();
+
+
   
   this->PickCenterToolbar = vtkKWToolbar::New();
   this->PickCenterButton = vtkKWPushButton::New();
@@ -1355,6 +1304,55 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   
   view = vtkPVRenderView::New();
   view->CreateRenderObjects(pvApp);
+
+  vtkPVCameraManipulator *manipulator;
+  vtkPVCenterOfRotationManipulator *rotationManipulator;
+  // ----
+  rotationManipulator = vtkPVTrackballRotate::New();
+  rotationManipulator->SetButton(1);
+  this->RotateCameraStyle->AddManipulator(rotationManipulator);
+  this->RotationManipulators->AddItem(rotationManipulator);
+  rotationManipulator->Delete();
+  rotationManipulator = NULL;
+  // ----
+  rotationManipulator = vtkPVTrackballRoll::New();
+  rotationManipulator->SetButton(1);
+  rotationManipulator->ShiftOn();
+  this->RotateCameraStyle->AddManipulator(rotationManipulator);
+  this->RotationManipulators->AddItem(rotationManipulator);
+  rotationManipulator->Delete();
+  rotationManipulator = NULL;
+  // ----
+  manipulator = vtkPVTrackballPan::New();
+  manipulator->SetButton(2);
+  this->RotateCameraStyle->AddManipulator(manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+  // ----
+  manipulator = vtkPVTrackballZoom::New();
+  manipulator->SetButton(3);
+  this->RotateCameraStyle->AddManipulator(manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+  // ----
+  manipulator = vtkPVTrackballPan::New();
+  manipulator->SetButton(3);
+  manipulator->ShiftOn();
+  this->RotateCameraStyle->AddManipulator(manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+  // ----
+  manipulator = vtkPVTrackballPan::New();
+  manipulator->SetButton(1);
+  this->TranslateCameraStyle->AddManipulator(manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
+  // ----
+  manipulator = vtkPVTrackballZoom::New();
+  manipulator->SetButton(3);
+  this->TranslateCameraStyle->AddManipulator(manipulator);
+  manipulator->Delete();
+  manipulator = NULL;
   
   this->MainView = view;
   this->MainView->SetParent(this->ViewFrame);
