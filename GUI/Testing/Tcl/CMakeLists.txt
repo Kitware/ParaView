@@ -39,7 +39,6 @@ SET(PROJECT_TESTS
   ConeCubeCylSQ
   CTH
   CutContours
-  D3
   Data
   Delete
   DeleteSource
@@ -77,6 +76,12 @@ SET(PROJECT_TESTS
   VolumeGroup
   XdmfRead
   )
+
+# some tests require MPI because the classes do not get built otherwise
+IF(VTK_USE_MPI)
+  SET(PROJECT_TESTS ${PROJECT_TESTS} D3)
+ENDIF(VTK_USE_MPI)
+
 
 # Foreach test add the following:
 # 1. the test (possibly with mpirun)
