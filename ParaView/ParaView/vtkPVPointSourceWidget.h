@@ -16,13 +16,18 @@
 // This widget contains a vtkPointWidget as well as a vtkPointSource. 
 // This vtkPointSource (which is created on all processes) can be used as 
 // input or source to filters (for example as streamline seed).
+//
+// If an InputMenu is specified, then DefaultRadius has no effect.  If
+// InputMenu is not specified, then RadiusScaleFactor has no effect.
 
 #ifndef __vtkPVPointSourceWidget_h
 #define __vtkPVPointSourceWidget_h
 
 #include "vtkPVSourceWidget.h"
 
+class vtkPVInputMenu;
 class vtkPVPointWidget;
+class vtkPVScaleFactorEntry;
 class vtkPVVectorEntry;
 class vtkPVWidgetProperty;
 
@@ -43,7 +48,7 @@ public:
 
   // Description:
   // Controls the radius of the point cloud.
-  vtkGetObjectMacro(RadiusWidget, vtkPVVectorEntry);
+  vtkGetObjectMacro(RadiusWidget, vtkPVScaleFactorEntry);
 
   // Description:
   // Controls the number of points in the point cloud.
@@ -84,20 +89,44 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  // Description:
+  // Values to be set from XML.
+  vtkSetMacro(RadiusScaleFactor, float);
+  vtkSetMacro(DefaultRadius, float);
+  vtkSetMacro(DefaultNumberOfPoints, int);
+  vtkSetMacro(ShowEntries, int);
+  void SetInputMenu(vtkPVInputMenu *im);
+
+  // Description:
+  // This is called if the input menu changes.
+  virtual void Update();
+  
 protected:
   vtkPVPointSourceWidget();
   ~vtkPVPointSourceWidget();
 
-
+//BTX
+  virtual void CopyProperties(vtkPVWidget *clone, vtkPVSource *pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+//ETX
+  virtual int ReadXMLAttributes(vtkPVXMLElement *element,
+                                vtkPVXMLPackageParser *parser);
+  
   vtkPVPointWidget* PointWidget;
 
   static int InstanceCount;
 
-  vtkPVVectorEntry* RadiusWidget;
+  vtkPVScaleFactorEntry* RadiusWidget;
   vtkPVVectorEntry* NumberOfPointsWidget;
   vtkPVWidgetProperty *RadiusProperty;
   vtkPVWidgetProperty *NumberOfPointsProperty;
 
+  float RadiusScaleFactor;
+  float DefaultRadius;
+  vtkPVInputMenu *InputMenu;
+  int DefaultNumberOfPoints;
+  int ShowEntries;
+  
   vtkPVPointSourceWidget(const vtkPVPointSourceWidget&); // Not implemented
   void operator=(const vtkPVPointSourceWidget&); // Not implemented
 

@@ -21,7 +21,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.7");
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.8");
 
 vtkCxxSetObjectMacro(vtkPVScaleFactorEntry, InputMenu, vtkPVInputMenu);
 
@@ -154,4 +154,5 @@ void vtkPVScaleFactorEntry::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "ScaleFactor: " << this->ScaleFactor << endl;
 }

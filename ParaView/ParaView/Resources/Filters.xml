@@ -752,7 +752,7 @@
   </Filter>
   <SelectWidget type="object" label="Probe object" trace_name="Probe object" variable="Input">
     <Item label="Point" value="Output">
-      <PointSourceWidget trace_name="Point"/>
+      <PointSourceWidget trace_name="Point" default_radius="0" default_number_fof_points="1" show_entries="0"/>
     </Item>
     <Item label="Line" value="Output">
       <LineSourceWidget trace_name="Line"/>
@@ -769,7 +769,7 @@
   <ArrayMenu input_name="Input" attribute_type="Vectors" trace_name="Vectors" label="Vectors" input_menu="im" number_of_components="3" help="Select the input vectors to use."/>
   <SelectWidget type="object" trace_name="Seed" label="Seed" variable="Source">
     <Item label="Point Cloud" value="Output">
-      <PointSourceWidget trace_name="Point"/>
+      <PointSourceWidget trace_name="Point" radius_scale_factor=".1" input_menu="im" default_number_of_points="100" show_entries="1"/>
     </Item>
     <Item label="Line" value="Output">
       <LineSourceWidget trace_name="Line"/>

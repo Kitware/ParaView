@@ -43,6 +43,8 @@ public:
   // Description:
   // Move widget state to vtk object or back.
   virtual void ResetInternal();
+
+  vtkSetMacro(ScaleFactor, float);
   
 protected:
   vtkPVScaleFactorEntry();
