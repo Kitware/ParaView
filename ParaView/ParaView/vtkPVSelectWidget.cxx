@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.28");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -609,21 +609,29 @@ int vtkPVSelectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   const char* type = element->GetAttribute("type");
-  if(!strcmp(type, "int"))
+  if (type)
     {
-    this->ElementType = INT;
+    if(!strcmp(type, "int"))
+      {
+      this->ElementType = INT;
+      }
+    else if(!strcmp(type, "float"))
+      {
+      this->ElementType = FLOAT;
+      }
+    else if(!strcmp(type, "string"))
+      {
+      this->ElementType = STRING;
+      }
+    else if(!strcmp(type, "object"))
+      {
+      this->ElementType = OBJECT;
+      }
     }
-  else if(!strcmp(type, "float"))
+  else
     {
-    this->ElementType = FLOAT;
-    }
-  else if(!strcmp(type, "string"))
-    {
-    this->ElementType = STRING;
-    }
-  else if(!strcmp(type, "object"))
-    {
-    this->ElementType = OBJECT;
+    vtkErrorMacro("Required element is missing: type");
+    return 0;
     }
   
   // Extract the list of items.
