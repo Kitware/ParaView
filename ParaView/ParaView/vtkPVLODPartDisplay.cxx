@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.14");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.14.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -503,6 +503,9 @@ void vtkPVLODPartDisplay::SetPointLabelVisibility(int val)
   
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
   
+  vtkPVDataInformation* di = this->GetPart()->GetDataInformation();
+  if (di->DataSetTypeIsA("vtkDataSet"))
+    {
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << this->PointLabelMapperID << "SetInput"
@@ -531,6 +534,7 @@ void vtkPVLODPartDisplay::SetPointLabelVisibility(int val)
       << this->PointLabelActorID << vtkClientServerStream::End;
     }
   pm->SendStreamToServer();
+    }
 }
 
 //----------------------------------------------------------------------------
