@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.9");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.10");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -78,7 +78,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
 
   this->CanvasHeight            = 50;
   this->CanvasWidth             = 0;
-  this->LockEndPoints           = 0;
+  this->LockEndPointsParameter  = 0;
   this->DisableAddAndRemove     = 0;
   this->PointRadius             = 4;
   this->SelectedPointRadius     = 1.45;
@@ -259,7 +259,13 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWParameterValueFunctionEditor::FunctionPointIsRemovable(int id)
+int vtkKWParameterValueFunctionEditor::FunctionPointCanBeAdded()
+{
+  return !this->DisableAddAndRemove;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWParameterValueFunctionEditor::FunctionPointCanBeRemoved(int id)
 {
   // Usually if the parameter is locked, the point should stay
 
@@ -271,8 +277,9 @@ int vtkKWParameterValueFunctionEditor::FunctionPointIsRemovable(int id)
 int vtkKWParameterValueFunctionEditor::FunctionPointParameterIsLocked(int id)
 {
   return (this->HasFunction() &&
-          this->LockEndPoints &&
-          (id == 0 || id == this->GetFunctionSize() - 1));
+          this->LockEndPointsParameter &&
+          (id == 0 || 
+           (this->GetFunctionSize() && id == this->GetFunctionSize() - 1)));
 }
 
 //----------------------------------------------------------------------------
@@ -2048,7 +2055,7 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
   // the user a chance to recover)
 
   int warn_delete = 
-    (this->FunctionPointIsRemovable(this->SelectedPoint) &&
+    (this->FunctionPointCanBeRemoved(this->SelectedPoint) &&
      (x < -VTK_KW_RANGE_CANVAS_DELETE_MARGIN ||
       x > this->CanvasWidth - 1 + VTK_KW_RANGE_CANVAS_DELETE_MARGIN ||
       y < -VTK_KW_RANGE_CANVAS_DELETE_MARGIN ||
@@ -2194,7 +2201,7 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
   // Invoke the commands/callbacks
   // If we are out of the canvas by a given margin, delete the point
 
-  if (this->FunctionPointIsRemovable(this->SelectedPoint) &&
+  if (this->FunctionPointCanBeRemoved(this->SelectedPoint) &&
       (x < -VTK_KW_RANGE_CANVAS_DELETE_MARGIN ||
        x > this->CanvasWidth - 1 + VTK_KW_RANGE_CANVAS_DELETE_MARGIN ||
        y < -VTK_KW_RANGE_CANVAS_DELETE_MARGIN ||
@@ -2229,8 +2236,8 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << this->SelectedPointRadius << endl;
   os << indent << "DisableCommands: "
      << (this->DisableCommands ? "On" : "Off") << endl;
-  os << indent << "LockEndPoints: "
-     << (this->LockEndPoints ? "On" : "Off") << endl;
+  os << indent << "LockEndPointsParameter: "
+     << (this->LockEndPointsParameter ? "On" : "Off") << endl;
   os << indent << "DisableAddAndRemove: "
      << (this->DisableAddAndRemove ? "On" : "Off") << endl;
   os << indent << "Canvas: "<< this->Canvas << endl;

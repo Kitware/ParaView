@@ -139,11 +139,11 @@ public:
   vtkGetMacro(CanvasWidth, float);
   
   // Description:
-  // Set/Get if the end-points of the function are locked (they can not
-  // be removed or can only be moved in the value space).
-  vtkSetMacro(LockEndPoints, int);
-  vtkBooleanMacro(LockEndPoints, int);
-  vtkGetMacro(LockEndPoints, int);
+  // Set/Get if the end-points of the function are locked in the parameter
+  // space (they can not be removed or can only be moved in the value space).
+  vtkSetMacro(LockEndPointsParameter, int);
+  vtkBooleanMacro(LockEndPointsParameter, int);
+  vtkGetMacro(LockEndPointsParameter, int);
 
   // Description:
   // Set/Get if points can be added and removed.
@@ -330,7 +330,7 @@ protected:
 
   int   CanvasHeight;
   int   CanvasWidth;
-  int   LockEndPoints;
+  int   LockEndPointsParameter;
   int   DisableAddAndRemove;
   int   PointRadius;
   float SelectedPointRadius;
@@ -431,8 +431,9 @@ protected:
   virtual int CanvasHasTag(const char *tag, int *suffix = 0);
 
   // Description:
-  // Is point locked, protected ?
-  virtual int FunctionPointIsRemovable(int id);
+  // Is point locked, protected, removable ?
+  virtual int FunctionPointCanBeAdded();
+  virtual int FunctionPointCanBeRemoved(int id);
   virtual int FunctionPointParameterIsLocked(int id);
   virtual int FunctionPointValueIsLocked(int id);
 
