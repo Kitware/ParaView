@@ -12,7 +12,7 @@
 #include <vtkDataSetAttributes.h>
 #include <vtkMatrix4x4.h>
 
-vtkCxxRevisionMacro(vtkSubdivisionAlgorithm,"1.3");
+vtkCxxRevisionMacro(vtkSubdivisionAlgorithm,"1.4");
 
 void vtkSubdivisionAlgorithm::PrintSelf( ostream& os, vtkIndent indent )
 {
@@ -90,7 +90,11 @@ int vtkSubdivisionAlgorithm::GetOutputField( int sourceId ) const
   return -1;
 }
 
-bool vtkSubdivisionAlgorithm::ViewDependentEval( const double* p0, double* p1, double* real_p1, const double* p2, int field_start, vtkMatrix4x4* Transform, const double* PixelSize, double AllowableChordError ) const
+bool vtkSubdivisionAlgorithm::ViewDependentEval( 
+  const double* p0, double* p1, double* real_p1, 
+  const double* p2, int , 
+  vtkMatrix4x4* Transform, const double* PixelSize, 
+  double AllowableChordError ) const
 {
   double real_p1t[4];
   double intr_p1t[4];
