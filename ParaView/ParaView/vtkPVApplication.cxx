@@ -537,6 +537,13 @@ int vtkPVApplication::IsParaViewScriptFile(const char* arg)
   return 0;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetEnvironmentVariable(const char* string)
+{
+  putenv(string);
+}
+
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
@@ -657,7 +664,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 #ifdef PV_USE_SGI_PIPES
   int numPipes = 1;
   int numProcs = this->Controller->GetNumberOfProcesses();
-  int myId = this->Controller->GetLocalProcessId();
+  int id;
   // Until I add a user interface to set the number of pipes,
   // just read it from a file.
   ifstream ifs("pipes.inp",ios::in);
@@ -676,45 +683,43 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   // assuming that the number of pipes is the same as the number of procs
   char *displayString;
-  int startRenderProc = 0;
-  int stopRenderProc = numProcs - 1;
-
-  if ((startRenderProc <= myId) && (myId <= stopRenderProc))
+  // Get display root
+  char displayCommand[80];
+  char displayStringRoot[80];
+  displayString = getenv("DISPLAY");
+  if (displayString)
     {
-    // Get display root
-    char displayCommand[80];
-    char displayStringRoot[80];
-    displayString = getenv("DISPLAY");
-
-    if (displayString)
+    // Extract the position of the display from the string.
+    int len = -1;
+    int j, i = 0;
+    while (i < 80)
       {
-      int len = -1;
-      int j, i = 0;
-      while (i < 80)
+      if (displayString[i] == ':')
         {
-        if (displayString[i] == ':')
+        j = i+1;
+        while (j < 80)
           {
-          j = i+1;
-          while (j < 80)
+          if (displayString[j] == '.')
             {
-            if (displayString[j] == '.')
-              {
-              len = j+1;
-              break;
-              }
-            j++;
+            len = j+1;
+            break;
             }
-          break;
+          j++;
           }
-        i++;
+        break;
         }
+      i++;
+      }
+    for (id = 0; id < numPipes; ++id)
+      {
+      // Format a new display string based on process.
       strncpy(displayStringRoot, displayString, len);
       displayStringRoot[len] = '\0';
       //    cerr << "display string root = " << displayStringRoot << endl;
-      sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, 
-              myId-startRenderProc);
+      sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, id);
       //    cerr << "display command = " << displayCommand << endl;
-      putenv(displayCommand);
+      this->RemoteScript(id, "Application SetEnvironmentVariable {%s}", 
+                         displayCommand);
       }
     }
 #endif

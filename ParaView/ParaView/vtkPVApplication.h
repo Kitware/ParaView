@@ -230,6 +230,10 @@ public:
   // the has a restricted set of processes as its world.
   vtkMultiProcessController *NewController(int minId, int maxId);
 
+  // Description:
+  // A method used to set environment variables in the satellite processes.
+  void SetEnvironmentVariable(const char* string);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
