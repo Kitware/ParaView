@@ -803,8 +803,19 @@ void vtkKWWindow::StoreRecentMenuToRegistry(char *key)
   char KeyNameP[10];
   char CmdNameP[10];
   unsigned int i;
+  if ( !this->RealNumberOfMRUFiles )
+    {
+    return;
+    }
+
+  //cout << "Store recent menu to registry; MRU: " 
+  //     << this->RealNumberOfMRUFiles << endl;
   vtkKWRegisteryUtilities *reg = vtkKWRegisteryUtilities::New();
-  reg->SetTopLevel( key ? key : this->GetClassName() );
+  reg->SetTopLevel( key ? key : 
+		    this->GetApplication()->GetApplicationName() );
+  
+  //cout << "Storing recent files: " << endl;
+  this->PrintRecentFiles();
 
   for (i = 0; i < this->NumberOfRecentFiles; i++)
     {
@@ -830,8 +841,9 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
 {
   char KeyNameP[10];
   char CmdNameP[10];
+  //cout << "vtkKWWindow::AddRecentFilesToMenu()" << endl;
   vtkKWRegisteryUtilities *reg = vtkKWRegisteryUtilities::New();
-  if ( reg->Open( key ? key : this->GetClassName(),
+  if ( reg->Open( key ? key : this->GetApplication()->GetApplicationName(),
 		  "MRU", vtkKWRegisteryUtilities::READONLY ) )
     {
     int i;
@@ -844,9 +856,9 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
       {
       sprintf(KeyNameP, "File%d", i);
       sprintf(CmdNameP, "File%dCmd", i);
-      if ( reg->ReadValue("MRU", File, KeyNameP) )
+      if ( reg->ReadValue("MRU", KeyNameP, File) )
 	{
-	if ( reg->ReadValue("MRU", Cmd, CmdNameP) )
+	if ( reg->ReadValue("MRU", CmdNameP, Cmd) )
 	  {
 	  if (strlen(File) > 1)
 	    {
@@ -864,8 +876,14 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
 void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
                                 const char *command)
 {
+  if ( this->RealNumberOfMRUFiles == 0 )
+    {
+    this->GetMenuFile()->InsertSeparator(
+      this->GetMenuFile()->GetIndex("Close") - 1);    
+    }
   this->InsertRecentFileToMenu(name, target, command);
   this->UpdateRecentMenu(key);
+  this->StoreRecentMenuToRegistry(key);
 }
 
 int vtkKWWindow::GetFileMenuIndex()
@@ -883,7 +901,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.56 $");
+  this->ExtractRevision(os,"$Revision: 1.57 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -938,7 +956,6 @@ void vtkKWWindow::UpdateRecentMenu(char *key)
 	}
       }
     }
-  this->StoreRecentMenuToRegistry(key);
   this->PrintRecentFiles();
 }
 
