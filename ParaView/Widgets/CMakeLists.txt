@@ -18,6 +18,7 @@ vtkKWFrame.cxx
 vtkKWGenericComposite.cxx 
 vtkKWImageLabel.cxx
 vtkKWLabel.cxx
+vtkKWLabeledLabel.cxx 
 vtkKWLabeledEntry.cxx 
 vtkKWLabeledFrame.cxx 
 vtkKWListBox.cxx 
