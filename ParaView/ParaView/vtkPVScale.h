@@ -70,6 +70,7 @@ public:
   // Description:
   // Check if the widget was modified.
   void CheckModifiedCallback();
+  void EntryCheckModifiedCallback();
   
 //BTX
   // Description:
@@ -128,8 +129,11 @@ public:
   // This is used as a script callback in AnimationMenuCallback.
   void SetObjectVariableToPVTime(int time);
   
+  // Description:
+  // Flags to determine how to display the scale.
   vtkSetMacro(EntryFlag, int);
   vtkSetMacro(EntryAndLabelOnTopFlag, int);
+  vtkSetMacro(DisplayValueFlag, int);
   
 protected:
   vtkPVScale();
@@ -139,6 +143,7 @@ protected:
 
   int EntryFlag;
   int EntryAndLabelOnTopFlag;
+  int DisplayValueFlag;
   
   vtkKWLabel *LabelWidget;
   vtkKWScale *Scale;

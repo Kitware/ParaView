@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.71");
+vtkCxxRevisionMacro(vtkKWScale, "1.72");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -625,6 +625,8 @@ void vtkKWScale::SetValue(double num)
 
   if (this->Value == num)
     {
+    // Pass the value to the entry to keep it in sync with the scale
+    this->RefreshValue();
     return;
     }
 

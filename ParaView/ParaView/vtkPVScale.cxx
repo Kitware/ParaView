@@ -15,6 +15,7 @@
 #include "vtkPVScale.h"
 
 #include "vtkArrayMap.txx"
+#include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
@@ -31,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.29");
+vtkCxxRevisionMacro(vtkPVScale, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -46,6 +47,7 @@ vtkPVScale::vtkPVScale()
   this->AcceptedValueInitialized = 0;
   this->EntryFlag = 0;
   this->EntryAndLabelOnTopFlag = 1;
+  this->DisplayValueFlag = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -147,6 +149,18 @@ void vtkPVScale::CheckModifiedCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVScale::EntryCheckModifiedCallback()
+{
+  if (!this->EntryFlag)
+    {
+    return;
+    }
+  
+  this->Scale->SetValue(this->Scale->GetEntry()->GetValueAsFloat());
+  this->CheckModifiedCallback();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVScale::Create(vtkKWApplication *pvApp)
 {
   if (this->Application)
@@ -176,12 +190,24 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
   this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
 
   this->Scale->SetParent(this);
-  this->Scale->Create(this->Application, "-showvalue 1");
+  if (this->DisplayValueFlag)
+    {
+    this->Scale->Create(this->Application, "-showvalue 1");
+    }
+  else
+    {
+    this->Scale->Create(this->Application, "-showvalue 0");
+    }
+
   this->Scale->SetCommand(this, "CheckModifiedCallback");
 
   if (this->EntryFlag)
     {
     this->DisplayEntry();
+    this->Script("bind %s <KeyPress> {%s CheckModifiedCallback}",
+                 this->Scale->GetEntry()->GetWidgetName(), this->GetTclName());
+    this->Script("bind %s <FocusOut> {%s EntryCheckModifiedCallback}",
+                 this->Scale->GetEntry()->GetWidgetName(), this->GetTclName());
     }
   this->SetDisplayEntryAndLabelOnTop(this->EntryAndLabelOnTopFlag);
   
@@ -215,6 +241,7 @@ void vtkPVScale::SetValue(float val)
   oldVal = this->Scale->GetValue();
   if (newVal == oldVal)
     {
+    this->Scale->SetValue(newVal); // to keep the entry in sync with the scale
     return;
     }
 
@@ -230,14 +257,24 @@ void vtkPVScale::AcceptInternal(vtkClientServerID sourceID)
 {
   if (sourceID.ID && this->VariableName)
     { 
-    float scalar;
+    float scalar, scaleValue = this->GetValue();
+    if (this->EntryFlag)
+      {
+      float entryValue;
+      entryValue = this->Scale->GetEntry()->GetValueAsFloat();
+      if (entryValue != scaleValue)
+        {
+        scaleValue = entryValue;
+        this->Scale->SetValue(entryValue);
+        }
+      }
     if(this->Round)
       {
-      scalar = this->RoundValue(this->GetValue());
+      scalar = this->RoundValue(scaleValue);
       }
     else
       {
-      scalar = this->GetValue();
+      scalar = scaleValue;
       }
     this->UpdateVTKSourceInternal(sourceID, scalar);
     }
@@ -307,6 +344,7 @@ void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvs->SetRangeSourceVariable(this->RangeSourceVariable);
     pvs->SetEntryFlag(this->EntryFlag);
     pvs->SetEntryAndLabelOnTopFlag(this->EntryAndLabelOnTopFlag);
+    pvs->SetDisplayValueFlag(this->DisplayValueFlag);
     }
   else 
     {
@@ -394,6 +432,12 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->EntryAndLabelOnTopFlag = atoi(display_top);
     }
+
+  const char* display_value = element->GetAttribute("display_value");
+  if (display_value)
+    {
+    this->DisplayValueFlag = atoi(display_value);
+    }
   
   return 1;  
 }
@@ -406,6 +450,7 @@ void vtkPVScale::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "EntryFlag: " << this->EntryFlag << endl;
   os << indent << "EntryAndLabelOnTopFlag: " << this->EntryAndLabelOnTopFlag
      << endl;
+  os << indent << "DisplayValueFlag: " << this->DisplayValueFlag << endl;
 }
 
 //----------------------------------------------------------------------------

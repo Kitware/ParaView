@@ -57,8 +57,9 @@
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this on to remove seams when running in parallel." default_value="1"/>
-  <Scale variable="Tolerance" trace_name="Tolerance" help="The tolerance in terms of fraction of bounding box length." default_value="0.0" resolution="0.01" range="0 1"/>
+  <Scale variable="Tolerance" trace_name="Tolerance" help="The tolerance in terms of fraction of bounding box length." default_value="0.0" resolution="0.01" range="0 1" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
 <!-- AbsoluteTolerance dependent on world-space size of data -->
+<!-- should use a widget that keeps value non-negative -->
   <VectorEntry label="Absolute tolerance" variable="AbsoluteTolerance" trace_name="AbsoluteTolerance" type="float" help="The tolerance in absolute terms." default_value="1.0"/>
   <LabeledToggle label="Tolerance is absolute" trace_name="ToleranceIsAbsolute" variable="ToleranceIsAbsolute" help="Turn this on to use the absolute tolerance." default_value="0"/>
   <LabeledToggle label="Convert lines to points" trace_name="ConvertLinesToPoints" variable="ConvertLinesToPoints" help="Turn on/off conversion of degenerate lines to points." default_value="1"/>
@@ -101,9 +102,9 @@
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale label="Reduction target" trace_name="TargetReduction" variable="TargetReduction" help="Value between 0 and 1. Desired reduction of the total number of triangles." default_value="0.90" resolution="0.01" range="0 1"/>
+  <Scale label="Reduction target" trace_name="TargetReduction" variable="TargetReduction" help="Value between 0 and 1. Desired reduction of the total number of triangles." default_value="0.90" resolution="0.01" range="0 1" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
   <LabeledToggle label="Preserve topology" trace_name="PreserveTopology" variable="PreserveTopology" help="If off, better reduction can occur, but model may break up." default_value="0"/>
-  <Scale label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists). Topology can be split along feature edges." default_value="15.0" resolution="0.01" range="0 180"/>
+  <Scale label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists). Topology can be split along feature edges." default_value="15.0" resolution="0.01" range="0 180" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
   <LabeledToggle label="Boundary deletable" trace_name="BoundaryVertexDeletion" variable="BoundaryVertexDeletion" help="If off, decimate will not remove points on the boundary." default_value="1"/>
 </Module>
 <Module name="D3" menu_name="D3" root_name="D3" module_type="Filter" multiprocess_support="multiple_processes" long_help="Repartition a data set." short_help="Repartition a data set.">
@@ -126,7 +127,7 @@
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." 
              input_name="Input"/>
-<!-- ScalarRange values chosen do not affect processing speed of this filter or cause it to crash. -->
+<!-- keeping vector entries with length > 1 -->
   <VectorEntry label="Scalar range" trace_name="ScalarRange" 
                variable="ScalarRange" type="float" length="2" 
                default_value="0.0 1.0" 
@@ -250,7 +251,7 @@
   <LabeledToggle label="Feature edges" trace_name="FeatureEdges" variable="FeatureEdges" help="Turn this off if you do not want to extract feature edges." default_value="1"/>
   <LabeledToggle label="Non-manifold edges" trace_name="NonManifoldEdges" variable="NonManifoldEdges" help="Turn this off if you do not want to extract non-manifold edges." default_value="1"/>
   <LabeledToggle variable="Coloring" trace_name="Coloring" help="Turn this off if you do not want to color the edges by type." default_value="1"/>
-  <Scale label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists).." default_value="30.0" resolution="0.01" range="0 180"/>
+  <Scale label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists).." default_value="30.0" resolution="0.01" range="0 180" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
 </Module>
 <Module name="Gradient" menu_name="Gradient" root_name="Grad" 
         module_type="Filter">
@@ -306,16 +307,19 @@
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale label="Number of divisions" trace_name="NumberOfSubdivisions" variable="NumberOfSubdivisions" help="Each subdivision changes single triangles into four triangles." default_value="1" resolution="1" range="1 4"/>
+  <Scale label="Number of divisions" trace_name="NumberOfSubdivisions" variable="NumberOfSubdivisions" help="Each subdivision changes single triangles into four triangles." default_value="1" resolution="1" range="1 4" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
 </Module>
 <Module name="MaskPoints" menu_name="Mask Points" root_name="MaskPts" module_type="Filter" long_help="Reduce the number of points.  This filter is often used before glyphing.  Generating vertices is an option." short_help="Reduce the number of points.">
   <Filter class="vtkMaskPoints">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale label="On ratio" trace_name="OnRatio" variable="OnRatio" help="The ratio of points retained." default_value="2" resolution="1" range="1 1000"/>
-  <Scale label="Max. points" trace_name="MaximumNumberOfPoints" variable="MaximumNumberOfPoints" help="Limit the number of points." default_value="5000" resolution="1" range="1 1000000" display_entry="1" entry_and_label_on_top="0"/>
-  <Scale variable="Offset" trace_name="Offset" help="Start with this point." default_value="0" resolution="1" range="0 10000"/>
+<!-- should use widget that keeps value positive -->
+  <VectorEntry label="On ratio" trace_name="OnRatio" variable="OnRatio" help="The ratio of points retained." type="int" default_value="2"/>
+<!-- should use widget that keeps value non-negative -->
+  <VectorEntry label="Max. points" trace_name="MaximumNumberOfPoints" variable="MaximumNumberOfPoints" help="Limit the number of points." type="int" default_value="5000"/>
+<!-- should use widget that keeps value non-negative -->
+  <VectorEntry variable="Offset" trace_name="Offset" help="Start with this point." type="int" default_value="0"/>
   <LabeledToggle label="Random" trace_name="Random" variable="RandomMode" help="Select whether to randomly select points, or subsample regularly." default_value="0"/>
   <LabeledToggle label="Generate vertices" trace_name="GenerateVertices" variable="GenerateVertices" help="Convienience feature to display points." default_value="0"/>
 </Module>
@@ -335,7 +339,7 @@
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" help="Points are duplicated along features over this angle (0->180)" default_value="30.0" resolution="0.01" range="0 180"/>
+  <Scale label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" help="Points are duplicated along features over this angle (0->180)" default_value="30.0" resolution="0.01" range="0 180" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
   <LabeledToggle variable="Splitting" trace_name="Splitting" help="Turn on/off the splitting of sharp edges." default_value="1"/>
   <LabeledToggle variable="Consistency" trace_name="Consistency" help="Turn on/off the enforcement of consistent polygon ordering." default_value="1"/>
   <LabeledToggle label="Cell normals" trace_name="ComputeCellNormals" variable="ComputeCellNormals" help="Turn on/off the computation of cell normals." default_value="0"/>
@@ -366,7 +370,7 @@
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale label="Corner factor" trace_name="CornerFactor" variable="CornerFactor" help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)" default_value="0.2" resolution="0.001" range="0.001 0.5"/>
+  <Scale label="Corner factor" trace_name="CornerFactor" variable="CornerFactor" help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)" default_value="0.2" resolution="0.001" range="0.001 0.5" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
 </Module>
 <Module name="PartScalars" menu_name="Part Id Scalars" root_name="ColorParts" module_type="Filter" long_help="This filter uses colors to show how data is partitioned across parts." short_help="Generate point scalars from part id.">
   <Filter class="vtkColorByPart">
@@ -422,8 +426,10 @@
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale label="Min. speed" trace_name="MinimumSpeed" variable="MinimumSpeed" help="The minimum size of the random point vectors generated." default_value="0.0" resolution="0.01" range="0 5000"/>
-  <Scale label="Max. speed" trace_name="MaximumSpeed" variable="MaximumSpeed" help="The maximum size of the random point vectors generated." default_value="1.0" resolution="0.01" range="0 5000"/>
+<!-- should use a widget that keeps the value non-negative -->
+  <VectorEntry label="Min. speed" trace_name="MinimumSpeed" variable="MinimumSpeed" help="The minimum size of the random point vectors generated." type="float" default_value="0.0"/>
+<!-- should use a widget that keeps the value non-negative -->
+  <VectorEntry label="Max. speed" trace_name="MaximumSpeed" variable="MaximumSpeed" help="The maximum size of the random point vectors generated." type="float" default_value="1.0"/>
 </Module>
 <Module name="ReflectionFilter" menu_name="Reflection" root_name="Reflect" module_type="Filter" long_help="This filter takes the union of the input and its reflection over an axis alligned plane." short_help="Reflect input over an axis alligned plane.">
   <Filter class="vtkReflectionFilter">
@@ -453,7 +459,7 @@
   <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <ArrayMenu input_name="Input" trace_name="Vectors" attribute_type="Vectors" label="Vectors" input_menu="im" number_of_components="3" help="Select the input normals to process."/>
   <ScaleFactorEntry variable="Width" input_menu="im" trace_name="Width" type="float" scale_factor="0.01" help="The half width of the ribbon (or minimum)."/>
-  <Scale variable="Angle" trace_name="Angle" help="The offset angle of the ribbon from the line normal (0->360)." default_value="0.0" resolution="0.01" range="0 360"/>
+  <Scale variable="Angle" trace_name="Angle" help="The offset angle of the ribbon from the line normal (0->360)." default_value="0.0" resolution="0.01" range="0 360" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
 <!-- keeping vector entries with length > 1 -->
   <VectorEntry label="Default normal" trace_name="DefaultNormal" variable="DefaultNormal" type="float" length="3" help="When this option is on, default normals will be calculated if the input contains no normals" default_value="0.0 0.0 1.0"/>
   <LabeledToggle label="Vary width" trace_name="VaryWidth" variable="VaryWidth" help="Turn on/off the variation of ribbon width with scalar value." default_value="0"/>
@@ -463,9 +469,10 @@
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale variable="Resolution" trace_name="Resolution" default_value="12" resolution="1" range="1 1000"/>
+<!-- should use widget that keeps value positive -->
+  <VectorEntry variable="Resolution" trace_name="Resolution" type="int" default_value="12"/>
   <LabeledToggle variable="Capping" trace_name="Capping" default_value="1"/>
-  <Scale variable="Angle" trace_name="Angle" help="Set the angle of rotation." default_value="360.0" resolution="0.01" range="0 360"/>
+  <VectorEntry variable="Angle" trace_name="Angle" help="Set the angle of rotation." type="float" default_value="360.0"/>
 <!-- Translation value chosen does not change processing speed of this filter or cause it to crash. -->
   <VectorEntry variable="Translation" trace_name="Translation" type="float" help="The total amount of translation along the z-axis." default_value="0.0"/>
 <!-- DeltaRadius value chosen does not change processing speed of this filter or cause it to crash. -->
@@ -476,7 +483,7 @@
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" help="Set the amount to shrink by" default_value="0.5" resolution="0.01" range="0 1"/>
+  <Scale label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" help="Set the amount to shrink by" default_value="0.5" resolution="0.01" range="0 1" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
 </Module>
 <!--
 <Module name="ShrinkPolyData" menu_name="Shrink (polygons)" root_name="ShrinkPD" module_type="Filter" 
@@ -495,18 +502,19 @@
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale label="Num. iterations" trace_name="NumberOfIterations" variable="NumberOfIterations" help="Number of iterations. More iterations produces better smoothing." default_value="20" resolution="1" range="1 100"/>
-  <Scale variable="Convergence" trace_name="Convergence" help="Convergence criterion for the iteration process. Smaller numbers result in more smoothing iterations (0->1)." default_value="0.0" resolution="0.01" range="0 1"/>
+<!-- should use widget that keeps value non-negative -->
+  <VectorEntry label="Num. iterations" trace_name="NumberOfIterations" variable="NumberOfIterations" help="Number of iterations. More iterations produces better smoothing." type="int" default_value="20"/>
+  <Scale variable="Convergence" trace_name="Convergence" help="Convergence criterion for the iteration process. Smaller numbers result in more smoothing iterations (0->1)." default_value="0.0" resolution="0.01" range="0 1" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
 </Module>
 <Module name="Stripper" menu_name="Triangle Strips" root_name="Strip" module_type="Filter" long_help="This filter uses a greedy algorythm to convert triangles into triangle strips" short_help="Convert triangles into triangle strips.">
   <Filter class="vtkStripper">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
   <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale label="Max. length" trace_name="MaximumLength" variable="MaximumLength" help="Stop stripping after this many triangles." default_value="1000" resolution="1" range="4 100000"/>
+  <Scale label="Max. length" trace_name="MaximumLength" variable="MaximumLength" help="Stop stripping after this many triangles." default_value="1000" resolution="1" range="4 100000" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
 </Module>
 <Module name="Subdivide" root_name="Subdivide" module_type="Filter" button_help="Subdivide the poly data into more polygons" long_help="This filter iteratively divide triangles into four smaller triangles.  New points are placed linearly so the output surface matches the input surface." short_help="Creates a surface with more triangles than the input.">
-  <Scale label="Num. divisions" trace_name="NumberOfSubdivisions" variable="NumberOfSubdivisions" help="Set the number of subdivisions" default_value="1" resolution="1" range="1 4"/>
+  <Scale label="Num. divisions" trace_name="NumberOfSubdivisions" variable="NumberOfSubdivisions" help="Set the number of subdivisions" default_value="1" resolution="1" range="1 4" display_entry="1" entry_and_label_on_top="0" display_value="0"/>
   <Filter class="vtkLinearSubdivisionFilter">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
@@ -539,7 +547,8 @@
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
   <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <Scale label="Num. sides" variable="NumberOfSides" trace_name="NumberOfSides" help="Set the number of sides for the tube" default_value="6" resolution="1" range="1 100"/>
+<!-- should use widget that keeps value > 2 -->
+  <VectorEntry label="Num. sides" variable="NumberOfSides" trace_name="NumberOfSides" help="Set the number of sides for the tube" type="int" default_value="6"/>
   <LabeledToggle variable="Capping" trace_name="Capping" help="Select whether to draw endcaps on the tube" default_value="0"/>
   <ScaleFactorEntry variable="Radius" input_menu="im" trace_name="Radius" type="float" scale_factor="0.01" help="Set the radius of the tube" />
   <SelectionList label="Vary radius" trace_name="VaryRadius" variable="VaryRadius" help="Select whether/how to vary the radius of the tube" default_value="0">
@@ -720,9 +729,9 @@
                      scale_factor_command="SetScaleFactor" 
                      default_orient_mode="1" 
                      default_scale_mode ="1"/>
-  <Scale label="Max. Number of Glyphs" trace_name="Max Glyphs" 
-               variable="MaximumNumberOfPoints" default_value="5000"
-               resolution="1" range="1 20000"
+<!-- should use a widget to keep value non-negative -->
+  <VectorEntry label="Max. Number of Glyphs" trace_name="Max Glyphs" 
+               variable="MaximumNumberOfPoints" type="int" default_value="5000"
                help="Set the maximum number of points to glyph" />
   <LabeledToggle label="Mask Points" trace_name="MaskPoints" 
                  variable="UseMaskPoints" default_value="1"

@@ -23,6 +23,8 @@ $pv(vtkTemp172) AcceptCallback
 set pv(vtkTemp192) [$pv(vtkTemp1) CreatePVSource TubeFilter]
 set pv(vtkTemp212) [$pv(vtkTemp192) GetPVWidget {Radius}]
 $pv(vtkTemp212) SetValue 0.01
+set pv(vtkTemp213) [$pv(vtkTemp192) GetPVWidget {NumberOfSides}]
+$pv(vtkTemp213) SetValue 3
 $pv(vtkTemp192) AcceptCallback
 
 # Retrace
