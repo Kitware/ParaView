@@ -33,23 +33,24 @@
 //
 // .SECTION See Also
 
-#include <vtkDistributedDataFilter.h>
-#include <vtkExtractCells.h>
-#include <vtkMergeCells.h>
-#include <vtkObjectFactory.h>
-#include <vtkPKdTree.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkDataSetAttributes.h>
-#include <vtkCellData.h>
-#include <vtkPointData.h>
-#include <vtkIdList.h>
-#include <vtkMultiProcessController.h>
-#include <vtkDataSetWriter.h>
-#include <vtkDataSetReader.h>
-#include <vtkCharArray.h>
-#include <vtkBoxClipDataSet.h>
-#include <vtkPlanes.h>
-#include <vtkPlane.h>
+#include "vtkDistributedDataFilter.h"
+#include "vtkExtractCells.h"
+#include "vtkMergeCells.h"
+#include "vtkObjectFactory.h"
+#include "vtkPKdTree.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkCellData.h"
+#include "vtkPointData.h"
+#include "vtkIntArray.h"
+#include "vtkMultiProcessController.h"
+#include "vtkSocketController.h"
+#include "vtkDataSetWriter.h"
+#include "vtkDataSetReader.h"
+#include "vtkCharArray.h"
+#include "vtkBoxClipDataSet.h"
+#include "vtkPlanes.h"
+#include "vtkPlane.h"
 
 #ifdef VTK_USE_MPI
 #include <vtkMPIController.h>
@@ -91,7 +92,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.4");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.5");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -162,24 +163,38 @@ unsigned long vtkDistributedDataFilter::GetMTime()
 
 void vtkDistributedDataFilter::SetController(vtkMultiProcessController *c)
 {
-  if (this->Controller == c)
-    {
-    return;
-    }
-  this->Modified();
-
   if (this->Kdtree)
     {
     this->Kdtree->SetController(c);
     }
 
-  if (this->Controller)
+  if ((c == NULL) || (c->GetNumberOfProcesses() == 0))
+    {
+    this->NumProcesses = 1;    
+    this->MyId = 0;
+    return;
+    }
+
+  if (this->Controller == c)
+    {
+    return;
+    }
+
+  this->Modified();
+
+  if (this->Controller != NULL)
     {
     this->Controller->UnRegister(this);
     this->Controller = NULL;
     }
-  if (c == NULL)
+
+  vtkSocketController *sc = vtkSocketController::SafeDownCast(c);
+
+  if (sc)
     {
+    vtkErrorMacro(<<
+      "vtkDistributedDataFilter communication will fail with a socket controller");
+
     return;
     }
 
@@ -187,7 +202,7 @@ void vtkDistributedDataFilter::SetController(vtkMultiProcessController *c)
   this->Controller->Register(this);
 
   this->NumProcesses = c->GetNumberOfProcesses();
-  this->MyLocalId = c->GetLocalProcessId();
+  this->MyId    = c->GetLocalProcessId();
 }
 
 void vtkDistributedDataFilter::ExecuteInformation()
@@ -208,17 +223,29 @@ void vtkDistributedDataFilter::Execute()
 
   vtkDebugMacro(<< "vtkDistributedDataFilter::Execute()");
 
+  if (input->GetNumberOfCells() < 1){
+    vtkErrorMacro("Empty input");
+    return;
+  }
+
+  if ( (this->NumProcesses == 1) && !this->RetainKdtree)
+    {
+    // Output is a new grid.  It is the input grid, with
+    // duplicate points removed.  Duplicate points arise
+    // when the input was read from a data set distributed
+    // across more than one file.
+
+    this->SingleProcessExecute();
+
+    return;
+    }
+
   if (this->Kdtree == NULL)
     {
     this->Kdtree = vtkPKdTree::New();
     this->Kdtree->SetController(this->Controller);
     }
 
-  if (this->Controller == NULL)
-    {
-    vtkErrorMacro("Must SetController first");
-    return;
-    }
   // Stage (1) - use vtkPKdTree to...
   //   Create a load balanced spatial decomposition in parallel.
   //   Create tables telling us how many cells each process has for
@@ -258,6 +285,12 @@ void vtkDistributedDataFilter::Execute()
 
   vtkUnstructuredGrid *finalGrid = NULL;
 
+  if (this->NumProcesses == 1)
+    {
+    this->SingleProcessExecute();
+    return;
+    }
+
 #ifdef VTK_USE_MPI
 
   vtkMPIController *mpiContr = vtkMPIController::SafeDownCast(this->Controller);
@@ -271,7 +304,13 @@ void vtkDistributedDataFilter::Execute()
     finalGrid = this->GenericRedistribute();
     }
 #else
-  finalGrid = this->GenericRedistribute();
+
+  // No MPI controller.  This is currently never used.  A socket
+  // controller would fail because comm routines are not written for
+  // them.  A threaded controller would fail because D3 is not yet
+  // threadsafe.
+
+  finalGrid = this->GenericRedistribute();  
 #endif
 
   TIMERDONE("Redistribute data among processors");
@@ -302,6 +341,35 @@ void vtkDistributedDataFilter::Execute()
     this->Kdtree = NULL;
     }
 }
+void vtkDistributedDataFilter::SingleProcessExecute()
+{
+  vtkDataSet *input               = this->GetInput();
+  vtkUnstructuredGrid *output     = this->GetOutput();
+
+  vtkDebugMacro(<< "vtkDistributedDataFilter::SingleProcessExecute()");
+
+  vtkMergeCells *merged = vtkMergeCells::New();
+
+  merged->SetTotalCells(input->GetNumberOfCells());
+  merged->SetTotalPoints(input->GetNumberOfPoints());
+  merged->SetTotalNumberOfDataSets(1);
+
+  merged->SetUnstructuredGrid(output);
+
+  if (this->GlobalIdArrayName)
+    {
+    merged->SetGlobalIdArrayName(this->GlobalIdArrayName);
+    }
+
+  vtkDataSet* tmp = input->NewInstance();
+  tmp->ShallowCopy(input);
+
+  merged->MergeDataSet(tmp);
+  tmp->Delete();
+
+  merged->Finish();
+  merged->Delete();
+}
 
 #ifdef VTK_USE_MPI
 
@@ -310,7 +378,7 @@ vtkUnstructuredGrid
 {
   int proc, offset, source, target;
 
-  int me = this->MyLocalId;
+  int me = this->MyId;
   int nnodes = this->NumProcesses;
 
   vtkUnstructuredGrid *mySubGrid = NULL;
@@ -597,6 +665,10 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::UnMarshallDataSet(char *buf, int 
   return newGrid;
 }
 #endif
+
+// This parallel redistribution does not require MPI.  It will never
+// be used unless this class is made threadsafe.
+
 vtkUnstructuredGrid *vtkDistributedDataFilter::GenericRedistribute()
 {
   vtkUnstructuredGrid *myGrid = NULL; 
@@ -620,7 +692,7 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::GenericRedistribute()
 
     vtkUnstructuredGrid *someGrid = this->ReduceUgridMerge(ugrid, proc);
 
-    if (this->MyLocalId == proc)
+    if (this->MyId == proc)
       {
       myGrid = someGrid;
       }
@@ -631,7 +703,7 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::GenericRedistribute()
 }
 vtkUnstructuredGrid *vtkDistributedDataFilter::ExtractCellsForProcess(int proc)
 {
-  vtkIdList *regions = vtkIdList::New();
+  vtkIntArray *regions = vtkIntArray::New();
 
   int nregions = this->Kdtree->GetRegionAssignmentList(proc, regions);
 
@@ -650,12 +722,12 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::ExtractCellsForProcess(int proc)
 
   for (int reg=0; reg < nregions; reg++)
     {
-    extCells->AddCellList(this->Kdtree->GetCellList(regions->GetId(reg)));
+    extCells->AddCellList(this->Kdtree->GetCellList(regions->GetValue(reg)));
 
     if (this->IncludeAllIntersectingCells)
       {
       extCells->
-        AddCellList(this->Kdtree->GetBoundaryCellList(regions->GetId(reg)));
+        AddCellList(this->Kdtree->GetBoundaryCellList(regions->GetValue(reg)));
       }
     }
 
@@ -686,7 +758,7 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::ReduceUgridMerge(
   int i, ii;
 
   int iHaveData = (ugrid->GetNumberOfCells() > 0);
-  int iAmRoot   = (root == this->MyLocalId);
+  int iAmRoot   = (root == this->MyId);
 
   if (!iHaveData && !iAmRoot)
     {
@@ -703,9 +775,9 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::ReduceUgridMerge(
   int *haveData = new int [nAllProcs];
   memset(haveData, 0, sizeof(int) * nAllProcs);
 
-  vtkIdList *Ids = vtkIdList::New();
+  vtkIntArray *Ids = vtkIntArray::New();
 
-  vtkIdList *regions = vtkIdList::New();
+  vtkIntArray *regions = vtkIntArray::New();
 
   int nregions = this->Kdtree->GetRegionAssignmentList(root, regions);
   
@@ -714,11 +786,11 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::ReduceUgridMerge(
     // Get list of all processes that have data for this region
 
     Ids->Initialize();
-    int nIds = this->Kdtree->GetProcessListForRegion(regions->GetId(reg), Ids);
+    int nIds = this->Kdtree->GetProcessListForRegion(regions->GetValue(reg), Ids);
 
     for (int p=0; p<nIds; p++)
       {
-      haveData[Ids->GetId(p)] = 1;
+      haveData[Ids->GetValue(p)] = 1;
       } 
     } 
   regions->Delete();
@@ -756,7 +828,7 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::ReduceUgridMerge(
     {
     if (haveData[i] && (i != root))
       {
-      if (i == this->MyLocalId)
+      if (i == this->MyId)
         {
         myLocalRank = ii;
         }
@@ -893,9 +965,9 @@ void vtkDistributedDataFilter::ClipCellsToSpatialRegion(vtkUnstructuredGrid *gri
 
   // Get a list of the ids of my spatial regions
 
-  vtkIdList *myRegions = vtkIdList::New();
+  vtkIntArray *myRegions = vtkIntArray::New();
 
-  kd->GetRegionAssignmentList(this->MyLocalId, myRegions);
+  kd->GetRegionAssignmentList(this->MyId, myRegions);
 
   // Decompose it into convex sub-regions.  These sub-regions
   // are axis aligned boxes
@@ -961,7 +1033,7 @@ void vtkDistributedDataFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ClipCells: " << this->ClipCells << endl;
 
   os << indent << "NumProcesses: " << this->NumProcesses << endl;
-  os << indent << "MyLocalId: " << this->MyLocalId << endl;
+  os << indent << "MyId: " << this->MyId << endl;
   os << indent << "Timing: " << this->Timing << endl;
   os << indent << "TimerLog: " << this->TimerLog << endl;
 }
