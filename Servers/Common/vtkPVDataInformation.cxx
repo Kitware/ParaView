@@ -32,7 +32,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -50,6 +50,7 @@ vtkPVDataInformation::vtkPVDataInformation()
 
   this->Name = 0;
   this->DataClassName = 0;
+  this->NumberOfDataSets = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -72,6 +73,7 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DataSetType: " << this->DataSetType << endl;
   os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
   os << indent << "NumberOfCells: " << this->NumberOfCells << endl;
+  os << indent << "NumberOfDataSets: " << this->NumberOfDataSets  << endl;
   os << indent << "MemorySize: " << this->MemorySize << endl;
   os << indent << "Bounds: " << this->Bounds[0] << ", " << this->Bounds[1]
      << ", " << this->Bounds[2] << ", " << this->Bounds[3]
@@ -103,6 +105,7 @@ void vtkPVDataInformation::Initialize()
   this->DataSetType = -1;
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
+  this->NumberOfDataSets = 0;
   this->MemorySize = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
@@ -124,6 +127,8 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
 
   this->DataSetType = dataInfo->GetDataSetType();
   this->SetDataClassName(dataInfo->GetDataClassName());
+
+  this->NumberOfDataSets = dataInfo->NumberOfDataSets;
 
   this->NumberOfPoints = dataInfo->GetNumberOfPoints();
   this->NumberOfCells = dataInfo->GetNumberOfCells();
@@ -150,6 +155,7 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
 //----------------------------------------------------------------------------
 void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
 {
+  int numDataSets = 0;
   vtkCompositeDataIterator* iter = data->NewIterator();
   iter->GoToFirstItem();
   while (!iter->IsDoneWithTraversal())
@@ -159,10 +165,14 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
     dinf->CopyFromObject(dobj);
     this->AddInformation(dinf);
     dinf->Delete();
+    numDataSets++;
     iter->GoToNextItem();
     }
   iter->Delete();
+
+  this->SetDataClassName(data->GetClassName());
   this->DataSetType = data->GetDataObjectType();
+  this->NumberOfDataSets = numDataSets;
 }
 
 //----------------------------------------------------------------------------
@@ -174,6 +184,8 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
 
   this->SetDataClassName(data->GetClassName());
   this->DataSetType = data->GetDataObjectType();
+
+  this->NumberOfDataSets = 1;
 
   // Look for a name stored in Field Data.
   vtkDataArray *nameArray = data->GetFieldData()->GetArray("Name");
@@ -241,7 +253,7 @@ void vtkPVDataInformation::CopyFromObject(vtkObject* object)
     return;
     }
 
-  vtkErrorMacro("Cound not cast object to data set.");
+  vtkErrorMacro("Could not cast object to data set: " << object);
 }
 
 //----------------------------------------------------------------------------
@@ -298,6 +310,7 @@ void vtkPVDataInformation::AddInformation(vtkPVInformation* pvi)
   this->NumberOfPoints += info->GetNumberOfPoints();
   this->NumberOfCells += info->GetNumberOfCells();
   this->MemorySize += info->GetMemorySize();
+  this->NumberOfDataSets += info->GetNumberOfDataSets();
 
   // Bounds are only a little harder.
   bounds = info->GetBounds();
@@ -438,6 +451,7 @@ void vtkPVDataInformation::CopyToStream(vtkClientServerStream* css) const
   *css << this->Name
        << this->DataClassName
        << this->DataSetType
+       << this->NumberOfDataSets
        << this->NumberOfPoints
        << this->NumberOfCells
        << this->MemorySize
@@ -483,27 +497,32 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
     vtkErrorMacro("Error parsing data set type.");
     return;
     }
-  if(!css->GetArgument(0, 3, &this->NumberOfPoints))
+  if(!css->GetArgument(0, 3, &this->NumberOfDataSets))
+    {
+    vtkErrorMacro("Error parsing number of datasets.");
+    return;
+    }
+  if(!css->GetArgument(0, 4, &this->NumberOfPoints))
     {
     vtkErrorMacro("Error parsing number of points.");
     return;
     }
-  if(!css->GetArgument(0, 4, &this->NumberOfCells))
+  if(!css->GetArgument(0, 5, &this->NumberOfCells))
     {
     vtkErrorMacro("Error parsing number of cells.");
     return;
     }
-  if(!css->GetArgument(0, 5, &this->MemorySize))
+  if(!css->GetArgument(0, 6, &this->MemorySize))
     {
     vtkErrorMacro("Error parsing memory size.");
     return;
     }
-  if(!css->GetArgument(0, 6, this->Bounds, 6))
+  if(!css->GetArgument(0, 7, this->Bounds, 6))
     {
     vtkErrorMacro("Error parsing bounds.");
     return;
     }
-  if(!css->GetArgument(0, 7, this->Extent, 6))
+  if(!css->GetArgument(0, 8, this->Extent, 6))
     {
     vtkErrorMacro("Error parsing extent.");
     return;
@@ -514,13 +533,13 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   vtkClientServerStream dcss;
 
   // Point data array information.
-  if(!css->GetArgumentLength(0, 8, &length))
+  if(!css->GetArgumentLength(0, 9, &length))
     {
     vtkErrorMacro("Error parsing length of point data information.");
     return;
     }
   data.resize(length);
-  if(!css->GetArgument(0, 8, &*data.begin(), length))
+  if(!css->GetArgument(0, 9, &*data.begin(), length))
     {
     vtkErrorMacro("Error parsing point data information.");
     return;
@@ -529,13 +548,13 @@ void vtkPVDataInformation::CopyFromStream(const vtkClientServerStream* css)
   this->PointDataInformation->CopyFromStream(&dcss);
 
   // Cell data array information.
-  if(!css->GetArgumentLength(0, 9, &length))
+  if(!css->GetArgumentLength(0, 10, &length))
     {
     vtkErrorMacro("Error parsing length of point data information.");
     return;
     }
   data.resize(length);
-  if(!css->GetArgument(0, 9, &*data.begin(), length))
+  if(!css->GetArgument(0, 10, &*data.begin(), length))
     {
     vtkErrorMacro("Error parsing point data information.");
     return;

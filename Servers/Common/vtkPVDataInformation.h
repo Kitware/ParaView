@@ -63,6 +63,7 @@ public:
   vtkGetMacro(NumberOfPoints, vtkIdType);
   vtkGetMacro(NumberOfCells, vtkIdType);
   vtkGetMacro(MemorySize, int);
+  vtkGetMacro(NumberOfDataSets, int);
   vtkGetVector6Macro(Bounds, double);
 
   // Description:
@@ -99,6 +100,7 @@ protected:
 
   // Data information collected from remote processes.
   int            DataSetType;
+  int            NumberOfDataSets;
   vtkIdType      NumberOfPoints;
   vtkIdType      NumberOfCells;
   int            MemorySize;
