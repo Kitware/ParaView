@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.35");
+vtkCxxRevisionMacro(vtkKWMenu, "1.36");
 
 
 
@@ -80,9 +80,11 @@ void vtkKWMenu::Create(vtkKWApplication* app, const char* args)
     }
   this->SetApplication(app);
 
-  this->Script("menu %s -tearoff %d %s", this->GetWidgetName(), this->TearOff, args); 
-  this->Script("bind %s <<MenuSelect>> {%s DisplayHelp %%W}", this->GetWidgetName(),
-               this->GetTclName());
+  this->Script("menu %s -tearoff %d %s", 
+               this->GetWidgetName(), this->TearOff, (args ? args : "")); 
+
+  this->Script("bind %s <<MenuSelect>> {%s DisplayHelp %%W}", 
+               this->GetWidgetName(), this->GetTclName());
 
   // Update enable state
 
