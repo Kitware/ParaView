@@ -39,7 +39,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.6");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -227,14 +227,17 @@ void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
     {
     if (data->GetSource())
       {
-      *tmpFile << "output of " << data->GetSource()->GetClassName();
+      *tmpFile << "output of " << data->GetSource()->GetClassName()
+               << " contains\n";
       }
     else if (data->GetProducerPort())
       {
       *tmpFile << "output of "
-               << data->GetProducerPort()->GetProducer()->GetClassName();
+               << data->GetProducerPort()->GetProducer()->GetClassName()
+               << " contains\n";
       }
-    *tmpFile << " contains " << this->NumberOfCells << " cells" << endl;
+    *tmpFile << "\t" << this->NumberOfPoints << " points" << endl;
+    *tmpFile << "\t" << this->NumberOfCells << " cells" << endl;
     }
   
   bds = data->GetBounds();
