@@ -149,11 +149,18 @@ int MyMain(int argc, char *argv[])
       // Think about moving it.
       app->SetRenderModuleName("MPIRenderModule");
       }
-#else 
+#else
     if (app->GetRenderModuleName() == NULL)
       { // I do not like this initialization here.
       // Think about moving it.
-      app->SetRenderModuleName("LODRenderModule");
+      if (app->GetClientMode())
+        {
+        app->SetRenderModuleName("MPIRenderModule");
+        }
+      else
+        {
+        app->SetRenderModuleName("LODRenderModule");
+        }
       }
 #endif
     }
