@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.9");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.10");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -120,17 +120,17 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
     this->Iterator->GetData(val);
     if (strcmp(ext, val) == 0)
       {
-      // The extension matches, see if the reader can read the file.
-      this->Script("%s vtkPVReaderModuleCanReadFileTemp",
-                   this->SourceClassName);
-      this->Script("vtkPVReaderModuleCanReadFileTemp CanReadFile {%s}",
-                   fname);
-      int result = this->GetIntegerResult(this->Application);
-      this->Script("vtkPVReaderModuleCanReadFileTemp Delete");
-      if(result)
-        {
-        return 1;
-        }
+//        // The extension matches, see if the reader can read the file.
+//        this->Script("%s vtkPVReaderModuleCanReadFileTemp",
+//                     this->SourceClassName);
+//        this->Script("vtkPVReaderModuleCanReadFileTemp CanReadFile {%s}",
+//                     fname);
+//        int result = this->GetIntegerResult(this->Application);
+//        this->Script("vtkPVReaderModuleCanReadFileTemp Delete");
+//        if(result)
+//          {
+      return 1;
+//        }
       }
     this->Iterator->GoToNextItem();
     }
