@@ -136,7 +136,7 @@ void vtkKWScrollableFrame::CalculateBBox(vtkKWWidget* canvas, char* name,
 void vtkKWScrollableFrame::ResizeFrame()
 {
   this->Script("winfo width %s", this->Frame->GetWidgetName());
-  int widthFrame = this->GetIntegerResult(this->Application);
+  //int widthFrame = this->GetIntegerResult(this->Application);
 
   int bbox[4];
   this->CalculateBBox(this->Canvas, "all", bbox);
@@ -148,7 +148,7 @@ void vtkKWScrollableFrame::ResizeFrame()
 void vtkKWScrollableFrame::ResizeCanvas()
 {
   this->Script("winfo width %s", this->Frame->GetWidgetName());
-  int widthFrame = this->GetIntegerResult(this->Application);
+  //int widthFrame = this->GetIntegerResult(this->Application);
 
   int bbox[4], heightCanvas, heightFrame;
 
