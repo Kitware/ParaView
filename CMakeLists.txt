@@ -5,7 +5,7 @@ PROJECT(ParaView)
 # Disallow in-source build
 STRING(COMPARE EQUAL "${ParaView_SOURCE_DIR}" "${ParaView_BINARY_DIR}" INSOURCE)
 IF(INSOURCE)
-  MESSAGE(FATAL_ERROR "ParaView requiers out of source Build. Please create a separate binary directory and run CMake there.")
+  MESSAGE(FATAL_ERROR "ParaView requires an out of source Build. Please create a separate binary directory and run CMake there.")
 ENDIF(INSOURCE)
 
 #########################################################################
