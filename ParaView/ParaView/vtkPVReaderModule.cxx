@@ -19,6 +19,7 @@
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVData.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
@@ -29,7 +30,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.39");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.40");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -302,6 +303,9 @@ void vtkPVReaderModule::SaveState(ofstream *file)
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 
   this->VisitedFlag = 1;
+  
+  // Let the output set its state.
+  this->GetPVOutput()->SaveState(file);
 }
 
 //----------------------------------------------------------------------------
