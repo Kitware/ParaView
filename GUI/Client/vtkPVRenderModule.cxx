@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.29");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.30");
 
 //===========================================================================
 //***************************************************************************
@@ -265,7 +265,7 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     vtkRenderWindow::SafeDownCast(
       pm->GetObjectFromID(this->RenderWindowID));
 
-  if (pvApp->GetUseStereoRendering)
+  if (pvApp->GetUseStereoRendering())
     {
     pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
                     << "StereoCapableWindowOn" 
