@@ -81,7 +81,7 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
     }
 
   this->CornerProp = vtkCornerAnnotation::New();
-  this->CornerProp->SetMaximumLineHeight(0.08);
+  this->CornerProp->SetMaximumLineHeight(0.05);
   this->CornerComposite = vtkKWGenericComposite::New();
   this->CornerComposite->SetProp(this->CornerProp);
 
@@ -386,6 +386,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.8 $");
+  this->ExtractRevision(os,"$Revision: 1.9 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
