@@ -1827,13 +1827,14 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.223 $");
+  this->ExtractRevision(os,"$Revision: 1.224 $");
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Initialized: " << (this->Initialized?"yes":"no") << endl;
   os << indent << "ModuleName: " << (this->ModuleName?this->ModuleName:"none")
      << endl;
   os << indent << "AcceptButton: " << this->GetAcceptButton() << endl;
