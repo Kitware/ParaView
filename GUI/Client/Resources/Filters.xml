@@ -1,4 +1,94 @@
 <ModuleInterfaces>
+  <Module name="SurfaceVectors"
+          button_image="PVSurfaceVectorsButton"
+          button_visibility="0"
+          button_help="Constrain a vector field to lie on a surface.  Glyphs must be used to display the vector field."
+          root_name="SurfaceV"
+          menu_name="Surface Vectors"
+          module_type="Filter"
+          long_help="This filter constrains vectors to lie on a surface."
+          short_help="This filter constrains vectors o lie on a surface.">
+    <Filter class="vtkSurfaceVectors">
+      <Input name="Input"
+             class="vtkDataSet">
+        <ArrayRequirement attribute="Point" components="3"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <ArrayMenu property="SelectInputVectors"
+               trace_name="Vectors"
+               label="Vectors"
+               input_menu="im"
+               help="Select the input vectors to process."/>
+    <SelectionList property="ConstraintMode"
+                   label="Constraint Mode"
+                   trace_name="ConstraintMode"
+                   help="Constrain vector relative to surface.">
+      <Item name="Parallel" value="0"/>
+      <Item name="Perpendicular" value="1"/>
+      <Item name="PerpendicularScale" value="2"/>
+    </SelectionList>
+    <Documentation>
+The surface vectors filter is used for 2D data sets.  It constrains vectors to lie in a surface by removing components of the vectors normal to the local surface.
+    </Documentation>
+  </Module>
+  <Module name="IntegrateAttributes"
+          class="vtkPVPick"
+          root_name="Integrate"
+          replace_input="0"
+          menu_name="Integrate Attributes"
+          module_type="Filter"
+          long_help="This filter integrates cell and point attributes.  Use selects whether the integration is over 1D lines, 2D surfaces or 3D volumes.  Cells not of the selected dimension are ignored."
+          short_help="Integrates over lines, surfaces or vectors.">
+    <Filter class="vtkIntegrateAttributes">
+      <Input name="Input"
+             class="vtkDataSet">
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <Documentation>
+Intergates point and cell data over lines and surfaces.  It also computes length of lines, area of surface or volume.
+    </Documentation>
+  </Module>
+  
+  <Module name="IntegrateFlowThroughSurface"
+          class="vtkPVPick"
+          button_image="PVIntegrateFlowButton"
+          button_help="Integrate a vector field through a surface. 3D cells are ignored."
+          button_visibility="0"
+          root_name="SurfaceFlow"
+          menu_name="Surface Flow"
+          module_type="Filter"
+          long_help="This filter integrates flow through a surface."
+          short_help="This filter integrates flow through a surface.">
+    <Filter class="vtkIntegrateFlowThroughSurface">
+      <Input name="Input"
+             class="vtkDataSet">
+        <ArrayRequirement attribute="Point" components="3"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <ArrayMenu property="SelectInputVectors"
+               trace_name="Vectors"
+               label="Vectors"
+               input_menu="im"
+               help="Select the input vectors to process."/>
+    <Documentation>
+The flow integration fitler  integrates the dot product of a point flow vector field and surface normal.  It computes the net flow across the 2D surface..
+    </Documentation>
+  </Module>  
   <Module name="Balance"
           root_name="Balance" module_type="Filter"
           multiprocess_support="multiple_processes"

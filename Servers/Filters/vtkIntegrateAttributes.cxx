@@ -28,7 +28,7 @@
 #include "vtkMultiProcessController.h"
 
 
-vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.1");
+vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.1.2.1");
 vtkStandardNewMacro(vtkIntegrateAttributes);
 
 //-----------------------------------------------------------------------------
@@ -167,21 +167,14 @@ void vtkIntegrateAttributes::Execute()
       }
     } 
     
+  // Here is the trick:  The satellites need a point and vertex to 
+  // marshal the attributes.  Node zero needs to receive first...
+  int localProcId = 0;  
   // Send results to process 0.
   if (this->Controller)
     {
-    int localProcId = this->Controller->GetLocalProcessId();
-    if (localProcId > 0)
-      {
-      double msg[5];
-      msg[0] = (double)(this->IntegrationDimension);
-      msg[1] = this->Sum;
-      msg[2] = this->SumCenter[0];
-      msg[3] = this->SumCenter[1];
-      msg[4] = this->SumCenter[2];
-      this->Controller->Send(msg, 5, 0, 28876);
-      }
-    else          
+    localProcId = this->Controller->GetLocalProcessId();
+    if (localProcId == 0)
       {
       int numProcs = this->Controller->GetNumberOfProcesses();
       int id;
@@ -189,27 +182,44 @@ void vtkIntegrateAttributes::Execute()
         {
         double msg[5];
         this->Controller->Receive(msg, 5, id, 28876);
+        vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
+        this->Controller->Receive(tmp, id, 28877);        
         if (this->CompareIntegrationDimension((int)(msg[0])))
           {
           this->Sum += msg[1];
           this->SumCenter[0] += msg[2];
           this->SumCenter[1] += msg[3];
           this->SumCenter[2] += msg[4];
+          this->IntegrateSatelliteData(tmp->GetPointData(),
+                                       output->GetPointData());
+          this->IntegrateSatelliteData(tmp->GetCellData(),
+                                       output->GetCellData());
           }
+        tmp->Delete();
+        tmp = 0;
         }
       }
     }        
     
+  // Generate point and vertex.  Add extra attributes for area too.
+  // Satellites do not need the area attribute, but it does not hurt.
+  double pt[3];
   vtkPoints* newPoints = vtkPoints::New();
   newPoints->SetNumberOfPoints(1);
   // Get rid of the weight factors.
   if (this->Sum != 0.0)
     {
-    this->SumCenter[0] = this->SumCenter[0] / this->Sum;    
-    this->SumCenter[1] = this->SumCenter[1] / this->Sum;    
-    this->SumCenter[2] = this->SumCenter[2] / this->Sum;    
+    pt[0] = this->SumCenter[0] / this->Sum;    
+    pt[1] = this->SumCenter[1] / this->Sum;    
+    pt[2] = this->SumCenter[2] / this->Sum;    
     }
-  newPoints->InsertPoint(0, this->SumCenter);
+  else
+    {
+    pt[0] = this->SumCenter[0];    
+    pt[1] = this->SumCenter[1];    
+    pt[2] = this->SumCenter[2];    
+    }    
+  newPoints->InsertPoint(0, pt);
   output->SetPoints(newPoints);
   newPoints->Delete();
   newPoints = 0;
@@ -238,6 +248,20 @@ void vtkIntegrateAttributes::Execute()
   output->GetCellData()->AddArray(sumArray);
   sumArray->Delete();
   cellPtIds->Delete();
+
+  if (localProcId > 0)
+    {
+    double msg[5];
+    msg[0] = (double)(this->IntegrationDimension);
+    msg[1] = this->Sum;
+    msg[2] = this->SumCenter[0];
+    msg[3] = this->SumCenter[1];
+    msg[4] = this->SumCenter[2];
+    this->Controller->Send(msg, 5, 0, 28876);
+    this->Controller->Send(output, 0, 28877);
+    // Done sending.  Reset output so satellites will have empty data.    
+    output->Initialize();
+    }
 }        
 
 //-----------------------------------------------------------------------------
@@ -369,6 +393,38 @@ void vtkIntegrateAttributes::IntegrateData3(vtkDataSetAttributes* inda,
     }
 }
 
+//-----------------------------------------------------------------------------
+// Used to sum arrays from all processes.
+void vtkIntegrateAttributes::IntegrateSatelliteData(vtkDataSetAttributes* inda,
+                                                    vtkDataSetAttributes* outda)
+{
+  int numArrays, i, numComponents, j;
+  vtkDataArray* inArray;
+  vtkDataArray* outArray;
+  numArrays = outda->GetNumberOfArrays();
+  double vIn, vOut;
+  for (i = 0; i < numArrays; ++i)
+    {
+    outArray = outda->GetArray(i);
+    numComponents = outArray->GetNumberOfComponents();
+    // Protect against arrays in a different order.
+    const char* name = outArray->GetName();
+    if (name && name[0] != '\0')
+      {
+      inArray = inda->GetArray(name);
+      if (inArray && inArray->GetNumberOfComponents() == numComponents)
+        {
+        // We could template for speed.
+        for (j = 0; j < numComponents; ++j)
+          {
+          vIn = inArray->GetComponent(0, j);
+          vOut = outArray->GetComponent(0, j);
+          outArray->SetComponent(0,j,vOut+vIn);
+          }
+        }
+      }
+    }
+}
        
 //-----------------------------------------------------------------------------
 void vtkIntegrateAttributes::IntegratePolyLine(vtkDataSet* input, 
@@ -460,32 +516,29 @@ void vtkIntegrateAttributes::IntegrateTriangle(vtkDataSet* input,
 {
   double pt1[3], pt2[3], pt3[3];
   double mid[3], v1[3], v2[3];
-  double base, height, k;
+  double cross[3];
+  double k;
   
   input->GetPoint(pt1Id,pt1);
   input->GetPoint(pt2Id,pt2);
   input->GetPoint(pt3Id,pt3);
 
-  // Compute the length of the base.
+  // Compute two legs.
   v1[0] = pt2[0] - pt1[0];
   v1[1] = pt2[1] - pt1[1];
   v1[2] = pt2[2] - pt1[2];
-  base = sqrt(v1[0]*v1[0] + v1[1]*v1[1] + v1[2]*v1[2]);
-  if (base == 0.0)
-    {
-    return;
-    }
-  // Compute the height
   v2[0] = pt3[0] - pt1[0];
   v2[1] = pt3[1] - pt1[1];
   v2[2] = pt3[2] - pt1[2];
-  k = vtkMath::Dot(v1, v2)/base;
-  v2[0] = v2[0] - v1[0]*k;
-  v2[1] = v2[1] - v1[1]*k;
-  v2[2] = v2[2] - v1[2]*k;
-  height = sqrt(v2[0]*v2[0] + v2[1]*v2[1] + v2[2]*v2[2]);
   
-  k = base * height * 0.5;
+  // Use the cross product to compute the area of the parallelogram.
+  vtkMath::Cross(v1,v2,cross);
+  k = sqrt(cross[0]*cross[0] + cross[1]*cross[1] + cross[2]*cross[2]) * 0.5;
+  
+  if (k == 0.0)
+    {
+    return;
+    }
   this->Sum += k;
 
   // Compute the middle, which is really just another attribute.
