@@ -55,7 +55,8 @@ MACRO(VTK_WRAP_ClientServer TARGET SRC_LIST_NAME SOURCES)
       # add custom command to output
       ADD_CUSTOM_COMMAND(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
-        DEPENDS vtkWrapClientServer ${VTK_WRAP_HINTS} ${TMP_INPUT}
+        MAIN_DEPENDENCY ${TMP_INPUT}
+        DEPENDS vtkWrapClientServer ${VTK_WRAP_HINTS}
         COMMAND ${VTK_WRAP_ClientServer_EXE}
         ARGS ${TMP_INPUT} ${VTK_WRAP_HINTS} ${TMP_CONCRETE} 
         ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}ClientServer.cxx
