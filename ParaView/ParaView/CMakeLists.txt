@@ -1,4 +1,11 @@
 SET( ParaView_SRCS
+  vtkDistributedDataFilter.cxx
+  vtkPKdTree.cxx
+  vtkExtractCells.cxx
+  vtkKdTree.cxx
+  vtkMergeCells.cxx
+  vtkPlanesIntersection.cxx
+  vtkPointsProjectedHull.cxx
 #  vtkAllToNRedistributePolyData.cxx
 #  vtkBalancedRedistributePolyData.cxx
   vtkClientCompositeManager.cxx
@@ -143,6 +150,7 @@ SET( ParaView_SRCS
   vtkPVSummaryHelper.cxx
   vtkPVThresholdFilter.cxx
   vtkPVTiledDisplayManager.cxx
+  vtkPVTimerInformation.cxx
   vtkPVTimerLogDisplay.cxx
   vtkPVTraceFileDialog.cxx
   vtkPVTrackballMoveActor.cxx
