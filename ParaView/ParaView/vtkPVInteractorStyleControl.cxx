@@ -260,8 +260,8 @@ void vtkPVInteractorStyleControl::UpdateMenus()
 }
 
 //------------------------------------------------------------------------------
-void vtkPVInteractorStyleControl::ExecuteEvent(vtkObject* wdg, unsigned long event, 
-                                               void* calldata)
+void vtkPVInteractorStyleControl::ExecuteEvent(
+  vtkObject* wdg, unsigned long vtkNotUsed(event), void* calldata)
 {
   if ( this->InEvent )
     {
@@ -288,7 +288,7 @@ void vtkPVInteractorStyleControl::ExecuteEvent(vtkObject* wdg, unsigned long eve
         {
         if ( vtkString::Equals(name, mname) )
           {
-          this->ResetWidget(manipulator, argument, name);
+          this->ResetWidget(manipulator, argument);
           }
         }
       vit->GoToNextItem();
@@ -728,7 +728,7 @@ void vtkPVInteractorStyleControl::AddArgument(
 
 //----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::ResetWidget(vtkPVCameraManipulator* man, 
-                                              const char* name, const char* manipulator)
+                                              const char* name)
 {
   vtkPVWidget *pw = 0;
   this->Widgets->GetItem(name, pw);

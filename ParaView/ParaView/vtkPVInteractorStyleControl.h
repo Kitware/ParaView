@@ -142,7 +142,7 @@ public:
   // Description:
   // Callback for widget to call when user modifies UI.
   void ChangeArgument(const char* name, const char* widget);
-  void ResetWidget(vtkPVCameraManipulator*, const char* name, const char* manipulator);
+  void ResetWidget(vtkPVCameraManipulator*, const char* name);
 
   // Description
   // This is hack to convert the current manipulator to Tcl variable.
