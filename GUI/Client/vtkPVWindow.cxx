@@ -130,7 +130,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.610");
+vtkCxxRevisionMacro(vtkPVWindow, "1.611");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3401,7 +3401,7 @@ void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
 void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
 {
 
-  if (pvs == this->CurrentPVSource)
+  if ( pvs && pvs == this->CurrentPVSource)
     {
     this->ShowCurrentSourceProperties();
     return;
