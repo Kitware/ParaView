@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.16");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.17");
 vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
@@ -338,4 +338,5 @@ void vtkPVGenericRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent
   os << indent << "PVRenderView: " << this->GetPVRenderView() << endl;
   os << indent << "InteractiveRenderEnabled: " 
      << this->InteractiveRenderEnabled << endl;
+  os << indent << "Renderer: " << this->Renderer << endl;
 }
