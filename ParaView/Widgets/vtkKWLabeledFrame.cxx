@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18.2.2");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.18.2.3");
 
 
 
@@ -175,16 +175,25 @@ void vtkKWLabeledFrame::AdjustMargin()
       height = this->IconData->GetHeight();
       }
 
+    int border_h = height / 2;
+    int border2_h = height / 2;
+#ifdef _WIN32
+    border_h++;
+#else
+    border2_h++;
+#endif
+
     this->Script("%s configure -height %d", 
-                 this->Border->GetWidgetName(), height / 2);
+                 this->Border->GetWidgetName(), border_h);
     this->Script("%s configure -height %d", 
-                 this->Border2->GetWidgetName(), height / 2);
+                 this->Border2->GetWidgetName(), border2_h);
 
     if ( vtkKWLabeledFrame::AllowShowHide && this->ShowHideFrame )
       {
-      this->Script("place %s -relx 1 -x -13 -rely 0 -y %d -anchor center",
+      this->Script("place %s -relx 1 -x %d -rely 0 -y %d -anchor center",
                    this->Icon->GetWidgetName(),
-                   height / 2 + 1);    
+                   -this->IconData->GetWidth() -1,
+                   border_h + 1);    
       this->Script("raise %s", this->Icon->GetWidgetName());
       }
     }
