@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.375");
+vtkCxxRevisionMacro(vtkPVWindow, "1.376");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1627,6 +1627,11 @@ void vtkPVWindow::PlayDemo()
 // Try to open a file for reading, return error on failure.
 int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
 {
+  struct stat fs;
+  if (stat(fileName, &fs)) 
+    {
+    return VTK_ERROR;
+    }
   ifstream input(fileName, ios::in PV_NOCREATE);
   if (input.fail())
     {
@@ -3847,7 +3852,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.375 $");
+  this->ExtractRevision(os,"$Revision: 1.376 $");
 }
 
 //----------------------------------------------------------------------------
