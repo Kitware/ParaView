@@ -31,7 +31,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.14");
+vtkCxxRevisionMacro(vtkPVOptions, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -52,7 +52,6 @@ vtkPVOptions::vtkPVOptions()
   this->UseRenderingGroup = 0;
   this->GroupFileName = 0;
 
-  this->UseTiledDisplay = 0;
   this->TileDimensions[0] = 0;
   this->TileDimensions[1] = 0;
   this->ClientMode = 0;
@@ -157,8 +156,6 @@ void vtkPVOptions::Initialize()
     "Have the server connect to the client.");
   this->AddBooleanArgument("--always-ssh", 0, &this->AlwaysSSH, 
     "Always use SSH.");
-  this->AddBooleanArgument("--use-tiled-display", "-td", &this->UseTiledDisplay, 
-    "Duplicate the final data to all nodes and tile node displays 1-N into one large display.");
   this->AddArgument("--tile-dimensions-x", "-tdx", this->TileDimensions, 
     "Size of tile display in the number of displays in each row of the display.");
   this->AddArgument("--tile-dimensions-y", "-tdy", this->TileDimensions+1, 
@@ -203,6 +200,17 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     {
     this->UseSoftwareRendering = 1;
     this->UseSatelliteSoftwareRendering = 1;
+    }
+  if ( this->TileDimensions[0] > 0 || this->TileDimensions[1] > 0 )
+    {
+    if ( this->TileDimensions[0] <= 0 )
+      {
+      this->TileDimensions[0] = 1;
+      }
+    if ( this->TileDimensions[1] <= 0 )
+      {
+      this->TileDimensions[1] = 1;
+      }
     }
   return 1;
 }
@@ -374,8 +382,8 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Offscreen Rendering: " << (this->UseOffscreenRendering?"Enabled":"Disabled") << endl;
 
-  os << indent << "Tiled Display: " << (this->UseTiledDisplay?"Enabled":"Disabled") << endl;
-  if (this->UseTiledDisplay)
+  os << indent << "Tiled Display: " << (this->TileDimensions[0]?"Enabled":"Disabled") << endl;
+  if (this->TileDimensions[0])
     { 
     os << indent << "With Tile Dimensions: " << this->TileDimensions[0]
        << ", " << this->TileDimensions[1] << endl;

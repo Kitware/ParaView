@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.318");
+vtkCxxRevisionMacro(vtkPVApplication, "1.319");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -811,7 +811,7 @@ int vtkPVApplication::ParseCommandLineArguments(int vtkNotUsed(argc), char*argv[
     }
 
   // Set the tiled display flag if any tiled display option is used.
-  if ( this->Options->GetUseTiledDisplay() )
+  if ( this->Options->GetTileDimensions()[0] )
     {
     if (!this->Options->GetClientMode())
       {

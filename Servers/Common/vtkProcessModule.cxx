@@ -45,7 +45,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.10");
+vtkCxxRevisionMacro(vtkProcessModule, "1.11");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -671,7 +671,7 @@ int vtkProcessModule::SetupRenderModule()
   // The client chooses a render module.
   if (renderModuleName == NULL)
     { // The render module has not been set by the user.  Choose a default.
-    if (this->Options->GetUseTiledDisplay())
+    if (this->Options->GetTileDimensions()[0])
       {
 #if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
       renderModuleName = "IceTRenderModule";

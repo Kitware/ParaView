@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.16");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.17");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -312,7 +312,8 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
         pvapp->GetIntRegisteryValue(2, "RunTime", "SquirtLevel");
       }
 
-    if (pvapp->GetOptions()->GetClientMode() && ! pvapp->GetOptions()->GetUseTiledDisplay())
+    if (pvapp->GetOptions()->GetClientMode() &&
+      !pvapp->GetOptions()->GetTileDimensions()[0])
       {
       this->SquirtLevelScale->SetBalloonHelpString(
         "Squirt is a combinination of runlength encoding and bit compression.");

@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -141,7 +141,8 @@ void vtkPVCompositeRenderModule::StillRender()
       << this->CompositeID << "SetImageReductionFactor" << 1
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT);
-    if (pm->GetOptions()->GetClientMode() && !pm->GetOptions()->GetUseTiledDisplay() )
+    if (pm->GetOptions()->GetClientMode() &&
+      !pm->GetOptions()->GetTileDimensions()[0] )
       {
       // No squirt if disabled, otherwise only lossless for still render.  
       int squirtLevel = 0;
@@ -306,7 +307,8 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 
   // Handle squirt compression.
-  if (pm->GetOptions()->GetClientMode() && !pm->GetOptions()->GetUseTiledDisplay() )
+  if (pm->GetOptions()->GetClientMode() &&
+    !pm->GetOptions()->GetTileDimensions()[0] )
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
