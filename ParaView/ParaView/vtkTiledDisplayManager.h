@@ -73,7 +73,7 @@ public:
 
   // Description:
   // Methods that are not used at the moment.
-  vtkSetObjectMacro(RenderView, vtkObject);
+  virtual void SetRenderView(vtkObject*);
 
   // Description:
   // Set/Get dimensions (in number of displays) of the

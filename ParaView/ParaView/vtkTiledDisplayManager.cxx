@@ -41,9 +41,10 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.2");
+vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.3");
 vtkStandardNewMacro(vtkTiledDisplayManager);
 
+vtkCxxSetObjectMacro(vtkTiledDisplayManager, RenderView, vtkObject);
 
 // Structures to communicate render info.
 struct vtkTiledDisplayRenderWindowInfo 
