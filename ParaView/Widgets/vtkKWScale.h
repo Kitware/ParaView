@@ -178,8 +178,9 @@ public:
   void Resize();
 
   // Description
-  // Convenience method to set the width of the label
+  // Convenience method to set the width of the label or entry
   virtual void SetLabelWidth(int width);
+  virtual void SetEntryWidth(int width);
 
 protected:
   vtkKWScale();
