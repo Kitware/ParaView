@@ -70,7 +70,11 @@ public:
   // Serialize message.
   virtual int GetMessageLength() { return sizeof(int); }
   virtual void WriteMessage(unsigned char *msg);
-  
+
+  // Description:
+  // Merge another information object.
+  // This is not needed for this information object because the number of
+  // outputs will not change from one processor to another.
   virtual void AddInformation(vtkPVInformation*) {};
   
 protected:

@@ -71,6 +71,10 @@ public:
   virtual int GetMessageLength();
   virtual void WriteMessage(unsigned char *msg);
   
+  // Description:
+  // Merge another information object.
+  // This is not needed for this information object because the class name
+  // will not change from one processor to another.
   virtual void AddInformation(vtkPVInformation*) {};
   
 protected:
