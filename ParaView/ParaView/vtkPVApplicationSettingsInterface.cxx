@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.8");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.8.2.1");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -143,7 +143,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->ShowSourcesNameCheckButton->SetParent(frame);
   this->ShowSourcesNameCheckButton->Create(app, 0);
   this->ShowSourcesNameCheckButton->SetText(
-    "Show sources name in source browsers");
+    "Show source names in browsers");
   this->ShowSourcesNameCheckButton->SetCommand(
     this, "ShowSourcesNameCallback");
   this->ShowSourcesNameCheckButton->SetBalloonHelpString(
