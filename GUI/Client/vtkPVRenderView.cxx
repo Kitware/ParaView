@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.320");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.321");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2331,21 +2331,14 @@ void vtkPVRenderView::PrintView()
     // Is this right? Should DPI be int or float?
     DPI = this->GetParentWindow()->GetPrintTargetDPI();
     }
-//  TODO: SetMagnification should work in client/server mode
-  if (!this->GetPVApplication()->GetClientMode())
+
+  if (DPI >= 150.0)
     {
-    if (DPI >= 150.0)
-      {
-      w2i->SetMagnification(2);
-      }
-    if (DPI >= 300.0)
-      {
-      w2i->SetMagnification(3);
-      }
+    w2i->SetMagnification(2);
     }
-  else
+  if (DPI >= 300.0)
     {
-    w2i->ShouldRerenderOff();
+    w2i->SetMagnification(3);
     }
 
   w2i->SetInput(this->GetRenderWindow());
