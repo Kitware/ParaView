@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.5");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.6");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -685,6 +685,7 @@ void vtkPVAnimationInterfaceEntry::SetCustomScript(const char* script)
   this->GetMethodMenuButton()->SetButtonText("Script");
   this->Parent->UpdateNewScript();
   this->Parent->ShowEntryInFrame(this, -1);
+  this->SwitchScriptTime(0);
 }
 
 //-----------------------------------------------------------------------------
