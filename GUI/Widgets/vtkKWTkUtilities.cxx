@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.38");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.39");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -532,7 +532,8 @@ int vtkKWTkUtilities::ChangeFontWeightToNormal(Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
-                                      const char *widget,
+                                      const char *font, 
+                                      char *new_font, 
                                       int slant)
 {
   int res;
@@ -541,9 +542,9 @@ int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
   // Catch the slant field, replace it with i (italic) or r (roman).
 
   ostrstream regsub;
-  regsub << "regsub -- {(-[^-]*\\S-[^-]*\\S-[^-]*\\S-)([^-]*)(-.*)} [" << widget 
-         << " cget -font] {\\1" << (slant ? "i" : "r") 
-         << "\\3} __temp__" << ends;
+  regsub << "regsub -- {(-[^-]*\\S-[^-]*\\S-[^-]*\\S-)([^-]*)(-.*)} \""
+         << font << "\" {\\1" << (slant ? "i" : "r") << "\\3} __temp__" 
+         << ends;
 
   res = Tcl_GlobalEval(interp, regsub.str());
   regsub.rdbuf()->freeze(0);
@@ -554,24 +555,22 @@ int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
     }
   if (atoi(Tcl_GetStringResult(interp)) == 1)
     {
-    ostrstream replace;
-    replace << widget << " config -font $__temp__" << ends;
-    res = Tcl_GlobalEval(interp, replace.str());
-    replace.rdbuf()->freeze(0);
+    res = Tcl_GlobalEval(interp, "set __temp__");
     if (res != TCL_OK)
       {
       vtkGenericWarningMacro(<< "Unable to replace result of regsub! ("
                              << interp->result << ")");
       return 0;
       }
+    strcpy(new_font, Tcl_GetStringResult(interp));
     return 1;
     }
 
   // Otherwise replace the -slant parameter with either bold or normal
 
   ostrstream regsub2;
-  regsub2 << "regsub -- {(.* -slant )(\\w*\\M)(.*)} [font actual [" << widget 
-          << " cget -font]] {\\1" << (slant ? "italic" : "roman") 
+  regsub2 << "regsub -- {(.* -slant )(\\w*\\M)(.*)} [font actual \"" 
+          << font << "\"] {\\1" << (slant ? "italic" : "roman") 
           << "\\3} __temp__" << ends;
   res = Tcl_GlobalEval(interp, regsub2.str());
   regsub2.rdbuf()->freeze(0);
@@ -582,19 +581,62 @@ int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
     }
   if (atoi(Tcl_GetStringResult(interp)) == 1)
     {
-    ostrstream replace2;
-    replace2 << widget << " config -font $__temp__" << ends;
-    res = Tcl_GlobalEval(interp, replace2.str());
-    replace2.rdbuf()->freeze(0);
+    res = Tcl_GlobalEval(interp, "set __temp__");
     if (res != TCL_OK)
       {
-      vtkGenericWarningMacro(<< "Unable to replace result of regsub (2) ! ("
+      vtkGenericWarningMacro(<< "Unable to replace result of regsub! (2) ("
                              << interp->result << ")");
       return 0;
       }
+    strcpy(new_font, Tcl_GetStringResult(interp));
     return 1;
     }
 
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontSlant(Tcl_Interp *interp,
+                                      const char *widget,
+                                      int slant)
+{
+  char font[1024], new_font[1024];
+  
+  int res;
+
+  // Get the font
+
+  ostrstream getfont;
+  getfont << widget << " cget -font" << ends;
+  res = Tcl_GlobalEval(interp, getfont.str());
+  getfont.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to getfont!");
+    return 0;
+    }
+  strcpy(font, Tcl_GetStringResult(interp));
+
+  // Change the font slant
+
+  if (!vtkKWTkUtilities::ChangeFontSlant(interp, font, new_font, slant))
+    {
+    return 0;
+    }
+
+  // Set the font
+
+  ostrstream setfont;
+  setfont << widget << " config -font \"" << new_font << "\"" << ends;
+  res = Tcl_GlobalEval(interp, setfont.str());
+  setfont.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to replace font ! ("
+                           << interp->result << ")");
+    return 0;
+    }
+  
   return 1;
 }
 

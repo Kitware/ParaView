@@ -110,6 +110,10 @@ public:
   static int ChangeFontWeightToNormal(Tcl_Interp *interp, const char *widget);
 
   // Change the -font slant attribute of widget to italic or roman (normal).
+  static int ChangeFontSlantToItalic(
+    Tcl_Interp *interp, const char *font, char *new_font);
+  static int ChangeFontSlantToRoman(
+    Tcl_Interp *interp, const char *font, char *new_font);
   static int ChangeFontSlantToItalic(Tcl_Interp *interp, const char *widget);
   static int ChangeFontSlantToRoman(Tcl_Interp *interp, const char *widget);
 
@@ -217,6 +221,8 @@ protected:
 
   static int ChangeFontWeight(Tcl_Interp *interp, const char *widget, int);
   static int ChangeFontSlant(Tcl_Interp *interp, const char *widget, int);
+  static int ChangeFontSlant(Tcl_Interp *interp, 
+                             const char *font, char *new_font, int);
 
 private:
   vtkKWTkUtilities(const vtkKWTkUtilities&); // Not implemented
