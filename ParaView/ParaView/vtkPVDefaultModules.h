@@ -50,11 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // Define the standard reader interfaces.
 const char* vtkPVWindow::StandardReaderInterfaces =
 "<ModuleInterfaces>\n"
-"  <Module name=\"ensight\" class=\"vtkPVEnSightReaderModule\" root_name=\"ensight\" \n"
-"          output=\"vtkDataSet\" module_type=\"Reader\"\n"
-"          extensions=\".case\" file_description=\"EnSight Files\">\n"
-"    <Source type=\"vtkGenericEnSightReader\"/>\n"
-"  </Module>\n"
 "  <Module name=\"pvtkfile\" class=\"vtkPVDataSetReaderModule\" root_name=\"pvtkfile\"\n"
 "          output=\"vtkDataSet\" module_type=\"Reader\"\n"
 "          extensions=\".pvtk\" file_description=\"Parallel VTK Files\">\n"
@@ -81,6 +76,11 @@ const char* vtkPVWindow::StandardReaderInterfaces =
 "                 help=\"For reading a smaller extent.\"/>\n"
 "    <VectorEntry variable=\"NumberOfGhostLevels\" type=\"int\" \n"
 "                 help=\"Set the number of ghost levels to read.\"/>\n"
+"  </Module>\n"
+"  <Module name=\"ensight\" class=\"vtkPVEnSightReaderModule\" root_name=\"ensight\" \n"
+"          output=\"vtkDataSet\" module_type=\"Reader\"\n"
+"          extensions=\".case .sos\" file_description=\"EnSight Files\">\n"
+"    <Source type=\"vtkGenericEnSightReader\"/>\n"
 "  </Module>\n"
 "</ModuleInterfaces>\n";
 
