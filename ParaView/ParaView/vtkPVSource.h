@@ -63,6 +63,7 @@ class vtkPVLabeledToggle;
 class vtkPVFileEntry;
 class vtkPVStringEntry;
 class vtkPVScalarEntry;
+class vtkPVVectorEntry;
 class vtkKWScale;
 class vtkKWEntry;
 class vtkPVSelectionList;
@@ -206,19 +207,19 @@ public:
   // The primary label is put to the left.  The element labels
   // (l1,l2,l3, ...) are put in from of the individual entry boxes.
   // The methods are called on the object (VTKSource if o=NULL).
-  void AddVector2Entry(char *label, char *l1, char *l2,
-		       char *setCmd, char *getCmd, char* help,
-                       vtkKWObject *o = NULL);
-  void AddVector3Entry(char *label, char *l1, char *l2, char *l3,
-		       char *setCmd, char *getCmd, char* help,
-                       vtkKWObject *o = NULL);
-  void AddVector4Entry(char *label, char *l1, char *l2, char *l3, char *l4,
-		       char *setCmd, char *getCmd, char *help,
-                       vtkKWObject *o = NULL);
-  void AddVector6Entry(char *label, char *l1, char *l2, char *l3, 
-		       char *l4, char *l5, char *l6,
-		       char *setCmd, char *getCmd, char* help,
-                       vtkKWObject *o = NULL);
+  vtkPVVectorEntry* AddVector2Entry(char *label, char *l1, char *l2,
+                                    char *setCmd, char *getCmd, char* help,
+                                    vtkKWObject *o = NULL);
+  vtkPVVectorEntry* AddVector3Entry(char *label, char *l1, char *l2, char *l3,
+                                    char *setCmd, char *getCmd, char* help,
+                                    vtkKWObject *o = NULL);
+  vtkPVVectorEntry* AddVector4Entry(char *label, char *l1, char *l2, char *l3,
+                                    char *l4, char *setCmd, char *getCmd,
+                                    char *help, vtkKWObject *o = NULL);
+  vtkPVVectorEntry* AddVector6Entry(char *label, char *l1, char *l2, char *l3, 
+                                    char *l4, char *l5, char *l6,
+                                    char *setCmd, char *getCmd, char* help,
+                                    vtkKWObject *o = NULL);
   
   // Description:
   // Special widget controls (not entries).

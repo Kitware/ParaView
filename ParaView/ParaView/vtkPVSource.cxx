@@ -67,6 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVFileEntry.h"
 #include "vtkPVStringEntry.h"
 #include "vtkPVScalarEntry.h"
+#include "vtkPVVectorEntry.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -1655,118 +1656,52 @@ vtkPVScalarEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
-                                  char *setCmd, char *getCmd, char *help,
-                                  vtkKWObject *o)
+vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
+                                               char *setCmd, char *getCmd,
+                                               char *help, vtkKWObject *o)
 {
-  vtkKWWidget *frame;
-  vtkKWLabel *labelWidget;
-  vtkKWEntry *minEntry, *maxEntry;
-
+  vtkPVVectorEntry *entry;
+  char* subLabels[2];
+  int i;
+  
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
   if (o)
     {
     tclName = o->GetTclName();
     }
-
-  // First a frame to hold the other widgets.
-  frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
-
-  // Now a label
-  if (label && label[0] != '\0')
-    {  
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 18 -justify right");
-    labelWidget->SetLabel(label);
-    if (help)
-      {
-      labelWidget->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
   
-  // Min
-  if (l1 && l1[0] != '\0')
+  subLabels[0] = new char[strlen(l1) + 1];
+  strcpy(subLabels[0], l1);
+  subLabels[1] = new char[strlen(l2) + 1];
+  strcpy(subLabels[1], l2);
+  entry = vtkPVVectorEntry::New();
+  this->Widgets->AddItem(entry);
+  entry->SetParent(this->ParameterFrame->GetFrame());
+  entry->SetPVSource(this);
+  entry->Create(this->Application, label, 2, subLabels, setCmd, getCmd, help,
+                tclName);
+  this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  entry->Delete();
+  
+  for (i = 0; i < 2; i++)
     {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l1);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
+    delete [] subLabels[i];
     }
-  minEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(minEntry);
-  minEntry->SetParent(frame);
-  minEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               minEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    minEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", minEntry->GetWidgetName());
 
-  // Max
-  if (l2 && l2[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l2);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }  
-  maxEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(maxEntry);
-  maxEntry->SetParent(frame);
-  maxEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               maxEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    maxEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", maxEntry->GetWidgetName());
-
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 0]",
-                                 minEntry->GetTclName(), tclName, getCmd);
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 1]",
-                                 maxEntry->GetTclName(), tclName, getCmd);
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue]\"",
-                        this->GetTclName(), tclName, setCmd, minEntry->GetTclName(),
-                        maxEntry->GetTclName());
-
-  frame->Delete();
-  minEntry->Delete();
-  maxEntry->Delete();
+  return entry;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
-				  char *setCmd, char *getCmd, char* help,
-                                  vtkKWObject *o)
+vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
+                                               char *l3, char *setCmd,
+                                               char *getCmd, char* help,
+                                               vtkKWObject *o)
 {
-  vtkKWWidget *frame;
-  vtkKWLabel *labelWidget;
-  vtkKWEntry *xEntry, *yEntry, *zEntry;
-
+  vtkPVVectorEntry *entry;
+  char* subLabels[3];
+  int i;
+  
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
   if (o)
@@ -1774,130 +1709,39 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
     tclName = o->GetTclName();
     }
 
-  // First a frame to hold the other widgets.
-  frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
-
-  // Now a label
-  if (label && label[0] != '\0')
+  subLabels[0] = new char[strlen(l1) + 1];
+  strcpy(subLabels[0], l1);
+  subLabels[1] = new char[strlen(l2) + 1];
+  strcpy(subLabels[1], l2);
+  subLabels[2] = new char[strlen(l3) + 1];
+  strcpy(subLabels[2], l3);
+  entry = vtkPVVectorEntry::New();
+  this->Widgets->AddItem(entry);
+  entry->SetParent(this->ParameterFrame->GetFrame());
+  entry->SetPVSource(this);
+  entry->Create(this->Application, label, 3, subLabels, setCmd, getCmd, help,
+                tclName);
+  this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  entry->Delete();
+  
+  for (i = 0; i < 3; i++)
     {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 18 -justify right");
-    labelWidget->SetLabel(label);
-    if (help)
-      {
-      labelWidget->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
+    delete [] subLabels[i];
     }
   
-  // X
-  if (l1 && l1[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l1);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  xEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(xEntry);
-  xEntry->SetParent(frame);
-  xEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               xEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    xEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", xEntry->GetWidgetName());
-
-  // Y
-  if (l2 && l2[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l2);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  yEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(yEntry);
-  yEntry->SetParent(frame);
-  yEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               yEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    yEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", yEntry->GetWidgetName());
-
-  // Z
-  if (l3 && l3[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l3);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  zEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(zEntry);
-  zEntry->SetParent(frame);
-  zEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               zEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    zEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
-
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 0]", 
-                                 xEntry->GetTclName(), tclName, getCmd); 
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 1]", 
-                                 yEntry->GetTclName(), tclName, getCmd); 
-  this->ResetCommands->AddString("%s SetValue [lindex [%s %s] 2]", 
-                                 zEntry->GetTclName(), tclName, getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
-                        this->GetTclName(), tclName, setCmd, xEntry->GetTclName(),
-                        yEntry->GetTclName(), zEntry->GetTclName());
-
-  frame->Delete();
-  xEntry->Delete();
-  yEntry->Delete();
-  zEntry->Delete();
+  return entry;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
-                                  char *l4, char *setCmd, char *getCmd,
-                                  char* help, vtkKWObject *o)
+vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
+                                               char *l3, char *l4,
+                                               char *setCmd, char *getCmd,
+                                               char* help, vtkKWObject *o)
 {
-  vtkKWWidget *frame;
-  vtkKWLabel *labelWidget;
-  vtkKWEntry *xEntry, *yEntry, *zEntry, *wEntry;
+  vtkPVVectorEntry* entry;
+  char* subLabels[4];
+  int i;
 
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
@@ -1906,160 +1750,45 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
     tclName = o->GetTclName();
     }
 
-  // First a frame to hold the other widgets.
-  frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
+  subLabels[0] = new char[strlen(l1) + 1];
+  strcpy(subLabels[0], l1);
+  subLabels[1] = new char[strlen(l2) + 1];
+  strcpy(subLabels[1], l2);
+  subLabels[2] = new char[strlen(l3) + 1];
+  strcpy(subLabels[2], l3);
+  subLabels[3] = new char[strlen(l4) + 1];
+  strcpy(subLabels[3], l4);
 
-  // Now a label
-  if (label && label[0] != '\0')
+  entry = vtkPVVectorEntry::New();
+  this->Widgets->AddItem(entry);
+  entry->SetParent(this->ParameterFrame->GetFrame());
+  entry->SetPVSource(this);
+  entry->Create(this->Application, label, 4, subLabels, setCmd, getCmd, help,
+                tclName);
+  this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  entry->Delete();
+  
+  for (i = 0; i < 4; i++)
     {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 18 -justify right");
-    labelWidget->SetLabel(label);
-    if (help)
-      {
-      labelWidget->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
+    delete [] subLabels[i];
     }
   
-  // X
-  if (l1 && l1[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l1);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  xEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(xEntry);
-  xEntry->SetParent(frame);
-  xEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               xEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    xEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", xEntry->GetWidgetName());
-
-  // Y
-  if (l2 && l2[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l2);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  yEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(yEntry);
-  yEntry->SetParent(frame);
-  yEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               yEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    yEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", yEntry->GetWidgetName());
-
-  // Z
-  if (l3 && l3[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l3);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  zEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(zEntry);
-  zEntry->SetParent(frame);
-  zEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               zEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    zEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
-
-  // W
-  if (l4 && l4[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l4);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  wEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(wEntry);
-  wEntry->SetParent(frame);
-  wEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               wEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    wEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", wEntry->GetWidgetName());
-
-  // Command to update the UI.
-  this->ResetCommands->AddString(
-    "%s SetValue [lindex [%s %s] 0]", xEntry->GetTclName(), tclName, getCmd);
-  this->ResetCommands->AddString(
-    "%s SetValue [lindex [%s %s] 1]", yEntry->GetTclName(), tclName, getCmd);
-  this->ResetCommands->AddString(
-    "%s SetValue [lindex [%s %s] 2]", zEntry->GetTclName(), tclName, getCmd);
-  this->ResetCommands->AddString(
-    "%s SetValue [lindex [%s %s] 3]", wEntry->GetTclName(), tclName, getCmd);
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
-                        this->GetTclName(), tclName, setCmd, xEntry->GetTclName(),
-                        yEntry->GetTclName(), zEntry->GetTclName(), wEntry->GetTclName());
-
-  frame->Delete();
-  xEntry->Delete();
-  yEntry->Delete();
-  zEntry->Delete();
-  wEntry->Delete();
+  return entry;
 }
 
 //----------------------------------------------------------------------------
 // It might make sense here to store the labels in an array 
 // so that a loop can be used to create the widgets.
-void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
-                                  char *l4, char *l5, char *l6,
-                                  char *setCmd, char *getCmd, char *help,
-                                  vtkKWObject *o)
+vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
+                                               char *l3, char *l4, char *l5,
+                                               char *l6, char *setCmd,
+                                               char *getCmd, char *help,
+                                               vtkKWObject *o)
 
 {
-  vtkKWWidget *frame;
-  vtkKWLabel *labelWidget;
-  vtkKWEntry  *uEntry, *vEntry, *wEntry, *xEntry, *yEntry, *zEntry;
+  vtkPVVectorEntry *entry;
+  char* subLabels[6];
+  int i;
 
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
@@ -2068,201 +1797,34 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
     tclName = o->GetTclName();
     }
 
-  // First a frame to hold the other widgets.
-  frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
+  subLabels[0] = new char[strlen(l1) + 1];
+  strcpy(subLabels[0], l1);
+  subLabels[1] = new char[strlen(l2) + 1];
+  strcpy(subLabels[1], l2);
+  subLabels[2] = new char[strlen(l3) + 1];
+  strcpy(subLabels[2], l3);
+  subLabels[3] = new char[strlen(l4) + 1];
+  strcpy(subLabels[3], l4);
+  subLabels[4] = new char[strlen(l5) + 1];
+  strcpy(subLabels[4], l5);
+  subLabels[5] = new char[strlen(l6) + 1];
+  strcpy(subLabels[5], l6);
 
-  // Now a label
-  if (label && label[0] != '\0')
+  entry = vtkPVVectorEntry::New();
+  this->Widgets->AddItem(entry);
+  entry->SetParent(this->ParameterFrame->GetFrame());
+  entry->SetPVSource(this);
+  entry->Create(this->Application, label, 6, subLabels, setCmd, getCmd, help,
+                tclName);
+  this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  entry->Delete();
+  
+  for (i = 0; i < 6; i++)
     {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 18 -justify right");
-    labelWidget->SetLabel(label);
-    if (help)
-      {
-      labelWidget->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
+    delete [] subLabels[i];
     }
   
-  // U
-  if (l1 && l1[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l1);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  uEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(uEntry);
-  uEntry->SetParent(frame);
-  uEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               uEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    uEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", uEntry->GetWidgetName());
-
-  // V
-  if (l2 && l2[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l2);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  vEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(vEntry);
-  vEntry->SetParent(frame);
-  vEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               vEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    vEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", vEntry->GetWidgetName());
-
-  // W
-  if (l3 && l3[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l3);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  wEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(wEntry);
-  wEntry->SetParent(frame);
-  wEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               wEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    wEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", wEntry->GetWidgetName());
-
-  // X
-  if (l4 && l4[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l4);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  xEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(xEntry);
-  xEntry->SetParent(frame);
-  xEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               xEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    xEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", xEntry->GetWidgetName());
-
-  // Y
-  if (l5 && l5[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l5);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  yEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(yEntry);
-  yEntry->SetParent(frame);
-  yEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               yEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    yEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", yEntry->GetWidgetName());
-
-  // Z
-  if (l6 && l6[0] != '\0')
-    {
-    labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "");
-    labelWidget->SetLabel(l6);
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
-  zEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(zEntry);
-  zEntry->SetParent(frame);
-  zEntry->Create(this->Application, "-width 2");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               zEntry->GetWidgetName(), this->GetTclName());
-  if (help)
-    {
-    zEntry->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
-
-  // Command to update the UI.
-  this->ResetCommands->AddString(
-    "%s SetValue [lindex [%s %s] 0]",uEntry->GetTclName(), tclName, getCmd);
-  this->ResetCommands->AddString(
-    "%s SetValue [lindex [%s %s] 1]",vEntry->GetTclName(), tclName, getCmd);
-  this->ResetCommands->AddString(
-    "%s SetValue [lindex [%s %s] 2]",wEntry->GetTclName(), tclName, getCmd);
-  this->ResetCommands->AddString(
-    "%s SetValue [lindex [%s %s] 3]",xEntry->GetTclName(), tclName, getCmd);
-  this->ResetCommands->AddString(
-    "%s SetValue [lindex [%s %s] 4]",yEntry->GetTclName(), tclName, getCmd);
-  this->ResetCommands->AddString(
-    "%s SetValue [lindex [%s %s] 5]",zEntry->GetTclName(), tclName, getCmd);
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
-  	 this->GetTclName(), tclName, setCmd, uEntry->GetTclName(), 
-         vEntry->GetTclName(), wEntry->GetTclName(),
-         xEntry->GetTclName(), yEntry->GetTclName(), zEntry->GetTclName());
-
-  frame->Delete();
-  uEntry->Delete();
-  vEntry->Delete();
-  wEntry->Delete();
-  xEntry->Delete();
-  yEntry->Delete();
-  zEntry->Delete();
+  return entry;
 }
 
 

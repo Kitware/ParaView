@@ -37,6 +37,7 @@ vtkPVSourceInterfaceParser
 vtkPVStringEntry
 vtkPVThreshold 
 vtkPVTreeComposite 
+vtkPVVectorEntry
 vtkPVWidget
 vtkPVWindow 
 vtkPVWorldPointPicker 
