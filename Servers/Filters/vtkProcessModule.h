@@ -168,6 +168,14 @@ public:
   // The controller is needed for filter that communicate internally.
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
+  // Description:
+  // Get the partition piece.  -1 means no assigned piece.
+  virtual int GetPartitionId() { return 0;} ;
+
+  // Description:
+  // Get the number of processes participating in sharing the data.
+  virtual int GetNumberOfPartitions() { return 1;} ;
+  
   vtkClientServerID GetUniqueID();
   vtkClientServerID GetProcessModuleID();
 
