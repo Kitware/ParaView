@@ -278,14 +278,16 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
   int i;
   vtkContourFilter *source =
     (vtkContourFilter*)this->GetVTKSource();
-
+  vtkPVSourceInterface *pvsInterface =
+    this->GetNthPVInput(0)->GetPVSource()->GetInterface();
+  
   if (this->DefaultScalarsName)
     {
     *file << "vtkFieldDataToAttributeDataFilter "
           << this->ChangeScalarsFilterTclName << "\n\t"
           << this->ChangeScalarsFilterTclName << " SetInput [";
-    if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
-               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
+    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
+                               "vtkGenericEnSightReader") == 0)
       {
       char *charFound;
       int pos;
@@ -297,8 +299,8 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n\t";
       }
-    else if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
-                    GetSourceClassName(), "vtkDataSetReader") == 0)
+    else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
+                                    "vtkDataSetReader") == 0)
       {
       tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
       *file << tempName << " GetOutput]\n\t";
@@ -323,8 +325,8 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
 
   if (!this->DefaultScalarsName)
     {
-    if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
-               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
+    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
+                               "vtkGenericEnSightReader") == 0)
       {
       char *charFound;
       int pos;
@@ -336,8 +338,8 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
       pos = charFound - dataName + 1;
       *file << dataName+pos << "]\n\t";
       }
-    else if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
-                    GetSourceClassName(), "vtkDataSetReader") == 0)
+    else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
+                                    "vtkDataSetReader") == 0)
       {
       tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
       *file << tempName << " GetOutput]\n\t";

@@ -1582,7 +1582,8 @@ void vtkPVActorComposite::SaveInTclScript(ofstream *file, const char *sourceName
   char* result;
   char* dataTclName;
   char* renTclName;
-  vtkPVSourceInterface *pvsInterface;
+  vtkPVSourceInterface *pvsInterface =
+    this->GetPVData()->GetPVSource()->GetInterface();
 
   renTclName = this->GetPVRenderView()->GetRendererTclName();
 
@@ -1592,7 +1593,6 @@ void vtkPVActorComposite::SaveInTclScript(ofstream *file, const char *sourceName
     *file << "vtkOutlineFilter Outline" << this->InstanceCount << "\n\t"
           << "Outline" << this->InstanceCount << " SetInput [" << sourceName
           << " GetOutput";
-    pvsInterface = this->GetPVData()->GetPVSource()->GetInterface();
     if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
                                "vtkGenericEnSightReader") == 0)
       {
@@ -1625,7 +1625,6 @@ void vtkPVActorComposite::SaveInTclScript(ofstream *file, const char *sourceName
     *file << "vtkDataSetSurfaceFilter " << this->GeometryTclName << "\n\t"
           << this->GeometryTclName << " SetInput [" << sourceName
           << " GetOutput";
-    pvsInterface = this->GetPVData()->GetPVSource()->GetInterface();
     if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
                                "vtkGenericEnSightReader") == 0)
       {
@@ -1658,7 +1657,6 @@ void vtkPVActorComposite::SaveInTclScript(ofstream *file, const char *sourceName
     *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
           << this->MapperTclName << " SetInput [" << sourceName
           << " GetOutput";
-    pvsInterface = this->GetPVData()->GetPVSource()->GetInterface();
     if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
                                "vtkGenericEnSightReader") == 0)
       {

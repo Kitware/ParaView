@@ -972,6 +972,8 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
 {
   Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();
   char *tempName;
+  vtkPVSourceInterface *pvsInterface =
+    this->PVProbeSource->GetPVSource()->GetInterface();
   
   if (this->Dimensionality == 0)
     {
@@ -1019,8 +1021,8 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
   
   *file << "\t" << this->GetVTKSourceTclName() << " SetSource [";
 
-  if (strcmp(this->PVProbeSource->GetPVSource()->GetInterface()->
-             GetSourceClassName(), "vtkGenericEnSightReader") == 0)
+  if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
+                             "vtkGenericEnSightReader") == 0)
     {
     char *dataName = this->ProbeSourceTclName;
     char *charFound;
@@ -1032,8 +1034,8 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
     pos = charFound - dataName + 1;
     *file << dataName+pos << "]\n\n";
     }
-  else if (strcmp(this->PVProbeSource->GetPVSource()->GetInterface()->
-                  GetSourceClassName(), "vtkDataSetReader") == 0)
+  else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
+                                  "vtkDataSetReader") == 0)
     {
     tempName = strtok(this->ProbeSourceTclName, "O");
     *file << tempName << " GetOutput]\n\n";
