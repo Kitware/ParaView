@@ -165,8 +165,15 @@ public:
       return *this->ClientServerStream;
     }
   
-  vtkClientServerID NewServerObject(const char*);
-  void DeleteServerObject(vtkClientServerID);
+  // Description: 
+  // These methods construct/delete a vtk object in the vtkClientServerStream
+  // owned by the process module.  The type of the object is specified by
+  // string name, and the object to delete is specified by the object id
+  // passed in.  To send the stream to the server call SendStreamToServer or
+  // SendStreamToClientAndServer.  For construction, the unique id for the
+  // new object is returned.
+  vtkClientServerID NewStreamObject(const char*);
+  void DeleteStreamObject(vtkClientServerID);
   
   // Description: 
   // Return the vtk object associated with the given id.

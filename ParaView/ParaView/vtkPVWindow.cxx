@@ -142,7 +142,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.8");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.9");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -305,7 +305,8 @@ vtkPVWindow::~vtkPVWindow()
     vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderWindow" 
            << 0 << vtkClientServerStream::End;
-    pvApp->DeleteClientAndServerObject(this->InteractorID);
+    pm->DeleteStreamObject(this->InteractorID);
+    pm->SendStreamToClientAndServer();
     this->InteractorID.ID = 0;
     this->SetInteractor(NULL);
     }
@@ -1094,7 +1095,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   vtkClientServerStream& stream = pm->GetStream();
 
   // Create a dummy interactor on the satellites so they han have 3d widgets.
-  this->InteractorID = pvApp->NewClientAndServerObject("vtkPVGenericRenderWindowInteractor");
+  this->InteractorID = pm->NewStreamObject("vtkPVGenericRenderWindowInteractor");
   stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderWindow" 
          << pvApp->GetRenderModule()->GetRenderWindowID()
          << vtkClientServerStream::End;

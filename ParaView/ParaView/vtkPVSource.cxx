@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.6");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.7");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2323,7 +2323,8 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     }
   pvs->SetName(tclName);
 
-
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
   // We need oue source for each part.
   int numSources = 1;
   // Set the input if necessary.
@@ -2350,9 +2351,9 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
       }
 
     // Create a vtkSource
-    pvs->AddVTKSource(pvApp->NewServerObject(this->SourceClassName));
+    pvs->AddVTKSource(pm->NewStreamObject(this->SourceClassName));
     }
-  pvApp->GetProcessModule()->SendStreamToServer();
+  pm->SendStreamToServer();
   pvs->SetView(this->GetPVWindow()->GetMainView());
 
   pvs->PrototypeInstanceCount = this->PrototypeInstanceCount;
@@ -2461,7 +2462,7 @@ int vtkPVSource::InitializeData()
       vtkClientServerID translatorID = {0};
       if ( ! input)
         {
-        vtkClientServerID translatorID = pvApp->NewServerObject("vtkPVExtentTranslator");
+        vtkClientServerID translatorID = pm->NewStreamObject("vtkPVExtentTranslator");
         stream << vtkClientServerStream::Invoke << dataID 
                << "SetExtentTranslator" << translatorID 
                << vtkClientServerStream::End;
@@ -2476,7 +2477,7 @@ int vtkPVSource::InitializeData()
         stream << vtkClientServerStream::Invoke << translatorID 
                << "SetOriginalSource" << dataID 
                << vtkClientServerStream::End;
-        pvApp->DeleteServerObject(translatorID); 
+        pm->DeleteStreamObject(translatorID); 
         pm->SendStreamToServer();
         }
       part->Delete();  

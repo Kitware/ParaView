@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVApplication_h
 
 #include "vtkKWApplication.h"
-#include "vtkClientServerStream.h"  // needed for vtkClientServerID
 class vtkPVProcessModule;
 class vtkPVRenderModule;
 
@@ -62,6 +61,7 @@ class vtkPVWindow;
 class vtkPVRenderView;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
+
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -175,23 +175,6 @@ public:
   // the object.
   void MakeServerTclObject(const char *className, const char *tclName);
 
-  // Description:
-  //  This constructs a vtk object (type specified by class name) on the
-  // server processes and returns a new id for the object created.
-  vtkClientServerID NewServerObject(const char* className);
-  
-  // Description:
-  // This constructs an 
-  vtkClientServerID NewClientAndServerObject(const char* className);
-  
-  // Description:
-  // Delete an object on both server and client
-  void DeleteClientAndServerObject(vtkClientServerID);
-  
-  // Description:
-  // Delete an object on the server
-  void DeleteServerObject(vtkClientServerID);
-  
   // Description:
   // This method returns pointer to the object specified as a tcl
   // name.

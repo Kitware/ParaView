@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.1");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -97,30 +97,35 @@ vtkPVPartDisplay::vtkPVPartDisplay()
 vtkPVPartDisplay::~vtkPVPartDisplay()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-    
-  if ( pvApp && this->MapperID.ID != 0)
+  vtkPVProcessModule* pm = 0;
+  if(pvApp)
     {
-    pvApp->DeleteClientAndServerObject(this->MapperID);
+    pm = pvApp->GetProcessModule();
+    }
+  
+  if ( pm && this->MapperID.ID != 0)
+    {
+    pm->DeleteStreamObject(this->MapperID);
     }
   this->Mapper = NULL;
     
-  if ( pvApp && this->PropID.ID != 0)
+  if ( pm && this->PropID.ID != 0)
     {
-    pvApp->DeleteClientAndServerObject(this->PropID);
+    pm->DeleteStreamObject(this->PropID);
     }
   this->Prop = NULL;
   
-  if ( pvApp && this->PropertyID.ID !=0)
+  if ( pm && this->PropertyID.ID !=0)
     {  
-    pvApp->DeleteClientAndServerObject(this->PropertyID);
+    pm->DeleteStreamObject(this->PropertyID);
     }
   this->Property = NULL;
   
   if (this->UpdateSuppressorID.ID)
     {
-    pvApp->DeleteClientAndServerObject(this->UpdateSuppressorID);
+    pm->DeleteStreamObject(this->UpdateSuppressorID);
     }
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer();
 
   this->SetPart(NULL);
 
@@ -160,10 +165,10 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
   // ===== Primary branch:
-  this->UpdateSuppressorID = pvApp->NewClientAndServerObject("vtkPVUpdateSuppressor");
+  this->UpdateSuppressorID = pm->NewStreamObject("vtkPVUpdateSuppressor");
 
   // Now create the mapper.
-  this->MapperID = pvApp->NewClientAndServerObject("vtkPolyDataMapper");
+  this->MapperID = pm->NewStreamObject("vtkPolyDataMapper");
   stream << vtkClientServerStream::Invoke << this->MapperID << "UseLookupTableScalarRangeOn" 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "GetOutput" 
@@ -176,8 +181,8 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // Create a LOD Actor for the subclasses.
   // I could use just a plain actor for this class.
   
-  this->PropID = pvApp->NewClientAndServerObject("vtkPVLODActor");
-  this->PropertyID = pvApp->NewClientAndServerObject("vtkProperty");
+  this->PropID = pm->NewStreamObject("vtkPVLODActor");
+  this->PropertyID = pm->NewStreamObject("vtkProperty");
   
   // I used to use ambient 0.15 and diffuse 0.85, but VTK did not
   // handle it correctly.
@@ -193,15 +198,15 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   ostrstream str;
   stream.Print(str);
   vtkErrorMacro(<<str.str());
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer();
   // now we can get pointers to the client vtk objects, this
   // must be after the streams are sent
   this->Property = 
     vtkProperty::SafeDownCast(
-      pvApp->GetProcessModule()->GetObjectFromID(this->PropertyID));
+      pm->GetObjectFromID(this->PropertyID));
   this->Mapper = 
     vtkPolyDataMapper::SafeDownCast(
-      pvApp->GetProcessModule()->GetObjectFromID(this->MapperID));
+      pm->GetObjectFromID(this->MapperID));
 
   // ****  need to fix this
 //   // Broadcast for subclasses.  
@@ -220,7 +225,7 @@ void vtkPVPartDisplay::SetUseImmediateMode(int val)
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->MapperID
          << "SetImmediateModeRendering" << val << vtkClientServerStream::End;
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -239,7 +244,7 @@ void vtkPVPartDisplay::SetVisibility(int v)
     vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << this->PropID
            << "SetVisibility" << v << vtkClientServerStream::End;
-    pvApp->GetProcessModule()->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndServer();
     }
   this->Visibility = v;
   // Recompute total visibile memory size.
@@ -261,7 +266,7 @@ void vtkPVPartDisplay::SetColor(float r, float g, float b)
          << "SetSpecularPower" << 100.0 << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->PropertyID
          << "SetSpecularColor" << 1.0 << 1.0 << 1.0 << vtkClientServerStream::End;
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer();
 }  
 
 
@@ -276,7 +281,7 @@ void vtkPVPartDisplay::Update()
     vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
            << "ForceUpdate" << vtkClientServerStream::End;
-    pvApp->GetProcessModule()->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndServer();
     this->GeometryIsValid = 1;
     }
 }
@@ -315,7 +320,7 @@ void vtkPVPartDisplay::RemoveAllCaches()
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
          << "RemoveAllCaches" << vtkClientServerStream::End; 
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -329,7 +334,7 @@ void vtkPVPartDisplay::CacheUpdate(int idx, int total)
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
          << "CacheUpdate" << idx << total << vtkClientServerStream::End; 
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -345,7 +350,7 @@ void vtkPVPartDisplay::SetScalarVisibility(int val)
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->MapperID
          << "SetScalarVisibility" << val << vtkClientServerStream::End;
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -374,7 +379,7 @@ void vtkPVPartDisplay::SetDirectColorFlag(int val)
     stream << vtkClientServerStream::Invoke << this->MapperID
            << "SetColorModeToMapScalars" << vtkClientServerStream::End;
     }
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------

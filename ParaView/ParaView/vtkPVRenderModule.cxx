@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.14.4.1");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.14.4.2");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -110,7 +110,12 @@ vtkPVRenderModule::vtkPVRenderModule()
 vtkPVRenderModule::~vtkPVRenderModule()
 {
   vtkPVApplication *pvApp = this->PVApplication;
-
+  vtkPVProcessModule* pm = 0;
+  if(pvApp)
+    {
+    pm = pvApp->GetProcessModule();
+    }
+  
   if (this->Renderer && this->ResetCameraClippingRangeTag > 0)
     {
     this->Renderer->RemoveObserver(this->ResetCameraClippingRangeTag);
@@ -129,22 +134,22 @@ vtkPVRenderModule::~vtkPVRenderModule()
       this->ResetCameraClippingRangeTag = 0;
       }
 
-    if ( pvApp )
+    if ( pm )
       {
-      pvApp->DeleteClientAndServerObject(this->RendererID);
+      pm->DeleteStreamObject(this->RendererID);
       }
     this->RendererID.ID = 0;
     }
   
   if (this->RenderWindow)
     {
-    if ( pvApp )
+    if ( pm )
       { 
-      pvApp->DeleteClientAndServerObject(this->RenderWindowID);
+      pm->DeleteStreamObject(this->RenderWindowID);
       }
     this->RenderWindowID.ID = 0;
     }
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer();
   this->SetPVApplication(NULL);
 }
 
@@ -212,15 +217,15 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->PVApplication = pvApp;
   this->PVApplication->Register(this);
 
-  this->RendererID = pvApp->NewClientAndServerObject("vtkRenderer");
-  this->RenderWindowID = pvApp->NewClientAndServerObject("vtkRenderWindow");
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  this->RendererID = pm->NewStreamObject("vtkRenderer");
+  this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
+  pm->SendStreamToClientAndServer();
   this->Renderer = 
     vtkRenderer::SafeDownCast(
-      pvApp->GetProcessModule()->GetObjectFromID(this->RendererID));
+      pm->GetObjectFromID(this->RendererID));
   this->RenderWindow = 
     vtkRenderWindow::SafeDownCast(
-      pvApp->GetProcessModule()->GetObjectFromID(this->RenderWindowID));
+      pm->GetObjectFromID(this->RenderWindowID));
   
   if (pvApp->GetUseStereoRendering())
     {
@@ -230,7 +235,7 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   stream << vtkClientServerStream::Invoke
          << this->RenderWindowID << "AddRenderer" << this->RendererID
          << vtkClientServerStream::End;
-  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndServer();
   
   // Make sure we have a chance to set the clipping range properly.
   vtkCallbackCommand* cbc;

@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.2");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.3");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -121,12 +121,18 @@ vtkPVPart::~vtkPVPart()
 
   // Used to be in vtkPVActorComposite........
   vtkPVApplication *pvApp = this->GetPVApplication();
-    
+  vtkPVProcessModule* pm = 0;
+  if(pvApp)
+    {
+    pm = pvApp->GetProcessModule();
+    }
+
   if (this->GeometryID.ID != 0)
     {
-    if ( pvApp )
+    if ( pm )
       {
-      pvApp->DeleteClientAndServerObject(this->GeometryID);
+      pm->DeleteStreamObject(this->GeometryID);
+      pm->SendStreamToClientAndServer();
       }
     }
   
@@ -154,9 +160,9 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
     return;
     }
   this->vtkKWObject::SetApplication(pvApp);
-  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
-  this->GeometryID = pvApp->NewClientAndServerObject("vtkPVGeometryFilter");
+  this->GeometryID = pm->NewStreamObject("vtkPVGeometryFilter");
   stream << vtkClientServerStream::Invoke << this->GeometryID << "SetUseStrips"
          << pvApp->GetMainView()->GetTriangleStripsCheck()->GetState()
          << vtkClientServerStream::End;
