@@ -251,7 +251,6 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow* master)
 {
   if ( !this->AboutDialog )
     {
-    cout << "Master: " << master << endl;
     ostrstream str;
     str << this->GetApplicationName() << " was developed by Kitware Inc." << endl
         << "http://www.paraview.org" << endl
