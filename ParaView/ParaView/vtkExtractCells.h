@@ -40,22 +40,28 @@ public:
   void FreeCellList(); 
   void SetCellList(vtkIdList *l); 
   void AddCellList(vtkIdList *l);
-  void AddCellRange(int from, int to);
+  void AddCellRange(vtkIdType from, vtkIdType to);
 
 protected:
 
   virtual void Execute();
 
-  vtkExtractCells(){};
-  ~vtkExtractCells(){};
+  vtkExtractCells();
+  ~vtkExtractCells();
 
 private:
 
   void Copy();
-  static int findInSortedList(vtkIdList *idList, vtkIdType id);
+  static vtkIdType findInSortedList(vtkIdList *idList, vtkIdType id);
   vtkIdList *reMapPointIds(vtkDataSet *grid);
 
+  void CopyCellsDataSet(vtkIdList *ptMap);
+  void CopyCellsUnstructuredGrid(vtkIdList *ptMap);
+
 //BTX
-  vtkstd::set<int> CellList;
+  vtkstd::set<vtkIdType> CellList;
 //ETX
+
+  int SubSetUGridCellArraySize;
+  char InputIsUgrid;
 };
