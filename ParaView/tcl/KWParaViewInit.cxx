@@ -74,12 +74,6 @@ ClientData vtkPVImageDataNewCommand();
 int vtkPVImageClipCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageClipNewCommand();
-int vtkPVImageMandelbrotSourceCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVImageMandelbrotSourceNewCommand();
-int vtkPVImageShiftScaleCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVImageShiftScaleNewCommand();
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageSliceNewCommand();
@@ -209,10 +203,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVImageDataCommand);
   vtkTclCreateNew(interp,"vtkPVImageClip", vtkPVImageClipNewCommand,
                   vtkPVImageClipCommand);
-  vtkTclCreateNew(interp,"vtkPVImageMandelbrotSource", vtkPVImageMandelbrotSourceNewCommand,
-                  vtkPVImageMandelbrotSourceCommand);
-  vtkTclCreateNew(interp,"vtkPVImageShiftScale", vtkPVImageShiftScaleNewCommand,
-                  vtkPVImageShiftScaleCommand);
   vtkTclCreateNew(interp,"vtkPVImageSlice", vtkPVImageSliceNewCommand,
                   vtkPVImageSliceCommand);
   vtkTclCreateNew(interp,"vtkPVImageSource", vtkPVImageSourceNewCommand,

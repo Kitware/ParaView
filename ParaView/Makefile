@@ -39,8 +39,6 @@ vtkPVGetRemoteGhostCells \
 vtkPVGlyph3D \
 vtkPVImageData \
 vtkPVImageClip \
-vtkPVImageMandelbrotSource \
-vtkPVImageShiftScale \
 vtkPVImageSlice \
 vtkPVImageSource \
 vtkPVImageToImageFilter \
