@@ -1019,4 +1019,10 @@ void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
   os << indent << "NumberOfLineDivisions: " 
      << this->NumberOfLineDivisions << endl;
+  os << indent << "EndPoint1: " << this->EndPoint1[0] << ", " 
+     << this->EndPoint1[1] << ", " << this->EndPoint1[2] << endl;
+  os << indent << "EndPoint2: " << this->EndPoint2[0] << ", " 
+     << this->EndPoint2[1] << ", " << this->EndPoint2[2] << endl;
+  os << indent << "PointPosition: " << this->PointPosition[0] << ", " 
+     << this->PointPosition[1] << ", " << this->PointPosition[2] << endl;
 }
