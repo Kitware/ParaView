@@ -152,7 +152,7 @@
     <Source class="vtkPVEnSightMasterServerReader"/>
     <SelectionList label="Byte order"
                    trace_name="ByteOrder"
-                   variable="ByteOrder"
+                   property="ByteOrder"
                    help="Select the byte order of the binary file"
                    default_value="0">
       <Item name="big endian" value="0"/>
@@ -255,7 +255,7 @@
                    default_value="0"/>
     <SelectionList label="Byte order"
                    trace_name="ByteOrder"
-                   variable="ByteOrder"
+                   property="ByteOrder"
                    help="Select the byte order of the binary file"
                    default_value="0">
       <Item name="big endian"
@@ -348,7 +348,7 @@
                  help="Set the format string for building filename. In creating the filename, %s will be replaced by the prefix and %d by a digit which represents the slice number in Z"/>
     <SelectionList label="Data type"
                    trace_name="DataScalarType"
-                   variable="DataScalarType" default_value="4"
+                   property="DataScalarType" default_value="4"
                    help="Select the pixel type in the file: short, int, float ...">
       <Item name="char" value="2"/>
       <Item name="unsigned char" value="3"/>
@@ -363,7 +363,7 @@
     </SelectionList>
     <SelectionList label="Byte order"
                    trace_name="DataByteOrder"
-                   variable="DataByteOrder"
+                   property="DataByteOrder"
                    help="Select the byte order of the binary file"
                    suppress_reset="1"
                    default_value="0">
@@ -374,7 +374,7 @@
     </SelectionList>
     <SelectionList label="File Dimensionality"
                    trace_name="Dimensionality"
-                   variable="FileDimensionality"
+                   property="FileDimensionality"
                    help="The number of dimensions stored in a file."
                    default_value="3">
       <Item name="2"

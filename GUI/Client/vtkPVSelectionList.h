@@ -29,7 +29,6 @@
 class vtkStringList;
 class vtkKWOptionMenu;
 class vtkKWLabel;
-class vtkPVIndexWidgetProperty;
 
 class VTK_EXPORT vtkPVSelectionList : public vtkPVObjectWidget
 {
@@ -88,12 +87,9 @@ public:
                                      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
-  //BTX
   // Description:
-  // Called when accept button is pushed.
-  // Sets the objects variable from UI.
-  virtual void AcceptInternal(vtkClientServerID);
-  //ETX
+  // Pass the value from the widget to the property.
+  virtual void Accept();
 
   // Description:
   // Called when reset button is pushed.
@@ -104,15 +100,6 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -143,11 +130,6 @@ protected:
 
   vtkSetStringMacro(CurrentName);
 
-  int DefaultValue;
-  vtkSetMacro(DefaultValue, int);
-
-  vtkPVIndexWidgetProperty *Property;
-  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

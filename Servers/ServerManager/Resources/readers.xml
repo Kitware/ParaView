@@ -606,7 +606,7 @@
         name="DataScalarType" 
         command="SetDataScalarType" 
         number_of_elements="1"
-        default_values="0" >
+        default_values="4" >
        <EnumerationDomain name="enum">
          <Entry value="2" text="char"/>
          <Entry value="3" text="unsigned char"/>
@@ -636,7 +636,7 @@
         name="FileDimensionality"
         command="SetFileDimensionality"
         number_of_elements="1" 
-        default_values="0" />
+        default_values="2" />
 
       <DoubleVectorProperty
          name="DataOrigin"

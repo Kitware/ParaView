@@ -5,7 +5,7 @@
         long_help="2D glyph source"
         short_help="Create a 3D arrow">
   <Source class="vtkGlyphSource2D"/>
-  <SelectionList variable="GlyphType" label="Glyph type"
+  <SelectionList property="GlyphType" label="Glyph type"
                  trace_name="GlyphType" help="Select the glyph type."
                  default_value="9">
     <Item name="Vertex"       value="1"/>

@@ -267,7 +267,7 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
                    variable="InvertMeanCurvature"
                    help="Turn this on to invert the mean curvature calculation for meshes with inward pointing normals."
                    default_value="0"/>
-    <SelectionList variable="CurvatureType"
+    <SelectionList property="CurvatureType"
                    label="Curvature type"
                    trace_name="CurvatureType"
                    help="Select the curvature type."
@@ -336,7 +336,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
     <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <SelectionList label="Boundary Cells" variable="BoundaryMode"
+    <SelectionList label="Boundary Cells" property="BoundaryMode"
                    trace_name="BoundaryMode"
                    default_value="0"
                    help="Select how to handle boundary cells. Isosurfacing works well when cells are uniquely assigned to processes. Dividing cells along processor boundaries is useful for volume rendering.">
@@ -650,8 +650,9 @@ This filter operates on polygonal data and produces polygonal output.
                trace_name="ArrayMenu"
                input_menu="im" number_of_components="1"
                help="Select the input scalars to process."/>
-    <SelectionList variable="Dimensionality"
+    <SelectionList property="Dimensionality"
                    trace_name="Dimensionality"
+                   label="Dimensionality"
                    default_value="3"
                    help="Select whether to perform a 2d or 3d gradient">
       <Item name="2"
@@ -682,8 +683,9 @@ The Gradient filter computes the gradient vector at each point in an image or vo
                trace_name="ArrayMenu"
                input_menu="im"
                help="Select the input scalars to process."/>
-    <SelectionList variable="Dimensionality"
+    <SelectionList property="Dimensionality"
                    trace_name="Dimensionality"
+                   label="Dimensionality"
                    default_value="3"
                    help="Select whether to perform a 2d or 3d gradient magnitude">
       <Item name="2"
@@ -1150,8 +1152,9 @@ The Random Vectors filter generates a point-centered array of random vectors. It
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <SelectionList variable="Plane"
+    <SelectionList property="Plane"
                    trace_name="Plane"
+                   label="Plane"
                    help="Select which plane of the bounding box to reflect across"
                    default_value="0">
       <Item name="X"
@@ -1578,7 +1581,7 @@ The Transform filter allows you to specify the position, size, and orientation o
                       help="Set the radius of the tube" />
     <SelectionList label="Vary radius"
                    trace_name="VaryRadius"
-                   variable="VaryRadius"
+                   property="VaryRadius"
                    help="Select whether/how to vary the radius of the tube"
                    default_value="0">
       <Item name="Off"
@@ -2024,7 +2027,7 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
                help="Set the input to this filter."
                input_name="Input"/>
     <PointWidget trace_name="Point" variable="WorldPoint"/>
-    <SelectionList variable="PickCell"
+    <SelectionList property="PickCell"
                    label="Pick Type"
                    trace_name="PickType"
                    help="Select whether to pick cells or points."
@@ -2122,7 +2125,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
     </SelectWidget>
     <ContainerWidget pack_direction="left" trace_name="MaxProp">
       <Item>
-        <SelectionList variable="MaximumPropagationUnit"
+        <SelectionList property="MaximumPropagationUnit"
                        trace_name="MaximumPropagationUnit"
                        label="Max. Propagation"
                        option_width="15"
@@ -2147,7 +2150,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
     <ContainerWidget pack_direction="left" trace_name="InitLen">
       <Item>
         <SelectionList trace_name="InitialIntegrationStepUnit"
-                       variable="InitialIntegrationStepUnit"
+                       property="InitialIntegrationStepUnit"
                        label="Init. Step Len."
                        option_width="15"
                        help="Initial step length"
@@ -2170,7 +2173,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       </Item>
     </ContainerWidget>
     <SelectionList trace_name="IntegrationDirection"
-                   variable="IntegrationDirection"
+                   property="IntegrationDirection"
                    label="Integration Direction"
                    option_width="15"
                    default_value="2">
@@ -2195,7 +2198,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       <Item>
         <ContainerWidget pack_direction="left" trace_name="MinLen">
           <Item>
-            <SelectionList variable="MinimumIntegrationStepUnit"
+            <SelectionList property="MinimumIntegrationStepUnit"
                            trace_name="MinimumIntegrationStepUnit"
                            label="Min. Step Len."
                            option_width="15"
@@ -2222,7 +2225,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       <Item>
         <ContainerWidget pack_direction="left" trace_name="MaxLen">
           <Item>
-            <SelectionList variable="MaximumIntegrationStepUnit"
+            <SelectionList property="MaximumIntegrationStepUnit"
                            trace_name="MaximumIntegrationStepUnit"
                            label="Max. Step Len."
                            option_width="15"
@@ -2339,64 +2342,4 @@ This filter operates on any type of data set, provided it has point-centered vec
 The Extract Grid filter returns a subgrid of a structured input data set (uniform rectilinear, curvilinear, or nonuniform rectilinear). The VOI section of the interface provides six sliders for specifying the extents of the desired output along each of the I, J, and K axes. The Sample Rate thumb wheels control whether to subsample the input grid in each dimension. Values greater than 1 result in subsampling. For example, if the Sample Rate along the I axis is 2, then every other input point will be passed to the output. If the Sample Rate in any dimension is greater than 1, then selecting the Include boundary option will pass the values on the boundary of the data set to the output even if the boundary extent is not an even multiple of the sample rate. The output data set type of this filter is the same as the input type. This filter is available on the Toolbar.
     </Documentation>
   </Module>
-
-  <Module name="BandedPolyDataContour" 
-          root_name="BandedContour" 
-          module_type="Filter" 
-          replace_input="0" 
-          long_help="Filled contours are bands of cells that all have the same cell scalar value, and can therefore be colored the same." 
-          short_help="Produces filled contours."> 
-    <Filter class="vtkBandedPolyDataContourFilter"> 
-      <Input name="Input" class="vtkPolyData"> 
-        <ArrayRequirement attribute="Point" components="1"/> 
-      </Input> 
-    </Filter> 
-    // Do not change the tracename of the input menu, it is used by vtkPVContour 
-    <InputMenu trace_name="Input" property="Input"
-               id="im" 
-               label="Input" 
-               input_name="Input" 
-               help="Set the input to this filter." /> 
-    // Do not change the tracename of the array menu, it is used by vtkPVContour 
-    <ArrayMenu id="am" property="SelectInputScalars"
-               input_name="Input" 
-               attribute_type="Scalars" 
-               label="Scalars" 
-               trace_name="Scalars" 
-               input_menu="im" 
-               number_of_components="1" 
-               help="Choose which scalar array you want to contour."/> 
-    <ScalarRangeLabel id="srl" 
-                      trace_name="ScalarRangeLabel" 
-                      array_menu="am"/> 
-    <ContourEntry label="Contour Values" 
-                  trace_name="Contour Values" 
-                  array_menu="am" 
-                  set_number_command="SetNumberOfContours" 
-                  set_contour_command="SetValue" 
-                  help="List of current contour values." /> 
-    <LabeledToggle label="Set Clipping" 
-                   variable="Clipping" 
-                   default_value="0" 
-                   trace_name="Set Clipping" 
-                   help="Select whether to clip outside the range specified by the user" /> 
-    <LabeledToggle label="Generate Contour Edges" 
-                   variable="GenerateContourEdges" 
-                   default_value="0" 
-                   trace_name="Set Generate Contour Edges" 
-                   help="Select whether to compute contour edges"/> 
-    <SelectionList variable="ScalarMode" 
-                   trace_name="Set Scalar Mode" 
-                   label="Scalar Mode" 
-                   option_width="15" 
-                   help="Select whether the cell scalars are output as an integer index or a scalar value" 
-                   default_value="0"> 
-      <Item name="Index" 
-            value="0"/> 
-      <Item name="Value" 
-            value="1"/> 
-    </SelectionList> 
-    <Documentation> 
-    </Documentation> 
-  </Module> 
 </ModuleInterfaces>

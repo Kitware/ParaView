@@ -22,11 +22,12 @@
 #include "vtkPVIndexWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.45");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.46");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -46,10 +47,6 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->Names = vtkStringList::New();
 
   this->OptionWidth = 0;
-  
-  this->DefaultValue = 0;
-  
-  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -159,7 +156,7 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
     }
   this->SetBalloonHelpString(this->BalloonHelpString);
 
-  this->SetCurrentValue(this->Property->GetIndex());
+//  this->SetCurrentValue(this->Property->GetIndex());
 }
 
 
@@ -187,19 +184,51 @@ const char *vtkPVSelectionList::GetLabel()
 //-----------------------------------------------------------------------------
 void vtkPVSelectionList::SaveInBatchScript(ofstream *file)
 {
-  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-        <<  " GetProperty " << this->VariableName << "] SetElements1 "
-        << this->Property->GetIndex() << endl;
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  if (sourceID.ID == 0 || !this->SMPropertyName)
+    {
+    vtkErrorMacro("Sanity check failed. "
+                  << this->GetClassName());
+    return;
+    }
+  
+  
+  *file << "  [$pvTemp" << sourceID <<  " GetProperty "
+        << this->SMPropertyName << "] SetElements1 "
+        << this->GetCurrentValue() << endl;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::AcceptInternal(vtkClientServerID sourceId)
+void vtkPVSelectionList::Accept()
 {
-  this->ModifiedFlag = 0;
-  this->Property->SetIndex(this->CurrentValue);
-  this->Property->SetVTKSourceID(sourceId);
+  int modFlag = this->GetModifiedFlag();
   
-  this->Property->AcceptInternal();
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (ivp)
+    {
+    ivp->SetNumberOfElements(1);
+    ivp->SetElement(0, this->CurrentValue);
+    }
+  
+  this->ModifiedFlag = 0;
+
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 
@@ -219,7 +248,14 @@ void vtkPVSelectionList::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::ResetInternal()
 {
-  this->SetCurrentValue(this->Property->GetIndex());
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (ivp)
+    {
+    // Get the selected item.
+    this->SetCurrentValue(ivp->GetElement(0));
+    }
   
   if (this->AcceptCalled)
     {
@@ -268,10 +304,10 @@ void vtkPVSelectionList::SetCurrentValue(int value)
     this->SelectCallback(name, value);
     }
   
-  if (!this->AcceptCalled)
-    {
-    this->Property->SetIndex(value);
-    }
+//  if (!this->AcceptCalled)
+//    {
+//    this->Property->SetIndex(value);
+//    }
 }
 
 //----------------------------------------------------------------------------
@@ -317,7 +353,6 @@ void vtkPVSelectionList::CopyProperties(vtkPVWidget* clone,
         pvsl->Names->SetString(i, name);
         }
       }
-    pvsl->SetDefaultValue(this->DefaultValue);
     }
   else 
     {
@@ -348,12 +383,6 @@ int vtkPVSelectionList::ReadXMLAttributes(vtkPVXMLElement* element,
     this->Label->SetLabel(this->VariableName);
     }
 
-  const char* defaultValue = element->GetAttribute("default_value");
-  if (defaultValue)
-    {
-    sscanf(defaultValue, "%d", &this->DefaultValue);
-    }
-  
   // Extract the list of items.
   unsigned int i;
   for(i=0;i < element->GetNumberOfNestedElements(); ++i)
@@ -381,32 +410,6 @@ int vtkPVSelectionList::ReadXMLAttributes(vtkPVXMLElement* element,
 
   
   return 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSelectionList::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVIndexWidgetProperty::SafeDownCast(prop);
-  if (this->Property)
-    {
-    char *cmd = new char[strlen(this->VariableName)+4];
-    sprintf(cmd, "Set%s", this->VariableName);
-    this->Property->SetVTKCommand(cmd);
-    this->Property->SetIndex(this->DefaultValue);
-    delete [] cmd;
-    }
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVSelectionList::GetProperty()
-{
-  return this->Property;
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVSelectionList::CreateAppropriateProperty()
-{
-  return vtkPVIndexWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------
