@@ -70,8 +70,6 @@ protected:
   vtkPVThreshold(const vtkPVThreshold&) {};
   void operator=(const vtkPVThreshold&) {};
 
-  vtkThreshold* Threshold;
-  
   vtkKWWidget* AttributeModeFrame;
   vtkKWLabel* AttributeModeLabel;
   vtkKWOptionMenu* AttributeModeMenu;

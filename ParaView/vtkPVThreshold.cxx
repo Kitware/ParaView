@@ -38,8 +38,6 @@ vtkPVThreshold::vtkPVThreshold()
 {
   this->CommandFunction = vtkPVThresholdCommand;
   
-  this->Threshold = NULL;
-  
   this->AttributeModeFrame = vtkKWWidget::New();
   this->AttributeModeLabel = vtkKWLabel::New();
   this->AttributeModeMenu = vtkKWOptionMenu::New();
@@ -76,14 +74,9 @@ void vtkPVThreshold::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   float range[2];
+  vtkDataSet *thresholdInput = this->GetNthPVInput(0)->GetVTKData();
   
   this->vtkPVSource::CreateProperties();
-  
-  this->Threshold = (vtkThreshold*)this->GetVTKSource();
-  if (!this->Threshold)
-    {
-    return;
-    }
   
   this->AttributeModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->AttributeModeFrame->Create(pvApp, "frame", "");
@@ -106,14 +99,14 @@ void vtkPVThreshold::CreateProperties()
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
   
-  if (this->Threshold->GetInput()->GetPointData()->GetScalars())
+  if (this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetScalars())
     {
-    this->Threshold->GetInput()->GetPointData()->GetScalars()->GetRange(range);
+    this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetScalars()->GetRange(range);
     }
   else
     {
     range[0] = 0;
-    range[1] = 500;
+    range[1] = 1;
     }
   
   this->UpperValueScale->SetParent(this->GetParameterFrame()->GetFrame());
@@ -209,36 +202,37 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
 {
   float range[2];
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkDataSet *thresholdInput = this->GetNthPVInput(0)->GetVTKData();
   
   this->ChangeAcceptButtonColor();
   
   if (strcmp(newMode, "point") == 0)
     {
-    if (this->Threshold->GetInput()->GetPointData()->GetScalars())
+    if (thresholdInput->GetPointData()->GetScalars())
       {
-      this->Threshold->GetInput()->GetPointData()->GetScalars()->GetRange(range);
+      thresholdInput->GetPointData()->GetScalars()->GetRange(range);
       }
     else
       {
       range[0] = 0;
       range[1] = 1;
       }
-    this->Threshold->SetAttributeModeToUsePointData();
+    ((vtkThreshold*)this->GetVTKSource())->SetAttributeModeToUsePointData();
     pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
                            this->GetVTKSourceTclName());
     }
   else if (strcmp(newMode, "cell") == 0)
     {
-    if (this->Threshold->GetInput()->GetCellData()->GetScalars())
+    if (thresholdInput->GetCellData()->GetScalars())
       {
-      this->Threshold->GetInput()->GetCellData()->GetScalars()->GetRange(range);
+      thresholdInput->GetCellData()->GetScalars()->GetRange(range);
       }
     else
       {
       range[0] = 0;
       range[1] = 1;
       }
-    this->Threshold->SetAttributeModeToUseCellData();
+    ((vtkThreshold*)this->GetVTKSource())->SetAttributeModeToUseCellData();
     pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
                            this->GetVTKSourceTclName());
     }
