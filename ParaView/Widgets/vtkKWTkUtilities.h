@@ -111,6 +111,23 @@ public:
                          int *nb_of_rows);
 
   // Description:
+  // Get the bounding box of the slaves of a pack (i.e. the largest width
+  // and height of the slaves packed in a master widget, including padding).
+  static int GetPackSlavesBbox(Tcl_Interp *interp,
+                               const char *widget,
+                               int *width,
+                               int *height);
+
+  // Description:
+  // Get the padding info of a slave (packed).
+  static int GetPackSlavePadding(Tcl_Interp *interp,
+                                 const char *widget,
+                                 int *ipadx,
+                                 int *ipady,
+                                 int *padx,
+                                 int *pady);
+
+  // Description:
   // Get the column widths of a grid (i.e. a master widget that has been grid).
   // If 'allocate' is true, the resulting array (col_widths) is allocated
   // by the function to match the number of columns.
