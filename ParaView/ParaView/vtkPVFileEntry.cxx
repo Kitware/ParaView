@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.43.2.7");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.43.2.8");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -125,6 +125,7 @@ const char* vtkPVFileEntry::GetLabel()
   return this->LabelWidget->GetLabel();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVFileEntry::SetBalloonHelpString(const char *str)
 {
 
@@ -411,7 +412,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       }
     file[cc] = 0;
     }
-  if ( path[0] && file[0] )
+  if ( path[0] )
     {
     this->SetPath(path);
     this->SetPrefix(file);
@@ -715,8 +716,9 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
       this->GetTclName(), ai->GetTclName());
     }
 
-  sprintf(script, "%s SetFileName [ lindex $%s_files [expr round($pvTime)-%d] ]",
+  sprintf(script, "%s Set%s [ lindex $%s_files [expr round($pvTime)-%d] ]",
     this->GetPVSource()->GetVTKSourceTclName(),
+    this->GetVariableName(),
     this->GetPVSource()->GetVTKSourceTclName(),
     this->Range[0]);
   ai->SetLabelAndScript(this->GetTraceName(), script);
