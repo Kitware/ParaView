@@ -755,8 +755,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Make sure the widget is name appropriately: paraview instead of a number.
   // On X11, the window name is the same as the widget name.
-  this->WidgetName = new char [strlen(".paraview")+1];
-  strcpy(this->WidgetName,".paraview");
+  this->WidgetName = vtkString::Duplicate(".paraview");
   // Invoke super method first.
   this->vtkKWWindow::Create(pvApp,"");
 
@@ -1441,9 +1440,8 @@ void vtkPVWindow::OpenCallback()
 	       "-filetypes {{{ParaView Files} {%s}} %s {{All Files} {*}}}]", 
                buffer, this->FileExtensions, this->FileDescriptions);
 
-  openFileName = new char[
-    strlen(this->GetPVApplication()->GetMainInterp()->result) + 1];
-  strcpy(openFileName, this->GetPVApplication()->GetMainInterp()->result);
+  openFileName 
+    = vtkString::Duplicate(this->GetPVApplication()->GetMainInterp()->result);
 
   if (strcmp(openFileName, "") == 0)
     {
@@ -1456,11 +1454,10 @@ void vtkPVWindow::OpenCallback()
     }
 
   // Store last path
-  if ( openFileName && strlen(openFileName) > 0 )
+  if ( openFileName && vtkString::Length(openFileName) > 0 )
     {
-    char *pth = new char [strlen(openFileName)+1];
-    sprintf(pth,"%s",openFileName);
-    int pos = strlen(openFileName);
+    char *pth = vtkString::Duplicate(openFileName);
+    int pos = vtkString::Length(openFileName);
     // Strip off the file name
     while (pos && pth[pos] != '/' && pth[pos] != '\\')
       {
@@ -1481,8 +1478,9 @@ int vtkPVWindow::Open(char *openFileName)
 {
   if (this->CheckIfFileIsReadable(openFileName) != VTK_OK)
     {
-    char* error = new char[strlen("Can not open file ")
-			  + strlen(openFileName) + strlen(" for reading.") 
+    char* error = new char[vtkString::Length("Can not open file ")
+			   + vtkString::Length(openFileName) 
+			   + vtkString::Length(" for reading.") 
 			  + 2];
     sprintf(error,"Can not open file %s for reading.", openFileName);
     if (this->UseMessageDialog)
@@ -1641,9 +1639,9 @@ void vtkPVWindow::WriteData()
     {
     this->Script("tk_getSaveFile -filetypes {{{VTK files} {.vtk}}} -defaultextension .vtk -initialfile data.vtk");
     
-    filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
-    sprintf(filename, "%s", this->Application->GetMainInterp()->result);
-  
+    filename 
+      = vtkString::Duplicate(this->Application->GetMainInterp()->result);
+    
     if (strcmp(filename, "") == 0)
       {
       delete [] filename;
@@ -1656,8 +1654,8 @@ void vtkPVWindow::WriteData()
     int ghostLevel;
 
     this->Script("tk_getSaveFile -filetypes {{{PVTK files} {.pvtk}}} -defaultextension .pvtk -initialfile data.pvtk");
-    filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
-    sprintf(filename, "%s", this->Application->GetMainInterp()->result);
+    filename 
+      = vtkString::Duplicate(this->Application->GetMainInterp()->result);
     if (strcmp(filename, "") == 0)
       {
       delete [] filename;
@@ -1703,7 +1701,7 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
     return 0;
     }
 
-  int pos = strlen(fname)-1;
+  int pos = vtkString::Length(fname)-1;
   while (pos > 0)
     {
     if ( fname[pos] == '.' )
@@ -1769,7 +1767,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
   // Descide what this script should do.
   // Save an image or series of images, or run interactively.
   const char *script = this->AnimationInterface->GetScript();
-  if (script && strlen(script) > 0)
+  if (script && vtkString::Length(script) > 0)
     {
     if (vtkKWMessageDialog::PopupYesNo(
 	  this->Application, this, "Animation", 
@@ -1794,14 +1792,12 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
   if (animationFlag || imageFlag)
     {
     this->Script("tk_getSaveFile -title {Save Image} -defaultextension {.jpg} -filetypes {{{JPEG Images} {.jpg}} {{PNG Images} {.png}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
-    path = strcpy(
-      new char[strlen(this->Application->GetMainInterp()->result)+1], 
-      this->Application->GetMainInterp()->result);
+    path = vtkString::Duplicate(this->Application->GetMainInterp()->result);
     }
 
   const char* extension = 0;
   const char* writerName = 0;
-  if (path && strlen(path) > 0)
+  if (path && vtkString::Length(path) > 0)
     {
     extension = this->ExtractFileExtension(path);
     if ( !extension)
@@ -1870,7 +1866,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
   *file << "compManager SetRenderWindow RenWin1 \n\t";
   *file << "compManager InitializePieces\n\n";
 
-  if (path && strlen(path) > 0)
+  if (path && vtkString::Length(path) > 0)
     {
     *file << "compManager ManualOn\n\t";
     *file << "if {[catch {set myProcId [[compManager GetController] "
@@ -1903,9 +1899,8 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
       *file << "# prevent the tk window from showing up then start "
 	"the event loop\n";
       *file << "wm withdraw .\n\n\n";
-      int length = strlen(path);
-      char* newPath = new char[length+1];
-      strcpy(newPath, path);
+      int length = vtkString::Length(path);
+      char* newPath = vtkString::Duplicate(path);
       // Remove the extension. The animation tool will add it's
       // own interface.
       if ( newPath[length-4] == '.')
@@ -2567,8 +2562,7 @@ void vtkPVWindow::SaveTrace()
   
   this->Script("tk_getSaveFile -filetypes {{{ParaView Script} {.pvs}}} -defaultextension .pvs");
   cout << this->Application->GetMainInterp()->result << endl;
-  filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
-  sprintf(filename, "%s", this->Application->GetMainInterp()->result);
+  filename = vtkString::Duplicate(this->Application->GetMainInterp()->result);
   
   if (strcmp(filename, "") == 0)
     {
@@ -2713,9 +2707,8 @@ int vtkPVWindow::OpenPackage()
     "-filetypes {{{ParaView Package Files} {*.xml}} {{All Files} {*.*}}}]", 
     buffer);
 
-  char* openFileName = new char[
-    strlen(this->GetPVApplication()->GetMainInterp()->result) + 1];
-  strcpy(openFileName, this->GetPVApplication()->GetMainInterp()->result);
+  char* openFileName 
+    = vtkString::Duplicate(this->GetPVApplication()->GetMainInterp()->result);
   
   if (strcmp(openFileName, "") == 0)
     {
@@ -2737,11 +2730,10 @@ int vtkPVWindow::OpenPackage(const char* openFileName)
   this->ReadSourceInterfacesFromFile(openFileName);
 
   // Store last path
-  if ( openFileName && strlen(openFileName) > 0 )
+  if ( openFileName && vtkString::Length(openFileName) > 0 )
     {
-    char *pth = new char [strlen(openFileName)+1];
-    sprintf(pth,"%s",openFileName);
-    int pos = strlen(openFileName);
+    char *pth = vtkString::Duplicate(openFileName);
+    int pos = vtkString::Length(openFileName);
     // Strip off the file name
     while (pos && pth[pos] != '/' && pth[pos] != '\\')
       {
@@ -2853,12 +2845,13 @@ int vtkPVWindow::ReadSourceInterfacesFromDirectory(const char* directory)
   for(int i=0; i < dir->GetNumberOfFiles(); ++i)
     {
     const char* file = dir->GetFile(i);
-    int extPos = strlen(file)-4;
+    int extPos = vtkString::Length(file)-4;
     
     // Look for the ".xml" extension.
-    if((extPos > 0) && (strcmp(file+extPos, ".xml") == 0))
+    if((extPos > 0) && vtkString::Equals(file+extPos, ".xml"))
       {
-      char* fullPath = new char[strlen(file)+strlen(directory)+2];
+      char* fullPath 
+	= new char[vtkString::Length(file)+vtkString::Length(directory)+2];
       strcpy(fullPath, directory);
       strcat(fullPath, "/");
       strcat(fullPath, file);
@@ -2910,9 +2903,9 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
   // First add to the extension string.
   if (this->FileExtensions)
     {
-    length = strlen(this->FileExtensions);
+    length = vtkString::Length(this->FileExtensions);
     }
-  length += strlen(ext) + 5;
+  length += vtkString::Length(ext) + 5;
   newStr = new char [length];
 #ifdef _WIN32
   if (this->FileExtensions == NULL)
@@ -2944,9 +2937,9 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
   length = 0;
   if (this->FileDescriptions)
     {
-    length = strlen(this->FileDescriptions);
+    length = vtkString::Length(this->FileDescriptions);
     }
-  length += strlen(description) + strlen(ext) + 10;
+  length += vtkString::Length(description) + vtkString::Length(ext) + 10;
   newStr = new char [length];
   if (this->FileDescriptions == NULL)
     {  

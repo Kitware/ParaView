@@ -563,4 +563,6 @@ void vtkKWNotebook::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MinimumHeight: " << this->GetMinimumHeight() << endl;
   os << indent << "MinimumWidth: " << this->GetMinimumWidth() << endl;
   os << indent << "NumberOfPages: " << this->GetNumberOfPages() << endl;
+  os << indent << "AlwaysShowTabs: " << (this->AlwaysShowTabs?"on":"off")
+     << endl;
 }

@@ -39,9 +39,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "vtkKWRegisteryUtilities.h"
+
 #include "vtkDebugLeaks.h"
+#include "vtkObjectFactory.h"
+#include "vtkString.h"
+
 #ifdef _WIN32
 #  include "vtkKWWin32RegisteryUtilities.h"
 #else // _WIN32
@@ -49,8 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif // _WIN32
 
 #include <ctype.h>
-#include "vtkObjectFactory.h"
 
+//-----------------------------------------------------------------------------
 vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
 {
   vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWRegisteryUtilities");
@@ -66,6 +69,7 @@ vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
 #endif // _WIN32
 }
 
+//-----------------------------------------------------------------------------
 vtkKWRegisteryUtilities::vtkKWRegisteryUtilities()
 {
   this->TopLevel = 0;
@@ -75,6 +79,7 @@ vtkKWRegisteryUtilities::vtkKWRegisteryUtilities()
   this->Empty    = 1;
 }
 
+//-----------------------------------------------------------------------------
 vtkKWRegisteryUtilities::~vtkKWRegisteryUtilities()
 {
   this->SetTopLevel(0);
@@ -85,6 +90,7 @@ vtkKWRegisteryUtilities::~vtkKWRegisteryUtilities()
     }
 }
 
+//-----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::Open(const char *toplevel,
 				  const char *subkey, int readonly)
 {
@@ -107,7 +113,7 @@ int vtkKWRegisteryUtilities::Open(const char *toplevel,
     }
 
   if ( this->IsSpace(toplevel[0]) || 
-       this->IsSpace(toplevel[strlen(toplevel)-1]) )
+       this->IsSpace(toplevel[vtkString::Length(toplevel)-1]) )
     {
     vtkErrorMacro("Toplevel has to start with letter or number and end"
 		  " with one");
@@ -132,6 +138,7 @@ int vtkKWRegisteryUtilities::Open(const char *toplevel,
   return res;
 }
 
+//-----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::Close()
 {
   int res = 0;
@@ -149,6 +156,7 @@ int vtkKWRegisteryUtilities::Close()
   return res;
 }
 
+//-----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::ReadValue(const char *subkey, 
 				       const char *key, 
 				       char *value)
@@ -181,6 +189,7 @@ int vtkKWRegisteryUtilities::ReadValue(const char *subkey,
   return res;
 }
 
+//-----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::DeleteKey(const char *subkey, 
 				       const char *key)
 {
@@ -209,6 +218,7 @@ int vtkKWRegisteryUtilities::DeleteKey(const char *subkey,
   return res;
 }
 
+//-----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::DeleteValue(const char *subkey, const char *key)
 {
   int res = 1;
@@ -236,6 +246,7 @@ int vtkKWRegisteryUtilities::DeleteValue(const char *subkey, const char *key)
   return res;
 }
 
+//-----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::SetValue(const char *subkey, const char *key, 
 				      const char *value)
 {
@@ -264,11 +275,13 @@ int vtkKWRegisteryUtilities::SetValue(const char *subkey, const char *key,
   return res;
 }
 
+//-----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::IsSpace(char c)
 {
   return isspace(c);
 }
 
+//-----------------------------------------------------------------------------
 char *vtkKWRegisteryUtilities::Strip(char *str)
 {
   int cc;
@@ -278,7 +291,7 @@ char *vtkKWRegisteryUtilities::Strip(char *str)
     {
     return NULL;
     }  
-  len = strlen(str);
+  len = vtkString::Length(str);
   nstr = str;
   for( cc=0; cc<len; cc++ )
     {
@@ -288,7 +301,7 @@ char *vtkKWRegisteryUtilities::Strip(char *str)
       }
     nstr ++;
     }
-  for( cc=(strlen(nstr)-1); cc>=0; cc-- )
+  for( cc=(vtkString::Length(nstr)-1); cc>=0; cc-- )
     {
     if ( !this->IsSpace( nstr[cc] ) )
       {

@@ -40,17 +40,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkKWSerializer.h"
+
 #include <ctype.h>
 #include "vtkObjectFactory.h"
-//#include "vtkKWApplication.h"
+#include "vtkString.h"
 
-
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSerializer );
 
-
-
-
+//-----------------------------------------------------------------------------
 // Internal function used to consume whitespace when reading in
 // an InputString.
 void vtkKWSerializer::EatWhiteSpace(istream *is)
@@ -66,6 +64,7 @@ void vtkKWSerializer::EatWhiteSpace(istream *is)
     }
 }
 
+//-----------------------------------------------------------------------------
 int vtkKWSerializer::GetNextToken(istream *is, char result[1024])
 {
   int success;
@@ -143,6 +142,7 @@ int vtkKWSerializer::GetNextToken(istream *is, char result[1024])
   return success;
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWSerializer::FindClosingBrace(istream *is, vtkObject *obj)
 {
   char token[1024];
@@ -166,6 +166,7 @@ void vtkKWSerializer::FindClosingBrace(istream *is, vtkObject *obj)
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWSerializer::ReadNextToken(istream *is, const char *tok,
                                     vtkObject *obj)
 {
@@ -180,10 +181,11 @@ void vtkKWSerializer::ReadNextToken(istream *is, const char *tok,
     }
 }
 
+//-----------------------------------------------------------------------------
 void vtkKWSerializer::WriteSafeString(ostream& os, const char *val)
 {
   int i;
-  int len = strlen(val);
+  int len = vtkString::Length(val);
   
   os << '"';
   for (i = 0; i < len; i++)

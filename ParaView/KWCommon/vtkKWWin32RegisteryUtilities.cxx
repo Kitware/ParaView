@@ -39,9 +39,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "vtkKWWin32RegisteryUtilities.h"
+
 #include "vtkObjectFactory.h"
+#include "vtkString.h"
 
 vtkStandardNewMacro( vtkKWWin32RegisteryUtilities );
 
@@ -55,7 +56,8 @@ vtkKWWin32RegisteryUtilities::~vtkKWWin32RegisteryUtilities()
 }
 
 int vtkKWWin32RegisteryUtilities::OpenInternal(const char *toplevel,
-					       const char *subkey, int readonly)
+					       const char *subkey, 
+					       int readonly)
 {
   int res = 0;
   ostrstream str;
@@ -113,8 +115,9 @@ int vtkKWWin32RegisteryUtilities::SetValueInternal(const char *key,
 						   const char *value)
 {
   int res = 1;
+  DWORD len = (DWORD) vtkString::Length(value);
   res = ( RegSetValueEx(this->HKey, key, 0, REG_SZ, 
 			(CONST BYTE *)(const char *)value, 
-			strlen(value)+1) == ERROR_SUCCESS );
+			len+1) == ERROR_SUCCESS );
   return res;
 }

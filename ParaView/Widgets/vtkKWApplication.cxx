@@ -79,14 +79,9 @@ vtkKWApplication::vtkKWApplication()
   this->BalloonHelpWidget = 0;
   this->CommandFunction = vtkKWApplicationCommand;
   
-  this->ApplicationName = new char[strlen("Kitware")+1];
-  strcpy(this->ApplicationName, "Kitware" );
-
-  this->ApplicationVersionName = new char[strlen("Kitware10")+1];
-  strcpy(this->ApplicationVersionName, "Kitware10" );
-
-  this->ApplicationReleaseName = new char[strlen("unknown")+1];
-  strcpy(this->ApplicationReleaseName, "unknown" );
+  this->ApplicationName = vtkString::Duplicate("Kitware");
+  this->ApplicationVersionName = vtkString::Duplicate("Kitware10");
+  this->ApplicationReleaseName = vtkString::Duplicate("unknown");
   
   this->InExit = 0;
   this->DialogUp = 0;
@@ -243,7 +238,7 @@ void vtkKWApplication::SimpleScript(const char *event)
   vtkOutputWindow::GetInstance()->DisplayText("\n");
 #endif
   
-  int len = strlen(event);
+  int len = vtkString::Length(event);
   if (!event || (len < 1))
     {
     return;
@@ -274,8 +269,7 @@ void vtkKWApplication::SetApplicationName(const char *_arg)
     } 
   if (_arg) 
     { 
-    this->ApplicationName = new char[strlen(_arg)+1]; 
-    strcpy(this->ApplicationName,_arg); 
+    this->ApplicationName = vtkString::Duplicate(_arg);
     } 
    else 
     { 
@@ -297,8 +291,7 @@ void vtkKWApplication::SetApplicationVersionName(const char *_arg)
     } 
   if (_arg) 
     { 
-    this->ApplicationVersionName = new char[strlen(_arg)+1]; 
-    strcpy(this->ApplicationVersionName,_arg); 
+    this->ApplicationVersionName = vtkString::Duplicate(_arg);
     } 
    else 
     { 
@@ -320,8 +313,7 @@ void vtkKWApplication::SetApplicationReleaseName(const char *_arg)
     } 
   if (_arg) 
     { 
-    this->ApplicationReleaseName = new char[strlen(_arg)+1]; 
-    strcpy(this->ApplicationReleaseName,_arg); 
+    this->ApplicationReleaseName = vtkString::Duplicate(_arg);
     } 
    else 
     { 

@@ -39,25 +39,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-#include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
-#include "vtkKWView.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWMenu.h"
-#include "vtkKWMessageDialog.h"
-#include "vtkKWMenu.h"
-#include "vtkKWProgressGauge.h"
-#include "vtkKWViewCollection.h"
-#include "vtkKWNotebook.h"
-#include "vtkKWSplitFrame.h"
-#include "vtkKWWindowCollection.h"
-#include "vtkKWRegisteryUtilities.h"
+
 #include "KitwareLogo.h"
+#include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
-#include "vtkKWWidgetCollection.h"
 #include "vtkKWLoadSaveDialog.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMessageDialog.h"
+#include "vtkKWNotebook.h"
+#include "vtkKWProgressGauge.h"
+#include "vtkKWRegisteryUtilities.h"
+#include "vtkKWSplitFrame.h"
+#include "vtkKWView.h"
+#include "vtkKWViewCollection.h"
+#include "vtkKWWidgetCollection.h"
+#include "vtkKWWindowCollection.h"
+#include "vtkObjectFactory.h"
+#include "vtkString.h"
 #include "vtkVector.txx"
 
 vtkSetObjectImplementationMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
@@ -102,7 +103,7 @@ public:
 	}
       if ( file )
 	{
-	this->File = strcpy(new char[strlen(file)+1], file);
+	this->File = vtkString::Duplicate(file);
 	}
     }
   void SetFullFile(const char *file)
@@ -114,7 +115,7 @@ public:
 	}
       if ( file )
 	{
-	this->FullFile = strcpy(new char[strlen(file)+1], file);
+	this->FullFile = vtkString::Duplicate(file);
 	}
     }
   void SetCommand(const char *command)
@@ -126,7 +127,7 @@ public:
 	}
       if ( command )
 	{
-	this->Command = strcpy(new char[strlen(command)+1], command);
+	this->Command = vtkString::Duplicate(command);
 	}
     }
   void SetTarget(vtkKWObject *target)
@@ -183,7 +184,7 @@ int vtkKWWindowMenuEntry::InsertToMenu( int pos, const char* menuEntry,
 {
   if ( this->File && this->Target && this->Command )
     {
-    char *file = strcpy(new char[strlen(this->File)+1], this->File);
+    char *file = vtkString::Duplicate(this->File);
     file[0] = pos + '0';
     ostrstream str;
     str << this->Command << " \"" << this->FullFile << "\"" << ends;
@@ -617,8 +618,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
 
   this->StatusFrame->Create(app,"frame","");
   this->Script("image create photo -height 34 -width 128");
-  this->StatusImageName = new char [strlen(interp->result)+1];
-  strcpy(this->StatusImageName,interp->result);
+  this->StatusImageName = vtkString::Duplicate(interp->result);
   this->CreateStatusImage();
   this->StatusImage->Create(app,"label",
                             "-relief sunken -bd 1 -height 38 -width 132 -fg #ffffff -bg #ffffff");
@@ -807,10 +807,8 @@ void vtkKWWindow::LoadScript()
   char *path = NULL;
 
   this->Script("tk_getOpenFile -title \"Load Script\" -filetypes {{{%s Script} {%s}}}", this->ScriptType, this->ScriptExtension);
-  path = 
-    strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
-	   this->Application->GetMainInterp()->result);
-  if (strlen(path) != 0)
+  path = vtkString::Duplicate(this->Application->GetMainInterp()->result);
+  if (vtkString::Length(path))
     {
     FILE *fin = fopen(path,"r");
     if (!fin)
@@ -917,7 +915,7 @@ void vtkKWWindow::AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target)
   char *newMenuEntry = 0;
   if ( menuEntry )
     {
-    newMenuEntry = new char[ strlen(menuEntry)+1 ];
+    newMenuEntry = new char[ vtkString::Length(menuEntry)+1 ];
     while ( menuEntry[i] )
       {
       if ( menuEntry[i] == '\\' )
@@ -949,7 +947,7 @@ void vtkKWWindow::AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target)
       {
       if ( this->GetApplication()->GetRegisteryValue(1, "MRU", CmdNameP, Cmd) )
 	{
-	if (strlen(File) > 1)
+	if (vtkString::Length(File) > 1)
 	  {
 	  this->InsertRecentFileToMenu(File, target, Cmd);
 	  }
@@ -993,7 +991,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.91 $");
+  this->ExtractRevision(os,"$Revision: 1.92 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1059,8 +1057,9 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
 					 const char *command)
 {
   //this->PrintRecentFiles();
-  char *file = new char [strlen(filename) + 3];
-  if ( strlen(filename) <= 40 )
+  int flen = vtkString::Length(filename);
+  char *file = new char [flen + 3];
+  if ( flen <= 40 )
     {
     sprintf(file, "  %s", filename);
     }
@@ -1077,8 +1076,9 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
 	lastI = ii;
 	}
       }
-    for(ii=strlen(filename); 
-        static_cast<unsigned int>(ii)>=(strlen(filename)-25); ii--)
+    int flen = vtkString::Length(filename);
+    for(ii=flen; 
+        static_cast<unsigned int>(ii)>=(flen-25); ii--)
       {
       if ( filename[ii] == '/' )
 	{
@@ -1233,7 +1233,7 @@ int vtkKWWindow::BooleanRegisteryCheck(int level, const char* key,
   if ( this->GetApplication()->GetRegisteryValue(
 	 level, "RunTime", key, buffer) )
     {
-    if ( !strncmp(buffer+1, trueval+1, strlen(trueval)-1) )
+    if ( !strncmp(buffer+1, trueval+1, vtkString::Length(trueval)-1) )
       {
       allset = 1;
       }

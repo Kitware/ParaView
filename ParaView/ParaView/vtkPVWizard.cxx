@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSelectionList.h"
 #include "vtkPVWindow.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkString.h"
 
 #include <ctype.h>
 
@@ -270,8 +271,9 @@ void vtkPVWizard::CheckForFilePattern()
     return;
     }
 
-  idx = strlen(lastFileName);
-  if (idx != (int)(strlen(this->FirstFileName)))
+  int flen = vtkString::Length(lastFileName);
+  idx = flen;
+  if (idx != flen)
     {
     vtkErrorMacro("Expecting file names to be the same length.");
     this->Done = 0;
@@ -325,7 +327,7 @@ void vtkPVWizard::CheckForFilePattern()
     delete [] this->FilePattern;
     this->FilePattern = NULL;
     }
-  this->FilePattern = new char[strlen(lastFileName) + 10];
+  this->FilePattern = new char[vtkString::Length(lastFileName) + 10];
   strncpy(this->FilePattern, lastFileName, numStart);
   this->FilePattern[numStart] = '%';
   sprintf(this->FilePattern+numStart+1, "0%dd%s", 
@@ -440,7 +442,7 @@ void vtkPVWizard::SetupPipeline(vtkPVWindow *pvWin)
     } 
 
   // Now setup the animation page.
-  if (this->LastFileName && strlen(this->LastFileName) > 0)
+  if (this->LastFileName && vtkString::Length(this->LastFileName) > 0)
     {
     vtkPVAnimationInterface *ai = pvWin->GetAnimationInterface();
     this->Script("%s SetPVSource $cthReader", ai->GetTclName());

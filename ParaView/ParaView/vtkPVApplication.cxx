@@ -154,9 +154,8 @@ public:
 	  error = 1;
 	  }
 	message += 3;
-	char *rmessage = new char [ strlen(message)+1 ];
-	strcpy(rmessage, message);
-	int last = strlen(rmessage)-1;
+	char *rmessage = vtkString::Duplicate(message);
+	int last = vtkString::Length(rmessage)-1;
 	while ( last > 0 && 
 		(rmessage[last] == ' ' || rmessage[last] == '\n' || 
 		 rmessage[last] == '\r' || rmessage[last] == '\t') )
@@ -220,8 +219,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
   Vtkkwparaviewtcl_Init(interp);
   
   // Create the component loader procedure in Tcl.
-  char* script = new char[strlen(vtkPVApplication::LoadComponentProc)+1];
-  strcpy(script, vtkPVApplication::LoadComponentProc);
+  char* script = vtkString::Duplicate(vtkPVApplication::LoadComponentProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
     // ????
