@@ -35,7 +35,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
 #include "vtkImageOutlineFilter.h"
-#include "vtkGeometryFilter.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkTexture.h"
 #include "vtkScalarBarActor.h"
@@ -143,6 +142,10 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   
   this->SetApplication(pvApp);
   
+  sprintf(tclName, "Geometry%d", this->InstanceCount);
+  pvApp->MakeTclObject("vtkPVGeometryFilter", tclName);
+  this->SetGeometryTclName(tclName);
+
   // Get rid of previous object created by the superclass.
   if (this->Mapper)
     {
@@ -155,6 +158,8 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
   pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->MapperTclName);
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
+                         this->GeometryTclName);
   
   sprintf(tclName, "ScalarBar%d", this->InstanceCount);
   this->SetScalarBarTclName(tclName);
@@ -178,6 +183,9 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
   pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
   pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+                         this->LODDeciTclName, this->GeometryTclName);
+
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
   pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->LODMapperTclName = NULL;
@@ -917,7 +925,7 @@ void vtkPVActorComposite::Initialize()
     {
     this->SetModeToPolyData();
     pvApp->BroadcastScript("%s SetInput %s",
-			   this->LODDeciTclName,
+			   this->GeometryTclName,
 			   this->PVData->GetVTKDataTclName());
     }
   else if (this->PVData->GetVTKData()->IsA("vtkImageData"))
@@ -939,6 +947,7 @@ void vtkPVActorComposite::Initialize()
     this->SetModeToDataSet();
     }
   
+  // Do we really need to do this here ???????????????  I don't think so.
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
 			 this->LODMapperTclName,
 			 this->LODDeciTclName);
@@ -1211,46 +1220,20 @@ void vtkPVActorComposite::SetMode(int mode)
     return;
     }
 
+  pvApp->BroadcastScript("%s SetInput %s", this->GeometryTclName, 
+	                		   this->PVData->GetVTKDataTclName());
   if (mode == VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
     {
-    pvApp->BroadcastScript("%s SetInput %s", this->MapperTclName, 
-			   this->PVData->GetVTKDataTclName());
+    pvApp->BroadcastScript("%s SetSetModeToSurface", this->GeometryTclName);
     }
   else if (mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
     {
-    if (this->OutlineTclName == NULL)
-      {
-      char tclName[150];
-      sprintf(tclName, "ActorCompositeOutline%d", this->InstanceCount);
-      pvApp->MakeTclObject("vtkImageOutlineFilter", tclName);
-      this->SetOutlineTclName(tclName);
-      }
-    pvApp->BroadcastScript("%s SetInput %s", this->OutlineTclName, 
-			   this->PVData->GetVTKDataTclName());
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-			   this->MapperTclName, this->OutlineTclName);
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-			   this->LODDeciTclName,
-			   this->OutlineTclName);
+    pvApp->BroadcastScript("%s SetSetModeToImageOutline", this->GeometryTclName); 
     }
   else if (mode == VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
     {
-    if (this->GeometryTclName == NULL)
-      {
-      char tclName[150];
-      sprintf(tclName, "ActorCompositeGeometry%d", this->InstanceCount);
-      pvApp->MakeTclObject("vtkDataSetSurfaceFilter", tclName);
-      this->SetGeometryTclName(tclName);
-      }
-    pvApp->BroadcastScript("%s SetInput %s", this->GeometryTclName,
-			   this->PVData->GetVTKDataTclName());
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-			   this->MapperTclName, this->GeometryTclName);    
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-			   this->LODDeciTclName,
-			   this->GeometryTclName);
-    }
-  
+    pvApp->BroadcastScript("%s SetSetModeToSurface", this->GeometryTclName);
+    }  
 }
 
 //----------------------------------------------------------------------------

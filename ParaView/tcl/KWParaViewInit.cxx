@@ -80,6 +80,9 @@ ClientData vtkPVEnSightReaderInterfaceNewCommand();
 int vtkPVExtentTranslatorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVExtentTranslatorNewCommand();
+int vtkPVGeometryFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVGeometryFilterNewCommand();
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVGlyph3DNewCommand();
@@ -210,6 +213,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVEnSightReaderInterfaceCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVExtentTranslator", vtkPVExtentTranslatorNewCommand,
                   vtkPVExtentTranslatorCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVGeometryFilter", vtkPVGeometryFilterNewCommand,
+                  vtkPVGeometryFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVGlyph3D", vtkPVGlyph3DNewCommand,
                   vtkPVGlyph3DCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVInputMenu", vtkPVInputMenuNewCommand,
