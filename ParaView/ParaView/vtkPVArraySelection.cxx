@@ -65,7 +65,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.30.4.2");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.30.4.3");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -369,10 +369,15 @@ void vtkPVArraySelection::SetReaderSelectionsFromWidgets()
     // file.  We could make every check button a pv widget.
     if(this->Selection->ArrayIsEnabled(check->GetText()) != check->GetState())
       {
-      pvApp->GetProcessModule()->ServerScript
-        ("%s Set%sArrayStatus {%s} %d", 
-         this->VTKReaderTclName, this->AttributeName, 
-         check->GetText(), check->GetState());
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << this->VTKReaderID 
+                      << (vtkstd::string("Set") 
+                          + vtkstd::string(this->AttributeName) 
+                          + vtkstd::string("ArrayStatus")).c_str()
+                      << check->GetText() << check->GetState() 
+                      << vtkClientServerStream::End;
+      pm->SendStreamToServer();
       this->AddTraceEntry("$kw(%s) SetArrayStatus {%s} %d", this->GetTclName(),
                           check->GetText(), check->GetState());
       }
