@@ -121,6 +121,10 @@ public:
   // Specify whether you want a scrollbar (default on) before you call Create.
   void ScrollbarOn() {this->SetScrollbarFlag(1);}
   void ScrollbarOff() {this->SetScrollbarFlag(0);}
+
+  // Description:
+  // Get the listbox widget.
+  vtkGetObjectMacro(Listbox, vtkKWWidget);
   
 protected:
   vtkKWListBox();

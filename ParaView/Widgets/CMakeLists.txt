@@ -38,6 +38,7 @@ vtkKWLabeledScaleSet.cxx
 vtkKWLabeledText.cxx 
 vtkKWLabeledWidget.cxx 
 vtkKWListBox.cxx 
+vtkKWListSelectOrder.cxx
 vtkKWLoadSaveButton.cxx
 vtkKWLoadSaveDialog.cxx
 vtkKWMenu.cxx 
