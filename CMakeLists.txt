@@ -63,6 +63,12 @@ VTK_SELECT_STREAMS_LIBRARY(PARAVIEW_USE_ANSI_STDLIB
 IF(CMAKE_COMPILER_IS_GNUCXX)
   # A GCC compiler.  Quiet warning about strstream deprecation.
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
+  IF(APPLE)
+    # The fink package on OSX sets the environment variable LD_PREBIND
+    # which breaks paraview linking.  Add this option to tell the
+    # linker to ignore the environment variable.
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -noprebind")
+  ENDIF(APPLE)
 ELSE(CMAKE_COMPILER_IS_GNUCXX)
   IF(CMAKE_SYSTEM MATCHES "OSF1-V.*")
      SET(CMAKE_CXX_FLAGS
