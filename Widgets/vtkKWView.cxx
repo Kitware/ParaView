@@ -133,9 +133,18 @@ vtkKWView::vtkKWView()
 
 vtkKWView::~vtkKWView()
 {
-  this->Renderer->Delete();
-  this->RenderWindow->Delete();
-
+  if (this->Renderer)
+    {
+    this->Renderer->Delete();
+    this->Renderer = NULL;
+    }
+  
+  if (this->RenderWindow)
+    {
+    this->RenderWindow->Delete();
+    this->RenderWindow = NULL;
+    }
+    
   // Remove all binding
   const char *wname = this->VTKWidget->GetWidgetName();
   this->Script("bind %s <Expose> {}",wname);
@@ -1063,7 +1072,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.33 $");
+  this->ExtractRevision(os,"$Revision: 1.34 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
