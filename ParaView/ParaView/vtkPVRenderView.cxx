@@ -103,8 +103,7 @@ vtkPVRenderView::vtkPVRenderView()
   else
     {
     this->TopLevelRenderWindow = NULL;
-    }
-    
+    }    
 
   this->CommandFunction = vtkPVRenderViewCommand;
   
@@ -170,6 +169,10 @@ vtkPVRenderView::~vtkPVRenderView()
       {
       pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
       }
+    else
+      {
+      this->Composite->Delete();
+      }
     this->SetCompositeTclName(NULL);
     this->Composite = NULL;
     }
@@ -180,6 +183,10 @@ vtkPVRenderView::~vtkPVRenderView()
       {
       pvApp->BroadcastScript("%s Delete", this->RendererTclName);
       }
+    else
+      {
+      this->Renderer->Delete();
+      }
     this->SetRendererTclName(NULL);
     this->Renderer = NULL;
     }
@@ -189,6 +196,10 @@ vtkPVRenderView::~vtkPVRenderView()
     if ( pvApp )
       {
       pvApp->BroadcastScript("%s Delete", this->RenderWindowTclName);
+      }
+    else
+      {
+      this->RenderWindow->Delete();
       }
     this->SetRenderWindowTclName(NULL);
     this->RenderWindow = NULL;
