@@ -41,11 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVSource.h"
 
+#include "vtkArrayMap.txx"
+#include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
-#include "vtkKWLabel.h"
+#include "vtkKWImageLabel.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWLabeledLabel.h"
@@ -60,25 +62,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVPart.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVInputMenu.h"
+#include "vtkPVPart.h"
+#include "vtkPVPassThrough.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
-#include "vtkPVPassThrough.h"
+#include "vtkRenderer.h"
 #include "vtkSource.h"
 #include "vtkString.h"
-#include "vtkVector.h"
-#include "vtkRenderer.h"
-#include "vtkArrayMap.txx"
 #include "vtkStringList.h"
-#include "vtkCollection.h"
+#include "vtkVector.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.261");
+vtkCxxRevisionMacro(vtkPVSource, "1.262");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2487,7 +2487,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.261 $");
+  this->ExtractRevision(os,"$Revision: 1.262 $");
 }
 
 //----------------------------------------------------------------------------
