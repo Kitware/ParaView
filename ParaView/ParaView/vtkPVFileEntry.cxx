@@ -179,7 +179,7 @@ void vtkPVFileEntry::Accept()
 
   if (this->ModifiedFlag)
     {  
-    pvApp->AddTraceEntry("$pv(%s) SetValue {%s}", this->GetTclName(), 
+    pvApp->AddTraceEntry("$pv(%s) SetValue %s", this->GetTclName(), 
                          this->GetValue());
     }
 
