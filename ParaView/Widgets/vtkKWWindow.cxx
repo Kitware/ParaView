@@ -96,24 +96,24 @@ public:
     {
       if ( this->File )
 	{
-	free ( this->File );
+	delete [] this->File;
 	this->File = 0;
 	}
       if ( file )
 	{
-	this->File = strdup( file );
+	this->File = strcpy(new char[strlen(file)+1], file);
 	}
     }
   void SetCommand(const char *command)
     {
       if ( this->Command )
 	{
-	free ( this->Command );
+	delete [] this->Command;
 	this->Command = 0;
 	}
       if ( command )
 	{
-	this->Command = strdup( command );
+	this->Command = strcpy(new char[strlen(command)+1], command);
 	}
     }
   void SetTarget(vtkKWObject *target)
@@ -148,11 +148,11 @@ vtkKWWindowMenuEntry::~vtkKWWindowMenuEntry()
 {
   if ( this->File )
     {
-    free( this->File );
+    delete [] this->File;
     }
   if ( this->Command )
     {
-    free( this->Command );
+    delete [] this->Command;
     }
   this->TotalCount --;
 }
@@ -161,11 +161,11 @@ int vtkKWWindowMenuEntry::InsertToMenu( int pos, vtkKWMenu *menu )
 {
   if ( this->File && this->Target && this->Command )
     {
-    char *file = strdup(this->File);
+    char *file = strcpy(new char[strlen(this->File)+1], this->File);
     file[0] = pos + '0';
     menu->InsertCommand( menu->GetIndex("Close") - 1, 
 			 file, this->Target, this->Command, 0 );
-    free( file );
+    delete [] file;
     return 1;
     }
   return 0;
@@ -973,7 +973,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.43 $");
+  this->ExtractRevision(os,"$Revision: 1.44 $");
 }
 
 int vtkKWWindow::ExitDialog()
