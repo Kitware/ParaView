@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.14");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.15");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -710,8 +710,6 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SaveInTclScript(ofstream *file)
 {
-  float* position;
-  char* result;
   char* renTclName;
 
   char scalarBarTclName[128];
@@ -721,7 +719,9 @@ void vtkPVColorMap::SaveInTclScript(ofstream *file)
   if (this->ScalarBarVisibility)
     {
     *file << "vtkScalarBarWidget " << scalarBarTclName << "\n\t";
-//    *file << renTclName << " AddProp " << scalarBarTclName << "\n";
+    *file << scalarBarTclName << " SetInteractor iren" << "\n\n";
+    *file << "[" << scalarBarTclName << " GetScalarBarActor] SetLookupTable " 
+          << this->LookupTableTclName << "\n";
     }
 
 
