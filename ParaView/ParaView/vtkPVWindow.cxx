@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.505");
+vtkCxxRevisionMacro(vtkPVWindow, "1.506");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4070,7 +4070,7 @@ void vtkPVWindow::ErrorMessage(const char* message)
   cout << "ErrorMessage end" << endl;
   if ( this->GetPVApplication()->GetCrashOnErrors() )
     {
-    abort();
+    vtkPVApplication::Abort();
     }
 }
 

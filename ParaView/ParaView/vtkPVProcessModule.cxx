@@ -60,7 +60,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.32");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.33");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -462,7 +462,7 @@ void vtkPVProcessModule::InterpreterCallback(unsigned long, void* pinfo)
     vtkErrorMacro(<< errorMessage << error.str());
     error.rdbuf()->freeze(0);
     vtkErrorMacro("Aborting execution for debugging purposes.");
-    abort();
+    vtkPVApplication::Abort();
     }
 }
 

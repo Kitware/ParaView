@@ -68,7 +68,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.73");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.74");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -890,7 +890,7 @@ void vtkPVFileEntry::UpdateTimeStep()
       {
       cout << "Element: " << this->FileListSelect->GetElementFromFinalList(cc) << endl;
       }
-    abort();
+    vtkPVApplication::Abort();
     }
   delete [] file;
   this->Timestep->SetValue(this->TimeStep);
