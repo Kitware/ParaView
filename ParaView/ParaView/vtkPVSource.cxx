@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.299");
+vtkCxxRevisionMacro(vtkPVSource, "1.300");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1248,6 +1248,15 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       return;
       }
 
+    if (!this->GetHideDisplayPage())
+      {
+      this->Notebook->AddPage("Display");
+      }
+    if (!this->GetHideInformationPage())
+      {
+      this->Notebook->AddPage("Information");
+      }
+
     pvd->CreateProperties();
     this->GetPVApplication()->GetRenderModule()->AddPVSource(this);
 
@@ -1260,14 +1269,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // for a polydata and imagedata collection.
     this->Update();
     
-    if (!this->GetHideDisplayPage())
-      {
-      this->Notebook->AddPage("Display");
-      }
-    if (!this->GetHideInformationPage())
-      {
-      this->Notebook->AddPage("Information");
-      }
 
     // Make the last data invisible.
     input = this->GetPVInput(0);
@@ -2621,7 +2622,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.299 $");
+  this->ExtractRevision(os,"$Revision: 1.300 $");
 }
 
 //----------------------------------------------------------------------------
