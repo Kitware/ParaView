@@ -22,7 +22,7 @@
 #include "vtkPolyData.h"
 #include "vtkCollection.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.9");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.9.2.1");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -83,7 +83,9 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   // Assume the input is the collection filter.
   // Client needs to modify the collection filter because it is not
   // connected to a pipeline.
-  if (input && input->GetSource() && input->GetSource()->IsA("vtkCollectPolyData"))
+  if (input && input->GetSource() && 
+       (input->GetSource()->IsA("vtkCollectPolyData") ||
+        input->GetSource()->IsA("vtkPVDuplicatePolyData")))
     {
     input->GetSource()->Modified();
     }

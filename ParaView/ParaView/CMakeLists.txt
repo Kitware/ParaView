@@ -24,6 +24,7 @@ SET( ParaView_SRCS
   vtkPVArrayInformation.cxx
   vtkPVArrayMenu.cxx 
   vtkPVArraySelection.cxx
+  vtkPVArrowSource.cxx
   vtkPVBatchCompositeManager.cxx
   vtkPVBoundsDisplay.cxx
   vtkPVBoxWidget.cxx

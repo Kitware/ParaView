@@ -30,7 +30,7 @@
 #include "vtkFloatArray.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkStructuredCacheFilter, "1.1.2.4");
+vtkCxxRevisionMacro(vtkStructuredCacheFilter, "1.1.2.5");
 vtkStandardNewMacro(vtkStructuredCacheFilter);
 
 //----------------------------------------------------------------------------
@@ -82,6 +82,7 @@ void vtkStructuredCacheFilter::UpdateData(vtkDataObject *outObject)
   vtkDataSet *output = this->GetOutput();
 
   vtkTimerLog::MarkStartEvent("Update StructuredCache");
+  output->Initialize();
 
   this->BuildExtentMap(input, output);
 

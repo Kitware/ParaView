@@ -13,7 +13,7 @@
         module_type="Source" 
         long_help="3D arrow with a long cylindrical shaft and a cone for the tip." 
         short_help="Create a 3D arrow">
-  <Source class="vtkArrowSource"/>
+  <Source class="vtkPVArrowSource"/>
   <VectorEntry label="Tip resolution" trace_name="TipResolution"
                variable="TipResolution" type="int"
                help="Set the number of faces on the tip."/>
