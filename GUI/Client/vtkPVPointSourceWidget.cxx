@@ -35,7 +35,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.33");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -201,7 +201,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->NumberOfPointsWidget->Create(app);
   float numPts = static_cast<float>(this->DefaultNumberOfPoints);
   this->NumberOfPointsWidget->SetValue(&numPts, 1);
-  ivp->SetElement(0, numPts);
+  ivp->SetElement(0, this->DefaultNumberOfPoints);
   if (this->ShowEntries)
     {
     this->Script("pack %s -side top -fill both -expand true",
