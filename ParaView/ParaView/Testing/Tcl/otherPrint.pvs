@@ -1,3 +1,5 @@
+Application ExitOnReturnOn
+
 for {set i  0} {$i < [expr $argc - 1]} {incr i} {
    if {[lindex $argv $i] == "-A"} {
       set auto_path "$auto_path [lindex $argv [expr $i +1]]"
@@ -16,6 +18,15 @@ proc rtOtherTest { fileid } {
 #actual test
     set all [lsort [info command vtk*]]
     foreach a $all {
+	if [string match "vtkTemp*" $a ] {
+	    continue
+        }
+        if {$a == "vtkTkRenderWidget"} {
+           continue
+        }
+        if {$a == "vtkCommand"} {
+            continue
+        }
         if {$a == "vtkIndent"} {
             continue
         }
@@ -46,7 +57,7 @@ proc rtOtherTest { fileid } {
            b GetClassName
            b Delete
         } fres ] != 0 } {
-          puts "Error pass 1: $fres"
+          puts "Error pass 1 for class $a: $fres"
 	  Application SetExitStatus 1
         }
         if { [ catch {
@@ -56,7 +67,7 @@ proc rtOtherTest { fileid } {
            b Delete
            c Delete
         } fres ] != 0 } {
-          puts "Error pass 2: $fres"
+          puts "Error pass 2 for class $a: $fres"
 	  Application SetExitStatus 1
         }
     }
