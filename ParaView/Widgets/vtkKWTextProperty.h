@@ -144,6 +144,10 @@ public:
   void ShadowCheckButtonCallback();
   void SetShadow(int);
 
+  // Description:
+  // Save out the text properties to a file.
+  void SaveInTclScript(ofstream *file, const char *tcl_name = 0);
+
 protected:
   vtkKWTextProperty();
   ~vtkKWTextProperty();

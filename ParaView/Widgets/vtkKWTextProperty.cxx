@@ -116,7 +116,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.1.2.2");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.1.2.3");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -797,6 +797,39 @@ void vtkKWTextProperty::CopyValuesFrom(vtkKWTextProperty *widget)
       this->SetItalic(tprop->GetItalic());
       this->SetShadow(tprop->GetShadow());
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTextProperty::SaveInTclScript(ofstream *file, 
+                                        const char *tcl_name)
+{
+  static int instance_count = 0;
+
+  const char *name;
+  char buffer[128];
+  if (tcl_name)
+    {
+    name = tcl_name;
+    }
+  else
+    {
+    sprintf(buffer, "TextProperty%d", instance_count++);
+    name = buffer;
+    *file << "vtkTextProperty " << name << endl;
+    }
+
+  vtkTextProperty *tprop = this->TextProperty;
+  if (tprop)
+    {
+    float *rgb = this->GetColor();
+    *file << "\t" << name << " SetColor " 
+          << rgb[0] << " "  << rgb[1] << " "  << rgb[2] << endl;
+    *file << "\t" << name << " SetFontFamily " 
+          << tprop->GetFontFamily() << endl;
+    *file << "\t" << name << " SetBold " << tprop->GetBold() << endl;
+    *file << "\t" << name << " SetItalic " << tprop->GetItalic() << endl;
+    *file << "\t" << name << " SetShadow " << tprop->GetShadow() << endl;
     }
 }
 
