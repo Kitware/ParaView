@@ -132,6 +132,7 @@ public:
   void SetColorSchemeToRedBlue();
   void SetColorSchemeToBlueRed();
   void SetColorSchemeToGrayscale();
+  void SetColorSchemeToLabBlueRed();
 
   // Description:
   // Choose which component to color with.
@@ -280,6 +281,9 @@ protected:
   void UpdateInternalScalarBarVisibility();
   void RGBToHSV(double rgb[3], double hsv[3]);
   void HSVToRGB(double hsv[3], double rgb[3]);
+
+  void LabToXYZ(double Lab[3], double xyz[3]);
+  void XYZToRGB(double xyz[3], double rgb[3]);
 
   vtkLookupTable* LookupTable;
   vtkClientServerID LookupTableID;
