@@ -5,6 +5,4 @@ TARGET_LINK_LIBRARIES(ConvertImage
     vtkFiltering
     vtkImaging
     vtkIO
-    vtkpng
-    vtkzlib
 )
