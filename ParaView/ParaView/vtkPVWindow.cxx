@@ -116,12 +116,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY "ToolbarFlatFrame"
 #define VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY "ToolbarFlatButtons"
 
-#define VTK_PV_VTK_FILTERS_MENU_LABEL "Insert Filters"
-#define VTK_PV_VTK_SOURCES_MENU_LABEL "Insert Sources"
+#define VTK_PV_VTK_FILTERS_MENU_LABEL "Apply Filter"
+#define VTK_PV_VTK_SOURCES_MENU_LABEL "Create Source"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.385");
+vtkCxxRevisionMacro(vtkPVWindow, "1.386");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -711,7 +711,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->SourceMenu->SetParent(this->AdvancedMenu);
   this->SourceMenu->Create(this->Application, "-tearoff 0");
   this->AdvancedMenu->AddCascade(VTK_PV_VTK_SOURCES_MENU_LABEL, 
-                                 this->SourceMenu, 8,
+                                 this->SourceMenu, 7,
                                  "Choose a source from a list of "
                                  "VTK sources");  
   
@@ -719,7 +719,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->FilterMenu->SetParent(this->AdvancedMenu);
   this->FilterMenu->Create(this->Application, "-tearoff 0");
   this->AdvancedMenu->AddCascade(VTK_PV_VTK_FILTERS_MENU_LABEL, 
-                                 this->FilterMenu, 7,
+                                 this->FilterMenu, 6,
                                  "Choose a filter from a list of "
                                  "VTK filters");  
   this->AdvancedMenu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL, 
@@ -728,7 +728,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Open XML package
   this->AdvancedMenu->AddSeparator();
   this->AdvancedMenu->AddCommand("Open Package", this, 
-                                "OpenPackage", 2,
+                                "OpenPackage", 0,
                                 "Open a ParaView package and load the "
                                 "contents");
 
@@ -3780,7 +3780,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.385 $");
+  this->ExtractRevision(os,"$Revision: 1.386 $");
 }
 
 //----------------------------------------------------------------------------
