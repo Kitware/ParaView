@@ -72,6 +72,12 @@ public:
   void SetSeparatorSize(int size);
   vtkGetMacro(SeparatorSize, int);
 
+  // Description:
+  // This sets the separators narrow margin, i.e. the empty space around the
+  // separator itself.
+  void SetSeparatorMargin(int size);
+  vtkGetMacro(SeparatorMargin, int);
+
   // Callbacks used internally to adjust the widths,
   void DragCallback();
   void ConfigureCallback();
@@ -106,6 +112,8 @@ protected:
   vtkKWSplitFrame();
   ~vtkKWSplitFrame();
 
+  int GetTotalSeparatorSize();
+
   vtkKWWidget *Frame1;
   vtkKWWidget *Separator;
   vtkKWWidget *Frame2;
@@ -114,6 +122,7 @@ protected:
   int Frame1Size;
   int Frame2Size;
   int SeparatorSize;
+  int SeparatorMargin;
 
   int Frame1Visibility;
   int Frame2Visibility;
