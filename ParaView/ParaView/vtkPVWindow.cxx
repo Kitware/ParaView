@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.457");
+vtkCxxRevisionMacro(vtkPVWindow, "1.458");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2918,8 +2918,7 @@ void vtkPVWindow::UpdateSourceMenu()
       {
       // Check if this is a source (or a toolbar module). We do not want to 
       // add those to the source lists.
-      if (proto && proto->GetNumberOfInputProperties() == 0 && 
-          !proto->GetToolbarModule())
+      if (proto && proto->GetNumberOfInputProperties() == 0)
         {
         numFilters++;
         char methodAndArgs[150];
@@ -2985,36 +2984,34 @@ void vtkPVWindow::UpdateFilterMenu()
             proto->GetInputProperty(0)->GetIsValidInput(this->CurrentPVSource, proto))
           {
           it->GetKey(key);
-
-          if (!proto->GetToolbarModule())
+          
+          numSources++;
+          char methodAndArgs[150];
+          sprintf(methodAndArgs, "CreatePVSource %s", key);
+          
+          const char* menuName = proto->GetMenuName();
+          if (!menuName)
             {
-            numSources++;
-            char methodAndArgs[150];
-            sprintf(methodAndArgs, "CreatePVSource %s", key);
-
-            const char* menuName = proto->GetMenuName();
-            if (!menuName)
-              {
-              menuName = key;
-              }
-
-            if (numSources % 25 == 0 )
-              {
-              this->FilterMenu->AddGeneric("command", menuName, this, 
-                                           methodAndArgs, "-columnbreak 1", 
-                                           proto->GetShortHelp());
-              }
-            else
-              {
-              this->FilterMenu->AddGeneric("command", menuName, this, 
-                                           methodAndArgs, 0, 
-                                           proto->GetShortHelp());
-              }
+            menuName = key;
+            }
+          
+          if (numSources % 25 == 0 )
+            {
+            this->FilterMenu->AddGeneric("command", menuName, this, 
+                                         methodAndArgs, "-columnbreak 1", 
+                                         proto->GetShortHelp());
             }
           else
             {
-            this->EnableToolbarButton(key);
+            this->FilterMenu->AddGeneric("command", menuName, this, 
+                                         methodAndArgs, 0, 
+                                         proto->GetShortHelp());
             }
+          }
+
+        if (proto->GetToolbarModule())
+          {
+          this->EnableToolbarButton(key);
           }
         }
       it->GoToNextItem();
