@@ -102,6 +102,7 @@ public:
 
   void SetCenter();
   void SetCenter(float,float,float);
+  void SetCenter(float c[3]) { this->SetCenter(c[0], c[1], c[2]); }
   void SetRadius();
   void SetRadius(float);
 
@@ -116,6 +117,8 @@ protected:
   // Description:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
+
+  void UpdateVTKObject();
 
   vtkKWEntry *CenterEntry[3];
   vtkKWEntry *RadiusEntry;
