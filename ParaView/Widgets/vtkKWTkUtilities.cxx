@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10.2.3");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10.2.4");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -84,21 +84,31 @@ void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
 }
 
 //-----------------------------------------------------------------------------
-void vtkKWTkUtilities::GetBackgroundColor(Tcl_Interp *interp,
-                                          const char *window,
-                                          int *r, int *g, int *b)
+void vtkKWTkUtilities::GetOptionColor(Tcl_Interp *interp,
+                                      const char *window,
+                                      const char *option,
+                                      int *r, int *g, int *b)
 {
   ostrstream command;
-  command << "lindex [ " << window << " configure -bg ] end" << ends;
+  command << window << " cget " << option << ends;
   if (Tcl_GlobalEval(interp, command.str()) != TCL_OK)
     {
-    vtkGenericWarningMacro(<< "Unable to get -bg option: " << interp->result);
+    vtkGenericWarningMacro(
+      << "Unable to get " << option << " option: " << interp->result);
     command.rdbuf()->freeze(0);     
     return;
     }
   command.rdbuf()->freeze(0);     
 
   vtkKWTkUtilities::GetRGBColor(interp, window, interp->result, r, g, b);
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWTkUtilities::GetBackgroundColor(Tcl_Interp *interp,
+                                          const char *window,
+                                          int *r, int *g, int *b)
+{
+  vtkKWTkUtilities::GetOptionColor(interp, window, "-bg", r, g, b);
 }
 
 //----------------------------------------------------------------------------
@@ -108,7 +118,8 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
                                   int width, int height,
                                   int pixel_size,
                                   unsigned long buffer_length,
-                                  const char *blend_with_name)
+                                  const char *blend_with_name,
+                                  const char *color_option)
 {
   // Find the photo
 
@@ -210,7 +221,10 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     int r, g, b;
     if (blend_with_name)
       {
-      vtkKWTkUtilities::GetBackgroundColor(interp, blend_with_name, &r, &g, &b);
+      vtkKWTkUtilities::GetOptionColor(interp, 
+                                       blend_with_name, 
+                                       (color_option ? color_option : "-bg"), 
+                                       &r, &g, &b);
       }
     else
       {
@@ -266,7 +280,8 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
 int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
                                   const char *photo_name,
                                   vtkImageData *image, 
-                                  const char *blend_with_name)
+                                  const char *blend_with_name,
+                                  const char *color_option)
 {
   if (!image )
     {
@@ -298,7 +313,8 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     width, height,
     pixel_size,
     width * height * pixel_size,
-    blend_with_name);
+    blend_with_name,
+    color_option);
 
   flip->Delete();
   return res;

@@ -68,6 +68,13 @@ public:
                           int *rr, int *gg, int *bb);
 
   // Description:
+  // Get option color of window/widget (ex: -bg, -fg, etc.).
+  static void GetOptionColor(Tcl_Interp *interp,
+                             const char *window, 
+                             const char *option, 
+                             int *r, int *g, int *b);
+  
+  // Description:
   // Get background color of window/widget.
   static void GetBackgroundColor(Tcl_Interp *interp,
                                  const char *window, 
@@ -76,19 +83,23 @@ public:
   // Description:
   // Update a photo given a pixel structure. 
   // If RGBA (pixel_size > 3), blend pixels with background color of
-  // the blend_with_name widget (otherwise 0.5, 0.5, 0.5 gray)
+  // the blend_with_name widget (otherwise 0.5, 0.5, 0.5 gray if NULL).
+  // If color_option is not NULL, use this widget option as color instead
+  // of background (-bg) (ex: -fg, -selectcolor)
   static int UpdatePhoto(Tcl_Interp *interp,
                          const char *photo_name,
                          const unsigned char *pixels, 
                          int width, int height,
                          int pixel_size,
                          unsigned long buffer_length = 0,
-                         const char *blend_with_name = 0);
+                         const char *blend_with_name = 0,
+                         const char *color_option = 0);
 
   static int UpdatePhoto(Tcl_Interp *interp,
                          const char *photo_name,
                          vtkImageData *image, 
-                         const char *blend_with_name = 0);
+                         const char *blend_with_name = 0,
+                         const char *color_option = 0);
 
   // Description:
   // Quick way to get a photo height/width.
