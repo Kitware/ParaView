@@ -295,6 +295,22 @@ public:
   vtkKWSplitFrame *GetSplitFrame() {return this->SplitFrame;}
 
   // Description:
+  // Threshold for individual actors as number of points.
+  void LODThresholdScaleCallback();
+
+  // Description:
+  // This method sets the threshold without tracing or
+  // changing the UI scale.
+  void SetLODThresholdInternal(int threshold);
+
+  // Description:
+  // This methods can be used from a script.  
+  // "Set" sets the value of the scale, and adds an entry to the trace.
+  void SetLODThreshold(int);
+  vtkGetMacro(LODThreshold, int);
+  vtkBooleanMacro(LODThreshold, int);
+
+  // Description:
   // Store current camera at a specified position. This stores all the
   // camera parameters and generates a small icon.
   void StoreCurrentCamera(int position);
@@ -350,10 +366,15 @@ protected:
   vtkKWRadioButton *NavigationWindowButton;
   vtkKWRadioButton *SelectionWindowButton;
 
-  vtkKWCheckButton *ReductionCheck;  
+  vtkKWCheckButton *ReductionCheck;
+  
   vtkKWWidget *FrameRateFrame;
   vtkKWLabel *FrameRateLabel;
   vtkKWScale *FrameRateScale;
+
+  vtkKWWidget *LODThresholdFrame;
+  vtkKWLabel *LODThresholdLabel;
+  vtkKWScale *LODThresholdScale;
 
   vtkKWSplitFrame *SplitFrame;
 
@@ -380,6 +401,8 @@ protected:
   vtkPVInteractorStyleControl *ManipulatorControl3D;
 
   int DisableRenderingFlag;
+
+  int LODThreshold;
 
   // Camera icons
   vtkKWLabeledFrame* CameraIconsFrame;

@@ -144,6 +144,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->FrameRateLabel = vtkKWLabel::New();
   this->FrameRateScale = vtkKWScale::New();
 
+  this->LODThresholdFrame = vtkKWWidget::New();
+  this->LODThresholdLabel = vtkKWLabel::New();
+  this->LODThresholdScale = vtkKWScale::New();
+
   this->ManipulatorControl2D = vtkPVInteractorStyleControl::New();
   this->ManipulatorControl2D->SetRegisteryName("2D");
   this->ManipulatorControl3D = vtkPVInteractorStyleControl::New();
@@ -169,6 +173,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->ParaViewOptionsFrame = vtkKWLabeledFrame::New();
   this->NavigationWindowButton = vtkKWRadioButton::New();
   this->SelectionWindowButton = vtkKWRadioButton::New();
+
+  this->LODThreshold = 1000;
 
   int cc;
   for ( cc = 0; cc < 6; cc ++ )
@@ -354,12 +360,19 @@ vtkPVRenderView::~vtkPVRenderView()
   this->ReductionCheck->Delete();
   this->ReductionCheck = NULL;
   
+  this->FrameRateFrame->Delete();
+  this->FrameRateFrame = NULL;
   this->FrameRateLabel->Delete();
   this->FrameRateLabel = NULL;
   this->FrameRateScale->Delete();
   this->FrameRateScale = NULL;
-  this->FrameRateFrame->Delete();
-  this->FrameRateFrame = NULL;
+
+  this->LODThresholdFrame->Delete();
+  this->LODThresholdFrame = NULL;
+  this->LODThresholdLabel->Delete();
+  this->LODThresholdLabel = NULL;
+  this->LODThresholdScale->Delete();
+  this->LODThresholdScale = NULL;
 
   this->CameraIconsFrame->Delete();
   this->CameraIconsFrame = 0;
@@ -482,6 +495,8 @@ void vtkPVRenderView::PrepareForDelete()
                              this->ReductionCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "FrameRate", "%f",
                              this->FrameRateScale->GetValue());
+    pvapp->SetRegisteryValue(2, "RunTime", "LODThreshold", "%d",
+                             this->LODThreshold);
 #ifdef VTK_USE_MPI
     pvapp->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
                              this->InterruptRenderCheck->GetState());
@@ -794,10 +809,9 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->FrameRateFrame->SetParent(this->RenderParametersFrame->GetFrame());
   this->FrameRateFrame->Create(this->Application, "frame", "");
-
   this->FrameRateLabel->SetParent(this->FrameRateFrame);
   this->FrameRateLabel->Create(this->Application, "");
-  this->FrameRateLabel->SetLabel("Frame Rate");
+  this->FrameRateLabel->SetLabel("Reduction");
   this->FrameRateScale->SetParent(this->FrameRateFrame);
   this->FrameRateScale->Create(this->Application, 
                                "-resolution 0.1 -orient horizontal");
@@ -814,116 +828,144 @@ void vtkPVRenderView::CreateViewProperties()
     }
   this->FrameRateScale->SetCommand(this, "FrameRateScaleCallback");
   this->FrameRateScale->SetBalloonHelpString(
-    "This slider adjusts the desired frame rate for interaction.  "
-    "The level of detail is adjusted to achieve the desired rate.");
-  this->Script("pack %s %s -side left -fill x",
-               this->FrameRateLabel->GetWidgetName(),
-               this->FrameRateScale->GetWidgetName());
-  
-#ifdef VTK_USE_MPI
-  this->InterruptRenderCheck->SetParent(
-    this->RenderParametersFrame->GetFrame());
-  this->InterruptRenderCheck->Create(this->Application, 
-                                     "-text \"Allow Rendering Interrupts\"");
-  this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
+    "This slider adjusts the target for subsample compression during compositing.  "
+    "Left: Use slow full-resolution compositing. Right: Fast pixelated compositing.");
 
-  if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
-                                                    "InterruptRender", 0))
+  this->LODThresholdFrame->SetParent(this->RenderParametersFrame->GetFrame());
+  this->LODThresholdFrame->Create(this->Application, "frame", "");
+  this->LODThresholdLabel->SetParent(this->LODThresholdFrame);
+  this->LODThresholdLabel->Create(this->Application, "");
+  this->LODThresholdLabel->SetLabel("LOD Threshold");
+  this->LODThresholdScale->SetParent(this->LODThresholdFrame);
+  this->LODThresholdScale->Create(this->Application, 
+                               "-resolution 0.1 -orient horizontal");
+  this->LODThresholdScale->SetRange(0, 18);
+  this->LODThresholdScale->SetResolution(0.1);
+  if (pvapp && pvwindow &&
+      pvapp->GetRegisteryValue(2, "RunTime", "LODThreshold", 0))
     {
-    this->InterruptRenderCheck->SetState(
-      pvwindow->GetIntRegisteryValue(2, "RunTime", "InterruptRender"));
-    this->InterruptRenderCallback();
+    this->SetLODThreshold(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "LODThreshold"));
+    }
+  this->LODThresholdScale->SetValue(18.0 - log((double)(this->LODThreshold)));
+
+  this->LODThresholdScale->SetCommand(this, "LODThresholdScaleCallback");
+  this->LODThresholdScale->SetBalloonHelpString(
+    "This slider adjusts when the decimated LOD is used. Threshold is based on number of points.  "
+    "Left: Use slow full-resolution models. Right: Use fast decimated models .");
+  pvapp->Script("pack %s %s -side left", this->LODThresholdLabel->GetWidgetName(), 
+                this->LODThresholdScale->GetWidgetName());
+
+  if (pvapp->GetController()->GetNumberOfProcesses() > 1)
+    {
+    this->Script("pack %s %s -side left -fill x",
+                 this->LODThresholdLabel->GetWidgetName(),
+                 this->LODThresholdScale->GetWidgetName());
+  
+    this->InterruptRenderCheck->SetParent(
+                                    this->RenderParametersFrame->GetFrame());
+    this->InterruptRenderCheck->Create(this->Application, 
+                                       "-text \"Allow Rendering Interrupts\"");
+    this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
+
+    if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
+                                                      "InterruptRender", 0))
+      {
+      this->InterruptRenderCheck->SetState(
+           pvwindow->GetIntRegisteryValue(2, "RunTime", "InterruptRender"));
+      this->InterruptRenderCallback();
+      }
+    else
+      {
+      this->InterruptRenderCheck->SetState(this->Composite->GetEnableAbort());
+      }
+    this->InterruptRenderCheck->SetBalloonHelpString(
+      "Toggle the use of asynchronous MPI calls to interrupt renders. "
+      "When off, renders can not be interrupted.");
+  
+    this->CompositeWithFloatCheck->SetParent(
+                                     this->RenderParametersFrame->GetFrame());
+    this->CompositeWithFloatCheck->Create(this->Application, 
+                                          "-text \"Composite With Floats\"");
+    this->CompositeWithRGBACheck->SetParent(
+                                    this->RenderParametersFrame->GetFrame());
+    this->CompositeWithRGBACheck->Create(this->Application, 
+                                         "-text \"Composite RGBA\"");
+    this->CompositeCompressionCheck->SetParent(
+                                       this->RenderParametersFrame->GetFrame());
+    this->CompositeCompressionCheck->Create(this->Application, 
+                                            "-text \"Composite Compression\"");
+  
+    this->CompositeWithFloatCheck->SetCommand(this, "CompositeWithFloatCallback");
+    if (pvwindow && pvapp && 
+        pvapp->GetRegisteryValue(2, "RunTime", "UseFloatInComposite", 0))
+      {
+      this->CompositeWithFloatCheck->SetState(
+        pvwindow->GetIntRegisteryValue(2, "RunTime", "UseFloatInComposite"));
+      this->CompositeWithFloatCallback();
+      }
+    else
+      {
+      this->CompositeWithFloatCheck->SetState(0);
+      }
+    this->CompositeWithFloatCheck->SetBalloonHelpString(
+      "Toggle the use of char/float values when compositing. "
+      "If rendering defects occur, try turning this on.");
+  
+    this->CompositeWithRGBACheck->SetCommand(this, "CompositeWithRGBACallback");
+    if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
+                                                      "UseRGBAInComposite", 0))
+      {
+      this->CompositeWithRGBACheck->SetState(
+        pvwindow->GetIntRegisteryValue(2, "RunTime", "UseRGBAInComposite"));
+      this->CompositeWithRGBACallback();
+      }
+    else
+      {
+      this->CompositeWithRGBACheck->SetState(0);
+      }
+    this->CompositeWithRGBACheck->SetBalloonHelpString(
+      "Toggle the use of RGB/RGBA values when compositing. "
+      "This is here to bypass some bugs in some graphics card drivers.");
+
+    this->CompositeCompressionCheck->SetCommand(this, 
+                                                "CompositeCompressionCallback");
+    if (pvwindow && pvapp && 
+        pvapp->GetRegisteryValue(2, "RunTime",  "UseCompressionInComposite", 0))
+      {
+      this->CompositeCompressionCheck->SetState(
+        pvwindow->GetIntRegisteryValue(2, "RunTime", "UseCompressionInComposite"));
+      this->CompositeCompressionCallback();
+      }
+    else
+      {
+      this->CompositeCompressionCheck->SetState(1);
+      }
+    this->CompositeCompressionCheck->SetBalloonHelpString(
+      "Toggle the use of run length encoding when compositing. "
+      "This is here to compare performance.  "
+      "It should not change the final rendered image.");
+  
+    this->Script("pack %s %s %s %s %s %s %s %s %s -side top -anchor w",
+                 this->ParallelProjectionCheck->GetWidgetName(),
+                 this->TriangleStripsCheck->GetWidgetName(),
+                 this->ImmediateModeCheck->GetWidgetName(),
+                 this->ReductionCheck->GetWidgetName(),
+                 this->FrameRateFrame->GetWidgetName(),
+                 this->LODThresholdFrame->GetWidgetName(),
+                 this->InterruptRenderCheck->GetWidgetName(),
+                 this->CompositeWithFloatCheck->GetWidgetName(),
+                 this->CompositeWithRGBACheck->GetWidgetName(),
+                 this->CompositeCompressionCheck->GetWidgetName());
     }
   else
     {
-    this->InterruptRenderCheck->SetState(this->Composite->GetEnableAbort());
+    this->Script("pack %s %s %s %s -side top -anchor w",
+                 this->ParallelProjectionCheck->GetWidgetName(),
+                 this->TriangleStripsCheck->GetWidgetName(),
+                 this->ImmediateModeCheck->GetWidgetName(),
+                 this->LODThresholdFrame->GetWidgetName());
     }
-  this->InterruptRenderCheck->SetBalloonHelpString(
-    "Toggle the use of asynchronous MPI calls to interrupt renders. "
-    "When off, renders can not be interrupted.");
-  
-  this->CompositeWithFloatCheck->SetParent(
-    this->RenderParametersFrame->GetFrame());
-  this->CompositeWithFloatCheck->Create(this->Application, 
-                                        "-text \"Composite With Floats\"");
-  this->CompositeWithRGBACheck->SetParent(
-    this->RenderParametersFrame->GetFrame());
-  this->CompositeWithRGBACheck->Create(this->Application, 
-                                       "-text \"Composite RGBA\"");
-  this->CompositeCompressionCheck->SetParent(
-    this->RenderParametersFrame->GetFrame());
-  this->CompositeCompressionCheck->Create(this->Application, 
-                                          "-text \"Composite Compression\"");
-  
-  this->CompositeWithFloatCheck->SetCommand(this, "CompositeWithFloatCallback");
-  if (pvwindow && pvapp && 
-      pvapp->GetRegisteryValue(2, "RunTime", "UseFloatInComposite", 0))
-    {
-    this->CompositeWithFloatCheck->SetState(
-      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseFloatInComposite"));
-    this->CompositeWithFloatCallback();
-    }
-  else
-    {
-    this->CompositeWithFloatCheck->SetState(0);
-    }
-  this->CompositeWithFloatCheck->SetBalloonHelpString(
-    "Toggle the use of char/float values when compositing. "
-    "If rendering defects occur, try turning this on.");
-  
-  this->CompositeWithRGBACheck->SetCommand(this, "CompositeWithRGBACallback");
-  if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
-                                                    "UseRGBAInComposite", 0))
-    {
-    this->CompositeWithRGBACheck->SetState(
-      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseRGBAInComposite"));
-    this->CompositeWithRGBACallback();
-    }
-  else
-    {
-    this->CompositeWithRGBACheck->SetState(0);
-    }
-  this->CompositeWithRGBACheck->SetBalloonHelpString(
-    "Toggle the use of RGB/RGBA values when compositing. "
-    "This is here to bypass some bugs in some graphics card drivers.");
-
-  this->CompositeCompressionCheck->SetCommand(this, 
-                                              "CompositeCompressionCallback");
-  if (pvwindow && pvapp && 
-      pvapp->GetRegisteryValue(2, "RunTime",  "UseCompressionInComposite", 0))
-    {
-    this->CompositeCompressionCheck->SetState(
-      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseCompressionInComposite"));
-    this->CompositeCompressionCallback();
-    }
-  else
-    {
-    this->CompositeCompressionCheck->SetState(1);
-    }
-  this->CompositeCompressionCheck->SetBalloonHelpString(
-    "Toggle the use of run length encoding when compositing. "
-    "This is here to compare performance.  "
-    "It should not change the final rendered image.");
-
-  
-  this->Script("pack %s %s %s %s %s %s %s %s %s -side top -anchor w",
-               this->ParallelProjectionCheck->GetWidgetName(),
-               this->TriangleStripsCheck->GetWidgetName(),
-               this->ImmediateModeCheck->GetWidgetName(),
-               this->ReductionCheck->GetWidgetName(),
-               this->FrameRateFrame->GetWidgetName(),
-               this->InterruptRenderCheck->GetWidgetName(),
-               this->CompositeWithFloatCheck->GetWidgetName(),
-               this->CompositeWithRGBACheck->GetWidgetName(),
-               this->CompositeCompressionCheck->GetWidgetName());
-#else
-  this->Script("pack %s %s %s %s -side top -anchor w",
-               this->ParallelProjectionCheck->GetWidgetName(),
-               this->TriangleStripsCheck->GetWidgetName(),
-               this->ImmediateModeCheck->GetWidgetName(),
-               this->FrameRateFrame->GetWidgetName());
-
-#endif
 
   this->ParaViewOptionsFrame->SetParent(this->GeneralProperties);
   this->ParaViewOptionsFrame->ShowHideFrameOn();
@@ -1594,6 +1636,70 @@ void vtkPVRenderView::ImmediateModeCallback()
     }
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::LODThresholdScaleCallback()
+{
+  float value = this->LODThresholdScale->GetValue();
+  float threshold;
+
+  // Value should be between 0 and 18.
+  // producing threshold between 65Mil and 1.
+  threshold = exp(18.0 - value);
+  
+  // Use internal method so we do not reset the slider.
+  // I do not know if it would cause a problem, but ...
+  this->SetLODThresholdInternal(threshold);
+
+  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", threshold);
+  this->AddTraceEntry("$kw(%s) SetLODThreshold %d",
+                      this->GetTclName(), threshold);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetLODThreshold(int threshold)
+{
+  float value;
+  
+  value = 18.0 - log((double)(threshold));
+  this->LODThresholdScale->SetValue(value);
+
+  this->SetLODThresholdInternal(threshold);
+
+  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", threshold);
+  this->AddTraceEntry("$kw(%s) SetLODThreshold %d",
+                      this->GetTclName(), threshold);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetLODThresholdInternal(int threshold)
+{
+  vtkPVWindow *pvWin;
+  vtkPVSourceCollection *sources;
+  vtkPVSource *pvs;
+  vtkPVData *pvd;
+  vtkPVApplication *pvApp;
+
+  this->LODThreshold = threshold;
+
+  pvApp = this->GetPVApplication();
+  pvWin = this->GetPVWindow();
+  if (pvWin == NULL)
+    {
+    vtkErrorMacro("Missing window.");
+    return;
+    }
+  sources = pvWin->GetSourceList("Sources");
+  sources->InitTraversal();
+  while ( (pvs = sources->GetNextPVSource()) )
+    {
+    pvd = pvs->GetPVOutput();
+    // The performs the check and enables or disables decimation LOD.
+    pvd->UpdateProperties();
+    }
+}
+
+
 //----------------------------------------------------------------------------
 void vtkPVRenderView::InterruptRenderCallback()
 {
@@ -1870,7 +1976,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.179 $");
+  this->ExtractRevision(os,"$Revision: 1.180 $");
 }
 
 //------------------------------------------------------------------------------
@@ -1986,5 +2092,6 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
      << this->ManipulatorControl2D << endl;
   os << indent << "ManipulatorControl3D: " 
      << this->ManipulatorControl3D << endl;
+  os << indent << "LODThreshold: " << this->LODThreshold << endl;
 }
 

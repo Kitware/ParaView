@@ -1357,6 +1357,23 @@ void vtkPVData::UpdateProperties()
   int currentColorByFound = 0;
   vtkPVWindow *window;
 
+  // Set LOD based on point threshold of render view.
+  // This is imperfect because the critera is based on
+  // the data, not the rendered geometry.
+  // It the solution communication in the PVLodActor?
+  int numberOfPoints = this->GetNumberOfPoints();
+  if ( ! this->RenderOnlyLocally)
+    {
+    if (numberOfPoints > this->GetPVRenderView()->GetLODThreshold())
+      {
+      pvApp->BroadcastScript("%s EnableLODOn", this->PropTclName);
+      }
+    else
+      {
+      pvApp->BroadcastScript("%s EnableLODOff", this->PropTclName);
+      }
+    }
+
   if (this->PVColorMap)
     {
     float *range = this->PVColorMap->GetScalarRange();
@@ -1407,8 +1424,7 @@ void vtkPVData::UpdateProperties()
   sprintf(tmp, "number of cells: %d", 
           this->GetNumberOfCells());
   this->NumCellsLabel->SetLabel(tmp);
-  sprintf(tmp, "number of points: %d",
-          this->GetNumberOfPoints());
+  sprintf(tmp, "number of points: %d", numberOfPoints);
   this->NumPointsLabel->SetLabel(tmp);
   
   this->BoundsDisplay->SetBounds(bounds);
@@ -2442,6 +2458,7 @@ void vtkPVData::ChangeLineWidth()
 
 
 
+//----------------------------------------------------------------------------
 void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 {
   if (this->PropertiesParent == parent)
@@ -2737,7 +2754,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.131 $");
+  this->ExtractRevision(os,"$Revision: 1.132 $");
 }
 
 //----------------------------------------------------------------------------

@@ -68,6 +68,8 @@ vtkPVLODActor::vtkPVLODActor()
   m->Delete();
   
   this->LODMapper = NULL;
+
+  this->EnableLOD = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -92,7 +94,7 @@ vtkMapper *vtkPVLODActor::SelectMapper()
     return this->Mapper;
     }
 
-  if (vtkPVApplication::GetGlobalLODFlag())
+  if (this->EnableLOD && vtkPVApplication::GetGlobalLODFlag())
     {
     return this->LODMapper;
     }
