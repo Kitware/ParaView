@@ -14,6 +14,7 @@ vtkContainer.cxx
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkQueue
+  vtkContainer
   WRAP_EXCLUDE
   )
 
