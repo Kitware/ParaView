@@ -81,11 +81,6 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Enable/Disable this panel. This should propagate SetEnabled() calls to the
-  // internal widgets.
-  virtual void SetEnabled(int e);
-
-  // Description:
   // Set ShowSourcesDescription UI On/Off programmatically. 
   // Save the setting to registry.
   // Do not call vtkPVWindow::SetShowSourcesLongHelp(), since it
@@ -137,6 +132,10 @@ protected:
   vtkKWLabeledFrame *ToolbarSettingsFrame;
   vtkKWCheckButton  *FlatFrameCheckButton;
   vtkKWCheckButton  *FlatButtonsCheckButton;
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 private:
   vtkPVApplicationSettingsInterface(const vtkPVApplicationSettingsInterface&); // Not implemented

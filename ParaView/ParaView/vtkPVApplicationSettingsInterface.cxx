@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.3");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.4");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -128,6 +128,8 @@ void vtkPVApplicationSettingsInterface::SetWindow(vtkPVWindow *arg)
     }
   this->Window = arg;
   this->Modified();
+
+  this->Update();
 }
 
 // ---------------------------------------------------------------------------
@@ -136,13 +138,6 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   if (this->IsCreated())
     {
     vtkErrorMacro("The panel is already created.");
-    return;
-    }
-
-  if (!this->Window)
-    {
-    vtkErrorMacro("A Window (vtkPVWindow) must be associated to the panel "
-                  "before it is created.");
     return;
     }
 
@@ -325,6 +320,10 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   tk_cmd << ends;
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
+
+  // Update according to the current Window
+
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -432,37 +431,37 @@ void vtkPVApplicationSettingsInterface::FlatButtonsCallback()
 }
 
 //------------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::SetEnabled(int e)
+void vtkPVApplicationSettingsInterface::UpdateEnableState()
 {
-  this->Superclass::SetEnabled(e);
+  this->Superclass::UpdateEnableState();
 
   // Interface settings
 
   if (this->ShowSourcesDescriptionCheckButton)
     {
-    this->ShowSourcesDescriptionCheckButton->SetEnabled(e);
+    this->ShowSourcesDescriptionCheckButton->SetEnabled(this->Enabled);
     }
 
   if (this->ShowSourcesNameCheckButton)
     {
-    this->ShowSourcesNameCheckButton->SetEnabled(e);
+    this->ShowSourcesNameCheckButton->SetEnabled(this->Enabled);
     }
 
   // Toolbar settings
 
   if (this->ToolbarSettingsFrame)
     {
-    this->ToolbarSettingsFrame->SetEnabled(e);
+    this->ToolbarSettingsFrame->SetEnabled(this->Enabled);
     }
 
   if (this->FlatFrameCheckButton)
     {
-    this->FlatFrameCheckButton->SetEnabled(e);
+    this->FlatFrameCheckButton->SetEnabled(this->Enabled);
     }
 
   if (this->FlatButtonsCheckButton)
     {
-    this->FlatButtonsCheckButton->SetEnabled(e);
+    this->FlatButtonsCheckButton->SetEnabled(this->Enabled);
     }
 }
 
