@@ -1557,6 +1557,18 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
    <!-- End Meta Image Reader -->
+
    </SourceProxy>
+   <SourceProxy name="PNGReader" 
+                class="vtkPNGReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+   <!-- End PNGReader -->
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>

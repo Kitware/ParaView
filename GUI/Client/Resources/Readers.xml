@@ -579,4 +579,12 @@
           file_description="Meta Image Data Files">
     <Source class="vtkMetaImageReader"/>
   </Module>
+  <Module name="PNGReader"
+          root_name="PNGReader"
+          class="vtkPVReaderModule"
+          module_type="Reader"
+          extensions=".png"
+          file_description="PNG Image Files">
+    <Source class="vtkPNGReader"/>
+  </Module>
 </ModuleInterfaces>
