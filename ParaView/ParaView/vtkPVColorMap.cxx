@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.10");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.11");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -337,15 +337,15 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // Not actually parallel.  Only on process 0.
   sprintf(tclName, "ScalarBar%d", this->InstanceCount);
   this->SetScalarBarTclName(tclName);
-  this->Script("vtkScalarBarActor %s", this->GetScalarBarTclName());
+  this->Script("vtkScalarBarActor %s", this->ScalarBarTclName);
   this->Script("[%s GetPositionCoordinate] SetCoordinateSystemToNormalizedViewport",
-               this->GetScalarBarTclName());
+               this->ScalarBarTclName);
   this->Script("[%s GetPositionCoordinate] SetValue 0.87 0.25",
-               this->GetScalarBarTclName());
+               this->ScalarBarTclName);
   this->Script("%s SetOrientationToVertical",
-               this->GetScalarBarTclName());
-  this->Script("%s SetWidth 0.13", this->GetScalarBarTclName());
-  this->Script("%s SetHeight 0.5", this->GetScalarBarTclName());
+               this->ScalarBarTclName);
+  this->Script("%s SetWidth 0.13", this->ScalarBarTclName);
+  this->Script("%s SetHeight 0.5", this->ScalarBarTclName);
 
   this->UpdateScalarBarTitle();
   
@@ -733,7 +733,7 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
     {
     if (val)
       {
-      this->Script("%s AddActor %s", tclName, this->GetScalarBarTclName());
+      this->Script("%s AddActor %s", tclName, this->ScalarBarTclName);
       // This is here in case process 0 has not geometry.  
       // We have to explicitly build the color map.
       this->Script("%s Build", this->LookupTableTclName);
@@ -741,7 +741,7 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
       }
     else
       {
-      this->Script("%s RemoveActor %s", tclName, this->GetScalarBarTclName());
+      this->Script("%s RemoveActor %s", tclName, this->ScalarBarTclName);
       }
     }
 
@@ -763,19 +763,19 @@ void vtkPVColorMap::SetScalarBarOrientation(int vertical)
     {
     this->ScalarBarOrientationCheck->SetState(1);
     this->Script("[%s GetPositionCoordinate] SetValue 0.87 0.25",
-                 this->GetScalarBarTclName());
-    this->Script("%s SetOrientationToVertical", this->GetScalarBarTclName());
-    this->Script("%s SetHeight 0.5", this->GetScalarBarTclName());
-    this->Script("%s SetWidth 0.13", this->GetScalarBarTclName());
+                 this->ScalarBarTclName);
+    this->Script("%s SetOrientationToVertical", this->ScalarBarTclName);
+    this->Script("%s SetHeight 0.5", this->ScalarBarTclName);
+    this->Script("%s SetWidth 0.13", this->ScalarBarTclName);
     }
   else
     {
     this->ScalarBarOrientationCheck->SetState(0);
     this->Script("[%s GetPositionCoordinate] SetValue 0.25 0.13",
-                 this->GetScalarBarTclName());
-    this->Script("%s SetOrientationToHorizontal", this->GetScalarBarTclName());
-    this->Script("%s SetHeight 0.13", this->GetScalarBarTclName());
-    this->Script("%s SetWidth 0.5", this->GetScalarBarTclName());
+                 this->ScalarBarTclName);
+    this->Script("%s SetOrientationToHorizontal", this->ScalarBarTclName);
+    this->Script("%s SetHeight 0.13", this->ScalarBarTclName);
+    this->Script("%s SetWidth 0.5", this->ScalarBarTclName);
     }
   this->GetPVRenderView()->EventuallyRender();
 
