@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.14");
+vtkCxxRevisionMacro(vtkPVPick, "1.15");
 
 
 //----------------------------------------------------------------------------
@@ -52,11 +52,14 @@ vtkPVPick::vtkPVPick()
   this->DisplayHasBeenAddedToTheRenderModule = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkPVPick::~vtkPVPick()
 {  
-  if (this->GetPVApplication() && this->GetPVApplication()->GetProcessModule()->GetRenderModule())
+  if (this->GetPVApplication() 
+   && this->GetPVApplication()->GetProcessModule()->GetRenderModule())
     {
-    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PointLabelDisplay);
+    this->GetPVApplication()->GetProcessModule()->
+      GetRenderModule()->RemoveDisplay(this->PointLabelDisplay);
     }
 
   this->PointLabelDisplay->SetVisibility(0);
@@ -108,7 +111,8 @@ void vtkPVPick::AcceptCallbackInternal()
     // Connect to the display.
     // These should be merged.
     this->PointLabelDisplay->SetInput(this->GetProxy());
-    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PointLabelDisplay);
+    this->GetPVApplication()->GetProcessModule()->
+      GetRenderModule()->AddDisplay(this->PointLabelDisplay);
     this->DisplayHasBeenAddedToTheRenderModule = 1;
     }
 

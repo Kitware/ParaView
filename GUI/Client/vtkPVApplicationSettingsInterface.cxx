@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.17");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.18");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -269,7 +269,7 @@ void vtkPVApplicationSettingsInterface::SetAutoAccept(int val)
     return;
     }
   this->AutoAccept = val;
-  vtkPVApplication *app =vtkPVApplication::SafeDownCast(this->GetApplication());
+  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
   if (app)
     {
     app->GetMainView()->GetSourceNotebook()->SetAutoAccept(val);
