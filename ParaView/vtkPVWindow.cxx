@@ -51,6 +51,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVRunTimeContour.h"
 #include "vtkSuperquadricSource.h"
 
+
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
 {
@@ -763,12 +764,12 @@ void vtkPVWindow::Save()
   
   fprintf(cameraFile, "position %.6f %.6f %.6f\n", position[0], position[1],
 	  position[2]);
-  fprintf(cameraFile, "focal point %.6f %.6f %.6f\n", focalPoint[0],
+  fprintf(cameraFile, "focal_point %.6f %.6f %.6f\n", focalPoint[0],
 	  focalPoint[1], focalPoint[2]);
-  fprintf(cameraFile, "view up %.6f %.6f %.6f\n", viewUp[0], viewUp[1],
+  fprintf(cameraFile, "view_up %.6f %.6f %.6f\n", viewUp[0], viewUp[1],
 	  viewUp[2]);
-  fprintf(cameraFile, "view angle %.6f\n", viewAngle);
-  fprintf(cameraFile, "clipping range %.6f %.6f", clippingRange[0],
+  fprintf(cameraFile, "view_angle %.6f\n", viewAngle);
+  fprintf(cameraFile, "clipping_range %.6f %.6f", clippingRange[0],
 	  clippingRange[1]);
 
   fclose (cameraFile);
