@@ -314,7 +314,8 @@ void vtkFastGeometryFilter::ExecuteFace(vtkDataSet *input, int maxFlag, int *ext
     {
     for (ib = ext[bA2]; ib <= ext[bA2+1]; ++ib)
       {
-      inId = inStartPtId + ib*pInc[bAxis] + ic*pInc[cAxis];
+      inId = inStartPtId + (ib-ext[bA2])*pInc[bAxis] 
+                         + (ic-ext[cA2])*pInc[cAxis];
       input->GetPoint(inId, pt);
       outId = outPts->InsertNextPoint(pt);
       // Copy point data.
@@ -334,7 +335,7 @@ void vtkFastGeometryFilter::ExecuteFace(vtkDataSet *input, int maxFlag, int *ext
     {
     // Fill in the array describing the strips.
     stripArrayIdx = 0;
-    outPtId = outStartPtId + ic*cOutInc;
+    outPtId = outStartPtId + (ic-ext[cA2])*cOutInc;
     if (rotatedFlag)
       {
       for (ib = ext[bA2]; ib <= ext[bA2+1]; ++ib)
@@ -364,8 +365,8 @@ void vtkFastGeometryFilter::ExecuteFace(vtkDataSet *input, int maxFlag, int *ext
     {
     for (ib = ext[bA2]; ib < ext[bA2+1]; ++ib)
       {
-      outPtId = outStartPtId + ib + ic*cOutInc;
-      inId = inStartCellId + ib*qInc[bAxis] + ic*qInc[cAxis];
+      outPtId = outStartPtId + (ib-ext[bA2]) + (ic-ext[cA2])*cOutInc;
+      inId = inStartCellId + (ib-ext[bA2])*qInc[bAxis] + (ic-ext[cA2])*qInc[cAxis];
 
       //newPolys->InsertNextCell(ptsPerStrip, ptidx);
 
