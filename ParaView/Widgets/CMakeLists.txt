@@ -20,7 +20,6 @@ vtkKWEntry.cxx
 vtkKWExtent.cxx 
 vtkKWFrame.cxx
 vtkKWGenericComposite.cxx 
-vtkKWImageLabel.cxx
 vtkKWLabel.cxx
 vtkKWLabeledCheckButton.cxx
 vtkKWLabeledCheckButtonSet.cxx 
