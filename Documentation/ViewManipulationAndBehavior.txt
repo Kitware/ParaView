@@ -14,4 +14,15 @@ The "Fly" interactor  causes the view to move toward where the cursor is pointin
 
 RotateButton.jpg
 
-The "Rotate" interactor is the default interactor.  Its behavior also depends on  where the cursor is position over the view.
+The "Rotate" interactor is the default interactor.  Its behavior also depends on  where the cursor is position over the view.  The left mouse button rotates around the center of rotation.  The center of rotation is indicated by the cross hairs in the view.  You can change the center of rotation using the center of rotation toolbar.  Reset puts the center of rotation in the current view.  You can also select the center of rotation by selecting the pick-center-of-rotation icon.  There is also an entry available to manually select the center of roation point.
+
+There are two options for rotation that depend on when you first click in the view.  When you mouse near the center of rotation, you get the standard rotation around the view's X and Y axes.  When you start rotation by clicking far from the center of rotation, the you get a roll behavior which is rotation around the views Z axis.
+
+For convienience, in the rotation interactor state, the right mouse button behaves like the translation interactor.
+
+TranslateButton.jpg
+
+The translate interactor allows you to pan the view.  Once again, its behavior depends on where you first click on the view.  When you click in upper or lower thirds of the view, you get a zooming behavor which moves the view along it's Z axis.  Clicking in the middle third of the view gives a paning interaction which translates the view along its X and Y axes.
+
+
+
