@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.19");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.20");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1565,22 +1565,30 @@ void vtkPVWindow::PlayDemo()
 
   // First look in the registery
   char loc[1024];
-  char temp[1024];
   
-  vtkKWRegisteryUtilities *reg = this->GetApplication()->GetRegistery();
-  sprintf(temp, "%i", this->GetApplication()->GetApplicationKey());
-  reg->SetTopLevel(temp);
-  if (reg->ReadValue("Inst", loc, "Loc"))
+  vtkKWApplication* app = this->GetApplication();
+  vtkKWRegisteryUtilities *reg = app->GetRegistery();
+  if (!app->GetRegisteryValue(2, "Setup", "InstalledPath", 0))
     {
-    sprintf(temp1,"%s/Demo1.pvs",loc);
+    app->GetRegistery()->SetGlobalScope(1);
     }
 
-  if (stat(temp1, &fs) == 0) 
+  if (app->GetRegisteryValue(2, "Setup", "InstalledPath", loc))
     {
-    this->Script("set DemoDir %s", loc);
-    this->LoadScript(temp1);
-    found=1;
+    sprintf(temp1,"%s/Demos/Demo1.pvs",loc);
+    if (stat(temp1, &fs) == 0) 
+      {
+      int len=strlen(loc);
+      for(int i=0; i<len; i++)
+        {
+        if (loc[i] == '\\') { loc[i] = '/';}
+        }
+      this->Script("set DemoDir %s/Demos", loc);
+      this->LoadScript(temp1);
+      found=1;
+      }
     }
+  app->GetRegistery()->SetGlobalScope(0);
 
 #else
 
@@ -1607,16 +1615,20 @@ void vtkPVWindow::PlayDemo()
 
 #endif // _WIN32  
 
-  // Look in binary and installation directories
-  const char** dir;
-  for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
+  if (!found)
     {
-    sprintf(temp1, "%s/Demo1.pvs", *dir);
-    if (stat(temp1, &fs) == 0) 
+    // Look in binary and installation directories
+    const char** dir;
+    for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
       {
-      this->Script("set DemoDir %s", *dir);
-      this->LoadScript(temp1);
-      found=1;
+      sprintf(temp1, "%s/Demo1.pvs", *dir);
+      if (stat(temp1, &fs) == 0) 
+        {
+        this->Script("set DemoDir %s", *dir);
+        this->LoadScript(temp1);
+        found=1;
+        break;
+        }
       }
     }
 
@@ -3856,7 +3868,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.19 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.20 $");
 }
 
 //----------------------------------------------------------------------------
