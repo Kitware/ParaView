@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21.2.6");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21.2.7");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -716,12 +716,6 @@ void vtkPVServerFileDialog::ExtensionsMenuButtonCallback(int typeIdx)
   vtkstd::string extensions = this->FileTypeStrings->GetString(typeIdx);
   for(unsigned int i = 0; i < extensions.length(); ++i)
     {
-    // Since we formated the string, we know that extensions always
-    // start with "*."  But, lets be general and handle spaces.
-    while(i < extensions.length() && extensions[i] == ' ')
-      {
-      ++i;
-      }
     if(i < extensions.length() && extensions[i] == '*')
       {
       ++i;
@@ -732,7 +726,11 @@ void vtkPVServerFileDialog::ExtensionsMenuButtonCallback(int typeIdx)
       }
     
     unsigned int extensionStart = i;
+#ifdef _WIN32
     while(i < extensions.length() && extensions[i] != ';')
+#else
+    while(i < extensions.length() && extensions[i] != ' ')
+#endif
       {
       ++i;
       }
@@ -795,7 +793,7 @@ void vtkPVServerFileDialog::UpdateExtensionsMenu()
   delete [] stringsTcl;
   delete [] descriptionsTcl;
   
-  const int maxExtensionsLength = 16;
+  const unsigned int maxExtensionsLength = 16;
   for(int i=0; i < this->FileTypeStrings->GetNumberOfStrings(); ++i)
     {
     ostrstream label;
@@ -865,7 +863,6 @@ int vtkPVServerFileDialog::CheckExtension(const char* name)
     {
     return 0;
     }
-
   for (idx = 0; idx < num; ++idx)
     {
     ext = this->ExtensionStrings->GetString(idx);
