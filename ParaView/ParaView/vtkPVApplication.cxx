@@ -120,7 +120,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.6");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.7");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1346,6 +1346,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
       {
       unlink(traceName);
       }
+    // Having trouble with tiled display.
+    // Not all tiles rendered properly after this dialoge at startup.
+    // It must have been a race condition.
+    this->GetMainView()->EventuallyRender();
     }
 
   // Open the trace file.
