@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.273");
+vtkCxxRevisionMacro(vtkPVSource, "1.274");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -111,8 +111,7 @@ vtkPVSource::vtkPVSource()
 
   this->PVInputs = NULL;
   this->NumberOfPVInputs = 0;
-  this->PVOutputs = NULL;
-  this->NumberOfPVOutputs = 0;
+  this->PVOutput = NULL;
 
   // The underlying VTK object. This will change. PVSource will
   // support multiple VTK sources/filters.
@@ -171,23 +170,7 @@ vtkPVSource::~vtkPVSource()
 {
   int i;
   
-  for (i = 0; i < this->NumberOfPVOutputs; i++)
-    {
-    if (this->PVOutputs[i])
-      {
-      this->PVOutputs[i]->UnRegister(this);
-      this->PVOutputs[i] = NULL;
-      }
-    }
-  
-  if (this->PVOutputs)
-    {
-    delete [] this->PVOutputs;
-    this->PVOutputs = 0;
-    }
-  
-  this->NumberOfPVOutputs = 0;
-  
+  this->SetPVOutput(NULL);  
   this->RemoveAllPVInputs();
 
   // We need to delete the Tcl object too.  This call does it.
@@ -388,12 +371,6 @@ void vtkPVSource::SetPVInput(int idx, vtkPVData *pvd)
 
   this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
 
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::SetPVOutput(vtkPVData *pvd)
-{
-  this->SetNthPVOutput(0, pvd);
 }
 
 //----------------------------------------------------------------------------
@@ -819,7 +796,6 @@ void vtkPVSource::Select()
   // which is now just another pvWidget.
   this->UpdateParameterWidgets();
   
-  // This assumes that a source only has one output.
   data = this->GetPVOutput();
   if (data)
     {
@@ -969,29 +945,18 @@ void vtkPVSource::LabelEntryCallback()
 }
 
 //----------------------------------------------------------------------------
-// We should really be dealing with the outputs.  Remove this method.
 void vtkPVSource::SetVisibility(int v)
 {
-  int i;
-  vtkPVData *ac;
-  
-  for (i = 0; i < this->NumberOfPVOutputs; ++i)
+  if (this->PVOutput)
     {
-    if (this->PVOutputs[i])
-      {
-      ac = this->PVOutputs[i];
-      if (ac)
-        {
-        ac->SetVisibility(v);
-        }
-      }
+    this->PVOutput->SetVisibility(v);
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkPVSource::GetVisibility()
 {
-  if ( this->GetPVOutput(0) && this->GetPVOutput(0)->GetVisibility() )
+  if ( this->GetPVOutput() && this->GetPVOutput()->GetVisibility() )
     {
     return 1;
     }
@@ -1074,7 +1039,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // Moved from creation of the source. (InitializeClone)
   // Initialize the output if necessary.
   // This has to be after the widgets are accepted (UpdateVTKSOurceParameters)
-  // because they can change the number of outputs.
+  // because they can change the number of parts.
   if ( ! this->Initialized)
     { // This is the first time, create the data.
     this->InitializeData();
@@ -1085,7 +1050,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     { // This is the first time, initialize data.    
     vtkPVData *pvd;
     
-    pvd = this->GetPVOutput(0);
+    pvd = this->GetPVOutput();
     if (pvd == NULL)
       { // I suppose we should try and delete the source.
       vtkErrorMacro("Could not get output.");
@@ -1130,7 +1095,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // Set the current data of the window.
     if ( ! hideFlag)
       {
-      window->SetCurrentPVData(this->GetNthPVOutput(0));
+      window->SetCurrentPVData(this->GetPVOutput());
       }
     else
       {
@@ -1178,6 +1143,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       {
       part = pvd->GetPVPart(idx);
       // This has a side effect of gathering and displaying information.
+      // Should this be part->Update() !!!!!!!!!!!!!!??????
       this->GetPVOutput()->GetPVPart()->Update();
       }
     pvd->UpdateProperties();
@@ -1249,30 +1215,6 @@ void vtkPVSource::DeleteCallback()
     return;
     }
   
-  // Remove all the dummy pvsources attached as
-  // connections to each output (only when there
-  // are multiple outputs)
-  int numOutputs = this->GetNumberOfPVOutputs();
-  if (numOutputs > 1)
-   {
-   for (i=0; i<numOutputs; i++)
-     {
-     vtkPVData* output = this->GetPVOutput(i);
-     if ( output )
-       {
-       int numCons2= output->GetNumberOfPVConsumers();
-       for (int j=0; j<numCons2; j++)
-         {
-         vtkPVSource* consumer = output->GetPVConsumer(j);
-         if ( consumer )
-           {
-           consumer->DeleteCallback();
-           }
-         }
-       }
-     }
-   }
-
   // Save this action in the trace file.
   this->GetPVApplication()->AddTraceEntry("$kw(%s) DeleteCallback",
                                           this->GetTclName());
@@ -1350,24 +1292,12 @@ void vtkPVSource::DeleteCallback()
     }
         
   // Remove all of the actors mappers. from the renderer.
-  for (i = 0; i < this->NumberOfPVOutputs; ++i)
+  if (this->PVOutput)
     {
-    if (this->PVOutputs[i])
-      {
-      ac = this->GetPVOutput(i);
-      this->GetPVRenderView()->RemovePVData(ac);
-      }
+    this->GetPVRenderView()->RemovePVData(this->PVOutput);
     }    
 
-  // Remove all of the outputs
-  for (i = 0; i < this->NumberOfPVOutputs; ++i)
-    {
-    if (this->PVOutputs[i])
-      {
-      this->PVOutputs[i]->UnRegister(this);
-      this->PVOutputs[i] = NULL;
-      }
-    }
+  this->SetPVOutput(NULL);
   
   if ( initialized )
     {
@@ -1445,36 +1375,9 @@ void vtkPVSource::UpdateVTKSourceParameters()
 // attached to each of the outputs.
 int vtkPVSource::GetNumberOfPVConsumers()
 {
-
- int numOutputs = this->GetNumberOfPVOutputs();
- if (numOutputs > 1)
+ if ( this->PVOutput )
    {
-   int numConsumers = 0;
-   for (int i=0; i<numOutputs; i++)
-     {
-     vtkPVData* output = this->GetPVOutput(i);
-     if ( output )
-       {
-       int numCons2= output->GetNumberOfPVConsumers();
-       for (int j=0; j<numCons2; j++)
-         {
-         vtkPVSource* consumer = output->GetPVConsumer(j);
-         if ( consumer )
-           {
-           numConsumers += consumer->GetNumberOfPVConsumers();
-           }
-         }
-       }
-     }
-   return numConsumers;
-   }
- else
-   {
-   vtkPVData* output0 = this->GetPVOutput(0);
-   if ( output0 )
-     {
-     return output0->GetNumberOfPVConsumers();
-     }
+   return this->PVOutput->GetNumberOfPVConsumers();
    }
 
  return 0;
@@ -1639,80 +1542,28 @@ vtkPVData *vtkPVSource::GetNthPVInput(int idx)
   return (vtkPVData *)(this->PVInputs[idx]);
 }
 
-//---------------------------------------------------------------------------
-void vtkPVSource::SetNumberOfPVOutputs(int num)
-{
-  int idx;
-  vtkPVDataPointer *outputs;
-
-  // in case nothing has changed.
-  if (num == this->NumberOfPVOutputs)
-    {
-    return;
-    }
-  
-  // Allocate new arrays.
-  outputs = new vtkPVDataPointer[num];
-
-  // Initialize with NULLs.
-  for (idx = 0; idx < num; ++idx)
-    {
-    outputs[idx] = NULL;
-    }
-
-  // Copy old outputs
-  for (idx = 0; idx < num && idx < this->NumberOfPVOutputs; ++idx)
-    {
-    outputs[idx] = this->PVOutputs[idx];
-    }
-  
-  // delete the previous arrays
-  if (this->PVOutputs)
-    {
-    delete [] this->PVOutputs;
-    this->PVOutputs = NULL;
-    this->NumberOfPVOutputs = 0;
-    }
-  
-  // Set the new array
-  this->PVOutputs = outputs;
-  
-  this->NumberOfPVOutputs = num;
-  this->Modified();
-}
 
 //---------------------------------------------------------------------------
-void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *pvd)
-{
-  if (idx < 0)
-    {
-    vtkErrorMacro(<< "SetNthPVOutput: " << idx << ", cannot set output. ");
-    return;
-    }
-  
-  if (this->NumberOfPVOutputs <= idx)
-    {
-    this->SetNumberOfPVOutputs(idx+1);
-    }
-  
+void vtkPVSource::SetPVOutput(vtkPVData *pvd)
+{  
   // Does this change anything?  Yes, it keeps the object from being modified.
-  if (pvd == this->PVOutputs[idx])
+  if (pvd == this->PVOutput)
     {
     return;
     }
   
-  if (this->PVOutputs[idx])
+  if (this->PVOutput)
     {
     // Manage backward pointer.
-    this->PVOutputs[idx]->SetPVSource(this);
-    this->PVOutputs[idx]->UnRegister(this);
-    this->PVOutputs[idx] = NULL;
+    this->PVOutput->SetPVSource(this);
+    this->PVOutput->UnRegister(this);
+    this->PVOutput = NULL;
     }
   
   if (pvd)
     {
     pvd->Register(this);
-    this->PVOutputs[idx] = pvd;
+    this->PVOutput = pvd;
     // Manage backward pointer.
     pvd->SetPVSource(this);
     }
@@ -1720,16 +1571,6 @@ void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *pvd)
   this->Modified();
 }
 
-//---------------------------------------------------------------------------
-vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
-{
-  if (idx >= this->NumberOfPVOutputs)
-    {
-    return NULL;
-    }
-  
-  return (vtkPVData *)(this->PVOutputs[idx]);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveInBatchScript(ofstream *file)
@@ -2544,7 +2385,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.273 $");
+  this->ExtractRevision(os,"$Revision: 1.274 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2571,8 +2412,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "NumberOfPVInputs: " << this->GetNumberOfPVInputs() << endl;
-  os << indent << "NumberOfPVOutputs: " << this->GetNumberOfPVOutputs() 
-     << endl;
   os << indent << "ParameterFrame: " << this->GetParameterFrame() << endl;
   os << indent << "ParametersParent: " << this->GetParametersParent() << endl;
   os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
@@ -2586,6 +2425,8 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HideDisplayPage: " << this->HideDisplayPage << endl;
   os << indent << "HideInformationPage: " << this->HideInformationPage << endl;
   os << indent << "ToolbarModule: " << this->ToolbarModule << endl;
+
+  os << indent << "PVOutput: " << this->PVOutput << endl;
 
   os << indent << "VTKMultipleInputsFlag: " << this->VTKMultipleInputsFlag << endl;
   os << indent << "InputProperties: \n";

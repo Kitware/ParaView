@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.6");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.7");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -137,14 +137,12 @@ void vtkPVGroupInputsWidget::Inactivate()
 //----------------------------------------------------------------------------
 void vtkPVGroupInputsWidget::AcceptInternal(const char* vtkSourceTclName)
 {
-  int numParts, partIdx;
   int num, idx, count;
   int state;
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
   vtkPVData *pvd;
-  vtkPVPart *part;
 
   pvWin = this->PVSource->GetPVWindow();
   sources = pvWin->GetSourceList("Sources");

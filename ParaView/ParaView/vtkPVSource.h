@@ -44,9 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This is a parallel object.  It needs to be cloned to work correctly.  
 // After cloning, the parallel nature of the object is transparent.
 // This class should probably be merged with vtkPVComposite.
-// Note when there are multiple outputs, a dummy pvsource has to
-// be attached to each of those. This way, the user can add modules
-// after each output.
 
 
 #ifndef __vtkPVSource_h
@@ -123,15 +120,7 @@ public:
   // Set/get the first output of this source. Most source are setup
   // with only one output.
   void SetPVOutput(vtkPVData *pvd);
-  vtkPVData* GetPVOutput() { return this->GetNthPVOutput(0);}
-
-  // Description:
-  // Set/get the nth output of this source. These are not commonly
-  // used since most of the source have only one output.
-  void SetPVOutput(int idx, vtkPVData *pvd) {this->SetNthPVOutput(idx,pvd);}
-  vtkPVData *GetPVOutput(int idx) { return this->GetNthPVOutput(idx); }
-  vtkGetMacro(NumberOfPVOutputs, int);
-  vtkPVData *GetNthPVOutput(int idx);
+  vtkGetObjectMacro(PVOutput,vtkPVData);
  
   // Description:
   // This name is used in the source list to identify this source.
@@ -253,7 +242,6 @@ public:
   // Description:
   // These are used for drawing the navigation window.
   vtkPVData **GetPVInputs() { return this->PVInputs; };
-  vtkPVData **GetPVOutputs() { return this->PVOutputs; };
 
   // Description:
   // The notebook that is displayed when the source is selected.
@@ -466,10 +454,8 @@ protected:
   vtkCollection *VTKSources;
   vtkStringList *VTKSourceTclNames;
 
-  // Called to allocate the output array.  Copies old outputs.
-  void SetNumberOfPVOutputs(int num);
-  vtkPVData **PVOutputs;
-  int NumberOfPVOutputs;  
+  // One output. Now used only to hold UI
+  vtkPVData *PVOutput;
   
   // Called to allocate the input array.  Copies old inputs.
   void SetNumberOfPVInputs(int num);
@@ -478,8 +464,6 @@ protected:
   vtkPVData *GetNthPVInput(int idx);
   void SetNthPVInput(int idx, vtkPVData *input);
    
-  void SetNthPVOutput(int idx, vtkPVData *output);
-
   void UpdateDescriptionFrame();
   
   // The real AcceptCallback method.

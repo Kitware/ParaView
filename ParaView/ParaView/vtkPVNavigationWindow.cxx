@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );
-vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.18");
+vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.19");
 
 //-----------------------------------------------------------------------------
 vtkPVNavigationWindow::vtkPVNavigationWindow()
@@ -73,7 +73,7 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
 {
   vtkPVSource *source;
   vtkPVData **inputs = currentSource->GetPVInputs();
-  vtkPVData **outputs;
+  vtkPVData *output;
   int numInputs, xMid, yMid=0, y, i;
   int bboxIn[4], bboxOut[4], bboxSource[4];
   vtkPVData *moreOut;
@@ -189,12 +189,11 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
     }
 
   // Put the outputs in the canvas.
-  outputs = currentSource->GetPVOutputs();
-  int numOutputs = currentSource->GetNumberOfPVOutputs();
-  if (outputs)
+  output = currentSource->GetPVOutput();
+  if (output)
     {
     y = 10;
-    if (outputs[0])
+    if (output)
       {
       // only want to set xMid  once
       xMid = bboxSource[2] + 25;
@@ -207,28 +206,10 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
       // 2. If there is only one output, we display all the consumers
       // of that output
       int num;
-      if (numOutputs > 1)
-        {
-        num = numOutputs;
-        }
-      else
-        {
-        num = outputs[0]->GetNumberOfPVConsumers();
-        }
+      num = output->GetNumberOfPVConsumers();
       for (i = 0; i < num; i++)
         {
-        if (numOutputs > 1)
-          {
-          if ( outputs[i]->GetNumberOfPVConsumers() == 0 )
-            {
-            continue;
-            }
-          source = outputs[i]->GetPVConsumer(0);
-          }
-        else
-          {
-          source = outputs[0]->GetPVConsumer(i);
-          }
+        source = output->GetPVConsumer(i);
         
         // Draw the name of the assembly .
         char *otext = this->GetTextRepresentation(source);
@@ -285,7 +266,7 @@ void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
                        this->Canvas->GetWidgetName(), xMid, yMid,
                        bboxOut[0], yMid);
           }
-        if ((moreOut = source->GetPVOutput(0)))
+        if ((moreOut = source->GetPVOutput()))
           {
           if (moreOut->GetNumberOfPVConsumers() > 0)
             {

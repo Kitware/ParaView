@@ -18,14 +18,14 @@ set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone]
 set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere]
 set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource Axes]
 $pv(vtkTemp98) AcceptCallback
-[$pv(vtkTemp98) GetPVOutput 0] SetLineWidth 3
+[$pv(vtkTemp98) GetPVOutput] SetLineWidth 3
 set pv(vtkTemp168) [$pv(vtkTemp1) CreatePVSource Axes]
 set pv(vtkTemp183) [$pv(vtkTemp168) GetPVWidget {Origin}]
 $pv(vtkTemp183) SetValue 0 3 0
 set pv(vtkTemp188) [$pv(vtkTemp168) GetPVWidget {Symmetric}]
 $pv(vtkTemp188) SetState 1
 $pv(vtkTemp168) AcceptCallback
-[$pv(vtkTemp168) GetPVOutput 0] SetLineWidth 3
+[$pv(vtkTemp168) GetPVOutput] SetLineWidth 3
 $pv(vtkTemp1) ResetCameraCallback
 $pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourcePropertiesCallback

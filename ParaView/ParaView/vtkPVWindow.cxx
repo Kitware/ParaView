@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.421");
+vtkCxxRevisionMacro(vtkPVWindow, "1.422");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4046,7 +4046,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.421 $");
+  this->ExtractRevision(os,"$Revision: 1.422 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -4349,7 +4349,7 @@ void vtkPVWindow::DeleteSourceAndOutputs(vtkPVSource* source)
     }
   while ( source->GetNumberOfPVConsumers() > 0 )
     {
-    vtkPVData* output = source->GetNthPVOutput(0);
+    vtkPVData* output = source->GetPVOutput();
     if ( output && output->GetPVSource() )
       {
       this->DeleteSourceAndOutputs(output->GetPVSource());

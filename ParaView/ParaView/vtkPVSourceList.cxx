@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.30");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.31");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -256,25 +256,21 @@ void vtkPVSourceList::Pick(int compIdx)
 void vtkPVSourceList::ToggleVisibility(int compIdx, char* id, int )
 {
   vtkPVSource *comp;
-  int i;
 
   comp = vtkPVSource::SafeDownCast(
     this->Sources->GetItemAsObject(compIdx));
   if (comp && !comp->GetHideDisplayPage())
     {
     // Toggle visibility
-    for (i = 0; i < comp->GetNumberOfPVOutputs(); i++)
+    if (comp->GetPVOutput()->GetVisibility())
       {
-      if (comp->GetPVOutput(i)->GetVisibility())
-        {
-        comp->GetPVOutput(i)->VisibilityOff();
-        }
-      else
-        {
-        comp->GetPVOutput(i)->VisibilityOn();
-        }
+      comp->GetPVOutput()->VisibilityOff();
       }
-
+    else
+      {
+      comp->GetPVOutput()->VisibilityOn();
+      }
+    
     this->UpdateVisibility(comp, id);
 
     vtkPVRenderView* renderView 
@@ -376,7 +372,7 @@ void vtkPVSourceList::UpdateVisibility(vtkPVSource *comp,
     }
   else
     {
-    if (comp->GetPVOutput(0) == NULL)
+    if (comp->GetPVOutput() == NULL)
       {
       this->Script("%s itemconfigure %s -image %s.visonimg",
                    this->Canvas->GetWidgetName(), id, 
@@ -384,7 +380,7 @@ void vtkPVSourceList::UpdateVisibility(vtkPVSource *comp,
       }
     else
       {
-      switch (comp->GetPVOutput(0)->GetVisibility())
+      switch (comp->GetPVOutput()->GetVisibility())
         {
         case 0:
           this->Script("%s itemconfigure %s -image %s.visoffimg",

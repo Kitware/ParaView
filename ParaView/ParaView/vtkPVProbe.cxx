@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.88");
+vtkCxxRevisionMacro(vtkPVProbe, "1.89");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -421,7 +421,7 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
       }
     }
   
-  this->GetPVOutput(0)->SaveInBatchScript(file);
+  this->GetPVOutput()->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
