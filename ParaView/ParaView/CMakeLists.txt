@@ -2,6 +2,7 @@ SET( ParaView_SRCS
   vtkAllToNRedistributePolyData.cxx
   vtkBalancedRedistributePolyData.cxx
   vtkClientCompositeManager.cxx
+  vtkColorByPart.cxx
   vtkCompositeProp.cxx
   vtkExtractCTHPart.cxx
   vtkGroup.cxx
@@ -138,6 +139,7 @@ SET( ParaView_SRCS
   vtkSelectInputs.cxx
   vtkStringList.cxx 
   vtkTiledDisplaySchedule.cxx
+  vtkVRMLSource.cxx
   vtkWeightedRedistributePolyData.cxx
   vtkXDMFReaderModule.cxx
   )

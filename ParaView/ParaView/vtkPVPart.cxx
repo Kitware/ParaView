@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.11");
+vtkCxxRevisionMacro(vtkPVPart, "1.12");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -715,6 +715,25 @@ vtkPVApplication* vtkPVPart::GetPVApplication()
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVPart::RemoveAllCaches()
+{
+  this->GetPVApplication()->GetProcessModule()->ServerScript(
+             "%s RemoveAllCaches; %s RemoveAllCaches",
+             this->UpdateSuppressorTclName, this->LODUpdateSuppressorTclName);
+}
+
+
+//----------------------------------------------------------------------------
+// Assume that this method is only called when the part is visible.
+// This is like the ForceUpdate method, but uses cached values if possible.
+void vtkPVPart::CacheUpdate(int idx)
+{
+  this->GetPVApplication()->GetProcessModule()->ServerScript(
+             "%s CacheUpdate %d; %s CacheUpdate %d",
+             this->UpdateSuppressorTclName, idx,
+             this->LODUpdateSuppressorTclName, idx);
+}
 
 
 //----------------------------------------------------------------------------

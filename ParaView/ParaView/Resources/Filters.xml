@@ -485,6 +485,18 @@ help="Set the name of the array to hold the results of this computation"/>
   <VectorEntry label="Corner factor" trace_name="CornerFactor" variable="CornerFactor" type="float" help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)"/>
 </Module>
 
+<Module name="PartScalars" menu_name="Part Id Scalars" root_name="ColorParts" module_type="Filter" 
+        long_help="This filter uses colors to show how data is partitioned across parts." 
+        short_help="Generate point scalars from part id.">
+  <Filter class="vtkColorByPart">
+    <Input name="Input" class="vtkDataSet" quantity="Multiple" > 
+      <GroupRequirement quantity="Multiple" /> 
+    </Input> 
+  </Filter>
+  <InputMenu label="Input" help="Set the input to this filter."
+             input_name="Input"/>
+</Module>
+
 <Module name="PieceScalars" menu_name="Process Id Scalars" root_name="ColorPieces" module_type="Filter" multiprocess_support="multiple_processes" 
         long_help="This filter uses colors to show how data is partitioned across processes." 
         short_help="Generate point scalars from process id.">

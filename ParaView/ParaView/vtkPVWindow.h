@@ -498,6 +498,11 @@ public:
   void SetInteractor(vtkPVGenericRenderWindowInteractor *iren);
   vtkPVGenericRenderWindowInteractor* GetInteractor() {return this->Interactor;}
 
+  // Description:
+  // For flip books. These methods should really be in a render module.
+  void RemoveAllCaches();
+  void CacheUpdate(int idx);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

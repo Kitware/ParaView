@@ -126,7 +126,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.37");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1001,7 +1001,7 @@ void vtkPVAnimationInterface::SetCurrentTime(float time)
 
   if (this->PVSource)
     {
-    this->PVSource->MarkSourcesForUpdate();
+    this->PVSource->MarkSourcesForUpdate(1);
     }
 
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);

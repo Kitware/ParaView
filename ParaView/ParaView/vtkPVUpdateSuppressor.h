@@ -16,16 +16,14 @@
 
 =========================================================================*/
 // .NAME vtkPVUpdateSuppressor - prevents propagation of update
-// .SECTION Description
-//
-// .SECTION Caveats
-
-// .SECTION See Also
+// .SECTION Description  I am also going to have this object manage
+// flip books (geometry cache).
 
 #ifndef __vtkPVUpdateSuppressor_h
 #define __vtkPVUpdateSuppressor_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
+class vtkCollection;
 
 class VTK_EXPORT vtkPVUpdateSuppressor : public vtkPolyDataToPolyDataFilter
 {
@@ -36,6 +34,12 @@ public:
   // Description:
   // Construct with user-specified implicit function.
   static vtkPVUpdateSuppressor *New();
+
+  // Description:
+  // Methods for saving, clearing and updating flip books.
+  // Cache update will update and save cache or just use previous cache.
+  void RemoveAllCaches();
+  void CacheUpdate(int idx);
 
   // Description:
   // Return the mtime also considering the locator and clip function.
@@ -72,6 +76,8 @@ protected:
   int UpdateNumberOfPieces;
 
   vtkTimeStamp UpdateTime;
+
+  vtkCollection* CachedGeometry;
 
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.

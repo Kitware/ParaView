@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.426");
+vtkCxxRevisionMacro(vtkPVWindow, "1.427");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4013,7 +4013,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.426 $");
+  this->ExtractRevision(os,"$Revision: 1.427 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -4381,6 +4381,18 @@ void vtkPVWindow::SetInteraction(int s)
     rw->SetDesiredUpdateRate(rwi->GetStillUpdateRate());
     //cout << "Interaction off" << endl;
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::RemoveAllCaches()
+{
+  // Loop through all parts ...
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::CacheUpdate(int idx)
+{
+  // Loop through all visible parts.
 }
 
 //-----------------------------------------------------------------------------

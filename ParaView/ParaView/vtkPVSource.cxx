@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.286");
+vtkCxxRevisionMacro(vtkPVSource, "1.287");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1216,7 +1216,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     {
     return;
     } 
-  this->MarkSourcesForUpdate();
+  this->MarkSourcesForUpdate(1);
 
   window = this->GetPVWindow();
 
@@ -1359,16 +1359,24 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::MarkSourcesForUpdate()
+void vtkPVSource::MarkSourcesForUpdate(int flag)
 {
   int idx;
   vtkPVSource* consumer;
 
-  this->PipelineModifiedTime.Modified();
+  if (flag)
+    {
+    this->PipelineModifiedTime.Modified();
+    }
+  else
+    {
+    this->UpdateTime = this->PipelineModifiedTime;
+    }
+
   for (idx = 0; idx < this->NumberOfPVConsumers; ++idx)
     {
     consumer = this->GetPVConsumer(idx);
-    consumer->MarkSourcesForUpdate();
+    consumer->MarkSourcesForUpdate(flag);
     }  
 }
 
@@ -2604,7 +2612,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.286 $");
+  this->ExtractRevision(os,"$Revision: 1.287 $");
 }
 
 //----------------------------------------------------------------------------

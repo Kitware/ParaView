@@ -170,6 +170,11 @@ public:
   vtkSetStringMacro(Name);
   vtkGetStringMacro(Name);
 
+  // Description:
+  // For flip books.
+  void RemoveAllCaches();
+  void CacheUpdate(int idx);
+
 protected:
   vtkPVPart();
   ~vtkPVPart();

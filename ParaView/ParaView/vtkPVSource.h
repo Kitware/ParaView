@@ -457,8 +457,9 @@ public:
 
   // Description:
   // This used to be private, but now the animation
-  // interface uses it to force an update.
-  void MarkSourcesForUpdate();
+  // interface uses it to force an update.  Animation
+  // interface will use this method to stop updates too (flag)?
+  void MarkSourcesForUpdate(int flag);
 
 protected:
   vtkPVSource();
