@@ -149,6 +149,14 @@ public:
                                 const char *MethodAndArgString);
 
   // Description:
+  // Set/get whether the above commands should be called or not.
+  // This allow you to disable the commands while you are setting the scale
+  // value for example.
+  vtkSetMacro(DisableCommands, int);
+  vtkGetMacro(DisableCommands, int);
+  vtkBooleanMacro(DisableCommands, int);
+
+  // Description:
   // Setting this string enables balloon help for this widget.
   // Override to pass down to children for cleaner behavior
   virtual void SetBalloonHelpString(const char *str);
@@ -181,6 +189,7 @@ protected:
   int         ExpandEntry;
   int         DisplayRange;
   int         SmartResize;
+  int         DisableCommands;
 
   char        *Command;
   char        *StartCommand;

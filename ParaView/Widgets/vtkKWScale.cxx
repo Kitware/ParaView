@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.45");
+vtkCxxRevisionMacro(vtkKWScale, "1.46");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -77,6 +77,8 @@ vtkKWScale::vtkKWScale()
   this->StartCommand = NULL;
   this->EndCommand   = NULL;
   this->EntryCommand = NULL;
+
+  this->DisableCommands = 0;
 
   this->SmartResize = 0;
 
@@ -677,7 +679,7 @@ void vtkKWScale::SetValue(float num)
     this->Entry->SetValue(this->Value, this->EntryResolution);
     }
 
-  if (this->Command)
+  if (this->Command && !this->DisableCommands)
     {
     this->Script("eval %s", this->Command);
     }
@@ -741,7 +743,7 @@ void vtkKWScale::EntryValueChanged()
   float old_value = this->GetValue();
   this->SetValue(value);
 
-  if (value != old_value && this->EntryCommand)
+  if (value != old_value && this->EntryCommand && !this->DisableCommands)
     {
     this->Script("eval %s", this->EntryCommand);
     }
@@ -750,7 +752,7 @@ void vtkKWScale::EntryValueChanged()
 // ---------------------------------------------------------------------------
 void vtkKWScale::InvokeStartCommand()
 {
-  if (this->StartCommand)
+  if (this->StartCommand && !this->DisableCommands)
     {
     this->Script("eval %s", this->StartCommand);
     }
@@ -759,7 +761,7 @@ void vtkKWScale::InvokeStartCommand()
 // ---------------------------------------------------------------------------
 void vtkKWScale::InvokeEndCommand()
 {
-  if (this->EndCommand)
+  if (this->EndCommand && !this->DisableCommands)
     {
     this->Script("eval %s", this->EndCommand);
     }
@@ -768,7 +770,7 @@ void vtkKWScale::InvokeEndCommand()
 // ---------------------------------------------------------------------------
 void vtkKWScale::InvokeEntryCommand()
 {
-  if (this->EntryCommand)
+  if (this->EntryCommand && !this->DisableCommands)
     {
     this->Script("eval %s",this->EntryCommand);
     }
@@ -1094,4 +1096,6 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
      << ( this->ShortLabel ? this->ShortLabel : "(None)" ) << endl;
   os << indent << "DisplayRange: "
      << (this->DisplayRange ? "On" : "Off") << endl;
+  os << indent << "DisableCommands: "
+     << (this->DisableCommands ? "On" : "Off") << endl;
 }
