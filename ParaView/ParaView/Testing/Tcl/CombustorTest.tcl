@@ -6,6 +6,7 @@
             }
         }
     } 
+
 proc AdjustContourValue { cnt val } {
     set entry [$cnt GetPVWidget {Contour Values}]
     $entry RemoveAllValues
@@ -15,17 +16,18 @@ proc AdjustContourValue { cnt val } {
 }
 
 
-
-
 # hack to get the window.
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
 # Create the reader
 set pInt [$pvWindow GetSourceInterface "vtkPLOT3DReader"]
 set pvPlot3D [$pInt CreateCallback]
-[$pvPlot3D GetVTKSource] SetXYZFileName $DataDir/Data/combxyz.bin
-[$pvPlot3D GetVTKSource] SetQFileName $DataDir/Data/combq.bin
-$pvPlot3D UpdateParameterWidgets
+
+
+set XYZFileEntry [$pvPlot3D GetPVWidget {XYZFileName}]
+$XYZFileEntry SetValue $DataDir/Data/combxyz.bin
+set QFileEntry [$pvPlot3D GetPVWidget {QFileName}]
+$QFileEntry SetValue $DataDir/Data/combq.bin
 $pvPlot3D AcceptCallback
 
 # Create the contour filter
@@ -36,9 +38,8 @@ $pvWindow SetCurrentPVSource $pvPlot3D
 
 set eInt [$pvWindow GetSourceInterface "vtkExtractGrid"]
 set pvExtract [$eInt CreateCallback]
-
-[$pvExtract GetVTKSource] SetVOI 0 56 0 32 0 0 
-$pvExtract UpdateParameterWidgets
+set VOIEntry [$pvExtract GetPVWidget {VOI}]
+$VOIEntry SetValue 0 56 0 32 0 0 
 $pvExtract AcceptCallback
 
 [$pvExtract GetPVOutput] SetVisibility 0
@@ -47,10 +48,9 @@ set pvGlyph [$pvWindow GlyphCallback]
 $pvGlyph AcceptCallback
 
 [$pvGlyph GetPVOutput] ColorByProperty
-[$pvGlyph GetVTKSource] SetScaleFactor 3.0
-$pvGlyph UpdateParameterWidgets
+set GlyphScaleEntry [$pvGlyph GetPVWidget {Scale Factor}]
+$GlyphScaleEntry SetValue 3.0
 $pvGlyph AcceptCallback
-
 [$pvGlyph GetPVOutput] SetVisibility 0
 
 
@@ -107,8 +107,7 @@ $camera SetViewUp 0.10793 0.00506272 0.994146
 $camera SetViewAngle 30
 $camera SetClippingRange 18.5955 61.8423
 
-[$pvExtract GetVTKSource] SetVOI 0 56 0 32 0 0 
-$pvExtract UpdateParameterWidgets
+$VOIEntry SetValue 0 56 0 32 0 0 
 $pvExtract AcceptCallback
 
 [$pvExtract GetPVOutput] SetVisibility 1
@@ -117,8 +116,7 @@ $pvExtract AcceptCallback
 RenWin1 Render
 
 for {set i 0} {$i < 24} {incr i 1} {
-    [$pvExtract GetVTKSource] SetVOI 0 56 0 32 $i $i
-    $pvExtract UpdateParameterWidgets
+    $VOIEntry SetValue 0 56 0 32 $i $i
     $pvExtract AcceptCallback
     RenWin1 Render
     update
@@ -126,8 +124,7 @@ for {set i 0} {$i < 24} {incr i 1} {
 }
 
 for {set i 23} {$i >= 0} {incr i -1} {
-    [$pvExtract GetVTKSource] SetVOI 0 56 0 32 $i $i
-    $pvExtract UpdateParameterWidgets
+    $VOIEntry SetValue 0 56 0 32 $i $i
     $pvExtract AcceptCallback
     RenWin1 Render
     update
@@ -142,19 +139,26 @@ $camera SetViewUp -0.639592 -0.0625532 0.766165
 $camera SetViewAngle 30
 $camera SetClippingRange 15.0904 64.6074
 
-[$pvExtract GetVTKSource] SetVOI 0 0 0 32 3 20
+$VOIEntry SetValue 0 0 0 32 3 20
+$pvExtract AcceptCallback
 RenWin1 Render
 
 for {set i 1} {$i < 56} {incr i 1} {
-    [$pvExtract GetVTKSource] SetVOI $i $i 0 32 3 20
-    $pvExtract UpdateParameterWidgets
+    $VOIEntry SetValue $i $i 0 32 3 20
     $pvExtract AcceptCallback
     RenWin1 Render
     update
-
 }
 
 source $DataDir/Utility/rtImage.tcl
 pvImageTest $DataDir/Baseline/CombustorTest.png 10
 
 Application Exit
+
+
+
+
+
+
+
+
