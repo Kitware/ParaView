@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVCameraManipulator.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
@@ -71,6 +72,7 @@ vtkPVInteractorStyleControl::vtkPVInteractorStyleControl()
   this->Manipulators = vtkPVInteractorStyleControl::ManipulatorMap::New();
 }
 
+//------------------------------------------------------------------------------
 vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
 {
   int cc;
@@ -89,12 +91,14 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
   this->Manipulators->Delete();
 }
 
+//------------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::AddManipulator(const char* name, 
-						 vtkPVCameraManipulator* object)
+                                                 vtkPVCameraManipulator* object)
 {
   this->Manipulators->SetItem(name, object);
 }
 
+//------------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::UpdateMenus()
 {
   if ( this->Application )
@@ -108,19 +112,20 @@ void vtkPVInteractorStyleControl::UpdateMenus()
       char command[100];
       it->InitTraversal();
       while ( !it->IsDoneWithTraversal() )
-	{
-	const char* name = 0;
-	it->GetKey(name);
-	sprintf(command, "InteractOption %d {%s}", cc, name);
-	this->Menus[cc]->AddEntryWithCommand(name, this, command);
-	it->GoToNextItem();
-	}
+        {
+        const char* name = 0;
+        it->GetKey(name);
+        sprintf(command, "InteractOption %d {%s}", cc, name);
+        this->Menus[cc]->AddEntryWithCommand(name, this, command);
+        it->GoToNextItem();
+        }
       }
     it->Delete();
     }
 }
 
 
+//------------------------------------------------------------------------------
 int vtkPVInteractorStyleControl::SetManipulator(int pos, const char* name)
 {
   if ( pos < 0 || pos > 8 )
@@ -137,7 +142,9 @@ int vtkPVInteractorStyleControl::SetManipulator(int pos, const char* name)
   return 1;
 }
 
-int vtkPVInteractorStyleControl::SetManipulator(int mouse, int key, const char* name)
+//------------------------------------------------------------------------------
+int vtkPVInteractorStyleControl::SetManipulator(int mouse, int key, 
+                                                const char* name)
 {
   if ( mouse < 0 || mouse > 2 || key < 0 || key > 2 )
     {
@@ -147,6 +154,7 @@ int vtkPVInteractorStyleControl::SetManipulator(int mouse, int key, const char* 
   return this->SetManipulator(mouse + key * 3, name);
 }
 
+//------------------------------------------------------------------------------
 vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int pos)
 {
   if ( pos < 0 || pos > 8 )
@@ -158,7 +166,9 @@ vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int pos)
   return this->GetManipulator(name);
 }
 
-vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int mouse, int key)
+//------------------------------------------------------------------------------
+vtkPVCameraManipulator* 
+vtkPVInteractorStyleControl::GetManipulator(int mouse, int key)
 {
   if ( mouse < 0 || mouse > 2 || key < 0 || key > 2 )
     {
@@ -168,13 +178,16 @@ vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int mouse, i
   return this->GetManipulator(mouse + key * 3);
 }
 
-vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(const char* name)
+//------------------------------------------------------------------------------
+vtkPVCameraManipulator* 
+vtkPVInteractorStyleControl::GetManipulator(const char* name)
 {
   vtkPVCameraManipulator* manipulator = 0;
   this->Manipulators->GetItem(name, manipulator);
   return manipulator;
 }
 
+//------------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
 {
   // must set the application
@@ -218,33 +231,33 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   this->Labels[5]->SetLabel("Control");
 
   this->Script("grid x %s %s %s -sticky ew", 
-  	       this->Labels[0]->GetWidgetName(), 
-  	       this->Labels[1]->GetWidgetName(), 
-  	       this->Labels[2]->GetWidgetName());
+               this->Labels[0]->GetWidgetName(), 
+               this->Labels[1]->GetWidgetName(), 
+               this->Labels[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew", 
-  	       this->Labels[3]->GetWidgetName(), 
-  	       this->Menus[0]->GetWidgetName(), 
-  	       this->Menus[1]->GetWidgetName(), 
-  	       this->Menus[2]->GetWidgetName());
+               this->Labels[3]->GetWidgetName(), 
+               this->Menus[0]->GetWidgetName(), 
+               this->Menus[1]->GetWidgetName(), 
+               this->Menus[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew", 
-  	       this->Labels[4]->GetWidgetName(), 
-  	       this->Menus[3]->GetWidgetName(), 
-  	       this->Menus[4]->GetWidgetName(), 
-  	       this->Menus[5]->GetWidgetName());
+               this->Labels[4]->GetWidgetName(), 
+               this->Menus[3]->GetWidgetName(), 
+               this->Menus[4]->GetWidgetName(), 
+               this->Menus[5]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew", 
-  	       this->Labels[5]->GetWidgetName(), 
-  	       this->Menus[6]->GetWidgetName(), 
-  	       this->Menus[7]->GetWidgetName(), 
-  	       this->Menus[8]->GetWidgetName());
-	       
+               this->Labels[5]->GetWidgetName(), 
+               this->Menus[6]->GetWidgetName(), 
+               this->Menus[7]->GetWidgetName(), 
+               this->Menus[8]->GetWidgetName());
+               
   this->Script("grid columnconfigure %s 0 -weight 0", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   
 
   //this->Script("pack %s -expand true -fill both", frame->GetWidgetName());
@@ -253,4 +266,9 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   this->UpdateMenus();
 }
 
-
+//----------------------------------------------------------------------------
+void vtkPVInteractorStyleControl::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "Frame: " << this->Frame << endl;
+}

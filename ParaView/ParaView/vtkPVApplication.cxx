@@ -105,8 +105,8 @@ extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 vtkPVApplication* vtkPVApplication::MainApplication = 0;
 
 static void vtkPVAppProcessMessage(vtkObject* vtkNotUsed(object),
-				   unsigned long vtkNotUsed(event), 
-				   void *clientdata, void *calldata)
+                                   unsigned long vtkNotUsed(event), 
+                                   void *clientdata, void *calldata)
 {
   vtkPVApplication *self = static_cast<vtkPVApplication*>( clientdata );
   const char* message = static_cast<char*>( calldata );
@@ -143,7 +143,7 @@ public:
   void DisplayText(const char* t)
   {
     if ( this->Windows && this->Windows->GetNumberOfItems() &&
-	 this->Windows->GetLastKWWindow() )
+         this->Windows->GetLastKWWindow() )
       {
       vtkKWWindow *win = this->Windows->GetLastKWWindow();
       char buffer[1024];      
@@ -152,36 +152,36 @@ public:
       int line;
       sscanf(t, "%[^:]: In %[^,], line %d", type, file, &line);
       if ( message )
-	{
-	int error = 0;
-	if ( !strncmp(t, "ERROR", 5) )
-	  {
-	  error = 1;
-	  }
-	message += 3;
-	char *rmessage = vtkString::Duplicate(message);
-	int last = vtkString::Length(rmessage)-1;
-	while ( last > 0 && 
-		(rmessage[last] == ' ' || rmessage[last] == '\n' || 
-		 rmessage[last] == '\r' || rmessage[last] == '\t') )
-	  {
-	  rmessage[last] = 0;
-	  last--;
-	  }
-	sprintf(buffer, "There was a VTK %s in file: %s (%d)\n %s", 
-		(error ? "Error" : "Warning"),
-		file, line,
-		rmessage);
-	if ( error )
-	  {
-	  win->ErrorMessage(buffer);
-	  }
-	else 
-	  {
-	  win->WarningMessage(buffer);
-	  }
-	delete [] rmessage;
-	}
+        {
+        int error = 0;
+        if ( !strncmp(t, "ERROR", 5) )
+          {
+          error = 1;
+          }
+        message += 3;
+        char *rmessage = vtkString::Duplicate(message);
+        int last = vtkString::Length(rmessage)-1;
+        while ( last > 0 && 
+                (rmessage[last] == ' ' || rmessage[last] == '\n' || 
+                 rmessage[last] == '\r' || rmessage[last] == '\t') )
+          {
+          rmessage[last] = 0;
+          last--;
+          }
+        sprintf(buffer, "There was a VTK %s in file: %s (%d)\n %s", 
+                (error ? "Error" : "Warning"),
+                file, line,
+                rmessage);
+        if ( error )
+          {
+          win->ErrorMessage(buffer);
+          }
+        else 
+          {
+          win->WarningMessage(buffer);
+          }
+        delete [] rmessage;
+        }
       }
   }
 
@@ -238,7 +238,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 vtkStandardNewMacro(vtkPVApplication);
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
-			    int argc, char *argv[]);
+                            int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
@@ -353,7 +353,7 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
     }
   
   this->Controller->TriggerRMI(remoteId, const_cast<char*>(str), 
-			       VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+                               VTK_PV_SLAVE_SCRIPT_RMI_TAG);
 }
 
 //----------------------------------------------------------------------------
@@ -424,7 +424,7 @@ int vtkPVApplication::CheckRegistration()
 
 //----------------------------------------------------------------------------
 int vtkPVApplication::CheckForArgument(int argc, char* argv[], 
-				       const char* arg, int& index)
+                                       const char* arg, int& index)
 {
   if (!arg)
     {
@@ -537,40 +537,40 @@ void vtkPVApplication::Start(int argc, char*argv[])
       {
       int valid=0;
       if (argv[i])
-	{
-	int  j=0;
-	const char* argument1 = ArgumentList[j];
-	const char* argument2 = ArgumentList[j+1];
-	while (argument1 && argument1[0])
-	  {
-	  if ( strcmp(argv[i], argument1) == 0 || 
-	       strcmp(argv[i], argument2) == 0)
-	    {
-	    valid = 1;
-	    }
-	  j += 3;
-	  argument1 = ArgumentList[j];
-	  if (argument1 && argument1[0]) {argument2 = ArgumentList[j+1];}
-	  }
-	}
+        {
+        int  j=0;
+        const char* argument1 = ArgumentList[j];
+        const char* argument2 = ArgumentList[j+1];
+        while (argument1 && argument1[0])
+          {
+          if ( strcmp(argv[i], argument1) == 0 || 
+               strcmp(argv[i], argument2) == 0)
+            {
+            valid = 1;
+            }
+          j += 3;
+          argument1 = ArgumentList[j];
+          if (argument1 && argument1[0]) {argument2 = ArgumentList[j+1];}
+          }
+        }
       if (!valid)
-	{
-	char* error = this->CreateHelpString();
-	vtkErrorMacro("Unrecognized argument " << argv[i] << "." << endl
-		      << error);
-	delete[] error;
-	this->Exit();
-	return;
-	}
+        {
+        char* error = this->CreateHelpString();
+        vtkErrorMacro("Unrecognized argument " << argv[i] << "." << endl
+                      << error);
+        delete[] error;
+        this->Exit();
+        return;
+        }
       }
     }
 
   int index=-1;
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--help",
-					  index) == VTK_OK ||
+                                          index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-h",
-					  index) == VTK_OK )
+                                          index) == VTK_OK )
     {
     char* error = this->CreateHelpString();
     vtkWarningMacro(<<error);
@@ -581,25 +581,25 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
 #ifdef VTK_MANGLE_MESA
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
-					  index) == VTK_OK ||
+                                          index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-s",
-					  index) == VTK_OK ||
+                                          index) == VTK_OK ||
        getenv("PV_SOFTWARE_RENDERING") )
     {
     this->BroadcastScript("vtkGraphicsFactory _graphics_fact\n"
-			  "_graphics_fact SetUseMesaClasses 1\n"
-			  "_graphics_fact Delete");
+                          "_graphics_fact SetUseMesaClasses 1\n"
+                          "_graphics_fact Delete");
     this->BroadcastScript("vtkImagingFactory _imaging_fact\n"
-			  "_imaging_fact SetUseMesaClasses 1\n"
-			  "_imaging_fact Delete");
+                          "_imaging_fact SetUseMesaClasses 1\n"
+                          "_imaging_fact Delete");
     if ( getenv("PV_SOFTWARE_RENDERING") )
       {
       this->Script("vtkGraphicsFactory _graphics_fact\n"
-		   "_graphics_fact SetUseMesaClasses 0\n"
-		   "_graphics_fact Delete");
+                   "_graphics_fact SetUseMesaClasses 0\n"
+                   "_graphics_fact Delete");
       this->Script("vtkImagingFactory _imaging_fact\n"
-		   "_imaging_fact SetUseMesaClasses 0\n"
-		   "_imaging_fact Delete");
+                   "_imaging_fact SetUseMesaClasses 0\n"
+                   "_imaging_fact Delete");
       }
     }
 #endif
@@ -667,7 +667,7 @@ void vtkPVApplication::Exit()
     if (id != myId)
       {
       this->Controller->TriggerRMI(id, 
-				   vtkMultiProcessController::BREAK_RMI_TAG);
+                                   vtkMultiProcessController::BREAK_RMI_TAG);
       }
     }
 
@@ -1394,6 +1394,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MinorVersion: " << this->MinorVersion << endl;
   os << indent << "RunningParaViewScript: " 
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
+  os << indent << "Current Process Id: " << this->ProcessId << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)

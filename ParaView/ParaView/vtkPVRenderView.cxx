@@ -353,9 +353,9 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TreeComp1");
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
-			 this->RendererTclName);
+                         this->RendererTclName);
   pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
-			 this->RenderWindowTclName);
+                         this->RenderWindowTclName);
   pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
 
   if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") )
@@ -379,24 +379,24 @@ void vtkPVRenderView::PrepareForDelete()
   if (pvapp)
     {
     pvapp->SetRegisteryValue(2, "RunTime", "UseParallelProjection", "%d",
-			     this->ParallelProjectionCheck->GetState());
+                             this->ParallelProjectionCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseStrips", "%d",
-			     this->TriangleStripsCheck->GetState());
+                             this->TriangleStripsCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
-			     this->ImmediateModeCheck->GetState());
+                             this->ImmediateModeCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseReduction", "%d",
                              this->ReductionCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "FrameRate", "%f",
                              this->FrameRateScale->GetValue());
 #ifdef VTK_USE_MPI
     pvapp->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
-			     this->InterruptRenderCheck->GetState());
+                             this->InterruptRenderCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
-			     this->CompositeWithFloatCheck->GetState());
+                             this->CompositeWithFloatCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
-			     this->CompositeWithRGBACheck->GetState());
+                             this->CompositeWithRGBACheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
-			     this->CompositeCompressionCheck->GetState());
+                             this->CompositeCompressionCheck->GetState());
 #endif
     }
 
@@ -458,7 +458,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     {
     // Since the render view is only on process 0, do not broadcast.
     this->GetPVApplication()->Script("%s SetRenderView %s", 
-				       this->CompositeTclName, this->GetTclName());
+                                       this->CompositeTclName, this->GetTclName());
     }
   
   // create the frame
@@ -506,7 +506,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   
   // Expose.
   this->Script("bind %s <Expose> {%s Exposed}", this->GetTclName(),
-	       this->GetTclName());
+               this->GetTclName());
   
   this->NavigationFrame->SetParent(this->GetPropertiesParent());
   this->NavigationFrame->ShowHideFrameOn();
@@ -646,7 +646,7 @@ void vtkPVRenderView::CreateViewProperties()
   
   this->ImmediateModeCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->ImmediateModeCheck->Create(this->Application, 
-				   "-text \"Use Immediate Mode Rendering\"");
+                                   "-text \"Use Immediate Mode Rendering\"");
   if (pvapp && pvwindow && 
       pvapp->GetRegisteryValue(2, "RunTime", "UseImmediateMode", 0))
     {
@@ -685,7 +685,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->FrameRateLabel->SetLabel("Frame Rate");
   this->FrameRateScale->SetParent(this->FrameRateFrame);
   this->FrameRateScale->Create(this->Application, 
-			       "-resolution 0.1 -orient horizontal");
+                               "-resolution 0.1 -orient horizontal");
   this->FrameRateScale->SetRange(0, 50);
   if (pvapp && pvwindow &&
       pvapp->GetRegisteryValue(2, "RunTime", "FrameRate", 0))
@@ -709,7 +709,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->InterruptRenderCheck->SetParent(
     this->RenderParametersFrame->GetFrame());
   this->InterruptRenderCheck->Create(this->Application, 
-				     "-text \"Allow Rendering Interrupts\"");
+                                     "-text \"Allow Rendering Interrupts\"");
   this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
 
   if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
@@ -730,15 +730,15 @@ void vtkPVRenderView::CreateViewProperties()
   this->CompositeWithFloatCheck->SetParent(
     this->RenderParametersFrame->GetFrame());
   this->CompositeWithFloatCheck->Create(this->Application, 
-					"-text \"Composite With Floats\"");
+                                        "-text \"Composite With Floats\"");
   this->CompositeWithRGBACheck->SetParent(
     this->RenderParametersFrame->GetFrame());
   this->CompositeWithRGBACheck->Create(this->Application, 
-				       "-text \"Composite RGBA\"");
+                                       "-text \"Composite RGBA\"");
   this->CompositeCompressionCheck->SetParent(
     this->RenderParametersFrame->GetFrame());
   this->CompositeCompressionCheck->Create(this->Application, 
-					  "-text \"Composite Compression\"");
+                                          "-text \"Composite Compression\"");
   
   this->CompositeWithFloatCheck->SetCommand(this, "CompositeWithFloatCallback");
   if (pvwindow && pvapp && 
@@ -773,7 +773,7 @@ void vtkPVRenderView::CreateViewProperties()
     "This is here to bypass some bugs in some graphics card drivers.");
 
   this->CompositeCompressionCheck->SetCommand(this, 
-					      "CompositeCompressionCallback");
+                                              "CompositeCompressionCallback");
   if (pvwindow && pvapp && 
       pvapp->GetRegisteryValue(2, "RunTime",  "UseCompressionInComposite", 0))
     {
@@ -1007,12 +1007,12 @@ void vtkPVRenderView::AddPVData(vtkPVData *pvc)
     if (pvc->GetRenderOnlyLocally())
       {
       pvApp->Script("%s AddProp %s", this->RendererTclName,
-		    pvc->GetPropTclName());
+                    pvc->GetPropTclName());
       }
     else
       {
       pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
-			     pvc->GetPropTclName());
+                             pvc->GetPropTclName());
       }
     }
 }
@@ -1033,12 +1033,12 @@ void vtkPVRenderView::RemovePVData(vtkPVData *pvc)
     if (pvc->GetRenderOnlyLocally() )
       {
       pvApp->Script("%s RemoveProp %s", this->RendererTclName,
-		    pvc->GetPropTclName());
+                    pvc->GetPropTclName());
       }
     else
       {
       pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
-			     pvc->GetPropTclName());
+                             pvc->GetPropTclName());
       }
     }
 }
@@ -1443,7 +1443,7 @@ vtkPVWindow *vtkPVRenderView::GetPVWindow()
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag,
-				      int offScreenFlag)
+                                      int offScreenFlag)
 {
   vtkCamera *camera;
   float position[3];
@@ -1468,7 +1468,7 @@ void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag,
     if (!offScreenFlag)
       {
       *file << "vtkRenderWindowInteractor iren\n\t"
-	    << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
+            << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
       }
     }
 
@@ -1537,5 +1537,6 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseReductionFactor: " << this->GetUseReductionFactor() << endl;
   os << indent << "DisableRenderingFlag: " 
      << (this->DisableRenderingFlag ? "on" : "off") << endl;
+  os << indent << "InteractorStyleControl: " << this->InteractorStyleControl << endl;
 }
 
