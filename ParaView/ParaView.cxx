@@ -29,7 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkMultiProcessController.h"
 #include "vtkPVApplication.h"
 #include "vtkTclUtil.h"
-
+#include "kwinit.h"
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
@@ -64,12 +64,24 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
 
 
 
+
 // The applications Initialize Tcl also initializes Tk and needs a DISPLAY env variable set.
 // This is a temporary solution.
+#define ET_TCL_LIBRARY "C:/Program Files/Tcl/lib/tcl8.2"
 Tcl_Interp *vtkPVInitializeTcl()
 {
-  Tcl_Interp *interp = Tcl_CreateInterp();
+  Tcl_Interp *interp;
+  
+  putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
 
+  Tcl_FindExecutable("ParaView");
+  interp = Tcl_CreateInterp();
+  Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
+  Et_DoInit(interp);
+  
+  // initialize VTK
+  Vtktcl_Init(interp);
+  
   if (Tcl_Init(interp) == TCL_ERROR) 
     {
     cerr << "Init Tcl error\n";
@@ -123,7 +135,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   myId = controller->GetLocalProcessId();
   numProcs = controller->GetNumberOfProcesses();
   
-  if (myId == 0)
+  if (myId ==  0)
     { // The last process is for UI.
     // We need to pass the local controller to the UI process.
     Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
@@ -146,7 +158,6 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     
     app->SetController(controller);
     app->Script("wm withdraw .");
-    
     app->Start(pvArgs->argc,pvArgs->argv);
     app->Delete();
     }
@@ -155,17 +166,22 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     // The slaves try to connect.  In the future, we may not want to initialize Tk.
     //putenv("DISPLAY=:0.0");
     //putenv("DISPLAY=www.kitware.com:2.0");
+    
+    cerr << "I1\n";
     vtkKWApplication::SetWidgetVisibility(0);
     //Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
+    cerr << "I2\n";
     Tcl_Interp *interp = vtkPVInitializeTcl();
     
     // We should use the application tcl name in the future.
     // All object in the satellite processes must be created through tcl.
     // (To assign the correct name).
+    cerr << "interp: " << Et_Interp << endl;
     if (Tcl_Eval(interp, "vtkPVApplication Application") != TCL_OK)
       {
       cerr << "Error returned from tcl script.\n" << interp->result << endl;
       }
+    cerr << "Finished \n";
     int    error;
     vtkPVApplication *app = (vtkPVApplication *)(
       vtkTclGetPointerFromObject("Application","vtkPVApplication",
