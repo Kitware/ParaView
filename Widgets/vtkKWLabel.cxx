@@ -88,6 +88,6 @@ void vtkKWLabel::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("label %s -text {%s}", wname, this->Label);
+  this->Script("label %s -text {%s} %s", wname, this->Label, args);
 }
 
