@@ -43,7 +43,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.3");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.4");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkIceTRenderManager::vtkIceTRenderManager()
@@ -578,7 +578,7 @@ void vtkIceTRenderManager::PreRenderProcessing()
     if (this->ImageReductionFactor > 1)
       {
       // Restore viewports.  ICE-T will handle reduced images better on its own.
-      float *viewport = ren->GetViewport();
+      double *viewport = ren->GetViewport();
       ren->SetViewport(viewport[0]*this->ImageReductionFactor,
                viewport[1]*this->ImageReductionFactor,
                viewport[2]*this->ImageReductionFactor,

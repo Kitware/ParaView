@@ -23,13 +23,13 @@
 #include <vtkLight.h>
 #include <vtkTimerLog.h>
 #include <vtkLightCollection.h>
-#include <vtkFloatArray.h>
+#include <vtkDoubleArray.h>
 #include <vtkUnsignedCharArray.h>
 #include "vtkMultiProcessController.h"
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.7");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.8");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()

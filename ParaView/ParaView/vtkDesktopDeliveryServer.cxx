@@ -40,7 +40,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.3");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.4");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -202,7 +202,7 @@ void vtkDesktopDeliveryServer::PreRenderProcessing()
       int i;
       for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
         {
-        float *viewport = ren->GetViewport();
+        double *viewport = ren->GetViewport();
         ren->SetViewport(viewport[0]*this->ImageReductionFactor,
           viewport[1]*this->ImageReductionFactor,
           viewport[2]*this->ImageReductionFactor,
