@@ -54,28 +54,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWObject.h"
 
-class vtkPVSourceCollection;
-class vtkPVWidgetCollection;
 class vtkKWEntry;
-class vtkKWLabel;
-class vtkKWWidget;
-class vtkKWView;
-class vtkKWNotebook;
+class vtkKWFrame;
+class vtkKWLabeledEntry;
 class vtkKWLabeledFrame;
+class vtkKWLabeledLabel;
+class vtkKWNotebook;
 class vtkKWPushButton;
+class vtkKWView;
+class vtkKWWidget;
 class vtkPVApplication;
 class vtkPVData;
+class vtkPVInputMenu;
 class vtkPVLabel;
 class vtkPVRenderView;
-class vtkPVRenderView;
-class vtkKWLabeledFrame;
-class vtkKWFrame;
-class vtkKWLabel;
+class vtkPVSourceCollection;
 class vtkPVWidget;
+class vtkPVWidgetCollection;
 class vtkPVWindow;
 class vtkSource;
 class vtkStringList;
-class vtkPVInputMenu;
 
 //BTX
 template <class DType> 
@@ -142,6 +140,17 @@ public:
   // This name is used in the data list to identify the composite.
   virtual void SetName(const char *name);
   char* GetName();
+    
+  // Description:
+  // The (short) description that can be used to give a more descriptive
+  // name to the object.
+  virtual void SetDescription(const char *description);
+  vtkGetStringMacro(Description);
+  vtkGetObjectMacro(DescriptionFrame, vtkKWWidget);
+
+  // Description:
+  // Called when the description entry is changed.
+  virtual void DescriptionEntryCallback();
     
   // Description:
   // This just returns the application typecast correctly.
@@ -410,6 +419,7 @@ protected:
 
   // The name is just for display.
   char      *Name;
+  char      *Description;
 
   // This is the module name.
   char      *ModuleName;
@@ -423,11 +433,16 @@ protected:
   
   vtkPVWidgetCollection *Widgets;
 
-
   vtkKWPushButton *AcceptButton;
   vtkKWPushButton *ResetButton;
   vtkKWPushButton *DeleteButton;
-  vtkKWLabel *DisplayNameLabel;
+
+  vtkKWWidget *DescriptionFrame;
+  vtkKWLabeledLabel *NameLabel;
+  vtkKWLabeledLabel *TypeLabel;
+  vtkKWLabeledEntry *DescriptionEntry;
+
+  void UpdateDescriptionFrame();
     
   char *OutputClassName;
   char *SourceClassName;

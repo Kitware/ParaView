@@ -44,9 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkArrayMap.txx"
 #include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
+#include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkKWLabeledFrame.h"
+#include "vtkKWLabeledLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
@@ -55,7 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
 #include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVRenderView.h"
@@ -68,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.235");
+vtkCxxRevisionMacro(vtkPVSource, "1.236");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -84,6 +86,7 @@ vtkPVSource::vtkPVSource()
   this->PrototypeInstanceCount = 0;
 
   this->Name = NULL;
+  this->Description = NULL;
   this->ModuleName = 0;
 
   // Initialize the data only after  Accept is invoked for the first time.
@@ -114,7 +117,11 @@ vtkPVSource::vtkPVSource()
   this->AcceptButton = vtkKWPushButton::New();
   this->ResetButton = vtkKWPushButton::New();
   this->DeleteButton = vtkKWPushButton::New();
-  this->DisplayNameLabel = vtkKWLabel::New();
+
+  this->DescriptionFrame = vtkKWWidget::New();
+  this->NameLabel = vtkKWLabeledLabel::New();
+  this->TypeLabel = vtkKWLabeledLabel::New();
+  this->DescriptionEntry = vtkKWLabeledEntry::New();
       
   this->Widgets = vtkPVWidgetCollection::New();
     
@@ -171,6 +178,7 @@ vtkPVSource::~vtkPVSource()
   this->SetVTKSource(NULL, NULL);
 
   this->SetName(NULL);
+  this->SetDescription(NULL);
 
   // This is necessary in order to make the parent frame release it's
   // reference to the widgets. Otherwise, the widgets get deleted only
@@ -190,10 +198,19 @@ vtkPVSource::~vtkPVSource()
   
   this->DeleteButton->Delete();
   this->DeleteButton = NULL;
-        
-  this->DisplayNameLabel->Delete();
-  this->DisplayNameLabel = NULL;
-  
+
+  this->DescriptionFrame->Delete();
+  this->DescriptionFrame = NULL;
+
+  this->NameLabel->Delete();
+  this->NameLabel = NULL;
+
+  this->TypeLabel->Delete();
+  this->TypeLabel = NULL;
+
+  this->DescriptionEntry->Delete();
+  this->DescriptionEntry = NULL;
+
   this->ParameterFrame->Delete();
   this->ParameterFrame = NULL;
 
@@ -387,7 +404,6 @@ vtkPVApplication* vtkPVSource::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVSource::CreateProperties()
 {
-  char displayName[256];
   vtkPVApplication *app = this->GetPVApplication();
   
 
@@ -422,28 +438,52 @@ void vtkPVSource::CreateProperties()
   this->GetParametersParent()->SetTraceReferenceObject(this);
   this->GetParametersParent()->SetTraceReferenceCommand("GetParametersParent");
 
-  // Setup the source page of the notebook.
+  // Set the description frame
+  // Try to do something that looks like the parameters, i.e. fixed-width
+  // labels and "expandable" values (this has to be done since an 'entry' 
+  // does not expand itself when 'gridded', so it has to be packed, hence
+  // the fixed-width label, etc. Tk stuff.
 
-  this->DisplayNameLabel->SetParent(this->Parameters);
-  if (this->Name != NULL)
-    {
-    if ( this->GetVTKSource() )
-      {
-      sprintf(displayName, "Name: %s Type: %s", this->GetName(),
-              this->GetVTKSource()->GetClassName()+3);
-      }
-    else
-      {
-      sprintf(displayName, "Name: %s", this->GetName());
-      }
-    this->DisplayNameLabel->SetLabel(displayName);
-    }
-  else
-    {
-    this->DisplayNameLabel->SetLabel("Name: ");
-    }
-  this->DisplayNameLabel->Create(app, "");
-  this->Script("pack %s", this->DisplayNameLabel->GetWidgetName());
+  this->DescriptionFrame ->SetParent(this->Parameters);
+  this->DescriptionFrame->Create(this->Application, "frame", "");
+  this->Script("pack %s -fill both -expand t -side top -padx 2 -pady 2", 
+               this->DescriptionFrame->GetWidgetName());
+
+  this->NameLabel->SetParent(this->DescriptionFrame);
+  this->NameLabel->Create(this->Application);
+  this->NameLabel->GetLabel1()->SetLabel("Name");
+  this->Script("%s config -width 18", 
+               this->NameLabel->GetLabel1()->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", 
+               this->NameLabel->GetLabel2()->GetWidgetName());
+
+  this->TypeLabel->SetParent(this->DescriptionFrame);
+  this->TypeLabel->Create(this->Application);
+  this->TypeLabel->GetLabel1()->SetLabel("Type");
+  this->Script("%s config -width 18", 
+               this->TypeLabel->GetLabel1()->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", 
+               this->TypeLabel->GetLabel2()->GetWidgetName());
+
+  this->DescriptionEntry->SetParent(this->DescriptionFrame);
+  this->DescriptionEntry->Create(this->Application);
+  this->DescriptionEntry->GetLabel()->SetLabel("Description");
+  this->Script("%s config -width 18", 
+               this->DescriptionEntry->GetLabel()->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", 
+               this->DescriptionEntry->GetEntry()->GetWidgetName());
+  this->Script("bind %s <KeyPress-Return> {%s DescriptionEntryCallback}",
+               this->DescriptionEntry->GetEntry()->GetWidgetName(), 
+               this->GetTclName());
+
+  this->Script("pack %s %s %s -side top -expand yes -fill x", 
+               this->NameLabel->GetWidgetName(),
+               this->TypeLabel->GetWidgetName(),
+               this->DescriptionEntry->GetWidgetName());
+
+  this->UpdateDescriptionFrame();
+
+  // The main parameter frame
 
   this->MainParameterFrame->SetParent(this->Parameters);
   this->MainParameterFrame->Create(this->Application, "frame", "");
@@ -504,6 +544,43 @@ void vtkPVSource::CreateProperties()
   //this->UpdateParameterWidgets();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVSource::UpdateDescriptionFrame()
+{
+  if (this->NameLabel->IsCreated())
+    {
+    this->NameLabel->GetLabel2()->SetLabel(this->Name ? this->Name : "");
+    }
+
+  if (this->TypeLabel->IsCreated())
+    {
+    if (this->GetVTKSource()) 
+      {
+      this->TypeLabel->GetLabel2()->SetLabel(
+        this->GetVTKSource()->GetClassName());
+      if (this->DescriptionFrame->IsPacked())
+        {
+        this->Script("pack %s -after %s -expand y -fill x", 
+                     this->TypeLabel->GetWidgetName(),
+                     this->NameLabel->GetWidgetName());
+        }
+      }
+    else
+      {
+      this->TypeLabel->GetLabel2()->SetLabel("");
+      if (this->DescriptionFrame->IsPacked())
+        {
+        this->Script("pack forget %s", 
+                     this->TypeLabel->GetWidgetName());
+        }
+      }
+    }
+
+  if (this->DescriptionEntry->IsCreated())
+    {
+    this->DescriptionEntry->GetEntry()->SetValue(this->Description);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::GrabFocus()
@@ -624,18 +701,62 @@ void vtkPVSource::SetName (const char* arg)
     }
   this->Modified();
   
-  // Make sure the label is upto date.
-  if (this->Name != NULL)
+  // Make sure the description frame is upto date.
+  this->UpdateDescriptionFrame();
+
+  // Update the nav window (that usually might display name + description)
+  if (this->GetPVRenderView())
     {
-    char displayName[512];
-    sprintf(displayName, "Name: %s", this->GetName());
-    this->DisplayNameLabel->SetLabel(displayName);
+    this->GetPVRenderView()->UpdateNavigationWindow(this, this->SourceGrabbed);
     }
-  else
-    {
-    this->DisplayNameLabel->SetLabel("Name: ");
-    }   
 } 
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetDescription (const char* arg) 
+{ 
+  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting " 
+                << this->Description << " to " << arg ); 
+  if ( this->Description && arg && (!strcmp(this->Description,arg))) 
+    { 
+    return;
+    } 
+  if (this->Description) 
+    { 
+    delete [] this->Description; 
+    } 
+  if (arg) 
+    { 
+    this->Description = new char[strlen(arg)+1]; 
+    strcpy(this->Description,arg); 
+    } 
+  else 
+    { 
+    this->Description = NULL;
+    }
+  this->Modified();
+
+  // Make sure the description frame is upto date.
+  this->UpdateDescriptionFrame();
+
+  // Update the nav window (that usually might display name + description)
+  if (this->GetPVRenderView())
+    {
+    this->GetPVRenderView()->UpdateNavigationWindow(this, this->SourceGrabbed);
+    }
+} 
+
+//----------------------------------------------------------------------------
+void vtkPVSource::DescriptionEntryCallback()
+{
+  this->SetDescription(this->DescriptionEntry->GetValue()
+);
+  // Trace here, not in SetDescription (design choice)
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) SetDescription {%s}",
+                                          this->GetTclName(),
+                                          this->Description);
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) DescriptionEntryCallback",
+                                          this->GetTclName());
+}
 
 //----------------------------------------------------------------------------
 // We should really be dealing with the outputs.  Remove this method.
@@ -1907,7 +2028,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.235 $");
+  this->ExtractRevision(os,"$Revision: 1.236 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1915,6 +2036,8 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Initialized: " << (this->Initialized?"yes":"no") << endl;
+  os << indent << "Name: " << (this->Name ? this->Name : "none") << endl;
+  os << indent << "Description: " << (this->Description ? this->Description : "none") << endl;
   os << indent << "ModuleName: " << (this->ModuleName?this->ModuleName:"none")
      << endl;
   os << indent << "AcceptButton: " << this->GetAcceptButton() << endl;

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.25");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.26");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -303,9 +303,19 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current,
     }
 
   // Draw the name of the assembly.
-  this->Script(
-    "%s create text %d %d -text {%s} -font %s -anchor w -tags x",
-    this->Canvas->GetWidgetName(), x, y, comp->GetName(), font);
+  if (comp->GetDescription())
+    {
+    this->Script(
+      "%s create text %d %d -text {%s (%s)} -font %s -anchor w -tags x",
+      this->Canvas->GetWidgetName(), x, y, comp->GetDescription(), 
+      comp->GetName(), font);
+    }
+  else
+    {
+    this->Script(
+      "%s create text %d %d -text {%s} -font %s -anchor w -tags x",
+      this->Canvas->GetWidgetName(), x, y, comp->GetName(), font);
+    }
 
   // Make the name hot for picking.
   result = this->Application->GetMainInterp()->result;
