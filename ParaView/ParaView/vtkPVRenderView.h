@@ -243,16 +243,9 @@ public:
   void SwitchBackAndForthToViewProperties();
 
   // Description:
-  // Access to the overlay renderer.
-  // fixme make me private
+  // Access to VTK renderer and render window.
   vtkRenderWindow *GetRenderWindow();
   vtkRenderer *GetRenderer();
-  vtkRenderer *GetRenderer2D();
-
-  // Description:
-  // Add/remove composites to/from the overlay renderer.
-  virtual void Add2DComposite(vtkKWComposite *c);
-  virtual void Remove2DComposite(vtkKWComposite *c);
 
   // Description:
   // Enable the input 3D widget
@@ -290,6 +283,9 @@ public:
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
+
+  // Access to the overlay renderer.
+  vtkRenderer *GetRenderer2D();
 
   void CalculateBBox(char* name, int bbox[4]);
  

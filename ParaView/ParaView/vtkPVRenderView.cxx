@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.302");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.303");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -735,9 +735,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->SetSourcesBrowserAlwaysShowName(
     this->GetPVApplication()->GetSourcesBrowserAlwaysShowName());
 
-  // This belongs in vtkPVRenderView.
-  // I copied it from vtkPVRenderView when I moved the observer over.
-  // fixme : Try to remove it.
   this->GetRenderWindow()->AddObserver(
                  vtkCommand::CursorChangedEvent, this->Observer);
 
@@ -2000,36 +1997,6 @@ void vtkPVRenderView::ExecuteEvent(vtkObject*, unsigned long event, void* par)
                  this->GetPVWindow()->GetWidgetName(), image);
     } 
 }
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::Add2DComposite(vtkKWComposite *c)
-{
-  //int fixme;  // this should be in render module.
-
-  c->SetView(this);
-  // never allow a composite to be added twice
-  if (this->Composites->IsItemPresent(c))
-    {
-    return;
-    }
-  this->Composites->AddItem(c);
-  if (c->GetProp() != NULL)
-    {
-    this->GetRenderer2D()->AddProp(c->GetProp());
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::Remove2DComposite(vtkKWComposite *c)
-{
-  //int fixme;  // this should be in render module.
-
-  c->SetView(NULL);
-  this->GetRenderer2D()->RemoveProp(c->GetProp());
-  this->Composites->RemoveItem(c);
-}
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Enable3DWidget(vtkInteractorObserver *o)
