@@ -41,14 +41,14 @@ public:
   // Set the Range of the Extent, this is the range of
   // acceptable values for the sliders. Specified as 
   // minx maxx miny maxy minz maxz
-  void SetExtentRange(float *);
-  void SetExtentRange(float,float,float,float,float,float);
+  void SetExtentRange(double *);
+  void SetExtentRange(double,double,double,double,double,double);
   
   // Description:
   // Set/Get the Extent.
-  vtkGetVector6Macro(Extent,float);
-  void SetExtent(float *);
-  void SetExtent(float,float,float,float,float,float);
+  vtkGetVector6Macro(Extent,double);
+  void SetExtent(double *);
+  void SetExtent(double,double,double,double,double,double);
 
   // Description:
   // handle the callback, this is called internally when one of the 
@@ -103,7 +103,7 @@ protected:
   ~vtkKWExtent();
 
   char *Command;
-  float Extent[6];
+  double Extent[6];
 
   vtkKWRange  *XRange;
   vtkKWRange  *YRange;

@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.27");
+vtkCxxRevisionMacro(vtkKWExtent, "1.28");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -134,16 +134,17 @@ void vtkKWExtent::Pack()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetExtentRange(float *er)
+void vtkKWExtent::SetExtentRange(double *er)
 {
   this->SetExtentRange(er[0],er[1],er[2],er[3],er[4],er[5]);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetExtentRange(float x1, float x2, float y1, float y2, 
-                                 float z1, float z2)
+void vtkKWExtent::SetExtentRange(double x1, double x2, 
+                                 double y1, double y2, 
+                                 double z1, double z2)
 {
-  float res = 512.0;
+  double res = 512.0;
   this->XRange->SetResolution((x2<x1)?((x1-x2)/res):((x2-x1)/res));
   this->YRange->SetResolution((y2<y1)?((y1-y2)/res):((y2-y1)/res));
   this->ZRange->SetResolution((y2<y1)?((y1-y2)/res):((y2-y1)/res));
@@ -152,7 +153,7 @@ void vtkKWExtent::SetExtentRange(float x1, float x2, float y1, float y2,
   this->YRange->SetWholeRange(y1, y2);
   this->ZRange->SetWholeRange(z1, z2);
 
-  float ex1, ex2, ey1, ey2, ez1, ez2;
+  double ex1, ex2, ey1, ey2, ez1, ez2;
 
   ex1 = (this->Extent[0] < x1 || this->Extent[0] > x2) ? x1 : this->Extent[0];
   ex2 = (this->Extent[1] < x1 || this->Extent[1] > x2) ? x2 : this->Extent[1];
@@ -165,7 +166,9 @@ void vtkKWExtent::SetExtentRange(float x1, float x2, float y1, float y2,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetExtent(float x1, float x2, float y1, float y2, float z1, float z2)
+void vtkKWExtent::SetExtent(double x1, double x2, 
+                            double y1, double y2, 
+                            double z1, double z2)
 {
   if (this->Extent[0] == x1 &&
       this->Extent[1] == x2 &&
@@ -183,7 +186,7 @@ void vtkKWExtent::SetExtent(float x1, float x2, float y1, float y2, float z1, fl
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetExtent(float *er)
+void vtkKWExtent::SetExtent(double *er)
 {
   this->SetExtent(er[0],er[1],er[2],er[3],er[4],er[5]);
 }
