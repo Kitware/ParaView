@@ -38,14 +38,14 @@ export PROJECT_NAME=ParaView
 # in Doxygen format. You need the VTK source files or a local copy of 
 # these scripts.
 # Example: 
-#   PATH_TO_VTK_DOX_SCRIPTS=@VTK_SOURCE_DIR@/Utilities/Doxygen
+#   PATH_TO_VTK_DOX_SCRIPTS=@VTK_DOXYGEN_HOME@
 #
-export PATH_TO_VTK_DOX_SCRIPTS=@VTK_SOURCE_DIR@/Utilities/Doxygen
+export PATH_TO_VTK_DOX_SCRIPTS=@VTK_DOXYGEN_HOME@
 
 # SOURCE_DIR:
 # Source directory. The top directory of the source files.
 # Example: 
-#   SOURCE_DIR=@VTK_SOURCE_DIR@
+#   SOURCE_DIR=@PARAVIEW_SOURCE_DIR@
 #
 export SOURCE_DIR=@PARAVIEW_SOURCE_DIR@
 
@@ -66,7 +66,7 @@ export REL_PATH_TO_TOP=.
 # the corresponding line.
 # DOXTEMP might be used to simplify the syntax.
 # Example: 
-#   DOXTEMP=DOXTEMP=@VTK_BINARY_DIR@/Utilities/Doxygen
+#   DOXTEMP=DOXTEMP=@PARAVIEW_BINARY_DIR@/Utilities/Doxygen
 #   INTERMEDIATE_DOX_DIR=$DOXTEMP/dox
 #
 export DOXTEMP=@PARAVIEW_BINARY_DIR@/Utilities/Doxygen
@@ -141,7 +141,7 @@ export RESULTING_HTML_TARZ_ARCHIVE_FILE=$DOXTEMP/$PROJECT_NAME-html.tar.gz
 # the .gz extension in VTK_TAGFILE.
 # Note: your doxyfile must be tailored to make use-of or create this tag file.
 #    (using TAGFILES = vtk4-nightly.tag=http://www.vtk.org/doc/nightly/html
-#        or GENERATE_TAGFILE = "@VTK_BINARY_DIR@/Utilities/Doxygen/vtk4.tag")
+#        or GENERATE_TAGFILE = "@FOO_BINARY_DIR@/Utilities/Doxygen/vtk4.tag")
 # Example: 
 #   DOWNLOAD_VTK_TAGFILE=OFF
 #   VTK_TAGFILE=vtk4-nightly.tag
