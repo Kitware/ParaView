@@ -15,28 +15,28 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVUpdateSupressor.h"
+#include "vtkPVUpdateSuppressor.h"
 
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSupressor, "1.2");
-vtkStandardNewMacro(vtkPVUpdateSupressor);
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.3");
+vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
-vtkPVUpdateSupressor::vtkPVUpdateSupressor()
+vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 {
   this->vtkSource::SetNthOutput(1,vtkPolyData::New());
   this->Outputs[1]->Delete();
 }
 
 //----------------------------------------------------------------------------
-vtkPVUpdateSupressor::~vtkPVUpdateSupressor()
+vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 {
 }
 
 //----------------------------------------------------------------------------
-unsigned long vtkPVUpdateSupressor::GetMTime()
+unsigned long vtkPVUpdateSuppressor::GetMTime()
 {
   unsigned long mTime=this->vtkPolyDataToPolyDataFilter::GetMTime();
 
@@ -44,7 +44,7 @@ unsigned long vtkPVUpdateSupressor::GetMTime()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSupressor::ForceUpdate()
+void vtkPVUpdateSuppressor::ForceUpdate()
 {
    vtkPolyData *input = this->GetInput();
    if ( input )
@@ -55,7 +55,7 @@ void vtkPVUpdateSupressor::ForceUpdate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSupressor::UpdateData(vtkDataObject *output)
+void vtkPVUpdateSuppressor::UpdateData(vtkDataObject *output)
 {
   int idx;
 
@@ -87,7 +87,7 @@ void vtkPVUpdateSupressor::UpdateData(vtkDataObject *output)
       if (this->SortedInputs[idx] != NULL)
         {
         this->SortedInputs[idx]->PropagateUpdateExtent();
-	// Do not update input
+        // Do not update input
         //this->SortedInputs[idx]->UpdateData();
         }
       }
@@ -169,7 +169,7 @@ void vtkPVUpdateSupressor::UpdateData(vtkDataObject *output)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSupressor::Execute()
+void vtkPVUpdateSuppressor::Execute()
 {
   vtkPolyData *input = this->GetInput();
   vtkPolyData *output = this->GetOutput();
@@ -181,7 +181,7 @@ void vtkPVUpdateSupressor::Execute()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSupressor::SetUpdateNumberOfPieces(int p)
+void vtkPVUpdateSuppressor::SetUpdateNumberOfPieces(int p)
 {
   vtkPolyData *input = this->GetInput();
   if ( input )
@@ -191,7 +191,7 @@ void vtkPVUpdateSupressor::SetUpdateNumberOfPieces(int p)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSupressor::SetUpdatePiece(int p)
+void vtkPVUpdateSuppressor::SetUpdatePiece(int p)
 {
   vtkPolyData *input = this->GetInput();
   if ( input )
@@ -201,7 +201,7 @@ void vtkPVUpdateSupressor::SetUpdatePiece(int p)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSupressor::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
