@@ -341,7 +341,7 @@ void outputFunction(FILE *fp, FileInfo *data)
       }
     fprintf(fp,");\n");
     return_result(fp);
-    fprintf(fp,"      return 0;\n");
+    fprintf(fp,"      return 1;\n");
     fprintf(fp,"      }\n");
     fprintf(fp,"    }\n");
 
@@ -363,7 +363,7 @@ void outputFunction(FILE *fp, FileInfo *data)
     fprintf(fp,"    op->AddObserver(temp0,apo);\n");
     fprintf(fp,"    apo->Delete();\n");
     fprintf(fp,"    delete [] temp0;\n");
-    fprintf(fp,"    return 0;\n");
+    fprintf(fp,"    return 1;\n");
     fprintf(fp,"    }\n");
     }
 #endif
@@ -375,7 +375,11 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
   int i;
 
   fprintf(fp,"// ClientServer wrapper for %s object\n//\n",data->ClassName);
-  fprintf(fp,"#define VTK_STREAMS_FWD_ONLY\n");
+  if(strcmp("vtkObjectBase", data->ClassName) != 0)
+    {
+    /* Block inclusion of full streams. */
+    fprintf(fp,"#define VTK_STREAMS_FWD_ONLY\n");
+    }
   fprintf(fp,"#include \"vtkSystemIncludes.h\"\n");
   fprintf(fp,"#include \"%s.h\"\n",data->ClassName);
   fprintf(fp,"#include \"vtkClientServerInterpreter.h\"\n");
@@ -438,11 +442,27 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
   /* try superclasses */
   for (i = 0; i < data->NumberOfSuperClasses; i++)
     {
-    fprintf(fp,"\n  if (%sCommand(arlu, op,method,msg,resultStream) == 0)\n",
+    fprintf(fp,"\n  if (%sCommand(arlu, op,method,msg,resultStream))\n",
               data->SuperClasses[i]);
-    fprintf(fp,"    {\n    return 0;\n    }\n");
+    fprintf(fp,"    {\n    return 1;\n    }\n");
     }
-
+  /* Add the Print method to vtkObjectBase. */
+  if (!strcmp("vtkObjectBase",data->ClassName))
+    {
+    fprintf(fp,
+            "  if (!strcmp(\"Print\",method) && msg.GetNumberOfArguments(0) == 2)\n"
+            "    {\n"
+            "    ostrstream buf_with_warning_C4701;\n"
+            "    op->Print(buf_with_warning_C4701);\n"
+            "    buf_with_warning_C4701.put('\\0');\n"
+            "    resultStream.Reset();\n"
+            "    resultStream << vtkClientServerStream::Reply\n"
+            "                 << buf_with_warning_C4701.str()\n"
+            "                 << vtkClientServerStream::End;\n"
+            "    buf_with_warning_C4701.rdbuf()->freeze(0);\n"
+            "    return 1;\n"
+            "    }\n");
+    }
   fprintf(fp,
           "  vtkOStrStreamWrapper vtkmsg;\n"
           "  vtkmsg << \"Object type: %s, could not find requested method: \\\"\"\n"
@@ -453,6 +473,6 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
           "  vtkmsg.rdbuf()->freeze(0);\n",
           data->ClassName);
   fprintf(fp,
-          "  return 1;\n"
+          "  return 0;\n"
           "}\n");
 }
