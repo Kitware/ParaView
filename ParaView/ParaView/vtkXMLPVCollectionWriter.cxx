@@ -41,9 +41,24 @@
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
+#if defined(_WIN32)
+# include <direct.h>
+int vtkXMLPVCollectionWriterMakeDirectory(const char* dirname)
+{
+  return (_mkdir(dirname) >= 0)?1:0;
+}
+#else
+# include <sys/stat.h>
+# include <sys/types.h>
+int vtkXMLPVCollectionWriterMakeDirectory(const char* dirname)
+{
+  return (mkdir(dirname, 00755) >= 0)?1:0;
+}
+#endif
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVCollectionWriter);
-vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.6.2.1");
+vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.6.2.2");
 
 class vtkXMLPVCollectionWriterInternals
 {
@@ -142,6 +157,11 @@ int vtkXMLPVCollectionWriter::WriteInternal()
   
   float progressRange[2] = {0,0};
   this->GetProgressRange(progressRange);
+  
+  // Create the subdirectory for the internal files.
+  vtkstd::string subdir = this->Internal->FilePath;
+  subdir += this->Internal->FilePrefix;
+  vtkXMLPVCollectionWriterMakeDirectory(subdir.c_str());
   
   // Write each input.
   int i;
@@ -411,7 +431,7 @@ void vtkXMLPVCollectionWriter::SplitFileName()
     }
   else
     {
-    this->Internal->FilePath = "";
+    this->Internal->FilePath = "./";
     name = fileName;
     }
   
@@ -424,6 +444,10 @@ void vtkXMLPVCollectionWriter::SplitFileName()
   else
     {
     this->Internal->FilePrefix = name;
+    
+    // Since a subdirectory is used to store the files, we need to
+    // change its name if there is no file extension.
+    this->Internal->FilePrefix += "_data";
     }
 }
 
@@ -439,7 +463,9 @@ vtkXMLPVCollectionWriterInternals::CreatePieceFileName(int index,
     fn_with_warning_C4701 << path;
     }
   fn_with_warning_C4701
-    << this->FilePrefix.c_str() << "_" << index << ".pva" << ends;
+    << this->FilePrefix.c_str() << "/"
+    << this->FilePrefix.c_str() << "_" << index << "."
+    << this->Writers[index]->GetDefaultFileExtension() << ends;
   fname = fn_with_warning_C4701.str();
   fn_with_warning_C4701.rdbuf()->freeze(0);
   return fname;
