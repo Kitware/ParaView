@@ -53,11 +53,7 @@ protected:
 
   // For picking.  Use a proxy in the future.
   vtkPVRenderModule* RenderModule;
-
-  virtual void OnMouseMove();
-  virtual void OnLeftButtonDown();
   virtual void OnRightButtonDown();
-  virtual void OnRightButtonUp();
 
 private:
   vtkPickPointWidget(const vtkPickPointWidget&); // Not implemented
