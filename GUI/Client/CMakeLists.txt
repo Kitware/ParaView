@@ -340,7 +340,7 @@ ADD_LIBRARY(vtkKWParaView ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
   ${ParaViewServerNonWrapped_SRCS}
   ${ParaViewSharedNotWrapped_SRCS}
   ${ParaView_SRCS})
-TARGET_LINK_LIBRARIES(vtkKWParaView vtkKWWidgetsTCL vtkPVServerManagerTCL)
+TARGET_LINK_LIBRARIES(vtkKWParaView vtkKWWidgetsTCL vtkPVServerManagerTCL ${PARAVIEW_ADDITIONAL_LIBRARIES})
 
 
 
