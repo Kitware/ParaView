@@ -25,8 +25,7 @@ $kw(vtkTemp1) SetUseMessageDialog 0
 $kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
 
 # Choose the file name/type based on whether we are in parallel mode.
-set kw(vtkTemp1000) [$Application GetController]
-set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
+set nprocs  [$Application GetNumberOfPartitions]
 
 set ext "vtu"
 if {$nprocs > 1} { set ext "pvtu" }

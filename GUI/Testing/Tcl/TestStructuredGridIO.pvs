@@ -29,8 +29,7 @@ $kw(vtkTemp305) SetValue "$DataDir/Data/combq.bin"
 $kw(vtkTemp292) AcceptCallback
 
 # Choose the file name/type based on whether we are in parallel mode.
-set kw(vtkTemp1000) [$Application GetController]
-set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
+set nprocs  [$Application GetNumberOfPartitions]
 
 set ext "vts"
 if {$nprocs > 1} { set ext "pvts" }
