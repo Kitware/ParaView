@@ -101,7 +101,13 @@ public:
   // if no such attribute or value exists.
   int GetAttributeValueIndex(int attribute, const char* value);
   int GetAttributeValueIndex(const char* name, const char* value);
-  
+
+  // Description:
+  // Get the vtkXMLDataElement representing the collection element
+  // corresponding to the output with the given index.  Valid when a
+  // FileName has been set.  May change when Restriction settings are
+  // changed.
+  vtkXMLDataElement* GetOutputXMLDataElement(int index);
 protected:
   vtkXMLCollectionReader();
   ~vtkXMLCollectionReader();  
