@@ -38,6 +38,7 @@ vtkKWScale.cxx
 vtkKWSplashScreen.cxx
 vtkKWSplitFrame.cxx
 vtkKWTclInteractor.cxx
+vtkKWTextProperty.cxx
 vtkKWTkUtilities.cxx
 vtkKWText.cxx 
 vtkKWToolbar.cxx 
