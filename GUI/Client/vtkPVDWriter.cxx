@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDWriter);
-vtkCxxRevisionMacro(vtkPVDWriter, "1.9");
+vtkCxxRevisionMacro(vtkPVDWriter, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVDWriter::vtkPVDWriter()
@@ -46,11 +46,15 @@ void vtkPVDWriter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVDWriter::CanWriteData(vtkDataSet* data, int, int)
+int vtkPVDWriter::CanWriteData(vtkDataObject* data, int, int)
 {
-  // We support all data types in both parallel and serial mode, and
+  // We support all dataset types in both parallel and serial mode, and
   // with any number of parts.
-  return data?1:0;
+  if (!data || !data->IsA("vtkDataSet"))
+    {
+    return 0;
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------

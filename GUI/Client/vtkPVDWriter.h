@@ -33,7 +33,7 @@ public:
   
   // Description:
   // Check whether this writer supports the given VTK data set's type.
-  virtual int CanWriteData(vtkDataSet* data, int parallel, int numParts);
+  virtual int CanWriteData(vtkDataObject* data, int parallel, int numParts);
   
   // Description:
   // Write the current source's data to the collection file with the
