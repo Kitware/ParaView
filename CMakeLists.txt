@@ -31,16 +31,16 @@ ENDIF (UNIX)
 
 IF (WIN32)
 FIND_PATH( HTML_HELP_PATH htmlhelp.h 
-	   "c:\program files\html help workshop"  
-	   "c:\program files\html help workshop\include" )
+	   "c:/program files/html help workshop"  
+	   "c:/program files/html help workshop/include" )
 
 IF (HTML_HELP_PATH)
   INCLUDE_DIRECTORIES(${HTML_HELP_PATH})
 ENDIF (HTML_HELP_PATH)
 
 FIND_LIBRARY( HTML_HELP_LIBRARY htmlhelp
-	   "c:\program files\html help workshop"  
-	   "c:\program files\html help workshop\LIB")
+	   "c:/program files/html help workshop"  
+	   "c:/program files/html help workshop/LIB")
 
 IF (HTML_HELP_LIBRARY)	  
    LINK_LIBRARIES( ${HTML_HELP_LIBRARY} )
