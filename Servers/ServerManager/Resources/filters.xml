@@ -1235,6 +1235,43 @@
    <!-- End Median -->
    </SourceProxy>
 
+   <SourceProxy name="MeshQuality" class="vtkMeshQuality">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+     </InputProperty>
+     <IntVectorProperty
+        name="TriangleQualityMeasure"
+        command="SetTriangleQualityMeasure"
+        number_of_elements="1"
+        default_values="0">
+       <IntRangeDomain name="range" min="0" max="3"/>
+     </IntVectorProperty>
+     <IntVectorProperty
+        name="QuadQualityMeasure"
+        command="SetQuadQualityMeasure"
+        number_of_elements="1"
+        default_values="0">
+       <IntRangeDomain name="range" min="0" max="3"/>
+     </IntVectorProperty>
+     <IntVectorProperty
+        name="TetQualityMeasure"
+        command="SetTetQualityMeasure"
+        number_of_elements="1"
+        default_values="0">
+       <IntRangeDomain name="range" min="0" max="3"/>
+     </IntVectorProperty>
+   <!-- End MeshQuality -->
+   </SourceProxy>
+
+
    <SourceProxy name="PolyDataNormals" class="vtkPPolyDataNormals">
     <InputProperty
        name="Input"

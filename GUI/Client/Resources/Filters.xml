@@ -26,7 +26,7 @@ No documation now.
   </Module>
   <Module name="SurfaceVectors"
           button_image="PVSurfaceVectorsButton"
-	  button_visibility="0"
+          button_visibility="0"
           button_help="Constrain a vector field to lie on a surface.  Glyphs must be used to display the vector field."
           root_name="SurfaceV"
           menu_name="Surface Vectors"
@@ -88,7 +88,7 @@ Intergates point and cell data over lines and surfaces.  It also computes length
           class="vtkPVPick"
           button_image="PVIntegrateFlowButton"
           button_help="Integrate a vector field through a surface. 3D cells are ignored."
-	  button_visibility="0"
+          button_visibility="0"
           root_name="SurfaceFlow"
           menu_name="Surface Flow"
           module_type="Filter"
@@ -184,7 +184,7 @@ Create texture coordinates.
 
     <SelectArrays filter_arrays="Off"
                   deactivate="Off"
-		  field="Cell"
+                  field="Cell"
                   input_menu="im"
                   trace_name="ArraySelection"
                   property="AddVolumeArrayName"
@@ -749,7 +749,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
                    help="Alternative algorithm" />
     <SelectArrays filter_arrays="On"
                   deactivate="On"
-		  field="Cell"
+                  field="Cell"
                   input_menu="im"
                   trace_name="ArraySelection"
                   property="AddVolumeArrayName"
@@ -785,7 +785,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
                input_name="Input"/>
     <SelectArrays filter_arrays="On"
                   deactivate="On"
-		  field="Cell"
+                  field="Cell"
                   input_menu="im"
                   trace_name="ArraySelection"
                   property="AddVolumeArrayName"
@@ -833,7 +833,7 @@ The Extract Edges filter produces a wireframe version of the input data set by e
           short_help="Extract a subset of parts from a group."
           button_image="PVUngroupButton"
           button_help="Separate parts from a group."
-	  button_visibility="0">
+          button_visibility="0">
     <Filter class="vtkSelectInputs">
       <Input name="Input"
              class="vtkDataSet" quantity="Multiple">
@@ -1046,7 +1046,7 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
           short_help="Group multiple inputs into one collection."
           button_image="PVGroupButton"
           button_help="Group multiple modules into one."
-	  button_visibility="0">
+          button_visibility="0">
     <Filter class="vtkGroup">
       <Input name="Input"
              class="vtkDataSet" quantity="Multiple"/>
@@ -1184,6 +1184,51 @@ The Input menu allows the user to select the data set to which this filter will 
                  help="Determines the smoothing neighborhood."/>
     <Documentation>
 The Median filter operates on uniform rectilinear (image or volume) data and produces uniform rectilinear output. It replaces the scalar value at each pixel / voxel with the median scalar value in the specified surrounding neighborhood (Kernel Size). From the Input menu, the user can select the data set on which to perform this calculation. The Scalar menu determines which scalar array will be used to determine the median. The Kernel Size entry boxes specify the number of pixels / voxels in each dimension to use in computing the median to assign to each pixel / voxel. If the kernel size in a particular dimension is 1, then the median will not be computed in that direction. Since the median operation removes outliers, this filter is useful for removing high-intensity, low-probability noise (shot noise).
+    </Documentation>
+  </Module>
+  <Module name="MeshQuality"
+          class="vtkPVSource"
+          root_name="Quality"
+          menu_name="Mesh Quality"
+          module_type="Filter"
+          long_help="Compute the quality of triangular, quadrilateral, and tetrahedral cells in a mesh."
+          short_help="Compute the quality of the cells in a mesh.">
+    <Filter class="vtkMeshQuality">
+      <Input name="Input"
+             class="vtkDataSet">
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <SelectionList property="TriangleQualityMeasure"
+                   trace_name="TriangleQualityMeasure"
+                   label="Triangle Quality Measure"
+                   help="Select the quality measure used to evaluate triangle quality. The radius ratio is the size of a circle circumscribed by a triangle's 3 vertices divided by the size of a circle tangent to a triangle's 3 edges. The edge ratio is the ratio of the longest edge length to the shortest edge length.">
+      <Item name="Radius Ratio" value="0"/>
+      <Item name="Aspect Ratio" value="1"/>
+      <Item name="Frobenius Norm" value="2"/>
+      <Item name="Edge Ratio" value="3"/>
+    </SelectionList>
+    <SelectionList property="QuadQualityMeasure"
+                   trace_name="QuadQualityMeasure"
+                   label="Quadrilateral Quality Measure"
+                   help="Select the quality measure used to evaluate quadrilateral quality">
+      <Item name="Radius Ratio" value="0"/>
+      <Item name="Aspect Ratio" value="1"/>
+      <Item name="Edge Ratio" value="3"/>
+    </SelectionList>
+    <SelectionList property="TetQualityMeasure"
+                   trace_name="TetQualityMeasure"
+                   label="Tet Quality Measure"
+                   help="Select the quality measure used to evaluate tetrahedral quality. The radius ratio is the size of a sphere circumscribed by a tetrahedron's 4 vertices divided by the size of a circle tangent to a tetrahedron's 4 faces. The edge ratio is the ratio of the longest edge length to the shortest edge length.">
+      <Item name="Radius Ratio" value="0"/>
+      <Item name="Aspect Ratio" value="1"/>
+      <Item name="Frobenius Norm" value="2"/>
+      <Item name="Edge Ratio" value="3"/>
+    </SelectionList>
+    <Documentation>
+The mesh quality filter computes the quality of individual triangles, quadrilaterals and tetrahedra in a data set. Several quality measures exist for the different cell types. You may choose one for each type of cell. The filter then adds a new scalar array named "Quality" to the per-cell values of the data set containing these measures. Typically, a value of 1 is the optimal quality and the higher the value, the lower the cell quality.
     </Documentation>
   </Module>
   <Module name="PolyDataNormals"
