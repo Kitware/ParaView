@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.11");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.12");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -213,6 +213,7 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPointAtCanvasCoordinates(
   this->ColorTransferFunction->GetColor(parameter, rgb);
 
   // Add the point and redraw if a point was really added
+  // If we the point was inserted before the selection, shift the selection
 
   int old_size = this->GetFunctionSize();
   id = this->ColorTransferFunction->AddRGBPoint(
@@ -220,6 +221,10 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPointAtCanvasCoordinates(
   if (old_size != this->GetFunctionSize())
     {
     this->RedrawCanvasPoint(id);
+    if (this->HasSelection() && id <= this->SelectedPoint)
+      {
+      this->SelectPoint(this->SelectedPoint + 1);
+      }
     }
 
   return 1;
@@ -240,6 +245,7 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPointAtParameter(
   this->ColorTransferFunction->GetColor(parameter, rgb);
 
   // Add the point and redraw if a point was really added
+  // If we the point was inserted before the selection, shift the selection
 
   int old_size = this->GetFunctionSize();
   id = this->ColorTransferFunction->AddRGBPoint(
@@ -247,6 +253,10 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPointAtParameter(
   if (old_size != this->GetFunctionSize())
     {
     this->RedrawCanvasPoint(id);
+    if (this->HasSelection() && id <= this->SelectedPoint)
+      {
+      this->SelectPoint(this->SelectedPoint + 1);
+      }
     }
 
   return 1;
@@ -289,20 +299,14 @@ int vtkKWColorTransferFunctionEditor::MoveFunctionPointToCanvasCoordinates(
   int new_id = this->ColorTransferFunction->AddRGBPoint(
     parameter, rgb[0], rgb[1], rgb[2]);
 
-  // If the point was selected and the new point does not match (which
-  // should not happen anyway), reselect the new point
+  // Redraw the point
+  // Note that we *imply* here that new_id == id (i.e., we are moving the
+  // point without changing the order of the points)
 
-  if (this->HasSelection() && this->SelectedPoint == id && id != new_id)
+  this->RedrawCanvasPoint(new_id);
+  if (new_id == this->SelectedPoint)
     {
-    this->SelectPoint(new_id);
-    }
-  else
-    {
-    this->RedrawCanvasPoint(id);
-    if (new_id == this->SelectedPoint)
-      {
-      this->UpdatePointLabelWithFunctionPoint(new_id);
-      }
+    this->UpdatePointLabelWithFunctionPoint(new_id);
     }
 
   return 1;
@@ -349,20 +353,14 @@ int vtkKWColorTransferFunctionEditor::MoveFunctionPointToParameter(
   int new_id = this->ColorTransferFunction->AddRGBPoint(
     parameter, rgb[0], rgb[1], rgb[2]);
 
-  // If the point was selected and the new point does not match (which
-  // should not happen anyway), reselect the new point
+  // Redraw the point
+  // Note that we *imply* here that new_id == id (i.e., we are moving the
+  // point without changing the order of the points)
 
-  if (this->HasSelection() && this->SelectedPoint == id && id != new_id)
+  this->RedrawCanvasPoint(new_id);
+  if (new_id == this->SelectedPoint)
     {
-    this->SelectPoint(new_id);
-    }
-  else
-    {
-    this->RedrawCanvasPoint(new_id);
-    if (new_id == this->SelectedPoint)
-      {
-      this->UpdatePointLabelWithFunctionPoint(new_id);
-      }
+    this->UpdatePointLabelWithFunctionPoint(new_id);
     }
 
   return 1;
@@ -386,6 +384,7 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
     }
 
   // Remove the point and redraw if a point was really removed
+  // If we the point was removed before the selection, shift the selection
 
   int old_size = this->GetFunctionSize();
   this->ColorTransferFunction->RemovePoint(
@@ -393,6 +392,10 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
   if (old_size != this->GetFunctionSize())
     {
     this->RedrawCanvasPoint(id);
+    if (this->HasSelection() && id < this->SelectedPoint)
+      {
+      this->SelectPoint(this->SelectedPoint - 1);
+      }
     }
 
   return 1;
