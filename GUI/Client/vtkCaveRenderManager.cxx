@@ -39,7 +39,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkCaveRenderManager, "1.3");
+vtkCxxRevisionMacro(vtkCaveRenderManager, "1.4");
 vtkStandardNewMacro(vtkCaveRenderManager);
 
 // Structures to communicate render info.
@@ -370,7 +370,6 @@ void vtkCaveRenderManager::ClientStartRender()
   vtkCamera *cam;
   vtkLightCollection *lc;
   vtkLight *light;
-  float updateRate = this->RenderWindow->GetDesiredUpdateRate();
   
   vtkDebugMacro("StartRender");
   // Make sure they all swp buffers at the same time.

@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModule);
-vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.2");
 
 
 
@@ -221,7 +221,6 @@ vtkPVPartDisplay* vtkPVCaveRenderModule::CreatePartDisplay()
 //----------------------------------------------------------------------------
 void vtkPVCaveRenderModule::StillRender()
 {
-  unsigned long totalMemory = 0;
   vtkObject* object;
   vtkPVCompositePartDisplay* pDisp;
 
