@@ -267,6 +267,17 @@ ADD_TEST (AnimationImages-ParaView
   -V ${PVClientTestData}/Baseline/AnimationImages.png
   )
 
+ADD_TEST(VolumeRenderVox8-ParaView 
+  ${PARAVIEW_EXECUTABLE} 
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/VolumeRenderVox8.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/VolumeRenderVox8.png
+  )
+
 # Test the PVLocal plugin example.
 IF(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 1.8)
   IF(BUILD_SHARED_LIBS)
