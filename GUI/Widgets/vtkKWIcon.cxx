@@ -14,7 +14,6 @@
 #include "vtkKWIcon.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkBase64Utilities.h"
 
 #if ((VTK_MAJOR_VERSION <= 4) && (VTK_MINOR_VERSION <= 4))
 #include "zlib.h"
@@ -24,9 +23,11 @@
 
 #include "Resources/vtkKWIconResources.h"
 
+#include <kwsys/Base64.h>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.6");
+vtkCxxRevisionMacro(vtkKWIcon, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -88,8 +89,8 @@ void vtkKWIcon::SetImage(const unsigned char *data,
     if (data_ptr[0] != 0x78 || data_ptr[1] != 0xDA)
       {
       base64_buffer = new unsigned char [buffer_length];
-      buffer_length = vtkBase64Utilities::Decode(data_ptr, 0, 
-                                                 base64_buffer, buffer_length);
+      buffer_length = kwsysBase64_Decode(data_ptr, 0, 
+                                         base64_buffer, buffer_length);
       if (buffer_length == 0)
         {
         vtkGenericWarningMacro(<< "Error decoding base64 stream");

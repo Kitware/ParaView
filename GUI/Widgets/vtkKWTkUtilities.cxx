@@ -19,12 +19,13 @@
 
 #include "vtkPNGWriter.h"
 #include "vtkImageData.h"
-#include "vtkBase64Utilities.h"
 #include "vtkObjectFactory.h"
 
 #include "vtkWindows.h"
-#include <kwsys/SystemTools.hxx>
 #include "X11/Xutil.h"
+
+#include <kwsys/SystemTools.hxx>
+#include <kwsys/Base64.h>
 
 // This has to be here because on HP varargs are included in 
 // tcl.h and they have different prototypes for va_start so
@@ -42,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.43");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.44");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -290,8 +291,8 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     if (data_ptr[0] != 0x78 || data_ptr[1] != 0xDA)
       {
       base64_buffer = new unsigned char [buffer_length];
-      buffer_length = vtkBase64Utilities::Decode(data_ptr, 0, 
-                                                 base64_buffer, buffer_length);
+      buffer_length = kwsysBase64_Decode(data_ptr, 0, 
+                                         base64_buffer, buffer_length);
       if (buffer_length == 0)
         {
         vtkGenericWarningMacro(<< "Error decoding base64 stream");
