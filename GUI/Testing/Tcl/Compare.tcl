@@ -25,6 +25,10 @@ proc Compare {Application argv argc} {
            }
            $colorMap SetScalarBarVisibility 0
        }
+       [ $MainView GetCornerAnnotation ] SetVisibility 0
+       [ $MainView GetHeaderButton ] SetState 0
+       $MainView HeaderChanged
+       $MainView OnDisplayHeader
       for {set i  1} {$i < [expr $argc - 1]} {incr i} {
          if {[lindex $argv $i] == "-BT"} {
             source [lindex $argv [expr $i + 1]]
