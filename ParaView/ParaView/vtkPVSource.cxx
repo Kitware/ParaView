@@ -720,6 +720,14 @@ int vtkPVSource::GetVisibility()
 //----------------------------------------------------------------------------
 void vtkPVSource::AcceptCallback()
 {
+  this->Accept();
+
+  this->GetPVApplication()->AddTraceEntry("$pv(%s) AcceptCallback",
+                                          this->GetTclName());
+}
+
+void vtkPVSource::Accept()
+{
   vtkPVWindow *window;
 
   window = this->GetPVWindow();
@@ -821,10 +829,6 @@ void vtkPVSource::AcceptCallback()
 #else
   this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
 #endif  
-
-
-  this->GetPVApplication()->AddTraceEntry("$pv(%s) AcceptCallback",
-                                          this->GetTclName());
 }
 
 //----------------------------------------------------------------------------

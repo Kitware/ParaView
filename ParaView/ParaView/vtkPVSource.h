@@ -150,6 +150,10 @@ public:
   // Description:
   // Called when the accept button is pressed.
   virtual void AcceptCallback();
+
+  // Description:
+  // Internal method; called by AcceptCallback
+  void Accept();
   
   // Description:
   // Called when the reset button is pressed.

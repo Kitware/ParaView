@@ -224,7 +224,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
 
   pvd->InsertExtractPiecesIfNecessary();
 
-  pvs->AcceptCallback();  
+  pvs->Accept();
 
   // so we get prompted for a filename if another data set reader is created
   this->SetDataFileName(NULL);

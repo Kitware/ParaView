@@ -898,7 +898,9 @@ void vtkPVWindow::OpenCallback()
 #else
   this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {.vtk .pvtk .case .pop .stl}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
 #endif
-  openFileName = this->GetPVApplication()->GetMainInterp()->result;
+  
+  openFileName = new char[strlen(this->GetPVApplication()->GetMainInterp()->result) + 1];
+  strcpy(openFileName, this->GetPVApplication()->GetMainInterp()->result);
 
   if (strcmp(openFileName, "") == 0)
     {
@@ -916,7 +918,7 @@ void vtkPVWindow::OpenCallback()
   delete input;
   
   this->Open(openFileName);
-
+  delete [] openFileName;
 }
 
 //----------------------------------------------------------------------------
@@ -928,10 +930,8 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   int position;
   char *endingSlash = NULL;
   char *newRootName;
+  vtkPVSource *pvs;
   
-  this->GetPVApplication()->AddTraceEntry("$pv(%s) Open {%s}",
-                                          this->GetTclName(), openFileName);
-
   extension = strrchr(openFileName, '.');
   position = extension - openFileName;
   rootName = new char[position + 1];
@@ -993,8 +993,13 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   sInt->SetRootName(rootName);
   
   delete [] rootName;
-  
-  return sInt->CreateCallback();
+
+  pvs = sInt->CreateCallback();
+  this->GetPVApplication()->AddTraceEntry("set pv(%s) [$pv(%s) Open {%s}]",
+                                          pvs->GetTclName(),
+                                          this->GetTclName(), openFileName);
+
+  return pvs;
 }
 
 

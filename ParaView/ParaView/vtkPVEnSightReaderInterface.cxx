@@ -202,7 +202,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     pvs->SetName(srcTclName);
     this->PVWindow->AddPVSource(pvs);
     pvs->SetNthPVOutput(0, pvd);
-    pvs->AcceptCallback();
+    pvs->Accept();
     
     pvs->Delete();
     pvd->Delete();
