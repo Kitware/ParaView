@@ -430,6 +430,8 @@ protected:
   int CheckRegistration();
   int PromptRegistration(char *,char *);
 
+  virtual void FindApplicationInstallationDirectory();
+
   vtkPVProcessModule *ProcessModule;
   vtkPVRenderModule *RenderModule;
   char* RenderModuleName;

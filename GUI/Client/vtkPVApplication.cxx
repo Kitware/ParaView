@@ -109,7 +109,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.290");
+vtkCxxRevisionMacro(vtkPVApplication, "1.291");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2235,11 +2235,11 @@ char* vtkPVApplication::GetDemoPath()
 
   if (this->GetApplicationInstallationDirectory())
     {
-    sprintf(temp1, "%s/../Demos/Demo1.pvs",
+    sprintf(temp1, "%s/Demos/Demo1.pvs",
             this->GetApplicationInstallationDirectory());
     if (stat(temp1, &fs) == 0) 
       {
-      sprintf(temp1, "%s/../Demos",
+      sprintf(temp1, "%s/Demos",
               this->GetApplicationInstallationDirectory());
       this->SetDemoPath(temp1);
       found=1;
@@ -2435,4 +2435,26 @@ vtkKWLoadSaveDialog* vtkPVApplication::NewLoadSaveDialog()
   dialog->SetMasterWindow(this->GetMainWindow());
   return dialog;
   
+}
+
+void vtkPVApplication::FindApplicationInstallationDirectory()
+{
+  this->Superclass::FindApplicationInstallationDirectory();
+  
+  if (!this->ApplicationInstallationDirectory)
+    {
+    return;
+    }
+
+  // Paraview is installed in the bin/ directory. Strip it off if found.
+  // This will only happen if the binary has been installed. No change is
+  // made if the path is retrieved from the registery, or if the binary
+  // is a 'build'.
+
+  int length = strlen(this->ApplicationInstallationDirectory);
+  if (length >= 4 &&
+      !strcmp(this->ApplicationInstallationDirectory + length - 4, "/bin"))
+    {
+    this->ApplicationInstallationDirectory[length - 4] = '\0';
+    }
 }
