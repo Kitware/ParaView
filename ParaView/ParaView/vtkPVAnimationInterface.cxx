@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.102.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.102.2.2");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -975,12 +975,10 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
       // the side effect of making the Accept button red. Here is we
       // set to white again. Ideally, we should only work with properties.
       // TODO: Fix this.
-      vtkCollectionIterator* it = this->AnimationEntriesIterator;
       for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
         {
         vtkPVAnimationInterfaceEntry* entry
           = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
-        vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
         if ( entry->GetPVSource() )
           {
           entry->GetPVSource()->SetAcceptButtonColorToWhite();

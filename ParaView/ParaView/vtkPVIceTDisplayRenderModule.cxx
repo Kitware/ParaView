@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.7");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.7.2.1");
 
 
 
@@ -163,11 +163,7 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
   // **********************************************************
   this->CompositeID = pm->NewStreamObject("vtkIceTClientCompositeManager");
-  pm->SendStreamToClient();
-  pm->GetStream() << vtkClientServerStream::New
-                  << "vtkIceTClientCompositeManager" << this->CompositeID 
-                  << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStreamToClientAndServerRoot();
 
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.

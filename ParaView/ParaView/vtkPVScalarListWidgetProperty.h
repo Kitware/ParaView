@@ -33,7 +33,6 @@ public:
   void SetVTKCommands(int numCmds, const char * const*cmds, int *numScalars);
 //ETX
   void SetScalars(int num, float *scalars);
-  void AddScalar(float scalar);
   float* GetScalars() { return this->Scalars; }
   float GetScalar(int idx);
   vtkGetMacro(NumberOfScalars, int);
