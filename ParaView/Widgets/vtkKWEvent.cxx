@@ -69,6 +69,8 @@ static const char *vtkKWEventStrings[] = {
   "CroppingPlanesPositionChangedEvent",
   "CroppingRegionFlagsChangedEvent",
   "ScaleBarVisibilityChangedEvent",
+  "DistanceVisibilityChangedEvent",
+  "AngleVisibilityChangedEvent",
   "MiddleMouseOptionChangedEvent",
   "MultiPassStillRenderEndEvent",
   "MultiPassStillRenderStageChangedEvent",

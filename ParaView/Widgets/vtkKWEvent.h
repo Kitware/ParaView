@@ -78,6 +78,8 @@ class VTK_EXPORT vtkKWEvent
     CroppingPlanesPositionChangedEvent,
     CroppingRegionFlagsChangedEvent,
     ScaleBarVisibilityChangedEvent,
+    DistanceVisibilityChangedEvent,
+    AngleVisibilityChangedEvent,
     MiddleMouseOptionChangedEvent,
     MultiPassStillRenderEndEvent,
     MultiPassStillRenderStageChangedEvent,
