@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.49");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.50");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -127,7 +127,7 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWChangeColorButton::CreateLabel(vtkKWApplication *app, const char *args)
+void vtkKWChangeColorButton::CreateLabel(vtkKWApplication *app, const char *vtkNotUsed(args))
 {
   // Tk bug: The button frame *has* to be created before the label if we
   // want to be able to pack the label inside the frame
@@ -509,7 +509,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.49 $");
+  this->ExtractRevision(os,"$Revision: 1.50 $");
 }
 
 //----------------------------------------------------------------------------
