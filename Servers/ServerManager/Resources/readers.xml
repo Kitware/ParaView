@@ -785,7 +785,8 @@
      <IntVectorProperty 
         name="DisplayType"
         command="SetDisplayType"
-        number_of_elements="1" />
+        number_of_elements="1" 
+        default_values="1"/>
 
      <StringVectorProperty
         name="BlockArrayStatus"
