@@ -141,6 +141,8 @@ protected:
   vtkKWVolumeComposite();
   ~vtkKWVolumeComposite();
 
+  vtkImageData                         *Input;
+  
   vtkLODProp3D                         *LODVolume;
   vtkVolumeProperty                    *VolumeProperty;
 
