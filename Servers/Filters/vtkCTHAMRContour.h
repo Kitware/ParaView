@@ -27,12 +27,6 @@
 #include "vtkToolkits.h" // I need the VTK_USE_PATENTED flag 
 
 class vtkCTHData;
-class vtkPlane;
-class vtkAppendPolyData;
-class vtkContourFilter;
-class vtkDataSetSurfaceFilter;
-class vtkCutter;
-class vtkImageData;
 class vtkPolyData;
 class vtkFloatArray;
 class vtkDataArray;
@@ -65,11 +59,6 @@ public:
     {this->SetInputScalarsSelection(fieldName);}
 
   // Description:
-  // Use a different algorithm that ignores ghost levels.
-  vtkSetMacro(IgnoreGhostLevels, int);
-  vtkGetMacro(IgnoreGhostLevels, int);
-
-  // Description:
   // Look at contours to compute MTime.
   unsigned long GetMTime();    
 
@@ -79,29 +68,12 @@ protected:
 
   virtual void Execute();
 
-  void ExecuteBlock(vtkImageData* block, vtkAppendPolyData* append);
-  void ExecutePart(const char* arrayName, vtkImageData* block, 
-                   vtkAppendPolyData* append);
-
-
   // ----
   vtkContourValues *ContourValues;
   char *InputScalarsSelection;
   vtkSetStringMacro(InputScalarsSelection);
 
-  int IgnoreGhostLevels;
-
-  void CreateInternalPipeline();
-  void DeleteInternalPipeline();
-
-  // Pipeline to extract a part from a block.
-  vtkImageData* Image;
-  // Polydata is not instantiated.  It just holds the output
-  // from the internal pipeline.
-  vtkPolyData* PolyData;
-
 private:
-  void InternalImageDataCopy(vtkCTHAMRContour *src);
 
   vtkCTHAMRContour(const vtkCTHAMRContour&);  // Not implemented.
   void operator=(const vtkCTHAMRContour&);  // Not implemented.

@@ -37,6 +37,7 @@ class vtkPixel;
 class vtkVertex;
 class vtkVoxel;
 class vtkImageData;
+class vtkRectilinearGrid;
 
 class VTK_EXPORT vtkCTHData : public vtkDataSet
 {
@@ -49,6 +50,7 @@ public:
   // Description:
   // Access to blocks as image data.
   void GetBlock(int blockId, vtkImageData* block);
+  void GetDualBlock(int blockId, vtkRectilinearGrid* dual);
 
   // Description:
   // Copy the geometric and topological structure of an input image data

@@ -38,8 +38,9 @@
 #include "vtkVertex.h"
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
+#include "vtkRectilinearGrid.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.23");
+vtkCxxRevisionMacro(vtkCTHData, "1.24");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -123,6 +124,265 @@ void vtkCTHData::Initialize()
 void vtkCTHData::GetExtent(int extent[6])
 {
   this->Information->Get(vtkDataObject::DATA_EXTENT(), extent);
+}
+
+//----------------------------------------------------------------------------
+template <class T>
+void vtkCTHDataInterpolateDualFace(T *ptr0, int *dims, int numComps)
+{
+  int i, j, k;
+  int inc1, inc2, inc3;
+  T *ptr1, *ptr2, *ptrc;
+
+  inc1 = numComps;
+  inc2 = dims[0] * inc1;
+  inc3 = dims[1] * inc2;
+
+  // XY faces.  
+  if (dims[2] > 1)
+    {
+    ptr2 = ptr0;
+    for (j = 0; j < dims[1]; ++j)
+      {
+      ptr1 = ptr2;
+      for (i = 0; i < dims[0]; ++i)
+        {
+        ptrc = ptr1;
+        for (k = 0; k < numComps; ++k)
+          {
+          *ptrc = 0.5 * (*ptrc + ptrc[inc3]);
+          ++ptrc;
+          }
+        ptr1 += inc1;
+        }
+      ptr2 += inc2;
+      }
+    }
+  // What to do if dims is 2? Skip it  
+  if (dims[2] > 2)
+    {
+    ptr2 = ptr0 + inc3*(dims[2]-1);
+    for (j = 0; j < dims[1]; ++j)
+      {
+      ptr1 = ptr2;
+      for (i = 0; i < dims[0]; ++i)
+        {
+        ptrc = ptr1;
+        for (k = 0; k < numComps; ++k)
+          {
+          *ptrc = 0.5 * (*ptrc + ptrc[-inc3]);
+          ++ptrc;
+          }
+        ptr1 += inc1;
+        }
+      ptr2 += inc2;
+      }
+    }
+    
+  // XZ faces
+  if (dims[1] > 1)
+    {
+    ptr2 = ptr0;
+    for (j = 0; j < dims[2]; ++j)
+      {
+      ptr1 = ptr2;
+      for (i = 0; i < dims[0]; ++i)
+        {
+        ptrc = ptr1;
+        for (k = 0; k < numComps; ++k)
+          {
+          *ptrc = 0.5 * (*ptrc + ptrc[inc2]);
+          ++ptrc;
+          }
+        ptr1 += inc1;
+        }
+      ptr2 += inc3;
+      }
+    }
+  // What to do if dims is 2? Skip it  
+  if (dims[1] > 2)
+    {
+    ptr2 = ptr0 + inc2*(dims[1]-1);
+    for (j = 0; j < dims[2]; ++j)
+      {
+      ptr1 = ptr2;
+      for (i = 0; i < dims[0]; ++i)
+        {
+        ptrc = ptr1;
+        for (k = 0; k < numComps; ++k)
+          {
+          *ptrc = 0.5 * (*ptrc + ptrc[-inc2]);
+          ++ptrc;
+          }
+        ptr1 += inc1;
+        }
+      ptr2 += inc3;
+      }
+    }
+  // YZ faces
+  if (dims[0] > 1)
+    {
+    ptr2 = ptr0;
+    for (j = 0; j < dims[2]; ++j)
+      {
+      ptr1 = ptr2;
+      for (i = 0; i < dims[1]; ++i)
+        {
+        ptrc = ptr1;
+        for (k = 0; k < numComps; ++k)
+          {
+          *ptrc = 0.5 * (*ptrc + ptrc[inc1]);
+          ++ptrc;
+          }
+        ptr1 += inc2;
+        }
+      ptr2 += inc3;
+      }
+    }
+  if (dims[0] > 2)
+    {
+    ptr2 = ptr0 + inc1*(dims[0]-1);
+    for (j = 0; j < dims[2]; ++j)
+      {
+      ptr1 = ptr2;
+      for (i = 0; i < dims[1]; ++i)
+        {
+        ptrc = ptr1;
+        for (k = 0; k < numComps; ++k)
+          {
+          *ptrc = 0.5 * (*ptrc + ptrc[-inc1]);
+          ++ptrc;
+          }
+        ptr1 += inc2;
+        }
+      ptr2 += inc3;
+      }
+    }
+} 
+
+
+//----------------------------------------------------------------------------
+void vtkCTHData::GetDualBlock(int blockId, vtkRectilinearGrid* dual)
+{
+  int idx;
+
+  if (blockId < 0 || blockId >= this->GetNumberOfBlocks())
+    {
+    vtkErrorMacro("Block id out of range.");
+    return;
+    }
+
+  int dims[3];
+  this->GetBlockCellDimensions(blockId, dims);
+  double *origin = this->GetBlockOrigin(blockId);
+  double *spacing = this->GetBlockSpacing(blockId);
+
+  // Set up the structure of the dual grid.
+  dual->Initialize();
+  dual->SetDimensions(dims);
+  vtkDoubleArray* coords;
+  // X
+  coords = vtkDoubleArray::New();
+  coords->SetNumberOfTuples(dims[0]);
+  // Trim the first and last to get rid of CTH ghost overlap
+  coords->SetValue(0, origin[0] + spacing[0]);
+  for (idx = 1; idx < dims[0]-1; ++idx)
+    {
+    coords->SetValue(idx, origin[0] + ((double)(idx)+0.5)*(spacing[0]));
+    }
+  if (dims[0] > 1)
+    {
+    coords->SetValue(idx, origin[0] + ((double)(dims[0])-1.0)*(spacing[0]));
+    }
+  dual->SetXCoordinates(coords);  
+  coords->Delete();
+  coords = 0;
+  // Z
+  coords = vtkDoubleArray::New();
+  coords->SetNumberOfTuples(dims[1]);
+  // Trim the first and last to get rid of CTH ghost overlap
+  coords->SetValue(0, origin[1] + spacing[1]);
+  for (idx = 1; idx < dims[1]-1; ++idx)
+    {
+    coords->SetValue(idx, origin[1] + ((double)(idx)+0.5)*(spacing[1]));
+    }
+  if (dims[1] > 1)
+    {
+    coords->SetValue(idx, origin[1] + ((double)(dims[1])-1.0)*(spacing[1]));
+    }
+  dual->SetYCoordinates(coords);  
+  coords->Delete();
+  coords = 0;
+  // Z
+  coords = vtkDoubleArray::New();
+  coords->SetNumberOfTuples(dims[2]);
+  // Trim the first and last to get rid of CTH ghost overlap
+  coords->SetValue(0, origin[2] + spacing[2]);
+  for (idx = 1; idx < dims[2]-1; ++idx)
+    {
+    coords->SetValue(idx, origin[2] + ((double)(idx)+0.5)*(spacing[2]));
+    }
+  if (dims[2] > 1)
+    {
+    coords->SetValue(idx, origin[2] + ((double)(dims[2])-1.0)*(spacing[2]));
+    }
+  dual->SetZCoordinates(coords);  
+  coords->Delete();
+  coords = 0;
+  
+  // Copy cell arrays to point arrays.
+  int num, tupleSize;
+  vtkDataArray *array;
+  unsigned char *ptr1;
+  vtkDataArray *newArray;
+  unsigned char *ptr2;
+  /*
+  num = this->PointData->GetNumberOfArrays();
+  for (idx = 0; idx < num; ++idx)
+    {
+    array = this->PointData->GetArray(idx);
+    newArray = array->NewInstance();
+    newArray->SetNumberOfComponents(array->GetNumberOfComponents());
+    newArray->SetNumberOfTuples(GetNumberOfPointsForBlock(blockId));
+    newArray->SetName(array->GetName());
+    // Copy memory segment.
+    tupleSize = array->GetDataTypeSize() * array->GetNumberOfComponents();
+    ptr1 = (unsigned char*)(array->GetVoidPointer(0));
+    ptr2 = (unsigned char*)(newArray->GetVoidPointer(0));
+    ptr1 += tupleSize * this->GetBlockStartPointId(blockId);
+    memcpy(ptr2, ptr1, tupleSize * GetNumberOfPointsForBlock(blockId));
+    block->GetPointData()->AddArray(newArray);
+    newArray->Delete();
+    newArray = NULL;
+    }
+  */
+  
+  num = this->CellData->GetNumberOfArrays();
+  for (idx = 0; idx < num; ++idx)
+    {
+    array = this->CellData->GetArray(idx);
+    newArray = array->NewInstance();
+    newArray->SetNumberOfComponents(array->GetNumberOfComponents());
+    newArray->SetNumberOfTuples(this->GetNumberOfCellsForBlock(blockId));
+    newArray->SetName(array->GetName());
+    // Copy memory segment.
+    tupleSize = array->GetDataTypeSize() * array->GetNumberOfComponents();
+    ptr1 = (unsigned char*)(array->GetVoidPointer(0));
+    ptr2 = (unsigned char*)(newArray->GetVoidPointer(0));
+    ptr1 += tupleSize * this->GetBlockStartCellId(blockId);
+    memcpy(ptr2, ptr1, tupleSize * this->GetNumberOfCellsForBlock(blockId));
+    switch (newArray->GetDataType())
+      {
+      vtkTemplateMacro3(vtkCTHDataInterpolateDualFace, 
+                        (VTK_TT *)(ptr2), dims, newArray->GetNumberOfComponents());
+      default:
+        vtkErrorMacro(<< "Execute: Unknown ScalarType");
+        return;
+      }
+    dual->GetPointData()->AddArray(newArray);
+    newArray->Delete();
+    newArray = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
