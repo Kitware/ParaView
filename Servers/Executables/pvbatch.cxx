@@ -138,12 +138,6 @@ int main(int argc, char* argv[])
     return 1;
     }
 
-  // The server is a special case.  We do not initialize Tk for process 0.
-  // I would rather have application find this command line option, but
-  // I cannot create an application before I initialize Tcl.
-  // I could clean this up if I separate the initialization of Tk and Tcl.
-  // I do not do this because it would affect other applications.
-
   // Create the process module for initializing the processes.
   // Only the root server processes args.
   
