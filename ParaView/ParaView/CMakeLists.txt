@@ -12,6 +12,7 @@ vtkPV3DWidget.cxx
 vtkPVAdvancedReaderModule.cxx
 vtkPVAnimationInterface.cxx
 vtkPVApplication.cxx 
+vtkPVApplicationResources.cxx 
 vtkPVArrayCalculator.cxx 
 vtkPVArrayMenu.cxx 
 vtkPVArraySelection.cxx
@@ -95,6 +96,10 @@ vtkPVXMLElement.cxx
 vtkPVXMLPackageParser.cxx
 vtkPVXMLParser.cxx
 vtkStringList.cxx 
+)
+
+WRAP_EXCLUDE_FILES(
+  vtkPVApplicationResources
 )
 
 IF (VTK_USE_MPI)

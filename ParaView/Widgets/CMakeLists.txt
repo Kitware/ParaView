@@ -34,6 +34,7 @@ vtkKWPushButton.cxx
 vtkKWRadioButton.cxx 
 vtkKWSaveImageDialog.cxx 
 vtkKWScale.cxx 
+vtkKWSplashScreen.cxx
 vtkKWSplitFrame.cxx
 vtkKWTclInteractor.cxx
 vtkKWTkUtilities.cxx

@@ -57,10 +57,13 @@ class vtkKWWindowCollection;
 class vtkKWWindow;
 class vtkKWWidget;
 class vtkKWRegisteryUtilities;
+class vtkKWSplashScreen;
 
 //BTX
 template<class KeyType,class DataType> class vtkAbstractMap;
 //ETX
+
+#define VTK_KW_SPLASH_SCREEN_REG_KEY "ShowSplashScreen"
 
 class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
@@ -257,6 +260,13 @@ public:
                                const char* key);
   int   GetIntRegisteryValue(int level, const char* subkey, const char* key);
   
+  // Description:
+  // Get the splash screen, if this app have/show a splash screen.
+  vtkGetObjectMacro(SplashScreen, vtkKWSplashScreen);
+  vtkGetMacro(HasSplashScreen, int);
+  vtkGetMacro(ShowSplashScreen, int);
+  vtkSetMacro(ShowSplashScreen, int);
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -290,6 +300,10 @@ protected:
   int UseMessageDialogs;
 
   int ExitOnReturn;
+
+  vtkKWSplashScreen *SplashScreen;
+  int HasSplashScreen;
+  int ShowSplashScreen;
 
 private:
   vtkKWApplication(const vtkKWApplication&);   // Not implemented.

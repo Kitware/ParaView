@@ -50,23 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMPIGroup.h"
 #endif
 
-
-#include "Resources/vtkKWFlyButton.h"
-#include "Resources/vtkKWPickCenterButton.h"
-#include "Resources/vtkKWResetViewButton.h"
-#include "Resources/vtkKWRotateViewButton.h"
-#include "Resources/vtkKWTranslateViewButton.h"
-#include "Resources/vtkPV3DCursor.h"
-#include "Resources/vtkPVCalculatorButton.h"
-#include "Resources/vtkPVClipButton.h"
-#include "Resources/vtkPVContourButton.h"
-#include "Resources/vtkPVCutButton.h"
-#include "Resources/vtkPVExtractGridButton.h"
-#include "Resources/vtkPVGlyphButton.h"
-#include "Resources/vtkPVProbeButton.h"
-#include "Resources/vtkPVThresholdButton.h"
-#include "Resources/vtkPVVectorDisplacementButton.h"
-
 #include "vtkCallbackCommand.h"
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
@@ -77,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWSplashScreen.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkLongArray.h"
@@ -87,7 +71,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkPNGReader.h"
 #include "vtkProbeFilter.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -113,10 +96,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "direct.h"
 #endif
 
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.128");
+vtkCxxRevisionMacro(vtkPVApplication, "1.129");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -304,6 +286,18 @@ vtkPVApplication::vtkPVApplication()
   char* tclname = vtkString::Duplicate(this->GetTclName());
   vtkTclUpdateCommand(this->MainInterp, tclname, this);
   delete[] tclname;
+
+  this->HasSplashScreen = 1;
+  if (this->HasRegisteryValue(
+    2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY))
+    {
+    this->ShowSplashScreen = this->GetIntRegisteryValue(
+      2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY);
+    }
+  else
+    {
+    this->ShowSplashScreen = 1;
+    }
 }
 
 
@@ -568,6 +562,14 @@ void vtkPVApplication::SetEnvironmentVariable(const char* str)
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
+  // Splash screen ?
+
+  if (this->ShowSplashScreen)
+    {
+    this->CreateSplashScreen();
+    this->SplashScreen->SetProgressMessage("Initializing application...");
+    }
+
   vtkOutputWindow::GetInstance()->PromptUserOn();
 
   // set the font size to be small
@@ -766,6 +768,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
   ui->AddObserver(vtkKWEvent::ErrorMessageEvent, ccm);
   ccm->Delete();
 
+  if (this->ShowSplashScreen)
+    {
+    this->SplashScreen->SetProgressMessage("Creating icons...");
+    }
+
   this->CreateButtonPhotos();
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--start-empty", index) 
@@ -775,6 +782,12 @@ void vtkPVApplication::Start(int argc, char*argv[])
     {
     ui->InitializeDefaultInterfacesOff();
     }
+
+  if (this->ShowSplashScreen)
+    {
+    this->SplashScreen->SetProgressMessage("Creating UI...");
+    }
+
   ui->Create(this,"");
 
   // ui has ref. count of at least 1 because of AddItem() above
@@ -785,6 +798,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
   window->SetWindowCollection( this->Windows );
   this->OutputWindow = window;
   vtkOutputWindow::SetInstance(this->OutputWindow);
+
+  if (this->ShowSplashScreen)
+    {
+    this->SplashScreen->Hide();
+    }
 
   // If any of the argumens has a .pvs extension, load it as a script.
   for (i=1; i < argc; i++)
@@ -1011,158 +1029,6 @@ void vtkPVApplication::SendDataArrayRange(vtkDataSet *data,
     }
 
   this->Controller->Send(range, 2, 0, 1976);
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::CreateButtonPhotos()
-{
-  this->CreatePhoto("KWResetViewButton", 
-                    KW_RESET_VIEW_BUTTON, 
-                    KW_RESET_VIEW_BUTTON_WIDTH, 
-                    KW_RESET_VIEW_BUTTON_HEIGHT);
-
-  this->CreatePhoto("KWTranslateViewButton", 
-                    KW_TRANSLATE_VIEW_BUTTON, 
-                    KW_TRANSLATE_VIEW_BUTTON_WIDTH, 
-                    KW_TRANSLATE_VIEW_BUTTON_HEIGHT);
-
-  this->CreatePhoto("KWActiveTranslateViewButton", 
-                    KW_ACTIVE_TRANSLATE_VIEW_BUTTON, 
-                    KW_ACTIVE_TRANSLATE_VIEW_BUTTON_WIDTH, 
-                    KW_ACTIVE_TRANSLATE_VIEW_BUTTON_HEIGHT);
-
-  this->CreatePhoto("KWFlyButton", 
-                    KW_FLY_BUTTON, 
-                    KW_FLY_BUTTON_WIDTH, 
-                    KW_FLY_BUTTON_HEIGHT);
-
-  this->CreatePhoto("KWActiveFlyButton", 
-                    KW_ACTIVE_FLY_BUTTON, 
-                    KW_ACTIVE_FLY_BUTTON_WIDTH, 
-                    KW_ACTIVE_FLY_BUTTON_HEIGHT);
-
-  this->CreatePhoto("KWRotateViewButton", 
-                    KW_ROTATE_VIEW_BUTTON, 
-                    KW_ROTATE_VIEW_BUTTON_WIDTH, 
-                    KW_ROTATE_VIEW_BUTTON_HEIGHT);
-
-  this->CreatePhoto("KWActiveRotateViewButton", 
-                    KW_ACTIVE_ROTATE_VIEW_BUTTON, 
-                    KW_ACTIVE_ROTATE_VIEW_BUTTON_WIDTH, 
-                    KW_ACTIVE_ROTATE_VIEW_BUTTON_HEIGHT);
-
-  this->CreatePhoto("KWPickCenterButton", 
-                    KW_PICK_CENTER_BUTTON, 
-                    KW_PICK_CENTER_BUTTON_WIDTH, 
-                    KW_PICK_CENTER_BUTTON_HEIGHT);
-  
-  this->CreatePhoto("PVCalculatorButton", 
-                    PV_CALCULATOR_BUTTON,
-                    PV_CALCULATOR_BUTTON_WIDTH, 
-                    PV_CALCULATOR_BUTTON_HEIGHT);
-
-  this->CreatePhoto("PVThresholdButton", 
-                    PV_THRESHOLD_BUTTON,
-                    PV_THRESHOLD_BUTTON_WIDTH, 
-                    PV_THRESHOLD_BUTTON_HEIGHT);
-
-  this->CreatePhoto("PVContourButton", 
-                    PV_CONTOUR_BUTTON,
-                    PV_CONTOUR_BUTTON_WIDTH, 
-                    PV_CONTOUR_BUTTON_HEIGHT);
-
-  this->CreatePhoto("PVProbeButton", 
-                    PV_PROBE_BUTTON,
-                    PV_PROBE_BUTTON_WIDTH, 
-                    PV_PROBE_BUTTON_HEIGHT);
-
-  this->CreatePhoto("PVGlyphButton", 
-                    PV_GLYPH_BUTTON,
-                    PV_GLYPH_BUTTON_WIDTH, 
-                    PV_GLYPH_BUTTON_HEIGHT);
-
-  this->CreatePhoto("PV3DCursorButton", 
-                    PV_3D_CURSOR_BUTTON,
-                    PV_3D_CURSOR_BUTTON_WIDTH, 
-                    PV_3D_CURSOR_BUTTON_HEIGHT);
-
-  this->CreatePhoto("PVActive3DCursorButton", 
-                    PV_ACTIVE_3D_CURSOR_BUTTON,
-                    PV_ACTIVE_3D_CURSOR_BUTTON_WIDTH, 
-                    PV_ACTIVE_3D_CURSOR_BUTTON_HEIGHT);
-
-  this->CreatePhoto("PVCutButton", 
-                    PV_CUT_BUTTON,
-                    PV_CUT_BUTTON_WIDTH, 
-                    PV_CUT_BUTTON_HEIGHT);
-
-  this->CreatePhoto("PVClipButton", 
-                    PV_CLIP_BUTTON,
-                    PV_CLIP_BUTTON_WIDTH, 
-                    PV_CLIP_BUTTON_HEIGHT);
-
-  this->CreatePhoto("PVExtractGridButton", 
-                    PV_EXTRACT_GRID_BUTTON,
-                    PV_EXTRACT_GRID_BUTTON_WIDTH, 
-                    PV_EXTRACT_GRID_BUTTON_HEIGHT);
-
-  this->CreatePhoto("PVVectorDisplacementButton", 
-                    PV_VECTOR_DISPLACEMENT_BUTTON,
-                    PV_VECTOR_DISPLACEMENT_BUTTON_WIDTH, 
-                    PV_VECTOR_DISPLACEMENT_BUTTON_HEIGHT);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::CreatePhoto(char *name, 
-                                   unsigned char *data, 
-                                   int width, int height,
-                                   char *filename)
-{
-  // Try to use the filename if provided
-
-  if (filename)
-    {
-    if (this->EvaluateBooleanExpression(
-      "catch {image create photo %s -file {%s}}", name, filename))
-      {
-      vtkWarningMacro("Error creating photo from file " << filename);
-      }
-    return;
-    }
-
-  // Otherwise try to find a file with the same name in the Resources dir
-
-  this->Script("image create photo %s -height %d -width %d",
-               name, height, width);
-
-  struct stat fs;
-  char buffer[1024];
-  sprintf(buffer, "%s/../ParaView/Resources/%s.png", 
-          VTK_PV_SOURCE_CONFIG_DIR, name);
-
-  if (stat(buffer, &fs) == 0)
-    {
-    vtkPNGReader *png_reader = vtkPNGReader::New();
-    png_reader->SetFileName(buffer);
-    if (!vtkKWTkUtilities::UpdatePhoto(this->GetMainInterp(),
-                                       name, 
-                                       png_reader->GetOutput()))
-      {
-      vtkWarningMacro("Error creating photo from file " << buffer);
-      }
-    png_reader->Delete();
-    return;
-    }
-
-  // Otherwise use the provided data
-
-  if (!vtkKWTkUtilities::UpdatePhoto(this->GetMainInterp(),
-                                     name, data, width, height, 3))
-    {
-    vtkWarningMacro("Error updating Tk photo " << name);
-    }
 }
 
 //----------------------------------------------------------------------------

@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.110");
+vtkCxxRevisionMacro(vtkKWWindow, "1.111");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -295,6 +295,7 @@ vtkKWWindow::vtkKWWindow()
 
   this->DialogSettingsFrame = 0;
   this->DialogSettingsConfirmExitCheck = 0;
+  this->DialogSettingsShowSplashScreenCheck = 0;
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -367,6 +368,10 @@ vtkKWWindow::~vtkKWWindow()
   if (this->DialogSettingsConfirmExitCheck)
     {
     this->DialogSettingsConfirmExitCheck->Delete();
+    }
+  if (this->DialogSettingsShowSplashScreenCheck)
+    {
+    this->DialogSettingsShowSplashScreenCheck->Delete();
     }
 }
 
@@ -817,6 +822,40 @@ void vtkKWWindow::CreatePreferencesProperties()
   this->Script("pack %s -side top -anchor w -expand no -fill none",
                this->DialogSettingsConfirmExitCheck->GetWidgetName());
 
+  // Show splash screen ?
+
+  if (this->Application->GetHasSplashScreen())
+    {
+    if (!this->DialogSettingsShowSplashScreenCheck)
+      {
+      this->DialogSettingsShowSplashScreenCheck = vtkKWCheckButton::New();
+      }
+
+    this->DialogSettingsShowSplashScreenCheck->SetParent(
+      this->DialogSettingsFrame->GetFrame());
+    this->DialogSettingsShowSplashScreenCheck->Create(
+      this->Application, "-text {Show splash screen}");
+    if (this->Application->HasRegisteryValue(
+      2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY))
+      {
+      this->DialogSettingsShowSplashScreenCheck->SetState(
+        this->Application->GetIntRegisteryValue(
+          2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY));
+      }
+    else
+      {
+      this->DialogSettingsShowSplashScreenCheck->SetState(
+        this->Application->GetShowSplashScreen());
+      }
+    this->DialogSettingsShowSplashScreenCheck->SetCommand(
+      this, "OnDialogSettingsChange");
+
+    // Pack inside the frame
+
+    this->Script("pack %s -side top -anchor w -expand no -fill none",
+                 this->DialogSettingsShowSplashScreenCheck->GetWidgetName());
+    }
+
   // Pack the frame
 
   this->Script(
@@ -830,6 +869,16 @@ void vtkKWWindow::OnDialogSettingsChange()
    {
    this->Application->SetMessageDialogResponse(
      VTK_KW_EXIT_DIALOG_NAME, this->DialogSettingsConfirmExitCheck->GetState() ? 0 : 1);
+   }
+
+ if (this->Application->GetHasSplashScreen() && 
+     this->DialogSettingsShowSplashScreenCheck)
+   {
+   this->Application->SetRegisteryValue(
+     2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY,
+     "%d", this->DialogSettingsShowSplashScreenCheck->GetState());
+   this->Application->SetShowSplashScreen(
+     this->DialogSettingsShowSplashScreenCheck->GetState());
    }
 }
 
@@ -1069,7 +1118,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.110 $");
+  this->ExtractRevision(os,"$Revision: 1.111 $");
 }
 
 int vtkKWWindow::ExitDialog()

@@ -63,7 +63,6 @@ class vtkProbeFilter;
 #define VTK_PV_SLAVE_SCRIPT_RESULT_LENGTH_TAG 1130
 #define VTK_PV_SLAVE_SCRIPT_RESULT_TAG 1140
 
-
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
 public:
@@ -247,6 +246,7 @@ protected:
   ~vtkPVApplication();
 
   void CreateButtonPhotos();
+  void CreateSplashScreen();
   void CreatePhoto(char *name, unsigned char *data, int width, int height, char *filename = 0);
   int CheckRegistration();
   int PromptRegistration(char *,char *);

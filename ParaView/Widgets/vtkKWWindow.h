@@ -372,6 +372,7 @@ protected:
 
   vtkKWLabeledFrame *DialogSettingsFrame;
   vtkKWCheckButton  *DialogSettingsConfirmExitCheck;
+  vtkKWCheckButton  *DialogSettingsShowSplashScreenCheck;
   
 //BTX
   // Description:

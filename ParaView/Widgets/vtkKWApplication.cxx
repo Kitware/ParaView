@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
 #include "vtkKWRegisteryUtilities.h"
+#include "vtkKWSplashScreen.h"
 #include "vtkKWWidgetsConfigure.h"
 #include "vtkKWWindow.h"
 #include "vtkKWWindowCollection.h"
@@ -71,7 +72,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.92");
+vtkCxxRevisionMacro(vtkKWApplication, "1.93");
 
 
 
@@ -148,6 +149,10 @@ vtkKWApplication::vtkKWApplication()
     }
 
   this->ExitOnReturn = 0;
+
+  this->SplashScreen = vtkKWSplashScreen::New();
+  this->HasSplashScreen = 0;
+  this->ShowSplashScreen = 1;
 }
 
 vtkKWApplication::~vtkKWApplication()
@@ -451,6 +456,12 @@ void vtkKWApplication::Exit()
     this->BalloonHelpLabel = NULL;
     }
 //  this->SetBalloonHelpPending(NULL);
+
+  if (this->SplashScreen)
+    {
+    this->SplashScreen->Delete();
+    this->SplashScreen = NULL;
+    }
 
   this->InExit = 0;
 
@@ -1081,4 +1092,14 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseMessageDialogs: " << this->GetUseMessageDialogs() 
      << endl;
   os << indent << "ExitOnReturn: " << (this->ExitOnReturn ? "on":"off") << endl;
+  if (this->SplashScreen)
+    {
+    os << indent << "SplashScreen: " << this->SplashScreen << endl;
+    }
+  else
+    {
+    os << indent << "SplashScreen: (none)" << endl;
+    }
+  os << indent << "HasSplashScreen: " << (this->HasSplashScreen ? "on":"off") << endl;
+  os << indent << "ShowSplashScreen: " << (this->ShowSplashScreen ? "on":"off") << endl;
 }
