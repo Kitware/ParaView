@@ -22,7 +22,6 @@
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
-class vtkKWListBox;
 
 class VTK_EXPORT vtkKWEntry : public vtkKWWidget
 {

@@ -13,27 +13,15 @@
 =========================================================================*/
 #include "vtkKWEntry.h"
 
-#include "vtkKWApplication.h"
-#include "vtkKWIcon.h"
-#include "vtkKWLabel.h"
-#include "vtkKWListBox.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWApplication.h"
 
-#ifdef _MSC_VER
-#pragma warning (push, 1)
-#pragma warning (disable: 4702)
-#endif
-
-#include <vector>
-#include <string>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
+#include <vtkstd/vector>
+#include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.56");
+vtkCxxRevisionMacro(vtkKWEntry, "1.57");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
