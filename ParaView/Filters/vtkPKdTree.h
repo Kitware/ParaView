@@ -21,10 +21,18 @@
 //
 // .SECTION Description
 //      Build, in parallel, a k-d tree decomposition of one or more
-//      vtkDataSets distributed across processors.
-//      When done, each processor has access to the k-d tree structure, and
-//      can obtain information about which processor contains the original
-//      data for which spatial regions.
+//      vtkDataSets distributed across processors.  We assume each
+//      process has read in one portion of a large distributed data set.
+//      When done, each process has access to the k-d tree structure, 
+//      can obtain information about which process contains 
+//      data for each spatial region, and can depth sort the spatial
+//      regions.
+//
+//      This class can also assign spatial regions to processors, based
+//      on one of several region assignment schemes.  By default 
+//      a contiguous, convex region is assigned to each process.  Several
+//      queries return information about how many and what cells I have
+//      that lie in a region assigned to another process.
 //
 // .SECTION See Also
 //      vtkKdTree
@@ -162,31 +170,42 @@ public:
 
   // Description:
   //    Writes the list of region IDs assigned to the specified
-  //    process.  Returns the number of regions in the list. 
+  //    process.  Regions IDs start at 0 and increase by 1 from there.
+  //    Returns the number of regions in the list. 
 
   int GetRegionAssignmentList(int procId, vtkIntArray *list);
 
   // Description:
+  //    The k-d tree spatial regions have been assigned to processes.
+  //    Given a point on the boundary of one of the regions, this
+  //    method creates a list of all processes whose region
+  //    boundaries include that point.  This may be required when
+  //    looking for processes that have cells adjacent to the cells
+  //    of a given process.
+
+  void GetAllProcessesBorderingOnPoint(float x, float y, float z, 
+                          vtkIntArray *list);
+
+  // Description:
+  //    Returns the ID of the process assigned to the region.
+
+  int GetProcessAssignedToRegion(int regionId);
+
+  // Description:
   //   Returns 1 if the process has data for the given region,
-  //   0 otherwise.  If ghost cells have been requested, a 1
-  //   is returned even if the process only has data which are
-  //   ghost cells for the region, and not actually within the
-  //   region.
+  //   0 otherwise. 
 
   int HasData(int processId, int regionId);
 
   // Description:
   //   Returns the number of cells the specified process has in the
-  //   specified region.  If ghost cells have been requested,
-  //   these are counted, even if they are not in the region.
+  //   specified region.  
 
   int GetProcessCellCountForRegion(int processId, int regionId);
 
   // Description:
   //   Returns the total number of processes that have data
-  //   falling within this spatial region.  If ghost cells were
-  //   requested, processes holding data that are ghost cells
-  //   for the region are also counted.
+  //   falling within this spatial region. 
 
   int GetTotalProcessesInRegion(int regionId);
 
@@ -208,9 +227,7 @@ public:
 
   // Description:
   //   Returns the total number of spatial regions that a given
-  //   process has data for.  If ghost cells were requested,
-  //   regions for which the process has only ghost cells are
-  //   counted.
+  //   process has data for. 
 
   int GetTotalRegionsForProcess(int processId);
 
@@ -221,13 +238,45 @@ public:
   int GetRegionListForProcess(int processId, vtkIntArray *regions);
 
   // Description:
-  //   Writes to the supplied list the number of cells this
+  //   Writes to the supplied integer array the number of cells this
   //   process has for each region.  Returns the number of
   //   cell counts written.  The order of the cell counts corresponds
   //   to the order of region IDs in the region list returned by
   //   GetRegionListForProcess.
 
   int GetRegionsCellCountForProcess(int ProcessId, int *count, int len);
+
+  // Description:
+  //   After regions have been assigned to processes, I may want to know
+  //   which cells I have that are in the regions assigned to a particular
+  //   process.
+  //
+  //   This method takes a process ID and two vtkIdLists.  It
+  //   writes to the first list the IDs of the cells
+  //   contained in the process' regions.  (That is, their cell
+  //   centroid is contained in the region.)  To the second list it
+  //   write the IDs of the cells which intersect the process' regions 
+  //   but whose cell centroid lies elsewhere.
+  //
+  //   The total number of cell IDs written to both lists is returned.  
+  //   Either list pointer passed in can be NULL, and it will be ignored. 
+  //   If there are multiple data sets, you must specify which data set
+  //   you wish cell IDs for.  
+  //
+  //   The caller should delete these two lists when done.  This method 
+  //   uses the cell lists created in vtkKdTree::CreateCellLists().
+  //   If the cell lists for the process' regions do not exist, this
+  //   method will first build the cell lists for all regions by calling
+  //   CreateCellLists().  You must remember to DeleteCellLists() when 
+  //   done with all calls to this method, as cell lists can require a 
+  //   great deal of memory.  
+
+  vtkIdType GetCellListsForProcessRegions(int ProcessId, int set, 
+            vtkIdList *inRegionCells, vtkIdList *onBoundaryCells);
+  vtkIdType GetCellListsForProcessRegions(int ProcessId, vtkDataSet *set,
+            vtkIdList *inRegionCells, vtkIdList *onBoundaryCells);
+  vtkIdType GetCellListsForProcessRegions(int ProcessId, vtkIdList *inRegionCells,
+                                    vtkIdList *onBoundaryCells);
 
   // Description:
   //    The internal process/region cell count tables may require a 
@@ -247,6 +296,8 @@ public:
   //    calculate the global range for each cell array and each point
   //    array across all processes.  Returns 1 on error, 0 otherwise.
 
+  int GetCellArrayGlobalRange(int arrayIndex, float range[2]);
+  int GetPointArrayGlobalRange(int arrayIndex, float range[2]);
   int GetCellArrayGlobalRange(int arrayIndex, double range[2]);
   int GetPointArrayGlobalRange(int arrayIndex, double range[2]);
 
@@ -279,7 +330,7 @@ private:
   int NumProcesses;
   int MyId;
 
-  // basic tables - each region is the responbility of one process, but
+  // basic tables - each region is the responsibility of one process, but
   //                one process may be assigned many regions
 
   int *RegionAssignmentMap;        // indexed by region ID
@@ -291,7 +342,7 @@ private:
   int UpdateRegionAssignment();
 
   // basic tables reflecting the data that was read from disk
-  // by each process, includes ghost cells if GhostLevel > 0
+  // by each process
 
   char *DataLocationMap;              // by process, by region
 
@@ -323,16 +374,16 @@ private:
 
   int WhoHas(int pos);
   int _whoHas(int L, int R, int pos);
-  double *GetLocalVal(int pos);
-  double *GetLocalValNext(int pos);
-  void SetLocalVal(int pos, double *val);
+  float *GetLocalVal(int pos);
+  float *GetLocalValNext(int pos);
+  void SetLocalVal(int pos, float *val);
   void ExchangeVals(int pos1, int pos2);
   void ExchangeLocalVals(int pos1, int pos2);
 
-  double *PtArray;
-  double *PtArray2;
-  double *CurrentPtArray;
-  double *NextPtArray;
+  float *PtArray;
+  float *PtArray2;
+  float *CurrentPtArray;
+  float *NextPtArray;
   int PtArraySize;
 
   int *SelectBuffer;
@@ -351,7 +402,7 @@ private:
   void _select(int L, int R, int K, int dim);
   void DoTransfer(int from, int to, int fromIndex, int toIndex, int count);
   int PartitionAboutMyValue(int L, int R, int K, int dim);
-  int PartitionAboutOtherValue(int L, int R, double T, int dim);
+  int PartitionAboutOtherValue(int L, int R, float T, int dim);
   int PartitionSubArray(int L, int R, int K, int dim, int p1, int p2);
 
   int CompleteTree();
@@ -362,13 +413,13 @@ private:
   void BroadcastData(vtkKdNode *kd);
 #endif
 
-  double *DataBounds(int L, int K, int R);
-  void GetLocalMinMax(int L, int R, int me, double *min, double *max);
+  float *DataBounds(int L, int K, int R);
+  void GetLocalMinMax(int L, int R, int me, float *min, float *max);
 
   static int FillOutTree(vtkKdNode *kd, int level);
   static int ComputeDepth(vtkKdNode *kd);
-  static void PackData(vtkKdNode *kd, double *data);
-  static void UnpackData(vtkKdNode *kd, double *data);
+  static void PackData(vtkKdNode *kd, float *data);
+  static void UnpackData(vtkKdNode *kd, float *data);
   static void CheckFixRegionBoundaries(vtkKdNode *tree);
 
   // list management
@@ -417,16 +468,16 @@ public:
   int Gather(int *data, int *to, int length, int root);
   int Gather(char *data, char *to, int length, int root);
   int Gather(float *data, float *to, int length, int root);
-  int Broadcast(double *data, int length, int root);
   int Broadcast(float *data, int length, int root);
+  int Broadcast(double *data, int length, int root);
   int Broadcast(int *data, int length, int root);
   int Broadcast(char *data, int length, int root);
   int ReduceSum(int *data, int *to, int length, int root);
-  int ReduceMax(double *data, double *to, int length, int root);
   int ReduceMax(float *data, float *to, int length, int root);
+  int ReduceMax(double *data, double *to, int length, int root);
   int ReduceMax(int *data, int *to, int length, int root);
-  int ReduceMin(double *data, double *to, int length, int root);
   int ReduceMin(float *data, float *to, int length, int root);
+  int ReduceMin(double *data, double *to, int length, int root);
   int ReduceMin(int *data, int *to, int length, int root);
 
   int AllReduceUniqueList(int *list, int len, int **newList);

@@ -26,9 +26,10 @@
 #include "vtkMultiProcessController.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
-#include "vtkIntArray.h"
 #include "vtkCellData.h"
 #include "vtkPointData.h"
+#include "vtkIntArray.h"
+#include "vtkIdList.h"
 #include <vtkstd/queue>
 #include <vtkstd/algorithm>
 
@@ -66,7 +67,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.9");
+vtkCxxRevisionMacro(vtkPKdTree, "1.10");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -135,19 +136,18 @@ void vtkPKdTree::SetController(vtkMultiProcessController *c)
     return;
     }
 
+  if ((c == NULL) || (c->GetNumberOfProcesses() == 0))
+    {
+    this->NumProcesses = 1;
+    this->MyId = 0;
+    }
+
   this->Modified();
 
   if (this->Controller != NULL)
     {
     this->Controller->UnRegister(this);
     this->Controller = NULL;
-    }
-
-  if ((c == NULL) || (c->GetNumberOfProcesses() == 0))
-    {
-    this->NumProcesses = 1;
-    this->MyId = 0;
-    return;
     }
 
   vtkSocketController *sc = vtkSocketController::SafeDownCast(c);
@@ -321,12 +321,19 @@ double *vtkPKdTree::VolumeBounds()
      VTKERROR("VolumeBounds - degenerate volume");
      return NULL;
     }
+
+  this->FudgeFactor = aLittle * 10e-4;
+
   for (i=0; i<3; i++)
     {
     if (diff[i] <= 0)
       {
         volBounds[2*i]   -= aLittle;
         volBounds[2*i+1] += aLittle;
+      }
+    else // need lower bound to be strictly less than any point in decomposition
+      {
+      volBounds[2*i] -= this->FudgeFactor;
       }
     }
   return volBounds;
@@ -638,15 +645,15 @@ int vtkPKdTree::BreadthFirstDivide(double *volBounds)
 
   vtkKdNode *kd = this->Top = new vtkKdNode();
 
-  kd->SetBounds((double)volBounds[0], (double)volBounds[1],
-                (double)volBounds[2], (double)volBounds[3],
-                (double)volBounds[4], (double)volBounds[5]);
+  kd->SetBounds(volBounds[0], volBounds[1],
+                volBounds[2], volBounds[3],
+                volBounds[4], volBounds[5]);
 
   kd->SetNumberOfCells(this->TotalNumCells);
 
-  kd->SetDataBounds((double)volBounds[0], (double)volBounds[1],
-                (double)volBounds[2], (double)volBounds[3],
-                (double)volBounds[4], (double)volBounds[5]);
+  kd->SetDataBounds(volBounds[0], volBounds[1],
+                volBounds[2], volBounds[3],
+                volBounds[4], volBounds[5]);
 
   int midpt = this->DivideRegion(kd, 0, 0, 0x00000001);
 
@@ -692,7 +699,7 @@ int vtkPKdTree::BreadthFirstDivide(double *volBounds)
 
   if (this->CurrentPtArray == this->PtArray2)
     {
-    memcpy(this->PtArray, this->PtArray2, this->PtArraySize * sizeof(double));
+    memcpy(this->PtArray, this->PtArray2, this->PtArraySize * sizeof(float));
     }
 
   this->FreeDoubleBuffer();
@@ -745,7 +752,7 @@ int vtkPKdTree::DivideRegion(vtkKdNode *kd, int L, int level, int tag)
     return 0;
     }
 
-  double *newDataBounds = this->DataBounds(L, midpt, R);
+  float *newDataBounds = this->DataBounds(L, midpt, R);
 
   if (newDataBounds == NULL)
     {
@@ -809,8 +816,8 @@ void vtkPKdTree::ExchangeVals(int pos1, int pos2)
 {
   vtkCommunicator *comm = this->Controller->GetCommunicator();
 
-  double *myval; 
-  double otherval[3];
+  float *myval; 
+  float otherval[3];
 
   int player1 = this->WhoHas(pos1);
   int player2 = this->WhoHas(pos2);
@@ -860,7 +867,7 @@ void vtkPKdTree::ExchangeVals(int pos1, int pos2)
 void vtkPKdTree::_select(int L, int R, int K, int dim)
 {
   int N, I, J, S, SD, LL, RR;
-  double Z;
+  float Z;
 
   while (R > L)
     {
@@ -873,7 +880,7 @@ void vtkPKdTree::_select(int L, int R, int K, int dim)
 
       N = R - L + 1;
       I = K - L + 1;
-      Z = log(double(N)); 
+      Z = log(float(N)); 
       S = static_cast<int>(.5 * exp(2*Z/3));
       SD = static_cast<int>(.5 * sqrt(Z*S*(N-S)/N) * sign(1 - N/2));
       LL = max(L, K - (I*S/N) + SD);
@@ -923,9 +930,9 @@ int vtkPKdTree::Select(int dim, int L, int R)
   int hasKleft = this->WhoHas(K-1);
   int hasKleftrank = this->SubGroup->getLocalRank(hasKleft);
 
-  double Kval;
-  double Kleftval;
-  double *pt;
+  float Kval;
+  float Kleftval;
+  float *pt;
 
   if (hasK == this->MyId)
     {
@@ -1005,7 +1012,7 @@ int vtkPKdTree::WhoHas(int pos)
     }
   return _whoHas(0, this->NumProcesses-1, pos);
 }
-double *vtkPKdTree::GetLocalVal(int pos)
+float *vtkPKdTree::GetLocalVal(int pos)
 {
   if ( (pos < this->StartVal[this->MyId]) || (pos > this->EndVal[this->MyId]))
     {
@@ -1015,7 +1022,7 @@ double *vtkPKdTree::GetLocalVal(int pos)
 
   return this->CurrentPtArray + (3*localPos);
 }
-double *vtkPKdTree::GetLocalValNext(int pos)
+float *vtkPKdTree::GetLocalValNext(int pos)
 {
   if ( (pos < this->StartVal[this->MyId]) || (pos > this->EndVal[this->MyId]))
     {
@@ -1025,7 +1032,7 @@ double *vtkPKdTree::GetLocalValNext(int pos)
 
   return this->NextPtArray + (3*localPos);
 }
-void vtkPKdTree::SetLocalVal(int pos, double *val)
+void vtkPKdTree::SetLocalVal(int pos, float *val)
 {
   if ( (pos < this->StartVal[this->MyId]) || (pos > this->EndVal[this->MyId]))
     {
@@ -1043,10 +1050,10 @@ void vtkPKdTree::SetLocalVal(int pos, double *val)
 }
 void vtkPKdTree::ExchangeLocalVals(int pos1, int pos2)
 {
-  double temp[3];
+  float temp[3];
 
-  double *pt1 = this->GetLocalVal(pos1);
-  double *pt2 = this->GetLocalVal(pos2);
+  float *pt1 = this->GetLocalVal(pos1);
+  float *pt2 = this->GetLocalVal(pos2);
 
   if (!pt1 || !pt2)
     {
@@ -1122,7 +1129,7 @@ int vtkPKdTree::PartitionSubArray(int L, int R, int K, int dim, int p1, int p2)
 
   // Get Kth element
     
-  double T;
+  float T;
 
   if (hasK == me)
     {
@@ -1201,7 +1208,7 @@ int vtkPKdTree::PartitionSubArray(int L, int R, int K, int dim, int p1, int p2)
 
   if ( (myL > this->StartVal[me]) || (myR < this->EndVal[me]))
     {
-    memcpy(this->NextPtArray, this->CurrentPtArray, this->PtArraySize * sizeof(double));
+    memcpy(this->NextPtArray, this->CurrentPtArray, this->PtArraySize * sizeof(float));
     }
 
   for (recvr = 0; recvr < nprocs; recvr++)
@@ -1304,7 +1311,7 @@ int vtkPKdTree::PartitionSubArray(int L, int R, int K, int dim, int p1, int p2)
 
 void vtkPKdTree::DoTransfer(int from, int to, int fromIndex, int toIndex, int count)
 {
-double *fromPt, *toPt;
+float *fromPt, *toPt;
 
   vtkCommunicator *comm = this->Controller->GetCommunicator();
 
@@ -1319,7 +1326,7 @@ double *fromPt, *toPt;
     fromPt = this->GetLocalVal(fromIndex);
     toPt = this->GetLocalValNext(toIndex);
 
-    memcpy(toPt, fromPt, nitems * sizeof(double));
+    memcpy(toPt, fromPt, nitems * sizeof(float));
     }
   else if (from == me)
     {
@@ -1341,9 +1348,9 @@ double *fromPt, *toPt;
 // [L:J-1] are < T and all elements [J:R] are >= T.  If all elements are
 // < T, let J = R+1.
 
-int vtkPKdTree::PartitionAboutOtherValue(int L, int R, double T, int dim)
+int vtkPKdTree::PartitionAboutOtherValue(int L, int R, float T, int dim)
 {
-  double *pt, Lval, Rval;
+  float *pt, Lval, Rval;
 
   pt = this->GetLocalVal(L);
   Lval = pt[dim];
@@ -1421,8 +1428,8 @@ int vtkPKdTree::PartitionAboutOtherValue(int L, int R, double T, int dim)
 
 int vtkPKdTree::PartitionAboutMyValue(int L, int R, int K, int dim)
 { 
-  double *pt;
-  double T;
+  float *pt;
+  float T;
   int I, J;
   
   // Set up so after first exchange in the loop, we have either
@@ -1479,7 +1486,7 @@ int vtkPKdTree::PartitionAboutMyValue(int L, int R, int K, int dim)
       
   pt = this->GetLocalVal(L);
       
-  double Lval = pt[dim];
+  float Lval = pt[dim];
 
   if (Lval == T)
     {
@@ -1498,7 +1505,7 @@ int vtkPKdTree::PartitionAboutMyValue(int L, int R, int K, int dim)
 //--------------------------------------------------------------------
 
 void vtkPKdTree::GetLocalMinMax(int L, int R, int me, 
-                                double *min, double *max)
+                                float *min, float *max)
 {
   int i, d;
   int from = this->StartVal[me];
@@ -1518,7 +1525,7 @@ void vtkPKdTree::GetLocalMinMax(int L, int R, int me,
     from -= this->StartVal[me];
     to   -= this->StartVal[me];
 
-    double *val = this->CurrentPtArray + from*3;
+    float *val = this->CurrentPtArray + from*3;
 
     for (d=0; d<3; d++)
       {
@@ -1554,18 +1561,18 @@ void vtkPKdTree::GetLocalMinMax(int L, int R, int me,
       }
     }
 }
-double *vtkPKdTree::DataBounds(int L, int K, int R) 
+float *vtkPKdTree::DataBounds(int L, int K, int R) 
 {
-  double localMinLeft[3];    // Left region is L through K-1
-  double localMaxLeft[3];
-  double globalMinLeft[3];
-  double globalMaxLeft[3];
-  double localMinRight[3];   // Right region is K through R
-  double localMaxRight[3];
-  double globalMinRight[3];
-  double globalMaxRight[3];
+  float localMinLeft[3];    // Left region is L through K-1
+  float localMaxLeft[3];
+  float globalMinLeft[3];
+  float globalMaxLeft[3];
+  float localMinRight[3];   // Right region is K through R
+  float localMaxRight[3];
+  float globalMinRight[3];
+  float globalMaxRight[3];
  
-  double *globalBounds = new double [12];
+  float *globalBounds = new float [12];
 
   int fail = (globalBounds == NULL);
 
@@ -1590,8 +1597,8 @@ double *vtkPKdTree::DataBounds(int L, int K, int R)
   this->SubGroup->ReduceMax(localMaxRight, globalMaxRight, 3, 0);
   this->SubGroup->Broadcast(globalMaxRight, 3, 0);
 
-  double *left = globalBounds;
-  double *right = globalBounds + 6;
+  float *left = globalBounds;
+  float *right = globalBounds + 6;
 
   MinMaxToBounds(left, globalMinLeft, globalMaxLeft);
 
@@ -1663,28 +1670,28 @@ int vtkPKdTree::CompleteTree()
   return 0;
 }
 
-void vtkPKdTree::PackData(vtkKdNode *kd, double *data)
+void vtkPKdTree::PackData(vtkKdNode *kd, float *data)
 {
   int i, v;
 
-  data[0] = (double)kd->Dim;
-  data[1] = (double)kd->Left->NumCells;
-  data[2] = (double)kd->Right->NumCells;
+  data[0] = (float)kd->Dim;
+  data[1] = (float)kd->Left->NumCells;
+  data[2] = (float)kd->Right->NumCells;
 
   v = 3;
   for (i=0; i<3; i++)
     {
-    data[v++]    = (double)kd->Left->Min[i];
-    data[v++]  = (double)kd->Left->Max[i];
-    data[v++]  = (double)kd->Left->MinVal[i];
-    data[v++]  = (double)kd->Left->MaxVal[i];
-    data[v++] = (double)kd->Right->Min[i];
-    data[v++] = (double)kd->Right->Max[i];
-    data[v++] = (double)kd->Right->MinVal[i];
-    data[v++] = (double)kd->Right->MaxVal[i];
+    data[v++]    = (float)kd->Left->Min[i];
+    data[v++]  = (float)kd->Left->Max[i];
+    data[v++]  = (float)kd->Left->MinVal[i];
+    data[v++]  = (float)kd->Left->MaxVal[i];
+    data[v++] = (float)kd->Right->Min[i];
+    data[v++] = (float)kd->Right->Max[i];
+    data[v++] = (float)kd->Right->MinVal[i];
+    data[v++] = (float)kd->Right->MaxVal[i];
     }
 } 
-void vtkPKdTree::UnpackData(vtkKdNode *kd, double *data)
+void vtkPKdTree::UnpackData(vtkKdNode *kd, float *data)
 {
   int i, v;
 
@@ -1695,20 +1702,20 @@ void vtkPKdTree::UnpackData(vtkKdNode *kd, double *data)
   v = 3;
   for (i=0; i<3; i++)
     {
-    kd->Left->Min[i]     = (double)data[v++];
-    kd->Left->Max[i]     = (double)data[v++];
-    kd->Left->MinVal[i]  = (double)data[v++];
-    kd->Left->MaxVal[i]  = (double)data[v++];
-    kd->Right->Min[i]    = (double)data[v++];
-    kd->Right->Max[i]    = (double)data[v++];
-    kd->Right->MinVal[i] = (double)data[v++];
-    kd->Right->MaxVal[i] = (double)data[v++];
+    kd->Left->Min[i]     = (float)data[v++];
+    kd->Left->Max[i]     = (float)data[v++];
+    kd->Left->MinVal[i]  = (float)data[v++];
+    kd->Left->MaxVal[i]  = (float)data[v++];
+    kd->Right->Min[i]    = (float)data[v++];
+    kd->Right->Max[i]    = (float)data[v++];
+    kd->Right->MinVal[i] = (float)data[v++];
+    kd->Right->MaxVal[i] = (float)data[v++];
     }
 } 
 void vtkPKdTree::ReduceData(vtkKdNode *kd, int *sources)
 {
   int i;
-  double data[27];
+  float data[27];
   vtkCommunicator *comm = this->Controller->GetCommunicator();
 
   if (kd->Left == NULL) return;
@@ -1771,7 +1778,7 @@ void vtkPKdTree::ReduceData(vtkKdNode *kd, int *sources)
 }
 void vtkPKdTree::BroadcastData(vtkKdNode *kd)
 {   
-  double data[27];
+  float data[27];
 
   if (kd->Left == NULL) return;
 
@@ -1828,7 +1835,7 @@ void vtkPKdTree::CheckFixRegionBoundaries(vtkKdNode *tree)
 void vtkPKdTree::RetrieveData(vtkKdNode *kd, int *sources)
 {
   int i;
-  double data[27];
+  float data[27];
 
   if (kd->Left == NULL) return;
 
@@ -1955,7 +1962,7 @@ int vtkPKdTree::AllocateDoubleBuffer()
 
   this->PtArraySize = this->NumCells[this->MyId] * 3;
 
-  this->PtArray2 = new double [this->PtArraySize];
+  this->PtArray2 = new float [this->PtArraySize];
 
   this->CurrentPtArray = this->PtArray;
   this->NextPtArray    = this->PtArray2;
@@ -1964,7 +1971,7 @@ int vtkPKdTree::AllocateDoubleBuffer()
 }
 void vtkPKdTree::SwitchDoubleBuffer()
 {
-  double *temp = this->CurrentPtArray;
+  float *temp = this->CurrentPtArray;
 
   this->CurrentPtArray = this->NextPtArray;
   this->NextPtArray = temp;
@@ -2789,6 +2796,19 @@ void vtkPKdTree::BuildRegionListsForProcesses()
 //--------------------------------------------------------------------
 // Queries
 //--------------------------------------------------------------------
+int vtkPKdTree::GetCellArrayGlobalRange(int arrayIndex, float range[2])
+{
+  double drange[2];
+  int val = this->GetCellArrayGlobalRange(arrayIndex, drange);
+
+  if (val == 0)
+    {
+    range[0] = (float)drange[0];
+    range[1] = (float)drange[1];
+    }
+
+  return val; 
+}
 int vtkPKdTree::GetCellArrayGlobalRange(int arrayIndex, double range[2])
 {
   if ((arrayIndex < 0) || (arrayIndex >= this->NumCellArrays))
@@ -2801,6 +2821,19 @@ int vtkPKdTree::GetCellArrayGlobalRange(int arrayIndex, double range[2])
   range[1] = this->CellDataMax[arrayIndex];
 
   return 0;
+}
+int vtkPKdTree::GetPointArrayGlobalRange(int arrayIndex, float range[2])
+{
+  double drange[2];
+  int val = this->GetPointArrayGlobalRange(arrayIndex, drange);
+
+  if (val == 0)
+    {
+    range[0] = (float)drange[0];
+    range[1] = (float)drange[1];
+    }
+
+  return val; 
 }
 int vtkPKdTree::GetPointArrayGlobalRange(int arrayIndex, double range[2])
 {
@@ -2874,6 +2907,52 @@ int vtkPKdTree::GetRegionAssignmentList(int procId, vtkIntArray *list)
     }
 
   return nregions;
+}
+void vtkPKdTree::GetAllProcessesBorderingOnPoint(float x, float y, float z, 
+                          vtkIntArray *list)
+{
+  vtkIntArray *regions = vtkIntArray::New();
+  double *subRegionBounds;
+  list->Initialize();
+
+  for (int procId = 0; procId < this->NumProcesses; procId++)
+    {
+    this->GetRegionAssignmentList(procId, regions);
+
+    int nSubRegions = this->MinimalNumberOfConvexSubRegions(
+          regions, &subRegionBounds);
+
+    double *b = subRegionBounds;
+
+    for (int r=0; r<nSubRegions; r++)
+      {
+      if ((((x == b[0]) || (x == b[1])) &&
+           ((y >= b[2]) && (y <= b[3]) && (z >= b[4]) && (z <= b[5]))) ||
+          (((y == b[2]) || (y == b[3])) &&
+           ((x >= b[0]) && (x <= b[1]) && (z >= b[4]) && (z <= b[5]))) ||
+          (((z == b[4]) || (z == b[5])) &&
+           ((x >= b[0]) && (x <= b[1]) && (y >= b[2]) && (y <= b[3]))) )
+        {
+        list->InsertNextValue(procId);
+        break;
+        }
+
+      b += 6;
+      }
+    }
+
+  regions->Delete();
+}
+
+int vtkPKdTree::GetProcessAssignedToRegion(int regionId)
+{
+  if ( !this->RegionAssignmentMap ||
+       (regionId < 0) || (regionId >= this->NumRegions))
+    {
+    return -1;
+    }
+
+  return this->RegionAssignmentMap[regionId];
 }
 int vtkPKdTree::HasData(int processId, int regionId)
 {
@@ -3029,6 +3108,59 @@ int vtkPKdTree::GetRegionsCellCountForProcess(int processId, int *count, int len
     count[i] = this->CellCountList[regionId][iam];
     }
   return nRegions;
+}
+vtkIdType vtkPKdTree::GetCellListsForProcessRegions(int processId,
+          int set, vtkIdList *inRegionCells, vtkIdList *onBoundaryCells)
+{
+  if ( (set < 0) || (set >= this->NumDataSets))
+    {
+    vtkErrorMacro(<<"vtkPKdTree::GetCellListsForProcessRegions no such data set");
+    return 0;
+    }
+  return this->GetCellListsForProcessRegions(processId,
+            this->DataSets[set], inRegionCells, onBoundaryCells);
+}
+vtkIdType vtkPKdTree::GetCellListsForProcessRegions(int processId,
+          vtkIdList *inRegionCells, vtkIdList *onBoundaryCells)
+{
+  return this->GetCellListsForProcessRegions(processId,
+            this->DataSets[0], inRegionCells, onBoundaryCells);
+}
+vtkIdType vtkPKdTree::GetCellListsForProcessRegions(int processId,
+          vtkDataSet *set,
+          vtkIdList *inRegionCells, vtkIdList *onBoundaryCells)
+{
+  vtkIdType totalCells = 0;
+
+  if ( (inRegionCells == NULL) && (onBoundaryCells == NULL))
+    {
+    return totalCells;
+    }
+
+  // Get the list of regions owned by this process
+
+  vtkIntArray *regions = vtkIntArray::New();
+    
+  int nregions = this->GetRegionAssignmentList(processId, regions);
+    
+  if (nregions == 0){
+    if (inRegionCells)
+      {
+      inRegionCells->Initialize();
+      }
+    if (onBoundaryCells)
+      {
+      onBoundaryCells->Initialize();
+      }
+    regions->Delete();
+    return totalCells;
+  }
+
+  totalCells = this->GetCellLists(regions, set, inRegionCells, onBoundaryCells);
+
+  regions->Delete();
+
+  return totalCells;
 }
 void vtkPKdTree::PrintTiming(ostream& os, vtkIndent indent)
 {
@@ -3605,8 +3737,8 @@ int vtkPKdTree::MakeSortedUnique(int *list, int len, int **newList)
 
 int vtkSubGroup::Barrier()
 {
-  double token = 0;
-  double result;
+  float token = 0;
+  float result;
 
   this->ReduceMin(&token, &result, 1, 0);
   this->Broadcast(&token, 1, 0);
