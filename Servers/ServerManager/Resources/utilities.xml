@@ -59,10 +59,11 @@
   </ProxyGroup>
 
   <ProxyGroup name="implicit_functions">
-    <Proxy name="Plane" class="vtkPlane">
+    <ImplicitPlaneProxy name="Plane" class="vtkPlane">
       <DoubleVectorProperty
          name="Origin"
          command="SetOrigin"
+         update_self="1"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
       </DoubleVectorProperty>
@@ -73,7 +74,21 @@
          number_of_elements="3"
          default_values="0.0 0.0 1.0" >
       </DoubleVectorProperty>
-    </Proxy>
+
+      <DoubleVectorProperty
+         name="Offset"
+         command="SetOffset"
+         update_self="1"
+         number_of_elements="1"
+         default_values="0.0" >
+        <BoundsDomain name="range" mode="oriented_magnitude">
+         <RequiredProperties>
+            <Property name="Origin" function="Origin"/>
+            <Property name="Normal" function="Normal"/>
+         </RequiredProperties>
+        </BoundsDomain>
+      </DoubleVectorProperty>
+    </ImplicitPlaneProxy>
 
     <Proxy name="Planes" class="vtkPlanes">
       <ProxyProperty name="Points" command="SetPoints">

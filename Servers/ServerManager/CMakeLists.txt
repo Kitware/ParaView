@@ -27,6 +27,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMFieldDataDomain.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMIdTypeVectorProperty.cxx
+  vtkSMImplicitPlaneProxy.cxx
   vtkSMInformationHelper.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
