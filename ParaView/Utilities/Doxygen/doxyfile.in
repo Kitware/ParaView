@@ -38,6 +38,7 @@ OUTPUT_DIRECTORY     = "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/doc"
 
 INPUT                = \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/KWCommon" \
+ "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/Development" \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/ParaView" \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/Widgets" \
  "@PARAVIEW_BINARY_DIR@/Utilities/Doxygen/dox/Filters" \

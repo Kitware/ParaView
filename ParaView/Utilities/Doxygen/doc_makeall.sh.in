@@ -164,6 +164,7 @@ if test "x$PERL_PROG" != "xNOTFOUND" ; then
         "$SOURCE_DIR/$REL_PATH_TO_TOP/KWCommon" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/ParaView" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/Filters" \
+        "$SOURCE_DIR/$REL_PATH_TO_TOP/Development" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/Widgets"
 fi
 
@@ -179,6 +180,7 @@ if test "x$PERL_PROG" != "xNOTFOUND" ; then
         "$SOURCE_DIR/$REL_PATH_TO_TOP/KWCommon" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/ParaView" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/Filters" \
+        "$SOURCE_DIR/$REL_PATH_TO_TOP/Development" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/Widgets"
 fi
 
