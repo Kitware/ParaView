@@ -300,7 +300,11 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
- 
+
+  // Description:
+  // Access to the Set View to Data button from a script
+  vtkGetObjectMacro(ResetCameraButton, vtkKWPushButton);
+  
 protected:
   vtkPVData();
   ~vtkPVData();

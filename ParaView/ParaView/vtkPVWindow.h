@@ -478,6 +478,7 @@ public:
   // Access to these widgets so their state can be set from a script
   vtkGetObjectMacro(TranslateCameraButton, vtkKWRadioButton);
   vtkGetObjectMacro(RotateCameraButton, vtkKWRadioButton);
+  vtkGetObjectMacro(ResetCameraButton, vtkKWPushButton);
   
   // Description:
   // Update the toolbar aspect once the toolbar settings have been changed
@@ -522,9 +523,9 @@ protected:
 
   // Interactor stuff
   vtkKWToolbar *InteractorToolbar;
+  vtkKWPushButton *ResetCameraButton;
   vtkKWRadioButton *RotateCameraButton;
   vtkKWRadioButton *TranslateCameraButton;
-  vtkKWRadioButton *TrackballCameraButton;
     
   // Main toolbar
   vtkKWToolbar *Toolbar;

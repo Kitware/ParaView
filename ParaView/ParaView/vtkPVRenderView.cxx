@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.306");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.307");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2346,4 +2346,7 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
      << this->ManipulatorControl3D << endl;
   os << indent << "RenderModuleUI: " << this->RenderModuleUI << endl;
   os << indent << "CameraControl: " << this->CameraControl << endl;
+  os << indent << "CameraControlFrame: " << this->CameraControlFrame << endl;
+  os << indent << "StandardViewsFrame: " << this->StandardViewsFrame << endl;
+  os << indent << "CameraIconsFrame: " << this->CameraIconsFrame << endl;
 }

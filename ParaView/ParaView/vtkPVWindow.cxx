@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.523");
+vtkCxxRevisionMacro(vtkPVWindow, "1.524");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -158,7 +158,8 @@ vtkPVWindow::vtkPVWindow()
   this->InteractorToolbar = vtkKWToolbar::New();
   this->Toolbars->AddToolbar(this->InteractorToolbar);
 
-  //this->FlyButton = vtkKWRadioButton::New();
+  this->ResetCameraButton = vtkKWPushButton::New();
+  
   this->RotateCameraButton = vtkKWRadioButton::New();
   this->TranslateCameraButton = vtkKWRadioButton::New();
     
@@ -323,6 +324,8 @@ vtkPVWindow::~vtkPVWindow()
     this->UserInterfaceManager->Delete();
     }
 
+  this->ResetCameraButton->Delete();
+  this->ResetCameraButton = NULL;
   this->RotateCameraButton->Delete();
   this->RotateCameraButton = NULL;
   this->TranslateCameraButton->Delete();
@@ -780,13 +783,11 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
 {
   // Set up the button to reset the camera.
   
-  vtkKWPushButton* reset_cam = vtkKWPushButton::New();
-  reset_cam->SetParent(this->InteractorToolbar->GetFrame());
-  reset_cam->Create(app, "-image PVResetViewButton");
-  reset_cam->SetCommand(this, "ResetCameraCallback");
-  reset_cam->SetBalloonHelpString("Reset the view to show everything visible.");
-  this->InteractorToolbar->AddWidget(reset_cam);
-  reset_cam->Delete();
+  this->ResetCameraButton->SetParent(this->InteractorToolbar->GetFrame());
+  this->ResetCameraButton->Create(app, "-image PVResetViewButton");
+  this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
+  this->ResetCameraButton->SetBalloonHelpString("Reset the view to show everything visible.");
+  this->InteractorToolbar->AddWidget(this->ResetCameraButton);
 
   // Rotate camera interactor style
 
@@ -4516,7 +4517,6 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CenterYEntry: " << this->GetCenterYEntry() << endl;
   os << indent << "CenterZEntry: " << this->GetCenterZEntry() << endl;
   os << indent << "FilterMenu: " << this->GetFilterMenu() << endl;
-//  os << indent << "FlyStyle: " << this->GetFlyStyle() << endl;
   os << indent << "InteractorStyleToolbar: " << this->GetInteractorToolbar() 
      << endl;
   os << indent << "MainView: " << this->GetMainView() << endl;
@@ -4524,6 +4524,7 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CameraStyle3D: " << this->CameraStyle3D << endl;
   os << indent << "CenterOfRotationStyle: " << this->CenterOfRotationStyle
      << endl;
+  os << indent << "ResetCameraButton: " << this->ResetCameraButton << endl;
   os << indent << "RotateCameraButton: " << this->RotateCameraButton << endl;
   os << indent << "TranslateCameraButton: " << this->TranslateCameraButton
      << endl;

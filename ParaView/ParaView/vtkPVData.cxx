@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.249");
+vtkCxxRevisionMacro(vtkPVData, "1.250");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2762,6 +2762,7 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ColorMap: " << this->PVColorMap << endl;
   os << indent << "ColorMenu: " << this->ColorMenu << endl;
+  os << indent << "ResetCameraButton: " << this->ResetCameraButton << endl;
   os << indent << "EditColorMapButton: " << this->EditColorMapButton << endl;
   if(this->CubeAxes)
     {
