@@ -24,6 +24,7 @@ SET(PROJECT_TESTS SimplePackage
 IF(RUN_WITH_MPI)
   FOREACH (tfile ${PROJECT_TESTS})
     ADD_TEST(${tfile}-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
+             --disable-registry
              ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
                -D ${PARAVIEW_SOURCE_DIR}/Data 
                -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
@@ -32,7 +33,7 @@ IF(RUN_WITH_MPI)
   ENDFOREACH(tfile)
 ENDIF(RUN_WITH_MPI)
 FOREACH (tfile ${PROJECT_TESTS})
-  ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE}
+  ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE} --disable-registry
            ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
              -D ${PARAVIEW_SOURCE_DIR}/Data 
              -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
