@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkStringList.h"
 #include "vtkPVSourceInterface.h"
+#include "vtkObjectFactory.h"
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -204,6 +205,13 @@ vtkPVArrayCalculator::~vtkPVArrayCalculator()
 //----------------------------------------------------------------------------
 vtkPVArrayCalculator* vtkPVArrayCalculator::New()
 {
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVArrayCalculator");
+  if(ret)
+    {
+    return (vtkPVArrayCalculator*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
   return new vtkPVArrayCalculator();
 }
 
