@@ -105,7 +105,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.293.2.3");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.293.2.4");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2145,7 +2145,6 @@ void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EditCopy()
 {
-  vtkWindow *vtkWin = this->GetVTKWindow();
   vtkPVWindowToImageFilter *w2i = vtkPVWindowToImageFilter::New();
   w2i->SetInput(this->GetPVApplication()->GetRenderModule());
   w2i->Update();

@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.18");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.18.2.1");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -102,7 +102,8 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
       tog->Disable();
       }
 
-    vtkPVSelectionList* list = vtkPVSelectionList::SafeDownCast(pvwp);
+    vtkPVSelectionList* list =
+      vtkPVSelectionList::SafeDownCast(pvwp->GetWidget());
     if (list)
       {
       list->Disable();
