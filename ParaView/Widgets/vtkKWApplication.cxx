@@ -411,31 +411,12 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 void vtkKWApplication::DisplayHelp()
 {
 #ifdef _WIN32
-  /*
-  char temp[1024];
-  char fkey[1024];
-  char loc[1024];
-  sprintf(fkey,"Software\\Kitware\\%i\\Inst",this->GetApplicationKey());  
-  HKEY hKey;
-  if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
-		  0, KEY_READ, &hKey) == ERROR_SUCCESS)
-    {
-    vtkKWWin32RegisteryUtilities::ReadAValue(hKey, loc,"Loc","");
-    RegCloseKey(hKey);
-    sprintf(temp,"%s/%s.chm::/Introduction/Introduction.htm",
-            loc,this->ApplicationName);
-    }
-  else
-    {
-    sprintf(temp,"%s.chm::/Introduction/Introduction.htm",this->ApplicationName);
-    }
-  */
   char temp[1024];
   char loc[1024];
   vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
   sprintf(temp, "%i", this->GetApplicationKey());
   reg->SetTopLevel( temp );
-  if ( reg->ReadValue( "Inst", loc, "Loc" ) )
+  if ( reg->ReadValue( "Inst", "Loc", loc ) )
     {
     sprintf(temp,"%s/%s.chm::/Introduction/Introduction.htm",
             loc,this->ApplicationName);
