@@ -26,7 +26,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -408,6 +408,53 @@ void vtkSMCompositeRenderModuleProxy::SetLODCollectionDecision(
   // We don't use properties since it slows us down considerably.
   pDisp->SetLODCollectionDecision(decision);
 }
+
+//-----------------------------------------------------------------------------
+double vtkSMCompositeRenderModuleProxy::GetZBufferValue(int x, int y)
+{
+  if (this->LocalRender)
+    {
+    return this->Superclass::GetZBufferValue(x,y);
+    }
+/*
+  // Only MPI has a pointer to a composite.
+  vtkPVProcessModule* pm = this->ProcessModule;
+  if(this->CompositeID.ID)
+    {
+    vtkPVTreeComposite *composite = 
+      vtkPVTreeComposite::SafeDownCast( pm->GetObjectFromID( this->CompositeID ));
+    if( composite ) // we know this is a vtkPVTreeComposite
+      {
+      return composite->GetZ(x, y);
+      }
+    }
+
+  // If client-server...
+  if (pm->GetOptions()->GetClientMode())
+    {
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->CompositeID << "GetZBufferValue" << x << y
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
+    float z = 0;
+    if(pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0, 0, &z))
+      {
+      return z;
+      }
+    else
+      {
+      vtkErrorMacro("Error getting float value from GetZBufferValue result.");
+      }
+    }
+
+  vtkErrorMacro("Unknown RenderModule mode.");
+  return 0;
+  */
+  vtkErrorMacro("TODO: NOt yet implemented!");
+  return 0; 
+}
+
 
 //-----------------------------------------------------------------------------
 void vtkSMCompositeRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)

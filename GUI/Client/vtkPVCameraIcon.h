@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCameraIcon -
+// .NAME vtkPVCameraIcon - A widget that provides the ability to 
+// capture and retrieve the camera properties.
 // .SECTION Description
+// Widget can save the current camera properties and later retrieve them.
 
 #ifndef __vtkPVCameraIcon_h
 #define __vtkPVCameraIcon_h

@@ -33,7 +33,6 @@
 #include "vtkXYPlotWidget.h"
 #include "vtkSMPlotDisplay.h"
 #include "vtkPVRenderModule.h"
-#include "vtkCommand.h"
 
 #include "vtkSMXYPlotDisplayProxy.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -45,38 +44,12 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.1");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.2");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
 
 #define PV_TAG_PROBE_OUTPUT 759362
-
-//===========================================================================
-//***************************************************************************
-class vtkXYPlotWidgetObserver : public vtkCommand
-{
-public:
-  static vtkXYPlotWidgetObserver *New() 
-    {return new vtkXYPlotWidgetObserver;};
-
-  vtkXYPlotWidgetObserver()
-    {
-      this->PVProbe = 0;
-    }
-
-  virtual void Execute(vtkObject* wdg, unsigned long event,  
-                       void* calldata)
-    {
-      if ( this->PVProbe )
-        {
-        this->PVProbe->ExecuteEvent(wdg, event, calldata);
-        }
-    }
-
-  vtkPVProbe* PVProbe;
-};
-
 
 
 
@@ -94,7 +67,6 @@ vtkPVProbe::vtkPVProbe()
   
   this->ProbeFrame = vtkKWWidget::New();
   
-  this->XYPlotObserver = NULL;
   
   this->ReplaceInputOff();
 
@@ -128,12 +100,6 @@ vtkPVProbe::~vtkPVProbe()
     this->PlotDisplayProxy = NULL;
     }
 
-  if (this->XYPlotObserver)
-    {
-    this->XYPlotObserver->Delete();
-    this->XYPlotObserver = NULL;
-    }
-    
   this->SelectedPointLabel->Delete();
   this->SelectedPointLabel = NULL;
   this->SelectedPointFrame->Delete();
@@ -204,59 +170,6 @@ void vtkPVProbe::SetVisibilityNoTrace(int val)
     this->PlotDisplayProxy->cmSetVisibility(val);
     }
   this->Superclass::SetVisibilityNoTrace(val);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg), 
-                              unsigned long event,  
-                              void* vtkNotUsed(calldata))
-{
-  //law int fixme;  // move this to the server.
-/*
-  switch ( event )
-    {
-    case vtkCommand::StartInteractionEvent:
-      //this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOn();
-      break;
-    case vtkCommand::EndInteractionEvent:
-      //this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOff();
-      //this->RenderView();
-      vtkXYPlotActor* xypa = this->XYPlotWidget->GetXYPlotActor();
-      double *pos1 = xypa->GetPositionCoordinate()->GetValue();
-      double *pos2 = xypa->GetPosition2Coordinate()->GetValue();
-      //this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %lf %lf", 
-      //                    this->GetTclName(), pos1[0], pos1[1]);
-      //this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %lf %lf", 
-      //                    this->GetTclName(), pos2[0], pos2[1]);
-      //this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d",
-      //                    this->GetTclName(), sact->GetOrientation());
-
-      // Synchronize the server scalar bar.
-      vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-      vtkClientServerStream stream;
-      stream << vtkClientServerStream::Invoke 
-             << this->PlotDisplay->GetXYPlotActorProxy()->GetID(0) 
-             << "GetPositionCoordinate" 
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke 
-             << vtkClientServerStream::LastResult 
-             << "SetValue" << pos1[0] << pos1[1]
-             << vtkClientServerStream::End;
-
-      stream << vtkClientServerStream::Invoke 
-             << this->PlotDisplay->GetXYPlotActorProxy()->GetID(0) 
-             << "GetPosition2Coordinate" 
-             << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke 
-             << vtkClientServerStream::LastResult 
-             << "SetValue" << pos2[0] << pos2[1]
-             << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
-
-      break;
-    }
-    */
 }
 
 
@@ -389,9 +302,6 @@ void vtkPVProbe::AcceptCallbackInternal()
 
   if (this->ShowXYPlotToggle->GetState() && numPts > 1)
     {
-//    vtkPVRenderModule* rm = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
-//    this->XYPlotWidget->SetCurrentRenderer(rm->GetRenderer2D());
-//    this->GetPVRenderView()->Enable3DWidget(this->XYPlotWidget);
     vtkPVArrayInformation* arrayInfo = 
       this->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(0);
     vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
@@ -407,10 +317,6 @@ void vtkPVProbe::AcceptCallbackInternal()
     }
   else
     {
-//    this->XYPlotWidget->SetEnabled(0);
-//    vtkPVApplication* pvApp = this->GetPVApplication();
-//    vtkPVRenderModule* rm = pvApp->GetProcessModule()->GetRenderModule();
-//    rm->RemoveDisplay(this->PlotDisplay);
     this->PlotDisplayProxy->cmSetVisibility(0);
     }
     
@@ -420,6 +326,6 @@ void vtkPVProbe::AcceptCallbackInternal()
 void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
+  os << indent << "PlotDisplayProxy: " << this->PlotDisplayProxy << endl;
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
 }

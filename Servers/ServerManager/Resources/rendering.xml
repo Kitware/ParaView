@@ -513,11 +513,29 @@
         default_values="0.01 1000.01">
       </DoubleVectorProperty>
 
+      <DoubleVectorProperty
+        name="CameraParallelScaleInfo"
+        command="GetParallelScale"
+        number_of_elements="1"
+        information_only="1"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
+      
+      <DoubleVectorProperty
+        name="CameraParallelScale"
+        command="SetParallelScale"
+        number_of_elements="1"
+        information_property="CameraParallelScaleInfo"
+        default_values="1.0">
+      </DoubleVectorProperty>
+
       <IntVectorProperty
         name="ParallelProjection"
         command="SetParallelProjection"
         number_of_elements="1"
         default_values="0">
+        <!-- TODO: verify if this property needs to be exposed-->
         <BooleanDomain name="bool" />
       </IntVectorProperty>
     </Proxy> <!-- end of Camera Proxy -->

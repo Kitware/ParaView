@@ -35,8 +35,9 @@
 #include "vtkCallbackCommand.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkCamera.h"
+#include "vtkFloatArray.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -108,8 +109,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
-  //************************************************
-  //TODO: don't set server an all!!!!!!!!!!!!!!!!!!
 
   this->RendererProxy = this->GetSubProxy("Renderer");
   this->Renderer2DProxy = this->GetSubProxy("Renderer2D");
@@ -143,11 +142,17 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     return;
     }
 
+  // I don't directly use this->SetServers() to set the servers of the subproxies,
+  // as the subclasses may have special subproxies that have specific servers on which
+  // they want those to be created.
   this->SetServersSelf(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->RendererProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->Renderer2DProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER); 
+  // Camera vtkObject is only created on the client. 
+  // This is so as we don't change the active camera on the
+  // servers as creation renderer (like IceT Tile renderer) fail if the active camera
+  // on  the renderer is modified.
   this->ActiveCameraProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  // NOTE: the Camera is created only on the Client.
   this->RenderWindowProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->InteractorProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
@@ -158,7 +163,27 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
 
   // Set the active camera for the renderers.
   /*
-   * We can't use the Proxy Property since Camera is only create on the CLIENT.
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+    << this->RendererProxy->GetID(0)
+    << "GetActiveCamera"
+    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Assign
+    << this->ActiveCameraProxy->GetID(0)
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+    << this->Renderer2DProxy->GetID(0)
+    << "GetActiveCamera"
+    << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Assign
+    << this->ActiveCameraProxy->GetID(0)
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pvm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+
+  this->ActiveCameraProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+ // We can't use the Proxy Property since Camera is only create on the CLIENT.
   vtkSMProxyProperty* pp1 = vtkSMProxyProperty::SafeDownCast(
     this->RendererProxy->GetProperty("ActiveCamera"));
   vtkSMProxyProperty* pp2 = vtkSMProxyProperty::SafeDownCast(
@@ -180,7 +205,6 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   pp1->AddProxy(this->ActiveCameraProxy);
   pp2->AddProxy(this->ActiveCameraProxy);
   */
-
   // Need to fix the camera behaviour.
   vtkCamera *camera = vtkCamera::SafeDownCast(
     pvm->GetObjectFromID(this->ActiveCameraProxy->GetID(0)));
@@ -193,7 +217,7 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     this->GetRenderer()->SetActiveCamera(camera);
     this->GetRenderer2D()->SetActiveCamera(camera);
     }
-
+  
   if (pvm->GetOptions()->GetUseStereoRendering())
     {
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -592,6 +616,19 @@ void vtkSMRenderModuleProxy::SetBackgroundColor(double rgb[3])
   this->UpdateVTKObjects();
 }
 
+//----------------------------------------------------------------------------
+double vtkSMRenderModuleProxy::GetZBufferValue(int x, int y)
+{
+  vtkFloatArray *array = vtkFloatArray::New();
+  double val;
+
+  array->SetNumberOfTuples(1);
+  this->GetRenderWindow()->GetZbufferData(x,y, x, y,
+                                     array);
+  val = array->GetValue(0);
+  array->Delete();
+  return val;  
+}
 
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::ResetCameraClippingRange()

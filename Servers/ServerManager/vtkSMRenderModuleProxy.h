@@ -94,6 +94,11 @@ public:
   // Description:
   // Compute the bounding box of all visible props.
   void ComputeVisiblePropBounds(double bounds[6]);
+
+  // Description:
+  // Get the value of the z buffer at a position. 
+  // This is necessary for picking the center of rotation.
+  virtual double GetZBufferValue(int x, int y);
 protected:
   vtkSMRenderModuleProxy();
   ~vtkSMRenderModuleProxy();
@@ -136,6 +141,10 @@ protected:
   friend class vtkSMCubeAxesDisplayProxy;
   friend class vtkSMXYPlotDisplayProxy;
   friend class vtkSMInteractorObserverProxy;
+  
+  
+  
+  friend class vtkPVCameraIcon; //needs access to Camera proxy.
   //ETX
   // Just a convienience method.
   int GetDisplayVisibility(vtkSMDisplayProxy* pDisp);

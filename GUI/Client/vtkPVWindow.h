@@ -209,12 +209,11 @@ public:
   // Save the state of the server manager.
   void SaveSMState();
   void SaveSMState(const char *filename);
-
+  
   // Description:
-  // This should part of a render module !!!!!
-  void SaveGeometryInBatchFile(ofstream *file, 
-                               const char* filename,
-                               int timeIdx);
+  // DEPRECATED:....TODO----to remove when the old Animation code is removed.
+  void SaveGeometryInBatchFile(ofstream *file, const char* filename,
+    int timeIdx) ;
 
   // Description:
   // Save the pipeline as a tcl script. Callback from menu.

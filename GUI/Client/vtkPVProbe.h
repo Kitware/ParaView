@@ -25,9 +25,7 @@ class vtkKWCheckButton;
 class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkKWWidget;
-class vtkXYPlotWidget;
 class vtkSMXYPlotDisplayProxy;
-class vtkXYPlotWidgetObserver;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -43,13 +41,6 @@ public:
   // Description:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
-
-  // Description:
-  // This method is called when event is triggered on the XYPlotWidget.
-//BTX
-  virtual void ExecuteEvent(vtkObject* wdg, unsigned long event,  
-                            void* calldata);
-//ETX
 
   // Description:
   // Control the visibility of the pick display as well.
@@ -76,8 +67,6 @@ protected:
   vtkKWLabel *PointDataLabel;
   
   vtkKWCheckButton *ShowXYPlotToggle;
-  
-  vtkXYPlotWidgetObserver* XYPlotObserver;
 
 private:
   vtkPVProbe(const vtkPVProbe&); // Not implemented

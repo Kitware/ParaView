@@ -93,7 +93,13 @@ public:
   // Convenience method to get/set Actor color.
   void cmSetColor(double rgb[3]);
   void cmGetColor(double rgb[3]);
-
+  void cmSetColor(double r, double g, double b)
+    { 
+    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
+    this->cmSetColor(rgb);
+    }
+    
+    
   // Description:
   // Convenience method to get/set InterpolateColorsBeforeMapping property.
   void cmSetInterpolateScalarsBeforeMapping(int flag);
@@ -108,21 +114,41 @@ public:
   // Convenience method to get/set Position property.
   void cmSetPosition(double pos[3]);
   void cmGetPosition(double pos[3]);
+  void cmSetPosition(double r, double g, double b)
+    { 
+    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
+    this->cmSetPosition(rgb);
+    }
 
   // Description:
   // Convenience method to get/set Scale property.
   void cmSetScale(double scale[3]);
   void cmGetScale(double scale[3]);
+  void cmSetScale(double r, double g, double b)
+    { 
+    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
+    this->cmSetScale(rgb);
+    } 
    
   // Description:
   // Convenience method to get/set Orientation property.
   void cmSetOrientation(double orientation[3]);
   void cmGetOrientation(double orientation[3]);
+  void cmSetOrientation(double r, double g, double b)
+    { 
+    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
+    this->cmSetOrientation(rgb);
+    }
 
   // Description
   // Convenience method to get/set Origin property.
   void cmGetOrigin(double origin[3]);
   void cmSetOrigin(double origin[3]);
+  void cmSetOrigin(double r, double g, double b)
+    { 
+    double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
+    this->cmSetOrigin(rgb);
+    }
 
   // Description:
   // Convenience method to get/set Visibility property.
@@ -133,6 +159,11 @@ public:
   // Convenience method to get/set Representation.
   void cmSetRepresentation(int r);
   int cmGetRepresentation();
+
+  // Description:
+  // Convenience method to get/set ImmediateModeRendering property.
+  void cmSetImmediateModeRendering(int f);
+  int cmGetImmediateModeRendering();
   
   
 protected:

@@ -134,12 +134,10 @@
 
 #define VTK_PV_ENABLE_OLD_ANIMATION_INTERFACE 0
 
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-  #include "vtkSMRenderModuleProxy.h"
-#endif
+#include "vtkSMRenderModuleProxy.h"
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.1");
+vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.2");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -335,26 +333,7 @@ vtkPVWindow::~vtkPVWindow()
     pm->DeleteStreamObject(this->ServerFileListingID, stream);
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     }
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   this->SetInteractor(0);
-#else
-  if (this->InteractorID.ID)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    vtkPVProcessModule *pm = pvApp->GetProcessModule();
-    stream << vtkClientServerStream::Invoke 
-           << this->InteractorID << "SetRenderWindow" << 0 
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke 
-           << this->InteractorID << "SetRenderer" << 0 
-           << vtkClientServerStream::End;
-    pm->DeleteStreamObject(this->InteractorID, stream);
-    pm->SendStream(
-      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
-    this->InteractorID.ID = 0;
-    this->SetInteractor(NULL);
-    }
-#endif
 
   this->PrepareForDelete();
 
@@ -1243,34 +1222,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     }
   this->InitializeToolbars(app);
 
-  vtkClientServerStream stream;
-  // Interface for the preferences.
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   this->SetInteractor(vtkPVGenericRenderWindowInteractor::SafeDownCast(
       this->GetPVApplication()->GetRenderModuleProxy()->GetInteractor()));
-#else
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  // Create a dummy interactor on the satellites so they can have 3d widgets.
-  // SetInteractor needs to be called before the main view is set so that there
-  // is an interactor to pass to the main view's orientation marker.
-  this->InteractorID = 
-    pm->NewStreamObject("vtkPVGenericRenderWindowInteractor", stream);
-  pm->GetRenderModule()->SetInteractorID(this->InteractorID);
-  stream << vtkClientServerStream::Invoke 
-         << this->InteractorID << "SetRenderWindow" << pm->GetRenderModule()->GetRenderWindowID()
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke 
-         << this->InteractorID << "SetRenderer" << pm->GetRenderModule()->GetRendererID()
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke 
-         << this->InteractorID << "SetInteractorStyle" << 0 
-         << vtkClientServerStream::End;
-  pm->SendStream(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
-  this->SetInteractor(
-    vtkPVGenericRenderWindowInteractor::SafeDownCast(
-      pvApp->GetProcessModule()->GetObjectFromID(this->InteractorID)));
-#endif
+
   // Create the main view.
   if (use_splash)
     {
@@ -1330,14 +1284,14 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   axes_str.rdbuf()->freeze(0);
   pxm->RegisterProxy("axes",this->CenterAxesProxyName, this->CenterAxesProxy);
   this->CenterAxesProxy->UpdateVTKObjects();
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+ 
+  // Add the axes proxy to the render module.
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
   if (rm)
     {
     rm->AddDisplay(this->CenterAxesProxy);
     rm->UpdateVTKObjects();
     }
-#endif
   
   this->CenterEntryFrame->SetParent(this->PickCenterToolbar->GetFrame());
   this->CenterEntryFrame->Create(app, "frame", "");

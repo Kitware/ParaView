@@ -17,7 +17,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVGeometryInformation.h"
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.3");
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.4");
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
 {
@@ -485,6 +485,34 @@ const char* vtkSMDisplayProxy::cmGetScalarArray()
   return svp->GetElement(0);
 }
 
+//-----------------------------------------------------------------------------
+void vtkSMDisplayProxy::cmSetImmediateModeRendering(int i)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("ImmediateModeRendering"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Visibility on ImmediateModeRendering.");
+    return;
+    }
+  ivp->SetElement(0, i);
+  this->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMDisplayProxy::cmGetImmediateModeRendering()
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("ImmediateModeRendering"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Visibility on ImmediateModeRendering.");
+    return 0;
+    }
+  return ivp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void vtkSMDisplayProxy::GatherGeometryInformation()
 {

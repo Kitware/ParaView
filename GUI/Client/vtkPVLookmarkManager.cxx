@@ -20,7 +20,7 @@
 #include "vtkPVLookmarkManager.h"
 
 #include "vtkPVWidgetCollection.h"
-#include "vtkSMPartDisplay.h"
+#include "vtkSMDisplayProxy.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVSelectTimeSet.h"
 #include "vtkPVStringEntry.h"
@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17.2.1");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17.2.2");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -3354,7 +3354,6 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
           }
         ptr = strtok(NULL,"\r\n");
         }
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
       // this line sets the partdisplay variable
       ptr+=4;
       ptr2 = ptr;
@@ -3363,84 +3362,89 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
       *ptr2='\0';
       strcpy(data,ptr);
 
-      vtkSMPartDisplay *partDisplay = reader->GetPartDisplay();
+      vtkSMDisplayProxy *display = reader->GetDisplayProxy();
       ptr = strtok(NULL,"\r\n");
       while(strstr(ptr,data)) 
         {
         if(strstr(ptr,"SetColor"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          partDisplay->SetColor(xval,yval,zval);
+          display->cmSetColor(xval,yval,zval);
           }
         else if(strstr(ptr,"SetRepresentation"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetRepresentation(val); 
+          display->cmSetRepresentation(val); 
           }
         else if(strstr(ptr,"SetUseImmediateMode"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetUseImmediateMode(val); 
+          display->cmSetImmediateModeRendering(val); 
           }
         else if(strstr(ptr,"SetScalarVisibility"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetScalarVisibility(val); 
+          display->cmSetScalarVisibility(val); 
           }
         else if(strstr(ptr,"SetDirectColorFlag"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetDirectColorFlag(val); 
+          // when DirectColorFlag = 0,
+          // color mode is Default (=1).
+          // when DirectColorFlag = 1
+          // color mode is MapScalars (=0).
+          display->cmSetColorMode(!val); 
           }
         else if(strstr(ptr,"SetInterpolateColorsFlag"))
           {
+          // This is "InterpolateColors" while property
+          // "InterpolateColorsBeforeMapping". 
+          // These are opposite concepts.
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetInterpolateColorsFlag(val); 
+          display->cmSetInterpolateScalarsBeforeMapping(val); 
           }
         else if(strstr(ptr,"SetInterpolation"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetInterpolation(val); 
+          display->cmSetInterpolation(val); 
           }
         else if(strstr(ptr,"SetPointSize"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetPointSize(val); 
+          display->cmSetPointSize(val); 
           }
         else if(strstr(ptr,"SetLineWidth"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetLineWidth(val); 
+          display->cmSetLineWidth(val); 
           }
         else if(strstr(ptr,"SetOpacity"))
           {
           fval = this->GetDoubleScalarWidgetValue(ptr);
-          partDisplay->SetOpacity(fval); 
+          display->cmSetOpacity(fval); 
           }
         else if(strstr(ptr,"SetTranslate"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          partDisplay->SetTranslate(xval,yval,zval); 
+          display->cmSetPosition(xval,yval,zval); 
           }
         else if(strstr(ptr,"SetScale"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          partDisplay->SetScale(xval,yval,zval); 
+          display->cmSetScale(xval,yval,zval); 
           }
         else if(strstr(ptr,"SetOrigin"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          partDisplay->SetOrigin(xval,yval,zval); 
+          display->cmSetOrigin(xval,yval,zval); 
           }
         else if(strstr(ptr,"SetOrientation"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          partDisplay->SetOrientation(xval,yval,zval); 
+          display->cmSetOrientation(xval,yval,zval); 
           }   
         ptr = strtok(NULL,"\r\n");
         }
-#endif
-
       break;
       }
     else

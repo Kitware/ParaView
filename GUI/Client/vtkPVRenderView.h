@@ -107,6 +107,11 @@ public:
   // Make snapshot of the render window.
   virtual void SaveAsImage() { this->Superclass::SaveAsImage(); }
   virtual void SaveAsImage(const char* filename) ;
+
+  // Description:
+  // Returns the RenderModuleProxy (same as the one got 
+  // from vtkPVApplication::GetRenderModuleProxy())
+  vtkGetObjectMacro(RenderModuleProxy, vtkSMRenderModuleProxy);
   
   // Description:
   // Casts to vtkPVApplication.
@@ -388,13 +393,7 @@ protected:
   vtkSetStringMacro(MenuLabelSwitchBackAndForthToViewProperties);
   
   vtkPVRenderViewObserver* Observer;
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkSMRenderModuleProxy* RenderModuleProxy;
-#else
-  // Need to make sure it destructs right before this view does.
-  // It's the whole TKRenderWidget destruction pain.
-  vtkPVRenderModule* RenderModule;
-#endif
 
   vtkTimerLog *RenderTimer;
   Tcl_TimerToken TimerToken;
