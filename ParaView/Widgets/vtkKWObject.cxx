@@ -116,7 +116,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.22 $");
+  this->ExtractRevision(os,"$Revision: 1.23 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -477,7 +477,7 @@ int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
         length += 128;
         
         // Eat the argument.
-        int i = va_arg(ap, int);        
+        (void)va_arg(ap, int);        
         }
       }
     }
