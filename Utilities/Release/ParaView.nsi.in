@@ -3,10 +3,10 @@
 ;--------------------------------
 ; You must define these values
 
-  !define VERSION "1.6"
-  !define PATCH  "2"
-  !define PV_BIN "C:\martink\ParaView\ParaView16Rel"
-  !define PV_SRC "C:\martink\ParaView\ParaView16"
+  !define VERSION "@PARAVIEW_VERSION@"
+  !define PATCH  "@PARAVIEW_VERSION_PATCH@"
+  !define PV_BIN "@ParaView_BINARY_DIR@"
+  !define PV_SRC "@ParaView_SOURCE_DIR@"
 
 
 ;--------------------------------
