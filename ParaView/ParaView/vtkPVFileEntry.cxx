@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.26");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.27");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -349,7 +349,6 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     char format[100];
     sprintf(format, "%%s/%%s%%0%dd.%%s", ncnt);
     this->SetFormat(format);
-    int cnum = atoi(number);
     this->Entry->DeleteAllValues();
     pm->GetDirectoryListing(path, dirs, files, "readable");
     int cnt = 0;
@@ -541,7 +540,6 @@ const char* vtkPVFileEntry::GetValue()
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file, const char* sourceTclName)
 {
-  const char* array;
   *file << "\tset " << sourceTclName << "_files {" << endl;
   *file << this->Script("concat $%s_files", sourceTclName);
   *file << "\t}" << endl;
