@@ -991,7 +991,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.92 $");
+  this->ExtractRevision(os,"$Revision: 1.93 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1077,8 +1077,7 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
 	}
       }
     int flen = vtkString::Length(filename);
-    for(ii=flen; 
-        static_cast<unsigned int>(ii)>=(flen-25); ii--)
+    for(ii=flen; ii >= (flen-25); ii--)
       {
       if ( filename[ii] == '/' )
 	{
