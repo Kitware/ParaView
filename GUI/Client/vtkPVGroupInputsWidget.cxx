@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.21");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -93,6 +93,8 @@ void vtkPVGroupInputsWidget::ResetInternal()
   vtkPVSourceCollection *sources;
   vtkPVSource *pvs;
 
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   pvWin = this->PVSource->GetPVWindow();
   sources = pvWin->GetSourceList("Sources");
 
@@ -101,7 +103,9 @@ void vtkPVGroupInputsWidget::ResetInternal()
   sources->InitTraversal();
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    this->PartSelectionList->InsertEntry(idx, pvs->GetName());
+    char* label = pvApp->GetTextRepresentation(pvs);
+    this->PartSelectionList->InsertEntry(idx, label);
+    delete[] label;
     ++idx;
     }
 
@@ -243,7 +247,7 @@ void vtkPVGroupInputsWidget::SetSelectState(vtkPVSource *input, int val)
 
   if (val == 1)
     {
-    vtkErrorMacro("Could not find source: " << input->GetName());
+    vtkErrorMacro("Could not find source: " << input->GetLabel());
     }
 }
 

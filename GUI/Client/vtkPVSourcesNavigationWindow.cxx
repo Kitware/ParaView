@@ -27,7 +27,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.14");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.15");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -345,30 +345,8 @@ void vtkPVSourcesNavigationWindow::ExecuteCommandOnModule(
 //-----------------------------------------------------------------------------
 char* vtkPVSourcesNavigationWindow::GetTextRepresentation(vtkPVSource* comp)
 {
-  char *buffer;
-  if (!comp->GetLabel())
-    {
-    buffer = new char [strlen(comp->GetName()) + 1];
-    sprintf(buffer, "%s", comp->GetName());
-    }
-  else
-    {
-    if (this->AlwaysShowName && comp->GetName() && *comp->GetName())
-      {
-      buffer = new char [strlen(comp->GetLabel())
-                        + 2
-                        + strlen(comp->GetName()) 
-                        + 1
-                        + 1];
-      sprintf(buffer, "%s (%s)", comp->GetLabel(), comp->GetName());
-      }
-    else
-      {
-      buffer = new char [strlen(comp->GetLabel()) + 1];
-      sprintf(buffer, "%s", comp->GetLabel());
-      }
-    }
-  return buffer;
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  return pvApp->GetTextRepresentation(comp);
 }
 
 //----------------------------------------------------------------------------

@@ -122,14 +122,15 @@ protected:
   // method.
   virtual void ChildCreate() {}
 
-//BTX
-  const char* CreateCanvasItem(const char *format, ...);
-//ETX
-
+  // Description:
   // Return the textual representation of the composite (i.e. its name and/or
   // its description. Memory is allocated, a pointer is return, it's up to
   // the caller to delete it.
   char* GetTextRepresentation(vtkPVSource* comp);
+
+//BTX
+  const char* CreateCanvasItem(const char *format, ...);
+//ETX
 
   int Width;
   int Height;
