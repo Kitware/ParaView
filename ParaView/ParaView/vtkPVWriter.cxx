@@ -46,11 +46,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
+
+#include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.8.2.1");
+vtkCxxRevisionMacro(vtkPVWriter, "1.8.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -110,7 +113,36 @@ vtkPVApplication* vtkPVWriter::GetPVApplication()
 
 //----------------------------------------------------------------------------
 void vtkPVWriter::Write(const char* fileName, vtkPVSource* pvs,
-                        int numProcs, int ghostLevel)
+                        int numProcs, int ghostLevel, int timeSeries)
+{
+  vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(pvs);
+  if(rm && timeSeries)
+    {
+    vtkstd::string name = fileName;
+    vtkstd::string::size_type pos = name.find_last_of(".");
+    vtkstd::string base = name.substr(0, pos);
+    vtkstd::string ext = name.substr(pos);
+    int n = rm->GetNumberOfTimeSteps();
+    char buf[100];
+    for(int i=0; i < n; ++i)
+      {
+      sprintf(buf, "T%03d", i);
+      name = base;
+      name += buf;
+      name += ext;
+      rm->SetRequestedTimeStep(i);
+      this->WriteOneFile(name.c_str(), pvs, numProcs, ghostLevel);
+      }
+    }
+  else
+    {
+    this->WriteOneFile(fileName, pvs, numProcs, ghostLevel);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
+                               int numProcs, int ghostLevel)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();

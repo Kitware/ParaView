@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.6");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.7");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1216,7 +1216,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
   
   // Create the animation writer pipeline.
   pm->ServerScript(
-    "vtkPVAnimationWriter pvAnimWriter\n"
+    "vtkXMLPVAnimationWriter pvAnimWriter\n"
     "pvAnimWriter SetFileName {%s}\n"
     "pvAnimWriter SetNumberOfPieces {%d}\n"
     "pvAnimWriter SetPiece [[$Application GetProcessModule] GetPartitionId]\n",

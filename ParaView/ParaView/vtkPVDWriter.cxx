@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVCollectionWriter.cxx
+  Module:    vtkPVDWriter.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,37 +39,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVCollectionWriter.h"
+#include "vtkPVDWriter.h"
 
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVCollectionWriter);
-vtkCxxRevisionMacro(vtkPVCollectionWriter, "1.4");
+vtkStandardNewMacro(vtkPVDWriter);
+vtkCxxRevisionMacro(vtkPVDWriter, "1.1.2.1");
 
 //----------------------------------------------------------------------------
-vtkPVCollectionWriter::vtkPVCollectionWriter()
+vtkPVDWriter::vtkPVDWriter()
 {
 }
 
 //----------------------------------------------------------------------------
-vtkPVCollectionWriter::~vtkPVCollectionWriter()
+vtkPVDWriter::~vtkPVDWriter()
 {
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCollectionWriter::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVDWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
 
 //----------------------------------------------------------------------------
-int vtkPVCollectionWriter::CanWriteData(vtkDataSet* data, int, int)
+int vtkPVDWriter::CanWriteData(vtkDataSet* data, int, int)
 {
   // We support all data types in both parallel and serial mode, and
   // with any number of parts.
@@ -77,29 +78,81 @@ int vtkPVCollectionWriter::CanWriteData(vtkDataSet* data, int, int)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCollectionWriter::Write(const char* fileName, vtkPVSource* pvs,
-                                  int numProcs, int ghostLevel)
+void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
+                         int numProcs, int ghostLevel, int timeSeries)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(pvs);
+  if(!rm)
+    {
+    timeSeries = 0;
+    }
   
-  int i;
+  // Create the writer.
   pm->ServerScript(
-    "vtkXMLPVCollectionWriter writer\n"
+    "%s writer\n"
     "writer SetNumberOfPieces %d\n"
+    "writer SetFileName {%s}\n"
     "writer SetGhostLevel %d\n"
-    "writer SetFileName {%s}",
-    numProcs, ghostLevel, fileName);
-  for(i=0; i < pvs->GetNumberOfParts(); ++i)
+    "writer SetPiece [[$Application GetProcessModule] GetPartitionId]\n",
+    (timeSeries?"vtkXMLPVAnimationWriter":"vtkXMLPVDWriter"),
+    numProcs, fileName, ghostLevel);
+  
+  // Tell each process's writer whether it should write the summary
+  // file.
+  if(numProcs > 1)
     {
-    pm->ServerScript("writer AddInput \"%s\"",
-                     pvs->GetPart(i)->GetVTKDataTclName());
+    pm->ServerScript(
+      "vtkPVSummaryHelper helper\n"
+      "helper SetWriter writer\n"
+      "helper SetController [$Application GetController]\n"
+      "helper SynchronizeSummaryFiles\n"
+      "helper Delete\n"
+      );
     }
-  pm->RootScript("writer SetPiece 0");
-  for (i=1; i < numProcs; ++i)
+  
+  if(timeSeries)
     {
-    pvApp->RemoteScript(i, "writer SetPiece %d", i);
+    // Plug the inputs into the writer.
+    int i;
+    for(i=0; i < pvs->GetNumberOfParts(); ++i)
+      {
+      pm->ServerScript("writer AddInput \"%s\" {%s}",
+                       pvs->GetPart(i)->GetVTKDataTclName(),
+                       pvs->GetName());
+      }
+    
+    // Start the animation.
+    pm->ServerScript("writer Start");
+    
+    // Loop through all of the time steps.
+    for(int t = 0; t < rm->GetNumberOfTimeSteps(); ++t)
+      {
+      // Update the data to the next time step.
+      rm->SetRequestedTimeStep(t);
+      
+      // Write this time step.
+      pm->ServerScript("writer WriteTime {%d}", t);
+      }
+    
+    // Finish the animation.
+    pm->ServerScript("writer Finish");
     }
-  pm->ServerScript("writer Write");
+  else
+    {
+    // Plug the inputs into the writer.
+    int i;
+    for(i=0; i < pvs->GetNumberOfParts(); ++i)
+      {
+      pm->ServerScript("writer AddInput \"%s\"",
+                       pvs->GetPart(i)->GetVTKDataTclName());
+      }
+    
+    // Just write the current data.
+    pm->ServerScript("writer Write");
+    }
+  
+  // Delete the writer.
   pm->ServerScript("writer Delete");
 }

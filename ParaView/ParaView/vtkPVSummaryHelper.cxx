@@ -44,8 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkXMLPDataWriter.h"
-#include "vtkXMLPVCollectionWriter.h"
-#include "vtkPVAnimationWriter.h"
+#include "vtkXMLPVDWriter.h"
 
 #include <vtkstd/string>
 
@@ -62,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSummaryHelper);
-vtkCxxRevisionMacro(vtkPVSummaryHelper, "1.1.2.4");
+vtkCxxRevisionMacro(vtkPVSummaryHelper, "1.1.2.5");
 
 vtkCxxSetObjectMacro(vtkPVSummaryHelper, Writer, vtkXMLWriter);
 vtkCxxSetObjectMacro(vtkPVSummaryHelper, Controller,
@@ -96,8 +95,7 @@ int vtkPVSummaryHelper::SynchronizeSummaryFiles()
   // Only need test if a potentially parallel writer is used.
   if(!this->Writer || !this->Controller ||
      (!vtkXMLPDataWriter::SafeDownCast(this->Writer) &&
-      !vtkXMLPVCollectionWriter::SafeDownCast(this->Writer) &&
-      !vtkPVAnimationWriter::SafeDownCast(this->Writer)))
+      !vtkXMLPVDWriter::SafeDownCast(this->Writer)))
     {
     return 0;
     }
@@ -229,12 +227,8 @@ void vtkPVSummaryHelper::SetWriteSummaryFile(int value)
     {
     w->SetWriteSummaryFile(value);
     }
-  else if(vtkXMLPVCollectionWriter* w = vtkXMLPVCollectionWriter::SafeDownCast(this->Writer))
+  else if(vtkXMLPVDWriter* w = vtkXMLPVDWriter::SafeDownCast(this->Writer))
     {
     w->SetWriteCollectionFile(value);
-    }
-  else if(vtkPVAnimationWriter* w = vtkPVAnimationWriter::SafeDownCast(this->Writer))
-    {
-    w->SetWriteAnimationFile(value);
     }
 }

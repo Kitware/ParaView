@@ -18,7 +18,6 @@ SET( ParaView_SRCS
   vtkPVAdvancedReaderModule.cxx
   vtkPVAnimationInterface.cxx
   vtkPVAnimationInterfaceEntry.cxx
-  vtkPVAnimationWriter.cxx
   vtkPVApplication.cxx 
   vtkPVApplicationResources.cxx 
   vtkPVApplicationSettingsInterface.cxx
@@ -33,7 +32,6 @@ SET( ParaView_SRCS
   vtkPVCameraManipulator.cxx
   vtkPVClientServerModule.cxx
   vtkPVClipDataSet.cxx
-  vtkPVCollectionWriter.cxx
   vtkPVColorMap.cxx
   vtkPVComponentSelection.cxx
   vtkPVCompositeBuffer.cxx
@@ -47,6 +45,7 @@ SET( ParaView_SRCS
   vtkPVContourEntry.cxx 
   vtkPVContourFilter.cxx
   vtkPVDReaderModule.cxx
+  vtkPVDWriter.cxx
   vtkPVData.cxx 
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
@@ -174,7 +173,8 @@ SET( ParaView_SRCS
   vtkPVXDMFParameters.cxx
   vtkXDMFReaderModule.cxx
   vtkXMLCollectionReader.cxx
-  vtkXMLPVCollectionWriter.cxx
+  vtkXMLPVAnimationWriter.cxx
+  vtkXMLPVDWriter.cxx
   )
 
 IF (PARAVIEW_USE_ICE_T)

@@ -1,7 +1,7 @@
 <ModuleInterfaces>
  <Writer input="vtkDataSet"
-         class="vtkPVCollectionWriter"
-         writer="vtkXMLPVCollectionWriter"
+         class="vtkPVDWriter"
+         writer="vtkXMLPVDWriter"
          extension=".pvd"
          file_description="ParaView Data Files"/>
  <Writer input="vtkPolyData" 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVCollectionWriter.h
+  Module:    vtkPVDWriter.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,23 +39,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVCollectionWriter - Wraps a VTK file writer.
+// .NAME vtkPVDWriter - Wraps a VTK file writer.
 // .SECTION Description
-// vtkPVCollectionWriter provides functionality for writers similar to that
+// vtkPVDWriter provides functionality for writers similar to that
 // provided by vtkPVReaderModule for readers.  An instance of this
 // class is configured by an XML ModuleInterface specification and
 // knows how to create and use a single VTK file writer object.
 
-#ifndef __vtkPVCollectionWriter_h
-#define __vtkPVCollectionWriter_h
+#ifndef __vtkPVDWriter_h
+#define __vtkPVDWriter_h
 
 #include "vtkPVWriter.h"
 
-class VTK_EXPORT vtkPVCollectionWriter : public vtkPVWriter
+class VTK_EXPORT vtkPVDWriter : public vtkPVWriter
 {
 public:
-  static vtkPVCollectionWriter* New();
-  vtkTypeRevisionMacro(vtkPVCollectionWriter,vtkPVWriter);
+  static vtkPVDWriter* New();
+  vtkTypeRevisionMacro(vtkPVDWriter,vtkPVWriter);
   void PrintSelf(ostream& os, vtkIndent indent);  
   
   // Description:
@@ -66,15 +66,15 @@ public:
   // Write the current source's data to the collection file with the
   // given name.
   void Write(const char* fileName, vtkPVSource* pvs, int numProcs,
-             int ghostLevel);
+             int ghostLevel, int timeSeries);
   
 protected:
-  vtkPVCollectionWriter();
-  ~vtkPVCollectionWriter();
+  vtkPVDWriter();
+  ~vtkPVDWriter();
   
 private:
-  vtkPVCollectionWriter(const vtkPVCollectionWriter&); // Not implemented
-  void operator=(const vtkPVCollectionWriter&); // Not implemented
+  vtkPVDWriter(const vtkPVDWriter&); // Not implemented
+  void operator=(const vtkPVDWriter&); // Not implemented
 };
 
 #endif

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkXMLPVCollectionWriter.cxx
+  Module:    vtkXMLPVDWriter.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -15,7 +15,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkXMLPVCollectionWriter.h"
+#include "vtkXMLPVDWriter.h"
 
 #include "vtkCallbackCommand.h"
 #include "vtkImageData.h"
@@ -43,57 +43,58 @@
 
 #if defined(_WIN32)
 # include <direct.h>
-int vtkXMLPVCollectionWriterMakeDirectory(const char* dirname)
+int vtkXMLPVDWriterMakeDirectory(const char* dirname)
 {
   return (_mkdir(dirname) >= 0)?1:0;
 }
 #else
 # include <sys/stat.h>
 # include <sys/types.h>
-int vtkXMLPVCollectionWriterMakeDirectory(const char* dirname)
+int vtkXMLPVDWriterMakeDirectory(const char* dirname)
 {
   return (mkdir(dirname, 00755) >= 0)?1:0;
 }
 #endif
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkXMLPVCollectionWriter);
-vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.6.2.3");
+vtkStandardNewMacro(vtkXMLPVDWriter);
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.1.2.1");
 
-class vtkXMLPVCollectionWriterInternals
+class vtkXMLPVDWriterInternals
 {
 public:
   vtkstd::vector< vtkSmartPointer<vtkXMLWriter> > Writers;
   vtkstd::string FilePath;
   vtkstd::string FilePrefix;
-  vtkstd::string CreatePieceFileName(int index, const char* path=0);
+  vtkstd::vector<std::string> Entries;
+  vtkstd::string CreatePieceFileName(int index);
 };
 
 //----------------------------------------------------------------------------
-vtkXMLPVCollectionWriter::vtkXMLPVCollectionWriter()
+vtkXMLPVDWriter::vtkXMLPVDWriter()
 {
-  this->Internal = new vtkXMLPVCollectionWriterInternals;
+  this->Internal = new vtkXMLPVDWriterInternals;
   this->Piece = 0;
   this->NumberOfPieces = 1;
   this->GhostLevel = 0;
   this->WriteCollectionFileInitialized = 0;
   this->WriteCollectionFile = 0;
-
+  
   // Setup a callback for the internal writers to report progress.
   this->ProgressObserver = vtkCallbackCommand::New();
-  this->ProgressObserver->SetCallback(&vtkXMLPVCollectionWriter::ProgressCallbackFunction);
+  this->ProgressObserver->SetCallback(&vtkXMLPVDWriter::ProgressCallbackFunction);
   this->ProgressObserver->SetClientData(this);
 }
 
 //----------------------------------------------------------------------------
-vtkXMLPVCollectionWriter::~vtkXMLPVCollectionWriter()
+vtkXMLPVDWriter::~vtkXMLPVDWriter()
 {
   this->ProgressObserver->Delete();
   delete this->Internal;
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVCollectionWriter::PrintSelf(ostream& os, vtkIndent indent)
+void vtkXMLPVDWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "GhostLevel: " << this->GhostLevel << endl;
@@ -103,13 +104,13 @@ void vtkXMLPVCollectionWriter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVCollectionWriter::AddInput(vtkDataSet* ds)
+void vtkXMLPVDWriter::AddInput(vtkDataSet* ds)
 {
   this->vtkProcessObject::AddInput(ds);
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVCollectionWriter::AddInput(vtkDataObject* d)
+void vtkXMLPVDWriter::AddInput(vtkDataObject* d)
 {
   vtkDataSet* ds = vtkDataSet::SafeDownCast(d);
   if(ds)
@@ -123,7 +124,7 @@ void vtkXMLPVCollectionWriter::AddInput(vtkDataObject* d)
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVCollectionWriter::SetWriteCollectionFile(int flag)
+void vtkXMLPVDWriter::SetWriteCollectionFile(int flag)
 {
   this->WriteCollectionFileInitialized = 1;
   vtkDebugMacro(<< this->GetClassName() << " ("
@@ -136,7 +137,7 @@ void vtkXMLPVCollectionWriter::SetWriteCollectionFile(int flag)
 }
 
 //----------------------------------------------------------------------------
-int vtkXMLPVCollectionWriter::WriteInternal()
+int vtkXMLPVDWriter::WriteInternal()
 {
   // Prepare file prefix for creation of internal file names.
   this->SplitFileName();
@@ -161,28 +162,35 @@ int vtkXMLPVCollectionWriter::WriteInternal()
   // Create the subdirectory for the internal files.
   vtkstd::string subdir = this->Internal->FilePath;
   subdir += this->Internal->FilePrefix;
-  vtkXMLPVCollectionWriterMakeDirectory(subdir.c_str());
+  this->MakeDirectory(subdir.c_str());
   
   // Write each input.
   int i;
+  this->DeleteAllEntries();
   for(i=0; i < this->GetNumberOfInputs(); ++i)
     {
     this->SetProgressRange(progressRange, i,
                            this->GetNumberOfInputs()+writeCollection);
-    if(vtkXMLWriter* w = this->Internal->Writers[i].GetPointer())
+    if(vtkXMLWriter* w = this->GetWriter(i))
       {
       // Set the file name.
-      vtkstd::string fname =
-        this->Internal->CreatePieceFileName(i,
-                                            this->Internal->FilePath.c_str());
-      w->SetFileName(fname.c_str());
-      
-      w->AddObserver(vtkCommand::ProgressEvent, this->ProgressObserver);
+      vtkstd::string fname = this->Internal->CreatePieceFileName(i);
+      vtkstd::string full = this->Internal->FilePath;
+      full += fname;
+      w->SetFileName(full.c_str());
       
       // Write the data.
+      w->AddObserver(vtkCommand::ProgressEvent, this->ProgressObserver);      
       w->Write();
-      
       w->RemoveObserver(this->ProgressObserver);
+      
+      // Create the entry for the collection file.
+      ostrstream entry_with_warning_C4701;
+      entry_with_warning_C4701
+        << "<DataSet part=\"" << i
+        << "\" file=\"" << fname.c_str() << "\"/>" << ends;
+      this->AppendEntry(entry_with_warning_C4701.str());
+      entry_with_warning_C4701.rdbuf()->freeze(0);
       }
     }
   
@@ -191,14 +199,13 @@ int vtkXMLPVCollectionWriter::WriteInternal()
     {
     this->SetProgressRange(progressRange, this->GetNumberOfInputs(),
                            this->GetNumberOfInputs()+writeCollection);
-    if(!this->Superclass::WriteInternal()) { return 0; }
+    return this->WriteCollectionFileIfRequested();
     }
-  
   return 1;  
 }
 
 //----------------------------------------------------------------------------
-int vtkXMLPVCollectionWriter::WriteData()
+int vtkXMLPVDWriter::WriteData()
 {
   // Write the collection file.
   this->StartFile();
@@ -208,17 +215,12 @@ int vtkXMLPVCollectionWriter::WriteData()
   ostream& os = *(this->Stream);
   os << indent << "<" << this->GetDataSetName() << ">\n";
   
-  // Write a DataSet entry for each input that was written.
-  int i;
-  for(i=0; i < this->GetNumberOfInputs(); ++i)
+  // Write the set of entries.
+  for(vtkstd::vector<vtkstd::string>::const_iterator i =
+        this->Internal->Entries.begin();
+      i != this->Internal->Entries.end(); ++i)
     {
-    if(this->Internal->Writers[i].GetPointer())
-      {
-      vtkstd::string fname = this->Internal->CreatePieceFileName(i);
-      os << indent.GetNextIndent()
-         << "<DataSet part=\"" << i << "\" file=\""
-         << fname.c_str() << "\"/>\n";
-      }
+    os << indent.GetNextIndent() << i->c_str() << "\n";
     }
   
   // Close the primary element.
@@ -229,19 +231,46 @@ int vtkXMLPVCollectionWriter::WriteData()
 }
 
 //----------------------------------------------------------------------------
-const char* vtkXMLPVCollectionWriter::GetDefaultFileExtension()
+int vtkXMLPVDWriter::WriteCollectionFileIfRequested()
 {
-  return "vtc";
+  // Decide whether to write the collection file.
+  int writeCollection = 0;
+  if(this->WriteCollectionFileInitialized)
+    {
+    writeCollection = this->WriteCollectionFile;
+    }
+  else if(this->Piece == 0)
+    {
+    writeCollection = 1;
+    }
+  
+  if(writeCollection)
+    {
+    if(!this->Superclass::WriteInternal()) { return 0; }
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkXMLPVCollectionWriter::GetDataSetName()
+void vtkXMLPVDWriter::MakeDirectory(const char* name)
+{
+  vtkXMLPVDWriterMakeDirectory(name);  
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLPVDWriter::GetDefaultFileExtension()
+{
+  return "pvd";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLPVDWriter::GetDataSetName()
 {
   return "Collection";
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVCollectionWriter::CreateWriters()
+void vtkXMLPVDWriter::CreateWriters()
 {
   int i;
   this->Internal->Writers.resize(this->GetNumberOfInputs());
@@ -424,7 +453,18 @@ void vtkXMLPVCollectionWriter::CreateWriters()
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVCollectionWriter::SplitFileName()
+vtkXMLWriter* vtkXMLPVDWriter::GetWriter(int index)
+{
+  int size = static_cast<int>(this->Internal->Writers.size());
+  if(index >= 0 && index < size)
+    {
+    return this->Internal->Writers[index].GetPointer();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVDWriter::SplitFileName()
 {
   vtkstd::string fileName = this->FileName;
   vtkstd::string name;
@@ -460,27 +500,19 @@ void vtkXMLPVCollectionWriter::SplitFileName()
 }
 
 //----------------------------------------------------------------------------
-vtkstd::string
-vtkXMLPVCollectionWriterInternals::CreatePieceFileName(int index,
-                                                       const char* path)
+const char* vtkXMLPVDWriter::GetFilePrefix()
 {
-  vtkstd::string fname;
-  ostrstream fn_with_warning_C4701;
-  if(path)
-    {
-    fn_with_warning_C4701 << path;
-    }
-  fn_with_warning_C4701
-    << this->FilePrefix.c_str() << "/"
-    << this->FilePrefix.c_str() << "_" << index << "."
-    << this->Writers[index]->GetDefaultFileExtension() << ends;
-  fname = fn_with_warning_C4701.str();
-  fn_with_warning_C4701.rdbuf()->freeze(0);
-  return fname;
+  return this->Internal->FilePrefix.c_str();
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVCollectionWriter::ProgressCallbackFunction(vtkObject* caller,
+const char* vtkXMLPVDWriter::GetFilePath()
+{
+  return this->Internal->FilePath.c_str();
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVDWriter::ProgressCallbackFunction(vtkObject* caller,
                                                         unsigned long,
                                                         void* clientdata,
                                                         void*)
@@ -488,12 +520,12 @@ void vtkXMLPVCollectionWriter::ProgressCallbackFunction(vtkObject* caller,
   vtkProcessObject* w = vtkProcessObject::SafeDownCast(caller);
   if(w)
     {
-    reinterpret_cast<vtkXMLPVCollectionWriter*>(clientdata)->ProgressCallback(w);
+    reinterpret_cast<vtkXMLPVDWriter*>(clientdata)->ProgressCallback(w);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLPVCollectionWriter::ProgressCallback(vtkProcessObject* w)
+void vtkXMLPVDWriter::ProgressCallback(vtkProcessObject* w)
 {
   float width = this->ProgressRange[1]-this->ProgressRange[0];
   float internalProgress = w->GetProgress();
@@ -503,4 +535,30 @@ void vtkXMLPVCollectionWriter::ProgressCallback(vtkProcessObject* w)
     {
     w->SetAbortExecute(1);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVDWriter::AppendEntry(const char* entry)
+{
+  this->Internal->Entries.push_back(entry);
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVDWriter::DeleteAllEntries()
+{
+  this->Internal->Entries.clear();
+}
+
+//----------------------------------------------------------------------------
+vtkstd::string vtkXMLPVDWriterInternals::CreatePieceFileName(int index)
+{
+  vtkstd::string fname;
+  ostrstream fn_with_warning_C4701;
+  fn_with_warning_C4701
+    << this->FilePrefix.c_str() << "/"
+    << this->FilePrefix.c_str() << "_" << index << "."
+    << this->Writers[index]->GetDefaultFileExtension() << ends;
+  fname = fn_with_warning_C4701.str();
+  fn_with_warning_C4701.rdbuf()->freeze(0);
+  return fname;
 }

@@ -106,11 +106,14 @@ public:
   // Description:
   // Write the data from the given source to the given file name.
   virtual void Write(const char* fileName, vtkPVSource* pvs,
-                     int numProcs, int ghostLevel);
+                     int numProcs, int ghostLevel, int timeSeries);
   
 protected:
   vtkPVWriter();
   ~vtkPVWriter();
+  
+  void WriteOneFile(const char* fileName, vtkPVSource* pvs,
+                    int numProcs, int ghostLevel);
   
   char* InputClassName;
   char* WriterClassName;

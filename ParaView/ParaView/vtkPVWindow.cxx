@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.3");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.4");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2098,7 +2098,8 @@ int vtkPVWindow::OpenWithReader(const char *fileName,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
+void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
+                               int timeSeries)
 {
   if(!this->CurrentPVSource)
     {
@@ -2152,7 +2153,8 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
                        filename, ghostLevel);
   
   // Actually write the file.
-  writer->Write(filename, this->GetCurrentPVSource(), numProcs, ghostLevel);
+  writer->Write(filename, this->GetCurrentPVSource(), numProcs, ghostLevel,
+                timeSeries);
 }
 
 //-----------------------------------------------------------------------------
@@ -2286,9 +2288,24 @@ void vtkPVWindow::WriteData()
   if ( saveDialog->Invoke() &&
        vtkString::Length(saveDialog->GetFileName())>0 )
     {
-    const char* filename = saveDialog->GetFileName();  
+    const char* filename = saveDialog->GetFileName();
     
-    // Write the file.
+    // If the current source is a reader and can provide time steps, ask
+    // the user whether to write the whole time series.
+    int timeSeries = 0;
+    vtkPVReaderModule* reader =
+      vtkPVReaderModule::SafeDownCast(this->GetCurrentPVSource());
+    if(reader && (reader->GetNumberOfTimeSteps() > 0) &&
+       vtkKWMessageDialog::PopupYesNo(
+         this->Application, this, "Timesteps",
+         "The current source provides multiple time steps.  "
+         "Do you want to save all time steps?", 0))
+      {
+      timeSeries = 1;
+      }
+    
+    // Choose ghost level.
+    int ghostLevel = 0;    
     if(parallel)
       {
       vtkPVGhostLevelDialog* dlg = vtkPVGhostLevelDialog::New();
@@ -2304,17 +2321,15 @@ void vtkPVWindow::WriteData()
         ghostLevel = dlg->GetGhostLevel();
         }
       dlg->Delete();
-      if (ghostLevel >= 0)
+      if(ghostLevel < 0)
         {
-        this->WriteVTKFile(filename, ghostLevel);
-        this->SaveLastPath(saveDialog, "SaveDataFile");
+        ghostLevel = 0;
         }
       }
-    else
-      {
-      this->WriteVTKFile(filename);  
-      this->SaveLastPath(saveDialog, "SaveDataFile");
-      }
+  
+    // Write the file.
+    this->WriteVTKFile(filename, ghostLevel, timeSeries);
+    this->SaveLastPath(saveDialog, "SaveDataFile");
     }
   saveDialog->Delete();
 }
