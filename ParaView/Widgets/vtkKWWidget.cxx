@@ -159,7 +159,7 @@ void vtkKWWidget::Create(vtkKWApplication *app, const char *name,
     return;
     }
   this->SetApplication(app);
-  this->Script("%s %s %s",name,this->GetWidgetName(),args);
+  this->Script("%s %s %s",name,this->GetWidgetName(),(args?args:""));
 
   const char* type = this->GetType();
   if ( !vtkString::Equals(type, "Frame") && 
@@ -343,7 +343,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.37 $");
+  this->ExtractRevision(os,"$Revision: 1.38 $");
 }
 
 //------------------------------------------------------------------------------
