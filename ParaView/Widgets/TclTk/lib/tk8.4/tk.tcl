@@ -79,7 +79,11 @@ proc ::tk::PlaceWindow {w {place ""} {anchor ""}} {
     wm withdraw $w
     update idletasks
     set checkBounds 1
-    if {[string equal -len [string length $place] $place "pointer"]} {
+    if {[string equal $place ""]} {
+	set x [expr {([winfo screenwidth $w]-[winfo reqwidth $w])/2}]
+	set y [expr {([winfo screenheight $w]-[winfo reqheight $w])/2}]
+	set checkBounds 0
+    } elseif {[string equal -len [string length $place] $place "pointer"]} {
 	## place at POINTER (centered if $anchor == center)
 	if {[string equal -len [string length $anchor] $anchor "center"]} {
 	    set x [expr {[winfo pointerx $w]-[winfo reqwidth $w]/2}]

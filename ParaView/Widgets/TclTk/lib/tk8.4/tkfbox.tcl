@@ -238,6 +238,12 @@ proc ::tk::IconList_Create {w} {
     set data(noScroll) 1
     set data(selection) {}
     set data(index,anchor) ""
+    set fg [option get $data(canvas) foreground Foreground]
+    if {$fg eq ""} {
+	set data(fill) black
+    } else {
+	set data(fill) $fg
+    }
 
     # Creates the event bindings.
     #
@@ -342,7 +348,7 @@ proc ::tk::IconList_Add {w image items} {
 	set iTag [$data(canvas) create image 0 0 -image $image -anchor nw \
 		-tags [list icon $data(numItems) item$data(numItems)]]
 	set tTag [$data(canvas) create text  0 0 -text  $text  -anchor nw \
-		-font $data(font) \
+		-font $data(font) -fill $data(fill) \
 		-tags [list text $data(numItems) item$data(numItems)]]
 	set rTag [$data(canvas) create rect  0 0 0 0 -fill "" -outline "" \
 		-tags [list rect $data(numItems) item$data(numItems)]]
@@ -767,7 +773,7 @@ proc ::tk::IconList_Reset {w} {
 
 namespace eval ::tk::dialog {}
 namespace eval ::tk::dialog::file {
-    namespace import ::tk::msgcat::*
+    namespace import -force ::tk::msgcat::*
 }
 
 # ::tk::dialog::file:: --
@@ -1189,8 +1195,7 @@ proc ::tk::dialog::file::Update {w} {
 	return
     }
     set class [winfo class $w]
-    if { [string compare $class TkFDialog] && \
-	    [string compare $class TkChooseDir] } {
+    if {($class ne "TkFDialog") && ($class ne "TkChooseDir")} {
 	return
     }
 
@@ -1219,9 +1224,8 @@ rSASvJTGhnhcV3EJlo3kh53ltF5nAhQAOw==}]
 	# should have been checked before ::tk::dialog::file::Update is called, so
 	# we normally won't come to here. Anyways, give an error and abort
 	# action.
-	tk_messageBox -type ok -parent $w -message \
-	    "[mc "Cannot change to the directory \"%1\$s\".\nPermission denied." $data(selectPath)]"\
-	    -icon warning
+	tk_messageBox -type ok -parent $w -icon warning -message \
+	    [mc "Cannot change to the directory \"%1\$s\".\nPermission denied." $data(selectPath)]
 	cd $appPWD
 	return
     }
@@ -1234,47 +1238,33 @@ rSASvJTGhnhcV3EJlo3kh53ltF5nAhQAOw==}]
     $data(ent) config -cursor watch
     $w         config -cursor watch
     update idletasks
-    
+
     ::tk::IconList_DeleteAll $data(icons)
 
     # Make the dir list
     #
-    set completeFileList [lsort -dictionary -unique [glob -nocomplain .* *]]
+    set dirs [lsort -dictionary -unique \
+		     [glob -tails -directory . -type d -nocomplain .* *]]
     set dirList {}
-    foreach f $completeFileList {
-	if {[string equal $f .]} {
+    foreach d $dirs {
+	if {$d eq "." || $d eq ".."} {
 	    continue
 	}
-	if {[string equal $f ..]} {
-	    continue
-	}
-	if {[file isdir ./$f]} {
-	    lappend dirList $f
-	}
+	lappend dirList $d
     }
     ::tk::IconList_Add $data(icons) $folder $dirList
-    if { [string equal $class TkFDialog] } {
-	# Make the file list if this is a File Dialog
+
+    if {$class eq "TkFDialog"} {
+	# Make the file list if this is a File Dialog, selecting all
+	# but 'd'irectory type files.
 	#
+	set cmd [list glob -tails -directory . -type {f b c l p s} -nocomplain]
 	if {[string equal $data(filter) *]} {
-	    set files $completeFileList
+	    lappend cmd .* *
 	} else {
-	    set files {}
-	    foreach f $completeFileList {
-		foreach pat $data(filter) {
-		    if { [string match $pat $f] } {
-			lappend files $f
-			break
-		    }
-		}
-	    }
+	    eval [list lappend cmd] $data(filter)
 	}
-	set fileList {}
-	foreach f $files {
-	    if {![file isdir ./$f]} {
-		lappend fileList $f
-	    }
-	}
+	set fileList [lsort -dictionary -unique [eval $cmd]]
 	::tk::IconList_Add $data(icons) $file $fileList
     }
 
@@ -1519,10 +1509,17 @@ proc ::tk::dialog::file::ActivateEnt {w} {
 	# names as a true list, watching out for a single file with a
 	# space in the name.  Thus we query the IconList directly.
 
+	set selIcos [::tk::IconList_Curselection $data(icons)]
 	set data(selectFile) ""
-	foreach item [::tk::IconList_Curselection $data(icons)] {
-	    ::tk::dialog::file::VerifyFileName $w \
+	if {[llength $selIcos] == 0 && $text ne ""} {
+	    # This assumes the user typed something in without selecting
+	    # files - so assume they only type in a single filename.
+	    ::tk::dialog::file::VerifyFileName $w $text
+	} else {
+	    foreach item $selIcos {
+		::tk::dialog::file::VerifyFileName $w \
 		    [::tk::IconList_Get $data(icons) $item]
+	    }
 	}
     } else {
 	::tk::dialog::file::VerifyFileName $w $text
