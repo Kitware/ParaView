@@ -1,3 +1,16 @@
+SET( ParaViewShared_SRCS
+  vtkPVApplication.cxx
+  vtkPVClientServerModule.cxx
+  vtkPVExtentTranslator.cxx
+  vtkPVGenericRenderWindowInteractor.cxx
+  vtkPVGeometryFilter.cxx
+  vtkPVLODActor.cxx
+  vtkPVMPIProcessModule.cxx
+  vtkPVProcessModule.cxx
+  vtkPVTreeComposite.cxx
+  vtkStringList.cxx
+)
+
 SET( ParaViewServer_SRCS
   vtkCTHData.cxx
   vtkCTHDataToPolyDataFilter.cxx
@@ -10,22 +23,14 @@ SET( ParaViewServer_SRCS
   vtkCompositeProp.cxx
   vtkExtractCTHPart.cxx
   vtkMultiDisplayManager.cxx
-  vtkPVApplication.cxx
-  vtkPVClientServerModule.cxx
-  vtkPVExtentTranslator.cxx
-  vtkPVGenericRenderWindowInteractor.cxx
-  vtkPVGeometryFilter.cxx
-  vtkPVLODActor.cxx
-  vtkPVMPIProcessModule.cxx
-  vtkPVProcessModule.cxx
-  vtkPVTreeComposite.cxx
+  vtkPVServerArraySelection.cxx
+  vtkPVServerObject.cxx
   vtkSelectInputs.cxx
-  vtkStringList.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx
   )
 
-SET( ParaView_SRCS ${ParaViewServer_SRCS}
+SET( ParaViewClient_SRCS
   vtkKWBoundsDisplay.cxx
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
@@ -171,8 +176,8 @@ SET( ParaView_SRCS ${ParaViewServer_SRCS}
   )
 
 IF (PARAVIEW_USE_ICE_T)
-  SET( ParaView_SRCS
-    ${ParaView_SRCS}
+  SET( ParaViewClient_SRCS
+    ${ParaViewClient_SRCS}
     vtkPVDeskTopRenderModule.cxx
     vtkPVDeskTopRenderModuleUI.cxx
     vtkDesktopDeliveryClient.cxx
@@ -195,6 +200,9 @@ IF (PARAVIEW_USE_ICE_T)
     ABSTRACT
     )
 ENDIF (PARAVIEW_USE_ICE_T)
+
+SET(ParaView_SRCS ${ParaViewShared_SRCS} ${ParaViewServer_SRCS}
+  ${ParaViewClient_SRCS})
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVApplicationResources
@@ -275,7 +283,7 @@ VTK_MAKE_INSTANTIATOR2(vtkParaViewInstantiator PVInstantiator_SRCS
 
 # Create ClientServer wrappers for ParaView classes.
 VTK_WRAP_ClientServer(vtkParaViewServerCS ParaViewServerCS_SRCS
-  ${ParaViewServer_SRCS}
+  ${ParaViewShared_SRCS} ${ParaViewServer_SRCS}
   ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWApplication.h
   ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWObject.h)
 ADD_LIBRARY(vtkParaViewServerCS ${ParaViewServerCS_SRCS}
@@ -284,7 +292,7 @@ TARGET_LINK_LIBRARIES(vtkParaViewServerCS vtkPVFiltersCS vtkKWWidgetsTCL)
 
 # Create Tcl wrappers for ParaView classes.
 VTK_WRAP_TCL2(vtkKWParaViewTCL ParaViewTCL_SRCS ${PVInstantiator_SRCS}
-  ${ParaView_SRCS})
+  ${ParaViewShared_SRCS} ${ParaViewClient_SRCS})
 ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
   ${ParaView_SRCS})
 IF(PARAVIEW_USE_EXODUS)

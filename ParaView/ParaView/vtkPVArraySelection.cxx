@@ -65,7 +65,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.30.4.3");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.30.4.4");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -94,6 +94,7 @@ vtkPVArraySelection::vtkPVArraySelection()
   this->NoArraysLabel = vtkKWLabel::New();
   this->Selection = vtkDataArraySelection::New();
   this->SelectionTclName = 0;
+  this->ServerSideID.ID = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -124,7 +125,14 @@ vtkPVArraySelection::~vtkPVArraySelection()
 
   this->Selection->Delete();
   this->SetSelectionTclName(0);
-  
+
+  if(this->ServerSideID.ID)
+    {
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    pm->DeleteStreamObject(this->ServerSideID);
+    pm->SendStreamToServer();
+    }
+
   delete this->ArraySet;
 }
 
@@ -216,40 +224,61 @@ void vtkPVArraySelection::SetLocalSelectionsFromReader()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   this->SetupSelectionTclName();
   this->Selection->RemoveAllArrays();
-  if(this->VTKReaderTclName)
+  int point = 0;
+  if(strcmp(this->AttributeName, "Point") == 0)
     {
-    pm->RootScript(
-      "namespace eval ::paraview::vtkPVArraySelection {\n"
-      "  proc GetArraySettings { reader type } {\n"
-      "    set n [$reader GetNumberOf${type}Arrays]\n"
-      "    set settings {}\n"
-      "    for {set i 0} {$i < $n} {incr i} {\n"
-      "      set name [$reader Get${type}ArrayName $i]\n"
-      "      set status [$reader Get${type}ArrayStatus $name]\n"
-      "      lappend settings [list $name $status]\n"
-      "    }\n"
-      "    return $settings\n"
-      "  }\n"
-      "  GetArraySettings {%s} {%s}\n"
-      "}\n",
-      this->VTKReaderTclName, this->AttributeName);
-    vtkstd::string settings = pm->GetRootResult();
-    this->Script(
-      "namespace eval ::paraview::vtkPVArraySelection {\n"
-      "  proc ParseArraySettings { selection settings } {\n"
-      "    foreach a $settings {\n"
-      "      set name [lindex $a 0]\n"
-      "      set value [lindex $a 1]\n"
-      "      if {$value} {\n"
-      "        $selection EnableArray $name\n"
-      "      } else {\n"
-      "        $selection DisableArray $name\n"
-      "      }\n"
-      "    }\n"
-      "  }\n"
-      "  ParseArraySettings {%s} {%s}\n"
-      "}\n",
-      this->SelectionTclName, settings.c_str());
+    point = 1;
+    }
+  else if(!(strcmp(this->AttributeName, "Cell") == 0))
+    {
+    vtkErrorMacro("AttributeName must be \"Point\" or \"Cell\".");
+    return;
+    }
+  if(this->VTKReaderID.ID)
+    {
+    this->CreateServerSide();
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->ServerSideID << "GetArraySettings"
+                    << this->VTKReaderID << point
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    vtkClientServerStream arrays;
+    if(pm->GetLastServerResult().GetArgument(0, 0, &arrays))
+      {
+      int numArrays = arrays.GetNumberOfArguments(0)/2;
+      for(int i=0; i < numArrays; ++i)
+        {
+        // Get the array name.
+        const char* name;
+        if(!arrays.GetArgument(0, i*2, &name))
+          {
+          vtkErrorMacro("Error getting array name from reader.");
+          break;
+          }
+
+         // Get the array status.
+        int status;
+        if(!arrays.GetArgument(0, i*2 + 1, &status))
+          {
+          vtkErrorMacro("Error getting array status from reader.");
+          break;
+          }
+
+        // Set the selection to match the reader.
+        if(status)
+          {
+          this->Selection->EnableArray(name);
+          }
+        else
+          {
+          this->Selection->DisableArray(name);
+          }
+        }
+      }
+    else
+      {
+      vtkErrorMacro("Error getting set of arrays from reader.");
+      }
     }
 }
 
@@ -280,7 +309,7 @@ void vtkPVArraySelection::Reset()
     this->ArrayCheckButtons->RemoveAllItems();
     
     // Create new check buttons.
-    if (this->VTKReaderTclName)
+    if (this->VTKReaderID.ID)
       {
       int numArrays, idx;
       int row = 0;
@@ -331,7 +360,7 @@ void vtkPVArraySelection::Trace(ofstream *file)
 void vtkPVArraySelection::Accept()
 {
   // Create new check buttons.
-  if (this->VTKReaderTclName == NULL)
+  if (!this->VTKReaderID.ID)
     {
     vtkErrorMacro("VTKReader has not been set.");
     }
@@ -361,7 +390,11 @@ void vtkPVArraySelection::SetWidgetSelectionsFromLocal()
 void vtkPVArraySelection::SetReaderSelectionsFromWidgets()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();  
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
+  vtkstd::string setArrayStatus = "Set";
+  setArrayStatus += this->AttributeName;
+  setArrayStatus += "ArrayStatus";
   for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
     vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
@@ -369,20 +402,17 @@ void vtkPVArraySelection::SetReaderSelectionsFromWidgets()
     // file.  We could make every check button a pv widget.
     if(this->Selection->ArrayIsEnabled(check->GetText()) != check->GetState())
       {
-      vtkPVProcessModule* pm = pvApp->GetProcessModule();
       pm->GetStream() << vtkClientServerStream::Invoke
-                      << this->VTKReaderID 
-                      << (vtkstd::string("Set") 
-                          + vtkstd::string(this->AttributeName) 
-                          + vtkstd::string("ArrayStatus")).c_str()
-                      << check->GetText() << check->GetState() 
+                      << this->VTKReaderID
+                      << setArrayStatus.c_str()
+                      << check->GetText() << check->GetState()
                       << vtkClientServerStream::End;
-      pm->SendStreamToServer();
       this->AddTraceEntry("$kw(%s) SetArrayStatus {%s} %d", this->GetTclName(),
                           check->GetText(), check->GetState());
       }
     }
   it->Delete();
+  pm->SendStreamToServer();
 }
 
 //----------------------------------------------------------------------------
@@ -453,7 +483,7 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
 {
   int firstOff = 1;
 
-  if (this->VTKReaderTclName == NULL)
+  if (!this->VTKReaderID.ID)
     {
     vtkErrorMacro("VTKReader has not been set.");
     }
@@ -470,11 +500,11 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
       if (firstOff)
         {
         // Need to update information before setting array selections.
-        *file << "\t" << this->VTKReaderTclName << " UpdateInformation\n";
+        *file << "\t" << "pvTemp" << this->VTKReaderID << " UpdateInformation\n";
         firstOff = 0;
         }
       *file << "\t";
-      *file << this->VTKReaderTclName
+      *file << "pvTemp" << this->VTKReaderID
             << " Set" << this->AttributeName << "ArrayStatus {" 
             << check->GetText() << "} 0\n";
        
@@ -535,11 +565,25 @@ int vtkPVArraySelection::GetNumberOfArrays()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVArraySelection::CreateServerSide()
+{
+  if(!this->ServerSideID.ID)
+    {
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    this->ServerSideID = pm->NewStreamObject("vtkPVServerArraySelection");
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->ServerSideID << "SetProcessModule"
+                    << pm->GetProcessModuleID()
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVArraySelection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "AttributeName: " 
      << (this->AttributeName?this->AttributeName:"none") << endl;
-  os << indent << "VTKReaderTclName: " 
-     << (this->VTKReaderTclName?this->VTKReaderTclName:"none") << endl;
+  os << indent << "VTKReaderID: " << this->VTKReaderID.ID << endl;
 }

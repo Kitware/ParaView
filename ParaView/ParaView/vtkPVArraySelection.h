@@ -129,8 +129,6 @@ protected:
   char* AttributeName;
   vtkClientServerID VTKReaderID;
   
-  char* VTKReaderTclName;
-
   vtkKWLabeledFrame* LabeledFrame;
   
   vtkKWWidget* ButtonFrame;
@@ -146,7 +144,11 @@ protected:
   char* SelectionTclName;
   
   vtkPVArraySelectionArraySet* ArraySet;
-  
+
+  // Server-side helper.
+  vtkClientServerID ServerSideID;
+  void CreateServerSide();
+
   vtkPVArraySelection(const vtkPVArraySelection&); // Not implemented
   void operator=(const vtkPVArraySelection&); // Not implemented
 
