@@ -47,11 +47,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWScale.h"
 #include "vtkPVApplication.h"
 #include "vtkTimerLog.h"
+#include "vtkKWLabeledFrame.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.1.2.2");
 
 int vtkPVDeskTopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -67,6 +68,31 @@ vtkPVDeskTopRenderModuleUI::vtkPVDeskTopRenderModuleUI()
 //----------------------------------------------------------------------------
 vtkPVDeskTopRenderModuleUI::~vtkPVDeskTopRenderModuleUI()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDeskTopRenderModuleUI::Create(vtkKWApplication *app, const char *)
+{
+  vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
+  // Skip over LOD res and threshold.
+  
+  if (this->Application)
+    {
+    vtkErrorMacro("RenderModuleUI already created");
+    return;
+    }
+
+  this->Superclass::Create(app, NULL);
+
+  this->Script("pack forget %s",
+               this->ParallelRenderParametersFrame->GetWidgetName());
+  //this->CompositeCompressionCheck->EnabledOff();
+
+  this->SquirtCheck->SetState(0);
+  this->SquirtLabel->EnabledOff();
+  this->SquirtCheck->EnabledOff();
+  this->SquirtLevelScale->EnabledOff();
+  this->SquirtLevelLabel->EnabledOff();
 }
 
 
