@@ -9,9 +9,15 @@ if {[info exists argc]} {
     }
 } 
 
-after 1 { This will test TCL error reporting }
-
+$Application DisableTestErrors 
+after idle { This will test TCL error reporting }
+update idletasks
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+$pvWindow UseMessageDialogOff
+$pvWindow ErrorMessage "This is an error"
+$pvWindow WarningMessage "This is a warning"
+$pvWindow Open "vtkParaViewThisIsAFileThatDoesNotExists"
+$Application EnableTestErrors
 
 $pvWindow OpenPackage "$DataDir/Data/Package.xml"
 
@@ -28,9 +34,7 @@ $kw(vtkTemp285) ResetCallback
 $Application StartRecordingScript none.pvs
 $Application AcceptLicense
 $Application AcceptEvaluation
-$pvWindow UseMessageDialogOff
-$pvWindow ErrorMessage "This is an error"
-$pvWindow WarningMessage "This is a warning"
+
 $pvWindow DisableToolbarButtons
 $pvWindow EnableToolbarButtons
 $pvWindow PrintRecentFiles
@@ -45,7 +49,6 @@ $pvWindow CenterEntryCallback
 $pvWindow ToggleCenterActorCallback
 $pvWindow ToggleCenterActorCallback
 $pvWindow ToggleCenterActorCallback
-$pvWindow Open "vtkParaViewThisIsAFileThatDoesNotExists"
 $pvWindow EnableNavigationWindow
 $pvWindow DisableNavigationWindow
 $pvWindow EnableNavigationWindow
@@ -56,7 +59,6 @@ $pvWindow EnableToolbarButton "PVProbeButton"
 $pvWindow ChangeInteractorStyle 0
 $pvWindow ChangeInteractorStyle 1
 $pvWindow ChangeInteractorStyle 2
-$pvWindow ChangeInteractorStyle 3
 $pvWindow ChangeInteractorStyle 4
 $pvWindow ChangeInteractorStyle 1
 
