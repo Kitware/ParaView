@@ -66,7 +66,7 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
   this->Script( "frame %s -height %d -relief raised -bd 1", 
                 this->GetWidgetName(), this->Height);
 
-  this->Bar1->Create(app, "frame", "-bd 1 -relief raised");
+  this->Bar1->Create(app, "frame", "-bd 1 -relief flat");
   this->Script("pack %s -side left -fill y -expand yes -padx 4 -pady 2 -ipadx 2 -ipady 2",
                this->Bar1->GetWidgetName());
   this->Script("bind %s <Configure> {%s ScheduleResize}",
