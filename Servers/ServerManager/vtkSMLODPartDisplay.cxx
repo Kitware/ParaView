@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.11");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -561,8 +561,11 @@ void vtkSMLODPartDisplay::InvalidateGeometry()
 //----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::RemoveAllCaches()
 {
-  if (this->UpdateSuppressorProxy &&
-      this->UpdateSuppressorProxy->GetNumberOfIDs())
+  if (!this->UpdateSuppressorProxy)
+    {
+    return;
+    }
+  if (this->UpdateSuppressorProxy->GetNumberOfIDs())
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
