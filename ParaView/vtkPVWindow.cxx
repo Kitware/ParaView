@@ -479,7 +479,7 @@ void vtkPVWindow::Open()
     return;
     }
   
-  extension = strchr(openFileName, '.');
+  extension = strrchr(openFileName, '.');
   
   numSourceInterfaces = this->SourceInterfaces->GetNumberOfItems();
   
