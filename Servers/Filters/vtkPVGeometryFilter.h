@@ -20,14 +20,13 @@
 #ifndef __vtkPVGeometryFilter_h
 #define __vtkPVGeometryFilter_h
 
-#include "vtkPolyDataSource.h"
+#include "vtkPolyDataAlgorithm.h"
 
 class vtkDataObject;
 class vtkDataSet;
 class vtkDataSetSurfaceFilter;
-class vtkHierarchicalBoxDataSet;
-//class vtkHierarchicalBoxOutlineFilter;
 class vtkImageData;
+class vtkInformationVector;
 class vtkCTHData;
 class vtkStructuredGrid;
 class vtkRectilinearGrid;
@@ -36,11 +35,11 @@ class vtkOutlineSource;
 class vtkMultiProcessController;
 class vtkCallbackCommand;
 
-class VTK_EXPORT vtkPVGeometryFilter : public vtkPolyDataSource
+class VTK_EXPORT vtkPVGeometryFilter : public vtkPolyDataAlgorithm
 {
 public:
   static vtkPVGeometryFilter *New();
-  vtkTypeRevisionMacro(vtkPVGeometryFilter,vtkPolyDataSource);
+  vtkTypeRevisionMacro(vtkPVGeometryFilter,vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -62,11 +61,6 @@ public:
   vtkBooleanMacro(UseStrips, int);
 
   // Description:
-  // Set / get the input data or filter.
-  virtual void SetInput(vtkDataObject *input);
-  vtkDataObject *GetInput();
-  
-  // Description:
   // Whether to generate cell normals.  Cell normals should speed up
   // rendering when point normals are not available.  They can only be used
   // for poly cells now.  This option does nothing if the output
@@ -84,18 +78,32 @@ protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
 
-  virtual void Execute();
-  virtual void ExecuteInformation();
-  void DataSetExecute(vtkDataSet *input);
-  void ImageDataExecute(vtkImageData *input);
-  void StructuredGridExecute(vtkStructuredGrid *input);
-  void RectilinearGridExecute(vtkRectilinearGrid *input);
-  void UnstructuredGridExecute(vtkUnstructuredGrid *input);
-  void PolyDataExecute(vtkPolyData *input);
-  void CTHDataExecute(vtkCTHData *input);
-  void DataSetSurfaceExecute(vtkDataSet *input);
-  void ExecuteCellNormals(vtkPolyData *output);
-  void HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *input);
+  virtual int RequestInformation(vtkInformation* request,
+                                 vtkInformationVector** inputVector,
+                                 vtkInformationVector* outputVector);
+  virtual int RequestCompositeData(vtkInformation* request,
+                                   vtkInformationVector** inputVector,
+                                   vtkInformationVector* outputVector);
+  virtual int RequestData(vtkInformation* request,
+                          vtkInformationVector** inputVector,
+                          vtkInformationVector* outputVector);
+
+  // Create a default executive.
+  virtual vtkExecutive* CreateDefaultExecutive();
+
+  void ExecuteBlock(vtkDataSet* input, vtkPolyData* output, int doCommunicate);
+
+  void DataSetExecute(vtkDataSet* input, vtkPolyData* output, int doCommunicate);
+  void ImageDataExecute(vtkImageData* input, vtkPolyData* output);
+  void StructuredGridExecute(vtkStructuredGrid* input, vtkPolyData* output);
+  void RectilinearGridExecute(vtkRectilinearGrid* input, vtkPolyData* output);
+  void UnstructuredGridExecute(
+    vtkUnstructuredGrid* input, vtkPolyData* output, int doCommunicate);
+  void PolyDataExecute(
+    vtkPolyData* input, vtkPolyData* output, int doCommunicate);
+  void DataSetSurfaceExecute(vtkDataSet* input, vtkPolyData* output);
+  void ExecuteCellNormals(vtkPolyData* output, int doCommunicate);
+  void CTHDataExecute(vtkCTHData *input, vtkPolyData* output, int doCommunicate);
 
   int OutlineFlag;
   int UseOutline;
@@ -105,7 +113,6 @@ protected:
   vtkMultiProcessController* Controller;
   vtkOutlineSource *OutlineSource;
   vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
-  //vtkHierarchicalBoxOutlineFilter* HierarchicalBoxOutline;
 
   int CheckAttributes(vtkDataObject* input);
 

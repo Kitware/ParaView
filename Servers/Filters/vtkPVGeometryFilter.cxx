@@ -14,35 +14,38 @@
 =========================================================================*/
 #include "vtkPVGeometryFilter.h"
 
-#include "vtkFloatArray.h"
+#include "vtkAppendPolyData.h"
+#include "vtkCTHAMRSurface.h"
+#include "vtkCTHData.h"
+#include "vtkCallbackCommand.h"
 #include "vtkCellArray.h"
-#include "vtkPolygon.h"
 #include "vtkCellData.h"
 #include "vtkCommand.h"
-#include "vtkDataSetSurfaceFilter.h"
-#include "vtkGeometryFilter.h"
 #include "vtkCompositeDataIterator.h"
-#include "vtkHierarchicalBoxDataSet.h"
-//#include "vtkHierarchicalBoxOutlineFilter.h"
+#include "vtkCompositeDataPipeline.h"
+#include "vtkCompositeDataSet.h"
+#include "vtkDataSetSurfaceFilter.h"
+#include "vtkFloatArray.h"
+#include "vtkGarbageCollector.h"
+#include "vtkGeometryFilter.h"
 #include "vtkImageData.h"
 #include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkPolygon.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRectilinearGridOutlineFilter.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStripper.h"
 #include "vtkStructuredGrid.h"
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkCallbackCommand.h"
-#include "vtkGarbageCollector.h"
-#include "vtkCTHAMRSurface.h"
-#include "vtkCTHData.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.46");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.47");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -54,10 +57,8 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->UseOutline = 1;
   this->UseStrips = 0;
   this->GenerateCellNormals = 1;
-  this->NumberOfRequiredInputs = 0;
-  this->SetNumberOfInputPorts(1);
+
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
-  //this->HierarchicalBoxOutline = vtkHierarchicalBoxOutlineFilter::New();
 
   // Setup a callback for the internal readers to report progress.
   this->InternalProgressObserver = vtkCallbackCommand::New();
@@ -78,13 +79,14 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter ()
     {
     this->DataSetSurfaceFilter->Delete();
     }
-//   if(this->HierarchicalBoxOutline)
-//     {
-//     this->HierarchicalBoxOutline->Delete();
-//     }
   this->OutlineSource->Delete();
   this->InternalProgressObserver->Delete();
   this->SetController(0);
+}
+
+vtkExecutive* vtkPVGeometryFilter::CreateDefaultExecutive()
+{
+  return vtkCompositeDataPipeline::New();
 }
 
 //----------------------------------------------------------------------------
@@ -108,27 +110,6 @@ void vtkPVGeometryFilter::InternalProgressCallback()
     this->DataSetSurfaceFilter->SetAbortExecute(1);
     }
 }
-
-//----------------------------------------------------------------------------
-// Specify the input data or filter.
-void vtkPVGeometryFilter::SetInput(vtkDataObject *input)
-{
-  this->vtkProcessObject::SetNthInput(0, input);
-}
-
-//----------------------------------------------------------------------------
-// Specify the input data or filter.
-vtkDataObject *vtkPVGeometryFilter::GetInput()
-{
-  if (this->NumberOfInputs < 1)
-    {
-    return NULL;
-    }
-  
-  return this->Inputs[0];
-}
-
-
 
 //----------------------------------------------------------------------------
 int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
@@ -161,90 +142,155 @@ int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::ExecuteInformation()
+int vtkPVGeometryFilter::RequestInformation(
+  vtkInformation*, vtkInformationVector**, vtkInformationVector* outputVector)
 {
-  vtkDataObject *output = this->GetOutput();
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
-  if (output)
-    { // Execute synchronizes (communicates among processes), so we need
-    // all procs to call Execute.
-    output->SetMaximumNumberOfPieces(-1);
-    }
+  // RequestData() synchronizes (communicates among processes), so we need
+  // all procs to call RequestData().
+  outInfo->Set(vtkStreamingDemandDrivenPipeline::MAXIMUM_NUMBER_OF_PIECES(), -1);
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::Execute()
+void vtkPVGeometryFilter::ExecuteBlock(
+  vtkDataSet* input, vtkPolyData* output, int doCommunicate)
 {
-  vtkDataObject *input = this->GetInput();
-
-  if (input == NULL)
-    {
-    return;
-    }
-
-  if (this->CheckAttributes(input))
-    {
-    return;
-    }
-
   if (input->IsA("vtkImageData"))
     {
-    this->ImageDataExecute(static_cast<vtkImageData*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
+    this->ImageDataExecute(static_cast<vtkImageData*>(input), output);
+    this->ExecuteCellNormals(output, doCommunicate);
     return;
     }
 
   if (input->IsA("vtkStructuredGrid"))
     {
-    this->StructuredGridExecute(static_cast<vtkStructuredGrid*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
+    this->StructuredGridExecute(static_cast<vtkStructuredGrid*>(input), output);
+    this->ExecuteCellNormals(output, doCommunicate);
     return;
     }
 
   if (input->IsA("vtkRectilinearGrid"))
     {
-    this->RectilinearGridExecute(static_cast<vtkRectilinearGrid*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
+    this->RectilinearGridExecute(static_cast<vtkRectilinearGrid*>(input),output);
+    this->ExecuteCellNormals(output, doCommunicate);
     return;
     }
 
   if (input->IsA("vtkUnstructuredGrid"))
     {
-    this->UnstructuredGridExecute(static_cast<vtkUnstructuredGrid*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
+    this->UnstructuredGridExecute(
+      static_cast<vtkUnstructuredGrid*>(input), output, doCommunicate);
+    this->ExecuteCellNormals(output, doCommunicate);
     return;
     }
+
   if (input->IsA("vtkPolyData"))
     {
-    this->PolyDataExecute(static_cast<vtkPolyData*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
+    this->PolyDataExecute(static_cast<vtkPolyData*>(input), output, doCommunicate);
+    this->ExecuteCellNormals(output, doCommunicate);
     return;
     }
   if (input->IsA("vtkCTHData"))
     {
-    this->CTHDataExecute(static_cast<vtkCTHData*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
+    this->CTHDataExecute(static_cast<vtkCTHData*>(input), output, doCommunicate);
+    this->ExecuteCellNormals(this->GetOutput(), doCommunicate);
     return;
     }
   if (input->IsA("vtkDataSet"))
     {
-    this->DataSetExecute(static_cast<vtkDataSet*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
+    this->DataSetExecute(static_cast<vtkDataSet*>(input), output, doCommunicate);
+    this->ExecuteCellNormals(output, doCommunicate);
     return;
     }
-  if (input->IsA("vtkHierarchicalBoxDataSet"))
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGeometryFilter::RequestData(vtkInformation* request,
+                                     vtkInformationVector** inputVector,
+                                     vtkInformationVector* outputVector)
+{
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+
+  vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
+    inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
+  if (hdInput) 
     {
-    this->HierarchicalBoxExecute(static_cast<vtkHierarchicalBoxDataSet*>(input));
-    this->ExecuteCellNormals(this->GetOutput());
-    return;
+    return this->RequestCompositeData(request, inputVector, outputVector);
     }
-  return;
+
+  vtkInformation* info = outputVector->GetInformationObject(0);
+  vtkPolyData *output = vtkPolyData::SafeDownCast(
+    info->Get(vtkDataObject::DATA_OBJECT()));
+  if (!output) {return 0;}
+
+  vtkDataSet *input = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  if (!input) {return 0;}
+
+  this->ExecuteBlock(input, output, 1);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
+                                              vtkInformationVector** inputVector,
+                                              vtkInformationVector* outputVector)
+{
+  vtkInformation* inInfo = inputVector[0]->GetInformationObject(0);
+
+  vtkInformation* info = outputVector->GetInformationObject(0);
+  vtkPolyData *output = vtkPolyData::SafeDownCast(
+    info->Get(vtkDataObject::DATA_OBJECT()));
+  if (!output) {return 0;}
+
+  vtkCompositeDataSet *hdInput = vtkCompositeDataSet::SafeDownCast(
+    inInfo->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET()));
+  if (!hdInput) {return 0;}
+
+
+  if (this->CheckAttributes(hdInput))
+    {
+    return 0;
+    }
+
+  vtkCompositeDataIterator* iter = hdInput->NewIterator();
+  iter->GoToFirstItem();
+  vtkAppendPolyData* append = vtkAppendPolyData::New();
+  int numInputs = 0;
+  while (!iter->IsDoneWithTraversal())
+    {
+    vtkDataSet* ds = vtkDataSet::SafeDownCast(iter->GetCurrentDataObject());
+    if (ds)
+      {
+      vtkPolyData* tmpOut = vtkPolyData::New();
+      this->ExecuteBlock(ds, tmpOut, 0);
+      append->AddInput(tmpOut);
+      tmpOut->Delete();
+      numInputs++;
+      }
+    iter->GoToNextItem();
+    }
+  iter->Delete();
+  if (numInputs > 0)
+    {
+    append->Update();
+    }
+
+  output->ShallowCopy(append->GetOutput());
+
+  append->Delete();
+
+  return 1;
 }
 
 //----------------------------------------------------------------------------
 // We need to change the mapper.  Now it always flat shades when cell normals
 // are available.
-void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData *output)
+void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData* output, int doCommunicate)
 {
   if ( ! this->GenerateCellNormals)
     {
@@ -270,7 +316,7 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData *output)
     {
     skip = 1;
     }
-  if( this->Controller )
+  if( this->Controller && doCommunicate )
     {
     // An MPI gather or reduce would be easier ...
     if (this->Controller->GetLocalProcessId() == 0)  
@@ -344,26 +390,14 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData *output)
 
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *)
+void vtkPVGeometryFilter::DataSetExecute(
+  vtkDataSet* input, vtkPolyData* output, int doCommunicate)
 {
-//   vtkHierarchicalBoxDataSet* ds = input->NewInstance();
-//   ds->ShallowCopy(input);
-//   this->HierarchicalBoxOutline->SetInput(ds);
-//   ds->Delete();
-//   this->HierarchicalBoxOutline->Update();
-//   this->GetOutput()->ShallowCopy(this->HierarchicalBoxOutline->GetOutput());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::DataSetExecute(vtkDataSet *input)
-{
-  vtkPolyData *output = this->GetOutput();
-
   double bds[6];
   int procid = 0;
   int numProcs = 1;
 
-  if (input->GetNumberOfPoints() == 0)
+  if (!doCommunicate && input->GetNumberOfPoints() == 0)
     {
     return;
     }
@@ -376,7 +410,7 @@ void vtkPVGeometryFilter::DataSetExecute(vtkDataSet *input)
 
   input->GetBounds(bds);
 
-  if ( procid )
+  if ( procid && doCommunicate )
     {
     // Satellite node
     this->Controller->Send(bds, 6, 0, 792390);
@@ -385,35 +419,39 @@ void vtkPVGeometryFilter::DataSetExecute(vtkDataSet *input)
     {
     int idx;
     double tmp[6];
-
-    for (idx = 1; idx < numProcs; ++idx)
+    
+    if (doCommunicate)
       {
-      this->Controller->Receive(tmp, 6, idx, 792390);
-      if (tmp[0] < bds[0])
+      for (idx = 1; idx < numProcs; ++idx)
         {
-        bds[0] = tmp[0];
-        }
-      if (tmp[1] > bds[1])
-        {
-        bds[1] = tmp[1];
-        }
-      if (tmp[2] < bds[2])
-        {
-        bds[2] = tmp[2];
-        }
-      if (tmp[3] > bds[3])
-        {
-        bds[3] = tmp[3];
-        }
-      if (tmp[4] < bds[4])
-        {
-        bds[4] = tmp[4];
-        }
-      if (tmp[5] > bds[5])
-        {
-        bds[5] = tmp[5];
+        this->Controller->Receive(tmp, 6, idx, 792390);
+        if (tmp[0] < bds[0])
+          {
+          bds[0] = tmp[0];
+          }
+        if (tmp[1] > bds[1])
+          {
+          bds[1] = tmp[1];
+          }
+        if (tmp[2] < bds[2])
+          {
+          bds[2] = tmp[2];
+          }
+        if (tmp[3] > bds[3])
+          {
+          bds[3] = tmp[3];
+          }
+        if (tmp[4] < bds[4])
+          {
+          bds[4] = tmp[4];
+          }
+        if (tmp[5] > bds[5])
+          {
+          bds[5] = tmp[5];
+          }
         }
       }
+
     // only output in process 0.
     this->OutlineSource->SetBounds(bds);
     this->OutlineSource->Update();
@@ -424,7 +462,8 @@ void vtkPVGeometryFilter::DataSetExecute(vtkDataSet *input)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::DataSetSurfaceExecute(vtkDataSet *input)
+void vtkPVGeometryFilter::DataSetSurfaceExecute(vtkDataSet* input, 
+                                                vtkPolyData* output)
 {
   vtkDataSet* ds = input->NewInstance();
   ds->ShallowCopy(input);
@@ -439,17 +478,17 @@ void vtkPVGeometryFilter::DataSetSurfaceExecute(vtkDataSet *input)
   // The internal filter is finished.  Remove the observer.
   this->DataSetSurfaceFilter->RemoveObserver(this->InternalProgressObserver);
 
-  this->GetOutput()->ShallowCopy(this->DataSetSurfaceFilter->GetOutput());
+  output->ShallowCopy(this->DataSetSurfaceFilter->GetOutput());
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input)
+void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
+                                           vtkPolyData* output)
 {
   double *spacing;
   double *origin;
   int *ext;
   double bounds[6];
-  vtkPolyData *output = this->GetOutput();
 
   ext = input->GetWholeExtent();
 
@@ -458,7 +497,7 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input)
 //      !this->UseOutline)
   if (!this->UseOutline)
     {
-    this->DataSetSurfaceExecute(input);
+    this->DataSetSurfaceExecute(input, output);
     this->OutlineFlag = 0;
     return;
     }  
@@ -497,10 +536,10 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid *input)
+void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid* input,
+                                                vtkPolyData* output)
 {
   int *ext;
-  vtkPolyData *output = this->GetOutput();
 
   ext = input->GetWholeExtent();
 
@@ -509,7 +548,7 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid *input)
 //      !this->UseOutline)
   if (!this->UseOutline)
     {
-    this->DataSetSurfaceExecute(input);
+    this->DataSetSurfaceExecute(input, output);
     this->OutlineFlag = 0;
     return;
     }  
@@ -533,10 +572,10 @@ void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid *input)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid *input)
+void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid* input,
+                                                 vtkPolyData* output)
 {
   int *ext;
-  vtkPolyData *output = this->GetOutput();
 
   ext = input->GetWholeExtent();
 
@@ -545,7 +584,7 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid *input)
 //      !this->UseOutline)
   if (!this->UseOutline)
     {
-    this->DataSetSurfaceExecute(input);
+    this->DataSetSurfaceExecute(input, output);
     this->OutlineFlag = 0;
     return;
     }  
@@ -568,7 +607,8 @@ void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid *input)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::CTHDataExecute(vtkCTHData *input)
+void vtkPVGeometryFilter::CTHDataExecute(
+  vtkCTHData *input, vtkPolyData* output, int doCommunicate)
 {
   if (!this->UseOutline)
     {
@@ -594,30 +634,30 @@ void vtkPVGeometryFilter::CTHDataExecute(vtkCTHData *input)
   //
   // Otherwise, let Outline do all the work
   //
-  this->DataSetExecute(input);
+  this->DataSetExecute(input, output, doCommunicate);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid* input)
+void vtkPVGeometryFilter::UnstructuredGridExecute(
+  vtkUnstructuredGrid* input, vtkPolyData* output, int doCommunicate)
 {
   if (!this->UseOutline)
     {
     this->OutlineFlag = 0;
-    this->DataSetSurfaceExecute(input);
+    this->DataSetSurfaceExecute(input, output);
     return;
     }
   
   this->OutlineFlag = 1;
 
-  this->DataSetExecute(input);
+  this->DataSetExecute(input, output, doCommunicate);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::PolyDataExecute(vtkPolyData *input)
+void vtkPVGeometryFilter::PolyDataExecute(
+  vtkPolyData* input, vtkPolyData* out, int doCommunicate)
 {
-  vtkPolyData *out = this->GetOutput(); 
-
   if (!this->UseOutline)
     {
     this->OutlineFlag = 0;
@@ -644,7 +684,7 @@ void vtkPVGeometryFilter::PolyDataExecute(vtkPolyData *input)
     }
   
   this->OutlineFlag = 1;
-  this->DataSetExecute(input);
+  this->DataSetExecute(input, out, doCommunicate);
 }
 
 //----------------------------------------------------------------------------
@@ -656,6 +696,8 @@ int vtkPVGeometryFilter::FillInputPortInformation(int port,
     return 0;
     }
   info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
+  info->Set(vtkCompositeDataPipeline::INPUT_REQUIRED_COMPOSITE_DATA_TYPE(), 
+            "vtkCompositeDataSet");
   return 1;
 }
 
@@ -665,8 +707,6 @@ void vtkPVGeometryFilter::ReportReferences(vtkGarbageCollector* collector)
   this->Superclass::ReportReferences(collector);
   vtkGarbageCollectorReport(collector, this->DataSetSurfaceFilter,
                             "DataSetSurfaceFilter");
-//   vtkGarbageCollectorReport(collector, this->HierarchicalBoxOutline,
-//                             "HierarchicalBoxOutline");
 }
 
 //----------------------------------------------------------------------------
