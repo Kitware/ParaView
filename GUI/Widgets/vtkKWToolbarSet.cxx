@@ -17,8 +17,6 @@
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWToolbar.h"
-#include "vtkLinkedList.txx"
-#include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
 
 #if defined(_WIN32)
@@ -27,13 +25,26 @@
 #define VTK_KW_TOOLBAR_RELIEF_SEP "sunken"
 #endif
 
+#include <vtkstd/list>
+
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.8");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.9");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
+
+//----------------------------------------------------------------------------
+class vtkKWToolbarSetInternals
+{
+public:
+
+  typedef vtkstd::list<vtkKWToolbarSet::ToolbarSlot*> ToolbarsContainer;
+  typedef vtkstd::list<vtkKWToolbarSet::ToolbarSlot*>::iterator ToolbarsContainerIterator;
+
+  ToolbarsContainer Toolbars;
+};
 
 //----------------------------------------------------------------------------
 vtkKWToolbarSet::vtkKWToolbarSet()
@@ -43,7 +54,7 @@ vtkKWToolbarSet::vtkKWToolbarSet()
   this->ToolbarsFrame        = vtkKWFrame::New();
   this->BottomSeparatorFrame = vtkKWFrame::New();
 
-  this->Toolbars = vtkKWToolbarSet::ToolbarsContainer::New();
+  this->Internals = new vtkKWToolbarSetInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -54,54 +65,47 @@ vtkKWToolbarSet::~vtkKWToolbarSet()
 
   // Delete all toolbars
 
-  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = NULL;
-  vtkKWToolbarSet::ToolbarsContainerIterator *it = 
-    this->Toolbars->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(toolbar_slot) == VTK_OK)
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
       {
-      if (toolbar_slot->SeparatorFrame)
+      if (*it)
         {
-        toolbar_slot->SeparatorFrame->Delete();
-        toolbar_slot->SeparatorFrame = NULL;
+        if ((*it)->SeparatorFrame)
+          {
+          (*it)->SeparatorFrame->Delete();
+          }
+        delete (*it);
         }
-      delete toolbar_slot;
       }
-    it->GoToNextItem();
+    delete this->Internals;
     }
-  it->Delete();
-
-  // Delete the container
-
-  this->Toolbars->Delete();
 }
 
 //----------------------------------------------------------------------------
 vtkKWToolbarSet::ToolbarSlot* 
 vtkKWToolbarSet::GetToolbarSlot(vtkKWToolbar *toolbar)
 {
-  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = NULL;
-  vtkKWToolbarSet::ToolbarSlot *found = NULL;
-  vtkKWToolbarSet::ToolbarsContainerIterator *it = 
-    this->Toolbars->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals && toolbar)
     {
-    if (it->GetData(toolbar_slot) == VTK_OK && 
-        toolbar_slot->Toolbar == toolbar)
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
       {
-      found = toolbar_slot;
-      break;
+      if (*it && (*it)->Toolbar == toolbar)
+        {
+        return *it;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -181,7 +185,7 @@ void vtkKWToolbarSet::PackBottomSeparator()
 // ----------------------------------------------------------------------------
 void vtkKWToolbarSet::PackToolbars()
 {
-  if (!this->IsCreated())
+  if (!this->IsCreated() || !this->Internals)
     {
     return;
     }
@@ -195,62 +199,57 @@ void vtkKWToolbarSet::PackToolbars()
 
   ostrstream tk_cmd;
 
-  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = NULL;
-  vtkKWToolbarSet::ToolbarsContainerIterator *it = 
-    this->Toolbars->NewIterator();
-
   vtkKWToolbar *previous = NULL;
 
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+    this->Internals->Toolbars.begin();
+  vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+    this->Internals->Toolbars.end();
+  for (; it != end; ++it)
     {
-    if (it->GetData(toolbar_slot) == VTK_OK && 
-        toolbar_slot->Toolbar && 
-        toolbar_slot->Toolbar->IsCreated())
+    if (*it && (*it)->Toolbar && (*it)->Toolbar->IsCreated())
       {
-      if (toolbar_slot->Visibility)
+      if ((*it)->Visibility)
         {
         // Pack a separator
-        toolbar_slot->Toolbar->Bind();
+        (*it)->Toolbar->Bind();
         if (previous)
           {
-          if (!toolbar_slot->SeparatorFrame->IsCreated())
+          if (!(*it)->SeparatorFrame->IsCreated())
             {
-            toolbar_slot->SeparatorFrame->SetParent(this->ToolbarsFrame);
-            toolbar_slot->SeparatorFrame->Create(
+            (*it)->SeparatorFrame->SetParent(this->ToolbarsFrame);
+            (*it)->SeparatorFrame->Create(
               this->GetApplication(), "-width 2 -bd 1");
             this->Script("%s config -relief %s", 
-                         toolbar_slot->SeparatorFrame->GetWidgetName(), 
+                         (*it)->SeparatorFrame->GetWidgetName(), 
                          VTK_KW_TOOLBAR_RELIEF_SEP);
             }
-          tk_cmd << "pack " << toolbar_slot->SeparatorFrame->GetWidgetName() 
+          tk_cmd << "pack " << (*it)->SeparatorFrame->GetWidgetName() 
                  << " -side left -padx 1 -pady 0 -fill y -expand n" << endl;
           }
-        previous = toolbar_slot->Toolbar;
+        previous = (*it)->Toolbar;
 
         // Pack toolbar
 
-        tk_cmd << "pack " << toolbar_slot->Toolbar->GetWidgetName() 
+        tk_cmd << "pack " << (*it)->Toolbar->GetWidgetName() 
                << " -side left -padx 1 -pady 0 -fill both -expand "
-               << (toolbar_slot->Toolbar->GetResizable() ? "y" : "n")
+               << ((*it)->Toolbar->GetResizable() ? "y" : "n")
                << " -in " << this->ToolbarsFrame->GetWidgetName() << endl;
         }
       else
         {
         // Unpack separator and toolbar
-        toolbar_slot->Toolbar->UnBind();
-        if (toolbar_slot->SeparatorFrame->IsCreated())
+        (*it)->Toolbar->UnBind();
+        if ((*it)->SeparatorFrame->IsCreated())
           {
           tk_cmd << "pack forget " 
-                 << toolbar_slot->SeparatorFrame->GetWidgetName() << endl;
+                 << (*it)->SeparatorFrame->GetWidgetName() << endl;
           }
         tk_cmd << "pack forget " 
-               << toolbar_slot->Toolbar->GetWidgetName() << endl;
+               << (*it)->Toolbar->GetWidgetName() << endl;
         }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -279,13 +278,8 @@ int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar)
   vtkKWToolbarSet::ToolbarSlot *toolbar_slot = 
     new vtkKWToolbarSet::ToolbarSlot;
 
-  if (this->Toolbars->AppendItem(toolbar_slot) != VTK_OK)
-    {
-    vtkErrorMacro("Error while adding a toolbar to the set.");
-    delete toolbar_slot;
-    return 0;
-    }
-  
+  this->Internals->Toolbars.push_back(toolbar_slot);
+
   // Create the toolbar
 
   toolbar_slot->Visibility = 1;
@@ -306,7 +300,7 @@ int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar)
 // ----------------------------------------------------------------------------
 vtkIdType vtkKWToolbarSet::GetNumberOfToolbars()
 {
-  return this->Toolbars->GetNumberOfItems();
+  return this->Internals->Toolbars.size();
 }
 
 //----------------------------------------------------------------------------
@@ -344,62 +338,62 @@ int vtkKWToolbarSet::IsToolbarVisible(vtkKWToolbar* toolbar)
 //----------------------------------------------------------------------------
 vtkIdType vtkKWToolbarSet::GetNumberOfVisibleToolbars()
 {
-  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = NULL;
-  vtkKWToolbarSet::ToolbarsContainerIterator *it = 
-    this->Toolbars->NewIterator();
+  int count = 0;
 
-  int nb = 0;
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(toolbar_slot) == VTK_OK && toolbar_slot->Visibility)
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
       {
-      nb++;
+      if (*it && (*it)->Visibility)
+        {
+        ++count;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return nb;
+  return count;
 }
 
 //----------------------------------------------------------------------------
 void vtkKWToolbarSet::SetToolbarsFlatAspect(int f)
 {
-  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = NULL;
-  vtkKWToolbarSet::ToolbarsContainerIterator *it = 
-    this->Toolbars->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(toolbar_slot) == VTK_OK && toolbar_slot->Toolbar)
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
       {
-      toolbar_slot->Toolbar->SetFlatAspect(f);
+      if (*it && (*it)->Toolbar)
+        {
+        (*it)->Toolbar->SetFlatAspect(f);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWToolbarSet::SetToolbarsWidgetsFlatAspect(int f)
 {
-  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = NULL;
-  vtkKWToolbarSet::ToolbarsContainerIterator *it = 
-    this->Toolbars->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(toolbar_slot) == VTK_OK && toolbar_slot->Toolbar)
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
       {
-      toolbar_slot->Toolbar->SetWidgetsFlatAspect(f);
+      if (*it && (*it)->Toolbar)
+        {
+        (*it)->Toolbar->SetWidgetsFlatAspect(f);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -419,27 +413,22 @@ void vtkKWToolbarSet::SetShowBottomSeparator(int arg)
 //----------------------------------------------------------------------------
 vtkKWToolbar* vtkKWToolbarSet::GetToolbar(int index)
 {
-  if (index < 0 || index >= this->GetNumberOfToolbars())
+  if (index >= 0 && index < this->GetNumberOfToolbars() && this->Internals)
     {
-    vtkErrorMacro("Invalid index");
-    return NULL;
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
+      {
+      if (*it && !index--)
+        {
+        return (*it)->Toolbar;
+        }
+      }
     }
-  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = NULL;
-  vtkKWToolbarSet::ToolbarsContainerIterator *it = 
-    this->Toolbars->NewIterator();
-  int i = 0;
-  while (!it->IsDoneWithTraversal() && i != index)
-    {
-    it->GoToNextItem();
-    i++;
-    }
-  vtkKWToolbar* toolbar = NULL;
-  if (!it->IsDoneWithTraversal() && it->GetData(toolbar_slot) == VTK_OK)
-    {
-    toolbar = toolbar_slot->Toolbar;
-    }
-  it->Delete();
-  return toolbar;
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -447,27 +436,27 @@ void vtkKWToolbarSet::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = NULL;
-  vtkKWToolbarSet::ToolbarsContainerIterator *it = 
-    this->Toolbars->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(toolbar_slot) == VTK_OK)
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
       {
-      if (toolbar_slot->Toolbar)
+      if (*it)
         {
-        toolbar_slot->Toolbar->SetEnabled(this->Enabled);
-        }
-      if (toolbar_slot->SeparatorFrame)
-        {
-        toolbar_slot->SeparatorFrame->SetEnabled(this->Enabled);
+        if ((*it)->Toolbar)
+          {
+          (*it)->Toolbar->SetEnabled(this->Enabled);
+          }
+        if ((*it)->SeparatorFrame)
+          {
+          (*it)->SeparatorFrame->SetEnabled(this->Enabled);
+          }
         }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------

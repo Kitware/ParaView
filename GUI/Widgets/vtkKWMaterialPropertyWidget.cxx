@@ -26,8 +26,6 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
 #include "vtkKWScale.h"
-#include "vtkLinkedList.txx"
-#include "vtkLinkedListIterator.txx"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
@@ -37,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.6");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.7");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals

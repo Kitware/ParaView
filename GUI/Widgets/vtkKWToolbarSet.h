@@ -23,11 +23,7 @@
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWToolbar;
-
-//BTX
-template<class DataType> class vtkLinkedList;
-template<class DataType> class vtkLinkedListIterator;
-//ETX
+class vtkKWToolbarSetInternals;
 
 class VTK_EXPORT vtkKWToolbarSet : public vtkKWWidget
 {
@@ -122,9 +118,10 @@ protected:
     vtkKWToolbar *Toolbar;
   };
 
-  typedef vtkLinkedList<ToolbarSlot*> ToolbarsContainer;
-  typedef vtkLinkedListIterator<ToolbarSlot*> ToolbarsContainerIterator;
-  ToolbarsContainer *Toolbars;
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWToolbarSetInternals *Internals;
+  friend class vtkKWToolbarSetInternals;
 
   // Helper methods
 
