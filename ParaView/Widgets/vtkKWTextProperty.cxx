@@ -122,7 +122,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.23");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.24");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -151,8 +151,8 @@ vtkKWTextProperty::vtkKWTextProperty()
   this->ShowOpacity = 1;
   this->OpacityScale = vtkKWScale::New();
 
-  this->OnChangeCommand = NULL;
-  this->OnColorChangeCommand = NULL;
+  this->ChangedCommand = NULL;
+  this->ColorChangedCommand = NULL;
 
   this->ShowCopy = 0;
   this->PushButtonSet = vtkKWLabeledPushButtonSet::New();
@@ -164,8 +164,17 @@ vtkKWTextProperty::~vtkKWTextProperty()
   this->SetTextProperty(NULL);
   this->SetActor2D(NULL);
 
-  this->SetOnChangeCommand(NULL);
-  this->SetOnColorChangeCommand(NULL);
+  if (this->ChangedCommand)
+    {
+    delete [] this->ChangedCommand;
+    this->ChangedCommand = NULL;
+    }
+
+  if (this->ColorChangedCommand)
+    {
+    delete [] this->ColorChangedCommand;
+    this->ColorChangedCommand = NULL;
+    }
 
   if (this->Label)
     {
@@ -594,14 +603,14 @@ void vtkKWTextProperty::SetColor(float r, float g, float b)
 
   this->AddTraceEntry("$kw(%s) SetColor %f %f %f", this->GetTclName(), r,g,b);
 
-  if (this->OnColorChangeCommand)
+  if (this->ColorChangedCommand)
     {
-    this->Script("eval %s", this->OnColorChangeCommand);
+    this->Script("eval %s", this->ColorChangedCommand);
     }
 
-  if (this->OnChangeCommand)
+  if (this->ChangedCommand)
     {
-    this->Script("eval %s", this->OnChangeCommand);
+    this->Script("eval %s", this->ChangedCommand);
     }
 }
 
@@ -688,9 +697,9 @@ void vtkKWTextProperty::SetFontFamily(int v)
 
   this->AddTraceEntry("$kw(%s) SetFontFamily %d", this->GetTclName(), v);
 
-  if (this->OnChangeCommand)
+  if (this->ChangedCommand)
     {
-    this->Script("eval %s", this->OnChangeCommand);
+    this->Script("eval %s", this->ChangedCommand);
     }
 }
 
@@ -787,9 +796,9 @@ void vtkKWTextProperty::SetBold(int v)
 
   this->AddTraceEntry("$kw(%s) SetBold %d", this->GetTclName(), v);
 
-  if (this->OnChangeCommand)
+  if (this->ChangedCommand)
     {
-    this->Script("eval %s", this->OnChangeCommand);
+    this->Script("eval %s", this->ChangedCommand);
     }
 }
 
@@ -831,9 +840,9 @@ void vtkKWTextProperty::SetItalic(int v)
 
   this->AddTraceEntry("$kw(%s) SetItalic %d", this->GetTclName(), v);
 
-  if (this->OnChangeCommand)
+  if (this->ChangedCommand)
     {
-    this->Script("eval %s", this->OnChangeCommand);
+    this->Script("eval %s", this->ChangedCommand);
     }
 }
 
@@ -875,9 +884,9 @@ void vtkKWTextProperty::SetShadow(int v)
 
   this->AddTraceEntry("$kw(%s) SetShadow %d", this->GetTclName(), v);
 
-  if (this->OnChangeCommand)
+  if (this->ChangedCommand)
     {
-    this->Script("eval %s", this->OnChangeCommand);
+    this->Script("eval %s", this->ChangedCommand);
     }
 }
 
@@ -935,9 +944,9 @@ void vtkKWTextProperty::SetOpacityNoTrace(float v)
 
   this->UpdateOpacityScale();
 
-  if (this->OnChangeCommand)
+  if (this->ChangedCommand)
     {
-    this->Script("eval %s", this->OnChangeCommand);
+    this->Script("eval %s", this->ChangedCommand);
     }
 }
 
@@ -1138,6 +1147,40 @@ void vtkKWTextProperty::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTextProperty::SetObjectMethodCommand(
+  char **command, vtkKWObject *object, const char *method)
+{
+  if (*command)
+    {
+    delete [] *command;
+    *command = NULL;
+    }
+
+  if (!object)
+    {
+    return;
+    }
+
+  ostrstream command_str;
+  command_str << object->GetTclName() << " " << method << ends;
+  *command = command_str.str();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTextProperty::SetChangedCommand(
+  vtkKWObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->ChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTextProperty::SetColorChangedCommand(
+  vtkKWObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(&this->ColorChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1170,10 +1213,10 @@ void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ShowOpacity: " 
      << (this->ShowOpacity ? "On" : "Off") << endl;
   os << indent << "ShowCopy: " << (this->ShowCopy ? "On" : "Off") << endl;
-  os << indent << "OnChangeCommand: " 
-     << (this->OnChangeCommand ? this->OnChangeCommand : "None") << endl;
-  os << indent << "OnColorChangeCommand: " 
-     << (this->OnColorChangeCommand ? this->OnColorChangeCommand : "None") << endl;
+  os << indent << "ChangedCommand: " 
+     << (this->ChangedCommand ? this->ChangedCommand : "None") << endl;
+  os << indent << "ColorChangedCommand: " 
+     << (this->ColorChangedCommand ? this->ColorChangedCommand : "None") << endl;
   os << indent << "Label: " << this->Label << endl;
 }
 

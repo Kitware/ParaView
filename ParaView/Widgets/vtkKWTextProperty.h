@@ -85,8 +85,9 @@ public:
   vtkGetObjectMacro(Actor2D, vtkActor2D);
 
   // Description:
-  // Set the widget aspect to be long, i.e. the widgets will be packed on several
-  // rows, with description labels. The default is short (all widgets on a row).
+  // Set the widget aspect to be long, i.e. the widgets will be packed on 
+  // several rows, with description labels. The default is short (all widgets
+  // on a row).
   virtual void SetLongFormat(int);
   vtkBooleanMacro(LongFormat, int);
   vtkGetMacro(LongFormat, int);
@@ -132,14 +133,14 @@ public:
   // Description:
   // Set/Get the command executed each time a change is made to the
   // text property.
-  vtkSetStringMacro(OnChangeCommand);
-  vtkGetStringMacro(OnChangeCommand);
+  virtual void SetChangedCommand(
+    vtkKWObject *object, const char *method);
 
   // Description:
   // Set/Get the command executed each time a change is made to the
-  // color of the text property (the OnChangeCommand is run too).
-  vtkSetStringMacro(OnColorChangeCommand);
-  vtkGetStringMacro(OnColorChangeCommand);
+  // color of the text property (the ChangedCommand is run too).
+  virtual void SetColorChangedCommand(
+    vtkKWObject *object, const char *method);
 
   // Description:
   // Show copy button. This button can be used to synchronize different
@@ -214,8 +215,11 @@ protected:
   int ShowOpacity;
   vtkKWScale *OpacityScale;
 
-  char *OnChangeCommand;
-  char *OnColorChangeCommand;
+  virtual void SetObjectMethodCommand(
+    char **command, vtkKWObject *object, const char *method);
+
+  char *ChangedCommand;
+  char *ColorChangedCommand;
 
   int ShowCopy;
   vtkKWLabeledPushButtonSet *PushButtonSet;

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.67");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.68");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -444,12 +444,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->TextPropertyWidget->GetLabel()->SetLabel("Text properties:");
   this->TextPropertyWidget->SetTraceReferenceObject(this);
   this->TextPropertyWidget->SetTraceReferenceCommand("GetTextPropertyWidget");
-
-  ostrstream onchangecommand;
-  onchangecommand << this->GetTclName() 
-                  << " TextPropertyCallback" << ends;
-  this->TextPropertyWidget->SetOnChangeCommand(onchangecommand.str());
-  onchangecommand.rdbuf()->freeze(0);
+  this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");
 
   this->Script("pack %s -padx 2 -pady %d -side top -anchor nw -fill y", 
                this->TextPropertyWidget->GetWidgetName(),
@@ -791,7 +786,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.67 $");
+  this->ExtractRevision(os,"$Revision: 1.68 $");
 }
 
 //----------------------------------------------------------------------------
