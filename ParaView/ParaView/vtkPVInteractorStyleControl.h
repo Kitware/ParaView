@@ -147,7 +147,6 @@ protected:
   vtkKWLabel *Labels[6];
   vtkKWOptionMenu *Menus[9];
   vtkKWFrame *ArgumentsFrame;
-  vtkKWFrame *MenusFrame;
 
   vtkPVInteractorStyleControlCmd *Observer;
 

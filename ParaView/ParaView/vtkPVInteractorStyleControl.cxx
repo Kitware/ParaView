@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.29");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.30");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -876,7 +876,6 @@ void vtkPVInteractorStyleControl::UpdateEnableState()
     this->PropagateEnableState(this->Menus[cc]);
     }
   this->PropagateEnableState(this->ArgumentsFrame);
-  this->PropagateEnableState(this->MenusFrame);
 
   vtkPVInteractorStyleControlInternal::WidgetsMap::iterator it;
   for ( it = this->Internals->Widgets.begin();
