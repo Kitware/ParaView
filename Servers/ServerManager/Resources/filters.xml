@@ -1751,5 +1751,32 @@
    <!-- End StreamTracer -->
    </SourceProxy>
 
+   <SourceProxy name="Pick" class="vtkPickFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain>
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
+      <DoubleVectorProperty
+         name="WorldPoint"
+         command="SetWorldPoint"
+         number_of_elements="3"
+         default_values="0 0 0" >
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="PickCell" 
+        command="SetPickCell" 
+        number_of_elements="1"
+        default_values="1" >
+       <EnumarationDomain 
+          values="Point:0 Cell:1" />
+     </IntVectorProperty>
+   </SourceProxy>
+
   </ProxyGroup>
 </ServerManagerConfiguration>
