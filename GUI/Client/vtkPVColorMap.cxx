@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.116.2.3");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.116.2.4");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -304,6 +304,14 @@ vtkPVColorMap::~vtkPVColorMap()
   this->SetScalarBarProxyName(0);
   if (this->ScalarBarProxy)
     {
+    vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+    vtkSMProxyProperty* pp =  (rm)? vtkSMProxyProperty::SafeDownCast(
+      rm->GetProperty("Displays")): 0;
+    if (pp)
+      {
+      pp->RemoveProxy(this->ScalarBarProxy);
+      rm->UpdateVTKObjects();
+      }
     this->ScalarBarProxy->Delete();
     this->ScalarBarProxy = 0;
     }
@@ -1021,8 +1029,17 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
   // Add to rendermodule.
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
-  rm->AddDisplay(this->ScalarBarProxy);
-  rm->UpdateVTKObjects();
+  pp =  vtkSMProxyProperty::SafeDownCast(
+    rm->GetProperty("Displays"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Displays on RenderModuleProxy.");
+    }
+  else
+    {
+    pp->AddProxy(this->ScalarBarProxy);
+    rm->UpdateVTKObjects();
+    }
 }
 
 //----------------------------------------------------------------------------

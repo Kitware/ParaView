@@ -32,9 +32,10 @@
 #include "vtkSM3DWidgetProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.67.2.3");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.67.2.4");
 
 //===========================================================================
 //***************************************************************************
@@ -99,8 +100,13 @@ vtkPV3DWidget::~vtkPV3DWidget()
     vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
     if (rm)
       {
-      rm->RemoveDisplay(this->WidgetProxy);
-      rm->UpdateVTKObjects();
+      vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+        rm->GetProperty("Displays"));
+      if (pp)
+        {
+        pp->RemoveProxy(this->WidgetProxy);
+        rm->UpdateVTKObjects();
+        }
       }
     this->WidgetProxy->Delete();
     this->WidgetProxy = 0;
@@ -181,8 +187,17 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
 
   // Add to the render module.
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
-  rm->AddDisplay(this->WidgetProxy);
-  rm->UpdateVTKObjects();
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    rm->GetProperty("Displays"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Displays on RenderModuleProxy.");
+    }
+  else
+    {
+    pp->AddProxy(this->WidgetProxy);
+    rm->UpdateVTKObjects();
+    }
 
   this->InitializeObservers(this->WidgetProxy);
   this->ChildCreate(pvApp);

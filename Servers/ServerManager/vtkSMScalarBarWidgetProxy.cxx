@@ -55,7 +55,7 @@ protected:
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.6.2.2");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.6.2.3");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
@@ -81,6 +81,7 @@ vtkSMScalarBarWidgetProxy::~vtkSMScalarBarWidgetProxy()
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
+  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
   if (!pp)
@@ -89,7 +90,9 @@ void vtkSMScalarBarWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     return;
     }
   pp->AddProxy(this->ScalarBarActorProxy);
-
+  */
+  rm->AddPropToRenderer2D(this->ScalarBarActorProxy);
+  
   this->RenderModuleProxy = rm;
   this->SetVisibility(this->Visibility);
 }
@@ -97,6 +100,7 @@ void vtkSMScalarBarWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 {
+  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
   if (!pp)
@@ -105,7 +109,9 @@ void vtkSMScalarBarWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* r
     return;
     }
   pp->RemoveProxy(this->ScalarBarActorProxy);
-  
+  */
+  rm->RemovePropFromRenderer2D(this->ScalarBarActorProxy);
+
   if (this->ScalarBarWidget->GetEnabled())
     {
     this->ScalarBarWidget->SetEnabled(0);

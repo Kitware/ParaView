@@ -24,7 +24,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMAxesProxy);
-vtkCxxRevisionMacro(vtkSMAxesProxy, "1.1.4.1");
+vtkCxxRevisionMacro(vtkSMAxesProxy, "1.1.4.2");
 //---------------------------------------------------------------------------
 vtkSMAxesProxy::vtkSMAxesProxy()
 {
@@ -112,6 +112,7 @@ void vtkSMAxesProxy::CreateVTKObjects(int numObjects)
 //---------------------------------------------------------------------------
 void vtkSMAxesProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
+  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRendererProxy()->GetProperty("ViewProps"));
   if (!pp)
@@ -120,11 +121,14 @@ void vtkSMAxesProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     return;
     }
   pp->AddProxy(this->GetSubProxy("Actor"));
+  */
+  rm->AddPropToRenderer(this->GetSubProxy("Actor"));
 }
 
 //---------------------------------------------------------------------------
 void vtkSMAxesProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 {
+  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRendererProxy()->GetProperty("ViewProps"));
   if (!pp)
@@ -133,6 +137,8 @@ void vtkSMAxesProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
     return;
     }
   pp->RemoveProxy(this->GetSubProxy("Actor"));
+  */
+  rm->RemovePropFromRenderer(this->GetSubProxy("Actor"));
 }
 
 //---------------------------------------------------------------------------

@@ -17,7 +17,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVGeometryInformation.h"
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.4");
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.5");
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
 {
@@ -513,6 +513,12 @@ int vtkSMDisplayProxy::cmGetImmediateModeRendering()
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMDisplayProxy::SaveInBatchScript(ofstream* file)
+{
+  *file << "# SaveInBatchScript not defined for " << this->GetClassName()
+    << endl;
+}
+
 //-----------------------------------------------------------------------------
 void vtkSMDisplayProxy::GatherGeometryInformation()
 {

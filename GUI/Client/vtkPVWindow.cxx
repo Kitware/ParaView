@@ -96,6 +96,7 @@
 #include "vtkKWWidgetCollection.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkSMProxyProperty.h"
 
 #include "vtkPVConfig.h"  // Needed for PARAVIEW_USE_LOOKMARKS
 #ifdef PARAVIEW_USE_LOOKMARKS
@@ -136,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.5");
+vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.6");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1289,8 +1290,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
   if (rm)
     {
-    rm->AddDisplay(this->CenterAxesProxy);
-    rm->UpdateVTKObjects();
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      rm->GetProperty("Displays"));
+    if (pp)
+      {
+      pp->AddProxy(this->CenterAxesProxy);
+      rm->UpdateVTKObjects();
+      }
     }
   
   this->CenterEntryFrame->SetParent(this->PickCenterToolbar->GetFrame());

@@ -64,7 +64,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.3");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.4");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 #if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
@@ -1849,20 +1849,15 @@ void vtkPVSource::AddDisplayToRenderModule(vtkSMDisplayProxy* pDisp)
     {
     return;
     }
-  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetProperty("AddDisplay"));
+    rm->GetProperty("Displays"));
   if (!pp)
     {
-    vtkErrorMacro("Failed to find property AddDisplay on vtkSMRenderModuleProxy.");
+    vtkErrorMacro("Failed to find property Displays on vtkSMRenderModuleProxy.");
     return;
     }
-  pp->RemoveAllProxies();
   pp->AddProxy(pDisp);
   rm->UpdateVTKObjects(); 
-  */
-  rm->AddDisplay(pDisp);
-  rm->UpdateVTKObjects();
 }
 #endif
 //----------------------------------------------------------------------------
@@ -1871,19 +1866,14 @@ void vtkPVSource::RemoveDisplayFromRenderModule(vtkSMDisplayProxy* pDisp)
 {
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
 
-  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    rm->GetProperty("RemoveDisplay"));
+    rm->GetProperty("Displays"));
   if (!pp)
     {
-    vtkErrorMacro("Failed to find property RemoveDisplay on vtkSMRenderModuleProxy.");
+    vtkErrorMacro("Failed to find property Displays on vtkSMRenderModuleProxy.");
     return;
     }
-  pp->RemoveAllProxies();
-  pp->AddProxy(pDisp);
-  rm->UpdateVTKObjects();
-  */
-  rm->RemoveDisplay(pDisp);
+  pp->RemoveProxy(pDisp);
   rm->UpdateVTKObjects();
 }
 #endif
@@ -2152,13 +2142,11 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
       {
       this->PVColorMap->SaveInBatchScript(file);
       }
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-    vtkSMPartDisplay *partD = this->GetPartDisplay();
-    if (partD)
+    vtkSMDisplayProxy* pDisp = this->GetDisplayProxy();
+    if (pDisp)
       {
-      partD->SaveInBatchScript(file, this->GetProxy());
+      pDisp->SaveInBatchScript(file);
       }
-#endif
     }
 }  
 

@@ -41,7 +41,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.1.2.2");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -272,7 +272,10 @@ void vtkPVComparativeVisManager::SaveAllGeometry()
         vtkSMIntVectorProperty::SafeDownCast(
           display->GetProperty("Representation"))->SetElements1(2);
         display->UpdateVTKObjects();
-        ren->AddDisplay(vtkSMDisplayProxy::SafeDownCast(display));
+
+        vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+          ren->GetProperty("Displays"));
+        pp->AddProxy(vtkSMDisplayProxy::SafeDownCast(display));
         display->Delete();
         }
       }

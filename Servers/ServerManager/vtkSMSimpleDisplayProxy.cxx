@@ -30,13 +30,13 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkMath.h"
-
+#include "vtkSMPropertyIterator.h"
 
 #include "vtkPolyData.h"
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.3");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.4");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -812,6 +812,7 @@ void vtkSMSimpleDisplayProxy::Update()
 //-----------------------------------------------------------------------------
 void vtkSMSimpleDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
+  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRendererProxy()->GetProperty("ViewProps"));
   if (!pp)
@@ -824,11 +825,18 @@ void vtkSMSimpleDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     {
     pp->AddProxy(this->VolumeActorProxy);
     }
+    */
+  rm->AddPropToRenderer(this->ActorProxy);
+  if (this->HasVolumePipeline)
+    {
+    rm->AddPropToRenderer(this->VolumeActorProxy);
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMSimpleDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 {
+  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRendererProxy()->GetProperty("ViewProps"));
   if (!pp)
@@ -840,6 +848,12 @@ void vtkSMSimpleDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
   if (this->HasVolumePipeline)
     {
     pp->RemoveProxy(this->VolumeActorProxy);
+    }
+    */
+  rm->RemovePropFromRenderer(this->ActorProxy);
+  if (this->HasVolumePipeline)
+    {
+    rm->RemovePropFromRenderer(this->VolumeActorProxy);
     }
 }
 
@@ -871,6 +885,103 @@ void vtkSMSimpleDisplayProxy::GatherGeometryInformation()
   information->Delete();
   // Skip generation of names.
   this->GeometryInformationIsValid = 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSimpleDisplayProxy::SaveInBatchScript(ofstream* file)
+{
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Display Proxy not created!");
+    return;
+    }
+
+  *file << endl;
+  *file << "set pvTemp" << this->SelfID
+    << " [$proxyManager NewProxy " << this->GetXMLGroup() << " "
+    << this->GetXMLName() << "]" << endl;
+  *file << "  $proxyManager RegisterProxy " << this->GetXMLGroup()
+    << " pvTemp" << this->SelfID <<" $pvTemp" << this->SelfID << endl;
+  *file << "  $pvTemp" << this->SelfID << " UnRegister {}" << endl;
+
+  //First set the input to the display.
+  vtkSMInputProperty* ipp;
+  ipp = vtkSMInputProperty::SafeDownCast(
+    this->GetProperty("Input"));
+  if (ipp && ipp->GetNumberOfProxies() > 0)
+    {
+    *file << "  [$pvTemp" << this->SelfID << " GetProperty Input] "
+      " AddProxy $pvTemp" << ipp->GetProxy(0)->GetID(0)
+      << endl;
+    }
+  else
+    {
+    *file << "# Input to Display Proxy not set properly" << endl;
+    }
+
+  // Now, we save all the properties that are not Proxy or Input.
+  // For shared properties, only one of the properties matter, but
+  // it makes no difference we the property's value is set twice.
+  // Since, we are not saving any proxy properties, we won't be saving
+  // information about actors added to the renderers. However, 
+  // since the displays will be added to the rendermodule using the 
+  // properties, while restoring the state of the render module, 
+  // the actors will get added appropriately.
+  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty* p = iter->GetProperty();
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(p);
+    if (pp)
+      {
+      *file << "  # skipping proxy property " << pp->GetXMLName() << endl;
+      continue;
+      }
+
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
+    vtkSMDoubleVectorProperty* dvp = 
+      vtkSMDoubleVectorProperty::SafeDownCast(p);
+    vtkSMStringVectorProperty* svp = 
+      vtkSMStringVectorProperty::SafeDownCast(p);
+    if (ivp)
+      {
+      for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
+        {
+        *file << "  [$pvTemp" << this->SelfID << " GetProperty "
+          << ivp->GetXMLName() << "] SetElement "
+          << i << " " << ivp->GetElement(i) 
+          << endl;
+        }
+      }
+    else if (dvp)
+      {
+      for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
+        {
+        *file << "  [$pvTemp" << this->SelfID << " GetProperty "
+          << dvp->GetXMLName() << "] SetElement "
+          << i << " " << dvp->GetElement(i) 
+          << endl;
+        }
+      }
+    else if (svp)
+      {
+      for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
+        {
+        *file << "  [$pvTemp" << this->SelfID << " GetProperty "
+          << svp->GetXMLName() << "] SetElement "
+          << i << " {" << svp->GetElement(i) << "}"
+          << endl;
+        }
+      }
+    else
+      {
+      *file << "  # skipping property " << p->GetXMLName() << endl;
+      }
+    }
+ 
+  iter->Delete();
+  *file << "  $pvTemp" << this->SelfID << " UpdateVTKObjects" << endl;
+  
 }
 
 //-----------------------------------------------------------------------------

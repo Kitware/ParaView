@@ -44,6 +44,11 @@ public:
   virtual void RemoveDisplay(vtkSMDisplayProxy* disp);
 
   // Description:
+  // Removes all added displays. 
+  // (Calls RemoveFromRenderModule on all displays).
+  virtual void RemoveAllDisplays();
+
+  // Description:
   // Renders using Still/FullRes or interactive/LODs
   virtual void StillRender();
   virtual void InteractiveRender();
@@ -130,6 +135,12 @@ protected:
   // This collection keeps a reference to all Display Proxies added
   // to this module.
   vtkCollection* Displays;
+
+  // Collection of props added to the renderer.
+  vtkCollection* RendererProps; 
+
+  // Collection of props added to the renderer2D.
+  vtkCollection* Renderer2DProps;
   
   vtkSMProxy* RendererProxy;
   vtkSMProxy* Renderer2DProxy;
@@ -142,6 +153,16 @@ protected:
   vtkGetObjectMacro(ActiveCameraProxy, vtkSMProxy);
   vtkGetObjectMacro(InteractorProxy, vtkSMProxy);
 
+  // Description:
+  // Methods called by Display proxies to add/remove the
+  // actor proxies to appropriate renderer.
+  // Note: these methods affect the reference count
+  // of the added/removed actor proxy.
+  virtual void AddPropToRenderer(vtkSMProxy* proxy);
+  virtual void AddPropToRenderer2D(vtkSMProxy* proxy);
+  virtual void RemovePropFromRenderer(vtkSMProxy* proxy);
+  virtual void RemovePropFromRenderer2D(vtkSMProxy* proxy);
+  
   //BTX
   friend class vtkSMSimpleDisplayProxy;
   friend class vtkSMAxesProxy;

@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.1.2.3");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplayProxy, "1.1.2.4");
 
 
 //----------------------------------------------------------------------------
@@ -133,8 +133,9 @@ void vtkSMCubeAxesDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     vtkErrorMacro("Can be added only to one render module.");
     return;
     }
-
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+  vtkSMProxyProperty* pp; 
+  /*
+  pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
   if (!pp)
     {
@@ -143,7 +144,11 @@ void vtkSMCubeAxesDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     }
   pp->AddProxy(this->CubeAxesProxy);
   rm->UpdateVTKObjects();
-  
+  */
+  rm->AddPropToRenderer2D(this->CubeAxesProxy);
+
+  // TODO:
+  // Set using stream...get the active camera.
   pp = vtkSMProxyProperty::SafeDownCast(
     this->CubeAxesProxy->GetProperty("Camera"));
   pp->RemoveAllProxies();
@@ -161,8 +166,9 @@ void vtkSMCubeAxesDisplayProxy::RemoveFromRenderModule(
     {
     return;
     }
- 
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+   vtkSMProxyProperty* pp;
+  /*
+  pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
   if (!pp)
     {
@@ -171,7 +177,9 @@ void vtkSMCubeAxesDisplayProxy::RemoveFromRenderModule(
     }
   pp->RemoveProxy(this->CubeAxesProxy);
   rm->UpdateVTKObjects();
-  
+  */
+  rm->RemovePropFromRenderer2D(this->CubeAxesProxy);
+
   pp = vtkSMProxyProperty::SafeDownCast(
     this->CubeAxesProxy->GetProperty("Camera"));
   pp->RemoveAllProxies();

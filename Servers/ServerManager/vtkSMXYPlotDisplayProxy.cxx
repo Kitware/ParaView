@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.5");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.6");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -431,6 +431,7 @@ void vtkSMXYPlotDisplayProxy::SetupDefaults()
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
+  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
   if (!pp)
@@ -439,6 +440,8 @@ void vtkSMXYPlotDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     return;
     }
   pp->AddProxy(this->XYPlotActorProxy);
+  */
+  rm->AddPropToRenderer2D(this->XYPlotActorProxy);
 
   this->RenderModuleProxy = rm;
   this->SetVisibility(this->Visibility);
@@ -447,6 +450,7 @@ void vtkSMXYPlotDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 //-----------------------------------------------------------------------------
 void vtkSMXYPlotDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 {
+  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
   if (!pp)
@@ -455,6 +459,9 @@ void vtkSMXYPlotDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
     return;
     }
   pp->RemoveProxy(this->XYPlotActorProxy);
+  */
+  rm->RemovePropFromRenderer2D(this->XYPlotActorProxy);
+
   if (this->XYPlotWidget->GetEnabled())
     {
     this->XYPlotWidget->SetEnabled(0);

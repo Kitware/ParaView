@@ -164,7 +164,12 @@ public:
   // Convenience method to get/set ImmediateModeRendering property.
   void cmSetImmediateModeRendering(int f);
   int cmGetImmediateModeRendering();
-  
+ 
+  // Description:
+  // Save the display in batch script. This will eventually get 
+  // removed as we will generate batch script from ServerManager
+  // state. However, until then.
+  virtual void SaveInBatchScript(ofstream* file);
   
 protected:
   vtkSMDisplayProxy();

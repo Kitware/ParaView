@@ -289,6 +289,7 @@ void vtkSMPointLabelDisplayProxy::SetupDefaults()
 //-----------------------------------------------------------------------------
 void vtkSMPointLabelDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
+  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
 
@@ -298,12 +299,15 @@ void vtkSMPointLabelDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     return;
     }
   pp->AddProxy(this->ActorProxy);
+  */
+  rm->AddPropToRenderer2D(this->ActorProxy);
 }
 
 //-----------------------------------------------------------------------------
 void vtkSMPointLabelDisplayProxy::RemoveFromRenderModule(
   vtkSMRenderModuleProxy* rm)
 {
+  /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
   if (!pp)
@@ -312,6 +316,8 @@ void vtkSMPointLabelDisplayProxy::RemoveFromRenderModule(
     return;
     }
   pp->RemoveProxy(this->ActorProxy);
+  */
+  rm->RemovePropFromRenderer2D(this->ActorProxy);
 }
 
 //-----------------------------------------------------------------------------

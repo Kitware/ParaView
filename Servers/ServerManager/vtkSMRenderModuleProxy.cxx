@@ -37,7 +37,7 @@
 #include "vtkCamera.h"
 #include "vtkFloatArray.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.4");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.5");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -73,6 +73,8 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->RenderWindowProxy = 0;
   this->InteractorProxy = 0;
   this->Displays = vtkCollection::New();
+  this->RendererProps = vtkCollection::New();
+  this->Renderer2DProps = vtkCollection::New();
   this->DisplayXMLName = 0;
   this->ResetCameraClippingRangeTag = 0;
   this->AbortCheckTag = 0;
@@ -94,6 +96,8 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
     this->AbortCheckTag = 0;
     }
   this->Displays->Delete();
+  this->RendererProps->Delete();
+  this->Renderer2DProps->Delete();
   this->RendererProxy = 0;
   this->Renderer2DProxy = 0;
   this->ActiveCameraProxy = 0;
@@ -399,6 +403,19 @@ void vtkSMRenderModuleProxy::RemoveDisplay(vtkSMDisplayProxy* disp)
 }
 
 //-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::RemoveAllDisplays()
+{
+  vtkCollectionIterator* iter = this->Displays->NewIterator();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkSMDisplayProxy* disp = vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    disp->RemoveFromRenderModule(this);
+    }
+  iter->Delete();  
+  this->Displays->RemoveAllItems();
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
 {
   vtkCollectionIterator* iter = this->Displays->NewIterator();
@@ -675,6 +692,102 @@ void vtkSMRenderModuleProxy::ComputeVisiblePropBounds(double bds[6])
     bds[1] = bds[3] = bds[5] = 1.0;
     }
   iter->Delete();
+}
+
+
+//-----------------------------------------------------------------------------
+// We deliberately use streams for this addtion of actor proxies.
+// Using property (and clean_command) causes problems with
+// 3D widgets (since they get cleaned out when a source is added!).
+void vtkSMRenderModuleProxy::AddPropToRenderer(vtkSMProxy* proxy)
+{
+  vtkClientServerStream stream;
+  for (unsigned int i=0; i < this->RendererProxy->GetNumberOfIDs(); i++)
+    {
+    for (unsigned int j=0; j < proxy->GetNumberOfIDs(); j++)
+      {
+      stream << vtkClientServerStream::Invoke
+        << this->RendererProxy->GetID(i)
+        << "AddViewProp"
+        << proxy->GetID(j)
+        << vtkClientServerStream::End;
+      }
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    this->RendererProps->AddItem(proxy);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->RendererProxy->GetServers(), stream);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::AddPropToRenderer2D(vtkSMProxy* proxy)
+{
+  vtkClientServerStream stream;
+  for (unsigned int i=0; i < this->Renderer2DProxy->GetNumberOfIDs(); i++)
+    {
+    for (unsigned int j=0; j < proxy->GetNumberOfIDs(); j++)
+      {
+      stream << vtkClientServerStream::Invoke
+        << this->Renderer2DProxy->GetID(i)
+        << "AddViewProp"
+        << proxy->GetID(j)
+        << vtkClientServerStream::End;
+      }
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    this->Renderer2DProps->AddItem(proxy);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->RendererProxy->GetServers(), stream);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::RemovePropFromRenderer(vtkSMProxy* proxy)
+{
+  vtkClientServerStream stream;
+  for (unsigned int i=0; i < this->RendererProxy->GetNumberOfIDs(); i++)
+    {
+    for (unsigned int j=0; j < proxy->GetNumberOfIDs(); j++)
+      {
+      stream << vtkClientServerStream::Invoke
+        << this->RendererProxy->GetID(i)
+        << "RemoveViewProp"
+        << proxy->GetID(j)
+        << vtkClientServerStream::End;
+      }
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    this->RendererProps->RemoveItem(proxy);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->RendererProxy->GetServers(), stream);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::RemovePropFromRenderer2D(vtkSMProxy* proxy)
+{
+  vtkClientServerStream stream;
+  for (unsigned int i=0; i < this->Renderer2DProxy->GetNumberOfIDs(); i++)
+    {
+    for (unsigned int j=0; j < proxy->GetNumberOfIDs(); j++)
+      {
+      stream << vtkClientServerStream::Invoke
+        << this->Renderer2DProxy->GetID(i)
+        << "RemoveViewProp"
+        << proxy->GetID(j)
+        << vtkClientServerStream::End;
+      }
+    }
+  if (stream.GetNumberOfMessages() > 0)
+    {
+    this->Renderer2DProps->RemoveItem(proxy);
+    vtkProcessModule::GetProcessModule()->SendStream(
+      this->RendererProxy->GetServers(), stream);
+    }
 }
 
 //-----------------------------------------------------------------------------

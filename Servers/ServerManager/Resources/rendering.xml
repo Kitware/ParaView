@@ -1078,17 +1078,10 @@
       <Property name="InteractiveRender" command="InteractiveRender" update_self="1">
       </Property>
       <ProxyProperty
-        name="AddDisplay"
+        name="Displays"
         command="AddDisplay"
-        update_self="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="displays" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-      <ProxyProperty
-        name="RemoveDisplay"
-        command="RemoveDisplay"
-        update_self="1">
+        update_self="1"
+        clean_command="RemoveAllDisplays">
         <ProxyGroupDomain name="groups">
           <Group name="displays" />
         </ProxyGroupDomain>
