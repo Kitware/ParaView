@@ -53,6 +53,11 @@ ELSE(ParaViewComplete_BINARY_DIR)
   # if vtk was found include the use vtk file
   IF (USE_VTK_FILE)
     INCLUDE(${USE_VTK_FILE})
+
+    # Pull in VTK's flags for now.
+    SET(CMAKE_C_FLAGS ${CMAKE_C_FLAGS} ${VTK_C_FLAGS})
+    SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${VTK_CXX_FLAGS})
+
   ELSE(USE_VTK_FILE)
     SET (PARAVIEW_CAN_BUILD 0)
     IF (CMAKE_MAJOR_VERSION MATCHES "^1$")
