@@ -269,43 +269,32 @@ MACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
   SET(ParaViewServer_SRCS ${ParaViewServer_SRCS} ${SRCS})
 ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
 
-OPTION(PARAVIEW_USE_EXODUS "Build using Exodus library. Requires access to Exodus libraries" OFF)
-MARK_AS_ADVANCED(PARAVIEW_USE_EXODUS)
-IF(PARAVIEW_USE_EXODUS)
-  FIND_PATH(EXODUS_SOURCE_DIR 
-    ExodusParaViewImport.cmake
-    ../Trilab/ExodusReader
-    ../../Trilab/ExodusReader
-    ../../../Trilab/ExodusReader)
 
-  IF(EXISTS ${EXODUS_SOURCE_DIR}/ExodusParaViewImport.cmake)
-    INCLUDE(${EXODUS_SOURCE_DIR}/ExodusParaViewImport.cmake)
-  ELSE(EXISTS ${EXODUS_SOURCE_DIR}/ExodusParaViewImport.cmake)
-    MESSAGE(SEND_ERROR "Cannot find Exodus sources directory")
-  ENDIF(EXISTS ${EXODUS_SOURCE_DIR}/ExodusParaViewImport.cmake)
-ENDIF(PARAVIEW_USE_EXODUS)
+FOREACH(external EXODUS SAF)
+  OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
+  MARK_AS_ADVANCED(PARAVIEW_USE_${external})
+  IF(PARAVIEW_USE_${external})
+    FIND_PATH(${external}_SOURCE_DIR 
+      ${external}ParaViewImport.cmake
+      ../Trilab/ExodusReader
+      ../../Trilab/ExodusReader
+      ../../../Trilab/ExodusReader)
 
-OPTION(PARAVIEW_USE_SAF "Build using SAF library. Requires access to SAF libraries and HDF5 version 1.6 libraries" OFF)
-MARK_AS_ADVANCED(PARAVIEW_USE_SAF)
+    IF(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
+      INCLUDE(${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
+    ELSE(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
+      MESSAGE(SEND_ERROR "Cannot find ${external} sources directory")
+    ENDIF(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
+  ENDIF(PARAVIEW_USE_${external})
+ENDFOREACH(external)
 
 IF(PARAVIEW_USE_SAF)
-  FIND_PATH(SAF_SOURCE_DIR 
-    SAFParaViewImport.cmake
-    ../Trilab/ExodusReader
-    ../../Trilab/ExodusReader
-    ../../../Trilab/ExodusReader)
-
-  IF(EXISTS ${SAF_SOURCE_DIR}/SAFParaViewImport.cmake)
-    INCLUDE(${SAF_SOURCE_DIR}/SAFParaViewImport.cmake)
-  ELSE(EXISTS ${SAF_SOURCE_DIR}/SAFParaViewImport.cmake)
-    MESSAGE(SEND_ERROR "Cannot find SAF sources directory")
-  ENDIF(EXISTS ${SAF_SOURCE_DIR}/SAFParaViewImport.cmake)
-
   SET( ParaViewClient_SRCS
     ${ParaViewClient_SRCS}
     ${SAF_SOURCE_DIR}/vtkPVSAFReaderModule.cxx )
-
 ENDIF(PARAVIEW_USE_SAF)
+
+
 
 SET(ParaView_SRCS ${ParaView_SRCS} ${ParaViewShared_SRCS}
   ${ParaViewClient_SRCS} ${ParaViewClientNotWrapped_SRCS} ${ParaViewSharedNotTclWrapped_SRCS})
