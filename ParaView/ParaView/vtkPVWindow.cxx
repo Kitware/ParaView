@@ -92,6 +92,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderWindow.h"
+#include "vtkString.h"
 #include "vtkToolkits.h"
 
 #ifdef _WIN32
