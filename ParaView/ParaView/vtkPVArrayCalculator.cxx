@@ -648,14 +648,16 @@ void vtkPVArrayCalculator::UpdateVTKSourceParameters()
 //----------------------------------------------------------------------------
 void vtkPVArrayCalculator::UpdateParameterWidgets()
 {
-
   // This takes care of the input selection menu.
   this->vtkPVSource::UpdateParameterWidgets();
 
-  this->Script("%s SetLabel [%s GetFunction]", 
-               this->FunctionLabel->GetTclName(), 
-               this->GetVTKSourceTclName());
-
+  if ( this->FunctionLabel->IsCreated() )
+    {
+    this->Script("%s SetLabel [%s GetFunction]", 
+                 this->FunctionLabel->GetTclName(), 
+                 this->GetVTKSourceTclName());
+    }
+  
   // Note: Since the Calculator is acting like a pvWidget, it has its own
   // modified flag that vtkPVSource knows nothing about.
   this->ModifiedFlag = 0;
@@ -718,7 +720,7 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
     }
   
   for (i = 0; i < ((vtkArrayCalculator*)this->GetVTKSource())->
-	 GetNumberOfScalarArrays(); i++)
+         GetNumberOfScalarArrays(); i++)
     {
     *file << this->VTKSourceTclName << " AddScalarVariable "
           << ((vtkArrayCalculator*)this->GetVTKSource())->
@@ -728,7 +730,7 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
           << " 0\n\t";
     }
   for (i = 0; i < ((vtkArrayCalculator*)this->GetVTKSource())->
-	 GetNumberOfVectorArrays(); i++)
+         GetNumberOfVectorArrays(); i++)
     {
     *file << this->VTKSourceTclName << " AddVectorVariable "
           << ((vtkArrayCalculator*)this->GetVTKSource())->

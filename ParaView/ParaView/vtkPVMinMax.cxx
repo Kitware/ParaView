@@ -229,12 +229,14 @@ void vtkPVMinMax::Accept()
 //----------------------------------------------------------------------------
 void vtkPVMinMax::Reset()
 {
-  // Command to update the UI.
-  this->Script("%s SetValue [%s %s]", this->MinScale->GetTclName(), 
-               this->ObjectTclName, this->GetMinCommand); 
-  this->Script("%s SetValue [%s %s]", this->MaxScale->GetTclName(), 
-               this->ObjectTclName, this->GetMaxCommand); 
-
+  if ( this->MinScale->IsCreated() )
+    {
+    // Command to update the UI.
+    this->Script("%s SetValue [%s %s]", this->MinScale->GetTclName(), 
+                 this->ObjectTclName, this->GetMinCommand); 
+    this->Script("%s SetValue [%s %s]", this->MaxScale->GetTclName(), 
+                 this->ObjectTclName, this->GetMaxCommand); 
+    }
   this->ModifiedFlag = 0;
 }
 
@@ -285,14 +287,14 @@ void vtkPVMinMax::SaveInTclScript(ofstream *file)
 }
 
 vtkPVMinMax* vtkPVMinMax::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVMinMax::SafeDownCast(clone);
 }
 
 void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVMinMax* pvmm = vtkPVMinMax::SafeDownCast(clone);
