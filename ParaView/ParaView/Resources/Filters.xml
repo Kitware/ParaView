@@ -571,6 +571,9 @@ help="Set the name of the array to hold the results of this computation"/>
   <InputMenu label="Input" help="Set the input to this filter."
              input_name="Input"/>
   <SelectionList variable="Plane" trace_name="Plane" help="Select which plane of the bounding box to reflect across">
+    <Item name="X" value="6"/>
+    <Item name="Y" value="7"/>
+    <Item name="Z" value="8"/>
     <Item name="X Min" value="0"/>
     <Item name="Y Min" value="1"/>
     <Item name="Z Min" value="2"/>
@@ -578,6 +581,8 @@ help="Set the name of the array to hold the results of this computation"/>
     <Item name="Y Max" value="4"/>
     <Item name="Z Max" value="5"/>
   </SelectionList>
+  <VectorEntry label="Center" trace_name="Center" variable="Center" type="float"
+               help="The center of the mirror plane."/>
 </Module>
 
 <Module name="RibbonFilter" menu_name="Ribbon" root_name="Ribbon" module_type="Filter" 
