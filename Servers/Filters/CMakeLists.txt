@@ -9,8 +9,10 @@ SET(Filters_SRCS
   vtkGroup.cxx
   vtkHDF5RawImageReader.cxx
   vtkMPIDuplicatePolyData.cxx
+  vtkMPIDuplicateUnstructuredGrid.cxx
   vtkMazeSource.cxx
   vtkMergeArrays.cxx
+  vtkPickFilter.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
