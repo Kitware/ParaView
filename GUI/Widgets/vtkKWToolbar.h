@@ -148,6 +148,7 @@ protected:
   void ConstrainWidgetsLayout();
   void UpdateWidgetsLayout();
   void UpdateWidgetsAspect();
+  void UpdateToolbarFrameAspect();
   
 //BTX
   vtkVector<vtkKWWidget*>* Widgets;
