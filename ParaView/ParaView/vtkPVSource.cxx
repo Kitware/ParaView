@@ -482,11 +482,12 @@ void vtkPVSource::CreateProperties()
 
   frame->Delete();  
   
-  // Isolate events to this window until accept or reset is pressed.
   
   this->UpdateProperties();
   
+  // Isolate events to this window until accept or reset is pressed.
   this->GrabFocus();
+
   //this->UpdateParameterWidgets();
 }
 
@@ -842,6 +843,7 @@ void vtkPVSource::DeleteCallback()
     {
     // Remove the local grab
     this->UnGrabFocus();
+
     this->Script("update");   
     this->Initialized = 1;
     }
@@ -1409,7 +1411,8 @@ void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
 
   if (pvw->GetTraceName() == NULL)
     {
-    vtkWarningMacro("TraceName not set.");
+    vtkWarningMacro("TraceName not set. Widget class: " 
+                    << pvw->GetClassName());
     return;
     }
 
@@ -1845,7 +1848,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.226 $");
+  this->ExtractRevision(os,"$Revision: 1.227 $");
 }
 
 //----------------------------------------------------------------------------
