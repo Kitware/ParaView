@@ -66,6 +66,7 @@ vtkPVSelectTimeSet.cxx
 vtkPVSource.cxx 
 vtkPVSourceCollection.cxx
 vtkPVSourceList.cxx
+vtkPVSourcesNavigationWindow.cxx
 vtkPVSphereWidget.cxx
 vtkPVStringEntry.cxx
 vtkPVThreshold.cxx 
