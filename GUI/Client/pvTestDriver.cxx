@@ -261,6 +261,7 @@ int pvTestDriver::OutputStringHasError(vtkstd::string& output)
     "error",
     "Missing:",
     "core dumped",
+    "process in local group is dead",
     "Segmentation fault",
     "erroneous",
     "ERROR:",
