@@ -127,6 +127,7 @@ public:
   void Script(const char *EventString, ...);
   void SimpleScript(char *EventString);
   void SimpleScript(const char *EventString);
+  const char* EvaluateString(const char *String, ...);
 //ETX
 
   // Description:
