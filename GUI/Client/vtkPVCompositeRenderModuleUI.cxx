@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.12");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.13");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -168,7 +168,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
 {
   vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
   // Skip over LOD res and threshold.
-  int row = 4;
+  int row = 6;
   
   if (this->Application)
     {
