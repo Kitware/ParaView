@@ -27,7 +27,7 @@
 #  define STRCASECMP strcasecmp
 #endif
 
-vtkCxxRevisionMacro(vtkString, "1.26");
+vtkCxxRevisionMacro(vtkString, "1.27");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -591,7 +591,7 @@ char* vtkString::AddSpaceToUpperFirstString(const char *str, char *res)
     *ptr++ = *str++;
     while (*str)
       {
-      if (isupper(*str) && !isupper(*(str - 1)))
+      if (isupper(*str) && !isspace(*(str - 1)) && !isupper(*(str - 1)))
         {
         *ptr++ = ' ';
         }
