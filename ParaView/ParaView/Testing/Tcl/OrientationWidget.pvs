@@ -37,7 +37,7 @@ $kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
 update
 
 #Resize widget from upper left corner
-$kw(vtkTemp22) SetEventInformationFlipY 200 231 0 0 0 0 0
+$kw(vtkTemp22) SetEventInformationFlipY 199 231 0 0 0 0 0
 $kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
 $kw(vtkTemp22) InvokeEvent "LeftButtonPressEvent"
 $kw(vtkTemp22) SetEventInformationFlipY 279 254 0 0 0 0 0
