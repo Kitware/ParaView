@@ -166,6 +166,30 @@ void vtkKWApplication::SimpleScript(char *event)
     }
 }
 
+void vtkKWApplication::SimpleScript(const char *event)
+{
+//#define VTK_DEBUG_SCRIPT
+#ifdef VTK_DEBUG_SCRIPT
+  vtkOutputWindow::GetInstance()->DisplayText(event);
+  vtkOutputWindow::GetInstance()->DisplayText("\n");
+#endif
+  
+  int len = strlen(event);
+  if (!event || (len < 1))
+    {
+    return;
+    }
+  char* script = new char[len+1];
+  strcpy(script, event);
+
+  if (Tcl_GlobalEval(this->MainInterp, script) != TCL_OK)
+    {
+    vtkErrorMacro("\n    Script: \n" << event << "\n    Returned Error: \n"  
+		  << this->MainInterp->result << endl);
+    }
+  delete[] script;
+}
+
 void vtkKWApplication::SetApplicationName(const char *_arg)
 {
   vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting ApplicationName to " << _arg ); 

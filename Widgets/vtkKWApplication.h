@@ -125,6 +125,7 @@ public:
   // perform arguement substitution.
   void Script(const char *EventString, ...);
   void SimpleScript(char *EventString);
+  void SimpleScript(const char *EventString);
 //ETX
 
   // Description:

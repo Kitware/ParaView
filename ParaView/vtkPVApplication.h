@@ -82,7 +82,9 @@ public:
   void BroadcastScript(char *EventString, ...);
 //ETX
   void RemoteSimpleScript(int remoteId, char *str);
+  void RemoteSimpleScript(int remoteId, const char *str);
   void BroadcastSimpleScript(char *str);
+  void BroadcastSimpleScript(const char *str);
   
   // Description:
   // We need to keep the controller in a prominent spot because there is no more 

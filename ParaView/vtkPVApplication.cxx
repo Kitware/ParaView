@@ -185,12 +185,6 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
 {
   int length;
 
-  if (this->Controller->GetLocalProcessId() == remoteId)
-    {
-    this->SimpleScript(str);
-    return;
-    }
-  
   // send string to evaluate.
   length = strlen(str) + 1;
   if (length <= 1)
@@ -198,9 +192,34 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
     return;
     }
 
-  //cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
+  if (this->Controller->GetLocalProcessId() == remoteId)
+    {
+    this->SimpleScript(str);
+    return;
+    }
   
   this->Controller->TriggerRMI(remoteId, str, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+}
+
+void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
+{
+  int length;
+
+  // send string to evaluate.
+  length = strlen(str) + 1;
+  if (length <= 1)
+    {
+    return;
+    }
+
+  if (this->Controller->GetLocalProcessId() == remoteId)
+    {
+    this->SimpleScript(str);
+    return;
+    }
+  
+  this->Controller->TriggerRMI(remoteId, const_cast<char*>(str), 
+			       VTK_PV_SLAVE_SCRIPT_RMI_TAG);
 }
 
 //----------------------------------------------------------------------------
@@ -223,6 +242,12 @@ void vtkPVApplication::BroadcastSimpleScript(char *str)
   
   num = this->Controller->GetNumberOfProcesses();
 
+  int len = strlen(str);
+  if (!str || (len < 1))
+    {
+    return;
+    }
+
   for (id = 1; id < num; ++id)
     {
     this->RemoteSimpleScript(id, str);
@@ -232,6 +257,26 @@ void vtkPVApplication::BroadcastSimpleScript(char *str)
   this->SimpleScript(str);
 }
 
+void vtkPVApplication::BroadcastSimpleScript(const char *str)
+{
+  int id, num;
+  
+  num = this->Controller->GetNumberOfProcesses();
+
+  int len = strlen(str);
+  if (!str || (len < 1))
+    {
+    return;
+    }
+
+  for (id = 1; id < num; ++id)
+    {
+    this->RemoteSimpleScript(id, str);
+    }
+  
+  // Do reverse order, because 0 will block.
+  this->SimpleScript(str);
+}
 
 
 //----------------------------------------------------------------------------
