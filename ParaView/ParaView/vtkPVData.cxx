@@ -83,7 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.180");
+vtkCxxRevisionMacro(vtkPVData, "1.181");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1323,7 +1323,7 @@ void vtkPVData::CreateProperties()
       "Orient the geometry relative to the dataset origin.");
     }
 
-  this->UpdateActorControlResolutions();
+//  this->UpdateActorControlResolutions();
 
   this->OpacityLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->OpacityLabel->Create(this->Application, 0);
@@ -3275,7 +3275,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.180 $");
+  this->ExtractRevision(os,"$Revision: 1.181 $");
 }
 
 //----------------------------------------------------------------------------
