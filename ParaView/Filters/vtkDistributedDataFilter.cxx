@@ -91,7 +91,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.8");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.9");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -341,6 +341,11 @@ void vtkDistributedDataFilter::SetController(vtkMultiProcessController *c)
     {
     this->Controller->UnRegister(this);
     this->Controller = NULL;
+    }
+
+  if (c == NULL)
+    {
+    return;
     }
 
   vtkSocketController *sc = vtkSocketController::SafeDownCast(c);

@@ -67,7 +67,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.10");
+vtkCxxRevisionMacro(vtkPKdTree, "1.11");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -148,6 +148,11 @@ void vtkPKdTree::SetController(vtkMultiProcessController *c)
     {
     this->Controller->UnRegister(this);
     this->Controller = NULL;
+    }
+
+  if (c == NULL)
+    {
+    return;
     }
 
   vtkSocketController *sc = vtkSocketController::SafeDownCast(c);
