@@ -44,6 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This is a parallel object.  It needs to be cloned to work correctly.  
 // After cloning, the parallel nature of the object is transparent.
 // This class should probably be merged with vtkPVComposite.
+// Note when there are multiple outputs, a dummy pvsource has to
+// be attached to each of those. This way, the user can add modules
+// after each output.
 
 
 #ifndef __vtkPVSource_h
@@ -136,8 +139,11 @@ public:
   virtual void PreAcceptCallback();
 
   // Description:
-  // Determine if this source can be deleted.
-  virtual int DeleteCheck();
+  // Determine if this source can be deleted. This depends
+  // on two conditions:
+  // 1. Does the source have any consumers,
+  // 2. Is it permanent (for example, a glyph source is permanent)
+  virtual int IsDeletable();
 
   // Description:
   // Internal method; called by AcceptCallback.
@@ -270,10 +276,36 @@ public:
   // Description:
   // Certain modules are not deletable (for example, glyph sources).
   // Such modules should be marked as such.
-  vtkSetMacro(IsDeletable, int);
-  vtkGetMacro(IsDeletable, int);
-  vtkBooleanMacro(IsDeletable, int);
+  vtkSetMacro(IsPermanent, int);
+  vtkGetMacro(IsPermanent, int);
+  vtkBooleanMacro(IsPermanent, int);
 
+  // Description:
+  // Returns the number of consumers of either:
+  // 1. the first output if there is only one output,
+  // 2. the outputs of the consumers of
+  //    each output if there are more than one outputs.
+  // Method (2) is used for multiple outputs because,
+  // in this situation, there is always a dummy pvsource
+  // attached to each of the outputs.
+  int GetNumberOfPVConsumers();
+
+  // Description:
+  // If this is on, no Display page (from vtkPVData) is display
+  // for this source. Used by sources like Glyphs.
+  vtkSetMacro(HideDisplayPage, int);
+  vtkGetMacro(HideDisplayPage, int);
+  vtkBooleanMacro(HideDisplayPage, int);
+
+  // Description:
+  // If this is on, no Paramters page  is displayed for this source.
+  vtkSetMacro(HideParametersPage, int);
+  vtkGetMacro(HideParametersPage, int);
+  vtkBooleanMacro(HideParametersPage, int);
+
+  //BTX
+  friend class vtkPVEnSightReaderModule;
+  //ETX
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -288,7 +320,15 @@ protected:
   
   // This flag gets set after the user hits accept for the first time.
   int Initialized;
-  
+
+  // If this is on, no Display page (from vtkPVData) is displayed
+  // for this source. Used by sources like Glyphs
+  int HideDisplayPage;
+
+  // If this is on, no Paramters page  is displayed
+  // for this source.
+  int HideParametersPage;
+
   vtkSource *VTKSource;
   char *VTKSourceTclName;
   
@@ -350,7 +390,7 @@ protected:
   // Number of instances cloned from this prototype
   int PrototypeInstanceCount;
 
-  int IsDeletable;
+  int IsPermanent;
 
   virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
 };

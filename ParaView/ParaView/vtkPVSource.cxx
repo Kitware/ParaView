@@ -122,7 +122,10 @@ vtkPVSource::vtkPVSource()
   this->OutputClassName = 0;
   this->SourceClassName = 0;
 
-  this->IsDeletable = 1;
+  this->IsPermanent = 0;
+
+  this->HideDisplayPage = 0;
+  this->HideParametersPage = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -229,7 +232,8 @@ void vtkPVSource::SetPVInput(vtkPVData *pvd)
   
   if (pvApp == NULL)
     {
-    vtkErrorMacro("No Application. Create the source before setting the input.");
+    vtkErrorMacro(
+      "No Application. Create the source before setting the input.");
     return;
     }
 
@@ -297,7 +301,8 @@ void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
   
   if (this->VTKSourceTclName)
     {
-    pvApp->BroadcastScript("%s Delete", this->VTKSourceTclName);
+    pvApp->BroadcastScript("if {[info command %s] != \"\"} { %s Delete }", 
+			   this->VTKSourceTclName, this->VTKSourceTclName);
     delete [] this->VTKSourceTclName;
     this->VTKSourceTclName = NULL;
     this->VTKSource = NULL;
@@ -312,10 +317,12 @@ void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
     //source->SetProgressMethod(vtkPVSourceReportProgress, this);
     //source->SetEndMethod(vtkPVSourceEndProgress, this);
 
-    pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute %s}}", 
-                           tclName, tclName);
-    pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute %s}}", 
-                           tclName, tclName);
+    pvApp->BroadcastScript(
+      "%s SetStartMethod {Application LogStartEvent {Execute %s}}", 
+      tclName, tclName);
+    pvApp->BroadcastScript(
+      "%s SetEndMethod {Application LogEndEvent {Execute %s}}", 
+      tclName, tclName);
 
 
     }
@@ -369,16 +376,23 @@ void vtkPVSource::CreateProperties()
   this->Notebook->SetParent(this->ParametersParent);
   this->Notebook->Create(this->Application,"");
 
-  //this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-  //             this->Notebook->GetWidgetName());
-
   // Set up the pages of the notebook.
-  this->Notebook->AddPage("Parameters");
-  this->Notebook->AddPage("Display");
-  this->Parameters->SetParent(this->Notebook->GetFrame("Parameters"));
+  if (!this->HideParametersPage)
+    {
+    this->Notebook->AddPage("Parameters");
+    this->Parameters->SetParent(this->Notebook->GetFrame("Parameters"));
+    }
+  else
+    {
+    this->Parameters->SetParent(this->ParametersParent);
+    }
+
   this->Parameters->Create(this->Application,"frame","");
-  this->Script("pack %s -pady 2 -fill x -expand yes",
-               this->Parameters->GetWidgetName());
+  if (!this->HideParametersPage)
+    {
+    this->Script("pack %s -pady 2 -fill x -expand yes",
+		 this->Parameters->GetWidgetName());
+    }
 
   // For initializing the trace of the notebook.
   this->GetParametersParent()->SetTraceReferenceObject(this);
@@ -389,8 +403,15 @@ void vtkPVSource::CreateProperties()
   this->DisplayNameLabel->SetParent(this->Parameters);
   if (this->Name != NULL)
     {
-    sprintf(displayName, "Name: %s Type: %s", this->GetName(),
-	    this->GetVTKSource()->GetClassName()+3);
+    if ( this->GetVTKSource() )
+      {
+      sprintf(displayName, "Name: %s Type: %s", this->GetName(),
+	      this->GetVTKSource()->GetClassName()+3);
+      }
+    else
+      {
+      sprintf(displayName, "Name: %s", this->GetName());
+      }
     this->DisplayNameLabel->SetLabel(displayName);
     }
   else
@@ -422,23 +443,29 @@ void vtkPVSource::CreateProperties()
   this->Script("pack %s -fill x -expand t", frame->GetWidgetName());  
   
   this->AcceptButton->SetParent(frame);
-  this->AcceptButton->Create(this->Application, "-text Accept -background red1");
+  this->AcceptButton->Create(this->Application, 
+			     "-text Accept -background red1");
   this->AcceptButton->SetCommand(this, "PreAcceptCallback");
-  this->AcceptButton->SetBalloonHelpString("Cause the current values in the user interface to take effect");
+  this->AcceptButton->SetBalloonHelpString(
+    "Cause the current values in the user interface to take effect");
   this->Script("pack %s -side left -fill x -expand t", 
 	       this->AcceptButton->GetWidgetName());
 
   this->ResetButton->SetParent(frame);
   this->ResetButton->Create(this->Application, "-text Reset");
   this->ResetButton->SetCommand(this, "ResetCallback");
-  this->ResetButton->SetBalloonHelpString("Revert to the previous values in the user interface.  If no values have been set, remove the filter from the pipeline.");
+  this->ResetButton->SetBalloonHelpString(
+    "Revert to the previous parameters of current module.  "
+    "If no values have been set, remove it.");
   this->Script("pack %s -side left -fill x -expand t", 
 	       this->ResetButton->GetWidgetName());
 
   this->DeleteButton->SetParent(frame);
   this->DeleteButton->Create(this->Application, "-text Delete");
   this->DeleteButton->SetCommand(this, "DeleteCallback");
-  this->DeleteButton->SetBalloonHelpString("Remove this filter from the pipeline.  This can only be done if the filter is at the end of the pipeline.");
+  this->DeleteButton->SetBalloonHelpString(
+    "Remove the current module.  "
+    "This can only be done if no other modules depends on the current one.");
   this->Script("pack %s -side left -fill x -expand t",
                this->DeleteButton->GetWidgetName());
 
@@ -568,7 +595,8 @@ void vtkPVSource::SetVisibility(int v)
 //----------------------------------------------------------------------------
 void vtkPVSource::PreAcceptCallback()
 {
-  this->Script("%s configure -cursor watch", this->GetPVWindow()->GetWidgetName());
+  this->Script("%s configure -cursor watch", 
+	       this->GetPVWindow()->GetWidgetName());
   this->Script("after idle {%s AcceptCallback}", this->GetTclName());
 }
 
@@ -634,13 +662,17 @@ void vtkPVSource::Accept(int hideFlag)
       }
     
     window->GetMainView()->AddPVData(ac);
+    if (!this->GetHideDisplayPage())
+      {
+      this->Notebook->AddPage("Display");
+      }
     ac->CreateProperties();
     ac->Initialize();
     // Make the last data invisible.
     input = this->GetPVInput();
     if (input)
       {
-      if (this->ReplaceInput)
+      if (this->ReplaceInput && input->GetPropertiesCreated())
         {
         input->SetVisibilityInternal(0);
         }
@@ -741,16 +773,36 @@ void vtkPVSource::DeleteCallback()
     this->Initialized = 1;
     }
   
-  for (i = 0; i < this->NumberOfPVOutputs; ++i)
+  if (this->GetNumberOfPVConsumers() > 0 )
     {
-    if (this->PVOutputs[i] && 
-        this->PVOutputs[i]->GetNumberOfPVConsumers() > 0)
-      { // Button should be deactivated.
-      vtkErrorMacro("An output is used.  We cannot delete this source.");
-      return;
-      }
+    vtkErrorMacro("An output is used.  We cannot delete this source.");
+    return;
     }
   
+  // Remove all the dummy pvsources attached as
+  // connections to each output (only when there
+  // are multiple outputs)
+  int numOutputs = this->GetNumberOfPVOutputs();
+  if (numOutputs > 1)
+   {
+   for (i=0; i<numOutputs; i++)
+     {
+     vtkPVData* output = this->GetPVOutput(i);
+     if ( output )
+       {
+       int numCons2= output->GetNumberOfPVConsumers();
+       for (int j=0; j<numCons2; j++)
+	 {
+	 vtkPVSource* consumer = output->GetPVConsumer(j);
+	 if ( consumer )
+	   {
+	   consumer->DeleteCallback();
+	   }
+	 }
+       }
+     }
+   }
+
   // Save this action in the trace file.
   this->GetPVApplication()->AddTraceEntry("$kw(%s) DeleteCallback",
                                           this->GetTclName());
@@ -812,7 +864,7 @@ void vtkPVSource::DeleteCallback()
       this->GetPVRenderView()->RemovePVData(ac);
       }
     }    
-  
+
   // Remove all of the outputs
   for (i = 0; i < this->NumberOfPVOutputs; ++i)
     {
@@ -862,15 +914,57 @@ void vtkPVSource::UpdateVTKSourceParameters()
 }
 
 //----------------------------------------------------------------------------
+// Returns the number of consumers of either:
+// 1. the first output if there is only one output,
+// 2. the outputs of the consumers of
+//    each output if there are more than one outputs.
+// Method (2) is used for multiple outputs because,
+// in this situation, there is always a dummy pvsource
+// attached to each of the outputs.
+int vtkPVSource::GetNumberOfPVConsumers()
+{
+
+ int numOutputs = this->GetNumberOfPVOutputs();
+ if (numOutputs > 1)
+   {
+   int numConsumers = 0;
+   for (int i=0; i<numOutputs; i++)
+     {
+     vtkPVData* output = this->GetPVOutput(i);
+     if ( output )
+       {
+       int numCons2= output->GetNumberOfPVConsumers();
+       for (int j=0; j<numCons2; j++)
+	 {
+	 vtkPVSource* consumer = output->GetPVConsumer(j);
+	 if ( consumer )
+	   {
+	   numConsumers += consumer->GetNumberOfPVConsumers();
+	   }
+	 }
+       }
+     }
+   return numConsumers;
+   }
+ else
+   {
+   vtkPVData* output0 = this->GetPVOutput(0);
+   if ( output0 )
+     {
+     return output0->GetNumberOfPVConsumers();
+     }
+   }
+
+ return 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSource::UpdateProperties()
 {
-  //int num, idx;
-  //vtkPVData *input;
-  
   // --------------------------------------
   // Change the state of the delete button based on if there are any users.
   // Only filters at the end of a pipeline can be deleted.
-  if ( this->DeleteCheck() )
+  if ( this->IsDeletable() )
       {
       this->Script("%s configure -state normal",
                    this->DeleteButton->GetWidgetName());
@@ -894,11 +988,11 @@ void vtkPVSource::UpdateProperties()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSource::DeleteCheck()
+int vtkPVSource::IsDeletable()
 {
-  return !((this->GetPVOutput(0) &&
-	    this->GetPVOutput(0)->GetNumberOfPVConsumers() > 0) ||
-	   !this->IsDeletable);
+  return !( (this->GetPVOutput(0) 
+	     && this->GetPVOutput(0)->GetNumberOfPVConsumers() > 0) ||
+	    this->IsPermanent);
 }
 
 //----------------------------------------------------------------------------
@@ -992,7 +1086,7 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
   
   if (pvd)
     {
-    if (this->ReplaceInput)
+    if (this->ReplaceInput && pvd->GetPropertiesCreated())
       {
       pvd->SetVisibilityInternal(0);
       }
@@ -1463,10 +1557,12 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ExtentTranslatorTclName: " 
      << (this->ExtentTranslatorTclName?this->ExtentTranslatorTclName:"null")
      << endl;
-  os << indent << "MainParameterFrame: " << this->GetMainParameterFrame() << endl;
+  os << indent << "MainParameterFrame: " << this->GetMainParameterFrame() 
+     << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "NumberOfPVInputs: " << this->GetNumberOfPVInputs() << endl;
-  os << indent << "NumberOfPVOutputs: " << this->GetNumberOfPVOutputs() << endl;
+  os << indent << "NumberOfPVOutputs: " << this->GetNumberOfPVOutputs() 
+     << endl;
   os << indent << "ParameterFrame: " << this->GetParameterFrame() << endl;
   os << indent << "ParametersParent: " << this->GetParametersParent() << endl;
   os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
@@ -1478,7 +1574,7 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Widgets: " << this->GetWidgets() << endl;
   os << indent << "InputClassName: " 
      << (this->InputClassName?this->InputClassName:"null") << endl;
-  os << indent << "IsDeletable: " << this->IsDeletable << endl;
+  os << indent << "IsPermanent: " << this->IsPermanent << endl;
   os << indent << "OutputClassName: " 
      << (this->OutputClassName?this->OutputClassName:"null") << endl;
   os << indent << "SourceClassName: " 
