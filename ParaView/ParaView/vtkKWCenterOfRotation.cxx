@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPropPicker.h"
 #include "vtkCamera.h"
 #include "vtkActor.h"
-#include "vtkTreeComposite.h"
+#include "vtkPVTreeComposite.h"
 #include "vtkObjectFactory.h"
 
 

@@ -58,11 +58,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWView.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkPVSource.h"
-#include "vtkTreeComposite.h"
 
 class vtkPVApplication;
 class vtkKWInteractor;
 class vtkLabeledFrame;
+class vtkPVTreeComposite;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
@@ -135,7 +135,7 @@ public:
 
   // Description:
   // This is for an experiment on rendering timing.  It should be temporary.
-  vtkTreeComposite *GetComposite() {return this->Composite;}
+  vtkPVTreeComposite *GetComposite() {return this->Composite;}
 
   // Description:
   // Update the navigation window for a particular source
@@ -235,7 +235,7 @@ protected:
 
   int UseReductionFactor;
   
-  vtkTreeComposite *Composite;
+  vtkPVTreeComposite *Composite;
   char *CompositeTclName;
   vtkSetStringMacro(CompositeTclName);
 
