@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.42");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.43");
 
 
 //=========================================================================
@@ -1838,7 +1838,8 @@ void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "EnableAbort: " << this->GetEnableAbort() << endl;
   os << indent << "CompositeTime: " << this->CompositeTime << endl;
   os << indent << "SetBuffersTime: " << this->SetBuffersTime << endl;
-  os << indent << "GetBuffersTime: " << this->GetBuffersTime << endl;
+  os << indent << "GetBuffersTime: " << this->GetGetBuffersTime() << endl;
+  os << indent << "MaxRenderTime: " << this->MaxRenderTime << endl;
   os << indent << "UseChar: " << this->UseChar << endl;
   os << indent << "UseRGB: " << this->UseRGB << endl;
 }
