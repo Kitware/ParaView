@@ -43,7 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkDataSet.h"
+#include "vtkPVApplication.h"
 #include "vtkKWLabel.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
@@ -193,6 +195,18 @@ void vtkPVInputMenu::MenuEntryCallback(vtkPVSource *pvs)
     {
     return;
     }
+  if ( this->CheckForLoop(pvs) )
+    {
+    vtkKWMessageDialog::PopupMessage(
+        this->Application, this->GetPVApplication()->GetMainWindow(),
+        "ParaView Error", 
+        "This operation would result in a loop in the pipeline. "
+        "Since loops in the pipeline can result in infinite loops, "
+        "this operation is prohibited.",
+        vtkKWMessageDialog::ErrorIcon);
+    this->Menu->SetValue(this->CurrentValue->GetName());
+    return;
+    }
   this->CurrentValue = pvs;
   this->ModifiedCallback();
   this->Update();
@@ -205,6 +219,7 @@ void vtkPVInputMenu::SetCurrentValue(vtkPVSource *pvs)
     {
     return;
     }
+
   this->CurrentValue = pvs;
   if (this->Application == NULL)
     {
@@ -222,6 +237,30 @@ void vtkPVInputMenu::SetCurrentValue(vtkPVSource *pvs)
   this->Update();
 }
 
+//----------------------------------------------------------------------------
+int vtkPVInputMenu::CheckForLoop(vtkPVSource *pvs)
+{
+  if ( !pvs )
+    {
+    return 0;
+    }
+  vtkPVSource* source = this->GetPVSource();
+  if ( pvs == source )
+    {
+    return 1;
+    }
+  int cc;
+  int res = 0;
+  for ( cc = 0; cc < pvs->GetNumberOfPVInputs(); cc ++ )
+    {
+    vtkPVData* data = pvs->GetNthPVInput(cc);
+    if ( data && data->GetPVSource() )
+      {
+      res += this->CheckForLoop(data->GetPVSource());
+      }
+    }
+  return res;
+}
 //----------------------------------------------------------------------------
 vtkPVData *vtkPVInputMenu::GetPVData()
 {

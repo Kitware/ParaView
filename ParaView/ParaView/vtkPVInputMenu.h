@@ -146,7 +146,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVInputMenu* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -175,6 +175,12 @@ protected:
   int AddEntry(vtkPVSource *pvs);
 
   // Description:
+  // When setting input, we have to be carefull not to cause the
+  // loop. This code will determine if the operation would cause the
+  // loop.
+  int CheckForLoop(vtkPVSource *pvs);
+
+  // Description:
   // Adds a collection of sources to the menu.
   // The sources are filtered by "InputType".
   void AddSources(vtkPVSourceCollection *sources);
@@ -184,7 +190,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
