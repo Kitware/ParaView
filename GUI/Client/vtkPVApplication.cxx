@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.296");
+vtkCxxRevisionMacro(vtkPVApplication, "1.297");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2223,21 +2223,23 @@ char* vtkPVApplication::GetDemoPath()
   vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
   const char* selfPath = util->FindSelfPath(
     this->GetArgv0());
-  const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
-  char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
-  sprintf(newPath, "%s/%s", selfPath, relPath);
-
-  char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
-  sprintf(demoFile, "%s/Demo1.pvs", newPath);
-
-  if (stat(demoFile, &fs) == 0) 
+  if (selfPath)
     {
-    this->SetDemoPath(newPath);
-    found = 1;
-    }
+    const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
+    char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
+    sprintf(newPath, "%s/%s", selfPath, relPath);
 
-  delete[] demoFile;
-  delete[] newPath;
+    char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
+    sprintf(demoFile, "%s/Demo1.pvs", newPath);
+
+    if (stat(demoFile, &fs) == 0) 
+      {
+      this->SetDemoPath(newPath);
+      found = 1;
+      }
+    delete[] demoFile;
+    delete[] newPath;
+    }
   util->Delete();
 
 #endif // _WIN32  
