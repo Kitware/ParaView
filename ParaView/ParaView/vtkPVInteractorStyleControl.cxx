@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.28");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.29");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -744,6 +744,7 @@ void vtkPVInteractorStyleControl::AddArgument(
     // If there is none, create it.
     vtkPVInteractorStyleControlInternal::ArrayString str;
     this->Internals->Arguments[name] = str;
+    mit = this->Internals->Arguments.find(name);
     }
   
   // Now check if this manipulator is already on the list
