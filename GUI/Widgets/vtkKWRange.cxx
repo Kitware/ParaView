@@ -19,14 +19,13 @@
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
-#include "vtkKWMath.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.38");
+vtkCxxRevisionMacro(vtkKWRange, "1.39");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -698,7 +697,8 @@ void vtkKWRange::ConstrainRangeToResolution(double range[2], int adjust)
   for (int i = 0; i <= 1; i++)
     {
     double value = range[i];
-    double new_value = res * vtkKWMath::Round(value / res);
+    double q = value / res;
+    double new_value = res * (q >= 0 ? floor(q + 0.5) : ceil(q - 0.5));
     // This adjustment is made to make sure that the new values
     // fall in the range. For example, if range is [1,62],
     // the line above assigns [0,63] to the new_values. The

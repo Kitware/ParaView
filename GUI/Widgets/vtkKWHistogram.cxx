@@ -18,7 +18,6 @@
 #include "vtkCommand.h"
 #include "vtkDataArray.h"
 #include "vtkImageData.h"
-#include "vtkKWMath.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkDoubleArray.h"
@@ -30,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.1");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -253,7 +252,7 @@ void vtkKWHistogram::EstimateHistogramRangeAndNumberOfBins(
 
     case VTK_SHORT:
     case VTK_UNSIGNED_SHORT:
-      vtkKWMath::GetScalarRange(scalars, comp, dscalars_range);
+      scalars->GetRange(dscalars_range, comp);
       range[0] = dscalars_range[0];
       range[1] = dscalars_range[1] + 1.0;
       try_nb_of_bins = (range[1] - range[0]);
@@ -263,14 +262,14 @@ void vtkKWHistogram::EstimateHistogramRangeAndNumberOfBins(
     case VTK_UNSIGNED_INT:
     case VTK_LONG:
     case VTK_UNSIGNED_LONG:
-      vtkKWMath::GetScalarRange(scalars, comp, dscalars_range);
+      scalars->GetRange(dscalars_range, comp);
       range[0] = dscalars_range[0];
       range[1] = dscalars_range[1] + 1.0;
       try_nb_of_bins = (range[1] - range[0]);
       break;
 
     case VTK_FLOAT:
-      vtkKWMath::GetScalarRange(scalars, comp, dscalars_range);
+      scalars->GetRange(dscalars_range, comp);
       delta = (dscalars_range[1] - dscalars_range[0]) * 0.01;
       range[0] = dscalars_range[0];
       range[1] = dscalars_range[1] + delta;
@@ -278,7 +277,7 @@ void vtkKWHistogram::EstimateHistogramRangeAndNumberOfBins(
       break;
 
     case VTK_DOUBLE:
-      vtkKWMath::GetScalarRange(scalars, comp, dscalars_range);
+      scalars->GetRange(dscalars_range, comp);
       delta = (dscalars_range[1] - dscalars_range[0]) * 0.01;
       range[0] = dscalars_range[0];
       range[1] = dscalars_range[1] + delta;

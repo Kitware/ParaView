@@ -29,7 +29,6 @@
 #include "vtkKWLabeledOptionMenu.h"
 #include "vtkKWLabeledPopupButton.h"
 #include "vtkKWLabeledScaleSet.h"
-#include "vtkKWMath.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPiecewiseFunctionEditor.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
@@ -47,7 +46,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.4");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -1281,7 +1280,7 @@ int vtkKWVolumePropertyWidget::GetDataSetScalarRange(
     vtkDataArray *scalars = this->DataSet->GetPointData()->GetScalars();
     if (scalars)
       {
-      return vtkKWMath::GetScalarRange(scalars, comp, range);
+      scalars->GetRange(range, comp);
       }
     }
   return 0;
@@ -1296,7 +1295,7 @@ int vtkKWVolumePropertyWidget::GetDataSetAdjustedScalarRange(
     vtkDataArray *scalars = this->DataSet->GetPointData()->GetScalars();
     if (scalars)
       {
-      return vtkKWMath::GetAdjustedScalarRange(scalars, comp, range);
+      return vtkMath::GetAdjustedScalarRange(scalars, comp, range);
       }
     }
   return 0;
