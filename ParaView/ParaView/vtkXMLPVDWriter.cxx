@@ -58,7 +58,7 @@ int vtkXMLPVDWriterMakeDirectory(const char* dirname)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.1.2.1");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.1.2.2");
 
 class vtkXMLPVDWriterInternals
 {
@@ -66,7 +66,7 @@ public:
   vtkstd::vector< vtkSmartPointer<vtkXMLWriter> > Writers;
   vtkstd::string FilePath;
   vtkstd::string FilePrefix;
-  vtkstd::vector<std::string> Entries;
+  vtkstd::vector<vtkstd::string> Entries;
   vtkstd::string CreatePieceFileName(int index);
 };
 
