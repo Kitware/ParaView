@@ -157,6 +157,7 @@ void vtkPVThreshold::CreateProperties()
   this->AllScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->AllScalarsCheck->Create(pvApp, "-text AllScalars");
   this->AllScalarsCheck->SetState(1);
+  this->AllScalarsCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->AllScalarsCheck->SetBalloonHelpString("If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.");
   
   // Command to update the UI.
@@ -182,6 +183,9 @@ void vtkPVThreshold::CreateProperties()
 void vtkPVThreshold::UpperValueCallback()
 {
   float lowerValue = this->LowerValueScale->GetValue();
+  
+  this->ChangeAcceptButtonColor();
+  
   if (this->UpperValueScale->GetValue() < lowerValue)
     {
     this->UpperValueScale->SetValue(lowerValue);
@@ -191,6 +195,9 @@ void vtkPVThreshold::UpperValueCallback()
 void vtkPVThreshold::LowerValueCallback()
 {
   float upperValue = this->UpperValueScale->GetValue();
+
+  this->ChangeAcceptButtonColor();
+  
   if (this->LowerValueScale->GetValue() > upperValue)
     {
     this->LowerValueScale->SetValue(upperValue);
@@ -201,6 +208,8 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
 {
   float range[2];
   vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  this->ChangeAcceptButtonColor();
   
   if (strcmp(newMode, "point") == 0)
     {

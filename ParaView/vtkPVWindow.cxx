@@ -881,55 +881,122 @@ void vtkPVWindow::ReadSourceInterfaces()
   vtkPVMethodInterface *mInt;
   vtkPVSourceInterface *sInt;
   
-  // ============= Image Sources ==============  
-
-  // ---- ImageReader ----
+  // ---- Axes ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkImageReader");
-  sInt->SetRootName("ImageRead");
-  sInt->SetOutputClassName("vtkImageData");
+  sInt->SetSourceClassName("vtkAxes");
+  sInt->SetRootName("Axes");
+  sInt->SetOutputClassName("vtkPolyData");
   // Method
   mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("FilePrefix");
-  mInt->SetSetCommand("SetFilePrefix");
-  mInt->SetGetCommand("GetFilePrefix");
-  mInt->AddStringArgument();
-  mInt->SetBalloonHelp("Set the prefix for the files for this image data.");
+  mInt->SetVariableName("Scale");
+  mInt->SetSetCommand("SetScaleFactor");
+  mInt->SetGetCommand("GetScaleFactor");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the size of the axes");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
   // Method
   mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("ScalarType");
-  mInt->SetSetCommand("SetDataScalarType");
-  mInt->SetGetCommand("GetDataScalarType");
-  mInt->AddIntegerArgument();
-  mInt->SetBalloonHelp("Set the scalar type for the data: unsigned char (3), short (4), unsigned short (5), int (6), float (10), double(11)");
+  mInt->SetVariableName("Origin");
+  mInt->SetSetCommand("SetOrigin");
+  mInt->SetGetCommand("GetOrigin");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the x, y, z coordinates of the origin of the axes");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
   // Method
   mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Extent");
-  mInt->SetSetCommand("SetDataExtent");
-  mInt->SetGetCommand("GetDataExtent");
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->SetBalloonHelp("Set the min and max values of the data in each dimension");
+  mInt->SetVariableName("Symmetric");
+  mInt->SetSetCommand("SetSymmetric");
+  mInt->SetGetCommand("GetSymmetric");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to display the negative axes");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
-  sInt = NULL;  
-  
+  sInt = NULL;
+
+  // ---- Cone ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkConeSource");
+  sInt->SetRootName("Cone");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Resolution");
+  mInt->SetSetCommand("SetResolution");
+  mInt->SetGetCommand("GetResolution");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the number of faces on this cone");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Radius");
+  mInt->SetSetCommand("SetRadius");
+  mInt->SetGetCommand("GetRadius");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the radius of the widest part of the cone");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Height");
+  mInt->SetSetCommand("SetHeight");
+  mInt->SetGetCommand("GetHeight");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the height of the cone");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Capping");
+  mInt->SetSetCommand("SetCapping");
+  mInt->SetGetCommand("GetCapping");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Set whether to draw the base of the cone");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- GenericDataSetReader ----.
+  sInt = vtkPVDataSetReaderInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkDataSetReader");
+  sInt->SetRootName("DataSet");
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- GenericEnSightReader ----.
+  sInt = vtkPVEnSightReaderInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkGenericEnSightReader");
+  sInt->SetRootName("EnSight");
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- Fractal Source ----
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -995,26 +1062,81 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ============= PolyData Sources ==============  
-  
-  // ---- STL Reader ----
+  // ---- ImageReader ----
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkSTLReader");
-  sInt->SetRootName("STLReader");
-  sInt->SetOutputClassName("vtkPolyData");
+  sInt->SetSourceClassName("vtkImageReader");
+  sInt->SetRootName("ImageRead");
+  sInt->SetOutputClassName("vtkImageData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("FilePrefix");
+  mInt->SetSetCommand("SetFilePrefix");
+  mInt->SetGetCommand("GetFilePrefix");
+  mInt->AddStringArgument();
+  mInt->SetBalloonHelp("Set the prefix for the files for this image data.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ScalarType");
+  mInt->SetSetCommand("SetDataScalarType");
+  mInt->SetGetCommand("GetDataScalarType");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the scalar type for the data: unsigned char (3), short (4), unsigned short (5), int (6), float (10), double(11)");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Extent");
+  mInt->SetSetCommand("SetDataExtent");
+  mInt->SetGetCommand("GetDataExtent");
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the min and max values of the data in each dimension");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;  
+  
+  // ---- POP Reader ----
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkPOPReader");
+  sInt->SetRootName("POPReader");
+  sInt->SetOutputClassName("vtkStructuredGrid");
   // Method
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("FileName");
   mInt->SetSetCommand("SetFileName");
   mInt->SetGetCommand("GetFileName");
   mInt->SetWidgetTypeToFile();
-  mInt->SetFileExtension("stl");
-  mInt->SetBalloonHelp("Select the data file for the STL data set");
+  mInt->SetFileExtension("pop");
+  mInt->SetBalloonHelp("Select the file for the data set");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Radius");
+  mInt->SetSetCommand("SetRadius");
+  mInt->SetGetCommand("GetRadius");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the radius of the data set");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;  
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
@@ -1114,94 +1236,21 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ---- Cone ----.
+  // ---- STL Reader ----
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkConeSource");
-  sInt->SetRootName("Cone");
+  sInt->SetSourceClassName("vtkSTLReader");
+  sInt->SetRootName("STLReader");
   sInt->SetOutputClassName("vtkPolyData");
   // Method
   mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Resolution");
-  mInt->SetSetCommand("SetResolution");
-  mInt->SetGetCommand("GetResolution");
-  mInt->AddIntegerArgument();
-  mInt->SetBalloonHelp("Set the number of faces on this cone");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Radius");
-  mInt->SetSetCommand("SetRadius");
-  mInt->SetGetCommand("GetRadius");
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the radius of the widest part of the cone");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Height");
-  mInt->SetSetCommand("SetHeight");
-  mInt->SetGetCommand("GetHeight");
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the height of the cone");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Capping");
-  mInt->SetSetCommand("SetCapping");
-  mInt->SetGetCommand("GetCapping");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Set whether to draw the base of the cone");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ---- Axes ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkAxes");
-  sInt->SetRootName("Axes");
-  sInt->SetOutputClassName("vtkPolyData");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Scale");
-  mInt->SetSetCommand("SetScaleFactor");
-  mInt->SetGetCommand("GetScaleFactor");
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the size of the axes");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Origin");
-  mInt->SetSetCommand("SetOrigin");
-  mInt->SetGetCommand("GetOrigin");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the x, y, z coordinates of the origin of the axes");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Symmetric");
-  mInt->SetSetCommand("SetSymmetric");
-  mInt->SetGetCommand("GetSymmetric");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Select whether to display the negative axes");
+  mInt->SetVariableName("FileName");
+  mInt->SetSetCommand("SetFileName");
+  mInt->SetGetCommand("GetFileName");
+  mInt->SetWidgetTypeToFile();
+  mInt->SetFileExtension("stl");
+  mInt->SetBalloonHelp("Select the data file for the STL data set");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1232,200 +1281,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ============= DataSet Sources ==============  
-  
-  // ---- GenericDataSetReader ----.
-  sInt = vtkPVDataSetReaderInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkDataSetReader");
-  sInt->SetRootName("DataSet");
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ---- GenericEnSightReader ----.
-  sInt = vtkPVEnSightReaderInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkGenericEnSightReader");
-  sInt->SetRootName("EnSight");
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // DataSet to PolyData Filters
-  
-  // ---- ExtractEdges ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkExtractEdges");
-  sInt->SetRootName("ExtractEdges");
-  sInt->SetInputClassName("vtkDataSet");
-  sInt->SetOutputClassName("vtkPolyData");
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ---- SingleContour ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkSingleContourFilter");
-  sInt->SetRootName("SingleContour");
-  sInt->SetInputClassName("vtkDataSet");
-  sInt->SetOutputClassName("vtkPolyData");
-  sInt->DefaultScalarsOn();
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Value");
-  mInt->SetSetCommand("SetFirstValue");
-  mInt->SetGetCommand("GetFirstValue");
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the contour value");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Normals");
-  mInt->SetSetCommand("SetComputeNormals");
-  mInt->SetGetCommand("GetComputeNormals");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Select whether to compute normals");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Gradients");
-  mInt->SetSetCommand("SetComputeGradients");
-  mInt->SetGetCommand("GetComputeGradients");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Select whether to compute gradients");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Scalars");
-  mInt->SetSetCommand("SetComputeScalars");
-  mInt->SetGetCommand("GetComputeScalars");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Select whether to compute scalars");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ---- Cut Plane ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkCutPlane");
-  sInt->SetRootName("CutPlane");
-  sInt->SetInputClassName("vtkDataSet");
-  sInt->SetOutputClassName("vtkPolyData");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Origin");
-  mInt->SetSetCommand("SetOrigin");
-  mInt->SetGetCommand("GetOrigin");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the x, y, z coordinates of the origin of the plane");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Normal");
-  mInt->SetSetCommand("SetNormal");
-  mInt->SetGetCommand("GetNormal");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the normal vector to the plane");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("GenerateCutScalars");
-  mInt->SetSetCommand("SetGenerateCutScalars");
-  mInt->SetGetCommand("GetGenerateCutScalars");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Select whether to generate scalars from the implicit function values or from the input scalar data");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ---- Cut Material ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkCutMaterial");
-  sInt->SetRootName("CutMaterial");
-  sInt->SetInputClassName("vtkDataSet");
-  sInt->SetOutputClassName("vtkPolyData");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("MaterialArray");
-  mInt->SetSetCommand("SetMaterialArrayName");
-  mInt->SetGetCommand("GetMaterialArrayName");
-  mInt->AddStringArgument();
-  mInt->SetBalloonHelp("Enter the array name of the cell array containing the material values");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Material");
-  mInt->SetSetCommand("SetMaterial");
-  mInt->SetGetCommand("GetMaterial");
-  mInt->AddIntegerArgument();
-  mInt->SetBalloonHelp("Set the value of the material to probe");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Array");
-  mInt->SetSetCommand("SetArrayName");
-  mInt->SetGetCommand("GetArrayName");
-  mInt->AddStringArgument();
-  mInt->SetBalloonHelp("Set the array name of the array to cut");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("UpVector");
-  mInt->SetSetCommand("SetUpVector");
-  mInt->SetGetCommand("GetUpVector");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Specify the normal vector of the plane to cut by");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ============= PolyData to PolyData Filters ==============
+  // Filters
   
   // ---- ClipPlane ----.
   sInt = vtkPVSourceInterface::New();
@@ -1528,21 +1384,323 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ---- Shrink ----.
+  // ---- Cut Material ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkShrinkPolyData");
-  sInt->SetRootName("Shrink");
+  sInt->SetSourceClassName("vtkCutMaterial");
+  sInt->SetRootName("CutMaterial");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("MaterialArray");
+  mInt->SetSetCommand("SetMaterialArrayName");
+  mInt->SetGetCommand("GetMaterialArrayName");
+  mInt->AddStringArgument();
+  mInt->SetBalloonHelp("Enter the array name of the cell array containing the material values");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Material");
+  mInt->SetSetCommand("SetMaterial");
+  mInt->SetGetCommand("GetMaterial");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the value of the material to probe");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Array");
+  mInt->SetSetCommand("SetArrayName");
+  mInt->SetGetCommand("GetArrayName");
+  mInt->AddStringArgument();
+  mInt->SetBalloonHelp("Set the array name of the array to cut");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("UpVector");
+  mInt->SetSetCommand("SetUpVector");
+  mInt->SetGetCommand("GetUpVector");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Specify the normal vector of the plane to cut by");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Cut Plane ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkCutPlane");
+  sInt->SetRootName("CutPlane");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Origin");
+  mInt->SetSetCommand("SetOrigin");
+  mInt->SetGetCommand("GetOrigin");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the x, y, z coordinates of the origin of the plane");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Normal");
+  mInt->SetSetCommand("SetNormal");
+  mInt->SetGetCommand("GetNormal");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the normal vector to the plane");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("GenerateCutScalars");
+  mInt->SetSetCommand("SetGenerateCutScalars");
+  mInt->SetGetCommand("GetGenerateCutScalars");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to generate scalars from the implicit function values or from the input scalar data");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- ElevationFilter ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkElevationFilter");
+  sInt->SetRootName("Elevation");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkDataSet");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("LowPoint");
+  mInt->SetSetCommand("SetLowPoint");
+  mInt->SetGetCommand("GetLowPoint");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();  
+  mInt->SetBalloonHelp("Set the minimum point for the elevation");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("HighPoint");
+  mInt->SetSetCommand("SetHighPoint");
+  mInt->SetGetCommand("GetHighPoint");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the maximum point for the elevation");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ScalarRange");
+  mInt->SetSetCommand("SetScalarRange");
+  mInt->SetGetCommand("GetScalarRange");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the range of scalar values to generate");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- ExtractEdges ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkExtractEdges");
+  sInt->SetRootName("ExtractEdges");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- ExtractGrid ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkExtractGrid");
+  sInt->SetRootName("ExtractGrid");
+  sInt->SetInputClassName("vtkStructuredGrid");
+  sInt->SetOutputClassName("vtkStructuredGrid");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("VOI");
+  mInt->SetSetCommand("SetVOI");
+  mInt->SetGetCommand("GetVOI");
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the min/max values of the volume of interest (VOI)");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("SampleRate");
+  mInt->SetSetCommand("SetSampleRate");
+  mInt->SetGetCommand("GetSampleRate");
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the sampling rate for each dimension");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("IncludeBoundary");
+  mInt->SetSetCommand("SetIncludeBoundary");
+  mInt->SetGetCommand("GetIncludeBoundary");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to always include the boundary of the grid in the output");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- ExtractPolyDataPiece ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkExtractPolyDataPiece");
+  sInt->SetRootName("PDPiece");
   sInt->SetInputClassName("vtkPolyData");
   sInt->SetOutputClassName("vtkPolyData");
   // Method
   mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("ShrinkFactor");
-  mInt->SetSetCommand("SetShrinkFactor");
-  mInt->SetGetCommand("GetShrinkFactor");
+  mInt->SetVariableName("GhostCells");
+  mInt->SetSetCommand("SetCreateGhostCells");
+  mInt->SetGetCommand("GetCreateGhostCells");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to generate ghost cells");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- ExtractUnstructuredGridPiece ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkExtractUnstructuredGridPiece");
+  sInt->SetRootName("UGPiece");
+  sInt->SetInputClassName("vtkUnstructuredGrid");
+  sInt->SetOutputClassName("vtkUnstructuredGrid");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("GhostCells");
+  mInt->SetSetCommand("SetCreateGhostCells");
+  mInt->SetGetCommand("GetCreateGhostCells");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to generate ghost cells");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- LinearExtrusion ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkLinearExtrusionFilter");
+  sInt->SetRootName("LinExtrude");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Capping");
+  mInt->SetSetCommand("SetCapping");
+  mInt->SetGetCommand("GetCapping");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to draw endcaps");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ScaleFactor");
+  mInt->SetSetCommand("SetScaleFactor");
+  mInt->SetGetCommand("GetScaleFactor");
   mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the amount to shrink by");
+  mInt->SetBalloonHelp("Set the extrusion scale factor");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Vector");
+  mInt->SetSetCommand("SetVector");
+  mInt->SetGetCommand("GetVector");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the direction for the extrusion");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- PieceScalars ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkPieceScalars");
+  sInt->SetRootName("ColorPieces");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkDataSet");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Random");
+  mInt->SetSetCommand("SetRandomMode");
+  mInt->SetGetCommand("GetRandomMode");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to use random colors for the various pieces");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1569,19 +1727,6 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ---- Triangle ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkTriangleFilter");
-  sInt->SetRootName("Tri");
-  sInt->SetInputClassName("vtkPolyData");
-  sInt->SetOutputClassName("vtkPolyData");
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
@@ -1637,6 +1782,170 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Shrink ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkShrinkPolyData");
+  sInt->SetRootName("Shrink");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ShrinkFactor");
+  mInt->SetSetCommand("SetShrinkFactor");
+  mInt->SetGetCommand("GetShrinkFactor");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the amount to shrink by");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- FieldDataToAttributeDataFilter ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkSimpleFieldDataToAttributeDataFilter");
+  sInt->SetRootName("FieldToAttr");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkDataSet");
+  // Method
+  //mInt = vtkPVMethodInterface::New();
+  //mInt->SetVariableName("AttributeType");
+  //mInt->SetSetCommand("SetAttributeType");
+  //mInt->SetGetCommand("GetAttributeType");
+  //mInt->SetWidgetTypeToSelection();
+  //mInt->AddSelectionEntry(0, "Point");
+  //mInt->AddSelectionEntry(1, "Cell");
+  //sInt->AddMethodInterface(mInt);
+  //mInt->Delete();
+  //mInt = NULL;  
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Attribute");
+  mInt->SetSetCommand("SetAttribute");
+  mInt->SetGetCommand("GetAttribute");
+  mInt->SetWidgetTypeToSelection();
+  mInt->AddSelectionEntry(0, "Scalars");
+  mInt->AddSelectionEntry(1, "Vectors");
+  mInt->SetBalloonHelp("Select whether the array contains scalars or vectors");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Field Name");
+  mInt->SetSetCommand("SetFieldName");
+  mInt->SetGetCommand("GetFieldName");
+  mInt->AddStringArgument();
+  mInt->SetBalloonHelp("Set the name of the array containing the data to operate on");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- SingleContour ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkSingleContourFilter");
+  sInt->SetRootName("SingleContour");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  sInt->DefaultScalarsOn();
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Value");
+  mInt->SetSetCommand("SetFirstValue");
+  mInt->SetGetCommand("GetFirstValue");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the contour value");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Normals");
+  mInt->SetSetCommand("SetComputeNormals");
+  mInt->SetGetCommand("GetComputeNormals");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to compute normals");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Gradients");
+  mInt->SetSetCommand("SetComputeGradients");
+  mInt->SetGetCommand("GetComputeGradients");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to compute gradients");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Scalars");
+  mInt->SetSetCommand("SetComputeScalars");
+  mInt->SetGetCommand("GetComputeScalars");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to compute scalars");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+  
+  // ---- Geometry ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkStructuredGridGeometryFilter");
+  sInt->SetRootName("GridGeom");
+  sInt->SetInputClassName("vtkStructuredGrid");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Extent");
+  mInt->SetSetCommand("SetExtent");
+  mInt->SetGetCommand("GetExtent");
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the min/max extents of the grid");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Triangle ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkTriangleFilter");
+  sInt->SetRootName("Tri");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
@@ -1706,337 +2015,5 @@ void vtkPVWindow::ReadSourceInterfaces()
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
-  sInt = NULL;
-
-  // ---- LinearExtrusion ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkLinearExtrusionFilter");
-  sInt->SetRootName("LinExtrude");
-  sInt->SetInputClassName("vtkPolyData");
-  sInt->SetOutputClassName("vtkPolyData");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Capping");
-  mInt->SetSetCommand("SetCapping");
-  mInt->SetGetCommand("GetCapping");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Select whether to draw endcaps");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("ScaleFactor");
-  mInt->SetSetCommand("SetScaleFactor");
-  mInt->SetGetCommand("GetScaleFactor");
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the extrusion scale factor");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Vector");
-  mInt->SetSetCommand("SetVector");
-  mInt->SetGetCommand("GetVector");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the direction for the extrusion");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ---- ExtractPolyDataPiece ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkExtractPolyDataPiece");
-  sInt->SetRootName("PDPiece");
-  sInt->SetInputClassName("vtkPolyData");
-  sInt->SetOutputClassName("vtkPolyData");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("GhostCells");
-  mInt->SetSetCommand("SetCreateGhostCells");
-  mInt->SetGetCommand("GetCreateGhostCells");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Select whether to generate ghost cells");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // UnstructuredGrid to UnstructuredGrid Filters
-
-  // ---- ExtractUnstructuredGridPiece ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkExtractUnstructuredGridPiece");
-  sInt->SetRootName("UGPiece");
-  sInt->SetInputClassName("vtkUnstructuredGrid");
-  sInt->SetOutputClassName("vtkUnstructuredGrid");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("GhostCells");
-  mInt->SetSetCommand("SetCreateGhostCells");
-  mInt->SetGetCommand("GetCreateGhostCells");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Select whether to generate ghost cells");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-
-  // StructuredGrid to StructuredGrid Filters
-
-  // ---- ExtractGrid ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkExtractGrid");
-  sInt->SetRootName("ExtractGrid");
-  sInt->SetInputClassName("vtkStructuredGrid");
-  sInt->SetOutputClassName("vtkStructuredGrid");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("VOI");
-  mInt->SetSetCommand("SetVOI");
-  mInt->SetGetCommand("GetVOI");
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->SetBalloonHelp("Set the min/max values of the volume of interest (VOI)");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("SampleRate");
-  mInt->SetSetCommand("SetSampleRate");
-  mInt->SetGetCommand("GetSampleRate");
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->SetBalloonHelp("Set the sampling rate for each dimension");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("IncludeBoundary");
-  mInt->SetSetCommand("SetIncludeBoundary");
-  mInt->SetGetCommand("GetIncludeBoundary");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Select whether to always include the boundary of the grid in the output");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-
-  // StructuredGrid to PolyData Filters
-  
-  // ---- Geometry ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkStructuredGridGeometryFilter");
-  sInt->SetRootName("GridGeom");
-  sInt->SetInputClassName("vtkStructuredGrid");
-  sInt->SetOutputClassName("vtkPolyData");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Extent");
-  mInt->SetSetCommand("SetExtent");
-  mInt->SetGetCommand("GetExtent");
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->SetBalloonHelp("Set the min/max extents of the grid");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  
-  // DataSet to DataSet Filters
-  
-  // ---- PieceScalars ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkPieceScalars");
-  sInt->SetRootName("ColorPieces");
-  sInt->SetInputClassName("vtkDataSet");
-  sInt->SetOutputClassName("vtkDataSet");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Random");
-  mInt->SetSetCommand("SetRandomMode");
-  mInt->SetGetCommand("GetRandomMode");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Select whether to use random colors for the various pieces");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ---- ElevationFilter ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkElevationFilter");
-  sInt->SetRootName("Elevation");
-  sInt->SetInputClassName("vtkDataSet");
-  sInt->SetOutputClassName("vtkDataSet");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("LowPoint");
-  mInt->SetSetCommand("SetLowPoint");
-  mInt->SetGetCommand("GetLowPoint");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();  
-  mInt->SetBalloonHelp("Set the minimum point for the elevation");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("HighPoint");
-  mInt->SetSetCommand("SetHighPoint");
-  mInt->SetGetCommand("GetHighPoint");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the maximum point for the elevation");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("ScalarRange");
-  mInt->SetSetCommand("SetScalarRange");
-  mInt->SetGetCommand("GetScalarRange");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the range of scalar values to generate");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // ---- FieldDataToAttributeDataFilter ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkSimpleFieldDataToAttributeDataFilter");
-  sInt->SetRootName("FieldToAttr");
-  sInt->SetInputClassName("vtkDataSet");
-  sInt->SetOutputClassName("vtkDataSet");
-  // Method
-  //mInt = vtkPVMethodInterface::New();
-  //mInt->SetVariableName("AttributeType");
-  //mInt->SetSetCommand("SetAttributeType");
-  //mInt->SetGetCommand("GetAttributeType");
-  //mInt->SetWidgetTypeToSelection();
-  //mInt->AddSelectionEntry(0, "Point");
-  //mInt->AddSelectionEntry(1, "Cell");
-  //sInt->AddMethodInterface(mInt);
-  //mInt->Delete();
-  //mInt = NULL;  
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Attribute");
-  mInt->SetSetCommand("SetAttribute");
-  mInt->SetGetCommand("GetAttribute");
-  mInt->SetWidgetTypeToSelection();
-  mInt->AddSelectionEntry(0, "Scalars");
-  mInt->AddSelectionEntry(1, "Vectors");
-  mInt->SetBalloonHelp("Select whether the array contains scalars or vectors");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Field Name");
-  mInt->SetSetCommand("SetFieldName");
-  mInt->SetGetCommand("GetFieldName");
-  mInt->AddStringArgument();
-  mInt->SetBalloonHelp("Set the name of the array containing the data to operate on");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
-  // Structured grid sources
-
-  // ---- POP Reader ----
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkPOPReader");
-  sInt->SetRootName("POPReader");
-  sInt->SetOutputClassName("vtkStructuredGrid");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("FileName");
-  mInt->SetSetCommand("SetFileName");
-  mInt->SetGetCommand("GetFileName");
-  mInt->SetWidgetTypeToFile();
-  mInt->SetFileExtension("pop");
-  mInt->SetBalloonHelp("Select the file for the data set");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Radius");
-  mInt->SetSetCommand("SetRadius");
-  mInt->SetGetCommand("GetRadius");
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Set the radius of the data set");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;  
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
+  sInt = NULL;  
 }
-
-

@@ -230,6 +230,11 @@ public:
   // interface directly.
   void SetInterface(vtkPVSourceInterface *pvsi);
   vtkPVSourceInterface *GetInterface() {return this->Interface;}
+
+  // Description:
+  // Make the Accept button turn red when one of the parameters has changed.
+  void ChangeAcceptButtonColor();
+  void EntryChanged(float f1, float f2);
   
 protected:
   vtkPVSource();

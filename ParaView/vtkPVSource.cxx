@@ -366,7 +366,7 @@ void vtkPVSource::CreateProperties()
   this->Script("pack %s -fill x -expand t", frame->GetWidgetName());  
   
   this->AcceptButton->SetParent(frame);
-  this->AcceptButton->Create(this->Application, "-text Accept");
+  this->AcceptButton->Create(this->Application, "-text Accept -background red1");
   this->AcceptButton->SetCommand(this, "AcceptCallback");
   this->AcceptButton->SetBalloonHelpString("Cause the current values in the user interface to take effect");
   this->Script("pack %s -side left -fill x -expand t", 
@@ -418,9 +418,6 @@ void vtkPVSource::CreateProperties()
   
   this->ScalarOperationMenu->SetParent(this->ScalarOperationFrame);
   this->ScalarOperationMenu->Create(this->Application, "");
-  this->ScalarOperationMenu->AddEntryWithCommand("Default Point Scalars",
-                                                 this, "ChangeScalars");
-  this->ScalarOperationMenu->SetValue("Default Point Scalars");
   this->ScalarOperationMenu->SetBalloonHelpString("Select which array to use as point scalars for this filter");
   
   // Isolate events to this window untill accept or cancel is pressed.
@@ -433,7 +430,7 @@ void vtkPVSource::CreateProperties()
 
 void vtkPVSource::PackScalarsMenu()
 {
-  int i;
+  int i, defaultSet = 0;
   vtkFieldData *fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetFieldData();
   
   if (fd)
@@ -444,6 +441,11 @@ void vtkPVSource::PackScalarsMenu()
         {
         this->ScalarOperationMenu->AddEntryWithCommand(fd->GetArrayName(i),
                                                        this, "ChangeScalars");
+        if (!defaultSet)
+          {
+          this->ScalarOperationMenu->SetValue(fd->GetArrayName(i));
+          defaultSet = 1;
+          }
         }
       }
     }
@@ -459,6 +461,8 @@ void vtkPVSource::ChangeScalars()
   char *newScalars = this->ScalarOperationMenu->GetValue();
   vtkPVApplication *pvApp = this->GetPVApplication();
   
+  this->ChangeAcceptButtonColor();
+  
   if (this->DefaultScalarsName)
     {
     if (strcmp(newScalars, this->DefaultScalarsName) == 0)
@@ -466,52 +470,34 @@ void vtkPVSource::ChangeScalars()
       return;
       }
     }
-  else if (strcmp(newScalars, "Default Point Scalars") == 0)
-    {
-    return;
-    }
-  
-  if (strcmp(newScalars, "Default Point Scalars") == 0)
+
+  if (this->DefaultScalarsName)
     {
     delete [] this->DefaultScalarsName;
     this->DefaultScalarsName = NULL;
-    pvApp->BroadcastScript("%s SetInput [%s GetInput]",
-                           this->VTKSourceTclName,
-                           this->ChangeScalarsFilterTclName);
-    pvApp->BroadcastScript("%s Delete", this->ChangeScalarsFilterTclName);
-    delete [] this->ChangeScalarsFilterTclName;
-    this->ChangeScalarsFilterTclName = NULL;
     }
+  this->SetDefaultScalarsName(newScalars);
+  if (!this->ChangeScalarsFilterTclName)
+    {
+    char tclName[256];
+    sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
+    this->SetChangeScalarsFilterTclName(tclName);
+      }
   else
     {
-    if (this->DefaultScalarsName)
-      {
-      delete [] this->DefaultScalarsName;
-      this->DefaultScalarsName = NULL;
-      }
-    this->SetDefaultScalarsName(newScalars);
-    if (!this->ChangeScalarsFilterTclName)
-      {
-      char tclName[256];
-      sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
-      this->SetChangeScalarsFilterTclName(tclName);
-      }
-    else
-      {
-      pvApp->BroadcastScript("%s Delete", this->ChangeScalarsFilterTclName);
-      }
-    pvApp->BroadcastScript("vtkSimpleFieldDataToAttributeDataFilter %s",
-                           this->ChangeScalarsFilterTclName);
-    pvApp->BroadcastScript("%s SetInput [%s GetInput]",
-                           this->ChangeScalarsFilterTclName,
-                           this->VTKSourceTclName);
-    pvApp->BroadcastScript("%s SetFieldName %s",
-                           this->ChangeScalarsFilterTclName,
-                           this->DefaultScalarsName);
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-                           this->VTKSourceTclName,
-                           this->ChangeScalarsFilterTclName);
+    pvApp->BroadcastScript("%s Delete", this->ChangeScalarsFilterTclName);
     }
+  pvApp->BroadcastScript("vtkSimpleFieldDataToAttributeDataFilter %s",
+                         this->ChangeScalarsFilterTclName);
+  pvApp->BroadcastScript("%s SetInput [%s GetInput]",
+                         this->ChangeScalarsFilterTclName,
+                         this->VTKSourceTclName);
+  pvApp->BroadcastScript("%s SetFieldName %s",
+                         this->ChangeScalarsFilterTclName,
+                         this->DefaultScalarsName);
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
+                         this->VTKSourceTclName,
+                         this->ChangeScalarsFilterTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -563,6 +549,8 @@ void vtkPVSource::UpdateInputList()
 void vtkPVSource::ChangeInput(const char *inputTclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  this->ChangeAcceptButtonColor();
   
   pvApp->BroadcastScript("%s SetNthPVInput 0 %s",
                          this->GetTclName(),
@@ -692,6 +680,9 @@ void vtkPVSource::AcceptCallback()
   vtkPVSource *source;
   
   window = this->GetWindow();
+  
+  this->Script("%s configure -background gray75",
+               this->AcceptButton->GetWidgetName());
   
   // Call the commands to set ivars from widget values.
   for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
@@ -1293,6 +1284,7 @@ vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
   this->Widgets->AddItem(check);
   check->SetParent(frame);
   check->Create(this->Application, "");
+  check->SetCommand(this, "ChangeAcceptButtonColor");
   if (help)
     {
     check->SetBalloonHelpString(help);
@@ -1360,6 +1352,8 @@ vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
   this->Widgets->AddItem(entry);
   entry->SetParent(frame);
   entry->Create(this->Application, "");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               entry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     entry->SetBalloonHelpString(help);
@@ -1450,6 +1444,8 @@ vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd,
   this->Widgets->AddItem(entry);
   entry->SetParent(frame);
   entry->Create(this->Application, "");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               entry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     entry->SetBalloonHelpString(help);
@@ -1516,6 +1512,8 @@ vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
   this->Widgets->AddItem(entry);
   entry->SetParent(frame);
   entry->Create(this->Application, "");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               entry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     entry->SetBalloonHelpString(help);
@@ -1594,6 +1592,8 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   this->Widgets->AddItem(minEntry);
   minEntry->SetParent(frame);
   minEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               minEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     minEntry->SetBalloonHelpString(help);
@@ -1616,6 +1616,8 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   this->Widgets->AddItem(maxEntry);
   maxEntry->SetParent(frame);
   maxEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               maxEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     maxEntry->SetBalloonHelpString(help);
@@ -1694,6 +1696,8 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
   xEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               xEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     xEntry->SetBalloonHelpString(help);
@@ -1716,6 +1720,8 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
   yEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               yEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     yEntry->SetBalloonHelpString(help);
@@ -1738,6 +1744,8 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
   zEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               zEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     zEntry->SetBalloonHelpString(help);
@@ -1820,6 +1828,8 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
   xEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               xEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     xEntry->SetBalloonHelpString(help);
@@ -1842,6 +1852,8 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
   yEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               yEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     yEntry->SetBalloonHelpString(help);
@@ -1864,6 +1876,8 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
   zEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               zEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     zEntry->SetBalloonHelpString(help);
@@ -1886,6 +1900,8 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(wEntry);
   wEntry->SetParent(frame);
   wEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               wEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     wEntry->SetBalloonHelpString(help);
@@ -1974,6 +1990,8 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(uEntry);
   uEntry->SetParent(frame);
   uEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               uEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     uEntry->SetBalloonHelpString(help);
@@ -1996,6 +2014,8 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(vEntry);
   vEntry->SetParent(frame);
   vEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               vEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     vEntry->SetBalloonHelpString(help);
@@ -2018,6 +2038,8 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(wEntry);
   wEntry->SetParent(frame);
   wEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               wEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     wEntry->SetBalloonHelpString(help);
@@ -2040,6 +2062,8 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
   xEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               xEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     xEntry->SetBalloonHelpString(help);
@@ -2062,6 +2086,8 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
   yEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               yEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     yEntry->SetBalloonHelpString(help);
@@ -2084,6 +2110,8 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
   zEntry->Create(this->Application, "-width 2");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               zEntry->GetWidgetName(), this->GetTclName());
   if (help)
     {
     zEntry->SetBalloonHelpString(help);
@@ -2159,6 +2187,7 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
   this->Widgets->AddItem(slider);
   slider->SetParent(frame);
   slider->Create(this->Application, "-showvalue 1");
+  slider->SetCommand(this, "ChangeAcceptButtonColor");
   slider->SetRange(min, max);
   slider->SetResolution(resolution);
   if (help)
@@ -2221,7 +2250,8 @@ vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd,
   vtkPVSelectionList *sl = vtkPVSelectionList::New();  
   this->Widgets->AddItem(sl);
   sl->SetParent(frame);
-  sl->Create(this->Application);  
+  sl->Create(this->Application);
+  sl->SetCommand(this, "ChangeAcceptButtonColor");
   if (help)
     {
     sl->SetBalloonHelpString(help);
@@ -2262,4 +2292,17 @@ void vtkPVSource::AddModeListItem(char *name, int value)
     return;
     }
   this->LastSelectionList->AddItem(name, value);
+}
+
+void vtkPVSource::ChangeAcceptButtonColor()
+{
+  this->Script("%s configure -background red1",
+               this->AcceptButton->GetWidgetName());
+}
+
+// This is necessary because -xscrollcommand passes 2 arguments to the
+// method it calls, and entry widgets don't have a -command.
+void vtkPVSource::EntryChanged(float vtkNotUsed(f1), float vtkNotUsed(f2))
+{
+  this->ChangeAcceptButtonColor();
 }

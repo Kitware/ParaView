@@ -136,6 +136,7 @@ void vtkPVContour::CreateProperties()
   this->ComputeNormalsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ComputeNormalsCheck->Create(pvApp, "-text \"Compute Normals\"");
   this->ComputeNormalsCheck->SetState(1);
+  this->ComputeNormalsCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ComputeNormalsCheck->SetBalloonHelpString("Select whether to compute normals");
   
   this->CancelCommands->AddString("%s SetState [%s %s]",
@@ -151,6 +152,7 @@ void vtkPVContour::CreateProperties()
   this->ComputeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ComputeGradientsCheck->Create(pvApp, "-text \"Compute Gradients\"");
   this->ComputeGradientsCheck->SetState(0);
+  this->ComputeGradientsCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ComputeGradientsCheck->SetBalloonHelpString("Select whether to compute gradients");
   
   this->CancelCommands->AddString("%s SetState [%s %s]",
@@ -166,6 +168,7 @@ void vtkPVContour::CreateProperties()
   this->ComputeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ComputeScalarsCheck->Create(pvApp, "-text \"Compute Scalars\"");
   this->ComputeScalarsCheck->SetState(1);
+  this->ComputeScalarsCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ComputeScalarsCheck->SetBalloonHelpString("Select whether to compute scalars");
   
   this->CancelCommands->AddString("%s SetState [%s %s]",
@@ -194,6 +197,7 @@ void vtkPVContour::AddValueCallback()
 
   this->ContourValuesList->AppendUnique(this->NewValueEntry->GetValue());
   this->NewValueEntry->SetValue("");
+  this->ChangeAcceptButtonColor();
 }
 
 void vtkPVContour::DeleteValueCallback()
@@ -202,6 +206,7 @@ void vtkPVContour::DeleteValueCallback()
   
   index = this->ContourValuesList->GetSelectionIndex();
   this->ContourValuesList->DeleteRange(index, index);
+  this->ChangeAcceptButtonColor();
 }
 
 void vtkPVContour::ContourValuesAcceptCallback()

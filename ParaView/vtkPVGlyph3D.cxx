@@ -156,10 +156,14 @@ void vtkPVGlyph3D::CreateProperties()
   
   this->ScaleModeMenu->SetParent(this->ScaleModeFrame);
   this->ScaleModeMenu->Create(pvApp, "");
-  this->ScaleModeMenu->AddEntry("Scalar");
-  this->ScaleModeMenu->AddEntry("Vector");
-  this->ScaleModeMenu->AddEntry("Vector Components");
-  this->ScaleModeMenu->AddEntry("Data Scaling Off");
+  this->ScaleModeMenu->AddEntryWithCommand("Scalar", this,
+                                           "ChangeAcceptButtonColor");
+  this->ScaleModeMenu->AddEntryWithCommand("Vector", this,
+                                           "ChangeAcceptButtonColor");
+  this->ScaleModeMenu->AddEntryWithCommand("Vector Components", this,
+                                           "ChangeAcceptButtonColor");
+  this->ScaleModeMenu->AddEntryWithCommand("Data Scaling Off", this,
+                                           "ChangeAcceptButtonColor");
   this->ScaleModeMenu->SetValue("Scalar");
   this->ScaleModeMenu->SetBalloonHelpString("Select whether/how to scale the glyphs");  
   this->SetGlyphScaleMode("Scalar");
@@ -186,9 +190,12 @@ void vtkPVGlyph3D::CreateProperties()
   
   this->VectorModeMenu->SetParent(this->VectorModeFrame);
   this->VectorModeMenu->Create(pvApp, "");
-  this->VectorModeMenu->AddEntry("Normal");
-  this->VectorModeMenu->AddEntry("Vector");
-  this->VectorModeMenu->AddEntry("Vector Rotation Off");
+  this->VectorModeMenu->AddEntryWithCommand("Normal", this,
+                                            "ChangeAcceptButtonColor");
+  this->VectorModeMenu->AddEntryWithCommand("Vector", this,
+                                            "ChangeAcceptButtonColor");
+  this->VectorModeMenu->AddEntryWithCommand("Vector Rotation Off", this,
+                                            "ChangeAcceptButtonColor");
   this->VectorModeMenu->SetValue("Vector");
   this->VectorModeMenu->SetBalloonHelpString("Select what to use as vectors for scaling/rotation");
   this->SetGlyphVectorMode("Vector");
@@ -206,6 +213,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->OrientCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->OrientCheck->Create(pvApp, "-text Orient");
   this->OrientCheck->SetState(1);
+  this->OrientCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->OrientCheck->SetBalloonHelpString("Select whether to orient the glyphs");
   
   this->CancelCommands->AddString("%s SetState [%s GetOrient]",
@@ -219,6 +227,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->ScaleCheck->SetParent(this->GetParameterFrame()->GetFrame());
   this->ScaleCheck->Create(pvApp, "-text Scale");
   this->ScaleCheck->SetState(1);
+  this->ScaleCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ScaleCheck->SetBalloonHelpString("Select whether to scale the glyphs");
   
   this->CancelCommands->AddString("%s SetState [%s GetScaling]",
@@ -233,6 +242,9 @@ void vtkPVGlyph3D::CreateProperties()
   this->ScaleEntry->Create(pvApp);
   this->ScaleEntry->SetLabel("Scale Factor:");
   this->ScaleEntry->SetValue("1.0");
+  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
+               this->ScaleEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
   this->ScaleEntry->SetBalloonHelpString("Select the amount to scale the glyphs by");
   
   this->CancelCommands->AddString("%s SetValue [%s GetScaleFactor]",
@@ -328,7 +340,8 @@ void vtkPVGlyph3D::UpdateSourceMenu()
         {
         this->SetGlyphSourceTclName(tclName);
         }
-      this->GlyphSourceMenu->AddEntry(tclName);
+      this->GlyphSourceMenu->AddEntryWithCommand(tclName, this,
+                                                 "ChangeAcceptButtonColor");
       }
     }
 }

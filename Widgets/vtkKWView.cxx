@@ -166,6 +166,7 @@ vtkKWView::vtkKWView()
   this->Renderer = vtkRenderer::New();
   this->RenderWindow = vtkRenderWindow::New();
   this->RenderWindow->AddRenderer(this->Renderer);
+  this->RenderWindow->SetAbortCheckMethod(KWViewAbortCheckMethod, (void*)this);
 }
 
 vtkKWView::~vtkKWView()
@@ -1193,7 +1194,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.35 $");
+  this->ExtractRevision(os,"$Revision: 1.36 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
