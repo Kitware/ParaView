@@ -584,8 +584,8 @@ void vtkPVActorComposite::CreateProperties()
   this->PointSizeScale->Create(this->Application, "-showvalue 1");
   this->PointSizeScale->SetRange(1, 5);
   this->PointSizeScale->SetResolution(1);
-  this->PointSizeScale->SetCommand(this, "ChangePointSize");
   this->PointSizeScale->SetValue(1);
+  this->PointSizeScale->SetCommand(this, "ChangePointSize");
 
   this->LineWidthLabel->SetParent(this->DisplayScalesFrame);
   this->LineWidthLabel->Create(this->Application, "");
@@ -595,8 +595,8 @@ void vtkPVActorComposite::CreateProperties()
   this->LineWidthScale->Create(this->Application, "-showvalue 1");
   this->LineWidthScale->SetRange(1, 5);
   this->LineWidthScale->SetResolution(1);
-  this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
   this->LineWidthScale->SetValue(1);
+  this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
   
   
   this->ScalarBarCheck->SetParent(this->ScalarBarCheckFrame);
