@@ -60,12 +60,7 @@ public:
   // Description:
   // Callbacks that initialize and finish the compositing.
   virtual void StartRender();
-  void ResetCamera(vtkRenderer *ren);
-  void ResetCameraClippingRange(vtkRenderer *ren);
-  void ComputeVisiblePropBounds(vtkRenderer *ren, 
-                                float bounds[6]);
   void RenderRMI();
-  void ComputeVisiblePropBoundsRMI();
   
   // Description:
   // If the user wants to handle the event loop, then they must call this
@@ -163,8 +158,6 @@ protected:
   int ClientFlag;
   unsigned long StartTag;
   //unsigned long EndTag;
-  unsigned long ResetCameraTag;
-  unsigned long ResetCameraClippingRangeTag;
   
   void SetPDataSize(int x, int y);
   void ReallocPDataArrays();

@@ -51,7 +51,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.13");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.14");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -61,7 +61,6 @@ struct vtkClientRenderWindowInfo
 {
   int Size[2];
   int NumberOfRenderers;
-  float DesiredUpdateRate;
   int ReductionFactor;
 };
 
@@ -194,31 +193,6 @@ vtkClientCompositeManager::~vtkClientCompositeManager()
 //=======================  Client ========================
 
 
-//-------------------------------------------------------------------------
-void vtkClientCompositeManagerResetCamera(vtkObject *vtkNotUsed(caller),
-                                          unsigned long vtkNotUsed(event), 
-                                          void *vtkNotUsed(clientData), void *)
-{
-  /*
-  vtkClientCompositeManager *self = (vtkClientCompositeManager *)clientData;
-  vtkRenderer *ren = (vtkRenderer*)caller;
-
-  self->ResetCamera(ren);
-  */
-}
-
-//-------------------------------------------------------------------------
-void vtkClientCompositeManagerResetCameraClippingRange(vtkObject *vtkNotUsed(caller), 
-                   unsigned long vtkNotUsed(event),void *vtkNotUsed(clientData), void *)
-{
-  /*
-  vtkClientCompositeManager *self = (vtkClientCompositeManager *)clientData;
-  vtkRenderer *ren = (vtkRenderer*)caller;
-
-  self->ResetCameraClippingRange(ren);
-  */
-}
-
 
 //-------------------------------------------------------------------------
 // We may want to pass the render window as an argument for a sanity check.
@@ -292,7 +266,6 @@ void vtkClientCompositeManager::StartRender()
   size = this->RenderWindow->GetSize();
   winInfo.Size[0] = size[0]/this->ReductionFactor;
   winInfo.Size[1] = size[1]/this->ReductionFactor;
-  winInfo.DesiredUpdateRate = updateRate;
   winInfo.ReductionFactor = this->ReductionFactor;
   winInfo.NumberOfRenderers = rens->GetNumberOfItems();
   this->SetPDataSize(winInfo.Size[0], winInfo.Size[1]);
@@ -300,8 +273,11 @@ void vtkClientCompositeManager::StartRender()
   controller->TriggerRMI(1, vtkClientCompositeManager::RENDER_RMI_TAG);
 
   // Synchronize the size of the windows.
-  controller->Send((char*)(&winInfo), 
-                   sizeof(vtkClientRenderWindowInfo), 1, 
+  //controller->Send((char*)(&winInfo), 
+  //                 sizeof(vtkClientRenderWindowInfo), 1, 
+  //                 vtkClientCompositeManager::WIN_INFO_TAG);
+  // Let the socket controller deal with byte swapping.
+  controller->Send((int*)(&winInfo), 4, 1, 
                    vtkClientCompositeManager::WIN_INFO_TAG);
   
   // Make sure the satellite renderers have the same camera I do.
@@ -334,8 +310,11 @@ void vtkClientCompositeManager::StartRender()
       }
     ren->GetBackground(renInfo.Background);
     ren->Clear();
-    controller->Send((char*)(&renInfo),
-                     sizeof(struct vtkClientRendererInfo), 1, 
+    //controller->Send((char*)(&renInfo),
+    //                 sizeof(struct vtkClientRendererInfo), 1, 
+    //                 vtkCompositeManager::REN_INFO_TAG);
+    // Let the socket controller deal with byte swapping.
+    controller->Send((float*)(&renInfo), 22, 1,
                      vtkCompositeManager::REN_INFO_TAG);
     }
   
@@ -644,72 +623,7 @@ void vtkClientCompositeManager::DoubleBuffer(vtkDataArray* localP,
     newLocalPData += outYInc;
    }
 }
-      
 
-
-
-//-------------------------------------------------------------------------
-void vtkClientCompositeManager::ResetCamera(vtkRenderer *vtkNotUsed(ren))
-{
-  /*
-  float bounds[6];
-
-  if (this->ClientController == NULL)
-    {
-    return;
-    }
-  
-  this->ComputeVisiblePropBounds(ren, bounds);
-  // Keep from setting camera from some outrageous value.
-  if (bounds[0]>bounds[1] || bounds[2]>bounds[3] || bounds[4]>bounds[5])
-    {
-    // See if the not pickable values are better.
-    ren->ComputeVisiblePropBounds(bounds);
-    if (bounds[0]>bounds[1] || bounds[2]>bounds[3] || bounds[4]>bounds[5])
-      {
-      return;
-      }
-    }
-  ren->ResetCamera(bounds);
-  */
-}
-
-//-------------------------------------------------------------------------
-void vtkClientCompositeManager::ResetCameraClippingRange(vtkRenderer *vtkNotUsed(ren))
-{
-  /*
-  float bounds[6];
-
-  if (this->ClientController == NULL)
-    {
-    return;
-    }
-  
-  this->ComputeVisiblePropBounds(ren, bounds);
-  ren->ResetCameraClippingRange(bounds);
-  */
-}
-
-//----------------------------------------------------------------------------
-void vtkClientCompositeManager::ComputeVisiblePropBounds(vtkRenderer *ren, 
-                                                         float bounds[6])
-{
-  float tmp[6];
-
-  // Make this into a real tag !!!!!
-  this->ClientController->TriggerRMI(1,8883);
-
-  // Make this ignore the rotation cursor. (not pickable).
-  ren->ComputeVisiblePropBounds(bounds);
-
-  this->ClientController->Receive(tmp, 6, 1, vtkCompositeManager::BOUNDS_TAG);
-  if (tmp[0] < bounds[0]) {bounds[0] = tmp[0];}
-  if (tmp[1] > bounds[1]) {bounds[1] = tmp[1];}
-  if (tmp[2] < bounds[2]) {bounds[2] = tmp[2];}
-  if (tmp[3] > bounds[3]) {bounds[3] = tmp[3];}
-  if (tmp[4] < bounds[4]) {bounds[4] = tmp[4];}
-  if (tmp[5] > bounds[5]) {bounds[5] = tmp[5];}
-}
 
 
 
@@ -789,15 +703,19 @@ void vtkClientCompositeManager::SatelliteStartRender()
   vtkInitializeClientRendererInfoMacro(renInfo);
   
   // Receive the window size.
-  controller->Receive((char*)(&winInfo), 
-                      sizeof(struct vtkClientRenderWindowInfo), 
-                      otherId, vtkCompositeManager::WIN_INFO_TAG);
+  //controller->Receive((char*)(&winInfo), 
+  //                    sizeof(struct vtkClientRenderWindowInfo), 
+  //                    otherId, vtkCompositeManager::WIN_INFO_TAG);
+  controller->Receive((int*)(&winInfo), 4, otherId, 
+                      vtkCompositeManager::WIN_INFO_TAG);
   if (myId == 0)
     {  // Relay info to server satellite processes.
     for (j = 1; j < numProcs; ++j)
       {
-      this->CompositeController->Send((char*)(&winInfo), 
-                      sizeof(struct vtkClientRenderWindowInfo), j,
+      //this->CompositeController->Send((char*)(&winInfo), 
+      //                sizeof(struct vtkClientRenderWindowInfo), j,
+      //                vtkCompositeManager::WIN_INFO_TAG);
+      this->CompositeController->Send((float*)(&winInfo), 22, j,
                       vtkCompositeManager::WIN_INFO_TAG);
       }
     }
@@ -806,7 +724,6 @@ void vtkClientCompositeManager::SatelliteStartRender()
   // This should be fixed.  Round off will cause window to resize. !!!!!
   renWin->SetSize(winInfo.Size[0] * winInfo.ReductionFactor,
                   winInfo.Size[1] * winInfo.ReductionFactor);
-  renWin->SetDesiredUpdateRate(winInfo.DesiredUpdateRate);
   this->ReductionFactor = winInfo.ReductionFactor;
   this->SquirtCompression = 3 * (winInfo.ReductionFactor-1);
 
@@ -827,16 +744,20 @@ void vtkClientCompositeManager::SatelliteStartRender()
       cam = ren->GetActiveCamera();
       }
 
-    controller->Receive((char*)(&renInfo), 
-                        sizeof(struct vtkClientRendererInfo), 
-                        otherId, vtkCompositeManager::REN_INFO_TAG);
+    //controller->Receive((char*)(&renInfo), 
+    //                    sizeof(struct vtkClientRendererInfo), 
+    //                    otherId, vtkCompositeManager::REN_INFO_TAG);
+    controller->Receive((float*)(&renInfo), 22, otherId, 
+                        vtkCompositeManager::REN_INFO_TAG);
     if (myId == 0)
       {  // Relay info to server satellite processes.
       for (j = 1; j < numProcs; ++j)
         {
-        this->CompositeController->Send((char*)(&renInfo), 
-                        sizeof(struct vtkClientRendererInfo), 
-                        j, vtkCompositeManager::REN_INFO_TAG);
+        //this->CompositeController->Send((char*)(&renInfo), 
+        //                sizeof(struct vtkClientRendererInfo), 
+        //                j, vtkCompositeManager::REN_INFO_TAG);
+        this->CompositeController->Send((float*)(&renInfo), 22, j, 
+                                        vtkCompositeManager::REN_INFO_TAG);
         }
       }
     if (ren == NULL)
@@ -993,52 +914,6 @@ void vtkClientCompositeManager::SatelliteEndRender()
 
 
 
-//----------------------------------------------------------------------------
-void vtkClientCompositeManagerComputeVisiblePropBoundsRMI(void *arg, void *, 
-                                                          int, int)
-{
-  vtkClientCompositeManager* self = (vtkClientCompositeManager*) arg;
-  
-  self->ComputeVisiblePropBoundsRMI();
-}
-//----------------------------------------------------------------------------
-// Only called by satellite processes.
-void vtkClientCompositeManager::ComputeVisiblePropBoundsRMI()
-{
-  vtkRendererCollection *rens;
-  vtkRenderer* ren;
-  float bounds[6];
-  
-  rens = this->RenderWindow->GetRenderers();
-  rens->InitTraversal();
-  ren = rens->GetNextItem();
-  ren->ComputeVisiblePropBounds(bounds);
-
-  if (this->CompositeController->GetLocalProcessId() == 0)
-    {
-    float tmp[6];
-    int id;
-    int numProc = this->CompositeController->GetNumberOfProcesses();
-    for (id = 1; id < numProc; ++id)
-      {
-      this->CompositeController->TriggerRMI(id, 8883);
-      this->CompositeController->Receive(tmp, 6, 1, vtkCompositeManager::BOUNDS_TAG);
-      if (tmp[0] < bounds[0]) {bounds[0] = tmp[0];}
-      if (tmp[1] > bounds[1]) {bounds[1] = tmp[1];}
-      if (tmp[2] < bounds[2]) {bounds[2] = tmp[2];}
-      if (tmp[3] > bounds[3]) {bounds[3] = tmp[3];}
-      if (tmp[4] < bounds[4]) {bounds[4] = tmp[4];}
-      if (tmp[5] > bounds[5]) {bounds[5] = tmp[5];}
-      }
-    // Send total server results to client. 
-    this->ClientController->Send(bounds, 6, 1, vtkCompositeManager::BOUNDS_TAG);
-    }
-  else
-    {
-    this->CompositeController->Send(bounds, 6, 0, vtkCompositeManager::BOUNDS_TAG);    
-    }
-}
-
 
 //-------------------------------------------------------------------------
 void vtkClientCompositeManager::InitializeOffScreen()
@@ -1078,11 +953,6 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
       rens = this->RenderWindow->GetRenderers();
       rens->InitTraversal();
       ren = rens->GetNextItem();
-      if (ren)
-        {
-        //ren->RemoveObserver(this->ResetCameraTag);
-        //ren->RemoveObserver(this->ResetCameraClippingRangeTag);
-        }
       }
     // Delete the reference.
     this->RenderWindow->UnRegister(this);
@@ -1108,25 +978,6 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
       rens = this->RenderWindow->GetRenderers();
       rens->InitTraversal();
       ren = rens->GetNextItem();
-      if (ren)
-        {
-        //cbc = vtkCallbackCommand::New();
-        //cbc->SetCallback(vtkClientCompositeManagerResetCameraClippingRange);
-        //cbc->SetClientData((void*)this);
-        // ren will delete the cbc when the observer is removed.
-        //this->ResetCameraClippingRangeTag = 
-        //ren->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
-        //cbc->Delete();
-        
-        
-        //cbc = vtkCallbackCommand::New();
-        //cbc->SetCallback(vtkClientCompositeManagerResetCamera);
-        //cbc->SetClientData((void*)this);
-        // ren will delete the cbc when the observer is removed.
-        //this->ResetCameraTag = 
-        //ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
-        //cbc->Delete();
-        }
       }
      if (this->Tiled && this->ClientFlag == 0)
       { 
@@ -1509,15 +1360,11 @@ void vtkClientCompositeManager::InitializeRMIs()
       }
     this->ClientController->AddRMI(vtkClientCompositeManagerRenderRMI, (void*)this, 
                                    vtkClientCompositeManager::RENDER_RMI_TAG); 
-    this->ClientController->AddRMI(vtkClientCompositeManagerComputeVisiblePropBoundsRMI,
-                                   (void*)this, 8883);  
     }
   else
     { // Other satellite processes wait for RMIs for root.
     this->CompositeController->AddRMI(vtkClientCompositeManagerRenderRMI, (void*)this, 
                                    vtkClientCompositeManager::RENDER_RMI_TAG); 
-    this->CompositeController->AddRMI(vtkClientCompositeManagerComputeVisiblePropBoundsRMI,
-                                   (void*)this, 8883);  
     }
 }
 
