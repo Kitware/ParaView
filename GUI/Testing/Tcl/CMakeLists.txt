@@ -97,16 +97,6 @@ ENDIF(VTK_USE_MPI)
 # 
 
 FOREACH (tfile ${PROJECT_TESTS})
-  ADD_TEST(${tfile}-ParaView 
-    ${PARAVIEW_EXECUTABLE} 
-    ${TIMEOUT}
-    --disable-registry
-    ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
-    -D ${PVClientTestData}
-    -C ${PVCompareImages}
-    -T ${ParaView_BINARY_DIR}/Testing/Temporary
-    -V ${PVClientTestData}/Baseline/${tfile}.png
-    )
   # repeat test in composite mode if test composite is on
   IF (PARAVIEW_TEST_COMPOSITING)
     ADD_TEST(${tfile}-ParaView-COMPOSITE-MPI 
@@ -207,7 +197,7 @@ ADD_TEST("ArrowServer-ParaView-rc"
   -V ${PVClientTestData}/Baseline/Arrow.png)
 
 # remove the following for the batch tests
-REMOVE (PROJECT_TESTS
+SET (PROJECT_TESTS_NO_BATCH 
   MouseInteraction
   TestDemo
   TestPackage
@@ -215,22 +205,39 @@ REMOVE (PROJECT_TESTS
   TestAnimationSaveLoad
 #  XdmfRead
 )
+REMOVE (PROJECT_TESTS ${PROJECT_TESTS_NO_BATCH})
+
 
 # for each test add a batch test that will possibly run in mpi mode
 FOREACH (tfile ${PROJECT_TESTS})
   # test batch
-  ADD_TEST(${tfile}-batch-ParaView 
-    ${PARAVIEW_EXECUTABLE}     
+  ADD_TEST(${tfile}-ParaView 
+    ${PARAVIEW_EXECUTABLE} 
     ${TIMEOUT}
-    ${PARAVIEW_MPI_RUN_ONE} 
     --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
     -D ${PVClientTestData}
+    -C ${PVCompareImages}
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
+    -V ${PVClientTestData}/Baseline/${tfile}.png
     -BT ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch.tcl
     -BC ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
     -B ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch
-    -V ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch.png
+    -BV ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch.png
+    )
+ENDFOREACH (tfile)
+
+# run the non batch tests just in normal mode
+FOREACH (tfile ${PROJECT_TESTS_NO_BATCH})
+  ADD_TEST(${tfile}-ParaView 
+    ${PARAVIEW_EXECUTABLE} 
+    ${TIMEOUT}
+    --disable-registry
+    ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
+    -D ${PVClientTestData}
+    -C ${PVCompareImages}
+    -T ${ParaView_BINARY_DIR}/Testing/Temporary
+    -V ${PVClientTestData}/Baseline/${tfile}.png
     )
 ENDFOREACH (tfile)
 

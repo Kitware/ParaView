@@ -15,20 +15,29 @@ if { ![$Application GetExitStatus] } {
 
         [$Application GetMainWindow] SaveBatchScript "$batchName.pvb" 0 "$batchName.png" {}
         $Application ExitOnReturnOff
-        $Application Exit
+        $Application DestroyGUI
         update
 
         $Application LoadScript "$batchName.pvb"
-#        catch { file delete -force "$batchName.pvb" }
+        catch { file delete -force "$batchName.pvb" }
         $Application ExitOnReturnOn
+
+        set batchValid {}
+        for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+            if {[lindex $argv $i] == "-BV"} {
+                set batchValid [lindex $argv [expr $i + 1]]
+            }
+        }
 
         for {set i  1} {$i < [expr $argc - 1]} {incr i} {
             if {[lindex $argv $i] == "-BC"} {
                 source [lindex $argv [expr $i + 1]]
-                $Application SetExitStatus [ComparePNG ${batchName}session]
+                $Application SetExitStatus [ComparePNG ${batchName}session $batchValid]
             }
         }
         catch { file delete -force "$batchName.png" }
         catch { file delete -force "$batchNamesession.png" }
+
+        $Application Exit
     }
 }

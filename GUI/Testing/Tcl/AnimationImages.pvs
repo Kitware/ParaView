@@ -46,7 +46,7 @@ set didRegression 0
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [ComparePNG "$TempDir/AnimationImages0001"]
+	$Application SetExitStatus [ComparePNG "$TempDir/AnimationImages0001" {}]
         set didRegression 1
     }
 }
