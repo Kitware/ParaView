@@ -59,7 +59,7 @@ vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
   vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWRegisteryUtilities");
   if(ret)
     {
-      return static_cast<vtkKWRegisteryUtilities*>(ret);
+    return static_cast<vtkKWRegisteryUtilities*>(ret);
     }
   vtkDebugLeaks::DestructClass("vtkKWRegisteryUtilities");
 #ifdef _WIN32
@@ -138,7 +138,7 @@ int vtkKWRegisteryUtilities::Open(const char *toplevel,
   return res;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::Close()
 {
   int res = 0;
@@ -218,7 +218,7 @@ int vtkKWRegisteryUtilities::DeleteKey(const char *subkey,
   return res;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::DeleteValue(const char *subkey, const char *key)
 {
   int res = 1;
@@ -246,7 +246,7 @@ int vtkKWRegisteryUtilities::DeleteValue(const char *subkey, const char *key)
   return res;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::SetValue(const char *subkey, const char *key, 
 				      const char *value)
 {
@@ -275,13 +275,13 @@ int vtkKWRegisteryUtilities::SetValue(const char *subkey, const char *key,
   return res;
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::IsSpace(char c)
 {
   return isspace(c);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 char *vtkKWRegisteryUtilities::Strip(char *str)
 {
   int cc;

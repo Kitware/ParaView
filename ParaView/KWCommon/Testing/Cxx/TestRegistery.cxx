@@ -1,20 +1,20 @@
 #include "vtkKWRegisteryUtilities.h"
 
-#define IFT(x,res) if ( !x ) \
-  { \
-  res = 1; \
-  cout << "Error in: " << #x << endl; \
+#define IFT(x,res) if ( !x )                    \
+  {                                             \
+  res = 1;                                      \
+  cout << "Error in: " << #x << endl;           \
   }
-#define IFNT(x,res) if ( x ) \
-  { \
-  res = 1; \
-  cout << "Error in: " << #x << endl; \
+#define IFNT(x,res) if ( x )                    \
+  {                                             \
+  res = 1;                                      \
+  cout << "Error in: " << #x << endl;           \
   }
 
-#define CHE(x,y,res) if ( strcmp(x,y) ) \
-  { \
-  res = 1; \
-  cout << "Error, " << x << " != " << y << endl;\
+#define CHE(x,y,res) if ( strcmp(x,y) )                 \
+  {                                                     \
+  res = 1;                                              \
+  cout << "Error, " << x << " != " << y << endl;        \
   }
 
 int main(int vtkNotUsed(argc), char* vtkNotUsed(argv))
