@@ -53,49 +53,69 @@ public:
   void SetProperty(vtkSMProperty* prop);
   vtkGetObjectMacro(Property, vtkSMProperty);
 
-  // Description:
-  // If the property is of type RANGE, these return min
-  // and max values as strings. If the property is of
-  // another type or no min/max exists, 0 returned.
-  const char* GetMinimum(unsigned int idx);
-  const char* GetMaximum(unsigned int idx);
+  // ----------------------------------------------------
+  // Vector properties (int and double) with range
 
   // Description:
-  // If the property is of type ENUMERATION, returns the
-  // number of enumeration entries. Returns 0 otherwise
-  unsigned int GetNumberOfEnumerationEntries();
+  const char* GetRangeMinimum(unsigned int idx);
+  const char* GetRangeMaximum(unsigned int idx);
 
   // Description:
-  // If the property is of type ENUMERATION, returns an
-  // enumeration value as a string. Returns 0 otherwise.
-  const char* GetEnumerationValue(unsigned int idx);
+  unsigned int GetNumberOfRangeElements();
 
   // Description:
-  // If the property is of type ENUMERATION, returns a
-  // current index of a value.
-  unsigned int GetEnumerationElementIndex(const char* element);
+  const char* GetRangeValue(unsigned int idx);
 
   // Description:
-  // Returns the number of property elements.
-  unsigned int GetNumberOfElements();
+  int SetRangeValue(unsigned int idx, const char* value);
 
-
-  // Description:
-  // Returns a property element.
-  const char* GetElement(unsigned int idx);
+  // ----------------------------------------------------
+  // Enumeration properties
 
   // Description:
-  // Set a property element. Returns 1 on success, 0 on
-  // failure.
-  int SetElement(unsigned int idx, const char* value);
+  unsigned int GetNumberOfEnumerationElements();
 
   // Description:
-  // Returns either ENUMERATION, RANGE or UNKNOWN.
+  const char* GetEnumerationName(unsigned int idx);
+
+  // Description:
+  const char* GetEnumerationValue();
+
+  // Description:
+  int SetEnumerationValue(const char* idx);
+
+  // ----------------------------------------------------
+  // Selection properties
+
+  // Description:
+  unsigned int GetNumberOfSelectionElements();
+
+  // Description:
+  const char* GetSelectionName(unsigned int idx);
+
+  // Description:
+  const char* GetSelectionValue(unsigned int idx);
+
+  // Description:
+  int SetSelectionValue(unsigned int idx, const char* value);
+
+  // Description:
+  const char* GetSelectionMinimum(unsigned int idx);
+  const char* GetSelectionMaximum(unsigned int idx);
+
+  // ----------------------------------------------------
+  // General
+
+  // Description:
+  void InitializePropertyFromInformation();
+
+  // Description:
+  // Returns either ENUMERATION, RANGE, SELECTION or UNKNOWN.
   int GetPropertyType();
 
   // Description:
-  // Returns either BOOLEAN, RANGE or UNKNOWN.
-  int GetSelectionType();
+  // Returns either INT, DOUBLE, STRING, PROXY, BOOLEAN or UNKNOWN
+  int GetElementType();
 
 //BTX
   enum PropertyTypes
@@ -106,9 +126,13 @@ public:
     RANGE
   };
 
-  enum SelectionTypes
+  enum ElementType
   {
-    BOOLEAN
+    INT,
+    DOUBLE,
+    STRING,
+    BOOLEAN,
+    PROXY
   };
 //ETX
 

@@ -32,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.4");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -183,26 +183,55 @@ int vtkSMPropertyAdaptor::GetPropertyType()
 }
 
 //---------------------------------------------------------------------------
-int vtkSMPropertyAdaptor::GetSelectionType()
+int vtkSMPropertyAdaptor::GetElementType()
 {
-  if (this->StringListRangeDomain)
+  if (this->ProxyProperty)
     {
-    int intDomainMode = this->StringListRangeDomain->GetIntDomainMode();
-    if (intDomainMode == vtkSMStringListRangeDomain::BOOLEAN)
+    return vtkSMPropertyAdaptor::PROXY;
+    }
+  if (this->DoubleVectorProperty)
+    {
+    return vtkSMPropertyAdaptor::DOUBLE;
+    }
+  if (this->IdTypeVectorProperty)
+    {
+    return vtkSMPropertyAdaptor::INT;
+    }
+  if (this->IntVectorProperty)
+    {
+    if (this->BooleanDomain)
       {
       return vtkSMPropertyAdaptor::BOOLEAN;
       }
     else
       {
-      return vtkSMPropertyAdaptor::RANGE;
+      return vtkSMPropertyAdaptor::INT;
       }
     }
-
+  if (this->StringVectorProperty)
+    {
+    if (this->StringListRangeDomain)
+      {
+      int intDomainMode = this->StringListRangeDomain->GetIntDomainMode();
+      if (intDomainMode == vtkSMStringListRangeDomain::BOOLEAN)
+        {
+        return vtkSMPropertyAdaptor::BOOLEAN;
+        }
+      else
+        {
+        return vtkSMPropertyAdaptor::RANGE;
+        }
+      }
+    else
+      {
+      return vtkSMPropertyAdaptor::STRING;
+      }
+    }
   return vtkSMPropertyAdaptor::UNKNOWN;
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMPropertyAdaptor::GetMinimum(unsigned int idx)
+const char* vtkSMPropertyAdaptor::GetRangeMinimum(unsigned int idx)
 {
   if (this->DoubleRangeDomain)
     {
@@ -226,6 +255,7 @@ const char* vtkSMPropertyAdaptor::GetMinimum(unsigned int idx)
       }
     }
 
+/*
   if (this->StringListRangeDomain)
     {
     int intDomainMode = this->StringListRangeDomain->GetIntDomainMode();
@@ -245,12 +275,12 @@ const char* vtkSMPropertyAdaptor::GetMinimum(unsigned int idx)
         }
       }
     }
-
+*/
   return 0;
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMPropertyAdaptor::GetMaximum(unsigned int idx)
+const char* vtkSMPropertyAdaptor::GetRangeMaximum(unsigned int idx)
 {
   if (this->DoubleRangeDomain)
     {
@@ -274,6 +304,7 @@ const char* vtkSMPropertyAdaptor::GetMaximum(unsigned int idx)
       }
     }
 
+/*
   if (this->StringListRangeDomain)
     {
     int intDomainMode = this->StringListRangeDomain->GetIntDomainMode();
@@ -293,12 +324,76 @@ const char* vtkSMPropertyAdaptor::GetMaximum(unsigned int idx)
         }
       }
     }
+*/
 
   return 0;
 }
 
 //---------------------------------------------------------------------------
-unsigned int vtkSMPropertyAdaptor::GetNumberOfEnumerationEntries()
+unsigned int vtkSMPropertyAdaptor::GetNumberOfRangeElements()
+{
+  if (this->DoubleVectorProperty)
+    {
+    return this->DoubleVectorProperty->GetNumberOfElements();
+    }
+  if (this->IdTypeVectorProperty)
+    {
+    return this->IdTypeVectorProperty->GetNumberOfElements();
+    }
+  if (this->IntVectorProperty)
+    {
+    return this->IntVectorProperty->GetNumberOfElements();
+    }
+  return 0;
+}
+
+
+//---------------------------------------------------------------------------
+const char* vtkSMPropertyAdaptor::GetRangeValue(unsigned int idx)
+{
+  if (this->DoubleVectorProperty)
+    {
+    sprintf(this->ElemValue, 
+            "%g", 
+            this->DoubleVectorProperty->GetElement(idx));
+    return this->ElemValue;
+    }
+  if (this->IdTypeVectorProperty)
+    {
+    ostrstream elemV(this->ElemValue, 128);
+    elemV << this->IdTypeVectorProperty->GetElement(idx) << ends;
+    return this->ElemValue;
+    }
+  if (this->IntVectorProperty)
+    {
+    ostrstream elemV(this->ElemValue, 128);
+    elemV << this->IntVectorProperty->GetElement(idx) << ends;
+    return this->ElemValue;
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMPropertyAdaptor::SetRangeValue(unsigned int idx, const char* value)
+{
+  if (this->DoubleVectorProperty)
+    {
+    return this->DoubleVectorProperty->SetElement(idx, atof(value));
+    }
+  if (this->IdTypeVectorProperty)
+    {
+    return this->IdTypeVectorProperty->SetElement(idx, atoi(value));
+    }
+  if (this->IntVectorProperty)
+    {
+    return this->IntVectorProperty->SetElement(idx, atoi(value));
+    }
+  return 0;
+}
+
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMPropertyAdaptor::GetNumberOfEnumerationElements()
 {
   if (this->BooleanDomain)
     {
@@ -316,15 +411,11 @@ unsigned int vtkSMPropertyAdaptor::GetNumberOfEnumerationEntries()
     {
     return this->StringListDomain->GetNumberOfStrings();
     }
-  if (this->StringListRangeDomain)
-    {
-    return this->StringListRangeDomain->GetNumberOfStrings();
-    }
   return 0;
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMPropertyAdaptor::GetEnumerationValue(unsigned int idx)
+const char* vtkSMPropertyAdaptor::GetEnumerationName(unsigned int idx)
 {
   if (this->BooleanDomain)
     {
@@ -346,6 +437,124 @@ const char* vtkSMPropertyAdaptor::GetEnumerationValue(unsigned int idx)
     {
     return this->StringListDomain->GetString(idx);
     }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMPropertyAdaptor::GetEnumerationValue()
+{
+  const char* name = 0;
+
+  if (this->BooleanDomain && 
+      this->IntVectorProperty &&
+      this->IntVectorProperty->GetNumberOfElements() > 0)
+    {
+    int val = this->IntVectorProperty->GetElement(0);
+    if (val)
+      {
+      name = "1";
+      }
+    else
+      {
+      name = "0";
+      }
+    }
+
+  if (this->EnumerationDomain && this->IntVectorProperty)
+    {
+    int val = this->IntVectorProperty->GetElement(0);
+    for (unsigned int i=0; i<this->EnumerationDomain->GetNumberOfEntries(); i++)
+      {
+      if (this->EnumerationDomain->GetEntryValue(i) == val)
+        {
+        name = this->EnumerationDomain->GetEntryText(i);
+        break;
+        }
+      }
+    }
+
+  if (this->StringListDomain && this->StringVectorProperty)
+    {
+    name = this->StringVectorProperty->GetElement(0);
+    }
+
+  if (this->ProxyGroupDomain && this->ProxyProperty)
+    {
+    name = 
+      this->ProxyGroupDomain->GetProxyName(this->ProxyProperty->GetProxy(0));
+    }
+
+  if (!name)
+    {
+    return 0;
+    }
+
+  unsigned int cc;
+  for ( cc = 0; cc < this->GetNumberOfEnumerationElements(); cc ++ )
+    {
+    if ( strcmp(name, this->GetEnumerationName(cc)) == 0 )
+      {
+      sprintf(this->EnumValue, "%d", cc);
+      return this->EnumValue;
+      }
+    }
+
+  return 0;
+
+}
+
+//---------------------------------------------------------------------------
+int vtkSMPropertyAdaptor::SetEnumerationValue(const char* sidx)
+{
+  unsigned int idx = atoi(sidx);
+
+  const char* enumName = this->GetEnumerationName(idx);
+  if (!enumName)
+    {
+    return 0;
+    }
+
+  if (this->BooleanDomain && 
+      this->IntVectorProperty &&
+      this->IntVectorProperty->GetNumberOfElements() > 0)
+    {
+    int val = atoi(enumName);
+    return this->IntVectorProperty->SetElement(0, val);
+    }
+
+  if (this->EnumerationDomain && this->IntVectorProperty)
+    {
+    return this->IntVectorProperty->SetElement(
+      0, this->EnumerationDomain->GetEntryValue(idx) );
+    }
+
+  if (this->StringListDomain && this->StringVectorProperty)
+    {
+    return this->StringVectorProperty->SetElement(0, enumName);
+    }
+
+  if (this->ProxyGroupDomain && this->ProxyProperty)
+    {
+    return this->ProxyProperty->SetProxy(
+      0, this->ProxyGroupDomain->GetProxy(enumName));
+    }
+
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMPropertyAdaptor::GetNumberOfSelectionElements()
+{
+  if (this->StringListRangeDomain)
+    {
+    return this->StringListRangeDomain->GetNumberOfStrings();
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMPropertyAdaptor::GetSelectionName(unsigned int idx)
+{
   if (this->StringListRangeDomain)
     {
     return this->StringListRangeDomain->GetString(idx);
@@ -354,108 +563,108 @@ const char* vtkSMPropertyAdaptor::GetEnumerationValue(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
-unsigned int vtkSMPropertyAdaptor::GetNumberOfElements()
+const char* vtkSMPropertyAdaptor::GetSelectionValue(unsigned int idx)
 {
-  if (this->ProxyProperty)
+  if (this->StringListRangeDomain)
     {
-    return this->ProxyProperty->GetNumberOfProxies();
-    }
-  if (this->DoubleVectorProperty)
-    {
-    return this->DoubleVectorProperty->GetNumberOfElements();
-    }
-  if (this->IdTypeVectorProperty)
-    {
-    return this->IdTypeVectorProperty->GetNumberOfElements();
-    }
-  if (this->IntVectorProperty)
-    {
-    return this->IntVectorProperty->GetNumberOfElements();
-    }
-  if (this->StringVectorProperty)
-    {
-    return this->StringVectorProperty->GetNumberOfElements();
-    }
-  return 0;
-}
+    const char* name = 
+      this->StringListRangeDomain->GetString(idx);
 
-//---------------------------------------------------------------------------
-unsigned int vtkSMPropertyAdaptor::GetEnumerationElementIndex(const char* element)
-{
-  if ( !element )
-    {
-    return 0;
-    }
-  unsigned int cc;
-  for ( cc = 0; cc < this->GetNumberOfEnumerationEntries(); cc ++ )
-    {
-    if ( strcmp(element, this->GetEnumerationValue(cc)) == 0 )
+    if (this->StringVectorProperty)
       {
-      return cc;
+      unsigned int numElems = this->StringVectorProperty->GetNumberOfElements();
+      if (numElems % 2 != 0)
+        {
+        return 0;
+        }
+      for(unsigned int i=0; i<numElems; i+=2)
+        {
+        if (strcmp(this->StringVectorProperty->GetElement(i), name)==0)
+          {
+          return this->StringVectorProperty->GetElement(i+1);
+          }
+        }
       }
     }
   return 0;
 }
 
 //---------------------------------------------------------------------------
-const char* vtkSMPropertyAdaptor::GetElement(unsigned int idx)
+int vtkSMPropertyAdaptor::SetSelectionValue(unsigned int idx, const char* value)
 {
-  if (this->ProxyProperty && this->ProxyGroupDomain)
+  if (this->StringListRangeDomain)
     {
-    return this->ProxyGroupDomain->GetProxyName(
-      this->ProxyProperty->GetProxy(idx));
-    }
-  if (this->DoubleVectorProperty)
-    {
-    sprintf(this->ElemValue, 
-            "%g", 
-            this->DoubleVectorProperty->GetElement(idx));
-    return this->ElemValue;
-    }
-  if (this->IdTypeVectorProperty)
-    {
-    ostrstream elemV(this->ElemValue, 128);
-    elemV << this->IdTypeVectorProperty->GetElement(idx) << ends;
-    return this->ElemValue;
-    }
-  if (this->IntVectorProperty)
-    {
-    ostrstream elemV(this->ElemValue, 128);
-    elemV << this->IntVectorProperty->GetElement(idx) << ends;
-    return this->ElemValue;
-    }
-  if (this->StringVectorProperty)
-    {
-    return this->StringVectorProperty->GetElement(idx);
+    const char* name = 
+      this->StringListRangeDomain->GetString(idx);
+
+    if (this->StringVectorProperty)
+      {
+      unsigned int numElems = this->StringVectorProperty->GetNumberOfElements();
+      if (numElems % 2 != 0)
+        {
+        return 0;
+        }
+      for(unsigned int i=0; i<numElems; i+=2)
+        {
+        if (strcmp(this->StringVectorProperty->GetElement(i), name)==0)
+          {
+          this->StringVectorProperty->SetElement(i+1, value);
+          }
+        }
+      }
     }
   return 0;
 }
 
 //---------------------------------------------------------------------------
-int vtkSMPropertyAdaptor::SetElement(unsigned int idx, const char* value)
+const char* vtkSMPropertyAdaptor::GetSelectionMinimum(unsigned int idx)
 {
-  if (this->ProxyProperty && this->ProxyGroupDomain)
+  if (this->StringListRangeDomain)
     {
-    return this->ProxyProperty->SetProxy(
-      idx, this->ProxyGroupDomain->GetProxy(value));
+    int exists=0;
+    int min = this->StringListRangeDomain->GetMinimum(idx, exists);
+    if (exists)
+      {
+      sprintf(this->Minimum, "%d", min);
+      return this->Minimum;
+      }
     }
-  if (this->DoubleVectorProperty)
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMPropertyAdaptor::GetSelectionMaximum(unsigned int idx)
+{
+  if (this->StringListRangeDomain)
     {
-    return this->DoubleVectorProperty->SetElement(idx, atof(value));
+    int exists=0;
+    int max = this->StringListRangeDomain->GetMinimum(idx, exists);
+    if (exists)
+      {
+      sprintf(this->Maximum, "%d", max);
+      return this->Maximum;
+      }
     }
-  if (this->IdTypeVectorProperty)
-    {
-    return this->IdTypeVectorProperty->SetElement(idx, atoi(value));
-    }
-  if (this->IntVectorProperty)
-    {
-    return this->IntVectorProperty->SetElement(idx, atoi(value));
-    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMPropertyAdaptor::InitializePropertyFromInformation()
+{
   if (this->StringVectorProperty)
     {
-    return this->StringVectorProperty->SetElement(idx, value);
+    vtkSMStringVectorProperty* ip = vtkSMStringVectorProperty::SafeDownCast(
+      this->StringVectorProperty->GetInformationProperty());
+    if (ip)
+      {
+      unsigned int numElems = ip->GetNumberOfElements();
+      this->StringVectorProperty->SetNumberOfElements(numElems);
+      for (unsigned int i=0; i<numElems; i++)
+        {
+        this->StringVectorProperty->SetElement(i, ip->GetElement(i));
+        }
+      }
     }
-  return 1;
 }
 
 //---------------------------------------------------------------------------
