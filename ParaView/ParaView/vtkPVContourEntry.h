@@ -54,6 +54,8 @@ class vtkKWEntry;
 class vtkKWPushButton;
 class vtkKWLabel;
 class vtkContourValues;
+class vtkPVScalarRangeLabel;
+class vtkPVVectorEntry;
 
 class VTK_EXPORT vtkPVContourEntry : public vtkPVWidget
 {
@@ -82,6 +84,7 @@ public:
   // Button callbacks.
   void AddValueCallback();
   void DeleteValueCallback();
+  void GenerateValuesCallback();
 
   // Description:
   // adds a script to the menu of the animation interface.
@@ -120,6 +123,9 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  void SetScalarRangeLabel(vtkPVScalarRangeLabel *srl);
+  vtkGetObjectMacro(ScalarRangeLabel, vtkPVScalarRangeLabel);
+  
 protected:
   vtkPVContourEntry();
   ~vtkPVContourEntry();
@@ -135,7 +141,17 @@ protected:
   vtkKWEntry* NewValueEntry;
   vtkKWPushButton* AddValueButton;
   vtkKWPushButton* DeleteValueButton;
-
+  vtkKWWidget *GenerateFrame;
+  vtkKWLabel *GenerateLabel;
+  vtkKWEntry *GenerateEntry;
+  vtkKWPushButton *GenerateButton;
+  vtkKWWidget *GenerateRangeFrame;
+  vtkKWLabel *GenerateRangeLabel;
+  vtkKWEntry *GenerateRangeMinEntry;
+  vtkKWEntry *GenerateRangeMaxEntry;
+  
+  vtkPVScalarRangeLabel *ScalarRangeLabel;
+  
   vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
   void operator=(const vtkPVContourEntry&); // Not implemented
 
