@@ -101,6 +101,10 @@ vtkInteractorStyleExtent::vtkInteractorStyleExtent()
   this->Extent[2] = this->Extent[3] = 0;
   this->Extent[4] = this->Extent[5] = 0;
 
+  this->Constraint0 = VTK_INTERACTOR_STYLE_EXTENT_NONE;
+  this->Constraint1 = VTK_INTERACTOR_STYLE_EXTENT_NONE;
+  this->Constraint2 = VTK_INTERACTOR_STYLE_EXTENT_NONE;
+
 }
 
 //----------------------------------------------------------------------------
@@ -395,6 +399,8 @@ void vtkInteractorStyleExtent::TranslateXY(int dx, int dy)
   // Now we check to see if any min > max...(drag min past max).
   if (changeFlag)
     {
+    this->Constrain();
+
     //vtkErrorMacro("Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", "
     //     << this->Extent[2] << ", " << this->Extent[3] << ", "
     //     << this->Extent[4] << ", " << this->Extent[5]);
@@ -457,6 +463,44 @@ void vtkInteractorStyleExtent::TranslateXY(int dx, int dy)
     this->ComputeDisplayToExtentMapping();
     this->SetCallbackType("InteractiveRender");
     (*this->CallbackMethod)(this->CallbackMethodArg);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkInteractorStyleExtent::Constrain() 
+{
+  if (this->Constraint0 == VTK_INTERACTOR_STYLE_EXTENT_COLLAPSE)
+    {
+    if (this->ExtentPtr0 == &(this->Extent[0]))
+      {
+      this->Extent[1] = this->Extent[0];
+      }
+    else
+      {
+      this->Extent[0] = this->Extent[1];
+      }
+    }
+  if (this->Constraint1 == VTK_INTERACTOR_STYLE_EXTENT_COLLAPSE)
+    {
+    if (this->ExtentPtr1 == &(this->Extent[2]))
+      {
+      this->Extent[3] = this->Extent[2];
+      }
+    else
+      {
+      this->Extent[2] = this->Extent[3];
+      }
+    }
+  if (this->Constraint2 == VTK_INTERACTOR_STYLE_EXTENT_COLLAPSE)
+    {
+    if (this->ExtentPtr2 == &(this->Extent[4]))
+      {
+      this->Extent[5] = this->Extent[4];
+      }
+    else
+      {
+      this->Extent[4] = this->Extent[5];
+      }
     }
 }
 

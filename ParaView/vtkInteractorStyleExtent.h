@@ -56,6 +56,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkPolyDataMapper;
 class vtkOutlineSource;
 
+#define VTK_INTERACTOR_STYLE_EXTENT_NONE 0
+#define VTK_INTERACTOR_STYLE_EXTENT_COLLAPSE 1
+
 class VTK_EXPORT vtkInteractorStyleExtent : public vtkInteractorStyle 
 {
 public:
@@ -95,6 +98,28 @@ public:
   // The CallbackMethod
   void DefaultCallback(char *type);
 
+  // Description:
+  // Contrain the axes of the extent.  Collapse will make the 
+  // min equal the max on the axis.
+  vtkSetMacro(Constraint0, int);
+  vtkGetMacro(Constraint0, int);
+  void SetConstraint0ToNone() 
+    {this->SetConstraint0(VTK_INTERACTOR_STYLE_EXTENT_NONE);}
+  void SetConstraint0ToCollapse() 
+    {this->SetConstraint0(VTK_INTERACTOR_STYLE_EXTENT_COLLAPSE);}
+  vtkSetMacro(Constraint1, int);
+  vtkGetMacro(Constraint1, int);
+  void SetConstraint1ToNone() 
+    {this->SetConstraint1(VTK_INTERACTOR_STYLE_EXTENT_NONE);}
+  void SetConstraint1ToCollapse() 
+    {this->SetConstraint1(VTK_INTERACTOR_STYLE_EXTENT_COLLAPSE);}
+  vtkSetMacro(Constraint2, int);
+  vtkGetMacro(Constraint2, int);
+  void SetConstraint2ToNone() 
+    {this->SetConstraint2(VTK_INTERACTOR_STYLE_EXTENT_NONE);}
+  void SetConstraint2ToCollapse() 
+    {this->SetConstraint2(VTK_INTERACTOR_STYLE_EXTENT_COLLAPSE);}
+
 protected:
   vtkInteractorStyleExtent();
   ~vtkInteractorStyleExtent();
@@ -102,6 +127,12 @@ protected:
   void operator=(const vtkInteractorStyleExtent&) {};
 
   int Extent[6];
+
+  // For constraining the extent variables.
+  int Constraint0;
+  int Constraint1;
+  int Constraint2;
+
   // For controlling the extent.
   int *ExtentPtr0;
   int *ExtentPtr1;
@@ -149,6 +180,8 @@ protected:
   // parameter of the Callback method.
   vtkSetStringMacro(CallbackType);
 
+  // Implement the constraints.
+  void Constrain();
 
 };
 
