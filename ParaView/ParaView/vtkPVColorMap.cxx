@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.11");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.12");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -569,6 +569,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   copy1 << "CopyValuesFrom " << this->LabelTextProperty->GetTclName() << ends;
   this->TitleTextProperty->GetCopyButton()->SetCommand(
     this->TitleTextProperty, copy1.str());
+  copy1.rdbuf()->freeze(0);
 
   this->LabelTextProperty->ShowCopyOn();
   this->LabelTextProperty->GetCopyButton()->SetBalloonHelpString(
@@ -577,6 +578,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   copy2 << "CopyValuesFrom " << this->TitleTextProperty->GetTclName() << ends;
   this->LabelTextProperty->GetCopyButton()->SetCommand(
     this->LabelTextProperty, copy2.str());
+  copy2.rdbuf()->freeze(0);
 
   // Scalar bar: synchronize all those grids to have them aligned
 
