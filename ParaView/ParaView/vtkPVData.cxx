@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.217");
+vtkCxxRevisionMacro(vtkPVData, "1.218");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2326,6 +2326,15 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
             << part->GetGeometryTclName() << " SetInput [" 
             << this->GetPVSource()->GetVTKSourceTclName(sourceCount) 
             << " GetOutput " << outputCount << "]\n";
+      *file << "\t";
+      if ( vtkString::Equals(this->RepresentationMenu->GetValue(), "Outline") )
+        {
+        *file << part->GetGeometryTclName() << " SetUseOutline 1" << endl;
+        }
+      else
+        {
+        *file << part->GetGeometryTclName() << " SetUseOutline 0" << endl;
+        }
       // Move to next output
       ++outputCount;
 
