@@ -80,6 +80,10 @@ public:
   // Clear all entries from the buffer.
   virtual void Clear();
 
+  // Description:
+  // Saves the current log to a file.
+  virtual void Save(const char* fileName);
+
 protected:
   vtkPVErrorLogDisplay();
   ~vtkPVErrorLogDisplay();

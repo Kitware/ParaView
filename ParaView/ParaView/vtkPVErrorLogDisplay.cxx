@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
-vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.3");
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.4");
 
 int vtkPVErrorLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -141,6 +141,39 @@ void vtkPVErrorLogDisplay::Update()
   this->DisableWrite();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVErrorLogDisplay::Save(const char *fileName)
+{
+  ofstream *fptr;
+ 
+  fptr = new ofstream(fileName);
+
+  if (fptr->fail())
+    {
+    vtkErrorMacro(<< "Could not open" << fileName);
+    delete fptr;
+    return;
+    }
+
+  int cc;
+  if ( this->ErrorMessages )
+    {
+    for ( cc = 0; cc < this->ErrorMessages->GetNumberOfItems(); cc ++ )
+      {
+      const char* item = 0;
+      if ( this->ErrorMessages->GetItem(cc, item) == VTK_OK && item )
+        {
+        *fptr << item << endl;
+        }
+      }
+    }
+  else
+    {
+    *fptr << "No errors" << endl;
+    }
+  fptr->close();
+  delete fptr;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVErrorLogDisplay::PrintSelf(ostream& os, vtkIndent indent)
