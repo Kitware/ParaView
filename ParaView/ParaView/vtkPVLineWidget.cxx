@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -343,14 +343,18 @@ void vtkPVLineWidget::ActualPlaceWidget()
   if ( this->PVSource->GetPVInput() )
     {
     data = this->PVSource->GetPVInput()->GetVTKData();
+    float bounds[6];
+    this->PVSource->GetPVInput()->GetBounds(bounds);
+
+    this->SetPoint1((bounds[0]+bounds[1])/2, 
+                    bounds[2], 
+                    (bounds[4]+bounds[5])/2);
+    this->SetPoint2((bounds[0]+bounds[1])/2, 
+                    bounds[3], 
+                    (bounds[4]+bounds[5])/2);
     }
   this->Widget3D->SetInput(data);
 
-  float bounds[6];
-  this->PVSource->GetPVInput()->GetBounds(bounds);
-
-  this->SetPoint1((bounds[0]+bounds[1])/2, bounds[2], (bounds[4]+bounds[5])/2);
-  this->SetPoint2((bounds[0]+bounds[1])/2, bounds[3], (bounds[4]+bounds[5])/2);
   this->Widget3D->PlaceWidget();  
   this->UpdateVTKObject();
 }
