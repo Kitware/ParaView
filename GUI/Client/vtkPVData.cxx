@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.287");
+vtkCxxRevisionMacro(vtkPVData, "1.288");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -138,6 +138,7 @@ vtkPVData::vtkPVData()
   this->ColorMenu = vtkKWOptionMenu::New();
 
   this->MapScalarsCheck = vtkKWCheckButton::New();
+  this->InterpolateColorsCheck = vtkKWCheckButton::New();
   this->EditColorMapButton = vtkKWPushButton::New();
   
   this->ColorButton = vtkKWChangeColorButton::New();
@@ -260,6 +261,9 @@ vtkPVData::~vtkPVData()
 
   this->MapScalarsCheck->Delete();
   this->MapScalarsCheck = NULL;  
+    
+  this->InterpolateColorsCheck->Delete();
+  this->InterpolateColorsCheck = NULL;  
     
   this->ColorButton->Delete();
   this->ColorButton = NULL;
@@ -615,7 +619,6 @@ void vtkPVData::CreateProperties()
   this->ColorButton->SetBalloonHelpString(
     "Edit the constant color for the geometry.");
 
-
   this->MapScalarsCheck->SetParent(this->ColorFrame->GetFrame());
   this->MapScalarsCheck->Create(this->GetApplication(), "-text {Map Scalars}");
   this->MapScalarsCheck->SetState(0);
@@ -624,6 +627,16 @@ void vtkPVData::CreateProperties()
   this->GetApplication()->Script(
     "%s configure -command {%s MapScalarsCheckCallback}",
     this->MapScalarsCheck->GetWidgetName(),
+    this->GetTclName());
+    
+  this->InterpolateColorsCheck->SetParent(this->ColorFrame->GetFrame());
+  this->InterpolateColorsCheck->Create(this->GetApplication(), "-text {Interpolate Colors}");
+  this->InterpolateColorsCheck->SetState(1);
+  this->InterpolateColorsCheck->SetBalloonHelpString(
+    "Interpolate colors after mapping.");
+  this->GetApplication()->Script(
+    "%s configure -command {%s InterpolateColorsCheckCallback}",
+    this->InterpolateColorsCheck->GetWidgetName(),
     this->GetTclName());
 
   this->EditColorMapButton->SetParent(this->ColorFrame->GetFrame());
@@ -637,20 +650,21 @@ void vtkPVData::CreateProperties()
   this->Script("grid %s %s -sticky wns",
                this->ColorMenuLabel->GetWidgetName(),
                this->ColorMenu->GetWidgetName());
-
   this->Script("grid %s -sticky news -padx %d -pady %d",
                this->ColorMenu->GetWidgetName(),
                col_1_padx, button_pady);
 
+  this->Script("grid %s %s -sticky wns",
+               this->MapScalarsCheck->GetWidgetName(),
+               this->ColorButton->GetWidgetName());
   this->Script("grid %s -column 1 -sticky news -padx %d -pady %d",
                this->ColorButton->GetWidgetName(),
                col_1_padx, button_pady);
   this->ColorButtonVisible = 0;
 
   this->Script("grid %s %s -sticky wns",
-               this->MapScalarsCheck->GetWidgetName(),
+               this->InterpolateColorsCheck->GetWidgetName(),
                this->EditColorMapButton->GetWidgetName());
-
   this->Script("grid %s -sticky news -padx %d -pady %d",
                this->EditColorMapButton->GetWidgetName(),
                col_1_padx, button_pady);
@@ -2704,6 +2718,33 @@ void vtkPVData::SetMapScalarsFlag(int val)
   for (idx = 0; idx < num; ++idx)
     {
     this->PVSource->GetPart(idx)->GetPartDisplay()->SetDirectColorFlag(!val);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::InterpolateColorsCheckCallback()
+{
+  this->SetInterpolateColorsFlag(this->InterpolateColorsCheck->GetState());
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetInterpolateColorsFlag(int val)
+{
+  if (this->InterpolateColorsCheck->GetState() != val)
+    {
+    this->AddTraceEntry("$kw(%s) SetInterpolateColorsFlag %d", this->GetTclName(), val);
+    this->InterpolateColorsCheck->SetState(val);
+    }
+
+  int num, idx;
+  num = this->PVSource->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->PVSource->GetPart(idx)->GetPartDisplay()->SetInterpolateColorsFlag(val);
     }
 }
 

@@ -287,13 +287,21 @@ public:
   // and to determine whether the scalar bar should be visible.
   void SetVisibilityCheckState(int v);
 
-
   // Description:
   // This determines whether to map array values through a color
   // map or use arrays values as colors directly.  The direct option
   // is only available for unsigned chanr arrays with 1 or 3 components.
   void SetMapScalarsFlag(int val);
   void MapScalarsCheckCallback();
+
+  // Description:
+  // This determines whether we will interpolate before or after
+  // scalrs are mapped.  Interpolate after is the standard VTK
+  // OpenGL vertex coloring.  It gives smooth coloring, but
+  // may generate colors not in the map  Interpolating before 
+  // mapping uses a 1d texture map.
+  void SetInterpolateColorsFlag(int val);
+  void InterpolateColorsCheckCallback();
 
   vtkGetMacro(ColorSetByUser, int);
   vtkGetMacro(ArraySetByUser, int);
@@ -399,6 +407,7 @@ protected:
   vtkKWCheckButton *ScalarBarCheck;
 
   vtkKWCheckButton *MapScalarsCheck;
+  vtkKWCheckButton *InterpolateColorsCheck;
   
   // For translating actor
   vtkKWLabeledFrame* ActorControlFrame;

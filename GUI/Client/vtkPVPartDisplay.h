@@ -69,6 +69,11 @@ public:
   virtual void ColorByArray(vtkPVColorMap *colorMap, int field);
 
   // Description:
+  // Option to use a 1d texture map for the attribute color.
+  virtual void SetInterpolateColorsFlag(int val);
+  vtkGetMacro(InterpolateColorsFlag, int);
+
+  // Description:
   // This just sets the color of the property.
   // you also have to set scalar visiblity to off.
   virtual void SetColor(float r, float g, float b);
@@ -181,6 +186,7 @@ protected:
   vtkPVApplication *PVApplication;
 
   int DirectColorFlag;
+  int InterpolateColorsFlag;
   int Visibility;
 
   // Problems with vtkLODActor led me to use these.

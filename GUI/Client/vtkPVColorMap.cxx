@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.92");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.93");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -848,9 +848,19 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->LookupTable =
     vtkLookupTable::SafeDownCast(pm->GetObjectFromID(this->LookupTableID));
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->LookupTableID << "SetVectorModeToMagnitude"
-                  << vtkClientServerStream::End;
+
+  if (this->NumberOfVectorComponents > 1)
+    {
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->LookupTableID << "SetVectorModeToMagnitude"
+                    << vtkClientServerStream::End;
+    }
+  else
+    {
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->LookupTableID << "SetVectorModeToComponent"
+                    << vtkClientServerStream::End;
+    }
 
   this->ScalarBar = vtkScalarBarWidget::New();
   this->ScalarBar->SetCurrentRenderer(pvApp->GetRenderModule()->GetRenderer2D());

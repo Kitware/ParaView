@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.24");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.25");
 
 
 //----------------------------------------------------------------------------
@@ -486,6 +486,34 @@ void vtkPVLODPartDisplay::SetDirectColorFlag(int val)
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLODPartDisplay::SetInterpolateColorsFlag(int val)
+{
+  if (val)
+    {
+    val = 1;
+    }
+  if (val == this->InterpolateColorsFlag)
+    {
+    return;
+    }
+
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  this->InterpolateColorsFlag = val;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->MapperID
+    << "SetInterpolateScalarsBeforeMapping" << (!val) 
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->LODMapperID 
+    << "SetInterpolateScalarsBeforeMapping" << (!val) 
+    << vtkClientServerStream::End;
+pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------

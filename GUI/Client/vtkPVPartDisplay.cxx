@@ -48,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.36");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.37");
 
 
 //----------------------------------------------------------------------------
@@ -57,6 +57,7 @@ vtkPVPartDisplay::vtkPVPartDisplay()
   this->PVApplication = NULL;
 
   this->DirectColorFlag = 1;
+  this->InterpolateColorsFlag = 1;
   this->Visibility = 1;
   this->Part = NULL;
   
@@ -571,6 +572,29 @@ void vtkPVPartDisplay::SetDirectColorFlag(int val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPartDisplay::SetInterpolateColorsFlag(int val)
+{
+  if (val)
+    {
+    val = 1;
+    }
+  if (val == this->InterpolateColorsFlag)
+    {
+    return;
+    }
+
+  vtkPVApplication* pvApp = this->GetPVApplication(); 
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  this->InterpolateColorsFlag = val;
+  stream << vtkClientServerStream::Invoke << this->MapperID
+         << "SetInterpolateScalarsBeforeMapping" << (!val) 
+         << vtkClientServerStream::End;
+
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPartDisplay::ColorByArray(vtkPVColorMap *colorMap,
                                     int field)
 {
@@ -754,6 +778,7 @@ void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "PVApplication: "    << this->PVApplication         << endl;
   os << indent << "DirectColorFlag: "  << this->DirectColorFlag       << endl;
+  os << indent << "InterpolateColorsFlag: " << this->InterpolateColorsFlag << endl;
   os << indent << "UpdateSuppressor: " << this->UpdateSuppressorID.ID << endl;
   
   os << indent << "VolumeID: "            << this->VolumeID.ID            << endl;

@@ -57,6 +57,10 @@ public:
   virtual void ColorByArray(vtkPVColorMap *colorMap, int field);
 
   // Description:
+  // Option to use a 1d texture map for the attribute color.
+  virtual void SetInterpolateColorsFlag(int val);
+
+  // Description:
   // This method updates the piece that has been assigned to this process.
   // It also gathers the data information.
   virtual void Update();
