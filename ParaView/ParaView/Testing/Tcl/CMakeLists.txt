@@ -50,6 +50,10 @@ CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/SphereTest.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/SphereTest.tcl)
 
+CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Threshold.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Threshold.tcl)
+
 ADD_TEST(Arrow ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Arrow.tcl)
 
@@ -88,3 +92,6 @@ ADD_TEST(Mandelbrot ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(SphereTest ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/SphereTest.tcl)
+
+ADD_TEST(Threshold ${PARAVIEW_EXECUTABLE}
+                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Threshold.tcl)
