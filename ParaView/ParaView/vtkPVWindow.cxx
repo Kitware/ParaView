@@ -1453,7 +1453,7 @@ void vtkPVWindow::OpenCallback()
   // Store last path
   if ( openFileName && vtkString::Length(openFileName) > 0 )
     {
-    if  (this->Open(openFileName) == VTK_OK)
+    if  (this->Open(openFileName, 1) == VTK_OK)
       {
       this->SaveLastPath(loadDialog, "OpenPath");
       }
@@ -1464,7 +1464,7 @@ void vtkPVWindow::OpenCallback()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVWindow::Open(char *openFileName)
+int vtkPVWindow::Open(char *openFileName, int store)
 {
   if (this->CheckIfFileIsReadable(openFileName) != VTK_OK)
     {
@@ -1520,7 +1520,10 @@ int vtkPVWindow::Open(char *openFileName)
         clone->Delete();
         }
       it->Delete();
-      this->AddRecentFile(NULL, openFileName, this, "Open");
+      if ( store )
+        {
+        this->AddRecentFile(NULL, openFileName, this, "Open");
+        }
       return VTK_OK;
       }
     it->GoToNextItem();
@@ -3223,4 +3226,3 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
      << this->InitializeDefaultInterfaces << endl;
   os << indent << "UseMessageDialog: " << this->UseMessageDialog << endl;
 }
-

@@ -223,9 +223,11 @@ public:
   void OpenCallback();
 
   // Description:
-  // Open a data file. Does not prompt the user.
-  // Returns VTK_OK on success and VTK_ERROR on failure.
-  int Open(char *fileName);
+  // Open a data file. Does not prompt the user. Returns VTK_OK on
+  // success and VTK_ERROR on failure. Set store to 1 to store to the
+  // recently used files list.
+  int Open(char *fileName, int store);
+  int Open(char *fileName) { return this->Open(fileName, 0); }
 
   // Description:
   // Play the demo.
