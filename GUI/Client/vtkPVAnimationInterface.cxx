@@ -30,6 +30,7 @@
 #include "vtkKWScale.h"
 #include "vtkKWText.h"
 #include "vtkKWView.h"
+#include "vtkMPEG2Writer.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationBatchHelper.h"
 #include "vtkPVApplication.h"
@@ -62,15 +63,6 @@
 #include "vtkCommand.h"
 #include "vtkKWEvent.h"
 #include "vtkPVConfig.h"
-
-#ifdef PARAVIEW_PLUS_BUILD
-# ifdef _WIN32
-#  include "vtkAVIWriter.h"
-# else
-//#  include "vtkMPEG2Writer.h"
-#  include "vtkMovieWriter.h"
-# endif
-#endif
 
 #ifndef _WIN32
 # include <unistd.h>
@@ -185,7 +177,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.161");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.161.2.1");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1221,13 +1213,8 @@ void vtkPVAnimationInterface::SaveImagesCallback()
   saveDialog->SetTitle("Save Animation Images");
   ostrstream ostr;
   ostr << "{{JPEG Images} {.jpg}} {{TIFF Images} {.tif}} {{PNG Images} {.png}}";
-#ifdef PARAVIEW_PLUS_BUILD
-# ifdef _WIN32
-  ostr << " {{AVI movie file} {.avi}}";
-# else
-  ostr << " {{MPEG movie file} {.mpg}}";
-# endif
-#endif
+  ostr << " {{MPEG2 movie file} {.mp2}}";
+
   ostr << ends;
 
   saveDialog->SetFileTypes(ostr.str());
@@ -1272,22 +1259,23 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     dlg->SetMasterWindow(this->Window);
     dlg->Create(this->GetApplication(), "");
     int isMPEG = (!strcmp(ext, "mpg") || !strcmp(ext, "mpeg") ||
-                  !strcmp(ext, "MPG") || !strcmp(ext, "MPEG"));
+                  !strcmp(ext, "MPG") || !strcmp(ext, "MPEG") ||
+                  !strcmp(ext, "MP2") || !strcmp(ext, "mp2"));
     if (isMPEG)
       {
       dlg->SetText(
-        "Specify the width and aspect ratio of the images to be saved from "
-        "this animation. The images will be scaled so that they are no larger "
-        "than the size of the display area.");
+        "Specify the width and height of the mpeg to be saved from this "
+        "animation. Each dimension must be a multiple of 32. Each will be "
+        "resized to the next smallest multiple of 32 if it does not meet this "
+        "criterion.");
       }
     else
       { 
       dlg->SetText(
         "Specify the width and height of the images to be saved from this "
-        "animation. Each dimension must be a multiple of 4. Each will be "
-        "resized to the next smallest multiple of 4 if it does not meet this "
-        "criterion. The images will also be scaled so that they are no "
-        "larger than the size of the display area.");
+        "animation. Each dimension must be a multiple of 32. Each will be "
+        "resized to the next smallest multiple of 32 if it does not meet this "
+        "criterion.");
       }
     vtkKWWidget *frame = vtkKWWidget::New();
     frame->SetParent(dlg->GetTopFrame());
@@ -1308,62 +1296,15 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     heightEntry->Create(this->GetApplication(), "");
     heightEntry->GetEntry()->SetValue(origHeight);
 
-    vtkKWLabeledOptionMenu *aspectRatioMenu = vtkKWLabeledOptionMenu::New();
-    aspectRatioMenu->SetLabel("Aspect Ratio:");
-    aspectRatioMenu->SetParent(frame);
-    aspectRatioMenu->Create(this->GetApplication(), "");
-    aspectRatioMenu->GetOptionMenu()->AddEntry("1:1");
-    aspectRatioMenu->GetOptionMenu()->AddEntry("4:3");
-    aspectRatioMenu->GetOptionMenu()->AddEntry("16:9");
-    aspectRatioMenu->GetOptionMenu()->AddEntry("2.21:1");
-    aspectRatioMenu->GetOptionMenu()->SetValue("1:1");
-    
-    if (isMPEG)
-      {
-      this->Script("pack %s %s -side left -fill both -expand t",
-                   widthEntry->GetWidgetName(),
-                   aspectRatioMenu->GetWidgetName());
-      }
-    else
-      {
       this->Script("pack %s %s -side left -fill both -expand t",
                    widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
-      }
     this->Script("pack %s -side top -pady 5", frame->GetWidgetName());
 
     dlg->Invoke();
 
     int width = widthEntry->GetEntry()->GetValueAsInt();
     int height = origHeight;
-    int aspectRatio = 0;
-    if (isMPEG)
-      {
-      const char *aspect = aspectRatioMenu->GetOptionMenu()->GetValue();
-      if (!strcmp(aspect, "1:1"))
-        {
-        height = width;
-        aspectRatio = 1;
-        }
-      else if (!strcmp(aspect, "4:3"))
-        {
-        height = static_cast<int>(width / 4.0 * 3);
-        aspectRatio = 2;
-        }
-      else if (!strcmp(aspect, "16:9"))
-        {
-        height = static_cast<int>(width / 16.0 * 9);
-        aspectRatio = 3;
-        }
-      else if (!strcmp(aspect, "2.21:1"))
-        {
-        height = static_cast<int>(width / 2.21);
-        aspectRatio = 4;
-        }
-      }
-    else
-      {
       height = heightEntry->GetEntry()->GetValueAsInt();
-      }
 
     // For now, the image size for the animations cannot be larger than
     // the size of the render window. The problem is that tiling doesn't
@@ -1385,6 +1326,19 @@ void vtkPVAnimationInterface::SaveImagesCallback()
         }
       }
     
+    if (isMPEG)
+      {
+      if ((width % 32) > 0)
+        {
+        width -= width % 32;
+        }
+      if ((height % 32) > 0)
+        {
+        height -= height % 32;
+        }
+      }
+    else
+      {
     if ((width % 4) > 0)
       {
       width -= width % 4;
@@ -1393,14 +1347,14 @@ void vtkPVAnimationInterface::SaveImagesCallback()
       {
       height -= height % 4;
       }
+      }
     
     widthEntry->Delete();
     heightEntry->Delete();
-    aspectRatioMenu->Delete();
     frame->Delete();
     dlg->Delete();
 
-    this->SaveImages(fileRoot, ext, width, height, aspectRatio);
+    this->SaveImages(fileRoot, ext, width, height, 0);
     this->View->SetRenderWindowSize(origWidth, origHeight);
     
     delete [] fileRoot;
@@ -1415,16 +1369,15 @@ void vtkPVAnimationInterface::SaveImagesCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveImages(const char* fileRoot, 
                                          const char* ext,
-                                         int width, int height, int vtkNotUsed(aspectRatio) /* = 0 */)
+                                         int width, int height, 
+                                         int vtkNotUsed(aspectRatio) /* = 0 */)
 {
   this->SavingData = 1;
   this->GetWindow()->UpdateEnableState();
   this->StopButton->SetEnabled(1);
   vtkWindowToImageFilter* winToImage;
   vtkImageWriter* writer = 0;
-#ifdef PARAVIEW_PLUS_BUILD
   vtkKWGenericMovieWriter* awriter = 0;
-#endif
   char *fileName;
   int fileCount;
   int t;
@@ -1459,26 +1412,14 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     {
     writer = vtkPNGWriter::New();
     }
-#ifdef PARAVIEW_PLUS_BUILD
-# ifdef _WIN32
-  else if (strcmp(ext,"avi") == 0 )
+  else if (strcmp(ext, "mp2") == 0)
     {
-    awriter = vtkAVIWriter::New();
-    }
-# else
-  else if (strcmp(ext, "mpg") == 0)
-    {
-    //awriter = vtkMPEG2Writer::New();
-    awriter = vtkMovieWriter::New();
-    /*
-    if ( aspectRatio > 0 && aspectRatio <= 4 )
-      {
-      vtkMPEG2Writer::SafeDownCast(awriter)->SetAspectRatio(aspectRatio);
+    awriter = vtkMPEG2Writer::New();
+//    if ( aspectRatio > 0 && aspectRatio <= 4 )
+//      {
+//      vtkMPEG2Writer::SafeDownCast(awriter)->SetAspectRatio(aspectRatio);
+//      }
       }
-      */
-    }
-# endif
-#endif
   else
     {
     vtkErrorMacro("Unknown extension " << ext << ", try: jpg, tif or png.");
@@ -1493,7 +1434,6 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     {
     writer->SetInput(winToImage->GetOutput());
     }
-#ifdef PARAVIEW_PLUS_BUILD
   else if ( awriter )
     {
     awriter->SetInput(winToImage->GetOutput());
@@ -1501,7 +1441,6 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     awriter->SetFileName(fileName);
     awriter->Start();
     }
-#endif
 
   // Loop through all of the time steps.
   t = this->GetGlobalStart();
@@ -1525,13 +1464,11 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
       writer->Write();
       errcode = writer->GetErrorCode();
       }
-#ifdef PARAVIEW_PLUS_BUILD
     else if ( awriter )
       {
       awriter->Write();
       errcode = awriter->GetErrorCode() + awriter->GetError();
       }
-#endif
     if ( errcode == vtkErrorCode::OutOfDiskSpaceError)
       {
       if ( writer )
@@ -1562,14 +1499,13 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     writer->Delete();
     writer = NULL;
     }
-#ifdef PARAVIEW_PLUS_BUILD
   else if ( awriter )
     {
+    awriter->End();
     awriter->SetInput(0);
     awriter->Delete();
     awriter = 0;
     }
-#endif
   delete [] fileName;
   fileName = NULL;
   
