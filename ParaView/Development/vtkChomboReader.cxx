@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkChomboReader, "1.1");
+vtkCxxRevisionMacro(vtkChomboReader, "1.2");
 vtkStandardNewMacro(vtkChomboReader);
 
 //----------------------------------------------------------------------------
@@ -66,7 +66,7 @@ void vtkChomboReader::CreateBoxDataType()
     H5Tclose( this->BoxDataType );
     }
 
-  hid_t boxType = H5Tcreate( H5T_COMPOUND, 2*this->Dimensionality*sizeof(int) );
+  hid_t boxType = H5Tcreate(H5T_COMPOUND, 2*this->Dimensionality*sizeof(int));
   char loCornerComponentNames[3][5] = {"lo_i", "lo_j", "lo_k"};
   char hiCornerComponentNames[3][5] = {"hi_i", "hi_j", "hi_k"};
 
