@@ -71,8 +71,6 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVRenderModuleUI.h"
 
-#include "vtkActor.h"
-
 // Just for the definition of VTK_POINT_DATA_FIELD ...
 #include "vtkFieldDataToAttributeDataFilter.h"
 
@@ -84,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.270");
+vtkCxxRevisionMacro(vtkPVData, "1.271");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
