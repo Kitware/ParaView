@@ -337,7 +337,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
                input_name="Input"/>
     <SelectionList label="Boundary Cells" variable="BoundaryMode"
                    trace_name="BoundaryMode"
-                   default_value="??"
+                   default_value="0"
                    help="Select how to handle boundary cells. Isosurfacing works well when cells are uniquely assigned to processes. Dividing cells along processor boundaries is useful for volume rendering.">
       <Item name="Assign cells uniquely" value="0"/>
       <Item name="Duplicate cells" value="1"/>
