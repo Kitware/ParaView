@@ -93,8 +93,8 @@ public:
   vtkGetMacro(DataSetType, int);
   const char *GetDataSetTypeAsString();
   int DataSetTypeIsA(const char* type);
-  vtkGetMacro(NumberOfPoints, int);
-  vtkGetMacro(NumberOfCells, int);
+  vtkGetMacro(NumberOfPoints, vtkIdType);
+  vtkGetMacro(NumberOfCells, vtkIdType);
   vtkGetMacro(MemorySize, unsigned long);
   vtkGetMacro(GeometryMemorySize, unsigned long);
   vtkGetMacro(LODMemorySize, unsigned long);
@@ -135,8 +135,8 @@ protected:
 
   // Data information collected from remote processes.
   int            DataSetType;
-  int            NumberOfPoints;
-  int            NumberOfCells;
+  vtkIdType      NumberOfPoints;
+  vtkIdType      NumberOfCells;
   unsigned long  MemorySize;
   unsigned long  GeometryMemorySize;
   unsigned long  LODMemorySize;

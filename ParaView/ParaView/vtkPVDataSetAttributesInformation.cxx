@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.2");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -287,14 +287,14 @@ int vtkPVDataSetAttributesInformation::WriteMessage(unsigned char *msg)
   // Shorts for default attributes.
   for (idx = 0; idx < 5; ++idx)
     {
-    *((short*)msg) = static_cast<short>(this->AttributeIndices[0]);
+    memcpy(msg, (unsigned char*)&this->AttributeIndices[0], sizeof(short));
     msg += sizeof(short); 
     length += sizeof(short);
     }
 
   // Number of arrays
   num = (short)(this->GetNumberOfArrays());
-  *((short*)msg) = num;
+  memcpy(msg, (unsigned char*)&num, sizeof(short));
   msg += sizeof(short);
   length += sizeof(short);
   for (idx = 0; idx < num; ++idx)
@@ -323,12 +323,12 @@ int vtkPVDataSetAttributesInformation::CopyFromMessage(unsigned char *msg)
   // Standard attributes
   for (idx = 0; idx < 5; ++idx)
     {
-    this->AttributeIndices[idx] = *((short*)msg);
+    memcpy((unsigned char*)&this->AttributeIndices[idx], msg, sizeof(short));
     msg += sizeof(short);
     length += sizeof(short);
     }
   // Number of arrays
-  num = *((short*)msg);
+  memcpy((unsigned char*)&num, msg, sizeof(short));
   msg += sizeof(short);
   length += sizeof(short);
   for (idx = 0; idx < num; ++idx)

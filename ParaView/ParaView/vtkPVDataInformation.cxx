@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.7");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.8");
 
 
 //----------------------------------------------------------------------------
@@ -421,28 +421,28 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
   tmp += sizeof(unsigned char);
   *tmp = (unsigned char)(this->DataSetType);
   tmp += sizeof(unsigned char);
-  *((vtkIdType*)tmp) = this->NumberOfPoints;
+  memcpy(tmp, (unsigned char*)&this->NumberOfPoints, sizeof(vtkIdType));
   tmp += sizeof(vtkIdType);
-  *((vtkIdType*)tmp) = this->NumberOfCells;
+  memcpy(tmp, (unsigned char*)&this->NumberOfCells, sizeof(vtkIdType));
   tmp += sizeof(vtkIdType);
   // Memory Size
-  *((unsigned long*)tmp) = this->MemorySize;
+  memcpy(tmp, (unsigned char*)&this->MemorySize, sizeof(unsigned long));
   tmp += sizeof(unsigned long);
-  *((unsigned long*)tmp) = this->GeometryMemorySize;
+  memcpy(tmp, (unsigned char*)&this->GeometryMemorySize, sizeof(unsigned long));
   tmp += sizeof(unsigned long);
-  *((unsigned long*)tmp) = this->LODMemorySize;
+  memcpy(tmp, (unsigned char*)&this->LODMemorySize, sizeof(unsigned long));
   tmp += sizeof(unsigned long);
 
   // Bounds
   for (idx = 0; idx < 6; ++idx)
     {
-    *((double*)tmp) = this->Bounds[idx];
+    memcpy(tmp, (unsigned char*)&this->Bounds[idx], sizeof(double));
     tmp += sizeof(double);
     }
   // Extent
   for (idx = 0; idx < 6; ++idx)
     {
-    *((int*)tmp) = this->Extent[idx];
+    memcpy(tmp, (unsigned char*)&this->Extent[idx], sizeof(int));
     tmp += sizeof(int);
     }
 
@@ -490,30 +490,30 @@ void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
   this->DataSetType = *tmp;
   tmp += 1;
 
-  this->NumberOfPoints = *((vtkIdType*)tmp);
+  memcpy((unsigned char*)&this->NumberOfPoints, tmp, sizeof(vtkIdType));
   tmp += sizeof(vtkIdType);
 
-  this->NumberOfCells = *((vtkIdType*)tmp);
+  memcpy((unsigned char*)&this->NumberOfCells, tmp, sizeof(vtkIdType));
   tmp += sizeof(vtkIdType);
 
-  this->MemorySize = *((unsigned long*)tmp);
+  memcpy((unsigned char*)&this->MemorySize, tmp, sizeof(unsigned long));
   tmp += sizeof(unsigned long);
-  this->GeometryMemorySize = *((unsigned long*)tmp);
+  memcpy((unsigned char*)&this->GeometryMemorySize, tmp, sizeof(unsigned long));
   tmp += sizeof(unsigned long);
-  this->LODMemorySize = *((unsigned long*)tmp);
+  memcpy((unsigned char*)&this->LODMemorySize, tmp, sizeof(unsigned long));
   tmp += sizeof(unsigned long);
 
   // Bounds
   for (idx = 0; idx < 6; ++idx)
     {
-    this->Bounds[idx] = *((double*)tmp);
+    memcpy((unsigned char*)&this->Bounds[idx], tmp, sizeof(double));
     tmp += sizeof(double);
     }
 
   // Extent
   for (idx = 0; idx < 6; ++idx)
     {
-    this->Extent[idx] = *((int*)tmp);
+    memcpy((unsigned char*)&this->Extent[idx], tmp, sizeof(int));
     tmp += sizeof(int);
     }
 
