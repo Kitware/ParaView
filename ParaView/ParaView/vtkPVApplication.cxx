@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkToolkits.h"
 #include "vtkPVConfig.h"
 #ifdef VTK_USE_MPI
-# include <mpi.h>
 #include "vtkMPIController.h"
 #include "vtkMPICommunicator.h"
 #include "vtkMPIGroup.h"
@@ -98,7 +97,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.144");
+vtkCxxRevisionMacro(vtkPVApplication, "1.145");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
