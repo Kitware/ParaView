@@ -36,6 +36,7 @@
 #include "vtkKWNotebook.h"
 #include "vtkKWProgressGauge.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWPushButtonWithMenu.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWSplashScreen.h"
@@ -128,7 +129,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.605");
+vtkCxxRevisionMacro(vtkPVWindow, "1.606");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -177,7 +178,7 @@ vtkPVWindow::vtkPVWindow()
   this->InteractorToolbar = vtkKWToolbar::New();
   this->Toolbars->AddToolbar(this->InteractorToolbar);
 
-  this->ResetCameraButton = vtkKWPushButton::New();
+  this->ResetCameraButton = vtkKWPushButtonWithMenu::New();
   
   this->RotateCameraButton = vtkKWRadioButton::New();
   this->TranslateCameraButton = vtkKWRadioButton::New();
@@ -430,6 +431,17 @@ void vtkPVWindow::PrepareForDelete()
     pm = pvApp->GetProcessModule();
     }
   
+  if (pvApp)
+    {
+    int state;
+    state = this->ResetCameraButton->GetCheckButtonState("ViewAngle");
+    pvApp->SetRegisteryValue(2, "RunTime", "ResetViewResetsViewAngle", 
+                             "%d", state);
+    state = this->ResetCameraButton->GetCheckButtonState("CenterOfRotation");
+    pvApp->SetRegisteryValue(2, "RunTime", "ResetViewResetsCenterOfRotation", 
+                             "%d", state);
+    }
+
   if (pvApp && this->CenterSourceID.ID)
     {
     pm->DeleteStreamObject(this->CenterSourceID);
@@ -834,7 +846,23 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
   this->ResetCameraButton->SetBalloonHelpString("Reset the view to show everything visible.");
   this->InteractorToolbar->AddWidget(this->ResetCameraButton);
-
+  
+  // Create options and popup option menu for the reset camera button.
+  int state = 0;
+  if (app->GetRegisteryValue(2, "RunTime", "ResetViewResetsCenterOfRotation", 0))
+    {
+    state = app->GetIntRegisteryValue(2, "RunTime", "ResetViewResetsCenterOfRotation");
+    }
+  this->ResetCameraButton->AddCheckButton("Reset Center Of Rotation", "CenterOfRotation", state,
+                                          "Button sets the center opf rotation to center of visible modules.");
+  state = 0;
+  if (app->GetRegisteryValue(2, "RunTime", "ResetViewResetsViewAngle", 0))
+    {
+    state = app->GetIntRegisteryValue(2, "RunTime", "ResetViewResetsViewAngle");
+    }
+  this->ResetCameraButton->AddCheckButton("Reset View Angle", "ViewAngle", state,
+                                          "Button sets the view plane normal to the default z axis.");
+  
   // Rotate camera interactor style
 
   this->RotateCameraButton->SetParent(this->InteractorToolbar->GetFrame());
@@ -3405,6 +3433,16 @@ void vtkPVWindow::ResetCameraCallback()
 
   this->GetPVApplication()->AddTraceEntry("$kw(%s) ResetCameraCallback", 
                                           this->GetTclName());
+
+  if (this->ResetCameraButton->GetCheckButtonState("ViewAngle"))
+    {
+    this->MainView->StandardViewCallback(0,0,1);
+    }
+  if (this->ResetCameraButton->GetCheckButtonState("CenterOfRotation"))
+    {
+    this->ResetCenterCallback();
+    }
+
   this->MainView->ResetCamera();
   this->MainView->EventuallyRender();
 }

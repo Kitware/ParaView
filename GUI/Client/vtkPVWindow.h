@@ -63,6 +63,7 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkKWNotebook;
 class vtkKWPushButton;
+class vtkKWPushButtonWithMenu;
 class vtkKWRadioButton;
 class vtkKWRotateCameraInteractor;
 class vtkKWScale;
@@ -492,7 +493,7 @@ public:
   // Access to these widgets so their state can be set from a script
   vtkGetObjectMacro(TranslateCameraButton, vtkKWRadioButton);
   vtkGetObjectMacro(RotateCameraButton, vtkKWRadioButton);
-  vtkGetObjectMacro(ResetCameraButton, vtkKWPushButton);
+  vtkGetObjectMacro(ResetCameraButton, vtkKWPushButtonWithMenu);
   
   // Description:
   // Update the toolbar aspect once the toolbar settings have been changed
@@ -555,7 +556,7 @@ protected:
 
   // Interactor stuff
   vtkKWToolbar *InteractorToolbar;
-  vtkKWPushButton *ResetCameraButton;
+  vtkKWPushButtonWithMenu *ResetCameraButton;
   vtkKWRadioButton *RotateCameraButton;
   vtkKWRadioButton *TranslateCameraButton;
     
