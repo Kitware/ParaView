@@ -46,27 +46,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVSourceList_h
 #define __vtkPVSourceList_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVSourcesNavigationWindow.h"
 
 class vtkKWEntry;
 class vtkPVSource;
 class vtkPVSourceCollection;
 class vtkKWMenu;
 
-class VTK_EXPORT vtkPVSourceList : public vtkKWWidget
+class VTK_EXPORT vtkPVSourceList : public vtkPVSourcesNavigationWindow
 {
 public:
   static vtkPVSourceList* New();
-  vtkTypeMacro(vtkPVSourceList,vtkKWWidget);
+  vtkTypeMacro(vtkPVSourceList,vtkPVSourcesNavigationWindow);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, char *args);
-
-  // Description:
-  // Redraws the canvas (assembly or list changed).
-  void Update(vtkPVSource*, vtkPVSourceCollection*);
 
   // Description:
   // Callback from the canvas buttons.
@@ -75,46 +67,32 @@ public:
   void EditColor(int assyIdx);
 
   // Description:
-  // Callbacks from menu items.
-  void DeletePicked();
-  void DeletePickedVerify();
-
-  // Description:
-  // Set the height of the widget.
-  void SetHeight(int height);
-
-  // Description:
-  // Display the module popup menu
-  void DisplayModulePopupMenu(const char*, int x, int y); 
- 
-  // Description:
-  // Execute a command on module.
-  void ExecuteCommandOnModule(const char* module, const char* command);
-
-  // Description:
   // This method is called before the object is deleted.
-  void PrepareForDelete();
+  virtual void PrepareForDelete();
  
 protected:
   vtkPVSourceList();
   ~vtkPVSourceList();
 
-  int Update(vtkPVSource *comp, int y, int in, int current);
+  virtual void ChildUpdate(vtkPVSource*);
+  virtual void PostChildUpdate();
 
-  vtkKWWidget *ScrollFrame;
-  vtkKWWidget *Canvas;
-  vtkKWWidget *ScrollBar;
-  vtkKWMenu* PopupMenu;
+  // Description:
+  // Create a Tk widget
+  virtual void ChildCreate();
 
-  int Height;
-  
+  int UpdateSource(vtkPVSource *comp, int y, int in, int current);
+
   // Description:
   // The assembly that is displayed in the editor.
   vtkGetObjectMacro(Sources, vtkPVSourceCollection);
   virtual void SetSources(vtkPVSourceCollection*);
   vtkPVSourceCollection *Sources;
-
   vtkPVSource* CurrentSource;
+
+  int StartY;
+  int LastY;
+  int CurrentY;
 
 private:
   vtkPVSourceList(const vtkPVSourceList&); // Not implemented

@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
+#include "vtkString.h"
 
 #include <stdarg.h>
 
@@ -57,82 +58,30 @@ vtkStandardNewMacro( vtkPVNavigationWindow );
 
 vtkPVNavigationWindow::vtkPVNavigationWindow()
 {
-  this->Width     = -1;
-  this->Height    = -1;
-  this->Canvas    = vtkKWWidget::New();
-  this->ScrollBar = vtkKWWidget::New();
-  this->PopupMenu = vtkKWMenu::New();
 }
 
 vtkPVNavigationWindow::~vtkPVNavigationWindow()
 {
-  if (this->Canvas)
-    {
-    this->Canvas->Delete();
-    }
-  if (this->ScrollBar)
-    {
-    this->ScrollBar->Delete();
-    }
-  if ( this->PopupMenu )
-    {
-    this->PopupMenu->Delete();
-    }
 }
 
 
-void vtkPVNavigationWindow::CalculateBBox(vtkKWWidget* canvas, char* name, 
-                                          int bbox[4])
-{
-  char *result;
-
-  // Get the bounding box for the name. We may need to highlight it.
-  this->Script("%s bbox %s", canvas->GetWidgetName(), name);
-  result = this->Application->GetMainInterp()->result;
-  sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
-
-}
-
-char* vtkPVNavigationWindow::CreateCanvasItem(const char *format, ...)
-{
-  char event[16000];
-  char* result, *retVal;
-  
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(event, format, var_args);
-  va_end(var_args);
-
-  this->Script(event);
-  result = this->Application->GetMainInterp()->result;
-  retVal = new char[strlen(result)+1];
-  strcpy(retVal,result);
-  return retVal;
-}
-
-void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
+void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
 {
   vtkPVSource *source;
   vtkPVData **inputs = currentSource->GetPVInputs();
   vtkPVData **outputs;
   int numInputs, xMid, yMid=0, y, i;
-  char *tmp;
   int bbox[4];
   int bboxIn[4], bboxOut[4], bboxSource[4];
   vtkPVData *moreOut;
   static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";  
-  
-  this->Script("pack forget %s", this->ScrollBar->GetWidgetName());
-
-  // Clear the canvas
-  this->Script("%s delete all", this->Canvas->GetWidgetName());
 
   // Draw the name of the assembly.
-  tmp = this->CreateCanvasItem("%s create text %d %d -text {%s} -font %s "
-                               "-tags x",
-                               this->Canvas->GetWidgetName(), 170, 10, 
-                               currentSource->GetName(),
-                               font);
+  const char *res = this->CreateCanvasItem(
+    "%s create text %d %d -text {%s} -font %s -tags x",
+    this->Canvas->GetWidgetName(), 170, 10, currentSource->GetName(),font);
+  char* tmp = vtkString::Duplicate(res);
+  
   this->Script("%s bind %s <ButtonPress-3> "
                "{ %s DisplayModulePopupMenu %s %%X %%Y }",
                this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
@@ -154,11 +103,13 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
       if (inputs[i] && (source = inputs[i]->GetPVSource()) )
         {
         // Draw the name of the assembly.
-        tmp = this->CreateCanvasItem(
+        
+        const char* res = this->CreateCanvasItem(
           "%s create text %d %d -text {%s} -font %s -anchor e "
           "-tags x -fill blue",
           this->Canvas->GetWidgetName(), bboxSource[0]-50, y,
           source->GetName(), font);
+        tmp = vtkString::Duplicate(res);
         
         this->CalculateBBox(this->Canvas, tmp, bboxIn);
         this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSourceCallback %s}",
@@ -188,11 +139,10 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
         // Draw a line from input to source.
         if (y == 10)
           {
-          tmp = this->CreateCanvasItem(
+          this->CreateCanvasItem(
             "%s create line %d %d %d %d -fill gray50 -arrow last",
             this->Canvas->GetWidgetName(), bboxIn[2], yMid,
             bboxSource[0], yMid);
-          delete[] tmp;
           }
         else
           {
@@ -269,11 +219,12 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
           }
         
         // Draw the name of the assembly .
-        tmp = this->CreateCanvasItem(
+        const char* res = this->CreateCanvasItem(
           "%s create text %d %d -text {%s} -font %s -anchor w "
           "-tags x -fill blue",
           this->Canvas->GetWidgetName(), bboxSource[2]+50, y,
           source->GetName(), font);
+        tmp = vtkString::Duplicate(res);
         
         // Get the bounding box for the name.
         this->CalculateBBox(this->Canvas, tmp, bboxOut);
@@ -337,213 +288,10 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
         }
       }
     }
-
-  char all[4] = "all";
-  this->CalculateBBox(this->Canvas, all, bbox);
-  this->Script("winfo height %s", this->Canvas->GetWidgetName());
-  int height = vtkKWObject::GetIntegerResult(this->Application);
-  if ( height > 1 && (bbox[3] - bbox[1]) > height )
-    {
-    this->Script("pack %s -fill both -side right", 
-                 this->ScrollBar->GetWidgetName());
-    this->Script("%s configure -scrollregion \"%d %d %d %d\"", 
-                 this->Canvas->GetWidgetName(), 
-                 0, bbox[1], 341, bbox[3]);
-    }
-  else
-    {
-    this->Script("%s configure -scrollregion \"%d %d %d %d\"", 
-                 this->Canvas->GetWidgetName(), 
-                 0, 0, 341, 45);
-    }
-  
-}
-
-void vtkPVNavigationWindow::Create(vtkKWApplication *app, const char *args)
-{
-  const char *wname;
-
-  // must set the application
-  if (this->Application)
-    {
-    vtkErrorMacro("Window already created");
-    return;
-    }
-
-  this->SetApplication(app);
-
-  ostrstream opts;
-  
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s %s", wname, (args?args:""));
-
-  if (this->Width > 0 && this->Height > 0)
-    {
-    opts << " -width " << this->Width << " -height " << this->Height;
-    }
-  else if (this->Width > 0)
-    {
-    opts << " -width " << this->Width;
-    }
-  else if (this->Height > 0)
-    {
-    opts << " -height " << this->Height;
-    }
-
-  opts << " -bg white" << ends;
-
-  char* optstr = opts.str();
-  this->Canvas->SetParent(this);
-  this->Canvas->Create(this->Application, "canvas", optstr); 
-  delete[] optstr;
-
-  ostrstream command;
-  this->ScrollBar->SetParent(this);
-  command << "-command \"" <<  this->Canvas->GetWidgetName()
-          << " yview\"" << ends;
-  char* commandStr = command.str();
-  this->ScrollBar->Create(this->Application, "scrollbar", commandStr);
-  delete[] commandStr;
-
-  this->Script("%s configure -yscrollcommand \"%s set\"", 
-               this->Canvas->GetWidgetName(),
-               this->ScrollBar->GetWidgetName());
-
-  this->Script("pack %s -fill both -expand t -side left", this->Canvas->GetWidgetName());
-  this->PopupMenu->SetParent(this);
-  this->PopupMenu->Create(this->Application, "-tearoff 0");
-  this->PopupMenu->AddCommand("Delete", this, "DeleteWidget", 0, 
-                              "Delete current widget");
-  char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
-  this->PopupMenu->AddCheckButton("Visibility", var, this, "Visibility", 0,
-                                  "Set visibility for the current object");  
-  delete [] var;
-  this->PopupMenu->AddCascade("Representation", 0, 0);
-  this->PopupMenu->AddCascade("Interpolation", 0, 0);
-  /*
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
-  this->PopupMenu->AddCascade(
-    "VTK Filters", pvApp->GetMainWindow()->GetFilterMenu(),
-    4, "Choose a filter from a list of VTK filters");
-  */
-}
-
-void vtkPVNavigationWindow::SetWidth(int width)
-{
-  if (this->Width == width)
-    {
-    return;
-    }
-
-  this->Modified();
-  this->Width = width;
-
-  if (this->Application != NULL)
-    {
-    this->Script("%s configure -width %d", this->Canvas->GetWidgetName(), 
-                 width);
-    }
-}
-
-void vtkPVNavigationWindow::SetHeight(int height)
-{
-  if (this->Height == height)
-    {
-    return;
-    }
-
-  this->Modified();
-  this->Height = height;
-
-  if (this->Application != NULL)
-    {
-    this->Script("%s configure -height %d", this->Canvas->GetWidgetName(), 
-                 height);
-    }
-}
-
-void vtkPVNavigationWindow::HighlightObject(const char* widget, int onoff)
-{
-  this->Script("%s itemconfigure %s -fill %s", 
-               this->Canvas->GetWidgetName(), widget,
-               (onoff ? "red" : "blue") );
-}
-
-//----------------------------------------------------------------------------
-void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module, 
-                                                   int x, int y)
-{
-  //cout << "Popup for module: " << module << " at " << x << ", " << y << endl;
-  vtkKWApplication *app = this->Application;
-  ostrstream str;
-  if ( app->EvaluateBooleanExpression("%s IsDeletable", module) )
-    {
-    str << "ExecuteCommandOnModule " << module << " DeleteCallback" << ends;
-    this->PopupMenu->SetEntryCommand("Delete", this, str.str());
-    this->PopupMenu->SetState("Delete", vtkKWMenu::Normal);
-    }
-  else
-    {
-    this->PopupMenu->SetState("Delete", vtkKWMenu::Disabled);
-    }
-  str.rdbuf()->freeze(0);
-  ostrstream str1;
-  if ( !app->EvaluateBooleanExpression("%s GetHideDisplayPage", module) )
-    {
-    this->PopupMenu->SetState("Visibility", vtkKWMenu::Normal);
-    this->PopupMenu->SetState("Representation", vtkKWMenu::Normal);
-    this->PopupMenu->SetState("Interpolation", vtkKWMenu::Normal);
-    char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
-    str1 << "[ " << module << " GetPVOutput ] SetVisibility $" 
-         << var << ";"
-         << "[ [ Application GetMainWindow ] GetMainView ] EventuallyRender" 
-         <<  ends;
-    this->PopupMenu->SetEntryCommand("Visibility", str1.str());
-    if ( app->EvaluateBooleanExpression("[ %s GetPVOutput ] GetVisibility",
-                                        module) )
-      {
-      this->Script("set %s 1", var);
-      }
-    else
-      {
-      this->Script("set %s 0", var);
-      }
-    delete [] var;
-    this->Script("%s SetCascade [ %s GetIndex \"Representation\" ] "
-                 "[ [ [ [ %s GetPVOutput ] GetRepresentationMenu ] "
-                 "GetMenu ] GetWidgetName ]",
-                 this->PopupMenu->GetTclName(),
-                 this->PopupMenu->GetTclName(), module);
-
-    this->Script("%s SetCascade [ %s GetIndex \"Interpolation\" ] "
-                 "[ [ [ [ %s GetPVOutput ] GetInterpolationMenu ] "
-                 "GetMenu ] GetWidgetName ]",
-                 this->PopupMenu->GetTclName(),
-                 this->PopupMenu->GetTclName(), module);
-                 
-    }
-  else
-    {
-    this->PopupMenu->SetState("Visibility", vtkKWMenu::Disabled);
-    this->PopupMenu->SetState("Representation", vtkKWMenu::Disabled);
-    this->PopupMenu->SetState("Interpolation", vtkKWMenu::Disabled);
-    }
-  this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
-  str1.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVNavigationWindow::ExecuteCommandOnModule(
-  const char* module, const char* command)
-{
-  //cout << "Executing: " << command << " on module: " << module << endl;
-  this->Script("%s %s", module, command);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVNavigationWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Canvas: " << this->GetCanvas() << endl;
 }

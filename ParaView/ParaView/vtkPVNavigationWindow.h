@@ -48,65 +48,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVNavigationWindow_h
 #define __vtkPVNavigationWindow_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVSourcesNavigationWindow.h"
 
 class vtkKWApplication;
 class vtkKWWidget;
 class vtkPVSource;
 class vtkKWMenu;
 
-class VTK_EXPORT vtkPVNavigationWindow : public vtkKWWidget
+class VTK_EXPORT vtkPVNavigationWindow : public vtkPVSourcesNavigationWindow
 {
 public:
   static vtkPVNavigationWindow* New();
-  vtkTypeMacro(vtkPVNavigationWindow,vtkKWWidget);
+  vtkTypeMacro(vtkPVNavigationWindow,vtkPVSourcesNavigationWindow);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Create a Tk widget
-  void Create(vtkKWApplication *app, const char *args);
-
-  // Description:
-  // Set the width and the height of the underlying canvas
-  void SetWidth(int width);
-  void SetHeight(int height);
-
-  // Description:
-  // Return the underlying canvas
-  vtkGetObjectMacro(Canvas, vtkKWWidget);
-
-  // Description:
-  // Regenerate the display and re-assign bindings.
-  void Update(vtkPVSource *currentSource);
-
-  // Description:
-  // Highlight the object.
-  void HighlightObject(const char* widget, int onoff);
-
-  // Description:
-  // Display the module popup menu
-  void DisplayModulePopupMenu(const char*, int x, int y);
-
-  // Description:
-  // Execute a command on module.
-  void ExecuteCommandOnModule(const char* module, const char* command);
-  
 protected:
   vtkPVNavigationWindow();
   ~vtkPVNavigationWindow();
 
-  void CalculateBBox(vtkKWWidget* canvas, char* name, int bbox[4]);
-
-//BTX
-  char* CreateCanvasItem(const char *format, ...);
-//ETX
-  
-  int Width;
-  int Height;
-  vtkKWWidget* Canvas;
-  vtkKWWidget* ScratchCanvas;
-  vtkKWWidget* ScrollBar;
-  vtkKWMenu* PopupMenu;
+  // This method actually does everything
+  virtual void ChildUpdate(vtkPVSource*);
 
 private:
   vtkPVNavigationWindow(const vtkPVNavigationWindow&); // Not implemented

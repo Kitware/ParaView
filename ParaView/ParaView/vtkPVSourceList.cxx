@@ -39,22 +39,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
+#include "vtkPVSourceList.h"
 
 #include "vtkCollectionIterator.h"
 #include "vtkKWEntry.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
-#include "vtkPVSourceList.h"
 #include "vtkPVWindow.h"
 #include "vtkString.h"
-
-int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
-                       int argc, char *argv[]);
 
 vtkStandardNewMacro(vtkPVSourceList);
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
@@ -63,74 +60,27 @@ vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 //----------------------------------------------------------------------------
 vtkPVSourceList::vtkPVSourceList()
 {
-  this->CommandFunction = vtkPVSourceListCommand;
-
-  this->Canvas = vtkKWWidget::New();
-  this->ScrollBar = vtkKWWidget::New();
-
   this->Sources = NULL;
-
   this->CurrentSource = 0;
-  this->PopupMenu = vtkKWMenu::New();
-  this->Height = 40;
+
+  this->LastY = 0;
+  this->CurrentY = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVSourceList::~vtkPVSourceList()
 {
-  this->Canvas->Delete();
-  this->Canvas = NULL;
-  this->ScrollBar->Delete();
-  this->ScrollBar = NULL;
-
   this->SetSources(0);
-
-  if ( this->PopupMenu )
-    {
-    this->PopupMenu->Delete();
-    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceList::Create(vtkKWApplication *app, char *args)
-{
-  char str[1024], str2[1024];
-
-  // must set the application
-  if (this->Application)
-    {
-    vtkErrorMacro("widget already created");
-    return;
-    }
-  this->SetApplication(app);
-  
-  // create the main frame for this widget
-  this->Script( "frame %s %s", this->GetWidgetName(), (args?args:""));
-
-  this->Canvas->SetParent(this);
-  this->Canvas->Create(app,"canvas ", 0);
-
-  this->ScrollBar->SetParent(this);
-  this->ScrollBar->Create(app,"scrollbar", 0);
-
-  this->Script("%s configure -command {%s yview}", 
-               this->ScrollBar->GetWidgetName(), 
-               this->Canvas->GetWidgetName());
-  this->Script("%s configure -bg white -height %d "
-               "-yscrollcommand {%s set}",
-               this->Canvas->GetWidgetName(), 
-               this->Height, this->ScrollBar->GetWidgetName());
-
-  this->Script("pack %s -side left -fill y -expand no",
-               this->ScrollBar->GetWidgetName());
-  this->Script( "pack %s -side left -fill both -expand yes",
-                this->Canvas->GetWidgetName());
- 
+void vtkPVSourceList::ChildCreate()
+{ 
+  char str[1024];
+  char str2[1024];
   // Set up bindings for the canvas (cut and paste).
   this->Script("bind %s <Enter> {focus %s}", this->Canvas->GetWidgetName(), 
                this->Canvas->GetWidgetName());
-  this->Script("bind %s <Delete> {%s DeletePickedVerify}", 
-               this->Canvas->GetWidgetName(), this->GetTclName());   
 
   // Bitmaps used to show which parts of the tree can be opened.
 
@@ -167,42 +117,7 @@ void vtkPVSourceList::Create(vtkKWApplication *app, char *args)
           "static unsigned char open_eye_bits[] = {",
           "0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x10, 0x02, 0x08",
           "0x0c, 0x06, 0xf2, 0x09, 0x48, 0x02};");
-  this->Script("image create bitmap visoffbm -data %s -foreground black -background white", str, str2);
-  
-  this->PopupMenu->SetParent(this);
-  this->PopupMenu->Create(this->Application, "-tearoff 0");
-  this->PopupMenu->AddCommand("Delete", this, "DeleteWidget", 0, 
-                              "Delete current widget");
-  char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
-  this->PopupMenu->AddCheckButton("Visibility", var, this, "Visibility", 0,
-                                  "Set visibility for the current object");  
-  delete [] var;
-  this->PopupMenu->AddCascade("Representation", 0, 0);
-  this->PopupMenu->AddCascade("Interpolation", 0, 0);
-  /*
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
-  this->PopupMenu->AddCascade(
-    "VTK Filters", pvApp->GetMainWindow()->GetFilterMenu(),
-    4, "Choose a filter from a list of VTK filters");
-  */
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSourceList::SetHeight(int height)
-{
-  if (this->Height == height)
-    {
-    return;
-    }
-
-  this->Modified();
-  this->Height = height;
-
-  if (this->Application != NULL)
-    {
-    this->Script("%s configure -height %d",
-         this->Canvas->GetWidgetName(), height);
-    }
+  this->Script("image create bitmap visoffbm -data %s -foreground black -background white", str, str2);  
 }
 
 //----------------------------------------------------------------------------
@@ -258,15 +173,16 @@ void vtkPVSourceList::EditColor(int )
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceList::Update(vtkPVSource* current, vtkPVSourceCollection* col)
+void vtkPVSourceList::ChildUpdate(vtkPVSource* current)
 {
   this->CurrentSource = current;
   vtkPVSource *comp;
   int y, in;
   
-  this->Script("%s delete all",
-               this->Canvas->GetWidgetName());
-
+  vtkPVApplication* app = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVWindow* window = app->GetMainWindow();
+  vtkPVSourceCollection* col = window->GetSourceList("Sources");
+  
   this->SetSources(col);
   if (this->Sources == NULL)
     {
@@ -287,7 +203,7 @@ void vtkPVSourceList::Update(vtkPVSource* current, vtkPVSourceCollection* col)
       {
       lasty = y;
       }
-    y = this->Update(comp, y, in, (current == comp));
+    y = this->UpdateSource(comp, y, in, (current == comp));
     if ( current == comp )
       {
       thisy = y;
@@ -295,13 +211,20 @@ void vtkPVSourceList::Update(vtkPVSource* current, vtkPVSourceCollection* col)
     it->GoToNextItem();
     }
   it->Delete();
-  
-  this->Script("%s config -scrollregion [%s bbox all]",
-               this->Canvas->GetWidgetName(),this->Canvas->GetWidgetName());
 
-  if ( lasty < thisy )
+  this->StartY = start;
+  this->LastY = lasty;
+  this->CurrentY = thisy;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSourceList::PostChildUpdate()
+{
+  int bbox[4];
+  this->CalculateBBox(this->Canvas, "all", bbox);
+  if ( this->LastY < this->CurrentY )
     {
-    int midy = lasty - start - ( thisy - lasty )/2;
+    int midy = this->LastY - this->StartY - ( this->CurrentY - this->LastY )/2;
     if ( midy < 0 )
       {
       midy = 0;
@@ -309,13 +232,13 @@ void vtkPVSourceList::Update(vtkPVSource* current, vtkPVSourceCollection* col)
     
     this->Script("%s yview moveto %f",
                  this->Canvas->GetWidgetName(), 
-                 (static_cast<float>(midy) / static_cast<float>(y)));
+                 (static_cast<float>(midy) / static_cast<float>(bbox[3])));
     
     }
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSourceList::Update(vtkPVSource *comp, int y, int in, int current)
+int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current)
 {
   int compIdx, x, yNext; 
   static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
@@ -415,87 +338,6 @@ int vtkPVSourceList::Update(vtkPVSource *comp, int y, int in, int current)
     }
 
   return yNext;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSourceList::DeletePicked()
-{
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSourceList::DeletePickedVerify()
-{
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSourceList::DisplayModulePopupMenu(const char* module, 
-                                                   int x, int y)
-{
-  //cout << "Popup for module: " << module << " at " << x << ", " << y << endl;
-  vtkKWApplication *app = this->Application;
-  ostrstream str;
-  if ( app->EvaluateBooleanExpression("%s IsDeletable", module) )
-    {
-    str << "ExecuteCommandOnModule " << module << " DeleteCallback" << ends;
-    this->PopupMenu->SetEntryCommand("Delete", this, str.str());
-    this->PopupMenu->SetState("Delete", vtkKWMenu::Normal);
-    }
-  else
-    {
-    this->PopupMenu->SetState("Delete", vtkKWMenu::Disabled);
-    }
-  str.rdbuf()->freeze(0);
-  ostrstream str1;
-  if ( !app->EvaluateBooleanExpression("%s GetHideDisplayPage", module) )
-    {
-    this->PopupMenu->SetState("Visibility", vtkKWMenu::Normal);
-    this->PopupMenu->SetState("Representation", vtkKWMenu::Normal);
-    this->PopupMenu->SetState("Interpolation", vtkKWMenu::Normal);
-    char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
-    str1 << "[ " << module << " GetPVOutput ] SetVisibility $" 
-         << var << ";"
-         << "[ [ Application GetMainWindow ] GetMainView ] EventuallyRender" 
-         <<  ends;
-    this->PopupMenu->SetEntryCommand("Visibility", str1.str());
-    if ( app->EvaluateBooleanExpression("[ %s GetPVOutput ] GetVisibility",
-                                        module) )
-      {
-      this->Script("set %s 1", var);
-      }
-    else
-      {
-      this->Script("set %s 0", var);
-      }
-    delete [] var;
-    this->Script("%s SetCascade [ %s GetIndex \"Representation\" ] "
-                 "[ [ [ [ %s GetPVOutput ] GetRepresentationMenu ] "
-                 "GetMenu ] GetWidgetName ]",
-                 this->PopupMenu->GetTclName(),
-                 this->PopupMenu->GetTclName(), module);
-
-    this->Script("%s SetCascade [ %s GetIndex \"Interpolation\" ] "
-                 "[ [ [ [ %s GetPVOutput ] GetInterpolationMenu ] "
-                 "GetMenu ] GetWidgetName ]",
-                 this->PopupMenu->GetTclName(),
-                 this->PopupMenu->GetTclName(), module);
-                 
-    }
-  else
-    {
-    this->PopupMenu->SetState("Visibility", vtkKWMenu::Disabled);
-    this->PopupMenu->SetState("Representation", vtkKWMenu::Disabled);
-    this->PopupMenu->SetState("Interpolation", vtkKWMenu::Disabled);
-    }
-  this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
-  str1.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSourceList::ExecuteCommandOnModule(
-  const char* module, const char* command)
-{
-  //cout << "Executing: " << command << " on module: " << module << endl;
-  this->Script("%s %s", module, command);
 }
 
 //----------------------------------------------------------------------------
