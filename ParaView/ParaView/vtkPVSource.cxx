@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.309.2.1");
+vtkCxxRevisionMacro(vtkPVSource, "1.309.2.2");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1231,7 +1231,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // about unspecified file names, etc., when ExecuteInformation is called on
   // the VTK source.  (The vtkPLOT3DReader is a good example of this.)
   this->UpdateVTKSourceParameters();
-  
+
   this->MarkSourcesForUpdate(1);
 
   // Moved from creation of the source. (InitializeClone)

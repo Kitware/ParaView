@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.25.2.1");
+vtkCxxRevisionMacro(vtkPVPart, "1.25.2.2");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -201,6 +201,12 @@ void vtkPVPart::GatherDataInformation()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
+
+  // This does nothing if the geometry is already up to date.
+  if (this->PartDisplay)
+    {
+    this->PartDisplay->Update();
+    }
 
   pm->GatherInformation(this->DataInformation, 
                         this->GetVTKDataTclName());
