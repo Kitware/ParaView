@@ -19,6 +19,7 @@
 #include "vtkClientServerStream.h"
 #include "vtkCollection.h"
 #include "vtkPVPartDisplay.h"
+#include "vtkPVPlotDisplay.h"
 //#include "vtkCallbackCommand.h"
 //#include "vtkCommand.h"
 //#include "vtkMultiProcessController.h"
@@ -44,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSimpleRenderModule);
-vtkCxxRevisionMacro(vtkPVSimpleRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVSimpleRenderModule, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -78,7 +79,7 @@ void vtkPVSimpleRenderModule::CacheUpdate(int idx, int total)
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVPartDisplay::SafeDownCast(object);
-    if (pDisp->GetVisibility())
+    if (pDisp && pDisp->GetVisibility())
       {
       pDisp->CacheUpdate(idx, total);
       }
@@ -89,12 +90,15 @@ void vtkPVSimpleRenderModule::CacheUpdate(int idx, int total)
 void vtkPVSimpleRenderModule::InvalidateAllGeometries()
 {
   vtkObject* object;
-  vtkPVPartDisplay* pDisp;
+  vtkPVDisplay* pDisp;
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
-    pDisp = vtkPVPartDisplay::SafeDownCast(object);
-    pDisp->InvalidateGeometry();
+    pDisp = vtkPVDisplay::SafeDownCast(object);
+    if (pDisp)
+      {
+      pDisp->InvalidateGeometry();
+      }
     }
 }
 
