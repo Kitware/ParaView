@@ -43,7 +43,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVAssignment.h"
 #include "vtkPVSource.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVImageReader.h"
 #include "vtkPVImageMandelbrotSource.h"
 #include "vtkPVImageData.h"
 #include "vtkPVSourceList.h"
