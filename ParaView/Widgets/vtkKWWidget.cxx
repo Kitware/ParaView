@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.72");
+vtkCxxRevisionMacro(vtkKWWidget, "1.73");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -265,6 +265,12 @@ void vtkKWWidget::SetBind(const char *Event, const char *CommandString)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWWidget::UnsetBind(const char *Event)
+{
+  this->SetBind(Event, "");
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWidget::SetBind(const char *event, const char *widget, const char *command)
 {
   this->Script("bind %s %s { %s %s }", this->GetWidgetName(), event, widget, command);
@@ -341,7 +347,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.72 $");
+  this->ExtractRevision(os,"$Revision: 1.73 $");
 }
 
 //----------------------------------------------------------------------------
