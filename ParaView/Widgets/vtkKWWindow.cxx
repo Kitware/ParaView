@@ -976,7 +976,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.39 $");
+  this->ExtractRevision(os,"$Revision: 1.40 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1043,7 +1043,7 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
 	lastI = ii;
 	}
       }
-    for(ii=strlen(filename); ii>=(strlen(filename)-25); ii--)
+    for(ii=strlen(filename); static_cast<unsigned int>(ii)>=(strlen(filename)-25); ii--)
       {
       if ( filename[ii] == '/' )
 	{
@@ -1068,7 +1068,7 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
   vtkKWWindowMenuEntry *recent = 0;
   vtkKWWindowMenuEntry *kc = 0;
   int cc;
-  for ( cc = 0; cc < this->RecentFiles->GetSize(); cc ++ )
+  for ( cc = 0; static_cast<unsigned int>(cc) < this->RecentFiles->GetSize(); cc ++ )
     {
     kc = (vtkKWWindowMenuEntry *)
       this->RecentFiles->Lookup(cc);
@@ -1118,7 +1118,7 @@ void vtkKWWindow::PrintRecentFiles()
   
   cout << "Recent files: " << endl;
   int cc;
-  for( cc=0; cc< this->RecentFiles->GetSize(); cc ++ )
+  for( cc=0; static_cast<unsigned int>(cc) < this->RecentFiles->GetSize(); cc ++ )
     {
     vtkKWWindowMenuEntry *kc;
     kc = (vtkKWWindowMenuEntry *)this->RecentFiles->Lookup(cc);
