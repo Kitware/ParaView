@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.52");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.53");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -718,7 +718,7 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
         }
       if (this->RenderWidget)
         {
-        this->RenderWidget->CornerAnnotationOn();
+        this->RenderWidget->SetCornerAnnotationVisibility(state);
         }
       }
     else
@@ -732,7 +732,7 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
         }
       if (this->RenderWidget)
         {
-        this->RenderWidget->CornerAnnotationOff();
+        this->RenderWidget->SetCornerAnnotationVisibility(state);
         }
       }
     }
@@ -952,7 +952,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.52 $");
+  this->ExtractRevision(os,"$Revision: 1.53 $");
 }
 
 //----------------------------------------------------------------------------

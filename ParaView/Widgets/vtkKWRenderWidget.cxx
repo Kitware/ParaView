@@ -57,8 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.19");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.20");
 
+//----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
   this->VTKWidget = vtkKWWidget::New();
@@ -96,6 +97,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->CollapsingRenders = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkKWRenderWidget::~vtkKWRenderWidget()
 {
   this->Renderer->Delete();
@@ -117,6 +119,7 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
   this->SetUnits(NULL);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
 {
   char *local;
@@ -151,6 +154,7 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
   this->UpdateEnableState();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetupBindings()
 {
   const char *wname = this->VTKWidget->GetWidgetName();
@@ -225,6 +229,7 @@ void vtkKWRenderWidget::SetupBindings()
                wname, tname);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveBindings()
 {
   const char *wname = this->VTKWidget->GetWidgetName();
@@ -251,12 +256,14 @@ void vtkKWRenderWidget::RemoveBindings()
   this->Script("bind %s <Configure> {}", wname);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::MouseMove(int vtkNotUsed(num), int x, int y)
 {
   this->Interactor->SetMoveEventInformationFlipY(x, y);
   this->Interactor->MouseMoveEvent();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::AButtonPress(int num, int x, int y,
                                      int ctrl, int shift)
 {
@@ -278,6 +285,7 @@ void vtkKWRenderWidget::AButtonPress(int num, int x, int y,
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::AButtonRelease(int num, int x, int y)
 {
   this->Interactor->SetEventInformationFlipY(x, y, 0, 0);
@@ -296,6 +304,7 @@ void vtkKWRenderWidget::AButtonRelease(int num, int x, int y)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::AKeyPress(char key, int x, int y, int ctrl, int shift)
 {
   this->Interactor->SetEventPositionFlipY(x, y);
@@ -305,6 +314,7 @@ void vtkKWRenderWidget::AKeyPress(char key, int x, int y, int ctrl, int shift)
   this->Interactor->KeyPressEvent();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::Exposed()
 {
   if (this->InExpose)
@@ -318,12 +328,14 @@ void vtkKWRenderWidget::Exposed()
   this->InExpose = 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::Configure(int width, int height)
 {
   this->Interactor->UpdateSize(width, height);
   this->Interactor->ConfigureEvent();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::Render()
 {
   if ( this->CollapsingRenders )
@@ -334,6 +346,7 @@ void vtkKWRenderWidget::Render()
   this->RenderWindow->Render();
 }
 
+//----------------------------------------------------------------------------
 #ifdef _WIN32
 void vtkKWRenderWidget::SetupPrint(RECT &rcDest, HDC ghdc,
                                    int printerPageSizeX, int printerPageSizeY,
@@ -384,6 +397,7 @@ void vtkKWRenderWidget::SetupPrint(RECT &rcDest, HDC ghdc,
 }
 #endif
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetParentWindow(vtkKWWindow *window)
 {
   if (this->ParentWindow == window)
@@ -394,6 +408,7 @@ void vtkKWRenderWidget::SetParentWindow(vtkKWWindow *window)
   this->Modified();
 }
 
+//----------------------------------------------------------------------------
 void* vtkKWRenderWidget::GetMemoryDC()
 {
 #ifdef _WIN32
@@ -404,6 +419,7 @@ void* vtkKWRenderWidget::GetMemoryDC()
 #endif
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetupMemoryRendering(
 #ifdef _WIN32
   int x, int y, void *cd
@@ -422,6 +438,7 @@ void vtkKWRenderWidget::SetupMemoryRendering(
 #endif
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::ResumeScreenRendering() 
 {
 #ifdef _WIN32
@@ -430,26 +447,31 @@ void vtkKWRenderWidget::ResumeScreenRendering()
 #endif
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddProp(vtkProp *prop)
 {
   this->Renderer->AddProp(prop);
 }
 
+//----------------------------------------------------------------------------
 int vtkKWRenderWidget::HasProp(vtkProp *prop)
 {
   return this->Renderer->GetProps()->IsItemPresent(prop);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveProp(vtkProp *prop)
 {
   this->Renderer->RemoveProp(prop);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveAllProps()
 {
   this->Renderer->RemoveAllProps();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetBackgroundColor(float r, float g, float b)
 {
   if (r < 0 || g < 0 || b < 0)
@@ -467,19 +489,13 @@ void vtkKWRenderWidget::SetBackgroundColor(float r, float g, float b)
   this->Render();
 }
 
-void vtkKWRenderWidget::GetBackgroundColor(float *r, float *g, float *b)
-{
-  float *ff = this->Renderer->GetBackground();
-  *r = ff[0];
-  *g = ff[1];
-  *b = ff[2];
-}
-
+//----------------------------------------------------------------------------
 float* vtkKWRenderWidget::GetBackgroundColor()
 {
   return this->Renderer->GetBackground();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::Close()
 {
   this->RemoveBindings();
@@ -491,48 +507,40 @@ void vtkKWRenderWidget::Close()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 {
   if (v)
     {
-    this->CornerAnnotationOn();
+    if (this->CornerAnnotation->GetVisibility() &&
+        this->HasProp(this->CornerAnnotation))
+      {
+      return;
+      }
+    this->CornerAnnotation->VisibilityOn();
+    if (!this->HasProp(this->CornerAnnotation))
+      {
+      this->AddProp(this->CornerAnnotation);
+      }
+    this->Render();
     }
   else
     {
-    this->CornerAnnotationOff();
-    }
-}
-
-void vtkKWRenderWidget::CornerAnnotationOn()
-{
-  if (this->CornerAnnotation->GetVisibility() &&
-      this->HasProp(this->CornerAnnotation))
-    {
-    return;
-    }
-  this->CornerAnnotation->VisibilityOn();
-  if (!this->HasProp(this->CornerAnnotation))
-    {
-    this->AddProp(this->CornerAnnotation);
-    }
-  this->Render();
-}
-
-void vtkKWRenderWidget::CornerAnnotationOff()
-{
-  if (!this->CornerAnnotation->GetVisibility() ||
+    if (!this->CornerAnnotation->GetVisibility() ||
       !this->HasProp(this->CornerAnnotation))
-    {
-    return;
+      {
+      return;
+      }
+    this->CornerAnnotation->VisibilityOff();
+    if (this->HasProp(this->CornerAnnotation))
+      {
+      this->RemoveProp(this->CornerAnnotation);
+      }
+    this->Render();
     }
-  this->CornerAnnotation->VisibilityOff();
-  if (this->HasProp(this->CornerAnnotation))
-    {
-    this->RemoveProp(this->CornerAnnotation);
-    }
-  this->Render();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCornerTextColor(float r, float g, float b)
 {
   if (this->CornerAnnotation && this->CornerAnnotation->GetTextProperty())
@@ -546,6 +554,7 @@ void vtkKWRenderWidget::SetCornerTextColor(float r, float g, float b)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCollapsingRenders(int r)
 {
   if ( r )
@@ -563,6 +572,7 @@ void vtkKWRenderWidget::SetCollapsingRenders(int r)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);

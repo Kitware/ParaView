@@ -67,15 +67,69 @@ public:
   vtkTypeRevisionMacro(vtkKWRenderWidget, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
+  // Description:
+  // Create the widget
   virtual void Create(vtkKWApplication *app, const char *args);
 
-  vtkGetObjectMacro(EventMap, vtkKWEventMap);
-  vtkGetObjectMacro(Renderer, vtkRenderer);
-  vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
+  // Description:
+  // Set the widget's parent window.
+  virtual void SetParentWindow(vtkKWWindow *window);
+  vtkGetObjectMacro(ParentWindow, vtkKWWindow);
+
+  // Description:
+  // Render the scene.
+  virtual void Render();
+
+  // Description:
+  // Enable/disable rendering.
+  vtkGetMacro(RenderState, int);
+  vtkSetClampMacro(RenderState, int, 0, 1);
+  vtkBooleanMacro(RenderState, int);
   
+  // Description:
+  // Set/get the rendering mode
+  vtkSetClampMacro(RenderMode, int, 
+                   VTK_KW_INTERACTIVE_RENDER, VTK_KW_SINGLE_RENDER);
+  vtkGetMacro(RenderMode, int);
+  virtual void SetRenderModeToInteractive() 
+    { this->RenderMode = VTK_KW_INTERACTIVE_RENDER; };
+  virtual void SetRenderModeToStill() 
+    { this->RenderMode = VTK_KW_STILL_RENDER; };
+  virtual void SetRenderModeToSingle() 
+    { this->RenderMode = VTK_KW_SINGLE_RENDER; };
+  virtual void SetRenderModeToDisabled() 
+    { this->RenderMode = VTK_KW_DISABLED_RENDER; };
+
+  // Description:
+  // Reset the view/widget (will usually reset the camera too).
+  virtual void Reset() = 0;
+  
+  // Description:
+  // Close the widget. 
+  // Usually called when new data is about to be loaded.
+  virtual void Close();
+  
+  // Description:
+  // Setup/remove the widget bindings (mouse, keyboard, etc.)
   virtual void SetupBindings();
   virtual void RemoveBindings();
   
+  // Description:
+  // Manage props inside this widget renderer(s). Add, remove, query.
+  virtual void AddProp(vtkProp *prop);
+  virtual int  HasProp(vtkProp *prop);
+  virtual void RemoveProp(vtkProp *prop);
+  virtual void RemoveAllProps();
+  
+  // Description:
+  // Set the widget background color
+  virtual float* GetBackgroundColor();
+  virtual void SetBackgroundColor(float r, float g, float b);
+  virtual void SetBackgroundColor(float *rgb)
+    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+
+  // Description:
+  // Event handlers and useful interactions
   virtual void MouseMove(int num, int x, int y);
   virtual void AButtonPress(int num, int x, int y, int ctrl, int shift);
   virtual void AButtonRelease(int num, int x, int y);
@@ -83,27 +137,54 @@ public:
   virtual void Exposed();
   virtual void Configure(int width, int height);
   virtual void Enter(int /*x*/, int /*y*/) {}
-  
-  virtual void Render();
-  virtual void Reset() = 0;
-  
-  vtkGetMacro(RenderState, int);
-  vtkSetClampMacro(RenderState, int, 0, 1);
-  vtkBooleanMacro(RenderState, int);
-  
-  vtkSetClampMacro( RenderMode, int, 
-                    VTK_KW_INTERACTIVE_RENDER,
-                    VTK_KW_SINGLE_RENDER );
-  vtkGetMacro( RenderMode, int );
-  void SetRenderModeToInteractive() 
-    { this->RenderMode = VTK_KW_INTERACTIVE_RENDER; };
-  void SetRenderModeToStill() 
-    { this->RenderMode = VTK_KW_STILL_RENDER; };
-  void SetRenderModeToSingle() 
-    { this->RenderMode = VTK_KW_SINGLE_RENDER; };
-  void SetRenderModeToDisabled() 
-    { this->RenderMode = VTK_KW_DISABLED_RENDER; };
 
+  // Description:
+  // Get the underlying vtkCornerAnnotation.
+  // Set the annotation visibility.
+  // Set the corner text color.
+  virtual void SetCornerAnnotationVisibility(int v);
+  virtual void SetCornerTextColor(float r, float g, float b);
+  virtual void SetCornerTextColor(float *rgb)
+    { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); };
+  vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
+      
+  // Description:
+  // Set/Get the units that pixel sizes are measured in
+  vtkSetStringMacro(Units);
+  vtkGetStringMacro(Units);
+  
+  // Description:
+  // Get the current camera
+  vtkGetObjectMacro(CurrentCamera, vtkCamera);
+
+  // Description:
+  // Set/Get the scalar shift/scale
+  vtkSetMacro(ScalarShift, float);
+  vtkGetMacro(ScalarShift, float);
+  vtkSetMacro(ScalarScale, float);
+  vtkGetMacro(ScalarScale, float);
+
+  // Description:
+  // Set / Get the collapsing of renders. If this is set to true, then
+  // all renders will be collapsed. Once this is set to false, if
+  // there are any pending render requests. The widget will render.
+  virtual void SetCollapsingRenders(int);
+  vtkBooleanMacro(CollapsingRenders, int);
+  vtkGetMacro(CollapsingRenders, int);
+
+  // Description:
+  // Get the event map
+  vtkGetObjectMacro(EventMap, vtkKWEventMap);
+
+  // Description:
+  // Get the renderer and render window
+  vtkGetObjectMacro(Renderer, vtkRenderer);
+  vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
+
+  // Description:
+  // Get the VTK widget
+  vtkGetObjectMacro(VTKWidget, vtkKWWidget);
+  
 #ifdef _WIN32
   void SetupPrint(RECT &rcDest, HDC ghdc,
                   int printerPageSizeX, int printerPageSizeY,
@@ -114,59 +195,9 @@ public:
   vtkSetMacro(Printing, int);
   vtkGetMacro(Printing, int);
   
-  void SetParentWindow(vtkKWWindow *window);
-  vtkGetObjectMacro(ParentWindow, vtkKWWindow);
-
   virtual void SetupMemoryRendering(int width, int height, void *cd);
   virtual void ResumeScreenRendering();
   virtual void* GetMemoryDC();
-  
-  vtkGetObjectMacro(VTKWidget, vtkKWWidget);
-
-  virtual void AddProp(vtkProp *prop);
-  virtual int  HasProp(vtkProp *prop);
-  virtual void RemoveProp(vtkProp *prop);
-  virtual void RemoveAllProps();
-  
-  virtual void SetBackgroundColor(float r, float g, float b);
-  virtual void SetBackgroundColor(float *rgb)
-    { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); }
-  virtual void GetBackgroundColor(float *r, float *g, float *b);
-  virtual float* GetBackgroundColor();
-
-  virtual void Close();
-  
-  // Description:
-  // Get the underlying vtkCornerAnnotation.
-  // Set the annotation visibility.
-  // Set the corner text color.
-  vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
-  virtual void CornerAnnotationOn();
-  virtual void CornerAnnotationOff();
-  virtual void SetCornerAnnotationVisibility(int v);
-  virtual void SetCornerTextColor(float r, float g, float b);
-  virtual void SetCornerTextColor(float *rgb)
-               { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); }
-      
-  // Description:
-  // Set/Get the units that pixel sizes are measured in
-  vtkSetStringMacro(Units);
-  vtkGetStringMacro(Units);
-  
-  vtkGetObjectMacro(CurrentCamera, vtkCamera);
-
-  vtkSetMacro(ScalarShift, float);
-  vtkGetMacro(ScalarShift, float);
-  vtkSetMacro(ScalarScale, float);
-  vtkGetMacro(ScalarScale, float);
-
-  // Description:
-  // Set / Get the collapsing of renders. If this is set to true, then
-  // all renders will be collapsed. Once this is set to false, if
-  // there are any pending render requests. The widget will render.
-  void SetCollapsingRenders(int);
-  vtkBooleanMacro(CollapsingRenders, int);
-  vtkGetMacro(CollapsingRenders, int);
   
 protected:
   vtkKWRenderWidget();
