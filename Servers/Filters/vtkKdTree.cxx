@@ -43,7 +43,7 @@
 #include <algorithm>
 #include <vtkstd/set>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.19");
+vtkCxxRevisionMacro(vtkKdTree, "1.20");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -449,11 +449,11 @@ int vtkKdNode::IntersectsBox(double x0, double x1, double y0, double y1,
     }
 
   if ( (min[0] >= x1) ||
-       (max[0] <= x0) ||
+       (max[0] <  x0) ||
        (min[1] >= y1) ||
-       (max[1] <= y0) ||
+       (max[1] <  y0) ||
        (min[2] >= z1) ||
-       (max[2] <= z0))
+       (max[2] <  z0))
     {
     return 0;
     }
@@ -509,12 +509,12 @@ int vtkKdNode::ContainsBox(double x0, double x1, double y0, double y1,
     max = this->Max;
     }
 
-  if ( (min[0] > x0) ||
-       (max[0] < x1) ||
-       (min[1] > y0) ||
-       (max[1] < y1) ||
-       (min[2] > z0) ||
-       (max[2] < z1))
+  if ( (min[0] >= x0) ||
+       (max[0] <  x1) ||
+       (min[1] >= y0) ||
+       (max[1] <  y1) ||
+       (min[2] >= z0) ||
+       (max[2] <  z1))
     {
     return 0;
     }
@@ -546,11 +546,11 @@ int vtkKdNode::ContainsPoint(double x, double y, double z, int useDataBounds=0)
   // for which they are on the upper boundary
 
   if ( (min[0] >= x) ||
-       (max[0] < x) ||
+       (max[0] <  x) ||
        (min[1] >= y) ||
-       (max[1] < y) ||
+       (max[1] <  y) ||
        (min[2] >= z) ||
-       (max[2] < z))
+       (max[2] <  z))
     {
     return 0;
     }
@@ -625,6 +625,7 @@ int vtkKdNode::IntersectsCell(vtkCell *cell, int useDataBounds, int cellRegion)
     }
 
   int intersects = -1;
+  int dim = cell->GetCellDimension();
 
   if (!this->IntersectsBox(cellBounds[0], cellBounds[1],
                            cellBounds[2], cellBounds[3],
@@ -638,27 +639,13 @@ int vtkKdNode::IntersectsCell(vtkCell *cell, int useDataBounds, int cellRegion)
     {
     intersects = 1;  // cell bounding box is completely inside region
     }
-  
-  if (intersects != -1)
-    { 
-    if (deleteCellBounds)
-      {
-      delete [] cellBounds;
-      }
-    return intersects;
-    }
-
-  int dim = cell->GetCellDimension();
-
-  vtkPoints *pts = cell->Points;
-  int npts = pts->GetNumberOfPoints();
-
-  // determine if cell intersects region
-
-  intersects = 0;
-
-  if (dim == 0)    // points
+  else
     {
+    // quick test - if any of the points are in this region,
+    // then it intersects
+
+    vtkPoints *pts = cell->Points;
+    int npts = pts->GetNumberOfPoints();
     double *pt = pts->GetPoint(0);
 
     for (i=0; i < npts ; i++)
@@ -670,8 +657,30 @@ int vtkKdNode::IntersectsCell(vtkCell *cell, int useDataBounds, int cellRegion)
         }
       pt += 3;
       }
+
+    if ((dim == 0) && (intersects != 1))
+      {
+      intersects = 0;   // it's a point set and no points intersect
+      }
     }
-  else if (dim == 1)    // lines
+  
+  if (intersects != -1)
+    { 
+    if (deleteCellBounds)
+      {
+      delete [] cellBounds;
+      }
+    return intersects;
+    }
+
+  vtkPoints *pts = cell->Points;
+  int npts = pts->GetNumberOfPoints();
+
+  // determine if cell intersects region
+
+  intersects = 0;
+
+  if (dim == 1)    // lines
     {
     double *p2 = pts->GetPoint(0);
     double *p1;
