@@ -42,6 +42,7 @@ SUBDIRS(ParaView)
 
 IF(USE_INCLUDED_TCLTK)
   IF(UNIX)
+    SET(TCL_TK_STATIC 1 CACHE BOOL "Build with static Tcl/Tk support. TCL_LIBRARY and TK_LIBRARY must point to the corresponding Tcl/Tk static libraries (example, tcl84sx.lib, tk84sx.lib)." FORCE)
     IF(RUN_CONFIGURE)
       EXEC_PROGRAM(
        "${ParaViewComplete_SOURCE_DIR}/tcl8.4.5/unix/configure --disable-shared"
