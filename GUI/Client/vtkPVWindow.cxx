@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.540");
+vtkCxxRevisionMacro(vtkPVWindow, "1.541");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3028,7 +3028,7 @@ void vtkPVWindow::UpdateFilterMenu()
       !this->CurrentPVSource->GetHideDisplayPage() )
     {
     vtkPVDataInformation *pvdi = this->CurrentPVSource->GetDataInformation();
-    if (!pvdi->GetNumberOfCells() || !pvdi->GetNumberOfPoints())
+    if (pvdi->GetNumberOfPoints() <= 0)
       {
       this->FilterMenu->SetEnabled(0);
       return;
