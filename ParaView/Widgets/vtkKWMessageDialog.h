@@ -121,6 +121,8 @@ protected:
   vtkKWWidget *OKButton;
   vtkKWWidget *CancelButton;  
   vtkKWWidget *Icon;
+  vtkKWWidget *OKFrame;
+  vtkKWWidget *CancelFrame;
 };
 
 

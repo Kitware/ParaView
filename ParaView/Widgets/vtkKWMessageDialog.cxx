@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkKWWindow.h"
 
 
 //-----------------------------------------------------------------------------
@@ -73,10 +73,16 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->Label->SetParent(this->MessageDialogFrame);
   this->ButtonFrame = vtkKWWidget::New();
   this->ButtonFrame->SetParent(this->MessageDialogFrame);
+  this->OKFrame = vtkKWWidget::New();
+  this->OKFrame->SetParent(this->ButtonFrame);
+  this->CancelFrame = vtkKWWidget::New();
+  this->CancelFrame->SetParent(this->ButtonFrame);  
   this->OKButton = vtkKWWidget::New();
-  this->OKButton->SetParent(this->ButtonFrame);
+  //this->OKButton->SetParent(this->ButtonFrame);
+  this->OKButton->SetParent(this->OKFrame);
   this->CancelButton = vtkKWWidget::New();
-  this->CancelButton->SetParent(this->ButtonFrame);
+  //this->CancelButton->SetParent(this->ButtonFrame);
+  this->CancelButton->SetParent(this->CancelFrame);
   this->Style = vtkKWMessageDialog::Message;
   this->Icon = vtkKWWidget::New();
   this->Icon->SetParent(this);
@@ -87,6 +93,8 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
 {
   this->Label->Delete();
   this->ButtonFrame->Delete();
+  this->OKFrame->Delete();
+  this->CancelFrame->Delete();
   this->OKButton->Delete();
   this->CancelButton->Delete();
   this->Icon->Delete();
@@ -106,32 +114,62 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   switch (this->Style)
     {
     case vtkKWMessageDialog::Message :
+      this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
       this->OKButton->Create(app,"button","-text OK -width 16");
       this->OKButton->SetCommand(this, "OK");
-      this->Script("pack %s -side left -padx 4 -expand yes",
+      this->Script("pack %s -side left -expand yes",
                    this->OKButton->GetWidgetName());
+      this->Script("pack %s -side left -padx 4 -expand yes",
+                   this->OKFrame->GetWidgetName());
       break;
     case vtkKWMessageDialog::YesNo :
+      this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
       this->OKButton->Create(app,"button","-text Yes -width 16");
       this->OKButton->SetCommand(this, "OK");
+      this->CancelFrame->Create(app,"frame","-borderwidth 3 -relief flat");
       this->CancelButton->Create(app,"button","-text No -width 16");
       this->CancelButton->SetCommand(this, "Cancel");
-      this->Script("pack %s %s -side left -padx 4 -expand yes",
+      this->Script("pack %s %s -side left -expand yes",
                    this->OKButton->GetWidgetName(),
                    this->CancelButton->GetWidgetName());
+      this->Script("pack %s %s -side left -padx 4 -expand yes",
+                   this->OKFrame->GetWidgetName(),
+                   this->CancelFrame->GetWidgetName());
       break;
     case vtkKWMessageDialog::OkCancel :
+      this->OKFrame->Create(app,"frame","-borderwidth 3 -relief flat");
       this->OKButton->Create(app,"button","-text OK -width 16");
       this->OKButton->SetCommand(this, "OK");
+      this->CancelFrame->Create(app,"frame","-borderwidth 3 -relief flat");
       this->CancelButton->Create(app,"button","-text Cancel -width 16");
       this->CancelButton->SetCommand(this, "Cancel");
-      this->Script("pack %s %s -side left -padx 4 -expand yes",
+      this->Script("pack %s %s -side left -expand yes",
                    this->OKButton->GetWidgetName(),
                    this->CancelButton->GetWidgetName());
+      this->Script("pack %s %s -side left -padx 4 -expand yes",
+                   this->OKFrame->GetWidgetName(),
+                   this->CancelFrame->GetWidgetName());
       break;
     }
 
-  
+  if ( this->OKButton->GetApplication() )
+    {
+    this->OKButton->SetBind("<FocusIn>", this->OKFrame->GetWidgetName(), 
+			    "configure -relief groove");
+    this->OKButton->SetBind("<FocusOut>", this->OKFrame->GetWidgetName(), 
+			    "configure -relief flat");    
+    this->OKButton->SetBind(this, "<Return>", "OK");
+    }
+  if ( this->CancelButton->GetApplication() )
+    {
+    this->CancelButton->SetBind(
+      "<FocusIn>", this->CancelFrame->GetWidgetName(), 
+      "configure -relief groove");
+    this->CancelButton->SetBind(
+      "<FocusOut>", this->CancelFrame->GetWidgetName(), \
+      "configure -relief flat");
+    this->CancelButton->SetBind(this, "<Return>", "Cancel");
+    }
   
   this->Script("pack %s -side bottom -fill x -pady 4",
                this->ButtonFrame->GetWidgetName());
@@ -154,13 +192,11 @@ int vtkKWMessageDialog::Invoke()
 {
   if ( this->Default == YesDefault )
     {
-    this->OKButton->SetBind(this, "<Return>", "OK");
-    this->SetBind(this, "<Return>", "OK");
+    this->OKButton->Focus();
     }
   else if( this->Default == NoDefault )
     {
-    this->CancelButton->SetBind(this, "<Return>", "Cancel");
-    this->SetBind(this, "<Return>", "Cancel");
+    this->CancelButton->Focus();
     }  
 
   return vtkKWDialog::Invoke();
