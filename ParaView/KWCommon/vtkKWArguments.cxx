@@ -77,7 +77,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.16");
+vtkCxxRevisionMacro(vtkKWArguments, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
@@ -342,7 +342,7 @@ void vtkKWArguments::GenerateHelp()
       }
     }
   char format[80];
-  sprintf(format, "%%%ds", maxlen);
+  sprintf(format, "%%%ds", static_cast<unsigned int>(maxlen));
   for ( mpit = mp.begin();
     mpit != mp.end();
     mpit ++ )
