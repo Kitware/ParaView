@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.15");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.16");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -399,7 +399,6 @@ int vtkPVSelectCTHArrays::StringMatch(const char* arrayName)
 // Multiple input filter has only one VTK source.
 void vtkPVSelectCTHArrays::SaveInBatchScript(ofstream *file)
 {
-  const char* arrayName;
   int num, idx;
 
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
