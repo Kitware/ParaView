@@ -65,50 +65,6 @@ VTK_CSS_VALUE_FROM_STRING(vtkTypeFloat64, VTK_TYPE_FORMAT_FLOAT64)
 #undef VTK_CSS_VALUE_FROM_STRING
 
 //----------------------------------------------------------------------------
-// Visual Studio 6 does not provide output operators for __int64.  We need
-// to wrap up streaming output for vtkTypeInt64 and vtkTypeUInt64.
-struct vtkClientServerStreamInt64
-{
-  vtkTypeInt64 Value;
-  vtkClientServerStreamInt64(vtkTypeInt64 v): Value(v) {}
-};
-struct vtkClientServerStreamUInt64
-{
-  vtkTypeUInt64 Value;
-  vtkClientServerStreamUInt64(vtkTypeUInt64 v): Value(v) {}
-};
-inline ostream& operator << (ostream& os, vtkClientServerStreamInt64 id)
-{
-#if defined(VTK_TYPE_INT64_NOT_STANDARD) && defined(_MSC_VER) && (_MSC_VER < 1300)
-  // _i64toa can use up to 33 bytes (32 + null terminator).
-  char buf[33];
-  // Convert to string representation in base 10.
-  return os << _i64toa(id.Value, buf, 10);
-#elif defined(__HP_aCC)
-  char buf[33];
-  sprintf(buf, "%lld", id.Value);
-  return os << buf;
-#else
-  return os << id.Value;
-#endif
-}
-inline ostream& operator << (ostream& os, vtkClientServerStreamUInt64 id)
-{
-#if defined(VTK_TYPE_INT64_NOT_STANDARD) && defined(_MSC_VER) && (_MSC_VER < 1300)
-  // _i64toa can use up to 33 bytes (32 + null terminator).
-  char buf[33];
-  // Convert to string representation in base 10.
-  return os << _ui64toa(id.Value, buf, 10);
-#elif defined(__HP_aCC)
-  char buf[33];
-  sprintf(buf, "%llu", id.Value);
-  return os << buf;
-#else
-  return os << id.Value;
-#endif
-}
-
-//----------------------------------------------------------------------------
 // Define some traits for vtkType types.
 template <class T> struct vtkClientServerTypeTraits;
 #define VTK_CLIENT_SERVER_TYPE_TRAIT(in, out, print)    \
@@ -127,11 +83,11 @@ template <class T> struct vtkClientServerTypeTraits;
 VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt8, int8, vtkTypeInt16);
 VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt16, int16, vtkTypeInt16);
 VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt32, int32, vtkTypeInt32);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt64, int64, vtkClientServerStreamInt64);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeInt64, int64, vtkTypeInt64);
 VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt8, uint8, vtkTypeUInt16);
 VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt16, uint16, vtkTypeUInt16);
 VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt32, uint32, vtkTypeUInt32);
-VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt64, uint64, vtkClientServerStreamUInt64);
+VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeUInt64, uint64, vtkTypeUInt64);
 VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeFloat32, float32, vtkTypeFloat32);
 VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeFloat64, float64, vtkTypeFloat64);
 #undef VTK_CLIENT_SERVER_TYPE_TRAIT
