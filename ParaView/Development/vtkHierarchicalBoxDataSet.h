@@ -63,9 +63,9 @@ public:
   vtkUniformGrid* GetDataSet(unsigned int level, 
                              unsigned int id, 
                              vtkAMRBox& box);
+//ETX
   vtkDataObject* GetDataSet(unsigned int level, unsigned int id)
     { return this->Superclass::GetDataSet(level, id); }
-//ETX
 
   // Description:
   // Sets the refinement of a given level.
