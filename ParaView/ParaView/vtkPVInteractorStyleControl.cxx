@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.32");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.33");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -504,18 +504,6 @@ int vtkPVInteractorStyleControl::SetManipulator(int pos, const char* name)
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVInteractorStyleControl::SetManipulator(int mouse, int key, 
-                                                const char* name)
-{
-  if ( mouse < 0 || mouse > 2 || key < 0 || key > 2 )
-    {
-    vtkErrorMacro("Setting manipulator to the wrong key or mouse");
-    return 0;
-    }
-  return this->SetManipulator(mouse + key * 3, name);
-}
-
-//-----------------------------------------------------------------------------
 vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int pos)
 {
   if ( pos < 0 || pos > 8 )
@@ -525,18 +513,6 @@ vtkPVCameraManipulator* vtkPVInteractorStyleControl::GetManipulator(int pos)
     }
   const char* name = this->Menus[pos]->GetValue();
   return this->GetManipulator(name);
-}
-
-//------------------------------------------------------------------------------
-vtkPVCameraManipulator* 
-vtkPVInteractorStyleControl::GetManipulator(int mouse, int key)
-{
-  if ( mouse < 0 || mouse > 2 || key < 0 || key > 2 )
-    {
-    vtkErrorMacro("Getting manipulator from the wrong key or mouse");
-    return 0;
-    }
-  return this->GetManipulator(mouse + key * 3);
 }
 
 //-----------------------------------------------------------------------------

@@ -69,9 +69,7 @@ public:
   // Set the specific manipulator for a mouse button and key
   // combination.
   int SetManipulator(int pos, const char*);
-  int SetManipulator(int mouse, int key, const char*);
   vtkPVCameraManipulator* GetManipulator(int pos);
-  vtkPVCameraManipulator* GetManipulator(int mouse, int key);
   vtkPVCameraManipulator* GetManipulator(const char* name);
 
   // Description:

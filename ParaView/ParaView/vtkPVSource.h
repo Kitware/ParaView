@@ -480,12 +480,6 @@ protected:
 
   vtkPVNumberOfOutputsInformation *NumberOfOutputsInformation;
   
-  // Description:
-  // Create a menu to select the input.
-  virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 
-                                       char* help, 
-                                       vtkPVSourceCollection* sources);
-
   // This flag gets set after the user hits accept for the first time.
   int Initialized;
 

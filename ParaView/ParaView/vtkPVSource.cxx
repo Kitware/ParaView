@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.341");
+vtkCxxRevisionMacro(vtkPVSource, "1.342");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2211,30 +2211,6 @@ vtkPVWidget* vtkPVSource::GetPVWidget(const char *name)
 vtkPVRenderView* vtkPVSource::GetPVRenderView()
 {
   return vtkPVRenderView::SafeDownCast(this->View);
-}
-
-//----------------------------------------------------------------------------
-vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, 
-                                          char *help, 
-                                          vtkPVSourceCollection *sources)
-{
-  vtkPVInputMenu *inputMenu;
-
-  inputMenu = vtkPVInputMenu::New();
-  inputMenu->SetPVSource(this);
-  inputMenu->SetSources(sources);
-  inputMenu->SetParent(this->ParameterFrame->GetFrame());
-  inputMenu->SetLabel(label);
-  inputMenu->SetModifiedCommand(this->GetTclName(), 
-                                "SetAcceptButtonColorToRed");
-  inputMenu->Create(this->Application);
-  inputMenu->SetInputName(inputName);
-  inputMenu->SetBalloonHelpString(help);
-
-  this->AddPVWidget(inputMenu);
-  inputMenu->Delete();
-
-  return inputMenu;
 }
 
 //----------------------------------------------------------------------------
