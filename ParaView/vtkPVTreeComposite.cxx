@@ -294,7 +294,7 @@ int vtkPVTreeComposite::SatelliteAbortCheck()
 //------------- Methods for Root Processes --------------
 
 // Count is temporary for testing.
-int vtkPVTreeComposite::RootAbortCheck()
+/*int vtkPVTreeComposite::RootAbortCheck()
 {
   //sleep(5);
   
@@ -331,11 +331,11 @@ int vtkPVTreeComposite::RootAbortCheck()
 
   //cout << this->LocalProcessId << ": RootAbortCheck Return 0\n";
   return 0;
-}
+} */
 
 
 // "abort" is true if rendering was previously aborted.
-int vtkPVTreeComposite::RootFinalAbortCheck()
+/*int vtkPVTreeComposite::RootFinalAbortCheck()
 {
   int waitingFlag;
   int idx;
@@ -398,7 +398,7 @@ int vtkPVTreeComposite::RootFinalAbortCheck()
   
   //cout << this->LocalProcessId << ": RootFinalAbortCheck, Returning: " << abort << "\n";
   return abort;
-}
+} */
 
 
 

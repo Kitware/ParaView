@@ -110,8 +110,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindow = (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
   this->RenderWindowTclName = NULL;
   this->SetRenderWindowTclName("RenWin1");
-  // Tree compositer handles aborts now.
-  //this->RenderWindow->SetAbortCheckMethod(PVRenderViewAbortCheck, (void*)this);
   
   // Create the compositer.
   this->Composite = (vtkTreeComposite*)pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1");
@@ -125,6 +123,11 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
   pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
 
+  // Tree compositer handles aborts now.
+#ifndef VTK_USE_MPI
+  this->RenderWindow->SetAbortCheckMethod(PVRenderViewAbortCheck, (void*)this);
+#endif
+  
   // The only call that should not be a broadcast is render.
 }
 
