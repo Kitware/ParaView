@@ -69,6 +69,8 @@ protected:
                          vtkUnstructuredGrid* output,
                          vtkIdType cellId, vtkIdType pt1Id,
                          vtkIdType pt2Id, vtkIdType pt3Id);
+  void IntegrateSatelliteData(vtkDataSetAttributes* inda,
+                              vtkDataSetAttributes* outda);                  
   void AllocateAttributes(vtkDataSetAttributes* inda, 
                           vtkDataSetAttributes* outda);
   void ZeroAttributes(vtkDataSetAttributes* outda);

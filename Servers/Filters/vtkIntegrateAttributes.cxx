@@ -28,7 +28,7 @@
 #include "vtkMultiProcessController.h"
 
 
-vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.1");
+vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.2");
 vtkStandardNewMacro(vtkIntegrateAttributes);
 
 //-----------------------------------------------------------------------------
@@ -167,10 +167,11 @@ void vtkIntegrateAttributes::Execute()
       }
     } 
     
+  int localProcId = 0;  
   // Send results to process 0.
   if (this->Controller)
     {
-    int localProcId = this->Controller->GetLocalProcessId();
+    localProcId = this->Controller->GetLocalProcessId();
     if (localProcId > 0)
       {
       double msg[5];
@@ -180,6 +181,7 @@ void vtkIntegrateAttributes::Execute()
       msg[3] = this->SumCenter[1];
       msg[4] = this->SumCenter[2];
       this->Controller->Send(msg, 5, 0, 28876);
+      this->Controller->Send(output, 0, 28877);
       }
     else          
       {
@@ -189,55 +191,72 @@ void vtkIntegrateAttributes::Execute()
         {
         double msg[5];
         this->Controller->Receive(msg, 5, id, 28876);
+        vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
+        this->Controller->Receive(tmp, id, 28877);        
         if (this->CompareIntegrationDimension((int)(msg[0])))
           {
           this->Sum += msg[1];
           this->SumCenter[0] += msg[2];
           this->SumCenter[1] += msg[3];
           this->SumCenter[2] += msg[4];
+          this->IntegrateSatelliteData(tmp->GetPointData(),
+                                       output->GetPointData());
+          this->IntegrateSatelliteData(tmp->GetCellData(),
+                                       output->GetCellData());
+          tmp->Delete();
+          tmp = 0;
           }
         }
       }
     }        
     
-  vtkPoints* newPoints = vtkPoints::New();
-  newPoints->SetNumberOfPoints(1);
-  // Get rid of the weight factors.
-  if (this->Sum != 0.0)
-    {
-    this->SumCenter[0] = this->SumCenter[0] / this->Sum;    
-    this->SumCenter[1] = this->SumCenter[1] / this->Sum;    
-    this->SumCenter[2] = this->SumCenter[2] / this->Sum;    
-    }
-  newPoints->InsertPoint(0, this->SumCenter);
-  output->SetPoints(newPoints);
-  newPoints->Delete();
-  newPoints = 0;
-      
-  output->Allocate(1);
-  vtkIdType vertexPtIds[1];
-  vertexPtIds[0] = 0;
-  output->InsertNextCell(VTK_VERTEX, 1, vertexPtIds);
+  // Only process 0 should have data.  Generate point.
+  // Other processes have no output.  
+  if (localProcId == 0)
+    { 
+    vtkPoints* newPoints = vtkPoints::New();
+    newPoints->SetNumberOfPoints(1);
+    // Get rid of the weight factors.
+    if (this->Sum != 0.0)
+      {
+      this->SumCenter[0] = this->SumCenter[0] / this->Sum;    
+      this->SumCenter[1] = this->SumCenter[1] / this->Sum;    
+      this->SumCenter[2] = this->SumCenter[2] / this->Sum;    
+      }
+    newPoints->InsertPoint(0, this->SumCenter);
+    output->SetPoints(newPoints);
+    newPoints->Delete();
+    newPoints = 0;
+        
+    output->Allocate(1);
+    vtkIdType vertexPtIds[1];
+    vertexPtIds[0] = 0;
+    output->InsertNextCell(VTK_VERTEX, 1, vertexPtIds);
 
-  // Create a new cell array for the total length, area or volume.
-  vtkDoubleArray* sumArray = vtkDoubleArray::New();
-  switch (this->IntegrationDimension)
-    {
-    case 1:
-      sumArray->SetName("Length");
-      break;
-    case 2:
-      sumArray->SetName("Area");
-      break;
-    case 3:
-      sumArray->SetName("Volume");
-      break;
+    // Create a new cell array for the total length, area or volume.
+    vtkDoubleArray* sumArray = vtkDoubleArray::New();
+    switch (this->IntegrationDimension)
+      {
+      case 1:
+        sumArray->SetName("Length");
+        break;
+      case 2:
+        sumArray->SetName("Area");
+        break;
+      case 3:
+        sumArray->SetName("Volume");
+        break;
+      }
+    sumArray->SetNumberOfTuples(1);
+    sumArray->SetValue(0, this->Sum);
+    output->GetCellData()->AddArray(sumArray);
+    sumArray->Delete();
+    cellPtIds->Delete();
     }
-  sumArray->SetNumberOfTuples(1);
-  sumArray->SetValue(0, this->Sum);
-  output->GetCellData()->AddArray(sumArray);
-  sumArray->Delete();
-  cellPtIds->Delete();
+  else
+    {
+    output->Initialize();
+    }
 }        
 
 //-----------------------------------------------------------------------------
@@ -369,6 +388,30 @@ void vtkIntegrateAttributes::IntegrateData3(vtkDataSetAttributes* inda,
     }
 }
 
+//-----------------------------------------------------------------------------
+// Used to sum arrays from all processes.
+void vtkIntegrateAttributes::IntegrateSatelliteData(vtkDataSetAttributes* inda,
+                                                    vtkDataSetAttributes* outda)
+{
+  int numArrays, i, numComponents, j;
+  vtkDataArray* inArray;
+  vtkDataArray* outArray;
+  numArrays = inda->GetNumberOfArrays();
+  double vIn, vOut;
+  for (i = 0; i < numArrays; ++i)
+    {
+    // We could template for speed.
+    inArray = inda->GetArray(i);
+    outArray = outda->GetArray(i);
+    numComponents = inArray->GetNumberOfComponents();
+    for (j = 0; j < numComponents; ++j)
+      {
+      vIn = inArray->GetComponent(0, j);
+      vOut = outArray->GetComponent(0, j);
+      outArray->SetComponent(0,j,vOut+vIn);
+      }
+    }
+}
        
 //-----------------------------------------------------------------------------
 void vtkIntegrateAttributes::IntegratePolyLine(vtkDataSet* input, 
