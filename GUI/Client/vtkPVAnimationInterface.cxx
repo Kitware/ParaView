@@ -21,9 +21,11 @@
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWLabeledFrame.h"
+#include "vtkKWLabeledOptionMenu.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWText.h"
@@ -182,7 +184,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.140");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.141");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1270,11 +1272,22 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->SetMasterWindow(this->Window);
     dlg->Create(this->GetApplication(), "");
-    dlg->SetText(
-      "Specify the width and height of the images to be saved from this "
-      "animation. Each dimension must be a multiple of 4. Each will be "
-      "resized to the next smallest multiple of 4 if it does not meet this "
-      "criterion.");
+    int isMPEG = (!strcmp(ext, "mpg") || !strcmp(ext, "mpeg") ||
+                  !strcmp(ext, "MPG") || !strcmp(ext, "MPEG"));
+    if (isMPEG)
+      {
+      dlg->SetText(
+        "Specify the width and aspect ratio of the images to be saved from "
+        "this animation.");
+      }
+    else
+      { 
+      dlg->SetText(
+        "Specify the width and height of the images to be saved from this "
+        "animation. Each dimension must be a multiple of 4. Each will be "
+        "resized to the next smallest multiple of 4 if it does not meet this "
+        "criterion.");
+      }
     vtkKWWidget *frame = vtkKWWidget::New();
     frame->SetParent(dlg->GetTopFrame());
     frame->Create(this->GetApplication(), "frame", "");
@@ -1294,14 +1307,57 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     heightEntry->Create(this->GetApplication(), "");
     heightEntry->GetEntry()->SetValue(origHeight);
 
-    this->Script("pack %s %s -side left -fill both -expand t",
-                 widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
+    vtkKWLabeledOptionMenu *aspectRatioMenu = vtkKWLabeledOptionMenu::New();
+    aspectRatioMenu->SetLabel("Aspect Ratio:");
+    aspectRatioMenu->SetParent(frame);
+    aspectRatioMenu->Create(this->GetApplication(), "");
+    aspectRatioMenu->GetOptionMenu()->AddEntry("1:1");
+    aspectRatioMenu->GetOptionMenu()->AddEntry("4:3");
+    aspectRatioMenu->GetOptionMenu()->AddEntry("16:9");
+    aspectRatioMenu->GetOptionMenu()->AddEntry("2.21:1");
+    aspectRatioMenu->GetOptionMenu()->SetValue("1:1");
+    
+    if (isMPEG)
+      {
+      this->Script("pack %s %s -side left -fill both -expand t",
+                   widthEntry->GetWidgetName(),
+                   aspectRatioMenu->GetWidgetName());
+      }
+    else
+      {
+      this->Script("pack %s %s -side left -fill both -expand t",
+                   widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
+      }
     this->Script("pack %s -side top -pady 5", frame->GetWidgetName());
 
     dlg->Invoke();
 
     int width = widthEntry->GetEntry()->GetValueAsInt();
-    int height = heightEntry->GetEntry()->GetValueAsInt();
+    int height = origHeight;
+    if (isMPEG)
+      {
+      const char *aspect = aspectRatioMenu->GetOptionMenu()->GetValue();
+      if (!strcmp(aspect, "1:1"))
+        {
+        height = width;
+        }
+      else if (!strcmp(aspect, "4:3"))
+        {
+        height = width / 4.0 * 3;
+        }
+      else if (!strcmp(aspect, "16:9"))
+        {
+        height = width / 16.0 * 9;
+        }
+      else if (!strcmp(aspect, "2.21:1"))
+        {
+        height = width / 2.21;
+        }
+      }
+    else
+      {
+      height = heightEntry->GetEntry()->GetValueAsInt();
+      }
     if ((width % 4) > 0)
       {
       width -= width % 4;
@@ -1313,6 +1369,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     
     widthEntry->Delete();
     heightEntry->Delete();
+    aspectRatioMenu->Delete();
     frame->Delete();
     dlg->Delete();
 
