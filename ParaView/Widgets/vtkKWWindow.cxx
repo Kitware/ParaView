@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.117");
+vtkCxxRevisionMacro(vtkKWWindow, "1.118");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -625,13 +625,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->Script("image create photo");
   this->StatusImageName = vtkString::Duplicate(interp->result);
   this->CreateStatusImage();
-  this->StatusImage->Create(app,"button",
-                            "-relief sunken -bd 1 -fg #ffffff -bg #ffffff");
+  this->StatusImage->Create(app,"label",
+                            "-relief sunken -bd 1 -fg #ffffff -bg #ffffff -highlightbackground #ffffff -highlightcolor #ffffff -highlightthickness 0 -padx 0 -pady 0");
   this->Script("%s configure -image %s", 
                this->StatusImage->GetWidgetName(),
                this->StatusImageName);
-  this->StatusImage->SetCommand(this, "DisplayAbout");
-  this->Script("pack %s -side left -ipadx 2 -ipady 2", 
+
+  this->Script("pack %s -side left -anchor c -ipadx 1 -ipady 1", 
                this->StatusImage->GetWidgetName());
 
   this->StatusLabel->Create(app,"-relief sunken -padx 3 -bd 1 -font \"Helvetica 10\" -anchor w");
@@ -644,7 +644,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->ProgressFrame->Create(app, "frame", "-relief sunken -borderwidth 2");
   this->ProgressGauge->SetLength(200);
   this->ProgressGauge->SetHeight(
-    vtkKWTkUtilities::GetPhotoHeight(interp, this->StatusImageName) - 2);
+    vtkKWTkUtilities::GetPhotoHeight(interp, this->StatusImageName) - 4);
   this->ProgressGauge->Create(app, "");
 
   this->Script("pack %s -side left -padx 2 -fill y", 
@@ -1159,7 +1159,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.117 $");
+  this->ExtractRevision(os,"$Revision: 1.118 $");
 }
 
 int vtkKWWindow::ExitDialog()
