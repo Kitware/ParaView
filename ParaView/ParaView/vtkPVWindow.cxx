@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.354");
+vtkCxxRevisionMacro(vtkPVWindow, "1.355");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -906,19 +906,19 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->PickCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
   this->PickCenterButton->Create(app, "-image KWPickCenterButton");
   this->PickCenterButton->SetCommand(this, "ChangeInteractorStyle 4");
+  this->PickCenterButton->SetBalloonHelpString(
+    "Pick the center of rotation of the current data set.");
   this->PickCenterToolbar->AddWidget(this->PickCenterButton);
   
   this->ResetCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
-  this->ResetCenterButton->Create(app, "");
-  this->ResetCenterButton->SetLabel("Reset");
+  this->ResetCenterButton->Create(app, "-image KWResetCenterButton");
   this->ResetCenterButton->SetCommand(this, "ResetCenterCallback");
   this->ResetCenterButton->SetBalloonHelpString(
     "Reset the center of rotation to the center of the current data set.");
   this->PickCenterToolbar->AddWidget(this->ResetCenterButton);
 
   this->HideCenterButton->SetParent(this->PickCenterToolbar->GetFrame());
-  this->HideCenterButton->Create(app, "");
-  this->HideCenterButton->SetLabel("Hide");
+  this->HideCenterButton->Create(app, "-image KWHideCenterButton");
   this->HideCenterButton->SetCommand(this, "ToggleCenterActorCallback");
   this->HideCenterButton->SetBalloonHelpString(
     "Hide the center of rotation to the center of the current data set.");
@@ -926,8 +926,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   
   this->CenterEntryOpenCloseButton->SetParent(
     this->PickCenterToolbar->GetFrame());
-  this->CenterEntryOpenCloseButton->Create(app, "");
-  this->CenterEntryOpenCloseButton->SetLabel(">");
+  this->CenterEntryOpenCloseButton->Create(app, "-image KWEditCenterButtonOpen");
+  this->CenterEntryOpenCloseButton->SetBalloonHelpString(
+    "Edit the center of rotation xyz coordinates.");
   this->CenterEntryOpenCloseButton->SetCommand(this, "CenterEntryOpenCallback");
   this->PickCenterToolbar->AddWidget(this->CenterEntryOpenCloseButton);
   
@@ -1176,7 +1177,11 @@ void vtkPVWindow::AddPackageName(const char* name)
 
 void vtkPVWindow::CenterEntryOpenCallback()
 {
-  this->CenterEntryOpenCloseButton->SetLabel("<");
+  this->Script("%s configure -image KWEditCenterButtonClose", 
+               this->CenterEntryOpenCloseButton->GetWidgetName() );
+  this->CenterEntryOpenCloseButton->SetBalloonHelpString(
+    "Finish editing the center of rotation xyz coordinates.");
+
   this->CenterEntryOpenCloseButton->SetCommand(
     this, "CenterEntryCloseCallback");
 
@@ -1186,7 +1191,11 @@ void vtkPVWindow::CenterEntryOpenCallback()
 
 void vtkPVWindow::CenterEntryCloseCallback()
 {
-  this->CenterEntryOpenCloseButton->SetLabel(">");
+  this->Script("%s configure -image KWEditCenterButtonOpen", 
+               this->CenterEntryOpenCloseButton->GetWidgetName() );
+  this->CenterEntryOpenCloseButton->SetBalloonHelpString(
+    "Edit the center of rotation xyz coordinates.");
+
   this->CenterEntryOpenCloseButton->SetCommand(
     this, "CenterEntryOpenCallback");
 
@@ -1222,8 +1231,10 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 //----------------------------------------------------------------------------
 void vtkPVWindow::HideCenterActor()
 {
-  this->Script("%s configure -text Show", 
+  this->Script("%s configure -image KWShowCenterButton", 
                this->HideCenterButton->GetWidgetName() );
+  this->HideCenterButton->SetBalloonHelpString(
+    "Show the center of rotation to the center of the current data set.");
   this->CenterActor->VisibilityOff();
 }
 
@@ -1232,8 +1243,10 @@ void vtkPVWindow::ShowCenterActor()
 {
   if (this->CenterActorVisibility)
     {
-    this->Script("%s configure -text Hide", 
+    this->Script("%s configure -image KWHideCenterButton", 
                  this->HideCenterButton->GetWidgetName() );
+  this->HideCenterButton->SetBalloonHelpString(
+    "Hide the center of rotation to the center of the current data set.");
     this->CenterActor->VisibilityOn();
     }
 }
@@ -3570,7 +3583,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.354 $");
+  this->ExtractRevision(os,"$Revision: 1.355 $");
 }
 
 //----------------------------------------------------------------------------

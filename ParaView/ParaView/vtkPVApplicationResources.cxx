@@ -116,6 +116,41 @@ void vtkPVApplication::CreateButtonPhotos()
                     KW_PICK_CENTER_BUTTON_WIDTH, 
                     KW_PICK_CENTER_BUTTON_HEIGHT);
   
+  /* I'm using the same one here */
+
+  this->CreatePhoto("KWResetCenterButton", 
+                    KW_PICK_CENTER_BUTTON, 
+                    KW_PICK_CENTER_BUTTON_WIDTH, 
+                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  
+  /* I'm using the same one here */
+
+  this->CreatePhoto("KWShowCenterButton", 
+                    KW_PICK_CENTER_BUTTON, 
+                    KW_PICK_CENTER_BUTTON_WIDTH, 
+                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  
+  /* I'm using the same one here */
+
+  this->CreatePhoto("KWHideCenterButton", 
+                    KW_PICK_CENTER_BUTTON, 
+                    KW_PICK_CENTER_BUTTON_WIDTH, 
+                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  
+  /* I'm using the same one here */
+
+  this->CreatePhoto("KWEditCenterButtonOpen", 
+                    KW_PICK_CENTER_BUTTON, 
+                    KW_PICK_CENTER_BUTTON_WIDTH, 
+                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  
+  /* I'm using the same one here */
+
+  this->CreatePhoto("KWEditCenterButtonClose", 
+                    KW_PICK_CENTER_BUTTON, 
+                    KW_PICK_CENTER_BUTTON_WIDTH, 
+                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  
   this->CreatePhoto("PVCalculatorButton", 
                     PV_CALCULATOR_BUTTON,
                     PV_CALCULATOR_BUTTON_WIDTH, 
