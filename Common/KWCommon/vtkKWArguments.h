@@ -144,7 +144,9 @@ protected:
   vtkSetStringMacro(Help);
   void GenerateHelp();
 
+  //BTX
   typedef vtkKWArgumentsInternal Internal;
+  //ETX
   Internal* Internals;
   char* Help;
 
