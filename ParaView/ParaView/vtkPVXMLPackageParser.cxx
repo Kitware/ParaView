@@ -52,10 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVReaderModule.h"
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.2");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.3");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
+template class VTK_EXPORT vtkAbstractMap<vtkPVXMLElement*, vtkPVWidget*>;
 template class VTK_EXPORT vtkArrayMap<vtkPVXMLElement*, vtkPVWidget*>;
 #endif
 

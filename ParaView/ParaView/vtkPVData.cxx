@@ -2278,19 +2278,19 @@ void vtkPVData::SaveInTclScript(ofstream *file)
 void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ColorMapMenu: " << this->GetColorMapMenu();
-  os << indent << "ColorMenu: " << this->GetColorMenu();
-  os << indent << "CubeAxesTclName: " << this->GetCubeAxesTclName();
-  os << indent << "GeometryTclName: " << this->GetGeometryTclName();
-  os << indent << "LODMapperTclName: " << this->GetLODMapperTclName();
-  os << indent << "Mapper: " << this->GetMapper();
-  os << indent << "MapperTclName: " << this->GetMapperTclName();
-  os << indent << "NumberOfPVConsumers: " << this->GetNumberOfPVConsumers();
-  os << indent << "PVSource: " << this->GetPVSource();
-  os << indent << "PropTclName: " << this->GetPropTclName();
-  os << indent << "PropertiesParent: " << this->GetPropertiesParent();
-  os << indent << "ScalarBarTclName: " << this->GetScalarBarTclName();
-  os << indent << "VTKData: " << this->GetVTKData();
-  os << indent << "VTKDataTclName: " << this->GetVTKDataTclName();
-  os << indent << "View: " << this->GetView();
+  os << indent << "ColorMapMenu: " << this->GetColorMapMenu() << endl;
+  os << indent << "ColorMenu: " << this->GetColorMenu() << endl;
+  os << indent << "CubeAxesTclName: " << (this->CubeAxesTclName?this->CubeAxesTclName:"none") << endl;
+  os << indent << "GeometryTclName: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
+  os << indent << "LODMapperTclName: " << (this->LODMapperTclName?this->LODMapperTclName:"none") << endl;
+  os << indent << "Mapper: " << this->GetMapper() << endl;
+  os << indent << "MapperTclName: " << (this->MapperTclName?this->MapperTclName:"none") << endl;
+  os << indent << "NumberOfPVConsumers: " << this->GetNumberOfPVConsumers() << endl;
+  os << indent << "PVSource: " << this->GetPVSource() << endl;
+  os << indent << "PropTclName: " << (this->PropTclName?this->PropTclName:"none") << endl;
+  os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
+  os << indent << "ScalarBarTclName: " << (this->ScalarBarTclName?this->ScalarBarTclName:"none") << endl;
+  os << indent << "VTKData: " << this->GetVTKData() << endl;
+  os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
+  os << indent << "View: " << this->GetView() << endl;
 }

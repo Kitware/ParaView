@@ -114,15 +114,15 @@ protected:
   vtkArrayMap() { this->Array = 0; }
   virtual ~vtkArrayMap();
 
-  vtkArrayMap(const vtkArrayMap<KeyType,DataType>&); // Not implemented
-  void operator=(const vtkArrayMap<KeyType,DataType>&); // Not implemented
-
   // Description:
   // Find vtkAbstractMapItem that with specific key
   virtual vtkAbstractMapItem<KeyType,DataType> 
     *FindDataItem(const KeyType key);
 
   vtkVector< vtkAbstractMapItem<KeyType,DataType>* > *Array;
+private:
+  vtkArrayMap(const vtkArrayMap<KeyType,DataType>&){}
+  void operator=(const vtkArrayMap<KeyType,DataType>&){}
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION

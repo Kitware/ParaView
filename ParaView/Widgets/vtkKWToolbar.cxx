@@ -47,7 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
+template class VTK_EXPORT vtkAbstractList<vtkKWWidget*>;
 template class VTK_EXPORT vtkVector<vtkKWWidget*>;
+template class VTK_EXPORT vtkAbstractIterator<vtkIdType,vtkKWWidget*>;
+template class VTK_EXPORT vtkVectorIterator<vtkKWWidget*>;
 
 #endif
 

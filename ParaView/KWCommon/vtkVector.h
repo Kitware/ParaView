@@ -155,6 +155,10 @@ protected:
   vtkIdType Size;
   int Resize;
   DType *Array;
+
+private:
+  vtkVector(const vtkVector<DType>&){}
+  void operator=(const vtkVector<DType>&){}
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION

@@ -55,8 +55,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
+template class VTK_EXPORT vtkAbstractList<void*>;
 template class VTK_EXPORT vtkLinkedList<void*>;
+template class VTK_EXPORT vtkAbstractIterator<vtkIdType,void*>;
+template class VTK_EXPORT vtkLinkedListIterator<void*>;
+template class VTK_EXPORT vtkAbstractMap<vtkPVWidget*, vtkPVWidget*>;
 template class VTK_EXPORT vtkArrayMap<vtkPVWidget*, vtkPVWidget*>;
+template class VTK_EXPORT vtkAbstractIterator<vtkPVWidget*, vtkPVWidget*>;
+template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 
 #endif
 

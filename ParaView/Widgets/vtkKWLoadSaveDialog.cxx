@@ -113,11 +113,16 @@ int vtkKWLoadSaveDialog::Invoke()
 void vtkKWLoadSaveDialog::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "DefaultExt: " << this->GetDefaultExt() << endl;
-  os << indent << "FileName: " << this->GetFileName() << endl;
-  os << indent << "FileTypes: " << this->GetFileTypes() << endl;
-  os << indent << "InitialDir: " << this->GetInitialDir() << endl;
-  os << indent << "LastPath: " << this->GetLastPath() << endl;
+  os << indent << "DefaultExt: " << (this->DefaultExt?this->DefaultExt:"none")
+     << endl;
+  os << indent << "FileName: " << (this->FileName?this->FileName:"none") 
+     << endl;
+  os << indent << "FileTypes: " << (this->FileTypes?this->FileTypes:"none") 
+     << endl;
+  os << indent << "InitialDir: " << (this->InitialDir?this->InitialDir:"none")
+     << endl;
+  os << indent << "LastPath: " << (this->LastPath?this->LastPath:"none")
+     << endl;
   os << indent << "SaveDialog: " << this->GetSaveDialog() << endl;
-  os << indent << "Title: " << this->GetTitle() << endl;
+  os << indent << "Title: " << (this->Title?this->Title:"none") << endl;
 }

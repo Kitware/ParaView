@@ -149,6 +149,10 @@ protected:
   vtkIdType NumberOfItems;
   vtkLinkedListNode<DType> *Head;
   vtkLinkedListNode<DType> *Tail;
+
+private:
+  vtkLinkedList(const vtkLinkedList<DType>&){}
+  void operator=(const vtkLinkedList<DType>&){}
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION

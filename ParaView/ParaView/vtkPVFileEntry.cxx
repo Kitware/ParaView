@@ -300,5 +300,5 @@ int vtkPVFileEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVFileEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "Extension: " << this->Extension << endl;
+  os << "Extension: " << (this->Extension?this->Extension:"none") << endl;
 }

@@ -50,6 +50,7 @@ int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
+template class VTK_EXPORT vtkAbstractList<vtkPVWidget*>;
 template class VTK_EXPORT vtkLinkedList<vtkPVWidget*>;
 
 #endif

@@ -53,10 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVWidget.h"
 
+class vtkKWEntry;
 class vtkLineWidget;
 class vtkLineWidgetObserver;
-
-class vtkKWEntry;
 
 class VTK_EXPORT vtkPVLineWidget : public vtkPVWidget
 {

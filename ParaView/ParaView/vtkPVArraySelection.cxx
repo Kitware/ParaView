@@ -373,13 +373,6 @@ void vtkPVArraySelection::SaveInTclScript(ofstream *file)
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVArraySelection::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "AttributeName: " << this->GetAttributeName();
-  os << indent << "VTKReaderTclName: " << this->GetVTKReaderTclName();
-}
 vtkPVArraySelection* vtkPVArraySelection::ClonePrototype(vtkPVSource* pvSource,
 				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -422,4 +415,14 @@ int vtkPVArraySelection::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "AttributeName: " 
+     << (this->AttributeName?this->AttributeName:"none") << endl;
+  os << indent << "VTKReaderTclName: " 
+     << (this->VTKReaderTclName?this->VTKReaderTclName:"none") << endl;
 }

@@ -721,22 +721,6 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   this->ComponentMenu->SetValue(label);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "ArrayName: " << this->GetArrayName() << endl;
-  os << indent << "ArrayNumberOfComponents: " << this->GetArrayNumberOfComponents() << endl;
-  os << indent << "AttributeType: " << this->GetAttributeType() << endl;
-  os << indent << "InputName: " << this->GetInputName() << endl;
-  os << indent << "NumberOfComponents: " << this->GetNumberOfComponents() << endl;
-  os << indent << "ObjectTclName: " << this->GetObjectTclName() << endl;
-  os << indent << "SelectedComponent: " << this->GetSelectedComponent() << endl;
-  os << indent << "ShowComponentMenu: " << this->GetShowComponentMenu() << endl;
-  os << indent << "ShowFieldMenu: " << this->GetShowFieldMenu() << endl;
-  os << indent << "InputMenu: " << this->InputMenu << endl;
-}
-
 vtkPVArrayMenu* vtkPVArrayMenu::ClonePrototype(vtkPVSource* pvSource,
 				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -881,3 +865,24 @@ int vtkPVArrayMenu::ReadXMLAttributes(vtkPVXMLElement* element,
   
   return 1;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ArrayName: " << (this->ArrayName?this->ArrayName:"none") 
+     << endl;
+  os << indent << "ArrayNumberOfComponents: " << this->ArrayNumberOfComponents
+     << endl;
+  os << indent << "AttributeType: " << this->GetAttributeType() << endl;
+  os << indent << "InputName: " << (this->InputName?this->InputName:"none") 
+     << endl;
+  os << indent << "NumberOfComponents: " << this->GetNumberOfComponents() << endl;
+  os << indent << "ObjectTclName: " 
+     << (this->ObjectTclName?this->ObjectTclName:"none") << endl;
+  os << indent << "SelectedComponent: " << this->GetSelectedComponent() << endl;
+  os << indent << "ShowComponentMenu: " << this->GetShowComponentMenu() << endl;
+  os << indent << "ShowFieldMenu: " << this->GetShowFieldMenu() << endl;
+  os << indent << "InputMenu: " << this->InputMenu << endl;
+}
+

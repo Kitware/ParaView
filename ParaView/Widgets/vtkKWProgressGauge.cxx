@@ -39,11 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWProgressGauge.h"
+
+#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
-
-
+#include "vtkString.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
@@ -58,7 +58,8 @@ vtkKWProgressGauge::vtkKWProgressGauge()
   this->Length = 100;
   this->Height = 20;
   this->Value = 0;
-  this->BarColor = strcpy(new char[5], "blue");
+  this->BarColor = vtkString::Duplicate("blue");
+  this->BackgroundColor = 0;
 }
 
 
@@ -148,8 +149,10 @@ void vtkKWProgressGauge::SetValue(int value)
 void vtkKWProgressGauge::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "BackgroundColor: " << this->GetBackgroundColor() << endl;
-  os << indent << "BarColor: " << this->GetBarColor() << endl;
+  os << indent << "BackgroundColor: " 
+     << (this->BackgroundColor?this->BackgroundColor:"none") << endl;
+  os << indent << "BarColor: " << (this->BarColor?this->BarColor:"none") 
+     << endl;
   os << indent << "Height: " << this->GetHeight() << endl;
   os << indent << "Length: " << this->GetLength() << endl;
 }

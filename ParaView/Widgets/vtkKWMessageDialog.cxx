@@ -398,7 +398,8 @@ int vtkKWMessageDialog::GetRememberMessage()
 void vtkKWMessageDialog::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "DialogName: " << this->GetDialogName() << endl;
+  os << indent << "DialogName: " << (this->DialogName?this->DialogName:"none")
+     << endl;
   os << indent << "Options: " << this->GetOptions() << endl;
   os << indent << "Style: " << this->GetStyle() << endl;
 }

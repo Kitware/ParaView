@@ -108,8 +108,8 @@ protected:
 
   vtkIdType Index;
 
-  vtkVectorIterator(const vtkVectorIterator&); // Not implemented
-  void operator=(const vtkVectorIterator&); // Not implemented
+  vtkVectorIterator(const vtkVectorIterator&){}
+  void operator=(const vtkVectorIterator&){}
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION

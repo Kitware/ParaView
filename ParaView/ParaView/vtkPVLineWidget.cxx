@@ -57,8 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //===========================================================================
 //***************************************************************************
-struct vtkLineWidgetObserver : public vtkCommand
+class vtkLineWidgetObserver : public vtkCommand
 {
+public:
   static vtkLineWidgetObserver *New() 
     {return new vtkLineWidgetObserver;};
 

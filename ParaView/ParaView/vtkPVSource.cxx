@@ -40,23 +40,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVSource.h"
-#include "vtkPVWidgetCollection.h"
-#include "vtkKWMessageDialog.h"
-#include "vtkPVInteractorStyleRotateCamera.h"
-#include "vtkSource.h"
-#include "vtkPVData.h"
-#include "vtkPVApplication.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVWindow.h"
-#include "vtkPVData.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWLabel.h"
-#include "vtkKWNotebook.h"
-#include "vtkKWFrame.h"
-#include "vtkPVSourceCollection.h"
-#include "vtkPVInputMenu.h"
-#include "vtkKWView.h"
+
 #include "vtkArrayMap.txx"
+#include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
+#include "vtkKWMessageDialog.h"
+#include "vtkKWNotebook.h"
+#include "vtkKWView.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVData.h"
+#include "vtkPVData.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVInteractorStyleRotateCamera.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVSourceCollection.h"
+#include "vtkPVWidgetCollection.h"
+#include "vtkPVWindow.h"
+#include "vtkSource.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -1442,7 +1443,9 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "AcceptButton: " << this->GetAcceptButton() << endl;
   os << indent << "DeleteButton: " << this->GetDeleteButton() << endl;
-  os << indent << "ExtentTranslatorTclName: " << this->GetExtentTranslatorTclName() << endl;
+  os << indent << "ExtentTranslatorTclName: " 
+     << (this->ExtentTranslatorTclName?this->ExtentTranslatorTclName:"null")
+     << endl;
   os << indent << "MainParameterFrame: " << this->GetMainParameterFrame() << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "NumberOfPVInputs: " << this->GetNumberOfPVInputs() << endl;
@@ -1451,12 +1454,16 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ParametersParent: " << this->GetParametersParent() << endl;
   os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
   os << indent << "VTKSource: " << this->GetVTKSource() << endl;
-  os << indent << "VTKSourceTclName: " << this->GetVTKSourceTclName() << endl;
+  os << indent << "VTKSourceTclName: " 
+     << (this->VTKSourceTclName?this->VTKSourceTclName:"none") << endl;
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "VisitedFlag: " << this->GetVisitedFlag() << endl;
   os << indent << "Widgets: " << this->GetWidgets() << endl;
-  os << indent << "InputClassName: " << this->InputClassName << endl;
+  os << indent << "InputClassName: " 
+     << (this->InputClassName?this->InputClassName:"null") << endl;
   os << indent << "IsDeletable: " << this->IsDeletable << endl;
-  os << indent << "OutputClassName: " << this->OutputClassName << endl;
-  os << indent << "SourceClassName: " << this->SourceClassName << endl;
+  os << indent << "OutputClassName: " 
+     << (this->OutputClassName?this->OutputClassName:"null") << endl;
+  os << indent << "SourceClassName: " 
+     << (this->SourceClassName?this->SourceClassName:"null") << endl;
 }

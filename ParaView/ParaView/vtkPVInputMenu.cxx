@@ -336,15 +336,6 @@ void vtkPVInputMenu::Reset()
     }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInputMenu::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "InputName: " << this->GetInputName() << endl;
-  os << indent << "InputType: " << this->GetInputType() << endl;
-  os << indent << "VTKInputName: " << this->GetVTKInputName() << endl;
-}
-
 vtkPVInputMenu* vtkPVInputMenu::ClonePrototype(vtkPVSource* pvSource,
 				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -418,4 +409,16 @@ int vtkPVInputMenu::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "InputName: " << (this->InputName?this->InputName:"none") 
+     << endl;
+  os << indent << "InputType: " << (this->InputType?this->InputType:"none") 
+     << endl;
+  os << indent << "VTKInputName: " 
+     << (this->VTKInputName?this->VTKInputName:"none") << endl;
 }
