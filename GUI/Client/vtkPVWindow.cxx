@@ -126,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.568");
+vtkCxxRevisionMacro(vtkPVWindow, "1.569");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4366,7 +4366,10 @@ void vtkPVWindow::UpdateEnableState()
   this->Superclass::UpdateEnableState();
 
 
+  int re = this->Enabled;
+  this->Enabled = enabled;
   this->PropagateEnableState(this->MainView);
+  this->Enabled = re;
 
   this->PropagateEnableState(this->Notebook);
 
