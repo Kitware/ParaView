@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.24");
+vtkCxxRevisionMacro(vtkKWExtent, "1.25");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -76,28 +76,28 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->Script("frame %s -bd 0 %s", wname, (args ? args : ""));
 
   this->XRange->SetParent(this);
+  this->XRange->ShowLabelOn();
+  this->XRange->ShowEntriesOn();
   this->XRange->Create(this->Application, "");
   this->XRange->SetCommand(this, "ExtentSelected");
   this->XRange->AdjustResolutionOn();
-  this->XRange->ShowLabelOn();
   this->XRange->SetLabel("X (Units)");
-  this->XRange->ShowEntriesOn();
   
   this->YRange->SetParent(this);
+  this->YRange->ShowLabelOn();
+  this->YRange->ShowEntriesOn();
   this->YRange->Create(this->Application, "");
   this->YRange->AdjustResolutionOn();
   this->YRange->SetCommand(this, "ExtentSelected");
-  this->YRange->ShowLabelOn();
   this->YRange->SetLabel("Y (Units)");
-  this->YRange->ShowEntriesOn();
 
   this->ZRange->SetParent(this);
+  this->ZRange->ShowLabelOn();
+  this->ZRange->ShowEntriesOn();
   this->ZRange->Create(this->Application, "");
   this->ZRange->AdjustResolutionOn();
   this->ZRange->SetCommand(this, "ExtentSelected");
-  this->ZRange->ShowLabelOn();
   this->ZRange->SetLabel("Z (Units)");
-  this->ZRange->ShowEntriesOn();
   
   // Pack the label and the option menu
 

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.11");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.12");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -292,8 +292,8 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
 
   this->TitleTextPropertyWidget->LongFormatOn();
   this->TitleTextPropertyWidget->LabelOnTopOn();
-  this->TitleTextPropertyWidget->Create(this->Application);
   this->TitleTextPropertyWidget->ShowLabelOn();
+  this->TitleTextPropertyWidget->Create(this->Application);
   this->TitleTextPropertyWidget->GetLabel()->SetLabel("Title properties:");
   this->TitleTextPropertyWidget->SetChangedCommand(
     this, "TitleTextPropertyCallback");
@@ -355,8 +355,8 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
 
   this->LabelTextPropertyWidget->LongFormatOn();
   this->LabelTextPropertyWidget->LabelOnTopOn();
-  this->LabelTextPropertyWidget->Create(this->Application);
   this->LabelTextPropertyWidget->ShowLabelOn();
+  this->LabelTextPropertyWidget->Create(this->Application);
   this->LabelTextPropertyWidget->GetLabel()->SetLabel(
     "Label text properties:");
   this->LabelTextPropertyWidget->SetChangedCommand(

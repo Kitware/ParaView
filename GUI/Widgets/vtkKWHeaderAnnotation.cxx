@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.7");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.8");
 
 int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -214,8 +214,8 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
 
   this->TextPropertyWidget->LongFormatOn();
   this->TextPropertyWidget->LabelOnTopOn();
-  this->TextPropertyWidget->Create(this->Application);
   this->TextPropertyWidget->ShowLabelOn();
+  this->TextPropertyWidget->Create(this->Application);
   this->TextPropertyWidget->GetLabel()->SetLabel("Header properties:");
   this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");
 
