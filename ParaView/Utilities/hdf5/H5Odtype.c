@@ -1294,7 +1294,7 @@ H5O_dtype_debug(H5F_t *f, const void *mesg, FILE *stream,
                 dt->u.array.ndims);
     fprintf(stream, "%*s%-*s {", indent, "", fwidth, "Dim Size:");
         for (i=0; i<dt->u.array.ndims; i++) {
-        fprintf (stream, "%s%u", i?", ":"", dt->u.array.dim[i]);
+        fprintf (stream, "%s%d", i?", ":"", dt->u.array.dim[i]);
     }
     fprintf (stream, "}\n");
     fprintf(stream, "%*s%-*s {", indent, "", fwidth, "Dim Permutation:");
