@@ -100,6 +100,8 @@
 
 #include "htmlhelp.h"
 #include "direct.h"
+#else
+#include "unistd.h"
 #endif
 
 #include <vtkstd/vector>
@@ -109,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.295");
+vtkCxxRevisionMacro(vtkPVApplication, "1.296");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
