@@ -105,7 +105,7 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
                wname);
 
   this->Frame1->Create(app,"frame","-borderwidth 0 -relief flat");
-  this->Separator->Create(app,"frame","-borderwidth 2 -relief raised");
+  this->Separator->Create(app,"frame","-borderwidth 0 -relief flat");
   this->Frame2->Create(app,"frame","-borderwidth 0 -relief flat");
   
   this->Update();
@@ -113,7 +113,7 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
   this->Script("bind %s <B1-Motion> {%s DragCallback}",
                this->Separator->GetWidgetName(), this->GetTclName());
   this->Script("bind %s <Configure> {%s ConfigureCallback}",
-               this->Separator->GetWidgetName(), this->GetTclName());
+               this->GetWidgetName(), this->GetTclName());
 
 
   // Setup the cursor to indication an action associatyed with the separator. 
