@@ -42,11 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPNGReader.h"
 #include "vtkTesting.h"
 #include "vtkWindowToImageFilter.h"
-#include "vtkRenderWIndow.h"
+#include "vtkRenderWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTesting );
-vtkCxxRevisionMacro(vtkKWTesting, "1.5");
+vtkCxxRevisionMacro(vtkKWTesting, "1.6");
 vtkCxxSetObjectMacro(vtkKWTesting,RenderView,vtkKWView);
 
 //----------------------------------------------------------------------------
