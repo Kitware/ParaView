@@ -60,7 +60,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
-#include "vtkKWScrollableFrame.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkPVArraySelection.h"
@@ -76,6 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 #include "vtkCallbackCommand.h"
 #include "vtkPVLabel.h"
+#include "vtkKWFrame.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -106,7 +106,7 @@ vtkPVSource::vtkPVSource()
 
   this->Properties = vtkKWWidget::New();
   
-  this->ParameterFrame = vtkKWScrollableFrame::New();
+  this->ParameterFrame = vtkKWFrame::New();
   this->ButtonFrame = vtkKWWidget::New();
   this->MainParameterFrame = vtkKWWidget::New();
   this->AcceptButton = vtkKWPushButton::New();
@@ -440,7 +440,7 @@ void vtkPVSource::CreateProperties()
 
   this->ParameterFrame->SetParent(this->MainParameterFrame);
 
-  this->ParameterFrame->Create(this->Application);
+  this->ParameterFrame->Create(this->Application, 1);
   this->Script("pack %s -fill both -expand t -side top", 
 	       this->ParameterFrame->GetWidgetName());
 

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPVRenderView.h"
-#include "vtkKWScrollableFrame.h"
+#include "vtkKWFrame.h"
 
 int vtkPVDataSetReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 				       int argc, char *argv[]);

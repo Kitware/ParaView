@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTclInteractor.h"
 #include "vtkKWCompositeCollection.h"
-#include "vtkKWScrollableFrame.h"
+#include "vtkKWFrame.h"
 
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVAnimationInterface.h"

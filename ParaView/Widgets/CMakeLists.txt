@@ -33,7 +33,6 @@ vtkKWPushButton
 vtkKWRadioButton 
 vtkKWSaveImageDialog 
 vtkKWScale 
-vtkKWScrollableFrame
 vtkKWSplitFrame
 vtkKWTclInteractor
 vtkKWText 

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceInterface.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWNotebook.h"
-#include "vtkKWScrollableFrame.h"
+#include "vtkKWFrame.h"
 
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
@@ -108,7 +108,7 @@ vtkPVData::vtkPVData()
   ++instanceCount;
   this->InstanceCount = instanceCount;
     
-  this->Properties = vtkKWScrollableFrame::New();
+  this->Properties = vtkKWFrame::New();
 
   this->ScalarBarFrame = vtkKWLabeledFrame::New();
   this->ColorFrame = vtkKWLabeledFrame::New();
@@ -812,7 +812,7 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
 void vtkPVData::CreateProperties()
 {
   this->Properties->SetParent(this->GetPVSource()->GetNotebook()->GetFrame("Display"));
-  this->Properties->Create(this->Application);
+  this->Properties->Create(this->Application, 1);
 
   this->ScalarBarFrame->SetParent(this->Properties->GetFrame());
   this->ScalarBarFrame->ShowHideFrameOn();

@@ -73,7 +73,7 @@ class vtkPVSelectionList;
 class vtkPVSourceInterface;
 class vtkPVRenderView;
 class vtkKWLabeledFrame;
-class vtkKWScrollableFrame;
+class vtkKWFrame;
 class vtkKWLabel;
 class vtkPVStringEntry;
 class vtkPVVectorEntry;
@@ -256,7 +256,7 @@ public:
   
   vtkGetObjectMacro(Widgets, vtkKWWidgetCollection);
   
-  vtkGetObjectMacro(ParameterFrame, vtkKWScrollableFrame);
+  vtkGetObjectMacro(ParameterFrame, vtkKWFrame);
   vtkGetObjectMacro(MainParameterFrame, vtkKWWidget);
   
   // Description:
@@ -382,7 +382,7 @@ protected:
 
   vtkKWWidget *MainParameterFrame;
   vtkKWWidget *ButtonFrame;
-  vtkKWScrollableFrame *ParameterFrame;
+  vtkKWFrame *ParameterFrame;
   
   vtkKWWidgetCollection *Widgets;
 

@@ -154,25 +154,32 @@ void vtkKWFrame::CalculateBBox(vtkKWWidget* canvas, char* name,
 
 void vtkKWFrame::ResizeFrame()
 {
+  this->Script("winfo width %s", this->Frame->GetWidgetName());
+  //int widthFrame = this->GetIntegerResult(this->Application);
+
   int bbox[4];
   this->CalculateBBox(this->Canvas, "all", bbox);
-  this->Script("%s configure -scrollregion \"%d %d %d %d\" "
+  this->Script("%s configure  -scrollregion \"%d %d %d %d\" "
 	       "-yscrollincrement 0.1i", this->Canvas->GetWidgetName(), 
 	       bbox[0], bbox[1], bbox[2], bbox[3]);
 }
 
 void vtkKWFrame::ResizeCanvas()
 {
+  this->Script("winfo width %s", this->Frame->GetWidgetName());
+  //int widthFrame = this->GetIntegerResult(this->Application);
+
   int bbox[4], heightCanvas, heightFrame;
 
   this->CalculateBBox(this->Canvas, "all", bbox);
   heightFrame = bbox[3] - bbox[1];
   this->Script("winfo height %s", this->Canvas->GetWidgetName());
   heightCanvas = this->GetIntegerResult(this->Application);
-  cout << heightFrame << " / " << heightCanvas << endl;
   if (heightFrame > heightCanvas)
     {
-    this->Script("pack %s -fill both -expand t -side left", 
+    this->Script("pack forget %s", this->Canvas->GetWidgetName());
+    this->Script("pack %s -fill both -expand t -side left", this->Canvas->GetWidgetName());
+    this->Script("pack %s -fill both -expand t -side right", 
 		 this->ScrollBar->GetWidgetName());
     }
   else
@@ -183,4 +190,5 @@ void vtkKWFrame::ResizeCanvas()
 	       this->Canvas->GetWidgetName(),
 	       this->FrameId,
 	       this->Canvas->GetWidgetName());
+
 }
