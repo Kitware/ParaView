@@ -59,6 +59,7 @@ vtkKWHashTableIterator::vtkKWHashTableIterator()
 
 vtkKWHashTableIterator::~vtkKWHashTableIterator()
 {
+  this->SetHashTable(0);
 }
 
 unsigned long vtkKWHashTableIterator::GetKey()
@@ -138,6 +139,11 @@ void vtkKWHashTableIterator::SetHashTable(vtkKWHashTable *table)
   //cout << "Set hash table" << endl;
   if ( !table )
     {
+    if ( this->HashTable )
+      {
+      this->HashTable->Delete();
+      this->HashTable=0;
+      }
     return;
     }
   if ( this->HashTable == table )
