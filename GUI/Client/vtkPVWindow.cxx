@@ -125,7 +125,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.555");
+vtkCxxRevisionMacro(vtkPVWindow, "1.556");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4107,7 +4107,7 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName,
 // This is the shared volume appearance editor
 vtkPVVolumeAppearanceEditor* vtkPVWindow::GetVolumeAppearanceEditor()
 {
-  if ( !this->VolumeAppearanceEditor )
+  if ( !this->VolumeAppearanceEditor && this->GetMainView() )
     {
     this->VolumeAppearanceEditor = vtkPVVolumeAppearanceEditor::New();
     this->VolumeAppearanceEditor->
