@@ -94,7 +94,7 @@ IF(USE_INCLUDED_TCLTK)
       ADD_CUSTOM_TARGET(maketk ALL 
         cd ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix; "$(MAKE)" )
     ENDIF (CMAKE_ESCAPES_SC)
-  
+
   ELSE(UNIX)
     SET(PV_TCL_DIR ${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win)
     SET(TCL_LIBRARY ${PV_TCL_DIR}/lib/tcl84.lib CACHE FILEPATH
@@ -109,36 +109,24 @@ IF(USE_INCLUDED_TCLTK)
       "Path to tcl include" FORCE)
     SET(TK_INCLUDE_PATH ${PV_TCL_DIR}/include CACHE PATH
       "Path to tk include" FORCE)
-  # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
-  # directory so no paths are needed to run this.
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/tcl84.dll 
-                   COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Debug/tcl84.dll 
-                   COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Release/tcl84.dll 
-                   COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/MinSizeRel/tcl84.dll 
-                   COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tcl84.dll
-                    COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/tk84.dll COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Debug/tk84.dll COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/Release/tk84.dll 
-                   COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/MinSizeRel/tk84.dll 
-                   COPYONLY)
-    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
-                   ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tk84.dll 
-                   COPYONLY)
+	SET(TCL_TK_COPY_SUPPORT_LIBRARY 1 CACHE BOOL "Very few users should worry about this option. If VTK is built against a static Tcl/Tk lib (see TCL_TK_STATIC) or a shared Tcl/Tk bundled inside a project with no library support files (ex: ParaViewComplete), this variable should be set to ON and both TCL_SUPPORT_LIBRARY_PATH and TK_SUPPORT_LIBRARY_PATH should point to the directories that hold those files (typically, lib/tcl8.4 and lib/tk8.4 for a typical Tcl/Tk installation, or tcl8.4.5/library and tk8.4.5/library for a Tcl/Tk source repository). Once this variable is set to ON, support files will automatically be copied to the build directory and the executables will try to use that location to initialize Tcl/Tk." FORCE)
+    SET(TCL_SUPPORT_LIBRARY_PATH ${ParaViewComplete_SOURCE_DIR}/tcl8.4.5/library CACHE PATH "Path to the Tcl support library files. See TCL_TK_COPY_SUPPORT_LIBRARY help." FORCE)
+    SET(TK_SUPPORT_LIBRARY_PATH ${ParaViewComplete_SOURCE_DIR}/tk8.4.5/library CACHE PATH "Path to the Tcl support library files. See TCL_TK_COPY_SUPPORT_LIBRARY help." FORCE)
+    # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
+    # directory so no paths are needed to run this.
+    IF (CMAKE_CONFIGURATION_TYPES)
+      SET (CONFIG_TYPES ${CMAKE_CONFIGURATION_TYPES})
+    ELSE (CMAKE_CONFIGURATION_TYPES)
+      SET (CONFIG_TYPES .)
+    ENDIF (CMAKE_CONFIGURATION_TYPES)
+    FOREACH (config "${CONFIG_TYPES}")
+      CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tcl84.dll
+                     ${ParaViewComplete_BINARY_DIR}/bin/${config}/tcl84.dll 
+                     COPYONLY)
+      CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win/bin/tk84.dll
+                     ${ParaViewComplete_BINARY_DIR}/bin/${config}/tk84.dll
+                     COPYONLY)
+    ENDFOREACH (config)
   ENDIF(UNIX)
 ENDIF(USE_INCLUDED_TCLTK)
 
