@@ -7,6 +7,7 @@ SET( KWCommon_SRCS
   vtkKWArguments.cxx
   vtkKWDirectoryUtilities.cxx
   vtkKWEvent.cxx
+  vtkKWGenericMovieWriter.cxx
   vtkKWHistogram.cxx
   vtkKWHistogramSet.cxx
   vtkKWIcon.cxx
@@ -19,40 +20,31 @@ SET( KWCommon_SRCS
   vtkString.cxx
   )
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkContainer
-  vtkKWEvent.cxx
-  vtkQueue
-  WRAP_EXCLUDE
-  )
+# include mpeg2 writer if the mpeg2 lib has been defined
+IF (DEFINED VTKMPEG2_INCLUDE_DIRS)
+  SET( KWCommon_SRCS ${KWCommon_SRCS} vtkMPEG2Writer.cxx)
+  INCLUDE_DIRECTORIES(${VTKMPEG2_INCLUDE_DIRS})
+  SET( KWCommon_LINK_LIBS ${KWCommon_LINK_LIBS} vtkMPEG2Encode)
+ENDIF (DEFINED VTKMPEG2_INCLUDE_DIRS)
 
 IF (WIN32)
-  SET( KWCommon_SRCS ${KWCommon_SRCS}
+  SET( KWCommon_SRCS ${KWCommon_SRCS} 
+    vtkAVIWriter.cxx
     vtkKWWin32RegisteryUtilities.cxx
     )
-  SET_SOURCE_FILES_PROPERTIES(
-    vtkKWWin32RegisteryUtilities
-    WRAP_EXCLUDE
-    )
+  SET( KWCommon_LINK_LIBS ${KWCommon_LINK_LIBS} vfw32)
 ELSE (WIN32)
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
   SET( KWCommon_SRCS ${KWCommon_SRCS}
     vtkKWUNIXRegisteryUtilities.cxx
     )
-  SET_SOURCE_FILES_PROPERTIES(
-    vtkKWUNIXRegisteryUtilities
-    WRAP_EXCLUDE
-    )
 ENDIF (WIN32)
 
-IF(ParaView_SOURCE_DIR)
-  IF(VTK_ZLIB_INCLUDE_DIRS)
-    INCLUDE_DIRECTORIES(${VTK_ZLIB_INCLUDE_DIRS})
-  ENDIF(VTK_ZLIB_INCLUDE_DIRS)
-ENDIF(ParaView_SOURCE_DIR)
+IF(VTK_ZLIB_INCLUDE_DIRS)
+  INCLUDE_DIRECTORIES(${VTK_ZLIB_INCLUDE_DIRS})
+ENDIF(VTK_ZLIB_INCLUDE_DIRS)
 
 ADD_LIBRARY(vtkKWCommon ${KWCommon_SRCS})
-
 
 IF(KWSYS_NAMESPACE)
   TARGET_LINK_LIBRARIES (vtkKWCommon ${KWSYS_NAMESPACE})
@@ -65,6 +57,7 @@ TARGET_LINK_LIBRARIES (vtkKWCommon
   vtkIO
   vtkImaging
   vtkRendering
+  ${KWCommon_LINK_LIBS}
   )
 
 SUBDIRS(Utilities)
