@@ -23,6 +23,9 @@
 <h1>Environment Variables</h1>
 
 ParaView looks for a few environment variables that can be used to modifiy its behavior.
+Environment variables are only accessed from the first process which contains the user 
+interface.  ParaView is responsible for broadcasting the effects of the modifications
+to all of the processes.
 
 <h2>PV_INTERFACE_PATH</h2>
 
@@ -63,9 +66,11 @@ create a render window separate from its main interface window.
 Since still renders can take a substantial amount of time, ParaView has the ability
 to interrupt a long render when another event comes along.  Although this is relativly
 straight forward when rendering with a single processes, interrupting multiple
-processes during rendering and compositing is tricky.  The implementation uses
+processes during rendering and compositing is tricky.  The parallel implementation 
+of this feature uses
 asynchronous send and receives.  Setting this environment variable will
-disable the interrupt feature.  It is primarily a debugging tool.
+disable the interrupt feature.  
+This option is used primarily for debugging purposes.
 </p>
 
 <h2>PV_USE_TRANSMIT</h2>
@@ -80,7 +85,7 @@ the same file at the same time.
 </p>
 
 <p>
-Setting this envirnment variable to "True" causes ParaView to use a more efficient
+Setting this environment variable to "True" causes ParaView to use a more efficient
 strategry.  The first process reads the entire data set, and then transmits
 pieces of the data set to the satellite processes.  Unfortunately, there are some
 VTK pipeline issues that have not been completely resolved with this strategy.
@@ -94,9 +99,9 @@ this feature is turned off by default.
 <h2>PV_DEBUG_HALF</h2>
 
 <p>
-This envirnment variable fools ParaView into thinking it has twice as many processors
+This environment variable fools ParaView into thinking it has twice as many processors
 than it actually has.  When it is set to "True", only half of any data set is processed
-and rendered.  It is primarly used for debugging purposes.
+and rendered.  This option is primarly used for debugging purposes.
 </p>
 
 <hr>
