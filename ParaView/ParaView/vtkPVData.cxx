@@ -169,7 +169,7 @@ vtkPVData::vtkPVData()
 
   this->ResetCameraButton = vtkKWPushButton::New();
   
-  this->PreviousAmbient = 0.2;
+  this->PreviousAmbient = 0.15;
   this->PreviousSpecular = 0.1;
   this->PreviousDiffuse = 0.8;
   this->PreviousWasSolid = 1;
@@ -510,8 +510,8 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   sprintf(tclName, "Property%d", this->InstanceCount);
   this->Property = (vtkProperty*)pvApp->MakeTclObject("vtkProperty", tclName);
   this->SetPropertyTclName(tclName);
-  pvApp->BroadcastScript("%s SetAmbient 0.2", this->PropertyTclName);
-  pvApp->BroadcastScript("%s SetDiffuse 0.8", this->PropertyTclName);
+  pvApp->BroadcastScript("%s SetAmbient 0.15", this->PropertyTclName);
+  pvApp->BroadcastScript("%s SetDiffuse 0.85", this->PropertyTclName);
 
   
   pvApp->BroadcastScript("%s SetProperty %s", this->PropTclName, 
@@ -1335,8 +1335,10 @@ void vtkPVData::ChangeActorColor(float r, float g, float b)
   this->AddTraceEntry("$kw(%s) ChangeActorColor %f %f %f",
                       this->GetTclName(), r, g, b);
 
-  pvApp->BroadcastScript("%s SetColor %f %f %f",
+  pvApp->BroadcastScript("%s SetDiffuseColor %f %f %f",
                          this->PropertyTclName, r, g, b);
+  pvApp->BroadcastScript("%s SetAmbientColor 1.0 1.0 1.0",
+                         this->PropertyTclName);
   this->GetPVRenderView()->EventuallyRender();
 }
 
