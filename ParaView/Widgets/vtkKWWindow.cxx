@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.166");
+vtkCxxRevisionMacro(vtkKWWindow, "1.167");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -1599,12 +1599,8 @@ void vtkKWWindow::UpdateToolbarAspect()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::UpdateEnableState()
+void vtkKWWindow::SetToolbarsEnabled(int state)
 {
-  this->Superclass::UpdateEnableState();
-
-  // Update the toolbars
-
   if (this->Toolbars)
     {
     vtkKWToolbar *tb = NULL;
@@ -1614,12 +1610,22 @@ void vtkKWWindow::UpdateEnableState()
       {
       if (it->GetData(tb) == VTK_OK)
         {
-        tb->SetEnabled(this->Enabled);
+        tb->SetEnabled(state);
         }
       it->GoToNextItem();
       }
     it->Delete();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  // Update the toolbars
+
+  this->SetToolbarsEnabled(this->Enabled);
 
   // Update the notebook
 

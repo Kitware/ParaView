@@ -329,6 +329,7 @@ public:
   // Description:
   // Update the toolbar aspect once the toolbar settings have been changed
   virtual void UpdateToolbarAspect();
+  virtual void SetToolbarsEnabled(int);
   //BTX
   vtkGetObjectMacro(Toolbars, vtkVector<vtkKWToolbar*>);
   //ETX
