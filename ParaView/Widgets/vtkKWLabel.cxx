@@ -49,7 +49,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.15");
+vtkCxxRevisionMacro(vtkKWLabel, "1.16");
 
 //-----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -110,8 +110,8 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
     }
   else
     {
-    this->Script("label %s -text {%s} -justify left %s", 
-                 wname, this->Label, (args?args:""));
+    this->Script("label %s -text {%s} -justify left %s -width %d", 
+                 wname, this->Label, (args?args:""), this->Width);
     }
 
   // Update enable state
@@ -137,12 +137,29 @@ void vtkKWLabel::SetLineType( int type )
         }
       else
         {
-        this->Script("label %s -text {%s} -justify left", 
-                     this->GetWidgetName(), str);
+        this->Script("label %s -text {%s} -justify left -width %d", 
+                     this->GetWidgetName(), str, this->Width);
         }                  
       }
     }
   this->LineType = type;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::SetWidth(int width)
+{
+  if (this->Width == width)
+    {
+    return;
+    }
+
+  this->Width = width;
+  this->Modified();
+
+  if (this->IsCreated())
+    {
+    this->Script("%s configure -width %d", this->GetWidgetName(), width);
+    }
 }
 
 //-----------------------------------------------------------------------------

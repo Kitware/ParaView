@@ -77,8 +77,8 @@ public:
   void SetLineType(int type);
 
   // Description:
-  // Set/Get width of the label when in multiline mode.
-  vtkSetMacro(Width, int);
+  // Set/Get width of the label.
+  virtual void SetWidth(int);
   vtkGetMacro(Width, int);
 
   // Description:
