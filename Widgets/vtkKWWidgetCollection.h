@@ -86,23 +86,6 @@ inline int vtkKWWidgetCollection::IsItemPresent(vtkKWWidget *a)
   return this->vtkCollection::IsItemPresent((vtkObject *)a);
 }
 
-inline vtkKWWidget *vtkKWWidgetCollection::GetNextKWWidget() 
-{ 
-  return (vtkKWWidget *)(this->GetNextItemAsObject());
-}
-
-inline vtkKWWidget *vtkKWWidgetCollection::GetLastKWWidget() 
-{ 
-  if ( this->Bottom == NULL )
-    {
-    return NULL;
-    }
-  else
-    {
-    return (vtkKWWidget *)(this->Bottom->Item);
-    }
-}
-
 #endif
 
 

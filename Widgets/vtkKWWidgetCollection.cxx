@@ -26,6 +26,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkKWWidgetCollection.h"
+#include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 
 vtkKWWidgetCollection* vtkKWWidgetCollection::New()
@@ -39,3 +40,21 @@ vtkKWWidgetCollection* vtkKWWidgetCollection::New()
   // If the factory was unable to create the object, then create it here.
   return new vtkKWWidgetCollection;
 }
+
+vtkKWWidget *vtkKWWidgetCollection::GetNextKWWidget() 
+{ 
+  return vtkKWWidget::SafeDownCast(this->GetNextItemAsObject());
+}
+
+vtkKWWidget *vtkKWWidgetCollection::GetLastKWWidget() 
+{ 
+  if ( this->Bottom == NULL )
+    {
+    return NULL;
+    }
+  else
+    {
+    return vtkKWWidget::SafeDownCast(this->Bottom->Item);
+    }
+}
+

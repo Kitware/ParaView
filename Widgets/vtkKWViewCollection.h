@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkKWViewC_h
 
 #include "vtkCollection.h"
-class vtkKWView;
+#include "vtkKWView.h"
 
 class VTK_EXPORT vtkKWViewCollection : public vtkCollection
 {
@@ -88,7 +88,7 @@ inline int vtkKWViewCollection::IsItemPresent(vtkKWView *a)
 
 inline vtkKWView *vtkKWViewCollection::GetNextKWView() 
 { 
-  return (vtkKWView *)(this->GetNextItemAsObject());
+  return vtkKWView::SafeDownCast(this->GetNextItemAsObject());
 }
 
 inline vtkKWView *vtkKWViewCollection::GetLastKWView() 
@@ -99,7 +99,7 @@ inline vtkKWView *vtkKWViewCollection::GetLastKWView()
     }
   else
     {
-    return (vtkKWView *)(this->Bottom->Item);
+    return vtkKWView::SafeDownCast(this->Bottom->Item);
     }
 }
 

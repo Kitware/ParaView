@@ -37,7 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkKWWindowC_h
 
 #include "vtkCollection.h"
-class vtkKWWindow;
+#include "vtkKWWindow.h"
 
 class VTK_EXPORT vtkKWWindowCollection : public vtkCollection
 {
@@ -90,7 +90,7 @@ inline int vtkKWWindowCollection::IsItemPresent(vtkKWWindow *a)
 
 inline vtkKWWindow *vtkKWWindowCollection::GetNextKWWindow() 
 { 
-  return (vtkKWWindow *)(this->GetNextItemAsObject());
+  return vtkKWWindow::SafeDownCast(this->GetNextItemAsObject());
 }
 
 inline vtkKWWindow *vtkKWWindowCollection::GetLastKWWindow() 
@@ -101,7 +101,7 @@ inline vtkKWWindow *vtkKWWindowCollection::GetLastKWWindow()
     }
   else
     {
-    return (vtkKWWindow *)(this->Bottom->Item);
+    return vtkKWWindow::SafeDownCast(this->Bottom->Item);
     }
 }
 
