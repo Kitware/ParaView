@@ -79,7 +79,7 @@ static inline int Chdir(const char* dir)
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.10");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.11");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -569,7 +569,8 @@ const char* vtkKWDirectoryUtilities::GetFilenameExtension(const char *filename,
 //----------------------------------------------------------------------------
 const char* vtkKWDirectoryUtilities::LocateFileInDir(const char *filename, 
                                                      const char *dir, 
-                                                     char *try_fname)
+                                                     char *try_fname,
+                                                     int try_filename_dirs)
 {
   if (!filename || !dir || !try_fname)
     {
@@ -601,7 +602,7 @@ const char* vtkKWDirectoryUtilities::LocateFileInDir(const char *filename,
 
   // Try to find the file in 'dir'
 
-  char *res = 0;
+  const char *res = 0;
   if (filename_base && dir)
     {
     size_t dir_len = strlen(dir);
@@ -609,9 +610,55 @@ const char* vtkKWDirectoryUtilities::LocateFileInDir(const char *filename,
       (dir_len && (dir[dir_len - 1] == '/' || dir[dir_len - 1] == '\\'));
     sprintf(try_fname, "%s%s%s", 
             dir, (has_slash ? "" : "/"), filename_base);
+
     if (vtkKWDirectoryUtilities::FileExists(try_fname))
       {
       res = try_fname;
+      }
+
+    // If not found, we can try harder by appending part of the file to
+    // found to the directory to look inside
+    // Example: if we were looking for /foo/bar/yo.txt in /d1/d2, then
+    // try to find yo.txt in /d1/d2/bar, then /d1/d2/foo/bar, etc.
+
+    else if (try_filename_dirs)
+      {
+      char *temp = new char [strlen(dir) + 1 + strlen(filename) + 1];
+
+      char *filename_dir = vtkString::Duplicate(filename);
+      char *filename_dir_base = new char [strlen(filename) + 1];
+      char *filename_dir_bases = new char [strlen(filename) + 1];
+      filename_dir_bases[0] = '\0';
+
+      do
+        {
+        vtkKWDirectoryUtilities::GetFilenamePath(
+          filename_dir, filename_dir);
+        vtkKWDirectoryUtilities::GetFilenameName(
+          filename_dir, filename_dir_base);
+#if _WIN32
+        size_t len = strlen(filename_dir_base);
+        if (!*filename_dir_base || filename_dir_base[len - 1] == ':')
+#else
+        if (!*filename_dir_base)
+#endif
+          {
+          break;
+          }
+
+        sprintf(temp, "%s/%s", filename_dir_base, filename_dir_bases);
+        strcpy(filename_dir_bases, temp);
+
+        sprintf(temp, "%s%s%s", dir, (has_slash ? "":"/"), filename_dir_bases);
+        res = vtkKWDirectoryUtilities::LocateFileInDir(
+          filename_base, temp, try_fname, 0);
+
+        } while (!res && *filename_dir_base);
+
+      delete [] filename_dir;
+      delete [] filename_dir_base;
+      delete [] filename_dir_bases;
+      delete [] temp;
       }
     }
     

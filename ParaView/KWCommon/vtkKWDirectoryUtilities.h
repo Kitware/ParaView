@@ -123,9 +123,15 @@ public:
   // yourself that step).
   // 'try_fname' is where the fully qualified name/path of the file will be
   // stored if it is found in 'dir'.
+  // If try_filename_dirs is true, it will try to find the file using
+  // part of its dirs, i.e. if we are looking for c:/foo/bar/bill.txt, it
+  // will first look for bill.txt in dir, then in dir/bar, then in dir/foo/bar
+  // etc.
   // Return a pointer to the file found (i.e. 'try_fname') or 0 if not.
   static const char* LocateFileInDir(const char *filename, 
-                                     const char *dir, char *try_fname);
+                                     const char *dir, 
+                                     char *try_fname,
+                                     int try_filename_dirs = 0);
 
   // Description:
   // Check if the file has a given signature (set of bytes).
