@@ -35,7 +35,7 @@
 #include <hdf5.h>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.11");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.12");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
@@ -168,6 +168,7 @@ void vtkHDF5RawImageReader::PrintSelf(ostream& os, vtkIndent indent)
   if(this->PointDataArraySelection)
     {
     os << indent << "PointDataArraySelection: " << this->PointDataArraySelection;
+    os << "\n";
     }
   else
     {
@@ -176,6 +177,7 @@ void vtkHDF5RawImageReader::PrintSelf(ostream& os, vtkIndent indent)
   if(this->CellDataArraySelection)
     {
     os << indent << "CellDataArraySelection: " << this->CellDataArraySelection;
+    os << "\n";
     }
   else
     {
