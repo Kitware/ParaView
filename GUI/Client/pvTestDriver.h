@@ -51,6 +51,8 @@ protected:
   
   int StartServer(kwsysProcess* server, const char* name,
                   vtkstd::vector<char>& out, vtkstd::vector<char>& err);
+  int StartClient(kwsysProcess* client, const char* name);
+  void Stop(kwsysProcess* p, const char* name);
   int OutputStringHasError(const char* pname, vtkstd::string& output);
 
   int WaitForLine(kwsysProcess* process, vtkstd::string& line, double timeout,

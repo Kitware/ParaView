@@ -383,6 +383,38 @@ int pvTestDriver::StartServer(kwsysProcess* server, const char* name,
     }
 }
 
+int pvTestDriver::StartClient(kwsysProcess* client, const char* name)
+{
+  if(!client)
+    {
+    return 1;
+    }
+  cerr << "pvTestDriver: starting process " << name << "\n";
+  kwsysProcess_SetTimeout(client, this->TimeOut);
+  kwsysProcess_Execute(client);
+  if(kwsysProcess_GetState(client) == kwsysProcess_State_Executing)
+    {
+    cerr << "pvTestDriver: " << name << " sucessfully started.\n";
+    return 1;
+    }
+  else
+    {
+    this->ReportStatus(client, name);
+    kwsysProcess_Kill(client);
+    return 0;
+    }
+}
+
+void pvTestDriver::Stop(kwsysProcess* p, const char* name)
+{
+  if(p)
+    {
+    cerr << "pvTestDriver: killing process " << name << "\n";
+    kwsysProcess_Kill(p);
+    kwsysProcess_WaitForExit(p, 0);
+    }
+}
+
 int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output)
 {
   const char* possibleMPIErrors[] = {
@@ -584,15 +616,6 @@ int pvTestDriver::Main(int argc, char* argv[])
   kwsysProcess_SetCommand(client, &clientCommand[0]);
 
   // Kill the processes if they are taking too long.
-  kwsysProcess_SetTimeout(client, this->TimeOut);
-  if(server)
-    {
-    kwsysProcess_SetTimeout(server, this->TimeOut);
-    }
-  if(renderServer)
-    {
-    kwsysProcess_SetTimeout(renderServer, this->TimeOut);
-    }
   if(this->ReverseConnection)
     {
     if(!this->StartServer(client, "client",
@@ -602,14 +625,17 @@ int pvTestDriver::Main(int argc, char* argv[])
       return -1;
       }
     // Now run the server
-    if(server)
+    if(!this->StartClient(server, "server"))
       {
-      kwsysProcess_Execute(server);
+      this->Stop(client, "client");
+      return -1;
       }
     // Now run the render server
-    if(renderServer)
+    if(!this->StartClient(renderServer, "renderserver"))
       {
-      kwsysProcess_Execute(renderServer);
+      this->Stop(client, "client");
+      this->Stop(server, "server");
+      return -1;
       }
     }
   else
@@ -625,11 +651,17 @@ int pvTestDriver::Main(int argc, char* argv[])
     if(!this->StartServer(server, "server",
                           ServerStdOut, ServerStdErr))
       {
+      this->Stop(renderServer, "renderserver");
       cerr << "pvTestDriver: Server never started.\n";
       return -1;
       }
     // Now run the client
-    kwsysProcess_Execute(client);
+    if(!this->StartClient(client, "client"))
+      {
+      this->Stop(server, "server");
+      this->Stop(renderServer, "renderserver");
+      return -1;
+      }
     }
   
   // Report the output of the processes.
