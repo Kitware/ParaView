@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.31");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.32");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -59,14 +59,15 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
 
   this->UpdateVTKSourceParameters();
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  
-  pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(0) 
-                  << "GetFileName" 
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(0) 
-                  << "CanReadBinaryFile" << vtkClientServerStream::LastResult
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+  vtkClientServerStream stream;
+
+  stream << vtkClientServerStream::Invoke 
+         << this->GetVTKSourceID(0) << "GetFileName" 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << this->GetVTKSourceID(0) << "CanReadBinaryFile" << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream, 0);
   int canread = 0;
   if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&canread))
     {

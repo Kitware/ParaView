@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.16");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.17");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -465,10 +465,11 @@ void vtkPVTempTessellatorEntry::Accept()
     }
   
   vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << sourceID << "ResetFieldCriteria"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << sourceID << "ResetFieldCriteria"
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
   
   this->UpdateProperty();
 

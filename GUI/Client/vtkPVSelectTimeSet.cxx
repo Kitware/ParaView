@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.48");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.49");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -75,8 +75,9 @@ vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
   if(this->ServerSideID.ID)
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    pm->DeleteStreamObject(this->ServerSideID);
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    vtkClientServerStream stream;
+    pm->DeleteStreamObject(this->ServerSideID, stream);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }
 }
 
@@ -492,22 +493,24 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   this->TimeSets->RemoveAllItems();
 
+  vtkClientServerStream stream;
+
   // Create the server-side helper if necessary.
   if(!this->ServerSideID.ID)
     {
-    this->ServerSideID = pm->NewStreamObject("vtkPVServerSelectTimeSet");
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    this->ServerSideID = pm->NewStreamObject("vtkPVServerSelectTimeSet", stream);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }
 
   // Get the time sets from the reader on the server.
   // Reader -> VTKSourceID (0). We assume that there is 1 VTKSource.
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << this->ServerSideID << "GetTimeSets"
-                  << this->PVSource->GetVTKSourceID(0)
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+  stream << vtkClientServerStream::Invoke
+         << this->ServerSideID << "GetTimeSets" << this->PVSource->GetVTKSourceID(0)
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
   vtkClientServerStream timeSets;
-  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &timeSets))
+  if(!pm->GetLastResult(
+       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &timeSets))
     {
     vtkErrorMacro("Error getting time sets from server.");
     return;

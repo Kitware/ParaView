@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.22");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.23");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -358,17 +358,18 @@ void vtkPVVolumeAppearanceEditor::SetScalarOpacityUnitDistance(double d)
       part = this->PVSource->GetPart(i);
 
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
-      vtkClientServerStream& stream = pm->GetStream();
+      vtkClientServerStream stream;
 
       //2. ScalarOpacityUnitDistance
       vtkClientServerID volumePropertyID = 
         this->PVSource->GetPartDisplay()->GetVolumePropertyProxy()->GetID(0);
-      stream << vtkClientServerStream::Invoke << volumePropertyID 
-             << "SetScalarOpacityUnitDistance" << d
+      stream << vtkClientServerStream::Invoke 
+             << volumePropertyID << "SetScalarOpacityUnitDistance" << d
              << vtkClientServerStream::End;
 
       //Send everything:
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream, 0);
+      pm->SendStream(
+        vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
       }
     }
 }
@@ -396,19 +397,19 @@ void vtkPVVolumeAppearanceEditor::AddColorPoint(double s, double r, double g, do
       part = this->PVSource->GetPart(i);
 
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
-      vtkClientServerStream& stream = pm->GetStream();
-      //vtkClientServerStream stream; // = pm->GetStream();
+      vtkClientServerStream stream;
 
       //3. Color Ramp, similar to ScalarOpacity
       vtkClientServerID volumeColorID = 
         this->PVSource->GetPartDisplay()->GetVolumeColorProxy()->GetID(0);
 
-      stream << vtkClientServerStream::Invoke << volumeColorID 
-        << "AddRGBPoint" << s << r << g << b
-        << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << volumeColorID << "AddRGBPoint" << s << r << g << b
+             << vtkClientServerStream::End;
 
       //Send everything:
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      pm->SendStream(
+        vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
       }
     }
 }
@@ -439,14 +440,15 @@ void vtkPVVolumeAppearanceEditor::AddScalarOpacityPoint(double scalar, double op
         this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0);
 
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
-      vtkClientServerStream& stream = pm->GetStream();
+      vtkClientServerStream stream;
 
-      stream << vtkClientServerStream::Invoke << volumeOpacityID 
-        << "AddPoint" << scalar << opacity
-        << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << volumeOpacityID << "AddPoint" << scalar << opacity
+             << vtkClientServerStream::End;
 
       //Send everything:
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      pm->SendStream(
+        vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
       }
     }
 }
@@ -533,23 +535,25 @@ void vtkPVVolumeAppearanceEditor::SetColorRamp( double s1, double r1,
       part = this->PVSource->GetPart(i);
 
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
-      vtkClientServerStream& stream = pm->GetStream();
+      vtkClientServerStream stream;
 
       //3. Color Ramp, similar to ScalarOpacity
       vtkClientServerID volumeColorID = 
         this->PVSource->GetPartDisplay()->GetVolumeColorProxy()->GetID(0);
 
-      stream << vtkClientServerStream::Invoke << volumeColorID 
-             << "RemoveAllPoints" << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke << volumeColorID 
-        << "AddRGBPoint" << s1 << r1 << g1 << b1
-        << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke << volumeColorID 
-        << "AddRGBPoint" << s2 << r2 << g2 << b2
-        << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << volumeColorID  << "RemoveAllPoints" 
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << volumeColorID << "AddRGBPoint" << s1 << r1 << g1 << b1
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << volumeColorID << "AddRGBPoint" << s2 << r2 << g2 << b2
+             << vtkClientServerStream::End;
  
       //Send everything:
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      pm->SendStream(
+        vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
       }
     this->RenderView();
     }
@@ -582,21 +586,22 @@ void vtkPVVolumeAppearanceEditor::SetScalarOpacityRamp( double scalarStart,
         this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0);
 
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
-      vtkClientServerStream& stream = pm->GetStream();
+      vtkClientServerStream stream;
 
       // Remove all previous points:
       stream << vtkClientServerStream::Invoke << volumeOpacityID 
              << "RemoveAllPoints" << vtkClientServerStream::End;
       // Copy points one by one from the vtkPiecewiseFunction:
-      stream << vtkClientServerStream::Invoke << volumeOpacityID 
-        << "AddPoint" << scalarStart << opacityStart 
-        << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke << volumeOpacityID 
-        << "AddPoint" << scalarEnd << opacityEnd
-        << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << volumeOpacityID << "AddPoint" << scalarStart << opacityStart 
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << volumeOpacityID << "AddPoint" << scalarEnd << opacityEnd
+             << vtkClientServerStream::End;
 
       //Send everything:
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      pm->SendStream(
+        vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
       }
     this->RenderView();
     }

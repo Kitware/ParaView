@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.2");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.3");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -201,11 +201,11 @@ void vtkPVSelectArrays::Accept()
     }
 
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << this->PVSource->GetVTKSourceID(0)
-                  << "RemoveAllVolumeArrayNames"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->PVSource->GetVTKSourceID(0) << "RemoveAllVolumeArrayNames"
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
   int count = 0;
   

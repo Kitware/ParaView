@@ -215,7 +215,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.639");
+vtkCxxRevisionMacro(vtkPVWindow, "1.640");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -400,25 +400,28 @@ vtkPVWindow::vtkPVWindow()
 //-----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
+  vtkClientServerStream stream;
   if(this->ServerFileListingID.ID)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
     vtkPVProcessModule *pm = pvApp->GetProcessModule();
-    pm->DeleteStreamObject(this->ServerFileListingID);
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+    pm->DeleteStreamObject(this->ServerFileListingID, stream);
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     }
 
   if (this->InteractorID.ID)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
     vtkPVProcessModule *pm = pvApp->GetProcessModule();
-    vtkClientServerStream& stream = pm->GetStream();
-    stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderWindow" 
-           << 0 << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderer" 
-           << 0 << vtkClientServerStream::End;
-    pm->DeleteStreamObject(this->InteractorID);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    stream << vtkClientServerStream::Invoke 
+           << this->InteractorID << "SetRenderWindow" << 0 
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->InteractorID << "SetRenderer" << 0 
+           << vtkClientServerStream::End;
+    pm->DeleteStreamObject(this->InteractorID, stream);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     this->InteractorID.ID = 0;
     this->SetInteractor(NULL);
     }
@@ -1370,23 +1373,26 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     }
   this->InitializeToolbars(app);
 
+  vtkClientServerStream stream;
   // Interface for the preferences.
 
   // Create a dummy interactor on the satellites so they can have 3d widgets.
   // SetInteractor needs to be called before the main view is set so that there
   // is an interactor to pass to the main view's orientation marker.
-  this->InteractorID = pm->NewStreamObject("vtkPVGenericRenderWindowInteractor");
+  this->InteractorID = 
+    pm->NewStreamObject("vtkPVGenericRenderWindowInteractor", stream);
   pm->GetRenderModule()->SetInteractorID(this->InteractorID);
-  vtkClientServerStream& stream = pm->GetStream();
-  stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderWindow" 
-         << pm->GetRenderModule()->GetRenderWindowID()
+  stream << vtkClientServerStream::Invoke 
+         << this->InteractorID << "SetRenderWindow" << pm->GetRenderModule()->GetRenderWindowID()
          << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderer" 
-         << pm->GetRenderModule()->GetRendererID()
+  stream << vtkClientServerStream::Invoke 
+         << this->InteractorID << "SetRenderer" << pm->GetRenderModule()->GetRendererID()
          << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->InteractorID 
-         << "SetInteractorStyle" << 0 << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  stream << vtkClientServerStream::Invoke 
+         << this->InteractorID << "SetInteractorStyle" << 0 
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
   this->SetInteractor(
     vtkPVGenericRenderWindowInteractor::SafeDownCast(
       pvApp->GetProcessModule()->GetObjectFromID(this->InteractorID)));
@@ -2151,15 +2157,16 @@ void vtkPVWindow::PlayDemo()
 int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkClientServerStream stream;
   if(!this->ServerFileListingID.ID)
     {
-    this->ServerFileListingID = pm->NewStreamObject("vtkPVServerFileListing");
+    this->ServerFileListingID = 
+      pm->NewStreamObject("vtkPVServerFileListing", stream);
     }
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << this->ServerFileListingID << "FileIsReadable"
-                  << fileName
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+  stream << vtkClientServerStream::Invoke
+         << this->ServerFileListingID << "FileIsReadable"<< fileName
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
   int readable = 0;
   if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &readable))
     {

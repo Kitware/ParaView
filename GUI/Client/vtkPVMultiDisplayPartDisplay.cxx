@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.14");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.15");
 
 
 //----------------------------------------------------------------------------
@@ -58,18 +58,19 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
   this->Superclass::CreateParallelTclObjects(pvApp);
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
+  vtkClientServerStream stream;
 
   // This little hack causes collect mode to be iditical to clone mode.
   // This allows the superclass to treat tiled display like normal compositing.
-  pm->GetStream()
+  stream
     << vtkClientServerStream::Invoke
     << this->CollectID << "DefineCollectAsCloneOn"
     << vtkClientServerStream::End;
-  pm->GetStream()
+  stream
     << vtkClientServerStream::Invoke
     << this->LODCollectID << "DefineCollectAsCloneOn"
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
 
   // pvApp->ClientMode is only set when there is a server.
@@ -80,24 +81,24 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
     {
     // We need this because the socket controller has no way of distinguishing
     // between processes.
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->CollectID << "SetServerToClient"
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODCollectID << "SetServerToClient"
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT);
-    pm->GetStream()
+    pm->SendStream(vtkProcessModule::CLIENT, stream);
+    stream
       << vtkClientServerStream::Invoke
       << this->CollectID << "SetServerToDataServer"
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODCollectID << "SetServerToDataServer"
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }
   else
     {
@@ -107,15 +108,15 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
   // if running in render server mode
   if(pvApp->GetRenderServerMode())
     {
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->CollectID << "SetServerToRenderServer"
       << vtkClientServerStream::End;
-    pm->GetStream()
+    stream
       << vtkClientServerStream::Invoke
       << this->LODCollectID << "SetServerToRenderServer"
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }  
 }
 

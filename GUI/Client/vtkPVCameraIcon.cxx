@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.20");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.21");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -109,47 +109,43 @@ void vtkPVCameraIcon::RestoreCamera()
     vtkClientServerID rendererID = pm->GetRenderModule()->GetRendererID();
 
     // create an id for the active camera of the renderer
+    vtkClientServerStream stream;
     vtkClientServerID activeCamera = pm->GetUniqueID();
-    pm->GetStream() << vtkClientServerStream::Invoke << rendererID
-                    << "GetActiveCamera"
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Assign << activeCamera 
-                    << vtkClientServerStream::LastResult 
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << rendererID << "GetActiveCamera"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Assign 
+           << activeCamera << vtkClientServerStream::LastResult 
+           << vtkClientServerStream::End;
 
     // copy the parameters of the current camera for this class
     // into the active camera on the client and server
     vtkCamera* camera = this->GetCamera();
     double a[3];
-    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
-                    << "SetParallelScale"
-                    << camera->GetParallelScale()
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
-                    << "SetViewAngle"
-                    << camera->GetViewAngle()
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << activeCamera << "SetParallelScale" << camera->GetParallelScale()
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << activeCamera << "SetViewAngle" << camera->GetViewAngle()
+           << vtkClientServerStream::End;
     camera->GetClippingRange(a);
-    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
-                    << "SetClippingRange"
-                    << vtkClientServerStream::InsertArray(a, 2)
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << activeCamera << "SetClippingRange" << vtkClientServerStream::InsertArray(a, 2)
+           << vtkClientServerStream::End;
     camera->GetFocalPoint(a);
-    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
-                    << "SetFocalPoint"
-                    << vtkClientServerStream::InsertArray(a, 3)
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << activeCamera << "SetFocalPoint" << vtkClientServerStream::InsertArray(a, 3)
+           << vtkClientServerStream::End;
     camera->GetPosition(a);
-    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
-                    << "SetPosition"
-                    << vtkClientServerStream::InsertArray(a, 3)
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << activeCamera << "SetPosition" << vtkClientServerStream::InsertArray(a, 3)
+           << vtkClientServerStream::End;
     camera->GetViewUp(a);
-    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
-                    << "SetViewUp"
-                    << vtkClientServerStream::InsertArray(a, 3)
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+    stream << vtkClientServerStream::Invoke 
+           << activeCamera << "SetViewUp" << vtkClientServerStream::InsertArray(a, 3)
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
     this->RenderView->EventuallyRender();
     }
 }

@@ -132,7 +132,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.350");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.351");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1735,7 +1735,7 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
       pvs->GetPartDisplay()->SetUseTriangleStrips(state);
       }
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+
   // Save this selection on the server manager so new
   // part displays will have it a s a default.
   pm->SetUseTriangleStrips(state);

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.21");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.22");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -274,12 +274,12 @@ void vtkPVTimerLogDisplay::SetThreshold(float val)
   if ( pvApp )
     {
     vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << pm->GetProcessModuleID()
-                    << "SetLogThreshold"
-                    << val
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke 
+           << pm->GetProcessModuleID() << "SetLogThreshold" << val
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
     }
 
   this->Threshold = val;
@@ -297,12 +297,12 @@ void vtkPVTimerLogDisplay::SetBufferLength(int length)
 
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << pm->GetProcessModuleID()
-                  << "SetLogBufferLength"
-                  << length
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke 
+         << pm->GetProcessModuleID() << "SetLogBufferLength" << length
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
   this->Update();
 }
 
@@ -319,11 +319,12 @@ void vtkPVTimerLogDisplay::Clear()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << pm->GetProcessModuleID()
-                  << "ResetLog"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke 
+         << pm->GetProcessModuleID() << "ResetLog"
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
   this->Update();
 }
 
@@ -333,13 +334,12 @@ void vtkPVTimerLogDisplay::EnableCheckCallback()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << pm->GetProcessModuleID()
-                  << "SetEnableLog"
-                  << this->EnableCheck->GetState()
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke 
+         << pm->GetProcessModuleID() << "SetEnableLog" << this->EnableCheck->GetState()
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------

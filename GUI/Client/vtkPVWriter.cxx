@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.21");
+vtkCxxRevisionMacro(vtkPVWriter, "1.22");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -131,76 +131,77 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
   int success = 1;
 
   // Create the writer and configure it.
-  vtkClientServerID writerID = pm->NewStreamObject(this->WriterClassName);
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << writerID << "SetFileName" << fileName
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << writerID << "SetInput" << dataID
-                  << vtkClientServerStream::End;
+  vtkClientServerStream stream;
+  vtkClientServerID writerID = 
+    pm->NewStreamObject(this->WriterClassName, stream);
+  stream << vtkClientServerStream::Invoke
+         << writerID << "SetFileName" << fileName
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << writerID << "SetInput" << dataID
+         << vtkClientServerStream::End;
   if (this->DataModeMethod)
     {
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << writerID << this->DataModeMethod
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << writerID << this->DataModeMethod
+           << vtkClientServerStream::End;
     }
 
   if(this->Parallel)
     {
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << writerID << "SetGhostLevel" << ghostLevel
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << writerID << "SetGhostLevel" << ghostLevel
+           << vtkClientServerStream::End;
     if (strstr(this->WriterClassName, "XMLP"))
       {
-      pm->GetStream() << vtkClientServerStream::Invoke
-                      << writerID << "SetNumberOfPieces" << numProcs
-                      << vtkClientServerStream::End;
-      pm->GetStream() << vtkClientServerStream::Invoke
-                      << pm->GetProcessModuleID() << "GetPartitionId"
-                      << vtkClientServerStream::End
-                      << vtkClientServerStream::Invoke
-                      << writerID << "SetStartPiece"
-                      << vtkClientServerStream::LastResult
-                      << vtkClientServerStream::End;
-      pm->GetStream() << vtkClientServerStream::Invoke
-                      << pm->GetProcessModuleID() << "GetPartitionId"
-                      << vtkClientServerStream::End
-                      << vtkClientServerStream::Invoke
-                      << writerID << "SetEndPiece"
-                      << vtkClientServerStream::LastResult
-                      << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << writerID << "SetNumberOfPieces" << numProcs
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << pm->GetProcessModuleID() << "GetPartitionId"
+             << vtkClientServerStream::End
+             << vtkClientServerStream::Invoke
+             << writerID << "SetStartPiece" << vtkClientServerStream::LastResult
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << pm->GetProcessModuleID() << "GetPartitionId"
+             << vtkClientServerStream::End
+             << vtkClientServerStream::Invoke
+             << writerID << "SetEndPiece" << vtkClientServerStream::LastResult
+             << vtkClientServerStream::End;
   
       // Tell each process's writer whether it should write the summary
       // file.  This assumes that the writer is a vtkXMLWriter.  When we
       // add more writers, we will need a separate writer module.
-      vtkClientServerID helperID = pm->NewStreamObject("vtkPVSummaryHelper");
-      pm->GetStream() << vtkClientServerStream::Invoke
-                      << helperID << "SetWriter" << writerID
-                      << vtkClientServerStream::End;
-      pm->GetStream() << vtkClientServerStream::Invoke
-                      << pm->GetProcessModuleID() << "GetController"
-                      << vtkClientServerStream::End
-                      << vtkClientServerStream::Invoke
-                      << helperID << "SetController"
-                      << vtkClientServerStream::LastResult
-                      << vtkClientServerStream::End;
-      pm->GetStream() << vtkClientServerStream::Invoke
-                      << helperID << "SynchronizeSummaryFiles"
-                      << vtkClientServerStream::End;
-      pm->DeleteStreamObject(helperID);
+      vtkClientServerID helperID = 
+        pm->NewStreamObject("vtkPVSummaryHelper", stream);
+      stream << vtkClientServerStream::Invoke
+             << helperID << "SetWriter" << writerID
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << pm->GetProcessModuleID() << "GetController"
+             << vtkClientServerStream::End
+             << vtkClientServerStream::Invoke
+             << helperID << "SetController" << vtkClientServerStream::LastResult
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke
+             << helperID << "SynchronizeSummaryFiles"
+             << vtkClientServerStream::End;
+      pm->DeleteStreamObject(helperID, stream);
       }
     }
 
   // Write the data.
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << writerID << "Write"
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << writerID << "GetErrorCode"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  stream << vtkClientServerStream::Invoke
+         << writerID << "Write"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << writerID << "GetErrorCode"
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
   int retVal;
-  if(pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal) &&
+  if(pm->GetLastResult(
+       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal) &&
      retVal == vtkErrorCode::OutOfDiskSpaceError)
     {
     vtkKWMessageDialog::PopupMessage(
@@ -211,7 +212,7 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
     }
 
   // Cleanup.
-  pm->DeleteStreamObject(writerID);
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  pm->DeleteStreamObject(writerID, stream);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
   return success;
 }

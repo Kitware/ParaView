@@ -30,7 +30,7 @@
 #include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.6");
 
 //===========================================================================
 //***************************************************************************
@@ -106,6 +106,7 @@ vtkPVRenderModule::~vtkPVRenderModule()
   this->Displays = NULL;
 
   
+  vtkClientServerStream stream;
   if (this->Renderer)
     {
     if (this->ResetCameraClippingRangeTag > 0)
@@ -116,7 +117,7 @@ vtkPVRenderModule::~vtkPVRenderModule()
 
     if ( pm )
       {
-      pm->DeleteStreamObject(this->RendererID);
+      pm->DeleteStreamObject(this->RendererID, stream);
       }
     this->RendererID.ID = 0;
     }
@@ -125,7 +126,7 @@ vtkPVRenderModule::~vtkPVRenderModule()
     {
     if ( pm )
       {
-      pm->DeleteStreamObject(this->Renderer2DID);
+      pm->DeleteStreamObject(this->Renderer2DID, stream);
       }
     this->Renderer2DID.ID = 0;
     }
@@ -134,13 +135,14 @@ vtkPVRenderModule::~vtkPVRenderModule()
     {
     if ( pm )
       { 
-      pm->DeleteStreamObject(this->RenderWindowID);
+      pm->DeleteStreamObject(this->RenderWindowID, stream);
       }
     this->RenderWindowID.ID = 0;
     }
   if(pm)
     {
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     }
   
   this->Observer->Delete();
@@ -200,16 +202,17 @@ void vtkPVRenderModule::SetProcessModule(vtkProcessModule *pm)
     return;
     }  
 
-  vtkClientServerStream& stream = pvm->GetStream();
+  vtkClientServerStream stream;
   // Maybe I should not reference count this object to avoid
   // a circular reference.
   this->ProcessModule = pvm;
   this->ProcessModule->Register(this);
 
-  this->RendererID = pvm->NewStreamObject("vtkRenderer");
-  this->Renderer2DID = pvm->NewStreamObject("vtkRenderer");
-  this->RenderWindowID = pvm->NewStreamObject("vtkRenderWindow");
-  pvm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->RendererID = pvm->NewStreamObject("vtkRenderer", stream);
+  this->Renderer2DID = pvm->NewStreamObject("vtkRenderer", stream);
+  this->RenderWindowID = pvm->NewStreamObject("vtkRenderWindow", stream);
+  pvm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
   this->Renderer = 
     vtkRenderer::SafeDownCast(
       pvm->GetObjectFromID(this->RendererID));
@@ -231,7 +234,7 @@ void vtkPVRenderModule::SetProcessModule(vtkProcessModule *pm)
     //stream << vtkClientServerStream::Invoke << this->RenderWindowID 
     //                << "SetStereoTypeToCrystalEyes" 
     //                << vtkClientServerStream::End;
-    pvm->SendStream(vtkProcessModule::RENDER_SERVER);
+    pvm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
 
     this->RenderWindow->StereoCapableWindowOn();
     this->RenderWindow->StereoRenderOn();
@@ -253,7 +256,8 @@ void vtkPVRenderModule::SetProcessModule(vtkProcessModule *pm)
   stream << vtkClientServerStream::Invoke
          << this->RenderWindowID << "AddRenderer" << this->Renderer2DID
          << vtkClientServerStream::End;
-  pvm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  pvm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
   this->InitializeObservers();
 }
@@ -339,10 +343,12 @@ vtkRenderer *vtkPVRenderModule::GetRenderer2D()
 void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
 {
   vtkProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
-  stream << vtkClientServerStream::Invoke << this->RendererID << "SetBackground"
-         << r << g << b << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke 
+         << this->RendererID << "SetBackground" << r << g << b 
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
   // Save so we can get the color.
   this->BackgroundColor[0] = r;

@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.57");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.58");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -136,25 +136,26 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
   // If the extension matches, see if the reader can read the file.
   if(matches)
     {
+    vtkClientServerStream stream;
     // Assume that it can read the file (based on extension match)
     // if CanReadFile does not exist.
     canRead = 1;
-    vtkClientServerID tmpID = pm->NewStreamObject(this->SourceClassName);
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << pm->GetProcessModuleID()
-                    << "SetReportInterpreterErrors" << 0
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << tmpID << "CanReadFile" << fname
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
-    pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &canRead);
-    pm->DeleteStreamObject(tmpID);
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << pm->GetProcessModuleID()
-                    << "SetReportInterpreterErrors" << 1
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    vtkClientServerID tmpID = 
+      pm->NewStreamObject(this->SourceClassName, stream);
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 0
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << tmpID << "CanReadFile" << fname
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->GetLastResult(
+      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &canRead);
+    pm->DeleteStreamObject(tmpID, stream);
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID() << "SetReportInterpreterErrors" << 1
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }
   return canRead;
 }
@@ -351,12 +352,11 @@ void vtkPVReaderModule::SetReaderFileName(const char* fname)
   // VTKSource. Hence, the use of index 0.
     if (prop)
       {
-      pm->GetStream() << vtkClientServerStream::Invoke 
-                      << this->GetVTKSourceID(0) 
-                      << prop->GetCommand()
-                      << fname
-                      << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER);
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke 
+             << this->GetVTKSourceID(0) << prop->GetCommand() << fname
+             << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
       }
     const char* ext = this->ExtractExtension(fname);
     if (ext)

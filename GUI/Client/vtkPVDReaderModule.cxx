@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.13");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -68,27 +68,27 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
   this->SetReaderFileName(fname);
 
   // Check whether the input file has a "timestep" attribute.
+  vtkClientServerStream stream;
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->GetStream()
+  stream
     << vtkClientServerStream::Invoke
     // Since this is a reader, there is only one VTK source. Therefore,
     // we use index 0.
     << this->GetVTKSourceID(0) << "UpdateAttributes"
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
-  pm->GetStream()
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  stream
     << vtkClientServerStream::Invoke
     << this->GetVTKSourceID(0) << "GetAttributeIndex" << "timestep"
     << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
   int index = -1;
-  this->HaveTime = (pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &index) &&
-                    index >= 0)? 1 : 0;
+  this->HaveTime = 
+    (pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &index) && index >= 0) ? 1 : 0;
 
   // If we have time, we need to behave as an advanced reader module.
   if(this->HaveTime)
     {
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
     this->TimeScale = vtkPVScale::New();
     this->TimeScale->SetLabel("Timestep");
     this->TimeScale->SetPVSource(this);

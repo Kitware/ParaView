@@ -46,7 +46,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.15");
+vtkCxxRevisionMacro(vtkProcessModule, "1.16");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -155,13 +155,16 @@ void vtkProcessModule::GatherInformation(vtkPVInformation* info,
 {
   // Just a simple way of passing the information object to the next
   // method.
+  vtkClientServerStream stream;
   this->TemporaryInformation = info;
-  this->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->GetProcessModuleID()
-    << "GatherInformationInternal" << info->GetClassName() << id
-    << vtkClientServerStream::End;
-  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  stream << vtkClientServerStream::Invoke
+         << this->GetProcessModuleID()
+         << "GatherInformationInternal" 
+         << info->GetClassName() 
+         << id
+         << vtkClientServerStream::End;
+  this->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
   this->TemporaryInformation = NULL;
 }
 
@@ -192,12 +195,6 @@ vtkTypeUInt32 vtkProcessModule::CreateSendFlag(vtkTypeUInt32 servers)
     return CLIENT;
     }
   return 0;
-}
-
-//----------------------------------------------------------------------------
-int vtkProcessModule::SendStream(vtkTypeUInt32 server)
-{ 
-  return this->SendStream(server, *this->ClientServerStream);
 }
 
 //----------------------------------------------------------------------------
@@ -277,12 +274,6 @@ int vtkProcessModule::SendStreamToRenderServerRoot(vtkClientServerStream&)
 
 
 //----------------------------------------------------------------------------
-vtkClientServerID vtkProcessModule::NewStreamObject(const char* type)
-{
-  return this->NewStreamObject(type, this->GetStream());
-}
-
-//----------------------------------------------------------------------------
 vtkClientServerID vtkProcessModule::NewStreamObject(
   const char* type, vtkClientServerStream& stream)
 {
@@ -296,12 +287,6 @@ vtkClientServerID vtkProcessModule::NewStreamObject(
 vtkObjectBase* vtkProcessModule::GetObjectFromID(vtkClientServerID id)
 {
   return this->Interpreter->GetObjectFromID(id);
-}
-
-//----------------------------------------------------------------------------
-void vtkProcessModule::DeleteStreamObject(vtkClientServerID id)
-{
-  this->DeleteStreamObject(id, this->GetStream());
 }
 
 //----------------------------------------------------------------------------
@@ -570,10 +555,12 @@ void vtkProcessModule::RegisterProgressEvent(vtkObject* po, int id)
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendPrepareProgress()
 {
-  vtkClientServerStream& stream = this->GetStream();
-  stream << vtkClientServerStream::Invoke << this->GetProcessModuleID()
-    << "PrepareProgress" << vtkClientServerStream::End;
-  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke 
+         << this->GetProcessModuleID() << "PrepareProgress" 
+         << vtkClientServerStream::End;
+  this->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
   this->ProgressRequests ++;
 }
 
@@ -590,10 +577,12 @@ void vtkProcessModule::SendCleanupPendingProgress()
     {
     return;
     }
-  vtkClientServerStream& stream = this->GetStream();
-  stream << vtkClientServerStream::Invoke << this->GetProcessModuleID()
-         << "CleanupPendingProgress" << vtkClientServerStream::End;
-  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke 
+         << this->GetProcessModuleID() << "CleanupPendingProgress" 
+         << vtkClientServerStream::End;
+  this->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
 }
 
 //----------------------------------------------------------------------------

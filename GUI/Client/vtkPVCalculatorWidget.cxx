@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.34");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.35");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -789,11 +789,12 @@ void vtkPVCalculatorWidget::Accept()
 {
   int i;
 
+  vtkClientServerStream stream;
   vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << this->PVSource->GetVTKSourceID(0) << "RemoveAllVariables"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  stream << vtkClientServerStream::Invoke
+         << this->PVSource->GetVTKSourceID(0) << "RemoveAllVariables"
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream, 0);
 
   vtkSMStringVectorProperty *functionProp =
     vtkSMStringVectorProperty::SafeDownCast(this->GetSMFunctionProperty());

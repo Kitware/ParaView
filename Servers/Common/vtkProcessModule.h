@@ -112,20 +112,6 @@ public:
                                          vtkObject* object);
   
 //BTX  
-  // Description:
-  // Return the client server stream
-  vtkClientServerStream& GetStream() 
-    {
-      return *this->ClientServerStream;
-    }
-
-  // Description:
-  // Return the client server stream
-  vtkClientServerStream* GetStreamPointer() 
-    {
-      return this->ClientServerStream;
-    }
-  
   // ParaView.cxx (main) calls this method to setup the processes.
   // It currently creates the application, but I will try to pass
   // the application as an argument.
@@ -142,9 +128,7 @@ public:
   // passed in.  To send the stream to the server call SendStreamToServer or
   // SendStreamToClientAndServer.  For construction, the unique id for the
   // new object is returned.
-  vtkClientServerID NewStreamObject(const char*);
   vtkClientServerID NewStreamObject(const char*, vtkClientServerStream& stream);
-  void DeleteStreamObject(vtkClientServerID);
   void DeleteStreamObject(vtkClientServerID, vtkClientServerStream& stream);
   
   // Description:
@@ -168,7 +152,6 @@ public:
   // be used.  If the current stream is used, then the stream is cleared
   // after the call.  If a stream is passed the resetStream flag determines
   // if Reset is called on the stream after it is sent.
-  int SendStream(vtkTypeUInt32 server);
   int SendStream(vtkTypeUInt32 server, vtkClientServerStream&, int resetStream=1);
 
   // Description:

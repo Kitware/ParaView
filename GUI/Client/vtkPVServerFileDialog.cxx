@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.34");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.35");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -202,8 +202,9 @@ vtkPVServerFileDialog::~vtkPVServerFileDialog()
   if(this->ServerSideID.ID)
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    pm->DeleteStreamObject(this->ServerSideID);
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+    vtkClientServerStream stream;
+    pm->DeleteStreamObject(this->ServerSideID, stream);
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     }
 }
 
@@ -213,8 +214,9 @@ void vtkPVServerFileDialog::CreateServerSide()
   if(!this->ServerSideID.ID)
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    this->ServerSideID = pm->NewStreamObject("vtkPVServerFileListing");
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+    vtkClientServerStream stream;
+    this->ServerSideID = pm->NewStreamObject("vtkPVServerFileListing", stream);
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     }
 }
 
@@ -583,11 +585,11 @@ void vtkPVServerFileDialog::LoadSaveCallback()
   if(fileName[0] == '/' || fileName[1] == ':')
     {
     this->CreateServerSide();
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->ServerSideID << "FileIsDirectory"
-                    << fileName.c_str()
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+    vtkClientServerStream stream;
+    stream << vtkClientServerStream::Invoke
+           << this->ServerSideID << "FileIsDirectory" << fileName.c_str()
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     int isdir = 0;
     if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &isdir))
       {
@@ -883,16 +885,19 @@ void vtkPVServerFileDialog::Update()
   vtkStringList* dirs = vtkStringList::New();
   vtkStringList* files = vtkStringList::New();
 
+  vtkClientServerStream stream;
+
   // Make sure we have a directory.
   if(!this->LastPath)
     {
     this->CreateServerSide();
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->ServerSideID << "GetCurrentWorkingDirectory"
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+    stream << vtkClientServerStream::Invoke
+           << this->ServerSideID << "GetCurrentWorkingDirectory"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     const char* cwd;
-    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd))
+    if(!pm->GetLastResult(
+         vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd))
       {
       vtkErrorMacro("Error getting current working directory from server.");
       cwd = "";
@@ -906,12 +911,13 @@ void vtkPVServerFileDialog::Update()
     {
     // Directory did not exist, use current directory instead.
     this->CreateServerSide();
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->ServerSideID << "GetCurrentWorkingDirectory"
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+    stream << vtkClientServerStream::Invoke
+           << this->ServerSideID << "GetCurrentWorkingDirectory"
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     const char* cwd;
-    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd))
+    if(!pm->GetLastResult(
+         vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd))
       {
       vtkErrorMacro("Error getting current working directory from server.");
       cwd = "";

@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -107,21 +107,23 @@ int vtkPVProcessModule::GetDirectoryListing(const char* dir,
                                             int save)
 {
   // Get the listing from the server.
-  vtkClientServerID lid = this->NewStreamObject("vtkPVServerFileListing");
-  this->GetStream() << vtkClientServerStream::Invoke
-                    << lid << "GetFileListing" << dir << save
-                    << vtkClientServerStream::End;
-  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+  vtkClientServerStream stream;
+  vtkClientServerID lid = 
+    this->NewStreamObject("vtkPVServerFileListing", stream);
+  stream << vtkClientServerStream::Invoke
+         << lid << "GetFileListing" << dir << save
+         << vtkClientServerStream::End;
+  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
   vtkClientServerStream result;
   if(!this->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &result))
     {
     vtkErrorMacro("Error getting file list result from server.");
-    this->DeleteStreamObject(lid);
-    this->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+    this->DeleteStreamObject(lid, stream);
+    this->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
     return 0;
     }
-  this->DeleteStreamObject(lid);
-  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+  this->DeleteStreamObject(lid, stream);
+  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
 
   // Parse the listing.
   if ( dirs )
@@ -249,12 +251,12 @@ void vtkPVProcessModule::FinalizeInterpreter()
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::LoadModule(const char* name, const char* directory)
 {
-  this->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->GetProcessModuleID()
-    << "LoadModuleInternal" << name << directory
-    << vtkClientServerStream::End;
-  this->SendStream(vtkProcessModule::DATA_SERVER);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetProcessModuleID()
+         << "LoadModuleInternal" << name << directory
+         << vtkClientServerStream::End;
+  this->SendStream(vtkProcessModule::DATA_SERVER, stream);
   int result = 0;
   if(!this->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &result))
     {
@@ -347,12 +349,14 @@ void vtkPVProcessModule::SetGlobalLODFlag(int val)
     {
     return;
     }
-  this->GetStream() << vtkClientServerStream::Invoke
-                  << this->GetProcessModuleID()
-                  << "SetGlobalLODFlagInternal"
-                  << val
-                  << vtkClientServerStream::End;
-  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << this->GetProcessModuleID()
+         << "SetGlobalLODFlagInternal"
+         << val
+         << vtkClientServerStream::End;
+  this->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
 }
 
  

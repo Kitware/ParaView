@@ -51,7 +51,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.133");
+vtkCxxRevisionMacro(vtkPVProbe, "1.134");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -160,15 +160,16 @@ void vtkPVProbe::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkClientServerStream stream;
   
   this->PlotDisplay->SetProcessModule(pm);
   this->vtkPVSource::CreateProperties();
   // We do not support probing groups and multi-block objects. Therefore,
   // we use the first VTKSource id.
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(0)
-                  << "SetSpatialMatch" << 2
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  stream << vtkClientServerStream::Invoke 
+         <<  this->GetVTKSourceID(0) << "SetSpatialMatch" << 2
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
   this->ProbeFrame->SetParent(this->ParameterFrame->GetFrame());
   this->ProbeFrame->Create(pvApp, "frame", "");
@@ -240,24 +241,25 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
 
       // Synchronize the server scalar bar.
       vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-      pm->GetStream() << vtkClientServerStream::Invoke 
-                      << this->PlotDisplay->GetXYPlotActorProxy()->GetID(0) 
-                      << "GetPositionCoordinate" 
-                      << vtkClientServerStream::End;
-      pm->GetStream() << vtkClientServerStream::Invoke 
-                      << vtkClientServerStream::LastResult 
-                      << "SetValue" << pos1[0] << pos1[1]
-                      << vtkClientServerStream::End;
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke 
+             << this->PlotDisplay->GetXYPlotActorProxy()->GetID(0) 
+             << "GetPositionCoordinate" 
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << vtkClientServerStream::LastResult 
+             << "SetValue" << pos1[0] << pos1[1]
+             << vtkClientServerStream::End;
 
-      pm->GetStream() << vtkClientServerStream::Invoke 
-                      << this->PlotDisplay->GetXYPlotActorProxy()->GetID(0) 
-                      << "GetPosition2Coordinate" 
-                      << vtkClientServerStream::End;
-      pm->GetStream() << vtkClientServerStream::Invoke 
-                      << vtkClientServerStream::LastResult 
-                      << "SetValue" << pos2[0] << pos2[1]
-                      << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::RENDER_SERVER);
+      stream << vtkClientServerStream::Invoke 
+             << this->PlotDisplay->GetXYPlotActorProxy()->GetID(0) 
+             << "GetPosition2Coordinate" 
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << vtkClientServerStream::LastResult 
+             << "SetValue" << pos2[0] << pos2[1]
+             << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
 
       break;
     }

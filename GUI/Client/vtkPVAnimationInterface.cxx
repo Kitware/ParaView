@@ -178,7 +178,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.176");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.177");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1605,27 +1605,23 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkPVSourceCollection* sources = this->GetWindow()->GetSourceList("Sources");
   
+  vtkClientServerStream stream;
+
   // Create the animation writer pipeline.
-  vtkClientServerID pvAnimWriterID = pm->NewStreamObject("vtkXMLPVAnimationWriter");
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << pvAnimWriterID
-                  << "SetFileName"
-                  << fileName
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << pvAnimWriterID
-                  << "SetNumberOfPieces"
-                  << numPartitions
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << pm->GetProcessModuleID()
-                  << "GetPartitionId"
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << pvAnimWriterID
-                  << "SetPiece"
-                  << vtkClientServerStream::LastResult
-                  << vtkClientServerStream::End;
+  vtkClientServerID pvAnimWriterID = 
+    pm->NewStreamObject("vtkXMLPVAnimationWriter", stream);
+  stream << vtkClientServerStream::Invoke 
+         << pvAnimWriterID << "SetFileName" << fileName
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << pvAnimWriterID << "SetNumberOfPieces" << numPartitions
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << pm->GetProcessModuleID() << "GetPartitionId"
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << pvAnimWriterID << "SetPiece" << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
   
   vtkstd::vector<vtkClientServerID> arrays;
     vtkPVSource* source;
@@ -1641,41 +1637,36 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
         // stuff into a special server manager object.
 
         vtkClientServerID animCompleteArraysID = 
-          pm->NewStreamObject("vtkCompleteArrays");
+          pm->NewStreamObject("vtkCompleteArrays", stream);
         source->GetPartDisplay()->ConnectGeometryForWriting(
-          animCompleteArraysID, "SetInput");
+          animCompleteArraysID, "SetInput", &stream);
         arrays.push_back(animCompleteArraysID);
         
-        pm->GetStream() << vtkClientServerStream::Invoke 
-                        << animCompleteArraysID
-                        << "GetOutput"
-                        << vtkClientServerStream::End;
-        pm->GetStream() << vtkClientServerStream::Invoke 
-                        << pvAnimWriterID
-                        << "AddInput"
-                        << vtkClientServerStream::LastResult
-                        << sourceName
-                        << vtkClientServerStream::End;
+        stream << vtkClientServerStream::Invoke 
+               << animCompleteArraysID << "GetOutput"
+               << vtkClientServerStream::End;
+        stream << vtkClientServerStream::Invoke 
+               << pvAnimWriterID << "AddInput" << vtkClientServerStream::LastResult << sourceName
+               << vtkClientServerStream::End;
         }
       }
     
     // Only write the animation file once on each disk.
-    vtkClientServerID pvAnimHelperID = pm->NewStreamObject("vtkPVSummaryHelper");
-    pm->GetStream() << vtkClientServerStream::Invoke << pvAnimHelperID 
-                    << "SetWriter"
-                    << pvAnimWriterID
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
-                    << "GetController"
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << pvAnimHelperID
-                    << "SetController" 
-                    << vtkClientServerStream::LastResult
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << pvAnimHelperID
-                    << "SynchronizeSummaryFiles" 
-                    << vtkClientServerStream::End;
-    pm->DeleteStreamObject(pvAnimHelperID);
+    vtkClientServerID pvAnimHelperID = 
+      pm->NewStreamObject("vtkPVSummaryHelper", stream);
+    stream << vtkClientServerStream::Invoke 
+           << pvAnimHelperID << "SetWriter" << pvAnimWriterID
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << pm->GetProcessModuleID() << "GetController"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << pvAnimHelperID << "SetController" << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << pvAnimHelperID << "SynchronizeSummaryFiles" 
+           << vtkClientServerStream::End;
+    pm->DeleteStreamObject(pvAnimHelperID, stream);
     }
   else
     {
@@ -1684,16 +1675,18 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
       {
       if(source->GetVisibility())
         {
-        source->GetPartDisplay()->ConnectGeometryForWriting(pvAnimWriterID, "AddInput");
+        source->GetPartDisplay()->ConnectGeometryForWriting(pvAnimWriterID, 
+                                                            "AddInput",
+                                                            &stream);
         }
       }
     }
   
   // Start the animation.
-  pm->GetStream() << vtkClientServerStream::Invoke << pvAnimWriterID
-                  << "Start"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  stream << vtkClientServerStream::Invoke 
+         << pvAnimWriterID << "Start"
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
   int retVal, success = 1;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -1706,14 +1699,15 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
     this->Script("update");
     
     // Write this time step. 
-    pm->GetStream() << vtkClientServerStream::Invoke << pvAnimWriterID
-                    << "WriteTime" << t
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << pvAnimWriterID
-                    << "GetErrorCode" 
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
-    pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal);
+    stream << vtkClientServerStream::Invoke 
+           << pvAnimWriterID << "WriteTime" << t
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << pvAnimWriterID << "GetErrorCode" 
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->GetLastResult(
+      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal);
     if (retVal == vtkErrorCode::OutOfDiskSpaceError)
       {
       success = 0;
@@ -1728,14 +1722,15 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
   if (success)
     {
     // Finish the animation. 
-    pm->GetStream() << vtkClientServerStream::Invoke << pvAnimWriterID
-                    << "Finish" 
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << pvAnimWriterID
-                    << "GetErrorCode" 
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
-    pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal);
+    stream << vtkClientServerStream::Invoke 
+           << pvAnimWriterID << "Finish" 
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << pvAnimWriterID << "GetErrorCode" 
+           << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+    pm->GetLastResult(
+      vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &retVal);
     if (retVal == vtkErrorCode::OutOfDiskSpaceError)
       {
       vtkKWMessageDialog::PopupMessage(
@@ -1744,8 +1739,8 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
         "for this animation. The file(s) already written will be deleted.");
       }
     }
-  pm->DeleteStreamObject(pvAnimWriterID);
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  pm->DeleteStreamObject(pvAnimWriterID, stream);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
   
   if(numPartitions > 1)
     {
@@ -1753,9 +1748,9 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
     for(vtkstd::vector<vtkClientServerID>::iterator i = arrays.begin();
         i != arrays.end(); ++i)
       {
-      pm->DeleteStreamObject(*i);
+      pm->DeleteStreamObject(*i, stream);
       }
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }  
   this->SavingData = 0;
   this->GetWindow()->UpdateEnableState();

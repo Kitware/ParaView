@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.329");
+vtkCxxRevisionMacro(vtkPVApplication, "1.330");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -845,18 +845,20 @@ void vtkPVApplication::Initialize()
 #ifdef VTK_USE_MANGLED_MESA
   if (this->Options->GetUseSoftwareRendering())
     {
+    vtkClientServerStream stream;
     vtkPVProcessModule* pm = this->GetProcessModule();
-    vtkClientServerID gf = pm->NewStreamObject("vtkGraphicsFactory");
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << gf << "SetUseMesaClasses" << 1
-                    << vtkClientServerStream::End;
-    pm->DeleteStreamObject(gf);
-    vtkClientServerID imf = pm->NewStreamObject("vtkImagingFactory");
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << imf << "SetUseMesaClasses" << 1
-                    << vtkClientServerStream::End;
-    pm->DeleteStreamObject(imf);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    vtkClientServerID gf = pm->NewStreamObject("vtkGraphicsFactory", stream);
+    stream << vtkClientServerStream::Invoke
+           << gf << "SetUseMesaClasses" << 1
+           << vtkClientServerStream::End;
+    pm->DeleteStreamObject(gf, stream);
+    vtkClientServerID imf = pm->NewStreamObject("vtkImagingFactory", stream);
+    stream << vtkClientServerStream::Invoke
+           << imf << "SetUseMesaClasses" << 1
+           << vtkClientServerStream::End;
+    pm->DeleteStreamObject(imf, stream);
+    pm->SendStream(
+      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
 
     if (this->Options->GetUseSatelliteSoftwareRendering())
       {
@@ -1582,11 +1584,13 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
 
   // Server path
   vtkPVProcessModule* pm = this->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << pm->GetProcessModuleID() << "GetDemoPath"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &demoDataPath))
+  vtkClientServerStream stream;
+  stream << vtkClientServerStream::Invoke
+         << pm->GetProcessModuleID() << "GetDemoPath"
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+  if(!pm->GetLastResult(
+       vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &demoDataPath))
     {
     demoDataPath = 0;
     }
@@ -1696,70 +1700,79 @@ void vtkPVApplication::FindApplicationInstallationDirectory()
 //----------------------------------------------------------------------------
 int vtkPVApplication::SendStringToClient(const char* str)
 {
-  if(!this->ProcessModule->GetStream().StreamFromString(str))
+  vtkClientServerStream stream;
+  if (!stream.StreamFromString(str))
     {
     return 0;
     }
-  this->ProcessModule->SendStream(vtkProcessModule::CLIENT);
+  this->ProcessModule->SendStream(vtkProcessModule::CLIENT, stream);
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVApplication::SendStringToClientAndServer(const char* str)
 {
-  if(!this->ProcessModule->GetStream().StreamFromString(str))
+  vtkClientServerStream stream;
+  if (!stream.StreamFromString(str))
     {
     return 0;
     }
   this->ProcessModule->SendStream(vtkProcessModule::CLIENT |
-                                  vtkProcessModule::DATA_SERVER);
+                                  vtkProcessModule::DATA_SERVER,
+                                  stream);
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVApplication::SendStringToClientAndServerRoot(const char* str)
 {
-  if(!this->ProcessModule->GetStream().StreamFromString(str))
+  vtkClientServerStream stream;
+  if (!stream.StreamFromString(str))
     {
     return 0;
     }
   this->ProcessModule->SendStream(vtkProcessModule::CLIENT |
-                                  vtkProcessModule::DATA_SERVER_ROOT);
+                                  vtkProcessModule::DATA_SERVER_ROOT,
+                                  stream);
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVApplication::SendStringToServer(const char* str)
 {
-  if(!this->ProcessModule->GetStream().StreamFromString(str))
+  vtkClientServerStream stream;
+  if (!stream.StreamFromString(str))
     {
     return 0;
     }
-  this->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER);
+  this->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER, stream);
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVApplication::SendStringToServerRoot(const char* str)
 {
-  if(!this->ProcessModule->GetStream().StreamFromString(str))
+  vtkClientServerStream stream;
+  if (!stream.StreamFromString(str))
     {
     return 0;
     }
-  this->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+  this->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
   return 1;
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVApplication::GetStringFromServer()
 {
-  return this->ProcessModule->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).StreamToString();
+  return this->ProcessModule->GetLastResult(
+    vtkProcessModule::DATA_SERVER_ROOT).StreamToString();
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVApplication::GetStringFromClient()
 {
-  return this->ProcessModule->GetLastResult(vtkProcessModule::CLIENT).StreamToString();
+  return this->ProcessModule->GetLastResult(
+    vtkProcessModule::CLIENT).StreamToString();
 }
 
 //----------------------------------------------------------------------------

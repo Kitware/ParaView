@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.54");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.55");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -58,13 +58,14 @@ int vtkPVEnSightReaderModule::InitializeData()
   int numSources = this->GetNumberOfVTKSources();
   int i;
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkClientServerStream stream;
   for(i = 0; i < numSources; ++i)
     {
-    pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(i)
-                    << "Update" 
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           <<  this->GetVTKSourceID(i) << "Update" 
+           << vtkClientServerStream::End;
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
   return this->Superclass::InitializeData();
 }
 
@@ -104,17 +105,17 @@ int vtkPVEnSightReaderModule::ReadFileInformation(const char* fname)
     int i;
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
     int numSources = this->GetNumberOfVTKSources();
+    vtkClientServerStream stream;
     for(i=0; i < numSources; ++i)
       {
-      pm->GetStream() << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-                      << "GetController"
-                      << vtkClientServerStream::End;
-      pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(i) 
-                      << "SetController"
-                      << vtkClientServerStream::LastResult
-                      << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::DATA_SERVER);
+      stream << vtkClientServerStream::Invoke 
+             << pm->GetProcessModuleID() << "GetController"
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << this->GetVTKSourceID(i) << "SetController" << vtkClientServerStream::LastResult
+             << vtkClientServerStream::End;
       }
+    pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
     }
   return this->Superclass::ReadFileInformation(fname);
 }

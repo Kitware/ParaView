@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.406");
+vtkCxxRevisionMacro(vtkPVSource, "1.407");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1682,7 +1682,7 @@ void vtkPVSource::RemoveAllPVInputs()
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
       int numSources = this->GetNumberOfVTKSources();
-      vtkClientServerStream& stream = pm->GetStream();
+      vtkClientServerStream stream;
       for (idx = 0; idx < numSources; ++idx)
         {
         vtkClientServerID sourceID = this->GetVTKSourceID(idx);
@@ -1690,7 +1690,7 @@ void vtkPVSource::RemoveAllPVInputs()
                << sourceID << "SetInputConnection" << 0 << 0
                << vtkClientServerStream::End;
         }
-      pm->SendStream(vtkProcessModule::DATA_SERVER);
+      pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
       if (this->Proxy)
         {
@@ -2256,6 +2256,7 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
   // Force the proxy to create numSources objects
   pvs->Proxy->GetID(numSources-1);
 
+  vtkClientServerStream stream;
   for (idx = 0; idx < numSources; ++idx)
     {
     // Create a vtkSource
@@ -2275,19 +2276,15 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
         << vtkClientServerStream::End;
     delete[] filterName_with_warning_C4701.str();
 
-    pm->GetStream() << vtkClientServerStream::Invoke << sourceId 
-                    << "AddObserver"
-                    << "StartEvent"
-                    << start
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << sourceId 
-                    << "AddObserver"
-                    << "EndEvent"
-                    << end
-                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << sourceId << "AddObserver" << "StartEvent" << start
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << sourceId << "AddObserver" << "EndEvent" << end
+           << vtkClientServerStream::End;
     
     }
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
   pvs->SetView(this->GetPVWindow()->GetMainView());
 
   pvs->PrototypeInstanceCount = this->PrototypeInstanceCount;
