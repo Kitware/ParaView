@@ -136,7 +136,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.48");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1617,7 +1617,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
 
   this->GetPVApplication()->GetProcessModule()->ServerScript(
                                                    "pvAnimWriter Delete");
-  if (numParitions > 1)
+  if (numPartitions > 1)
     {
     this->GetPVApplication()->GetProcessModule()->ServerScript(
                                           "pvAnimCompleteArrays Delete");
