@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.348");
+vtkCxxRevisionMacro(vtkPVWindow, "1.349");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -539,8 +539,11 @@ void vtkPVWindow::PrepareForDelete()
     this->MainView = NULL;
     }
   
-  this->Application->SetRegisteryValue(2, "RunTime", "CenterActorVisibility",
-                                       "%d", this->CenterActorVisibility);
+  if (this->Application)
+    {
+    this->Application->SetRegisteryValue(2, "RunTime", "CenterActorVisibility",
+                                         "%d", this->CenterActorVisibility);
+    }
 
   if (this->SourceMenu)
     {
@@ -3547,7 +3550,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.348 $");
+  this->ExtractRevision(os,"$Revision: 1.349 $");
 }
 
 //----------------------------------------------------------------------------
