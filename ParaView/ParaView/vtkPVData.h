@@ -165,14 +165,32 @@ public:
   void SetActorTranslate(float* p);
   void SetActorTranslate(float x, float y, float z);
   void GetActorTranslate(float* p);
-  void SetActorTranslate();
+  void ActorTranslateCallback();
   
   // Description:
   // Scale the actor. Also modify the entry widget that controles the scaling.
   void SetActorScale(float* p);
   void SetActorScale(float x, float y, float z);
   void GetActorScale(float* p);
-  void SetActorScale();
+  void ActorScaleCallback();
+  
+  // Description:
+  // Orient the actor. 
+  // Also modify the entry widget that controles the orientation.
+  void SetActorOrientation(float* p);
+  void SetActorOrientation(float x, float y, float z);
+  void SetActorOrientationNoTrace(float x, float y, float z);
+  void GetActorOrientation(float* p);
+  void ActorOrientationCallback();
+  void ActorOrientationEndCallback();
+  
+  // Description:
+  // Set the actor origin. 
+  // Also modify the entry widget that controles the origin.
+  void SetActorOrigin(float* p);
+  void SetActorOrigin(float x, float y, float z);
+  void GetActorOrigin(float* p);
+  void ActorOriginCallback();
   
   // Description:
   // Set the transparency of the actor.
@@ -485,8 +503,12 @@ protected:
   vtkKWEntry* TranslateEntry[3];
   vtkKWLabel* ScaleLabel;
   vtkKWEntry* ScaleEntry[3];
-  vtkKWScale* Opacity;
+  vtkKWLabel* OrientationLabel;
+  vtkKWScale* OrientationScale[3];
+  vtkKWLabel* OriginLabel;
+  vtkKWEntry* OriginEntry[3];
   vtkKWLabel* OpacityLabel;
+  vtkKWScale* OpacityScale;
 
   vtkKWCheckButton *CubeAxesCheck;
   char* CubeAxesTclName;

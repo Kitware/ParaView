@@ -61,6 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkProp3D.h"
 #include "vtkPVApplication.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVConfig.h"
@@ -79,10 +80,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.172");
+vtkCxxRevisionMacro(vtkPVData, "1.173");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
+
 
 //----------------------------------------------------------------------------
 vtkPVData::vtkPVData()
@@ -174,15 +176,20 @@ vtkPVData::vtkPVData()
   this->ActorControlFrame = vtkKWLabeledFrame::New();
   this->TranslateLabel = vtkKWLabel::New();
   this->ScaleLabel = vtkKWLabel::New();
+  this->OrientationLabel = vtkKWLabel::New();
+  this->OriginLabel = vtkKWLabel::New();
+
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
     this->TranslateEntry[cc] = vtkKWEntry::New();
     this->ScaleEntry[cc] = vtkKWEntry::New();
+    this->OrientationScale[cc] = vtkKWScale::New();
+    this->OriginEntry[cc] = vtkKWEntry::New();
     }
+
   this->OpacityLabel = vtkKWLabel::New();
-  this->Opacity = vtkKWScale::New();
-  
+  this->OpacityScale = vtkKWScale::New();
   
   this->PreviousAmbient = 0.15;
   this->PreviousSpecular = 0.1;
@@ -286,14 +293,20 @@ vtkPVData::~vtkPVData()
   this->ActorControlFrame->Delete();
   this->TranslateLabel->Delete();
   this->ScaleLabel->Delete();
+  this->OrientationLabel->Delete();
+  this->OriginLabel->Delete();
+
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
     this->TranslateEntry[cc]->Delete();
     this->ScaleEntry[cc]->Delete();
+    this->OrientationScale[cc]->Delete();
+    this->OriginEntry[cc]->Delete();
     }
+
   this->OpacityLabel->Delete();
-  this->Opacity->Delete();
+  this->OpacityScale->Delete();
  
   if (this->CubeAxesTclName)
     {
@@ -1084,7 +1097,6 @@ void vtkPVData::CreateProperties()
 
   // View frame
 
-
   this->ViewFrame->SetParent(this->Properties->GetFrame());
   this->ViewFrame->ShowHideFrameOn();
   this->ViewFrame->Create(this->Application);
@@ -1246,8 +1258,7 @@ void vtkPVData::CreateProperties()
   this->PointSizeScale->DisplayEntry();
   this->PointSizeScale->DisplayEntryAndLabelOnTopOff();
   this->PointSizeScale->SetBalloonHelpString("Set the point size.");
-  this->Script("%s configure -width 5", 
-               this->PointSizeScale->GetEntry()->GetWidgetName());
+  this->PointSizeScale->GetEntry()->SetWidth(5);
   this->PointSizeScale->SetCommand(this, "ChangePointSize");
   this->PointSizeScale->SetEndCommand(this, "ChangePointSizeEndCallback");
   this->PointSizeScale->SetEntryCommand(this, "ChangePointSizeEndCallback");
@@ -1271,8 +1282,7 @@ void vtkPVData::CreateProperties()
   this->LineWidthScale->DisplayEntry();
   this->LineWidthScale->DisplayEntryAndLabelOnTopOff();
   this->LineWidthScale->SetBalloonHelpString("Set the line width.");
-  this->Script("%s configure -width 5", 
-               this->LineWidthScale->GetEntry()->GetWidgetName());
+  this->LineWidthScale->GetEntry()->SetWidth(5);
   this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
   this->LineWidthScale->SetEndCommand(this, "ChangeLineWidthEndCallback");
   this->LineWidthScale->SetEntryCommand(this, "ChangeLineWidthEndCallback");
@@ -1349,13 +1359,28 @@ void vtkPVData::CreateProperties()
   this->ScaleLabel->SetBalloonHelpString(
     "Scale the geometry relative to the size of the dataset.");
 
+  this->OrientationLabel->SetParent(this->ActorControlFrame->GetFrame());
+  this->OrientationLabel->Create(this->Application, 0);
+  this->OrientationLabel->SetLabel("Orientation:");
+  this->OrientationLabel->SetBalloonHelpString(
+    "Orient the geometry relative to the dataset origin.");
+
+  this->OriginLabel->SetParent(this->ActorControlFrame->GetFrame());
+  this->OriginLabel->Create(this->Application, 0);
+  this->OriginLabel->SetLabel("Origin:");
+  this->OriginLabel->SetBalloonHelpString(
+    "Set the origin point about which rotations take place.");
+
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
     this->TranslateEntry[cc]->SetParent(this->ActorControlFrame->GetFrame());
     this->TranslateEntry[cc]->Create(this->Application, 0);
     this->TranslateEntry[cc]->SetValue(0, 4);
-    this->Script("bind %s <Key-Return> { %s SetActorTranslate }",
+    this->Script("bind %s <Key-Return> { %s ActorTranslateCallback }",
+                 this->TranslateEntry[cc]->GetWidgetName(),
+                 this->GetTclName());
+    this->Script("bind %s <FocusOut> { %s ActorTranslateCallback }",
                  this->TranslateEntry[cc]->GetWidgetName(),
                  this->GetTclName());
     this->TranslateEntry[cc]->SetBalloonHelpString(
@@ -1366,8 +1391,41 @@ void vtkPVData::CreateProperties()
     this->ScaleEntry[cc]->SetValue(1, 4);
     this->ScaleEntry[cc]->SetBalloonHelpString(
       "Scale the geometry relative to the size of the dataset.");
-    this->Script("bind %s <Key-Return> { %s SetActorScale }",
+    this->Script("bind %s <Key-Return> { %s ActorScaleCallback }",
                  this->ScaleEntry[cc]->GetWidgetName(),
+                 this->GetTclName());
+    this->Script("bind %s <FocusOut> { %s ActorScaleCallback }",
+                 this->ScaleEntry[cc]->GetWidgetName(),
+                 this->GetTclName());
+
+    this->OrientationScale[cc]->SetParent(this->ActorControlFrame->GetFrame());
+    this->OrientationScale[cc]->PopupScaleOn();
+    this->OrientationScale[cc]->Create(this->Application, 0);
+    this->OrientationScale[cc]->SetRange(0, 360);
+    this->OrientationScale[cc]->SetResolution(1);
+    this->OrientationScale[cc]->SetValue(0);
+    this->OrientationScale[cc]->DisplayEntry();
+    this->OrientationScale[cc]->DisplayEntryAndLabelOnTopOff();
+    this->OrientationScale[cc]->ExpandEntryOn();
+    this->OrientationScale[cc]->GetEntry()->SetWidth(5);
+    this->OrientationScale[cc]->SetCommand(this, "ActorOrientationCallback");
+    this->OrientationScale[cc]->SetEndCommand(this, 
+                                              "ActorOrientationEndCallback");
+    this->OrientationScale[cc]->SetEntryCommand(this, 
+                                                "ActorOrientationEndCallback");
+    this->OrientationScale[cc]->SetBalloonHelpString(
+      "Orient the geometry relative to the dataset origin.");
+
+    this->OriginEntry[cc]->SetParent(this->ActorControlFrame->GetFrame());
+    this->OriginEntry[cc]->Create(this->Application, 0);
+    this->OriginEntry[cc]->SetValue(0, 4);
+    this->OriginEntry[cc]->SetBalloonHelpString(
+      "Orient the geometry relative to the dataset origin.");
+    this->Script("bind %s <Key-Return> { %s ActorOriginCallback }",
+                 this->OriginEntry[cc]->GetWidgetName(),
+                 this->GetTclName());
+    this->Script("bind %s <FocusOut> { %s ActorOriginCallback }",
+                 this->OriginEntry[cc]->GetWidgetName(),
                  this->GetTclName());
     }
 
@@ -1379,44 +1437,68 @@ void vtkPVData::CreateProperties()
     "Artifacts may appear in translucent geomtry "
     "because primatives are not sorted.");
 
-  this->Opacity->SetParent(this->ActorControlFrame->GetFrame());
-  this->Opacity->Create(this->Application, 0);
-  this->Opacity->SetRange(0, 1);
-  this->Opacity->SetResolution(0.1);
-  this->Opacity->SetValue(1);
-  this->Opacity->DisplayEntry();
-  this->Opacity->DisplayEntryAndLabelOnTopOff();
-  this->Script("%s configure -width 5", 
-               this->Opacity->GetEntry()->GetWidgetName());
-  this->Opacity->SetCommand(this, "OpacityChangedCallback");
-  this->Opacity->SetEndCommand(this, "OpacityChangedEndCallback");
-  this->Opacity->SetEntryCommand(this, "OpacityChangedEndCallback");
-  this->Opacity->SetBalloonHelpString(
+  this->OpacityScale->SetParent(this->ActorControlFrame->GetFrame());
+  this->OpacityScale->PopupScaleOn();
+  this->OpacityScale->Create(this->Application, 0);
+  this->OpacityScale->SetRange(0, 1);
+  this->OpacityScale->SetResolution(0.1);
+  this->OpacityScale->SetValue(1);
+  this->OpacityScale->DisplayEntry();
+  this->OpacityScale->DisplayEntryAndLabelOnTopOff();
+  this->OpacityScale->ExpandEntryOn();
+  this->OpacityScale->GetEntry()->SetWidth(5);
+  this->OpacityScale->SetCommand(this, "OpacityChangedCallback");
+  this->OpacityScale->SetEndCommand(this, "OpacityChangedEndCallback");
+  this->OpacityScale->SetEntryCommand(this, "OpacityChangedEndCallback");
+  this->OpacityScale->SetBalloonHelpString(
     "Set the opacity of the dataset's geometry.  "
     "Artifacts may appear in translucent geomtry "
     "because primatives are not sorted.");
 
-  this->Script("grid %s %s %s %s -sticky news",
+  this->Script("grid %s %s %s %s -sticky news -pady %d",
                this->TranslateLabel->GetWidgetName(),
                this->TranslateEntry[0]->GetWidgetName(),
                this->TranslateEntry[1]->GetWidgetName(),
-               this->TranslateEntry[2]->GetWidgetName());
+               this->TranslateEntry[2]->GetWidgetName(),
+               button_pady);
 
   this->Script("grid %s -sticky nws",
                this->TranslateLabel->GetWidgetName());
 
-  this->Script("grid %s %s %s %s -sticky news",
+  this->Script("grid %s %s %s %s -sticky news -pady %d",
                this->ScaleLabel->GetWidgetName(),
                this->ScaleEntry[0]->GetWidgetName(),
                this->ScaleEntry[1]->GetWidgetName(),
-               this->ScaleEntry[2]->GetWidgetName());
+               this->ScaleEntry[2]->GetWidgetName(),
+               button_pady);
 
   this->Script("grid %s -sticky nws",
                this->ScaleLabel->GetWidgetName());
 
-  this->Script("grid %s %s - -  -sticky news",
+  this->Script("grid %s %s %s %s -sticky news -pady %d",
+               this->OrientationLabel->GetWidgetName(),
+               this->OrientationScale[0]->GetWidgetName(),
+               this->OrientationScale[1]->GetWidgetName(),
+               this->OrientationScale[2]->GetWidgetName(),
+               button_pady);
+
+  this->Script("grid %s -sticky nws",
+               this->OrientationLabel->GetWidgetName());
+
+  this->Script("grid %s %s %s %s -sticky news -pady %d",
+               this->OriginLabel->GetWidgetName(),
+               this->OriginEntry[0]->GetWidgetName(),
+               this->OriginEntry[1]->GetWidgetName(),
+               this->OriginEntry[2]->GetWidgetName(),
+               button_pady);
+
+  this->Script("grid %s -sticky nws",
+               this->OriginLabel->GetWidgetName());
+
+  this->Script("grid %s %s -sticky news -pady %d",
                this->OpacityLabel->GetWidgetName(),
-               this->Opacity->GetWidgetName());
+               this->OpacityScale->GetWidgetName(),
+               button_pady);
 
   this->Script("grid %s -sticky nws",
                this->OpacityLabel->GetWidgetName());
@@ -2885,11 +2967,17 @@ void vtkPVData::GetColorRange(float *range)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::SetOpacity(float val)
+{ 
+  this->OpacityScale->SetValue(val);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVData::OpacityChangedCallback()
 {
   this->GetPVApplication()->BroadcastScript("[ %s GetProperty ] SetOpacity %f",
                                             this->PropTclName, 
-                                            this->Opacity->GetValue());
+                                            this->OpacityScale->GetValue());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2901,21 +2989,49 @@ void vtkPVData::OpacityChangedEndCallback()
 {
   this->OpacityChangedCallback();
   this->AddTraceEntry("$kw(%s) SetOpacity %f", 
-                      this->GetTclName(), this->Opacity->GetValue());
+                      this->GetTclName(), this->OpacityScale->GetValue());
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetOpacity(float val)
-{ 
-  this->Opacity->SetValue(val);
+void vtkPVData::GetActorTranslate(float* point)
+{
+  vtkProp3D *prop = vtkProp3D::SafeDownCast(this->Prop);
+  if (prop)
+    {
+    prop->GetPosition(point);
+    }
+  else
+    {
+    point[0] = this->TranslateEntry[0]->GetValueAsFloat();
+    point[1] = this->TranslateEntry[1]->GetValueAsFloat();
+    point[2] = this->TranslateEntry[2]->GetValueAsFloat();
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorTranslate()
+void vtkPVData::SetActorTranslate(float x, float y, float z)
 {
   float point[3];
   this->GetActorTranslate(point);
-  this->SetActorTranslate(point);
+  if (x == point[0] && y == point[1] && z == point[2])
+    {
+    return;
+    }
+
+  this->TranslateEntry[0]->SetValue(x, 4);
+  this->TranslateEntry[1]->SetValue(y, 4);
+  this->TranslateEntry[2]->SetValue(z, 4);
+
+  this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
+                                            this->PropTclName, x, y, z);
+
+  this->AddTraceEntry("$kw(%s) SetActorTranslate %f %f %f",
+                      this->GetTclName(), x, y, z);  
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2925,35 +3041,55 @@ void vtkPVData::SetActorTranslate(float* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorTranslate(float x, float y, float z)
+void vtkPVData::ActorTranslateCallback()
 {
-  this->TranslateEntry[0]->SetValue(x, 4);
-  this->TranslateEntry[1]->SetValue(y, 4);
-  this->TranslateEntry[2]->SetValue(z, 4);
-  this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
-                                            this->PropTclName, x, y, z);
-  this->AddTraceEntry("$kw(%s) SetActorTranslate %f %f %f",
-                      this->GetTclName(), x, y, z);  
-  if ( this->GetPVRenderView() )
+  float point[3];
+  point[0] = this->TranslateEntry[0]->GetValueAsFloat();
+  point[1] = this->TranslateEntry[1]->GetValueAsFloat();
+  point[2] = this->TranslateEntry[2]->GetValueAsFloat();
+  this->SetActorTranslate(point);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::GetActorScale(float* point)
+{
+  vtkProp3D *prop = vtkProp3D::SafeDownCast(this->Prop);
+  if (prop)
     {
-    this->GetPVRenderView()->EventuallyRender();
+    prop->GetScale(point);
+    }
+  else
+    {
+    point[0] = this->ScaleEntry[0]->GetValueAsFloat();
+    point[1] = this->ScaleEntry[1]->GetValueAsFloat();
+    point[2] = this->ScaleEntry[2]->GetValueAsFloat();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::GetActorTranslate(float* point)
-{
-  point[0] = this->TranslateEntry[0]->GetValueAsFloat();
-  point[1] = this->TranslateEntry[1]->GetValueAsFloat();
-  point[2] = this->TranslateEntry[2]->GetValueAsFloat();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::SetActorScale()
+void vtkPVData::SetActorScale(float x, float y, float z)
 {
   float point[3];
   this->GetActorScale(point);
-  this->SetActorScale(point);
+  if (x == point[0] && y == point[1] && z == point[2])
+    {
+    return;
+    }
+
+  this->ScaleEntry[0]->SetValue(x, 4);
+  this->ScaleEntry[1]->SetValue(y, 4);
+  this->ScaleEntry[2]->SetValue(z, 4);
+
+  this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
+                                            this->PropTclName, x, y, z);
+
+  this->AddTraceEntry("$kw(%s) SetActorScale %f %f %f",
+                      this->GetTclName(), x, y, z);  
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2963,15 +3099,48 @@ void vtkPVData::SetActorScale(float* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorScale(float x, float y, float z)
+void vtkPVData::ActorScaleCallback()
 {
-  this->ScaleEntry[0]->SetValue(x, 4);
-  this->ScaleEntry[1]->SetValue(y, 4);
-  this->ScaleEntry[2]->SetValue(z, 4);
-  this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
+  float point[3];
+  point[0] = this->ScaleEntry[0]->GetValueAsFloat();
+  point[1] = this->ScaleEntry[1]->GetValueAsFloat();
+  point[2] = this->ScaleEntry[2]->GetValueAsFloat();
+  this->SetActorScale(point);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::GetActorOrientation(float* point)
+{
+  vtkProp3D *prop = vtkProp3D::SafeDownCast(this->Prop);
+  if (prop)
+    {
+    prop->GetOrientation(point);
+    }
+  else
+    {
+    point[0] = this->OrientationScale[0]->GetValue();
+    point[1] = this->OrientationScale[1]->GetValue();
+    point[2] = this->OrientationScale[2]->GetValue();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorOrientationNoTrace(float x, float y, float z)
+{
+  float point[3];
+  this->GetActorOrientation(point);
+  if (x == point[0] && y == point[1] && z == point[2])
+    {
+    return;
+    }
+
+  this->OrientationScale[0]->SetValue(x);
+  this->OrientationScale[1]->SetValue(y);
+  this->OrientationScale[2]->SetValue(z);
+
+  this->GetPVApplication()->BroadcastScript("%s SetOrientation %f %f %f",
                                             this->PropTclName, x, y, z);
-  this->AddTraceEntry("$kw(%s) SetActorScale %f %f %f",
-                      this->GetTclName(), x, y, z);  
+
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2979,11 +3148,103 @@ void vtkPVData::SetActorScale(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::GetActorScale(float* point)
+void vtkPVData::SetActorOrientation(float x, float y, float z)
 {
-  point[0] = this->ScaleEntry[0]->GetValueAsFloat();
-  point[1] = this->ScaleEntry[1]->GetValueAsFloat();
-  point[2] = this->ScaleEntry[2]->GetValueAsFloat();
+  float point[3];
+  this->GetActorOrientation(point);
+  if (x == point[0] && y == point[1] && z == point[2])
+    {
+    return;
+    }
+
+  this->SetActorOrientationNoTrace(x, y, z);
+
+  this->AddTraceEntry("$kw(%s) SetActorOrientation %f %f %f",
+                      this->GetTclName(), x, y, z);  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorOrientation(float* point)
+{
+  this->SetActorOrientation(point[0], point[1], point[2]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ActorOrientationCallback()
+{
+  float point[3];
+  point[0] = this->OrientationScale[0]->GetValue();
+  point[1] = this->OrientationScale[1]->GetValue();
+  point[2] = this->OrientationScale[2]->GetValue();
+  this->SetActorOrientationNoTrace(point[0], point[1], point[2]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ActorOrientationEndCallback()
+{
+  float point[3];
+  point[0] = this->OrientationScale[0]->GetValue();
+  point[1] = this->OrientationScale[1]->GetValue();
+  point[2] = this->OrientationScale[2]->GetValue();
+  this->SetActorOrientation(point);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::GetActorOrigin(float* point)
+{
+  vtkProp3D *prop = vtkProp3D::SafeDownCast(this->Prop);
+  if (prop)
+    {
+    prop->GetOrigin(point);
+    }
+  else
+    {
+    point[0] = this->OriginEntry[0]->GetValueAsFloat();
+    point[1] = this->OriginEntry[1]->GetValueAsFloat();
+    point[2] = this->OriginEntry[2]->GetValueAsFloat();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorOrigin(float x, float y, float z)
+{
+  float point[3];
+  this->GetActorOrigin(point);
+  if (x == point[0] && y == point[1] && z == point[2])
+    {
+    return;
+    }
+
+  this->OriginEntry[0]->SetValue(x, 4);
+  this->OriginEntry[1]->SetValue(y, 4);
+  this->OriginEntry[2]->SetValue(z, 4);
+
+  this->GetPVApplication()->BroadcastScript("%s SetOrigin %f %f %f",
+                                            this->PropTclName, x, y, z);
+
+  this->AddTraceEntry("$kw(%s) SetActorOrigin %f %f %f",
+                      this->GetTclName(), x, y, z);  
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorOrigin(float* point)
+{
+  this->SetActorOrigin(point[0], point[1], point[2]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::ActorOriginCallback()
+{
+  float point[3];
+  point[0] = this->OriginEntry[0]->GetValueAsFloat();
+  point[1] = this->OriginEntry[1]->GetValueAsFloat();
+  point[2] = this->OriginEntry[2]->GetValueAsFloat();
+  this->SetActorOrigin(point);
 }
 
 //----------------------------------------------------------------------------
@@ -3031,7 +3292,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.172 $");
+  this->ExtractRevision(os,"$Revision: 1.173 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3056,11 +3317,19 @@ void vtkPVData::SerializeSelf(ostream& os, vtkIndent indent)
      << this->TranslateEntry[0]->GetValue() << " "
      << this->TranslateEntry[1]->GetValue() << " " 
      << this->TranslateEntry[1]->GetValue() << endl;
-  os << indent << "Opacity " << this->Opacity->GetValue() << endl;
   os << indent << "ActorScale " 
      << this->ScaleEntry[0]->GetValue() << " "
      << this->ScaleEntry[1]->GetValue() << " " 
      << this->ScaleEntry[1]->GetValue() << endl;
+  os << indent << "ActorOrientation " 
+     << this->OrientationScale[0]->GetValue() << " "
+     << this->OrientationScale[1]->GetValue() << " " 
+     << this->OrientationScale[1]->GetValue() << endl;
+  os << indent << "ActorOrigin " 
+     << this->OriginEntry[0]->GetValue() << " "
+     << this->OriginEntry[1]->GetValue() << " " 
+     << this->OriginEntry[1]->GetValue() << endl;
+  os << indent << "Opacity " << this->OpacityScale->GetValue() << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -3160,6 +3429,36 @@ void vtkPVData::SerializeToken(istream& is, const char token[1024])
         }
       }
     this->SetActorScale(cor);
+    }
+  else if ( vtkString::Equals(token, "ActorOrientation") )
+    {
+    float cor[3];
+    int cc;
+    for ( cc = 0; cc < 3; cc ++ )
+      {
+      cor[cc] = 0.0;
+      if (! (is >> cor[cc]) )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        return;
+        }
+      }
+    this->SetActorOrientation(cor);
+    }
+  else if ( vtkString::Equals(token, "ActorOrigin") )
+    {
+    float cor[3];
+    int cc;
+    for ( cc = 0; cc < 3; cc ++ )
+      {
+      cor[cc] = 0.0;
+      if (! (is >> cor[cc]) )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        return;
+        }
+      }
+    this->SetActorOrigin(cor);
     }
   else if ( vtkString::Equals(token, "ColorRange") )
     {
