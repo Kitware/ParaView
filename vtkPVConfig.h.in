@@ -24,11 +24,22 @@
 #cmakedefine XDMF_SYSTEM_HDF5
 #cmakedefine PARAVIEW_BUILD_DEVELOPMENT
 #cmakedefine PARAVIEW_BLT_LIBRARY
+
+// Build ParaView with Floating Point Exceptions turned on
+#cmakedefine PARAVIEW_ENABLE_FPE
+// Build ParaView with all experimental options (such as script in animation...)
+#cmakedefine PARAVIEW_EXPERIMENTAL_USER
+
 #define PARAVIEW_VERSION_MAJOR @PARAVIEW_VERSION_MAJOR@
 #define PARAVIEW_VERSION_MINOR @PARAVIEW_VERSION_MINOR@
 #define PARAVIEW_VERSION_PATCH @PARAVIEW_VERSION_PATCH@
 #define PARAVIEW_VERSION "@PARAVIEW_VERSION@"
 #define PARAVIEW_VERSION_FULL "@PARAVIEW_VERSION_FULL@"
+
+// Some runtime informations to be displayed in About box:
+#define OPENGL_gl_LIBRARY   "@OPENGL_gl_LIBRARY@"
+#define OPENGL_INCLUDE_DIR  "@OPENGL_INCLUDE_DIR@"
+#define CMAKE_BUILD_TYPE    "@CMAKE_BUILD_TYPE@"
 
 #cmakedefine PARAVIEW_PLUS_BUILD
 
