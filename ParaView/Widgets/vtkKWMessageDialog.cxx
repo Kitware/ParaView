@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.46");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.47");
 
 
 
@@ -61,10 +61,10 @@ int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWMessageDialog::vtkKWMessageDialog()
 {
-  this->TopFrame = vtkKWWidget::New();
-  this->TopFrame->SetParent(this);
   this->MessageDialogFrame = vtkKWWidget::New();
   this->MessageDialogFrame->SetParent(this);
+  this->TopFrame = vtkKWWidget::New();
+  this->TopFrame->SetParent(this->MessageDialogFrame);
   this->BottomFrame = vtkKWWidget::New();
   this->BottomFrame->SetParent(this->MessageDialogFrame);
   
@@ -124,8 +124,8 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   // invoke super method
   this->Superclass::Create(app,args);
   
-  this->TopFrame->Create(app,"frame","");
   this->MessageDialogFrame->Create(app,"frame","");
+  this->TopFrame->Create(app,"frame","");
   this->BottomFrame->Create(app,"frame","");
   this->Label->SetLineType(vtkKWLabel::MultiLine);
   this->Label->SetWidth(300);
@@ -196,6 +196,10 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     }
     }
   
+  this->Script("pack %s -side right -fill both -expand true -pady 4",
+               this->MessageDialogFrame->GetWidgetName());
+  this->Script("pack %s -side top -fill both -expand true",
+               this->TopFrame->GetWidgetName());
   this->Script("pack %s -side top -fill x -padx 20 -pady 5",
                this->Label->GetWidgetName());
   if ( this->GetDialogName() )
@@ -205,11 +209,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
                  this->CheckButton->GetWidgetName());
     }
 
-  this->Script("pack %s -side top -fill both -expand true -pady 4",
-               this->TopFrame->GetWidgetName());
-  this->Script("pack %s -side top -fill both -expand true -pady 4",
-               this->MessageDialogFrame->GetWidgetName());
-  this->Script("pack %s -side top -fill both -expand true -pady 4",
+  this->Script("pack %s -side top -fill both -expand true",
                this->BottomFrame->GetWidgetName());
   this->Script("pack %s -side top -fill x -pady 2",
                this->ButtonFrame->GetWidgetName());
@@ -217,6 +217,13 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -side left -fill y",
                this->Icon->GetWidgetName());
   this->Script("pack forget %s", this->Icon->GetWidgetName());
+
+#ifdef KW_MESSAGEDIALOG_DEBUG
+  this->Script("%s configure -bg red -height 5", this->TopFrame->GetWidgetName());
+  this->Script("%s configure -bg green", this->MessageDialogFrame->GetWidgetName());
+  this->Script("%s configure -bg blue -height 5", this->BottomFrame->GetWidgetName());
+  this->Script("%s configure -bg purple", this->ButtonFrame->GetWidgetName());
+#endif
 }
 
 void vtkKWMessageDialog::SetText(const char *txt)
