@@ -11,7 +11,7 @@
 #include <vtkRendererCollection.h>
 #include <vtkTimerLog.h>
 
-vtkCxxRevisionMacro(vtkCompositeRenderManager, "1.3");
+vtkCxxRevisionMacro(vtkCompositeRenderManager, "1.4");
 vtkStandardNewMacro(vtkCompositeRenderManager);
 vtkCxxSetObjectMacro(vtkCompositeRenderManager,Compositer,vtkCompositer);
 
@@ -42,6 +42,7 @@ void vtkCompositeRenderManager::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
+  os << indent << "ImageProcessingTime: " << this->ImageProcessingTime << endl;
   os << indent << "Compositer: " << endl;
   this->Compositer->PrintSelf(os, indent.GetNextIndent());
 }

@@ -1,5 +1,3 @@
-// -*- c++ -*-
-
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -21,11 +19,11 @@
 #ifndef __vtkCompositeRenderManager_h
 #define __vtkCompositeRenderManager_h
 
-#include <vtkParallelRenderManager.h>
+#include "vtkParallelRenderManager.h"
+
 class vtkCompositer;
 
-class VTK_EXPORT vtkCompositeRenderManager
-    : public vtkParallelRenderManager
+class VTK_EXPORT vtkCompositeRenderManager : public vtkParallelRenderManager
 {
 public:
   vtkTypeRevisionMacro(vtkCompositeRenderManager, vtkParallelRenderManager);

@@ -1,5 +1,3 @@
-// -*- c++ -*-
-
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -29,14 +27,14 @@
 
 //#include "vtksnlGraphicsWin32Header.h"
 
-#include <vtkTimerLog.h>
-#include <vtkLocator.h>
-#include <vtkIdList.h>
-#include <vtkPoints.h>
-#include <vtkCellArray.h>
-#include <vtkRenderer.h>
-#include <vtkVersion.h>
-#include <vtkPlanesIntersection.h>
+#include "vtkTimerLog.h"
+#include "vtkLocator.h"
+#include "vtkIdList.h"
+#include "vtkPoints.h"
+#include "vtkCellArray.h"
+#include "vtkRenderer.h"
+#include "vtkVersion.h"
+#include "vtkPlanesIntersection.h"
 
 #define makeCompareFunc(name, loc) \
    static int compareFunc##name(const void *a, const void *b){ \
@@ -48,7 +46,7 @@
    }
 //BTX
 
-class VTK_EXPORT vtkKdNode{
+class vtkKdNode{
 public:
 
   vtkKdNode();

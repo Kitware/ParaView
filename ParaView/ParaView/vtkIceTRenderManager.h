@@ -1,5 +1,3 @@
-// -*- c++ -*- *******************************************************
-
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -52,8 +50,7 @@
 
 #include <GL/ice-t.h>
 
-class VTK_EXPORT vtkIceTRenderManager
-    : public vtkParallelRenderManager
+class VTK_EXPORT vtkIceTRenderManager : public vtkParallelRenderManager
 {
 public:
   static vtkIceTRenderManager *New();
