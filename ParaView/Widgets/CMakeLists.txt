@@ -51,6 +51,7 @@ vtkKWPushButton.cxx
 vtkKWPushButtonSet.cxx 
 vtkKWRadioButton.cxx 
 vtkKWRadioButtonSet.cxx
+vtkKWRange.cxx 
 vtkKWRenderWidget.cxx 
 vtkKWSaveImageDialog.cxx 
 vtkKWScale.cxx 
