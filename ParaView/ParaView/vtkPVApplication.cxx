@@ -113,7 +113,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.172");
+vtkCxxRevisionMacro(vtkPVApplication, "1.173");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1587,6 +1587,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
   os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off")
      << endl; 
+  os << indent << "StartGUI: " << this->StartGUI << endl;
   if (this->UseTiledDisplay)
     { 
     os << indent << "UseTiledDisplay: On\n";

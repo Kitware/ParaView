@@ -114,6 +114,20 @@ vtkPVXMLPackageParser.cxx
 vtkPVXMLParser.cxx
 vtkStringList.cxx 
 vtkTiledDisplayManager.cxx
+
+vtkPVWarpScalar
+vtkPVClipDataSet
+vtkPVContourFilter
+vtkPVKitwareContourFilter
+vtkPVGlyphFilter
+vtkPVThresholdFilter
+vtkPVRibbonFilter
+vtkPVWarpVector
+vtkPVImageGradient
+vtkPVImageGradientMagnitude
+vtkPVImageMedian3D
+vtkPVImageContinuousDilate3D
+vtkPVImageContinuousErode3D
 )
 
 SET_SOURCE_FILES_PROPERTIES(
