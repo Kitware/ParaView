@@ -17,7 +17,6 @@ INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SET( KWCommon_SRCS
   vtkContainer.cxx
   vtkKWArguments.cxx
-  vtkKWDirectoryUtilities.cxx
   vtkKWGenericMovieWriter.cxx
   vtkKWHistogram.cxx
   vtkKWHistogramSet.cxx
