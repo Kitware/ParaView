@@ -23,6 +23,8 @@
           module_type="Reader"
           extensions=".xyz" file_description="XYZ Molecule Files">
     <Source class="vtkXYZMolReader"/>
+    <VectorEntry variable="TimeStep" trace_name="TimeStep" type="int" 
+                 help="Set the TimeStep"/>
   </Module>
   <Module name="gaussiancubereader" class="vtkPVAdvancedReaderModule" root_name="GaussianCube" 
           module_type="Reader"
