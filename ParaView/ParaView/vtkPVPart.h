@@ -132,6 +132,26 @@ public:
   vtkPVPartDisplay* GetPartDisplay() { return this->PartDisplay;}
   void SetPartDisplay(vtkPVPartDisplay* pDisp);
 
+  // Description:
+  // VTKSourceIndex points to the VTKSourceTclName in this
+  // part's PVSource. The tcl name of the VTK source that produced
+  // the data in this part can be obtained with
+  // source->GetVTKSourceTclName(part->GetVTKSourceIndex())
+  // This is used during batch file generation.
+  vtkGetMacro(VTKSourceIndex, int);
+  vtkSetMacro(VTKSourceIndex, int);
+
+  // Description:
+  // VTKOutputIndex together with  VTKSourceTclName is used
+  // to obtain the source of the data object in this part.
+  // For example, the output in this data object is obtained
+  // with "%s GetOutput %d",
+  // source->GetVTKSourceTclName(part->GetVTKSourceIndex()),
+  // part->GetVTKOutputIndex()
+  // This is used during batch file generation.
+  vtkGetMacro(VTKOutputIndex, int);
+  vtkSetMacro(VTKOutputIndex, int);
+
 protected:
   vtkPVPart();
   ~vtkPVPart();
@@ -160,6 +180,9 @@ protected:
 
   // If the data changes, we need to change to.
   vtkTimeStamp UpdateTime;
+
+  int VTKSourceIndex;
+  int VTKOutputIndex;
 
   vtkPVPart(const vtkPVPart&); // Not implemented
   void operator=(const vtkPVPart&); // Not implemented

@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.25.2.9");
+vtkCxxRevisionMacro(vtkPVPart, "1.25.2.10");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -94,6 +94,9 @@ vtkPVPart::vtkPVPart()
   // Create a unique id for creating tcl names.
   ++instanceCount;
   this->InstanceCount = instanceCount;
+
+  this->VTKSourceIndex = -1;
+  this->VTKOutputIndex = -1;
 }
 
 //----------------------------------------------------------------------------
