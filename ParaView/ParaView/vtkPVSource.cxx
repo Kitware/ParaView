@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.24");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.25");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2455,7 +2455,7 @@ int vtkPVSource::InitializeData()
 
       // Create the extent translator (sources with no inputs only).
       // Needs to be before "ExtractPieces" because translator propagates.
-      part->CreateTranslatorIfNecessary(translatorTclName);
+      part->CreateTranslatorIfNecessary();
       part->InsertExtractPiecesIfNecessary();
       part->Delete();
       }
