@@ -101,14 +101,6 @@ SOURCE=.\vtkDummyRenderWindowInteractor.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkInteractorStyleCamera.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkInteractorStyleCameraTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkInteractorStyleExtent.cxx
 # End Source File
 # Begin Source File
@@ -330,26 +322,6 @@ SOURCE=.\vtkPVWindowTcl.cxx
 # Begin Source File
 
 SOURCE=.\vtkDummyRenderWindowInteractor.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkInteractorStyleCamera.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkInteractorStyleCamera.h
-InputName=vtkInteractorStyleCamera
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 

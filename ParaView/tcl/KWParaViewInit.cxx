@@ -1,13 +1,7 @@
 #include "vtkTclUtil.h"
-int vtkInteractorStyleCameraCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkInteractorStyleCameraNewCommand();
 int vtkInteractorStyleGridExtentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStyleGridExtentNewCommand();
-int vtkInteractorStyleImageExtentCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkInteractorStyleImageExtentNewCommand();
 int vtkInteractorStylePlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStylePlaneNewCommand();
@@ -23,9 +17,6 @@ ClientData vtkKWRenderViewNewCommand();
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVApplicationNewCommand();
-int vtkPVImagePlaneComponentCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVImagePlaneComponentNewCommand();
 int vtkPVRenderSlaveCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderSlaveNewCommand();
@@ -66,12 +57,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
-  vtkTclCreateNew(interp,"vtkInteractorStyleCamera", vtkInteractorStyleCameraNewCommand,
-                  vtkInteractorStyleCameraCommand);
   vtkTclCreateNew(interp,"vtkInteractorStyleGridExtent", vtkInteractorStyleGridExtentNewCommand,
                   vtkInteractorStyleGridExtentCommand);
-  vtkTclCreateNew(interp,"vtkInteractorStyleImageExtent", vtkInteractorStyleImageExtentNewCommand,
-                  vtkInteractorStyleImageExtentCommand);
   vtkTclCreateNew(interp,"vtkInteractorStylePlane", vtkInteractorStylePlaneNewCommand,
                   vtkInteractorStylePlaneCommand);
   vtkTclCreateNew(interp,"vtkInteractorStylePlaneSource", vtkInteractorStylePlaneSourceNewCommand,
@@ -82,8 +69,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkKWRenderViewCommand);
   vtkTclCreateNew(interp,"vtkPVApplication", vtkPVApplicationNewCommand,
                   vtkPVApplicationCommand);
-  vtkTclCreateNew(interp,"vtkPVImagePlaneComponent", vtkPVImagePlaneComponentNewCommand,
-                  vtkPVImagePlaneComponentCommand);
   vtkTclCreateNew(interp,"vtkPVRenderSlave", vtkPVRenderSlaveNewCommand,
                   vtkPVRenderSlaveCommand);
   vtkTclCreateNew(interp,"vtkPVRenderView", vtkPVRenderViewNewCommand,

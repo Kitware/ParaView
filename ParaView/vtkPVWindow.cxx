@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWNotebook.h"
 
 #include "vtkInteractorStylePlaneSource.h"
-#include "vtkInteractorStyleCamera.h"
+#include "vtkInteractorStyleTrackballCamera.h"
 
 #include "vtkMath.h"
 #include "vtkSynchronizedTemplates3D.h"
@@ -212,7 +212,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->ShowDataProperties();
   
   // Setup an interactor style.
-  vtkInteractorStyleCamera *style = vtkInteractorStyleCamera::New();
+  vtkInteractorStyleTrackballCamera *style = vtkInteractorStyleTrackballCamera::New();
   this->MainView->SetInteractorStyle(style);
 }
 
@@ -315,7 +315,7 @@ void vtkPVWindow::SetupCone()
   // Setup an interactor style
   vtkInteractorStylePlaneSource *planeStyle = 
                       vtkInteractorStylePlaneSource::New();
-  vtkInteractorStyle *style = vtkInteractorStyleCamera::New();
+  vtkInteractorStyle *style = vtkInteractorStyleTrackballCamera::New();
 
   //this->MainView->SetInteractorStyle(planeStyle);
   this->MainView->SetInteractorStyle(style);
