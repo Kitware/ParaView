@@ -35,6 +35,7 @@ set kw(vtkTemp668) [$kw(vtkTemp152) GetPVWidget {Equation}]
 $kw(vtkTemp668) AddScalarVariable Iterations Iterations 0
 $kw(vtkTemp668) SetFunctionLabel {Iterations*2}
 $kw(vtkTemp152) AcceptCallback
+[$kw(vtkTemp152) GetPVOutput] DrawSurface
 set kw(vtkTemp179) [$kw(vtkTemp1) CreatePVSource SphereSource]
 $kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp194) [$kw(vtkTemp179) GetPVWidget {Radius}]
