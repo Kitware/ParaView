@@ -17,7 +17,7 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.8");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.9");
 
 #ifdef __linux
 #include <sys/procfs.h>
@@ -153,10 +153,10 @@ float vtkKWProcessStatistics::GetProcessCPUTimeInMilliseconds()
 
 int vtkKWProcessStatistics::QueryMemory()
 {
-  unsigned long tv;
-  unsigned long tp;
-  unsigned long av;
-  unsigned long ap;
+  unsigned long tv=0;
+  unsigned long tp=0;
+  unsigned long av=0;
+  unsigned long ap=0;
 
   this->TotalVirtualMemory = -1;
   this->TotalPhysicalMemory = -1;
