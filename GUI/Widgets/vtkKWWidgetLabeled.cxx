@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetLabeled);
-vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.2");
+vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.3");
 
 int vtkKWWidgetLabeledCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -99,12 +99,12 @@ void vtkKWWidgetLabeled::CreateLabel(vtkKWApplication *app, const char *args)
   // do not set it.
   // Note that GetLabel() will allocate the label on the fly
   
-  vtkKWLabel *label = this->GetLabel();
-  if (label->IsCreated())
+  if (this->HasLabel() && this->GetLabel()->IsCreated())
     {
     return;
     }
 
+  vtkKWLabel *label = this->GetLabel();
   if (!label->GetParent())
     {
     label->SetParent(this);
