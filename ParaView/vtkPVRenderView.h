@@ -138,6 +138,10 @@ public:
   void ShowSourceParent();
   void ShowActorParent();  
   
+  // Description:
+  // This is for an experiment on rendering timing.  It should be temporary.
+  vtkGetObjectMacro(Composite, vtkTreeComposite);
+  
 protected:
 
   vtkPVRenderView();
