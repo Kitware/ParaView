@@ -21,6 +21,7 @@
 #define __vtkKWWin32RegisteryUtilities_h
 
 #include "vtkKWRegisteryUtilities.h"
+#include "vtkWindows.h" // needed for HKEY
 
 class VTK_EXPORT vtkKWWin32RegisteryUtilities : public vtkKWRegisteryUtilities
 {

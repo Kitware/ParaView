@@ -13,7 +13,7 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.7");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.8");
 
 #ifdef __linux
 #include <sys/procfs.h>
@@ -29,6 +29,7 @@ vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.7");
 #endif
 
 #include "vtkObjectFactory.h"
+#include "vtkWindows.h"
 
 vtkStandardNewMacro(vtkKWProcessStatistics);
 

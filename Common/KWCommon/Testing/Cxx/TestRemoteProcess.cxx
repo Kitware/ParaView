@@ -16,6 +16,8 @@
 
 #ifndef _WIN32
 #include <unistd.h>
+#else
+#include "vtkWindows.h"
 #endif
 
 int main()
