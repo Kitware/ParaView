@@ -19,7 +19,6 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        animateable="1"
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
@@ -33,6 +32,7 @@
         name="TimeStep"
         command="SetTimeStep"
         number_of_elements="1"
+        animateable="1"
         default_values="0">
        <IntRangeDomain name="range">
           <RequiredProperties>
@@ -723,7 +723,6 @@
    <SourceProxy name="spcthreader" class="vtkAMRSpyPlotReader">
      <StringVectorProperty
         name="FileName"
-        animateable="1"
         command="SetFileName"
         number_of_elements="1">
         <StringListDomain name="files"/>
@@ -739,6 +738,7 @@
         name="TimeStep"
         command="SetTimeStep"
         number_of_elements="1"
+        animateable="1"
         default_values="0">
        <IntRangeDomain name="range">
           <RequiredProperties>
@@ -806,7 +806,6 @@
    <SourceProxy name="xyzreader" class="vtkXYZMolReader">
      <StringVectorProperty
         name="FileName"
-        animateable="1"
         command="SetFileName"
         number_of_elements="1">
         <StringListDomain name="files"/>
@@ -816,6 +815,7 @@
         name="TimeStep"
         command="SetTimeStep"
         number_of_elements="1"
+        animateable="1"
         default_values="0" >
        <IntRangeDomain name="range"/>
      </IntVectorProperty>
@@ -1243,7 +1243,6 @@
                 class="vtkPExodusReader">
      <StringVectorProperty
         name="FileName"
-        animateable="1"
         command="SetFileName"
         number_of_elements="1">
         <StringListDomain name="files"/>
@@ -1333,6 +1332,7 @@
         name="TimeStep"
         command="SetTimeStep"
         number_of_elements="1"
+        animateable="1"
         default_values="0">
        <IntRangeDomain name="range">
           <RequiredProperties>
@@ -1514,7 +1514,6 @@
                 class="vtkSAFPVReader">
      <StringVectorProperty
         name="FileName"
-        animateable="1"
         command="SetFileName"
         number_of_elements="1">
         <StringListDomain name="files"/>
@@ -1573,6 +1572,7 @@
         name="TimeStep"
         command="SetTimeStep"
         number_of_elements="1"
+        animateable="1"
         default_values="0">
        <IntRangeDomain name="range">
           <RequiredProperties>

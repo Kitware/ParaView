@@ -52,14 +52,14 @@
 #include "vtkProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkCollectionIterator.h"
-
+#include "vtkPVWidget.h"
 #include <vtkstd/map>
 #include <vtkstd/string>
 
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.16");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.17");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1143,6 +1143,13 @@ void vtkPVAnimationManager::AddDefaultAnimation(vtkPVSource* pvSource)
       {
       return;
       }
+    vtkPVWidget* pvTimeStepWidget = clone->GetTimeStepWidget();
+    const char* animatedPropertyName = pvTimeStepWidget->GetSMProperty()->GetXMLName();
+    if (!animatedPropertyName || !animatedPropertyName[0])
+      {
+      return;
+      }
+
     // add keyframes to the timestep cue.
     // First get the CueTree for this source.
     vtkPVAnimationCueTree* cueTree = this->GetAnimationCueTreeForSource(pvSource);
@@ -1158,14 +1165,10 @@ void vtkPVAnimationManager::AddDefaultAnimation(vtkPVSource* pvSource)
       vtkPVAnimationCue* child = vtkPVAnimationCue::SafeDownCast(
         iter->GetCurrentObject());
       const char* propertyname = child->GetAnimatedPropertyName();
-      if (propertyname && strcmp(propertyname,"FileName")==0)
+      if (propertyname && strcmp(propertyname,animatedPropertyName)==0)
         {
         child->AddNewKeyFrame(0.0);
         child->AddNewKeyFrame(1.0);
-        //int id1 = child->AddNewKeyFrame(0.0);
-        //int id2 = child->AddNewKeyFrame(1.0);
-        //child->GetKeyFrame(id1)->SetKeyValue(0);
-        //child->GetKeyFrame(id2)->SetKeyValue(numOfTimeSteps-1);
         break;
         }
       }

@@ -20,6 +20,7 @@
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVFileEntry.h"
+#include "vtkPVScale.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWidgetCollection.h"
@@ -31,7 +32,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.58");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.59");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -369,20 +370,92 @@ void vtkPVReaderModule::SetReaderFileName(const char* fname)
 //----------------------------------------------------------------------------
 int vtkPVReaderModule::GetNumberOfTimeSteps()
 {
-  if ( !this->FileEntry )
+  vtkPVWidget* pvWidget = this->GetTimeStepWidget();
+  if ( !pvWidget)
     {
     return 0;
     }
-  return this->FileEntry->GetNumberOfFiles();
+  vtkPVFileEntry* pvFE = vtkPVFileEntry::SafeDownCast(pvWidget);
+  if (pvFE)
+    {
+    return pvFE->GetNumberOfFiles();
+    }
+  vtkPVScale* pvScale = vtkPVScale::SafeDownCast(pvWidget);
+  if (pvScale)
+    {
+    return static_cast<int>(pvScale->GetRangeMax() - pvScale->GetRangeMin());
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVReaderModule::SetRequestedTimeStep(int step)
 {
-  this->FileEntry->SetTimeStep(step);
+  vtkPVWidget* pvWidget = this->GetTimeStepWidget();
+  if ( !pvWidget)
+    {
+    return;
+    }
+  vtkPVFileEntry* pvFE = vtkPVFileEntry::SafeDownCast(pvWidget);
+  vtkPVScale* pvScale = vtkPVScale::SafeDownCast(pvWidget);
+  if (pvFE)
+    {
+    pvFE->SetTimeStep(step);
+    }
+  else if (pvScale)
+    {
+    pvScale->SetValue(step);
+    }
+
   this->AcceptCallback();
   this->GetPVApplication()->GetMainView()->EventuallyRender();
   this->Script("update");
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidget* vtkPVReaderModule::GetTimeStepWidget()
+{
+  // 1) check if the FileEntry has KeepsTimeStep iVar set. If so, it's the one
+  // that gives us the timesteps.
+  if (this->FileEntry && this->FileEntry->GetKeepsTimeStep())
+    {
+    return this->FileEntry;
+    }
+
+  // 2) if not, search thru all the widgets and find one with KeepsTimeStep iVar set 
+  // and use it to get the timesteps.
+  if (this->Widgets)
+    {
+    vtkPVWidget* toReturn = NULL;
+    vtkPVWidget* pvWidget;
+    vtkCollectionIterator* it = this->Widgets->NewIterator();
+    it->InitTraversal();
+
+    int i;
+    for (i=0; i < this->Widgets->GetNumberOfItems(); i++)
+      {
+      pvWidget = vtkPVWidget::SafeDownCast(it->GetCurrentObject());
+      if (pvWidget && pvWidget->GetKeepsTimeStep())
+        {
+        toReturn = pvWidget;
+        break;
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    if (toReturn) 
+      {
+      return toReturn;
+      }
+    }
+
+  // 3) if none such property is found, try to use FileEntry directly.
+  if (this->FileEntry)
+    {
+    return this->FileEntry;
+    }
+  // Every attempt to determine the widget that controls the timestep has failed!
+  return 0;
 }
 
 //----------------------------------------------------------------------------

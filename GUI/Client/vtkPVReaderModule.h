@@ -129,7 +129,11 @@ public:
   // Set the time step that should be provided by the reader.  This
   // value is ignored unless GetNumberOfTimeSteps returns 1 or more.
   virtual void SetRequestedTimeStep(int);
-  
+ 
+  // Description:
+  // Method to obtain the widget that controls the timestep.
+  vtkPVWidget* GetTimeStepWidget();
+ 
 protected:
   vtkPVReaderModule();
   ~vtkPVReaderModule();

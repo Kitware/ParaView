@@ -257,6 +257,11 @@ public:
   // If HideGUI is true, the widget is not shown in the property page.
   vtkGetMacro(HideGUI, int);
 
+  // Description:
+  // If true, indicates that for the vtkPVReaderModule, this is a
+  // widget that keeps the timestep. Note that a vtkPVReaderModule 
+  // can have atmost one widget that keeps the timestep.
+  vtkGetMacro(KeepsTimeStep, int);
 protected:
   vtkPVWidget();
   ~vtkPVWidget();
@@ -276,6 +281,10 @@ protected:
   int ModifiedFlag;
 
   int SupportsAnimation;
+
+  // This flag indicates if the widget is a widget used to keep
+  // timestep information for Readers.
+  int KeepsTimeStep;
 
   vtkPVSource* PVSource;
 

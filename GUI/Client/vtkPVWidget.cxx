@@ -67,7 +67,7 @@ protected:
 
 //*****************************************************************************
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.59");
+vtkCxxRevisionMacro(vtkPVWidget, "1.60");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -97,6 +97,7 @@ vtkPVWidget::vtkPVWidget()
   this->HideGUI = 0;
   this->Observer = vtkPVWidgetObserver::New();
   this->Observer->SetPVWidget(this);
+  this->KeepsTimeStep = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -369,6 +370,7 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   clone->SetSMPropertyName(this->GetSMPropertyName());
   clone->SupportsAnimation = this->SupportsAnimation;
   clone->HideGUI = this->HideGUI;
+  clone->KeepsTimeStep = this->KeepsTimeStep;
 
   // Now copy the dependencies
   vtkPVWidget* dep;
@@ -453,6 +455,11 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     this->HideGUI = 0;
     }
 
+  if (!element->GetScalarAttribute("keeps_timesteps", &this->KeepsTimeStep))
+    {
+    this->KeepsTimeStep = 0;
+    }
+
   const char* trace_name = element->GetAttribute("trace_name");
   if (trace_name) 
     { 
@@ -517,4 +524,5 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
     os << "(none)" << endl;
     }
   os << indent << "SupportsAnimation: " << this->SupportsAnimation << endl;
+  os << indent << "KeepsTimeStep: " << this->KeepsTimeStep << endl;
 }

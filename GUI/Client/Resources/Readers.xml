@@ -17,6 +17,7 @@
     
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
+           keeps_timesteps="1"
            help="Set the current timestep."/>	
   </Module>
   <Module name="XMLPolyDataReader"
@@ -228,6 +229,7 @@
     <Source class="vtkAMRSpyPlotReader"/>
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
+           keeps_timesteps="1"
            display_entry="1" display_value="0"
            help="Set the current timestep."/>
     <ArraySelection label_text="Cell Arrays"
@@ -256,7 +258,9 @@
     <Source class="vtkXYZMolReader"/>
     <VectorEntry property="TimeStep" label="TimeStep"
                  trace_name="TimeStep" type="int"
+                 keeps_timesteps="1"
                  help="Set the TimeStep"/>
+    <!--TODO: shouldn't this widget be a Scale, rather than a VectorEntry? -->
   </Module>
   <Module name="P3DReader"
           class="vtkPVPLOT3DReaderModule"
@@ -268,6 +272,7 @@
     <FileEntry label="Q File"
                trace_name="QFileName"
                property="QFileName" extension="q"
+               keeps_timesteps="1"
                help="Set the plot3d q file to read."/>
     <LabeledToggle label="Binary"
                    trace_name="BinaryFile"
@@ -486,6 +491,7 @@
 
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
+           keeps_timesteps="1"
            help="Set the current timestep."/>
 
     <ArraySelection trace_name="cell_array_sel"
@@ -570,6 +576,7 @@
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
            help="Set the current timestep."
+           keeps_timesteps="1"
            range_source="TimeStepRange" />
 
     <ArraySelection trace_name="variable_sel"
