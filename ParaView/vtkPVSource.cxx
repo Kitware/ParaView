@@ -176,6 +176,8 @@ vtkPVSource::~vtkPVSource()
   
   if (this->ChangeScalarsFilterTclName)
     {
+    this->GetPVApplication()->BroadcastScript("%s Delete", 
+                                this->ChangeScalarsFilterTclName);
     delete [] this->ChangeScalarsFilterTclName;
     this->ChangeScalarsFilterTclName = NULL;
     }
@@ -505,21 +507,22 @@ void vtkPVSource::ChangeScalars()
     this->DefaultScalarsName = NULL;
     }
   this->SetDefaultScalarsName(newScalars);
+
   if (!this->ChangeScalarsFilterTclName)
     {
     char tclName[256];
     sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
     this->SetChangeScalarsFilterTclName(tclName);
-      }
-  else
-    {
-    pvApp->BroadcastScript("%s Delete", this->ChangeScalarsFilterTclName);
+    // I don't know why we are not using "MakeTclObject".
+    pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
+                          this->ChangeScalarsFilterTclName);
+    pvApp->BroadcastScript("%s SetInput [%s GetInput]",
+                           this->ChangeScalarsFilterTclName,
+                           this->VTKSourceTclName);
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
+                           this->VTKSourceTclName,
+                           this->ChangeScalarsFilterTclName);
     }
-  pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
-                         this->ChangeScalarsFilterTclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetInput]",
-                         this->ChangeScalarsFilterTclName,
-                         this->VTKSourceTclName);
   pvApp->BroadcastScript("%s SetInputFieldToPointDataField",
                          this->ChangeScalarsFilterTclName);
   pvApp->BroadcastScript("%s SetOutputAttributeDataToPointData",
@@ -527,9 +530,6 @@ void vtkPVSource::ChangeScalars()
   pvApp->BroadcastScript("%s SetScalarComponent 0 %s 0",
                          this->ChangeScalarsFilterTclName,
                          this->DefaultScalarsName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-                         this->VTKSourceTclName,
-                         this->ChangeScalarsFilterTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -773,6 +773,12 @@ void vtkPVSource::AcceptCallback()
                                         methodAndArg);
     }
   
+  // Regenerate the data property page in case something has changed.
+  if (this->NumberOfPVOutputs > 0)
+    {
+    this->GetNthPVOutput(0)->UpdateProperties();
+    }
+
   this->Script("update");
   
 #ifdef _WIN32
@@ -1058,10 +1064,21 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
     this->PVInputs[idx] = pvd;
     }
 
+
   // Relay the change to the VTK objects.  
   // This is where we will need a SetCommand from the interface ...
-  pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
-			 pvd->GetVTKDataTclName());
+  if (this->ChangeScalarsFilterTclName && idx == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s",
+                           this->ChangeScalarsFilterTclName,
+                           pvd->GetVTKDataTclName());
+    }
+  else
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
+			   pvd->GetVTKDataTclName());
+    }
+
   
   this->Modified();
 }
