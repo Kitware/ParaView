@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.1");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.2");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -303,7 +303,7 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app,
 
   // Create the container frame
 
-  this->Script("frame %s -relief flat -bd 0 -highlightthickness	0 %s", 
+  this->Script("frame %s -relief flat -bd 0 -highlightthickness 0 %s", 
                this->GetWidgetName(), args ? args : "");
 
   // Create the canvas
@@ -1518,7 +1518,8 @@ void vtkKWParameterValueFunctionEditor::StartInteractionCallback(int x, int y)
   float c_x1, c_y1, c_x2, c_y2;
   int nb_points = this->GetFunctionSize();
 
-  for (int i = 0; i < nb_points; i++)
+  int i;
+  for (i = 0; i < nb_points; i++)
     {
     if (sscanf(this->Script("%s coords p%d", canv, i), 
                "%f %f %f %f", 
