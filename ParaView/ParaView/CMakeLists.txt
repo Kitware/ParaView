@@ -3,6 +3,7 @@ SET( ParaView_SRCS
   vtkBalancedRedistributePolyData.cxx
   vtkClientCompositeManager.cxx
   vtkColorByPart.cxx
+  vtkCompleteArrays.cxx
   vtkCompositeProp.cxx
   vtkExtractCTHPart.cxx
   vtkGroup.cxx

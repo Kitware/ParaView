@@ -130,7 +130,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.439");
+vtkCxxRevisionMacro(vtkPVWindow, "1.440");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2715,16 +2715,23 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
 
   if (geometryFileName)
     {
-    *file << "if {$numberOfProcs > 1} {\n";
-    *file << "\tvtkXMLPPolyDataWriter GeometryWriter\n";
-    *file << "\tGeometryWriter SetNumberOfPieces $numberOfProcs" << endl;
-    *file << "\tGeometryWriter SetStartPiece $myProcId\n";
-    *file << "\tGeometryWriter SetEndPiece $myProcId\n";
-    *file << "} else {\n";
-    *file << "\tvtkXMLPolyDataWriter GeometryWriter\n";
-    *file << "}\n";
-    *file << "GeometryWriter SetDataModeToBinary" << endl;
-    *file << "GeometryWriter EncodeAppendedDataOff" << endl;
+    //*file << "if {$numberOfProcs > 1} {\n";
+    //*file << "\tvtkXMLPPolyDataWriter GeometryWriter\n";
+    //*file << "\tGeometryWriter SetNumberOfPieces $numberOfProcs" << endl;
+    //*file << "\tGeometryWriter SetStartPiece $myProcId\n";
+    //*file << "\tGeometryWriter SetEndPiece $myProcId\n";
+    //*file << "} else {\n";
+    //*file << "\tvtkXMLPolyDataWriter GeometryWriter\n";
+    //*file << "}\n";
+    //*file << "GeometryWriter SetDataModeToBinary" << endl;
+    //*file << "GeometryWriter EncodeAppendedDataOff" << endl;
+    *file << "vtkCollectPolyData CollectionFilter\n";
+    *file << "vtkPolyData TempPolyData\n";
+    *file << "vtkXMLPolyDataWriter GeometryWriter\n";
+    *file << "\tGeometryWriter SetInput TempPolyData\n";
+    *file << "[CollectionFilter GetOutput] SetUpdateNumberOfPieces $numberOfProcs\n";
+    *file << "[CollectionFilter GetOutput] SetUpdatePiece $myProcId\n";
+
     }
 
   if (animationFlag)
@@ -2734,15 +2741,15 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     }
   else
     { // Just do one frame.
-    *file << "RenWin1 Render\n";
-    *file << "compManager Composite\n";
-    *file << "if {$myProcId == 0} {\n\t";
-    if ( extension && writerName)
+    if (imageFileName)
       {
-      *file << "ImageWriter SetFileName {" << imageFileName << "}\n\t";
-      *file << "ImageWriter Write\n";
+      *file << "RenWin1 Render\n";
+      *file << "compManager Composite\n";
+      *file << "if {$myProcId == 0} {\n";
+      *file << "\t" << "ImageWriter SetFileName {" << imageFileName << "}\n";
+      *file << "\t" << "ImageWriter Write\n";
+      *file << "}\n\n";
       }
-    *file << "}\n\n";
 
     if (geometryFileName)
       {
@@ -2833,13 +2840,21 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
           sprintf(fileName, "%s/%s%sP%d", 
                   filePath, fileRoot, sourceName, partIdx);
           }
-        *file << "GeometryWriter SetInput [" << part->GetGeometryTclName() << " GetOutput]\n";
-        *file << "if {$numberOfProcs > 1} {\n";
-        *file << "\tGeometryWriter SetFileName {" << fileName << ".Pvtp}\n";
-        *file << "} else {\n";
+        //*file << "GeometryWriter SetInput [" << part->GetGeometryTclName() << " GetOutput]\n";
+        //*file << "if {$numberOfProcs > 1} {\n";
+        //*file << "\tGeometryWriter SetFileName {" << fileName << ".pvtp}\n";
+        //*file << "} else {\n";
+        //*file << "\tGeometryWriter SetFileName {" << fileName << ".vtp}\n";
+        //*file << "}\n";
+        //*file << "GeometryWriter Write\n";
+
+        *file << "CollectionFilter SetInput [" << part->GetGeometryTclName() << " GetOutput]\n";
+        *file << "[CollectionFilter GetOutput] Update\n";
+        *file << "TempPolyData ShallowCopy [CollectionFilter GetOutput]\n";
+        *file << "if {$myProcId == 0} {\n";
         *file << "\tGeometryWriter SetFileName {" << fileName << ".vtp}\n";
+        *file << "\tGeometryWriter Write\n";
         *file << "}\n";
-        *file << "GeometryWriter Write\n";
         }
       }
     }
@@ -4189,7 +4204,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.439 $");
+  this->ExtractRevision(os,"$Revision: 1.440 $");
 }
 
 //-----------------------------------------------------------------------------

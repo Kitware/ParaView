@@ -57,6 +57,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVProcessModule.h"
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
+#include "vtkCompleteArrays.h"
 
 // We need to:
 // Format min/max/resolution entries better.
@@ -135,7 +136,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.46");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1511,9 +1512,14 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
 
   if (numPartitions > 1)
     {
+    // Protect agains empty root partition.
+    this->GetPVApplication()->GetProcessModule()->ServerScript(
+            "vtkCompleteArrays pvAnimCompleteArrays"); 
     // Writer has to be in tcl to connect to geometry filter. 
     this->GetPVApplication()->GetProcessModule()->ServerScript(
             "vtkXMLPPolyDataWriter pvAnimWriter; pvAnimWriter EncodeAppendedDataOff"); 
+    this->GetPVApplication()->GetProcessModule()->ServerScript(
+            "pvAnimWriter SetInput[pvAnimCompleteArrays GetOutput]"); 
     this->GetPVApplication()->GetProcessModule()->ServerScript(
             "pvAnimWriter SetNumberOfPieces %d; pvAnimWriter SetEndPiece [[$Application GetProcessModule] GetPartitionId]; pvAnimWriter SetStartPiece [[$Application GetProcessModule] GetPartitionId]", 
             this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions());
@@ -1581,10 +1587,20 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
                       fileRoot, sourceName, partIdx, timeCount);
               }
             }
-          this->GetPVApplication()->GetProcessModule()->ServerScript(
-                  "pvAnimWriter SetInput [%s GetInput]; pvAnimWriter SetFileName %s; pvAnimWriter Write", 
-                  part->GetPartDisplay()->GetMapperTclName(), fileName,
-                  this->GetPVApplication()->GetProcessModule()->GetPartitionId());
+          if (numPartitions > 1)
+            {
+            this->GetPVApplication()->GetProcessModule()->ServerScript(
+                    "pvAnimCompleteArrays SetInput [%s GetInput]; pvAnimWriter SetFileName %s; pvAnimWriter Write", 
+                    part->GetPartDisplay()->GetMapperTclName(), fileName,
+                    this->GetPVApplication()->GetProcessModule()->GetPartitionId());
+            }
+          else
+            {
+            this->GetPVApplication()->GetProcessModule()->ServerScript(
+                    "pvAnimWriter SetInput [%s GetInput]; pvAnimWriter SetFileName %s; pvAnimWriter Write", 
+                    part->GetPartDisplay()->GetMapperTclName(), fileName,
+                    this->GetPVApplication()->GetProcessModule()->GetPartitionId());
+            }  
           }
         }
       }
@@ -1632,12 +1648,12 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
     {
     *file << "set pvTime " << t << "\n";
     *file << this->GetScript() << endl;
-    *file << "RenWin1 Render\n";
-    *file << "compManager Composite\n";
-    *file << "if {$myProcId == 0} {\n\t";  
     sprintf(countStr, "%05d", (int)(timeIdx));
     if (imageFileName)
       {
+      *file << "RenWin1 Render\n";
+      *file << "compManager Composite\n";
+      *file << "if {$myProcId == 0} {\n";  
       root = new char[strlen(imageFileName)+1];
       strcpy(root, imageFileName);
       ext = NULL;
@@ -1654,17 +1670,17 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
         {
         *ext = '\0';
         ++ext;
-        *file << "ImageWriter SetFileName {" << root << countStr
-              << "." << ext << "}\n\t";
+        *file << "\t" << "ImageWriter SetFileName {" << root << countStr
+              << "." << ext << "}\n";
         }
       else
         {
-        *file << "ImageWriter SetFileName {" << root << countStr << "}\n\t";
+        *file << "\t" << "ImageWriter SetFileName {" << root << countStr << "}\n";
         }
-      *file << "ImageWriter Write\n";
+      *file << "\t" << "ImageWriter Write\n";
+      *file << "}\n";
       delete [] root;
       }
-    *file << "}\n";
     if (geometryFileName)
       {
       this->GetWindow()->SaveGeometryInBatchFile(file, 
@@ -1672,7 +1688,6 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
                                                  timeIdx);
       }
     *file << endl;
-
     ++timeIdx;
     t = t + this->TimeStep;
     // Do not let numerical issues keep us from getting the last sample.
