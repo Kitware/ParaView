@@ -108,6 +108,11 @@ ENDIF (WIN32)
 VTK_WRAP_TCL2(vtkKWCommonTCL KWCommonTCL_SRCS ${KWCommon_SRCS})
 ADD_LIBRARY(vtkKWCommonTCL ${KWCommonTCL_SRCS} ${KWCommon_SRCS})
 
+IF(KWSYS_NAMESPACE)
+  # Link to the kwsys library if the parent project configures it.
+  TARGET_LINK_LIBRARIES (vtkKWCommonTCL ${KWSYS_NAMESPACE})
+ENDIF(KWSYS_NAMESPACE)
+
 TARGET_LINK_LIBRARIES (vtkKWCommonTCL
 vtkImagingTCL 
 vtkGraphicsTCL 

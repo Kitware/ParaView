@@ -209,6 +209,27 @@ IF(NOT PARAVIEW_NO_HDF5)
   ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 ENDIF(NOT PARAVIEW_NO_HDF5)
 
+#-----------------------------------------------------------------------------
+# Tell the KW components where to install their libraries.
+SET(KW_INSTALL_LIB_DIR /lib/paraview-${PARAVIEW_VERSION})
+
+#-----------------------------------------------------------------------------
+# Create the kwsys library for KWCommon.
+IF (PARAVIEW_CAN_BUILD)
+  SET(KWSYS_NAMESPACE kwsys)
+  SET(KWSYS_USE_Process 1)
+  SET(KWSYS_HEADER_ROOT ${PARAVIEW_BINARY_DIR}/KWCommon)
+  IF(BUILD_SHARED_LIBS)
+    SET(KWSYS_LIBRARY_INSTALL_DIR ${KW_INSTALL_LIB_DIR})
+  ENDIF(BUILD_SHARED_LIBS)
+  IF(NOT VTK_USE_ANSI_STDLIB)
+    SET(KWSYS_FORCE_OLD_STREAMS 1)
+  ENDIF(NOT VTK_USE_ANSI_STDLIB)
+  SUBDIRS(KWCommon/kwsys)
+ENDIF (PARAVIEW_CAN_BUILD)
+
+#-----------------------------------------------------------------------------
+
 IF (PARAVIEW_CAN_BUILD)
 
  SET (KWWIDGETS_SOURCE_DIR ${PARAVIEW_SOURCE_DIR}/Widgets)
@@ -254,6 +275,7 @@ IF (PARAVIEW_CAN_BUILD)
 
  INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}
                      ${PARAVIEW_SOURCE_DIR}/KWCommon
+                     ${PARAVIEW_BINARY_DIR}/KWCommon
                      ${PARAVIEW_SOURCE_DIR}/Widgets
                      ${PARAVIEW_SOURCE_DIR}/ClientServer
                      ${PARAVIEW_BINARY_DIR}/ClientServer
@@ -293,7 +315,3 @@ ENDIF(BUILD_TESTING)
  INSTALL_FILES(/share/paraview-${PARAVIEW_VERSION}/Data .vtk Data/Data/blow)
 
 ENDIF (PARAVIEW_CAN_BUILD)
-
-# Tell the KW components where to install their libraries.
-SET(KW_INSTALL_LIB_DIR /lib/paraview-${PARAVIEW_VERSION})
-
