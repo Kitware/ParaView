@@ -1581,10 +1581,11 @@ void vtkPVRenderView::SetupCameraManipulators()
   vtkPVInteractorStyleControl *iscontrol2D = this->GetManipulatorControl2D();
 
   iscontrol3D->SetCurrentManipulator(0, 0, "Rotate");
-  iscontrol3D->SetCurrentManipulator(0, 1, "Roll");
   iscontrol3D->SetCurrentManipulator(1, 0, "Pan");
-  iscontrol3D->SetCurrentManipulator(2, 1, "Pan");
   iscontrol3D->SetCurrentManipulator(2, 0, "Zoom");
+  iscontrol3D->SetCurrentManipulator(0, 1, "Roll");
+  iscontrol3D->SetCurrentManipulator(1, 1, "Center");
+  iscontrol3D->SetCurrentManipulator(2, 1, "Pan");
   iscontrol3D->SetCurrentManipulator(0, 2, "FlyIn");
   iscontrol3D->SetCurrentManipulator(2, 2, "FlyOut");
   iscontrol3D->SetDefaultManipulator("Rotate");

@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVInteractorStyle.h"
+#include "vtkPVPushButton.h"
 #include "vtkPVScale.h"
 #include "vtkPVWidget.h"
 #include "vtkString.h"
@@ -227,6 +228,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     return;
     }
   vtkPVScale* scale = vtkPVScale::SafeDownCast(widget);
+  vtkPVPushButton* pushButton = vtkPVPushButton::SafeDownCast(widget);
   const char* value = 0;
   if ( scale )
     {
@@ -234,6 +236,10 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     str << "[ " << scale->GetTclName() << " GetValue ]" << ends;
     value = vtkString::Duplicate(str.str());
     str.rdbuf()->freeze(0);
+    }
+  else if ( pushButton )
+    {
+    value = vtkString::Duplicate("");
     }
   else
     {
@@ -286,10 +292,13 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
 
   if ( found )
     {
-    const char* val = this->Application->EvaluateString("%s", value);
-    char *rname = vtkString::Append("Manipulator", name);
-    this->Application->SetRegisteryValue(2, "RunTime", rname, val);
-    delete[] rname;
+    if ( vtkString::Length(value) > 0 )
+      {
+      const char* val = this->Application->EvaluateString("%s", value);
+      char *rname = vtkString::Append("Manipulator", name);      
+      this->Application->SetRegisteryValue(2, "RunTime", rname, val);
+      delete[] rname;
+      }
     }
   delete [] value;
 }

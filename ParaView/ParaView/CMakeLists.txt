@@ -50,9 +50,11 @@ vtkPVLineWidget.cxx
 vtkPVMinMax.cxx
 vtkPVNavigationWindow.cxx
 vtkPVObjectWidget.cxx
+vtkPVPivotManipulator.cxx
 vtkPVPlaneWidget.cxx
 vtkPVPointWidget.cxx
 vtkPVProbe.cxx
+vtkPVPushButton.cxx
 vtkPVReaderModule.cxx
 vtkPVRenderView.cxx 
 vtkPVScalarRangeLabel.cxx 
