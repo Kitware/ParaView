@@ -153,11 +153,13 @@ public:
   // Description:
   // Convenience method to set the visibility of all annotations.
   virtual void SetAnnotationsVisibility(int v);
+  vtkBooleanMacro(AnnotationsVisibility, int);
 
   // Description:
   // Get and control the corner annotation.
   virtual void SetCornerAnnotationVisibility(int v);
   virtual int  GetCornerAnnotationVisibility();
+  vtkBooleanMacro(CornerAnnotationVisibility, int);
   virtual void SetCornerAnnotationColor(float r, float g, float b);
   virtual void SetCornerAnnotationColor(float *rgb)
     { this->SetCornerAnnotationColor(rgb[0], rgb[1], rgb[2]); };
@@ -168,6 +170,7 @@ public:
   // Get and control the header annotation.
   virtual void SetHeaderAnnotationVisibility(int v);
   virtual int  GetHeaderAnnotationVisibility();
+  vtkBooleanMacro(HeaderAnnotationVisibility, int);
   virtual void SetHeaderAnnotationColor(float r, float g, float b);
   virtual void SetHeaderAnnotationColor(float *rgb)
     { this->SetHeaderAnnotationColor(rgb[0], rgb[1], rgb[2]); };
