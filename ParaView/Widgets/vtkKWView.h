@@ -375,7 +375,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   vtkKWWidget *ControlFrame;
   vtkKWComposite *SelectedComposite;
 
-  vtkKWWidget            *AnnotationProperties;
+  vtkKWFrame             *AnnotationProperties;
 
   vtkKWGenericComposite  *HeaderComposite;
   vtkKWLabeledFrame      *HeaderFrame;

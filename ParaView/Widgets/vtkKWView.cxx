@@ -82,7 +82,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 #include "vtkXOpenGLRenderWindow.h"
 
-vtkCxxRevisionMacro(vtkKWView, "1.76");
+vtkCxxRevisionMacro(vtkKWView, "1.77");
 
 int vtkKWViewFoundMatch;
 
@@ -152,21 +152,14 @@ vtkKWView::vtkKWView()
   this->SharedPropertiesParent = 0;
   this->Notebook = vtkKWNotebook::New();
 
-  this->AnnotationProperties = vtkKWWidget::New();
+  this->AnnotationProperties = vtkKWFrame::New();
   this->HeaderFrame = vtkKWLabeledFrame::New();
-  this->HeaderFrame->SetParent( this->AnnotationProperties );
   this->HeaderDisplayFrame = vtkKWWidget::New();
-  this->HeaderDisplayFrame->SetParent(this->HeaderFrame->GetFrame());
   this->HeaderEntryFrame = vtkKWWidget::New();
-  this->HeaderEntryFrame->SetParent(this->HeaderFrame->GetFrame());
   this->HeaderButton = vtkKWCheckButton::New();
-  this->HeaderButton->SetParent(this->HeaderDisplayFrame);
   this->HeaderColor = vtkKWChangeColorButton::New();
-  this->HeaderColor->SetParent(this->HeaderDisplayFrame);
   this->HeaderLabel = vtkKWWidget::New();
-  this->HeaderLabel->SetParent(this->HeaderEntryFrame);
   this->HeaderEntry = vtkKWEntry::New();
-  this->HeaderEntry->SetParent(this->HeaderEntryFrame);
   this->HeaderMapper = vtkTextMapper::New();
   this->HeaderMapper->SetJustificationToCentered();
   this->HeaderMapper->SetVerticalJustificationToTop();
@@ -183,8 +176,6 @@ vtkKWView::vtkKWView()
   this->HeaderComposite->SetProp(this->HeaderProp);
 
   this->CornerAnnotation = vtkKWCornerAnnotation::New();
-  this->CornerAnnotation->SetParent(this->AnnotationProperties);
-  this->CornerAnnotation->SetView(this);
   
   this->PropertiesCreated = 0;
   this->InteractiveUpdateRate = 5.0;
@@ -199,9 +190,7 @@ vtkKWView::vtkKWView()
   this->GeneralProperties = vtkKWFrame::New();
 
   this->BackgroundFrame = vtkKWLabeledFrame::New();
-  this->BackgroundFrame->SetParent( this->GeneralProperties );
   this->BackgroundColor = vtkKWChangeColorButton::New();
-  this->BackgroundColor->SetParent( this->BackgroundFrame->GetFrame() );
 
   this->Printing = 0;
   
@@ -488,9 +477,8 @@ void vtkKWView::CreateViewProperties()
     "Annotate", "Set the header and corner annotation", ico);
   ico->Delete();
   
-  this->AnnotationProperties->SetParent
-    (this->Notebook->GetFrame("Annotate"));
-  this->AnnotationProperties->Create(app,"frame","");
+  this->AnnotationProperties->SetParent(this->Notebook->GetFrame("Annotate"));
+  this->AnnotationProperties->Create(app,1);
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
@@ -498,9 +486,12 @@ void vtkKWView::CreateViewProperties()
   this->Notebook->Raise("Annotate");
   
   // create the anno widgets
+  this->HeaderFrame->SetParent( this->AnnotationProperties->GetParent() );  
   this->HeaderFrame->Create(app);
   this->HeaderFrame->SetLabel("Header Annotation");
+  this->HeaderDisplayFrame->SetParent(this->HeaderFrame->GetFrame());
   this->HeaderDisplayFrame->Create(app,"frame","");
+  this->HeaderEntryFrame->SetParent(this->HeaderFrame->GetFrame());
   this->HeaderEntryFrame->Create(app,"frame","");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->HeaderFrame->GetWidgetName());
@@ -508,10 +499,12 @@ void vtkKWView::CreateViewProperties()
                this->HeaderDisplayFrame->GetWidgetName(),
                this->HeaderEntryFrame->GetWidgetName());
 
+  this->HeaderButton->SetParent(this->HeaderDisplayFrame);
   this->HeaderButton->Create(this->Application,
                              "-text {Display Header Annotation}");
   this->HeaderButton->SetBalloonHelpString("Toggle the visibility of the header text");
   this->HeaderButton->SetCommand(this, "OnDisplayHeader");
+  this->HeaderColor->SetParent(this->HeaderDisplayFrame);
   this->HeaderColor->Create(this->Application, "");
   this->HeaderColor->SetCommand( this, "SetHeaderTextColor" );
   this->HeaderColor->SetBalloonHelpJustificationToRight();
@@ -520,8 +513,10 @@ void vtkKWView::CreateViewProperties()
                this->HeaderButton->GetWidgetName());
   this->Script("pack %s -side right -padx 2 -pady 4 -anchor ne",
                this->HeaderColor->GetWidgetName());
+  this->HeaderLabel->SetParent(this->HeaderEntryFrame);
   this->HeaderLabel->Create(app,"label","-text Header:");
   this->HeaderLabel->SetBalloonHelpString("Set the header text string");
+  this->HeaderEntry->SetParent(this->HeaderEntryFrame);
   this->HeaderEntry->Create(app,"-width 20");
   this->Script("bind %s <Return> {%s HeaderChanged}",
                this->HeaderEntry->GetWidgetName(),this->GetTclName());
@@ -530,6 +525,8 @@ void vtkKWView::CreateViewProperties()
   this->Script("pack %s -side left -anchor w -padx 4 -expand yes -fill x",
                this->HeaderEntry->GetWidgetName());
 
+  this->CornerAnnotation->SetParent(this->AnnotationProperties->GetFrame());
+  this->CornerAnnotation->SetView(this);
   this->CornerAnnotation->Create(app);
   this->CornerAnnotation->SetLabel("Corner Annotation");
   this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
@@ -543,12 +540,14 @@ void vtkKWView::CreateViewProperties()
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
                this->GeneralProperties->GetWidgetName());  
 
+  this->BackgroundFrame->SetParent( this->GeneralProperties->GetFrame() );
   this->BackgroundFrame->Create( app );
   this->BackgroundFrame->SetLabel("Background");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->BackgroundFrame->GetWidgetName());
 
   float c[3];  c[0] = 0.0;  c[1] = 0.0;  c[2] = 0.0;
+  this->BackgroundColor->SetParent( this->BackgroundFrame->GetFrame() );
   this->BackgroundColor->SetColor( c );
   this->BackgroundColor->Create( app, "" );
   this->BackgroundColor->SetCommand( this, "SetBackgroundColor" );
@@ -1375,7 +1374,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.76 $");
+  this->ExtractRevision(os,"$Revision: 1.77 $");
 }
 
 //----------------------------------------------------------------------------
