@@ -1,3 +1,5 @@
+Application ExitOnReturnOn
+
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
@@ -37,7 +39,7 @@ $normalsOutput SetVisibility 0
 
 
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
-$pvWindow SetCurrentPVSource $pvWarp
+$pvWindow SetCurrentPVSourceCallback $pvWarp
 
 set camera [Ren1 GetActiveCamera]
 $camera SetPosition 143.632 4.67034 -39.8384

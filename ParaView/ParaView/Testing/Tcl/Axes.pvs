@@ -1,3 +1,5 @@
+Application ExitOnReturnOn
+
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
@@ -24,8 +26,8 @@ $pv(vtkTemp188) SetState 1
 $pv(vtkTemp168) AcceptCallback
 [$pv(vtkTemp168) GetPVOutput 0] SetLineWidth 3
 $pv(vtkTemp1) ResetCameraCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
-$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp98)
+$pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
 # Position the camera
 set camera [Ren1 GetActiveCamera]
@@ -34,6 +36,18 @@ $camera SetFocalPoint 0.190213 2.17507 -0.136077
 $camera SetViewUp 0.252184 0.506968 -0.824249
 $camera SetViewAngle 30
 $camera SetClippingRange 8.34501 19.084
+
+# Retracing produces wrong image for some reason
+# Retrace
+#update
+#Application StopRecordingScript
+#[ Application GetMainWindow ] DeleteAllSources
+# Source the trace to regenerate the sources.
+#if {[catch {set channel [open test.tmp w]}] == 0 } {
+#   close $channel
+#   file delete -force test.tmp
+#   source "ParaViewTrace.pvs"
+#}
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300
