@@ -381,9 +381,10 @@ void vtkPVPlaneWidget::SaveInTclScript(ofstream *file)
 void vtkPVPlaneWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "CenterEntry: " << this->GetCenterEntry() << endl;
-  os << indent << "NormalEntry: " << this->GetNormalEntry() << endl;
-  os << indent << "PlaneTclName: " << this->GetPlaneTclName() << endl;
+  os << indent << "CenterEntry: " << this->CenterEntry << endl;
+  os << indent << "NormalEntry: " << this->NormalEntry << endl;
+  os << indent << "PlaneTclName: " 
+     << (this->PlaneTclName?this->PlaneTclName:"none") << endl;
 }
 
 vtkPVPlaneWidget* vtkPVPlaneWidget::ClonePrototype(vtkPVSource* pvSource,

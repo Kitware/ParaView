@@ -733,5 +733,5 @@ void vtkPVWizard::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Data: " << this->GetData() << endl;
-  os << indent << "String: " << this->GetString() << endl;
+  os << indent << "String: " << (this->String?this->String:"none") << endl;
 }

@@ -223,7 +223,8 @@ void vtkPVSphereWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "CenterEntry: " << this->GetCenterEntry() << endl;
   os << indent << "RadiusEntry: " << this->GetRadiusEntry() << endl;
-  os << indent << "SphereTclName: " << this->GetSphereTclName() << endl;
+  os << indent << "SphereTclName: " 
+     << (this->SphereTclName?this->SphereTclName:"none") << endl;
 }
 
 vtkPVSphereWidget* vtkPVSphereWidget::ClonePrototype(vtkPVSource* pvSource,

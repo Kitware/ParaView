@@ -434,7 +434,7 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "DataType: " << this->GetDataType() << endl;
   os << indent << "Entries: " << this->GetEntries() << endl;
-  os << indent << "ScriptValue: " << this->GetScriptValue() << endl;
+  os << indent << "ScriptValue: " << (this->ScriptValue?this->ScriptValue:"none") << endl;
   os << indent << "SubLabels: " << this->GetSubLabels() << endl;
   os << indent << "LabelWidget: " << this->LabelWidget << endl;
   os << indent << "ReadOnly: " << this->ReadOnly << endl;

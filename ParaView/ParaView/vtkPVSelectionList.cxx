@@ -231,14 +231,6 @@ void vtkPVSelectionList::SelectCallback(const char *name, int value)
   this->ModifiedCallback();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVSelectionList::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "CurrentName: " << this->GetCurrentName() << endl;
-  os << indent << "CurrentValue: " << this->GetCurrentValue() << endl;
-}
-
 vtkPVSelectionList* vtkPVSelectionList::ClonePrototype(vtkPVSource* pvSource,
 				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -315,4 +307,12 @@ int vtkPVSelectionList::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "CurrentName: " << (this->CurrentName?this->CurrentName:"none") << endl;
+  os << indent << "CurrentValue: " << this->CurrentValue << endl;
 }
