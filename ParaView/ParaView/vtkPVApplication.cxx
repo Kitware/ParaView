@@ -120,7 +120,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.5");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.6");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -217,6 +217,7 @@ public:
         if ( error )
           {
           win->ErrorMessage(buffer);
+          this->ErrorOccurred = 1;
           }
         else 
           {
@@ -226,10 +227,11 @@ public:
         }
       }
   }
-
+  
   vtkPVOutputWindow()
   {
     this->Windows = 0;
+    this->ErrorOccurred = 0;
   }
   
   void SetWindowCollection(vtkKWWindowCollection *windows)
@@ -237,9 +239,13 @@ public:
     this->Windows = windows;
   }
 
+  int GetErrorOccurred()
+    {
+    return this->ErrorOccurred;
+    }
 protected:
   vtkKWWindowCollection *Windows;
-
+  int ErrorOccurred;
 private:
   vtkPVOutputWindow(const vtkPVOutputWindow&);
   void operator=(const vtkPVOutputWindow&);
@@ -1403,6 +1409,17 @@ void vtkPVApplication::Exit()
   if (this->InExit)
     {
     return;
+    }
+  
+  // If errors were reported to the output window, return a bad
+  // status.
+  if(vtkPVOutputWindow* w =
+     vtkPVOutputWindow::SafeDownCast(vtkOutputWindow::GetInstance()))
+    {
+    if(w->GetErrorOccurred())
+      {
+      this->SetExitStatus(1);
+      }
     }
   
   // Remove the ParaView output window so errors during exit will
