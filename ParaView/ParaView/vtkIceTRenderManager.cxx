@@ -17,6 +17,7 @@
  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 ----------------------------------------------------------------------------*/
 
+#include "vtkMath.h"
 #include "vtkIceTRenderManager.h"
 #include "vtkIceTRenderer.h"
 #include "vtkPKdTree.h"
@@ -45,7 +46,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.12");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.13");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -575,11 +576,14 @@ void vtkIceTRenderManager::PreRenderProcessing()
     int tileIdx = this->Controller->GetLocalProcessId();
     y = tileIdx/this->NumTilesX;
     x = tileIdx - y*this->NumTilesX;
+    y = this->NumTilesY-y-1;
     // Setup the camera for this tile.
     cam->SetWindowCenter(1.0-(double)(this->NumTilesX) + 2.0*(double)x,
                          1.0-(double)(this->NumTilesY) + 2.0*(double)y);
-
-
+    // Try to match IceT's view angle calculation.
+    double angle = cam->GetViewAngle() * vtkMath::DoublePi()/180.0;
+    angle = 2.0*atan(tan(angle/2.0)/(double)(this->NumTilesY));
+    cam->SetViewAngle(angle * 180.0/vtkMath::DoublePi());
     return;
     }
   else
