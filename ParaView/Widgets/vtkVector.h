@@ -50,6 +50,8 @@ template <class DType>
 class vtkVector : public vtkAbstractList<DType>
 {
 public:
+  vtkContainerTypeMacro(vtkVector<DType>, vtkAbstractList<DType>);
+  
   static vtkVector<DType> *New() { return new vtkVector<DType>(); }  
   
   // Description:
