@@ -139,7 +139,8 @@ protected:
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
 
   // Description:
-  // Fills the values of the vector using Command.
+  // If InformationOnly is set, uses the Command to get values
+  // from the server and assign them to the property.
   virtual void UpdateInformation(int serverids, vtkClientServerID objectId);
 //ETX
 

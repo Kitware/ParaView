@@ -114,6 +114,8 @@ public:
   void SaveState(const char* filename);
 
   // Description:
+  // Given a group name, create prototypes and store them
+  // in a instance group called groupName_prototypes.
   void InstantiateGroupPrototypes(const char* groupName);
 
 protected:

@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.17");
+vtkCxxRevisionMacro(vtkSMProperty, "1.18");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 
@@ -45,7 +45,6 @@ vtkSMProperty::vtkSMProperty()
   this->UpdateSelf = 0;
   this->PInternals = new vtkSMPropertyInternals;
   this->XMLName = 0;
-  this->IsReadOnly = 0;
   this->DomainIterator = vtkSMDomainIterator::New();
   this->DomainIterator->SetProperty(this);
   this->Proxy = 0;
@@ -219,7 +218,7 @@ void vtkSMProperty::RemoveSubProperty(const char* name)
 void vtkSMProperty::AppendCommandToStream(
   vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (!this->Command || this->IsReadOnly)
+  if (!this->Command || this->InformationOnly)
     {
     return;
     }
@@ -271,13 +270,6 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if(retVal) 
     { 
     this->SetUpdateSelf(update_self); 
-    }
-
-  int read_only;
-  retVal = element->GetScalarAttribute("read_only", &read_only);
-  if(retVal) 
-    { 
-    this->SetIsReadOnly(read_only); 
     }
 
   int information_only;
@@ -363,7 +355,7 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
      << (this->Command ? this->Command : "(null)") << endl;
   os << indent << "ImmediateUpdate:" << this->ImmediateUpdate << endl;
   os << indent << "UpdateSelf:" << this->UpdateSelf << endl;
-  os << indent << "IsReadOnly:" << this->IsReadOnly << endl;
+  os << indent << "InformationOnly:" << this->InformationOnly << endl;
   os << indent << "XMLName:" 
      <<  (this->XMLName ? this->XMLName : "(null)") << endl;
 

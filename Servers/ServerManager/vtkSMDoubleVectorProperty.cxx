@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.19");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.20");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -48,7 +48,7 @@ vtkSMDoubleVectorProperty::~vtkSMDoubleVectorProperty()
 void vtkSMDoubleVectorProperty::AppendCommandToStream(
   vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (!this->Command || this->IsReadOnly)
+  if (!this->Command || this->InformationOnly)
     {
     return;
     }
@@ -124,7 +124,9 @@ void vtkSMDoubleVectorProperty::UpdateInformation(
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
 
-  const vtkClientServerStream& res = pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT);
+  const vtkClientServerStream& res =     
+    pm->GetLastResult(vtkProcessModule::GetRootId(serverIds));
+
 
   int numMsgs = res.GetNumberOfMessages();
   if (numMsgs < 1)
@@ -249,11 +251,6 @@ void vtkSMDoubleVectorProperty::SetUncheckedElement(
 //---------------------------------------------------------------------------
 int vtkSMDoubleVectorProperty::SetElement(unsigned int idx, double value)
 {
-  if (this->IsReadOnly)
-    {
-    return 0;
-    }
-
   if ( vtkSMProperty::GetCheckDomains() )
     {
     int numArgs = this->GetNumberOfElements();
@@ -316,11 +313,6 @@ int vtkSMDoubleVectorProperty::SetElements4(
 //---------------------------------------------------------------------------
 int vtkSMDoubleVectorProperty::SetElements(const double* values)
 {
-  if (this->IsReadOnly)
-    {
-    return 0;
-    }
-
   int numArgs = this->GetNumberOfElements();
 
   if ( vtkSMProperty::GetCheckDomains() )

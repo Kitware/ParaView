@@ -77,11 +77,6 @@ public:
   vtkGetMacro(UpdateSelf, int);
 
   // Description:
-  // Advanced. When IsReadOnly is true, the value(s) of the property
-  // cannot be changed.
-  vtkGetMacro(IsReadOnly, int);
-
-  // Description:
   // Returns a sub-property with the given name. If the sub-property
   // does not exist, NULL is returned.
   vtkSMProperty* GetSubProperty(const char* name);
@@ -134,6 +129,11 @@ public:
   // The name assigned by the xml parser. Used to get the property
   // from a proxy.
   vtkGetStringMacro(XMLName);
+
+  // Description:
+  // Is InformationOnly is set to true, this property is used to
+  // get information from server instead of setting values.
+  vtkGetMacro(InformationOnly, int);
 
 protected:
   vtkSMProperty();
@@ -193,11 +193,6 @@ protected:
   void RemoveSubProperty(const char* name);
 
   // Description:
-  // Advanced. When IsReadOnly is true, the value(s) of the property
-  // cannot be changed.
-  vtkSetMacro(IsReadOnly, int);
-
-  // Description:
   // Internal. Used during XML parsing to get a property with
   // given name. Used by the domains when setting required properties.
   vtkSMProperty* NewProperty(const char* name);
@@ -221,7 +216,6 @@ protected:
 
   int ImmediateUpdate;
   int UpdateSelf;
-  int IsReadOnly;
 
   char* XMLName;
 
@@ -235,7 +229,6 @@ protected:
   void SetProxy(vtkSMProxy* proxy);
 
   vtkSetMacro(InformationOnly, int);
-  vtkGetMacro(InformationOnly, int);
   int InformationOnly;
 
 private:

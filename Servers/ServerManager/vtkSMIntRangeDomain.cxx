@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.8");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.9");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -294,7 +294,7 @@ int vtkSMIntRangeDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement*
 void vtkSMIntRangeDomain::Update(vtkSMProperty* prop)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
-  if (ivp)
+  if (ivp && ivp->GetInformationOnly())
     {
     this->RemoveAllMinima();
     this->RemoveAllMaxima();

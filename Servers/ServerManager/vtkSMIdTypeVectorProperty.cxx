@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.3");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.4");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
@@ -46,7 +46,7 @@ vtkSMIdTypeVectorProperty::~vtkSMIdTypeVectorProperty()
 void vtkSMIdTypeVectorProperty::AppendCommandToStream(
   vtkSMProxy*, vtkClientServerStream* str, vtkClientServerID objectId )
 {
-  if (!this->Command || this->IsReadOnly)
+  if (!this->Command || this->InformationOnly)
     {
     return;
     }
@@ -150,11 +150,6 @@ void vtkSMIdTypeVectorProperty::SetUncheckedElement(
 //---------------------------------------------------------------------------
 int vtkSMIdTypeVectorProperty::SetElement(unsigned int idx, vtkIdType value)
 {
-  if (this->IsReadOnly)
-    {
-    return 0;
-    }
-
   if ( vtkSMProperty::GetCheckDomains() )
     {
     int numArgs = this->GetNumberOfElements();
@@ -207,11 +202,6 @@ int vtkSMIdTypeVectorProperty::SetElements3(vtkIdType value0,
 //---------------------------------------------------------------------------
 int vtkSMIdTypeVectorProperty::SetElements(const vtkIdType* values)
 {
-  if (this->IsReadOnly)
-    {
-    return 0;
-    }
-
   int numArgs = this->GetNumberOfElements();
 
   if ( vtkSMProperty::GetCheckDomains() )

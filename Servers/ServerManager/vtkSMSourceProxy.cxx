@@ -33,7 +33,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.16");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.17");
 
 struct vtkSMSourceProxyInternals
 {
@@ -345,7 +345,6 @@ void vtkSMSourceProxy::UpdateDataInformation()
 void vtkSMSourceProxy::ConvertDataInformationToProperty(
   vtkPVDataInformation* info, vtkSMProperty* prop)
 {
-  prop->SetIsReadOnly(0);
   vtkSMIdTypeVectorProperty* numId = vtkSMIdTypeVectorProperty::SafeDownCast(
     prop->GetSubProperty("NumberOfPoints"));
   if (!numId)
@@ -435,7 +434,7 @@ void vtkSMSourceProxy::ConvertDataInformationToProperty(
   this->ConvertFieldDataInformationToProperty(
     info->GetCellDataInformation(), cd);
 
-  prop->SetIsReadOnly(1);
+  prop->SetInformationOnly(1);
 }
 
 //---------------------------------------------------------------------------
@@ -487,8 +486,6 @@ void vtkSMSourceProxy::ConvertFieldDataInformationToProperty(
 void vtkSMSourceProxy::ConvertArrayInformationToProperty(
   vtkPVArrayInformation* info, vtkSMProperty* prop)
 {
-  prop->SetIsReadOnly(0);
-
   vtkSMIntVectorProperty* num = vtkSMIntVectorProperty::SafeDownCast(
     prop->GetSubProperty("DataType"));
   if (!num)
@@ -531,7 +528,7 @@ void vtkSMSourceProxy::ConvertArrayInformationToProperty(
     dnum->SetElement(2*i+1, range[1]);
     }
 
-  prop->SetIsReadOnly(1);
+  prop->SetInformationOnly(1);
 }
 
 //---------------------------------------------------------------------------
