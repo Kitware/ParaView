@@ -140,7 +140,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.664");
+vtkCxxRevisionMacro(vtkPVWindow, "1.665");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3324,7 +3324,8 @@ void vtkPVWindow::SaveState(const char* filename)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateSourceMenu()
 {
-  if ( this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+  if ( (this->AnimationInterface && this->AnimationInterface->GetInPlay() ) 
+    || (this->AnimationManager && this->AnimationManager->GetInPlay()))
     {
     return;
     }
@@ -3415,7 +3416,8 @@ void vtkPVWindow::UpdateSourceMenu()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateFilterMenu()
 {
-  if ( this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+  if ( (this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+    || (this->AnimationManager && this->AnimationManager->GetInPlay()))
     {
     return;
     }
@@ -3703,7 +3705,8 @@ void vtkPVWindow::ResetCameraCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateSelectMenu()
 {
-  if ( this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+  if ( (this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+    || (this->AnimationManager && this->AnimationManager->GetInPlay()))
     {
     return;
     }
