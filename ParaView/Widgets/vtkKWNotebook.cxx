@@ -216,17 +216,23 @@ void vtkKWNotebook::Raise(int num)
 		   this->Buttons[this->Current]->GetWidgetName(),
 		   this->ForeColor, this->ForeColor,
 		   this->ForeColor);
-      this->Script("%s configure -bg %s",
-		   this->Icons[this->Current]->GetWidgetName(),
-		   this->ForeColor);
+      if ( this->Icons[this->Current] )
+	{
+	this->Script("%s configure -bg %s",
+		     this->Icons[this->Current]->GetWidgetName(),
+		     this->ForeColor);
+	}
       }
     this->Script("pack %s -fill both -anchor n",
                  this->Frames[num]->GetWidgetName());
     this->Script("%s configure -disabledforeground black -state disabled"
 		 " -bg %s -height 1",
 		 this->Buttons[num]->GetWidgetName(), this->BackColor);
-    this->Script("%s configure -bg %s",
-		 this->Icons[num]->GetWidgetName(), this->BackColor);
+    if ( this->Icons[num] )
+      {
+      this->Script("%s configure -bg %s",
+		   this->Icons[num]->GetWidgetName(), this->BackColor);
+      }
     this->Script("focus %s", this->Frames[num]->GetWidgetName());
     }
 
