@@ -126,6 +126,7 @@ SET( ParaViewClient_SRCS
   vtkPVSource.cxx
   vtkPVSourceCollection.cxx
   vtkPVSourceList.cxx
+  vtkPVSourceNotebook.cxx
   vtkPVSourceWidget.cxx
   vtkPVSourcesNavigationWindow.cxx
   vtkPVSphereWidget.cxx

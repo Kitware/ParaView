@@ -37,6 +37,7 @@
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
+#include "vtkPVSourceNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
@@ -53,7 +54,6 @@
 #include "vtkPVCameraIcon.h"
 #include "vtkPVCompositeRenderModule.h"
 #include "vtkPVConfig.h"
-#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyleControl.h"
@@ -79,7 +79,6 @@
 #include "vtkToolkits.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkClientServerStream.h"
-#include "vtkPVInformationGUI.h"
 #include "vtkPVOptions.h"
 
 
@@ -137,7 +136,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.342");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.343");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -231,8 +230,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->TimerToken = NULL;
 
   this->SourceNotebook = 0;
-  this->DisplayGUI = 0;
-  this->InformationGUI = 0;
 }
 
 
@@ -480,18 +477,6 @@ vtkPVRenderView::~vtkPVRenderView()
     this->SourceNotebook->SetParent(0);
     this->SourceNotebook->Delete();
     this->SourceNotebook = 0;
-    }
-  if (this->DisplayGUI)
-    {
-    this->DisplayGUI->SetParent(0);
-    this->DisplayGUI->Delete();
-    this->DisplayGUI = 0;
-    }
-  if (this->InformationGUI)
-    {
-    this->InformationGUI->SetParent(0);
-    this->InformationGUI->Delete();
-    this->InformationGUI = 0;
     }
 }
 
@@ -820,13 +805,9 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // This is created in this object only because the GetSourceParent method.
   // These should be create in application or window.
-  this->SourceNotebook = vtkKWNotebook::New();
-  this->SourceNotebook->AlwaysShowTabsOn();
+  this->SourceNotebook = vtkPVSourceNotebook::New();
   this->SourceNotebook->SetParent(this->GetSourceParent());
   this->SourceNotebook->Create(app,"");
-  this->SourceNotebook->AddPage("Parameters");
-  this->SourceNotebook->AddPage("Display");
-  this->SourceNotebook->AddPage("Information");
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->SourceNotebook->GetWidgetName());
 
@@ -834,23 +815,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   // Do we really need this?
   this->GetSourceParent()->SetTraceReferenceObject(this);
   this->GetSourceParent()->SetTraceReferenceCommand("GetParametersParent");
-
-  // Create the display GUI.
-  this->DisplayGUI = vtkPVDisplayGUI::New();
-  this->DisplayGUI->SetParent(this->SourceNotebook->GetFrame("Display"));
-  this->DisplayGUI->ScrollableOn();
-  this->DisplayGUI->Create(app, 0);
-  this->Script("pack %s -fill both -expand yes -side top",
-                this->DisplayGUI->GetWidgetName());
-
-  // Create the information page.
-  this->InformationGUI = vtkPVInformationGUI::New();
-  this->InformationGUI->SetParent(
-        this->SourceNotebook->GetFrame("Information"));
-  this->InformationGUI->ScrollableOn();
-  this->InformationGUI->Create(app, 0);
-  this->Script("pack %s -fill both -expand yes -side top",
-               this->InformationGUI->GetWidgetName());
 
   this->EventuallyRender();
   delete [] local;
@@ -1249,7 +1213,6 @@ void vtkPVRenderView::CreateViewProperties()
     }
   
   // Camera settings
-
   this->Notebook->AddPage("Camera", 
                           "Camera and viewing navigation properties page");
   vtkKWWidget* page = this->Notebook->GetFrame("Camera");
@@ -2579,28 +2542,10 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "OrientationAxes: " << this->OrientationAxes << endl;
   os << indent << "OrientationAxesFrame: " << this->OrientationAxesFrame
      << endl;
-  os << indent << "DisplayGUI: ";
-  if( this->DisplayGUI )
-    {
-    this->DisplayGUI->PrintSelf(os << endl, indent.GetNextIndent() );
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
   os << indent << "SourceNotebook: ";
   if( this->SourceNotebook )
     {
     this->SourceNotebook->PrintSelf(os << endl, indent.GetNextIndent() );
-    }
-  else
-    {
-    os << "(none)" << endl;
-    }
-  os << indent << "InformationGUI: ";
-  if( this->InformationGUI )
-    {
-    this->InformationGUI->PrintSelf(os << endl, indent.GetNextIndent() );
     }
   else
     {

@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.15");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -48,7 +48,8 @@ vtkPVInputProperty::~vtkPVInputProperty()
 //----------------------------------------------------------------------------
 int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
 {
-  if (input->GetDisplayGUI() == NULL)
+  // Used to be check if DisplayGui is NULL.
+  if ( ! input->GetInitialized())
     {
     return 0;
     }

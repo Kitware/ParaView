@@ -28,12 +28,13 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
+#include "vtkPVSourceNotebook.h"
 #include "vtkSource.h"
 #include "vtkStructuredGrid.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.30");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.31");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -78,7 +79,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
     if (this->Initialized)
       {
       this->UnGrabFocus();
-      this->SetAcceptButtonColorToUnmodified();
+      this->Notebook->SetAcceptButtonColorToUnmodified();
       }
 #ifdef _WIN32
     this->Script("%s configure -cursor arrow", window->GetWidgetName());

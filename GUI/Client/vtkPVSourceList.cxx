@@ -28,7 +28,7 @@
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.36");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.37");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -232,7 +232,7 @@ void vtkPVSourceList::ToggleVisibility(int compIdx, char* id, int )
 
   comp = vtkPVSource::SafeDownCast(
     this->Sources->GetItemAsObject(compIdx));
-  if (comp && !comp->GetHideDisplayPage())
+  if (comp)
     {
     // Toggle visibility
     if (comp->GetVisibility())
@@ -335,29 +335,18 @@ void vtkPVSourceList::PostChildUpdate()
 void vtkPVSourceList::UpdateVisibility(vtkPVSource *comp,
                                       const char *id)
 {
-  
-  // Draw the icon indicating visibility.
-  if (comp->GetHideDisplayPage())
+  switch (comp->GetVisibility())
     {
-    this->Script("%s itemconfigure %s -image %s.visnovisimg",
-                 this->Canvas->GetWidgetName(), id, 
-                 this->GetWidgetName());
-    }
-  else
-    {
-    switch (comp->GetVisibility())
-      {
-      case 0:
-        this->Script("%s itemconfigure %s -image %s.visoffimg",
-                      this->Canvas->GetWidgetName(), id, 
-                      this->GetWidgetName());
-        break;
-      case 1:
-        this->Script("%s itemconfigure %s -image %s.visonimg",
-                      this->Canvas->GetWidgetName(), id, 
-                      this->GetWidgetName());
-        break;
-      }
+    case 0:
+      this->Script("%s itemconfigure %s -image %s.visoffimg",
+                    this->Canvas->GetWidgetName(), id, 
+                    this->GetWidgetName());
+      break;
+    case 1:
+      this->Script("%s itemconfigure %s -image %s.visonimg",
+                    this->Canvas->GetWidgetName(), id, 
+                    this->GetWidgetName());
+      break;
     }
 }
 

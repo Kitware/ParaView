@@ -36,9 +36,7 @@ class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
 class vtkKWScale;
-class vtkKWNotebook;
-class vtkPVInformationGUI;
-class vtkPVDisplayGUI;
+class vtkPVSourceNotebook;
 class vtkKWSplitFrame;
 class vtkLabeledFrame;
 class vtkMultiProcessController;
@@ -230,9 +228,7 @@ public:
   // This object does not seen like the best place to create
   // this notebook and GUI. But it is here now for legacy reasons.
   // Get SourceParent may not be needed anymore.
-  vtkGetObjectMacro(SourceNotebook,vtkKWNotebook);
-  vtkGetObjectMacro(DisplayGUI,vtkPVDisplayGUI);
-  vtkGetObjectMacro(InformationGUI,vtkPVInformationGUI);
+  vtkGetObjectMacro(SourceNotebook,vtkPVSourceNotebook);
 
   // Description:
   // This method is called when an event is called that PVRenderView
@@ -330,9 +326,7 @@ protected:
   // Access to the overlay renderer.
   vtkRenderer *GetRenderer2D();
 
-  vtkKWNotebook* SourceNotebook;
-  vtkPVDisplayGUI* DisplayGUI;
-  vtkPVInformationGUI* InformationGUI;
+  vtkPVSourceNotebook* SourceNotebook;
 
   void CalculateBBox(char* name, int bbox[4]);
  

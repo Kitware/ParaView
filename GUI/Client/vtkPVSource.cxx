@@ -27,14 +27,13 @@
 #include "vtkKWLabeledLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWNotebook.h"
+#include "vtkPVSourceNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
-#include "vtkPVInformationGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
@@ -68,10 +67,8 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.387");
-vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkKWNotebook);
-vtkCxxSetObjectMacro(vtkPVSource,InformationGUI,vtkPVInformationGUI);
-vtkCxxSetObjectMacro(vtkPVSource,DisplayGUI,vtkPVDisplayGUI);
+vtkCxxRevisionMacro(vtkPVSource, "1.388");
+vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -101,12 +98,9 @@ vtkPVSource::vtkPVSource()
   // Initialize the data only after  Accept is invoked for the first time.
   // This variable is used to determine that.
   this->Initialized = 0;
-  this->AcceptButtonRed = 0;
 
   // The notebook which holds Parameters, Display and Information pages.
-  this->Notebook = 0;
-  this->SavedRaisedNotebookPageId = 0;
-  
+  this->Notebook = 0;  
   this->PVInputs = NULL;
   this->NumberOfPVInputs = 0;
   
@@ -114,26 +108,8 @@ vtkPVSource::vtkPVSource()
   this->PVConsumers = 0;
   
   this->PartDisplay = 0;
-  this->DisplayGUI = 0;
-  this->InformationGUI = 0;
 
-  // The frame which contains the parameters related to the data source
-  // and the Accept/Reset/Delete buttons.
-  this->Parameters = vtkKWWidget::New();
-  
   this->ParameterFrame = vtkKWFrame::New();
-  this->ButtonFrame = vtkKWWidget::New();
-  this->MainParameterFrame = vtkKWWidget::New();
-  this->AcceptButton = vtkKWPushButton::New();
-  this->ResetButton = vtkKWPushButton::New();
-  this->DeleteButton = vtkKWPushButton::New();
-
-  this->DescriptionFrame = vtkKWWidget::New();
-  this->NameLabel = vtkKWLabeledLabel::New();
-  this->TypeLabel = vtkKWLabeledLabel::New();
-  this->LongHelpLabel = vtkKWLabeledLabel::New();
-  this->LabelEntry = vtkKWLabeledEntry::New();
-      
   this->Widgets = vtkPVWidgetCollection::New();
     
   this->ReplaceInput = 1;
@@ -151,10 +127,6 @@ vtkPVSource::vtkPVSource()
   this->VTKMultipleProcessFlag = 2;
   
   this->IsPermanent = 0;
-
-  this->HideDisplayPage = 0;
-  this->HideParametersPage = 0;
-  this->HideInformationPage = 0;
   
   this->AcceptCallbackFlag = 0;
 
@@ -177,8 +149,6 @@ vtkPVSource::vtkPVSource()
 vtkPVSource::~vtkPVSource()
 {
   this->SetPartDisplay(0);
-  this->SetDisplayGUI(0);
-  this->SetInformationGUI(0);
   this->RemoveAllPVInputs();
 
   this->NumberOfOutputsInformation->Delete();
@@ -210,51 +180,17 @@ vtkPVSource::~vtkPVSource()
   // This is necessary in order to make the parent frame release it's
   // reference to the widgets. Otherwise, the widgets get deleted only
   // when the parent (usually the parameters notebook page) is deleted.
-  this->SetNotebook(0);
-
-  this->Widgets->Delete();
-  this->Widgets = NULL;
-
-  this->AcceptButton->Delete();
-  this->AcceptButton = NULL;  
-  
-  this->ResetButton->Delete();
-  this->ResetButton = NULL;  
-  
-  this->DeleteButton->Delete();
-  this->DeleteButton = NULL;
-
-  this->DescriptionFrame->Delete();
-  this->DescriptionFrame = NULL;
-
-  this->NameLabel->Delete();
-  this->NameLabel = NULL;
-
-  this->TypeLabel->Delete();
-  this->TypeLabel = NULL;
-
-  this->LongHelpLabel->Delete();
-  this->LongHelpLabel = NULL;
-
-  this->LabelEntry->Delete();
-  this->LabelEntry = NULL;
-
-  this->ParameterFrame->Delete();
-  this->ParameterFrame = NULL;
-
-  this->MainParameterFrame->Delete();
-  this->MainParameterFrame = NULL;
-
-  this->ButtonFrame->Delete();
-  this->ButtonFrame = NULL;
-
+  // (I must of fixed this bug twice. keep both comments).
   // Since the notebook is now shared and remains around after 
   // this source deletes.  This parameters from as a child will 
   // not be deleted either.  Parent keeps a list of children.
-  this->Parameters->SetParent(0);
-  this->Parameters->Delete();
-  this->Parameters = NULL;
-    
+  this->SetNotebook(0);
+  this->ParameterFrame->SetParent(0);
+  this->ParameterFrame->Delete();
+  this->ParameterFrame = NULL;
+  this->Widgets->Delete();
+  this->Widgets = NULL;
+
   this->SetView(NULL);
 
   this->SetSourceClassName(0);
@@ -423,10 +359,8 @@ vtkPVDataInformation* vtkPVSource::GetDataInformation()
     // I am going to get rid of this refernece anyway. (Or should I?)
     // Window will know to update the InformationGUI when the current PVSource
     // is changed, but how will it detect that a source has changed?
-    if (this->InformationGUI)
-      {
-      this->InformationGUI->Update(this);
-      }
+    // Used to only update the information.  We could make it specific to info again ...
+    this->Notebook->Update();
     }
   return this->Proxy->GetDataInformation();
 }
@@ -453,10 +387,10 @@ void vtkPVSource::GatherDataInformation()
     }
   this->DataInformationValid = 1;
 
-  if (this->GetDisplayGUI())
+  // Used to only update the display gui ...
+  if (this->Notebook)
     {
-    // This will cause a recursive call, but the Valid flag will terminate it.
-    this->GetDisplayGUI()->Update();
+    this->Notebook->Update();
     }
 }
 
@@ -471,13 +405,8 @@ void vtkPVSource::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->DisplayGUI);
-  this->PropagateEnableState(this->InformationGUI);
   this->PropagateEnableState(this->Notebook);
-  this->PropagateEnableState(this->Parameters);
-  this->PropagateEnableState(this->MainParameterFrame);
-  this->PropagateEnableState(this->ButtonFrame);
-  this->PropagateEnableState(this->ParameterFrame);
+  this->Notebook->UpdateEnableState(this);
   this->PropagateEnableState(this->PVColorMap);
 
   if ( this->Widgets )
@@ -495,22 +424,6 @@ void vtkPVSource::UpdateEnableState()
       }
     it->Delete();
     }
-
-  this->PropagateEnableState(this->AcceptButton);
-  this->PropagateEnableState(this->ResetButton);
-  if ( this->IsDeletable() )
-    {
-    this->PropagateEnableState(this->DeleteButton);
-    }
-  else
-    {
-    this->DeleteButton->SetEnabled(0);
-    }
-  this->PropagateEnableState(this->DescriptionFrame);
-  this->PropagateEnableState(this->NameLabel);
-  this->PropagateEnableState(this->TypeLabel);
-  this->PropagateEnableState(this->LabelEntry);
-  this->PropagateEnableState(this->LongHelpLabel);
 }
   
 
@@ -619,152 +532,16 @@ void vtkPVSource::CreateProperties()
     vtkErrorMacro("Notebook has not been set yet.");  
     }
 
-  this->Notebook->Raise("Parameters");
-  this->Notebook->HidePage("Display");
-  this->Notebook->HidePage("Information");
-  
-  //law int fixme; // Berk says hide paramters is no longer used.
-  // Set up the pages of the notebook.
-  if (!this->HideParametersPage)
-    {
-    this->Parameters->SetParent(this->Notebook->GetFrame("Parameters"));
-    }
-  else
-    {
-    //law int fixme;  //deal with hiding the parameters page.
-    //this->Parameters->SetParent(this->ParametersParent);
-    }
-
-  this->Parameters->Create(this->GetApplication(),"frame","");
-  if (!this->HideParametersPage)
-    {
-    this->Script("pack %s -pady 2 -fill x -expand yes",
-                 this->Parameters->GetWidgetName());
-    }
-
   // Set the description frame
   // Try to do something that looks like the parameters, i.e. fixed-width
   // labels and "expandable" values. This has to be fixed later when the
   // parameters will be properly aligned (i.e. gridded)
 
-  this->DescriptionFrame ->SetParent(this->Parameters);
-  this->DescriptionFrame->Create(this->GetApplication(), "frame", "");
-  this->Script("pack %s -fill both -expand t -side top -padx 2 -pady 2", 
-               this->DescriptionFrame->GetWidgetName());
-
-  const char *label1_opt = "-width 12 -anchor e";
-
-  this->NameLabel->SetParent(this->DescriptionFrame);
-  this->NameLabel->Create(this->GetApplication());
-  this->NameLabel->SetLabel("Name:");
-  this->Script("%s configure -anchor w", 
-               this->NameLabel->GetLabel2()->GetWidgetName());
-  this->Script("%s config %s", 
-               this->NameLabel->GetLabel()->GetWidgetName(), label1_opt);
-  this->Script("pack %s -fill x -expand t", 
-               this->NameLabel->GetLabel2()->GetWidgetName());
-  vtkKWTkUtilities::ChangeFontWeightToBold(
-    this->GetApplication()->GetMainInterp(),
-    this->NameLabel->GetLabel2()->GetWidgetName());
-
-  this->TypeLabel->SetParent(this->DescriptionFrame);
-  this->TypeLabel->Create(this->GetApplication());
-  this->TypeLabel->GetLabel()->SetLabel("Class:");
-  this->Script("%s configure -anchor w", 
-               this->TypeLabel->GetLabel2()->GetWidgetName());
-  this->Script("%s config %s", 
-               this->TypeLabel->GetLabel()->GetWidgetName(), label1_opt);
-  this->Script("pack %s -fill x -expand t", 
-               this->TypeLabel->GetLabel2()->GetWidgetName());
-
-  this->LabelEntry->SetParent(this->DescriptionFrame);
-  this->LabelEntry->Create(this->GetApplication());
-  this->LabelEntry->GetLabel()->SetLabel("Label:");
-  this->Script("%s config %s", 
-               this->LabelEntry->GetLabel()->GetWidgetName(),label1_opt);
-  this->Script("pack %s -fill x -expand t", 
-               this->LabelEntry->GetEntry()->GetWidgetName());
-  this->Script("bind %s <KeyPress-Return> {%s LabelEntryCallback}",
-               this->LabelEntry->GetEntry()->GetWidgetName(), 
-               this->GetTclName());
-
-  this->LongHelpLabel->SetParent(this->DescriptionFrame);
-  this->LongHelpLabel->Create(this->GetApplication());
-  this->LongHelpLabel->GetLabel()->SetLabel("Description:");
-  this->LongHelpLabel->GetLabel2()->AdjustWrapLengthToWidthOn();
-  this->Script("%s configure -anchor w", 
-               this->LongHelpLabel->GetLabel2()->GetWidgetName());
-  this->Script("%s config %s", 
-               this->LongHelpLabel->GetLabel()->GetWidgetName(), label1_opt);
-  this->Script("pack %s -fill x -expand t", 
-               this->LongHelpLabel->GetLabel2()->GetWidgetName());
-
-  this->Script("grid %s -sticky news", 
-               this->NameLabel->GetWidgetName());
-  this->Script("grid %s -sticky news", 
-               this->TypeLabel->GetWidgetName());
-  this->Script("grid %s -sticky news", 
-               this->LabelEntry->GetWidgetName());
-  this->Script("grid %s -sticky news", 
-               this->LongHelpLabel->GetWidgetName());
-  this->Script("grid columnconfigure %s 0 -weight 1", 
-               this->LongHelpLabel->GetParent()->GetWidgetName());
-
-  // The main parameter frame
-
-  this->MainParameterFrame->SetParent(this->Parameters);
-  this->MainParameterFrame->Create(this->GetApplication(), "frame", "");
-  this->Script("pack %s -fill both -expand t -side top", 
-               this->MainParameterFrame->GetWidgetName());
-
-  this->ButtonFrame->SetParent(this->MainParameterFrame);
-  this->ButtonFrame->Create(this->GetApplication(), "frame", "");
-  this->Script("pack %s -fill both -expand t -side top", 
-               this->ButtonFrame->GetWidgetName());
-
-  this->ParameterFrame->SetParent(this->MainParameterFrame);
+  this->ParameterFrame->SetParent(this->Notebook->GetMainParameterFrame());
 
   this->ParameterFrame->ScrollableOn();
   this->ParameterFrame->Create(this->GetApplication(),0);
-  this->Script("pack %s -fill both -expand t -side top", 
-               this->ParameterFrame->GetWidgetName());
 
-  vtkKWWidget *frame = vtkKWWidget::New();
-  frame->SetParent(this->ButtonFrame);
-  frame->Create(this->GetApplication(), "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());  
-  
-  this->AcceptButton->SetParent(frame);
-  this->AcceptButton->Create(this->GetApplication(), 
-                             "-text Accept");
-  this->AcceptButton->SetCommand(this, "PreAcceptCallback");
-  this->AcceptButton->SetBalloonHelpString(
-    "Cause the current values in the user interface to take effect "
-    "(key shortcut: Ctrl+Enter)");
-
-  this->ResetButton->SetParent(frame);
-  this->ResetButton->Create(this->GetApplication(), "-text Reset");
-  this->ResetButton->SetCommand(this, "ResetCallback");
-  this->ResetButton->SetBalloonHelpString(
-    "Revert to the previous parameters of the module.");
-
-  this->DeleteButton->SetParent(frame);
-  this->DeleteButton->Create(this->GetApplication(), "-text Delete");
-  this->DeleteButton->SetCommand(this, "DeleteCallback");
-  this->DeleteButton->SetBalloonHelpString(
-    "Remove the current module.  "
-    "This can only be done if no other modules depends on the current one.");
-
-  this->Script("pack %s %s %s -padx 2 -pady 2 -side left -fill x -expand t",
-               this->AcceptButton->GetWidgetName(), 
-               this->ResetButton->GetWidgetName(), 
-               this->DeleteButton->GetWidgetName());
-  this->Script("bind %s <Enter> {+focus %s}",
-               this->AcceptButton->GetWidgetName(),
-               this->AcceptButton->GetWidgetName());
-
-  frame->Delete();  
- 
   this->UpdateProperties();
 
   vtkPVWidget *pvWidget;
@@ -782,69 +559,6 @@ void vtkPVSource::CreateProperties()
     it->GoToNextItem();
     }
   it->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::UpdateDescriptionFrame()
-{
-  if (!this->GetApplication())
-    {
-    return;
-    }
-
-  if (this->NameLabel && this->NameLabel->IsCreated())
-    {
-    this->NameLabel->GetLabel2()->SetLabel(this->Name ? this->Name : "");
-    }
-
-  if (this->TypeLabel && this->TypeLabel->IsCreated())
-    {
-    if (this->GetSourceClassName()) 
-      {
-      this->TypeLabel->GetLabel2()->SetLabel(
-        this->GetSourceClassName());
-//        this->GetVTKSource()->GetClassName());
-      if (this->DescriptionFrame->IsPacked())
-        {
-        this->Script("grid %s", this->TypeLabel->GetWidgetName());
-        }
-      }
-    else
-      {
-      this->TypeLabel->GetLabel2()->SetLabel("");
-      if (this->DescriptionFrame->IsPacked())
-        {
-        this->Script("grid remove %s", this->TypeLabel->GetWidgetName());
-        }
-      }
-    }
-
-  if (this->LabelEntry && this->LabelEntry->IsCreated())
-    {
-    this->LabelEntry->GetEntry()->SetValue(this->Label);
-    }
-
-  if (this->LongHelpLabel && this->LongHelpLabel->IsCreated())
-    {
-    if (this->LongHelp && 
-        !(this->GetPVApplication() && 
-          !this->GetPVApplication()->GetShowSourcesLongHelp())) 
-      {
-      this->LongHelpLabel->GetLabel2()->SetLabel(this->LongHelp);
-      if (this->DescriptionFrame->IsPacked())
-        {
-        this->Script("grid %s", this->LongHelpLabel->GetWidgetName());
-        }
-      }
-    else
-      {
-      this->LongHelpLabel->GetLabel2()->SetLabel("");
-      if (this->DescriptionFrame->IsPacked())
-        {
-        this->Script("grid remove %s", this->LongHelpLabel->GetWidgetName());
-        }
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -880,48 +594,26 @@ void vtkPVSource::Pack()
   this->GetPVRenderView()->UpdateTclButAvoidRendering();
 
   this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->Notebook->GetFrame("Parameters")->GetWidgetName());
-
-  //this->Script("pack %s -side top -fill both -expand t",
-  //             this->GetPVRenderView()->GetNavigationFrame()->GetWidgetName());
-  this->Script("pack %s -pady 2 -fill x -expand yes",
-               this->Parameters->GetWidgetName());               
+               this->Notebook->GetMainParameterFrame()->GetWidgetName());
+  this->Script("pack %s -fill both -expand t -side top", 
+               this->ParameterFrame->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::Select()
 {
   this->Pack();
-
-  vtkPVDisplayGUI *data;
   
-  // We could remember the last page displayed.
-  if (this->Notebook)
-    {
-    // This implemented the old behavior where each source remebered its page.
-    // I am trying a new behavior where the raised page stays the same 
-    // between sources until it is changed.
-    //this->Notebook->Raise(this->SavedRaisedNotebookPageId);    
-    }
   this->UpdateProperties();
   // This may best be merged with the UpdateProperties call but ...
   // We make the call here to update the input menu, 
   // which is now just another pvWidget.
   this->UpdateParameterWidgets();
   
-  data = this->GetDisplayGUI();
-  if (data)
+  if (this->Notebook)
     {
-    // The display GUI should not need both of these references,
-    // The Display GUI should be enough.  Until it is cleaned up,
-    // I am keeping both.
-    data->SetPVSource(this);
-    data->Update();
-    }
-
-  if (this->InformationGUI)
-    {
-    this->InformationGUI->Update(this);
+    this->Notebook->SetPVSource(this);
+    this->Notebook->Update();
     }
 
   if (this->GetPVRenderView())
@@ -945,11 +637,9 @@ void vtkPVSource::Select()
 //----------------------------------------------------------------------------
 void vtkPVSource::Deselect(int)
 {
-  // Save the page to restore when the sources is selected later.
-  this->SavedRaisedNotebookPageId = this->Notebook->GetRaisedPageId();
-  if (this->DisplayGUI)
+  if (this->Notebook)
     {
-    this->DisplayGUI->SetPVSource(0);
+    this->Notebook->SetPVSource(0);
     }
 
   int i;
@@ -998,8 +688,8 @@ void vtkPVSource::SetName (const char* arg)
   this->Modified();
   
   // Make sure the description frame is upto date.
-  this->UpdateDescriptionFrame();
-
+  this->Notebook->Update();
+  
   // Update the nav window (that usually might display name + description)
   if (this->GetPVRenderView())
     {
@@ -1080,7 +770,7 @@ void vtkPVSource::SetLabelNoTrace(const char* arg)
   this->Modified();
 
   // Make sure the description frame is upto date.
-  this->UpdateDescriptionFrame();
+  this->Notebook->Update();
 
   vtkPVWindow *window = this->GetPVWindow();
   if (window)
@@ -1089,12 +779,6 @@ void vtkPVSource::SetLabelNoTrace(const char* arg)
     }
 
 } 
-
-//----------------------------------------------------------------------------
-void vtkPVSource::LabelEntryCallback()
-{
-  this->SetLabel(this->LabelEntry->GetEntry()->GetValue());
-}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::SetVisibility(int v)
@@ -1138,9 +822,10 @@ void vtkPVSource::SetVisibilityNoTrace(int v)
   // Update GUI.
   // Maybe the display GUI reference should be set to NULL
   // when the source is not current.
-  if (this->DisplayGUI && this->DisplayGUI->GetPVSource() == this)
-    {
-    this->DisplayGUI->UpdateVisibilityCheck();
+  if (this->Notebook)
+    { // Notebook will only be set when this source is current.
+    // We could update the whole notbook, but that would be wasteful.
+    this->Notebook->GetDisplayGUI()->UpdateVisibilityCheck();
     }
   if ( this->GetPVRenderView() && this->GetPVWindow())
     {
@@ -1171,14 +856,20 @@ void vtkPVSource::SetCubeAxesVisibilityNoTrace(int val)
   this->CubeAxesVisibility = val;
   this->CubeAxesDisplay->SetVisibility(this->GetVisibility() && val);
   
-  if (this->DisplayGUI && this->DisplayGUI->GetPVSource() == this)
+  if (this->Notebook)
     {
-    this->DisplayGUI->UpdateCubeAxesVisibilityCheck();
+    this->Notebook->GetDisplayGUI()->UpdateCubeAxesVisibilityCheck();
     }
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }  
+}
+
+//----------------------------------------------------------------------------
+vtkPVDisplayGUI* vtkPVSource::GetPVOutput()
+{
+  return this->Notebook->GetDisplayGUI();
 }
 
 //----------------------------------------------------------------------------
@@ -1237,7 +928,7 @@ void vtkPVSource::AcceptCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::PreAcceptCallback()
 {
-  if ( ! this->AcceptButtonRed)
+  if ( ! this->Notebook->GetAcceptButtonRed())
     {
     return;
     }
@@ -1287,7 +978,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 
   // vtkPVSource is taking over some of the update descisions because
   // client does not have a real pipeline.
-  if ( ! this->AcceptButtonRed)
+  if ( ! this->Notebook->GetAcceptButtonRed())
     {
     return;
     } 
@@ -1298,7 +989,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 
   this->Notebook->ShowPage("Display");
   this->Notebook->ShowPage("Information");
-  this->SetAcceptButtonColorToUnmodified();
+  this->Notebook->SetAcceptButtonColorToUnmodified();
   this->GetPVRenderView()->UpdateTclButAvoidRendering();
   
   // We need to pass the parameters from the UI to the VTK objects before
@@ -1312,14 +1003,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // Initialize the output if necessary.
   if ( ! this->Initialized)
     { // This is the first time, initialize data. 
-    vtkPVDisplayGUI *pvd = this->GetDisplayGUI();
-    if (pvd == NULL)
-      { // I suppose we should try and delete the source.
-      vtkErrorMacro("Could not get display GUI.");
-      this->DeleteCallback();    
-      this->GetPVApplication()->GetProcessModule()->SendCleanupPendingProgress();
-      return;
-      }
+    // I used to see if the display gui was properly set, but that was a legacy
+    // check.  I removed the check.
 
     // Create the display and add it to the render module.
     vtkPVRenderModule* rm = 
@@ -1347,9 +1032,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     input = this->GetPVInput(0);
     if (input)
       {
-      if (this->ReplaceInput && 
-          input->GetDisplayGUI()->GetApplication() && 
-          hideSource)
+      // I used to also check that the input was created by looking at the application of the DisplayGUI.
+      if (this->ReplaceInput && hideSource)
         { // Application is set when the widget is created.
         input->SetVisibilityNoTrace(0);
         }
@@ -1366,7 +1050,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
 
     // We need to update so we will have correct information for initialization.
-    if (this->GetDisplayGUI())
+    if (this->Notebook)
       {
       // Update the VTK data.
       this->Update();
@@ -1389,7 +1073,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         }
       }
 
-    pvd->Initialize();
+    int fixme;
+    // Quick fix to get paraview working again.  What does initiailze do?
+    // Could we update instead.
+    this->Notebook->GetDisplayGUI()->Initialize();
     // This causes input to be checked for validity.
     // I put it at the end so the InputFixedTypeRequirement will work.
     this->UnGrabFocus();
@@ -1410,15 +1097,14 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   window->UpdateSelectMenu();
 
   // Regenerate the data property page in case something has changed.
-  vtkPVDisplayGUI *pvd = this->GetDisplayGUI();
-  if (pvd)
+  if (this->Notebook)
     {
     // Update the vtk data which has already been done ...
     this->Update();
     // Causes the data information to be updated if the filter executed.
     // Note has to be done here because tcl update causes render which
     // causes the filter to execute.
-    pvd->Update();  
+    this->Notebook->Update();  
     }
 
   this->GetPVRenderView()->UpdateTclButAvoidRendering();
@@ -1454,13 +1140,6 @@ void vtkPVSource::SetDefaultColorParameters()
   vtkPVDataSetAttributesInformation* attrInfo;
   vtkPVArrayInformation* arrayInfo;
   vtkPVColorMap* colorMap;  
-
-  // Make sure this source is current.
-  //if (this->DisplayGUI == NULL || this->DisplayGUI->GetPVSource() != this)
-  //  {
-   // vtkErrorMacro("Source m,ust be current to set default colors.");
-  //  return;
-  //  }
     
   dataInfo = this->GetDataInformation();
   if (input)
@@ -1602,7 +1281,7 @@ void vtkPVSource::ResetCallback()
     this->GetPVRenderView()->EventuallyRender();
     this->Script("update");
 
-    this->SetAcceptButtonColorToUnmodified();
+    this->Notebook->SetAcceptButtonColorToUnmodified();
     }
 }
 
@@ -1626,9 +1305,12 @@ void vtkPVSource::DeleteCallback()
 
   window->GetAnimationInterface()->DeleteSource(this);
 
-  if (this->GetDisplayGUI())
-    {  
-    this->GetDisplayGUI()->DeleteCallback();
+  if (this->Notebook)
+    { // Delete call back set the cube axes visibility 
+    // and point label visibility off.
+    // Cube axes is controled by this source so we could handle it.
+    // Point label visibility has not been made into a display yet ...
+    this->Notebook->GetDisplayGUI()->DeleteCallback();
     }
 
   // Just in case cursor was left in a funny state.
@@ -1714,7 +1396,7 @@ void vtkPVSource::DeleteCallback()
     }
         
   // Remove all of the actors mappers. from the renderer.
-  if (this->DisplayGUI)
+  if (this->Notebook)
     {
     vtkSMPartDisplay* pDisp = this->GetPartDisplay();
     if (pDisp)
@@ -1725,12 +1407,11 @@ void vtkPVSource::DeleteCallback()
     }
 
   // I doubt this is necessary (may to break a reference loop).
-  if (this->DisplayGUI)
+  if (this->Notebook)
     {
-    this->DisplayGUI->SetPVSource(0);
-    this->DisplayGUI->UnRegister(this);
-    this->DisplayGUI = 0;
+    this->Notebook->SetPVSource(0);
     }
+  this->SetNotebook(0);
   
   if ( initialized )
     {
@@ -1835,7 +1516,7 @@ void vtkPVSource::UpdateVTKSourceParameters()
 void vtkPVSource::UpdateProperties()
 {
   this->UpdateEnableState();
-  this->UpdateDescriptionFrame();
+  this->Notebook->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -2083,16 +1764,18 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SaveState(ofstream *file, int pass)
+void vtkPVSource::SaveStateVisibility(ofstream *file)
+{
+
+  *file << "$kw(" << this->GetTclName() << ") SetVisibility " 
+        << this->GetVisibility() << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SaveState(ofstream *file)
 {
   int i, numWidgets;
   vtkPVWidget *pvw;
-
-  if (pass == 2)
-    {
-    *file << "$kw(" << this->GetTclName() << ") SetVisibility " 
-          << this->GetVisibility() << endl;
-    }
 
   // Detect if this source is in Glyph sourcesm and already exists.
   if (this->GetTraceReferenceCommand())
@@ -2116,7 +1799,7 @@ void vtkPVSource::SaveState(ofstream *file, int pass)
     {
     if (this->PVInputs[i] && this->PVInputs[i]->GetVisitedFlag() != 2)
       {
-      this->PVInputs[i]->SaveState(file, pass);
+      this->PVInputs[i]->SaveState(file);
       }
     }
   
@@ -2288,45 +1971,6 @@ vtkPVInputProperty* vtkPVSource::GetInputProperty(const char* name)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetAcceptButtonColorToModified()
-{
-  if (this->AcceptButtonRed)
-    {
-    return;
-    }
-  this->AcceptButtonRed = 1;
-  this->Script("%s configure -background #17b27e",
-               this->AcceptButton->GetWidgetName());
-  this->Script("%s configure -activebackground #17b27e",
-               this->AcceptButton->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::SetAcceptButtonColorToUnmodified()
-{
-  if (!this->AcceptButtonRed)
-    {
-    return;
-    }
-  this->AcceptButtonRed = 0;
-
-#ifdef _WIN32
-  this->Script("%s configure -background [lindex [%s configure -background] 3]",
-               this->AcceptButton->GetWidgetName(),
-               this->AcceptButton->GetWidgetName());
-  this->Script("%s configure -activebackground "
-               "[lindex [%s configure -activebackground] 3]",
-               this->AcceptButton->GetWidgetName(),
-               this->AcceptButton->GetWidgetName());
-#else
-  this->Script("%s configure -background #ccc",
-               this->AcceptButton->GetWidgetName());
-  this->Script("%s configure -activebackground #eee",
-               this->AcceptButton->GetWidgetName());
-#endif
-}
-
-//----------------------------------------------------------------------------
 vtkPVWidget* vtkPVSource::GetPVWidget(const char *name)
 {
   vtkObject *o;
@@ -2383,6 +2027,13 @@ int vtkPVSource::GetNumberOfProcessorsValid()
   return 1;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetAcceptButtonColorToModified()
+{
+  this->Notebook->SetAcceptButtonColorToModified();
+}
+
 //----------------------------------------------------------------------------
 int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone)
 {
@@ -2403,9 +2054,6 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone)
     clone = 0;
     return retVal;
     }
-
-  // Accept button is always red when a source is first created.
-  clone->SetAcceptButtonColorToModified();
 
   return VTK_OK;
 }
@@ -2457,8 +2105,6 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
   pvs->SetApplication(this->GetApplication());
   pvs->SetReplaceInput(this->ReplaceInput);
   pvs->SetNotebook(this->Notebook);
-  pvs->SetDisplayGUI(this->DisplayGUI);
-  pvs->SetInformationGUI(this->InformationGUI);
 
   pvs->SetShortHelp(this->GetShortHelp());
   pvs->SetLongHelp(this->GetLongHelp());
@@ -2671,15 +2317,8 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "MenuName: " << (this->MenuName?this->MenuName:"none")
      << endl;
-  os << indent << "AcceptButton: " << this->GetAcceptButton() << endl;
-  os << indent << "DeleteButton: " << this->GetDeleteButton() << endl;
-  os << indent << "MainParameterFrame: " << this->GetMainParameterFrame() 
-     << endl;
-  os << indent << "DescriptionFrame: " << this->DescriptionFrame 
-     << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "NumberOfPVInputs: " << this->GetNumberOfPVInputs() << endl;
-  os << indent << "ParameterFrame: " << this->GetParameterFrame() << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
   os << indent << "View: " << this->GetView() << endl;
@@ -2688,12 +2327,8 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "IsPermanent: " << this->IsPermanent << endl;
   os << indent << "SourceClassName: " 
      << (this->SourceClassName?this->SourceClassName:"null") << endl;
-  os << indent << "HideParametersPage: " << this->HideParametersPage << endl;
-  os << indent << "HideDisplayPage: " << this->HideDisplayPage << endl;
-  os << indent << "HideInformationPage: " << this->HideInformationPage << endl;
   os << indent << "ToolbarModule: " << this->ToolbarModule << endl;
 
-  os << indent << "DisplayGUI: " << this->DisplayGUI << endl;
   os << indent << "NumberOfPVConsumers: " << this->GetNumberOfPVConsumers() << endl;
   os << indent << "NumberOfParts: " << this->GetNumberOfParts() << endl;
   if (this->PVColorMap)

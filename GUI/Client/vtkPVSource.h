@@ -31,13 +31,11 @@ class vtkKWFrame;
 class vtkKWLabeledEntry;
 class vtkKWLabeledFrame;
 class vtkKWLabeledLabel;
-class vtkKWNotebook;
+class vtkPVSourceNotebook;
 class vtkKWPushButton;
 class vtkKWView;
 class vtkKWWidget;
 class vtkPVApplication;
-class vtkPVDisplayGUI;
-class vtkPVInformationGUI;
 class vtkPVInputMenu;
 class vtkPVInputProperty;
 class vtkPVRenderView;
@@ -54,6 +52,7 @@ class vtkPVDataInformation;
 class vtkPVNumberOfOutputsInformation;
 class vtkSMCubeAxesDisplay;
 class vtkPVColorMap;
+class vtkPVDisplayGUI;
 
 class VTK_EXPORT vtkPVSource : public vtkKWWidget
 {
@@ -150,26 +149,12 @@ public:
   int IsPVConsumer(vtkPVSource *c);
 
   // Description:
-  // Set/get the first output of this source. Most source are setup
-  // with only one output.
-  vtkGetObjectMacro(DisplayGUI,vtkPVDisplayGUI);
-  void SetDisplayGUI(vtkPVDisplayGUI* dispGUI);
-
-  // Description:
   // For legacy scripts
-  vtkPVDisplayGUI* GetPVOutput() {return this->GetDisplayGUI();}
-
+  vtkPVDisplayGUI* GetPVOutput();
+  
   // Description:
   // Access to this object from a script.
   vtkGetObjectMacro(PVColorMap, vtkPVColorMap);
-
-  // Description:
-  // Set the pointer to GUI object that displays the data information
-  // on the information page.  All sources share this one object.
-  // We could get rid of this reference if the window (or some other
-  // global object) called update on this widget with the selected 
-  // source as an argument (when the source is selected).
-  void SetInformationGUI(vtkPVInformationGUI* infoGUI);
    
   // Description:
   // This name is used in the source list to identify this source.
@@ -187,10 +172,6 @@ public:
   virtual void SetLabel(const char *label);
   virtual char* GetLabel();
   virtual void SetLabelOnce(const char *label);
-
-  // Description:
-  // Called when the description entry is changed.
-  virtual void LabelEntryCallback();
     
   // Description:
   // This just returns the application typecast correctly.
@@ -258,17 +239,10 @@ public:
   // Give an index, return the ID of a VTK source as unsigned int.
   unsigned int GetVTKSourceIDAsInt(int idx);
 
-  vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
-  vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
-
   //BTX
   vtkGetObjectMacro(Widgets, vtkPVWidgetCollection);
   //ETX
   
-  vtkGetObjectMacro(ParameterFrame, vtkKWFrame);
-  vtkGetObjectMacro(MainParameterFrame, vtkKWWidget);
-  vtkGetObjectMacro(DescriptionFrame, vtkKWWidget);
-
   // Description:
   // Save the pipeline to a batch file which can be run without
   // a user interface.
@@ -277,13 +251,8 @@ public:
   // Description:
   // Saves the pipeline in a ParaView script.  This is similar
   // to saveing a trace, except only the last state is stored.
-  virtual void SaveState(ofstream *file, int pass);
-
-  // Description:
-  // Make the Accept button turn green/white when one of the parameters 
-  // has changed.
-  void SetAcceptButtonColorToModified();
-  void SetAcceptButtonColorToUnmodified();
+  virtual void SaveState(ofstream *file);
+  virtual void SaveStateVisibility(ofstream *file);
   
   // Description:
   // This flag determines whether a source will make its input invisible or
@@ -302,8 +271,8 @@ public:
 
   // Description:
   // The notebook that is displayed when the source is selected.
-  void SetNotebook(vtkKWNotebook* notebook);
-  vtkGetObjectMacro(Notebook, vtkKWNotebook);
+  void SetNotebook(vtkPVSourceNotebook* notebook);
+  vtkGetObjectMacro(Notebook, vtkPVSourceNotebook);
 
   // I shall want to get rid of this.
   void SetView(vtkKWView* view);
@@ -407,26 +376,6 @@ public:
   vtkBooleanMacro(IsPermanent, int);
 
   // Description:
-  // If this is on, no Display page (from vtkPVDisplayGUI) is display
-  // for this source. Used by sources like Glyphs.
-  vtkSetMacro(HideDisplayPage, int);
-  vtkGetMacro(HideDisplayPage, int);
-  vtkBooleanMacro(HideDisplayPage, int);
-
-  // Description:
-  // If this is on, no Paramters page  is displayed for this source.
-  vtkSetMacro(HideParametersPage, int);
-  vtkGetMacro(HideParametersPage, int);
-  vtkBooleanMacro(HideParametersPage, int);
-
-  // Description:
-  // If this is on, no Information page (from vtkPVDisplayGUI) is displayed
-  // for this source. Used by sources like Glyphs.
-  vtkSetMacro(HideInformationPage, int);
-  vtkGetMacro(HideInformationPage, int);
-  vtkBooleanMacro(HideInformationPage, int);
-
-  // Description:
   // Raise the current source page.
   void RaiseSourcePage();
 
@@ -527,6 +476,11 @@ public:
   void SetPartDisplay(vtkSMPartDisplay* pdisp);
   vtkGetObjectMacro(PartDisplay, vtkSMPartDisplay);
 
+  // Description:
+  // This method is now in the vtkPVSourceNotebook.
+  // This legacy method is for backward compatability.
+  void SetAcceptButtonColorToModified();
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -559,21 +513,8 @@ protected:
   // visibility is the value "visibility and CubeAxesVisibility".
   int CubeAxesVisibility;
 
-  // If this is on, no Display page (from vtkPVDisplayGUI) is displayed
-  // for this source. Used by sources like Glyphs
-  int HideDisplayPage;
-
-  // If this is on, no Paramters page  is displayed
-  // for this source.
-  int HideParametersPage;
-
-  // If this is on, no Information page (from vtkPVDisplayGUI) is displayed
-  // for this source. Used by sources like Glyphs
-  int HideInformationPage;
-
+  vtkKWFrame *ParameterFrame;
   vtkSMPartDisplay*     PartDisplay;
-  vtkPVDisplayGUI*     DisplayGUI;
-  vtkPVInformationGUI* InformationGUI;
 
   // Called to allocate the input array.  Copies old inputs.
   void SetNumberOfPVInputs(int num);
@@ -585,13 +526,11 @@ protected:
   // Keep a list of sources that are using this data.
   vtkPVSource **PVConsumers;
   int NumberOfPVConsumers;
-   
-  void UpdateDescriptionFrame();
-  
+     
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();
   
-  vtkKWNotebook *Notebook;
+  vtkPVSourceNotebook *Notebook;
   // Since the notebook is share between all sources,
   // we remeber the raised page to restore when the source is selected.
   // This ivar is set and used by vtkPVWindow.
@@ -607,23 +546,8 @@ protected:
   // This is the module name.
   char      *ModuleName;
 
-  vtkKWWidget* Parameters;
-
-  vtkKWWidget *MainParameterFrame;
-  vtkKWWidget *ButtonFrame;
-  vtkKWFrame *ParameterFrame;
   
   vtkPVWidgetCollection *Widgets;
-
-  vtkKWPushButton *AcceptButton;
-  vtkKWPushButton *ResetButton;
-  vtkKWPushButton *DeleteButton;
-
-  vtkKWWidget *DescriptionFrame;
-  vtkKWLabeledLabel *NameLabel;
-  vtkKWLabeledLabel *TypeLabel;
-  vtkKWLabeledEntry *LabelEntry;
-  vtkKWLabeledLabel *LongHelpLabel;
 
   char *SourceClassName;
 
@@ -633,9 +557,6 @@ protected:
   int ReplaceInput;
 
   int VisitedFlag;
-
-  // We have to manaage updates separate from the VTK pipeline.
-  int AcceptButtonRed;
 
   // Number of instances cloned from this prototype
   int PrototypeInstanceCount;

@@ -25,6 +25,7 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVSourceNotebook.h"
 
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -32,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.10");
+vtkCxxRevisionMacro(vtkPVPick, "1.11");
 
 
 //----------------------------------------------------------------------------
@@ -89,7 +90,7 @@ void vtkPVPick::CreateProperties()
 
   this->Superclass::CreateProperties();
 
-  this->DataFrame->SetParent(this->GetParameterFrame()->GetFrame());
+  this->DataFrame->SetParent(this->ParameterFrame->GetFrame());
   this->DataFrame->Create(pvApp, "frame", "");
   this->Script("pack %s",
                this->DataFrame->GetWidgetName());
@@ -114,10 +115,10 @@ void vtkPVPick::AcceptCallbackInternal()
   // We need to update manually for the case we are probing one point.
   this->PickDisplay->Update();
   this->PickDisplay->SetVisibility(1);
-  this->GetDisplayGUI()->DrawWireframe();
-  this->GetDisplayGUI()->ColorByProperty();
-  this->GetDisplayGUI()->ChangeActorColor(0.8, 0.0, 0.2);
-  this->GetDisplayGUI()->SetLineWidth(2);
+  this->Notebook->GetDisplayGUI()->DrawWireframe();
+  this->Notebook->GetDisplayGUI()->ColorByProperty();
+  this->Notebook->GetDisplayGUI()->ChangeActorColor(0.8, 0.0, 0.2);
+  this->Notebook->GetDisplayGUI()->SetLineWidth(2);
 
   this->UpdateGUI();
 }

@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.15");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.16");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -464,7 +464,7 @@ void vtkPVVolumeAppearanceEditor::BackButtonCallback()
     }
 
   // This has a side effect of gathering and display information.
-  this->PVRenderView->GetPVWindow()->GetCurrentPVSource()->GetDisplayGUI()->Update();
+  this->PVRenderView->GetPVWindow()->GetCurrentPVSource()->GetPVOutput()->Update();
   
   // Use the Callback version of the method to get the trace
   this->PVRenderView->GetPVWindow()->ShowCurrentSourcePropertiesCallback();

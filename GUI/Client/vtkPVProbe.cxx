@@ -51,7 +51,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.131");
+vtkCxxRevisionMacro(vtkPVProbe, "1.132");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -170,7 +170,7 @@ void vtkPVProbe::CreateProperties()
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER);
 
-  this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
+  this->ProbeFrame->SetParent(this->ParameterFrame->GetFrame());
   this->ProbeFrame->Create(pvApp, "frame", "");
   
   this->Script("pack %s",

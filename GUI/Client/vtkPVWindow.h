@@ -64,6 +64,7 @@ class vtkKWLabeledFrame;
 class vtkKWNotebook;
 class vtkKWPushButton;
 class vtkKWPushButtonWithMenu;
+class vtkKWMenuButton;
 class vtkKWRadioButton;
 class vtkKWRotateCameraInteractor;
 class vtkKWScale;
@@ -337,8 +338,8 @@ public:
   // Description:
   // Add a push button to the main toolbar.
   void AddToolbarButton(const char* buttonName, const char* imageName,
-                        const char* fileName, 
-                        const char* command, const char* balloonHelp);
+                        const char* fileName, const char* command, 
+                        const char* balloonHelp, int buttonVisibility);
 
   // Description:
   // Determines whether message dialogs or error macros as used
@@ -521,6 +522,10 @@ public:
   // Call AcceptCallback() on the current source.
   void AcceptCurrentSource();
 
+  // Description:
+  // Callback for when the user changed the visibility of a toolbar button.
+  void ToolbarMenuCheckCallback(const char* buttonName);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -560,7 +565,9 @@ protected:
   vtkKWRadioButton *TranslateCameraButton;
     
   // Main toolbar
-  vtkKWToolbar *Toolbar;
+  vtkKWToolbar* Toolbar;
+  // This controls button visibility.
+  vtkKWMenuButton* ToolbarMenuButton;
   
   // widgets for setting center of rotation for rotate camera interactor style
   vtkKWToolbar *PickCenterToolbar;

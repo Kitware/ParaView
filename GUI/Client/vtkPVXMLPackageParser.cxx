@@ -37,7 +37,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.44");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.45");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -451,10 +451,8 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
 {
   vtkPVApplication *pvApp = this->Window->GetPVApplication();
   pvm->SetApplication(pvApp);
-  //law int fixMe; // Move Source notbook and InformationGUI into window.
+  //law int fixme; // Move Source notbook into window.
   pvm->SetNotebook(this->Window->GetMainView()->GetSourceNotebook());
-  pvm->SetDisplayGUI(this->Window->GetMainView()->GetDisplayGUI());
-  pvm->SetInformationGUI(this->Window->GetMainView()->GetInformationGUI());
   const char* classAttr;
 
   const char* menu_name = me->GetAttribute("menu_name");
@@ -502,12 +500,17 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
   if(name && button_image)
     {
     const char* button_image_file = me->GetAttribute("button_image_file");
-
     const char* button_help = me->GetAttribute("button_help");
+    const char* button_visiblity = me->GetAttribute("button_visibility");
+    int vis = 1;
+    if (button_visiblity && ! atoi(button_visiblity))
+      {
+      vis = 0;
+      }
     ostrstream command;
     command << "CreatePVSource " << name << ends;
     this->Window->AddToolbarButton(name, button_image, button_image_file,
-                                   command.str(), button_help);
+                                   command.str(), button_help, vis);
     command.rdbuf()->freeze(0);
     pvm->SetToolbarModule(1);
     }

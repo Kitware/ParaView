@@ -55,7 +55,7 @@
 #include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.103");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.104");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -749,7 +749,7 @@ void vtkPVColorMap::BackButtonCallback()
     }
 
   // This has a side effect of gathering and display information.
-  this->PVRenderView->GetPVWindow()->GetCurrentPVSource()->GetDisplayGUI()->Update();
+  this->PVRenderView->GetPVWindow()->GetCurrentPVSource()->GetPVOutput()->Update();
   this->PVRenderView->GetPVWindow()->ShowCurrentSourceProperties();
 }
 

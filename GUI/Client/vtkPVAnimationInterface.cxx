@@ -53,6 +53,7 @@
 #include "vtkSMPartDisplay.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkCompleteArrays.h"
+#include "vtkPVSourceNotebook.h"
 
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkCollectionIterator.h"
@@ -184,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.160");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.161");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -992,7 +993,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
           = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
         if ( entry->GetPVSource() )
           {
-          entry->GetPVSource()->SetAcceptButtonColorToUnmodified();
+          entry->GetPVSource()->GetNotebook()->SetAcceptButtonColorToUnmodified();
           }
         }
       }
@@ -1004,7 +1005,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
           vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
         if (entry->GetPVSource())
           {
-          entry->GetPVSource()->SetAcceptButtonColorToModified();
+          entry->GetPVSource()->GetNotebook()->SetAcceptButtonColorToModified();
           entry->GetPVSource()->AcceptCallback();
           vtkKWMenu *menu = entry->GetPVSource()->GetPVWindow()->GetMenuView();
           menu->CheckRadioButton(menu, "Radio", VTK_PV_ANIMATION_MENU_INDEX);
@@ -1367,7 +1368,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     // For now, the image size for the animations cannot be larger than
     // the size of the render window. The problem is that tiling doesn't
     // work with multiple processes.
-    if (width > origWidth || height > origHeight)
+    if (0 && (width > origWidth || height > origHeight))
       {
       int diffX = width - origWidth;
       int diffY = height - origHeight;
@@ -1382,7 +1383,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
         height = origHeight;
         width = (int)(height * aspect);
         }
-      }    
+      }
     
     if ((width % 4) > 0)
       {

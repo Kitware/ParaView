@@ -32,6 +32,7 @@
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWProgressGauge.h"
@@ -129,7 +130,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.609");
+vtkCxxRevisionMacro(vtkPVWindow, "1.610");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -190,6 +191,9 @@ vtkPVWindow::vtkPVWindow()
   // Keep a list of the toolbar buttons so that they can be 
   // disabled/enabled in certain situations.
   this->ToolbarButtons = vtkArrayMap<const char*, vtkKWPushButton*>::New();
+  
+  // A menu to control toolbar button visibility.
+  this->ToolbarMenuButton = vtkKWMenuButton::New();
 
   this->CameraStyle3D = vtkPVInteractorStyle::New();
   this->CameraStyle2D = vtkPVInteractorStyle::New();
@@ -514,6 +518,8 @@ void vtkPVWindow::PrepareForDelete()
     this->Toolbar->Delete();
     this->Toolbar = NULL;
     }
+  this->ToolbarMenuButton->Delete();
+  this->ToolbarMenuButton = 0;
 
   if (this->PickCenterButton)
     {
@@ -834,6 +840,10 @@ void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
   this->Toolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->Toolbar->Create(app);
   this->Toolbar->ResizableOn();
+  //this->ToolbarMenuButton->SetParent(this->Toolbar->GetFrame());
+  this->ToolbarMenuButton->SetParent(this->Toolbar);
+  this->ToolbarMenuButton->Create(app, "-image PVPullDownArrow -relief flat");
+  this->ToolbarMenuButton->IndicatorOff();
 }
 
 //-----------------------------------------------------------------------------
@@ -900,7 +910,8 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
                                    const char* imageName, 
                                    const char* fileName,
                                    const char* command,
-                                   const char* balloonHelp)
+                                   const char* balloonHelp,
+                                   int buttonVisibility)
 {
   if (fileName)
     {
@@ -911,6 +922,27 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
   ostrstream opts;
   opts << "-image " << imageName << ends;
   button->Create(this->GetPVApplication(), opts.str());
+  // Add the button to the toolbar configuration menu.
+  vtkKWMenu* menu = this->ToolbarMenuButton->GetMenu();
+  const char* var = menu->CreateCheckButtonVariable(this, buttonName);
+  ostrstream checkCommand;
+  checkCommand << "ToolbarMenuCheckCallback " << buttonName << ends;
+  menu->AddCheckButton(buttonName,var,this, checkCommand.str(),
+    "Show/Hide button in toolbar.");
+  // Look in the registery to see if a button should be visible.
+  vtkKWApplication* app = this->GetApplication();
+  if (app->GetRegisteryValue(2, "RunTime", buttonName, 0))
+    {
+    buttonVisibility = app->GetIntRegisteryValue(2, "RunTime", buttonName);
+    }
+  menu->CheckCheckButton(this, buttonName, buttonVisibility);
+
+  // Lets see if we can put an image with the check button.
+  int index = menu->GetNumberOfItems()-1;
+  menu->ConfigureItem(index, opts.str());  
+  checkCommand.rdbuf()->freeze(0);
+  // Clean up.
+  delete [] var;
   opts.rdbuf()->freeze(0);
   button->SetCommand(this, command);
   if (balloonHelp)
@@ -918,8 +950,38 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
     button->SetBalloonHelpString(balloonHelp);
     }
   this->ToolbarButtons->SetItem(buttonName, button);
-  this->Toolbar->AddWidget(button);
+  if (buttonVisibility)
+    {
+    this->Toolbar->AddWidget(button);
+    }
   button->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::ToolbarMenuCheckCallback(const char* buttonName)
+{
+  int checkValue;
+  vtkKWMenu* menu;
+  
+  menu = this->ToolbarMenuButton->GetMenu();
+  checkValue = menu->GetCheckButtonValue(this,buttonName);
+  // Find the toolbar button widget.
+  vtkKWPushButton *button = 0;
+  if ( this->ToolbarButtons->GetItem(buttonName, button) == VTK_OK && button )
+    {
+    // Save in the registery
+    vtkPVApplication* pvApp = this->GetPVApplication();
+    pvApp->SetRegisteryValue(2, "RunTime", buttonName, 
+                             "%d", checkValue);
+    if (checkValue)
+      {
+      this->Toolbar->AddWidget(button);
+      }
+    else
+      {
+      this->Toolbar->RemoveWidget(button);
+      }
+    }
 }
 
 
@@ -1244,8 +1306,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     if (pvs)
       {
       pvs->IsPermanentOn();
-      pvs->HideDisplayPageOn();
-      pvs->HideInformationPageOn();
       pvs->Accept(1);
       pvs->SetTraceReferenceObject(this);
       ostrstream s;
@@ -1263,8 +1323,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     if (pvs)
       {
       pvs->IsPermanentOn();
-      pvs->HideDisplayPageOn();
-      pvs->HideInformationPageOn();
       pvs->Accept(1);
       pvs->SetTraceReferenceObject(this);
       ostrstream s;
@@ -1282,8 +1340,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     if (pvs)
       {
       pvs->IsPermanentOn();
-      pvs->HideDisplayPageOn();
-      pvs->HideInformationPageOn();
       pvs->Accept(1);
       pvs->SetTraceReferenceObject(this);
       ostrstream s;
@@ -1302,8 +1358,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     if (pvs)
       {
       pvs->IsPermanentOn();
-      pvs->HideDisplayPageOn();
-      pvs->HideInformationPageOn();
       pvs->Accept(1);
       pvs->SetTraceReferenceObject(this);
       ostrstream s;
@@ -1321,8 +1375,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     if (pvs)
       {
       pvs->IsPermanentOn();
-      pvs->HideDisplayPageOn();
-      pvs->HideInformationPageOn();
       pvs->Accept(1);
       pvs->SetTraceReferenceObject(this);
       ostrstream s;
@@ -1379,6 +1431,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   
   // Update the enable state
   this->UpdateEnableState();
+  
+  // Lets see if this works.
+  this->Script("pack %s -side right", this->ToolbarMenuButton->GetWidgetName());
 }
 
 //-----------------------------------------------------------------------------
@@ -3040,7 +3095,7 @@ void vtkPVWindow::SaveState(const char* filename)
   while ( !cit->IsDoneWithTraversal() )
     {
     pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
-    pvs->SaveState(file, 1);
+    pvs->SaveState(file);
     cit->GoToNextItem();
     }
   cit->Delete();
@@ -3050,7 +3105,7 @@ void vtkPVWindow::SaveState(const char* filename)
   while ( !cit->IsDoneWithTraversal() )
     {
     pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
-    pvs->SaveState(file, 2);
+    pvs->SaveStateVisibility(file);
     cit->GoToNextItem();
     }
   cit->Delete();
@@ -3215,8 +3270,7 @@ void vtkPVWindow::UpdateFilterMenu()
     }
 
   if (this->CurrentPVSource &&
-      !this->CurrentPVSource->GetIsPermanent() && 
-      !this->CurrentPVSource->GetHideDisplayPage() )
+      !this->CurrentPVSource->GetIsPermanent())
     {
     vtkPVDataInformation *pvdi = this->CurrentPVSource->GetDataInformation();
     if (pvdi->GetNumberOfPoints() <= 0)
@@ -3329,7 +3383,6 @@ void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
 
   if (pvs)
     {
-    pvs->SetAcceptButtonColorToUnmodified();
     if (pvs->InitializeTrace(NULL))
       {
       this->GetPVApplication()->AddTraceEntry(

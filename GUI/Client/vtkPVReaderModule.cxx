@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.53");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.54");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -67,7 +67,7 @@ void vtkPVReaderModule::CreateProperties()
   this->FileEntry = vtkPVFileEntry::New();
   this->FileEntry->SetLabel("Filename");
   this->FileEntry->SetPVSource(this);
-  this->FileEntry->SetParent(this->GetParameterFrame()->GetFrame());
+  this->FileEntry->SetParent(this->ParameterFrame->GetFrame());
   this->FileEntry->SetModifiedCommand(this->GetTclName(), 
                                       "SetAcceptButtonColorToModified");
   this->FileEntry->SetSMPropertyName("FileName");
