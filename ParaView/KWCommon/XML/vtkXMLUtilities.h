@@ -52,6 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkXMLDataElement;
 
+//BTX
+template<class DataType> class vtkVector;
+template<class DataType> class vtkVectorIterator;
+//ETX
+
 class VTK_EXPORT vtkXMLUtilities : public vtkObject
 {
 public:
@@ -66,7 +71,7 @@ public:
   // Description:
   // Collate a vtkXMLDataElement's attributes to a stream as a series of
   // name="value" pairs (the separator between each pair can be specified,
-  // it defaults to a space).
+  // if not, it defaults to a space).
   static void CollateAttributes(vtkXMLDataElement*, 
                                 ostream&, 
                                 const char *sep = 0);
@@ -75,9 +80,13 @@ public:
   // Flatten a vtkXMLDataElement to a stream, i.e. output an XML stream
   // of characters corresponding to that element, its attributes and its
   // nested elements.
+  // If 'indent' is not NULL, it is used to indent the whole tree.
+  // If 'indent' is not NULL and 'indent_attributes' is true, attributes will 
+  // be indented as well.
   static void FlattenElement(vtkXMLDataElement*, 
                              ostream&, 
-                             vtkIndent *indent = 0);
+                             vtkIndent *indent = 0,
+                             int indent_attributes = 1);
 
   // Description:
   // Write a vtkXMLDataElement to a file
@@ -94,9 +103,44 @@ public:
   static vtkXMLDataElement* ReadElement(const char *filename);
   //ETX
 
+  // Description:
+  // Find all elements in 'tree' that are similar to 'elem' (using the
+  // vtkXMLDataElement::IsEqualTo() predicate). 
+  // Return the number of elements found and store those elements in
+  // 'results' (automatically allocated).
+  // Warning: the results do not include 'elem' if it was found in the tree ;
+  // do not forget to deallocate 'results' if something was found.
+  //BTX
+  static int FindSimilarElements(vtkXMLDataElement *elem, 
+                                 vtkXMLDataElement *tree, 
+                                 vtkXMLDataElement ***results);
+  //ETX
+
+  // Description:
+  // Factor and unfactor a tree. This operation looks for duplicate elements
+  // in the tree, and replace them with references to a pool of elements.
+  // Unfactoring a non-factored element is harmless.
+  static void FactorElements(vtkXMLDataElement *tree);
+  static void UnFactorElements(vtkXMLDataElement *tree);
+
 protected:  
   vtkXMLUtilities() {};
   ~vtkXMLUtilities() {};
+
+  //BTX
+  typedef vtkVector<vtkXMLDataElement*> DataElementContainer;
+  typedef vtkVectorIterator<vtkXMLDataElement*> DataElementContainerIterator;
+
+  static void FindSimilarElementsInternal(vtkXMLDataElement *elem, 
+                                          vtkXMLDataElement *tree, 
+                                          DataElementContainer *results);
+
+  static int FactorElementsInternal(vtkXMLDataElement *tree, 
+                                    vtkXMLDataElement *root, 
+                                    vtkXMLDataElement *pool);
+  static int UnFactorElementsInternal(vtkXMLDataElement *tree, 
+                                      vtkXMLDataElement *pool);
+  //ETX
 
 private:
   vtkXMLUtilities(const vtkXMLUtilities&); // Not implemented
