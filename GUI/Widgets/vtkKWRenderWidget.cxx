@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.83");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.84");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -941,8 +941,17 @@ void vtkKWRenderWidget::RemovePropInternal(vtkProp* prop)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveAllProps()
 {
-  this->GetRenderer()->RemoveAllProps();
-  this->GetOverlayRenderer()->RemoveAllProps();
+  vtkRenderer *renderer = this->GetRenderer();
+  if (renderer)
+    {
+    renderer->RemoveAllProps();
+    }
+
+  renderer = this->GetOverlayRenderer();
+  if (renderer)
+    {
+    renderer->RemoveAllProps();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -994,6 +1003,8 @@ void vtkKWRenderWidget::GetRendererBackgroundColor(double *r, double *g, double 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Close()
 {
+  this->RemoveAllProps();
+
   this->RemoveBindings();
 
   // Clear all corner annotation texts
