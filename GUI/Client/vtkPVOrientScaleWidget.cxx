@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.20");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -554,9 +554,8 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
   if (!strcmp(scaleMode, "Scalar") && scalarProp)
     {
     const char *arrayName = this->ScalarsMenu->GetValue();
-    char *propArrayName = new char[strlen(scalarProp->GetElement(0))+1];
-    sprintf(propArrayName, scalarProp->GetElement(0));
-    scalarProp->SetElement(0, arrayName);
+    scalarProp->SetUncheckedElement(0, arrayName);
+    scalarProp->UpdateDependentDomains();
     if (arrayName)
       {
       double range[2];
@@ -566,15 +565,12 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
       absMaxRange = (fabs(range[1]) > absMaxRange) ? fabs(range[1]) :
         absMaxRange;
       }
-    scalarProp->SetElement(0, propArrayName);
-    delete [] propArrayName;
     }
   else if (!strcmp(scaleMode, "Vector Magnitude") && vectorProp)
     {
     const char *arrayName = this->VectorsMenu->GetValue();
-    char *propArrayName = new char[strlen(vectorProp->GetElement(0))+1];
-    sprintf(propArrayName, vectorProp->GetElement(0));
-    vectorProp->SetElement(0, arrayName);
+    vectorProp->SetUncheckedElement(0, arrayName);
+    vectorProp->UpdateDependentDomains();
     if (arrayName)
       {
       double range[2];
@@ -584,15 +580,12 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
       absMaxRange = (fabs(range[1]) > absMaxRange) ? fabs(range[1]) :
         absMaxRange;
       }
-    vectorProp->SetElement(0, propArrayName);
-    delete [] propArrayName;
     }
   else if (!strcmp(scaleMode, "Vector Components") && vectorProp)
     {
     const char *arrayName = this->VectorsMenu->GetValue();
-    char *propArrayName = new char[strlen(vectorProp->GetElement(0))+1];
-    sprintf(propArrayName, vectorProp->GetElement(0));
-    vectorProp->SetElement(0, arrayName);
+    vectorProp->SetUncheckedElement(0, arrayName);
+    vectorProp->UpdateDependentDomains();
     if (arrayName)
       {
       double range0[2], range1[2], range2[2];
@@ -614,8 +607,6 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
       absMaxRange = (fabs(range2[1]) > absMaxRange) ? fabs(range2[1]) :
         absMaxRange;
       }
-    vectorProp->SetElement(0, propArrayName);
-    delete [] propArrayName;
     }
   
   if (absMaxRange != 0)
@@ -835,6 +826,12 @@ void vtkPVOrientScaleWidget::ResetInternal()
     return;
     }
 
+  if (!this->AcceptCalled)
+    {
+    this->Update();
+    return;
+    }
+
   vtkSMStringVectorProperty *scalarProp =
     vtkSMStringVectorProperty::SafeDownCast(this->GetSMScalarProperty());
   vtkSMStringVectorProperty *vectorProp =
@@ -859,12 +856,6 @@ void vtkPVOrientScaleWidget::ResetInternal()
     this->SetCurrentScaleMode(this->ScaleModeMenu->GetValue());
     }
 
-  if (!this->AcceptCalled)
-    {
-    this->Update();
-    return;
-    }
-  
   if (scalarProp)
     {
     this->ScalarsMenu->SetValue(scalarProp->GetElement(0));
