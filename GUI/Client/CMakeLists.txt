@@ -95,7 +95,6 @@ SET( ParaViewClient_SRCS
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
   vtkPVData.cxx
-  vtkPVDataSetFileEntry.cxx
   vtkPVDataSetReaderModule.cxx
   vtkPVDisplay.cxx
   vtkPVDummyWidget.cxx
