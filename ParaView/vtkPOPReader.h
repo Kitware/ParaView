@@ -115,6 +115,8 @@ protected:
   char **ArrayNames;
   char **ArrayFileNames;  
   unsigned long *ArrayOffsets;
+  int ArrayFileDimensionality;
+
 
   char *UFlowFileName;
   vtkSetStringMacro(UFlowFileName);

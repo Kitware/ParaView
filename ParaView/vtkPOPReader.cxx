@@ -78,6 +78,7 @@ vtkPOPReader::vtkPOPReader()
   this->ArrayNames = NULL;
   this->ArrayFileNames = NULL;
   this->ArrayOffsets = NULL;
+  this->ArrayFileDimensionality = 3;
 
   this->UFlowFileName = NULL;
   this->UFlowFileOffset = 0;
@@ -202,6 +203,9 @@ void vtkPOPReader::Execute()
 
   output = this->GetOutput();
   
+  cout << "Reading POP file\n";
+  cout.flush();
+
   // Set up the extent of the grid image.
   ext[0] = ext[2] = ext[4] = 0;
   ext[1] = this->Dimensions[0]-1;
@@ -243,13 +247,29 @@ void vtkPOPReader::Execute()
   ext[5] = this->DepthValues->GetNumberOfTuples()-1;
   reader->SetDataExtent(ext);
   reader->SetDataScalarTypeToFloat();
+  reader->SetFileDimensionality(this->ArrayFileDimensionality);
   ++ext[1];
   wrap->SetOutputWholeExtent(ext);
   for (i = 0; i < this->NumberOfArrays; ++i)
     {
     if (this->ArrayFileNames[i] && this->ArrayNames[i])
       {
-      reader->SetFileName(this->ArrayFileNames[i]);
+      if (this->ArrayFileDimensionality == 3)
+        {
+        reader->SetFileName(this->ArrayFileNames[i]);
+        }
+      else if (this->ArrayFileDimensionality == 2)
+        {
+        reader->SetFilePattern("%s.%02d");
+        reader->SetFilePrefix(this->ArrayFileNames[i]);
+        }
+      else
+        {
+        vtkErrorMacro("FileDimensionality can only be 2 or 3.");
+        reader->Delete();
+        wrap->New();
+        return;
+        }
       reader->SetHeaderSize(this->ArrayOffsets[i] * 4 
 			    * this->Dimensions[0] * this->Dimensions[1]);
       // Just in case.
@@ -257,7 +277,6 @@ void vtkPOPReader::Execute()
       output->GetUpdateExtent(ext);
       image = wrap->GetOutput();
       image->SetUpdateExtent(ext);
-      cerr << "Reading arrray.\n";
       image->Update();
       array = image->GetPointData()->GetScalars()->GetData();
       array->SetName(this->ArrayNames[i]);
@@ -432,6 +451,18 @@ void vtkPOPReader::ReadInformationFile()
           }
         this->AddArrayName(str, str2, offset);
         }
+      }
+
+    else if (strcmp(str, "ArrayFileDimensionality") == 0)
+      {
+      *file >> num;
+      if (file->fail())
+        {
+        vtkErrorMacro("Error reading array name " << i);    
+        delete file;
+        return;
+        }
+      this->ArrayFileDimensionality = num;
       }
 
     else if (strcmp(str, "Flow") == 0)
