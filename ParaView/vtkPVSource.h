@@ -41,7 +41,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWComposite.h"
 class vtkPVWindow;
 
-class vtkPVAssignment;
 
 class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {
@@ -53,12 +52,7 @@ public:
   // This duplicates the object in the satellite processes.
   // They will all have the same tcl name.
   void Clone(vtkPVApplication *app);
-  
-  // Description:
-  // Tells the filter which piece of data to generate.
-  // Makes the call (indirectly) in parallel (on every process).
-  virtual void SetAssignment(vtkPVAssignment *a);
-  
+    
   // Description:
   // Get the Prop for this class.
   virtual vtkProp *GetProp();

@@ -39,6 +39,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWApplication.h"
 #include "vtkDataSetMapper.h"
 
+class vtkPVPolyDataMapper;
+class vtkPVAssignment;
+
+
 class VTK_EXPORT vtkPVActorComposite : public vtkKWActorComposite
 {
 public:
@@ -62,14 +66,21 @@ public:
   void Deselect(vtkKWView *v);
   
   // Description:
-  // This flage turns the visibility of the prop on and off.  These methods transmit
+  // This flag turns the visibility of the prop on and off.  These methods transmit
   // the state change to all of the satellite processes.
   void SetVisibility(int v);
   int GetVisibility();
   vtkBooleanMacro(Visibility, int);
   
-  //will need to add a function to handle cloning
+  // Description:
+  // Since we are using a special (subclass) mapper,
+  // this method provides a safe downcast.
+  vtkPVPolyDataMapper *GetPVMapper();
   
+  // Description:
+  // The mapper needs to know what the assignment is.
+  void SetAssignment(vtkPVAssignment *a);
+
 protected:
   vtkPVActorComposite();
   ~vtkPVActorComposite();

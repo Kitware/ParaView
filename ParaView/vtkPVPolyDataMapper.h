@@ -28,19 +28,29 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 // .NAME vtkPVPolyDataMapper - PV version of the mapper.
 // .SECTION Description
 // This subclass just adds the ability to select a portion of the input
-// with an assignment.
+// with an assignment.  This functionality should probably make its way
+// into vtkMapper (but what about assignments?/vtkExtent!)
 
 #ifndef __vtkPVPolyDataMapper_h
 #define __vtkPVPolyDataMapper_h
 
+#ifdef _WIN32
+#include "vtkOpenGLPolyDataMapper.h"
+#else
 #include "vtkMesaPolyDataMapper.h"
+#endif
+
 #include "vtkPVAssignment.h"
 
-class VTK_EXPORT vtkPVPolyDataMapper : public vtkMesaPolyDataMapper
+class VTK_EXPORT vtkPVPolyDataMapper : public vtkOpenGLPolyDataMapper
 {
 public:
   static vtkPVPolyDataMapper* New();
+#ifdef _WIN32
+  vtkTypeMacro(vtkPVPolyDataMapper, vtkOpenGLPolyDataMapper);
+#else
   vtkTypeMacro(vtkPVPolyDataMapper, vtkMesaPolyDataMapper);
+#endif
   
   // Description:
   // Paraviews way of telling the mapper what to display.

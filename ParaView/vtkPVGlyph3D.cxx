@@ -31,6 +31,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPVPolyData.h"
+#include "vtkPVActorComposite.h"
+#include "vtkPVConeSource.h"
+#include "vtkPVAssignment.h"
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
 			int argc, char *argv[]);
@@ -174,6 +177,22 @@ void vtkPVGlyph3D::SetScaleModeToDataScalingOff()
 
 
 //----------------------------------------------------------------------------
+void vtkPVGlyph3D::SetScaleFactor(float factor)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetScaleFactor %f", this->GetTclName(),
+			   factor);
+    }  
+  
+  this->GetGlyph()->SetScaleFactor(factor);
+}
+
+
+
+//----------------------------------------------------------------------------
 void vtkPVGlyph3D::ShowGlyphSource()
 {
   vtkPVWindow *window = 
@@ -195,25 +214,51 @@ void vtkPVGlyph3D::ScaleFactorChanged()
   vtkPVWindow *window = this->GetWindow();
   vtkPVActorComposite *ac;
   
-  pvd = vtkPVPolyData::New();
-  pvd->Clone(pvApp);
+  this->SetScaleFactor(this->ScaleFactorEntry->GetValueAsFloat());
   
-  this->SetOutput(pvd);
-  a = window->GetPreviousSource()->GetPVData()->GetAssignment();
-  this->SetAssignment(a);
-  
-  this->Glyph->SetScaleFactor(this->ScaleFactorEntry->GetValueAsFloat());
-  this->Glyph->Modified();
-  this->Glyph->Update();
-  
-  window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
-  
-  this->GetView()->Render();
-  
-  this->CreateDataPage();
-  
-  ac = this->GetPVData()->GetActorComposite();
-  window->GetMainView()->AddComposite(ac);
+  if (this->GetPVData() == NULL)
+    { // This is the first time.  Create the data.
+    vtkPVConeSource *cone;
+    vtkPVPolyData *coneOut;
+    vtkPVAssignment *coneAssignment;
+
+    // Here we are creating our own glyph source.
+    // In the future this may be set in the UI.
+    cone = vtkPVConeSource::New();
+    cone->Clone(pvApp);
+    cone->SetName("glyph cone");
+    window->GetMainView()->AddComposite(cone);
+    // Accept
+    coneOut = vtkPVPolyData::New();
+    coneOut->Clone(pvApp);
+    coneAssignment = vtkPVAssignment::New();
+    coneAssignment->Clone(pvApp);
+    coneOut->SetAssignment(coneAssignment);
+    cone->SetOutput(coneOut);
+    cone->CreateDataPage();
+    window->GetMainView()->AddComposite(coneOut->GetActorComposite());
+    coneOut->GetActorComposite()->VisibilityOff();
+    cone->Delete();
+    cone = NULL;
+    this->SetSource(coneOut);
+    coneOut->Delete();
+    coneOut = NULL;
+    coneAssignment->Delete();
+    coneAssignment = NULL;
+
+    // Create our own output.
+    pvd = vtkPVPolyData::New();
+    pvd->Clone(pvApp);
+    this->SetOutput(pvd);
+    a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+    pvd->SetAssignment(a);
+    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+    this->CreateDataPage();
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
+    }
+
   window->GetMainView()->SetSelectedComposite(this);
+  this->GetView()->Render();
 }
 

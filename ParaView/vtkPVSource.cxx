@@ -114,17 +114,6 @@ void vtkPVSource::SetPVData(vtkPVData *data)
     }
 }
   
-//----------------------------------------------------------------------------
-// Data must be set first.  This is OK, because Source will merge with PVComposite ...
-void vtkPVSource::SetAssignment(vtkPVAssignment *a)
-{
-  if (this->Output == NULL)
-    {
-    vtkErrorMacro("Cannot make assignment.  Output has not been created.");
-    return;
-    }
-  this->Output->SetAssignment(a); 
-}
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVSource::GetWindow()
@@ -185,6 +174,7 @@ void vtkPVSource::CreateProperties()
                this->Properties->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVSource::CreateDataPage()
 {
   if (!this->DataCreated)
@@ -209,6 +199,7 @@ void vtkPVSource::CreateDataPage()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVSource::Select(vtkKWView *v)
 {
   // invoke super
@@ -234,6 +225,7 @@ void vtkPVSource::Select(vtkKWView *v)
   delete [] rbv;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVSource::Deselect(vtkKWView *v)
 {
   // invoke super
@@ -241,6 +233,7 @@ void vtkPVSource::Deselect(vtkKWView *v)
   v->GetParentWindow()->GetMenuProperties()->DeleteMenuItem(" Data");
 }
 
+//----------------------------------------------------------------------------
 void vtkPVSource::ShowProperties()
 {
   vtkKWWindow *pw = this->View->GetParentWindow();
@@ -306,7 +299,6 @@ void vtkPVSource::SetVisibility(int v)
   
   pvApp = (vtkPVApplication*)(this->Application);
   
-  // Make the assignment in all of the processes.
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetVisibility %d", this->GetTclName(), v);

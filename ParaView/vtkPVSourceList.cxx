@@ -29,6 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWEntry.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVWindow.h"
+#include "vtkPVActorComposite.h"
 
 int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);

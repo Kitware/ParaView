@@ -152,7 +152,7 @@ void vtkPVImageSlice::SliceChanged()
   this->SetOutput(pvi);
   
   a = window->GetPreviousSource()->GetPVData()->GetAssignment();
-  this->SetAssignment(a);
+  pvi->SetAssignment(a);
 
   if (this->XDimension->GetState())
     {

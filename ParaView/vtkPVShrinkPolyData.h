@@ -61,6 +61,10 @@ public:
   // The methods executes on all processes.
   void SetInput(vtkPVPolyData *pvData);
   
+  // Description:
+  // The methods executes on all processes.
+  void SetShrinkFactor(float factor);
+
 protected:
   vtkPVShrinkPolyData();
   ~vtkPVShrinkPolyData();

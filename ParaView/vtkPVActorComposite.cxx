@@ -31,8 +31,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 #include "vtkKWWindow.h"
 #include "vtkPVApplication.h"
+#include "vtkPVPolyDataMapper.h"
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
 {
   // First try to create the object from the vtkObjectFactory
@@ -48,6 +49,7 @@ vtkPVActorComposite* vtkPVActorComposite::New()
 int vtkPVActorCompositeCommand(ClientData cd, Tcl_Interp *interp,
 			       int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVActorComposite::vtkPVActorComposite()
 {
   this->CommandFunction = vtkPVActorCompositeCommand;
@@ -55,8 +57,14 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->Properties = vtkKWWidget::New();
   this->Label = vtkKWLabel::New();
   this->Name = NULL;
+
+  // We want to use a special mapper. (Get rid of supper classes mapper.)
+  this->Mapper->Delete();
+  this->Mapper = vtkPVPolyDataMapper::New();
+  this->Actor->SetMapper(this->Mapper);
 }
 
+//----------------------------------------------------------------------------
 vtkPVActorComposite::~vtkPVActorComposite()
 {
   this->Label->Delete();
@@ -68,6 +76,7 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->SetName(NULL);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::CreateProperties()
 {
   const char *actorPage;
@@ -149,12 +158,14 @@ void vtkPVActorComposite::Select(vtkKWView *v)
   delete [] rbv;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::Deselect(vtkKWView *v)
 {
   // invoke super
   this->vtkKWComposite::Deselect(v);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::ShowProperties()
 {
   vtkKWWindow *pw = this->View->GetParentWindow();
@@ -208,4 +219,30 @@ int vtkPVActorComposite::GetVisibility()
     }
   
   return p->GetVisibility();
+}
+
+
+//----------------------------------------------------------------------------
+vtkPVPolyDataMapper* vtkPVActorComposite::GetPVMapper()
+{
+  if (this->Mapper == NULL)
+    {
+    return NULL;
+    }
+  
+  if (this->Mapper->IsA("vtkPVPolyDataMapper"))
+    {  
+    return (vtkPVPolyDataMapper*)(this->Mapper);
+    }
+  else
+    {
+    vtkErrorMacro("Bad typecast");
+    return NULL;
+    } 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetAssignment(vtkPVAssignment *a)
+{
+  this->GetPVMapper()->SetAssignment(a);
 }

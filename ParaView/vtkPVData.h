@@ -29,16 +29,17 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVData_h
 #define __vtkPVData_h
 
-#include "vtkProp.h"
-#include "vtkDataSetMapper.h"
-#include "vtkPVMenuButton.h"
-#include "vtkActor.h"
+#include "vtkKWWidget.h"
 #include "vtkDataSet.h"
-#include "vtkPVActorComposite.h"
 
+class vtkActor;
+class vtkDataSetMapper;
+class vtkProp;
+class vtkPVActorComposite;
 class vtkPVSource;
 class vtkPVAssignment;
 class vtkPVApplication;
+class vtkPVMenuButton;
 
 
 class VTK_EXPORT vtkPVData : public vtkKWWidget

@@ -58,7 +58,11 @@ void vtkPVPolyDataMapper::Update()
     pd->SetUpdatePiece(this->Assignment->GetPiece());
     }
   
+#ifdef _WIN32
+  this->vtkOpenGLPolyDataMapper::Update();
+#else
   this->vtkMesaPolyDataMapper::Update();
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -73,7 +77,11 @@ float *vtkPVPolyDataMapper::GetBounds()
     pd->SetUpdatePiece(this->Assignment->GetPiece());
     }
   
+#ifdef _WIN32
+  return this->vtkOpenGLPolyDataMapper::GetBounds();
+#else
   return this->vtkMesaPolyDataMapper::GetBounds();
+#endif
 }
 
 

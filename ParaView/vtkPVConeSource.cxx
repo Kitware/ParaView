@@ -34,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkPVAssignment.h"
 #include "vtkPVWindow.h"
+#include "vtkPVActorComposite.h"
 
 int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -145,43 +146,33 @@ vtkPVPolyData *vtkPVConeSource::GetOutput()
 //----------------------------------------------------------------------------
 void vtkPVConeSource::ConeParameterChanged()
 {
-  int id, num;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVPolyData *pvd;
   vtkPVAssignment *a;
   vtkPVActorComposite *ac;
   vtkPVWindow *window = this->GetWindow();
-  
-  pvd = vtkPVPolyData::New();
-  pvd->Clone(pvApp);
-  a = vtkPVAssignment::New();
-  a->Clone(pvApp);
-  
-  this->SetOutput(pvd);
-  this->SetAssignment(a);
-  
+ 
   this->ConeSource->SetRadius(this->RadiusEntry->GetValueAsFloat());
   this->ConeSource->SetHeight(this->HeightEntry->GetValueAsFloat());
   this->ConeSource->SetResolution(this->ResolutionEntry->GetValueAsInt());
+
+  if (this->GetPVData() == NULL)
+    { // This is the first time, initialize data.  
+    pvd = vtkPVPolyData::New();
+    pvd->Clone(pvApp);
+    a = vtkPVAssignment::New();
+    a->Clone(pvApp);
   
-  num = pvApp->GetController()->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    pvApp->RemoteScript(id, "%s SetRadius %f", this->GetTclName(),
-			this->ConeSource->GetRadius());
-    pvApp->RemoteScript(id, "%s SetHeight %f", this->GetTclName(),
-			this->ConeSource->GetHeight());
-    pvApp->RemoteScript(id, "%s SetResolution %d", this->GetTclName(),
-			this->ConeSource->GetResolution());
+    pvd->SetAssignment(a);
+    this->SetOutput(pvd);
+  
+    this->CreateDataPage();
+  
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
     }
-  
-  this->GetView()->Render();
-  
-  this->CreateDataPage();
-  
-  ac = this->GetPVData()->GetActorComposite();
-  window->GetMainView()->AddComposite(ac);
   window->GetMainView()->SetSelectedComposite(this);
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------

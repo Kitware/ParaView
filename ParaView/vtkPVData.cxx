@@ -25,6 +25,8 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+#include "vtkActor.h"
+#include "vtkDataSetMapper.h"
 #include "vtkPVData.h"
 #include "vtkPVPolyData.h" 
 #include "vtkPVSource.h"
@@ -34,6 +36,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVContourFilter.h"
 #include "vtkPVAssignment.h"
 #include "vtkPVApplication.h"
+#include "vtkPVActorComposite.h"
+#include "vtkPVMenuButton.h"
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -136,19 +140,12 @@ void vtkPVData::Contour()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVContourFilter *contour;
-//  vtkPVPolyData *pvd;
-//  vtkPVAssignment *a;
   float *range;
   
   contour = vtkPVContourFilter::New();
   contour->Clone(pvApp);
-//  pvd = vtkPVPolyData::New();
-//  pvd->Clone(pvApp);
   
   contour->SetInput(this);
-//  contour->SetOutput(pvd);
-//  a = this->GetAssignment();
-//  contour->SetAssignment(a);
   
   range = this->Data->GetScalarRange();
   contour->SetValue(0, (range[1]-range[0])/2.0);
@@ -227,6 +224,11 @@ void vtkPVData::SetPVSource(vtkPVSource *source)
 //----------------------------------------------------------------------------
 void vtkPVData::SetAssignment(vtkPVAssignment *a)
 {
+  if (this->Assignment == a)
+    {
+    return;
+    }
+
   vtkPVApplication *pvApp = this->GetPVApplication();
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
@@ -234,10 +236,7 @@ void vtkPVData::SetAssignment(vtkPVAssignment *a)
 			   a->GetTclName());
     }
   
-  if (this->Assignment == a)
-    {
-    return;
-    }
+  this->ActorComposite->SetAssignment(a);
   
   if (this->Assignment)
     {
@@ -247,16 +246,8 @@ void vtkPVData::SetAssignment(vtkPVAssignment *a)
 
   if (a)
     {
-    if (this->Data == NULL)
-      {
-      vtkErrorMacro("I do not have a data set to make an assignment.");
-      return;
-      }
     this->Assignment = a;
     a->Register(this);
-  
-    cerr << "Setting UpdateExtent to " << a->GetPiece() << ", " << a->GetNumberOfPieces() << endl;
-    this->Data->SetUpdateExtent(a->GetPiece(), a->GetNumberOfPieces());
     }
 }
 

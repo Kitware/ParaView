@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVRenderView.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVWindow.h"
+#include "vtkPVActorComposite.h"
 
 int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -118,27 +119,36 @@ void vtkPVShrinkPolyData::ShrinkFactorChanged()
   vtkPVWindow *window = this->GetWindow();
   vtkPVActorComposite *ac;
   
-  pvd = vtkPVPolyData::New();
-  pvd->Clone(pvApp);
-  
-  this->SetOutput(pvd);
-  a = window->GetPreviousSource()->GetPVData()->GetAssignment();
-  this->SetAssignment(a);
-  
-  this->Shrink->SetShrinkFactor(this->ShrinkFactorScale->GetValue());
-  this->Shrink->Modified();
-  this->Shrink->Update();
-  
-//  window->GetPreviousSource()->VisibilityOff();
-  window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
-  
-  this->GetView()->Render();
-  
-  this->CreateDataPage();
-  
-  ac = this->GetPVData()->GetActorComposite();
-  window->GetMainView()->AddComposite(ac);
+  this->SetShrinkFactor(this->ShrinkFactorScale->GetValue());
+
+  if (this->GetPVData() == NULL)
+    { // This is the first time. Create the data.
+    pvd = vtkPVPolyData::New();
+    pvd->Clone(pvApp);
+    this->SetOutput(pvd);
+    a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+    pvd->SetAssignment(a);
+    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
+    this->CreateDataPage();
+    }
+
   window->GetMainView()->SetSelectedComposite(this);
+  this->GetView()->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVShrinkPolyData::SetShrinkFactor(float factor)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetShrinkFactor %f", this->GetTclName(), 
+			   factor);
+    }
+  
+  this->Shrink->SetShrinkFactor(factor);
 }
 
 

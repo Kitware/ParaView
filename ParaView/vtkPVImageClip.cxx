@@ -230,7 +230,7 @@ void vtkPVImageClip::ExtentsChanged()
   this->SetOutput(pvi);
 
   a = window->GetPreviousSource()->GetPVData()->GetAssignment();
-  this->SetAssignment(a);
+  pvi->SetAssignment(a);
   
   this->ImageClip->SetOutputWholeExtent(this->ClipXMinEntry->GetValueAsInt(),
 					this->ClipXMaxEntry->GetValueAsInt(),

@@ -41,6 +41,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkConeSource.h"
 #include "vtkPVApplication.h"
+#include "vtkPVMenuButton.h"
+#include "vtkDataSetMapper.h"
+#include "vtkPVActorComposite.h"
 
 int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 		                     int argc, char *argv[]);
@@ -91,29 +94,15 @@ void vtkPVPolyData::Shrink()
 void vtkPVPolyData::Glyph()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVConeSource *glyphCone;
   vtkPVGlyph3D *glyph;
-  vtkPVPolyData *glyphOut;
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
 
   glyph = vtkPVGlyph3D::New();
   glyph->Clone(pvApp);
 
-  glyphCone = vtkPVConeSource::New();
-  glyphCone->Clone(pvApp);
-  glyphOut = vtkPVPolyData::New();
-  glyphOut->Clone(pvApp);
-  
-  glyphCone->SetOutput(glyphOut);
-  window->GetMainView()->AddComposite(glyphCone);
-  glyphCone->SetName("glyph source");
   
   glyph->SetInput(this);
-  glyph->SetSource(glyphOut);
-  glyph->SetGlyphSource(glyphCone);
   glyph->SetScaleModeToDataScalingOff();
-  
-  glyphCone->VisibilityOff();
     
   glyph->SetName("glyph");
  
@@ -122,7 +111,6 @@ void vtkPVPolyData::Glyph()
   window->SetCurrentSource(glyph);
   window->GetSourceList()->Update();
   
-  glyphCone->Delete();
 }
 
 //----------------------------------------------------------------------------

@@ -152,7 +152,7 @@ void vtkPVImageReader::ImageAccepted()
   this->ReadImage();
   
   this->SetOutput(image);
-  this->SetAssignment(a);
+  image->SetAssignment(a);
   
   this->GetView()->Render();
   
