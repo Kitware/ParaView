@@ -123,6 +123,8 @@ template <class value>
 class vtkLinkedList;
 //ETX
 
+#define VTK_PV_APPSETTINGS_MENU_INDEX  1
+#define VTK_PV_APPSETTINGS_MENU_LABEL  " Application Settings"
 #define VTK_PV_SOURCE_MENU_INDEX       2
 #define VTK_PV_SOURCE_MENU_LABEL       " Source"
 #define VTK_PV_ANIMATION_MENU_INDEX    3
@@ -206,7 +208,7 @@ public:
   // Description:
   // Callback to show the animation page.
   void ShowAnimationProperties();
-  
+
   // Description:
   // Access to the toolbars.
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
@@ -442,6 +444,10 @@ public:
   void EnableNavigationWindow();
   void DisableNavigationWindow();
 
+  // Description:
+  // Callback to handle toolbar settings change
+  void OnToolbarSettingsChange();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -450,6 +456,12 @@ protected:
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
   virtual void SerializeToken(istream& is, const char token[1024]);
 
+  virtual void AddPreferencesProperties();
+
+  vtkKWLabeledFrame *ToolbarSettingsFrame;
+  vtkKWCheckButton  *ToolbarSettingsFlatFrameCheck;
+  vtkKWCheckButton  *ToolbarSettingsFlatButtonsCheck;
+ 
   // Main render window
   vtkPVRenderView *MainView;
 
@@ -594,6 +606,8 @@ protected:
   // Description:
   // Create error log display.
   void CreateErrorLogDisplay();
+
+  void UpdateToolbarAspect();
 
 private:
   static const char* StandardReaderInterfaces;

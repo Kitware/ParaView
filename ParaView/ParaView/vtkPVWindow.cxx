@@ -105,6 +105,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PV_NOCREATE 
 #endif
 
+#define VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY "ToolbarFlatFrame"
+#define VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY "ToolbarFlatButtons"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
 
@@ -261,6 +264,10 @@ vtkPVWindow::vtkPVWindow()
   this->MainView = 0;
 
   this->PVColorMaps = vtkCollection::New();
+
+  this->ToolbarSettingsFrame = 0;
+  this->ToolbarSettingsFlatFrameCheck = 0;
+  this->ToolbarSettingsFlatButtonsCheck = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -568,9 +575,27 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 {
   // Add view options.
 
-  // Shows the notebook for the current source and data object.
+  // View menu: Show the application settings
 
   char *rbv = 
+    this->GetMenuView()->CreateRadioButtonVariable(
+      this->GetMenuView(),"Radio");
+
+  this->GetMenuView()->AddRadioButton(
+    VTK_PV_APPSETTINGS_MENU_INDEX, 
+    VTK_PV_APPSETTINGS_MENU_LABEL, 
+    rbv, 
+    this, 
+    "ShowWindowProperties", 
+    1,
+    "Display the application settings");
+  delete [] rbv;
+
+  this->GetMenuView()->AddSeparator();
+
+  // View menu: shows the notebook for the current source and data object.
+
+  rbv = 
     this->GetMenuView()->CreateRadioButtonVariable(
       this->GetMenuView(),"Radio");
 
@@ -584,7 +609,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     "Display the properties of the current data source or filter");
   delete [] rbv;
 
-  // Shows the animation tool.
+  // View menu: Shows the animation tool.
 
   rbv = this->GetMenuView()->CreateRadioButtonVariable(
            this->GetMenuView(),"Radio");
@@ -600,7 +625,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     "in a loop");
   delete [] rbv;
 
-  // Add/Remove to/from File menu.
+  // File menu: 
 
   // We do not need Close in the file menu since we don't
   // support multiple windows (exit is enough)
@@ -612,7 +637,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Copies the current trace file to another file.
   this->MenuFile->InsertCommand(3, "Save Trace File", this, "SaveTrace");
 
-  // ParaView specific menus.
+  // Select menu: ParaView specific menus.
 
   // Create the select menu (for selecting user created and default
   // (i.e. glyphs) data objects/sources)
@@ -626,29 +651,18 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
                                  "Select one of the glyph sources.");  
 
-  // Advanced stuff like saving VTK scripts, loading packages etc.
+  // Advanced menu: stuff like saving VTK scripts, loading packages etc.
+
   this->AdvancedMenu->SetParent(this->GetMenu());
   this->AdvancedMenu->Create(this->Application, "-tearoff 0");
   this->Menu->InsertCascade(3, "Advanced", this->AdvancedMenu, 0);
 
-  this->AdvancedMenu->InsertCommand(4, "Command Prompt", this,
-                                    "DisplayCommandPrompt",8,
-                                    "Display a prompt to interact "
-    "with the ParaView engine");
   this->AdvancedMenu->AddCommand("Load ParaView Script", this, "LoadScript", 0,
                                  "Load ParaView Script (.pvs)");
   this->AdvancedMenu->InsertCommand(2, "Export VTK Script", this,
                                     "ExportVTKScript", 7,
                                     "Write a script which can be "
                                     "parsed by the vtk executable");
-  
-  // Log stuff (not traced)
-  this->AdvancedMenu->InsertCommand(5, "Show Timer Log", this, "ShowTimerLog", 
-                                    2, "Show log of render events and timing");
-              
-  // Log stuff (not traced)
-  this->AdvancedMenu->InsertCommand(5, "Show Error Log", this, "ShowErrorLog", 
-                                    2, "Show log of all errors and warnings");
   
   this->AdvancedMenu->InsertCommand(5, "Delete All Sources", this, 
                                     "DeleteAllSourcesCallback", 
@@ -673,6 +687,28 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                  "Choose a filter from a list of "
                                  "VTK filters");  
   this->AdvancedMenu->SetState("VTK Filters", vtkKWMenu::Disabled);
+
+  // Window menu:
+
+  this->GetMenuWindow()->AddSeparator();
+
+  this->GetMenuWindow()->InsertCommand(
+    4, "Command Prompt", this,
+    "DisplayCommandPrompt", 8,
+    "Display a prompt to interact with the ParaView engine");
+
+  // Log stuff (not traced)
+  this->GetMenuWindow()->InsertCommand(
+    5, "Timer Log", this, 
+    "ShowTimerLog", 2, 
+    "Show log of render events and timing");
+              
+  // Log stuff (not traced)
+  this->GetMenuWindow()->InsertCommand(
+    5, "Error Log", this, 
+    "ShowErrorLog", 2, 
+    "Show log of all errors and warnings");
+  
 }
 
 //----------------------------------------------------------------------------
@@ -785,14 +821,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   this->InitializeMenus(app);
   this->InitializeToolbars(app);
-  this->CreateDefaultPropertiesParent();
 
   // Interface for the preferences.
-
-  // Create the main properties notebook.
-  // The notebook does not create trace entries.
-  this->Notebook->SetParent(this->GetPropertiesParent());
-  this->Notebook->Create(this->Application,"");
 
   // Create the main view.
   this->CreateMainView(pvApp);
@@ -943,7 +973,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // Interface for the animation tool.
   this->AnimationInterface->SetWindow(this);
   this->AnimationInterface->SetView(this->GetMainView());
-  this->AnimationInterface->SetParent(this->MainView->GetPropertiesParent());
+  this->AnimationInterface->SetParent(this->GetPropertiesParent());
   this->AnimationInterface->Create(app, "-bd 2 -relief raised");
 
   this->AddRecentFilesToMenu("Exit",this);
@@ -1028,6 +1058,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->UpdateSelectMenu();
   // Show the sources (in Advanced).
   this->UpdateSourceMenu();
+
+  // Update preferences
+  this->AddPreferencesProperties();
+
+  // Update toolbar aspect
+  this->UpdateToolbarAspect();
 
   // Make the 3D View Settings the current one.
   this->Script("%s invoke \"%s\"", 
@@ -1362,6 +1398,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   view->CreateRenderObjects(pvApp);
   this->MainView = view;
   this->MainView->SetParent(this->ViewFrame);
+  this->MainView->SetPropertiesParent(this->GetPropertiesParent());
   this->AddView(this->MainView);
   this->MainView->Create(this->Application,"-width 200 -height 200");
   this->MainView->MakeSelected();
@@ -1547,6 +1584,157 @@ void vtkPVWindow::OpenCallback()
   
   loadDialog->Delete();
   delete [] openFileName;
+}
+
+void vtkPVWindow::AddPreferencesProperties()
+{
+  // The "Toolbar settings" frame (GUI settings)
+
+  if (!this->ToolbarSettingsFrame)
+    {
+    this->ToolbarSettingsFrame = vtkKWLabeledFrame::New();
+    }
+
+  this->ToolbarSettingsFrame->SetParent(
+    this->Notebook->GetFrame(VTK_KW_PREFERENCES_PAGE_LABEL));
+  this->ToolbarSettingsFrame->Create(this->Application);
+  this->ToolbarSettingsFrame->ShowHideFrameOn();
+  this->ToolbarSettingsFrame->SetLabel("Toolbar settings");
+  
+  // Flat aspect ?
+
+  if (!this->ToolbarSettingsFlatFrameCheck)
+    {
+    this->ToolbarSettingsFlatFrameCheck = vtkKWCheckButton::New();
+    }
+
+  this->ToolbarSettingsFlatFrameCheck->SetParent(
+    this->ToolbarSettingsFrame->GetFrame());
+  this->ToolbarSettingsFlatFrameCheck->Create(
+    this->Application, "-text {Flat frame}");
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY))
+    {
+    this->ToolbarSettingsFlatFrameCheck->SetState(
+      this->Application->GetIntRegisteryValue(
+        2, "RunTime", VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY));
+    }
+  else
+    {
+    this->ToolbarSettingsFlatFrameCheck->SetState(
+      vtkKWToolbar::GetGlobalFlatAspect());
+    }
+  this->ToolbarSettingsFlatFrameCheck->SetCommand(
+    this, "OnToolbarSettingsChange");
+
+  // Flat buttons aspect ?
+
+  if (!this->ToolbarSettingsFlatButtonsCheck)
+    {
+    this->ToolbarSettingsFlatButtonsCheck = vtkKWCheckButton::New();
+    }
+
+  this->ToolbarSettingsFlatButtonsCheck->SetParent(
+    this->ToolbarSettingsFrame->GetFrame());
+  this->ToolbarSettingsFlatButtonsCheck->Create(
+    this->Application, "-text {Flat buttons}");
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY))
+    {
+    this->ToolbarSettingsFlatButtonsCheck->SetState(
+      this->Application->GetIntRegisteryValue(
+        2, "RunTime", VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY));
+    }
+  else
+    {
+    this->ToolbarSettingsFlatButtonsCheck->SetState(
+      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
+    }
+  this->ToolbarSettingsFlatButtonsCheck->SetCommand(
+    this, "OnToolbarSettingsChange");
+
+  // Pack inside the frame
+
+  this->Script("pack %s %s -side top -anchor w -expand no -fill none",
+               this->ToolbarSettingsFlatFrameCheck->GetWidgetName(),
+               this->ToolbarSettingsFlatButtonsCheck->GetWidgetName());
+
+  // Get the first slave packed in the pref page, and pack everything before
+  // it if it exists
+
+  const char *slave = this->Script(
+    "lindex [pack slaves %s] 0",
+    this->ToolbarSettingsFrame->GetParent()->GetWidgetName());
+
+  ostrstream pack_before;
+  if (slave && *slave)
+    {
+    pack_before << " -before " << slave;
+    }
+  pack_before << ends;
+
+  this->Script
+    ("pack %s %s -side top -anchor w -expand yes -fill x -padx 2 -pady 2",
+     this->ToolbarSettingsFrame->GetWidgetName(),
+     pack_before.str());
+}
+
+void vtkPVWindow::OnToolbarSettingsChange()
+{
+  if (this->ToolbarSettingsFlatFrameCheck)
+    {
+    this->Application->SetRegisteryValue(
+      2, "RunTime", VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY,
+      "%d", this->ToolbarSettingsFlatFrameCheck->GetState());
+    }
+
+  if (this->ToolbarSettingsFlatButtonsCheck)
+    {
+    this->Application->SetRegisteryValue(
+      2, "RunTime", VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY,
+      "%d", this->ToolbarSettingsFlatButtonsCheck->GetState());
+    }
+
+  this->UpdateToolbarAspect();
+}
+
+void vtkPVWindow::UpdateToolbarAspect()
+{
+  int flat_frame;
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY))
+    {
+    flat_frame = this->Application->GetIntRegisteryValue(
+      2, "RunTime", VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY);
+    }
+  else
+    {
+    flat_frame = vtkKWToolbar::GetGlobalFlatAspect();
+    }
+
+  int flat_buttons;
+  if (this->Application->HasRegisteryValue(
+    2, "RunTime", VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY))
+    {
+    flat_buttons = this->Application->GetIntRegisteryValue(
+      2, "RunTime", VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY);
+    }
+  else
+    {
+    flat_buttons = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
+    }
+
+  this->InteractorToolbar->SetFlatAspect(flat_frame);
+  this->InteractorToolbar->SetWidgetsFlatAspect(flat_buttons);
+
+  this->Toolbar->SetFlatAspect(flat_frame);
+  this->Toolbar->SetWidgetsFlatAspect(flat_buttons);
+
+  this->PickCenterToolbar->SetFlatAspect(flat_frame);
+  this->PickCenterToolbar->SetWidgetsFlatAspect(flat_buttons);
+
+  this->FlySpeedToolbar->SetFlatAspect(flat_frame);
+  this->FlySpeedToolbar->SetWidgetsFlatAspect(flat_buttons);
 }
 
 //----------------------------------------------------------------------------
@@ -2674,6 +2862,8 @@ void vtkPVWindow::ShowCurrentSourcePropertiesCallback()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourceProperties()
 {
+  // Bring up the properties panel
+  
   this->ShowProperties();
   
   // We need to update the view-menu radio button too!
@@ -2682,19 +2872,20 @@ void vtkPVWindow::ShowCurrentSourceProperties()
     this->GetMenuView(), "Radio", VTK_PV_SOURCE_MENU_INDEX);
 
   this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->MainView->GetPropertiesParent()->GetWidgetName());
+               this->MainView->GetSplitFrame()->GetParent()->GetWidgetName());
+
   this->Script("pack %s -side top -fill both -expand t",
                this->MainView->GetSplitFrame()->GetWidgetName());
-  
+
   if (!this->GetCurrentPVSource())
     {
     return;
     }
-  
-  this->Script("pack %s -side top -fill x -expand t",
-               this->GetCurrentPVSource()->GetNotebookWidgetName());
+
+  this->GetCurrentPVSource()->Pack();
   this->GetCurrentPVSource()->RaiseSourcePage();
 }
+
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowAnimationProperties()
 {
@@ -2714,7 +2905,7 @@ void vtkPVWindow::ShowAnimationProperties()
     this->AnimationInterface->SetPVSource(pvs);
     }
 
-  // What does this do?
+  // Bring up the properties panel
   this->ShowProperties();
   
   // We need to update the properties-menu radio button too!
@@ -2723,7 +2914,7 @@ void vtkPVWindow::ShowAnimationProperties()
 
   // Get rid of the page already packed.
   this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->MainView->GetPropertiesParent()->GetWidgetName());
+               this->AnimationInterface->GetParent()->GetWidgetName());
   // Put our page in.
   this->Script("pack %s -anchor n -side top -expand t -fill x -ipadx 3 -ipady 3",
                this->AnimationInterface->GetWidgetName());
@@ -3302,7 +3493,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.338 $");
+  this->ExtractRevision(os,"$Revision: 1.339 $");
 }
 
 //----------------------------------------------------------------------------
