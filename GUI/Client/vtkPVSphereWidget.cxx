@@ -37,8 +37,12 @@
 #include "vtkKWEvent.h"
 #include "vtkRMSphereWidget.h"
 
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxy.h"
+
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.41");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.42");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -57,6 +61,9 @@ vtkPVSphereWidget::vtkPVSphereWidget()
   this->RadiusEntry = vtkKWEntry::New();
   this->CenterResetButton = vtkKWPushButton::New();
   this->RM3DWidget = vtkRMSphereWidget::New();
+  
+  this->SphereProxy = 0;
+  this->SphereProxyName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -73,12 +80,26 @@ vtkPVSphereWidget::~vtkPVSphereWidget()
   this->RadiusEntry->Delete();
   this->CenterResetButton->Delete();
   this->RM3DWidget->Delete();
+  
+  if (this->SphereProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("implicit_functions",
+                                                    this->SphereProxyName);
+    }
+  this->SetSphereProxyName(0);
+  if (this->SphereProxy)
+    {
+    this->SphereProxy->Delete();
+    this->SphereProxy = 0;
+    }
 }
+
 //----------------------------------------------------------------------------
-vtkClientServerID vtkPVSphereWidget::GetObjectByName(const char* )
-{ 
-  return static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetSphereID();
+vtkSMProxy* vtkPVSphereWidget::GetProxyByName(const char*)
+{
+  return this->SphereProxy;
 }
+
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::CenterResetCallback()
 {
@@ -143,30 +164,23 @@ void vtkPVSphereWidget::AcceptInternal(vtkClientServerID sourceID)
     return;
     }
   static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->UpdateVTKObject();
-  //if ( this->SphereID.ID )
-  //  {
-  //  vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
-  //    this->GetApplication()); 
-  //  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  //  double val[3];
-  //  int cc;
-  //  for ( cc = 0; cc < 3; cc ++ )
-  //    {
-  //    val[cc] = atof( this->CenterEntry[cc]->GetValue() );
-  //    }
-  //  this->SetCenterInternal(val);
-  //  double rad = atof(this->RadiusEntry->GetValue());
-  //  this->SetRadiusInternal(rad);
-  //  pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
-  //                  << "SetCenter" << val[0] << val[1] << val[2] 
-  //                  << vtkClientServerStream::End;
-  //  pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
-  //                  << "SetRadius" << rad
-  //                  << vtkClientServerStream::End;
-  //  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-  //  this->SetLastAcceptedCenter(val);
-  //  this->SetLastAcceptedRadius(rad);
-  //  }
+
+  vtkSMDoubleVectorProperty *cProp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->SphereProxy->GetProperty("Center"));
+  vtkSMDoubleVectorProperty *rProp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->SphereProxy->GetProperty("Radius"));
+  if (cProp)
+    {
+    cProp->SetElement(0, this->CenterEntry[0]->GetValueAsFloat());
+    cProp->SetElement(1, this->CenterEntry[1]->GetValueAsFloat());
+    cProp->SetElement(2, this->CenterEntry[2]->GetValueAsFloat());
+    }
+  if (rProp)
+    {
+    rProp->SetElement(0, this->RadiusEntry->GetValueAsFloat());
+    }
+  this->SphereProxy->UpdateVTKObjects();
+  
   this->Superclass::AcceptInternal(sourceID);
 }
 
@@ -205,8 +219,7 @@ void vtkPVSphereWidget::UpdateVTKObject(const char*)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
 {
-  vtkClientServerID sphereID = 
-    static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetSphereID();
+  vtkClientServerID sphereID = this->SphereProxy->GetID(0);
   double center[3];
   static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->
     GetLastAcceptedCenter(center);
@@ -304,15 +317,6 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
-  //vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  //this->Widget3DID = pm->NewStreamObject("vtkSphereWidget");
-  //pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-  //                << "PlaceWidget" << 0 << 1 << 0 << 1 << 0 << 1 
-  //                << vtkClientServerStream::End;
-  //pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  //this->SphereID = pm->NewStreamObject("vtkSphere");
-  //pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-  
   this->SetFrameLabel("Sphere Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
@@ -398,22 +402,11 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
       {
       double bds[6];
       input->GetDataInformation()->GetBounds(bds);
-      //pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID 
-      //                << "SetCenter" 
-      //                << 0.5*(bds[0]+bds[1])
-      //                << 0.5*(bds[2]+bds[3])
-      //                << 0.5*(bds[4]+bds[5]) 
-      //                << vtkClientServerStream::End;
-      //pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                       0.5*(bds[4]+bds[5]));
       static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->SetLastAcceptedCenter(
                       0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                                   0.5*(bds[4]+bds[5]));
-      //pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID 
-      //                << "SetRadius"  << 0.5*(bds[1]-bds[0])
-      //                << vtkClientServerStream::End;
-      //pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       this->SetRadius(0.5*(bds[1]-bds[0]));
       static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->SetLastAcceptedRadius(
                       0.5*(bds[1]-bds[0]));
@@ -422,6 +415,17 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
 
   this->SetBalloonHelpString(this->BalloonHelpString);
 
+  vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
+  this->SphereProxy = pm->NewProxy("implicit_functions", "Sphere");
+  ostrstream str;
+  static int instanceCount = 0;
+  str << "Sphere" << instanceCount << ends;
+  instanceCount++;
+  this->SetSphereProxyName(str.str());
+  pm->RegisterProxy("implicit_functions", this->SphereProxyName,
+                    this->SphereProxy);
+  this->SphereProxy->CreateVTKObjects(1);
+  str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

@@ -46,8 +46,16 @@
 #include "vtkRMBoxWidget.h"
 #include "vtkKWEvent.h"
 
+#include "vtkDoubleArray.h"
+#include "vtkPoints.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
+
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.36");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -72,6 +80,18 @@ vtkPVBoxWidget::vtkPVBoxWidget()
 
   this->RM3DWidget = vtkRMBoxWidget::New();
   this->Initialized = 0;
+  
+  this->BoxProxy = 0;
+  this->BoxTransformProxy = 0;
+  this->BoxMatrixProxy = 0;
+  this->BoxPointsProxy = 0;
+  this->BoxNormalsProxy = 0;
+  
+  this->BoxProxyName = 0;
+  this->BoxTransformProxyName = 0;
+  this->BoxMatrixProxyName = 0;
+  this->BoxPointsProxyName = 0;
+  this->BoxNormalsProxyName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -90,6 +110,66 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
     this->OrientationScale[cc]->Delete();
     }
   this->RM3DWidget->Delete();
+  
+  if (this->BoxProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("implicit_functions",
+                                                    this->BoxProxyName);
+    }
+  this->SetBoxProxyName(0);
+  if (this->BoxProxy)
+    {
+    this->BoxProxy->Delete();
+    this->BoxProxy = 0;
+    }
+  
+  if (this->BoxTransformProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("transforms",
+                                                    this->BoxTransformProxyName);
+    }
+  this->SetBoxTransformProxyName(0);
+  if (this->BoxTransformProxy)
+    {
+    this->BoxTransformProxy->Delete();
+    this->BoxTransformProxy = 0;
+    }
+  
+  if (this->BoxMatrixProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("matrices",
+                                                    this->BoxMatrixProxyName);
+    }
+  this->SetBoxMatrixProxyName(0);
+  if (this->BoxMatrixProxy)
+    {
+    this->BoxMatrixProxy->Delete();
+    this->BoxMatrixProxy = 0;
+    }
+  
+  if (this->BoxPointsProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("points",
+                                                    this->BoxPointsProxyName);
+    }
+  this->SetBoxPointsProxyName(0);
+  if (this->BoxPointsProxy)
+    {
+    this->BoxPointsProxy->Delete();
+    this->BoxPointsProxy = 0;
+    }
+  
+  if (this->BoxNormalsProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("data_arrays",
+                                                    this->BoxNormalsProxyName);
+    }
+  this->SetBoxNormalsProxyName(0);
+  if (this->BoxNormalsProxy)
+    {
+    this->BoxNormalsProxy->Delete();
+    this->BoxNormalsProxy = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -121,6 +201,115 @@ void vtkPVBoxWidget::AcceptInternal(vtkClientServerID sourceID)
     return;
     }
   static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->UpdateVTKObject();
+  
+  vtkBoxWidget *bw = vtkBoxWidget::SafeDownCast(this->Widget3D);
+  if (bw)
+    {
+    vtkSMDoubleVectorProperty *dcProp =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        this->BoxMatrixProxy->GetProperty("DeepCopy"));
+    vtkTransform *t = vtkTransform::New();
+    bw->GetTransform(t);
+    vtkMatrix4x4 *mat = t->GetMatrix();
+    if (dcProp)
+      {
+      dcProp->SetElement(0, mat->Element[0][0]);
+      dcProp->SetElement(1, mat->Element[0][1]);
+      dcProp->SetElement(2, mat->Element[0][2]);
+      dcProp->SetElement(3, mat->Element[0][3]);
+      dcProp->SetElement(4, mat->Element[1][0]);
+      dcProp->SetElement(5, mat->Element[1][1]);
+      dcProp->SetElement(6, mat->Element[1][2]);
+      dcProp->SetElement(7, mat->Element[1][3]);
+      dcProp->SetElement(8, mat->Element[2][0]);
+      dcProp->SetElement(9, mat->Element[2][1]);
+      dcProp->SetElement(10, mat->Element[2][2]);
+      dcProp->SetElement(11, mat->Element[2][3]);
+      dcProp->SetElement(12, mat->Element[3][0]);
+      dcProp->SetElement(13, mat->Element[3][1]);
+      dcProp->SetElement(14, mat->Element[3][2]);
+      dcProp->SetElement(15, mat->Element[3][3]);
+      }
+
+    vtkSMDoubleVectorProperty *matProp =
+      vtkSMDoubleVectorProperty::SafeDownCast(
+        this->BoxTransformProxy->GetProperty("Matrix"));
+    if (matProp)
+      {
+      matProp->SetElement(0, mat->Element[0][0]);
+      matProp->SetElement(1, mat->Element[0][1]);
+      matProp->SetElement(2, mat->Element[0][2]);
+      matProp->SetElement(3, mat->Element[0][3]);
+      matProp->SetElement(4, mat->Element[1][0]);
+      matProp->SetElement(5, mat->Element[1][1]);
+      matProp->SetElement(6, mat->Element[1][2]);
+      matProp->SetElement(7, mat->Element[1][3]);
+      matProp->SetElement(8, mat->Element[2][0]);
+      matProp->SetElement(9, mat->Element[2][1]);
+      matProp->SetElement(10, mat->Element[2][2]);
+      matProp->SetElement(11, mat->Element[2][3]);
+      matProp->SetElement(12, mat->Element[3][0]);
+      matProp->SetElement(13, mat->Element[3][1]);
+      matProp->SetElement(14, mat->Element[3][2]);
+      matProp->SetElement(15, mat->Element[3][3]);
+      }
+    
+    vtkPlanes *p = vtkPlanes::New();
+    bw->GetPlanes(p);
+    vtkSMProxyProperty *ptsProp = vtkSMProxyProperty::SafeDownCast(
+      this->BoxProxy->GetProperty("Points"));
+    vtkSMProxyProperty *nProp = vtkSMProxyProperty::SafeDownCast(
+      this->BoxProxy->GetProperty("Normals"));
+    int i;
+    vtkSMDoubleVectorProperty *dvpPt = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->BoxPointsProxy->GetProperty("Points"));
+    vtkSMDoubleVectorProperty *dvpN = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->BoxNormalsProxy->GetProperty("Values"));
+    vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->BoxNormalsProxy->GetProperty("Components"));
+    if (dvpPt)
+      {
+      vtkPoints *pts = p->GetPoints();
+      double *pt;
+      for (i = 0; i < 6; i++)
+        {
+        pt = pts->GetPoint(i);
+        dvpPt->SetElement(3*i, pt[0]);
+        dvpPt->SetElement(3*i+1, pt[1]);
+        dvpPt->SetElement(3*i+2, pt[2]);
+        }
+      }
+    if (dvpN)
+      {
+      vtkDoubleArray *normals = vtkDoubleArray::SafeDownCast(p->GetNormals());
+      for (i = 0; i < 18; i++)
+        {
+        dvpN->SetElement(i, normals->GetValue(i));
+        }
+      }
+    if (ivp)
+      {
+      ivp->SetElement(0, 3);
+      }
+    if (ptsProp)
+      {
+      ptsProp->RemoveAllProxies();
+      ptsProp->AddProxy(this->BoxPointsProxy);
+      }
+    if (nProp)
+      {
+      nProp->RemoveAllProxies();
+      nProp->AddProxy(this->BoxNormalsProxy);
+      }
+    this->BoxPointsProxy->UpdateVTKObjects();
+    this->BoxNormalsProxy->UpdateVTKObjects();
+    this->BoxProxy->UpdateVTKObjects();
+    this->BoxTransformProxy->UpdateVTKObjects();
+    this->BoxMatrixProxy->UpdateVTKObjects();
+    t->Delete();
+    p->Delete();
+    }
+  
   this->Superclass::AcceptInternal(sourceID);
   this->Initialized = 1;
 }
@@ -186,8 +375,13 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
   trans->Scale(this->GetScaleFromGUI());
   vtkMatrix4x4* mat = trans->GetMatrix();
   
-  vtkClientServerID boxMatrixID = 
-    static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxMatrixID();
+  vtkBoxWidget *bw = vtkBoxWidget::SafeDownCast(this->Widget3D);
+  vtkPlanes *p = vtkPlanes::New();
+  bw->GetPlanes(p);
+  vtkPoints *pts = p->GetPoints();
+  vtkDoubleArray *normals = vtkDoubleArray::SafeDownCast(p->GetNormals());
+  
+  vtkClientServerID boxMatrixID = this->BoxMatrixProxy->GetID(0);
 
   *file << endl;
   *file << "set pvTemp" << boxMatrixID.ID
@@ -208,21 +402,74 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
         << " UpdateVTKObjects" << endl;
 
   *file << endl;
-  vtkClientServerID boxTransformID = 
-    static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxTransformID();
+  vtkClientServerID boxTransformID = this->BoxTransformProxy->GetID(0);
+
   *file << "set pvTemp" << boxTransformID.ID
         << " [$proxyManager NewProxy transforms Transform]"
         << endl;
   *file << "$proxyManager RegisterProxy transforms pvTemp" << boxTransformID.ID
         << " $pvTemp" << boxTransformID.ID << endl;
-  *file << " $pvTemp" << boxTransformID.ID << " UnRegister {}" << endl;
+  *file << "  $pvTemp" << boxTransformID.ID << " UnRegister {}" << endl;
   *file << "  [$pvTemp" << boxTransformID.ID
-        << " GetProperty Matrix] AddProxy $pvTemp" << boxMatrixID.ID
+        << " GetProperty MatrixProxy] AddProxy $pvTemp" << boxMatrixID.ID
         << endl;
   *file << "  $pvTemp" << boxTransformID.ID
         << " UpdateVTKObjects"  << endl;
-
   *file << endl;
+
+  vtkClientServerID boxPointsID = this->BoxPointsProxy->GetID(0);
+  *file << "set pvTemp" << boxPointsID.ID
+        << " [$proxyManager NewProxy points Points]" << endl;
+  *file << "$proxyManager RegisterProxy points pvTemp" << boxPointsID.ID
+        << " $pvTemp" << boxPointsID.ID << endl;
+  *file << "  $pvTemp" << boxPointsID.ID << " UnRegister {}" << endl;
+  double *pt;
+  for (i = 0; i < 6; i++)
+    {
+    pt = pts->GetPoint(i);
+    *file << "  [$pvTemp" << boxPointsID.ID
+          << " GetProperty Points] SetElement " << 3*i << " " << pt[0] << endl;
+    *file << "  [$pvTemp" << boxPointsID.ID
+          << " GetProperty Points] SetElement " << 3*i+1 << " " << pt[1]
+          << endl;
+    *file << "  [$pvTemp" << boxPointsID.ID
+          << " GetProperty Points] SetElement " << 3*i+2 << " " << pt[2]
+          << endl;
+    }
+  *file << "  $pvTemp" << boxPointsID.ID << " UpdateVTKObjects" << endl;
+  *file << endl;
+  
+  vtkClientServerID boxNormalsID = this->BoxNormalsProxy->GetID(0);
+  *file << "set pvTemp" << boxNormalsID.ID
+        << " [$proxyManager NewProxy data_arrays DoubleArray]" << endl;
+  *file << "$proxyManager RegisterProxy data_arrays pvTemp" << boxNormalsID.ID
+        << " $pvTemp" << boxNormalsID.ID << endl;
+  *file << "  $pvTemp" << boxNormalsID.ID << " UnRegister {}" << endl;
+  *file << "  [$pvTemp" << boxNormalsID.ID
+        << " GetProperty Components] SetElement 0 3" << endl;
+  for (i = 0; i < 18; i++)
+    {
+    *file << "  [$pvTemp" << boxNormalsID.ID
+          << " GetProperty Values] SetElement " << i << " "
+          << normals->GetValue(i) << endl;
+    }
+  *file << "  $pvTemp" << boxNormalsID.ID << " UpdateVTKObjects" << endl;
+  *file << endl;
+  
+  vtkClientServerID boxID = this->BoxProxy->GetID(0);
+  *file << "set pvTemp" << boxID.ID
+        << " [$proxyManager NewProxy implicit_functions Planes]" << endl;
+  *file << "$proxyManager RegisterProxy implicit_functions pvTemp" << boxID.ID
+        << " $pvTemp" << boxID.ID << endl;
+  *file << "  $pvTemp" << boxID.ID << " UnRegister {}" << endl;
+  *file << "  [$pvTemp" << boxID.ID << " GetProperty Points] AddProxy $pvTemp"
+        << boxPointsID.ID << endl;
+  *file << "  [$pvTemp" << boxID.ID << " GetProperty Normals] AddProxy $pvTemp"
+        << boxNormalsID.ID << endl;
+  *file << "  $pvTemp" << boxID.ID << " UpdateVTKObjects" << endl;
+  *file << endl;
+  
+  p->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -407,6 +654,53 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     }
 
   this->SetBalloonHelpString(this->BalloonHelpString);
+
+  static int instanceCount = 0;
+  vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
+  this->BoxProxy = pm->NewProxy("implicit_functions", "Planes");
+  ostrstream str1;
+  str1 << "Box" << instanceCount << ends;
+  this->SetBoxProxyName(str1.str());
+  pm->RegisterProxy("implicit_functions", this->BoxProxyName, this->BoxProxy);
+  this->BoxProxy->CreateVTKObjects(1);
+  str1.rdbuf()->freeze(0);
+  
+  this->BoxTransformProxy = pm->NewProxy("transforms", "Transform");
+  ostrstream str2;
+  str2 << "BoxTransform" << instanceCount << ends;
+  this->SetBoxTransformProxyName(str2.str());
+  pm->RegisterProxy("transforms", this->BoxTransformProxyName,
+                    this->BoxTransformProxy);
+  this->BoxTransformProxy->CreateVTKObjects(1);
+  str2.rdbuf()->freeze(0);
+  
+  this->BoxMatrixProxy = pm->NewProxy("matrices", "Matrix4x4");
+  ostrstream str3;
+  str3 << "BoxMatrix" << instanceCount << ends;
+  this->SetBoxMatrixProxyName(str3.str());
+  pm->RegisterProxy("matrices", this->BoxMatrixProxyName,
+                    this->BoxMatrixProxy);
+  this->BoxMatrixProxy->CreateVTKObjects(1);
+  str3.rdbuf()->freeze(0);
+  
+  this->BoxPointsProxy = pm->NewProxy("points", "Points");
+  ostrstream str4;
+  str4 << "BoxPoints" << instanceCount << ends;
+  this->SetBoxPointsProxyName(str4.str());
+  pm->RegisterProxy("points", this->BoxPointsProxyName, this->BoxPointsProxy);
+  this->BoxPointsProxy->CreateVTKObjects(1);
+  str4.rdbuf()->freeze(0);
+  
+  this->BoxNormalsProxy = pm->NewProxy("data_arrays", "DoubleArray");
+  ostrstream str5;
+  str5 << "BoxNormals" << instanceCount << ends;
+  this->SetBoxNormalsProxyName(str5.str());
+  pm->RegisterProxy("data_arrays", this->BoxNormalsProxyName,
+                    this->BoxNormalsProxy);
+  this->BoxNormalsProxy->CreateVTKObjects(1);
+  str5.rdbuf()->freeze(0);
+  
+  instanceCount++;
 }
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::EnableCallbacks()
@@ -722,23 +1016,30 @@ int vtkPVBoxWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerID vtkPVBoxWidget::GetObjectByName(const char* name)
+vtkSMProxy* vtkPVBoxWidget::GetProxyByName(const char *name)
 {
-  if(!strcmp(name, "Box"))
+  if (!strcmp(name, "Box"))
     {
-    return static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxID();
+    return this->BoxProxy;
     }
-  if(!strcmp(name, "BoxTransform"))
+  if (!strcmp(name, "BoxTransform"))
     {
-    return static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxTransformID();
+    return this->BoxTransformProxy;
     }
-  if(!strcmp(name, "BoxMatrix"))
+  if (!strcmp(name, "BoxMatrix"))
     {
-    return static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxMatrixID();
+    return this->BoxMatrixProxy;
     }
-  vtkClientServerID id = {0};
-  vtkErrorMacro("GetObjectByName called with invalid object name: " << name);
-  return id;
+  if (!strcmp(name, "BoxPoints"))
+    {
+    return this->BoxPointsProxy;
+    }
+  if (!strcmp(name, "BoxNormals"))
+    {
+    return this->BoxNormalsProxy;
+    }
+  vtkErrorMacro("GetProxyByName called with invalid proxy name: " << name);
+  return 0;
 }
 
 //----------------------------------------------------------------------------

@@ -104,12 +104,6 @@ public:
   virtual void Trace(ofstream *file);
   
   // Description:
-  // Return a contained object by name as follows:
-  // Plane == PlaneID
-  vtkClientServerID GetObjectByName(const char* );
-
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -118,10 +112,14 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  // Description:
+  // Provide access to the proxy used by this widget.
+  // Plane == PlaneProxy
+  vtkSMProxy* GetProxyByName(const char*);
+
 protected:
   vtkPVImplicitPlaneWidget();
   ~vtkPVImplicitPlaneWidget();
-
 
   // Description:
   // Call creation on the child.
@@ -145,6 +143,10 @@ protected:
   vtkKWPushButton *NormalZButton;
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
+
+  vtkSMProxy *PlaneProxy;
+  char *PlaneProxyName;
+  vtkSetStringMacro(PlaneProxyName);
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);

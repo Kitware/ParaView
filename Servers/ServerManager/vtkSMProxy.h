@@ -159,7 +159,10 @@ protected:
   friend class vtkSMPropertyIterator;
   friend class vtkPVPointSourceWidget;
   friend class vtkPVLineSourceWidget;
-
+  friend class vtkPVImplicitPlaneWidget;
+  friend class vtkPVSphereWidget;
+  friend class vtkPVBoxWidget;
+  
   // Temporary
   friend class vtkPVSource;
 //ETX

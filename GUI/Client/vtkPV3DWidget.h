@@ -33,6 +33,7 @@ class vtkPV3DWidgetObserver;
 class vtkKWFrame;
 
 class vtkRM3DWidget;
+class vtkSMProxy;
 
 class VTK_EXPORT vtkPV3DWidget : public vtkPVObjectWidget
 {
@@ -98,7 +99,11 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
- 
+
+  // Description:
+  // Provide access to the proxy used by this widget.
+  virtual vtkSMProxy* GetProxyByName(const char*) { return NULL; }
+
 protected:
   vtkPV3DWidget();
   ~vtkPV3DWidget();
@@ -142,7 +147,7 @@ protected:
   int Visible;
   int UseLabel;
 
-  vtk3DWidget* Widget3D;  
+  vtk3DWidget* Widget3D;
 
 private:  
   vtkPV3DWidget(const vtkPV3DWidget&); // Not implemented

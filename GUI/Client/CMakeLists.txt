@@ -77,7 +77,6 @@ SET( ParaViewClient_SRCS
   vtkPVExtractPartsWidget.cxx
   vtkPVFieldMenu.cxx
   vtkPVFileEntry.cxx
-  vtkPVFileEntryProperty.cxx
   vtkPVGhostLevelDialog.cxx
   vtkPVGroupInputsWidget.cxx
   vtkPVImplicitPlaneWidget.cxx
@@ -131,7 +130,6 @@ SET( ParaViewClient_SRCS
   vtkPVSphereWidget.cxx
   vtkPVStringAndScalarListWidgetProperty.cxx
   vtkPVStringEntry.cxx
-  vtkPVStringWidgetProperty.cxx
   vtkPVTempTessellatorEntry.cxx
   vtkPVThumbWheel.cxx
   vtkPVTimerLogDisplay.cxx

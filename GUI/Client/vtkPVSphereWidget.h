@@ -87,13 +87,6 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
-  //BTX
-  // Description:
-  // Return a contained object by name as follows:
-  // Sphere == SphereID
-  vtkClientServerID GetObjectByName(const char* );
-  //ETX
-
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -102,7 +95,12 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
- 
+
+  // Description:
+  // Provide access to the proxy used by this widget.
+  // Sphere == SphereProxy
+  vtkSMProxy* GetProxyByName(const char*);
+  
 protected:
   vtkPVSphereWidget();
   ~vtkPVSphereWidget();
@@ -124,6 +122,10 @@ protected:
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
 
+  vtkSMProxy *SphereProxy;
+  char *SphereProxyName;
+  vtkSetStringMacro(SphereProxyName);
+  
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 

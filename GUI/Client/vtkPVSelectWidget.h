@@ -29,7 +29,6 @@ class vtkStringList;
 class vtkKWOptionMenu;
 class vtkKWLabel;
 class vtkPVSource;
-class vtkPVStringWidgetProperty;
 class vtkPVWidgetCollection;
 class vtkKWLabeledFrame;
 class vtkStringList;
@@ -42,20 +41,6 @@ class vtkArrayMap;
 class VTK_EXPORT vtkPVSelectWidget : public vtkPVObjectWidget
 {
 public:
-  //BTX
-
-  // What type of elements are in the widget
-  // this is needed to pass the correct type to the
-  // clientserver stream in accept internal
-  // Description:
-  // Normally, SelectWidget executes a command of the form
-  // <ObjectID> Set<VariableName> <CurrentValue> where
-  // ObjectID usually corresponds to the underlying VTK
-  // object, VariableName is an ivar of that object and the
-  // CurrentValue is a value assigned in AddItem (vtkVal argument).
-  // This enum allows the type of CurrentValue to be known.
-  enum ElementTypes{ INT, FLOAT, STRING, OBJECT};
-  //ETX
   static vtkPVSelectWidget* New();
   vtkTypeRevisionMacro(vtkPVSelectWidget, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -126,7 +111,7 @@ public:
   // Description:
   // Called when accept button is pushed.
   // Sets the objects variable from UI.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   virtual void PostAccept();
   //ETX
 
@@ -138,14 +123,6 @@ public:
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
-
-  // Description:
-  // Set the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
 
   // Description:
   // adds a script to the menu of the animation interface.
@@ -184,9 +161,6 @@ protected:
   vtkPVWidgetCollection *Widgets;
 
   int CurrentIndex;
-  ElementTypes ElementType;
-  
-  vtkPVStringWidgetProperty *Property;
   
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,

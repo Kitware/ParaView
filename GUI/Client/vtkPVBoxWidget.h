@@ -34,6 +34,7 @@ class vtkKWScale;
 class vtkTransform;
 class vtkBoxWidget;
 class vtkPlanes;
+class vtkXMProxy;
 
 class VTK_EXPORT vtkPVBoxWidget : public vtkPV3DWidget
 {
@@ -110,13 +111,6 @@ public:
   //ETX
 
   // Description:
-  // Return a contained object by name as follows:
-  // Box == BoxID
-  // BoxTransform == BoxTransformID
-  // BoxMatrix == BoxMatrixID
-  virtual vtkClientServerID GetObjectByName(const char*);
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -124,7 +118,16 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
- 
+
+  // Description:
+  // Provide access to the proxies used by this widget.
+  // BoxTransform == BoxTransformProxy
+  // BoxMatrix == BoxMatrixProxy
+  // Box == BoxProxy
+  // BoxPoints == BoxPointsProxy
+  // BoxNormals == BoxNormalsProxy
+  vtkSMProxy* GetProxyByName(const char* name);
+  
 protected:
   vtkPVBoxWidget();
   ~vtkPVBoxWidget();
@@ -161,6 +164,22 @@ protected:
   vtkKWLabel*        OrientationLabel;
   vtkKWScale*        OrientationScale[3];
 
+  vtkSMProxy *BoxProxy;
+  vtkSMProxy *BoxTransformProxy;
+  vtkSMProxy *BoxMatrixProxy;
+  vtkSMProxy *BoxPointsProxy;
+  vtkSMProxy *BoxNormalsProxy;
+  char *BoxProxyName;
+  char *BoxTransformProxyName;
+  char *BoxMatrixProxyName;
+  char *BoxPointsProxyName;
+  char *BoxNormalsProxyName;
+  vtkSetStringMacro(BoxProxyName);
+  vtkSetStringMacro(BoxTransformProxyName);
+  vtkSetStringMacro(BoxMatrixProxyName);
+  vtkSetStringMacro(BoxPointsProxyName);
+  vtkSetStringMacro(BoxNormalsProxyName);
+  
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 

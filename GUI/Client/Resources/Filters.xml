@@ -393,8 +393,8 @@ The line can be specified interactively using the 3D line widget. See section 7.
     <SelectCTHArrays input_menu="im"
                      trace_name="ArraySelection"
                      help="Select the volume fraction arrays for generating parts."/>
-    <SelectWidget variable="ClipPlane"
-                  trace_name="Clipping" type="object">
+    <SelectWidget property="ClipPlane" label="Clip Plane"
+                  trace_name="Clipping">
       <Item label="On" value="On">
         <ImplicitPlaneWidget use_label="0" trace_name="Plane"
                              input_menu="im"
@@ -426,8 +426,8 @@ The line can be specified interactively using the 3D line widget. See section 7.
                      trace_name="ArraySelection"
                      property="AddVolumeArrayName"
                      help="Select the volume fraction arrays for generating parts."/>
-    <SelectWidget variable="ClipPlane"
-                  trace_name="Clipping" type="object">
+    <SelectWidget property="ClipPlane"
+                  trace_name="Clipping" label="Clip Plane">
       <Item label="On" value="On">
         <ImplicitPlaneWidget use_label="0" trace_name="Plane"
                              input_menu="im"
@@ -1465,8 +1465,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
                input_name="Input"/>
     <SelectWidget label="Transform Widget"
                   trace_name="Transform Widget"
-                  variable="Transform"
-                  type="object">
+                  property="Transform">
       <Item label="Box"
             value="BoxTransform">
       <BoxWidget use_label="0"
@@ -1642,10 +1641,9 @@ The Warp (vector) filter translates the points of the input data set using a spe
                    property="InputBounds"
                    trace_name="Input Bounds"
                    input_menu="im1"/>
-    <SelectWidget type="object"
-                  label="Cut Function"
+    <SelectWidget label="Cut Function"
                   trace_name="Cut Function"
-                  variable="CutFunction">
+                  property="CutFunction">
       <Item label="Plane"
             value="Plane">
       <ImplicitPlaneWidget trace_name="Plane"
@@ -1693,10 +1691,9 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
                    property="InputBounds"
                    trace_name="Input Bounds"
                    input_menu="im1"/>
-    <SelectWidget type="object"
-                  label="Clip Function"
+    <SelectWidget label="Clip Function"
                   trace_name="Clip Function"
-                  variable="ClipFunction">
+                  property="ClipFunction">
       <Item label="Plane"
             value="Plane">
         <ImplicitPlaneWidget use_label="0"
@@ -1956,8 +1953,7 @@ The Pick filter operates on any type of data and produces unstructured grid outp
         <ArrayRequirement attribute="Point"/>
       </Input>
     </Filter>
-    <SelectWidget type="object"
-                  label="Probe object"
+    <SelectWidget label="Probe object"
                   trace_name="Probe object"
                   property="Input">
       <Item label="Point"
@@ -2005,8 +2001,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                label="Vectors"
                input_menu="im"
                help="Select the input vectors to use."/>
-    <SelectWidget type="object"
-                  trace_name="Seed"
+    <SelectWidget trace_name="Seed"
                   label="Seed"
                   property="Source">
       <Item label="Point Cloud"
@@ -2078,8 +2073,8 @@ The Probe filter operates on any type of data and produces polygonal output (a p
       <Item name="BOTH"
             value="2"/>
     </SelectionList>
-    <SelectWidget type="int"
-                  variable="IntegratorType"
+    <SelectWidget label="Integrator Type"
+                  property="IntegratorType"
                   trace_name="IntegrationType">
       <Item label="Runge-Kutta 2" value="0">
         <DummyWidget trace_name="Dummy1"/>

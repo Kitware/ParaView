@@ -42,9 +42,13 @@
 #include "vtkKWEvent.h"
 #include "vtkRMImplicitPlaneWidget.h"
 
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxy.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.36");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -74,6 +78,9 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
   this->NormalZButton = vtkKWPushButton::New();
   
   this->RM3DWidget = vtkRMImplicitPlaneWidget::New();
+  
+  this->PlaneProxy = 0;
+  this->PlaneProxyName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -96,6 +103,18 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
   this->NormalYButton->Delete();
   this->NormalZButton->Delete();
   this->RM3DWidget->Delete();
+  
+  if (this->PlaneProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("implicit_functions",
+                                                    this->PlaneProxyName);
+    }
+  this->SetPlaneProxyName(0);
+  if (this->PlaneProxy)
+    {
+    this->PlaneProxy->Delete();
+    this->PlaneProxy = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -204,9 +223,10 @@ void vtkPVImplicitPlaneWidget::ActualPlaceWidget()
   this->SetNormal(normal[0], normal[1], normal[2]);
 }
 
-vtkClientServerID vtkPVImplicitPlaneWidget::GetObjectByName(const char* )
+//----------------------------------------------------------------------------
+vtkSMProxy* vtkPVImplicitPlaneWidget::GetProxyByName(const char*)
 {
-return static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->GetPlaneID();
+  return this->PlaneProxy;
 }
 
 //----------------------------------------------------------------------------
@@ -215,6 +235,27 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
   this->PlaceWidget();
   static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->UpdateVTKObject(
     sourceID, this->VariableName);
+  
+  if (this->GetModifiedFlag())
+    {
+    vtkSMDoubleVectorProperty *oProp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->PlaneProxy->GetProperty("Origin"));
+    vtkSMDoubleVectorProperty *nProp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->PlaneProxy->GetProperty("Normal"));
+    if (oProp)
+      {
+      oProp->SetElement(0, this->CenterEntry[0]->GetValueAsFloat());
+      oProp->SetElement(1, this->CenterEntry[1]->GetValueAsFloat());
+      oProp->SetElement(2, this->CenterEntry[2]->GetValueAsFloat());
+      }
+    if (nProp)
+      {
+      nProp->SetElement(0, this->NormalEntry[0]->GetValueAsFloat());
+      nProp->SetElement(1, this->NormalEntry[1]->GetValueAsFloat());
+      nProp->SetElement(2, this->NormalEntry[2]->GetValueAsFloat());
+      }
+    this->PlaneProxy->UpdateVTKObjects();
+    }
   this->Superclass::AcceptInternal(sourceID);
 }
 
@@ -246,8 +287,7 @@ void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
 {
-  vtkClientServerID planeID = static_cast<vtkRMImplicitPlaneWidget*>
-    (this->RM3DWidget)->GetPlaneID();
+  vtkClientServerID planeID = this->PlaneProxy->GetID(0);
   *file << endl;
   *file << "set pvTemp" <<  planeID.ID
         << " [$proxyManager NewProxy implicit_functions Plane]"
@@ -255,7 +295,7 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
   *file << "  $proxyManager RegisterProxy implicit_functions pvTemp"
         << planeID.ID << " $pvTemp" << planeID.ID
         << endl;
-  *file << " $pvTemp" << planeID.ID << " UnRegister {}" << endl;
+  *file << "  $pvTemp" << planeID.ID << " UnRegister {}" << endl;
 
   double val[3];
   int cc;
@@ -527,6 +567,16 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
       }
     }
   this->SetBalloonHelpString(this->BalloonHelpString);
+  
+  vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
+  this->PlaneProxy = pm->NewProxy("implicit_functions", "Plane");
+  ostrstream str;
+  str << "Plane" << instanceCount << ends;
+  this->SetPlaneProxyName(str.str());
+  pm->RegisterProxy("implicit_functions", this->PlaneProxyName,
+                    this->PlaneProxy);
+  this->PlaneProxy->CreateVTKObjects(1);
+  str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

@@ -75,6 +75,19 @@
       </DoubleVectorProperty>
     </Proxy>
 
+    <Proxy name="Planes" class="vtkPlanes">
+      <ProxyProperty name="Points" command="SetPoints">
+        <ProxyGroupDomain name="group">
+          <Group name="points"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty name="Normals" command="SetNormals">
+        <ProxyGroupDomain name="group">
+          <Group name="data_arrays"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
+    </Proxy>
+
     <Proxy name="Sphere" class="vtkSphere">
       <DoubleVectorProperty
          name="Center"
@@ -94,11 +107,17 @@
 
   <ProxyGroup name="transforms">
     <Proxy name="Transform" class="vtkTransform">
-      <ProxyProperty name="Matrix" command="SetMatrix">
+      <ProxyProperty name="MatrixProxy" command="SetMatrix">
            <ProxyGroupDomain name="groups">
               <Group name="matrices"/>
            </ProxyGroupDomain>
      </ProxyProperty>
+     <DoubleVectorProperty
+        name="Matrix"
+        command="SetMatrix"
+        number_of_elements="16"
+        argument_is_array="1"
+        default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
     </Proxy>
   </ProxyGroup>
 
@@ -114,4 +133,34 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="points">
+    <Proxy name="Points" class="vtkPoints">
+      <DoubleVectorProperty
+         name="Points"
+         command="SetPoint"
+         set_number_command="SetNumberOfPoints"
+         number_of_elements="0"
+         repeat_command="1"
+         number_of_elements_per_command="3"
+         use_index="1" />
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="data_arrays">
+    <Proxy name="DoubleArray" class="vtkDoubleArray">
+      <DoubleVectorProperty
+         name="Values"
+         command="SetValue"
+         set_number_command="SetNumberOfValues"
+         number_of_elements="0"
+         repeat_command="1"
+         number_of_elements_per_command="1"
+         use_index="1" />
+      <IntVectorProperty
+         name="Components"
+         command="SetNumberOfComponents"
+         number_of_elements="1"
+         default_values="1" />
+    </Proxy>
+  </ProxyGroup>
 </ServerManagerConfiguration>

@@ -470,8 +470,8 @@
                     property="PointArrayStatus"
                     label_text="Node Variables" />
 
-    <SelectWidget type="int" 
-                  variable="DisplayType"
+    <SelectWidget label="Display Type"
+                  property="DisplayType"
                   trace_name="DisplayType">
       <Item label="Blocks" value="1">
         <ArraySelection trace_name="block_sel"

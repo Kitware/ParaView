@@ -33,8 +33,11 @@
 
 #include "vtkKWEvent.h"
 #include "vtkRM3DWidget.h"
+#include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.57");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.58");
 
 //===========================================================================
 //***************************************************************************
