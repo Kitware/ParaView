@@ -90,7 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.188");
+vtkCxxRevisionMacro(vtkPVData, "1.189");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -609,7 +609,8 @@ void vtkPVData::CreateProperties()
     this->Properties->SetParent(
       this->GetPVSource()->GetNotebook()->GetFrame("Display"));
     }
-  this->Properties->Create(this->Application, "-scrollable");
+  this->Properties->ScrollableOn();
+  this->Properties->Create(this->Application,0);
 
   // We are going to 'grid' most of it, so let's define some const
 
@@ -1083,7 +1084,8 @@ void vtkPVData::CreateProperties()
     this->InformationFrame->SetParent(
       this->GetPVSource()->GetNotebook()->GetFrame("Information"));
     }
-  this->InformationFrame->Create(this->Application, "-scrollable");
+  this->InformationFrame->ScrollableOn();
+  this->InformationFrame->Create(this->Application,0);
 
   this->StatsFrame->SetParent(this->InformationFrame->GetFrame());
   this->StatsFrame->ShowHideFrameOn();
@@ -2950,7 +2952,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.188 $");
+  this->ExtractRevision(os,"$Revision: 1.189 $");
 }
 
 //----------------------------------------------------------------------------
