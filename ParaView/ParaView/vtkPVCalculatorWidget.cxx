@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.5");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -605,21 +605,21 @@ void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
         {
         if (numComponents == 1)
           {
-          sprintf(menuCommand, "AddScalarVariable %s %s 0", name, name);
+          sprintf(menuCommand, "AddScalarVariable {%s} {%s} 0", name, name);
           this->ScalarsMenu->GetMenu()->AddCommand(name, this,
                                                    menuCommand);
           }
         else
           {
           sprintf(menuEntry, "%s_%d", name, j);
-          sprintf(menuCommand, "AddScalarVariable %s %s %d", menuEntry,
+          sprintf(menuCommand, "AddScalarVariable {%s} {%s} {%d}", menuEntry,
                   name, j);
           this->ScalarsMenu->GetMenu()->AddCommand(menuEntry, this, menuCommand);
           }
         }
       if (numComponents == 3)
         {
-        sprintf(menuCommand, "AddVectorVariable %s %s",
+        sprintf(menuCommand, "AddVectorVariable {%s} {%s}",
                 name, name);
         this->VectorsMenu->GetMenu()->AddCommand(name, this,
                                                  menuCommand);
@@ -643,12 +643,12 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
   num = this->PVSource->GetNumberOfVTKSources();
   for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s AddScalarVariable %s %s %d",
+    pvApp->BroadcastScript("%s AddScalarVariable {%s} {%s} {%d}",
                            this->PVSource->GetVTKSourceTclName(idx),
                            variableName, arrayName, component);
     }
   
-  this->AddTraceEntry("$kw(%s) AddScalarVariable %s %s %d",
+  this->AddTraceEntry("$kw(%s) AddScalarVariable {%s} {%s} {%d}",
                        this->GetTclName(), variableName, arrayName, component);
 }
 
@@ -665,12 +665,12 @@ void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
   num = this->PVSource->GetNumberOfVTKSources();
   for (idx = 0; idx < num; ++idx)
     {
-    pvApp->BroadcastScript("%s AddVectorVariable %s %s 0 1 2",
+    pvApp->BroadcastScript("%s AddVectorVariable {%s} {%s} 0 1 2",
                            this->PVSource->GetVTKSourceTclName(idx),
                            variableName, arrayName);
     }
 
-  this->AddTraceEntry("$kw(%s) AddVectorVariable %s %s",
+  this->AddTraceEntry("$kw(%s) AddVectorVariable {%s} {%s}",
                        this->GetTclName(), variableName, arrayName);
 }
 
@@ -804,19 +804,19 @@ void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
     for (i = 0; i < calc->GetNumberOfScalarArrays(); i++)
       {
       *file << this->PVSource->GetVTKSourceTclName(sourceIdx) 
-            << " AddScalarVariable "
-            << calc->GetScalarVariableName(i) << " "
+            << " AddScalarVariable {"
+            << calc->GetScalarVariableName(i) << "} {"
             << calc->GetScalarArrayName(i) 
-            << " " << calc->GetSelectedScalarComponent(i)
+            << "} " << calc->GetSelectedScalarComponent(i)
             << "\n\t";
       }
     for (i = 0; i < calc->GetNumberOfVectorArrays(); i++)
       {
       *file << this->PVSource->GetVTKSourceTclName(sourceIdx) 
-            << " AddVectorVariable "
-            << calc->GetVectorVariableName(i) << " "
+            << " AddVectorVariable {"
+            << calc->GetVectorVariableName(i) << "} {"
             << calc->GetVectorArrayName(i)
-            << " 0 1 2\n\t";
+            << "} 0 1 2\n\t";
       }  
 
     if ( this->FunctionLabel->IsCreated() )
