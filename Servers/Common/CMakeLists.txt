@@ -22,6 +22,7 @@ SET(Common_SRCS
   vtkMPIMToNSocketConnection.cxx
   vtkPVProgressHandler.cxx
   vtkPVOptions.cxx
+  vtkPVCreateProcessModule.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -29,13 +30,16 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkProcessModuleGUIHelper
   vtkProcessModule
   vtkPVInformation
+  vtkPVCreateProcessModule
   ABSTRACT
   )
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVProgressHandler.cxx
   vtkStringList.cxx
   vtkPVOptions.cxx
+  vtkPVCreateProcessModule
   WRAP_EXCLUDE)
+
 SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
 SET(VTK_BINARY_DIR "${PVCommon_BINARY_DIR}")
 INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
@@ -71,6 +75,10 @@ TARGET_LINK_LIBRARIES(vtkPVCommon vtkClientServer)
 INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
 CS_INITIALIZE_WRAP()
 INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
+
+CONFIGURE_FILE(${PVCommon_SOURCE_DIR}/vtkPVDemoPaths.h.in
+  ${PVCommon_BINARY_DIR}/vtkPVDemoPaths.h
+  ESCAPE_QUOTES)
 
 # Wrap PVCommon
 SET(KIT_WRAP_DEPS Parallel Hybrid Rendering)

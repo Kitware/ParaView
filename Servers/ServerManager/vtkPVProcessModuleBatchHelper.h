@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVProcessModuleGUIHelper.h
+  Module:    vtkPVProcessModuleBatchHelper.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,24 +12,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVProcessModuleGUIHelper
+// .NAME vtkPVProcessModuleBatchHelper
 // .SECTION Description
 // A class that can be used to provide GUI elements to the vtkProcessModule
 // without forcing the process modules to link to a GUI.
 
-#ifndef __vtkPVProcessModuleGUIHelper_h
-#define __vtkPVProcessModuleGUIHelper_h
+#ifndef __vtkPVProcessModuleBatchHelper_h
+#define __vtkPVProcessModuleBatchHelper_h
 
 #include "vtkProcessModuleGUIHelper.h"
 
-class vtkPVApplication;
-class vtkProcessModule;
+class vtkPVBatchOptions;
+class vtkPVProcessModule;
+class vtkSMApplication;
 
-class VTK_EXPORT vtkPVProcessModuleGUIHelper : public vtkProcessModuleGUIHelper
+class VTK_EXPORT vtkPVProcessModuleBatchHelper : public vtkProcessModuleGUIHelper
 {
 public: 
-  static vtkPVProcessModuleGUIHelper* New();
-  vtkTypeRevisionMacro(vtkPVProcessModuleGUIHelper,vtkProcessModuleGUIHelper);
+  static vtkPVProcessModuleBatchHelper* New();
+  vtkTypeRevisionMacro(vtkPVProcessModuleBatchHelper,vtkProcessModuleGUIHelper);
   void PrintSelf(ostream& os, vtkIndent indent);
   // Description: 
   // run main gui loop from process module
@@ -37,36 +38,32 @@ public:
 
   // Description:
   // Open a connection dialog GUI.
-  virtual int OpenConnectionDialog(int* start);
+  virtual int OpenConnectionDialog(int*) { return 1; }
   
   // Description:
   // Handle progress links.
-  virtual void SendPrepareProgress();
-  virtual void SendCleanupPendingProgress();
-  virtual void SetLocalProgress(const char* filter, int progress);
+  virtual void SendPrepareProgress() {}
+  virtual void SendCleanupPendingProgress() {}
+  virtual void SetLocalProgress(const char*, int) {}
 
   // Description:
   // Exit the application
   virtual void ExitApplication();
-  // Description:
-  // Set the Application pointer
-  virtual void SetPVApplication(vtkPVApplication*);
-  vtkPVApplication* GetPVApplication() 
-    {
-      return this->PVApplication;
-    }
   
+  void SetOptions(vtkPVBatchOptions* op)
+    {
+    this->Options = op;
+    }
 protected:
-  vtkPVProcessModuleGUIHelper();
-  virtual ~vtkPVProcessModuleGUIHelper();
+  vtkPVProcessModuleBatchHelper();
+  virtual ~vtkPVProcessModuleBatchHelper();
 
-  int ActualRun(int argc, char **argv);
-
-
+  vtkSMApplication* SMApplication;
 private:
-  vtkPVApplication* PVApplication;
-  vtkPVProcessModuleGUIHelper(const vtkPVProcessModuleGUIHelper&); // Not implemented
-  void operator=(const vtkPVProcessModuleGUIHelper&); // Not implemented
+  vtkPVBatchOptions* Options;
+
+  vtkPVProcessModuleBatchHelper(const vtkPVProcessModuleBatchHelper&); // Not implemented
+  void operator=(const vtkPVProcessModuleBatchHelper&); // Not implemented
 };
 
 #endif

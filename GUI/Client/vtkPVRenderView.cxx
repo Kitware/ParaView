@@ -79,6 +79,7 @@
 #include "vtkToolkits.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkClientServerStream.h"
+#include "vtkPVOptions.h"
 
 
 #ifdef _WIN32
@@ -135,7 +136,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.338");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.339");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -985,8 +986,8 @@ void vtkPVRenderView::CreateViewProperties()
   // Create the render module user interface.
   char* rmuiClassName;
   vtkProcessModule* pm = pvapp->GetProcessModule();
-  rmuiClassName = new char[strlen(pm->GetRenderModuleName()) + 20];
-  sprintf(rmuiClassName, "vtkPV%sUI", pm->GetRenderModuleName());
+  rmuiClassName = new char[strlen(pm->GetOptions()->GetRenderModuleName()) + 20];
+  sprintf(rmuiClassName, "vtkPV%sUI", pm->GetOptions()->GetRenderModuleName());
   vtkObject* rmui = vtkInstantiator::CreateInstance(rmuiClassName);
   vtkPVRenderModuleUI* rmuio = vtkPVRenderModuleUI::SafeDownCast(rmui);
   if ( rmuio )

@@ -68,12 +68,20 @@ public:
   vtkGetStringMacro(GroupFileName);
 
   // Description:
+  // vtkProcessModule needs to set the render module name
+  vtkSetStringMacro(RenderModuleName);
+
+  // Description:
   // In case of unknown argument, set this variable with the unknown argument.
   vtkGetStringMacro(UnknownArgument);
 
   // Description:
   // Get the error message if Parse returned 0.
   vtkGetStringMacro(ErrorMessage);
+
+  // Description:
+  // Get argv[0]
+  const char* GetArgv0();
 
 protected:
   // Description:
@@ -143,7 +151,6 @@ private:
   int TileDimensions[2];
   int UseRenderingGroup;
 
-  vtkSetStringMacro(RenderModuleName);
   char* RenderModuleName;
 
   vtkSetStringMacro(CaveConfigurationFileName);

@@ -39,7 +39,6 @@ class vtkClientServerInterpreter;
 class vtkClientServerStream;
 class vtkSocketController;
 class vtkKWApplication;
-class vtkProcessModuleGUIHelper;
 class vtkPVServerInformation;
 class vtkPVOptions;
 
@@ -150,10 +149,6 @@ public:
   static int GetGlobalLODFlag();
   static void SetGlobalLODFlagInternal(int val);
   
-  void SetGUIHelper(vtkProcessModuleGUIHelper*);
-  vtkSetMacro(ProgressEnabled, int);
-  vtkGetMacro(ProgressEnabled, int);
-  
   // Description:  
   // This method leaks memory.  It is a quick and dirty way to set different 
   // DISPLAY environment variables on the render server.  I think the string 
@@ -195,15 +190,12 @@ protected:
   // of the vtkCollectPolydata filter.
   static int GlobalLODFlag;
   
-  int ProgressEnabled;
   float LogThreshold;
   char* DemoPath;
   vtkPVServerInformation* ServerInformation;
-  vtkProcessModuleGUIHelper* GUIHelper;
   int UseTriangleStrips;
   int UseImmediateMode;
 
-  vtkPVOptions* Options;
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented

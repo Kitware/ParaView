@@ -226,10 +226,6 @@ public:
   virtual void GetApplicationSettingsFromRegistery();
 
   // Description:
-  // We need to get the data path for the demo on the server.
-  char* GetDemoPath();
-
-  // Description:
   // Enable or disable test errors. This refers to wether errors make test fail
   // or not.
   void EnableTestErrors();
@@ -334,9 +330,6 @@ protected:
 
   int ShowSourcesLongHelp;
   int SourcesBrowserAlwaysShowName;
-
-  char* DemoPath;
-  vtkSetStringMacro(DemoPath);
 
   vtkPVApplicationObserver* Observer;
 

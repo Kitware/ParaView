@@ -26,6 +26,8 @@
 #include "vtkPVProgressHandler.h"
 #include "vtkProcessObject.h"
 #include "vtkPVRenderModule.h"
+#include "vtkPVOptions.h"
+#include "vtkProcessModuleGUIHelper.h"
 
 #include <vtkstd/map>
 
@@ -43,7 +45,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.8");
+vtkCxxRevisionMacro(vtkProcessModule, "1.9");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -94,15 +96,20 @@ vtkProcessModule::vtkProcessModule()
   this->Observer = vtkProcessModuleObserver::New();
   this->Observer->SetPM(this);
 
+  this->ProgressEnabled = 0;
   this->ProgressRequests = 0;
   this->ProgressHandler = vtkPVProgressHandler::New();
   this->RenderModule = 0;
-  this->RenderModuleName = 0;
+  this->GUIHelper = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkProcessModule::~vtkProcessModule()
 {
+  if(this->GUIHelper)
+    {
+    this->GUIHelper->Delete();
+    }
   this->ProgressHandler->Cleanup();
   this->ProgressHandler->Delete();
   this->ProgressHandler = 0;
@@ -118,7 +125,6 @@ vtkProcessModule::~vtkProcessModule()
   this->Observer->Delete();
   this->Observer = 0;
   this->SetRenderModule(0);
-  this->SetRenderModuleName(0);
 
   delete this->Internals;
 }
@@ -422,9 +428,14 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Controller: " << this->Controller << endl;
   os << indent << "ProgressRequests: " << this->ProgressRequests << endl;
   os << indent << "ProgressHandler: " << this->ProgressHandler << endl;
+  os << indent << "ProgressEnabled: " << this->ProgressEnabled << endl;
   os << indent << "ReportInterpreterErrors: "
      << this->ReportInterpreterErrors << endl;
-  os << indent << "RenderModuleName: " << (this->RenderModuleName?this->RenderModuleName:"(none)") << endl;
+  os << indent << "Options:" << (this->Options?"":"(none)") << endl;
+  if ( this->Options )
+    {
+    this->Options->PrintSelf(os, indent.GetNextIndent());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -438,25 +449,50 @@ void vtkProcessModule::InitializeInterpreter()
   // Create the interpreter and supporting stream.
   this->Interpreter = vtkClientServerInterpreter::New();
   this->ClientServerStream = new vtkClientServerStream;
-  
+
   // Setup a callback for the interpreter to report errors.
   this->InterpreterObserver = vtkCallbackCommand::New();
   this->InterpreterObserver->SetCallback(&vtkProcessModule::InterpreterCallbackFunction);
   this->InterpreterObserver->SetClientData(this);
   this->Interpreter->AddObserver(vtkCommand::UserEvent,
-                                 this->InterpreterObserver);
+    this->InterpreterObserver);
 
   // Assign standard IDs.
-// TODO move this to subclass
-//   vtkPVApplication *app = this->GetPVApplication();
+  // TODO move this to subclass
+  //   vtkPVApplication *app = this->GetPVApplication();
   vtkClientServerStream css;
-//   css << vtkClientServerStream::Assign
-//       << this->GetApplicationID() << app
-//       << vtkClientServerStream::End;
+  //   css << vtkClientServerStream::Assign
+  //       << this->GetApplicationID() << app
+  //       << vtkClientServerStream::End;
   css << vtkClientServerStream::Assign
-      << this->GetProcessModuleID() << this
-      << vtkClientServerStream::End;
+    << this->GetProcessModuleID() << this
+    << vtkClientServerStream::End;
   this->Interpreter->ProcessStream(css);
+
+  bool needLog = false;
+  if(getenv("VTK_CLIENT_SERVER_LOG"))
+    {
+    needLog = true;
+    if(this-Options->GetClientMode())
+      {
+      needLog = false;
+      this->GetInterpreter()->SetLogFile("paraviewClient.log");
+      }
+    if(this->Options->GetServerMode())
+      {
+      needLog = false;
+      this->GetInterpreter()->SetLogFile("paraviewServer.log");
+      }
+    if(this->Options->GetRenderServerMode())
+      {
+      needLog = false;
+      this->GetInterpreter()->SetLogFile("paraviewRenderServer.log");
+      }
+    } 
+  if(needLog)
+    {
+    this->GetInterpreter()->SetLogFile("paraview.log");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -614,19 +650,63 @@ void vtkProcessModule::ExecuteEvent(vtkObject *o, unsigned long event, void* cal
 }
 
 //----------------------------------------------------------------------------
+void vtkProcessModule::SetGUIHelper(vtkProcessModuleGUIHelper* h)
+{
+  if ( this->GUIHelper )
+    {
+    this->GUIHelper->UnRegister(this);
+    this->GUIHelper = 0;
+    }
+  if ( h )
+    {
+    this->GUIHelper = h;
+    h->Register(this);
+    }
+}
+
+//----------------------------------------------------------------------------
 int vtkProcessModule::SetupRenderModule()
 {
-  cout << "Creating process module: " << this->RenderModuleName << endl;
+  const char* renderModuleName = this->Options->GetRenderModuleName();
+  // The client chooses a render module.
+  if (renderModuleName == NULL)
+    { // The render module has not been set by the user.  Choose a default.
+    if (this->Options->GetUseTiledDisplay())
+      {
+#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
+      renderModuleName = "IceTRenderModule";
+#else
+      renderModuleName = "MultiDisplayRenderModule";
+#endif
+      }
+    else if (this->Options->GetClientMode())
+      { // Client server, no tiled display.
+#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
+      renderModuleName = "DeskTopRenderModule";
+#else
+      renderModuleName = "MPIRenderModule";
+#endif        
+      }
+    else
+      { // Single process, or one MPI program
+#ifdef VTK_USE_MPI
+      renderModuleName = "MPIRenderModule";
+#else
+      renderModuleName = "LODRenderModule";
+#endif
+      }
+    }
+  
   // Create the rendering module here.
   char* rmClassName;
-  rmClassName = new char[strlen(this->RenderModuleName) + 20];
-  sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
+  rmClassName = new char[strlen(renderModuleName) + 20];
+  sprintf(rmClassName, "vtkPV%s", renderModuleName);
   vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
   vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
   if (rm == 0)
     {
     vtkErrorMacro("Could not create render module " << rmClassName);
-    this->SetRenderModuleName("RenderModule");
+    renderModuleName = "RenderModule";
     o = vtkInstantiator::CreateInstance("vtkPVRenderModule");
     rm = vtkPVRenderModule::SafeDownCast(o);
     if ( rm == 0 )
@@ -651,6 +731,8 @@ int vtkProcessModule::SetupRenderModule()
 
   delete [] rmClassName;
   rmClassName = NULL;
+
+  this->Options->SetRenderModuleName(renderModuleName);
 
   return 1;
 }

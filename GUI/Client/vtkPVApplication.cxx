@@ -14,7 +14,6 @@
 =========================================================================*/
 #include "vtkPVApplication.h"
 
-#include "vtkPVDemoPaths.h"
 #include "vtkToolkits.h"
 #include "vtkPVConfig.h"
 #ifdef VTK_USE_MPI
@@ -86,11 +85,9 @@
 // #include "vtkPVRenderGroupDialog.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkPVServerFileDialog.h"
-#include <sys/stat.h>
 #include <stdarg.h>
 #include <signal.h>
 #include "vtkPVProgressHandler.h"
-#include "vtkKWDirectoryUtilities.h"
 
 #include "vtkPVGUIClientOptions.h"
 
@@ -107,12 +104,13 @@
 
 #include <vtkstd/vector>
 #include <vtkstd/string>
+#include <sys/stat.h>
 
 #define PVAPPLICATION_PROGRESS_TAG 31415
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.316");
+vtkCxxRevisionMacro(vtkPVApplication, "1.317");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -449,7 +447,6 @@ vtkPVApplication::vtkPVApplication()
 
   this->SourcesBrowserAlwaysShowName = 0;
   this->ShowSourcesLongHelp = 1;
-  this->DemoPath = NULL;
 
 
   this->SMApplication = vtkSMApplication::New();
@@ -470,7 +467,6 @@ vtkPVApplication::~vtkPVApplication()
     }
   this->SetTraceFileName(0);
   this->SetArgv0(0);
-  this->SetDemoPath(NULL);
   vtkOutputWindow::SetInstance(0);
   this->OutputWindow->Delete();
   this->Observer->Delete();
@@ -493,7 +489,6 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 
     pm->GetServerInformation()->SetTileDimensions(this->Options->GetTileDimensions());
     pm->GetServerInformation()->SetUseOffscreenRendering(this->Options->GetUseOffscreenRendering());
-    pm->SetDemoPath(this->GetDemoPath());
     // Juggle the compositing flag to let server in on the decision
     // whether to allow compositing / rendering on the server.
     // Put the flag on the process module.
@@ -501,11 +496,6 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
       {
       pm->GetServerInformation()->SetRemoteRendering(0);
       }
-    vtkPVProcessModuleGUIHelper* helper = vtkPVProcessModuleGUIHelper::New();
-    helper->SetPVApplication(this);
-    helper->SetPVProcessModule(pm);
-    pm->SetGUIHelper(helper);
-    helper->Delete();
     pm->GetProgressHandler()->SetClientMode(this->Options->GetClientMode());
     pm->GetProgressHandler()->SetServerMode(this->Options->GetServerMode());
     }
@@ -1533,77 +1523,6 @@ void vtkPVApplication::DisplayTCLError(const char* message)
 const char* const vtkPVApplication::ExitProc =
 "proc exit {} { global Application; $Application Exit }";
 
-//============================================================================
-// Stuff that is a part of render-process module.
-
-//-----------------------------------------------------------------------------
-char* vtkPVApplication::GetDemoPath()
-{
-  int found=0;
-  char temp1[1024];
-  struct stat fs;
-
-  this->SetDemoPath(NULL);
-
-#ifdef _WIN32  
-
-  if (this->GetApplicationInstallationDirectory())
-    {
-    sprintf(temp1, "%s/Demos/Demo1.pvs",
-            this->GetApplicationInstallationDirectory());
-    if (stat(temp1, &fs) == 0) 
-      {
-      sprintf(temp1, "%s/Demos",
-              this->GetApplicationInstallationDirectory());
-      this->SetDemoPath(temp1);
-      found=1;
-      }
-    }
-
-#else
-
-  vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
-  const char* selfPath = util->FindSelfPath(
-    this->GetArgv0());
-  if (selfPath)
-    {
-    const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
-    char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
-    sprintf(newPath, "%s/%s", selfPath, relPath);
-
-    char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
-    sprintf(demoFile, "%s/Demo1.pvs", newPath);
-
-    if (stat(demoFile, &fs) == 0) 
-      {
-      this->SetDemoPath(newPath);
-      found = 1;
-      }
-    delete[] demoFile;
-    delete[] newPath;
-    }
-  util->Delete();
-
-#endif // _WIN32  
-
-  if (!found)
-    {
-    // Look in binary and installation directories
-    const char** dir;
-    for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
-      {
-      sprintf(temp1, "%s/Demo1.pvs", *dir);
-      if (stat(temp1, &fs) == 0) 
-        {
-        this->SetDemoPath(*dir);
-        found = 1;
-        }
-      }
-    }
-
-  return this->DemoPath;
-}
-
 //----------------------------------------------------------------------------
 void vtkPVApplication::EnableTestErrors()
 {
@@ -1673,7 +1592,7 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
     demoDataPath = 0;
     }
   // Client path
-  demoScriptPath = this->GetDemoPath();
+  demoScriptPath = pm->GetDemoPath();
 
   if (demoDataPath && demoScriptPath)
     {

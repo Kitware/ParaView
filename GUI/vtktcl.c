@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkToolkits.h"
-#include "vtkTk.h"
+#include "vtkTcl.h"
 
 extern int Vtkcommontcl_Init(Tcl_Interp *interp);
 int Vtktcl_Init(Tcl_Interp *interp)

@@ -1,7 +1,7 @@
 /*=========================================================================
 
 Program:   ParaView
-Module:    ParaView.cxx
+Module:    pvbatch.cxx
 
 Copyright (c) Kitware, Inc.
 All rights reserved.
@@ -24,9 +24,8 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include "vtkTimerLog.h"
 
-#include "vtkPVGUIClientOptions.h"
+#include "vtkPVBatchOptions.h"
 #include "vtkPVProcessModuleBatchHelper.h"
-#include "vtkPVProcessModuleGUIHelper.h"
 #include "vtkPVCreateProcessModule.h"
 #include "vtkProcessModule.h"
 
@@ -61,7 +60,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVCommonInstantiator.h"
 #include "vtkPVFiltersInstantiator.h"
 #include "vtkSMInstantiator.h"
-#include "vtkParaViewInstantiator.h"
 #include "vtkClientServerInterpreter.h"
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
@@ -85,7 +83,7 @@ void u_fpu_setup()
 #endif //PARAVIEW_ENABLE_FPE
 
 //----------------------------------------------------------------------------
-int MyMain(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
   int retVal = 0;
   int startVal = 0;
@@ -116,7 +114,7 @@ int MyMain(int argc, char *argv[])
 #endif
 
   int display_help = 0;
-  vtkPVGUIClientOptions* options = vtkPVGUIClientOptions::New();
+  vtkPVBatchOptions* options = vtkPVBatchOptions::New();
   if ( !options->Parse(argc, argv) )
     {
     cerr << "Problem parsing command line arguments" << endl;
@@ -151,15 +149,8 @@ int MyMain(int argc, char *argv[])
   
   vtkProcessModule* pm = vtkPVCreateProcessModule::CreateProcessModule(options);
 
-  vtkProcessModuleGUIHelper* helper;
-  if ( options->GetBatchScriptName() )
-    {
-    helper = vtkPVProcessModuleBatchHelper::New();
-    }
-  else
-    {
-    helper = vtkPVProcessModuleGUIHelper::New();
-    }
+  vtkPVProcessModuleBatchHelper* helper = vtkPVProcessModuleBatchHelper::New();
+  helper->SetOptions(options);
   helper->SetProcessModule(pm);
   pm->SetGUIHelper(helper);
   helper->Delete();
@@ -194,133 +185,6 @@ int MyMain(int argc, char *argv[])
 }
 
 //----------------------------------------------------------------------------
-#ifdef _WIN32
-#include <windows.h>
-#include "vtkDynamicLoader.h"
-
-int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance), 
-                      HINSTANCE vtkNotUsed(hPrevInstance),
-                      LPSTR lpCmdLine, int vtkNotUsed(nShowCmd))
-{
-  int          argc;
-  int          retVal;
-  char**       argv;
-  unsigned int i;
-  int          j;
-  typedef void (* VOID_FUN)();
-  vtkLibHandle lib = vtkDynamicLoader::OpenLibrary("user32.dll");
-  if(lib)
-    {
-    VOID_FUN func = (VOID_FUN)
-      vtkDynamicLoader::GetSymbolAddress(lib, "DisableProcessWindowsGhosting");
-    if(func)
-      {
-      (*func)();
-      }
-    }
-  
-  // parse a few of the command line arguments
-  // a space delimites an argument except when it is inside a quote
-  argc = 1;
-  int pos = 0;
-  for (i = 0; i < strlen(lpCmdLine); i++)
-    {
-    while (lpCmdLine[i] == ' ' && i < strlen(lpCmdLine))
-      {
-      i++;
-      }
-    if (lpCmdLine[i] == '\"')
-      {
-      i++;
-      while (lpCmdLine[i] != '\"' && i < strlen(lpCmdLine))
-        {
-        i++;
-        pos++;
-        }
-      argc++;
-      pos = 0;
-      }
-    else
-      {
-      while (lpCmdLine[i] != ' ' && i < strlen(lpCmdLine))
-        {
-        i++;
-        pos++;
-        }
-      argc++;
-      pos = 0;
-      }
-    }
-
-  argv = (char**)malloc(sizeof(char*)* (argc+1));
-
-  argv[0] = (char*)malloc(1024);
-  ::GetModuleFileName(0, argv[0],1024);
-
-  for(j=1; j<argc; j++)
-    {
-    argv[j] = (char*)malloc(strlen(lpCmdLine)+10);
-    }
-  argv[argc] = 0;
-
-  argc = 1;
-  pos = 0;
-  for (i = 0; i < strlen(lpCmdLine); i++)
-    {
-    while (lpCmdLine[i] == ' ' && i < strlen(lpCmdLine))
-      {
-      i++;
-      }
-    if (lpCmdLine[i] == '\"')
-      {
-      i++;
-      while (lpCmdLine[i] != '\"' && i < strlen(lpCmdLine))
-        {
-        argv[argc][pos] = lpCmdLine[i];
-        i++;
-        pos++;
-        }
-      argv[argc][pos] = '\0';
-      argc++;
-      pos = 0;
-      }
-    else
-      {
-      while (lpCmdLine[i] != ' ' && i < strlen(lpCmdLine))
-        {
-        argv[argc][pos] = lpCmdLine[i];
-        i++;
-        pos++;
-        }
-      argv[argc][pos] = '\0';
-      argc++;
-      pos = 0;
-      }
-    }
-  argv[argc] = 0;
-
-  // Initialize the processes and start the application.
-  retVal = MyMain(argc, argv);
-
-  // Delete arguments
-  for(j=0; j<argc; j++)
-    {
-    free(argv[j]);
-    }
-  free(argv);
-
-  return retVal;;
-}
-#else
-int main(int argc, char *argv[])
-{
-  int res = MyMain(argc, argv);
-  return res;
-}
-#endif
-
-
-//----------------------------------------------------------------------------
 // ClientServer wrapper initialization functions.
 extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
@@ -335,8 +199,6 @@ extern "C" void vtkPatentedCS_Initialize(vtkClientServerInterpreter*);
 #endif
 extern "C" void vtkPVCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
-
-extern "C" void vtkKWParaViewCS_Initialize(vtkClientServerInterpreter*);
 
 #ifdef PARAVIEW_LINK_XDMF
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
@@ -362,7 +224,6 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
 #endif
   vtkPVCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
-  vtkKWParaViewCS_Initialize(pm->GetInterpreter());
 
 #ifdef PARAVIEW_LINK_XDMF
   vtkXdmfCS_Initialize(pm->GetInterpreter());

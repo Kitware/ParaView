@@ -59,6 +59,7 @@ SET( ServerManagerCommon_SRCS
   )
 
 SET( ServerManagerNonWrapped_SRCS
+  vtkPVBatchOptions.cxx
   vtkPVCaveRenderModule.cxx
   vtkPVCompositeRenderModule.cxx
   vtkPVMultiDisplayRenderModule.cxx
@@ -104,6 +105,7 @@ ENDIF (PARAVIEW_USE_ICE_T)
 
 
 INCLUDE_DIRECTORIES(
+  ${KWSYS_INCLUDE_DIR}
   ${VTK_BINARY_DIR}
   ${TCL_INCLUDE_PATH}
   ${ParaView_SOURCE_DIR}/Common/KWCommon
@@ -173,7 +175,10 @@ VTK_WRAP_TCL3(
   "${ServerManagerCommon_SRCS};${SMInstantiator_SRCS}"
   ""
   )
-ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS})
+SET(VTK_TCL_HOME ${PVGUI_SOURCE_DIR})
+ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS}
+  ${VTK_TCL_HOME}/vtktcl.c
+  vtkPVProcessModuleBatchHelper.cxx)
 TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL vtkPVServerManager vtkCommonTCL)
 
 

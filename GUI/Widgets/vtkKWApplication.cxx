@@ -57,10 +57,11 @@ EXTERN Tcl_Obj* TclGetLibraryPath _ANSI_ARGS_((void));
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 int vtkKWApplication::WidgetVisibility = 1;
+Tcl_Interp *vtkKWApplication::GlobalInterp = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.173");
+vtkCxxRevisionMacro(vtkKWApplication, "1.174");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -137,6 +138,7 @@ vtkKWApplication::vtkKWApplication()
       "initialized properly...");
     return;
     }
+  vtkKWApplication::GlobalInterp = this->MainInterp;
 
   //vtkTclGetObjectFromPointer(this->MainInterp, (void *)this, 
   //                           vtkKWApplicationCommand);
@@ -733,6 +735,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
     vtkKWBWidgets::Initialize(interp);
     }
+  vtkKWApplication::GlobalInterp = interp;
 
   return interp;
 }
@@ -1393,12 +1396,24 @@ int vtkKWApplication::SelfTest()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::LoadScript(const char* filename)
+int vtkKWApplication::LoadTclScript(const char* filename)
 {
   int res = 1;
   char* file = vtkString::Duplicate(filename);
   // add this window as a variable
-  if ( Tcl_EvalFile(this->MainInterp, file) != TCL_OK )
+  if ( Tcl_EvalFile(Et_Interp, file) != TCL_OK )
+    {
+    res = 0;
+    }
+  delete [] file;
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::LoadScript(const char* filename)
+{
+  int res = 1;
+  if ( !vtkKWApplication::LoadTclScript(filename) )
     {
     vtkErrorMacro("\n    Script: \n" << filename 
                   << "\n    Returned Error on line "
@@ -1407,8 +1422,6 @@ int vtkKWApplication::LoadScript(const char* filename)
     res = 0;
     this->SetExitStatus(1);
     }
-  delete [] file;
-
   if ( this->ExitOnReturn )
     {
     this->Exit();

@@ -42,22 +42,25 @@
 #include "vtkInstantiator.h"
 #include "vtkPVOptions.h"
 
+#include "vtkPVDemoPaths.h"
+
+#include "vtkKWDirectoryUtilities.h"
+#include <sys/stat.h>
+
 // initialze the class variables
 int vtkPVProcessModule::GlobalLODFlag = 0;
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.19");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
   this->MPIMToNSocketConnectionID.ID = 0;
-  this->ProgressEnabled = 0;
   this->LogThreshold = 0;
   this->DemoPath = 0;
-  this->GUIHelper = 0;
   this->ServerInformation = vtkPVServerInformation::New();
   this->UseTriangleStrips = 0;
   this->UseImmediateMode = 1;
@@ -67,10 +70,6 @@ vtkPVProcessModule::vtkPVProcessModule()
 //----------------------------------------------------------------------------
 vtkPVProcessModule::~vtkPVProcessModule()
 { 
-  if(this->GUIHelper)
-    {
-    this->GUIHelper->Delete();
-    }
   this->SetDemoPath(0);
   this->FinalizeInterpreter();
   this->ServerInformation->Delete();
@@ -89,10 +88,6 @@ int vtkPVProcessModule::Start(int argc, char **argv)
     {
     this->Controller = vtkDummyController::New();
     vtkMultiProcessController::SetGlobalController(this->Controller);
-    }
-  if ( !this->SetupRenderModule() )
-    {
-    return -1;
     }
   return this->GUIHelper->RunGUIStart(argc, argv, 1, 0);
 }
@@ -199,7 +194,6 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "LogThreshold: " << this->LogThreshold << endl;
-  os << indent << "ProgressEnabled: " << this->ProgressEnabled << endl;
   os << indent << "DemoPath: " << (this->DemoPath?this->DemoPath:"(none)") << endl;
   os << indent << "UseTriangleStrips: " << this->UseTriangleStrips << endl;
   os << indent << "UseImmediateMode: " << this->UseImmediateMode << endl;
@@ -372,18 +366,75 @@ int vtkPVProcessModule::GetGlobalLODFlag()
   return vtkPVProcessModule::GlobalLODFlag;
 }
 
+//============================================================================
+// Stuff that is a part of render-process module.
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const char* vtkPVProcessModule::GetDemoPath()
 {
-  return this->DemoPath;
-}
+  int found=0;
+  char temp1[1024];
+  struct stat fs;
 
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::SetGUIHelper(vtkProcessModuleGUIHelper* h)
-{
-  this->GUIHelper = h;
-  h->Register(this);
+  this->SetDemoPath(NULL);
+
+#ifdef _WIN32  
+
+  if (this->GetApplicationInstallationDirectory())
+    {
+    sprintf(temp1, "%s/Demos/Demo1.pvs",
+            this->GetApplicationInstallationDirectory());
+    if (stat(temp1, &fs) == 0) 
+      {
+      sprintf(temp1, "%s/Demos",
+              this->GetApplicationInstallationDirectory());
+      this->SetDemoPath(temp1);
+      found=1;
+      }
+    }
+
+#else
+
+  vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
+  const char* selfPath = util->FindSelfPath(
+    this->Options->GetArgv0());
+  if (selfPath)
+    {
+    const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
+    char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
+    sprintf(newPath, "%s/%s", selfPath, relPath);
+
+    char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
+    sprintf(demoFile, "%s/Demo1.pvs", newPath);
+
+    if (stat(demoFile, &fs) == 0) 
+      {
+      this->SetDemoPath(newPath);
+      found = 1;
+      }
+    delete[] demoFile;
+    delete[] newPath;
+    }
+  util->Delete();
+
+#endif // _WIN32  
+
+  if (!found)
+    {
+    // Look in binary and installation directories
+    const char** dir;
+    for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
+      {
+      sprintf(temp1, "%s/Demo1.pvs", *dir);
+      if (stat(temp1, &fs) == 0) 
+        {
+        this->SetDemoPath(*dir);
+        found = 1;
+        }
+      }
+    }
+
+  return this->DemoPath;
 }
 
 //----------------------------------------------------------------------------

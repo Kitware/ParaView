@@ -20,18 +20,8 @@
 
 
 //----------------------------------------------------------------------------
-//****************************************************************************
-class vtkPVGUIClientOptionsInternal
-{
-public:
-  kwsys::CommandLineArguments CMD;
-};
-//****************************************************************************
-//----------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGUIClientOptions);
-vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.1");
+vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVGUIClientOptions::vtkPVGUIClientOptions()
@@ -41,17 +31,15 @@ vtkPVGUIClientOptions::vtkPVGUIClientOptions()
   this->CrashOnErrors = 0;
   this->StartEmpty = 0;
   this->ParaViewScriptName = 0;
-  this->BatchScriptName = 0;
 
-  // When running from client, default is different.
-  this->ServerMode = 0;
+  // We do not require batch script in this subclass
+  this->RequireBatchScript = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVGUIClientOptions::~vtkPVGUIClientOptions()
 {
   this->SetParaViewScriptName(0);
-  this->SetBatchScriptName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -77,15 +65,6 @@ void vtkPVGUIClientOptions::Initialize()
 //----------------------------------------------------------------------------
 int vtkPVGUIClientOptions::PostProcess()
 {
-  if ( this->BatchScriptName && 
-    kwsys::SystemTools::GetFilenameLastExtension(this->BatchScriptName) != ".pvb")
-    {
-    ostrstream str;
-    str << "Wrong batch script name: " << this->BatchScriptName << ends;
-    this->SetErrorMessage(str.str());
-    str.rdbuf()->freeze(0);
-    return 0;
-    }
   return this->Superclass::PostProcess();
 }
 
@@ -95,12 +74,6 @@ int vtkPVGUIClientOptions::WrongArgument(const char* argument)
     kwsys::SystemTools::GetFilenameLastExtension(argument) == ".pvs")
     {
     this->SetParaViewScriptName(argument);
-    return 1;
-    }
-  if ( kwsys::SystemTools::FileExists(argument) &&
-    kwsys::SystemTools::GetFilenameLastExtension(argument) == ".pvb")
-    {
-    this->SetBatchScriptName(argument);
     return 1;
     }
 
@@ -119,5 +92,4 @@ void vtkPVGUIClientOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Username: " << (this->Username?this->Username:"(none)") << endl;
   os << indent << "HostName: " << (this->HostName?this->HostName:"(none)") << endl;
   os << indent << "ParaViewScriptName: " << (this->ParaViewScriptName?this->ParaViewScriptName:"(none)") << endl;
-  os << indent << "BatchScriptName: " << (this->BatchScriptName?this->BatchScriptName:"(none)") << endl;
 }

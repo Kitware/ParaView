@@ -324,10 +324,6 @@ CONFIGURE_FILE(
   ${PVGUI_BINARY_DIR}/Client/vtkPVSourceInterfaceDirectories.h
   ESCAPE_QUOTES)
 
-CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/vtkPVDemoPaths.h.in
-  ${PVGUI_BINARY_DIR}/Client/vtkPVDemoPaths.h
-  ESCAPE_QUOTES)
-
 CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/vtkPVHelpPaths.h.in
   ${PVGUI_BINARY_DIR}/Client/vtkPVHelpPaths.h
   ESCAPE_QUOTES)

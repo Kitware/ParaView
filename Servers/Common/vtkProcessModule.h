@@ -34,6 +34,8 @@ class vtkClientServerStream;
 class vtkDataObject;
 class vtkPVProgressHandler;
 class vtkProcessObject;
+class vtkProcessModuleGUIHelper;
+class vtkPVOptions;
 //BTX
 struct vtkProcessModuleInternals;
 //ETX
@@ -118,6 +120,15 @@ public:
       return this->ClientServerStream;
     }
   
+  // ParaView.cxx (main) calls this method to setup the processes.
+  // It currently creates the application, but I will try to pass
+  // the application as an argument.
+  virtual int Start(int, char **) = 0;
+  
+  // Description:
+  // This breaks rmi loops and cleans up processes.`                
+  virtual void Exit() = 0;
+
   // Description: 
   // These methods construct/delete a vtk object in the vtkClientServerStream
   // owned by the process module.  The type of the object is specified by
@@ -222,23 +233,30 @@ public:
   vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
 
   // Description:
+  vtkSetMacro(ProgressEnabled, int);
+  vtkGetMacro(ProgressEnabled, int);
+  
+  // Description:
   // RenderingModule has the rendering abstraction.  
   // It creates the render window and any composit manager.  
   // It also creates part displays which handle level of details.
   void SetRenderModule(vtkPVRenderModule *module);
   vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
   
-  // Description:
-  // This root class name will eventually be replaced
-  // with an XML specification of rendering module classes.
-  vtkGetStringMacro(RenderModuleName);
-
-  // Description:
-  // I have ParaView.cxx set the proper default render module.
-  vtkSetStringMacro(RenderModuleName);  
-
   // Create and start using render module
   int SetupRenderModule();
+
+  // Description:
+  // Set and get the application options
+  vtkGetObjectMacro(Options, vtkPVOptions);
+  virtual void SetOptions(vtkPVOptions* op)
+    {
+    this->Options = op;
+    }
+
+  // Description:
+  // Set the gui helper
+  void SetGUIHelper(vtkProcessModuleGUIHelper*);
 
 protected:
   vtkProcessModule();
@@ -290,10 +308,12 @@ protected:
 
   vtkPVProgressHandler* ProgressHandler;
   int ProgressRequests;
+  int ProgressEnabled;
 
   vtkProcessModuleObserver* Observer;
   vtkPVRenderModule *RenderModule;
-  char* RenderModuleName;
+  vtkPVOptions* Options;
+  vtkProcessModuleGUIHelper* GUIHelper;
 
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented

@@ -1,7 +1,7 @@
 /*=========================================================================
   
   Program:   ParaView
-  Module:    vtkPVGUIClientOptions.h
+  Module:    vtkPVBatchOptions.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVGUIClientOptions - ParaView options storage
+// .NAME vtkPVBatchOptions - ParaView options storage
 // .SECTION Description
 // An object of this class represents a storage for ParaView options
 // 
@@ -22,39 +22,28 @@
 // .SECTION See Also
 // kwsys::CommandLineArguments
 
-#ifndef __vtkPVGUIClientOptions_h
-#define __vtkPVGUIClientOptions_h
+#ifndef __vtkPVBatchOptions_h
+#define __vtkPVBatchOptions_h
 
-#include "vtkPVBatchOptions.h"
+#include "vtkPVOptions.h"
 
-class VTK_EXPORT vtkPVGUIClientOptions : public vtkPVBatchOptions
+class VTK_EXPORT vtkPVBatchOptions : public vtkPVOptions
 {
 public:
-  static vtkPVGUIClientOptions* New();
-  vtkTypeRevisionMacro(vtkPVGUIClientOptions,vtkPVBatchOptions);
+  static vtkPVBatchOptions* New();
+  vtkTypeRevisionMacro(vtkPVBatchOptions,vtkPVOptions);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  vtkGetMacro(PlayDemoFlag, int);
-  vtkGetMacro(DisableRegistry, int);
-  vtkGetMacro(CrashOnErrors, int);
-  vtkGetMacro(StartEmpty, int);
-  vtkGetStringMacro(ParaViewScriptName);
-
-  // Description:
-  // Some variables need to be overwritten
-  vtkSetStringMacro(HostName);
-  vtkSetStringMacro(Username);
-  vtkSetClampMacro(Port, int, 0, 65535);
-  vtkSetStringMacro(ParaViewScriptName);
+  vtkGetStringMacro(BatchScriptName);
 
 protected:
   // Description:
   // Default constructor.
-  vtkPVGUIClientOptions();
+  vtkPVBatchOptions();
 
   // Description:
   // Destructor.
-  virtual ~vtkPVGUIClientOptions();
+  virtual ~vtkPVBatchOptions();
 
   // Description:
   // Initialize arguments.
@@ -69,17 +58,17 @@ protected:
   // the parsing will fail.
   virtual int WrongArgument(const char* argument);
 
-private:
-  vtkPVGUIClientOptions(const vtkPVGUIClientOptions&); // Not implemented
-  void operator=(const vtkPVGUIClientOptions&); // Not implemented
-
   // Options:
-  int PlayDemoFlag;
-  int DisableRegistry;
-  int CrashOnErrors;
-  int StartEmpty;
-  char* ParaViewScriptName;
+  vtkSetStringMacro(BatchScriptName);
+  char* BatchScriptName;
+
+  int RequireBatchScript;
+
+private:
+  vtkPVBatchOptions(const vtkPVBatchOptions&); // Not implemented
+  void operator=(const vtkPVBatchOptions&); // Not implemented
 };
 
-#endif // #ifndef __vtkPVGUIClientOptions_h
+#endif // #ifndef __vtkPVBatchOptions_h
+
 

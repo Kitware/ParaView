@@ -22,6 +22,7 @@
 
 #include "vtkObject.h"
 
+class vtkProcessModule;
 
 class VTK_EXPORT vtkProcessModuleGUIHelper : public vtkObject
 {
@@ -45,8 +46,14 @@ public:
   // Description:
   // Exit the application
   virtual void ExitApplication() = 0;
+
+  // Set the Process module pointer
+  virtual void SetProcessModule(vtkProcessModule*);
+
 protected:
-  vtkProcessModuleGUIHelper() { }
+  vtkProcessModuleGUIHelper();
+
+  vtkProcessModule* ProcessModule;
   
 private:
   vtkProcessModuleGUIHelper(const vtkProcessModuleGUIHelper&); // Not implemented
