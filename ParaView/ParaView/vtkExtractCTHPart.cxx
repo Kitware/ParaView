@@ -41,7 +41,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkExtractCTHPart, "1.5");
+vtkCxxRevisionMacro(vtkExtractCTHPart, "1.6");
 vtkStandardNewMacro(vtkExtractCTHPart);
 vtkCxxSetObjectMacro(vtkExtractCTHPart,ClipPlane,vtkPlane);
 
@@ -265,7 +265,6 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
   vtkTimerLog::MarkEndEvent("CTH Contour");
 
   // Create the capping surface for the contour and append.
-  /*
   append1 = vtkAppendPolyData::New();
   append1->AddInput(contour->GetOutput());
   surface = vtkDataSetSurfaceFilter::New();
@@ -320,9 +319,6 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
     clip2->Delete();
     clip2 = NULL;
     }
-  */
-
-tmp = contour->GetOutput();
 
   output->CopyStructure(tmp);
   output->GetCellData()->PassData(tmp->GetCellData());
