@@ -208,7 +208,7 @@ void vtkPVExtentEntry::Accept()
 //---------------------------------------------------------------------------
 void vtkPVExtentEntry::Reset()
 {
-  int count = 0;
+  //int count = 0;
 
   if ( ! this->ModifiedFlag)
     {

@@ -102,12 +102,12 @@ public:
       return VTK_ERROR;
     }
   virtual int SetRGBAPixelData(int ,int ,int ,int ,float *,int,
-			       int blend=0) 
+			       int vtkNotUsed(blend)=0) 
     {
       return VTK_ERROR;
     }
   virtual int SetRGBAPixelData(int, int, int, int, vtkFloatArray*,
-			       int, int blend=0) 
+			       int, int vtkNotUsed(blend)=0) 
     {
       return VTK_ERROR;
     }
@@ -117,13 +117,13 @@ public:
       return VTK_ERROR;
     }
   virtual int SetRGBACharPixelData(int ,int ,int ,int ,unsigned char *, int,
-				   int blend=0) 
+				   int vtkNotUsed(blend)=0) 
     {
       return VTK_ERROR;
     }
   virtual int SetRGBACharPixelData(int, int, int, int,
 				   vtkUnsignedCharArray *,
-				   int, int blend=0) 
+				   int, int vtkNotUsed(blend)=0) 
     {
       return VTK_ERROR;
     }

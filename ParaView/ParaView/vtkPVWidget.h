@@ -125,8 +125,9 @@ public:
   // to find a new way of exporting the animation to a VTK script.
   // It would also be nice if the selection of a method would also
   // set the min/max/step animation parametets.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu* menu, 
-                                 vtkPVAnimationInterface *object) {};
+  virtual void AddAnimationScriptsToMenu(
+    vtkKWMenu* vtkNotUsed(menu), 
+    vtkPVAnimationInterface* vtkNotUsed(object) ) {};
  
 protected:
   vtkPVWidget();
