@@ -31,7 +31,7 @@
 
 #include "spcth_interface.h"
 
-vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.5");
+vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.6");
 vtkStandardNewMacro(vtkAMRSpyPlotReader);
 vtkCxxSetObjectMacro(vtkAMRSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -340,6 +340,8 @@ void vtkAMRSpyPlotReader::ExecuteInformation()
 //------------------------------------------------------------------------------
 void vtkAMRSpyPlotReader::UpdateCaseFile(const char* fname)
 {
+
+  SPCTH* spcth;
   
   // Check to see if this is a different filename than before.
   // If we do have a difference file name we reset the 
@@ -384,9 +386,19 @@ void vtkAMRSpyPlotReader::UpdateCaseFile(const char* fname)
       {
       f = GetFilenamePath(this->FileName) + "/" + f;
       }
-    //cout << "Push file: [" << f.c_str() << "]" << endl;
-    this->UpdateMetaData(f.c_str());
+      
+    // Store all the file names and spcth structures in our internal 'file map'
+    spcth = spcth_initialize();
+    this->Internals->Files[f.c_str()] = spcth;
+    
     }
+    
+    // Okay now open just the first file to get meta data
+    // See CAVEATS in the documentation
+    vtkAMRSpyPlotReaderInternal::MapOfStringToSPCTH::iterator it;
+    it = this->Internals->Files.begin();
+    this->UpdateMetaData(it->first.c_str());
+    vtkDebugMacro("Reading Meta Data in UpdateCaseFile(ExecuteInformation) from file: " << it->first.c_str());
 }
 
 //------------------------------------------------------------------------------
@@ -403,12 +415,10 @@ void vtkAMRSpyPlotReader::UpdateMetaData(const char* fname)
     }
 
   SPCTH* spcth = 0;
-  vtkAMRSpyPlotReaderInternal::MapOfStringToSPCTH::iterator it =
-    this->Internals->Files.find(fname);
+  vtkAMRSpyPlotReaderInternal::MapOfStringToSPCTH::iterator it = this->Internals->Files.find(fname);
   if ( it == this->Internals->Files.end() )
     {
-    spcth = spcth_initialize();
-    this->Internals->Files[fname] = spcth;
+    vtkErrorMacro("Could not find file " << fname << " in the internal file map!");
     }
   else
     {
@@ -532,7 +542,14 @@ void vtkAMRSpyPlotReader::Execute()
   // Now loop and read until I hit my end file
   for(; index<=end; ++it,++index)
     {
-    vtkDebugMacro("Process File: " << it->first.c_str());
+    // Because only the first file got 'UpdataMetaData'
+    // called during ExecuteInformation we need to make
+    // sure that every file we use first has it's
+    // spcth data structure properly filled in
+    this->UpdateMetaData(it->first.c_str());
+    vtkDebugMacro("Reading Meta Data in Execute from file: " << it->first.c_str());
+    
+    vtkDebugMacro("Processing File: " << it->first.c_str());
     spcth = it->second;
     int number_of_blocks = spcth_getNumberOfDataBlocksForCurrentTime(spcth);
     for ( block = 0; block < number_of_blocks; ++ block )

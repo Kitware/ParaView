@@ -15,6 +15,11 @@
 // .NAME vtkAMRSpyPlotReader - Reader for SPCTH Spy Plot file
 // .SECTION Description
 // vtkAMRSpyPlotReader is a reader that reads SPCTH Spy Plot file format
+// .SECTION Caveats
+// Assumption 1: All processors read first file in case file when
+// running 'ExecuteInformation'
+// Assumption 2: The first file contains all the cell array name variables
+// Assumption 3: The first timestep contains all the call array name variables
 
 #ifndef __vtkAMRSpyPlotReader_h
 #define __vtkAMRSpyPlotReader_h
