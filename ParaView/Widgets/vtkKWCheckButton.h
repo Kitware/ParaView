@@ -86,10 +86,12 @@ public:
   virtual void SetImageOption(vtkKWIcon *icon,
                               const char *blend_color_option = 0,
                               const char *image_option = 0);
-  virtual void SetImageOption(const unsigned char* data, 
+  virtual void SetImageOption(const unsigned char *data, 
                               int width, int height, int pixel_size = 4,
                               unsigned long buffer_length = 0,
                               const char *blend_color_option = 0,
+                              const char *image_option = 0);
+  virtual void SetImageOption(const char *image_name,
                               const char *image_option = 0);
 
 protected:

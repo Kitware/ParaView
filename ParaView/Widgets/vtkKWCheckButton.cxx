@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.24");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -253,6 +253,13 @@ void vtkKWCheckButton::SetImageOption(const unsigned char* data,
       data, width, height, pixel_size, buffer_length, 
       "-selectcolor", "-selectimage");
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButton::SetImageOption(const char *image_name,
+                                      const char *image_option)
+{
+  this->Superclass::SetImageOption(image_name, image_option);
 }
 
 //----------------------------------------------------------------------------
