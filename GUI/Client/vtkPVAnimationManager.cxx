@@ -59,7 +59,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.19");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.20");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -811,6 +811,14 @@ void vtkPVAnimationManager::StartRecording()
   this->InRecording = 1;
   this->RecordingIncrement = 0.1;
   this->HAnimationInterface->StartRecording();
+
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
+  vtkPVWindow *pvWindow = (pvApp)? pvApp->GetMainWindow() : NULL;
+  if (pvWindow)
+    {
+    pvWindow->UpdateEnableState();
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -822,6 +830,13 @@ void vtkPVAnimationManager::StopRecording()
     }
   this->InRecording = 0;
   this->HAnimationInterface->StopRecording();
+
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
+  vtkPVWindow *pvWindow = (pvApp)? pvApp->GetMainWindow() : NULL;
+  if (pvWindow)
+    {
+    pvWindow->UpdateEnableState();
+    }
 }
 
 
@@ -1261,4 +1276,5 @@ void vtkPVAnimationManager::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ProxyIterator: " << this->ProxyIterator << endl;
   os << indent << "AdvancedView: " << this->AdvancedView << endl;
   os << indent << "OverrideCache: " << this->OverrideCache << endl;
+  os << indent << "InRecording: " << this->InRecording << endl;
 }

@@ -232,6 +232,11 @@ public:
   // Means to override us of cache.
   vtkSetMacro(OverrideCache, int);
   vtkGetMacro(OverrideCache, int);
+
+  // Description:
+  // Determine if the animation manager is currently recording.
+  vtkGetMacro(InRecording, int);
+
 protected:
   vtkPVAnimationManager();
   ~vtkPVAnimationManager();
