@@ -304,4 +304,29 @@
               
  </Module>
 #endif
+#ifdef PARAVIEW_USE_EXODUS
+ <Module name="ExodusReader" root_name="ExodusReader" 
+   output="vtkUnstructuredGrid" 
+   class="vtkPVAdvancedReaderModule" module_type="Reader" extensions=".e .ex2 .00" 
+   file_description="Exodus Reader">
+  <Source class="vtkPExodusReader"/>
+  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" />
+  <FileEntry variable="FilePrefix" extension="*" label="File prefix" 
+               help="Set the file root. Used with file pattern to format a file name." />
+
+  <StringEntry variable="FilePattern" label="File Pattern" 
+               help="Pattern used to load files. There are two parts to it prefix (%s) and the file number (%i)" />
+
+  <VectorEntry variable="FileRange" label="Range of files" type="int"
+               length="2" help="Range of files that are loaded" />
+
+  <VectorEntry variable="TimeStep" type="int" label="Time step"
+               help="Set the current timestep." />
+
+  <VectorEntry variable="NumberOfTimeSteps" type="int" readonly="1"
+               label="Number of time steps" help="Number of time steps." />
+
+ </Module>
+#endif
 </ModuleInterfaces>
