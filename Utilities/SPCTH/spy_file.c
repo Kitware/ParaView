@@ -570,11 +570,12 @@ void init_group_header(SpyFile* spy)
 int read_group_header(SpyFile* spy)
 {
   int ntmp;
+  long lg = (long)spy->LastGroup;
 
   if (spy->in_file == NULL) return 0;
 
   /* Position the file pointer to spy->LastGroup */
-  fseek(spy->in_file,spy->LastGroup,SEEK_SET);
+  fseek(spy->in_file,lg,SEEK_SET);
 
   /* This stuff is needed for each section of MAX_DUMPS dumps */
   fread_int(spy, &ntmp,1,spy->in_file);
