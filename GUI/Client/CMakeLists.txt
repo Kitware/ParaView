@@ -215,6 +215,7 @@ INCLUDE_DIRECTORIES(
   ${PVGUI_BINARY_DIR}/Client
   ${PVGUI_SOURCE_DIR}/Client
   ${PVSERVERMANAGER_INCLUDE_DIR}
+  ${KWCommon_INCLUDE_PATH}
   ${KWWidgets_INCLUDE_PATH}
   ${VTKCLIENTSERVER_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
@@ -293,6 +294,7 @@ ADD_LIBRARY(vtkKWParaView ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
   ${ParaViewSharedNotWrapped_SRCS}
   ${ParaView_SRCS})
 TARGET_LINK_LIBRARIES(vtkKWParaView 
+  ${KWCommon_LIBRARIES} 
   ${KWWidgets_LIBRARIES} 
   vtkPVServerManagerTCL 
   vtkPVServerCommonTCL 

@@ -378,9 +378,6 @@ SET(PARAVIEW_KWSYS_INCLUDE_DIRS ${KWSYS_INCLUDE_DIR})
 
 #########################################################################
 # Configure Common
-SET(KWCOMMON_INCLUDE_DIR
-  ${ParaView_SOURCE_DIR}/Common/KWCommon
-  ${ParaView_BINARY_DIR}/Common/KWCommon)
 SUBDIRS(Common)
 
 #########################################################################
@@ -524,7 +521,7 @@ SET(PARAVIEW_USE_FILE ${ParaView_SOURCE_DIR}/ParaViewUse.cmake)
 SET(PARAVIEW_INCLUDE_DIRS
   ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
   ${ParaView_SOURCE_DIR}/Utilities/hdf5
-  ${ParaView_SOURCE_DIR}/Common/KWCommon
+  ${KWCommon_INCLUDE_PATH}
   ${ParaView_SOURCE_DIR}/Servers/Filters
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
   ${ParaView_SOURCE_DIR}/Servers/Common
@@ -534,7 +531,6 @@ SET(PARAVIEW_INCLUDE_DIRS
   ${ParaView_BINARY_DIR}
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
   ${ParaView_BINARY_DIR}/Utilities/hdf5
-  ${ParaView_BINARY_DIR}/Common/KWCommon
   ${ParaView_BINARY_DIR}/Servers/Filters
   ${ParaView_BINARY_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/Common
@@ -544,7 +540,7 @@ SET(PARAVIEW_INCLUDE_DIRS
 SET(PARAVIEW_GUI_INCLUDE_DIRS
   ${TCL_INCLUDE_PATH}
   ${TK_INCLUDE_PATH}
-  ${KWCOMMON_INCLUDE_DIR}
+  ${KWCommon_INCLUDE_PATH}
   ${VTKZLIB_INCLUDE_DIR})
 SET(PARAVIEW_LIBRARY_DIRS ${LIBRARY_OUTPUT_PATH} ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
 SET(PARAVIEW_LIBRARY_DEPENDS_FILE ${ParaView_BINARY_DIR}/ParaViewLibraryDepends.cmake)

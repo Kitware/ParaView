@@ -121,8 +121,6 @@ INCLUDE_DIRECTORIES(
   ${KWSYS_INCLUDE_DIR}
   ${VTK_BINARY_DIR}
   ${TCL_INCLUDE_PATH}
-  ${ParaView_SOURCE_DIR}/Common/KWCommon
-  ${ParaView_BINARY_DIR}/Common/KWCommon
   ${ParaView_SOURCE_DIR}/Servers/Filters
   ${ParaView_SOURCE_DIR}/Servers/Common
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
