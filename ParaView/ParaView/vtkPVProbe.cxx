@@ -50,22 +50,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkPVData.h"
-#include "vtkPVPart.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVPart.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkProperty2D.h"
 #include "vtkSource.h"
 #include "vtkString.h"
-#include "vtkTclUtil.h"
 #include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
-#include "vtkProperty2D.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.90");
+vtkCxxRevisionMacro(vtkPVProbe, "1.91");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -183,8 +183,6 @@ void vtkPVProbe::CreateProperties()
     
     pvApp->BroadcastScript("%s SetController [ $Application GetController ] ", 
                            this->GetVTKSourceTclName());
-    pvApp->BroadcastScript("%s SetSocketController [ $Application GetSocketController ] ", 
-                           this->GetVTKSourceTclName());
     // Special condition to signal the client.
     // Because both processes of the Socket controller think they are 0!!!!
     if (pvApp->GetClientMode())
@@ -218,14 +216,30 @@ void vtkPVProbe::AcceptCallbackInternal()
     // Update the VTK data.
     this->Update();
     }
-
-  vtkPolyData *probeOutput = (vtkPolyData *)(this->GetPVPart(0)->GetVTKData());
+  
+  // Get the probe filter's output from the root node's process.
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkDataObject* output = pm->ReceiveRootDataObject(
+    this->GetPVPart(0)->GetVTKDataTclName());
+  vtkPolyData* probeOutput = vtkPolyData::SafeDownCast(output);
+  if(!probeOutput)
+    {
+    if(output)
+      {
+      output->Delete();
+      }
+    vtkErrorMacro("Failed to receive probe output from root node process.");
+    this->XYPlotWidget->SetEnabled(0);
+    this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
+    return;
+    }
+  
   vtkPointData *pd = probeOutput->GetPointData();
-    
+  
   int arrayCount;
   int numArrays = pd->GetNumberOfArrays();
   vtkDataArray *array;
-
+  
   if (probeOutput->GetNumberOfPoints() == 1)
     {
     // update the ui to see the point data for the probed point
@@ -326,6 +340,9 @@ void vtkPVProbe::AcceptCallbackInternal()
     
     window->GetMainView()->Render();
     }
+  
+  // Free reference produced by ReceiveRootDataObject.
+  probeOutput->Delete();
 }
  
 //----------------------------------------------------------------------------
