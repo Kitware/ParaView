@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyDataSource.h"
 #include "vtkImageData.h"
 class vtkOutlineSource;
+class vtkImageData;
 
 class VTK_EXPORT vtkImageOutlineFilter : public vtkPolyDataSource
 {

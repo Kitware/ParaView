@@ -33,6 +33,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVAssignment_h
 
 #include "vtkKWObject.h"
+#include "vtkExtentTranslator.h"
+
 
 class vtkPVApplication;
 
@@ -52,19 +54,37 @@ public:
   void SetPiece(int piece, int numPieces);
   int GetPiece() {return this->Piece;}
   int GetNumberOfPieces() {return this->NumberOfPieces;}
-  
-  vtkSetVector6Macro(Extent, int);
-  vtkGetVector6Macro(Extent, int);
 
+  // Description:
+  // Set this whole extent before you try to get the extent.
+  vtkSetVector6Macro(WholeExtent,int);
+  vtkGetVector6Macro(WholeExtent,int);
+  
+  // Description:
+  // A hack to get around changing the hints file (PV Hints???).
+  // This broadcasts the whole extent to clones in all processes.
+  void BroadcastWholeExtent(int *ext);
+  
+  // Description:
+  // The extent is computetd from then piece and whole extent.
+  int *GetExtent();
+
+  // Description:
+  // Casts to vtkPVApplication.
+  vtkPVApplication *GetPVApplication();
+  
 protected:
   vtkPVAssignment();
-  ~vtkPVAssignment() {};
+  ~vtkPVAssignment();
   vtkPVAssignment(const vtkPVAssignment&) {};
   void operator=(const vtkPVAssignment&) {};
   
   int Piece;
   int NumberOfPieces;
+
+  vtkExtentTranslator *Translator;
   
+  int WholeExtent[6];
   int Extent[6];
 };
 

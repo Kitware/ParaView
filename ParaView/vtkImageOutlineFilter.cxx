@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkImageOutlineFilter.h"
+#include "vtkImageData.h"
 #include "vtkOutlineSource.h"
 #include "vtkObjectFactory.h"
 

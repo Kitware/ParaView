@@ -246,6 +246,7 @@ void vtkPVData::SetAssignment(vtkPVAssignment *a)
     this->Assignment = a;
     a->Register(this);
   
+    cerr << "Setting UpdateExtent to " << a->GetPiece() << ", " << a->GetNumberOfPieces() << endl;
     this->Data->SetUpdateExtent(a->GetPiece(), a->GetNumberOfPieces());
     }
 }

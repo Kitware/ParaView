@@ -226,6 +226,7 @@ void vtkPVRenderViewStartRender(void *arg)
   int id, num;
   int *windowSize;
   
+  
   if (TIMER == NULL)
     {  
     TIMER = vtkTimerLog::New();
@@ -677,7 +678,7 @@ void vtkPVRenderView::RenderHack()
   vtkPVApplication *pvApp;
   vtkMultiProcessController *controller;
   vtkRenderer *ren;
-  vtkRenderWindow *renWin;
+  vtkRenderWindow *renWin;  
   
   pvApp = (vtkPVApplication*)(this->Application);
   controller = pvApp->GetController();
@@ -685,7 +686,6 @@ void vtkPVRenderView::RenderHack()
   numProcs = controller->GetNumberOfProcesses();
   ren = this->RendererHack;
   renWin = this->RenderWindowHack;
-  
   
   // Makes an assumption about how the tasks are setup (UI id is 0).
   // Receive the camera information.

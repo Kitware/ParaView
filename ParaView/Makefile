@@ -34,6 +34,7 @@ vtkPVImage \
 vtkPVImageClip \
 vtkPVImageReader \
 vtkPVImageSlice \
+vtkPVImageTextureFilter \
 vtkPVMenuButton \
 vtkPVPolyData \
 vtkPVRenderView \
@@ -78,7 +79,7 @@ TCL_LIB_FILE  = vtk${ME}Tcl${VTK_LIB_EXT}
 include ../Kits.make
 
 vtktcl.o: ${VTKSRC}/tcl/vtktcl.c
-	$(CC) $(CC_FLAGS) -c -o vtktcl.o $(VTKSRC)/tcl/vtktcl.c
+	$(CC) -I${VTKBIN}/common $(CC_FLAGS) -c -o vtktcl.o $(VTKSRC)/tcl/vtktcl.c
 
 ParaView: Makefile ParaView.o vtktcl.o ${TOOLKIT_DEPENDS} 
 	$(CXX) -o ParaView ParaView.o \

@@ -50,8 +50,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVImageTextureFilter_h
 
 #include "vtkSource.h"
-class vtkPVAssignment;
+#include "vtkPVAssignment.h"
 class vtkOutlineSource;
+class vtkImageData;
+class vtkPolyData;
+class vtkImageClip;
+class vtkPlaneSource;
 
 class VTK_EXPORT vtkPVImageTextureFilter : public vtkSource
 {
@@ -75,7 +79,10 @@ public:
   // Description:
   // Texture output is a second output the contains the texture map
   // to use with the poly data output.
-  vtkStructuredPoints *GetTextureOutput();
+  void SetTextureOutput(vtkImageData *out);
+  vtkImageData *GetTextureOutput();
+  
+  
   
   // Description:
   // Select which portion of the input we need.
@@ -83,8 +90,8 @@ public:
 
   // Description:
   // Assignment to a process is encoded in this object.
-  vtkSetMacro(Assignment, vtkPVAssignment);
-  vtkGetMacro(Assignment, vtkPVAssignment);
+  vtkSetObjectMacro(Assignment, vtkPVAssignment);
+  vtkGetObjectMacro(Assignment, vtkPVAssignment);
   
 protected:
   vtkPVImageTextureFilter();
@@ -97,8 +104,10 @@ protected:
   vtkPVAssignment *Assignment;
   
   vtkImageData *IntermediateImage;
-  vtkExtractVOI *Extract;
+  vtkImageClip *Clip;
   vtkPlaneSource *PlaneSource;
+  
+  int PlaneAxis;
   
   int Extent[6];
 };

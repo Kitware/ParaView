@@ -239,10 +239,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();
-  controller->SetNumberOfProcesses(1);
   controller->Initialize(argc, argv);
-
-
+  
   Tcl_Interp *interp = vtkPVApplication::InitializeTcl(argc,argv);
   vtkPVApplication *app = vtkPVApplication::New();
   app->SetController(controller);
@@ -271,6 +269,7 @@ int main(int argc, char *argv[])
   vtkMultiProcessController *controller = vtkMultiProcessController::New();  
   controller->Initialize(argc, argv);
   //controller->SetNumberOfProcesses(2);
+
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
   controller->SingleMethodExecute();
 
@@ -281,6 +280,27 @@ int main(int argc, char *argv[])
   return 0;
 }
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

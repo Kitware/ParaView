@@ -40,7 +40,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkOutlineSource.h"
 #include "vtkPVData.h"
 
+class vtkTexture;
 class vtkPVComposite;
+class vtkPVImageTextureFilter;
 
 class VTK_EXPORT vtkPVImage : public vtkPVData
 {
@@ -76,6 +78,9 @@ protected:
   void operator=(const vtkPVImage&) {};
   
   int OutlineFlag;
+  
+  vtkPVImageTextureFilter *TextureFilter;
+  vtkTexture *Texture;
 };
 
 #endif

@@ -41,9 +41,6 @@ ClientData vtkPVContourFilterNewCommand();
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataNewCommand();
-int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVSourceListNewCommand();
 int vtkPVElevationFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVElevationFilterNewCommand();
@@ -62,6 +59,9 @@ ClientData vtkPVImageReaderNewCommand();
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageSliceNewCommand();
+int vtkPVImageTextureFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVImageTextureFilterNewCommand();
 int vtkPVMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVMenuButtonNewCommand();
@@ -77,6 +77,9 @@ ClientData vtkPVShrinkPolyDataNewCommand();
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSourceNewCommand();
+int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVSourceListNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
@@ -136,8 +139,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVContourFilterCommand);
   vtkTclCreateNew(interp,"vtkPVData", vtkPVDataNewCommand,
                   vtkPVDataCommand);
-  vtkTclCreateNew(interp,"vtkPVSourceList", vtkPVSourceListNewCommand,
-                  vtkPVSourceListCommand);
   vtkTclCreateNew(interp,"vtkPVElevationFilter", vtkPVElevationFilterNewCommand,
                   vtkPVElevationFilterCommand);
   vtkTclCreateNew(interp,"vtkPVGlyph3D", vtkPVGlyph3DNewCommand,
@@ -150,6 +151,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVImageReaderCommand);
   vtkTclCreateNew(interp,"vtkPVImageSlice", vtkPVImageSliceNewCommand,
                   vtkPVImageSliceCommand);
+  vtkTclCreateNew(interp,"vtkPVImageTextureFilter", vtkPVImageTextureFilterNewCommand,
+                  vtkPVImageTextureFilterCommand);
   vtkTclCreateNew(interp,"vtkPVMenuButton", vtkPVMenuButtonNewCommand,
                   vtkPVMenuButtonCommand);
   vtkTclCreateNew(interp,"vtkPVPolyData", vtkPVPolyDataNewCommand,
@@ -160,6 +163,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVShrinkPolyDataCommand);
   vtkTclCreateNew(interp,"vtkPVSource", vtkPVSourceNewCommand,
                   vtkPVSourceCommand);
+  vtkTclCreateNew(interp,"vtkPVSourceList", vtkPVSourceListNewCommand,
+                  vtkPVSourceListCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
   return TCL_OK;

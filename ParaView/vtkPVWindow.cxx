@@ -297,7 +297,6 @@ void vtkPVWindow::NewVolume()
   vtkPVImageReader *reader;
   vtkPVImage *image;
   vtkPVAssignment *a;
-
   
   reader = vtkPVImageReader::New();
   reader->Clone(pvApp);
@@ -305,7 +304,10 @@ void vtkPVWindow::NewVolume()
   image->Clone(pvApp);
   a = vtkPVAssignment::New();
   a->Clone(pvApp);
-
+  
+  reader->GetImageReader()->UpdateInformation();
+  a->BroadcastWholeExtent(reader->GetImageReader()->GetOutput()->GetWholeExtent());
+  
   // Does not actually read.  Just sets the file name ...
   reader->ReadImage();
   

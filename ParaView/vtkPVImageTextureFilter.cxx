@@ -40,9 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVImageTextureFilter.h"
-#include "vtkOutlineSource.h"
+#include "vtkPlaneSource.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkImageClip.h"
 
 
 //------------------------------------------------------------------------------
@@ -64,9 +64,22 @@ vtkPVImageTextureFilter* vtkPVImageTextureFilter::New()
 //----------------------------------------------------------------------------
 vtkPVImageTextureFilter::vtkPVImageTextureFilter ()
 {
-  this->IntermediateImage = vtkImageData:New();
-  this->Extract = vtkExtractVOI::New();
-  this->Extract->SetInput(this->IntermediateInput);
+  this->vtkSource::SetNthOutput(0, vtkPolyData::New());
+  // Releasing data for pipeline parallism.
+  // Filters will know it is empty. 
+  this->Outputs[0]->ReleaseData();
+  this->Outputs[0]->Delete();
+  
+  this->vtkSource::SetNthOutput(1, vtkImageData::New());
+  // Releasing data for pipeline parallism.
+  // Filters will know it is empty. 
+  this->Outputs[1]->ReleaseData();
+  this->Outputs[1]->Delete();
+  
+  this->IntermediateImage = vtkImageData::New();
+  this->Clip = vtkImageClip::New();
+  this->Clip->SetInput(this->IntermediateImage);
+  this->Clip->ClipDataOn();
   
   this->PlaneSource = vtkPlaneSource::New();
   this->PlaneSource->SetXResolution(1);
@@ -76,16 +89,18 @@ vtkPVImageTextureFilter::vtkPVImageTextureFilter ()
   
   this->Extent[0] = this->Extent[1] = this->Extent[2] = 0;
   this->Extent[3] = this->Extent[4] = this->Extent[5] = 0;  
+
+  this->PlaneAxis = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVImageTextureFilter::~vtkPVImageTextureFilter ()
 {
-  this->IntermediateInput->Delete();
-  this->IntermediateInput = NULL;
+  this->IntermediateImage->Delete();
+  this->IntermediateImage = NULL;
 
-  this->Extract->Delete();
-  this->Extract = NULL;
+  this->Clip->Delete();
+  this->Clip = NULL;
 
   this->PlaneSource->Delete();
   this->PlaneSource = NULL;
@@ -128,34 +143,34 @@ vtkPolyData *vtkPVImageTextureFilter::GetGeometryOutput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageTextureFilter::SetTextureOutput(vtkStructuredPoints *output)
+void vtkPVImageTextureFilter::SetTextureOutput(vtkImageData *output)
 {
   this->vtkSource::SetNthOutput(1, output);
 }
 
 //----------------------------------------------------------------------------
-vtkStructuredPoints *vtkPVImageTextureFilter::GetTextureOutput()
+vtkImageData *vtkPVImageTextureFilter::GetTextureOutput()
 {
   if (this->NumberOfOutputs < 2)
     {
     return NULL;
     }
   
-  return (vtkStructuredPoints *)(this->Outputs[1]);
+  return (vtkImageData *)(this->Outputs[1]);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImageTextureFilter::ComputeInputUpdateExtents( vtkDataObject *o)
 {
   vtkImageData *input = this->GetInput();
-  int aExt[6];
+  int *aExt;
   o = o;
 
   input->GetWholeExtent(this->Extent);
 
   if (this->Assignment)
     {
-    this->Assignment->GetExtent(aExt);
+    aExt = this->Assignment->GetExtent();
     
     if (aExt[0] > this->Extent[0])
       {
@@ -186,6 +201,7 @@ void vtkPVImageTextureFilter::ComputeInputUpdateExtents( vtkDataObject *o)
     }
   
   input->SetUpdateExtent(this->Extent);
+  
 }
 
 
@@ -197,13 +213,13 @@ void vtkPVImageTextureFilter::Execute()
   float *origin;
   vtkImageData *input = this->GetInput();
   vtkPolyData *output = this->GetOutput();
-  vtkStructuredPoints *outputTexture = this->GetTextureOutput();
+  vtkImageData *outputTexture = this->GetTextureOutput();
   
-  this->IntermediateInput->ShallowCopy(input);
-  this->Extract->SetVOI(this->Extent);
-  this->Extract->Update();
+  this->IntermediateImage->ShallowCopy(input);
+  this->Clip->SetOutputWholeExtent(this->Extent);
+  this->Clip->Update();
   
-  outputTexture->ShallowCopy(this->Extract->GetOutput());
+  outputTexture->ShallowCopy(this->Clip->GetOutput());
 
   // Determine which axis we are displaying.
   if (this->Extent[0] == this->Extent[1])
@@ -223,44 +239,55 @@ void vtkPVImageTextureFilter::Execute()
     vtkErrorMacro("We do not handle volumes at this time.");
     }
   
+  spacing = input->GetSpacing();
+  origin = input->GetOrigin();
+  
   // Place the plane in the correct position.
-  x = origin[0] + (float)(pieceExt[0]) * spacing[0];
-  y = origin[1] + (float)(pieceExt[2]) * spacing[1];
-  z = origin[2] + (float)(pieceExt[4]) * spacing[2];
+  x = origin[0] + (float)(this->Extent[0]) * spacing[0];
+  y = origin[1] + (float)(this->Extent[2]) * spacing[1];
+  z = origin[2] + (float)(this->Extent[4]) * spacing[2];
+
+  cerr << "Origin: " << x << ", " << y << ", " << z << endl;
   this->PlaneSource->SetOrigin(x, y, z);
 
   if (this->PlaneAxis == 0)
     {
-    x = origin[0] + (float)(pieceExt[0]) * spacing[0];
-    y = origin[1] + (float)(pieceExt[3]) * spacing[1];
-    z = origin[2] + (float)(pieceExt[4]) * spacing[2];
+    x = origin[0] + (float)(this->Extent[0]) * spacing[0];
+    y = origin[1] + (float)(this->Extent[3]) * spacing[1];
+    z = origin[2] + (float)(this->Extent[4]) * spacing[2];
     this->PlaneSource->SetPoint1(x, y, z);
-    x = origin[0] + (float)(pieceExt[0]) * spacing[0];
-    y = origin[1] + (float)(pieceExt[2]) * spacing[1];
-    z = origin[2] + (float)(pieceExt[5]) * spacing[2];
+    x = origin[0] + (float)(this->Extent[0]) * spacing[0];
+    y = origin[1] + (float)(this->Extent[2]) * spacing[1];
+    z = origin[2] + (float)(this->Extent[5]) * spacing[2];
     this->PlaneSource->SetPoint2(x, y, z);
     }
   if (this->PlaneAxis == 1)
     {
-    x = origin[0] + (float)(pieceExt[1]) * spacing[0];
-    y = origin[1] + (float)(pieceExt[2]) * spacing[1];
-    z = origin[2] + (float)(pieceExt[4]) * spacing[2];
+    x = origin[0] + (float)(this->Extent[1]) * spacing[0];
+    y = origin[1] + (float)(this->Extent[2]) * spacing[1];
+    z = origin[2] + (float)(this->Extent[4]) * spacing[2];
     this->PlaneSource->SetPoint1(x, y, z);
-    x = origin[0] + (float)(pieceExt[0]) * spacing[0];
-    y = origin[1] + (float)(pieceExt[2]) * spacing[1];
-    z = origin[2] + (float)(pieceExt[5]) * spacing[2];
+    x = origin[0] + (float)(this->Extent[0]) * spacing[0];
+    y = origin[1] + (float)(this->Extent[2]) * spacing[1];
+    z = origin[2] + (float)(this->Extent[5]) * spacing[2];
     this->PlaneSource->SetPoint2(x, y, z);
     }  
   if (this->PlaneAxis == 2)
     {
-    x = origin[0] + (float)(pieceExt[1]) * spacing[0];
-    y = origin[1] + (float)(pieceExt[2]) * spacing[1];
-    z = origin[2] + (float)(pieceExt[4]) * spacing[2];
+    x = origin[0] + (float)(this->Extent[1]) * spacing[0];
+    y = origin[1] + (float)(this->Extent[2]) * spacing[1];
+    z = origin[2] + (float)(this->Extent[4]) * spacing[2];
+    
+  cerr << "P1: " << x << ", " << y << ", " << z << endl;
+    
     this->PlaneSource->SetPoint1(x, y, z);
-    x = origin[0] + (float)(pieceExt[0]) * spacing[0];
-    y = origin[1] + (float)(pieceExt[3]) * spacing[1];
-    z = origin[2] + (float)(pieceExt[4]) * spacing[2];
+    x = origin[0] + (float)(this->Extent[0]) * spacing[0];
+    y = origin[1] + (float)(this->Extent[3]) * spacing[1];
+    z = origin[2] + (float)(this->Extent[4]) * spacing[2];
     this->PlaneSource->SetPoint2(x, y, z);
+
+  cerr << "P2: " << x << ", " << y << ", " << z << endl;
+    
     }
   
   this->PlaneSource->Update();

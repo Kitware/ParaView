@@ -53,6 +53,18 @@ vtkPVAssignment::vtkPVAssignment()
   this->NumberOfPieces = 1;
   this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
   this->Extent[1] = this->Extent[3] = this->Extent[5] = 0;  
+
+  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
+  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = 0;  
+  
+  this->Translator = vtkExtentTranslator::New();
+}
+
+//----------------------------------------------------------------------------
+vtkPVAssignment::~vtkPVAssignment()
+{
+  this->Translator->Delete();
+  this->Translator = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -68,14 +80,35 @@ void vtkPVAssignment::Clone(vtkPVApplication *pvApp)
 
   // Clone this object on every other process, and set up the assignment.
   num = pvApp->GetController()->GetNumberOfProcesses();
-  this->SetPiece(0, num);
+
+  this->SetPiece(0, 2);
   for (id = 1; id < num; ++id)
     {
     pvApp->RemoteScript(id, "%s %s", this->GetClassName(), this->GetTclName());
-    pvApp->RemoteScript(id, "%s SetPiece %d %d", this->GetTclName(), id, num);
+    pvApp->RemoteScript(id, "%s SetPiece %d %d", this->GetTclName(), 0, 2);
     }
+
+
+  //this->SetPiece(0, num);
+  //for (id = 1; id < num; ++id)
+  //  {
+  //  pvApp->RemoteScript(id, "%s %s", this->GetClassName(), this->GetTclName());
+  //  pvApp->RemoteScript(id, "%s SetPiece %d %d", this->GetTclName(), id, num);
+  //  }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVAssignment::BroadcastWholeExtent(int *ext)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetWholeExtent %d %d %d %d %d %d",
+			   this->GetTclName(), ext[0], ext[1], 
+			   ext[2], ext[3], ext[4], ext[5]);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVAssignment::SetPiece(int piece, int numPieces)
@@ -90,5 +123,41 @@ void vtkPVAssignment::SetPiece(int piece, int numPieces)
   this->Piece = piece;
 }
 
+
+
+//----------------------------------------------------------------------------
+int *vtkPVAssignment::GetExtent()
+{
+  this->Extent[0] = this->WholeExtent[0];
+  this->Extent[1] = this->WholeExtent[1];
+  this->Extent[2] = this->WholeExtent[2];
+  this->Extent[3] = this->WholeExtent[3];
+  this->Extent[4] = this->WholeExtent[4];
+  this->Extent[5] = this->WholeExtent[5];
+  
+  this->Translator->SplitExtent(this->Piece, this->NumberOfPieces, this->Extent);
+  
+  return this->Extent;
+}
+
+
+//----------------------------------------------------------------------------
+vtkPVApplication* vtkPVAssignment::GetPVApplication()
+{
+  if (this->Application == NULL)
+    {
+    return NULL;
+    }
+  
+  if (this->Application->IsA("vtkPVApplication"))
+    {  
+    return (vtkPVApplication*)(this->Application);
+    }
+  else
+    {
+    vtkErrorMacro("Bad typecast");
+    return NULL;
+    } 
+}
 
 
