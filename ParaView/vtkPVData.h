@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkDataSet.h"
 
 class vtkPVComposite;
+class vtkPVSource;
 
 class VTK_EXPORT vtkPVData : public vtkKWWidget
 {
@@ -47,16 +48,19 @@ public:
   void AddCommonWidgets(vtkKWApplication *app, char *args);
 
   vtkProp* GetProp();
-
-  // Description:
-  // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
-  void SetComposite(vtkPVComposite *pvComp);
   
   vtkGetObjectMacro(Data, vtkDataSet);
   vtkSetObjectMacro(Data, vtkDataSet);
 
+  // Description:
+  // General filters that can be applied to vtkDataSet.
   void Contour();
-  
+
+  // Description:
+  // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
+  // The composite sets this so this data widget will know who owns it.
+  void SetSourceWidget(vtkPVSource *source);
+
 protected:
   vtkPVData();
   ~vtkPVData();
@@ -68,7 +72,14 @@ protected:
   vtkDataSet *Data;
   vtkDataSetMapper *Mapper;
   vtkActor *Actor;
-  vtkPVComposite *Composite;
+
+  // This points to the source widget that owns this data widget.
+  vtkPVSource *SourceWidget;
+
+  // Description:
+  // A convenience method to get the cpmposite that owns the source widget
+  // that owns this data widget.
+  vtkPVComposite *GetComposite();
 };
 
 #endif

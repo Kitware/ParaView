@@ -75,17 +75,17 @@ void vtkPVImage::Clip()
   newComp->SetData(id);
   newComp->SetSource(clip);
   
-  vtkPVWindow *window = this->Composite->GetWindow();
+  vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
   newComp->CreateProperties(this->Application, "");
-  this->Composite->GetView()->AddComposite(newComp);
-  this->Composite->GetProp()->VisibilityOff();
+  this->GetComposite()->GetView()->AddComposite(newComp);
+  this->GetComposite()->GetProp()->VisibilityOff();
   
   newComp->SetWindow(window);
   
   window->SetCurrentDataComposite(newComp);
   
-  id->Composite->GetView()->Render();
+  id->GetComposite()->GetView()->Render();
   
   id->Delete();
   newComp->Delete();
@@ -120,17 +120,17 @@ void vtkPVImage::Slice()
   newComp->SetData(id);
   newComp->SetSource(slice);
   
-  vtkPVWindow *window = this->Composite->GetWindow();
+  vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
   newComp->CreateProperties(this->Application, "");
-  this->Composite->GetView()->AddComposite(newComp);
-  this->Composite->GetProp()->VisibilityOff();
+  this->GetComposite()->GetView()->AddComposite(newComp);
+  this->GetComposite()->GetProp()->VisibilityOff();
   
   newComp->SetWindow(window);
   
   window->SetCurrentDataComposite(newComp);
   
-  id->Composite->GetView()->Render();
+  id->GetComposite()->GetView()->Render();
   
   id->Delete();
   newComp->Delete();

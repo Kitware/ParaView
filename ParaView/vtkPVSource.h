@@ -30,6 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVSource_h
 
 #include "vtkKWLabel.h"
+#include "vtkPVData.h"
 #include "vtkSource.h"
 
 class vtkPVComposite;
@@ -41,12 +42,22 @@ public:
   vtkTypeMacro(vtkPVSource,vtkKWWidget);
   
   // Description:
+  // Create a Tk widget
+  virtual void Create(vtkKWApplication *app, char *args) {};
+
+  // Description:
+  // Set and get the UI representing the data.  These calls also manage the
+  // double pointers between the data widget and this source widget.
+  void SetDataWidget(vtkPVData *data);
+  vtkPVData *GetDataWidget();
+
+  // Description:
   // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
   void SetComposite(vtkPVComposite *comp);
 
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, char *args) {};
+  // Gets the composite that owns this source widget.
+  vtkGetObjectMacro(Composite, vtkPVComposite);
   
 protected:
   vtkPVSource();
@@ -55,6 +66,7 @@ protected:
   void operator=(const vtkPVSource&) {};
     
   vtkPVComposite* Composite;
+  vtkPVData *DataWidget;
 };
 
 #endif

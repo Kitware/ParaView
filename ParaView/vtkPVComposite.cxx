@@ -35,7 +35,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 vtkPVComposite::vtkPVComposite()
 {
   this->Notebook = vtkKWNotebook::New();
-  this->Data = NULL;
   this->Source = NULL;
   this->Window = NULL;
   
@@ -53,7 +52,6 @@ vtkPVComposite::~vtkPVComposite()
   this->Notebook->Delete();
   this->Notebook = NULL;
   
-  this->SetData(NULL);
   this->SetSource(NULL);
 }
 
@@ -96,14 +94,21 @@ void vtkPVComposite::Deselect(vtkKWView *view)
 
 vtkProp* vtkPVComposite::GetProp()
 {
-  return this->Data->GetProp();
+  vtkPVData *data = this->GetData();
+
+  if (data == NULL)
+    {
+    return NULL;
+    }
+  return data->GetProp();
 }
 
 void vtkPVComposite::CreateProperties(vtkKWApplication *app, char *args)
 { 
   const char *dataPage, *sourcePage;
+  vtkPVData *data = this->GetData();
 
-  if (this->Data == NULL || this->Source == NULL)
+  if (data == NULL || this->Source == NULL)
     {
     vtkErrorMacro("You need to set the data and source before you create a composite");
     return;
@@ -120,15 +125,15 @@ void vtkPVComposite::CreateProperties(vtkKWApplication *app, char *args)
   this->Notebook->Create(app, args);
   sourcePage = this->Source->GetClassName();
   this->Notebook->AddPage(sourcePage);
-  dataPage = this->Data->GetClassName();
+  dataPage = data->GetClassName();
   this->Notebook->AddPage(dataPage);
   
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
     
-  this->Data->SetParent(this->Notebook->GetFrame(dataPage));
-  this->Data->Create(app, "");
-  this->Script("pack %s", this->Data->GetWidgetName());
+  data->SetParent(this->Notebook->GetFrame(dataPage));
+  data->Create(app, "");
+  this->Script("pack %s", data->GetWidgetName());
 
   this->Source->SetParent(this->Notebook->GetFrame(sourcePage));
   this->Source->Create(app, "");
@@ -175,23 +180,19 @@ void vtkPVComposite::SetSource(vtkPVSource *source)
 
 void vtkPVComposite::SetData(vtkPVData *data)
 {
-  if (this->Data == data)
+  if (this->Source == NULL)
     {
+    vtkErrorMacro("Source is not set yet");
     return;
     }
-  this->Modified();
-
-  if (this->Data)
+  this->Source->SetDataWidget(data);
+}
+  
+vtkPVData *vtkPVComposite::GetData()
+{
+  if (this->Source == NULL)
     {
-    vtkPVData *tmp = this->Data;
-    this->Data = NULL;
-    tmp->SetComposite(NULL);
-    tmp->UnRegister(this);
+    return NULL;
     }
-  if (data)
-    {
-    this->Data = data;
-    data->Register(this);
-    data->SetComposite(this);
-    }
+  return this->Source->GetDataWidget();
 }

@@ -28,6 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVData.h"
 #include "vtkPVPolyData.h" //because contour produces poly data as output
 #include "vtkPVComposite.h"
+#include "vtkPVSource.h"
 #include "vtkKWView.h"
 
 #include "vtkPVWindow.h"
@@ -44,19 +45,20 @@ vtkPVData::vtkPVData()
   this->CommandFunction = vtkPVDataCommand;
 
   this->Data = NULL;
+  this->SourceWidget = NULL;
   
   this->FiltersMenuButton = vtkPVMenuButton::New();
   
   this->Mapper = vtkDataSetMapper::New();
   this->Actor = vtkActor::New();
   
-  this->Composite = vtkPVComposite::New();
 }
 
 vtkPVData::~vtkPVData()
 {
   this->SetData(NULL);
-  
+  this->SetSourceWidget(NULL);
+
   this->FiltersMenuButton->Delete();
   this->FiltersMenuButton = NULL;
   
@@ -89,20 +91,20 @@ void vtkPVData::Contour()
   pd->SetPolyData(contour->GetContour()->GetOutput());
     
   newComp = vtkPVComposite::New();
-  newComp->SetData(pd);
   newComp->SetSource(contour);
-  
-  vtkPVWindow *window = this->Composite->GetWindow();
+  newComp->SetData(pd);
+
+  vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
   newComp->CreateProperties(this->Application, "");
-  this->Composite->GetView()->AddComposite(newComp);
-  this->Composite->GetProp()->VisibilityOff();
+  this->GetComposite()->GetView()->AddComposite(newComp);
+  this->GetComposite()->GetProp()->VisibilityOff();
   
   newComp->SetWindow(window);
   
   window->SetCurrentDataComposite(newComp);
   
-  pd->Composite->GetView()->Render();
+  pd->GetComposite()->GetView()->Render();
   
   pd->Delete();
   newComp->Delete();
@@ -147,23 +149,36 @@ vtkProp* vtkPVData::GetProp()
   return this->Actor;
 }
 
-void vtkPVData::SetComposite(vtkPVComposite *comp)
+// MAYBE WE SHOULD NOT REFERENCE COUNT HERE BECAUSE NO ONE BUT THE 
+// SOURCE WIDGET WILL REFERENCE THE DATA WIDGET.
+void vtkPVData::SetSourceWidget(vtkPVSource *source)
 {
-  if (this->Composite == comp)
+  if (this->SourceWidget == source)
     {
     return;
     }
   this->Modified();
 
-  if (this->Composite)
+  if (this->SourceWidget)
     {
-    vtkPVComposite *tmp = this->Composite;
-    this->Composite = NULL;
+    vtkPVSource *tmp = this->SourceWidget;
+    this->SourceWidget = NULL;
     tmp->UnRegister(this);
     }
-  if (comp)
+  if (source)
     {
-    this->Composite = comp;
-    comp->Register(this);
+    this->SourceWidget = source;
+    source->Register(this);
     }
+}
+
+
+vtkPVComposite *vtkPVData::GetComposite()
+{
+  if (this->SourceWidget == NULL)
+    {
+    return NULL;
+    }
+
+  return this->SourceWidget->GetComposite();
 }

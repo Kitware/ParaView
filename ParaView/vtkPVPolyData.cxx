@@ -70,20 +70,20 @@ void vtkPVPolyData::Shrink()
   pd->SetPolyData(shrink->GetShrink()->GetOutput());
     
   newComp = vtkPVComposite::New();
-  newComp->SetData(pd);
   newComp->SetSource(shrink);
+  newComp->SetData(pd);
   
-  vtkPVWindow *window = this->Composite->GetWindow();
+  vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
   newComp->CreateProperties(this->Application, "");
-  this->Composite->GetView()->AddComposite(newComp);
-  this->Composite->GetProp()->VisibilityOff();
+  this->GetComposite()->GetView()->AddComposite(newComp);
+  this->GetComposite()->GetProp()->VisibilityOff();
   
   newComp->SetWindow(window);
   
   window->SetCurrentDataComposite(newComp);
   
-  pd->Composite->GetView()->Render();
+  pd->GetComposite()->GetView()->Render();
   
   pd->Delete();
   newComp->Delete();
@@ -114,20 +114,20 @@ void vtkPVPolyData::Elevation()
   pd->SetPolyData(elevation->GetElevation()->GetPolyDataOutput());
   
   newComp = vtkPVComposite::New();
-  newComp->SetData(pd);
   newComp->SetSource(elevation);
+  newComp->SetData(pd);
   
-  vtkPVWindow *window = this->Composite->GetWindow();
+  vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
   newComp->CreateProperties(this->Application, "");
-  this->Composite->GetView()->AddComposite(newComp);
-  this->Composite->GetProp()->VisibilityOff();
+  this->GetComposite()->GetView()->AddComposite(newComp);
+  this->GetComposite()->GetProp()->VisibilityOff();
   
   newComp->SetWindow(window);
   
   window->SetCurrentDataComposite(newComp);
   
-  pd->Composite->GetView()->Render();
+  pd->GetComposite()->GetView()->Render();
   
   pd->Delete();
   newComp->Delete();

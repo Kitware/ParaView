@@ -60,7 +60,7 @@ public:
   vtkKWWidget *GetProperties();
 
   void SetData(vtkPVData *data);
-  vtkGetObjectMacro(Data, vtkPVData);
+  vtkPVData *GetData();
 
   void SetSource(vtkPVSource *source);
   vtkGetObjectMacro(Source, vtkPVSource);
@@ -76,7 +76,6 @@ protected:
   ~vtkPVComposite();
   
   vtkKWNotebook *Notebook;
-  vtkPVData *Data;
   vtkPVSource *Source;
   vtkPVWindow *Window;
   

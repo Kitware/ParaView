@@ -40,11 +40,13 @@ vtkPVSource::vtkPVSource()
   this->CommandFunction = vtkPVSourceCommand;
   
   this->Composite = NULL;
+  this->DataWidget = NULL;
 }
 
 vtkPVSource::~vtkPVSource()
 {
   this->SetComposite(NULL);
+  this->SetDataWidget(NULL);
 }
 
 vtkPVSource* vtkPVSource::New()
@@ -71,4 +73,40 @@ void vtkPVSource::SetComposite(vtkPVComposite *comp)
     this->Composite = comp;
     comp->Register(this);
     }
+}
+
+
+
+
+
+
+void vtkPVSource::SetDataWidget(vtkPVData *data)
+{
+  if (this->DataWidget == data)
+    {
+    return;
+    }
+  this->Modified();
+
+  if (this->DataWidget)
+    {
+    // extra careful for circular references
+    vtkPVData *tmp = this->DataWidget;
+    this->DataWidget = NULL;
+    // Manage double pointer.
+    tmp->SetSourceWidget(NULL);
+    tmp->UnRegister(this);
+    }
+  if (data)
+    {
+    this->DataWidget = data;
+    data->Register(this);
+    // Manage double pointer.
+    data->SetSourceWidget(this);
+    }
+}
+  
+vtkPVData *vtkPVSource::GetDataWidget()
+{
+  return this->DataWidget;
 }
