@@ -150,8 +150,6 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWActorCompositeCommand);
   vtkTclCreateNew(interp,(char *) "vtkKWApplication", vtkKWApplicationNewCommand,
                   vtkKWApplicationCommand);
-  vtkTclCreateNew(interp,(char *) "vtkKWCallbackSpecification", vtkKWCallbackSpecificationNewCommand,
-                  vtkKWCallbackSpecificationCommand);
   vtkTclCreateNew(interp,(char *) "vtkKWChangeColorButton", vtkKWChangeColorButtonNewCommand,
                   vtkKWChangeColorButtonCommand);
   vtkTclCreateNew(interp,(char *) "vtkKWCheckButton", vtkKWCheckButtonNewCommand,
@@ -164,8 +162,6 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWDialogCommand);
   vtkTclCreateNew(interp,(char *) "vtkKWEntry", vtkKWEntryNewCommand,
                   vtkKWEntryCommand);
-  vtkTclCreateNew(interp,(char *) "vtkKWEventNotifier", vtkKWEventNotifierNewCommand,
-                  vtkKWEventNotifierCommand);
   vtkTclCreateNew(interp,(char *) "vtkKWExtent", vtkKWExtentNewCommand,
                   vtkKWExtentCommand);
   vtkTclCreateNew(interp,(char *) "vtkKWGenericComposite", vtkKWGenericCompositeNewCommand,
