@@ -33,6 +33,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkRenderer.h"
 #include "vtkPVRenderModule.h"
+#include "vtkPickPointWidget.h"
 
 #include "vtkKWEvent.h"
 #include "vtkPVRenderModule.h"
@@ -41,7 +42,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.37");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -241,11 +242,24 @@ void vtkPVPointWidget::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 {
+  int i;
+  unsigned int ui;
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
     {
     this->SetTraceName("Point");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
+    }
+  // Widget needs the RenderModule for picking
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  for (ui=0; ui<this->WidgetProxy->GetNumberOfIDs(); ui++)
+    {
+    vtkPickPointWidget* widget = vtkPickPointWidget::SafeDownCast(
+      pm->GetObjectFromID(this->WidgetProxy->GetID(ui)));
+    if (widget)
+      {
+      widget->SetRenderModule(pm->GetRenderModule());
+      }
     }
   
   this->SetFrameLabel("Point Widget");
@@ -253,7 +267,6 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
   this->Labels[0]->Create(pvApp, "");
   this->Labels[0]->SetLabel("Position");
 
-  int i;
   for (i=0; i<3; i++)
     {
     this->CoordinateLabel[i]->SetParent(this->Frame->GetFrame());
