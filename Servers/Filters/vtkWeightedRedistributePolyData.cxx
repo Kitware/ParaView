@@ -29,7 +29,7 @@
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.6");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.7");
 
 //-------------------------------------------------------------------
 
@@ -91,6 +91,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
 //*****************************************************************
 // purpose: This routine sets up a schedule to shift cells around so
 //          the number of cells on each processor is as even as possible.
+//
 //*****************************************************************
 
   // get total number of polys and figure out how many each processor should have
@@ -104,7 +105,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
   inputCellArrays[2] = input->GetPolys();
   inputCellArrays[3] = input->GetStrips();
 
-  // Record the number of input cells of each type.
+  
   vtkIdType numLocalCells[NUM_CELL_TYPES];
   for (type=0; type<NUM_CELL_TYPES; type++)
     {
@@ -152,10 +153,6 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
 
   vtkCommSched* remoteSched = new vtkCommSched[numProcs];
 
-  // Collect the number of cells (for each cell array type)
-  // from all processes onto the process 0.
-  // There is a separate schedual (array remoteSched) for each process.
-  // Also compute the "totalCells" for each cell array type.
   vtkIdType totalCells[NUM_CELL_TYPES];
   vtkIdType numRemoteCells[NUM_CELL_TYPES];
   vtkIdType* goalNumCells[NUM_CELL_TYPES];
@@ -188,35 +185,17 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         }
       }
 
-    // The computes "goalNumCells" for each type. The result is a matrix indexed
-    // by process and cell type.
-    // The original implementation simply multiplied the total by weight and truncated.
-    // remainders were diveded up later.  This remainder logic has a bug and I see no 
-    // reason for remainders.  I am going to create a more robust division that rounds
-    // instead of truncates, and recomputes the total weight as the cells are dived up.
-    // leftovers should always be zero and I will remove the variable later.
     for (type=0; type<NUM_CELL_TYPES; type++) 
       {
-      vtkIdType numCellsLeftToDivideUp = totalCells[type];
-      float weightTotalOfRemainingProcesses = 1.0;
       goalNumCells[type] = new vtkIdType [numProcs]; 
       for (id = 0; id < numProcs; id++) 
         {
-        // Round here instead of truncating.
         goalNumCells[type][id] = 
-          static_cast<vtkIdType>((static_cast<float>(numCellsLeftToDivideUp) * (Weights[id]/weightTotalOfRemainingProcesses)) + 0.5);
-        numCellsLeftToDivideUp -= goalNumCells[type][id];
-        weightTotalOfRemainingProcesses -= Weights[id];
-       
-        // Put this back until I can fix the tests.
-        goalNumCells[type][id] = 
-          static_cast<vtkIdType>(numCellsLeftToDivideUp * Weights[id]);
+          static_cast<vtkIdType>( totalCells[type] * Weights[id] );
         if (goalNumCells[type][id]==0) { numProcZero[type]++;}
         }
       }
 
-    // "leftovers" for each type is just the remainder caused by integer
-    // truncation.
     for (type=0; type<NUM_CELL_TYPES; type++)
       {
       leftovers[type] = 0;
@@ -226,12 +205,6 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         sumCells += goalNumCells[type][id];
         }
       leftovers[type] = totalCells[type] - sumCells;
-      // sanity check before I get rid of this variable.
-      //if (leftovers[type] != 0)
-      //  {
-      //  vtkErrorMacro("non zero leftover[" <<type<< "] = " << leftovers[type]);
-      //  leftovers[type] = 0;
-      //  }
       }
     }
 
