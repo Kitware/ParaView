@@ -176,12 +176,11 @@ int main(int argc, char **argv)
 
   // Loop over each image
 
-  vtkPNGReader *pr = vtkPNGReader::New();
-  vtkImageFlip *flip = vtkImageFlip::New();
-
   int i;
   for (i = 2; i < argc; i++)
     {
+    vtkPNGReader *pr = vtkPNGReader::New();
+    vtkImageFlip *flip = vtkImageFlip::New();
     
     // Check if image exists
 
@@ -346,14 +345,14 @@ int main(int argc, char **argv)
       delete [] zlib_buffer;
       }
     
+    pr->Delete();
+    flip->Delete();
+
     } // Next file
 
   // Close file, free objects
 
   out.close();
-
-  pr->Delete();
-  flip->Delete();
 
   return 0;
 }
