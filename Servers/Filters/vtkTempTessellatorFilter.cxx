@@ -32,7 +32,7 @@
 #include "vtkDataSetSubdivisionAlgorithm.h"
 #include "vtkSubdivisionAlgorithm.h"
 
-vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.7");
+vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.8");
 vtkStandardNewMacro(vtkTempTessellatorFilter);
 
 // ========================================
@@ -189,9 +189,6 @@ void vtkTempTessellatorFilter::OutputLine( const double* a, const double* b )
 
 // ========================================
 
-vtkCxxSetObjectMacro(vtkTempTessellatorFilter, Tessellator, vtkStreamingTessellator);
-vtkCxxSetObjectMacro(vtkTempTessellatorFilter, Subdivider, vtkDataSetSubdivisionAlgorithm);
-
 // constructor/boilerplate members
 vtkTempTessellatorFilter::vtkTempTessellatorFilter()
   : Tessellator( 0 ), Subdivider( 0 )
@@ -243,6 +240,56 @@ unsigned long vtkTempTessellatorFilter::GetMTime()
 
   return mt;
 }
+
+void vtkTempTessellatorFilter::SetTessellator( vtkStreamingTessellator* t )
+{
+  if ( this->Tessellator == t )
+    {
+    return;
+    }
+  
+  if ( this->Tessellator )
+    {
+    this->Tessellator->UnRegister( this );
+    }
+  
+  this->Tessellator = t; 
+  
+  if ( this->Tessellator )
+    {
+    this->Tessellator->Register( this );
+    this->Tessellator->SetSubdivisionAlgorithm( this->Subdivider );
+    }
+  
+  this->Modified();
+}
+
+void vtkTempTessellatorFilter::SetSubdivider( vtkDataSetSubdivisionAlgorithm* s )
+{
+  if ( this->Subdivider == s )
+    {
+    return;
+    }
+  
+  if ( this->Subdivider )
+    {
+    this->Subdivider->UnRegister( this );
+    }
+  
+  this->Subdivider = s;
+  
+  if ( this->Subdivider )
+    {
+    this->Subdivider->Register( this );
+    }
+  
+  if ( this->Tessellator )
+    {
+    this->Tessellator->SetSubdivisionAlgorithm( this->Subdivider );
+    }
+  
+  this->Modified();
+} 
 
 void vtkTempTessellatorFilter::SetFieldCriterion( int s, double err )
 {
