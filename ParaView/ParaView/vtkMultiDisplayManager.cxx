@@ -45,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.8.2.2");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.8.2.3");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
@@ -650,6 +650,8 @@ void vtkMultiDisplayManager::SetupCamera(int tileIdx, int reduction)
   int x, y;
   y = tileIdx/this->TileDimensions[0];
   x = tileIdx - y*this->TileDimensions[0];
+  // Flip the y axis to match IceT
+  y = this->TileDimensions[1]-1-y;
   // Setup the camera for this tile.
   cam->SetWindowCenter(1.0-(double)(this->TileDimensions[0]) + 2.0*(double)x,
                        1.0-(double)(this->TileDimensions[1]) + 2.0*(double)y);
