@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledOptionMenu );
-vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.1");
+vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.2");
 
 int vtkKWLabeledOptionMenuCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -119,6 +119,34 @@ void vtkKWLabeledOptionMenu::SetEnabled(int e)
 
   this->Enabled = e;
   this->Modified();
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWLabeledOptionMenu::SetBalloonHelpString(const char *string)
+{
+  if (this->Label)
+    {
+    this->Label->SetBalloonHelpString(string);
+    }
+
+  if (this->OptionMenu)
+    {
+    this->OptionMenu->SetBalloonHelpString(string);
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWLabeledOptionMenu::SetBalloonHelpJustification(int j)
+{
+  if (this->Label)
+    {
+    this->Label->SetBalloonHelpJustification(j);
+    }
+
+  if (this->OptionMenu)
+    {
+    this->OptionMenu->SetBalloonHelpJustification(j);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -72,8 +72,14 @@ public:
   vtkGetObjectMacro(OptionMenu, vtkKWOptionMenu);
 
   // Description:
-  // Set or get enabled state.
+  // Override to pass down to children.
   virtual void SetEnabled(int);
+
+  // Description:
+  // Setting this string enables balloon help for this widget.
+  // Override to pass down to children.
+  virtual void SetBalloonHelpString(const char *str);
+  virtual void SetBalloonHelpJustification(int j);
 
 protected:
   vtkKWLabeledOptionMenu();

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledLabel );
-vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.3");
+vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.4");
 
 int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -119,6 +119,34 @@ void vtkKWLabeledLabel::SetEnabled(int e)
 
   this->Enabled = e;
   this->Modified();
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWLabeledLabel::SetBalloonHelpString(const char *string)
+{
+  if (this->Label1)
+    {
+    this->Label1->SetBalloonHelpString(string);
+    }
+
+  if (this->Label2)
+    {
+    this->Label2->SetBalloonHelpString(string);
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWLabeledLabel::SetBalloonHelpJustification(int j)
+{
+  if (this->Label1)
+    {
+    this->Label1->SetBalloonHelpJustification(j);
+    }
+
+  if (this->Label2)
+    {
+    this->Label2->SetBalloonHelpJustification(j);
+    }
 }
 
 //----------------------------------------------------------------------------
