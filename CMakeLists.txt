@@ -208,6 +208,10 @@ ENDIF(VTK_USE_SYSTEM_ZLIB)
 #########################################################################
 # Configure SPCTH
 SUBDIRS(Utilities/SPCTH)
+SET(SPCTH_LIBRARIES SPCTH)
+SET(SPCTH_INCLUDE_DIR
+  "${ParaView_SOURCE_DIR}/Utilities/SPCTH"
+  "${ParaView_BINARY_DIR}/Utilities/SPCTH")
 
 #########################################################################
 # Configure HDF5
@@ -380,7 +384,7 @@ ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
 SET(PARAVIEW_EXTRA_EXTERNAL_MODULES
   "" CACHE STRING "Extra modules that ParaView will try to import. The modules have to provide ParaViewImport.cmake file.")
 MARK_AS_ADVANCED(PARAVIEW_EXTRA_EXTERNAL_MODULES)
-FOREACH(external EXODUS SAF LOOKMARKS AMRCTH ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
+FOREACH(external EXODUS SAF LOOKMARKS ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
   OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
   MARK_AS_ADVANCED(PARAVIEW_USE_${external})
   IF(PARAVIEW_USE_${external})
@@ -406,6 +410,9 @@ FOREACH(external EXODUS SAF LOOKMARKS AMRCTH ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
       "${PARAVIEW_CONFIG_EXTRA_DEFINES}\n/* #undef PARAVIEW_USE_${external} */")
   ENDIF(PARAVIEW_USE_${external})
 ENDFOREACH(external)
+IF(PARAVIEW_USE_AMRCTH OR AMRCTH_SOURCE_DIR)
+  MESSAGE("Use of external AMRCTH code was removed since the code is now present in the ParaView. Please remove the cache variables: PARAVIEW_USE_AMRCTH and AMRCTH_SOURCE_DIR")
+ENDIF(PARAVIEW_USE_AMRCTH OR AMRCTH_SOURCE_DIR)
 
 #########################################################################
 # Configure Server
