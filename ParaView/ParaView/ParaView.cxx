@@ -25,15 +25,15 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-#ifdef VTK_USE_MPI
- #include <mpi.h>
-#endif
-
 #include "vtkObject.h"
 #include "vtkMultiProcessController.h"
 #include "vtkPVApplication.h"
 #include "vtkTclUtil.h"
 #include "vtkToolkits.h"
+
+#ifdef VTK_USE_MPI
+# include <mpi.h>
+#endif
 
 
 // external global variable.
@@ -320,8 +320,19 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
 int main(int argc, char *argv[])
 {
 
+#ifdef VTK_USE_MPI
+// This is here to avoid false leak messages from vtkDebugLeaks when
+// using mpich. It appears that the root process which spawns all the
+// main processes waits in MPI_Init() and calls exit() when
+// the others are done, causing apparent memory leaks for any objects
+// created before MPI_Init().
+  MPI_Init(&argc, &argv);
+  vtkMultiProcessController *controller = vtkMultiProcessController::New();  
+  controller->Initialize(&argc, &argv, 1);
+#else
   vtkMultiProcessController *controller = vtkMultiProcessController::New();  
   controller->Initialize(&argc, &argv);
+#endif
 
   int retVal = 0;
   // New processes need these args to initialize.
