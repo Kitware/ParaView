@@ -42,18 +42,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVLODActor.h"
 
 #include "vtkMapper.h"
+#include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkProperty.h"
 #include "vtkRenderWindow.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
+#include "vtkTransform.h"
 
 #include <math.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.14");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.15");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 

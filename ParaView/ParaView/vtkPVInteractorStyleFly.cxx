@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkLight.h"
+#include "vtkLightCollection.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -52,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.5");
+vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.6");
 vtkStandardNewMacro(vtkPVInteractorStyleFly);
 
 //-------------------------------------------------------------------------
