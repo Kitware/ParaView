@@ -83,7 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.181");
+vtkCxxRevisionMacro(vtkPVData, "1.182");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1322,8 +1322,6 @@ void vtkPVData::CreateProperties()
     this->OriginThumbWheel[cc]->SetBalloonHelpString(
       "Orient the geometry relative to the dataset origin.");
     }
-
-//  this->UpdateActorControlResolutions();
 
   this->OpacityLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->OpacityLabel->Create(this->Application, 0);
@@ -3218,15 +3216,20 @@ void vtkPVData::UpdateActorControlResolutions()
   int i;
   for (i = 0; i < 3; i++)
     {
-    if (bounds[i * 2 + 1] != bounds[i * 2])
+    float delta = bounds[i * 2 + 1] - bounds[i * 2];
+    if (delta <= 0)
       {
-      oneh = log10((bounds[i * 2 + 1] - bounds[i * 2]) * 0.051234);
+      res = 0.1;
+      }
+    else
+      {
+      oneh = log10(delta * 0.051234);
       half = 0.5 * pow(10, ceil(oneh));
       res = (oneh > log10(half) ? half : pow(10, floor(oneh)));
-      // cout << "up i: " << i << ", bounds: " << (bounds[i * 2 + 1] - bounds[i * 2]) << ", oneh: " << oneh << ", half: " << half << ", res: " << res << endl;
-      this->TranslateThumbWheel[i]->SetResolution(res);
-      this->OriginThumbWheel[i]->SetResolution(res);
+      // cout << "up i: " << i << ", delta: " << delta << ", oneh: " << oneh << ", half: " << half << ", res: " << res << endl;
       }
+    this->TranslateThumbWheel[i]->SetResolution(res);
+    this->OriginThumbWheel[i]->SetResolution(res);
     }
 }
 
@@ -3275,7 +3278,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.181 $");
+  this->ExtractRevision(os,"$Revision: 1.182 $");
 }
 
 //----------------------------------------------------------------------------
