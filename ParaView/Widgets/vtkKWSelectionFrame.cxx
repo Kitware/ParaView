@@ -40,11 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
+#include "vtkKWIcon.h"
 
 #include "Resources/vtkKWArrowDown.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.12");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
@@ -53,24 +54,25 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->Title                 = vtkKWLabel::New();
   this->SelectionList         = vtkKWMenuButton::New();
   this->TitleBarRightSubframe = vtkKWWidget::New();
-  
   this->BodyFrame             = vtkKWWidget::New();
   
-  this->SelectObject = NULL;
-  this->SelectMethod = NULL;
+  this->SelectCommand         = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::~vtkKWSelectionFrame()
 {
-  this->SetSelectObject(NULL);
-  this->SetSelectMethod(NULL);
-
   this->TitleBar->Delete();
   this->Title->Delete();
   this->SelectionList->Delete();
   this->TitleBarRightSubframe->Delete();
   this->BodyFrame->Delete();
+
+  if (this->SelectCommand)
+    {
+    delete [] this->SelectCommand;
+    this->SelectCommand = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -91,18 +93,21 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   // create the top level
 
   wname = this->GetWidgetName();
-  this->Script("frame %s %s -bd 3 -relief ridge", wname, args);
+  this->Script("frame %s %s -bd 3 -relief ridge", wname, (args ? args : ""));
 
   this->TitleBar->SetParent(this);
   this->TitleBar->Create(app, "frame", "-bg #008");
   
   this->SelectionList->SetParent(this->TitleBar);
   this->SelectionList->Create(app, "-indicatoron 0");
-  this->SelectionList->SetImageOption(image_KWArrowDown, 
+  this->SelectionList->SetImageOption(vtkKWIcon::ICON_EXPAND);
+#if 0
+image_KWArrowDown, 
                                       image_KWArrowDown_width,
                                       image_KWArrowDown_height,
                                       image_KWArrowDown_pixel_size,
                                       image_KWArrowDown_buffer_length);
+#endif
 
   this->Title->SetParent(this->TitleBar);
   this->Title->Create(app, "-bg #008 -fg #fff");
@@ -124,9 +129,6 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -side top -fill both -expand yes",
                this->BodyFrame->GetWidgetName());
   
-  this->SetSelectObject(NULL);
-  this->SetSelectMethod(NULL);
-
   // Update enable state
 
   this->UpdateEnableState();
@@ -135,7 +137,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitle(const char *title)
 {
-  if ( ! this->Title->IsCreated() )
+  if (!this->Title->IsCreated())
     {
     vtkErrorMacro("Selection frame must be created before title can be set");
     return;
@@ -174,31 +176,42 @@ void vtkKWSelectionFrame::SetSelectionList(int num, const char **list)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetSelectCommand(vtkKWObject *object,
-                                           const char *methodAndArgString)
+void vtkKWSelectionFrame::SetObjectMethodCommand(
+  char **command, 
+  vtkKWObject *object, 
+  const char *method)
 {
-  this->SetSelectObject(object);
-  this->SetSelectMethod(methodAndArgString);
+  if (*command)
+    {
+    delete [] *command;
+    *command = NULL;
+    }
+
+  if (!object)
+    {
+    return;
+    }
+
+  ostrstream command_str;
+  command_str << object->GetTclName() << " " << method << ends;
+  *command = command_str.str();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetSelectCommand(vtkKWObject *object,
+                                           const char *method)
+{
+  this->SetObjectMethodCommand(&this->SelectCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SelectionMenuCallback(const char *menuItem)
 {
-  if ( ! (this->SelectObject && this->SelectMethod) )
+  if (this->SelectCommand)
     {
-    return;
+    this->Script("eval %s {%s} %s",
+                 this->SelectCommand, menuItem, this->GetTclName());
     }
-  
-  this->Script("%s %s {%s} %s",
-               this->SelectObject->GetTclName(), this->SelectMethod,
-               menuItem, this->GetTclName());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetSelectObject(vtkKWObject *object)
-{
-  // avoiding reference-counting loops
-  this->SelectObject = object;
 }
 
 //----------------------------------------------------------------------------

@@ -69,7 +69,7 @@ public:
   // Description:
   // Set the selection list, command
   void SetSelectionList(int num, const char **list);
-  void SetSelectCommand(vtkKWObject *object, const char *methodAndArgString);
+  void SetSelectCommand(vtkKWObject *object, const char *method);
 
   // Description:
   // Callbacks
@@ -94,10 +94,9 @@ protected:
   vtkKWWidget     *TitleBarRightSubframe;
   vtkKWWidget     *BodyFrame;
 
-  vtkKWObject     *SelectObject;
-  char            *SelectMethod;
-  void SetSelectObject(vtkKWObject *object);
-  vtkSetStringMacro(SelectMethod);
+  void SetObjectMethodCommand(
+    char **command, vtkKWObject *object, const char *method);
+  char *SelectCommand;
   
 private:
   vtkKWSelectionFrame(const vtkKWSelectionFrame&);  // Not implemented
