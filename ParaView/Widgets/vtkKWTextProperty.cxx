@@ -129,12 +129,10 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.10");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.11");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
-
-vtkCxxSetObjectMacro(vtkKWTextProperty, Actor2D, vtkActor2D);
 
 // ----------------------------------------------------------------------------
 vtkKWTextProperty::vtkKWTextProperty()
@@ -576,10 +574,6 @@ void vtkKWTextProperty::UpdateInterface()
   this->UpdateStylesCheckButtonSet();
   this->UpdateOpacityScale();
   this->UpdatePushButtonSet();
-
-  // Now if there is text prop, we might just disable the GUI
-
-  this->SetEnabled(this->TextProperty ? 1 : 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -592,8 +586,26 @@ void vtkKWTextProperty::SetTextProperty(vtkTextProperty *_arg)
 
   this->TextProperty = _arg;
   
-  if (this->TextProperty != NULL) 
-    { 
+  if (this->TextProperty)
+    {
+    this->UpdateInterface();
+    }
+
+  this->Modified();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWTextProperty::SetActor2D(vtkActor2D *_arg)
+{
+  if (this->Actor2D == _arg)
+    {
+    return;
+    }
+
+  this->Actor2D = _arg;
+  
+  if (this->Actor2D)
+    {
     this->UpdateInterface();
     }
 
@@ -629,7 +641,7 @@ void vtkKWTextProperty::SetShowLabel(int _arg)
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateLabel()
 {
-  if (this->Label->IsCreated())
+  if (this->IsCreated() && this->Label)
     {
     this->Script("grid %s %s",
                  (this->ShowLabel ? "" : "remove"), 
@@ -718,7 +730,7 @@ float* vtkKWTextProperty::GetColor()
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateColorButton()
 {
-  if (this->ChangeColorButton->IsCreated())
+  if (this->IsCreated() && this->ChangeColorButton)
     {
     if (this->GetColor())
       {
@@ -775,7 +787,9 @@ void vtkKWTextProperty::SetFontFamily(int v)
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateFontFamilyOptionMenu()
 {
-  if (this->FontFamilyOptionMenu->IsCreated() && this->TextProperty)
+  if (this->IsCreated() &&
+      this->FontFamilyOptionMenu &&
+      this->TextProperty)
     {
     switch (this->TextProperty->GetFontFamily())
       {
@@ -835,7 +849,7 @@ void vtkKWTextProperty::SetShowStyles(int _arg)
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateStylesCheckButtonSet()
 {
-  if (this->StylesCheckButtonSet->IsCreated())
+  if (this->IsCreated() && this->StylesCheckButtonSet)
     {
     this->Script("grid %s %s",
                  (this->ShowStyles ? "" : "remove"), 
@@ -872,7 +886,9 @@ void vtkKWTextProperty::SetBold(int v)
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateBoldCheckButton()
 {
-  if (this->IsCreated() && this->TextProperty)
+  if (this->IsCreated() && 
+      this->StylesCheckButtonSet &&
+      this->TextProperty)
     {
     this->StylesCheckButtonSet->GetCheckButtonSet()->SetButtonState(
       VTK_KW_TEXT_PROP_BOLD_ID, this->TextProperty->GetBold());
@@ -914,7 +930,9 @@ void vtkKWTextProperty::SetItalic(int v)
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateItalicCheckButton()
 {
-  if (this->IsCreated() && this->TextProperty)
+  if (this->IsCreated() && 
+      this->StylesCheckButtonSet &&
+      this->TextProperty)
     {
     this->StylesCheckButtonSet->GetCheckButtonSet()->SetButtonState(
       VTK_KW_TEXT_PROP_ITALIC_ID, this->TextProperty->GetItalic());
@@ -956,7 +974,9 @@ void vtkKWTextProperty::SetShadow(int v)
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateShadowCheckButton()
 {
-  if (this->IsCreated() && this->TextProperty)
+  if (this->IsCreated() && 
+      this->StylesCheckButtonSet &&
+      this->TextProperty)
     {
     this->StylesCheckButtonSet->GetCheckButtonSet()->SetButtonState(
       VTK_KW_TEXT_PROP_SHADOW_ID, this->TextProperty->GetShadow());
@@ -1052,7 +1072,9 @@ float vtkKWTextProperty::GetOpacity()
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateOpacityScale()
 {
-  if (this->OpacityScale->IsCreated() && this->TextProperty)
+  if (this->IsCreated() && 
+      this->OpacityScale &&
+      this->TextProperty)
     {
     this->OpacityScale->SetValue(this->GetOpacity());
     this->Script("grid %s %s",
@@ -1106,17 +1128,16 @@ vtkKWPushButton* vtkKWTextProperty::GetCopyButton()
 // ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdatePushButtonSet()
 {
-  if (!this->IsCreated())
+  if (this->IsCreated() && this->PushButtonSet)
     {
-    return;
+    this->PushButtonSet->GetPushButtonSet()->SetButtonVisibility(
+      VTK_KW_TEXT_PROP_COPY_ID, this->ShowCopy);
+
+    this->Script("grid %s %s",
+                 (this->PushButtonSet->GetPushButtonSet()
+                  ->GetNumberOfVisibleButtons() ? "" : "remove"), 
+                 this->PushButtonSet->GetWidgetName());
     }
-
-  this->PushButtonSet->GetPushButtonSet()->SetButtonVisibility(
-    VTK_KW_TEXT_PROP_COPY_ID, this->ShowCopy);
-
-  this->Script("grid %s %s",
-               (this->PushButtonSet->GetPushButtonSet()->GetNumberOfVisibleButtons() ? "" : "remove"), 
-               this->PushButtonSet->GetWidgetName());
 }
 
 // ----------------------------------------------------------------------------
@@ -1179,11 +1200,26 @@ void vtkKWTextProperty::SetEnabled(int e)
 
   if (this->IsCreated())
     {
-    this->Label->SetEnabled(e);
-    this->ChangeColorButton->SetEnabled(e);
-    this->FontFamilyOptionMenu->SetEnabled(e);
-    this->StylesCheckButtonSet->SetEnabled(e);
-    this->OpacityScale->SetEnabled(e);
+    if (this->Label)
+      {
+      this->Label->SetEnabled(e);
+      }
+    if (this->ChangeColorButton)
+      {
+      this->ChangeColorButton->SetEnabled(e);
+      }
+    if (this->FontFamilyOptionMenu)
+      {
+      this->FontFamilyOptionMenu->SetEnabled(e);
+      }
+    if (this->StylesCheckButtonSet)
+      {
+      this->StylesCheckButtonSet->SetEnabled(e);
+      }
+    if (this->OpacityScale)
+      {
+      this->OpacityScale->SetEnabled(e);
+      }
     }
 
   // Then call superclass, which will 
