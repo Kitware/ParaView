@@ -93,7 +93,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.2");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -169,6 +169,13 @@ const void vtkPVAnimationInterfaceEntry::CreateLabel(int idx)
   }
   */
   this->SetLabel(label.c_str());
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVAnimationInterfaceEntry::GetDirty()
+{
+  this->UpdateStartEndValueFromEntry();
+  return this->Dirty;
 }
 
 //-----------------------------------------------------------------------------

@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.69");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.70");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -928,6 +928,10 @@ void vtkPVAnimationInterface::Play()
   // Make sure we have the up to date entries for end and step.
 
   this->EntryCallback();
+
+  // Make sure script is up to date
+  
+  this->UpdateNewScript();
 
   // Update the buttons according to the play status
 

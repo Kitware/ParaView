@@ -128,7 +128,8 @@ public:
   void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
 
   vtkSetClampMacro(Dirty, int, 0, 1);
-  vtkGetMacro(Dirty, int);
+
+  int GetDirty();
 
   void NoMethodCallback();
 
