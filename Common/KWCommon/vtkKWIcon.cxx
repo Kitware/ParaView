@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.25");
+vtkCxxRevisionMacro(vtkKWIcon, "1.26");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -486,6 +486,103 @@ void vtkKWIcon::SetImage(int image)
         image_transfer_width, image_transfer_height,
         image_transfer_pixel_size, 
         image_transfer_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_BEGINNING:
+      this->SetImage(
+        image_transport_beginning, 
+        image_transport_beginning_width, image_transport_beginning_height,
+        image_transport_beginning_pixel_size, 
+        image_transport_beginning_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_END:
+      this->SetImage(
+        image_transport_end, 
+        image_transport_end_width, image_transport_end_height,
+        image_transport_end_pixel_size, 
+        image_transport_end_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_FAST_FORWARD:
+      this->SetImage(
+        image_transport_fast_forward, 
+        image_transport_fast_forward_width, 
+        image_transport_fast_forward_height,
+        image_transport_fast_forward_pixel_size, 
+        image_transport_fast_forward_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_FAST_FORWARD_TO_KEY:
+      this->SetImage(
+        image_transport_fast_forward_to_key, 
+        image_transport_fast_forward_to_key_width, 
+        image_transport_fast_forward_to_key_height,
+        image_transport_fast_forward_to_key_pixel_size, 
+        image_transport_fast_forward_to_key_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_LOOP:
+      this->SetImage(
+        image_transport_loop, 
+        image_transport_loop_width, 
+        image_transport_loop_height,
+        image_transport_loop_pixel_size, 
+        image_transport_loop_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_PAUSE:
+      this->SetImage(
+        image_transport_pause, 
+        image_transport_pause_width, 
+        image_transport_pause_height,
+        image_transport_pause_pixel_size, 
+        image_transport_pause_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_PLAY:
+      this->SetImage(
+        image_transport_play, 
+        image_transport_play_width, 
+        image_transport_play_height,
+        image_transport_play_pixel_size, 
+        image_transport_play_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_PLAY_TO_KEY:
+      this->SetImage(
+        image_transport_play_to_key, 
+        image_transport_play_to_key_width, 
+        image_transport_play_to_key_height,
+        image_transport_play_to_key_pixel_size, 
+        image_transport_play_to_key_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_REWIND:
+      this->SetImage(
+        image_transport_rewind, 
+        image_transport_rewind_width, 
+        image_transport_rewind_height,
+        image_transport_rewind_pixel_size, 
+        image_transport_rewind_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_REWIND_TO_KEY:
+      this->SetImage(
+        image_transport_rewind_to_key, 
+        image_transport_rewind_to_key_width, 
+        image_transport_rewind_to_key_height,
+        image_transport_rewind_to_key_pixel_size, 
+        image_transport_rewind_to_key_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TRANSPORT_STOP:
+      this->SetImage(
+        image_transport_stop, 
+        image_transport_stop_width, 
+        image_transport_stop_height,
+        image_transport_stop_pixel_size, 
+        image_transport_stop_buffer_length);
       break;
       
     case vtkKWIcon::ICON_TRASHCAN:
