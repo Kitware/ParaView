@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.154");
+vtkCxxRevisionMacro(vtkPVData, "1.155");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2463,7 +2463,8 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 
 
 //----------------------------------------------------------------------------
-void vtkPVData::SaveInTclScript(ofstream *file)
+void vtkPVData::SaveInTclScript(ofstream *file, int interactiveFlag, 
+                                int vtkFlag)
 {
   float range[2];
   const char* scalarMode;
@@ -2477,26 +2478,34 @@ void vtkPVData::SaveInTclScript(ofstream *file)
     *file << "vtkPVGeometryFilter " << this->GeometryTclName << "\n\t"
           << this->GeometryTclName << " SetInput [" 
           << this->GetPVSource()->GetVTKSourceTclName() << " GetOutput]\n";
+
+    if (this->PVColorMap)
+      {
+      this->PVColorMap->SaveInTclScript(file, interactiveFlag, vtkFlag);
+      }
+
     *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
           << this->MapperTclName << " SetInput ["
           << this->GeometryTclName << " GetOutput]\n\t";  
     *file << this->MapperTclName << " SetImmediateModeRendering "
           << this->Mapper->GetImmediateModeRendering() << "\n\t";
     this->Mapper->GetScalarRange(range);
-    *file << this->MapperTclName << " SetScalarRange " << range[0] << " "
-          << range[1] << "\n\t";
+    *file << this->MapperTclName << " UseLookupTableScalarRangeOn\n\t";
     *file << this->MapperTclName << " SetScalarVisibility "
           << this->Mapper->GetScalarVisibility() << "\n\t"
           << this->MapperTclName << " SetScalarModeTo";
-
     scalarMode = this->Mapper->GetScalarModeAsString();
     *file << scalarMode << "\n";
     if (strcmp(scalarMode, "UsePointFieldData") == 0 ||
         strcmp(scalarMode, "UseCellFieldData") == 0)
       {
-      *file << "\t" << this->MapperTclName << " ColorByArrayComponent {"
-            << this->Mapper->GetArrayName() << "} "
-            << this->Mapper->GetArrayComponent() << "\n";
+      *file << "\t" << this->MapperTclName << " SelectColorArray {"
+            << this->Mapper->GetArrayName() << "}\n";
+      }
+    if (this->PVColorMap)
+      {
+      *file << this->MapperTclName << " SetLookupTable " 
+            << this->PVColorMap->GetLookupTableTclName() << endl;
       }
   
     *file << "vtkActor " << this->PropTclName << "\n\t"
@@ -2517,51 +2526,6 @@ void vtkPVData::SaveInTclScript(ofstream *file)
 
     *file << renTclName << " AddActor " << this->PropTclName << "\n";
     }  
-  /*
-  if (this->ScalarBarCheck->GetState())
-    {
-    *file << "vtkScalarBarActor " << this->ScalarBarTclName << "\n\t"
-          << "[" << this->ScalarBarTclName
-          << " GetPositionCoordinate] SetCoordinateSystemToNormalizedViewport\n\t"
-          << "[" << this->ScalarBarTclName
-          << " GetPositionCoordinate] SetValue ";
-    this->Script("set tempResult [[%s GetPositionCoordinate] GetValue]",
-                 this->ScalarBarTclName);
-    result = this->GetPVApplication()->GetMainInterp()->result;
-    sscanf(result, "%f %f", &position[0], &position[1]);
-    *file << position[0] << " " << position[1] << "\n\t"
-          << this->ScalarBarTclName << " SetOrientationTo";
-    this->Script("set tempResult [%s GetOrientation]",
-                 this->ScalarBarTclName);
-    result = this->GetPVApplication()->GetMainInterp()->result;
-    if (strncmp(result, "0", 1) == 0)
-      {
-      *file << "Horizontal\n\t";
-      }
-    else
-      {
-      *file << "Vertical\n\t";
-      }
-    *file << this->ScalarBarTclName << " SetWidth ";
-    this->Script("set tempResult [%s GetWidth]",
-                 this->ScalarBarTclName);
-    result = this->GetPVApplication()->GetMainInterp()->result;
-    *file << result << "\n\t";
-    *file << this->ScalarBarTclName << " SetHeight ";
-    this->Script("set tempResult [%s GetHeight]",
-                 this->ScalarBarTclName);
-    result = this->GetPVApplication()->GetMainInterp()->result;
-    *file << result << "\n\t"
-          << this->ScalarBarTclName << " SetLookupTable ["
-          << this->MapperTclName << " GetLookupTable]\n\t"
-          << this->ScalarBarTclName << " SetTitle {";
-    this->Script("set tempResult [%s GetTitle]",
-                 this->ScalarBarTclName);
-    result = this->GetPVApplication()->GetMainInterp()->result;
-    *file << result << "}\n";
-    *file << renTclName << " AddProp " << this->ScalarBarTclName << "\n";
-    }
-  */
 
   if (this->CubeAxesCheck->GetState())
     {
@@ -2769,7 +2733,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.154 $");
+  this->ExtractRevision(os,"$Revision: 1.155 $");
 }
 
 //----------------------------------------------------------------------------

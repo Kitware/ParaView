@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.51");
+vtkCxxRevisionMacro(vtkPVContour, "1.52");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -228,7 +228,8 @@ void vtkPVContour::SetPVInput(vtkPVData *input)
 
 
 //----------------------------------------------------------------------------
-void vtkPVContour::SaveInTclScript(ofstream* file)
+void vtkPVContour::SaveInTclScript(ofstream* file, int interactiveFlag,
+                                   int vtkFlag)
 {
   char* tempName;
   int i;
@@ -280,15 +281,15 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
           << source->GetValue(i) << "\n\t";
     }
 
-  this->GetPVOutput(0)->SaveInTclScript(file);
+  this->GetPVOutput(0)->SaveInTclScript(file, interactiveFlag, vtkFlag);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVContour::InitializePrototype()
 {
-
-
 }
 
+//----------------------------------------------------------------------------
 int vtkPVContour::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
 {
   return this->Superclass::ClonePrototypeInternal(makeCurrent, clone);

@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.244");
+vtkCxxRevisionMacro(vtkPVSource, "1.245");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -999,7 +999,8 @@ void vtkPVSource::DeleteCallback()
   vtkPVSource *prev = NULL;
   vtkPVSource *current = 0;
   vtkPVWindow *window = this->GetPVWindow();
-  
+
+  // Condition here because I am trying to delete glyph sources.  
   this->GetPVOutput()->DeleteCallback();
 
   // Just in case cursor was left in a funny state.
@@ -1509,7 +1510,8 @@ vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SaveInTclScript(ofstream *file)
+void vtkPVSource::SaveInTclScript(ofstream *file, int interactiveFlag, 
+                                  int vtkFlag)
 {
   int i, numWidgets;
   vtkPVWidget *widget;
@@ -1531,8 +1533,8 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
   // the tcl script contains the source.
   if (this->VisitedFlag == 1)
     { // This source is already in in the stack, but there is a loop.
-    *file << "\n" << this->VTKSource->GetClassName() << " "
-          << this->VTKSourceTclName << "\n";
+    *file << "\n" << this->VTKSource->GetClassName()
+          << " " << this->VTKSourceTclName << "\n";
     this->VisitedFlag = 2;
     return;
     }
@@ -1544,15 +1546,15 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
     {
     if (this->PVInputs[i] && this->PVInputs[i]->GetPVSource()->GetVisitedFlag() != 2)
       {
-      this->PVInputs[i]->GetPVSource()->SaveInTclScript(file);
+      this->PVInputs[i]->GetPVSource()->SaveInTclScript(file, interactiveFlag, vtkFlag);
       }
     }
   
   // Save the object in the script.
   if (this->VisitedFlag != 2)
     {
-    *file << "\n" << this->VTKSource->GetClassName() << " "
-          << this->VTKSourceTclName << "\n";
+    *file << "\n" << this->VTKSource->GetClassName()
+          << " " << this->VTKSourceTclName << "\n";
     this->VisitedFlag = 2;
     }
 
@@ -1568,7 +1570,7 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
     }
 
   // Add the mapper, actor, scalar bar actor ...
-  this->GetPVOutput()->SaveInTclScript(file);
+  this->GetPVOutput()->SaveInTclScript(file, interactiveFlag, vtkFlag);
 }
 
 
@@ -2048,7 +2050,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.244 $");
+  this->ExtractRevision(os,"$Revision: 1.245 $");
 }
 
 //----------------------------------------------------------------------------

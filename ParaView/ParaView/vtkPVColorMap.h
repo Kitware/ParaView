@@ -152,7 +152,7 @@ public:
 
   // Description:
   // Save out the mapper and actor to a file.
-  void SaveInTclScript(ofstream *file);
+  void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag = 0);
     
   // Description:
   // The data needs to lookup table name to set the lookup table of the mapper.
@@ -193,11 +193,18 @@ public:
   void NumberOfColorsScaleCallback();
 
   // Description:
+  // For internal use.
+  // This is just a flag that is used to mark that the source has been saved
+  // into the tcl script (visited) during the recursive saving process.
+  vtkSetMacro(VisitedFlag,int);
+  vtkGetMacro(VisitedFlag,int);
+
+  // Description:
   // This method is called when event is triggered on the scalar bar.
-  //BTX
+//BTX
   virtual void ExecuteEvent(vtkObject* wdg, unsigned long event,  
                             void* calldata);
-  //ETX
+//ETX
 
 protected:
   vtkPVColorMap();
@@ -265,6 +272,9 @@ protected:
   vtkKWLabeledEntry* ColorRangeMaxEntry;
   
   vtkKWPushButton*   BackButton;
+
+  // For Saving into a tcl script.
+  int VisitedFlag;
 
   vtkPVColorMap(const vtkPVColorMap&); // Not implemented
   void operator=(const vtkPVColorMap&); // Not implemented

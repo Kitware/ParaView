@@ -62,7 +62,7 @@ public:
   
   // Description:
   // Save this source to a file.
-  void SaveInTclScript(ofstream* file);
+  void SaveInTclScript(ofstream* file, int interactiveFlag, int vtkFlag=0);
 
   // Description:
   // This does the same thing as the superclass, but also

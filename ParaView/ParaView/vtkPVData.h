@@ -274,7 +274,7 @@ public:
   
   // Description:
   // Save out the mapper and actor to a file.
-  void SaveInTclScript(ofstream *file);
+  void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag = 0);
   
   // Description:
   // Callback for the change color button.

@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.202");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.203");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2215,8 +2215,8 @@ vtkPVWindow *vtkPVRenderView::GetPVWindow()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag,
-                                      int offScreenFlag)
+void vtkPVRenderView::SaveInTclScript(ofstream *file,
+                                      int interactiveFlag, int vtkFlag)
 {
   vtkCamera *camera;
   float position[3];
@@ -2238,7 +2238,7 @@ void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag,
           << this->RenderWindowTclName << " AddRenderer "
           << this->RendererTclName << "\n\t";
     *file << this->RenderWindowTclName << " SetSize " << size[0] << " " << size[1] << endl;
-    if (!offScreenFlag)
+    if (vtkFlag && interactiveFlag)
       {
       *file << "vtkRenderWindowInteractor iren\n\t"
             << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
@@ -2265,34 +2265,6 @@ void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag,
         << clippingRange[1] << "\n";
 }
 
-//----------------------------------------------------------------------------
-void vtkPVRenderView::AddActorsToTclScript(ofstream *file)
-{
-  int i;
-  char *result;
-  //char tclName[100];
-  
-  *file << "# assign actors to the renderer\n";
-  
-  for (i = 0; i < this->GetRenderer()->GetProps()->GetNumberOfItems(); i++)
-    {
-    this->Script("set tempValue [[%s GetProps] GetItemAsObject %d]",
-                 this->RendererTclName, i);
-    result = this->Application->GetMainInterp()->result;
-    // Notice we are using actors and not LODProp3Ds in the script/
-    if (strncmp(result, "vtkTemp", 7) != 0)
-      {
-      *file << this->RendererTclName << " AddActor ";
-      *file << result << "\n";
-      }
-    }
-
-  int *windowSize = this->GetVTKWindow()->GetSize();
-  *file << this->RenderWindowTclName << " SetSize "
-        << windowSize[0] << " " << windowSize[1] << "\n";
-
-  *file << "\n";
-}
 
 //----------------------------------------------------------------------------
 int* vtkPVRenderView::GetRenderWindowSize()
@@ -2384,7 +2356,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.202 $");
+  this->ExtractRevision(os,"$Revision: 1.203 $");
 }
 
 //------------------------------------------------------------------------------

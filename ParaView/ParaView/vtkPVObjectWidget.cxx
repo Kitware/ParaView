@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
@@ -85,6 +85,7 @@ void vtkPVObjectWidget::SaveInTclScript(ofstream *file)
   *file << " " << result << "\n";
 }
 
+//----------------------------------------------------------------------------
 vtkPVObjectWidget* vtkPVObjectWidget::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -92,6 +93,7 @@ vtkPVObjectWidget* vtkPVObjectWidget::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVObjectWidget::SafeDownCast(clone);
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVObjectWidget::CopyProperties(vtkPVWidget* clone, 
                                        vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
@@ -123,12 +125,12 @@ int vtkPVObjectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkPVObjectWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVObjectWidget ";
-  this->ExtractRevision(os,"$Revision: 1.8 $");
+  this->ExtractRevision(os,"$Revision: 1.9 $");
 }
 
 //----------------------------------------------------------------------------

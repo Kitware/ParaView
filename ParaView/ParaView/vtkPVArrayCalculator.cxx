@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayCalculator);
-vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.46");
+vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.47");
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -665,13 +665,18 @@ void vtkPVArrayCalculator::UpdateParameterWidgets()
   this->ModifiedFlag = 0;
 }
 
+
+//----------------------------------------------------------------------------
 void vtkPVArrayCalculator::SetFunctionLabel(char *function)
 {
   this->ModifiedFlag = 1;
   this->FunctionLabel->SetLabel(function);
 }
 
-void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
+
+//----------------------------------------------------------------------------
+void vtkPVArrayCalculator::SaveInTclScript(ofstream *file, int interactiveFlag,
+                                           int vtkFlag)
 {
   char* tempName;
   int i;
@@ -745,7 +750,7 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
   this->ArrayNameEntry->SaveInTclScript(file);
   *file << "\n";
   
-  this->GetPVOutput(0)->SaveInTclScript(file);
+  this->GetPVOutput(0)->SaveInTclScript(file, interactiveFlag, vtkFlag);
 }
 
 //----------------------------------------------------------------------------

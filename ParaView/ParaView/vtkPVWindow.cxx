@@ -116,7 +116,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.373");
+vtkCxxRevisionMacro(vtkPVWindow, "1.374");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2297,7 +2297,7 @@ void vtkPVWindow::ExportVTKScript()
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0)
     {
-    this->SaveInTclScript(exportDialog->GetFileName(), 1, 0);
+    this->SaveInTclScript(exportDialog->GetFileName(), 1);
     this->SaveLastPath(exportDialog, "ExportVTKLastPath");
     }
   exportDialog->Delete();
@@ -2324,14 +2324,50 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::SaveInTclScript(const char* filename,
-                                  int vtkFlag, int askFlag)
+void vtkPVWindow::ImportVTKScript(const char *name)
+{
+  vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->Application);
+
+  vtkPVSourceCollection* col = this->GetSourceList("Sources");
+  while ( col->GetNumberOfItems() > 0 )
+    {
+    vtkPVSource* source = col->GetLastPVSource();
+    if ( !source )
+      {
+      break;
+      }
+    this->DeleteSourceAndOutputs(source);
+    }
+
+  col = this->GetSourceList("GlyphSources");
+  col->RemoveAllItems();
+
+  // Get rid of all color maps.
+  vtkPVColorMap *cm;  
+  this->PVColorMaps->InitTraversal();
+  while ( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
+    {
+    cm->SetScalarBarVisibility(0);
+    }
+  this->PVColorMaps->RemoveAllItems();
+
+
+  pvApp->SetRunningParaViewScript(1);
+  this->vtkKWWindow::LoadScript(name);
+  pvApp->SetRunningParaViewScript(0);
+  this->MainView->EventuallyRender();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
 {
   ofstream *file;
   vtkPVSource *pvs;
   int imageFlag = 0;
   int animationFlag = 0;
   int offScreenFlag = 0;
+  int interactiveFlag = 1;
   char *path = NULL;
       
   file = new ofstream(filename, ios::out);
@@ -2363,22 +2399,11 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
     }
   *file << endl << endl;
 
-  if (vtkFlag)
-    {
-    *file << "package require vtk\n"
-          << "package require vtkinteraction\n"
-          << "# create a rendering window and renderer\n";
-    }
-  else
-    {
-    *file << "# Script generated for regression test within ParaView.\n";
-    }
-
 
   // Descide what this script should do.
   // Save an image or series of images, or run interactively.
   const char *script = this->AnimationInterface->GetScript();
-  if (script && vtkString::Length(script) > 0 && !askFlag)
+  if (script && vtkString::Length(script) > 0 && vtkFlag)
     {
     if (vtkKWMessageDialog::PopupYesNo(
           this->Application, this, "Animation", 
@@ -2386,10 +2411,11 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
           vtkKWMessageDialog::QuestionIcon))
       {
       animationFlag = 1;
+      interactiveFlag = 0;
       }
     }
   
-  if (animationFlag == 0 && !askFlag)
+  if (animationFlag == 0 && vtkFlag)
     {
     if (vtkKWMessageDialog::PopupYesNo(
           this->Application, this, "Image", 
@@ -2397,10 +2423,11 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
           vtkKWMessageDialog::QuestionIcon))
       {
       imageFlag = 1;
+      interactiveFlag = 0;
       }
     }
 
-  if ( (animationFlag || imageFlag) && !askFlag )
+  if ( (animationFlag || imageFlag) && vtkFlag )
     {
     this->Script("tk_getSaveFile -title {Save Image} -defaultextension {.jpg} -filetypes {{{JPEG Images} {.jpg}} {{PNG Images} {.png}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
     path = vtkString::Duplicate(this->Application->GetMainInterp()->result);
@@ -2444,7 +2471,20 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
       }
     }
 
-  this->GetMainView()->SaveInTclScript(file, vtkFlag, offScreenFlag);
+  if (vtkFlag)
+    {
+    *file << "package require vtk\n";
+    if (interactiveFlag)
+      {    
+      *file << "package require vtkinteraction\n";
+      }
+    }
+  else
+    {
+    *file << "# Script generated for regression test within ParaView.\n";
+    }
+
+  this->GetMainView()->SaveInTclScript(file, interactiveFlag, vtkFlag);
 
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
     this->SourceLists->NewIterator();
@@ -2469,6 +2509,14 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
     }
   it->Delete();
 
+  // Mark all color maps as not visited.
+  vtkPVColorMap *cm;
+  this->PVColorMaps->InitTraversal();
+  while( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
+    {    
+    cm->SetVisitedFlag(0);
+    }
+
   // Loop through sources saving the visible sources.
   vtkPVSourceCollection* modules = this->GetSourceList("Sources");
   vtkCollectionIterator* cit = modules->NewIterator();
@@ -2476,7 +2524,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
   while ( !cit->IsDoneWithTraversal() )
     {
     pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
-    pvs->SaveInTclScript(file);
+    pvs->SaveInTclScript(file, interactiveFlag, vtkFlag);
     cit->GoToNextItem();
     }
   cit->Delete();
@@ -2540,7 +2588,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
     }
   else
     {
-    if (vtkFlag)
+    if (vtkFlag && interactiveFlag)
       {
       *file << "# enable user interface interactor\n"
             << "iren SetUserMethod {wm deiconify .vtkInteract}\n"
@@ -3779,7 +3827,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.373 $");
+  this->ExtractRevision(os,"$Revision: 1.374 $");
 }
 
 //----------------------------------------------------------------------------

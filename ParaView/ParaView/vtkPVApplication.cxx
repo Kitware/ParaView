@@ -83,6 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedShortArray.h"
 #include "vtkPolyData.h"
 #include "vtkPVSourceInterfaceDirectories.h"
+#include "vtkPVRenderGroupDialog.h"
 
 #include <sys/stat.h>
 #include <stdarg.h>
@@ -97,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.146");
+vtkCxxRevisionMacro(vtkPVApplication, "1.147");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -495,7 +496,7 @@ int vtkPVApplication::CheckForArgument(int argc, char* argv[],
   for (i=0; i < argc; i++)
     {
     char* newarg = vtkString::Duplicate(argv[i]);
-    int len = strlen(newarg);
+    int len = (int)(strlen(newarg));
     for (int j=0; j<len; j++)
       {
       if (newarg[j] == '=')
@@ -642,7 +643,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
           {
 
           char* newarg = vtkString::Duplicate(argv[i]);
-          int len = strlen(newarg);
+          int len = (int)(strlen(newarg));
           for (int i=0; i<len; i++)
             {
             if (newarg[i] == '=')
@@ -714,7 +715,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     {
     const char* newarg=0;
 
-    int len = strlen(argv[index]);
+    int len = (int)(strlen(argv[index]));
     for (int i=0; i<len; i++)
       {
       if (argv[index][i] == '=')
@@ -763,8 +764,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // Handle setting up the SGI pipes.
   if (this->UseRenderingGroup)
     {
-    int numPipes = 1;
     int numProcs = this->Controller->GetNumberOfProcesses();
+    int numPipes = 1;
     int id;
     // Until I add a user interface to set the number of pipes,
     // just read it from a file.
@@ -795,49 +796,33 @@ void vtkPVApplication::Start(int argc, char*argv[])
       if (numPipes > numProcs) numPipes = numProcs;
       if (numPipes < 1) numPipes = 1;
       }
-    this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);
+
     
-    // assuming that the number of pipes is the same as the number of procs
-    char *displayString;
-    // Get display root
-    char displayCommand[80];
-    char displayStringRoot[80];
+    vtkPVRenderGroupDialog *rgDialog = vtkPVRenderGroupDialog::New();
+    const char *displayString;
+    char *displayCommand;
     displayString = getenv("DISPLAY");
     if (displayString)
       {
-      // Extract the position of the display from the string.
-      int len = -1;
-      int j, i = 0;
-      while (i < 80)
-        {
-        if (displayString[i] == ':')
-          {
-          j = i+1;
-          while (j < 80)
-            {
-            if (displayString[j] == '.')
-              {
-              len = j+1;
-              break;
-              }
-            j++;
-            }
-          break;
-          }
-        i++;
-        }
-      for (id = 0; id < numPipes; ++id)
+      rgDialog->SetDisplayString(0, displayString);
+      }
+    rgDialog->SetNumberOfProcessesInGroup(numPipes);
+    rgDialog->Invoke();
+    numPipes = rgDialog->GetNumberOfProcessesInGroup();
+  
+    this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);    
+    if (displayString)
+      {    
+      for (id = 1; id < numPipes; ++id)
         {
         // Format a new display string based on process.
-        strncpy(displayStringRoot, displayString, len);
-        displayStringRoot[len] = '\0';
-        //    cerr << "display string root = " << displayStringRoot << endl;
-        sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, id);
-        //    cerr << "display command = " << displayCommand << endl;
-        this->RemoteScript(id, "$Application SetEnvironmentVariable {%s}", 
-                           displayCommand);
+        displayString = rgDialog->GetDisplayString(id);
+        this->RemoteScript(id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
+                           displayString);
         }
       }
+      rgDialog->Delete();
+      rgDialog = NULL;
     }
 
   vtkPVWindow *ui = vtkPVWindow::New();

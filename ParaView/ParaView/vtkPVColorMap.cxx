@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.22");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.23");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -174,6 +174,8 @@ vtkPVColorMap::vtkPVColorMap()
   this->MapWidth = 250;
 
   this->PopupMenu = vtkKWMenu::New();
+
+  this->VisitedFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -918,23 +920,78 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
 
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::SaveInTclScript(ofstream *file)
+void vtkPVColorMap::SaveInTclScript(ofstream *file, int interactiveFlag,
+                                    int vtkFlag)
 {
-  char* renTclName;
+  if (this->VisitedFlag)
+    {
+    return;
+    }
+  this->VisitedFlag = 1;
 
-  char scalarBarTclName[128];
-  sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
-  renTclName = this->GetPVRenderView()->GetRendererTclName();
+  *file << "vtkLookupTable " << this->LookupTableTclName << endl;
+  *file << "\t" << this->LookupTableTclName << " SetNumberOfTableValues " 
+        << this->NumberOfColors << endl;
+  *file << "\t" << this->LookupTableTclName << " SetHueRange " 
+        << this->StartHSV[0] << " " << this->EndHSV[0] << endl;
+  *file << "\t" << this->LookupTableTclName << " SetSaturationRange " 
+        << this->StartHSV[1] << " " << this->EndHSV[1] << endl;
+  *file << "\t" << this->LookupTableTclName << " SetValueRange " 
+        << this->StartHSV[2] << " " << this->EndHSV[2] << endl;
+  *file << "\t" << this->LookupTableTclName << " SetTableRange "
+        << this->ScalarRange[0] << " " << this->ScalarRange[1] << endl;
+  *file << "\t" << this->LookupTableTclName << " SetVectorComponent " 
+        << this->VectorComponent << endl;
+  *file << "\t" << this->LookupTableTclName << " Build" << endl;
 
   if (this->ScalarBarVisibility)
     {
-    *file << "vtkScalarBarWidget " << scalarBarTclName << "\n\t";
-    *file << scalarBarTclName << " SetInteractor iren" << "\n\n";
-    *file << "[" << scalarBarTclName << " GetScalarBarActor] SetLookupTable " 
-          << this->LookupTableTclName << "\n";
+    char scalarBarTclName[128];
+    sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
+    if (interactiveFlag && vtkFlag)
+      {
+      *file << "vtkScalarBarWidget " << scalarBarTclName << "\n";
+      *file << "\t" << scalarBarTclName << " SetInteractor iren" << "\n";
+      *file << "\t[" << scalarBarTclName << " GetScalarBarActor] SetLookupTable " 
+            << this->LookupTableTclName << "\n";
+      if (this->ScalarBar->GetScalarBarActor()->GetOrientation() == VTK_ORIENT_HORIZONTAL)
+        {
+        *file << "\t[" << scalarBarTclName << " GetScalarBarActor] SetOrientationToHorizontal" 
+              << endl; 
+        }
+      *file << "\t[" << scalarBarTclName << " GetScalarBarActor] SetWidth " 
+            << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
+      *file << "\t[" << scalarBarTclName << " GetScalarBarActor] SetHeight " 
+            << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
+      const float *pos = this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue(); 
+      *file << "\t[[" << scalarBarTclName << " GetScalarBarActor] GetPositionCoordinate] SetValue " 
+            << pos[0] << " " << pos[1] << "\n";
+      *file << "\t[" << scalarBarTclName << " GetScalarBarActor] SetTitle {" 
+            << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
+      *file << "\t" << scalarBarTclName << " EnabledOn\n";
+      }
+    else  
+      {
+      *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
+      *file << "\t" << scalarBarTclName << " SetLookupTable " 
+            << this->LookupTableTclName << "\n";
+      if (this->ScalarBar->GetScalarBarActor()->GetOrientation() == VTK_ORIENT_HORIZONTAL)
+        {
+        *file << "\t" << scalarBarTclName << " SetOrientationToHorizontal" 
+              << endl; 
+        }
+      *file << "\t" << scalarBarTclName << " SetWidth " 
+            << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
+      *file << "\t" << scalarBarTclName << " SetHeight " 
+            << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
+      const float *pos = this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue(); 
+      *file << "\t[" << scalarBarTclName << " GetPositionCoordinate] SetValue " 
+            << pos[0] << " " << pos[1] << "\n";
+      *file << "\t" << scalarBarTclName << " SetTitle {" 
+            << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
+      *file << "Ren1 AddActor " << scalarBarTclName << endl;
+      }
     }
-
-
 }
 
 
@@ -1216,4 +1273,5 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "ScalarRange: " << this->ScalarRange[0] << ", "
      << this->ScalarRange[1] << endl;
+  os << indent << "VisitedFlag: " << this->VisitedFlag << endl;
 }

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.71");
+vtkCxxRevisionMacro(vtkPVProbe, "1.72");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -446,7 +446,8 @@ vtkPVInputMenu *vtkPVProbe::AddInputMenu(char *label, char *inputName,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProbe::SaveInTclScript(ofstream *file)
+void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag, 
+                                 int vtkFlag)
 {
   Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();
   char *tempName;
@@ -543,7 +544,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
       }
     }
   
-  this->GetPVOutput(0)->SaveInTclScript(file);
+  this->GetPVOutput(0)->SaveInTclScript(file, interactiveFlag, vtkFlag);
 }
 
 //----------------------------------------------------------------------------

@@ -180,8 +180,9 @@ public:
   
   // Description:
   // Save the renderer and render window to a file.
-  void SaveInTclScript(ofstream *file, int vtkFlag, int offScreenFlag);
-  void AddActorsToTclScript(ofstream *file);
+  // The "vtkFlag" argument is only set when regression testing.
+  // It causes the actors to b e added to the ParaView renderer. 
+  void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag = 0);
 
   // Description:
   // Change the background color.
