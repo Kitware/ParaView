@@ -940,8 +940,13 @@ int vtkClientServerStream::GetArgumentObject(int message, int argument,
 {
   // Get the argument object and check its type.
   vtkObjectBase* obj;
-  if(this->GetArgument(message, argument, &obj) && obj && obj->IsA(type))
+  if(this->GetArgument(message, argument, &obj))
     {
+    // if the pointer is valid then check the type
+    if(obj && !obj->IsA(type))
+      {
+      return 0;
+      }
     *value = obj;
     return 1;
     }
