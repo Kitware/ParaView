@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -88,32 +88,15 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
   // If we have time, we need to behave as an advanced reader module.
   if(this->HaveTime)
     {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->GetVTKSourceID(0) << "SetRestrictionAsIndex"
-      << "timestep" << 0
-      << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER);
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->GetVTKSourceID(0) << "GetNumberOfAttributeValues" << index
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-    int numValues = 0;
-    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &numValues))
-      {
-      vtkErrorMacro("Error getting number of timesteps from reader.");
-      numValues = 0;
-      }
     this->TimeScale = vtkPVScale::New();
     this->TimeScale->SetLabel("Timestep");
     this->TimeScale->SetPVSource(this);
     this->TimeScale->RoundOn();
-    this->TimeScale->SetRange(0, numValues-1);
     this->TimeScale->SetParent(this->GetParameterFrame()->GetFrame());
     this->TimeScale->SetModifiedCommand(this->GetTclName(), 
                                         "SetAcceptButtonColorToModified");
-    this->TimeScale->SetVariableName("TimestepAsIndex");
+    this->TimeScale->SetSMPropertyName("TimestepAsIndex");
     this->TimeScale->SetDisplayEntryAndLabelOnTop(0);
     this->TimeScale->SetDisplayValueFlag(0);
     this->TimeScale->Create(this->GetPVApplication());
@@ -121,10 +104,13 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
     this->AddPVWidget(this->TimeScale);
     this->Script("pack %s -side top -fill x -expand 1", 
                  this->TimeScale->GetWidgetName());
+
+    // Have time.  Behave as a vtkPVAdvancedReaderModule.
     return this->Superclass::ReadFileInformation(fname);
     }
   else
     {
+    // No time, skip over vtkPVAdvancedReaderModule behavior.
     return this->vtkPVReaderModule::ReadFileInformation(fname);
     }
 }

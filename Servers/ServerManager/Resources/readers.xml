@@ -10,13 +10,25 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
      <IntVectorProperty 
+        name="TimestepIndexRangeInfo"
+        command="GetTimestepIndexRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     <IntVectorProperty 
         name="TimestepAsIndex"
         command="SetTimestepAsIndex"
-        number_of_elements="1" 
-        default_values="0"/>
+        number_of_elements="1"
+        default_values="0">
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="TimestepIndexRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
    <!-- End PVDReader -->
    </SourceProxy>
-                    
+
    <SourceProxy name="XMLPolyDataReader" 
                 class="vtkXMLPolyDataReader">
      <StringVectorProperty
