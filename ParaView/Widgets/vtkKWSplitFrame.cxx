@@ -105,7 +105,7 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
                wname);
 
   this->Frame1->Create(app,"frame","-borderwidth 0 -relief flat");
-  this->Separator->Create(app,"frame","-borderwidth 0 -relief flat");
+  this->Separator->Create(app,"frame","-borderwidth 2 -relief raised");
   this->Frame2->Create(app,"frame","-borderwidth 0 -relief flat");
   
   this->Update();
