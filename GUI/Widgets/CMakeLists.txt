@@ -95,7 +95,6 @@ SET( KWWidgets_SRCS
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWComposite.cxx
-  # vtkKWRenderWidget.cxx
   vtkKWUserInterfaceManager.cxx
   vtkKWView.cxx
   ABSTRACT
@@ -103,13 +102,14 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   ${VTK_TCL_HOME}/vtktcl.c
-  vtkKWRenderWidgetCallbackCommand.cxx 
-  vtkKWTkUtilities.cxx
   vtkCornerAnnotation.cxx
   vtkKWCompositeCollection.cxx
+  vtkKWGenericRenderWindowInteractor.cxx
+  vtkKWRenderWidgetCallbackCommand.cxx 
+  vtkKWTkUtilities.cxx
   vtkKWViewCollection.cxx
-  vtkKWWindowCollection.cxx
   vtkKWWidgetCollection.cxx
+  vtkKWWindowCollection.cxx
   WRAP_EXCLUDE
   )
 
