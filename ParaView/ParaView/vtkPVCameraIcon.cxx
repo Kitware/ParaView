@@ -53,10 +53,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkPVRenderModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.7");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.8");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -120,28 +121,31 @@ void vtkPVCameraIcon::Create(vtkKWApplication *pvApp, const char *args)
 //----------------------------------------------------------------------------
 void vtkPVCameraIcon::RestoreCamera()
 {
+  const char* renTclName;
+
   if ( this->RenderView && this->Camera )
     {
+    renTclName = this->RenderView->GetPVApplication()->GetRenderModule()->GetRendererTclName();
     ostrstream str;
-    str << "eval [ " << this->RenderView->GetRendererTclName() 
+    str << "eval [" << renTclName 
         << " GetActiveCamera ] SetParallelScale [[ "
         << this->GetTclName() << " GetCamera ] GetParallelScale ]" << endl;
-    str << "eval [ " << this->RenderView->GetRendererTclName() 
+    str << "eval [ " << renTclName 
         << " GetActiveCamera ] SetViewAngle [[ "
         << this->GetTclName() << " GetCamera ] GetViewAngle ]" << endl;
-    str << "eval [ " << this->RenderView->GetRendererTclName() 
+    str << "eval [ " << renTclName 
         << " GetActiveCamera ] SetClippingRange [[ "
         << this->GetTclName() << " GetCamera ] GetClippingRange ]" << endl;
-    str << "eval [ " << this->RenderView->GetRendererTclName() 
+    str << "eval [ " << renTclName 
         << " GetActiveCamera ] SetFocalPoint [[ "
         << this->GetTclName() << " GetCamera ] GetFocalPoint ]" << endl;
-    str << "eval [ " << this->RenderView->GetRendererTclName() 
+    str << "eval [ " << renTclName 
         << " GetActiveCamera ] SetPosition [[ "
         << this->GetTclName() << " GetCamera ] GetPosition ]" << endl;
-    str << "eval [ " << this->RenderView->GetRendererTclName() 
+    str << "eval [ " << renTclName 
         << " GetActiveCamera ] SetViewUp [[ "
         << this->GetTclName() << " GetCamera ] GetViewUp ]" << endl;
-    str << this->RenderView->GetRendererTclName() << " ResetCameraClippingRange";
+    str << renTclName << " ResetCameraClippingRange";
     str << ends;
 
     this->RenderView->GetPVApplication()->BroadcastScript(str.str());

@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.54");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.55");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1705,8 +1705,7 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
     this->LabelTextPropertyWidget->SaveInTclScript(file, tlprop.str());
     tlprop.rdbuf()->freeze(0);
 
-    *file << this->GetPVRenderView()->GetRendererTclName() 
-          << " AddActor " << scalarBarTclName << endl;
+    *file << "Ren1" << " AddActor " << scalarBarTclName << endl;
 
     actor.rdbuf()->freeze(0);
     }

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.1");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.2");
 
 int vtkPVPartDisplayCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -72,6 +72,8 @@ vtkPVPartDisplay::vtkPVPartDisplay()
 {
   this->CommandFunction = vtkPVPartDisplayCommand;
 
+  this->DirectColorFlag = 1;
+
   this->CollectionDecision = 1;
   this->LODCollectionDecision = 1;
 
@@ -79,7 +81,6 @@ vtkPVPartDisplay::vtkPVPartDisplay()
   static int instanceCount = 0;
 
   this->Mapper = NULL;
-
   this->Property = NULL;
   this->PropertyTclName = NULL;
   this->Prop = NULL;
@@ -352,10 +353,9 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
   pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->LODMapperTclName);
-  pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
+  //pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->LODMapperTclName,
                          this->LODUpdateSuppressorTclName);
-  
   
   // Now the two branches merge at the LOD actor.
   sprintf(tclName, "Actor%d", this->InstanceCount);
@@ -546,6 +546,32 @@ void vtkPVPartDisplay::CacheUpdate(int idx, int total)
 
 
 //----------------------------------------------------------------------------
+void vtkPVPartDisplay::SetDirectColorFlag(int val)
+{
+  if (val)
+    {
+    val = 1;
+    }
+  if (val == this->DirectColorFlag)
+    {
+    return;
+    }
+
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  this->DirectColorFlag = val;
+  if (val)
+    {
+    pvApp->BroadcastScript("%s SetColorModeToDefault", this->MapperTclName);
+    pvApp->BroadcastScript("%s SetColorModeToDefault", this->LODMapperTclName);
+    }
+  else
+    {
+    pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
+    pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -557,6 +583,8 @@ void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CollectTclName: " << (this->CollectTclName?this->CollectTclName:"none") << endl;
   os << indent << "LODCollectTclName: " << (this->LODCollectTclName?this->LODCollectTclName:"none") << endl;
   os << indent << "LODDeciTclName: " << (this->LODDeciTclName?this->LODDeciTclName:"none") << endl;
+
+  os << indent << "DirectColorFlag: " << this->DirectColorFlag << endl;
 
   os << indent << "CollectionDecision: " 
      <<  this->CollectionDecision << endl;

@@ -99,7 +99,7 @@ public:
   // Description:
   // Compute the bounding box of all the visibile props
   // Used in ResetCamera() and ResetCameraClippingRange()
-  void ComputeVisiblePropBounds( float bounds[6] ); 
+  //void ComputeVisiblePropBounds( float bounds[6] ); 
   
   // Description:
   // Method called by the toolbar reset camera button.
@@ -122,8 +122,8 @@ public:
 
   // Description:
   // This method is executed in all processes.
-  void AddPVSource(vtkPVSource *pvs);
-  void RemovePVSource(vtkPVSource *pvs);
+  //void AddPVSource(vtkPVSource *pvs);
+  //void RemovePVSource(vtkPVSource *pvs);
 
   // Description:
   // Make snapshot of the render window.
@@ -136,7 +136,7 @@ public:
 
   // Description:
   // Computes the reduction factor to use in compositing.
-  void StartRender();
+  //void StartRender();
   
   // Description:
   // Composites
@@ -152,7 +152,7 @@ public:
   
   // Description:
   // Update all the actors.
-  void Update();
+  //void Update();
 
   // Description:
   // Callback method bound to expose or configure events.
@@ -167,11 +167,11 @@ public:
   // My version.
   vtkRenderer *GetRenderer();
   vtkRenderWindow *GetRenderWindow();
-  const char *GetRenderWindowTclName() {return this->RenderWindowTclName;}
+  //const char *GetRenderWindowTclName() {return this->RenderWindowTclName;}
 
   // Description:
   // The center of rotation picker needs the compositers zbuffer.
-  vtkPVTreeComposite *GetComposite() {return this->Composite;}
+  //vtkPVTreeComposite *GetComposite() {return this->Composite;}
 
   // Description:
   // Update the navigation window for a particular source
@@ -212,21 +212,21 @@ public:
   
   // Description:
   // Get the tcl name of the renderer.
-  vtkGetStringMacro(RendererTclName);
+  //vtkGetStringMacro(RendererTclName);
   
   // Description:
   // Set this flag to indicate whether to calculate the reduction factor for
   // use in tree composite.
-  vtkSetMacro(UseReductionFactor, int);
-  vtkGetMacro(UseReductionFactor, int);
-  vtkBooleanMacro(UseReductionFactor, int);
+  //vtkSetMacro(UseReductionFactor, int);
+  //vtkGetMacro(UseReductionFactor, int);
+  //vtkBooleanMacro(UseReductionFactor, int);
   
   // Description:
   // The render view keeps track of these times but does not use them.
-  vtkGetMacro(StillRenderTime, double);
-  vtkGetMacro(InteractiveRenderTime, double);
-  vtkGetMacro(StillCompositeTime, double);
-  vtkGetMacro(InteractiveCompositeTime, double);
+  //vtkGetMacro(StillRenderTime, double);
+  //vtkGetMacro(InteractiveRenderTime, double);
+  //vtkGetMacro(StillCompositeTime, double);
+  //vtkGetMacro(InteractiveCompositeTime, double);
 
   // Description:
   // Callback for toggling between parallel and perspective.
@@ -388,21 +388,21 @@ protected:
   // This is used before a render to make sure all visible sources
   // have been updated.  It returns 1 if all the data has been collected
   // and the render should be local.
-  int UpdateAllPVData(int interactive);
+  //int UpdateAllPVData(int interactive);
  
   int Interactive;
 
   int UseReductionFactor;
   
-  vtkPVTreeComposite *Composite;
-  char *CompositeTclName;
-  vtkSetStringMacro(CompositeTclName);
+  //vtkPVTreeComposite *Composite;
+  //char *CompositeTclName;
+  //vtkSetStringMacro(CompositeTclName);
 
-  char *RendererTclName;
-  vtkSetStringMacro(RendererTclName);  
+  //char *RendererTclName;
+  //vtkSetStringMacro(RendererTclName);  
    
-  char *RenderWindowTclName;
-  vtkSetStringMacro(RenderWindowTclName);  
+  //char *RenderWindowTclName;
+  //vtkSetStringMacro(RenderWindowTclName);  
     
   vtkKWLabeledFrame *StandardViewsFrame;
   vtkKWPushButton   *XMaxViewButton; 
@@ -450,10 +450,10 @@ protected:
   char* RenderPending;
   vtkSetStringMacro(RenderPending);
 
-  double StillRenderTime;
-  double InteractiveRenderTime;
-  double StillCompositeTime;
-  double InteractiveCompositeTime;
+  //double StillRenderTime;
+  //double InteractiveRenderTime;
+  //double StillCompositeTime;
+  //double InteractiveCompositeTime;
 
   int ShowSelectionWindow;
   int ShowNavigationWindow;

@@ -72,6 +72,7 @@ class vtkPVApplication;
 class vtkPVColorMap;
 class vtkPVSource;
 class vtkPVRenderView;
+class vtkPVDataSetAttributesInformation;
 
 // Try to eliminate this !!!!
 class vtkData;
@@ -235,7 +236,6 @@ public:
 
   void SetCubeAxesVisibility(int val);
   void CubeAxesCheckCallback();
-
   vtkGetObjectMacro(CubeAxesCheck, vtkKWCheckButton);
 
   void CenterCamera();
@@ -299,6 +299,14 @@ public:
   // The source calls this to update the visibility check button,
   // and to determine whether the scalar bar should be visible.
   void SetVisibilityCheckState(int v);
+
+
+  // Description:
+  // This determines whether to map array values through a color
+  // map or use arrays values as colors directly.  The direct option
+  // is only available for unsigned chanr arrays with 1 or 3 components.
+  void SetDirectColorFlag(int val);
+  void DirectColorCheckCallback();
 
 protected:
   vtkPVData();
@@ -372,6 +380,8 @@ protected:
   int PropertiesCreated;
 
   vtkKWCheckButton *ScalarBarCheck;
+
+  vtkKWCheckButton *DirectColorCheck;
   
   // For translating actor
   vtkKWLabeledFrame* ActorControlFrame;
@@ -401,6 +411,8 @@ protected:
 
   void UpdatePropertiesInternal();
   void UpdateActorControlResolutions();
+  void UpdateDirectColorCheck(vtkPVDataSetAttributesInformation* info,
+                              const char* name);
 
   vtkPVData(const vtkPVData&); // Not implemented
   void operator=(const vtkPVData&); // Not implemented

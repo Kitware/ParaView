@@ -100,6 +100,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderModule.h"
 #include "vtkPVSelectCustomReader.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
@@ -136,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.443");
+vtkCxxRevisionMacro(vtkPVWindow, "1.444");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -715,7 +716,7 @@ void vtkPVWindow::PrepareForDelete()
     this->MainView->Delete();
     this->MainView = NULL;
     }
-  
+
   if (this->Application)
     {
     this->Application->SetRegisteryValue(2, "RunTime", "CenterActorVisibility",
@@ -1204,13 +1205,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
       }
     }
   
-  pvApp->BroadcastScript("%s AddActor %s", this->MainView->GetRendererTclName(),
+  pvApp->BroadcastScript("%s AddActor %s", pvApp->GetRenderModule()->GetRendererTclName(),
                          this->CenterActorTclName);
 
   // Create a dummy interactor on the satellites so they han have 3d widgets.
   pvApp->BroadcastScript("vtkPVGenericRenderWindowInteractor pvRenderWindowInteractor");
   pvApp->BroadcastScript("pvRenderWindowInteractor SetRenderWindow %s", 
-                         this->MainView->GetRenderWindowTclName());
+                         pvApp->GetRenderModule()->GetRenderWindowTclName());
   pvApp->BroadcastScript("pvRenderWindowInteractor SetInteractorStyle {}"); 
   this->SetInteractorTclName("pvRenderWindowInteractor");  
   this->Script("%s SetInteractor pvRenderWindowInteractor", this->GetTclName());
@@ -4250,7 +4251,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.443 $");
+  this->ExtractRevision(os,"$Revision: 1.444 $");
 }
 
 //-----------------------------------------------------------------------------

@@ -79,6 +79,14 @@ public:
   void SetVisibility(int v);
 
   // Description:
+  // Change the color mode to map scalars or 
+  // use unsigned char arrays directly.
+  // MapScalarsOff only works when coloring by an array 
+  // on unsigned chars with 1 or 3 components.
+  void SetDirectColorFlag(int val);
+  vtkGetMacro(DirectColorFlag, int);
+
+  // Description:
   // This also creates the parallel vtk objects for the composite.
   // (actor, mapper, ...)
   void SetPVApplication(vtkPVApplication *pvApp);
@@ -134,6 +142,7 @@ protected:
   
   int CollectionDecision;
   int LODCollectionDecision;
+  int DirectColorFlag;
 
   // Problems with vtkLODActor led me to use these.
   vtkProperty *Property;

@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.95");
+vtkCxxRevisionMacro(vtkPVProbe, "1.96");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -449,7 +449,7 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
       *file << "\t" << this->XYPlotTclName << " AddInput [ " 
             << this->GetVTKSourceTclName() << " GetOutput ]" << endl;
 
-      *file << this->GetPVRenderView()->GetRendererTclName() << " AddActor "
+      *file << "Ren1" << " AddActor "
             << this->XYPlotTclName << endl;
 
       }

@@ -49,9 +49,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkPVWorldPointPicker.h"
 #include "vtkRenderer.h"
+#include "vtkPVRenderModule.h"
 
 vtkStandardNewMacro(vtkPVPivotManipulator);
-vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.3");
+vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.4");
 
 //-------------------------------------------------------------------------
 vtkPVPivotManipulator::vtkPVPivotManipulator()
@@ -92,7 +93,7 @@ void vtkPVPivotManipulator::OnButtonDown(int, int, vtkRenderer *ren,
     vtkPVRenderView *view = window->GetMainView();
     if (view)
       {
-      this->Picker->SetComposite(view->GetComposite());
+      this->Picker->SetComposite(app->GetRenderModule()->GetComposite());
       }
     else
       {

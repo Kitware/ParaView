@@ -49,6 +49,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMPIGroup.h"
 #endif
 
+#include "vtkPVProcessModule.h"
+#include "vtkPVRenderModule.h"
+
 #include "vtkCallbackCommand.h"
 #include "vtkCellData.h"
 #include "vtkCharArray.h"
@@ -73,10 +76,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOutputWindow.h"
 #include "vtkPVData.h"
 #include "vtkPVHelpPaths.h"
-#include "vtkPVHelpPaths.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVRenderGroupDialog.h"
 #include "vtkPVRenderGroupDialog.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSourceInterfaceDirectories.h"
@@ -119,7 +118,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.190");
+vtkCxxRevisionMacro(vtkPVApplication, "1.191");
+vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -299,6 +299,7 @@ vtkPVApplication::vtkPVApplication()
   char name[128];
 
   this->ProcessModule = NULL;
+  this->RenderModule = NULL;
   this->CommandFunction = vtkPVApplicationCommand;
   this->MajorVersion = 0;
   this->MinorVersion = 7;
@@ -371,6 +372,7 @@ vtkPVApplication::~vtkPVApplication()
     this->AboutDialog = 0;
     }
   this->SetProcessModule(NULL);
+  this->SetRenderModule(NULL);
   if ( this->TraceFile )
     {
     delete this->TraceFile;
@@ -1001,6 +1003,13 @@ void vtkPVApplication::Start(int argc, char*argv[])
     return;
     }
 
+  // Create the rendering module here.
+  vtkPVRenderModule* rm = vtkPVRenderModule::New();
+  this->SetRenderModule(rm);
+  rm->SetPVApplication(this);
+  rm->Delete();
+  rm = NULL;
+
   vtkstd::vector<vtkstd::string> open_files;
   // If any of the arguments has a .pvs extension, load it as a script.
   int i;
@@ -1010,6 +1019,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
       {
       if ( !vtkKWDirectoryUtilities::FileExists(argv[i]) )
         {
+        this->SetRenderModule(NULL);
         cout << "Cannot find file: " << argv[i] << endl;
         this->SetExitStatus(1);
         this->Exit();
@@ -1286,6 +1296,9 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
   vtkOutputWindow::SetInstance(0);
   this->OutputWindow->Delete();
+
+  // Circular reference.
+  this->SetRenderModule(NULL);
 }
 
 

@@ -48,8 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkKWEntry.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderModule.h"
+#include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.2");
+vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.3");
 vtkStandardNewMacro(vtkPVInteractorStyleCenterOfRotation);
 
 //-------------------------------------------------------------------------
@@ -94,7 +96,7 @@ void vtkPVInteractorStyleCenterOfRotation::Pick()
       ((vtkPVGenericRenderWindowInteractor*)this->Interactor)->GetPVRenderView();
     if (view)
       {
-      this->Picker->SetComposite(view->GetComposite());
+      this->Picker->SetComposite(view->GetPVApplication()->GetRenderModule()->GetComposite());
       }
     }
   int x = this->Interactor->GetEventPosition()[0];

@@ -68,6 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputProperty.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderModule.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
@@ -80,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.296");
+vtkCxxRevisionMacro(vtkPVSource, "1.297");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -605,7 +606,7 @@ void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
   this->VTKSources->AddItem(source);
   this->VTKSourceTclNames->AddString(tclName);
     
-  pvApp->Script("%s AddObserver ModifiedEvent {%s VTKSourceModifiedMethod}",
+  pvApp->Script("%s AddObserver ModifiedEvent {catch {%s VTKSourceModifiedMethod}}",
                 tclName, this->GetTclName());
     
   pvApp->BroadcastScript(
@@ -1251,7 +1252,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // for a polydata and imagedata collection.
     this->Update();
     
-    window->GetMainView()->AddPVSource(this);
+    this->GetPVApplication()->GetRenderModule()->AddPVSource(this);
     if (!this->GetHideDisplayPage())
       {
       this->Notebook->AddPage("Display");
@@ -1507,7 +1508,7 @@ void vtkPVSource::DeleteCallback()
   // Remove all of the actors mappers. from the renderer.
   if (this->PVOutput)
     {
-    this->GetPVRenderView()->RemovePVSource(this);
+    this->GetPVApplication()->GetRenderModule()->RemovePVSource(this);
     }    
 
   this->SetPVOutput(NULL);
@@ -2644,7 +2645,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.296 $");
+  this->ExtractRevision(os,"$Revision: 1.297 $");
 }
 
 //----------------------------------------------------------------------------

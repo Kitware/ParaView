@@ -93,10 +93,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkToolkits.h"
 #include "vtkTreeComposite.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVRenderModule.h"
+#include "vtkPVArrayInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.201");
+vtkCxxRevisionMacro(vtkPVData, "1.202");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -143,6 +145,7 @@ vtkPVData::vtkPVData()
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorMenu = vtkKWOptionMenu::New();
 
+  this->DirectColorCheck = vtkKWCheckButton::New();
   this->EditColorMapButton = vtkKWPushButton::New();
   
   this->ColorButton = vtkKWChangeColorButton::New();
@@ -245,6 +248,9 @@ vtkPVData::~vtkPVData()
 
   this->EditColorMapButton->Delete();
   this->EditColorMapButton = NULL;
+
+  this->DirectColorCheck->Delete();
+  this->DirectColorCheck = NULL;  
     
   this->ColorButton->Delete();
   this->ColorButton = NULL;
@@ -515,13 +521,6 @@ void vtkPVData::CreateProperties()
     this->ScalarBarCheck->GetWidgetName(),
     this->GetTclName());
 
-  this->EditColorMapButton->SetParent(this->ViewFrame->GetFrame());
-  this->EditColorMapButton->Create(this->Application, "");
-  this->EditColorMapButton->SetLabel("Edit Color Map...");
-  this->EditColorMapButton->SetCommand(this,"EditColorMapCallback");
-  this->EditColorMapButton->SetBalloonHelpString(
-    "Edit the table used to map data attributes to pseudo colors.");
-
   this->CubeAxesCheck->SetParent(this->ViewFrame->GetFrame());
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
@@ -536,13 +535,8 @@ void vtkPVData::CreateProperties()
                this->ResetCameraButton->GetWidgetName(),
                col_1_padx, button_pady);
 
-  this->Script("grid %s %s -sticky wns",
-               this->ScalarBarCheck->GetWidgetName(),
-               this->EditColorMapButton->GetWidgetName());
-
-  this->Script("grid %s -sticky news -padx %d -pady %d",
-               this->EditColorMapButton->GetWidgetName(),
-               col_1_padx, button_pady);
+  this->Script("grid %s -sticky wns",
+               this->ScalarBarCheck->GetWidgetName());
 
   this->Script("grid %s -sticky wns",
                this->CubeAxesCheck->GetWidgetName());
@@ -570,6 +564,25 @@ void vtkPVData::CreateProperties()
   this->ColorButton->SetCommand(this, "ChangeActorColor");
   this->ColorButton->SetBalloonHelpString(
     "Edit the constant color for the geometry.");
+
+
+  this->DirectColorCheck->SetParent(this->ColorFrame->GetFrame());
+  this->DirectColorCheck->Create(this->Application, "-text {Map Scalars}");
+  this->DirectColorCheck->SetState(1);
+  this->DirectColorCheck->SetBalloonHelpString(
+    "Toggle the visibility of the scalar bar for this data.");
+  this->Application->Script(
+    "%s configure -command {%s DirectColorCheckCallback}",
+    this->DirectColorCheck->GetWidgetName(),
+    this->GetTclName());
+
+  this->EditColorMapButton->SetParent(this->ColorFrame->GetFrame());
+  this->EditColorMapButton->Create(this->Application, "");
+  this->EditColorMapButton->SetLabel("Edit Color Map...");
+  this->EditColorMapButton->SetCommand(this,"EditColorMapCallback");
+  this->EditColorMapButton->SetBalloonHelpString(
+    "Edit the table used to map data attributes to pseudo colors.");
+
   
   this->Script("grid %s %s -sticky wns",
                this->ColorMenuLabel->GetWidgetName(),
@@ -582,8 +595,17 @@ void vtkPVData::CreateProperties()
   this->Script("grid %s -column 1 -sticky news -padx %d -pady %d",
                this->ColorButton->GetWidgetName(),
                col_1_padx, button_pady);
+  this->ColorButton->EnabledOff();
 
-  this->Script("grid remove %s", this->ColorButton->GetWidgetName());
+  this->Script("grid %s %s -sticky wns",
+               this->DirectColorCheck->GetWidgetName(),
+               this->EditColorMapButton->GetWidgetName());
+
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->EditColorMapButton->GetWidgetName(),
+               col_1_padx, button_pady);
+  this->DirectColorCheck->EnabledOff();
+  this->EditColorMapButton->EnabledOff();
 
   // Display style
 
@@ -1354,11 +1376,12 @@ void vtkPVData::ColorByPropertyInternal()
 
   this->SetPVColorMap(NULL);
 
-  this->Script("grid remove %s %s",
-               this->ScalarBarCheck->GetWidgetName(),
-               this->EditColorMapButton->GetWidgetName());
+  this->DirectColorCheck->EnabledOff();
+  this->EditColorMapButton->EnabledOff();
+  this->ScalarBarCheck->EnabledOff();
 
-  this->Script("grid %s", this->ColorButton->GetWidgetName());
+  this->ColorButton->EnabledOn();
+
 
   if (this->GetPVRenderView())
     {
@@ -1436,11 +1459,11 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
     pvApp->BroadcastScript("%s SelectColorArray {%s}",
                            part->GetPartDisplay()->GetLODMapperTclName(), name);
     } 
-  this->Script("grid remove %s", this->ColorButton->GetWidgetName());
+  this->ColorButton->EnabledOff();
+  this->UpdateDirectColorCheck(
+           this->PVSource->GetDataInformation()->GetPointDataInformation(),
+           name);
 
-  this->Script("grid %s %s",
-               this->ScalarBarCheck->GetWidgetName(),
-               this->EditColorMapButton->GetWidgetName());
 
   if ( this->GetPVRenderView() )
     {
@@ -1517,16 +1540,61 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
                            part->GetPartDisplay()->GetLODMapperTclName(), name);
     }
 
-  this->Script("grid remove %s", this->ColorButton->GetWidgetName());
-
-  this->Script("grid %s %s",
-               this->ScalarBarCheck->GetWidgetName(),
-               this->EditColorMapButton->GetWidgetName());
+  this->ColorButton->EnabledOff();
+  this->UpdateDirectColorCheck(
+           this->PVSource->GetDataInformation()->GetCellDataInformation(),
+           name);
 
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVData::UpdateDirectColorCheck(vtkPVDataSetAttributesInformation* info,
+                                       const char* name)
+{
+  vtkPVArrayInformation* arrayInfo;
+  
+  arrayInfo = info->GetArrayInformation(name);
+  
+  // First set of conditions.
+  if (arrayInfo == NULL || 
+      arrayInfo->GetDataType() != VTK_UNSIGNED_CHAR)
+    { // Direct mapping not an option.
+    this->DirectColorCheck->EnabledOff();
+    this->ScalarBarCheck->EnabledOn();
+    this->EditColorMapButton->EnabledOn();
+    return;
+    }
+
+  // Number of component restriction.
+  if (arrayInfo->GetNumberOfComponents() != 1 &&
+      arrayInfo->GetNumberOfComponents() != 3)
+    { // I would like to have two as an option also ...
+    this->DirectColorCheck->EnabledOff();
+    this->ScalarBarCheck->EnabledOn();
+    this->EditColorMapButton->EnabledOn();
+    return;
+    }
+
+  // Direct color map is an option.
+  this->DirectColorCheck->EnabledOn();
+
+  // I might like to store the default in another variable.
+  if (this->DirectColorCheck->GetState())
+    {
+    this->ScalarBarCheck->EnabledOff();
+    this->EditColorMapButton->EnabledOff();
+    }
+  else
+    {
+    this->ScalarBarCheck->EnabledOn();
+    this->EditColorMapButton->EnabledOn();
+    }
+    
 }
 
 //----------------------------------------------------------------------------
@@ -1795,7 +1863,7 @@ void vtkPVData::Initialize()
   
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
 
-  tclName = this->GetPVRenderView()->GetRendererTclName();
+  tclName = pvApp->GetRenderModule()->GetRendererTclName();
   
   sprintf(newTclName, "CubeAxes%d", this->InstanceCount);
   this->SetCubeAxesTclName(newTclName);
@@ -1839,7 +1907,7 @@ void vtkPVData::CenterCamera()
   vtkPVApplication *pvApp = this->GetPVApplication();
   char* tclName;
   
-  tclName = this->GetPVRenderView()->GetRendererTclName();
+  tclName = pvApp->GetRenderModule()->GetRendererTclName();
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
@@ -1915,6 +1983,8 @@ void vtkPVData::SetScalarBarVisibility(int val)
     }
 }
 
+
+// This should really be a part of vtkPVPartDisplay object.
 //----------------------------------------------------------------------------
 void vtkPVData::SetCubeAxesVisibility(int val)
 {
@@ -1927,7 +1997,7 @@ void vtkPVData::SetCubeAxesVisibility(int val)
     }
   
   ren = this->GetPVRenderView()->GetRenderer();
-  tclName = this->GetPVRenderView()->GetRendererTclName();
+  tclName = this->GetPVApplication()->GetRenderModule()->GetRendererTclName();
   
   if (ren == NULL)
     {
@@ -1978,6 +2048,44 @@ void vtkPVData::CubeAxesCheckCallback()
     }
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVData::DirectColorCheckCallback()
+{
+  this->SetDirectColorFlag(this->DirectColorCheck->GetState());
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetDirectColorFlag(int val)
+{
+  if (this->DirectColorCheck->GetState() != val)
+    {
+    this->AddTraceEntry("$kw(%s) SetDirectColorFlag %d", this->GetTclName(), val);
+    this->DirectColorCheck->SetState(val);
+    }
+
+  if (val)
+    {
+    this->EditColorMapButton->EnabledOff();
+    this->ScalarBarCheck->EnabledOff();
+    }
+  else
+    {
+    this->EditColorMapButton->EnabledOn();
+    this->ScalarBarCheck->EnabledOn();
+    }
+
+  int num, idx;
+  num = this->PVSource->GetNumberOfPVParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->PVSource->GetPVPart(idx)->GetPartDisplay()->SetDirectColorFlag(val);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetPointSize(int size)
@@ -2112,7 +2220,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
   int numOutputs;
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
 
-  renTclName = this->GetPVRenderView()->GetRendererTclName();
+  renTclName = this->GetPVApplication()->GetRenderModule()->GetRendererTclName();
   if (this->GetVisibility())
     {
     if (this->PVColorMap)
@@ -2798,7 +2906,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.201 $");
+  this->ExtractRevision(os,"$Revision: 1.202 $");
 }
 
 //----------------------------------------------------------------------------

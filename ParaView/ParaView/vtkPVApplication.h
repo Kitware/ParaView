@@ -48,12 +48,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWApplication.h"
 
+class vtkPVProcessModule;
+class vtkPVRenderModule;
+
 class vtkDataSet;
 class vtkKWMessageDialog;
 class vtkMapper;
 class vtkMultiProcessController;
 class vtkSocketController;
-class vtkPVProcessModule;
 class vtkPVOutputWindow;
 class vtkPVSource;
 class vtkPVWindow;
@@ -81,6 +83,19 @@ public:
   int ParseCommandLineArguments(int argc, char*argv[]);
 
   // Description:
+  // Process module contains all methods for managing 
+  // processes and communication.
+  void SetProcessModule(vtkPVProcessModule *module);
+  vtkPVProcessModule* GetProcessModule() { return this->ProcessModule;}
+  
+  // Description:
+  // RenderingModule has the rendering abstraction.  It creates the render window
+  // and any composit manager.  It also creates part displays which
+  // handle level of details.
+  void SetRenderModule(vtkPVRenderModule *module);
+  vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
+
+  // Description:
   // Start running the main application.
   virtual void Start(int argc, char *argv[]);
   virtual void Start()
@@ -102,12 +117,6 @@ public:
 //ETX
   void RemoteSimpleScript(int remoteId, const char *str);
   void BroadcastSimpleScript(const char *str);
-  
-  // Description:
-  // Process module contains all methods for managing 
-  // processes and communication.
-  void SetProcessModule(vtkPVProcessModule *module);
-  vtkPVProcessModule* GetProcessModule() { return this->ProcessModule;}
   
   // Description:
   // We need to keep the controller in a prominent spot because there is no
@@ -334,6 +343,9 @@ protected:
   int CheckRegistration();
   int PromptRegistration(char *,char *);
 
+  vtkPVProcessModule *ProcessModule;
+  vtkPVRenderModule *RenderModule;
+
   // For running with SGI pipes.
   int NumberOfPipes;
 
@@ -373,8 +385,6 @@ protected:
   static int GlobalLODFlag;
 
   int RunningParaViewScript;
-
-  vtkPVProcessModule *ProcessModule;
   
   vtkPVOutputWindow *OutputWindow;
 
