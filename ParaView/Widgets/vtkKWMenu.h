@@ -165,6 +165,12 @@ public:
   // Description:
   // Set state of the menu entry with a given index.
   void SetState(int index, int state);
+  void SetState(const char* item, int state);
+
+  // Description:
+  // Set command of the menu entry with a given index.
+  void SetCommand(int index, vtkKWObject* object, const char* MethodAndArgString);
+  void SetCommand(const char* item, vtkKWObject* object, const char* method);
 
 //BTX
   enum { Normal = 0, Active, Disabled };
