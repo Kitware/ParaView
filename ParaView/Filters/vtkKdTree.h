@@ -1,3 +1,5 @@
+// -*- c++ -*-
+
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -5,6 +7,23 @@
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
+
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+  Copyright (C) 2003 Sandia Corporation
+  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+  license for use of this work by or on behalf of the U.S. Government.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that this Notice and any statement
+  of authorship are reproduced on all copies.
+
+  Contact: Lee Ann Fisk, lafisk@sandia.gov
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
@@ -25,16 +44,17 @@
 #ifndef __vtkKdTree_h
 #define __vtkKdTree_h
 
-//#include "vtksnlGraphicsWin32Header.h"
+#include <vtkLocator.h>
 
-#include "vtkTimerLog.h"
-#include "vtkLocator.h"
-#include "vtkIdList.h"
-#include "vtkPoints.h"
-#include "vtkCellArray.h"
-#include "vtkRenderer.h"
-#include "vtkVersion.h"
-#include "vtkPlanesIntersection.h"
+class vtkTimerLog;
+class vtkIdList;
+class vtkPoints;
+class vtkCellArray;
+class vtkRenderer;
+class vtkPlanesIntersection;
+class vtkPlanes;
+class vtkCell;
+class vtkCamera;
 
 #define makeCompareFunc(name, loc) \
    static int compareFunc##name(const void *a, const void *b){ \
@@ -60,18 +80,33 @@ public:
 
   void SetBounds(double x1,double x2,double y1,double y2,double z1,double z2);
   void GetBounds(double *b) const;
+  void GetBounds(float *b) const;
+
 
   void SetDataBounds(double x1,double x2,double y1,double y2,double z1,double z2);
   void SetDataBounds(float *b);  
   void GetDataBounds(double *b) const;
+  void GetDataBounds(float *b) const;
 
   void PrintNode(int depth);
   void PrintVerboseNode(int depth);
   void AddChildNodes(vtkKdNode *left, vtkKdNode *right);
 
-  int IntersectsBox(float x1, float x2, float y1, float y2, float z1, float z2);
-  int IntersectsBox(double x1,double x2,double y1,double y2,double z1,double z2);
-  int IntersectsRegion(vtkPlanesIntersection *pi);
+  int IntersectsBox(float x1, float x2, float y1, float y2, float z1, float z2,
+                    int useDataBounds);
+  int IntersectsBox(double x1,double x2,double y1,double y2,double z1,double z2,
+                    int useDataBounds);
+  int IntersectsRegion(vtkPlanesIntersection *pi, int useDataBounds);
+
+  int IntersectsCell(vtkCell *cell, int useDataBounds, int cellRegion=-1);
+
+  int ContainsBox(float x1, float x2, float y1, float y2, float z1, float z2,
+                     int useDataBounds);
+  int ContainsBox(double x1,double x2,double y1,double y2,double z1,double z2,
+                     int useDataBounds);
+
+  int ContainsPoint(float x, float y, float z, int useDataBounds);
+  int ContainsPoint(double x, double y, double z, int useDataBounds);
 
   static const char *LevelMarker[20];
 
@@ -87,6 +122,11 @@ public:
   int Dim;
 
   int Id;        // region id
+
+  int MinId;
+  int MaxId;
+
+  float *cellBoundsCache;  // to optimize IntersectsCell
 };
 //ETX
 
@@ -118,17 +158,6 @@ public:
     // Description:
     //    Level of complete tree
     vtkGetMacro(Level, int);
-
-    // Description:
-    //    The cell centers are the points used in computing the
-    //    spatial decomposition.  They are normally deleted after
-    //    construction of the k-d tree.  If you plan to CreateCellList
-    //    (make lists of cells found in each region) it is efficient
-    //    to retain the cell centers.
-
-    vtkSetMacro(RetainCellLocations, int);
-    vtkGetMacro(RetainCellLocations, int);
-    vtkBooleanMacro(RetainCellLocations, int);
 
     // Description:
     //    Omit partitions along the X axis, yielding shafts in the X direction
@@ -208,55 +237,118 @@ public:
     void GetRegionDataBounds(int regionID, float bounds[6]);
 
     // Description:
+    //    Get the spatial bounds of a list k-d tree regions
+
+    void GetRegionsBounds(int *regions, int numRegions, float bounds[6]);
+    
+    // Description:
+    //    Get the bounds of the data within a list of k-d tree regions
+    
+    void GetRegionsDataBounds(int *regions, int numRegions, float bounds[6]);
+    
+    // Description:
     //    Print out nodes of kd tree
     void PrintTree();
     void PrintVerboseTree();
- 
+    
     // Description:
     //    Print out leaf node data for given id
     void PrintRegion(int id){ this->RegionList[id]->PrintNode(0);}
+    
+    // Description:
+    //   Create a list for each of the requested regions, listing
+    //   the IDs of all cells whose centroid falls in the region.
+    //   These lists are obtained with GetCellList().
+    //   If no DataSet is specified, the cell list is created
+    //   for DataSet 0.  If no list of requested regions is provided,
+    //   the cell lists for all regions are created.  
+    //
+    //   When CreateCellLists is called again, the lists created
+    //   on the previous call  are deleted.
+    
+    void CreateCellLists(int DataSet, vtkIdType *regionReqList, 
+                         int reqListSize);
+    void CreateCellLists(vtkDataSet *set, vtkIdType *regionReqList,
+                         int reqListSize);
+    void CreateCellLists(vtkIdType *regionReqList, int listSize);
+    void CreateCellLists(); 
+    
+    // Description:
+    //   If IncludeRegionBoundaryCells is ON,
+    //   CreateCellLists() will also create a list of cells which
+    //   intersect a given region, but are not assigned
+    //   to the region.  These lists are obtained with 
+    //   GetBoundaryCellList().  Default is OFF.
+
+    vtkSetMacro(IncludeRegionBoundaryCells, int);
+    vtkGetMacro(IncludeRegionBoundaryCells, int);
+    vtkBooleanMacro(IncludeRegionBoundaryCells, int);
 
     // Description:
-    //    Create cell list for a region or regions.  If no DataSet is 
-    //    specified, the cell list is created for DataSet 0.  If no
-    //    region list is provided, the cell lists for all regions are
-    //    created.
+    //    Free the memory used by the cell lists.
 
-    void CreateCellList(int DataSet, vtkIdType *regionList, int listSize);
-    void CreateCellList(vtkDataSet *set, vtkIdType *regionList, int listSize);
-    void CreateCellList(vtkIdType *regionList, int listSize);
-    void CreateCellList();
+    void DeleteCellLists();
 
     // Description:
-    //    Free the memory used by the cell list.  If not DataSet is
-    //    specified, assume DataSet 0.  If no region list is provided, 
-    //    free memory used by all cell lists computed.
+    //    Get the cell list for a region.
 
-    void DeleteCellList(int DataSet, vtkIdType *regionList, int listSize);
-    void DeleteCellList(vtkDataSet *set, vtkIdType *regionList, int listSize);
-    void DeleteCellList(vtkIdType *regionList, int listSize);
-    void DeleteCellList();
-
-    // Description:
-    //    Get the cell list for a region.  If no DataSet is 
-    //    specified, the cell list for DataSet 0 is returned.
-
-    vtkIdList *GetCellList(int DataSet, int regionID);
-    vtkIdList *GetCellList(vtkDataSet *set, int regionID);
     vtkIdList *GetCellList(int regionID);
 
     // Description:
-    //    Get the id of the region containing the cell.  If
-    //    no DataSet is specified, assume DataSet 0.
+    //    The cell list obtained with GetCellList is the list
+    //    of all cells such that their centroid is contained in
+    //    the spatial region.  It may also be desirable to get
+    //    a list of all cells intersecting a spatial region,
+    //    but with centroid in some other region.  This is that
+    //    list.  This list is computed in CreateCellLists() if
+    //    and only if IncludeRegionBoundaryCells is ON.
+
+    vtkIdList *GetBoundaryCellList(int regionID);
+
+    // Description:
+    //    Get the id of the region containing the cell centroid.  If
+    //    no DataSet is specified, assume DataSet 0.  If you need the
+    //    region ID for every cell, use AllGetRegionContainingCell
+    //    instead.  It is more efficient.
 
     int GetRegionContainingCell(vtkDataSet *set, vtkIdType cellID);
     int GetRegionContainingCell(int set, vtkIdType cellID);
     int GetRegionContainingCell(vtkIdType cellID);
 
     // Description:
+    //    Get a list (in order by data set by cell id) of the
+    //    region IDs of the region containing the centroid for
+    //    each cell.
+    //    This is faster than calling GetRegionContainingCell
+    //    for each cell in the DataSet.
+    //    vtkKdTree uses this list, so don't delete it.
+
+    int *AllGetRegionContainingCell();
+
+    // Description:
     //    Get the id of the region containing the specified location.
 
     int GetRegionContainingPoint(float x, float y, float z);
+    
+    // Description:
+    //    Given a vtkCamera, this function creates a list of the k-d tree
+    //    region IDs in order from front to back with respect to the
+    //    camera's direction of projection.  The number of regions in
+    //    the ordered list is returned.  (This is not actually sorting
+    //    the regions on their distance from the view plane, but there
+    //    is no region on the list which blocks a region that appears
+    //    earlier on the list.)
+
+    int DepthOrderAllRegions(vtkCamera *camera, vtkIdList *orderedList);
+    
+    // Description:
+    //    Given a vtkCamera, and a list of k-d tree region IDs, this
+    //    function creates an ordered list of those IDs
+    //    in front to back order with respect to the
+    //    camera's direction of projection.  The number of regions in
+    //    the ordered list is returned.
+    
+    int DepthOrderRegions(vtkIdList *regionIds, vtkCamera *camera, vtkIdList *orderedList);
 
     // Description:
     //    Determine whether a region of the spatial decomposition 
@@ -311,6 +403,32 @@ public:
                          int nvertices, double *vertices);
 
     // Description:
+    //    Determine whether a region of the spatial decomposition
+    //    intersects the given cell.  If a cell Id is given, and
+    //    no data set is specified, data set 0 is assumed.  If you
+    //    already know the region that the cell centroid lies in,
+    //    (perhaps from a previous call to AllGetRegionContainingCell),
+    //    provide that as the last argument to make the computation
+    //    quicker.
+
+    int IntersectsCell(int regionId, vtkCell *cell, int cellRegion=-1);
+    int IntersectsCell(int regionId, int cellId, int cellRegion=-1);
+    int IntersectsCell(int regionId, vtkDataSet *Set, int cellId, int cellRegion=-1);
+
+    // Description:
+    //    Compute a list of the Ids of all regions that
+    //    intersect the given cell.  If a cell Id is given,
+    //    and no data set is specified, data set 0 is assumed.  If you
+    //    already know the region that the cell centroid lies in,
+    //    provide that as the last argument to make the computation
+    //    quicker.
+    //    Returns the number of regions the cell intersects.
+
+    int IntersectsCell(int *ids, int len, vtkCell *cell, int cellRegion=-1);
+    int IntersectsCell(int *ids, int len, int cellId, int cellRegion=-1);
+    int IntersectsCell(int *ids, int len, vtkDataSet *set, int cellId, int cellRegion=-1);
+
+    // Description:
     //    Determine whether a region of the spatial decomposition 
     //    intersects a region which is the view frustum obtained from 
     //    an axis aligned rectangular viewport.  
@@ -333,39 +451,79 @@ public:
     int IntersectsFrustum(int *ids, int len,  vtkRenderer *ren, 
            double x0, double x1, double y0, double y1);
 
+    // Description:
+    //   Given a list of region IDs, determine the decomposition of
+    //   these regions into the minimal number of convex subregions.  Due
+    //   to the way the k-d tree is constructed, those convex subregions
+    //   will be axis-aligned boxes.  Return the minimal number of
+    //   such convex regions that compose the original region list.
+    //   This call will set convexRegionBounds to point to a list
+    //   of the bounds of these regions.  Caller should free this.
+    //   There will be six values for each convex subregion (xmin,
+    //   xmax, ymin, ymax, zmin, zmax).  If the regions in the
+    //   regionIdList form a box already, a "1" is returned and the
+    //   second argument contains the bounds of the box.
+    
+    int MinimalNumberOfConvexSubRegions(vtkIdList *regionIdList,
+                                        float **convexRegionBounds);
+    
+    // Description:
+    //   When computing the intersection of k-d tree regions with other
+    //   objects, we use the spatial bounds of the region.  To use the
+    //   tighter bound of the bounding box of the data within the region,
+    //   set this variable ON.
+    
+    vtkBooleanMacro(ComputeIntersectionsUsingDataBounds, int);
+    vtkSetMacro(ComputeIntersectionsUsingDataBounds, int);
+    vtkGetMacro(ComputeIntersectionsUsingDataBounds, int);
 
     // Description:
-    // Satisfy vtkLocator abstract interface.
+    // Create the k-d tree decomposition of the cells of the data set
+    // or data sets.  Cells are assigned to k-d tree spatial regions
+    // based on the location of their centroids.
 
     void BuildLocator();
-    void FreeSearchStructure();
-    void GenerateRepresentation(int level, vtkPolyData *pd);
 
     // Description:
-    //    Generate a polygonal representation of a list of regions
+    // Delete the k-d tree data structure. Also delete any
+    // cell lists that were computed with CreateCellLists().
 
+    void FreeSearchStructure();
+    
+    // Description:
+    // Create a polydata representation of the boundaries of
+    // the k-d tree regions.  If level equals GetLevel(), the
+    // leaf nodes are represented.
+    
+    void GenerateRepresentation(int level, vtkPolyData *pd);
+    
+    // Description:
+    //    Generate a polygonal representation of a list of regions.
+    //    Only leaf nodes have region IDs, so these will be leaf nodes.
+    
     void GenerateRepresentation(int *regionList, int len, vtkPolyData *pd);
+
+    // Description:
+    //    The polydata representation of the k-d tree shows the boundaries
+    //    of the k-d tree decomposition spatial regions.  The data inside
+    //    the regions may not occupy the entire space.  To draw just the
+    //    bounds of the data in the regions, set this variable ON.
+
+    vtkBooleanMacro(GenerateRepresentationUsingDataBounds, int);
+    vtkSetMacro(GenerateRepresentationUsingDataBounds, int);
+    vtkGetMacro(GenerateRepresentationUsingDataBounds, int);
 
     // Description:
     //    Print timing of k-d tree build
     virtual void PrintTiming(ostream& os, vtkIndent indent);
 
-    // Note: I took users out because they looked like they were there only
-    // to propagete mtimes.  Filters that user KDTrees should consider the
-    // locator when computing there MTime.  If the users gave the ability
-    // to use more than one input to generate the KD tree, then I will put the 
-    // users back in.
-
     // Description:
-    //    If a filter object is using a vtkKdTree, and wants to be sure
-    //    to re-execute when the vtkKdTree changes, then register that
-    //    object as a user of the vtkKdTree.  It's MTime will be updated
-    //    when the vtkKdTree parameters change.
-    //void AddUser(vtkObject *c);
-    //void RemoveUser(vtkObject *c);
-    //vtkGetMacro(NumberOfUsers,int);
-    //int IsUser(vtkObject *c);
-    //vtkObject *GetUser(int i);
+    //    Write six floats to the bounds array giving the bounds
+    //    of the specified cell.
+    
+//BTX                             
+    static inline void SetCellBounds(vtkCell *cell, float *bounds);
+//ETX
 
 protected:
 
@@ -373,26 +531,14 @@ protected:
     ~vtkKdTree();
 
     void Modified();
-    //void UpdateUserMTimes();
 
 //BTX
     static const int xdim;
     static const int ydim;
     static const int zdim;
 
-    static const int PrecisionFactor;
-
     int ValidDirections;
-
-    struct _cellList{
-      vtkDataSet *dataSet;
-      vtkIdType *regionIds;
-      int nRegions;
-      vtkIdList **cells;
-    };
 //ETX
-
-    void FreeCellLists();
 
     int MinCells;
     int NumRegions;              // number of leaf nodes
@@ -400,14 +546,10 @@ protected:
     vtkDataSet **DataSets;
     int NumDataSets;
 
-
 //BTX
     vtkKdNode *Top;
     vtkKdNode **RegionList;      // indexed by region ID
-
-    struct _cellList *CellList;
 //ETX
-    int NumCellLists;
 
     int Timing;
     vtkTimerLog *TimerLog;
@@ -431,47 +573,69 @@ protected:
     static void GetLeafNodeIds(vtkKdNode *node, vtkIdList *ids);
 
     // Description:
-    //    Compute the list of centers of all cells.  These are automatically
-    //    computed in BuildLocator, but deleted unless RetainCellLocationsOn.
-    //    Returns 0 on success, 1 if memory allocation fails.
+    //   Returns the total number of cells in all the data sets
 
-    int ComputeCellCenters();
+    int GetNumberOfCells();
+
+    // Description:
+    //   Returns the total number of cells in data set 1 through
+    //   data set 2.
+
+    int GetDataSetsNumberOfCells(int set1, int set2);
 
     // Description:
     //    Get or compute the center of one cell.  If the DataSet is
-    //    NULL, the first DataSet is used. 
+    //    NULL, the first DataSet is used.  This is the point used in
+    //    determining to which spatial region the cell is assigned.
 
     void ComputeCellCenter(vtkDataSet *set, int cellId, float *center);
 
     // Description:
-    //   Get a pointer to our list of all cell centers, in order by
-    //   DataSet by cellId.
+    //    Compute and return a pointer to a list of all cell centers,
+    //    in order by data set by cell Id.  If a DataSet is specified
+    //    cell centers for cells of that data only are returned.  If
+    //    no DataSet is specified, the cell centers of cells in all
+    //    DataSets are returned.  The caller should free the list of
+    //    cell centers when done.
 
-    float *GetCellCenters(){return this->CellCenters;}
-
-    // Description:
-    //   Get the number of 3-tuples on the list of cell centers.
-
-    int GetNumberOfCellCenters(){return this->CellCentersSize;}
-
-    // Description:
-    //    Free memory taken by cell centers.
-
-    void FreeCellCenters();
+    float *ComputeCellCenters();
+    float *ComputeCellCenters(int set);
+    float *ComputeCellCenters(vtkDataSet *set);
 
 private:
 
     vtkKdTree(const vtkKdTree&);
 
 //BTX
-    int DivideRegion(vtkKdNode *kd, float *c1, int nlevels);
+    virtual int DivideRegion(vtkKdNode *kd, float *c1, int nlevels);
     void SelfRegister(vtkKdNode *kd);
+
+    struct _cellList{
+      vtkDataSet *dataSet;        // cell lists for which data set
+      vtkIdType *regionIds;       // NULL if listing all regions
+      int nRegions;
+      vtkIdList **cells;
+      vtkIdList **boundaryCells;
+    };
+
+    void InitializeCellLists();
+    vtkIdList *GetList(int regionId, vtkIdList **which);
+
+    void ComputeCellCenter(vtkCell* cell, float *center, float *weights);
+
 //ETX
 
 
 //BTX
-    void _generateRepresentation(vtkKdNode *kd, vtkPoints *pts,
+    void GenerateRepresentationDataBounds(int level, vtkPolyData *pd);
+    void _generateRepresentationDataBounds(vtkKdNode *kd, vtkPoints *pts,
                                        vtkCellArray *polys, int level);
+
+    void GenerateRepresentationWholeSpace(int level, vtkPolyData *pd);
+    void _generateRepresentationWholeSpace(vtkKdNode *kd, vtkPoints *pts,
+                                       vtkCellArray *polys, int level);
+
+    void AddPolys(vtkKdNode *kd, vtkPoints *pts, vtkCellArray *polys);
 
     int _IntersectsBox(vtkKdNode *node, int *ids, int len,
                              double x0, double x1,
@@ -479,6 +643,9 @@ private:
 
     int _IntersectsRegion(vtkKdNode *node, int *ids, int len,
                                  vtkPlanesIntersection *pi);
+
+    int _IntersectsCell(vtkKdNode *node, int *ids, int len,
+                                  vtkCell *cell, int cellRegion=-1);
 
     void _printTree(int verbose);
     static void __printTree(vtkKdNode *kd, int depth, int verbose);
@@ -488,41 +655,35 @@ private:
     static int Select(int dim, float *c1, int nvals, double &coord);
     static float findMaxLeftHalf(int dim, float *c1, int K);
     static void _Select(int dim, float *X, int L, int R, int K);
+    static int __DepthOrderRegions(vtkKdNode *node, vtkIdList *list, float dir[3], int size);
 
 //BTX
     static int ComputeLevel(vtkKdNode *kd);
     static int SelfOrder(int id, vtkKdNode *kd);
-    static void AddPolys(vtkKdNode *kd, vtkPoints *pts, vtkCellArray *polys);
     static int findRegion(vtkKdNode *node, float x, float y, float z);
 //ETX
-
-    static float sensibleZcoordinate(vtkRenderer *ren);
-    static void computeNormal(float *p1, float *p2, float *p3, float N[3]);
-    static void pointOnPlane(float a, float b, float c, float d, float pt[3]);
-    static vtkPlanesIntersection *ConvertFrustumToWorldPerspective(
-         vtkRenderer *ren, double xmin, double xmax, double ymin, double ymax);
-    static vtkPlanesIntersection *ConvertFrustumToWorldParallel(
-         vtkRenderer *ren, double xmin, double xmax, double ymin, double ymax);
-    static vtkPlanesIntersection *ConvertFrustumToWorld(
-         vtkRenderer *ren, double x0, double x1, double y0, double y1);
-
-
-//BTX
-    static void DeleteAllCellLists(struct vtkKdTree::_cellList *list);
-    void DeleteSomeCellLists(struct vtkKdTree::_cellList *list, 
-              int ndelete, vtkIdType *rlist, int listsize);
-//ETX
-    static int OnList(vtkIdType *list, int size, vtkIdType n);
 
     static vtkKdNode **_GetRegionsAtLevel(int level, 
                    vtkKdNode **nodes, vtkKdNode *kd);
 
+    static int __ConvexSubRegions(int *ids, int len, vtkKdNode *tree, vtkKdNode **nodes);
 
     int NumDataSetsAllocated;
-    int NumCellListsAllocated;
 
-    float *CellCenters;
-    int CellCentersSize;
-    int RetainCellLocations;
+    int IncludeRegionBoundaryCells;
+    float cellBoundsCache[6];       // to optimize IntersectsCell()
+
+    int GenerateRepresentationUsingDataBounds;
+    int ComputeIntersectionsUsingDataBounds;
+
+//BTX
+    struct _cellList CellList;
+//ETX
+
+    // Region Ids, by data set by cell id - this list is large (one
+    // int per cell) but accelerates creation of cell lists
+
+    int *CellRegionList;
+
 };
 #endif
