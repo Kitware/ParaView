@@ -27,13 +27,15 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
 {
-  this->SetPosition1(0.87,0.25);
-  this->SetPosition2(0.13,0.5);
+  this->Position1[0] = 0.87;
+  this->Position1[1] = 0.25;
+  this->Position2[0] = 0.13;
+  this->Position2[1] = 0.5;
   this->Orientation = VTK_ORIENT_VERTICAL;
 }
 
