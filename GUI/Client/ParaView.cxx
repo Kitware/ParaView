@@ -209,7 +209,7 @@ int MyMain(int argc, char *argv[])
     int idx;
     for (idx = 0; idx < argc; ++idx)
       {
-      const char* arg = "--connect_id";
+      const char* arg = "--connect-id";
       if (strncmp(argv[idx], arg, strlen(arg)) == 0)
         {
         // Strip string to equals sign.
