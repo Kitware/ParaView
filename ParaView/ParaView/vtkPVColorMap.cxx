@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.75");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.76");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2209,6 +2209,51 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
                           this->GetTclName(), pos2[0], pos2[1]);
       this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d",
                           this->GetTclName(), sact->GetOrientation());
+
+      // Synchronize the server scalar bar.
+      int fixme;  // Create a scalar bar actor (not widget) on the server.
+
+      vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << this->ScalarBarID << "GetScalarBarActor"
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << vtkClientServerStream::LastResult 
+                      << "GetPositionCoordinate" 
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << vtkClientServerStream::LastResult 
+                      << "SetValue" << pos1[0] << pos1[1]
+                      << vtkClientServerStream::End;
+
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << this->ScalarBarID << "GetScalarBarActor"
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << vtkClientServerStream::LastResult 
+                      << "SetOrientation" 
+                      << this->ScalarBar->GetScalarBarActor()->GetOrientation() 
+                      << vtkClientServerStream::End;
+
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << this->ScalarBarID << "GetScalarBarActor"
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << vtkClientServerStream::LastResult 
+                      << "SetWidth" 
+                      << this->ScalarBar->GetScalarBarActor()->GetWidth() 
+                      << vtkClientServerStream::End;
+
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << this->ScalarBarID << "GetScalarBarActor"
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << vtkClientServerStream::LastResult 
+                      << "SetHeight" 
+                      << this->ScalarBar->GetScalarBarActor()->GetHeight() 
+                      << vtkClientServerStream::End;
+      pm->SendStreamToServer();
+
       break;
     }
 }
