@@ -58,7 +58,42 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
   char fullPath[256];
   
   // Create the vtkSource.
-  sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
+  if (this->GetDataFileName())
+    {
+    char *extension;
+    int position;
+    char *endingSlash = NULL;
+    char *newTclName;
+    
+    extension = strrchr(this->DataFileName, '.');
+    position = extension - this->DataFileName;
+    strncpy(tclName, this->DataFileName, position);
+    tclName[position] = '\0';
+
+    if ((endingSlash = strrchr(tclName, '/')))
+      {
+      position = endingSlash - tclName + 1;
+      newTclName = new char[strlen(tclName) - position + 1];
+      strcpy(newTclName, tclName + position);
+      strcpy(tclName, "");
+      strcat(tclName, newTclName);
+      delete [] newTclName;
+      }
+    if (isdigit(tclName[0]))
+      {
+      // A VTK object names beginning with a digit is invalid.
+      newTclName = new char[strlen(tclName) + 3];
+      sprintf(newTclName, "PV%s", tclName);
+      strcpy(tclName, "");
+      strcat(tclName, newTclName);
+      delete [] newTclName;
+      }
+    }
+  else
+    {
+    sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
+    }
+  
   // Create the object through tcl on all processes.
   reader = (vtkGenericEnSightReader *)
     (pvApp->MakeTclObject(this->SourceClassName, tclName));

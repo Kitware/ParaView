@@ -470,6 +470,10 @@ void vtkPVWindow::Open()
   int i, numSourceInterfaces;
   char* className;
   vtkPVSourceInterface *sInt;
+  char rootName[100];
+  int position;
+  char *endingSlash = NULL;
+  char *newRootName;
   
   this->Script("set openFileName [tk_getOpenFile -filetypes {{{VTK files} {.vtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
   openFileName = this->GetPVApplication()->GetMainInterp()->result;
@@ -480,6 +484,27 @@ void vtkPVWindow::Open()
     }
   
   extension = strrchr(openFileName, '.');
+  position = extension - openFileName;
+  strncpy(rootName, openFileName, position);
+  rootName[position] = '\0';
+  if ((endingSlash = strrchr(rootName, '/')))
+    {
+    position = endingSlash - rootName + 1;
+    newRootName = new char[strlen(rootName) - position + 1];
+    strcpy(newRootName, rootName + position);
+    strcpy(rootName, "");
+    strcat(rootName, newRootName);
+    delete [] newRootName;
+    }
+  if (isdigit(rootName[0]))
+    {
+    // A VTK object names beginning with a digit is invalid.
+    newRootName = new char[strlen(rootName) + 3];
+    sprintf(newRootName, "PV%s", rootName);
+    strcpy(rootName, "");
+    strcat(rootName, newRootName);
+    delete [] newRootName;
+    }
   
   numSourceInterfaces = this->SourceInterfaces->GetNumberOfItems();
   
@@ -521,6 +546,7 @@ void vtkPVWindow::Open()
       if (strcmp(className, "vtkPOPReader") == 0)
 	{
 	sInt->SetDataFileName(openFileName);
+        sInt->SetRootName(rootName);
 	sInt->CreateCallback();
 	}
       }
@@ -535,6 +561,7 @@ void vtkPVWindow::Open()
       if (strcmp(className, "vtkSTLReader") == 0)
 	{
 	sInt->SetDataFileName(openFileName);
+        sInt->SetRootName(rootName);
 	sInt->CreateCallback();
 	}
       }
