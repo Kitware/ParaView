@@ -1,17 +1,9 @@
 <ModuleInterfaces>
-  <Writer input="vtkDataSet"
-          class="vtkPVWriter"
-          writer="vtkDataSetWriter"
-          data_mode_method="SetFileTypeToBinary"
-          extension=".vtk"
-          file_description="VTK Files"/>
-  <Writer input="vtkDataSet"
-          class="vtkPVWriter"
-          writer="vtkPDataSetWriter"
-          data_mode_method="SetFileTypeToBinary"
-          parallel="1"
-          extension=".pvtk"
-          file_description="PVTK Files"/>
+ <Writer input="vtkDataSet"
+         class="vtkPVCollectionWriter"
+         writer="vtkXMLPVCollectionWriter"
+         extension=".pvd"
+         file_description="ParaView Data Files"/>
  <Writer input="vtkPolyData" 
          class="vtkPVWriter"
          writer="vtkXMLPolyDataWriter"
@@ -67,10 +59,11 @@
          parallel="1"
          extension=".pvti"
          file_description="PVTK ImageData Files"/>
- <Writer input="vtkDataSet"
-         class="vtkPVCollectionWriter"
-         writer="vtkXMLPVCollectionWriter"
-         extension=".pvd"
-         file_description="ParaView Data Files"/>
+  <Writer input="vtkDataSet"
+          class="vtkPVWriter"
+          writer="vtkDataSetWriter"
+          data_mode_method="SetFileTypeToBinary"
+          extension=".vtk"
+          file_description="VTK Files"/>
 </ModuleInterfaces>
 
