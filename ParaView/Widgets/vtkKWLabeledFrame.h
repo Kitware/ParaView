@@ -78,8 +78,6 @@ public:
 protected:
   vtkKWLabeledFrame();
   ~vtkKWLabeledFrame();
-  vtkKWLabeledFrame(const vtkKWLabeledFrame&) {};
-  void operator=(const vtkKWLabeledFrame&) {};
 
   vtkKWWidget *Border;
   vtkKWWidget *Border2;
@@ -89,6 +87,9 @@ protected:
   vtkKWWidget *Icon;
   int Displayed;
   static int AllowShowHide;
+private:
+  vtkKWLabeledFrame(const vtkKWLabeledFrame&); // Not implemented
+  void operator=(const vtkKWLabeledFrame&); // Not implemented
 };
 
 

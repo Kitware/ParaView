@@ -173,8 +173,6 @@ protected:
   
   vtkKWMenu();
   ~vtkKWMenu();
-  vtkKWMenu(const vtkKWMenu&) {};
-  void operator=(const vtkKWMenu&) {};
 
   void AddGeneric(const char* addtype, const char* label, vtkKWObject* Object,
 		  const char* MethodAndArgString, const char* extra, const char* help);
@@ -184,6 +182,9 @@ protected:
 
   int TearOff;
   
+private:
+  vtkKWMenu(const vtkKWMenu&); // Not implemented
+  void operator=(const vtkKWMenu&); // Not implemented
 };
 
 

@@ -101,8 +101,6 @@ public:
 protected:
   vtkKWNotebook();
   ~vtkKWNotebook();
-  vtkKWNotebook(const vtkKWNotebook&) {};
-  void operator=(const vtkKWNotebook&) {};
 
   int MinimumWidth;
   int MinimumHeight;
@@ -123,6 +121,9 @@ protected:
   vtkKWWidget **Frames;
   vtkKWWidget **Buttons;
   char **Titles;
+private:
+  vtkKWNotebook(const vtkKWNotebook&); // Not implemented
+  void operator=(const vtkKWNotebook&); // Not implemented
 };
 
 

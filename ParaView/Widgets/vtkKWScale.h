@@ -108,8 +108,6 @@ public:
 protected:
   vtkKWScale();
   ~vtkKWScale();
-  vtkKWScale(const vtkKWScale&) {};
-  void operator=(const vtkKWScale&) {};
 
   char        *Command;
   char        *StartCommand;
@@ -120,6 +118,9 @@ protected:
   vtkKWWidget *ScaleWidget;
   vtkKWWidget *ScaleLabel;
   float Range[2];
+private:
+  vtkKWScale(const vtkKWScale&); // Not implemented
+  void operator=(const vtkKWScale&); // Not implemented
 };
 
 

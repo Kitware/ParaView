@@ -81,15 +81,15 @@ public:
 protected:
   vtkKWEntry();
   ~vtkKWEntry();
-  vtkKWEntry(const vtkKWEntry&) {};
-  void operator=(const vtkKWEntry&) {};
   
   vtkSetStringMacro(ValueString);
   vtkGetStringMacro(ValueString);
   
   char *ValueString;
   int Width;
-  
+private:
+  vtkKWEntry(const vtkKWEntry&); // Not implemented
+  void operator=(const vtkKWEntry&); // Not Implemented
 };
 
 

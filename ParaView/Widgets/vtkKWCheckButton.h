@@ -79,11 +79,12 @@ protected:
 
   vtkKWCheckButton();
   ~vtkKWCheckButton() {};
-  vtkKWCheckButton(const vtkKWCheckButton&) {};
-  void operator=(const vtkKWCheckButton&) {};
 
   int IndicatorOn;
   char* MyText;
+private:
+  vtkKWCheckButton(const vtkKWCheckButton&); // Not implemented
+  void operator=(const vtkKWCheckButton&); // Not Implemented
 };
 
 

@@ -90,12 +90,12 @@ public:
 protected:
   vtkKWLabel();
   ~vtkKWLabel();
-  vtkKWLabel(const vtkKWLabel&) {};
-  void operator=(const vtkKWLabel&) {};
 private:
   char* Label;
   int LineType;
   int Width;
+  vtkKWLabel(const vtkKWLabel&); // Not implemented
+  void operator=(const vtkKWLabel&); // Not implemented
 };
 
 

@@ -71,10 +71,11 @@ public:
 protected:
   vtkKWSaveImageDialog();
   ~vtkKWSaveImageDialog() {};
-  vtkKWSaveImageDialog(const vtkKWSaveImageDialog&) {};
-  void operator=(const vtkKWSaveImageDialog&) {};
 
   char *FileName;
+private:
+  vtkKWSaveImageDialog(const vtkKWSaveImageDialog&); // Not implemented
+  void operator=(const vtkKWSaveImageDialog&); // Not implemented
 };
 
 

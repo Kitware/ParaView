@@ -79,14 +79,15 @@ public:
 protected:
   vtkKWProgressGauge();
   ~vtkKWProgressGauge();
-  vtkKWProgressGauge(const vtkKWProgressGauge&) {};
-  void operator=(const vtkKWProgressGauge&) {};
 private:
   int Length;
   int Height;
   char* BarColor;
   char* BackgroundColor;
   int Value;
+private:
+  vtkKWProgressGauge(const vtkKWProgressGauge&); // Not implemented
+  void operator=(const vtkKWProgressGauge&); // Not implemented
 };
 
 

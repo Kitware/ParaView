@@ -57,8 +57,6 @@ class VTK_EXPORT vtkKWToolbar : public vtkKWWidget
 public:
   vtkKWToolbar();
   ~vtkKWToolbar();
-  vtkKWToolbar(const vtkKWToolbar&) {};
-  void operator=(const vtkKWToolbar&) {};
   static vtkKWToolbar* New();
   const char *GetClassName() {return "vtkKWToolbar";};
 
@@ -86,6 +84,9 @@ protected:
   vtkKWWidget *Bar1;
   vtkKWWidget *Bar2;
 
+private:
+  vtkKWToolbar(const vtkKWToolbar&); // Not implemented
+  void operator=(const vtkKWToolbar&); // Not implemented
 };
 
 

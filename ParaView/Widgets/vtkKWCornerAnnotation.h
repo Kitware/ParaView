@@ -110,8 +110,6 @@ public:
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();
-  vtkKWCornerAnnotation(const vtkKWCornerAnnotation&) {};
-  void operator=(const vtkKWCornerAnnotation&) {};
 
   vtkKWWidget            *CornerDisplayFrame;
   vtkKWChangeColorButton *CornerColor;
@@ -127,6 +125,9 @@ protected:
   vtkKWGenericComposite  *CornerComposite;
 
   vtkKWView *View;
+private:
+  vtkKWCornerAnnotation(const vtkKWCornerAnnotation&); // Not implemented
+  void operator=(const vtkKWCornerAnnotation&); // Not Implemented
 };
 
 

@@ -66,13 +66,14 @@ public:
 protected:
   vtkKWOKCancelDialog();
   ~vtkKWOKCancelDialog();
-  vtkKWOKCancelDialog(const vtkKWOKCancelDialog&) {};
-  void operator=(const vtkKWOKCancelDialog&) {};
 
   vtkKWWidget *Message;
   vtkKWWidget *ButtonFrame;
   vtkKWWidget *OKButton;
   vtkKWWidget *CancelButton;
+private:
+  vtkKWOKCancelDialog(const vtkKWOKCancelDialog&); // Not implemented
+  void operator=(const vtkKWOKCancelDialog&); // Not implemented
 };
 
 

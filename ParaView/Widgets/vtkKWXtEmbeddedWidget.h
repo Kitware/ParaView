@@ -75,10 +75,11 @@ public:
 protected:
   vtkKWXtEmbeddedWidget();
   ~vtkKWXtEmbeddedWidget();
-  vtkKWXtEmbeddedWidget(const vtkKWXtEmbeddedWidget&) {};
-  void operator=(const vtkKWXtEmbeddedWidget&) {};
 
   void* WindowId;
+private:
+  vtkKWXtEmbeddedWidget(const vtkKWXtEmbeddedWidget&); // Not implemented
+  void operator=(const vtkKWXtEmbeddedWidget&); // Not implemented
 };
 
 

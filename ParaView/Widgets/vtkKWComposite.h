@@ -121,8 +121,6 @@ public:
 protected:
   vtkKWComposite();
   ~vtkKWComposite();
-  vtkKWComposite(const vtkKWComposite&) {};
-  void operator=(const vtkKWComposite&) {};
 
   vtkKWNotebook *Notebook;
   vtkKWNotebook *Notebook2;
@@ -132,6 +130,9 @@ protected:
   vtkKWView *View;
 
   vtkKWWidget *PropertiesParent;
+private:
+  vtkKWComposite(const vtkKWComposite&); // Not implemented
+  void operator=(const vtkKWComposite&); // Not Implemented
 };
 
 

@@ -125,8 +125,6 @@ public:
 protected:
   vtkKWVolumeComposite();
   ~vtkKWVolumeComposite();
-  vtkKWVolumeComposite(const vtkKWVolumeComposite&) {};
-  void operator=(const vtkKWVolumeComposite&) {};
 
   vtkLODProp3D                         *LODVolume;
   vtkVolumeProperty                    *VolumeProperty;
@@ -159,6 +157,9 @@ protected:
   int                                  HiResTextureID;
   int                                  VolumeProID;
   int                                  LowResVolumeProID;
+private:
+  vtkKWVolumeComposite(const vtkKWVolumeComposite&); // Not implemented
+  void operator=(const vtkKWVolumeComposite&); // Not implemented
 };
 
 

@@ -67,14 +67,14 @@ public:
 protected:
   vtkKWImageLabel();
   ~vtkKWImageLabel();
-  vtkKWImageLabel(const vtkKWImageLabel&) {};
-  void operator=(const vtkKWImageLabel&) {};
 
   vtkSetStringMacro(ImageDataLabel);
   vtkGetStringMacro(ImageDataLabel);
 
 private:
   char *ImageDataLabel;
+  vtkKWImageLabel(const vtkKWImageLabel&); // Not implemented
+  void operator=(const vtkKWImageLabel&); // Not implemented
 };
 
 

@@ -83,8 +83,9 @@ public:
 protected:
   vtkKWWindowCollection() {};
   ~vtkKWWindowCollection() {};
-  vtkKWWindowCollection(const vtkKWWindowCollection&) {};
-  void operator=(const vtkKWWindowCollection&) {};
+private:
+  vtkKWWindowCollection(const vtkKWWindowCollection&); // Not implemented
+  void operator=(const vtkKWWindowCollection&); // Not implemented
 };
 
 inline void vtkKWWindowCollection::AddItem(vtkKWWindow *a) 

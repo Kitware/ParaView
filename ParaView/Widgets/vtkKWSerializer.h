@@ -75,10 +75,11 @@ public:
 protected:
   vtkKWSerializer() {};
   ~vtkKWSerializer() {};
-  vtkKWSerializer(const vtkKWSerializer&) {};
-  void operator=(const vtkKWSerializer&) {};
 
   static void EatWhiteSpace(istream *is);
+private:
+  vtkKWSerializer(const vtkKWSerializer&); // Not implemented
+  void operator=(const vtkKWSerializer&); // Not implemented
 };
 
 

@@ -119,8 +119,6 @@ protected:
 
   vtkKWDialog();
   ~vtkKWDialog();
-  vtkKWDialog(const vtkKWDialog&) {};
-  void operator=(const vtkKWDialog&) {};
 
   vtkKWWindow* MasterWindow;
 
@@ -129,6 +127,9 @@ protected:
   int Done;
   int Beep;
   int BeepType;
+private:
+  vtkKWDialog(const vtkKWDialog&); // Not implemented
+  void operator=(const vtkKWDialog&); // Not Implemented
 };
 
 

@@ -80,9 +80,10 @@ public:
 protected:
   vtkKWViewCollection() {};
   ~vtkKWViewCollection() {};
-  vtkKWViewCollection(const vtkKWViewCollection&) {};
-  void operator=(const vtkKWViewCollection&) {};
 
+private:
+  vtkKWViewCollection(const vtkKWViewCollection&); // Not implemented
+  void operator=(const vtkKWViewCollection&); // Not implemented
 };
 
 inline void vtkKWViewCollection::AddItem(vtkKWView *a) 

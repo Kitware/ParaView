@@ -64,9 +64,10 @@ public:
 protected:
   vtkKWPushButton() {};
   ~vtkKWPushButton() {};
-  vtkKWPushButton(const vtkKWPushButton&) {};
-  void operator=(const vtkKWPushButton&) {};
   
+private:
+  vtkKWPushButton(const vtkKWPushButton&); // Not implemented
+  void operator=(const vtkKWPushButton&); // Not implemented
 };
 
 

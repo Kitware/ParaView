@@ -165,8 +165,6 @@ public:
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
-  vtkKWWidget(const vtkKWWidget&) {};
-  void operator=(const vtkKWWidget&) {};
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   char *WidgetName;
@@ -190,6 +188,9 @@ protected:
   // is unfortunate, but necessary.  With out this name set, the
   // trace cannot be initialized for this widget.
   char *TraceName;
+private:
+  vtkKWWidget(const vtkKWWidget&); // Not implemented
+  void operator=(const vtkKWWidget&); // Not implemented
 };
 
 

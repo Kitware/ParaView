@@ -82,9 +82,10 @@ public:
 protected:
   vtkKWCompositeCollection() {};
   ~vtkKWCompositeCollection() {};
-  vtkKWCompositeCollection(const vtkKWCompositeCollection&) {};
-  void operator=(const vtkKWCompositeCollection&) {};
 
+private:
+  vtkKWCompositeCollection(const vtkKWCompositeCollection&); // Not implemented
+  void operator=(const vtkKWCompositeCollection&); // Not Implemented
 };
 
 inline void vtkKWCompositeCollection::AddItem(vtkKWComposite *a) 

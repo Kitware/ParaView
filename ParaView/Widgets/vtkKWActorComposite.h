@@ -84,11 +84,13 @@ public:
 protected:
   vtkKWActorComposite();
   ~vtkKWActorComposite();
-  vtkKWActorComposite(const vtkKWActorComposite&) {};
-  void operator=(const vtkKWActorComposite&) {};
 
   vtkActor *Actor;
   vtkPolyDataMapper *Mapper;
+
+private:
+  vtkKWActorComposite(const vtkKWActorComposite&);  // Not implemented.
+  void operator=(const vtkKWActorComposite&);  // Not implemented.
 };
 
 

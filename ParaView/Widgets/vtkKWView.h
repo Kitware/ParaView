@@ -348,8 +348,6 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   protected:
   vtkKWView();
   ~vtkKWView();
-  vtkKWView(const vtkKWView&) {};
-  void operator=(const vtkKWView&) {};
 
   vtkKWCornerAnnotation *CornerAnnotation;
   
@@ -406,6 +404,9 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   int              SupportPrint;
   int              SupportControlFrame;
   
+private:
+  vtkKWView(const vtkKWView&); // Not implemented
+  void operator=(const vtkKWView&); // Not implemented
 };
 
 

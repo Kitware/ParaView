@@ -69,10 +69,11 @@ public:
 protected:
   vtkKWGenericComposite();
   ~vtkKWGenericComposite();
-  vtkKWGenericComposite(const vtkKWGenericComposite&) {};
-  void operator=(const vtkKWGenericComposite&) {};
 
   vtkProp *Prop;
+private:
+  vtkKWGenericComposite(const vtkKWGenericComposite&); // Not implemented
+  void operator=(const vtkKWGenericComposite&); // Not implemented
 };
 
 

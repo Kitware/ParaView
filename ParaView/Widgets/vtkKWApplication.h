@@ -186,8 +186,6 @@ public:
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
-  vtkKWApplication(const vtkKWApplication&) {};
-  void operator=(const vtkKWApplication&) {};
 
   Tk_Window MainWindow;
   Tcl_Interp *MainInterp;
@@ -213,6 +211,10 @@ protected:
   vtkKWRegisteryUtilities *Registery;
   int RegisteryLevel;
   int BalloonHelpDelay;
+
+private:
+  vtkKWApplication(const vtkKWApplication&);   // Not implemented.
+  void operator=(const vtkKWApplication&);  // Not implemented.
 };
 
 #endif

@@ -67,8 +67,9 @@ public:
 protected:
   vtkKWRadioButton() {};
   ~vtkKWRadioButton() {};
-  vtkKWRadioButton(const vtkKWRadioButton&) {};
-  void operator=(const vtkKWRadioButton&) {};
+private:
+  vtkKWRadioButton(const vtkKWRadioButton&); // Not implemented
+  void operator=(const vtkKWRadioButton&); // Not implemented
 };
 
 

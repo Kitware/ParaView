@@ -119,8 +119,6 @@ public:
 protected:
   vtkKWMessageDialog();
   ~vtkKWMessageDialog();
-  vtkKWMessageDialog(const vtkKWMessageDialog&) {};
-  void operator=(const vtkKWMessageDialog&) {};
 
   int Style;
   int Default;
@@ -133,6 +131,9 @@ protected:
   vtkKWImageLabel *Icon;
   vtkKWWidget *OKFrame;
   vtkKWWidget *CancelFrame;
+private:
+  vtkKWMessageDialog(const vtkKWMessageDialog&); // Not implemented
+  void operator=(const vtkKWMessageDialog&); // Not implemented
 };
 
 

@@ -95,14 +95,15 @@ public:
 protected:
   vtkKWChangeColorButton();
   ~vtkKWChangeColorButton();
-  vtkKWChangeColorButton(const vtkKWChangeColorButton&) {};
-  void operator=(const vtkKWChangeColorButton&) {};
 
   vtkKWWidget *Label1;
   vtkKWWidget *Label2;
   char        *Command;
   char        *Text;
   float       Color[3];
+private:
+  vtkKWChangeColorButton(const vtkKWChangeColorButton&); // Not implemented
+  void operator=(const vtkKWChangeColorButton&); // Not implemented
 };
 
 

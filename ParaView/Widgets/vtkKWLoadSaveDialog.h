@@ -116,8 +116,6 @@ protected:
   vtkKWLoadSaveDialog();
   ~vtkKWLoadSaveDialog();
 
-  vtkKWLoadSaveDialog(const vtkKWLoadSaveDialog&) {};
-  void operator=(const vtkKWLoadSaveDialog&) {};
 
   char *FileTypes;
   char *InitialDir;  
@@ -127,6 +125,9 @@ protected:
   char *LastPath;
   int SaveDialog;
   int Done;
+private:
+  vtkKWLoadSaveDialog(const vtkKWLoadSaveDialog&); // Not implemented
+  void operator=(const vtkKWLoadSaveDialog&); // Not implemented
 };
 
 

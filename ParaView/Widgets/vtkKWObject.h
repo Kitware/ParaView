@@ -133,8 +133,6 @@ private:
 protected:
   vtkKWObject();
   ~vtkKWObject();
-  vtkKWObject(const vtkKWObject&) {};
-  void operator=(const vtkKWObject&) {};
 
   vtkKWApplication *Application;
 
@@ -161,6 +159,9 @@ protected:
 
 //ETX
 
+private:
+  vtkKWObject(const vtkKWObject&); // Not implemented
+  void operator=(const vtkKWObject&); // Not implemented
 };
 
 #endif

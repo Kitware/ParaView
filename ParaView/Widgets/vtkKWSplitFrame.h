@@ -97,8 +97,6 @@ public:
 protected:
   vtkKWSplitFrame();
   ~vtkKWSplitFrame();
-  vtkKWSplitFrame(const vtkKWSplitFrame&) {};
-  void operator=(const vtkKWSplitFrame&) {};
 
   vtkKWWidget *Frame1;
   vtkKWWidget *Separator;
@@ -114,6 +112,9 @@ protected:
 
   // Reset the actual windows to match our width IVars.
   void Update();
+private:
+  vtkKWSplitFrame(const vtkKWSplitFrame&); // Not implemented
+  void operator=(const vtkKWSplitFrame&); // Not implemented
 };
 
 

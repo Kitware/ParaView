@@ -94,8 +94,6 @@ public:
 protected:
   vtkKWTclInteractor();
   ~vtkKWTclInteractor();
-  vtkKWTclInteractor(const vtkKWTclInteractor&) {};
-  void operator=(const vtkKWTclInteractor&) {};
 
   vtkKWWindow* MasterWindow;
 
@@ -111,6 +109,9 @@ protected:
   char *Title;
   int TagNumber;
   int CommandIndex;
+private:
+  vtkKWTclInteractor(const vtkKWTclInteractor&); // Not implemented
+  void operator=(const vtkKWTclInteractor&); // Not implemented
 };
 
 #endif

@@ -87,11 +87,12 @@ public:
 protected:
   vtkKWOptionMenu();
   ~vtkKWOptionMenu();
-  vtkKWOptionMenu(const vtkKWOptionMenu&) {};
-  void operator=(const vtkKWOptionMenu&) {};
 
   char *CurrentValue;  
   vtkKWWidget *Menu;
+private:
+  vtkKWOptionMenu(const vtkKWOptionMenu&); // Not implemented
+  void operator=(const vtkKWOptionMenu&); // Not implemented
 };
 
 

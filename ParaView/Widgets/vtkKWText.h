@@ -68,13 +68,14 @@ public:
 protected:
   vtkKWText();
   ~vtkKWText();
-  vtkKWText(const vtkKWText&) {};
-  void operator=(const vtkKWText&) {};
 
   vtkGetStringMacro( ValueString );
   vtkSetStringMacro( ValueString );
   
   char *ValueString;
+private:
+  vtkKWText(const vtkKWText&); // Not implemented
+  void operator=(const vtkKWText&); // Not implemented
 };
 
 

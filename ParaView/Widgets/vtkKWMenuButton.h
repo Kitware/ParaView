@@ -69,10 +69,11 @@ public:
 protected:
   vtkKWMenuButton();
   ~vtkKWMenuButton();
-  vtkKWMenuButton(const vtkKWMenuButton&) {};
-  void operator=(const vtkKWMenuButton&) {};
   
   vtkKWMenu *Menu;
+private:
+  vtkKWMenuButton(const vtkKWMenuButton&); // Not implemented
+  void operator=(const vtkKWMenuButton&); // Not implemented
 };
 
 #endif

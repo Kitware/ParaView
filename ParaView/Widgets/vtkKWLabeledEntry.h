@@ -85,11 +85,12 @@ public:
 protected:
   vtkKWLabeledEntry();
   ~vtkKWLabeledEntry();
-  vtkKWLabeledEntry(const vtkKWLabeledEntry&) {};
-  void operator=(const vtkKWLabeledEntry&) {};
 
   vtkKWLabel *Label;
   vtkKWEntry *Entry;
+private:
+  vtkKWLabeledEntry(const vtkKWLabeledEntry&); // Not implemented
+  void operator=(const vtkKWLabeledEntry&); // Not implemented
 };
 
 

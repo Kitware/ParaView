@@ -99,8 +99,6 @@ public:
 protected:
   vtkKWExtent();
   ~vtkKWExtent();
-  vtkKWExtent(const vtkKWExtent&) {};
-  void operator=(const vtkKWExtent&) {};
 
   char *Command;
   float Extent[6];
@@ -110,6 +108,9 @@ protected:
   vtkKWScale  *YMaxScale;
   vtkKWScale  *ZMinScale;
   vtkKWScale  *ZMaxScale;
+private:
+  vtkKWExtent(const vtkKWExtent&); // Not implemented
+  void operator=(const vtkKWExtent&); // Not Implemented
 };
 
 

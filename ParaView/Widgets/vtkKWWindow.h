@@ -234,8 +234,6 @@ public:
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
-  vtkKWWindow(const vtkKWWindow&) {};
-  void operator=(const vtkKWWindow&) {};
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   void InsertRecentFileToMenu(const char *filename, 
@@ -286,6 +284,9 @@ protected:
   vtkKWPointerArray *RecentFiles;
   
   void PrintRecentFiles();
+private:
+  vtkKWWindow(const vtkKWWindow&); // Not implemented
+  void operator=(const vtkKWWindow&); // Not implemented
 };
 
 
