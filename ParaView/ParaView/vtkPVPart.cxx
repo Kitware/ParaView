@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.11");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.12");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -324,18 +324,6 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   // We are going to create the piece filter with a dummy tcl name,
   // setup the pipeline, and remove tcl's reference to the objects.
   // The vtkData object will be moved to the output of the piece filter.
-  vtkClientServerStream& stream = pm->GetStream();
-  stream.Reset();
-  stream << vtkClientServerStream::Invoke 
-         << this->VTKDataID << "IsA" << "vtkPolyData" 
-         << vtkClientServerStream::End;
-  pm->SendStreamToServer();
-  int ispolydata = 0;
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &ispolydata))
-    {
-    vtkErrorMacro("bad return from IsA call");
-    }
-  return;
   pm->GatherInformation(this->ClassNameInformation, this->VTKDataID);
   char *className = this->ClassNameInformation->GetVTKClassName();
   vtkClientServerID tempDataPiece = {0};
@@ -477,10 +465,13 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   pm->GetStream() << vtkClientServerStream::Invoke << tempDataPiece 
                   << "GetOutput"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
-  pm->GetLastServerResult().GetArgument(0, 0, &this->VTKDataID);
+  this->VTKDataID = pm->GetUniqueID();
+  pm->GetStream() << vtkClientServerStream::Assign << this->VTKDataID
+                  << vtkClientServerStream::LastResult
+                  << vtkClientServerStream::End;
   pm->DeleteStreamObject(tempDataPiece);
   pm->SendStreamToServer();
+  this->SetVTKDataID(this->VTKDataID);
 }
 
 
