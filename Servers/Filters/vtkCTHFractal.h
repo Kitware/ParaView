@@ -77,6 +77,7 @@ protected:
   void SetBlockInfo(int blockId, int level,
                     int x0, int y0, int z0);
 
+  void AddTestArray();
   void AddFractalArray();
   void AddBlockIdArray();
   void AddDepthArray();

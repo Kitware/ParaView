@@ -26,7 +26,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.10");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.11");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------
@@ -94,6 +94,7 @@ void vtkCTHFractal::Execute()
   this->Levels->Initialize();
   this->Traverse(blockId, 0, output, 0, 0, 0);
 
+  this->AddTestArray();
   this->AddFractalArray();
   this->AddBlockIdArray();
   this->AddDepthArray();
@@ -104,8 +105,6 @@ void vtkCTHFractal::Execute()
     }
 }
   
-
-
 
 int vtkCTHFractal::LineTest2(float x0, float y0, float z0,
                              float x1, float y1, float z1, 
@@ -291,6 +290,55 @@ void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output,
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkCTHFractal::AddTestArray()
+{
+  vtkCTHData* output = this->GetOutput();
+  int numCells = output->GetNumberOfCells();
+  int numBlocks = output->GetNumberOfBlocks();
+  int numCellsPerBlock = output->GetNumberOfCellsPerBlock();
+  vtkDoubleArray* array = vtkDoubleArray::New();
+  int blockId;
+  double* arrayPtr;
+  double* spacing;
+  double* origin;
+
+  array->Allocate(numCells);
+  array->SetNumberOfTuples(numCells);
+  if (numCells != numBlocks*numCellsPerBlock)
+    {
+    vtkErrorMacro("Cell count error.");
+    array->Delete();
+    return;
+    }
+  arrayPtr = (double*)(array->GetPointer(0));
+
+  origin = output->GetTopLevelOrigin();
+  for (blockId = 0; blockId < numBlocks; ++blockId)
+    {
+    spacing = output->GetBlockSpacing(blockId);
+    int x,y,z;
+    int ext[6];
+    output->GetBlockPointExtent(blockId,ext);
+    for (z = ext[4]; z < ext[5]; ++z)
+      {
+      for (y = ext[2]; y < ext[3]; ++y)
+        {
+        for (x = ext[0]; x < ext[1]; ++x)
+          {
+//          *arrayPtr++ = origin[0] + spacing[0]*((float)x + 0.5)
+//                        + origin[1] + spacing[1]*((float)y + 0.5);
+          *arrayPtr++ = origin[1] + spacing[1]*((float)y + 0.5);
+//                        + origin[2] + spacing[2]*((float)z + 0.5);
+          }
+        }
+      }
+    }
+  
+  array->SetName("TestX");
+  output->GetCellData()->AddArray(array);
+  array->Delete();
+}
 
 //----------------------------------------------------------------------------
 void vtkCTHFractal::AddFractalArray()
