@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.21");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.22");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -185,12 +185,14 @@ void vtkPVVolumeAppearanceEditor::VolumePropertyInternalCallback()
 //----------------------------------------------------------------------------
 void vtkPVVolumeAppearanceEditor::VolumePropertyChangedCallback()
 {
+  this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOn();
   this->VolumePropertyInternalCallback();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVVolumeAppearanceEditor::VolumePropertyChangingCallback()
 {
+  this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOff();
   this->VolumePropertyInternalCallback();
 }
 

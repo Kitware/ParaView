@@ -92,7 +92,7 @@ public:
   void AddScalarOpacityPoint(double scalar, double opacity);
 
   // Description
-  // Svae State
+  // Save State
   void SaveState(ofstream *file);
 
 protected:
