@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.171");
+vtkCxxRevisionMacro(vtkKWWindow, "1.172");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -404,7 +404,11 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   // Menubar separator
 
   this->MenuBarSeparatorFrame->SetParent(this);  
+#if defined(_WIN32)
   this->MenuBarSeparatorFrame->Create(app, "-height 2 -bd 1 -relief groove");
+#else
+  this->MenuBarSeparatorFrame->Create(app, "-height 2 -bd 1 -relief sunken");
+#endif
 
   this->Script("pack %s -side top -fill x -pady 2",
                this->MenuBarSeparatorFrame->GetWidgetName());

@@ -43,10 +43,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
 
+#if defined(_WIN32)
+#define VTK_KW_TOOLBAR_RELIEF_SEP "groove"
+#else
+#define VTK_KW_TOOLBAR_RELIEF_SEP "sunken"
+#endif
+
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.1");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.2");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -145,7 +151,11 @@ void vtkKWToolbarSet::Create(vtkKWApplication *app, const char *args)
   // Bottom separator
 
   this->BottomSeparatorFrame->SetParent(this);  
-  this->BottomSeparatorFrame->Create(app, "-height 2 -bd 1 -relief groove");
+  this->BottomSeparatorFrame->Create(app, "-height 2 -bd 1");
+
+  this->Script("%s config -relief %s", 
+               this->BottomSeparatorFrame->GetWidgetName(), 
+               VTK_KW_TOOLBAR_RELIEF_SEP);
 
   this->Update();
 }
@@ -236,7 +246,10 @@ void vtkKWToolbarSet::PackToolbars()
             {
             toolbar_slot->SeparatorFrame->SetParent(this->ToolbarsFrame);
             toolbar_slot->SeparatorFrame->Create(
-              this->Application, "-width 2 -bd 1 -relief groove");
+              this->Application, "-width 2 -bd 1");
+            this->Script("%s config -relief %s", 
+                         toolbar_slot->SeparatorFrame->GetWidgetName(), 
+                         VTK_KW_TOOLBAR_RELIEF_SEP);
             }
           tk_cmd << "pack " << toolbar_slot->SeparatorFrame->GetWidgetName() 
                  << " -side left -padx 1 -pady 0 -fill y -expand n" << endl;
