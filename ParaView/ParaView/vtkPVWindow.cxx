@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.360");
+vtkCxxRevisionMacro(vtkPVWindow, "1.361");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -682,7 +682,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   this->AdvancedMenu->AddCommand("Load ParaView Script", this, "LoadScript", 0,
                                  "Load ParaView Script (.pvs)");
-  this->AdvancedMenu->AddCommand("Save ParaView Script", this, "SaveScript", 0,
+  this->AdvancedMenu->AddCommand("Save ParaView Script", this, "SaveTrace", 0,
                                  "Saves a script/trace of every action since start up.");
   this->AdvancedMenu->InsertCommand(2, "Export VTK Script", this,
                                     "ExportVTKScript", 7,
@@ -3587,7 +3587,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.360 $");
+  this->ExtractRevision(os,"$Revision: 1.361 $");
 }
 
 //----------------------------------------------------------------------------
