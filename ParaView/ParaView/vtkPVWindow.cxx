@@ -168,7 +168,9 @@ vtkPVWindow::vtkPVWindow()
   this->TclInteractor = NULL;
 
   this->SetScriptExtension(".pvs");
+  this->SetScriptType("ParaView");
 
+  this->SetMenuPropertiesTitle("View");
 }
 
 //----------------------------------------------------------------------------
@@ -404,14 +406,18 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
       this->GetMenuProperties(),"Radio");
   this->GetMenuProperties()->AddRadioButton(2, " Source",
                                             rbv, this,
-                                            "ShowCurrentSourceProperties", 1);
+                                            "ShowCurrentSourceProperties", 1,
+					    "Display the properties of the "
+    "current data source or filter");
   delete [] rbv;
 
   rbv = this->GetMenuProperties()->CreateRadioButtonVariable(
            this->GetMenuProperties(),"Radio");
   this->GetMenuProperties()->AddRadioButton(3, " Animation",
                                             rbv, this,
-                                            "ShowAnimationProperties", 1);
+                                            "ShowAnimationProperties", 1,
+					    "Display the interface for "
+    "creating animations by varying variables in a loop");
   delete [] rbv;
 
 
@@ -438,23 +444,32 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Menu->InsertCascade(3, "Advanced", this->AdvancedMenu, 0);
 
   this->AdvancedMenu->InsertCommand(4, "Command Prompt", this,
-			       "DisplayCommandPrompt",8);
-  this->AdvancedMenu->AddCommand("Load Script", this, "LoadScript", 0);
+				    "DisplayCommandPrompt",8,
+				    "Display a prompt to interact "
+    "with the ParaView engine");
+  this->AdvancedMenu->AddCommand("Load ParaView Script", this, "LoadScript", 0,
+				 "Load ParaView Script (.pvs)");
   this->AdvancedMenu->InsertCommand(2, "Export VTK Script", this,
-			       "SaveInTclScript", 7);
+				    "SaveInTclScript", 7,
+				    "Write a script which can be "
+    "parsed by the vtk executable");
   // Log stuff (not traced)
-  this->AdvancedMenu->InsertCommand(5, "Open Log File", this, "StartLog");
-  this->AdvancedMenu->InsertCommand(6, "Close Log File", this, "StopLog");
+  this->AdvancedMenu->InsertCommand(5, "Start Log", this, "StartLog", 2,
+				    "Start logging render events and timing");
+  this->AdvancedMenu->InsertCommand(6, "Stop Log", this, "StopLog", 2,
+				    "Stop logging render events and timing");
   
   // Create the menu for creating data sources.  
   this->SourceMenu->SetParent(this->AdvancedMenu);
   this->SourceMenu->Create(this->Application, "-tearoff 0");
-  this->AdvancedMenu->AddCascade("VTK Sources", this->SourceMenu, 4);  
+  this->AdvancedMenu->AddCascade("VTK Sources", this->SourceMenu, 4,
+				 "Choose a source from a list of VTK sources");  
   
   // Create the menu for creating data sources.  
   this->FilterMenu->SetParent(this->AdvancedMenu);
   this->FilterMenu->Create(this->Application, "-tearoff 0");
-  this->AdvancedMenu->AddCascade("VTK Filters", this->FilterMenu, 4);  
+  this->AdvancedMenu->AddCascade("VTK Filters", this->FilterMenu, 4,
+				 "Choose a filter from a list of VTK filters");  
   this->Script("%s entryconfigure \"VTK Filters\" -state disabled",
 	       this->AdvancedMenu->GetWidgetName());
   
@@ -2343,10 +2358,11 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char *className)
 //----------------------------------------------------------------------------
 void vtkPVWindow::DisplayCommandPrompt()
 {
-  if ( ! this->TclInteractor)
+  if ( ! this->TclInteractor )
     {
     this->TclInteractor = vtkKWTclInteractor::New();
     this->TclInteractor->SetTitle("Command Prompt");
+    this->TclInteractor->SetMasterWindow(this);
     this->TclInteractor->Create(this->GetPVApplication());
     }
   

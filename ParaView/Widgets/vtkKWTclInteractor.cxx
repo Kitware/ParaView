@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWText.h"
+#include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 
 //-------------------------------------------------------------------------
@@ -72,6 +73,7 @@ vtkKWTclInteractor::vtkKWTclInteractor()
   
   this->TagNumber = 1;
   this->CommandIndex = 0;
+  this->MasterWindow = 0;
 }
 
 vtkKWTclInteractor::~vtkKWTclInteractor()
@@ -96,6 +98,30 @@ vtkKWTclInteractor::~vtkKWTclInteractor()
   this->DisplayFrame = NULL;
   
   this->SetTitle(NULL);
+  this->SetMasterWindow(0);
+}
+
+void vtkKWTclInteractor::SetMasterWindow(vtkKWWindow* win)
+{
+  if (this->MasterWindow != win) 
+    { 
+    if (this->MasterWindow) 
+      { 
+      this->MasterWindow->UnRegister(this); 
+      }
+    this->MasterWindow = win; 
+    if (this->MasterWindow) 
+      { 
+      this->MasterWindow->Register(this); 
+      if (this->Application)
+	{
+	this->Script("wm transient %s %s", this->GetWidgetName(), 
+		     this->MasterWindow->GetWidgetName());
+	}
+      } 
+    this->Modified(); 
+    } 
+  
 }
 
 void vtkKWTclInteractor::Create(vtkKWApplication *app)
@@ -116,6 +142,11 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   this->Script("toplevel %s", wname);
   this->Script("wm title %s \"%s\"", wname, this->Title);
   this->Script("wm iconname %s \"vtk\"", wname);
+  if (this->MasterWindow)
+    {
+    this->Script("wm transient %s %s", wname, 
+		 this->MasterWindow->GetWidgetName());
+    }
   
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create(app, "frame", "");
@@ -129,6 +160,9 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   this->DismissButton->SetLabel("Dismiss");
   this->Script("pack %s -side left -expand 1 -fill x",
                this->DismissButton->GetWidgetName());
+
+  this->Script("wm protocol %s WM_DELETE_WINDOW {wm withdraw %s}",
+               wname, wname);
   
   this->CommandFrame->SetParent(this);
   this->CommandFrame->Create(app, "frame", "");

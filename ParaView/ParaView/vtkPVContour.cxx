@@ -194,8 +194,9 @@ void vtkPVContour::SetPVInput(vtkPVData *input)
   if (this->ArrayMenu->GetValue() == NULL)
     {
     vtkKWMessageDialog::PopupMessage(this->Application, 
-                                     vtkKWMessageDialog::Warning, "Warning", 
-                                     "Input does not have scalars to contour.");
+				     this->Application->GetMainWindow(),
+				     vtkKWMessageDialog::Warning, "Warning", 
+				     "Input does not have scalars to contour.");
     }
 }
 

@@ -310,6 +310,8 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // sheet entry
   vtkSetStringMacro( MenuPropertiesName );
   vtkGetStringMacro( MenuPropertiesName );
+  vtkSetStringMacro( MenuPropertiesHelp );
+  vtkGetStringMacro( MenuPropertiesHelp );
   vtkSetMacro( MenuPropertiesUnderline, int );
   vtkGetMacro( MenuPropertiesUnderline, int );
 
@@ -395,6 +397,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   int              RenderState;
   
   char             *MenuPropertiesName;
+  char             *MenuPropertiesHelp;
   int              MenuPropertiesUnderline;
   
   int              Printing;

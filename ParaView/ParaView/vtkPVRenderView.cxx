@@ -115,7 +115,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->EventuallyRenderFlag = 0;
   this->RenderPending = NULL;
 
-  this->MenuPropertiesUnderline = 1;
+  this->MenuPropertiesUnderline = 4;
+
+  this->SetMenuPropertiesName(" 3D View Settings");
+  this->SetMenuPropertiesHelp("Show global view parameters (background color, annoations2 etc.)");
 }
 
 //----------------------------------------------------------------------------

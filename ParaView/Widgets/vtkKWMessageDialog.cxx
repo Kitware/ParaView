@@ -215,9 +215,12 @@ void vtkKWMessageDialog::SetIcon( int ico )
 	       icon_array[ico]);
 }
 
-void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, unsigned int icon, const char* title, const char*message)
+void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,
+				      unsigned int icon, const char* title, 
+				      const char*message)
 {
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
+  dlg2->SetMasterWindow(win);
   dlg2->Create(app,"");
   dlg2->SetText( message );
   dlg2->SetTitle( title );
@@ -228,10 +231,13 @@ void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, unsigned int icon, 
   dlg2->Delete();
 }
 
-int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, unsigned int icon, const char* title, const char*message)
+int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
+				   unsigned int icon, const char* title, 
+				   const char*message)
 {
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
   dlg2->SetStyleToYesNo();
+  dlg2->SetMasterWindow(win);
   dlg2->Create(app,"");
   dlg2->SetText( message );
   dlg2->SetTitle( title );
@@ -242,10 +248,13 @@ int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, unsigned int icon, con
   dlg2->Delete();
   return ret;
 }
-int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, unsigned int icon, const char* title, const char*message)
+int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindow *win,
+				      unsigned int icon, const char* title, 
+				      const char*message)
 {
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
   dlg2->SetStyleToOkCancel();
+  dlg2->SetMasterWindow(win);
   dlg2->Create(app,"");
   dlg2->SetText( message );
   dlg2->SetTitle( title );

@@ -134,11 +134,11 @@ vtkPVApplication::vtkPVApplication()
   char name[128];
   this->CommandFunction = vtkPVApplicationCommand;
   this->MajorVersion = 0;
-  this->MinorVersion = 2;
+  this->MinorVersion = 3;
   this->SetApplicationName("ParaView");
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
   this->SetApplicationVersionName(name);
-  this->SetApplicationReleaseName("beta");
+  this->SetApplicationReleaseName("development");
 
   this->Controller = NULL;
   this->Log = NULL;
@@ -905,7 +905,7 @@ vtkObject *vtkPVApplication::MakeTclObject(const char *className,
   return o;
 }
 
-void vtkPVApplication::DisplayAbout(vtkKWWindow *win)
+void vtkPVApplication::DisplayAbout(vtkKWWindow *master)
 {
   ostrstream str;
   str << this->GetApplicationName() << " was developed by Kitware Inc." << endl
@@ -917,6 +917,7 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow *win)
   char* msg = str.str();
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("About ParaView");
+  dlg->SetMasterWindow(master);
   dlg->Create(this,"");
   dlg->SetText(msg);
   dlg->Invoke();  
@@ -924,7 +925,7 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow *win)
   delete[] msg;
 }
 
-void vtkPVApplication::DisplayHelp()
+void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
 {
 #ifdef _WIN32
   char temp[1024];
@@ -945,6 +946,7 @@ void vtkPVApplication::DisplayHelp()
 #else
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");
+  dlg->SetMasterWindow(master);
   dlg->Create(this,"");
   dlg->SetText(
     "HTML help is included in the Documentation/HTML subdirectory of\n"

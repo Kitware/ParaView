@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWDialog.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkKWWindow.h"
 
 
 //------------------------------------------------------------------------------
@@ -59,6 +59,7 @@ vtkKWDialog::vtkKWDialog()
   this->TitleString = 0;
   this->SetTitleString("Kitware Dialog");
   this->Beep = 0;
+  this->MasterWindow = 0;
 }
 
 vtkKWDialog::~vtkKWDialog()
@@ -68,6 +69,7 @@ vtkKWDialog::~vtkKWDialog()
     delete [] this->Command;
     }
   this->SetTitleString(0);
+  this->SetMasterWindow(0);
 }
 
 int vtkKWDialog::Invoke()
@@ -149,6 +151,35 @@ void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
   this->Script("wm protocol %s WM_DELETE_WINDOW {%s Cancel}",
                wname, this->GetTclName());
   this->Script("wm withdraw %s",wname);
+  if (this->MasterWindow)
+    {
+    this->Script("wm transient %s %s", wname, 
+		 this->MasterWindow->GetWidgetName());
+    }
+
+}
+
+void vtkKWDialog::SetMasterWindow(vtkKWWindow* win)
+{
+  if (this->MasterWindow != win) 
+    { 
+    if (this->MasterWindow) 
+      { 
+      this->MasterWindow->UnRegister(this); 
+      }
+    this->MasterWindow = win; 
+    if (this->MasterWindow) 
+      { 
+      this->MasterWindow->Register(this); 
+      if (this->Application)
+	{
+	this->Script("wm transient %s %s", this->GetWidgetName(), 
+		     this->MasterWindow->GetWidgetName());
+	}
+      } 
+    this->Modified(); 
+    } 
+  
 }
 
 void vtkKWDialog::SetCommand(vtkKWObject* CalledObject, const char *CommandString)

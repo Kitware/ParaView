@@ -173,8 +173,8 @@ public:
   // Description:
   // Display the on-line help and about dialog for this application.
   // Over-writing vtkKWApplication defaults.
-  void DisplayHelp();
-  virtual void DisplayAbout(vtkKWWindow *);
+  void DisplayHelp(vtkKWWindow* master);
+  virtual void DisplayAbout(vtkKWWindow *master);
 
   // For locating help (.chm) on Windows.
   virtual int GetApplicationKey() 

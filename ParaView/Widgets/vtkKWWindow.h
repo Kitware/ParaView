@@ -181,6 +181,11 @@ public:
   vtkSetStringMacro(WindowClass);
   vtkGetStringMacro(WindowClass);
 
+  // Description:
+  // The title of the properties menu button
+  vtkSetStringMacro(MenuPropertiesTitle);
+  vtkGetStringMacro(MenuPropertiesTitle);
+
   //Description:
   // Set/Get PromptBeforeClose
   vtkSetMacro(PromptBeforeClose, int);
@@ -190,6 +195,11 @@ public:
   // The extension used in LoadScript. Default is .tcl.
   vtkSetStringMacro(ScriptExtension);
   vtkGetStringMacro(ScriptExtension);
+
+  // Description:
+  // The type name used in LoadScript. Default is Tcl.
+  vtkSetStringMacro(ScriptType);
+  vtkGetStringMacro(ScriptType);
 
   // Description:
   // Call render on all views
@@ -259,10 +269,14 @@ protected:
   float      PrintTargetDPI;
   vtkKWMenu *PageMenu;
   char *ScriptExtension;
+  char *ScriptType;
 
   int SupportHelp;
   char *WindowClass;
+  char *MenuPropertiesTitle;
   int PromptBeforeClose;
+
+  int InExit;
 
   vtkKWPointerArray *RecentFiles;
   

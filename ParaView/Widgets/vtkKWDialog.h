@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 class vtkKWApplication;
+class vtkKWWindow;
 
 class VTK_EXPORT vtkKWDialog : public vtkKWWidget
 {
@@ -102,6 +103,13 @@ public:
   // Set the title of the dialog. Default is "Kitware Dialog".
   void SetTitle(const char *);
 
+  // Description:
+  // Set the window to which the dialog will be slave.
+  // If set, this dialog will always be on top of the master
+  // window and will minimize with it (assuming that the windowing
+  // system supports this)
+  void SetMasterWindow(vtkKWWindow* win);
+
 protected:
   // Description:
   // Set the title string of the dialog window. Should be called before
@@ -112,6 +120,8 @@ protected:
   ~vtkKWDialog();
   vtkKWDialog(const vtkKWDialog&) {};
   void operator=(const vtkKWDialog&) {};
+
+  vtkKWWindow* MasterWindow;
 
   char *Command;
   char *TitleString;

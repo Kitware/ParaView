@@ -248,6 +248,8 @@ vtkKWWindow::vtkKWWindow()
   this->MenuView = NULL;
   this->MenuWindow = NULL;
   this->MenuProperties = NULL;
+  this->MenuPropertiesTitle = NULL;
+  this->SetMenuPropertiesTitle("Properties");
   this->NumberOfMRUFiles = 0;
   this->RealNumberOfMRUFiles = 0;
   this->PrintTargetDPI = 100;
@@ -263,7 +265,11 @@ vtkKWWindow::vtkKWWindow()
   this->NumberOfRecentFiles = 5;
 
   this->ScriptExtension = 0;
+  this->ScriptType = 0;
   this->SetScriptExtension(".tcl");
+  this->SetScriptType("Tcl");
+
+  this->InExit = 0;
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -326,11 +332,15 @@ vtkKWWindow::~vtkKWWindow()
 
   this->SetWindowClass(0);
   this->SetScriptExtension(0);
+  this->SetScriptType(0);
+
+  this->SetMenuPropertiesTitle(0);
+
 }
 
 void vtkKWWindow::DisplayHelp()
 {
-  this->Application->DisplayHelp();
+  this->Application->DisplayHelp(this);
 }
 
 void vtkKWWindow::AddView(vtkKWView *v) 
@@ -385,11 +395,20 @@ void vtkKWWindow::SetSelectedView(vtkKWView *_arg)
 // invoke the apps exit when selected
 void vtkKWWindow::Exit()
 {  
+  if (!this->InExit)
+    {
+    this->InExit = 1;
+    }
+  else
+    {
+    return;
+    }
   if ( this->ExitDialog() )
     {
     this->PromptBeforeClose = 0;
     this->Application->Exit();
     }
+  this->InExit = 0;
 }
 
 // invoke the apps close when selected
@@ -533,15 +552,18 @@ vtkKWMenu *vtkKWWindow::GetMenuProperties()
   // make sure Help menu is on the right
   if (this->MenuView && this->MenuEdit)
     {
-    this->Menu->InsertCascade(3, "Properties", this->MenuProperties, 0);
+    this->Menu->InsertCascade(3, this->MenuPropertiesTitle, 
+			      this->MenuProperties, 0);
     }
   else if (this->MenuView || this->MenuEdit)
     {
-    this->Menu->InsertCascade(2, "Properties", this->MenuProperties, 0);
+    this->Menu->InsertCascade(2, this->MenuPropertiesTitle, 
+			      this->MenuProperties, 0);
     }
   else
     { 
-    this->Menu->InsertCascade(1, "Properties", this->MenuProperties, 0);
+    this->Menu->InsertCascade(1, this->MenuPropertiesTitle, 
+			      this->MenuProperties, 0);
     }
   return this->MenuProperties;
 }
@@ -648,7 +670,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
     this->GetMenuProperties()->CreateRadioButtonVariable(
       this->GetMenuProperties(),"Radio");
   this->GetMenuProperties()->AddRadioButton(0," Hide Properties", 
-                                            rbv, this, "HideProperties", 1);
+                                            rbv, this, "HideProperties", 1,
+					    "Hide the properties frame");
   delete [] rbv;
 }
 
@@ -756,7 +779,7 @@ void vtkKWWindow::LoadScript()
 {
   char *path = NULL;
 
-  this->Script("tk_getOpenFile -title \"Load Script\" -filetypes {{{Tcl Script} {%s}}}", this->ScriptExtension);
+  this->Script("tk_getOpenFile -title \"Load Script\" -filetypes {{{%s Script} {%s}}}", this->ScriptType, this->ScriptExtension);
   path = 
     strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
 	   this->Application->GetMainInterp()->result);
@@ -926,16 +949,11 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.62 $");
+  this->ExtractRevision(os,"$Revision: 1.63 $");
 }
 
 int vtkKWWindow::ExitDialog()
 {
-  // Removing the default handler while we are displaying exit dialog.
-  // Note that using wm protocol %s WM_DELETE_WINDOW {} installs
-  // the default handlers, that's why we put the ; there.
-  this->Script("wm protocol %s WM_DELETE_WINDOW {;}",
-               this->GetWidgetName());
 
   ostrstream title;
   title << "Exit " << this->GetApplication()->GetApplicationName() << ends;
@@ -945,14 +963,9 @@ int vtkKWWindow::ExitDialog()
   char* msg = str.str();
   
   int ret = vtkKWMessageDialog::PopupYesNo(
-    this->GetApplication(), vtkKWMessageDialog::Question,
+    this->GetApplication(), this, vtkKWMessageDialog::Question,
     ttl, msg);
 
-  if (!ret)
-    {
-    this->Script("wm protocol %s WM_DELETE_WINDOW {%s Close}",
-		 this->GetWidgetName(), this->GetTclName());
-    }
   delete[] msg;
   delete[] ttl;
  

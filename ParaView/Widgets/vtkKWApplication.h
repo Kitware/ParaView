@@ -95,8 +95,8 @@ public:
 
   // Description:
   // Display the on-line help and about dialog for this application.
-  virtual void DisplayHelp();
-  virtual void DisplayAbout(vtkKWWindow *);
+  virtual void DisplayHelp(vtkKWWindow *master);
+  virtual void DisplayAbout(vtkKWWindow *master);
 
   // Description:
   // Add a window to this application.

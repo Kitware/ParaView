@@ -413,7 +413,7 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 }
 
 
-void vtkKWApplication::DisplayHelp()
+void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
 {
 #ifdef _WIN32
   char temp[1024];
@@ -434,6 +434,7 @@ void vtkKWApplication::DisplayHelp()
   HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
 #else
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+  dlg->SetMasterWindow(master);
   dlg->Create(this,"");
   dlg->SetText(
     "HTML help is included in the help subdirectory of\n"
@@ -581,13 +582,14 @@ int vtkKWApplication::GetWidgetVisibility()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::DisplayAbout(vtkKWWindow* /*win*/)
+void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
 {
   ostrstream str;
   str << "Application : " << this->GetApplicationName() << "\nVersion : " << this->GetApplicationVersionName() << "\nRelease : " << this->GetApplicationReleaseName() << ends;
 
   char* msg = str.str();
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+  dlg->SetMasterWindow(master);
   dlg->Create(this,"");
   dlg->SetText(msg);
   dlg->Invoke();  

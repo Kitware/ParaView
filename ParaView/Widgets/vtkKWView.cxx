@@ -180,6 +180,7 @@ vtkKWView::vtkKWView()
   this->Printing = 0;
   
   this->MenuPropertiesName = NULL;
+  this->MenuPropertiesHelp = NULL;
   this->MenuPropertiesUnderline = -1;
   this->SetMenuPropertiesName(" View");
   
@@ -250,6 +251,7 @@ vtkKWView::~vtkKWView()
   delete [] this->StillUpdateRates;
   
   this->SetMenuPropertiesName(NULL);
+  this->SetMenuPropertiesHelp(NULL);
   
 }
 
@@ -803,6 +805,7 @@ void vtkKWView::Print()
     psw->Delete();
 
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+    dlg->SetMasterWindow(this->ParentWindow);
     dlg->Create(this->Application,"");
     dlg->SetText(
       "A postscript file has been generated. You will need to\n"
@@ -953,7 +956,14 @@ void vtkKWView::Select(vtkKWWindow *pw)
   char *rbv = 
     pw->GetMenuProperties()->CreateRadioButtonVariable(
       pw->GetMenuProperties(),"Radio");
-  pw->GetMenuProperties()->AddRadioButton(10, this->MenuPropertiesName, rbv, this, "ShowViewProperties", this->GetMenuPropertiesUnderline());
+  pw->GetMenuProperties()->AddRadioButton(10, 
+					  this->MenuPropertiesName, 
+					  rbv, this, "ShowViewProperties", 
+					  this->GetMenuPropertiesUnderline(),
+					  this->MenuPropertiesHelp ? 
+					  this->MenuPropertiesHelp :
+					  this->MenuPropertiesName
+					  );
   delete [] rbv;
 
   if ( this->SupportSaveAsImage )
@@ -1275,7 +1285,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.53 $");
+  this->ExtractRevision(os,"$Revision: 1.54 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
