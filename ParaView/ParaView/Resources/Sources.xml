@@ -92,24 +92,6 @@
   <VectorEntry label="Max. iterations" trace_name="MaxIterations" variable="MaximumNumberOfIterations" type="int" help="The limit on computational iterations. Values less than 2.0 after this many iterations are considered in the set."/>
 </Module>
 
-<Module name="MultiSphere" menu_name="MultiSphere" root_name="MultiSphere" module_type="Source" 
-        long_help="String of spheres." 
-        short_help="3D spheres">
-  <Source class="vtkMultiOut"/>
-</Module>
-
-<Module name="MultiHetero" menu_name="MultiHetero" root_name="MultiHetero" module_type="Source" 
-        long_help="Mixed collection: Sphere and wavelet" 
-        short_help="Sphere and wavelet">
-  <Source class="vtkMultiOut2"/>
-</Module>
-
-<Module name="MultiVolume" menu_name="MultiVolume" root_name="MultiVolume" module_type="Source" 
-        long_help="Two Mandelbrot volumes. Extents are offset to merge as one volume." 
-        short_help="Two volumes.">
-  <Source class="vtkMultiOut3"/>
-</Module>
-
 <Module name="PlaneSource" menu_name="Plane" root_name="Plane" module_type="Source" 
         long_help="Parallelogram given an origin and two points. The resolution indicates the number of division along each axis of the plane." 
         short_help="Create a parallelogram from an origin and two points">
