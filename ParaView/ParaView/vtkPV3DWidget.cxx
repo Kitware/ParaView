@@ -94,6 +94,7 @@ vtkPV3DWidget::vtkPV3DWidget()
   this->Widget3D = 0;
   this->Visible = 0;
   this->Placed = 0;
+  this->UseLabel = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -133,19 +134,26 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
 
-  this->LabeledFrame->SetParent(this);
-  this->LabeledFrame->Create(pvApp);
-  this->LabeledFrame->SetLabel("3D Widget");
+  vtkKWWidget* parent = this;
 
-  this->Script("pack %s -fill both -expand 1", 
-               this->LabeledFrame->GetWidgetName());
+  if (this->UseLabel)
+    {
+    this->LabeledFrame->SetParent(this);
+    this->LabeledFrame->Create(pvApp);
+    this->LabeledFrame->SetLabel("3D Widget");
+    
+    this->Script("pack %s -fill both -expand 1", 
+                 this->LabeledFrame->GetWidgetName());
 
-  this->Frame->SetParent(this->LabeledFrame->GetFrame());
+    parent = this->LabeledFrame->GetFrame();
+    }
+
+  this->Frame->SetParent(parent);
   this->Frame->Create(pvApp, 0);
   this->Script("pack %s -fill both -expand 1", 
                this->Frame->GetWidgetName());
   
-  this->Visibility->SetParent(this->LabeledFrame->GetFrame());
+  this->Visibility->SetParent(parent);
   this->Visibility->Create(pvApp, "");
   this->Visibility->SetText("Visibility");
   this->Visibility->SetCommand(this, "SetVisibility");
@@ -212,6 +220,7 @@ void vtkPV3DWidget::SetVisibility(int visibility)
     {
     this->PlaceWidget();
     }
+
   this->Widget3D->SetEnabled(visibility);
   this->AddTraceEntry("$kw(%s) SetVisibility %d", 
                       this->GetTclName(), visibility);
@@ -243,7 +252,7 @@ void vtkPV3DWidget::SetVisibilityNoTrace(int visibility)
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetFrameLabel(const char* label)
 {
-  if ( this->LabeledFrame )
+  if ( this->LabeledFrame && this->UseLabel )
     {
     this->LabeledFrame->SetLabel(label);
     } 
@@ -291,6 +300,12 @@ int vtkPV3DWidget::ReadXMLAttributes(vtkPVXMLElement* element,
                                      vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+
+  if(!element->GetScalarAttribute("use_label", &this->UseLabel))
+    {
+    this->UseLabel = 1;
+    }
+
   return 1;
 }
 

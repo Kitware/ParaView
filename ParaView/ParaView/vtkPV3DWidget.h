@@ -113,6 +113,12 @@ public:
   // Get the 3D Widget.
   vtkGetObjectMacro(Widget3D, vtk3DWidget);
 
+  // Description:
+  // Determines whether there is a label-border around the widget
+  // ui.
+  vtkSetMacro(UseLabel, int);
+  vtkGetMacro(UseLabel, int);
+
 protected:
   vtkPV3DWidget();
   ~vtkPV3DWidget();
@@ -136,7 +142,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 
   friend class vtkPV3DWidgetObserver;
 //ETX
@@ -146,7 +152,7 @@ protected:
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
   
   virtual int ReadXMLAttributes(vtkPVXMLElement* element,
-				vtkPVXMLPackageParser* parser);
+                                vtkPVXMLPackageParser* parser);
 
   vtkKWFrame*        Frame;
   vtkKWLabeledFrame* LabeledFrame;
@@ -154,6 +160,7 @@ protected:
   int ValueChanged;
   int Placed;
   int Visible;
+  int UseLabel;
 
 private:  
   vtkPV3DWidget(const vtkPV3DWidget&); // Not implemented
