@@ -47,6 +47,7 @@ $kw(vtkTemp243) DeleteCallback
 # Read the vtkPolyData from the temporary file.
 $kw(vtkTemp1) Open "testPolyData.$ext"
 set kw(vtkTemp337) [vtkTemp1 GetCurrentPVSource]
+$kw(vtkTemp337) AcceptCallback
 update
 
 # Fix the size of the image.

@@ -37,6 +37,7 @@ $kw(vtkTemp257) DeleteCallback
 # Read the vtkUnstructuredGrid from the temporary file.
 $kw(vtkTemp1) Open "testUnstructuredGrid.$ext"
 set kw(vtkTemp291) [vtkTemp1 GetCurrentPVSource]
+$kw(vtkTemp291) AcceptCallback
 update
 
 # Fix the size of the image.
