@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWLabeledLabelSet);
-vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.1");
+vtkCxxRevisionMacro(vtkKWLabeledLabelSet, "1.2");
 
 int vtkvtkKWLabeledLabelSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -224,6 +224,7 @@ int vtkKWLabeledLabelSet::AddLabeledLabel(int id,
 
   labeledlabel_slot->LabeledLabel->SetParent(this);
   labeledlabel_slot->LabeledLabel->Create(this->Application, 0);
+  labeledlabel_slot->LabeledLabel->SetEnabled(this->Enabled);
 
   // Set text balloon help, if any
 

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.3");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.4");
 
 int vtkvtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -225,6 +225,7 @@ int vtkKWRadioButtonSet::AddButton(int id,
   button_slot->Button->SetParent(this);
   button_slot->Button->Create(this->Application, 0);
   button_slot->Button->SetValue(id);
+  button_slot->Button->SetEnabled(this->Enabled);
 
   // All radiobuttons share the same var name
 

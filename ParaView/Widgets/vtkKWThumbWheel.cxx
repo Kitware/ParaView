@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.5");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.6");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -444,6 +444,7 @@ void vtkKWThumbWheel::CreateEntry()
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
   this->Entry->Create(this->Application, "-width 7");
+  this->Entry->SetEnabled(this->Enabled);
   this->UpdateEntryResolution();
   this->Entry->SetValue(this->GetValue(), this->EntryResolution);
 }
@@ -479,6 +480,7 @@ void vtkKWThumbWheel::CreateLabel()
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this);
   this->Label->Create(this->Application, "");
+  this->Label->SetEnabled(this->Enabled);
 }
 
 // ---------------------------------------------------------------------------

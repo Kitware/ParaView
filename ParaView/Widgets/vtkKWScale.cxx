@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.48");
+vtkCxxRevisionMacro(vtkKWScale, "1.49");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -285,6 +285,7 @@ void vtkKWScale::DisplayEntry()
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
   this->Entry->Create(this->Application, "-width 10");
+  this->Entry->SetEnabled(this->Enabled);
   this->UpdateEntryResolution();
   this->Entry->SetValue(this->GetValue(), this->EntryResolution);
 
@@ -311,6 +312,7 @@ void vtkKWScale::DisplayLabel(const char *label)
     {
     this->Label->SetParent(this);
     this->Label->Create(this->Application, "label", "-anchor w");
+    this->Label->SetEnabled(this->Enabled);
     }
 
   this->Script("%s configure -text {%s}",
@@ -661,16 +663,16 @@ void vtkKWScale::SetValue(float num)
 
   if (this->Scale && this->Scale->IsCreated())
     {
-    int was_disabled = !this->Enabled;
+    int was_disabled = !this->Scale->GetEnabled();
     if (was_disabled)
       {
-      this->SetEnabled(1);
+      this->Scale->SetEnabled(1);
       }
     this->Script("%s set %f", 
                  this->Scale->GetWidgetName(), num);
     if (was_disabled)
       {
-      this->SetEnabled(0);
+      this->Scale->SetEnabled(0);
       }
     }
   
@@ -1044,6 +1046,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     {
     this->RangeMinLabel = vtkKWLabel::New();
     this->RangeMinLabel->SetParent(this);
+
     if (this->Resolution >= 1)
       {
       sprintf(labelText, "(%.0f)", this->Range[0]);
@@ -1054,6 +1057,7 @@ void vtkKWScale::SetDisplayRange(int flag)
       }
     this->RangeMinLabel->Create(this->Application, "");
     this->RangeMinLabel->SetLabel(labelText);
+    this->RangeMinLabel->SetEnabled(this->Enabled);
     }
   if ( ! this->RangeMaxLabel)
     {
@@ -1069,6 +1073,7 @@ void vtkKWScale::SetDisplayRange(int flag)
       }
     this->RangeMaxLabel->Create(this->Application, "");
     this->RangeMaxLabel->SetLabel(labelText);
+    this->RangeMaxLabel->SetEnabled(this->Enabled);
     }
   this->Modified();
   this->PackWidget();

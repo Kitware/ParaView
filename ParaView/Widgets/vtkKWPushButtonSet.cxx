@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWPushButtonSet);
-vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.4");
+vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.5");
 
 int vtkvtkKWPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -227,6 +227,7 @@ int vtkKWPushButtonSet::AddButton(int id,
 
   button_slot->Button->SetParent(this);
   button_slot->Button->Create(this->Application, 0);
+  button_slot->Button->SetEnabled(this->Enabled);
 
   // Set text command and balloon help, if any
 
