@@ -45,9 +45,9 @@ public:
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController); 
 
-  void SetColorProc(int cp){colorProc = cp;};
-  void SetColorProc(){colorProc = 1;};
-  int GetColorProc(){return colorProc;};
+  vtkGetMacro(ColorProc,int);
+  vtkSetMacro(ColorProc,int);
+  void SetColorProc() { this->ColorProc = 1; };
 
   // Description:
   // These are here for ParaView compatibility. Not used.
@@ -166,8 +166,8 @@ protected:
   int DoubleCheckArrays(vtkPolyData* input);
 
   vtkMultiProcessController *Controller;
-  //vtkPointLocator *Locator;
-  int colorProc; // Set to 1 to color data according to processor
+
+  int ColorProc; // Set to 1 to color data according to processor
 
 private:
   vtkRedistributePolyData(const vtkRedistributePolyData&); // Not implemented

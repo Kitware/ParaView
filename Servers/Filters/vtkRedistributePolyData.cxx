@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.16");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.17");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -62,8 +62,8 @@ vtkRedistributePolyData::vtkRedistributePolyData()
     {
     this->Controller->Register(this);
     }
-  //this->Locator = vtkPointLocator::New();
-  this->colorProc = 0;
+
+  this->ColorProc = 0;
 }
 
 vtkRedistributePolyData::~vtkRedistributePolyData()
@@ -910,7 +910,7 @@ void vtkRedistributePolyData::CopyArrays
     case VTK_DOUBLE:
       dArrayFrom = ((vtkDoubleArray*)DataFrom)->GetPointer(0);
       dArrayTo = ((vtkDoubleArray*)DataTo)->GetPointer(0);
-      if (!colorProc)
+      if (!this->ColorProc)
         {
         for (i = 0; i < numToCopy; i++)
           {
@@ -1049,7 +1049,7 @@ void vtkRedistributePolyData::CopyBlockArrays
     case VTK_DOUBLE:
       dArrayFrom = ((vtkDoubleArray*)DataFrom)->GetPointer(fromOffset);
       dArrayTo = ((vtkDoubleArray*)DataTo)->GetPointer(toOffset);
-      if (!colorProc)
+      if (!this->ColorProc)
         for (i=start; i<stop; i++) { dArrayTo[i] = dArrayFrom[i]; }
       else
         for (i=start; i<stop; i++) { dArrayTo[i] = myId; }
@@ -2562,7 +2562,7 @@ void vtkRedistributePolyData::ReceiveArrays
 
       this->Controller->
         Receive(sc, numToCopy*numComps*dataSize, recFrom, recTag);
-      if (!colorProc)
+      if (!this->ColorProc)
         {
         for (i = 0; i < numToCopy; i++)
           {
