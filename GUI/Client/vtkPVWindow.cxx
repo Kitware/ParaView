@@ -215,7 +215,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.641");
+vtkCxxRevisionMacro(vtkPVWindow, "1.642");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -786,6 +786,7 @@ void vtkPVWindow::PrepareForDelete()
 
   if (this->MainView)
     {
+    this->MainView->PrepareForDelete();
     this->MainView->Delete();
     }
 
