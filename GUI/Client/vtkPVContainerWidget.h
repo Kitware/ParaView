@@ -24,7 +24,7 @@
 //BTX
 template <class key, class data> 
 class vtkArrayMap;
-class vtkCollection;
+class vtkPVWidgetCollection;
 //ETX
 
 class VTK_EXPORT vtkPVContainerWidget : public vtkPVWidget
@@ -123,7 +123,7 @@ protected:
 
 //BTX
 
-  vtkCollection *WidgetProperties;
+  vtkPVWidgetCollection *Widgets;
 
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
