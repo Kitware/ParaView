@@ -17,7 +17,6 @@
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkGlyphSource2D.h"
 #include "vtkPVGlyphFilter.h"
-#include "vtkPVThresholdFilter.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkPVContourFilter.h"
@@ -28,6 +27,13 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+
+#include "vtkPVArrowSource.h"
+#include "vtkPVRibbonFilter.h"
+#include "vtkPVThresholdFilter.h"
+#include "vtkPVLinearExtrusionFilter.h"
+#include "vtkPVWarpScalar.h"
+#include "vtkDataSetMapper.h"
 
 int main(int argc, char* argv[])
 {
@@ -80,9 +86,40 @@ int main(int argc, char* argv[])
   vtkPVLODActor *actor = vtkPVLODActor::New();
   actor->SetMapper( mapper );
   
+  //Now for the PVPolyData part:
+  vtkPVRibbonFilter *ribbon = vtkPVRibbonFilter::New();
+  ribbon->SetInput( contour->GetOutput() );
+  ribbon->SetWidth( 0.1 );
+  ribbon->SetWidthFactor(5);
+
+  vtkPVArrowSource *arrow = vtkPVArrowSource::New();
+
+  vtkPVLinearExtrusionFilter *extrude = vtkPVLinearExtrusionFilter::New();
+  extrude->SetInput( arrow->GetOutput() );
+  extrude->SetScaleFactor(1);
+  extrude->SetExtrusionTypeToNormalExtrusion();
+  extrude->SetVector(1, 0, 0);
+  extrude->Update();  //discard
+  
+  vtkPVThresholdFilter *threshold = vtkPVThresholdFilter::New();
+  threshold->SetInput( ribbon->GetOutput() );
+  threshold->ThresholdBetween(0.25, 0.75);
+
+  vtkPVWarpScalar *warp = vtkPVWarpScalar::New();
+  warp->SetInput( threshold->GetOutput() );
+  warp->XYPlaneOn();
+  warp->SetScaleFactor(0.5);
+  
+  vtkDataSetMapper *warpMapper = vtkDataSetMapper::New();
+  warpMapper->SetInput( warp->GetOutput() );
+  
+  vtkActor *warpActor = vtkActor::New();
+  warpActor->SetMapper( warpMapper );
+
   vtkRenderer *ren = vtkRenderer::New();
   ren->AddActor( actor );
-  
+  ren->AddActor( warpActor );
+
   vtkRenderWindow *renWin = vtkRenderWindow::New();
   renWin->AddRenderer( ren );
   
@@ -98,6 +135,15 @@ int main(int argc, char* argv[])
   geometry->Delete();
   mapper->Delete();
   actor->Delete();
+
+  arrow->Delete();
+  ribbon->Delete();
+  extrude->Delete();
+  threshold->Delete();
+  warp->Delete();
+  warpMapper->Delete();
+  warpActor->Delete();
+
   ren->Delete();
   renWin->Delete();
 
