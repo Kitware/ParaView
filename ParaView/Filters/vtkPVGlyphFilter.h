@@ -63,8 +63,7 @@ public:
   virtual void SetInput(vtkDataSet *input);
   
   // Description:
-  // Set/get the number of processes used to run this filter.
-  vtkSetMacro(NumberOfProcesses, int);
+  // Get the number of processes used to run this filter.
   vtkGetMacro(NumberOfProcesses, int);
   
   // Description:

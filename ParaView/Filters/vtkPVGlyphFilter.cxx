@@ -19,9 +19,10 @@
 
 #include "vtkMaskPoints.h"
 #include "vtkObjectFactory.h"
+#include "vtkMultiProcessController.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.4");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.5");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 vtkPVGlyphFilter::vtkPVGlyphFilter()
@@ -30,7 +31,8 @@ vtkPVGlyphFilter::vtkPVGlyphFilter()
   this->SetScaleModeToScaleByVector();
   this->MaskPoints = vtkMaskPoints::New();
   this->MaximumNumberOfPoints = 5000;
-  this->NumberOfProcesses = 1;
+  this->NumberOfProcesses =
+    vtkMultiProcessController::GetGlobalController()->GetNumberOfProcesses();
   this->UseMaskPoints = 1;
 }
 
