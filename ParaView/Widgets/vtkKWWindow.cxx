@@ -278,6 +278,16 @@ vtkKWWindow::~vtkKWWindow()
 {
   if ( this->RecentFiles )
     {
+    vtkKWWindowMenuEntry *kc = 0;
+    while( this->RecentFiles->GetSize() > 0 )
+      {
+      if ( ( kc = (vtkKWWindowMenuEntry *)
+	     this->RecentFiles->Lookup( this->RecentFiles->GetSize()-1 ) ) )
+	{
+	kc->Delete();
+	this->RecentFiles->Remove( this->RecentFiles->GetSize()-1 );
+	}
+      }
     this->RecentFiles->Delete();
     }
   this->Notebook->Delete();
@@ -913,7 +923,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.46 $");
+  this->ExtractRevision(os,"$Revision: 1.47 $");
 }
 
 int vtkKWWindow::ExitDialog()
