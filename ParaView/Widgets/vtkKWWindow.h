@@ -199,6 +199,13 @@ public:
   // Set/Get Number of recent files in the menu.
   vtkSetClampMacro(NumberOfRecentFiles, unsigned int, 4, 10);
   vtkGetMacro(NumberOfRecentFiles, unsigned int);
+
+  //Description:
+  // Set or get the registry value for the application.
+  int SetRegisteryValue(const char* subkey, const char* key, 
+			const char*value);
+  int GetRegisteryValue(const char* subkey, const char* key, 
+			char*value);
   
 protected:
   vtkKWWindow();

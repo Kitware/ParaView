@@ -899,7 +899,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.58 $");
+  this->ExtractRevision(os,"$Revision: 1.59 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1076,4 +1076,34 @@ void vtkKWWindow::PrintRecentFiles()
       cout << " -- null " << endl;
       }
     }
+}
+
+
+int vtkKWWindow::SetRegisteryValue(const char* subkey, const char* key, 
+				   const char*value)
+{
+  int res = 0;
+  vtkKWRegisteryUtilities *reg 
+    = this->GetApplication()->GetRegistery(
+      this->GetApplication()->GetApplicationName());
+  res = reg->SetValue(subkey, key, value);
+  cout << "SetRegisteryValue(" << subkey << ", " << key << ", "
+       << value << ")" << endl;
+  return res;
+}
+int vtkKWWindow::GetRegisteryValue(const char* subkey, const char* key, 
+				   char*value)
+{
+  int res = 0;
+  char buffer[1024];
+  *value = 0;
+  vtkKWRegisteryUtilities *reg 
+    = this->GetApplication()->GetRegistery(
+      this->GetApplication()->GetApplicationName());
+  res = reg->ReadValue(subkey, key, buffer);
+  if ( *buffer )
+    {
+    strcpy(value, buffer);
+    }  
+  return res;
 }
