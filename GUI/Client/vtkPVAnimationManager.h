@@ -223,10 +223,10 @@ protected:
   
   // Description:
   // NOTE: these methods allocated memory. It is up to the caller to delete it.
-  const char* GetSourceListName(const char* proxyname);
-  const char* GetSourceName(const char* proxyname);
-  const char* GetSubSourceName(const char* proxyname);
-  const char* GetSourceKey(const char* proxyname);
+  char* GetSourceListName(const char* proxyname);
+  char* GetSourceName(const char* proxyname);
+  char* GetSubSourceName(const char* proxyname);
+  char* GetSourceKey(const char* proxyname);
 
   // Description:
   // Iterates over properties of the proxy and add animation cues.

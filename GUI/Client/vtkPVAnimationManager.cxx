@@ -57,7 +57,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.3");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.4");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -230,9 +230,9 @@ void vtkPVAnimationManager::ValidateOldSources()
      */
     int deleted = 0;
     const char* sourcekey = iter->first.c_str();
-    const char* listname = this->GetSourceListName(sourcekey);
-    const char* sourcename = this->GetSourceName(sourcekey);
-    const char* subsourcename = this->GetSubSourceName(sourcekey);
+    char* listname = this->GetSourceListName(sourcekey);
+    char* sourcename = this->GetSourceName(sourcekey);
+    char* subsourcename = this->GetSubSourceName(sourcekey);
 
     if (strcmp(listname,"_dont_validate_") == 0)
       {
@@ -285,9 +285,9 @@ void vtkPVAnimationManager::AddNewSources()
     vtkSMProxy* proxy = this->ProxyIterator->GetProxy();
     vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
     const char* proxyname = pxm->GetProxyName(VTK_PV_ANIMATION_GROUP, proxy);
-    const char* listname = this->GetSourceListName(proxyname);
-    const char* sourcename = this->GetSourceName(proxyname);
-    const char* subsourcename = this->GetSubSourceName(proxyname);
+    char* listname = this->GetSourceListName(proxyname);
+    char* sourcename = this->GetSourceName(proxyname);
+    char* subsourcename = this->GetSubSourceName(proxyname);
 
     if (strcmp(listname, "GlyphSources") == 0)
       {
@@ -334,7 +334,7 @@ void vtkPVAnimationManager::AddNewSources()
     vtkPVAnimationCueTree* pvParentTree = NULL;
     if (subsourcename!=NULL)
       {
-      const char* sourcekey = this->GetSourceKey(proxyname);
+      char* sourcekey = this->GetSourceKey(proxyname);
       pvParentTree = vtkPVAnimationCueTree::SafeDownCast(
         this->Internals->PVAnimationCues[sourcekey]);
       // Set the pvSource for the source tree so that 
@@ -568,7 +568,7 @@ void vtkPVAnimationManager::InitializeObservers(vtkPVAnimationCue* cue)
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkPVAnimationManager::GetSourceListName(const char* proxyname)
+char* vtkPVAnimationManager::GetSourceListName(const char* proxyname)
 {
   if (proxyname==NULL || vtkString::Length(proxyname) == 0)
     {
@@ -582,7 +582,7 @@ const char* vtkPVAnimationManager::GetSourceListName(const char* proxyname)
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkPVAnimationManager::GetSourceName(const char* proxyname)
+char* vtkPVAnimationManager::GetSourceName(const char* proxyname)
 {
   if (proxyname==NULL || vtkString::Length(proxyname) == 0)
     {
@@ -599,18 +599,18 @@ const char* vtkPVAnimationManager::GetSourceName(const char* proxyname)
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkPVAnimationManager::GetSourceKey(const char* proxyname)
+char* vtkPVAnimationManager::GetSourceKey(const char* proxyname)
 {
-  const char* listname = this->GetSourceListName(proxyname);
-  const char* sourcename  = this->GetSourceName(proxyname);
-  const char* key = vtkString::Append(listname,";",sourcename);
+  char* listname = this->GetSourceListName(proxyname);
+  char* sourcename  = this->GetSourceName(proxyname);
+  char* key = vtkString::Append(listname,";",sourcename);
   delete [] listname;
   delete [] sourcename;
   return key;
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkPVAnimationManager::GetSubSourceName(const char* proxyname)
+char* vtkPVAnimationManager::GetSubSourceName(const char* proxyname)
 {
   if (proxyname==NULL || vtkString::Length(proxyname) == 0)
     {
