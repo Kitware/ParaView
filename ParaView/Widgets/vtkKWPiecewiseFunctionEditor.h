@@ -76,9 +76,8 @@ public:
 
   // Description:
   // Set/Get the window/level.
-  // This method will invoke FunctionChangedCommand and 
-  // WindowLevelChangedCommand. Use SetInteractiveWindowLevel to invoke
-  // FunctionChangingCommand and trigger a WindowLevelChangingCommand.
+  // This method will invoke FunctionChangedCommand. Use 
+  // SetInteractiveWindowLevel to invoke FunctionChangingCommand instead.
   virtual void SetWindowLevel(float window, float level);
   virtual void SetInteractiveWindowLevel(float window, float level);
   vtkGetMacro(Window, float);
