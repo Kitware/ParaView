@@ -899,7 +899,6 @@ void vtkPVSource::AcceptCallback()
   char methodAndArg[256];
   int numSources;
   vtkPVSource *source;
-  int numMenus;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   // This adds an extract filter only when the MaximumNumberOfPieces is 1.
@@ -1003,14 +1002,7 @@ void vtkPVSource::AcceptCallback()
 
   this->Script("update");  
 
-  this->Script("%s index end", window->GetMenu()->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state normal",
-                 window->GetMenu()->GetWidgetName(), i);
-    }
+  window->EnableMenus();
 
 #ifdef _WIN32
   this->Script("%s configure -cursor arrow", window->GetWidgetName());
@@ -1046,7 +1038,7 @@ void vtkPVSource::DeleteCallback()
 {
   vtkPVData *ac;
   vtkPVSource *prev;
-  int i, numMenus;
+  int i;
   int numSources;
   char methodAndArg[256];
   vtkPVSource *source;
@@ -1070,7 +1062,7 @@ void vtkPVSource::DeleteCallback()
   for (i = 0; i < this->NumberOfPVOutputs; ++i)
     {
     if (this->PVOutputs[i] && 
-	this->PVOutputs[i]->GetNumberOfPVConsumers() > 0)
+        this->PVOutputs[i]->GetNumberOfPVConsumers() > 0)
       { // Button should be deactivated.
       vtkErrorMacro("An output is used.  We cannot delete this source.");
       return;
@@ -1136,15 +1128,8 @@ void vtkPVSource::DeleteCallback()
   
   this->GetPVRenderView()->EventuallyRender();
 
-  this->Script("%s index end", window->GetMenu()->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
+  this->GetWindow()->EnableMenus();
   
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state normal",
-                 window->GetMenu()->GetWidgetName(), i);
-    }
-
   // This should delete this source.
   this->GetWindow()->GetMainView()->RemoveComposite(this);
 }

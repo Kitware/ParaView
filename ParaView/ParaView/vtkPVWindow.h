@@ -213,6 +213,12 @@ public:
     {return this->RotateCameraInteractor;}
 
   // Description:
+  // Ability to disable and enable the menus on the menu bar.
+  // Most of the manipulation is internal to window.
+  void DisableMenus();
+  void EnableMenus();
+
+  // Description:
   // Ability to disable and enable the filter buttons on the toolbar.
   // Most of the manipulation is internal to window.
   void DisableFilterButtons();

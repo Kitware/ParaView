@@ -1364,6 +1364,42 @@ void vtkPVWindow::ReductionCheckCallback()
   this->GetMainView()->SetUseReductionFactor(reduce);
 }
 
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::DisableMenus()
+{
+  int numMenus;
+  int i;
+
+  this->Script("%s index end", this->Menu->GetWidgetName());
+  numMenus = atoi(this->GetPVApplication()->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state disabled",
+                 this->Menu->GetWidgetName(), i);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::EnableMenus()
+{
+  int numMenus;
+  int i;
+
+  this->Script("%s index end", this->Menu->GetWidgetName());
+  numMenus = atoi(this->GetPVApplication()->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state normal",
+                 this->Menu->GetWidgetName(), i);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkPVWindow::DisableFilterButtons()
 {
@@ -1415,7 +1451,6 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
-  int numMenus, i;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1476,15 +1511,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return calc;
@@ -1501,7 +1528,6 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
   const char* outputDataType;
-  int numMenus, i;
   vtkPVData *current;
   
   current = this->GetCurrentPVData();
@@ -1569,15 +1595,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return cutPlane;
@@ -1595,7 +1613,6 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
   const char* outputDataType;
-  int numMenus, i;
   vtkPVData *current;
   
   // Before we do anything, let's see if we can determine the output type.
@@ -1659,15 +1676,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return threshold;
@@ -1684,7 +1693,6 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
   const char* outputDataType;
-  int numMenus, i;
   vtkPVData *current;
   
   // Before we do anything, let's see if we can determine the output type.
@@ -1753,15 +1761,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return clipPlane;
@@ -1780,7 +1780,6 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
-  int numMenus, i;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1846,15 +1845,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   // It has not really been deleted.
@@ -1873,7 +1864,6 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
-  int numMenus, i;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1936,15 +1926,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return glyph;
@@ -1962,7 +1944,6 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
-  int i, numMenus;
   
   current = this->GetCurrentPVData();
   if (current == NULL)
@@ -2024,15 +2005,7 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   
   ++instanceCount;
   
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return probe;
