@@ -20,7 +20,7 @@
 #include "vtkPVImageGradient.h"
 #include "vtkImageViewer.h"
 #include "vtkPVImageGradientMagnitude.h"
-#include "vtkTestUtilitites.h"
+#include "vtkTestUtilities.h"
 #include "vtkTesting.h"
 
 #ifdef VTK_USE_PATENTED
