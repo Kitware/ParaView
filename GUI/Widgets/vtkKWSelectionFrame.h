@@ -24,6 +24,7 @@ class vtkKWLabel;
 class vtkKWMenuButton;
 class vtkKWPushButton;
 class vtkKWToolbarSet;
+class vtkKWSelectionFrameInternals;
 
 class VTK_EXPORT vtkKWSelectionFrame : public vtkKWWidget
 {
@@ -57,21 +58,35 @@ public:
   virtual void SetSelectionList(int num, const char **list);
   virtual void SetSelectionListCommand(
     vtkKWObject *object, const char *method);
+  vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
   virtual void SetShowSelectionList(int);
   vtkGetMacro(ShowSelectionList, int);
   vtkBooleanMacro(ShowSelectionList, int);
-  vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
 
   // Description:
-  // Show/Hide the close button
-  // Set the close command, called when the frame is closed by the user.
+  // Show close (button and menu entry)
+  // If set, a close button is added in the top right corner,
+  // and a "Close" entry is added to the end of the selection list.
+  // Set the close command, called when the the close button or the menu entry
+  // is selected by the user.
   // This command will be passed a pointer to this object.
+  virtual void SetShowClose(int);
+  vtkGetMacro(ShowClose, int);
+  vtkBooleanMacro(ShowClose, int);
   virtual void SetCloseCommand(
     vtkKWObject *object, const char *method);
-  virtual void SetShowCloseButton(int);
-  vtkGetMacro(ShowCloseButton, int);
-  vtkBooleanMacro(ShowCloseButton, int);
   vtkGetObjectMacro(CloseButton, vtkKWPushButton);
+
+  // Description:
+  // Show change title (menu entry)
+  // If set, a "Change title" entry is added to the end of the selection list.
+  // Set the command, called when the menu entry is selected by the user.
+  // This command will be passed a pointer to this object.
+  virtual void SetShowChangeTitle(int);
+  vtkGetMacro(ShowChangeTitle, int);
+  vtkBooleanMacro(ShowChangeTitle, int);
+  virtual void SetChangeTitleCommand(
+    vtkKWObject *object, const char *method);
 
   // Description:
   // Set the select command, called when the frame is selected by the user
@@ -104,16 +119,11 @@ public:
     { this->SetTitleBackgroundSelectedColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
-  // Set the selection list (array of num strings) and the command
-  // that will be called when a selection is made by the user. 
-  // This command will be passed both the selected string and 
-  // a pointer to this object.
-  // The selection list is represented as a pull down menu, which
-  // visibility can be set.
+  // Show/Hide the toolbar set.
+  vtkGetObjectMacro(ToolbarSet, vtkKWToolbarSet);
   virtual void SetShowToolbarSet(int);
   vtkGetMacro(ShowToolbarSet, int);
   vtkBooleanMacro(ShowToolbarSet, int);
-  vtkGetObjectMacro(ToolbarSet, vtkKWToolbarSet);
 
   // Description:
   // Callbacks
@@ -121,6 +131,7 @@ public:
   virtual void SelectionListCallback(const char *menuItem);
   virtual void SelectCallback();
   virtual void DoubleClickCallback();
+  virtual void ChangeTitleCallback();
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -154,6 +165,7 @@ protected:
 
   virtual int SetColor(float *color, float r, float g, float b);
   virtual void UpdateColors();
+  virtual void UpdateSelectionList();
 
   float TitleColor[3];
   float TitleSelectedColor[3];
@@ -164,11 +176,17 @@ protected:
   char *SelectionListCommand;
   char *SelectCommand;
   char *DoubleClickCommand;
+  char *ChangeTitleCommand;
 
   int Selected;
   int ShowSelectionList;
-  int ShowCloseButton;
+  int ShowClose;
+  int ShowChangeTitle;
   int ShowToolbarSet;
+
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWSelectionFrameInternals *Internals;
 
 private:
   vtkKWSelectionFrame(const vtkKWSelectionFrame&);  // Not implemented

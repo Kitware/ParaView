@@ -23,12 +23,26 @@
 #include "vtkKWIcon.h"
 #include "vtkKWToolbarSet.h"
 
+#include <vtkstd/list>
+
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.26");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.27");
+
+//----------------------------------------------------------------------------
+class vtkKWSelectionFrameInternals
+{
+public:
+  typedef vtkstd::list<vtkstd::string> PoolType;
+  typedef vtkstd::list<vtkstd::string>::iterator PoolIterator;
+
+  PoolType Pool;
+};
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
 {
+  this->Internals             = new vtkKWSelectionFrameInternals;
+
   this->TitleBar              = vtkKWFrame::New();
   this->Title                 = vtkKWLabel::New();
   this->SelectionList         = vtkKWMenuButton::New();
@@ -41,6 +55,7 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->SelectionListCommand  = NULL;
   this->SelectCommand         = NULL;
   this->DoubleClickCommand    = NULL;
+  this->ChangeTitleCommand    = NULL;
 
   this->TitleColor[0]                   = 1.0;
   this->TitleColor[1]                   = 1.0;
@@ -58,15 +73,20 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->TitleBackgroundSelectedColor[1] = 0.0;
   this->TitleBackgroundSelectedColor[2] = 0.5;
 
-  this->Selected          = 0;
-  this->ShowSelectionList = 1;
-  this->ShowCloseButton   = 0;
-  this->ShowToolbarSet    = 0;
+  this->Selected           = 0;
+  this->ShowSelectionList  = 1;
+  this->ShowClose       = 0;
+  this->ShowChangeTitle = 0;
+  this->ShowToolbarSet     = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::~vtkKWSelectionFrame()
 {
+  // Delete our pool
+
+  delete this->Internals;
+
   if (this->TitleBar)
     {
     this->TitleBar->Delete();
@@ -131,6 +151,12 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
     {
     delete [] this->DoubleClickCommand;
     this->DoubleClickCommand = NULL;
+    }
+
+  if (this->ChangeTitleCommand)
+    {
+    delete [] this->ChangeTitleCommand;
+    this->ChangeTitleCommand = NULL;
     }
 }
 
@@ -243,7 +269,7 @@ void vtkKWSelectionFrame::Pack()
            << " -side left -anchor e -padx 2 -fill x -expand n" << endl;
     }
   
-  if (this->ShowCloseButton && this->CloseButton->IsCreated())
+  if (this->ShowClose && this->CloseButton->IsCreated())
     {
     tk_cmd << "pack " << this->CloseButton->GetWidgetName()
            << " -side left -anchor e -fill y -padx 1 -pady 1 ";
@@ -344,6 +370,7 @@ void vtkKWSelectionFrame::UnBind()
 void vtkKWSelectionFrame::SetTitle(const char *title)
 {
   this->Title->SetLabel(title);
+  cout << this->GetTclName() << " : " << title << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -442,17 +469,32 @@ void vtkKWSelectionFrame::SetShowSelectionList(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetShowCloseButton(int arg)
+void vtkKWSelectionFrame::SetShowClose(int arg)
 {
-  if (this->ShowCloseButton == arg)
+  if (this->ShowClose == arg)
     {
     return;
     }
 
-  this->ShowCloseButton = arg;
+  this->ShowClose = arg;
 
   this->Modified();
   this->Pack();
+  this->UpdateSelectionList();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetShowChangeTitle(int arg)
+{
+  if (this->ShowChangeTitle == arg)
+    {
+    return;
+    }
+
+  this->ShowChangeTitle = arg;
+
+  this->Modified();
+  this->UpdateSelectionList();
 }
 
 //----------------------------------------------------------------------------
@@ -506,23 +548,64 @@ void vtkKWSelectionFrame::UpdateColors()
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetSelectionList(int num, const char **list)
 {
+  this->Internals->Pool.clear();
+  
+  for (int i = 0; i < num; i++)
+    {
+    this->Internals->Pool.push_back(list[i]);
+    }
+
+  this->UpdateSelectionList();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::UpdateSelectionList()
+{
   if (!this->SelectionList->IsCreated())
     {
-    vtkErrorMacro(
-      "Selection frame must be created before selection list can be set");
     return;
     }
+
+  vtkstd::string callback;
+
+  vtkKWMenu *menu = this->SelectionList->GetMenu();
+  menu->DeleteAllMenuItems();
   
-  this->SelectionList->GetMenu()->DeleteAllMenuItems();
-  
-  int i;
-  for (i = 0; i < num; i++)
+  vtkKWSelectionFrameInternals::PoolIterator it = 
+    this->Internals->Pool.begin();
+  vtkKWSelectionFrameInternals::PoolIterator end = 
+    this->Internals->Pool.end();
+  for (; it != end; ++it)
     {
-    ostrstream cbk;
-    cbk << "SelectionListCallback {" << list[i] << "}" << ends;
-    this->SelectionList->AddCommand(list[i], this, cbk.str());
-    cbk.rdbuf()->freeze(0);
+    callback = "SelectionListCallback {";
+    callback += *it;
+    callback += "}";
+    menu->AddCommand((*it).c_str(), this, callback.c_str());
     }
+
+  // Add more commands
+
+  if (this->ShowClose || this->ShowChangeTitle)
+    {
+    if (this->Internals->Pool.size())
+      {
+      menu->AddSeparator();
+      }
+    if (this->ShowChangeTitle)
+      {
+      menu->AddCommand(
+        "Change Title", this, "ChangeTitleCallback", "Change frame title");
+      }
+    if (this->ShowClose)
+      {
+      menu->AddCommand(
+        "Close", this, "CloseCallback", "Close frame");
+      }
+    }
+
+  // The selection list is disabled when there are no entries
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -551,6 +634,13 @@ void vtkKWSelectionFrame::SetDoubleClickCommand(vtkKWObject *object,
                                                 const char *method)
 {
   this->SetObjectMethodCommand(&this->DoubleClickCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetChangeTitleCommand(vtkKWObject *object,
+                                                const char *method)
+{
+  this->SetObjectMethodCommand(&this->ChangeTitleCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
@@ -603,6 +693,16 @@ void vtkKWSelectionFrame::DoubleClickCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSelectionFrame::ChangeTitleCallback()
+{
+  if (this->ChangeTitleCommand)
+    {
+    this->Script("eval {%s %s}",
+                 this->ChangeTitleCommand, this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
@@ -615,7 +715,7 @@ void vtkKWSelectionFrame::UpdateEnableState()
   this->PropagateEnableState(this->ToolbarSet);
   this->PropagateEnableState(this->BodyFrame);
 
-  if (this->SelectionList && 
+  if (this->SelectionList &&
       this->SelectionList->GetMenu() &&
       !this->SelectionList->GetMenu()->GetNumberOfItems())
     {
@@ -661,7 +761,8 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
      << this->TitleBackgroundSelectedColor[2] << ")" << endl;
   os << indent << "Selected: " << (this->Selected ? "On" : "Off") << endl;
   os << indent << "ShowSelectionList: " << (this->ShowSelectionList ? "On" : "Off") << endl;
-  os << indent << "ShowCloseButton: " << (this->ShowCloseButton ? "On" : "Off") << endl;
+  os << indent << "ShowClose: " << (this->ShowClose ? "On" : "Off") << endl;
+  os << indent << "ShowChangeTitle: " << (this->ShowChangeTitle ? "On" : "Off") << endl;
   os << indent << "ShowToolbarSet: " << (this->ShowToolbarSet ? "On" : "Off") << endl;
 }
 
