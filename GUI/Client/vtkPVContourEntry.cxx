@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.50");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.51");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -59,7 +59,7 @@ int vtkPVContourEntry::ComputeWidgetRange()
   vtkSMDoubleRangeDomain* dom = 0;
   if (prop)
     {
-    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("range"));
+    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("scalar_range"));
     }
   if (dom)
     {
@@ -190,7 +190,7 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMDoubleRangeDomain *rangeDomain = vtkSMDoubleRangeDomain::SafeDownCast(
-    prop->GetDomain("range"));
+    prop->GetDomain("scalar_range"));
     
 
   if (!rangeDomain)
