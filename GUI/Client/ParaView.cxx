@@ -141,22 +141,22 @@ int MyMain(int argc, char *argv[])
   // Create the application to parse the command line arguments.
   app = vtkPVApplication::New();
 
-  if (myId == 0 && app->ParseCommandLineArguments(argc, argv))
+  if (myId == 0)
     {
-    retVal = 1;
-    app->SetStartGUI(0);
+    if (app->ParseCommandLineArguments(argc, argv))
+      {
+      retVal = 1;
+      app->SetStartGUI(0);
     app->Exit();
-    }
-  else
-    {
+      }
     // Get the application settings from the registery
     // It has to be called now, after ParseCommandLineArguments, which can 
     // change the registery level (also, it can not be called in the application
     // constructor or even the KWApplication constructor since we need the
     // application name to be set)
-
+    
     app->GetApplicationSettingsFromRegistery();
-
+    
     // Create the proper default render module.
     // Only the root server processes args.
     if (app->GetUseTiledDisplay())
