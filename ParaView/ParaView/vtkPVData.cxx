@@ -601,7 +601,6 @@ void vtkPVData::ForceUpdate(vtkPVApplication* pvApp)
 {
   if ( this->UpdateSupressorTclName )
     {
-    cout << "Force update on " << this->UpdateSupressorTclName << endl;
     pvApp->BroadcastScript("%s ForceUpdate", this->UpdateSupressorTclName);
     }
 }
