@@ -141,7 +141,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.1");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3185,9 +3185,10 @@ void vtkPVWindow::UpdateSelectMenu()
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
               source->GetTclName());
       this->GlyphMenu->AddCommand(source->GetName(), this, methodAndArg,
-                                  source->GetVTKSource() ?
-                                  source->GetVTKSource()->GetClassName()+3
-                                  : 0);
+                                  source->GetSourceClassName());
+//                                  source->GetVTKSource() ?
+//                                  source->GetVTKSource()->GetClassName()+3
+//                                  : 0);
       numGlyphs++;
       it->GoToNextItem();
       }
@@ -3207,9 +3208,10 @@ void vtkPVWindow::UpdateSelectMenu()
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
               source->GetTclName());
       this->SelectMenu->AddCommand(source->GetName(), this, methodAndArg,
-                                   source->GetVTKSource() ?
-                                   source->GetVTKSource()->GetClassName()+3
-                                   : 0);
+                                   source->GetSourceClassName());
+//                                   source->GetVTKSource() ?
+//                                   source->GetVTKSource()->GetClassName()+3
+//                                   : 0);
       numSources++;
       it->GoToNextItem();
       }

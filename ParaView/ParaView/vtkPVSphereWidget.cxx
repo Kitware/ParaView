@@ -53,7 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
@@ -62,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.25.4.2");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.25.4.3");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -92,7 +91,7 @@ vtkPVSphereWidget::~vtkPVSphereWidget()
 {
   if (this->SphereTclName)
     {
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
+    this->GetPVApplication()->BroadcastScript(
       "%s Delete", this->SphereTclName);
     this->SetSphereTclName(NULL);
     }
@@ -186,11 +185,9 @@ void vtkPVSphereWidget::AcceptInternal(const char* sourceTclName)
     this->SetCenterInternal(val);
     float rad = atof(this->RadiusEntry->GetValue());
     this->SetRadiusInternal(rad);
-    pvApp->GetProcessModule()->ServerScript("%s SetCenter %f %f %f",
-                                            this->SphereTclName,
-                                            val[0], val[1], val[2]);
-    pvApp->GetProcessModule()->ServerScript("%s SetRadius %f",
-                                            this->SphereTclName, rad);
+    pvApp->BroadcastScript("%s SetCenter %f %f %f",
+                           this->SphereTclName, val[0], val[1], val[2]);
+    pvApp->BroadcastScript("%s SetRadius %f", this->SphereTclName, rad);
     this->SetLastAcceptedCenter(val);
     this->SetLastAcceptedRadius(rad);
     }
@@ -317,12 +314,11 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
   ++instanceCount;
   sprintf(tclName, "pvSphereWidget%d", instanceCount);
   this->SetWidget3DTclName(tclName);
-  pvApp->GetProcessModule()->ServerScript("vtkSphereWidget %s", tclName);
-  pvApp->GetProcessModule()->ServerScript("%s PlaceWidget 0 1 0 1 0 1",
-                                          tclName);
+  pvApp->BroadcastScript("vtkSphereWidget %s", tclName);
+  pvApp->BroadcastScript("%s PlaceWidget 0 1 0 1 0 1", tclName);
 
   sprintf(tclName, "pvSphere%d", instanceCount);
-  pvApp->GetProcessModule()->ServerScript("vtkSphere %s", tclName);
+  pvApp->BroadcastScript("vtkSphere %s", tclName);
   this->SetSphereTclName(tclName);
   
   this->SetFrameLabel("Sphere Widget");
@@ -410,16 +406,15 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
       {
       double bds[6];
       input->GetDataInformation()->GetBounds(bds);
-      pvApp->GetProcessModule()->ServerScript(
-        "%s SetCenter %f %f %f", this->SphereTclName,
-        0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]), 0.5*(bds[4]+bds[5]));
+      pvApp->BroadcastScript("%s SetCenter %f %f %f", this->SphereTclName,
+                             0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+                             0.5*(bds[4]+bds[5]));
       this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                       0.5*(bds[4]+bds[5]));
       this->SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                                   0.5*(bds[4]+bds[5]));
-      pvApp->GetProcessModule()->ServerScript("%s SetRadius %f",
-                                              this->SphereTclName,
-                                              0.5*(bds[1]-bds[0]));
+      pvApp->BroadcastScript("%s SetRadius %f", this->SphereTclName,
+                             0.5*(bds[1]-bds[0]));
       this->SetRadius(0.5*(bds[1]-bds[0]));
       this->SetLastAcceptedRadius(0.5*(bds[1]-bds[0]));
       }
@@ -459,7 +454,7 @@ void vtkPVSphereWidget::SetCenterInternal(float x, float y, float z)
   this->CenterEntry[2]->SetValue(z, 5);  
   if ( this->Widget3DTclName )
     {
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
+    this->GetPVApplication()->BroadcastScript(
       "%s SetCenter %f %f %f", this->Widget3DTclName, x, y, z);
     }
 }
@@ -481,7 +476,7 @@ void vtkPVSphereWidget::SetCenter()
     val[cc] = atof(this->CenterEntry[cc]->GetValue());
     }
 
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
+  this->GetPVApplication()->BroadcastScript(
     "%s SetCenter %f %f %f", this->Widget3DTclName, val[0], val[1], val[2]);
   this->Render();
   this->ModifiedCallback();
@@ -494,7 +489,7 @@ void vtkPVSphereWidget::SetRadiusInternal(float r)
   this->RadiusEntry->SetValue(r, 5); 
   if ( this->Widget3DTclName )
     {
-    this->GetPVApplication()->GetProcessModule()->ServerScript(
+    this->GetPVApplication()->BroadcastScript(
       "%s SetRadius %f", this->Widget3DTclName, r);
     }
 }
@@ -512,7 +507,7 @@ void vtkPVSphereWidget::SetRadius()
   float val;
   val = atof(this->RadiusEntry->GetValue());
 
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
+  this->GetPVApplication()->BroadcastScript(
     "%s SetRadius %f", this->Widget3DTclName, val);
   this->Render();
   this->ModifiedCallback();
