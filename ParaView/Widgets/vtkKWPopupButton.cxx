@@ -33,17 +33,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "vtkKWPopupButton.h"
 
 #include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
+#include "vtkString.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.4");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.5");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -58,11 +58,14 @@ vtkKWPopupButton::vtkKWPopupButton()
   this->PopupFrame = vtkKWWidget::New();
 
   this->PopupCloseButton = vtkKWPushButton::New();
+
+  this->PopupTitle = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkKWPopupButton::~vtkKWPopupButton()
 {
+  this->SetPopupTitle(0);
   if (this->PopupTopLevel)
     {
     this->PopupTopLevel->Delete();
@@ -144,10 +147,42 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   tk_cmd << ends;
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
+  
+  if ( this->PopupTitle )
+    {
+    this->Script("wm title %s {%s}", this->PopupTopLevel->GetWidgetName(), this->PopupTitle);
+    }
 
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWPopupButton::SetPopupTitle(const char* title)
+{
+  if ( this->PopupTitle == title )
+    {
+    return;
+    }
+  if ( vtkString::Equals(this->PopupTitle, title) )
+    {
+    return;
+    }
+  if ( this->PopupTitle )
+    {
+    delete [] this->PopupTitle;
+    this->PopupTitle = 0;
+    }
+  if ( title )
+    {
+    this->PopupTitle = vtkString::Duplicate(title);
+
+    if ( this->IsCreated() && this->PopupTopLevel->IsCreated() )
+      {
+      this->Script("wm title %s {%s}", this->PopupTopLevel->GetWidgetName(), this->PopupTitle);
+      }
+    }
 }
 
 // ---------------------------------------------------------------------------

@@ -69,6 +69,9 @@ public:
   virtual void DisplayPopupCallback();
   virtual void WithdrawPopupCallback();
 
+  void SetPopupTitle(const char* title);
+  vtkGetStringMacro(PopupTitle);
+
 protected:
   vtkKWPopupButton();
   ~vtkKWPopupButton();
@@ -76,6 +79,8 @@ protected:
   vtkKWWidget     *PopupTopLevel;
   vtkKWWidget     *PopupFrame;
   vtkKWPushButton *PopupCloseButton;
+
+  char* PopupTitle;
 
   // Update the enable state. This should propagate similar calls to the
   // internal widgets.

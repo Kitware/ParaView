@@ -191,6 +191,8 @@ public:
   // In vtkKWView mode, displays and updates the property ui display
   virtual void ShowProperties();
 
+  vtkGetObjectMacro(PopupButton, vtkKWPopupButton);
+
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();
