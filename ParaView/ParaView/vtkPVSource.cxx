@@ -503,7 +503,11 @@ void vtkPVSource::Select()
   // which is now just another pvWidget.
   this->UpdateParameterWidgets();
   
-  // This assumes that a source only has one output.
+  // This assumes that a source only has one (visible) output.
+  // This assumption should normally hold because when the
+  // source has multiple outputs, the design requires creating
+  // "connection" objects for each output. The actual outputs
+  // of a multi-output source are not visible.
   data = this->GetPVOutput();
   if (data)
     {
@@ -645,9 +649,14 @@ void vtkPVSource::Accept(int hideFlag)
   
   // This adds an extract filter only when the MaximumNumberOfPieces is 1.
   // This is only the case the first time the accept is called.
-  if (this->GetNthPVOutput(0))
+  int i;
+  int numOutputs = this->GetNumberOfPVOutputs();
+  for (i=0; i<numOutputs; i++)
     {
-    this->GetNthPVOutput(0)->InsertExtractPiecesIfNecessary();
+    if (this->GetNthPVOutput(i))
+      {
+      this->GetNthPVOutput(i)->InsertExtractPiecesIfNecessary();
+      }
     }
 
   // Initialize the output if necessary.
