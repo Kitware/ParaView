@@ -73,7 +73,6 @@ public:
   // This method updates the piece that has been assigned to this process.
   // It update all parts and gathers data information.
   void Update();
-  void ForceUpdate(vtkPVApplication* pvApp);
 
   // Description:
   // Methods to indicate when this source is selected in the window..
@@ -559,8 +558,6 @@ protected:
 
   // We have to manaage updates separate from the VTK pipeline.
   int AcceptButtonRed;
-  vtkTimeStamp PipelineModifiedTime;
-  vtkTimeStamp UpdateTime;
 
   // Number of instances cloned from this prototype
   int PrototypeInstanceCount;

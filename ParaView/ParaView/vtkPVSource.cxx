@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.334");
+vtkCxxRevisionMacro(vtkPVSource, "1.335");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -534,24 +534,6 @@ void vtkPVSource::GatherDataInformation()
     }
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVSource::ForceUpdate(vtkPVApplication* vtkNotUsed(pvApp))
-{
-  vtkPVPart *part;
-
-  if (this->UpdateTime > this->PipelineModifiedTime)
-    {
-    return;
-    }
-  this->UpdateTime.Modified();
-
-  this->Parts->InitTraversal();
-  while ( (part = (vtkPVPart*)(this->Parts->GetNextItemAsObject())) )
-    {
-    part->GetPartDisplay()->Update();
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::Update()
@@ -1375,14 +1357,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   vtkPVData *pvd = this->GetPVOutput();
   if (pvd)
     {
-    num = this->GetNumberOfParts();
-    for (idx = 0; idx < num; ++idx)
-      {
-      part = this->GetPart(idx);
-      // This has a side effect of gathering and displaying information.
-      // Should this be part->Update() !!!!!!!!!!!!!!??????
-      this->GetPart()->GetPartDisplay()->Update();
-      }
+    this->Update();
     pvd->UpdateProperties();
     }
 
@@ -1419,7 +1394,6 @@ void vtkPVSource::MarkSourcesForUpdate(int flag)
   if (flag)
     {
     this->InvalidateDataInformation();
-    this->PipelineModifiedTime.Modified();
     // Get rid of caches.
     int numParts;
     vtkPVPart *part;
@@ -1429,10 +1403,6 @@ void vtkPVSource::MarkSourcesForUpdate(int flag)
       part = this->GetPart(idx);
       part->GetPartDisplay()->InvalidateGeometry();
       }
-    }
-  else
-    {
-    this->UpdateTime = this->PipelineModifiedTime;
     }
 
   for (idx = 0; idx < this->NumberOfPVConsumers; ++idx)
