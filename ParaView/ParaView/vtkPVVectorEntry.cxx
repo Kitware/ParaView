@@ -40,13 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVVectorEntry.h"
-#include "vtkPVApplication.h"
-#include "vtkPVAnimationInterface.h"
-#include "vtkObjectFactory.h"
+
 #include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
-#include "vtkStringList.h"
+#include "vtkKWWidgetCollection.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVAnimationInterface.h"
+#include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
+#include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVVectorEntry::New()

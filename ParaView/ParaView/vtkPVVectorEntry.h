@@ -46,13 +46,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVVectorEntry_h
 
 #include "vtkPVObjectWidget.h"
-#include "vtkKWApplication.h"
-#include "vtkKWLabel.h"
-#include "vtkKWWidgetCollection.h"
-#include "vtkArrayMap.txx"
 
 class vtkStringList;
 class vtkKWEntry;
+class vtkKWApplication;
+class vtkKWLabel;
+class vtkKWWidgetCollection;
+
+//BTX
+template<class KeyType,class DataType> class vtkArrayMap;
+//ETX
 
 class VTK_EXPORT vtkPVVectorEntry : public vtkPVObjectWidget
 {
