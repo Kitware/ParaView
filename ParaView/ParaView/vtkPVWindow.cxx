@@ -1577,10 +1577,33 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
   // Make sure a writer is available for this file type.
   if(!writer)
     {
-    vtkKWMessageDialog::PopupMessage(
-      this->Application, this, "Error Saving File", 
-      "No writers support the data set's type.", 
-      vtkKWMessageDialog::ErrorIcon);
+    ostrstream msg;
+    msg << "No writers support";
+    
+    if(parallel)
+      {
+      msg << " parallel writing of ";
+      }
+    else
+      {
+      msg << " serial writing of ";
+      }
+    
+    msg << this->GetCurrentPVData()->GetVTKData()->GetClassName()
+        << " to file with name \"" << filename << "\"" << ends;
+    
+    if (this->UseMessageDialog)
+      {
+      vtkKWMessageDialog::PopupMessage(
+        this->Application, this, "Error Saving File", 
+        msg.str(), 
+        vtkKWMessageDialog::ErrorIcon);
+      }
+    else
+      {
+      vtkErrorMacro(<< msg.str());
+      }
+    msg.rdbuf()->freeze(0);
     return;
     }
   
@@ -1644,10 +1667,26 @@ void vtkPVWindow::WriteData()
   // Make sure we have at least one writer.
   if(!defaultExtension)
     {
+    ostrstream msg;
+    msg << "No writers support";
+    
+    if(parallel)
+      {
+      msg << " parallel writing of ";
+      }
+    else
+      {
+      msg << " serial writing of ";
+      }
+    
+    msg << this->GetCurrentPVData()->GetVTKData()->GetClassName()
+        << "." << ends;
+
     vtkKWMessageDialog::PopupMessage(
       this->Application, this, "Error Saving File", 
-      "No writers support the data set's type.", 
+      msg.str(),
       vtkKWMessageDialog::ErrorIcon);
+    msg.rdbuf()->freeze(0);
     return;
     }
   
