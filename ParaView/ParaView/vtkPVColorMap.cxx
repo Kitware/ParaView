@@ -40,37 +40,66 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVColorMap.h"
-#include "vtkKWMenu.h"
-#include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWLabeledEntry.h"
+
+#include "vtkCommand.h"
+#include "vtkKWChangeColorButton.h"
+#include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
+#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledEntry.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkKWMenu.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWWidget.h"
-#include "vtkKWCheckButton.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWChangeColorButton.h"
-#include "vtkKWImageLabel.h"
 #include "vtkLookupTable.h"
-#include "vtkPVRenderView.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVWindow.h"
-#include "vtkPVSource.h"
 #include "vtkPVData.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
-#include "vtkObjectFactory.h"
+#include "vtkPVWindow.h"
 #include "vtkRenderer.h"
 #include "vtkScalarBarActor.h"
 #include "vtkScalarBarWidget.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.19");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.20");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
 
+//===========================================================================
+//***************************************************************************
+class vtkScalarBarWidgetObserver : public vtkCommand
+{
+public:
+  static vtkScalarBarWidgetObserver *New() 
+    {return new vtkScalarBarWidgetObserver;};
+
+  vtkScalarBarWidgetObserver()
+    {
+      this->PVColorMap = 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+                       void* calldata)
+    {
+      if ( this->PVColorMap )
+        {
+        this->PVColorMap->ExecuteEvent(wdg, event, calldata);
+        }
+    }
+
+  vtkPVColorMap* PVColorMap;
+};
+
+//***************************************************************************
+//===========================================================================
 //vtkCxxSetObjectMacro(vtkPVColorMap,PVRenderView,vtkPVRenderView);
 //----------------------------------------------------------------------------
 // No register count because of reference loop.
@@ -107,6 +136,7 @@ vtkPVColorMap::vtkPVColorMap()
   this->LookupTableTclName = NULL;
   this->LookupTable = NULL;
   this->ScalarBar = NULL;
+  this->ScalarBarObserver = NULL;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -179,6 +209,12 @@ vtkPVColorMap::~vtkPVColorMap()
     {
     this->ScalarBar->Delete();
     this->ScalarBar = NULL;
+    }
+
+  if (this->ScalarBarObserver)
+    {
+    this->ScalarBarObserver->Delete();
+    this->ScalarBarObserver = NULL;
     }
     
   // User interaface.
@@ -428,6 +464,15 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
     ->SetValue(0.87, 0.25);
   this->ScalarBar->GetScalarBarActor()->SetWidth(0.13);
   this->ScalarBar->GetScalarBarActor()->SetHeight(0.5);
+
+  this->ScalarBarObserver = vtkScalarBarWidgetObserver::New();
+  this->ScalarBarObserver->PVColorMap = this;
+  this->ScalarBar->AddObserver(vtkCommand::InteractionEvent, 
+                               this->ScalarBarObserver);
+  this->ScalarBar->AddObserver(vtkCommand::StartInteractionEvent, 
+                               this->ScalarBarObserver);
+  this->ScalarBar->AddObserver(vtkCommand::EndInteractionEvent, 
+                               this->ScalarBarObserver);
 
   this->UpdateScalarBarTitle();
 
@@ -1093,6 +1138,21 @@ void vtkPVColorMap::UpdateMap(int width, int height)
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::ExecuteEvent(vtkObject* wdg, unsigned long event,  
+                                 void* calldata)
+{
+  switch ( event )
+    {
+    case vtkCommand::StartInteractionEvent:
+      this->PVRenderView->GetPVWindow()->InteractionOn();
+      break;
+    case vtkCommand::EndInteractionEvent:
+      this->PVRenderView->GetPVWindow()->InteractionOff();
+      this->PVRenderView->EventuallyRender();
+      break;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)

@@ -55,22 +55,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
-class vtkLookupTable;
-class vtkScalarBarWidget;
-class vtkPVApplication;
-class vtkPVRenderView;
+class vtkKWChangeColorButton;
+class vtkKWCheckButton;
+class vtkKWImageLabel;
+class vtkKWLabel;
+class vtkKWLabeledEntry;
+class vtkKWLabeledFrame;
 class vtkKWMenu;
 class vtkKWOptionMenu;
-class vtkKWLabel;
-class vtkKWScale;
-class vtkKWLabeledFrame;
-class vtkKWLabeledEntry;
-class vtkKWWidget;
-class vtkKWCheckButton;
 class vtkKWPushButton;
-class vtkKWChangeColorButton;
-class vtkKWImageLabel;
-
+class vtkKWScale;
+class vtkKWWidget;
+class vtkLookupTable;
+class vtkPVApplication;
+class vtkPVRenderView;
+class vtkScalarBarWidget;
+class vtkScalarBarWidgetObserver;
 
 class VTK_EXPORT vtkPVColorMap : public vtkKWWidget
 {
@@ -186,6 +186,13 @@ public:
   // Called when the slider that select the resolution changes.
   void NumberOfColorsScaleCallback();
 
+  // Description:
+  // This method is called when event is triggered on the scalar bar.
+  //BTX
+  virtual void ExecuteEvent(vtkObject* wdg, unsigned long event,  
+                            void* calldata);
+  //ETX
+
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
@@ -205,6 +212,7 @@ protected:
   float EndHSV[3];
 
   vtkScalarBarWidget* ScalarBar;
+  vtkScalarBarWidgetObserver* ScalarBarObserver;
 
   void UpdateScalarBarTitle();
   void UpdateLookupTable();
