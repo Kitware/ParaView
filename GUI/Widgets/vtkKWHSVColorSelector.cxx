@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.4");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.5");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -773,7 +773,7 @@ void vtkKWHSVColorSelector::UpdateHueSatWheelImage()
   img_name << this->HueSatWheelCanvas->GetWidgetName() 
            << "." << VTK_KW_HSV_SEL_IMAGE_TAG << ends;
 
-  vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
+  vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
                                 img_name.str(),
                                 buffer,
                                 diameter, diameter, 4,
@@ -789,7 +789,7 @@ void vtkKWHSVColorSelector::UpdateHueSatWheelImage()
   img_name_d << this->HueSatWheelCanvas->GetWidgetName() 
              << "." << VTK_KW_HSV_SEL_IMAGE_TAG << "_disabled" << ends;
 
-  vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
+  vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
                                 img_name_d.str(),
                                 buffer_d,
                                 diameter, diameter, 4,
@@ -996,7 +996,7 @@ void vtkKWHSVColorSelector::UpdateValueBoxImage()
   img_name << this->ValueBoxCanvas->GetWidgetName() 
            << "." << VTK_KW_HSV_SEL_IMAGE_TAG << ends;
 
-  vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
+  vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
                                 img_name.str(),
                                 buffer,
                                 width, height, 3,
@@ -1012,7 +1012,7 @@ void vtkKWHSVColorSelector::UpdateValueBoxImage()
   img_name_d << this->ValueBoxCanvas->GetWidgetName() 
              << "." << VTK_KW_HSV_SEL_IMAGE_TAG << "_disabled" << ends;
 
-  vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
+  vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
                                 img_name_d.str(),
                                 buffer_d,
                                 width, height, 4,

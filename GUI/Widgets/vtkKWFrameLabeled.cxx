@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.4");
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.5");
 
 int vtkKWFrameLabeledCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -129,10 +129,8 @@ void vtkKWFrameLabeled::AdjustMargin()
     if (height <= 1) 
       {
       int width;
-      vtkKWTkUtilities::GetPackSlavesBbox(
-        this->GetApplication()->GetMainInterp(),
-        this->LabelFrame->GetWidgetName(),
-        &width, &height);
+      vtkKWTkUtilities::GetSlavesBoundingBoxInPack(
+        this->LabelFrame, &width, &height);
       }
 
     // Don't forget the show/hide collapse icon, it might be bigger than
@@ -225,9 +223,7 @@ void vtkKWFrameLabeled::Create(vtkKWApplication *app, const char* args)
 
   if (vtkKWFrameLabeled::BoldLabel)
     {
-    vtkKWTkUtilities::ChangeFontWeightToBold(
-      app->GetMainInterp(),
-      this->GetLabel()->GetWidgetName());
+    vtkKWTkUtilities::ChangeFontWeightToBold(this->GetLabel());
     }
 
   this->IconData->SetImage(vtkKWIcon::ICON_SHRINK);

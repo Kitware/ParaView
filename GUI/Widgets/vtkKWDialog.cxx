@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.42");
+vtkCxxRevisionMacro(vtkKWDialog, "1.43");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -72,8 +72,9 @@ int vtkKWDialog::Invoke()
 
     if (this->GetMasterWindow())
       {
-      this->Script("wm geometry %s", this->GetMasterWindow()->GetWidgetName());
-      sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
+      sscanf(this->Script(
+               "wm geometry %s", this->GetMasterWindow()->GetWidgetName()),
+             "%dx%d+%d+%d",
              &width, &height, &x, &y);
 
       x += width / 2;

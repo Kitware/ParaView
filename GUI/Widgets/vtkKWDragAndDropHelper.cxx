@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDragAndDropHelper );
-vtkCxxRevisionMacro(vtkKWDragAndDropHelper, "1.1");
+vtkCxxRevisionMacro(vtkKWDragAndDropHelper, "1.2");
 
 int vtkKWDragAndDropHelperCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -647,10 +647,7 @@ void vtkKWDragAndDropHelper::EndCallback(int x, int y)
       if (*it && (*it)->EndCommand && 
           (*it)->Target && 
           (*it)->Target->IsCreated() &&
-          vtkKWTkUtilities::ContainsCoordinates(
-            (*it)->Target->GetApplication()->GetMainInterp(),
-            (*it)->Target->GetWidgetName(),
-            x, y))
+          vtkKWTkUtilities::ContainsCoordinates((*it)->Target, x, y))
         {
         if (this->Source && !this->Source->GetApplication())
           {

@@ -30,7 +30,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.23");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.24");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -662,10 +662,8 @@ void vtkKWColorTransferFunctionEditor::Pack()
     if (show_pr &&
         (this->ParameterRangePosition == 
          vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom) &&
-        vtkKWTkUtilities::GetGridPosition(
-          this->GetApplication()->GetMainInterp(), 
-          this->ParameterRange->GetWidgetName(), 
-          &col, &row))
+        vtkKWTkUtilities::GetWidgetPositionInGrid(
+          this->ParameterRange, &col, &row))
       {
       tk_cmd << "grid " << this->ParameterRange->GetWidgetName() 
              << " -row " << row + 1 << endl;
@@ -674,9 +672,7 @@ void vtkKWColorTransferFunctionEditor::Pack()
       {
       col = 2;
       if (!vtkKWTkUtilities::GetGridSize(
-            this->GetApplication()->GetMainInterp(), 
-            this->ColorRamp->GetParent()->GetWidgetName(), 
-            &nb_cols, &row))
+            this->ColorRamp->GetParent(), &nb_cols, &row))
         {
         row = 2 + (this->ShowParameterTicks ? 1 : 0) + 
           (show_pr &&
