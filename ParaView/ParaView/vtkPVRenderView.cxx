@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.207");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.208");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -211,12 +211,13 @@ vtkPVRenderView::vtkPVRenderView()
   this->NavigationWindow = vtkPVNavigationWindow::New();
   this->SelectionWindow = vtkPVSourceList::New();
 
+  this->NavigationWindowButton = vtkKWRadioButton::New();
+  this->SelectionWindowButton = vtkKWRadioButton::New();
+
   this->ShowSelectionWindow = 0;
   this->ShowNavigationWindow = 0;
 
   this->ParaViewOptionsFrame = vtkKWLabeledFrame::New();
-  this->NavigationWindowButton = vtkKWRadioButton::New();
-  this->SelectionWindowButton = vtkKWRadioButton::New();
   this->Display3DWidgets = vtkKWCheckButton::New();
 
   this->LODThreshold = 1000;
@@ -288,8 +289,6 @@ vtkPVRenderView::~vtkPVRenderView()
     }
 
   this->ParaViewOptionsFrame->Delete();
-  this->NavigationWindowButton->Delete();
-  this->SelectionWindowButton->Delete();
   this->Display3DWidgets->Delete();
 
   if ( this->SelectionWindow )
@@ -302,6 +301,9 @@ vtkPVRenderView::~vtkPVRenderView()
   this->NavigationFrame->Delete();
   this->NavigationFrame = NULL;
  
+  this->NavigationWindowButton->Delete();
+  this->SelectionWindowButton->Delete();
+
   this->NavigationWindow->Delete();
   this->NavigationWindow = NULL;
 
@@ -757,6 +759,27 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->SelectionWindow->SetHeight(545);
   this->SelectionWindow->Create(this->Application, 0); 
 
+  this->SelectionWindowButton->SetParent(
+    this->NavigationFrame->GetLabelFrame());
+  this->SelectionWindowButton->Create(this->Application, "-indicatoron 0 -highlightthickness 0 -image PVSelectionWindowButton -selectimage PVSelectionWindowButton");
+  this->SelectionWindowButton->SetBalloonHelpString(
+    "Switch to selection window mode.");
+  this->SelectionWindowButton->SetCommand(
+    this, "ShowSelectionWindowCallback 1");
+  
+  this->NavigationWindowButton->SetParent(
+    this->NavigationFrame->GetLabelFrame());
+  this->NavigationWindowButton->Create(this->Application, "-indicatoron 0 -highlightthickness 0 -image PVNavigationWindowButton -selectimage PVNavigationWindowButton");
+  this->NavigationWindowButton->SetBalloonHelpString(
+    "Switch to navigation window mode.");
+  this->NavigationWindowButton->SetCommand(
+    this, "ShowNavigationWindowCallback 1");
+
+  this->Script("pack %s %s -side left -anchor w -before %s -padx 1 -pady 2",
+               this->SelectionWindowButton->GetWidgetName(),
+               this->NavigationWindowButton->GetWidgetName(),
+               this->NavigationFrame->GetLabel()->GetWidgetName());
+
   if (this->Application->GetRegisteryValue(2, 
                                            "SourcesBrowser", 
                                            "SelectionWindow", 0))
@@ -1158,24 +1181,6 @@ void vtkPVRenderView::CreateViewProperties()
   this->ParaViewOptionsFrame->SetLabel("ParaView Options");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->ParaViewOptionsFrame->GetWidgetName());
-
-  this->SelectionWindowButton->SetParent(
-    this->ParaViewOptionsFrame->GetFrame());
-  this->SelectionWindowButton->Create(this->Application, 0);
-  this->SelectionWindowButton->SetText("Selection Window");
-  this->SelectionWindowButton->SetCommand(
-    this, "ShowSelectionWindowCallback 1");
-
-  this->NavigationWindowButton->SetParent(
-    this->ParaViewOptionsFrame->GetFrame());
-  this->NavigationWindowButton->Create(this->Application, 0);
-  this->NavigationWindowButton->SetText("Navigation Window");
-  this->NavigationWindowButton->SetCommand(
-    this, "ShowNavigationWindowCallback 1");
-
-  this->Script("pack %s %s -side top -padx 2 -pady 2 -anchor w",
-               this->SelectionWindowButton->GetWidgetName(),
-               this->NavigationWindowButton->GetWidgetName());
 
   this->Display3DWidgets->SetParent(
     this->ParaViewOptionsFrame->GetFrame());
@@ -2341,7 +2346,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.207 $");
+  this->ExtractRevision(os,"$Revision: 1.208 $");
 }
 
 //------------------------------------------------------------------------------
