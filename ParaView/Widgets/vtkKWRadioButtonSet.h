@@ -101,6 +101,7 @@ public:
   // Convenience method to hide/show a button
   void HideButton(int id);
   void ShowButton(int id);
+  int GetButtonVisibility(int id);
   void SetButtonVisibility(int id, int flag);
   int GetNumberOfVisibleButtons();
 
@@ -128,7 +129,8 @@ protected:
   //BTX
 
   // A radiobutton slot associates a radiobutton to a unique Id
-  // No, I don't want to use a map between those two, for the following reasons:
+  // No, I don't want to use a map between those two, for the following 
+  // reasons:
   // a), we might need more information in the future, b) a map 
   // Register/Unregister pointers if they are pointers to VTK objects.
  

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.8");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.9");
 
 int vtkvtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -383,6 +383,22 @@ void vtkKWRadioButtonSet::SetButtonVisibility(int id, int flag)
                  (flag ? "" : "remove"),
                  button_slot->Button->GetWidgetName());
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRadioButtonSet::GetButtonVisibility(int id)
+{
+  vtkKWRadioButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
+
+  if (button_slot && button_slot->Button && this->Application)
+    {
+    const char *res = 
+      this->Script("grid info %s", button_slot->Button->GetWidgetName());
+    return (res && *res) ? 1 : 0;
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------
