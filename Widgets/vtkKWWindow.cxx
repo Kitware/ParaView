@@ -2726,12 +2726,20 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
       ReadAValue(hKey, Cmd, CmdName[i],"Open");
       if (strlen(File) > 1)
         {
-        char cmd[1024];
+        char *cmd = new char [strlen(Cmd) + strlen(File) + 10];
         sprintf(cmd,"%s {%s}",Cmd, File);
+        if (strlen(File) > 40)
+          {
+          File[36] = '.';
+          File[37] = '.';
+          File[38] = '.';
+          File[39] = '\0';
+          }
         this->GetMenuFile()->InsertCommand(
           this->GetMenuFile()->GetIndex("Close") - 1,
           File, target, cmd);
         this->NumberOfMRUFiles++;
+        delete [] cmd;
         }    
       }
     }
@@ -2824,15 +2832,45 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
       {
       char cmd[1024];
       sprintf(cmd,"%s {%s}",command, name);
-      this->GetMenuFile()->InsertCommand(
-        this->GetFileMenuIndex()+2,name,target,cmd);
+      if (strlen(name) > 40)
+        {
+        char *name2 = new char [strlen(name)+1];
+        sprintf(name2,"%s",name);
+        name2[36] = '.';
+        name2[37] = '.';
+        name2[38] = '.';
+        name2[39] = '\0';
+        this->GetMenuFile()->InsertCommand(
+          this->GetFileMenuIndex()+2,name2,target,cmd);
+        delete [] name2;
+        }
+      else
+        {
+        this->GetMenuFile()->InsertCommand(
+          this->GetFileMenuIndex()+2,name,target,cmd);
+        }
       }
     else
       {
       char cmd[1024];
       sprintf(cmd,"%s {%s}",command, name);
-      this->GetMenuFile()->InsertCommand(
-        this->GetMenuFile()->GetIndex("Close")-1,name,target,cmd);
+      if (strlen(name) > 40)
+        {
+        char *name2 = new char [strlen(name)+1];
+        sprintf(name2,"%s",name);
+        name2[36] = '.';
+        name2[37] = '.';
+        name2[38] = '.';
+        name2[39] = '\0';
+        this->GetMenuFile()->InsertCommand(
+          this->GetFileMenuIndex()+2,name2,target,cmd);
+        delete [] name2;
+        }
+      else
+        {
+        this->GetMenuFile()->InsertCommand(
+          this->GetMenuFile()->GetIndex("Close")-1,name,target,cmd);
+        }
       }
     }
   RegCloseKey(hKey);
@@ -2855,5 +2893,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.13 $");
+  this->ExtractRevision(os,"$Revision: 1.14 $");
 }
