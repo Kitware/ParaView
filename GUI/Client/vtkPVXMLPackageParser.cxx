@@ -21,7 +21,6 @@
 #include "vtkPVApplication.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVInputProperty.h"
-#include "vtkPVInputRequirement.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
@@ -38,7 +37,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.35");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.36");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -99,29 +98,6 @@ vtkPVWidget* vtkPVXMLPackageParser::CreatePVWidget(vtkPVXMLElement* element)
   pvWidget->SetTraceNameState(vtkPVWidget::Default);
   tname.rdbuf()->freeze(0);
   return pvWidget;
-}
-
-//----------------------------------------------------------------------------
-vtkPVInputRequirement* vtkPVXMLPackageParser::CreatePVInputRequirement(
-                                                      vtkPVXMLElement* element)
-{
-  // Create the object with the instantiator.
-  vtkObject* object = 0;
-  ostrstream name;
-  name << "vtkPVInput" << element->GetName() << ends;
-  object = vtkInstantiator::CreateInstance(name.str());
-  name.rdbuf()->freeze(0);
-
-  // Make sure we got a widget.
-  vtkPVInputRequirement* pvir = vtkPVInputRequirement::SafeDownCast(object);
-  if(!pvir)
-    {
-    if(object) { object->Delete(); }
-    vtkErrorMacro("Error creating " << element->GetName());
-    return 0;
-    }
-
-  return pvir;
 }
 
 //----------------------------------------------------------------------------
@@ -582,8 +558,6 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
                                           vtkPVSource* pvm)
 {
   vtkPVXMLElement* inputElement;
-  vtkPVXMLElement* rElement;
-  unsigned int rIdx;
   const char* classAttr;
   const char* quantityAttr;
 
@@ -644,22 +618,6 @@ int vtkPVXMLPackageParser::ParseVTKFilter(vtkPVXMLElement* filterElement,
         return 0;
         }
 
-      // Find all restrictions for this input.
-      for(rIdx=0; rIdx < inputElement->GetNumberOfNestedElements(); ++rIdx)
-        {
-        rElement = inputElement->GetNestedElement(rIdx);
-        vtkPVInputRequirement *pvir;
-        pvir = this->CreatePVInputRequirement(rElement);
-        if(!pvir) { return 0; }
-
-        if(!pvir->ReadXMLAttributes(rElement, this))
-          {
-          pvir->Delete();
-          pvir = 0;
-          }
-        prop->AddRequirement(pvir);
-        pvir->Delete();
-        }
       }
     else
       { // Only input elements inside filter element.

@@ -28,7 +28,6 @@
 
 #include "vtkObject.h"
 class vtkCollection;
-class vtkPVInputRequirement;
 class vtkPVDataSetAttributesInformation;
 class vtkPVSource;
 
@@ -48,11 +47,6 @@ public:
   int GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs);
 
   // Description:
-  // This are used by the field menu to determine is a field
-  // should be selectable.
-  int GetIsValidField(int field, vtkPVDataSetAttributesInformation* info);
-
-  // Description:
   // The name is used to construct methods for setting/adding/getting the input.
   // It is most commonly "Input", but can also be "Source" ...
   vtkSetStringMacro(Name);
@@ -66,17 +60,12 @@ public:
   vtkSetStringMacro(Type);
   vtkGetStringMacro(Type);
 
-  // Description:
-  // To restrict inputs by attributes.
-  void AddRequirement(vtkPVInputRequirement* ir);
-
 protected:
   vtkPVInputProperty();
   ~vtkPVInputProperty();
 
   char* Name;
   char* Type;
-  vtkCollection* Requirements;
 
   vtkPVInputProperty(const vtkPVInputProperty&); // Not implemented
   void operator=(const vtkPVInputProperty&); // Not implemented

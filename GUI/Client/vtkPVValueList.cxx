@@ -28,14 +28,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
-#include "vtkPVContourWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.17");
+vtkCxxRevisionMacro(vtkPVValueList, "1.18");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -75,8 +75,6 @@ vtkPVValueList::vtkPVValueList()
   
   this->SuppressReset = 1;
 
-  this->Property = NULL;
-  
   this->ContourValues = vtkContourValues::New();
 }
 
@@ -335,22 +333,26 @@ void vtkPVValueList::Create(vtkKWApplication *app)
 //-----------------------------------------------------------------------------
 void vtkPVValueList::Update()
 {
-  int num, idx;
   char str[256];
 
-  if (this->GetApplication() == NULL || this->Property == NULL)
+  if (this->GetApplication() == NULL)
     {
     return;
     }
 
   this->ContourValuesList->DeleteAll();
-  num = (this->Property->GetNumberOfScalars() - 1) / 2;
-
-  for (idx = 0; idx < num; ++idx)
+  vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (prop)
     {
-    sprintf(str, "%g", this->Property->GetScalar(2*(idx+1)));
-    this->ContourValuesList->AppendUnique(str);
-    }    
+    unsigned int num = prop->GetNumberOfElements();
+
+    for (unsigned int idx = 0; idx < num; ++idx)
+      {
+      sprintf(str, "%g", prop->GetElement(idx));
+      this->ContourValuesList->AppendUnique(str);
+      }    
+    }
 
   if (!this->ComputeWidgetRange())
     {
@@ -541,17 +543,12 @@ void vtkPVValueList::AddValue(double val)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVValueList::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVValueList::Accept()
 {
+  int modFlag = this->GetModifiedFlag();
+
   int numContours;
 
-  if (sourceID.ID == 0)
-    {
-    return;
-    }
-
-  this->Superclass::AcceptInternal(sourceID);
-  
   numContours = this->ContourValues->GetNumberOfContours();
 
   if (numContours == 0)
@@ -564,14 +561,12 @@ void vtkPVValueList::AcceptInternal(vtkClientServerID sourceID)
     this->ContourValuesList->AppendUnique(str);
     numContours = 1;
     }
+
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVValueList::Trace(ofstream *file)
 {
-  int i, numContours;
-  float value;
-
   if ( ! this->InitializeTrace(file))
     {
     return;
@@ -579,12 +574,16 @@ void vtkPVValueList::Trace(ofstream *file)
 
   *file << "$kw(" << this->GetTclName() << ") RemoveAllValues\n";
 
-  numContours = (this->Property->GetNumberOfScalars() - 1) / 2;
-  for (i = 0; i < numContours; i++)
+  vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (prop)
     {
-    value = this->Property->GetScalar(2*(i+1));
-    *file << "$kw(" << this->GetTclName() << ") AddValue "
-          << value << endl;
+    unsigned int numContours = prop->GetNumberOfElements();
+    for (unsigned int i = 0; i < numContours; i++)
+      {
+      *file << "$kw(" << this->GetTclName() << ") AddValue "
+            << prop->GetElement(i) << endl;
+      }
     }
 }
 
@@ -604,18 +603,11 @@ void vtkPVValueList::CopyProperties(
   vtkPVSource* pvSource,
   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
-  int idx, num;
-
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVValueList* pvce = vtkPVValueList::SafeDownCast(clone);
   if (pvce)
     {
     pvce->SetLabel(this->ContourValuesFrame->GetLabel()->GetLabel());
-    num = this->ContourValues->GetNumberOfContours();
-    for (idx = 0; idx < num; ++idx)
-      {
-      pvce->AddValue(this->ContourValues->GetValue(idx));
-      }
     }
   else 
     {

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.53");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.54");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -86,17 +86,20 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
   this->SetProperty(NULL);
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetLabel(const char* label)
 {
   this->SetEntryLabel(label);
   this->LabelWidget->SetLabel(label);
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetSubLabel(int i, const char* sublabel)
 {
   this->SubLabelTxts->SetString(i, sublabel);
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
 {
 
@@ -678,6 +681,7 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VectorLength: " << this->VectorLength << endl;
 }
 
+//-----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVVectorEntry::ClonePrototype(vtkPVSource* pvSource,
   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {

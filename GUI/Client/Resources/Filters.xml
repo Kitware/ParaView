@@ -1682,7 +1682,7 @@ The Warp (vector) filter translates the points of the input data set using a spe
     <CutEntry label="Cut Offset Values"
               trace_name="Cut Values"
               initial_value="0"
-              input_menu="im1"
+              input_menu="im1" property="ContourValues"
               help="List of current offset values. This can be used to create multiple cut planes/spheres with different centers. Each entry represents a new cut with center shifted by the offset value."
               set_number_command="SetNumberOfContours"
               set_contour_command="SetValue"/>
@@ -1863,7 +1863,7 @@ The Threshold filter extracts the portions of the input data set whose scalars l
                       array_menu="am"/>
     <ContourEntry label="Contour Values"
                   trace_name="Contour Values"
-                  array_menu="am"
+                  array_menu="am" property="ContourValues"
                   set_number_command="SetNumberOfContours"
                   set_contour_command="SetValue"
                   help="List of current contour values." />

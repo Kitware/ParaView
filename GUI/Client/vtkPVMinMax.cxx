@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.33");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.34");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -332,7 +332,7 @@ void vtkPVMinMax::Update()
   vtkSMDoubleRangeDomain* dom = 0;
   if (prop)
     {
-    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("array_range"));
+    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("range"));
     }
   if (dom)
     {
