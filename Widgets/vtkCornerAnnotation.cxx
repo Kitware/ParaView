@@ -55,7 +55,8 @@ vtkCornerAnnotation::vtkCornerAnnotation()
   this->LastSize[1] = 0;
 
   this->MaximumLineHeight = 1.0;
-
+  this->MinimumFontSize = 6;
+  
   for (int i = 0; i < 4; i++)
     {
     this->TextMapper[i] = vtkTextMapper::New();
@@ -102,16 +103,19 @@ void vtkCornerAnnotation::ReleaseGraphicsResources(vtkWindow *win)
 int vtkCornerAnnotation::RenderOverlay(vtkViewport *viewport)
 {
   // Everything is built, just have to render
-  for (int i = 0; i < 4; i++)
+  // only render if font is at least minimum font
+  if (this->TextMapper[0]->GetFontSize() >= this->MinimumFontSize)
     {
-    this->TextActor[i]->RenderOverlay(viewport);
+    for (int i = 0; i < 4; i++)
+      {
+      this->TextActor[i]->RenderOverlay(viewport);
+      }
     }
   return 1;
 }
 
 int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
 {
-  int size[2];
   int fontSize;
   int i;
   
@@ -200,7 +204,6 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
       }
     
     // now set the position of the TextActors
-    int fpos[2];
     this->TextActor[0]->SetPosition(5,5);
     this->TextActor[1]->SetPosition(vSize[0]-5,5);
     this->TextActor[2]->SetPosition(5,vSize[1]-5);
@@ -214,9 +217,12 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
     }
 
   // Everything is built, just have to render
-  for (i = 0; i < 4; i++)
+  if (this->TextMapper[0]->GetFontSize() >= this->MinimumFontSize)
     {
-    this->TextActor[i]->RenderOpaqueGeometry(viewport);
+    for (i = 0; i < 4; i++)
+      {
+      this->TextActor[i]->RenderOpaqueGeometry(viewport);
+      }
     }
   return 1;
 }

@@ -64,6 +64,12 @@ public:
   vtkGetMacro(MaximumLineHeight,float);
   
   // Description:
+  // Set/Get the minimum size font that will be shown.
+  // If the font drops below this size it will not be rendered.
+  vtkSetMacro(MinimumFontSize,int);
+  vtkGetMacro(MinimumFontSize,int);
+
+  // Description:
   // Release any graphics resources that are being consumed by this actor.
   // The parameter window could be used to determine which graphic
   // resources to release.
@@ -85,7 +91,7 @@ protected:
   vtkTimeStamp   BuildTime;
   int            LastSize[2];
   vtkTextMapper *TextMapper[4];
-
+  int MinimumFontSize;
 private:
 };
 
