@@ -19,7 +19,7 @@
 #include "vtkDataSet.h"
 #include "vtkCollection.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.14");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.15");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -78,17 +78,24 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   vtkDataSet *input = this->GetInput();
   vtkDataSet *output = this->GetOutput();
 
+  if (input == 0)
+    {
+    vtkErrorMacro("Missing input.");
+    return;
+    }
+
   // int fixme; // I do not like this hack.  How can we get rid of it?
   // Assume the input is the collection filter.
   // Client needs to modify the collection filter because it is not
   // connected to a pipeline.
-  if (input && input->GetSource() && 
-       (input->GetSource()->IsA("vtkCollectPolyData") ||
-        input->GetSource()->IsA("vtkMPIDuplicatePolyData") ||
-        input->GetSource()->IsA("vtkM2NDuplicate") ||
-        input->GetSource()->IsA("vtkM2NCollect") ||
-        input->GetSource()->IsA("vtkMPIDuplicateUnstructuredGrid") ||
-        input->GetSource()->IsA("vtkPVDuplicatePolyData")))
+  if (input->GetSource() && 
+      (input->GetSource()->IsA("vtkMPIMoveData") ||
+       input->GetSource()->IsA("vtkCollectPolyData") ||
+       input->GetSource()->IsA("vtkMPIDuplicatePolyData") ||
+       input->GetSource()->IsA("vtkM2NDuplicate") ||
+       input->GetSource()->IsA("vtkM2NCollect") ||
+       input->GetSource()->IsA("vtkMPIDuplicateUnstructuredGrid") ||
+       input->GetSource()->IsA("vtkPVDuplicatePolyData")))
     {
     input->GetSource()->Modified();
     }
