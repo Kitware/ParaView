@@ -1,0 +1,569 @@
+# This file contains a collection of tests for the msgcat package.
+# Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1998 Mark Harrison.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# Contributions from Don Porter, NIST, 2002.  (not subject to US copyright)
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# Note that after running these tests, entries will be left behind in the
+# message catalogs for locales foo, foo_BAR, and foo_BAR_baz.
+#
+# RCS: @(#) Id
+
+package require Tcl 8.2
+if {[catch {package require tcltest 2}]} {
+    puts stderr "Skipping tests in [info script].  tcltest 2 required."
+    return
+}
+if {[catch {package require msgcat 1.3}]} {
+    puts stderr "Skipping tests in [info script].  No msgcat 1.3 found to test."
+    return
+}
+
+namespace eval ::msgcat::test {
+    namespace import ::msgcat::*
+    namespace import ::tcltest::test
+    namespace import ::tcltest::cleanupTests
+    namespace import ::tcltest::temporaryDirectory
+    namespace import ::tcltest::make*
+    namespace import ::tcltest::remove*
+
+    # Tests msgcat-0.*: locale initialization
+
+    proc PowerSet {l} {
+	if {[llength $l] == 0} {return [list [list]]}
+	set element [lindex $l 0]
+	set rest [lrange $l 1 end]
+	set result [list]
+	foreach x [PowerSet $rest] {
+	    lappend result [linsert $x 0 $element]
+	    lappend result $x
+	}
+	return $result
+    }
+
+    variable envVars {LC_ALL LC_MESSAGES LANG}
+    variable count 0
+    variable body
+    variable result
+    variable setVars
+    foreach setVars [PowerSet $envVars] { 
+	set result [string tolower [lindex $setVars 0]]
+	if {[string length $result] == 0} {
+	    set result c
+	}
+	test msgcat-0.$count {
+	    locale initialization from environment variables
+	} -setup {
+	    variable var
+	    foreach var $envVars {
+		catch {variable $var $::env($var)}
+		catch {unset ::env($var)}
+	    }
+	    foreach var $setVars {
+		set ::env($var) $var
+	    }
+	    interp create [namespace current]::i
+	    i eval [list package ifneeded msgcat [package provide msgcat] \
+		    [package ifneeded msgcat [package provide msgcat]]]
+	    i eval package require msgcat
+	} -cleanup {
+	    interp delete [namespace current]::i
+	    foreach var $envVars {
+		catch {unset ::env($var)}
+		catch {set ::env($var) [set [namespace current]::$var]}
+	    }
+	} -body {i eval msgcat::mclocale} -result $result
+	incr count
+    }
+    catch {unset result}
+    
+    # Could add tests of initialization from Windows registry here.
+    # Use a fake registry package.
+
+    # Tests msgcat-1.*: [mclocale], [mcpreferences]
+
+    test msgcat-1.3 {mclocale set, single element} -setup {
+	variable locale [mclocale]
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mclocale en
+    } -result en
+
+    test msgcat-1.4 {mclocale get, single element} -setup {
+	variable locale [mclocale]
+	mclocale en
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mclocale
+    } -result en
+
+    test msgcat-1.5 {mcpreferences, single element} -setup {
+	variable locale [mclocale]
+	mclocale en
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mcpreferences
+    } -result en
+
+    test msgcat-1.6 {mclocale set, two elements} -setup {
+	variable locale [mclocale]
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mclocale en_US
+    } -result en_us
+
+    test msgcat-1.7 {mclocale get, two elements} -setup {
+	variable locale [mclocale]
+	mclocale en_US
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mclocale
+    } -result en_us
+
+    test msgcat-1.8 {mcpreferences, two elements} -setup {
+	variable locale [mclocale]
+	mclocale en_US
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mcpreferences
+    } -result {en_us en}
+
+    test msgcat-1.9 {mclocale set, three elements} -setup {
+	variable locale [mclocale]
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mclocale en_US_funky
+    } -result en_us_funky
+
+    test msgcat-1.10 {mclocale get, three elements} -setup {
+	variable locale [mclocale]
+	mclocale en_US_funky
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mclocale
+    } -result en_us_funky
+
+    test msgcat-1.11 {mcpreferences, three elements} -setup {
+	variable locale [mclocale]
+	mclocale en_US_funky
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mcpreferences
+    } -result {en_us_funky en_us en}
+
+    # Tests msgcat-2.*: [mcset], [mcmset], namespace partitioning
+
+    test msgcat-2.1 {mcset, global scope} {
+	namespace eval :: ::msgcat::mcset  foo_BAR text1 text2
+    } {text2}
+
+    test msgcat-2.2 {mcset, global scope, default} {
+	namespace eval :: ::msgcat::mcset foo_BAR text3
+    } {text3}
+
+    test msgcat-2.2.1 {mcset, namespace overlap} {
+	namespace eval baz {::msgcat::mcset  foo_BAR con1 con1baz}
+    } {con1baz}
+
+    test msgcat-2.3 {mcset, namespace overlap} -setup {
+	namespace eval bar {::msgcat::mcset  foo_BAR con1 con1bar}
+	namespace eval baz {::msgcat::mcset  foo_BAR con1 con1baz}
+	variable locale [mclocale]
+	mclocale foo_BAR
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	namespace eval bar {::msgcat::mc con1}
+    } -result con1bar
+
+    test msgcat-2.4 {mcset, namespace overlap} -setup {
+	namespace eval bar {::msgcat::mcset  foo_BAR con1 con1bar}
+	namespace eval baz {::msgcat::mcset  foo_BAR con1 con1baz}
+	variable locale [mclocale]
+	mclocale foo_BAR
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	namespace eval baz {::msgcat::mc con1}
+    } -result con1baz
+
+    test msgcat-2.5 {mcmset, global scope} -setup {
+	namespace eval :: {
+	    ::msgcat::mcmset  foo_BAR {
+	        src1 trans1
+	        src2 trans2
+	    }
+	}
+	variable locale [mclocale]
+	mclocale foo_BAR
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	namespace eval :: {
+	    ::msgcat::mc src1
+	}
+    } -result trans1
+
+    test msgcat-2.6 {mcmset, namespace overlap} -setup {
+	namespace eval bar {::msgcat::mcmset  foo_BAR {con2 con2bar}}
+	namespace eval baz {::msgcat::mcmset  foo_BAR {con2 con2baz}}
+	variable locale [mclocale]
+	mclocale foo_BAR
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	namespace eval bar {::msgcat::mc con2}
+    } -result con2bar
+
+    test msgcat-2.7 {mcmset, namespace overlap} -setup {
+	namespace eval bar {::msgcat::mcmset  foo_BAR {con2 con2bar}}
+	namespace eval baz {::msgcat::mcmset  foo_BAR {con2 con2baz}}
+	variable locale [mclocale]
+	mclocale foo_BAR
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	namespace eval baz {::msgcat::mc con2}
+    } -result con2baz
+
+    # Tests msgcat-3.*: [mcset], [mc], catalog "inheritance"
+    #
+    # Test mcset and mc, ensuring that more specific locales
+    # (e.g. en_UK) will search less specific locales
+    # (e.g. en) for translation strings.
+    #
+    # Do this for the 12 permutations of
+    #     locales: {foo foo_BAR foo_BAR_baz}
+    #     strings: {ov1 ov2 ov3 ov4}
+    #     locale foo         defines ov1, ov2, ov3
+    #     locale foo_BAR     defines      ov2, ov3
+    #     locale foo_BAR_BAZ defines           ov3
+    #     (ov4 is defined in none)
+    # So,
+    #     ov3 should be resolved in foo, foo_BAR, foo_BAR_baz
+    #     ov2 should be resolved in foo, foo_BAR
+    #     ov2 should resolve to foo_BAR in foo_BAR_baz
+    #     ov1 should be resolved in foo
+    #     ov1 should resolve to foo in foo_BAR, foo_BAR_baz
+    #     ov4 should be resolved in none, and call mcunknown
+    #
+    variable count 2
+    variable result
+    array set result {
+	foo,ov1 ov1_foo foo,ov2 ov2_foo foo,ov3 ov3_foo foo,ov4 ov4
+	foo_BAR,ov1 ov1_foo foo_BAR,ov2 ov2_foo_BAR foo_BAR,ov3 ov3_foo_BAR
+	foo_BAR,ov4 ov4 foo_BAR_baz,ov1 ov1_foo foo_BAR_baz,ov2 ov2_foo_BAR
+	foo_BAR_baz,ov3 ov3_foo_BAR_baz foo_BAR_baz,ov4 ov4
+    }
+    variable loc
+    variable string
+    foreach loc {foo foo_BAR foo_BAR_baz} {
+	foreach string {ov1 ov2 ov3 ov4} {
+	    test msgcat-3.$count {mcset, overlap} -setup {
+		mcset foo ov1 ov1_foo
+		mcset foo ov2 ov2_foo
+		mcset foo ov3 ov3_foo
+		mcset foo_BAR ov2 ov2_foo_BAR
+		mcset foo_BAR ov3 ov3_foo_BAR
+		mcset foo_BAR_baz ov3 ov3_foo_BAR_baz
+		variable locale [mclocale]
+		mclocale $loc
+	    } -cleanup {
+		mclocale $locale
+	    } -body {
+		mc $string
+	    } -result $result($loc,$string)
+	    incr count
+	}
+    }
+    catch {unset result}
+
+    # Tests msgcat-4.*: [mcunknown]
+
+    test msgcat-4.2 {mcunknown, default} -setup {
+	mcset foo unk1 "unknown 1"
+	variable locale [mclocale]
+	mclocale foo
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mc unk1
+    } -result {unknown 1}
+
+    test msgcat-4.3 {mcunknown, default} -setup {
+	mcset foo unk1 "unknown 1"
+	variable locale [mclocale]
+	mclocale foo
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mc unk2
+    } -result unk2
+
+    test msgcat-4.4 {mcunknown, overridden} -setup {
+	rename ::msgcat::mcunknown SavedMcunknown
+	proc ::msgcat::mcunknown {dom s} {
+            return unknown:$dom:$s
+	}
+	mcset foo unk1 "unknown 1"
+	variable locale [mclocale]
+	mclocale foo
+    } -cleanup {
+	mclocale $locale
+	rename ::msgcat::mcunknown {}
+	rename SavedMcunknown ::msgcat::mcunknown
+    } -body {
+	mc unk1
+    } -result {unknown 1}
+
+    test msgcat-4.5 {mcunknown, overridden} -setup {
+	rename ::msgcat::mcunknown SavedMcunknown
+	proc ::msgcat::mcunknown {dom s} {
+            return unknown:$dom:$s
+	}
+	mcset foo unk1 "unknown 1"
+	variable locale [mclocale]
+	mclocale foo
+    } -cleanup {
+	mclocale $locale
+	rename ::msgcat::mcunknown {}
+	rename SavedMcunknown ::msgcat::mcunknown
+    } -body {
+	mc unk2
+    } -result {unknown:foo:unk2}
+
+    test msgcat-4.6 {mcunknown, uplevel context} -setup {
+	rename ::msgcat::mcunknown SavedMcunknown
+	proc ::msgcat::mcunknown {dom s} {
+            return "unknown:$dom:$s:[expr {[info level] - 1}]"
+	}
+	mcset foo unk1 "unknown 1"
+	variable locale [mclocale]
+	mclocale foo
+    } -cleanup {
+	mclocale $locale
+	rename ::msgcat::mcunknown {}
+	rename SavedMcunknown ::msgcat::mcunknown
+    } -body {
+	mc unk2
+    } -result unknown:foo:unk2:[info level]
+
+    # Tests msgcat-5.*: [mcload]
+
+    variable locales {foo foo_BAR foo_BAR_baz}
+    makeDirectory msgdir
+    foreach loc $locales {
+	makeFile "::msgcat::mcset $loc abc abc-$loc" \
+		[string tolower [file join msgdir $loc.msg]]
+    }
+    variable count 1
+    foreach loc {foo foo_BAR foo_BAR_baz} {
+	test msgcat-5.$count {mcload} -setup {
+	    variable locale [mclocale]
+	    mclocale $loc
+	} -cleanup {
+	    mclocale $locale
+	} -body {
+	    mcload [file join [temporaryDirectory] msgdir]
+	} -result $count
+	incr count
+    }
+
+    # Even though foo_BAR_notexist does not exist,
+    # foo_BAR and foo should be loaded.
+	test msgcat-5.4 {mcload} -setup {
+	    variable locale [mclocale]
+	    mclocale foo_BAR_notexist
+	} -cleanup {
+	    mclocale $locale
+	} -body {
+	    mcload [file join [temporaryDirectory] msgdir]
+	} -result 2
+
+	test msgcat-5.5 {mcload} -setup {
+	    variable locale [mclocale]
+	    mclocale no_FI_notexist
+	} -cleanup {
+	    mclocale $locale
+	} -body {
+	    mcload [file join [temporaryDirectory] msgdir]
+	} -result 0
+
+	test msgcat-5.6 {mcload} -setup {
+	    variable locale [mclocale]
+	    mclocale foo
+	} -cleanup {
+	    mclocale $locale
+	} -body {
+	    mc abc
+	} -result abc-foo
+
+	test msgcat-5.7 {mcload} -setup {
+	    variable locale [mclocale]
+	    mclocale foo_BAR
+	} -cleanup {
+	    mclocale $locale
+	} -body {
+	    mc abc
+	} -result abc-foo_BAR
+
+	test msgcat-5.8 {mcload} -setup {
+	    variable locale [mclocale]
+	    mclocale foo_BAR_baz
+	} -cleanup {
+	    mclocale $locale
+	} -body {
+	    mc abc
+	} -result abc-foo_BAR_baz
+
+	test msgcat-5.9 {mcload} -setup {
+	    rename ::msgcat::mcunknown SavedMcunknown
+	    proc ::msgcat::mcunknown {dom s} {
+		return unknown:$dom:$s
+	    }
+	    variable locale [mclocale]
+	    mclocale no_FI_notexist
+	} -cleanup {
+	    mclocale $locale
+	    rename ::msgcat::mcunknown {}
+	    rename SavedMcunknown ::msgcat::mcunknown
+	} -body {
+	    mc abc
+	} -result unknown:no_fi_notexist:abc
+
+
+    foreach loc $locales {
+	removeFile [string tolower [file join msgdir $loc.msg]]
+    }
+    removeDirectory msgdir
+
+    # Tests msgcat-6.*: [mcset], [mc] namespace inheritance
+#
+# Test mcset and mc, ensuring that resolution for messages
+# proceeds from the current ns to its parent and so on to the 
+# global ns.
+#
+# Do this for the 12 permutations of
+#     locales: foo
+#     namespaces: foo foo::bar foo::bar::baz
+#     strings: {ov1 ov2 ov3 ov4}
+#     namespace ::foo            defines ov1, ov2, ov3
+#     namespace ::foo::bar       defines      ov2, ov3
+#     namespace ::foo::bar::baz  defines           ov3
+#
+#     ov4 is not defined in any namespace.
+#
+# So,
+#     ov3 should be resolved in ::foo::bar::baz, ::foo::bar, ::foo;
+#     ov2 should be resolved in ::foo, ::foo::bar
+#     ov1 should be resolved in ::foo
+#     ov4 should be resolved in none, and call mcunknown
+#
+
+    variable result
+    array set result {
+	foo,ov1 ov1_foo foo,ov2 ov2_foo foo,ov3 ov3_foo foo,ov4 ov4
+	foo::bar,ov1 ov1_foo foo::bar,ov2 ov2_foo_bar
+	foo::bar,ov3 ov3_foo_bar foo::bar,ov4 ov4 foo::bar::baz,ov1 ov1_foo
+	foo::bar::baz,ov2 ov2_foo_bar foo::bar::baz,ov3 ov3_foo_bar_baz
+	foo::bar::baz,ov4 ov4
+    }
+    variable count 1
+    variable ns
+    foreach ns {foo foo::bar foo::bar::baz} {
+	foreach string {ov1 ov2 ov3 ov4} {
+	    test msgcat-6.$count {mcset, overlap} -setup {
+		namespace eval foo {
+		    ::msgcat::mcset foo ov1 ov1_foo
+		    ::msgcat::mcset foo ov2 ov2_foo
+		    ::msgcat::mcset foo ov3 ov3_foo
+		    namespace eval bar {
+			::msgcat::mcset foo ov2 ov2_foo_bar
+			::msgcat::mcset foo ov3 ov3_foo_bar
+			namespace eval baz {
+			    ::msgcat::mcset foo ov3 "ov3_foo_bar_baz"
+			}
+		    }
+		    
+		}
+		variable locale [mclocale]
+		mclocale foo
+	    } -cleanup {
+		mclocale $locale
+		namespace delete foo
+	    } -body {
+		namespace eval $ns [list ::msgcat::mc $string]
+	    } -result $result($ns,$string)
+	    incr count
+	}
+    }
+
+    # Tests msgcat-7.*: [mc] extra args processed by [format]
+
+    test msgcat-7.1 {mc extra args go through to format} -setup {
+	mcset foo format1 "this is a test"
+	mcset foo format2 "this is a %s"
+	mcset foo format3 "this is a %s %s"
+	variable locale [mclocale]
+	mclocale foo
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mc format1 "good test"
+    } -result "this is a test"
+
+    test msgcat-7.2 {mc extra args go through to format} -setup {
+	mcset foo format1 "this is a test"
+	mcset foo format2 "this is a %s"
+	mcset foo format3 "this is a %s %s"
+	variable locale [mclocale]
+	mclocale foo
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mc format2 "good test"
+    } -result "this is a good test"
+
+    test msgcat-7.3 {mc errors from format are propagated} -setup {
+	mcset foo format1 "this is a test"
+	mcset foo format2 "this is a %s"
+	mcset foo format3 "this is a %s %s"
+	variable locale [mclocale]
+	mclocale foo
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	catch {mc format3 "good test"}
+    } -result 1
+
+    test msgcat-7.4 {mc, extra args are given to unknown} -setup {
+	mcset foo format1 "this is a test"
+	mcset foo format2 "this is a %s"
+	mcset foo format3 "this is a %s %s"
+	variable locale [mclocale]
+	mclocale foo
+    } -cleanup {
+	mclocale $locale
+    } -body {
+	mc "this is a %s" "good test"
+    } -result "this is a good test"
+
+    cleanupTests
+}
+namespace delete ::msgcat::test
+return
+

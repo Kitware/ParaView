@@ -1,6 +1,8 @@
 .git*            export-ignore
 
 *.bat           -crlf
+*.dsp           -crlf
+*.dsw           -crlf
 *.sh             crlf=input
 *.sh.in          crlf=input
 CreateConverters.tcl  crlf=input
@@ -24,4 +26,5 @@ square           crlf=input
 tcltk-man2html.tcl  crlf=input
 tcolor           crlf=input
 timer            crlf=input
+uniClass.tcl     crlf=input
 widget           crlf=input

@@ -1,0 +1,39 @@
+Notes about the use of libmoto
+------------------------------
+
+RCS: @(#) Id
+
+First of all, libmoto is not required!  If you don't have it, you
+can simply remove the library reference from the project file and
+everything should compile just fine.
+
+The libmoto library replaces certain functions in the MathLib and
+ANSI libraries.  Motorola has optimized the functions in the library
+to run very fast on the PowerPC.  As I said above, you don't need
+this library, but it does make things faster.
+
+Obtaining Libmoto:
+
+	For more information about Libmoto and how to doanload
+	it, visit the following URL:
+
+    http://www.mot.com/SPS/PowerPC/library/fact_sheet/libmoto.html
+
+	You will need to register for the library.  However, the
+	library is free and you can use it in any commercial product
+	you might have.
+
+Installing Libmoto:
+
+	Just follow the instructions provided by the Motorola 
+	README file.  You need to make sure that the Libmoto
+	library is before the ANSI and MathLib libraries in
+	link order.  Also, you will get several warnings stateing
+	that certain functions have already been defined in 
+	Libmoto.  (These can safely be ignored.)
+
+Finally, you can thank Kate Stewart of Motorola for twisting my
+arm at the Tcl/Tk Conference to provide some support for Libmoto.
+
+Ray Johnson
+

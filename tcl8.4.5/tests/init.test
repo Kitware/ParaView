@@ -1,0 +1,207 @@
+# Functionality covered: this file contains a collection of tests for the
+# auto loading and namespaces.
+#
+# Sourcing this file into Tcl runs the tests and generates output for
+# errors. No output means no errors were found.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
+
+# Clear out any namespaces called test_ns_*
+catch {eval namespace delete [namespace children :: test_ns_*]}
+
+# Six cases - white box testing
+
+test init-1.1 {auto_qualify - absolute cmd - namespace} {
+    auto_qualify ::foo::bar ::blue
+} ::foo::bar
+
+test init-1.2 {auto_qualify - absolute cmd - global} {
+    auto_qualify ::global ::sub
+} global
+
+test init-1.3 {auto_qualify - no colons cmd - global} {
+    auto_qualify nocolons ::
+} nocolons 
+
+test init-1.4 {auto_qualify - no colons cmd - namespace} {
+    auto_qualify nocolons ::sub
+} {::sub::nocolons nocolons}
+
+test init-1.5 {auto_qualify - colons in cmd - global} {
+    auto_qualify foo::bar ::
+} ::foo::bar
+
+test init-1.6 {auto_qualify - colons in cmd - namespace} {
+    auto_qualify foo::bar ::sub
+} {::sub::foo::bar ::foo::bar}
+
+# Some additional tests
+
+test init-1.7 {auto_qualify - multiples colons 1} {
+    auto_qualify :::foo::::bar ::blue
+} ::foo::bar
+
+test init-1.8 {auto_qualify - multiple colons 2} {
+    auto_qualify :::foo ::bar
+} foo
+
+
+# we use a sub interp and auto_reset and double the tests because there is 2
+# places where auto_loading occur (before loading the indexes files and after)
+
+set testInterp [interp create]
+interp eval $testInterp [list set argv $argv]
+interp eval $testInterp [list package require tcltest]
+interp eval $testInterp [list namespace import -force ::tcltest::*]
+
+interp eval $testInterp {
+
+auto_reset
+catch {rename parray {}}
+
+test init-2.0 {load parray - stage 1} {
+    set ret [catch {parray} error]
+    rename parray {} ; # remove it, for the next test - that should not fail.
+    list $ret $error
+} {1 {wrong # args: should be "parray a ?pattern?"}}
+
+
+test init-2.1 {load parray - stage 2} {
+    set ret [catch {parray} error]
+    list $ret $error
+} {1 {wrong # args: should be "parray a ?pattern?"}}
+
+
+auto_reset
+catch {rename ::safe::setLogCmd {}}
+#unset auto_index(::safe::setLogCmd)
+#unset auto_oldpath
+
+test init-2.2 {load ::safe::setLogCmd - stage 1} {
+    ::safe::setLogCmd
+    rename ::safe::setLogCmd {} ; # should not fail
+} {}
+
+test init-2.3 {load ::safe::setLogCmd - stage 2} {
+    ::safe::setLogCmd
+    rename ::safe::setLogCmd {} ; # should not fail
+} {}
+
+auto_reset
+catch {rename ::safe::setLogCmd {}}
+
+test init-2.4 {load safe:::setLogCmd - stage 1} {
+    safe:::setLogCmd ; # intentionally 3 :
+    rename ::safe::setLogCmd {} ; # should not fail
+} {}
+
+test init-2.5 {load safe:::setLogCmd - stage 2} {
+    safe:::setLogCmd ; # intentionally 3 :
+    rename ::safe::setLogCmd {} ; # should not fail
+} {}
+
+auto_reset
+catch {rename ::safe::setLogCmd {}}
+
+test init-2.6 {load setLogCmd from safe:: - stage 1} {
+    namespace eval safe setLogCmd 
+    rename ::safe::setLogCmd {} ; # should not fail
+} {}
+
+test init-2.7 {oad setLogCmd from safe::  - stage 2} {
+    namespace eval safe setLogCmd 
+    rename ::safe::setLogCmd {} ; # should not fail
+} {}
+
+
+auto_reset
+package require http 2.0
+catch {rename ::http::geturl {}}
+
+test init-2.8 {load http::geturl (package)} {
+    # 3 ':' on purpose
+    set ret [catch {http:::geturl} error]
+    # removing it, for the next test. should not fail.
+    rename ::http::geturl {} ; 
+    list $ret $error
+} {1 {wrong # args: should be "http:::geturl url args"}}
+
+
+test init-3.0 {random stuff in the auto_index, should still work} {
+    set auto_index(foo:::bar::blah) {
+        namespace eval foo {namespace eval bar {proc blah {} {return 1}}}
+    }
+    foo:::bar::blah
+} 1
+
+# Tests that compare the error stack trace generated when autoloading
+# with that generated when no autoloading is necessary.  Ideally they
+# should be the same.
+
+set count 0
+foreach arg [subst -nocommands -novariables {
+		c
+                {argument
+                which spans
+                multiple lines}
+                {argument which is all on one line but which is of such great length that the Tcl C library will truncate it when appending it onto the global error stack}
+                {argument which spans multiple lines
+                and is long enough to be truncated and
+"               <- includes a false lead in the prune point search
+                and must be longer still to force truncation}
+                {contrived example: rare circumstance 
+		where the point at which to prune the
+		error stack cannot be uniquely determined.
+		foo bar foo
+"}
+                {contrived example: rare circumstance 
+		where the point at which to prune the
+		error stack cannot be uniquely determined.
+		foo bar
+"}
+		{argument that contains non-ASCII character, \u20ac, and which is of such great length that it will be longer than 150 bytes so it will be truncated by the Tcl C library}
+	}] {
+
+    test init-4.$count.0 {::errorInfo produced by [unknown]} {
+	auto_reset
+	catch {parray a b $arg}
+	set first $::errorInfo
+	catch {parray a b $arg}
+	set second $::errorInfo
+	string equal $first $second
+    } 1
+
+    test init-4.$count.1 {::errorInfo produced by [unknown]} {
+	auto_reset
+	namespace eval junk [list array set $arg [list 1 2 3 4]]
+	trace variable ::junk::$arg r \
+		"[list error [subst {Variable \"$arg\" is write-only}]] ;# "
+	catch {parray ::junk::$arg}
+	set first $::errorInfo
+	catch {parray ::junk::$arg}
+	set second $::errorInfo
+	string equal $first $second
+    } 1
+
+    incr count
+}
+
+cleanupTests
+}	;#  End of [interp eval $testInterp]
+
+# cleanup
+interp delete $testInterp
+::tcltest::cleanupTests
+return
+

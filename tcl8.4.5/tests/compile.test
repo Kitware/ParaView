@@ -1,0 +1,385 @@
+# This file contains tests for the files tclCompile.c, tclCompCmds.c
+# and tclLiteral.c
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1997 by Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+package require tcltest 2
+namespace import -force ::tcltest::*
+
+# The following tests are very incomplete, although the rest of the
+# test suite covers this file fairly well.
+
+catch {rename p ""}
+catch {namespace delete test_ns_compile}
+catch {unset x}
+catch {unset y}
+catch {unset a}
+
+test compile-1.1 {TclCompileString: look up cmds in proc ns, not current ns} {
+    catch {namespace delete test_ns_compile}
+    catch {unset x}
+    set x 123
+    namespace eval test_ns_compile {
+        proc set {args} {
+            global x
+            lappend x test_ns_compile::set
+        }
+        proc p {} {
+            set 0
+        }
+    }
+    list [test_ns_compile::p] [set x]
+} {{123 test_ns_compile::set} {123 test_ns_compile::set}}
+test compile-1.2 {TclCompileString, error result is reset if TclGetLong determines word isn't an integer} {
+    proc p {x} {info commands 3m}
+    list [catch {p} msg] $msg
+} {1 {wrong # args: should be "p x"}}
+test compile-2.1 {TclCompileDollarVar: global scalar name with ::s} {
+    catch {unset x}
+    set x 123
+    list $::x [expr {[lsearch -exact [info globals] x] != 0}]
+} {123 1}
+test compile-2.2 {TclCompileDollarVar: global scalar name with ::s} {
+    catch {unset y}
+    proc p {} {
+        set ::y 789
+        return $::y
+    }
+    list [p] $::y [expr {[lsearch -exact [info globals] y] != 0}]
+} {789 789 1}
+test compile-2.3 {TclCompileDollarVar: global array name with ::s} {
+    catch {unset a}
+    set ::a(1) 2
+    list $::a(1) [set ::a($::a(1)) 3] $::a(2) [expr {[lsearch -exact [info globals] a] != 0}]
+} {2 3 3 1}
+test compile-2.4 {TclCompileDollarVar: global scalar name with ::s} {
+    catch {unset a}
+    proc p {} {
+        set ::a(1) 1
+        return $::a($::a(1))
+    }
+    list [p] $::a(1) [expr {[lsearch -exact [info globals] a] != 0}]
+} {1 1 1}
+test compile-2.5 {TclCompileDollarVar: global array, called as ${arrName(0)}} {
+    catch {unset a}
+    proc p {} {
+	global a
+        set a(1) 1
+        return ${a(1)}$::a(1)$a(1)
+    }
+    list [p] $::a(1) [expr {[lsearch -exact [info globals] a] != 0}]
+} {111 1 1}
+
+test compile-3.1 {TclCompileCatchCmd: only catch cmds with scalar vars are compiled inline} {
+    catch {unset a}
+    set a(1) xyzzyx
+    proc p {} {
+        global a
+        catch {set x 123} a(1)
+    }
+    list [p] $a(1)
+} {0 123}
+test compile-3.2 {TclCompileCatchCmd: non-local variables} {
+    set ::foo 1
+    proc catch-test {} {
+	catch {set x 3} ::foo
+    }
+    catch-test
+    set ::foo
+} 3
+test compile-3.3 {TclCompileCatchCmd: overagressive compiling [bug 219184]} {
+    proc catch-test {str} {
+	catch [eval $str GOOD]
+	error BAD
+    }
+    catch {catch-test error} ::foo
+    set ::foo
+} {GOOD}
+test compile-3.4 {TclCompileCatchCmd: bcc'ed [return] is caught} {
+    proc foo {} {
+	set fail [catch {
+	    return 1
+	}] ; # {}	
+	return 2
+    }
+    foo
+} {2}
+
+test compile-3.5 {TclCompileCatchCmd: recover from error, [Bug 705406]} {
+    proc foo {} {
+	catch {
+	    if {[a]} {
+		if b {}
+	    }   
+	}   
+    }
+    list [catch foo msg] $msg
+} {1 {invalid command name "a"}}
+
+test compile-4.1 {TclCompileForCmd: command substituted test expression} {
+    set i 0
+    set j 0
+    # Should be "forever"
+    for {} [expr $i < 3] {} {
+	set j [incr i]
+	if {$j > 3} break
+    }
+    set j
+} {4}
+
+test compile-5.1 {TclCompileForeachCmd: exception stack} {
+    proc foreach-exception-test {} {
+	foreach array(index) [list 1 2 3] break
+	foreach array(index) [list 1 2 3] break
+	foreach scalar [list 1 2 3] break
+    }
+    list [catch foreach-exception-test result] $result
+} {0 {}}
+test compile-5.2 {TclCompileForeachCmd: non-local variables} {
+    set ::foo 1
+    proc foreach-test {} {
+	foreach ::foo {1 2 3} {}
+    }
+    foreach-test
+    set ::foo
+} 3
+
+test compile-6.1 {TclCompileSetCmd: global scalar names with ::s} {
+    catch {unset x}
+    catch {unset y}
+    set x 123
+    proc p {} {
+        set ::y 789
+        return $::y
+    }
+    list $::x [expr {[lsearch -exact [info globals] x] != 0}] \
+         [p] $::y [expr {[lsearch -exact [info globals] y] != 0}]
+} {123 1 789 789 1}
+test compile-6.2 {TclCompileSetCmd: global array names with ::s} {
+    catch {unset a}
+    set ::a(1) 2
+    proc p {} {
+        set ::a(1) 1
+        return $::a($::a(1))
+    }
+    list $::a(1) [p] [set ::a($::a(1)) 3] $::a(1) [expr {[lsearch -exact [info globals] a] != 0}]
+} {2 1 3 3 1}
+test compile-6.3 {TclCompileSetCmd: namespace var names with ::s} {
+    catch {namespace delete test_ns_compile}
+    catch {unset x}
+    namespace eval test_ns_compile {
+        variable v hello
+        variable arr
+        set ::x $::test_ns_compile::v
+	set ::test_ns_compile::arr(1) 123
+    }
+    list $::x $::test_ns_compile::arr(1)
+} {hello 123}
+
+test compile-7.1 {TclCompileWhileCmd: command substituted test expression} {
+    set i 0
+    set j 0
+    # Should be "forever"
+    while [expr $i < 3] {
+	set j [incr i]
+	if {$j > 3} break
+    }
+    set j
+} {4}
+
+test compile-8.1 {CollectArgInfo: binary data} {
+    list [catch "string length \000foo" msg] $msg
+} {0 4}
+test compile-8.2 {CollectArgInfo: binary data} {
+    list [catch "string length foo\000" msg] $msg
+} {0 4}
+test compile-8.3 {CollectArgInfo: handle "]" at end of command properly} {
+    set x ]
+} {]}
+
+test compile-9.1 {UpdateStringOfByteCode: called for duplicate of compiled empty object} {
+    proc p {} {
+        set x {}
+        eval $x
+        append x { }
+        eval $x
+    }
+    p
+} {}
+
+test compile-10.1 {BLACKBOX: exception stack overflow} {
+    set x {{0}}
+    set y 0
+    while {$y < 100} {
+	if !$x {incr y}
+    }
+} {}
+
+test compile-11.1 {Tcl_Append*: ensure Tcl_ResetResult is used properly} {
+    proc p {} {
+	# shared object - Interp result && Var 'r'
+	set r [list foobar]
+	# command that will add error to result
+	lindex a bogus
+    }
+    list [catch {p} msg] $msg
+} {1 {bad index "bogus": must be integer or end?-integer?}}
+test compile-11.2 {Tcl_Append*: ensure Tcl_ResetResult is used properly} {
+    proc p {} { set r [list foobar] ; string index a bogus }
+    list [catch {p} msg] $msg
+} {1 {bad index "bogus": must be integer or end?-integer?}}
+test compile-11.3 {Tcl_Append*: ensure Tcl_ResetResult is used properly} {
+    proc p {} { set r [list foobar] ; string index a 09 }
+    list [catch {p} msg] $msg
+} {1 {bad index "09": must be integer or end?-integer? (looks like invalid octal number)}}
+test compile-11.4 {Tcl_Append*: ensure Tcl_ResetResult is used properly} {
+    proc p {} { set r [list foobar] ; array set var {one two many} }
+    list [catch {p} msg] $msg
+} {1 {list must have an even number of elements}}
+test compile-11.5 {Tcl_Append*: ensure Tcl_ResetResult is used properly} {
+    proc p {} { set r [list foobar] ; incr foo }
+    list [catch {p} msg] $msg
+} {1 {can't read "foo": no such variable}}
+test compile-11.6 {Tcl_Append*: ensure Tcl_ResetResult is used properly} {
+    proc p {} { set r [list foobar] ; incr foo bogus }
+    list [catch {p} msg] $msg
+} {1 {expected integer but got "bogus"}}
+test compile-11.7 {Tcl_Append*: ensure Tcl_ResetResult is used properly} {
+    proc p {} { set r [list foobar] ; expr !a }
+    list [catch {p} msg] $msg
+} {1 {syntax error in expression "!a": variable references require preceding $}}
+test compile-11.8 {Tcl_Append*: ensure Tcl_ResetResult is used properly} {
+    proc p {} { set r [list foobar] ; expr {!a} }
+    list [catch {p} msg] $msg
+} {1 {syntax error in expression "!a": variable references require preceding $}}
+test compile-11.9 {Tcl_Append*: ensure Tcl_ResetResult is used properly} {
+    proc p {} { set r [list foobar] ; llength "\{" }
+    list [catch {p} msg] $msg
+} {1 {unmatched open brace in list}}
+
+# 
+# Special section for tests of tclLiteral.c
+# The following tests check for incorrect memory handling in
+# TclReleaseLiteral. They are only effective when tcl is compiled 
+# with TCL_MEM_DEBUG
+#
+# Special test for leak on interp delete [Bug 467523]. 
+::tcltest::testConstraint exec [llength [info commands exec]]
+::tcltest::testConstraint memDebug [llength [info commands memory]]
+
+test compile-12.1 {testing literal leak on interp delete} {memDebug} {
+    proc getbytes {} {
+	set lines [split [memory info] "\n"]
+	lindex [lindex $lines 3] 3
+    }
+    
+    set end [getbytes]
+    for {set i 0} {$i < 5} {incr i} {
+	interp create foo 
+	foo eval { 
+	    namespace eval bar {}
+	} 
+	interp delete foo
+	set tmp $end
+	set end [getbytes]
+    }    
+    rename getbytes {}
+    set leak [expr {$end - $tmp}]
+} 0
+# Special test for a memory error in a preliminary fix of [Bug 467523]. 
+# It requires executing a helpfile.  Presumably the child process is
+# used because when this test fails, it crashes.
+test compile-12.2 {testing error on literal deletion} {memDebug exec} {
+    makeFile {
+	for {set i 0} {$i < 5} {incr i} {
+	    namespace eval bar {}
+	    namespace delete bar
+	}
+	puts 0
+    } source.file
+    set res [catch {
+	exec [interpreter] source.file 
+    }]
+    catch {removeFile source.file}
+    set res
+} 0
+# Test to catch buffer overrun in TclCompileTokens from buf 530320
+test compile-12.3 {check for a buffer overrun} {
+    proc crash {} {
+	puts $array([expr {a+2}])
+    }
+    list [catch crash msg] $msg
+} {1 {syntax error in expression "a+2": variable references require preceding $}}
+
+# Special test for underestimating the maxStackSize required for a
+# compiled command. A failure will cause a segfault in the child 
+# process.
+test compile-13.1 {testing underestimate of maxStackSize in list cmd} {exec} {
+    set body {set x [list}
+    for {set i 0} {$i < 3000} {incr i} {
+	append body " $i"
+    }
+    append body {]; puts OK}
+    regsub BODY {proc crash {} {BODY}; crash} $body script
+    list [catch {exec [interpreter] << $script} msg] $msg
+} {0 OK}
+
+# Special test for compiling tokens from a copy of the source
+# string [Bug #599788]
+test compile-14.1 {testing errors in element name; segfault?} {} {
+     catch {set a([error])} msg1
+     catch {set bubba([join $abba $jubba]) $vol} msg2
+     list $msg1 $msg2
+} {{wrong # args: should be "error message ?errorInfo? ?errorCode?"} {can't read "abba": no such variable}}
+
+# Next 4 tests cover Tcl Bug 633204
+test compile-15.1 {proper TCL_RETURN code from [return]} {
+    proc p {} {catch return}
+    set result [p]
+    rename p {}
+    set result
+} 2
+test compile-15.2 {proper TCL_RETURN code from [return]} {
+    proc p {} {catch {return foo}}
+    set result [p]
+    rename p {}
+    set result
+} 2
+test compile-15.3 {proper TCL_RETURN code from [return]} {
+    proc p {} {catch {return $::tcl_library}}
+    set result [p]
+    rename p {}
+    set result
+} 2
+test compile-15.4 {proper TCL_RETURN code from [return]} {
+    proc p {} {catch {return [info library]}}
+    set result [p]
+    rename p {}
+    set result
+} 2
+test compile-15.5 {proper TCL_RETURN code from [return]} {
+    proc p {} {catch {set a 1}; return}
+    set result [p]
+    rename p {}
+    set result
+} ""
+
+
+# cleanup
+catch {rename p ""}
+catch {namespace delete test_ns_compile}
+catch {unset x}
+catch {unset y}
+catch {unset a}
+::tcltest::cleanupTests
+return

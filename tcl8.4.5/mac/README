@@ -1,0 +1,69 @@
+Tcl 8.4 for Macintosh
+
+RCS: @(#) Id
+
+1. Introduction
+---------------
+
+This is the README file for the Macintosh version of the Tcl
+scripting language.  The home page for the Mac/Tcl info is
+	http://www.tcl.tk/software/mac/
+
+A summary of what's new in this release is at
+	http://www.tcl.tk/software/tcltk/8.4.html
+
+A summary of Macintosh-specific features is at
+	http://www.tcl.tk/software/mac/features.html
+
+2. The Distribution
+-------------------
+
+Macintosh Tcl is distributed in three different forms.  This should
+make it easier to only download what you need.  Substitute <version>
+with the version you wish to use. The packages are as follows:
+
+mactk<version>.sea.hqx
+
+    This distribution is a "binary" only release.  It contains an
+    installer program that will install a 68k, PowerPC, or Fat
+    version of the "Tcl Shell" and "Wish" applications.  In addition,
+    it installs the Tcl & Tk libraries in the Extensions folder inside
+    your System Folder.
+
+mactcltk-full-<version>.sea.hqx
+
+    This release contains the full release of Tcl and Tk for the
+    Macintosh plus the More Files packages which Macintosh Tcl and Tk
+    rely on.
+
+mactcl-source-<version>.sea.hqx
+
+    This release contains the complete source for Tcl.  In
+    addition, Metrowerks CodeWarrior libraries and project files
+    are included.  However, you must already have the More Files
+    package to compile this code.
+
+The "html" subdirectory contains reference documentation in
+in the HTML format.  You may also find these pages at:
+
+	http://www.tcl.tk/man/
+
+3. Compiling Tcl
+----------------
+
+In order to compile Macintosh Tcl you must have the 
+following items:
+
+	CodeWarrior Pro 5+
+	Mac Tcl (sources)
+	More Files 1.4.9
+
+The included project files should work fine.  However, for
+current release notes please check this page:
+
+	http://www.tcl.tk/doc/howto/compile.html#mac
+
+If you have comments or Bug reports, please use the SourceForge
+Bug tracker to report them:
+
+	http://tcl.sourceforge.net/

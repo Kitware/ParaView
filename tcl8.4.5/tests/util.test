@@ -1,0 +1,368 @@
+# This file is a Tcl script to test the code in the file tclUtil.c.
+# This file is organized in the standard fashion for Tcl tests.
+#
+# Copyright (c) 1995-1998 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
+
+if {[info commands testobj] == {}} {
+    puts "This application hasn't been compiled with the \"testobj\""
+    puts "command, so I can't test the Tcl type and object support."
+    ::tcltest::cleanupTests
+    return
+}
+
+test util-1.1 {TclFindElement procedure - binary element in middle of list} {
+    lindex {0 foo\x00help 1} 1
+} "foo\x00help"
+test util-1.2 {TclFindElement procedure - binary element at end of list} {
+    lindex {0 foo\x00help} 1
+} "foo\x00help"
+
+test util-2.1 {TclCopyAndCollapse procedure - normal string} {
+    lindex {0 foo} 1
+} {foo}
+test util-2.2 {TclCopyAndCollapse procedure - string with backslashes} {
+    lindex {0 foo\n\x00help 1} 1
+} "foo\n\x00help"
+
+test util-3.1 {Tcl_ScanCountedElement procedure - don't leave unmatched braces} {
+    # This test checks for a very tricky feature.  Any list element
+    # generated with Tcl_ScanCountedElement and Tcl_ConvertElement must
+    # have the property that it can be enclosing in curly braces to make
+    # an embedded sub-list.  If this property doesn't hold, then
+    # Tcl_DStringStartSublist doesn't work.
+
+    set x {}
+    lappend x " \\\{ \\"
+    concat $x [llength "{$x}"]
+} {\ \\\{\ \\ 1}
+
+test util-4.1 {Tcl_ConcatObj - backslash-space at end of argument} {
+    concat a {b\ } c
+} {a b\  c}
+test util-4.2 {Tcl_ConcatObj - backslash-space at end of argument} {
+    concat a {b\   } c
+} {a b\  c}
+test util-4.3 {Tcl_ConcatObj - backslash-space at end of argument} {
+    concat a {b\\   } c
+} {a b\\  c}
+test util-4.4 {Tcl_ConcatObj - backslash-space at end of argument} {
+    concat a {b } c
+} {a b c}
+test util-4.5 {Tcl_ConcatObj - backslash-space at end of argument} {
+    concat a { } c
+} {a c}
+test util-4.6 {Tcl_ConcatObj - utf-8 sequence with "whitespace" char} {
+    # Check for Bug #227512.  If this violates C isspace, then it returns \xc3.
+    concat \xe0
+} \xe0
+
+proc Wrapper_Tcl_StringMatch {pattern string} {
+    # Forces use of Tcl_StringMatch, not Tcl_UniCharCaseMatch
+    switch -glob -- $string $pattern {return 1} default {return 0}
+}
+test util-5.1 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch ab*c abc
+} 1
+test util-5.2 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch ab**c abc
+} 1
+test util-5.3 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch ab* abcdef
+} 1
+test util-5.4 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch *c abc
+} 1
+test util-5.5 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch *3*6*9 0123456789
+} 1
+test util-5.6 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch *3*6*9 01234567890
+} 0
+test util-5.7 {Tcl_StringMatch: UTF-8} {
+    Wrapper_Tcl_StringMatch *u \u4e4fu
+} 1
+test util-5.8 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch a?c abc
+} 1
+test util-5.9 {Tcl_StringMatch: UTF-8} {
+    # skip one character in string
+
+    Wrapper_Tcl_StringMatch a?c a\u4e4fc
+} 1
+test util-5.10 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch a??c abc
+} 0
+test util-5.11 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch ?1??4???8? 0123456789
+} 1
+test util-5.12 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {[abc]bc} abc
+} 1
+test util-5.13 {Tcl_StringMatch: UTF-8} {
+    # string += Tcl_UtfToUniChar(string, &ch);
+
+    Wrapper_Tcl_StringMatch "\[\u4e4fxy\]bc" "\u4e4fbc"
+} 1
+test util-5.14 {Tcl_StringMatch} {
+    # if ((*pattern == ']') || (*pattern == '\0'))
+    # badly formed pattern
+
+    Wrapper_Tcl_StringMatch {[]} {[]}
+} 0
+test util-5.15 {Tcl_StringMatch} {
+    # if ((*pattern == ']') || (*pattern == '\0'))
+    # badly formed pattern
+
+    Wrapper_Tcl_StringMatch {[} {[}
+} 0
+test util-5.16 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {a[abc]c} abc
+} 1
+test util-5.17 {Tcl_StringMatch: UTF-8} {
+    # pattern += Tcl_UtfToUniChar(pattern, &endChar);
+    # get 1 UTF-8 character
+
+    Wrapper_Tcl_StringMatch "a\[a\u4e4fc]c" "a\u4e4fc"
+} 1
+test util-5.18 {Tcl_StringMatch: UTF-8} {
+    # pattern += Tcl_UtfToUniChar(pattern, &endChar);
+    # proper advance: wrong answer would match on UTF trail byte of \u4e4f
+
+    Wrapper_Tcl_StringMatch {a[a\u4e4fc]c} [bytestring a\u008fc]
+} 0
+test util-5.19 {Tcl_StringMatch: UTF-8} {
+    # pattern += Tcl_UtfToUniChar(pattern, &endChar);
+    # proper advance.
+
+    Wrapper_Tcl_StringMatch {a[a\u4e4fc]c} "acc"
+} 1
+test util-5.20 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {a[xyz]c} abc
+} 0
+test util-5.21 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {12[2-7]45} 12345
+} 1
+test util-5.22 {Tcl_StringMatch: UTF-8 range} {
+    Wrapper_Tcl_StringMatch "\[\u4e00-\u4e4f]" "0"
+} 0
+test util-5.23 {Tcl_StringMatch: UTF-8 range} {
+    Wrapper_Tcl_StringMatch "\[\u4e00-\u4e4f]" "\u4e33"
+} 1
+test util-5.24 {Tcl_StringMatch: UTF-8 range} {
+    Wrapper_Tcl_StringMatch "\[\u4e00-\u4e4f]" "\uff08"
+} 0
+test util-5.25 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {12[ab2-4cd]45} 12345
+} 1
+test util-5.26 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {12[ab2-4cd]45} 12b45
+} 1
+test util-5.27 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {12[ab2-4cd]45} 12d45
+} 1
+test util-5.28 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {12[ab2-4cd]45} 12145
+} 0
+test util-5.29 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {12[ab2-4cd]45} 12545
+} 0
+test util-5.30 {Tcl_StringMatch: forwards range} {
+    Wrapper_Tcl_StringMatch {[k-w]} "z"
+} 0
+test util-5.31 {Tcl_StringMatch: forwards range} {
+    Wrapper_Tcl_StringMatch {[k-w]} "w"
+} 1
+test util-5.32 {Tcl_StringMatch: forwards range} {
+    Wrapper_Tcl_StringMatch {[k-w]} "r"
+} 1
+test util-5.33 {Tcl_StringMatch: forwards range} {
+    Wrapper_Tcl_StringMatch {[k-w]} "k"
+} 1
+test util-5.34 {Tcl_StringMatch: forwards range} {
+    Wrapper_Tcl_StringMatch {[k-w]} "a"
+} 0
+test util-5.35 {Tcl_StringMatch: reverse range} {
+    Wrapper_Tcl_StringMatch {[w-k]} "z"
+} 0
+test util-5.36 {Tcl_StringMatch: reverse range} {
+    Wrapper_Tcl_StringMatch {[w-k]} "w"
+} 1
+test util-5.37 {Tcl_StringMatch: reverse range} {
+    Wrapper_Tcl_StringMatch {[w-k]} "r"
+} 1
+test util-5.38 {Tcl_StringMatch: reverse range} {
+    Wrapper_Tcl_StringMatch {[w-k]} "k"
+} 1
+test util-5.39 {Tcl_StringMatch: reverse range} {
+    Wrapper_Tcl_StringMatch {[w-k]} "a"
+} 0
+test util-5.40 {Tcl_StringMatch: skip correct number of ']'} {
+    Wrapper_Tcl_StringMatch {[A-]x} Ax
+} 0
+test util-5.41 {Tcl_StringMatch: skip correct number of ']'} {
+    Wrapper_Tcl_StringMatch {[A-]]x} Ax
+} 1
+test util-5.42 {Tcl_StringMatch: skip correct number of ']'} {
+    Wrapper_Tcl_StringMatch {[A-]]x} \ue1x
+} 0
+test util-5.43 {Tcl_StringMatch: skip correct number of ']'} {
+    Wrapper_Tcl_StringMatch \[A-]\ue1]x \ue1x
+} 1
+test util-5.44 {Tcl_StringMatch: skip correct number of ']'} {
+    Wrapper_Tcl_StringMatch {[A-]h]x} hx
+} 1
+test util-5.45 {Tcl_StringMatch} {
+    # if (*pattern == '\0')
+    # badly formed pattern, still treats as a set
+
+    Wrapper_Tcl_StringMatch {[a} a
+} 1
+test util-5.46 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {a\*b} a*b
+} 1
+test util-5.47 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {a\*b} ab
+} 0
+test util-5.48 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch {a\*\?\[\]\\\x} "a*?\[\]\\x"
+} 1
+test util-5.49 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch ** ""
+} 1
+test util-5.50 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch *. ""
+} 0
+test util-5.51 {Tcl_StringMatch} {
+    Wrapper_Tcl_StringMatch "" ""
+} 1
+
+test util-6.1 {Tcl_PrintDouble - using tcl_precision} {
+    concat x[expr 1.4]
+} {x1.4}
+test util-6.2 {Tcl_PrintDouble - using tcl_precision} {
+    concat x[expr 1.39999999999]
+} {x1.39999999999}
+test util-6.3 {Tcl_PrintDouble - using tcl_precision} {
+    concat x[expr 1.399999999999]
+} {x1.4}
+test util-6.4 {Tcl_PrintDouble - using tcl_precision} {
+    set tcl_precision 5
+    concat x[expr 1.123412341234]
+} {x1.1234}
+set tcl_precision 12
+test util-6.5 {Tcl_PrintDouble - make sure there's a decimal point} {
+    concat x[expr 2.0]
+} {x2.0}
+test util-6.6 {Tcl_PrintDouble - make sure there's a decimal point} {eformat} {
+    concat x[expr 3.0e98]
+} {x3e+98}
+
+test util-7.1 {TclPrecTraceProc - unset callbacks} {
+    set tcl_precision 7
+    set x $tcl_precision
+    unset tcl_precision
+    list $x $tcl_precision
+} {7 7}
+test util-7.2 {TclPrecTraceProc - read traces, sharing among interpreters} {
+    set tcl_precision 12
+    interp create child
+    set x [child eval set tcl_precision]
+    child eval {set tcl_precision 6}
+    interp delete child
+    list $x $tcl_precision
+} {12 6}
+test util-7.3 {TclPrecTraceProc - write traces, safe interpreters} {
+    set tcl_precision 12
+    interp create -safe child
+    set x [child eval {
+	list [catch {set tcl_precision 8} msg] $msg
+    }]
+    interp delete child
+    list $x $tcl_precision
+} {{1 {can't set "tcl_precision": can't modify precision from a safe interpreter}} 12}
+test util-7.4 {TclPrecTraceProc - write traces, bogus values} {
+    set tcl_precision 12
+    list [catch {set tcl_precision abc} msg] $msg $tcl_precision
+} {1 {can't set "tcl_precision": improper value for precision} 12}
+
+set tcl_precision 12
+
+# This test always succeeded in the C locale anyway...
+test util-8.1 {TclNeedSpace - correct UTF8 handling} {
+    # Bug 411825
+    # Note that this test relies on the fact that
+    # [interp target] calls on Tcl_AppendElement()
+    # which calls on TclNeedSpace().  If [interp target]
+    # is ever updated, this test will no longer test
+    # TclNeedSpace.
+    interp create \u5420
+    interp create [list \u5420 foo]
+    interp alias {} fooset [list \u5420 foo] set
+    set result [interp target {} fooset]
+    interp delete \u5420
+    set result
+} "\u5420 foo"
+
+set ::tcltest::testConstraints(testdstring) \
+	[expr {[info commands testdstring] != {}}]
+
+test util-8.2 {TclNeedSpace - correct UTF8 handling} testdstring {
+    # Bug 411825
+    # This tests the same bug as the previous test, but
+    # should be more future-proof, as the DString
+    # operations will likely continue to call TclNeedSpace
+    testdstring free
+    testdstring append \u5420 -1
+    testdstring element foo
+    llength [testdstring get]
+} 2
+test util-8.3 {TclNeedSpace - correct UTF8 handling} testdstring {
+    # Bug 411825 - new variant reported by Dossy Shiobara
+    testdstring free
+    testdstring append \u00A0 -1
+    testdstring element foo
+    llength [testdstring get]
+} 2
+test util-8.4 {TclNeedSpace - correct UTF8 handling} testdstring {
+    # Another bug uncovered while fixing 411825
+    testdstring free
+    testdstring append {\ } -1
+    testdstring append \{ -1
+    testdstring element foo
+    llength [testdstring get]
+} 2
+test util-8.5 {TclNeedSpace - correct UTF8 handling} testdstring {
+    # Note that in this test TclNeedSpace actually gets it wrong,
+    # claiming we need a space when we really do not.  Extra space
+    # between list elements is harmless though, and better to have
+    # extra space in really weird string reps of lists, than to
+    # invest the effort required to make TclNeedSpace foolproof.
+    testdstring free
+    testdstring append {\\ } -1
+    testdstring element foo
+    list [llength [testdstring get]] [string length [testdstring get]]
+} {2 7}
+test util-8.6 {TclNeedSpace - correct UTF8 handling} testdstring {
+    # Another example of TclNeedSpace harmlessly getting it wrong.
+    testdstring free
+    testdstring append {\\ } -1
+    testdstring append \{ -1
+    testdstring element foo
+    testdstring append \} -1
+    list [llength [testdstring get]] [string length [testdstring get]]
+} {2 9}
+
+# cleanup
+::tcltest::cleanupTests
+return

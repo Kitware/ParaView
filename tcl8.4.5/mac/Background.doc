@@ -1,0 +1,92 @@
+Notes about the Background Only application template
+====================================================
+
+RCS: @(#) Id
+
+We have included sample code and project files for making a Background-Only
+ application (BOA) in Tcl.  This could be used for server processes (like the 
+Tcl Web-Server).  
+
+Files:
+------
+
+* BOA_TclShells.¼    - This is the project file.
+* tclMacBOAAppInit.c - This is the AppInit file for the BOA App.
+* tclMacBOAMain      - This is a replacement for the Tcl_Main for BOA's.
+
+Caveat:
+-------
+
+This is an unsupported addition to MacTcl.  The main feature that will certainly
+change is how we handle AppleEvents.  Currently, all the AppleEvent handling is
+done on the Tk side, which is not really right.  Also, there is no way to 
+register your own AppleEvent handlers, which is obviously something that would be 
+useful in a BOA App.  We will address these issues in Tcl8.1.  If you need to 
+register your own AppleEvent Handlers in the meantime, be aware that your code
+will probably break in Tcl8.1.
+
+I will also improve the basic code here based on feedback that I recieve.  This
+is to be considered a first cut only at writing a BOA in Tcl.
+
+Introduction:
+-------------
+
+This project makes a double-clickable BOA application.  It obviously needs 
+some Tcl code to get it started.  It will look for this code first in a 
+'TEXT' resource in the application shell whose name is "bgScript.tcl".  If 
+it does not find any such resource, it will look for a file called 
+bgScript.tcl in the application's folder.  Otherwise it will quit with an 
+error.
+
+It creates three files in the application folder to store stdin, stdout & 
+stderr.  They are imaginatively called temp.in, temp.out & temp.err.  They 
+will be opened append, so you do not need to erase them after each use of 
+the BOA.
+
+The app does understand the "quit", and the "doScript" AppleEvents, so you can 
+kill it with the former, and instruct it with the latter.  It also has an 
+aete, so you can target it with Apple's "Script Editor".
+
+For more information on Macintosh BOA's, see the Apple TechNote: 1070.
+
+Notifications:
+--------------
+
+BOA's are not supposed to have direct contact with the outside world.  They 
+are, however, allowed to go through the Notification Manager to post 
+alerts.  To this end, I have added a Tcl command called "bgnotify" to the 
+shell, that simply posts a notification through the notification manager.
+
+To use it, say:
+
+bgnotify "Hi, there little buddy"
+
+It will make the system beep, and pop up an annoying message box with the 
+text of the first argument to the command.  While the message is up, Tcl 
+is yielding processor time, but not processing any events.
+
+Errors:
+-------
+
+Usually a Tcl background application will have some startup code, opening 
+up a server socket, or whatever, and at the end of this, will use the 
+vwait command to kick off the event loop.  If an error occurs in the 
+startup code, it will kill the application, and a notification of the error 
+will be posted through the Notification Manager.  
+
+If an error occurs in the event handling code after the 
+vwait, the error message will be written to the file temp.err.  However, 
+if you would like to have these errors post a notification as well, just 
+define a proc called bgerror that takes one argument, the error message, 
+and passes that off to "bgnotify", thusly:
+
+proc bgerror {mssg} {
+	bgnotify "A background error has occured\n $mssg"
+}
+
+Support:
+--------
+
+If you have any questions, contact me at:
+
+jim.ingham@eng.sun.com

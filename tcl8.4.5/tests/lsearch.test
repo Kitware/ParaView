@@ -1,0 +1,364 @@
+# Commands covered:  lsearch
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1991-1993 The Regents of the University of California.
+# Copyright (c) 1994 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
+
+set x {abcd bbcd 123 234 345}
+test lsearch-1.1 {lsearch command} {
+    lsearch $x 123
+} 2
+test lsearch-1.2 {lsearch command} {
+    lsearch $x 3456
+} -1
+test lsearch-1.3 {lsearch command} {
+    lsearch $x *5
+} 4
+test lsearch-1.4 {lsearch command} {
+    lsearch $x *bc*
+} 0
+
+test lsearch-2.1 {search modes} {
+    lsearch -exact {xyz bbcc *bc*} *bc*
+} 2
+test lsearch-2.2 {search modes} {
+    lsearch -exact {b.x ^bc xy bcx} ^bc
+} 1
+test lsearch-2.3 {search modes} {
+    lsearch -exact {foo bar cat} ba
+} -1
+test lsearch-2.4 {search modes} {
+    lsearch -exact {foo bar cat} bart
+} -1
+test lsearch-2.5 {search modes} {
+    lsearch -exact {foo bar cat} bar
+} 1
+test lsearch-2.6 {search modes} {
+    list [catch {lsearch -regexp {xyz bbcc *bc*} *bc*} msg] $msg
+} {1 {couldn't compile regular expression pattern: quantifier operand invalid}}
+test lsearch-2.7 {search modes} {
+    lsearch -regexp {b.x ^bc xy bcx} ^bc
+} 3
+test lsearch-2.8 {search modes} {
+    lsearch -glob {xyz bbcc *bc*} *bc*
+} 1
+test lsearch-2.9 {search modes} {
+    lsearch -glob {b.x ^bc xy bcx} ^bc
+} 1
+test lsearch-2.10 {search modes} {
+    list [catch {lsearch -glib {b.x bx xy bcx} b.x} msg] $msg
+} {1 {bad option "-glib": must be -all, -ascii, -decreasing, -dictionary, -exact, -glob, -increasing, -inline, -integer, -not, -real, -regexp, -sorted, or -start}}
+
+test lsearch-3.1 {lsearch errors} {
+    list [catch lsearch msg] $msg
+} {1 {wrong # args: should be "lsearch ?options? list pattern"}}
+test lsearch-3.2 {lsearch errors} {
+    list [catch {lsearch a} msg] $msg
+} {1 {wrong # args: should be "lsearch ?options? list pattern"}}
+test lsearch-3.3 {lsearch errors} {
+    list [catch {lsearch a b c} msg] $msg
+} {1 {bad option "a": must be -all, -ascii, -decreasing, -dictionary, -exact, -glob, -increasing, -inline, -integer, -not, -real, -regexp, -sorted, or -start}}
+test lsearch-3.4 {lsearch errors} {
+    list [catch {lsearch a b c d} msg] $msg
+} {1 {bad option "a": must be -all, -ascii, -decreasing, -dictionary, -exact, -glob, -increasing, -inline, -integer, -not, -real, -regexp, -sorted, or -start}}
+test lsearch-3.5 {lsearch errors} {
+    list [catch {lsearch "\{" b} msg] $msg
+} {1 {unmatched open brace in list}}
+
+test lsearch-4.1 {binary data} {
+    lsearch -exact [list foo one\000two bar] bar
+} 2
+test lsearch-4.2 {binary data} {
+    set x one
+    append x \x00
+    append x two
+    lsearch -exact [list foo one\000two bar] $x
+} 1
+
+# Make a sorted list
+set l {}
+set l2 {}
+for {set i 0} {$i < 100} {incr i} {
+    lappend l $i
+    lappend l2 [expr {double($i)/2}]
+}
+set increasingIntegers [lsort -integer $l]
+set decreasingIntegers [lsort -decreasing -integer $l]
+set increasingDoubles [lsort -real $l2]
+set decreasingDoubles [lsort -decreasing -real $l2]
+set increasingStrings [lsort {48 6a 18b 22a 21aa 35 36}]
+set decreasingStrings [lsort -decreasing {48 6a 18b 22a 21aa 35 36}]
+set increasingDictionary [lsort -dictionary {48 6a 18b 22a 21aa 35 36}]
+set decreasingDictionary [lsort -dictionary -decreasing $increasingDictionary]
+
+set l {}
+for {set i 0} {$i < 10} {incr i} {
+    lappend l $i $i $i $i $i
+}
+set repeatingIncreasingIntegers [lsort -integer $l]
+set repeatingDecreasingIntegers [lsort -integer -decreasing $l]
+
+test lsearch-5.1 {binary search} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -integer -sorted $increasingIntegers $i]
+    }
+    set res
+} $increasingIntegers
+test lsearch-5.2 {binary search} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -integer -decreasing -sorted \
+		$decreasingIntegers $i]
+    }
+    set res
+} $decreasingIntegers
+test lsearch-5.3 {binary search finds leftmost occurances} {
+    set res {}
+    for {set i 0} {$i < 10} {incr i} {
+	lappend res [lsearch -integer -sorted $repeatingIncreasingIntegers $i]
+    }
+    set res
+} [list 0 5 10 15 20 25 30 35 40 45]
+test lsearch-5.4 {binary search -decreasing finds leftmost occurances} {
+    set res {}
+    for {set i 9} {$i >= 0} {incr i -1} {
+	lappend res [lsearch -sorted -integer -decreasing \
+		$repeatingDecreasingIntegers $i]
+    }
+    set res
+} [list 0 5 10 15 20 25 30 35 40 45]
+
+test lsearch-6.1 {integer search} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -exact -integer $increasingIntegers $i]
+    }
+    set res
+} [lrange $increasingIntegers 0 99]
+test lsearch-6.2 {decreasing integer search} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -exact -integer -decreasing \
+		$decreasingIntegers $i]
+    }
+    set res
+} [lrange $decreasingIntegers 0 99]
+test lsearch-6.3 {sorted integer search} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -sorted -integer $increasingIntegers $i]
+    }
+    set res
+} [lrange $increasingIntegers 0 99]
+test lsearch-6.4 {sorted decreasing integer search} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -integer -sorted -decreasing \
+		$decreasingIntegers $i]
+    }
+    set res
+} [lrange $decreasingIntegers 0 99]
+
+test lsearch-7.1 {double search} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -exact -real $increasingDoubles \
+		[expr {double($i)/2}]]
+    }
+    set res
+} [lrange $increasingIntegers 0 99]
+test lsearch-7.2 {decreasing double search} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -exact -real -decreasing \
+		$decreasingDoubles [expr {double($i)/2}]]
+    }
+    set res
+} [lrange $decreasingIntegers 0 99]
+test lsearch-7.3 {sorted double search} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -sorted -real \
+		$increasingDoubles [expr {double($i)/2}]]
+    }
+    set res
+} [lrange $increasingIntegers 0 99]
+test lsearch-7.4 {sorted decreasing double search} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -sorted -real -decreasing \
+		$decreasingDoubles [expr {double($i)/2}]]
+    }
+    set res
+} [lrange $decreasingIntegers 0 99]
+
+test lsearch-8.1 {dictionary search} {
+    set res {}
+    foreach val {6a 18b 21aa 22a 35 36 48} {
+	lappend res [lsearch -exact -dictionary $increasingDictionary $val]
+    }
+    set res
+} [list 0 1 2 3 4 5 6]
+test lsearch-8.2 {decreasing dictionary search} {
+    set res {}
+    foreach val {6a 18b 21aa 22a 35 36 48} {
+	lappend res [lsearch -exact -dictionary $decreasingDictionary $val]
+    }
+    set res
+} [list 6 5 4 3 2 1 0]
+test lsearch-8.3 {sorted dictionary search} {
+    set res {}
+    foreach val {6a 18b 21aa 22a 35 36 48} {
+	lappend res [lsearch -sorted -dictionary $increasingDictionary $val]
+    }
+    set res
+} [list 0 1 2 3 4 5 6]
+test lsearch-8.4 {decreasing sorted dictionary search} {
+    set res {}
+    foreach val {6a 18b 21aa 22a 35 36 48} {
+	lappend res [lsearch -decreasing -sorted -dictionary \
+		$decreasingDictionary $val]
+    }
+    set res
+} [list 6 5 4 3 2 1 0]
+
+test lsearch-9.1 {ascii search} {
+    set res {}
+    foreach val {18b 21aa 22a 35 36 48 6a} {
+	lappend res [lsearch -exact -ascii $increasingStrings $val]
+    }
+    set res
+} [list 0 1 2 3 4 5 6]
+test lsearch-9.2 {decreasing ascii search} {
+    set res {}
+    foreach val {18b 21aa 22a 35 36 48 6a} {
+	lappend res [lsearch -exact -ascii $decreasingStrings $val]
+    }
+    set res
+} [list 6 5 4 3 2 1 0]
+test lsearch-9.3 {sorted ascii search} {
+    set res {}
+    foreach val {18b 21aa 22a 35 36 48 6a} {
+	lappend res [lsearch -sorted -ascii $increasingStrings $val]
+    }
+    set res
+} [list 0 1 2 3 4 5 6]
+test lsearch-9.4 {decreasing sorted ascii search} {
+    set res {}
+    foreach val {18b 21aa 22a 35 36 48 6a} {
+	lappend res [lsearch -decreasing -sorted -ascii \
+		$decreasingStrings $val]
+    }
+    set res
+} [list 6 5 4 3 2 1 0]
+
+test lsearch-10.1 {offset searching} {
+    lsearch -start 2 {a b c a b c} a
+} 3
+test lsearch-10.2 {offset searching} {
+    lsearch -start 2 {a b c d e f} a
+} -1
+test lsearch-10.3 {offset searching} {
+    lsearch -start end-4 {a b c a b c} a
+} 3
+test lsearch-10.4 {offset searching} {
+    list [catch {lsearch -start foobar {a b c a b c} a} msg] $msg
+} {1 {bad index "foobar": must be integer or end?-integer?}}
+test lsearch-10.5 {offset searching} {
+    list [catch {lsearch -start 1 2} msg] $msg
+} {1 {missing starting index}}
+test lsearch-10.6 {binary search with offset} {
+    set res {}
+    for {set i 0} {$i < 100} {incr i} {
+	lappend res [lsearch -integer -start 2 -sorted $increasingIntegers $i]
+    }
+    set res
+} [concat -1 -1 [lrange $increasingIntegers 2 end]]
+test lsearch-10.7 {offset searching with an empty list} {
+    # Stop bug #694232 from reocurring
+    lsearch -start 0 {} x
+} -1
+
+test lsearch-11.1 {negated searches} {
+    lsearch -not {a a a b a a a} a
+} 3
+test lsearch-11.2 {negated searches} {
+    lsearch -not {a a a a a a a} a
+} -1
+
+test lsearch-12.1 {return values instead of indices} {
+    lsearch -glob -inline {a1 b2 c3 d4} c*
+} c3
+test lsearch-12.2 {return values instead of indices} {
+    lsearch -glob -inline {a1 b2 c3 d4} e*
+} {}
+
+test lsearch-13.1 {search for all matches} {
+    lsearch -all {a b a c a d} 1
+} {}
+test lsearch-13.2 {search for all matches} {
+    lsearch -all {a b a c a d} a
+} {0 2 4}
+
+test lsearch-14.1 {combinations: -all and -inline} {
+    lsearch -all -inline -glob {a1 b2 a3 c4 a5 d6} a*
+} {a1 a3 a5}
+test lsearch-14.2 {combinations: -all, -inline and -not} {
+    lsearch -all -inline -not -glob {a1 b2 a3 c4 a5 d6} a*
+} {b2 c4 d6}
+test lsearch-14.3 {combinations: -all and -not} {
+    lsearch -all -not -glob {a1 b2 a3 c4 a5 d6} a*
+} {1 3 5}
+test lsearch-14.4 {combinations: -inline and -not} {
+    lsearch -inline -not -glob {a1 b2 a3 c4 a5 d6} a*
+} {b2}
+test lsearch-14.5 {combinations: -start, -all and -inline} {
+    lsearch -start 2 -all -inline -glob {a1 b2 a3 c4 a5 d6} a*
+} {a3 a5}
+test lsearch-14.6 {combinations: -start, -all, -inline and -not} {
+    lsearch -start 2 -all -inline -not -glob {a1 b2 a3 c4 a5 d6} a*
+} {c4 d6}
+test lsearch-14.7 {combinations: -start, -all and -not} {
+    lsearch -start 2 -all -not -glob {a1 b2 a3 c4 a5 d6} a*
+} {3 5}
+test lsearch-14.8 {combinations: -start, -inline and -not} {
+    lsearch -start 2 -inline -not -glob {a1 b2 a3 c4 a5 d6} a*
+} {c4}
+
+test lsearch-15.1 {make sure no shimmering occurs} {
+    set x [expr int(sin(0))]
+    lsearch -start $x $x $x
+} 0
+
+test lsearch-16.1 {lsearch -regexp shared object} {
+    set str a
+    lsearch -regexp $str $str
+} 0
+
+# cleanup
+catch {unset res}
+catch {unset increasingIntegers}
+catch {unset decreasingIntegers}
+catch {unset increasingDoubles}
+catch {unset decreasingDoubles}
+catch {unset increasingStrings}
+catch {unset decreasingStrings}
+catch {unset increasingDictionary}
+catch {unset decreasingDictionary}
+::tcltest::cleanupTests
+return

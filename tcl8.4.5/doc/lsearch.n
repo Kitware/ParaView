@@ -1,0 +1,136 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\" Copyright (c) 2001 Kevin B. Kenny.  All rights reserved.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH lsearch n 8.4 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+lsearch \- See if a list contains a particular element
+.SH SYNOPSIS
+\fBlsearch \fR?\fIoptions\fR? \fIlist pattern\fR
+.BE
+
+.SH DESCRIPTION
+.PP
+This command searches the elements of \fIlist\fR to see if one
+of them matches \fIpattern\fR.  If so, the command returns the index
+of the first matching element
+.VS 8.4
+(unless the options \fB\-all\fR or \fB\-inline\fR are specified.)
+.VE 8.4
+If not, the command returns \fB\-1\fR.  The \fIoption\fR arguments
+indicates how the elements of the list are to be matched against
+\fIpattern\fR and it must have one of the following values:
+.TP
+\fB\-all\fR
+.VS 8.4
+Changes the result to be the list of all matching indices (or all
+matching values if \fB\-inline\fR is specified as well.)
+.VE 8.4
+.TP
+\fB\-ascii\fR
+The list elements are to be examined as Unicode strings (the name is
+for backward-compatability reasons.)  This option is only meaningful
+when used with \fB\-exact\fR or \fB\-sorted\fR.
+.TP
+\fB\-decreasing\fR
+The list elements are sorted in decreasing order.  This option is only
+meaningful when used with \fB\-sorted\fR.
+.TP
+\fB\-dictionary\fR
+The list elements are to be compared using dictionary-style
+comparisons.  This option is only meaningful when used with
+\fB\-exact\fR or \fB\-sorted\fR.
+.TP
+\fB\-exact\fR
+The list element must contain exactly the same string as \fIpattern\fR.
+.TP
+\fB\-glob\fR
+\fIPattern\fR is a glob-style pattern which is matched against each list
+element using the same rules as the \fBstring match\fR command.
+.TP
+\fB\-increasing\fR
+The list elements are sorted in increasing order.  This option is only
+meaningful when used with \fB\-sorted\fR.
+.TP
+\fB\-inline\fR
+.VS 8.4
+The matching value is returned instead of its index (or an empty
+string if no value matches.)  If \fB\-all\fR is also specified, then
+the result of the command is the list of all values that matched.
+.VE 8.4
+.TP
+\fB\-integer\fR
+The list elements are to be compared as integers.  This option is only
+meaningful when used with \fB\-exact\fR or \fB\-sorted\fR.
+.TP
+\fB\-not\fR
+.VS 8.4
+This negates the sense of the match, returning the index of the first
+non-matching value in the list.
+.VE 8.4
+.TP
+\fB\-real\fR
+The list elements are to be compared as floating-point values.  This
+option is only meaningful when used with \fB\-exact\fR or \fB\-sorted\fR.
+.TP
+\fB\-regexp\fR
+\fIPattern\fR is treated as a regular expression and matched against
+each list element using the rules described in the \fBre_syntax\fR
+reference page.
+.TP
+\fB\-sorted\fR
+The list elements are in sorted order.  If this option is specified,
+\fBlsearch\fR will use a more efficient searching algorithm to search
+\fIlist\fR.  If no other options are specified, \fIlist\fR is assumed
+to be sorted in increasing order, and to contain ASCII strings.  This
+option is mutually exclusive with \fB\-glob\fR and \fB\-regexp\fR, and
+is treated exactly like \fB-exact\fR when either \fB\-all\fR, or
+\fB\-not\fR is specified.
+.TP
+\fB\-start\fR \fIindex\fR
+.VS 8.4
+The list is searched starting at position \fIindex\fR.  If \fIindex\fR
+has the value \fBend\fR, it refers to the last element in the list,
+and \fBend\-\fIinteger\fR refers to the last element in the list minus
+the specified integer offset.
+.VE 8.4
+.PP
+If \fIoption\fR is omitted then it defaults to \fB\-glob\fR.  If more
+than one of \fB\-exact\fR, \fB\-glob\fR, \fB\-regexp\fR, and
+\fB\-sorted\fR is specified, whichever option is specified last takes
+precedence.  If more than one of \fB\-ascii\fR, \fB\-dictionary\fR,
+\fB\-integer\fR and \fB\-real\fR is specified, the option specified
+last takes precedence.  If more than one of \fB\-increasing\fR and
+\fB\-decreasing\fR is specified, the option specified last takes
+precedence.
+
+.VS 8.4
+.SH EXAMPLES
+.CS
+lsearch {a b c d e} c => 2
+lsearch -all {a b c a b c} c => 2 5
+lsearch -inline {a20 b35 c47} b* => b35
+lsearch -inline -not {a20 b35 c47} b* => a20
+lsearch -all -inline -not {a20 b35 c47} b* => a20 c47
+lsearch -all -not {a20 b35 c47} b* => 0 2
+lsearch -start 3 {a b c a b c} c => 5
+.CE
+.VE 8.4
+
+.SH "SEE ALSO"
+.VS 8.4
+foreach(n), list(n), lappend(n), lindex(n), linsert(n), llength(n), 
+lset(n), lsort(n), lrange(n), lreplace(n)
+.VE
+
+.SH KEYWORDS
+list, match, pattern, regular expression, search, string

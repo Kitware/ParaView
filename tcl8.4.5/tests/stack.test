@@ -1,0 +1,60 @@
+# Tests that the stack size is big enough for the application.
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1998-2000 Ajuba Solutions.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest 2
+    namespace import -force ::tcltest::*
+}
+
+# Note that a failure in this test results in a crash of the executable.
+# In order to avoid that, we do a basic check of the current stacksize.
+# This size can be changed with ulimit (ksh/bash/sh) or limit (csh/tcsh).
+
+# This doesn't catch all cases, for example threads of lower stacksize
+# can still squeak through.  A core check is really needed. -- JH
+
+if {[string equal $::tcl_platform(platform) "unix"]} {
+    set stackSize [exec /bin/sh -c "ulimit -s"]
+    if {[string is integer $stackSize] && ($stackSize < 2400)} {
+        puts stderr "WARNING: the default application stacksize of $stackSize\
+                may cause Tcl to\ncrash due to stack overflow before the\
+                recursion limit is reached.\nA minimum stacksize of 2400\
+                kbytes is recommended.\nSkipping infinite recursion test."
+        ::tcltest::testConstraint minStack2400 0
+    } else {
+        ::tcltest::testConstraint minStack2400 1
+    }
+} else {
+    ::tcltest::testConstraint minStack2400 1
+}
+
+test stack-1.1 {maxNestingDepth reached on infinite recursion} {minStack2400} {
+    proc recurse {} { return [recurse] }
+    catch {recurse} rv
+    rename recurse {}
+    set rv
+} {too many nested evaluations (infinite loop?)}
+
+test stack-2.1 {maxNestingDepth reached on infinite recursion} {minStack2400} {
+    # do this in a slave to not mess with parent
+    set slave stack-2.1
+    interp create $slave
+    $slave eval { interp alias {} unknown {} notaknownproc }
+    set msg [$slave eval { catch {foo} msg ; set msg }]
+    interp delete $slave
+    set msg
+} {too many nested evaluations (infinite loop?)}
+
+# cleanup
+::tcltest::cleanupTests
+return

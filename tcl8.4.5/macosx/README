@@ -1,0 +1,120 @@
+Tcl MacOSX README 
+-----------------
+
+RCS: @(#) Id
+
+This is the README file for the Mac OS X native version of Tcl (framework build).
+
+
+1. General
+----------
+
+- The tcl-mac mailing list on sourceforge is the canonical place for questions
+specific to Tcl & Tk on Mac OS X:
+	http://lists.sourceforge.net/lists/listinfo/tcl-mac
+(this page also has a link to searchable archives of the list, please check them
+before asking on the list, many questions have already been answered).
+
+- For general tcl/tk questions, the newsgroup comp.lang.tcl is your best bet,
+but also check the Tcl'ers Wiki for a wealth of information:
+	http://wiki.tcl.tk/
+
+- The wiki has a page listing known bugs in Mac OS X Tcl/Tk (and other tips)
+	http://wiki.tcl.tk/MacOS%20X
+as well as a page with info on building Tcl/Tk on Mac OS X
+	http://wiki.tcl.tk/Steps%20to%20build%20Tcl/Tk%208.4.0%20on%20MacOS%20X
+
+- You should report bugs to the sourceforge bug trackers as usual: 
+	Tcl: https://sourceforge.net/tracker/?func=add&group_id=10894&atid=110894
+	Tk:  https://sourceforge.net/tracker/?func=add&group_id=12997&atid=112997
+please make sure that your report Tk specific bugs to the tktoolkit bug
+tracker and not the tcl one.
+
+
+2. Using Tcl on MacOSX
+----------------------
+
+- Mac OS X 10.1 (or higher) is required to run Tcl on MacOSX.
+
+- Tcl built on Mac OS X 10.2 or higher will not run on 10.1 due to missing
+symbols in libSystem, however Tcl built on 10.1 will run on 10.2 (but without
+prebinding and other optimizations).
+
+- Tcl extensions will be found in any of:
+	$HOME/Library/Tcl /Library/Tcl /Network/Library/Tcl /System/Library/Tcl
+	$HOME/Library/Frameworks /Library/Frameworks /Network/Library/Frameworks
+	/System/Library/Frameworks (searched in that order).
+Given a potential package directory $pkg, Tcl on OSX checks for the file
+$pkg/Resources/Scripts/pkgIndex.tcl as well as the usual $pkg/pkgIndex.tcl.
+This allows building extensions as frameworks with all script files contained
+in the Resources/Scripts directory of the framework.
+
+- The Tcl framework contains documentation in html format in the
+standard location for frameworks:
+	Tcl.framework/Resources/English.lproj/Documentation/Reference/Tcl
+No manpages are installed by default.
+
+- the framework Tcl.framework can be placed in any of the system's standard
+framework directories:
+	$HOME/Library/Frameworks /Library/Frameworks
+	/Network/Library/Frameworks /System/Library/Frameworks
+and /usr/bin/tclsh will work.
+
+- the format of binary extensions expected by [load] is that of ordinary shared
+libraries (.dylib) and not MachO bundles, at present loading of MachO bundles is
+not supported.
+
+
+3. Building Tcl.framework
+-------------------------
+
+- Mac OS X 10.1.5 (or higher) is required to build Tcl on MacOSX.
+
+- Apple's Developer Tools CD needs to be installed (the version matching your OS
+release, but no earlier than April 2002). This CD should have come with Mac OS X
+retail or should be present as a disk image on new macs that came with OSX
+preinstalled. It can also be downloaded from http://connect.apple.com (after you
+register for free ADC membership).
+
+- Tcl is built as a Mac OS X framework via the Makefile in tcl/macosx, but can
+also be built from Apple's ProjectBuilder IDE using the Tcl.pbproj project (which
+calls through to the Makefile).
+
+- Unpack the tcl source release archive.
+
+- The following instructions assume the tcl source tree is named "tcl${ver}", 
+where ${ver} is a shell variable containing the tcl version number (for 
+example '8.4.2').
+Setup the shell variable as follows:
+	set ver="8.4.2" ;: if your shell is csh
+	ver="8.4.2"     ;: if your shell is sh
+The source tree will be named this way only if you are building from a release
+archive, if you are building from CVS, the version numbers will be missing; so
+set ${ver} to the empty string instead:
+	set ver=""     ;: if your shell is csh
+	ver=""         ;: if your shell is sh
+
+- If you're only interested in _building_ Tcl.framework and don't plan on doing
+development with the ProjectBuilder projects, using the Makefile is easiest.
+The following steps will build Tcl from the Terminal, assuming you are
+located in the directory containing the tcl source tree:
+	make -C tcl${ver}/macosx
+and the following will then install Tcl onto the root volume (admin password 
+required):
+	sudo make -C tcl${ver}/macosx install
+if you don't have the admin password, you can install into your home directory,
+instead by passing an INSTALL_ROOT argument to make:
+	make -C tcl${ver}/macosx install INSTALL_ROOT="${HOME}/"
+
+- The default Makefile targets will build _both_ debug and optimized versions of
+the Tcl framework with the standard convention of naming the debug
+library Tcl.framework/Tcl_debug.
+This allows you to dynamically link to the debug libraries at runtime by setting
+	setenv DYLD_IMAGE_SUFFIX _debug
+(c.f. man dyld for more details)
+
+If you only want to build and install the debug or optimized build, use the
+'develop' or 'deploy' target variants of the Makefiles, respectively.
+For example, to build and install only the optimized versions:
+	make -C tcl${ver}/macosx deploy
+	sudo make -C tcl${ver}/macosx install-deploy

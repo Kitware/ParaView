@@ -1,0 +1,113 @@
+'\"
+'\" Copyright (c) 2001 by Kevin B. Kenny.  All rights reserved.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH lset n 8.4 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+lset \- Change an element in a list
+.SH SYNOPSIS
+\fBlset \fIvarName ?index...? newValue\fR
+.BE
+.SH DESCRIPTION
+.PP
+The \fBlset\fR command accepts a parameter, \fIvarName\fR, which
+it interprets as the name of a variable containing a Tcl list. 
+It also accepts zero or more \fIindices\fR into
+the list.  The indices may be presented either consecutively on the
+command line, or grouped in a
+Tcl list and presented as a single argument.
+Finally, it accepts a new value for an element of \fIvarName\fR.
+.PP
+If no indices are presented, the command takes the form:
+.CS
+lset varName newValue
+.CE
+or
+.CS
+lset varName {} newValue
+.CE
+In this case, \fInewValue\fR replaces the old value of the variable
+\fIvarName\fR.
+.PP
+When presented with a single index, the \fBlset\fR command
+treats the content of the \fIvarBane\fR variable as a Tcl list.
+It addresses the \fIindex\fR'th element in it 
+(0 refers to the first element of the list).
+When interpreting the list, \fBlset\fR observes the same rules
+concerning braces and quotes and backslashes as the Tcl command
+interpreter; however, variable
+substitution and command substitution do not occur.
+The command constructs a new list in which the designated element is
+replaced with \fInewValue\fR.  This new list is stored in the
+variable \fIvarName\fR, and is also the return value from the \fBlset\fR
+command.
+.PP
+If \fIindex\fR is negative or greater than or equal to the number
+of elements in \fI$varName\fR, then an error occurs.
+.PP
+If \fIindex\fR has the value \fBend\fR, it refers to the last element
+in the list, and \fBend\-\fIinteger\fR refers to the last element in
+the list minus the specified integer offset.
+.PP
+If additional \fIindex\fR arguments are supplied, then each argument is
+used in turn to address an element within a sublist designated
+by the previous indexing operation,
+allowing the script to alter elements in sublists.  The command,
+.CS
+lset a 1 2 newValue
+.CE
+or
+.CS
+lset a {1 2} newValue
+.CE
+replaces element 2 of sublist 1 with \fInewValue\fR.
+.PP
+The integer appearing in each \fIindex\fR argument must be greater
+than or equal to zero.  The integer appearing in each \fIindex\fR
+argument must be strictly less than the length of the corresponding
+list.  In other words, the \fBlset\fR command cannot change the size
+of a list.  If an index is outside the permitted range, an error is reported.
+.SH EXAMPLES
+In each of these examples, the initial value of \fIx\fR is:
+.CS
+set x [list [list a b c] [list d e f] [list g h i]]
+  => {a b c} {d e f} {g h i}
+.CE
+The indicated return value also becomes the new value of \fIx\fR
+(except in the last case, which is an error which leaves the value of
+\fIx\fR unchanged.)
+.CS
+lset x {j k l} => j k l
+lset x {} {j k l} => j k l
+lset x 0 j => j {d e f} {g h i}
+lset x 2 j => {a b c} {d e f} j
+lset x end j => {a b c} {d e f} j
+lset x end-1 j => {a b c} j {g h i}
+lset x 2 1 j => {a b c} {d e f} {g j i}
+lset x {2 1} j => {a b c} {d e f} {g j i}
+lset x {2 3} j => \fIlist index out of range\fR
+.CE
+In the following examples, the initial value of \fIx\fR is:
+.CS
+set x [list [list [list a b] [list c d]] \e
+            [list [list e f] [list g h]]]
+ => {{a b} {c d}} {{e f} {g h}}
+.CE
+The indicated return value also becomes the new value of \fIx\fR.
+.CS
+lset x 1 1 0 j => {{a b} {c d}} {{e f} {j h}}
+lset x {1 1 0} j => {{a b} {c d}} {{e f} {j h}}
+.CE
+.SH "SEE ALSO"
+list(n), lappend(n), lindex(n), linsert(n), llength(n), lsearch(n), 
+lsort(n), lrange(n), lreplace(n)
+
+.SH KEYWORDS
+element, index, list, replace, set

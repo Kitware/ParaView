@@ -1,0 +1,194 @@
+README:  Tcl
+    This is the Tcl 8.4.5 source distribution.
+    Tcl/Tk is also available through NetCVS:
+	http://tcl.sourceforge.net/
+    You can get any source release of Tcl from the file distributions
+    link at the above URL.
+
+RCS: @(#) Id
+
+Contents
+--------
+    1. Introduction
+    2. Documentation
+    3. Compiling and installing Tcl
+    4. Development tools
+    5. Tcl newsgroup
+    6. Tcl contributed archive
+    7. Tcl Resource Center
+    8. Mailing lists
+    9. Support and Training
+    10. Thank You
+
+1. Introduction
+---------------
+Tcl provides a powerful platform for creating integration applications that
+tie together diverse applications, protocols, devices, and frameworks.
+When paired with the Tk toolkit, Tcl provides the fastest and most powerful
+way to create GUI applications that run on PCs, Unix, and the Macintosh.
+Tcl can also be used for a variety of web-related tasks and for creating
+powerful command languages for applications.
+
+Tcl is maintained, enhanced, and distributed freely by the Tcl community.
+The home for Tcl/Tk sources and bug/patch database is on SourceForge:
+
+	http://tcl.sourceforge.net/
+
+with the Tcl Developer Xchange hosted at:
+
+	http://www.tcl.tk/
+
+Tcl is a freely available open source package.  You can do virtually
+anything you like with it, such as modifying it, redistributing it,
+and selling it either in whole or in part.  See the file
+"license.terms" for complete information.
+
+2. Documentation
+----------------
+
+Extensive documentation is available at our website.
+The home page for this release, including new features, is
+	http://www.tcl.tk/software/tcltk/8.4.html
+
+Detailed release notes can be found at the file distributions page
+by clicking on the relevant version.
+	http://sourceforge.net/project/showfiles.php?group_id=10894
+
+Information about Tcl itself can be found at
+	http://www.tcl.tk/scripting/
+
+There have been many Tcl books on the market.  Most are listed at
+	http://www.tcl.tk/resource/doc/books/
+
+2a. Unix Documentation
+----------------------
+
+The "doc" subdirectory in this release contains a complete set of
+reference manual entries for Tcl.  Files with extension ".1" are for
+programs (for example, tclsh.1); files with extension ".3" are for C
+library procedures; and files with extension ".n" describe Tcl
+commands.  The file "doc/Tcl.n" gives a quick summary of the Tcl
+language syntax.  To print any of the man pages on Unix, cd to the
+"doc" directory and invoke your favorite variant of troff using the
+normal -man macros, for example
+
+		ditroff -man Tcl.n
+
+to print Tcl.n.  If Tcl has been installed correctly and your "man" program
+supports it, you should be able to access the Tcl manual entries using the
+normal "man" mechanisms, such as
+
+		man Tcl
+
+2b. Windows Documentation
+-------------------------
+
+The "doc" subdirectory in this release contains a complete set of Windows
+help files for Tcl.  Once you install this Tcl release, a shortcut to the
+Windows help Tcl documentation will appear in the "Start" menu:
+
+	Start | Programs | Tcl | Tcl Help
+
+3. Compiling and installing Tcl
+-------------------------------
+
+There are brief notes in the unix/README, win/README, and mac/README about
+compiling on these different platforms.  There is additional information
+about building Tcl from sources at
+
+	http://www.tcl.tk/doc/howto/compile.html
+
+4. TclPro Development tools
+---------------------------
+
+A high quality set of commercial quality development tools is available to
+accelerate your Tcl application development.  The TclPro product provides a
+debugger, static code checker, packaging utility, and bytecode compiler.
+TclPro was open-sourced when Scriptics/Ajuba was acquired by Interwoven.
+Visit its home at SourceForge for more information and source/binaries:
+
+	http://tclpro.sourceforge.net/
+
+ActiveState has picked up support for commercial Tcl development tools.
+More information can be found at
+
+	http://www.ActiveState.com/Tcl
+
+5. Tcl newsgroup
+----------------
+
+There is a USENET news group, "comp.lang.tcl", intended for the exchange of
+information about Tcl, Tk, and related applications.  The newsgroup is a
+great place to ask general information questions.  There is also
+a USENET news group, "comp.lang.tcl.announce", intended to announce new
+releases of software, training, and more.  For bug reports, please
+see the "Support and bug fixes" section below.
+
+6. Tcl contributed archive
+--------------------------
+
+Many people have created exciting packages and applications based on Tcl
+and/or Tk and made them freely available to the Tcl community.  An archive
+of these contributions is kept on the machine ftp://archives.tcl.tk/pub/tcl
+(aka ftp://ftp.procplace.com/pub/tcl).  You can access the archive using
+anonymous FTP.  The archive also contains several FAQ ("frequently asked
+questions") documents that provide solutions to problems that are commonly
+encountered by Tcl newcomers.
+
+7. Tcl Resource Center
+----------------------
+
+Visit http://www.tcl.tk/resource/ to see an annotated index of
+many Tcl resources available on the World Wide Web.  This includes
+papers, books, and FAQs, as well as development tools, extensions,
+applications, binary releases, and patches.  You can also recommend
+additional URLs for the resource center using the forms labeled "Add a
+Resource".
+
+8. Mailing lists
+----------------
+
+Several mailing lists are hosted at SourceForge to discuss development or
+use issues (like Macintosh and Windows topics).  For more information and
+to subscribe, visit:
+
+	http://sourceforge.net/projects/tcl/
+
+and go to the Mailing Lists page.
+
+9. Support and Training
+------------------------
+
+We are very interested in receiving bug reports, patches, and suggestions
+for improvements.  We prefer that you send this information to us via the
+bug form at SourceForge, rather than emailing us directly.  The bug
+database is at:
+
+	http://tcl.sourceforge.net/
+
+The bug form was designed to give uniform structure to bug reports as
+well as to solicit enough information to minimize followup questions.
+
+We will log and follow-up on each bug, although we cannot promise a
+specific turn-around time.  Enhancements, reported via the Feature
+Requests form at the same web site, may take longer and may not happen
+at all unless there is widespread support for them (we're trying to
+slow the rate at which Tcl/Tk turns into a kitchen sink).  It's very
+difficult to make incompatible changes to Tcl/Tk at this point, due to
+the size of the installed base.
+
+The Tcl community is too large for us to provide much individual support
+for users.  If you need help we suggest that you post questions to
+comp.lang.tcl.  We read the newsgroup and will attempt to answer esoteric
+questions for which no one else is likely to know the answer.  In addition,
+see the following Web site for links to other organizations that offer
+Tcl/Tk training:
+
+	http://www.tcl.tk/resource/community/commercial/training
+
+10. Thank You
+-------------
+
+We'd like to express our thanks to the Tcl community for all the
+helpful suggestions, bug reports, and patches we have received.
+Tcl/Tk has improved vastly and will continue to do so with your help.

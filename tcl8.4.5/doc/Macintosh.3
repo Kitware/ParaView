@@ -1,0 +1,111 @@
+'\"
+'\" Copyright (c) 1997-1998 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH Tcl_MacSetEventProc 3 "8.1" Tcl "Tcl Library Procedures"
+.BS
+.SH NAME
+Tcl_MacSetEventProc, Tcl_MacConvertTextResource, Tcl_MacEvalResource, Tcl_MacFindResource, Tcl_GetOSTypeFromObj, Tcl_SetOSTypeObj, Tcl_NewOSTypeObj \- procedures to handle Macintosh resources and other Macintosh specifics
+.SH SYNOPSIS
+.nf
+\fB#include <tcl.h>\fR
+.sp
+int
+\fBTcl_MacEvalResource\fR(\fIinterp, resourceName, resourceNumber, fileName\fR)
+.sp
+char*
+\fBTcl_MacConvertTextResource\fR(\fIresource\fR)
+.sp
+Handle
+\fBTcl_MacFindResource\fR(\fIinterp, resourceType, resourceName, resourceNumber, resFileRef, releaseIt\fR)
+.sp
+Tcl_Obj*
+\fBTcl_NewOSTypeObj\fR(\fInewOSType\fR)
+.sp
+void
+\fBTcl_SetOSTypeObj\fR(\fIobjPtr, newOSType\fR)
+.sp
+int
+\fBTcl_GetOSTypeFromObj\fR(\fIinterp, objPtr, osTypePtr\fR)
+.sp
+void
+\fBTcl_MacSetEventProc\fR(\fIprocPtr\fR)
+.SH ARGUMENTS
+.AP Tcl_Interp *interp in
+Interpreter to use for error reporting, or NULL if no error reporting is
+desired.
+.AP "CONST char" *resourceName in
+Name of TEXT resource to source, NULL if number should be used.
+.AP int resourceNumber in
+Resource id of source.
+.AP "CONST char" *fileName in
+Name of file to process. NULL if application resource.
+.AP Handle resource in
+Handle to TEXT resource.
+.AP long resourceType in
+Type of resource to load.
+.AP "CONST char" *resFileRef in
+Registered resource file reference, NULL if searching all open resource files.
+.AP int *releaseIt out
+Should we release this resource when done.
+.AP int newOSType in
+Int used to initialize the new object or set the object's value.
+.AP Tcl_Obj *objPtr in
+Object whose internal representation is to be set or retrieved.
+.AP osTypePtr out
+Place to store the resulting integer.
+.AP Tcl_MacConvertEventPtr procPtr in
+Reference to the new function to handle all incoming Mac events.
+
+.BE
+.SH INTRODUCTION
+.PP
+The described routines are used to implement the Macintosh specific
+\fBresource\fR command and the Mac specific notifier.. They manipulate
+or use Macintosh resources and provide administration for open
+resource file references.
+
+.SH DESCRIPTION
+.PP
+\fBTcl_MacEvalResource\fR extends the \fBsource\fR command to
+Macintosh resources.  It sources Tcl code from a Text resource.
+Currently only sources the resource by name, file IDs may be supported
+at a later date.
+.PP
+\fBTcl_MacConvertTextResource\fR converts a TEXT resource into a Tcl
+suitable string. It mallocs the returned memory, converts ``\\r'' to
+``\\n'', and appends a null. The caller has the responsibility for
+freeing the memory.
+.PP
+\fBTcl_MacFindResource\fR provides a higher level interface for
+loading resources. It is used by \fBresource read\fR.
+.PP
+\fBTcl_NewOSTypeObj\fR is used to create a new resource name type
+object. The object type is "ostype".
+.PP
+\fBTcl_SetOSTypeObj\fR modifies an object to be a resource type and to
+have the specified long value.
+.PP
+\fBTcl_GetOSTypeFromObj\fR attempts to return an int from the Tcl
+object "objPtr". If the object is not already an int, an attempt will
+be made to convert it to one.
+.PP
+\fBTcl_MacSetEventProc\fR sets the event handling procedure for the
+application. This function will be passed all incoming Mac events.
+This function usually controls the console or some other entity like
+Tk.
+
+.SH RESOURCE TYPES
+.PP
+Resource types are 4-byte values used by the macintosh resource
+facility to tag parts of the resource fork in a file so that the OS
+knows how to handle them. As all 4 bytes are restricted to printable
+characters such a type can be interpreted as a 4 character string too.
+
+.SH KEYWORDS
+macintosh, mac, resource, notifier
