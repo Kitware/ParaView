@@ -156,6 +156,11 @@
              command="ResetCamera"
              immediate_update="1">
           </Property>
+          <Property
+             name="ResetCameraClippingRange"
+             command="ResetCameraClippingRange"
+             immediate_update="1">
+          </Property>
           <DoubleVectorProperty
              name="BackgroundColor"
              command="SetBackground"
