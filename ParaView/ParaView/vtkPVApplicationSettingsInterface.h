@@ -115,10 +115,10 @@ public:
 
   // Description:
   // Callback used when interaction has been performed.
-  void ShowSourcesDescriptionCheckButtonCallback();
-  void ShowSourcesNameCheckButtonCallback();
-  void FlatFrameCheckButtonCallback();
-  void FlatButtonsCheckButtonCallback();
+  void ShowSourcesDescriptionCallback();
+  void ShowSourcesNameCallback();
+  void FlatFrameCallback();
+  void FlatButtonsCallback();
 
   // Description:
   // Access to some sub-widgets. Note that they might be NULL until the Create()

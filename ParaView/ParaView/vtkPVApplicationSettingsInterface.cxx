@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.2");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.3");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -184,7 +184,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ShowSourcesDescriptionCheckButton->SetCommand(
-    this, "ShowSourcesDescriptionCheckButtonCallback");
+    this, "ShowSourcesDescriptionCallback");
 
   this->ShowSourcesDescriptionCheckButton->SetBalloonHelpString(
     "This advanced option adjusts whether the sources description "
@@ -220,7 +220,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ShowSourcesNameCheckButton->SetCommand(
-    this, "ShowSourcesNameCheckButtonCallback");
+    this, "ShowSourcesNameCallback");
 
   this->ShowSourcesNameCheckButton->SetBalloonHelpString(
     "This advanced option adjusts whether the unique source names "
@@ -277,7 +277,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->FlatFrameCheckButton->SetCommand(
-    this, "FlatFrameCheckButtonCallback");
+    this, "FlatFrameCallback");
 
   this->FlatFrameCheckButton->SetBalloonHelpString(
     "Display the toolbar frames using a flat aspect.");  
@@ -312,7 +312,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
       vtkKWToolbar::GetGlobalWidgetsFlatAspect());
     }
   this->FlatButtonsCheckButton->SetCommand(
-    this, "FlatButtonsCheckButtonCallback");
+    this, "FlatButtonsCallback");
 
   this->FlatButtonsCheckButton->SetBalloonHelpString(
     "Display the toolbar buttons using a flat aspect.");  
@@ -340,7 +340,7 @@ void vtkPVApplicationSettingsInterface::SetShowSourcesDescription(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCheckButtonCallback()
+void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCallback()
 {
  if (this->IsCreated())
    {
@@ -367,7 +367,7 @@ void vtkPVApplicationSettingsInterface::SetShowSourcesName(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::ShowSourcesNameCheckButtonCallback()
+void vtkPVApplicationSettingsInterface::ShowSourcesNameCallback()
 {
  if (this->IsCreated())
    {
@@ -398,7 +398,7 @@ void vtkPVApplicationSettingsInterface::SetFlatFrame(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::FlatFrameCheckButtonCallback()
+void vtkPVApplicationSettingsInterface::FlatFrameCallback()
 {
   if (this->IsCreated())
     {
@@ -423,7 +423,7 @@ void vtkPVApplicationSettingsInterface::SetFlatButtons(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplicationSettingsInterface::FlatButtonsCheckButtonCallback()
+void vtkPVApplicationSettingsInterface::FlatButtonsCallback()
 {
   if (this->IsCreated())
     {
