@@ -17,9 +17,6 @@
 #define __vtkPVConfig_h
 
 #cmakedefine PARAVIEW_LINK_XDMF
-#cmakedefine PARAVIEW_USE_EXODUS
-#cmakedefine PARAVIEW_USE_SAF
-#cmakedefine PARAVIEW_USE_LOOKMARKS
 #cmakedefine PARAVIEW_USE_ICE_T
 #cmakedefine PARAVIEW_USE_SYSTEM_HDF5
 #cmakedefine XDMF_SYSTEM_HDF5

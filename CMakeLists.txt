@@ -361,7 +361,10 @@ MACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
   SET(ExtraParaViewServer_SRCS ${ExtraParaViewServer_SRCS} ${SRCS})
 ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
 
-FOREACH(external EXODUS SAF LOOKMARKS)
+SET(PARAVIEW_EXTRA_EXTERNAL_MODULES
+  "" CACHE STRING "Extra modules that ParaView will try to import. The modules have to provide ParaViewImport.cmake file.")
+MARK_AS_ADVANCED(PARAVIEW_EXTRA_EXTERNAL_MODULES)
+FOREACH(external EXODUS SAF LOOKMARKS AMRCTH ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
   OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
   MARK_AS_ADVANCED(PARAVIEW_USE_${external})
   IF(PARAVIEW_USE_${external})
@@ -380,6 +383,11 @@ FOREACH(external EXODUS SAF LOOKMARKS)
     ELSE(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
       MESSAGE(SEND_ERROR "Cannot find ${external} sources directory: ${${external}_SOURCE_DIR}")
     ENDIF(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
+    SET(PARAVIEW_CONFIG_EXTRA_DEFINES
+      "${PARAVIEW_CONFIG_EXTRA_DEFINES}\n#define PARAVIEW_USE_${external} 1")
+  ELSE(PARAVIEW_USE_${external})
+    SET(PARAVIEW_CONFIG_EXTRA_DEFINES
+      "${PARAVIEW_CONFIG_EXTRA_DEFINES}\n/* #undef PARAVIEW_USE_${external} */")
   ENDIF(PARAVIEW_USE_${external})
 ENDFOREACH(external)
 
