@@ -165,7 +165,7 @@ ENDIF(VTK_USE_SYSTEM_ZLIB)
 
 #########################################################################
 # Configure HDF5
-OPTION(PARAVIEW_USE_SYSTEM_HDF5 "Use system installed HDF5. Has to be version 1.6 or higher" OFF)
+OPTION(PARAVIEW_USE_SYSTEM_HDF5 "Use system installed HDF5" OFF)
 IF(PARAVIEW_USE_SYSTEM_HDF5)
 
   INCLUDE(${ParaView_SOURCE_DIR}/CMake/FindHDF5.cmake)
