@@ -325,7 +325,7 @@ vtkKWWindow::~vtkKWWindow()
     }
 
   this->SetWindowClass(0);
-  this->SetScriptExtension(".tcl");
+  this->SetScriptExtension(0);
 }
 
 void vtkKWWindow::DisplayHelp()
@@ -926,7 +926,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.61 $");
+  this->ExtractRevision(os,"$Revision: 1.62 $");
 }
 
 int vtkKWWindow::ExitDialog()
