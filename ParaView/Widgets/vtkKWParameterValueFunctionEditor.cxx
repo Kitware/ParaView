@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.2");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.3");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -398,13 +398,13 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app,
   this->Icons[ICON_MOVE_V]->SetImageData(vtkKWIcon::ICON_MOVE_V);
   this->Icons[ICON_TRASHCAN]->SetImageData(vtkKWIcon::ICON_TRASHCAN);
 
-  // Pack the widget
-
-  this->Pack();
-
   // Set the bindings
 
   this->Bind();
+
+  // Pack the widget
+
+  this->Pack();
 
   // Update
 
@@ -450,7 +450,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   // Title frame (T)
 
   tk_cmd << "grid " << this->TitleFrame->GetWidgetName() 
-         << " -row 0 -column 0 -stick ew" << endl;
+         << " -row 0 -column 0 -stick ew -ipady 2" << endl;
 
   this->TitleFrame->UnpackChildren();
 
@@ -479,7 +479,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   // Info frame (I)
 
   tk_cmd << "grid " << this->InfoFrame->GetWidgetName() 
-         << " -row 0 -column 1 -stick ew" << endl;
+         << " -row 0 -column 1 -stick ew -ipady 2" << endl;
   
   this->InfoFrame->UnpackChildren();
 
