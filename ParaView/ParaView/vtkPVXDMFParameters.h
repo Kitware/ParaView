@@ -88,6 +88,11 @@ public:
   virtual void ResetInternal();
 
   // Description:
+  // Called during animation and from trace file to set a parameter on
+  // the reader on the server.
+  void SetParameterIndex(const char* label, int value);
+
+  // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
@@ -117,7 +122,7 @@ public:
   // Description:
   // Get the frame
   vtkGetObjectMacro(Frame, vtkKWLabeledFrame);
-  vtkGetStringMacro(VTKReaderTclName);
+  vtkGetMacro(VTKReaderID, vtkClientServerID);
 
   void SaveInBatchScript(ofstream *file);
 
@@ -143,10 +148,11 @@ protected:
   char* FrameLabel;
 
   // Description:
-  // This is the name of the VTK reader.
-  vtkSetStringMacro(VTKReaderTclName);
-  char* VTKReaderTclName;
+  // This is the ID of the VTK Xdmf reader.
+  vtkClientServerID VTKReaderID;
 
+  // ID of server-side helper.
+  vtkClientServerID ServerSideID;
 private:
   vtkPVXDMFParameters(const vtkPVXDMFParameters&); // Not implemented
   void operator=(const vtkPVXDMFParameters&); // Not implemented

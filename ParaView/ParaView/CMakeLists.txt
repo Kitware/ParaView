@@ -31,6 +31,26 @@ SET( ParaViewServer_SRCS
   vtkXMLPVAnimationWriter.cxx
   )
 
+SET( ParaViewExtraWrapper_SRCS
+  ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWApplication.h
+  ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWObject.h
+)
+
+IF(XDMF_FOUND)
+  SET(XDMF_READER_HEADER)
+  FOREACH(dir ${XDMF_INCLUDE_DIRS})
+    IF(NOT XDMF_READER_HEADER)
+      IF(EXISTS ${dir}/vtkXdmfReader.h)
+        SET(XDMF_READER_HEADER ${dir}/vtkXdmfReader.h)
+      ENDIF(EXISTS ${dir}/vtkXdmfReader.h)
+    ENDIF(NOT XDMF_READER_HEADER)
+  ENDFOREACH(dir)
+  SET(ParaViewServer_SRCS ${ParaViewServer_SRCS}
+    vtkPVServerXDMFParameters.cxx
+    ${XDMF_READER_HEADER}
+    )
+ENDIF(XDMF_FOUND)
+
 SET( ParaViewClient_SRCS
   vtkKWBoundsDisplay.cxx
   vtkPV3DWidget.cxx
@@ -285,8 +305,7 @@ VTK_MAKE_INSTANTIATOR2(vtkParaViewInstantiator PVInstantiator_SRCS
 # Create ClientServer wrappers for ParaView classes.
 VTK_WRAP_ClientServer(vtkParaViewServerCS ParaViewServerCS_SRCS
   ${ParaViewShared_SRCS} ${ParaViewServer_SRCS}
-  ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWApplication.h
-  ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWObject.h)
+  ${ParaViewExtraWrapper_SRCS})
 ADD_LIBRARY(vtkParaViewServerCS ${ParaViewServerCS_SRCS}
   ${ParaViewServer_SRCS})
 TARGET_LINK_LIBRARIES(vtkParaViewServerCS vtkPVFiltersCS vtkKWWidgetsTCL)
