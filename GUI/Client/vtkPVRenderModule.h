@@ -185,6 +185,9 @@ protected:
   int DisableRenderingFlag;
   int RenderInterruptsEnabled;
 
+  // Handle reset observers because we can do them more efficiently than
+  // the render manager can.
+  void InitializeObservers();
   unsigned long ResetCameraClippingRangeTag;
 
   vtkPVRenderModuleObserver* Observer;

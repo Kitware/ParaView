@@ -43,7 +43,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.7");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.8");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -103,6 +103,9 @@ void vtkDesktopDeliveryServer
     {
     // Create a reference.
     this->ParallelRenderManager->Register(this);
+
+    // No need to write the image back on the render server.
+    this->ParallelRenderManager->WriteBackImagesOff();
 
     // Attach observers.
     vtkCallbackCommand *cbc;

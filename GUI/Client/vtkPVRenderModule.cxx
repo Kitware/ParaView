@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.34");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.35");
 
 //===========================================================================
 //***************************************************************************
@@ -302,7 +302,13 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
          << this->RenderWindowID << "AddRenderer" << this->Renderer2DID
          << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    
+
+  this->InitializeObservers();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderModule::InitializeObservers()
+{   
   // the 2d renderer must be kept in sync with the main renderer
   this->Renderer->AddObserver(
     vtkCommand::StartEvent, this->Observer);  

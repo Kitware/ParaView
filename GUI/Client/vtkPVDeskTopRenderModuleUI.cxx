@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.5");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.6");
 
 int vtkPVDeskTopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -66,10 +66,9 @@ void vtkPVDeskTopRenderModuleUI::Create(vtkKWApplication *app, const char *)
   //this->SquirtLevelScale->EnabledOff();
   //this->SquirtLevelLabel->EnabledOff();
 
-  this->SetReductionFactor(1);
-  this->ReductionCheck->EnabledOff();
-  this->ReductionLabel->EnabledOff();
-
+  //this->SetReductionFactor(1);
+  //this->ReductionCheck->EnabledOff();
+  //this->ReductionLabel->EnabledOff();
 }
 
 //----------------------------------------------------------------------------
@@ -78,10 +77,7 @@ void vtkPVDeskTopRenderModuleUI::EnableRenductionFactor()
   this->SetReductionFactor(2);
   this->ReductionCheck->EnabledOn();
   this->ReductionLabel->EnabledOn();
-
 }
-
-
 
 
 

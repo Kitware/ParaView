@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.11");
 
 
 
@@ -159,7 +159,7 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   // **********************************************************
 
   // create a vtkDesktopDeliveryClient on the client
-  this->CompositeID = pm->NewStreamObject("vtkDesktopDeliveryClient");
+  this->CompositeID = pm->NewStreamObject("vtkDesktopDeliveryClient2");
   pm->SendStream(vtkProcessModule::CLIENT);
   // create a vtkDesktopDeliveryServer on the server, but use
   // the same id
@@ -193,13 +193,16 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "InitializeRMIs"
                   << vtkClientServerStream::End;
+  // Default to off so that the render window does not show up until necessary. 
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
-                  << "UseCompositingOn"
+                  << "UseCompositingOff"
                   << vtkClientServerStream::End;
   tmp = pm->GetStream();
   pm->SendStream(vtkProcessModule::CLIENT);
   pm->GetStream() = tmp;
   pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
+
+  this->InitializeObservers();
 }
 
 //----------------------------------------------------------------------------
