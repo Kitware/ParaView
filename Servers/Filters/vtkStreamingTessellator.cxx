@@ -31,7 +31,7 @@
 #  define VTK_TESSELLATOR_INCR_SUBCASE_COUNT(cs,sc)
 #endif // PARAVIEW_DEBUG_TESSELLATOR
 
-vtkCxxRevisionMacro(vtkStreamingTessellator,"1.8");
+vtkCxxRevisionMacro(vtkStreamingTessellator,"1.9");
 vtkStandardNewMacro(vtkStreamingTessellator);
 
 void vtkStreamingTessellator::PrintSelf( ostream& os, vtkIndent indent )
@@ -254,6 +254,7 @@ bool compareHopfCrossStringDist( const double* a0, const double* a1, const doubl
 {
   // Re-run vtkStreamingTessellatorGenerator.py with QualityThang=1
   // to get this implemented (along with on-the-fly quality improvement)
+  return 1;
 }
 
 
