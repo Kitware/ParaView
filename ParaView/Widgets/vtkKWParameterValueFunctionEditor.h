@@ -179,9 +179,11 @@ public:
   // Synchronize points with a given editor. 
   // First it will make sure both editors have the same points in the
   // parameter space (by calling MergePointsFromEditor on each other).
-  // Then each time a point is added, moved or removed, the same point
-  // is altered in the synchronized editor.
-  // Multiple editors can be synchronized.
+  // Then each time a point is added, moved or removed through 
+  // user interaction, the same point is altered in the synchronized editor,
+  // and vice-versa.
+  // Multiple editors can be synchronized (note that if you synchronize A
+  // with B, you do not need to synchronize B with A, this is a double-link).
   // Return 1 on success, 0 otherwise.
   virtual int SynchronizePointsWithEditor(
     vtkKWParameterValueFunctionEditor *editor);
@@ -191,8 +193,9 @@ public:
   // Description:
   // Synchronize the visible parameter range with a given editor. 
   // Each time the current visible range is changed, the same visible range
-  // is assigned to the synchronized editor.
-  // Multiple editors can be synchronized.
+  // is assigned to the synchronized editor, and vice-versa.
+  // Multiple editors can be synchronized (note that if you synchronize A
+  // with B, you do not need to synchronize B with A, this is a double-link).
   // Return 1 on success, 0 otherwise.
   virtual int SynchronizeVisibleParameterRangeWithEditor(
     vtkKWParameterValueFunctionEditor *editor);
@@ -354,42 +357,6 @@ protected:
   vtkKWImageLabel   **Icons;
   //ETX
 
-  // Synchronized editors
-
-  //BTX
-
-  class SynchronizedEditorSlot
-  {
-  public:
-    enum
-    {
-      SYNC_VISIBLE_PARAMETER_RANGE = 1,
-      SYNC_POINTS                  = 2
-    };
-    int Options;
-    vtkKWParameterValueFunctionEditor *Editor;
-  };
-
-  typedef vtkLinkedList<SynchronizedEditorSlot*> 
-          SynchronizedEditorsContainer;
-  typedef vtkLinkedListIterator<SynchronizedEditorSlot*> 
-          SynchronizedEditorsContainerIterator;
-  SynchronizedEditorsContainer *SynchronizedEditors;
-
-  virtual void DeleteAllSynchronizedEditors();
-  SynchronizedEditorSlot* GetSynchronizedEditorSlot(
-    vtkKWParameterValueFunctionEditor *editor);
-  virtual int AddSynchronizedEditor(
-    vtkKWParameterValueFunctionEditor *editor);
-  virtual int RemoveSynchronizedEditor(
-    vtkKWParameterValueFunctionEditor *editor);
-  virtual int AddSynchronizedEditorOption(
-    vtkKWParameterValueFunctionEditor *editor, int option);
-  virtual int RemoveSynchronizedEditorOption(
-    vtkKWParameterValueFunctionEditor *editor, int option);
-
-  //ETX
-
   // Description:
   // Bind/Unbind all components.
   virtual void Bind();
@@ -448,7 +415,8 @@ protected:
   virtual int FunctionPointValueIsLocked(int id);
 
   // Description:
-  // Proxy to the function
+  // Proxy to the function. 
+  // Only those functions need to be implemented in the subclasses.
   virtual int  HasFunction() = 0;
   virtual int  GetFunctionSize() = 0;
   virtual int  GetFunctionPointColor(int id, float rgb[3]);
@@ -460,6 +428,45 @@ protected:
   virtual int  RemoveFunctionPoint(int id) = 0;
   virtual void UpdateInfoLabelWithFunctionPoint(int id) = 0;
   virtual unsigned long GetFunctionMTime() = 0;
+
+  // Synchronized editors
+
+  //BTX
+
+  class SynchronizedEditorSlot
+  {
+  public:
+    enum
+    {
+      SYNC_VISIBLE_PARAMETER_RANGE = 1,
+      SYNC_POINTS                  = 2
+    };
+    int Options;
+    vtkKWParameterValueFunctionEditor *Editor;
+  };
+
+  typedef vtkLinkedList<SynchronizedEditorSlot*> 
+          SynchronizedEditorsContainer;
+  typedef vtkLinkedListIterator<SynchronizedEditorSlot*> 
+          SynchronizedEditorsContainerIterator;
+  SynchronizedEditorsContainer *SynchronizedEditors;
+
+  virtual void DeleteAllSynchronizedEditors();
+  SynchronizedEditorSlot* GetSynchronizedEditorSlot(
+    vtkKWParameterValueFunctionEditor *editor);
+  virtual int AddSynchronizedEditor(
+    vtkKWParameterValueFunctionEditor *editor);
+  virtual int RemoveSynchronizedEditor(
+    vtkKWParameterValueFunctionEditor *editor);
+  virtual int AddSynchronizedEditorOption(
+    vtkKWParameterValueFunctionEditor *editor, int option);
+  virtual int RemoveSynchronizedEditorOption(
+    vtkKWParameterValueFunctionEditor *editor, int option);
+
+  virtual void SynchronizePointsWithAllEditors();
+  virtual void SynchronizeVisibleParameterRangeWithAllEditors();
+
+  //ETX
 
   // Description:
   // Update the enable state. This should propagate similar calls to the
