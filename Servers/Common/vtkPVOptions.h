@@ -37,6 +37,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   int Parse(int argc, const char* const argv[]);
+  void GetRemainingArguments(int* argc, char** argv[]);
   const char* GetHelp();
 
   vtkGetMacro(ServerMode, int);
@@ -163,6 +164,10 @@ private:
 
   vtkPVOptionsInternal* Internals;
   static int UnknownArgumentHandler(const char* argument, void* call_data);
+
+  void CleanArgcArgv();
+  int Argc;
+  char** Argv;
 };
 
 #endif // #ifndef __vtkPVOptions_h

@@ -31,7 +31,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.11");
+vtkCxxRevisionMacro(vtkPVOptions, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -42,6 +42,8 @@ vtkPVOptions::vtkPVOptions()
   this->Internals->CMD.SetClientData(this);
   this->UnknownArgument = 0;
   this->ErrorMessage = 0;
+  this->Argc = 0;
+  this->Argv = 0;
 
   this->CaveConfigurationFileName = 0;
   this->MachinesFileName = 0;
@@ -90,6 +92,7 @@ vtkPVOptions::~vtkPVOptions()
   
   // Remove internals
   this->SetUnknownArgument(0);
+  this->CleanArgcArgv();
   delete this->Internals;
 }
 
@@ -219,9 +222,25 @@ int vtkPVOptions::Parse(int argc, const char* const argv[])
   int res1 = this->Internals->CMD.Parse();
   int res2 = this->PostProcess();
   //cout << "Res1: " << res1 << " Res2: " << res2 << endl;
+  this->CleanArgcArgv();
+  this->Internals->CMD.GetRemainingArguments(&this->Argc, &this->Argv);
   return res1 && res2;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVOptions::CleanArgcArgv()
+{
+  int cc;
+  if ( this->Argv )
+    {
+    for ( cc = 0; cc < this->Argc; cc ++ )
+      {
+      delete [] this->Argv[cc];
+      }
+    delete [] this->Argv;
+    this->Argv = 0;
+    }
+}
 //----------------------------------------------------------------------------
 void vtkPVOptions::AddBooleanArgument(const char* longarg, const char* shortarg, int* var, const char* help)
 {
@@ -265,6 +284,13 @@ int vtkPVOptions::UnknownArgumentHandler(const char* argument, void* call_data)
     return self->WrongArgument(argument);
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOptions::GetRemainingArguments(int* argc, char*** argv)
+{
+  *argc = this->Argc;
+  *argv = this->Argv;
 }
 
 //----------------------------------------------------------------------------
