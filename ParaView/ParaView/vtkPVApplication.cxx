@@ -482,8 +482,10 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
 { "--start-empty" , "-e", 
   "Start ParaView without any default modules.", 
 #ifdef VTK_MANGLE_MESA
-  "--use-software-rendering", "-s", 
+  "--use-software-rendering", "-r", 
   "Use software (Mesa) rendering (supports off-screen rendering).", 
+  "--use-satellite-software", "-s", 
+  "Use software (Mesa) rendering (supports off-screen rendering) only on satellite processes.", 
 #endif
   "--help", "",
   "Displays available command line arguments.",
@@ -618,6 +620,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
   
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
                                           index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-r",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "--use-satellite-software",
+                                          index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-s",
                                           index) == VTK_OK ||
        getenv("PV_SOFTWARE_RENDERING") )
@@ -628,7 +634,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->BroadcastScript("vtkImagingFactory _imaging_fact\n"
                           "_imaging_fact SetUseMesaClasses 1\n"
                           "_imaging_fact Delete");
-    if ( getenv("PV_SOFTWARE_RENDERING") )
+    if ( getenv("PV_SOFTWARE_RENDERING") ||
+         vtkPVApplication::CheckForArgument(
+           argc, argv, "--use-satellite-software", index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-s",
+                                            index) == VTK_OK)
       {
       this->Script("vtkGraphicsFactory _graphics_fact\n"
                    "_graphics_fact SetUseMesaClasses 0\n"
