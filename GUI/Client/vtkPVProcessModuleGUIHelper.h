@@ -64,6 +64,7 @@ protected:
 
 
 private:
+  int BatchFlag;
   vtkPVApplication* PVApplication;
   vtkPVProcessModuleGUIHelper(const vtkPVProcessModuleGUIHelper&); // Not implemented
   void operator=(const vtkPVProcessModuleGUIHelper&); // Not implemented

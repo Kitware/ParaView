@@ -27,7 +27,7 @@ class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkXYPlotWidget;
-class vtkPVPlotDisplay;
+class vtkSMPlotDisplay;
 class vtkXYPlotWidgetObserver;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
@@ -58,11 +58,15 @@ public:
                             void* calldata);
 //ETX
 
+  // Description:
+  // Control the visibility of the pick display as well.
+  virtual void SetVisibilityInternal(int val);
+
 protected:
   vtkPVProbe();
   ~vtkPVProbe();
   
-  vtkPVPlotDisplay* PlotDisplay;
+  vtkSMPlotDisplay* PlotDisplay;
   
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  

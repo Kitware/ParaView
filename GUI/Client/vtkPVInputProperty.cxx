@@ -16,7 +16,7 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVSource.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkCollection.h"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.14");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -48,7 +48,7 @@ vtkPVInputProperty::~vtkPVInputProperty()
 //----------------------------------------------------------------------------
 int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
 {
-  if (input->GetPVOutput() == NULL)
+  if (input->GetDisplayGUI() == NULL)
     {
     return 0;
     }

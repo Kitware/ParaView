@@ -21,11 +21,12 @@
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPProbeFilter.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkPVClientServerModule.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -42,7 +43,7 @@
 #include "vtkSystemIncludes.h"
 #include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
-#include "vtkPVPlotDisplay.h"
+#include "vtkSMPlotDisplay.h"
 #include "vtkPVRenderModule.h"
 #include "vtkCommand.h"
 
@@ -50,7 +51,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.129");
+vtkCxxRevisionMacro(vtkPVProbe, "1.130");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -114,7 +115,7 @@ vtkPVProbe::vtkPVProbe()
   // We cannot process inputs that have more than one part.
   this->RequiredNumberOfInputParts = 1;
   
-  this->PlotDisplay = vtkPVPlotDisplay::New();
+  this->PlotDisplay = vtkSMPlotDisplay::New();
 }
 
 vtkPVProbe::~vtkPVProbe()
@@ -200,31 +201,16 @@ void vtkPVProbe::CreateProperties()
   this->Script("pack %s",
                this->ShowXYPlotToggle->GetWidgetName());
 
-  if ( !this->XYPlotWidget )
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProbe::SetVisibilityInternal(int val)
+{
+  if (this->PlotDisplay)
     {
-    this->XYPlotWidget = vtkXYPlotWidget::New();
-    this->XYPlotWidget->SetXYPlotActor(vtkXYPlotActor::SafeDownCast(
-                pm->GetObjectFromID(this->PlotDisplay->GetXYPlotActorID())));
-
-  
-    vtkPVGenericRenderWindowInteractor* iren = 
-      this->GetPVWindow()->GetInteractor();
-    if ( iren )
-      {
-      this->XYPlotWidget->SetInteractor(iren);
-      }
-
-    // This observer synchronizes all processes when
-    // the widget changes the plot.
-    this->XYPlotObserver = vtkXYPlotWidgetObserver::New();
-    this->XYPlotObserver->PVProbe = this;
-    this->XYPlotWidget->AddObserver(vtkCommand::InteractionEvent, 
-                                    this->XYPlotObserver);
-    this->XYPlotWidget->AddObserver(vtkCommand::StartInteractionEvent, 
-                                    this->XYPlotObserver);
-    this->XYPlotWidget->AddObserver(vtkCommand::EndInteractionEvent, 
-                                    this->XYPlotObserver);
+    this->PlotDisplay->SetVisibility(val);
     }
+  this->Superclass::SetVisibilityNoTrace(val);
 }
 
 
@@ -233,6 +219,7 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
                               unsigned long event,  
                               void* vtkNotUsed(calldata))
 {
+  //law int fixme;  // move this to the server.
   switch ( event )
     {
     case vtkCommand::StartInteractionEvent:
@@ -254,7 +241,7 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
       // Synchronize the server scalar bar.
       vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
       pm->GetStream() << vtkClientServerStream::Invoke 
-                      << this->PlotDisplay->GetXYPlotActorID() 
+                      << this->PlotDisplay->GetXYPlotActorProxy()->GetID(0) 
                       << "GetPositionCoordinate" 
                       << vtkClientServerStream::End;
       pm->GetStream() << vtkClientServerStream::Invoke 
@@ -263,7 +250,7 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
                       << vtkClientServerStream::End;
 
       pm->GetStream() << vtkClientServerStream::Invoke 
-                      << this->PlotDisplay->GetXYPlotActorID() 
+                      << this->PlotDisplay->GetXYPlotActorProxy()->GetID(0) 
                       << "GetPosition2Coordinate" 
                       << vtkClientServerStream::End;
       pm->GetStream() << vtkClientServerStream::Invoke 
@@ -287,15 +274,43 @@ void vtkPVProbe::AcceptCallbackInternal()
   // call the superclass's method
   this->vtkPVSource::AcceptCallbackInternal();
     
-  if (this->PlotDisplay->GetPart() == NULL)
+  if (this->PlotDisplay->GetNumberOfIDs() == 0)
     {
     // Connect to the display.
     // These should be merged.
-    this->PlotDisplay->SetPart(this->GetPart(0));
-    this->PlotDisplay->SetInput(this->GetPart(0));
-    this->GetPart(0)->AddDisplay(this->PlotDisplay);
+    this->PlotDisplay->SetInput(this->GetProxy());
+    //this->GetProxy()->AddDisplay(this->PlotDisplay);
     this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PlotDisplay);
     }
+
+  //law int fixme; // This should be in server.
+  if ( !this->XYPlotWidget )
+    {
+    this->XYPlotWidget = vtkXYPlotWidget::New();
+    this->PlotDisplay->ConnectWidgetAndActor(this->XYPlotWidget);
+
+  
+    vtkPVGenericRenderWindowInteractor* iren = 
+      this->GetPVWindow()->GetInteractor();
+    if ( iren )
+      {
+      this->XYPlotWidget->SetInteractor(iren);
+      }
+
+    // This observer synchronizes all processes when
+    // the widget changes the plot.
+    this->XYPlotObserver = vtkXYPlotWidgetObserver::New();
+    this->XYPlotObserver->PVProbe = this;
+    this->XYPlotWidget->AddObserver(vtkCommand::InteractionEvent, 
+                                    this->XYPlotObserver);
+    this->XYPlotWidget->AddObserver(vtkCommand::StartInteractionEvent, 
+                                    this->XYPlotObserver);
+    this->XYPlotWidget->AddObserver(vtkCommand::EndInteractionEvent, 
+                                    this->XYPlotObserver);
+    }
+
+
+
 
   // We need to update manually for the case we are probing one point.
   this->PlotDisplay->Update();
@@ -386,14 +401,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->XYPlotWidget->SetCurrentRenderer(rm->GetRenderer2D());
     this->GetPVRenderView()->Enable3DWidget(this->XYPlotWidget);
 
-    // Enable XYPlotActor on server for tiled display.
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << rm->GetRenderer2DID()
-                    << "AddActor"
-                    << this->PlotDisplay->GetXYPlotActorID() 
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::RENDER_SERVER);
+    this->PlotDisplay->SetVisibility(1);
     }
   else
     {

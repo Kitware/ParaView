@@ -16,13 +16,15 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVColorMap.h"
+#include "vtkSMPartDisplay.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.53");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.54");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -79,7 +81,18 @@ void vtkPVEnSightReaderModule::SaveInBatchScript(ofstream *file)
         << " UpdatePipeline" 
         << endl;
   // Add the mapper, actor, scalar bar actor ...
-  this->GetPVOutput()->SaveInBatchScript(file);
+  if (this->GetVisibility())
+    {
+    if (this->PVColorMap)
+      {
+      this->PVColorMap->SaveInBatchScript(file);
+      }
+    vtkSMPartDisplay *partD = this->GetPartDisplay();
+    if (partD)
+      {
+      partD->SaveInBatchScript(file, this->GetProxy());
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -23,7 +23,7 @@
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVProcessModule.h"
@@ -41,7 +41,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.35");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.36");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

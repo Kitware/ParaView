@@ -20,9 +20,9 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPVSource.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkSMPart.h"
-#include "vtkPVPartDisplay.h"
+#include "vtkSMPartDisplay.h"
 #include "vtkKWRange.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkPVArrayInformation.h"
@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.13");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.14");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -426,13 +426,12 @@ void vtkPVVolumeAppearanceEditor::UpdateMap(int width, int height)
     return;
     }
   
-  vtkSMPart *part = this->PVSource->GetPart(0);
+  vtkSMPartDisplay *pd = this->PVSource->GetPartDisplay();
 
   vtkColorTransferFunction *colorFunc = 
       vtkColorTransferFunction::SafeDownCast(
         pvApp->GetProcessModule()->
-        GetObjectFromID(part->GetPartDisplay()->
-                        GetVolumeColorID()));
+        GetObjectFromID(pd->GetVolumeColorProxy()->GetID(0)));
 
   step = (this->ScalarRange[1]-this->ScalarRange[0])/(double)(width);
   ptr = this->MapData;
@@ -465,7 +464,7 @@ void vtkPVVolumeAppearanceEditor::BackButtonCallback()
     }
 
   // This has a side effect of gathering and display information.
-  this->PVRenderView->GetPVWindow()->GetCurrentPVSource()->GetPVOutput()->UpdateProperties();
+  this->PVRenderView->GetPVWindow()->GetCurrentPVSource()->GetDisplayGUI()->Update();
   
   // Use the Callback version of the method to get the trace
   this->PVRenderView->GetPVWindow()->ShowCurrentSourcePropertiesCallback();
@@ -513,14 +512,14 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
     vtkPiecewiseFunction *opacityFunc = 
       vtkPiecewiseFunction::SafeDownCast(
         pvApp->GetProcessModule()->
-        GetObjectFromID(part->GetPartDisplay()->
-                        GetVolumeOpacityID()));
+        GetObjectFromID(this->PVSource->GetPartDisplay()->
+                        GetVolumeOpacityProxy()->GetID(0)));
 
     vtkColorTransferFunction *colorFunc = 
       vtkColorTransferFunction::SafeDownCast(
         pvApp->GetProcessModule()->
-        GetObjectFromID(part->GetPartDisplay()->
-                        GetVolumeColorID()));
+        GetObjectFromID(this->PVSource->GetPartDisplay()->
+                        GetVolumeColorProxy()->GetID(0)));
 
     int size = opacityFunc->GetSize();
     
@@ -568,8 +567,8 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
     vtkVolumeProperty *volumeProperty = 
       vtkVolumeProperty::SafeDownCast(
         pvApp->GetProcessModule()->
-        GetObjectFromID(part->GetPartDisplay()->
-                        GetVolumePropertyID()));
+        GetObjectFromID(this->PVSource->GetPartDisplay()->
+                        GetVolumePropertyProxy()->GetID(0)));
     
     double unitDistance = volumeProperty->GetScalarOpacityUnitDistance();
     this->ScalarOpacityUnitDistanceScale->SetValue( unitDistance );
@@ -649,7 +648,7 @@ void vtkPVVolumeAppearanceEditor::SetScalarOpacityRampInternal( double scalarSta
       part =  this->PVSource->GetPart(i);
       vtkClientServerID volumeOpacityID;
       
-      volumeOpacityID = part->GetPartDisplay()->GetVolumeOpacityID();
+      volumeOpacityID = this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0);
       
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();
@@ -705,7 +704,7 @@ void vtkPVVolumeAppearanceEditor::SetScalarOpacityUnitDistanceInternal(double d)
       part =  this->PVSource->GetPart(i);
       vtkClientServerID volumePropertyID;
       
-      volumePropertyID = part->GetPartDisplay()->GetVolumePropertyID();
+      volumePropertyID = this->PVSource->GetPartDisplay()->GetVolumePropertyProxy()->GetID(0);
       
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();
@@ -798,7 +797,7 @@ void vtkPVVolumeAppearanceEditor::SetColorRampInternal( double s1, double r1,
       part =  this->PVSource->GetPart(i);
       vtkClientServerID volumeColorID;
       
-      volumeColorID = part->GetPartDisplay()->GetVolumeColorID();
+      volumeColorID = this->PVSource->GetPartDisplay()->GetVolumeColorProxy()->GetID(0);
       
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();

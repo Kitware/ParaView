@@ -19,7 +19,6 @@
 // vtkPVAdvancedReaderModule
 
 
-
 #ifndef __vtkPVRawReaderModule_h
 #define __vtkPVRawReaderModule_h
 

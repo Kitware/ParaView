@@ -15,7 +15,7 @@
 #include "vtkPVInputFixedTypeRequirement.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputFixedTypeRequirement);
-vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.8");
+vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVInputFixedTypeRequirement::vtkPVInputFixedTypeRequirement()

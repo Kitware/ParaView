@@ -38,11 +38,11 @@
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraIcon.h"
 #include "vtkPVConfig.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkSMPart.h"
-#include "vtkPVPartDisplay.h"
+#include "vtkSMPartDisplay.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkPVProcessModule.h"
@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.17");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.18");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

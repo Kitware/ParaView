@@ -67,9 +67,9 @@ SET( ParaViewClient_SRCS
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx
   vtkPVCutEntry.cxx
+  vtkPVDisplayGUI.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
-  vtkPVData.cxx
   vtkPVDataSetReaderModule.cxx
   vtkPVDummyWidget.cxx
   vtkPVEnSightReaderModule.cxx
@@ -81,6 +81,7 @@ SET( ParaViewClient_SRCS
   vtkPVGhostLevelDialog.cxx
   vtkPVGroupInputsWidget.cxx
   vtkPVImplicitPlaneWidget.cxx
+  vtkPVInformationGUI.cxx
   vtkPVInitialize.cxx
   vtkPVInputArrayRequirement.cxx
   vtkPVInputFixedTypeRequirement.cxx

@@ -36,7 +36,8 @@ class vtkKWPushButton;
 class vtkKWView;
 class vtkKWWidget;
 class vtkPVApplication;
-class vtkPVData;
+class vtkPVDisplayGUI;
+class vtkPVInformationGUI;
 class vtkPVInputMenu;
 class vtkPVInputProperty;
 class vtkPVRenderView;
@@ -45,11 +46,14 @@ class vtkPVWidget;
 class vtkPVWidgetCollection;
 class vtkPVWindow;
 class vtkSMSourceProxy;
+class vtkSMPartDisplay;
 class vtkSource;
 class vtkStringList;
 class vtkSMPart;
 class vtkPVDataInformation;
 class vtkPVNumberOfOutputsInformation;
+class vtkSMCubeAxesDisplay;
+class vtkPVColorMap;
 
 class VTK_EXPORT vtkPVSource : public vtkKWWidget
 {
@@ -88,7 +92,29 @@ public:
   // processes.
   void SetVisibility(int v);
   int GetVisibility();
-  virtual void SetVisibilityInternal(int v);
+  virtual void SetVisibilityNoTrace(int v);
+  
+  // Description:
+  // If we are the last source to unregister a color map,
+  // this method will turn its scalar bar visibility off.
+  void SetPVColorMap(vtkPVColorMap *colorMap);  
+  
+  // Description:
+  // This method sets the color mode based on arrays set in scalars and
+  // the input color mode.  The source must be current to call this method.
+  // The rules are:
+  // If the source created a NEW point scalar array, use it.
+  // Else if the source created a NEW cell scalar array, use it.
+  // Else if the input clolor by array exists in this source, use it.
+  // Else color by property.
+  void SetDefaultColorParameters();
+  
+  // Description:
+  // Actual cube axis visibility is a combination of this variable and
+  // overall visibility.
+  void SetCubeAxesVisibility(int val);
+  void SetCubeAxesVisibilityNoTrace(int val);
+  vtkGetMacro(CubeAxesVisibility, int);
 
   // Description:
   // Connect an input to this pvsource. 
@@ -126,9 +152,25 @@ public:
   // Description:
   // Set/get the first output of this source. Most source are setup
   // with only one output.
-  void SetPVOutput(vtkPVData *pvd);
-  vtkGetObjectMacro(PVOutput,vtkPVData);
- 
+  vtkGetObjectMacro(DisplayGUI,vtkPVDisplayGUI);
+  void SetDisplayGUI(vtkPVDisplayGUI* dispGUI);
+
+  // Description:
+  // For legacy scripts
+  vtkPVDisplayGUI* GetPVOutput() {return this->GetDisplayGUI();}
+
+  // Description:
+  // Access to this object from a script.
+  vtkGetObjectMacro(PVColorMap, vtkPVColorMap);
+
+  // Description:
+  // Set the pointer to GUI object that displays the data information
+  // on the information page.  All sources share this one object.
+  // We could get rid of this reference if the window (or some other
+  // global object) called update on this widget with the selected 
+  // source as an argument (when the source is selected).
+  void SetInformationGUI(vtkPVInformationGUI* infoGUI);
+   
   // Description:
   // This name is used in the source list to identify this source.
   // This name is passed to vtkPVWindow::GetPVSource() to get a
@@ -260,20 +302,13 @@ public:
 
   // Description:
   // The notebook that is displayed when the source is selected.
+  void SetNotebook(vtkKWNotebook* notebook);
   vtkGetObjectMacro(Notebook, vtkKWNotebook);
 
   // I shall want to get rid of this.
   void SetView(vtkKWView* view);
   vtkGetObjectMacro(View, vtkKWView);
   vtkKWView *View;
-
-  // Description:
-  // This allows you to set the propertiesParent to any widget you like.  
-  // If you do not specify a parent, then the views->PropertyParent is used.  
-  // If the composite does not have a view, then a top level window is created.
-  void SetParametersParent(vtkKWWidget *parent);
-  vtkGetObjectMacro(ParametersParent, vtkKWWidget);
-  vtkKWWidget *ParametersParent;
 
   // Desription:
   // This is just a flag that is used to mark that the source has been saved
@@ -300,7 +335,7 @@ public:
   // Description: 
   // This method is usually called on a clone created using ClonePrototype().
   // It: 1. sets the input, 2. calls CreateProperties(), 3. make the source
-  // current (if makeCurrent is true), 4. creates output (vtkPVData) which
+  // current (if makeCurrent is true), 4. creates output (vtkPVDisplayGUI) which
   // contains a vtk data object of type outputDataType, 5. assigns or
   // creates an extent translator to the output.
   virtual int InitializeClone(vtkPVSource* input, int makeCurrent);
@@ -323,8 +358,6 @@ public:
 
   // Description:
   // Access to individual parts.
-  void AddPart(vtkSMPart *part);
-  void SetPart(vtkSMPart *part);
   vtkSMPart *GetPart() {return this->GetPart(0);} 
   vtkSMPart *GetPart(int idx); 
   int GetNumberOfParts();
@@ -374,7 +407,7 @@ public:
   vtkBooleanMacro(IsPermanent, int);
 
   // Description:
-  // If this is on, no Display page (from vtkPVData) is display
+  // If this is on, no Display page (from vtkPVDisplayGUI) is display
   // for this source. Used by sources like Glyphs.
   vtkSetMacro(HideDisplayPage, int);
   vtkGetMacro(HideDisplayPage, int);
@@ -387,7 +420,7 @@ public:
   vtkBooleanMacro(HideParametersPage, int);
 
   // Description:
-  // If this is on, no Information page (from vtkPVData) is displayed
+  // If this is on, no Information page (from vtkPVDisplayGUI) is displayed
   // for this source. Used by sources like Glyphs.
   vtkSetMacro(HideInformationPage, int);
   vtkGetMacro(HideInformationPage, int);
@@ -488,11 +521,17 @@ public:
   // Calls UpdateVTKObjects on the proxy as well as on all widgets.
   virtual void UpdateVTKObjects();
   
+//BTX  
+  // Description:
+  // Source keeps the part display, because the DisplayGUI
+  // is shared between all sources.
+  void SetPartDisplay(vtkSMPartDisplay* pdisp);
+  vtkGetObjectMacro(PartDisplay, vtkSMPartDisplay);
+//ETX
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
-
-  vtkCollection *Parts;
 
   void SetPVInputInternal(const char* name, 
                           int idx, 
@@ -504,6 +543,8 @@ protected:
   // Description:
   void MarkSourcesForUpdate();
 
+  vtkPVColorMap *PVColorMap;
+  
   // Description:
   // This method collects data information from all processes.
   void GatherDataInformation();
@@ -515,7 +556,12 @@ protected:
   // This flag gets set after the user hits accept for the first time.
   int Initialized;
 
-  // If this is on, no Display page (from vtkPVData) is displayed
+  // This is different than the CubeAxesDisplay visibility.
+  // This is the state of the user selection. The CubeAxesDisplay
+  // visibility is the value "visibility and CubeAxesVisibility".
+  int CubeAxesVisibility;
+
+  // If this is on, no Display page (from vtkPVDisplayGUI) is displayed
   // for this source. Used by sources like Glyphs
   int HideDisplayPage;
 
@@ -523,12 +569,14 @@ protected:
   // for this source.
   int HideParametersPage;
 
-  // If this is on, no Information page (from vtkPVData) is displayed
+  // If this is on, no Information page (from vtkPVDisplayGUI) is displayed
   // for this source. Used by sources like Glyphs
   int HideInformationPage;
-  // One output. Now used only to hold UI
-  vtkPVData *PVOutput;
-  
+
+  vtkSMPartDisplay*     PartDisplay;
+  vtkPVDisplayGUI*     DisplayGUI;
+  vtkPVInformationGUI* InformationGUI;
+
   // Called to allocate the input array.  Copies old inputs.
   void SetNumberOfPVInputs(int num);
   vtkPVSource **PVInputs;
@@ -546,7 +594,11 @@ protected:
   virtual void AcceptCallbackInternal();
   
   vtkKWNotebook *Notebook;
-
+  // Since the notebook is share between all sources,
+  // we remeber the raised page to restore when the source is selected.
+  // This ivar is set and used by vtkPVWindow.
+  int SavedRaisedNotebookPageId;
+  
   // The name is just for display.
   char      *Name;
   char      *MenuName;
@@ -619,7 +671,10 @@ protected:
   int UpdateSourceInBatch;
 
   int LabelSetByUser;
-
+  
+  // CubeAxes should be moved into a display of its own.
+  vtkSMCubeAxesDisplay* CubeAxesDisplay;
+ 
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented
   void operator=(const vtkPVSource&); // Not implemented

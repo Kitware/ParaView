@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVFieldMenu.h"
@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.66");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.67");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -61,11 +61,6 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
 
   this->Label->Delete();
   this->Label = NULL;
-  if (this->FieldMenu)
-    {
-    this->FieldMenu->Delete();
-    this->FieldMenu = NULL;
-    }
   if (this->ArrayMenu)
     {
     this->ArrayMenu->Delete();

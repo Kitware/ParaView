@@ -14,10 +14,11 @@
 =========================================================================*/
 #include "vtkPVPick.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVData.h"
-#include "vtkPVPickDisplay.h"
+#include "vtkPVDisplayGUI.h"
+#include "vtkSMPickDisplay.h"
 #include "vtkPVApplication.h"
 #include "vtkSMPart.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkPVRenderModule.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkPointData.h"
@@ -32,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.7");
+vtkCxxRevisionMacro(vtkPVPick, "1.8");
 
 
 //----------------------------------------------------------------------------
@@ -44,10 +45,11 @@ vtkPVPick::vtkPVPick()
   // We cannot process inputs that have more than one part yet.
   this->RequiredNumberOfInputParts = 1;
   
-  this->PickDisplay = vtkPVPickDisplay::New();
+  this->PickDisplay = vtkSMPickDisplay::New();
 
   this->DataFrame = vtkKWWidget::New();
   this->LabelCollection = vtkCollection::New();
+  this->DisplayHasBeenAddedToTheRenderModule = 0;
 }
 
 vtkPVPick::~vtkPVPick()
@@ -57,7 +59,7 @@ vtkPVPick::~vtkPVPick()
     this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PickDisplay);
     }
 
-  this->PickDisplay->SetPointLabelVisibility(0);
+  this->PickDisplay->SetVisibility(0);
   this->PickDisplay->Delete();
   this->PickDisplay = NULL;
 
@@ -74,9 +76,9 @@ void vtkPVPick::SetVisibilityInternal(int val)
 {
   if (this->PickDisplay)
     {
-    this->PickDisplay->SetPointLabelVisibility(val);
+    this->PickDisplay->SetVisibility(val);
     }
-  this->Superclass::SetVisibilityInternal(val);
+  this->Superclass::SetVisibilityNoTrace(val);
 }
 
 
@@ -101,23 +103,22 @@ void vtkPVPick::AcceptCallbackInternal()
   // call the superclass's method
   this->Superclass::AcceptCallbackInternal();
     
-  if (this->PickDisplay->GetPart() == NULL)
+  if (this->DisplayHasBeenAddedToTheRenderModule == 0)
     {
     // Connect to the display.
     // These should be merged.
-    this->PickDisplay->SetPart(this->GetPart(0));
-    this->PickDisplay->SetInput(this->GetPart(0));
-    this->GetPart(0)->AddDisplay(this->PickDisplay);
+    this->PickDisplay->SetInput(this->GetProxy());
     this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PickDisplay);
+    this->DisplayHasBeenAddedToTheRenderModule = 1;
     }
 
   // We need to update manually for the case we are probing one point.
   this->PickDisplay->Update();
-  this->PickDisplay->SetPointLabelVisibility(1);
-  this->GetPVOutput()->DrawWireframe();
-  this->GetPVOutput()->ColorByProperty();
-  this->GetPVOutput()->ChangeActorColor(0.8, 0.0, 0.2);
-  this->GetPVOutput()->SetLineWidth(2);
+  this->PickDisplay->SetVisibility(1);
+  this->GetDisplayGUI()->DrawWireframe();
+  this->GetDisplayGUI()->ColorByProperty();
+  this->GetDisplayGUI()->ChangeActorColor(0.8, 0.0, 0.2);
+  this->GetDisplayGUI()->SetLineWidth(2);
 
   this->ClearDataLabels();
   // Get the collected data from the display.

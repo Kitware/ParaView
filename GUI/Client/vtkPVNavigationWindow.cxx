@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVNavigationWindow );
-vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.23");
+vtkCxxRevisionMacro(vtkPVNavigationWindow, "1.24");
 
 //-----------------------------------------------------------------------------
 vtkPVNavigationWindow::vtkPVNavigationWindow()
@@ -44,6 +44,10 @@ vtkPVNavigationWindow::~vtkPVNavigationWindow()
 //-----------------------------------------------------------------------------
 void vtkPVNavigationWindow::ChildUpdate(vtkPVSource *currentSource)
 {
+  if (currentSource == 0)
+    {
+    return;
+    }
   vtkPVSource *source;
   vtkPVSource **inputs = currentSource->GetPVInputs();
   int numInputs, xMid, yMid=0, y, i;

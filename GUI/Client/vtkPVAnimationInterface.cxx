@@ -33,7 +33,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationBatchHelper.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -50,8 +50,7 @@
 #include "vtkPNGWriter.h"
 #include "vtkRenderWindow.h"
 #include "vtkPVProcessModule.h"
-#include "vtkSMPart.h"
-#include "vtkPVPartDisplay.h"
+#include "vtkSMPartDisplay.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkCompleteArrays.h"
 
@@ -185,7 +184,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.156");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.157");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1633,40 +1632,31 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
                   << vtkClientServerStream::End;
   
   vtkstd::vector<vtkClientServerID> arrays;
+    vtkPVSource* source;
   if(numPartitions > 1)
     {
-    vtkPVSource* source;
     sources->InitTraversal();
     while((source = sources->GetNextPVSource()))
       {
       if(source->GetVisibility())
         {
         const char* sourceName = source->GetName();
-        int numParts = source->GetNumberOfParts();
-        for(int partIdx = 0; partIdx < numParts; ++partIdx)
-          {
-          vtkSMPart* part = source->GetPart(partIdx);
-          vtkClientServerID animCompleteArraysID = pm->NewStreamObject("vtkCompleteArrays");
-          arrays.push_back(animCompleteArraysID);
-          pm->GetStream() << vtkClientServerStream::Invoke 
-                          << part->GetPartDisplay()->GetGeometryID()
-                          << "GetOutput"
-                          << vtkClientServerStream::End;
-          pm->GetStream() << vtkClientServerStream::Invoke << animCompleteArraysID
-                          << "SetInput"
-                          << vtkClientServerStream::LastResult
-                          << vtkClientServerStream::End;
-          pm->GetStream() << vtkClientServerStream::Invoke 
-                          << animCompleteArraysID
-                          << "GetOutput"
-                          << vtkClientServerStream::End;
-          pm->GetStream() << vtkClientServerStream::Invoke 
-                          << pvAnimWriterID
-                          << "AddInput"
-                          << vtkClientServerStream::LastResult
-                          << sourceName
-                          << vtkClientServerStream::End;
-          }
+        // Not a perfect solution ...
+        // We should probably move most of this stuff into a special server manager object.
+        vtkClientServerID animCompleteArraysID = pm->NewStreamObject("vtkCompleteArrays");
+        this->PVSource->GetPartDisplay()->ConnectGeometryForWriting(animCompleteArraysID, "SetInput");
+        arrays.push_back(animCompleteArraysID);
+        
+        pm->GetStream() << vtkClientServerStream::Invoke 
+                        << animCompleteArraysID
+                        << "GetOutput"
+                        << vtkClientServerStream::End;
+        pm->GetStream() << vtkClientServerStream::Invoke 
+                        << pvAnimWriterID
+                        << "AddInput"
+                        << vtkClientServerStream::LastResult
+                        << sourceName
+                        << vtkClientServerStream::End;
         }
       }
     
@@ -1690,25 +1680,12 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
     }
   else
     {
-    vtkPVSource* source;
     sources->InitTraversal();
     while((source = sources->GetNextPVSource()))
       {
       if(source->GetVisibility())
         {
-        int numParts = source->GetNumberOfParts();
-        for(int partIdx = 0; partIdx < numParts; ++partIdx)
-          {
-          vtkSMPart* part = source->GetPart(partIdx);
-          pm->GetStream() << vtkClientServerStream::Invoke 
-                          << part->GetPartDisplay()->GetGeometryID()
-                          << "GetOutput"
-                          << vtkClientServerStream::End;
-          pm->GetStream() << vtkClientServerStream::Invoke << pvAnimWriterID
-                          << "AddInput"
-                          << vtkClientServerStream::LastResult
-                          << vtkClientServerStream::End;
-          }
+        source->GetPartDisplay()->ConnectGeometryForWriting(pvAnimWriterID, "AddInput");
         }
       }
     }

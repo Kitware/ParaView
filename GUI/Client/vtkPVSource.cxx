@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVSource.h"
 
+#include "vtkPVColorMap.h"
 #include "vtkArrayMap.txx"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
@@ -32,11 +33,14 @@
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
+#include "vtkPVInformationGUI.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkSMPart.h"
-#include "vtkPVPartDisplay.h"
+#include "vtkSMPartDisplay.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
@@ -57,12 +61,18 @@
 #include "vtkArrayMap.txx"
 #include "vtkStringList.h"
 #include "vtkPVAnimationInterface.h"
+#include "vtkSMCubeAxesDisplay.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkDataSet.h"
 #include <vtkstd/vector>
 
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.378");
 
+vtkStandardNewMacro(vtkPVSource);
+vtkCxxRevisionMacro(vtkPVSource, "1.379");
+vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkKWNotebook);
+vtkCxxSetObjectMacro(vtkPVSource,InformationGUI,vtkPVInformationGUI);
+vtkCxxSetObjectMacro(vtkPVSource,DisplayGUI,vtkPVDisplayGUI);
+vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -74,9 +84,6 @@ vtkCxxSetObjectMacro(vtkPVSource, Proxy, vtkSMSourceProxy);
 vtkPVSource::vtkPVSource()
 {
   this->CommandFunction = vtkPVSourceCommand;
-
-  this->Parts = vtkCollection::New();
-
   this->DataInformationValid = 0;
 
   this->NumberOfOutputsInformation = vtkPVNumberOfOutputsInformation::New();
@@ -97,16 +104,18 @@ vtkPVSource::vtkPVSource()
   this->AcceptButtonRed = 0;
 
   // The notebook which holds Parameters, Display and Information pages.
-  this->Notebook = vtkKWNotebook::New();
-  this->Notebook->AlwaysShowTabsOn();
-
+  this->Notebook = 0;
+  this->SavedRaisedNotebookPageId = 0;
+  
   this->PVInputs = NULL;
   this->NumberOfPVInputs = 0;
-  this->PVOutput = NULL;
-
+  
   this->NumberOfPVConsumers = 0;
   this->PVConsumers = 0;
-
+  
+  this->PartDisplay = 0;
+  this->DisplayGUI = 0;
+  this->InformationGUI = 0;
 
   // The frame which contains the parameters related to the data source
   // and the Accept/Reset/Delete buttons.
@@ -129,7 +138,6 @@ vtkPVSource::vtkPVSource()
     
   this->ReplaceInput = 1;
 
-  this->ParametersParent = NULL;
   this->View = NULL;
 
   this->VisitedFlag = 0;
@@ -159,16 +167,19 @@ vtkPVSource::vtkPVSource()
   this->LabelSetByUser = 0;
 
   this->Proxy = 0;
+  this->CubeAxesDisplay = vtkSMCubeAxesDisplay::New();
+  this->CubeAxesVisibility = 0;
+  
+  this->PVColorMap = 0;  
 }
 
 //----------------------------------------------------------------------------
 vtkPVSource::~vtkPVSource()
 {
-  this->SetPVOutput(NULL);  
+  this->SetPartDisplay(0);
+  this->SetDisplayGUI(0);
+  this->SetInformationGUI(0);
   this->RemoveAllPVInputs();
-
-  this->Parts->Delete();
-  this->Parts = NULL;
 
   this->NumberOfOutputsInformation->Delete();
   this->NumberOfOutputsInformation = NULL;
@@ -199,9 +210,7 @@ vtkPVSource::~vtkPVSource()
   // This is necessary in order to make the parent frame release it's
   // reference to the widgets. Otherwise, the widgets get deleted only
   // when the parent (usually the parameters notebook page) is deleted.
-  this->Notebook->SetParent(0);
-  this->Notebook->Delete();
-  this->Notebook = NULL;
+  this->SetNotebook(0);
 
   this->Widgets->Delete();
   this->Widgets = NULL;
@@ -242,11 +251,6 @@ vtkPVSource::~vtkPVSource()
   this->Parameters->Delete();
   this->Parameters = NULL;
     
-  if (this->ParametersParent)
-    {
-    this->ParametersParent->UnRegister(this);
-    this->ParametersParent = NULL;
-    }
   this->SetView(NULL);
 
   this->SetSourceClassName(0);
@@ -255,7 +259,10 @@ vtkPVSource::~vtkPVSource()
   this->InputProperties = NULL;
 
   this->SetModuleName(0);
-
+  this->CubeAxesDisplay->Delete();
+  this->CubeAxesDisplay = 0;
+  
+  this->SetPVColorMap(0);
 }
 
 //----------------------------------------------------------------------------
@@ -316,8 +323,6 @@ void vtkPVSource::SetPVInputInternal(
 
   this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddPVConsumer(vtkPVSource *c)
@@ -390,43 +395,16 @@ vtkPVSource *vtkPVSource::GetPVConsumer(int i)
   return this->PVConsumers[i];
 }
 
-
-
-
-
 //----------------------------------------------------------------------------
 int vtkPVSource::GetNumberOfParts()
 {
-  return this->Parts->GetNumberOfItems();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::SetPart(vtkSMPart* part)
-{
-  if ( !part )
-    {
-    return;
-    }
-  this->Parts->AddItem(part);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::AddPart(vtkSMPart* part)
-{
-  if ( !part )
-    {
-    return;
-    }
-  this->Parts->AddItem(part);
+  return this->Proxy->GetNumberOfParts();
 }
 
 //----------------------------------------------------------------------------
 vtkSMPart* vtkPVSource::GetPart(int idx)
 {
-  vtkSMPart *part;
-
-  part = static_cast<vtkSMPart*>(this->Parts->GetItemAsObject(idx));
-  return part;
+  return this->Proxy->GetPart(idx);
 }
 
 //----------------------------------------------------------------------------
@@ -435,6 +413,16 @@ vtkPVDataInformation* vtkPVSource::GetDataInformation()
   if (this->DataInformationValid == 0)
     {
     this->GatherDataInformation();
+    
+    // Where else should I put this?
+    //law int fixme; // Although this should probably go into vtkPVSource::Update,
+    // I am going to get rid of this refernece anyway. (Or should I?)
+    // Window will know to update the InformationGUI when the current PVSource
+    // is changed, but how will it detect that a source has changed?
+    if (this->InformationGUI)
+      {
+      this->InformationGUI->Update(this);
+      }
     }
   return this->Proxy->GetDataInformation();
 }
@@ -449,31 +437,29 @@ void vtkPVSource::InvalidateDataInformation()
 void vtkPVSource::GatherDataInformation()
 {
   vtkSMPart *part;
+  int i, num;
 
-  this->Parts->InitTraversal();
-  while ( ( part = (vtkSMPart*)(this->Parts->GetNextItemAsObject())) )
+  //law int fixme;  // Try just calling gather on the partdisplay.
+
+  num = this->GetNumberOfParts();
+  for (i = 0; i < num; ++i)
     {
+    part = this->GetPart(i);
     part->GatherDataInformation();
     }
   this->DataInformationValid = 1;
 
-  if (this->GetPVOutput())
+  if (this->GetDisplayGUI())
     {
     // This will cause a recursive call, but the Valid flag will terminate it.
-    this->GetPVOutput()->UpdateProperties();
+    this->GetDisplayGUI()->Update();
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::Update()
 {
-  vtkSMPart *part;
-
-  this->Parts->InitTraversal();
-  while ( (part = (vtkSMPart*)(this->Parts->GetNextItemAsObject())) )
-    {
-    part->Update();
-    }
+  this->Proxy->UpdatePipeline();
 }
 
 //----------------------------------------------------------------------------
@@ -481,12 +467,14 @@ void vtkPVSource::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->PVOutput);
+  this->PropagateEnableState(this->DisplayGUI);
+  this->PropagateEnableState(this->InformationGUI);
   this->PropagateEnableState(this->Notebook);
   this->PropagateEnableState(this->Parameters);
   this->PropagateEnableState(this->MainParameterFrame);
   this->PropagateEnableState(this->ButtonFrame);
   this->PropagateEnableState(this->ParameterFrame);
+  this->PropagateEnableState(this->PVColorMap);
 
   if ( this->Widgets )
     {
@@ -521,28 +509,6 @@ void vtkPVSource::UpdateEnableState()
   this->PropagateEnableState(this->LongHelpLabel);
 }
   
-//----------------------------------------------------------------------------
-void vtkPVSource::SetVisibilityInternal(int v)
-{
-  vtkSMPart *part;
-  int idx, num;
-
-  if (this->GetPVOutput())
-    {
-    this->GetPVOutput()->SetVisibilityCheckState(v);
-    }
-
-  num = this->GetNumberOfParts();
-  for (idx = 0; idx < num; ++idx)
-    {
-    part = this->GetPart(idx);
-    if (part)
-      {
-      part->GetPartDisplay()->SetVisibility(v);
-      }
-    }
-}
-
 
 //----------------------------------------------------------------------------
 // Functions to update the progress bar
@@ -644,24 +610,25 @@ vtkPVApplication* vtkPVSource::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVSource::CreateProperties()
 {
-  // If the user has not set the parameters parent.
-  if (this->ParametersParent == NULL)
+  if (this->Notebook == 0)
     {
-    vtkErrorMacro("ParametersParent has not been set.");
+    vtkErrorMacro("Notebook has not been set yet.");  
     }
 
-  this->Notebook->SetParent(this->ParametersParent);
-  this->Notebook->Create(this->GetApplication(),"");
-
+  this->Notebook->Raise("Parameters");
+  this->Notebook->HidePage("Display");
+  this->Notebook->HidePage("Information");
+  
+  //law int fixme; // Berk says hide paramters is no longer used.
   // Set up the pages of the notebook.
   if (!this->HideParametersPage)
     {
-    this->Notebook->AddPage("Parameters");
     this->Parameters->SetParent(this->Notebook->GetFrame("Parameters"));
     }
   else
     {
-    this->Parameters->SetParent(this->ParametersParent);
+    //law int fixme;  //deal with hiding the parameters page.
+    //this->Parameters->SetParent(this->ParametersParent);
     }
 
   this->Parameters->Create(this->GetApplication(),"frame","");
@@ -670,10 +637,6 @@ void vtkPVSource::CreateProperties()
     this->Script("pack %s -pady 2 -fill x -expand yes",
                  this->Parameters->GetWidgetName());
     }
-
-  // For initializing the trace of the notebook.
-  this->GetParametersParent()->SetTraceReferenceObject(this);
-  this->GetParametersParent()->SetTraceReferenceCommand("GetParametersParent");
 
   // Set the description frame
   // Try to do something that looks like the parameters, i.e. fixed-width
@@ -907,11 +870,12 @@ void vtkPVSource::Pack()
   this->GetPVRenderView()->UpdateTclButAvoidRendering();
 
   this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->ParametersParent->GetWidgetName());
-  this->Script("pack %s -side top -fill both -expand t",
-               this->GetPVRenderView()->GetNavigationFrame()->GetWidgetName());
-  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-               this->Notebook->GetWidgetName());
+               this->Notebook->GetFrame("Parameters")->GetWidgetName());
+
+  //this->Script("pack %s -side top -fill both -expand t",
+  //             this->GetPVRenderView()->GetNavigationFrame()->GetWidgetName());
+  this->Script("pack %s -pady 2 -fill x -expand yes",
+               this->Parameters->GetWidgetName());               
 }
 
 //----------------------------------------------------------------------------
@@ -919,19 +883,35 @@ void vtkPVSource::Select()
 {
   this->Pack();
 
-  vtkPVData *data;
+  vtkPVDisplayGUI *data;
   
+  // We could remember the last page displayed.
+  if (this->Notebook)
+    {
+    // This implemented the old behavior where each source remebered its page.
+    // I am trying a new behavior where the raised page stays the same 
+    // between sources until it is changed.
+    //this->Notebook->Raise(this->SavedRaisedNotebookPageId);    
+    }
   this->UpdateProperties();
   // This may best be merged with the UpdateProperties call but ...
   // We make the call here to update the input menu, 
   // which is now just another pvWidget.
   this->UpdateParameterWidgets();
   
-  data = this->GetPVOutput();
+  data = this->GetDisplayGUI();
   if (data)
     {
-    // This has a side effect of gathering and displaying information.
-    data->GetPVSource()->GetDataInformation();
+    // The display GUI should not need both of these references,
+    // The Display GUI should be enough.  Until it is cleaned up,
+    // I am keeping both.
+    data->SetPVSource(this);
+    data->Update();
+    }
+
+  if (this->InformationGUI)
+    {
+    this->InformationGUI->Update(this);
     }
 
   if (this->GetPVRenderView())
@@ -955,10 +935,13 @@ void vtkPVSource::Select()
 //----------------------------------------------------------------------------
 void vtkPVSource::Deselect(int doPackForget)
 {
-  if (doPackForget)
+  // Save the page to restore when the sources is selected later.
+  this->SavedRaisedNotebookPageId = this->Notebook->GetRaisedPageId();
+  if (this->DisplayGUI)
     {
-    this->Script("pack forget %s", this->Notebook->GetWidgetName());
+    this->DisplayGUI->SetPVSource(0);
     }
+
   int i;
   vtkPVWidget *pvWidget = 0;
   vtkCollectionIterator *it = this->Widgets->NewIterator();
@@ -972,7 +955,6 @@ void vtkPVSource::Deselect(int doPackForget)
     }
   it->Delete();
 }
-
 
 //----------------------------------------------------------------------------
 char* vtkPVSource::GetName()
@@ -1106,20 +1088,127 @@ void vtkPVSource::LabelEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::SetVisibility(int v)
 {
-  if (this->PVOutput)
+  if (this->GetVisibility() == v)
     {
-    this->PVOutput->SetVisibility(v);
+    return;
     }
+  
+  this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
+  this->SetVisibilityNoTrace(v);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetVisibilityNoTrace(int v)
+{
+  if (this->GetVisibility() == v || this->PartDisplay == 0)
+    {
+    return;
+    }
+
+  int cubeAxesVisibility = this->GetCubeAxesVisibility();
+  
+  this->PartDisplay->SetVisibility(v);
+  this->CubeAxesDisplay->SetVisibility(v && cubeAxesVisibility);
+
+  // Handle visibility of shared colormap.
+  if (this->PVColorMap)
+    {
+    // Use count to manage color map visibility.
+    if (v)
+      {
+      this->PVColorMap->IncrementUseCount();
+      }
+    else
+      {
+      this->PVColorMap->DecrementUseCount();
+      }
+    }
+
+  // Update GUI.
+  // Maybe the display GUI reference should be set to NULL
+  // when the source is not current.
+  if (this->DisplayGUI && this->DisplayGUI->GetPVSource() == this)
+    {
+    this->DisplayGUI->UpdateVisibilityCheck();
+    }
+  if ( this->GetPVRenderView() && this->GetPVWindow())
+    {
+    this->GetPVRenderView()->UpdateNavigationWindow(
+                                this->GetPVWindow()->GetCurrentPVSource(), 0);
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetCubeAxesVisibility(int val)
+{
+  if (this->CubeAxesVisibility == val)
+    {
+    return;
+    }
+  this->AddTraceEntry("$kw(%s) SetCubeAxesVisibility %d", this->GetTclName(), val);
+  this->SetCubeAxesVisibilityNoTrace(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetCubeAxesVisibilityNoTrace(int val)
+{
+  if (this->CubeAxesVisibility == val)
+    {
+    return;
+    }
+  this->CubeAxesVisibility = val;
+  this->CubeAxesDisplay->SetVisibility(this->GetVisibility() && val);
+  
+  if (this->DisplayGUI && this->DisplayGUI->GetPVSource() == this)
+    {
+    this->DisplayGUI->UpdateCubeAxesVisibilityCheck();
+    }
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }  
 }
 
 //----------------------------------------------------------------------------
 int vtkPVSource::GetVisibility()
 {
-  if ( this->GetPVOutput() && this->GetPVOutput()->GetVisibility() )
+  if ( this->GetPartDisplay() && this->GetPartDisplay()->GetVisibility() )
     {
     return 1;
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetPVColorMap(vtkPVColorMap *colorMap)
+{
+  if (this->PVColorMap == colorMap)
+    {
+    return;
+    }
+
+  // Get rid of previous color map.
+  if (this->PVColorMap)
+    {
+    // Use count to manage color map visibility.
+    if (this->GetVisibility())
+      {
+      this->PVColorMap->DecrementUseCount();
+      }
+    this->PVColorMap->UnRegister(this);
+    this->PVColorMap = NULL;
+    }
+
+  this->PVColorMap = colorMap;
+  if (this->PVColorMap)
+    {
+    if (this->GetVisibility())
+      {
+      this->PVColorMap->IncrementUseCount();
+      }
+    this->PVColorMap->Register(this);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1196,6 +1285,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 
   window = this->GetPVWindow();
 
+  this->Notebook->ShowPage("Display");
+  this->Notebook->ShowPage("Information");
   this->SetAcceptButtonColorToUnmodified();
   this->GetPVRenderView()->UpdateTclButAvoidRendering();
   
@@ -1206,51 +1297,50 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   this->UpdateVTKSourceParameters();
 
   this->MarkSourcesForUpdate();
-
-  // Moved from creation of the source. (InitializeClone)
-  // Initialize the output if necessary.
-  // This has to be after the widgets are accepted (UpdateVTKSOurceParameters)
-  // because they can change the number of parts.
-  if (this->GetPVOutput() == NULL)
-    { // This is the first time, create the data.
-    this->InitializeData();
-    }
     
   // Initialize the output if necessary.
   if ( ! this->Initialized)
-    { // This is the first time, initialize data.    
-    vtkPVData *pvd;
-    
-    pvd = this->GetPVOutput();
+    { // This is the first time, initialize data. 
+    vtkPVDisplayGUI *pvd = this->GetDisplayGUI();
     if (pvd == NULL)
       { // I suppose we should try and delete the source.
-      vtkErrorMacro("Could not get output.");
+      vtkErrorMacro("Could not get display GUI.");
       this->DeleteCallback();    
       this->GetPVApplication()->GetProcessModule()->SendCleanupPendingProgress();
       return;
       }
 
-    if (!this->GetHideDisplayPage())
-      {
-      this->Notebook->AddPage("Display");
-      }
-    if (!this->GetHideInformationPage())
-      {
-      this->Notebook->AddPage("Information");
-      }
-
-    pvd->CreateProperties();
-    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddSource(this->GetProxy());
+    // Create the display and add it to the render module.
+    vtkPVRenderModule* rm = 
+        this->GetPVApplication()->GetProcessModule()->GetRenderModule();
+    vtkSMPartDisplay *pDisp = rm->CreatePartDisplay();
+    // Parts need to be created before we set source as inpout to part display.
+    // This creates the proxy parts.
+    this->InitializeData();
+    // Display needs an input.
+    pDisp->SetInput(this->GetProxy());
+    // Render module keeps a list of all the displays.
+    rm->AddDisplay(pDisp);
+    
+    // Hookup cube axes display.
+    this->CubeAxesDisplay->SetInput(this->Proxy);
+    this->CubeAxesDisplay->SetVisibility(0);
+    rm->AddDisplay(this->CubeAxesDisplay);   
+    
+    // Display GUI is shared. PartDisplay and source of DisplayGUI is set
+    // when the source selected as current.
+    this->SetPartDisplay(pDisp);
+    pDisp->Delete();
 
     // Make the last data invisible.
     input = this->GetPVInput(0);
     if (input)
       {
       if (this->ReplaceInput && 
-          input->GetPVOutput()->GetPropertiesCreated() && 
+          input->GetDisplayGUI()->GetApplication() && 
           hideSource)
-        {
-        input->SetVisibilityInternal(0);
+        { // Application is set when the widget is created.
+        input->SetVisibilityNoTrace(0);
         }
       }
 
@@ -1261,11 +1351,11 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
     else
       {
-      this->SetVisibilityInternal(0);
+      this->SetVisibilityNoTrace(0);
       }
 
     // We need to update so we will have correct information for initialization.
-    if (this->GetPVOutput())
+    if (this->GetDisplayGUI())
       {
       // Update the VTK data.
       this->Update();
@@ -1292,6 +1382,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // This causes input to be checked for validity.
     // I put it at the end so the InputFixedTypeRequirement will work.
     this->UnGrabFocus();
+    this->SetDefaultColorParameters();
     this->Initialized = 1;
     }
   else
@@ -1308,11 +1399,15 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   window->UpdateSelectMenu();
 
   // Regenerate the data property page in case something has changed.
-  vtkPVData *pvd = this->GetPVOutput();
+  vtkPVDisplayGUI *pvd = this->GetDisplayGUI();
   if (pvd)
     {
+    // Update the vtk data which has already been done ...
     this->Update();
-    pvd->UpdateProperties();
+    // Causes the data information to be updated if the filter executed.
+    // Note has to be done here because tcl update causes render which
+    // causes the filter to execute.
+    pvd->Update();  
     }
 
   this->GetPVRenderView()->UpdateTclButAvoidRendering();
@@ -1323,12 +1418,136 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
 #endif  
 
-  // Causes the data information to be updated if the filter executed.
-  // Note has to be done here because tcl update causes render which
-  // causes the filter to execute.
-  pvd->UpdateProperties();
-  
   this->GetPVApplication()->GetProcessModule()->SendCleanupPendingProgress();
+}
+
+//----------------------------------------------------------------------------
+// Only call this when the source is current!
+// The rules are:
+// If the source created a NEW point scalar array, use it.
+// Else if the source created a NEW cell scalar array, use it.
+// Else if the input clolor by array exists in this source, use it.
+// Else color by property.
+void vtkPVSource::SetDefaultColorParameters()
+{
+  vtkPVSource* input = this->GetPVInput(0);
+  vtkPVDataInformation* inDataInfo = 0;
+  vtkPVDataSetAttributesInformation* inAttrInfo = 0;
+  vtkPVArrayInformation* inArrayInfo = 0;
+  vtkPVDataInformation* dataInfo;
+  vtkPVDataSetAttributesInformation* attrInfo;
+  vtkPVArrayInformation* arrayInfo;
+  vtkPVColorMap* colorMap;  
+
+  // Make sure this source is current.
+  //if (this->DisplayGUI == NULL || this->DisplayGUI->GetPVSource() != this)
+  //  {
+   // vtkErrorMacro("Source m,ust be current to set default colors.");
+  //  return;
+  //  }
+    
+  dataInfo = this->GetDataInformation();
+  if (input)
+    {
+    inDataInfo = input->GetDataInformation();
+    }
+    
+  // Inherit property color from input.
+  if (input)
+    {
+    float rgb[3];
+    input->GetPartDisplay()->GetColor(rgb);
+    this->GetPartDisplay()->SetColor(rgb[0], rgb[1], rgb[2]);
+    } 
+    
+  // Check for new point scalars.
+  attrInfo = dataInfo->GetPointDataInformation();
+  arrayInfo = attrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+  if (arrayInfo)
+    {
+    if (inDataInfo)
+      {
+      inAttrInfo = inDataInfo->GetPointDataInformation();
+      inArrayInfo = inAttrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+      }
+    if (inArrayInfo == 0 ||  strcmp(arrayInfo->GetName(),inArrayInfo->GetName()) != 0)
+      { // No input or different scalars: use the new scalars.
+      colorMap = this->GetPVWindow()->GetPVColorMap(arrayInfo->GetName(), 
+                                        arrayInfo->GetNumberOfComponents());
+      this->SetPVColorMap(colorMap);                                   
+      this->PartDisplay->ColorByArray(colorMap->GetRMScalarBarWidget(), 
+                                      vtkDataSet::POINT_DATA_FIELD);
+      return;
+      }
+    }
+
+  // Check for new cell scalars.
+  attrInfo = dataInfo->GetCellDataInformation();
+  arrayInfo = attrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+  if (arrayInfo)
+    {
+    if (inDataInfo)
+      {
+      inAttrInfo = inDataInfo->GetCellDataInformation();
+      inArrayInfo = inAttrInfo->GetAttributeInformation(vtkDataSetAttributes::SCALARS);
+      }
+    if (inArrayInfo == 0 ||  strcmp(arrayInfo->GetName(),inArrayInfo->GetName()) != 0)
+      { // No input or different scalars: use the new scalars.
+      colorMap = this->GetPVWindow()->GetPVColorMap(arrayInfo->GetName(), 
+                                        arrayInfo->GetNumberOfComponents());
+      this->SetPVColorMap(colorMap);                                   
+      this->PartDisplay->ColorByArray(colorMap->GetRMScalarBarWidget(), 
+                                      vtkDataSet::CELL_DATA_FIELD);
+      return;
+      }
+    }
+
+  // Try to use the same array selected by the input.
+  if (input)
+    {
+    colorMap = input->GetPVColorMap();
+    int colorField = -1;
+    if (colorMap)
+      {
+      colorField = input->GetPartDisplay()->GetColorField();
+      // Find the array in our info.
+      switch (colorField)
+        {
+        case vtkDataSet::POINT_DATA_FIELD:
+          attrInfo = dataInfo->GetPointDataInformation();
+          arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
+          if (arrayInfo && colorMap->MatchArrayName(arrayInfo->GetName(),
+                                       arrayInfo->GetNumberOfComponents()))
+            {  
+            this->SetPVColorMap(colorMap);                                   
+            this->PartDisplay->ColorByArray(colorMap->GetRMScalarBarWidget(), 
+                                            vtkDataSet::POINT_DATA_FIELD);
+            return;
+            }
+          break;
+        case vtkDataSet::CELL_DATA_FIELD:
+          attrInfo = dataInfo->GetCellDataInformation();
+          arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
+          if (arrayInfo && colorMap->MatchArrayName(arrayInfo->GetName(),
+                                       arrayInfo->GetNumberOfComponents()))
+            {  
+            this->SetPVColorMap(colorMap);                                   
+            this->PartDisplay->ColorByArray(colorMap->GetRMScalarBarWidget(), 
+                                            vtkDataSet::CELL_DATA_FIELD);
+            return;
+            }
+          break;
+        default:
+          vtkErrorMacro("Bad attribute.");
+          return;
+        }
+
+      }
+    }
+
+  // Color by property.
+  this->SetPVColorMap(0);
+  this->GetPartDisplay()->SetScalarVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -1382,9 +1601,9 @@ void vtkPVSource::DeleteCallback()
 
   window->GetAnimationInterface()->DeleteSource(this);
 
-  if (this->GetPVOutput())
+  if (this->GetDisplayGUI())
     {  
-    this->GetPVOutput()->DeleteCallback();
+    this->GetDisplayGUI()->DeleteCallback();
     }
 
   // Just in case cursor was left in a funny state.
@@ -1428,7 +1647,7 @@ void vtkPVSource::DeleteCallback()
       }
     else
       {
-      prev->SetVisibilityInternal(1);
+      prev->SetVisibilityNoTrace(1);
       }
     }
 
@@ -1476,8 +1695,10 @@ void vtkPVSource::DeleteCallback()
     if (prev == NULL)
       {
       // Unpack the properties.  This is required if prev is NULL.
-      this->Script("catch {eval pack forget [pack slaves %s]}",
-                   this->ParametersParent->GetWidgetName());
+      //this->Script("catch {eval pack forget [pack slaves %s]}",
+      //             this->Notebook->GetParent()->GetWidgetName());
+      
+      //law int remindme;  // Should we unpack the parameters frame?
       
       // Show the 3D View settings
       vtkPVApplication *pvApp = 
@@ -1490,12 +1711,23 @@ void vtkPVSource::DeleteCallback()
     }
         
   // Remove all of the actors mappers. from the renderer.
-  if (this->PVOutput)
+  if (this->DisplayGUI)
     {
-    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveSource(this->GetProxy());
-    }    
+    vtkSMPartDisplay* pDisp = this->GetPartDisplay();
+    if (pDisp)
+      {
+      this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->CubeAxesDisplay);
+      this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(pDisp);
+      }
+    }
 
-  this->SetPVOutput(NULL);
+  // I doubt this is necessary (may to break a reference loop).
+  if (this->DisplayGUI)
+    {
+    this->DisplayGUI->SetPVSource(0);
+    this->DisplayGUI->UnRegister(this);
+    this->DisplayGUI = 0;
+    }
   
   if ( initialized )
     {
@@ -1609,26 +1841,7 @@ int vtkPVSource::IsDeletable()
 
   return 1;
 }
-
-//----------------------------------------------------------------------------
-void vtkPVSource::SetParametersParent(vtkKWWidget *parent)
-{
-  if (this->ParametersParent == parent)
-    {
-    return;
-    }
-  if (this->ParametersParent)
-    {
-    vtkErrorMacro("Cannot reparent properties.");
-    return;
-    }
-  this->ParametersParent = parent;
-  parent->Register(this);
-}
-
-
   
-
 //---------------------------------------------------------------------------
 void vtkPVSource::SetNumberOfPVInputs(int num)
 {
@@ -1670,7 +1883,6 @@ void vtkPVSource::SetNumberOfPVInputs(int num)
   this->NumberOfPVInputs = num;
   this->Modified();
 }
-
 
 //---------------------------------------------------------------------------
 void vtkPVSource::SetNthPVInput(int idx, vtkPVSource *pvs)
@@ -1776,35 +1988,6 @@ vtkPVSource *vtkPVSource::GetNthPVInput(int idx)
   return (vtkPVSource *)(this->PVInputs[idx]);
 }
 
-
-//---------------------------------------------------------------------------
-void vtkPVSource::SetPVOutput(vtkPVData *pvd)
-{  
-  // Does this change anything?  Yes, it keeps the object from being modified.
-  if (pvd == this->PVOutput)
-    {
-    return;
-    }
-  
-  if (this->PVOutput)
-    {
-    // Manage backward pointer.
-    this->PVOutput->SetPVSource(this);
-    this->PVOutput->UnRegister(this);
-    this->PVOutput = NULL;
-    }
-  
-  if (pvd)
-    {
-    pvd->Register(this);
-    this->PVOutput = pvd;
-    // Manage backward pointer.
-    pvd->SetPVSource(this);
-    }
-
-  this->Modified();
-}
-
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveInBatchScript(ofstream *file)
 {
@@ -1816,8 +1999,20 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
 
   this->SaveFilterInBatchScript(file);
   // Add the mapper, actor, scalar bar actor ...
-  this->GetPVOutput()->SaveInBatchScript(file);
-}
+  if (this->GetVisibility())
+    {
+    if (this->PVColorMap)
+      {
+      this->PVColorMap->SaveInBatchScript(file);
+      }
+    vtkSMPartDisplay *partD = this->GetPartDisplay();
+    if (partD)
+      {
+      partD->SaveInBatchScript(file, this->GetProxy());
+      }
+    }
+}  
+
 
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
@@ -1951,9 +2146,6 @@ void vtkPVSource::SaveState(ofstream *file)
   // What about visibility?  
   // A second pass to set visibility?
   // Can we disable rendering and changing input visibility?
-
-  // Let the output set its state.
-  this->GetPVOutput()->SaveState(file);
 }
 
 //----------------------------------------------------------------------------
@@ -1996,7 +2188,6 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
 
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
 {
@@ -2016,7 +2207,6 @@ void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
   pvw->Select();
 }
 
-
 //----------------------------------------------------------------------------
 vtkIdType vtkPVSource::GetNumberOfInputProperties()
 {
@@ -2028,7 +2218,6 @@ vtkPVInputProperty* vtkPVSource::GetInputProperty(int idx)
 {
   return static_cast<vtkPVInputProperty*>(this->InputProperties->GetItemAsObject(idx));
 }
-
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty* vtkPVSource::GetInputProperty(const char* name)
@@ -2054,7 +2243,6 @@ vtkPVInputProperty* vtkPVSource::GetInputProperty(const char* name)
 
   return inProp;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVSource::SetAcceptButtonColorToModified()
@@ -2225,7 +2413,9 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
   // Copy properties
   pvs->SetApplication(this->GetApplication());
   pvs->SetReplaceInput(this->ReplaceInput);
-  pvs->SetParametersParent(this->ParametersParent);
+  pvs->SetNotebook(this->Notebook);
+  pvs->SetDisplayGUI(this->DisplayGUI);
+  pvs->SetInformationGUI(this->InformationGUI);
 
   pvs->SetShortHelp(this->GetShortHelp());
   pvs->SetLongHelp(this->GetLongHelp());
@@ -2300,6 +2490,8 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 
   pvs->Proxy = vtkSMSourceProxy::SafeDownCast(
     proxm->NewProxy(module_group, this->GetModuleName()));
+  pvs->Proxy->Register(pvs);
+  pvs->Proxy->Delete();
   if (!pvs->Proxy)
     {
     vtkErrorMacro("Can not create " 
@@ -2376,7 +2568,6 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
   return VTK_OK;
 }
 
-
 //----------------------------------------------------------------------------
 int vtkPVSource::InitializeClone(vtkPVSource* input,
                                  int makeCurrent)
@@ -2399,7 +2590,8 @@ int vtkPVSource::InitializeClone(vtkPVSource* input,
 
   // Create the properties frame etc.
   this->CreateProperties();
-
+  
+  // Display page must be created before source is selected.
   if (makeCurrent)
     {
     this->GetPVWindow()->SetCurrentPVSourceCallback(this);
@@ -2408,31 +2600,14 @@ int vtkPVSource::InitializeClone(vtkPVSource* input,
   return VTK_OK;
 }
 
-
-
 //----------------------------------------------------------------------------
 // This stuff used to be in Initialize clone.
 // I want to initialize the output after accept is called.
 int vtkPVSource::InitializeData()
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVData* pvd;
-
-  // Create the output.
-  pvd = vtkPVData::New();
-  pvd->SetPVApplication(pvApp);
+  //law int fixme;  //I would like to get rid of these part references.
 
   this->Proxy->CreateParts();
-
-  unsigned int numParts = this->Proxy->GetNumberOfParts();
-  for (unsigned int i=0; i<numParts; i++)
-    {
-    vtkSMPart* smpart = this->Proxy->GetPart(i); 
-    this->AddPart(smpart);
-    }
-
-  this->SetPVOutput(pvd);
-  pvd->Delete();
 
   return VTK_OK;
 }
@@ -2462,7 +2637,7 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "NumberOfPVInputs: " << this->GetNumberOfPVInputs() << endl;
   os << indent << "ParameterFrame: " << this->GetParameterFrame() << endl;
-  os << indent << "ParametersParent: " << this->GetParametersParent() << endl;
+  os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "VisitedFlag: " << this->GetVisitedFlag() << endl;
@@ -2475,9 +2650,17 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HideInformationPage: " << this->HideInformationPage << endl;
   os << indent << "ToolbarModule: " << this->ToolbarModule << endl;
 
-  os << indent << "PVOutput: " << this->PVOutput << endl;
+  os << indent << "DisplayGUI: " << this->DisplayGUI << endl;
   os << indent << "NumberOfPVConsumers: " << this->GetNumberOfPVConsumers() << endl;
   os << indent << "NumberOfParts: " << this->GetNumberOfParts() << endl;
+  if (this->PVColorMap)
+    {
+    os << indent << "PVColorMap: " << this->PVColorMap->GetScalarBarTitle() << endl;
+    }
+  else
+    {
+    os << indent << "PVColorMap: NULL\n";
+    }
 
   os << indent << "VTKMultipleInputsFlag: " << this->VTKMultipleInputsFlag << endl;
   os << indent << "VTKMultipleProcessFlag: " << this->VTKMultipleProcessFlag
@@ -2503,4 +2686,5 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "ColorMap: " << this->PVColorMap << endl;    
 }

@@ -20,7 +20,7 @@
 #include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkSMPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.27");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -41,7 +41,6 @@ vtkPVGroupInputsWidget::vtkPVGroupInputsWidget()
   
   this->PartSelectionList = vtkKWListBox::New();
   this->PartLabelCollection = vtkCollection::New();
-  this->Inputs = vtkPVSourceCollection::New();
 }
 
 //----------------------------------------------------------------------------
@@ -51,8 +50,6 @@ vtkPVGroupInputsWidget::~vtkPVGroupInputsWidget()
   this->PartSelectionList = NULL;
   this->PartLabelCollection->Delete();
   this->PartLabelCollection = NULL;
-  this->Inputs->Delete();
-  this->Inputs = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -174,9 +171,6 @@ void vtkPVGroupInputsWidget::Accept()
     this->Inactivate();
     }
 
-  // Keep a list of selected inputs for later use.
-  this->Inputs->RemoveAllItems();
-
   // Now loop through the input mask setting the selection states.
   pvApp->GetProcessModule()->SendStream(vtkProcessModule::DATA_SERVER);
   this->PVSource->RemoveAllPVInputs();  
@@ -193,7 +187,7 @@ void vtkPVGroupInputsWidget::Accept()
     if (state)
       {
       // Keep a list of selected inputs for later use.
-      this->Inputs->AddItem(pvs);
+      this->InputsVector.push_back(pvs);
 
       this->PVSource->AddPVInput(pvs);
       // SetPVinput does all this for us.
@@ -207,6 +201,7 @@ void vtkPVGroupInputsWidget::Accept()
     }
 
   this->Superclass::Accept();
+  this->ModifiedFlag = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -254,9 +249,9 @@ void vtkPVGroupInputsWidget::Trace(ofstream *file)
     }
   *file << "$kw(" << this->GetTclName() << ") AllOffCallback" << endl;
  
-  this->Inputs->InitTraversal();
-  while ( (pvs = this->Inputs->GetNextPVSource()) )
+  for (unsigned int i=0; i < this->InputsVector.size(); ++i)
     {
+    pvs = this->InputsVector[i];
     if ( ! pvs->InitializeTrace(file))
       {
       vtkErrorMacro("Could not initialize trace for object.");

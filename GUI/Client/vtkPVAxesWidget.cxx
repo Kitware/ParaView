@@ -30,7 +30,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.20");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -174,7 +174,10 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
     this->AxesActor->SetVisibility(0);
     if (this->ParentRenderer)
       {
-      this->ParentRenderer->GetRenderWindow()->RemoveRenderer(this->Renderer);
+      if (this->ParentRenderer->GetRenderWindow())
+        {
+        this->ParentRenderer->GetRenderWindow()->RemoveRenderer(this->Renderer);
+        }
       if (this->StartEventObserverId != 0)
         {
         this->ParentRenderer->RemoveObserver(this->StartEventObserverId);

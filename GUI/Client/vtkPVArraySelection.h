@@ -29,7 +29,6 @@ class vtkKWLabeledFrame;
 class vtkKWPushButton;
 class vtkKWRadioButton;
 class vtkPVArraySelectionArraySet;
-class vtkPVData;
 
 class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
 {

@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVGUIClientOptions.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.7");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.8");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -149,8 +149,7 @@ int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* start)
     vtkErrorMacro("Attempt to call OpenConnectionDialog without using a vtkPVClientServerModule");
     return 0;
     }
-  
-  
+    
   char servers[1024];
   servers[0] = 0;
   pvApp->GetRegisteryValue(2, "RunTime", "Servers", servers);
@@ -190,6 +189,10 @@ int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* start)
   
 void vtkPVProcessModuleGUIHelper::SendPrepareProgress()
 {  
+  if (! this->PVApplication || !this->PVApplication->GetMainWindow())
+    {
+    return;
+    }
   if (!this->ProcessModule->GetProgressRequests())
     {
     this->PVApplication->GetMainWindow()->StartProgress();
@@ -203,7 +206,7 @@ void vtkPVProcessModuleGUIHelper::SendPrepareProgress()
 
 void vtkPVProcessModuleGUIHelper::SendCleanupPendingProgress()
 { 
-  if ( !this->PVApplication )
+  if ( !this->PVApplication || !this->PVApplication->GetMainWindow())
     {
     return;
     }
@@ -214,7 +217,7 @@ void vtkPVProcessModuleGUIHelper::SendCleanupPendingProgress()
 
 void vtkPVProcessModuleGUIHelper::SetLocalProgress(const char* filter, int progress)
 {
-  if ( !this->PVApplication )
+  if ( !this->PVApplication || !this->PVApplication->GetMainWindow())
     {
     return;
     }

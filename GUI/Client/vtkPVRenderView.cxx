@@ -53,13 +53,13 @@
 #include "vtkPVCameraIcon.h"
 #include "vtkPVCompositeRenderModule.h"
 #include "vtkPVConfig.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkSMPart.h"
-#include "vtkPVPartDisplay.h"
+#include "vtkSMPartDisplay.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModuleUI.h"
 #include "vtkPVRenderView.h"
@@ -79,6 +79,7 @@
 #include "vtkToolkits.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkClientServerStream.h"
+#include "vtkPVInformationGUI.h"
 #include "vtkPVOptions.h"
 
 
@@ -136,7 +137,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.339");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.340");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -228,6 +229,10 @@ vtkPVRenderView::vtkPVRenderView()
   
   this->RenderTimer = vtkTimerLog::New();
   this->TimerToken = NULL;
+
+  this->SourceNotebook = 0;
+  this->DisplayGUI = 0;
+  this->InformationGUI = 0;
 }
 
 
@@ -468,6 +473,25 @@ vtkPVRenderView::~vtkPVRenderView()
     {
     Tcl_DeleteTimerHandler( this->TimerToken );
     this->TimerToken = NULL;
+    }
+    
+  if (this->SourceNotebook)
+    {
+    this->SourceNotebook->SetParent(0);
+    this->SourceNotebook->Delete();
+    this->SourceNotebook = 0;
+    }
+  if (this->DisplayGUI)
+    {
+    this->DisplayGUI->SetParent(0);
+    this->DisplayGUI->Delete();
+    this->DisplayGUI = 0;
+    }
+  if (this->InformationGUI)
+    {
+    this->InformationGUI->SetParent(0);
+    this->InformationGUI->Delete();
+    this->InformationGUI = 0;
     }
 }
 
@@ -780,6 +804,41 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   this->GetRenderWindow()->AddObserver(
                  vtkCommand::CursorChangedEvent, this->Observer);
+
+
+  // This is created in this object only because the GetSourceParent method.
+  // These should be create in application or window.
+  this->SourceNotebook = vtkKWNotebook::New();
+  this->SourceNotebook->AlwaysShowTabsOn();
+  this->SourceNotebook->SetParent(this->GetSourceParent());
+  this->SourceNotebook->Create(app,"");
+  this->SourceNotebook->AddPage("Parameters");
+  this->SourceNotebook->AddPage("Display");
+  this->SourceNotebook->AddPage("Information");
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->SourceNotebook->GetWidgetName());
+
+  // For initializing the trace of the notebook.
+  // Do we really need this?
+  this->GetSourceParent()->SetTraceReferenceObject(this);
+  this->GetSourceParent()->SetTraceReferenceCommand("GetParametersParent");
+
+  // Create the display GUI.
+  this->DisplayGUI = vtkPVDisplayGUI::New();
+  this->DisplayGUI->SetParent(this->SourceNotebook->GetFrame("Display"));
+  this->DisplayGUI->ScrollableOn();
+  this->DisplayGUI->Create(app, 0);
+  this->Script("pack %s -fill both -expand yes -side top",
+                this->DisplayGUI->GetWidgetName());
+
+  // Create the information page.
+  this->InformationGUI = vtkPVInformationGUI::New();
+  this->InformationGUI->SetParent(
+        this->SourceNotebook->GetFrame("Information"));
+  this->InformationGUI->ScrollableOn();
+  this->InformationGUI->Create(app, 0);
+  this->Script("pack %s -fill both -expand yes -side top",
+               this->InformationGUI->GetWidgetName());
 
   this->EventuallyRender();
   delete [] local;
@@ -1350,6 +1409,10 @@ void vtkPVRenderView::StandardViewCallback(float x, float y, float z)
 void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource, 
                                              int nobind)
 {
+  if (currentSource == 0)
+    {
+    return;
+    }
   if (this->NavigationWindow)
     {
     this->NavigationWindow->SetCreateSelectionBindings(!nobind);
@@ -1705,11 +1768,7 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
     numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      vtkClientServerStream& stream = pm->GetStream();
-      stream << vtkClientServerStream::Invoke
-             << pvs->GetPart(partIdx)->GetPartDisplay()->GetGeometryID()
-             <<  "SetUseStrips" << state << vtkClientServerStream::End;
-      pvs->GetPart(partIdx)->GetPartDisplay()->InvalidateGeometry();
+      pvs->GetPartDisplay()->SetUseTriangleStrips(state);
       }
     }
   pm->SendStream(vtkProcessModule::DATA_SERVER);
@@ -1812,7 +1871,7 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
     numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      pvs->GetPart(partIdx)->GetPartDisplay()->SetUseImmediateMode(state);
+      pvs->GetPartDisplay()->SetUseImmediateMode(state);
       }
     }
   // Save this selection on the server manager so new

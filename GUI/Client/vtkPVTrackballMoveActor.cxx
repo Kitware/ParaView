@@ -17,7 +17,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVSource.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVWindow.h"
@@ -25,7 +25,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.12");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.13");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -110,14 +110,14 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
       }
 
     double move[3];
-    pvs->GetPVOutput()->GetActorTranslate(move);
+    pvs->GetDisplayGUI()->GetActorTranslate(move);
     
     for ( cc = 0; cc < 3; cc ++ )
       {
       move[cc] += endpoint[cc] - startpoint[cc];
       }
     
-    pvs->GetPVOutput()->SetActorTranslate(move);
+    pvs->GetDisplayGUI()->SetActorTranslate(move);
 
     ren->ResetCameraClippingRange();
     rwi->Render();

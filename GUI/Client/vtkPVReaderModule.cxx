@@ -18,7 +18,7 @@
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.52");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.53");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -301,7 +301,8 @@ void vtkPVReaderModule::SaveState(ofstream *file)
   this->VisitedFlag = 1;
   
   // Let the output set its state.
-  this->GetPVOutput()->SaveState(file);
+  //this->GetDisplayGUI()->SaveState(file);
+  //law int fixme;  // should we ask the part display to save the state?
 }
 
 //----------------------------------------------------------------------------

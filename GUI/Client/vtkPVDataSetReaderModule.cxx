@@ -19,7 +19,7 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPDataSetReader.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkString.h"
@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.18");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.19");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

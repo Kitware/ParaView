@@ -21,7 +21,6 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
@@ -29,7 +28,7 @@
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.35");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.36");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -236,13 +235,13 @@ void vtkPVSourceList::ToggleVisibility(int compIdx, char* id, int )
   if (comp && !comp->GetHideDisplayPage())
     {
     // Toggle visibility
-    if (comp->GetPVOutput()->GetVisibility())
+    if (comp->GetVisibility())
       {
-      comp->GetPVOutput()->VisibilityOff();
+      comp->SetVisibility(0);
       }
     else
       {
-      comp->GetPVOutput()->VisibilityOn();
+      comp->SetVisibility(1);
       }
     
     this->UpdateVisibility(comp, id);
@@ -336,8 +335,8 @@ void vtkPVSourceList::PostChildUpdate()
 void vtkPVSourceList::UpdateVisibility(vtkPVSource *comp,
                                       const char *id)
 {
+  
   // Draw the icon indicating visibility.
-
   if (comp->GetHideDisplayPage())
     {
     this->Script("%s itemconfigure %s -image %s.visnovisimg",
@@ -346,27 +345,18 @@ void vtkPVSourceList::UpdateVisibility(vtkPVSource *comp,
     }
   else
     {
-    if (comp->GetPVOutput() == NULL)
+    switch (comp->GetVisibility())
       {
-      this->Script("%s itemconfigure %s -image %s.visonimg",
-                   this->Canvas->GetWidgetName(), id, 
-                   this->GetWidgetName());
-      }
-    else
-      {
-      switch (comp->GetPVOutput()->GetVisibility())
-        {
-        case 0:
-          this->Script("%s itemconfigure %s -image %s.visoffimg",
-                       this->Canvas->GetWidgetName(), id, 
-                       this->GetWidgetName());
-          break;
-        case 1:
-          this->Script("%s itemconfigure %s -image %s.visonimg",
-                       this->Canvas->GetWidgetName(), id, 
-                       this->GetWidgetName());
-          break;
-        }
+      case 0:
+        this->Script("%s itemconfigure %s -image %s.visoffimg",
+                      this->Canvas->GetWidgetName(), id, 
+                      this->GetWidgetName());
+        break;
+      case 1:
+        this->Script("%s itemconfigure %s -image %s.visonimg",
+                      this->Canvas->GetWidgetName(), id, 
+                      this->GetWidgetName());
+        break;
       }
     }
 }

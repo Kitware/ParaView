@@ -25,7 +25,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVMinMax.h"
@@ -39,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.47");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.48");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -69,11 +69,7 @@ vtkPVExtentEntry::~vtkPVExtentEntry()
   this->LabeledFrame = 0;
 
   this->SetLabel(0);
-
-  if (this->InputMenu)
-    {
-    this->InputMenu->Delete();
-    }
+  this->SetInputMenu(0);
 
   for(int i=0; i<3; i++)
     {

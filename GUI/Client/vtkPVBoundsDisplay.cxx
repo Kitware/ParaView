@@ -19,7 +19,7 @@
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVSource.h"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.22");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.23");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 

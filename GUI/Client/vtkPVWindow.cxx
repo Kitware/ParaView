@@ -53,13 +53,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
-#include "vtkPVClassNameInformation.h"
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraManipulator.h"
-#include "vtkPVClassNameInformation.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVConfig.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVErrorLogDisplay.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -70,7 +68,7 @@
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkSMPart.h"
-#include "vtkPVPartDisplay.h"
+#include "vtkSMPartDisplay.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderModule.h"
@@ -90,6 +88,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkStdString.h"
 #include "vtkString.h"
 #include "vtkStructuredGrid.h"
@@ -129,7 +128,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.602");
+vtkCxxRevisionMacro(vtkPVWindow, "1.603");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1300,7 +1299,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
       {
       vtkErrorMacro("Could not create glyph source: GlyphSource2D");
       }
-
     }
   else
     {
@@ -2186,32 +2184,31 @@ void vtkPVWindow::WriteData()
 
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkSMPart *part = this->GetCurrentPVSource()->GetPart();
-  vtkPVClassNameInformation* info = part->GetClassNameInformation();
-  pm->GatherInformation(info, part->GetID(0));
+  vtkPVDataInformation* info = part->GetDataInformation();
 
   // Instantiator does not work for static builds and VTK objects.
   vtkDataSet* data;
-  if (strcmp(info->GetVTKClassName(), "vtkImageData") == 0)
+  if (info->DataSetTypeIsA("vtkImageData"))
     {
     data = vtkImageData::New();
     }
-  else if (strcmp(info->GetVTKClassName(), "vtkStructuredPoints") == 0)
+  else if (info->DataSetTypeIsA("vtkStructuredPoints"))
     {
     data = vtkStructuredPoints::New();
     }
-  else if (strcmp(info->GetVTKClassName(), "vtkStructuredGrid") == 0)
+  else if (info->DataSetTypeIsA("vtkStructuredGrid"))
     {
     data = vtkStructuredGrid::New();
     }
-  else if (strcmp(info->GetVTKClassName(), "vtkRectilinearGrid") == 0)
+  else if (info->DataSetTypeIsA("vtkRectilinearGrid"))
     {
     data = vtkRectilinearGrid::New();
     }
-  else if (strcmp(info->GetVTKClassName(), "vtkPolyData") == 0)
+  else if (info->DataSetTypeIsA("vtkPolyData"))
     {
     data = vtkPolyData::New();
     }
-  else if (strcmp(info->GetVTKClassName(), "vtkUnstructuredGrid") == 0)
+  else if (info->DataSetTypeIsA("vtkUnstructuredGrid"))
     {
     data = vtkUnstructuredGrid::New();
     }
@@ -2356,29 +2353,28 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
   vtkDataSet* data = NULL;
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkSMPart *part = this->GetCurrentPVSource()->GetPart();
-  vtkPVClassNameInformation* info = part->GetClassNameInformation();
-  pm->GatherInformation(info, part->GetID(0));
-  if (strcmp(info->GetVTKClassName(), "vtkImageData") == 0)
+  vtkPVDataInformation* info = part->GetDataInformation();
+  if (info->DataSetTypeIsA("vtkImageData"))
     {
     data = vtkImageData::New();
     }
-  else if (strcmp(info->GetVTKClassName(), "vtkStructuredPoints") == 0)
+  else if (info->DataSetTypeIsA("vtkStructuredPoints"))
     {
     data = vtkStructuredPoints::New();
     }
-  else if (strcmp(info->GetVTKClassName(), "vtkStructuredGrid") == 0)
+  else if (info->DataSetTypeIsA("vtkStructuredGrid"))
     {
     data = vtkStructuredGrid::New();
     }
-  else if (strcmp(info->GetVTKClassName(), "vtkRectilinearGrid") == 0)
+  else if (info->DataSetTypeIsA("vtkRectilinearGrid"))
     {
     data = vtkRectilinearGrid::New();
     }
-  else if (strcmp(info->GetVTKClassName(), "vtkPolyData") == 0)
+  else if (info->DataSetTypeIsA("vtkPolyData"))
     {
     data = vtkPolyData::New();
     }
-  else if (strcmp(info->GetVTKClassName(), "vtkUnstructuredGrid") == 0)
+  else if (info->DataSetTypeIsA("vtkUnstructuredGrid"))
     {
     data = vtkUnstructuredGrid::New();
     }
@@ -2802,7 +2798,7 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
   const char* sourceName;
   int numParts, partIdx;
   vtkSMPart* part;
-  vtkPVPartDisplay* partDisplay = NULL;
+  vtkSMPartDisplay* partDisplay = NULL;
   char *fileName;
   vtkPVSourceCollection *sources;
   char* fileExt = NULL;
@@ -2850,10 +2846,7 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
       for ( partIdx = 0; partIdx < numParts; ++partIdx)
         {
         part = source->GetPart(partIdx);
-        if (part)
-          {
-          partDisplay = part->GetPartDisplay();
-          }
+        partDisplay = source->GetPartDisplay();
         // Sanity check
         if (part == NULL || partDisplay == NULL)
           {
@@ -2881,26 +2874,8 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
           sprintf(fileName, "%s/%s%sP%d", 
                   filePath, fileRoot, sourceName, partIdx);
           }
-
-        // fixme
-        // The PartDisplay should be responsible for adding these to the batch file.
-        *file << "GeometryWriter SetInput [pvTemp" 
-              << partDisplay->GetGeometryID() << " GetOutput]\n";
-        *file << "if {$numberOfProcs > 1} {\n";
-        *file << "\tGeometryWriter SetFileName {" << fileName << ".pvtp}\n";
-        *file << "} else {\n";
-        *file << "\tGeometryWriter SetFileName {" << fileName << ".vtp}\n";
-        *file << "}\n";
-        *file << "GeometryWriter Write\n";
-
-        *file << "CollectionFilter SetInput [pvTemp" 
-              << partDisplay->GetGeometryID() << " GetOutput]\n";
-        *file << "[CollectionFilter GetOutput] Update\n";
-        *file << "TempPolyData ShallowCopy [CollectionFilter GetOutput]\n";
-        *file << "if {$myProcId == 0} {\n";
-        *file << "\tGeometryWriter SetFileName {" << fileName << ".vtp}\n";
-        *file << "\tGeometryWriter Write\n";
-        *file << "}\n";
+          
+        partDisplay->SaveGeometryInBatchFile(file, filename, timeIdx);
         }
       }
     }
@@ -3364,7 +3339,17 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
     {
     this->ShowCurrentSourceProperties();
     }
-  this->UpdateEnableState();
+    
+  // I was having problems with the parts being created too early 
+  // (before accept was called).  Group was getting onloy one part when 
+  // it should have two (two inputs selected form GUI).
+  // This call seemed to trigger creation of the parts.
+  //  This conditional will keep the parts from being created when
+  // the half finished source is set to be the current.
+  if (pvs && pvs->GetInitialized())
+    {
+    this->UpdateEnableState();
+    }
 }
 
 //-----------------------------------------------------------------------------

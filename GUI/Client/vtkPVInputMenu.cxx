@@ -22,7 +22,7 @@
 #include "vtkKWMessageDialog.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVDataInformation.h"
 #include "vtkSMPart.h"
@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.64");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.65");
 
 
 //----------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 #include "vtkKWLabeledFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -37,7 +37,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.60");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.61");
 
 //===========================================================================
 //***************************************************************************

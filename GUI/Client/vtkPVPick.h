@@ -25,7 +25,7 @@
 
 #include "vtkPVSource.h"
 
-class vtkPVPickDisplay;
+class vtkSMPickDisplay;
 
 class vtkCollection;
 class vtkKWFrame;
@@ -50,8 +50,12 @@ public:
 protected:
   vtkPVPick();
   ~vtkPVPick();
+
+  // I am putting this here so that the display is added to the render module
+  // only once.  There may be a better check using the Proxy.
+  int DisplayHasBeenAddedToTheRenderModule;
   
-  vtkPVPickDisplay* PickDisplay;
+  vtkSMPickDisplay* PickDisplay;
   vtkKWWidget *DataFrame;
 
   vtkCollection* LabelCollection;

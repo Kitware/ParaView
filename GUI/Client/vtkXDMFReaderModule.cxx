@@ -21,7 +21,7 @@
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVData.h"
+#include "vtkPVDisplayGUI.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVWidgetCollection.h"
@@ -31,13 +31,15 @@
 #include "vtkVectorIterator.txx"
 #include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
+#include "vtkPVColorMap.h"
+#include "vtkSMPartDisplay.h"
 
 #include <vtkstd/string>
 #include <vtkstd/map>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.24");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.25");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -490,8 +492,18 @@ void vtkXDMFReaderModule::SaveInBatchScript(ofstream *file)
   *file << "  $pvTemp" << this->GetVTKSourceID(0) << " UpdateVTKObjects" << endl;
 
   // Add the mapper, actor, scalar bar actor ...
-  this->GetPVOutput()->SaveInBatchScript(file);
-
+  if (this->GetVisibility())
+    {
+    if (this->PVColorMap)
+      {
+      this->PVColorMap->SaveInBatchScript(file);
+      }
+    vtkSMPartDisplay *partD = this->GetPartDisplay();
+    if (partD)
+      {
+      partD->SaveInBatchScript(file, this->GetProxy());
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
