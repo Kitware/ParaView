@@ -170,8 +170,11 @@ void vtkKWScale::DisplayLabel(const char *name)
 {
   if (this->ScaleLabel)
     {
+    this->Script("%s configure -text {%s}",
+		 this->ScaleLabel->GetWidgetName(), name );
     return;
     }
+
   this->ScaleLabel = vtkKWWidget::New();
   this->ScaleLabel->SetParent(this);
   char temp[1024];

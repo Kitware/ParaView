@@ -64,3 +64,10 @@ void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
   this->Script("button %s %s", wname,args);
 }
 
+void vtkKWPushButton::SetLabel( const char *name )
+{
+  if ( this->Application )
+    {
+    this->Script("%s configure -text {%s}", this->GetWidgetName(), name );
+    }
+}

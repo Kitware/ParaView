@@ -45,6 +45,8 @@ public:
   // Create a Tk widget
   virtual void Create(vtkKWApplication *app, const char *args);
 
+  void SetLabel(const char *label);
+
 protected:
   vtkKWPushButton() {};
   ~vtkKWPushButton() {};

@@ -272,16 +272,18 @@ void vtkKWView::CreateViewProperties()
 
   this->Notebook->SetParent(this->GetPropertiesParent());
   this->Notebook->Create(this->Application,"");
-  this->Notebook->AddPage("Anno");
+
+  this->Notebook->AddPage("General");
+  this->Notebook->AddPage("Annotate");
   
   this->AnnotationProperties->SetParent
-    (this->Notebook->GetFrame("Anno"));
+    (this->Notebook->GetFrame("Annotate"));
   this->AnnotationProperties->Create(app,"frame","");
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
                this->AnnotationProperties->GetWidgetName());
-  this->Notebook->Raise("Anno");
+  this->Notebook->Raise("Annotate");
   
   // create the anno widgets
   this->HeaderFrame->Create(app);
@@ -321,7 +323,6 @@ void vtkKWView::CreateViewProperties()
   this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
                this->CornerAnnotation->GetWidgetName());
 
-  this->Notebook->AddPage("General");
   
   this->GeneralProperties->SetParent(this->Notebook->GetFrame("General"));
   this->GeneralProperties->Create(app,"frame","");
@@ -1042,5 +1043,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.23 $");
+  this->ExtractRevision(os,"$Revision: 1.24 $");
 }
