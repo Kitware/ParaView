@@ -216,6 +216,7 @@ protected:
   vtkPVRenderView *View;
   vtkPVWindow *Window;
 
+  vtkKWFrame        *TopFrame;
   vtkKWLabeledFrame *ControlFrame;
   vtkKWWidget *ControlButtonFrame;
   vtkKWPushButton *PlayButton;

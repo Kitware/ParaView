@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.64");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.65");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -489,6 +489,8 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->Window = NULL;
 
   // Animation control
+  //
+  this->TopFrame = vtkKWFrame::New();
 
   this->ControlFrame = vtkKWLabeledFrame::New();
 
@@ -548,6 +550,11 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
 {
   this->CommandFunction = vtkPVAnimationInterfaceCommand;
 
+  if ( this->TopFrame )
+    {
+    this->TopFrame->Delete();
+    this->TopFrame = 0;
+    }
   if (this->ControlFrame)
     {
     this->ControlFrame->Delete();
@@ -682,9 +689,15 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   this->Script("frame %s %s", this->GetWidgetName(), frameArgs);
 
+  this->TopFrame->SetParent(this);
+  this->TopFrame->ScrollableOn();
+  this->TopFrame->Create(this->Application, 0);
+  this->Script("pack %s -side top -fill both -expand t -anchor center", 
+               this->TopFrame->GetWidgetName());
+
   // Animation Control
 
-  this->ControlFrame->SetParent(this);
+  this->ControlFrame->SetParent(this->TopFrame->GetFrame());
   this->ControlFrame->ShowHideFrameOn();
   this->ControlFrame->Create(this->Application, 0);
   this->ControlFrame->SetLabel("Animation Control");
@@ -819,7 +832,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   //             this->TimeRange->GetWidgetName());
 
   // New Interface ----------------------------------------------------
-  this->AnimationEntriesFrame->SetParent(this);
+  this->AnimationEntriesFrame->SetParent(this->TopFrame->GetFrame());
   this->AnimationEntriesFrame->ShowHideFrameOn();
   this->AnimationEntriesFrame->Create(this->Application, 0);
   this->AnimationEntriesFrame->SetLabel("Actions");
@@ -859,7 +872,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   
   // Action frame
 
-  this->ActionFrame->SetParent(this);
+  this->ActionFrame->SetParent(this->TopFrame->GetFrame());
   this->ActionFrame->ShowHideFrameOn();
   this->ActionFrame->Create(this->Application, 0);
   this->ActionFrame->SetLabel("Script");
@@ -888,7 +901,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
     this->ScriptEditor->GetWidgetName(), this->GetTclName());
 
   // Save frame stuff
-  this->SaveFrame->SetParent(this);
+  this->SaveFrame->SetParent(this->TopFrame->GetFrame());
   this->SaveFrame->ShowHideFrameOn();
   this->SaveFrame->SetLabel("Save");
   this->SaveFrame->Create(this->Application, 0);
