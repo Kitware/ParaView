@@ -284,7 +284,7 @@ public:
   // Description:
   // Perform a boolean check of the value in registery. If the value 
   // at the key is trueval, then return true, otherwise return false.
-  int BooleanRegisteryCheck(int level, const char* key, const char* trueval);
+  int BooleanRegisteryCheck(int level, const char* subkey, const char* key, const char* trueval);
   
   // Description:
   // Save or retrieve color from registery. If color does not 
