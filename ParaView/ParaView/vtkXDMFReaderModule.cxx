@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.4");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.5");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -92,7 +92,7 @@ int vtkXDMFReaderModule::Initialize(const char* fname,
     }
   
   const char* res = clone->GetVTKSourceTclName();
-  this->Script("%s Set%s %s", res, "FileName", fname);
+  this->Script("%s Set%s {%s}", res, "FileName", fname);
   this->SetGrid(0);
   this->SetDomain(0);
 
