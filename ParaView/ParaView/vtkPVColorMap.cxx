@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.17");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.18");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -867,6 +867,18 @@ void vtkPVColorMap::UpdateLookupTable()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+
+  // The a hue is arbitrary, make is consistent
+  // so we do not get unexpected interpolated hues.
+  if (this->StartHSV[1] == 0.0)
+    {
+    this->StartHSV[0] = this->EndHSV[0];
+    }
+  if (this->EndHSV[1] == 0.0)
+    {
+    this->EndHSV[0] = this->StartHSV[0];
+    }
+
   pvApp->BroadcastScript("%s SetNumberOfTableValues %d", this->LookupTableTclName,
                          this->NumberOfColors);
 
@@ -960,6 +972,7 @@ void vtkPVColorMap::StartColorButtonCallback(float r, float g, float b)
   rgb[1] = g;
   rgb[2] = b;
   this->RGBToHSV(rgb, hsv);
+
   this->StartHSV[0] = hsv[0];
   this->StartHSV[1] = hsv[1];
   this->StartHSV[2] = hsv[2];
@@ -1369,6 +1382,15 @@ void vtkPVColorMap::RGBToHSV(float rgb[3], float hsv[3])
     hsv[2] = 0.0;
     return;
     }
+
+  if (rgb[0] == rgb[1] && rgb[1] == rgb[2])
+    {
+    hsv[2] = rgb[0];
+    hsv[1] = 0.0;
+    hsv[0] = 0.0;
+    return;
+    }
+
   if (rgb[0] >= rgb[1] && rgb[1] >= rgb[2])
     { // case 0
     val = rgb[0];
