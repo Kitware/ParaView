@@ -158,6 +158,8 @@ protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();
 
+  void Connect();
+
   int NumberOfServerProcesses;
   int ClientMode;
   vtkSocketController* SocketController;
