@@ -211,7 +211,7 @@ protected:
   void CreateProxy();
   int InPlay;
   int InvokingError;
-  
+
   unsigned long ErrorEventTag;
 private:
   vtkPVAnimationScene(const vtkPVAnimationScene&); // Not implemented.

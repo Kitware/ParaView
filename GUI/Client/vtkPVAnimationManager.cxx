@@ -59,7 +59,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.17");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.18");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -129,6 +129,7 @@ vtkPVAnimationManager::vtkPVAnimationManager()
   this->RecordingIncrement = 0.1;
 
   this->AdvancedView = 0;
+  this->OverrideCache = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -920,6 +921,10 @@ void vtkPVAnimationManager::UpdateEnableState()
 //-----------------------------------------------------------------------------
 int vtkPVAnimationManager::GetUseGeometryCache()
 {
+  if (this->OverrideCache)
+    {
+    return 0;
+    }
   return (this->VAnimationInterface->GetCacheGeometry() && 
     this->AnimationScene->GetPlayMode() == VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE);
 }
@@ -1254,4 +1259,5 @@ void vtkPVAnimationManager::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnimationScene: " << this->AnimationScene << endl;
   os << indent << "ProxyIterator: " << this->ProxyIterator << endl;
   os << indent << "AdvancedView: " << this->AdvancedView << endl;
+  os << indent << "OverrideCache: " << this->OverrideCache << endl;
 }

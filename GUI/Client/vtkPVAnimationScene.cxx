@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.15");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.16");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -948,6 +948,8 @@ int vtkPVAnimationScene::GetLoop()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetCurrentTime(double time)
 {
+  int old_override = this->AnimationManager->GetOverrideCache();
+  this->AnimationManager->SetOverrideCache(1);
   if (!this->IsCreated())
     {
     vtkErrorMacro("Scene has not been created yet.");
@@ -960,6 +962,7 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
     this->Window->GetCurrentPVSource()->ResetCallback();
     }
   this->AddTraceEntry("$kw(%s) SetCurrentTime %f", this->GetTclName(), time);
+  this->AnimationManager->SetOverrideCache(old_override);
 }
 
 //-----------------------------------------------------------------------------

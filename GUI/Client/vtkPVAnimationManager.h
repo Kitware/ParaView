@@ -228,6 +228,10 @@ public:
   // Get's the cue tree for an animateable proxy registed with the proxyname.
   vtkPVAnimationCueTree* GetAnimationCueTreeForProxy(const char* proxyname);
 
+  // Description:
+  // Means to override us of cache.
+  vtkSetMacro(OverrideCache, int);
+  vtkGetMacro(OverrideCache, int);
 protected:
   vtkPVAnimationManager();
   ~vtkPVAnimationManager();
@@ -287,6 +291,8 @@ protected:
   int AdvancedView;
   int InRecording;
   double RecordingIncrement;
+
+  int OverrideCache;
 private:
   vtkPVAnimationManager(const vtkPVAnimationManager&); // Not implemented.
   void operator=(const vtkPVAnimationManager&); // Not implemented.
