@@ -17,8 +17,9 @@
 // vtkClientCompositeManager operates in client server mode.
 // Server composites normaly.  I wanted to use vtkPVTreeComposite here,
 // But have to rethink the architecture.
-// Client receives the image over the socket.  It renders on top
-// of the remote image. (No zbuffer).
+// Only the first render in the render window gets composited.
+// Client receives the image over the socket.  Additional renderers 
+// render on top of the remote image. (No zbuffer).
 
 // .SECTION see also
 // vtkMultiProcessController vtkRenderWindow vtkCompositeManager.
@@ -37,6 +38,8 @@ class vtkDataArray;
 class vtkFloatArray;
 class vtkUnsignedCharArray;
 class vtkImageData;
+class vtkImageActor;
+class vtkCamera;
 
 class VTK_EXPORT vtkClientCompositeManager : public vtkParallelRenderManager
 {
@@ -84,18 +87,10 @@ public:
   vtkGetMacro(ClientFlag, int);
 
   // Description:
-  // This flag tells the compositer to use char values for pixel data rather than float.
-  // Default is float.  I have seen some artifacts on some systems with char.
-  void SetUseChar(int useChar);
-  vtkGetMacro(UseChar, int);
-  vtkBooleanMacro(UseChar, int);
-
-  // Description:
   // This flag tells the compositier to get the color buffer as RGB 
   // instead of RGBA. We do not use the alpha value so it is not 
   // important to get.  ATI Radeon cards / drivers do not properly get 
-  // the color buffer as RGBA.  This flag turns the UseChar flag on 
-  // because VTK does not have methods to get the pixel data as RGB float.
+  // the color buffer as RGBA.  
   void SetUseRGB(int useRGB);
   vtkGetMacro(UseRGB, int);
   vtkBooleanMacro(UseRGB, int);
@@ -110,16 +105,6 @@ public:
   // composites the buffers into one.  Defaults to vtkCompressCompositer.
   void SetCompositer(vtkCompositer *c);
   vtkGetObjectMacro(Compositer,vtkCompositer);
-
-  // Description:
-  // These parameters allow this object to manage a tiled display.
-  // When the flag is on, the nodes (starting in lower left)
-  // render tiles of a larger display defined by TiledDimensions.
-  vtkSetMacro(Tiled,int);
-  vtkGetMacro(Tiled,int);
-  vtkBooleanMacro(Tiled,int);
-  vtkSetVector2Macro(TiledDimensions,int);
-  vtkGetVector2Macro(TiledDimensions,int);
 
 //BTX
   enum Tags {
@@ -151,9 +136,6 @@ protected:
   vtkSocketController* ClientController;
   vtkCompositer *Compositer;
 
-  int Tiled;
-  int TiledDimensions[2];
-
   int ClientFlag;
   unsigned long StartTag;
   
@@ -166,6 +148,10 @@ protected:
   void PreRenderProcessing() {}
   void PostRenderProcessing() {}
   vtkImageData *CompositeData;
+  vtkImageActor *ImageActor;
+  // This is used to restore the camera.
+  // We have to change it to display the image actor.
+  vtkCamera* SavedCamera;
 
   // Same method that is in vtkComposite manager.
   // We should find a way to share this method. !!!!
@@ -184,6 +170,7 @@ protected:
   vtkObject *RenderView;
   int InternalReductionFactor;
 
+  int PDataSize[2];
   vtkDataArray *PData;
   vtkFloatArray *ZData;
   // Temporary arrays used for compositing.
@@ -202,14 +189,6 @@ protected:
   void DeltaEncode(vtkUnsignedCharArray *buf);
   void DeltaDecode(vtkUnsignedCharArray *buf);
 
-  int PDataSize[2];
-
-  // This is used to hold the result from pixel replication.
-  // It is only allocated on the client.
-  vtkDataArray *MagnifiedPData;
-  int MagnifiedPDataSize[2];
-
-  int UseChar;
   int UseRGB;
 
 private:

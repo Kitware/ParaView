@@ -22,9 +22,9 @@
 
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
+#include "vtkImageActor.h"
 #include "vtkCompressCompositer.h"
 #include "vtkFloatArray.h"
-#include "vtkImageActor.h"
 #include "vtkImageData.h"
 #include "vtkLight.h"
 #include "vtkLightCollection.h"
@@ -57,21 +57,22 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.30");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.31");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
 
 // Structures to communicate render info.
-struct vtkClientRenderWindowInfo 
+struct vtkClientCompositeIntInfo 
 {
-  int Size[2];
-  int NumberOfRenderers;
+  // I am sending the origianl window size.  
+  // The server can composite an image of any size.
+  int WindowSize[2];
   int ImageReductionFactor;
   int SquirtLevel;
 };
 
-struct vtkClientRendererInfo 
+struct vtkClientCompositeDoubleInfo 
 {
   double CameraPosition[3];
   double CameraFocalPoint[3];
@@ -86,17 +87,17 @@ struct vtkClientRendererInfo
 
 #define vtkInitializeVector3(v) { v[0] = 0; v[1] = 0; v[2] = 0; }
 #define vtkInitializeVector2(v) { v[0] = 0; v[1] = 0; }
-#define vtkInitializeClientRendererInfoMacro(r)      \
-  {                                                     \
-  vtkInitializeVector3(r.CameraPosition);               \
-  vtkInitializeVector3(r.CameraFocalPoint);             \
-  vtkInitializeVector3(r.CameraViewUp);                 \
-  vtkInitializeVector2(r.CameraClippingRange);          \
-  vtkInitializeVector3(r.LightPosition);                \
-  vtkInitializeVector3(r.LightFocalPoint);              \
-  vtkInitializeVector3(r.Background);                   \
-  r.ParallelScale = 0.0;                                \
-  r.CameraViewAngle = 0.0;                              \
+#define vtkInitializeClientCompositeDoubleInfoMacro(r)      \
+  {                                                      \
+  vtkInitializeVector3(r.CameraPosition);                \
+  vtkInitializeVector3(r.CameraFocalPoint);              \
+  vtkInitializeVector3(r.CameraViewUp);                  \
+  vtkInitializeVector2(r.CameraClippingRange);           \
+  vtkInitializeVector3(r.LightPosition);                 \
+  vtkInitializeVector3(r.LightFocalPoint);               \
+  vtkInitializeVector3(r.Background);                    \
+  r.ParallelScale = 0.0;                                 \
+  r.CameraViewAngle = 0.0;                               \
   }
   
 
@@ -119,28 +120,23 @@ vtkClientCompositeManager::vtkClientCompositeManager()
   this->InternalReductionFactor = 2;
   this->ImageReductionFactor = 2;
   this->PDataSize[0] = this->PDataSize[1] = 0;
-  this->MagnifiedPDataSize[0] = this->MagnifiedPDataSize[1] = 0;
   this->PData = NULL;
   this->ZData = NULL;
   this->PData2 = NULL;
   this->ZData2 = NULL;
   this->SquirtArray = NULL;
-  this->MagnifiedPData = NULL;
 
   this->Compositer = vtkCompressCompositer::New();
   //this->Compositer = vtkTreeCompositer::New();
 
-  this->Tiled = 0;
-  this->TiledDimensions[0] = this->TiledDimensions[1] = 1;
-
-  this->UseChar = 1;
   this->UseRGB = 0;
 
   this->BaseArray = NULL;
 
   this->UseCompositing = 0;
-  
   this->CompositeData = vtkImageData::New();
+  this->ImageActor = vtkImageActor::New();
+  this->SavedCamera = vtkCamera::New();
 }
 
   
@@ -179,13 +175,12 @@ vtkClientCompositeManager::~vtkClientCompositeManager()
     vtkCompositeManager::DeleteArray(this->SquirtArray);
     this->SquirtArray = NULL;
     }
-  if (this->MagnifiedPData)
-    {
-    vtkCompositeManager::DeleteArray(this->MagnifiedPData);
-    this->MagnifiedPData = NULL;
-    }
   this->SetCompositer(NULL);
 
+  this->ImageActor->Delete();
+  this->ImageActor = NULL;
+  this->SavedCamera->Delete();
+  this->SavedCamera = NULL;
 
   if (this->BaseArray)
     {
@@ -338,35 +333,39 @@ void vtkClientCompositeManager::StartRender()
     return;
     }
 
-  struct vtkClientRenderWindowInfo winInfo;
-  struct vtkClientRendererInfo renInfo;
-  int *size;
-  vtkRendererCollection *rens;
-  vtkRenderer* ren;
-  vtkCamera *cam;
-  vtkLightCollection *lc;
-  vtkLight *light;
+  // This fixed some bug with the first render.
+  // Something about the size of the render window I think.
   static int firstRender = 1;
-  float updateRate = this->RenderWindow->GetDesiredUpdateRate();
-  
-  if ( ! this->UseCompositing)
-    {
-    this->RenderWindow->EraseOn();
-    this->RenderWindow->Render();
-    return;
-    }
-
   if (firstRender)
     {
     firstRender = 0;
     return;
     }
 
+  struct vtkClientCompositeIntInfo winInfo;
+  struct vtkClientCompositeDoubleInfo renInfo;
+  int *size;
+  vtkRendererCollection *rens;
+  vtkRenderer* ren;
+  vtkCamera *cam;
+  vtkLightCollection *lc;
+  vtkLight *light;
+  float updateRate = this->RenderWindow->GetDesiredUpdateRate();
+  
+  if ( ! this->UseCompositing)
+    {
+    this->ImageActor->VisibilityOff();
+    return;
+    }
+
+  // InternalReductionFactor changes based on still or interactive
+  // renders.  The user set ImageReductionFactor can remain as set.
   this->InternalReductionFactor = this->ImageReductionFactor;
   if (this->InternalReductionFactor < 1)
     {
     this->InternalReductionFactor = 1;
     }
+  // Still render never has pixel reduction.
   if (updateRate <= 2.0)
     {
     this->InternalReductionFactor = 1;
@@ -385,19 +384,17 @@ void vtkClientCompositeManager::StartRender()
   // Trigger the satellite processes to start their render routine.
   rens = this->RenderWindow->GetRenderers();
   size = this->RenderWindow->GetSize();
-  winInfo.Size[0] = size[0]/this->InternalReductionFactor;
-  winInfo.Size[1] = size[1]/this->InternalReductionFactor;
+  winInfo.WindowSize[0] = size[0];
+  winInfo.WindowSize[1] = size[1];
   winInfo.ImageReductionFactor = this->InternalReductionFactor;
   winInfo.SquirtLevel = this->SquirtLevel;
-  winInfo.NumberOfRenderers = rens->GetNumberOfItems();
-  this->SetPDataSize(winInfo.Size[0], winInfo.Size[1]);
   
   controller->TriggerRMI(1, vtkClientCompositeManager::RENDER_RMI_TAG);
 
   // Synchronize the size of the windows.
   // Let the socket controller deal with byte swapping.
   controller->Send((int*)(&winInfo), 
-                   sizeof(vtkClientRenderWindowInfo)/sizeof(int), 1, 
+                   sizeof(vtkClientCompositeIntInfo)/sizeof(int), 1, 
                    vtkClientCompositeManager::WIN_INFO_TAG);
   
   // Make sure the satellite renderers have the same camera I do.
@@ -430,28 +427,31 @@ void vtkClientCompositeManager::StartRender()
   ren->Clear();
   // Let the socket controller deal with byte swapping.
   controller->Send((double*)(&renInfo), 
-                   sizeof(struct vtkClientRendererInfo)/sizeof(double), 1,
-                   vtkCompositeManager::REN_INFO_TAG);
+                   sizeof(struct vtkClientCompositeDoubleInfo)/sizeof(double),
+                   1, vtkCompositeManager::REN_INFO_TAG);
   
-  if (this->Tiled == 0)
-    {
-    this->ReceiveAndSetColorBuffer();
-    this->EndRender();
-    // I do not know why the camera is set here.
-    //cam->SetPosition(renInfo.CameraPosition);
-    //cam->SetFocalPoint(renInfo.CameraFocalPoint);
-    //cam->SetViewUp(renInfo.CameraViewUp);
-    }
+  this->ReceiveAndSetColorBuffer();
 }
 
 //----------------------------------------------------------------------------
 // Method executed only on client.
 void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
 {
-  if (this->UseChar && ! this->UseRGB && this->SquirtLevel)
+  int winSize[3];
+  int length;
+
+  // I hate to have a separate send for the rare case that the client asks
+  // for a larger image than the server can provide, but this is no worse
+  // than sending the length of the squirt array (previous implementation).
+  // The length is now the third value in window size.
+  // Maybe in the future we can encode the 
+  // window size and length in the color buffer.
+  this->ClientController->Receive(winSize, 3, 1, 123450);
+  length = winSize[2];
+  this->SetPDataSize(winSize[0], winSize[1]);
+
+  if (!this->UseRGB && this->SquirtLevel)
     {
-    int length;
-    this->ClientController->Receive(&length, 1, 1, 123450);
     this->SquirtArray->SetNumberOfTuples(length / (this->SquirtArray->GetNumberOfComponents()));
     this->ClientController->Receive((unsigned char*)(this->SquirtArray->GetVoidPointer(0)),
                                                     length, 1, 123451);
@@ -461,108 +461,60 @@ void vtkClientCompositeManager::ReceiveAndSetColorBuffer()
     }
   else
     {
-    //this->ClientController->Receive(this->PData, 1, 123451);
-    int length = this->PData->GetMaxId() + 1;
+    //int length = this->PData->GetMaxId() + 1;
     this->ClientController->Receive((unsigned char*)(this->PData->GetVoidPointer(0)),
                                     length, 1, 123451);
     }
  
-  /*
-  if (this->InternalReductionFactor == 2)
-    {
-    vtkTimerLog::MarkStartEvent("Double Buffer");
-    this->DoubleBuffer(this->PData, this->MagnifiedPData, this->PDataSize);
-    vtkTimerLog::MarkEndEvent("Double Buffer");
-    
-    // I do not know if this is necessary !!!!!!!
-    vtkRenderer* renderer =
-      ((vtkRenderer*)
-       this->RenderWindow->GetRenderers()->GetItemAsObject(0));
-    renderer->SetViewport(0, 0, 1.0, 1.0);
-    renderer->GetActiveCamera()->UpdateViewport(renderer);
-    // We have to set the color buffer as an even multiple of factor.
-    }
-  else 
-  */
-  if (this->InternalReductionFactor > 1)
-    {
-    vtkTimerLog::MarkStartEvent("Magnify Buffer");
-    this->MagnifyBuffer(this->PData, this->MagnifiedPData, this->PDataSize);
-    vtkTimerLog::MarkEndEvent("Magnify Buffer");
-    
-    // I do not know if this is necessary !!!!!!!
-    vtkRenderer* renderer =
-      ((vtkRenderer*)
-       this->RenderWindow->GetRenderers()->GetItemAsObject(0));
-    renderer->SetViewport(0, 0, 1.0, 1.0);
-    renderer->GetActiveCamera()->UpdateViewport(renderer);
-    // We have to set the color buffer as an even multiple of factor.
-    }
-   
   this->CompositeData->Initialize();
   
   // Set the color buffer
-  if (this->UseChar) 
+  vtkUnsignedCharArray* buf;
+  buf = static_cast<vtkUnsignedCharArray*>(this->PData);
+
+  this->CompositeData->GetPointData()->SetScalars(buf);
+  this->CompositeData->SetScalarType(VTK_UNSIGNED_CHAR);
+  this->CompositeData->SetNumberOfScalarComponents(buf->GetNumberOfComponents());
+
+  this->CompositeData->SetDimensions(this->PDataSize[0],
+                                     this->PDataSize[1], 1);
+
+  // Sanity check.
+  if (this->CompositeData->GetScalarType() != VTK_UNSIGNED_CHAR)
     {
-    vtkUnsignedCharArray* buf;
-    if (this->InternalReductionFactor > 1)
-      {
-      buf = static_cast<vtkUnsignedCharArray*>(this->MagnifiedPData);
-      }
-    else
-      {
-      buf = static_cast<vtkUnsignedCharArray*>(this->PData);
-      }
-    if (this->PData->GetNumberOfComponents() == 4)
-      {
-      vtkTimerLog::MarkStartEvent("Set RGBA Char Buffer");
-//      this->RenderWindow->SetRGBACharPixelData(0, 0, 
-//                            this->MagnifiedPDataSize[0]-1, 
-//                            this->MagnifiedPDataSize[1]-1, buf, 0);
-      vtkTimerLog::MarkEndEvent("Set RGBA Char Buffer");
-      }
-    else if (this->PData->GetNumberOfComponents() == 3)
-      {
-      vtkTimerLog::MarkStartEvent("Set RGB Char Buffer");
-//      this->RenderWindow->SetPixelData(0, 0, 
-//                            this->MagnifiedPDataSize[0]-1, 
-//                            this->MagnifiedPDataSize[1]-1, buf, 0);
-      vtkTimerLog::MarkEndEvent("Set RGB Char Buffer");
-      }
-    this->CompositeData->GetPointData()->SetScalars(buf);
-    this->CompositeData->SetScalarType(VTK_UNSIGNED_CHAR);
-    this->CompositeData->SetNumberOfScalarComponents(buf->GetNumberOfComponents());
+    return;
     }
-  else 
-    {
-    if (this->InternalReductionFactor)
-      {
-      vtkTimerLog::MarkStartEvent("Set RGBA Float Buffer");
-//      this->RenderWindow->SetRGBAPixelData(0, 0, 
-//                     this->MagnifiedPDataSize[0]-1, 
-//                     this->MagnifiedPDataSize[1]-1,
-//                     static_cast<vtkFloatArray*>(this->MagnifiedPData), 
-//                     0);
-      vtkTimerLog::MarkEndEvent("Set RGBA Float Buffer");
-      this->CompositeData->SetNumberOfScalarComponents(
-        this->MagnifiedPData->GetNumberOfComponents());
-      }
-    else
-      {
-      vtkTimerLog::MarkStartEvent("Set RGBA Float Buffer");
-//      this->RenderWindow->SetRGBAPixelData(
-//                   0, 0, this->MagnifiedPDataSize[0]-1, 
-//                   this->MagnifiedPDataSize[1]-1,
-//                   static_cast<vtkFloatArray*>(this->PData), 0);
-      vtkTimerLog::MarkEndEvent("Set RGBA Float Buffer");
-      this->CompositeData->SetNumberOfScalarComponents(
-        this->PData->GetNumberOfComponents());
-      }
-    this->CompositeData->GetPointData()->SetScalars(this->PData);
-    this->CompositeData->SetScalarType(VTK_FLOAT);
-    }
-  this->CompositeData->SetDimensions(this->MagnifiedPDataSize[0],
-                                     this->MagnifiedPDataSize[1], 1);
+
+  this->ImageActor->VisibilityOn();
+  this->ImageActor->SetInput(this->CompositeData);
+  this->ImageActor->SetDisplayExtent(0, this->PDataSize[0]-1,
+                                     0, this->PDataSize[1]-1, 0, 0);
+
+  // int fixme
+  // I would like to change SetRenderWindow to set renderer.  I believe the
+  // only time that we use the render window now would be to synchronize
+  // the swap buffers for tiled displays.
+  // We also need to set the size of the render window, but this
+  // could be done using the renderer.
+  vtkRendererCollection* rens = this->RenderWindow->GetRenderers();
+  rens->InitTraversal();
+  vtkRenderer* ren = rens->GetNextItem();
+  vtkCamera *cam = ren->GetActiveCamera();
+  // Why doesn't camera have a Copy method?
+  this->SavedCamera->SetPosition(cam->GetPosition());
+  this->SavedCamera->SetFocalPoint(cam->GetFocalPoint());
+  this->SavedCamera->SetViewUp(cam->GetViewUp());
+  this->SavedCamera->SetParallelProjection(cam->GetParallelProjection());
+  this->SavedCamera->SetParallelScale(cam->GetParallelScale());
+  cam->ParallelProjectionOn();
+  cam->SetParallelScale(
+    (this->PDataSize[1]-1.0)*0.5);
+  cam->SetPosition((this->PDataSize[0]-1.0)*0.5,
+                   (this->PDataSize[1]-1.0)*0.5, 10.0);
+  cam->SetFocalPoint((this->PDataSize[0]-1.0)*0.5,
+                     (this->PDataSize[1]-1.0)*0.5, 0.0);
+  cam->SetViewUp(0.0, 1.0, 0.0);
+  cam->SetClippingRange(9.0, 11.0);
 }
 
 void vtkClientCompositeManager::EndRender()
@@ -573,234 +525,21 @@ void vtkClientCompositeManager::EndRender()
     this->SatelliteEndRender();
     return;
     }
-
-  if (this->CompositeData->GetScalarType() != VTK_UNSIGNED_CHAR)
+  if (this->UseCompositing)
     {
-    return;
+    // Restore the camera.
+    vtkRendererCollection* rens = this->RenderWindow->GetRenderers();
+    rens->InitTraversal();
+    vtkRenderer* ren = rens->GetNextItem();
+    vtkCamera *cam = ren->GetActiveCamera();
+    cam->SetPosition(this->SavedCamera->GetPosition());
+    cam->SetFocalPoint(this->SavedCamera->GetFocalPoint());
+    cam->SetViewUp(this->SavedCamera->GetViewUp());
+    cam->SetParallelProjection(this->SavedCamera->GetParallelProjection());
+    cam->SetParallelScale(this->SavedCamera->GetParallelScale());
     }
-
-  vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
-  vtkRenderer *firstRen =
-    static_cast<vtkRenderer*>(renderers->GetItemAsObject(0));
-  
-  vtkRenderer *ren = vtkRenderer::New();
-  ren->SetRenderWindow(this->RenderWindow);
-  renderers->ReplaceItem(0, ren);
-  
-  vtkImageActor *imageActor = vtkImageActor::New();
-  imageActor->SetInput(this->CompositeData);
-  imageActor->SetDisplayExtent(0, this->MagnifiedPDataSize[0]-1,
-                               0, this->MagnifiedPDataSize[1]-1, 0, 0);
-  
-  ren->AddProp(imageActor);
-
-  vtkCamera *cam = ren->GetActiveCamera();
-  cam->ParallelProjectionOn();
-  cam->SetParallelScale(
-    (this->MagnifiedPDataSize[1]-1)*0.5);
-  ren->ResetCameraClippingRange();
-
-  ren->SetBackground(firstRen->GetBackground());
-
-  this->RenderWindow->Render();
-  
-  renderers->ReplaceItem(0, firstRen);
-  
-  ren->RemoveProp(imageActor);  
-  imageActor->Delete();
-  ren->Delete();
 }
 
-
-//----------------------------------------------------------------------------
-// We change this to work backwards so we can make it inplace. !!!!!!!     
-void vtkClientCompositeManager::MagnifyBuffer(vtkDataArray* localP, 
-                                              vtkDataArray* magP,
-                                              int windowSize[2])
-{
-  float *rowp, *subp;
-  float *pp1;
-  float *pp2;
-  int   x, y, xi, yi;
-  int   xInDim, yInDim;
-  // Local increments for input.
-  int   pInIncY; 
-  float *newLocalPData;
-  int numComp = localP->GetNumberOfComponents();
-  
-  xInDim = windowSize[0];
-  yInDim = windowSize[1];
-
-  newLocalPData = reinterpret_cast<float*>(magP->GetVoidPointer(0));
-  float* localPdata = reinterpret_cast<float*>(localP->GetVoidPointer(0));
-
-  if (this->UseChar)
-    {
-    if (numComp == 4)
-      {
-      // Get the last pixel.
-      rowp = localPdata;
-      pp2 = newLocalPData;
-      for (y = 0; y < yInDim; y++)
-        {
-        // Duplicate the row rowp N times.
-        for (yi = 0; yi < this->InternalReductionFactor; ++yi)
-          {
-          pp1 = rowp;
-          for (x = 0; x < xInDim; x++)
-            {
-            // Duplicate the pixel p11 N times.
-            for (xi = 0; xi < this->InternalReductionFactor; ++xi)
-              {
-              *pp2++ = *pp1;
-              }
-            ++pp1;
-            }
-          }
-        rowp += xInDim;
-        }
-      }
-    else if (numComp == 3)
-      { // RGB char pixel data.
-      // Get the last pixel.
-      pInIncY = numComp * xInDim;
-      unsigned char* crowp = reinterpret_cast<unsigned char*>(localPdata);
-      unsigned char* cpp2 = reinterpret_cast<unsigned char*>(newLocalPData);
-      unsigned char *cpp1, *csubp;
-      for (y = 0; y < yInDim; y++)
-        {
-        // Duplicate the row rowp N times.
-        for (yi = 0; yi < this->InternalReductionFactor; ++yi)
-          {
-          cpp1 = crowp;
-          for (x = 0; x < xInDim; x++)
-            {
-            // Duplicate the pixel p11 N times.
-            for (xi = 0; xi < this->InternalReductionFactor; ++xi)
-              {
-              csubp = cpp1;
-              *cpp2++ = *csubp++;
-              *cpp2++ = *csubp++;
-              *cpp2++ = *csubp;
-              }
-            cpp1 += numComp;
-            }
-          }
-        crowp += pInIncY;
-        }
-      }
-    }
-  else
-    {
-    // Get the last pixel.
-    pInIncY = numComp * xInDim;
-    rowp = localPdata;
-    pp2 = newLocalPData;
-    for (y = 0; y < yInDim; y++)
-      {
-      // Duplicate the row rowp N times.
-      for (yi = 0; yi < this->InternalReductionFactor; ++yi)
-        {
-        pp1 = rowp;
-        for (x = 0; x < xInDim; x++)
-          {
-          // Duplicate the pixel p11 N times.
-          for (xi = 0; xi < this->InternalReductionFactor; ++xi)
-            {
-            subp = pp1;
-            if (numComp == 4)
-              {
-              *pp2++ = *subp++;
-              }
-            *pp2++ = *subp++;
-            *pp2++ = *subp++;
-            *pp2++ = *subp;
-            }
-          pp1 += numComp;
-          }
-        }
-      rowp += pInIncY;
-      }
-    }
-  
-}
-  
-
-//----------------------------------------------------------------------------
-// We change this to work backwards so we can make it inplace. !!!!!!!     
-void vtkClientCompositeManager::DoubleBuffer(vtkDataArray* localP, 
-                                             vtkDataArray* magP,
-                                             int windowSize[2])
-{
-  int   x, y, i;
-  int   xInDim, yInDim;
-  // Local increments for input.
-  int   outYInc; 
-  unsigned char *localPdata;
-  unsigned char *newLocalPData;
-  unsigned char half, quarter;
-  
-  xInDim = windowSize[0];
-  yInDim = windowSize[1];
-
-  outYInc = 2 * xInDim * 4;
-
-  if (this->InternalReductionFactor != 2)
-    {
-    vtkErrorMacro("double does not match reduction factor.");
-    return;
-    }
-  // Assume rgba char.
-  if (localP->GetNumberOfComponents() != 4)
-    {
-    vtkErrorMacro("Expecting RGBA");
-    return;
-    }
-  if ( ! this->UseChar)
-    {
-    vtkErrorMacro("Expecting char data");
-    return;
-    }
-
-  newLocalPData = reinterpret_cast<unsigned char*>(magP->GetVoidPointer(0));
-  memset(newLocalPData, 0, magP->GetMaxId()+1);
-  localPdata = reinterpret_cast<unsigned char*>(localP->GetVoidPointer(0));
-
-  for (y = 0; y < yInDim; y++)
-    {
-    for (x = 0; x < xInDim; x++)
-      {
-      for (i = 0; i < 4; ++i)
-        {
-        half = *localPdata >> 1;
-        quarter = half >> 1;
-        newLocalPData[0] = *localPdata;
-        newLocalPData[4] += half;
-        newLocalPData[outYInc] += half;
-        newLocalPData[outYInc+4] += quarter;
-        if (x > 0)
-          {
-          newLocalPData[-4] += half;
-          newLocalPData[outYInc-4] += quarter;
-          if (y > 0)
-            {
-            newLocalPData[-outYInc-4] += quarter;
-            }
-          }
-        if (y > 0)
-          {
-          newLocalPData[-outYInc] += half;
-          newLocalPData[-outYInc+4] += quarter;
-          }
-      
-        ++localPdata;
-        ++newLocalPData;
-        }
-      newLocalPData += 4;
-      }
-    newLocalPData += outYInc;
-   }
-}
 
 
 
@@ -848,10 +587,9 @@ void vtkClientCompositeManager::RenderRMI()
 //-------------------------------------------------------------------------
 void vtkClientCompositeManager::SatelliteStartRender()
 {
-  int renIdx;
-  int i, j, myId, numProcs;
-  vtkClientRenderWindowInfo winInfo;
-  vtkClientRendererInfo renInfo;
+  int j, myId, numProcs;
+  vtkClientCompositeIntInfo winInfo;
+  vtkClientCompositeDoubleInfo renInfo;
   vtkRendererCollection *rens;
   vtkRenderer* ren;
   vtkCamera *cam = 0;
@@ -875,131 +613,142 @@ void vtkClientCompositeManager::SatelliteStartRender()
     otherId = 0;
     }
   
-  vtkInitializeClientRendererInfoMacro(renInfo);
+  vtkInitializeClientCompositeDoubleInfoMacro(renInfo);
   
   // Receive the window size.
-  //controller->Receive((char*)(&winInfo), 
-  //                    sizeof(struct vtkClientRenderWindowInfo), 
-  //                    otherId, vtkCompositeManager::WIN_INFO_TAG);
-  controller->Receive((int*)(&winInfo), 5, otherId, 
-                      vtkCompositeManager::WIN_INFO_TAG);
+  int winInfoSize = sizeof(struct vtkClientCompositeIntInfo)/sizeof(int);
+  controller->Receive((int*)(&winInfo), winInfoSize, 
+                      otherId, vtkCompositeManager::WIN_INFO_TAG);
+
+  renWin->SetSize(winInfo.WindowSize[0],
+                  winInfo.WindowSize[1]);
+  // Artificial size maximum to test.
+  if (0)
+    {
+    int x, y;
+    x = winInfo.WindowSize[0];
+    y = winInfo.WindowSize[1];
+    if (x > 200)
+      {
+      x = 200;
+      }
+    if (y > 200)
+      {
+      y = 200;
+      }
+    renWin->SetSize(x, y);
+    }
+
+  // In case the render window is smaller than requested.
+  // This assumes that all server processes will have the
+  // same (or larger) maximum render window size.
+  int* renWinSize;
+  renWinSize = renWin->GetSize();
+  if (winInfo.WindowSize[0] != renWinSize[0] ||
+      winInfo.WindowSize[1] != renWinSize[1])
+    {
+    if (myId == 0)
+      {
+      // We need to keep the same aspect ratio.
+      int newSize[2];
+      float k1, k2;
+      k1 = (float)renWinSize[0]/(float)winInfo.WindowSize[0];
+      k2 = (float)renWinSize[1]/(float)winInfo.WindowSize[1];
+      if (k1 < k2)
+        {
+        newSize[0] = renWinSize[0];
+        newSize[1] = (int)((float)(winInfo.WindowSize[1]) * k1);
+        }
+      else
+        {
+        newSize[0] = (int)((float)(winInfo.WindowSize[0]) * k2);
+        newSize[1] = renWinSize[1];
+        }
+      winInfo.WindowSize[0] = newSize[0];
+      winInfo.WindowSize[1] = newSize[1];
+      renWin->SetSize(newSize);
+      }
+    else
+      { // Sanity check that all server 
+        // procs have the same window limitation.
+      vtkErrorMacro("Server window size mismatch.");
+      }
+    }
+
+  if (myId == 0)
+    {  
+    // Relay info to server satellite processes.
+    for (j = 1; j < numProcs; ++j)
+      {
+      this->Controller->Send((int*)(&winInfo), winInfoSize, 
+                             j, vtkCompositeManager::WIN_INFO_TAG);
+      }
+    }
+        
+  this->InternalReductionFactor = winInfo.ImageReductionFactor;
+  this->SquirtLevel = winInfo.SquirtLevel;
+
+  // Synchronize the cameras on all processes.
+  rens = renWin->GetRenderers();
+  rens->InitTraversal();
+  // Receive the camera information.
+  // We put this before receive because we want the pipeline to be
+  // updated the first time if the camera does not exist and we want
+  // it to happen before we block in receive
+  ren = rens->GetNextItem();
+  if (ren)
+    {
+    cam = ren->GetActiveCamera();
+    }
+  int doubleInfoSize=sizeof(struct vtkClientCompositeDoubleInfo)/sizeof(double);
+
+  controller->Receive((double*)(&renInfo), 
+                      doubleInfoSize,
+                      otherId, vtkCompositeManager::REN_INFO_TAG);
   if (myId == 0)
     {  // Relay info to server satellite processes.
     for (j = 1; j < numProcs; ++j)
       {
-      //this->Controller->Send((char*)(&winInfo), 
-      //                sizeof(struct vtkClientRenderWindowInfo), j,
-      //                vtkCompositeManager::WIN_INFO_TAG);
-      this->Controller->Send((int*)(&winInfo), 5, j,
-                      vtkCompositeManager::WIN_INFO_TAG);
+      this->Controller->Send((double*)(&renInfo), 
+                      doubleInfoSize, 
+                      j, vtkCompositeManager::REN_INFO_TAG);
       }
     }
-
-
-  // This should be fixed.  Round off will cause window to resize. !!!!!
-  renWin->SetSize(winInfo.Size[0] * winInfo.ImageReductionFactor,
-                  winInfo.Size[1] * winInfo.ImageReductionFactor);
-  this->InternalReductionFactor = winInfo.ImageReductionFactor;
-  this->SquirtLevel = winInfo.SquirtLevel;
-
-  // Synchronize the renderers.
-  rens = renWin->GetRenderers();
-  rens->InitTraversal();
-  // This is misleading.  We do not support multiple renderers.
-//  for (renIdx = 0; renIdx < winInfo.NumberOfRenderers; ++renIdx)
-  for (renIdx = 0; renIdx < 1; ++renIdx) // only consider 1st renderer
+  if (ren == NULL)
     {
-    // Receive the camera information.
-
-    // We put this before receive because we want the pipeline to be
-    // updated the first time if the camera does not exist and we want
-    // it to happen before we block in receive
-    ren = rens->GetNextItem();
-    if (ren)
+    vtkErrorMacro("Renderer mismatch.");
+    }
+  else
+    {
+    lc = ren->GetLights();
+    lc->InitTraversal();
+    light = lc->GetNextItem();
+    cam->SetPosition(renInfo.CameraPosition);
+    cam->SetFocalPoint(renInfo.CameraFocalPoint);
+    cam->SetViewUp(renInfo.CameraViewUp);
+    cam->SetClippingRange(renInfo.CameraClippingRange);
+    if (renInfo.ParallelScale != 0.0)
       {
-      cam = ren->GetActiveCamera();
-      }
-
-    //controller->Receive((char*)(&renInfo), 
-    //                    sizeof(struct vtkClientRendererInfo), 
-    //                    otherId, vtkCompositeManager::REN_INFO_TAG);
-    controller->Receive((double*)(&renInfo), 22, otherId, 
-                        vtkCompositeManager::REN_INFO_TAG);
-    if (myId == 0)
-      {  // Relay info to server satellite processes.
-      for (j = 1; j < numProcs; ++j)
-        {
-        //this->Controller->Send((char*)(&renInfo), 
-        //                sizeof(struct vtkClientRendererInfo), 
-        //                j, vtkCompositeManager::REN_INFO_TAG);
-        this->Controller->Send((double*)(&renInfo), 22, j, 
-                                        vtkCompositeManager::REN_INFO_TAG);
-        }
-      }
-    if (ren == NULL)
-      {
-      vtkErrorMacro("Renderer mismatch.");
+      cam->ParallelProjectionOn();
+      cam->SetParallelScale(renInfo.ParallelScale);
       }
     else
       {
-      lc = ren->GetLights();
-      lc->InitTraversal();
-      light = lc->GetNextItem();
-
-      if (this->Tiled)
-        {
-        int x, y;
-        // Figure out the tile indexes.
-        i = this->Controller->GetLocalProcessId() - 1;
-        y = i/this->TiledDimensions[0];
-        x = i - y*this->TiledDimensions[0];
-
-        cam->SetWindowCenter(1.0-(double)(this->TiledDimensions[0]) + 2.0*(double)x,
-                             1.0-(double)(this->TiledDimensions[1]) + 2.0*(double)y);
-        cam->SetViewAngle(asin(sin(renInfo.CameraViewAngle*3.1415926/360.0)/(double)(this->TiledDimensions[0])) * 360.0 / 3.1415926);
-        cam->SetPosition(renInfo.CameraPosition);
-        cam->SetFocalPoint(renInfo.CameraFocalPoint);
-        cam->SetViewUp(renInfo.CameraViewUp);
-        cam->SetClippingRange(renInfo.CameraClippingRange);
-        if (renInfo.ParallelScale != 0.0)
-          {
-          cam->ParallelProjectionOn();
-          cam->SetParallelScale(renInfo.ParallelScale/(double)(this->TiledDimensions[0]));
-          }
-        else
-          {
-          cam->ParallelProjectionOff();   
-          }
-        }
-      else
-        { // Not tiled display.
-        cam->SetPosition(renInfo.CameraPosition);
-        cam->SetFocalPoint(renInfo.CameraFocalPoint);
-        cam->SetViewUp(renInfo.CameraViewUp);
-        cam->SetClippingRange(renInfo.CameraClippingRange);
-        if (renInfo.ParallelScale != 0.0)
-          {
-          cam->ParallelProjectionOn();
-          cam->SetParallelScale(renInfo.ParallelScale);
-          }
-        else
-          {
-          cam->ParallelProjectionOff();   
-          }
-        }
-      if (light)
-        {
-        light->SetPosition(renInfo.LightPosition);
-        light->SetFocalPoint(renInfo.LightFocalPoint);
-        }
-      ren->SetBackground(renInfo.Background);
-      // Should not have reduction when using tiled display.
-      ren->SetViewport(0, 0, 1.0/(float)this->InternalReductionFactor, 
-                       1.0/(float)this->InternalReductionFactor);
+      cam->ParallelProjectionOff();   
       }
+    if (light)
+      {
+      light->SetPosition(renInfo.LightPosition);
+      light->SetFocalPoint(renInfo.LightFocalPoint);
+      }
+    ren->SetBackground(renInfo.Background);
+    ren->SetViewport(0, 0, 1.0/(float)this->InternalReductionFactor, 
+                     1.0/(float)this->InternalReductionFactor);
     }
+
   // This makes sure the arrays are large enough.
-  this->SetPDataSize(winInfo.Size[0], winInfo.Size[1]);
+  this->SetPDataSize(winInfo.WindowSize[0]/winInfo.ImageReductionFactor, 
+                     winInfo.WindowSize[1]/winInfo.ImageReductionFactor);
 }
 
 //-------------------------------------------------------------------------
@@ -1008,43 +757,27 @@ void vtkClientCompositeManager::SatelliteEndRender()
   int numProcs, myId;
   int front = 0;
 
-  if (this->Tiled)
-    { // Do not need to composite if we are rendering a tiled display. 
-    return;
-    }
-
   myId = this->Controller->GetLocalProcessId();
   numProcs = this->Controller->GetNumberOfProcesses();
 
   // Get the color buffer (pixel data).
-  if (this->UseChar) 
+  if (this->PData->GetNumberOfComponents() == 4)
     {
-    if (this->PData->GetNumberOfComponents() == 4)
-      {
-      vtkTimerLog::MarkStartEvent("Get RGBA Char Buffer");
-      this->RenderWindow->GetRGBACharPixelData(
-        0,0,this->PDataSize[0]-1, this->PDataSize[1]-1, 
-        front,static_cast<vtkUnsignedCharArray*>(this->PData));
-      vtkTimerLog::MarkEndEvent("Get RGBA Char Buffer");
-      }
-    else if (this->PData->GetNumberOfComponents() == 3)
-      {
-      vtkTimerLog::MarkStartEvent("Get RGB Char Buffer");
-      this->RenderWindow->GetPixelData(
-        0,0,this->PDataSize[0]-1, this->PDataSize[1]-1, 
-        front,static_cast<vtkUnsignedCharArray*>(this->PData));
-      vtkTimerLog::MarkEndEvent("Get RGB Char Buffer");
-      }
-    } 
-  else 
-    {
-    vtkTimerLog::MarkStartEvent("Get RGBA Float Buffer");
-    this->RenderWindow->GetRGBAPixelData(
-      0,0,this->PDataSize[0]-1,this->PDataSize[1]-1, 
-      front,static_cast<vtkFloatArray*>(this->PData));
-    vtkTimerLog::MarkEndEvent("Get RGBA Float Buffer");
+    vtkTimerLog::MarkStartEvent("Get RGBA Char Buffer");
+    this->RenderWindow->GetRGBACharPixelData(
+      0,0,this->PDataSize[0]-1, this->PDataSize[1]-1, 
+      front,static_cast<vtkUnsignedCharArray*>(this->PData));
+    vtkTimerLog::MarkEndEvent("Get RGBA Char Buffer");
     }
-
+  else if (this->PData->GetNumberOfComponents() == 3)
+    {
+    vtkTimerLog::MarkStartEvent("Get RGB Char Buffer");
+    this->RenderWindow->GetPixelData(
+      0,0,this->PDataSize[0]-1, this->PDataSize[1]-1, 
+      front,static_cast<vtkUnsignedCharArray*>(this->PData));
+    vtkTimerLog::MarkEndEvent("Get RGB Char Buffer");
+    }
+ 
   // Do not bother getting Z buffer and compositing if only one proc.
   if (numProcs > 1)
     { 
@@ -1068,20 +801,25 @@ void vtkClientCompositeManager::SatelliteEndRender()
 
   if (myId == 0)
     {
-    if (this->UseChar && ! this->UseRGB && this->SquirtLevel)
+    int length;
+    int winSize[3];
+    winSize[0] = this->PDataSize[0];
+    winSize[1] = this->PDataSize[1];
+    if (! this->UseRGB && this->SquirtLevel)
       {
-      //this->DeltaEncode(static_cast<vtkUnsignedCharArray*>(this->PData));
       this->SquirtCompress(static_cast<vtkUnsignedCharArray*>(this->PData),
                            this->SquirtArray, this->SquirtLevel);
-      int length = this->SquirtArray->GetMaxId() + 1;
-      this->ClientController->Send(&length, 1, 1, 123450);
+      length = this->SquirtArray->GetMaxId() + 1;
+      winSize[2] = length;
+      this->ClientController->Send(winSize, 3, 1, 123450);
       this->ClientController->Send((unsigned char*)(this->SquirtArray->GetVoidPointer(0)),
                                                     length, 1, 123451);
       }
     else
       {
-      //this->ClientController->Send(this->PData, 1, 123451);
-      int length = this->PData->GetMaxId() + 1;
+      length = this->PData->GetMaxId() + 1;
+      winSize[2] = length;
+      this->ClientController->Send(winSize, 3, 1, 123450);
       this->ClientController->Send((unsigned char*)(this->PData->GetVoidPointer(0)),
                                                     length, 1, 123451);
       }
@@ -1124,12 +862,11 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
   //  }
   if (renWin)
     {
-    //renWin->Register(this);
-    //this->RenderWindow = renWin;
-    if (this->Tiled && this->ClientFlag == 0)
-      { 
-      renWin->FullScreenOn();
-      }
+    // Add the image actor to the renderer.
+    vtkRendererCollection* rens = renWin->GetRenderers();
+    rens->InitTraversal();
+    vtkRenderer *ren = rens->GetNextItem();
+    ren->AddActor(this->ImageActor);
     }
 
   // Superclass sets up renderer start and end events.
@@ -1173,25 +910,6 @@ void vtkClientCompositeManager::SetClientController(
   this->ClientController = mpc;
 }
 
-//-------------------------------------------------------------------------
-void vtkClientCompositeManager::SetUseChar(int useChar)
-{
-  if (useChar == this->UseChar)
-    {
-    return;
-    }
-  this->Modified();
-  this->UseChar = useChar;
-
-  // Cannot use float RGB (must be float RGBA).
-  if (this->UseChar == 0)
-    {
-    this->UseRGB = 0;
-    }
-  
-  this->ReallocPDataArrays();
-}
-
 
 //-------------------------------------------------------------------------
 void vtkClientCompositeManager::SetUseRGB(int useRGB)
@@ -1202,12 +920,6 @@ void vtkClientCompositeManager::SetUseRGB(int useRGB)
     }
   this->Modified();
   this->UseRGB = useRGB;
-
-  // Cannot use float RGB (must be char RGB).
-  if (useRGB)
-    {  
-    this->UseChar = 1;
-    }
 
   this->ReallocPDataArrays();
 }
@@ -1220,7 +932,7 @@ void vtkClientCompositeManager::ReallocPDataArrays()
 {
   int numComps = 4;
   int numTuples = this->PDataSize[0] * this->PDataSize[1];
-  int magNumTuples = this->MagnifiedPDataSize[0] * this->MagnifiedPDataSize[1];
+  int magNumTuples = this->PDataSize[0] * this->PDataSize[1];
   int numProcs = 1;
 
   if ( ! this->ClientFlag)
@@ -1248,14 +960,9 @@ void vtkClientCompositeManager::ReallocPDataArrays()
     vtkCompositeManager::DeleteArray(this->SquirtArray);
     this->SquirtArray = NULL;
     } 
-  if (this->MagnifiedPData)
-    {
-    vtkCompositeManager::DeleteArray(this->MagnifiedPData);
-    this->MagnifiedPData = NULL;
-    } 
 
   // Allocate squirt compressed array.
-  if (this->UseChar && ! this->UseRGB)
+  if (! this->UseRGB)
     {
     if (this->ClientFlag || this->Controller->GetLocalProcessId() == 0)
       {
@@ -1267,47 +974,16 @@ void vtkClientCompositeManager::ReallocPDataArrays()
           this->SquirtArray, 4, numTuples);
       }
     }
-  if (this->UseChar)
-    {
-    this->PData = vtkUnsignedCharArray::New();
+  this->PData = vtkUnsignedCharArray::New();
+  vtkCompositeManager::ResizeUnsignedCharArray(
+      static_cast<vtkUnsignedCharArray*>(this->PData),
+      numComps, numTuples);
+  if (numProcs > 1)
+    { // Not client (numProcs == 1)
+    this->PData2 = vtkUnsignedCharArray::New();
     vtkCompositeManager::ResizeUnsignedCharArray(
-        static_cast<vtkUnsignedCharArray*>(this->PData),
+        static_cast<vtkUnsignedCharArray*>(this->PData2),
         numComps, numTuples);
-    if (numProcs > 1)
-      { // Not client (numProcs == 1)
-      this->PData2 = vtkUnsignedCharArray::New();
-      vtkCompositeManager::ResizeUnsignedCharArray(
-          static_cast<vtkUnsignedCharArray*>(this->PData2),
-          numComps, numTuples);
-      }
-    if (this->ClientFlag)
-      {
-      this->MagnifiedPData = vtkUnsignedCharArray::New();
-      vtkCompositeManager::ResizeUnsignedCharArray(
-          static_cast<vtkUnsignedCharArray*>(this->MagnifiedPData),
-          numComps, magNumTuples);
-      }
-    }
-  else 
-    {
-    this->PData = vtkFloatArray::New();
-    vtkCompositeManager::ResizeFloatArray(
-            static_cast<vtkFloatArray*>(this->PData),
-            numComps, numTuples);
-    if (numProcs > 1)
-      { // Not client (numProcs == 1)
-      this->PData2 = vtkFloatArray::New();
-      vtkCompositeManager::ResizeFloatArray(
-            static_cast<vtkFloatArray*>(this->PData2),
-            numComps, numTuples);
-      }
-    if (this->ClientFlag)
-      {
-      this->MagnifiedPData = vtkFloatArray::New();
-      vtkCompositeManager::ResizeFloatArray(
-              static_cast<vtkFloatArray*>(this->MagnifiedPData),
-              numComps, magNumTuples);
-      }
     }
 }
 
@@ -1317,7 +993,6 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
 {
   int numComps;  
   int numPixels;
-  int magNumPixels;
   int numProcs = 1;
 
   if ( ! this->ClientFlag)
@@ -1341,8 +1016,6 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
 
   this->PDataSize[0] = x;
   this->PDataSize[1] = y;
-  this->MagnifiedPDataSize[0] = x * this->InternalReductionFactor;
-  this->MagnifiedPDataSize[1] = y * this->InternalReductionFactor;
 
   if (x == 0 || y == 0)
     {
@@ -1371,21 +1044,14 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
       vtkCompositeManager::DeleteArray(this->ZData2);
       this->ZData2 = NULL;
       }
-    if (this->MagnifiedPData)
-      {
-      vtkCompositeManager::DeleteArray(this->MagnifiedPData);
-      this->MagnifiedPData = NULL;
-      }
     return;
     }    
 
   numPixels = x * y;
-  magNumPixels = this->MagnifiedPDataSize[0] 
-                  * this->MagnifiedPDataSize[1];
 
 
   // Allocate squirt compressed array.
-  if (this->UseChar && ! this->UseRGB)
+  if (! this->UseRGB)
     {
     if (this->ClientFlag || this->Controller->GetLocalProcessId() == 0)
       {
@@ -1427,66 +1093,22 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
     numComps = 4;
     }
   
-  if (this->UseChar)
+  if (!this->PData)
     {
-    if (!this->PData)
+    this->PData = vtkUnsignedCharArray::New();
+    }
+  vtkCompositeManager::ResizeUnsignedCharArray(
+    static_cast<vtkUnsignedCharArray*>(this->PData), 
+    numComps, numPixels);
+  if (numProcs > 1)
+    { // Not client (numProcs == 1)
+    if (!this->PData2)
       {
-      this->PData = vtkUnsignedCharArray::New();
+      this->PData2 = vtkUnsignedCharArray::New();
       }
     vtkCompositeManager::ResizeUnsignedCharArray(
-      static_cast<vtkUnsignedCharArray*>(this->PData), 
+      static_cast<vtkUnsignedCharArray*>(this->PData2), 
       numComps, numPixels);
-    if (numProcs > 1)
-      { // Not client (numProcs == 1)
-      if (!this->PData2)
-        {
-        this->PData2 = vtkUnsignedCharArray::New();
-        }
-      vtkCompositeManager::ResizeUnsignedCharArray(
-        static_cast<vtkUnsignedCharArray*>(this->PData2), 
-        numComps, numPixels);
-      }
-    if (this->ClientFlag)
-      {
-      if (!this->MagnifiedPData)
-        {
-        this->MagnifiedPData = vtkUnsignedCharArray::New();
-        }
-      vtkCompositeManager::ResizeUnsignedCharArray(
-        static_cast<vtkUnsignedCharArray*>(this->MagnifiedPData), 
-        numComps, magNumPixels);
-      }
-    }
-  else
-    {
-    if (!this->PData)
-      {
-      this->PData = vtkFloatArray::New();
-      }
-
-    vtkCompositeManager::ResizeFloatArray(
-      static_cast<vtkFloatArray*>(this->PData), 
-      numComps, numPixels);
-    if (numProcs > 1)
-      { // Not client (numProcs == 1)
-      if (!this->PData)
-        {
-        this->PData = vtkFloatArray::New();
-        }
-      vtkCompositeManager::ResizeFloatArray(
-        static_cast<vtkFloatArray*>(this->PData2), 
-        numComps, numPixels);
-      }
-    if (this->ClientFlag)
-      {
-      if (!this->MagnifiedPData)
-        {
-        this->MagnifiedPData = vtkFloatArray::New();
-        }
-      vtkCompositeManager::ResizeFloatArray(
-        static_cast<vtkFloatArray*>(this->MagnifiedPData), 
-        numComps, magNumPixels);
-      }
     }
 }
 
@@ -1746,14 +1368,7 @@ void vtkClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   
   os << indent << "ClientController: (" << this->ClientController << ")\n"; 
-
-  if (this->Tiled)
-    {
-    os << indent << "Tiled display with dimensions: " 
-       << this->TiledDimensions[0] << ", " << this->TiledDimensions[1] << endl;
-    }
   
-  os << indent << "UseChar: " << this->UseChar << endl;
   os << indent << "UseRGB: " << this->UseRGB << endl;
   os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
   os << indent << "ClientFlag: " << this->ClientFlag << endl;

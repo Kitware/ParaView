@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.15");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.16");
 
 
 
@@ -147,7 +147,7 @@ void vtkPVCompositeRenderModule::StillRender()
     pm->SendStreamToClient();
     if (this->PVApplication->GetClientMode())
       {
-      // No squirt if disabled, otherwise only lossless or still render.  
+      // No squirt if disabled, otherwise only lossless for still render.  
       int squirtLevel = 0;
       if (this->SquirtLevel)
         {
@@ -180,45 +180,51 @@ void vtkPVCompositeRenderModule::StillRender()
         << vtkClientServerStream::End;
       pm->SendStreamToClient();
       }
-    // Save this so we know where to get the z buffer.
+    // Save this so we know where to get the z buffer (for picking?).
     this->LocalRender = localRender;
    }
 
-
-  // Still Render can get called some funky ways.
+  // This was to fix a clipping range bug. Still Render can get called some 
+  // funky ways.  Some do not reset the clipping range.
   // Interactive renders get called through the PVInteractorStyles
-  // which cal ResetCameraClippingRange on the Renderer.
-  // We could convert them to call a method on the module directly ...
+  // which call ResetCameraClippingRange on the Renderer.
+  // We could convert still renders to call a method on the module directly ...
   this->Renderer->ResetCameraClippingRange();
 
+  // This used to be the way LODs (geometry and pixel redection) we choosen.
+  // Geometry LODs are now choosen globally to simplify the process.
+  // The algorithm in the render window was too complex and often
+  // made bad choices.  Most composite ImageReduction values
+  // are constant (for interactive render)and just directly choosen by the user.
+  // We can make make the choice more sophisticated in the future.
   this->RenderWindow->SetDesiredUpdateRate(0.002);
-  // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
   this->GetPVApplication()->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << this->CompositeID << "IsA" << "vtkClientCompositeManager"
-                  << vtkClientServerStream::End;
-  pm->SendStreamToClient();
-  int result = 0;
-  pm->GetLastClientResult().GetArgument(0, 0, &result);
-  if(result)
-    {
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->CompositeID << "StartRender"
-                    << vtkClientServerStream::End;
-    pm->SendStreamToClient();
-    }
-  else
-    {
+
+  // This special case seems really stupid.
+  // I forget why Amy did this, but i am going to try and remove it.
+  // Actually amy did this to use the image actor I think.
+  // fixme
+  //pm->GetStream() << vtkClientServerStream::Invoke
+  //                << this->CompositeID << "IsA" << "vtkClientCompositeManager"
+  //                << vtkClientServerStream::End;
+  //pm->SendStreamToClient();
+  //int result = 0;
+  //pm->GetLastClientResult().GetArgument(0, 0, &result);
+  //if(result)
+  //  {
+  //  pm->GetStream() << vtkClientServerStream::Invoke
+  //                  << this->CompositeID << "StartRender"
+  //                  << vtkClientServerStream::End;
+  //  pm->SendStreamToClient();
+  //  }
+  //else
+  //  {
     this->RenderWindow->Render();
-    }
+  //  }
   vtkTimerLog::MarkEndEvent("Still Render");
   
-//  if (this->CompositeTclName && !strcmp(this->CompositeTclName, "CCompositeManager1") && !localRender)
-//    {
-//    this->PVApplication->Script("%s EndRender", this->CompositeTclName);
-//    }
 }
 
 
@@ -331,6 +337,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   this->Renderer->ResetCameraClippingRange();
 
   // This might be used for Reduction factor.
+  // See comment in still render.
   this->RenderWindow->SetDesiredUpdateRate(5.0);
   // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
@@ -341,23 +348,23 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 
   vtkTimerLog::MarkStartEvent("Interactive Render");
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << this->CompositeID << "IsA" << "vtkClientCompositeManager"
-                  << vtkClientServerStream::End;
-  pm->SendStreamToClient();
-  int result = 0;
-  pm->GetLastClientResult().GetArgument(0, 0, &result);
-  if(result)
-    {
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->CompositeID << "StartRender"
-                    << vtkClientServerStream::End;
-    pm->SendStreamToClient();
-    }
-  else
-    {
+  //pm->GetStream() << vtkClientServerStream::Invoke
+  //                << this->CompositeID << "IsA" << "vtkClientCompositeManager"
+  //                << vtkClientServerStream::End;
+  //pm->SendStreamToClient();
+  //int result = 0;
+  //pm->GetLastClientResult().GetArgument(0, 0, &result);
+  //if(result)
+  //  {
+  //  pm->GetStream() << vtkClientServerStream::Invoke
+   //                 << this->CompositeID << "StartRender"
+  //                  << vtkClientServerStream::End;
+  //  pm->SendStreamToClient();
+  //  }
+  //else
+  //  {
     this->RenderWindow->Render();
-    }
+  //  }
   vtkTimerLog::MarkEndEvent("Interactive Render");
 
   // These times are used to determine reduction factor.
@@ -369,20 +376,6 @@ void vtkPVCompositeRenderModule::InteractiveRender()
       + this->Composite->GetGetBuffersTime()
       + this->Composite->GetSetBuffersTime();
     }
-
-  /*
-  if (this->CompositeTclName && !strcmp(this->CompositeTclName, "CCompositeManager1"))
-    {
-    int composite;
-    this->PVApplication->Script("%s GetUseCompositing",
-                                this->CompositeTclName);
-    composite = vtkKWObject::GetIntegerResult(this->PVApplication);
-    if (composite)
-      {
-      this->PVApplication->Script("%s EndRender", this->CompositeTclName);
-      }
-    }
-  */
 }
 
 
