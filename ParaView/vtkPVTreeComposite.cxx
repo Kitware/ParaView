@@ -564,19 +564,6 @@ int vtkPVTreeComposite::CheckForAbortComposite()
   return this->vtkTreeComposite::CheckForAbortComposite();
 }
 
-//-------------------------------------------------------------------------
-//int vtkPVTreeComposite::RootWaitForSatelliteToFinish(int satelliteId)
-//{
-//  satelliteId = satelliteId;
-//}
-
-//----------------------------------------------------------------------------
-//void vtkPVTreeComposite::RootSendFinalCompositeDecision()
-//{
-//}
-
-
-
 
 
 #endif  // VTK_USE_MPI
