@@ -197,7 +197,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->AcceptCommands->AddString("%s ChangeScaleMode",
                                   this->GetTclName());
   this->ResetCommands->AddString("%s SetValue %s",
-                                 this->GetTclName(),
+                                 this->ScaleModeMenu->GetTclName(),
                                  this->GetGlyphScaleMode());
   
   this->Script("pack %s %s -side left",
@@ -229,7 +229,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->AcceptCommands->AddString("%s ChangeVectorMode",
                                   this->GetTclName());
   this->ResetCommands->AddString("%s SetValue %s",
-                                 this->GetTclName(),
+                                 this->VectorModeMenu->GetTclName(),
                                  this->GetGlyphVectorMode());
   
   this->Script("pack %s %s -side left",
