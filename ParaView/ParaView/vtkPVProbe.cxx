@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.79");
+vtkCxxRevisionMacro(vtkPVProbe, "1.80");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -622,4 +622,5 @@ void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Dimensionality: " << this->GetDimensionality() << endl;
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
+  os << indent << "XYPlotWidget: " << this->XYPlotWidget << endl;
 }
