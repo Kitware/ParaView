@@ -973,7 +973,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.42 $");
+  this->ExtractRevision(os,"$Revision: 1.43 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1119,7 +1119,8 @@ void vtkKWWindow::PrintRecentFiles()
   
   cout << "Recent files: " << endl;
   int cc;
-  for( cc=0; static_cast<unsigned int>(cc) < this->RecentFiles->GetSize(); cc ++ )
+  for( cc=0; 
+       static_cast<unsigned int>(cc) < this->RecentFiles->GetSize(); cc ++ )
     {
     vtkKWWindowMenuEntry *kc;
     kc = (vtkKWWindowMenuEntry *)this->RecentFiles->Lookup(cc);
