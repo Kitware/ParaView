@@ -73,10 +73,10 @@ public:
   // display a balloon help. An optional icon can also be specified and will 
   // be displayed on the left side of the tab label (all icons can be hidden
   // later on using the SetShowIcons() method). Finally, an optional tag
-  // can be provided and will be associated to the page (see SetPageTag()) ; this
-  // tag will default to 0 otherwise.
+  // can be provided and will be associated to the page (see SetPageTag()) ; 
+  // this/ tag will default to 0 otherwise.
   // Return a unique positive ID corresponding to that page, or < 0 on error.
-  int AddPage(const char *title, const char* balloon, vtkKWIcon *icon, int tag);
+  int AddPage(const char *title, const char* balloon, vtkKWIcon *icon,int tag);
   int AddPage(const char *title, const char* balloon, vtkKWIcon *icon);
   int AddPage(const char *title, const char* balloon);
   int AddPage(const char *title);
@@ -90,9 +90,9 @@ public:
   unsigned int GetNumberOfPages();
   
   // Description:
-  // Set/Get a page tag. A tag (int) can be associated to a page (given the page
-  // id). This provides a way to group pages. The default tag, if not provided,
-  // is 0. 
+  // Set/Get a page tag. A tag (int) can be associated to a page (given the
+  // page id). This provides a way to group pages. The default tag, if not 
+  // provided, is 0. 
   // If a page title is provided instead of a page id, the first page matching
   // that title is considered.
   void SetPageTag(int id, int tag);
@@ -104,7 +104,7 @@ public:
   // Raise the specified page to be on the top (i.e. the one selected).
   // If a page title is provided instead of a page id, the first page matching
   // that title is considered. In the same way, if a tag is provided with the 
-  // title, the page which title *and* tag match is considered.
+  // title, the page which match both title *and* tag is considered.
   // GetRaisedPageId() returns the id of the page raised at the moment, -1 if
   // none is raised.
   // RaiseFirstPageMatchingTag() is a convenience method use to raise the first
@@ -116,11 +116,11 @@ public:
   void RaiseFirstPageMatchingTag(int tag);
   
   // Description:
-  // Get the vtkKWWidget corresponding to the frame of the specified page (Tab).
+  // Get the vtkKWWidget corresponding to the frame of a specified page (Tab).
   // This is where the UI components should be inserted.
   // If a page title is provided instead of a page id, the first page matching
   // that title is considered. In the same way, if a tag is provided with the 
-  // title, the page which title *and* tag match is considered.
+  // title, the page which match both title *and* tag is considered.
   // Return NULL on error.
   vtkKWWidget *GetFrame(int id);
   vtkKWWidget *GetFrame(const char *title);
@@ -142,25 +142,32 @@ public:
   
   // Description:
   // Show/hide a page tab (i.e. Set/Get the page visibility). Showing a page 
-  // tab does not raise the page, it just makes the page selectable by displaying
-  // its tab. A hidden page tab is not displayed in the tabs: the corresponding
-  // page can not be selected. 
+  // tab does not raise the page, it just makes the page selectable by 
+  // displaying its tab. A hidden page tab is not displayed in the tabs: the 
+  // corresponding page can not be selected. 
   // If a page title is provided instead of a page id, the first page matching
-  // that title is considered.
+  // that title is considered. In the same way, if a tag is provided with the 
+  // title, the page which match both title *and* tag is considered.
   // If the currently selected page is hidden, it is unselected first and
   // the first visible tab (if any) becomes selected instead.
   void ShowPage(int id);
   void ShowPage(const char *title);
+  void ShowPage(const char *title, int tag);
   void HidePage(int id);
   void HidePage(const char *title);
+  void HidePage(const char *title, int tag);
   void SetPageVisibility(int id, int flag);
   void SetPageVisibility(const char *title, int flag);
+  void SetPageVisibility(const char *title, int tag, int flag);
   int  GetPageVisibility(int id);
   int  GetPageVisibility(const char *title);
+  int  GetPageVisibility(const char *title, int tag);
   void TogglePageVisibility(int id);
   void TogglePageVisibility(const char *title);
+  void TogglePageVisibility(const char *title, int tag);
   int  CanBeHidden(int id);
   int  CanBeHidden(const char *title);
+  int  CanBeHidden(const char *title, int tag);
   void HideAllPages();
 
   // Description:
@@ -222,15 +229,20 @@ public:
   // Description:
   // Pin/unpin a page tab. A pinned page tab can not be hidden.
   // If a page title is provided instead of a page id, the first page matching
-  // that title is considered.
+  // that title is considered. In the same way, if a tag is provided with the 
+  // title, the page which match both title *and* tag is considered.
   void PinPage(int id);
   void PinPage(const char *title);
+  void PinPage(const char *title, int tag);
   void UnpinPage(int id);
   void UnpinPage(const char *title);
+  void UnpinPage(const char *title, int tag);
   void TogglePagePinned(int id);
   void TogglePagePinned(const char *title);
+  void TogglePagePinned(const char *title, int tag);
   int  GetPagePinned(int id);
   int  GetPagePinned(const char *title);
+  int  GetPagePinned(const char *title, int tag);
   
   // Description:
   // Allow pages to be pinned.
@@ -243,8 +255,8 @@ public:
   unsigned int GetNumberOfPinnedPages();
 
   // Description:
-  // Get the n-th pinned page id (starting at index 0, i.e. the first pinned page
-  // is at index 0).
+  // Get the n-th pinned page id (starting at index 0, i.e. the first pinned 
+  // page is at index 0).
   // Return -1 if the index is out of the range, or if there is no pinned
   // page for that index.
   int GetPinnedPageId(int idx);
@@ -289,7 +301,10 @@ public:
   void ScheduleResize();
   void Resize();
   void PageTabContextMenuCallback(int id, int x, int y);
-  
+  void RaiseCallback(int id);
+  void TogglePagePinnedCallback(int id);
+  void TogglePageVisibilityCallback(int id);
+
 protected:
   vtkKWNotebook();
   ~vtkKWNotebook();
@@ -407,6 +422,10 @@ protected:
   // ShowOnlyMostRecentPages
 
   void ConstrainVisiblePages();
+
+  // Send event
+
+  void SendEventForPage(unsigned long event, int id);
 
   // Update the enable state. This should propagate similar calls to the
   // internal widgets.

@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
@@ -47,9 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-// The amount of padding that is to be added to the internal vertical padding of
-// the selected tab (basically defines the additional height of the selected
-// tab compared to an unselected tab).
+// The amount of padding that is to be added to the internal vertical padding
+// of the selected tab (basically defines the additional height of the 
+// selected tab compared to an unselected tab).
 
 #define VTK_KW_NB_TAB_SELECT_BD_Y  2
 
@@ -62,8 +63,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_NB_TAB_BD           2
 
 // The amount of horizontal padding around the tabs frame itself (i.e. defines
-// a margin between the first (respectively last) tab and the left (respectively
-// right) border of the notebook widget
+// a margin between the first (respectively last) tab and the left 
+// (respectively right) border of the notebook widget
 
 #define VTK_KW_NB_TAB_FRAME_PADX   10
 
@@ -80,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.55");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.56");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -764,9 +765,10 @@ void vtkKWNotebook::BindPage(vtkKWNotebook::Page *page)
   ostrstream cmd;
 
   cmd << "bind " << page->Label->GetWidgetName() << " <Button-1> {" 
-      << this->GetTclName() << " Raise " << page->Id << "}" << endl
+      << this->GetTclName() << " RaiseCallback " << page->Id << "}" << endl
       << "bind " << page->Label->GetWidgetName() << " <Double-1> {" 
-      << this->GetTclName() << " TogglePagePinned " << page->Id << "}" << endl
+      << this->GetTclName() << " TogglePagePinnedCallback " << page->Id << "}" 
+      << endl
       << "bind " << page->Label->GetWidgetName() << " <Button-3> {" 
       << this->GetTclName() << " PageTabContextMenuCallback " << page->Id 
       << " %%X %%Y}" 
@@ -775,7 +777,7 @@ void vtkKWNotebook::BindPage(vtkKWNotebook::Page *page)
   if (page->ImageLabel)
     {
     cmd << "bind " << page->ImageLabel->GetWidgetName() << " <Button-1> {" 
-        << this->GetTclName() << " Raise " << page->Id << "}" << endl;
+        << this->GetTclName() << " RaiseCallback " << page->Id << "}" << endl;
     }
 
   cmd << ends;
@@ -1184,6 +1186,12 @@ void vtkKWNotebook::ShowPage(const char *title)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWNotebook::ShowPage(const char *title, int tag)
+{
+  this->ShowPage(this->GetPage(title, tag));
+}
+
+//----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPage(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated() || page->Visibility)
@@ -1223,6 +1231,12 @@ int vtkKWNotebook::CanBeHidden(const char *title)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWNotebook::CanBeHidden(const char *title, int tag)
+{
+  return this->CanBeHidden(this->GetPage(title, tag));
+}
+
+//----------------------------------------------------------------------------
 int vtkKWNotebook::CanBeHidden(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1245,6 +1259,12 @@ void vtkKWNotebook::HidePage(int id)
 void vtkKWNotebook::HidePage(const char *title)
 {
   this->HidePage(this->GetPage(title));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::HidePage(const char *title, int tag)
+{
+  this->HidePage(this->GetPage(title, tag));
 }
 
 //----------------------------------------------------------------------------
@@ -1327,6 +1347,19 @@ void vtkKWNotebook::SetPageVisibility(const char *title, int flag)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWNotebook::SetPageVisibility(const char *title, int tag, int flag)
+{
+  if (flag)
+    {
+    this->ShowPage(title, tag);
+    }
+  else
+    {
+    this->HidePage(title, tag);
+    }
+}
+
+//----------------------------------------------------------------------------
 int vtkKWNotebook::GetPageVisibility(int id)
 {
   return this->GetPageVisibility(this->GetPage(id));
@@ -1336,6 +1369,12 @@ int vtkKWNotebook::GetPageVisibility(int id)
 int vtkKWNotebook::GetPageVisibility(const char *title)
 {
   return this->GetPageVisibility(this->GetPage(title));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWNotebook::GetPageVisibility(const char *title, int tag)
+{
+  return this->GetPageVisibility(this->GetPage(title, tag));
 }
 
 //----------------------------------------------------------------------------
@@ -1359,6 +1398,12 @@ void vtkKWNotebook::TogglePageVisibility(int id)
 void vtkKWNotebook::TogglePageVisibility(const char *title)
 {
   this->TogglePageVisibility(this->GetPage(title));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::TogglePageVisibility(const char *title, int tag)
+{
+  this->TogglePageVisibility(this->GetPage(title, tag));
 }
 
 //----------------------------------------------------------------------------
@@ -1553,7 +1598,13 @@ void vtkKWNotebook::PinPage(const char *title)
   this->PinPage(this->GetPage(title));
 }
 
-//--------------------------------------------------------------------------1----
+//----------------------------------------------------------------------------
+void vtkKWNotebook::PinPage(const char *title, int tag)
+{
+  this->PinPage(this->GetPage(title, tag));
+}
+
+//----------------------------------------------------------------------------
 void vtkKWNotebook::PinPage(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1578,6 +1629,12 @@ void vtkKWNotebook::UnpinPage(const char *title)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWNotebook::UnpinPage(const char *title, int tag)
+{
+  this->UnpinPage(this->GetPage(title, tag));
+}
+
+//----------------------------------------------------------------------------
 void vtkKWNotebook::UnpinPage(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
@@ -1599,6 +1656,12 @@ void vtkKWNotebook::TogglePagePinned(int id)
 void vtkKWNotebook::TogglePagePinned(const char *title)
 {
   this->TogglePagePinned(this->GetPage(title));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::TogglePagePinned(const char *title, int tag)
+{
+  this->TogglePagePinned(this->GetPage(title, tag));
 }
 
 //----------------------------------------------------------------------------
@@ -1629,6 +1692,12 @@ int vtkKWNotebook::GetPagePinned(int id)
 int vtkKWNotebook::GetPagePinned(const char *title)
 {
   return this->GetPagePinned(this->GetPage(title));
+}
+
+//----------------------------------------------------------------------------
+int vtkKWNotebook::GetPagePinned(const char *title, int tag)
+{
+  return this->GetPagePinned(this->GetPage(title, tag));
 }
 
 //----------------------------------------------------------------------------
@@ -1687,6 +1756,59 @@ int vtkKWNotebook::GetPinnedPageId(int idx)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWNotebook::SendEventForPage(unsigned long event, int id)
+{
+  vtkKWNotebook::Page *page = this->GetPage(id);
+  if (page)
+    {
+    char tag[128];
+    sprintf(tag, "%d", page->Tag);
+    const char *cargs[2];
+    cargs[0] = page->Title;
+    cargs[1] = tag;
+    this->InvokeEvent(event, cargs);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::RaiseCallback(int id)
+{
+  this->Raise(id);
+
+  this->SendEventForPage(vtkKWEvent::NotebookRaisePageEvent, id);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::TogglePagePinnedCallback(int id)
+{
+  this->TogglePagePinned(id);
+
+  if (this->GetPagePinned(id))
+    {
+    this->SendEventForPage(vtkKWEvent::NotebookPinPageEvent, id);
+    }
+  else
+    {
+    this->SendEventForPage(vtkKWEvent::NotebookUnpinPageEvent, id);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::TogglePageVisibilityCallback(int id)
+{
+  this->TogglePageVisibility(id);
+
+  if (this->GetPageVisibility(id))
+    {
+    this->SendEventForPage(vtkKWEvent::NotebookShowPageEvent, id);
+    }
+  else
+    {
+    this->SendEventForPage(vtkKWEvent::NotebookHidePageEvent, id);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
 {
   if (!this->IsCreated() || !this->EnablePageTabContextMenu)
@@ -1718,7 +1840,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
 
   var = this->TabPopupMenu->CreateCheckButtonVariable(this, "Show");
   ostrstream visibility;
-  visibility << "TogglePageVisibility " << id << ends;
+  visibility << "TogglePageVisibilityCallback " << id << ends;
   this->TabPopupMenu->AddCheckButton(
     "Show", var, this, visibility.str(), "Show/Hide this notebook page");
   this->TabPopupMenu->CheckCheckButton(
@@ -1732,7 +1854,7 @@ void vtkKWNotebook::PageTabContextMenuCallback(int id, int x, int y)
     {
     var = this->TabPopupMenu->CreateCheckButtonVariable(this, "Pin");
     ostrstream pin;
-    pin << "TogglePagePinned " << id << ends;
+    pin << "TogglePagePinnedCallback " << id << ends;
     this->TabPopupMenu->InsertCheckButton(
       0, "Pin", var, this, pin.str(), "Pin/Unpin this notebook page");
     this->TabPopupMenu->CheckCheckButton(this, "Pin", page->Pinned);
