@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.1");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.2");
 
 int vtkKWUserInterfacePanelCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -191,16 +191,26 @@ void vtkKWUserInterfacePanel::RaisePage(const char *title)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWUserInterfacePanel::Show()
+int vtkKWUserInterfacePanel::Show()
 {
   if (this->UserInterfaceManager == NULL)
     {
     vtkErrorMacro("The UserInterfaceManager manager needs to be set before "
                   "all pages can be shown.");
-    return;
+    return 0;
     }
 
-  this->UserInterfaceManager->Show(this);
+  return this->UserInterfaceManager->Show(this);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWUserInterfacePanel::Raise()
+{
+  if (this->Show() && this->UserInterfaceManager)
+    {
+    return this->UserInterfaceManager->Raise(this);
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------

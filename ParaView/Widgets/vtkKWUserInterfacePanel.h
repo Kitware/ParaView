@@ -135,7 +135,11 @@ public:
   // Note that if the panel has not been created at this point, the manager 
   // will call the panel's Create() method automatically, allowing the 
   // creation of the panel to be delayed until it is really needed.
-  virtual void Show();
+  // Raise() behaves like Show(), but it will also instruct the manager to bring
+  // up the first page of the panel to the front.
+  // Return 1 on success, 0 on error.
+  virtual int Show();
+  virtual int Raise();
 
   // Description:
   // Refresh the interface.
