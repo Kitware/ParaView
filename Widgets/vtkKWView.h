@@ -54,6 +54,8 @@ class vtkViewport;
 #include "vtkScaledTextActor.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWText.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkKWChangeColorButton.h"
 
 class VTK_EXPORT vtkKWView : public vtkKWWidget
 {
@@ -237,6 +239,11 @@ public:
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
   virtual void SerializeToken(istream& is,const char token[1024]);
 
+  // Description:
+  // Change the color of the annotation text
+  void SetHeaderTextColor( float r, float g, float b );
+  void SetCornerTextColor( float r, float g, float b );
+
 protected:
   vtkKWView();
   ~vtkKWView();
@@ -257,22 +264,33 @@ protected:
   vtkKWWidget *Frame2;
   vtkKWComposite *SelectedComposite;
 
-  vtkKWGenericComposite *HeaderComposite;
-  vtkKWWidget *AnnotationProperties;
-  vtkKWCheckButton *HeaderButton;
-  vtkKWWidget *HeaderLabel;
-  vtkKWEntry  *HeaderEntry;
-  vtkScaledTextActor *HeaderProp;
-  vtkTextMapper *HeaderMapper;
+  vtkKWWidget            *AnnotationProperties;
 
-  vtkKWGenericComposite *CornerComposite;
-  vtkKWCheckButton *CornerButton;
-  vtkKWWidget *CornerLabel;
-  vtkKWText  *CornerText;
-  vtkScaledTextActor *CornerProp;
-  vtkTextMapper *CornerMapper;
-  vtkKWOptionMenu *CornerOptions;
-  int PropertiesCreated;
+  vtkKWGenericComposite  *HeaderComposite;
+  vtkKWLabeledFrame      *HeaderFrame;
+  vtkKWWidget            *HeaderDisplayFrame;
+  vtkKWWidget            *HeaderEntryFrame;
+  vtkKWChangeColorButton *HeaderColor;
+  vtkKWCheckButton       *HeaderButton;
+  vtkKWWidget            *HeaderLabel;
+  vtkKWEntry             *HeaderEntry;
+  vtkScaledTextActor     *HeaderProp;
+  vtkTextMapper          *HeaderMapper;
+
+  vtkKWGenericComposite  *CornerComposite;
+  vtkKWLabeledFrame      *CornerFrame;
+  vtkKWWidget            *CornerDisplayFrame;
+  vtkKWChangeColorButton *CornerColor;
+  vtkKWCheckButton       *CornerButton;
+  vtkKWWidget            *CornerLabel;
+  vtkKWText              *CornerText;
+  vtkScaledTextActor     *CornerProp;
+  vtkTextMapper          *CornerMapper;
+  vtkKWWidget            *CornerOptionsFrame;
+  vtkKWWidget            *CornerOptionsLabel;
+  vtkKWOptionMenu        *CornerOptions;
+
+  int              PropertiesCreated;
 
   float            InteractiveUpdateRate;
   float            *StillUpdateRates;

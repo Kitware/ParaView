@@ -63,30 +63,52 @@ vtkKWView::vtkKWView()
   this->Notebook = vtkKWNotebook::New();
 
   this->AnnotationProperties = vtkKWWidget::New();
+  this->HeaderFrame = vtkKWLabeledFrame::New();
+  this->HeaderFrame->SetParent( this->AnnotationProperties );
+  this->HeaderDisplayFrame = vtkKWWidget::New();
+  this->HeaderDisplayFrame->SetParent(this->HeaderFrame->GetFrame());
+  this->HeaderEntryFrame = vtkKWWidget::New();
+  this->HeaderEntryFrame->SetParent(this->HeaderFrame->GetFrame());
+  this->HeaderButton = vtkKWCheckButton::New();
+  this->HeaderButton->SetParent(this->HeaderDisplayFrame);
+  this->HeaderColor = vtkKWChangeColorButton::New();
+  this->HeaderColor->SetParent(this->HeaderDisplayFrame);
   this->HeaderLabel = vtkKWWidget::New();
-  this->HeaderLabel->SetParent(this->AnnotationProperties);
+  this->HeaderLabel->SetParent(this->HeaderEntryFrame);
   this->HeaderEntry = vtkKWEntry::New();
-  this->HeaderEntry->SetParent(this->AnnotationProperties);
+  this->HeaderEntry->SetParent(this->HeaderEntryFrame);
   this->HeaderMapper = vtkTextMapper::New();
   this->HeaderMapper->SetJustificationToCentered();
   this->HeaderMapper->SetVerticalJustificationToTop();
   this->HeaderMapper->SetFontSize(15);  
-  this->HeaderMapper->ShadowOn();  
+  this->HeaderMapper->ShadowOff();  
   this->HeaderProp = vtkScaledTextActor::New();
   this->HeaderProp->GetPositionCoordinate()->SetValue(0.2,0.88);
   this->HeaderProp->SetMapper(this->HeaderMapper);
   this->HeaderComposite = vtkKWGenericComposite::New();
   this->HeaderComposite->SetProp(this->HeaderProp);
-  this->HeaderButton = vtkKWCheckButton::New();
-  this->HeaderButton->SetParent(this->AnnotationProperties);
 
+  this->CornerFrame = vtkKWLabeledFrame::New();
+  this->CornerFrame->SetParent(this->AnnotationProperties);
+  this->CornerDisplayFrame = vtkKWWidget::New();
+  this->CornerDisplayFrame->SetParent( this->CornerFrame->GetFrame() );
+  this->CornerOptionsFrame = vtkKWWidget::New();
+  this->CornerOptionsFrame->SetParent( this->CornerFrame->GetFrame() );
+  this->CornerButton = vtkKWCheckButton::New();
+  this->CornerButton->SetParent(this->CornerDisplayFrame);
+  this->CornerColor = vtkKWChangeColorButton::New();
+  this->CornerColor->SetParent(this->CornerDisplayFrame);
+  this->CornerOptions = vtkKWOptionMenu::New();
+  this->CornerOptions->SetParent(this->CornerOptionsFrame);
   this->CornerLabel = vtkKWWidget::New();
-  this->CornerLabel->SetParent(this->AnnotationProperties);
+  this->CornerLabel->SetParent(this->CornerFrame->GetFrame());
+  this->CornerOptionsLabel = vtkKWWidget::New();
+  this->CornerOptionsLabel->SetParent(this->CornerOptionsFrame);
   this->CornerText = vtkKWText::New();
-  this->CornerText->SetParent(this->AnnotationProperties);
+  this->CornerText->SetParent(this->CornerFrame->GetFrame());
   this->CornerMapper = vtkTextMapper::New();
   this->CornerMapper->SetFontSize(15);  
-  this->CornerMapper->ShadowOn();  
+  this->CornerMapper->ShadowOff();  
   this->CornerProp = vtkScaledTextActor::New();
   this->CornerProp->SetMaximumLineHeight(0.25);
   this->CornerProp->SetWidth(0.4);
@@ -96,10 +118,6 @@ vtkKWView::vtkKWView()
   this->CornerMapper->SetJustificationToLeft();
   this->CornerComposite = vtkKWGenericComposite::New();
   this->CornerComposite->SetProp(this->CornerProp);
-  this->CornerButton = vtkKWCheckButton::New();
-  this->CornerButton->SetParent(this->AnnotationProperties);
-  this->CornerOptions = vtkKWOptionMenu::New();
-  this->CornerOptions->SetParent(this->AnnotationProperties);
   this->PropertiesCreated = 0;
   this->InteractiveUpdateRate = 5.0;
   this->NumberOfStillUpdates  = 1;
@@ -119,15 +137,24 @@ vtkKWView::~vtkKWView()
   this->HeaderComposite->Delete();
   this->HeaderProp->Delete();
   this->HeaderMapper->Delete();
+  this->HeaderFrame->Delete();
+  this->HeaderDisplayFrame->Delete();
+  this->HeaderColor->Delete();
+  this->HeaderEntryFrame->Delete();
   this->HeaderButton->Delete();
   this->HeaderLabel->Delete();
   this->HeaderEntry->Delete();
 
+  this->CornerFrame->Delete();
+  this->CornerDisplayFrame->Delete();
+  this->CornerOptionsFrame->Delete();
   this->CornerComposite->Delete();
   this->CornerProp->Delete();
   this->CornerMapper->Delete();
   this->CornerButton->Delete();
   this->CornerLabel->Delete();
+  this->CornerOptionsLabel->Delete();
+  this->CornerColor->Delete();
   this->CornerText->Delete();
   this->CornerOptions->Delete();
   
@@ -266,35 +293,56 @@ void vtkKWView::CreateViewProperties()
   this->Notebook->Raise("Anno");
   
   // create the anno widgets
+  this->HeaderFrame->Create(app);
+  this->HeaderFrame->SetLabel("Header Annotation");
+  this->HeaderDisplayFrame->Create(app,"frame","");
+  this->HeaderEntryFrame->Create(app,"frame","");
+  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->HeaderFrame->GetWidgetName());
+    this->Script("pack %s %s -side top -padx 2 -pady 4 -expand 1 -fill x -anchor nw",
+               this->HeaderDisplayFrame->GetWidgetName(),
+               this->HeaderEntryFrame->GetWidgetName());
+
   this->HeaderButton->Create(this->Application,
                              "-text {Display Header Annotation}");
   this->HeaderButton->SetCommand(this, "OnDisplayHeader");
-  this->Script("pack %s -padx 2 -pady 4 -anchor nw",
+  this->HeaderColor->Create(this->Application, "");
+  this->HeaderColor->SetCommand( this, "SetHeaderTextColor" );
+  this->Script("pack %s -side left -padx 2 -pady 4 -anchor nw",
                this->HeaderButton->GetWidgetName());
-  this->HeaderLabel->Create(app,"label","-text Header");
-  this->HeaderEntry->Create(app,"-width 28");
+  this->Script("pack %s -side right -padx 2 -pady 4 -anchor ne",
+               this->HeaderColor->GetWidgetName());
+  this->HeaderLabel->Create(app,"label","-text Header:");
+  this->HeaderEntry->Create(app,"-width 20");
   this->Script("bind %s <Return> {%s HeaderChanged}",
                this->HeaderEntry->GetWidgetName(),this->GetTclName());
-  this->Script("pack %s -side top -anchor w -padx 4 -expand yes",
+  this->Script("pack %s -side left -anchor w -padx 4 -expand no",
                this->HeaderLabel->GetWidgetName());
-  this->Script("pack %s -side top -anchor w -padx 4 -expand yes -fill x",
+  this->Script("pack %s -side left -anchor w -padx 4 -expand yes -fill x",
                this->HeaderEntry->GetWidgetName());
-  
+
+  this->CornerFrame->Create(app);
+  this->CornerFrame->SetLabel("Corner Annotation");
+  this->CornerDisplayFrame->Create( app, "frame", "" );
+  this->CornerOptionsFrame->Create( app, "frame", "" );
+  this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
+               this->CornerFrame->GetWidgetName());
+  this->Script(
+	   "pack %s -side top -padx 0 -pady 0 -expand 1 -fill x -anchor nw",
+	   this->CornerDisplayFrame->GetWidgetName() );
   this->CornerButton->Create(this->Application,
                              "-text {Display Corner Annotation}");
   this->CornerButton->SetCommand(this, "OnDisplayCorner");
-  this->Script("pack %s -padx 2 -pady 4 -anchor nw",
+  this->Script("pack %s -side left -padx 2 -pady 4 -anchor nw",
                this->CornerButton->GetWidgetName());
-  this->CornerLabel->Create(app,"label","-text {Corner Text}");
-  this->CornerText->Create(app,"-height 4 -width 28");
-  this->Script("bind %s <Return> {%s CornerChanged}",
-               this->CornerText->GetWidgetName(), 
-               this->GetTclName());
-  this->Script("pack %s -side top -anchor w -padx 4 -expand yes",
-               this->CornerLabel->GetWidgetName());
-  this->Script("pack %s -side top -anchor w -padx 4 -expand yes -fill x",
-               this->CornerText->GetWidgetName());
-  
+  this->CornerColor->Create( app, "" );
+  this->Script("pack %s -side right -padx 2 -pady 4 -anchor ne",
+               this->CornerColor->GetWidgetName());
+  this->CornerColor->SetCommand( this, "SetCornerTextColor" );
+  this->Script(
+	   "pack %s -side top -padx 0 -pady 0 -expand 1 -fill x -anchor nw",
+	   this->CornerOptionsFrame->GetWidgetName() );
+  this->CornerOptionsLabel->Create(app,"label","-text {Location: }");
   this->CornerOptions->Create(this->Application,"");
   this->CornerOptions->AddEntryWithCommand("Lower Left",this->GetTclName(),
                                            "CornerSelected 0");
@@ -305,8 +353,33 @@ void vtkKWView::CreateViewProperties()
   this->CornerOptions->AddEntryWithCommand("Upper Right",this->GetTclName(),
                                            "CornerSelected 3");
   this->CornerOptions->SetCurrentEntry("Lower Left");
-  this->Script("pack %s -side top -anchor w -padx 4 -expand yes",
+  this->Script("pack %s -side left -anchor w -padx 4 -expand no",
+    this->CornerOptionsLabel->GetWidgetName());
+  this->Script("pack %s -side left -anchor w -padx 4 -expand yes",
     this->CornerOptions->GetWidgetName());
+
+  this->CornerLabel->Create(app,"label","-text {Corner Text}");
+  this->CornerText->Create(app,"-height 4 -width 28");
+  this->Script("bind %s <Return> {%s CornerChanged}",
+               this->CornerText->GetWidgetName(), 
+               this->GetTclName());
+  this->Script("pack %s -side top -anchor w -padx 4 -expand yes",
+               this->CornerLabel->GetWidgetName());
+  this->Script("pack %s -side top -anchor w -padx 4 -pady 2 -expand yes -fill x",
+               this->CornerText->GetWidgetName());
+  
+}
+
+void vtkKWView::SetHeaderTextColor( float r, float g, float b )
+{
+  this->HeaderProp->GetProperty()->SetColor( r, g, b );
+  this->Render();
+}
+
+void vtkKWView::SetCornerTextColor( float r, float g, float b )
+{
+  this->CornerProp->GetProperty()->SetColor( r, g, b );
+  this->Render();
 }
 
 void vtkKWView::ShowViewProperties()
