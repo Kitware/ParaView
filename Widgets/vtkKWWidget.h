@@ -84,6 +84,11 @@ public:
   // The caller is resposible for deleting the returned string.  
   char* CreateCommand(vtkKWObject* Object, const char* MethodAndArgString);
 
+  // Description:
+  // Setting this string enables balloon help for this widget.
+  void SetBalloonHelpString(char *str);
+  vtkGetStringMacro(BalloonHelpString);
+
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
@@ -94,6 +99,8 @@ protected:
   vtkKWWidget *Parent;
   vtkKWWidgetCollection *Children; 
   int DeletingChildren;
+
+  char *BalloonHelpString;
 };
 
 

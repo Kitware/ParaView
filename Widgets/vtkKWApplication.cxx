@@ -89,11 +89,29 @@ vtkKWApplication::vtkKWApplication()
                              vtkKWApplicationCommand);
 
   this->Script("set Application %s",this->MainInterp->result);
+
+  this->BalloonHelpWindow = vtkKWWidget::New();
+  this->BalloonHelpLabel = vtkKWWidget::New();
+  this->BalloonHelpLabel->SetParent(this->BalloonHelpWindow);
+  this->BalloonHelpPending = NULL;
+
+  //this->BalloonHelpWindow->SetParent(this->GetParentWindow());
+  this->BalloonHelpWindow->Create(this, "toplevel", "-background black -borderwidth 1 -relief flat");
+  this->BalloonHelpLabel->Create(this, "label", "-background LightYellow -justify left -wraplength 2i");
+  this->Script("pack %s", this->BalloonHelpLabel->GetWidgetName());
+  this->Script("wm overrideredirect %s 1", this->BalloonHelpWindow->GetWidgetName());
+  this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
 }
 
 vtkKWApplication::~vtkKWApplication()
 {
   this->SetApplicationName(NULL);
+
+  this->BalloonHelpWindow->Delete();
+  this->BalloonHelpWindow = NULL;
+  this->BalloonHelpLabel->Delete();
+  this->BalloonHelpLabel = NULL;
+  this->SetBalloonHelpPending(NULL);
 }
 
 void vtkKWApplication::Script(char *format, ...)
@@ -226,4 +244,57 @@ void vtkKWApplication::DisplayHelp()
   dlg->Invoke();  
 #endif
 }
+
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
+{
+  char *result;
+
+  this->BalloonHelpCancel();
+  this->Script("after 2000 {%s BalloonHelpDisplay %s}", 
+               this->GetTclName(), widget->GetTclName());
+  result = this->GetMainInterp()->result;
+  this->SetBalloonHelpPending(result);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
+{
+  int x, y;
+
+  this->Script("%s configure -text {%s}", 
+               this->BalloonHelpLabel->GetWidgetName(), 
+               widget->GetBalloonHelpString());
+
+  // Get the position of the mouse in the renderer.
+  this->Script( "winfo pointerx %s", widget->GetWidgetName());
+  x = vtkKWObject::GetIntegerResult(this);
+  this->Script( "winfo pointery %s", widget->GetWidgetName());
+  y = vtkKWObject::GetIntegerResult(this);
+
+  // Set the position of the window relative to the mouse.
+  this->Script("wm geometry %s +%d+%d",
+               this->BalloonHelpWindow->GetWidgetName(), x, y+15);
+  this->Script("update");
+
+  // map the window
+  this->Script("wm deiconify %s", this->BalloonHelpWindow->GetWidgetName());
+  this->Script("raise %s", this->BalloonHelpWindow->GetWidgetName());
+  this->SetBalloonHelpPending(NULL);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::BalloonHelpCancel()
+{
+  if (this->BalloonHelpPending)
+    {
+    this->Script("after cancel %s", this->BalloonHelpPending);
+    this->SetBalloonHelpPending(NULL);
+    }
+  this->Script("wm withdraw %s",this->BalloonHelpWindow->GetWidgetName());
+}
+
 

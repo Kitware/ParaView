@@ -56,11 +56,16 @@ vtkKWWidget::vtkKWWidget()
   this->Parent = NULL;
   this->CommandFunction = vtkKWWidgetCommand;
   this->Children = vtkKWWidgetCollection::New();
-  this->DeletingChildren= 0;  
+  this->DeletingChildren= 0;
+  this->BalloonHelpString = NULL;  
 }
 
 vtkKWWidget::~vtkKWWidget()
 {
+  if (this->BalloonHelpString)
+    {
+    this->SetBalloonHelpString(NULL);
+    }
   this->Children->Delete();
   
   if (this->Application)
@@ -188,4 +193,50 @@ char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * Command
 	<< CalledObject->GetTclName() 
 	<< " " << CommandString << "} " << ends;
   return event.str();
+}
+
+void vtkKWWidget::SetBalloonHelpString(char *str)
+{
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Application needs to be set before balloon help.");
+    return;
+    }
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // We do not need to change the bindings if the string is replaced
+  // with another string.
+  if (this->BalloonHelpString == NULL && str != NULL)
+    { // Turning balloon help on.
+    this->Script("bind %s <Enter> {%s BalloonHelpTrigger %s}", 
+               this->GetWidgetName(), this->Application->GetTclName(),
+               this->GetTclName());
+    this->Script("bind %s <ButtonPress> {%s BalloonHelpCancel}", 
+               this->GetWidgetName(), this->Application->GetTclName());
+    this->Script("bind %s <Leave> {%s BalloonHelpCancel}", 
+               this->GetWidgetName(), this->Application->GetTclName());
+    }
+  if (this->BalloonHelpString != NULL && str == NULL)
+    { // Turning balloon help off.
+    this->Script("catch {bind %s <Enter> {}}", this->GetWidgetName());
+    this->Script("catch {bind %s <ButtonPress> {}}", this->GetWidgetName());
+    this->Script("catch {bind %s <Leave> {}}", this->GetWidgetName());
+    }
+
+  // Normal string stuff.
+  if (this->BalloonHelpString)
+    {
+    delete [] this->BalloonHelpString;
+    this->BalloonHelpString = NULL;
+    }
+  if (str != NULL)
+    {
+    this->BalloonHelpString = new char[strlen(str)+1];
+    strcpy(this->BalloonHelpString, str);
+    }
 }

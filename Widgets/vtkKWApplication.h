@@ -95,6 +95,12 @@ public:
   void Script(char *EventString, ...);
   void SimpleScript(char *EventString);
 //ETX
+
+  // Description:
+  // Internal Balloon help callbacks.
+  void BalloonHelpTrigger(vtkKWWidget *widget);
+  void BalloonHelpDisplay(vtkKWWidget *widget);
+  void BalloonHelpCancel();
   
 protected:
   vtkKWApplication();
@@ -106,6 +112,13 @@ protected:
   Tcl_Interp *MainInterp;
   vtkKWWindowCollection *Windows;
   char *ApplicationName;
+
+  // For Balloon help
+  vtkKWWidget *BalloonHelpWindow;
+  vtkKWWidget *BalloonHelpLabel;
+  char *BalloonHelpPending;
+  vtkSetStringMacro(BalloonHelpPending);
+
 };
 
 #endif
