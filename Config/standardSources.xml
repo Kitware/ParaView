@@ -1,9 +1,3 @@
 <Interfaces>
 <!-- Define local system-wide source interfaces here. -->
- <Source class="vtkPLOT3DReader" root="Plot3D" output="vtkStructuredGrid">
-  <File name="XYZFileName" extension="bin" help="Set the geometry file to read."/>
-  <File name="QFileName" extension="bin" help="Set the data file to read."/>
-  <Scalar name="ScalarFunctionNumber" type="int" help="PLOT3D number for scalars"/>
-  <Scalar name="VectorFunctionNumber" type="int" help="PLOT3D number for vectors"/>
- </Source>
 </Interfaces>
