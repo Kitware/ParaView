@@ -26,7 +26,7 @@ PROJECT=paraview
 CVS_MODULE=ParaViewComplete
 
 # Release version number.
-TAG="HEAD"
+TAG="ParaView-1-0"
 PARAVIEW_VERSION="1.0"
 VERSION="${PARAVIEW_VERSION}.0"
 RELEASE="1"
