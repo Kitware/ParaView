@@ -92,9 +92,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #ifndef VTK_USE_ANSI_STDLIB
-#define PV_NOCREATE ios::nocreate
+#define PV_NOCREATE | ios::nocreate
 #else
-#define PV_NOCREATE 0
+#define PV_NOCREATE 
 #endif
 
 //----------------------------------------------------------------------------
@@ -829,7 +829,7 @@ void vtkPVWindow::PlayDemo()
     sprintf(temp2,"%s/Data/blow.vtk",loc);
     }
 
-  ifstream fptr2(temp2, ios::in | PV_NOCREATE);
+  ifstream fptr2(temp2, ios::in  PV_NOCREATE);
   if (!fptr2.fail())
     {
     fptr2.close();
@@ -838,7 +838,7 @@ void vtkPVWindow::PlayDemo()
     }
 
   vtkDebugMacro(<<temp1);
-  ifstream fptr(temp1, ios::in | PV_NOCREATE);
+  ifstream fptr(temp1, ios::in  PV_NOCREATE);
   if (!fptr.fail())
     {
     fptr.close();
@@ -857,7 +857,7 @@ void vtkPVWindow::PlayDemo()
     if (!foundData)
       {
       sprintf(temp2, "%s/Data/blow.vtk", *dir);
-      ifstream fptr2(temp2, ios::in | PV_NOCREATE);
+      ifstream fptr2(temp2, ios::in  PV_NOCREATE);
       if (!fptr2.fail())
 	{
 	fptr2.close();
@@ -870,7 +870,7 @@ void vtkPVWindow::PlayDemo()
   for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
     {
     sprintf(temp1, "%s/Demos/Demo1.tcl", *dir);
-    ifstream fptr(temp1, ios::in | PV_NOCREATE);
+    ifstream fptr(temp1, ios::in  PV_NOCREATE);
     if (!fptr.fail())
       {
       fptr.close();
@@ -912,7 +912,7 @@ void vtkPVWindow::OpenCallback()
     return;
     }
 
-  input = new ifstream(openFileName, ios::in|PV_NOCREATE );
+  input = new ifstream(openFileName, ios::in PV_NOCREATE );
   if (input->fail())
     {
     vtkErrorMacro("Permission denied for opening " << openFileName);
