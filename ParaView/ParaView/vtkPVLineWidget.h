@@ -53,12 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPV3DWidget.h"
 
-class vtkKWCheckButton;
 class vtkKWEntry;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
 class vtkLineWidget;
-class vtkLineWidgetObserver;
 
 class VTK_EXPORT vtkPVLineWidget : public vtkPV3DWidget
 {

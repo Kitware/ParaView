@@ -41,13 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVLineWidget.h"
 
-#include "vtkCommand.h"
 #include "vtkDataSet.h"
-#include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
 #include "vtkLineWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -56,49 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
-
-//===========================================================================
-//***************************************************************************
-class vtkLineWidgetObserver : public vtkCommand
-{
-public:
-  static vtkLineWidgetObserver *New() 
-    {return new vtkLineWidgetObserver;};
-
-  vtkLineWidgetObserver()
-    {
-      this->PVLineWidget = 0;
-    }
-
-  virtual void Execute(vtkObject* wdg, unsigned long, 
-                       void*)
-    {
-      vtkLineWidget* widget = vtkLineWidget::SafeDownCast(wdg);
-      if (!widget)
-	{
-	return;
-	}
-      if (this->PVLineWidget)
-	{
-	float val[3];
-	int i;
-	widget->GetPoint1(val);
-	for (i=0; i<3; i++)
-	  {
-	  this->PVLineWidget->Point1[i]->SetValue(val[i],5);
-	  }
-	widget->GetPoint2(val);
-	for (i=0; i<3; i++)
-	  {
-	  this->PVLineWidget->Point2[i]->SetValue(val[i],5);
-	  }
-	}
-    }
-
-  vtkPVLineWidget* PVLineWidget;
-};
-//***************************************************************************
-//===========================================================================
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget* vtkPVLineWidget::New()
