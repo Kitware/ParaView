@@ -681,8 +681,13 @@ void vtkPVSource::AcceptCallback()
   
   window = this->GetWindow();
   
-  this->Script("%s configure -background gray75",
+#ifdef _WIN32
+  this->Script("%s configure -background SystemButtonFace",
                this->AcceptButton->GetWidgetName());
+#else
+  this->Script("%s configure -background #d9d9d9",
+               this->AcceptButton->GetWidgetName());
+#endif
   
   // Call the commands to set ivars from widget values.
   for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
