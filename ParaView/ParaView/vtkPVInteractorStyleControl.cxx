@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.19.2.2");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.19.2.3");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -600,10 +600,9 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
     this->Menus[cc]->Create(app, "-anchor w");
     }
 
-  this->Labels[0]->SetLabel("Left");
-  this->Labels[1]->SetLabel("Middle");
-  this->Labels[2]->SetLabel("Right");
-  this->Labels[3]->SetLabel("Plain");
+  this->Labels[0]->SetLabel("Left Button");
+  this->Labels[1]->SetLabel("Middle Button");
+  this->Labels[2]->SetLabel("Right Button");
   this->Labels[4]->SetLabel("Shift");
   this->Labels[5]->SetLabel("Control");
 
