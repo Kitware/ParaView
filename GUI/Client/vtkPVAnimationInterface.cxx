@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.122");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.123");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1563,7 +1563,8 @@ int vtkPVAnimationInterface::IsAnimationValid()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file, 
                                                 const char* imageFileName,
-                                                const char* /*geometryFileName*/)
+                                                const char* /*geometryFileName*/,
+                                                const char* writerName)
 {
   char *root;
   char *ext;
@@ -1626,11 +1627,13 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
         *ext = '\0';
         ++ext;
         *file << "$Ren1 WriteImage {" << root << countStr
-               << "." << ext << "}\n";
+              << "." << ext << "} " << writerName << "\n";
          }
        else
          {
-         *file << "$Ren1 WriteImage {" << root << countStr << "}\n";
+         *file 
+           << "$Ren1 WriteImage {" << root << countStr << "} " << writerName
+           << "\n";
          }
       }
     else
