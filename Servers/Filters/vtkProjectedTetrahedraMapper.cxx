@@ -60,7 +60,7 @@ static int tet_edges[6][2] = { {0,1}, {1,2}, {2,0},
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.4");
+vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.5");
 vtkStandardNewMacro(vtkProjectedTetrahedraMapper);
 
 vtkCxxSetObjectMacro(vtkProjectedTetrahedraMapper,
@@ -289,11 +289,11 @@ void vtkProjectedTetrahedraMapper::Render(vtkRenderer *renderer,
 //-----------------------------------------------------------------------------
 
 template<class point_type>
-static void TransformPoints(const point_type *in_points,
-                            vtkIdType num_points,
-                            const float projection_mat[16],
-                            const float modelview_mat[16],
-                            float *out_points);
+void vtkProjectedTetrahedraMapperTransformPoints(const point_type *in_points,
+                                                 vtkIdType num_points,
+                                                 const float projection_mat[16],
+                                                 const float modelview_mat[16],
+                                                 float *out_points);
 
 static inline float GetCorrectedDepth(float x, float y, float z1, float z2,
                                       const float inverse_projection_mat[16],
@@ -415,10 +415,12 @@ void vtkProjectedTetrahedraMapper::ProjectTetrahedra(vtkRenderer *renderer,
   float *points = this->TransformedPoints->GetPointer(0);
   switch (input->GetPoints()->GetDataType())
     {
-    vtkTemplateMacro(::TransformPoints((const VTK_TT *)input->GetPoints()->GetVoidPointer(0),
-                                       num_points,
-                                       projection_mat, modelview_mat,
-                                       points));
+    vtkTemplateMacro
+      (vtkProjectedTetrahedraMapperTransformPoints(
+                          (const VTK_TT *)input->GetPoints()->GetVoidPointer(0),
+                           num_points,
+                           projection_mat, modelview_mat,
+                           points));
     }
 
   if (renderer->GetRenderWindow()->CheckAbortStatus())
@@ -740,11 +742,11 @@ void vtkProjectedTetrahedraMapper::ProjectTetrahedra(vtkRenderer *renderer,
 //-----------------------------------------------------------------------------
 
 template<class point_type>
-static void TransformPoints(const point_type *in_points,
-                            vtkIdType num_points,
-                            const float projection_mat[16],
-                            const float modelview_mat[16],
-                            float *out_points)
+void vtkProjectedTetrahedraMapperTransformPoints(const point_type *in_points,
+                                                 vtkIdType num_points,
+                                                 const float projection_mat[16],
+                                                 const float modelview_mat[16],
+                                                 float *out_points)
 {
   float mat[16];
   int row, col;
