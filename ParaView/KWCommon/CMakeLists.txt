@@ -10,6 +10,7 @@ vtkKWRegisteryUtilities.cxx
 vtkKWSerializer.cxx
 vtkQueue.cxx
 vtkString.cxx
+vtkKWArguments.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
