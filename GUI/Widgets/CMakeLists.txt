@@ -208,7 +208,7 @@ ADD_LIBRARY(vtkKWWidgetsTCL ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
 
 IF(VTK_WRAP_TCL)
   TARGET_LINK_LIBRARIES (vtkKWWidgetsTCL
-    vtkKWCommonTCL
+    vtkKWCommon
     vtkHybridTCL
     vtkCommonTCL
     )
