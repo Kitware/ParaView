@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.31");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.32");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -1247,8 +1247,8 @@ int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
   do
     {
     keep_going = 0;
-    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator it = this->Internals->DragAndDropEntries.begin();
-    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator end = this->Internals->DragAndDropEntries.end();
+    it = this->Internals->DragAndDropEntries.begin();
+    end = this->Internals->DragAndDropEntries.end();
     while (it != end)
       {
       if (*it && this->IsDragAndDropWidgetAtOriginalLocation((*it)->Widget))

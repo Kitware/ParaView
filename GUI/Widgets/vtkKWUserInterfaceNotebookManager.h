@@ -259,6 +259,7 @@ protected:
     WidgetLocation FromLocation;
     WidgetLocation ToLocation;
   };
+  friend class vtkKWUserInterfaceNotebookManager::DragAndDropEntry;
 
   // PIMPL Encapsulation for STL containers
 
