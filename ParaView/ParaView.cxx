@@ -127,7 +127,23 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     { // The last process is for UI.
     // We need to pass the local controller to the UI process.
     Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
-    vtkPVApplication *app = vtkPVApplication::New();
+    
+    // To bypass vtkKWApplicaion assigning vtkKWApplicationCommand
+    // to the tcl command, create the application from tcl.
+    if (Tcl_Eval(interp, "vtkPVApplication Application") != TCL_OK)
+      {
+      cerr << "Error returned from tcl script.\n" << interp->result << endl;
+      }
+    int    error;
+    vtkPVApplication *app = (vtkPVApplication *)(
+      vtkTclGetPointerFromObject("Application","vtkPVApplication",
+				 interp,error));
+    if (app == NULL)
+      {
+      vtkGenericWarningMacro("Could not get application pointer.");
+      return;
+      }  
+    
     app->SetController(controller);
     app->Script("wm withdraw .");
     
@@ -146,13 +162,14 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     // We should use the application tcl name in the future.
     // All object in the satellite processes must be created through tcl.
     // (To assign the correct name).
-    if (Tcl_Eval(interp, "vtkPVApplication Slave") != TCL_OK)
+    if (Tcl_Eval(interp, "vtkPVApplication Application") != TCL_OK)
       {
       cerr << "Error returned from tcl script.\n" << interp->result << endl;
       }
     int    error;
     vtkPVApplication *app = (vtkPVApplication *)(
-      vtkTclGetPointerFromObject("Slave","vtkPVApplication",interp,error));
+      vtkTclGetPointerFromObject("Application","vtkPVApplication",
+				 interp,error));
     if (app == NULL)
       {
       vtkGenericWarningMacro("Could not get application pointer.");

@@ -51,6 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_POINT_COORDS_TAG 20
 #define VTK_NUM_POINTS_TAG   30
 #define VTK_NUM_CELLS_TAG    40
+#define VTK_POLY_DATA_TAG    50
+#define VTK_BOUNDS_TAG       60
 
 class VTK_EXPORT vtkGetRemoteGhostCells : public vtkPolyDataToPolyDataFilter 
 {

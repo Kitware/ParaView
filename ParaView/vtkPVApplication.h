@@ -60,13 +60,15 @@ public:
   // Script which is executed in the remot processes.
   // If a result string is passed in, the results are place in it. 
   void RemoteScript(int remoteId, char *EventString, ...);
-  void RemoteSimpleScript(int remoteId, char *str);
 
   // Description:
   // Can only be called by process 0.  It executes a script on every other process.
   void BroadcastScript(char *EventString, ...);
-  void BroadcastSimpleScript(char *str);
 //ETX
+  void RemoteSimpleScript(int remoteId, char *str);
+  void BroadcastSimpleScript(char *str);
+
+  
   
   // Description:
   // We need to keep the controller in a prominent spot because there is no more 
