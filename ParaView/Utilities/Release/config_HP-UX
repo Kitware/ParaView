@@ -19,7 +19,7 @@ EOF
 
     write_standard_cache &&
     cat >> CMakeCache.txt <<EOF
-CMAKE_EXE_LINKER_FLAGS:STRING=-ldld -Wl,-a,archive_shared
+CMAKE_EXE_LINKER_FLAGS:STRING=-ldld -lc_r -Wl,-a,archive_shared
 CMAKE_USER_MAKE_RULES_OVERRIDE:STRING=${BINDIR}/UserMakeRules.cmake
 EOF
 }

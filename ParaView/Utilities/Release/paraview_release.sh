@@ -23,8 +23,8 @@
 #
 
 # Release version number.
-TAG="HEAD"
-PARAVIEW_VERSION="1.1"
+TAG="ParaView-1-2-0"
+PARAVIEW_VERSION="1.2"
 VERSION="${PARAVIEW_VERSION}.0"
 RELEASE="1"
 
@@ -346,6 +346,8 @@ checkout()
         mkdir CheckoutTemp &&
         cd CheckoutTemp &&
         cvs -q -z3 -d $CVSROOT export -r ${TAG} ${CVS_MODULE} &&
+        rm -rf ${CVS_MODULE}/Xdmf/Utilities/expat &&
+        rm -rf ${CVS_MODULE}/Xdmf/Utilities/zlib &&
         mv ${CVS_MODULE} ../${PROJECT}-${VERSION} &&
         cd .. &&
         rm -rf CheckoutTemp
@@ -461,6 +463,7 @@ CMAKE_SKIP_RPATH:BOOL=1
 CMAKE_VERBOSE_MAKEFILE:BOOL=TRUE
 PARAVIEW_LINK_XDMF:BOOL=ON
 USE_INCLUDED_TCLTK:BOOL=ON
+USE_INSTALLED_TCLTK_PACKAGES:BOOL=OFF
 VTK_USE_64BIT_IDS:BOOL=OFF
 VTK_USE_HYBRID:BOOL=ON
 VTK_USE_MPI:BOOL=OFF
@@ -526,7 +529,7 @@ install()
 {
     [ -z "${DONE_install}" ] || return 0 ; DONE_install="yes"
     config || return 1
-    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/ParaView" ] || build || return 1
+    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/paraview" ] || build || return 1
     echo "Running make install ..." &&
     (
         rm -rf Install &&
@@ -540,7 +543,7 @@ strip()
 {
     [ -z "${DONE_strip}" ] || return 0 ; DONE_strip="yes"
     config || return 1
-    [ -f "Install${PREFIX}/bin/ParaView" ] || install || return 1
+    [ -f "Install${PREFIX}/bin/paraview" ] || install || return 1
     echo "Stripping executables ..." &&
     (
         strip Install${PREFIX}/bin/*
@@ -552,7 +555,7 @@ manifest()
 {
     [ -z "${DONE_manifest}" ] || return 0 ; DONE_manifest="yes"
     config || return 1
-    [ -f "Install${PREFIX}/bin/ParaView" ] || install || return 1
+    [ -f "Install${PREFIX}/bin/paraview" ] || install || return 1
     echo "Writing MANIFEST ..." &&
     (
         mkdir -p Install${PREFIX}${DOC_DIR} &&
