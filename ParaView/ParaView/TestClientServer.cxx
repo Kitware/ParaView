@@ -21,12 +21,13 @@ void RunServer(void * p)
 
 int main(int ac, char* av[])
 {
-  vtkstd::string path = PARAVIEW_BINARY_DIR;
+  vtkstd::string path = "\"";
+  path += PARAVIEW_BINARY_DIR;
   path += "/bin";
 #ifdef  CMAKE_INTDIR
   path += "/" CMAKE_INTDIR;
 #endif
-  path += "/paraview";
+  path += "/paraview\"";
   vtkMultiThreader* thread = vtkMultiThreader::New();
   thread->SetNumberOfThreads(2);
   int id = 
@@ -39,9 +40,9 @@ int main(int ac, char* av[])
   path += " --client";
   for(int i =1; i < ac; ++i)
     {
-    path += " ";
+    path += " \"";
     path += av[i];
-    path += " ";
+    path += "\"";
     }
   cout << "Running:" <<  path.c_str() << "\n";
   cout.flush();
