@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCornerAnnotation.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
+#include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkMultiProcessController.h"
@@ -572,48 +573,6 @@ void vtkPVRenderView::CreateViewProperties()
   //this->RenderParametersFrame->ShowHideFrameOn();
 
   
-  this->StandardViewsFrame->SetParent( this->GeneralProperties );
-  this->StandardViewsFrame->Create(this->Application);
-  this->StandardViewsFrame->SetLabel("Standard Views");
-
-  this->XMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->XMaxViewButton->SetLabel("+X");
-  this->XMaxViewButton->Create(this->Application, "");
-  this->XMaxViewButton->SetCommand(this, "StandardViewCallback 1 0 0");
-  this->Script("grid configure %s -column 0 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->XMaxViewButton->GetWidgetName());
-  this->XMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->XMinViewButton->SetLabel("-X");
-  this->XMinViewButton->Create(this->Application, "");
-  this->XMinViewButton->SetCommand(this, "StandardViewCallback -1 0 0");
-  this->Script("grid configure %s -column 0 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->XMinViewButton->GetWidgetName());
-
-  this->YMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->YMaxViewButton->SetLabel("+Y");
-  this->YMaxViewButton->Create(this->Application, "");
-  this->YMaxViewButton->SetCommand(this, "StandardViewCallback 0 1 0");
-  this->Script("grid configure %s -column 1 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->YMaxViewButton->GetWidgetName());
-  this->YMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->YMinViewButton->SetLabel("-Y");
-  this->YMinViewButton->Create(this->Application, "");
-  this->YMinViewButton->SetCommand(this, "StandardViewCallback 0 -1 0");
-  this->Script("grid configure %s -column 1 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->YMinViewButton->GetWidgetName());
-
-  this->ZMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->ZMaxViewButton->SetLabel("+Z");
-  this->ZMaxViewButton->Create(this->Application, "");
-  this->ZMaxViewButton->SetCommand(this, "StandardViewCallback 0 0 1");
-  this->Script("grid configure %s -column 2 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->ZMaxViewButton->GetWidgetName());
-  this->ZMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
-  this->ZMinViewButton->SetLabel("-Z");
-  this->ZMinViewButton->Create(this->Application, "");
-  this->ZMinViewButton->SetCommand(this, "StandardViewCallback 0 0 -1");
-  this->Script("grid configure %s -column 2 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->ZMinViewButton->GetWidgetName());
 
   this->RenderParametersFrame->ShowHideFrameOn();
   this->RenderParametersFrame->Create(this->Application);
@@ -824,10 +783,55 @@ void vtkPVRenderView::CreateViewProperties()
 
 #endif
 
-  this->ManipulatorControl2D->SetParent(this->GeneralProperties);
+  this->Notebook->AddPage("Camera", "Camera and viewing navigation properties page");
+  vtkKWWidget* page = this->Notebook->GetFrame("Camera");
+
+  this->StandardViewsFrame->SetParent( page );
+  this->StandardViewsFrame->Create(this->Application);
+  this->StandardViewsFrame->SetLabel("Standard Views");
+
+  this->XMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->XMaxViewButton->SetLabel("+X");
+  this->XMaxViewButton->Create(this->Application, "");
+  this->XMaxViewButton->SetCommand(this, "StandardViewCallback 1 0 0");
+  this->Script("grid configure %s -column 0 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->XMaxViewButton->GetWidgetName());
+  this->XMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->XMinViewButton->SetLabel("-X");
+  this->XMinViewButton->Create(this->Application, "");
+  this->XMinViewButton->SetCommand(this, "StandardViewCallback -1 0 0");
+  this->Script("grid configure %s -column 0 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->XMinViewButton->GetWidgetName());
+
+  this->YMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->YMaxViewButton->SetLabel("+Y");
+  this->YMaxViewButton->Create(this->Application, "");
+  this->YMaxViewButton->SetCommand(this, "StandardViewCallback 0 1 0");
+  this->Script("grid configure %s -column 1 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->YMaxViewButton->GetWidgetName());
+  this->YMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->YMinViewButton->SetLabel("-Y");
+  this->YMinViewButton->Create(this->Application, "");
+  this->YMinViewButton->SetCommand(this, "StandardViewCallback 0 -1 0");
+  this->Script("grid configure %s -column 1 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->YMinViewButton->GetWidgetName());
+
+  this->ZMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->ZMaxViewButton->SetLabel("+Z");
+  this->ZMaxViewButton->Create(this->Application, "");
+  this->ZMaxViewButton->SetCommand(this, "StandardViewCallback 0 0 1");
+  this->Script("grid configure %s -column 2 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->ZMaxViewButton->GetWidgetName());
+  this->ZMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
+  this->ZMinViewButton->SetLabel("-Z");
+  this->ZMinViewButton->Create(this->Application, "");
+  this->ZMinViewButton->SetCommand(this, "StandardViewCallback 0 0 -1");
+  this->Script("grid configure %s -column 2 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
+               this->ZMinViewButton->GetWidgetName());
+  this->ManipulatorControl2D->SetParent(page);
   this->ManipulatorControl2D->Create(pvapp, 0);
   this->ManipulatorControl2D->SetLabel("2D Movements");
-  this->ManipulatorControl3D->SetParent(this->GeneralProperties);
+  this->ManipulatorControl3D->SetParent(page);
   this->ManipulatorControl3D->Create(pvapp, 0);
   this->ManipulatorControl3D->SetLabel("3D Movements");
 
@@ -836,6 +840,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->Script("pack %s %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->ManipulatorControl2D->GetWidgetName(),
                this->ManipulatorControl3D->GetWidgetName());
+  this->Notebook->Raise("General");
 }
 
 //----------------------------------------------------------------------------

@@ -2636,27 +2636,27 @@ void vtkPVWindow::SaveTrace()
   exportDialog->SetDefaultExt(".pvs");
   exportDialog->SetFileTypes("{{ParaView Scripts} {.pvs}} {{All Files} {.*}}");
   if ( exportDialog->Invoke() && 
-       vtkString::Length(exportDialog->GetFileName())>0)
+       vtkString::Length(exportDialog->GetFileName())>0 &&
+       this->SaveTrace(exportDialog->GetFileName()) )
     {
-    this->SaveTrace(exportDialog->GetFileName());
     this->SaveLastPath(exportDialog, "SaveTracePath");
     }
   exportDialog->Delete();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::SaveTrace(const char* filename)
+int vtkPVWindow::SaveTrace(const char* filename)
 {
   ofstream *trace = this->GetPVApplication()->GetTraceFile();
   cout << trace << endl;
   if ( ! trace)
     {
-    return;
+    return 0;
     }
   
   if (vtkString::Length(filename) <= 0)
     {
-    return;
+    return 0;
     }
   
   trace->close();
@@ -2678,6 +2678,7 @@ void vtkPVWindow::SaveTrace(const char* filename)
     }
 
   trace->open("ParaViewTrace.pvs", ios::in | ios::app );
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -2791,30 +2792,20 @@ void vtkPVWindow::LoadScript(const char *name)
 //----------------------------------------------------------------------------
 int vtkPVWindow::OpenPackage()
 {
-
-  char buffer[1024];
-  // Retrieve old path from the registery
-  if ( !this->GetApplication()->GetRegisteryValue(
-         2, "RunTime", "PackagePath", buffer) )
+  int res = 0;
+  vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
+  this->RetrieveLastPath(loadDialog, "PackagePath");
+  loadDialog->Create(this->Application,"");
+  loadDialog->SetTitle("Open ParaView Package");
+  loadDialog->SetDefaultExt(".xml");
+  loadDialog->SetFileTypes("{{ParaView Package Files} {*.xml}} {{All Files} {*.*}}");
+  if ( loadDialog->Invoke() && this->OpenPackage(loadDialog->GetFileName()) )
     {
-    sprintf(buffer, ".");
+    this->SaveLastPath(loadDialog, "PackagePath");
+    res = 1;
     }
-
-  this->Script(
-    "set openFileName [tk_getOpenFile -initialdir {%s} "
-    "-filetypes {{{ParaView Package Files} {*.xml}} {{All Files} {*.*}}}]", 
-    buffer);
-
-  char* openFileName 
-    = vtkString::Duplicate(this->GetPVApplication()->GetMainInterp()->result);
-  
-  if (strcmp(openFileName, "") == 0)
-    {
-    return VTK_ERROR;
-    }
-
-  return this->OpenPackage(openFileName);
-
+  loadDialog->Delete();
+  return res;
 }
 
 //----------------------------------------------------------------------------
