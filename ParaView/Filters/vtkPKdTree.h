@@ -8,6 +8,23 @@
   Date:      $Date$
   Version:   $Revision$
 
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+  Copyright (C) 2003 Sandia Corporation
+  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+  license for use of this work by or on behalf of the U.S. Government.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that this Notice and any statement
+  of authorship are reproduced on all copies.
+
+  Contact: Lee Ann Fisk, lafisk@sandia.gov
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 // .NAME vtkPKdTree - Build a k-d tree decomposition of a list of points.
@@ -25,11 +42,10 @@
 #ifndef __vtkPKdTree_h
 #define __vtkPKdTree_h
 
-#include "vtkKdTree.h"
-#include "vtkMultiProcessController.h"
-#include "vtkCommunicator.h"
-#include "vtkVersion.h"
+#include <vtkKdTree.h>
 
+class vtkMultiProcessController;
+class vtkCommunicator;
 class vtkSubGroup;
 class vtkIdList;
 
@@ -37,6 +53,7 @@ class VTK_EXPORT vtkPKdTree : public vtkKdTree
 {
 public:
     vtkTypeRevisionMacro(vtkPKdTree, vtkKdTree);
+
 
     void PrintSelf(ostream& os, vtkIndent indent);
     void PrintTiming(ostream& os, vtkIndent indent);
@@ -87,24 +104,14 @@ public:
     vtkGetMacro(GhostLevel, int);
 
     // Description:
-    //    Set/Get whether any cell counts, including block level, 
-    //    are created.  If this is "On", we create tables indicating
+    //    Set/Get whether cell counts are computed.
+    //    If this is "On", we create tables indicating
     //    how many cells each processor has in each spatial region.
     //    Default is "Off".
 
     vtkBooleanMacro(ProcessCellCountData, int);
     vtkSetMacro(ProcessCellCountData, int);
     vtkGetMacro(ProcessCellCountData, int);
-
-    // Description:
-    //    Set/Get whether block level cell counts are created.  If
-    //    this is "On", the process cell counts will be broken down
-    //    per Exodus file block.  Default is "Off".  Ignored if
-    //    ProcessCellCountData is "Off".
-
-    vtkBooleanMacro(BlockData, int);
-    vtkSetMacro(BlockData, int);
-    vtkGetMacro(BlockData, int);
 
     // Description:
     //   Set/Get the communicator object
@@ -145,10 +152,12 @@ public:
     int AssignRegionsRoundRobin();
 
     // Description:
-    //    Let the PKdTree class assign a process to each region 
+    //    Let the PKdTree class assign a process to each region
     //    by assigning contiguous sets of spatial regions to each
-    //    process.  If the k-d tree has not yet been
-    //   built, the regions will be assigned after BuildLocator executes.
+    //    process.  The set of regions assigned to each process will
+    //    always have a union that is a convex space (a box).
+    //    If the k-d tree has not yet been built, the regions
+    //    will be assigned after BuildLocator executes.
 
     int AssignRegionsContiguous();
 
@@ -231,50 +240,25 @@ public:
     int GetRegionsCellCountForProcess(int ProcessId, int *count, int len);
 
     // Description:
-    //    Returns the number of blocks in the data set.
-
-    int GetNumberOfBlockIds();
-
-    // Description:
-    //    Adds the IDs of the blocks in the data set to the provided list. 
-    //    Returns the number of block IDs added.
-
-    int GetListOfBlockIds(vtkIdList *blockIds);
-
-    // Description:
-    //   Some data sets organize cells into blocks, each block having
-    //   and assigned unique non-negative block ID.  This function
-    //   adds to the supplied list the block Ids of all data found in
-    //   the given region.  Returns the number of block Ids added.
-
-    int GetBlockIdsInRegion(int regionId, vtkIdList *blockIds);
-
-    // Description:
-    //   Adds to the supplied list the regions containing the
-    //   given block ID.  Returns the number of region IDs added.
-
-    int GetRegionIdsContainingBlock(int blockID, vtkIdList *regionIds);
-
-    // Description:
-    //   Writes to the supplied array the number of cells found in
-    //   each block found in the given spatial region (up to a maximum
-    //   of len blocks).  The order of the block data written is the
-    //   order of the block Ids returned in GetBlockIdsInRegion.
-    //   Returns the number of cell counts written.
-
-    int GetBlockCellCountsInRegion(int regionId, int *cellCounts, int len);
-
-    // Description:
-    //   Returns the number of cells held by the given process for the
-    //   given region and block Id.
-
-    int GetProcessBlockCellCountInRegion(int processId, int regionId, int blockId);
-
-    // Description:
-    //    The internal process/region/block tables may require a 
+    //    The internal process/region cell count tables may require a 
     //    large amount of memory.  This call frees this memory.
 
     void ReleaseTables();
+
+    // Description:
+    //    Return a list of all processes in order from front to
+    //    back, given a vtkCamera
+
+    int DepthOrderAllProcesses(vtkCamera *camera, vtkIdList *orderedList);
+
+    // Description:
+    //    This class doesn't have enough public methods, so I am adding
+    //    two more.  While building the k-d tree data structure we also
+    //    calculate the global range for each cell array and each point
+    //    array across all processes.  Returns 1 on error, 0 otherwise.
+
+    int GetCellArrayGlobalRange(int arrayIndex, float range[2]);
+    int GetPointArrayGlobalRange(int arrayIndex, float range[2]);
 
     // Description:
     //   This is a useful function that probably belongs in some
@@ -293,7 +277,6 @@ private:
   int NumRegionsOrLess;
   int NumRegionsOrMore;
   int GhostLevel;
-  int BlockData;
   int ProcessCellCountData;
   int RegionAssignment;
 
@@ -309,6 +292,7 @@ private:
 
   int *RegionAssignmentMap;        // indexed by region ID
   int RegionAssignmentMapLength;
+  int **ProcessAssignmentMap;      // indexed by process ID
   int *NumRegionsAssigned;         // indexed by process ID
 
   vtkSetMacro(RegionAssignment, int);
@@ -327,22 +311,12 @@ private:
 
   int **CellCountList;                // indexed by region ID
 
-  // optional block data
-
-  int NumBlockIds;
-  int *BlockIdList;
-  int FirstBlockId;
-  int LastBlockId;
-  int BlockIdsContiguous;
-
-  int *NumBlocksInRegion;    // indexed by region ID
-  int *CumulativeNumBlocks;  // indexed by region ID
-  int **BlockList;           // indexed by region ID
-
-  int *TempBlockCounts;          // by region by block ID
-  int *TotalBlockCounts;         // by region by block ID
-
-  int **ProcessRegionBlockCounts;  // by process, by region, by block ID
+  float *CellDataMin;           // global range for data arrays
+  float *CellDataMax;
+  float *PointDataMin;
+  float *PointDataMax;
+  int NumCellArrays;
+  int NumPointArrays; 
 
   // distribution of indices for select operation
 
@@ -389,7 +363,12 @@ private:
   int PartitionSubArray(int L, int R, int K, int dim, int p1, int p2);
 
   int CompleteTree();
+#ifdef YIELDS_INCONSISTENT_REGION_BOUNDARIES
   void RetrieveData(vtkKdNode *kd, int *buf);
+#else
+  void ReduceData(vtkKdNode *kd, int *sources);
+  void BroadcastData(vtkKdNode *kd);
+#endif
 
   float *DataBounds(int L, int K, int R);
   void GetLocalMinMax(int L, int R, int me, float *min, float *max);
@@ -398,6 +377,7 @@ private:
   static int ComputeDepth(vtkKdNode *kd);
   static void PackData(vtkKdNode *kd, float *data);
   static void UnpackData(vtkKdNode *kd, float *data);
+  static void CheckFixRegionBoundaries(vtkKdNode *tree);
 
   // list management
 
@@ -415,24 +395,18 @@ private:
   void FreeRegionAssignmentLists();
   void InitializeProcessDataLists();
   int AllocateAndZeroProcessDataLists();
-  void FreeBlockDataLists();
   void FreeProcessDataLists();
 
   // Assigning regions to processors
 
   void AddProcessRegions(int procId, vtkKdNode *kd);
+  void BuildRegionListsForProcesses();
 
   // Gather process/region data totals
 
   int *CollectLocalRegionProcessData();
   int BuildRegionProcessTables();
   void AddEntry(int *list, int len, int id);
-  int FindBlockIdIndex(int block);
-  int FindBlockId(int index);
-  int FindRegionBlockIndex(int regionId, int blockIndex);
-  int BuildGlobalBlockIdList();
-  int SameBlockIdList(vtkDataArray *blockIds);
-  void BuildBlockCountTables();
   static int BinarySearch(int *list, int len, int which);
 
 };
