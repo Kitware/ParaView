@@ -49,8 +49,6 @@ vtkPVGlyph3D::vtkPVGlyph3D()
   g->SetVectorModeToUseNormal();
   this->SetVTKSource(g);
   g->Delete();
-  
-  this->Source = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -63,7 +61,7 @@ vtkPVGlyph3D* vtkPVGlyph3D::New()
 void vtkPVGlyph3D::AcceptCallback()
 {
   
-  if (this->Source == NULL)
+  if (this->vtkPVSource::GetNthInput(1) == NULL)
     {
     vtkPVPolyDataSource *cone;
     cone = this->GetWindow()->CreateCone();    
@@ -92,9 +90,7 @@ void vtkPVGlyph3D::SetSource(vtkPVPolyData *pvData)
   
   f->SetSource(pvData->GetPolyData());
   
-  // All inputs should be stored in vtkPVSource (like vtk).
-  // Get rid of this ivar.
-  this->Source = pvData;
+  this->vtkPVSource::SetNthInput(1, pvData);
 }
 
 

@@ -54,8 +54,6 @@ protected:
   ~vtkPVGlyph3D() {};
   vtkPVGlyph3D(const vtkPVGlyph3D&) {};
   void operator=(const vtkPVGlyph3D&) {};
-  
-  vtkPVData *Source;
 };
 
 #endif

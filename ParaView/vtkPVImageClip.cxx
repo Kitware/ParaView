@@ -160,16 +160,8 @@ void vtkPVImageClip::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVImageClip::SetInput(vtkPVImageData *pvi)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
-			   pvi->GetTclName());
-    }
-  
   this->GetImageClip()->SetInput(pvi->GetImageData());
-  this->Input = pvi;
+  this->vtkPVSource::SetNthInput(0, pvi);
 }
 
 //----------------------------------------------------------------------------
@@ -337,4 +329,10 @@ void vtkPVImageClip::Select(vtkKWView *view)
     }
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
 	       this->ExtentStyleButton->GetWidgetName());
+}
+
+//---------------------------------------------------------------------------
+vtkPVImageData *vtkPVImageClip::GetInput()
+{
+  return (vtkPVImageData *)(this->vtkPVSource::GetNthInput(0));
 }

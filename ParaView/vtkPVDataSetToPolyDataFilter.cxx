@@ -50,32 +50,13 @@ vtkPVDataSetToPolyDataFilter* vtkPVDataSetToPolyDataFilter::New()
 //----------------------------------------------------------------------------
 void vtkPVDataSetToPolyDataFilter::SetInput(vtkPVData *pvData)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkDataSetToPolyDataFilter *f;
   
   f = vtkDataSetToPolyDataFilter::SafeDownCast(this->GetVTKSource());
   
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
-			   pvData->GetTclName());
-    }  
-  
   f->SetInput(pvData->GetData());
 
-  // Handle reference counting and the reverse link.
-  if (this->Input)
-    {
-    this->Input->RemovePVSourceFromUsers(this);
-    this->Input->UnRegister(this);
-    this->Input = NULL;
-    }
-  if (pvData)
-    {
-    pvData->Register(this);
-    this->Input = pvData;
-    this->Input->AddPVSourceToUsers(this);
-    }
+  this->vtkPVSource::SetNthInput(0, pvData);
 }
 
 

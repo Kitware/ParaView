@@ -61,7 +61,9 @@ public:
   // All pipeline calls have to use vtkKWObjects so GetTclName will work.
   // The methods executes on all processes.
   void SetInput(vtkPVData *pvData);
-
+  
+  vtkPVData *GetInput();
+  
 protected:
   vtkPVDataSetToDataSetFilter();
   ~vtkPVDataSetToDataSetFilter() {};

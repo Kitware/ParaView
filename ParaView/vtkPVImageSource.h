@@ -53,6 +53,8 @@ public:
   void SetPVOutput(vtkPVImageData *pvi);
   vtkPVImageData *GetPVOutput();
 
+  vtkPVImageData *GetInput();
+
 protected:
   vtkPVImageSource();
   ~vtkPVImageSource() {};

@@ -60,6 +60,8 @@ public:
   // this method is needed in the satellite processes to set the data.
   void SetPVOutput(vtkPVPolyData *pvd);
   vtkPVPolyData *GetPVOutput();
+
+  vtkPVPolyData *GetInput();
   
 protected:
   vtkPVPolyDataSource();

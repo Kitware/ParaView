@@ -93,8 +93,12 @@ public:
   // This name is used in the data list to identify the composite.
   virtual void SetName(const char *name);
   char* GetName();
-
-  vtkGetObjectMacro(Input, vtkPVData);
+  
+  vtkPVData **GetInputs() { return this->Inputs; };
+  vtkPVData *GetNthInput(int idx);
+  vtkGetMacro(NumberOfInputs, int);
+  void SqueezeInputArray();
+  void RemoveAllInputs();
   
   // Description:
   // This just returns the application typecast correctly.
@@ -191,8 +195,17 @@ protected:
   vtkSource *VTKSource;
   char *VTKSourceTclName;
 
-  // Just one input for now.
-  vtkPVData *Input;
+  vtkPVData **Inputs;
+  int NumberOfInputs;
+  
+  // Called to allocate the input array.  Copies old inputs.
+  void SetNumberOfInputs(int num);
+  
+  // protected methods for setting inputs.
+  void SetNthInput(int idx, vtkPVData *input);
+  void AddInput(vtkPVData *input);
+  void RemoveInput(vtkPVData *input);
+  
   // The name is just for display.
   char      *Name;
 

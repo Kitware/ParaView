@@ -76,7 +76,7 @@ void vtkPVPolyDataSource::InitializeOutput()
   vtkPVPolyData *output;
   vtkPVAssignment *assignment;
   
-  input = this->Input;
+  input = this->vtkPVSource::GetNthInput(0);
   output = vtkPVPolyData::New();
   output->Clone(this->GetPVApplication());
   this->SetPVOutput(output);
@@ -121,15 +121,8 @@ vtkPolyDataSource *vtkPVPolyDataSource::GetVTKPolyDataSource()
   return pds;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+//---------------------------------------------------------------------------
+vtkPVPolyData *vtkPVPolyDataSource::GetInput()
+{
+  return (vtkPVPolyData *)this->vtkPVSource::GetNthInput(0);
+}

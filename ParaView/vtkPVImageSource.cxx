@@ -81,7 +81,7 @@ void vtkPVImageSource::InitializeOutput()
   output->Clone(this->GetPVApplication());
   this->SetPVOutput(output);
 
-  input = this->Input;  
+  input = this->GetInput();  
   if (input != NULL)
     {
     assignment = input->GetAssignment();
@@ -110,4 +110,10 @@ vtkImageSource *vtkPVImageSource::GetVTKImageSource()
     vtkWarningMacro("Could not get the vtkImageSource.");
     }
   return imageSource;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVImageData *vtkPVImageSource::GetInput()
+{
+  return (vtkPVImageData *)this->vtkPVSource::GetNthInput(0);
 }
