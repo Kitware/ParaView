@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkToolkits.h" // For VTK_USE_MPI and VTK_USE_PATENTED
 #include "vtkPVServerOptions.h"
 #include "vtkPVConfig.h" // Required to get build options for paraview
+
 // Include all the Instantiators:
 #include "vtkCommonInstantiator.h"
 #include "vtkFilteringInstantiator.h"
@@ -25,6 +26,10 @@ PURPOSE.  See the above copyright notice for more information.
 
 #ifdef VTK_USE_RENDERING
 #include "vtkRenderingInstantiator.h"
+#endif
+
+#ifdef VTK_USE_VOLUMERENDERING
+#include "vtkVolumeRenderingInstantiator.h"
 #endif
 
 #ifdef VTK_USE_PATENTED
@@ -77,6 +82,7 @@ extern "C" void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkVolumeRenderingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 #ifdef VTK_USE_PATENTED
@@ -101,6 +107,7 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   vtkGraphicsCS_Initialize(pm->GetInterpreter());
   vtkIOCS_Initialize(pm->GetInterpreter());
   vtkRenderingCS_Initialize(pm->GetInterpreter());
+  vtkVolumeRenderingCS_Initialize(pm->GetInterpreter());
   vtkHybridCS_Initialize(pm->GetInterpreter());
   vtkParallelCS_Initialize(pm->GetInterpreter());
 #ifdef VTK_USE_PATENTED

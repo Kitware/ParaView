@@ -34,12 +34,17 @@ PURPOSE.  See the above copyright notice for more information.
  */
 #include "vtkCommonInstantiator.h"
 #include "vtkFilteringInstantiator.h"
+#include "vtkGenericFilteringInstantiator.h"
 #include "vtkIOInstantiator.h"
 #include "vtkImagingInstantiator.h"
 #include "vtkGraphicsInstantiator.h"
 
 #ifdef VTK_USE_RENDERING
 #include "vtkRenderingInstantiator.h"
+#endif
+
+#ifdef VTK_USE_VOLUMERENDERING
+#include "vtkVolumeRenderingInstantiator.h"
 #endif
 
 #ifdef VTK_USE_PATENTED
@@ -59,6 +64,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMInstantiator.h"
 #include "vtkParaViewInstantiator.h"
 #include "vtkClientServerInterpreter.h"
+        
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
 //----------------------------------------------------------------------------
@@ -205,10 +211,12 @@ int main(int argc, char *argv[])
 // ClientServer wrapper initialization functions.
 extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkGenericFilteringCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkVolumeRenderingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 #ifdef VTK_USE_PATENTED
@@ -219,9 +227,7 @@ extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 
 extern "C" void vtkKWParaViewCS_Initialize(vtkClientServerInterpreter*);
 
-#ifdef PARAVIEW_LINK_XDMF
 extern "C" void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
-#endif
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
 extern "C" void vtkPVDevelopmentCS_Initialize(vtkClientServerInterpreter *);
 #endif
@@ -232,10 +238,12 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   // Initialize built-in wrapper modules.
   vtkCommonCS_Initialize(pm->GetInterpreter());
   vtkFilteringCS_Initialize(pm->GetInterpreter());
+  vtkGenericFilteringCS_Initialize(pm->GetInterpreter());
   vtkImagingCS_Initialize(pm->GetInterpreter());
   vtkGraphicsCS_Initialize(pm->GetInterpreter());
   vtkIOCS_Initialize(pm->GetInterpreter());
   vtkRenderingCS_Initialize(pm->GetInterpreter());
+  vtkVolumeRenderingCS_Initialize(pm->GetInterpreter());
   vtkHybridCS_Initialize(pm->GetInterpreter());
   vtkParallelCS_Initialize(pm->GetInterpreter());
 #ifdef VTK_USE_PATENTED
