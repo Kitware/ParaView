@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.41");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.42");
 
 
 
@@ -61,8 +61,13 @@ int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWMessageDialog::vtkKWMessageDialog()
 {
+  this->TopFrame = vtkKWWidget::New();
+  this->TopFrame->SetParent(this);
   this->MessageDialogFrame = vtkKWWidget::New();
   this->MessageDialogFrame->SetParent(this);
+  this->BottomFrame = vtkKWWidget::New();
+  this->BottomFrame->SetParent(this);
+  
   this->CommandFunction = vtkKWMessageDialogCommand;
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this->MessageDialogFrame);
@@ -102,6 +107,8 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
   this->CancelButton->Delete();
   this->Icon->Delete();
   this->MessageDialogFrame->Delete();
+  this->TopFrame->Delete();
+  this->BottomFrame->Delete();
   if ( this->IconImage )
     {
     this->IconImage->Delete();
@@ -117,7 +124,9 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   // invoke super method
   this->Superclass::Create(app,args);
   
+  this->TopFrame->Create(app,"frame","");
   this->MessageDialogFrame->Create(app,"frame","");
+  this->BottomFrame->Create(app,"frame","");
   this->Label->SetLineType(vtkKWLabel::MultiLine);
   this->Label->SetWidth(300);
   this->Label->Create(app,"");
@@ -198,8 +207,12 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -side top -fill x -pady 2",
                this->ButtonFrame->GetWidgetName());
 
+  this->Script("pack %s -side top -fill both -expand true -pady 4",
+               this->TopFrame->GetWidgetName());
   this->Script("pack %s -side right -fill both -expand true -pady 4",
                this->MessageDialogFrame->GetWidgetName());
+  this->Script("pack %s -side bottom -fill both -expand true -pady 4",
+               this->BottomFrame->GetWidgetName());
   this->Icon->Create(app,"-width 0 -pady 0 -padx 0 -borderwidth 0");
   this->Script("pack %s -side left -fill y",
                this->Icon->GetWidgetName());

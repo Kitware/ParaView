@@ -143,7 +143,9 @@ public:
 
   // Description:
   // Retrieve the frame where the message is.
+  vtkGetObjectMacro(TopFrame, vtkKWWidget);
   vtkGetObjectMacro(MessageDialogFrame, vtkKWWidget);
+  vtkGetObjectMacro(BottomFrame, vtkKWWidget);
 
   // Description:
   // Set the icon on the message dialog.
@@ -162,7 +164,9 @@ protected:
   vtkSetStringMacro(DialogText);
   vtkGetStringMacro(DialogText);
 
+  vtkKWWidget     *TopFrame;
   vtkKWWidget     *MessageDialogFrame;
+  vtkKWWidget     *BottomFrame;
   vtkKWLabel      *Label;
   vtkKWWidget     *ButtonFrame;
   vtkKWWidget     *OKButton;
