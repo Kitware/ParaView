@@ -9,6 +9,7 @@ vtkKWSerializer.cxx
 vtkKWDirectoryUtilities.cxx
 vtkQueue.cxx
 vtkString.cxx
+vtkContainer.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
