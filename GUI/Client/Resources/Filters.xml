@@ -1435,6 +1435,47 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
 The Subdivide filter iteratively divides each triangle in the data set into 4 new triangles. The Num. divisions slider determines the number of subdivision passes the filter will take through the data. This filter operates only on polygonal data containing triangles, so run your polygonal data through the Triangulate filter first if it is not composed of triangles. The output of this filter is also polygonal.
     </Documentation>
   </Module>
+  <Module name="TempTessellatorFilter" menu_name="Tessellate" root_name="TempTessellatorFilter" module_type="Filter"
+          long_help="Tessellate nonlinear curves, surfaces, and volumes with lines, triangles, and tetrahedra."
+          short_help="Polygonize a mesh.">
+    <Filter class="vtkTempTessellatorFilter">
+      <Input name="Input" class="vtkPolyData"/>
+      <Input name="Input" class="vtkDataSet"/>
+      <Input name="Input" class="vtkUnstructuredGrid"/>
+    </Filter>
+    <InputMenu label="Input" trace_name="Input" id="tess_source_select"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <Scale label="Output Dimension" trace_name="OutputDimension"
+           variable="OutputDimension"  type="int"
+           help="Maximum dimensionality of output tessellation. Cells of higher dimension will be reduced to their boundaries."
+           default_value="2" display_entry="0" entry_and_label_on_top="1" display_value="1"
+           range="1 3"/>
+    <VectorEntry label="Max Chord Error"
+                 trace_name="ChordError"
+                 variable="ChordError" type="float"
+                 help="The maximum chord error allowed at any edge midpoint in the output tessellation."
+                 default_value="0.0001" data_range=".0000000001 1"
+                 />
+    <TempTessellatorEntry label="Max Field Error" trace_name="FieldError2"
+                      variable="FieldError2" type="float"
+                      help="The maximum field error allowed at any edge midpoint in the output tessellation."
+                      input_menu_id="tess_source_select"
+                      set_criterion_command="SetFieldCriterion"
+                      reset_criteria_command="ResetFieldCriteria"
+                      />
+    <VectorEntry label="Max Num Of Subdivisions"
+                 trace_name="MaximumNumberOfSubdivisions"
+                 variable="MaximumNumberOfSubdivisions" type="int"
+                 default_value="1" data_range="0 8"/>
+    <Documentation>
+The DataSetPolygonizer filter tessellates cells with nonlinear geometry and/or scalar fields into a simplicial complex with linearly interpolated field values that more closely approximate the original field. This is useful for the quadratic cells supported by VTK. There are several settings that affect the tessellation.
+The Output Dimension specifies whether nonlinear cells should have their volumes, surfaces, or edges tessellated. When the Output Dimension is 3 then 3-D cells produce tetrahedra, 2-D cells produce triangles, and 1-D cells produce line segments. When the Output Dimension is 2, 3-D cells will have their boundaries tessellated with triangles. And when the Output Dimension is 1, then all cells except points produce line-segments.
+The Max Chord Error setting is the maximum allowed distance between the midpoint of any output edge and the original nonlinear geometry.
+The Max Field Error setting is a per-field error, also sampled at midpoints, but comparing the linear and nonlinear field values.
+The Max Num Of Subdivisions setting specifies the maximum number of times an edge may be subdivided. Increasing this number allows further refinement but can drastically increase the computational and storage requirements, especially when the Output Dimension is 3.
+    </Documentation>
+  </Module>
   <Module name="DataSetTriangleFilter"
           menu_name="Tetrahedralize"
           root_name="Tetra"
