@@ -60,12 +60,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkProperty2D.h"
 #include "vtkSource.h"
 #include "vtkString.h"
+#include "vtkSystemIncludes.h"
 #include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
 
+
+
+// Needed by vtkOStrStreamWrapper 
+// Use ANSI ostrstream or ostringstream.
+#ifdef VTK_USE_ANSI_STDLIB
+# ifndef VTK_NO_ANSI_STRING_STREAM
+#  include <sstream>
+using std::ostringstream;
+# else
+#  include <strstream>
+using std::ostrstream;
+using std::ends;
+# endif
+
+// Use old-style strstream.
+#else
+# ifdef _WIN32_WCE
+#  include "vtkWinCE.h"
+# else
+#  if defined(_MSC_VER)
+#   include <strstrea.h>
+#  else
+#   include <strstream.h>
+#  endif
+# endif // Win CE
+#endif
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.92");
+vtkCxxRevisionMacro(vtkPVProbe, "1.93");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -245,53 +273,69 @@ void vtkPVProbe::AcceptCallbackInternal()
     // update the ui to see the point data for the probed point
     
     vtkIdType j, numComponents;
-    char label[256]; // this may need to be longer
-    char arrayData[256];
-    char tempArray[32];
+
+    // use vtkstd::string since 'label' can grow in lenght arbitrarily
+    vtkstd::string label;
+    vtkstd::string arrayData;
+    vtkstd::string tempArray;
+
+    // used to read data values to a vtkstd::string using arbitrary length buffer
+    vtkstd::ostrstream arrayStrm;
+    vtkstd::ostrstream tempStrm;
 
     this->XYPlotWidget->SetEnabled(0);
 
-    // label needs to be initialized so strcat doesn't fail
-    label[0] = '\0';
-    
     for (i = 0; i < numArrays; i++)
       {
       array = pd->GetArray(i);
       numComponents = array->GetNumberOfComponents();
       if (numComponents > 1)
         {
-        sprintf(arrayData, "%s: (", array->GetName());
+        // make sure we fill buffer from the beginning
+        arrayStrm.freeze( false );
+        arrayStrm.seekp( 0, ios::beg );
+        arrayStrm << array->GetName() << ": ( " << ends;
+        arrayData = arrayStrm.str();
+
         for (j = 0; j < numComponents; j++)
           {
-          sprintf(tempArray, "%f", array->GetComponent(0, j));
+          // make sure we fill buffer from the beginning
+          tempStrm.freeze( false );
+          tempStrm.seekp( 0, ios::beg );
+          tempStrm << array->GetComponent( 0, j ) << ends; 
+          tempArray = tempStrm.str();
+
           if (j < numComponents - 1)
             {
-            strcat(tempArray, ",");
+            tempArray += ",";
             if (j % 3 == 2)
               {
-              strcat(tempArray, "\n\t");
+              tempArray += "\n\t";
               }
             else
               {
-              strcat(tempArray, " ");
+              tempArray += " ";
               }
             }
           else
             {
-            strcat(tempArray, ")\n");
+            tempArray += " )\n";
             }
-          strcat(arrayData, tempArray);
+          arrayData += tempArray;
           }
-        strcat(label, arrayData);
+        label += arrayData;
         }
       else
         {
-        sprintf(arrayData, "%s: %f\n", array->GetName(),
-                array->GetComponent(0, 0));
-        strcat(label, arrayData);
+        // make sure we fill buffer from the beginning
+        arrayStrm.freeze( false );
+        arrayStrm.seekp( 0, ios::beg );
+        arrayStrm << array->GetName() << ": " << array->GetComponent( 0, 0 ) << endl << ends;
+
+        label += arrayStrm.str();
         }
       }
-    this->PointDataLabel->SetLabel(label);
+    this->PointDataLabel->SetLabel( label.c_str() );
     this->Script("pack %s", this->PointDataLabel->GetWidgetName());
     }
   else if (probeOutput->GetNumberOfPoints() > 1)
