@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.62");
+vtkCxxRevisionMacro(vtkKWScale, "1.63");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -77,7 +77,6 @@ vtkKWScale::vtkKWScale()
 
   this->Value      = 0;
   this->Resolution = 1;
-  this->EntryResolution = 2;
   this->Range[0]   = 0;
   this->Range[1]   = 1;  
 
@@ -265,10 +264,10 @@ void vtkKWScale::DisplayEntry()
 
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
-  this->Entry->Create(this->Application, "-width 10");
+  this->Entry->Create(this->Application, 0);
+  this->Entry->SetWidth(11);
   this->Entry->SetEnabled(this->Enabled);
-  this->UpdateEntryResolution();
-  this->Entry->SetValue(this->GetValue(), this->EntryResolution);
+  this->Entry->SetValue(this->GetValue());
 
   this->PackWidget();
   this->Bind();
@@ -596,27 +595,6 @@ void vtkKWScale::WithdrawPopupScaleCallback()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWScale::UpdateEntryResolution()
-{
-  if (fabs(this->Resolution) >= 1.0)
-    {
-    this->EntryResolution = 5;
-    }
-  else if (this->IsCreated())
-    {
-    // Trick here: use the 'expr' Tcl command to display the shortest
-    // representation of the floating point number this->Resolution.
-    // sprintf would be of no help here.
-    const char *res = this->Script("expr %g", fabs(this->Resolution));
-    const char *pos = strchr(res, '.');
-    if (pos)
-      {
-      this->EntryResolution = (int)(strlen(res)) - (pos - res) - 1;
-      }
-    }
-}
-
-// ---------------------------------------------------------------------------
 void vtkKWScale::SetResolution(double r)
 {
   if (this->Resolution == r)
@@ -631,12 +609,6 @@ void vtkKWScale::SetResolution(double r)
     {
     this->Script("%s configure -resolution %g",
                  this->Scale->GetWidgetName(), r);
-    }
-
-  if (this->Entry && this->Entry->IsCreated())
-    {
-    this->UpdateEntryResolution();
-    this->Entry->SetValue(this->Value, this->EntryResolution);
     }
 }
 
@@ -679,7 +651,7 @@ void vtkKWScale::RefreshValue()
   
   if (this->Entry && this->Entry->IsCreated())
     {
-    this->Entry->SetValue(this->Value, this->EntryResolution);
+    this->Entry->SetValue(this->Value);
     }
 }
 
@@ -702,29 +674,13 @@ void vtkKWScale::SetRange(double min, double max)
     }
   if (this->RangeMinLabel && this->RangeMinLabel->IsCreated())
     {
-    if (this->Resolution >= 1)
-      {
-      this->Script("%s configure -text %.5g",
-                   this->RangeMinLabel->GetWidgetName(), min);
-      }
-    else
-      {
-      this->Script("%s configure -text %g",
-                   this->RangeMinLabel->GetWidgetName(), min);
-      }
+    this->Script("%s configure -text %g",
+                 this->RangeMinLabel->GetWidgetName(), min);
     }
   if (this->RangeMaxLabel && this->RangeMaxLabel->IsCreated())
     {
-    if (this->Resolution >= 1)
-      {
-      this->Script("%s configure -text %.5g",
-                   this->RangeMaxLabel->GetWidgetName(), max);
-      }
-    else
-      {
-      this->Script("%s configure -text %g",
-                   this->RangeMaxLabel->GetWidgetName(), max);
-      }
+    this->Script("%s configure -text %g",
+                 this->RangeMaxLabel->GetWidgetName(), max);
     }
 }
 
@@ -991,27 +947,13 @@ void vtkKWScale::Resize()
     
     if (this->RangeMinLabel && this->RangeMinLabel->IsCreated())
       {
-      if (this->Resolution >= 1)
-        {
-        sprintf(labelText, "(%.5g)", this->Range[0]);
-        }
-      else
-        {
-        sprintf(labelText, "(%g)", this->Range[0]);
-        }
+      sprintf(labelText, "(%g)", this->Range[0]);
       this->Script("%s configure -text %s",
                    this->RangeMinLabel->GetWidgetName(), labelText);
       }
     if (this->RangeMaxLabel && this->RangeMaxLabel->IsCreated())
       {
-      if (this->Resolution >= 1)
-        {
-        sprintf(labelText, "(%.5g)", this->Range[1]);
-        }
-      else
-        {
-        sprintf(labelText, "(%g)", this->Range[1]);
-        }
+      sprintf(labelText, "(%g)", this->Range[1]);
       this->Script("%s configure -text %s",
                    this->RangeMaxLabel->GetWidgetName(), labelText);
       }
@@ -1036,15 +978,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     {
     this->RangeMinLabel = vtkKWLabel::New();
     this->RangeMinLabel->SetParent(this);
-
-    if (this->Resolution >= 1)
-      {
-      sprintf(labelText, "(%.5g)", this->Range[0]);
-      }
-    else
-      {
-      sprintf(labelText, "(%g)", this->Range[0]);
-      }
+    sprintf(labelText, "(%g)", this->Range[0]);
     this->RangeMinLabel->Create(this->Application, "");
     this->RangeMinLabel->SetLabel(labelText);
     this->RangeMinLabel->SetEnabled(this->Enabled);
@@ -1053,14 +987,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     {
     this->RangeMaxLabel = vtkKWLabel::New();
     this->RangeMaxLabel->SetParent(this);
-    if (this->Resolution >= 1)
-      {
-      sprintf(labelText, "(%.5g)", this->Range[1]);
-      }
-    else
-      {
-      sprintf(labelText, "(%g)", this->Range[1]);
-      }
+    sprintf(labelText, "(%g)", this->Range[1]);
     this->RangeMaxLabel->Create(this->Application, "");
     this->RangeMaxLabel->SetLabel(labelText);
     this->RangeMaxLabel->SetEnabled(this->Enabled);

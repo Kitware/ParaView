@@ -79,7 +79,10 @@ public:
   vtkGetVector2Macro(Range, double);
   virtual void GetRange(float &min, float &max) {
     min = (float)this->GetRange()[0];
-    min = (float)this->GetRange()[1];
+    max = (float)this->GetRange()[1];
+    }
+  virtual void GetRange(float array[2]) {
+    this->GetRange(array[0], array[1]);
     }
   virtual double GetRangeMin() { return this->GetRange()[0]; };
   virtual double GetRangeMax() { return this->GetRange()[1]; };
@@ -215,8 +218,6 @@ protected:
   double       Value;
   double       Resolution;
   double       Range[2];
-
-  int         EntryResolution;
 
   vtkKWWidget *Scale;
   vtkKWEntry  *Entry;

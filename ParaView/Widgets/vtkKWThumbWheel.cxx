@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.12");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.13");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -117,7 +117,6 @@ vtkKWThumbWheel::vtkKWThumbWheel()
   this->PopupPushButton = NULL;
 
   this->CommandFunction = vtkKWThumbWheelCommand;
-  this->EntryResolution = 0;
   this->State           = vtkKWThumbWheel::Idle;
 
   this->ThumbWheelShift = 0.0;
@@ -275,7 +274,7 @@ void vtkKWThumbWheel::SetValue(float arg)
 
   if (this->Entry && this->Entry->IsCreated())
     {
-    this->Entry->SetValue(this->Value, this->EntryResolution);
+    this->Entry->SetValue(this->Value);
     }
   
   this->InvokeCommand();
@@ -294,8 +293,7 @@ void vtkKWThumbWheel::SetResolution(float arg)
 
   if (this->Entry && this->Entry->IsCreated())
     {
-    this->UpdateEntryResolution();
-    this->Entry->SetValue(this->Value, this->EntryResolution);
+    this->Entry->SetValue(this->Value);
     }
 }
 
@@ -426,8 +424,7 @@ void vtkKWThumbWheel::CreateEntry()
   this->Entry->SetParent(this);
   this->Entry->Create(this->Application, "-width 7");
   this->Entry->SetEnabled(this->Enabled);
-  this->UpdateEntryResolution();
-  this->Entry->SetValue(this->GetValue(), this->EntryResolution);
+  this->Entry->SetValue(this->GetValue());
 }
 
 // ---------------------------------------------------------------------------
@@ -863,27 +860,6 @@ void vtkKWThumbWheel::WithdrawPopupCallback()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::UpdateEntryResolution()
-{
-  if (fabs(this->Resolution) >= 1.0)
-    {
-    this->EntryResolution = 0;
-    }
-  else if (this->IsCreated())
-    {
-    // Trick here: use the 'expr' Tcl command to display the shortest
-    // representation of the floating point number this->Resolution.
-    // sprintf would be of no help here.
-    const char *res = this->Script("expr %f", fabs(this->Resolution));
-    const char *pos = strchr(res, '.');
-    if (pos)
-      {
-      this->EntryResolution = static_cast<int>(strlen(res)) - (pos - res) - 1;
-      }
-    }
-}
-
-// ---------------------------------------------------------------------------
 void vtkKWThumbWheel::EntryCallback()
 {
   float value = this->Entry->GetValueAsFloat();
@@ -969,7 +945,7 @@ void vtkKWThumbWheel::PerformLinearMotionCallback()
 
   // If the resolution implies an integer, round the value
 
-  if (this->EntryResolution == 0)
+  if ((float)((int)this->Resolution) == this->Resolution)
     {
     this->SetValue((int)(new_value));
     }
@@ -1054,7 +1030,7 @@ void vtkKWThumbWheel::PerformNonLinearMotionCallback()
 
   // If the resolution implies an integer, round the value
 
-  if (this->EntryResolution == 0)
+  if ((float)((int)this->Resolution) == this->Resolution)
     {
     this->SetValue((int)(new_value));
     }
