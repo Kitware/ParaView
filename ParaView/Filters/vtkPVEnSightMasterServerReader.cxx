@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.15");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.16");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -434,6 +434,26 @@ void vtkPVEnSightMasterServerReader::SuperclassExecuteData()
     const_cast<char*>(this->Internal->PieceFileNames[piece].c_str());
   this->Superclass::Execute();
   this->CaseFileName = temp;
+
+  // We should be able to run with more processes than ensight partitions.
+  int fixme;
+  int idx;
+  vtkUnstructuredGrid *ugrid;
+  vtkPolyData *pd;
+  
+  // The superclass thinks it is reading the whole data set.
+  // This subclass tells the output that it is only a piece.
+  for (idx = 0; idx < this->NumberOfOutputs; ++idx)
+    {
+    if (this->Outputs[idx])
+      {
+      // This gets transfered to the Piece/NumberOfPieces
+      // when 'DataHasBeenGenerated' is called.
+      this->Outputs[idx]->SetUpdatePiece(piece);
+      this->Outputs[idx]->SetUpdateNumberOfPieces(this->NumberOfPieces);
+      this->Outputs[idx]->SetMaximumNumberOfPieces(-1);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -469,7 +489,27 @@ static int vtkPVEnSightMasterServerReaderGetLineFromStream(
   // been reached.
   while((is.getline(buffer, bufferSize), is.gcount() > 0))
     {
+    char *p;
+    int ppos, numCharsRead = is.gcount();
+  
     haveData = 1;
+
+    // Get rid of endline character.
+    p = buffer;
+    ppos = 0;
+    while (ppos<bufferSize && ppos < numCharsRead && *p != '\0')
+      {
+      if (*p == '\r')
+        {
+        // Change existing method as little as possible.
+        *p = '\0';
+        line.append(buffer);
+        return haveData;
+        }
+      ++p;
+      ++ppos;
+      }
+    
     line.append(buffer);
 
     // If newline character was read, the gcount includes the
@@ -643,7 +683,7 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
     {
     vtkDataObject* output = this->GetOutput(i);
 
-    output->SetMaximumNumberOfPieces(this->NumberOfPieces);
+    output->SetMaximumNumberOfPieces(-1);
     }
   
   return VTK_OK;
