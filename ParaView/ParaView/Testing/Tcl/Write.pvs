@@ -22,7 +22,7 @@ set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
 set ext "vtk"
 if {$nprocs > 1} { set ext "pvtp" }
 
-$pvWindow Open "$DataDir/Data/blow.vtk"
+$pvWindow Open "$DataDir/Data/blow data.vtk"
 if { [catch {
   $pvWindow DisableMenus
   $pvWindow ShowAnimationProperties

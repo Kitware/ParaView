@@ -18,10 +18,10 @@ $pv(vtkTemp43) SetBackgroundColor 0 0 0
 $kw(vtkTemp1) SetUseMessageDialog 0
 
 # Open an image data set.
-$kw(vtkTemp1) Open "$DataDir/Data/ironProt.vtk"
+$kw(vtkTemp1) Open "$DataDir/Data/iron protein.vtk"
 set kw(vtkTemp257) [$kw(vtkTemp1) GetCurrentPVSource]
 set kw(vtkTemp266) [$kw(vtkTemp257) GetPVWidget {Filename}]
-$kw(vtkTemp266) SetValue "$DataDir/Data/ironProt.vtk"
+$kw(vtkTemp266) SetValue "$DataDir/Data/iron protein.vtk"
 
 # Choose the file name/type based on whether we are in parallel mode.
 set kw(vtkTemp1000) [$Application GetController]

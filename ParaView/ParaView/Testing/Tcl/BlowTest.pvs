@@ -14,7 +14,7 @@ set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 set pv(vtkTemp43) [$pvWindow GetMainView]
 $pv(vtkTemp43) SetBackgroundColor 0 0 0
 
-$pvWindow Open "$DataDir/Data/blow.vtk"
+$pvWindow Open "$DataDir/Data/blow data.vtk"
 
 set pvWarp [$pvWindow CreatePVSource WarpVector]
 $pvWarp UpdateParameterWidgets
