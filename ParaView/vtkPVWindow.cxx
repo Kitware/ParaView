@@ -2078,49 +2078,6 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ---- Dicer ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkDicer");
-  sInt->SetRootName("Dicer");
-  sInt->SetInputClassName("vtkDataSet");
-  sInt->SetOutputClassName("vtkDataSet");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("FieldData");
-  mInt->SetSetCommand("SetFieldData");
-  mInt->SetGetCommand("GetFieldData");
-  mInt->SetWidgetTypeToToggle();
-  mInt->SetBalloonHelp("Generate point scalars or a field array.");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("NumberOfPointsPerPiece");
-  mInt->SetSetCommand("SetNumberOfPointsPerPiece");
-  mInt->SetGetCommand("GetNumberOfPointsPerPiece");
-  mInt->AddIntegerArgument();
-  mInt->SetBalloonHelp("Controls piece size.");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("NumberOfPieces");
-  mInt->SetSetCommand("SetNumberOfPieces");
-  mInt->SetGetCommand("GetNumberOfPieces");
-  mInt->AddIntegerArgument();
-  mInt->SetBalloonHelp("Controls number of pieces generated.");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
   // ---- ElevationFilter ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -2559,6 +2516,49 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetGetCommand("GetGenerateVertices");
   mInt->SetWidgetTypeToToggle();
   mInt->SetBalloonHelp("Convienience feature to display points.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Dicer ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkOBBDicer");
+  sInt->SetRootName("Dicer");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkDataSet");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("FieldData");
+  mInt->SetSetCommand("SetFieldData");
+  mInt->SetGetCommand("GetFieldData");
+  mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Generate point scalars or a field array.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("NumberOfPointsPerPiece");
+  mInt->SetSetCommand("SetNumberOfPointsPerPiece");
+  mInt->SetGetCommand("GetNumberOfPointsPerPiece");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Controls piece size.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("NumberOfPieces");
+  mInt->SetSetCommand("SetNumberOfPieces");
+  mInt->SetGetCommand("GetNumberOfPieces");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Controls number of pieces generated.");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
