@@ -128,6 +128,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->InterruptRenderCheck = vtkKWCheckButton::New();
   this->CompositeWithFloatCheck = vtkKWCheckButton::New();
   this->CompositeWithRGBACheck = vtkKWCheckButton::New();
+  this->CompositeCompressionCheck = vtkKWCheckButton::New();
+
   this->ReductionCheck = vtkKWCheckButton::New();
   this->FrameRateFrame = vtkKWWidget::New();
   this->FrameRateLabel = vtkKWLabel::New();
@@ -198,6 +200,9 @@ vtkPVRenderView::~vtkPVRenderView()
 
   this->CompositeWithRGBACheck->Delete();
   this->CompositeWithRGBACheck = NULL;
+  
+  this->CompositeCompressionCheck->Delete();
+  this->CompositeCompressionCheck = NULL;
   
   this->ReductionCheck->Delete();
   this->ReductionCheck = NULL;
@@ -337,6 +342,8 @@ void vtkPVRenderView::PrepareForDelete()
 			     this->CompositeWithFloatCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
 			     this->CompositeWithRGBACheck->GetState());
+    pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
+			     this->CompositeCompressionCheck->GetState());
 #endif
     }
 
@@ -593,6 +600,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->CompositeWithFloatCheck->Create(this->Application, "-text \"Composite With Floats\"");
   this->CompositeWithRGBACheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->CompositeWithRGBACheck->Create(this->Application, "-text \"Composite RGBA\"");
+  this->CompositeCompressionCheck->SetParent(this->RenderParametersFrame->GetFrame());
+  this->CompositeCompressionCheck->Create(this->Application, "-text \"Composite Compression\"");
   
   this->CompositeWithFloatCheck->SetCommand(this, "CompositeWithFloatCallback");
   if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
@@ -621,15 +630,31 @@ void vtkPVRenderView::CreateViewProperties()
     this->CompositeWithRGBACheck->SetState(0);
     }
   this->CompositeWithRGBACheck->SetBalloonHelpString("Toggle the use of RGB/RGBA values when compositing. This is here to bypass some bugs in some graphics card drivers.");
+
+  this->CompositeCompressionCheck->SetCommand(this, "CompositeCompressionCallback");
+  if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
+                                                    "UseCompressionInComposite", 0))
+    {
+    this->CompositeCompressionCheck->SetState(pvwindow->GetIntRegisteryValue(
+      2, "RunTime", "UseCompressionInComposite"));
+    }
+  else
+    {
+    this->CompositeCompressionCheck->SetState(0);
+    this->CompositeCompressionCallback();
+    }
+  this->CompositeCompressionCheck->SetBalloonHelpString("Toggle the use of run length encoding when compositing. This is here to compare performance.  It should not change the final rendered image.");
+
   
-  this->Script("pack %s %s %s %s %s %s %s -side top -anchor w",
+  this->Script("pack %s %s %s %s %s %s %s %s -side top -anchor w",
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName(),
                this->ReductionCheck->GetWidgetName(),
                this->FrameRateFrame->GetWidgetName(),
                this->InterruptRenderCheck->GetWidgetName(),
                this->CompositeWithFloatCheck->GetWidgetName(),
-               this->CompositeWithRGBACheck->GetWidgetName());
+               this->CompositeWithRGBACheck->GetWidgetName(),
+               this->CompositeCompressionCheck->GetWidgetName());
 #else
   this->Script("pack %s %s %s %s -side top -anchor w",
                this->TriangleStripsCheck->GetWidgetName(),
@@ -1129,6 +1154,37 @@ void vtkPVRenderView::CompositeWithRGBACallback()
     {
     vtkTimerLog::MarkEvent("--- Use RGB pixels to get color buffers.");
     }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::CompositeCompressionCallback()
+{
+  if (this->Composite)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    if (this->CompositeCompressionCheck->GetState())
+      {
+      pvApp->BroadcastScript("vtkCompressCompositer pvTemp");
+      }
+    else
+      {
+      pvApp->BroadcastScript("vtkTreeCompositer pvTemp");
+      }
+    pvApp->BroadcastScript("%s SetCompositer pvTemp", this->CompositeTclName);
+    pvApp->BroadcastScript("pvTemp Delete");
+    this->EventuallyRender();
+    }
+
+  if (this->CompositeCompressionCheck->GetState())
+    {
+    vtkTimerLog::MarkEvent("--- Enable compression when compositing.");
+    }
+  else
+    {
+    vtkTimerLog::MarkEvent("--- Disable compression when compositing.");
+    }
+
 }
 
 

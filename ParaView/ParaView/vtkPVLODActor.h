@@ -97,6 +97,10 @@ public:
   // Shallow copy of an LOD actor. Overloads the virtual vtkProp method.
   void ShallowCopy(vtkProp *prop);
 
+  // Description:
+  // Get the bounds of the current mapper.
+  float *GetBounds();
+
 protected:
   vtkPVLODActor();
   ~vtkPVLODActor();

@@ -11,9 +11,6 @@ if {[info exists argc]} {
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 
-# To get better coverage, log the actions of this script.
-Application StartLog "ClipCutLog.txt"
-
 set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
 set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Extent}]
 $pv(vtkTemp110) SetValue 0 12 0 12 0 10
@@ -97,9 +94,6 @@ set pv(vtkTemp463) [$pv(vtkTemp446) GetPVWidget {Cut Values}]
 $pv(vtkTemp463) RemoveAllValues
 $pv(vtkTemp463) AddValue 0.1
 $pv(vtkTemp446) AcceptCallback
-
-Application StopLog
-
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300

@@ -210,6 +210,96 @@ void vtkPVLODActor::ReleaseGraphicsResources(vtkWindow *renWin)
 }
 
 
+// Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
+float *vtkPVLODActor::GetBounds()
+{
+  int i,n;
+  float *bounds, bbox[24], *fptr;
+  vtkMapper *mapper = this->GetMapper();
+
+  vtkDebugMacro( << "Getting Bounds" );
+
+  // get the bounds of the Mapper if we have one
+  if (!mapper)
+    {
+    return this->Bounds;
+    }
+
+  bounds = mapper->GetBounds();
+  // Check for the special case when the mapper's bounds are unknown
+  if (!bounds)
+    {
+    return bounds;
+    }
+
+  // Check for the special case when the actor is empty.
+  if (bounds[0] > bounds[1])
+    { 
+    memcpy( this->MapperBounds, bounds, 6*sizeof(float) );
+    this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
+    this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+    this->BoundsMTime.Modified();
+    return this->Bounds;
+    }
+
+  // Check if we have cached values for these bounds - we cache the
+  // values returned by this->Mapper->GetBounds() and we store the time
+  // of caching. If the values returned this time are different, or
+  // the modified time of this class is newer than the cached time,
+  // then we need to rebuild.
+  if ( ( memcmp( this->MapperBounds, bounds, 6*sizeof(float) ) != 0 ) ||
+       ( this->GetMTime() > this->BoundsMTime ) )
+    {
+    vtkDebugMacro( << "Recomputing bounds..." );
+
+    memcpy( this->MapperBounds, bounds, 6*sizeof(float) );
+
+    // fill out vertices of a bounding box
+    bbox[ 0] = bounds[1]; bbox[ 1] = bounds[3]; bbox[ 2] = bounds[5];
+    bbox[ 3] = bounds[1]; bbox[ 4] = bounds[2]; bbox[ 5] = bounds[5];
+    bbox[ 6] = bounds[0]; bbox[ 7] = bounds[2]; bbox[ 8] = bounds[5];
+    bbox[ 9] = bounds[0]; bbox[10] = bounds[3]; bbox[11] = bounds[5];
+    bbox[12] = bounds[1]; bbox[13] = bounds[3]; bbox[14] = bounds[4];
+    bbox[15] = bounds[1]; bbox[16] = bounds[2]; bbox[17] = bounds[4];
+    bbox[18] = bounds[0]; bbox[19] = bounds[2]; bbox[20] = bounds[4];
+    bbox[21] = bounds[0]; bbox[22] = bounds[3]; bbox[23] = bounds[4];
+  
+    // save the old transform
+    this->Transform->Push(); 
+    this->Transform->SetMatrix(this->GetMatrix());
+
+    // and transform into actors coordinates
+    fptr = bbox;
+    for (n = 0; n < 8; n++) 
+      {
+      this->Transform->TransformPoint(fptr,fptr);
+      fptr += 3;
+      }
+  
+    this->Transform->Pop();  
+  
+    // now calc the new bounds
+    this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
+    this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+    for (i = 0; i < 8; i++)
+      {
+      for (n = 0; n < 3; n++)
+        {
+        if (bbox[i*3+n] < this->Bounds[n*2]) 
+          {
+          this->Bounds[n*2] = bbox[i*3+n];
+          }
+        if (bbox[i*3+n] > this->Bounds[n*2+1]) 
+          {
+          this->Bounds[n*2+1] = bbox[i*3+n];
+          }
+        }
+      }
+    this->BoundsMTime.Modified();
+    }
+
+  return this->Bounds;
+}
 
 
 //----------------------------------------------------------------------------

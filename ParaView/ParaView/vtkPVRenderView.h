@@ -211,9 +211,13 @@ public:
   void InterruptRenderCallback();
   
   // Description:
-  // Callback for the use char check button
+  // Callback for the use char check button.  
+  // These are only public because they are callbacks.
+  // Cannot be used from a script because they do not 
+  // change the state of the check.
   void CompositeWithFloatCallback();
   void CompositeWithRGBACallback();
+  void CompositeCompressionCallback();
   
   // Description:
   // Get the triangle strips check button.
@@ -266,6 +270,8 @@ protected:
   vtkKWCheckButton *InterruptRenderCheck;
   vtkKWCheckButton *CompositeWithFloatCheck;
   vtkKWCheckButton *CompositeWithRGBACheck;
+  vtkKWCheckButton *CompositeCompressionCheck;
+
   vtkKWCheckButton *ReductionCheck;  
   vtkKWWidget *FrameRateFrame;
   vtkKWLabel *FrameRateLabel;
