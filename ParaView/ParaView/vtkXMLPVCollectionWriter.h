@@ -69,6 +69,10 @@ protected:
   vtkXMLPVCollectionWriter();
   ~vtkXMLPVCollectionWriter();
   
+  // Override vtkProcessObject's AddInput method to prevent compiler
+  // warnings.
+  virtual void AddInput(vtkDataObject*);
+
   // Replace vtkXMLWriter's writing driver method.
   virtual int WriteInternal();
   virtual int WriteData();

@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVCollectionWriter);
-vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.5");
+vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.6");
 
 class vtkXMLPVCollectionWriterInternals
 {
@@ -91,6 +91,20 @@ void vtkXMLPVCollectionWriter::PrintSelf(ostream& os, vtkIndent indent)
 void vtkXMLPVCollectionWriter::AddInput(vtkDataSet* ds)
 {
   this->vtkProcessObject::AddInput(ds);
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVCollectionWriter::AddInput(vtkDataObject* d)
+{
+  vtkDataSet* ds = vtkDataSet::SafeDownCast(d);
+  if(ds)
+    {
+    this->AddInput(ds);
+    }
+  else
+    {
+    vtkWarningMacro("Attempt to add NULL or non vtkDataSet input.");
+    }
 }
 
 //----------------------------------------------------------------------------
