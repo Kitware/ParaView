@@ -90,7 +90,9 @@ public:
   // Description:
   // Add a window to this application.
   void AddWindow(vtkKWWindow *w);
+  //BTX
   vtkKWWindowCollection *GetWindows();
+  //ETX
   
   // Description:
   // Set/Get the ApplicationName
@@ -209,11 +211,13 @@ public:
   //ETX
   virtual int GetApplicationKey() {return -1;};
 
+  //BTX
   // Description:
   // Return the Registery object. It is created on first use
   // and deleted on exiting the application.
   vtkKWRegisteryUtilities *GetRegistery( const char* toplevel);
   vtkKWRegisteryUtilities *GetRegistery( );
+  //ETX
 
   // Description:
   // Set or get the current registery level. If the called

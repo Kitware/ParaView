@@ -41,9 +41,11 @@ public:
   vtkGetObjectMacro(View,vtkKWView);
   virtual void SetView(vtkKWView *view);
 
+  //BTX
   // Description:
   // Get the Prop for this class.
   virtual vtkProp *GetProp() = 0;
+  //ETX
 
   // Description:
   // Initialize properties should be called by any methods

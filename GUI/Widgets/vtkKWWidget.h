@@ -74,7 +74,9 @@ public:
   // Add/Remove/Get a child to this Widget
   void AddChild(vtkKWWidget *w);
   void RemoveChild(vtkKWWidget *w);
+  //BTX
   vtkGetObjectMacro(Children,vtkKWWidgetCollection);
+  //ETX
   vtkKWWidget *GetChildWidgetWithName(const char *);
   
   // Description::
