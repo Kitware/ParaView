@@ -41,6 +41,7 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVWidgetCollection.cxx
   vtkPVWorldPointPicker.cxx
   vtkPVXMLPackageParser.cxx
+  vtkPVGUIClientOptions.cxx
   )
 
 SET( ParaViewClient_SRCS
@@ -168,7 +169,6 @@ ENDIF(VTK_USE_MPI)
 
 
 SET(ParaViewBinary_SRCS
-  vtkPVGUIClientOptions.cxx
   ParaView.cxx)
 
 IF (PARAVIEW_USE_ICE_T)
