@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.24");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -80,6 +80,7 @@ vtkPVStringEntry::~vtkPVStringEntry()
   this->SetEntryLabel(0);
   this->SetProperty(0);
   this->SetInitSourceVariable(0);;
+  this->SetDefaultValue(0);
 }
 
 void vtkPVStringEntry::SetLabel(const char* label)
