@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.43");
+vtkCxxRevisionMacro(vtkKWScale, "1.44");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -695,7 +695,7 @@ void vtkKWScale::SetRange(float min, float max)
     {
     if (this->Resolution >= 1)
       {
-      this->Script("%s configure -text %.f",
+      this->Script("%s configure -text %.0f",
                    this->RangeMinLabel->GetWidgetName(), min);
       }
     else
@@ -708,7 +708,7 @@ void vtkKWScale::SetRange(float min, float max)
     {
     if (this->Resolution >= 1)
       {
-      this->Script("%s configure -text %.f",
+      this->Script("%s configure -text %.0f",
                    this->RangeMaxLabel->GetWidgetName(), max);
       }
     else
@@ -990,7 +990,7 @@ void vtkKWScale::Resize()
       {
       if (this->Resolution >= 1)
         {
-        sprintf(labelText, "(%.f)", this->Range[0]);
+        sprintf(labelText, "(%.0f)", this->Range[0]);
         }
       else
         {
@@ -1003,7 +1003,7 @@ void vtkKWScale::Resize()
       {
       if (this->Resolution >= 1)
         {
-        sprintf(labelText, "(%.f)", this->Range[1]);
+        sprintf(labelText, "(%.0f)", this->Range[1]);
         }
       else
         {
@@ -1035,7 +1035,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     this->RangeMinLabel->SetParent(this);
     if (this->Resolution >= 1)
       {
-      sprintf(labelText, "(%.f)", this->Range[0]);
+      sprintf(labelText, "(%.0f)", this->Range[0]);
       }
     else
       {
@@ -1050,7 +1050,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     this->RangeMaxLabel->SetParent(this);
     if (this->Resolution >= 1)
       {
-      sprintf(labelText, "(%.f)", this->Range[1]);
+      sprintf(labelText, "(%.0f)", this->Range[1]);
       }
     else
       {
