@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.53");
+vtkCxxRevisionMacro(vtkPVPart, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVPart, SMPart, vtkSMPart);
 vtkCxxSetObjectMacro(vtkPVPart, ProcessModule, vtkPVProcessModule);
@@ -61,8 +61,6 @@ vtkPVPart::vtkPVPart()
 //----------------------------------------------------------------------------
 vtkPVPart::~vtkPVPart()
 {  
-  vtkPVProcessModule *pm = this->GetProcessModule();
-
   this->SetName(NULL);
 
   this->ClassNameInformation->Delete();
