@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.78");
+vtkCxxRevisionMacro(vtkKWWidget, "1.79");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -309,31 +309,6 @@ void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandStri
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetObjectMethodCommand(
-  char **command, 
-  vtkKWObject *object, 
-  const char *method)
-{
-  if (*command)
-    {
-    delete [] *command;
-    *command = NULL;
-    }
-
-  ostrstream command_str;
-  if (object)
-    {
-    command_str << object->GetTclName() << " ";
-    }
-  if (method)
-    {
-    command_str << method;
-    }
-  command_str << ends;
-  *command = command_str.str();
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWidget::SetBalloonHelpString(const char *str)
 {
 //    if (this->Application == NULL)
@@ -373,7 +348,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.78 $");
+  this->ExtractRevision(os,"$Revision: 1.79 $");
 }
 
 //----------------------------------------------------------------------------
@@ -617,15 +592,113 @@ int vtkKWWidget::GetConfigurationOptionAsInt(const char* option)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidget::SetTextOption(const char *text, const char *option)
+const char* vtkKWWidget::GetCharacterEncodingAsString(int encoding)
+{
+  switch (encoding)
+    {
+    case VTK_ENCODING_US_ASCII:
+      return "ascii";
+
+    case VTK_ENCODING_UNICODE:
+      return "unicode";
+
+    case VTK_ENCODING_UTF_8:
+      return "utf-8";
+
+    case VTK_ENCODING_ISO_8859_1:
+      return "iso8859-1";
+
+    case VTK_ENCODING_ISO_8859_2:
+      return "iso8859-2";
+
+    case VTK_ENCODING_ISO_8859_3:
+      return "iso8859-3";
+
+    case VTK_ENCODING_ISO_8859_4:
+      return "iso8859-4";
+
+    case VTK_ENCODING_ISO_8859_5:
+      return "iso8859-5";
+
+    case VTK_ENCODING_ISO_8859_6:
+      return "iso8859-5";
+
+    case VTK_ENCODING_ISO_8859_7:
+      return "iso8859-7";
+
+    case VTK_ENCODING_ISO_8859_8:
+      return "iso8859-8";
+
+    case VTK_ENCODING_ISO_8859_9:
+      return "iso8859-9";
+
+    case VTK_ENCODING_ISO_8859_10:
+      return "iso8859-10";
+
+    case VTK_ENCODING_ISO_8859_11:
+      return "iso8859-11";
+
+    case VTK_ENCODING_ISO_8859_12:
+      return "iso8859-12";
+
+    case VTK_ENCODING_ISO_8859_13:
+      return "iso8859-13";
+
+    case VTK_ENCODING_ISO_8859_14:
+      return "iso8859-14";
+
+    case VTK_ENCODING_ISO_8859_15:
+      return "iso8859-15";
+
+    case VTK_ENCODING_ISO_8859_16:
+      return "iso8859-16";
+
+    default:
+      return "identity";
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidget::ConvertInternalStringToTkString(const char *str)
+{
+  if (!str || !this->IsCreated())
+    {
+    return "";
+    }
+
+  return this->Script(
+    "encoding convertfrom %s {%s}", 
+    vtkKWWidget::GetCharacterEncodingAsString(
+      this->GetApplication()->GetCharacterEncoding()), str);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWWidget::ConvertTkStringToInternalString(const char *str)
+{
+  if (!str || !this->IsCreated())
+    {
+    return "";
+    }
+
+  return this->Script(
+    "encoding convertfrom identity {%s}", str);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::SetTextOption(const char *str, const char *option)
 {
   if (!option || !this->IsCreated())
     {
     return;
     }
 
-  this->Script("%s configure %s [encoding convertfrom utf-8 {%s}]", 
-               this->GetWidgetName(), option, (text ? text : ""));
+  this->Script(
+    "%s configure %s [encoding convertfrom %s {%s}]", 
+    this->GetWidgetName(), 
+    option, 
+    vtkKWWidget::GetCharacterEncodingAsString(
+      this->GetApplication()->GetCharacterEncoding()), 
+    (str ? str : ""));
 }
 
 //----------------------------------------------------------------------------
