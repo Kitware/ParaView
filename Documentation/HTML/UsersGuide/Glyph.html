@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Glyphing</title>
+</head>
+
+<body>
+<h1>Glyphing <img alt="Glyph Button" src="Images/glyphButton.jpg"></h1>
+
+The vtkGlyph3D filter is used for copying glyph geometry (possibly scaled
+and/or oriented) to every point in a data set.  In ParaView, the user may
+choose which scalar and vector arrays to use, which glyph geometry to
+display at every point in the data set, and how to orient and scale the
+glyphs.
+
+<p>
+<center>
+<img alt="Glyph Screenshot" src="Images/glyph.jpg">
+</center>
+<p>
+
+The possible glyph sources (to create glyph geometry) are arrows, cones,
+and spheres.  These are listed in the "Glyph Source" menu as
+pvGlyphArrowOutput, pvGlyphConeOutput, and pvGlyphSphereOutput,
+respectively.
+
+<p>
+<center>
+<img alt="Glyph Sources" src="Images/glyphSources.jpg">
+</center>
+<p>
+
+If the user chooses to scale the glyphs to reflect the underlying data,
+then the "Scale" check button must be checked, one of four scaling options
+should be selected from the "Scale Mode" menu.  If the scale mode is
+"Scalar", the glyphs will be scaled according to the data in the selected
+"Point Scalars" array.  If "Vector" is selected, the glyphs will be scaled
+by the vector magnitude of the data in the selected "Point Vectors" array.
+If the scale mode is "Vector Components", then the glyphs are scaled in the
+x direction by the first component of the vectors in the selected "Point
+Vectors" array, in the y direction by the second components, and in the z
+direction by the third component.  If the scale mode is "Data Scaling Off",
+then the underlying data arrays will not affect the scale of the glyphs.
+Additionally, the user may also enter a scale factor, to be applied to all
+the glyphs, in the "Scale Factor" entry box.
+
+<p>
+<center>
+<img alt="Scaling Modes" src="Images/scaleModes.jpg">
+</center>
+<p>
+
+The glyphs can also be oriented to display the data in the selected "Point
+Vectors" data array or to reflect the normals of the underlying data set.
+This is determined by selecting a vector mode of "Normal" or "Vector",
+respectively.  If the glyphs are not to be oriented (rotated) according to
+underlying data arrays, then "Vector Rotation Off" should be selected.
+
+<p>
+<center>
+<img alt="Vector Modes" src="Images/vectorModes.jpg">
+</center>
+<p>
+
+<hr>
+<address></address>
+<!-- hhmts start -->
+Last modified: Tue Oct 23 15:08:40 EDT 2001
+<!-- hhmts end -->
+</body> </html>

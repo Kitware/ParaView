@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Using the Probe Filter</title>
+</head>
+
+<body>
+<h1>Using the Probe Filter</h1>
+
+The vtkProbeFilter is used for sampling the data values of a data set at
+specified point locations.  In ParaView, we supply two options for
+specifying point locations: a single point at a time or at evenly spaced
+points along a line.  When probing with a point, all the underlying point
+data is displayed in the user interface.  When using a line, the data is
+displayed in an xy-plot in the render window.  In the user interface, you
+can change which data array is being displayed.
+<p>
+<center>
+<img alt="Probing" src="Images/probePoint.jpg">
+</center>
+<p>
+If you choose to probe with a point, then you must select which point in
+the data to display information about.  If you are probing with a line, you
+need to select the endpoints of that line within the data set.  (Choose an
+endpoint to select coordinates for, and then choose the position of the
+endpoint.)  To select any of these points, we use a 3D cursor.  When the
+probe filter is selected, a button for this cursor is added to the
+interactor toolbar.  This interactor is made up of an axis-aligned bounding
+box containing a 3D axis.  Spheres are drawn on the faces of the bounding
+box at the endpoints of the 3 axes.  To select a point using the 3D cursor,
+move the mouse over one of these spheres (which will cause the sphere to
+turn red).  Then click on the sphere and drag it to select a new point.  If
+you wish to move a sphere on a face that is not currently visible, select
+another of the interactors from the toolbar (most likely the one for
+rotation) and change the view so that the desired face is visible.  Then
+select the 3D cursor interactor again to continue choosing a point.
+Alternatively, instead of using the 3D cursor, you can type the coordinates
+into the user interface.
+<p>
+<p>
+<center>
+<img alt="Probing with a Point" src="Images/probePointScalars.jpg">
+</center>
+<p>
+<p>
+<center>
+<img alt="Probing with a Line" src="Images/probeLineScalars.jpg">
+</center>
+<p>
+
+If you are probing with a line, you can also specify the number of
+subdivisions you wish to break the line into.  The number of subdivisions
+determines the number of points used in probing.
+<p>
+
+Once you have set the values for the parameters displayed in the user
+interface for probing, click the "Accept" button to see the results.
+<p>
+
+
+<hr>
+<address></address>
+<!-- hhmts start -->
+Last modified: Tue Oct 23 16:05:51 EDT 2001
+<!-- hhmts end -->
+</body> </html>
