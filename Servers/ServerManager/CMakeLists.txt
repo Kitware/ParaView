@@ -48,6 +48,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMLookupTableProxy.cxx
   vtkSMNumberOfPartsDomain.cxx
   vtkSMObject.cxx
+  vtkSMPVDWriterProxy.cxx
   vtkSMPart.cxx
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
