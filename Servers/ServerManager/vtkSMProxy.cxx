@@ -26,7 +26,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMProxy, "1.10");
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -337,6 +337,7 @@ void vtkSMProxy::AddProperty(const char* subProxyName,
 
   if (! subProxyName)
     {
+    // Check if the property is in a sub-proxy. If so, replace.
     vtkSMProxyInternals::ProxyMap::iterator it2 =
       this->Internals->SubProxies.begin();
     for( ; it2 != this->Internals->SubProxies.end(); it2++)
@@ -449,6 +450,9 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
   vtkSMProperty* prop = it->second.Property.GetPointer();
   if (flag && prop->GetImmediateUpdate())
     {
+    // If ImmediateUpdate is set, update the server immediatly.
+    // Also set the modified flag to 0.
+    //
     // This special condition is necessary because VTK objects cannot
     // be created before the input is set.
     if (!vtkSMInputProperty::SafeDownCast(prop))
@@ -494,7 +498,36 @@ void vtkSMProxy::UpdateVTKObjects()
   // referred by the proxy. This is done by appending all
   // the command to a streaming and executing that stream
   // at the end.
+  // The update is done in two passes. First: all input properties
+  // are updated, second: all other properties are updated. This
+  // is because setting input should create the VTK objects (the
+  // number of objects to create is based on the number of inputs
+  // in the case of filters)
   vtkSMProxyInternals::PropertyInfoMap::iterator it;
+  for (it  = this->Internals->Properties.begin();
+       it != this->Internals->Properties.end();
+       ++it)
+    {
+    vtkSMProperty* prop = it->second.Property.GetPointer();
+    if (prop->IsA("vtkSMInputProperty"))
+      {
+      if (it->second.ModifiedFlag && !prop->GetImmediateUpdate())
+        {
+        if (prop->GetUpdateSelf())
+          {
+          this->PushProperty(it->first.c_str(), this->SelfID, 0);
+          }
+        else
+          {
+          for (int i=0; i<numObjects; i++)
+            {
+            prop->AppendCommandToStream(&str, this->Internals->IDs[i]);
+            }
+          }
+        it->second.ModifiedFlag = 0;
+        }
+      }
+    }
   for (it  = this->Internals->Properties.begin();
        it != this->Internals->Properties.end();
        ++it)

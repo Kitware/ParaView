@@ -25,24 +25,10 @@
 
 #include "vtkStdString.h"
 
+#include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.10");
-
-class vtkSMProxyManagerElementMapType:
-  public vtkstd::map<vtkStdString, vtkSmartPointer<vtkPVXMLElement> > {};
-
-class vtkSMProxyManagerProxyMapType:
-  public vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMProxy> > {};
-
-struct vtkSMProxyManagerInternals
-{
-  typedef vtkstd::map<vtkStdString, vtkSMProxyManagerElementMapType> GroupMapType;
-  GroupMapType GroupMap;
-
-  typedef vtkstd::map<vtkStdString, vtkSMProxyManagerProxyMapType> ProxyGroupType;
-  ProxyGroupType RegisteredProxyMap;
-};
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.11");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -81,6 +67,10 @@ vtkSMProperty* vtkSMProxyManager::NewProperty(vtkPVXMLElement* pelement)
     {
     property->ReadXMLAttributes(pelement);
     }
+  else
+    {
+    vtkErrorMacro("Could not instantiate property: " << pelement->GetName());
+    }
   return property;
 }
 
@@ -92,6 +82,8 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(
     {
     return 0;
     }
+  // Find the XML element from which the proxy can be instantiated and
+  // initialized
   vtkSMProxyManagerInternals::GroupMapType::iterator it =
     this->Internals->GroupMap.find(groupName);
   if (it != this->Internals->GroupMap.end())
@@ -134,6 +126,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
       }
     proxy->SetXMLGroup(groupname);
 
+    // Create all sub-proxies and properties
     for(unsigned int i=0; i < pelement->GetNumberOfNestedElements(); ++i)
       {
       vtkPVXMLElement* propElement = pelement->GetNestedElement(i);
@@ -151,14 +144,17 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
             }
           }
         }
-      const char* name = propElement->GetAttribute("name");
-      if (name)
+      else
         {
-        vtkSMProperty* prop = this->NewProperty(propElement);
-        if (prop)
+        const char* name = propElement->GetAttribute("name");
+        if (name)
           {
-          proxy->AddProperty(name, prop);
-          prop->Delete();
+          vtkSMProperty* prop = this->NewProperty(propElement);
+          if (prop)
+            {
+            proxy->AddProperty(name, prop);
+            prop->Delete();
+            }
           }
         }
       }
@@ -311,6 +307,7 @@ void vtkSMProxyManager::SaveState(const char* filename)
   ofstream os(filename, ios::out);
   vtkIndent indent;
 
+  // First save the state of all proxies
   vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.begin();
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
@@ -323,6 +320,8 @@ void vtkSMProxyManager::SaveState(const char* filename)
       }
     }
 
+  // Save the proxy collections. This is done seprately because
+  // one proxy can be in more than one group.
   it = this->Internals->RegisteredProxyMap.begin();
   for (; it != this->Internals->RegisteredProxyMap.end(); it++)
     {

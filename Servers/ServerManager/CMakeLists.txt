@@ -18,6 +18,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMDisplayerProxy.cxx
   vtkSMDisplayWindowProxy.cxx
   vtkSMProxyGroupDomain.cxx
+  vtkSMProxyIterator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMStringVectorProperty.cxx

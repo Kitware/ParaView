@@ -12,14 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyManager - singleton responsible for creating proxies
+// .NAME vtkSMProxyManager - singleton responsible for creating and managing proxies
 // .SECTION Description
 // vtkSMProxyManager is a singleton that creates and manages proxies.
 // It maintains a map of XML elements (populated by the XML parser) from
 // which it can create and initialize proxies and properties.
 // Once a proxy is created, it can either be managed by the user code or
 // the proxy manager. For latter, pass the control of the proxy to the
-// manager with ManageProxy() and unregister it. At destruction, proxy
+// manager with RegisterProxy() and unregister it. At destruction, proxy
 // manager deletes all managed proxies.
 // .SECTION See Also
 // vtkSMXMLParser
@@ -57,12 +57,18 @@ public:
   // Used to pass the control of the proxy to the manager. The user code can
   // then release its reference count and not care about what happens
   // to the proxy. Managed proxies are deleted at destruction. NOTE:
-  // The name has to be unique. If not, the existing proxy will be
-  // replaced (and unregistered).
+  // The name has to be unique (per group). If not, the existing proxy will be
+  // replaced (and unregistered). The proxy instances are grouped in collections
+  // (not necessarily the same as the group in the XML configuration file).
+  // These collections can be used to separate proxies based on their
+  // functionality. For example, implicit planes can be grouped together
+  // and the acceptable values of a proxy property can be restricted
+  // (using a domain) to this collection.
   void RegisterProxy(const char* groupname, const char* name, vtkSMProxy* proxy);
 
   // Description:
-  // Given its name returns a proxy. If not a managed proxy, returns 0.
+  // Given its name (and group) returns a proxy. If not a managed proxy, 
+  // returns 0.
   vtkSMProxy* GetProxy(const char* groupname, const char* name);
   vtkSMProxy* GetProxy(const char* name);
 
@@ -88,6 +94,9 @@ public:
   void UpdateRegisteredProxies();
 
   // Description:
+  // Save the state of the server manager in XML format in a file.
+  // This saves the state of all proxies and properties. NOTE: The XML
+  // format is still evolving.
   void SaveState(const char* filename);
 
 protected:
@@ -106,14 +115,14 @@ protected:
   vtkSMProperty* NewProperty(vtkPVXMLElement* pelement);
 
   // Description:
-  // Given an XML element create a proxy and all of it's properties.
+  // Given an XML element and group name create a proxy 
+  // and all of it's properties.
   vtkSMProxy* NewProxy(vtkPVXMLElement* element, const char* groupname);
 
 //BTX
   friend class vtkSMXMLParser;
+  friend class vtkSMProxyIterator;
 //ETX
-
-  virtual void SaveState(const char*, ofstream*, vtkIndent) {};
 
 private:
   vtkSMProxyManagerInternals* Internals;

@@ -12,9 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProxyGroupDomain -
+// .NAME vtkSMProxyGroupDomain - union of proxy groups
 // .SECTION Description
+// The proxy group domain consists of all proxies in a list of groups.
+// This domain is commonly used together with vtkSMProxyPropery
 // .SECTION See Also
+// vtkSMDomain vtkSMProxyPropery
 
 #ifndef __vtkSMProxyGroupDomain_h
 #define __vtkSMProxyGroupDomain_h
@@ -35,6 +38,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Add a group to the domain. The domain is the union of
+  // all groups.
   void AddGroup(const char* group);
 
   // Description:

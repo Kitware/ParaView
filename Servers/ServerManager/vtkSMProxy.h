@@ -21,8 +21,11 @@
 // by the VTKClassName variable. The object is managed by getting the desired
 // property from the proxy, changing it's value and updating the server
 // with UpdateVTKObjects().
+// A proxy can be composite. Sub-proxies can be added by the proxy 
+// manager. This is transparent to the user who sees all properties
+// as if they belong to the root proxy.
 // .SECTION See Also
-// vtkSMProperty vtkSMSourceProxy
+// vtkSMProxyManager vtkSMProperty vtkSMSourceProxy vtkSMPropertyIterator
 
 #ifndef __vtkSMProxy_h
 #define __vtkSMProxy_h
@@ -47,7 +50,7 @@ public:
   // Add a property with the given key (name). The name can then
   // be used to retrieve the property with GetProperty(). If a
   // property with the given name has been added before, it will
-  // be replaced.
+  // be replaced. This includes properties in sub-proxies.
   void AddProperty(const char* name, vtkSMProperty* prop);
 
   // Description:
@@ -62,6 +65,20 @@ public:
   virtual void UpdateVTKObjects();
 
   // Description:
+  // Calls UpdateVTKObjects() on self and all proxies that depend
+  // on this proxy (through vtkSMProxyProperty properties). It will
+  // traverse the dependence tree and update starting from the source.
+  // This allows instantiating a whole pipeline (including connectivity)
+  // without having to worry about the order. Here is how to do it:
+  // @verbatim
+  // * Create all proxies
+  // * Set all property values - make sure that input properties
+  //      do not auto update by calling 
+  //      vtkSMInputProperty::SetInputsUpdateImmediately(0); 
+  // * Call UpdateSelfAndAllInputs() on either all proxies or
+  //   one that depends on all others (usually one or more DisplayWindows)
+  // * If necessary vtkSMInputProperty::SetInputsUpdateImmediately(1); 
+  // @endverbatim
   virtual void UpdateSelfAndAllInputs();
 
   // Description:
@@ -69,9 +86,12 @@ public:
   vtkGetStringMacro(VTKClassName);
 
   // Description:
+  // Overloaded to break the reference loop caused by the fact that
+  // proxies store their own ClientServer ids.
   virtual void UnRegister(vtkObjectBase* obj);
 
   // Description:
+  // Returns a new (initialized) iterator of the properties.
   vtkSMPropertyIterator* NewPropertyIterator();
 
 protected:
@@ -99,9 +119,15 @@ protected:
   vtkSetStringMacro(VTKClassName);
 
   // Description:
+  // Assigned by the XML parser. The name assigned in the XML
+  // configuration. Can be used to figure out the origin of the
+  // proxy.
   vtkSetStringMacro(XMLName);
 
   // Description:
+  // Assigned by the XML parser. The group in the XML configuration that
+  // this proxy belongs to. Can be used to figure out the origin of the
+  // proxy.
   vtkSetStringMacro(XMLGroup);
 
   // Description:
@@ -211,19 +237,30 @@ protected:
   // Changes the modified flag of a property. Used by the observers
   void SetPropertyModifiedFlag(const char* name, int flag);
 
+  // Description:
+  // Add a property to either self (subProxyName = 0) or a sub-proxy.
+  // IMPORTANT: If subProxyName = 0, AddProperty() checks for a
+  // proxy with the given name in self and all sub-proxies, if one
+  // exists, it replaces it. In this special case, it is possible for
+  // the property to be added to a sub-proxy as opposed to self.
   void AddProperty(const char* subProxyName,
                    const char* name, 
                    vtkSMProperty* prop);
 
+  // Description:
+  // Add a property to self.
   void AddPropertyToSelf(const char* name, vtkSMProperty* prop);
 
   // Description:
+  // Add a sub-proxy.
   void AddSubProxy(const char* name, vtkSMProxy* proxy);
 
   // Description:
+  // Remove a sub-proxy.
   void RemoveSubProxy(const char* name);
 
   // Description:
+  // Returns a sub-proxy. Returns 0 if sub-proxy does not exist.
   vtkSMProxy* GetSubProxy(const char* name);
 
   char* VTKClassName;

@@ -56,6 +56,8 @@ public:
   void SetRepresentation(int repr);
 
   // Description:
+  // Set the color of the render window. Also set specular color
+  // to (1,1,1)
   void SetColor(double r, double g, double b);
 
 protected:

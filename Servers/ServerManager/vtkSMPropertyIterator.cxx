@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.2");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.3");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -75,6 +75,7 @@ void vtkSMPropertyIterator::Begin()
   this->Internals->ProxyIterator = 
     this->Proxy->Internals->SubProxies.begin(); 
 
+  // Go to the first sub-proxy that is not empty.
   while (this->Internals->ProxyIterator != 
          this->Proxy->Internals->SubProxies.end())
     {
@@ -112,6 +113,8 @@ void vtkSMPropertyIterator::Next()
     vtkErrorMacro("Proxy is not set. Can not perform operation: Next()");
     return;
     }
+
+  // If we are still in the root proxy, move to the next element.
   if (this->Internals->PropertyIterator != 
       this->Proxy->Internals->Properties.end())
     {
@@ -119,19 +122,24 @@ void vtkSMPropertyIterator::Next()
     return;
     }
 
+  // If we moved past the elements in the root proxy, move to the 
+  // sub-proxy elements.
   if (this->Internals->ProxyIterator != 
       this->Proxy->Internals->SubProxies.end())
     {
+    // Increment
     if (this->Internals->SubPropertyIterator != 
         this->Internals->ProxyIterator->second->Internals->Properties.end())
       {
       this->Internals->SubPropertyIterator++;
       }
 
+    // If we reached the end of the current sub-proxy, move to the next one
     if (this->Internals->SubPropertyIterator == 
         this->Internals->ProxyIterator->second->Internals->Properties.end())
       {
       this->Internals->ProxyIterator++;
+      // Move to the first sub-proxy which is not empty
       while (this->Internals->ProxyIterator != 
              this->Proxy->Internals->SubProxies.end())
         {

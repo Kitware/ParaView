@@ -12,9 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDomain -
+// .NAME vtkSMDomain - represents the possible values a property can have
 // .SECTION Description
+// vtkSMDomain is an abstract class that describes the "domain" of a
+// a widget. A domain is a collection of possible values a property
+// can have.
 // .SECTION See Also
+// vtkSMProxyGroupDomain
 
 #ifndef __vtkSMDomain_h
 #define __vtkSMDomain_h
@@ -31,6 +35,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Is the value of the property in the domain? Overwritten by
+  // sub-classes.
   virtual int IsInDomain(vtkSMProperty* property) = 0;
 
 protected:

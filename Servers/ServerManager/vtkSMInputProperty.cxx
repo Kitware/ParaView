@@ -17,11 +17,13 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMPropertyIterator.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyIterator.h"
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMInputProperty);
-vtkCxxRevisionMacro(vtkSMInputProperty, "1.3");
+vtkCxxRevisionMacro(vtkSMInputProperty, "1.4");
 
 int vtkSMInputProperty::InputsUpdateImmediately = 1;
 
@@ -37,6 +39,38 @@ vtkSMInputProperty::vtkSMInputProperty()
 //---------------------------------------------------------------------------
 vtkSMInputProperty::~vtkSMInputProperty()
 {
+}
+
+//---------------------------------------------------------------------------
+int vtkSMInputProperty::GetInputsUpdateImmediately()
+{
+  return vtkSMInputProperty::InputsUpdateImmediately;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMInputProperty::SetInputsUpdateImmediately(int up)
+{
+  vtkSMInputProperty::InputsUpdateImmediately = up;
+
+  vtkSMPropertyIterator* piter = vtkSMPropertyIterator::New();
+  vtkSMProxyIterator* iter = vtkSMProxyIterator::New();
+  while(!iter->IsAtEnd())
+    {
+    piter->SetProxy(iter->GetProxy());
+    while(!piter->IsAtEnd())
+      {
+      vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+        piter->GetProperty());
+      if (ip)
+        {
+        ip->SetImmediateUpdate(up);
+        }
+      piter->Next();
+      }
+    iter->Next();
+    }
+  iter->Delete();
+  piter->Delete();
 }
 
 //---------------------------------------------------------------------------
@@ -93,16 +127,6 @@ int vtkSMInputProperty::ReadXMLAttributes(vtkPVXMLElement* element)
     }
 
   return 1;
-}
-
-int vtkSMInputProperty::GetInputsUpdateImmediately()
-{
-  return vtkSMInputProperty::InputsUpdateImmediately;
-}
-
-void vtkSMInputProperty::SetInputsUpdateImmediately(int up)
-{
-  vtkSMInputProperty::InputsUpdateImmediately = up;
 }
 
 //---------------------------------------------------------------------------
