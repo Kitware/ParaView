@@ -17,7 +17,7 @@ proc CheckForDemoFile { file } {
         return 0
     }
 
-    [$Application GetProcessModule] RootSimpleScript "file exists $DemoDir/$file"
+    [$Application GetProcessModule] RootSimpleScript "file exists {$DemoDir/$file}"
     if { ! [[$Application GetProcessModule] GetRootResult]} {
 	vtkKWMessageDialog _adialog
 	_adialog PopupMessage $Application [$Application GetMainWindow] Error "Could not find the data file $file. This usually means that ParaView was not installed properly. Please fix the problem and try again." 0
