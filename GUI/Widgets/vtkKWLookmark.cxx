@@ -30,7 +30,6 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
-#include <sstream>
 #include "vtkKWIcon.h"
 #include "vtkKWRadioButtonSet.h"
 #include "vtkKWRadioButton.h"
@@ -38,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.2");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.3");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -442,4 +441,8 @@ void vtkKWLookmark::Pack()
 void vtkKWLookmark::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Location: " << this->Location << endl;
+  os << indent << "SeparatorFrame: " << this->SeparatorFrame << endl;
+  os << indent << "LmkMainFrame: " << this->LmkMainFrame << endl;
+  os << indent << "LmkIcon: " << this->LmkIcon << endl;
 }

@@ -30,14 +30,13 @@
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
-#include <sstream>
 #include "vtkKWWidgetCollection.h"
 #include "vtkCollectionIterator.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.1");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.2");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -413,4 +412,9 @@ void vtkKWLookmarkFolder::UpdateEnableState()
 void vtkKWLookmarkFolder::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Location: " << this->Location << endl;
+  os << indent << "LabelFrame: " << this->LabelFrame << endl;
+  os << indent << "SeparatorFrame: " << this->SeparatorFrame << endl;
+  os << indent << "NestedSeparatorFrame: " << 
+    this->NestedSeparatorFrame << endl;
 }
