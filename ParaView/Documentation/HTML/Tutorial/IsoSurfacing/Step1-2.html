@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html> <head>
-<title>Introduction to ParaView - Steps 1 and 2</title>
+<title>Creating Isosurfaces - Steps 1 and 2</title>
 </head>
 
 <body>
@@ -10,7 +10,7 @@
     <tr>
       <td valign="Top"><a href="index.html">Up</a>
       </td>
-      <td valign="Top"><a href="Step3.html">Next</a>
+      <td valign="Top"><a href="Step3-5.html">Next</a>
       </td>
     </tr>
   </tbody>
@@ -18,20 +18,20 @@
 
 <hr>
 <!-- End NavBar -->
+
 <h1>Step 1</h1>
 Start ParaView (see the <a href="../../UsersGuide/index.html">user's guide</a> for information on how to launch ParaView)
 
 <h1>Step 2</h1>
-
-Create a sphere source by selecting SphereSource from VTK -> Sources
-menu. The VTK menu allows the user to access a selected list of VTK
-sources and filters. Normally, this menu is for advanced users who
-have knowledge about VTK sources and filters and is not required for
-the most common tasks.
+Create a test source by selecting RTAnalyticSource from VTK -> Sources
+menu. Click Accept.  RTAnalyticSource is an artificial data source which
+generates three-dimensional image data (also referred to as structured
+points) using an analytical function of the form Maximum*Gaussian*XMag*sin(XFreq*x)*sin(YFreq*y)*cos(ZFreq*z).
 <p>
 <center>
-<img alt="Creating a Sphere" src="creating.jpg"> 
+<img alt="Creating a Source" src="source.jpg"> 
 </center>
+
 
 <hr>
 <!-- Start NavBar -->
@@ -40,15 +40,15 @@ the most common tasks.
     <tr>
       <td valign="Top"><a href="index.html">Up</a>
       </td>
-      <td valign="Top"><a href="Step3.html">Next</a>
+      <td valign="Top"><a href="Step3-5.html">Next</a>
       </td>
     </tr>
   </tbody>
 </table>
-<!-- End NavBar -->
 
+<!-- End NavBar -->
 <address></address>
 <!-- hhmts start -->
-Last modified: Mon Dec  3 10:23:55 EST 2001
+Last modified: Mon Dec  3 10:25:35 EST 2001
 <!-- hhmts end -->
 </body> </html>
