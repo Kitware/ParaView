@@ -13,9 +13,6 @@ OPTION (VTK_USE_PARALLEL "Build the parallel directory classes" ON)
 OPTION (VTK_WRAP_TCL "wrap classes into the TCL intepreted language" ON)
 
 OPTION(BUILD_SHARED_LIBS "Build VTK with shared libraries." OFF)
-IF(NOT BUILD_SHARED_LIBS)
-  SET(TCL_TK_STATIC 1)
-ENDIF(NOT BUILD_SHARED_LIBS)
 
 OPTION (USE_INCLUDED_TCLTK "Should Tcl/Tk included in ParaViewComplete be used. Turn this off if you want to use your own Tcl/Tk. Note that you need version 8.4.5" ON)
 
@@ -88,25 +85,14 @@ IF(USE_INCLUDED_TCLTK)
   
   ELSE(UNIX)
     SET(PV_TCL_DIR ${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win)
-    IF (TCL_TK_STATIC)
-      SET(TCL_LIBRARY ${PV_TCL_DIR}/tcl84sx.lib CACHE FILEPATH
-        "Path to tcl library" FORCE)
-      SET(TCL_LIBRARY_DEBUG ${PV_TCL_DIR}/tcl84sgx.lib CACHE FILEPATH
-        "Path to tcl debug library" FORCE)
-      SET(TK_LIBRARY ${PV_TCL_DIR}/tk84sx.lib CACHE FILEPATH
-        "Path to tk library" FORCE)
-      SET(TK_LIBRARY_DEBUG ${PV_TCL_DIR}/tk84sgx.lib CACHE FILEPATH
-        "Path to tk debug library" FORCE)
-    ELSE (TCL_TK_STATIC)
-      SET(TCL_LIBRARY ${PV_TCL_DIR}/tcl84.lib CACHE FILEPATH
-        "Path to tcl library" FORCE)
-      SET(TCL_LIBRARY_DEBUG ${PV_TCL_DIR}/tcl84.lib CACHE FILEPATH
-        "Path to tcl debug library" FORCE)
-      SET(TK_LIBRARY ${PV_TCL_DIR}/tk84.lib CACHE FILEPATH
-        "Path to tk library" FORCE)
-      SET(TK_LIBRARY_DEBUG ${PV_TCL_DIR}/tk84.lib CACHE FILEPATH
-        "Path to tk debug library" FORCE)
-    ENDIF (TCL_TK_STATIC)
+    SET(TCL_LIBRARY ${PV_TCL_DIR}/lib/tcl84.lib CACHE FILEPATH
+      "Path to tcl library" FORCE)
+    SET(TCL_LIBRARY_DEBUG ${PV_TCL_DIR}/lib/tcl84.lib CACHE FILEPATH
+      "Path to tcl debug library" FORCE)
+    SET(TK_LIBRARY ${PV_TCL_DIR}/lib/tk84.lib CACHE FILEPATH
+      "Path to tk library" FORCE)
+    SET(TK_LIBRARY_DEBUG ${PV_TCL_DIR}/lib/tk84.lib CACHE FILEPATH
+      "Path to tk debug library" FORCE)
     SET(TCL_INCLUDE_PATH ${PV_TCL_DIR}/include CACHE PATH
       "Path to tcl include" FORCE)
     SET(TK_INCLUDE_PATH ${PV_TCL_DIR}/include CACHE PATH
