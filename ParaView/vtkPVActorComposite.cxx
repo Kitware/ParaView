@@ -1023,6 +1023,11 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
 {
   vtkRenderer *ren;
   
+  if (!this->GetView())
+    {
+    return;
+    }
+  
   ren = this->GetView()->GetRenderer();
   
   if (this->ScalarBarCheck->GetState() != val)
