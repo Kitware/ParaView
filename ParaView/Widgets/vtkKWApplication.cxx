@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.91");
+vtkCxxRevisionMacro(vtkKWApplication, "1.92");
 
 
 
@@ -957,6 +957,14 @@ int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey,
     = this->GetRegistery(this->GetApplicationName());
   res = reg->DeleteValue(buffer, key);
   return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::HasRegisteryValue(int level, const char* subkey, 
+                                        const char* key)
+{
+  char buffer[1024];
+  return this->GetRegisteryValue(level, subkey, key, buffer);
 }
 
 //----------------------------------------------------------------------------

@@ -241,6 +241,7 @@ public:
   int GetRegisteryValue(int level, const char* subkey, const char* key, 
                         char* value);
   int DeleteRegisteryValue(int level, const char* subkey, const char* key);
+  int HasRegisteryValue(int level, const char* subkey, const char* key);
   
   // Description:
   // Perform a boolean check of the value in registery. If the value
