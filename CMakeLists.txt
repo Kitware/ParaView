@@ -19,6 +19,11 @@ SET (EXECUTABLE_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
 # No XML IO
 SET(DO_NOT_BUILD_XML_RW 1)
 
+INCLUDE_DIRECTORIES(${ParaView_BINARY_DIR})
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
+  ${ParaView_BINARY_DIR}/vtkPVConfig.h
+  ESCAPE_QUOTES)
+
 #########################################################################
 # Configure Testing
 OPTION(BUILD_TESTING "Build ParaView Complete Testing" OFF)
@@ -54,29 +59,30 @@ SUBDIRS(Utilities/TclTk)
 #########################################################################
 # Configure VTK
 # force some values to be set by default as they are required by ParaView
-SET(VTK_USE_HYBRID_FORCE ON)
-SET(VTK_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
-SET(VTK_USE_PARALLEL_FORCE ON)
-SET(VTK_USE_RENDERING ON CACHE INTERNAL "" FORCE)
+# 
+# something_ISSET is set for vtkDependentOption to not change it to bool. For
+# more information, check VTK/CMake/vtkDependentOption.cmake
+SET(VTK_USE_HYBRID_ISSET ON)
+SET(VTK_USE_PARALLEL_ISSET ON)
+SET(VTK_USE_VOLUMEPRO_ISSET OFF)
+SET(VTK_USE_GL2PS_ISSET OFF)
 
-SET(VTK_USE_VOLUMEPRO_FORCE OFF)
-SET(VTK_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
-SET(VTK_WRAP_JAVA OFF CACHE INTERNAL "" FORCE)
-SET(VTK_USE_GL2PS_FORCE OFF)
+SET(VTK_USE_RENDERING ON)
+SET(VTK_WRAP_TCL OFF)
+SET(VTK_WRAP_PYTHON OFF)
+SET(VTK_WRAP_JAVA OFF)
 
 SET(VTK_DIR "${ParaView_BINARY_DIR}/VTK")
+SET(VTK_FOUND 1)
+
+# Specify python build so that we can use vtkTkRenderWidget with no
+# vtkRenderWindow wrapped.
+ADD_DEFINITIONS(-DVTK_PYTHON_BUILD)
 
 SUBDIRS(VTK)
-IF(EXISTS "${VTK_DIR}/VTKLibraryDepends.cmake")
-ELSE(EXISTS "${VTK_DIR}/VTKLibraryDepends.cmake")
-  SET(VTK_NO_LIBRARY_DEPENDS 1)
-ENDIF(EXISTS "${VTK_DIR}/VTKLibraryDepends.cmake")
-IF(EXISTS "${VTK_DIR}/VTKConfig.cmake")
-  FIND_PACKAGE(VTK QUIET)
-  IF(VTK_FOUND)
-    INCLUDE(${VTK_USE_FILE})
-  ENDIF(VTK_FOUND)
-ENDIF(EXISTS "${VTK_DIR}/VTKConfig.cmake")
+
+# This is a hack for now. Once the transition is over, this macro goes aways
+ADD_DEFINITIONS(-DPARAVIEW_NEW_SOURCE_ORGANIZATION)
 
 
 #########################################################################
