@@ -28,7 +28,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.14.2.3");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.14.2.4");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -109,8 +109,8 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(
       return this->NewProxy(element, groupName);
       }
     }
-  vtkErrorMacro( << "No Proxy where found that matches: group=" << groupName 
-                 << " and proxy=" << proxyName );
+  vtkErrorMacro( << "No proxy that matches: group=" << groupName 
+                 << " and proxy=" << proxyName << " were found.");
   return 0;
 }
 
