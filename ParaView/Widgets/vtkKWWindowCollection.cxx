@@ -41,8 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkKWWindowCollection.h"
-#include "vtkObjectFactory.h"
+
 #include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWWindowCollection);
 

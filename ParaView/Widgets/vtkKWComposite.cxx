@@ -41,10 +41,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkKWComposite.h"
-#include "vtkKWView.h"
+
 #include "vtkKWApplication.h"
-#include "vtkKWWindow.h"
 #include "vtkKWMenu.h"
+#include "vtkKWView.h"
+#include "vtkKWWindow.h"
 
 int vtkKWCompositeCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -213,7 +214,7 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.17 $");
+  this->ExtractRevision(os,"$Revision: 1.18 $");
 }
 
 //----------------------------------------------------------------------------

@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCornerAnnotation.h"
 
 #include "vtkCornerAnnotation.h"
-#include "vtkKWApplication.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEvent.h"
@@ -50,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSerializer.h"
 #include "vtkKWText.h"
 #include "vtkKWView.h"
-#include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
 
@@ -352,7 +350,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.26 $");
+  this->ExtractRevision(os,"$Revision: 1.27 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 

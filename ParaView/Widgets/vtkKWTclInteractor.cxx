@@ -39,15 +39,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWTclInteractor.h"
+
+#include "vtkKWApplication.h"
+#include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWLabeledEntry.h"
 #include "vtkKWText.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWLabel.h"
-#include "vtkKWEntry.h"
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );

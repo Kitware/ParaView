@@ -41,14 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWMessageDialog.h"
 
-#include "vtkKWApplication.h"
-#include "vtkKWCheckButton.h"
-#include "vtkKWEvent.h"
-#include "vtkKWIcon.h"
-#include "vtkKWImageLabel.h"
-#include "vtkKWLabel.h"
-#include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWLabel.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWImageLabel.h"
+#include "vtkKWIcon.h"
+#include "vtkKWApplication.h"
+#include "vtkKWEvent.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
