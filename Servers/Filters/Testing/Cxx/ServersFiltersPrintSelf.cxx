@@ -12,6 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPVConfig.h"
+
 #include "vtkCaveRenderManager.h"
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkClientCompositeManager.h"
@@ -82,21 +84,22 @@
 #include "vtkXMLPVAnimationWriter.h"
 #include "vtkXMLPVDWriter.h"
 
-// In an ideal world we would have PARAVIEW_USE_ICE_T
 #ifdef VTK_USE_MPI
-#include "vtkAllToNRedistributePolyData.h"
-#include "vtkBalancedRedistributePolyData.h"
-#include "vtkDesktopDeliveryClient.h"
-#include "vtkDesktopDeliveryServer.h"
+# include "vtkAllToNRedistributePolyData.h"
+# include "vtkBalancedRedistributePolyData.h"
+# ifdef PARAVIEW_USE_ICE_T
+#  include "vtkDesktopDeliveryClient.h"
+#  include "vtkDesktopDeliveryServer.h"
 //#include "vtkExtractCTHPart2.h"
-#include "vtkIceTClientCompositeManager.h"
-#include "vtkIceTFactory.h"
-#include "vtkIceTRenderer.h"
-#include "vtkIceTRenderManager.h"
-#include "vtkPVDuplicatePolyData.h"
-#include "vtkRedistributePolyData.h"
+#  include "vtkIceTClientCompositeManager.h"
+#  include "vtkIceTFactory.h"
+#  include "vtkIceTRenderer.h"
+#  include "vtkIceTRenderManager.h"
+# endif
+# include "vtkPVDuplicatePolyData.h"
+# include "vtkRedistributePolyData.h"
 //#include "vtkStructuredCacheFilter.h"
-#include "vtkWeightedRedistributePolyData.h"
+# include "vtkWeightedRedistributePolyData.h"
 #endif //VTK_USE_MPI
 
 #ifdef VTK_USE_PATENTED
@@ -179,6 +182,7 @@ int main(int , char *[])
 #ifdef VTK_USE_MPI
   c = vtkAllToNRedistributePolyData::New(); c->Print(cout); c->Delete();
   c = vtkBalancedRedistributePolyData::New(); c->Print(cout); c->Delete();
+# ifdef PARAVIEW_USE_ICE_T
   c = vtkDesktopDeliveryClient::New(); c->Print(cout); c->Delete();
   c = vtkDesktopDeliveryServer::New(); c->Print(cout); c->Delete();
 //  c = vtkExtractCTHPart2::New(); c->Print(cout); c->Delete();
@@ -186,6 +190,7 @@ int main(int , char *[])
   c = vtkIceTFactory::New(); c->Print(cout); c->Delete();
   c = vtkIceTRenderer::New(); c->Print(cout); c->Delete();
   c = vtkIceTRenderManager::New(); c->Print(cout); c->Delete();
+# endif
   c = vtkPVDuplicatePolyData::New(); c->Print(cout); c->Delete();
   c = vtkRedistributePolyData::New(); c->Print(cout); c->Delete();
 //  c = vtkStructuredCacheFilter::New(); c->Print(cout); c->Delete();
