@@ -77,6 +77,18 @@ public:
   virtual int Write(const char *filename);
 
   // Description:
+  // Enable/Disable factorization of the XML tree on write.
+  vtkSetClampMacro(WriteFactored, int, 0, 1);
+  vtkGetMacro(WriteFactored, int);
+  vtkBooleanMacro(WriteFactored, int);
+
+  // Description:
+  // Enable/Disable indentation of the XML tree on write.
+  vtkSetClampMacro(WriteIndented, int, 0, 1);
+  vtkGetMacro(WriteIndented, int);
+  vtkBooleanMacro(WriteIndented, int);
+
+  // Description:
   // Return the name of the root element of the XML tree this writer
   // is supposed to write.
   virtual char* GetRootElementName() = 0;
@@ -102,6 +114,9 @@ protected:
   ~vtkXMLObjectWriter();  
   
   vtkObject *Object;
+
+  int WriteFactored;
+  int WriteIndented;
 
   // Description:
   // Add the root element attributes.

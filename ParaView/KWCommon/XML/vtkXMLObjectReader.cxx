@@ -44,8 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLDataParser.h"
+#include "vtkXMLUtilities.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectReader, "1.3");
+vtkCxxRevisionMacro(vtkXMLObjectReader, "1.4");
 
 vtkCxxSetObjectMacro(vtkXMLObjectReader, Object, vtkObject);
 
@@ -91,6 +92,7 @@ int vtkXMLObjectReader::ParseStream(istream &is)
 
   if (this->XMLParser->Parse())
     {
+    vtkXMLUtilities::UnFactorElements(this->XMLParser->GetRootElement());
     return this->Parse(this->XMLParser->GetRootElement());
     }
 

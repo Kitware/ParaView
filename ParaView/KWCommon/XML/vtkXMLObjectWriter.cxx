@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLUtilities.h"
 #include "vtkXMLDataElement.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.3");
+vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.4");
 
 vtkCxxSetObjectMacro(vtkXMLObjectWriter, Object, vtkObject);
 
@@ -54,6 +54,8 @@ vtkCxxSetObjectMacro(vtkXMLObjectWriter, Object, vtkObject);
 vtkXMLObjectWriter::vtkXMLObjectWriter()
 {
   this->Object = 0;
+  this->WriteFactored = 1;
+  this->WriteIndented = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -178,9 +180,16 @@ int vtkXMLObjectWriter::Write(ostream &os, vtkIndent indent)
   vtkXMLDataElement *elem = vtkXMLDataElement::New();
   this->Create(elem);
 
+  // Factor it
+
+  if (this->WriteFactored)
+    {
+    vtkXMLUtilities::FactorElements(elem);
+    }
+
   // Output the element
   
-  vtkXMLUtilities::FlattenElement(elem, os, &indent);
+  vtkXMLUtilities::FlattenElement(elem, os, this->WriteIndented ? &indent : 0);
 
   elem->Delete();
 
@@ -209,4 +218,10 @@ void vtkXMLObjectWriter::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Object: (none)\n";
     }
+
+  os << indent << "WriteFactored: " 
+     << (this->WriteFactored ? "On" : "Off") << endl;
+
+  os << indent << "WriteIndented: " 
+     << (this->WriteIndented ? "On" : "Off") << endl;
 }
