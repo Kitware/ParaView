@@ -45,7 +45,7 @@ int vtkPVAnimationWriterMakeDirectory(const char* dirname)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationWriter);
-vtkCxxRevisionMacro(vtkPVAnimationWriter, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationWriter, "1.1.2.2");
 
 //----------------------------------------------------------------------------
 
@@ -332,7 +332,7 @@ int vtkPVAnimationWriter::WriteData()
       i != this->Internal->Entries.end(); ++i)
     {
     os << indent.GetNextIndent()
-       << "<DataSet time=\"" << i->Time
+       << "<DataSet timestep=\"" << i->Time
        << "\" group=\"" << i->Group.c_str()
        << "\" part=\"" << i->Part
        << "\" file=\"" << i->FileName.c_str()
