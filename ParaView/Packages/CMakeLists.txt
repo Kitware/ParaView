@@ -3,6 +3,7 @@ PROJECT(PVPackages)
 
 INCLUDE_DIRECTORIES(${PVPackages_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${PVPackages_BINARY_DIR})
+LINK_DIRECTORIES(${PVPackages_BINARY_DIR})
 
 SET( AltIO_SRCS
   vtkBase64InputStream.cxx
@@ -88,6 +89,8 @@ VTK_MAKE_INSTANTIATOR(vtkAltIOInstantiator AltIOInstantiator_SRCS
                       HEADER_LOCATION ${PVPackages_BINARY_DIR})
 ADD_LIBRARY(vtkAltIO SHARED ${AltIO_SRCS} ${AltIOInstantiator_SRCS})
 
+TARGET_LINK_LIBRARIES (vtkAltIO vtkIO)
+
 IF (VTK_WRAP_TCL)
   VTK_WRAP_TCL(vtkAltIOTCL AltIOTCL_SRCS ${AltIO_SRCS})
   ADD_LIBRARY(vtkAltIOTCL SHARED ${AltIOTCL_SRCS})
@@ -98,9 +101,5 @@ IF (VTK_WRAP_TCL)
                          vtkCommonTCL
                          ${TCL_LIBRARY})
 ENDIF (VTK_WRAP_TCL)
-
-TARGET_LINK_LIBRARIES (vtkAltIO
-vtkIO
-)
 
 SUBDIRS(Testing)
