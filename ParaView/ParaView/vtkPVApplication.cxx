@@ -932,7 +932,7 @@ void vtkPVApplication::DisplayHelp()
   vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
   sprintf(temp, "%i", this->GetApplicationKey());
   reg->SetTopLevel(temp);
-  if (reg->ReadValue("Inst", loc, "Loc"))
+  if (reg->ReadValue("Inst", "Loc", loc))
     {
     sprintf(temp,"%s/%s.chm::/UsersGuide/index.html",
             loc,this->ApplicationName);
