@@ -1,0 +1,4 @@
+ADD_EXECUTABLE(TestContinuousClose3D TestContinuousClose3D.cxx)
+ADD_TEST(TestContinuousClose3D ${CXX_TEST_PATH}/TestContinuousClose3D)
+ 
+TARGET_LINK_LIBRARIES(TestContinuousClose3D vtkPVFilters)
