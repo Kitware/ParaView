@@ -8,6 +8,23 @@
   Date:      $Date$
   Version:   $Revision$
 
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+  Copyright (C) 2003 Sandia Corporation
+  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+  license for use of this work by or on behalf of the U.S. Government.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that this Notice and any statement
+  of authorship are reproduced on all copies.
+
+  Contact: Lee Ann Fisk, lafisk@sandia.gov
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 // .NAME vtkDistributedDataFilter
@@ -37,16 +54,17 @@
 #define __vtkDistributedDataFilter_h
 
 #include <vtkDataSetToUnstructuredGridFilter.h>
-#include <vtkVersion.h>
-#include <vtkTimerLog.h>
 
-class vtkPointData;
-class vtkCellData;
+#include <vtkToolkits.h>    // for VTK_USE_MPI
+
 class vtkUnstructuredGrid;
 class vtkPKdTree;
 class vtkMultiProcessController;
+class vtkTimerLog;
+
+#ifdef VTK_USE_MPI
 class vtkMPIController;
-class vtkIdList;
+#endif
 
 class VTK_EXPORT vtkDistributedDataFilter: public vtkDataSetToUnstructuredGridFilter
 {
@@ -106,6 +124,29 @@ public:
   vtkPKdTree *GetKdtree(){return this->Kdtree;}
 
   // Description:
+  //   Each cell in the data set is associated with one of the
+  //   spatial regions of the k-d tree decomposition.  In particular,
+  //   the cell belongs to the region that it's centroid lies in.
+  //   When the new vtkUnstructuredGrid is created, by default it
+  //   is composed of the cells associated with the region(s)
+  //   assigned to this process.  If you also want it to contain
+  //   cells that intersect these regions, but have their centroid
+  //   elsewhere, then set this variable on.  By default it is off.
+
+  vtkBooleanMacro(IncludeAllIntersectingCells, int);
+  vtkGetMacro(IncludeAllIntersectingCells, int);
+  vtkSetMacro(IncludeAllIntersectingCells, int);
+
+  // Description:
+  //   Set this variable if you want the cells of the output
+  //   vtkUnstructuredGrid to be clipped to the spatial region
+  //   boundaries.  By default this is off.
+
+  vtkBooleanMacro(ClipCells, int);
+  vtkGetMacro(ClipCells, int);
+  vtkSetMacro(ClipCells, int);
+
+  // Description:
   //   Build a vtkUnstructuredGrid for a spatial region from the 
   //   data distributed across processes.  Execute() must be called
   //   by all processes, or it will hang.
@@ -136,13 +177,18 @@ private:
     int **source, int *nsources, int *target, int *ntargets);
 
   vtkUnstructuredGrid *ExtractCellsForProcess(int proc);
-  int MPIRedistribute(vtkMPIController *mpiContr);
+
+#ifdef VTK_USE_MPI
+  vtkUnstructuredGrid *MPIRedistribute(vtkMPIController *mpiContr);
   char *MarshallDataSet(vtkUnstructuredGrid *extractedGrid, int &size);
   vtkUnstructuredGrid *UnMarshallDataSet(char *buf, int size);
+#endif
 
-  int GenericRedistribute();
+  vtkUnstructuredGrid *GenericRedistribute();
 
-  int ReduceUgridMerge(vtkUnstructuredGrid *ugrid, int root);
+  vtkUnstructuredGrid *ReduceUgridMerge(vtkUnstructuredGrid *ugrid, int root);
+
+  void ClipCellsToSpatialRegion(vtkUnstructuredGrid *grid);
 
   vtkPKdTree *Kdtree;
   vtkMultiProcessController *Controller;
@@ -150,6 +196,8 @@ private:
   char *GlobalIdArrayName;
 
   int RetainKdtree;
+  int IncludeAllIntersectingCells;
+  int ClipCells;
 
   int NumProcesses;
   int MyLocalId;
