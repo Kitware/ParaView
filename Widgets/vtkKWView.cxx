@@ -761,7 +761,7 @@ void vtkKWView::Select(vtkKWWindow *pw)
     {
     // add the save as image option
     pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
-                                     "Save As Image",this, "SaveAsImage");
+                                     "Save Image",this, "SaveAsImage");
     }
   
   if ( this->SupportPrint )
@@ -812,7 +812,7 @@ void vtkKWView::Deselect(vtkKWWindow *pw)
   
   if ( this->SupportSaveAsImage )
     {
-    pw->GetMenuFile()->DeleteMenuItem("Save As Image");
+    pw->GetMenuFile()->DeleteMenuItem("Save Image");
     }
   
 #ifdef _WIN32
@@ -1062,7 +1062,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.31 $");
+  this->ExtractRevision(os,"$Revision: 1.32 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
