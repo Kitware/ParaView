@@ -473,7 +473,7 @@ void usage(const XML_Char *prog)
   exit(1);
 }
 
-int tmain(int argc, XML_Char **argv)
+int NO_main(int argc, XML_Char **argv)
 {
   int i, j;
   const XML_Char *outputDir = 0;
