@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLKWUserInterfaceNotebookManagerWriter);
-vtkCxxRevisionMacro(vtkXMLKWUserInterfaceNotebookManagerWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLKWUserInterfaceNotebookManagerWriter, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWUserInterfaceNotebookManagerWriter::GetRootElementName()
@@ -86,7 +86,7 @@ int vtkXMLKWUserInterfaceNotebookManagerWriter::AddNestedElements(vtkXMLDataElem
     int page_nb = notebook->GetNumberOfVisiblePages();
     if (page_nb)
       {
-      vtkXMLDataElement *vp_elem = vtkXMLDataElement::New();
+      vtkXMLDataElement *vp_elem = this->NewDataElement();
       elem->AddNestedElement(vp_elem);
       vp_elem->Delete();
       vp_elem->SetName(this->GetVisiblePagesElementName());
@@ -105,7 +105,7 @@ int vtkXMLKWUserInterfaceNotebookManagerWriter::AddNestedElements(vtkXMLDataElem
           continue;
           }
         
-        vtkXMLDataElement *p_elem = vtkXMLDataElement::New();
+        vtkXMLDataElement *p_elem = this->NewDataElement();
         vp_elem->AddNestedElement(p_elem);
         p_elem->Delete();
         p_elem->SetName(this->GetPageElementName());
