@@ -76,7 +76,11 @@ public:
 
   // Description:
   // Initialize Tcl/Tk
-  static Tcl_Interp *InitializeTcl(int argc, char *argv[]);
+  // Return NULL on error (eventually provides an ostream where detailed
+  // error messages will be stored).
+  //BTX
+  static Tcl_Interp *InitializeTcl(int argc, char *argv[], ostream *err = 0);
+  //ETX
   
   // Description:
   // Get the interpreter being used by this application

@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.124");
+vtkCxxRevisionMacro(vtkKWApplication, "1.125");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -472,13 +472,20 @@ void vtkKWApplication::Exit()
 #define ET_TK_LIBRARY "/ThisIsNotAPath/Tcl/lib/tk8.2"
 #endif
 
-Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
+Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, 
+                                            char *argv[], 
+                                            ostream *err)
 {
   Tcl_Interp *interp;
   char *args;
   char buf[100];
 
+  // This is mandatory, it does more than just finding the executable
+
   Tcl_FindExecutable(argv[0]);
+
+  // Add the path to our internal Tcl/Tk support library/packages 
+  // to the environment
 
 #if !defined(USE_INSTALLED_TCLTK_PACKAGES)
 #if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
@@ -520,15 +527,31 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
     (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
 
   // It seems the environment is not propagated correctly to the interpreter,
-  // so set the env explicitly
+  // so set the libs explicitly
 
   if (tcl_library && *tcl_library)
     {
-    Tcl_SetVar(interp, "env(TCL_LIBRARY)", tcl_library, TCL_GLOBAL_ONLY);
+    if (!Tcl_SetVar(
+          interp, "tcl_library", tcl_library, TCL_LEAVE_ERR_MSG))
+      {
+      if (err)
+        {
+        *err << "Tcl_SetVar error: " << Tcl_GetStringResult(interp) << endl;
+        }
+      return NULL;
+      }
     }
+
   if (tk_library && *tk_library)
     {
-    Tcl_SetVar(interp, "env(TK_LIBRARY)", tk_library, TCL_GLOBAL_ONLY);
+    if (!Tcl_SetVar(interp, "tk_library", tk_library, TCL_LEAVE_ERR_MSG))
+      {
+      if (err)
+        {
+        *err << "Tcl_SetVar error: " << Tcl_GetStringResult(interp) << endl;
+        }
+      return NULL;
+      }
     }
 
 #endif
@@ -547,14 +570,20 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   status = Tcl_Init(interp);
   if (status != TCL_OK)
     {
-    cerr << "Tcl_Init error: " << Tcl_GetStringResult(interp) << endl;
+    if (err)
+      {
+      *err << "Tcl_Init error: " << Tcl_GetStringResult(interp) << endl;
+      }
     return NULL;
     }
 
   status = Tk_Init(interp);
   if (status != TCL_OK)
     {
-    cerr << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
+    if (err)
+      {
+      *err << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
+      }
     return NULL;
     }
 
