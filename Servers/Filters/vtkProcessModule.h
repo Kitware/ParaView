@@ -116,7 +116,7 @@ public:
   // after the call.  If a stream is passed the resetStream flag determines
   // if Reset is called on the stream after it is sent.
   int SendStream(vtkTypeUInt32 server);
-  int SendStream(vtkTypeUInt32 server, vtkClientServerStream&, bool resetStream=true);
+  int SendStream(vtkTypeUInt32 server, vtkClientServerStream&, int resetStream=1);
 //ETX
 
   

@@ -26,7 +26,7 @@ vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.5");
+vtkCxxRevisionMacro(vtkProcessModule, "1.6");
 
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -125,7 +125,7 @@ int vtkProcessModule::SendStream(vtkTypeUInt32 server)
 //----------------------------------------------------------------------------
 int vtkProcessModule::SendStream(vtkTypeUInt32 servers, 
                                  vtkClientServerStream& stream,
-                                 bool resetStream)
+                                 int resetStream)
 {
   vtkTypeUInt32 sendflag = this->CreateSendFlag(servers);
   if(sendflag & DATA_SERVER)
