@@ -149,7 +149,6 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
   this->Visibility->Create(pvApp, "");
   this->Visibility->SetText("Visibility");
   this->Visibility->SetCommand(this, "SetVisibility");
-  this->Visibility->EnabledOff();
     
   this->Script("pack %s -fill x -expand 1",
                this->Visibility->GetWidgetName());
@@ -191,7 +190,6 @@ void vtkPV3DWidget::Accept()
   this->PlaceWidget();
   this->ModifiedFlag = 0;
   this->ValueChanged = 0;
-  this->Visibility->EnabledOn();
 }
 
 //----------------------------------------------------------------------------
