@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCheckButtonSet.h"
-#include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledCheckButtonSet.h"
 #include "vtkKWLabeledOptionMenu.h"
@@ -129,7 +128,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.15");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.16");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -424,7 +423,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   this->OpacityScale->Create(this->Application, "");
   this->OpacityScale->DisplayEntry();
   this->OpacityScale->DisplayLabel("");
-  this->OpacityScale->GetEntry()->SetWidth(4);
+  this->OpacityScale->SetEntryWidth(4);
   this->OpacityScale->DisplayEntryAndLabelOnTopOff();
   this->OpacityScale->SetCommand(this, "OpacityCallback");
   this->OpacityScale->SetEndCommand(this, "OpacityEndCallback");

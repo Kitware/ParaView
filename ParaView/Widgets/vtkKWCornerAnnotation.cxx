@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCompositeCollection.h"
-#include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWGenericComposite.h"
@@ -66,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.53");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.54");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -508,7 +507,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->MaximumLineHeightScale->DisplayEntry();
   this->MaximumLineHeightScale->DisplayEntryAndLabelOnTopOff();
   this->MaximumLineHeightScale->DisplayLabel("Max line height:");
-  this->MaximumLineHeightScale->GetEntry()->SetWidth(5);
+  this->MaximumLineHeightScale->SetEntryWidth(5);
 
   this->MaximumLineHeightScale->SetBalloonHelpString(
     "Set the maximum height of a line of text as a percentage of the vertical "
@@ -952,7 +951,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.53 $");
+  this->ExtractRevision(os,"$Revision: 1.54 $");
 }
 
 //----------------------------------------------------------------------------
