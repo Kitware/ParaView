@@ -38,15 +38,23 @@ public:
   Server* server;
 };
 
-
-// Declare the initialization function as external
-// this is defined in the PackageInit file
-extern void Vtkparaviewcswrapped_Initialize(vtkClientServerInterpreter *arlu);
+// ClientServer wrapper initialization functions.
+extern void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkIOCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
 
 Server::Server()
 {
-  ClientServerInterpreter = vtkClientServerInterpreter::New();
-  Vtkparaviewcswrapped_Initialize(this->ClientServerInterpreter);
+  this->ClientServerInterpreter = vtkClientServerInterpreter::New();
+  vtkCommonCS_Initialize(this->ClientServerInterpreter);
+  vtkFilteringCS_Initialize(this->ClientServerInterpreter);
+  vtkImagingCS_Initialize(this->ClientServerInterpreter);
+  vtkGraphicsCS_Initialize(this->ClientServerInterpreter);
+  vtkIOCS_Initialize(this->ClientServerInterpreter);
+  vtkRenderingCS_Initialize(this->ClientServerInterpreter);
 }
 
 void Server::GetResultMessageData(const unsigned char** data, size_t* len)

@@ -2,5 +2,5 @@ INCLUDE_DIRECTORIES(${PARAVIEW_SOURCE_DIR}/ClientServer)
 
 ADD_EXECUTABLE(TestSimple TestSimple.cxx)
 ADD_EXECUTABLE(TestSphere TestSphere.cxx)
-TARGET_LINK_LIBRARIES(TestSimple vtkClientServer vtkParaViewCSWrapped)
-TARGET_LINK_LIBRARIES(TestSphere vtkClientServer vtkParaViewCSWrapped)
+TARGET_LINK_LIBRARIES(TestSimple vtkClientServer vtkRenderingCS vtkKWCommonTCL)
+TARGET_LINK_LIBRARIES(TestSphere vtkClientServer vtkRenderingCS vtkKWCommonTCL)

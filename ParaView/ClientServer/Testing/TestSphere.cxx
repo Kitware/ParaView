@@ -10,11 +10,25 @@ vtkClientServerID GetUniqueID()
   return id;
 }
 
+// ClientServer wrapper initialization functions.
+extern void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkIOCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
+
 int main()
 {
   vtkClientServerInterpreter* interp = vtkClientServerInterpreter::New();
   interp->SetLogStream(&cout);
-  Vtkparaviewcswrapped_Initialize(interp);
+
+  vtkCommonCS_Initialize(interp);
+  vtkFilteringCS_Initialize(interp);
+  vtkImagingCS_Initialize(interp);
+  vtkGraphicsCS_Initialize(interp);
+  vtkIOCS_Initialize(interp);
+  vtkRenderingCS_Initialize(interp);
 
   vtkClientServerStream css;
 
