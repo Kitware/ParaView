@@ -43,7 +43,7 @@
 #include "vtkGarbageCollector.h"
 #include "vtkCTHAMRSurface.h"
 
-vtkCxxRevisionMacro(vtkCTHAMRExtractPart, "1.3");
+vtkCxxRevisionMacro(vtkCTHAMRExtractPart, "1.4");
 vtkStandardNewMacro(vtkCTHAMRExtractPart);
 vtkCxxSetObjectMacro(vtkCTHAMRExtractPart,ClipPlane,vtkPlane);
 
@@ -72,7 +72,7 @@ vtkCTHAMRExtractPart::vtkCTHAMRExtractPart()
   this->Clip2 =0;
   this->Cut = 0;
 
-  this->IgnoreGhostLevels = 1;
+  this->IgnoreGhostLevels = 0;
 }
 
 //----------------------------------------------------------------------------

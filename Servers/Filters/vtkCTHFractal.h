@@ -65,6 +65,12 @@ public:
   vtkGetMacro(TwoDimensional, int);
   vtkBooleanMacro(TwoDimensional, int);
 
+  // Description:
+  // Test the case when the blocks do not have the same sizes.
+  // Adds 2 to the x extent of the far x blocks (level 1).
+  vtkSetMacro(Asymetric,int);
+  vtkGetMacro(Asymetric,int);
+
 protected:
   vtkCTHFractal();
   ~vtkCTHFractal();
@@ -75,7 +81,7 @@ protected:
   virtual void ExecuteInformation();
   virtual void Execute();
   void Traverse(int &blockId, int level, vtkCTHData* output, 
-                int x0, int y0, int z0);
+                int x0,int x1, int y0,int y1, int z0,int z1);
 
   int LineTest2(float x0, float y0, float z0, 
                 float x1, float y1, float z1,
@@ -84,9 +90,9 @@ protected:
                float x1, float y1, float z1,
                double bds[6], int level, int target); 
 
-  void SetBlockInfo(int blockId, int level,
-                    int x0, int y0, int z0);
+  void SetBlockInfo(int blockId, int level, int* ext);
 
+  void AddVectorArray();
   void AddTestArray();
   void AddFractalArray();
   void AddBlockIdArray();
@@ -99,6 +105,7 @@ protected:
 private:
   void InternalImageDataCopy(vtkCTHFractal *src);
 
+  int Asymetric;
   int MaximumLevel;
   int Dimensions;
   float FractalValue;

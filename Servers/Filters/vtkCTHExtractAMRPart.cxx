@@ -44,7 +44,7 @@
 #include "vtkGarbageCollector.h"
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.18");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.19");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -75,7 +75,7 @@ vtkCTHExtractAMRPart::vtkCTHExtractAMRPart()
   this->Clip2 =0;
   this->Cut = 0;
 
-  this->IgnoreGhostLevels = 1;
+  this->IgnoreGhostLevels = 0;
 }
 
 //----------------------------------------------------------------------------

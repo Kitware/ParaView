@@ -28,7 +28,7 @@
 #include "vtkCellArray.h"
 
 
-vtkCxxRevisionMacro(vtkCTHAMRSurface, "1.2");
+vtkCxxRevisionMacro(vtkCTHAMRSurface, "1.3");
 vtkStandardNewMacro(vtkCTHAMRSurface);
 
 //----------------------------------------------------------------------------
@@ -643,7 +643,7 @@ int vtkCTHAMRSurface::FindFace(vtkCTHData* input, int blockId, int face,
   // Face point increments.
   incs[0] = 1;
   incs[1] = (ext[1]-ext[0]+1);
-  incs[2] = (ext[1]-ext[0]+1) * incs[1]; 
+  incs[2] = (ext[3]-ext[2]+1) * incs[1]; 
   inPIncs[1] = incs[permutation[0]];
   inPIncs[2] = incs[permutation[1]];
   // Calculate the starting offset from min corner of the block.
@@ -668,7 +668,7 @@ int vtkCTHAMRSurface::FindFace(vtkCTHData* input, int blockId, int face,
   // Face cell increments. Max 2D face cell gets the lower 3D cell.
   incs[0] = 1;
   incs[1] = (ext[1]-ext[0]);
-  incs[2] = (ext[1]-ext[0]) * incs[1]; 
+  incs[2] = (ext[3]-ext[2]) * incs[1]; 
   inCIncs[1] = incs[permutation[0]];
   inCIncs[2] = incs[permutation[1]];
   // Calculate the starting offset from min corner of the block.

@@ -26,7 +26,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.14");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.15");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------
@@ -39,6 +39,7 @@ vtkCTHFractal::vtkCTHFractal()
 
   this->Levels = vtkIntArray::New();
   this->TwoDimensional = 1;
+  this->Asymetric = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -51,17 +52,8 @@ vtkCTHFractal::~vtkCTHFractal()
 //----------------------------------------------------------------------------
 // This handles any alterations necessary for ghost levels.
 void vtkCTHFractal::SetBlockInfo(int blockId, int level, 
-                                int x0, int y0, int z0)
+                                int *ext)
 {
-  int ext[6];
-  
-  ext[0] = x0;
-  ext[2] = y0;
-  ext[4] = z0;
-  ext[1] = x0+this->Dimensions-1;
-  ext[3] = y0+this->Dimensions-1;
-  ext[5] = z0+this->Dimensions-1;
-  
   if (this->GhostLevels)
     {
     ext[0] -= 1;
@@ -179,12 +171,20 @@ void vtkCTHFractal::Execute()
     output->SetNumberOfGhostLevels(0);
     }
 
+  int ext[6];
+  ext[0] = ext[2] = ext[4] = 0;
+  ext[1] = ext[3] = ext[5] = this->Dimensions - 1;
+  if (this->Asymetric)
+    { // The changes to an extra 2 in the next level.
+    ext[1] += 1;
+    }
+
   // Get a global (across all processes) count of the blocks.
   // Do not create the blocks.
   this->StartBlock = 0;
   this->EndBlock = -1;
   this->BlockCount = 0;;
-  this->Traverse(blockId, 0, output, 0, 0, 0);
+  this->Traverse(blockId, 0, output, ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
 
   // Generate our share of the blocks.
   this->StartBlock = (int)((float)(piece*this->BlockCount)/(float)(numPieces));
@@ -192,8 +192,9 @@ void vtkCTHFractal::Execute()
   this->BlockCount = 0;
 
   this->Levels->Initialize();
-  this->Traverse(blockId, 0, output, 0, 0, 0);
+  this->Traverse(blockId, 0, output, ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
 
+  this->AddVectorArray();
   this->AddTestArray();
   this->AddFractalArray();
   this->AddBlockIdArray();
@@ -345,40 +346,52 @@ int vtkCTHFractal::LineTest(float x0, float y0, float z0,
 
 //----------------------------------------------------------------------------
 void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output, 
-                             int x0, int y0, int z0)
+                             int x0, int x3, int y0, int y3, int z0, int z3)
 {
-  int ext[6];
   double bds[6];
   int dim = this->Dimensions;
-
-  // Compute cell extent.
-  ext[0] = x0;
-  ext[1] = x0+dim-1;
-  ext[2] = y0;
-  ext[3] = y0+dim-1;
-  ext[4] = z0;
-  ext[5] = z0+dim-1;
+  int x1, x2, y1, y2, z1, z2;
   
   if (this->TwoDimensional)
     {
-    ext[4] = ext[5] = 0;
+    z0 = z3 = 0;
     }  
   
   // Get the bounds of the proposed block.
+  int ext[6];
+  ext[0]=x0; ext[1]=x3; ext[2]=y0; ext[3]=y3, ext[4]=z0; ext[5]=z3;
   output->CellExtentToBounds(level, ext, bds);
 
+  x0 = x0*2;
+  x3 = (x3+1)*2 - 1;
+  y0 = y0*2;
+  y3 = (y3+1)*2 - 1;
+  z0 = z0*2;
+  z3 = (z3+1)*2 - 1;
+
+  x2 = x0+this->Dimensions;
+  x1 = x2-1;
+  y2 = y0+this->Dimensions;
+  y1 = y2-1;
+  z2 = z0+this->Dimensions;
+  z1 = z2-1;
+
+  if (x3-x2-x1+x0 > 2)
+    { // balance asymetric blocks.
+    x2 += 2;
+    x1 += 2;
+    }
+    
   if (this->TwoDimensional)
     {
     if (this->TwoDTest(bds, level, this->MaximumLevel))
       {
       ++level;
-      x0 = 2 * x0;
-      y0 = 2 * y0;
       // Traverse the 4 new blocks.
-      this->Traverse(blockId, level, output, x0, y0, z0);
-      this->Traverse(blockId, level, output, x0+dim, y0, z0);
-      this->Traverse(blockId, level, output, x0, y0+dim, z0);
-      this->Traverse(blockId, level, output, x0+dim, y0+dim, z0);
+      this->Traverse(blockId, level, output, x0,x1,y0,y1,z0,z0);
+      this->Traverse(blockId, level, output, x2,x3,y0,y1,z0,z0);
+      this->Traverse(blockId, level, output, x0,x1,y2,y3,z0,z0);
+      this->Traverse(blockId, level, output, x2,x3,y2,y3,z0,z0);
       }
     else
       {
@@ -390,7 +403,7 @@ void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output,
           return;
           }
         this->Levels->InsertValue(blockId, level);
-        this->SetBlockInfo(blockId++, level, x0, y0, z0);
+        this->SetBlockInfo(blockId++, level, ext);
         }
       ++this->BlockCount;
       }
@@ -401,18 +414,15 @@ void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output,
         this->LineTest(-1.05088,0.85595,0.87104, -0.61430,1.00347,0.59553, bds, level, this->MaximumLevel) )
       { // break block into eight.
       ++level;
-      x0 = 2 * x0;
-      y0 = 2 * y0;
-      z0 = 2 * z0;
       // Traverse the 8 new blocks.
-      this->Traverse(blockId, level, output, x0, y0, z0);
-      this->Traverse(blockId, level, output, x0+dim, y0, z0);
-      this->Traverse(blockId, level, output, x0, y0+dim, z0);
-      this->Traverse(blockId, level, output, x0+dim, y0+dim, z0);
-      this->Traverse(blockId, level, output, x0, y0, z0+dim);
-      this->Traverse(blockId, level, output, x0+dim, y0, z0+dim);
-      this->Traverse(blockId, level, output, x0, y0+dim, z0+dim);
-      this->Traverse(blockId, level, output, x0+dim, y0+dim, z0+dim);
+      this->Traverse(blockId, level, output, x0,x1,y0,y1,z0,z1);
+      this->Traverse(blockId, level, output, x2,x3,y0,y1,z0,z1);
+      this->Traverse(blockId, level, output, x0,x1,y2,y3,z0,z1);
+      this->Traverse(blockId, level, output, x2,x3,y2,y3,z0,z1);
+      this->Traverse(blockId, level, output, x0,x1,y0,y1,z2,z3);
+      this->Traverse(blockId, level, output, x2,x3,y0,y1,z2,z3);
+      this->Traverse(blockId, level, output, x0,x1,y2,y3,z2,z3);
+      this->Traverse(blockId, level, output, x2,x3,y2,y3,z2,z3);
       }
     else
       {
@@ -424,7 +434,7 @@ void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output,
           return;
           }
         this->Levels->InsertValue(blockId, level);
-        this->SetBlockInfo(blockId++, level, x0, y0, z0);
+        this->SetBlockInfo(blockId++, level, ext);
         }
       ++this->BlockCount;
       }
@@ -475,6 +485,51 @@ void vtkCTHFractal::AddTestArray()
 }
 
 //----------------------------------------------------------------------------
+void vtkCTHFractal::AddVectorArray()
+{
+  vtkCTHData* output = this->GetOutput();
+  int numCells = output->GetNumberOfCells();
+  int numBlocks = output->GetNumberOfBlocks();
+  int numCellsPerBlock;
+  vtkDoubleArray* array = vtkDoubleArray::New();
+  int blockId;
+  double* arrayPtr;
+  double* spacing;
+  double* origin;
+
+  array->SetNumberOfComponents(3);
+  array->Allocate(numCells);
+  array->SetNumberOfTuples(numCells);
+  arrayPtr = (double*)(array->GetPointer(0));
+
+  origin = output->GetTopLevelOrigin();
+  for (blockId = 0; blockId < numBlocks; ++blockId)
+    {
+    spacing = output->GetBlockSpacing(blockId);
+    int x,y,z;
+    int ext[6];
+    output->GetBlockCellExtent(blockId,ext);
+    for (z = ext[4]; z <= ext[5]; ++z)
+      {
+      for (y = ext[2]; y <= ext[3]; ++y)
+        {
+        for (x = ext[0]; x <= ext[1]; ++x)
+          {
+          *arrayPtr++ = origin[0] + spacing[0]*((float)x + 0.5);
+          *arrayPtr++ = origin[1] + spacing[1]*((float)y + 0.5);
+          *arrayPtr++ = origin[2] + spacing[2]*((float)z + 0.5);
+          }
+        }
+      }
+    }
+  
+  array->SetName("VectorXYZ");
+  output->GetCellData()->AddArray(array);
+  array->Delete();
+}
+
+
+//----------------------------------------------------------------------------
 void vtkCTHFractal::AddFractalArray()
 {
   vtkCTHData* output = this->GetOutput();
@@ -495,7 +550,6 @@ void vtkCTHFractal::AddFractalArray()
   arrayPtr = (double*)(array->GetPointer(0));
 
   // hack
-  output->GetBlockPointDimensions(0, dims);
   if (this->TwoDimensional)
     {
     dims[2] = 2;
@@ -504,8 +558,9 @@ void vtkCTHFractal::AddFractalArray()
     {
     origin = output->GetBlockOrigin(blockId);
     spacing = output->GetBlockSpacing(blockId);
+    output->GetBlockCellDimensions(blockId, dims);
     // Shift point to center of voxel.
-    fractalSource->SetWholeExtent(0,dims[0]-2, 0,dims[1]-2, 0,dims[2]-2);
+    fractalSource->SetWholeExtent(0,dims[0]-1, 0,dims[1]-1, 0,dims[2]-1);
     fractalSource->SetOriginCX(origin[0]+(spacing[0]*0.5), 
                                origin[1]+(spacing[1]*0.5), 
                                origin[2]+(spacing[2]*0.5), 0.0);
