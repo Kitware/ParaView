@@ -398,8 +398,6 @@ protected:
   virtual void SaveWindowGeometry();
   virtual void RestoreWindowGeometry();
 
-  virtual void CreateStatusImage();
-
   vtkKWNotebook *Notebook;
 
   vtkKWSplitFrame     *MiddleFrame; // Contains view frame & properties parent.

@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWWindow.h"
 
-#include "KitwareLogo.h"
 #include "vtkKWApplication.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWCheckButton.h"
@@ -44,7 +43,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.211");
+vtkCxxRevisionMacro(vtkKWWindow, "1.212");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -444,7 +443,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Status frame : image
 
   this->SetStatusImageName(this->Script("image create photo"));
-  this->CreateStatusImage();
 
   this->StatusImage->SetParent(this->StatusFrame);
   this->StatusImage->Create(app, "-relief sunken -bd 1");
@@ -1066,60 +1064,6 @@ void vtkKWWindow::LoadScript(const char *path)
 {
   this->Script("set InitialWindow %s", this->GetTclName());
   this->GetApplication()->LoadScript(path);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::CreateStatusImage()
-{
-  int x, y;
-  Tk_PhotoHandle photo;
-  Tk_PhotoImageBlock block;
-  
-  block.width = 128;
-  block.height = 34;
-  block.pixelSize = 3;
-  block.pitch = block.width*block.pixelSize;
-  block.offset[0] = 0;
-  block.offset[1] = 1;
-  block.offset[2] = 2;
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
-  block.offset[3] = 3;
-#endif
-  block.pixelPtr = new unsigned char [block.pitch*block.height];
-
-  photo = Tk_FindPhoto(this->GetApplication()->GetMainInterp(),
-                       this->StatusImageName);
-  if (!photo)
-    {
-    vtkWarningMacro("error looking up color ramp image");
-    return;
-    }
-
-  Tk_PhotoSetSize(photo, block.width, block.height);
-  
-  unsigned char *pp = block.pixelPtr;
-  float *lp = KITLOGO + 33*128*3;
-  for (y = 0; y < 34; y++)
-    {
-    for (x = 0; x < 128; x++)
-      {
-      pp[0] = (unsigned char)(*lp*255.0);
-      lp++;
-      pp[1] = (unsigned char)(*lp*255.0);
-      lp++;
-      pp[2] = (unsigned char)(*lp*255.0);
-      lp++;
-      pp += block.pixelSize;
-      }
-    lp = lp - 2*128*3;
-    }
-  
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4) && !defined(USE_COMPOSITELESS_PHOTO_PUT_BLOCK)
-  Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height, TK_PHOTO_COMPOSITE_SET);
-#else
-  Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height);
-#endif
-  delete [] block.pixelPtr;
 }
 
 //----------------------------------------------------------------------------
