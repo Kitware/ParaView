@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.37");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.38");
 
 
 
@@ -394,4 +394,5 @@ void vtkKWMessageDialog::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "Options: " << this->GetOptions() << endl;
   os << indent << "Style: " << this->GetStyle() << endl;
+  os << indent << "MessageDialogFrame: " << this->MessageDialogFrame << endl;
 }
