@@ -31,6 +31,10 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVStringAndScalarListWidgetProperty.h"
 
+#include "vtkSMProperty.h"
+#include "vtkSMStringListRangeDomain.h"
+#include "vtkSMStringVectorProperty.h"
+
 #include <vtkstd/string>
 #include <vtkstd/map>
 
@@ -146,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.22");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.23");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -157,7 +161,6 @@ vtkPVXDMFParameters::vtkPVXDMFParameters()
   this->SetFrameLabel("Parameters");
   this->VTKReaderID.ID = 0;
   this->ServerSideID.ID = 0;
-  this->Property = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -209,78 +212,65 @@ void vtkPVXDMFParameters::Create(vtkKWApplication *pvApp)
 
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::UpdateFromReader()
+void vtkPVXDMFParameters::UpdateParameters(int fromReader)
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  if(this->VTKReaderID.ID)
+
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (svp)
     {
-    // Create server-side helper if necessary.
-    if(!this->ServerSideID.ID)
+    vtkSMStringListRangeDomain* dom = vtkSMStringListRangeDomain::SafeDownCast(
+      svp->GetDomain("range"));
+    if (dom)
       {
-      this->ServerSideID = pm->NewStreamObject("vtkPVServerXDMFParameters");
-      }
-
-    // Get the parameters from the server.
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->ServerSideID << "GetParameters"
-                    << this->VTKReaderID
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-    vtkClientServerStream parameters;
-    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &parameters))
-      {
-      vtkErrorMacro("Error getting parameters from server.");
-      return;
-      }
-
-    // Add each parameter locally.
-    int numParameters = parameters.GetNumberOfArguments(0)/3;
-    for(int i=0; i < numParameters; ++i)
-      {
-      const char* name;
-      int index;
-      int range[3];
-      if(!parameters.GetArgument(0, 3*i, &name))
+      unsigned int numStrings = dom->GetNumberOfStrings();
+      
+      // Obtain parameters from the domain (that obtained them
+      // from the information property that obtained them from the server)
+      for(unsigned int i=0; i < numStrings; ++i)
         {
-        vtkErrorMacro("Error parsing parameter name.");
-        return;
-        }
-      if(!parameters.GetArgument(0, 3*i + 1, &index))
-        {
-        vtkErrorMacro("Error parsing parameter index.");
-        return;
-        }
-      if(!parameters.GetArgument(0, 3*i + 2, range, 3))
-        {
-        vtkErrorMacro("Error parsing parameter range.");
-        return;
-        }
-      // Use the property if available. This is done so that reset
-      // is based on the property not the reader. However, we still
-      // have to obtain the range from the reader since currently
-      // properties do not have ranges.
-      int numStrings = this->Property->GetNumberOfStrings();
-      int idx;
-      for(idx=0; idx<numStrings; idx++)
-        {
-        if ( strcmp(name, this->Property->GetString(idx)) == 0)
+        // Min, max and name are always taken from the domain
+        int minexists, maxexists;
+        int min = dom->GetMinimum(i, minexists);
+        int max = dom->GetMaximum(i, maxexists);
+        const char* name = dom->GetString(i);
+        if (minexists && maxexists && name)
           {
-          break;
+          int val=0;
+          // We are updating the value from the property not
+          // the domain
+          if (!fromReader)
+            {
+            // Find the right property comparing the name
+            // to the property value
+            int found=0;
+            unsigned int idx = svp->GetElementIndex(name, found);
+            if (found)
+              {
+              val = atoi(svp->GetElement(idx+1));
+              }
+            else
+              {
+              vtkErrorMacro("Could not find an appropriate property value "
+                            "matching the domain. Can not update widget.");
+              }
+            }
+          this->AddXDMFParameter(name, val, min, 1, max);
           }
         }
-      if (idx < numStrings)
-        {
-        this->AddXDMFParameter(
-          name, 
-          static_cast<int>(this->Property->GetScalar(idx)), 
-          range[0], range[1], range[2]);
-        }
-      else
-        {
-        this->AddXDMFParameter(name, index, range[0], range[1], range[2]);
-        }
+      }
+    else
+      {
+      vtkErrorMacro("An appropriate domain (name: range) is not specified. "
+                    "Can not update");
       }
     this->Internals->Update(this);
+    }
+  else
+    {
+    vtkErrorMacro("An appropriate property not specified. "
+                  "Can not update");
     }
 }
 
@@ -288,24 +278,6 @@ void vtkPVXDMFParameters::UpdateFromReader()
 void vtkPVXDMFParameters::AddXDMFParameter(const char* pname, int value, int min, int step, int max)
 {
   this->Internals->AddParameter(pname, value, min, step, max);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVXDMFParameters::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVStringAndScalarListWidgetProperty::SafeDownCast(prop);
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVXDMFParameters::GetProperty()
-{
-  return this->Property;
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVXDMFParameters::CreateAppropriateProperty()
-{
-  return vtkPVStringAndScalarListWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------
@@ -319,85 +291,88 @@ void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
 
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
 
-  int numStrings = this->Property->GetNumberOfStrings();
-  *file << "  [$pvTemp" << sourceID.ID 
-        << " GetProperty ParameterIndex] SetNumberOfElements "
-        << numStrings*2 << endl;;
-
-  int idx;
-  for(idx=0; idx<numStrings; idx++)
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (svp)
     {
+    unsigned int numStrings = svp->GetNumberOfElements();
     *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty ParameterIndex] SetElement " << idx*2
-          <<  " " << this->Property->GetString(idx) << endl;
-    *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty ParameterIndex] SetElement " << idx*2+1
-          <<  " " << static_cast<int>(this->Property->GetScalar(idx)) << endl;
+          << " GetProperty ParameterIndex] SetNumberOfElements "
+          << numStrings << endl;
+    
+    unsigned int idx;
+    for(idx=0; idx<numStrings; idx++)
+      {
+      *file << "  [$pvTemp" << sourceID.ID 
+            << " GetProperty ParameterIndex] SetElement " << idx
+            <<  " " << svp->GetElement(idx) << endl;
+      }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::AcceptInternal(vtkClientServerID)
+void vtkPVXDMFParameters::Accept()
 {
-  vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
+  int modFlag = this->GetModifiedFlag();
 
-  int numParams = 0;
-  for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (svp)
     {
-    numParams++;
-    }
+    vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
 
-  if (numParams > 0)
-    {
-    char **cmds = new char*[numParams];
-    char **strings = new char*[numParams];
-    float *scalars = new float[numParams];
-    int *numStrings = new int[numParams];
-    int *numScalars = new int[numParams];
-
-    int idx=0;
+    int numParams = 0;
     for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
       {
-      vtkKWScale* scale = (vtkKWScale*)it->GetObject();
-      const char* label = scale->GetShortLabel();
-      vtkPVXDMFParametersInternals::Parameter* par =
-        this->Internals->GetParameter(label);
-      par->Value = static_cast<int>(scale->GetValue());
-
-      cmds[idx] = new char[strlen("SetParameterIndex")+1];
-      strcpy (cmds[idx] , "SetParameterIndex");
-
-      strings[idx] = new char[strlen(label)+1];
-      strcpy (strings[idx], label);
-
-      scalars[idx] = par->Value;
-
-      numStrings[idx] = 1;
-
-      numScalars[idx] = 1;
-
-      idx++;
+      numParams++;
       }
 
-    this->Property->SetVTKCommands(numParams, cmds, numStrings, numScalars);
-    this->Property->SetStrings(numParams, strings);
-    this->Property->SetScalars(numParams, scalars);
-    this->Property->SetVTKSourceID(this->VTKReaderID);
-    this->Property->AcceptInternal();
-
-    for (idx=0; idx<numParams; idx++)
+    svp->SetNumberOfElements(0);
+    if (numParams > 0)
       {
-      delete[] cmds[idx];
-      delete[] strings[idx];
+      svp->SetNumberOfElements(2*numParams);
+      int idx=0;
+      for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
+        {
+        vtkKWScale* scale = (vtkKWScale*)it->GetObject();
+        const char* label = scale->GetShortLabel();
+        vtkPVXDMFParametersInternals::Parameter* par =
+          this->Internals->GetParameter(label);
+        par->Value = static_cast<int>(scale->GetValue());
+        svp->SetElement(2*idx, label);
+        char value[128];
+        sprintf(value, "%d", static_cast<int>(scale->GetValue()));
+        svp->SetElement(2*idx+1, value);
+        idx++;
+        }
       }
-    delete[] cmds;
-    delete[] strings;
-    delete[] scalars;
-    delete[] numStrings;
-    delete[] numScalars;
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
     }
 
   this->ModifiedFlag = 0;
+
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -434,11 +409,13 @@ void vtkPVXDMFParameters::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVXDMFParameters::ResetInternal()
 {
-  this->UpdateFromReader();
-  if (this->AcceptCalled)
+  if (!this->AcceptCalled)
     {
-    this->ModifiedFlag = 0;
+    this->UpdateParameters(1);
+    return;
     }
+  this->UpdateParameters(0);
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -500,40 +477,57 @@ int vtkPVXDMFParameters::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVXDMFParameters::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                  vtkPVAnimationInterfaceEntry *ai)
+void vtkPVXDMFParameters::AddAnimationScriptsToMenu(
+  vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai)
 {
   if ( !this->VTKReaderID.ID )
     {
     return;
     }
 
-  char methodAndArgs[1024];
-  char name[1024];
-  vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
-  for ( it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (svp)
     {
-    vtkKWScale* scale = (vtkKWScale*)it->GetObject();
-    sprintf(methodAndArgs, "AnimationMenuCallback %s %s", ai->GetTclName(), scale->GetShortLabel());
-    sprintf(name, "%s_%s", this->GetTraceName(), scale->GetShortLabel());
-    menu->AddCommand(name, this, methodAndArgs, 0,"");
+    char methodAndArgs[1024];
+    char name[1024];
+    unsigned int numProps = svp->GetNumberOfElements()/2;
+    for (unsigned int i=0; i<numProps; i++)
+      {
+      sprintf(methodAndArgs, 
+              "AnimationMenuCallback %s %s %d", 
+              ai->GetTclName(), 
+              svp->GetElement(2*i),
+              i);
+      sprintf(name, "%s_%s", this->GetTraceName(), svp->GetElement(2*i));
+      menu->AddCommand(name, this, methodAndArgs, 0,"");
+      }
     }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVXDMFParameters::AnimationMenuCallback(
-  vtkPVAnimationInterfaceEntry *ai, const char *name)
+  vtkPVAnimationInterfaceEntry *ai, const char *name, unsigned int idx)
 {
   if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) {%s}", 
-      this->GetTclName(), ai->GetTclName(), name);
+                        this->GetTclName(), ai->GetTclName(), name);
     }
-
+  
   vtkPVXDMFParametersInternals::Parameter *p = 
     this->Internals->GetParameter(name);
-  ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
-  ai->SetCurrentProperty(this->Property);
+  char label[1024];
+  sprintf(label, "%s_%s", this->GetTraceName(), name);
+  ai->SetLabelAndScript(label, NULL, this->GetTraceName());
+
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMDomain *rangeDomain = prop->GetDomain("range");
+  
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(rangeDomain);
+  ai->SetAnimationElement(idx);
   ai->SetTimeStart(p->Min);
   ai->SetTimeEnd(p->Max);
   ai->SetTypeToInt();

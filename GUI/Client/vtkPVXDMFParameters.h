@@ -24,7 +24,6 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkKWScale;
 class vtkPVXDMFParametersInternals;
-class vtkPVStringAndScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVXDMFParameters : public vtkPVObjectWidget
 {
@@ -34,6 +33,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Create(vtkKWApplication *pvApp);
+
+  // Description:
+  virtual void Accept();
   
   // Description:
   // Check if the widget was modified.
@@ -48,14 +50,6 @@ public:
   vtkPVXDMFParameters* ClonePrototype(vtkPVSource* pvSource,
                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
-
-  //BTX
-  // Description:
-  // Called when accept button is pushed.  
-  // Sets objects variable to the widgets value.
-  // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(vtkClientServerID);
-  //ETX
 
   // Description:
   // Called when the reset button is pushed.
@@ -77,8 +71,9 @@ public:
   void SetLabel(const char* label);
 
   // Description:
-  // This method updates values from the reader
-  void UpdateFromReader();
+  // This method updates values from the reader if fromReader is true,
+  // from the property otherwise
+  void UpdateParameters(int fromReader);
 
   // Description:
   // This method adds parameter with value and range to the list.
@@ -92,7 +87,8 @@ public:
   // Description:
   // This method gets called when the user selects this widget to animate.
   // It sets up the script and animation parameters.
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, const char* name);
+  void AnimationMenuCallback(
+    vtkPVAnimationInterfaceEntry *ai, const char* name, unsigned int idx);
 
 
   //BTX
@@ -113,16 +109,6 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
-  // Description:
-  // Create the right property for use with this widget 
-  // (vtkPVStringAndScalarListWidgetProperty).
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-
 protected:
   vtkPVXDMFParameters();
   ~vtkPVXDMFParameters();
@@ -130,8 +116,6 @@ protected:
 
   vtkPVXDMFParametersInternals* Internals;
   vtkKWLabeledFrame* Frame;
-
-  vtkPVStringAndScalarListWidgetProperty* Property;
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

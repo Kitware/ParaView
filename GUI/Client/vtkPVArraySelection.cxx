@@ -28,18 +28,22 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMSourceProxy.h"
+#include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkTclUtil.h"
 
 #include <vtkstd/string>
 #include <vtkstd/set>
 
+vtkCxxSetObjectMacro(vtkPVArraySelection, SMInformationProperty, vtkSMProperty);
+
 typedef vtkstd::set<vtkstd::string> vtkPVArraySelectionArraySetBase;
 class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.52");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.53");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -67,7 +71,9 @@ vtkPVArraySelection::vtkPVArraySelection()
 
   this->NoArraysLabel = vtkKWLabel::New();
   this->Selection = vtkDataArraySelection::New();
-  this->ServerSideID.ID = 0;
+
+  this->SMInformationProperty = 0;
+  this->SMInformationPropertyName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -99,14 +105,30 @@ vtkPVArraySelection::~vtkPVArraySelection()
 
   this->Selection->Delete();
 
-  if(this->ServerSideID.ID)
+  delete this->ArraySet;
+
+  this->SetSMInformationProperty(0);
+  this->SetSMInformationPropertyName(0);
+}
+
+//-----------------------------------------------------------------------------
+vtkSMProperty* vtkPVArraySelection::GetSMInformationProperty()
+{
+  if (this->SMInformationProperty)
     {
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    pm->DeleteStreamObject(this->ServerSideID);
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+    return this->SMInformationProperty;
     }
 
-  delete this->ArraySet;
+  if (!this->GetPVSource() || !this->GetPVSource()->GetProxy())
+    {
+    return 0;
+    }
+
+  this->SetSMInformationProperty(
+    this->GetPVSource()->GetProxy()->GetProperty(
+      this->GetSMInformationPropertyName()));
+
+  return this->SMInformationProperty;
 }
 
 //----------------------------------------------------------------------------
@@ -190,72 +212,65 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::SetLocalSelectionsFromReader()
+void vtkPVArraySelection::UpdateSelections(int fromReader)
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  this->Selection->RemoveAllArrays();
-  
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
-
-  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
+
+  vtkSMStringVectorProperty* isvp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMInformationProperty());
   
-  if(sourceID.ID && (svp || this->AcceptCalled))
+  vtkSMStringVectorProperty* prop;
+  if (fromReader)
     {
-    this->CreateServerSide();
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->ServerSideID << "GetArraySettings"
-                    << sourceID << this->AttributeName
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-    vtkClientServerStream arrays;
-    if(pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &arrays))
+    prop = isvp;
+    }
+  else
+    {
+    prop = svp;
+    }
+  if (svp && isvp)
+    {
+    vtkSMStringListRangeDomain* dom = vtkSMStringListRangeDomain::SafeDownCast(
+      svp->GetDomain("array_list"));
+    if (dom)
       {
-      int numArrays = arrays.GetNumberOfArguments(0)/2;
-      for(int i=0; i < numArrays; ++i)
+      unsigned int numStrings = dom->GetNumberOfStrings();
+      
+      // Obtain parameters from the domain (that obtained them
+      // from the information property that obtained them from the server)
+      for(unsigned int i=0; i < numStrings; ++i)
         {
-        // Get the array name.
-        const char* name;
-        if(!arrays.GetArgument(0, i*2, &name))
+        const char* name = dom->GetString(i);
+        int found=0;
+        unsigned int idx = prop->GetElementIndex(name, found);
+        if (!found)
           {
-          vtkErrorMacro("Error getting array name from reader.");
-          break;
+          continue;
           }
-
-         // Get the array status.
-        int status;
-        if(!arrays.GetArgument(0, i*2 + 1, &status))
-          {
-          vtkErrorMacro("Error getting array status from reader.");
-          break;
-          }
-
-        // Set the selection to match the reader.
-        if(status)
+        int onoff = atoi(prop->GetElement(idx+1));
+        if (onoff)
           {
           this->Selection->EnableArray(name);
-          if (!this->AcceptCalled)
-            {
-            svp->SetElement(2*i, name);
-            svp->SetElement(2*i+1, "1");
-            }
           }
         else
           {
           this->Selection->DisableArray(name);
-          if (!this->AcceptCalled)
-            {
-            svp->SetElement(2*i, name);
-            svp->SetElement(2*i+1, "0");
-            }
           }
         }
       }
     else
       {
-      vtkErrorMacro("Error getting set of arrays from reader.");
+      vtkErrorMacro("An appropriate domain (name: array_list) is not specified. "
+                    "Can not update");
       }
     }
+  else
+    {
+    vtkErrorMacro("An appropriate property not specified. "
+                  "Can not update");
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -263,9 +278,17 @@ void vtkPVArraySelection::ResetInternal()
 {
   vtkKWCheckButton* checkButton;
   
-  // Update our local vtkDataArraySelection instance with the reader's
-  // settings.
-  this->SetLocalSelectionsFromReader();
+  if (!this->AcceptCalled)
+    {
+    // Update our local vtkDataArraySelection instance with the reader's
+    // settings.
+    this->UpdateSelections(1);
+    }
+  else
+    {
+    // Or update from the property
+    this->UpdateSelections(0);
+    }
   
   // See if we need to create new check buttons.
   vtkPVArraySelectionArraySet newSet;
@@ -312,9 +335,14 @@ void vtkPVArraySelection::ResetInternal()
       }
     }
   
-  // Now set the state of the check buttons.
-  this->SetWidgetSelectionsFromLocal();
-  
+  vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
+  for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+    {
+    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
+    check->SetState(this->Selection->ArrayIsEnabled(check->GetText()));
+    }
+  it->Delete();
+
   if (this->AcceptCalled)
     {
     this->ModifiedFlag = 0;
@@ -350,10 +378,13 @@ void vtkPVArraySelection::Accept()
     vtkErrorMacro("VTKReader has not been set.");
     }
 
-  this->SetLocalSelectionsFromReader();
-  this->SetReaderSelectionsFromWidgets();
-  this->SetLocalSelectionsFromReader();
-  this->SetWidgetSelectionsFromLocal();
+  this->AcceptCalled = 1;
+
+  this->SetReaderSelectionsFromProperty();
+  // In case changing the selection caused changes in other 
+  // selections, we update information and GUI from reader
+  this->GetPVSource()->GetProxy()->UpdateInformation();
+  this->ResetInternal();
 
   this->ModifiedFlag = 0;
   
@@ -370,34 +401,10 @@ void vtkPVArraySelection::Accept()
       }
     }
 
-  this->AcceptCalled = 1;
-}
-
-//---------------------------------------------------------------------------
-void vtkPVArraySelection::SetWidgetSelectionsFromLocal()
-{
-  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->GetSMProperty());
-  if (svp)
-    {
-    vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
-    int checkIdx;
-    for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
-      {
-      vtkKWCheckButton* check =
-        static_cast<vtkKWCheckButton*>(it->GetObject());
-      checkIdx = svp->GetElementIndex(check->GetText());
-      if (checkIdx > -1)
-        {
-        check->SetState(atoi(svp->GetElement(checkIdx+1)));
-        }
-      }
-    it->Delete();
-    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::SetReaderSelectionsFromWidgets()
+void vtkPVArraySelection::SetReaderSelectionsFromProperty()
 {
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
 
@@ -494,7 +501,7 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
     return;
     }
 
-  this->SetLocalSelectionsFromReader();
+  this->UpdateSelections(0);
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
 
   int numElems=0;
@@ -542,6 +549,7 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
    it->Delete();
 }
 
+//----------------------------------------------------------------------------
 vtkPVArraySelection* vtkPVArraySelection::ClonePrototype(vtkPVSource* pvSource,
                                   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -549,6 +557,7 @@ vtkPVArraySelection* vtkPVArraySelection::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVArraySelection::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone,
                                          vtkPVSource* pvSource,
                                          vtkArrayMap<vtkPVWidget*,
@@ -560,6 +569,7 @@ void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone,
     {
     pvas->SetAttributeName(this->AttributeName);
     pvas->SetLabelText(this->LabelText);
+    pvas->SetSMInformationPropertyName(this->GetSMInformationPropertyName());
     }
   else 
     {
@@ -584,6 +594,12 @@ int vtkPVArraySelection::ReadXMLAttributes(vtkPVXMLElement* element,
     return 0;
     }
 
+  const char* inf_property = element->GetAttribute("information_property");
+  if (inf_property)
+    {
+    this->SetSMInformationPropertyName(inf_property);
+    }
+
   const char* label_text = element->GetAttribute("label_text");
   if(label_text)
     {
@@ -597,21 +613,6 @@ int vtkPVArraySelection::ReadXMLAttributes(vtkPVXMLElement* element,
 int vtkPVArraySelection::GetNumberOfArrays()
 {
   return this->ArrayCheckButtons->GetNumberOfItems();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVArraySelection::CreateServerSide()
-{
-  if(!this->ServerSideID.ID)
-    {
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    this->ServerSideID = pm->NewStreamObject("vtkPVServerArraySelection");
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->ServerSideID << "SetProcessModule"
-                    << pm->GetProcessModuleID()
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-    }
 }
 
 //----------------------------------------------------------------------------
