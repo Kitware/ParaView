@@ -99,6 +99,10 @@ public:
   void SetPosition();
   void SetPosition(float,float,float);
 
+  // Description:
+  // Set the tcl variables that are modified when accept is called.
+  void SetPositionMethod(const char* wname, const char* varname);
+
 protected:
   vtkPVPointWidget();
   ~vtkPVPointWidget();
@@ -119,6 +123,12 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  vtkSetStringMacro(PositionVariable);
+  vtkSetStringMacro(PositionObject);
+  
+  char *PositionVariable;
+  char *PositionObject;
 
 private:
   vtkPVPointWidget(const vtkPVPointWidget&); // Not implemented

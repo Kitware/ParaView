@@ -68,7 +68,8 @@ int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVPointWidget::vtkPVPointWidget()
 {
   int cc;
-  this->Widget3D = vtkPointWidget::New();
+  vtkPointWidget *point = vtkPointWidget::New();
+  this->Widget3D = point;
   this->Labels[0] = vtkKWLabel::New();
   this->Labels[1] = vtkKWLabel::New();  
   for ( cc = 0; cc < 3; cc ++ )
@@ -77,6 +78,9 @@ vtkPVPointWidget::vtkPVPointWidget()
     this->CoordinateLabel[cc] = vtkKWLabel::New();
    }
   this->PositionResetButton = vtkKWPushButton::New();
+  this->PositionVariable = 0;
+  this->PositionObject   = 0;
+  point->AllOff();
 }
 
 //----------------------------------------------------------------------------
@@ -91,6 +95,8 @@ vtkPVPointWidget::~vtkPVPointWidget()
     this->CoordinateLabel[i]->Delete();
     }
   this->PositionResetButton->Delete();
+  this->SetPositionVariable(0);
+  this->SetPositionObject(0);
 }
 
 //----------------------------------------------------------------------------
@@ -127,24 +133,57 @@ void vtkPVPointWidget::Reset()
     return;
     }
   // Reset point
+  if ( this->PositionVariable && this->PositionObject )
+    {
+    this->Script("eval %s SetPosition [ %s Get%s ]",
+		 this->GetTclName(), this->PositionObject, 
+		 this->PositionVariable);
+    }
   this->Superclass::Reset();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::Accept()  
 {
-  this->PlaceWidget();
   if ( ! this->ModifiedFlag)
     {
     return;
     }
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  ofstream *traceFile = pvApp->GetTraceFile();
+  int traceFlag = 0;
+
+  // Start the trace entry and the accept command.
+  if (traceFile && this->InitializeTrace())
+    {
+    traceFlag = 1;
+    }
+
+  if (traceFlag)
+    {
+    *traceFile << "$kw(" << this->GetTclName() << ") SetPosition "
+	       << this->PositionEntry[0]->GetValue() << " "
+	       << this->PositionEntry[1]->GetValue() << " "
+	       << this->PositionEntry[2]->GetValue() << endl;
+    }
+    
   // Accept point
+  char acceptCmd[1024];
+  if ( this->PositionVariable && this->PositionObject )
+    {    
+    sprintf(acceptCmd, "%s Set%s %f %f %f", this->PositionObject, 
+	    this->PositionVariable,
+	    this->PositionEntry[0]->GetValueAsFloat(),
+	    this->PositionEntry[1]->GetValueAsFloat(),
+	    this->PositionEntry[2]->GetValueAsFloat());
+    pvApp->BroadcastScript(acceptCmd);
+    }
   this->Superclass::Accept();
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::SaveInTclScript(ofstream *file)
+void vtkPVPointWidget::SaveInTclScript(ofstream *)
 {
 }
 
@@ -152,6 +191,8 @@ void vtkPVPointWidget::SaveInTclScript(ofstream *file)
 void vtkPVPointWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << "3D Widget:" << endl;
+  this->Widget3D->PrintSelf(os, indent.GetNextIndent());
 }
 
 //----------------------------------------------------------------------------
@@ -165,6 +206,8 @@ vtkPVPointWidget* vtkPVPointWidget::ClonePrototype(vtkPVSource* pvSource,
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 {
+  this->SetTraceName("Point");
+
   this->SetFrameLabel("Point Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
@@ -264,15 +307,7 @@ int vtkPVPointWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::ActualPlaceWidget()
 {
-  float center[3];
-  int cc;
-  for ( cc = 0; cc < 3; cc ++ )
-    {
-    center[cc] = atof(this->PositionEntry[cc]->GetValue());
-    }
- 
   this->Superclass::ActualPlaceWidget();
-  this->SetPosition(center[0], center[1], center[2]);
 }
 
 //----------------------------------------------------------------------------
@@ -286,6 +321,20 @@ void vtkPVPointWidget::SetPosition(float x, float y, float z)
     vtkPointWidget *point = static_cast<vtkPointWidget*>(this->Widget3D);
     point->SetPosition(x, y, z);
     }
+  this->ModifiedFlag = 1;
+  vtkPVGenericRenderWindowInteractor* iren = 
+    this->PVSource->GetPVWindow()->GetGenericInteractor();
+  if(iren)
+    {
+    iren->Render();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPointWidget::SetPositionMethod(const char* wname, const char* varname)
+{
+  this->SetPositionObject(wname);
+  this->SetPositionVariable(varname);
 }
 
 //----------------------------------------------------------------------------
@@ -299,12 +348,6 @@ void vtkPVPointWidget::SetPosition()
     }
   vtkPointWidget *point = static_cast<vtkPointWidget*>(this->Widget3D);
   point->SetPosition(val);
-  vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetGenericInteractor();
-  if(iren)
-    {
-    iren->Render();
-    }
   this->ModifiedCallback();
   this->ValueChanged = 0;
 }
