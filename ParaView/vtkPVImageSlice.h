@@ -60,22 +60,35 @@ public:
   void SetOutput(vtkPVImage *pvd);
   vtkPVImage *GetOutput();
   
+  // Description:
+  // This is called when the accept button is pressed.
+  // The first time, it creates data.
   void SliceChanged();
-  void SelectX();
-  void SelectY();
-  void SelectZ();
-  void GetSource();
 
-  vtkGetObjectMacro(Slice, vtkImageClip);
-  
-  void SetDimensions(int dim[6]);
-  int *GetDimensions();
+  // Description:
+  // Manual method for selecting which axis gets sliced.
+  void SetSliceAxis(int axis);
+
+  // Description:
+  // Manual method for selecting which slice to display
+  void SetSliceNumber(int slice);
+
+  // Description:
+  // Callbacks from the Select SliceAxis buttons.
+  // This is the only way to get radio button fuctionality.
+  void SelectXCallback();
+  void SelectYCallback();
+  void SelectZCallback();
   
 protected:
   vtkPVImageSlice();
   ~vtkPVImageSlice();
   vtkPVImageSlice(const vtkPVImageSlice&) {};
   void operator=(const vtkPVImageSlice&) {};
+  
+  // This is called to update the widgets when the parameters are changed
+  // programatically (not through UI).
+  void UpdateProperties();
   
   vtkKWPushButton *Accept;
   vtkKWPushButton *SourceButton;
@@ -84,9 +97,17 @@ protected:
   vtkKWRadioButton *XDimension;
   vtkKWRadioButton *YDimension;
   vtkKWRadioButton *ZDimension;
+
+  // Keep the parameters here (in addition to the widgets)
+  // so they can be set before the properties are created.
+  int PropertiesCreated;
+  int ParametersInitialized;
+  int SliceNumber;
+  int SliceAxis;
   
   vtkImageClip  *Slice;
-  int Dimensions[6];
 };
 
 #endif
+
+

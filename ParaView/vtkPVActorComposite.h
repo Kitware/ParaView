@@ -40,6 +40,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkDataSetMapper.h"
 
 class vtkPVAssignment;
+class vtkPVApplication;
 
 
 class VTK_EXPORT vtkPVActorComposite : public vtkKWActorComposite
@@ -75,6 +76,16 @@ public:
   // The mapper needs to know what the assignment is.
   void SetAssignment(vtkPVAssignment *a);
 
+  // Description:
+  // Parallel methods for computing the scalar range from the input,
+  /// and setting the scalar range of the mapper.
+  void GetInputScalarRange(float range[2]);
+  void TransmitInputScalarRange();
+  void SetScalarRange(float min, float max);
+    
+  // Description:
+  // Casts to vtkPVApplication.
+  vtkPVApplication *GetPVApplication();
   
 protected:
   vtkPVActorComposite();

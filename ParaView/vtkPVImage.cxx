@@ -94,18 +94,7 @@ void vtkPVImage::Slice()
   slice = vtkPVImageSlice::New();
   slice->Clone(pvApp);
 
-  slice->SetInput(this);
-  
-  extents = this->GetImageData()->GetExtent();
-  slice->SetDimensions(extents);
-  
-  extents[5] = (extents[4] + extents[5])/2;
-  extents[4] = extents[5];
-  
-  slice->GetSlice()->ClipDataOn();
-  slice->GetSlice()->SetOutputWholeExtent(extents);
-  slice->GetSlice()->Update();
-
+  slice->SetInput(this);  
   slice->SetName("slice");
   
   vtkPVWindow *window = this->GetPVSource()->GetWindow();

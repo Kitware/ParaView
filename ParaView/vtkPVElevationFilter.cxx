@@ -367,8 +367,6 @@ void vtkPVElevationFilter::ElevationParameterChanged()
   
   this->GetView()->Render();
   window->GetMainView()->SetSelectedComposite(this);
-  
-  window->GetMainView()->ResetCamera();
 }
 
 //----------------------------------------------------------------------------

@@ -90,7 +90,67 @@ void vtkPVActorComposite::CreateProperties()
   this->Label->Create(this->Application, "");
   this->Label->SetLabel("vtkPVActorComposite label");
   this->Script("pack %s", this->Label->GetWidgetName());
+  
+  // Lets try to pick a reasonable scalar range.
+  float range[2];
+  this->GetInputScalarRange(range);
+  this->SetScalarRange(range[0], range[1]);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::GetInputScalarRange(float range[2]) 
+{ 
+  float tmp[2];
+  int idx;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  int numProcs = controller->GetNumberOfProcesses();
+  
+  this->Mapper->Update();
+  this->Mapper->GetInput()->GetScalarRange(range);
+  for (idx = 1; idx < numProcs; ++idx)
+    {
+    pvApp->RemoteScript(idx, "%s TransmitInputScalarRange", this->GetTclName());
+    controller->Receive(tmp, 2, idx, 99399);
+    if (range[0] > tmp[0])
+      {
+      range[0] = tmp[0];
+      }
+    if (range[1] < tmp[1])
+      {
+      range[1] = tmp[1];
+      }    
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::TransmitInputScalarRange() 
+{ 
+  float tmp[2];
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  
+  this->Mapper->Update();
+  this->Mapper->GetInput()->GetScalarRange(tmp);
+
+  controller->Send(tmp, 2, 0, 99399);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetScalarRange(float min, float max) 
+{ 
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetScalarRange %f %f", this->GetTclName(), 
+			   min, max);
+    }
+  
+  this->Mapper->SetScalarRange(min, max);
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetName (const char* arg) 
@@ -227,4 +287,23 @@ void vtkPVActorComposite::SetAssignment(vtkPVAssignment *a)
        << ", numPieces: " << a->GetNumberOfPieces() << endl;
   
 
+}
+
+//----------------------------------------------------------------------------
+vtkPVApplication* vtkPVActorComposite::GetPVApplication()
+{
+  if (this->Application == NULL)
+    {
+    return NULL;
+    }
+  
+  if (this->Application->IsA("vtkPVApplication"))
+    {  
+    return (vtkPVApplication*)(this->Application);
+    }
+  else
+    {
+    vtkErrorMacro("Bad typecast");
+    return NULL;
+    } 
 }

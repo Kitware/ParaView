@@ -140,7 +140,6 @@ void vtkPVShrinkPolyData::ShrinkFactorChanged()
 
   window->GetMainView()->SetSelectedComposite(this);
   this->GetView()->Render();
-  window->GetMainView()->ResetCamera();
 }
 
 //----------------------------------------------------------------------------

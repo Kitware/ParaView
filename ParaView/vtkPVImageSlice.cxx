@@ -59,6 +59,12 @@ vtkPVImageSlice::vtkPVImageSlice()
   this->ZDimension->SetParent(this->Properties);
   
   this->Slice = vtkImageClip::New();
+  this->Slice->ClipDataOn();
+  
+  this->PropertiesCreated = 0;
+  this->ParametersInitialized = 0;
+  this->SliceNumber = 0;
+  this->SliceAxis = 3;
 }
 
 //----------------------------------------------------------------------------
@@ -93,40 +99,26 @@ vtkPVImageSlice* vtkPVImageSlice::New()
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::CreateProperties()
 {
-  int *extents;
-  int sliceNumber;
+  if (this->PropertiesCreated)
+    {
+    vtkErrorMacro("Properties already created.");
+    return;
+    }
+  this->PropertiesCreated = 1;
   
   // must set the application
   this->vtkPVSource::CreateProperties();
   
   this->XDimension->Create(this->Application, "-text X");
-  this->XDimension->SetCommand(this, "SelectX");
+  this->XDimension->SetCommand(this, "SelectXCallback");
   this->YDimension->Create(this->Application, "-text Y");
-  this->YDimension->SetCommand(this, "SelectY");
+  this->YDimension->SetCommand(this, "SelectYCallback");
   this->ZDimension->Create(this->Application, "-text Z");
-  this->ZDimension->SetCommand(this, "SelectZ");
-  
-  extents = this->GetSlice()->GetOutputWholeExtent();
-  if (extents[0] == extents[1])
-    {
-    sliceNumber = extents[0];
-    this->SelectX();
-    }
-  else if (extents[2] == extents[3])
-    {
-    sliceNumber = extents[2];
-    this->SelectY();
-    }
-  else
-    {
-    sliceNumber = extents[4];
-    this->SelectZ();
-    }
-  
+  this->ZDimension->SetCommand(this, "SelectZCallback");
+
   this->SliceLabel->Create(this->Application, "");
   this->SliceLabel->SetLabel("Slice:");
   this->SliceEntry->Create(this->Application, "");
-  this->SliceEntry->SetValue(sliceNumber);
   
   this->SourceButton->Create(this->Application, "-text GetSource");
   this->SourceButton->SetCommand(this, "GetSource");
@@ -140,106 +132,202 @@ void vtkPVImageSlice::CreateProperties()
 	       this->XDimension->GetWidgetName(),
 	       this->YDimension->GetWidgetName(),
 	       this->ZDimension->GetWidgetName());
+
+
+  if (this->ParametersInitialized == 0 && this->Slice->GetInput())
+    {
+    // Lets try to setup a good default.
+    this->Slice->UpdateInformation();
+    int *ext = this->Slice->GetOutput()->GetWholeExtent();
+    if (ext[0] == ext[1])
+      {
+      this->SetSliceNumber(ext[0]);
+      this->SliceAxis = 0;
+      }
+    else if (ext[2] == ext[3])
+      {
+      this->SliceNumber = ext[1];
+      this->SliceAxis = 1;
+      }
+    else
+      {
+      this->SliceNumber = (int)(((float)(ext[4]) + (float)(ext[5])) * 0.5);
+      this->SliceAxis = 2;
+      }
+    this->ParametersInitialized = 1;
+    }
+  
+  this->UpdateProperties();
 }
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::SelectXCallback()
+{
+  this->YDimension->SetState(0);
+  this->ZDimension->SetState(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::SelectYCallback()
+{
+  this->XDimension->SetState(0);
+  this->ZDimension->SetState(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::SelectZCallback()
+{
+  this->XDimension->SetState(0);
+  this->YDimension->SetState(0);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::UpdateProperties()
+{
+  if ( ! this->PropertiesCreated)
+    {
+    return;
+    }
+  
+  this->SliceEntry->SetValue(this->SliceNumber);
+
+  this->XDimension->SetState(0);
+  this->YDimension->SetState(0);
+  this->ZDimension->SetState(0);
+  if (this->SliceAxis == 0)
+    {
+    this->XDimension->SetState(1);
+    }
+  if (this->SliceAxis == 1)
+    {
+    this->YDimension->SetState(1);
+    }
+  if (this->SliceAxis == 2)
+    {
+    this->ZDimension->SetState(1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::SetSliceNumber(int num)
+{
+  this->ParametersInitialized = 1;
+  if (this->SliceNumber == num)
+    {
+    return;
+    }
+  
+  this->Modified();
+  this->SliceNumber = num;
+  this->UpdateProperties();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::SetSliceAxis(int axis)
+{
+  this->ParametersInitialized = 1;
+  if (this->SliceAxis == axis)
+    {
+    return;
+    }
+  
+  this->Modified();
+  this->SliceAxis = axis;
+  this->UpdateProperties();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::SliceChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVImage *pvi;
-  int newSliceNum = this->SliceEntry->GetValueAsInt();
   vtkPVWindow *window = this->GetWindow();
   vtkPVActorComposite *ac;
   vtkPVAssignment *a;
+  int *ext;
   
+  // Get the parameter values from the properties UI.
   if (this->XDimension->GetState())
     {
-    this->Slice->SetOutputWholeExtent(newSliceNum, newSliceNum,
-				      this->Dimensions[2],
-				      this->Dimensions[3],
-				      this->Dimensions[4],
-				      this->Dimensions[5]);
+    this->SliceAxis = 0;
     }
   else if (this->YDimension->GetState())
     {
-    this->Slice->SetOutputWholeExtent(this->Dimensions[0],
-				      this->Dimensions[1],
-				      newSliceNum, newSliceNum,
-				      this->Dimensions[4],
-				      this->Dimensions[5]);
+    this->SliceAxis = 1;
     }
   else
     {
-    this->Slice->SetOutputWholeExtent(this->Dimensions[0],
-				      this->Dimensions[1],
-				      this->Dimensions[2],
-				      this->Dimensions[3],
-				      newSliceNum, newSliceNum);
+    this->SliceAxis = 2;
     }
+  this->SliceNumber = this->SliceEntry->GetValueAsInt();
+  this->ParametersInitialized = 1;
   
+  // Create the data if this is the first accept.
   if (this->GetPVData() == NULL)
     {
     pvi = vtkPVImage::New();
     pvi->Clone(pvApp);
     pvi->OutlineFlagOff();
     this->SetOutput(pvi);
-    a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+    a = this->GetInput()->GetAssignment();
     pvi->SetAssignment(a);  
-    this->GetPVData()->GetData()->
-      SetUpdateExtent(this->GetPVData()->GetData()->GetWholeExtent());
     this->GetInput()->GetActorComposite()->VisibilityOff();
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
     }
+
+  // Set the extent of the clip filter.
+  this->Slice->GetInput()->UpdateInformation();
+  ext = this->Slice->GetInput()->GetWholeExtent();
   
-  this->Slice->Modified();
-  this->Slice->Update();
-  
-  this->GetView()->Render();  
-  window->GetMainView()->SetSelectedComposite(this);
-  window->GetMainView()->ResetCamera();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SelectX()
-{
-  this->XDimension->SetState(1);
-  this->YDimension->SetState(0);
-  this->ZDimension->SetState(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SelectY()
-{
-  this->XDimension->SetState(0);
-  this->YDimension->SetState(1);
-  this->ZDimension->SetState(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SelectZ()
-{
-  this->XDimension->SetState(0);
-  this->YDimension->SetState(0);
-  this->ZDimension->SetState(1);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SetDimensions(int dim[6])
-{
-  int i;
-  
-  for (i = 0; i < 6; i++)
+  if (this->SliceAxis == 0)
     {
-    this->Dimensions[i] = dim[i];
+    if (this->SliceNumber < ext[0])
+      {
+      this->SetSliceNumber(ext[0]);
+      }
+    if (this->SliceNumber > ext[1])
+      {
+      this->SetSliceNumber(ext[1]);
+      }
+    this->Slice->SetOutputWholeExtent(this->SliceNumber, this->SliceNumber,
+				      ext[2], ext[3], ext[4], ext[5]);
     }
-}
-
-//----------------------------------------------------------------------------
-int* vtkPVImageSlice::GetDimensions()
-{
-  return this->Dimensions;
+  if (this->SliceAxis == 1)
+    {
+    if (this->SliceNumber < ext[2])
+      {
+      this->SetSliceNumber(ext[2]);
+      }
+    if (this->SliceNumber > ext[3])
+      {
+      this->SetSliceNumber(ext[3]);
+      }
+    this->Slice->SetOutputWholeExtent(ext[0], ext[1], this->SliceNumber, 
+				      this->SliceNumber, ext[4], ext[5]);
+    }
+  if (this->SliceAxis == 2)
+    {
+    if (this->SliceNumber < ext[4])
+      {
+      this->SetSliceNumber(ext[4]);
+      }
+    if (this->SliceNumber > ext[5])
+      {
+      this->SetSliceNumber(ext[5]);
+      }
+    this->Slice->SetOutputWholeExtent(ext[0], ext[1], ext[2], ext[3],
+				      this->SliceNumber, this->SliceNumber);
+    }  
+  
+  window->GetMainView()->SetSelectedComposite(this);
+  this->GetView()->Render();  
 }
 
 //----------------------------------------------------------------------------
@@ -253,7 +341,7 @@ void vtkPVImageSlice::SetInput(vtkPVImage *pvData)
 			   pvData->GetTclName());
     }  
   
-  this->GetSlice()->SetInput(pvData->GetImageData());
+  this->Slice->SetInput(pvData->GetImageData());
   this->Input = pvData;
 }
 
@@ -279,13 +367,3 @@ vtkPVImage *vtkPVImageSlice::GetOutput()
   return vtkPVImage::SafeDownCast(this->Output);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::GetSource()
-{
-  this->GetPVData()->GetActorComposite()->VisibilityOff();
-  this->GetWindow()->GetMainView()->
-    SetSelectedComposite(this->GetInput()->GetPVSource());
-  this->GetInput()->GetActorComposite()->VisibilityOn();
-  this->GetView()->Render();
-  this->GetWindow()->GetMainView()->ResetCamera();
-}

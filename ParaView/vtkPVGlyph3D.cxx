@@ -262,9 +262,7 @@ void vtkPVGlyph3D::ScaleFactorChanged()
     }
   
   window->GetMainView()->SetSelectedComposite(this);
-
   this->GetView()->Render();
-  window->GetMainView()->ResetCamera();
 }
 
 //----------------------------------------------------------------------------

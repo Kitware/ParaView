@@ -174,9 +174,7 @@ void vtkPVContourFilter::ContourValueChanged()
     window->GetMainView()->AddComposite(ac);
     }
   window->GetMainView()->SetSelectedComposite(this);
-
   this->GetView()->Render();
-  window->GetMainView()->ResetCamera();
 }
 
 //----------------------------------------------------------------------------
