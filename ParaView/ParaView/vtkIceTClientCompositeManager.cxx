@@ -1,0 +1,1312 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkIceTClientCompositeManager.cxx
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even 
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#ifdef VTK_USE_MPI
+ #include <mpi.h>
+#endif
+
+#include "vtkIceTClientCompositeManager.h"
+#include "vtkCompositeManager.h"
+
+#include "vtkCallbackCommand.h"
+#include "vtkCamera.h"
+#include "vtkLight.h"
+#include "vtkLightCollection.h"
+#include "vtkMultiProcessController.h"
+#include "vtkSocketController.h"
+#include "vtkCompressCompositer.h"
+#include "vtkTreeCompositer.h"
+#include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
+#include "vtkRendererCollection.h"
+#include "vtkToolkits.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkFloatArray.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkTimerLog.h"
+// Until we trigger LOD from AllocatedRenderTime ...
+#include "vtkPVApplication.h"
+#include "vtkByteSwap.h"
+
+
+#ifdef _WIN32
+#include "vtkWin32OpenGLRenderWindow.h"
+#elif defined(VTK_USE_MESA)
+#include "vtkMesaRenderWindow.h"
+#endif
+
+
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.1");
+vtkStandardNewMacro(vtkIceTClientCompositeManager);
+
+vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,Compositer,vtkCompositer);
+
+// Structures to communicate render info.
+struct vtkClientRenderWindowInfo 
+{
+  int Size[2];
+  int NumberOfRenderers;
+  int ReductionFactor;
+};
+
+struct vtkClientRendererInfo 
+{
+  float CameraPosition[3];
+  float CameraFocalPoint[3];
+  float CameraViewUp[3];
+  float CameraClippingRange[2];
+  float LightPosition[3];
+  float LightFocalPoint[3];
+  float Background[3];
+  float ParallelScale;
+  float CameraViewAngle;
+};
+
+#define vtkInitializeVector3(v) { v[0] = 0; v[1] = 0; v[2] = 0; }
+#define vtkInitializeVector2(v) { v[0] = 0; v[1] = 0; }
+#define vtkInitializeClientRendererInfoMacro(r)      \
+  {                                                     \
+  vtkInitializeVector3(r.CameraPosition);               \
+  vtkInitializeVector3(r.CameraFocalPoint);             \
+  vtkInitializeVector3(r.CameraViewUp);                 \
+  vtkInitializeVector2(r.CameraClippingRange);          \
+  vtkInitializeVector3(r.LightPosition);                \
+  vtkInitializeVector3(r.LightFocalPoint);              \
+  vtkInitializeVector3(r.Background);                   \
+  r.ParallelScale = 0.0;                                \
+  r.CameraViewAngle = 0.0;                              \
+  }
+  
+
+
+//-------------------------------------------------------------------------
+vtkIceTClientCompositeManager::vtkIceTClientCompositeManager()
+{
+  this->UseSquirt = 1;
+  this->RenderWindow = NULL;
+
+  this->ClientController = NULL;
+  this->ClientFlag = 1;
+
+  this->StartTag = 0;
+  this->RenderView = NULL;
+
+  this->ReductionFactor = 2;
+  this->PDataSize[0] = this->PDataSize[1] = 0;
+  this->MagnifiedPDataSize[0] = this->MagnifiedPDataSize[1] = 0;
+  this->PData = NULL;
+  this->ZData = NULL;
+  this->PData2 = NULL;
+  this->ZData2 = NULL;
+  this->SquirtArray = NULL;
+  this->MagnifiedPData = NULL;
+  this->RenderView = NULL;
+
+  this->Compositer = vtkCompressCompositer::New();
+  //this->Compositer = vtkTreeCompositer::New();
+
+  this->Tiled = 0;
+  this->TiledDimensions[0] = this->TiledDimensions[1] = 1;
+
+  this->UseChar = 1;
+  this->UseRGB = 0;
+
+  this->BaseArray = NULL;
+
+  this->SquirtCompression = 0;
+  this->UseCompositing = 0;
+}
+
+  
+//-------------------------------------------------------------------------
+vtkIceTClientCompositeManager::~vtkIceTClientCompositeManager()
+{
+  this->SetRenderWindow(NULL);
+
+  this->SetPDataSize(0,0);
+  
+  this->SetClientController(NULL);
+
+  if (this->PData)
+    {
+    vtkCompositeManager::DeleteArray(this->PData);
+    this->PData = NULL;
+    }
+  if (this->ZData)
+    {
+    vtkCompositeManager::DeleteArray(this->ZData);
+    this->ZData = NULL;
+    }
+
+  if (this->PData2)
+    {
+    vtkCompositeManager::DeleteArray(this->PData2);
+    this->PData2 = NULL;
+    }
+  if (this->ZData2)
+    {
+    vtkCompositeManager::DeleteArray(this->ZData2);
+    this->ZData2 = NULL;
+    }
+
+  if (this->SquirtArray)
+    {
+    vtkCompositeManager::DeleteArray(this->SquirtArray);
+    this->SquirtArray = NULL;
+    }
+  if (this->MagnifiedPData)
+    {
+    vtkCompositeManager::DeleteArray(this->MagnifiedPData);
+    this->MagnifiedPData = NULL;
+    }
+  this->SetRenderView(NULL);
+  this->SetCompositer(NULL);
+
+
+  if (this->BaseArray)
+    {
+    this->BaseArray->Delete();
+    }
+}
+
+
+//----------------------------------------------------------------------------
+// Called only on the client.
+float vtkIceTClientCompositeManager::GetZBufferValue(int x, int y)
+{
+  float z;
+  int pArg[3];
+
+  if (this->UseCompositing == 0)
+    {
+    // This could cause a problem between setting this ivar and rendering.
+    // We could always composite, and always consider client z.
+    float *pz;
+    pz = this->RenderWindow->GetZbufferData(x, y, x, y);
+    z = *pz;
+    delete [] pz;
+    return z;
+    }
+  
+  // This first int is to check for byte swapping.
+  pArg[0] = 1;
+  pArg[1] = x;
+  pArg[2] = y;
+  this->ClientController->TriggerRMI(1, (void*)pArg, sizeof(int)*3, 
+                                vtkIceTClientCompositeManager::GATHER_Z_RMI_TAG);
+  this->ClientController->Receive(&z, 1, 1, vtkIceTClientCompositeManager::CLIENT_Z_TAG);
+  return z;
+}
+
+//----------------------------------------------------------------------------
+void vtkIceTClientCompositeManagerGatherZBufferValueRMI(void *local, void *pArg, 
+                                                    int pLength, int)
+{
+  vtkIceTClientCompositeManager* self = (vtkIceTClientCompositeManager*)local;
+  int *p;
+  int x, y;
+
+  if (pLength != sizeof(int)*3)
+    {
+    vtkGenericWarningMacro("Integer sizes differ.");
+    }
+
+  p = (int*)pArg;
+  if (p[0] != 1)
+    { // Need to swap
+    vtkByteSwap::SwapVoidRange(pArg, 3, sizeof(int));
+    if (p[0] != 1)
+      { // Swapping did not work.
+      vtkGenericWarningMacro("Swapping failed.");
+      }
+    }
+  x = p[1];
+  y = p[2];
+  
+  self->GatherZBufferValueRMI(x, y);
+}
+
+//----------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::GatherZBufferValueRMI(int , int ){}
+
+
+
+//=======================  Client ========================
+
+
+
+//-------------------------------------------------------------------------
+// We may want to pass the render window as an argument for a sanity check.
+void vtkIceTClientCompositeManagerStartRender(vtkObject *caller,
+                                 unsigned long vtkNotUsed(event), 
+                                 void *clientData, void *)
+{
+  vtkIceTClientCompositeManager *self = (vtkIceTClientCompositeManager *)clientData;
+  
+  if (caller != self->GetRenderWindow())
+    { // Sanity check.
+    vtkGenericWarningMacro("Caller mismatch.");
+    return;
+    }
+  
+  self->StartRender();
+}
+
+//-------------------------------------------------------------------------
+// Only called in process 0.
+void vtkIceTClientCompositeManager::StartRender()
+{
+  struct vtkClientRenderWindowInfo winInfo;
+  struct vtkClientRendererInfo renInfo;
+  int *size;
+  vtkRendererCollection *rens;
+  vtkRenderer* ren;
+  vtkCamera *cam;
+  vtkLightCollection *lc;
+  vtkLight *light;
+  static int firstRender = 1;
+  float updateRate = this->RenderWindow->GetDesiredUpdateRate();
+  
+  if ( ! this->UseCompositing)
+    {
+    this->RenderWindow->EraseOn();
+    return;
+    }
+
+  if (firstRender)
+    {
+    firstRender = 0;
+    return;
+    }
+
+  if (updateRate > 2.0)
+    {
+    this->ReductionFactor = 2;
+    }
+  else
+    {
+    this->ReductionFactor = 1;
+    }
+  
+  vtkDebugMacro("StartRender");
+  
+  vtkMultiProcessController *controller = this->ClientController;
+
+  if (controller == NULL)
+    {
+    this->RenderWindow->EraseOn();
+    return;
+    }
+
+  // Make sure they all swp buffers at the same time.
+  //vtkRenderWindow* renWin = this->RenderWindow;
+  //renWin->SwapBuffersOff();
+
+  // Trigger the satellite processes to start their render routine.
+  rens = this->RenderWindow->GetRenderers();
+  size = this->RenderWindow->GetSize();
+  winInfo.Size[0] = size[0]/this->ReductionFactor;
+  winInfo.Size[1] = size[1]/this->ReductionFactor;
+  winInfo.ReductionFactor = this->ReductionFactor;
+  winInfo.NumberOfRenderers = rens->GetNumberOfItems();
+  this->SetPDataSize(winInfo.Size[0], winInfo.Size[1]);
+  
+  controller->TriggerRMI(1, vtkIceTClientCompositeManager::RENDER_RMI_TAG);
+
+  // Synchronize the size of the windows.
+  //controller->Send((char*)(&winInfo), 
+  //                 sizeof(vtkClientRenderWindowInfo), 1, 
+  //                 vtkIceTClientCompositeManager::WIN_INFO_TAG);
+  // Let the socket controller deal with byte swapping.
+  controller->Send((int*)(&winInfo), 4, 1, 
+                   vtkIceTClientCompositeManager::WIN_INFO_TAG);
+  
+  // Make sure the satellite renderers have the same camera I do.
+  // Note: This will lockup unless every process has the same number
+  // of renderers.
+  rens->InitTraversal();
+  while ( (ren = rens->GetNextItem()) )
+    {
+    cam = ren->GetActiveCamera();
+    lc = ren->GetLights();
+    lc->InitTraversal();
+    light = lc->GetNextItem();
+    cam->GetPosition(renInfo.CameraPosition);
+    cam->GetFocalPoint(renInfo.CameraFocalPoint);
+    cam->GetViewUp(renInfo.CameraViewUp);
+    cam->GetClippingRange(renInfo.CameraClippingRange);
+    renInfo.CameraViewAngle = cam->GetViewAngle();
+    if (cam->GetParallelProjection())
+      {
+      renInfo.ParallelScale = cam->GetParallelScale();
+      }
+    else
+      {
+      renInfo.ParallelScale = 0.0;
+      }
+    if (light)
+      {
+      light->GetPosition(renInfo.LightPosition);
+      light->GetFocalPoint(renInfo.LightFocalPoint);
+      }
+    ren->GetBackground(renInfo.Background);
+    ren->Clear();
+    //controller->Send((char*)(&renInfo),
+    //                 sizeof(struct vtkClientRendererInfo), 1, 
+    //                 vtkCompositeManager::REN_INFO_TAG);
+    // Let the socket controller deal with byte swapping.
+    controller->Send((float*)(&renInfo), 22, 1,
+                     vtkCompositeManager::REN_INFO_TAG);
+    }
+  int i = 0;
+  controller->Receive(&i, 1, 1, vtkIceTClientCompositeManager::ACKNOWLEDGE_RMI);
+}
+
+//----------------------------------------------------------------------------
+// Method executed only on client.
+void vtkIceTClientCompositeManager::ReceiveAndSetColorBuffer()
+{
+  if (this->UseChar && ! this->UseRGB && this->UseSquirt)
+    {
+    int length;
+    this->ClientController->Receive(&length, 1, 1, 123450);
+    this->SquirtArray->SetNumberOfTuples(length / (this->SquirtArray->GetNumberOfComponents()));
+    this->ClientController->Receive((unsigned char*)(this->SquirtArray->GetVoidPointer(0)),
+                                                    length, 1, 123451);
+    this->SquirtDecompress(this->SquirtArray,
+                           static_cast<vtkUnsignedCharArray*>(this->PData));
+    //this->DeltaDecode(static_cast<vtkUnsignedCharArray*>(this->PData));
+    }
+  else
+    {
+    //this->ClientController->Receive(this->PData, 1, 123451);
+    int length = this->PData->GetMaxId() + 1;
+    this->ClientController->Receive((unsigned char*)(this->PData->GetVoidPointer(0)),
+                                    length, 1, 123451);
+    }
+ 
+  /*
+  if (this->ReductionFactor == 2)
+    {
+    vtkTimerLog::MarkStartEvent("Double Buffer");
+    this->DoubleBuffer(this->PData, this->MagnifiedPData, this->PDataSize);
+    vtkTimerLog::MarkEndEvent("Double Buffer");
+    
+    // I do not know if this is necessary !!!!!!!
+    vtkRenderer* renderer =
+      ((vtkRenderer*)
+       this->RenderWindow->GetRenderers()->GetItemAsObject(0));
+    renderer->SetViewport(0, 0, 1.0, 1.0);
+    renderer->GetActiveCamera()->UpdateViewport(renderer);
+    // We have to set the color buffer as an even multiple of factor.
+    }
+  else 
+  */
+  if (this->ReductionFactor > 1)
+    {
+    vtkTimerLog::MarkStartEvent("Magnify Buffer");
+    this->MagnifyBuffer(this->PData, this->MagnifiedPData, this->PDataSize);
+    vtkTimerLog::MarkEndEvent("Magnify Buffer");
+    
+    // I do not know if this is necessary !!!!!!!
+    vtkRenderer* renderer =
+      ((vtkRenderer*)
+       this->RenderWindow->GetRenderers()->GetItemAsObject(0));
+    renderer->SetViewport(0, 0, 1.0, 1.0);
+    renderer->GetActiveCamera()->UpdateViewport(renderer);
+    // We have to set the color buffer as an even multiple of factor.
+    }
+   
+  // Set the color buffer
+  if (this->UseChar) 
+    {
+    vtkUnsignedCharArray* buf;
+    if (this->ReductionFactor > 1)
+      {
+      buf = static_cast<vtkUnsignedCharArray*>(this->MagnifiedPData);
+      }
+    else
+      {
+      buf = static_cast<vtkUnsignedCharArray*>(this->PData);
+      }
+    if (this->PData->GetNumberOfComponents() == 4)
+      {
+      vtkTimerLog::MarkStartEvent("Set RGBA Char Buffer");
+      this->RenderWindow->SetRGBACharPixelData(0, 0, 
+                            this->MagnifiedPDataSize[0]-1, 
+                            this->MagnifiedPDataSize[1]-1, buf, 0);
+      vtkTimerLog::MarkEndEvent("Set RGBA Char Buffer");
+      }
+    else if (this->PData->GetNumberOfComponents() == 3)
+      {
+      vtkTimerLog::MarkStartEvent("Set RGB Char Buffer");
+      this->RenderWindow->SetPixelData(0, 0, 
+                            this->MagnifiedPDataSize[0]-1, 
+                            this->MagnifiedPDataSize[1]-1, buf, 0);
+      vtkTimerLog::MarkEndEvent("Set RGB Char Buffer");
+      }
+    } 
+  else 
+    {
+    if (this->ReductionFactor)
+      {
+      vtkTimerLog::MarkStartEvent("Set RGBA Float Buffer");
+      this->RenderWindow->SetRGBAPixelData(0, 0, 
+                     this->MagnifiedPDataSize[0]-1, 
+                     this->MagnifiedPDataSize[1]-1,
+                     static_cast<vtkFloatArray*>(this->MagnifiedPData), 
+                     0);
+      vtkTimerLog::MarkEndEvent("Set RGBA Float Buffer");
+      }
+    else
+      {
+      vtkTimerLog::MarkStartEvent("Set RGBA Float Buffer");
+      this->RenderWindow->SetRGBAPixelData(
+                   0, 0, this->MagnifiedPDataSize[0]-1, 
+                   this->MagnifiedPDataSize[1]-1,
+                   static_cast<vtkFloatArray*>(this->PData), 0);
+      vtkTimerLog::MarkEndEvent("Set RGBA Float Buffer");
+      }
+    }
+}
+
+
+//----------------------------------------------------------------------------
+// We change this to work backwards so we can make it inplace. !!!!!!!     
+void vtkIceTClientCompositeManager::MagnifyBuffer(vtkDataArray* localP, 
+                                              vtkDataArray* magP,
+                                              int windowSize[2])
+{
+  float *rowp, *subp;
+  float *pp1;
+  float *pp2;
+  int   x, y, xi, yi;
+  int   xInDim, yInDim;
+  // Local increments for input.
+  int   pInIncY; 
+  float *newLocalPData;
+  int numComp = localP->GetNumberOfComponents();
+  
+  xInDim = windowSize[0];
+  yInDim = windowSize[1];
+
+  newLocalPData = reinterpret_cast<float*>(magP->GetVoidPointer(0));
+  float* localPdata = reinterpret_cast<float*>(localP->GetVoidPointer(0));
+
+  if (this->UseChar)
+    {
+    if (numComp == 4)
+      {
+      // Get the last pixel.
+      rowp = localPdata;
+      pp2 = newLocalPData;
+      for (y = 0; y < yInDim; y++)
+        {
+        // Duplicate the row rowp N times.
+        for (yi = 0; yi < this->ReductionFactor; ++yi)
+          {
+          pp1 = rowp;
+          for (x = 0; x < xInDim; x++)
+            {
+            // Duplicate the pixel p11 N times.
+            for (xi = 0; xi < this->ReductionFactor; ++xi)
+              {
+              *pp2++ = *pp1;
+              }
+            ++pp1;
+            }
+          }
+        rowp += xInDim;
+        }
+      }
+    else if (numComp == 3)
+      { // RGB char pixel data.
+      // Get the last pixel.
+      pInIncY = numComp * xInDim;
+      unsigned char* crowp = reinterpret_cast<unsigned char*>(localPdata);
+      unsigned char* cpp2 = reinterpret_cast<unsigned char*>(newLocalPData);
+      unsigned char *cpp1, *csubp;
+      for (y = 0; y < yInDim; y++)
+        {
+        // Duplicate the row rowp N times.
+        for (yi = 0; yi < this->ReductionFactor; ++yi)
+          {
+          cpp1 = crowp;
+          for (x = 0; x < xInDim; x++)
+            {
+            // Duplicate the pixel p11 N times.
+            for (xi = 0; xi < this->ReductionFactor; ++xi)
+              {
+              csubp = cpp1;
+              *cpp2++ = *csubp++;
+              *cpp2++ = *csubp++;
+              *cpp2++ = *csubp;
+              }
+            cpp1 += numComp;
+            }
+          }
+        crowp += pInIncY;
+        }
+      }
+    }
+  else
+    {
+    // Get the last pixel.
+    pInIncY = numComp * xInDim;
+    rowp = localPdata;
+    pp2 = newLocalPData;
+    for (y = 0; y < yInDim; y++)
+      {
+      // Duplicate the row rowp N times.
+      for (yi = 0; yi < this->ReductionFactor; ++yi)
+        {
+        pp1 = rowp;
+        for (x = 0; x < xInDim; x++)
+          {
+          // Duplicate the pixel p11 N times.
+          for (xi = 0; xi < this->ReductionFactor; ++xi)
+            {
+            subp = pp1;
+            if (numComp == 4)
+              {
+              *pp2++ = *subp++;
+              }
+            *pp2++ = *subp++;
+            *pp2++ = *subp++;
+            *pp2++ = *subp;
+            }
+          pp1 += numComp;
+          }
+        }
+      rowp += pInIncY;
+      }
+    }
+  
+}
+  
+
+//----------------------------------------------------------------------------
+// We change this to work backwards so we can make it inplace. !!!!!!!     
+void vtkIceTClientCompositeManager::DoubleBuffer(vtkDataArray* localP, 
+                                             vtkDataArray* magP,
+                                             int windowSize[2])
+{
+  int   x, y, i;
+  int   xInDim, yInDim;
+  // Local increments for input.
+  int   outYInc; 
+  unsigned char *localPdata;
+  unsigned char *newLocalPData;
+  unsigned char half, quarter;
+  
+  xInDim = windowSize[0];
+  yInDim = windowSize[1];
+
+  outYInc = 2 * xInDim * 4;
+
+  if (this->ReductionFactor != 2)
+    {
+    vtkErrorMacro("double does not match reduction factor.");
+    return;
+    }
+  // Assume rgba char.
+  if (localP->GetNumberOfComponents() != 4)
+    {
+    vtkErrorMacro("Expecting RGBA");
+    return;
+    }
+  if ( ! this->UseChar)
+    {
+    vtkErrorMacro("Expecting char data");
+    return;
+    }
+
+  newLocalPData = reinterpret_cast<unsigned char*>(magP->GetVoidPointer(0));
+  memset(newLocalPData, 0, magP->GetMaxId()+1);
+  localPdata = reinterpret_cast<unsigned char*>(localP->GetVoidPointer(0));
+
+  for (y = 0; y < yInDim; y++)
+    {
+    for (x = 0; x < xInDim; x++)
+      {
+      for (i = 0; i < 4; ++i)
+        {
+        half = *localPdata >> 1;
+        quarter = half >> 1;
+        newLocalPData[0] = *localPdata;
+        newLocalPData[4] += half;
+        newLocalPData[outYInc] += half;
+        newLocalPData[outYInc+4] += quarter;
+        if (x > 0)
+          {
+          newLocalPData[-4] += half;
+          newLocalPData[outYInc-4] += quarter;
+          if (y > 0)
+            {
+            newLocalPData[-outYInc-4] += quarter;
+            }
+          }
+        if (y > 0)
+          {
+          newLocalPData[-outYInc] += half;
+          newLocalPData[-outYInc+4] += quarter;
+          }
+      
+        ++localPdata;
+        ++newLocalPData;
+        }
+      newLocalPData += 4;
+      }
+    newLocalPData += outYInc;
+   }
+}
+
+
+
+
+
+//=======================  Server ========================
+
+
+
+
+//----------------------------------------------------------------------------
+void vtkIceTClientCompositeManagerRenderRMI(void *arg, void *, int, int)
+{
+  vtkIceTClientCompositeManager* self = (vtkIceTClientCompositeManager*) arg;
+  
+  self->RenderRMI();
+}
+
+//----------------------------------------------------------------------------
+// Only Called by the satellite processes.
+void vtkIceTClientCompositeManager::RenderRMI()
+{
+  if (this->ClientFlag)
+    {
+    vtkErrorMacro("Expecting the server side to call this method.");
+    return;
+    }
+
+  // Get and redistribute renderer information (camera ...)
+  this->SatelliteStartRender();
+  this->RenderWindow->Render();
+  int i = 837;
+  this->ClientController->Send(&i, 1, 1, vtkIceTClientCompositeManager::ACKNOWLEDGE_RMI);
+}
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::SatelliteStartRender()
+{
+  int renIdx;
+  vtkClientRenderWindowInfo winInfo;
+  vtkClientRendererInfo renInfo;
+  vtkRendererCollection *rens;
+  vtkRenderer* ren;
+  vtkCamera *cam = 0;
+  vtkLightCollection *lc;
+  vtkLight *light;
+  vtkRenderWindow* renWin = this->RenderWindow;
+  vtkMultiProcessController *controller; 
+  int otherId;
+
+    controller = this->ClientController;
+    otherId = 1;
+  
+  vtkInitializeClientRendererInfoMacro(renInfo);
+  
+  // Receive the window size.
+  //controller->Receive((char*)(&winInfo), 
+  //                    sizeof(struct vtkClientRenderWindowInfo), 
+  //                    otherId, vtkCompositeManager::WIN_INFO_TAG);
+  controller->Receive((int*)(&winInfo), 4, otherId, 
+                      vtkCompositeManager::WIN_INFO_TAG);
+
+  // This should be fixed.  Round off will cause window to resize. !!!!!
+  renWin->SetSize(winInfo.Size[0] * winInfo.ReductionFactor,
+                  winInfo.Size[1] * winInfo.ReductionFactor);
+  //this->ReductionFactor = winInfo.ReductionFactor;
+  this->ReductionFactor = 1;
+  this->SquirtCompression = 3 * (winInfo.ReductionFactor-1);
+
+  // Synchronize the renderers.
+  rens = renWin->GetRenderers();
+  rens->InitTraversal();
+  // This is misleading.  We do not support multiple renderers.
+  for (renIdx = 0; renIdx < winInfo.NumberOfRenderers; ++renIdx)
+    {
+    // Receive the camera information.
+
+    // We put this before receive because we want the pipeline to be
+    // updated the first time if the camera does not exist and we want
+    // it to happen before we block in receive
+    ren = rens->GetNextItem();
+    if (ren)
+      {
+      cam = ren->GetActiveCamera();
+      }
+
+    //controller->Receive((char*)(&renInfo), 
+    //                    sizeof(struct vtkClientRendererInfo), 
+    //                    otherId, vtkCompositeManager::REN_INFO_TAG);
+    controller->Receive((float*)(&renInfo), 22, otherId, 
+                        vtkCompositeManager::REN_INFO_TAG);
+    if (ren == NULL)
+      {
+      vtkErrorMacro("Renderer mismatch.");
+      }
+    else
+      {
+      lc = ren->GetLights();
+      lc->InitTraversal();
+      light = lc->GetNextItem();
+
+        cam->SetPosition(renInfo.CameraPosition);
+        cam->SetFocalPoint(renInfo.CameraFocalPoint);
+        cam->SetViewUp(renInfo.CameraViewUp);
+        cam->SetClippingRange(renInfo.CameraClippingRange);
+        if (renInfo.ParallelScale != 0.0)
+          {
+          cam->ParallelProjectionOn();
+          cam->SetParallelScale(renInfo.ParallelScale);
+          }
+        else
+          {
+          cam->ParallelProjectionOff();   
+          }
+      if (light)
+        {
+        light->SetPosition(renInfo.LightPosition);
+        light->SetFocalPoint(renInfo.LightFocalPoint);
+        }
+      ren->SetBackground(renInfo.Background);
+      // Should not have reduction when using tiled display.
+      ren->SetViewport(0, 0, 1.0/(float)this->ReductionFactor, 
+                       1.0/(float)this->ReductionFactor);
+      }
+    }
+  // This makes sure the arrays are large enough.
+  this->SetPDataSize(winInfo.Size[0], winInfo.Size[1]);
+}
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::SatelliteEndRender()
+{}
+
+
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::InitializeOffScreen()
+{
+  if (this->RenderWindow)
+    { 
+    if ( ! this->ClientFlag)
+      {
+      this->RenderWindow->OffScreenRenderingOn();
+      }
+    }
+}
+
+
+
+
+//-------------------------------------------------------------------------
+// Only process 0 needs start and end render callbacks.
+void vtkIceTClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
+{
+  vtkRendererCollection *rens;
+  vtkRenderer *ren = 0;
+
+  if (this->RenderWindow == renWin)
+    {
+    return;
+    }
+  this->Modified();
+
+  if (this->RenderWindow)
+    {
+    // Remove all of the observers.
+    if (this->ClientFlag)
+      {
+      this->RenderWindow->RemoveObserver(this->StartTag);
+      // Will make do with first renderer. (Assumes renderer does not change.)
+      rens = this->RenderWindow->GetRenderers();
+      rens->InitTraversal();
+      ren = rens->GetNextItem();
+      }
+    // Delete the reference.
+    this->RenderWindow->UnRegister(this);
+    this->RenderWindow =  NULL;
+    }
+  if (renWin)
+    {
+    renWin->Register(this);
+    this->RenderWindow = renWin;
+    if (this->ClientFlag)
+      {
+      vtkCallbackCommand *cbc;
+      
+      cbc= vtkCallbackCommand::New();
+      cbc->SetCallback(vtkIceTClientCompositeManagerStartRender);
+      cbc->SetClientData((void*)this);
+      // renWin will delete the cbc when the observer is removed.
+      this->StartTag = renWin->AddObserver(vtkCommand::StartEvent,cbc);
+      cbc->Delete();
+
+      // Will make do with first renderer. (Assumes renderer does
+      // not change.)
+      rens = this->RenderWindow->GetRenderers();
+      rens->InitTraversal();
+      ren = rens->GetNextItem();
+      }
+     if (this->Tiled && this->ClientFlag == 0)
+      { 
+      renWin->FullScreenOn();
+      }
+    }
+}
+
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::SetCompositeController(
+                                          vtkMultiProcessController *mpc)
+{
+  if (this->CompositeController == mpc)
+    {
+    return;
+    }
+  if (mpc)
+    {
+    mpc->Register(this);
+    }
+  if (this->CompositeController)
+    {
+    this->CompositeController->UnRegister(this);
+    }
+  this->CompositeController = mpc;
+}
+
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::SetClientController(
+                                          vtkSocketController *mpc)
+{
+  if (this->ClientController == mpc)
+    {
+    return;
+    }
+  if (mpc)
+    {
+    mpc->Register(this);
+    }
+  if (this->ClientController)
+    {
+    this->ClientController->UnRegister(this);
+    }
+  this->ClientController = mpc;
+}
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::SetUseChar(int useChar)
+{
+  if (useChar == this->UseChar)
+    {
+    return;
+    }
+  this->Modified();
+  this->UseChar = useChar;
+
+  // Cannot use float RGB (must be float RGBA).
+  if (this->UseChar == 0)
+    {
+    this->UseRGB = 0;
+    }
+  
+  this->ReallocPDataArrays();
+}
+
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::SetUseRGB(int useRGB)
+{
+  if (useRGB == this->UseRGB)
+    {
+    return;
+    }
+  this->Modified();
+  this->UseRGB = useRGB;
+
+  // Cannot use float RGB (must be char RGB).
+  if (useRGB)
+    {  
+    this->UseChar = 1;
+    }
+
+  this->ReallocPDataArrays();
+}
+
+//-------------------------------------------------------------------------
+// Only reallocs arrays if they have been allocated already.
+// This method is only used when buffer options have been changed:
+// Char vs. float, or RGB vs. RGBA.
+void vtkIceTClientCompositeManager::ReallocPDataArrays(){}
+
+// Work this and realloc PData into compositer.
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::SetPDataSize(int, int ){}
+
+//-------------------------------------------------------------------------
+// This is only called in the satellite processes (not 0).
+void vtkIceTClientCompositeManager::InitializeRMIs()
+{
+  if (this->ClientFlag)
+    { // Just in case.
+    return;
+    }
+  if (this->ClientController == NULL)
+    {
+    vtkErrorMacro("Missing Controller.");
+    return;
+    }
+  this->ClientController->AddRMI(vtkIceTClientCompositeManagerRenderRMI, (void*)this, 
+    vtkIceTClientCompositeManager::RENDER_RMI_TAG); 
+  this->ClientController->AddRMI(vtkIceTClientCompositeManagerGatherZBufferValueRMI, 
+    (void*)this, 
+    vtkIceTClientCompositeManager::GATHER_Z_RMI_TAG); 
+}
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
+                                               vtkUnsignedCharArray *out,
+                                               int compress_level)
+{
+  if (in->GetNumberOfComponents() != 4)
+    {
+    vtkErrorMacro("Squirt only works with RGBA");
+    return;
+    }
+
+  unsigned int count=0;
+  int index=0;
+  int comp_index=0;
+  int end_index;
+  unsigned int current_color;
+  unsigned int compress_mask;
+
+ // Set bitmask based on compress_level
+  // switch statement is a bit lame
+#ifdef VTK_WORDS_BIGENDIAN
+  switch (compress_level) {
+  case 0: compress_mask = 0xFFFFFF00;
+      break;
+  case 1: compress_mask = 0xFEFFFE00;
+      break;
+  case 2: compress_mask = 0xFCFEFC00;
+      break;
+  case 3: compress_mask = 0xF8FCF800;
+      break;
+  case 4: compress_mask = 0xF0F8F000;
+      break;
+  case 5: compress_mask = 0xE0F0E000;
+      break;
+  default: compress_mask = 0xE0F0E000;
+      break;
+  }
+#else
+  switch (compress_level) {
+  case 0: compress_mask = 0x00FFFFFF;
+      break;
+  case 1: compress_mask = 0x00FEFFFE;
+      break;
+  case 2: compress_mask = 0x00FCFEFC;
+      break;
+  case 3: compress_mask = 0x00F8FCF8;
+      break;
+  case 4: compress_mask = 0x00F0F8F0;
+      break;
+  case 5: compress_mask = 0x00E0F0E0;
+      break;
+  default: compress_mask = 0x00E0F0E0;
+      break;
+  }
+#endif
+
+  // Access raw arrays directly
+  unsigned int* _rawColorBuffer;
+  unsigned int* _rawCompressedBuffer;
+  int numPixels = in->GetNumberOfTuples();
+  _rawColorBuffer = (unsigned int*)in->GetPointer(0);
+  _rawCompressedBuffer = (unsigned int*)out->WritePointer(0,numPixels*4);
+
+  end_index = numPixels;
+
+  // Go through color buffer and put RLE format into compressed buffer
+  while((index < end_index) && (comp_index < end_index)) 
+    {
+    // Record color
+    current_color = _rawCompressedBuffer[comp_index] = (_rawColorBuffer[index] |
+#ifdef VTK_WORDS_BIGENDIAN
+                                                        0x000000FF
+#else
+                                                        0xFF000000
+#endif
+                                                        );
+    index++;
+
+    // Compute Run
+    while(((current_color&compress_mask) ==(_rawColorBuffer[index]&compress_mask)) && 
+          (index<end_index) && (count<255)) 
+      { 
+      index++; 
+      count++; 
+      }
+
+    // Record Run length
+#ifdef VTK_WORDS_BIGENDIAN
+    _rawCompressedBuffer[comp_index] &= (count|0xFFFFFF00);
+#else
+    _rawCompressedBuffer[comp_index] &= (count<<24|0x00FFFFFF);
+#endif
+    comp_index++;
+    
+    count = 0;
+    }
+
+  // Back to vtk arrays :)
+  //ColorBuffer->SetNumberOfTuples(ImageX*ImageY);  
+  out->SetNumberOfTuples(comp_index);
+
+  // Doesn't do much good to keep stats on the server.
+  //static int total_size=0, total_compress=0;
+  //static float max_ratio=0;
+  // Keep stats
+  //total_size += end_index;
+  //total_compress += comp_index;
+  //if (comp_index/(float)end_index > max_ratio) 
+  //  {
+  //  max_ratio = comp_index/(float)end_index;
+  //  }
+
+  // Output stats
+  //vtkTimerLog::FormatAndMarkEvent("Compress ratio: %f", comp_index/(float)end_index);
+  //vtkTimerLog::FormatAndMarkEvent("Compress size: %f", comp_index*4);
+  //vtkTimerLog::FormatAndMarkEvent("Avg ratio: %f", total_compress/(float)total_size);
+  //vtkTimerLog::FormatAndMarkEvent("Max ratio: %f", max_ratio);
+}
+
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::SquirtDecompress(vtkUnsignedCharArray *in,
+                                                 vtkUnsignedCharArray *out)
+{
+  int count=0;
+  int index=0;
+  unsigned int current_color;
+  unsigned int* _rawColorBuffer;
+  unsigned int* _rawCompressedBuffer;
+
+  // Get compressed buffer size
+  int CompSize = in->GetNumberOfTuples();
+
+  // Access raw arrays directly
+  _rawColorBuffer = (unsigned int*)out->GetPointer(0);
+  _rawCompressedBuffer = (unsigned int*)in->GetPointer(0);
+
+  // Go through compress buffer and extract RLE format into color buffer
+  for(int i=0; i<CompSize; i++) 
+    {
+    // Get color and count
+    current_color = _rawCompressedBuffer[i];
+
+    // Get first byte as count;
+#ifdef VTK_WORDS_BIGENDIAN
+    count = current_color&0x000000FF;
+#else
+    count = current_color>>24;
+#endif
+
+    // Fixed Alpha
+#ifdef VTK_WORDS_BIGENDIAN
+    current_color |= 0x000000FF;
+#else
+    current_color |= 0xFF000000;
+#endif
+
+    // Set color
+    _rawColorBuffer[index++] = current_color;
+
+    // Blast color into color buffer
+    for(int j=0; j< count; j++)
+      _rawColorBuffer[index++] = current_color;
+    }
+
+  // Back to vtk arrays :)
+  // Could use index, 
+  // but color buffer should be set to correct length already.
+  //out->SetNumberOfTuples(ImageX*ImageY);
+
+  // Save out compression stats.
+  vtkTimerLog::FormatAndMarkEvent("Squirt ratio: %f", (float)CompSize/(float)index);
+}
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::DeltaEncode(vtkUnsignedCharArray *buf)
+{
+  int idx;
+  int numPixels = buf->GetNumberOfTuples();
+  unsigned char* ptr1;
+  unsigned char* ptr2;
+  short a, b, c;
+
+  if (this->BaseArray == NULL)
+    {
+    this->BaseArray = vtkUnsignedCharArray::New();
+    this->BaseArray->SetNumberOfComponents(4);
+    this->BaseArray->SetNumberOfTuples(numPixels);
+    ptr1 = this->BaseArray->GetPointer(0);
+    memset(ptr1, 0, numPixels*4);
+    }
+  if (this->BaseArray->GetNumberOfTuples() != numPixels)
+    {
+    this->BaseArray->SetNumberOfTuples(numPixels);
+    ptr1 = this->BaseArray->GetPointer(0);
+    memset(ptr1, 0, numPixels*4);
+    }
+  ptr1 = this->BaseArray->GetPointer(0);  
+  ptr2 = buf->GetPointer(0);
+  for (idx = 0; idx < numPixels; ++idx)
+    {
+    a = ptr1[0];
+    b = ptr2[0];
+    c = b-a + 256;
+    c = c >> 1;
+    if (c > 255) {c = 255;}
+    if (c < 0) {c = 0;} 
+    ptr2[0] = (unsigned char)(c);
+    c = c << 1;
+    ptr1[0] = (unsigned char)(c + a - 255);
+
+    a = ptr1[1];
+    b = ptr2[1];
+    c = b-a + 256;
+    c = c >> 1;
+    if (c > 255) {c = 255;}
+    if (c < 0) {c = 0;}
+    ptr2[1] = (unsigned char)(c);
+    c = c << 1;
+    ptr1[1] = (unsigned char)(c + a - 255);
+
+    a = ptr1[2];
+    b = ptr2[2];
+    c = b-a + 256;
+    c = c >> 1;
+    if (c > 255) {c = 255;}
+    if (c < 0) {c = 0;}
+    ptr2[2] = (unsigned char)(c);
+    c = c << 1;
+    ptr1[2] = (unsigned char)(c + a - 255);
+
+    ptr1 += 4;
+    ptr2 += 4;
+    }
+}
+
+//-------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::DeltaDecode(vtkUnsignedCharArray *buf)
+{
+  int idx;
+  int numPixels = buf->GetNumberOfTuples();
+  unsigned char* ptr1;
+  unsigned char* ptr2;
+  short dif;
+
+  if (this->BaseArray == NULL)
+    {
+    this->BaseArray = vtkUnsignedCharArray::New();
+    this->BaseArray->SetNumberOfComponents(4);
+    this->BaseArray->SetNumberOfTuples(numPixels);
+    ptr1 = this->BaseArray->GetPointer(0);
+    memset(ptr1, 0, numPixels*4);
+    }
+  if (this->BaseArray->GetNumberOfTuples() != numPixels)
+    {
+    this->BaseArray->SetNumberOfTuples(numPixels);
+    ptr1 = this->BaseArray->GetPointer(0);
+    memset(ptr1, 0, numPixels*4);
+    }
+  ptr1 = this->BaseArray->GetPointer(0);  
+  ptr2 = buf->GetPointer(0);
+  for (idx = 0; idx < numPixels; ++idx)
+    {
+    dif = (short)(ptr2[0]);
+    dif = dif << 1;
+    dif = dif + (short)(ptr1[0]) - 255;
+    ptr2[0] = ptr1[0] = (unsigned char)(dif);
+
+    dif = (short)(ptr2[1]);
+    dif = dif << 1;
+    dif = dif + (short)(ptr1[1]) - 255;
+    ptr2[1] = ptr1[1] = (unsigned char)(dif);
+
+    dif = (short)(ptr2[2]);
+    dif = dif << 1;
+    dif = dif + (short)(ptr1[2]) - 255;
+    ptr2[2] = ptr1[2] = (unsigned char)(dif);
+
+    ptr1 += 4;
+    ptr2 += 4;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkIceTClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->vtkObject::PrintSelf(os, indent);
+  
+  if ( this->RenderWindow )
+    {
+    os << indent << "RenderWindow: " << this->RenderWindow << "\n";
+    }
+  else
+    {
+    os << indent << "RenderWindow: (none)\n";
+    }
+  os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
+  
+  os << indent << "CompositeController: (" << this->CompositeController << ")\n"; 
+  os << indent << "ClientController: (" << this->ClientController << ")\n"; 
+
+  if (this->Tiled)
+    {
+    os << indent << "Tiled display with dimensions: " 
+       << this->TiledDimensions[0] << ", " << this->TiledDimensions[1] << endl;
+    }
+  
+  os << indent << "UseCompositing: " << this->UseCompositing << endl;
+  os << indent << "UseChar: " << this->UseChar << endl;
+  os << indent << "UseRGB: " << this->UseRGB << endl;
+  os << indent << "UseSquirt: " << this->UseSquirt << endl;
+  os << indent << "ClientFlag: " << this->ClientFlag << endl;
+
+  os << indent << "Compositer: " << this->Compositer << endl;
+
+}
+
+
+

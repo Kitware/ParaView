@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214");
+vtkCxxRevisionMacro(vtkPVApplication, "1.215");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1203,13 +1203,25 @@ void vtkPVApplication::Start(int argc, char*argv[])
   sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
   vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
   vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
-  this->SetRenderModule(rm);
-  rm->SetPVApplication(this);
-  o->Delete();
-  o = NULL;
-  rm = NULL;
+  if ( rm )
+    {
+    this->SetRenderModule(rm);
+    rm->SetPVApplication(this);
+    o->Delete();
+    o = NULL;
+    rm = NULL;
+    }
+  else
+    {
+    vtkErrorMacro("Cannot find Render Module: " << this->RenderModuleName);
+    this->Exit();
+    }
   delete [] rmClassName;
   rmClassName = NULL;
+  if ( !this->RenderModule )
+    {
+    return;
+    }
 
   vtkstd::vector<vtkstd::string> open_files;
   // If any of the arguments has a .pvs extension, load it as a script.
@@ -1782,6 +1794,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVApplication::DisplayTCLError(const char* message)
 {
   vtkErrorMacro("TclTk error: "<<message);
+  abort();
 }
 
 //----------------------------------------------------------------------------

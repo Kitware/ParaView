@@ -111,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.265");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.266");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -908,12 +908,20 @@ void vtkPVRenderView::CreateViewProperties()
   rmuiClassName = new char[strlen(pvapp->GetRenderModuleName()) + 20];
   sprintf(rmuiClassName, "vtkPV%sUI", pvapp->GetRenderModuleName());
   vtkObject* rmui = vtkInstantiator::CreateInstance(rmuiClassName);
-  this->RenderModuleUI = vtkPVRenderModuleUI::SafeDownCast(rmui);
-  this->RenderModuleUI->SetRenderModule(pvapp->GetRenderModule());
-  this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
-  this->RenderModuleUI->Create(this->Application,0);
-  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->RenderModuleUI->GetWidgetName());
+  vtkPVRenderModuleUI* rmuio = vtkPVRenderModuleUI::SafeDownCast(rmui);
+  if ( rmuio )
+    {
+    this->RenderModuleUI = rmuio;
+    this->RenderModuleUI->SetRenderModule(pvapp->GetRenderModule());
+    this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
+    this->RenderModuleUI->Create(this->Application,0);
+    this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+      this->RenderModuleUI->GetWidgetName());
+    }
+  else
+    {
+    this->RenderModuleUI = 0;
+    }
   delete [] rmuiClassName;
   rmuiClassName = NULL;
 

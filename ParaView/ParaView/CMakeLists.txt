@@ -175,7 +175,7 @@ SET( ParaView_SRCS
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaView_SRCS
     ${ParaView_SRCS}
-    vtkIceTComposite.cxx
+    #vtkIceTComposite.cxx
     vtkIceTRenderer.cxx
     vtkIceTRenderManager.cxx
     vtkParallelRenderManager.cxx
@@ -183,6 +183,7 @@ IF (PARAVIEW_USE_ICE_T)
     vtkCompositeRenderManager.cxx
     vtkPVIceTDisplayRenderModuleUI.cxx
     vtkPVIceTDisplayRenderModule.cxx
+    vtkIceTClientCompositeManager.cxx
     )
   SET_SOURCE_FILES_PROPERTIES(
     vtkParallelRenderManager.cxx
@@ -234,7 +235,7 @@ IF(XDMF_FOUND)
   TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkXdmfTCL)
 ENDIF(XDMF_FOUND)
 IF(PARAVIEW_USE_ICE_T)
-  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${ICE_T_LIBRARY})
+  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL icet icet_mpi icet_strategies)
   INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
 ENDIF(PARAVIEW_USE_ICE_T)
 
