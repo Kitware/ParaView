@@ -83,9 +83,6 @@ vtkPVObjectWidget
 vtkPVWidget
 vtkPV3DWidget
 )
-WRAP_EXCLUDE_FILES(
-vtkPVSourceInterfaceParser
-)
 
 # Setup vtkInstantiator registration for this library's classes.
 VTK_MAKE_INSTANTIATOR(vtkParaViewInstantiator PVInstantiator_SRCS
