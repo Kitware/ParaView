@@ -45,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.7");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.8");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
@@ -933,6 +933,8 @@ void vtkMultiDisplayManager::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "UseCompositing: " << this->UseCompositing << "\n";
   os << indent << "LODReductionFactor: " << this->LODReductionFactor << "\n";
+
+  os << indent << "ZeroEmpty: " << this->ZeroEmpty << "\n";
   
   os << indent << "Tile Dimensions: " << this->TileDimensions[0] << ", "
      << this->TileDimensions[1] << endl;
