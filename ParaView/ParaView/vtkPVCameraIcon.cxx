@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCameraIcon.h"
 
 #include "vtkCamera.h"
+#include "vtkImageFlip.h"
 #include "vtkImageResample.h"
 #include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
@@ -165,11 +166,16 @@ void vtkPVCameraIcon::StoreCamera()
                                          static_cast<float>(this->Height)/height);
     resample->SetInput(w2i->GetOutput());
     resample->Update();
+    
+    vtkImageFlip *flip = vtkImageFlip::New();
+    flip->SetInput(resample->GetOutput());
+    flip->SetFilteredAxis(1);
 
     vtkKWIcon* icon = vtkKWIcon::New();
-    icon->SetImageData(resample->GetOutput());
+    icon->SetImageData(flip->GetOutput());
     this->SetImageData(icon);
     icon->Delete();
+    flip->Delete();
     
     resample->Delete();
     w2i->Delete();
