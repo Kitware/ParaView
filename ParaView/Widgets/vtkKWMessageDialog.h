@@ -59,6 +59,13 @@ public:
   enum {Message = 0,
         YesNo,
         OkCancel};
+  
+  enum {NoIcon = 0,
+	Error,
+	Warning,
+	Question,
+	Info};
+	
   //ETX
   
   // Description:
@@ -68,6 +75,10 @@ public:
   // Description:
   // Set the text of the message
   void SetText(const char *);
+
+  // Description:
+  // Set the icon in the message dialog
+  void SetIcon(int);
 
   // Description:
   // Set the style of the message box
@@ -84,11 +95,13 @@ protected:
   void operator=(const vtkKWMessageDialog&) {};
 
   int Style;
-  
+
+  vtkKWWidget *MessageDialogFrame;
   vtkKWWidget *Label;
   vtkKWWidget *ButtonFrame;
   vtkKWWidget *OKButton;
   vtkKWWidget *CancelButton;  
+  vtkKWWidget *Icon;
 };
 
 

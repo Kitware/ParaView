@@ -66,16 +66,20 @@ int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWMessageDialog::vtkKWMessageDialog()
 {
+  this->MessageDialogFrame = vtkKWWidget::New();
+  this->MessageDialogFrame->SetParent(this);
   this->CommandFunction = vtkKWMessageDialogCommand;
   this->Label = vtkKWWidget::New();
-  this->Label->SetParent(this);
+  this->Label->SetParent(this->MessageDialogFrame);
   this->ButtonFrame = vtkKWWidget::New();
-  this->ButtonFrame->SetParent(this);
+  this->ButtonFrame->SetParent(this->MessageDialogFrame);
   this->OKButton = vtkKWWidget::New();
   this->OKButton->SetParent(this->ButtonFrame);
   this->CancelButton = vtkKWWidget::New();
   this->CancelButton->SetParent(this->ButtonFrame);
   this->Style = vtkKWMessageDialog::Message;
+  this->Icon = vtkKWWidget::New();
+  this->Icon->SetParent(this);
 }
 
 vtkKWMessageDialog::~vtkKWMessageDialog()
@@ -84,6 +88,8 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
   this->ButtonFrame->Delete();
   this->OKButton->Delete();
   this->CancelButton->Delete();
+  this->Icon->Delete();
+  this->MessageDialogFrame->Delete();
 }
 
 
@@ -92,6 +98,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   // invoke super method
   this->vtkKWDialog::Create(app,args);
   
+  this->MessageDialogFrame->Create(app,"frame","");
   this->Label->Create(app,"label","");
   this->ButtonFrame->Create(app,"frame","");
   
@@ -127,10 +134,29 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
                this->ButtonFrame->GetWidgetName());
   this->Script("pack %s -side bottom -fill x -pady 4",
                this->Label->GetWidgetName());
+  this->Script("pack %s -side right -fill both -expand true -pady 4",
+	       this->MessageDialogFrame->GetWidgetName());
+  this->Icon->Create(app,"label","-width 0 -pady 0 -padx 0 -borderwidth 0");
+  this->Script("pack %s -side left -fill y",
+	       this->Icon->GetWidgetName());
 }
 
 void vtkKWMessageDialog::SetText(const char *txt)
 {
   this->Script("%s configure -text {%s}",
                this->Label->GetWidgetName(),txt);
+}
+
+void vtkKWMessageDialog::SetIcon( int ico )
+{
+  if( ico <= vtkKWMessageDialog::NoIcon || ico > vtkKWMessageDialog::Info )
+    {
+    this->Script("%s configure -width 0 -pady 0 -padx 0 -borderwidth 0",
+		 this->Icon->GetWidgetName());
+    return;
+    }
+  char icon_array[][9] = { "", "error", "warning", "question", "info" };
+  this->Script("%s configure -bitmap {%s} -anchor n -pady 4 -padx 4 -borderwidth 4",
+	       this->Icon->GetWidgetName(),
+	       icon_array[ico]);
 }
