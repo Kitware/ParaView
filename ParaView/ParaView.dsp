@@ -105,7 +105,15 @@ SOURCE=.\vtkInteractorStyleExtent.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkInteractorStyleExtentTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkInteractorStyleGridExtent.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleGridExtentTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -166,14 +174,62 @@ SOURCE=.\vtkDummyRenderWindowInteractor.h
 # Begin Source File
 
 SOURCE=.\vtkInteractorStyleExtent.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkInteractorStyleExtent.h
+InputName=vtkInteractorStyleExtent
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkInteractorStyleGridExtent.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkInteractorStyleGridExtent.h
+InputName=vtkInteractorStyleGridExtent
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkInteractorStyleImageExtent.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkInteractorStyleImageExtent.h
+InputName=vtkInteractorStyleImageExtent
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 

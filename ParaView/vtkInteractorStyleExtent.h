@@ -59,6 +59,7 @@ class vtkOutlineSource;
 class VTK_EXPORT vtkInteractorStyleExtent : public vtkInteractorStyle 
 {
 public:
+  static vtkInteractorStyleExtent* New();
   vtkTypeMacro(vtkInteractorStyleExtent,vtkInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -132,10 +133,10 @@ protected:
   void ComputeDisplayToExtentMapping();
 
   // methods implemented by the subclass
-  virtual void GetWorldSpot(int spotId, float spot[3]) = 0; 
+  virtual void GetWorldSpot(int spotId, float spot[3]) {}; 
   virtual void GetSpotAxes(int spotId, double *v0, 
-                           double *v1, double *v2) = 0;
-  virtual int *GetWholeExtent() = 0; 
+                           double *v1, double *v2) {};
+  virtual int *GetWholeExtent() {return NULL;}; 
 
   // Description:
   // The CallbackMethod

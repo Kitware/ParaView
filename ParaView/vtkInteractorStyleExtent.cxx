@@ -45,6 +45,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h" 
 #include "vtkCellPicker.h"
 #include "vtkSphereSource.h"
+#include "vtkObjectFactory.h"
+
+//----------------------------------------------------------------------------
+vtkInteractorStyleExtent* vtkInteractorStyleExtent::New()
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkInteractorStyleExtent");
+  if(ret)
+    {
+    return (vtkInteractorStyleExtent*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkInteractorStyleExtent;
+}
 
 //----------------------------------------------------------------------------
 void vtkInteractorStyleExtentCallback(void *arg)
