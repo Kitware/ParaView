@@ -23,10 +23,10 @@
     set pvExtract [$eInt2 CreateCallback]
     $pvExtract AcceptCallback
 
-    set extractOutput [$pvExtract GetNthPVOutput 0]
+    set extractOutput [$pvExtract GetPVOutput]
     $extractOutput ColorByProperty
 
-    set elevOutput [$pvElevation GetNthPVOutput 0]
+    set elevOutput [$pvElevation GetPVOutput]
     $elevOutput SetVisibility 1
 
 

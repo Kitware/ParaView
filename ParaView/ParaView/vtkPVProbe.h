@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSelectPointInteractor.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkPVData.h"
+#include "vtkPVArrayMenu.h"
 
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
@@ -64,6 +65,10 @@ public:
   // Description:
   // Set up the UI for this source
   void CreateProperties();
+
+  // Description:
+  // We are redefine the input to the VTK probes source.
+  virtual void SetPVInput(vtkPVData *input);
 
   // Description:
   // Set the interactor to use for choosing a point for probing.
@@ -80,11 +85,6 @@ public:
   void Deselect(vtkKWView *view);
 
   // Description:
-  // Set/Get the ProbeSourceTclName
-  vtkSetStringMacro(ProbeSourceTclName);
-  vtkGetStringMacro(ProbeSourceTclName);
-  
-  // Description:
   // Called when the accept button is pressed.
   virtual void AcceptCallback();
   
@@ -92,11 +92,6 @@ public:
   // Callbacks for Dimensionality menu
   void UsePoint();
   void UseLine();
-
-  // Description:
-  // Set the vtkPVData object whose VTK data will be used as the source for
-  // vtkProbeFilter.
-  vtkSetObjectMacro(PVProbeSource, vtkPVData);
 
   // Description:
   // Set the entries for SelectedPoint, EndPoint1, and EndPoint2.
@@ -134,19 +129,27 @@ public:
   // Description:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
+
+  // Description:
+  // Callbacks method for array menu.
+  void SelectInputScalars(const char *fieldName); 
+  vtkGetStringMacro(InputScalarsSelection);
+  void SelectInputScalarsComponent(int comp);
+  vtkGetMacro(InputScalarsComponentSelection, int);
+
   
 protected:
   vtkPVProbe();
   ~vtkPVProbe();
   vtkPVProbe(const vtkPVProbe&) {};
   void operator=(const vtkPVProbe&) {};
-
-  char *ProbeSourceTclName;
   
   vtkKWLabel *DimensionalityLabel;
   vtkKWOptionMenu *DimensionalityMenu;
   vtkKWRadioButton *SelectPointButton;
   vtkKWWidget *ProbeFrame;
+
+  vtkPVArrayMenu *ScalarArrayMenu;
 
   vtkKWWidget *SelectedPointFrame;
   vtkKWLabel *SelectedPointLabel;
@@ -176,13 +179,15 @@ protected:
   int Dimensionality; // point = 0, line = 1
   int CurrentEndPoint;
   
-  vtkPVData *PVProbeSource;
-  
-  char *XYPlotTclName;
+  char* XYPlotTclName;
   vtkSetStringMacro(XYPlotTclName);
 
   int InstanceCount;
-  vtkKWInteractor *PreviousInteractor;
+  vtkKWInteractor* PreviousInteractor;
+
+  char* InputScalarsSelection;
+  vtkSetStringMacro(InputScalarsSelection);
+  int InputScalarsComponentSelection;
 };
 
 #endif

@@ -40,7 +40,7 @@ set pv(vtkTemp239) [$pv(vtkTemp230) GetPVWidget {Glyph}]
 $pv(vtkTemp239) SetCurrentValue $pv(vtkTemp89)
 $pv(vtkTemp230) AcceptCallback
 $pv(vtkTemp239) SetCurrentValue $pv(vtkTemp93)
-set pv(vtkTemp251) [$pv(vtkTemp230) GetPVWidget {Scale Factor:}]
+set pv(vtkTemp251) [$pv(vtkTemp230) GetPVWidget {Scale Factor}]
 $pv(vtkTemp251) SetValue 2
 $pv(vtkTemp230) AcceptCallback
 set pv(vtkTemp245) [$pv(vtkTemp230) GetPVWidget {Orient}]

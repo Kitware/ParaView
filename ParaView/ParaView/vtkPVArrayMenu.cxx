@@ -61,16 +61,20 @@ vtkPVArrayMenu* vtkPVArrayMenu::New()
 vtkPVArrayMenu::vtkPVArrayMenu()
 {
   this->ArrayName = NULL;
+  this->ArrayNumberOfComponents = 1;
+  this->SelectedComponent = 0;
 
   this->PVSource = NULL;
   this->NumberOfComponents = 1;
+  this->ShowComponentMenu = 0;
 
   this->InputName = NULL;
   this->AttributeName = NULL;
   this->ObjectTclName = NULL;
 
   this->Label = vtkKWLabel::New();
-  this->Menu = vtkKWOptionMenu::New();
+  this->ArrayMenu = vtkKWOptionMenu::New();
+  this->ComponentMenu = vtkKWOptionMenu::New();
 }
 
 //----------------------------------------------------------------------------
@@ -86,8 +90,44 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
 
   this->Label->Delete();
   this->Label = NULL;
-  this->Menu->Delete();
-  this->Menu = NULL;
+  this->ArrayMenu->Delete();
+  this->ArrayMenu = NULL;
+  this->ComponentMenu->Delete();
+  this->ComponentMenu = NULL;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::SetNumberOfComponents(int num)
+{
+  if (this->NumberOfComponents == num)
+    {
+    return;
+    }
+  this->Modified();
+
+  this->NumberOfComponents = num;
+  if (num != 1)
+    {
+    this->ShowComponentMenu = 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::SetShowComponentMenu(int flag)
+{
+  if (this->ShowComponentMenu == flag)
+    {
+    return;
+    }
+  this->Modified();
+
+  this->ShowComponentMenu = flag;
+  if (flag)
+    {
+    this->NumberOfComponents = 1;
+    }
+  this->UpdateComponentMenu();
 }
 
 //----------------------------------------------------------------------------
@@ -114,15 +154,21 @@ void vtkPVArrayMenu::Create(vtkKWApplication *app)
   this->Label->Create(app, "-width 18 -justify right");
   this->Script("pack %s -side left", this->Label->GetWidgetName());
 
-  this->Menu->SetParent(this);
-  this->Menu->Create(app, "");
-  this->Script("pack %s -side left", this->Menu->GetWidgetName());
+  this->ArrayMenu->SetParent(this);
+  this->ArrayMenu->Create(app, "");
+  this->Script("pack %s -side left", this->ArrayMenu->GetWidgetName());
+
+  this->ComponentMenu->SetParent(this);
+  this->ComponentMenu->Create(app, "");
+  if (this->ShowComponentMenu)
+    {
+    this->Script("pack %s -side left", this->ComponentMenu->GetWidgetName());
+    }
 }
 
 
-
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::MenuEntryCallback(const char* name)
+void vtkPVArrayMenu::ArrayMenuEntryCallback(const char* name)
 {
   if (strcmp(name, this->ArrayName) == 0)
     {
@@ -130,8 +176,22 @@ void vtkPVArrayMenu::MenuEntryCallback(const char* name)
     }
 
   this->SetArrayName(name);
+  this->UpdateComponentMenu();
   this->ModifiedCallback();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::ComponentMenuEntryCallback(int comp)
+{
+  if (comp == this->SelectedComponent)
+    {
+    return;
+    }
+
+  this->SelectedComponent = comp;
+  this->ModifiedCallback();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SetValue(const char* name)
@@ -141,10 +201,30 @@ void vtkPVArrayMenu::SetValue(const char* name)
     return;
     }
 
-  this->Menu->SetValue(name);
+  this->ArrayMenu->SetValue(name);
   this->SetArrayName(name);
+  this->UpdateComponentMenu();
   this->ModifiedCallback();
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::SetSelectedComponent(int comp)
+{
+  char label[128];
+
+  if (comp == this->SelectedComponent)
+    {
+    return;
+    }
+  sprintf(label, "%d", comp);
+  this->ComponentMenu->SetValue(label);
+  this->SelectedComponent = comp;
+  this->ModifiedCallback();
+}
+
+
+
 
 
 //----------------------------------------------------------------------------
@@ -184,8 +264,22 @@ void vtkPVArrayMenu::Accept()
     pvApp->AddTraceEntry("$pv(%s) SetValue {}", this->GetTclName());
     }
 
+  if (this->ShowComponentMenu)
+    {
+    pvApp->BroadcastScript("%s Select%s%sComponent %d", 
+                           this->ObjectTclName,
+                           this->InputName,
+                           this->AttributeName,
+                           this->SelectedComponent);
+    pvApp->AddTraceEntry("$pv(%s) SetSelectedComponent %s", 
+                         this->GetTclName(), 
+                         this->ArrayName);
+    }
+
+
   this->vtkPVWidget::Accept();
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::Reset()
@@ -212,8 +306,18 @@ void vtkPVArrayMenu::Reset()
                this->InputName,
                this->AttributeName);
 
+  // Get the selected array form the VTK filter.
+  if (this->ShowComponentMenu)
+    {
+    this->Script("%s SetSelectedComponent [%s Get%s%sComponentSelection]",
+                 this->GetTclName(), 
+                 this->ObjectTclName,
+                 this->InputName,
+                 this->AttributeName);
+    }
+
   // Regenerate the menu, and look for the specified array.
-  this->Menu->ClearEntries();
+  this->ArrayMenu->ClearEntries();
   if (this->PVSource == NULL)
     {
     vtkErrorMacro("PVSource has not been set.");
@@ -239,11 +343,11 @@ void vtkPVArrayMenu::Reset()
     if (array->GetName())
       {
       // Match the requested number of componenets.
-      if (this->NumberOfComponents <= 0 || 
+      if (this->NumberOfComponents <= 0 || this->ShowComponentMenu ||
           array->GetNumberOfComponents() == this->NumberOfComponents) 
         {
-        sprintf(methodAndArgs, "MenuEntryCallback %s", array->GetName());
-        this->Menu->AddEntryWithCommand(array->GetName(), 
+        sprintf(methodAndArgs, "ArrayMenuEntryCallback %s", array->GetName());
+        this->ArrayMenu->AddEntryWithCommand(array->GetName(), 
                                       this, methodAndArgs);
         if (first == NULL)
           {
@@ -286,6 +390,88 @@ void vtkPVArrayMenu::Reset()
     }
 
   // Now set the menu's value.
-  this->Menu->SetValue(this->ArrayName);
+  this->ArrayMenu->SetValue(this->ArrayName);
 
+  this->UpdateComponentMenu();
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::UpdateComponentMenu()
+{
+  int i;
+  vtkPVData *pvd;
+  vtkDataSet *data;
+  char methodAndArgs[1024];
+  char label[124];
+  vtkDataArray *array;
+  int currentComponent;
+
+  if (this->Application == NULL)
+    {
+    this->SelectedComponent = 0;
+    return;
+    }
+
+  this->Script("pack forget %s", this->ComponentMenu->GetWidgetName()); 
+  currentComponent = this->SelectedComponent;
+  this->ArrayNumberOfComponents = 1;
+  this->SelectedComponent = 0;
+
+  // Find out how many components the selected array has.
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("PVSource has not been set.");
+    return;
+    }
+  pvd = this->PVSource->GetPVInput();
+  if (pvd == NULL)
+    {
+    vtkErrorMacro("Could not get the input of my source.");
+    return;
+    }
+  data = pvd->GetVTKData();
+  if (data == NULL)
+    { // Lets be anal.
+    vtkErrorMacro("Could not find vtk data.");
+    return;
+    }
+  array = data->GetPointData()->GetArray(this->ArrayName);
+  if (array == NULL)
+    {
+    vtkErrorMacro("Could not find array.");
+    return;
+    }
+  this->ArrayNumberOfComponents = array->GetNumberOfComponents();
+
+  if ( ! this->ShowComponentMenu || this->ArrayNumberOfComponents == 1)
+    {
+    return;
+    }
+
+  if (currentComponent < 0 || currentComponent >= this->ArrayNumberOfComponents)
+    {
+    currentComponent = 0;
+    this->ModifiedCallback();
+    }
+  this->SelectedComponent = currentComponent;
+  this->Script("pack %s -side left", this->ComponentMenu->GetWidgetName());
+
+
+
+  // Clear current values.
+  this->ComponentMenu->ClearEntries();
+
+  // Regenerate the menu.
+  for (i = 0; i < this->ArrayNumberOfComponents; ++i)
+    {
+    sprintf(label, "%d", i);
+    sprintf(methodAndArgs, "ComponentMenuEntryCallback %d", i);
+    this->ComponentMenu->AddEntryWithCommand(label, this, methodAndArgs);
+    }
+
+  // Now set the menu's value.
+  sprintf(label, "%d", this->SelectedComponent);
+  this->ComponentMenu->SetValue(label);
 }

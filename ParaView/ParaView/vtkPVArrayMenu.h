@@ -88,9 +88,18 @@ public:
   // Description:
   // Only arrays with this number of components are added to the menu.
   // If this value is 0 or less, then all arrays are added to the menu.
-  // The default value is 1.
+  // The default value is 1.  If "ShowComponentMenu" is on, then all
+  // arrays are added to the menu.
+  void SetNumberOfComponents(int num);
   vtkGetMacro(NumberOfComponents, int);
-  vtkSetMacro(NumberOfComponents, int);
+
+  // Description:
+  // When NumberOfComponents is 1, this option allows components to
+  // be selected from multidimensional arrays.  
+  // A second component menu is displayed.
+  void SetShowComponentMenu(int flag);
+  vtkGetMacro(ShowComponentMenu, int);
+  vtkBooleanMacro(ShowComponentMenu, int);
 
   // Description:
   // This is one value that lets this widget interact with its associated 
@@ -133,6 +142,15 @@ public:
   void SetValue(const char* name);
   const char* GetValue() { return this->ArrayName;}
 
+  // Description:
+  // This is the number of components the selected array has.
+  vtkGetMacro(ArrayNumberOfComponents, int);
+
+  // Description:
+  // Set the selected component.  This is only aplicable when 
+  // "ShowComponentMenu" is on. It can be used in scripts.
+  void SetSelectedComponent(int comp);
+  vtkGetMacro(SelectedComponent, int);
 
 
   // Description:
@@ -141,8 +159,9 @@ public:
   vtkSetStringMacro(ArrayName);
 
   // Description:
-  // This is an internal method that is called when the menu is changed.
-  void MenuEntryCallback(const char* name);
+  // These are internal methods that are called when a menu is changed.
+  void ArrayMenuEntryCallback(const char* name);
+  void ComponentMenuEntryCallback(int comp);
 
 protected:
   vtkPVArrayMenu();
@@ -152,9 +171,12 @@ protected:
 
   // The selected array name in the menu.  Current value of the widget.
   char *ArrayName;
+  int ArrayNumberOfComponents;
+  int SelectedComponent;
 
   vtkPVSource *PVSource;
   int NumberOfComponents;
+  int ShowComponentMenu;
 
   // These are options that allow the widget to interact with its associated object.
   char*       InputName;
@@ -163,8 +185,11 @@ protected:
 
   // Subwidgets.
   vtkKWLabel *Label;
-  vtkKWOptionMenu *Menu;
+  vtkKWOptionMenu *ArrayMenu;
+  vtkKWOptionMenu *ComponentMenu;
 
+  // Resets the values based on the array.
+  void UpdateComponentMenu();
 
 };
 

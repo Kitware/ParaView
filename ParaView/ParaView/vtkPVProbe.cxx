@@ -60,6 +60,10 @@ vtkPVProbe::vtkPVProbe()
   
   this->CommandFunction = vtkPVProbeCommand;
 
+  this->ScalarArrayMenu = vtkPVArrayMenu::New();
+  this->InputScalarsSelection = NULL;
+  this->InputScalarsComponentSelection = 0;
+
   this->DimensionalityMenu = vtkKWOptionMenu::New();
   this->DimensionalityLabel = vtkKWLabel::New();
   this->SelectPointButton = vtkKWRadioButton::New();
@@ -94,11 +98,8 @@ vtkPVProbe::vtkPVProbe()
 
   this->Interactor = NULL;
   
-  this->ProbeSourceTclName = NULL;
   this->Dimensionality = -1;
   this->CurrentEndPoint = -1;
-  
-  this->PVProbeSource = NULL;
   
   this->XYPlotTclName = NULL;
   
@@ -107,6 +108,8 @@ vtkPVProbe::vtkPVProbe()
   this->InstanceCount = instanceCount;
   
   this->PreviousInteractor = NULL;
+
+  this->ReplaceInputOff();
 }
 
 //----------------------------------------------------------------------------
@@ -170,14 +173,16 @@ vtkPVProbe::~vtkPVProbe()
   
   this->ProbeFrame->Delete();
   this->ProbeFrame = NULL;
-
-  this->SetPVProbeSource(NULL);
   
   if (this->XYPlotTclName)
     {
     this->Script("%s Delete", this->XYPlotTclName);
     this->SetXYPlotTclName(NULL);
     }
+
+  this->ScalarArrayMenu->Delete();
+  this->ScalarArrayMenu = NULL;
+  this->SetInputScalarsSelection(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -193,6 +198,30 @@ vtkPVProbe* vtkPVProbe::New()
   return new vtkPVProbe();
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVProbe::SetPVInput(vtkPVData *pvd)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp == NULL)
+    {
+    vtkErrorMacro("No Application. Create the source before setting the input.");
+    return;
+    }
+
+  this->SetNthPVInput(0, pvd);
+
+  // Notice this is set to the source and not the input.
+  // This fits the interface better and was necessary for the
+  // rather inflexible vtkPVArrayMenu.
+  pvApp->BroadcastScript("%s SetSource %s", this->GetVTKSourceTclName(),
+                         pvd->GetVTKDataTclName());
+}
+
+
+
+
 //----------------------------------------------------------------------------
 void vtkPVProbe::UpdateScalars()
 {
@@ -207,6 +236,19 @@ void vtkPVProbe::CreateProperties()
   char tclName[100];
   
   this->vtkPVSource::CreateProperties();
+
+  this->ScalarArrayMenu->SetPVSource(this);
+  this->ScalarArrayMenu->SetNumberOfComponents(1);
+  this->ScalarArrayMenu->ShowComponentMenuOn();
+  this->ScalarArrayMenu->SetInputName("Input");
+  this->ScalarArrayMenu->SetAttributeName("Scalars");
+  this->ScalarArrayMenu->SetObjectTclName(this->GetTclName());
+  this->ScalarArrayMenu->SetParent(this->ParameterFrame->GetFrame());
+  this->ScalarArrayMenu->SetLabel("Scalars");
+  this->ScalarArrayMenu->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  this->ScalarArrayMenu->Create(this->Application);
+  this->ScalarArrayMenu->SetBalloonHelpString("Choose the scalar array to graph.");
+  this->Widgets->AddItem(this->ScalarArrayMenu);
 
   frame = vtkKWWidget::New();
   frame->SetParent(this->GetParameterFrame()->GetFrame());
@@ -232,7 +274,7 @@ void vtkPVProbe::CreateProperties()
   this->SelectPointButton->SetCommand(this, "SetInteractor");
   this->SetInteractor();
 
-  this->PVProbeSource->GetBounds(bounds);
+  this->GetPVInput()->GetBounds(bounds);
   this->Interactor->SetBounds(bounds);
   this->Interactor->GetSelectedPoint(point);
   
@@ -575,18 +617,31 @@ void vtkPVProbe::AcceptCallback()
     this->PointDataLabel->SetLabel(label);
     }
   else if (this->Dimensionality == 1)
-    {    
-    this->Script("%s SetYTitle %s", this->XYPlotTclName, this->DefaultScalarsName);
-
-    this->Script("set numItems [[%s GetInputList] GetNumberOfItems]",
-		 this->XYPlotTclName);
-
-    if (atoi(pvApp->GetMainInterp()->result) > 0)
+    {
+    if (this->ScalarArrayMenu->GetArrayNumberOfComponents() > 1)
       {
-      this->Script("%s RemoveInput [[%s GetInputList] GetItem 0]",
-                   this->XYPlotTclName, this->XYPlotTclName);
+      this->Script("%s SetYTitle {%s %d}", this->XYPlotTclName, 
+                   this->InputScalarsSelection, this->InputScalarsComponentSelection);
       }
+    else
+      {
+      this->Script("%s SetYTitle {%s}", this->XYPlotTclName, this->InputScalarsSelection);
+      }
+    this->Script("%s RemoveAllInputs", this->XYPlotTclName);
+    this->Script("%s AddInput %s %s %d", this->XYPlotTclName,
+                 this->GetPVOutput()->GetVTKDataTclName(), 
+                 this->InputScalarsSelection,
+                 this->InputScalarsComponentSelection);
         
+    // Color by the choosen array in the output.
+    this->GetPVOutput()->ColorByPointFieldComponent(this->InputScalarsSelection, 
+                                                    this->InputScalarsComponentSelection);
+    // The menu's not changing, but It is going to replaced soon.
+    // For now I will put this here.
+    char tmp[256];
+    sprintf(tmp, "Point %s %d", this->InputScalarsSelection, this->InputScalarsComponentSelection);
+    this->GetPVOutput()->GetColorMenu()->SetValue(tmp);
+
     if (this->ShowXYPlotToggle->GetState())
       {
       this->Script("%s AddActor %s",
@@ -596,6 +651,19 @@ void vtkPVProbe::AcceptCallback()
     window->GetMainView()->Render();
     }
 }
+
+
+void vtkPVProbe::SelectInputScalars(const char *fieldName) 
+{
+  this->SetInputScalarsSelection(fieldName);
+}
+
+
+void vtkPVProbe::SelectInputScalarsComponent(int comp) 
+{
+  this->InputScalarsComponentSelection = comp;
+}
+
 
 void vtkPVProbe::UpdateProbe()
 {
@@ -673,9 +741,6 @@ void vtkPVProbe::UpdateProbe()
     this->GetPVRenderView()->Render();
     }    
   
-  pvApp->BroadcastScript("%s SetSource %s",
-                         this->GetVTKSourceTclName(),
-                         this->ProbeSourceTclName);
   this->GetNthPVOutput(0)->Update();
   
   pvApp->BroadcastScript("Application SendProbeData %s",
@@ -777,6 +842,7 @@ void vtkPVProbe::UsePoint()
   this->Script("pack %s %s",
                this->SelectedPointFrame->GetWidgetName(),
                this->PointDataLabel->GetWidgetName());
+  this->Script("pack forget %s", this->ScalarArrayMenu->GetWidgetName());
   this->ChangeAcceptButtonColor();
 }
 
@@ -785,6 +851,10 @@ void vtkPVProbe::UseLine()
   this->Dimensionality = 1;
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->ProbeFrame->GetWidgetName());
+
+  this->Script("pack %s -side top -fill x -expand t",
+               this->ScalarArrayMenu->GetWidgetName());
+
   this->Script("pack %s %s %s %s %s",
                this->EndPointMenuFrame->GetWidgetName(),
                this->EndPoint1Frame->GetWidgetName(),
@@ -951,7 +1021,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
   Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();
   char *tempName;
   vtkPVSourceInterface *pvsInterface =
-    this->PVProbeSource->GetPVSource()->GetInterface();
+    this->GetPVInput()->GetPVSource()->GetInterface();
   
   if (this->Dimensionality == 0)
     {
@@ -1002,11 +1072,12 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
   if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                              "vtkGenericEnSightReader") == 0)
     {
-    char *dataName = new char[strlen(this->ProbeSourceTclName) + 1];
+    const char *probeSourceTclName = this->GetPVInput()->GetVTKDataTclName();
+    char *dataName = new char[strlen(probeSourceTclName) + 1];
     char *charFound;
     int pos;
     
-    strcpy(dataName, this->ProbeSourceTclName);
+    strcpy(dataName, probeSourceTclName);
     charFound = strrchr(dataName, 't');
     tempName = strtok(dataName, "O");
     *file << tempName << " GetOutput ";
@@ -1017,16 +1088,17 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
   else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
                                   "vtkPDataSetReader") == 0)
     {
-    char *dataName = new char[strlen(this->ProbeSourceTclName) + 1];
-    strcpy(dataName, this->ProbeSourceTclName);
+    const char *probeSourceTclName = this->GetPVInput()->GetVTKDataTclName();
+    char *dataName = new char[strlen(probeSourceTclName) + 1];
+    strcpy(dataName, probeSourceTclName);
     
-    tempName = strtok(this->ProbeSourceTclName, "O");
+    tempName = strtok(dataName, "O");
     *file << tempName << " GetOutput]\n\n";
     delete [] dataName;
     }
   else
     {
-    *file << this->PVProbeSource->GetPVSource()->GetVTKSourceTclName()
+    *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
           << " GetOutput]\n\n";
     }
   

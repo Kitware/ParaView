@@ -8,8 +8,8 @@ set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
 set pv(vtkTemp100) [$pv(vtkTemp1) Open $DataDir/Data/vox8_bin.vtk]
 set pv(vtkTemp138) [$pv(vtkTemp1) ProbeCallback]
 $pv(vtkTemp138) UseLine
-[$pv(vtkTemp138) GetScalarOperationMenu] SetValue scalars
-$pv(vtkTemp138) UpdateScalars
+[$pv(vtkTemp138) GetPVWidget {Scalars}] SetValue scalars
+$pv(vtkTemp138) AcceptCallback
 [$pv(vtkTemp138) GetEndPointMenu] SetValue "End Point 1"
 $pv(vtkTemp138) SetCurrentEndPoint 1
 [$pv(vtkTemp138) GetInteractor] SetSelectedPoint 0.000000 0.000000 1.000000

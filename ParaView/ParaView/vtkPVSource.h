@@ -109,8 +109,8 @@ public:
   // Description:
   // Although not all sources will need or use this input, I want to 
   // avoid duplicating VTK's source class structure.
-  void SetPVInput(vtkPVData *input);
-  vtkPVData* GetPVInput() {return this->GetNthPVInput(0);}
+  virtual void SetPVInput(vtkPVData *input);
+  virtual vtkPVData* GetPVInput() {return this->GetNthPVInput(0);}
 
   // Description:
   // Sources are currently setup to have exactly one output.
