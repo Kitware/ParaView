@@ -107,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.265");
+vtkCxxRevisionMacro(vtkPVApplication, "1.266");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -529,6 +529,7 @@ vtkPVApplication::~vtkPVApplication()
   this->ProgressHandler = 0;
   this->Observer->Delete();
   this->Observer = 0;
+  this->SetBatchScriptName(0);
 }
 
 //----------------------------------------------------------------------------
