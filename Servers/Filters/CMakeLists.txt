@@ -85,6 +85,7 @@ SET(Filters_SRCS
   vtkSurfaceVectors.cxx
   vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
   vtkTiledDisplaySchedule.cxx
+  vtkUpdateSuppressorPipeline.cxx
   vtkVRMLSource.cxx
   vtkVisibilitySort.cxx
   vtkXMLCollectionReader.cxx
