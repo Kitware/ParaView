@@ -34,6 +34,7 @@ IF (VTK_USE_MPI)
                ScalarSelection
                ScalarsSphereClip
                SphereTest
+	       TestPackage
                Threshold
                ThresholdAttrMode
                Trace
@@ -81,6 +82,7 @@ FOREACH (tfile
          ScalarSelection
          ScalarsSphereClip
          SphereTest
+	 TestPackage
          Threshold
          ThresholdAttrMode
          Trace
