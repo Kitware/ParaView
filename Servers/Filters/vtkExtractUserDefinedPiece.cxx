@@ -29,7 +29,7 @@
 #include "vtkPoints.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkExtractUserDefinedPiece, "1.4");
+vtkCxxRevisionMacro(vtkExtractUserDefinedPiece, "1.5");
 vtkStandardNewMacro(vtkExtractUserDefinedPiece);
 
 vtkExtractUserDefinedPiece::vtkExtractUserDefinedPiece()
@@ -44,6 +44,14 @@ vtkExtractUserDefinedPiece::~vtkExtractUserDefinedPiece()
     delete [] (char *)this->ConstantData;
     this->ConstantData = NULL;
   }
+}
+void vtkExtractUserDefinedPiece::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf( os, indent );
+  os << indent << "ConstantData: " << this->ConstantData
+     << indent << "ConstantDataLen: " << this->ConstantDataLen
+     << indent << "InPiece: " << this->InPiece
+     << "\n";
 }
 void vtkExtractUserDefinedPiece::SetConstantData(void *data, int len)
 {

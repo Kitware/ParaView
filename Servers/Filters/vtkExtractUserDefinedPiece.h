@@ -38,8 +38,8 @@ class VTK_EXPORT vtkExtractUserDefinedPiece : public vtkExtractUnstructuredGridP
 {
 public:
   vtkTypeRevisionMacro(vtkExtractUserDefinedPiece, vtkExtractUnstructuredGridPiece);
-
   static vtkExtractUserDefinedPiece *New();
+  virtual void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX
   typedef int (*UserDefFunc)(vtkIdType cellID, vtkUnstructuredGrid *grid, void *constantData);
@@ -72,6 +72,8 @@ protected:
   void ComputeCellTagsWithFunction(vtkIntArray *tags, vtkIdList *pointOwnership);
 
 private:
+  vtkExtractUserDefinedPiece(const vtkExtractUserDefinedPiece&); // Not implemented
+  void operator=(const vtkExtractUserDefinedPiece&); // Not implemented
 
   void *ConstantData;
   int ConstantDataLen;

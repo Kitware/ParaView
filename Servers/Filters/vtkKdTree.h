@@ -78,82 +78,7 @@ class vtkPlanes;
 class vtkCell;
 class vtkCamera;
 
-//BTX
-
-class VTK_EXPORT vtkKdNode{
-public:
-
-  vtkKdNode();
-  ~vtkKdNode();
-
-  void SetDim(int n){this->Dim = n;}
-  int  GetDim(){return this->Dim;}
-
-  void SetNumberOfCells(int n){this->NumCells = n;}
-  int  GetNumberOfCells(){return this->NumCells;}
-
-  void SetBounds(double x1,double x2,double y1,double y2,double z1,double z2);
-  void GetBounds(double *b) const;
-  void GetBounds(float *b) const;
-
-
-  void SetDataBounds(double x1,double x2,double y1,double y2,double z1,double z2);
-  void SetDataBounds(float *b);  
-  void GetDataBounds(double *b) const;
-  void GetDataBounds(float *b) const;
-
-  void PrintNode(int depth);
-  void PrintVerboseNode(int depth);
-  void AddChildNodes(vtkKdNode *left, vtkKdNode *right);
-
-  int IntersectsBox(float x1, float x2, float y1, float y2, float z1, float z2,
-                  int useDataBounds);
-  int IntersectsBox(double x1,double x2,double y1,double y2,double z1,double z2,
-                  int useDataBounds);
-  int IntersectsSphere2(float x, float y, float z, float rSquared,
-                              int useDataBounds);
-  int IntersectsSphere2(double x, double y, double z, double rSquared,
-                              int useDataBounds);
-  int IntersectsRegion(vtkPlanesIntersection *pi, int useDataBounds);
-
-  int IntersectsCell(vtkCell *cell, int useDataBounds, int cellRegion=-1);
-
-  int ContainsBox(float x1, float x2, float y1, float y2, float z1, float z2,
-                   int useDataBounds);
-  int ContainsBox(double x1,double x2,double y1,double y2,double z1,double z2,
-                   int useDataBounds);
-
-  int ContainsPoint(float x, float y, float z, int useDataBounds);
-  int ContainsPoint(double x, double y, double z, int useDataBounds);
-
-  float GetDistance2ToBoundary(float x, float y, float z, int useDataBounds);
-  float GetDistance2ToBoundary(float x, float y, float z, float *boundaryPt,
-                             int useDataBounds);
-  float GetDistance2ToInnerBoundary(float x, float y, float z);
-  float _GetDistance2ToBoundary(float x, float y, float z, float *boundaryPt,
-                             int innerBoundaryOnly, int useDataBounds);
-
-  static const char *LevelMarker[20];
-
-  double Min[3], Max[3];       // spatial bounds of node
-  double MinVal[3], MaxVal[3]; // spatial bounds of data
-  int NumCells;
-  
-  vtkKdNode *Up;
-
-  vtkKdNode *Left;
-  vtkKdNode *Right;
-
-  int Dim;
-
-  int Id;        // region id
-
-  int MinId;
-  int MaxId;
-
-  double *CellBoundsCache;  // to optimize IntersectsCell
-};
-//ETX
+class vtkKdNode;
 
 class VTK_EXPORT vtkKdTree : public vtkLocator
 {
@@ -904,4 +829,82 @@ private:
   vtkKdTree(const vtkKdTree&); // Not implemented
   void operator=(const vtkKdTree&); // Not implemented
 };
+
+//BTX
+
+class VTK_EXPORT vtkKdNode{
+public:
+
+  vtkKdNode();
+  ~vtkKdNode();
+
+  void SetDim(int n){this->Dim = n;}
+  int  GetDim(){return this->Dim;}
+
+  void SetNumberOfCells(int n){this->NumCells = n;}
+  int  GetNumberOfCells(){return this->NumCells;}
+
+  void SetBounds(double x1,double x2,double y1,double y2,double z1,double z2);
+  void GetBounds(double *b) const;
+  void GetBounds(float *b) const;
+
+
+  void SetDataBounds(double x1,double x2,double y1,double y2,double z1,double z2);
+  void SetDataBounds(float *b);  
+  void GetDataBounds(double *b) const;
+  void GetDataBounds(float *b) const;
+
+  void PrintNode(int depth);
+  void PrintVerboseNode(int depth);
+  void AddChildNodes(vtkKdNode *left, vtkKdNode *right);
+
+  int IntersectsBox(float x1, float x2, float y1, float y2, float z1, float z2,
+                  int useDataBounds);
+  int IntersectsBox(double x1,double x2,double y1,double y2,double z1,double z2,
+                  int useDataBounds);
+  int IntersectsSphere2(float x, float y, float z, float rSquared,
+                              int useDataBounds);
+  int IntersectsSphere2(double x, double y, double z, double rSquared,
+                              int useDataBounds);
+  int IntersectsRegion(vtkPlanesIntersection *pi, int useDataBounds);
+
+  int IntersectsCell(vtkCell *cell, int useDataBounds, int cellRegion=-1);
+
+  int ContainsBox(float x1, float x2, float y1, float y2, float z1, float z2,
+                   int useDataBounds);
+  int ContainsBox(double x1,double x2,double y1,double y2,double z1,double z2,
+                   int useDataBounds);
+
+  int ContainsPoint(float x, float y, float z, int useDataBounds);
+  int ContainsPoint(double x, double y, double z, int useDataBounds);
+
+  float GetDistance2ToBoundary(float x, float y, float z, int useDataBounds);
+  float GetDistance2ToBoundary(float x, float y, float z, float *boundaryPt,
+                             int useDataBounds);
+  float GetDistance2ToInnerBoundary(float x, float y, float z);
+  float _GetDistance2ToBoundary(float x, float y, float z, float *boundaryPt,
+                             int innerBoundaryOnly, int useDataBounds);
+
+  static const char *LevelMarker[20];
+
+  double Min[3], Max[3];       // spatial bounds of node
+  double MinVal[3], MaxVal[3]; // spatial bounds of data
+  int NumCells;
+  
+  vtkKdNode *Up;
+
+  vtkKdNode *Left;
+  vtkKdNode *Right;
+
+  int Dim;
+
+  int Id;        // region id
+
+  int MinId;
+  int MaxId;
+
+  double *CellBoundsCache;  // to optimize IntersectsCell
+};
+//ETX
+
 #endif

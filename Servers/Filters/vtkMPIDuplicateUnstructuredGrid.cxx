@@ -30,7 +30,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIDuplicateUnstructuredGrid, "1.1");
+vtkCxxRevisionMacro(vtkMPIDuplicateUnstructuredGrid, "1.2");
 vtkStandardNewMacro(vtkMPIDuplicateUnstructuredGrid);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicateUnstructuredGrid,Controller, vtkMultiProcessController);
@@ -442,5 +442,7 @@ void vtkMPIDuplicateUnstructuredGrid::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "PassThrough: " << this->PassThrough << endl;
   os << indent << "ZeroEmpty: " << this->ZeroEmpty << endl;
+  // this->MemorySize doesn't exist (if vtkCollectUnstructuredGrid API is ever
+  // to be mimicked, then this may need to be declared).
 }
 

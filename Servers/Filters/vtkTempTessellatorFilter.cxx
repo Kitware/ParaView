@@ -24,7 +24,7 @@
 #include <vtkDataSetSubdivisionAlgorithm.h>
 #include <vtkSubdivisionAlgorithm.h>
 
-vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.4");
+vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.5");
 vtkStandardNewMacro(vtkTempTessellatorFilter);
 
 // ========================================
@@ -204,6 +204,7 @@ void vtkTempTessellatorFilter::PrintSelf( ostream& os, vtkIndent indent )
   os << indent << "OutputDimension: " << this->OutputDimension << endl
      << indent << "Tessellator: " << this->Tessellator << endl
      << indent << "Subdivider: " << this->Subdivider << " (" << this->Subdivider->GetClassName() << ")" << endl;
+  // don't print this->MergePoints because we don't use it yet.
 }
 
 // override for proper Update() behavior
