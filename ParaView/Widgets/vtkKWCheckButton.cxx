@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.17");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.18");
 
 //------------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -78,8 +78,11 @@ void vtkKWCheckButton::SetVariableName(const char* _arg)
   int has_old_state = 0, old_state = 0;
   if (this->VariableName) 
     { 
-    has_old_state = 1;
-    old_state = this->GetState();
+    if (_arg)
+      {
+      has_old_state = 1;
+      old_state = this->GetState();
+      }
     delete [] this->VariableName; 
     }
 
