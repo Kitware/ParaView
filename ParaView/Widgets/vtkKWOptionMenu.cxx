@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.18");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.19");
 
 //-----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -67,7 +67,6 @@ vtkKWOptionMenu::~vtkKWOptionMenu()
     }
   this->Menu->Delete();
 }
-
 
 //-----------------------------------------------------------------------------
 const char *vtkKWOptionMenu::GetValue()
@@ -151,28 +150,32 @@ void vtkKWOptionMenu::AddImageEntryWithCommand(const char *imageName,
                                                const char *methodAndArgs,
                                                const char *options)
 {
-  this->AddEntryWithCommand(imageName, obj->GetTclName(), methodAndArgs,
+  this->AddEntryWithCommand(imageName, 
+                            obj->GetTclName(), 
+                            methodAndArgs,
                             options);
 }
 
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::DeleteEntry(const char* name)
 { 
-  this->Script(
-    "%s  delete {%s}",
-    this->Menu->GetWidgetName(), name);
+  this->Script("%s delete {%s}", this->Menu->GetWidgetName(), name);
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::DeleteEntry(int index)
 {
-  this->Script(
-    "%s  delete %d",
-    this->Menu->GetWidgetName(), index);
-
+  this->Script("%s delete %d", this->Menu->GetWidgetName(), index);
 }
 
+//-----------------------------------------------------------------------------
+int vtkKWOptionMenu::HasEntry(const char *name)
+{
+  return (this->IsCreated() &&
+          !this->Application->EvaluateBooleanExpression(
+            "catch {%s index {%s}}",
+            this->Menu->GetWidgetName(), name)) ? 1 : 0;
+}
 
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::ClearEntries()

@@ -85,8 +85,12 @@ public:
 
   // Description:
   // Remove entry from an option menu.
-  void DeleteEntry(const char*name);
+  void DeleteEntry(const char *name);
   void DeleteEntry(int index);
+  
+  // Description:
+  // Has entry ?
+  int HasEntry(const char *name);
   
   // Description:
   // Remove all entries from the option menu.
