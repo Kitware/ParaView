@@ -38,7 +38,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.11.2.1");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.11.2.2");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -70,8 +70,8 @@ void vtkIceTRenderer::ComputeAspect()
   icetGetIntegerv(ICET_TILE_MAX_WIDTH, &tile_width);
   icetGetIntegerv(ICET_TILE_MAX_HEIGHT, &tile_height);
 
-  double global_aspect = global_viewport[2]/global_viewport[3];
-  double tile_aspect = tile_width/tile_height;
+  double global_aspect = (double)global_viewport[2]/global_viewport[3];
+  double tile_aspect = (double)tile_width/tile_height;
 
   aspect[0] *= global_aspect/tile_aspect;
 

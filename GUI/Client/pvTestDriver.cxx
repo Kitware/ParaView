@@ -296,6 +296,9 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
     "due to signal",
     "failure",
     "bnormal termination",
+    "failed",
+    "FAILED",
+    "Failed",
     0
   };
   
