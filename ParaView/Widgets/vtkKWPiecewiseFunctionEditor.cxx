@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.7");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.8");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -580,6 +580,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
   float *v_w_range = this->GetWholeValueRange();
 
   float parameter;
+  int id;
 
   // We are in not WindowLevel mode, make sure our points are within the
   // range (while in W/L mode, those points can be out of the parameter range)
@@ -590,7 +591,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
     do
       {
       done = 1;
-      for (int id = 0; id < this->GetFunctionSize(); id++)
+      for (id = 0; id < this->GetFunctionSize(); id++)
         {
         if (this->GetFunctionPointParameter(id, parameter) &&
             (parameter < p_w_range[0] || parameter > p_w_range[1]))
@@ -666,7 +667,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
     // Check if modification is needed (if any of those points is different,
     // just remove everything)
 
-    for (int id = 0; id < 4; id++)
+    for (id = 0; id < 4; id++)
       {
       if (!this->GetFunctionPointParameter(id, parameter) ||
           parameter != points[id] ||
@@ -680,7 +681,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointsFromWindowLevel(int interactive)
 
     // Set the points
   
-    for (int id = 0; id < 4; id++)
+    for (id = 0; id < 4; id++)
       {
       this->PiecewiseFunction->AddPoint(points[id], id < 2 ? start_v : end_v);
       }
