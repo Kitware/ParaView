@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.27");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.28");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -312,6 +312,13 @@ void vtkPVFileEntry::SetValue(const char* fileName)
   int in_ext = 1;
   int in_num = 0;
   int cc;
+
+  int h5Flag = 0;
+  if (strcmp(ext, "h5") == 0)
+    {
+    h5Flag = 1;
+    file[strlen(file)-1] = 'f';
+    }
 
   int ncnt = 0;
   for ( cc = strlen(file)-1; cc >= 0; cc -- )
