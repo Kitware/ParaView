@@ -41,6 +41,7 @@ vtkKWTclInteractor.cxx
 vtkKWTextProperty.cxx
 vtkKWTkUtilities.cxx
 vtkKWText.cxx 
+vtkKWThumbWheel.cxx
 vtkKWToolbar.cxx 
 vtkKWView.cxx 
 vtkKWViewCollection.cxx 
