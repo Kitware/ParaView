@@ -65,6 +65,15 @@ public:
   // Description:
   // Run command.
   int RunCommand(const char* command, const char* args[]);
+
+  static void* RunCommandThread(void*);
+
+  enum {
+    NOT_RUN,
+    RUNNING,
+    SUCCESS,
+    FAIL
+  };
 //ETX
 
   // Description:
@@ -78,13 +87,31 @@ public:
   vtkSetStringMacro(RemoteHost);
   vtkGetStringMacro(RemoteHost);
 
+  // Description:
+  // Get the result. It can be NOT_RUN, RUNNING, SUCCESS, FAIL
+  vtkGetMacro(Result, int);
+
+  // Description:
+  // Set SSH command
+  vtkSetStringMacro(SSHCommand);
+  vtkGetStringMacro(SSHCommand);
+
+  // Description:
+  // Set SSH arguments
+  vtkSetStringMacro(SSHArguments);
+  vtkGetStringMacro(SSHArguments);
+
 protected:
   vtkKWRemoteExecute();
   ~vtkKWRemoteExecute();
 
   vtkKWRemoteExecuteInternal* Internals;
 
+  char* SSHCommand;
+  char* SSHArguments;
   char* RemoteHost;
+  int ProcessRunning;
+  int Result;
 
 private:
   vtkKWRemoteExecute(const vtkKWRemoteExecute&); // Not implemented

@@ -4,7 +4,7 @@ int main()
 {
   const char* args[] = {
     "find",
-    "/",
+    "/usr",
     "-type",
     "f",
     0

@@ -149,6 +149,10 @@ protected:
   int    ArgumentCount;
   char** Arguments;
   int    ReturnValue;
+
+  vtkSetStringMacro(Hostname);
+  char* Hostname;
+  int Port;
   
   vtkSetStringMacro(RootResult);
   

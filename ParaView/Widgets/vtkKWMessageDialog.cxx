@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.45");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.46");
 
 
 
@@ -66,7 +66,7 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   this->MessageDialogFrame = vtkKWWidget::New();
   this->MessageDialogFrame->SetParent(this);
   this->BottomFrame = vtkKWWidget::New();
-  this->BottomFrame->SetParent(this);
+  this->BottomFrame->SetParent(this->MessageDialogFrame);
   
   this->CommandFunction = vtkKWMessageDialogCommand;
   this->Label = vtkKWLabel::New();
@@ -204,15 +204,15 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     this->Script("pack %s -side top -fill x -padx 20 -pady 5",
                  this->CheckButton->GetWidgetName());
     }
-  this->Script("pack %s -side top -fill x -pady 2",
-               this->ButtonFrame->GetWidgetName());
 
   this->Script("pack %s -side top -fill both -expand true -pady 4",
                this->TopFrame->GetWidgetName());
-  this->Script("pack %s -side right -fill both -expand true -pady 4",
+  this->Script("pack %s -side top -fill both -expand true -pady 4",
                this->MessageDialogFrame->GetWidgetName());
-  this->Script("pack %s -side bottom -fill both -expand true -pady 4",
+  this->Script("pack %s -side top -fill both -expand true -pady 4",
                this->BottomFrame->GetWidgetName());
+  this->Script("pack %s -side top -fill x -pady 2",
+               this->ButtonFrame->GetWidgetName());
   this->Icon->Create(app,"-width 0 -pady 0 -padx 0 -borderwidth 0");
   this->Script("pack %s -side left -fill y",
                this->Icon->GetWidgetName());
@@ -230,6 +230,10 @@ void vtkKWMessageDialog::SetText(const char *txt)
 
 int vtkKWMessageDialog::Invoke()
 {
+  if ( !this->Application )
+    {
+    return 0;
+    }
   this->InvokeEvent(vtkKWEvent::MessageDialogInvokeEvent, 
                     this->DialogText);
   if ( !this->GetApplication()->GetUseMessageDialogs() )

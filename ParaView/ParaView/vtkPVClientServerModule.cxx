@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVClientServerModule.h"
+
 #include "vtkObjectFactory.h"
 
 #include "vtkToolkits.h"
@@ -64,6 +65,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
+
+#include "vtkKWMessageDialog.h"
+#include "vtkPVWindow.h"
+#include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
+
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
 #include "vtkMPICommunicator.h"
@@ -86,6 +93,112 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 #define VTK_PV_ROOT_RESULT_TAG               838488
  
 
+
+//----------------------------------------------------------------------------
+//============================================================================
+class vtkPVClientServerModuleConnectDialog : public vtkKWMessageDialog
+{
+public:
+  vtkTypeRevisionMacro(vtkPVClientServerModuleConnectDialog, vtkKWMessageDialog);
+  static vtkPVClientServerModuleConnectDialog* New();
+
+  void Create(vtkPVApplication* app, const char* opts)
+    {
+    char buffer[1024];
+    sprintf(buffer, "Cannot connect to the server %s:%d. Make sure the server is running.",
+        this->HostnameString, this->PortInt);
+    this->SetOptions(
+      vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault |
+      vtkKWMessageDialog::WarningIcon );
+    this->SetStyleToOkCancel();
+    this->Superclass::Create(app, 0);
+    this->SetMasterWindow(app->GetMainWindow());
+    this->SetText(buffer);
+    this->SetTitle("ParaView Connection Warning");
+    this->Label->SetParent(this->BottomFrame);
+    this->Label->Create(app, "-text {Hostname}");
+    this->Hostname->SetParent(this->BottomFrame);
+    this->Hostname->Create(app, 0);
+    this->Port->SetParent(this->BottomFrame);
+    this->Port->Create(app, 0);
+    this->Script("pack %s -side left -expand 0", 
+        this->Label->GetWidgetName());
+    this->Script("pack %s -side left -expand 1 -fill x", 
+        this->Hostname->GetWidgetName());
+    this->Script("pack %s -side left -expand 0", 
+        this->Port->GetWidgetName());
+    this->SetHostname(this->HostnameString);
+    this->SetPort(this->PortInt);
+    }
+
+  void OK()
+    {
+    this->SetHostnameString(this->Hostname->GetValue());
+    this->PortInt = this->Port->GetValueAsInt();
+    this->Superclass::OK();
+    }
+
+  void SetHostname(const char* hn)
+    {
+    if ( this->Hostname->IsCreated() )
+      {
+      this->Hostname->SetValue(hn);
+      }
+    this->SetHostnameString(hn);
+    }
+  const char* GetHostName()
+    {
+    return this->HostnameString;
+    }
+  void SetPort(int pt)
+    {
+    if ( this->Port->IsCreated() )
+      {
+      char buffer[100];
+      sprintf(buffer, "%d", pt);
+      this->Port->SetValue(buffer);
+      }
+    this->PortInt = pt;
+    }
+  int GetPort()
+    {
+    return this->PortInt;
+    }
+
+protected:
+  vtkPVClientServerModuleConnectDialog() 
+    {
+    this->Hostname = vtkKWEntry::New();
+    this->Port = vtkKWEntry::New();
+    this->Label = vtkKWLabel::New();
+
+    this->HostnameString = 0;
+    this->PortInt = 0;
+    }
+
+  ~vtkPVClientServerModuleConnectDialog() 
+    {
+    this->Hostname->Delete();
+    this->Port->Delete();
+    this->Label->Delete();
+    }
+
+  vtkKWEntry* Hostname;
+  vtkKWEntry* Port;
+  vtkKWLabel* Label;
+
+  vtkSetStringMacro(HostnameString);
+  char* HostnameString;
+  int PortInt;
+
+private:
+  vtkPVClientServerModuleConnectDialog(const vtkPVClientServerModuleConnectDialog&);
+  void operator=(const vtkPVClientServerModuleConnectDialog&);
+};
+vtkStandardNewMacro(vtkPVClientServerModuleConnectDialog);
+vtkCxxRevisionMacro(vtkPVClientServerModuleConnectDialog, "1.25");
+//============================================================================
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 // This RMI is only on process 0 of server. (socket controller)
@@ -154,7 +267,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.24");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.25");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -171,6 +284,9 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->Arguments = NULL;
   this->ReturnValue = 0;
   this->RootResult = 0;
+
+  this->Hostname = 0;
+  this->Port = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -191,6 +307,8 @@ vtkPVClientServerModule::~vtkPVClientServerModule()
   this->Arguments = NULL;
   this->ReturnValue = 0;
   this->SetRootResult(0);
+
+  this->SetHostname(0);
 }
 
 
@@ -230,17 +348,36 @@ void vtkPVClientServerModule::Initialize()
     vtkSocketCommunicator *comm = vtkSocketCommunicator::New();
 
     // Get the host name from the command line arguments
-    char* hostname = pvApp->GetHostName();
+    this->SetHostname(pvApp->GetHostName());
+
     // Get the port from the command line arguments
-    int port = pvApp->GetPort();
+    this->Port = pvApp->GetPort();
     // Establish connection
-    if (!comm->ConnectTo(hostname, port))
+    while (!comm->ConnectTo(this->Hostname, this->Port))
       {
-      vtkErrorMacro("Client error: Could not connect to the server.");
-      comm->Delete();
-      pvApp->Exit();
-      this->ReturnValue = 1;
-      return;
+      this->Script("wm withdraw .");
+      vtkPVClientServerModuleConnectDialog* dialog = 
+        vtkPVClientServerModuleConnectDialog::New();
+      dialog->SetHostname(this->Hostname);
+      dialog->SetPort(this->Port);
+      dialog->Create(this->GetPVApplication(), 0);
+      int res = dialog->Invoke();
+      cout << "Res: " << res << endl;
+      if ( res )
+        {
+        this->SetHostname(dialog->GetHostName());
+        this->Port = dialog->GetPort();
+        }
+      dialog->Delete();
+
+      if ( !res )
+        {
+        vtkErrorMacro("Client error: Could not connect to the server.");
+        comm->Delete();
+        pvApp->Exit();
+        this->ReturnValue = 1;
+        return;
+        }
       }
     this->SocketController = vtkSocketController::New();
     this->SocketController->SetCommunicator(comm);
