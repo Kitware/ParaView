@@ -53,11 +53,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tcl.h" // Needed for Tcl_Interp
 #include "tk.h" // Needed for Tk_Window
 
-class vtkKWWindowCollection;
-class vtkKWWindow;
-class vtkKWWidget;
+class vtkKWLabel;
 class vtkKWRegisteryUtilities;
 class vtkKWSplashScreen;
+class vtkKWWidget;
+class vtkKWWindow;
+class vtkKWWindowCollection;
 
 //BTX
 template<class KeyType,class DataType> class vtkAbstractMap;
@@ -287,7 +288,7 @@ protected:
 
   // For Balloon help
   vtkKWWidget *BalloonHelpWindow;
-  vtkKWWidget *BalloonHelpLabel;
+  vtkKWLabel *BalloonHelpLabel;
   char *BalloonHelpPending;
   vtkSetStringMacro(BalloonHelpPending);
   vtkKWWidget *BalloonHelpWidget;

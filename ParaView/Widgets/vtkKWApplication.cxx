@@ -73,7 +73,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.100");
+vtkCxxRevisionMacro(vtkKWApplication, "1.101");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -108,8 +108,7 @@ vtkKWApplication::vtkKWApplication()
   if (vtkKWApplication::WidgetVisibility)
     {
     this->BalloonHelpWindow = vtkKWWidget::New();
-    this->BalloonHelpLabel = vtkKWWidget::New();
-    this->BalloonHelpLabel->SetParent(this->BalloonHelpWindow);
+    this->BalloonHelpLabel = vtkKWLabel::New();
     }
   else
     {
@@ -138,9 +137,10 @@ vtkKWApplication::vtkKWApplication()
     //this->BalloonHelpWindow->SetParent(this->GetParentWindow());
     this->BalloonHelpWindow->Create(
       this, "toplevel", "-background black -borderwidth 1 -relief flat");
+    this->BalloonHelpLabel->SetParent(this->BalloonHelpWindow);    
     this->BalloonHelpLabel->Create(
-      this, "label", "-background LightYellow -foreground black -justify left "
-                     "-wraplength 2i");
+      this, "-background LightYellow -foreground black -justify left "
+      "-wraplength 2i");
     this->Script("pack %s", this->BalloonHelpLabel->GetWidgetName());
     this->Script("wm overrideredirect %s 1", 
                  this->BalloonHelpWindow->GetWidgetName());
@@ -705,9 +705,7 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
     }
 
   // make sure it is really pending
-  this->Script("%s configure -text {%s}", 
-               this->BalloonHelpLabel->GetWidgetName(), 
-               widget->GetBalloonHelpString());
+  this->BalloonHelpLabel->SetLabel(widget->GetBalloonHelpString());
 
   // Get the position of the mouse in the renderer.
   this->Script( "winfo pointerx %s", widget->GetWidgetName());
