@@ -524,13 +524,14 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetBackgroundColor(float r, float g, float b)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   pvApp->BroadcastScript("%s SetBackground %f %f %f",
                          this->RendererTclName, r, g, b);
-  this->Render();
+  this->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
@@ -655,10 +656,10 @@ void vtkPVRenderView::AddComposite(vtkKWComposite *c)
     return;
     }
   this->Composites->AddItem(c);
-  if (pvc->GetActorTclName() != NULL)
+  if (pvc->GetPropTclName() != NULL)
     {
     pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
-			   pvc->GetActorTclName());
+			   pvc->GetPropTclName());
     }
 }
 
@@ -676,10 +677,10 @@ void vtkPVRenderView::RemoveComposite(vtkKWComposite *c)
     }
   
   c->SetView(NULL);
-  if (pvc->GetActorTclName() != NULL)
+  if (pvc->GetPropTclName() != NULL)
     {
     pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
-			   pvc->GetActorTclName());
+			   pvc->GetPropTclName());
     }
   this->Composites->RemoveItem(c);
 }
@@ -740,11 +741,23 @@ void vtkPVRenderView::StartRender()
 void vtkPVRenderView::Render()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  int abort;
 
   this->Update();
 
   //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
   this->RenderWindow->SetDesiredUpdateRate(20.0);
+
+  abort = this->ShouldIAbort();
+  if (abort)
+    {
+    if (abort == 1)
+      {
+      this->EventuallyRender();
+      }
+    return;
+    }
+
   this->StartRender();
   this->RenderWindow->Render();
 }
@@ -766,6 +779,8 @@ void vtkPVRenderView::EventuallyRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRenderCallBack()
 {
+  int abort;
+  
   // sanity check
   if (this->EventuallyRenderFlag == 0)
     {
@@ -776,6 +791,17 @@ void vtkPVRenderView::EventuallyRenderCallBack()
   this->UnRegister(this);
   this->RenderWindow->SetDesiredUpdateRate(0.000001);
   //this->SetRenderModeToStill();
+
+  abort = this->ShouldIAbort();
+  if (abort)
+    {
+    if (abort == 1)
+      {
+      this->EventuallyRender();
+      }
+    return;
+    }
+
   this->ResetCameraClippingRange();
   this->StartRender();
   this->RenderWindow->Render();
