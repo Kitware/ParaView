@@ -438,10 +438,17 @@ protected:
 
   int VolumeRenderMode;
 
-  int MapScalarsVisible;
-  int EditColorMapVisible;
+  // Keep widget enabled state so they can be disabled globally
+  int MapScalarsCheckVisible;
+  int InterpolateColorsCheckVisible;
+  int EditColorMapButtonVisible;
   int ColorButtonVisible;
-  int ScalarBarVisible;
+  int ScalarBarCheckVisible;
+  // We have to remember when the current color attribute is from cell data.
+  // InterpolateColors is not applicable for cell attriubtes we have
+  // to know a cell attribute is current so that we do not enable the
+  // interpolate button when map scalars is turned on.
+  int CurrentColorAttributeIsFromCellData;
 
   vtkPVColorMap *PVColorMap;
 
