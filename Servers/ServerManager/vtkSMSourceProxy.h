@@ -40,9 +40,6 @@ public:
   void SetInput(int idx, vtkSMSourceProxy* input, const char* method);
 
   // Description:
-  virtual void UnRegister(vtkObjectBase* obj);
-
-  // Description:
   void UpdateInformation();
 
   // Description:
@@ -79,8 +76,6 @@ protected:
 
   vtkSMSourceProxy **Consumers;
   int NumberOfConsumers;
-
-  vtkClientServerID ClientServerID;
 
   int HasMultipleInputs;
 
