@@ -22,9 +22,7 @@
 
 #include "vtkKWRegisteryUtilities.h"
 
-//BTX
-template<class KeyType,class DataType> class vtkArrayMap;
-//ETX
+class vtkKWUNIXRegisteryUtilitiesInternals;
 
 class VTK_EXPORT vtkKWUNIXRegisteryUtilities : public vtkKWRegisteryUtilities
 {
@@ -32,10 +30,6 @@ public:
   static vtkKWUNIXRegisteryUtilities* New();
   vtkTypeRevisionMacro(vtkKWUNIXRegisteryUtilities, vtkKWRegisteryUtilities);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-//BTX  
-  typedef vtkArrayMap<const char*, const char*> StringStringMap;
-//ETX
 
   // Description:
   // Read a value from the registry.
@@ -70,8 +64,9 @@ protected:
   char *CreateKey(const char *key);
 
 private:
-  StringStringMap *EntriesMap;
   char *SubKey;
+
+  vtkKWUNIXRegisteryUtilitiesInternals* Internals;
 
   vtkKWUNIXRegisteryUtilities(const vtkKWUNIXRegisteryUtilities&); // Not implemented
   void operator=(const vtkKWUNIXRegisteryUtilities&); // Not implemented

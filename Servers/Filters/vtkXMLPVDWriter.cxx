@@ -36,40 +36,14 @@
 #include "vtkXMLStructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLWriter.h"
+#include <kwsys/SystemTools.hxx>
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
-#ifndef _WIN32
-# include <unistd.h>
-#endif
-
-#if defined(_WIN32)
-# include <direct.h>
-int vtkXMLPVDWriterMakeDirectory(const char* dirname)
-{
-  return (_mkdir(dirname) >= 0)?1:0;
-}
-int vtkXMLPVDWriterRemoveDirectory(const char* dirname)
-{
-  return (_rmdir(dirname) >= 0)?1:0;
-}
-#else
-# include <sys/stat.h>
-# include <sys/types.h>
-int vtkXMLPVDWriterMakeDirectory(const char* dirname)
-{
-  return (mkdir(dirname, 00755) >= 0)?1:0;
-}
-int vtkXMLPVDWriterRemoveDirectory(const char* dirname)
-{
-  return (mkdir(dirname, 00755) >= 0)?1:0;
-}
-#endif
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.7");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.7.2.1");
 
 class vtkXMLPVDWriterInternals
 {
@@ -210,7 +184,7 @@ int vtkXMLPVDWriter::WriteInternal()
           fname = this->Internal->CreatePieceFileName(i);
           full = this->Internal->FilePath;
           full += fname;
-          unlink(full.c_str());
+          kwsys::SystemTools::RemoveFile(full.c_str());
           }
         this->RemoveDirectory(subdir.c_str());
         this->SetErrorCode(vtkErrorCode::OutOfDiskSpaceError);
@@ -277,13 +251,24 @@ int vtkXMLPVDWriter::WriteCollectionFileIfRequested()
 //----------------------------------------------------------------------------
 void vtkXMLPVDWriter::MakeDirectory(const char* name)
 {
-  vtkXMLPVDWriterMakeDirectory(name);  
+  if( !kwsys::SystemTools::MakeDirectory(name) )
+    {
+    vtkErrorMacro( << "Sorry unable to create directory: " << name 
+                   << endl << "Last systen error was: " 
+                   << kwsys::SystemTools::GetLastSystemError().c_str() );
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkXMLPVDWriter::RemoveDirectory(const char* name)
 {
-  vtkXMLPVDWriterRemoveDirectory(name);
+  if( !kwsys::SystemTools::RemoveADirectory(name) )
+    {
+    vtkErrorMacro( << "Sorry unable to remove a directory: " << name 
+                   << endl << "Last systen error was: " 
+                   << kwsys::SystemTools::GetLastSystemError().c_str() );
+    }
+
 }
 
 //----------------------------------------------------------------------------

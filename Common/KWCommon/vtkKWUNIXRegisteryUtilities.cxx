@@ -15,8 +15,9 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
-#include "vtkArrayMap.txx"
-#include "vtkArrayMapIterator.txx"
+
+#include "vtkStdString.h"
+#include <vtkstd/map>
 
 #ifdef VTK_USE_ANSI_STDLIB
 #define VTK_IOS_NOCREATE 
@@ -27,22 +28,30 @@
 #define BUFFER_SIZE 8192
 
 vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
-vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.13");
+vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.13.8.1");
+
+//----------------------------------------------------------------------------
+//****************************************************************************
+class vtkKWUNIXRegisteryUtilitiesInternals
+{
+public:
+  typedef vtkstd::map<vtkStdString, vtkStdString> StringToStringMap;
+  StringToStringMap EntriesMap;
+};
+//****************************************************************************
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 vtkKWUNIXRegisteryUtilities::vtkKWUNIXRegisteryUtilities()
 {
-  this->EntriesMap = 0;
+  this->Internals = new vtkKWUNIXRegisteryUtilitiesInternals;
   this->SubKey  = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkKWUNIXRegisteryUtilities::~vtkKWUNIXRegisteryUtilities()
 {
-  if ( this->EntriesMap )
-    {
-    this->EntriesMap->Delete();
-    }
+  delete this->Internals;
 }
 
 
@@ -81,10 +90,6 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
     delete ifs;
     return 0;
     }
-  if ( !this->EntriesMap )
-    {
-    this->EntriesMap = vtkKWUNIXRegisteryUtilities::StringStringMap::New();
-    }
 
   res = 1;
   char buffer[BUFFER_SIZE];
@@ -102,7 +107,8 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
       // Comment
       continue;
       }   
-    for ( cc = 0; cc< static_cast<int>(strlen(line)); cc++ )
+    int linelen = static_cast<int>(strlen(line));
+    for ( cc = 0; cc < linelen; cc++ )
       {
       if ( line[cc] == '=' )
         {
@@ -112,7 +118,7 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
         char *value = line + cc + 1;
         char *nkey = this->Strip(key);
         char *nvalue = this->Strip(value);
-        this->EntriesMap->SetItem( nkey, nvalue );
+        this->Internals->EntriesMap[nkey] = nvalue;
         this->Empty = 0;
         delete [] key;
         found = 1;      
@@ -132,8 +138,9 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
   int res = 0;
   if ( !this->Changed )
     {
-    this->EntriesMap->Delete();
-    this->EntriesMap = 0;
+    this->Internals->EntriesMap.erase(
+      this->Internals->EntriesMap.begin(),
+      this->Internals->EntriesMap.end());
     this->Empty = 1;
     this->SetSubKey(0);
     return 1;
@@ -163,23 +170,19 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
        << "# key = value" << endl
        << "#" << endl;
 
-  if ( this->EntriesMap )
+  if ( !this->Internals->EntriesMap.empty() )
     {
-    vtkKWUNIXRegisteryUtilities::StringStringMap::IteratorType *it
-      = this->EntriesMap->NewIterator();
-    while ( !it->IsDoneWithTraversal() )
+    vtkKWUNIXRegisteryUtilitiesInternals::StringToStringMap::iterator it;
+    for ( it = this->Internals->EntriesMap.begin();
+      it != this->Internals->EntriesMap.end();
+      ++ it )
       {
-      const char *key = 0;
-      const char *value = 0;
-      it->GetKey(key);
-      it->GetData(value);
-      *ofs << key << " = " << value << endl;
-      it->GoToNextItem();
+      *ofs << it->first.c_str() << " = " << it->second.c_str()<< endl;
       }
-    it->Delete();
     }
-  this->EntriesMap->Delete();
-  this->EntriesMap = 0;
+  this->Internals->EntriesMap.erase(
+    this->Internals->EntriesMap.begin(),
+    this->Internals->EntriesMap.end());
   ofs->close();
   delete ofs;
   res = 1;
@@ -199,10 +202,11 @@ int vtkKWUNIXRegisteryUtilities::ReadValueInternal(const char *skey,
     {
     return 0;
     }
-  const char* val = 0;
-  if ( this->EntriesMap->GetItem(key, val) == VTK_OK )
+  vtkKWUNIXRegisteryUtilitiesInternals::StringToStringMap::iterator it
+    = this->Internals->EntriesMap.find(key);
+  if ( it != this->Internals->EntriesMap.end() )
     {
-    strcpy(value, val);
+    strcpy(value, it->second.c_str());
     res = 1;
     }
   delete [] key;
@@ -224,7 +228,7 @@ int vtkKWUNIXRegisteryUtilities::DeleteValueInternal(const char *skey)
     {
     return 0;
     }
-  this->EntriesMap->RemoveItem(key);
+  this->Internals->EntriesMap.erase(key);
   delete [] key;
   return 1;
 }
@@ -238,7 +242,7 @@ int vtkKWUNIXRegisteryUtilities::SetValueInternal(const char *skey,
     {
     return 0;
     }
-  this->EntriesMap->SetItem(key, value);
+  this->Internals->EntriesMap[key] = value;
   delete [] key;
   return 1;
 }
