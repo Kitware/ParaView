@@ -28,8 +28,7 @@
  
 class vtkHierarchicalBoxDataSet;
 
-class VTK_FILTERING_EXPORT vtkHierarchicalBoxToPolyDataFilter : 
-  public vtkPolyDataSource
+class VTK_EXPORT vtkHierarchicalBoxToPolyDataFilter : public vtkPolyDataSource
 {
 public:
   vtkTypeRevisionMacro(vtkHierarchicalBoxToPolyDataFilter,

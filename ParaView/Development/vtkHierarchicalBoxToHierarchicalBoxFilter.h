@@ -28,7 +28,7 @@
  
 class vtkHierarchicalBoxDataSet;
 
-class VTK_FILTERING_EXPORT vtkHierarchicalBoxToHierarchicalBoxFilter : 
+class VTK_EXPORT vtkHierarchicalBoxToHierarchicalBoxFilter : 
   public vtkHierarchicalBoxSource
 {
 public:

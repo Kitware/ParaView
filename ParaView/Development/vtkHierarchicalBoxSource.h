@@ -33,7 +33,7 @@
 
 class vtkHierarchicalBoxDataSet;
 
-class VTK_FILTERING_EXPORT vtkHierarchicalBoxSource : public vtkSource
+class VTK_EXPORT vtkHierarchicalBoxSource : public vtkSource
 {
 public:
   vtkTypeRevisionMacro(vtkHierarchicalBoxSource,vtkSource);
