@@ -330,7 +330,7 @@
          class="vtkPVAdvancedReaderModule" module_type="Reader" 
          extensions=".e .ex2 .exo .gen .0 .00 .000" 
          file_description="Exodus">
- <StringEntry variable="FilePrefix" extension="*" label="File prefix" 
+  <StringEntry variable="FilePrefix" extension="*" label="File prefix" 
                init_source="FilePrefix"
                trace_name="file_prefix"
                help="Set the file root. Used with file pattern to format a file name." />
