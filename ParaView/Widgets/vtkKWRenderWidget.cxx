@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.50");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.51");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -589,7 +589,7 @@ void vtkKWRenderWidget::SetBackgroundColor(float r, float g, float b)
     return;
     }
   
-  float *ff = this->Renderer->GetBackground();
+  float *ff = this->GetBackgroundColor();
   if (ff[0] == r && ff[1] == g && ff[2] == b)
     {
     return;
