@@ -96,11 +96,6 @@ public:
   vtkBooleanMacro(UseRGB, int);
 
   // Description:
-  // For values larger than 1, render a smaller image and display the
-  // result using pixel replication.
-  vtkSetMacro(ImageReductionFactor, int);
-
-  // Description:
   // When the server has more than one process, this object
   // composites the buffers into one.  Defaults to vtkCompressCompositer.
   void SetCompositer(vtkCompositer *c);
