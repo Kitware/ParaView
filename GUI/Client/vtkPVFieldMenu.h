@@ -31,7 +31,6 @@ class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkKWLabel;
 class vtkKWOptionMenu;
-class vtkPVIndexWidgetProperty;
 class vtkPVInputMenu;
 class vtkPVInputProperty;
 class vtkPVDataSetAttributesInformation;

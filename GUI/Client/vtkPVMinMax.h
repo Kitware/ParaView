@@ -23,7 +23,6 @@
 class vtkKWScale;
 class vtkKWLabel;
 class vtkPVArrayMenu;
-class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVMinMax : public vtkPVWidget
 {
