@@ -42,8 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkObjectFactory.h"
-
-
+#include "vtkKWImageLabel.h"
+#include "vtkKWIcon.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
@@ -68,14 +68,17 @@ vtkKWLabeledFrame::vtkKWLabeledFrame()
   this->Frame->SetParent(this->Groove);
   this->Label = vtkKWWidget::New();
   this->Label->SetParent(this);
-  this->Icon = vtkKWWidget::New();
+  this->Icon = vtkKWImageLabel::New();
   this->Icon->SetParent(this);
+  this->IconData = vtkKWIcon::New();
+  this->IconData->SetImageData(vtkKWIcon::ICON_SHRINK);
   this->Displayed = 1;
 }
 
 vtkKWLabeledFrame::~vtkKWLabeledFrame()
 {
   this->Icon->Delete();
+  this->IconData->Delete();
   this->Label->Delete();
   this->Frame->Delete();
   this->Border->Delete();
@@ -111,7 +114,8 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
   this->Groove->Create(app,"frame","-borderwidth 2 -relief groove");
   this->Border2->Create(app,"frame","-height 10 -borderwidth 0 -relief flat");
   this->Frame->Create(app,"frame","-borderwidth 0 -relief flat");
-  this->Icon->Create(app,"label","-bitmap error");
+  this->Icon->Create(app,"");
+  this->Icon->SetImageData(this->IconData);
   
   this->Script("pack %s -fill x -side top", this->Border->GetWidgetName());
   this->Script("pack %s -fill x -side top", this->Groove->GetWidgetName());
@@ -124,7 +128,7 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
 
   if ( vtkKWLabeledFrame::AllowShowHide )
     {
-    this->Script("place %s -relx 1 -x -5 -y 0 -anchor ne",
+    this->Script("place %s -relx 1 -x -5 -y 2 -anchor ne",
 		 this->Icon->GetWidgetName());    
     this->Script("bind %s <ButtonRelease-1> { %s ShowHideFrame }",
 		 this->Icon->GetWidgetName(),
@@ -139,13 +143,16 @@ void vtkKWLabeledFrame::ShowHideFrame()
     {
     this->Script("pack forget %s", this->Frame->GetWidgetName());
     this->Displayed = 0;
+    this->IconData->SetImageData(vtkKWIcon::ICON_EXPAND);
     }
   else
     {
     this->Script("pack %s -fill both -expand yes",
 		 this->Frame->GetWidgetName());
     this->Displayed = 1;
+    this->IconData->SetImageData(vtkKWIcon::ICON_SHRINK);
    }
+  this->Icon->SetImageData(this->IconData);
 }
 
 int vtkKWLabeledFrame::AllowShowHide = 0;

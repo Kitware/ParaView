@@ -170,6 +170,14 @@ void vtkKWIcon::SetImageData(int image)
       this->SetInternalData(image_warning, image_warning_width, 
 			    image_warning_height);
       break;
+    case vtkKWIcon::ICON_SHRINK:
+      this->SetInternalData(image_shrink, image_shrink_width, 
+			    image_shrink_height);
+      break;
+    case vtkKWIcon::ICON_EXPAND:
+      this->SetInternalData(image_expand, image_expand_width, 
+			    image_expand_height);
+      break;
     }
   this->Internal = image;
 }

@@ -89,6 +89,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWRegisteryUtilities.h"
 #endif
 
+#include "vtkKWLabeledFrame.h"
+
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 
@@ -163,6 +165,8 @@ vtkPVApplication::vtkPVApplication()
     delete this->TraceFile;
     this->TraceFile = NULL;
     }
+
+  vtkKWLabeledFrame::AllowShowHideOn();
 }
 
 
