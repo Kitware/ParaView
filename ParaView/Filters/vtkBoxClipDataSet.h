@@ -22,6 +22,10 @@
 //returning tetrahedral cells inside of the box.
 //The output of this filter is an unstructured grid.
 //
+// This filter can be configured to compute a second output. The
+// second output is the part of the cell that is clipped away. Set the
+// GenerateClippedData boolean on if you wish to access this output data.
+//
 //The vtkBoxClipDataSet will triangulate all types of 3D cells (i.e, create tetrahedra).
 //This is necessary to preserve compatibility across face neighbors.
 //
@@ -66,24 +70,11 @@ public:
   // If the box is not parallel to axis, you need to especify  
   // normal vector of each plane and a point on the plane. 
   
-  void SetBoxClip(double xmin,
-                  double xmax,
-                  double ymin,
-                  double ymax,
-                  double zmin,
-                  double zmax);
-  void SetBoxClip(double *n0,
-                  double *o0,
-                  double *n1,
-                  double *o1,
-                  double *n2,
-                  double *o2,
-                  double *n3,
-                  double *o3,
-                  double *n4,
-                  double *o4,
-                  double *n5,
-                  double *o5);
+  void SetBoxClip(float xmin,float xmax,float ymin,float ymax,float zmin,float zmax);
+  void SetBoxClip(double xmin,double xmax,double ymin,double ymax,double zmin,double zmax);
+
+  void SetBoxClip(float *n0,float *o0,float *n1,float *o1,float *n2,float *o2,float *n3,float *o3,float *n4,float *o4,float *n5,float *o5);
+  void SetBoxClip(double *n0,double *o0,double *n1,double *o1,double *n2,double *o2,double *n3,double *o3,double *n4,double *o4,double *n5,double *o5);
   
 
   // Description:
@@ -93,6 +84,12 @@ public:
   vtkGetMacro(GenerateClipScalars,int);
   vtkBooleanMacro(GenerateClipScalars,int);
 
+  // Description:
+  // Control whether a second output is generated. The second output
+  // contains the polygonal data that's been clipped away.
+  vtkSetMacro(GenerateClippedOutput,int);
+  vtkGetMacro(GenerateClippedOutput,int);
+  vtkBooleanMacro(GenerateClippedOutput,int);
 
   // Description:
   // Set the tolerance for merging clip intersection points that are near
@@ -135,26 +132,26 @@ public:
   unsigned int GetOrientation()
           {return  Orientation;};
   void MinEdgeF(unsigned int *id_v, vtkIdType *cellIds,unsigned int *edgF );
-  void PyramidToTetra(vtkIdType *pyramId, 
-                      vtkIdType *cellIds,
-                      vtkCellArray *newCellArray);
-  void WedgeToTetra(vtkIdType *wedgeId, 
-                    vtkIdType *cellIds,
-                    vtkCellArray *newCellArray);
-  void TetraGrid(vtkIdType typeobj, 
-                 vtkIdType npts, 
-                 vtkIdType *cellIds,
-                 vtkCellArray *newCellArray);
+  void PyramidToTetra(vtkIdType *pyramId, vtkIdType *cellIds,vtkCellArray *newCellArray);
+  void WedgeToTetra(vtkIdType *wedgeId, vtkIdType *cellIds,vtkCellArray *newCellArray);
+  void TetraGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *cellIds,vtkCellArray *newCellArray);
   void CreateTetra(vtkIdType npts,vtkIdType *cellIds,vtkCellArray *newCellArray);
   void ClipBox(vtkPoints *newPoints,vtkGenericCell *cell, 
                vtkPointLocator *locator, vtkCellArray *tets,vtkPointData *inPD, 
                vtkPointData *outPD,vtkCellData *inCD,vtkIdType cellId,
                vtkCellData *outCD);
   void ClipHexahedron(vtkPoints *newPoints,vtkGenericCell *cell,
-               vtkPointLocator *locator, vtkCellArray *tets,vtkPointData *inPD, 
-               vtkPointData *outPD,vtkCellData *inCD,vtkIdType cellId,
-               vtkCellData *outCD);
-
+      vtkPointLocator *locator, vtkCellArray *tets,vtkPointData *inPD, 
+      vtkPointData *outPD,vtkCellData *inCD,vtkIdType cellId,
+      vtkCellData *outCD);
+  void ClipBoxInOut(vtkPoints *newPoints,vtkGenericCell *cell, 
+           vtkPointLocator *locator, vtkCellArray **tets,vtkPointData *inPD, 
+           vtkPointData *outPD,vtkCellData *inCD,vtkIdType cellId,
+           vtkCellData **outCD);
+  void ClipHexahedronInOut(vtkPoints *newPoints,vtkGenericCell *cell,
+                  vtkPointLocator *locator, vtkCellArray **tets,vtkPointData *inPD, 
+                  vtkPointData *outPD,vtkCellData *inCD,vtkIdType cellId,
+                  vtkCellData **outCD);
 protected:
   vtkBoxClipDataSet();
   ~vtkBoxClipDataSet();
@@ -164,15 +161,17 @@ protected:
   vtkPointLocator *Locator;
   int GenerateClipScalars;
 
+  int GenerateClippedOutput;
+
   double MergeTolerance;
 
   char *InputScalarsSelection;
   vtkSetStringMacro(InputScalarsSelection);
 
-  double    BoundBoxClip[3][2];
+  double BoundBoxClip[3][2];
   unsigned int Orientation;
-  double    n_pl[6][3];
-  double    o_pl[6][3];
+  double n_pl[6][3];
+  double o_pl[6][3];
 
 private:
   vtkBoxClipDataSet(const vtkBoxClipDataSet&);  // Not implemented.
