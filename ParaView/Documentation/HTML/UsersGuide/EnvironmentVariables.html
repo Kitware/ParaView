@@ -42,7 +42,7 @@ When the assigned processors do not have access to a display, this environment
 variable should be set to "True" (any value will do).  When this varible is set,
 ParaView only maps the render window of the first process.  Software render
 will be used for the other processes.  Of course, using software rendering will 
-affect ParaViews rendering performance.
+affect ParaView's rendering performance.
 </p>
 
 <p>
@@ -81,12 +81,12 @@ the same file at the same time.
 
 <p>
 Setting this envirnment variable to "True" causes ParaView to use a more efficient
-strategry.  The first process reads the entire data set, and the transmits
+strategry.  The first process reads the entire data set, and then transmits
 pieces of the data set to the satellite processes.  Unfortunately, there are some
 VTK pipeline issues that have not been completely resolved with this strategy.
 All processes must execute or a deadlock will occur.  Although most of the time
 ParaView can use this strategy without incident, there is a small possiblilty
-that ParaView might hang.  I can currently only get paraview to hang when using 
+that ParaView might hang.  I can currently only get ParaView to hang when using 
 a vtkCleanPolyDataFilter with result invariance on.  Until this issue is resolved,
 this feature is turned off by default.
 </p>
