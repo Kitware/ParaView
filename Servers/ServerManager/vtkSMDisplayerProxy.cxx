@@ -28,7 +28,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.13.2.1");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -319,7 +319,7 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
     }
 
   vtkSMProxy* actorProxy = this->GetSubProxy("actor");
-  if (!actorProxy)
+  if (!actorProxy || !mapperProxy)
     {
     //vtkErrorMacro("No actor sub-proxy was defined. Please make sure that "
     //              "the configuration file defines it.");

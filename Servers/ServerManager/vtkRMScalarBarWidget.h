@@ -158,6 +158,7 @@ protected:
 
   vtkLookupTable* LookupTable;
   vtkClientServerID LookupTableID;
+  friend class vtkPVColorMap;
 
 private:  
   vtkRMScalarBarWidget(const vtkRMScalarBarWidget&); // Not implemented

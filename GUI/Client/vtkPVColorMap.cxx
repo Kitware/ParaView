@@ -55,7 +55,7 @@
 #include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.104");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.104.2.1");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1388,6 +1388,85 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
   *file << "  $pvTemp" << lookupTableID << " Build"
         << endl;
   *file << endl;
+
+  if (this->ScalarBarVisibility)
+    {
+    
+    *file << endl;
+
+    // First thing define the TextProperty (Title and Label )
+    ostrstream pvTitle, pvLabel;
+    pvTitle << "pvTitle" << this->RMScalarBarWidget->ScalarBarActorID << ends;
+    this->TitleTextPropertyWidget->SaveInBatchScript( pvTitle.str(), file );
+
+    pvLabel << "pvLabel" << this->RMScalarBarWidget->ScalarBarActorID << ends;
+    this->LabelTextPropertyWidget->SaveInBatchScript( pvLabel.str(), file );
+
+    *file << "set pvTemp" <<  this->RMScalarBarWidget->ScalarBarActorID
+          << " [$proxyManager NewProxy rendering ScalarBarActor]"
+          << endl;
+    *file << "  $proxyManager RegisterProxy scalar_bar pvTemp"
+          << this->RMScalarBarWidget->ScalarBarActorID << " $pvTemp" << this->RMScalarBarWidget->ScalarBarActorID
+          << endl;
+    *file << "  $pvTemp" << this->RMScalarBarWidget->ScalarBarActorID << " UnRegister {}" << endl;
+
+    *file << "  [$pvTemp" << this->RMScalarBarWidget->ScalarBarActorID 
+          << " GetProperty LookupTable] AddProxy $pvTemp"
+          << this->RMScalarBarWidget->LookupTableID << endl;
+
+    *file << "  [$pvTemp" << this->RMScalarBarWidget->ScalarBarActorID 
+          << " GetProperty TitleTextProperty] AddProxy $" << pvTitle.str()
+          << endl;
+
+    *file << "  [$pvTemp" << this->RMScalarBarWidget->ScalarBarActorID 
+          << " GetProperty LabelTextProperty] AddProxy $" << pvLabel.str()
+          << endl;
+
+    *file << "  [$pvTemp" << this->RMScalarBarWidget->ScalarBarActorID 
+          << " GetProperty Orientation] SetElements1 "
+          << this->RMScalarBarWidget->ScalarBar->GetScalarBarActor()->GetOrientation() << endl;
+
+    *file << "  [$pvTemp" << this->RMScalarBarWidget->ScalarBarActorID 
+          << " GetProperty Width] SetElements1 " 
+          << this->RMScalarBarWidget->ScalarBar->GetScalarBarActor()->GetWidth() << endl;
+
+    *file << "  [$pvTemp" << this->RMScalarBarWidget->ScalarBarActorID 
+          << " GetProperty Height] SetElements1 " 
+          << this->RMScalarBarWidget->ScalarBar->GetScalarBarActor()->GetHeight() << endl;
+
+    const double *pos = 
+     this->RMScalarBarWidget->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue();
+    *file << "  [$pvTemp" << this->RMScalarBarWidget->ScalarBarActorID 
+          << " GetProperty Position] SetElements2 " 
+          << pos[0] << " " << pos[1] << endl;
+
+    *file << "  [$pvTemp" << this->RMScalarBarWidget->ScalarBarActorID 
+          << " GetProperty Title] SetElement 0 {" 
+          << this->RMScalarBarWidget->ScalarBar->GetScalarBarActor()->GetTitle() << "}" << endl;
+
+    *file << "  [$pvTemp" << this->RMScalarBarWidget->ScalarBarActorID 
+          << " GetProperty LabelFormat] SetElement 0 {" 
+          << this->RMScalarBarWidget->ScalarBar->GetScalarBarActor()->GetLabelFormat() << "}" 
+          << endl;
+
+    pvTitle.rdbuf()->freeze(0);
+    pvLabel.rdbuf()->freeze(0);
+
+    /*  ostrstream ttprop, tlprop;
+    ttprop << "[$pvTemp" << this->ScalarBarActorID  << " GetTitleTextProperty]" << ends;
+    this->TitleTextPropertyWidget->SaveInBatchScript(file, ttprop.str());
+    ttprop.rdbuf()->freeze(0);
+
+    tlprop << "[$pvTemp" << this->ScalarBarActorID  << " GetLabelTextProperty]" << ends;
+    this->LabelTextPropertyWidget->SaveInBatchScript(file, tlprop.str());
+    tlprop.rdbuf()->freeze(0);*/
+    
+    *file << "  [$Ren1 GetProperty Displayers] AddProxy $pvTemp" << this->RMScalarBarWidget->ScalarBarActorID << endl;
+
+    *file << "  $pvTemp" << this->RMScalarBarWidget->ScalarBarActorID << " UpdateVTKObjects"
+          << endl;
+    *file << endl;
+    }
 }
 
 
@@ -1892,4 +1971,3 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VisitedFlag: " << this->VisitedFlag << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
 }
-

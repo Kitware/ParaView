@@ -147,6 +147,7 @@ public:
   // Description:
   // Save out the mapper and actor to a file.
   void SaveInBatchScript(ofstream *file);
+  void SaveTextPropertyInBatchScript(const char* iden, ofstream *file);
 
   // Description:
   // The data needs to lookup table name to set the lookup table of the mapper.

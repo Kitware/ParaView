@@ -80,7 +80,8 @@
          <StringVectorProperty 
              name="ColorArray" 
              command="SelectColorArray" 
-            number_of_elements="1" /> 
+             number_of_elements="1"> 
+         </StringVectorProperty>
 
          <ProxyProperty name="LookupTable" command="SetLookupTable">
            <ProxyGroupDomain name="groups">
@@ -285,6 +286,99 @@
          </Proxy>
        </SubProxy>
      </DisplayWindowProxy>
+
+  <DisplayerProxy name="ScalarBarActor" class="vtkObject">
+    <SubProxy>
+      <Proxy name="actor" class="vtkScalarBarActor">
+        <IntVectorProperty
+          name="Orientation"
+          command="SetOrientation"
+          number_of_elements="1"
+          default_values="1">
+        </IntVectorProperty>
+
+        <DoubleVectorProperty
+          name="Width"
+          command="SetWidth"
+          number_of_elements="1"
+          default_values="0.13">
+        </DoubleVectorProperty>
+
+        <DoubleVectorProperty
+          name="Height"
+          command="SetHeight"
+          number_of_elements="1"
+          default_values="0.5">
+        </DoubleVectorProperty>
+
+        <StringVectorProperty
+          name="Title"
+          command="SetTitle"
+          number_of_elements="1"
+          default_values="my_scalar_bar">
+        </StringVectorProperty>
+
+        <StringVectorProperty
+          name="LabelFormat"
+          command="SetLabelFormat"
+          number_of_elements="1">
+        </StringVectorProperty>
+          
+        <DoubleVectorProperty
+          name="Position"
+          command="SetPosition"
+          number_of_elements="2"
+          default_values="0 0">
+        </DoubleVectorProperty>
+
+        <ProxyProperty name="LookupTable" command="SetLookupTable">
+          <ProxyGroupDomain name="groups">
+            <Group name="lookup_tables"/>
+          </ProxyGroupDomain>
+        </ProxyProperty>
+
+        <ProxyProperty name="TitleTextProperty" command="SetTitleTextProperty">
+          <ProxyGroupDomain name="groups">
+            <Group name="text_properties"/>
+           </ProxyGroupDomain>
+         </ProxyProperty>
+
+         <ProxyProperty name="LabelTextProperty" command="SetLabelTextProperty">
+           <ProxyGroupDomain name="groups">
+             <Group name="text_properties"/>
+           </ProxyGroupDomain>
+         </ProxyProperty>
+       </Proxy>
+     </SubProxy>
+   </DisplayerProxy>
+   
+<!--   <Proxy name="CornerAnnotation" class="vtkObject">-->
+   <DisplayerProxy name="CornerAnnotation" class="vtkObject">
+     <SubProxy>
+       <Proxy name="actor" class="vtkCornerAnnotation">
+         <DoubleVectorProperty
+            name="MaximumLineHeight"
+            command="SetMaximumLineHeight"
+            number_of_elements="1"
+            default_values="0">
+          </DoubleVectorProperty>
+
+          <StringVectorProperty
+             name="Text"
+             command="SetText"
+             number_of_elements="0" 
+             repeat_command="1"
+             number_of_elements_per_command="1"
+             use_index="1"/> 
+
+          <ProxyProperty name="TextProperty" command="SetTextProperty">
+             <ProxyGroupDomain name="groups">
+               <Group name="text_properties"/>
+             </ProxyGroupDomain>
+         </ProxyProperty>
+       </Proxy>
+     </SubProxy>
+   </DisplayerProxy>
 
    </ProxyGroup>
 
