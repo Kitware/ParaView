@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 class vtkKWApplication;
-class vtkKWImageLabel;
 
 class VTK_EXPORT vtkKWSplashScreen : public vtkKWWidget
 {
@@ -72,16 +71,26 @@ public:
   void SetProgressMessage(const char *);
   
   // Description:
-  // Get the image
-  vtkGetObjectMacro(Image, vtkKWImageLabel);
+  // Set/Get the offset of the progress message (negative value means
+  // offset from the bottom of the splash, positive value from the top)
+  virtual void SetProgressMessageVerticalOffset(int);
+  vtkGetMacro(ProgressMessageVerticalOffset, int);
+
+  // Description:
+  // Set/Get the name of the splash image (Tk image name)
+  vtkGetStringMacro(ImageName);
+  virtual void SetImageName(const char*);
   
 protected:
   vtkKWSplashScreen();
   ~vtkKWSplashScreen();
 
-  vtkKWWidget *ProgressMessage;
-  vtkKWImageLabel *Image;
-  vtkKWWidget *MainFrame;
+  vtkKWWidget *Canvas;
+  char *ImageName;
+  int ProgressMessageVerticalOffset;
+
+  void UpdateCanvasSize();
+  void UpdateProgressMessagePosition();
 
 private:
   vtkKWSplashScreen(const vtkKWSplashScreen&); // Not implemented

@@ -42,41 +42,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSplashScreen.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWImageLabel.h"
 #include "vtkObjectFactory.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.5");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.6");
 
 //-----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
 {
-  this->MainFrame = vtkKWWidget::New();
-  this->MainFrame->SetParent(this);
+  this->Canvas = vtkKWWidget::New();
+  this->Canvas->SetParent(this);
 
-  this->ProgressMessage = vtkKWWidget::New();
-  this->ProgressMessage->SetParent(this->MainFrame);
-
-  this->Image = vtkKWImageLabel::New();
-  this->Image->SetParent(this->MainFrame);
+  this->ImageName = NULL;
+  this->ProgressMessageVerticalOffset = -10;
 }
 
 //-----------------------------------------------------------------------------
 vtkKWSplashScreen::~vtkKWSplashScreen()
 {
-  if (this->MainFrame)
+  if (this->Canvas)
     {
-    this->MainFrame->Delete();
+    this->Canvas->Delete();
     }
-  if (this->ProgressMessage)
-    {
-    this->ProgressMessage->Delete();
-    }
-  if (this->Image)
-    {
-    this->Image->Delete();
-    }
+
+  this->SetImageName(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -89,25 +79,64 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
     }
   this->SetApplication(app);
 
+  // Create the toplevel
+
   this->Script("toplevel %s", this->GetWidgetName());
 
   this->Script("wm withdraw %s", this->GetWidgetName());
   this->Script("wm overrideredirect %s 1", this->GetWidgetName());
 
-  this->MainFrame->Create(app, "frame", args);
-  this->Script("%s config -bd 1 -relief solid",
-               this->MainFrame->GetWidgetName());
+  // Create and pack the canvas
 
-  this->Script("pack %s -fill both -expand y",
-               this->MainFrame->GetWidgetName());
+  this->Canvas->Create(app, "canvas", "-borderwidth 0 -highlightthickness 0");
+  this->Script("%s config %s", 
+               this->Canvas->GetWidgetName(), args);
+  this->Script("pack %s -side top -fill both -expand y",
+               this->Canvas->GetWidgetName());
 
-  this->ProgressMessage->Create(app, "label", args);
-  this->Image->Create(app, args);
+  // Insert the image
 
-  this->Script("pack %s %s -side top -fill x -expand y",
-               this->Image->GetWidgetName(),
-               this->ProgressMessage->GetWidgetName());
+  this->Script("%s create image 0 0 -tags image -anchor nw", 
+               this->Canvas->GetWidgetName());
+  
+  // Insert the text
 
+  this->Script("%s create text 0 0 -tags msg -anchor c", 
+               this->Canvas->GetWidgetName());
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWSplashScreen::UpdateCanvasSize()
+{
+  // Resize the canvas according to the image
+
+  if (this->Application && this->ImageName)
+    {
+    int w, h;
+    this->Script("concat [%s cget -width] [%s cget -height]", 
+                 this->ImageName, this->ImageName);
+    sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &w, &h);
+
+    this->Script("%s config -width %d -height %d",
+                 this->Canvas->GetWidgetName(), w, h);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWSplashScreen::UpdateProgressMessagePosition()
+{
+  if (this->Application)
+    {
+    this->Script("%s cget -height", this->Canvas->GetWidgetName());
+    int height = vtkKWObject::GetIntegerResult(this->Application);
+
+    this->Script("%s coords msg [expr 0.5 * [%s cget -width]] %d", 
+                 this->Canvas->GetWidgetName(), 
+                 this->Canvas->GetWidgetName(), 
+                 (ProgressMessageVerticalOffset < 0 
+                  ? height + ProgressMessageVerticalOffset 
+                  : ProgressMessageVerticalOffset));
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -115,21 +144,43 @@ void vtkKWSplashScreen::ShowWithBind()
 {
   this->SetProgressMessage(0);
   this->Show();
-  this->Image->SetBind(this, "<ButtonPress>", "Hide");
+  if (this->Canvas)
+    {
+    this->Canvas->SetBind(this, "<ButtonPress>", "Hide");
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkKWSplashScreen::Show()
 {
+  if (!this->Application)
+    {
+    return;
+    }
+
+  // Update canvas size and message position
+
+  this->UpdateCanvasSize();
+  this->UpdateProgressMessagePosition();
+
+  // Get screen size
+
   int sw, sh;
   this->Script("concat [winfo screenwidth %s] [winfo screenheight %s]",
                this->GetWidgetName(), this->GetWidgetName());
   sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &sw, &sh);
 
-  int w, h;
-  const char *photo  = this->Image->GetImageDataName();
-  this->Script("concat [%s cget -width] [%s cget -height]", photo, photo);
-  sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &w, &h);
+  // Get size of splash from image size
+
+  int w = 0, h = 0;
+  if (this->ImageName)
+    {
+    this->Script("concat [%s cget -width] [%s cget -height]", 
+                 this->ImageName, this->ImageName);
+    sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &w, &h);
+    }
+
+  // Center the splash
 
   int x = (sw - w) / 2;
   int y = (sh - h) / 2;
@@ -148,17 +199,72 @@ void vtkKWSplashScreen::Hide()
   this->Script("wm withdraw %s", this->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
+void vtkKWSplashScreen::SetImageName (const char* _arg)
+{
+  if (this->ImageName == NULL && _arg == NULL) 
+    { 
+    return;
+    }
+
+  if (this->ImageName && _arg && (!strcmp(this->ImageName, _arg))) 
+    {
+    return;
+    }
+
+  if (this->ImageName) 
+    { 
+    delete [] this->ImageName; 
+    }
+
+  if (_arg)
+    {
+    this->ImageName = new char[strlen(_arg)+1];
+    strcpy(this->ImageName, _arg);
+    }
+  else
+    {
+    this->ImageName = NULL;
+    }
+
+  this->Modified();
+
+  if (this->Application && this->ImageName)
+    {
+    this->Script("%s itemconfigure image -image %s", 
+                 this->Canvas->GetWidgetName(), this->ImageName);
+    }
+} 
+
 //-----------------------------------------------------------------------------
 void vtkKWSplashScreen::SetProgressMessage(const char *txt)
 {
-  this->Script("%s configure -text {%s}",
-               this->ProgressMessage->GetWidgetName(), (txt?txt:""));
-  this->Show();
+  if (this->Application)
+    {
+    this->Script("%s itemconfigure msg -text {%s}",
+                 this->Canvas->GetWidgetName(), (txt ? txt : ""));
+    this->Show();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWSplashScreen::SetProgressMessageVerticalOffset(int _arg)
+{
+  if (this->ProgressMessageVerticalOffset == _arg)
+    {
+    return;
+    }
+
+  this->ProgressMessageVerticalOffset = _arg;
+  this->Modified();
+
+  this->UpdateProgressMessagePosition();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWSplashScreen::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Image: " << this->GetImage() << endl;
+  os << indent << "ProgressMessageVerticalOffset: " << this->ProgressMessageVerticalOffset << endl;
+  os << indent << "ImageName: " << this->ImageName << endl;
 }
