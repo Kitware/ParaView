@@ -48,6 +48,7 @@ static const char *vtkKWEventStrings[] = {
   "ContourAnnotationActiveChangedEvent",
   "ContourAnnotationAddAtPositionEvent",
   "ContourAnnotationAddEvent",
+  "ContourAnnotationColorByScalarsChangedEvent",
   "ContourAnnotationColorChangedEvent",
   "ContourAnnotationComputeStatisticsEvent",
   "ContourAnnotationLineWidthChangedEvent",

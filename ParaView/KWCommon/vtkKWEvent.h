@@ -58,6 +58,7 @@ class VTK_EXPORT vtkKWEvent
     ContourAnnotationActiveChangedEvent,
     ContourAnnotationAddAtPositionEvent,
     ContourAnnotationAddEvent,
+    ContourAnnotationColorByScalarsChangedEvent,
     ContourAnnotationColorChangedEvent,
     ContourAnnotationComputeStatisticsEvent,
     ContourAnnotationLineWidthChangedEvent,
