@@ -482,14 +482,15 @@ if $FoundFiles {
 	place .control.main.info -rely 0 -relx 0.5 -anchor n
 	place .control.main.stop  -rely 0.95 -relx 0.5 -anchor s
 	
-	set pvDemoShouldStop 0
-	for {set i 0} {$i < $length} {incr i 1} {
-	    set TestName [lindex $Demos $i]
-	    set pvDemoRetVals($TestName) [eval ${TestName}Init]
-	}
-	if $pvDemoShouldStop { set pvDemoStopNow 1 }
 	
     }
+
+    set pvDemoShouldStop 0
+    for {set i 0} {$i < $length} {incr i 1} {
+	set TestName [lindex $Demos $i]
+	set pvDemoRetVals($TestName) [eval ${TestName}Init]
+    }
+    if $pvDemoShouldStop { set pvDemoStopNow 1 }
     
     wm deiconify .control
     if !$pvDemoStopNow {
