@@ -2584,7 +2584,8 @@ void vtkPVData::SetActorTranslate(float x, float y, float z)
   this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
                                             this->PropTclName, x, y, z);
   this->AddTraceEntry("$kw(%s) SetActorTranslate %f %f %f",
-                      this->GetTclName(), x, y, z);
+                      this->GetTclName(), x, y, z);  
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
