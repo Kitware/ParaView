@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.19");
+vtkCxxRevisionMacro(vtkKWListBox, "1.20");
 
 
 //----------------------------------------------------------------------------
@@ -346,5 +346,6 @@ void vtkKWListBox::SetBalloonHelpJustification( int j )
 void vtkKWListBox::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << "Listbox " << this->Listbox << endl;
 }
 
