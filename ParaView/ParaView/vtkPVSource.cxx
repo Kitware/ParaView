@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.268");
+vtkCxxRevisionMacro(vtkPVSource, "1.269");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2281,6 +2281,10 @@ int vtkPVSource::InitializeData()
                    dataName, dataName);
       pvApp->GetProcessModule()->InitializePVPartPartition(part);
       pvd->AddPVPart(part);
+      // This initialization should be done by a render module.
+      part->SetCollectionDecision(this->GetPVWindow()->MakeCollectionDecision());
+      part->SetLODCollectionDecision(this->GetPVWindow()->MakeLODCollectionDecision());
+
       part->Delete();
   
       // Create the extent translator
@@ -2502,7 +2506,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.268 $");
+  this->ExtractRevision(os,"$Revision: 1.269 $");
 }
 
 //----------------------------------------------------------------------------

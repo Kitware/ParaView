@@ -87,7 +87,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.9");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.10");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -403,6 +403,7 @@ void vtkPVMPIProcessModule::GatherDataInformation(vtkSource *deci)
 void vtkPVMPIProcessModule::InitializePVPartPartition(vtkPVPart *part)
 {
   int numProcs, id;
+  vtkPVApplication* pvApp = this->GetPVApplication();
 
   // Hard code assignment based on processes.
   numProcs = this->GetNumberOfPartitions();
@@ -411,7 +412,7 @@ void vtkPVMPIProcessModule::InitializePVPartPartition(vtkPVPart *part)
   // This allows us to debug the parallel features of the
   // application and VTK on only one process.
   int debugNum = numProcs;
-  if (getenv("PV_DEBUG_ZERO") != NULL)
+  if (pvApp->GetUseTiledDisplay())
     {
     this->Script("%s SetNumberOfPieces 0",part->GetMapperTclName());
     this->Script("%s SetPiece 0", part->GetMapperTclName());

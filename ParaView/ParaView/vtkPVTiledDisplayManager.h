@@ -141,7 +141,6 @@ protected:
 
   // On: Composite, Off, assume geometry copied to all tile procs.
   int UseCompositing;
-  int CompositeFlag;
 
   void Composite();
 

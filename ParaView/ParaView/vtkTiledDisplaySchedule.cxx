@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 
 
-vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.2");
+vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.3");
 vtkStandardNewMacro(vtkTiledDisplaySchedule);
 
 
@@ -542,7 +542,7 @@ void vtkTiledDisplaySchedule::InitializeTiles(int numTiles, int numProcs)
   for (tIdx = 0; tIdx < numTiles; ++tIdx)
     {
     ts = tileSchedules[tIdx];
-    delete ts;
+    ts->Delete();
     tileSchedules[tIdx] = NULL;
     }
   delete [] tileSchedules;

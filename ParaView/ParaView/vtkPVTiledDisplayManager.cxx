@@ -43,7 +43,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.6");
+vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.7");
 vtkStandardNewMacro(vtkPVTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
@@ -553,6 +553,7 @@ struct vtkPVTiledDisplayRenderWindowInfo
   int Size[2];
   int NumberOfRenderers;
   int ReductionFactor;
+  int UseCompositing;
 };
 
 struct vtkPVTiledDisplayRendererInfo 
@@ -607,7 +608,7 @@ vtkPVTiledDisplayManager::vtkPVTiledDisplayManager()
 
   this->Schedule = NULL;
   this->ZeroEmpty = 1;
-  this->CompositeFlag = 1;
+  this->UseCompositing = 1;
 
   this->CompositeUtilities = vtkPVCompositeUtilities::New();
 
@@ -808,9 +809,8 @@ void vtkPVTiledDisplayManager::Composite()
     cam = ren->GetActiveCamera();
     }
 
-  // This flag should really be transmitted from the root.
-  // This is a place holder until I activate the feature.
-  if ( ! this->CompositeFlag)
+  // If this flag is set by the root, then skip compositing.
+  if ( ! this->UseCompositing)
     { // Just set up this one tile and render.
     // Figure out the tile indexes.
     i = this->Controller->GetLocalProcessId() - 1;
@@ -1034,6 +1034,7 @@ void vtkPVTiledDisplayManager::SatelliteStartRender()
   winInfo.Size[0] = winInfo.Size[1] = 0;
   winInfo.NumberOfRenderers = 1;
   winInfo.ReductionFactor = 1;
+  winInfo.UseCompositing = 1;
 
   // Receive the window size.
   controller->Receive((char*)(&winInfo), 
@@ -1041,6 +1042,7 @@ void vtkPVTiledDisplayManager::SatelliteStartRender()
                       vtkPVTiledDisplayManager::WIN_INFO_TAG);
   //renWin->SetDesiredUpdateRate(winInfo.DesiredUpdateRate);
   this->ReductionFactor = winInfo.ReductionFactor;
+  this->UseCompositing = winInfo.UseCompositing;
 
   // Synchronize the renderers.
   rens = renWin->GetRenderers();
@@ -1165,8 +1167,10 @@ void vtkPVTiledDisplayManager::StartRender()
   winInfo.Size[0] = size[0]/this->ReductionFactor;
   winInfo.Size[1] = size[1]/this->ReductionFactor;
   winInfo.NumberOfRenderers = rens->GetNumberOfItems();
+  winInfo.UseCompositing = this->UseCompositing;
   // We should send the reduction factor !!!
-  if (this->RenderWindow->GetDesiredUpdateRate() > 2.0)
+  if (this->RenderWindow->GetDesiredUpdateRate() > 2.0 &&
+      this->UseCompositing)
     {
     winInfo.ReductionFactor = this->LODReductionFactor;
     }

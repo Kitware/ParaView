@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.5");
+vtkCxxRevisionMacro(vtkPVPart, "1.6");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -264,7 +264,12 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
       }
     else if (pvApp->GetUseTiledDisplay())
       {
-      pvApp->BroadcastScript("vtkDuplicatePolyData %s", tclName);
+      int numProcs = pvApp->GetController()->GetNumberOfProcesses();
+      int* dims = pvApp->GetTileDimensions();
+      pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
+      pvApp->BroadcastScript("%s InitializeSchedule %d %d", tclName,
+                             numProcs, dims[0]*dims[1]);
+      // Initialize collection descision here. (When we have rendering module).
       }
     else
       {
@@ -290,7 +295,12 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
       }
     else if (pvApp->GetUseTiledDisplay())
       {
-      pvApp->BroadcastScript("vtkDuplicatePolyData %s", tclName);
+      int numProcs = pvApp->GetController()->GetNumberOfProcesses();
+      int* dims = pvApp->GetTileDimensions();
+      pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
+      pvApp->BroadcastScript("%s InitializeSchedule %d %d", tclName,
+                             numProcs, dims[0]*dims[1]);
+      // Initialize collection descision here. (When we have rendering module).
       }
     else
       {

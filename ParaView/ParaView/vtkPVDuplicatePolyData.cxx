@@ -26,7 +26,7 @@
 #include "vtkSocketController.h"
 #include "vtkTiledDisplaySchedule.h"
 
-vtkCxxRevisionMacro(vtkPVDuplicatePolyData, "1.2");
+vtkCxxRevisionMacro(vtkPVDuplicatePolyData, "1.3");
 vtkStandardNewMacro(vtkPVDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkPVDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -61,8 +61,8 @@ vtkPVDuplicatePolyData::~vtkPVDuplicatePolyData()
 //-----------------------------------------------------------------------------
 void vtkPVDuplicatePolyData::InitializeSchedule(int numProcs, int numTiles)
 {
-  // The +1 is for zeroEmpty.
-  this->Schedule->InitializeTiles(numTiles, (numProcs+1));
+  // The -1 is for zeroEmpty.
+  this->Schedule->InitializeTiles(numTiles, (numProcs-1));
 }
 
 //-----------------------------------------------------------------------------
@@ -172,7 +172,8 @@ void vtkPVDuplicatePolyData::Execute()
         tmp = NULL;
         }
       tmp = vtkPolyData::New();
-      this->Controller->Receive(tmp, otherProcessId, 12329);
+      // +1 is for zeroEmpty condition.
+      this->Controller->Receive(tmp, otherProcessId+1, 12329);
       appendFilters[tileId]->AddInput(tmp);
       tmp->Delete();
       tmp = NULL;
@@ -182,13 +183,15 @@ void vtkPVDuplicatePolyData::Execute()
       tileId = this->Schedule->GetElementTileId(myId, idx);
       if (appendFilters[tileId] == NULL)
         {
-        this->Controller->Send(input, otherProcessId, 12329);
+        // +1 is for zeroEmpty condition.
+        this->Controller->Send(input, otherProcessId+1, 12329);
         }
       else
         {
         tmp = appendFilters[tileId]->GetOutput();
         tmp->Update();
-        this->Controller->Send(tmp, otherProcessId, 12329);
+        // +1 is for zeroEmpty condition.
+        this->Controller->Send(tmp, otherProcessId+1, 12329);
         // No longer need this filter.
         appendFilters[tileId]->Delete();
         appendFilters[tileId] = NULL;

@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.240");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.241");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -543,8 +543,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
     int *tileDim = pvApp->GetTileDimensions();
     pvApp->BroadcastScript("TDispManager1 SetTileDimensions %d %d",
                            tileDim[0], tileDim[1]);
-    pvApp->BroadcastScript("TDispManager1 SetNumberOfProcesses %d",
-               pvApp->GetController()->GetNumberOfProcesses());
     pvApp->BroadcastScript("TDispManager1 InitializeSchedule");
 
     this->CompositeTclName = NULL;
@@ -2655,7 +2653,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.240 $");
+  this->ExtractRevision(os,"$Revision: 1.241 $");
 }
 
 //------------------------------------------------------------------------------

@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.419");
+vtkCxxRevisionMacro(vtkPVWindow, "1.420");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -494,7 +494,7 @@ int vtkPVWindow::MakeLODCollectionDecision()
     {
     pvd = pvs->GetPVOutput();
     numParts = pvd->GetNumberOfPVParts();
-    for (partIdx = 0; partIdx < numParts; ++numParts)
+    for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
       pvp = pvd->GetPVPart(partIdx);
       pvp->SetLODCollectionDecision(this->LODCollectionDecision);
@@ -4047,7 +4047,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.419 $");
+  this->ExtractRevision(os,"$Revision: 1.420 $");
 }
 
 //-----------------------------------------------------------------------------
