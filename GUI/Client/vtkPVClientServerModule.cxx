@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.69");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.70");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -725,6 +725,14 @@ void vtkPVClientServerModule::Exit()
     vtkErrorMacro("Not expecting server to call Exit.");
     return;
     }
+
+  if (this->MPIMToNSocketConnectionID.ID)
+    {    
+    this->DeleteStreamObject(this->MPIMToNSocketConnectionID);
+    this->SendStreamToRenderServerAndServer();
+    this->MPIMToNSocketConnectionID.ID = 0;
+    }
+ 
 
   // If we are being called because a connection was not established,
   // we don't need to cleanup the connection.
