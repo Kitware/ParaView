@@ -1,0 +1,287 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkPVCutter.cxx
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+Copyright (c) 1998-2000 Kitware Inc. 469 Clifton Corporate Parkway,
+Clifton Park, NY, 12065, USA.
+
+All rights reserved. No part of this software may be reproduced, distributed,
+or modified, in any form or by any means, without permission in writing from
+Kitware Inc.
+
+IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY FOR
+DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
+OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES THEREOF,
+EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
+"AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
+MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+
+=========================================================================*/
+
+#include "vtkPVCutter.h"
+#include "vtkPVApplication.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVPolyData.h"
+#include "vtkPVWindow.h"
+#include "vtkPVActorComposite.h"
+
+
+int vtkPVCutterCommand(ClientData cd, Tcl_Interp *interp,
+		       int argc, char *argv[]);
+
+//----------------------------------------------------------------------------
+vtkPVCutter::vtkPVCutter()
+{
+  this->CommandFunction = vtkPVCutterCommand;
+  
+  this->Accept = vtkKWPushButton::New();
+  this->Accept->SetParent(this->Properties);
+  this->SourceButton = vtkKWPushButton::New();
+  this->SourceButton->SetParent(this->Properties);
+
+  this->OriginFrame = vtkKWLabeledFrame::New();
+  this->OriginFrame->SetParent(this->Properties);
+  this->NormalFrame = vtkKWLabeledFrame::New();
+  this->NormalFrame->SetParent(this->Properties);
+  this->OriginXLabel = vtkKWLabel::New();
+  this->OriginYLabel = vtkKWLabel::New();
+  this->OriginZLabel = vtkKWLabel::New();
+  this->NormalXLabel = vtkKWLabel::New();
+  this->NormalYLabel = vtkKWLabel::New();
+  this->NormalZLabel = vtkKWLabel::New();
+  this->OriginXEntry = vtkKWEntry::New();
+  this->OriginYEntry = vtkKWEntry::New();
+  this->OriginZEntry = vtkKWEntry::New();
+  this->NormalXEntry = vtkKWEntry::New();
+  this->NormalYEntry = vtkKWEntry::New();
+  this->NormalZEntry = vtkKWEntry::New();
+  
+  this->Cutter = vtkCutter::New();  
+}
+
+//----------------------------------------------------------------------------
+vtkPVCutter::~vtkPVCutter()
+{ 
+  this->Accept->Delete();
+  this->Accept = NULL;
+  
+  this->SourceButton->Delete();
+  this->SourceButton = NULL;
+  
+  this->OriginXLabel->Delete();
+  this->OriginXLabel = NULL;
+  this->OriginYLabel->Delete();
+  this->OriginYLabel = NULL;
+  this->OriginZLabel->Delete();
+  this->OriginZLabel = NULL;
+  this->NormalXLabel->Delete();
+  this->NormalXLabel = NULL;
+  this->NormalYLabel->Delete();
+  this->NormalYLabel = NULL;
+  this->NormalZLabel->Delete();
+  this->NormalZLabel = NULL;
+  this->OriginXEntry->Delete();
+  this->OriginXEntry = NULL;
+  this->OriginYEntry->Delete();
+  this->OriginYEntry = NULL;
+  this->OriginZEntry->Delete();
+  this->OriginZEntry = NULL;
+  this->NormalXEntry->Delete();
+  this->NormalXEntry = NULL;
+  this->NormalYEntry->Delete();
+  this->NormalYEntry = NULL;
+  this->NormalZEntry->Delete();
+  this->NormalZEntry = NULL;
+  this->OriginFrame->Delete();
+  this->OriginFrame = NULL;
+  this->NormalFrame->Delete();
+  this->NormalFrame = NULL;
+  
+  this->Cutter->Delete();
+  this->Cutter = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkPVCutter* vtkPVCutter::New()
+{
+  return new vtkPVCutter();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::CreateProperties()
+{
+  this->vtkPVSource::CreateProperties();
+  
+  this->SourceButton->Create(this->Application, "-text GetSource");
+  this->SourceButton->SetCommand(this, "GetSource");
+  this->Script("pack %s", this->SourceButton->GetWidgetName());
+
+  this->Accept->Create(this->Application, "-text Accept");
+  this->Accept->SetCommand(this, "CutterChanged");
+  this->Script("pack %s", this->Accept->GetWidgetName());
+  
+  this->OriginFrame->Create(this->Application);
+  this->OriginFrame->SetLabel("Origin");
+  this->NormalFrame->Create(this->Application);
+  this->NormalFrame->SetLabel("Normal");
+  this->Script("pack %s %s", this->OriginFrame->GetWidgetName(),
+	       this->NormalFrame->GetWidgetName());
+  
+  this->OriginXLabel->SetParent(this->OriginFrame->GetFrame());
+  this->OriginXLabel->Create(this->Application, "");
+  this->OriginXLabel->SetLabel("X: ");
+  this->OriginXEntry->SetParent(this->OriginFrame->GetFrame());
+  this->OriginXEntry->Create(this->Application, "-width 5");
+  this->OriginXEntry->SetValue(0, 2);
+  this->OriginYLabel->SetParent(this->OriginFrame->GetFrame());
+  this->OriginYLabel->Create(this->Application, "");
+  this->OriginYLabel->SetLabel("Y: ");
+  this->OriginYEntry->SetParent(this->OriginFrame->GetFrame());
+  this->OriginYEntry->Create(this->Application, "-width 5");
+  this->OriginYEntry->SetValue(0, 2);
+  this->OriginZLabel->SetParent(this->OriginFrame->GetFrame());
+  this->OriginZLabel->Create(this->Application, "");
+  this->OriginZLabel->SetLabel("Z: ");
+  this->OriginZEntry->SetParent(this->OriginFrame->GetFrame());
+  this->OriginZEntry->Create(this->Application, "-width 5");
+  this->OriginZEntry->SetValue(0, 2);
+  this->Script("pack %s %s %s %s %s %s -side left -fill x",
+	       this->OriginXLabel->GetWidgetName(),
+	       this->OriginXEntry->GetWidgetName(),
+	       this->OriginYLabel->GetWidgetName(),
+	       this->OriginYEntry->GetWidgetName(),
+	       this->OriginZLabel->GetWidgetName(),
+	       this->OriginZEntry->GetWidgetName());
+  
+  this->NormalXLabel->SetParent(this->NormalFrame->GetFrame());
+  this->NormalXLabel->Create(this->Application, "");
+  this->NormalXLabel->SetLabel("X: ");
+  this->NormalXEntry->SetParent(this->NormalFrame->GetFrame());
+  this->NormalXEntry->Create(this->Application, "-width 5");
+  this->NormalXEntry->SetValue(0, 2);
+  this->NormalYLabel->SetParent(this->NormalFrame->GetFrame());
+  this->NormalYLabel->Create(this->Application, "");
+  this->NormalYLabel->SetLabel("Y: ");
+  this->NormalYEntry->SetParent(this->NormalFrame->GetFrame());
+  this->NormalYEntry->Create(this->Application, "-width 5");
+  this->NormalYEntry->SetValue(1, 2);
+  this->NormalZLabel->SetParent(this->NormalFrame->GetFrame());
+  this->NormalZLabel->Create(this->Application, "");
+  this->NormalZLabel->SetLabel("Z: ");
+  this->NormalZEntry->SetParent(this->NormalFrame->GetFrame());
+  this->NormalZEntry->Create(this->Application, "-width 5");
+  this->NormalZEntry->SetValue(0, 2);
+  this->Script("pack  %s %s %s %s %s %s -side left -fill x",
+	       this->NormalXLabel->GetWidgetName(),
+	       this->NormalXEntry->GetWidgetName(),
+	       this->NormalYLabel->GetWidgetName(),
+	       this->NormalYEntry->GetWidgetName(),
+	       this->NormalZLabel->GetWidgetName(),
+	       this->NormalZEntry->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::SetInput(vtkPVData *pvData)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+			   pvData->GetTclName());
+    }  
+  
+  this->GetCutter()->SetInput(pvData->GetData());
+  this->Input = pvData;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::SetOutput(vtkPVPolyData *pvd)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(),
+			   pvd->GetTclName());
+    }  
+  
+  this->SetPVData(pvd);  
+  pvd->SetData(this->Cutter->GetOutput());
+}
+
+//----------------------------------------------------------------------------
+vtkPVPolyData *vtkPVCutter::GetOutput()
+{
+  return vtkPVPolyData::SafeDownCast(this->Output);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::CutterChanged()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVWindow *window = this->GetWindow();
+  vtkPVPolyData *pvd;
+  vtkPVAssignment *a;
+  vtkPVActorComposite *ac;
+
+  this->SetCutPlane(this->OriginXEntry->GetValueAsFloat(),
+		    this->OriginYEntry->GetValueAsFloat(),
+		    this->OriginZEntry->GetValueAsFloat(),
+		    this->NormalXEntry->GetValueAsFloat(),
+		    this->NormalYEntry->GetValueAsFloat(),
+		    this->NormalZEntry->GetValueAsFloat());
+  
+  if (this->GetPVData() == NULL)
+    { // This is the first time.  Create the data.
+    pvd = vtkPVPolyData::New();
+    pvd->Clone(pvApp);
+    this->SetOutput(pvd);
+    a = this->GetInput()->GetAssignment();
+    pvd->SetAssignment(a);
+    this->GetInput()->GetActorComposite()->VisibilityOff();
+    this->CreateDataPage();
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
+    }
+  window->GetMainView()->SetSelectedComposite(this);
+  this->GetView()->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::SetCutPlane(float originX, float originY, float originZ,
+			      float normalX, float normalY, float normalZ)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPlane *plane = vtkPlane::New();
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetCutPlane %f %f %f %f %f %f",
+			   this->GetTclName(), originX, originY, originZ,
+			   normalX, normalY, normalZ);
+    }
+  plane->SetOrigin(originX, originY, originZ);
+  plane->SetNormal(normalX, normalY, normalZ);
+  this->GetCutter()->SetCutFunction(plane);
+  plane->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutter::GetSource()
+{
+  this->GetPVData()->GetActorComposite()->VisibilityOff();
+  this->GetWindow()->GetMainView()->
+    SetSelectedComposite(this->GetInput()->GetPVSource());
+  this->GetInput()->GetActorComposite()->VisibilityOn();
+  this->GetView()->Render();
+  this->GetWindow()->GetMainView()->ResetCamera();
+}

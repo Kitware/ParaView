@@ -32,6 +32,7 @@ vtkPVAssignment \
 vtkPVColorByProcess \
 vtkPVConeSource \
 vtkPVContourFilter \
+vtkPVCutter \
 vtkPVData \
 vtkPVDataSetToDataSetFilter \
 vtkPVElevationFilter \
