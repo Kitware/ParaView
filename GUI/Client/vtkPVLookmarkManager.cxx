@@ -114,17 +114,18 @@
 #include "vtkClientServerStream.h"
 #include "vtkClientServerID.h"
 
+#include <vtkstd/string>
+
 #ifndef _WIN32
   #include <sys/wait.h>
   #include <unistd.h>
 #endif
-#include <sstream>
 #include <vtkstd/vector>
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.4");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.5");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -1293,12 +1294,12 @@ void vtkPVLookmarkManager::ImportLookmarksInternal(int locationOfLmkItemAmongSib
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::SetLookmarkIconCommand(vtkKWLookmark *lmkWidget, vtkIdType index)
 {
-  vtkstd::ostringstream viewCallback;
+  ostrstream viewCallback;
   viewCallback << "ViewLookmarkCallback " << index;
   lmkWidget->GetLmkIcon()->UnsetBind("<Button-1>");
   lmkWidget->GetLmkIcon()->UnsetBind("<Double-1>");
-  lmkWidget->GetLmkIcon()->SetBind(this, "<Button-1>", viewCallback.str().c_str());
-  lmkWidget->GetLmkIcon()->SetBind(this, "<Double-1>", viewCallback.str().c_str());
+  lmkWidget->GetLmkIcon()->SetBind(this, "<Button-1>", viewCallback.str());
+  lmkWidget->GetLmkIcon()->SetBind(this, "<Double-1>", viewCallback.str());
 }
 
 //----------------------------------------------------------------------------
@@ -1713,7 +1714,7 @@ void vtkPVLookmarkManager::StoreStateScript(vtkPVLookmark *lmk)
   FILE *lookmarkScript;
   char *buf = new char[300];
   char *stateScript;
-  vtkstd::ostringstream state;
+  ostrstream state;
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
 
   win->SetSaveVisibleSourcesOnlyFlag(1);
@@ -1729,8 +1730,8 @@ void vtkPVLookmarkManager::StoreStateScript(vtkPVLookmark *lmk)
   state << ends;
   fclose(lookmarkScript);
   delete [] buf;
-  stateScript = new char[strlen(state.str().c_str())+1];
-  strcpy(stateScript,state.str().c_str());
+  stateScript = new char[strlen(state.str())+1];
+  strcpy(stateScript,state.str());
   lmk->SetStateScript(stateScript);
   delete [] stateScript;
 
@@ -3958,30 +3959,33 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget, int forceRemoveFlag)
+void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget, 
+                                                 int forceRemoveFlag)
 {
   vtkIdType loc;
   vtkKWWidget *widget;
-  vtkKWWidgetCollection *col;
 
-  // Beginning at the Lookmark Manager's internal frame, we are going through each of its nested widgets (nestedWidget)
+  // Beginning at the Lookmark Manager's internal frame, we are going through
+  // each of its nested widgets (nestedWidget)
 
   if(nestedWidget->IsA("vtkKWLookmarkFolder"))
     {
-    vtkKWLookmarkFolder *oldLmkFolder = vtkKWLookmarkFolder::SafeDownCast(nestedWidget);
+    vtkKWLookmarkFolder *oldLmkFolder = 
+      vtkKWLookmarkFolder::SafeDownCast(nestedWidget);
     if(this->LmkFolderWidgets->IsItemPresent(oldLmkFolder))
       {
       if(oldLmkFolder->GetSelectionState() || forceRemoveFlag)
         {
         this->RemoveItemAsDragAndDropTarget(oldLmkFolder);
-        this->DecrementHigherSiblingLmkItemLocationIndices(oldLmkFolder->GetParent(),oldLmkFolder->GetLocation());
+        this->DecrementHigherSiblingLmkItemLocationIndices(
+          oldLmkFolder->GetParent(),oldLmkFolder->GetLocation());
         this->LmkFolderWidgets->FindItem(oldLmkFolder,loc);
         this->LmkFolderWidgets->RemoveItem(loc);
 
         //loop through all children to this container's LabeledFrame
-        vtkKWWidgetCollection *col = oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()->GetChildren();
-
-        vtkCollectionIterator *it = col->NewIterator();
+        vtkCollectionIterator *it = 
+          oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()
+          ->GetChildren()->NewIterator();
         it->InitTraversal();
         while ( !it->IsDoneWithTraversal() )
           {
@@ -3999,9 +4003,9 @@ void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget, int 
       else
         {
         //loop through all children to this container's LabeledFrame
-        vtkKWWidgetCollection *col = oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()->GetChildren();
-
-        vtkCollectionIterator *it = col->NewIterator();
+        vtkCollectionIterator *it = 
+          oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()
+          ->GetChildren()->NewIterator();
         it->InitTraversal();
         while ( !it->IsDoneWithTraversal() )
           {
@@ -4024,7 +4028,8 @@ void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget, int 
       if(oldLmkWidget->GetSelectionState() || forceRemoveFlag)
         {
         this->RemoveItemAsDragAndDropTarget(oldLmkWidget);
-        this->DecrementHigherSiblingLmkItemLocationIndices(oldLmkWidget->GetParent(),oldLmkWidget->GetLocation());
+        this->DecrementHigherSiblingLmkItemLocationIndices(
+          oldLmkWidget->GetParent(),oldLmkWidget->GetLocation());
         this->KWLookmarks->FindItem(oldLmkWidget,loc);
         this->PVLookmarks->GetItem(loc,lookmark);
         this->KWLookmarks->RemoveItem(loc);
@@ -4040,9 +4045,7 @@ void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget, int 
     }
   else
     {
-    col = nestedWidget->GetChildren();
-
-    vtkCollectionIterator *it = col->NewIterator();
+    vtkCollectionIterator *it = nestedWidget->GetChildren()->NewIterator();
     it->InitTraversal();
     while ( !it->IsDoneWithTraversal() )
       {
