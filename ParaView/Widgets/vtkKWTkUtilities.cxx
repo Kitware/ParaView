@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWTkUtilities.h"
 
 #include "vtkBase64Utility.h"
+#include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
@@ -58,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10.2.4");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10.2.5");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,

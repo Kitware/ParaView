@@ -40,16 +40,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkCornerAnnotation.h"
-#include "vtkObjectFactory.h"
-#include "vtkTextMapper.h"
-#include "vtkImageMapToWindowLevelColors.h"
+
 #include "vtkImageActor.h"
-#include "vtkViewport.h"
+#include "vtkImageData.h"
+#include "vtkImageMapToWindowLevelColors.h"
+#include "vtkObjectFactory.h"
 #include "vtkPropCollection.h"
+#include "vtkTextMapper.h"
+#include "vtkViewport.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.21.2.1");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.21.2.2");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,

@@ -42,21 +42,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCameraIcon.h"
 
 #include "vtkCamera.h"
+#include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkImageResample.h"
 #include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
+#include "vtkPNGWriter.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkWindowToImageFilter.h"
 
-#include "vtkPNGWriter.h"
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.4.2.4");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.4.2.5");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
