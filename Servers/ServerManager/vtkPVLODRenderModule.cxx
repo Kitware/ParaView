@@ -26,14 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModule);
-vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.3");
-
-//int vtkPVLODRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
-//                             int argc, char *argv[]);
-
-
-//***************************************************************************
-//===========================================================================
+vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVLODRenderModule::vtkPVLODRenderModule()
@@ -65,6 +58,8 @@ void PVLODRenderModuleAbortCheck(vtkObject*, unsigned long, void* arg, void*)
     }
 }
 
+
+//----------------------------------------------------------------------------
 
 void vtkPVLODRenderModule::SetProcessModule(vtkProcessModule *pm)
 {
@@ -122,35 +117,26 @@ void vtkPVLODRenderModule::InteractiveRender()
   vtkTimerLog::MarkEndEvent("Interactive Render");
 }
 
-
-
-
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVLODRenderModule::SetLODThreshold(float threshold)
-{
-  this->LODThreshold = threshold;
-}
-
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModule::SetLODResolution(int resolution)
 {
-  vtkObject* object;
-  vtkPVLODPartDisplay* partDisp;
-
-  this->LODResolution = resolution;
-
-  this->Displays->InitTraversal();
-  while ( (object = this->Displays->GetNextItemAsObject()) )
+  if( this->LODResolution != resolution )
     {
-    partDisp = vtkPVLODPartDisplay::SafeDownCast(object);
-    if (partDisp)
+    vtkObject* object;
+    vtkPVLODPartDisplay* partDisp;
+
+    this->LODResolution = resolution;
+
+    this->Displays->InitTraversal();
+    while ( (object = this->Displays->GetNextItemAsObject()) )
       {
-      partDisp->SetLODResolution(resolution);
+      partDisp = vtkPVLODPartDisplay::SafeDownCast(object);
+      if (partDisp)
+        {
+        partDisp->SetLODResolution(resolution);
+        }
       }
-    } 
+    }
 }
 
 

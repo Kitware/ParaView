@@ -44,7 +44,7 @@ public:
   // Description:
   // This methods can be used from a script.  
   // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetLODThreshold(float);
+  vtkSetMacro(LODThreshold, float);
   vtkGetMacro(LODThreshold, float);
 
   // Description:
@@ -73,7 +73,7 @@ protected:
   unsigned long TotalVisibleLODMemorySize;
 
   float LODThreshold;
-  int LODResolution;
+  int   LODResolution;
 
   unsigned long AbortCheckTag;
 
