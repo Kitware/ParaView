@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.2.2.2");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.2.2.3");
 
 
 //----------------------------------------------------------------------------
@@ -286,7 +286,7 @@ void vtkPVClientServerModule::Initialize()
     // Check if versions matched
     int tmpmatch;
     this->SocketController->Receive(&tmpmatch, 1, 1, 8843);
-    if (!tmpmatch)
+    if (dsmatch && !tmpmatch)
       {
       vtkErrorMacro("Client and data server versions do not match. "
                     "Please make sure that you are using the right "
