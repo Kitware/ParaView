@@ -174,8 +174,6 @@ int main(int argc, char* argv[])
   vtkstd::string output = argv[1];
   vtkstd::string input = argv[2];
 
-  ostrstream createstring;
-  ostrstream lenstr;
   int cc;
   for ( cc = 6; cc < argc; cc ++ )
     {
@@ -188,6 +186,8 @@ int main(int argc, char* argv[])
       return 1;
       }
     int kk;
+  ostrstream createstring;
+  ostrstream lenstr;
     for ( kk = 0; kk < num; kk ++ )
       {
       lenstr << endl 
@@ -196,21 +196,22 @@ int main(int argc, char* argv[])
       createstring << "  strcat(res, " << ot.Prefix.c_str() << argv[cc] << ot.Suffix.c_str()
         << kk << ");" << endl;
       }
-    }
+    ot.Stream
+      << "// Get single string" << endl
+      << "char* " << ot.Prefix.c_str() << argv[cc] << argv[5] << "()" << endl
+      << "{" << endl
+      << "  int len = ( 0"
+      << lenstr.rdbuf()
+      << " );" << endl
+      << "  char* res = new char[ len + 1];" << endl
+      << "  res[0] = 0;" << endl
+      << createstring.rdbuf()
+      << "  return res;" << endl
+      << "}" << endl << endl;
+  }
   
   ot.Stream
     << endl << endl
-    << "// Get single string" << endl
-    << "char* " << ot.Prefix.c_str() << argv[5] << "()" << endl
-    << "{" << endl
-    << "  int len = ( 0"
-    << lenstr.rdbuf()
-    << " );" << endl
-    << "  char* res = new char[ len + 1];" << endl
-    << "  res[0] = 0;" << endl
-    << createstring.rdbuf()
-    << "  return res;" << endl
-    << "}" << endl << endl
     << "#endif" << endl;
   ot.Stream << ends;
   FILE* fp = fopen(output.c_str(), "w");

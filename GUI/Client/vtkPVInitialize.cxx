@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInitialize);
-vtkCxxRevisionMacro(vtkPVInitialize, "1.7");
+vtkCxxRevisionMacro(vtkPVInitialize, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVInitialize::vtkPVInitialize()
@@ -38,7 +38,25 @@ vtkPVInitialize::~vtkPVInitialize()
 //----------------------------------------------------------------------------
 void vtkPVInitialize::Initialize(vtkPVWindow* win)
 {
-  char* init_string = vtkPVDefaultModulesGetInterfaces();
+  char* init_string;
+
+  init_string = vtkPVDefaultModulesFiltersGetInterfaces();
+  win->ReadSourceInterfacesFromString(init_string);
+  delete [] init_string;
+
+  init_string = vtkPVDefaultModulesManipulatorsGetInterfaces();
+  win->ReadSourceInterfacesFromString(init_string);
+  delete [] init_string;
+
+  init_string = vtkPVDefaultModulesSourcesGetInterfaces();
+  win->ReadSourceInterfacesFromString(init_string);
+  delete [] init_string;
+
+  init_string = vtkPVDefaultModulesReadersGetInterfaces();
+  win->ReadSourceInterfacesFromString(init_string);
+  delete [] init_string;
+
+  init_string = vtkPVDefaultModulesWritersGetInterfaces();
   win->ReadSourceInterfacesFromString(init_string);
   delete [] init_string;
 }
