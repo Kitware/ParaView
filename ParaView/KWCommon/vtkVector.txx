@@ -376,6 +376,12 @@ void vtkVector<DType>::CopyItems(vtkVector<DType> *in)
     }
 }
 
+template <class DType>
+void vtkVector<DType>::Sort(int (*func)(const void *, const void *))
+{
+  qsort((void *)this->Array, this->GetNumberOfItems(), sizeof(DType), func);
+}
+
 #if defined ( _MSC_VER )
 template <class DType>
 vtkVector<DType>::vtkVector(const vtkVector<DType>&){}
