@@ -250,6 +250,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
   free(argv);
 
+  Tcl_Finalize();
   return retVal;;
 }
 #else
