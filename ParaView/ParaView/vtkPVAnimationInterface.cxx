@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.73");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.74");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -222,7 +222,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->AnimationEntriesMenu = vtkKWMenuButton::New();
 
   this->Dirty = 1;
-
+  this->ScriptAvailable = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1639,6 +1639,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
   str << "# first frame, 1 at the last frame).\n" << endl;
   vtkCollectionIterator* it = this->AnimationEntriesIterator;
   int cnt = 0;
+  int script_available = 0;
   if ( this->AnimationEntries->GetNumberOfItems() > 0 )
     {
     typedef vtkstd::map<vtkstd::string, int> smaptype;
@@ -1671,6 +1672,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
         str << sit->first.c_str() << " ";
         }
       str << endl;
+      script_available = 1;
       }
     }
   if ( !cnt )
@@ -1693,6 +1695,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
       {
       str << entry->GetTimeEquation(this->NumberOfFrames) << endl;
       str << entry->GetScript() << endl;
+      script_available = 1;
       }
     entry->SetDirty(0);
     }
@@ -1704,6 +1707,8 @@ void vtkPVAnimationInterface::UpdateNewScript()
   cstr.rdbuf()->freeze(0);
   this->ScriptEditor->SetValue(this->NewScriptString);
   this->Dirty = 0;
+
+  this->ScriptAvailable = script_available;
 }
 
 //-----------------------------------------------------------------------------

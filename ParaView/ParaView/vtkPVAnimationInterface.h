@@ -203,6 +203,10 @@ public:
   // This method is called when the source is deleted.
   void DeleteSource(vtkPVSource* src);
 
+  // Description:
+  // Return true if the animation is available.
+  vtkGetMacro(ScriptAvailable, int);
+
 protected:
   vtkPVAnimationInterface();
   ~vtkPVAnimationInterface();
@@ -257,6 +261,7 @@ protected:
 
   vtkSetStringMacro(NewScriptString);
   char* NewScriptString;
+  int ScriptAvailable;
 
   // Should be a better way (menu?)
   vtkKWLabeledFrame* SaveFrame;
