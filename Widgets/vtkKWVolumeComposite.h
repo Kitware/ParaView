@@ -46,6 +46,9 @@ class vtkImageData;
 class vtkVolumeProperty;
 class vtkVolumeRayCastMapper;
 
+#define VTK_VOLUMECOMPOSITE_SOFTWARE_METHOD    0
+#define VTK_VOLUMECOMPOSITE_VOLUMEPRO_METHOD   1
+
 class VTK_EXPORT vtkKWVolumeComposite : public vtkKWComposite
 {
 public:
@@ -81,6 +84,29 @@ public:
   // Chaining method to serialize an object and its superclasses.
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Is there a volume pro board available
+  vtkGetMacro( VolumeProMapperAvailable, int );
+
+  // Description:
+  // What are we using to render?
+  vtkSetClampMacro( RenderMethod, int, 
+		    VTK_VOLUMECOMPOSITE_SOFTWARE_METHOD,
+		    VTK_VOLUMECOMPOSITE_VOLUMEPRO_METHOD );
+  vtkGetMacro( RenderMethod, int );
+  virtual void SetRenderMethodToSoftware(); 
+  virtual void SetRenderMethodToVolumePro();
+
+
+  // Description:
+  // If the VolumePro is available, do we still want to do texture mapping / ray casting?
+  // If so, we MUST specify this before setting the input. If no board is available, this 
+  // will automatically be turned on. Software rendering is actually always "available" but
+  // this flag is set to 0 if the VolumePro is being used since we might now want to extra
+  // overhead of setting up texture LODs if they are not going to be used.
+  vtkGetMacro( SoftwareMapperAvailable, int );
+  vtkSetMacro( SoftwareMapperAvailable, int );
+  
 protected:
   vtkKWVolumeComposite();
   ~vtkKWVolumeComposite();
@@ -108,7 +134,9 @@ protected:
   
   vtkVolumeProMapper                   *VolumeProMapper;
   vtkVolumeProMapper                   *LowResVolumeProMapper;
-  int                                  UsingVolumeProMapper;
+  int                                  RenderMethod;
+  int                                  VolumeProMapperAvailable;
+  int                                  SoftwareMapperAvailable;
 
   int                                  RayCastID;
   int                                  LowResTextureID;

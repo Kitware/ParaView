@@ -147,13 +147,17 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
     this->VolumeProID = 
       this->LODVolume->AddLOD( this->VolumeProMapper,
                                this->VolumeProperty, 1.0 );
-    this->UsingVolumeProMapper = 1;
+    this->RenderMethod = VTK_VOLUMECOMPOSITE_VOLUMEPRO_METHOD;
+    this->VolumeProMapperAvailable = 1;
+    this->SoftwareMapperAvailable = 0;
     this->LODVolume->AutomaticLODSelectionOff();
     this->LODVolume->SetSelectedLODID( this->VolumeProID );
     }
   else
     {
-    this->UsingVolumeProMapper = 0;
+    this->RenderMethod = VTK_VOLUMECOMPOSITE_SOFTWARE_METHOD;
+    this->SoftwareMapperAvailable = 1;
+    this->VolumeProMapperAvailable = 0;
     }
 
   pwf->Delete();
@@ -179,9 +183,45 @@ vtkKWVolumeComposite::~vtkKWVolumeComposite()
   this->VProResampler->Delete();
 }
 
+void vtkKWVolumeComposite::SetRenderMethodToSoftware()
+{
+  if ( this->SoftwareMapperAvailable )
+    {
+    this->RenderMethod = VTK_VOLUMECOMPOSITE_SOFTWARE_METHOD;
+    if ( this->LowResVolumeProID > 0 )
+      {
+      this->LODVolume->DisableLOD( this->LowResVolumeProID );
+      }
+    this->LODVolume->DisableLOD( this->VolumeProID );
+    this->LODVolume->AutomaticLODSelectionOn();
+    }
+}
+
+void vtkKWVolumeComposite::SetRenderMethodToVolumePro()
+{
+  if ( this->VolumeProMapperAvailable )
+    {
+    this->RenderMethod = VTK_VOLUMECOMPOSITE_VOLUMEPRO_METHOD;
+    if ( this->LowResVolumeProID > 0 )
+      {
+      this->LODVolume->EnableLOD( this->LowResVolumeProID );
+      }
+    this->LODVolume->EnableLOD( this->VolumeProID );
+    this->LODVolume->AutomaticLODSelectionOff();
+    this->LODVolume->SetSelectedLODID( this->VolumeProID );
+    }
+}
+
 void vtkKWVolumeComposite::SetInput(vtkImageData *input)
 {
   int   size[3];
+
+  // Make sure the user has not turned off Software rendering when Hardware is
+  // not available
+  if ( !this->VolumeProMapperAvailable )
+    {
+    this->SoftwareMapperAvailable = 1;
+    }
 
   if ( this->GetView() )
     {
@@ -220,7 +260,7 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
   
   input->GetDimensions( size );
 
-  if ( this->UsingVolumeProMapper )
+  if ( this->VolumeProMapperAvailable )
     {
     int subSize[3];
     int i;
@@ -256,7 +296,7 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
                                  this->VolumeProperty, 0.0 );
       }
     }
-  else
+  if ( this->SoftwareMapperAvailable )
     {
     // if there is an opportunity for a 1/16th size volume then do it
     // we find the target volume size and then reduce it
@@ -443,5 +483,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.20 $");
+  this->ExtractRevision(os,"$Revision: 1.21 $");
 }
