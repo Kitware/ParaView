@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.6");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.7");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1076,7 +1076,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->AnimationInterface->SetWindow(this);
   this->AnimationInterface->SetView(this->GetMainView());
   this->AnimationInterface->SetParent(this->GetPropertiesParent());
-  this->AnimationInterface->Create(app, "-bd 2 -relief raised");
+  this->AnimationInterface->Create(app, "-relief flat");
 
   this->AddRecentFilesToMenu("Exit",this);
 
@@ -3158,7 +3158,7 @@ void vtkPVWindow::ShowAnimationProperties()
   this->AnimationInterface->UnpackSiblings();
 
   // Put our page in.
-  this->Script("pack %s -anchor n -side top -expand t -fill x -ipadx 3 -ipady 3",
+  this->Script("pack %s -anchor n -side top -expand t -fill x",
                this->AnimationInterface->GetWidgetName());
 }
 
@@ -3772,7 +3772,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.6 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.7 $");
 }
 
 //----------------------------------------------------------------------------
