@@ -220,7 +220,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.651");
+vtkCxxRevisionMacro(vtkPVWindow, "1.652");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1418,10 +1418,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->Script("pack %s -side top -fill both -expand t",
                this->LowerFrame->GetWidgetName());
   int hvisibility = 0;
-//if (app->HasRegisteryValue(2, "RunTime", "HorizontalPaneVisibility"))
-//  {
-//  hvisibility = app->GetIntRegisteryValue(2, "RunTime", "HorizontalPaneVisibility");
-//  }
+  if (app->HasRegisteryValue(2, "RunTime", "HorizontalPaneVisibility"))
+    {
+    hvisibility = app->GetIntRegisteryValue(2, "RunTime", "HorizontalPaneVisibility");
+    }
   this->SetHorizontalPaneVisibility(hvisibility);
   
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
@@ -1673,6 +1673,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->AnimationManager->SetHorizantalParent(this->LowerFrame->GetFrame2());
   this->AnimationManager->SetVerticalParent(this->GetPropertiesParent());
   this->AnimationManager->Create(app, "-relief flat");
+  this->AnimationManager->ShowHAnimationInterface();
+  this->AnimationManager->RestoreWindowGeometry();
   
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
@@ -4221,8 +4223,8 @@ void vtkPVWindow::SetHorizontalPaneVisibility(int arg)
         VTK_PV_SHOW_HORZPANE_LABEL);
       }
     }
-//  this->GetApplication()->SetRegisteryValue(2, "RunTime",
-//    "HorizontalPaneVisibility", "%d", arg);
+  this->GetApplication()->SetRegisteryValue(2, "RunTime",
+    "HorizontalPaneVisibility", "%d", arg);
 }
 
 //----------------------------------------------------------------------------
@@ -5394,20 +5396,21 @@ void vtkPVWindow::InvokeInteractorEvent(const char *event)
 void vtkPVWindow::SaveWindowGeometry()
 {
   this->Superclass::SaveWindowGeometry();
-//  this->AnimationManager->SaveWindowGeometry();
   if (this->IsCreated())
     {
     this->GetApplication()->SetRegisteryValue(
       2, "Geometry", "WindowHorzizontalFrame1Size",
       "%d", this->LowerFrame->GetFrame1Size());
+
+    this->AnimationManager->SaveWindowGeometry();
     }
+  
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::RestoreWindowGeometry()
 {
   this->Superclass::RestoreWindowGeometry();
-//  this->AnimationManager->RestoreWindowGeometry();
   if (this->GetApplication()->HasRegisteryValue(
       2, "Geometry", "WindowHorzizontalFrame1Size"))
     {

@@ -97,6 +97,8 @@ public:
   // Description:
   // Pack both the animation interfaces.
   void ShowAnimationInterfaces();
+  void ShowVAnimationInterface();
+  void ShowHAnimationInterface();
 
   // Description:
   // Iterates over the animatable proxies registered with the Proxy Manager

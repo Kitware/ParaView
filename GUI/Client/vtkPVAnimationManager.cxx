@@ -61,7 +61,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.7");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.8");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -203,7 +203,6 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
   this->AddKeyFramesButton->SetBalloonHelpString(
     "Record all the changes in animatable properties, and add them as key frames.");
   this->KeyFramesToolbar->AddWidget(this->AddKeyFramesButton);
-  
 }
 
 //-----------------------------------------------------------------------------
@@ -216,12 +215,23 @@ void vtkPVAnimationManager::SetTimeMarker(double time)
 void vtkPVAnimationManager::ShowAnimationInterfaces()
 {
   this->Update();
+  this->ShowVAnimationInterface();
+  this->ShowHAnimationInterface();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::ShowVAnimationInterface()
+{
   this->VAnimationInterface->UnpackSiblings();
   this->Script("pack %s -anchor n -side top -expand t -fill both",
-               this->HAnimationInterface->GetWidgetName());
-
-  this->Script("pack %s -anchor n -side top -expand t -fill both",
     this->VAnimationInterface->GetWidgetName());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::ShowHAnimationInterface()
+{
+  this->Script("pack %s -anchor n -side top -expand t -fill both",
+    this->HAnimationInterface->GetWidgetName());
 }
 
 //-----------------------------------------------------------------------------
@@ -1136,7 +1146,10 @@ vtkPVAnimationCueTree* vtkPVAnimationManager::GetAnimationCueTreeForSource(
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::SaveWindowGeometry()
 {
-  this->HAnimationInterface->SaveWindowGeometry();
+  if (this->IsCreated())
+    {
+    this->HAnimationInterface->SaveWindowGeometry();
+    }
 }
 
 //-----------------------------------------------------------------------------
