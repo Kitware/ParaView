@@ -182,7 +182,7 @@ ENDIF (PARAVIEW_BUILD_GUI)
 # more information, check VTK/CMake/vtkDependentOption.cmake
 SET(VTK_USE_HYBRID_ISSET ON)
 SET(VTK_USE_PARALLEL_ISSET ON)
-SET(VTK_USE_VOLUMEPRO_ISSET OFF)
+SET(VTK_USE_VOLUMERENDERING_ISSET ON)
 SET(VTK_USE_VIDEO_FOR_WINDOWS_ISSET ON)
 SET(VTK_USE_GL2PS_ISSET OFF)
 SET(VTK_USE_ANSI_STDLIB ${PARAVIEW_USE_ANSI_STDLIB})
@@ -250,7 +250,7 @@ SET(VTK_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/VTK/Utilities
   ${ParaView_BINARY_DIR}/VTK/Utilities
   )
-SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid)
+SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering)
 IF(VTK_USE_PATENTED)
   SET(kits ${kits} Patented)
 ENDIF(VTK_USE_PATENTED)
