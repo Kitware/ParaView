@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.510");
+vtkCxxRevisionMacro(vtkPVWindow, "1.511");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2232,7 +2232,7 @@ void vtkPVWindow::WriteData()
     int timeSeries = 0;
     vtkPVReaderModule* reader =
       vtkPVReaderModule::SafeDownCast(this->GetCurrentPVSource());
-    if(reader && (reader->GetNumberOfTimeSteps() > 0) &&
+    if(reader && (reader->GetNumberOfTimeSteps() > 1) &&
        vtkKWMessageDialog::PopupYesNo(
          this->Application, this, "Timesteps",
          "The current source provides multiple time steps.  "
