@@ -2,6 +2,8 @@ PROJECT(PVFilters)
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(Filters_SRCS
+  vtkPVXMLElement.cxx
+  vtkPVXMLParser.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
   vtkGroup.cxx
