@@ -66,25 +66,51 @@ public:
   //    Specify the total number of cells in the final vtkUnstructuredGrid.
   //    Make this call before any call to MergeDataSet().
 
-  vtkSetMacro(TotalCells, vtkIdType);
-  vtkGetMacro(TotalCells, vtkIdType);
+  vtkSetMacro(TotalNumberOfCells, vtkIdType);
+  vtkGetMacro(TotalNumberOfCells, vtkIdType);
 
   // Description:
   //    Specify the total number of points in the final vtkUnstructuredGrid
   //    Make this call before any call to MergeDataSet().  This is an
   //    upper bound, since some points may be duplicates.
 
-  vtkSetMacro(TotalPoints, vtkIdType);
-  vtkGetMacro(TotalPoints, vtkIdType);
+  vtkSetMacro(TotalNumberOfPoints, vtkIdType);
+  vtkGetMacro(TotalNumberOfPoints, vtkIdType);
 
   // Description:
-  //    You can specify the name of a point array that contains a global
-  //    Id for every point.  Then, when DataSets are merged in, duplicate
-  //    points will be detected and not included in the final merged 
-  //    UnstructuredGrid.
+  //   vtkMergeCells attempts eliminate duplicate points when merging
+  //   data sets.  This is done most efficiently if a global point ID
+  //   field array is available.  Set the name of the point array if you
+  //   have one. 
 
   vtkSetStringMacro(GlobalIdArrayName);
   vtkGetStringMacro(GlobalIdArrayName);
+
+  // Description:
+  //   vtkMergeCells attempts eliminate duplicate points when merging
+  //   data sets.  If no global point ID field array name is provided,
+  //   it will use a point locator to find duplicate points.  You can
+  //   set a tolerance for that locator here.  The default tolerance
+  //   is 10e-4.
+
+  vtkSetClampMacro(PointMergeTolerance, float, 0.0, .25);
+  vtkGetMacro(PointMergeTolerance, float);
+
+  // Description:
+  //   vtkMergeCells will detect and filter out duplicate cells if you
+  //   provide it the name of a global cell ID array.
+
+  vtkSetStringMacro(GlobalCellIdArrayName);
+  vtkGetStringMacro(GlobalCellIdArrayName);
+
+  // Description:
+  //   vtkMergeCells attempts eliminate duplicate points when merging
+  //   data sets.  If for some reason you don't want it to do this,
+  //   than MergeDuplicatePointsOff().
+
+  vtkSetMacro(MergeDuplicatePoints, int);
+  vtkGetMacro(MergeDuplicatePoints, int);
+  vtkBooleanMacro(MergeDuplicatePoints, int);
 
   // Description:
   //    We need to know the number of different data sets that will
@@ -117,25 +143,51 @@ protected:
 private:
 
   void FreeLists();
-  void StartUGrid(vtkPointData *PD, vtkCellData *CD);
-  vtkIdType *MapPointsToIds(vtkDataSet *set);
+  void StartUGrid(vtkDataSet *set);
+  vtkIdType *MapPointsToIdsUsingGlobalIds(vtkDataSet *set);
+  vtkIdType *MapPointsToIdsUsingLocator(vtkDataSet *set);
   vtkIdType AddNewCellsUnstructuredGrid(vtkDataSet *set, vtkIdType *idMap);
   vtkIdType AddNewCellsDataSet(vtkDataSet *set, vtkIdType *idMap);
 
+  vtkIdType GlobalCellIdAccessGetId(vtkIdType idx);
+  int GlobalCellIdAccessStart(vtkDataSet *set);
+  vtkIdType GlobalNodeIdAccessGetId(vtkIdType idx);
+  int GlobalNodeIdAccessStart(vtkDataSet *set);
+
   int TotalNumberOfDataSets;
 
-  vtkIdType TotalCells;
-  vtkIdType TotalPoints;
+  vtkIdType TotalNumberOfCells;
+  vtkIdType TotalNumberOfPoints;
 
   vtkIdType NumberOfCells;     // so far
   vtkIdType NumberOfPoints;
 
-  char *GlobalIdArrayName;
+  char *GlobalIdArrayName;       // point, or node, IDs
+
+  vtkIdType *GlobalIdArrayIdType;
+  long *GlobalIdArrayLong;
+  int *GlobalIdArrayInt;
+  short *GlobalIdArrayShort;
+  char *GlobalIdArrayChar;
+
+  char *GlobalCellIdArrayName;   // cell IDs
+
+  vtkIdType *GlobalCellIdArrayIdType;
+  long *GlobalCellIdArrayLong;
+  int *GlobalCellIdArrayInt;
+  short *GlobalCellIdArrayShort;
+  char *GlobalCellIdArrayChar;
+
+  float PointMergeTolerance;
+  int MergeDuplicatePoints;
 
   char InputIsUGrid;
+  char InputIsPointSet;
 
 //BTX
   vtkstd::map<vtkIdType, vtkIdType> GlobalIdMap;
+
+  vtkstd::map<vtkIdType, vtkIdType> GlobalCellIdMap;
 
   vtkDataSetAttributes::FieldList *ptList;
   vtkDataSetAttributes::FieldList *cellList;
