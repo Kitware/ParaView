@@ -85,7 +85,7 @@ static inline int Chdir(const char* dir)
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.3");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.4");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -496,7 +496,8 @@ const char* vtkKWDirectoryUtilities::FindSelfPath(const char* argv0)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWDirectoryUtilities::GetFilenamePath(const char *filename, char *path)
+const char* vtkKWDirectoryUtilities::GetFilenamePath(const char *filename, 
+                                                     char *path)
 {
   const char *ptr = filename + strlen(filename) - 1;
   while (ptr > filename && *ptr != '/' && *ptr != '\\')
@@ -512,4 +513,25 @@ const char* vtkKWDirectoryUtilities::GetFilenamePath(const char *filename, char 
   path[length] = '\0';
   
   return path;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWDirectoryUtilities::GetFilenameName(const char *filename, 
+                                                     char *name)
+{
+  int found = 0;
+  const char *ptr = filename + strlen(filename) - 1;
+  while (ptr > filename)
+    {
+    if (*ptr == '/' || *ptr == '\\')
+      {
+      found = 1;
+      break;
+      }
+    ptr--;
+    }
+
+  strcpy(name, ptr + found);
+  
+  return name;
 }
