@@ -184,7 +184,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.158");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.159");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1562,6 +1562,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
 #ifdef PARAVIEW_PLUS_BUILD
   else if ( awriter )
     {
+    awriter->SetInput(0);
     awriter->Delete();
     awriter = 0;
     }
