@@ -117,10 +117,14 @@ public:
   // between the client and process 0 of the server.
   vtkGetObjectMacro(SocketController, vtkSocketController);
 
+  //BTX
   // Description:
   // Module dependant method for collecting data information from all procs.
-  virtual void GatherInformation(vtkPVInformation* info, char* objectTclName);
-  virtual void GatherInformationInternal(char* infoClassName, vtkObject* object);
+  virtual void GatherInformation(vtkPVInformation* info,
+                                 vtkClientServerID id);
+  //ETX
+  virtual void GatherInformationInternal(const char* infoClassName,
+                                         vtkObject* object);
 
   // Description:
   // This executes a script on process 0 of the server.
@@ -219,5 +223,3 @@ private:
 };
 
 #endif
-
-

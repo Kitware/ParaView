@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.3");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.4");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -212,6 +212,9 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
   this->GetStream()
     << vtkClientServerStream::Assign
     << this->GetApplicationID() << this->GetPVApplication()
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Assign
+    << this->GetProcessModuleID() << this
     << vtkClientServerStream::End;
   this->ClientInterpreter->ProcessStream(this->GetStream());
   this->GetStream().Reset();
@@ -330,8 +333,9 @@ int vtkPVMPIProcessModule::GetNumberOfPartitions()
 
 //----------------------------------------------------------------------------
 // This method is broadcast to all processes.
-void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName,
-                                                      vtkObject *object)
+void
+vtkPVMPIProcessModule::GatherInformationInternal(const char* infoClassName,
+                                                 vtkObject *object)
 {
   vtkClientServerStream css;
   int myId = this->Controller->GetLocalProcessId();
@@ -354,10 +358,14 @@ void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName,
     }
   o = NULL;
 
-  int rootOnly = tmpInfo->GetRootOnly();
-
-  if (myId != 0 && !rootOnly)
+  if(myId != 0)
     {
+    if(tmpInfo->GetRootOnly())
+      {
+      // Root-only and we are not the root.  Do nothing.
+      tmpInfo->Delete();
+      return;
+      }
     tmpInfo->CopyFromObject(object);
     tmpInfo->CopyToStream(&css);
     size_t length;
@@ -370,13 +378,14 @@ void vtkPVMPIProcessModule::GatherInformationInternal(char* infoClassName,
     return;
     }
 
-  // Node 0.
-  int numProcs = this->Controller->GetNumberOfProcesses();
-  int idx;
+  // This is node 0.  First get our own information.
   this->TemporaryInformation->CopyFromObject(object);
-  if (!rootOnly)
+
+  if(!tmpInfo->GetRootOnly())
     {
-    for (idx = 1; idx < numProcs; ++idx)
+    // Merge information from other nodes.
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    for(int idx = 1; idx < numProcs; ++idx)
       {
       int length;
       this->Controller->Receive(&length, 1, idx, 498798);

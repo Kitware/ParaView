@@ -93,7 +93,8 @@ public:
 
   // Description:
   // A method for getting generic information from the server.
-  virtual void GatherInformationInternal(char* infoClassName, vtkObject *object);
+  virtual void GatherInformationInternal(const char* infoClassName,
+                                         vtkObject* object);
     
   // Description:
   // Get the partition number. -1 means no assigned partition.
@@ -118,5 +119,3 @@ private:
 };
 
 #endif
-
-

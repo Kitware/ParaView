@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.8");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.9");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -153,6 +153,9 @@ int vtkPVProcessModule::Start(int argc, char **argv)
   this->GetStream()
     << vtkClientServerStream::Assign
     << this->GetApplicationID() << app
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Assign
+    << this->GetProcessModuleID() << this
     << vtkClientServerStream::End;
   this->ClientInterpreter->ProcessStream(this->GetStream());
   this->GetStream().Reset();
@@ -322,35 +325,28 @@ int vtkPVProcessModule::GetNumberOfPartitions()
   return 1;
 }
 
-
-
-
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::GatherInformation(vtkPVInformation* info,
-                                           char* objectTclName)
+                                           vtkClientServerID id)
 {
   // Just a simple way of passing the information object to the next
   // method.
   this->TemporaryInformation = info;
-  // Some objects are not created on the client (data.
-  if (!info->GetRootOnly())
-    {
-    this->ServerScript(
-      "[$Application GetProcessModule] GatherInformationInternal %s %s",
-      info->GetClassName(), objectTclName);
-    }
-  else
-    {
-    this->RootScript(
-      "[$Application GetProcessModule] GatherInformationInternal %s %s",
-      info->GetClassName(), objectTclName);
-    }
+  this->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GetApplicationID() << "GetProcessModule"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << vtkClientServerStream::LastResult
+    << "GatherInformationInternal" << info->GetClassName() << id
+    << vtkClientServerStream::End;
+  this->SendStreamToServer();
   this->TemporaryInformation = NULL;
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::GatherInformationInternal(char*, vtkObject* object)
+void vtkPVProcessModule::GatherInformationInternal(const char*,
+                                                   vtkObject* object)
 {
   // This class is used only for one processes.
   if (this->TemporaryInformation == NULL)
@@ -609,6 +605,13 @@ vtkClientServerID vtkPVProcessModule::GetUniqueID()
 vtkClientServerID vtkPVProcessModule::GetApplicationID()
 {
   vtkClientServerID id = {1};
+  return id;
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVProcessModule::GetProcessModuleID()
+{
+  vtkClientServerID id = {2};
   return id;
 }
 

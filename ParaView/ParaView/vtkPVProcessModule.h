@@ -112,11 +112,15 @@ public:
   // The controller is needed for filter that communicate internally.
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
+  //BTX
   // Description:
   // This is going to be a generic method of getting/gathering 
   // information form the server.
-  virtual void GatherInformation(vtkPVInformation* info, char* objectTclName);
-  virtual void GatherInformationInternal(char* infoClassName, vtkObject* object);
+  virtual void GatherInformation(vtkPVInformation* info,
+                                 vtkClientServerID id);
+  //ETX
+  virtual void GatherInformationInternal(const char* infoClassName,
+                                         vtkObject* object);
   
   // Description:
   // Get the partition piece.  -1 means no assigned piece.
@@ -209,6 +213,7 @@ public:
 
   vtkClientServerID GetUniqueID();
   vtkClientServerID GetApplicationID();
+  vtkClientServerID GetProcessModuleID();
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
@@ -229,5 +234,3 @@ private:
 };
 
 #endif
-
-

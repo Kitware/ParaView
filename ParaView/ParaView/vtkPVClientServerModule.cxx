@@ -260,7 +260,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.8");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.9");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -455,6 +455,9 @@ void vtkPVClientServerModule::Connect()
     this->GetStream()
       << vtkClientServerStream::Assign
       << this->GetApplicationID() << this->GetPVApplication()
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Assign
+      << this->GetProcessModuleID() << this
       << vtkClientServerStream::End;
     this->ClientInterpreter->ProcessStream(this->GetStream());
     this->GetStream().Reset();
@@ -467,6 +470,9 @@ void vtkPVClientServerModule::Connect()
     this->GetStream()
       << vtkClientServerStream::Assign
       << this->GetApplicationID() << this->GetPVApplication()
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Assign
+      << this->GetProcessModuleID() << this
       << vtkClientServerStream::End;
     this->ServerInterpreter->ProcessStream(this->GetStream());
     this->GetStream().Reset();
@@ -972,31 +978,32 @@ int vtkPVClientServerModule::GetNumberOfPartitions()
 
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::GatherInformation(vtkPVInformation* info,
-                                                char* objectTclName)
+                                                vtkClientServerID id)
 {
   // Just a simple way of passing the information object to the next method.
   this->TemporaryInformation = info;
-  // Some objects are not created on the client (data.
-  if (!info->GetRootOnly())
-    {
-    this->ServerScript(
-      "[$Application GetProcessModule] GatherInformationInternal %s %s",
-      info->GetClassName(), objectTclName);
-    }
-  else
-    {
-    this->RootScript(
-      "[$Application GetProcessModule] GatherInformationInternal %s %s",
-      info->GetClassName(), objectTclName);
-    }
+
+  // Gather on the server.
+  this->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GetApplicationID() << "GetProcessModule"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << vtkClientServerStream::LastResult
+    << "GatherInformationInternal" << info->GetClassName() << id
+    << vtkClientServerStream::End;
+  this->SendStreamToServer();
+
+  // Gather on the client.
   this->GatherInformationInternal(NULL, NULL);
   this->TemporaryInformation = NULL;
 }
 
 //----------------------------------------------------------------------------
 // This method is broadcast to all processes.
-void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName,
-                                                        vtkObject* object)
+void
+vtkPVClientServerModule::GatherInformationInternal(const char* infoClassName,
+                                                   vtkObject* object)
 {
   vtkClientServerStream css;
 
@@ -1031,11 +1038,17 @@ void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName,
     }
   vtkPVInformation* tempInfo1 = vtkPVInformation::SafeDownCast(o);
   o = 0;
-  tempInfo1->CopyFromObject(object);
 
   // Nodes other than 0 just send their information.
-  if (myId != 0 && !tempInfo1->GetRootOnly())
+  if(myId != 0)
     {
+    if(tempInfo1->GetRootOnly())
+      {
+      // Root-only and we are not the root.  Do nothing.
+      tempInfo1->Delete();
+      return;
+      }
+    tempInfo1->CopyFromObject(object);
     tempInfo1->CopyToStream(&css);
     size_t length;
     const unsigned char* data;
@@ -1048,16 +1061,18 @@ void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName,
     return;
     }
 
- // Node 0.
+  // This is node 0.  First get our own information.
   tempInfo1->CopyFromObject(object);
-  if (!tempInfo1->GetRootOnly())
+
+  if(!tempInfo1->GetRootOnly())
     {
     // Create another temporary information object in which to
     // receive information from other nodes.
     o = vtkInstantiator::CreateInstance(infoClassName);
     vtkPVInformation* tempInfo2 = vtkPVInformation::SafeDownCast(o);
     o = NULL;
-    
+
+    // Merge information from other nodes.
     int numProcs = this->Controller->GetNumberOfProcesses();
     int idx;
     for (idx = 1; idx < numProcs; ++idx)
@@ -1073,7 +1088,6 @@ void vtkPVClientServerModule::GatherInformationInternal(char* infoClassName,
       }
     tempInfo2->Delete();
     }
-
 
   // Send final information to client over socket connection.
   size_t length;
