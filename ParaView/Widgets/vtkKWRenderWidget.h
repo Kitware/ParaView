@@ -160,6 +160,7 @@ public:
   virtual float* GetHeaderAnnotationColor();
   virtual void SetHeaderAnnotationText(const char*);
   virtual char* GetHeaderAnnotationText();
+  vtkGetObjectMacro(HeaderAnnotation, vtkTextActor);
   
   // Description:
   // Set/Get the units that pixel sizes are measured in
@@ -231,7 +232,7 @@ protected:
   vtkKWWidget *VTKWidget;
 
   vtkCornerAnnotation *CornerAnnotation;
-  vtkTextActor        *HeaderProp;
+  vtkTextActor        *HeaderAnnotation;
   
   vtkRenderer     *Renderer;
   vtkRenderWindow *RenderWindow;

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.47");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.48");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -104,17 +104,17 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->CornerAnnotation->SetMaximumLineHeight(0.07);
   this->CornerAnnotation->VisibilityOff();
 
-  this->HeaderProp = vtkTextActor::New();
-  this->HeaderProp->GetTextProperty()->SetJustificationToCentered();
-  this->HeaderProp->GetTextProperty()->SetVerticalJustificationToTop();
-  this->HeaderProp->GetTextProperty()->ShadowOff();
-  this->HeaderProp->ScaledTextOn();
-  this->HeaderProp->GetPositionCoordinate()
+  this->HeaderAnnotation = vtkTextActor::New();
+  this->HeaderAnnotation->GetTextProperty()->SetJustificationToCentered();
+  this->HeaderAnnotation->GetTextProperty()->SetVerticalJustificationToTop();
+  this->HeaderAnnotation->GetTextProperty()->ShadowOff();
+  this->HeaderAnnotation->ScaledTextOn();
+  this->HeaderAnnotation->GetPositionCoordinate()
     ->SetCoordinateSystemToNormalizedViewport();
-  this->HeaderProp->GetPositionCoordinate()->SetValue(0.2, 0.88);
-  this->HeaderProp->GetPosition2Coordinate()
+  this->HeaderAnnotation->GetPositionCoordinate()->SetValue(0.2, 0.88);
+  this->HeaderAnnotation->GetPosition2Coordinate()
     ->SetCoordinateSystemToNormalizedViewport();
-  this->HeaderProp->GetPosition2Coordinate()->SetValue(0.6, 0.1);
+  this->HeaderAnnotation->GetPosition2Coordinate()->SetValue(0.6, 0.1);
   
   this->Units = NULL;
 
@@ -148,7 +148,7 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     this->CornerAnnotation = NULL;
     }
 
-  this->HeaderProp->Delete();
+  this->HeaderAnnotation->Delete();
   
   this->SetUnits(NULL);
   
@@ -690,15 +690,15 @@ float* vtkKWRenderWidget::GetCornerAnnotationColor()
 //----------------------------------------------------------------------------
 int vtkKWRenderWidget::GetHeaderAnnotationVisibility()
 {
-  return (this->HeaderProp && 
-          this->HasProp(this->HeaderProp) && 
-          this->HeaderProp->GetVisibility());
+  return (this->HeaderAnnotation && 
+          this->HasProp(this->HeaderAnnotation) && 
+          this->HeaderAnnotation->GetVisibility());
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 {
-  if (!this->HeaderProp || 
+  if (!this->HeaderAnnotation || 
       this->GetHeaderAnnotationVisibility() == v)
     {
     return;
@@ -706,18 +706,18 @@ void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 
   if (v)
     {
-    this->HeaderProp->VisibilityOn();
-    if (!this->HasProp(this->HeaderProp))
+    this->HeaderAnnotation->VisibilityOn();
+    if (!this->HasProp(this->HeaderAnnotation))
       {
-      this->AddProp(this->HeaderProp);
+      this->AddProp(this->HeaderAnnotation);
       }
     }
   else
     {
-    this->HeaderProp->VisibilityOff();
-    if (this->HasProp(this->HeaderProp))
+    this->HeaderAnnotation->VisibilityOff();
+    if (this->HasProp(this->HeaderAnnotation))
       {
-      this->RemoveProp(this->HeaderProp);
+      this->RemoveProp(this->HeaderAnnotation);
       }
     }
 
@@ -727,12 +727,12 @@ void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderAnnotationColor(float r, float g, float b)
 {
-  if (this->HeaderProp && this->HeaderProp->GetTextProperty())
+  if (this->HeaderAnnotation && this->HeaderAnnotation->GetTextProperty())
     {
-    float *rgb = this->HeaderProp->GetTextProperty()->GetColor();
+    float *rgb = this->HeaderAnnotation->GetTextProperty()->GetColor();
     if (rgb[0] != r || rgb[1] != g || rgb[2] != b)
       {
-      this->HeaderProp->GetTextProperty()->SetColor(r, g, b);
+      this->HeaderAnnotation->GetTextProperty()->SetColor(r, g, b);
       this->Render();
       }
     }
@@ -741,15 +741,15 @@ void vtkKWRenderWidget::SetHeaderAnnotationColor(float r, float g, float b)
 //----------------------------------------------------------------------------
 float* vtkKWRenderWidget::GetHeaderAnnotationColor()
 {
-  if (!this->HeaderProp ||
-      !this->HeaderProp->GetTextProperty())
+  if (!this->HeaderAnnotation ||
+      !this->HeaderAnnotation->GetTextProperty())
     {
     return 0;
     }
-  float *color = this->HeaderProp->GetTextProperty()->GetColor();
+  float *color = this->HeaderAnnotation->GetTextProperty()->GetColor();
   if (color[0] < 0 || color[1] < 0 || color[2] < 0)
     {
-    color = this->HeaderProp->GetProperty()->GetColor();
+    color = this->HeaderAnnotation->GetProperty()->GetColor();
     }
   return color;
 }
@@ -757,9 +757,9 @@ float* vtkKWRenderWidget::GetHeaderAnnotationColor()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderAnnotationText(const char *text)
 {
-  if (this->HeaderProp)
+  if (this->HeaderAnnotation)
     {
-    this->HeaderProp->SetInput(text);
+    this->HeaderAnnotation->SetInput(text);
     if (this->GetHeaderAnnotationVisibility())
       {
       this->Render();
@@ -770,9 +770,9 @@ void vtkKWRenderWidget::SetHeaderAnnotationText(const char *text)
 //----------------------------------------------------------------------------
 char* vtkKWRenderWidget::GetHeaderAnnotationText()
 {
-  if (this->HeaderProp)
+  if (this->HeaderAnnotation)
     {
-    return this->HeaderProp->GetInput();
+    return this->HeaderAnnotation->GetInput();
     }
   return 0;
 }
@@ -877,6 +877,7 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "CornerAnnotation: " << this->CornerAnnotation << endl;
+  os << indent << "HeaderAnnotation: " << this->HeaderAnnotation << endl;
   os << indent << "Printing: " << this->Printing << endl;
   os << indent << "VTKWidget: " << this->VTKWidget << endl;
   os << indent << "RenderWindow: " << this->RenderWindow << endl;
