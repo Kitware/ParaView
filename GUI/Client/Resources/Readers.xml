@@ -327,7 +327,6 @@
                     trace_name="CellArrays"/>
   </Module>
   <Module name="ImageReader"
-          menu_name="Raw File Reader"
           root_name="ImageRead"
           module_type="Reader"
           class="vtkPVRawReaderModule"
