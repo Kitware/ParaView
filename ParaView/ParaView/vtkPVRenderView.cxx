@@ -304,9 +304,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 // Here we are going to change only the satellite procs.
 void vtkPVRenderView::PrepareForDelete()
-{
-  vtkPVTreeComposite *c;
-  
+{  
   // Circular reference.
   if (this->Composite)
     {

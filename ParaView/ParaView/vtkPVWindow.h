@@ -117,6 +117,7 @@ public:
   vtkPVSource *GetGlyphSource(char* name);
     
   vtkGetObjectMacro(SelectMenu, vtkKWMenu);
+  vtkGetObjectMacro(GlyphMenu, vtkKWMenu);
   vtkGetObjectMacro(SourceMenu, vtkKWMenu);
   vtkGetObjectMacro(FilterMenu, vtkKWMenu);
   
@@ -278,10 +279,11 @@ protected:
   void operator=(const vtkPVWindow&) {};
 
   vtkPVRenderView *MainView;
+  vtkKWMenu *AdvancedMenu;
   vtkKWMenu *SourceMenu;
   vtkKWMenu *FilterMenu;
   vtkKWMenu *SelectMenu;
-  vtkKWMenu *AdvancedMenu;
+  vtkKWMenu *GlyphMenu;
   
   vtkInteractorStyleTrackballCamera *CameraStyle;
   

@@ -124,6 +124,7 @@ vtkPVWindow::vtkPVWindow()
   this->SourceMenu = vtkKWMenu::New();
   this->FilterMenu = vtkKWMenu::New();
   this->SelectMenu = vtkKWMenu::New();
+  this->GlyphMenu = vtkKWMenu::New();
   this->AdvancedMenu = vtkKWMenu::New();
   this->InteractorToolbar = vtkKWToolbar::New();
 
@@ -349,6 +350,12 @@ void vtkPVWindow::PrepareForDelete()
     this->SelectMenu = NULL;
     }
   
+  if (this->GlyphMenu)
+    {
+    this->GlyphMenu->Delete();
+    this->GlyphMenu = NULL;
+    }
+  
   if (this->AdvancedMenu)
     {
     this->AdvancedMenu->Delete();
@@ -444,9 +451,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->Application, "-tearoff 0");
   this->Menu->InsertCascade(2, "Select", this->SelectMenu, 0);
-  this->Script("%s entryconfigure Select -state disabled",
-	       this->Menu->GetWidgetName());
+  //this->Script("%s entryconfigure Select -state disabled",
+	//       this->Menu->GetWidgetName());
   
+  // Create the menu for selecting the glyph sources.  
+  this->GlyphMenu->SetParent(this->SelectMenu);
+  this->GlyphMenu->Create(this->Application, "-tearoff 0");
+  this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
+				 "Select one of the glyph sources.");  
+
   this->AdvancedMenu->SetParent(this->GetMenu());
   this->AdvancedMenu->Create(this->Application, "-tearoff 0");
   this->Menu->InsertCascade(3, "Advanced", this->AdvancedMenu, 0);
@@ -778,6 +791,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   pvs->Delete();
   pvd->Delete();
 
+  // Show glyph sources in menu.
+  this->UpdateSelectMenu();
 
   this->DisableFilterButtons();
 
@@ -1442,12 +1457,7 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
                         this->GetTclName());
     this->SetCurrentPVData(NULL);
     }
-  
-  if (comp && this->Sources->IsItemPresent(comp) == 0)
-    {
-    this->Sources->AddItem(comp);
-    }
-  
+    
   // This will update the parameters.  
   // I doubt the conditional is still necessary.
   if (comp)
@@ -1529,29 +1539,43 @@ void vtkPVWindow::UpdateSelectMenu()
   vtkPVSource *source;
   char methodAndArg[512];
 
-  this->GetSelectMenu()->DeleteAllMenuItems();
+  this->GlyphMenu->DeleteAllMenuItems();
+  numSources = this->GlyphSources->GetNumberOfItems();
+  for (i = 0; i < numSources; i++)
+    {
+    source = (vtkPVSource*)this->GlyphSources->GetItemAsObject(i);
+    sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
+    this->GlyphMenu->AddCommand(source->GetName(), this, methodAndArg,
+				      source->GetVTKSource() ?
+				      source->GetVTKSource()->GetClassName()+3
+				      : 0);
+    }
+
+  this->SelectMenu->DeleteAllMenuItems();
+  this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
+				 "Select one of the glyph sources.");  
   numSources = this->GetSources()->GetNumberOfItems();
   for (i = 0; i < numSources; i++)
     {
     source = (vtkPVSource*)this->GetSources()->GetItemAsObject(i);
     sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
-    this->GetSelectMenu()->AddCommand(source->GetName(), this, methodAndArg,
+    this->SelectMenu->AddCommand(source->GetName(), this, methodAndArg,
 				      source->GetVTKSource() ?
 				      source->GetVTKSource()->GetClassName()+3
 				      : 0);
     }
 
   // Disable or enable the menu.
-  if (numSources == 0)
-    {
-    this->Script("%s entryconfigure Select -state disabled",
-                 this->Menu->GetWidgetName());
-    }
-  else
-    {
-    this->Script("%s entryconfigure Select -state normal",
-                 this->Menu->GetWidgetName());
-    }
+  //if (numSources == 0)
+  //  {
+  //  this->Script("%s entryconfigure Select -state disabled",
+  //               this->Menu->GetWidgetName());
+  //  }
+  //else
+  //  {
+  //  this->Script("%s entryconfigure Select -state normal",
+  //               this->Menu->GetWidgetName());
+  //  }
 }
 
 //----------------------------------------------------------------------------
