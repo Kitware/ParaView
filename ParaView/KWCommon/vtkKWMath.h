@@ -91,6 +91,15 @@ public:
   // Return 1 on success, 0 otherwise.
   static int GetScalarMinDelta(vtkDataArray *array, int comp, double *delta);
  
+  // Description:
+  // Get the scalar type that will be able to store a given range of data 
+  // once it has been scaled and shifted. If any of those parameters is not
+  // an integer number, the search will default to float types (float, double)
+  // Return -1 on error or no scalar type found.
+  static int GetScalarTypeFittingRange(
+    double range_min, double range_max, 
+    double scale = 1.0, double shift = 0.0);
+ 
 protected:
   vtkKWMath() {};
   ~vtkKWMath() {};

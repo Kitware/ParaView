@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDataArray.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWMath, "1.2");
+vtkCxxRevisionMacro(vtkKWMath, "1.3");
 vtkStandardNewMacro(vtkKWMath);
 
 //----------------------------------------------------------------------------
@@ -220,3 +220,70 @@ int vtkKWMath::GetScalarMinDelta(vtkDataArray *array, int comp, double *delta)
   
   return 1;
 }
+
+//----------------------------------------------------------------------------
+int vtkKWMath::GetScalarTypeFittingRange(
+  double range_min, double range_max, double scale, double shift)
+{
+  class TypeRange
+  {
+  public:
+    int Type;
+    double Min;
+    double Max;
+  };
+
+  TypeRange FloatTypes[] = 
+    {
+      { VTK_FLOAT,          VTK_FLOAT_MIN,          VTK_FLOAT_MAX },
+      { VTK_DOUBLE,         VTK_DOUBLE_MIN,         VTK_DOUBLE_MAX }
+    };
+
+  TypeRange IntTypes[] = 
+    {
+      { VTK_BIT,            VTK_BIT_MIN,            VTK_BIT_MAX },
+      { VTK_CHAR,           VTK_CHAR_MIN,           VTK_CHAR_MAX },
+      { VTK_UNSIGNED_CHAR,  VTK_UNSIGNED_CHAR_MIN,  VTK_UNSIGNED_CHAR_MAX },
+      { VTK_SHORT,          VTK_SHORT_MIN,          VTK_SHORT_MAX },
+      { VTK_UNSIGNED_SHORT, VTK_UNSIGNED_SHORT_MIN, VTK_UNSIGNED_SHORT_MAX },
+      { VTK_INT,            VTK_INT_MIN,            VTK_INT_MAX },
+      { VTK_UNSIGNED_INT,   VTK_UNSIGNED_INT_MIN,   VTK_UNSIGNED_INT_MAX },
+      { VTK_LONG,           VTK_LONG_MIN,           VTK_LONG_MAX },
+      { VTK_UNSIGNED_LONG,  VTK_UNSIGNED_LONG_MIN,  VTK_UNSIGNED_LONG_MAX }
+    };
+
+  // If the range, scale or shift are decimal number, just browse
+  // the decimal types
+
+  double intpart;
+
+  int range_min_is_int = (modf(range_min, &intpart) == 0.0);
+  int range_max_is_int = (modf(range_max, &intpart) == 0.0);
+  int scale_is_int = (modf(scale, &intpart) == 0.0);
+  int shift_is_int = (modf(shift, &intpart) == 0.0);
+
+  range_min = range_min * scale + shift;
+  range_max = range_max * scale + shift;
+
+  if (range_min_is_int && range_max_is_int && scale_is_int && shift_is_int)
+    {
+    for (int i = 0; i < sizeof(IntTypes) / sizeof(TypeRange); i++)
+      {
+      if (IntTypes[i].Min <= range_min && range_max <= IntTypes[i].Max)
+        {
+        return IntTypes[i].Type;
+        }
+      }
+    }
+
+  for (int i = 0; i < sizeof(FloatTypes) / sizeof(TypeRange); i++)
+    {
+    if (FloatTypes[i].Min <= range_min && range_max <= FloatTypes[i].Max)
+      {
+      return FloatTypes[i].Type;
+      }
+    }
+
+  return -1;
+}
+
