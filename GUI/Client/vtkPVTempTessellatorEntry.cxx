@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.1.2.3");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -89,6 +89,16 @@ vtkPVTempTessellatorEntry::~vtkPVTempTessellatorEntry()
 
   this->SetPVSource(NULL);
   this->SetInputMenu(NULL);
+
+  if ( this->SetFieldCriterionCommand )
+    {
+    delete [] this->SetFieldCriterionCommand;
+    }
+
+  if ( this->ResetCriteriaCommand )
+    {
+    delete [] this->ResetCriteriaCommand;                                                                                              
+    }
 }
 
 void vtkPVTempTessellatorEntry::PrintSelf( ostream& s, vtkIndent indent )
