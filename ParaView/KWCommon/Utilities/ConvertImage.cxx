@@ -1,5 +1,9 @@
-#include "vtkPNGReader.h"
+#include "vtkBase64Utility.h"
 #include "vtkImageFlip.h"
+#include "vtkPNGReader.h"
+
+#include <zlib.h>
+
 #include <sys/stat.h>
 
 #ifdef VTK_USE_ANSI_STDLIB
@@ -8,12 +12,67 @@
 #define VTK_IOS_NOCREATE | ios::nocreate
 #endif
 
+//----------------------------------------------------------------------------
+#if 0
+
+#define PNGFILE "PVSplashScreen.png"
+#define B64FILE "PVSplashScreen2.txt"
+#define BINFILE "PVSplashScreen2.bin"
+
+void test ()
+{
+  // Encode PNG to Base64
+
+  vtkPNGReader *pr = vtkPNGReader::New();
+  pr->SetFileName(PNGFILE);
+  pr->Update();
+  int *dim = pr->GetOutput()->GetDimensions();
+  unsigned long nb_of_bytes = 
+    dim[0] * dim[1] * pr->GetOutput()->GetNumberOfScalarComponents();
+ 
+  unsigned char *encoded_buffer = new unsigned char [nb_of_bytes * 2];
+
+  unsigned long nb_of_bytes_encoded = vtkBase64Utility::Encode(
+    (unsigned char *)(pr->GetOutput()->GetScalarPointer()),
+    nb_of_bytes,
+    encoded_buffer);
+  cout << "Encoded: " << nb_of_bytes << " to " << nb_of_bytes_encoded << " bytes\n";
+
+  ofstream encoded_output_file(B64FILE, ios::out);
+  encoded_output_file.write(reinterpret_cast<char*>(encoded_buffer), 
+                            nb_of_bytes_encoded);
+  encoded_output_file.close();
+
+  pr->Delete();
+
+  // Decode Base64 to Binary
+
+  unsigned char *decoded_buffer = new unsigned char [nb_of_bytes];
+
+  unsigned long nb_of_bytes_decoded = vtkBase64Utility::Decode(
+    const_cast<const unsigned char *>(encoded_buffer), 
+    nb_of_bytes, decoded_buffer);
+  cout << "Decoded: " << nb_of_bytes_decoded << " bytes (expecting " << nb_of_bytes << ")\n";
+
+  ofstream decoded_output_file(BINFILE, ios::out | ios::binary);
+  decoded_output_file.write(reinterpret_cast<char*>(decoded_buffer), 
+                            nb_of_bytes_decoded);
+  decoded_output_file.close();
+
+  delete [] encoded_buffer;
+  delete [] decoded_buffer;
+}
+
+#endif
+
+//----------------------------------------------------------------------------
 int file_exists(const char *filename)
 {
   struct stat fs;
   return (stat(filename, &fs) != 0) ? 0 : 1;
 }
 
+//----------------------------------------------------------------------------
 long int modified_time(const char *filename)
 {
   struct stat fs;
@@ -27,6 +86,7 @@ long int modified_time(const char *filename)
     }
 }
 
+//----------------------------------------------------------------------------
 const char* name(const char *filename)
 {
   char *forward = strrchr(filename, '/');
@@ -38,25 +98,57 @@ const char* name(const char *filename)
   return filename;
 }
 
+//----------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
   // Usage
 
   if (argc < 3)
     {
-    cerr << "Usage: " << argv[0] << " header.h image.png [image.png image.png...] [UPDATE]" << endl;
+    cerr << "Usage: " << argv[0] << " header.h image.png [image.png image.png...] [UPDATE] [ZLIB] [BASE64]" << endl;
     return 1;
     }
 
-  // If in UPDATE mode, do something only if one of the images is newer
-  // than the header file
-  
-  if (!strcmp(argv[argc - 1], "UPDATE"))
+  // Get parameters:
+
+  // UPDATE: do something only if one of the images is newer
+  //         than the header file
+  // ZLIB:   compress the resulting image buffer
+  // BASE64: convert to base64
+
+  int update     = 0;
+  int zlib       = 0;
+  int base64     = 0;
+
+  int has_params;
+  do
     {
-    argc--;
+    has_params = 0;
+    if (!strcmp(argv[argc - 1], "UPDATE"))
+      {
+      update = has_params = 1;
+      }
+    else if (!strcmp(argv[argc - 1], "ZLIB"))
+      {
+      zlib = has_params = 1;
+      }
+    else if (!strcmp(argv[argc - 1], "BASE64"))
+      {
+      base64 = has_params = 1;
+      }
+    if (has_params)
+      {
+      argc--;
+      }
+    } while (has_params);
+
+  // Update mode ?
+
+  if (update)
+    {
     if (file_exists(argv[1]))
       {
-      long int header_modified_time =  modified_time(argv[1]);
+      long int header_modified_time = modified_time(argv[1]);
       int i = 2;
       while (i < argc && modified_time(argv[i]) <= header_modified_time)
         {
@@ -95,16 +187,15 @@ int main(int argc, char **argv)
     if (!file_exists(argv[i]))
       {
       cerr << "Cannot open: " << argv[2] << " for reading" << endl;
-      return 2;
+      continue;
       }
   
     // Read as PNG
 
-    char buffer[1024];
-    strcpy(buffer, name(argv[i]));
+    char image_name[1024];
+    strcpy(image_name, name(argv[i]));
 
-    cout << "  - from: " << buffer << endl;
-
+    cout << "  - from: " << image_name << endl;
 
     pr->SetFileName(argv[i]);
     pr->Update();
@@ -113,7 +204,6 @@ int main(int argc, char **argv)
         pr->GetOutput()->GetNumberOfScalarComponents() != 4)
       {
       cerr << "Can only convert RGB or RGBA images" << endl;
-      pr->Delete();
       continue;
       }
 
@@ -123,81 +213,141 @@ int main(int argc, char **argv)
     flip->SetFilteredAxis(1);
     flip->Update();
 
-    // Output image info
+    unsigned char *flip_ptr = 
+      (unsigned char *)(flip->GetOutput()->GetScalarPointer());
+
+    unsigned char *data_ptr = flip_ptr;
+
+    // Image info
 
     int *dim = flip->GetOutput()->GetDimensions();
     int width = dim[0];
     int height = dim[1];
     int pixel_size = flip->GetOutput()->GetNumberOfScalarComponents();
     unsigned long nb_of_pixels = width * height;
+    unsigned long nb_of_bytes = nb_of_pixels * pixel_size;
+
+    // Zlib
+
+    unsigned char *zlib_buffer;
+    if (zlib)
+      {
+      unsigned long zlib_buffer_size = 
+        (unsigned long)((float)nb_of_bytes * 1.2 + 12);
+      zlib_buffer = new unsigned char [zlib_buffer_size];
+      if (compress2(zlib_buffer, &zlib_buffer_size, 
+                    data_ptr, nb_of_bytes, 
+                    Z_BEST_COMPRESSION) != Z_OK)
+        {
+        cerr << "Error: zlib encoding failed." << endl;
+        delete [] zlib_buffer;
+        continue;
+        }
+      data_ptr = zlib_buffer;
+      nb_of_bytes = zlib_buffer_size;
+      }
+  
+    // Base64
+
+    unsigned char *base64_buffer;
+    if (base64)
+      {
+      base64_buffer = new unsigned char [nb_of_bytes * 2];
+      nb_of_bytes = 
+        vtkBase64Utility::Encode(data_ptr, nb_of_bytes, base64_buffer);
+      if (nb_of_bytes == 0)
+        {
+        cerr << "Error: base64 encoding failed." << endl;
+        if (zlib)
+          {
+          delete [] zlib_buffer;
+          }
+        delete [] base64_buffer;
+        continue;
+        }
+      data_ptr = base64_buffer;
+      }
+    
+    // Output image info
 
     out << "/* " << endl
-        << " * This file is generated by ImageConvert from image:" << endl
-        << " *    " << buffer << endl
-        << " */" << endl;
+        << " * This part was generated by ImageConvert from image:" << endl
+        << " *    " << image_name;
 
-    buffer[strlen(buffer) - 4] = 0;
+    if (base64 || zlib)
+      {
+      out << " (" << (zlib ? "zlib" : "") 
+          << (zlib && base64 ? ", " : "") 
+          << (base64 ? "base64" : "") << ")";
+      }
+
+    out << endl << " */" << endl;
+
+    image_name[strlen(image_name) - 4] = 0;
   
-    out << "#define image_" << buffer << "_width      " << width << endl
-        << "#define image_" << buffer << "_height     " << height << endl
-        << "#define image_" << buffer << "_pixel_size " << pixel_size << endl
-        << endl
-        << "static unsigned char image_" << buffer << "[] = {" << endl
-        << "  ";
+    out 
+      << "#define image_" << image_name << "_width         " << width << endl
+      << "#define image_" << image_name << "_height        " << height << endl
+      << "#define image_" << image_name << "_pixel_size    " << pixel_size << endl
+      << "#define image_" << image_name << "_buffer_length " << nb_of_bytes << endl
+      << endl
+      << "static unsigned char image_" << image_name << "[] = " << endl
+      << (base64 ? "  \"" : "{\n  ");
 
     // Loop over pixels
 
-    unsigned char *image = 
-      (unsigned char *)(flip->GetOutput()->GetScalarPointer());
+    unsigned char *ptr = data_ptr;
+    unsigned char *end = data_ptr + nb_of_bytes;
 
-    unsigned long row_size = width;
-    unsigned long cc;
-
-    for (cc = 0; cc < nb_of_pixels; cc++)
-      {    
-      
-      // Output marker for each line
-
-      if (cc % row_size == 0)
+    int cc = 0;
+    while (ptr < (end - 1))
+      {
+      if (base64)
         {
-        out << endl << "/* " << (cc / row_size) << " */ ";
-        }
-    
-      // Output pixel
-
-      if (pixel_size == 4 && (unsigned int)image[cc * pixel_size + 3] == 0)
-        {
-        out << "0, 0, 0, 0";
+        out << *ptr;
+        if (cc % 70 == 69)
+          {
+          out << "\"" << endl << "  \"";
+          }
         }
       else
         {
-        out << (unsigned int)image[cc * pixel_size] << ", "
-            << (unsigned int)image[cc * pixel_size + 1] << ", "
-            << (unsigned int)image[cc * pixel_size + 2];
-        if (pixel_size == 4)
+        out << (unsigned int)*ptr << ", ";
+        if (cc % 15 == 14)
           {
-          out << ", " << (unsigned int)image[cc * pixel_size + 3];
+          out << endl << "  ";
           }
         }
-
-      // Pixel Separator
-
-      if (cc != (nb_of_pixels)-1)
-        {
-        out << ", ";
-        }
-
-      // Line separator
-
-      if (cc % pixel_size == 11)
-        {
-        out << endl << "  ";
-        }
+      cc++;
+      ptr++;
       }
 
-    out << "};" << endl << endl;
+    if (base64)
+      {
+      out << *ptr << "\";";
+      }
+    else
+      {
+      out << (unsigned int)*ptr << endl << "};";
+      }
 
+    out << endl << endl;
+
+    // Free mem
+
+    if (base64)
+      {
+      delete [] base64_buffer;
+      }
+
+    if (zlib)
+      {
+      delete [] zlib_buffer;
+      }
+    
     } // Next file
+
+  // Close file, free objects
 
   out.close();
 
