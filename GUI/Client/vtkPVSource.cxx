@@ -69,7 +69,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.417");
+vtkCxxRevisionMacro(vtkPVSource, "1.418");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1186,7 +1186,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         << "Time = [smGet Sources " << this->GetName()
         << " TimestepValues "
         << "[smGet Sources " << this->GetName()
-        << " TimeStep]]"
+        << " TimeStep] 13.5f]"
         << ends;
       annot->SetCornerText(cornerText.str(), 1);
       delete[] cornerText.str();
