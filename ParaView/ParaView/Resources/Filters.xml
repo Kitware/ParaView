@@ -1724,7 +1724,8 @@
     <Filter class="vtkPProbeFilter">
       <Input name="Source"
              class="vtkDataSet">
-    <GroupRequirement quantity="Single"/>
+        <GroupRequirement quantity="Single"/>
+        <ArrayRequirement attribute="Point"/>
       </Input>
     </Filter>
     <SelectWidget type="object"
