@@ -22,18 +22,19 @@
 
 #include "vtkObject.h"
 
-class vtkRenderer;
-class vtkRenderWindow;
-
 class VTK_EXPORT vtkPVRenderModuleProxy : public vtkObject
 {
 public:
   vtkTypeRevisionMacro(vtkPVRenderModuleProxy, vtkObject);
+
   // Description:
   // Forward these calls to an actual vtkPVRenderView in a sub class.
   virtual float GetZBufferValue(int x, int y) = 0;
+
 protected:
-  vtkPVRenderModuleProxy() {    }
+  vtkPVRenderModuleProxy();
+  ~vtkPVRenderModuleProxy();
+
 private:
   vtkPVRenderModuleProxy(const vtkPVRenderModuleProxy&); // Not implemented
   void operator=(const vtkPVRenderModuleProxy&); // Not implemented
