@@ -262,6 +262,12 @@ public:
   // The name of the trace file.
   vtkGetStringMacro(TraceFileName);
 
+  // Description:
+  // This is used (Unix only) to obtain the path of the executable.
+  // This path is used to locate demos etc.
+  vtkGetStringMacro(Argv0);
+  vtkSetStringMacro(Argv0);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -312,6 +318,7 @@ protected:
 
   vtkSetStringMacro(TraceFileName);
   char* TraceFileName;
+  char* Argv0;
 
   //BTX
   enum

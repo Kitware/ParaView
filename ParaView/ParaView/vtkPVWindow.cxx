@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
 #include "vtkDirectory.h"
+#include "vtkKWDirectoryUtilities.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
@@ -125,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.18");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.19");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1580,6 +1581,29 @@ void vtkPVWindow::PlayDemo()
     this->LoadScript(temp1);
     found=1;
     }
+
+#else
+
+  vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
+  const char* selfPath = util->FindSelfPath(
+    this->GetPVApplication()->GetArgv0());
+  const char* relPath = "../share/ParaView/Demos";
+  char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
+  sprintf(newPath, "%s/%s", selfPath, relPath);
+
+  char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
+  sprintf(demoFile, "%s/Demo1.pvs", newPath);
+
+  if (stat(demoFile, &fs) == 0) 
+    {
+    this->Script("set DemoDir %s", newPath);
+    this->LoadScript(demoFile);
+    found=1;
+    }
+
+  delete[] demoFile;
+  delete[] newPath;
+  util->Delete();
 
 #endif // _WIN32  
 
@@ -3832,7 +3856,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.18 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.19 $");
 }
 
 //----------------------------------------------------------------------------

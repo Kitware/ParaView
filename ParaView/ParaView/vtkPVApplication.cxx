@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.8");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.9");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -294,6 +294,7 @@ vtkPVApplication::vtkPVApplication()
     }
 
   this->TraceFileName = 0;
+  this->Argv0 = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -316,6 +317,7 @@ vtkPVApplication::~vtkPVApplication()
     }
   this->SetGroupFileName(0);
   this->SetTraceFileName(0);
+  this->SetArgv0(0);
 }
 
 

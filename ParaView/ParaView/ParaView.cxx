@@ -96,6 +96,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
     app->SetController(controller);
     app->Script("wm withdraw .");
+    app->SetArgv0(pvArgs->argv[0]);
     app->Start(pvArgs->argc,pvArgs->argv);
     *(pvArgs->RetVal) = app->GetExitStatus();
     app->Delete();
