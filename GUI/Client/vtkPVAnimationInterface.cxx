@@ -68,6 +68,7 @@
 # ifdef _WIN32
 #  include "vtkAVIWriter.h"
 # else
+//#  include "vtkMPEG2Writer.h"
 #  include "vtkMovieWriter.h"
 # endif
 #endif
@@ -185,7 +186,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.149");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.150");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1337,24 +1338,29 @@ void vtkPVAnimationInterface::SaveImagesCallback()
 
     int width = widthEntry->GetEntry()->GetValueAsInt();
     int height = origHeight;
+    int aspectRatio = 0;
     if (isMPEG)
       {
       const char *aspect = aspectRatioMenu->GetOptionMenu()->GetValue();
       if (!strcmp(aspect, "1:1"))
         {
         height = width;
+        aspectRatio = 1;
         }
       else if (!strcmp(aspect, "4:3"))
         {
         height = static_cast<int>(width / 4.0 * 3);
+        aspectRatio = 2;
         }
       else if (!strcmp(aspect, "16:9"))
         {
         height = static_cast<int>(width / 16.0 * 9);
+        aspectRatio = 3;
         }
       else if (!strcmp(aspect, "2.21:1"))
         {
         height = static_cast<int>(width / 2.21);
+        aspectRatio = 4;
         }
       }
     else
@@ -1398,7 +1404,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     frame->Delete();
     dlg->Delete();
 
-    this->SaveImages(fileRoot, ext, width, height);
+    this->SaveImages(fileRoot, ext, width, height, aspectRatio);
     this->View->SetRenderWindowSize(origWidth, origHeight);
     
     delete [] fileRoot;
@@ -1413,7 +1419,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveImages(const char* fileRoot, 
                                          const char* ext,
-                                         int width, int height)
+                                         int width, int height, int aspectRatio /* = 0 */)
 {
   this->SavingData = 1;
   this->GetWindow()->UpdateEnableState();
@@ -1466,7 +1472,15 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
 # else
   else if (strcmp(ext, "mpg") == 0)
     {
+    //awriter = vtkMPEG2Writer::New();
     awriter = vtkMovieWriter::New();
+    (void)aspectRatio;
+    /*
+    if ( aspectRatio > 0 && aspectRatio <= 4 )
+      {
+      vtkMPEG2Writer::SafeDownCast(awriter)->SetAspectRatio(aspectRatio);
+      }
+      */
     }
 # endif
 #endif
@@ -1501,7 +1515,8 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   int i, success = 1;
   this->StopFlag = 0;
 
-  while (t <= this->GetGlobalEnd())
+  int errcode = 0;
+  while (t <= this->GetGlobalEnd() && !errcode)
     {
     this->SetCurrentTime(t, 0);
 
@@ -1509,7 +1524,6 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     sprintf(fileName, "%s%04d.%s", fileRoot, fileCount, ext);
     winToImage->Modified();
     winToImage->ShouldRerenderOff();
-    int errcode = 0;
     if ( writer )
       {
       writer->SetFileName(fileName);
@@ -1520,7 +1534,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     else if ( awriter )
       {
       awriter->Write();
-      errcode = awriter->GetErrorCode();
+      errcode = awriter->GetErrorCode() + awriter->GetError();
       }
 #endif
     if ( errcode == vtkErrorCode::OutOfDiskSpaceError)
