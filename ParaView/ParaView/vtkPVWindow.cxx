@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.21");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.22");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -283,6 +283,9 @@ vtkPVWindow::vtkPVWindow()
 
   this->ShowSourcesLongHelpCheckButton = vtkKWCheckButton::New();
   this->ShowSourcesLongHelp = 1;
+
+  this->MenusDisabled = 0;
+  this->ToolbarButtonsDisabled = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3073,6 +3076,12 @@ void vtkPVWindow::DisableNavigationWindow()
 //----------------------------------------------------------------------------
 void vtkPVWindow::DisableMenus()
 {
+  if (this->MenusDisabled)
+    {
+    return;
+    }
+  this->MenusDisabled = 1;
+
   // First store the state of all menu items.
   this->Menu->StoreMenuState(this->MenuState);
 
@@ -3088,13 +3097,23 @@ void vtkPVWindow::DisableMenus()
 //----------------------------------------------------------------------------
 void vtkPVWindow::EnableMenus()
 {
+  if (!this->MenusDisabled)
+    {
+    return;
+    }
   // Now restore the state of all menu items
   this->Menu->RestoreMenuState(this->MenuState);
+  this->MenusDisabled = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::DisableToolbarButtons()
 {
+  if (this->ToolbarButtonsDisabled)
+    {
+    return;
+    }
+  this->ToolbarButtonsDisabled = 1;
   vtkArrayMapIterator<const char*, vtkKWPushButton*>* it = 
     this->ToolbarButtons->NewIterator();
   while ( !it->IsDoneWithTraversal() )
@@ -3112,12 +3131,18 @@ void vtkPVWindow::DisableToolbarButtons()
 //----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButton(const char* buttonName)
 {
+  if (!this->ToolbarButtonsDisabled)
+    {
+    return;
+    }
+
   vtkKWPushButton *button = 0;
   if ( this->ToolbarButtons->GetItem(buttonName, button) == VTK_OK &&
        button )
     {
     button->EnabledOn();
     }
+  this->ToolbarButtonsDisabled = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -3368,6 +3393,12 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
 
   if ( this->Prototypes->GetItem(moduleName, pvs) == VTK_OK ) 
     {
+    if (grabFocus)
+      {
+      this->DisableToolbarButtons();
+      this->DisableMenus();
+      }
+
     // Make the cloned source current only if it is going into
     // the Sources list.
     if (sourceList && strcmp(sourceList, "Sources") != 0)
@@ -3381,6 +3412,8 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
 
     if (success != VTK_OK)
       {
+      this->EnableToolbarButtons();
+      this->EnableMenus();
       vtkErrorMacro("Cloning operation for " << moduleName
                     << " failed.");
       return 0;
@@ -3388,6 +3421,8 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
 
     if (!clone)
       {
+      this->EnableToolbarButtons();
+      this->EnableMenus();
       return 0;
       }
     
@@ -3873,7 +3908,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.21 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.22 $");
 }
 
 //----------------------------------------------------------------------------
