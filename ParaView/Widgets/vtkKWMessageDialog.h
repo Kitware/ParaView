@@ -93,6 +93,7 @@ public:
   // Description:
   // Set the default button
   vtkSetClampMacro(Default, int, 0, 2);
+  vtkGetMacro(Default, int );
 
   // Description:
   // Set the style of the message box

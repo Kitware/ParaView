@@ -157,8 +157,10 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     this->OKButton->SetBind("<FocusIn>", this->OKFrame->GetWidgetName(), 
 			    "configure -relief groove");
     this->OKButton->SetBind("<FocusOut>", this->OKFrame->GetWidgetName(), 
-			    "configure -relief flat");    
+			    "configure -relief flat");
+    {
     this->OKButton->SetBind(this, "<Return>", "OK");
+    }
     }
   if ( this->CancelButton->GetApplication() )
     {
@@ -168,7 +170,9 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     this->CancelButton->SetBind(
       "<FocusOut>", this->CancelFrame->GetWidgetName(), \
       "configure -relief flat");
+    {
     this->CancelButton->SetBind(this, "<Return>", "Cancel");
+    }
     }
   
   this->Script("pack %s -side bottom -fill x -pady 4",
@@ -190,14 +194,19 @@ void vtkKWMessageDialog::SetText(const char *txt)
 
 int vtkKWMessageDialog::Invoke()
 {
-  if ( this->Default == YesDefault )
+  if ( this->Default == vtkKWMessageDialog::YesDefault )
     {
     this->OKButton->Focus();
     }
-  else if( this->Default == NoDefault )
+  else if( this->Default == vtkKWMessageDialog::NoDefault )
     {
     this->CancelButton->Focus();
-    }  
+    } 
+  if ( this->GetDefault() != vtkKWMessageDialog::NoneDefault )
+    {
+    this->SetBindAll("<Right>", "focus [ tk_focusNext %W ]");
+    this->SetBindAll("<Left>", "focus [ tk_focusPrev %W ]");
+    }
 
   return vtkKWDialog::Invoke();
 }
