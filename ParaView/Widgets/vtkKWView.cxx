@@ -1243,7 +1243,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.45 $");
+  this->ExtractRevision(os,"$Revision: 1.46 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
@@ -1283,3 +1283,10 @@ unsigned char *vtkKWView::GetMemoryData()
 #endif
   return NULL;
 }
+
+void vtkKWView::SetBackgroundColor( float r, float g, float b )
+{
+  this->Renderer->SetBackground( r, g, b );
+  this->Render();
+}
+

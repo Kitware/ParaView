@@ -284,7 +284,7 @@ public:
 
   // Description:
   // Set the background color
-  virtual void SetBackgroundColor( float r, float g, float b ) {};
+  virtual void SetBackgroundColor( float r, float g, float b );
 
   // Description:
   // Set the name to be used in the Properties menu for the view properties
