@@ -14,11 +14,11 @@ set pv(vtkTemp1) [$Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 $pv(vtkTemp43) SetBackgroundColor 0 0 0
 
-set pv(vtkTemp603) [$pv(vtkTemp1) InitializeReadCustom "ImageReader" "/home/berk/Work/ParaView/Data/Data/headsq/quarter.1"]
-$pv(vtkTemp1) ReadFileInformation $pv(vtkTemp603) "/home/berk/Work/ParaView/Data/Data/headsq/quarter.1"
-$pv(vtkTemp1) FinalizeRead $pv(vtkTemp603) "/home/berk/Work/ParaView/Data/Data/headsq/quarter.1"
+set pv(vtkTemp603) [$pv(vtkTemp1) InitializeReadCustom "ImageReader" "$DataDir/Data/headsq/quarter.1"]
+$pv(vtkTemp1) ReadFileInformation $pv(vtkTemp603) "$DataDir/Data/headsq/quarter.1"
+$pv(vtkTemp1) FinalizeRead $pv(vtkTemp603) "$DataDir/Data/headsq/quarter.1"
 set pv(vtkTemp646) [$pv(vtkTemp603) GetPVWidget {Filename}]
-$pv(vtkTemp646) SetValue "/home/berk/Work/ParaView/Data/Data/headsq/quarter"
+$pv(vtkTemp646) SetValue "$DataDir/Data/headsq/quarter"
 set pv(vtkTemp609) [$pv(vtkTemp603) GetPVWidget {FilePattern}]
 $pv(vtkTemp609) SetValue {%s.%d}
 set pv(vtkTemp617) [$pv(vtkTemp603) GetPVWidget {DataByteOrder}]
