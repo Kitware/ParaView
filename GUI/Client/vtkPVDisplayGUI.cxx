@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.5");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.6");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -943,7 +943,7 @@ void vtkPVDisplayGUI::EditColorMapCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DataColorRangeCallback()
 {
-  int fixme;  // we need to trace this callback.
+  this->AddTraceEntry("$kw(%s) DataColorRangeCallback", this->GetTclName());
   if (this->PVSource)
     {
     vtkPVColorMap* colorMap = this->PVSource->GetPVColorMap();
