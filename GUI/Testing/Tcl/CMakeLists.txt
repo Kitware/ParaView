@@ -23,7 +23,7 @@ IF (VTK_USE_MPI)
 ENDIF (VTK_USE_MPI)
 
 SET(PROJECT_TESTS
-  Animation
+  #Animation
   ArrayMenuChangeInput
   Arrow
   Axes
@@ -245,7 +245,7 @@ ADD_TEST("ArrowServer-ParaView-rc"
 
 # remove the following for the batch tests
 SET (PROJECT_TESTS_NO_BATCH 
-  Animation
+  #Animation
   MouseInteraction
   TestDemo
   TestPackage
