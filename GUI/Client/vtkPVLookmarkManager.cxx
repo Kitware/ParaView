@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.18");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.19");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -1670,8 +1670,17 @@ vtkKWIcon *vtkPVLookmarkManager::GetIconOfRenderWindow(vtkRenderWindow *renderWi
   resample->SetInput(iclip->GetOutput());
   resample->Update();
 
+  vtkImageData *img_data = resample->GetOutput();
+  int *wext = img_data->GetWholeExtent();
+
   vtkKWIcon* icon = vtkKWIcon::New();
-  icon->SetImage(resample->GetOutput());
+  icon->SetImage(
+    static_cast<unsigned char*>(img_data->GetScalarPointer()), 
+    wext[1] - wext[0] + 1,
+    wext[3] - wext[2] + 1,
+    img_data->GetNumberOfScalarComponents(),
+    0,
+    vtkKWIcon::IMAGE_OPTION_FLIP_V);
 
   w2i->Delete();
   resample->Delete();

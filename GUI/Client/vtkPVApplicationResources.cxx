@@ -24,11 +24,9 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWindow.h"
 
-#include "vtkPNGReader.h"
 #include "vtkPVOptions.h"
 #include "vtkPVWindow.h"
 
-#include <sys/stat.h>
 #include <vtkstd/string>
 
 #include "vtkPVSourceInterfaceDirectories.h"
@@ -577,48 +575,17 @@ void vtkPVApplication::CreatePhoto(const char *name,
                                    unsigned long buffer_length,
                                    const char *filename)
 {
-  struct stat fs;
-
-  // Try to use the filename directly (provided that Tk will support 
-  // this image format)
-
-  if (filename)
-    {
-    if (stat(filename, &fs) != 0 || this->EvaluateBooleanExpression(
-      "catch {image create photo %s -file {%s}}", name, filename))
-      {
-      vtkWarningMacro("Error creating photo from file " << filename);
-      }
-    return;
-    }
-
-  // Otherwise try to find a PNG file with the same name in the Resources dir
-
-  char buffer[1024];
-  sprintf(buffer, "%s/../ParaView/Resources/%s.png", 
-          VTK_PV_SOURCE_CONFIG_DIR, name);
-
-  if (stat(buffer, &fs) == 0)
-    {
-    vtkPNGReader *png_reader = vtkPNGReader::New();
-    png_reader->SetFileName(buffer);
-    if (!vtkKWTkUtilities::UpdatePhoto(this->GetMainInterp(),
-                                       name, 
-                                       png_reader->GetOutput()))
-      {
-      vtkWarningMacro("Error creating photo from file " << buffer);
-      }
-    png_reader->Delete();
-    return;
-    }
-
-  // Otherwise use the provided data
-
-  if (!vtkKWTkUtilities::UpdatePhoto(this->GetMainInterp(),
-                                     name, 
-                                     data, 
-                                     width, height, pixel_size,
-                                     buffer_length))
+  char dir[1024];
+  sprintf(dir, "%s/../GUI/Client/Resources", VTK_PV_SOURCE_CONFIG_DIR, name);
+  if (!vtkKWTkUtilities::UpdateOrLoadPhoto(
+        this->GetMainInterp(),
+        name, 
+        name,
+        dir,
+        data, 
+        width, height, 
+        pixel_size,
+        buffer_length))
     {
     vtkWarningMacro("Error updating Tk photo " << name);
     }

@@ -78,8 +78,6 @@ public:
   virtual void Start(int argc, char *argv[]);
   virtual void Start()
     { this->vtkKWApplication::Start(); }
-  virtual void Start(char* arg)
-    { this->vtkKWApplication::Start(arg); }
 
   // Description:
   // We need to keep the controller in a prominent spot because there is no
