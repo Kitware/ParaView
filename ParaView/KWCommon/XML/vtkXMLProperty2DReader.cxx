@@ -18,7 +18,7 @@
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLProperty2DReader);
-vtkCxxRevisionMacro(vtkXMLProperty2DReader, "1.3");
+vtkCxxRevisionMacro(vtkXMLProperty2DReader, "1.4");
 
 //----------------------------------------------------------------------------
 char* vtkXMLProperty2DReader::GetRootElementName()
@@ -43,12 +43,13 @@ int vtkXMLProperty2DReader::Parse(vtkXMLDataElement *elem)
 
   // Get attributes
 
-  float fbuffer3[3], fval;
+  double dbuffer3[3];
+  float fval;
   int ival;
 
-  if (elem->GetVectorAttribute("Color", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Color", 3, dbuffer3) == 3)
     {
-    obj->SetColor(fbuffer3);
+    obj->SetColor(dbuffer3);
     }
 
   if (elem->GetScalarAttribute("Opacity", fval))

@@ -18,7 +18,7 @@
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLPropertyReader);
-vtkCxxRevisionMacro(vtkXMLPropertyReader, "1.3");
+vtkCxxRevisionMacro(vtkXMLPropertyReader, "1.4");
 
 //----------------------------------------------------------------------------
 char* vtkXMLPropertyReader::GetRootElementName()
@@ -43,7 +43,8 @@ int vtkXMLPropertyReader::Parse(vtkXMLDataElement *elem)
 
   // Get attributes
 
-  float fbuffer3[3], fval;
+  double dbuffer3[3];
+  float fval;
   int ival;
 
   if (elem->GetScalarAttribute("Interpolation", ival))
@@ -56,9 +57,9 @@ int vtkXMLPropertyReader::Parse(vtkXMLDataElement *elem)
     obj->SetRepresentation(ival);
     }
 
-  if (elem->GetVectorAttribute("Color", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Color", 3, dbuffer3) == 3)
     {
-    obj->SetColor(fbuffer3);
+    obj->SetColor(dbuffer3);
     }
 
   if (elem->GetScalarAttribute("Ambient", fval))
@@ -86,19 +87,19 @@ int vtkXMLPropertyReader::Parse(vtkXMLDataElement *elem)
     obj->SetOpacity(fval);
     }
 
-  if (elem->GetVectorAttribute("AmbientColor", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("AmbientColor", 3, dbuffer3) == 3)
     {
-    obj->SetAmbientColor(fbuffer3);
+    obj->SetAmbientColor(dbuffer3);
     }
 
-  if (elem->GetVectorAttribute("DiffuseColor", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("DiffuseColor", 3, dbuffer3) == 3)
     {
-    obj->SetDiffuseColor(fbuffer3);
+    obj->SetDiffuseColor(dbuffer3);
     }
 
-  if (elem->GetVectorAttribute("SpecularColor", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("SpecularColor", 3, dbuffer3) == 3)
     {
-    obj->SetSpecularColor(fbuffer3);
+    obj->SetSpecularColor(dbuffer3);
     }
 
   if (elem->GetScalarAttribute("EdgeVisibility", ival))
@@ -106,9 +107,9 @@ int vtkXMLPropertyReader::Parse(vtkXMLDataElement *elem)
     obj->SetEdgeVisibility(ival);
     }
 
-  if (elem->GetVectorAttribute("EdgeColor", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("EdgeColor", 3, dbuffer3) == 3)
     {
-    obj->SetEdgeColor(fbuffer3);
+    obj->SetEdgeColor(dbuffer3);
     }
 
   if (elem->GetScalarAttribute("LineWidth", fval))
