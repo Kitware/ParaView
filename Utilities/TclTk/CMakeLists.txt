@@ -150,10 +150,10 @@ IF (try_file)
   VTK_GET_TCL_TK_VERSION ("TCL_TK_MAJOR_VERSION" "TCL_TK_MINOR_VERSION")
   SET (TCL_TK_VERSIOND "${TCL_TK_MAJOR_VERSION}.${TCL_TK_MINOR_VERSION}")
   FIND_PATH(
-     TK_INTERNAL_PATH 
-     ${try_file} 
-     "${VTK_SOURCE_DIR}/Utilities/TclTk/internals/tk${TCL_TK_VERSIOND}"
-     DOC "The path to the Tk internal headers (${try_file}).")
+    TK_INTERNAL_PATH 
+    ${try_file} 
+    "${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/internals/tk${TCL_TK_VERSIOND}"
+    DOC "The path to the Tk internal headers (${try_file}).")
   MARK_AS_ADVANCED(TK_INTERNAL_PATH)
 ENDIF (try_file)
 
