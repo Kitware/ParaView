@@ -47,7 +47,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.106");
+vtkCxxRevisionMacro(vtkPVProbe, "1.107");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -200,7 +200,7 @@ void vtkPVProbe::CreateProperties()
 void vtkPVProbe::AcceptCallbackInternal()
 {
   int i;
-  const char *arrayName;
+  const char *arrayName = NULL;
     
   // call the superclass's method
   this->vtkPVSource::AcceptCallbackInternal();

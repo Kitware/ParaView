@@ -20,7 +20,7 @@
 #include "vtkPointsProjectedHull.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.9");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.10");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;
@@ -217,7 +217,7 @@ int vtkPointsProjectedHull::rectangleIntersection(double hmin, double hmax,
 //
 int vtkPointsProjectedHull::grahamScanAlgorithm(int dir)
 {
-int horizAxis, vertAxis;
+int horizAxis = 0, vertAxis = 0;
 int incrVertAxis(const void *p1, const void *p2);
 int ccw(const void *p1, const void *p2);
 int i,j;

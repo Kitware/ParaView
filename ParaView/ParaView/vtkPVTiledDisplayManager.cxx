@@ -40,7 +40,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.14");
+vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.15");
 vtkStandardNewMacro(vtkPVTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
@@ -793,7 +793,7 @@ void vtkPVTiledDisplayManager::Composite()
   int size[2];
   int *rws;
   vtkPVCompositeBuffer** tileBuffers;
-  vtkCamera* cam;
+  vtkCamera* cam = NULL;
   vtkRenderWindow* renWin = this->RenderWindow;
   vtkRendererCollection *rens;
   vtkRenderer* ren;
@@ -807,6 +807,11 @@ void vtkPVTiledDisplayManager::Composite()
     cam = ren->GetActiveCamera();
     }
 
+  if (!cam)
+    {
+    return;
+    }
+  
   // If this flag is set by the root, then skip compositing.
   if ( ! this->UseCompositing)
     { // Just set up this one tile and render.

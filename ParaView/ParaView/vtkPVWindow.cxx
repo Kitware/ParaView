@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.506");
+vtkCxxRevisionMacro(vtkPVWindow, "1.507");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1540,7 +1540,7 @@ void vtkPVWindow::MouseAction(int action,int button,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::Configure(int width, int height)
+void vtkPVWindow::Configure(int vtkNotUsed(width), int vtkNotUsed(height))
 {
   this->MainView->Configured();
   // The above Configured call could have changed the size of the render
@@ -2275,7 +2275,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
 {
   // Find the writer that supports this file name and data type.
   vtkPVWriter* writer = 0;
-  vtkDataSet* data;
+  vtkDataSet* data = NULL;
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
   vtkPVClassNameInformation* info = part->GetClassNameInformation();
