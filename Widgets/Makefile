@@ -35,6 +35,7 @@ vtkKWMenu \
 vtkKWMessageDialog \
 vtkKWNotebook \
 vtkKWObject \
+vtkKWOKCancelDialog \
 vtkKWOptionMenu \
 vtkKWProgressGauge \
 vtkKWPushButton \
