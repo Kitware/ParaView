@@ -41,7 +41,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.1");
+vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.2");
 vtkStandardNewMacro(vtkTiledDisplayManager);
 
 
@@ -295,9 +295,22 @@ void vtkTiledDisplayManager::RenderRMI()
   // Start and end methods take care of synchronization and compositing
   vtkRenderWindow* renWin = this->RenderWindow;
 
-  this->SatelliteStartRender();
+  // Delay swapping buffers untill all processes are finished.
+  if (this->Controller)
+    {
+    renWin->SwapBuffersOff();  
+    }
 
+  this->SatelliteStartRender();
   renWin->Render();
+
+  // Force swap buffers here.
+  if (this->Controller)
+    {
+    this->Controller->Barrier();
+    renWin->SwapBuffersOn();  
+    renWin->Frame();
+    }
 }
 
 
@@ -479,7 +492,10 @@ void vtkTiledDisplayManager::StartRender()
     {
     return;
     }
-  
+
+  // Make sure they all swp buffers at the same time.
+  renWin->SwapBuffersOff();
+
   // Trigger the satellite processes to start their render routine.
   rens = this->RenderWindow->GetRenderers();
   numProcs = this->Controller->GetNumberOfProcesses();
@@ -549,8 +565,12 @@ void vtkTiledDisplayManager::EndRender()
   vtkRenderWindow* renWin = this->RenderWindow;
   
   // Force swap buffers here.
-  //renWin->SwapBuffersOn();  
-  //renWin->Frame();
+  if (this->Controller)
+    {
+    this->Controller->Barrier();
+    renWin->SwapBuffersOn();  
+    renWin->Frame();
+    }
 }
 
 
