@@ -84,7 +84,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.22.2.2");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.22.2.3");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -94,7 +94,8 @@ int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVProcessModule::vtkPVProcessModule()
 {
   this->Controller = NULL;
-  this->TemporaryInformation = NULL; 
+  this->TemporaryInformation = NULL;
+  this->RootResult = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -105,6 +106,7 @@ vtkPVProcessModule::~vtkPVProcessModule()
     this->Controller->Delete();
     this->Controller = NULL;
     }
+  this->SetRootResult(NULL);
 }
 
 
@@ -368,12 +370,13 @@ void vtkPVProcessModule::RootSimpleScript(const char *script)
 {
   // Default implementation just executes locally.
   this->Script(script);
+  this->SetRootResult(this->Application->GetMainInterp()->result);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVProcessModule::GetRootResult()
 {
-  return this->Application->GetMainInterp()->result;
+  return this->RootResult;
 }
 
 //----------------------------------------------------------------------------
@@ -506,5 +509,10 @@ int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
 void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Controller: " << this->Controller << endl;;
+  os << indent << "Controller: " << this->Controller << endl;
+  if (this->RootResult)
+    {
+    os << indent << "RootResult: " << this->RootResult << endl;
+    }
 }
+

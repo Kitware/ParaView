@@ -130,6 +130,7 @@ public:
   void  RootScript(const char *EventString, ...);
 //ETX
   virtual void  RootSimpleScript(const char *str);
+  vtkSetStringMacro(RootResult);
   virtual const char* GetRootResult();
   
   // Description:
@@ -162,6 +163,8 @@ protected:
   
   vtkMultiProcessController *Controller;
   vtkPVInformation *TemporaryInformation;
+
+  char *RootResult;
 
 private:  
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
