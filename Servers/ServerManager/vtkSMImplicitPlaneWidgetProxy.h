@@ -64,19 +64,6 @@ protected:
   double  Normal[3];
   int     DrawPlane;
 
-  // Description:
-  // These are the center and normal that were last set on the VTK object on the Server.
-  // This is used to determine if the Center/Normal changed has changed when 
-  // UpdateVTKObjects() is called. The WidgetModifiedEvent is raised only if they are 
-  // changed. This intricacy is needed since, we don't wnat the WidgetModifiedEvent 
-  // invoked when only the DrawPlane status is modified. 
-  // Otherwise we get problems like the Accept button
-  // remaining green even after Accept is called etc.
-  double LastCenter[3];
-  double LastNormal[3];
-  vtkSetVector3Macro(LastCenter,double);
-  vtkSetVector3Macro(LastNormal,double); 
-
 private:
   vtkSMImplicitPlaneWidgetProxy(const vtkSMImplicitPlaneWidgetProxy&); // Not implemented
   void operator=(const vtkSMImplicitPlaneWidgetProxy&); // Not implemented

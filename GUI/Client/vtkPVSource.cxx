@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.395.2.2");
+vtkCxxRevisionMacro(vtkPVSource, "1.395.2.3");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -634,6 +634,11 @@ void vtkPVSource::Select()
   it->Delete();
   this->Notebook->ShowPage("Display");
   this->Notebook->ShowPage("Information");
+
+  if (this->Initialized)
+    {
+    this->Notebook->SetAcceptButtonColorToUnmodified();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1444,7 +1449,7 @@ void vtkPVSource::UpdateParameterWidgets()
     {
     pvw = static_cast<vtkPVWidget*>(it->GetObject());
     // Do not try to reset the widget if it is not initialized
-    if (pvw->GetApplication())
+    if (pvw && (pvw->GetModifiedFlag() || !this->Initialized))
       {
       pvw->Reset();
       }

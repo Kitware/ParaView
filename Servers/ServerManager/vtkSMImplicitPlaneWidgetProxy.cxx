@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.3.2.1");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -33,9 +33,6 @@ vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
   this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
   this->Normal[0] = this->Normal[2] = 0.0;
   this->Normal[1] = 1.0;
-  this->LastCenter[0] = this->LastCenter[1] = this->LastCenter[2] = 0.0;
-  this->LastNormal[0] = this->LastNormal[2] = 0.0;
-  this->LastNormal[1] = 1.0;
   this->DrawPlane = 0;
   this->SetVTKClassName("vtkImplicitPlaneWidget");
 }
@@ -95,13 +92,13 @@ void vtkSMImplicitPlaneWidgetProxy::PlaceWidget(double bds[6])
 {
   double normal[3];
   this->GetNormal(normal);
-  this->Superclass::PlaceWidget(bds);
   double center[3];
   center[0] = (bds[0]+bds[1])/2;
   center[1] = (bds[2]+bds[3])/2;
   center[2] = (bds[4]+bds[5])/2;
   this->SetCenter(center);
   this->SetNormal(normal);
+  this->Superclass::PlaceWidget(bds);
 }
 
 //----------------------------------------------------------------------------
@@ -117,13 +114,10 @@ void vtkSMImplicitPlaneWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long e
   widget->GetNormal(normal);
   //Just set the iVars
   this->SetCenter(center);
-  this->SetLastCenter(center);
   this->SetNormal(normal);
-  this->SetLastNormal(normal);
   if (!widget->GetDrawPlane() && event == vtkCommand::InteractionEvent)
     { 
     this->SetDrawPlane(1);
-    this->UpdateVTKObjects();
     }
   this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
   this->Superclass::ExecuteEvent(wdg,event,p);
@@ -136,34 +130,21 @@ void vtkSMImplicitPlaneWidgetProxy::UpdateVTKObjects()
 
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream str;
-  int trigger_event = 0;
   for(unsigned int cc=0; cc<this->GetNumberOfIDs();cc++)
     { 
     vtkClientServerID id = this->GetID(cc);
-    if (this->Center[0] != this->LastCenter[0]
-      || this->Center[1] != this->LastCenter[1]
-      || this->Center[2] != this->LastCenter[2])
-      {
-      trigger_event = 1;
-      str << vtkClientServerStream::Invoke 
+    str << vtkClientServerStream::Invoke 
         << id << "SetOrigin" 
         << this->Center[0] 
         << this->Center[1] 
         << this->Center[2]
         << vtkClientServerStream::End;
-      }
-    if (this->Normal[0] != this->LastNormal[0]
-      || this->Normal[1] != this->LastNormal[1]
-      || this->Normal[2] != this->LastNormal[2])
-      {
-      trigger_event = 1;
-      str << vtkClientServerStream::Invoke 
+    str << vtkClientServerStream::Invoke 
         << id << "SetNormal"
         << this->Normal[0]
         << this->Normal[1]
         << this->Normal[2]
         << vtkClientServerStream::End;
-      }
     str << vtkClientServerStream::Invoke 
       << id << "SetDrawPlane" 
       << this->DrawPlane
@@ -172,10 +153,6 @@ void vtkSMImplicitPlaneWidgetProxy::UpdateVTKObjects()
   if (str.GetNumberOfMessages() > 0)
     {
     pm->SendStream(this->Servers,str,0);
-    }
-  if (trigger_event)
-    {
-    this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
     }
 }
 

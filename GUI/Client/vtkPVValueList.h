@@ -99,6 +99,8 @@ protected:
 
   static const int MAX_NUMBER_ENTRIES;
 
+  void AddValueNoModified(double val);
+
   vtkContourValues *ContourValues;
   
   vtkKWLabeledFrame* ContourValuesFrame;

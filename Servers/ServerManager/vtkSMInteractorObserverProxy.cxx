@@ -24,7 +24,7 @@
 
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.3.2.1");
 
 //===========================================================================
 //***************************************************************************
@@ -113,6 +113,10 @@ void vtkSMInteractorObserverProxy::ExecuteEvent(vtkObject*, unsigned long event,
   else if ( event == vtkCommand::EndInteractionEvent )
     {
     this->InvokeEvent(vtkCommand::EndInteractionEvent);
+    }
+  else
+    {
+    this->UpdateVTKObjects();
     }
 }
 

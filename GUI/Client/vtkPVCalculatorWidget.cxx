@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.30.2.1");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -805,11 +805,11 @@ void vtkPVCalculatorWidget::Accept()
     {
     if (strcmp(mode, "Point Data") == 0)
       {
-      attributeProp->SetElement(0, 0);
+      attributeProp->SetElement(0, 1);
       }
     else
       {
-      attributeProp->SetElement(0, 1);
+      attributeProp->SetElement(0, 2);
       }
     }
 

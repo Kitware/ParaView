@@ -29,7 +29,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.54");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.54.2.1");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -158,7 +158,7 @@ void vtkPVContourEntry::ResetInternal()
 
     for (unsigned int i = 0; i < numContours; i++)
       {
-      this->AddValue(prop->GetElement(i));
+      this->AddValueNoModified(prop->GetElement(i));
       }
     }
   

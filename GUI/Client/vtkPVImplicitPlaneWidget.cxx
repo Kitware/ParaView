@@ -51,7 +51,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.40");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.40.2.1");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -211,9 +211,22 @@ void vtkPVImplicitPlaneWidget::ResetInternal()
     return;
     }
 
+  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->ImplicitFunctionProxy->GetProperty("Offset"));
+  if(sdvp)
+    {
+    double offset = sdvp->GetElement(0);
+    this->OffsetEntry->SetValue(offset);
+    }
+  else
+    {
+    vtkErrorMacro("Could not find property Offset for widget: "<< 
+                  this->ImplicitFunctionProxy->GetVTKClassName());
+    }
+
   if ( this->AcceptCalled )
     {
-    vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
       this->ImplicitFunctionProxy->GetProperty("Origin"));
     if(sdvp)
       {
@@ -245,19 +258,6 @@ void vtkPVImplicitPlaneWidget::ResetInternal()
                     this->ImplicitFunctionProxy->GetVTKClassName());
       }
 
-    sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->ImplicitFunctionProxy->GetProperty("Offset"));
-    if(sdvp)
-      {
-      double offset = sdvp->GetElement(0);
-      this->OffsetEntry->SetValue(offset);
-      }
-    else
-      {
-      vtkErrorMacro("Could not find property Offset for widget: "<< 
-                    this->ImplicitFunctionProxy->GetVTKClassName());
-      }
-    
     vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->WidgetProxy->GetProperty("DrawPlane"));
     if (ivp)
@@ -662,19 +662,6 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
   this->Script("pack %s -side left -fill x -expand t",
     this->NormalZButton->GetWidgetName());
 
-  // Initialize the center of the plane based on the input bounds.
-  if (this->PVSource)  
-    {
-    vtkPVSource *input = this->PVSource->GetPVInput(0);
-    if (input)
-      {
-      double bds[6];
-      input->GetDataInformation()->GetBounds(bds);
-      this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
-        0.5*(bds[4]+bds[5]));
-      this->SetNormal(0, 0, 1);
-      }
-    }
   this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
@@ -788,6 +775,13 @@ void vtkPVImplicitPlaneWidget::SetCenterInternal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Center"));
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
+  this->Render();
+
+  this->CenterEntry[0]->SetValue(x);
+  this->CenterEntry[1]->SetValue(y);
+  this->CenterEntry[2]->SetValue(z);
+
+  this->UpdateOffsetRange();
 }
 
 //----------------------------------------------------------------------------
@@ -826,6 +820,13 @@ void vtkPVImplicitPlaneWidget::SetNormalInternal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Normal"));
   dvp->SetElements3(x,y,z);
   this->WidgetProxy->UpdateVTKObjects();
+  this->Render();
+
+  this->NormalEntry[0]->SetValue(x);
+  this->NormalEntry[1]->SetValue(y);
+  this->NormalEntry[2]->SetValue(z);
+
+  this->UpdateOffsetRange();
 }
 
 //----------------------------------------------------------------------------
@@ -930,7 +931,6 @@ void vtkPVImplicitPlaneWidget::UpdateOffsetRange()
 void vtkPVImplicitPlaneWidget::Update()
 {
   vtkPVSource *input;
-  double bds[6];
 
   this->Superclass::Update();
 
@@ -953,8 +953,24 @@ void vtkPVImplicitPlaneWidget::Update()
 
     prop->UpdateDependentDomains();
 
+    double bds[6];
     input->GetDataInformation()->GetBounds(bds);
     this->PlaceWidget(bds);
+
+    double center[3];
+    double normal[3];
+    this->WidgetProxy->UpdateInformation();
+    this->GetCenterInternal(center);
+    this->GetNormalInternal(normal);
+  
+    this->CenterEntry[0]->SetValue(center[0]);
+    this->CenterEntry[1]->SetValue(center[1]);
+    this->CenterEntry[2]->SetValue(center[2]);
+    
+    this->NormalEntry[0]->SetValue(normal[0]);
+    this->NormalEntry[1]->SetValue(normal[1]);
+    this->NormalEntry[2]->SetValue(normal[2]);
+
     }
 }
 
