@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.95");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.95.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -646,6 +646,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       if ( strcmp(fullPath.str(), dom->GetString(i)) == 0 )
         {
         this->SetTimeStep(i);
+        this->TimeStep = i;
         break;
         }
       }
@@ -1027,12 +1028,12 @@ void vtkPVFileEntry::UpdateTimeStep()
   int ts = this->FileListSelect->GetElementIndexFromFinalList(file);
   if ( ts < 0 )
     {
-    cout << "This should not have happended" << endl;
-    cout << "Cannot find \"" << file << "\" on the list" << endl;
+    cerr << "This should not have happended" << endl;
+    cerr << "Cannot find \"" << file << "\" on the list" << endl;
     int cc;
     for ( cc = 0; cc < this->FileListSelect->GetNumberOfElementsOnFinalList(); cc ++ )
       {
-      cout << "Element: " << this->FileListSelect->GetElementFromFinalList(cc) << endl;
+      cerr << "Element: " << this->FileListSelect->GetElementFromFinalList(cc) << endl;
       }
     vtkPVApplication::Abort();
     }

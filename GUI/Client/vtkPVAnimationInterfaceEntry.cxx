@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVAnimationInterfaceEntry.h"
 
+#include "vtkPVConfig.h" // Needed for PARAVIEW_EXPERIMENTAL_USER
 #include "vtkCommand.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -77,7 +78,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.52");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.52.2.1");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);

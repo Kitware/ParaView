@@ -164,6 +164,15 @@ public:
   void VolumeRenderModeOff();
 
   // Description:
+  // Return whether volume rendering is on or off.
+  vtkGetMacro(VolumeRenderMode, int);
+
+  // Description:
+  // Set/Get the scalar array used during volume rendering.
+  vtkSetStringMacro(VolumeRenderField);
+  vtkGetStringMacro(VolumeRenderField);
+
+  // Description:
   // Initialize the transfer functions based on the scalar range
   void ResetTransferFunctions(vtkPVArrayInformation *arrayInfo,
                               vtkPVDataInformation *dataInfo);
@@ -268,6 +277,8 @@ protected:
   int GeometryIsValid;
   int VolumeRenderMode;
     
+  char *VolumeRenderField;
+
   vtkSMPartDisplay(const vtkSMPartDisplay&); // Not implemented
   void operator=(const vtkSMPartDisplay&); // Not implemented
 };

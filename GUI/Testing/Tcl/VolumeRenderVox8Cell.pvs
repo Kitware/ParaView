@@ -51,7 +51,7 @@ $kw(vtkTemp1187) SetVisibility 1
 $kw(vtkTemp1187) DrawVolume
 $kw(vtkTemp24) SetCameraState -2.443 -3.984 4.451  1.000 1.000 1.000  -0.384 0.690 0.613
 $kw(vtkTemp24) SetCameraState 5.820 -3.332 3.569  1.000 1.000 1.000  -0.554 -0.129 0.823
-$kw(vtkTemp1187) VolumeRenderCellField {cRamp1}
+$kw(vtkTemp1187) VolumeRenderCellField {cRamp1} 1
 $kw(vtkTemp24) SetCameraState 5.351 -2.781 4.920  1.000 1.000 1.000  -0.682 -0.027 0.731
 $kw(vtkTemp24) SetCameraState 6.208 -3.526 5.692  1.857 0.256 1.772  -0.682 -0.027 0.731
 $kw(vtkTemp24) SetCameraState 6.208 -3.526 5.692  1.880 0.351 1.839  -0.682 -0.027 0.731

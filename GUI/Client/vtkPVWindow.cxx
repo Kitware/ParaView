@@ -130,7 +130,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.615");
+vtkCxxRevisionMacro(vtkPVWindow, "1.615.2.1");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -518,8 +518,11 @@ void vtkPVWindow::PrepareForDelete()
     this->Toolbar->Delete();
     this->Toolbar = NULL;
     }
+  if ( this->ToolbarMenuButton )
+    {
   this->ToolbarMenuButton->Delete();
   this->ToolbarMenuButton = 0;
+    }
 
   if (this->PickCenterButton)
     {
@@ -983,6 +986,7 @@ void vtkPVWindow::ToolbarMenuCheckCallback(const char* buttonName)
       this->Toolbar->RemoveWidget(button);
       }
     }
+  this->UpdateEnableState();
 }
 
 
@@ -2185,6 +2189,8 @@ int vtkPVWindow::OpenWithReader(const char *fileName,
     }
   int retVal;
   retVal = this->ReadFileInformation(clone, fileName);
+  clone->GrabFocus();
+  this->UpdateEnableState();
   if (retVal != VTK_OK)
     {
     return retVal;
@@ -2196,7 +2202,6 @@ int vtkPVWindow::OpenWithReader(const char *fileName,
     return retVal;
     }
   return VTK_OK;
-
 }
 
 //-----------------------------------------------------------------------------
@@ -3667,7 +3672,7 @@ void vtkPVWindow::EnableToolbarButtons()
     {
     return;
     }
-  if (this->CurrentPVSource == NULL)
+  if (this->CurrentPVSource == 0)
     {
     return;
     }
@@ -4694,6 +4699,16 @@ void vtkPVWindow::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkPVWindow::UpdateMenuState()
 {
+  int source_grabbed = 0;
+  if ( this->CurrentPVSource && this->CurrentPVSource->GetSourceGrabbed() )
+    {
+    source_grabbed = 1;
+    }
+  int enabled = this->Enabled;
+  if ( source_grabbed )
+    {
+    this->Enabled = 0;
+    }
   this->Superclass::UpdateMenuState();
 
   this->PropagateEnableState(this->Menu);
@@ -4712,6 +4727,7 @@ void vtkPVWindow::UpdateMenuState()
 
   if ( this->InDemo )
     {
+    this->Enabled = enabled;
     return;
     }
 
@@ -4756,6 +4772,7 @@ void vtkPVWindow::UpdateMenuState()
 
   // Handle the source menu and toolbar buttons.
   this->UpdateSourceMenu();
+  this->Enabled = enabled;
 }
 
 //-----------------------------------------------------------------------------
@@ -4871,3 +4888,4 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InteractorID: " << this->InteractorID << endl;
   os << indent << "InDemo: " << this->InDemo << endl;
 }
+

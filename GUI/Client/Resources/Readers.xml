@@ -432,7 +432,7 @@
           output="vtkUnstructuredGrid"
           class="vtkPVAdvancedReaderModule"
           module_type="Reader"
-          extensions=".g .e .ex2 .exo .gen .0 .00 .000 .0000"
+          extensions=".g .e .ex2 .exo .gen .exoII .0 .00 .000 .0000"
           file_description="Exodus">
     <Source class="vtkPExodusReader"/>
 

@@ -134,6 +134,7 @@ public:
   void Update();
   void UpdateCubeAxesVisibilityCheck();
   void UpdateColorGUI();
+  void UpdateVolumeGUI();
      
   // Description:
   // This method is meant to setup the actor/mapper
@@ -220,11 +221,11 @@ public:
   
   // Description:
   // Select a point field to use for volume rendering
-  void VolumeRenderPointField(const char *name);
+  void VolumeRenderPointField(const char *name, int numComps);
 
   // Description:
   // Select a cell field to use for volume rendering
-  void VolumeRenderCellField(const char *name);
+  void VolumeRenderCellField(const char *name, int numComps);
   
   // Description:
   // Called by vtkPVSource::DeleteCallback().

@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.11");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.11.2.1");
 
 
 //----------------------------------------------------------------------------s
@@ -175,6 +175,7 @@ vtkSMPartDisplay::vtkSMPartDisplay()
   
   this->OpacityUnitDistance    = 0;
   this->VolumeRenderMode       = 0;
+  this->VolumeRenderField      = NULL;
  }
 
 //----------------------------------------------------------------------------
@@ -1160,6 +1161,8 @@ void vtkSMPartDisplay::InitializeTransferFunctions(vtkPVArrayInformation *arrayI
 void vtkSMPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *arrayInfo, 
                                               vtkPVDataInformation *dataInfo)
 {
+  this->SetVolumeRenderField(arrayInfo->GetName());
+
   double range[2];
   arrayInfo->GetComponentRange(0, range);
   
@@ -1193,10 +1196,10 @@ void vtkSMPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *arrayInfo,
   stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(0)
          << "RemoveAllPoints" << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(0)
-         << "AddHSVPoint" << range[0] << 0.0 << 1.0 << 1.0 
+         << "AddHSVPoint" << range[0] << 0.667 << 1.0 << 1.0 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(0)
-         << "AddHSVPoint" << range[1] << 0.8 << 1.0 << 1.0 
+         << "AddHSVPoint" << range[1] << 0.0 << 1.0 << 1.0 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorProxy->GetID(0)
          << "SetColorSpaceToHSVNoWrap" << vtkClientServerStream::End;
@@ -1661,5 +1664,8 @@ void vtkSMPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VolumeColorProxy: "       << this->VolumeColorProxy       << endl;
   os << indent << "VolumeTetraFilterProxy: " << this->VolumeTetraFilterProxy << endl;
 
+  os << indent << "VolumeRenderMode: " << this->VolumeRenderMode << endl;
+  os << indent << "VolumeRenderField: "
+     << (this->VolumeRenderField ? this->VolumeRenderField : "(NULL)") << endl;
 }
 

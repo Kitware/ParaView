@@ -20,7 +20,7 @@
 #include "vtkSMStringListDomain.h"
 
 vtkStandardNewMacro(vtkPVAnimationBatchHelper);
-vtkCxxRevisionMacro(vtkPVAnimationBatchHelper, "1.2");
+vtkCxxRevisionMacro(vtkPVAnimationBatchHelper, "1.2.4.1");
 
 //---------------------------------------------------------------------------
 void vtkPVAnimationBatchHelper::SetAnimationValueInBatch(
@@ -32,13 +32,13 @@ void vtkPVAnimationBatchHelper::SetAnimationValueInBatch(
     return;
     }
 
-  if (!strcmp(domain->GetClassName(), "vtkSMDoubleRangeDomain"))
+  if (domain->IsA("vtkSMDoubleRangeDomain"))
     {
     *file << "  [$pvTemp" << sourceID << " GetProperty "
           << property->GetXMLName() << "] SetElement " << idx << " " << value
           << endl;
     }
-  else if (!strcmp(domain->GetClassName(), "vtkSMExtentDomain"))
+  else if (domain->IsA("vtkSMExtentDomain"))
     {
     vtkSMIntVectorProperty *ivp =
       vtkSMIntVectorProperty::SafeDownCast(property);
@@ -79,13 +79,13 @@ void vtkPVAnimationBatchHelper::SetAnimationValueInBatch(
         break;
       }
     }
-  else if (!strcmp(domain->GetClassName(), "vtkSMIntRangeDomain"))
+  else if (domain->IsA("vtkSMIntRangeDomain"))
     {
     *file << "  [$pvTemp" << sourceID << " GetProperty "
           << property->GetXMLName() << "] SetElement " << idx << " "
           << (int)(floor(value + 0.5)) << endl;
     }
-  else if (!strcmp(domain->GetClassName(), "vtkSMStringListDomain"))
+  else if (domain->IsA("vtkSMStringListDomain"))
     {
     vtkSMStringListDomain *sld = vtkSMStringListDomain::SafeDownCast(domain);
     if (!sld)
@@ -96,13 +96,17 @@ void vtkPVAnimationBatchHelper::SetAnimationValueInBatch(
           << property->GetXMLName() << "] SetElement " << idx << " {"
           << sld->GetString((int)(floor(value + 0.5))) << "}" << endl;
     }
-  else if (!strcmp(domain->GetClassName(), "vtkSMStringListRangeDomain"))
+  else if (domain->IsA("vtkSMStringListRangeDomain"))
     {
     char val[128];
     sprintf(val, "%d", static_cast<int>(floor(value + 0.5)));
     *file << "  [$pvTemp" << sourceID << " GetProperty "
           << property->GetXMLName() << "] SetElement " << 2*idx+1 << " " << val
           << endl;
+    }
+  else
+    {
+    vtkErrorMacro("Missing handler for " << domain->GetClassName() << " domain");
     }
 
   *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
