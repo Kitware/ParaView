@@ -9,8 +9,6 @@ SET(ServersFilters_SRCS
   TestCTH
   TestPVFilters
   TestMPI
-  TestProjectedTetrahedra
-  TestSort
   )
 
 IF(VTK_USE_MPI)
@@ -20,7 +18,20 @@ IF(VTK_USE_MPI)
     )
 ENDIF(VTK_USE_MPI)
 
+SET(ServersFiltersImage_SRCS
+  TestProjectedTetrahedra
+  TestSort
+)
+
 FOREACH(name ${ServersFilters_SRCS})
+  ADD_EXECUTABLE(${name} ${name}.cxx)
+  ADD_TEST(${name} ${CXX_TEST_PATH}/${name} ${name}
+    -D ${VTK_DATA_ROOT}
+    )
+  TARGET_LINK_LIBRARIES(${name} vtkPVFilters)
+ENDFOREACH(name)
+
+FOREACH(name ${ServersFiltersImage_SRCS})
   ADD_EXECUTABLE(${name} ${name}.cxx)
   ADD_TEST(${name} ${CXX_TEST_PATH}/${name} ${name}
     -D ${VTK_DATA_ROOT}
