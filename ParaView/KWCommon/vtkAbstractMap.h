@@ -106,7 +106,7 @@ int vtkContainerCompareMethod(const vtkAbstractMapItem<KeyType, DataType>& d1,
                               const vtkAbstractMapItem<KeyType, DataType>& d2)
 {
   // Use only the Key for comparison.
-  return vtkContainerCompareMethod(d1.Key, d2.Key);
+  return ::vtkContainerCompareMethod(d1.Key, d2.Key);
 }
 
 //----------------------------------------------------------------------------

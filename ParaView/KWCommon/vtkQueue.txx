@@ -108,7 +108,7 @@ int vtkQueue<DType>::EnqueueItem(DType a)
     }
 
   this->Start = (this->Start + 1) % this->GetSize();
-  this->Array[this->Start] = static_cast<DType>( vtkContainerCreateMethod(a) );
+  this->Array[this->Start] = static_cast<DType>( ::vtkContainerCreateMethod(a) );
   this->NumberOfItems ++;
   return VTK_OK;
 }
@@ -122,7 +122,7 @@ int vtkQueue<DType>::DequeueItem()
     //cout << "Queue is empty" << endl;
     return VTK_ERROR;
     }
-  vtkContainerDeleteMethod(this->Array[this->End]);
+  ::vtkContainerDeleteMethod(this->Array[this->End]);
   this->End = (this->End + 1) % this->GetSize();
   this->NumberOfItems --;
   return VTK_OK;
@@ -150,7 +150,7 @@ void vtkQueue<DType>::MakeEmpty()
   vtkIdType cc;
   for ( cc = this->End; this->NumberOfItems > 0 ; cc = (cc + 1) % this->GetSize() )
     {
-    vtkContainerDeleteMethod(this->Array[cc]);
+    ::vtkContainerDeleteMethod(this->Array[cc]);
     this->NumberOfItems --;
     }
   this->NumberOfItems = 0;
