@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.20");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.21");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -655,9 +655,13 @@ void vtkKWColorTransferFunctionEditor::Pack()
     // row below. Otherwise get the current number of rows and insert
     // the ramp at the end
 
+    int show_pr = 
+      (this->ShowParameterRange && this->ParameterRange->IsCreated()) ? 1 : 0;
+
     int col, row, nb_cols;
-    if (this->ShowParameterRange && 
-        this->ParameterRange->IsCreated() &&
+    if (show_pr &&
+        (this->ParameterRangePosition == 
+         vtkKWParameterValueFunctionEditor::ParameterRangePositionAtBottom) &&
         vtkKWTkUtilities::GetGridPosition(
           this->GetApplication()->GetMainInterp(), 
           this->ParameterRange->GetWidgetName(), 
@@ -674,7 +678,11 @@ void vtkKWColorTransferFunctionEditor::Pack()
             this->ColorRamp->GetParent()->GetWidgetName(), 
             &nb_cols, &row))
         {
-        row = 2 + (this->ShowParameterTicks ? 1 : 0);
+        row = 2 + (this->ShowParameterTicks ? 1 : 0) + 
+          (show_pr &&
+           (this->ParameterRangePosition == 
+            vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop) 
+           ? 1 :0 );
         }
       }
     tk_cmd << "grid " << this->ColorRamp->GetWidgetName() 

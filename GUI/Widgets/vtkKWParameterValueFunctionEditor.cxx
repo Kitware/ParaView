@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.22");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.23");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -68,6 +68,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->ShowParameterRange          = 1;
   this->ShowValueRange              = 1;
   this->PointPositionInValueRange   = vtkKWParameterValueFunctionEditor::PointPositionAtValue;
+  this->ParameterRangePosition      = vtkKWParameterValueFunctionEditor::ParameterRangePositionAtBottom;
   this->CanvasHeight                = 55;
   this->CanvasWidth                 = 55;
   this->ExpandCanvasWidth           = 1;
@@ -1520,6 +1521,14 @@ void vtkKWParameterValueFunctionEditor::Pack()
         1|  L VT [--------------]   VR PE      LabelPosition: Left
         2|       PT                            RangeLabelPosition: Default
         3|       PR                            ParameterEntryPosition: Right
+
+            a b  c              d   e  f
+         +------------------------------
+        0|       TLC            TRF            ShowLabel: On
+        1|       PR                            ParameterEntryPosition: Right
+        2|  L VT [--------------]   VR PE      LabelPosition: Left
+        3|       PT                            RangeLabelPosition: Default
+                                               ParameterRangePosition: Top
   */
 
   // We need a grid
@@ -1652,6 +1661,19 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   row++;
   
+  // Parameter range (PR) if at top
+  
+  if (this->ShowParameterRange && 
+      this->ParameterRange->IsCreated() &&
+      (this->ParameterRangePosition == 
+       vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop))
+    {
+    tk_cmd << "grid " << this->ParameterRange->GetWidgetName() 
+           << " -sticky ew -padx 0 -pady 2"
+           << " -columnspan 2 -column " << col_c << " -row " << row << endl;
+    row++;
+    }
+
   // Label (L) if at left
 
   if (this->ShowLabel && 
@@ -1719,7 +1741,10 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // Parameter range (PR)
   
-  if (this->ShowParameterRange && this->ParameterRange->IsCreated())
+  if (this->ShowParameterRange && 
+      this->ParameterRange->IsCreated() &&
+      (this->ParameterRangePosition == 
+       vtkKWParameterValueFunctionEditor::ParameterRangePositionAtBottom))
     {
     tk_cmd << "grid " << this->ParameterRange->GetWidgetName() 
            << " -sticky ew -padx 0 -pady 2"
@@ -1988,6 +2013,31 @@ void vtkKWParameterValueFunctionEditor::SetShowParameterRange(int arg)
 
   this->Pack();
   this->UpdateRangeLabel();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWParameterValueFunctionEditor::SetParameterRangePosition(int arg)
+{
+  if (arg < vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop)
+    {
+    arg = vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop;
+    }
+  else if (arg > 
+           vtkKWParameterValueFunctionEditor::ParameterRangePositionAtBottom)
+    {
+    arg = vtkKWParameterValueFunctionEditor::ParameterRangePositionAtBottom;
+    }
+
+  if (this->ParameterRangePosition == arg)
+    {
+    return;
+    }
+
+  this->ParameterRangePosition = arg;
+
+  this->Modified();
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -6380,6 +6430,7 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
   os << indent << "PointGuidelineStyle: " << this->PointGuidelineStyle << endl;
   os << indent << "PointOutlineWidth: " << this->PointOutlineWidth << endl;
   os << indent << "PointPositionInValueRange: " << this->PointPositionInValueRange << endl;
+  os << indent << "ParameterRangePosition: " << this->ParameterRangePosition << endl;
   os << indent << "ShowCanvasOutline: "
      << (this->ShowCanvasOutline ? "On" : "Off") << endl;
   os << indent << "ShowCanvasBackground: "

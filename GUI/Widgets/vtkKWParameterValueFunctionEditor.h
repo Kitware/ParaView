@@ -176,6 +176,18 @@ public:
   vtkGetMacro(ShowParameterRange, int);
 
   // Description:
+  // Set the position of the parameter range UI.
+  //BTX
+  enum 
+  {
+    ParameterRangePositionAtTop = 0,
+    ParameterRangePositionAtBottom
+  };
+  //ETX
+  virtual void SetParameterRangePosition(int);
+  vtkGetMacro(ParameterRangePosition, int);
+
+  // Description:
   // Show the value range UI (the slider).
   // Note: set this parameter to the proper value before calling Create() in
   // order to minimize the footprint of the object.
@@ -866,6 +878,7 @@ protected:
   int   ShowParameterRange;
   int   ShowValueRange;
   int   PointPositionInValueRange;
+  int   ParameterRangePosition;
   int   CanvasHeight;
   int   CanvasWidth;
   int   ExpandCanvasWidth;
