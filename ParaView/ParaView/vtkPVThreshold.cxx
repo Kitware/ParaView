@@ -315,7 +315,6 @@ void vtkPVThreshold::UpdateScalars()
   char *arrayName;
   int attributeMode;
   vtkDataArray *dataArray;
-  int defaultSet = 0;
   
   this->vtkPVSource::UpdateScalars();
   arrayName = this->ScalarOperationMenu->GetValue();
