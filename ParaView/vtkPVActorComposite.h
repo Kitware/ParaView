@@ -168,6 +168,10 @@ public:
   vtkBooleanMacro(Decimate, int);
   void DecimateCheckCallback();
 
+  // Description:
+  // Temporary intoerface for seting the compositing reduction.
+  void ReductionCallback();
+  
 protected:
 
   vtkPVActorComposite();
@@ -228,6 +232,8 @@ protected:
 
   // If the data changes, we need to change to.
   vtkTimeStamp UpdateTime;
+  
+  vtkKWEntry *ReductionEntry;
 };
 
 #endif

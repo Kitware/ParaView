@@ -39,6 +39,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkFastGeometryFilter.h"
 //#include "vtkPVImageTextureFilter.h"
 #include "vtkTexture.h"
+#include "vtkTimerLog.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
@@ -85,6 +86,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->RepresentationMenu = vtkKWOptionMenu::New();
   
   this->DecimateCheck = vtkKWCheckButton::New();
+  this->ReductionEntry = vtkKWEntry::New();
 
   this->PVData = NULL;
   this->DataSetInput = NULL;
@@ -144,10 +146,10 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   numProcs = pvApp->GetController()->GetNumberOfProcesses() ;
   for (id = 0; id < numProcs; ++id)
     {
-    pvApp->RemoteScript(id, "%s SetNumberOfPieces %d", this->MapperTclName, numProcs);
-    pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
-    //pvApp->RemoteScript(id, "%s SetNumberOfPieces 2", this->MapperTclName);
-    //pvApp->RemoteScript(id, "%s SetPiece 1", this->MapperTclName);
+    //pvApp->RemoteScript(id, "%s SetNumberOfPieces %d", this->MapperTclName, numProcs);
+    //pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
+    pvApp->RemoteScript(id, "%s SetNumberOfPieces 2", this->MapperTclName);
+    pvApp->RemoteScript(id, "%s SetPiece 1", this->MapperTclName);
     }
 }
 
@@ -206,6 +208,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
 
   this->DecimateCheck->Delete();
   this->DecimateCheck = NULL;
+  
+  this->ReductionEntry->Delete();
+  this->ReductionEntry = NULL;
   
   if (this->DeciTclName)
     {
@@ -292,6 +297,13 @@ void vtkPVActorComposite::CreateProperties()
                             this->DecimateCheck->GetWidgetName(),
                             this->GetTclName());
 
+  this->ReductionEntry->SetParent(this->Properties);
+  this->ReductionEntry->Create(this->Application, "-text CompositeReduction");
+  this->ReductionEntry->SetValue(1);
+  this->Application->Script("bind %s <KeyPress-Return> {%s ReductionCallback}",
+                            this->ReductionEntry->GetWidgetName(),
+                            this->GetTclName());
+
   this->Script("pack %s",
 	       this->NumCellsLabel->GetWidgetName());
   this->Script("pack %s",
@@ -312,6 +324,8 @@ void vtkPVActorComposite::CreateProperties()
                this->RepresentationMenu->GetWidgetName());
   this->Script("pack %s",
                this->DecimateCheck->GetWidgetName());
+  this->Script("pack %s",
+               this->ReductionEntry->GetWidgetName());
 }
 
 
@@ -331,10 +345,19 @@ void vtkPVActorComposite::UpdateProperties()
     return;
     }
   this->UpdateTime.Modified();
-  
+
+  cerr << "Start timer\n";
+  vtkTimerLog *timer = vtkTimerLog::New();
+  timer->StartTimer();
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
   this->GetPVData()->GetBounds(bounds);
-      
+  timer->StopTimer();
+  cerr << "Stop timer\n";    
+  vtkWarningMacro(<< this->PVData->GetVTKDataTclName() << " : took " 
+                  << timer->GetElapsedTime() << " seconds.");
+  timer->Delete();
+  
+  
   sprintf(tmp, "number of cells: %d", 
 	  this->GetPVData()->GetNumberOfCells());
   this->NumCellsLabel->SetLabel(tmp);
@@ -614,6 +637,7 @@ void vtkPVActorComposite::Initialize()
     this->SetModeToDataSet();
     }
 
+  cerr << "Initialize --------\n";
   this->UpdateProperties();
   
   // Mapper needs an input, so the mode needs to be set first.
@@ -881,3 +905,15 @@ void vtkPVActorComposite::SetDecimate(int val)
   this->Decimate = val;
 }
 
+#include "vtkPVWindow.h"
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ReductionCallback()
+{
+  int factor;
+  
+  
+  factor = this->ReductionEntry->GetValueAsInt();
+
+  cerr << "Setting reduction factor to " << factor << endl;
+  this->PVData->GetPVSource()->GetWindow()->GetMainView()->GetComposite()->SetReductionFactor(factor);
+}
