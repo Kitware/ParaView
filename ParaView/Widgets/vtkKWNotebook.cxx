@@ -84,7 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.37");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.38");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -546,7 +546,7 @@ int vtkKWNotebook::AddPage(const char *title,
       << "bind " << page->Label->GetWidgetName() << " <Button-1> {" 
       << this->GetTclName() << " Raise " << page->Id << "}" << endl
       << "bind " << page->Label->GetWidgetName() << " <Double-1> {" 
-      << this->GetTclName() << " PinPageToggle " << page->Id << "}" << endl;
+      << this->GetTclName() << " PinPageToggleCallback " << page->Id << "}" << endl;
 
   // Create the icon if any. We want to keep both the icon and the image label
   // since the icon is required to recreate the label when its background
@@ -1141,11 +1141,11 @@ void vtkKWNotebook::UnpinPage(vtkKWNotebook::Page *page)
 }
 
 //------------------------------------------------------------------------------
-void vtkKWNotebook::PinPageToggle(int id)
+void vtkKWNotebook::PinPageToggleCallback(int id)
 {
   vtkKWNotebook::Page *page = this->GetPage(id);
 
-  if (page == NULL)
+  if (page == NULL || !this->PagesCanBePinned)
     {
     return;
     }

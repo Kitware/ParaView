@@ -217,7 +217,7 @@ public:
   // Some callback routines.
   void ScheduleResize();
   void Resize();
-  void PinPageToggle(int id);
+  void PinPageToggleCallback(int id);
   
 protected:
   vtkKWNotebook();
