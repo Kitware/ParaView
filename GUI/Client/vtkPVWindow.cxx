@@ -125,8 +125,8 @@
 # define PV_NOCREATE 
 #endif
 
-#define VTK_PV_SHOW_HORZPANE_LABEL "Show Bottom Pane"
-#define VTK_PV_HIDE_HORZPANE_LABEL "Hide Bottom Pane"
+#define VTK_PV_SHOW_HORZPANE_LABEL "Show Animation Tracks"
+#define VTK_PV_HIDE_HORZPANE_LABEL "Hide Animation Tracks"
 
 #define VTK_PV_VTK_FILTERS_MENU_LABEL "Filter"
 #define VTK_PV_VTK_SOURCES_MENU_LABEL "Source"
@@ -140,7 +140,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.661");
+vtkCxxRevisionMacro(vtkPVWindow, "1.662");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

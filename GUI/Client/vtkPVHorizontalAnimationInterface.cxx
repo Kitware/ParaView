@@ -32,7 +32,7 @@
 #include "vtkKWParameterValueFunctionEditor.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.9");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.10");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -70,6 +70,7 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
+ 
   this->ScrollFrame->SetParent(this);
   this->ScrollFrame->ScrollableOn();
   this->ScrollFrame->Create(app, "");
@@ -96,7 +97,7 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char
 
   this->ParentTree->SetParent(this->PropertiesFrame);
   this->ParentTree->SetTimeLineParent(this->TimeLineFrame);
-  this->ParentTree->SetLabelText("Animation Scene");
+  this->ParentTree->SetLabelText("Animation Tracks");
   this->ParentTree->SetEnableZoom(1);
   this->ParentTree->Create(app, "-relief flat");
   this->InitializeObservers(this->ParentTree);
@@ -106,6 +107,15 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char
     vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop);
   this->ParentTree->GetTimeLine()->SetCanvasOutlineStyle(
     vtkKWParameterValueFunctionEditor::CanvasOutlineStyleAllSides);
+ this->ParentTree->SetBalloonHelpString("Animation Tracks list the properties that can be animated, "
+    "grouped under the source or filter to which they belong. "
+    "Expand the Source which you are interested in animating, and locate the property "
+    "to be animated over time. "
+    "Add key frames to any property by clicking on the corresponding track to create "
+    "an animation.");
+ 
+
+
 }
 
 //-----------------------------------------------------------------------------

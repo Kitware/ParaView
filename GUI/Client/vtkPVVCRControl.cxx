@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.5");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.6");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -158,7 +158,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
   this->RecordStateButton->SetParent(this->GetFrame());
   this->RecordStateButton->Create(app, "-image PVRecordState");
   this->RecordStateButton->SetCommand(this, "RecordStateCallback");
-  this->RecordStateButton->SetBalloonHelpString("Record the current state of the system as key frames.");
+  this->RecordStateButton->SetBalloonHelpString("Record a frame.");
  
   this->SaveAnimationButton->SetParent(this->GetFrame());
   this->SaveAnimationButton->Create(app, "-image PVMovie");
