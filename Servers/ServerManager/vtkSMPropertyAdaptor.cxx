@@ -32,7 +32,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.10");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.11");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -466,6 +466,12 @@ const char* vtkSMPropertyAdaptor::GetEnumerationValue()
   if (!name)
     {
     return 0;
+    }
+
+  // For empty domains, assume value is always correct.
+  if ( this->GetNumberOfEnumerationElements() == 0 )
+    {
+    return name;
     }
 
   unsigned int cc;
