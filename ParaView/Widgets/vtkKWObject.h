@@ -105,44 +105,6 @@ public:
   // perform arguement substitution.
   void Script(const char *EventString, ...);
 
-  enum {
-    WindowLevelChangedEvent = 2000,
-    WindowLevelChangingEvent,
-    WindowLevelChangedImageCompositeEvent,
-    WindowLevelChangingImageCompositeEvent,
-    ColorImageEvent,
-    GradientOpacityFunctionChangedEvent,
-    GradientOpacityStateChangedEvent,
-    GrayScaleImageEvent,
-    InteractiveRenderStartEvent,
-    LeftMouseOptionChangedEvent,
-    Cursor3DOffEvent,
-    Cursor3DOnEvent,
-    Cursor3DPositionChangedEvent,
-    Cursor3DTypeChangedEvent,
-    Cursor3DXColorChangedEvent,
-    Cursor3DYColorChangedEvent,
-    Cursor3DZColorChangedEvent,
-    MiddleMouseOptionChangedEvent,
-    MultiPassStillRenderEndEvent,
-    MultiPassStillRenderStageChangedEvent,
-    OrthoImageCameraResetEvent,
-    OrthoImageZoomFactorChangedEvent,
-    ProbeInformationChangedEvent,
-    RightMouseOptionChangedEvent,
-    ScalarColorFunctionChangedEvent,
-    ScalarOpacityFunctionChangedEvent,
-    ShiftLeftMouseOptionChangedEvent,
-    ShiftMiddleMouseOptionChangedEvent,
-    ShiftRightMouseOptionChangedEvent,
-    TransferFunctionsChangedEvent,
-    TransferFunctionsChangingEvent,
-    ContourAnnotationAddEvent,
-    ContourAnnotationRemoveEvent,
-    ContourAnnotationChangeColorEvent,
-    ContourAnnotationChangeThicknessEvent
-  };
-
 private:
   char *TclName;
   

@@ -51,9 +51,47 @@ class vtkKWEvent
 {
   public:
   enum {
-    InitializeTraceEvent = 10000,
-    }
-}
+    KWWidgetEvents = 2000,
+    // VV
+    WindowLevelChangedEvent = 2000,
+    WindowLevelChangingEvent,
+    WindowLevelChangedImageCompositeEvent,
+    WindowLevelChangingImageCompositeEvent,
+    ColorImageEvent,
+    GradientOpacityFunctionChangedEvent,
+    GradientOpacityStateChangedEvent,
+    GrayScaleImageEvent,
+    InteractiveRenderStartEvent,
+    LeftMouseOptionChangedEvent,
+    Cursor3DOffEvent,
+    Cursor3DOnEvent,
+    Cursor3DPositionChangedEvent,
+    Cursor3DTypeChangedEvent,
+    Cursor3DXColorChangedEvent,
+    Cursor3DYColorChangedEvent,
+    Cursor3DZColorChangedEvent,
+    MiddleMouseOptionChangedEvent,
+    MultiPassStillRenderEndEvent,
+    MultiPassStillRenderStageChangedEvent,
+    OrthoImageCameraResetEvent,
+    OrthoImageZoomFactorChangedEvent,
+    ProbeInformationChangedEvent,
+    RightMouseOptionChangedEvent,
+    ScalarColorFunctionChangedEvent,
+    ScalarOpacityFunctionChangedEvent,
+    ShiftLeftMouseOptionChangedEvent,
+    ShiftMiddleMouseOptionChangedEvent,
+    ShiftRightMouseOptionChangedEvent,
+    TransferFunctionsChangedEvent,
+    TransferFunctionsChangingEvent,
+    ContourAnnotationAddEvent,
+    ContourAnnotationRemoveEvent,
+    ContourAnnotationChangeColorEvent,
+    ContourAnnotationChangeThicknessEvent,
+    // PV
+    InitializeTraceEvent,
+  };
+};
 
 #endif
 
