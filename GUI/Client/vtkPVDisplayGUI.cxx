@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.11");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.12");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1857,6 +1857,13 @@ void vtkPVDisplayGUI::DrawPoints()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DrawVolume()
 {
+  if (this->PVSource->GetDataInformation()->GetNumberOfCells() > 500000)
+    {
+    vtkWarningMacro("Sorry.  Unstructured grids with more than 500,000 "
+                    "cells cannot currently be rendered with ParaView.  "
+                    "Consider thresholding cells you are not interested in.");
+    return;
+    }
   if (this->GetPVSource()->GetInitialized())
     {
     this->AddTraceEntry("$kw(%s) DrawVolume", this->GetTclName());
