@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.103");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.104");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -980,7 +980,6 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
         {
         vtkPVAnimationInterfaceEntry* entry
           = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
-        vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
         if ( entry->GetPVSource() )
           {
           entry->GetPVSource()->SetAcceptButtonColorToWhite();
