@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBatchOptions);
-vtkCxxRevisionMacro(vtkPVBatchOptions, "1.1");
+vtkCxxRevisionMacro(vtkPVBatchOptions, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVBatchOptions::vtkPVBatchOptions()
@@ -46,7 +46,7 @@ void vtkPVBatchOptions::Initialize()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVBatchOptions::PostProcess()
+int vtkPVBatchOptions::PostProcess(int argc, const char* const* argv)
 {
   if ( this->RequireBatchScript && !this->BatchScriptName )
     {
@@ -62,7 +62,7 @@ int vtkPVBatchOptions::PostProcess()
     str.rdbuf()->freeze(0);
     return 0;
     }
-  return this->Superclass::PostProcess();
+  return this->Superclass::PostProcess(argc, argv);
 }
 
 int vtkPVBatchOptions::WrongArgument(const char* argument)

@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGUIClientOptions);
-vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.2");
+vtkCxxRevisionMacro(vtkPVGUIClientOptions, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVGUIClientOptions::vtkPVGUIClientOptions()
@@ -63,9 +63,9 @@ void vtkPVGUIClientOptions::Initialize()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVGUIClientOptions::PostProcess()
+int vtkPVGUIClientOptions::PostProcess(int argc, const char* const* argv)
 {
-  return this->Superclass::PostProcess();
+  return this->Superclass::PostProcess(argc, argv);
 }
 
 int vtkPVGUIClientOptions::WrongArgument(const char* argument)

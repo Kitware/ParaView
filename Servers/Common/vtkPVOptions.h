@@ -83,6 +83,10 @@ public:
   // Get argv[0]
   const char* GetArgv0();
 
+  // Description:
+  // Get the index of the last argument parsed.
+  int GetLastArgument();
+
 protected:
   // Description:
   // Default constructor.
@@ -104,7 +108,7 @@ protected:
 
   // Description:
   // After parsing, process extra option dependencies.
-  virtual int PostProcess();
+  virtual int PostProcess(int argc, const char* const* argv);
 
   // Description:
   // This method is called when wrong argument is found. If it returns 0, then

@@ -62,7 +62,7 @@ protected:
 
   // Description:
   // After parsing, process extra option dependencies.
-  virtual int PostProcess();
+  virtual int PostProcess(int argc, const char* const* argv);
 
   // Description:
   // This method is called when wrong argument is found. If it returns 0, then

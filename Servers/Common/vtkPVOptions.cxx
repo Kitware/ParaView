@@ -31,7 +31,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.13");
+vtkCxxRevisionMacro(vtkPVOptions, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -92,6 +92,7 @@ vtkPVOptions::~vtkPVOptions()
   
   // Remove internals
   this->SetUnknownArgument(0);
+  this->SetErrorMessage(0);
   this->CleanArgcArgv();
   delete this->Internals;
 }
@@ -173,7 +174,7 @@ void vtkPVOptions::Initialize()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVOptions::PostProcess()
+int vtkPVOptions::PostProcess(int, const char* const*)
 {
   if ( this->CaveConfigurationFileName )
     {
@@ -226,7 +227,7 @@ int vtkPVOptions::Parse(int argc, const char* const argv[])
   this->AddBooleanArgument("--help", "/?", &this->HelpSelected, 
     "Displays available command line arguments.");
   int res1 = this->Internals->CMD.Parse();
-  int res2 = this->PostProcess();
+  int res2 = this->PostProcess(argc, argv);
   //cout << "Res1: " << res1 << " Res2: " << res2 << endl;
   this->CleanArgcArgv();
   this->Internals->CMD.GetRemainingArguments(&this->Argc, &this->Argv);
@@ -297,6 +298,12 @@ void vtkPVOptions::GetRemainingArguments(int* argc, char*** argv)
 {
   *argc = this->Argc;
   *argv = this->Argv;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVOptions::GetLastArgument()
+{
+  return this->Internals->CMD.GetLastArgument();
 }
 
 //----------------------------------------------------------------------------
