@@ -593,7 +593,7 @@ void vtkPVApplication::CreatePhoto(char *name, unsigned char *data,
 //----------------------------------------------------------------------------
 void vtkPVApplication::StartLog(char *filename)
 {
-  this->Application->AddTraceEntry("%s StartLog", this->GetTclName());
+  this->AddTraceEntry("%s StartLog", this->GetTclName());
 
   if (this->Log)
     {
@@ -608,7 +608,7 @@ void vtkPVApplication::StartLog(char *filename)
 //----------------------------------------------------------------------------
 void vtkPVApplication::StopLog()
 {
-  this->Application->AddTraceEntry("%s StopLog", this->GetTclName());
+  this->AddTraceEntry("%s StopLog", this->GetTclName());
 
   if (this->Log)
     {
