@@ -143,7 +143,7 @@ protected:
   vtkKWWindow(const vtkKWWindow&) {};
   void operator=(const vtkKWWindow&) {};
 
-  void CreateStatusImage();
+  virtual void CreateStatusImage();
   int NumberOfMRUFiles;
   vtkKWView *SelectedView;
   vtkKWViewCollection *Views;
