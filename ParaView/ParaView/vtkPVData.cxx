@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.209.2.2");
+vtkCxxRevisionMacro(vtkPVData, "1.209.2.3");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1510,13 +1510,21 @@ void vtkPVData::UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
     }
 
   // Number of component restriction.
-  if (arrayInfo->GetNumberOfComponents() != 1 &&
-      arrayInfo->GetNumberOfComponents() != 3)
+  if (arrayInfo->GetNumberOfComponents() != 3)
     { // I would like to have two as an option also ...
     this->MapScalarsCheck->SetState(1);
     this->MapScalarsCheck->EnabledOff();
     this->ScalarBarCheck->EnabledOn();
     this->EditColorMapButton->EnabledOn();
+
+    // Tell all of the part displays to map scalars.
+    int num, idx;
+    num = this->PVSource->GetNumberOfParts();
+    for (idx = 0; idx < num; ++idx)
+      {
+      this->PVSource->GetPart(idx)->GetPartDisplay()->SetDirectColorFlag(0);
+      }
+    
     return;
     }
 
