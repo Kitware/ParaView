@@ -153,7 +153,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback(const char* name,
     vtkErrorMacro("Could not get pointer from object.");
     return NULL;
     }
-  pvApp->Script("%s SetCaseFileName %s", tclName, this->GetDataFileName());
+  pvApp->Script("%s SetCaseFileName \"%s\"", tclName, this->GetDataFileName());
 
   if (strcmp(reader->GetCaseFileName(), "") == 0)
     {
@@ -161,9 +161,9 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback(const char* name,
     return NULL;
     }
 
-  pvApp->BroadcastScript("%s SetFilePath %s", tclName,
+  pvApp->BroadcastScript("%s SetFilePath \"%s\"", tclName,
 			 reader->GetFilePath());
-  pvApp->BroadcastScript("%s SetCaseFileName %s", tclName,
+  pvApp->BroadcastScript("%s SetCaseFileName \"%s\"", tclName,
 			 reader->GetCaseFileName());
   
   fullPath = new char[strlen(reader->GetFilePath()) +
