@@ -81,6 +81,8 @@ MARK_AS_ADVANCED(VTK_USE_PATENTED)
 MARK_AS_ADVANCED(VTK_DATA_ROOT)
 MARK_AS_ADVANCED(BUILD_EXAMPLES)
 
+OPTION(VTK_USE_PATENTED "Build VTK with patented support" OFF)
+
 # Specify python build so that we can use vtkTkRenderWidget with no
 # vtkRenderWindow wrapped.
 ADD_DEFINITIONS(-DVTK_PYTHON_BUILD)
@@ -89,7 +91,23 @@ SUBDIRS(VTK)
 
 # This is a hack for now. Once the transition is over, this macro goes aways
 ADD_DEFINITIONS(-DPARAVIEW_NEW_SOURCE_ORGANIZATION)
-
+SET(VTK_INCLUDE_DIR
+  ${ParaView_SOURCE_DIR}/VTK
+  ${ParaView_BINARY_DIR}/VTK
+  )
+SET(kits Common Filtering IO Imaging Rendering Parallel Graphics Hybrid)
+IF(VTK_USE_PATENTED)
+  SET(kits ${kits} Patented)
+ENDIF(VTK_USE_PATENTED)
+FOREACH(kit ${kits})
+  SET(VTK_INCLUDE_DIR ${VTK_INCLUDE_DIR}
+    ${VTK_SOURCE_DIR}/${kit}
+    ${VTK_BINARY_DIR}/${kit}
+    )
+ENDFOREACH(kit)
+SET(VTKZLIB_INCLUDE_DIR
+  ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
+  ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
 
 #########################################################################
 # Configure HDF5
@@ -98,6 +116,10 @@ SET(VTK_ZLIB_LIBRARIES vtkzlib)
 SET(VTK_ZLIB_INCLUDE_DIRS
   ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
   ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
+SET(HDF5_INCLUDE_DIR 
+  ${ParaView_SOURCE_DIR}/Utilities/hdf5
+  ${ParaView_BINARY_DIR}/Utilities/hdf5)
+
 SUBDIRS(Utilities/hdf5)
 
 #########################################################################
@@ -109,6 +131,17 @@ SET(XDMF_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
 SUBDIRS(Utilities/Xdmf)
 
 #########################################################################
+# Configure IceT
+OPTION(PARAVIEW_USE_ICE_T "Use IceT multi display manager" OFF)
+IF(PARAVIEW_USE_ICE_T)
+  SET(ICE_T_INCLUDE_DIR 
+    ${ParaView_SOURCE_DIR}/Utilities/IceT/src/include
+    ${ParaView_BINARY_DIR}/Utilities/IceT/src/include
+    )
+  SUBDIRS(Utilities/IceT)
+ENDIF(PARAVIEW_USE_ICE_T)
+
+#########################################################################
 # Configure KWsys
 SET(KWSYS_NAMESPACE kwsys)
 SET(KWSYS_USE_Process 1)
@@ -118,14 +151,22 @@ SET(KWSYS_HEADER_ROOT ${ParaView_BINARY_DIR}/Utilities/KWSys)
 IF(NOT VTK_USE_ANSI_STDLIB)
   SET(KWSYS_FORCE_OLD_STREAMS 1)
 ENDIF(NOT VTK_USE_ANSI_STDLIB)
+SET(KWSYS_INCLUDE_DIR ${ParaView_BINARY_DIR}/Utilities/KWSys)
 SUBDIRS(Utilities/KWSys)
 
 #########################################################################
-# Configure Xdmf
+# Configure Common
+SET(KWCOMMON_INCLUDE_DIR
+  ${ParaView_SOURCE_DIR}/Common/KWCommon
+  ${ParaView_BINARY_DIR}/Common/KWCommon)
 SUBDIRS(Common)
 
 #########################################################################
 # Configure VTKClientServer wrapping
+SET(VTKCLIENTSERVER_INCLUDE_DIR
+  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
+  ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
+  )
 SUBDIRS(Utilities/VTKClientServer)
 
 #########################################################################
@@ -134,6 +175,9 @@ SUBDIRS(Utilities/VTKTclWrapping)
 
 #########################################################################
 # Configure Server
+SET(PVFILTERS_INCLUDE_DIR
+  ${ParaView_SOURCE_DIR}/Servers/Filters
+  ${ParaView_BINARY_DIR}/Servers/Filters)
 SUBDIRS(Servers)
 
 #########################################################################

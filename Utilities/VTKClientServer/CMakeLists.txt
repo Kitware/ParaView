@@ -18,19 +18,8 @@ CONFIGURE_FILE(
 INCLUDE_DIRECTORIES(
   ${VTKCS_SOURCE_DIR}
   ${VTKCS_BINARY_DIR}
-  ${VTK_SOURCE_DIR}
-  ${VTK_BINARY_DIR}
+  ${VTK_INCLUDE_DIR}
   )
-SET(kits Common Filtering IO Imaging Rendering Parallel Graphics Hybrid)
-IF(VTK_USE_PATENTED)
-  SET(kits ${kits} Patented)
-ENDIF(VTK_USE_PATENTED)
-FOREACH(kit ${kits})
-  INCLUDE_DIRECTORIES(
-    ${VTK_SOURCE_DIR}/${kit}
-    ${VTK_BINARY_DIR}/${kit}
-    )
-ENDFOREACH(kit)
 
 # Create vtkClientServer library.
 ADD_LIBRARY(vtkClientServer

@@ -1,5 +1,6 @@
 PROJECT(VTKTclWrapping)
 
+# We only wrap subportion of VTK, so include only that
 INCLUDE_DIRECTORIES(
   ${VTK_SOURCE_DIR}/Wrapping
   ${VTK_SOURCE_DIR}

@@ -193,19 +193,19 @@ SET( ParaViewClient_SRCS
   )
 
 INCLUDE_DIRECTORIES(
-  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
-  ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
-  ${ParaView_SOURCE_DIR}/Servers/Filters
-  ${ParaView_SOURCE_DIR}/GUI/Widgets
-  ${ParaView_SOURCE_DIR}/GUI/Client
-  ${ParaView_BINARY_DIR}/Utilities/KWSys
-  ${VTK_BINARY_DIR}
+  ${PVFILTERS_INCLUDE_DIR}
+  ${PVGUI_BINARY_DIR}/Client
+  ${PVGUI_SOURCE_DIR}/Client
+  ${PVWIDGETS_INCLUDE_DIR}
+  ${VTKCLIENTSERVER_INCLUDE_DIR}
+  ${VTK_INCLUDE_DIR}
+  ${KWSYS_INCLUDE_DIR}
   )
-FOREACH(dir Common Rendering Imaging Parallel Graphics Filtering IO Hybrid)
-  INCLUDE_DIRECTORIES(
-    ${VTK_SOURCE_DIR}/${dir}
-    )
-ENDFOREACH(dir)
+IF(VTK_USE_MPI)
+  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
+ENDIF(VTK_USE_MPI)
+
+
 
 SET(ParaViewBinary_SRCS
   ParaView.cxx)
@@ -216,6 +216,12 @@ IF (PARAVIEW_USE_ICE_T)
     vtkPVDeskTopRenderModule.cxx
     vtkPVIceTDisplayRenderModule.cxx
     vtkPVIceTRenderModule.cxx
+    )
+  SET( ParaViewClient_SRCS
+    ${ParaViewClient_SRCS}
+    vtkPVDeskTopRenderModuleUI.cxx
+    vtkPVIceTDisplayRenderModuleUI.cxx
+    vtkPVIceTRenderModuleUI.cxx
     )
 
 ENDIF (PARAVIEW_USE_ICE_T)
@@ -311,10 +317,6 @@ VTK_MAKE_INSTANTIATOR3(vtkParaViewInstantiator PVInstantiator_SRCS
 # load the ClientServer command
 INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
 CS_INITIALIZE_WRAP()
-INCLUDE_DIRECTORIES(
-  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
-  ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
-  )
 
 # Wrap PVServer
 # Create ClientServer wrappers for ParaView classes.
@@ -362,13 +364,6 @@ CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/vtkPVHelpPaths.h.in
   ${PVGUI_BINARY_DIR}/Client/vtkPVHelpPaths.h
   ESCAPE_QUOTES)
 
-INCLUDE_DIRECTORIES(${PVGUI_BINARY_DIR}/Client
-  ${ParaView_SOURCE_DIR}/Filters)
-
-IF(PARAVIEW_BUILD_DEVELOPMENT)
-  INCLUDE_DIRECTORIES(${ParaView_SOURCE_DIR}/Development)
-ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
-
 IF(WIN32 AND TK_RESOURCE_FILE)
   GET_FILENAME_COMPONENT(TK_RESOURCE_PATH ${TK_RESOURCE_FILE} PATH)
   INCLUDE_DIRECTORIES(${TK_RESOURCE_PATH})
@@ -407,17 +402,10 @@ ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
 TARGET_LINK_LIBRARIES(vtkKWParaView vtkPVFilters)
 TARGET_LINK_LIBRARIES(vtkKWParaView vtkXdmf)
-IF(VTK_USE_MPI)
-  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
-ENDIF(VTK_USE_MPI)
 
 IF(PARAVIEW_BUILD_DEVELOPMENT)
   TARGET_LINK_LIBRARIES(vtkKWParaView vtkPVDevelopment)
 ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
-IF(PARAVIEW_USE_ICE_T)
-  TARGET_LINK_LIBRARIES(vtkKWParaView icet icet_mpi icet_strategies)
-  INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
-ENDIF(PARAVIEW_USE_ICE_T)
 
 
 ADD_EXECUTABLE(ProcessXML ProcessXML.cxx)

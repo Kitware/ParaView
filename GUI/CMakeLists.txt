@@ -1,21 +1,22 @@
 PROJECT(PVGUI)
 
+SET(PVWIDGETS_INCLUDE_DIR
+  ${ParaView_SOURCE_DIR}/GUI/Widgets)
+
+
 SET(VTK_WRAP_TCL_EXE ${PARAVIEW_VTK_WRAP_TCL_EXE})
 SET(VTK_WRAP_TCL_INIT_EXE ${PARAVIEW_VTK_WRAP_TCL_INIT_EXE})
 SET(VTK_TCL_HOME ${PVGUI_SOURCE_DIR})
 INCLUDE_DIRECTORIES(
-  ${TCL_INCLUDE_PATH} ${TK_INCLUDE_PATH}
-  ${KWCommon_SOURCE_DIR}
-  ${VTK_SOURCE_DIR}/Utilities/zlib
-  ${VTK_BINARY_DIR}/Utilities/zlib
+  ${TCL_INCLUDE_PATH}
+  ${TK_INCLUDE_PATH}
+  ${KWCOMMON_INCLUDE_DIR}
+  ${VTKZLIB_INCLUDE_DIR}
   )
 
 IF (WIN32)
 
- FIND_PATH( HTML_HELP_PATH htmlhelp.h
-           "c:/program files/html help workshop"
-           "c:/program files/html help workshop/include"
-           "[HKEY_CURRENT_USER\\Software\\Microsoft\\HTML Help Workshop;InstallDir]/include" )
+ FIND_PATH( HTML_HELP_PATH htmlhelp.h ${ParaView_SOURCE_DIR}/Utilities/HtmlHelp)
 
  IF (HTML_HELP_PATH)
    INCLUDE_DIRECTORIES(${HTML_HELP_PATH})
@@ -28,10 +29,7 @@ IF (WIN32)
  ENDIF (HTML_HELP_PATH)
 
 
- FIND_LIBRARY( HTML_HELP_LIBRARY htmlhelp
-              "c:/program files/html help workshop"
-              "c:/program files/html help workshop/LIB"
-              "[HKEY_CURRENT_USER\\Software\\Microsoft\\HTML Help Workshop;InstallDir]/lib")
+ FIND_LIBRARY( HTML_HELP_LIBRARY htmlhelp ${ParaView_SOURCE_DIR}/Utilities/HtmlHelp)
 
  IF (HTML_HELP_LIBRARY)
    LINK_LIBRARIES( ${HTML_HELP_LIBRARY} )

@@ -83,9 +83,6 @@ IF (PARAVIEW_USE_ICE_T)
     ${Filters_SRCS}
     #vtkIceTComposite.cxx
     vtkIceTFactory.cxx
-    vtkPVDeskTopRenderModuleUI.cxx
-    vtkPVIceTDisplayRenderModuleUI.cxx
-    vtkPVIceTRenderModuleUI.cxx
     vtkDesktopDeliveryServer.cxx
     vtkIceTClientCompositeManager.cxx
     vtkIceTRenderer.cxx
@@ -120,24 +117,16 @@ SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 
 INCLUDE_DIRECTORIES(
   ${PVFilters_BINARY_DIR}
-  ${VTK_SOURCE_DIR}
-  ${VTK_BINARY_DIR}
-  ${ParaView_SOURCE_DIR}/Common/KWCommon
-  ${ParaView_BINARY_DIR}/Common/KWCommon
-  ${ParaView_SOURCE_DIR}/Utilities/hdf5
-  ${ParaView_BINARY_DIR}/Utilities/hdf5
+  ${PVFilters_SOURCE_DIR}
+  ${KWCOMMON_INCLUDE_DIR}
+  ${HDF5_INCLUDE_DIR}
+  ${VTK_INCLUDE_DIR}
   )
 
-SET(kits Common Filtering IO Imaging Rendering Parallel Graphics Hybrid)
-IF(VTK_USE_PATENTED)
-  SET(kits ${kits} Patented)
-ENDIF(VTK_USE_PATENTED)
-FOREACH(kit ${kits})
-  INCLUDE_DIRECTORIES(
-    ${VTK_SOURCE_DIR}/${kit}
-    ${VTK_BINARY_DIR}/${kit}
-    )
-ENDFOREACH(kit)
+IF(VTK_USE_MPI)
+  INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
+ENDIF(VTK_USE_MPI)
+
 
 CONFIGURE_FILE(${PVFilters_SOURCE_DIR}/vtkPVFiltersConfig.h.in
   ${PVFilters_BINARY_DIR}/vtkPVFiltersConfig.h
@@ -162,18 +151,17 @@ TARGET_LINK_LIBRARIES(vtkPVFilters vtkClientServer)
 ADD_EXECUTABLE(vtkTestFilters test.cxx)
 TARGET_LINK_LIBRARIES(vtkTestFilters vtkPVFiltersCS)
 
+IF(PARAVIEW_USE_ICE_T)
+  TARGET_LINK_LIBRARIES(vtkPVFilters icet icet_mpi icet_strategies)
+  INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
+ENDIF(PARAVIEW_USE_ICE_T)
+
 # load the ClientServer command
 INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
 CS_INITIALIZE_WRAP()
-INCLUDE_DIRECTORIES(
-  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
-  ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
-  )
+INCLUDE_DIRECTORIES(${VTKCLIENTSERVER_INCLUDE_DIR})
 
 # Wrap PVFilters
-INCLUDE_DIRECTORIES(
-  ${ParaView_SOURCE_DIR}/Servers/Filters
-  )
 SET(KIT_WRAP_DEPS Parallel Hybrid Rendering)
 IF(VTK_USE_PATENTED)
   SET(KIT_WRAP_DEPS Patented)
