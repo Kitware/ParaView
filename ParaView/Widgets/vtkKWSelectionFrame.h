@@ -51,21 +51,39 @@ public:
   vtkTypeRevisionMacro(vtkKWSelectionFrame, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
+  // Description:
+  // Create the widget
   virtual void Create(vtkKWApplication *app, const char *args);
   
+  // Description:
+  // Access to sub-widgets
   vtkGetObjectMacro(TitleBarRightSubframe, vtkKWWidget);
   vtkGetObjectMacro(BodyFrame, vtkKWWidget);
+  vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
   
   // Description:
-  // Must be called after Create
+  // Set/Get title (must be called after Create)
   void SetTitle(const char *title);
   const char* GetTitle();
-  void SetSelectionList(int num, const char **list);
 
+  // Description:
+  // Set the selection list, command
+  void SetSelectionList(int num, const char **list);
   void SetSelectCommand(vtkKWObject *object, const char *methodAndArgString);
 
+  // Description:
+  // Callbacks
   void SelectionMenuCallback(const char *menuItem);
   
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
 protected:
   vtkKWSelectionFrame();
   ~vtkKWSelectionFrame();
@@ -74,11 +92,10 @@ protected:
   vtkKWMenuButton *SelectionList;
   vtkKWLabel      *Title;
   vtkKWWidget     *TitleBarRightSubframe;
-  
-  vtkKWWidget *BodyFrame;
-  
-  vtkKWObject *SelectObject;
-  char *SelectMethod;
+  vtkKWWidget     *BodyFrame;
+
+  vtkKWObject     *SelectObject;
+  char            *SelectMethod;
   void SetSelectObject(vtkKWObject *object);
   vtkSetStringMacro(SelectMethod);
   

@@ -44,28 +44,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Resources/vtkKWArrowDown.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.11");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.12");
 
-//vtkCxxSetObjectMacro(vtkKWSelectionFrame, SelectObject, vtkKWObject);
-
+//----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
 {
-  this->TitleBar = vtkKWWidget::New();
-  this->TitleBar->SetParent(this);
-  this->Title = vtkKWLabel::New();
-  this->Title->SetParent(this->TitleBar);
-  this->SelectionList = vtkKWMenuButton::New();
-  this->SelectionList->SetParent(this->TitleBar);
+  this->TitleBar              = vtkKWWidget::New();
+  this->Title                 = vtkKWLabel::New();
+  this->SelectionList         = vtkKWMenuButton::New();
   this->TitleBarRightSubframe = vtkKWWidget::New();
-  this->TitleBarRightSubframe->SetParent(this->TitleBar);
   
-  this->BodyFrame = vtkKWWidget::New();
-  this->BodyFrame->SetParent(this);
+  this->BodyFrame             = vtkKWWidget::New();
   
   this->SelectObject = NULL;
   this->SelectMethod = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkKWSelectionFrame::~vtkKWSelectionFrame()
 {
   this->SetSelectObject(NULL);
@@ -78,6 +73,7 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
   this->BodyFrame->Delete();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -93,30 +89,35 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   this->SetApplication(app);
   
   // create the top level
+
   wname = this->GetWidgetName();
   this->Script("frame %s %s -bd 3 -relief ridge", wname, args);
-  
+
+  this->TitleBar->SetParent(this);
   this->TitleBar->Create(app, "frame", "-bg #008");
   
+  this->SelectionList->SetParent(this->TitleBar);
   this->SelectionList->Create(app, "-indicatoron 0");
-
   this->SelectionList->SetImageOption(image_KWArrowDown, 
                                       image_KWArrowDown_width,
                                       image_KWArrowDown_height,
                                       image_KWArrowDown_pixel_size,
                                       image_KWArrowDown_buffer_length);
 
+  this->Title->SetParent(this->TitleBar);
   this->Title->Create(app, "-bg #008 -fg #fff");
   this->Title->SetLabel("<Click to Select>");
   
-  this->Script("pack %s %s -side left -anchor w",
+  this->Script("pack %s %s -side left -anchor w -fill y",
                this->SelectionList->GetWidgetName(),
                this->Title->GetWidgetName());
   
+  this->TitleBarRightSubframe->SetParent(this->TitleBar);
   this->TitleBarRightSubframe->Create(app, "frame", "-bg #008");
   this->Script("pack %s -side right -anchor e -padx 4",
                this->TitleBarRightSubframe->GetWidgetName());
   
+  this->BodyFrame->SetParent(this);
   this->BodyFrame->Create(app, "frame", "-bg white");
   this->Script("pack %s -side top -fill x -expand no",
                this->TitleBar->GetWidgetName());
@@ -131,6 +132,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   this->UpdateEnableState();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitle(const char *title)
 {
   if ( ! this->Title->IsCreated() )
@@ -142,11 +144,13 @@ void vtkKWSelectionFrame::SetTitle(const char *title)
   this->Title->SetLabel(title);
 }
 
+//----------------------------------------------------------------------------
 const char* vtkKWSelectionFrame::GetTitle()
 {
   return this->Title->GetLabel();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetSelectionList(int num, const char **list)
 {
   if ( ! this->SelectionList->IsCreated() )
@@ -169,6 +173,7 @@ void vtkKWSelectionFrame::SetSelectionList(int num, const char **list)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetSelectCommand(vtkKWObject *object,
                                            const char *methodAndArgString)
 {
@@ -176,6 +181,7 @@ void vtkKWSelectionFrame::SetSelectCommand(vtkKWObject *object,
   this->SetSelectMethod(methodAndArgString);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SelectionMenuCallback(const char *menuItem)
 {
   if ( ! (this->SelectObject && this->SelectMethod) )
@@ -188,12 +194,45 @@ void vtkKWSelectionFrame::SelectionMenuCallback(const char *menuItem)
                menuItem, this->GetTclName());
 }
 
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetSelectObject(vtkKWObject *object)
 {
   // avoiding reference-counting loops
   this->SelectObject = object;
 }
 
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  if (this->TitleBar)
+    {
+    this->TitleBar->SetEnabled(this->Enabled);
+    }
+
+  if (this->SelectionList)
+    {
+    this->SelectionList->SetEnabled(this->Enabled);
+    }
+
+  if (this->Title)
+    {
+    this->Title->SetEnabled(this->Enabled);
+    }
+
+  if (this->TitleBarRightSubframe)
+    {
+    this->TitleBarRightSubframe->SetEnabled(this->Enabled);
+    }
+
+  if (this->BodyFrame)
+    {
+    this->BodyFrame->SetEnabled(this->Enabled);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
