@@ -170,8 +170,6 @@ for {set i 55} {$i < 56} {incr i 1} {
     update
 }
 
-$pvWindow SaveSessionFile "vtkParaViewTestingCombustorTest.session"
-
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
