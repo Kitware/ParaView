@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.45");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVProcessModule, Application, vtkKWApplication);
 
@@ -63,7 +63,10 @@ vtkPVProcessModule::~vtkPVProcessModule()
 {
   // Free Interpreter and ClientServerStream.
   this->FinalizeInterpreter();
-  this->Application->Delete();
+  if (this->Application)
+    {
+    this->Application->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------
