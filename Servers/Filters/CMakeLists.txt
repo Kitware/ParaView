@@ -34,6 +34,7 @@ SET(Filters_SRCS
   vtkCTHExtractAMRPart.cxx
   vtkCTHAMRCellToPointData.cxx
   vtkCTHAMRContour.cxx
+  vtkCTHAMRSurface.cxx
   vtkCTHFractal.cxx
   vtkCTHOutlineFilter.cxx
   vtkCTHSource.cxx
