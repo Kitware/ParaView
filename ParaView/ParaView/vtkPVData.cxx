@@ -195,6 +195,9 @@ vtkPVData::vtkPVData()
 
   this->PVColorMap = NULL;
 
+  this->LODResolution = 50;
+  this->CollectThreshold = 2.0;
+
   this->RenderOnlyLocally = 0;
 }
 
@@ -495,8 +498,9 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
   //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
   // This should be changed to origin and spacing determined globally.
-  pvApp->BroadcastScript("%s SetNumberOfDivisions 50 50 50", 
-                         this->LODDeciTclName); 
+  pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
+                         this->LODDeciTclName, this->LODResolution,
+                         this->LODResolution, this->LODResolution); 
 
 #ifdef VTK_USE_MPI
   // Create the collection filters which allow small models to render locally.  
@@ -510,6 +514,8 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
                          pvApp->GetNumberOfPipes());
 #else
   pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+  pvApp->BroadcastScript("%s SetThreshold %f", tclName, 
+                         this->CollectThreshold);
 #endif
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
@@ -2627,6 +2633,8 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
+  os << indent << "LODResolution: " << this->LODResolution << endl;
+  os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
 }
 
 //-------}---------------------------------------------------------------------
@@ -2750,11 +2758,43 @@ void vtkPVData::SetScalarBarOrientationToHorizontal()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::SetLODResolution(int dim)
+{
+  if (this->LODResolution == dim)
+    {
+    return;
+    }
+  this->LODResolution = dim;
+  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+    
+  pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
+                         this->LODDeciTclName, this->LODResolution,
+                         this->LODResolution, this->LODResolution); 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetCollectThreshold(float threshold)
+{
+  if (this->CollectThreshold == threshold)
+    {
+    return;
+    }
+  this->CollectThreshold = threshold;
+  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+    
+  pvApp->BroadcastScript("%s SetThreshold %f", this->CollectTclName,
+                         threshold*1000.0);
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.132 $");
+  this->ExtractRevision(os,"$Revision: 1.133 $");
 }
 
 //----------------------------------------------------------------------------

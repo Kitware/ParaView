@@ -352,6 +352,19 @@ public:
   // Called by vtkPVSource::DeleteCallback().
   void DeleteCallback();
   
+  // Description:
+  // Set the resolution of the decimation LOD.
+  // Resulting decimation uses dim^3 volume.
+  void SetLODResolution(int dim);
+  vtkGetMacro(LODResolution, int);
+
+  // Description:
+  // Set the collection threshold.  The units of this threshold are 
+  // in MegaBytes.  Defaults to 2 MB.  Threshold is compared against
+  // the size of the total (across all processes) data set size.
+  void SetCollectThreshold(float size);
+  vtkGetMacro(CollectThreshold, float)
+
 protected:
   vtkPVData();
   ~vtkPVData();
@@ -499,6 +512,9 @@ protected:
   vtkPolyDataMapper *Mapper;
 
   vtkPVColorMap *PVColorMap;
+
+  int LODResolution;
+  float CollectThreshold;
 
   vtkPVData(const vtkPVData&); // Not implemented
   void operator=(const vtkPVData&); // Not implemented

@@ -147,6 +147,15 @@ vtkPVRenderView::vtkPVRenderView()
   this->LODThresholdFrame = vtkKWWidget::New();
   this->LODThresholdLabel = vtkKWLabel::New();
   this->LODThresholdScale = vtkKWScale::New();
+  this->LODThresholdValue = vtkKWLabel::New();
+  this->LODResolutionFrame = vtkKWWidget::New();
+  this->LODResolutionLabel = vtkKWLabel::New();
+  this->LODResolutionScale = vtkKWScale::New();
+  this->LODResolutionValue = vtkKWLabel::New();
+  this->CollectThresholdFrame = vtkKWWidget::New();
+  this->CollectThresholdLabel = vtkKWLabel::New();
+  this->CollectThresholdScale = vtkKWScale::New();
+  this->CollectThresholdValue = vtkKWLabel::New();
 
   this->ManipulatorControl2D = vtkPVInteractorStyleControl::New();
   this->ManipulatorControl2D->SetRegisteryName("2D");
@@ -175,6 +184,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->SelectionWindowButton = vtkKWRadioButton::New();
 
   this->LODThreshold = 1000;
+  this->LODResolution = 50;
+  this->CollectThreshold = 2.0;
 
   int cc;
   for ( cc = 0; cc < 6; cc ++ )
@@ -373,6 +384,26 @@ vtkPVRenderView::~vtkPVRenderView()
   this->LODThresholdLabel = NULL;
   this->LODThresholdScale->Delete();
   this->LODThresholdScale = NULL;
+  this->LODThresholdValue->Delete();
+  this->LODThresholdValue = NULL;
+
+  this->LODResolutionFrame->Delete();
+  this->LODResolutionFrame = NULL;
+  this->LODResolutionLabel->Delete();
+  this->LODResolutionLabel = NULL;
+  this->LODResolutionScale->Delete();
+  this->LODResolutionScale = NULL;
+  this->LODResolutionValue->Delete();
+  this->LODResolutionValue = NULL;
+
+  this->CollectThresholdFrame->Delete();
+  this->CollectThresholdFrame = NULL;
+  this->CollectThresholdLabel->Delete();
+  this->CollectThresholdLabel = NULL;
+  this->CollectThresholdScale->Delete();
+  this->CollectThresholdScale = NULL;
+  this->CollectThresholdValue->Delete();
+  this->CollectThresholdValue = NULL;
 
   this->CameraIconsFrame->Delete();
   this->CameraIconsFrame = 0;
@@ -497,7 +528,11 @@ void vtkPVRenderView::PrepareForDelete()
                              this->FrameRateScale->GetValue());
     pvapp->SetRegisteryValue(2, "RunTime", "LODThreshold", "%d",
                              this->LODThreshold);
+    pvapp->SetRegisteryValue(2, "RunTime", "LODResolution", "%d",
+                             this->LODResolution);
 #ifdef VTK_USE_MPI
+    pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%d",
+                             this->CollectThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
                              this->InterruptRenderCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
@@ -831,6 +866,7 @@ void vtkPVRenderView::CreateViewProperties()
     "This slider adjusts the target for subsample compression during compositing.  "
     "Left: Use slow full-resolution compositing. Right: Fast pixelated compositing.");
 
+  // Determines when the decimated LOD is used.
   this->LODThresholdFrame->SetParent(this->RenderParametersFrame->GetFrame());
   this->LODThresholdFrame->Create(this->Application, "frame", "");
   this->LODThresholdLabel->SetParent(this->LODThresholdFrame);
@@ -841,6 +877,8 @@ void vtkPVRenderView::CreateViewProperties()
                                "-resolution 0.1 -orient horizontal");
   this->LODThresholdScale->SetRange(0, 18);
   this->LODThresholdScale->SetResolution(0.1);
+  this->LODThresholdValue->SetParent(this->LODThresholdFrame);
+  this->LODThresholdValue->Create(this->Application, "");
   if (pvapp && pvwindow &&
       pvapp->GetRegisteryValue(2, "RunTime", "LODThreshold", 0))
     {
@@ -851,20 +889,77 @@ void vtkPVRenderView::CreateViewProperties()
     {
     this->LODThresholdScale->SetValue(18.0 - log((double)(this->LODThreshold)));
     }
-
   this->LODThresholdScale->SetCommand(this, "LODThresholdScaleCallback");
   this->LODThresholdScale->SetBalloonHelpString(
-    "This slider adjusts when the decimated LOD is used. Threshold is based on number of points.  "
+    "This slider determines how often the decimated LOD is used. Threshold is based on number of points.  "
     "Left: Use slow full-resolution models. Right: Use fast decimated models .");
-  pvapp->Script("pack %s %s -side left", this->LODThresholdLabel->GetWidgetName(), 
-                this->LODThresholdScale->GetWidgetName());
+  pvapp->Script("pack %s %s %s -side left", 
+                this->LODThresholdLabel->GetWidgetName(), 
+                this->LODThresholdScale->GetWidgetName(),
+                this->LODThresholdValue->GetWidgetName());
+
+  // Determines the complexity of the decimated LOD
+  this->LODResolutionFrame->SetParent(this->RenderParametersFrame->GetFrame());
+  this->LODResolutionFrame->Create(this->Application, "frame", "");
+  this->LODResolutionLabel->SetParent(this->LODResolutionFrame);
+  this->LODResolutionLabel->Create(this->Application, "");
+  this->LODResolutionLabel->SetLabel("LOD Resolution");
+  this->LODResolutionScale->SetParent(this->LODResolutionFrame);
+  this->LODResolutionScale->Create(this->Application, 
+                               "-orient horizontal");
+  this->LODResolutionScale->SetRange(10, 160);
+  this->LODResolutionScale->SetResolution(1.0);
+  this->LODResolutionValue->SetParent(this->LODResolutionFrame);
+  this->LODResolutionValue->Create(this->Application, "");
+  if (pvapp && pvwindow &&
+      pvapp->GetRegisteryValue(2, "RunTime", "LODResolution", 0))
+    {
+    this->SetLODResolution(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "LODResolution"));
+    }
+  this->LODResolutionScale->SetValue(150 - this->LODResolution);
+  this->LODResolutionScale->SetCommand(this, "LODResolutionScaleCallback");
+  this->LODResolutionScale->SetBalloonHelpString(
+    "This slider determines the resolution of the decimated level of details.  "
+    "The value is the dimension for each axis in the quadric clustering filter.  "
+    "Left: Use slow high-resolution models. Right: Use fast simple models .");
+  pvapp->Script("pack %s %s %s -side left", 
+                this->LODResolutionLabel->GetWidgetName(), 
+                this->LODResolutionScale->GetWidgetName(),
+                this->LODResolutionValue->GetWidgetName());
+
+  // Determines when geometry is collected to process 0 for rendering.
+  this->CollectThresholdFrame->SetParent(this->RenderParametersFrame->GetFrame());
+  this->CollectThresholdFrame->Create(this->Application, "frame", "");
+  this->CollectThresholdLabel->SetParent(this->CollectThresholdFrame);
+  this->CollectThresholdLabel->Create(this->Application, "");
+  this->CollectThresholdLabel->SetLabel("Collection Threshold");
+  this->CollectThresholdScale->SetParent(this->CollectThresholdFrame);
+  this->CollectThresholdScale->Create(this->Application, 
+                               "-orient horizontal");
+  this->CollectThresholdScale->SetRange(0.0, 6.0);
+  this->CollectThresholdScale->SetResolution(0.1);
+  this->CollectThresholdValue->SetParent(this->CollectThresholdFrame);
+  this->CollectThresholdValue->Create(this->Application, "");
+  if (pvapp && pvwindow &&
+      pvapp->GetRegisteryValue(2, "RunTime", "CollectThreshold", 0))
+    {
+    this->SetCollectThreshold(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "CollectThreshold"));
+    }
+  this->CollectThresholdScale->SetValue(this->CollectThreshold);
+  this->CollectThresholdScale->SetCommand(this, "CollectThresholdScaleCallback");
+  this->CollectThresholdScale->SetBalloonHelpString(
+    "This slider determines when models are collected to process 0 for local rendering.  "
+    "Threshold critera is based on size of model in mega bytes.  "
+    "Left: Always leave models distributed. Right: Move even large models to process 0.");
+  pvapp->Script("pack %s %s %s -side left", 
+                this->CollectThresholdLabel->GetWidgetName(), 
+                this->CollectThresholdScale->GetWidgetName(),
+                this->CollectThresholdValue->GetWidgetName());
 
   if (pvapp->GetController()->GetNumberOfProcesses() > 1)
     {
-    this->Script("pack %s %s -side left -fill x",
-                 this->LODThresholdLabel->GetWidgetName(),
-                 this->LODThresholdScale->GetWidgetName());
-  
     this->InterruptRenderCheck->SetParent(
                                     this->RenderParametersFrame->GetFrame());
     this->InterruptRenderCheck->Create(this->Application, 
@@ -949,13 +1044,15 @@ void vtkPVRenderView::CreateViewProperties()
       "This is here to compare performance.  "
       "It should not change the final rendered image.");
   
-    this->Script("pack %s %s %s %s %s %s %s %s %s -side top -anchor w",
+    this->Script("pack %s %s %s %s %s %s %s %s %s %s %s -side top -anchor w",
                  this->ParallelProjectionCheck->GetWidgetName(),
                  this->TriangleStripsCheck->GetWidgetName(),
                  this->ImmediateModeCheck->GetWidgetName(),
                  this->ReductionCheck->GetWidgetName(),
                  this->FrameRateFrame->GetWidgetName(),
                  this->LODThresholdFrame->GetWidgetName(),
+                 this->LODResolutionFrame->GetWidgetName(),
+                 this->CollectThresholdFrame->GetWidgetName(),
                  this->InterruptRenderCheck->GetWidgetName(),
                  this->CompositeWithFloatCheck->GetWidgetName(),
                  this->CompositeWithRGBACheck->GetWidgetName(),
@@ -963,11 +1060,12 @@ void vtkPVRenderView::CreateViewProperties()
     }
   else
     {
-    this->Script("pack %s %s %s %s -side top -anchor w",
+    this->Script("pack %s %s %s %s %s -side top -anchor w",
                  this->ParallelProjectionCheck->GetWidgetName(),
                  this->TriangleStripsCheck->GetWidgetName(),
                  this->ImmediateModeCheck->GetWidgetName(),
-                 this->LODThresholdFrame->GetWidgetName());
+                 this->LODThresholdFrame->GetWidgetName(),
+                 this->LODResolutionFrame->GetWidgetName());
     }
 
   this->ParaViewOptionsFrame->SetParent(this->GeneralProperties);
@@ -1654,7 +1752,8 @@ void vtkPVRenderView::LODThresholdScaleCallback()
   // I do not know if it would cause a problem, but ...
   this->SetLODThresholdInternal(threshold);
 
-  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", threshold);
+  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", 
+                                  threshold);
   this->AddTraceEntry("$kw(%s) SetLODThreshold %d",
                       this->GetTclName(), threshold);
 }
@@ -1676,7 +1775,8 @@ void vtkPVRenderView::SetLODThreshold(int threshold)
 
   this->SetLODThresholdInternal(threshold);
 
-  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", threshold);
+  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", 
+                                  threshold);
   this->AddTraceEntry("$kw(%s) SetLODThreshold %d",
                       this->GetTclName(), threshold);
 }
@@ -1689,8 +1789,75 @@ void vtkPVRenderView::SetLODThresholdInternal(int threshold)
   vtkPVSource *pvs;
   vtkPVData *pvd;
   vtkPVApplication *pvApp;
+  char str[256];
+
+  sprintf(str, " %d Points", threshold);
+  this->LODThresholdValue->SetLabel(str);
 
   this->LODThreshold = threshold;
+
+  pvApp = this->GetPVApplication();
+  pvWin = this->GetPVWindow();
+  if (pvWin == NULL)
+    {
+    vtkErrorMacro("Missing window.");
+    return;
+    }
+  sources = pvWin->GetSourceList("Sources");
+  sources->InitTraversal();
+
+  while ( (pvs = sources->GetNextPVSource()) )
+    {
+    pvd = pvs->GetPVOutput();
+    // The performs the check and enables or disables decimation LOD.
+    pvd->UpdateProperties();
+    }
+}
+
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::LODResolutionScaleCallback()
+{
+  int value = this->LODResolutionScale->GetValue();
+  value = 170 - value;
+
+  // Use internal method so we do not reset the slider.
+  // I do not know if it would cause a problem, but ...
+  this->SetLODResolutionInternal(value);
+
+  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Resolution %d.", value);
+  this->AddTraceEntry("$kw(%s) SetLODResolution %d",
+                      this->GetTclName(), value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetLODResolution(int value)
+{
+  this->LODResolutionScale->SetValue(150 - value);
+
+  this->SetLODResolutionInternal(value);
+
+  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Resolution %d.", value);
+  this->AddTraceEntry("$kw(%s) SetLODResolution %d",
+                      this->GetTclName(), value);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetLODResolutionInternal(int resolution)
+{
+  vtkPVWindow *pvWin;
+  vtkPVSourceCollection *sources;
+  vtkPVSource *pvs;
+  vtkPVData *pvd;
+  vtkPVApplication *pvApp;
+  char str[256];
+
+  sprintf(str, " %dx%dx%d", resolution, resolution, resolution);
+  this->LODResolutionValue->SetLabel(str);
+
+  this->LODResolution = resolution;
 
   pvApp = this->GetPVApplication();
   pvWin = this->GetPVWindow();
@@ -1704,10 +1871,72 @@ void vtkPVRenderView::SetLODThresholdInternal(int threshold)
   while ( (pvs = sources->GetNextPVSource()) )
     {
     pvd = pvs->GetPVOutput();
-    // The performs the check and enables or disables decimation LOD.
-    pvd->UpdateProperties();
+    pvd->SetLODResolution(resolution);
     }
 }
+
+
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::CollectThresholdScaleCallback()
+{
+  float threshold = this->CollectThresholdScale->GetValue();
+
+  // Use internal method so we do not reset the slider.
+  // I do not know if it would cause a problem, but ...
+  this->SetCollectThresholdInternal(threshold);
+
+  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %f.", threshold);
+  this->AddTraceEntry("$kw(%s) SetCollectThreshold %f",
+                      this->GetTclName(), threshold);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetCollectThreshold(float threshold)
+{
+  this->CollectThresholdScale->SetValue(threshold);
+
+  this->SetCollectThresholdInternal(threshold);
+
+  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %f.", threshold);
+  this->AddTraceEntry("$kw(%s) SetCollectThreshold %f",
+                      this->GetTclName(), threshold);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetCollectThresholdInternal(float threshold)
+{
+  vtkPVWindow *pvWin;
+  vtkPVSourceCollection *sources;
+  vtkPVSource *pvs;
+  vtkPVData *pvd;
+  vtkPVApplication *pvApp;
+  char str[256];
+
+  sprintf(str, " %.1f MBytes", threshold);
+  this->CollectThresholdValue->SetLabel(str);
+
+  this->CollectThreshold = threshold;
+
+  pvApp = this->GetPVApplication();
+  pvWin = this->GetPVWindow();
+  if (pvWin == NULL)
+    {
+    vtkErrorMacro("Missing window.");
+    return;
+    }
+  sources = pvWin->GetSourceList("Sources");
+  sources->InitTraversal();
+  while ( (pvs = sources->GetNextPVSource()) )
+    {
+    pvd = pvs->GetPVOutput();
+    pvd->SetCollectThreshold(threshold);
+    }
+}
+
+
 
 
 //----------------------------------------------------------------------------
@@ -1986,7 +2215,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.181 $");
+  this->ExtractRevision(os,"$Revision: 1.182 $");
 }
 
 //------------------------------------------------------------------------------

@@ -310,6 +310,43 @@ public:
   vtkGetMacro(LODThreshold, int);
   vtkBooleanMacro(LODThreshold, int);
 
+
+  // Description:
+  // LOD resolution determines how many cells are in decimated model.
+  void LODResolutionScaleCallback();
+
+  // Description:
+  // This method sets the resolution without tracing or
+  // changing the UI scale.
+  void SetLODResolutionInternal(int threshold);
+
+  // Description:
+  // This methods can be used from a script.  
+  // "Set" sets the value of the scale, and adds an entry to the trace.
+  void SetLODResolution(int);
+  vtkGetMacro(LODResolution, int);
+  vtkBooleanMacro(LODResolution, int);
+
+
+
+  // Description:
+  // Threshold for collecting data to a single process (MBytes).
+  void CollectThresholdScaleCallback();
+
+  // Description:
+  // This method sets the threshold without tracing or
+  // changing the UI scale.
+  void SetCollectThresholdInternal(float threshold);
+
+  // Description:
+  // This methods can be used from a script.  
+  // "Set" sets the value of the scale, and adds an entry to the trace.
+  void SetCollectThreshold(float);
+  vtkGetMacro(CollectThreshold, float);
+  vtkBooleanMacro(CollectThreshold, float);
+
+
+
   // Description:
   // Store current camera at a specified position. This stores all the
   // camera parameters and generates a small icon.
@@ -375,6 +412,17 @@ protected:
   vtkKWWidget *LODThresholdFrame;
   vtkKWLabel *LODThresholdLabel;
   vtkKWScale *LODThresholdScale;
+  vtkKWLabel *LODThresholdValue;
+
+  vtkKWWidget *LODResolutionFrame;
+  vtkKWLabel *LODResolutionLabel;
+  vtkKWScale *LODResolutionScale;
+  vtkKWLabel *LODResolutionValue;
+
+  vtkKWWidget *CollectThresholdFrame;
+  vtkKWLabel *CollectThresholdLabel;
+  vtkKWScale *CollectThresholdScale;
+  vtkKWLabel *CollectThresholdValue;
 
   vtkKWSplitFrame *SplitFrame;
 
@@ -403,6 +451,8 @@ protected:
   int DisableRenderingFlag;
 
   int LODThreshold;
+  int LODResolution;
+  float CollectThreshold;
 
   // Camera icons
   vtkKWLabeledFrame* CameraIconsFrame;
