@@ -101,15 +101,32 @@ public:
 
   // Description:
   // Set the widget packing order to be horizontal (default is vertical).
+  // This means that given the insertion order of the button in the set,
+  // the buttons will be packed in the horizontal direction.
   void SetPackHorizontally(int);
   vtkBooleanMacro(PackHorizontally, int);
   vtkGetMacro(PackHorizontally, int);
+
+  // Description:
+  // Set the maximum number of widgets that will be packed in the packing
+  // direction (i.e. horizontally or vertically). Default is 0, meaning that
+  // all widgets are packed along the same direction. If 3 (for example) and
+  // direction is horizontal, you end up with 3 columns.
+  void SetMaximumNumberOfWidgetInPackingDirection(int);
+  vtkGetMacro(MaximumNumberOfWidgetInPackingDirection, int);
+
+  // Description:
+  // Set the button padding.
+  virtual void SetPadding(int x, int y);
 
 protected:
   vtkKWPushButtonSet();
   ~vtkKWPushButtonSet();
 
   int PackHorizontally;
+  int MaximumNumberOfWidgetInPackingDirection;
+  int PadX;
+  int PadY;
 
   //BTX
 

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWPushButtonSet);
-vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.2");
+vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.3");
 
 int vtkvtkKWPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -60,6 +60,9 @@ int vtkvtkKWPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWPushButtonSet::vtkKWPushButtonSet()
 {
   this->PackHorizontally = 0;
+  this->MaximumNumberOfWidgetInPackingDirection = 0;
+  this->PadX = 0;
+  this->PadY = 0;
   this->Buttons = vtkKWPushButtonSet::ButtonsContainer::New();
 }
 
@@ -266,7 +269,9 @@ void vtkKWPushButtonSet::Pack()
   vtkKWPushButtonSet::ButtonsContainerIterator *it = 
     this->Buttons->NewIterator();
 
-  int i = 0;
+  int col = 0;
+  int row = 0;
+
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
@@ -274,17 +279,40 @@ void vtkKWPushButtonSet::Pack()
       {
       tk_cmd << "grid " << button_slot->Button->GetWidgetName() 
              << " -sticky news"
-             << " -column " << (this->PackHorizontally ? i : 0)
-             << " -row " << (this->PackHorizontally ? 0 : i)
+             << " -column " << (this->PackHorizontally ? col : row)
+             << " -row " << (this->PackHorizontally ? row : col)
+             << " -padx " << this->PadX
+             << " -pady " << this->PadY
              << endl;
-      i++;
+      col++;
+      if (this->MaximumNumberOfWidgetInPackingDirection &&
+          col >= this->MaximumNumberOfWidgetInPackingDirection)
+        {
+        col = 0;
+        row++;
+        }
       }
     it->GoToNextItem();
     }
   it->Delete();
 
-  tk_cmd << "grid " << (this->PackHorizontally ? "row" : "column") 
-         << "configure " << this->GetWidgetName() << " 0 -weight 1" << endl;
+  // Weights
+  
+  int i;
+  int maxcol = (row > 0) ? this->MaximumNumberOfWidgetInPackingDirection : col;
+  for (i = 0; i < maxcol; i++)
+    {
+    tk_cmd << "grid " << (this->PackHorizontally ? "column" : "row") 
+           << "configure " << this->GetWidgetName() << " " 
+           << i << " -weight 1" << endl;
+    }
+
+  for (i = 0; i <= row; i++)
+    {
+    tk_cmd << "grid " << (this->PackHorizontally ? "row" : "column") 
+           << "configure " << this->GetWidgetName() << " " 
+           << i << " -weight 1" << endl;
+    }
 
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -299,6 +327,35 @@ void vtkKWPushButtonSet::SetPackHorizontally(int _arg)
     return;
     }
   this->PackHorizontally = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWPushButtonSet::SetMaximumNumberOfWidgetInPackingDirection(int _arg)
+{
+  if (this->MaximumNumberOfWidgetInPackingDirection == _arg)
+    {
+    return;
+    }
+  this->MaximumNumberOfWidgetInPackingDirection = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWPushButtonSet::SetPadding(int x, int y)
+{
+  if (this->PadX == x && this->PadY == y)
+    {
+    return;
+    }
+
+  this->PadX = x;
+  this->PadY = y;
+
   this->Modified();
 
   this->Pack();
