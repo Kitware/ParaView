@@ -107,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.264");
+vtkCxxRevisionMacro(vtkPVApplication, "1.265");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -412,6 +412,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->MachinesFileName = 0;
   this->ProgressEnabled = 0;
   this->ProgressRequests = 0;
   this->Observer = vtkPVApplicationObserver::New();
@@ -598,6 +599,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Run ParaView as client (MPI run, 1 process) (ParaView Server must be started first).", 
   "--client-render-server" , "-crs", 
   "Run ParaView as client (MPI run, 1 process) (ParaView Data Server and Render Server must be started first).", 
+  "--machines" , "-m", 
+  "Specify the network configurations file for the render server (--machines=cfgfile).",
   "--server" , "-v", 
   "Start ParaView as a server (use MPI run).",
   "--render-server" , "-rs", 
@@ -1028,7 +1031,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-server-host",
                                             index) == VTK_OK ||
          vtkPVApplication::CheckForArgument(argc, argv, "-rsh",
-                                          index) == VTK_OK )
+                                            index) == VTK_OK )
       {
       // Strip string to equals sign.
       const char* newarg=0;
@@ -1058,6 +1061,25 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
         }
       this->Port = atoi(newarg);
       }
+
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--machines",
+                                            index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-m", 
+                                            index) == VTK_OK)
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->SetMachinesFileName(newarg);
+      }
+    
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-port",
                                             index) == VTK_OK)
       {

@@ -34,7 +34,7 @@ public:
 
 
 vtkStandardNewMacro(vtkMPIMToNSocketConnectionPortInformation);
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, "1.1");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, "1.2");
 
 //----------------------------------------------------------------------------
 vtkMPIMToNSocketConnectionPortInformation::vtkMPIMToNSocketConnectionPortInformation()
@@ -85,15 +85,23 @@ void vtkMPIMToNSocketConnectionPortInformation::CopyFromObject(vtkObject* obj)
 }
 
 
-void vtkMPIMToNSocketConnectionPortInformation::SetPortInformation(unsigned int processNumber,
-                                                                   int port,
-                                                                   const char* hostname)
+void vtkMPIMToNSocketConnectionPortInformation::SetPortNumber(unsigned int processNumber,
+                                                              int port)
 {
   if(this->Internals->ServerInformation.size() == 0)
     {
     this->Internals->ServerInformation.resize(this->NumberOfConnections);
     }
   this->Internals->ServerInformation[processNumber].PortNumber = port;
+}
+
+void vtkMPIMToNSocketConnectionPortInformation::SetHostName(unsigned int processNumber,
+                                                            const char* hostname)
+{
+  if(this->Internals->ServerInformation.size() == 0)
+    {
+    this->Internals->ServerInformation.resize(this->NumberOfConnections);
+    }
   this->Internals->ServerInformation[processNumber].HostName = hostname;
 }
 
@@ -107,7 +115,7 @@ void vtkMPIMToNSocketConnectionPortInformation::AddInformation(vtkPVInformation*
     vtkErrorMacro("Wrong type for AddInformation" << i);
     return;
     }
-  this->SetPortInformation(info->ProcessNumber, info->PortNumber, info->HostName);
+  this->SetPortNumber(info->ProcessNumber, info->PortNumber);
 }
 
 //----------------------------------------------------------------------------

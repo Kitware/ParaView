@@ -313,6 +313,10 @@ public:
   vtkGetStringMacro(Argv0);
 
   // Description:
+  // This is used by the render server only.
+  vtkGetStringMacro(MachinesFileName);
+
+  // Description:
   // The name of the trace file.
   vtkGetStringMacro(TraceFileName);
 
@@ -462,6 +466,8 @@ protected:
   void DeleteTraceFiles(char* name, int all);
   void SaveTraceFile(const char* fname);
 
+  vtkSetStringMacro(MachinesFileName);
+  char* MachinesFileName;
   vtkSetStringMacro(TraceFileName);
   char* TraceFileName;
   char* Argv0;

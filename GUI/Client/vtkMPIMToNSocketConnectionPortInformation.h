@@ -48,7 +48,8 @@ public:
   
   // Description:
   // Set the port and host information for a specific process number.
-  void SetPortInformation(unsigned int processNumber, int port, const char* host);
+  void SetPortNumber(unsigned int processNumber, int port);
+  void SetHostName(unsigned int processNumber, const char* host);
   
   // Description:
   // Set/Get the number of connections.

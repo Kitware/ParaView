@@ -23,7 +23,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.4");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.5");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -37,11 +37,13 @@ public:
     vtkstd::string HostName;
   };
   vtkstd::vector<NodeInformation> ServerInformation;
+  vtkstd::vector<std::string> MachineNames;
 };
 
 
 vtkMPIMToNSocketConnection::vtkMPIMToNSocketConnection()
 {
+  this->MachinesFileName = 0;
   this->Socket = 0;
   this->HostName = 0;
   this->PortNumber = -1;
@@ -83,6 +85,37 @@ void vtkMPIMToNSocketConnection::PrintSelf(ostream& os, vtkIndent indent)
     }
 }
 
+void vtkMPIMToNSocketConnection::LoadMachinesFile()
+{
+  unsigned int myId = this->Controller->GetLocalProcessId();
+  if(!this->MachinesFileName)
+    {
+    return;
+    } 
+  FILE* file = fopen(this->MachinesFileName, "r");
+  char machinename[1024];
+  if(!file)
+    {
+    vtkErrorMacro("Could not open file : " << this->MachinesFileName);
+    return;
+    }
+  while(!feof(file))
+    {
+    if(fgets(machinename, 1024, file) != 0)
+      {
+      int pos = strlen(machinename)-1;
+      if(machinename[pos] == '\n')
+        {
+        machinename[pos] = 0;
+        }
+      if(strlen(machinename) > 0)
+        {
+        this->Internals->MachineNames.push_back(machinename);
+        }
+      }
+    }
+  fclose(file);
+}
 
 
 void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
@@ -92,13 +125,32 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
     vtkErrorMacro("SetupWaitForConnection called more than once");
     return;
     }
+  unsigned int myId = this->Controller->GetLocalProcessId();
   this->SocketCommunicator = vtkSocketCommunicator::New();
   // open a socket on a random port
   int sock = this->SocketCommunicator->OpenSocket(0);
   // find out the random port picked
   int port = this->SocketCommunicator->GetPort(sock);
-  cout << "found port " << port << "\n";
-  this->SetHostName("localhost");
+  if(this->Internals->MachineNames.size())
+    {
+    if( myId < this->Internals->MachineNames.size())
+      {
+      this->SetHostName(this->Internals->MachineNames[myId].c_str());
+      }
+    else
+      {
+      vtkErrorMacro("Bad configuration file more processes than machines listed."
+                    << " Configfile= " << this->MachinesFileName << "\n"
+                    << " process id = " << myId << "\n"
+                    << " number of machines in file: " <<  
+                    this->Internals->MachineNames.size() << "\n");
+      this->SetHostName("localhost");
+      }
+    }
+  else
+    {
+    this->SetHostName("localhost");
+    }
   this->PortNumber = port;
   this->Socket = sock;
   this->NumberOfConnections = this->Controller->GetNumberOfProcesses();
@@ -112,13 +164,13 @@ void vtkMPIMToNSocketConnection::WaitForConnection()
     vtkErrorMacro("SetupWaitForConnection must be called before WaitForConnection");
     return;
     }
-  int myId = this->Controller->GetLocalProcessId();
-  if(myId >= this->NumberOfConnections)
+  unsigned int myId = this->Controller->GetLocalProcessId();
+  if(myId >= static_cast<unsigned int>(this->NumberOfConnections))
     {
     return;
     }
   cout << "WaitForConnection: id :" 
-       << myId << "  host: " << this->HostName << "  Port:" << this->PortNumber << "\n";
+       << myId << "  Port:" << this->PortNumber << "\n";
   this->SocketCommunicator->WaitForConnectionOnSocket(this->Socket);
   int data;
   this->SocketCommunicator->Receive(&data, 1, 1, 1238);
@@ -162,7 +214,7 @@ void vtkMPIMToNSocketConnection::SetNumberOfConnections(int c)
 
 void vtkMPIMToNSocketConnection::SetPortInformation(unsigned int processNumber,
                                                     int port, const char* host)
-{
+{ 
   if(processNumber >= this->Internals->ServerInformation.size())
     {
     vtkErrorMacro("Attempt to set port information for process larger than number of processes.\n"
@@ -186,7 +238,19 @@ void vtkMPIMToNSocketConnection::GetPortInformation(
   // not call AddInformation for process 0
   if(myId == 0)
     {
-    info->SetPortInformation(0, this->PortNumber, this->HostName);
+    this->LoadMachinesFile();
+    info->SetPortNumber(0, this->PortNumber);
+    if(this->Internals->MachineNames.size() &&
+       (this->Internals->MachineNames.size() 
+        < static_cast<unsigned int>(info->GetNumberOfConnections())))
+      {
+      vtkErrorMacro("Bad Configuration file, expected " << info->GetNumberOfConnections()
+                    << " machines and found " << this->Internals->MachineNames.size());
+      }
+    for(unsigned int i = 0; i < this->Internals->MachineNames.size(); ++i)
+      {
+      info->SetHostName(i, this->Internals->MachineNames[i].c_str());
+      }
     }
   info->SetHostName(this->HostName);
   info->SetProcessNumber(myId);

@@ -62,8 +62,9 @@ public:
   // Description:
   // Fill the port information values into the port information object.
   void GetPortInformation(vtkMPIMToNSocketConnectionPortInformation*);
-  
+  vtkSetStringMacro(MachinesFileName);
 protected:
+  void LoadMachinesFile();
   virtual void SetController(vtkMultiProcessController*);
   virtual void SetSocketCommunicator(vtkSocketCommunicator*);
   vtkMPIMToNSocketConnection();
@@ -72,6 +73,7 @@ private:
   int PortNumber;
   int Socket;
   char* HostName;
+  char* MachinesFileName;
   vtkSetStringMacro(HostName);
   int NumberOfConnections;
   vtkMPIMToNSocketConnectionInternals* Internals;
