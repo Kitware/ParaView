@@ -6,8 +6,12 @@
   Date:      $Date$
   Version:   $Revision$
 
+Copyright (c) 1998-1999 Kitware Inc. 469 Clifton Corporate Parkway,
+Clifton Park, NY, 12065, USA.
 
-Copyright (c) 1999-2000 Mercury Computers Inc. All rigts reserved.
+All rights reserved. No part of this software may be reproduced, distributed,
+or modified, in any form or by any means, without permission in writing from
+Kitware Inc.
 
 IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY FOR
 DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
@@ -20,9 +24,8 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 "AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
-
 =========================================================================*/
-#include "mvinit.h"
+#include "pvinit.h"
 
 #ifdef _WIN32
 #include <windows.h>

@@ -7,5 +7,5 @@ load vtkKWParaViewTcl
 wm withdraw .
 
 # create the app
-vtkParaViewApplication app
+vtkPVApplication app
 app Start
