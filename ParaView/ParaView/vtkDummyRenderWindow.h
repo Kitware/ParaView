@@ -57,6 +57,90 @@ public:
 
   virtual void SetMultiSamples(int i) {i = i;}
 
+  // Description:
+  // The following methods have to be defined since they
+  // are pure virtual in super-class.
+  virtual void SetDisplayId(void *) {};
+  virtual void SetWindowId(void *)  {};
+  virtual void SetParentId(void *)  {};
+  virtual void *GetGenericDisplayId() {};
+  virtual void *GetGenericWindowId()  {};
+  virtual void *GetGenericParentId()  {};
+  virtual void *GetGenericContext()   {};
+  virtual void *GetGenericDrawable()  {};
+  virtual void SetWindowInfo(char *)  {};
+  virtual void SetParentInfo(char *)  {};
+  virtual void Start() {};
+  virtual void Frame() {};
+  virtual void HideCursor() {};
+  virtual void ShowCursor() {};
+  virtual void SetFullScreen(int) {};
+  virtual void WindowRemap() {};
+  virtual int GetEventPending() {return 0;};
+  virtual void MakeCurrent() {};
+  virtual int GetDepthBufferSize() {return -1;};
+  virtual unsigned char *GetPixelData(int, int, int, int, int) 
+    {
+      return 0;
+    }
+  virtual int GetPixelData(int ,int ,int ,int , int,
+			   vtkUnsignedCharArray*) 
+    {
+      return VTK_ERROR;
+    }
+  virtual int SetPixelData(int, int, int, int, unsigned char *,int)
+    {
+      return VTK_ERROR;
+    }
+  virtual int SetPixelData(int, int, int, int, vtkUnsignedCharArray*,
+			   int )
+    {
+      return VTK_ERROR;
+    }
+  virtual int GetRGBAPixelData(int, int, int, int, int, vtkFloatArray* )
+    {
+      return VTK_ERROR;
+    }
+  virtual int SetRGBAPixelData(int ,int ,int ,int ,float *,int,
+			       int blend=0) 
+    {
+      return VTK_ERROR;
+    }
+  virtual int SetRGBAPixelData(int, int, int, int, vtkFloatArray*,
+			       int, int blend=0) 
+    {
+      return VTK_ERROR;
+    }
+  virtual int GetRGBACharPixelData(int ,int, int, int, int,
+				   vtkUnsignedCharArray*)
+    {
+      return VTK_ERROR;
+    }
+  virtual int SetRGBACharPixelData(int ,int ,int ,int ,unsigned char *, int,
+				   int blend=0) 
+    {
+      return VTK_ERROR;
+    }
+  virtual int SetRGBACharPixelData(int, int, int, int,
+				   vtkUnsignedCharArray *,
+				   int, int blend=0) 
+    {
+      return VTK_ERROR;
+    }
+  virtual int GetZbufferData( int, int, int, int, vtkFloatArray*)
+    {
+      return VTK_ERROR;
+    }
+  virtual int SetZbufferData(int, int, int, int, float *)
+    {
+      return VTK_ERROR;
+    }
+  virtual int SetZbufferData( int, int, int, int, vtkFloatArray * )
+    {
+      return VTK_ERROR;
+    }
+
+
 protected:
   vtkDummyRenderWindow();
   ~vtkDummyRenderWindow();
