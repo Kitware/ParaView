@@ -40,15 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataParser.h"
 #include "vtkXMLUtilities.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectReader, "1.8");
-
-vtkCxxSetObjectMacro(vtkXMLObjectReader, Object, vtkObject);
+vtkCxxRevisionMacro(vtkXMLObjectReader, "1.9");
 
 //----------------------------------------------------------------------------
 vtkXMLObjectReader::vtkXMLObjectReader()
 {
-  this->Object = 0;
-  this->ErrorLog = NULL;
   this->XMLParser = 0;  
   this->LastParsedElement = 0;
 }
@@ -56,8 +52,6 @@ vtkXMLObjectReader::vtkXMLObjectReader()
 //----------------------------------------------------------------------------
 vtkXMLObjectReader::~vtkXMLObjectReader()
 {
-  this->SetObject(0);
-  this->SetErrorLog(NULL);
   this->DestroyXMLParser();
 }
 
@@ -86,6 +80,7 @@ int vtkXMLObjectReader::ParseStream(istream &is)
 {
   this->CreateXMLParser();
   this->XMLParser->SetStream(&is);
+  this->XMLParser->SetAttributesEncoding(this->GetDefaultCharacterEncoding());
 
   if (this->XMLParser->Parse())
     {
@@ -243,36 +238,3 @@ int vtkXMLObjectReader::IsInNestedElement(vtkXMLDataElement *grandparent,
 
   return this->IsInElement(parent);
 }
-
-//----------------------------------------------------------------------------
-void vtkXMLObjectReader::AppendToErrorLog(const char *msg)
-{
-  ostrstream str;
-  if (this->ErrorLog)
-    {
-    str << this->ErrorLog << endl;
-    }
-  str << msg << ends;
-  this->SetErrorLog(str.str());
-  str.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkXMLObjectReader::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-
-  if (this->Object)
-    {
-    os << indent << "Object: " << this->Object << "\n";
-    }
-  else
-    {
-    os << indent << "Object: (none)\n";
-    }
-
-  os << indent << "ErrorLog: " 
-     << (this->ErrorLog ? this->ErrorLog : "(none)") << endl;
-}
-
-

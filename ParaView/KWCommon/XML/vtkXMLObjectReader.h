@@ -33,7 +33,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkXMLObjectReader - Base XML Reader.
+// .NAME vtkXMLObjectReader - XML Object Reader.
 // .SECTION Description
 // vtkXMLObjectReader provides base functionalities for all XML readers.
 // .SECTION See Also
@@ -42,21 +42,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkXMLObjectReader_h
 #define __vtkXMLObjectReader_h
 
-#include "vtkObject.h"
+#include "vtkXMLIOBase.h"
 
 class vtkXMLDataElement;
 class vtkXMLDataParser;
 
-class VTK_EXPORT vtkXMLObjectReader : public vtkObject
+class VTK_EXPORT vtkXMLObjectReader : public vtkXMLIOBase
 {
 public:
-  vtkTypeRevisionMacro(vtkXMLObjectReader,vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Get/Set the object to serialize.
-  virtual void SetObject(vtkObject*);
-  vtkGetObjectMacro(Object, vtkObject);
+  vtkTypeRevisionMacro(vtkXMLObjectReader,vtkXMLIOBase);
 
   // Description:
   // Parse an XML tree and modify the object accordingly.
@@ -77,11 +71,6 @@ public:
   // Parse an XML file.
   // Return 1 on success, 0 on error.
   virtual int ParseFile(const char*);
-
-  // Description:
-  // Return the name of the root element of the XML tree this reader
-  // is supposed to read and process.
-  virtual char* GetRootElementName() = 0;
 
   // Description:
   // Convenience method to look in 'parent' for an XML element matching 
@@ -105,19 +94,9 @@ public:
   virtual int IsInNestedElement(vtkXMLDataElement *grandparent,
                                 const char *name);
 
-  // Description:
-  // Set/Get the error log.
-  vtkSetStringMacro(ErrorLog);
-  vtkGetStringMacro(ErrorLog);
-  virtual void AppendToErrorLog(const char *);
-
 protected:
   vtkXMLObjectReader();
   ~vtkXMLObjectReader();  
-
-  vtkObject *Object;
-
-  char *ErrorLog;
 
   // Description:
   // Create and destroy the XML parser.

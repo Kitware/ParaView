@@ -33,7 +33,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkXMLObjectWriter - Base XML Writer.
+// .NAME vtkXMLObjectWriter - XML Object Writer.
 // .SECTION Description
 // vtkXMLObjectWriter provides base functionalities for all XML writers.
 // .SECTION See Also
@@ -42,20 +42,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkXMLObjectWriter_h
 #define __vtkXMLObjectWriter_h
 
-#include "vtkObject.h"
+#include "vtkXMLIOBase.h"
 
 class vtkXMLDataElement;
 
-class VTK_EXPORT vtkXMLObjectWriter : public vtkObject
+class VTK_EXPORT vtkXMLObjectWriter : public vtkXMLIOBase
 {
 public:
-  vtkTypeRevisionMacro(vtkXMLObjectWriter,vtkObject);
+  vtkTypeRevisionMacro(vtkXMLObjectWriter,vtkXMLIOBase);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Get/Set the object to serialize.
-  virtual void SetObject(vtkObject*);
-  vtkGetObjectMacro(Object, vtkObject);
 
   // Description:
   // Create an XML representation of the object (in-place) by setting
@@ -67,8 +62,8 @@ public:
   // Description:
   // Write an XML serialized representation of the object
   // Return 1 on success, 0 otherwise.
-  virtual int Write(ostream &os, vtkIndent *indent = 0);
-  virtual int Write(const char *filename);
+  virtual int WriteToStream(ostream &os, vtkIndent *indent = 0);
+  virtual int WriteToFile(const char *filename);
 
   // Description:
   // Enable/Disable factorization of the XML tree on write.
@@ -81,11 +76,6 @@ public:
   vtkSetClampMacro(WriteIndented, int, 0, 1);
   vtkGetMacro(WriteIndented, int);
   vtkBooleanMacro(WriteIndented, int);
-
-  // Description:
-  // Return the name of the root element of the XML tree this writer
-  // is supposed to write.
-  virtual char* GetRootElementName() = 0;
 
   // Description:
   // Convenience method to create an XML representation of the object
@@ -105,10 +95,8 @@ public:
 
 protected:
   vtkXMLObjectWriter();
-  ~vtkXMLObjectWriter();  
+  ~vtkXMLObjectWriter() {};  
   
-  vtkObject *Object;
-
   int WriteFactored;
   int WriteIndented;
 
