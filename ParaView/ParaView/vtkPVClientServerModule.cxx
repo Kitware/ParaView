@@ -260,7 +260,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.9");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.10");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -335,9 +335,6 @@ void vtkPVClientServerModule::ErrorCallback(vtkObject *vtkNotUsed(caller),
 {
   cout << (char*)calldata << endl;
 }
-// Declare the initialization function as external
-// this is defined in the PackageInit file
-extern void Vtkparaviewcswrapped_Initialize(vtkClientServerInterpreter *arlu);
 
 //----------------------------------------------------------------------------
 // This method is a bit long, we should probably break it up
@@ -451,7 +448,7 @@ void vtkPVClientServerModule::Connect()
     {
     this->ClientInterpreter = vtkClientServerInterpreter::New();
     this->ClientInterpreter->SetLogFile("pvClient.out");
-    Vtkparaviewcswrapped_Initialize(this->ClientInterpreter);
+    vtkPVProcessModule::InitializeInterpreter(this->ClientInterpreter);
     this->GetStream()
       << vtkClientServerStream::Assign
       << this->GetApplicationID() << this->GetPVApplication()
@@ -466,7 +463,7 @@ void vtkPVClientServerModule::Connect()
     {
     this->ServerInterpreter = vtkClientServerInterpreter::New();
     this->ServerInterpreter->SetLogFile("pvServer.out");
-    Vtkparaviewcswrapped_Initialize(this->ServerInterpreter);
+    vtkPVProcessModule::InitializeInterpreter(this->ServerInterpreter);
     this->GetStream()
       << vtkClientServerStream::Assign
       << this->GetApplicationID() << this->GetPVApplication()

@@ -1,25 +1,40 @@
-SET( ParaView_SRCS
-  vtkClientCompositeManager.cxx
-  vtkCompleteArrays.cxx
-  vtkCompositeProp.cxx
+SET( ParaViewServer_SRCS
   vtkCTHData.cxx
   vtkCTHDataToPolyDataFilter.cxx
   vtkCTHExtractAMRPart.cxx
   vtkCTHFractal.cxx
   vtkCTHOutlineFilter.cxx
   vtkCTHSource.cxx
+  vtkClientCompositeManager.cxx
+  vtkCompleteArrays.cxx
+  vtkCompositeProp.cxx
   vtkExtractCTHPart.cxx
-  vtkKWBoundsDisplay.cxx
   vtkMultiDisplayManager.cxx
+  vtkPVApplication.cxx
+  vtkPVClientServerModule.cxx
+  vtkPVExtentTranslator.cxx
+  vtkPVGenericRenderWindowInteractor.cxx
+  vtkPVGeometryFilter.cxx
+  vtkPVLODActor.cxx
+  vtkPVMPIProcessModule.cxx
+  vtkPVProcessModule.cxx
+  vtkPVTreeComposite.cxx
+  vtkSelectInputs.cxx
+  vtkStringList.cxx
+  vtkXMLCollectionReader.cxx
+  vtkXMLPVAnimationWriter.cxx
+  )
+
+SET( ParaView_SRCS ${ParaViewServer_SRCS}
+  vtkKWBoundsDisplay.cxx
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
   vtkPVAnimationInterface.cxx
   vtkPVAnimationInterfaceEntry.cxx
-  vtkPVApplication.cxx 
-  vtkPVApplicationResources.cxx 
+  vtkPVApplicationResources.cxx
   vtkPVApplicationSettingsInterface.cxx
   vtkPVArrayInformation.cxx
-  vtkPVArrayMenu.cxx 
+  vtkPVArrayMenu.cxx
   vtkPVArraySelection.cxx
   vtkPVBatchCompositeManager.cxx
   vtkPVBoundsDisplay.cxx
@@ -28,7 +43,6 @@ SET( ParaView_SRCS
   vtkPVCameraIcon.cxx
   vtkPVCameraManipulator.cxx
   vtkPVClassNameInformation.cxx
-  vtkPVClientServerModule.cxx
   vtkPVColorMap.cxx
   vtkPVComponentSelection.cxx
   vtkPVCompositeBuffer.cxx
@@ -38,30 +52,26 @@ SET( ParaView_SRCS
   vtkPVCompositeUtilities.cxx
   vtkPVConnectDialog.cxx
   vtkPVContainerWidget.cxx
-  vtkPVContourEntry.cxx 
+  vtkPVContourEntry.cxx
   vtkPVContourWidgetProperty.cxx
   vtkPVCutEntry.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
-  vtkPVData.cxx 
+  vtkPVData.cxx
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSetFileEntry.cxx
   vtkPVDataSetReaderModule.cxx
-  ${PARAVIEW_SOURCE_DIR}/Filters/vtkPVDuplicatePolyData.cxx
   vtkPVDummyWidget.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
   vtkPVExtentEntry.cxx
-  vtkPVExtentTranslator.cxx
   vtkPVExtentWidgetProperty.cxx
   vtkPVExtractGeometryByScalar.cxx
   vtkPVExtractPartsWidget.cxx
   vtkPVFieldMenu.cxx
   vtkPVFileEntry.cxx
   vtkPVFileEntryProperty.cxx
-  vtkPVGenericRenderWindowInteractor.cxx
-  vtkPVGeometryFilter.cxx
   vtkPVGhostLevelDialog.cxx
   vtkPVGroupInputsWidget.cxx
   vtkPVImplicitPlaneWidget.cxx
@@ -71,7 +81,7 @@ SET( ParaView_SRCS
   vtkPVInputArrayRequirement.cxx
   vtkPVInputFixedTypeRequirement.cxx
   vtkPVInputGroupRequirement.cxx
-  vtkPVInputMenu.cxx 
+  vtkPVInputMenu.cxx
   vtkPVInputProperty.cxx
   vtkPVInputRequirement.cxx
   vtkPVInteractorStyle.cxx
@@ -81,7 +91,6 @@ SET( ParaView_SRCS
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx
   vtkPVJoystickFlyOut.cxx
-  vtkPVLODActor.cxx
   vtkPVLODPartDisplay.cxx
   vtkPVLODPartDisplayInformation.cxx
   vtkPVLODRenderModule.cxx
@@ -90,7 +99,6 @@ SET( ParaView_SRCS
   vtkPVLabeledToggle.cxx
   vtkPVLineSourceWidget.cxx
   vtkPVLineWidget.cxx
-  vtkPVMPIProcessModule.cxx
   vtkPVMPIRenderModule.cxx
   vtkPVMPIRenderModuleUI.cxx
   vtkPVMinMax.cxx
@@ -101,34 +109,32 @@ SET( ParaView_SRCS
   vtkPVNumberOfOutputsInformation.cxx
   vtkPVObjectWidget.cxx
   vtkPVOrientScaleWidget.cxx
+  vtkPVPLOT3DReaderModule.cxx
   vtkPVPart.cxx
   vtkPVPartDisplay.cxx
-  vtkPVPLOT3DReaderModule.cxx
   vtkPVPivotManipulator.cxx
   vtkPVPlaneWidget.cxx
   vtkPVPointSourceWidget.cxx
   vtkPVPointWidget.cxx
   vtkPVProbe.cxx
-  vtkPVProcessModule.cxx
   vtkPVPushButton.cxx
   vtkPVRawReaderModule.cxx
   vtkPVReaderModule.cxx
-#  vtkPVRenderGroupDialog.cxx
   vtkPVRenderModule.cxx
   vtkPVRenderModuleUI.cxx
-  vtkPVRenderView.cxx 
+  vtkPVRenderView.cxx
   vtkPVSaveBatchScriptDialog.cxx
   vtkPVScalarListWidgetProperty.cxx
-  vtkPVScalarRangeLabel.cxx 
-  vtkPVScale.cxx 
+  vtkPVScalarRangeLabel.cxx
+  vtkPVScale.cxx
   vtkPVScaleFactorEntry.cxx
   vtkPVSelectCTHArrays.cxx
   vtkPVSelectCustomReader.cxx
   vtkPVSelectTimeSet.cxx
-  vtkPVSelectWidget.cxx 
+  vtkPVSelectWidget.cxx
   vtkPVSelectionList.cxx
   vtkPVServerFileDialog.cxx
-  vtkPVSource.cxx 
+  vtkPVSource.cxx
   vtkPVSourceCollection.cxx
   vtkPVSourceList.cxx
   vtkPVSourceWidget.cxx
@@ -147,26 +153,21 @@ SET( ParaView_SRCS
   vtkPVTrackballRoll.cxx
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
-  vtkPVTreeComposite.cxx 
   vtkPVValueList.cxx
   vtkPVVectorEntry.cxx
   vtkPVWidget.cxx
   vtkPVWidgetCollection.cxx
   vtkPVWidgetProperty.cxx
-  vtkPVWindow.cxx 
-  vtkPVWindowResources.cxx 
-  vtkPVWorldPointPicker.cxx 
+  vtkPVWindow.cxx
+  vtkPVWindowResources.cxx
+  vtkPVWorldPointPicker.cxx
   vtkPVWriter.cxx
+  vtkPVXDMFParameters.cxx
   vtkPVXMLElement.cxx
   vtkPVXMLPackageParser.cxx
   vtkPVXMLParser.cxx
-  vtkSelectInputs.cxx
-  vtkStringList.cxx 
-  vtkTiledDisplaySchedule.cxx
-  vtkPVXDMFParameters.cxx
   vtkXDMFReaderModule.cxx
-  vtkXMLCollectionReader.cxx
-  vtkXMLPVAnimationWriter.cxx
+#  vtkPVRenderGroupDialog.cxx
   )
 
 IF (PARAVIEW_USE_ICE_T)
@@ -272,18 +273,25 @@ VTK_MAKE_INSTANTIATOR2(vtkParaViewInstantiator PVInstantiator_SRCS
   EXPORT_MACRO VTK_EXPORT
   HEADER_LOCATION ${PARAVIEW_BINARY_DIR}/ParaView)
 
-VTK_WRAP_TCL2(vtkKWParaViewTCL ParaViewTCL_SRCS ${PVInstantiator_SRCS} 
+# Create ClientServer wrappers for ParaView classes.
+VTK_WRAP_ClientServer(vtkParaViewServerCS ParaViewServerCS_SRCS
+  ${ParaViewServer_SRCS}
+  ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWApplication.h
+  ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWObject.h)
+ADD_LIBRARY(vtkParaViewServerCS ${ParaViewServerCS_SRCS}
+  ${ParaViewServer_SRCS})
+TARGET_LINK_LIBRARIES(vtkParaViewServerCS vtkPVFiltersCS vtkKWWidgetsTCL)
+
+# Create Tcl wrappers for ParaView classes.
+VTK_WRAP_TCL2(vtkKWParaViewTCL ParaViewTCL_SRCS ${PVInstantiator_SRCS}
   ${ParaView_SRCS})
-ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS} 
+ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
   ${ParaView_SRCS})
 IF(PARAVIEW_USE_EXODUS)
   TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${EXODUS_LIBRARY} ${NETCDF_LIBRARY})
 ENDIF(PARAVIEW_USE_EXODUS)
 
-TARGET_LINK_LIBRARIES (vtkKWParaViewTCL
-  vtkPVFiltersTCL
-  vtkKWWidgetsTCL 
-  vtkParallel vtkParaViewCSWrapped vtkClientServer)
+TARGET_LINK_LIBRARIES (vtkKWParaViewTCL vtkPVFiltersTCL vtkParaViewServerCS)
 IF(XDMF_FOUND)
   TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkXdmfTCL)
 ENDIF(XDMF_FOUND)
@@ -291,7 +299,6 @@ IF(PARAVIEW_USE_ICE_T)
   TARGET_LINK_LIBRARIES(vtkKWParaViewTCL icet icet_mpi icet_strategies)
   INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
 ENDIF(PARAVIEW_USE_ICE_T)
-
 
 CONFIGURE_FILE(
   ${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h.in
@@ -333,8 +340,7 @@ IF(VTK_USE_CARBON)
   ENDIF(VTK_APPLE_RESOURCE)
 ENDIF(VTK_USE_CARBON)
 
-TARGET_LINK_LIBRARIES (paraview
-  vtkKWParaViewTCL)
+TARGET_LINK_LIBRARIES (paraview vtkKWParaViewCS)
 
 IF(UNIX)
   IF(NOT APPLE)

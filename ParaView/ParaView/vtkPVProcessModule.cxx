@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.9");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.10");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -119,11 +119,6 @@ vtkPVProcessModule::~vtkPVProcessModule()
   delete this->ClientServerStream;
 }
 
-// Declare the initialization function as external
-// this is defined in the PackageInit file
-extern void Vtkparaviewcswrapped_Initialize(vtkClientServerInterpreter *arlu);
-
-
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::Start(int argc, char **argv)
 {
@@ -149,7 +144,7 @@ int vtkPVProcessModule::Start(int argc, char **argv)
   this->ClientServerStream = new vtkClientServerStream;
   this->ClientInterpreter = vtkClientServerInterpreter::New();
   this->ClientInterpreter->SetLogFile("c:/pvClient.out");
-  Vtkparaviewcswrapped_Initialize(this->ClientInterpreter);
+  vtkPVProcessModule::InitializeInterpreter(this->ClientInterpreter);
   this->GetStream()
     << vtkClientServerStream::Assign
     << this->GetApplicationID() << app
@@ -624,4 +619,38 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "RootResult: " << this->RootResult << endl;
     }
+}
+
+// ClientServer wrapper initialization functions.
+extern void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkIOCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkRenderingCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkHybridCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
+#ifdef VTK_USE_PATENTED
+extern void vtkPatentedCS_Initialize(vtkClientServerInterpreter*);
+#endif
+extern void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
+extern void vtkParaViewServerCS_Initialize(vtkClientServerInterpreter*);
+
+//----------------------------------------------------------------------------
+void
+vtkPVProcessModule::InitializeInterpreter(vtkClientServerInterpreter* interp)
+{
+  vtkCommonCS_Initialize(interp);
+  vtkFilteringCS_Initialize(interp);
+  vtkImagingCS_Initialize(interp);
+  vtkGraphicsCS_Initialize(interp);
+  vtkIOCS_Initialize(interp);
+  vtkRenderingCS_Initialize(interp);
+  vtkHybridCS_Initialize(interp);
+  vtkParallelCS_Initialize(interp);
+#ifdef VTK_USE_PATENTED
+  vtkPatentedCS_Initialize(interp);
+#endif
+  vtkPVFiltersCS_Initialize(interp);
+  vtkParaViewServerCS_Initialize(interp);
 }

@@ -45,8 +45,7 @@ static void CreateInitFile(cmLoadedCommandInfo *info,
                            void *mf, const char *libName, 
                            int numConcrete, const char **concrete) 
 {
-  /* we have to make sure that the name is the correct case */
-  char *kitName = info->CAPI->Capitalized(libName);
+  const char *kitName = libName;
   int i;
   char *tempOutputFile;  
   char *outFileName = 
@@ -70,7 +69,7 @@ static void CreateInitFile(cmLoadedCommandInfo *info,
   for (i = 0; i < numConcrete; i++)
     {
     fprintf(fout,"int %sCommand(vtkClientServerInterpreter *, vtkObjectBase *, const char *, const vtkClientServerStream&, vtkClientServerStream& resultStrem);\n",concrete[i]);
-    fprintf(fout,"vtkObjectBase *%sNewCommand();\n",concrete[i]);
+    fprintf(fout,"vtkObjectBase *%sClientServerNewCommand();\n",concrete[i]);
     }
   
   fprintf(fout,"\n\nvoid VTK_EXPORT %s_Initialize(vtkClientServerInterpreter *arlu)\n{\n",kitName);
@@ -91,7 +90,7 @@ static void CreateInitFile(cmLoadedCommandInfo *info,
     fprintf(fout,
             "    if (!strcmp(\"%s\",type))\n"
             "      {\n"
-            "      vtkObjectBase *ptr = %sNewCommand();\n"
+            "      vtkObjectBase *ptr = %sClientServerNewCommand();\n"
             "      arlu->NewInstance(ptr,id);\n"
             "      return 1;\n"
             "      }\n"

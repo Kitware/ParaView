@@ -395,7 +395,7 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
 #endif
   if (data->IsConcrete)
     {
-    fprintf(fp,"\nvtkObjectBase *%sNewCommand()\n{\n",data->ClassName);
+    fprintf(fp,"\nvtkObjectBase *%sClientServerNewCommand()\n{\n",data->ClassName);
     fprintf(fp,"  return %s::New();\n}\n\n",data->ClassName);
     }
 

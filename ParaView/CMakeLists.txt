@@ -20,7 +20,6 @@ ENDIF (COMMAND VTK_WRAP_ClientServer)
 UTILITY_SOURCE(VTK_WRAP_ClientServer_EXE vtkWrapClientServer ClientServer/Wrapping vtkWrapClientServer.c)
 MARK_AS_ADVANCED(VTK_WRAP_ClientServer_EXE)
 
-SUBDIRS(ClientServer/Wrapping)
 #-----------------------------------------------------------------------------
 # ParaView version number.  An even minor number corresponds to releases.
 SET(PARAVIEW_VERSION_MAJOR 1)
@@ -209,7 +208,7 @@ IF (PARAVIEW_CAN_BUILD)
 
  SET (DO_NOT_BUILD_XML_RW 1)
 
- SUBDIRS(Utilities KWCommon Filters Widgets ClientServer ParaView Demos)
+ SUBDIRS(Utilities KWCommon ClientServer Filters Widgets ParaView Demos)
  SUBDIRS(Packages)
 
  SUBDIR_DEPENDS(ParaView Widgets)

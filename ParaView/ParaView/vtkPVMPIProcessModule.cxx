@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.4");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.5");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -184,11 +184,6 @@ void vtkPVMPIProcessModule::Initialize()
     }
 }
 
-// Declare the initialization function as external
-// this is defined in the PackageInit file
-extern void Vtkparaviewcswrapped_Initialize(vtkClientServerInterpreter *arlu);
-
-
 //----------------------------------------------------------------------------
 int vtkPVMPIProcessModule::Start(int argc, char **argv)
 {
@@ -208,7 +203,7 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
   this->ClientServerStream = new vtkClientServerStream;
   this->ClientInterpreter = vtkClientServerInterpreter::New();
   this->ClientInterpreter->SetLogFile("pvClient.out");
-  Vtkparaviewcswrapped_Initialize(this->ClientInterpreter);
+  vtkPVProcessModule::InitializeInterpreter(this->ClientInterpreter);
   this->GetStream()
     << vtkClientServerStream::Assign
     << this->GetApplicationID() << this->GetPVApplication()

@@ -217,7 +217,8 @@ protected:
   ~vtkPVProcessModule();
 
   void InitializeTclMethodImplementations();
-  
+  static void InitializeInterpreter(vtkClientServerInterpreter* interp);
+
   vtkMultiProcessController *Controller;
   vtkPVInformation *TemporaryInformation;
 
