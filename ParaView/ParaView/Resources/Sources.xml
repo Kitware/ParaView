@@ -58,39 +58,44 @@
         long_help="3D arrow with a long cylindrical shaft and a cone for the tip." 
         short_help="Create a 3D arrow">
   <Source class="vtkPVArrowSource"/>
-  <VectorEntry label="Tip resolution" trace_name="TipResolution"
-               variable="TipResolution" type="int"
+  <Scale label="Tip resolution" trace_name="TipResolution"
+               variable="TipResolution"
                help="Set the number of faces on the tip."
                default_value="6"
-               data_range="1 128"/>
-  <VectorEntry label="Tip radius" trace_name="TipRadius"
-               variable="TipRadius" type="float"
+               resolution="1"
+               range="1 128"/>
+  <Scale label="Tip radius" trace_name="TipRadius"
+               variable="TipRadius"
                help="Set the radius of the widest part of the tip."
                default_value="0.1"
-               data_range="0 10"/>
-  <VectorEntry label="Tip length" trace_name="TipLength"
-               variable="TipLength" type="float"
+               resolution="0.01"
+               range="0 10"/>
+  <Scale label="Tip length" trace_name="TipLength"
+               variable="TipLength"
                help="Set the length of the tip (the whole arrow is length 1)"
                default_value="0.35"
-               data_range="0 1"/>
-  <VectorEntry label="Shaft resolution" trace_name="ShaftResolution"
-               variable="ShaftResolution" type="int"
+               resolution="0.01"
+               range="0 1"/>
+  <Scale label="Shaft resolution" trace_name="ShaftResolution"
+               variable="ShaftResolution"
                help="Set the number of faces on shaft"
                default_value="6"
-               data_range="1 128"/>
-  <VectorEntry label="Shaft radius" trace_name="ShaftRadius"
-               variable="ShaftRadius" type="float"
+               resolution="1"
+               range="1 128"/>
+  <Scale label="Shaft radius" trace_name="ShaftRadius"
+               variable="ShaftRadius"
                help="Set the radius of the shaft"
                default_value="0.03"
-               data_range="0 5"/>
+               resolution="0.01"
+               range="0 5"/>
 </Module>
 
 <Module name="Axes" root_name="Axes" module_type="Source" 
         long_help="Three lines representing the axes - red line along X, green line along Y, and blue line along Z." 
         short_help="Create three lines representing X, Y and Z axes">
   <Source class="vtkAxes"/>
-  <VectorEntry label="Scale" trace_name="ScaleFactor" variable="ScaleFactor" 
-               type="float" default_value="1.0"
+  <Scale label="Scale" trace_name="ScaleFactor" variable="ScaleFactor" 
+               default_value="1.0" resolution="0.1" range="0 100"
                help="Set the size of the axes"/>
   <VectorEntry variable="Origin" trace_name="Origin"  type="float" 
                length="3" default_value="0.0 0.0 0.0"
@@ -105,14 +110,14 @@
         long_help="3D box with specified X, Y, and Z lengths." 
         short_help="Create a box with specified X, Y, and Z lengths.">
   <Source class="vtkCubeSource"/>
-  <VectorEntry label="X length" trace_name="XLength" variable="XLength" 
-               type="int" default_value="1.0" 
+  <Scale label="X length" trace_name="XLength" variable="XLength" 
+               default_value="1.0" resolution="0.1" range="0 100"
                help="The length of the cube in the x direction." />
-  <VectorEntry label="Y length" trace_name="YLength" variable="YLength" 
-               type="int" default_value="1.0"
+  <Scale label="Y length" trace_name="YLength" variable="YLength" 
+               default_value="1.0" resolution="0.1" range="0 100"
                help="The length of the cube in the y direction." />
-  <VectorEntry label="Z length" trace_name="ZLength" variable="ZLength" 
-               type="int" default_value="1.0"
+  <Scale label="Z length" trace_name="ZLength" variable="ZLength" 
+               default_value="1.0" resolution="0.1" range="0 100"
                help="The length of the cube in the z direction." />
   <VectorEntry variable="Center" trace_name="Center" length="3" 
                type="float" default_value="0.0 0.0 0.0"
@@ -124,14 +129,14 @@
         long_help="3D cone of a given radius and height." 
         short_help="Create a 3D cone of a given radius and height">
   <Source class="vtkConeSource"/>
-  <VectorEntry variable="Resolution" trace_name="Resolution" type="int"
-               default_value="6" data_range="0 512" 
+  <Scale variable="Resolution" trace_name="Resolution"
+               default_value="6" resolution="1" range="0 512" 
                help="Set the number of faces on this cone" />
-  <VectorEntry variable="Radius" trace_name="Radius" type="float" 
-               default_value="0.5"
+  <Scale variable="Radius" trace_name="Radius"
+               default_value="0.5" resolution="0.1" range="0 100"
                help="Set the radius of the widest part of the cone" />
-  <VectorEntry variable="Height" trace_name="Height" type="float"
-               default_value="1.0" 
+  <Scale variable="Height" trace_name="Height"
+               default_value="1.0" resolution="0.1" range="0 100"
                help="Set the height of the cone" />
   <LabeledToggle variable="Capping" trace_name="Capping" default_value="1"
                  help="Set whether to draw the base of the cone" />
@@ -142,14 +147,14 @@
         long_help="3D cylinder of a given radius and height." 
         short_help="Create a 3D cylinder of a given radius and height">
   <Source class="vtkCylinderSource"/>
-  <VectorEntry variable="Resolution" trace_name="Resolution" type="int"
-               default_value="6" data_range="0 512" 
+  <Scale variable="Resolution" trace_name="Resolution"
+               default_value="6" resolution="1" range="0 512" 
                help="The number of facets used to define the cylinder." />
-  <VectorEntry variable="Height" trace_name="Height" type="float" 
-               default_value="1.0" 
+  <Scale variable="Height" trace_name="Height"
+               default_value="1.0" resolution="0.1" range="0 100"
                help="The height of the cylinder (along the y axis)." />
-  <VectorEntry variable="Radius" trace_name="Radius" type="float"
-               default_value="0.5" 
+  <Scale variable="Radius" trace_name="Radius"
+               default_value="0.5" resolution="0.1" range="0 100"
                help="The radius of the cylinder." />
   <VectorEntry variable="Center" trace_name="Center" type="float" length="3"
                default_value="0.0 0.0 0.0" 
@@ -168,8 +173,8 @@
               point1_label="Point 1" point2_label="Point 2"
               show_resolution="0"
               help="Set the start and end point for the line"/>
-  <VectorEntry variable="Resolution" trace_name="Resolution" 
-               type="int" default_value="1" 
+  <Scale variable="Resolution" trace_name="Resolution" 
+               default_value="1" resolution="1" range="1 500"
                help="The number of pieces that divide the line into." />
 </Module>
 <Module name="ImageMandelbrotSource" menu_name="Mandelbrot" 
@@ -190,9 +195,9 @@
   <VectorEntry label="Size" trace_name="Size" variable="SizeCX" type="float" 
                length="4" default_value="2.5 2.5 2.0 1.5"
                help="Set the inaginary and real values for the world size of the volume for C (constant) and X (initial value)" />
-  <VectorEntry label="Max. iterations" trace_name="MaxIterations" 
-               variable="MaximumNumberOfIterations" type="int" 
-               default_value="100"
+  <Scale label="Max. iterations" trace_name="MaxIterations" 
+               variable="MaximumNumberOfIterations"
+               default_value="100" resolution="1" range="1 5000"
                help="The limit on computational iterations. Values less than 2.0 after this many iterations are considered in the set."/>
 </Module>
 
@@ -210,11 +215,11 @@
   <VectorEntry label="Second point" variable="Point2" trace_name="Point2" 
                type="float" length="3" default_value="-0.5 0.5 0.0"
                help="Set the position of the point defining the second axis."/>
-  <VectorEntry label="X resolution" trace_name="XResolution" 
-               variable="XResolution" type="int" default_value="1"
+  <Scale label="X resolution" trace_name="XResolution" variable="XResolution"
+               default_value="1" resolution="1" range="1 100"
                help="The number of x pieces that divide the plane into."/>
-  <VectorEntry label="Y resolution" trace_name="YResolution" 
-               variable="YResolution" type="int"  default_value="1"
+  <Scale label="Y resolution" trace_name="YResolution" variable="YResolution"
+               default_value="1" resolution="1" range="1 100"
                help="The number of y pieces that divide the plane into."/>
 </Module>
 
@@ -226,29 +231,29 @@
   <VectorEntry variable="Center" trace_name="Center" type="float" length="3"
                default_value="0.0 0.0 0.0" 
                help="Set the coordinates for the center of the sphere." />
-  <VectorEntry variable="Radius" trace_name="Radius" type="float" 
-               default_value="0.5"
+  <Scale variable="Radius" trace_name="Radius"
+               default_value="0.5" resolution="0.1" range="0 100"
                help="Set the radius of the sphere" />
-  <VectorEntry label="Theta Resolution" trace_name="Theta Resolution" 
-               variable="ThetaResolution" type="int" default_value="8" 
-               data_range="0 1024" 
+  <Scale label="Theta Resolution" trace_name="Theta Resolution" 
+               variable="ThetaResolution"
+               default_value="8" resolution="1" data_range="0 1024" 
                help="Set the number of points in the longitude direction (ranging from Start Theta to End Theta)" />
-  <VectorEntry label="Start Theta" trace_name="Start Theta" 
-               variable="StartTheta" type="float" 
-               default_value="0.0" data_range="0 360" 
+  <Scale label="Start Theta" trace_name="Start Theta" 
+               variable="StartTheta"
+               default_value="0.0" resolution="0.01" range="0 360" 
                help="Set the starting angle in the longitude direction" />
-  <VectorEntry label="End Theta" trace_name="End Theta" variable="EndTheta" 
-               type="float" default_value="360.0" data_range="0 360"
+  <Scale label="End Theta" trace_name="End Theta" variable="EndTheta" 
+               default_value="360.0" resolution="0.01" range="0 360"
                help="Set the ending angle in the longitude direction" />
-  <VectorEntry label="Phi Resolution" trace_name="Phi Resolution" 
-               variable="PhiResolution" type="int" default_value="8" 
-               data_range="0 1024" 
+  <Scale label="Phi Resolution" trace_name="Phi Resolution" 
+               variable="PhiResolution" default_value="8" resolution="1"
+               range="0 1024" 
                help="Set the number of points in the latitude direction (ranging from Start Phi to End Phi)" />
-  <VectorEntry label="Start Phi" trace_name="Start Phi" variable="StartPhi" 
-               type="float" default_value="0.0" data_range="0 180" 
+  <Scale label="Start Phi" trace_name="Start Phi" variable="StartPhi" 
+               default_value="0.0" resolution="0.01" range="0 180" 
                help="Set the starting angle in the latitude direction" />
-  <VectorEntry label="End Phi" trace_name="End Phi" variable="EndPhi" 
-               type="float" default_value="180.0" data_range="0 180" 
+  <Scale label="End Phi" trace_name="End Phi" variable="EndPhi" 
+               default_value="180.0" resolution="0.01" range="0 180" 
                help="Set the ending angle in the latitude direction" />
 </Module>
 
@@ -263,25 +268,28 @@
   <VectorEntry variable="Scale" trace_name="Scale" type="float" length="3" 
                default_value="1.0 1.0 1.0" 
                help="Set the scale of the superquadric" />
-  <VectorEntry label="Theta resolution" trace_name="ThetaResolution" 
-               variable="ThetaResolution" type="int"  default_value="16" 
-               data_range="8 1024" 
+  <Scale label="Theta resolution" trace_name="ThetaResolution" 
+               variable="ThetaResolution" default_value="16" resolution="1"
+               range="8 1024" 
                help="The number of points in the longitude direction."/>
-  <VectorEntry label="Phi resolution" variable="PhiResolution" 
-               trace_name="PhiResolution" type="int" default_value="16" 
-               data_range="4 1024"
+  <Scale label="Phi resolution" variable="PhiResolution" 
+               trace_name="PhiResolution" default_value="16" resolution="1"
+               range="4 1024"
                help="The number of points in the latitude direction." />
-  <VectorEntry variable="Thickness" trace_name="Thickness" type="float"  
-               data_range="0.0001 1" default_value="0.3333"
+  <Scale variable="Thickness" trace_name="Thickness" type="float"  
+               resolution="0.001" range="0.0001 1" default_value="0.3333"
                help="Changing thickness maintains the outside diameter of the toroid."/>
-  <VectorEntry label="Theta roundness" trace_name="ThetaRoundness" 
-               variable="ThetaRoundness" type="float" default_value="1.0"
+  <Scale label="Theta roundness" trace_name="ThetaRoundness" 
+               variable="ThetaRoundness" default_value="1.0" resolution="0.01"
+               range="0 1"
                help="Values range from 0 (rectangular) to 1 (circular) to higher order." />
-  <VectorEntry label="Phi roundness" trace_name="PhiRoundness" 
-               variable="PhiRoundness" type="float"  default_value="1.0"
-                help="Values range from 0 (rectangular) to 1 (circular) to higher order."/>
-  <VectorEntry variable="Size" trace_name="Size" type="float" 
-               default_value="0.5" help="Isotropic size" />
+  <Scale label="Phi roundness" trace_name="PhiRoundness" 
+               variable="PhiRoundness" default_value="1.0" resolution="0.01"
+               range="0 1"
+               help="Values range from 0 (rectangular) to 1 (circular) to higher order."/>
+  <Scale variable="Size" trace_name="Size"
+               default_value="0.5" resolution="0.1" range="0 100"
+               help="Isotropic size" />
   <LabeledToggle variable="Toroidal" trace_name="Toroidal" default_value="0" 
                  help="Whether or not the superquadric is toroidal or ellipsoidal" />
 </Module>
