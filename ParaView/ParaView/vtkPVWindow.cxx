@@ -1555,65 +1555,37 @@ int vtkPVWindow::Open(char *openFileName, int store)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::WriteVTKFile(const char* filename)
+void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel)
 {
   if(!this->CurrentPVData)
     {
     return;
     }
   
-  // Find the writer that supports this file name and data type.
-  vtkPVWriter* writer = this->FindPVWriter(filename, 0);
-  
-  // Make sure a writer is available for this file type.
-  if(!writer)
-    {
-    vtkKWMessageDialog::PopupMessage(
-      this->Application, this, "Error Saving File", 
-      "No writers support the data set's type.", 
-      vtkKWMessageDialog::ErrorIcon);
-    return;
-    }
-  
-  // Now that we can safely write the file, add the trace entry.
-  vtkPVApplication *pvApp = this->GetPVApplication();  
-  pvApp->AddTraceEntry("$kw(%s) WriteVTKFile \"%s\"", this->GetTclName(),
-                       filename);
-  
-  // Actually write the file.
-  writer->Write(filename, this->GetCurrentPVData()->GetVTKDataTclName(), 1, 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::WritePVTKFile(const char* filename, int ghostLevel)
-{
-  if (!this->CurrentPVData)
-    {
-    return;
-    }
-  
-  // Find the writer that supports this file name and data type.
-  vtkPVWriter* writer = this->FindPVWriter(filename, 1);
-  
-  // Make sure a writer is available for this file type.
-  if(!writer)
-    {
-    vtkKWMessageDialog::PopupMessage(
-      this->Application, this, "Error Saving File", 
-      "No writers support the data set's type.", 
-      vtkKWMessageDialog::ErrorIcon);
-    return;
-    }
-  
+  // Check the number of processes.
   vtkPVApplication *pvApp = this->GetPVApplication();
   int numProcs = 1;
   if (pvApp->GetController())
     {
     numProcs = pvApp->GetController()->GetNumberOfProcesses();
     }
+  int parallel = (numProcs > 1);
+  
+  // Find the writer that supports this file name and data type.
+  vtkPVWriter* writer = this->FindPVWriter(filename, parallel);
+  
+  // Make sure a writer is available for this file type.
+  if(!writer)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this, "Error Saving File", 
+      "No writers support the data set's type.", 
+      vtkKWMessageDialog::ErrorIcon);
+    return;
+    }
   
   // Now that we can safely write the file, add the trace entry.
-  pvApp->AddTraceEntry("$kw(%s) WritePVTKFile \"%s\"", this->GetTclName(),
+  pvApp->AddTraceEntry("$kw(%s) WriteVTKFile \"%s\" %d", this->GetTclName(),
                        filename, ghostLevel);
   
   // Actually write the file.
@@ -1712,7 +1684,7 @@ void vtkPVWindow::WriteData()
     int ghostLevel = this->GetIntegerResult(this->GetPVApplication());
     if (ghostLevel >= 0)
       {
-      this->WritePVTKFile(filename, ghostLevel);
+      this->WriteVTKFile(filename, ghostLevel);
       }
     }
   else

@@ -251,8 +251,8 @@ public:
 
   // Description:
   // Methods that can be used from scripts to save data to files.
-  void WriteVTKFile(const char* filename);
-  void WritePVTKFile(const char* filename, int ghostLevel);
+  void WriteVTKFile(const char* filename, int ghostLevel);
+  void WriteVTKFile(const char* filename) { this->WriteVTKFile(filename, 0); }
 
   // Description:
   // These methods create a new data source/object given a name and a 
