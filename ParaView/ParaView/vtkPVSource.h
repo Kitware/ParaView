@@ -195,12 +195,6 @@ public:
   void UpdateProperties();  
 
   // Description:
-  // The SetVTKSource method registers a ModifiedEvent observer with
-  // the vtkSource to call this method.  This is used to keep the GUI
-  // up to date as the vtkSource changes.
-  void VTKSourceModifiedMethod();
-  
-  // Description:
   // This method gets called to set the VTK source parameters
   // from the widget values.
   virtual void UpdateVTKSourceParameters();

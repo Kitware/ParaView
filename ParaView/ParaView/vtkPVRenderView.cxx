@@ -59,7 +59,6 @@
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceList.h"
-#include "vtkPVTreeComposite.h"
 #include "vtkPVWindow.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
@@ -96,7 +95,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.292");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.293");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

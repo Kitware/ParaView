@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.336");
+vtkCxxRevisionMacro(vtkPVSource, "1.337");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1554,15 +1554,6 @@ void vtkPVSource::DeleteCallback()
   // "this" will no longer be valid after the call.
   window->RemovePVSource("Sources", this);
   window->SetCurrentPVSourceCallback(current);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::VTKSourceModifiedMethod()
-{
-  if(!this->AcceptCallbackFlag)
-    {
-    this->UpdateParameterWidgets();
-    }
 }
 
 //----------------------------------------------------------------------------

@@ -1,15 +1,15 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    ParaView.cxx
+Program:   ParaView
+Module:    ParaView.cxx
 
-  Copyright (c) Kitware, Inc.
-  All rights reserved.
-  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+Copyright (c) Kitware, Inc.
+All rights reserved.
+See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkToolkits.h"
@@ -141,87 +141,86 @@ int MyMain(int argc, char *argv[])
     }
   else
     {
+    // Get the application settings from the registery
+    // It has to be called now, after ParseCommandLineArguments, which can 
+    // change the registery level (also, it can not be called in the application
+    // constructor or even the KWApplication constructor since we need the
+    // application name to be set)
 
-  // Get the application settings from the registery
-  // It has to be called now, after ParseCommandLineArguments, which can 
-  // change the registery level (also, it can not be called in the application
-  // constructor or even the KWApplication constructor since we need the
-  // application name to be set)
+    app->GetApplicationSettingsFromRegistery();
 
-  app->GetApplicationSettingsFromRegistery();
-
-  // Create the proper default render module.
-  // Only the root server processes args.
-  if (app->GetUseTiledDisplay())
-    {
-    if (app->GetRenderModuleName() == NULL)
-      { // I do not like this initialization here.
-      // Think about moving it.
-      app->SetRenderModuleName("MultiDisplayRenderModule");
+    // Create the proper default render module.
+    // Only the root server processes args.
+    if (app->GetUseTiledDisplay())
+      {
+      if (app->GetRenderModuleName() == NULL)
+        { // I do not like this initialization here.
+        // Think about moving it.
+        app->SetRenderModuleName("MultiDisplayRenderModule");
+        }
       }
-    }
-  else
-    {
+    else
+      {
 #ifdef VTK_USE_MPI
-    if (app->GetRenderModuleName() == NULL)
-      { // I do not like this initialization here.
-      // Think about moving it.
-      app->SetRenderModuleName("MPIRenderModule");
-      }
-#else
-    if (app->GetRenderModuleName() == NULL)
-      { // I do not like this initialization here.
-      // Think about moving it.
-      if (app->GetClientMode())
-        {
+      if (app->GetRenderModuleName() == NULL)
+        { // I do not like this initialization here.
+        // Think about moving it.
         app->SetRenderModuleName("MPIRenderModule");
         }
-      else
-        {
-        app->SetRenderModuleName("LODRenderModule");
+#else
+      if (app->GetRenderModuleName() == NULL)
+        { // I do not like this initialization here.
+        // Think about moving it.
+        if (app->GetClientMode())
+          {
+          app->SetRenderModuleName("MPIRenderModule");
+          }
+        else
+          {
+          app->SetRenderModuleName("LODRenderModule");
+          }
         }
+#endif
       }
-#endif
-    }
 
-  // Create the process module for initializing the processes.
-  // Only the root server processes args.
-  if (app->GetClientMode() || serverMode) 
-    {
-    vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
-    pm = processModule;
-    }
-  else
-    {
+    // Create the process module for initializing the processes.
+    // Only the root server processes args.
+    if (app->GetClientMode() || serverMode) 
+      {
+      vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
+      pm = processModule;
+      }
+    else
+      {
 #ifdef VTK_USE_MPI
-    vtkPVMPIProcessModule *processModule = vtkPVMPIProcessModule::New();
+      vtkPVMPIProcessModule *processModule = vtkPVMPIProcessModule::New();
 #else 
-    vtkPVProcessModule *processModule = vtkPVProcessModule::New();
+      vtkPVProcessModule *processModule = vtkPVProcessModule::New();
 #endif
-    pm = processModule;
-    }
+      pm = processModule;
+      }
 
-  pm->SetApplication(app);
-  app->SetProcessModule(pm);
-  pm->InitializeInterpreter();
-  ParaViewInitializeInterpreter(pm);
+    pm->SetApplication(app);
+    app->SetProcessModule(pm);
+    pm->InitializeInterpreter();
+    ParaViewInitializeInterpreter(pm);
 
-  // Start the application's event loop.  This will enable
-  // vtkOutputWindow's user prompting for any further errors now that
-  // startup is completed.
-  if ( retVal )
-    {
-    app->Exit();
-    }
-  else
-    {
-    startVal = pm->Start(argc, argv);
-    }
+    // Start the application's event loop.  This will enable
+    // vtkOutputWindow's user prompting for any further errors now that
+    // startup is completed.
+    if ( retVal )
+      {
+      app->Exit();
+      }
+    else
+      {
+      startVal = pm->Start(argc, argv);
+      }
 
-  // Clean up for exit.
-  pm->FinalizeInterpreter();
-  pm->Delete();
-  pm = NULL;
+    // Clean up for exit.
+    pm->FinalizeInterpreter();
+    pm->Delete();
+    pm = NULL;
     }
 
   app->Delete();
