@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  include "vtkKWUNIXRegisteryUtilities.h"
 #endif // _WIN32
 
+#include <ctype.h>
 #include "vtkObjectFactory.h"
 
 vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
