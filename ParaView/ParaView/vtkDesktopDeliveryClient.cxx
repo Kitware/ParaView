@@ -29,7 +29,7 @@
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.4");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.5");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -213,7 +213,7 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
         //   }
         // }
 
-//        this->SetRenderWindowPixelData(this->FullImage, this->FullImageSize);
+        this->SetRenderWindowPixelData(this->FullImage, this->FullImageSize);
         }
       else
         {
