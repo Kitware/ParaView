@@ -46,7 +46,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.13");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.14");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -569,27 +569,14 @@ void vtkIceTRenderManager::PreRenderProcessing()
     return;
     }
   
+  // Normally if this->UseCompositing was false, we would return here.  But
+  // if we did that, the tile display would become invalid.  Instead, in
+  // UpdateIceTContext we tell ICE-T that the data is replicated on all
+  // nodes.  This will make ICE-T turn off compositing and make each
+  // process render its local tile (if any).  The only real overhead is an
+  // unnecessary frame buffer read back by ICE-T.  If that's a problem, we
+  // could always add a special case to ICE-T...
   // Code taken from my tile display module.
-  if (!this->UseCompositing)
-    {
-    int x, y;
-    int tileIdx = this->Controller->GetLocalProcessId();
-    y = tileIdx/this->NumTilesX;
-    x = tileIdx - y*this->NumTilesX;
-    y = this->NumTilesY-y-1;
-    // Setup the camera for this tile.
-    cam->SetWindowCenter(1.0-(double)(this->NumTilesX) + 2.0*(double)x,
-                         1.0-(double)(this->NumTilesY) + 2.0*(double)y);
-    // Try to match IceT's view angle calculation.
-    double angle = cam->GetViewAngle() * vtkMath::DoublePi()/180.0;
-    angle = 2.0*atan(tan(angle/2.0)/(double)(this->NumTilesY));
-    cam->SetViewAngle(angle * 180.0/vtkMath::DoublePi());
-    return;
-    }
-  else
-    {
-    cam->SetWindowCenter(0.0, 0.0);
-    }
 
   this->UpdateIceTContext();
   // Only composite the first frame.
