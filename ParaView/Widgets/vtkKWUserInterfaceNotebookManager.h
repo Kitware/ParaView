@@ -210,6 +210,13 @@ public:
     const char *to_page_title,
     const char *to_after_widget_label);
 
+  // Description:
+  // Lock Drag and Drop entries. If enabled, GetDragAndDropEntry() will
+  // not return any entry, and DragAndDropWidget() will not set any.
+  vtkBooleanMacro(LockDragAndDropEntries, int);
+  vtkSetMacro(LockDragAndDropEntries, int);
+  vtkGetMacro(LockDragAndDropEntries, int);
+
   //BTX
   // A Widget location. 
   // Store both the page the widget is packed in, and the widget it is 
@@ -257,6 +264,7 @@ protected:
   // Update Drag And Drop bindings
   virtual void UpdatePanelDragAndDrop(vtkKWUserInterfacePanel *panel);
   int EnableDragAndDrop;
+  int LockDragAndDropEntries;
 
   //BTX
 

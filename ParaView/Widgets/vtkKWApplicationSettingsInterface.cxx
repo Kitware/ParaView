@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.20");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.21");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -75,7 +75,10 @@ vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
   this->ShowSplashScreenCheckButton = 0;
   this->ShowBalloonHelpCheckButton = 0;
   this->ShowMostRecentPanelsCheckButton = 0;
-  this->DragAndDropFrame = 0;
+
+  // Interface customization
+
+  this->InterfaceCustomizationFrame = 0;
   this->EnableDragAndDropCheckButton = 0;
   this->ResetDragAndDropButton = 0;
 
@@ -129,10 +132,12 @@ vtkKWApplicationSettingsInterface::~vtkKWApplicationSettingsInterface()
     this->ShowMostRecentPanelsCheckButton = NULL;
     }
 
-  if (this->DragAndDropFrame)
+  // Interface customization
+
+  if (this->InterfaceCustomizationFrame)
     {
-    this->DragAndDropFrame->Delete();
-    this->DragAndDropFrame = NULL;
+    this->InterfaceCustomizationFrame->Delete();
+    this->InterfaceCustomizationFrame = NULL;
     }
 
   if (this->EnableDragAndDropCheckButton)
@@ -322,30 +327,35 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
-  // Interface settings : Drag & Drop
+  // Interface customization : main frame
 
-  if (!this->DragAndDropFrame)
+  if (!this->InterfaceCustomizationFrame)
     {
-    this->DragAndDropFrame = vtkKWFrame::New();
+    this->InterfaceCustomizationFrame = vtkKWLabeledFrame::New();
     }
 
-  this->DragAndDropFrame->SetParent(frame);
-  this->DragAndDropFrame->Create(app, 0);
-
-  tk_cmd << "pack " << this->DragAndDropFrame->GetWidgetName()
-         << "  -side top -expand y -fill x" << endl;
+  this->InterfaceCustomizationFrame->SetParent(this->GetPagesParentWidget());
+  this->InterfaceCustomizationFrame->ShowHideFrameOn();
+  this->InterfaceCustomizationFrame->Create(app, 0);
+  this->InterfaceCustomizationFrame->SetLabel("Interface Customization");
+    
+  tk_cmd << "pack " << this->InterfaceCustomizationFrame->GetWidgetName()
+         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 " 
+         << " -in " << page->GetWidgetName() << endl;
+  
+  frame = this->InterfaceCustomizationFrame->GetFrame();
 
   // --------------------------------------------------------------
-  // Interface settings : Drag & Drop : Enable
+  // Interface customization : Drag & Drop : Enable
 
   if (!this->EnableDragAndDropCheckButton)
     {
     this->EnableDragAndDropCheckButton = vtkKWCheckButton::New();
     }
 
-  this->EnableDragAndDropCheckButton->SetParent(this->DragAndDropFrame);
+  this->EnableDragAndDropCheckButton->SetParent(frame);
   this->EnableDragAndDropCheckButton->Create(app, 0);
-  this->EnableDragAndDropCheckButton->SetText("Enable Interface Drag & Drop");
+  this->EnableDragAndDropCheckButton->SetText("Enable interface Drag & Drop");
   this->EnableDragAndDropCheckButton->SetCommand(
     this, "EnableDragAndDropCallback");
   this->EnableDragAndDropCheckButton->SetBalloonHelpString(
@@ -355,26 +365,26 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     "a panel, or drop it on another tab to move it to a different panel.");
 
   tk_cmd << "pack " << this->EnableDragAndDropCheckButton->GetWidgetName()
-         << "  -side left -anchor w -expand no -fill none" << endl;
+         << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
-  // Interface settings : Drag & Drop : Reset
+  // Interface customization : Drag & Drop : Reset
 
   if (!this->ResetDragAndDropButton)
     {
     this->ResetDragAndDropButton = vtkKWPushButton::New();
     }
 
-  this->ResetDragAndDropButton->SetParent(this->DragAndDropFrame);
+  this->ResetDragAndDropButton->SetParent(frame);
   this->ResetDragAndDropButton->Create(app, 0);
-  this->ResetDragAndDropButton->SetLabel("Reset Interface");
+  this->ResetDragAndDropButton->SetLabel("Reset Interface To Default State");
   this->ResetDragAndDropButton->SetCommand(this, "ResetDragAndDropCallback");
   this->ResetDragAndDropButton->SetBalloonHelpString(
     "Reset the placement of all user interface elements, discarding any "
     "Drag & Drop events.");
 
   tk_cmd << "pack " << this->ResetDragAndDropButton->GetWidgetName()
-         << "  -side right -anchor e -padx 4 -ipadx 4 -expand no -fill none" 
+         << "  -side top -anchor w -expand no -fill none -padx 22 -pady 2" 
          << endl;
 
   // --------------------------------------------------------------
@@ -512,7 +522,7 @@ void vtkKWApplicationSettingsInterface::Update()
       }
     }
 
-  // Interface settings : Drag & Drop : Enable
+  // Interface customization : Drag & Drop : Enable
 
   if (this->EnableDragAndDropCheckButton)
     {
@@ -778,9 +788,11 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
     this->ShowMostRecentPanelsCheckButton->SetEnabled(this->Enabled);
     }
 
-  if (this->DragAndDropFrame)
+  // Interface customization
+
+  if (this->InterfaceCustomizationFrame)
     {
-    this->DragAndDropFrame->SetEnabled(this->Enabled);
+    this->InterfaceCustomizationFrame->SetEnabled(this->Enabled);
     }
 
   if (this->EnableDragAndDropCheckButton)

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.20");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.21");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -941,7 +941,8 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropEntry(
   ostream &to_after_widget_label)
 {
   vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry = NULL;
-  if (!this->DragAndDropEntries ||
+  if (this->LockDragAndDropEntries ||
+      !this->DragAndDropEntries ||
       this->DragAndDropEntries->GetItem(idx, dd_entry) != VTK_OK ||
       !dd_entry)
     {
@@ -1030,7 +1031,7 @@ int vtkKWUserInterfaceNotebookManager::DragAndDropWidget(
   const char *to_page_title,
   const char *to_after_widget_label)
 {
-  if (!this->Notebook || !widget_label)
+  if (this->LockDragAndDropEntries || !this->Notebook || !widget_label)
     {
     return 0;
     }

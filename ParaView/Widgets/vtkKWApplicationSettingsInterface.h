@@ -47,11 +47,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 
-#define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY     "SaveWindowGeometry"
-#define VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY       "ShowSplashScreen"
-#define VTK_KW_SHOW_TOOLTIPS_REG_KEY            "ShowBalloonHelp"
-#define VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY  "ShowMostRecentPanels"
-#define VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY "EnableGUIDragAndDrop"
+#define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY        "SaveWindowGeometry"
+#define VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY          "ShowSplashScreen"
+#define VTK_KW_SHOW_TOOLTIPS_REG_KEY               "ShowBalloonHelp"
+#define VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY     "ShowMostRecentPanels"
+#define VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY    "EnableGUIDragAndDrop"
 
 #define VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY      "ToolbarFlatFrame"
 #define VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY    "ToolbarFlatButtons"
@@ -122,7 +122,10 @@ protected:
   vtkKWCheckButton  *ShowSplashScreenCheckButton;
   vtkKWCheckButton  *ShowBalloonHelpCheckButton;
   vtkKWCheckButton  *ShowMostRecentPanelsCheckButton;
-  vtkKWFrame        *DragAndDropFrame;
+
+  // Interface customization
+
+  vtkKWLabeledFrame *InterfaceCustomizationFrame;
   vtkKWCheckButton  *EnableDragAndDropCheckButton;
   vtkKWPushButton   *ResetDragAndDropButton;
 
