@@ -128,6 +128,12 @@ ELSE(ParaViewComplete_BINARY_DIR)
   ENDIF (VTK_FOUND)
 ENDIF(ParaViewComplete_BINARY_DIR)
 
+OPTION(PARAVIEW_USE_ICE_T "Build paraview using IceT" OFF)	 
+IF(PARAVIEW_USE_ICE_T)	 
+	INCLUDE( ${PARAVIEW_SOURCE_DIR}/FindIceT.cmake )
+  INCLUDE(${ICET_USE_FILE})
+ENDIF(PARAVIEW_USE_ICE_T)	 
+
 IF (PARAVIEW_CAN_BUILD)
  IF ( NOT VTK_WRAP_TCL )
    MESSAGE("ParaView requires VTK to be built with Tcl bindings. Please rebuild VTK with Tcl bindings and re-run CMake")
