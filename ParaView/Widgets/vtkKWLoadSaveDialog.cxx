@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.18");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.19");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -100,7 +100,7 @@ int vtkKWLoadSaveDialog::Invoke()
           << (this->DefaultExtension ? this->DefaultExtension : "")
           << "}"
           << " -filetypes {" << this->FileTypes << "}"
-          << " -initialdir { " 
+          << " -initialdir {" 
           << (this->LastPath ? this->LastPath : ".")
           << "}";
 
