@@ -35,6 +35,7 @@ vtkPVSourceCollection \
 vtkPVSourceInterface \
 vtkPVSourceList \
 vtkPVWindow \
+vtkSimpleFieldDataToAttributeDataFilter \
 vtkSingleContourFilter \
 vtkStringList 
 
