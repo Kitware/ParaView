@@ -70,20 +70,9 @@ public:
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
   
-  // Description:
-  // Parse the configuration file.  Returns 1 for success, 0 otherwise.
-  int Parse();
-  
-  // Description:
-  // Parse the given string.  Returns 1 for success, 0 otherwise.
-  int Parse(const char* input);
-  
 protected:
   vtkPVXMLParser();
   ~vtkPVXMLParser();
-  
-  // Override parsing driver.
-  int ParseXML();
   
   void StartElement(const char* name, const char** atts);
   void EndElement(const char* name);
@@ -102,12 +91,6 @@ protected:
   
   // Counter to assign unique element ids to those that don't have any.
   unsigned int ElementIdIndex;  
-  
-  // The name of the input file.
-  char* FileName;
-  
-  // The string currently getting parsed if not from a file.
-  const char* InputString;
   
 private:
   vtkPVXMLParser(const vtkPVXMLParser&);  // Not implemented.

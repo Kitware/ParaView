@@ -69,7 +69,7 @@ public:
   // Create widget prototypes from parsed configuration and store them
   // in the given window.  Should be called after a Parse() method.
   void StoreConfiguration(vtkPVWindow* window);
-  
+
 protected:
   vtkPVXMLPackageParser();
   ~vtkPVXMLPackageParser();
@@ -104,8 +104,7 @@ protected:
   friend class vtkPVWidget;
   //ETX
   
-private:
-  
+private:  
   // Used by GetPVWidget.  Do not call directly.
   vtkPVWidget* CreatePVWidget(vtkPVXMLElement* element);
 

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkPVXMLParser, "1.2");
+vtkCxxRevisionMacro(vtkPVXMLParser, "1.3");
 vtkStandardNewMacro(vtkPVXMLParser);
 
 //----------------------------------------------------------------------------
@@ -161,55 +161,4 @@ void vtkPVXMLParser::PrintXML(ostream& os)
 vtkPVXMLElement* vtkPVXMLParser::GetRootElement()
 {
   return this->RootElement;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVXMLParser::Parse()
-{
-  if(!this->FileName)
-    {
-    vtkErrorMacro("No FileName set!");
-    return 0;
-    }
-  
-  ifstream inFile(this->FileName);
-  if(!inFile)
-    {
-    vtkErrorMacro("Error opening " << this->FileName);
-    return 0;
-    }
-  
-  // Call the superclass's parser.
-  this->SetStream(&inFile);
-  int result = this->Superclass::Parse();
-  this->SetStream(0);
-  return result;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVXMLParser::Parse(const char* input)
-{
-  this->InputString = input;
-  int result = this->Superclass::Parse();
-  this->InputString = 0;
-  return result;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVXMLParser::ParseXML()
-{
-  // Dispatch parser based on source of data.
-  if(this->Stream)
-    {
-    return this->Superclass::ParseXML();
-    }
-  else if(this->InputString)
-    {
-    return this->ParseBuffer(this->InputString);
-    }
-  else
-    {
-    vtkErrorMacro("ParseXML() called with no stream or input string.");
-    return 0;
-    }
 }
