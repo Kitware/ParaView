@@ -202,6 +202,7 @@ int vtkKWWindowCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWWindow::vtkKWWindow()
 {
+  this->UseMenuProperties = 1;
   this->PropertiesParent = NULL;
   this->SelectedView = NULL;
   this->Views = vtkKWViewCollection::New();
@@ -541,6 +542,11 @@ vtkKWMenu *vtkKWWindow::GetMenuWindow()
 
 vtkKWMenu *vtkKWWindow::GetMenuProperties()
 {
+  if ( !this->GetUseMenuProperties() )
+    {
+    return 0;
+    }
+
   if (this->MenuProperties)
     {
     return this->MenuProperties;
@@ -667,13 +673,16 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp", 0);
   this->MenuHelp->AddCommand("About", this, "DisplayAbout", 0);
 
-  rbv = 
-    this->GetMenuProperties()->CreateRadioButtonVariable(
-      this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(0," Hide Properties", 
-                                            rbv, this, "HideProperties", 1,
-					    "Hide the properties frame");
-  delete [] rbv;
+  if ( this->UseMenuProperties )
+    {
+    rbv = 
+      this->GetMenuProperties()->CreateRadioButtonVariable(
+	this->GetMenuProperties(),"Radio");
+    this->GetMenuProperties()->AddRadioButton(0," Hide Properties", 
+					      rbv, this, "HideProperties", 1,
+					      "Hide the properties frame");
+    delete [] rbv;
+    }
 }
 
 void vtkKWWindow::OnPrint1(int propagate) 
@@ -725,9 +734,11 @@ void vtkKWWindow::ShowProperties()
 void vtkKWWindow::HideProperties()
 {
   // make sure the variable is set, otherwise set it
-  this->GetMenuProperties()->CheckRadioButton(
-    this->GetMenuProperties(),"Radio",0);
-  
+  if ( this->UseMenuProperties )
+    {
+    this->GetMenuProperties()->CheckRadioButton(
+      this->GetMenuProperties(),"Radio",0);
+    }
   this->MiddleFrame->SetFrame1MinimumWidth(0);
   this->MiddleFrame->SetFrame1Width(0);
 }
@@ -944,7 +955,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.71 $");
+  this->ExtractRevision(os,"$Revision: 1.72 $");
 }
 
 int vtkKWWindow::ExitDialog()

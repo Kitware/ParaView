@@ -213,6 +213,12 @@ public:
   vtkGetStringMacro(ScriptType);
 
   // Description:
+  // Use or not use the Properties menu. By default is set to use.
+  vtkSetMacro(UseMenuProperties, int);
+  vtkBooleanMacro(UseMenuProperties, int);
+  vtkGetMacro(UseMenuProperties, int);
+
+  // Description:
   // Call render on all views
   void Render();
 
@@ -291,6 +297,7 @@ protected:
   int PromptBeforeClose;
 
   int InExit;
+  int UseMenuProperties;
 
   vtkKWPointerArray *RecentFiles;
 private:
