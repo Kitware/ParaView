@@ -38,12 +38,12 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
-
+#include "vtkMPIDuplicatePolyData.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPlotDisplay);
-vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.1");
+vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -94,6 +94,31 @@ vtkPVPlotDisplay::~vtkPVPlotDisplay()
 
 
 //----------------------------------------------------------------------------
+vtkPolyData* vtkPVPlotDisplay::GetCollectedData()
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  if (pvApp == NULL)
+    {
+    return NULL;
+    }
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  if (pm == NULL)
+    {
+    return NULL;
+    }
+  vtkMPIDuplicatePolyData* dp;
+  dp = vtkMPIDuplicatePolyData::SafeDownCast(
+      pm->GetObjectFromID(this->DuplicatePolyDataID));
+  if (dp == NULL)
+    {
+    return NULL;
+    }
+
+  return dp->GetOutput();
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
@@ -101,6 +126,7 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
   // Create the fliter wich duplicates the data on all processes.
   this->DuplicatePolyDataID = pm->NewStreamObject("vtkMPIDuplicatePolyData");
+  pm->SendStreamToClientAndServer();
   if(pvApp->GetClientMode())
     {
     // We need this because the socket controller has no way of distinguishing
@@ -189,6 +215,25 @@ void vtkPVPlotDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
                   << "SetLegendPosition2" << 0.5 << 0.25 
                   << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
+
+  // Tell the update suppressor to produce the correct partition.
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetNumberOfPartitions"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorID << "SetUpdateNumberOfPieces"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << pm->GetProcessModuleID() << "GetPartitionId"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->UpdateSuppressorID << "SetUpdatePiece"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -213,6 +258,8 @@ void vtkPVPlotDisplay::SetInput(vtkPVPart* input)
                   << this->DuplicatePolyDataID 
                   << "SetInput" << input->GetVTKDataID() 
                   << vtkClientServerStream::End;
+  // Only the server has data.
+  pm->SendStreamToServer();
 
   // Clear previous plots.
   pm->GetStream() << vtkClientServerStream::Invoke 
@@ -278,6 +325,7 @@ void vtkPVPlotDisplay::SetInput(vtkPVPart* input)
                     << "SetPlotColor" << 0 << 1 << 1 << 1
                     << vtkClientServerStream::End;
     }
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
