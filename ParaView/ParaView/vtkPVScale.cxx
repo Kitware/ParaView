@@ -140,7 +140,7 @@ void vtkPVScale::Create(vtkKWApplication *pvApp, char *label,
 //----------------------------------------------------------------------------
 void vtkPVScale::SetValue(float val)
 {
-  int oldVal;
+  float oldVal;
   
   oldVal = this->Scale->GetValue();
   if (val == oldVal)

@@ -120,8 +120,6 @@ vtkPVClipPlane* vtkPVClipPlane::New()
 //----------------------------------------------------------------------------
 void vtkPVClipPlane::CreateProperties()
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  
   this->vtkPVSource::CreateProperties();
  
   this->BoundsDisplay->SetParent(this->GetParameterFrame()->GetFrame());

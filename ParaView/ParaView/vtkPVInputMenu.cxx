@@ -251,8 +251,6 @@ void vtkPVInputMenu::Accept()
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::Reset()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if (this->PVSource == NULL)
     {
     vtkErrorMacro("PVSource not set.");
