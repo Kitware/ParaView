@@ -28,10 +28,11 @@
 #include "vtkTimerLog.h"
 #include "vtkKWScale.h"
 #include "vtkClientServerStream.h"
+#include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.19");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.20");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -478,7 +479,7 @@ void vtkPVTimerLogDisplay::Update()
   pm->GatherInformation(this->TimerInformation, pm->GetProcessModuleID());
 
   // Special case for client-server.  add the client process as a log.
-  if (pvApp->GetClientMode())
+  if (pvApp->GetOptions()->GetClientMode())
     {
     vtkPVTimerInformation* tmp = vtkPVTimerInformation::New();
     tmp->CopyFromObject(pvApp);

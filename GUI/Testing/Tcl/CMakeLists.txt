@@ -287,8 +287,8 @@ ENDIF(VTK_FIND_STRING_TCL AND TCL_TCLSH)
 # run these test with mpi 1 process if mpi is around, or just run the test
 FOREACH(test otherPrint TestSetGet)
   ADD_TEST(${test}-ParaView 
-    ${PARAVIEW_EXECUTABLE} ${PARAVIEW_MPI_RUN_ONE} --batch
-    ${PVClientTests_SOURCE_DIR}/Tcl/${test}.pvb
+    ${PARAVIEW_EXECUTABLE} ${PARAVIEW_MPI_RUN_ONE}
+    --batch=${PVClientTests_SOURCE_DIR}/Tcl/${test}.pvb
     )
 ENDFOREACH(test)
 

@@ -1,3 +1,17 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkPVProcessModuleGUIHelper.cxx
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
 #include "vtkPVProcessModuleGUIHelper.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
@@ -5,8 +19,9 @@
 #include "vtkPVClientServerModule.h"
 #include "vtkPVWindow.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVOptions.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.3");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.4");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkPVProcessModuleGUIHelper::vtkPVProcessModuleGUIHelper()
@@ -78,9 +93,9 @@ int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* start)
   pvApp->Script("wm withdraw .");
   vtkPVConnectDialog* dialog = 
     vtkPVConnectDialog::New();
-  dialog->SetHostname(pvApp->GetHostName());
-  dialog->SetSSHUser(pvApp->GetUsername());
-  dialog->SetPort(pvApp->GetPort());
+  dialog->SetHostname(pvApp->GetOptions()->GetHostName());
+  dialog->SetSSHUser(pvApp->GetOptions()->GetUsername());
+  dialog->SetPort(pvApp->GetOptions()->GetPort());
   dialog->SetNumberOfProcesses(pm->GetNumberOfProcesses());
   dialog->SetMultiProcessMode(pm->GetMultiProcessMode());
   dialog->Create(this->PVApplication, 0);

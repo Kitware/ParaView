@@ -25,10 +25,11 @@
 #include "vtkTimerLog.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.15");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.16");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -180,8 +181,8 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
   
   // LOD parameters: collection threshold
   // Conditional interface should really be part of a module. !!!!
-  if ((pvapp->GetClientMode() || pvapp->GetProcessModule()->GetNumberOfPartitions() > 1) &&
-      !pvapp->GetUseRenderingGroup())
+  if ((pvapp->GetOptions()->GetClientMode() || pvapp->GetProcessModule()->GetNumberOfPartitions() > 1) &&
+      !pvapp->GetOptions()->GetUseRenderingGroup())
     {
     // Determines when geometry is collected to process 0 for rendering.
     this->CompositeLabel->SetParent(this->LODScalesFrame);
@@ -311,7 +312,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
         pvapp->GetIntRegisteryValue(2, "RunTime", "SquirtLevel");
       }
 
-    if (pvapp->GetClientMode() && ! pvapp->GetUseTiledDisplay())
+    if (pvapp->GetOptions()->GetClientMode() && ! pvapp->GetOptions()->GetUseTiledDisplay())
       {
       this->SquirtLevelScale->SetBalloonHelpString(
         "Squirt is a combinination of runlength encoding and bit compression.");

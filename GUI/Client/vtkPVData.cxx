@@ -74,6 +74,7 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVRenderModuleUI.h"
 #include "vtkVolumeProperty.h"
+#include "vtkPVOptions.h"
 
 // Just for the definition of VTK_POINT_DATA_FIELD ...
 #include "vtkFieldDataToAttributeDataFilter.h"
@@ -86,7 +87,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.300");
+vtkCxxRevisionMacro(vtkPVData, "1.301");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -597,7 +598,7 @@ void vtkPVData::CreateProperties()
                this->CubeAxesCheck->GetWidgetName());
 
   if ((this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions() == 1) &&
-      (!this->GetPVApplication()->GetClientMode()))
+      (!this->GetPVApplication()->GetOptions()->GetClientMode()))
     {
     this->Script("grid %s -sticky wns",
                  this->PointLabelCheck->GetWidgetName());

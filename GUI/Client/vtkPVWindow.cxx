@@ -100,6 +100,7 @@
 #include "vtkTimerLog.h"
 #include "vtkPVPluginsDialog.h"
 #include "vtkPVRenderViewProxyImplementation.h"
+#include "vtkPVOptions.h"
 #include <vtkstd/map>
 
 #ifdef _WIN32
@@ -127,7 +128,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.596");
+vtkCxxRevisionMacro(vtkPVWindow, "1.597");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4172,7 +4173,7 @@ void vtkPVWindow::ErrorMessage(const char* message)
   this->ErrorLogDisplay->AppendError(message);
   this->SetErrorIcon(2);
   cout << "ErrorMessage end" << endl;
-  if ( this->GetPVApplication()->GetCrashOnErrors() )
+  if ( this->GetPVApplication()->GetOptions()->GetCrashOnErrors() )
     {
     vtkPVApplication::Abort();
     }

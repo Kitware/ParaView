@@ -92,6 +92,8 @@
 #include "vtkPVProgressHandler.h"
 #include "vtkKWDirectoryUtilities.h"
 
+#include "vtkPVOptions.h"
+
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
 
@@ -110,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.309");
+vtkCxxRevisionMacro(vtkPVApplication, "1.310");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -397,18 +399,14 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
-  this->CaveConfigurationFileName = 0;
+  this->Options = 0;
   this->ApplicationInitialized = 0;
-  this->MachinesFileName = 0;
-  this->CaveConfigurationFileName = 0;
   this->Observer = vtkPVApplicationObserver::New();
   this->Observer->SetApplication(this);
   vtkPVApplication::MainApplication = this;
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   this->OutputWindow = window;
   vtkOutputWindow::SetInstance(this->OutputWindow);
-  this->CrashOnErrors = 0;
-  this->AlwaysSSH = 0;
   this->MajorVersion = PARAVIEW_VERSION_MAJOR;
   this->MinorVersion = PARAVIEW_VERSION_MINOR;
   this->SetApplicationName("ParaView");
@@ -424,36 +422,9 @@ vtkPVApplication::vtkPVApplication()
   this->RunningParaViewScript = 0;
 
   this->ProcessModule = NULL;
-  this->OldRenderModuleName = NULL;
   this->CommandFunction = vtkPVApplicationCommand;
 
   this->NumberOfPipes = 1;
-
-  this->UseRenderingGroup = 0;
-  this->GroupFileName = 0;
-
-  this->UseTiledDisplay = 0;
-  this->TileDimensions[0] = this->TileDimensions[1] = 1;
-
-  this->ClientMode = 0;
-  this->ServerMode = 0;
-  this->RenderServerMode = 0;
-  this->HostName = NULL;
-  this->RenderServerHostName = NULL;
-  this->SetRenderServerHostName("localhost");
-  this->SetHostName("localhost");
-  this->Port = 11111;
-  this->RenderServerPort = 22221;
-  this->RenderNodePort = 0;
-  this->ReverseConnection = 0;
-  this->Username = 0;
-  this->UseSoftwareRendering = 0;
-  this->UseSatelliteSoftware = 0;
-  this->UseStereoRendering = 0;
-  this->UseOffscreenRendering = 0;
-  this->StartEmpty = 0;
-  this->DisableComposite = 0;
-  this->PlayDemoFlag = 0;
 
   // GUI style & consistency
 
@@ -477,9 +448,6 @@ vtkPVApplication::vtkPVApplication()
 
   this->StartGUI = 1;
 
-  this->BatchScriptName = 0;
-  this->RunBatchScript = 0;
-
   this->SourcesBrowserAlwaysShowName = 0;
   this->ShowSourcesLongHelp = 1;
   this->DemoPath = NULL;
@@ -496,24 +464,18 @@ vtkPVApplication::~vtkPVApplication()
   vtkOutputWindow::SetInstance(0);
 
   this->SetProcessModule(NULL);
-  this->SetOldRenderModuleName(NULL);
   if ( this->TraceFile )
     {
     delete this->TraceFile;
     this->TraceFile = 0;
     }
-  this->SetGroupFileName(0);
   this->SetTraceFileName(0);
   this->SetArgv0(0);
-  this->SetRenderServerHostName(NULL);
-  this->SetHostName(NULL);
-  this->SetUsername(0);
   this->SetDemoPath(NULL);
   vtkOutputWindow::SetInstance(0);
   this->OutputWindow->Delete();
   this->Observer->Delete();
   this->Observer = 0;
-  this->SetBatchScriptName(0);
 
   this->SMApplication->Finalize();
   this->SMApplication->Delete();
@@ -528,28 +490,28 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
     {  
     // copy all the command line settings from the application
     // to the process module
-    pm->SetAlwaysSSH(this->GetAlwaysSSH());
-    pm->SetPort(this->GetPort());
-    pm->SetHostName(this->GetHostName());
-    pm->SetUsername(this->GetUsername());
-    pm->SetRenderServerHostName(this->GetRenderServerHostName());
-    pm->SetClientMode(this->GetClientMode());
-    pm->SetRenderServerPort(this->GetRenderServerPort());
-    pm->SetRenderServerMode(this->GetRenderServerMode());
-    pm->SetRenderNodePort(this->GetRenderNodePort());
-    pm->SetMachinesFileName(this->GetMachinesFileName());
-    pm->SetReverseConnection(this->GetReverseConnection());
+    pm->SetAlwaysSSH(this->Options->GetAlwaysSSH());
+    pm->SetPort(this->Options->GetPort());
+    pm->SetHostName(this->Options->GetHostName());
+    pm->SetUsername(this->Options->GetUsername());
+    pm->SetRenderServerHostName(this->Options->GetRenderServerHostName());
+    pm->SetClientMode(this->Options->GetClientMode());
+    pm->SetRenderServerPort(this->Options->GetRenderServerPort());
+    pm->SetRenderServerMode(this->Options->GetRenderServerMode());
+    pm->SetRenderNodePort(this->Options->GetRenderNodePort());
+    pm->SetMachinesFileName(this->Options->GetMachinesFileName());
+    pm->SetReverseConnection(this->Options->GetReverseConnection());
     pm->SetDemoPath(this->GetDemoPath());
-    pm->SetServerMode(this->GetServerMode());
-    pm->SetUseStereoRendering(this->GetUseStereoRendering());
-    pm->GetServerInformation()->SetTileDimensions(this->TileDimensions);
-    pm->GetServerInformation()->SetUseOffscreenRendering(this->UseOffscreenRendering);
-    pm->SetUseTiledDisplay(this->UseTiledDisplay);
-    pm->SetCaveConfigurationFileName(this->CaveConfigurationFileName);
+    pm->SetServerMode(this->Options->GetServerMode());
+    pm->SetUseStereoRendering(this->Options->GetUseStereoRendering());
+    pm->GetServerInformation()->SetTileDimensions(this->Options->GetTileDimensions());
+    pm->GetServerInformation()->SetUseOffscreenRendering(this->Options->GetUseOffscreenRendering());
+    pm->SetUseTiledDisplay(this->Options->GetUseTiledDisplay());
+    pm->SetCaveConfigurationFileName(this->Options->GetCaveConfigurationFileName());
     // Juggle the compositing flag to let server in on the decision
     // whether to allow compositing / rendering on the server.
     // Put the flag on the process module.
-    if (this->GetDisableComposite())
+    if (this->Options->GetDisableComposite())
       {
       pm->GetServerInformation()->SetRemoteRendering(0);
       }
@@ -558,8 +520,8 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
     helper->SetPVProcessModule(pm);
     pm->SetGUIHelper(helper);
     helper->Delete();
-    pm->GetProgressHandler()->SetClientMode(this->GetClientMode());
-    pm->GetProgressHandler()->SetServerMode(this->GetServerMode());
+    pm->GetProgressHandler()->SetClientMode(this->Options->GetClientMode());
+    pm->GetProgressHandler()->SetServerMode(this->Options->GetServerMode());
     }
 }
   
@@ -621,79 +583,79 @@ int vtkPVApplication::CheckRegistration()
 
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
 { "--client" , "-c", 
-  "Run ParaView as client (MPI run, 1 process) (ParaView Server must be started first).", 
+  "", 
   "--client-render-server" , "-crs", 
-  "Run ParaView as a client to a data and render server. The render server will wait for the data server.", 
+  "", 
   "--connect-data-to-render" , "-d2r", 
-  "Run ParaView as a client to a data and render server. The render server will wait for the data server.", 
+  "", 
   "--connect-render-to-data" , "-r2d", 
-  "Run ParaView as a client to a data and render server. The data server will wait for the render server.", 
+  "", 
   "--machines" , "-m", 
-  "Specify the network configurations file for the render server (--machines=cfgfile).",
+  "",
   "--cave-configuration" , "-cc", 
-  "Specify the file that defines the displays for a cave. It is used only with CaveRenderModule. (--cave-configuration=ccfile).",
+  "",
   "--server" , "-v", 
-  "Start ParaView as a server (use MPI run).",
+  "",
   "--render-server" , "-rs", 
-  "Start ParaView as a server (use MPI run).",
+  "",
   "--render-server-host", "-rsh",
-  "Tell the client where to look for the render server (default: localhost). Used with --client option.", 
+  "", 
   "--host", "-h",
-  "Tell the client where to look for the server (default: localhost). Used with --client option or --server -rc options.", 
+  "", 
   "--user", "",
-  "Tell the client what username to send to server when establishing SSH connection.",
+  "",
   "--always-ssh", "",
   "",
   "--render-port", "",
-  "Specify the port client and render server will use (--port=22222).  Client and render servers ports must match.", 
+  "", 
   "--render-node-port", "",
-  "Specify the port to be used by each render node (--render-node-port=22222).  Client and render servers ports must match.", 
+  "", 
   "--port", "",
-  "Specify the port client and server will use (--port=11111).  Client and servers ports must match.", 
+  "", 
   "--reverse-connection", "-rc",
-  "Have the server connect to the client.", 
+  "", 
   "--stereo", "",
-  "Tell the application to enable stero rendering (only when running on a single process).",
+  "",
   "--render-module", "",
-  "User specified rendering module (--render-module=...)",
+  "",
   "--start-empty" , "-e", 
-  "Start ParaView without any default modules.", 
+  "", 
   "--disable-registry", "-dr", 
-  "Do not use registry when running ParaView (for testing).", 
+  "", 
   "--batch", "-b", 
-  "Load and run the batch script specified.", 
+  "", 
 #ifdef VTK_USE_MPI
 /* Temporarily disabling - for release
   "--use-rendering-group", "-p",
-  "Use a subset of processes to render.",
+  "",
   "--group-file", "-gf",
-  "--group-file=fname where fname is the name of the input file listing number of processors to render on.",
+  "",
 */
 #endif
   "--use-tiled-display", "-td",
-  "Duplicate the final data to all nodes and tile node displays 1-N into one large display.",
+  "",
   "--tile-dimensions-x", "-tdx",
-  "-tdx=X where X is number of displays in each row of the display.",
+  "",
   "--tile-dimensions-y", "-tdy",
-  "-tdy=Y where Y is number of displays in each column of the display.",
+  "",
   "--crash-on-errors", "",
   "",
 #ifdef VTK_USE_MANGLED_MESA
   "--use-software-rendering", "-r", 
-  "Use software (Mesa) rendering (supports off-screen rendering).", 
+  "", 
   "--use-satellite-software", "-s", 
-  "Use software (Mesa) rendering (supports off-screen rendering) only on satellite processes.", 
+  "", 
 #endif
   "--use-offscreen-rendering", "-os", 
-  "Render offscreen on the satellite processes. This option only works with software rendering or mangled mesa on Unix", 
+  "", 
   "--play-demo", "-pd",
-  "Run the ParaView demo.",
+  "",
   "--disable-composite", "-dc",
-  "Use this option when redering resources are not available on the server.",
+  "",
   "--connect-id", "",
   "",
   "--help", "",
-  "Displays available command line arguments.",
+  "",
   "" 
 };
 
@@ -726,6 +688,7 @@ char* vtkPVApplication::CreateHelpString()
       help = vtkPVApplication::ArgumentList[j+2];
       }
     }
+  error << this->Options->GetHelp();
   error << ends;
   return error.str();
   
@@ -860,62 +823,11 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
 int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 {
   int i;
-  int index=-1;
 
   // This should really be part of Parsing !!!!!!
   if (argv)
     {
     this->SetArgv0(argv[0]);
-    }
-
-#ifdef VTK_USE_MANGLED_MESA
-  
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-r",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "--use-satellite-software",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-s",
-                                          index) == VTK_OK ||
-       getenv("PV_SOFTWARE_RENDERING") )
-    {
-    this->UseSoftwareRendering = 1;
-    if ( getenv("PV_SOFTWARE_RENDERING") ||
-         vtkPVApplication::CheckForArgument(
-           argc, argv, "--use-satellite-software", index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-s",
-                                            index) == VTK_OK)
-      {
-      this->UseSatelliteSoftware = 1;
-      }
-    }
-#endif
-
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-offscreen-rendering",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-os",
-                                          index) == VTK_OK ||
-       getenv("PV_OFFSCREEN") )
-    {
-    this->UseOffscreenRendering = 1;
-    }
-  
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--batch",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-b",
-                                          index) == VTK_OK )
-    {
-    for (i=1; i < argc; i++)
-      {
-      if (vtkPVApplication::CheckForExtension(argv[i], ".pvb"))
-        {
-        this->RunBatchScript = 1;
-        this->SetBatchScriptName(argv[i]);
-        break;
-        }
-      }
-    return 0;
     }
 
   for (i=1; i < argc; i++)
@@ -975,8 +887,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       }
     }
 
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--help",
-                                          index) == VTK_OK )
+  if ( this->Options->GetHelpSelected() )
     {
     char* error = this->CreateHelpString();
     vtkWarningMacro(<<error);
@@ -984,373 +895,22 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     return 1;
     }
 
-  this->PlayDemoFlag = 0;
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--play-demo",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-pd",
-                                          index) == VTK_OK )
-    {
-    this->PlayDemoFlag = 1;
-    }
-
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-registry",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-dr",
-                                          index) == VTK_OK )
+  if ( this->Options->GetDisableRegistry() )
     {
     this->RegisteryLevel = 0;
     }
 
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--stereo",
-                                          index) == VTK_OK)
-    {
-    this->UseStereoRendering = 1;
-    }
-
-
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--client",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-c",
-                                          index) == VTK_OK )
-    {
-    this->ClientMode = 1;
-
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--user",
-                                            index) == VTK_OK )
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->SetUsername(newarg);
-      }
-    }
-
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--client-render-server",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-crs",
-                                          index) == VTK_OK )
-      {
-        this->ClientMode = 1;
-        this->RenderServerMode = 1;
-      }
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--connect-render-to-data",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-r2d",
-                                          index) == VTK_OK )
-      {
-        this->ClientMode = 1;
-        this->RenderServerMode = 2;
-      }
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--connect-data-to-render",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-d2r",
-                                          index) == VTK_OK )
-      {
-        this->ClientMode = 1;
-        this->RenderServerMode = 1;
-      }
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--user",
-                                            index) == VTK_OK )
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->SetUsername(newarg);
-      }
-    
-
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--server",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-v",
-                                          index) == VTK_OK )
-    {
-    this->ServerMode = 1;
-    }
-
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-server",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-rs",
-                                          index) == VTK_OK )
-    {
-    this->RenderServerMode = 1;
-    }
-
-  if (this->ServerMode || this->ClientMode || this->RenderServerMode)
-    {
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--host",
-                                            index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-h",
-                                          index) == VTK_OK )
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->SetHostName(newarg);
-      }
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-server-host",
-                                            index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-rsh",
-                                            index) == VTK_OK )
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->SetRenderServerHostName(newarg);
-      }
-
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--port",
-                                            index) == VTK_OK)
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->Port = atoi(newarg);
-      }
-
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--machines",
-                                            index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-m", 
-                                            index) == VTK_OK)
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->SetMachinesFileName(newarg);
-      }
-    
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--cave-configuration",
-                                            index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-cc", 
-                                            index) == VTK_OK)
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->SetCaveConfigurationFileName(newarg);
-      this->SetOldRenderModuleName("CaveRenderModule");
-      }
-  
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-node-port",
-                                            index) == VTK_OK)
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->RenderNodePort = atoi(newarg);
-      }
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-port",
-                                            index) == VTK_OK)
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->RenderServerPort = atoi(newarg);
-      }
-    // Change behavior so server connects to the client.
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--reverse-connection",
-                                            index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-rc",
-                                            index) == VTK_OK )
-      {
-      this->ReverseConnection = 1;
-      }
-    }
-
-  if (this->ClientMode)
-    {
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--always-ssh",
-                                            index) == VTK_OK)
-      {
-      this->AlwaysSSH = 1;
-      }
-    }
-
-#ifdef VTK_USE_MPI
-// Temporarily removing this (for the release - it has bugs)
-//    if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-rendering-group",
-//                                            index) == VTK_OK ||
-//         vtkPVApplication::CheckForArgument(argc, argv, "-p",
-//                                            index) == VTK_OK )
-//      {
-//      this->UseRenderingGroup = 1;
-//      }
-
-//    if ( vtkPVApplication::CheckForArgument(argc, argv, "--group-file",
-//                                            index) == VTK_OK ||
-//         vtkPVApplication::CheckForArgument(argc, argv, "-gf",
-//                                            index) == VTK_OK )
-//      {
-//      const char* newarg=0;
-//      int len = (int)(strlen(argv[index]));
-//      for (int i=0; i<len; i++)
-//        {
-//        if (argv[index][i] == '=')
-//          {
-//          newarg = &(argv[index][i+1]);
-//          }
-//        }
-//      this->SetGroupFileName(newarg);
-//      }
-#endif
-
   // Set the tiled display flag if any tiled display option is used.
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-tiled-display",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-td",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-x",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-tdx",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-y",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-tdy",
-                                          index) == VTK_OK )
+  if ( this->Options->GetUseTiledDisplay() )
     {
-    if (!this->ClientMode)
+    if (!this->Options->GetClientMode())
       {
       vtkErrorMacro("Tiled display is supported only in client/server mode. Please re-run with --client option. Disabling tiled display");
       }
-    else
-      {
-      this->UseTiledDisplay = 1;
-      
-      if ( vtkPVApplication::CheckForArgument(argc, argv,"--tile-dimensions-x",
-                                              index) == VTK_OK ||
-           vtkPVApplication::CheckForArgument(argc, argv, "-tdx",
-                                              index) == VTK_OK )
-        {
-        // Strip string to equals sign.
-        const char* newarg=0;
-        int len = (int)(strlen(argv[index]));
-        for (i=0; i<len; i++)
-          {
-          if (argv[index][i] == '=')
-            {
-            newarg = &(argv[index][i+1]);
-            }
-          }
-        this->TileDimensions[0] = atoi(newarg);
-        }
-      if ( vtkPVApplication::CheckForArgument(argc, argv,"--tile-dimensions-y",
-                                              index) == VTK_OK ||
-           vtkPVApplication::CheckForArgument(argc, argv, "-tdy",
-                                              index) == VTK_OK )
-        {
-        // Strip string to equals sign.
-        const char* newarg=0;
-        int len = (int)(strlen(argv[index]));
-        for (i=0; i<len; i++)
-          {
-          if (argv[index][i] == '=')
-            {
-            newarg = &(argv[index][i+1]);
-            }
-          }
-        this->TileDimensions[1] = atoi(newarg);
-        }
-      }
     }
 
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--start-empty", index) 
-       == VTK_OK || 
-       vtkPVApplication::CheckForArgument(argc, argv, "-e", index) 
-       == VTK_OK)
+  if ( this->Options->GetCrashOnErrors() )
     {
-    this->StartEmpty = 1;
-    }
-
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-module",
-                                            index) == VTK_OK)
-    {
-    // Strip string to equals sign.
-    const char* newarg=0;
-    int len = (int)(strlen(argv[index]));
-    for (i=0; i<len; i++)
-      {
-      if (argv[index][i] == '=')
-        {
-        newarg = &(argv[index][i+1]);
-        }
-      }
-    this->SetOldRenderModuleName(newarg);
-    }
-    
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--disable-composite",
-                                          index) == VTK_OK  ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-dc",
-                                          index) == VTK_OK)
-    {
-    this->DisableComposite = 1;
-    }
-
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--crash-on-errors",
-      index) == VTK_OK )
-    {
-    this->CrashOnErrors = 1;
     this->OutputWindow->CrashOnErrorsOn();
     }
 
@@ -1381,7 +941,7 @@ void vtkPVApplication::Initialize()
   this->FindApplicationInstallationDirectory();
 
 #ifdef VTK_USE_MANGLED_MESA
-  if (this->UseSoftwareRendering)
+  if (this->Options->GetUseSoftwareRendering())
     {
     vtkPVProcessModule* pm = this->GetProcessModule();
     vtkClientServerID gf = pm->NewStreamObject("vtkGraphicsFactory");
@@ -1396,7 +956,7 @@ void vtkPVApplication::Initialize()
     pm->DeleteStreamObject(imf);
     pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
-    if (this->UseSatelliteSoftware)
+    if (this->Options->GetUseSatelliteSoftwareRendering())
       {
       vtkGraphicsFactory::SetUseMesaClasses(0);
       vtkImagingFactory::SetUseMesaClasses(0);
@@ -1446,7 +1006,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
 // Temporarily removing this (for the release - it has bugs)
 //    // Handle setting up the SGI pipes.
-//    if (this->UseRenderingGroup)
+//    if (this->Options->GetUseRenderingGroup())
 //      {
 //      int numProcs = this->ProcessModule->GetNumberOfPartitions();
 //      int numPipes = 1;
@@ -1516,9 +1076,9 @@ void vtkPVApplication::Start(int argc, char*argv[])
 //        }
 //      }
 
-  if (this->RunBatchScript)
+  if (this->Options->GetBatchScriptName())
     {
-    this->LoadScript(this->GetBatchScriptName());
+    this->LoadScript(this->Options->GetBatchScriptName());
     this->Exit();
     return;
     }
@@ -1581,7 +1141,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   this->CreateButtonPhotos();
 
-  if (this->StartEmpty)
+  if (this->Options->GetStartEmpty())
     {
     ui->InitializeDefaultInterfacesOff();
     }
@@ -1705,7 +1265,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->RunningParaViewScript = 0;
     }
   
-  if (this->PlayDemoFlag)
+  if (this->Options->GetPlayDemoFlag())
     {
     this->Script("set pvDemoCommandLine 1");
     this->PlayDemo(0);
@@ -2037,64 +1597,64 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RunningParaViewScript: " 
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
-  os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off")
+  os << indent << "UseRenderingGroup: " << (this->Options->GetUseRenderingGroup()?"on":"off")
      << endl; 
-  os << indent << "UseOffscreenRendering: " << (this->UseOffscreenRendering?"on":"off")
+  os << indent << "UseOffscreenRendering: " << (this->Options->GetUseOffscreenRendering()?"on":"off")
      << endl; 
   os << indent << "StartGUI: " << this->StartGUI << endl;
-  if (this->UseTiledDisplay)
+  if (this->Options->GetUseTiledDisplay())
     { 
     os << indent << "UseTiledDisplay: On\n";
-    os << indent << "TileDimensions: " << this->TileDimensions[0]
-       << ", " << this->TileDimensions[1] << endl;
+    os << indent << "TileDimensions: " << this->Options->GetTileDimensions()[0]
+       << ", " << this->Options->GetTileDimensions()[1] << endl;
     }
 
-  os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
+  os << indent << "UseStereoRendering: " << this->Options->GetUseStereoRendering() << endl;
 
-  if (this->ClientMode)
+  if (this->Options->GetClientMode())
     {
     os << indent << "Running as a client\n";
-    os << indent << "Port: " << this->Port << endl;
-    os << indent << "RenderNodePort: " << this->RenderNodePort << endl;
-    os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
-    os << indent << "Host: " << (this->HostName?this->HostName:"(none)") << endl;
-    os << indent << "Render Host: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
+    os << indent << "Port: " << this->Options->GetPort() << endl;
+    os << indent << "RenderNodePort: " << this->Options->GetRenderNodePort() << endl;
+    os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
+    os << indent << "Host: " << (this->Options->GetHostName()?this->Options->GetHostName():"(none)") << endl;
+    os << indent << "Render Host: " << (this->Options->GetRenderServerHostName()?this->Options->GetRenderServerHostName():"(none)") << endl;
     os << indent << "Username: " 
-       << (this->Username?this->Username:"(none)") << endl;
-    os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
-    os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+       << (this->Options->GetUsername()?this->Options->GetUsername():"(none)") << endl;
+    os << indent << "AlwaysSSH: " << this->Options->GetAlwaysSSH() << endl;
+    os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
     }
-  if (this->ServerMode)
+  if (this->Options->GetServerMode())
     {
     os << indent << "Running as a server\n";
-    os << indent << "Port: " << this->Port << endl;
-    os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
-    os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+    os << indent << "Port: " << this->Options->GetPort() << endl;
+    os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
+    os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
     }
-  if (this->RenderServerMode)
+  if (this->Options->GetRenderServerMode())
     {
-    if(this->ClientMode)
+    if(this->Options->GetClientMode())
       {
       os << indent << "Running as a client connectd to a render server\n";
       }
     else
       {
       os << indent << "Running as a render server\n";
-      os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
-      os << indent << "Port: " << this->Port << endl;
-      os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+      os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
+      os << indent << "Port: " << this->Options->GetPort() << endl;
+      os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
       }
     
     }
-  if (this->UseSoftwareRendering)
+  if (this->Options->GetUseSoftwareRendering())
     {
     os << indent << "UseSoftwareRendering: Enabled\n";
     }
-  if (this->UseSatelliteSoftware)
+  if (this->Options->GetUseSatelliteSoftwareRendering())
     {
     os << indent << "UseSatelliteSoftware: Enabled\n";
     }
-  if (this->StartEmpty)
+  if (this->Options->GetStartEmpty())
     {
     os << indent << "ParaView was started with no default modules.\n";
     }
@@ -2110,13 +1670,13 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourcesBrowserAlwaysShowName: " 
      << (this->SourcesBrowserAlwaysShowName?"on":"off") << endl;
 
-  os << indent << "CrashOnErrors: " << (this->CrashOnErrors?"on":"off") << endl;
-  os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
+  os << indent << "CrashOnErrors: " << (this->Options->GetCrashOnErrors()?"on":"off") << endl;
+  os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
   os << indent << "MachinesFileName: " 
-    << (this->MachinesFileName?this->MachinesFileName:"(null)") << endl;
+    << (this->Options->GetMachinesFileName()?this->Options->GetMachinesFileName():"(null)") << endl;
   os << indent << "CaveConfigurationFileName: " 
-    << (this->CaveConfigurationFileName?this->CaveConfigurationFileName:"(null)") << endl;
-  os << indent << "DisableComposite: " << this->DisableComposite << endl;
+    << (this->Options->GetCaveConfigurationFileName()?this->Options->GetCaveConfigurationFileName():"(null)") << endl;
+  os << indent << "DisableComposite: " << this->Options->GetDisableComposite() << endl;
 
   os << indent << "SMApplication: ";
   if (this->SMApplication)
@@ -2128,7 +1688,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-  os << "OldRenderModuleName: " << (this->OldRenderModuleName?this->OldRenderModuleName:"(none)") << endl;
+  os << "OldRenderModuleName: " << (this->Options->GetRenderModuleName()?this->Options->GetRenderModuleName():"(none)") << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)
@@ -2350,7 +1910,7 @@ char* vtkPVApplication::GetTextRepresentation(vtkPVSource* comp)
 
 vtkKWLoadSaveDialog* vtkPVApplication::NewLoadSaveDialog()
 {
-  if(!this->ClientMode)
+  if(!this->Options->GetClientMode())
     {
       return vtkKWLoadSaveDialog::New();
     }
@@ -2450,3 +2010,11 @@ const char* vtkPVApplication::GetStringFromClient()
 {
   return this->ProcessModule->GetLastResult(vtkProcessModule::CLIENT).StreamToString();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetOptions(vtkPVOptions* op)
+{
+  this->Options = op;
+}
+
+

@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkTclUtil.h"
 #include "vtkTimerLog.h"
 
+#include "vtkPVOptions.h"
+
 /*
  * Make sure all the kits register their classes with vtkInstantiator.
  * Since ParaView uses Tcl wrapping, all of VTK is already compiled in
@@ -63,6 +65,8 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkParaViewInstantiator.h"
 #include "vtkClientServerInterpreter.h"
 static void ParaViewInitializeInterpreter(vtkPVProcessModule* pm);
+
+#include <unistd.h>
 
 #ifdef PARAVIEW_ENABLE_FPE
 void u_fpu_setup()
@@ -116,29 +120,37 @@ int MyMain(int argc, char *argv[])
   vtkOutputWindow::GetInstance()->PromptUserOff();
 #endif
 
+  int display_help = 0;
+  vtkPVOptions* options = vtkPVOptions::New();
+  if ( !options->Parse(argc, argv) )
+    {
+    cerr << "Problem parsing command line arguments" << endl;
+    if ( options->GetUnknownArgument() )
+      {
+      cerr << "Got unknown argument: " << options->GetUnknownArgument() << endl;
+      }
+    if ( options->GetErrorMessage() )
+      {
+      cerr << "Error: " << options->GetErrorMessage() << endl;
+      }
+    display_help = 1;
+    }
+  if ( display_help || options->GetHelpSelected() )
+    {
+    cerr << options->GetHelp() << endl;
+    options->Delete();
+    return 1;
+    }
+
   // The server is a special case.  We do not initialize Tk for process 0.
   // I would rather have application find this command line option, but
   // I cannot create an application before I initialize Tcl.
   // I could clean this up if I separate the initialization of Tk and Tcl.
   // I do not do this because it would affect other applications.
-  int serverMode = 0;
-  int renderServerMode = 0;
-  int idx;
-  for (idx = 0; idx < argc; ++idx)
-    {
-    if (strcmp(argv[idx],"--server") == 0 || strcmp(argv[idx],"-v") == 0)
-      {
-      serverMode = 1;
-      }
-    if (strcmp(argv[idx],"--render-server") == 0 || strcmp(argv[idx],"-rs") == 0)
-      {
-      renderServerMode = 1;
-      }
-    }
 
   // Initialize Tcl/Tk.
   Tcl_Interp *interp;
-  if (renderServerMode || serverMode || myId > 0)
+  if (options->GetRenderServerMode() && !options->GetClientMode() || options->GetServerMode() || myId > 0)
     { // DO not initialize Tk.
     vtkKWApplication::SetWidgetVisibility(0);
     }
@@ -165,6 +177,7 @@ int MyMain(int argc, char *argv[])
 
   // Create the application to parse the command line arguments.
   app = vtkPVApplication::New();
+  app->SetOptions(options);
 
   if (myId == 0)
     {
@@ -184,32 +197,11 @@ int MyMain(int argc, char *argv[])
 
   // Create the process module for initializing the processes.
   // Only the root server processes args.
-  if (app->GetClientMode() || serverMode || renderServerMode) 
+  if (options->GetClientMode() || options->GetServerMode() || options->GetRenderServerMode()) 
     {
     vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
 
-    for (idx = 0; idx < argc; ++idx)
-      {
-      const char* arg = "--connect-id";
-      if (strncmp(argv[idx], arg, strlen(arg)) == 0)
-        {
-        // Strip string to equals sign.
-        const char* newarg=0;
-        int len = (int)(strlen(argv[idx]));
-        for (int i=0; i<len; i++)
-          {
-          if (argv[idx][i] == '=')
-            {
-            newarg = &(argv[idx][i+1]);
-            }
-          }
-        if (newarg)
-          {
-          processModule->SetConnectID(atoi(newarg));
-          break;
-          }
-        }
-      }
+    processModule->SetConnectID(options->GetConnectID());
 
     pm = processModule;
     }
@@ -223,9 +215,9 @@ int MyMain(int argc, char *argv[])
     pm = processModule;
     }
 
-  if ( app->GetOldRenderModuleName() )
+  if ( options->GetRenderModuleName() )
     {
-    pm->SetRenderModuleName(app->GetOldRenderModuleName());
+    pm->SetRenderModuleName(options->GetRenderModuleName());
     }
 
   if ( myId == 0 )
@@ -233,7 +225,7 @@ int MyMain(int argc, char *argv[])
     // The client chooses a render module.
     if (pm->GetRenderModuleName() == NULL)
       { // The render module has not been set by the user.  Choose a default.
-      if (app->GetUseTiledDisplay())
+      if (options->GetUseTiledDisplay())
         {
 #if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
         pm->SetRenderModuleName("IceTRenderModule");
@@ -241,7 +233,7 @@ int MyMain(int argc, char *argv[])
         pm->SetRenderModuleName("MultiDisplayRenderModule");
 #endif
         }
-      else if (app->GetClientMode())
+      else if (options->GetClientMode())
         { // Client server, no tiled display.
 #if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
         pm->SetRenderModuleName("DeskTopRenderModule");
@@ -267,17 +259,17 @@ int MyMain(int argc, char *argv[])
   if(getenv("VTK_CLIENT_SERVER_LOG"))
     {
     needLog = true;
-    if(app->GetClientMode())
+    if(options->GetClientMode())
       {
       needLog = false;
       pm->GetInterpreter()->SetLogFile("paraviewClient.log");
       }
-    if(serverMode)
+    if(options->GetServerMode())
       {
       needLog = false;
       pm->GetInterpreter()->SetLogFile("paraviewServer.log");
       }
-    if(renderServerMode)
+    if(options->GetRenderServerMode())
       {
       needLog = false;
       pm->GetInterpreter()->SetLogFile("paraviewRenderServer.log");
@@ -309,10 +301,12 @@ int MyMain(int argc, char *argv[])
 #ifdef VTK_USE_MPI
   MPI_Finalize();
 #endif
+  options->Delete();
 
   return (retVal?retVal:startVal);
 }
 
+//----------------------------------------------------------------------------
 #ifdef _WIN32
 #include <windows.h>
 #include "vtkDynamicLoader.h"
@@ -433,7 +427,8 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
 #else
 int main(int argc, char *argv[])
 {
-  return MyMain(argc, argv);
+  int res = MyMain(argc, argv);
+  return res;
 }
 #endif
 
