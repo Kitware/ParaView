@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.39");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.40");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -182,15 +182,17 @@ int vtkPVSelectWidget::GetModifiedFlag()
 void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
 {
   vtkPVWidgetProperty *pvwp;
-  pvwp = (vtkPVWidgetProperty*)(
+  pvwp = vtkPVWidgetProperty::SafeDownCast(
     this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
+  if (!pvwp)
+    {
+    return;
+    }
+
   pvwp->GetWidget()->SaveInBatchScript(file);
  
   if(this->ElementType == OBJECT)
     { 
-    vtkPVWidgetProperty *pvwp;
-    pvwp = vtkPVWidgetProperty::SafeDownCast(
-      this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
     // TODO Fix this hack.
     vtkPVObjectWidget* ow = 
       vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget()); 
@@ -302,28 +304,56 @@ void vtkPVSelectWidget::ResetInternal()
 {
   int index=-1, i;
   int num = this->Values->GetNumberOfStrings();
-  const char* value;
-  char* currentValue;
 
   if (this->AcceptCalled)
     {
-    currentValue = new char[strlen(this->Property->GetString())+1];
-    strcpy(currentValue, this->Property->GetString());
-    for (i = 0; i < num; ++i)
+    if(this->ElementType == OBJECT)
       {
-      value = this->GetVTKValue(i);
-      if (value && currentValue && strcmp(value, currentValue) == 0)
+      vtkClientServerID csid = this->Property->GetObjectID();
+      for (i = 0; i < num; ++i)
         {
-        index = i;
-        break;
+        vtkPVWidgetProperty *pvwp;
+        pvwp = vtkPVWidgetProperty::SafeDownCast(
+          this->WidgetProperties->GetItemAsObject(i));
+        if (pvwp)
+          {
+          vtkPVObjectWidget* ow = 
+            vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget()); 
+          if (ow)
+            {
+            vtkClientServerID id = 
+              ow->GetObjectByName(this->GetVTKValue(i));
+            if (id == csid)
+              {
+              index = i;
+              break;
+              }
+            }
+          }
         }
+      }
+    else
+      {
+      const char* value;
+      char* currentValue;
+      currentValue = new char[strlen(this->Property->GetString())+1];
+      strcpy(currentValue, this->Property->GetString());
+      for (i = 0; i < num; ++i)
+        {
+        value = this->GetVTKValue(i);
+        if (value && currentValue && strcmp(value, currentValue) == 0)
+          {
+          index = i;
+          break;
+          }
+        }
+      delete[] currentValue;
       }
     if ( index >= 0 )
       {
       this->Menu->SetValue(this->Labels->GetString(index));
       this->SetCurrentIndex(index);
       }
-    delete[] currentValue;
     this->ModifiedFlag = 0;
     }
   else
