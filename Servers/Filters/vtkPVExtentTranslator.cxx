@@ -20,7 +20,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentTranslator);
-vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.1");
+vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.2");
 
 //vtkCxxSetObjectMacro(vtkPVExtentTranslator, OriginalSource, vtkDataSet);
 
@@ -60,7 +60,6 @@ int vtkPVExtentTranslator::PieceToExtentThreadSafe(int piece, int numPieces,
     }
   else
     {
-    this->OriginalSource->UpdateInformation();
     this->OriginalSource->GetWholeExtent(origWholeExt);
     }
 
