@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.26");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.27");
 
 
 //----------------------------------------------------------------------------
@@ -253,17 +253,7 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
          << vtkClientServerStream::LastResult << vtkClientServerStream::End;
 
   // Now create the mapper.
-  if (pvApp->GetUseSoftwareRendering())
-    {
-    // vtkPVPolyDataMapper does not have a mangled mesa version. 
-    // Therefore, in case of software rendering, we use vtkPolyDataMapper.
-    // This goes through the factory and creates the right mesa classes.
-    this->MapperID = pm->NewStreamObject("vtkPolyDataMapper");
-    }
-  else
-    {
-    this->MapperID = pm->NewStreamObject("vtkPVPolyDataMapper");
-    }
+  this->MapperID = pm->NewStreamObject("vtkPolyDataMapper");
   stream << vtkClientServerStream::Invoke << this->MapperID << "UseLookupTableScalarRangeOn" 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "GetOutput" 
