@@ -71,8 +71,12 @@ public:
 
   // Description:
   // Get the data's scalar range given a component
+  // WARNING: the 'double' version does *not* cache the ranges, it 
+  // iterates over the data each time (whereas the 'float' version is
+  // just a proxy to vtkDataArray::GetRange)
   // Return 1 on success, 0 otherwise.
   static int GetScalarRange(vtkDataArray *array, int comp, float range[2]);
+  static int GetScalarRange(vtkDataArray *array, int comp, double range[2]);
  
   // Description:
   // Get the data's scalar range given a component. This range is adjusted
