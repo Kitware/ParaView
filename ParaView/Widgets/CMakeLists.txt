@@ -102,6 +102,10 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${Widgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationWriter.cxx
     ${Widgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetReader.cxx
     ${Widgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetWriter.cxx
+    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceManagerReader.cxx
+    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceManagerWriter.cxx
+    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceNotebookManagerReader.cxx
+    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceNotebookManagerWriter.cxx
     ${Widgets_SOURCE_DIR}/XML/vtkXMLKWWindowReader.cxx
     ${Widgets_SOURCE_DIR}/XML/vtkXMLKWWindowWriter.cxx
   )
