@@ -124,9 +124,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindowTclName = NULL;
   this->SetRenderWindowTclName("RenWin1");
   
-
-  Sleep(20000);
-
   // Create the compositer.
   str = getenv("PV_DISABLE_COMPOSITE_INTERRUPTS");
   if ( str != NULL)
