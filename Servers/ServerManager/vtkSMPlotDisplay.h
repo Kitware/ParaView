@@ -121,8 +121,7 @@ protected:
 
   virtual void CreateVTKObjects(int num);
 
-  void HSVtoRGB(float h, float s, float v, float *r, float *g, float *b);
-
+private:
   vtkSMPlotDisplay(const vtkSMPlotDisplay&); // Not implemented
   void operator=(const vtkSMPlotDisplay&); // Not implemented
 };
