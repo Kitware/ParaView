@@ -38,25 +38,25 @@ public:
 
   // Description:
   // Set/Get the whole range.
-  vtkGetVector2Macro(WholeRange, float);
-  virtual void SetWholeRange(float r0, float r1);
-  virtual void SetWholeRange(float range[2]) 
+  vtkGetVector2Macro(WholeRange, double);
+  virtual void SetWholeRange(double r0, double r1);
+  virtual void SetWholeRange(double range[2]) 
     { this->SetWholeRange(range[0], range[1]); };
 
   // Description:
   // Set/Get the current (sub-)range.
-  vtkGetVector2Macro(Range, float);
-  virtual void SetRange(float r0, float r1);
-  virtual void SetRange(float *range) 
+  vtkGetVector2Macro(Range, double);
+  virtual void SetRange(double r0, double r1);
+  virtual void SetRange(double *range) 
     { this->SetRange(range[0], range[1]); };
 
   // Description:
   // Set/Get the current (sub-)range as relative positions in the whole range.
-  virtual void GetRelativeRange(float &r0, float &r1);
-  virtual void GetRelativeRange(float range[2])
+  virtual void GetRelativeRange(double &r0, double &r1);
+  virtual void GetRelativeRange(double range[2])
     { this->GetRelativeRange(range[0], range[1]); };
-  virtual void SetRelativeRange(float r0, float r1);
-  virtual void SetRelativeRange(float range[2])
+  virtual void SetRelativeRange(double r0, double r1);
+  virtual void SetRelativeRange(double range[2])
     { this->SetRelativeRange(range[0], range[1]); };
   
   // Description:
@@ -73,8 +73,8 @@ public:
   // the slider will only snap to values ranging from 3 to 63 (within the 
   // whole range constraint), but the entries can be used to set accurate
   // values out of the resolution (i.e., 1, 2... 64).
-  virtual void SetResolution(float r);
-  vtkGetMacro(Resolution, float);
+  virtual void SetResolution(double r);
+  vtkGetMacro(Resolution, double);
 
   // Description:
   // Adjust the resolution automatically (to a power of 10 in this implem)
@@ -116,8 +116,8 @@ public:
   // Set/Get the desired narrow dimension of the internal widget as a fraction
   // of the thickness of the widget (see Thickness). 
   // In the current implementation, this controls the range bar narrow dim.
-  virtual void SetInternalThickness(float);
-  vtkGetMacro(InternalThickness, float);
+  virtual void SetInternalThickness(double);
+  vtkGetMacro(InternalThickness, double);
   
   // Description:
   // Set/Get the slider size.
@@ -134,9 +134,9 @@ public:
   // Set/Get the (sub) range scale color. 
   // Defaults to -1, -1, -1: a shade of the widget background color will
   // be used at runtime.
-  vtkGetVector3Macro(RangeColor, float);
-  virtual void SetRangeColor(float r, float g, float b);
-  virtual void SetRangeColor(float rgb[3])
+  vtkGetVector3Macro(RangeColor, double);
+  virtual void SetRangeColor(double r, double g, double b);
+  virtual void SetRangeColor(double rgb[3])
     { this->SetRangeColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
@@ -144,9 +144,9 @@ public:
   // is performed using the sliders.
   // IF set to -1, -1, -1: a shade of the widget background color will
   // be used at runtime.
-  vtkGetVector3Macro(RangeInteractionColor, float);
-  virtual void SetRangeInteractionColor(float r, float g, float b);
-  virtual void SetRangeInteractionColor(float rgb[3])
+  vtkGetVector3Macro(RangeInteractionColor, double);
+  virtual void SetRangeInteractionColor(double r, double g, double b);
+  virtual void SetRangeInteractionColor(double rgb[3])
     { this->SetRangeInteractionColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
@@ -282,20 +282,20 @@ protected:
   vtkKWRange();
   ~vtkKWRange();
 
-  float WholeRange[2];
-  float Range[2];
-  float WholeRangeAdjusted[2];
-  float RangeAdjusted[2];
-  float Resolution;
+  double WholeRange[2];
+  double Range[2];
+  double WholeRangeAdjusted[2];
+  double RangeAdjusted[2];
+  double Resolution;
   int   AdjustResolution;
   int   Inverted;
   int   Thickness;
-  float InternalThickness;
+  double InternalThickness;
   int   Orientation;
   int   DisableCommands;
   int   SliderSize;
-  float RangeColor[3];
-  float RangeInteractionColor[3];
+  double RangeColor[3];
+  double RangeInteractionColor[3];
   int   ShowEntries;
   int   LabelPosition;
   int   EntriesPosition;
@@ -306,7 +306,7 @@ protected:
 
   int   InInteraction;
   int   StartInteractionPos;
-  float StartInteractionRange[2];
+  double StartInteractionRange[2];
 
   int ClampRange;
 
@@ -322,7 +322,7 @@ protected:
 
   virtual void CreateEntries();
   virtual void CreateZoomButtons();
-  virtual void UpdateEntriesValue(float range[2]);
+  virtual void UpdateEntriesValue(double range[2]);
   virtual void ConstrainResolution();
 
   // Description:
@@ -332,11 +332,11 @@ protected:
 
   // Description:
   // Make sure all elements are constrained correctly
-  virtual void ConstrainRangeToResolution(float range[2], int adjust = 1);
+  virtual void ConstrainRangeToResolution(double range[2], int adjust = 1);
   virtual void ConstrainRangeToWholeRange(
-    float range[2], float whole_range[2], float *old_range_hint = 0);
+    double range[2], double whole_range[2], double *old_range_hint = 0);
   virtual void ConstrainWholeRange();
-  virtual void ConstrainRange(float *old_range_hint = 0);
+  virtual void ConstrainRange(double *old_range_hint = 0);
   virtual void ConstrainRanges();
 
   // Description:

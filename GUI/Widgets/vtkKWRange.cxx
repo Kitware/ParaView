@@ -26,7 +26,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.36");
+vtkCxxRevisionMacro(vtkKWRange, "1.37");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -516,7 +516,7 @@ void vtkKWRange::UnBind()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetWholeRange(float r0, float r1)
+void vtkKWRange::SetWholeRange(double r0, double r1)
 {
   if (this->WholeRange[0] == r0 && this->WholeRange[1] == r1)
     {
@@ -535,14 +535,14 @@ void vtkKWRange::SetWholeRange(float r0, float r1)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetRange(float r0, float r1)
+void vtkKWRange::SetRange(double r0, double r1)
 {
   if (this->Range[0] == r0 && this->Range[1] == r1)
     {
     return;
     }
 
-  float old_range[2];
+  double old_range[2];
   old_range[0] = this->Range[0];
   old_range[1] = this->Range[1];
 
@@ -588,7 +588,7 @@ void vtkKWRange::SetRange(float r0, float r1)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::GetRelativeRange(float &r0, float &r1)
+void vtkKWRange::GetRelativeRange(double &r0, double &r1)
 {
   if (this->WholeRange[1] == this->WholeRange[0])
     {
@@ -596,34 +596,29 @@ void vtkKWRange::GetRelativeRange(float &r0, float &r1)
     }
   else
     {
-    double whole_range = 
-      (double)this->WholeRange[1] - (double)this->WholeRange[0];
-    r0 = (float)(((double)this->Range[0] - (double)this->WholeRange[0]) 
-      / whole_range);
-    r1 = (float)(((double)this->Range[1] - (double)this->WholeRange[0]) 
-      / whole_range);
+    double whole_range = this->WholeRange[1] - this->WholeRange[0];
+    r0 = (this->Range[0] - this->WholeRange[0]) / whole_range;
+    r1 = (this->Range[1] - this->WholeRange[0]) / whole_range;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetRelativeRange(float r0, float r1)
+void vtkKWRange::SetRelativeRange(double r0, double r1)
 {
-  double whole_range = 
-    (double)this->WholeRange[1] - (double)this->WholeRange[0];
-  this->SetRange(
-    (float)((double)r0 * whole_range + (double)this->WholeRange[0]),
-    (float)((double)r1 * whole_range + (double)this->WholeRange[0]));
+  double whole_range = this->WholeRange[1] - this->WholeRange[0];
+  this->SetRange(r0 * whole_range + this->WholeRange[0],
+                 r1 * whole_range + this->WholeRange[0]);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetResolution(float arg)
+void vtkKWRange::SetResolution(double arg)
 {
   if (this->Resolution == arg || arg <= 0.0)
     {
     return;
     }
 
-  float old_res = this->Resolution;
+  double old_res = this->Resolution;
   this->Resolution = arg;
   this->ConstrainResolution();
 
@@ -666,7 +661,7 @@ void vtkKWRange::ConstrainResolution()
     fracp = modf(reslog, &intp);
     if (fabs(fracp) > 0.00001)
       {
-      float newres = (float)pow(10.0, floor(reslog));
+      double newres = (double)pow(10.0, floor(reslog));
       if (newres != this->Resolution)
         {
         this->SetResolution(newres);
@@ -676,7 +671,7 @@ void vtkKWRange::ConstrainResolution()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWRange::UpdateEntriesValue(float range[2])
+void vtkKWRange::UpdateEntriesValue(double range[2])
 {
   if (!range)
     {
@@ -693,16 +688,16 @@ void vtkKWRange::UpdateEntriesValue(float range[2])
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::ConstrainRangeToResolution(float range[2], int adjust)
+void vtkKWRange::ConstrainRangeToResolution(double range[2], int adjust)
 {
   int inv = (range[0] > range[1]) ? 1 : 0;
 
-  double res = (double)this->Resolution;
+  double res = this->Resolution;
   double epsilon = res / 1000.0;
 
   for (int i = 0; i <= 1; i++)
     {
-    double value = (double)range[i];
+    double value = range[i];
     double new_value = res * vtkKWMath::Round(value / res);
     // This adjustment is made to make sure that the new values
     // fall in the range. For example, if range is [1,62],
@@ -754,13 +749,13 @@ void vtkKWRange::ConstrainRangeToResolution(float range[2], int adjust)
           }
         }
       }
-    range[i] = (float)new_value;
+    range[i] = new_value;
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRange::ConstrainRangeToWholeRange(
-  float range[2], float whole_range[2], float *old_range_hint)
+  double range[2], double whole_range[2], double *old_range_hint)
 {
   int i;
 
@@ -827,7 +822,7 @@ void vtkKWRange::ConstrainWholeRange()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::ConstrainRange(float *old_range_hint)
+void vtkKWRange::ConstrainRange(double *old_range_hint)
 {
   this->ConstrainRangeToWholeRange(
     this->Range, this->WholeRange, old_range_hint);
@@ -991,7 +986,7 @@ void vtkKWRange::SetThickness(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetInternalThickness(float arg)
+void vtkKWRange::SetInternalThickness(double arg)
 {
   if (this->InternalThickness == arg || 
       arg < 0.0 || arg > 1.0)
@@ -1023,7 +1018,7 @@ void vtkKWRange::SetSliderSize(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetRangeColor(float r, float g, float b)
+void vtkKWRange::SetRangeColor(double r, double g, double b)
 {
   if ((r == this->RangeColor[0] &&
        g == this->RangeColor[1] &&
@@ -1045,7 +1040,7 @@ void vtkKWRange::SetRangeColor(float r, float g, float b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::SetRangeInteractionColor(float r, float g, float b)
+void vtkKWRange::SetRangeInteractionColor(double r, double g, double b)
 {
   if ((r == this->RangeInteractionColor[0] &&
        g == this->RangeInteractionColor[1] &&
@@ -1074,8 +1069,8 @@ void vtkKWRange::GetWholeRangeColor(int type, int &r, int &g, int &b)
     return;
     }
 
-  float fr, fg, fb;
-  float fh, fs, fv;
+  double fr, fg, fb;
+  double fh, fs, fv;
 
   switch (type)
     {
@@ -1085,9 +1080,9 @@ void vtkKWRange::GetWholeRangeColor(int type, int &r, int &g, int &b)
 
       this->GetWholeRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
 
-      fr = (float)r / 255.0;
-      fg = (float)g / 255.0;
-      fb = (float)b / 255.0;
+      fr = (double)r / 255.0;
+      fg = (double)g / 255.0;
+      fb = (double)b / 255.0;
 
       if (fr == fg && fg == fb)
         {
@@ -1137,9 +1132,9 @@ void vtkKWRange::GetRangeColor(int type, int &r, int &g, int &b)
     return;
     }
 
-  float fr, fg, fb;
-  float fh, fs, fv;
-  float *rgb;
+  double fr, fg, fb;
+  double fh, fs, fv;
+  double *rgb;
 
   switch (type)
     {
@@ -1149,9 +1144,9 @@ void vtkKWRange::GetRangeColor(int type, int &r, int &g, int &b)
 
       this->GetRangeColor(vtkKWRange::BACKGROUND_COLOR, r, g, b);
 
-      fr = (float)r / 255.0;
-      fg = (float)g / 255.0;
-      fb = (float)b / 255.0;
+      fr = (double)r / 255.0;
+      fg = (double)g / 255.0;
+      fb = (double)b / 255.0;
 
       if (fr == fg && fg == fb)
         {
@@ -1594,7 +1589,7 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
 
   pos_range = pos_max - pos_min;
 
-  float r0, r1;
+  double r0, r1;
 
   if (this->WholeRangeAdjusted[1] == this->WholeRangeAdjusted[0])
     {
@@ -1602,16 +1597,14 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
     }
   else
     {
-    double whole_range = ((double)this->WholeRangeAdjusted[1] - 
-                          (double)this->WholeRangeAdjusted[0]);
-    r0 = (float)(((double)this->RangeAdjusted[0] - 
-                  (double)this->WholeRangeAdjusted[0]) / whole_range);
-    r1 = (float)(((double)this->RangeAdjusted[1] - 
-                  (double)this->WholeRangeAdjusted[0]) / whole_range);
+    double whole_range = 
+      (this->WholeRangeAdjusted[1] - this->WholeRangeAdjusted[0]);
+    r0 = (this->RangeAdjusted[0] - this->WholeRangeAdjusted[0]) / whole_range;
+    r1 = (this->RangeAdjusted[1] - this->WholeRangeAdjusted[0]) / whole_range;
     }
 
-  pos[0] = (int)((float)pos_range * r0);
-  pos[1] = (int)((float)pos_range * r1);
+  pos[0] = (int)((double)pos_range * r0);
+  pos[1] = (int)((double)pos_range * r1);
 
   if (this->Inverted)
     {
@@ -2049,8 +2042,8 @@ void vtkKWRange::EntriesUpdateCallback(int i)
     return;
     }
 
-  float value = (float)this->Entries[i]->GetValueAsFloat();
-  float old_value = this->Range[i];
+  double value = this->Entries[i]->GetValueAsFloat();
+  double old_value = this->Range[i];
 
   if (i == 0)
     {
@@ -2082,19 +2075,19 @@ void vtkKWRange::MaximizeRangeCallback()
 //----------------------------------------------------------------------------
 void vtkKWRange::EnlargeRangeCallback()
 {
-  float *range = this->GetRange();
+  double *range = this->GetRange();
   double delta2 = (((double)range[1] - (double)range[0]) / 2.0) * 2.0;
   double center = ((double)range[1] + (double)range[0]) / 2.0;
-  this->SetRange((float)(center - delta2), (float)(center + delta2));
+  this->SetRange((double)(center - delta2), (double)(center + delta2));
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRange::ShrinkRangeCallback()
 {
-  float *range = this->GetRange();
-  double delta2 = (((double)range[1] - (double)range[0]) / 2.0) / 2.0;
-  double center = ((double)range[1] + (double)range[0]) / 2.0;
-  this->SetRange((float)(center - delta2), (float)(center + delta2));
+  double *range = this->GetRange();
+  double delta2 = ((range[1] - range[0]) / 2.0) / 2.0;
+  double center = (range[1] + range[0]) / 2.0;
+  this->SetRange((center - delta2), (center + delta2));
 }
 
 //----------------------------------------------------------------------------
@@ -2147,7 +2140,7 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
 
   const char *canv = this->Canvas->GetWidgetName();
   double whole_range = 
-    (double)this->WholeRangeAdjusted[1] - (double)this->WholeRangeAdjusted[0];
+    this->WholeRangeAdjusted[1] - this->WholeRangeAdjusted[0];
 
   // Update depending on the orientation
 
@@ -2166,20 +2159,20 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
     max = atoi(this->Script("%s cget -height", canv)) - 1;
     }
 
-  float new_value;
+  double new_value;
   if (this->Inverted)
     {
-    new_value = (float)(max - pos);
+    new_value = (double)(max - pos);
     }
   else
     {
-    new_value = (float)(pos - min);
+    new_value = (double)(pos - min);
     }
-  new_value = (float)
+  new_value = (double)
     ((double)this->WholeRangeAdjusted[0] + 
      ((double)new_value / (double)(max - min)) * whole_range);
 
-  float new_range[2];
+  double new_range[2];
 
   if (slider_idx == vtkKWRange::SLIDER_INDEX_1)
     {
@@ -2208,7 +2201,7 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
 
   const char *canv = this->Canvas->GetWidgetName();
   double whole_range = 
-    (double)this->WholeRangeAdjusted[1] - (double)this->WholeRangeAdjusted[0];
+    this->WholeRangeAdjusted[1] - this->WholeRangeAdjusted[0];
 
   // Update depending on the orientation
 
@@ -2235,9 +2228,9 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
     rel_delta = -rel_delta;
     }
 
-  float new_range[2];
-  new_range[0] = (float)((double)this->StartInteractionRange[0] + rel_delta);
-  new_range[1] = (float)((double)this->StartInteractionRange[1] + rel_delta);
+  double new_range[2];
+  new_range[0] = (this->StartInteractionRange[0] + rel_delta);
+  new_range[1] = (this->StartInteractionRange[1] + rel_delta);
 
   this->ConstrainRangeToWholeRange(
     new_range, this->WholeRangeAdjusted, this->RangeAdjusted);
@@ -2255,11 +2248,11 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
       {
       if (whole_range * rel_delta > 0)  // I just care of the sign
         {
-        new_range[0] = (float)((double)new_range[1] - old_delta);
+        new_range[0] = (new_range[1] - old_delta);
         }
       else
         {
-        new_range[1] = (float)((double)new_range[0] + old_delta);
+        new_range[1] = (new_range[0] + old_delta);
         }
       }
     }
