@@ -4,7 +4,7 @@ INCLUDE_REGULAR_EXPRESSION("^(vtk).*$")
 SET (LIBRARY_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all executables.")
 
-SET (PARAVIEW_DATA_ROOT ${PARAVIEW_SOURCE_DIR}/ParaView/data CACHE PATH "Where the Data, Baseline and Utility directories are located.")
+SET (PARAVIEW_DATA_ROOT ${PARAVIEW_SOURCE_DIR}/Data CACHE PATH "Where the Data, Baseline and Utility directories are located.")
 
 SET (PARAVIEW_CAN_BUILD 1)
 
