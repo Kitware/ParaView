@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.68");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.69");
 
 
 //----------------------------------------------------------------------------
@@ -445,7 +445,11 @@ void vtkPVInputMenu::ResetInternal()
                  input->GetTclName());
 
     // Update any widgets that depend on this input menu.
-    this->Update();
+    // SetCurrentValue already has a call to this->Update
+    // so this call is redundant and also erroneous when
+    // input == this->CurrentValue, (as it leads to ModifiedCallback
+    // which leads to setting the Accept button green in  a Reset method!
+    // this->Update();
     }
 }
 

@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.41");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.42");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -168,8 +168,8 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->RadiusWidget->SetVariableName("Radius");
   this->RadiusWidget->SetPVSource(this->GetPVSource());
   this->RadiusWidget->SetLabel("Radius");
-  this->RadiusWidget->SetModifiedCommand(this->GetPVSource()->GetTclName(), 
-    "SetAcceptButtonColorToModified");
+  this->RadiusWidget->SetModifiedCommand(this->GetTclName(), "ModifiedCallback");
+  
   vtkSMProperty *prop = this->SourceProxy->GetProperty("Radius");
   vtkSMBoundsDomain *bd = vtkSMBoundsDomain::New();
   vtkPVInputMenu *input = vtkPVInputMenu::SafeDownCast(
@@ -198,8 +198,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->NumberOfPointsWidget->SetVariableName("NumberOfPoints");
   this->NumberOfPointsWidget->SetPVSource(this->GetPVSource());
   this->NumberOfPointsWidget->SetLabel("Number of Points");
-  this->NumberOfPointsWidget->SetModifiedCommand(
-    this->GetPVSource()->GetTclName(), "SetAcceptButtonColorToModified");
+  this->NumberOfPointsWidget->SetModifiedCommand(this->GetTclName(), "ModifiedCallback");
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->SourceProxy->GetProperty("NumberOfPoints"));
   this->NumberOfPointsWidget->SetSMProperty(ivp);
@@ -244,6 +243,11 @@ void vtkPVPointSourceWidget::Initialize()
 //-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::ResetInternal()
 {
+  if (!this->ModifiedFlag)
+    {
+    return;
+    }
+
   vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->SourceProxy->GetProperty("Center"));
   if (dvp)

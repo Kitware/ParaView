@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.66");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.67");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -353,6 +353,10 @@ void vtkPVVectorEntry::Initialize()
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::ResetInternal()
 {
+  if (!this->ModifiedFlag)
+    {
+    return;
+    }
   this->Initialize();
   this->ModifiedFlag = 0;
 }
