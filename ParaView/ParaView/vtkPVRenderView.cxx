@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -62,6 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
+#include "vtkPVSourceList.h"
 #include "vtkPVTreeComposite.h"
 #include "vtkPVWindow.h"
 #include "vtkPolyData.h"
@@ -157,16 +159,80 @@ vtkPVRenderView::vtkPVRenderView()
   this->Composite                = 0;
 
   this->DisableRenderingFlag = 0;
+  this->SelectionWindow = vtkPVSourceList::New();
+
+  this->ShowSelectionWindow = 0;
+  this->ShowNavigationWindow = 0;
+
+  this->ParaViewOptionsFrame = vtkKWLabeledFrame::New();
+  this->NavigationWindowButton = vtkKWRadioButton::New();
+  this->SelectionWindowButton = vtkKWRadioButton::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ShowNavigationWindowCallback(int registery)
+{
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->NavigationFrame->GetFrame()->GetWidgetName());
+  this->Script("pack %s -fill both -expand t -side top -anchor n", 
+               this->NavigationWindow->GetWidgetName());
+  this->NavigationFrame->SetLabel("Navigation Window");
+  this->ShowSelectionWindow = 0;
+  this->ShowNavigationWindow = 1;
+
+  this->NavigationWindowButton->StateOn();
+  this->SelectionWindowButton->StateOff();
+  if ( registery )
+    {
+    this->Application->SetRegisteryValue(2, "RunTime","SourcesBrowser",
+                                         "NavigationWindow");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ShowSelectionWindowCallback(int registery)
+{
+  if ( !this->Application )
+    {
+    return;
+    }
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->NavigationFrame->GetFrame()->GetWidgetName());
+  this->Script("pack %s -fill both -expand t -side top -anchor n", 
+               this->SelectionWindow->GetWidgetName());
+  this->NavigationFrame->SetLabel("Selection Window");
+  this->ShowNavigationWindow = 0;
+  this->ShowSelectionWindow = 1;
+
+  this->NavigationWindowButton->StateOff();
+  this->SelectionWindowButton->StateOn();
+  if ( registery )
+    {
+    this->Application->SetRegisteryValue(2, "RunTime","SourcesBrowser",
+                                         "SelectionWindow");
+    }
 }
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
+  if ( !this->Application )
+    {
+    return;
+    }
   vtkPVApplication *pvApp = this->GetPVApplication();
-  
+
+  this->ParaViewOptionsFrame->Delete();
+  this->NavigationWindowButton->Delete();
+  this->SelectionWindowButton->Delete();
+
+  if ( this->SelectionWindow )
+    {
+    this->SelectionWindow->Delete();
+    }
   this->NavigationFrame->Delete();
   this->NavigationFrame = NULL;
-
+ 
   this->NavigationWindow->Delete();
   this->NavigationWindow = NULL;
 
@@ -421,6 +487,12 @@ void vtkPVRenderView::PrepareForDelete()
     {
     this->ManipulatorControl3D->SetManipulatorCollection(0);
     }
+  if ( this->SelectionWindow )
+    {
+    this->SelectionWindow->PrepareForDelete();
+    this->SelectionWindow->Delete();
+    this->SelectionWindow = 0;
+    }
 }
 
 
@@ -474,7 +546,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     {
     // Since the render view is only on process 0, do not broadcast.
     this->GetPVApplication()->Script("%s SetRenderView %s", 
-                                       this->CompositeTclName, this->GetTclName());
+                                     this->CompositeTclName, 
+                                     this->GetTclName());
     }
   
   // create the frame
@@ -508,7 +581,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
     {
     this->TopLevelRenderWindow->Create(app, "toplevel", "");
-    this->Script("wm title %s ParaView", this->TopLevelRenderWindow->GetWidgetName());
+    this->Script("wm title %s ParaView", 
+                 this->TopLevelRenderWindow->GetWidgetName());
     }
 
   // add the -rw argument
@@ -528,14 +602,28 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationFrame->ShowHideFrameOn();
   this->NavigationFrame->Create(this->Application);  
   this->NavigationFrame->SetLabel("Navigation");
-  this->Script("pack %s -fill x -expand t -side top", this->NavigationFrame->GetWidgetName());
+  this->Script("pack %s -fill x -expand t -side top", 
+               this->NavigationFrame->GetWidgetName());
 
   this->NavigationWindow->SetParent(this->NavigationFrame->GetFrame());
   this->NavigationWindow->SetWidth(341);
   this->NavigationWindow->SetHeight(45);
-  this->NavigationWindow->Create(this->Application, ""); 
-  this->Script("pack %s -fill both -expand t -side top -anchor n", this->NavigationWindow->GetWidgetName());
-  
+  this->NavigationWindow->Create(this->Application, 0); 
+
+  this->SelectionWindow->SetParent(this->NavigationFrame->GetFrame());
+  this->SelectionWindow->SetHeight(45);
+  this->SelectionWindow->Create(this->Application, 0); 
+
+  if ( this->Application->BooleanRegisteryCheck(2, "SourcesBrowser",
+                                                "SelectionWindow") )
+    {
+    this->ShowSelectionWindowCallback(0);
+    }
+  else
+    {
+    this->ShowNavigationWindowCallback(0);
+    }
+
   this->EventuallyRender();
   delete [] local;
 }
@@ -783,6 +871,31 @@ void vtkPVRenderView::CreateViewProperties()
 
 #endif
 
+  this->ParaViewOptionsFrame->SetParent(this->GeneralProperties);
+  this->ParaViewOptionsFrame->ShowHideFrameOn();
+  this->ParaViewOptionsFrame->Create(this->Application);
+  this->ParaViewOptionsFrame->SetLabel("ParaView Options");
+  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->ParaViewOptionsFrame->GetWidgetName());
+
+  this->SelectionWindowButton->SetParent(
+    this->ParaViewOptionsFrame->GetFrame());
+  this->SelectionWindowButton->Create(this->Application, 0);
+  this->SelectionWindowButton->SetText("Selection Window");
+  this->SelectionWindowButton->SetCommand(
+    this, "ShowSelectionWindowCallback 1");
+
+  this->NavigationWindowButton->SetParent(
+    this->ParaViewOptionsFrame->GetFrame());
+  this->NavigationWindowButton->Create(this->Application, 0);
+  this->NavigationWindowButton->SetText("Navigation Window");
+  this->NavigationWindowButton->SetCommand(
+    this, "ShowNavigationWindowCallback 1");
+
+  this->Script("pack %s %s -side top -padx 2 -pady 2 -anchor w",
+               this->SelectionWindowButton->GetWidgetName(),
+               this->NavigationWindowButton->GetWidgetName());
+
   this->Notebook->AddPage("Camera", "Camera and viewing navigation properties page");
   vtkKWWidget* page = this->Notebook->GetFrame("Camera");
 
@@ -841,6 +954,16 @@ void vtkPVRenderView::CreateViewProperties()
                this->ManipulatorControl2D->GetWidgetName(),
                this->ManipulatorControl3D->GetWidgetName());
   this->Notebook->Raise("General");
+
+  if ( this->Application->BooleanRegisteryCheck(2, "SourcesBrowser",
+                                                "SelectionWindow") )
+    {
+    this->ShowSelectionWindowCallback(0);
+    }
+  else
+    {
+    this->ShowNavigationWindowCallback(0);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -887,6 +1010,12 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
   if (this->NavigationWindow)
     {
     this->NavigationWindow->Update(currentSource);
+    }
+  if (this->SelectionWindow)
+    {
+    vtkPVWindow *pvWin = this->GetPVWindow();
+    this->SelectionWindow->Update(currentSource,
+                                  pvWin->GetSourceList("Sources"));
     }
 }
 

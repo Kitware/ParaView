@@ -59,13 +59,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWLabel;
 class vtkKWPushButton;
+class vtkKWRadioButton;
 class vtkKWScale;
 class vtkLabeledFrame;
 class vtkPVApplication;
 class vtkPVData;
 class vtkPVInteractorStyleControl;
 class vtkPVNavigationWindow;
+class vtkPVSelectionWindow;
 class vtkPVSource;
+class vtkPVSourceList;
 class vtkPVTreeComposite;
 class vtkPVWindow;
 
@@ -163,6 +166,13 @@ public:
   // Description:
   // Get the frame for the navigation window
   vtkGetObjectMacro(NavigationFrame, vtkKWLabeledFrame);
+
+  // Description:
+  // Show either navigation window with a fragment of pipeline or a
+  // source window with a list of sources. If the argument registery
+  // is 1, then the value will be stored in the registery.
+  void ShowNavigationWindowCallback(int registery);
+  void ShowSelectionWindowCallback(int registery);
   
   void AddBindings();
   
@@ -317,12 +327,19 @@ protected:
   vtkKWCheckButton *CompositeWithRGBACheck;
   vtkKWCheckButton *CompositeCompressionCheck;
 
+  vtkKWLabeledFrame *ParaViewOptionsFrame;
+  vtkKWRadioButton *NavigationWindowButton;
+  vtkKWRadioButton *SelectionWindowButton;
+
   vtkKWCheckButton *ReductionCheck;  
   vtkKWWidget *FrameRateFrame;
   vtkKWLabel *FrameRateLabel;
   vtkKWScale *FrameRateScale;
 
   vtkPVNavigationWindow *NavigationWindow;
+
+  vtkKWLabeledFrame* SelectionFrame;
+  vtkPVSourceList* SelectionWindow;
   
   int EventuallyRenderFlag;
   char* RenderPending;
@@ -332,6 +349,9 @@ protected:
   double InteractiveRenderTime;
   double StillCompositeTime;
   double InteractiveCompositeTime;
+
+  int ShowSelectionWindow;
+  int ShowNavigationWindow;
 
   // For the renderer in a separate toplevel window.
   vtkKWWidget *TopLevelRenderWindow;

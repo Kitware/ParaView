@@ -789,6 +789,7 @@ void vtkPVSource::DeleteCallback()
   int i;
   vtkPVData *ac;
   vtkPVSource *prev = NULL;
+  vtkPVSource *current = 0;
   vtkPVWindow *window = this->GetPVWindow();
   
   this->GetPVOutput()->DeleteCallback();
@@ -872,7 +873,9 @@ void vtkPVSource::DeleteCallback()
     {
     prev = this->GetPVWindow()->GetPreviousPVSource();
     }
-  this->GetPVWindow()->SetCurrentPVSource(prev);
+  // Just remember it. We set the current pv source later.
+  //this->GetPVWindow()->SetCurrentPVSourceCallback(prev);
+  current = prev;
   if (prev == NULL)
     {
     // Unpack the properties.  This is required if prev is NULL.
@@ -916,6 +919,8 @@ void vtkPVSource::DeleteCallback()
   this->GetPVWindow()->EnableMenus();
   // This should delete this source.
   this->GetPVWindow()->RemovePVSource("Sources", this);
+
+  this->GetPVWindow()->SetCurrentPVSourceCallback(current);
 }
 
 //----------------------------------------------------------------------------
@@ -1538,7 +1543,7 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
     // This has to be here because if it is called
     // after the PVData is set we get errors. This 
     // should probably be fixed.
-    this->GetPVWindow()->SetCurrentPVSource(pvs);
+    this->GetPVWindow()->SetCurrentPVSourceCallback(pvs);
     this->GetPVWindow()->ShowCurrentSourceProperties();
     }
 
