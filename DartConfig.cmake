@@ -1,6 +1,6 @@
 # Dashboard is opened for submissions for a 24 hour period starting at
 # the specified NIGHLY_START_TIME. Time is specified in 24 hour format.
-SET (NIGHTLY_START_TIME "0:30:00 EDT")
+SET (NIGHTLY_START_TIME "21:00:00 EDT")
 
 # Dart server to submit results (used by client)
 IF(DROP_METHOD MATCHES http)
@@ -30,4 +30,21 @@ SET (USE_GNATS "On")
 
 # copy over the testing logo
 CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/Resources/ParaViewLogo.gif ${PARAVIEW_BINARY_DIR}/Testing/HTML/TestingResults/Icons/Logo.gif COPYONLY)
+
+# Continuous email delivery variables
+SET (CONTINUOUS_FROM "paraview-dashboard@public.kitware.com")
+SET (SMTP_MAILHOST "public.kitware.com")
+SET (CONTINUOUS_MONITOR_LIST "paraview-dashboard@public.kitware.com andy.cedilnik@kitware.com")
+SET (CONTINUOUS_BASE_URL "${PROJECT_URL}/Testing")
+
+SET (DELIVER_BROKEN_BUILD_EMAIL_WITH_TEST_FAILURES ON)
+SET (DELIVER_BROKEN_BUILD_EMAIL "Continuous")
+SET (EMAIL_FROM "paraview-dashboard@public.kitware.com")
+SET (DARTBOARD_BASE_URL "http://${DROP_SITE}/Testing")
+
+SET (DELIVER_BROKEN_BUILD_EMAIL_WITH_CONFIGURE_FAILURES 1)
+SET (DELIVER_BROKEN_BUILD_EMAIL_WITH_BUILD_ERRORS 1)
+SET (DELIVER_BROKEN_BUILD_EMAIL_WITH_BUILD_WARNINGS 1)
+SET (DELIVER_BROKEN_BUILD_EMAIL_WITH_TEST_NOT_RUNS 1)
+SET (DELIVER_BROKEN_BUILD_EMAIL_WITH_TEST_FAILURES 1)
 
