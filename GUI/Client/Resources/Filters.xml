@@ -493,7 +493,7 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
                       attribute_mode_property="AttributeMode"
                       help="Enter the equation for the new array."/>
     <Documentation>
-The Calculator filter computes new data arrays as functions of existing scalar or vector arrays. The Input menu allows the user to select the data set to which this filter will be applied. The Result Array Name entry box allows the user to specify the name of the array containing the results of the computation. The Attribute Mode menu selects whether to operate on and produce results that are point-centered or cell-centered. If point-centered arrays are used, the resulting array will also be point-centered. The same is true for cell-centered arrays. The Calculator interface operates similarly to a scientific calculator. In creating the function to evaluate, the standard order of operations applies.
+The Calculator filter computes new data arrays as functions of existing scalar or vector arrays. The Input menu allows the user to select the data set to which this filter will be applied. The Result Array Name entry box allows the user to specify the name of the array containing the results of the computation. The Attribute Mode menu selects whether to operate on and produce results that are Pcikpoint-centered or cell-centered. If point-centered arrays are used, the resulting array will also be point-centered. The same is true for cell-centered arrays. The Calculator interface operates similarly to a scientific calculator. In creating the function to evaluate, the standard order of operations applies.
 Each of the calculator functions is described below. Unless otherwise noted, enclose the operand in parentheses using the ( and ) buttons.
 Clear: Erase the current function (displayed in the read-only text box above the calculator buttons).
 /: Divide one scalar by another. The operands for this function are not required to be enclosed in parentheses.
@@ -1851,6 +1851,9 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
              class="vtkDataSet" quantity="Multiple">
       </Input>
     </Filter>
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
     <PointWidget trace_name="Point" variable="WorldPoint"/>
     <SelectionList property="PickCell"
                    label="Pick Type"
@@ -1879,6 +1882,11 @@ The Pick filter operates on any type of data and produces unstructured grid outp
         <ArrayRequirement attribute="Point"/>
       </Input>
     </Filter>
+    <InputMenu trace_name="Source" property="Source"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Source"/>
     <SelectWidget label="Probe object"
                   trace_name="Probe object"
                   property="Input">
