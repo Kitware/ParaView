@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.2");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.3");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 //----------------------------------------------------------------------------
@@ -66,6 +66,7 @@ vtkPVXMLElement::vtkPVXMLElement()
 vtkPVXMLElement::~vtkPVXMLElement()
 {
   this->SetName(0);
+  this->SetId(0);
   unsigned int i;
   for(i=0;i < this->NumberOfAttributes;++i)
     {
