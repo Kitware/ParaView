@@ -985,7 +985,7 @@ help="Set the name of the array to hold the results of this computation"/>
          button_help="Generate streamtraces from a collection of seed points." 
          long_help="Integrate streamlines in a vector field." 
          short_help="Integrate streamlines in a vector field.">
-  <Filter class="vtkPStreamTracer">
+  <Filter class="vtkDistributedStreamTracer">
     <Input name="Input" class="vtkDataSet" quantity="Multiple" > 
       <ArrayRequirement attribute="Point" components="3" /> 
     </Input> 
