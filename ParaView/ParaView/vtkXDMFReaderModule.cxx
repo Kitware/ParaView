@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXDMFReaderModule.h"
 
 #include "vtkCollectionIterator.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWOptionMenu.h"
@@ -57,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.1");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.2");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

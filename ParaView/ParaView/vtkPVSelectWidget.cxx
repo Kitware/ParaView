@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSelectWidget.h"
 
 #include "vtkArrayMap.txx"
+#include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
@@ -52,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.20");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);

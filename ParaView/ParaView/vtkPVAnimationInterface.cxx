@@ -29,6 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWLabeledFrame.h"
@@ -125,7 +126,7 @@ static unsigned char image_goto_end[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.32");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.33");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
