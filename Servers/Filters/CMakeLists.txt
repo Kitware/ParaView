@@ -120,6 +120,8 @@ INCLUDE_DIRECTORIES(
   ${PVFilters_BINARY_DIR}
   ${VTK_SOURCE_DIR}
   ${VTK_BINARY_DIR}
+  ${ParaView_SOURCE_DIR}/Utilities/hdf5
+  ${ParaView_BINARY_DIR}/Utilities/hdf5
   )
 
 SET(kits Common Filtering IO Imaging Rendering Parallel Graphics Hybrid)
@@ -144,6 +146,7 @@ IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)
 TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_HDF5_LIBRARIES})
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkClientServer)
 
 ADD_EXECUTABLE(vtkTestFilters test.cxx)
 TARGET_LINK_LIBRARIES(vtkTestFilters vtkPVFiltersCS)

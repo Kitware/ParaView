@@ -9,7 +9,7 @@ SET( ParaViewSharedNotWrapped_SRCS
   vtkPVProgressHandler.cxx
   )
 
-SET(ParaViewServerNotTclWrapped_SRCS
+SET(ParaViewSharedNotTclWrapped_SRCS
   vtkPVProcessModule.cxx
   vtkPVGeometryFilter.cxx
   vtkPVPolyDataMapper.cxx
@@ -28,7 +28,6 @@ SET( ParaViewServer_SRCS
   vtkPVServerProbe.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVSummaryHelper.cxx
-  vtkPVGenericRenderWindowInteractor.cxx
   )
 
 IF(PARAVIEW_BUILD_DEVELOPMENT)
@@ -58,6 +57,7 @@ IF(XDMF_FOUND)
 ENDIF(XDMF_FOUND)
 
 SET( ParaViewClientNotWrapped_SRCS
+  vtkPVGenericRenderWindowInteractor.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
   vtkPVInteractorStyle.cxx
@@ -300,8 +300,6 @@ IF(PARAVIEW_USE_SAF)
 ENDIF(PARAVIEW_USE_SAF)
 
 SET(ParaView_SRCS ${ParaView_SRCS} ${ParaViewShared_SRCS}
-  ${ParaViewSharedNotWrapped_SRCS} ${ParaViewServerNotTclWrapped_SRCS}
-  ${ParaViewServer_SRCS} ${ParaViewServerNonWrapped_SRCS}
   ${ParaViewClient_SRCS} ${ParaViewClientNotWrapped_SRCS})
 
 # Setup vtkInstantiator registration for this library's classes.
@@ -311,11 +309,8 @@ VTK_MAKE_INSTANTIATOR3(vtkParaViewInstantiator PVInstantiator_SRCS
   VTK_EXPORT
   "${PVGUI_BINARY_DIR}/Client" "")
 
-ADD_LIBRARY(vtkKWParaView ${PVInstantiator_SRCS}
-  ${ParaView_SRCS})
-
-ADD_LIBRARY(vtkParaViewServer ${ParaViewServer_SRCS})
-TARGET_LINK_LIBRARIES(vtkParaViewServer vtkPVFiltersCS vtkKWParaView)
+ADD_LIBRARY(vtkParaViewServer foo.cxx)
+TARGET_LINK_LIBRARIES(vtkParaViewServer vtkPVFiltersCS vtkKWWidgetsTCL)
 
 # load the ClientServer command
 INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
@@ -337,12 +332,16 @@ PV_WRAP_VTK_CS(ParaViewServer PVSERVER "${KIT_WRAP_DEPS}")
 
 # Wrap Tcl code
 SET(VTK_WRAP_TCL3_INIT_DIR "${VTKTclWrapping_SOURCE_DIR}")
-SET(VTK_WRAP_TCL_EXE "${EXECUTABLE_OUTPUT_PATH}/vtkWrapTcl")
-SET(VTK_WRAP_TCL_INIT_EXE "${EXECUTABLE_OUTPUT_PATH}/vtkWrapTclInit")
 INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
 VTK_WRAP_TCL3(vtkKWParaViewTCL ParaViewTCL_SRCS "${ParaViewShared_SRCS};${ParaViewClient_SRCS}" "")
-ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS})
-TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkKWParaView)
+ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
+  ${ParaViewServer_SRCS} 
+  ${ParaViewServerNonWrapped_SRCS}
+  ${ParaViewSharedNotTclWrapped_SRCS}
+  ${ParaViewSharedNotWrapped_SRCS}
+  ${ParaView_SRCS})
+TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkKWWidgetsTCL vtkParaViewServer)
+
 
 
 
@@ -353,24 +352,6 @@ IF(PARAVIEW_BUILD_DEVELOPMENT)
     )
   MARK_AS_ADVANCED(PARAVIEW_BLT_LIBRARY)
 ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
-
-TARGET_LINK_LIBRARIES(vtkKWParaView vtkKWWidgetsTCL vtkClientServer ${PARAVIEW_ADDITIONAL_LIBRARIES})
-IF(PARAVIEW_BUILD_DEVELOPMENT)
-  IF (PARAVIEW_BLT_LIBRARY)
-    TARGET_LINK_LIBRARIES(vtkKWParaView ${PARAVIEW_BLT_LIBRARY})
-  ENDIF (PARAVIEW_BLT_LIBRARY)
-ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
-
-TARGET_LINK_LIBRARIES(vtkKWParaView vtkPVFilters)
-TARGET_LINK_LIBRARIES(vtkKWParaView vtkXdmf)
-
-IF(PARAVIEW_BUILD_DEVELOPMENT)
-  TARGET_LINK_LIBRARIES(vtkKWParaView vtkPVDevelopment)
-ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
-IF(PARAVIEW_USE_ICE_T)
-  TARGET_LINK_LIBRARIES(vtkKWParaView icet icet_mpi icet_strategies)
-  INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
-ENDIF(PARAVIEW_USE_ICE_T)
 
 CONFIGURE_FILE(
   ${PVGUI_SOURCE_DIR}/Client/vtkPVSourceInterfaceDirectories.h.in
@@ -419,10 +400,27 @@ IF(VTK_USE_CARBON)
 ENDIF(VTK_USE_CARBON)
 
 TARGET_LINK_LIBRARIES (paraview 
-  vtkKWParaView 
   vtkParaViewServerCS 
   vtkKWParaViewTCL
-  )
+  vtkClientServer 
+  ${PARAVIEW_ADDITIONAL_LIBRARIES})
+IF(PARAVIEW_BUILD_DEVELOPMENT)
+  IF (PARAVIEW_BLT_LIBRARY)
+    TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${PARAVIEW_BLT_LIBRARY})
+  ENDIF (PARAVIEW_BLT_LIBRARY)
+ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
+
+TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkPVFilters)
+TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkXdmf)
+
+IF(PARAVIEW_BUILD_DEVELOPMENT)
+  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkPVDevelopment)
+ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
+IF(PARAVIEW_USE_ICE_T)
+  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL icet icet_mpi icet_strategies)
+  INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
+ENDIF(PARAVIEW_USE_ICE_T)
+
 
 ADD_EXECUTABLE(ProcessXML ProcessXML.cxx)
 TARGET_LINK_LIBRARIES(ProcessXML vtkCommon kwsys)
