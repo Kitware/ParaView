@@ -103,11 +103,19 @@ public:
   void Stop();
 
   // Description:
-  // Callback that stops the animation that is running.
+  // Callback that enable/disable the animation loop.
   void SetLoop(int v);
   vtkGetMacro(Loop, int);
   vtkBooleanMacro(Loop, int);
   void LoopCheckButtonCallback();
+
+  // Description:
+  // Callback that sets the current time to the beginning of the time range.
+  void GoToBeginning();
+
+  // Description:
+  // Callback that sets the current time to the end of the time range.
+  void GoToEnd();
 
   // ------------------------------------------------
 
@@ -177,6 +185,8 @@ protected:
   vtkKWWidget *ControlButtonFrame;
   vtkKWPushButton *PlayButton;
   vtkKWPushButton *StopButton;
+  vtkKWPushButton *GoToBeginningButton;
+  vtkKWPushButton *GoToEndButton;
   vtkKWCheckButton *LoopCheckButton;
 
   vtkKWScale *TimeScale;
