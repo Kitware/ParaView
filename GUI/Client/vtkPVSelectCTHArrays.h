@@ -64,7 +64,7 @@ public:
   // Description:
   // Called when the Accept button is pressed.  It moves the widget values to the 
   // VTK calculator filter.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:

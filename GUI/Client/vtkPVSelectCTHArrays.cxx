@@ -33,10 +33,11 @@
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
 #include "vtkCollectionIterator.h"
+#include "vtkSMStringVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.14");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.15");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -163,32 +164,43 @@ void vtkPVSelectCTHArrays::Inactivate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectCTHArrays::AcceptInternal(vtkClientServerID vtkSourceID)
+void vtkPVSelectCTHArrays::Accept()
 {
   int num, idx;
   const char* arrayName;
   int state;
+  int modFlag = this->GetModifiedFlag();
 
   if ( ! this->Active)
     {
     return;
     }
-
+  
   num = this->ArraySelectionList->GetNumberOfItems();
 
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (this->ModifiedFlag)
+  if (modFlag)
     {
     this->Inactivate();
     }
+ 
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (!svp)
+    {
+    return;
+    }
 
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke <<  vtkSourceID
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->PVSource->GetVTKSourceID(0)
                   << "RemoveAllVolumeArrayNames"
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER);
 
+  int count = 0;
+  
   // Now loop through the input mask setting the selection states.
   for (idx = 0; idx < num; ++idx)
     {
@@ -196,15 +208,27 @@ void vtkPVSelectCTHArrays::AcceptInternal(vtkClientServerID vtkSourceID)
     if (state)
       {
       arrayName = this->ArraySelectionList->GetItem(idx); 
-      pm->GetStream() << vtkClientServerStream::Invoke <<  vtkSourceID
-                      << "AddVolumeArrayName"
-                      << arrayName
-                      << vtkClientServerStream::End;   
-      pm->SendStream(vtkProcessModule::DATA_SERVER);
+      svp->SetElement(count, arrayName);
+      count++;
       }
     }
 
   this->ModifiedFlag = 0;
+
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 
@@ -378,6 +402,14 @@ void vtkPVSelectCTHArrays::SaveInBatchScript(ofstream *file)
   const char* arrayName;
   int num, idx;
 
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  
+  if (sourceID.ID == 0 || !this->SMPropertyName)
+    {
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
+    }
+
   num = this->SelectedArrayNames->GetNumberOfStrings();
 
   *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
@@ -387,10 +419,9 @@ void vtkPVSelectCTHArrays::SaveInBatchScript(ofstream *file)
   // Now loop through the input mask setting the selection states.
   for (idx = 0; idx < num; ++idx)
     {
-    arrayName = this->SelectedArrayNames->GetString(idx);
-    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-          << " GetProperty AddVolumeArrayName] SetElement "
-          << idx << " {" << arrayName << "}\n";  
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+          << this->SMPropertyName << "] SetElement " << idx << " "
+          << this->SelectedArrayNames->GetString(idx) << endl;
     }
 }
 
