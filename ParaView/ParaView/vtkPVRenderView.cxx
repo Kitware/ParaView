@@ -111,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.265");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.265.2.1");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -815,6 +815,8 @@ void vtkPVRenderView::SetSourcesBrowserAlwaysShowName(int s)
 void vtkPVRenderView::CreateViewProperties()
 {
   this->vtkKWView::CreateViewProperties();
+
+  Sleep(15000);
 
   this->BackgroundColor->SetBalloonHelpString("Change the background color of the 3D View window");
 

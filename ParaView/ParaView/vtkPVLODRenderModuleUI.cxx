@@ -90,7 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5.2.1");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -115,7 +115,7 @@ vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
   this->LODResolutionScale = vtkKWScale::New();
   this->LODResolutionValue = vtkKWLabel::New();
 
-  this->LODThreshold = 2.0;
+  this->LODThreshold = 5.0;
   this->LODResolution = 50;
 
   this->RenderInterruptsEnabled = 1;
@@ -220,7 +220,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   this->LODThresholdScale->SetParent(this->LODScalesFrame);
   this->LODThresholdScale->Create(this->Application, 
                                   "-resolution 0.1 -orient horizontal");
-  this->LODThresholdScale->SetRange(0.0, 20.0);
+  this->LODThresholdScale->SetRange(0.0, 100.0);
   this->LODThresholdScale->SetResolution(0.1);
 
   this->LODThresholdValue->SetParent(this->LODScalesFrame);

@@ -4,11 +4,9 @@ INCLUDE_REGULAR_EXPRESSION("^(vtk).*$")
 
 #-----------------------------------------------------------------------------
 # ParaView version number.  An even minor number corresponds to releases.
-SET(PARAVIEW_VERSION_MAJOR 1)
-SET(PARAVIEW_VERSION_MINOR 0)
+SET(PARAVIEW_VERSION_MAJOR 0)
+SET(PARAVIEW_VERSION_MINOR 7)
 SET(PARAVIEW_VERSION_PATCH 0)
-SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
-SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
 
 SET (LIBRARY_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all executables.")
@@ -217,7 +215,7 @@ IF (PARAVIEW_CAN_BUILD)
                   ${PARAVIEW_BINARY_DIR}/Widgets
                   ${PARAVIEW_BINARY_DIR}/ParaView)
 
- SET (PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/paraview)
+ SET (PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/ParaView)
 
 # Include the standard Dart testing module
  INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
@@ -237,10 +235,7 @@ ENDIF(BUILD_TESTING)
  INCLUDE (${PARAVIEW_BINARY_DIR}/LocalUserOptions.cmake OPTIONAL)
  INCLUDE (${PARAVIEW_SOURCE_DIR}/LocalUserOptions.cmake OPTIONAL)
 
- INSTALL_FILES(/share/paraview-${PARAVIEW_VERSION}/Data .bin Data/Data/combq Data/Data/combxyz)
- INSTALL_FILES(/share/paraview-${PARAVIEW_VERSION}/Data .vtk Data/Data/blow)
+ INSTALL_FILES(/share/ParaView/Data .bin Data/Data/combq Data/Data/combxyz)
+ INSTALL_FILES(/share/ParaView/Data .vtk Data/Data/blow)
 
 ENDIF (PARAVIEW_CAN_BUILD)
-
-# Tell the KW components where to install their libraries.
-SET(KW_INSTALL_LIB_DIR /lib/paraview-${PARAVIEW_VERSION})
