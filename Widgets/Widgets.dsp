@@ -274,6 +274,14 @@ SOURCE=.\vtkKWViewTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWVolumeComposite.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWVolumeCompositeTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWWidget.cxx
 # End Source File
 # Begin Source File
@@ -909,6 +917,10 @@ InputName=vtkKWViewCollection
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWVolumeComposite.h
 # End Source File
 # Begin Source File
 
