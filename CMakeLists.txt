@@ -73,7 +73,7 @@ SET(VTK_WRAP_TCL OFF)
 SET(VTK_WRAP_PYTHON OFF)
 SET(VTK_WRAP_JAVA OFF)
 
-SET(VTK_DIR "${ParaView_BINARY_DIR}/VTK")
+SET(VTK_DIR "${ParaView_BINARY_DIR}/VTK" CACHE INTERNAL "" FORCE)
 SET(VTK_FOUND 1)
 
 # Specify python build so that we can use vtkTkRenderWidget with no
@@ -89,6 +89,7 @@ ADD_DEFINITIONS(-DPARAVIEW_NEW_SOURCE_ORGANIZATION)
 #########################################################################
 # Configure HDF5
 SET(PARAVIEW_HDF5_LIBRARIES vtkhdf5)
+SET(VTK_ZLIB_LIBRARIES 1)
 SUBDIRS(Utilities/hdf5)
 
 #########################################################################
