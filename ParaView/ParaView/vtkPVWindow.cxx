@@ -3217,7 +3217,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.330 $");
+  this->ExtractRevision(os,"$Revision: 1.331 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3239,7 +3239,6 @@ void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
     = this->SourceLists->NewIterator();
   scit->InitTraversal();
   vtkIndent nindent = indent.GetNextIndent();
-  vtkIndent nnindent = indent.GetNextIndent();
   while ( !scit->IsDoneWithTraversal() )
     {
     vtkPVSourceCollection* col = 0;
@@ -3501,7 +3500,6 @@ void vtkPVWindow::DeleteSourceAndOutputs(vtkPVSource* source)
     {
     return;
     }
-  int cc;
   while ( source->GetNumberOfPVConsumers() > 0 )
     {
     vtkPVData* output = source->GetNthPVOutput(0);
@@ -3516,10 +3514,17 @@ void vtkPVWindow::DeleteSourceAndOutputs(vtkPVSource* source)
 //----------------------------------------------------------------------------
 void vtkPVWindow::DeleteAllSourcesCallback()
 {
+  vtkPVSourceCollection* col = this->GetSourceList("Sources");
+  if ( col->GetNumberOfItems() <= 0 )
+    {
+    return;
+    }
   if ( vtkKWMessageDialog::PopupYesNo(
-         this->Application, this, "Delete All The Sources", 
+         this->Application, this, "DeleteAllTheSources",
+         "Delete All The Sources", 
          "Are you sure you want to delete all the sources?", 
-         vtkKWMessageDialog::QuestionIcon))
+         vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
+         vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault ))
     {
     this->DeleteAllSources();
     }
