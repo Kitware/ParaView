@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.296");
+vtkCxxRevisionMacro(vtkPVData, "1.297");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -3144,7 +3144,7 @@ void vtkPVData::SaveState(ofstream *file)
     {
     *file << "$kw(" << this->GetTclName() << ") DrawVolume\n";
     *file << "$kw(" << this->GetTclName() << ") VolumeRenderPointField {" 
-            << (this->VolumeScalarsMenu->GetValue() + 7) << "} " << endl;
+            << (this->VolumeScalarsMenu->GetValue()+6) << "} " << endl;
     }
 
   if (strcmp(this->InterpolationMenu->GetValue(),"Flat") == 0)
