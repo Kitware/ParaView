@@ -104,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.166");
+vtkCxxRevisionMacro(vtkPVApplication, "1.167");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -507,7 +507,7 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "--tile-dimensions-y", "-tdy",
   "-tdy=Y where Y is number of displays in each column of the display.",
 #endif
-#ifdef VTK_MANGLE_MESA
+#ifdef VTK_USE_MANGLED_MESA
   "--use-software-rendering", "-r", 
   "Use software (Mesa) rendering (supports off-screen rendering).", 
   "--use-satellite-software", "-s", 
@@ -867,7 +867,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->StartEmpty = 1;
     }
 
-#ifdef VTK_MANGLE_MESA
+#ifdef VTK_USE_MANGLED_MESA
   
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
                                           index) == VTK_OK ||
@@ -926,7 +926,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->Script("option add *selectColor #666");
 #endif
 
-#ifdef VTK_MANGLE_MESA
+#ifdef VTK_USE_MANGLED_MESA
   if (this->UseSoftwareRendering)
     {
     this->BroadcastScript("vtkGraphicsFactory _graphics_fact\n"

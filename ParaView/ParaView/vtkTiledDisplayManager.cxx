@@ -33,15 +33,13 @@
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
-#elif defined(VTK_USE_MESA)
-#include "vtkMesaRenderWindow.h"
 #endif
 
 #ifdef VTK_USE_MPI
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.4");
+vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.5");
 vtkStandardNewMacro(vtkTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkTiledDisplayManager, RenderView, vtkObject);
