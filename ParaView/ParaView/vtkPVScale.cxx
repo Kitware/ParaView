@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.25");
+vtkCxxRevisionMacro(vtkPVScale, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -70,6 +70,7 @@ vtkPVScale::vtkPVScale()
   this->RangeSourceVariable = 0;
   this->Property = 0;
   this->DefaultValue = 0.0;
+  this->AcceptedValueInitialized = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -244,8 +245,6 @@ void vtkPVScale::SetValue(float val)
 //----------------------------------------------------------------------------
 void vtkPVScale::AcceptInternal(vtkClientServerID sourceID)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if (sourceID.ID && this->VariableName)
     { 
     float scalar;
@@ -291,7 +290,7 @@ void vtkPVScale::ResetInternal()
     pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
                     << str.str() << vtkClientServerStream::End;
     pm->SendStreamToServerRoot();
-    int range[2] = { 0.0, 0.0 };
+    int range[2] = { 0, 0 };
     pm->GetLastServerResult().GetArgument(0,0, range, 2);
     this->Script("eval %s SetRange %i %i", this->Scale->GetTclName(), 
       range[0], range[1]);
