@@ -30,7 +30,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.7");
+vtkCxxRevisionMacro(vtkPickFilter, "1.8");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -48,12 +48,17 @@ vtkPickFilter::vtkPickFilter ()
   this->PointMap = 0;
   this->RegionPointIds = 0;
   this->BestInputIndex = -1;
+  this->GlobalIdArrayName = 0;
+  this->SetGlobalIdArrayName("GlobalId");
+  this->Id = 0;
+  this->UseIdToPick = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkPickFilter::~vtkPickFilter ()
 {
   this->SetController(0);
+  this->SetGlobalIdArrayName(0);  
 }
 
 //----------------------------------------------------------------------------
@@ -72,9 +77,17 @@ vtkDataSet *vtkPickFilter::GetInput(int idx)
 // Specify the input data or filter.
 void vtkPickFilter::AddInput(vtkDataSet *input)
 {
-  int i = this->GetNumberOfInputs();
-  this->vtkProcessObject::SetNthInput(i, input);
+  this->vtkProcessObject::AddInput(input);
 }
+
+//----------------------------------------------------------------------------
+// Remove a dataset from the list of data to append.
+void vtkPickFilter::RemoveInput(vtkDataSet *ds)
+{
+  this->vtkProcessObject::RemoveInput(ds);
+  this->vtkProcessObject::SqueezeInputArray();
+}
+
 
 //----------------------------------------------------------------------------
 // Specify the input data or filter.
@@ -82,9 +95,15 @@ void vtkPickFilter::RemoveAllInputs()
 {
   int num, idx;
   num = this->NumberOfInputs;
-  for (idx = 0; idx < num; ++idx)
+  vtkDataSet* input; 
+  if (num > 0)
     {
-    this->SetNthInput(idx, NULL);
+    this->Modified();
+    }
+  for (idx = num-1; idx >= 0; --idx)
+    {
+    input = this->GetInput(idx);
+    this->RemoveInput(input);
     }
 }
 
@@ -468,6 +487,13 @@ void vtkPickFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Pick: "
      << (this->PickCell ? "Cell" : "Point")
      << endl;
+
+  os << indent << "UseIdToPick: " << this->UseIdToPick << endl;
+  os << indent << "Id: " << this->Id << endl;
+  if (this->GlobalIdArrayName)
+    {
+    os << indent << "GlobalIdArrayName: " << this->GlobalIdArrayName << endl;
+    }
 }
 
 

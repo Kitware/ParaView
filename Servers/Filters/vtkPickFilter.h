@@ -43,6 +43,7 @@ public:
   void AddInput(vtkDataSet* input);
   void AddInput(vtkDataObject*){vtkErrorMacro("NotDefined");}
   vtkDataSet* GetInput(int idx);
+  void RemoveInput(vtkDataSet* input);
   void RemoveAllInputs();
 
   // Description:
@@ -51,11 +52,29 @@ public:
   vtkGetVector3Macro(WorldPoint,double);
 
   // Description:
-  // Select whether you are picking point or cells.
-  // The default value of this flag is off (picking points).
+  // Select whether you are us9ing a world point to pick, or
+  // a cell / point id.
   vtkSetMacro(PickCell,int);
   vtkGetMacro(PickCell,int);
   vtkBooleanMacro(PickCell,int);
+
+  // Description:
+  // Select whether you are picking point or cells.
+  // The default value of this flag is off (use world point).
+  vtkSetMacro(UseIdToPick,int);
+  vtkGetMacro(UseIdToPick,int);
+  vtkBooleanMacro(UseIdToPick,int);
+  
+  // Description:
+  // If using an Id to pick, set the ID with this method.
+  vtkSetMacro(Id,vtkIdType);
+  vtkGetMacro(Id,vtkIdType);
+  
+  // Descrption:
+  // If the input point/cell attributes has an array with this name,
+  // then it is used to find the point.  Defaults to GlobalId.
+  vtkSetStringMacro(GlobalIdArrayName);
+  vtkGetStringMacro(GlobalIdArrayName);
   
   // Description:
   // This is set by default (if compiled with MPI).
@@ -78,6 +97,10 @@ protected:
 
   // Input pick point.
   double WorldPoint[3];
+
+  int UseIdToPick;
+  vtkIdType Id;
+  char* GlobalIdArrayName;
 
   vtkMultiProcessController* Controller;
 
