@@ -245,9 +245,9 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       }
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_EXTENT)
       {
-      this->Script("eval %s %s [[%s GetInput] GetWholeExtent]",
+      this->Script("eval %s %s [%s GetWholeExtent]",
 		   pvs->GetVTKSourceTclName(), mInt->GetSetCommand(),
-		   pvs->GetVTKSourceTclName());
+		   pvs->GetNthPVInput(0)->GetVTKDataTclName());
       pvs->AddVector6Entry(mInt->GetVariableName(), "", "", "", "", "", "",
 			   mInt->GetSetCommand(),
 			   mInt->GetGetCommand(),
