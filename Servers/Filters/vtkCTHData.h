@@ -148,9 +148,9 @@ public:
   int* GetBlockCellDimensions(int blockId);
   void GetBlockCellDimensions(int blockId, int dims[3]);
   int* GetBlockPointExtent(int blockId);
-  void GetBlockPointExtent(int blockId, int ext[3]);
+  void GetBlockPointExtent(int blockId, int ext[6]);
   int* GetBlockCellExtent(int blockId);
-  void GetBlockCellExtent(int blockId, int ext[3]);
+  void GetBlockCellExtent(int blockId, int ext[6]);
 
   // Description:
   // Convenience method that computes bounds from level and extent.
