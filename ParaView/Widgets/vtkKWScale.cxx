@@ -58,7 +58,7 @@ vtkKWScale::vtkKWScale()
 {
   this->CommandFunction = vtkKWScaleCommand;
   this->Command = NULL;
-  this->StartCommand = NULL;
+  this->StartCommand = 0;
   this->EndCommand = NULL;
   this->Value = 0;
   this->Resolution = 1;
@@ -68,6 +68,10 @@ vtkKWScale::vtkKWScale()
   this->ScaleWidget->SetParent(this);
   this->Range[0] = 0;
   this->Range[1] = 1;  
+
+  this->SetStartCommand(0, 0);
+  this->SetEndCommand(0, 0);
+  this->SetCommand(0,0);
 }
 
 vtkKWScale::~vtkKWScale()
@@ -246,7 +250,14 @@ void vtkKWScale::SetStartCommand(vtkKWObject* Object, const char * MethodAndArgS
     delete [] this->StartCommand;
     }
   ostrstream command;
-  command << Object->GetTclName() << " " << MethodAndArgString << ends;
+  if ( !Object )
+    {
+    command << "{}" << ends;
+    }
+  else
+    {
+    command << Object->GetTclName() << " " << MethodAndArgString << ends;
+    }
   this->StartCommand = command.str();
 }
 
@@ -257,7 +268,14 @@ void vtkKWScale::SetEndCommand(vtkKWObject* Object, const char * MethodAndArgStr
     delete [] this->EndCommand;
     }
   ostrstream command;
-  command << Object->GetTclName() << " " << MethodAndArgString << ends;
+  if ( !Object )
+    {
+    command << "{}" << ends;
+    }
+  else
+    {
+    command << Object->GetTclName() << " " << MethodAndArgString << ends;
+    }
   this->EndCommand = command.str();
 }
 
@@ -269,7 +287,14 @@ void vtkKWScale::SetCommand(vtkKWObject* CalledObject, const char *CommandString
     delete [] this->Command;
     }
   ostrstream command;
-  command << CalledObject->GetTclName() << " " << CommandString << ends;
+  if ( !CalledObject )
+    {
+    command << "{}" << ends;
+    }
+  else
+    {
+    command << CalledObject->GetTclName() << " " << CommandString << ends;
+    }
   this->Command = command.str();
 }
 
