@@ -20,6 +20,7 @@ vtkKWEntry.cxx
 vtkKWExtent.cxx 
 vtkKWFrame.cxx
 vtkKWGenericComposite.cxx 
+vtkKWHeaderAnnotation.cxx 
 vtkKWLabel.cxx
 vtkKWLabeledCheckButton.cxx
 vtkKWLabeledCheckButtonSet.cxx 
@@ -45,6 +46,8 @@ vtkKWOKCancelDialog.cxx
 vtkKWObject.cxx 
 vtkKWOptionMenu.cxx 
 vtkKWPopupButton.cxx 
+vtkKWPopupFrame.cxx 
+vtkKWPopupFrameCheckButton.cxx 
 vtkKWProgressGauge.cxx 
 vtkKWPushButton.cxx 
 vtkKWPushButtonSet.cxx 

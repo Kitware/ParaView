@@ -42,38 +42,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWCornerAnnotation_h
 #define __vtkKWCornerAnnotation_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWPopupFrameCheckButton.h"
 
 class vtkCornerAnnotation;
-class vtkKWChangeColorButton;
-class vtkKWCheckButton;
 class vtkKWFrame;
 class vtkKWGenericComposite;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
 class vtkKWLabeledPopupButton;
 class vtkKWLabeledText;
-class vtkKWPopupButton;
 class vtkKWRenderWidget;
 class vtkKWScale;
 class vtkKWTextProperty;
 class vtkKWView;
 
-class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWWidget
+class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWPopupFrameCheckButton
 {
 public:
   static vtkKWCornerAnnotation* New();
-  vtkTypeRevisionMacro(vtkKWCornerAnnotation,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWCornerAnnotation,vtkKWPopupFrameCheckButton);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Display the visibility check button only, and the rest of the UI as a
-  // popup (default is off).
-  // This has to be called before Create().
-  vtkSetMacro(PopupMode, int);
-  vtkGetMacro(PopupMode, int);
-  vtkBooleanMacro(PopupMode, int);
-  
   // Description:
   // Makes the text property sub-widget popup (instead of displaying the
   // whole text property UI, which can be long).
@@ -110,7 +98,7 @@ public:
   // Description:
   // Set/Get the annotation visibility
   virtual void SetVisibility(int i);
-  virtual int  GetVisibility();
+  virtual int GetVisibility();
   vtkBooleanMacro(Visibility, int);
 
   // Description:
@@ -131,14 +119,6 @@ public:
   virtual void SetMaximumLineHeightNoTrace(float);
 
   // Description:
-  // Disable the popup button when the visibility button is not checked.
-  // You will have to call the Update() method manually though, to reflect
-  // that state.
-  virtual void SetDisablePopupButtonWhenNotDisplayed(int);
-  vtkBooleanMacro(DisablePopupButtonWhenNotDisplayed, int);
-  vtkGetMacro(DisablePopupButtonWhenNotDisplayed, int);
-
-  // Description:
   // Set the event invoked when the anything in the annotation is changed.
   // Defaults to vtkKWEvent::ViewAnnotationChangedEvent
   vtkSetMacro(AnnotationChangedEvent, int);
@@ -146,7 +126,7 @@ public:
 
   // Description:
   // Callbacks
-  virtual void CornerVisibilityCallback();
+  virtual void CheckButtonCallback();
   virtual void CornerTextCallback(int i);
   virtual void MaximumLineHeightCallback();
   virtual void MaximumLineHeightEndCallback();
@@ -154,9 +134,8 @@ public:
 
   // Description:
   // Access to sub-widgets
-  vtkGetObjectMacro(CornerVisibilityButton, vtkKWCheckButton);
-  vtkGetObjectMacro(PopupButton, vtkKWPopupButton);
-  vtkGetObjectMacro(Frame, vtkKWLabeledFrame);
+  virtual vtkKWCheckButton* GetCornerVisibilityButton()
+    { return this->GetCheckButton(); };
 
   // Description:
   // Update the GUI according to the value of the ivars
@@ -189,13 +168,8 @@ protected:
 
   // GUI
 
-  int                     PopupMode;
   int                     PopupTextProperty;
-  int                     DisablePopupButtonWhenNotDisplayed;
 
-  vtkKWPopupButton        *PopupButton;
-  vtkKWLabeledFrame       *Frame;
-  vtkKWCheckButton        *CornerVisibilityButton;
   vtkKWFrame              *CornerFrame;
   vtkKWLabeledText        *CornerText[4];
   vtkKWFrame              *PropertiesFrame;
@@ -204,6 +178,12 @@ protected:
   vtkKWLabeledPopupButton *TextPropertyPopupButton;
 
   void Render();
+
+  // Get the value that should be used to set the checkbutton state
+  // (i.e. depending on the value this checkbutton is supposed to reflect,
+  // for example, an annotation visibility).
+  // This does *not* return the state of the widget.
+  virtual int GetCheckButtonState() { return this->GetVisibility(); };
 
   // Update the enable state. This should propagate similar calls to the
   // internal widgets.
