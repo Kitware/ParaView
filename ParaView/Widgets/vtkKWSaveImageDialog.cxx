@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.15");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.16");
 
 
 
@@ -132,8 +132,9 @@ void vtkKWSaveImageDialog::Invoke()
 
 void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* /*args*/)
 {
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("SaveImageDialog already created");
     return;
