@@ -84,8 +84,7 @@ protected:
   vtkXYPlotWidget* XYPlotWidget;
   vtkXYPlotWidgetObserver* XYPlotObserver;
 
-  int InstanceCount;
-  
+private:
   vtkPVProbe(const vtkPVProbe&); // Not implemented
   void operator=(const vtkPVProbe&); // Not implemented
 };

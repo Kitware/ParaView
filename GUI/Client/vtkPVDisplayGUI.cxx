@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.26");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -92,8 +92,6 @@ int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVDisplayGUI::vtkPVDisplayGUI()
 {
-  static int instanceCount = 0;
-
   this->CommandFunction = vtkPVDisplayGUICommand;
 
   this->PVSource = 0;
@@ -104,10 +102,6 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->ScalarBarCheckVisible = 1;
   this->InterpolateColorsCheckVisible = 1;
 
-  // Create a unique id for creating tcl names.
-  ++instanceCount;
-  this->InstanceCount = instanceCount;
-    
   this->ColorFrame = vtkKWFrameLabeled::New();
   this->VolumeAppearanceFrame = vtkKWFrameLabeled::New();
   this->DisplayStyleFrame = vtkKWFrameLabeled::New();

@@ -50,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.136");
+vtkCxxRevisionMacro(vtkPVProbe, "1.137");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -88,8 +88,6 @@ public:
 //----------------------------------------------------------------------------
 vtkPVProbe::vtkPVProbe()
 {
-  static int instanceCount = 0;
-  
   this->CommandFunction = vtkPVProbeCommand;
 
   this->SelectedPointFrame = vtkKWWidget::New();
@@ -103,10 +101,6 @@ vtkPVProbe::vtkPVProbe()
   
   this->XYPlotWidget = 0;
   this->XYPlotObserver = NULL;
-  
-  // Create a unique id for creating tcl names.
-  ++instanceCount;
-  this->InstanceCount = instanceCount;
   
   this->ReplaceInputOff();
 

@@ -300,8 +300,6 @@ protected:
   vtkPVDisplayGUI();
   ~vtkPVDisplayGUI();
 
-  int InstanceCount;
-  
   // Order of these calls makes a difference.  
   // might want to merge some of them.
   // UpdateColorGUI calls them all.
@@ -409,6 +407,7 @@ protected:
   void UpdateActorControl();  
   void UpdateActorControlResolutions();
 
+private:
   vtkPVDisplayGUI(const vtkPVDisplayGUI&); // Not implemented
   void operator=(const vtkPVDisplayGUI&); // Not implemented
 };
