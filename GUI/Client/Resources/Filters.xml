@@ -1251,31 +1251,31 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
                    trace_name="TriangleQualityMeasure"
                    label="Triangle Quality Measure"
                    help="Select the quality measure used to evaluate triangle quality. The radius ratio is the size of a circle circumscribed by a triangle's 3 vertices divided by the size of a circle tangent to a triangle's 3 edges. The edge ratio is the ratio of the longest edge length to the shortest edge length.">
-      <Item name="Radius Ratio" value="0"/>
+      <Item name="Edge Ratio" value="0"/>
       <Item name="Aspect Ratio" value="1"/>
-      <Item name="Frobenius Norm" value="2"/>
-      <Item name="Edge Ratio" value="3"/>
+      <Item name="Radius Ratio" value="2"/>
+      <Item name="Frobenius Norm" value="3"/>
       <Item name="Minimal Angle" value="6"/>
     </SelectionList>
     <SelectionList property="QuadQualityMeasure"
                    trace_name="QuadQualityMeasure"
                    label="Quadrilateral Quality Measure"
                    help="Select the quality measure used to evaluate quadrilateral quality">
-      <Item name="Radius Ratio" value="0"/>
+      <Item name="Edge Ratio" value="0"/>
       <Item name="Aspect Ratio" value="1"/>
+      <Item name="Radius Ratio" value="2"/>
       <Item name="Average Frobenius Norm" value="4"/>
       <Item name="Maximal Frobenius Norm" value="5"/>
-      <Item name="Edge Ratio" value="3"/>
       <Item name="Minimal Angle" value="6"/>
     </SelectionList>
     <SelectionList property="TetQualityMeasure"
                    trace_name="TetQualityMeasure"
                    label="Tet Quality Measure"
                    help="Select the quality measure used to evaluate tetrahedral quality. The radius ratio is the size of a sphere circumscribed by a tetrahedron's 4 vertices divided by the size of a circle tangent to a tetrahedron's 4 faces. The edge ratio is the ratio of the longest edge length to the shortest edge length.">
-      <Item name="Radius Ratio" value="0"/>
+      <Item name="Edge Ratio" value="0"/>
       <Item name="Aspect Ratio" value="1"/>
-      <Item name="Frobenius Norm" value="2"/>
-      <Item name="Edge Ratio" value="3"/>
+      <Item name="Radius Ratio" value="2"/>
+      <Item name="Frobenius Norm" value="3"/>
       <Item name="Minimal Dihedral Angle" value="6"/>
     </SelectionList>
     <Documentation>
