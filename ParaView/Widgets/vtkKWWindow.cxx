@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.179");
+vtkCxxRevisionMacro(vtkKWWindow, "1.180");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1004,6 +1004,8 @@ void vtkKWWindow::LoadScript()
   loadScriptDialog->SetFileTypes(filetypes.str());
   filetypes.rdbuf()->freeze(0);
 
+  int enabled = this->GetEnabled();
+  this->SetEnabled(0);
   if (loadScriptDialog->Invoke() && 
       vtkString::Length(loadScriptDialog->GetFileName()) > 0)
     {
@@ -1018,6 +1020,7 @@ void vtkKWWindow::LoadScript()
       this->LoadScript(loadScriptDialog->GetFileName());
       }
     }
+  this->SetEnabled(enabled);
   loadScriptDialog->Delete();
 }
 

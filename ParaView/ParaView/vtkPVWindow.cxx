@@ -144,7 +144,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.493");
+vtkCxxRevisionMacro(vtkPVWindow, "1.494");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2314,12 +2314,15 @@ void vtkPVWindow::SaveBatchScript()
   exportDialog->SetTitle("Save Batch Script");
   exportDialog->SetDefaultExtension(".pvb");
   exportDialog->SetFileTypes("{{ParaView Batch Script} {.pvb}} {{All Files} {*}}");
+  int enabled = this->GetEnabled();
+  this->SetEnabled(0);
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0)
     {
     this->SaveBatchScript(exportDialog->GetFileName());
     this->SaveLastPath(exportDialog, "SaveBatchLastPath");
     }
+  this->SetEnabled(enabled);
   exportDialog->Delete();
 }
 
@@ -2724,12 +2727,15 @@ void vtkPVWindow::SaveState()
   exportDialog->SetTitle("Save State");
   exportDialog->SetDefaultExtension(".pvs");
   exportDialog->SetFileTypes("{{ParaView State} {.pvs}} {{All Files} {*}}");
+  int enabled = this->GetEnabled();
+  this->SetEnabled(0);
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0)
     {
     this->SaveState(exportDialog->GetFileName());
     this->SaveLastPath(exportDialog, "SaveStateLastPath");
     }
+  this->SetEnabled(enabled);
   exportDialog->Delete();
 }
 //-----------------------------------------------------------------------------
@@ -3498,12 +3504,15 @@ void vtkPVWindow::SaveTrace()
   exportDialog->SetTitle("Save ParaView Trace");
   exportDialog->SetDefaultExtension(".pvs");
   exportDialog->SetFileTypes("{{ParaView Trace} {.pvs}} {{All Files} {*}}");
+  int enabled = this->GetEnabled();
+  this->SetEnabled(0);
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0 &&
        this->SaveTrace(exportDialog->GetFileName()) )
     {
     this->SaveLastPath(exportDialog, "SaveTracePath");
     }
+  this->SetEnabled(enabled);
   exportDialog->Delete();
 }
 
@@ -3684,11 +3693,14 @@ int vtkPVWindow::OpenPackage()
   loadDialog->SetTitle("Open ParaView Package");
   loadDialog->SetDefaultExtension(".xml");
   loadDialog->SetFileTypes("{{ParaView Package Files} {*.xml}} {{All Files} {*}}");
+  int enabled = this->GetEnabled();
+  this->SetEnabled(0);
   if ( loadDialog->Invoke() && this->OpenPackage(loadDialog->GetFileName()) )
     {
     this->SaveLastPath(loadDialog, "PackagePath");
     res = 1;
     }
+  this->SetEnabled(enabled);
   loadDialog->Delete();
   return res;
 }
