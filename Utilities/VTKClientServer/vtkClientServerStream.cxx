@@ -134,6 +134,15 @@ public:
         }
       }
     ~ObjectsType() { this->Clear(); }
+    ObjectsType& operator=(const ObjectsType& that)
+      {
+        Superclass::operator=(that);
+        for(Superclass::iterator i = this->begin(); i != this->end(); ++i)
+          {
+          (*i)->Register(this->Owner);
+          }
+        return *this;
+      }
     vtkObjectBase* Owner;
 
     void Insert(vtkObjectBase* obj)
