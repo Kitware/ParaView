@@ -115,6 +115,18 @@ public:
   void SetBind(const char *event, const char *widget, const char *command);
 
   // Description:
+  // A method to set binding on the object.
+  // This method sets binding:
+  // bind all event { widget command }  
+  void SetBindAll(const char *event, const char *widget, const char *command);
+
+  // Description:
+  // A method to set binding on the object.
+  // This method sets binding:
+  // bind all event { command }  
+  void SetBindAll(const char *event, const char *command);
+
+  // Description:
   // Set focus to this widget.
   void Focus();
 

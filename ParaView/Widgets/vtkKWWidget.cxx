@@ -249,6 +249,18 @@ void vtkKWWidget::SetBind(const char *event, const char *widget, const char *com
 			    event, widget, command);
 }
 
+void vtkKWWidget::SetBindAll(const char *event, const char *widget, const char *command)
+{
+  this->Application->Script("bind all %s { %s %s }", 
+			    event, widget, command);
+}
+
+void vtkKWWidget::SetBindAll(const char *event, const char *command)
+{
+  this->Application->Script("bind all %s { %s }", 
+			    event, command);
+}
+
 void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandString)
 {
   char* command = this->CreateCommand(CalledObject, CommandString);
@@ -303,7 +315,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.20 $");
+  this->ExtractRevision(os,"$Revision: 1.21 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()
