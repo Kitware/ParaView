@@ -65,7 +65,7 @@ public:
   // Set and get the length and width of the widget
   vtkSetMacro(Length, int);
   vtkGetMacro(Length, int);
-  vtkSetMacro(Height, int);
+  void SetHeight(int height);
   vtkGetMacro(Height, int);
   
   // Description:
