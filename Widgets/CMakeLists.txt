@@ -1,4 +1,4 @@
-SOURCE_FILES( Widgets_SRCS
+SOURCE_FILES( KWWidgets_SRCS
 kwinit
 vtkKWComposite 
 vtkKWView 
@@ -48,12 +48,12 @@ vtkKWComposite
 vtkKWView 
 )
 
-ADD_LIBRARY(vtkKWWidgets Widgets_SRCS)
+ADD_LIBRARY(vtkKWWidgets KWWidgets_SRCS)
 
 WRAP_EXCLUDE_FILES(kwinit)
 
-VTK_WRAP_TCL(vtkKWWidgetsTCL WidgetsTCL_SRCS Widgets_SRCS)
-ADD_LIBRARY(vtkKWWidgetsTCL WidgetsTCL_SRCS)
+VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
+ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS)
 TARGET_LINK_LIBRARIES (vtkKWWidgetsTCL vtkCommonTCL vtkFilteringTCL   
                        vtkGraphicsTCL vtkImagingTCL vtkRenderingTCL vtkIOTCL)
 
