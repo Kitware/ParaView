@@ -15,7 +15,9 @@
 #include <vtkSphereSource.h>
 #include <vtkCamera.h>
 
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 #define USE_INTERACTOR 1
 
