@@ -59,6 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 #include "vtkKWSaveImageDialog.h"
 #include "vtkKWSerializer.h"
+#include "vtkKWUserInterfaceManager.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWWindow.h"
 #include "vtkPNGWriter.h"
@@ -102,7 +103,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.100");
+vtkCxxRevisionMacro(vtkKWView, "1.101");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1249,6 +1250,10 @@ void vtkKWView::MakeSelected()
   if (this->ParentWindow)
     {
     this->ParentWindow->SetSelectedView(this);
+    if (this->ParentWindow->GetUserInterfaceManager())
+      {
+      this->ParentWindow->GetUserInterfaceManager()->Update();
+      }
     }
   this->Script("focus %s", this->VTKWidget->GetWidgetName());
 }
@@ -1513,7 +1518,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.100 $");
+  this->ExtractRevision(os,"$Revision: 1.101 $");
 }
 
 //----------------------------------------------------------------------------
