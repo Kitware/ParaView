@@ -223,6 +223,10 @@ public:
   vtkClientServerID GetUniqueID();
   vtkClientServerID GetApplicationID();
   vtkClientServerID GetProcessModuleID();
+
+  static vtkPVProcessModule* GetProcessModule();
+  static void SetProcessModule(vtkPVProcessModule* pm);
+
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
@@ -240,6 +244,9 @@ protected:
   vtkClientServerID UniqueID;
   vtkCallbackCommand* InterpreterObserver;
   int ReportInterpreterErrors;
+
+  static vtkPVProcessModule* ProcessModule;
+
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented

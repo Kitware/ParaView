@@ -47,6 +47,8 @@
 
 #include <vtkstd/string>
 
+vtkPVProcessModule* vtkPVProcessModule::ProcessModule = 0;
+
 int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
 
@@ -60,7 +62,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.40");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.41");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -93,6 +95,18 @@ vtkPVProcessModule::~vtkPVProcessModule()
 }
 
 //----------------------------------------------------------------------------
+vtkPVProcessModule* vtkPVProcessModule::GetProcessModule()
+{
+  return vtkPVProcessModule::ProcessModule;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SetProcessModule(vtkPVProcessModule* pm)
+{
+  vtkPVProcessModule::ProcessModule = pm;
+}
+
+//----------------------------------------------------------------------------
 int vtkPVProcessModule::Start(int argc, char **argv)
 {
   if (this->Controller == NULL)
@@ -109,10 +123,16 @@ int vtkPVProcessModule::Start(int argc, char **argv)
   app->SetupTrapsForSignals(myId);
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
   app->SetProcessModule(this);
-  app->Script("wm withdraw .");
 
-  app->Start(argc,argv);
-
+  if (app->GetStartGUI())
+    {
+    app->Script("wm withdraw .");
+    app->Start(argc,argv);
+    }
+  else
+    {
+    app->Exit();
+    }
   return app->GetExitStatus();
 }
 

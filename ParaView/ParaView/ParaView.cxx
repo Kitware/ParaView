@@ -147,7 +147,6 @@ int MyMain(int argc, char *argv[])
       {
       retVal = 1;
       app->SetStartGUI(0);
-    app->Exit();
       }
     // Get the application settings from the registery
     // It has to be called now, after ParseCommandLineArguments, which can 
@@ -194,46 +193,39 @@ int MyMain(int argc, char *argv[])
         }
 #endif
       }
-
-    // Create the process module for initializing the processes.
-    // Only the root server processes args.
-    if (app->GetClientMode() || serverMode || renderServerMode) 
-      {
-      vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
-      pm = processModule;
-      }
-    else
-      {
-#ifdef VTK_USE_MPI
-      vtkPVMPIProcessModule *processModule = vtkPVMPIProcessModule::New();
-#else 
-      vtkPVProcessModule *processModule = vtkPVProcessModule::New();
-#endif
-      pm = processModule;
-      }
-
-    pm->SetApplication(app);
-    app->SetProcessModule(pm);
-    pm->InitializeInterpreter();
-    ParaViewInitializeInterpreter(pm);
-
-    // Start the application's event loop.  This will enable
-    // vtkOutputWindow's user prompting for any further errors now that
-    // startup is completed.
-    if ( retVal )
-      {
-      app->Exit();
-      }
-    else
-      {
-      startVal = pm->Start(argc, argv);
-      }
-
-    // Clean up for exit.
-    pm->FinalizeInterpreter();
-    pm->Delete();
-    pm = NULL;
     }
+  
+  // Create the process module for initializing the processes.
+  // Only the root server processes args.
+  if (app->GetClientMode() || serverMode || renderServerMode) 
+    {
+    vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
+    pm = processModule;
+    }
+  else
+    {
+#ifdef VTK_USE_MPI
+    vtkPVMPIProcessModule *processModule = vtkPVMPIProcessModule::New();
+#else 
+    vtkPVProcessModule *processModule = vtkPVProcessModule::New();
+#endif
+    pm = processModule;
+    }
+  
+  pm->SetApplication(app);
+  app->SetProcessModule(pm);
+  pm->InitializeInterpreter();
+  ParaViewInitializeInterpreter(pm);
+  
+  // Start the application's event loop.  This will enable
+  // vtkOutputWindow's user prompting for any further errors now that
+  // startup is completed.
+  startVal = pm->Start(argc, argv);
+  
+  // Clean up for exit.
+  pm->FinalizeInterpreter();
+  pm->Delete();
+  pm = NULL;
 
   // free some memory
   vtkTimerLog::CleanupLog();
