@@ -270,6 +270,7 @@ protected:
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 
 
+  // Used void* instead of vtkPVWidget* to avoid reference counting
   vtkLinkedList<void*>* Dependents;
 //ETX
 
