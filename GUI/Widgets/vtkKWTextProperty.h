@@ -160,7 +160,7 @@ public:
 
   // Description:
   // Temporary solution, don't use
-  void SaveInBatchScript(const char* iden, ofstream *file);
+  void SaveInBatchScript(const char*, ofstream *);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
