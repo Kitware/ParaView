@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.3");
+vtkCxxRevisionMacro(vtkPVPick, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -156,7 +156,7 @@ void vtkPVPick::ClearDataLabels()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPick::InsertDataLabel(char* labelArg, vtkIdType idx, 
+void vtkPVPick::InsertDataLabel(const char* labelArg, vtkIdType idx, 
                                 vtkDataSetAttributes* attr)
 {
   // update the ui
