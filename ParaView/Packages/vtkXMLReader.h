@@ -24,11 +24,13 @@
 
 #include "vtkSource.h"
 
-class vtkXMLDataParser;
-class vtkXMLDataElement;
+class vtkCallbackCommand;
+class vtkDataArray;
+class vtkDataArraySelection;
 class vtkDataSet;
 class vtkDataSetAttributes;
-class vtkDataArray;
+class vtkXMLDataElement;
+class vtkXMLDataParser;
 
 class VTK_EXPORT vtkXMLReader : public vtkSource
 {
@@ -49,6 +51,31 @@ public:
   // Description:
   // Get the output as a vtkDataSet pointer.
   vtkDataSet* GetOutputAsDataSet();
+  
+  // Description:
+  // Get the data array selection tables used to configure which data
+  // arrays are loaded by the reader.
+  vtkGetObjectMacro(PointDataArraySelection, vtkDataArraySelection);
+  vtkGetObjectMacro(CellDataArraySelection, vtkDataArraySelection);
+  
+  // Description:  
+  // Get the number of point or cell arrays available in the input.
+  int GetNumberOfPointArrays();
+  int GetNumberOfCellArrays();
+  
+  // Description:
+  // Get the name of the point or cell array with the given index in
+  // the input.
+  const char* GetPointArrayName(int index);
+  const char* GetCellArrayName(int index);
+  
+  // Description:
+  // Get/Set whether the point or cell array with the given name is to
+  // be read.
+  int GetPointArrayStatus(const char* name);
+  int GetCellArrayStatus(const char* name);
+  void SetPointArrayStatus(const char* name, int status);  
+  void SetCellArrayStatus(const char* name, int status);  
   
 protected:
   vtkXMLReader();
@@ -106,6 +133,20 @@ protected:
                              int i, int j, int k);
   void ReadAttributeIndices(vtkXMLDataElement* eDSA,
                             vtkDataSetAttributes* dsa);
+  char** CreateStringArray(int numStrings);
+  void DestroyStringArray(int numStrings, char** strings);  
+  
+  // Setup the data array selections for the input's set of arrays.
+  void SetDataArraySelections(vtkXMLDataElement* eDSA,
+                              vtkDataArraySelection* sel);
+  
+  // Check whether the given array element is an enabled array.
+  int PointDataArrayIsEnabled(vtkXMLDataElement* ePDA);
+  int CellDataArrayIsEnabled(vtkXMLDataElement* eCDA);
+  
+  // Callback registered with the SelectionObserver.
+  static void SelectionModifiedCallback(vtkObject* caller, unsigned long eid,
+                                        void* clientdata, void* calldata);
   
   // The vtkXMLDataParser instance used to hide XML reading details.
   vtkXMLDataParser* XMLParser;
@@ -115,6 +156,14 @@ protected:
   
   // The file stream used to read the input file.
   ifstream* FileStream;
+  
+  // The array selections.
+  vtkDataArraySelection* PointDataArraySelection;
+  vtkDataArraySelection* CellDataArraySelection;
+  
+  // The observer to modify this object when the array selections are
+  // modified.
+  vtkCallbackCommand* SelectionObserver;
   
 private:
   vtkXMLReader(const vtkXMLReader&);  // Not implemented.

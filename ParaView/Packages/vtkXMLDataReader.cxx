@@ -16,13 +16,15 @@
 
 =========================================================================*/
 #include "vtkXMLDataReader.h"
-#include "vtkXMLDataParser.h"
-#include "vtkXMLDataElement.h"
-#include "vtkPointData.h"
-#include "vtkCellData.h"
-#include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLDataReader, "1.2");
+#include "vtkCellData.h"
+#include "vtkDataArraySelection.h"
+#include "vtkDataSet.h"
+#include "vtkPointData.h"
+#include "vtkXMLDataElement.h"
+#include "vtkXMLDataParser.h"
+
+vtkCxxRevisionMacro(vtkXMLDataReader, "1.3");
 
 //----------------------------------------------------------------------------
 vtkXMLDataReader::vtkXMLDataReader()
@@ -122,26 +124,34 @@ void vtkXMLDataReader::SetupOutputInformation()
   vtkCellData* cellData = this->GetOutputAsDataSet()->GetCellData();  
   
   // Setup the point and cell data arrays without allocation.
+  this->SetDataArraySelections(ePointData, this->PointDataArraySelection);
   if(ePointData)
     {
     for(i=0;i < ePointData->GetNumberOfNestedElements();++i)
       {
       vtkXMLDataElement* eNested = ePointData->GetNestedElement(i);
-      vtkDataArray* array = this->CreateDataArray(eNested);
-      pointData->AddArray(array);
-      array->Delete();
+      if(this->PointDataArrayIsEnabled(eNested))
+        {
+        vtkDataArray* array = this->CreateDataArray(eNested);
+        pointData->AddArray(array);
+        array->Delete();
+        }
       }
     }
+  this->SetDataArraySelections(eCellData, this->CellDataArraySelection);
   if(eCellData)
     {
     for(i=0;i < eCellData->GetNumberOfNestedElements();++i)
       {
       vtkXMLDataElement* eNested = eCellData->GetNestedElement(i);
-      vtkDataArray* array = this->CreateDataArray(eNested);
-      cellData->AddArray(array);
-      array->Delete();
+      if(this->CellDataArrayIsEnabled(eNested))
+        {
+        vtkDataArray* array = this->CreateDataArray(eNested);
+        cellData->AddArray(array);
+        array->Delete();
+        }
       }
-    }  
+    }
   
   // Setup attribute indices for the point data and cell data.
   this->ReadAttributeIndices(ePointData, pointData);
@@ -168,18 +178,28 @@ void vtkXMLDataReader::SetupOutputData()
   int i;
   if(ePointData)
     {
+    int a=0;
     for(i=0;i < ePointData->GetNumberOfNestedElements();++i)
       {
-      pointData->GetArray(i)->SetNumberOfTuples(pointTuples);
+      vtkXMLDataElement* eNested = ePointData->GetNestedElement(i);
+      if(this->PointDataArrayIsEnabled(eNested))
+        {
+        pointData->GetArray(a++)->SetNumberOfTuples(pointTuples);
+        }
       }
     }
   if(eCellData)
     {
+    int a=0;
     for(i=0;i < eCellData->GetNumberOfNestedElements();++i)
       {
-      cellData->GetArray(i)->SetNumberOfTuples(cellTuples);
+      vtkXMLDataElement* eNested = eCellData->GetNestedElement(i);
+      if(this->CellDataArrayIsEnabled(eNested))
+        {
+        cellData->GetArray(a++)->SetNumberOfTuples(cellTuples);
+        }
       }
-    }  
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -228,23 +248,31 @@ int vtkXMLDataReader::ReadPieceData()
   int i;
   if(ePointData)
     {
+    int a=0;
     for(i=0;i < ePointData->GetNumberOfNestedElements();++i)
       {
-      if(!this->ReadArrayForPoints(ePointData->GetNestedElement(i),
-                                   pointData->GetArray(i)))
+      vtkXMLDataElement* eNested = ePointData->GetNestedElement(i);
+      if(this->PointDataArrayIsEnabled(eNested))
         {
-        return 0;
+        if(!this->ReadArrayForPoints(eNested, pointData->GetArray(a++)))
+          {
+          return 0;
+          }
         }
       }
     }
   if(eCellData)
     {
+    int a=0;
     for(i=0;i < eCellData->GetNumberOfNestedElements();++i)
       {
-      if(!this->ReadArrayForCells(eCellData->GetNestedElement(i),
-                                  cellData->GetArray(i)))
+      vtkXMLDataElement* eNested = eCellData->GetNestedElement(i);
+      if(this->CellDataArrayIsEnabled(eNested))
         {
-        return 0;
+        if(!this->ReadArrayForCells(eNested, cellData->GetArray(a++)))
+          {
+          return 0;
+          }
         }
       }
     }

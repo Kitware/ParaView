@@ -17,19 +17,22 @@
 =========================================================================*/
 #include "vtkXMLReader.h"
 
+#include "vtkCallbackCommand.h"
 #include "vtkDataArray.h"
+#include "vtkDataArraySelection.h"
 #include "vtkDataCompressor.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
+#include "vtkString.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLDataParser.h"
 #include "vtkXMLFileReadTester.h"
 
 #include <sys/stat.h>
 
-vtkCxxRevisionMacro(vtkXMLReader, "1.3");
+vtkCxxRevisionMacro(vtkXMLReader, "1.4");
 
 //----------------------------------------------------------------------------
 vtkXMLReader::vtkXMLReader()
@@ -37,6 +40,18 @@ vtkXMLReader::vtkXMLReader()
   this->FileName = 0;
   this->FileStream = 0;
   this->XMLParser = 0;  
+  this->PointDataArraySelection = vtkDataArraySelection::New();
+  this->CellDataArraySelection = vtkDataArraySelection::New();
+  
+  // Setup the selection callback to modify this object when an array
+  // selection is changed.
+  this->SelectionObserver = vtkCallbackCommand::New();
+  this->SelectionObserver->SetCallback(&vtkXMLReader::SelectionModifiedCallback);
+  this->SelectionObserver->SetClientData(this);
+  this->PointDataArraySelection->AddObserver(vtkCommand::ModifiedEvent,
+                                             this->SelectionObserver);
+  this->CellDataArraySelection->AddObserver(vtkCommand::ModifiedEvent,
+                                            this->SelectionObserver);
 }
 
 //----------------------------------------------------------------------------
@@ -47,6 +62,11 @@ vtkXMLReader::~vtkXMLReader()
     {
     this->DestroyXMLParser();
     }
+  this->CellDataArraySelection->RemoveObserver(this->SelectionObserver);
+  this->PointDataArraySelection->RemoveObserver(this->SelectionObserver);
+  this->SelectionObserver->Delete();
+  this->CellDataArraySelection->Delete();
+  this->PointDataArraySelection->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -451,5 +471,141 @@ void vtkXMLReader::ReadAttributeIndices(vtkXMLDataElement* eDSA,
       {
       dsa->SetActiveAttribute(eDSA->GetAttribute(attrName), i);
       }
+    }
+}
+
+//----------------------------------------------------------------------------
+char** vtkXMLReader::CreateStringArray(int numStrings)
+{
+  char** strings = new char*[numStrings];
+  int i;
+  for(i=0; i < numStrings; ++i)
+    {
+    strings[i] = 0;
+    }
+  return strings;
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLReader::DestroyStringArray(int numStrings, char** strings)
+{
+  int i;
+  for(i=0; i < numStrings; ++i)
+    {
+    if(strings[i])
+      {
+      delete [] strings[i];
+      }
+    }
+  delete strings;
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLReader::SetDataArraySelections(vtkXMLDataElement* eDSA,
+                                               vtkDataArraySelection* sel)
+{
+  if(!eDSA)
+    {
+    sel->SetArrays(0, 0);
+    return;
+    }
+  int numArrays = eDSA->GetNumberOfNestedElements();
+  if(!numArrays)
+    {
+    sel->SetArrays(0, 0);
+    return;
+    }
+  
+  char** names = this->CreateStringArray(numArrays);
+  int i;
+  for(i=0;i < numArrays;++i)
+    {
+    vtkXMLDataElement* eNested = eDSA->GetNestedElement(i);
+    names[i] = vtkString::Duplicate(eNested->GetAttribute("Name"));
+    }
+  sel->SetArrays(names, numArrays);
+  this->DestroyStringArray(numArrays, names);
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLReader::PointDataArrayIsEnabled(vtkXMLDataElement* ePDA)
+{
+  const char* name = ePDA->GetAttribute("Name");
+  return (name && this->PointDataArraySelection->ArrayIsEnabled(name));
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLReader::CellDataArrayIsEnabled(vtkXMLDataElement* eCDA)
+{
+  const char* name = eCDA->GetAttribute("Name");
+  return (name && this->CellDataArraySelection->ArrayIsEnabled(name));
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLReader::SelectionModifiedCallback(vtkObject*, unsigned long,
+                                             void* clientdata, void*)
+{
+  static_cast<vtkXMLReader*>(clientdata)->Modified();
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLReader::GetNumberOfPointArrays()
+{
+  return this->PointDataArraySelection->GetNumberOfArrays();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLReader::GetPointArrayName(int index)
+{
+  return this->PointDataArraySelection->GetArrayName(index);
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLReader::GetPointArrayStatus(const char* name)
+{
+  return this->PointDataArraySelection->ArrayIsEnabled(name);
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLReader::SetPointArrayStatus(const char* name, int status)
+{
+  if(status)
+    {
+    this->PointDataArraySelection->EnableArray(name);
+    }
+  else
+    {
+    this->PointDataArraySelection->DisableArray(name);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLReader::GetNumberOfCellArrays()
+{
+  return this->CellDataArraySelection->GetNumberOfArrays();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLReader::GetCellArrayName(int index)
+{
+  return this->CellDataArraySelection->GetArrayName(index);
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLReader::GetCellArrayStatus(const char* name)
+{
+  return this->CellDataArraySelection->ArrayIsEnabled(name);
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLReader::SetCellArrayStatus(const char* name, int status)
+{
+  if(status)
+    {
+    this->CellDataArraySelection->EnableArray(name);
+    }
+  else
+    {
+    this->CellDataArraySelection->DisableArray(name);
     }
 }
