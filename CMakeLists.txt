@@ -37,6 +37,7 @@ ${PARAVIEW_BINARY_DIR}/ParaView
 
 IF (UNIX)
   LINK_LIBRARIES(${THREAD_LIBS} ${DL_LIBS} -lm)
+  FIND_LIBRARY( OPTIONAL_MPI_LIB mpi++ /opt/mpt/mpt_default/usr/lib64 )
 ENDIF (UNIX)
 
 IF (WIN32)
@@ -47,6 +48,7 @@ FIND_PATH( HTML_HELP_PATH htmlhelp.h
 IF (HTML_HELP_PATH)
   INCLUDE_DIRECTORIES(${HTML_HELP_PATH})
 ENDIF (HTML_HELP_PATH)
+
 
 FIND_LIBRARY( HTML_HELP_LIBRARY htmlhelp
 	   "c:/program files/html help workshop"  
