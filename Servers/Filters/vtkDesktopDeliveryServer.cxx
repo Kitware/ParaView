@@ -14,21 +14,19 @@
 =========================================================================*/
 
 #include "vtkDesktopDeliveryServer.h"
-#include <vtkObjectFactory.h>
-#include <vtkRenderWindow.h>
-#include <vtkRendererCollection.h>
-#include <vtkRenderer.h>
-#include <vtkUnsignedCharArray.h>
-#include <vtkFloatArray.h>
-#include <vtkCamera.h>
-#include <vtkLight.h>
-#include <vtkTimerLog.h>
-#include <vtkLightCollection.h>
-#include <vtkCallbackCommand.h>
-#include <vtkVersion.h>
+#include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
+#include "vtkRendererCollection.h"
+#include "vtkRenderer.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkDoubleArray.h"
+#include "vtkCamera.h"
+#include "vtkLight.h"
+#include "vtkTimerLog.h"
+#include "vtkLightCollection.h"
+#include "vtkCallbackCommand.h"
+#include "vtkVersion.h"
 #include "vtkMultiProcessController.h"
-
-//#include <vtkRef.h>
 
 static void SatelliteStartRender(vtkObject *caller,
                  unsigned long vtkNotUsed(event),
@@ -43,7 +41,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.10");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.11");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -223,21 +221,17 @@ void vtkDesktopDeliveryServer::PreRenderProcessing()
     if (this->ImageReductionFactor > 1)
       {
       vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
-      vtkRenderer *ren;
-      int i;
-      for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
-        {
-        double *viewport = ren->GetViewport();
-        ren->SetViewport(viewport[0]*this->ImageReductionFactor,
-          viewport[1]*this->ImageReductionFactor,
-          viewport[2]*this->ImageReductionFactor,
-          viewport[3]*this->ImageReductionFactor);
-        }
+      // Just grab first renderer because that is all that the superclass
+      // really does anything with right now.
+      rens->InitTraversal();
+      vtkRenderer *ren = rens->GetNextItem();
+      double *viewport = this->Viewports->GetPointer(0);
+      ren->SetViewport(viewport);
       }
 
     // Make sure the prm has the correct image reduction factor.
-    if (  this->ParallelRenderManager->GetImageReductionFactor()
-      < this->ImageReductionFactor)
+    if (  this->ParallelRenderManager->GetMaxImageReductionFactor()
+        < this->ImageReductionFactor)
       {
       this->ParallelRenderManager
         ->SetMaxImageReductionFactor(this->ImageReductionFactor);
