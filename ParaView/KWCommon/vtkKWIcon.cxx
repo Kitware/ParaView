@@ -43,11 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkImageConstantPad.h"
 #include "vtkImageData.h"
+#include "vtkImageFlip.h"
 #include "vtkObjectFactory.h"
 
 #include "icons.h"
-
-#include "vtkPNGWriter.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
@@ -99,10 +98,17 @@ void vtkKWIcon::SetImageData(vtkImageData* id)
     pad->Delete();
     }
 
-  this->SetData(static_cast<unsigned char*>(image->GetScalarPointer()), 
-                width, height);
-
+  vtkImageFlip* flip = vtkImageFlip::New();
+  flip->SetInput(image);
+  flip->SetFilteredAxis(1);
+  flip->Update();
   image->UnRegister(this);
+
+  this->SetData(
+    static_cast<unsigned char*>(flip->GetOutput()->GetScalarPointer()),
+    width, height);
+  flip->Delete();
+
 }
 
 void vtkKWIcon::SetData(const unsigned char* data, int width, int height)
