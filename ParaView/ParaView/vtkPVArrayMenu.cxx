@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVData.h"
 
 //----------------------------------------------------------------------------
 vtkPVArrayMenu* vtkPVArrayMenu::New()
@@ -79,9 +81,11 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->ArrayMenu = vtkKWOptionMenu::New();
   this->ComponentMenu = vtkKWOptionMenu::New();
 
-  this->DataSetCommandObjectTclName = NULL;
-  this->DataSetCommandMethod = NULL;
-  this->DataSet = NULL;
+  this->InputMenu = NULL;
+
+  //this->DataSetCommandObjectTclName = NULL;
+  //this->DataSetCommandMethod = NULL;
+  //this->DataSet = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -101,19 +105,21 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
   this->ComponentMenu->Delete();
   this->ComponentMenu = NULL;
 
-  this->SetDataSetCommandObjectTclName(NULL);
-  this->SetDataSetCommandMethod(NULL);
-  this->SetDataSet(NULL);
+  //this->SetDataSetCommandObjectTclName(NULL);
+  //this->SetDataSetCommandMethod(NULL);
+  //this->SetDataSet(NULL);
+
+  this->SetInputMenu(NULL);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::SetDataSetCommand(const char* objTclName, 
-                                       const char* method)
-{
-  this->SetDataSetCommandObjectTclName(objTclName);
-  this->SetDataSetCommandMethod(method);
-}
+//void vtkPVArrayMenu::SetDataSetCommand(const char* objTclName, 
+//                                       const char* method)
+//{
+//  this->SetDataSetCommandObjectTclName(objTclName);
+//  this->SetDataSetCommandMethod(method);
+//}
 
 
 //----------------------------------------------------------------------------
@@ -470,13 +476,30 @@ void vtkPVArrayMenu::UpdateArrayMenu()
   this->ArrayMenu->ClearEntries();
 
   // We have to get the data set incase an input has changed. 
-  if (this->DataSetCommandMethod == NULL || this->DataSetCommandObjectTclName == NULL)
+  //if (this->DataSetCommandMethod == NULL || this->DataSetCommandObjectTclName == NULL)
+  //  {
+  //  vtkErrorMacro("DataSetCommand has not been set.")
+  //  return;
+  //  }
+  //this->Script("%s SetDataSet [%s %s]", this->GetTclName(),
+  //             this->DataSetCommandObjectTclName, this->DataSetCommandMethod);
+  
+  if (this->InputMenu == NULL)
     {
-    vtkErrorMacro("DataSetCommand has not been set.")
+    this->SetArrayName(NULL);
+    this->ArrayMenu->SetValue("None");
+    vtkErrorMacro("Input menu has not been set.");
+    return;
+    } 
+  vtkPVSource *pvs = this->InputMenu->GetCurrentValue();
+  if (pvs == NULL)
+    {
+    this->SetArrayName(NULL);
+    this->ArrayMenu->SetValue("None");
+    vtkErrorMacro("Input menu has no value.");
     return;
     }
-  this->Script("%s SetDataSet [%s %s]", this->GetTclName(),
-               this->DataSetCommandObjectTclName, this->DataSetCommandMethod);
+  this->DataSet = pvs->GetPVOutput()->GetVTKData();
   if (this->DataSet == NULL)
     {
     this->SetArrayName(NULL);
@@ -583,13 +606,29 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   this->SelectedComponent = 0;
 
   // Make sure the data set is the latest.
-  if (this->DataSetCommandMethod == NULL || this->DataSetCommandObjectTclName == NULL)
+  //if (this->DataSetCommandMethod == NULL || this->DataSetCommandObjectTclName == NULL)
+  //  {
+  //  vtkErrorMacro("DataSetCommand has not been set.")
+  //  return;
+  //  }
+  //this->Script("%s SetDataSet [%s %s]", this->GetTclName(),
+  //             this->DataSetCommandObjectTclName, this->DataSetCommandMethod);
+  
+  if (this->InputMenu == NULL)
     {
-    vtkErrorMacro("DataSetCommand has not been set.")
+    this->SetArrayName(NULL);
+    this->ArrayMenu->SetValue("None");
+    vtkErrorMacro("Input menu has not been set.");
     return;
-    }
-  this->Script("%s SetDataSet [%s %s]", this->GetTclName(),
-               this->DataSetCommandObjectTclName, this->DataSetCommandMethod);
+    } 
+  vtkPVSource *pvs = this->InputMenu->GetCurrentValue();
+  if (pvs == NULL)
+    {
+    this->SetArrayName(NULL);
+    this->ArrayMenu->SetValue("None");
+    vtkErrorMacro("Input menu has no value.");
+    return;
+    }  
   if (this->DataSet == NULL)
     {
     vtkErrorMacro("Could not find vtk data set.");

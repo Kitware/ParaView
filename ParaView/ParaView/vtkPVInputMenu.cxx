@@ -217,6 +217,7 @@ void vtkPVInputMenu::SetCurrentValue(vtkPVSource *pvs)
     this->Menu->SetValue("");
     }
   this->ModifiedCallback();
+  this->Update();
 }
 
 

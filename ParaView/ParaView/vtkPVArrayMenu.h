@@ -140,13 +140,13 @@ public:
   // Description:
   // We need a method to get the vtkDataSet. obj->Method() must return a data set.  
   // This is necessary because the input to the filter/mapper might change.
-  void SetDataSetCommand(const char* objTclName, const char* method);
+  //void SetDataSetCommand(const char* objTclName, const char* method);
 
   // Description:
   // This is used internally (by DataSetCommand).  If you set a data set yourself,
   // it will just be overwritten.
-  vtkSetObjectMacro(DataSet, vtkDataSet);
-  vtkGetObjectMacro(DataSet, vtkDataSet);
+  //vtkSetObjectMacro(DataSet, vtkDataSet);
+  //vtkGetObjectMacro(DataSet, vtkDataSet);
 
   // -----
 
@@ -187,6 +187,10 @@ public:
   void ArrayMenuEntryCallback(const char* name);
   void ComponentMenuEntryCallback(int comp);
 
+  // Description:
+  // This is called to update the menus if soething (InputMenu) changes.
+  virtual void Update() {this->UpdateArrayMenu();};
+
 protected:
   vtkPVArrayMenu();
   ~vtkPVArrayMenu();
@@ -226,10 +230,10 @@ protected:
 
 
   // For getting the data set.
-  char* DataSetCommandObjectTclName;
-  vtkSetStringMacro(DataSetCommandObjectTclName);
-  char* DataSetCommandMethod;
-  vtkSetStringMacro(DataSetCommandMethod);
+  //char* DataSetCommandObjectTclName;
+  //vtkSetStringMacro(DataSetCommandObjectTclName);
+  //char* DataSetCommandMethod;
+  //vtkSetStringMacro(DataSetCommandMethod);
   vtkDataSet *DataSet;
 };
 

@@ -1318,7 +1318,6 @@ vtkPVArrayMenu *vtkPVSource::AddArrayMenu(const char *label,
     }
 
   arrayMenu = vtkPVArrayMenu::New();
-  arrayMenu->SetDataSetCommand(this->GetVTKSourceTclName(), "GetInput");
   arrayMenu->SetNumberOfComponents(numComponenets);
   arrayMenu->SetInputName("Input");
   arrayMenu->SetAttributeType(attributeType);

@@ -98,13 +98,12 @@ void vtkPVContour::CreateProperties()
   vtkPVLabeledToggle *computeScalarsCheck;
   vtkPVLabeledToggle *computeNormalsCheck;
   vtkPVLabeledToggle *computeGradientsCheck;
-  vtkPVInputMenu *inputMenu;
 
   this->vtkPVSource::CreateProperties();
 
-  inputMenu = this->AddInputMenu("Input", "PVInput", "vtkDataSet",
-                                 "Set the input to this filter.",
-                                 this->GetPVWindow()->GetSources()); 
+  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
+                     "Set the input to this filter.",
+                     this->GetPVWindow()->GetSources()); 
   
   this->ScalarArrayMenu = this->AddArrayMenu("Scalars", vtkDataSetAttributes::SCALARS, 1,
                                  "Choose which scalar array you want to contour.");

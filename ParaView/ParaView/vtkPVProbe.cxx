@@ -237,7 +237,11 @@ void vtkPVProbe::CreateProperties()
   
   this->vtkPVSource::CreateProperties();
 
-  this->ScalarArrayMenu->SetDataSetCommand(this->GetVTKSourceTclName(), "GetSource");
+  this->AddInputMenu("Input", "PVInput", "vtkDataSet",
+                     "Set the input to this filter.",
+                     this->GetPVWindow()->GetSources()); 
+
+  // We should really use the vtkPVSource helper methods.
   this->ScalarArrayMenu->SetNumberOfComponents(1);
   this->ScalarArrayMenu->ShowComponentMenuOn();
   this->ScalarArrayMenu->SetInputName("Input");
@@ -249,6 +253,15 @@ void vtkPVProbe::CreateProperties()
   this->ScalarArrayMenu->Create(this->Application);
   this->ScalarArrayMenu->SetBalloonHelpString("Choose the scalar array to graph.");
   this->AddPVWidget(this->ScalarArrayMenu);
+  if (this->InputMenu == NULL)
+    {
+    vtkErrorMacro("Could not find the input menu.");
+    }
+  else
+    {
+    this->ScalarArrayMenu->SetInputMenu(this->InputMenu);
+    }
+
 
   frame = vtkKWWidget::New();
   frame->SetParent(this->GetParameterFrame()->GetFrame());
