@@ -531,6 +531,7 @@ void vtkPVWindow::Open()
       if (strcmp(className, "vtkDataSetReader") == 0)
 	{
 	sInt->SetDataFileName(openFileName);
+        sInt->SetRootName(rootName);
 	((vtkPVDataSetReaderInterface*)sInt)->CreateCallback();
 	}
       }
@@ -545,6 +546,7 @@ void vtkPVWindow::Open()
       if (strcmp(className, "vtkGenericEnSightReader") == 0)
 	{
 	sInt->SetDataFileName(openFileName);
+        sInt->SetRootName(rootName);
 	((vtkPVEnSightReaderInterface*)sInt)->CreateCallback();
 	}
       }
@@ -754,10 +756,13 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
     }
   
   // update the input list and (if this source is a glyph) the source list
-  comp->UpdateInputList();
-  if (comp->IsA("vtkPVGlyph3D"))
+  if (comp)
     {
-    ((vtkPVGlyph3D*)comp)->UpdateSourceMenu();
+    comp->UpdateInputList();
+    if (comp->IsA("vtkPVGlyph3D"))
+      {
+      ((vtkPVGlyph3D*)comp)->UpdateSourceMenu();
+      }
     }
 }
 
@@ -1059,16 +1064,23 @@ void vtkPVWindow::ShowCurrentSourceProperties()
   // We need to update the properties-menu radio button too!
   this->GetMenuProperties()->CheckRadioButton(
     this->GetMenuProperties(), "Radio", 2);
+
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->MainView->GetPropertiesParent()->GetWidgetName());
+  this->Script("pack %s -side top -fill x",
+               this->MainView->GetNavigationFrame()->GetWidgetName());
+  
+  if (!this->GetCurrentPVSource())
+    {
+    return;
+    }
   
   this->GetCurrentPVSource()->UpdateInputList();
   if (this->GetCurrentPVSource()->IsA("vtkPVGlyph3D"))
     {
     ((vtkPVGlyph3D*)this->GetCurrentPVSource())->UpdateSourceMenu();
     }
-  this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->MainView->GetPropertiesParent()->GetWidgetName());
-  this->Script("pack %s -side top -fill x",
-               this->MainView->GetNavigationFrame()->GetWidgetName());
+
   this->Script("pack %s -side top -fill x",
                this->GetCurrentPVSource()->GetNotebook()->GetWidgetName());
   this->GetCurrentPVSource()->GetNotebook()->Raise("Source");
