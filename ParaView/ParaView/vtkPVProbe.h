@@ -81,7 +81,7 @@ public:
 
   // Description:
   // Write out the part of the tcl script cooresponding to vtkPVProbe
-  void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag=0);
+  virtual void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag);
   
   // Description:
   // Method to update which scalars are being used in the xyplot

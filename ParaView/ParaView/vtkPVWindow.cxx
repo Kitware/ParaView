@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.378");
+vtkCxxRevisionMacro(vtkPVWindow, "1.379");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2270,14 +2270,17 @@ void vtkPVWindow::ImportVTKScript(const char *name)
   while ( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
     {
     cm->SetScalarBarVisibility(0);
+    cm->SetParent(NULL);
     }
   this->PVColorMaps->RemoveAllItems();
 
 
-  pvApp->SetRunningParaViewScript(1);
-  this->vtkKWWindow::LoadScript(name);
-  pvApp->SetRunningParaViewScript(0);
-  this->MainView->EventuallyRender();
+  //pvApp->SetRunningParaViewScript(1);
+  //this->vtkKWWindow::LoadScript(name);
+  //pvApp->SetRunningParaViewScript(0);
+  //this->MainView->EventuallyRender();
+  // MainView was a bad pointer.  I will look into it later.
+  //this->Script("RenWin1 Render");
 }
 
 
@@ -2451,9 +2454,12 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
     }
   cit->Delete();
 
-  *file << "vtkCompositeManager compManager\n\t";
-  *file << "compManager SetRenderWindow RenWin1 \n\t";
-  *file << "compManager InitializePieces\n\n";
+  if (vtkFlag)
+    {
+    *file << "vtkCompositeManager compManager\n\t";
+    *file << "compManager SetRenderWindow RenWin1 \n\t";
+    *file << "compManager InitializePieces\n\n";
+    }
 
   if (path && vtkString::Length(path) > 0)
     {
@@ -3759,7 +3765,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.378 $");
+  this->ExtractRevision(os,"$Revision: 1.379 $");
 }
 
 //----------------------------------------------------------------------------

@@ -86,6 +86,13 @@ public:
   // has to forward the call to a widget it contains.
   virtual void SetBalloonHelpString(const char *str);
 
+  // Description:
+  // This widget needs a special "SaveInTclScript" method
+  // because the string has to be enclosed by brackets.
+  // This method is used internally by PVSources to save
+  // parameters into a VTK Tcl script.
+  void SaveInTclScript(ofstream *file);
+
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create

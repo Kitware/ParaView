@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.72");
+vtkCxxRevisionMacro(vtkPVProbe, "1.73");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -453,6 +453,12 @@ void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag,
   char *tempName;
   vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
   
+  if (this->VisitedFlag)
+    {
+    return;
+    } 
+  this->VisitedFlag = 1;
+
   if (this->GetDimensionality() == 0)
     {
     *file << "vtkIdList pointList\n";
@@ -498,37 +504,8 @@ void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag,
     }
   
   *file << "\t" << this->GetVTKSourceTclName() << " SetSource [";
-
-  if (pvs && strcmp(pvs->GetSourceClassName(), "vtkGenericEnSightReader") == 0)
-    {
-    const char *probeSourceTclName = this->GetPVInput()->GetVTKDataTclName();
-    char *dataName = new char[strlen(probeSourceTclName) + 1];
-    char *charFound;
-    int pos;
-    
-    strcpy(dataName, probeSourceTclName);
-    charFound = strrchr(dataName, 't');
-    tempName = strtok(dataName, "O");
-    *file << tempName << " GetOutput ";
-    pos = charFound - dataName + 1;
-    *file << dataName+pos << "]\n\n";
-    delete [] dataName;
-    }
-  else if (pvs && strcmp(pvs->GetSourceClassName(), "vtkPDataSetReader") == 0)
-    {
-    const char *probeSourceTclName = this->GetPVInput()->GetVTKDataTclName();
-    char *dataName = new char[strlen(probeSourceTclName) + 1];
-    strcpy(dataName, probeSourceTclName);
-    
-    tempName = strtok(dataName, "O");
-    *file << tempName << " GetOutput]\n\n";
-    delete [] dataName;
-    }
-  else
-    {
-    *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
-          << " GetOutput]\n\n";
-    }
+  *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
+        << " GetOutput]\n\n";
   
   if (this->GetDimensionality() == 1)
     {    

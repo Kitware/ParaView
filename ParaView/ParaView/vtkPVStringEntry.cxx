@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.13");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -256,6 +256,25 @@ int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 const char* vtkPVStringEntry::GetValue() 
 {
   return this->Entry->GetValue();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVStringEntry::SaveInTclScript(ofstream *file)
+{
+  char *result;
+  
+  if (this->ObjectTclName == NULL || this->VariableName == NULL)
+    {
+    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInTclScript method.");
+    return;
+    } 
+
+  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName;
+  this->Script("set tempValue [%s Get%s]", 
+               this->ObjectTclName, this->VariableName);
+  result = this->Application->GetMainInterp()->result;
+  *file << " {" << result << "}\n";
 }
 
 //----------------------------------------------------------------------------

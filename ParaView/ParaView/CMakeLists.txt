@@ -6,7 +6,6 @@ vtkRedistributePolyData.cxx
 vtkWeightedRedistributePolyData.cxx
 vtkKWBoundsDisplay.cxx
 vtkKWExtractGeometryByScalar.cxx
-vtkPassThroughFilter.cxx
 vtkPickDataSetFilter.cxx
 vtkPV3DWidget.cxx
 vtkPVAdvancedReaderModule.cxx
@@ -56,6 +55,7 @@ vtkPVLineSourceWidget.cxx
 vtkPVMinMax.cxx
 vtkPVNavigationWindow.cxx
 vtkPVObjectWidget.cxx
+vtkPVPassThrough.cxx
 vtkPVPLOT3DReaderModule.cxx
 vtkPVPivotManipulator.cxx
 vtkPVPlaneWidget.cxx

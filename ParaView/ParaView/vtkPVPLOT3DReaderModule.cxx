@@ -54,11 +54,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
+#include "vtkPVPassThrough.h"
 #include "vtkStructuredGrid.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.4");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -150,7 +151,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
 
   if ( !this->Initialized || numOutputs > numPVOutputs )
     {
-    vtkPVSource* connection;
+    vtkPVPassThrough* connection;
     vtkPVData* connectionOutput;
     for (i = begin; i < numOutputs; i++)
       {
@@ -177,7 +178,8 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
         // ith connection point and it's output
         // These are dummy filters (vtkPassThroughFilter) which
         // simply shallow copy their input to their output.
-        connection = vtkPVSource::New();
+        connection = vtkPVPassThrough::New();
+        connection->SetOutputNumber(i);
         connection->SetParametersParent(
           window->GetMainView()->GetSourceParent());
         connection->SetApplication(pvApp);

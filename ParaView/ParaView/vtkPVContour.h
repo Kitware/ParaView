@@ -61,10 +61,6 @@ public:
   void CreateProperties();
   
   // Description:
-  // Save this source to a file.
-  void SaveInTclScript(ofstream* file, int interactiveFlag, int vtkFlag=0);
-
-  // Description:
   // This does the same thing as the superclass, but also
   // checks fopr scalars.
   virtual void SetPVInput(vtkPVData* input);

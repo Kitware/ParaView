@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
@@ -78,6 +78,12 @@ void vtkPVObjectWidget::SaveInTclScript(ofstream *file)
 {
   char *result;
   
+  if (this->ObjectTclName == NULL || this->VariableName == NULL)
+    {
+    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInTclScript method.");
+    return;
+    } 
+
   *file << "\t" << this->ObjectTclName << " Set" << this->VariableName;
   this->Script("set tempValue [%s Get%s]", 
                this->ObjectTclName, this->VariableName);
@@ -130,7 +136,7 @@ void vtkPVObjectWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVObjectWidget ";
-  this->ExtractRevision(os,"$Revision: 1.9 $");
+  this->ExtractRevision(os,"$Revision: 1.10 $");
 }
 
 //----------------------------------------------------------------------------

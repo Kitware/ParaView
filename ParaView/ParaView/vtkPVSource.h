@@ -221,7 +221,7 @@ public:
   // Save the renderer and render window to a file.
   // The "vtkFlag" argument is only set when regression testing.
   // It causes the actors to b e added to the ParaView renderer. 
-  void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag=0);
+  virtual void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag);
 
   // Description:
   // Make the Accept button turn red/white when one of the parameters 

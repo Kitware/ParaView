@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.27");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -342,6 +342,46 @@ void vtkPVLineWidget::ActualPlaceWidget()
 
   this->Widget3D->PlaceWidget();  
   this->UpdateVTKObject();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::SaveInTclScript(ofstream *file)
+{
+  char *result;
+
+  if (this->ObjectTclName == NULL)
+    {
+    return;
+    }
+
+  // Point1
+  if (this->Point1Variable)
+    {  
+    *file << "\t" << this->ObjectTclName << " Set" << this->Point1Variable;
+    this->Script("set tempValue [%s Get%s]", 
+                 this->ObjectTclName, this->Point1Variable);
+    result = this->Application->GetMainInterp()->result;
+    *file << " " << result << "\n";
+    }
+
+  // Point2
+  if (this->Point2Variable)
+    {
+    *file << "\t" << this->ObjectTclName << " Set" << this->Point2Variable;
+    this->Script("set tempValue [%s Get%s]", 
+                 this->ObjectTclName, this->Point2Variable);
+    result = this->Application->GetMainInterp()->result;
+    *file << " " << result << "\n";
+
+  // Resolution
+  if (this->ResolutionVariable)
+    
+    *file << "\t" << this->ObjectTclName << " Set" << this->ResolutionVariable;
+    this->Script("set tempValue [%s Get%s]", 
+                 this->ObjectTclName, this->ResolutionVariable);
+    result = this->Application->GetMainInterp()->result;
+    *file << " " << result << "\n";
+    }
 }
 
 //----------------------------------------------------------------------------

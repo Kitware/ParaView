@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.155");
+vtkCxxRevisionMacro(vtkPVData, "1.156");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -204,7 +204,7 @@ vtkPVData::~vtkPVData()
 {
   if (this->PVColorMap)
     {
-    this->PVColorMap->Delete();
+    this->PVColorMap->UnRegister(this);
     this->PVColorMap = 0;
     }
 
@@ -2515,6 +2515,28 @@ void vtkPVData::SaveInTclScript(ofstream *file, int interactiveFlag,
           << "[" << this->PropTclName << " GetProperty] SetInterpolationTo"
           << this->Property->GetInterpolationAsString() << "\n";
 
+    *file << "\t[" << this->PropTclName << " GetProperty] SetAmbient "
+          << this->Property->GetAmbient() << "\n";
+    *file << "\t[" << this->PropTclName << " GetProperty] SetDiffuse "
+          << this->Property->GetDiffuse() << "\n";
+    *file << "\t[" << this->PropTclName << " GetProperty] SetSpecular "
+          << this->Property->GetSpecular() << "\n";
+    *file << "\t[" << this->PropTclName << " GetProperty] SetSpecularPower "
+          << this->Property->GetSpecularPower() << "\n";
+    float *color = this->Property->GetSpecularColor();
+    *file << "\t[" << this->PropTclName << " GetProperty] SetSpecularColor "
+          << color[0] << " " << color[1] << " " << color[2] << "\n";
+    if (this->Property->GetLineWidth() > 1)
+      {
+      *file << "\t[" << this->PropTclName << " GetProperty] SetLineWidth "
+          << this->Property->GetLineWidth() << "\n";
+      }
+    if (this->Property->GetPointSize() > 1)
+      {
+      *file << "\t[" << this->PropTclName << " GetProperty] SetPointSize "
+          << this->Property->GetPointSize() << "\n";
+      }
+
     if (!this->Mapper->GetScalarVisibility())
       {
       float propColor[3];
@@ -2733,7 +2755,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.155 $");
+  this->ExtractRevision(os,"$Revision: 1.156 $");
 }
 
 //----------------------------------------------------------------------------

@@ -126,6 +126,10 @@ public:
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  // Description:
+  // Used internally. Method to save widget parameters into vtk tcl script.
+  virtual void SaveInTclScript(ofstream *file);
+
 protected:
   vtkPVLineWidget();
   ~vtkPVLineWidget();

@@ -58,13 +58,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceCollection.h"
 #include "vtkPVStringEntry.h"
 #include "vtkPVStringEntry.h"
+#include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
 #include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayCalculator);
-vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.47");
+vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.48");
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -678,45 +679,83 @@ void vtkPVArrayCalculator::SetFunctionLabel(char *function)
 void vtkPVArrayCalculator::SaveInTclScript(ofstream *file, int interactiveFlag,
                                            int vtkFlag)
 {
-  char* tempName;
   int i;
-  vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
-  
-  *file << this->VTKSource->GetClassName() << " "
-        << this->VTKSourceTclName << "\n\t"
-        << this->VTKSourceTclName << " SetInput [";
-  if (pvs && strcmp(pvs->GetSourceClassName(), "vtkGenericEnSightReader") == 0)
-    {
-    char *charFound;
-    int pos;
-    char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-    strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
+  vtkArrayCalculator *calc = (vtkArrayCalculator*)(this->GetVTKSource());
 
-    charFound = strrchr(dataName, 't');
-    tempName = strtok(dataName, "O");
-    *file << dataName << " GetOutput ";
-    pos = charFound - dataName + 1;
-    *file << dataName+pos << "]\n";
-    delete [] dataName;
-    }
-  else if (pvs && strcmp(pvs->GetSourceClassName(), "vtkPDataSetReader") == 0)
+
+
+
+  // This is just the super classes method "SaveInTclScript" without
+  // saving the output.
+  // The correct way to do this is to create a calculator PVWidget.
+  // I am just fixing bugs for a release right now.
+  int numWidgets;
+  vtkPVWidget *widget;
+
+  // Detect special sources we do not handle yet.
+  if (this->VTKSource == NULL)
     {
-    char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-    strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-    
-    tempName = strtok(dataName, "O");
-    *file << tempName << " GetOutput]\n";
-    delete [] dataName;
+    return;
     }
-  else
+
+  // This should not be needed, but We can check anyway.
+  if (this->VisitedFlag == 2)
     {
-    *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
-          << " GetOutput]\n";
+    return;
+    }
+
+  // Special condition to detect loops in the pipeline.
+  // Visited 1 means that source is in stack, 2 means that
+  // the tcl script contains the source.
+  if (this->VisitedFlag == 1)
+    { // This source is already in in the stack, but there is a loop.
+    *file << "\n" << this->VTKSource->GetClassName()
+          << " " << this->VTKSourceTclName << "\n";
+    this->VisitedFlag = 2;
+    return;
+    }
+
+  // This is the recursive part.
+  this->VisitedFlag = 1;
+  // Loop through all of the inputs
+  for (i = 0; i < this->NumberOfPVInputs; ++i)
+    {
+    if (this->PVInputs[i] && this->PVInputs[i]->GetPVSource()->GetVisitedFlag() != 2)
+      {
+      this->PVInputs[i]->GetPVSource()->SaveInTclScript(file, interactiveFlag, vtkFlag);
+      }
     }
   
-  *file << "\t" << this->VTKSourceTclName << " SetFunction "
-        << this->FunctionLabel->GetLabel() << "\n\t"
-        << this->VTKSourceTclName << " SetAttributeModeToUse";
+  // Save the object in the script.
+  if (this->VisitedFlag != 2)
+    {
+    *file << "\n" << this->VTKSource->GetClassName()
+          << " " << this->VTKSourceTclName << "\n";
+    this->VisitedFlag = 2;
+    }
+
+  // Let the PVWidgets set up the object.
+  numWidgets = this->Widgets->GetNumberOfItems();
+  for (i = 0; i < numWidgets; i++)
+    {
+    widget = vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
+    if (widget)
+      {
+      widget->SaveInTclScript(file);
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+  // This suff is what should be in PVWidgets.
+  *file << "\t" << this->VTKSourceTclName << " SetAttributeModeToUse";
   if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
     {
     *file << "PointData\n\t";
@@ -726,15 +765,13 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file, int interactiveFlag,
     *file << "CellData\n\t";
     }
   
-  for (i = 0; i < ((vtkArrayCalculator*)this->GetVTKSource())->
-         GetNumberOfScalarArrays(); i++)
+  for (i = 0; i < calc->GetNumberOfScalarArrays(); i++)
     {
     *file << this->VTKSourceTclName << " AddScalarVariable "
-          << ((vtkArrayCalculator*)this->GetVTKSource())->
-      GetScalarVariableName(i) << " "
-          << ((vtkArrayCalculator*)this->GetVTKSource())->
-      GetScalarArrayName(i)
-          << " 0\n\t";
+          << calc->GetScalarVariableName(i) << " "
+          << calc->GetScalarArrayName(i) 
+          << " " << calc->GetSelectedScalarComponent(i)
+          << "\n\t";
     }
   for (i = 0; i < ((vtkArrayCalculator*)this->GetVTKSource())->
          GetNumberOfVectorArrays(); i++)
@@ -745,12 +782,20 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file, int interactiveFlag,
           << ((vtkArrayCalculator*)this->GetVTKSource())->
       GetVectorArrayName(i)
           << " 0 1 2\n\t";
+    }  
+
+  if ( this->FunctionLabel->IsCreated() )
+    {
+    *file << "\t" << this->VTKSourceTclName << " SetFunction {"  
+          << this->FunctionLabel->GetLabel() << "}\n";
     }
 
-  this->ArrayNameEntry->SaveInTclScript(file);
-  *file << "\n";
-  
-  this->GetPVOutput(0)->SaveInTclScript(file, interactiveFlag, vtkFlag);
+
+
+
+  // Put the ouptut at the end so that the actor gets created last.
+  // Add the mapper, actor, scalar bar actor ...
+  this->GetPVOutput()->SaveInTclScript(file, interactiveFlag, vtkFlag);
 }
 
 //----------------------------------------------------------------------------

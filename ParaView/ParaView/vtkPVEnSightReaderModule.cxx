@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVPassThrough.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSelectTimeSet.h"
 #include "vtkPVSourceCollection.h"
@@ -70,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.21");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.22");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -721,7 +722,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     }
 
   // Create the main reader source.
-  pvs = vtkPVSource::New();
+  pvs = vtkPVEnSightReaderModule::New();
   pvs->SetParametersParent(window->GetMainView()->GetSourceParent());
   pvs->SetApplication(pvApp);
   pvs->SetVTKSource(reader, tclName);
@@ -742,7 +743,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
 
   window->GetMainView()->DisableRenderingFlagOn();
 
-  vtkPVSource* connection;
+  vtkPVPassThrough* connection;
   vtkPVData* connectionOutput;
   char* extentTranslatorName = 0;
   for (i = 0; i < numOutputs; i++)
@@ -787,7 +788,8 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       // ith connection point and it's output
       // These are dummy filters (vtkPassThroughFilter) which
       // simply shallow copy their input to their output.
-      connection = vtkPVSource::New();
+      connection = vtkPVPassThrough::New();
+      connection->SetOutputNumber(i);
       connection->SetParametersParent(
         window->GetMainView()->GetSourceParent());
       connection->SetApplication(pvApp);
@@ -1031,6 +1033,45 @@ void vtkPVEnSightReaderModule::AddCellVariable(const char* variableName)
   strcpy(this->RequestedCellVariables[size], variableName);
   
   this->NumberOfRequestedCellVariables++;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVEnSightReaderModule::SaveInTclScript(ofstream *file, int interactiveFlag,
+                                               int vtkFlag)
+{
+  vtkGenericEnSightReader *reader = 
+    vtkGenericEnSightReader::SafeDownCast(this->GetVTKSource());
+
+  if (reader == NULL)
+    {
+    vtkErrorMacro("GenericEnsightReader: Bad guess. " << this->VTKSource->GetClassName());
+    return;
+    }
+
+  // This should not be needed, but We can check anyway.
+  if (this->VisitedFlag != 0)
+    {
+    return;
+    }
+
+  this->VisitedFlag = 1;
+
+  // Save the object in the script.
+  *file << "\n" << this->VTKSource->GetClassName()
+        << " " << this->VTKSourceTclName << "\n";
+
+  *file << "\t" << this->VTKSourceTclName << " SetFilePath {"
+        << reader->GetFilePath() << "}\n";
+
+  *file << "\t" << this->VTKSourceTclName << " SetCaseFileName {"
+        << reader->GetCaseFileName() << "}\n";
+   
+  *file << "\t" << this->VTKSourceTclName << " SetTimeValue "
+        << reader->GetTimeValue() << "\n";
+   
+  *file << "\t" << this->VTKSourceTclName << " Update\n";
+
 }
 
 //----------------------------------------------------------------------------

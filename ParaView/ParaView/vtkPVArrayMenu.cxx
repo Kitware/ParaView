@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.26");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.27");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
 
@@ -487,6 +487,13 @@ void vtkPVArrayMenu::SaveInTclScript(ofstream *file)
   const char* attributeName;
 
   attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
+
+  if (this->ObjectTclName == NULL)
+    {
+    vtkErrorMacro("Subclass must not have implemented SaveInTclScript. " 
+                  << this->GetClassName());
+    return;
+    }
 
   if (this->ArrayName)
     {

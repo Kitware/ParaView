@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThreshold);
-vtkCxxRevisionMacro(vtkPVThreshold, "1.46");
+vtkCxxRevisionMacro(vtkPVThreshold, "1.47");
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -294,42 +294,23 @@ void vtkPVThreshold::UpdateScalars()
 
 void vtkPVThreshold::SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag)
 {
-  char* tempName;
-  char *charFound;
-  int pos;
   vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
   
+  if (this->VisitedFlag)
+    {
+    return;
+    }
+  this->VisitedFlag = 1;
+
+  this->GetPVInput()->GetPVSource()->SaveInTclScript(file, interactiveFlag,vtkFlag);
 
   *file << this->VTKSource->GetClassName() << " "
         << this->VTKSourceTclName << "\n";
   
   *file << "\t" << this->VTKSourceTclName << " SetInput [";
 
-  if (pvs && strcmp(pvs->GetSourceClassName(), "vtkGenericEnSightReader") == 0)
-    {
-    char *dataName = this->GetPVInput()->GetVTKDataTclName();
-    
-    charFound = strrchr(dataName, 't');
-    tempName = strtok(dataName, "O");
-    *file << tempName << " GetOutput ";
-    pos = charFound - dataName + 1;
-    *file << dataName+pos << "]\n\t";
-    delete [] dataName;
-    }
-  else if (pvs && strcmp(pvs->GetSourceClassName(), "vtkPDataSetReader") == 0)
-    {
-    char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-    strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-    
-    tempName = strtok(dataName, "O");
-    *file << tempName << " GetOutput]\n\t";
-    delete [] dataName;
-    }
-  else
-    {
-    *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
-          << " GetOutput]\n\t";
-    }
+  *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
+        << " GetOutput]\n\t";
   
   *file << this->VTKSourceTclName << " SetAttributeModeToUse";
   if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)

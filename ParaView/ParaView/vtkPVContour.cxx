@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.52");
+vtkCxxRevisionMacro(vtkPVContour, "1.53");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
@@ -224,64 +224,6 @@ void vtkPVContour::SetPVInput(vtkPVData *input)
         vtkKWMessageDialog::WarningIcon);
       }
     }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVContour::SaveInTclScript(ofstream* file, int interactiveFlag,
-                                   int vtkFlag)
-{
-  char* tempName;
-  int i;
-  vtkContourFilter *source =
-    (vtkContourFilter*)this->GetVTKSource();
-  vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
-  
-
-  *file << this->VTKSource->GetClassName() << " "
-        << this->VTKSourceTclName << "\n";
-
-  *file << "\t" << this->VTKSourceTclName << " SetInput [";
-
-  if (pvs && strcmp(pvs->GetSourceClassName(), "vtkGenericEnSightReader") == 0)
-    {
-    char *charFound;
-    int pos;
-    char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-    strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-    
-    charFound = strrchr(dataName, 't');
-    tempName = strtok(dataName, "O");
-    *file << tempName << " GetOutput ";
-    pos = charFound - dataName + 1;
-    *file << dataName+pos << "]\n\t";
-    delete [] dataName;
-    }
-  else if (pvs && strcmp(pvs->GetSourceClassName(), "vtkPDataSetReader") == 0)
-    {
-    char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-    strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-    
-    tempName = strtok(dataName, "O");
-    *file << tempName << " GetOutput]\n\t";
-    delete [] dataName;
-    }
-  else
-    {
-    *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
-          << " GetOutput]\n\t";
-    }
-  
-  *file << this->VTKSourceTclName << " SetNumberOfContours "
-        << source->GetNumberOfContours() << "\n\t";
-  
-  for (i = 0; i < source->GetNumberOfContours(); i++)
-    {
-    *file << this->VTKSourceTclName << " SetValue " << i << " "
-          << source->GetValue(i) << "\n\t";
-    }
-
-  this->GetPVOutput(0)->SaveInTclScript(file, interactiveFlag, vtkFlag);
 }
 
 //----------------------------------------------------------------------------
