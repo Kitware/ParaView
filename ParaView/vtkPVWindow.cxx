@@ -752,6 +752,13 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
     {
     this->Sources->AddItem(comp);
     }
+  
+  // update the input list and (if this source is a glyph) the source list
+  comp->UpdateInputList();
+  if (comp->IsA("vtkPVGlyph3D"))
+    {
+    ((vtkPVGlyph3D*)comp)->UpdateSourceMenu();
+    }
 }
 
 //----------------------------------------------------------------------------

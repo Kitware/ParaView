@@ -40,7 +40,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkCollection.h"
 #include "vtkPVData.h"
 #include "vtkPVSourceInterface.h"
-
+#include "vtkPVGlyph3D.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -574,13 +574,16 @@ void vtkPVSource::UpdateInputList()
   for (i = 0; i < sources->GetNumberOfItems(); i++)
     {
     currentSource = (vtkPVSource*)sources->GetItemAsObject(i);
-    if (currentSource->GetNthPVOutput(0)->GetVTKData()->IsA(inputType))
+    if (currentSource->GetNthPVOutput(0))
       {
-      tclName = currentSource->GetNthPVOutput(0)->GetVTKDataTclName();
-      sprintf(methodAndArgs, "ChangeInput %s",
-              currentSource->GetNthPVOutput(0)->GetTclName());
-      this->InputMenu->AddEntryWithCommand(tclName, this,
-                                           methodAndArgs);
+      if (currentSource->GetNthPVOutput(0)->GetVTKData()->IsA(inputType))
+        {
+        tclName = currentSource->GetNthPVOutput(0)->GetVTKDataTclName();
+        sprintf(methodAndArgs, "ChangeInput %s",
+                currentSource->GetNthPVOutput(0)->GetTclName());
+        this->InputMenu->AddEntryWithCommand(tclName, this,
+                                             methodAndArgs);
+        }
       }
     }
   this->InputMenu->SetValue(this->GetNthPVInput(0)->GetVTKDataTclName());
@@ -987,6 +990,10 @@ void vtkPVSource::SelectSource(vtkPVSource *source)
     {
     this->GetWindow()->SetCurrentPVSource(source);
     source->UpdateInputList();
+    if (source->IsA("vtkPVGlyph3D"))
+      {
+      ((vtkPVGlyph3D*)source)->UpdateSourceMenu();
+      }
     source->ShowProperties();
     source->GetNotebook()->Raise(0);
     }

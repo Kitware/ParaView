@@ -333,15 +333,18 @@ void vtkPVGlyph3D::UpdateSourceMenu()
   for (i = 0; i < sources->GetNumberOfItems(); i++)
     {
     currentSource = (vtkPVSource*)sources->GetItemAsObject(i);
-    if (currentSource->GetNthPVOutput(0)->GetVTKData()->IsA("vtkPolyData"))
+    if (currentSource->GetNthPVOutput(0))
       {
-      tclName = currentSource->GetNthPVOutput(0)->GetVTKDataTclName();
-      if (!this->GlyphSourceTclName)
+      if (currentSource->GetNthPVOutput(0)->GetVTKData()->IsA("vtkPolyData"))
         {
-        this->SetGlyphSourceTclName(tclName);
+        tclName = currentSource->GetNthPVOutput(0)->GetVTKDataTclName();
+        if (!this->GlyphSourceTclName)
+          {
+          this->SetGlyphSourceTclName(tclName);
+          }
+        this->GlyphSourceMenu->AddEntryWithCommand(tclName, this,
+                                                   "ChangeAcceptButtonColor");
         }
-      this->GlyphSourceMenu->AddEntryWithCommand(tclName, this,
-                                                 "ChangeAcceptButtonColor");
       }
     }
 }
