@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWChangeColorButton.h"
+#include "vtkKWImageLabel.h"
 #include "vtkLookupTable.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVApplication.h"
@@ -63,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.15");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.16");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -91,6 +93,13 @@ vtkPVColorMap::vtkPVColorMap()
   this->ScalarRange[1] = 1.0;
   this->Initialized = 0;
 
+  this->StartHSV[0] = 0.0;
+  this->StartHSV[1] = 1.0;
+  this->StartHSV[2] = 1.0;
+  this->EndHSV[0] = 0.6667;
+  this->EndHSV[1] = 1.0;
+  this->EndHSV[2] = 1.0;
+
   this->PVRenderView = NULL;
   this->LookupTableTclName = NULL;
   this->LookupTable = NULL;
@@ -112,6 +121,11 @@ vtkPVColorMap::vtkPVColorMap()
   this->ScalarBarCheckFrame = vtkKWWidget::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
   
+  this->ColorEditorFrame = vtkKWWidget::New();
+  this->StartColorButton = vtkKWChangeColorButton::New();
+  this->Map = vtkKWImageLabel::New();
+  this->EndColorButton = vtkKWChangeColorButton::New();
+ 
   // Stuff for setting the range of the color map.
   this->ColorRangeFrame = vtkKWWidget::New();
   this->ColorRangeResetButton = vtkKWPushButton::New();
@@ -122,6 +136,11 @@ vtkPVColorMap::vtkPVColorMap()
   this->ColorMapMenu = vtkKWOptionMenu::New();
 
   this->BackButton = vtkKWPushButton::New();
+
+  this->MapData = NULL;
+  this->MapDataSize = 0;
+  this->MapHeight = 25;
+  this->MapWidth = 250;
 }
 
 //----------------------------------------------------------------------------
@@ -171,6 +190,15 @@ vtkPVColorMap::~vtkPVColorMap()
   this->ScalarBarCheckFrame = NULL;
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;
+
+  this->ColorEditorFrame->Delete();
+  this->ColorEditorFrame = NULL;
+  this->StartColorButton->Delete();
+  this->StartColorButton = NULL;
+  this->Map->Delete();
+  this->Map = NULL;
+  this->EndColorButton->Delete();
+  this->EndColorButton = NULL;
   
   // Stuff for setting the range of the color map.
   this->ColorRangeFrame->Delete();
@@ -189,6 +217,14 @@ vtkPVColorMap::~vtkPVColorMap()
 
   this->BackButton->Delete();
   this->BackButton = NULL;
+
+  if (this->MapData)
+    {
+    delete [] this->MapData;
+    this->MapDataSize = 0;
+    this->MapWidth = 0;
+    this->MapHeight = 0;
+    }
 }
 
 
@@ -253,6 +289,23 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                                           "SetColorSchemeToGrayscale");
   this->ColorMapMenu->SetValue("Red to Blue");
   
+  this->ColorEditorFrame->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ColorEditorFrame->Create(this->Application, "frame", "");
+  this->StartColorButton->SetParent(this->ColorEditorFrame);
+  this->StartColorButton->SetText("");
+  this->StartColorButton->Create(this->Application, "");
+  this->StartColorButton->SetColor(1.0, 0.0, 0.0);
+  this->StartColorButton->SetCommand(this, "StartColorButtonCallback");
+  this->Map->SetParent(this->ColorEditorFrame);
+  this->Map->Create(this->Application, "");
+  this->Script("bind %s <Configure> {%s MapConfigureCallback %s}", 
+               this->Map->GetWidgetName(), this->GetTclName(), "%w %h");
+  this->EndColorButton->SetParent(this->ColorEditorFrame);
+  this->EndColorButton->SetText("");
+  this->EndColorButton->Create(this->Application, "");
+  this->EndColorButton->SetColor(0.0, 0.0, 1.0);
+  this->EndColorButton->SetCommand(this, "EndColorButtonCallback");
+
   this->ColorRangeFrame->SetParent(this->ScalarBarFrame->GetFrame());
   this->ColorRangeFrame->Create(this->Application, "frame", "");
   this->ColorRangeResetButton->SetParent(this->ColorRangeFrame);
@@ -293,10 +346,11 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   this->Script("pack %s -fill x", this->ScalarBarFrame->GetWidgetName());
   this->Script("pack %s -fill x -padx 2 -pady 2", this->BackButton->GetWidgetName());
-  this->Script("pack %s %s %s %s -side top -expand t -fill x",
+  this->Script("pack %s %s %s %s %s -side top -expand t -fill x",
                this->ScalarBarTitleEntry->GetWidgetName(),
                this->ArrayNameLabel->GetWidgetName(),
                this->ScalarBarCheckFrame->GetWidgetName(),
+               this->ColorEditorFrame->GetWidgetName(),
                this->ColorRangeFrame->GetWidgetName());
   this->Script("pack %s %s %s -side left",
                this->ScalarBarCheck->GetWidgetName(),
@@ -304,9 +358,17 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                this->ColorMapMenu->GetWidgetName());
   this->Script("pack %s -side left -expand f",
                this->ColorRangeResetButton->GetWidgetName());
+  this->Script("pack %s -side left -expand f -fill none",
+               this->StartColorButton->GetWidgetName());
+  this->Script("pack %s -side left -expand t -fill both",
+               this->Map->GetWidgetName());
+  this->Script("pack %s -side right -expand f -fill none",
+               this->EndColorButton->GetWidgetName());
   this->Script("pack %s %s -side left -expand t -fill x",
                this->ColorRangeMinEntry->GetWidgetName(),
                this->ColorRangeMaxEntry->GetWidgetName());
+
+  this->SetColorSchemeToRedBlue();
 }
 
 
@@ -322,7 +384,6 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->LookupTable = static_cast<vtkLookupTable*>(
     pvApp->MakeTclObject("vtkLookupTable", this->LookupTableTclName));
   
-
   this->ScalarBar = vtkScalarBarWidget::New();
   this->ScalarBar->SetInteractor(
     this->PVRenderView->GetPVWindow()->GetGenericInteractor());
@@ -443,64 +504,116 @@ void vtkPVColorMap::SetScalarBarTitleNoTrace(const char* name)
   this->UpdateScalarBarTitle();
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPVColorMap::SetColorSchemeToRedBlue()
+void vtkPVColorMap::UpdateLookupTable()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  pvApp->BroadcastScript("%s SetHueRange 0 0.666667",
-                         this->LookupTableTclName);
-  pvApp->BroadcastScript("%s SetSaturationRange 1 1",
-                         this->LookupTableTclName);
-  pvApp->BroadcastScript("%s SetValueRange 1 1",
-                         this->LookupTableTclName);
+  pvApp->BroadcastScript("%s SetHueRange %f %f", this->LookupTableTclName,
+                         this->StartHSV[0], this->EndHSV[0]);
+  pvApp->BroadcastScript("%s SetSaturationRange %f %f", this->LookupTableTclName,
+                         this->StartHSV[1], this->EndHSV[1]);
+  pvApp->BroadcastScript("%s SetValueRange %f %f", this->LookupTableTclName,
+                         this->StartHSV[2], this->EndHSV[2]);
   pvApp->BroadcastScript("%s Build",
                          this->LookupTableTclName);
 
-  this->GetPVRenderView()->EventuallyRender();
+  if (this->MapWidth > 0 && this->MapHeight > 0)
+    {
+    this->UpdateMap(this->MapWidth, this->MapHeight);
+    }
 
-  this->AddTraceEntry("$kw(%s) SetColorSchemeToRedBlue", this->GetTclName());
+  this->GetPVRenderView()->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetColorSchemeToRedBlue()
+{
+  this->StartHSV[0] = 0.0;
+  this->StartHSV[1] = 1.0;
+  this->StartHSV[2] = 1.0;
+  this->EndHSV[0] = 0.66667;
+  this->EndHSV[1] = 1.0;
+  this->EndHSV[2] = 1.0;
+
+  this->StartColorButton->SetColor(1.0, 0.0, 0.0);
+  this->EndColorButton->SetColor(0.0, 0.0, 1.0);
+
+  this->UpdateLookupTable();
+  this->AddTraceEntry("$kw(%s) SetColorSchemeToRedBlue", this->GetTclName());
+}
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetColorSchemeToBlueRed()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
+  this->StartHSV[0] = 0.66667;
+  this->StartHSV[1] = 1.0;
+  this->StartHSV[2] = 1.0;
+  this->EndHSV[0] = 0.0;
+  this->EndHSV[1] = 1.0;
+  this->EndHSV[2] = 1.0;
 
-  pvApp->BroadcastScript("%s SetHueRange 0.666667 0",
-                         this->LookupTableTclName);
-  pvApp->BroadcastScript("%s SetSaturationRange 1 1",
-                         this->LookupTableTclName);
-  pvApp->BroadcastScript("%s SetValueRange 1 1",
-                         this->LookupTableTclName);
-  pvApp->BroadcastScript("%s Build",
-                         this->LookupTableTclName);
+  this->StartColorButton->SetColor(0.0, 0.0, 1.0);
+  this->EndColorButton->SetColor(1.0, 0.0, 0.0);
 
-  this->GetPVRenderView()->EventuallyRender();
-
+  this->UpdateLookupTable();
   this->AddTraceEntry("$kw(%s) SetColorSchemeToBlueRed", this->GetTclName());
 }
+
 
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetColorSchemeToGrayscale()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
+  this->StartHSV[0] = 0.0;
+  this->StartHSV[1] = 0.0;
+  this->StartHSV[2] = 0.0;
+  this->EndHSV[0] = 0.0;
+  this->EndHSV[1] = 0.0;
+  this->EndHSV[2] = 1.0;
 
-  pvApp->BroadcastScript("%s SetHueRange 0 0",
-                         this->LookupTableTclName);
-  pvApp->BroadcastScript("%s SetSaturationRange 0 0",
-                         this->LookupTableTclName);
-  pvApp->BroadcastScript("%s SetValueRange 0 1",
-                         this->LookupTableTclName);
-  pvApp->BroadcastScript("%s Build",
-                         this->LookupTableTclName);
+  this->StartColorButton->SetColor(0.0, 0.0, 0.0);
+  this->EndColorButton->SetColor(1.0, 1.0, 1.0);
 
-  this->GetPVRenderView()->EventuallyRender();
+  this->UpdateLookupTable();
+  this->AddTraceEntry("$kw(%s) SetColorSchemeToGrayScale", this->GetTclName());
+}
 
-  this->AddTraceEntry("$kw(%s) SetColorSchemeToGrayscale", this->GetTclName());
+//----------------------------------------------------------------------------
+void vtkPVColorMap::StartColorButtonCallback(float r, float g, float b)
+{
+  float rgb[3];
+  float hsv[3];
 
+  // Convert RGB to HSV.
+  rgb[0] = r;
+  rgb[1] = g;
+  rgb[2] = b;
+  this->RGBToHSV(rgb, hsv);
+  this->StartHSV[0] = hsv[0];
+  this->StartHSV[1] = hsv[1];
+  this->StartHSV[2] = hsv[2];
+
+  this->UpdateLookupTable();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::EndColorButtonCallback(float r, float g, float b)
+{
+  float rgb[3];
+  float hsv[3];
+
+  // Convert RGB to HSV.
+  rgb[0] = r;
+  rgb[1] = g;
+  rgb[2] = b;
+  this->RGBToHSV(rgb, hsv);
+  this->EndHSV[0] = hsv[0];
+  this->EndHSV[1] = hsv[1];
+  this->EndHSV[2] = hsv[2];
+
+  this->UpdateLookupTable();
 }
 
 //----------------------------------------------------------------------------
@@ -801,6 +914,131 @@ void vtkPVColorMap::ColorRangeEntryCallback()
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::RGBToHSV(float rgb[3], float hsv[3])
+{
+  float hue, sat, val;
+  float lx, ly, lz;
+
+  if (rgb[0] <= 0.0 && rgb[1] <= 0.0 && rgb[2] <= 0.0)
+    {
+    hsv[0] = 0.0;
+    hsv[1] = 0.0;
+    hsv[2] = 0.0;
+    return;
+    }
+  if (rgb[0] >= rgb[1] && rgb[1] >= rgb[2])
+    { // case 0
+    val = rgb[0];
+    lz = rgb[1];
+    lx = rgb[2];
+    sat = 1.0 - (lx/val);
+    hue = (0.0 + (1.0 - ((1.0 - (lz/val))/sat)))/6.0;
+    }
+  else if (rgb[1] >= rgb[0] && rgb[0] >= rgb[2])
+    { // case 1
+    ly = rgb[0];
+    val = rgb[1];
+    lx = rgb[2];
+    sat = 1.0 - (lx/val);
+    hue = (1.0 + ((1.0 - (ly/val))/sat))/6.0;
+    }
+  else if (rgb[1] >= rgb[2] && rgb[2] >= rgb[0])
+    { // case 2
+    lx = rgb[0];
+    val = rgb[1];
+    lz = rgb[2];
+    sat = 1.0 - (lx/val);
+    hue = (2.0 + (1.0 - ((1.0 - (lz/val))/sat)))/6.0;
+    }
+  else if (rgb[2] >= rgb[1] && rgb[1] >= rgb[0])
+    { // case 3
+    lx = rgb[0];
+    ly = rgb[1];
+    val = rgb[2];
+    sat = 1.0 - (lx/val);
+    hue = (3.0 + ((1.0 - (ly/val))/sat))/6.0;
+    }
+  else if (rgb[2] >= rgb[0] && rgb[0] >= rgb[1])
+    { // case 4
+    lz = rgb[0];
+    lx = rgb[1];
+    val = rgb[2];
+    sat = 1.0 - (lx/val);
+    hue = (4.0 + (1.0 - ((1.0 - (lz/val))/sat)))/6.0;
+    }
+  else if (rgb[0] >= rgb[2] && rgb[2] >= rgb[1])
+    { // case 5
+    val = rgb[0];
+    lx = rgb[1];
+    ly = rgb[2];
+    sat = 1.0 - (lx/val);
+    hue = (5.0 + ((1.0 - (ly/val))/sat))/6.0;
+    }
+  hsv[0] = hue;
+  hsv[1] = sat;
+  hsv[2] = val;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::MapConfigureCallback(int width, int height)
+{
+  this->UpdateMap(width-4, height-4);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::UpdateMap(int width, int height)
+{
+  int size;
+  int i, j;
+  float *range;
+  float val, step;
+  unsigned char *rgba;  
+  unsigned char *ptr;  
+
+  size = width*height;
+  if (this->MapDataSize < size)
+    {
+    if (this->MapData)
+      {
+      delete [] this->MapData;
+      }
+    this->MapData = new unsigned char[size*4];
+    this->MapDataSize = size;
+    }
+  this->MapWidth = width;
+  this->MapHeight = height;
+
+  if (this->LookupTable == NULL)
+    {
+    return;
+    }
+
+  range = this->LookupTable->GetRange();
+  step = (range[1]-range[0])/(float)(width);
+  ptr = this->MapData;
+  for (j = 0; j < height; ++j)
+    {
+    for (i = 0; i < width; ++i)
+      {
+      val = range[0] + ((float)(i)*step);
+      rgba = this->LookupTable->MapValue(val);
+      
+      ptr[0] = rgba[0];
+      ptr[1] = rgba[1];
+      ptr[2] = rgba[2];
+      ptr[3] = rgba[3];
+      ptr += 4;
+      }
+    }
+
+  if (size > 0)
+    {
+    this->Map->SetImageData(this->MapData, width, height);
+    }
+}
 
 
 //----------------------------------------------------------------------------

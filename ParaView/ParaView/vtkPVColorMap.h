@@ -66,6 +66,9 @@ class vtkKWLabeledEntry;
 class vtkKWWidget;
 class vtkKWCheckButton;
 class vtkKWPushButton;
+class vtkKWChangeColorButton;
+class vtkKWImageLabel;
+
 
 class VTK_EXPORT vtkPVColorMap : public vtkKWWidget
 {
@@ -164,6 +167,15 @@ public:
   // This method is called when the user changes the name of the scalar bar.
   void NameEntryCallback();
 
+  // Description:
+  // Callbacks to change the color map.
+  void StartColorButtonCallback(float r, float g, float b);
+  void EndColorButtonCallback(float r, float g, float b);
+
+  // Description:
+  // Internal call used when the color map image changes shape.
+  void MapConfigureCallback(int width, int height);
+
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
@@ -178,9 +190,14 @@ protected:
   int VectorComponent;
   int NumberOfVectorComponents;
 
+  float StartHSV[3];
+  float EndHSV[3];
+
   vtkScalarBarWidget* ScalarBar;
 
   void UpdateScalarBarTitle();
+  void UpdateLookupTable();
+  void RGBToHSV(float rgb[3], float hsv[3]);
 
   vtkLookupTable* LookupTable;
   char* LookupTableTclName;
@@ -196,7 +213,20 @@ protected:
   vtkKWLabeledFrame* ScalarBarFrame;
   vtkKWWidget*       ScalarBarCheckFrame;
   vtkKWCheckButton*  ScalarBarCheck;
+
+  // Stuff for selecting start and end colors.
+  vtkKWWidget*            ColorEditorFrame;
+  vtkKWChangeColorButton* StartColorButton;
+  vtkKWImageLabel*        Map;
+  vtkKWChangeColorButton* EndColorButton;
   
+  // For the map image.
+  unsigned char *MapData;
+  int MapDataSize;
+  int MapWidth;
+  int MapHeight;
+  void UpdateMap(int width, int height);
+
   // Stuff for setting the range of the color map.
   vtkKWWidget*       ColorRangeFrame;
   vtkKWPushButton*   ColorRangeResetButton;

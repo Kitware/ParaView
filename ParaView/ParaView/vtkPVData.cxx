@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.151");
+vtkCxxRevisionMacro(vtkPVData, "1.152");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1637,8 +1637,6 @@ void vtkPVData::ColorRangeEntryCallback()
   min = this->ColorRangeMinEntry->GetValueAsFloat();
   max = this->ColorRangeMaxEntry->GetValueAsFloat();
   
-  vtkErrorMacro("Range " << min << ", " << max);
-
   // Avoid the bad range error
   if (max <= min)
     {
@@ -2763,7 +2761,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.151 $");
+  this->ExtractRevision(os,"$Revision: 1.152 $");
 }
 
 //----------------------------------------------------------------------------
