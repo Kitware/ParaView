@@ -105,11 +105,19 @@ public:
   virtual int IsInNestedElement(vtkXMLDataElement *grandparent,
                                 const char *name);
 
+  // Description:
+  // Set/Get the error log.
+  vtkSetStringMacro(ErrorLog);
+  vtkGetStringMacro(ErrorLog);
+  virtual void AppendToErrorLog(const char *);
+
 protected:
   vtkXMLObjectReader();
   ~vtkXMLObjectReader();  
 
   vtkObject *Object;
+
+  char *ErrorLog;
 
   // Description:
   // Create and destroy the XML parser.

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataParser.h"
 #include "vtkXMLUtilities.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectReader, "1.5");
+vtkCxxRevisionMacro(vtkXMLObjectReader, "1.6");
 
 vtkCxxSetObjectMacro(vtkXMLObjectReader, Object, vtkObject);
 
@@ -48,6 +48,7 @@ vtkCxxSetObjectMacro(vtkXMLObjectReader, Object, vtkObject);
 vtkXMLObjectReader::vtkXMLObjectReader()
 {
   this->Object = 0;
+  this->ErrorLog = NULL;
   this->XMLParser = 0;  
   this->LastParsedElement = 0;
 }
@@ -56,6 +57,7 @@ vtkXMLObjectReader::vtkXMLObjectReader()
 vtkXMLObjectReader::~vtkXMLObjectReader()
 {
   this->SetObject(0);
+  this->SetErrorLog(NULL);
   this->DestroyXMLParser();
 }
 
@@ -242,6 +244,19 @@ int vtkXMLObjectReader::IsInNestedElement(vtkXMLDataElement *grandparent,
 }
 
 //----------------------------------------------------------------------------
+void vtkXMLObjectReader::AppendToErrorLog(const char *msg)
+{
+  ostrstream str;
+  if (this->ErrorLog)
+    {
+    str << this->ErrorLog << endl;
+    }
+  str << msg;
+  this->SetErrorLog(str.str());
+  str.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkXMLObjectReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -254,6 +269,9 @@ void vtkXMLObjectReader::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Object: (none)\n";
     }
+
+  os << indent << "ErrorLog: " 
+     << (this->ErrorLog ? this->ErrorLog : "(none)") << endl;
 }
 
 
