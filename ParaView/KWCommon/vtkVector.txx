@@ -320,7 +320,8 @@ template <class DType>
 void vtkVector<DType>::DebugList()
 {
   vtkIdType cc;
-  cout << "List: " << this->GetClassName() << endl;
+  cout << "List: " << this << " type: " << this->GetClassName() << endl;
+  cout << "Number of items: " << this->GetNumberOfItems() << endl;
   for ( cc = 0; cc < this->NumberOfItems; cc ++ )
     {
     cout << "Item [" << cc << "]: " << this->Array[cc] << endl;
