@@ -1,0 +1,793 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+
+   <SourceProxy name="PVDReader" 
+                class="vtkPVDReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <IntVectorProperty 
+        name="TimestepAsIndex"
+        command="SetTimestepAsIndex"
+        number_of_elements="1" />
+   <!-- End PVDReader -->
+   </SourceProxy>
+                    
+   <SourceProxy name="XMLPolyDataReader" 
+                class="vtkXMLPolyDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLUnstructuredGridReader" 
+                class="vtkXMLUnstructuredGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLImageDataReader" 
+                class="vtkXMLImageDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLStructuredGridReader" 
+                class="vtkXMLStructuredGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLRectilinearGridReader" 
+                class="vtkXMLRectilinearGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPPolyDataReader" 
+                class="vtkPXMLPolyDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPUnstructuredGridReader" 
+                class="vtkXMLPUnstructuredGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPImageDataReader" 
+                class="vtkXMLPImageDataReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPStructuredGridReader" 
+                class="vtkXMLPStructuredGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XMLPRectilinearGridReader" 
+                class="vtkXMLPRectilinearGridReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End XMLRectilinearGridReader -->
+   </SourceProxy>
+
+   <SourceProxy name="legacyreader" 
+                class="vtkPDataSetReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+   <!-- End legacyreader -->
+   </SourceProxy>
+
+   <SourceProxy name="pvtkfile" 
+                class="vtkPDataSetReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+   <!-- End pvtkfile -->
+   </SourceProxy>
+
+   <SourceProxy name="ensight" 
+                class="vtkPVEnSightMasterServerReader">
+     <StringVectorProperty
+        name="CaseFileName"
+        command="SetCaseFileName"
+        number_of_elements="1" />
+
+     <IntVectorProperty 
+        name="ByteOrder" 
+        command="SetByteOrder" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="BigEndian:0 LittleEndian:1" />
+     </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="SetTimeValue"
+         command="SetTimeValue"
+         number_of_elements="1"
+         default_values="0.0" >
+      </DoubleVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End ensight -->
+   </SourceProxy>
+
+   <SourceProxy name="HDF5RawImageReader" class="vtkHDF5RawImageReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+      <IntVectorProperty
+         name="Stride"
+         command="SetStride"
+         number_of_elements="3"
+         default_values="1 1 1" >
+      </IntVectorProperty>
+   <!-- End HDF5RawImageReader -->
+   </SourceProxy>
+
+   <SourceProxy name="vrmlreader" class="vtkVRMLSource">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+   <!-- End vrmlreader -->
+   </SourceProxy>
+
+   <SourceProxy name="pdbreader" class="vtkPDBReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+   <!-- End pdbreader -->
+   </SourceProxy>
+
+   <SourceProxy name="xyzreader" class="vtkXYZMolReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+      <IntVectorProperty
+         name="TimeStep"
+         command="SetTimeStep"
+         number_of_elements="1"
+         default_values="0" >
+      </IntVectorProperty>
+   <!-- End xyzreader -->
+   </SourceProxy>
+
+   <SourceProxy name="P3DReader" class="vtkPLOT3DReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+
+     <StringVectorProperty
+        name="QFileName"
+        command="SetQFileName"
+        number_of_elements="1" />
+
+     <IntVectorProperty 
+        name="BinaryFile" 
+        command="SetBinaryFile" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="MultiGrid" 
+        command="SetMultiGrid" 
+        number_of_elements="1"
+        default_values="0" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="HasByteCount" 
+        command="SetHasByteCount" 
+        number_of_elements="1"
+        default_values="0" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="IBlanking" 
+        command="SetIBlanking" 
+        number_of_elements="1"
+        default_values="0" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="TwoDimensionalGeometry" 
+        command="SetTwoDimensionalGeometry" 
+        number_of_elements="1"
+        default_values="0" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ForceRead" 
+        command="SetForceRead" 
+        number_of_elements="1"
+        default_values="0" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ByteOrder" 
+        command="SetByteOrder" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="BigEndian:0 LittleEndian:1" />
+     </IntVectorProperty>
+   <!-- End P3DReader -->
+   </SourceProxy>
+
+   <SourceProxy name="stlreader" class="vtkSTLReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+   <!-- End stlreader -->
+   </SourceProxy>
+
+   <SourceProxy name="byureader" class="vtkBYUReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+   <!-- End stlreader -->
+   </SourceProxy>
+
+   <SourceProxy name="gaussiancubereader" class="vtkGaussianCubeReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+
+      <DoubleVectorProperty
+         name="HBScale"
+         command="SetHBScale"
+         number_of_elements="1"
+         default_values="1.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="BScale"
+         command="SetBScale"
+         number_of_elements="1"
+         default_values="1.0" >
+      </DoubleVectorProperty>
+   <!-- End gaussiancubereader -->
+   </SourceProxy>
+
+   <SourceProxy name="popreader" class="vtkPOPReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+
+      <DoubleVectorProperty
+         name="Radius"
+         command="SetRadius"
+         number_of_elements="1"
+         default_values="60000" >
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="ClipExtent" 
+        command="SetClipExtent" 
+        number_of_elements="6"
+        default_values="-2147483647 2147483647 -2147483647 2147483647 -2147483647 2147483647" > 
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="NumberOfGhostLevels" 
+        command="SetNumberOfGhostLevels" 
+        number_of_elements="1"
+        default_values="1" > 
+     </IntVectorProperty>
+   <!-- End popreader -->
+   </SourceProxy>
+
+   <SourceProxy name="ensightMS" 
+                class="vtkPVEnSightMasterServerReader">
+     <StringVectorProperty
+        name="CaseFileName"
+        command="SetCaseFileName"
+        number_of_elements="1" />
+
+     <IntVectorProperty 
+        name="ByteOrder" 
+        command="SetByteOrder" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="BigEndian:0 LittleEndian:1" />
+     </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="SetTimeValue"
+         command="SetTimeValue"
+         number_of_elements="1"
+         default_values="0.0" >
+      </DoubleVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End ensightMS -->
+   </SourceProxy>
+
+   <SourceProxy name="ImageReader" 
+                class="vtkImageReader">
+     <StringVectorProperty
+        name="FilePrefix"
+        command="SetFilePrefix"
+        number_of_elements="1" />
+
+     <StringVectorProperty
+        name="FilePattern"
+        command="SetFilePattern"
+        number_of_elements="1" 
+        default_values="%s" />
+
+     <IntVectorProperty 
+        name="DataScalarType" 
+        command="SetDataScalarType" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="char:2 {unsigned char}:3 short:4 {unsigned short}:5 int:6 {unsigned int}:7 long:8 {unsigned long}:9 float:10 double:11" />
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="DataByteOrder" 
+        command="SetDataByteOrder" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="BigEndian:0 LittleEndian:1" />
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="FileDimensionality"
+        command="SetFileDimensionality"
+        number_of_elements="1" 
+        default_values="0" />
+
+      <DoubleVectorProperty
+         name="DataOrigin"
+         command="SetDataOrigin"
+         number_of_elements="3"
+         default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="DataSpacing"
+         command="SetDataSpacing"
+         number_of_elements="3"
+         default_values="1.0 1.0 1.0" >
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="DataExtent"
+        command="SetDataExtent"
+        number_of_elements="6" 
+        default_values="0 0 0 0 0 0" />
+
+     <IntVectorProperty 
+        name="NumberOfScalarComponents"
+        command="SetNumberOfScalarComponents"
+        number_of_elements="1" 
+        default_values="1" />
+
+     <StringVectorProperty
+        name="ScalarArrayName"
+        command="SetScalarArrayName"
+        number_of_elements="1" 
+        default_values="ImageFile" />
+   <!-- End ImageReader -->
+   </SourceProxy>
+
+   <SourceProxy name="XdmfReader" 
+                class="vtkXdmfReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+      <IntVectorProperty
+         name="Stride"
+         command="SetStride"
+         number_of_elements="3"
+         default_values="1 1 1" >
+      </IntVectorProperty>
+
+     <StringVectorProperty
+        name="DomainName"
+        command="SetDomainName"
+        number_of_elements="1"/> 
+
+     <StringVectorProperty
+        name="EnableGrid"
+        command="EnableGrid"
+        number_of_elements="0" 
+        repeat_command="1"/> 
+   <!-- End XdmfReader -->
+   </SourceProxy>
+
+   <SourceProxy name="ExodusReader" 
+                class="vtkPExodusReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+
+     <StringVectorProperty
+        name="FilePrefix"
+        command="SetFilePrefix"
+        number_of_elements="1" />
+
+     <StringVectorProperty
+        name="FilePattern"
+        command="SetFilePattern"
+        number_of_elements="1" />
+
+     <IntVectorProperty 
+        name="FileRange"
+        command="SetFileRange"
+        number_of_elements="2" />
+
+     <IntVectorProperty 
+        name="TimeStep"
+        command="SetTimeStep"
+        number_of_elements="1" />
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <StringVectorProperty
+        name="BlockArrayStatus"
+        command="SetBlockArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <IntVectorProperty 
+        name="GenerateBlockIdCellArray" 
+        command="SetGenerateBlockIdCellArray" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="GenerateGlobalNodeIdArray" 
+        command="SetGenerateGlobalNodeIdArray" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="GenerateGlobalElementIdArray" 
+        command="SetGenerateGlobalElementIdArray" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="GenerateFileIdArray" 
+        command="SetGenerateFileIdArray" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End ExodusReader -->
+   </SourceProxy>
+
+   <SourceProxy name="SAFReader" 
+                class="vtkSAFPVReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+
+     <StringVectorProperty
+        name="VariableArrayStatus"
+        command="SetVariableArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <StringVectorProperty
+        name="BlockArrayStatus"
+        command="SetBlockArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <IntVectorProperty 
+        name="TimeStep"
+        command="SetTimeStep"
+        number_of_elements="1" />
+   <!-- End SAFReader -->
+   </SourceProxy>
+
+   <SourceProxy name="AVSucdReader" 
+                class="vtkAVSucdReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <StringVectorProperty
+        name="PointArrayStatus"
+        command="SetPointArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+   <!-- End AVSucdReader -->
+   </SourceProxy>
+
+   <SourceProxy name="Meta Image Reader" 
+                class="vtkMetaImageReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1" />
+   <!-- End Meta Image Reader -->
+   </SourceProxy>
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,0 +1,1212 @@
+<ServerManagerConfiguration>
+<!-- TODO need input requirements -->
+  <ProxyGroup name="filters">
+   <SourceProxy name="AppendAttributes" class="vtkMergeArrays">
+   <!-- End AppendAttributes -->
+   </SourceProxy>
+
+   <SourceProxy name="AppendPolyData" class="vtkAppendPolyData">
+   <!-- End AppendPolyData -->
+   </SourceProxy>
+
+   <SourceProxy name="Append" class="vtkAppendFilter">
+   <!-- End AppendDataSet -->
+   </SourceProxy>
+
+   <SourceProxy name="CellCenters" class="vtkCellCenters">
+     <IntVectorProperty 
+        name="VertexCells" 
+        command="SetVertexCells" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End CellCenters -->
+   </SourceProxy>
+
+   <SourceProxy name="CellDataToPointData" class="vtkPCellDataToPointData">
+     <IntVectorProperty 
+        name="PassCellData" 
+        command="SetPassCellData" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End CellDataToPointData -->
+   </SourceProxy>
+
+   <SourceProxy name="CleanPolyData" class="vtkCleanPolyData">
+     <IntVectorProperty 
+        name="PieceInvariant" 
+        command="SetPieceInvariant" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="Tolerance"
+        command="SetTolerance"
+        number_of_elements="1"
+        default_values="0.0" >
+       <DoubleRangeDomain min="0" max="1" />
+     </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="AbsoluteTolerance"
+         command="SetAbsoluteTolerance"
+         number_of_elements="1"
+         default_values="1.0" >
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="ToleranceIsAbsolute" 
+        command="SetToleranceIsAbsolute" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ConvertLinesToPoints" 
+        command="SetConvertLinesToPoints" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ConvertPolysToLines" 
+        command="SetConvertPolysToLines" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ConvertStripsToPolys" 
+        command="SetConvertStripsToPolys" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="PointMerging" 
+        command="SetPointMerging" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End CleanPolyData -->
+   </SourceProxy>
+
+   <SourceProxy name="CleanUnstructuredGrid" class="vtkCleanUnstructuredGrid">
+   <!-- End CleanUnstructuredGrid -->
+   </SourceProxy>
+
+   <SourceProxy name="PVConnectivityFilter" class="vtkPVConnectivityFilter">
+   <!-- End PVConnectivityFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="ImageClip" class="vtkImageClip">
+     <IntVectorProperty 
+        name="OutputWholeExtent" 
+        command="SetOutputWholeExtent" 
+        number_of_elements="6"> 
+     </IntVectorProperty>
+   <!-- End ImageClip -->
+   </SourceProxy>
+
+   <SourceProxy name="Curvatures" class="vtkCurvatures">
+     <IntVectorProperty 
+        name="InvertMeanCurvature" 
+        command="SetInvertMeanCurvature" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="CurvatureType" 
+        command="SetCurvatureType" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="Gaussian:0 Mean:1" />
+     </IntVectorProperty>
+   <!-- End Curvatures -->
+   </SourceProxy>
+
+   <SourceProxy name="DecimatePro" class="vtkDecimatePro">
+      <DoubleVectorProperty
+         name="TargetReduction"
+         command="SetTargetReduction"
+         number_of_elements="1"
+         default_values="0.9" >
+        <DoubleRangeDomain min="0" max="1" />
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="PreserveTopology" 
+        command="SetPreserveTopology" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="FeatureAngle"
+        command="SetFeatureAngle"
+        number_of_elements="1"
+        default_values="15.0" >
+       <DoubleRangeDomain min="0" max="180" />
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="BoundaryVertexDeletion" 
+        command="SetBoundaryVertexDeletion" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End DecimatePro -->
+   </SourceProxy>
+
+   <SourceProxy name="D3" class="vtkDistributedDataFilter">
+     <IntVectorProperty 
+        name="BoundaryMode" 
+        command="SetBoundaryMode" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="{Assign cells uniquely}:0 {Duplicate cells}:1 {Divide cells}:2" />
+     </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="GlobalIdArrayName" 
+        command="SetGlobalIdArrayName" 
+        number_of_elements="1" /> 
+
+     <IntVectorProperty 
+        name="UseMinimalMemory" 
+        command="SetUseMinimalMemory" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End D3 -->
+   </SourceProxy>
+
+   <SourceProxy name="ElevationFilter" class="vtkElevationFilter">
+      <DoubleVectorProperty
+         name="ScalarRange"
+         command="SetScalarRange"
+         number_of_elements="2"
+         default_values="0 1" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="LowPoint"
+         command="SetLowPoint"
+         number_of_elements="1"
+         default_values="0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="HighPoint"
+         command="SetHighPoint"
+         number_of_elements="1"
+         default_values="1" >
+      </DoubleVectorProperty>
+   <!-- End ElevationFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="CTHPart" class="vtkExtractCTHPart">
+     <ProxyProperty name="ClipPlane" command="SetClipPlane"/>
+
+     <StringVectorProperty 
+        name="AddVolumeArrayName" 
+        command="AddVolumeArrayName" 
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        number_of_elements="1" /> 
+   <!-- End CTHPart -->
+   </SourceProxy>
+
+   <SourceProxy name="ExtractEdges" class="vtkExtractEdges">
+   <!-- End ExtractEdges -->
+   </SourceProxy>
+
+   <SourceProxy name="ExtractParts" class="vtkSelectInputs">
+     <IntVectorProperty 
+        name="InputMask" 
+        command="SetInputMask"
+        number_of_elements="1"
+        repeat_command="1"
+        number_of_elements_per_command="2" />
+   <!-- End ExtractParts -->
+   </SourceProxy>
+
+   <SourceProxy name="DataSetSurfaceFilter" class="vtkDataSetSurfaceFilter">
+   <!-- End DataSetSurfaceFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="Calculator" class="vtkArrayCalculator">
+     <StringVectorProperty 
+        name="ResultArrayName" 
+        command="SetResultArrayName" 
+        number_of_elements="1"
+        default_values="result" /> 
+
+     <StringVectorProperty 
+        name="Function" 
+        command="SetFunction" 
+        number_of_elements="1" /> 
+   
+     <StringVectorProperty 
+        name="AddScalarVariable" 
+        command="AddScalarVariable" 
+        number_of_elements="3" 
+        repeat_command="1"
+        number_of_elements_per_command="3"
+        element_types="2 2 0" /> 
+
+     <StringVectorProperty 
+        name="AddVectorVariable" 
+        command="AddVectorVariable" 
+        number_of_elements="5" 
+        repeat_command="1"
+        number_of_elements_per_command="5"
+        element_types="2 2 0 0 0" /> 
+
+     <IntVectorProperty 
+        name="AttributeMode" 
+        command="SetAttributeMode" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="default:0 point_data:1 cell_data:2" />
+     </IntVectorProperty>
+   <!-- End Calculator -->
+   </SourceProxy>
+
+   <SourceProxy name="FeatureEdges" class="vtkFeatureEdges">
+     <IntVectorProperty 
+        name="BoundaryEdges" 
+        command="SetBoundaryEdges" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="FeatureEdges" 
+        command="SetFeatureEdges" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="NonManifoldEdges" 
+        command="SetNonManifoldEdges" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ManifoldEdges" 
+        command="SetManifoldEdges" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Coloring" 
+        command="SetColoring" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="FeatureAngle"
+        command="SetFeatureAngle"
+        number_of_elements="1"
+        default_values="30.0" >
+       <DoubleRangeDomain min="0" max="180" />
+     </DoubleVectorProperty>
+   <!-- End FeatureEdges -->
+   </SourceProxy>
+
+   <SourceProxy name="Gradient" class="vtkPVImageGradient">
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1" /> 
+     <IntVectorProperty 
+        name="Dimensionality" 
+        command="SetDimensionality" 
+        number_of_elements="1"
+        default_values="3" >
+       <EnumarationDomain 
+          values="Two:2 Three:3" />
+     </IntVectorProperty>
+   <!-- End Gradient -->
+   </SourceProxy>
+
+   <SourceProxy name="GradientMagnitude" class="vtkPVImageGradientMagnitude">
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1" /> 
+     <IntVectorProperty 
+        name="Dimensionality" 
+        command="SetDimensionality" 
+        number_of_elements="1"
+        default_values="3" >
+       <EnumarationDomain 
+          values="Two:2 Three:3" />
+     </IntVectorProperty>
+   <!-- End Gradient -->
+   </SourceProxy>
+
+   <SourceProxy name="GroupParts" class="vtkGroup">
+   <!-- End GroupParts -->
+   </SourceProxy>
+
+   <SourceProxy name="LinearExtrusionFilter" class="vtkPVLinearExtrusionFilter">
+     <DoubleVectorProperty
+        name="ScaleFactor"
+        command="SetScaleFactor"
+        number_of_elements="1"
+        default_values="1.0" >
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+        name="Vector"
+        command="SetVector"
+        number_of_elements="3"
+        default_values="0 0 1" >
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="Capping" 
+        command="SetCapping" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="PieceInvariant" 
+        command="SetPieceInvariant" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End LinearExtrusionFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="LoopSubdivisionFilter" class="vtkLoopSubdivisionFilter">
+     <IntVectorProperty 
+        name="NumberOfSubdivisions" 
+        command="SetNumberOfSubdivisions" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End LoopSubdivisionFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="MaskPoints" class="vtkMaskPoints">
+     <IntVectorProperty 
+        name="OnRatio" 
+        command="SetOnRatio" 
+        number_of_elements="1"
+        default_values="2" > 
+       <IntRangeDomain min="1"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="MaximumNumberOfPoints" 
+        command="SetMaximumNumberOfPoints" 
+        number_of_elements="1"
+        default_values="5000" > 
+       <IntRangeDomain min="0"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Offset" 
+        command="SetOffset" 
+        number_of_elements="1"
+        default_values="0" > 
+       <IntRangeDomain min="0"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="RandomMode" 
+        command="SetRandomMode" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="GenerateVertices" 
+        command="SetGenerateVertices" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End MaskPoints -->
+   </SourceProxy>
+
+   <SourceProxy name="Median" class="vtkPVImageMedian3D">
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1" /> 
+     <IntVectorProperty 
+        name="KernelSize" 
+        command="SetKernelSize" 
+        number_of_elements="3"
+        default_values="1 1 1" > 
+     </IntVectorProperty>
+   <!-- End Median -->
+   </SourceProxy>
+
+   <SourceProxy name="PolyDataNormals" class="vtkPPolyDataNormals">
+     <DoubleVectorProperty 
+        name="FeatureAngle" 
+        command="SetFeatureAngle" 
+        number_of_elements="1"
+        default_values="30" > 
+       <DoubleRangeDomain min="0" max="180"/>
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="Splitting" 
+        command="SetSplitting" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Consistency" 
+        command="SetConsistency" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="FlipNormals" 
+        command="SetFlipNormals" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="NonManifoldTraversal" 
+        command="SetNonManifoldTraversal" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ComputeCellNormals" 
+        command="SetComputeCellNormals" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="PieceInvariant" 
+        command="SetPieceInvariant" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End  PolyDataNormals -->
+   </SourceProxy>
+
+   <SourceProxy name="OutlineFilter" class="vtkPOutlineFilter">
+   <!-- End  OutlineFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="OutlineCornerFilter" class="vtkPOutlineCornerFilter">
+     <DoubleVectorProperty
+        name="CornerFactor"
+        command="SetCornerFactor"
+        number_of_elements="1"
+        default_values="0.2" >
+       <DoubleRangeDomain min="0.001" max="0.5" />
+     </DoubleVectorProperty>
+   <!-- End  OutlineCornerFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="PartScalars" class="vtkColorByPart">
+   <!-- End  PartScalars -->
+   </SourceProxy>
+
+   <SourceProxy name="PieceScalars" class="vtkPieceScalars">
+     <IntVectorProperty 
+        name="RandomMode" 
+        command="SetRandomMode" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End PieceScalars -->
+   </SourceProxy>
+
+   <SourceProxy name="PointDataToCellData" class="vtkPointDataToCellData">
+     <IntVectorProperty 
+        name="PassPointData" 
+        command="SetPassPointData" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End CellDataToPointData -->
+   </SourceProxy>
+
+   <SourceProxy name="QuadricClustering" class="vtkQuadricClustering">
+     <IntVectorProperty 
+        name="NumberOfDivisions" 
+        command="SetNumberOfDivisions" 
+        number_of_elements="3"
+        default_values="50 50 50" /> 
+
+     <IntVectorProperty 
+        name="UseInputPoints" 
+        command="SetUseInputPoints" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="UseFeatureEdges" 
+        command="SetUseFeatureEdges" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="UseFeaturePoints" 
+        command="SetUseFeaturePoints" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="CopyCellData" 
+        command="SetCopyCellData" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End QuadricClustering -->
+   </SourceProxy>
+
+   <SourceProxy name="BrownianPoints" class="vtkBrownianPoints">
+     <DoubleVectorProperty 
+        name="MinimumSpeed" 
+        command="SetMinimumSpeed" 
+        number_of_elements="1"
+        default_values="0" > 
+       <DoubleRangeDomain min="0" />
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty 
+        name="MaximumSpeed" 
+        command="SetMaximumSpeed" 
+        number_of_elements="1"
+        default_values="0" > 
+       <DoubleRangeDomain min="0" />
+     </DoubleVectorProperty>
+   <!-- End BrownianPoints -->
+   </SourceProxy>
+
+   <SourceProxy name="ReflectionFilter" class="vtkReflectionFilter">
+     <IntVectorProperty 
+        name="Plane" 
+        command="SetPlane" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="{X Min}:0 {Y Min}:1 {Z Max}:2 {X Max}:3 {Y Max}:4 {Z Max}:5 X:6 Y:7 Z:8" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="Center"
+        command="SetCenter"
+        number_of_elements="1"
+        default_values="0.0" >
+     </DoubleVectorProperty>
+   <!-- End ReflectionFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="RibbonFilter" class="vtkPVRibbonFilter">
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1" /> 
+
+     <StringVectorProperty 
+        name="SelectInputVectors" 
+        command="SelectInputVectors" 
+        number_of_elements="1" /> 
+
+     <DoubleVectorProperty
+        name="Width"
+        command="SetWidth"
+        number_of_elements="1"
+        default_values="1" >
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+        name="Angle"
+        command="SetAngle"
+        number_of_elements="1"
+        default_values="1" >
+       <DoubleRangeDomain min="0" max="360" />
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="UseDefaultNormal" 
+        command="SetUseDefaultNormal" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="DefaultNormal"
+        command="SetDefaultNormal"
+        number_of_elements="3"
+        default_values="0 0 1" >
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="VaryWidth" 
+        command="SetVaryWidth" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End RibbonFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="RotationalExtrusionFilter" 
+                class="vtkRotationalExtrusionFilter">
+     <IntVectorProperty 
+        name="Resolution" 
+        command="SetResolution" 
+        number_of_elements="1"
+        default_values="12" > 
+       <IntRangeDomain min="1"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Capping" 
+        command="SetCapping" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="Angle"
+        command="SetAngle"
+        number_of_elements="1"
+        default_values="360" >
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+        name="Translation"
+        command="SetTranslation"
+        number_of_elements="1"
+        default_values="0" >
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
+        name="DeltaRadius"
+        command="SetDeltaRadius"
+        number_of_elements="1"
+        default_values="0" >
+     </DoubleVectorProperty>
+   <!-- End RotationalExtrusionFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="ShrinkFilter" class="vtkShrinkFilter">
+      <DoubleVectorProperty
+         name="ShrinkFactor"
+         command="SetShrinkFactor"
+         number_of_elements="1"
+         default_values="0.5" >
+        <DoubleRangeDomain min="0" max="1" />
+      </DoubleVectorProperty>
+   <!-- End ShrinkFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="SmoothPolyDataFilter" class="vtkSmoothPolyDataFilter">
+     <IntVectorProperty 
+        name="NumberOfIterations" 
+        command="SetNumberOfIterations" 
+        number_of_elements="1"
+        default_values="20" > 
+       <IntRangeDomain min="0"/>
+     </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Convergence"
+         command="SetConvergence"
+         number_of_elements="1"
+         default_values="0.0" >
+        <DoubleRangeDomain min="0" max="1" />
+      </DoubleVectorProperty>
+   <!-- End SmoothPolyDataFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="Stripper" class="vtkStripper">
+     <IntVectorProperty 
+        name="MaximumLength" 
+        command="SetMaximumLength" 
+        number_of_elements="1"
+        default_values="1000" > 
+       <IntRangeDomain min="4" max="100000"/>
+     </IntVectorProperty>
+   <!-- End Stripper -->
+   </SourceProxy>
+
+   <SourceProxy name="Subdivide" class="vtkLinearSubdivisionFilter">
+     <IntVectorProperty 
+        name="NumberOfSubdivisions" 
+        command="SetNumberOfSubdivisions" 
+        number_of_elements="1"
+        default_values="1" > 
+       <IntRangeDomain min="1" max="4"/>
+     </IntVectorProperty>
+   <!-- End Subdivide -->
+   </SourceProxy>
+
+   <SourceProxy name="DataSetTriangleFilter" class="vtkDataSetTriangleFilter">
+   <!-- End DataSetTriangleFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="TriangleFilter" class="vtkTriangleFilter">
+   <!-- End TriangleFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="TubeFilter" class="vtkTubeFilter">
+     <IntVectorProperty 
+        name="NumberOfSides" 
+        command="SetNumberOfSides" 
+        number_of_elements="1"
+        default_values="6" > 
+       <IntRangeDomain min="3"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="Capping" 
+        command="SetCapping" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="Radius"
+         command="SetRadius"
+         number_of_elements="1"
+         default_values="1.0" >
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="VaryRadius" 
+        command="SetVaryRadius" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="Off:0 {By Scalar}:1 {By Vector}:2" />
+     </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="RadiusFactor"
+         command="SetRadiusFactor"
+         number_of_elements="1"
+         default_values="10" >
+      </DoubleVectorProperty>
+   <!-- End TubeFilter -->
+   </SourceProxy>
+
+   <SourceProxy name="WarpScalar" class="vtkPVWarpScalar">
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1" /> 
+
+      <DoubleVectorProperty
+         name="ScaleFactor"
+         command="SetScaleFactor"
+         number_of_elements="1"
+         default_values="1.0" >
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Normal"
+         command="SetNormal"
+         number_of_elements="3"
+         default_values="0 0 1" >
+      </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="UseNormal" 
+        command="SetUseNormal" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="XYPlane" 
+        command="SetXYPlane" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End WarpScalar -->
+   </SourceProxy>
+
+   <SourceProxy name="WarpVector" class="vtkPVWarpVector">
+     <StringVectorProperty 
+        name="SelectInputVectors" 
+        command="SelectInputVectors" 
+        number_of_elements="1" /> 
+
+      <DoubleVectorProperty
+         name="ScaleFactor"
+         command="SetScaleFactor"
+         number_of_elements="1"
+         default_values="1.0" >
+      </DoubleVectorProperty>
+   <!-- End WarpVector -->
+   </SourceProxy>
+
+
+   <SourceProxy name="Cut" class="vtkKitwareCutter">
+     <ProxyProperty name="CutFunction" command="SetCutFunction"/>
+
+     <DoubleVectorProperty
+        name="ContourValues"
+        command="SetValue"
+        number_of_elements="1"
+        default_values="0.0" 
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
+     </DoubleVectorProperty>
+   <!-- End Cut -->
+   </SourceProxy>
+
+   <SourceProxy name="Clip" class="vtkPVClipDataSet">
+     <ProxyProperty name="ClipFunction" command="SetClipFunction"/>
+     <IntVectorProperty 
+        name="InsideOut" 
+        command="SetInsideOut" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End Clip -->
+   </SourceProxy>
+
+   <SourceProxy name="Threshold" class="vtkPVThresholdFilter">
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1" /> 
+
+     <IntVectorProperty 
+        name="AttributeMode" 
+        command="SetAttributeMode"
+        number_of_elements="1">
+       <EnumarationDomain 
+          values="point_data:1 cell_data:2" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="ThresholdBetween" 
+        command="ThresholdBetween"
+        number_of_elements="2" />
+
+     <IntVectorProperty 
+        name="AllScalars" 
+        command="SetAllScalars" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End Threshold -->
+   </SourceProxy>
+
+   <SourceProxy name="Contour" class="vtkPVKitwareContourFilter">
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1" /> 
+
+     <DoubleVectorProperty
+        name="ContourValues"
+        command="SetValue"
+        number_of_elements="1"
+        default_values="0.0" 
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="ComputeNormals" 
+        command="SetComputeNormals" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ComputeGradients" 
+        command="SetComputeGradients" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ComputeScalars" 
+        command="SetComputeScalars" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End Contour -->
+   </SourceProxy>
+
+
+   <SourceProxy name="Glyph" class="vtkPVGlyphFilter">
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1" /> 
+
+     <StringVectorProperty 
+        name="SelectInputVectors" 
+        command="SelectInputVectors" 
+        number_of_elements="1" /> 
+
+     <IntVectorProperty 
+        name="SetOrient" 
+        command="SetOrient" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="SetScaleMode" 
+        command="SetScaleMode" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="scalar:0 vector:1 vector_components:2 off:3" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="SetScaleFactor"
+        command="SetScaleFactor"
+        number_of_elements="1"
+        default_values="1.0" >
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="MaximumNumberOfPoints" 
+        command="SetMaximumNumberOfPoints" 
+        number_of_elements="1"
+        default_values="5000" >
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="UseMaskPoints" 
+        command="SetUseMaskPoints" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="RandomMode" 
+        command="SetRandomMode" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End Glyph -->
+   </SourceProxy>
+
+   <SourceProxy name="ExtractGrid" class="vtkPVExtractVOI">
+     <IntVectorProperty 
+        name="VOI" 
+        command="SetVOI"
+        number_of_elements="6"/>
+
+     <IntVectorProperty 
+        name="SampleRateI" 
+        command="SetSampleRateI"
+        number_of_elements="1"/>
+
+     <IntVectorProperty 
+        name="SampleRateJ" 
+        command="SetSampleRateJ"
+        number_of_elements="1"/>
+
+     <IntVectorProperty 
+        name="SampleRateK" 
+        command="SetSampleRateK"
+        number_of_elements="1"/>
+
+     <IntVectorProperty 
+        name="IncludeBoundary" 
+        command="SetIncludeBoundary" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain/>
+     </IntVectorProperty>
+   <!-- End ExtractGrid -->
+   </SourceProxy>
+
+   <SourceProxy name="StreamTracer" class="vtkDistributedStreamTracer">
+
+     <StringVectorProperty 
+        name="SelectInputVectors" 
+        command="SelectInputVectors" 
+        number_of_elements="1" /> 
+
+     <IntVectorProperty 
+        name="MaximumPropagationUnit" 
+        command="SetMaximumPropagationUnit" 
+        number_of_elements="1"
+        default_values="1" >
+       <EnumarationDomain 
+          values="Time:0 Length:1" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MaximumPropagation"
+        command="SetMaximumPropagation"
+        number_of_elements="1"
+        default_values="1.0" >
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="InitialIntegrationStepUnit" 
+        command="SetInitialIntegrationStepUnit" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumarationDomain 
+          values="Time:0 Length:1 {Cell Length}:2" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="InitialIntegrationStep"
+        command="SetInitialIntegrationStep"
+        number_of_elements="1"
+        default_values="0.5" >
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="IntegrationDirection" 
+        command="SetIntegrationDirection" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumarationDomain 
+          values="{FORWARD}:0 {BACKWARD}:1 {BOTH}:2" />
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="IntegratorType" 
+        command="SetIntegratorType" 
+        number_of_elements="1"
+        default_values="0" >
+       <EnumarationDomain 
+          values="{Runge-Kutta 2}:0 {Runge-Kutta 4}:1 {Runge-Kutta 4-5}:2" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MaximumError"
+        command="SetMaximumError"
+        number_of_elements="1"
+        default_values="0.000001" >
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="MinimumIntegrationStepUnit" 
+        command="SetMinimumIntegrationStepUnit" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumarationDomain 
+          values="Time:0 Length:1 {Cell Length}:2" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MinimumIntegrationStep"
+        command="SetMinimumIntegrationStep"
+        number_of_elements="1"
+        default_values="0.01" >
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="MaximumIntegrationStepUnit" 
+        command="SetMaximumIntegrationStepUnit" 
+        number_of_elements="1"
+        default_values="2" >
+       <EnumarationDomain 
+          values="Time:0 Length:1 {Cell Length}:2" />
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="MaximumIntegrationStep"
+        command="SetMaximumIntegrationStep"
+        number_of_elements="1"
+        default_values="0.01" >
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="MaximumNumberOfSteps" 
+        command="SetMaximumNumberOfSteps" 
+        number_of_elements="1"
+        default_values="2000" >
+     </IntVectorProperty>
+
+     <DoubleVectorProperty
+        name="TerminalSpeed"
+        command="SetTerminalSpeed"
+        number_of_elements="1"
+        default_values="0.000000000001" >
+     </DoubleVectorProperty>
+   <!-- End StreamTracer -->
+   </SourceProxy>
+
+  </ProxyGroup>
+</ServerManagerConfiguration>

@@ -1,0 +1,19 @@
+<ServerManagerConfiguration>
+
+  <ProxyGroup name="rendering">
+  
+   <DisplayerProxy name="DefaultDisplayer">
+   </DisplayerProxy>
+
+   <DisplayWindowProxy name="DefaultRenderer">
+     <IntVectorProperty 
+        name="WindowPosition" 
+        command="SetPosition" 
+        number_of_elements="2"
+        default_values="0 0" > 
+     </IntVectorProperty>
+   </DisplayWindowProxy>
+   
+  </ProxyGroup>
+
+</ServerManagerConfiguration>
