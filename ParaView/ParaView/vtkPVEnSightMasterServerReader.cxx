@@ -51,9 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStructuredGrid.h"
 #include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkMultiProcessController.h"
 
 #ifdef VTK_USE_MPI
-# include "vtkMPIController.h"
+# include "vtkMPICommunicator.h"
 #endif
 
 #include <vtkstd/string>
@@ -63,24 +64,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.6.2.4");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.6.2.5");
 
-#ifdef VTK_USE_MPI
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
-                     vtkMPIController);
+                     vtkMultiProcessController);
 vtkMultiProcessController* vtkPVEnSightMasterServerReader::GetController()
 {
   return this->Controller;
 }
-#else
-void vtkPVEnSightMasterServerReader::SetController(vtkMPIController*)
-{
-}
-vtkMultiProcessController* vtkPVEnSightMasterServerReader::GetController()
-{
-  return 0;
-}
-#endif
 
 //----------------------------------------------------------------------------
 class vtkPVEnSightMasterServerReaderInternal
@@ -127,7 +118,7 @@ void vtkPVEnSightMasterServerReader::PrintSelf(ostream& os, vtkIndent indent)
 template <class T>
 int vtkPVEnSightMasterServerReaderSyncValues(T* data, int numValues,
                                              int numPieces,
-                                             vtkMPIController* controller)
+                                             vtkMultiProcessController* controller)
 {
   // Compare values on all processes that will read real pieces.
   // Returns whether the values match.  If they match, all processes'

@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkGenericEnSightReader.h"
 
-class vtkMPIController;
 class vtkMultiProcessController;
 class vtkPVEnSightMasterServerReaderInternal;
 class vtkPVEnSightMasterServerTranslator;
@@ -68,7 +67,7 @@ public:
   // In client-server mode, we may still need to create an instance of
   // this class on the client process even if MPI is not compiled in.
   virtual vtkMultiProcessController* GetController();
-  virtual void SetController(vtkMPIController* controller);
+  virtual void SetController(vtkMultiProcessController* controller);
   
   // Description:
   // Get the number of pieces in the file.  Valid after
@@ -91,7 +90,7 @@ protected:
   
   // The MPI controller used to communicate with the instances in
   // other processes.
-  vtkMPIController* Controller;
+  vtkMultiProcessController* Controller;
   
   // The number of pieces available in the file.
   int NumberOfPieces;
