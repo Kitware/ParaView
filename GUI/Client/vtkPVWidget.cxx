@@ -45,7 +45,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 vtkCxxSetObjectMacro(vtkPVWidget, SMProperty, vtkSMProperty);
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.55");
+vtkCxxRevisionMacro(vtkPVWidget, "1.56");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -71,6 +71,8 @@ vtkPVWidget::vtkPVWidget()
   this->WidgetRange[1] = 0;
   this->SMProperty = 0;
   this->SMPropertyName = 0;
+
+  this->SupportsAnimation = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -332,7 +334,8 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   clone->SetDebug(this->GetDebug());
   clone->SetSMPropertyName(this->GetSMPropertyName());
   clone->SuppressReset = this->SuppressReset;
-  
+  clone->SupportsAnimation = this->SupportsAnimation;
+
   // Now copy the dependencies
   vtkPVWidget* dep;
   vtkPVWidget* clonedep;
@@ -406,6 +409,11 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   const char* help = element->GetAttribute("help");
   if(help) { this->SetBalloonHelpString(help); }
   
+  if(!element->GetScalarAttribute("animation_support", &this->SupportsAnimation))
+    {
+    this->SupportsAnimation = 1;
+    }
+
   const char* trace_name = element->GetAttribute("trace_name");
   if (trace_name) 
     { 

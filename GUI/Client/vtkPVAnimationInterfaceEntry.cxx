@@ -77,7 +77,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.49");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.50");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
@@ -614,7 +614,10 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
   pvWidgets->InitTraversal();
   while ((pvw = static_cast<vtkPVWidget*>(pvWidgets->GetNextItemAsObject())))
     {
-    pvw->AddAnimationScriptsToMenu(menu, this);
+    if (pvw->GetSupportsAnimation())
+      {
+      pvw->AddAnimationScriptsToMenu(menu, this);
+      }
     }
   char methodAndArgs[1024];
   sprintf(methodAndArgs, "ScriptMethodCallback");

@@ -242,6 +242,11 @@ public:
   vtkGetMacro(UseWidgetRange, int);
   vtkSetVector2Macro(WidgetRange, double);
   vtkGetVector2Macro(WidgetRange, double);
+
+  // Description:
+  // If false, the corresponding widget is not displayed as an
+  // action item in the animation menu. True by default
+  vtkGetMacro(SupportsAnimation, int);
   
 protected:
   vtkPVWidget();
@@ -264,6 +269,8 @@ protected:
   // This flag stops resets until accept has been called.
   // It is used to let the widget set the default value.
   int SuppressReset;
+
+  int SupportsAnimation;
 
   vtkPVSource* PVSource;
 
