@@ -28,6 +28,7 @@ vtkKWLabeledLabel.cxx
 vtkKWLabeledOptionMenu.cxx 
 vtkKWLabeledPushButtonSet.cxx 
 vtkKWLabeledRadioButtonSet.cxx 
+vtkKWLabeledText.cxx 
 vtkKWLabeledWidget.cxx 
 vtkKWListBox.cxx 
 vtkKWLoadSaveDialog.cxx
