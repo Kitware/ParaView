@@ -42,13 +42,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Calls UpdateInformation() on all sources. In future, this
-  // will also populate some information properties.
+  // Calls UpdateInformation() on all sources.
   void UpdateInformation();
 
   // Description:
-  // Calls Update() on all sources.  In future, this will also 
-  // populate some information properties.
+  // Calls Update() on all sources. 
   void UpdatePipeline();
 
   // Description:
@@ -73,6 +71,28 @@ public:
   // Description:
   virtual void UpdateSelfAndAllInputs();
 
+  // Description:
+  void UpdateDataInformation();
+
+  // Description:
+  unsigned int GetNumberOfParts();
+
+  // Description:
+  vtkSMPart* GetPart(unsigned int idx);
+
+  // Description:
+  // Create n parts where n is the number of filters. Each part
+  // correspond to one output of one filter.
+  void CreateParts();
+
+//BTX
+  // Description:
+  vtkPVDataInformation* GetDataInformation();
+//ETX
+
+  // Description:
+  virtual void MarkConsumersAsModified();
+  
 protected:
   vtkSMSourceProxy();
   ~vtkSMSourceProxy();
@@ -81,29 +101,21 @@ protected:
   friend class vtkSMInputProperty;
 //ETX
 
-
-  // Description:
-  // Create n parts where n is the number of filters. Each part
-  // correspond to one output of one filter.
-  void CreateParts();
-  
   // Description:
   void ConvertDataInformationToProperty(
     vtkPVDataInformation* info, vtkSMProperty* prop);
 
-  int GetNumberOfParts();
-  vtkSMPart* GetPart(int idx);
-
-//   // Description:
-//   // Connectivity methods. Manage inputs and consumers. These methods
-//   // do not invoke anything on the managed sources.
-//   // Consumer info is not used yet.
-//   void AddConsumer(vtkSMSourceProxy *c);
-//   void RemoveConsumer(vtkSMSourceProxy *c);
-//   int IsConsumer(vtkSMSourceProxy *c);
-//   vtkSMSourceProxy *GetConsumer(int i);
-
   int PartsCreated;
+
+
+  // Description:
+  void GatherDataInformation();
+
+  // Description:
+  void InvalidateDataInformation();
+
+  vtkPVDataInformation *DataInformation;
+  int DataInformationValid;
 
 private:
   vtkSMSourceProxyInternals* PInternals;

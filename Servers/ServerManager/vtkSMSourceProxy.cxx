@@ -19,6 +19,8 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkProcessModule.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMPart.h"
 #include "vtkSMProperty.h"
 #include "vtkSmartPointer.h"
@@ -26,7 +28,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.12");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.13");
 
 struct vtkSMSourceProxyInternals
 {
@@ -39,22 +41,26 @@ vtkSMSourceProxy::vtkSMSourceProxy()
   this->PInternals = new  vtkSMSourceProxyInternals;
   this->PartsCreated = 0;
 
+  this->DataInformation = vtkPVDataInformation::New();
+  this->DataInformationValid = 0;
 }
 
 //---------------------------------------------------------------------------
 vtkSMSourceProxy::~vtkSMSourceProxy()
 {
   delete this->PInternals;
+
+  this->DataInformation->Delete();
 }
 
 //---------------------------------------------------------------------------
-int vtkSMSourceProxy::GetNumberOfParts()
+unsigned int vtkSMSourceProxy::GetNumberOfParts()
 {
   return this->PInternals->Parts.size();
 }
 
 //---------------------------------------------------------------------------
-vtkSMPart* vtkSMSourceProxy::GetPart(int idx)
+vtkSMPart* vtkSMSourceProxy::GetPart(unsigned int idx)
 {
   return this->PInternals->Parts[idx].GetPointer();
 }
@@ -154,6 +160,16 @@ void vtkSMSourceProxy::CreateParts()
   pm->SendStream(this->Servers, stream, 0);
   stream.Reset();
   info->Delete();
+
+  vtkstd::vector<vtkSmartPointer<vtkSMPart> >::iterator it =
+     this->PInternals->Parts.begin();
+
+  for(; it != this->PInternals->Parts.end(); it++)
+    {
+    it->GetPointer()->CreateTranslatorIfNecessary();
+    it->GetPointer()->InsertExtractPiecesIfNecessary();
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -233,83 +249,12 @@ void vtkSMSourceProxy::AddInput(
     }
 }
 
-// //----------------------------------------------------------------------------
-// void vtkSMSourceProxy::AddConsumer(vtkSMSourceProxy *c)
-// {
-//   // make sure it isn't already there
-//   if (this->IsConsumer(c))
-//     {
-//     return;
-//     }
-//   // add it to the list, reallocate memory
-//   vtkSMSourceProxy **tmp = this->Consumers;
-//   this->NumberOfConsumers++;
-//   this->Consumers = new vtkSMSourceProxy* [this->NumberOfConsumers];
-//   for (int i = 0; i < (this->NumberOfConsumers-1); i++)
-//     {
-//     this->Consumers[i] = tmp[i];
-//     }
-//   this->Consumers[this->NumberOfConsumers-1] = c;
-//   // free old memory
-//   delete [] tmp;
-// }
-
-// //----------------------------------------------------------------------------
-// void vtkSMSourceProxy::RemoveConsumer(vtkSMSourceProxy *c)
-// {
-//   // make sure it is already there
-//   if (!this->IsConsumer(c))
-//     {
-//     return;
-//     }
-//   // remove it from the list, reallocate memory
-//   vtkSMSourceProxy **tmp = this->Consumers;
-//   this->NumberOfConsumers--;
-//   if (this->NumberOfConsumers > 0)
-//     {
-//     this->Consumers = new vtkSMSourceProxy* [this->NumberOfConsumers];
-//     int cnt = 0;
-//     int i;
-//     for (i = 0; i <= this->NumberOfConsumers; i++)
-//       {
-//       if (tmp[i] != c)
-//         {
-//         this->Consumers[cnt] = tmp[i];
-//         cnt++;
-//         }
-//       }
-//     }
-//   else
-//     {
-//     this->Consumers = 0;
-//     }
-//   // free old memory
-//   delete [] tmp;
-// }
-
-// //----------------------------------------------------------------------------
-// int vtkSMSourceProxy::IsConsumer(vtkSMSourceProxy *c)
-// {
-//   int i;
-//   for (i = 0; i < this->NumberOfConsumers; i++)
-//     {
-//     if (this->Consumers[i] == c)
-//       {
-//       return 1;
-//       }
-//     }
-//   return 0;
-// }
-
-// //----------------------------------------------------------------------------
-// vtkSMSourceProxy *vtkSMSourceProxy::GetConsumer(int i)
-// {
-//   if (i >= this->NumberOfConsumers)
-//     {
-//     return 0;
-//     }
-//   return this->Consumers[i];
-// }
+//----------------------------------------------------------------------------
+void vtkSMSourceProxy::MarkConsumersAsModified()
+{
+  this->Superclass::MarkConsumersAsModified();
+  this->InvalidateDataInformation();
+}
 
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::UpdateSelfAndAllInputs()
@@ -318,10 +263,132 @@ void vtkSMSourceProxy::UpdateSelfAndAllInputs()
   this->UpdateInformation();
 }
 
+//----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMSourceProxy::GetDataInformation()
+{
+  if (this->DataInformationValid == 0)
+    {
+    this->GatherDataInformation();
+    }
+  return this->DataInformation;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSourceProxy::InvalidateDataInformation()
+{
+  this->DataInformationValid = 0;
+  vtkstd::vector<vtkSmartPointer<vtkSMPart> >::iterator it =
+    this->PInternals->Parts.begin();
+  for (; it != this->PInternals->Parts.end(); it++)
+    {
+    it->GetPointer()->InvalidateDataInformation();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSourceProxy::GatherDataInformation()
+{
+  this->DataInformation->Initialize();
+
+  vtkstd::vector<vtkSmartPointer<vtkSMPart> >::iterator it =
+    this->PInternals->Parts.begin();
+  for (; it != this->PInternals->Parts.end(); it++)
+    {
+    this->DataInformation->AddInformation(
+      it->GetPointer()->GetDataInformation());
+    }
+  this->DataInformationValid = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMSourceProxy::UpdateDataInformation()
+{
+  vtkPVDataInformation* info = this->GetDataInformation();
+  vtkSMProperty* property = this->GetProperty("DataInformation");
+  if (!property)
+    {
+    vtkSMProperty* prop = vtkSMProperty::New();
+    this->AddProperty("DataInformation", prop);
+    property = prop;
+    // Assignment above is still valid. Adding pointer increments 
+    // it's ref. count
+    prop->Delete();
+    }
+  this->ConvertDataInformationToProperty(info, property);
+}
+
 //---------------------------------------------------------------------------
 void vtkSMSourceProxy::ConvertDataInformationToProperty(
-  vtkPVDataInformation* /*info*/, vtkSMProperty* /*prop*/)
+  vtkPVDataInformation* info, vtkSMProperty* prop)
 {
+  prop->SetIsReadOnly(0);
+  vtkSMIntVectorProperty* num = vtkSMIntVectorProperty::SafeDownCast(
+    prop->GetSubProperty("NumberOfPoints"));
+  if (!num)
+    {
+    num = vtkSMIntVectorProperty::New();
+    prop->AddSubProperty("NumberOfPoints", num);
+    // This is OK. AddSubProperty increments ref count
+    num->Delete();
+    }
+  num->SetNumberOfElements(1);
+  num->SetElements1(info->GetNumberOfPoints());
+
+  num = vtkSMIntVectorProperty::SafeDownCast(
+    prop->GetSubProperty("NumberOfCells"));
+  if (!num)
+    {
+    num = vtkSMIntVectorProperty::New();
+    prop->AddSubProperty("NumberOfCells", num);
+    // This is OK. AddSubProperty increments ref count
+    num->Delete();
+    }
+  num->SetNumberOfElements(1);
+  num->SetElements1(info->GetNumberOfCells());
+
+  num = vtkSMIntVectorProperty::SafeDownCast(
+    prop->GetSubProperty("MemorySize"));
+  if (!num)
+    {
+    num = vtkSMIntVectorProperty::New();
+    prop->AddSubProperty("MemorySize", num);
+    // This is OK. AddSubProperty increments ref count
+    num->Delete();
+    }
+  num->SetNumberOfElements(1);
+  num->SetElements1(info->GetMemorySize());
+
+  num = vtkSMIntVectorProperty::SafeDownCast(
+    prop->GetSubProperty("Extent"));
+  if (!num)
+    {
+    num = vtkSMIntVectorProperty::New();
+    prop->AddSubProperty("Extent", num);
+    // This is OK. AddSubProperty increments ref count
+    num->Delete();
+    }
+  num->SetNumberOfElements(6);
+  for (int i=0; i<6; i++)
+    {
+    num->SetElement(i, info->GetExtent()[i]);
+    }
+
+  vtkSMDoubleVectorProperty* bounds = vtkSMDoubleVectorProperty::SafeDownCast(
+    prop->GetSubProperty("Bounds"));
+  if (!bounds)
+    {
+    bounds = vtkSMDoubleVectorProperty::New();
+    prop->AddSubProperty("Bounds", bounds);
+    // This is OK. AddSubProperty increments ref count
+    bounds->Delete();
+    }
+  bounds->SetNumberOfElements(6);
+  for (int i=0; i<6; i++)
+    {
+    bounds->SetElement(i, info->GetBounds()[i]);
+    }
+
+  prop->SetIsReadOnly(1);
 }
 
 //---------------------------------------------------------------------------
