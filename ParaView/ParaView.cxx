@@ -26,9 +26,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "pvinit.h"
-//#include "vtkThreadedController.h"
-#include "vtkMultiThreader.h"
+#include "vtkThreadedController.h"
 
+#include "vtkObject.h"
 
 struct vtkPVArgs
 {
@@ -36,9 +36,20 @@ struct vtkPVArgs
   char **argv;
 };
 
+//typedef int VTK_THREAD_RETURN_TYPE;
+//#define VTK_THREAD_RETURN_VALUE 0 
+
 VTK_THREAD_RETURN_TYPE Process_Init( void *arg )
 {
   vtkPVArgs *pvArgs = (vtkPVArgs *)arg;
+  vtkMultiProcessController *controller;
+  int numProcs, myId;
+
+  controller = vtkMultiProcessController::RegisterAndGetGlobalController(NULL);
+  numProcs = controller->GetNumberOfProcesses();
+  myId = controller->GetLocalProcessId();
+
+  //vtkGenericWarningMacro("Process_Init: " << myId << " of " << numProcs);
 
   Et_Init(pvArgs->argc, pvArgs->argv);
 
@@ -105,13 +116,13 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   pvArgs.argc = argc;
   pvArgs.argv = argv;
   
-  //vtkThreadedController *controller = vtkThreadedController::New();
-  //controller->SetNumberOfProcesses(1);
-  //controller->Initialize(argc, argv);
-  //controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
-  //controller->SingleMethodExecute();
+  vtkThreadedController *controller = vtkThreadedController::New();
+  controller->SetNumberOfProcesses(1);
+  controller->Initialize(argc, argv);
+  controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
+  controller->SingleMethodExecute();
 
-  Process_Init((void *)(&pvArgs));
+  //Process_Init((void *)(&pvArgs));
 
   delete [] argv[0];
   delete [] argv[1];
