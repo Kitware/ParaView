@@ -34,7 +34,7 @@
 
 class vtkXMLDataParser;
 
-class VTK_IO_EXPORT vtkXMLLookmarkElement : public vtkXMLDataElement
+class VTK_EXPORT vtkXMLLookmarkElement : public vtkXMLDataElement
 {
 public:
 
