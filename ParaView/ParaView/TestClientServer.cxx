@@ -1,6 +1,9 @@
 #include <vtkMultiThreader.h>
 #include <TestClientServer.h>
 #include <vtkstd/string>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 
 void RunServer(void * p)
 {
@@ -27,7 +30,11 @@ int main(int ac, char* av[])
   thread->SetNumberOfThreads(2);
   int id = 
     thread->SpawnThread((vtkThreadFunctionType)RunServer, (void*)path.c_str());
-  Sleep(2000);
+#ifdef _WIN32
+  Sleep(1000);
+#else
+  sleep(1);
+#endif
   path += " --client";
   for(int i =1; i < ac; ++i)
     {
