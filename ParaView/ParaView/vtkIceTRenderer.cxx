@@ -38,7 +38,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.8");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.9");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -110,16 +110,16 @@ void vtkIceTRenderer::DeviceRender()
   if (in_buffers == ICET_COLOR_BUFFER_BIT)
     {
     glClearColor((GLclampf)(this->Background[0]),
-         (GLclampf)(this->Background[1]),
-         (GLclampf)(this->Background[2]),
-         (GLclampf)(0.0));
+                 (GLclampf)(this->Background[1]),
+                 (GLclampf)(this->Background[2]),
+                 (GLclampf)(0.0));
     }
   else
     {
     glClearColor((GLclampf)(this->Background[0]),
-         (GLclampf)(this->Background[1]),
-         (GLclampf)(this->Background[2]),
-         (GLclampf)(1.0));
+                 (GLclampf)(this->Background[1]),
+                 (GLclampf)(this->Background[2]),
+                 (GLclampf)(1.0));
     }
 
   //ICE-T works much better if it knows the bounds of the geometry.
@@ -135,7 +135,7 @@ void vtkIceTRenderer::DeviceRender()
   else
     {
     icetBoundingBoxf(allBounds[0], allBounds[1], allBounds[2], allBounds[3],
-             allBounds[4], allBounds[5]);
+                     allBounds[4], allBounds[5]);
     }
 
   //Setup ICE-T callback function.  Note that this is not thread safe.
@@ -175,7 +175,7 @@ void vtkIceTRenderer::Clear()
   float bgcolor[4];
   icetGetFloatv(ICET_BACKGROUND_COLOR, bgcolor);
   vtkDebugMacro("Clear Color: " << bgcolor[0] << ", " << bgcolor[1]
-        << ", " << bgcolor[2] << ", " << bgcolor[3]);
+                << ", " << bgcolor[2] << ", " << bgcolor[3]);
   glClearColor(bgcolor[0], bgcolor[1], bgcolor[2], bgcolor[3]);
   glClearDepth(1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -208,8 +208,8 @@ int vtkIceTRenderer::UpdateCamera()
 
 #define MI(r,c)    (c*4+r)
 static inline void UpdateViewParams(GLdouble vert[3], GLdouble transform[16],
-                    bool &left, bool &right, bool &bottom,
-                    bool &top, bool &znear, bool &zfar)
+                                    bool &left, bool &right, bool &bottom,
+                                    bool &top, bool &znear, bool &zfar)
 {
   GLdouble x, y, z, w;
 
@@ -248,9 +248,9 @@ int vtkIceTRenderer::UpdateGeometry()
     for (int r = 0; r < 4; r++)
       {
       transform[c*4+r] = (  projection[MI(r,0)]*modelview[MI(0,c)]
-              + projection[MI(r,1)]*modelview[MI(1,c)]
-              + projection[MI(r,2)]*modelview[MI(2,c)]
-              + projection[MI(r,3)]*modelview[MI(3,c)]);
+                          + projection[MI(r,1)]*modelview[MI(1,c)]
+                          + projection[MI(r,2)]*modelview[MI(2,c)]
+                          + projection[MI(r,3)]*modelview[MI(3,c)]);
       }
     }
 
@@ -297,7 +297,7 @@ int vtkIceTRenderer::UpdateGeometry()
     if (visible[i])
       {
       this->NumberOfPropsRendered +=
-    this->PropArray[i]->RenderOpaqueGeometry(this);
+        this->PropArray[i]->RenderOpaqueGeometry(this);
       }
     }
   for (i = 0; i < this->PropArrayCount; i++)
@@ -305,12 +305,12 @@ int vtkIceTRenderer::UpdateGeometry()
     if (visible[i])
       {
       this->NumberOfPropsRendered +=
-    this->PropArray[i]->RenderTranslucentGeometry(this);
+        this->PropArray[i]->RenderTranslucentGeometry(this);
       }
     }
 
   vtkDebugMacro("Rendered " << this->NumberOfPropsRendered
-        << " actors");
+                << " actors");
 
   delete[] visible;
   return this->NumberOfPropsRendered;

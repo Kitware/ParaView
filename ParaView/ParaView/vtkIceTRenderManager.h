@@ -50,6 +50,8 @@
 
 #include "vtkParallelRenderManager.h"
 
+class vtkPKdTree;
+
 #include <GL/ice-t.h> // Needed for IceTContext
 
 class VTK_EXPORT vtkIceTRenderManager : public vtkParallelRenderManager
@@ -125,6 +127,21 @@ public:
     this->SetComposeOperation(OVER);
   }
 
+  // Description:
+  // Get/Set a parallel Kd-tree structure that will determine the order of
+  // image composition.  If set to NULL (the default), no ordering will be
+  // imposed.  Generally speaking, if the ComposeOperation is set to
+  // CLOSEST, then giving an ordering is unnecessary.  If the
+  // ComposeOperation is set to OVER, then an ordering is necessary.
+  //
+  // The given Kd-tree should have processes assigned to regions (the
+  // default if created with the vtkDistributeDataFilter) and should have
+  // the same controller as the one assigned to this object.  Furthermore,
+  // the data held by each process should be strictly contained within the
+  // Kd-tree regions it is assigned to (i.e. turn clipping on).
+  vtkGetObjectMacro(SortingKdTree, vtkPKdTree);
+  virtual void SetSortingKdTree(vtkPKdTree *tree);
+
 //BTX
   enum {
     ICET_INFO_TAG=234551,
@@ -167,6 +184,8 @@ protected:
 
   ComposeOperationType ComposeOperation;
   int ComposeOperationDirty;
+
+  vtkPKdTree *SortingKdTree;
 
   // Description:
   // Used to keep track of when the ImageReductionFactor changes, which
