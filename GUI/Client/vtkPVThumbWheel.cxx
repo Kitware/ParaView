@@ -27,7 +27,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.1");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -67,7 +67,11 @@ void vtkPVThumbWheel::Create(vtkKWApplication *pvApp)
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   // Now a label
-  this->Label->Create(pvApp, "-width 18 -justify right");
+  this->Label->Create(pvApp, "-justify right");
+  if (strlen(this->Label->GetLabel()) > 0)
+    {
+    this->Label->SetWidth(18);
+    }
   this->Script("pack %s -side left", this->Label->GetWidgetName());
   
   // Now the thumb wheel
@@ -76,7 +80,6 @@ void vtkPVThumbWheel::Create(vtkKWApplication *pvApp)
   this->ThumbWheel->DisplayEntryOn();
   this->ThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->ThumbWheel->ExpandEntryOn();
-  this->ThumbWheel->GetEntry()->SetWidth(15);
   this->ThumbWheel->ClampMinimumValueOn();
   this->ThumbWheel->SetInteractionModeToNonLinear(0);
   this->ThumbWheel->SetNonLinearMaximumMultiplier(10);
@@ -88,7 +91,7 @@ void vtkPVThumbWheel::Create(vtkKWApplication *pvApp)
     {
     this->SetBalloonHelpString(this->BalloonHelpString);
     }
-  this->Script("pack %s -side left", this->ThumbWheel->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand 1", this->ThumbWheel->GetWidgetName());
 }
 
 //-----------------------------------------------------------------------------
@@ -132,7 +135,7 @@ float vtkPVThumbWheel::GetValue()
 //-----------------------------------------------------------------------------
 void vtkPVThumbWheel::SetLabel(const char *str)
 {
-  this->Label->SetLabel(str); 
+  this->Label->SetLabel(str);
   if (str && str[0] &&
       (this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
