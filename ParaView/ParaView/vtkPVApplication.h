@@ -98,10 +98,6 @@ public:
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   
   // Description:
-  // Display the on-line help and about dialog for this application.
-  virtual void DisplayAbout(vtkKWWindow *);
-
-  // Description:
   // Make sure the user accepts the license before running.
   int AcceptLicense();
   int AcceptEvaluation();
@@ -161,6 +157,12 @@ public:
   vtkSetMacro(ExitStatus, int);
   vtkGetMacro(ExitStatus, int);
 
+  // Description:
+  // ParaView version is always MajorVersion.MinorVersion.
+  // Change these in the constructor.
+  vtkGetMacro(MajorVersion, int);
+  vtkGetMacro(MinorVersion, int);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -183,6 +185,8 @@ protected:
   int PromptRegistration(char *,char *);
 
   int ExitStatus;
+  int MajorVersion;
+  int MinorVersion;
 
   vtkMultiProcessController *Controller;
 };

@@ -517,7 +517,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // Save current data in VTK format
   this->MenuFile->InsertCommand(1, "Save Data", this, "WriteData");
   
-  this->MenuFile->InsertCommand(2, "Export Tcl Script", this, "SaveInTclScript");
+  this->MenuFile->InsertCommand(2, "Export VTK Script", this, "SaveInTclScript");
   //this->MenuFile->InsertCommand(3, "Save Workspace", this, "SaveWorkspace");
   
   // Log stuff
@@ -552,8 +552,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
       this->SourceMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
       }
     }
-  
-  this->SetStatusText("Version 1.0 beta");
+
+  char version[128];
+  sprintf(version,"Version %d.%d", this->GetPVApplication()->GetMajorVersion(),
+	  this->GetPVApplication()->GetMinorVersion());
+  this->SetStatusText(version);
   
   this->Script( "wm withdraw %s", this->GetWidgetName());
 
@@ -1066,7 +1069,8 @@ void vtkPVWindow::SaveInTclScript()
     return;
     }
 
-  *file << "# ParaView Version 0.1\n\n";
+  *file << "# ParaView Version " << this->GetPVApplication()->GetMajorVersion()
+	<< "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
 
   *file << "package require vtk\n"
         << "package require vtkinteraction\n"
@@ -1153,7 +1157,8 @@ void vtkPVWindow::SaveWorkspace()
     return;
     }
 
-  *file << "# ParaView Workspace Version 0.1\n\n";
+  *file << "# ParaView Workspace Version  " << this->GetPVApplication()->GetMajorVersion()
+	<< "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
 
   
   this->GetMainView()->SaveInTclScript(file);

@@ -126,22 +126,20 @@ int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  char name[128];
   this->CommandFunction = vtkPVApplicationCommand;
+  this->MajorVersion = 0;
+  this->MinorVersion = 2;
   this->SetApplicationName("ParaView");
+  sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
+  this->SetApplicationVersionName(name);
+  this->SetApplicationReleaseName("beta");
 
   this->Controller = NULL;
   this->Log = NULL;
   this->LogFileName = NULL;
 
   this->ExitStatus = 0;
-  // For some reason "GetObjectFromPointer" is returning vtkTemp0 instead
-  /// of Application.  Lets force it.
-  //if (this->TclName != NULL)
-  //  {
-  //  vtkErrorMacro("Expecting TclName to be NULL.");
-  //  }
-  //this->TclName = new char [strlen("Application")+1];
-  //strcpy(this->TclName,"Application");
 }
 
 
@@ -368,15 +366,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->vtkKWApplication::Start(argc,argv);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVApplication::DisplayAbout(vtkKWWindow *win)
-{
-  
-  if (!this->AcceptLicense())
-    {
-    this->Exit();
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::Exit()
