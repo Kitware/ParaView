@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.461");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1678,7 +1678,7 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
   vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
   const char* selfPath = util->FindSelfPath(
     this->GetPVApplication()->GetArgv0());
-  const char* relPath = "../share/ParaView-" PARAVIEW_VERSION_STRING "/Demos";
+  const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
   char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
   sprintf(newPath, "%s/%s", selfPath, relPath);
 
