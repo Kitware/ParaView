@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.6.4.1");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.6.4.2");
 
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
@@ -75,12 +75,28 @@ void vtkSMLineWidgetProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
+  
+  unsigned int cc;
+
   //superclass will create the stream objects
   this->Superclass::CreateVTKObjects(numObjects);
   //now do additional initialization on the streamobjects
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
+ /* 
+  // Now create vtkPickPointWidget on the client.
+  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
+    {
+    stream << vtkClientServerStream::New
+      << "vtkPickLineWidget"
+      << this->GetID(cc)
+      << vtkClientServerStream::End;
+    }
+  pm->SendStream(vtkProcessModule::CLIENT, stream);
+  this->SetServers(
+    vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
+  */
+  for(cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
     stream << vtkClientServerStream::Invoke <<  id

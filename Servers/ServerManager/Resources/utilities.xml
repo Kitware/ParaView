@@ -284,7 +284,9 @@
   </ProxyGroup>
   
   <ProxyGroup name="3d_widgets">
-    <LineWidgetProxy name="LineWidgetProxy" class="vtkPickLineWidget">
+    <LineWidgetProxy name="LineWidgetProxy" class="vtkLineWidget"
+      client_class="vtkPickLineWidget">
+      <!-- vtkPickLineWidget is only created on the client -->
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
         command="SetIgnorePlaceWidgetChanges"
@@ -347,7 +349,9 @@
       </IntVectorProperty>
     </LineWidgetProxy>
 
-    <PointWidgetProxy name="PointWidgetProxy" class="vtkPickPointWidget">
+    <PointWidgetProxy name="PointWidgetProxy" class="vtkPointWidget"
+      client_class="vtkPickPointWidget">
+      <!-- vtkPickPointWidget object is created only on the client -->
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
         command="SetIgnorePlaceWidgetChanges"

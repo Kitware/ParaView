@@ -22,13 +22,12 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.5.4.1");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
 {
   this->Position[0] = this->Position[1] = this->Position[2] = 0;
-  this->SetVTKClassName("vtkPickPointWidget");
 }
 
 //----------------------------------------------------------------------------
@@ -43,10 +42,28 @@ void vtkSMPointWidgetProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
-  this->Superclass::CreateVTKObjects(numObjects);
+  unsigned int cc;
+  // Create the vtkPointWidget only on render server.
+//  this->SetServers(vtkProcessModule::RENDER_SERVER);
+  
+  this->Superclass::CreateVTKObjects(numObjects); 
+  
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
+  /*
+  // Now create vtkPickPointWidget on the client.
+  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
+    {
+    stream << vtkClientServerStream::New
+      << "vtkPickPointWidget"
+      << this->GetID(cc)
+      << vtkClientServerStream::End;
+    }
+  pm->SendStream(vtkProcessModule::CLIENT, stream);
+  this->SetServers(
+    vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
+  */
+  for( cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
     stream << vtkClientServerStream::Invoke 

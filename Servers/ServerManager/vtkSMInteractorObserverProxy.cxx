@@ -22,8 +22,11 @@
 #include "vtkClientServerID.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVXMLElement.h"
+#include "vtkPVOptions.h"
+
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.8.2.3");
+vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.8.2.4");
 
 //===========================================================================
 //***************************************************************************
@@ -56,12 +59,14 @@ vtkSMInteractorObserverProxy::vtkSMInteractorObserverProxy()
   this->Observer->SMInteractorObserverProxy = this;
   this->Enabled = 0;
   this->CurrentRenderModuleProxy = 0;
+  this->ClientSideVTKClassName = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMInteractorObserverProxy::~vtkSMInteractorObserverProxy()
 {
   this->Observer->Delete();
+  this->SetClientSideVTKClassName(0);
 }
 
 
@@ -120,6 +125,7 @@ void vtkSMInteractorObserverProxy::ExecuteEvent(vtkObject*, unsigned long event,
     }
   else if ( event == vtkCommand::EndInteractionEvent && iren)
     {
+    this->UpdateVTKObjects();
     iren->InteractiveRenderEnabledOff();
     }
   else if ( event == vtkCommand::PlaceWidgetEvent )
@@ -131,6 +137,7 @@ void vtkSMInteractorObserverProxy::ExecuteEvent(vtkObject*, unsigned long event,
     // So the the client object changes are sent over to the Servers
     this->UpdateVTKObjects();
     }
+
   if (iren)
     {
     iren->Render();
@@ -144,15 +151,59 @@ void vtkSMInteractorObserverProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
-  //Chage the SMProxy default proxy creation location
-  this->SetServers(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   
+  unsigned int cc;
+  vtkTypeUInt32 old_Servers = this->Servers;
+  vtkTypeUInt32 new_Servers = this->Servers;
+  int create_on_client = 0;
+  
+  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
+    vtkProcessModule::GetProcessModule());
+ 
+  // This crookedness is required because, vtkPickPointWidget/ vtkPickLineWiget
+  // need render module, and hence should be created only on the client side.
+  // They cannot be created on the ServerSide at all (since they are 
+  // are ServerManager). So, we create vtkPointWidget / vtkLineWidget on the
+  // serverside. However, if not running in client server mode,
+  // we create vtkPickPointWidget / vtkPickLineWiget directly.
+
+  if (this->ClientSideVTKClassName && 
+    !pm->GetOptions()->GetClientMode() && !pm->GetOptions()->GetServerMode())
+    {
+    // paraview run as a single process or MPI,
+    this->SetVTKClassName(this->ClientSideVTKClassName); 
+    }
+  else if (this->ClientSideVTKClassName)
+    {
+    // check if the proxy is being created on the Client at all.
+    create_on_client = ( (this->Servers & vtkProcessModule::CLIENT) != 0)? 1 : 0;
+    new_Servers = (create_on_client)? ( old_Servers & (~vtkProcessModule::CLIENT)) :
+      old_Servers;
+    this->SetServers(new_Servers);
+    }
+
   //Superclass creates the actual VTK objects
   this->Superclass::CreateVTKObjects(numObjects);
 
+  
+  if (create_on_client)
+    {
+    vtkClientServerStream stream;
+    for (cc=0; cc < this->GetNumberOfIDs(); cc++)
+      {
+      stream << vtkClientServerStream::New
+        << this->ClientSideVTKClassName << this->GetID(cc)
+        << vtkClientServerStream::End;
+      }
+    if (stream.GetNumberOfMessages() > 0)
+      {
+      pm->SendStream(vtkProcessModule::CLIENT, stream);
+      }
+    this->SetServers(old_Servers);
+    }
+
    //additional initialization 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
+  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkInteractorObserver* widget = vtkInteractorObserver::SafeDownCast(
       pm->GetObjectFromID(this->GetID(cc)));
@@ -207,6 +258,23 @@ void vtkSMInteractorObserverProxy::SetCurrentRenderModuleProxy(
   this->CurrentRenderModuleProxy = rm;
   this->SetEnabled(this->Enabled);
 }
+
+//----------------------------------------------------------------------------
+int vtkSMInteractorObserverProxy::ReadXMLAttributes(
+  vtkSMProxyManager* pm, vtkPVXMLElement* element)
+{
+  if (!this->Superclass::ReadXMLAttributes(pm, element))
+    {
+    return 0;
+    }
+  const char* client_class = element->GetAttribute("client_class");
+  if (client_class)
+    {
+    this->SetClientSideVTKClassName(client_class);
+    }
+  return 1;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkSMInteractorObserverProxy::PrintSelf(ostream& os, vtkIndent indent)

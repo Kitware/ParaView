@@ -35,7 +35,7 @@
 #include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.67.2.4");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.67.2.5");
 
 //===========================================================================
 //***************************************************************************
@@ -183,6 +183,8 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
   pxm->RegisterProxy("3d_widgets",this->WidgetProxyName, this->WidgetProxy);
   proxyNum++;
   str.rdbuf()->freeze(0);
+  this->WidgetProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->WidgetProxy->CreateVTKObjects(1);
 
   // Add to the render module.

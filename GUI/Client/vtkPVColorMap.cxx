@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.116.2.4");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.116.2.5");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -988,6 +988,8 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
     vtkErrorMacro("Failed to create LookupTableProxy");
     return;
     }
+  this->LookupTableProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   ostrstream str1;
   str1 << "PVColorMap_LookupTable" << proxyNum << ends;
   this->SetLookupTableProxyName(str1.str());
