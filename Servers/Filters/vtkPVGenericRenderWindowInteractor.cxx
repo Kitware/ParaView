@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.1");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.2");
 vtkCxxSetObjectMacro(vtkPVGenericRenderWindowInteractor,Renderer,vtkRenderer);
 
 //----------------------------------------------------------------------------
@@ -30,7 +30,6 @@ vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
 {
   this->PVRenderView = NULL;
   this->Renderer = NULL;
-  this->ReductionFactor = 1;
   this->InteractiveRenderEnabled = 0;
 }
 
@@ -71,8 +70,7 @@ void vtkPVGenericRenderWindowInteractor::SetPVRenderView(vtkPVRenderViewProxy *v
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SetMoveEventInformationFlipY(
-  int x, int y)
+void vtkPVGenericRenderWindowInteractor::SetMoveEventInformationFlipY(int x, int y)
 {
   this->SetEventInformationFlipY(x, y, this->ControlKey, this->ShiftKey,
                                  this->KeyCode, this->RepeatCount,
@@ -126,243 +124,70 @@ void vtkPVGenericRenderWindowInteractor::SetInteractiveRenderEnabled(int val)
     }
 }
 
-
-
-// Special methods for forwarding events to satellite processes.
-// The take care of the reduction factor by comparing 
-// renderer size with render window size. 
-
-
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SatelliteLeftPress(int x, int y, 
+void vtkPVGenericRenderWindowInteractor::OnLeftPress(int x, int y, 
                                                      int control, int shift)
 {
-  int *winSize;
-  int *renSize;
-  winSize = this->RenderWindow->GetSize();
-  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
-  rc->InitTraversal();
-  vtkRenderer *aren = rc->GetNextItem();
-  renSize = aren->GetSize();
-  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
-  x = (int)((float)x / (float)(reductionFactor));
-  y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
-  this->SetEventInformation(x, y, control, shift);
-  if (reductionFactor != this->ReductionFactor)
-    {
-    this->LastEventPosition[0] = this->LastEventPosition[0] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->LastEventPosition[1] = this->LastEventPosition[1] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->Size[0] = renSize[0];
-    this->Size[1] = renSize[1];
-    this->ReductionFactor = reductionFactor;
-    }
+  this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
   this->InvokeEvent(vtkCommand::LeftButtonPressEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SatelliteMiddlePress(int x, int y, 
-                                                     int control, int shift)
+void vtkPVGenericRenderWindowInteractor::OnMiddlePress(int x, int y, 
+                                                       int control, int shift)
 {
-  int *winSize;
-  int *renSize;
-  winSize = this->RenderWindow->GetSize();
-  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
-  rc->InitTraversal();
-  vtkRenderer *aren = rc->GetNextItem();
-  renSize = aren->GetSize();
-  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
-  x = (int)((float)x / (float)(reductionFactor));
-  y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
-  this->SetEventInformation(x, y, control, shift);
-  if (reductionFactor != this->ReductionFactor)
-    {
-    this->LastEventPosition[0] = this->LastEventPosition[0] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->LastEventPosition[1] = this->LastEventPosition[1] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->Size[0] = renSize[0];
-    this->Size[1] = renSize[1];
-    this->ReductionFactor = reductionFactor;
-    }
+  this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
   this->InvokeEvent(vtkCommand::MiddleButtonPressEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SatelliteRightPress(int x, int y, 
-                                                     int control, int shift)
+void vtkPVGenericRenderWindowInteractor::OnRightPress(int x, int y, 
+                                                      int control, int shift)
 {
-  int *winSize;
-  int *renSize;
-  winSize = this->RenderWindow->GetSize();
-  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
-  rc->InitTraversal();
-  vtkRenderer *aren = rc->GetNextItem();
-  renSize = aren->GetSize();
-  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
-  x = (int)((float)x / (float)(reductionFactor));
-  y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
-  this->SetEventInformation(x, y, control, shift);
-  if (reductionFactor != this->ReductionFactor)
-    {
-    this->LastEventPosition[0] = this->LastEventPosition[0] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->LastEventPosition[1] = this->LastEventPosition[1] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->Size[0] = renSize[0];
-    this->Size[1] = renSize[1];
-    this->ReductionFactor = reductionFactor;
-    }
+  this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
   this->InvokeEvent(vtkCommand::RightButtonPressEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SatelliteLeftRelease(int x, int y, 
+void vtkPVGenericRenderWindowInteractor::OnLeftRelease(int x, int y, 
                                                        int control, int shift)
 {
-  int *winSize;
-  int *renSize;
-  winSize = this->RenderWindow->GetSize();
-  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
-  rc->InitTraversal();
-  vtkRenderer *aren = rc->GetNextItem();
-  renSize = aren->GetSize();
-  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
-  x = (int)((float)x / (float)(reductionFactor));
-  y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
-  this->SetEventInformation(x, y, control, shift);
-  if (reductionFactor != this->ReductionFactor)
-    {
-    this->LastEventPosition[0] = this->LastEventPosition[0] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->LastEventPosition[1] = this->LastEventPosition[1] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->Size[0] = renSize[0];
-    this->Size[1] = renSize[1];
-    this->ReductionFactor = reductionFactor;
-    }
+  this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
   this->InvokeEvent(vtkCommand::LeftButtonReleaseEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SatelliteMiddleRelease(int x, int y, 
-                                                        int control, int shift)
+void vtkPVGenericRenderWindowInteractor::OnMiddleRelease(int x, int y, 
+                                                         int control, int shift)
 {
-  int *winSize;
-  int *renSize;
-  winSize = this->RenderWindow->GetSize();
-  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
-  rc->InitTraversal();
-  vtkRenderer *aren = rc->GetNextItem();
-  renSize = aren->GetSize();
-  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
-  x = (int)((float)x / (float)(reductionFactor));
-  y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
-  this->SetEventInformation(x, y, control, shift);
-  if (reductionFactor != this->ReductionFactor)
-    {
-    this->LastEventPosition[0] = this->LastEventPosition[0] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->LastEventPosition[1] = this->LastEventPosition[1] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->Size[0] = renSize[0];
-    this->Size[1] = renSize[1];
-    this->ReductionFactor = reductionFactor;
-    }
+  this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
   this->InvokeEvent(vtkCommand::MiddleButtonReleaseEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SatelliteRightRelease(int x, int y, 
+void vtkPVGenericRenderWindowInteractor::OnRightRelease(int x, int y, 
                                                         int control, int shift)
 {
-  int *winSize;
-  int *renSize;
-  winSize = this->RenderWindow->GetSize();
-  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
-  rc->InitTraversal();
-  vtkRenderer *aren = rc->GetNextItem();
-  renSize = aren->GetSize();
-  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
-  x = (int)((float)x / (float)(reductionFactor));
-  y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
-  this->SetEventInformation(x, y, control, shift);
-  if (reductionFactor != this->ReductionFactor)
-    {
-    this->LastEventPosition[0] = this->LastEventPosition[0] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->LastEventPosition[1] = this->LastEventPosition[1] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->Size[0] = renSize[0];
-    this->Size[1] = renSize[1];
-    this->ReductionFactor = reductionFactor;
-    }
+  this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, control, shift);
   this->InvokeEvent(vtkCommand::RightButtonReleaseEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SatelliteMove(int x, int y) 
+void vtkPVGenericRenderWindowInteractor::OnMove(int x, int y) 
 {
-  int* winSize;
-  int* renSize;
-  winSize = this->RenderWindow->GetSize();
-  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
-  rc->InitTraversal();
-  vtkRenderer *aren = rc->GetNextItem();
-  renSize = aren->GetSize(); 
-  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
-  x = (int)((float)x / (float)(reductionFactor));
-  y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
-  this->SetEventInformation(x, y, this->ControlKey, this->ShiftKey,
-                                 this->KeyCode, this->RepeatCount,
-                                 this->KeySym);
-  if (reductionFactor != this->ReductionFactor)
-    {
-    this->LastEventPosition[0] = this->LastEventPosition[0] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->LastEventPosition[1] = this->LastEventPosition[1] 
-                                   * this->ReductionFactor / reductionFactor;
-    this->Size[0] = renSize[0];
-    this->Size[1] = renSize[1];
-    this->ReductionFactor = reductionFactor;
-    }
+  this->SetEventInformation(x, this->RenderWindow->GetSize()[1]-y, 
+                            this->ControlKey, this->ShiftKey,
+                            this->KeyCode, this->RepeatCount,
+                            this->KeySym);
   this->InvokeEvent(vtkCommand::MouseMoveEvent, NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGenericRenderWindowInteractor::SatelliteKeyPress(char keyCode,
-                                                           int x, int y) 
+void vtkPVGenericRenderWindowInteractor::OnKeyPress(char keyCode, int x, int y) 
 {
-  int *winSize;
-  int *renSize;
-  winSize = this->RenderWindow->GetSize();
-  vtkRendererCollection *rc = this->RenderWindow->GetRenderers();
-  rc->InitTraversal();
-  vtkRenderer *aren = rc->GetNextItem();
-  renSize = aren->GetSize();
-  int reductionFactor = this->CalculateReductionFactor(winSize[1], renSize[1]);
-  x = (int)((float)x / (float)(reductionFactor));
-  y = (int)((float)(winSize[1]-y) / (float)(reductionFactor));
-
-  this->SetEventPosition(x, y);
+  this->SetEventPosition(x, this->RenderWindow->GetSize()[1]-y);
   this->KeyCode = keyCode;
   this->InvokeEvent(vtkCommand::CharEvent, NULL);
-}
-
-
-//----------------------------------------------------------------------------
-int vtkPVGenericRenderWindowInteractor::CalculateReductionFactor(int winSize1,
-                                                                 int renSize1)
-{
-  if(winSize1 > 0 && renSize1 > 0)
-    {
-    return (int)(0.5 + ((float)winSize1/(float)renSize1));
-    }
-  else
-    {
-    return 1;
-    }
 }
 
 

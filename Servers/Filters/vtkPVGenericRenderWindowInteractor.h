@@ -65,23 +65,20 @@ public:
 
   // Description:
   // Methods broadcasted to the satellites to synchronize 3D widgets.
-  void SatelliteLeftPress(int x, int y, int control, int shift);
-  void SatelliteMiddlePress(int x, int y, int control, int shift);
-  void SatelliteRightPress(int x, int y, int control, int shift);
-  void SatelliteLeftRelease(int x, int y, int control, int shift);
-  void SatelliteMiddleRelease(int x, int y, int control, int shift);
-  void SatelliteRightRelease(int x, int y, int control, int shift);
-  void SatelliteMove(int x, int y);
-  void SatelliteKeyPress(char keyCode, int x, int y);
+  void OnLeftPress(int x, int y, int control, int shift);
+  void OnMiddlePress(int x, int y, int control, int shift);
+  void OnRightPress(int x, int y, int control, int shift);
+  void OnLeftRelease(int x, int y, int control, int shift);
+  void OnMiddleRelease(int x, int y, int control, int shift);
+  void OnRightRelease(int x, int y, int control, int shift);
+  void OnMove(int x, int y);
+  void OnKeyPress(char keyCode, int x, int y);
 
 protected:
   vtkPVGenericRenderWindowInteractor();
   ~vtkPVGenericRenderWindowInteractor();
 
-  int CalculateReductionFactor(int winSize1, int renSize1);
-  
   vtkPVRenderViewProxy *PVRenderView;
-  int ReductionFactor;
   int InteractiveRenderEnabled;
   vtkRenderer* Renderer;
 

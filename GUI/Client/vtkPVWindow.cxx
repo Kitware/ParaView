@@ -107,8 +107,6 @@
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWToolbarSet.h"
 
-#include "vtkInteractorStyleTrackballCamera.h"
-
 #include "vtkPVAnimationManager.h"
 #ifdef _WIN32
 # include "vtkKWRegisteryUtilities.h"
@@ -142,7 +140,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.659");
+vtkCxxRevisionMacro(vtkPVWindow, "1.660");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1881,15 +1879,6 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
       break;
     }
 
-//   this->InteractiveRenderEnabledOn();
-
-//   vtkInteractorStyleTrackballCamera* style =
-//     vtkInteractorStyleTrackballCamera::New();
-//   this->Interactor->SetInteractorStyle(style);
-//   style->Delete();
-
-  //this->Toolbars->SetToolbarVisibility(
-  //  this->PickCenterToolbar, pick_toolbar_vis);
   this->Superclass::SetToolbarVisibility(
     this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL, pick_toolbar_vis);
   this->MainView->EventuallyRender();
