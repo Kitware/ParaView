@@ -2595,7 +2595,7 @@ void vtkPVWindow::SaveTrace()
 int vtkPVWindow::SaveTrace(const char* filename)
 {
   ofstream *trace = this->GetPVApplication()->GetTraceFile();
-  cout << trace << endl;
+
   if ( ! trace)
     {
     return 0;
@@ -2611,7 +2611,6 @@ int vtkPVWindow::SaveTrace(const char* filename)
   const int bufferSize = 4096;
   char buffer[bufferSize];
 
-  cout << filename << endl;
   ofstream newTrace(filename);
   ifstream oldTrace("ParaViewTrace.pvs");
   
