@@ -179,12 +179,14 @@ vtkKWView::vtkKWView()
   this->Printing = 0;
   
   this->MenuPropertiesName = NULL;
+  this->MenuPropertiesUnderline = -1;
   this->SetMenuPropertiesName("  View");
   
   this->Renderer = vtkRenderer::New();
   this->RenderWindow = vtkRenderWindow::New();
   this->RenderWindow->AddRenderer(this->Renderer);
   this->RenderWindow->SetAbortCheckMethod(KWViewAbortCheckMethod, (void*)this);
+
 }
 
 vtkKWView::~vtkKWView()
@@ -920,26 +922,26 @@ void vtkKWView::Select(vtkKWWindow *pw)
   char *rbv = 
     pw->GetMenuProperties()->CreateRadioButtonVariable(
       pw->GetMenuProperties(),"Radio");
-  pw->GetMenuProperties()->AddRadioButton(10, this->MenuPropertiesName, rbv, this, "ShowViewProperties");
+  pw->GetMenuProperties()->AddRadioButton(10, this->MenuPropertiesName, rbv, this, "ShowViewProperties", this->GetMenuPropertiesUnderline());
   delete [] rbv;
 
   if ( this->SupportSaveAsImage )
     {
     // add the save as image option
     pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
-                                     "Save Image",this, "SaveAsImage");
+                                     "Save Image",this, "SaveAsImage", 8);
     }
   
   if ( this->SupportPrint )
     {
     // add the Print option
     pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
-                                     "Print", this, "Print");
+                                     "Print", this, "Print", 0);
     }
   
 #ifdef _WIN32
   // add the edit copy option
-  pw->GetMenuEdit()->AddCommand("Copy",this,"EditCopy");
+  pw->GetMenuEdit()->AddCommand("Copy",this,"EditCopy", 0);
 #endif
   // change the color of the frame
   this->Script("%s configure -bg #008", this->Label->GetWidgetName());
@@ -1242,7 +1244,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.43 $");
+  this->ExtractRevision(os,"$Revision: 1.44 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 

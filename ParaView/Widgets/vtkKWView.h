@@ -295,6 +295,8 @@ public:
   // sheet entry
   vtkSetStringMacro( MenuPropertiesName );
   vtkGetStringMacro( MenuPropertiesName );
+  vtkSetMacro( MenuPropertiesUnderline, int );
+  vtkGetMacro( MenuPropertiesUnderline, int );
 
   // Description:
   // Options to enable / disable UI elements. Should be set before the
@@ -378,6 +380,7 @@ protected:
   int              RenderState;
   
   char             *MenuPropertiesName;
+  int              MenuPropertiesUnderline;
   
   int              Printing;
   
