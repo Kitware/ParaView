@@ -26,6 +26,10 @@
 #include "vtkRegressionTestImage.h"
 #include "vtkClipDataSet.h"
 #include "vtkCutter.h"
+#include "vtkDataSetMapper.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkLookupTable.h"
+#include "vtkCellData.h"
 
 int main(int argc, char * argv[])
 {
@@ -58,6 +62,7 @@ int main(int argc, char * argv[])
   extract->SetClipPlane (clipPlane);
   extract->GetNumberOfVolumeArrayNames ();
   extract->GetVolumeArrayName ( 0 );
+  extract->Update();  //discard
   
   vtkCTHOutlineFilter *outline = vtkCTHOutlineFilter::New();
   outline->SetInput( fractal->GetOutput());
@@ -68,14 +73,17 @@ int main(int argc, char * argv[])
   vtkActor *outlineActor = vtkActor::New();
   outlineActor->SetMapper( outlineMapper );
 
-  vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
-  mapper->SetInput( extract->GetOutput() );
-  mapper->SelectColorArray( "Fractal Volume Fraction" );
-  
+  vtkLookupTable *lut = vtkLookupTable::New();
+  lut->SetHueRange (0.667, 0.0);
+
+  vtkDataSetMapper *mapper = vtkDataSetMapper::New();
+  mapper->SetInput( clip->GetOutput() );
+  mapper->SetLookupTable (lut);
+  clip->GetOutput()->GetCellData()->
+    SetActiveScalars ( "Fractal Volume Fraction"   );
+
   vtkActor *actor = vtkActor::New();
   actor->SetMapper( mapper );
-  vtkProperty *p = actor->GetProperty ();
-  p->SetColor (0.5, 0.5, 0.5);
 
   vtkRenderer *ren = vtkRenderer::New();
   ren->AddActor( actor );
@@ -112,6 +120,7 @@ int main(int argc, char * argv[])
   ren->Delete();
   renWin->Delete();
   iren->Delete();
+  lut->Delete();
 
   return !retVal;
 }
