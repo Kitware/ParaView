@@ -37,26 +37,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWIcon.h"
 
-#include "Resources/vtkKWArrowDown.h"
-
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.13");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
 {
-  this->TitleBar              = vtkKWWidget::New();
+  this->TitleBar              = vtkKWFrame::New();
   this->Title                 = vtkKWLabel::New();
   this->SelectionList         = vtkKWMenuButton::New();
-  this->TitleBarRightSubframe = vtkKWWidget::New();
-  this->BodyFrame             = vtkKWWidget::New();
+  this->TitleBarRightSubframe = vtkKWFrame::New();
+  this->BodyFrame             = vtkKWFrame::New();
   
   this->SelectCommand         = NULL;
+
+  this->TitleColor[0]                   = 1.0;
+  this->TitleColor[1]                   = 1.0;
+  this->TitleColor[2]                   = 1.0;
+
+  this->TitleSelectedColor[0]           = 1.0;
+  this->TitleSelectedColor[1]           = 1.0;
+  this->TitleSelectedColor[2]           = 1.0;
+
+  this->TitleBackgroundColor[0]         = 0.0;
+  this->TitleBackgroundColor[1]         = 0.0;
+  this->TitleBackgroundColor[2]         = 0.5;
+
+  this->TitleBackgroundSelectedColor[0] = 0.0;
+  this->TitleBackgroundSelectedColor[1] = 0.0;
+  this->TitleBackgroundSelectedColor[2] = 0.5;
 }
 
 //----------------------------------------------------------------------------
@@ -95,40 +110,51 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   wname = this->GetWidgetName();
   this->Script("frame %s %s -bd 3 -relief ridge", wname, (args ? args : ""));
 
+  // The title bar
+
   this->TitleBar->SetParent(this);
-  this->TitleBar->Create(app, "frame", "-bg #008");
-  
+  this->TitleBar->Create(app, "");
+
+  this->Script("pack %s -side top -fill x -expand no",
+               this->TitleBar->GetWidgetName());
+
+  // The selection button
+
   this->SelectionList->SetParent(this->TitleBar);
-  this->SelectionList->Create(app, "-indicatoron 0");
+  this->SelectionList->Create(app, "");
+  this->SelectionList->IndicatorOff();
   this->SelectionList->SetImageOption(vtkKWIcon::ICON_EXPAND);
-#if 0
-image_KWArrowDown, 
-                                      image_KWArrowDown_width,
-                                      image_KWArrowDown_height,
-                                      image_KWArrowDown_pixel_size,
-                                      image_KWArrowDown_buffer_length);
-#endif
+
+  // The title itself
 
   this->Title->SetParent(this->TitleBar);
-  this->Title->Create(app, "-bg #008 -fg #fff");
+  this->Title->Create(app, "");
   this->Title->SetLabel("<Click to Select>");
   
   this->Script("pack %s %s -side left -anchor w -fill y",
                this->SelectionList->GetWidgetName(),
                this->Title->GetWidgetName());
   
+  // The subframe on the right
+
   this->TitleBarRightSubframe->SetParent(this->TitleBar);
-  this->TitleBarRightSubframe->Create(app, "frame", "-bg #008");
+  this->TitleBarRightSubframe->Create(app, "");
+
   this->Script("pack %s -side right -anchor e -padx 4",
                this->TitleBarRightSubframe->GetWidgetName());
   
+  // The body frame
+
   this->BodyFrame->SetParent(this);
-  this->BodyFrame->Create(app, "frame", "-bg white");
-  this->Script("pack %s -side top -fill x -expand no",
-               this->TitleBar->GetWidgetName());
+  this->BodyFrame->Create(app, "-bg white");
+
   this->Script("pack %s -side top -fill both -expand yes",
                this->BodyFrame->GetWidgetName());
-  
+
+  // Update colors
+
+  this->UpdateColors();
+
   // Update enable state
 
   this->UpdateEnableState();
@@ -137,12 +163,6 @@ image_KWArrowDown,
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitle(const char *title)
 {
-  if (!this->Title->IsCreated())
-    {
-    vtkErrorMacro("Selection frame must be created before title can be set");
-    return;
-    }
-  
   this->Title->SetLabel(title);
 }
 
@@ -153,11 +173,102 @@ const char* vtkKWSelectionFrame::GetTitle()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWSelectionFrame::SetColor(
+  float *color, float r, float g, float b)
+{
+  if ((r == color[0] && g == color[1] &&  b == color[2]) ||
+      (r < 0.0 || r > 1.0) || (g < 0.0 || g > 1.0) || (b < 0.0 || b > 1.0))
+    {
+    return 0;
+    }
+
+  color[0] = r;
+  color[1] = g;
+  color[2] = b;
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetTitleColor(
+  float r, float g, float b)
+{
+  if (this->SetColor(this->TitleColor, r, g, b))
+    {
+    this->Modified();
+    this->UpdateColors();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetTitleSelectedColor(
+  float r, float g, float b)
+{
+  if (this->SetColor(this->TitleSelectedColor, r, g, b))
+    {
+    this->Modified();
+    this->UpdateColors();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetTitleBackgroundColor(
+  float r, float g, float b)
+{
+  if (this->SetColor(this->TitleBackgroundColor, r, g, b))
+    {
+    this->Modified();
+    this->UpdateColors();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetTitleBackgroundSelectedColor(
+  float r, float g, float b)
+{
+  if (this->SetColor(this->TitleBackgroundSelectedColor, r, g, b))
+    {
+    this->Modified();
+    this->UpdateColors();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::UpdateColors()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  this->TitleBar->SetBackgroundColor(
+    this->TitleBackgroundColor[0], 
+    this->TitleBackgroundColor[1], 
+    this->TitleBackgroundColor[2]);
+
+  this->Title->SetBackgroundColor(
+    this->TitleBackgroundColor[0], 
+    this->TitleBackgroundColor[1], 
+    this->TitleBackgroundColor[2]);
+
+  this->Title->SetForegroundColor(
+    this->TitleColor[0], 
+    this->TitleColor[1], 
+    this->TitleColor[2]);
+
+  this->TitleBarRightSubframe->SetBackgroundColor(
+    this->TitleBackgroundColor[0], 
+    this->TitleBackgroundColor[1], 
+    this->TitleBackgroundColor[2]);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetSelectionList(int num, const char **list)
 {
-  if ( ! this->SelectionList->IsCreated() )
+  if (!this->SelectionList->IsCreated())
     {
-    vtkErrorMacro("Selection frame must be created before selection list can be set");
+    vtkErrorMacro(
+      "Selection frame must be created before selection list can be set");
     return;
     }
   
@@ -253,5 +364,21 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "BodyFrame: " << this->BodyFrame << endl;
   os << indent << "TitleBarRightSubframe: " << this->TitleBarRightSubframe
      << endl;
+  os << indent << "TitleColor: ("
+     << this->TitleColor[0] << ", " 
+     << this->TitleColor[1] << ", " 
+     << this->TitleColor[2] << ")" << endl;
+  os << indent << "TitleSelectedColor: ("
+     << this->TitleSelectedColor[0] << ", " 
+     << this->TitleSelectedColor[1] << ", " 
+     << this->TitleSelectedColor[2] << ")" << endl;
+  os << indent << "TitleBackgroundColor: ("
+     << this->TitleBackgroundColor[0] << ", " 
+     << this->TitleBackgroundColor[1] << ", " 
+     << this->TitleBackgroundColor[2] << ")" << endl;
+  os << indent << "TitleBackgroundSelectedColor: ("
+     << this->TitleBackgroundSelectedColor[0] << ", " 
+     << this->TitleBackgroundSelectedColor[1] << ", " 
+     << this->TitleBackgroundSelectedColor[2] << ")" << endl;
 }
 

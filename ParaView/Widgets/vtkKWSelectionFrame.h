@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
+class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWMenuButton;
 
@@ -56,24 +57,40 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
   
   // Description:
-  // Access to sub-widgets
-  vtkGetObjectMacro(TitleBarRightSubframe, vtkKWWidget);
-  vtkGetObjectMacro(BodyFrame, vtkKWWidget);
-  vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
+  // Set/Get title
+  virtual void SetTitle(const char *title);
+  virtual const char* GetTitle();
+
+  // Description:
+  // Set the selection list (array for num strings) and the command
+  // that will be called when a selection is made (this command will be
+  // passed both the string selected and a point to this object)
+  virtual void SetSelectionList(int num, const char **list);
+  virtual void SetSelectCommand(vtkKWObject *object, const char *method);
+
+  // Description:
+  // Set/Get the title foregroud/background color (in both normal and 
+  // selected mode). 
+  vtkGetVector3Macro(TitleColor, float);
+  vtkGetVector3Macro(TitleSelectedColor, float);
+  vtkGetVector3Macro(TitleBackgroundColor, float);
+  vtkGetVector3Macro(TitleBackgroundSelectedColor, float);
+  virtual void SetTitleColor(float r, float g, float b);
+  virtual void SetTitleColor(float rgb[3])
+    { this->SetTitleColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetTitleSelectedColor(float r, float g, float b);
+  virtual void SetTitleSelectedColor(float rgb[3])
+    { this->SetTitleSelectedColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetTitleBackgroundColor(float r, float g, float b);
+  virtual void SetTitleBackgroundColor(float rgb[3])
+    { this->SetTitleBackgroundColor(rgb[0], rgb[1], rgb[2]); };
+  virtual void SetTitleBackgroundSelectedColor(float r, float g, float b);
+  virtual void SetTitleBackgroundSelectedColor(float rgb[3])
+    { this->SetTitleBackgroundSelectedColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
-  // Set/Get title (must be called after Create)
-  void SetTitle(const char *title);
-  const char* GetTitle();
-
-  // Description:
-  // Set the selection list, command
-  void SetSelectionList(int num, const char **list);
-  void SetSelectCommand(vtkKWObject *object, const char *method);
-
-  // Description:
   // Callbacks
-  void SelectionMenuCallback(const char *menuItem);
+  virtual void SelectionMenuCallback(const char *menuItem);
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -84,17 +101,31 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Access to sub-widgets
+  vtkGetObjectMacro(TitleBarRightSubframe, vtkKWFrame);
+  vtkGetObjectMacro(BodyFrame, vtkKWFrame);
+  vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
+  
 protected:
   vtkKWSelectionFrame();
   ~vtkKWSelectionFrame();
   
-  vtkKWWidget     *TitleBar;
+  vtkKWFrame      *TitleBar;
   vtkKWMenuButton *SelectionList;
   vtkKWLabel      *Title;
-  vtkKWWidget     *TitleBarRightSubframe;
-  vtkKWWidget     *BodyFrame;
+  vtkKWFrame      *TitleBarRightSubframe;
+  vtkKWFrame      *BodyFrame;
 
-  void SetObjectMethodCommand(
+  virtual int SetColor(float *color, float r, float g, float b);
+  virtual void UpdateColors();
+
+  float TitleColor[3];
+  float TitleSelectedColor[3];
+  float TitleBackgroundColor[3];
+  float TitleBackgroundSelectedColor[3];
+
+  virtual void SetObjectMethodCommand(
     char **command, vtkKWObject *object, const char *method);
   char *SelectCommand;
   
