@@ -29,7 +29,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.23.6.1");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.23.6.2");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -126,9 +126,36 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
   return proxy;
 }
 
+
+//---------------------------------------------------------------------------
+int vtkSMProxyManager::ProxyElementExists(const char* groupName, 
+                                          const char* proxyName)
+{
+  if (!groupName || !proxyName)
+    {
+    return 0;
+    }
+  // Find the XML element from the proxy.
+  // 
+  vtkSMProxyManagerInternals::GroupMapType::iterator it =
+    this->Internals->GroupMap.find(groupName);
+  if (it != this->Internals->GroupMap.end())
+    {
+    vtkSMProxyManagerElementMapType::iterator it2 =
+      it->second.find(proxyName);
+
+    if (it2 != it->second.end())
+      {
+      vtkPVXMLElement* element = it2->second.GetPointer();
+      return 1;
+      }
+    }
+  return 0;
+}
+
 //---------------------------------------------------------------------------
 vtkPVXMLElement* vtkSMProxyManager::GetProxyElement(const char* groupName, 
-  const char* proxyName)
+                                                    const char* proxyName)
 {
   if (!groupName || !proxyName)
     {
@@ -150,7 +177,33 @@ vtkPVXMLElement* vtkSMProxyManager::GetProxyElement(const char* groupName,
       }
     }
   vtkErrorMacro( << "No proxy that matches: group=" << groupName 
-    << " and proxy=" << proxyName << " were found.");
+                 << " and proxy=" << proxyName << " were found.");
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMProxyManager::GetNumberOfXMLGroups()
+{
+  return this->Internals->GroupMap.size();
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxyManager::GetXMLGroupName(unsigned int n)
+{
+  unsigned int idx;
+  vtkSMProxyManagerInternals::GroupMapType::iterator it = 
+    this->Internals->GroupMap.begin();
+  for (idx=0; 
+       it != this->Internals->GroupMap.end() && idx < n;
+       it++)
+    {
+    idx++;
+    }
+
+  if (idx == n && it != this->Internals->GroupMap.end())
+    {
+    return it->first.c_str();
+    }
   return 0;
 }
 

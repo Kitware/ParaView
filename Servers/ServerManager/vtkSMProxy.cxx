@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.33.2.1");
+vtkCxxRevisionMacro(vtkSMProxy, "1.33.2.2");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1141,6 +1141,53 @@ vtkSMPropertyIterator* vtkSMProxy::NewPropertyIterator()
   vtkSMPropertyIterator* iter = vtkSMPropertyIterator::New();
   iter->SetProxy(this);
   return iter;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::DeepCopy(vtkSMProxy* src)
+{
+  this->DeepCopy(src, 0);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::DeepCopy(vtkSMProxy* src, const char* exceptionClass)
+{
+  if (!src)
+    {
+    return;
+    }
+
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    src->Internals->SubProxies.begin();
+  for( ; it2 != src->Internals->SubProxies.end(); it2++)
+    {
+    vtkSMProxy* sub = this->GetSubProxy(it2->first.c_str());
+    if (sub)
+      {
+      sub->DeepCopy(it2->second, exceptionClass); 
+      }
+    }
+
+  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+  iter->SetTraverseSubProxies(0);
+  for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    const char* key = iter->GetKey();
+    vtkSMProperty* dest = iter->GetProperty();
+    if (key && dest)
+      {
+      vtkSMProperty* source = src->GetProperty(key);
+      if (source)
+        {
+        if (!exceptionClass || !dest->IsA(exceptionClass))
+          {
+          dest->DeepCopy(source);
+          }
+        }
+      }
+    }
+
+  iter->Delete();
 }
 
 //---------------------------------------------------------------------------

@@ -17,7 +17,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVGeometryInformation.h"
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
 {
@@ -28,7 +28,6 @@ vtkSMDisplayProxy::vtkSMDisplayProxy()
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::~vtkSMDisplayProxy()
 {
-  cout << "vtkSMDisplayProxy::~vtkSMDisplayProxy()" << endl;
   this->GeometryInformation->Delete();
 }
 

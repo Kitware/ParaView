@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.17.8.1");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.17.8.2");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -295,6 +295,39 @@ void vtkSMStringVectorProperty::SaveState(
     }
   this->Superclass::SaveState(name, file, indent);
   *file << indent << "</Property>" << endl;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::DeepCopy(vtkSMProperty* src)
+{
+  this->Superclass::DeepCopy(src);
+
+  vtkSMStringVectorProperty* dsrc = vtkSMStringVectorProperty::SafeDownCast(
+    src);
+  if (dsrc)
+    {
+    int imUpdate = this->ImmediateUpdate;
+    this->ImmediateUpdate = 0;
+    unsigned int i;
+    unsigned int numElems = dsrc->GetNumberOfElements();
+    this->SetNumberOfElements(numElems);
+    for(i=0; i<numElems; i++)
+      {
+      this->SetElement(i, dsrc->GetElement(i));
+      }
+    numElems = dsrc->GetNumberOfElements();
+    this->SetNumberOfUncheckedElements(numElems);
+    for(i=0; i<numElems; i++)
+      {
+      this->SetUncheckedElement(i, dsrc->GetUncheckedElement(i));
+      }
+    this->ImmediateUpdate = imUpdate;
+    }
+
+  if (this->ImmediateUpdate)
+    {
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------

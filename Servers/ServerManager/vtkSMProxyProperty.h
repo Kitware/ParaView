@@ -107,6 +107,10 @@ public:
   // Return a proxy. No bounds check is performed.
   vtkSMProxy* GetUncheckedProxy(unsigned int idx);
 
+  // Description: 
+  // Copy all property values.
+  virtual void DeepCopy(vtkSMProperty* src);
+
 protected:
   vtkSMProxyProperty();
   ~vtkSMProxyProperty();

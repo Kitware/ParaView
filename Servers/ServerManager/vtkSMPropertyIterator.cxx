@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5.6.1");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -33,6 +33,7 @@ vtkSMPropertyIterator::vtkSMPropertyIterator()
 {
   this->Proxy = 0;
   this->Internals = new vtkSMPropertyIteratorInternals;
+  this->TraverseSubProxies = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -72,18 +73,21 @@ void vtkSMPropertyIterator::Begin()
   this->Internals->ProxyIterator = 
     this->Proxy->Internals->SubProxies.begin(); 
 
-  // Go to the first sub-proxy that is not empty.
-  while (this->Internals->ProxyIterator != 
-         this->Proxy->Internals->SubProxies.end())
+  if (this->TraverseSubProxies)
     {
-    this->Internals->SubPropertyIterator = 
-      this->Internals->ProxyIterator->second->Internals->Properties.begin();
-    if ( this->Internals->SubPropertyIterator !=
-         this->Internals->ProxyIterator->second->Internals->Properties.end())
+    // Go to the first sub-proxy that is not empty.
+    while (this->Internals->ProxyIterator != 
+           this->Proxy->Internals->SubProxies.end())
       {
-      break;
+      this->Internals->SubPropertyIterator = 
+        this->Internals->ProxyIterator->second->Internals->Properties.begin();
+      if ( this->Internals->SubPropertyIterator !=
+           this->Internals->ProxyIterator->second->Internals->Properties.end())
+        {
+        break;
+        }
+      this->Internals->ProxyIterator++;
       }
-    this->Internals->ProxyIterator++;
     }
 }
 
@@ -95,9 +99,19 @@ int vtkSMPropertyIterator::IsAtEnd()
     vtkErrorMacro("Proxy is not set. Can not perform operation: IsAtEnd()");
     return 1;
     }
-  if ( (this->Internals->PropertyIterator == this->Proxy->Internals->Properties.end()) && (this->Internals->ProxyIterator == this->Proxy->Internals->SubProxies.end()) )
+  if (this->TraverseSubProxies)
     {
-    return 1;
+    if ( (this->Internals->PropertyIterator == this->Proxy->Internals->Properties.end()) && (this->Internals->ProxyIterator == this->Proxy->Internals->SubProxies.end()) )
+      {
+      return 1;
+      }
+    }
+  else
+    {
+    if ( this->Internals->PropertyIterator == this->Proxy->Internals->Properties.end() ) 
+      {
+      return 1;
+      }
     }
   return 0;
 }
@@ -116,6 +130,11 @@ void vtkSMPropertyIterator::Next()
       this->Proxy->Internals->Properties.end())
     {
     this->Internals->PropertyIterator++;
+    return;
+    }
+
+  if (!this->TraverseSubProxies)
+    {
     return;
     }
 
@@ -168,10 +187,13 @@ const char* vtkSMPropertyIterator::GetKey()
     return this->Internals->PropertyIterator->first.c_str();
     }
 
-  if (this->Internals->ProxyIterator != 
-      this->Proxy->Internals->SubProxies.end())
+  if (this->TraverseSubProxies)
     {
-    return this->Internals->SubPropertyIterator->first.c_str();
+    if (this->Internals->ProxyIterator != 
+        this->Proxy->Internals->SubProxies.end())
+      {
+      return this->Internals->SubPropertyIterator->first.c_str();
+      }
     }
 
   return 0;
@@ -191,10 +213,13 @@ vtkSMProperty* vtkSMPropertyIterator::GetProperty()
     return this->Internals->PropertyIterator->second.Property.GetPointer();
     }
 
-  if (this->Internals->ProxyIterator != 
-      this->Proxy->Internals->SubProxies.end())
+  if (this->TraverseSubProxies)
     {
-    return this->Internals->SubPropertyIterator->second.Property.GetPointer();
+    if (this->Internals->ProxyIterator != 
+        this->Proxy->Internals->SubProxies.end())
+      {
+      return this->Internals->SubPropertyIterator->second.Property.GetPointer();
+      }
     }
 
   return 0;

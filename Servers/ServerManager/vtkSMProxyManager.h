@@ -123,6 +123,21 @@ public:
   // in a instance group called groupName_prototypes.
   void InstantiateGroupPrototypes(const char* groupName);
 
+  // Description:
+  // Returns the number of XML groups from which proxies can
+  // be created.
+  unsigned int GetNumberOfXMLGroups();
+
+  // Description:
+  // Returns the name of nth XML group.
+  const char* GetXMLGroupName(unsigned int n);
+
+  // Description:
+  // Returns 1 if a proxy element of given group and exists, 0
+  // otherwise. If a proxy element does not exist, a call to
+  // NewProxy() will fail.
+  int ProxyElementExists(const char* groupName,  const char* proxyName);
+
 protected:
   vtkSMProxyManager();
   ~vtkSMProxyManager();

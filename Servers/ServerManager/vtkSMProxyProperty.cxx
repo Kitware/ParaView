@@ -28,7 +28,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.1");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.2");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -345,6 +345,37 @@ void vtkSMProxyProperty::SaveState(
   this->Superclass::SaveState(name, file, indent);
   *file << indent << "</Property>" << endl;
           
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::DeepCopy(vtkSMProperty* src)
+{
+  this->Superclass::DeepCopy(src);
+
+  vtkSMProxyProperty* dsrc = vtkSMProxyProperty::SafeDownCast(
+    src);
+  if (dsrc)
+    {
+    int imUpdate = this->ImmediateUpdate;
+    this->ImmediateUpdate = 0;
+    unsigned int i;
+    unsigned int numElems = dsrc->GetNumberOfProxies();
+    for(i=0; i<numElems; i++)
+      {
+      this->AddProxy(dsrc->GetProxy(i));
+      }
+    numElems = dsrc->GetNumberOfUncheckedProxies();
+    for(i=0; i<numElems; i++)
+      {
+      this->AddUncheckedProxy(dsrc->GetUncheckedProxy(i));
+      }
+    this->ImmediateUpdate = imUpdate;
+    }
+
+  if (this->ImmediateUpdate)
+    {
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------

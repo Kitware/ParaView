@@ -143,6 +143,16 @@ public:
   // Return the servers.
   vtkTypeUInt32 GetServers();
 
+  // Description:
+  // Copy the values of all properties and sub-proxies.
+  // NOTE: This does NOT create properties and sub-proxies. Only
+  // copies values. Mismatched property and sub-proxy pairs are
+  // ignored.
+  // Properties of type exceptionClass are not copied. This
+  // is usually vtkSMInputProperty
+  virtual void DeepCopy(vtkSMProxy* src, const char* exceptionClass);
+  virtual void DeepCopy(vtkSMProxy* src);
+
 protected:
   vtkSMProxy();
   ~vtkSMProxy();
@@ -371,6 +381,7 @@ protected:
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);
 
   int CreateProxyHierarchy(vtkSMProxyManager* pm, vtkPVXMLElement* element);
+
 private:
   vtkSMProxyInternals* Internals;
 

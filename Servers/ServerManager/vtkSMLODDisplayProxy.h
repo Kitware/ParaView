@@ -47,13 +47,15 @@ public:
   // will result in call to ForceUpdate on the UpdateSuppressor(s), if any.
   virtual void InvalidateGeometry();
 
-  //BTX
   // Description:
   // Returns an up to data information object.
   // Do not keep a reference to this object.
   virtual vtkPVLODPartDisplayInformation* GetLODInformation();
+
+  //BTX
   enum {InformationInvalidatedEvent = 2000};
   //ETX
+
 protected:
   vtkSMLODDisplayProxy();
   ~vtkSMLODDisplayProxy();

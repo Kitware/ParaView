@@ -31,8 +31,12 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkMath.h"
 
+
+#include "vtkPolyData.h"
+#include "vtkPVUpdateSuppressor.h"
+
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -872,4 +876,11 @@ void vtkSMSimpleDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PropertyProxy: " << this->PropertyProxy << endl;
   os << indent << "ActorProxy: " << this->ActorProxy << endl;
   os << indent << "GeometryIsValid: " << this->GeometryIsValid << endl;
+
+  vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
+    vtkProcessModule::GetProcessModule());
+  vtkPVUpdateSuppressor* sup = vtkPVUpdateSuppressor::SafeDownCast(
+        pm->GetObjectFromID(this->UpdateSuppressorProxy->GetID(0)));
+  os << indent << "Update suppressor output: " << endl;
+  sup->GetOutput()->PrintSelf(os, indent.GetNextIndent());
 }

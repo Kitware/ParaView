@@ -89,6 +89,11 @@ public:
   // is called before the main Command.
   vtkSetStringMacro(CleanCommand);
   vtkGetStringMacro(CleanCommand);
+
+  // Description: 
+  // Copy all property values.
+  virtual void DeepCopy(vtkSMProperty* src);
+
 protected:
   vtkSMVectorProperty();
   ~vtkSMVectorProperty();

@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.20.6.1");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.20.6.2");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -308,6 +308,34 @@ void vtkSMIntVectorProperty::SaveState(
     }
   this->Superclass::SaveState(name, file, indent);
   *file << indent << "</Property>" << endl;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIntVectorProperty::DeepCopy(vtkSMProperty* src)
+{
+  this->Superclass::DeepCopy(src);
+
+  vtkSMIntVectorProperty* dsrc = vtkSMIntVectorProperty::SafeDownCast(
+    src);
+  if (dsrc)
+    {
+    int imUpdate = this->ImmediateUpdate;
+    this->ImmediateUpdate = 0;
+    this->SetNumberOfElements(dsrc->GetNumberOfElements());
+    this->SetNumberOfUncheckedElements(dsrc->GetNumberOfUncheckedElements());
+    memcpy(&this->Internals->Values[0], 
+           &dsrc->Internals->Values[0], 
+           this->GetNumberOfElements()*sizeof(int));
+    memcpy(&this->Internals->UncheckedValues[0], 
+           &dsrc->Internals->UncheckedValues[0], 
+           this->GetNumberOfUncheckedElements()*sizeof(int));
+    this->ImmediateUpdate = imUpdate;
+    }
+
+  if (this->ImmediateUpdate)
+    {
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------
