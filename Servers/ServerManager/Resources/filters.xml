@@ -413,6 +413,43 @@
    <!-- End CTHPart -->
    </SourceProxy>
 
+   <SourceProxy name="CTHOutlineFilter" class="vtkCTHOutlineFilter">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+   <!-- End CTHOutlineAMR -->
+   </SourceProxy>
+
+   <SourceProxy name="CTHPartAMR" class="vtkCTHExtractAMRPart">
+     <InputProperty
+        name="Input"
+        command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+      </InputProperty>
+
+     <ProxyProperty name="ClipPlane" command="SetClipPlane">
+           <ProxyGroupDomain name="groups">
+              <Group name="implicit_functions"/>
+           </ProxyGroupDomain>
+     </ProxyProperty>
+
+     <StringVectorProperty 
+        name="AddVolumeArrayName" 
+        command="AddVolumeArrayName" 
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        number_of_elements="1" /> 
+   <!-- End CTHPartAMR -->
+   </SourceProxy>
+
    <SourceProxy name="ExtractEdges" class="vtkExtractEdges">
      <InputProperty
         name="Input"

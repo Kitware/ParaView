@@ -187,6 +187,33 @@
    <!-- End Cone -->
    </SourceProxy>
 
+   <SourceProxy name="CTHFractal" class="vtkCTHFractal">
+      <IntVectorProperty
+         name="Dimension"
+         command="SetDimension"
+         number_of_elements="1"
+         default_values="10" >
+        <IntRangeDomain name="range" min="2" max="64" />
+      </IntVectorProperty>
+
+      <DoubleVectorProperty
+         name="FractalValue"
+         command="SetFractalValue"
+         number_of_elements="1"
+         default_values="9.5" >
+        <DoubleRangeDomain name="range" min="0" />
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+         name="MaximumLevel"
+         command="SetMaximumLevel"
+         number_of_elements="1"
+         default_values="5" >
+        <IntRangeDomain name="range" min="1" max="10" />
+      </IntVectorProperty>
+   <!-- End CTHSource -->
+   </SourceProxy>
+
    <SourceProxy name="CylinderSource" class="vtkCylinderSource">
       <IntVectorProperty
          name="Resolution"

@@ -22,14 +22,14 @@
 #include "vtkCollection.h"
 #include "vtkPVInputRequirement.h"
 #include "vtkPVConfig.h"
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
+//#ifdef PARAVIEW_BUILD_DEVELOPMENT
 #include "vtkCTHData.h"
-#endif
+//#endif
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.10");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -98,9 +98,9 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
          info->GetDataSetType() == VTK_STRUCTURED_POINTS ||
          info->GetDataSetType() == VTK_POLY_DATA ||
          info->GetDataSetType() == VTK_UNSTRUCTURED_GRID ||
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
+//#ifdef PARAVIEW_BUILD_DEVELOPMENT
          info->GetDataSetType() == VTK_CTH_DATA ||
-#endif
+//#endif
          info->GetDataSetType() == VTK_UNIFORM_GRID )
       {
       return 1;
@@ -151,13 +151,13 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
     {
     return 1;
     }
-#ifdef PARAVIEW_BUILD_DEVELOPMENT
+  //#ifdef PARAVIEW_BUILD_DEVELOPMENT
   if (strcmp(this->Type, "vtkCTHData") == 0 &&
       info->GetDataSetType() == VTK_CTH_DATA)
     {
     return 1;
     }
-#endif
+  //#endif
   if (strcmp(this->Type, "vtkHierarchicalBoxDataSet") == 0 &&
       info->GetDataSetType() == VTK_HIERARCHICAL_BOX_DATA_SET)
     {
