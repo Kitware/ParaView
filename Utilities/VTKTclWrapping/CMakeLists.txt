@@ -60,13 +60,13 @@ ADD_EXECUTABLE(vtkWrapTclInit
   ${VTK_SOURCE_DIR}/Wrapping/vtkWrapTclInit.c)
 
 SET(VTK_TCL_FILES
-  "${ParaView_SOURCE_DIR}/VTK/Common/vtkCollection.cxx"
-  "${ParaView_SOURCE_DIR}/VTK/Common/vtkCollectionIterator.cxx"
-  "${ParaView_SOURCE_DIR}/VTK/Common/vtkObject.cxx"
-  "${ParaView_SOURCE_DIR}/VTK/Common/vtkObjectBase.cxx")
+  "${VTK_SOURCE_DIR}/Common/vtkCollection.cxx"
+  "${VTK_SOURCE_DIR}/Common/vtkCollectionIterator.cxx"
+  "${VTK_SOURCE_DIR}/Common/vtkObject.cxx"
+  "${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx")
 
 SET_SOURCE_FILES_PROPERTIES(
-  "${ParaView_SOURCE_DIR}/VTK/Common/vtkObjectBase.cxx"
+  "${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx"
   ABSTRACT
   )
 
@@ -85,21 +85,19 @@ IF(MAKE_SYSTEM OR UNIX)
   SET(CFG_INIT "")
 ENDIF(MAKE_SYSTEM OR UNIX)
 
-SET(PARAVIEW_VTK_WRAP_TCL_EXE 
+SET(VTK_WRAP_TCL_EXE 
   "${EXECUTABLE_OUTPUT_PATH}${CFG_INIT}/vtkWrapTcl${EXE_EXT}"
   CACHE INTERNAL "Location of program to do tcl wrapping")
-SET(PARAVIEW_VTK_WRAP_TCL_INIT_EXE 
+SET(VTK_WRAP_TCL_INIT_EXE 
   "${EXECUTABLE_OUTPUT_PATH}${CFG_INIT}/vtkWrapTclInit${EXE_EXT}"
   CACHE INTERNAL "Location of program to do tcl wrapping")
-SET(VTK_WRAP_TCL_EXE ${PARAVIEW_VTK_WRAP_TCL_EXE})
-SET(VTK_WRAP_TCL_INIT_EXE ${PARAVIEW_VTK_WRAP_TCL_INIT_EXE})
 INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
 VTK_WRAP_TCL3(vtkCommonTCL vtkTCLSources "${VTK_TCL_FILES}" "")
 
 ADD_LIBRARY(vtkCommonTCL ${vtkTCLSources}
-  "${ParaView_SOURCE_DIR}/VTK/Common/vtkTclUtil.cxx"
-  "${ParaView_SOURCE_DIR}/VTK/Rendering/vtkTkRenderWidget.cxx"
-  "${ParaView_SOURCE_DIR}/VTK/Rendering/vtkTkImageViewerWidget.cxx"
+  "${VTK_SOURCE_DIR}/Common/vtkTclUtil.cxx"
+  "${VTK_SOURCE_DIR}/Rendering/vtkTkRenderWidget.cxx"
+  "${VTK_SOURCE_DIR}/Rendering/vtkTkImageViewerWidget.cxx"
   )
 TARGET_LINK_LIBRARIES(vtkCommonTCL 
   vtkCommon

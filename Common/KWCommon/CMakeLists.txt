@@ -47,57 +47,23 @@ IF(ParaView_SOURCE_DIR)
   IF(VTK_ZLIB_INCLUDE_DIRS)
     INCLUDE_DIRECTORIES(${VTK_ZLIB_INCLUDE_DIRS})
   ENDIF(VTK_ZLIB_INCLUDE_DIRS)
-
-  ADD_LIBRARY(vtkKWCommon ${KWCommon_SRCS})
-ELSE(ParaView_SOURCE_DIR)
-  VTK_WRAP_TCL2(vtkKWCommonTCL KWCommonTCL_SRCS ${KWCommon_SRCS})
-  ADD_LIBRARY(vtkKWCommonTCL ${KWCommonTCL_SRCS} ${KWCommon_SRCS})
 ENDIF(ParaView_SOURCE_DIR)
+
+ADD_LIBRARY(vtkKWCommon ${KWCommon_SRCS})
+
 
 IF(KWSYS_NAMESPACE)
-  # Link to the kwsys library if the parent project configures it.
-  IF(ParaView_SOURCE_DIR)
-    TARGET_LINK_LIBRARIES (vtkKWCommon ${KWSYS_NAMESPACE})
-  ELSE(ParaView_SOURCE_DIR)
-    TARGET_LINK_LIBRARIES (vtkKWCommonTCL ${KWSYS_NAMESPACE})
-  ENDIF(ParaView_SOURCE_DIR)
+  TARGET_LINK_LIBRARIES (vtkKWCommon ${KWSYS_NAMESPACE})
 ENDIF(KWSYS_NAMESPACE)
 
-IF(ParaView_SOURCE_DIR)
-  TARGET_LINK_LIBRARIES (vtkKWCommon
-    vtkFiltering
-    vtkGenericFiltering
-    vtkGraphics
-    vtkIO
-    vtkImaging
-    vtkRendering
-    )
-ELSE(ParaView_SOURCE_DIR)
-  TARGET_LINK_LIBRARIES (vtkKWCommonTCL
-    vtkImagingTCL 
-    vtkGraphicsTCL 
-    vtkIOTCL
-    vtkFilteringTCL
-    vtkGenericFilteringTCL   
-    vtkRenderingTCL   
-    vtkImaging
-    vtkGraphics
-    vtkIO
-    vtkFiltering
-    vtkGenericFiltering
-    vtkRendering
-    )
-
-  IF (NOT DO_NOT_BUILD_XML_RW)
-    IF (VTK_USE_HYBRID)
-      TARGET_LINK_LIBRARIES (vtkKWCommonTCL
-        vtkHybridTCL 
-        vtkHybrid
-        )
-    ENDIF (VTK_USE_HYBRID)
-  ENDIF (NOT DO_NOT_BUILD_XML_RW)
-
-ENDIF(ParaView_SOURCE_DIR)
+TARGET_LINK_LIBRARIES (vtkKWCommon
+  vtkFiltering
+  vtkGenericFiltering
+  vtkGraphics
+  vtkIO
+  vtkImaging
+  vtkRendering
+  )
 
 SUBDIRS(Utilities)
 
@@ -118,11 +84,7 @@ IF(BUILD_SHARED_LIBS)
   IF(NOT KW_INSTALL_LIB_DIR)
     SET(KW_INSTALL_LIB_DIR /lib)
   ENDIF(NOT KW_INSTALL_LIB_DIR)
-  IF(ParaView_SOURCE_DIR)
-    INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkKWCommon)
-  ELSE(ParaView_SOURCE_DIR)
-    INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkKWCommonTCL)
-  ENDIF(ParaView_SOURCE_DIR)
+  INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkKWCommon)
 ENDIF(BUILD_SHARED_LIBS)
 
 IF(BUILD_TESTING)

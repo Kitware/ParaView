@@ -19,17 +19,9 @@ ADD_TEST(TestCommandLineArguments
 ADD_TEST(CommonKWCommonPrintSelf ${CXX_TEST_PATH}/CommonKWCommonPrintSelf)
 
 
-IF(ParaView_SOURCE_DIR)
-  TARGET_LINK_LIBRARIES(TestRegistery vtkKWCommon)
-  TARGET_LINK_LIBRARIES(TestMemory vtkKWCommon)
-  TARGET_LINK_LIBRARIES(TestCommandLineArguments vtkKWCommon)
-  TARGET_LINK_LIBRARIES(TestRemoteProcess vtkKWCommon)
-  TARGET_LINK_LIBRARIES(CommonKWCommonPrintSelf vtkKWCommon)
-ELSE(ParaView_SOURCE_DIR)
-  TARGET_LINK_LIBRARIES(TestRegistery vtkKWCommonTCL)
-  TARGET_LINK_LIBRARIES(TestMemory vtkKWCommonTCL)
-  TARGET_LINK_LIBRARIES(TestCommandLineArguments vtkKWCommonTCL)
-  TARGET_LINK_LIBRARIES(TestRemoteProcess vtkKWCommonTCL)
-  TARGET_LINK_LIBRARIES(CommonKWCommonPrintSelf vtkKWCommonTCL)
-ENDIF(ParaView_SOURCE_DIR)
+TARGET_LINK_LIBRARIES(TestRegistery vtkKWCommon)
+TARGET_LINK_LIBRARIES(TestMemory vtkKWCommon)
+TARGET_LINK_LIBRARIES(TestCommandLineArguments vtkKWCommon)
+TARGET_LINK_LIBRARIES(TestRemoteProcess vtkKWCommon)
+TARGET_LINK_LIBRARIES(CommonKWCommonPrintSelf vtkKWCommon)
 
