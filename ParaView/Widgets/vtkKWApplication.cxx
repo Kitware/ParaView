@@ -41,12 +41,7 @@
 #define REG_KEY_VALUE_SIZE_MAX 8192
 #define REG_KEY_NAME_SIZE_MAX 100
 
-#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
-    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
-#include "kwinit.h"
-#else
 static Tcl_Interp *Et_Interp = 0;
-#endif
 
 #ifdef _WIN32
 #include <process.h>
@@ -67,7 +62,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.156");
+vtkCxxRevisionMacro(vtkKWApplication, "1.157");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -510,16 +505,6 @@ void vtkKWApplication::Exit()
   return;
 }
     
-#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
-    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
-/* The following constants define internal paths (not on disk)   */
-/* for Tcl/Tk to use when looking for initialization scripts     */
-/* which are in this file. They do not represent any hardwired   */
-/* paths                                                         */
-#define ET_TCL_LIBRARY "/ThisIsNotAPath/Tcl/lib/tcl8.2"
-#define ET_TK_LIBRARY "/ThisIsNotAPath/Tcl/lib/tk8.2"
-#endif
-
 //----------------------------------------------------------------------------
 Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, 
                                             char *argv[], 
@@ -531,69 +516,16 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   (void)err;
 
-  // Set TCL_LIBRARY, TK_LIBRARY for the embedded version of Tk (kind
-  // of deprecated right now)
-
-#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
-    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
-  putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
-  putenv("TK_LIBRARY=" ET_TK_LIBRARY);
-#endif
-
-  // This is mandatory *now*, it does more than just finding the executable
-  // (like finding the encodings, setting variables depending on the value
-  // of TCL_LIBRARY, TK_LIBRARY
+  // The call to Tcl_FindExecutable has to be executed *now*, it does more 
+  // than just finding the executable (for ex:, it will set variables 
+  // depending on the value of TCL_LIBRARY, TK_LIBRARY)
 
   Tcl_FindExecutable(argv[0]);
-
-  // Find the path to our internal Tcl/Tk support library/packages
-  // if we are not using the installed Tcl/Tk
-  
-#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
-    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
-
-  char tcl_library[1024] = "";
-  char tk_library[1024] = "";
-
-  const char *nameofexec = Tcl_GetNameOfExecutable();
-  if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
-    {
-    char directory[1024], buffer[1024];
-    const char* dir = 0;
-    vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
-    dir = util->GetFilenamePath(nameofexec, directory);
-    sprintf(buffer, "%s/..%s/TclTk", dir, KW_INSTALL_LIB_DIR);
-    if (vtkKWDirectoryUtilities::FileExists(buffer) )
-      {
-      // Installed KW application
-      dir = util->CollapseDirectory(buffer);
-      sprintf(tcl_library, "%s/lib/tcl%s", dir, TCL_VERSION);
-      sprintf(tk_library, "%s/lib/tk%s", dir, TK_VERSION);
-      }
-    else
-      {
-      // Build tree or windows
-      strcpy(directory, util->ConvertToUnixSlashes(directory));
-      util->Delete();
-
-      sprintf(tcl_library, "%s/TclTk/lib/tcl%s", directory, TCL_VERSION);
-      sprintf(tk_library, "%s/TclTk/lib/tk%s", directory, TK_VERSION);
-      }
-
-    // At this point this is useless, since the call to Tcl_FindExecutable
-    // already used the contents of the env variable. Anyway, let's just
-    // set them to comply with the path that we are about to set
-    sprintf(buffer, "TCL_LIBRARY=%s", tcl_library);
-    putenv(buffer);
-    sprintf(buffer, "TK_LIBRARY=%s", tk_library);
-    putenv(buffer);
-    }
-#endif
 
   // Create the interpreter
 
   interp = Tcl_CreateInterp();
-  args = Tcl_Merge(argc-1, argv+1);
+  args = Tcl_Merge(argc - 1, argv + 1);
   Tcl_SetVar(interp, "argv", args, TCL_GLOBAL_ONLY);
   ckfree(args);
   sprintf(buf, "%d", argc-1);
@@ -601,98 +533,112 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   Tcl_SetVar(interp, "argv0", argv[0], TCL_GLOBAL_ONLY);
   Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
 
+  // Find the path to our internal Tcl/Tk support library/packages
+  // if we are not using the installed Tcl/Tk (i.e., if the support
+  // file were copied to the build/install dir)
   // Sets the path to the Tcl and Tk library manually
-  // if we are not using the installed Tcl/Tk
-  // (nope, the env variables like TCL_LIBRARY were not used when the
-  // interpreter was created, they were used during the call to 
-  // Tcl_FindExecutable).
+  
+#ifdef VTK_TCL_TK_COPY_SUPPORT_LIBRARY
 
-#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
-    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4)
-
-  // Tcl lib path
-
-  if (tcl_library && *tcl_library)
+  int has_tcllibpath_env = getenv("TCL_LIBRARY") ? 1 : 0;
+  int has_tklibpath_env = getenv("TK_LIBRARY") ? 1 : 0;
+  if (!has_tcllibpath_env || !has_tklibpath_env)
     {
-    if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
-                    TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
+    const char *nameofexec = Tcl_GetNameOfExecutable();
+    if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
       {
-      if (err)
+      char dir[1024], dir_unix[1024], buffer[1024];
+      vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
+      strcpy(dir, util->GetFilenamePath(nameofexec, dir));
+      strcpy(dir_unix, util->ConvertToUnixSlashes(dir));
+
+      // Installed KW application, otherwise build tree/windows
+      sprintf(buffer, "%s/..%s/TclTk", dir_unix, KW_INSTALL_LIB_DIR);
+      int exists = vtkKWDirectoryUtilities::FileExists(buffer);
+      if (!exists)
         {
-        *err << "Tcl_SetVar error: " << Tcl_GetStringResult(interp) << endl;
+        sprintf(buffer, "%s/TclTk", dir_unix);
+        exists = vtkKWDirectoryUtilities::FileExists(buffer);
         }
-      return NULL;
-      }
-    }
-  
-  // Tk lib path
-
-  if (tk_library && *tk_library)
-    {
-    if (!Tcl_SetVar(interp, "tk_library", tk_library, 
-                    TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
-      {
-      if (err)
+      sprintf(buffer, util->CollapseDirectory(buffer));
+      util->Delete();
+      if (exists)
         {
-        *err << "Tcl_SetVar error: " << Tcl_GetStringResult(interp) << endl;
+        // Also prepend our Tcl Tk lib path to the library paths
+        // This *is* mandatory if we want encodings files to be found, as they
+        // are searched by browsing TclGetLibraryPath().
+        // (nope, updating the Tcl tcl_libPath var won't do the trick)
+        
+        Tcl_Obj *new_libpath = Tcl_NewObj();
+        
+        // Tcl lib path
+        
+        if (!has_tcllibpath_env)
+        {
+        char tcl_library[1024] = "";
+        sprintf(tcl_library, "%s/lib/tcl%s", buffer, TCL_VERSION);
+        if (vtkKWDirectoryUtilities::FileExists(tcl_library))
+          {
+          cout << "tcl_library: " << tcl_library << endl;
+          if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
+                          TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
+            {
+            if (err)
+              {
+              *err << "Tcl_SetVar error: " << Tcl_GetStringResult(interp) 
+                   << endl;
+              }
+            return NULL;
+            }
+          Tcl_Obj *obj = Tcl_NewStringObj(tcl_library, -1);
+          if (obj && 
+              !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK &&
+              err)
+            {
+            *err << "Tcl_ListObjAppendElement error: " 
+                 << Tcl_GetStringResult(interp) << endl;
+            }
+          }
         }
-      return NULL;
-      }
-    }
-
-  // Prepend our Tcl Tk lib path to the library paths
-  // This *is* mandatory if we want encodings files to be found, as they
-  // are searched by browsing TclGetLibraryPath().
-  // (nope, updating the Tcl tcl_libPath var won't do the trick)
-
-  Tcl_Obj *new_libpath = Tcl_NewObj();
-
-  if (tcl_library && *tcl_library)
-    {
-    Tcl_Obj *obj = Tcl_NewStringObj(tcl_library, -1);
-    if (obj && 
-        !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK && err)
-      {
-      *err << "Tcl_ListObjAppendElement error: " 
-           << Tcl_GetStringResult(interp) << endl;
-      }
-    }
   
-  if (tk_library && *tk_library)
-    {
-    Tcl_Obj *obj = Tcl_NewStringObj(tk_library, -1);
-    if (obj && 
-        !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK && err)
-      {
-      *err << "Tcl_ListObjAppendElement error: " 
-           << Tcl_GetStringResult(interp) << endl;
+        // Tk lib path
+
+        if (!has_tklibpath_env)
+          {
+          char tk_library[1024] = "";
+          sprintf(tk_library, "%s/lib/tk%s", dir, TK_VERSION);
+          if (vtkKWDirectoryUtilities::FileExists(tk_library))
+            {
+            cout << "tk_library: " << tk_library << endl;
+            if (!Tcl_SetVar(interp, "tk_library", tk_library, 
+                            TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
+              {
+              if (err)
+                {
+                *err << "Tcl_SetVar error: " << Tcl_GetStringResult(interp) 
+                     << endl;
+                }
+              return NULL;
+              }
+            Tcl_Obj *obj = Tcl_NewStringObj(tk_library, -1);
+            if (obj && 
+                !Tcl_ListObjAppendElement(interp, new_libpath, obj) != TCL_OK 
+                && err)
+              {
+              *err << "Tcl_ListObjAppendElement error: " 
+                   << Tcl_GetStringResult(interp) << endl;
+              }
+            }
+          }
+
+        TclSetLibraryPath(new_libpath);
+        }
       }
     }
-  
-  // Actually let's be conservative for now and not use the
-  // predefined lib paths
-#if 0    
-  Tcl_Obj *old_libpath = TclGetLibraryPath();
-  if (old_libpath && 
-      !Tcl_ListObjAppendList(interp, new_libpath, old_libpath) !=TCL_OK && err)
-    {
-    *err << "Tcl_ListObjAppendList error: " 
-         << Tcl_GetStringResult(interp) << endl;
-    }
-#endif
-
-  TclSetLibraryPath(new_libpath);
 
 #endif
 
   // Init Tcl
-
-#if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
-    (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION < 4)
-
-  Et_DoInit(interp);
-
-#else
 
   Et_Interp = interp;
 
@@ -725,8 +671,6 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
     Tcl_StaticPackage(interp, "Tk", Tk_Init, 0);
     }
     
-#endif
-  
   // create the SetApplicationIcon command
 #ifdef _WIN32
   ApplicationIcon_DoInit(interp);
