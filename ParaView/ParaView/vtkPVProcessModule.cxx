@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.4");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.5");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -578,9 +578,7 @@ void vtkPVProcessModule::DeleteStreamObject(vtkClientServerID id)
 //----------------------------------------------------------------------------
 const vtkClientServerStream* vtkPVProcessModule::GetLastResultStream()
 {
-  vtkClientServerID id;
-  id.ID=0;
-  return this->ClientInterpreter->GetMessageFromID(id);
+  return this->ClientInterpreter->GetLastResult();
 }
 
 vtkClientServerID vtkPVProcessModule::GetUniqueID()

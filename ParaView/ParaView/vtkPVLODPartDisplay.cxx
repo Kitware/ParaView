@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.6.2.1");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.6.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -142,9 +142,8 @@ void vtkPVLODPartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
   
   stream << vtkClientServerStream::Invoke << geometryID
          << "GetOutput" << vtkClientServerStream::End;
-  vtkClientServerID outputID = {0};
   stream << vtkClientServerStream::Invoke << this->LODDeciID << "SetInput" 
-         << outputID << vtkClientServerStream::End;
+         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
 }
 

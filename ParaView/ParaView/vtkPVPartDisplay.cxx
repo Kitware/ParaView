@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.2");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.3");
 
 
 //----------------------------------------------------------------------------
@@ -149,9 +149,8 @@ void vtkPVPartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
   stream.Reset();
   stream << vtkClientServerStream::Invoke << geometryID
          << "GetOutput" << vtkClientServerStream::End;
-  vtkClientServerID outputID = {0};
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "SetInput" 
-         << outputID << vtkClientServerStream::End;
+         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
 }
 
@@ -173,10 +172,10 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "GetOutput" 
          <<  vtkClientServerStream::End;
-  vtkClientServerID id = {0};
-  stream << vtkClientServerStream::Invoke << this->MapperID << "SetInput" << id
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->MapperID << "SetImmediateModeRendering" << id
+  stream << vtkClientServerStream::Invoke << this->MapperID << "SetInput" 
+         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->MapperID
+         << "SetImmediateModeRendering" 
          << pvApp->GetMainView()->GetImmediateModeCheck()->GetState() << vtkClientServerStream::End;
   // Create a LOD Actor for the subclasses.
   // I could use just a plain actor for this class.
