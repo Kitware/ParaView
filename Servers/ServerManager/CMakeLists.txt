@@ -197,7 +197,8 @@ IF (PARAVIEW_BUILD_GUI)
   ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS}
     ${VTK_TCL_HOME}/vtktcl.c
     vtkPVProcessModuleBatchHelper.cxx)
-  TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL vtkPVServerManager vtkCommonTCL)
+  TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL 
+    vtkPVServerCommonTCL vtkPVServerManager vtkCommonTCL)
 ENDIF (PARAVIEW_BUILD_GUI)
 
 
