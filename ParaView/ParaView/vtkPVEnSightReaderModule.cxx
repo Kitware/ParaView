@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.25.2.5");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.25.2.6");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -90,6 +90,8 @@ vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
 #ifdef VTK_USE_MPI
   this->Verifier = 0;
 #endif
+
+  this->ByteOrder = FILE_BIG_ENDIAN;
 }
 
 //----------------------------------------------------------------------------
@@ -193,65 +195,78 @@ char* vtkPVEnSightReaderModule::CreateTclName(const char* fname)
 int vtkPVEnSightReaderModule::InitialTimeSelection(
   const char* tclName, vtkGenericEnSightReader* reader, float& time)
 {
-    vtkKWDialog* timeDialog = vtkKWDialog::New();
-    timeDialog->Create(this->Application, "");
-    timeDialog->SetMasterWindow(this->GetPVWindow());
-    timeDialog->SetTitle("Select time step");
-    
-    vtkPVSelectTimeSet* firstSelect = vtkPVSelectTimeSet::New();
-    firstSelect->SetParent(timeDialog);
-    firstSelect->Create(this->Application);
-    firstSelect->SetLabel("Select initial time step:");
-    firstSelect->SetObjectTclName(tclName);
-    firstSelect->SetTraceName("selectTimeSet");
-    firstSelect->SetTraceNameState(vtkPVWidget::SelfInitialized);
-    firstSelect->SetReader(reader);
-    firstSelect->Reset();
-    this->Application->Script("pack %s -side top -fill x -expand t", 
-                              firstSelect->GetWidgetName());
 
-    vtkKWFrame* frame = vtkKWFrame::New();
-    frame->SetParent(timeDialog);
-    frame->Create(this->Application, 0);
-
-    vtkKWWidget* okbutton = vtkKWWidget::New();
-    okbutton->SetParent(frame);
-    okbutton->Create(this->Application,"button","-text OK");
-    okbutton->SetCommand(timeDialog, "OK");
-
-    vtkKWWidget* cancelbutton = vtkKWWidget::New();
-    cancelbutton->SetParent(frame);
-    cancelbutton->Create(this->Application,"button","-text Cancel");
-    cancelbutton->SetCommand(timeDialog, "Cancel2");
-
-    this->Script("pack %s %s -side left -expand t -fill both -padx 2 -pady 2",
-                 okbutton->GetWidgetName(),
-                 cancelbutton->GetWidgetName());
-
-    okbutton->Delete();
-    cancelbutton->Delete();
-
-    this->Script("pack %s -side top -expand yes -fill both", 
-                 frame->GetWidgetName());
-    frame->Delete();
-
-    int status = timeDialog->Invoke();
-    time = firstSelect->GetTimeValue();
-    firstSelect->Delete();
-
-    timeDialog->Delete();
-
-    return status;
+  vtkKWDialog* timeDialog = vtkKWDialog::New();
+  timeDialog->Create(this->Application, "");
+  timeDialog->SetMasterWindow(this->GetPVWindow());
+  timeDialog->SetTitle("Select time step");
+  
+  vtkPVSelectTimeSet* firstSelect = vtkPVSelectTimeSet::New();
+  firstSelect->SetParent(timeDialog);
+  firstSelect->Create(this->Application);
+  firstSelect->SetLabel("Select initial time step:");
+  firstSelect->SetObjectTclName(tclName);
+  firstSelect->SetTraceName("selectTimeSet");
+  firstSelect->SetTraceNameState(vtkPVWidget::SelfInitialized);
+  firstSelect->SetReader(reader);
+  firstSelect->Reset();
+  this->Application->Script("pack %s -side top -fill x -expand t", 
+                            firstSelect->GetWidgetName());
+  
+  vtkKWFrame* frame = vtkKWFrame::New();
+  frame->SetParent(timeDialog);
+  frame->Create(this->Application, 0);
+  
+  vtkKWWidget* okbutton = vtkKWWidget::New();
+  okbutton->SetParent(frame);
+  okbutton->Create(this->Application,"button","-text OK");
+  okbutton->SetCommand(timeDialog, "OK");
+  
+  vtkKWWidget* cancelbutton = vtkKWWidget::New();
+  cancelbutton->SetParent(frame);
+  cancelbutton->Create(this->Application,"button","-text Cancel");
+  cancelbutton->SetCommand(timeDialog, "Cancel");
+  
+  this->Script("pack %s %s -side left -expand t -fill both -padx 2 -pady 2",
+               okbutton->GetWidgetName(),
+               cancelbutton->GetWidgetName());
+  
+  okbutton->Delete();
+  cancelbutton->Delete();
+  
+  this->Script("pack %s -side top -expand yes -fill both", 
+               frame->GetWidgetName());
+  frame->Delete();
+  
+  int status = timeDialog->Invoke();
+  time = firstSelect->GetTimeValue();
+  firstSelect->Delete();
+  
+  timeDialog->Delete();
+  
+  return status;
 }
 
 //----------------------------------------------------------------------------
 // Prompt the user for the first variables loaded
-int vtkPVEnSightReaderModule::InitialVariableSelection(const char* tclName)
+int vtkPVEnSightReaderModule::InitialVariableSelection(const char* tclName,
+                                                       int askEndian)
 {
+  int shouldInvoke = askEndian;
+
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   vtkKWOKCancelDialog *dialog = vtkKWOKCancelDialog::New();
   dialog->Create(this->Application, "");
   dialog->SetMasterWindow(this->GetPVWindow());
-  dialog->SetTitle("Select variables");
+  if (askEndian)
+    {
+    dialog->SetTitle("Select variables/byte order");
+    }
+  else
+    {
+    dialog->SetTitle("Select variables");
+    }
   
   vtkPVEnSightArraySelection *pointSelect = vtkPVEnSightArraySelection::New();
   pointSelect->SetParent(dialog);
@@ -266,25 +281,67 @@ int vtkPVEnSightReaderModule::InitialVariableSelection(const char* tclName)
   cellSelect->SetVTKReaderTclName(tclName);
   cellSelect->Create(this->Application);
   cellSelect->AllOnCallback();
-  
+
   if (pointSelect->GetNumberOfArrays() > 0)
     {
     this->Script("pack %s -side top -fill x -expand t",
                  pointSelect->GetWidgetName());
+    shouldInvoke = 1;
     }
   if (cellSelect->GetNumberOfArrays() > 0)
     {
     this->Script("pack %s -side top -fill x -expand t",
                  cellSelect->GetWidgetName());
+    shouldInvoke = 1;
     }
   
-  int status = dialog->Invoke();
-  if (status)
+  vtkKWOptionMenu* endianness;
+  vtkKWLabeledFrame* lf;
+  if (askEndian)
     {
-    pointSelect->Accept();
-    cellSelect->Accept();
+    lf = vtkKWLabeledFrame::New();
+    lf->SetParent(dialog);
+    lf->Create(this->Application);
+    lf->SetLabel("Byte Order");
+
+    endianness = vtkKWOptionMenu::New();
+    endianness->SetParent(lf->GetFrame());
+    endianness->Create(this->Application, "");
+    endianness->AddEntry("Big Endian");
+    endianness->AddEntry("Little Endian");
+    endianness->SetCurrentEntry("Big Endian");
+
+    this->Script("pack %s -side left", endianness->GetWidgetName());
+    this->Script("pack %s -side top -fill x -expand t", lf->GetWidgetName());
     }
-  
+
+  int status=1;
+  if (shouldInvoke)
+    {
+    status = dialog->Invoke();
+    if (status)
+      {
+      pointSelect->Accept();
+      cellSelect->Accept();
+      }
+    }
+
+  if (askEndian)
+    {
+    const char* endiansel = endianness->GetValue();
+    if ( strcmp(endiansel, "Big Endian") == 0 )
+      {
+      pvApp->BroadcastScript("%s SetByteOrderToBigEndian", tclName);
+      }
+    else
+      {
+      pvApp->BroadcastScript("%s SetByteOrderToLittleEndian", tclName);
+      }
+
+    endianness->Delete();
+    lf->Delete();
+    }
+
   pointSelect->Delete();
   cellSelect->Delete();
   dialog->Delete();
@@ -520,6 +577,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   int masterFile=0;
 
   vtkEnSightReader* reader = 0;
+  int askEndian=0;
   switch (fileType)
     {
     case vtkGenericEnSightReader::ENSIGHT_6:
@@ -529,6 +587,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     case vtkGenericEnSightReader::ENSIGHT_6_BINARY:
       reader = static_cast<vtkEnSightReader*>
         (pvApp->MakeTclObject("vtkEnSight6BinaryReader", tclName));
+      askEndian=1;
       break;
     case vtkGenericEnSightReader::ENSIGHT_GOLD:
       reader = static_cast<vtkEnSightReader*>
@@ -537,11 +596,13 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     case vtkGenericEnSightReader::ENSIGHT_GOLD_BINARY:
       reader = static_cast<vtkEnSightReader*>
         (pvApp->MakeTclObject("vtkEnSightGoldBinaryReader", tclName));
+      askEndian=1;
       break;
 #ifdef VTK_USE_MPI
     case vtkGenericEnSightReader::ENSIGHT_MASTER_SERVER:
       reader = this->VerifyMasterFile(pvApp, tclName, fname);
       masterFile = 1;
+      askEndian=1;
       break;
 #endif
     default:
@@ -603,20 +664,20 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   pvApp->BroadcastScript("%s ReadAllVariablesOff", tclName);
   int numVariables = reader->GetNumberOfVariables() +
     reader->GetNumberOfComplexVariables();
-
-  if (numVariables > 0)
+  
+  if ( ! pvApp->GetRunningParaViewScript())
     {
-    if ( ! pvApp->GetRunningParaViewScript())
+    if ( this->InitialVariableSelection(tclName, askEndian) == 0)
       {
-      if ( this->InitialVariableSelection(tclName) == 0)
-        {
-        pvApp->BroadcastScript("%s Delete", tclName);
-        delete [] tclName;
-        this->DeleteVerifier();
-        return VTK_ERROR;
-        }
+      pvApp->BroadcastScript("%s Delete", tclName);
+      delete [] tclName;
+      this->DeleteVerifier();
+      return VTK_ERROR;
       }
-    else
+    }
+  else
+    {
+    if (numVariables > 0)
       {
       for (i = 0; i < this->NumberOfRequestedPointVariables; i++)
         {
@@ -628,8 +689,18 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
         pvApp->BroadcastScript("%s AddCellVariableName %s",
                                tclName, this->RequestedCellVariables[i]);
         }
+      if ( this->ByteOrder == FILE_BIG_ENDIAN )
+        {
+        pvApp->BroadcastScript("%s SetByteOrderToBigEndian", tclName);
+        }
+      else
+        {
+        pvApp->BroadcastScript("%s SetByteOrderToLittleEndian", tclName);
+        }
+
       }
     }
+      
 
   ostrstream namestr;
   namestr << "_tmp_ensightreadermodule" << this->PrototypeInstanceCount 
@@ -710,6 +781,10 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
         }
       }
     }
+  if (askEndian)
+    {
+    pvApp->AddTraceEntry("%s SetByteOrder %d", name, reader->GetByteOrder());
+    }
   
   pvApp->AddTraceEntry("%s ReadFile %s %12.5e $Application $kw(%s)", name, 
                        fname, time, window->GetTclName());
@@ -764,7 +839,17 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     // ith output (PVData)
     // Create replacement outputs of proper type and replace the
     // current ones.
-    outputTclName = new char[strlen(tclName)+7 + (i%10)+1];
+    int len;
+    if ( i == 0 )
+      {
+      len = strlen(tclName)+ strlen("Output") + 3;
+      }
+    else
+      {
+      len = strlen(tclName)+ strlen("Output") + 
+        static_cast<int>(log10(static_cast<double>(i))) + 3;
+      }
+    outputTclName = new char[len];
     sprintf(outputTclName, "%sOutput%d", tclName, i);
     d = static_cast<vtkDataSet*>(pvApp->MakeTclObject(
       reader->GetOutput(i)->GetClassName(), outputTclName));
@@ -806,7 +891,9 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       connection->SetParametersParent(
         window->GetMainView()->GetSourceParent());
       connection->SetApplication(pvApp);
-      connectionTclName = new char[strlen(tclName)+2 + ((i+1)%10)+1];
+      int len = strlen(tclName)+ 2 + 
+        static_cast<int>(log10(static_cast<double>(i+1))) + 3;
+      connectionTclName = new char[len];
       sprintf(connectionTclName, "%s_%d", tclName, i+1);
       vtkSource* source = static_cast<vtkSource*>(
         pvApp->MakeTclObject("vtkPassThroughFilter", connectionTclName));
@@ -816,7 +903,16 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       connection->HideParametersPageOn();
       connection->SetTraceInitialized(1);
       
-      outputTclName = new char[strlen(connectionTclName)+7 + (i%10)+1];
+      if ( i == 0 )
+        {
+        len = strlen(connectionTclName)+ strlen("Output") + 3;
+        }
+      else
+        {
+        len = strlen(connectionTclName)+ strlen("Output") + 
+          static_cast<int>(log10(static_cast<double>(i))) + 3;
+        }
+      outputTclName = new char[len];
       sprintf(outputTclName, "%sOutput%d", connectionTclName, i);
       d = static_cast<vtkDataSet*>(pvApp->MakeTclObject(
         reader->GetOutput(i)->GetClassName(), outputTclName));
@@ -979,6 +1075,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   return VTK_OK;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVEnSightReaderModule::AddPointVariable(const char* variableName)
 {
   int size = this->NumberOfRequestedPointVariables;
@@ -1017,6 +1114,7 @@ void vtkPVEnSightReaderModule::AddPointVariable(const char* variableName)
   this->NumberOfRequestedPointVariables++;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVEnSightReaderModule::AddCellVariable(const char* variableName)
 {
   int size = this->NumberOfRequestedCellVariables;
@@ -1055,6 +1153,31 @@ void vtkPVEnSightReaderModule::AddCellVariable(const char* variableName)
   this->NumberOfRequestedCellVariables++;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVEnSightReaderModule::SetByteOrderToBigEndian()
+{
+  this->ByteOrder = FILE_BIG_ENDIAN;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVEnSightReaderModule::SetByteOrderToLittleEndian()
+{
+  this->ByteOrder = FILE_LITTLE_ENDIAN;
+}
+
+//----------------------------------------------------------------------------
+const char *vtkPVEnSightReaderModule::GetByteOrderAsString()
+{
+  if ( this->ByteOrder ==  FILE_LITTLE_ENDIAN)
+    {
+    return "LittleEndian";
+    }
+  else
+    {
+    return "BigEndian";
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVEnSightReaderModule::SaveInTclScript(ofstream *file, 
@@ -1099,4 +1222,5 @@ void vtkPVEnSightReaderModule::SaveInTclScript(ofstream *file,
 void vtkPVEnSightReaderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "ByteOrder: " << this->ByteOrder << endl;
 }

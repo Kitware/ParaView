@@ -108,6 +108,25 @@ public:
   void AddPointVariable(const char* variableName);
   void AddCellVariable(const char* variableName);
   
+  // Description:
+  // Set the byte order of the file (remember, more Unix workstations
+  // write big endian whereas PCs write little endian). Default is
+  // big endian (since most older PLOT3D files were written by
+  // workstations).
+  void SetByteOrderToBigEndian();
+  void SetByteOrderToLittleEndian();
+  vtkSetMacro(ByteOrder, int);
+  vtkGetMacro(ByteOrder, int);
+  const char *GetByteOrderAsString();
+
+//BTX
+  enum 
+  {
+    FILE_BIG_ENDIAN=0,
+    FILE_LITTLE_ENDIAN=1
+  };
+//ETX
+
 protected:
   vtkPVEnSightReaderModule();
   ~vtkPVEnSightReaderModule();
@@ -125,7 +144,7 @@ protected:
                            vtkGenericEnSightReader* reader, float& time);
 
   // Prompt the user for the variables loaded first.
-  int InitialVariableSelection(const char* tclName);
+  int InitialVariableSelection(const char* tclName, int askEndian);
   
   // Make sure that all case files in the master file are compatible.
   vtkEnSightReader* VerifyMasterFile(vtkPVApplication* app,
@@ -144,6 +163,8 @@ protected:
   int NumberOfRequestedCellVariables;
   char** RequestedPointVariables;
   char** RequestedCellVariables;
+
+  int ByteOrder;
   
 private:
   vtkPVEnSightReaderModule(const vtkPVEnSightReaderModule&); // Not implemented
