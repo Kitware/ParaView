@@ -71,7 +71,7 @@ vtkPVLODActor::vtkPVLODActor()
   m->Delete();
   
   this->LODMapper = NULL;
-  this->TimePerCell = this->LODTimePerCell = 0.00001;
+  this->TimePerPoint = this->LODTimePerPoint = 0.00001;
 }
 
 //----------------------------------------------------------------------------
@@ -92,9 +92,11 @@ void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+// We use points as the size of the data, because cells cqan mislead.
+// A good example is verts.  One cell can contain any number of verticies.
 vtkMapper *vtkPVLODActor::SelectMapper()
 {
-  float myTime, timePerCell;
+  float myTime, timePerPoint;
 
   if (this->Mapper == NULL || this->Mapper->GetInput() == NULL)
     {
@@ -109,14 +111,14 @@ vtkMapper *vtkPVLODActor::SelectMapper()
   myTime = this->AllocatedRenderTime;
 
   // Choose the smallest time constant.
-  timePerCell = this->TimePerCell;
-  if (this->LODTimePerCell < timePerCell)
+  timePerPoint = this->TimePerPoint;
+  if (this->LODTimePerPoint < timePerPoint)
     {
-    timePerCell = this->LODTimePerCell;
+    timePerPoint = this->LODTimePerPoint;
     }
 
   // Will the high res take too long?
-  if ( (timePerCell * this->Mapper->GetInput()->GetNumberOfCells()) > myTime)
+  if ( (timePerPoint * this->Mapper->GetInput()->GetNumberOfPoints()) > myTime)
     {
     return this->LODMapper;
     }
@@ -182,11 +184,11 @@ void vtkPVLODActor::Render(vtkRenderer *ren, vtkMapper *vtkNotUsed(m))
   // we need to save the information.
   if (mapper == this->Mapper)
     {
-    this->TimePerCell = mapper->GetTimeToDraw() / mapper->GetInput()->GetNumberOfCells();
+    this->TimePerPoint = mapper->GetTimeToDraw() / mapper->GetInput()->GetNumberOfPoints();
     }
   else if (mapper == this->LODMapper)
     {
-    this->LODTimePerCell = mapper->GetTimeToDraw() / mapper->GetInput()->GetNumberOfCells();
+    this->LODTimePerPoint = mapper->GetTimeToDraw() / mapper->GetInput()->GetNumberOfPoints();
     }
 }
 

@@ -205,7 +205,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
-  pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->LODMapperTclName);
+  pvApp->BroadcastScript("%s ImmediateModeRenderingOff", this->LODMapperTclName);
 
   this->Script("%s SetLookupTable [%s GetLookupTable]",
                this->GetScalarBarTclName(), this->MapperTclName);
