@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.12");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.13");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -338,8 +338,10 @@ vtkClientServerInterpreter
   else
     {
     *this->LastResultMessage
-      << vtkClientServerStream::Error
-      << "Invalid arguments to vtkClientServerStream::New."
+      << vtkClientServerStream::Error <<
+      "Invalid arguments to vtkClientServerStream::New.  "
+      "There must be exactly two arguments.  The first must be a string and "
+      "the second an id."
       << vtkClientServerStream::End;
     }
   return 0;
@@ -402,8 +404,10 @@ vtkClientServerInterpreter
   else
     {
     *this->LastResultMessage
-      << vtkClientServerStream::Error
-      << "Invalid arguments to vtkClientServerStream::Invoke."
+      << vtkClientServerStream::Error <<
+        "Invalid arguments to vtkClientServerStream::Invoke.  "
+        "There must be at least two arguments.  The first must be an object "
+        "and the second a string."
       << vtkClientServerStream::End;
     }
   return 0;
@@ -468,8 +472,9 @@ vtkClientServerInterpreter
   else
     {
     *this->LastResultMessage
-      << vtkClientServerStream::Error
-      << "Invalid arguments to vtkClientServerStream::Delete."
+      << vtkClientServerStream::Error <<
+      "Invalid arguments to vtkClientServerStream::Delete.  "
+      "There must be exactly one argument and it must be an id."
       << vtkClientServerStream::End;
     }
 
@@ -540,8 +545,9 @@ vtkClientServerInterpreter
     {
     this->LastResultMessage->Reset();
     *this->LastResultMessage
-      << vtkClientServerStream::Error
-      << "Invalid arguments to vtkClientServerStream::Assign."
+      << vtkClientServerStream::Error <<
+      "Invalid arguments to vtkClientServerStream::Assign.  "
+      "There must be at least one argument and it must be an id."
       << vtkClientServerStream::End;
     }
 
