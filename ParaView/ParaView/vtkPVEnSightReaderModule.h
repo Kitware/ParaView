@@ -39,157 +39,44 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVEnSightReaderModule - A class to handle the UI for EnSight readers
+// .NAME vtkPVEnSightReaderModule - Module representing an "advanced" reader
 // .SECTION Description
-// This is a special reader module for the EnSight readers. Since EnSight
-// readers have usually multiple output, this module creates dummy
-// "connection" modules for each output. These modules act as terminals
-// to which users can attach other modules. The module which represent
-// the properties of the reader does not have a display page and does
-// not add any actors. On the other hand, the "connection" modules have
-// no properties pages. Deleting the reader module (only possible if
-// the connection points have no consumers) deletes the whole assembly.
+// The class vtkPVEnSightReaderModule is used to represent an "advanced"
+// reader (or a pipeline which contains a reader). An advanced reader is
+// one which allows the user to pre-select certain attributes (for example,
+// list of arrays to be loaded) before reading the whole file.  This is
+// done by reading some header information during UpdateInformation.  The
+// main difference between vtkPVEnSightReaderModule and vtkPVReaderModule
+// is that the former does not automatically call Accept after the filename
+// is selected. Instead, it prompts the user for more selections. The file
+// is only fully loaded when the user presses Accept.
 //
 // .SECTION See also
-// vtkPVReaderModule vtkPVAdvancedReaderModule vtkGenericEnsightReader
-// vtkEnSightReader vtkEnSightGoldReader vtkEnSightGoldBinaryReader
-// vtkEnSight6Reader vtkEnSight6BinaryReader vtkEnSightMasterServerReader
-// vtkPVEnSightVerifier
+// vtkPVReadermodule vtkPVEnSightReaderModule vtkPVPLOT3DReaderModule
+
+
 
 #ifndef __vtkPVEnSightReaderModule_h
 #define __vtkPVEnSightReaderModule_h
 
-#include "vtkPVReaderModule.h"
+#include "vtkPVAdvancedReaderModule.h"
 
-class vtkGenericEnSightReader;
-class vtkEnSightReader;
-class vtkPVEnSightVerifier;
-
-class VTK_EXPORT vtkPVEnSightReaderModule : public vtkPVReaderModule
+class VTK_EXPORT vtkPVEnSightReaderModule : public vtkPVAdvancedReaderModule
 {
 public:
   static vtkPVEnSightReaderModule* New();
-  vtkTypeRevisionMacro(vtkPVEnSightReaderModule, vtkPVReaderModule);
+  vtkTypeRevisionMacro(vtkPVEnSightReaderModule, vtkPVAdvancedReaderModule);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Special method because of custom widgets are not pvWidgets.
-  virtual void SaveInBatchScript(ofstream *file);
-    
-  // Description:
-  // Try to read a given file. Return VTK_OK on success, VTK_ERROR
-  // on failure. A new instance of a reader module (which contains the 
-  // actual VTK reader to be used) is returned. This should be called
-  // only on a prototype. 
-  // The EnSight readers are special. They can have as many outputs
-  // as there are parts in the file. Furthermore, these outputs can
-  // be of different type. Furthermore, they recognize time and they
-  // can load different data/files for different time. Furthermore,
-  // the master server (or sos, or server of servers) files contain
-  // references to other EnSight files. ReadFile supports all of these
-  // and provides sanity checking and error handling. For master server
-  // files, a vtkPVEnSightVerifier is used to make sure that the 
-  // EnSight files on all processes are compatible. (Note that the
-  // master server files are only supported when ParaView is compiled
-  // with MPI support)
-  virtual int Initialize(const char* fname, vtkPVReaderModule*& clone);
-
-  // Description:
-  // Called on the clone returned by ReadFileInformation(), these
-  // methods complete the reading process. See superclass for more
-  // information.
-  virtual int ReadFileInformation(const char* fname);
-  virtual int Finalize(const char* fname);
-
-  // Description:
-  // The EnSight reader can actually be used to check a file to see if it
-  // is a valid EnSight file. A vtkGenericEnSightReader is used to
-  // determine if the given file is an EnSight file.  The extension is not
-  // relevant.
-  virtual int CanReadFile(const char* fname);
-
-  // Description:
-  // Access from trace file to specifying which point/cell variables to read
-  void AddPointVariable(const char* variableName);
-  void AddCellVariable(const char* variableName);
   
-  // Description:
-  // Set the byte order of the file (remember, more Unix workstations
-  // write big endian whereas PCs write little endian). Default is
-  // big endian (since most older PLOT3D files were written by
-  // workstations).
-  void SetByteOrderToBigEndian();
-  void SetByteOrderToLittleEndian();
-  vtkSetMacro(ByteOrder, int);
-  vtkGetMacro(ByteOrder, int);
-  const char *GetByteOrderAsString();
-
-  // Description:
-  // This variable is useful when writing traces. If RunningScript
-  // is on, ReadFileInformation does not create any dialogs. Instead,
-  // it assumes the required parameters are set in the script.
-  vtkSetMacro(RunningScript, int);
-  vtkGetMacro(RunningScript, int);
-  vtkBooleanMacro(RunningScript, int);
-
-  // Description:
-  // Time value to load. Only used when RunningScript is ON.
-  vtkSetMacro(TimeValue, float);
-  vtkGetMacro(TimeValue, float);
-
-//BTX
-  enum 
-  {
-    FILE_BIG_ENDIAN=0,
-    FILE_LITTLE_ENDIAN=1
-  };
-//ETX
-
 protected:
   vtkPVEnSightReaderModule();
   ~vtkPVEnSightReaderModule();
 
-  char* VerifierTclName;
-  vtkSetStringMacro(VerifierTclName);
-
-  vtkPVEnSightVerifier* Verifier;
-
-  // Given a filename, creates a (hopefully unique) tclname.
-  char* CreateTclName(const char* fname);
+  // This method is called when the accept button is pressed for the
+  // first time.
+  virtual int InitializeData();
+  virtual void CreateProperties();
   
-  // Prompt the user for the time step loaded first.
-  int InitialTimeSelection(const char* tclName,
-                           vtkGenericEnSightReader* reader, float& time);
-
-  // Prompt the user for the variables loaded first.
-  int InitialVariableSelection(const char* tclName, int askEndian);
-  
-  // Make sure that all case files in the master file are compatible.
-  vtkEnSightReader* VerifyMasterFile(vtkPVApplication* app,
-                                     const char* tclName,
-                                     const char* filename);
-  
-  // Make sure that all time steps are compatible.
-  void VerifyTimeSets(vtkPVApplication* app, const char* filename);
-  // Make sure that all parts are compatible.
-  int  VerifyParts(vtkPVApplication* app, const char* filename);
-
-  void DeleteVerifier();
-  void DisplayErrorMessage(const char* message, int warning);
-
-  int NumberOfRequestedPointVariables;
-  int NumberOfRequestedCellVariables;
-  char** RequestedPointVariables;
-  char** RequestedCellVariables;
-
-  int ByteOrder;
-  
-  int RunningScript;
-  float TimeValue;
-  int MasterFile;
-  
-  vtkEnSightReader* Reader;
-
 private:
   vtkPVEnSightReaderModule(const vtkPVEnSightReaderModule&); // Not implemented
   void operator=(const vtkPVEnSightReaderModule&); // Not implemented

@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
 #include "vtkDataArraySelection.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
@@ -56,19 +57,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkTclUtil.h"
 
+#ifdef _MSC_VER
+#pragma warning (push, 3)
+#endif
+
 #include <string>
+#include <set>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
+typedef vtkstd::set<vtkstd::string> vtkPVArraySelectionArraySetBase;
+class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.25");
-
-int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
-                                 int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.26");
 
 //----------------------------------------------------------------------------
+int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
+                                 int argc, char *argv[]);
 int vtkPVArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
                                int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkPVArraySelection::vtkPVArraySelection()
 {
   this->CommandFunction = vtkPVArraySelectionCommand;
@@ -84,7 +97,7 @@ vtkPVArraySelection::vtkPVArraySelection()
   this->CheckFrame = vtkKWWidget::New();
   this->ArrayCheckButtons = vtkCollection::New();
 
-  this->FileName = NULL;
+  this->ArraySet = new vtkPVArraySelectionArraySet;
 
   this->NoArraysLabel = vtkKWLabel::New();
   this->Selection = vtkDataArraySelection::New();
@@ -118,9 +131,10 @@ vtkPVArraySelection::~vtkPVArraySelection()
   this->NoArraysLabel->Delete();
   this->NoArraysLabel = 0;
 
-  this->SetFileName(NULL);
   this->Selection->Delete();
   this->SetSelectionTclName(0);
+  
+  delete this->ArraySet;
 }
 
 //----------------------------------------------------------------------------
@@ -194,9 +208,8 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::ResetLocalSelectionInstance()
+void vtkPVArraySelection::SetupSelectionTclName()
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   if(!this->SelectionTclName)
     {
     vtkTclGetObjectFromPointer(this->Application->GetMainInterp(),
@@ -204,13 +217,19 @@ void vtkPVArraySelection::ResetLocalSelectionInstance()
     this->SetSelectionTclName(
       Tcl_GetStringResult(this->Application->GetMainInterp()));
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::SetLocalSelectionsFromReader()
+{
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  this->SetupSelectionTclName();
   this->Selection->RemoveAllArrays();
   if(this->VTKReaderTclName)
     {
     pm->RootScript(
       "namespace eval ::paraview::vtkPVArraySelection {\n"
       "  proc GetArraySettings { reader type } {\n"
-      "    $reader UpdateInformation\n"
       "    set n [$reader GetNumberOf${type}Arrays]\n"
       "    set settings {}\n"
       "    for {set i 0} {$i < $n} {incr i} {\n"
@@ -247,26 +266,22 @@ void vtkPVArraySelection::ResetLocalSelectionInstance()
 void vtkPVArraySelection::Reset()
 {
   vtkKWCheckButton* checkButton;
-  int row = 0;
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  
-  // See if we need to create new check buttons.
-  pm->RootScript("%s GetFileName", this->VTKReaderTclName);
-  vtkstd::string fileName = pm->GetRootResult();
-    
-  // Filename not set
-  if (fileName.length() == 0)
-    {
-    return;
-    }  
   
   // Update our local vtkDataArraySelection instance with the reader's
   // settings.
-  this->ResetLocalSelectionInstance();
+  this->SetLocalSelectionsFromReader();
   
-  if (this->FileName == NULL || (fileName != this->FileName))
+  // See if we need to create new check buttons.
+  vtkPVArraySelectionArraySet newSet;
+  int i;
+  for(i=0; i < this->Selection->GetNumberOfArrays(); ++i)
     {
-    this->SetFileName(fileName.c_str());
+    newSet.insert(this->Selection->GetArrayName(i));
+    }
+  
+  if(newSet != *(this->ArraySet))
+    {
+    *(this->ArraySet) = newSet;
 
     // Clear out any old check buttons.
     this->Script("catch {eval pack forget [pack slaves %s]}",
@@ -277,6 +292,7 @@ void vtkPVArraySelection::Reset()
     if (this->VTKReaderTclName)
       {
       int numArrays, idx;
+      int row = 0;
       numArrays = this->Selection->GetNumberOfArrays();
       for (idx = 0; idx < numArrays; ++idx)
         {
@@ -299,15 +315,8 @@ void vtkPVArraySelection::Reset()
     }
   
   // Now set the state of the check buttons.
-  this->ArrayCheckButtons->InitTraversal();
-  while ( (checkButton = (vtkKWCheckButton*)(
-             this->ArrayCheckButtons->GetNextItemAsObject())) )
-    {
-    checkButton->SetState(
-      this->Selection->ArrayIsEnabled(checkButton->GetText()));
-    }
+  this->SetWidgetSelectionsFromLocal();
 }
-
 
 //---------------------------------------------------------------------------
 void vtkPVArraySelection::Trace(ofstream *file)
@@ -319,20 +328,19 @@ void vtkPVArraySelection::Trace(ofstream *file)
     return;
     }
 
-  this->ArrayCheckButtons->InitTraversal();
-  while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
+  vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
+  for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
+    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
     *file << "$kw(" << this->GetTclName() << ") SetArrayStatus {"
           << check->GetText() << "} " << check->GetState() << endl;
     }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::Accept()
 {
-  vtkKWCheckButton *check;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   // Create new check buttons.
   if (this->VTKReaderTclName == NULL)
     {
@@ -343,26 +351,44 @@ void vtkPVArraySelection::Accept()
     {
     return;
     }
+  
+  this->SetLocalSelectionsFromReader();
+  this->SetReaderSelectionsFromWidgets();
+}
 
-  this->ResetLocalSelectionInstance();
-  this->ArrayCheckButtons->InitTraversal();
-  while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
+//---------------------------------------------------------------------------
+void vtkPVArraySelection::SetWidgetSelectionsFromLocal()
+{
+  vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
+  for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    // This is only here to try to avoid extra lines in the trace
+    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
+    check->SetState(this->Selection->ArrayIsEnabled(check->GetText()));
+    }
+  it->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::SetReaderSelectionsFromWidgets()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();  
+  vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
+  for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+    {
+    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
+    // This test is only here to try to avoid extra lines in the trace
     // file.  We could make every check button a pv widget.
     if(this->Selection->ArrayIsEnabled(check->GetText()) != check->GetState())
       {
       pvApp->BroadcastScript("%s Set%sArrayStatus {%s} %d", 
                              this->VTKReaderTclName, this->AttributeName, 
-                             check->GetText(), check->GetState());    
-
-      this->AddTraceEntry("$kw(%s) SetArrayStatus {%s} %d", this->GetTclName(), 
+                             check->GetText(), check->GetState());
+      this->AddTraceEntry("$kw(%s) SetArrayStatus {%s} %d", this->GetTclName(),
                           check->GetText(), check->GetState());
       }
     }
+  it->Delete();
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::AllOnCallback()
@@ -430,29 +456,27 @@ void vtkPVArraySelection::SetArrayStatus(const char *name, int status)
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
 {
-  vtkKWCheckButton *check;
-  int state;
-
-  // Create new check buttons.
   if (this->VTKReaderTclName == NULL)
     {
     vtkErrorMacro("VTKReader has not been set.");
     }
 
-  this->ResetLocalSelectionInstance();
-  this->ArrayCheckButtons->InitTraversal();
-  while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
+  this->SetLocalSelectionsFromReader();
+  vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
+  for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    state = this->Selection->ArrayIsEnabled(check->GetText());
+    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
     // Since they default to on.
-    if (state == 0)
+    if(!this->Selection->ArrayIsEnabled(check->GetText()))
       {
       *file << "\t";
-      *file << this->VTKReaderTclName << " Set" << this->AttributeName << "ArrayStatus {" 
-            << check->GetText() << "} " << state << endl;
+      *file << this->VTKReaderTclName
+            << " Set" << this->AttributeName << "ArrayStatus {" 
+            << check->GetText() << "} 0\n";
        
       }
     }
+  it->Delete();
 }
 
 vtkPVArraySelection* vtkPVArraySelection::ClonePrototype(vtkPVSource* pvSource,

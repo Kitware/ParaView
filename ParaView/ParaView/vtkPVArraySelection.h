@@ -55,6 +55,7 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkKWPushButton;
 class vtkKWRadioButton;
+class vtkPVArraySelectionArraySet;
 class vtkPVData;
 
 class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
@@ -125,7 +126,10 @@ protected:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
-  void ResetLocalSelectionInstance();
+  void SetupSelectionTclName();
+  virtual void SetWidgetSelectionsFromLocal();
+  virtual void SetLocalSelectionsFromReader();
+  virtual void SetReaderSelectionsFromWidgets();
   
   char* AttributeName;
   char* VTKReaderTclName;
@@ -144,11 +148,8 @@ protected:
   vtkSetStringMacro(SelectionTclName);
   char* SelectionTclName;
   
-  // Description:
-  // Stores the file name to descide when to rebuild the array check list.
-  vtkSetStringMacro(FileName);
-  char *FileName;
-
+  vtkPVArraySelectionArraySet* ArraySet;
+  
   vtkPVArraySelection(const vtkPVArraySelection&); // Not implemented
   void operator=(const vtkPVArraySelection&); // Not implemented
 

@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSelectTimeSet.h"
 
 #include "vtkDataArrayCollection.h"
-#include "vtkGenericEnSightReader.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
@@ -50,13 +49,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkTclUtil.h"
 
+#ifdef _MSC_VER
+#pragma warning (push, 3)
+#endif
+
+#include <string>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.16");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.17");
+
+//-----------------------------------------------------------------------------
+int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
+                                  int argc, char *argv[]);
 
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -76,9 +90,10 @@ vtkPVSelectTimeSet::vtkPVSelectTimeSet()
 
   this->TimeValue = 0.0;
 
-  this->Reader = 0;
-
   this->FrameLabel = 0;
+  
+  this->TimeSets = vtkDataArrayCollection::New();
+  this->TimeSetsTclName = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -88,15 +103,10 @@ vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
   this->Tree->Delete();
   this->TreeFrame->Delete();
   this->TimeLabel->Delete();
-  if (this->Reader)
-    {
-    this->Reader->Delete();
-    }
   this->SetFrameLabel(0);
+  this->TimeSets->Delete();
+  this->SetTimeSetsTclName(0);
 }
-
-//-----------------------------------------------------------------------------
-vtkCxxSetObjectMacro(vtkPVSelectTimeSet, Reader, vtkGenericEnSightReader);
 
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SetLabel(const char* label)
@@ -201,7 +211,7 @@ void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
   this->Script("%s itemcget %s -data", this->Tree->GetWidgetName(),
                item);
   const char* result = this->Application->GetMainInterp()->result;
-  if (result[0] == '\0' || !this->Reader)
+  if (result[0] == '\0')
     {
     return;
     }
@@ -209,9 +219,8 @@ void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
   int index[2];
   sscanf(result, "%d %d", &(index[0]), &(index[1]));
 
-  vtkDataArrayCollection* timeSets = this->Reader->GetTimeSets();
-
-  this->SetTimeValue(timeSets->GetItem(index[0])->GetTuple1(index[1]));
+  this->SetTimeSetsFromReader();
+  this->SetTimeValue(this->TimeSets->GetItem(index[0])->GetTuple1(index[1]));
   this->ModifiedCallback();
 }
 
@@ -289,17 +298,7 @@ void vtkPVSelectTimeSet::Reset()
   this->Script("%s delete [%s nodes root]", this->Tree->GetWidgetName(),
                this->Tree->GetWidgetName());
   
-  if (!this->Reader)
-    {
-    return;
-    }
-
-  vtkDataArrayCollection* timeSets = this->Reader->GetTimeSets();
-  if (!timeSets)
-    {
-    vtkErrorMacro("The reader does not contain any time sets.");
-    return;
-    }
+  this->SetTimeSetsFromReader();
 
   int timeSetId=0;
   char timeSetName[32];
@@ -309,18 +308,20 @@ void vtkPVSelectTimeSet::Reset()
   char timeValueText[32];
   char indices[32];
 
-  float actualTimeValue = this->Reader->GetTimeValue();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  pm->RootScript("%s GetTimeValue", this->PVSource->GetVTKSourceTclName());
+  float actualTimeValue = atof(pm->GetRootResult());
   int matchFound = 0;
 
-  timeSets->InitTraversal();
+  this->TimeSets->InitTraversal();
   vtkDataArray* da;
-  while( (da=timeSets->GetNextItem()) )
+  while( (da=this->TimeSets->GetNextItem()) )
     {
     timeSetId++;
     sprintf(timeSetName,"timeset%d", timeSetId);
     sprintf(timeSetText,"Time Set %d", timeSetId); 
     this->AddRootNode(timeSetName, timeSetText);
-
+    
     vtkIdType tuple;
     for(tuple=0; tuple<da->GetNumberOfTuples(); tuple++)
       {
@@ -345,7 +346,16 @@ void vtkPVSelectTimeSet::Reset()
                    timeSetName);
       }
     }
-
+  
+  this->TimeSets->InitTraversal();
+  if(!matchFound && (da=this->TimeSets->GetNextItem()))
+    {
+    float timeValue = da->GetTuple1(0);
+    sprintf(timeValueName, "time%d_%-12.5e", 1, timeValue);
+    this->Script("%s selection set %s", this->Tree->GetWidgetName(),
+                 timeValueName);
+    }
+  
   this->SetTimeValue(actualTimeValue);
   this->ModifiedFlag = 0;
 }
@@ -428,10 +438,74 @@ int vtkPVSelectTimeSet::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVSelectTimeSet::SetTimeSetsFromReader()
+{
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  this->SetupTimeSetsTclName();
+  this->TimeSets->RemoveAllItems();
+  pm->RootScript(
+    "namespace eval ::paraview::vtkPVSelectTimeSet {\n"
+    "  proc GetTimeSets { reader } {\n"
+    "    set rts [$reader GetTimeSets]\n"
+    "    if {$rts == {}} {\n"
+    "      return {}\n"
+    "    }\n"
+    "    set sets {}\n"
+    "    vtkCollectionIterator vtkPVSelectTimeSetTemp\n"
+    "    set iter vtkPVSelectTimeSetTemp\n"
+    "    $iter SetCollection $rts\n"
+    "    while {![$iter IsDoneWithTraversal]} {\n"
+    "      set da [$iter GetObject]\n"
+    "      set s {}\n"
+    "      set n [$da GetNumberOfTuples]\n"
+    "      for {set i 0} {$i < $n} {incr i} {\n"
+    "        lappend s [$da GetTuple1 $i]\n"
+    "      }\n"
+    "      lappend sets $s\n"
+    "      $iter GoToNextItem\n"
+    "    }\n"
+    "    $iter Delete\n"
+    "    return $sets\n"
+    "  }\n"
+    "  GetTimeSets {%s}\n"
+    "}\n",
+    this->PVSource->GetVTKSourceTclName());
+  vtkstd::string settings = pm->GetRootResult();
+  this->Script(
+    "namespace eval ::paraview::vtkPVSelectTimeSet {\n"
+    "  proc ParseTimeSets { ts sets } {\n"
+    "    foreach s $sets {\n"
+    "      vtkFloatArray vtkPVSelectTimeSetTemp\n"
+    "      set n [llength $s]\n"
+    "      vtkPVSelectTimeSetTemp SetNumberOfTuples $n\n"
+    "      for {set i 0} {$i < $n} {incr i} {\n"
+    "        vtkPVSelectTimeSetTemp SetTuple1 $i [lindex $s $i]\n"
+    "      }\n"
+    "      $ts AddItem vtkPVSelectTimeSetTemp\n"
+    "      vtkPVSelectTimeSetTemp Delete\n"
+    "    }\n"
+    "  }\n"
+    "  ParseTimeSets {%s} {%s}\n"
+    "}\n",
+    this->TimeSetsTclName, settings.c_str());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectTimeSet::SetupTimeSetsTclName()
+{
+  if(!this->TimeSetsTclName)
+    {
+    vtkTclGetObjectFromPointer(this->Application->GetMainInterp(),
+                               this->TimeSets, vtkDataArrayCollectionCommand);
+    this->SetTimeSetsTclName(
+      Tcl_GetStringResult(this->Application->GetMainInterp()));
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "TimeValue: " << this->TimeValue << endl;
   os << indent << "LabeledFrame: " << this->LabeledFrame << endl;
-  os << indent << "Reader: " << this->Reader << endl;
 }

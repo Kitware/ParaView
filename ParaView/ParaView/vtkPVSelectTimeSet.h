@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWLabel;
 class vtkKWMenu;
 class vtkKWLabeledFrame;
-class vtkGenericEnSightReader;
+class vtkDataArrayCollection;
 
 class VTK_EXPORT vtkPVSelectTimeSet : public vtkPVObjectWidget
 {
@@ -107,11 +107,6 @@ public:
   // with currently selected time value.
   void SetTimeValueCallback(const char* item);
 
-  // Description:
-  // The reader is set by the EnSightReader module.
-  void SetReader(vtkGenericEnSightReader* reader);
-  vtkGetObjectMacro(Reader, vtkGenericEnSightReader);
-
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
@@ -148,7 +143,15 @@ protected:
   float TimeValue;
   char* FrameLabel;
 
-  vtkGenericEnSightReader* Reader;
+  vtkDataArrayCollection* TimeSets;
+  vtkSetStringMacro(TimeSetsTclName);
+  char* TimeSetsTclName;
+  
+  // Set TimeSetsTclName with the tcl name of the TimeSets instance.
+  void SetupTimeSetsTclName();
+  
+  // Fill the TimeSets collection with that from the actual reader.
+  void SetTimeSetsFromReader();
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

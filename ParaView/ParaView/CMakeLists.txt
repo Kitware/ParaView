@@ -41,7 +41,6 @@ SET( ParaView_SRCS
   vtkPVDataSetReaderModule.cxx
   vtkPVDummyWidget.cxx
   vtkPVDuplicatePolyData.cxx
-  vtkPVEnSightArraySelection.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
   vtkPVExtentEntry.cxx
