@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.23");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -66,6 +66,8 @@ vtkPVStringEntry::vtkPVStringEntry()
   this->EntryLabel = 0;
   this->DefaultValue = 0;
   this->Property = 0;
+
+  this->InitSourceVariable = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -77,6 +79,7 @@ vtkPVStringEntry::~vtkPVStringEntry()
   this->LabelWidget = NULL;
   this->SetEntryLabel(0);
   this->SetProperty(0);
+  this->SetInitSourceVariable(0);;
 }
 
 void vtkPVStringEntry::SetLabel(const char* label)
@@ -228,6 +231,13 @@ void vtkPVStringEntry::ResetInternal()
 
   // Command to update the UI.
   this->SetValue(this->Property->GetString());
+
+  if ( this->ObjectTclName && this->InitSourceVariable )
+    {
+    this->GetPVApplication()->GetProcessModule()->RootScript("%s Get%s",
+                  this->ObjectTclName, this->InitSourceVariable);
+    this->SetValue(this->GetPVApplication()->GetProcessModule()->GetRootResult());
+    }
   
   if (this->AcceptCalled)
     {
@@ -253,6 +263,7 @@ void vtkPVStringEntry::CopyProperties(vtkPVWidget* clone,
     {
     pvse->SetLabel(this->EntryLabel);
     pvse->SetDefaultValue(this->DefaultValue);
+    pvse->SetInitSourceVariable(this->InitSourceVariable);
     }
   else 
     {
@@ -275,6 +286,12 @@ int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   else
     {
     this->SetLabel(this->VariableName);
+    }
+
+  const char* init_source = element->GetAttribute("init_source");
+  if ( init_source )
+    {
+    this->SetInitSourceVariable(init_source);
     }
   
   // Set the default value.
