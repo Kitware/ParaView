@@ -743,7 +743,7 @@ void vtkKWWindow::OnPrint3(int propagate)
 void vtkKWWindow::ShowProperties()
 {
   this->MiddleFrame->SetFrame1MinimumWidth(360);
-  this->MiddleFrame->SetFrame1Width(360);
+  //this->MiddleFrame->SetFrame1Width(360);
 }
 
 void vtkKWWindow::HideProperties()
@@ -993,7 +993,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.89 $");
+  this->ExtractRevision(os,"$Revision: 1.90 $");
 }
 
 int vtkKWWindow::ExitDialog()
