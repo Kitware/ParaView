@@ -28,12 +28,12 @@
 #include "vtkToolkits.h"
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
+#include "vtkAllToNRedistributePolyData.h"
 #endif
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
-#include "vtkAllToNRedistributePolyData.h"
 
-vtkCxxRevisionMacro(vtkM2NCollect, "1.5");
+vtkCxxRevisionMacro(vtkM2NCollect, "1.6");
 vtkStandardNewMacro(vtkM2NCollect);
 
 vtkCxxSetObjectMacro(vtkM2NCollect,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
@@ -136,6 +136,7 @@ void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
 
   // If we are the data server and there are fewer render processes,
   // Perform the M to N operation.
+#ifdef VTK_USE_MPI
   vtkAllToNRedistributePolyData* AllToN = NULL;
   vtkPolyData* input = this->GetInput();
   vtkMultiProcessController* controller = this->GetController();
@@ -149,6 +150,7 @@ void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
     AllToN->Update();
     input = AllToN->GetOutput();
     }
+#endif
 
   // If we have data, marshal it.
   if (input && input->GetNumberOfPoints() > 0)
@@ -173,12 +175,15 @@ void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
     pd->Delete();
     pd = NULL;
     }
+
+#ifdef VTK_USE_MPI
   if (AllToN)
     {
     AllToN->Delete();
     AllToN = NULL;
     input = NULL;
     }
+#endif
 
   // M to N stuff..
   char* newBuf = NULL;
