@@ -826,7 +826,7 @@
         name="GenerateGlobalElementIdArray" 
         command="SetGenerateGlobalElementIdArray" 
         number_of_elements="1"
-        default_values="1" > 
+        default_values="0" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -834,7 +834,7 @@
         name="GenerateFileIdArray" 
         command="SetGenerateFileIdArray" 
         number_of_elements="1"
-        default_values="1" > 
+        default_values="0" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End ExodusReader -->
