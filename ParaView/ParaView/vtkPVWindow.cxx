@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.470");
+vtkCxxRevisionMacro(vtkPVWindow, "1.471");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -668,14 +668,27 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   // We do not need Close in the file menu since we don't
   // support multiple windows (exit is enough)
+
   this->MenuFile->DeleteMenuItem("Close");
+
+  this->AddRecentFilesMenu(NULL, this);
+
+  int clidx = this->GetFileMenuIndex();
+
+  this->MenuFile->InsertSeparator(clidx++);
+
   // Open a data file. Can support multiple file formats (see Open()).
-  this->MenuFile->InsertCommand(0, VTK_PV_OPEN_DATA_MENU_LABEL, this, "OpenCallback",0);
+
+  this->MenuFile->InsertCommand(
+    clidx++, VTK_PV_OPEN_DATA_MENU_LABEL, this, "OpenCallback",0);
+
   // Save current data in VTK format.
-  this->MenuFile->InsertCommand(1, VTK_PV_SAVE_DATA_MENU_LABEL, this, "WriteData",0);
+
+  this->MenuFile->InsertCommand(
+    clidx++, VTK_PV_SAVE_DATA_MENU_LABEL, this, "WriteData",0);
 
   // Add advanced file options
-  int clidx = this->GetFileMenuIndex();
+
   this->MenuFile->InsertCommand(clidx++, "Save Batch Script", this,
                                 "SaveBatchScript", 7,
                                 "Write a script which can run "
@@ -1130,8 +1143,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->AnimationInterface->SetView(this->GetMainView());
   this->AnimationInterface->SetParent(this->GetPropertiesParent());
   this->AnimationInterface->Create(app, "-relief flat");
-
-  this->AddRecentFilesToMenu("Exit",this);
 
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
@@ -1826,7 +1837,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
         {
         ostrstream str;
         str << "OpenCustom \"" << rm->GetModuleName() << "\"" <<ends;
-        this->AddRecentFile(NULL, openFileName, this, str.str());
+        this->AddRecentFile(openFileName, this, str.str());
         str.rdbuf()->freeze(0);
         }
       it->Delete();
@@ -1870,7 +1881,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
         {
         ostrstream str;
         str << "OpenCustom \"" << reader->GetModuleName() << "\"" <<ends;
-        this->AddRecentFile(NULL, openFileName, this, str.str());
+        this->AddRecentFile(openFileName, this, str.str());
         str.rdbuf()->freeze(0);
         }
       // Cleanup

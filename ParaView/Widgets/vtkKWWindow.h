@@ -60,12 +60,13 @@ class vtkKWView;
 class vtkKWViewCollection;
 
 //BTX
-class vtkKWWindowMenuEntry;
+class vtkKWRecentFileEntry;
 template<class DType> class vtkVector;
 //ETX
 
-#define VTK_KW_PAGE_SETUP_MENU_LABEL "Page Setup"
-#define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
+#define VTK_KW_PAGE_SETUP_MENU_LABEL   "Page Setup"
+#define VTK_KW_RECENT_FILES_MENU_LABEL "Open Recent File"
+#define VTK_KW_EXIT_DIALOG_NAME        "ExitApplication"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -170,18 +171,27 @@ public:
   virtual void UnRegister(vtkObjectBase *o);
 
   // Description::
-  // Add to the menu a list of recently used files. Specify a menu entry,
-  // which will be used to position menu. Pick NULL if you want to use
-  // "Close". The command
-  // is the command to execute when a file is selected.
-  virtual void AddRecentFilesToMenu(const char *menuEntry, vtkKWObject *target);
-  virtual void AddRecentFile(const char *key, const char *name, 
-                             vtkKWObject *target, const char *command);
+  // Add a "Recent Files" sub-menu to the File menu and fill it with the
+  // most recent files stored in the registery.
+  // - menuEntry is the name of the menu entry in the File menu above which 
+  //   the sub-menu will be inserted. If NULL (or not found), the sub-menu
+  //   will be inserted before the last entry in the File menu 
+  //   (see GetFileMenuIndex)
+  // - target is the object against which the command associated to a most
+  //   recent file will be executed.
+  // - label is an optional label that will be used for the sub-menu
+  virtual void AddRecentFilesMenu(
+    const char *menuEntry, 
+    vtkKWObject *target, 
+    const char *label = VTK_KW_RECENT_FILES_MENU_LABEL);
+
+  // Description::
+  // Add a file to the Recent File list.
+  virtual void AddRecentFile(
+    const char *filename, vtkKWObject *target, const char *command);
   
   // Description:
-  // Return the index of the entry above the MRU File list
-  // in the file menu. This is useful because most menu options
-  // go above the MRU list, hence above this index.
+  // Return the index of the entry above the last entry in the file menu.
   int GetFileMenuIndex();
 
   // Description:
@@ -248,10 +258,10 @@ public:
 
   //Description:
   // Set/Get Number of recent files in the menu.
-  vtkSetClampMacro(NumberOfRecentFiles, unsigned int, 4, 10);
-  vtkGetMacro(NumberOfRecentFiles, unsigned int);
+  virtual void SetNumberOfRecentFiles(vtkIdType);
+  vtkGetMacro(NumberOfRecentFiles, vtkIdType);
 
-//BTX
+  //BTX
   //Description:
   // Set or get the registery value for the application.
   // When storing multiple arguments, separate with spaces.
@@ -291,11 +301,6 @@ public:
   void RetrieveLastPath(vtkKWLoadSaveDialog *, const char*);
 
 //ETX
-  
-  // Description:
-  // Print a list of recent files to the standard output for debug
-  // purposes.
-  void PrintRecentFiles();
   
   // Description:
   // Get the User Interface Manager.
@@ -338,20 +343,22 @@ protected:
   vtkKWWindow();
   ~vtkKWWindow();
 
-  void InsertRecentFileToMenu(const char *filename, 
-                              vtkKWObject *taret, 
-                              const char *command);
-  void UpdateRecentMenu(const char *key);
-  void StoreRecentMenuToRegistery(const char *key);
+  // Recent files
 
-  unsigned int NumberOfRecentFiles;
-
+  //BTX
   // Description:
-  // This is the menu entry that recent files will be above.
-  // If it is null, then pick "Close"
-  vtkSetStringMacro(RecentFilesMenuTag);
-  vtkGetStringMacro(RecentFilesMenuTag);
-  char *RecentFilesMenuTag;
+  // This vector holds the list of most recently used files.
+  vtkVector<vtkKWRecentFileEntry*> *RecentFilesVector;
+  //ETX
+
+  vtkKWMenu *MenuRecentFiles;
+
+  void InsertRecentFile(
+    const char *filename, vtkKWObject *target, const char *command);
+  void UpdateRecentFilesMenu();
+  void StoreRecentFilesToRegistery();
+
+  vtkIdType NumberOfRecentFiles;
 
   // Description:
   // Display the exit dialog.
@@ -359,12 +366,10 @@ protected:
 
   // Description:
   // Process events
-  virtual void InternalProcessEvent(vtkObject *, unsigned long, float *, void *);
+  virtual void InternalProcessEvent(
+    vtkObject *, unsigned long, float *, void *);
 
   virtual void CreateStatusImage();
-
-  int NumberOfMRUFiles;
-  int RealNumberOfMRUFiles;
 
   vtkKWNotebook *Notebook;
 
@@ -408,15 +413,11 @@ protected:
   int   PromptBeforeClose;
   int   InExit;
 
-//BTX
-  // Description:
-  // This vector holds the list of most recently used files.
-  vtkVector<vtkKWWindowMenuEntry*> *RecentFilesVector;
-
+  //BTX
   // Description:
   // This vector holds the list of toolbars.
   vtkVector<vtkKWToolbar*> *Toolbars;
-//ETX
+  //ETX
 
   vtkKWTclInteractor *TclInteractor;
 
