@@ -57,6 +57,7 @@ class vtkMPIController;
 
 #include "vtkCompositeRenderManager.h"
 
+class vtkDataArray;
 class vtkFloatArray;
 class vtkRenderWindowInteractor;
 
