@@ -92,6 +92,7 @@ public:
   // Called when accept button is pushed.
   // Adds to the trace file and sets the objects variable from UI.
   virtual void AcceptInternal(vtkClientServerID);
+  virtual void PostAccept();
   //ETX
 
   // Description:

@@ -42,7 +42,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.57");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.58");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -230,22 +230,10 @@ void vtkPVArraySelection::UpdateSelections(int fromReader)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::ResetInternal()
+void vtkPVArraySelection::UpdateGUI()
 {
   vtkKWCheckButton* checkButton;
-  
-  if (!this->AcceptCalled)
-    {
-    // Update our local vtkDataArraySelection instance with the reader's
-    // settings.
-    this->UpdateSelections(1);
-    }
-  else
-    {
-    // Or update from the property
-    this->UpdateSelections(0);
-    }
-  
+
   // See if we need to create new check buttons.
   vtkPVArraySelectionArraySet newSet;
   int i;
@@ -299,6 +287,26 @@ void vtkPVArraySelection::ResetInternal()
     }
   it->Delete();
 
+  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::ResetInternal()
+{
+  if (!this->AcceptCalled)
+    {
+    // Update our local vtkDataArraySelection instance with the reader's
+    // settings.
+    this->UpdateSelections(1);
+    }
+  else
+    {
+    // Or update from the property
+    this->UpdateSelections(0);
+    }
+
+  this->UpdateGUI();
+
   if (this->AcceptCalled)
     {
     this->ModifiedFlag = 0;
@@ -336,11 +344,7 @@ void vtkPVArraySelection::Accept()
 
   this->AcceptCalled = 1;
 
-  this->SetReaderSelectionsFromProperty();
-  // In case changing the selection caused changes in other 
-  // selections, we update information and GUI from reader
-  this->GetPVSource()->GetProxy()->UpdateInformation();
-  this->ResetInternal();
+  this->SetPropertyFromGUI();
 
   this->ModifiedFlag = 0;
   
@@ -360,7 +364,17 @@ void vtkPVArraySelection::Accept()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::SetReaderSelectionsFromProperty()
+void vtkPVArraySelection::PostAccept()
+{
+  // In case changing the selection caused changes in other 
+  // selections, we update information and GUI from reader
+  this->GetPVSource()->GetProxy()->UpdateInformation();
+  this->UpdateSelections(1);
+  this->UpdateGUI();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::SetPropertyFromGUI()
 {
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
@@ -468,7 +482,7 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
     return;
     }
 
-  this->UpdateSelections(0);
+  this->UpdateSelections(1);
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
 
   int numElems=0;

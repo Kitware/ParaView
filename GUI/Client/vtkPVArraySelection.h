@@ -43,6 +43,7 @@ public:
   // Methods for setting the value of the VTKReader from the widget.
   // User internally when user hits Accept.
   virtual void Accept();
+  virtual void PostAccept();
 //ETX
 
   // Description:
@@ -105,8 +106,9 @@ protected:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  virtual void UpdateGUI();
   virtual void UpdateSelections(int fromReader);
-  virtual void SetReaderSelectionsFromProperty();
+  virtual void SetPropertyFromGUI();
 
   char* LabelText;
   

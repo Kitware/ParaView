@@ -59,6 +59,7 @@ public:
   // to override these methods.
   // Accept needs to add to the trace (call trace), but AcceptInternal does not.
   virtual void Accept();
+  virtual void PostAccept() {};
   virtual void Reset();
 
   // Description:

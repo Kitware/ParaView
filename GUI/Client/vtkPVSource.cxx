@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.370");
+vtkCxxRevisionMacro(vtkPVSource, "1.371");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1552,16 +1552,33 @@ void vtkPVSource::UpdateVTKSourceParameters()
   while( !it->IsDoneWithTraversal() )
     {
     pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
-    pvwProp->Accept();
+    vtkPVWidget* widget = pvwProp->GetWidget();
+    if (widget && widget->GetModifiedFlag())
+      {
+      widget->Accept();
+      }
     it->GoToNextItem();
     }
-  it->Delete();
 
   if (this->Proxy)
     {
     this->Proxy->UpdateVTKObjects();
     }
 
+  it->InitTraversal();
+  while( !it->IsDoneWithTraversal() )
+    {
+    pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    vtkPVWidget* widget = pvwProp->GetWidget();
+    if (widget)
+      {
+      widget->PostAccept();
+      }
+    it->GoToNextItem();
+    }
+
+  it->Delete();
+  
 }
 
 

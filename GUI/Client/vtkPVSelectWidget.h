@@ -127,6 +127,7 @@ public:
   // Called when accept button is pushed.
   // Sets the objects variable from UI.
   virtual void AcceptInternal(vtkClientServerID);
+  virtual void PostAccept();
   //ETX
 
   // Description:

@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.27");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -117,6 +117,28 @@ int vtkPVContainerWidget::GetModifiedFlag()
   return 0;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVContainerWidget::PostAccept()
+{
+  vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+  it->InitTraversal();
+  
+  vtkPVWidget* widget;
+  vtkPVWidgetProperty *prop;
+  int i;
+  
+  for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
+    {
+    prop = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+    widget = prop->GetWidget();
+    if (widget)
+      {
+      widget->PostAccept();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVContainerWidget::AcceptInternal(vtkClientServerID sourceID)

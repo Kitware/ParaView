@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.50");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.51");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -233,6 +233,17 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
     }
   *file << endl;
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVSelectWidget::PostAccept()
+{
+  if (this->CurrentIndex >= 0)
+    {
+    vtkPVWidgetProperty *pvwp;
+    pvwp = (vtkPVWidgetProperty*)this->WidgetProperties->GetItemAsObject(this->CurrentIndex);
+    pvwp->GetWidget()->PostAccept();
+    }
+ }
 
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
