@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.16.2.4");
+vtkCxxRevisionMacro(vtkPVScale, "1.16.2.5");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -352,6 +352,7 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVScale::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Round: " << this->Round << endl;
 }
 
 //----------------------------------------------------------------------------
