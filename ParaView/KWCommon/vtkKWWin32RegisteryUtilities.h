@@ -47,9 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class VTK_EXPORT vtkKWWin32RegisteryUtilities : public vtkKWRegisteryUtilities
 {
-  public:
+public:
   static vtkKWWin32RegisteryUtilities* New();
-  vtkTypeMacro(vtkKWWin32RegisteryUtilities, vtkKWRegisteryUtilities);
+  vtkTypeRevisionMacro(vtkKWWin32RegisteryUtilities, vtkKWRegisteryUtilities);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Read a value from the registry.
@@ -75,14 +76,14 @@ class VTK_EXPORT vtkKWWin32RegisteryUtilities : public vtkKWRegisteryUtilities
   // Close the registry.
   virtual int CloseInternal();
 
-  protected:
+protected:
   vtkKWWin32RegisteryUtilities();
   virtual ~vtkKWWin32RegisteryUtilities();
 
-  private:
-  vtkKWWin32RegisteryUtilities(const vtkKWWin32RegisteryUtilities&);
-  void operator=(const vtkKWWin32RegisteryUtilities&);
+private:
   HKEY HKey;
+  vtkKWWin32RegisteryUtilities(const vtkKWWin32RegisteryUtilities&); // Not implemented
+  void operator=(const vtkKWWin32RegisteryUtilities&); // Not implemented
 };
 
 #endif

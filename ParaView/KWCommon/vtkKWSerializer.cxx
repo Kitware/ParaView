@@ -41,12 +41,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWSerializer.h"
 
-#include <ctype.h>
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
+#include <ctype.h>
+
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSerializer );
+vtkCxxRevisionMacro(vtkKWSerializer, "1.3");
 
 //-----------------------------------------------------------------------------
 // Internal function used to consume whitespace when reading in
@@ -99,11 +101,11 @@ int vtkKWSerializer::GetNextToken(istream *is, char result[1024])
           result[count] = c;
           count++;
           }
-	      else
-					{
-					result[count] = c;
+              else
+                                        {
+                                        result[count] = c;
           count++;
-					}
+                                        }
         if (count >= 1024)
           {
           result[count] ='\0';
@@ -197,6 +199,10 @@ void vtkKWSerializer::WriteSafeString(ostream& os, const char *val)
     os << val[i];
     }
   os << '"';
-}
+}  
 
-  
+//----------------------------------------------------------------------------
+void vtkKWSerializer::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+}

@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BUFFER_SIZE 1024
 
 vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
+vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWUNIXRegisteryUtilities::vtkKWUNIXRegisteryUtilities()
@@ -78,8 +79,8 @@ vtkKWUNIXRegisteryUtilities::~vtkKWUNIXRegisteryUtilities()
 
 //----------------------------------------------------------------------------
 int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
-					      const char *subkey, 
-					      int readonly)
+                                              const char *subkey, 
+                                              int readonly)
 {  
   int res = 0;
   int cc;
@@ -133,18 +134,18 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
     for ( cc = 0; cc< static_cast<int>(strlen(line)); cc++ )
       {
       if ( line[cc] == '=' )
-	{
-	char *key = new char[ cc+1 ];
-	strncpy( key, line, cc );
-	key[cc] = 0;
-	char *value = line + cc + 1;
-	char *nkey = this->Strip(key);
-	char *nvalue = this->Strip(value);
-	this->EntriesMap->SetItem( nkey, nvalue );
-	this->Empty = 0;
-	delete [] key;
-	found = 1;	
-	}
+        {
+        char *key = new char[ cc+1 ];
+        strncpy( key, line, cc );
+        key[cc] = 0;
+        char *value = line + cc + 1;
+        char *nkey = this->Strip(key);
+        char *nvalue = this->Strip(value);
+        this->EntriesMap->SetItem( nkey, nvalue );
+        this->Empty = 0;
+        delete [] key;
+        found = 1;      
+        }
       }
     if ( !found )
       {
@@ -220,7 +221,7 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
 
 //----------------------------------------------------------------------------
 int vtkKWUNIXRegisteryUtilities::ReadValueInternal(const char *skey,
-						   char *value)
+                                                   char *value)
 
 {
   int res = 0;
@@ -261,7 +262,7 @@ int vtkKWUNIXRegisteryUtilities::DeleteValueInternal(const char *skey)
 
 //----------------------------------------------------------------------------
 int vtkKWUNIXRegisteryUtilities::SetValueInternal(const char *skey, 
-						  const char *value)
+                                                  const char *value)
 {
   char *key = this->CreateKey( skey );
   if ( !key )
@@ -285,4 +286,10 @@ char *vtkKWUNIXRegisteryUtilities::CreateKey( const char *key )
   newkey = new char[ len+1 ] ;
   sprintf(newkey, "%s\\%s", this->SubKey, key);
   return newkey;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUNIXRegisteryUtilities::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }

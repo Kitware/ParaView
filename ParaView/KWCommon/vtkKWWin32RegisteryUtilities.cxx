@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
+vtkCxxRevisionMacro(vtkKWWin32RegisteryUtilities, "1.3");
 vtkStandardNewMacro( vtkKWWin32RegisteryUtilities );
 
 vtkKWWin32RegisteryUtilities::vtkKWWin32RegisteryUtilities()
@@ -56,8 +57,8 @@ vtkKWWin32RegisteryUtilities::~vtkKWWin32RegisteryUtilities()
 }
 
 int vtkKWWin32RegisteryUtilities::OpenInternal(const char *toplevel,
-					       const char *subkey, 
-					       int readonly)
+                                               const char *subkey, 
+                                               int readonly)
 {
   int res = 0;
   ostrstream str;
@@ -66,13 +67,13 @@ int vtkKWWin32RegisteryUtilities::OpenInternal(const char *toplevel,
   if ( readonly == vtkKWRegisteryUtilities::READONLY )
     {
     res = ( RegOpenKeyEx(HKEY_CURRENT_USER, str.str(), 
-			 0, KEY_READ, &this->HKey) == ERROR_SUCCESS );
+                         0, KEY_READ, &this->HKey) == ERROR_SUCCESS );
     }
   else
     {
     res = ( RegCreateKeyEx(HKEY_CURRENT_USER, str.str(),
-			   0, "", REG_OPTION_NON_VOLATILE, KEY_READ|KEY_WRITE, 
-			   NULL, &this->HKey, &dwDummy) == ERROR_SUCCESS );    
+                           0, "", REG_OPTION_NON_VOLATILE, KEY_READ|KEY_WRITE, 
+                           NULL, &this->HKey, &dwDummy) == ERROR_SUCCESS );    
     }
   str.rdbuf()->freeze(0);
   return res;
@@ -86,14 +87,14 @@ int vtkKWWin32RegisteryUtilities::CloseInternal()
 }
 
 int vtkKWWin32RegisteryUtilities::ReadValueInternal(const char *key,
-						    char *value)
+                                                    char *value)
 {
   int res = 1;
   DWORD dwType, dwSize;  
   dwType = REG_SZ;
   dwSize = 1023;
   res = ( RegQueryValueEx(this->HKey, key, NULL, &dwType, 
-			  (BYTE *)value, &dwSize) == ERROR_SUCCESS );
+                          (BYTE *)value, &dwSize) == ERROR_SUCCESS );
   return res;
 }
 
@@ -112,12 +113,12 @@ int vtkKWWin32RegisteryUtilities::DeleteValueInternal(const char *key)
 }
 
 int vtkKWWin32RegisteryUtilities::SetValueInternal(const char *key, 
-						   const char *value)
+                                                   const char *value)
 {
   int res = 1;
   DWORD len = (DWORD) vtkString::Length(value);
   res = ( RegSetValueEx(this->HKey, key, 0, REG_SZ, 
-			(CONST BYTE *)(const char *)value, 
-			len+1) == ERROR_SUCCESS );
+                        (CONST BYTE *)(const char *)value, 
+                        len+1) == ERROR_SUCCESS );
   return res;
 }

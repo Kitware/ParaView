@@ -29,8 +29,8 @@ public:
   // Description:
   // Construct the ProcessStatistics with eight points.
   static vtkKWProcessStatistics *New();
-
   vtkTypeRevisionMacro(vtkKWProcessStatistics,vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   int   GetProcessSizeInBytes();
   float GetProcessCPUTimeInMilliseconds();

@@ -54,7 +54,8 @@ class VTK_EXPORT vtkKWSerializer : public vtkObject
 {
 public:
   static vtkKWSerializer* New();
-  vtkTypeMacro(vtkKWSerializer,vtkObject);
+  vtkTypeRevisionMacro(vtkKWSerializer,vtkObject);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // The primary helper functions instances can invoke.

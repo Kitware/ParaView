@@ -53,7 +53,8 @@ class VTK_EXPORT vtkKWUNIXRegisteryUtilities : public vtkKWRegisteryUtilities
 {
 public:
   static vtkKWUNIXRegisteryUtilities* New();
-  vtkTypeMacro(vtkKWUNIXRegisteryUtilities, vtkKWRegisteryUtilities);
+  vtkTypeRevisionMacro(vtkKWUNIXRegisteryUtilities, vtkKWRegisteryUtilities);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
 //BTX  
   typedef vtkArrayMap<const char*, const char*> StringStringMap;
@@ -78,7 +79,7 @@ public:
   // Description:
   // Open the registry at toplevel/subkey.
   virtual int OpenInternal(const char *toplevel, const char *subkey, 
-			   int readonly);
+                           int readonly);
   
   // Description:
   // Close the registry.
@@ -94,6 +95,9 @@ protected:
 private:
   StringStringMap *EntriesMap;
   char *SubKey;
+
+  vtkKWUNIXRegisteryUtilities(const vtkKWUNIXRegisteryUtilities&); // Not implemented
+  void operator=(const vtkKWUNIXRegisteryUtilities&); // Not implemented
 };
 
 #endif

@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
+vtkCxxRevisionMacro(vtkKWIcon, "1.6");
 
 vtkKWIcon::vtkKWIcon()
 {

@@ -49,13 +49,13 @@ class VTK_EXPORT vtkKWRegisteryUtilities : public vtkObject
 {
   public:
   static vtkKWRegisteryUtilities* New();
-  vtkTypeMacro(vtkKWRegisteryUtilities, vtkObject);
+  vtkTypeRevisionMacro(vtkKWRegisteryUtilities, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Read a value from the registry.
   int ReadValue(const char *subkey, 
-		const char *key, char *value);
+                const char *key, char *value);
 
   // Description:
   // Delete a key from the registry.
@@ -68,12 +68,12 @@ class VTK_EXPORT vtkKWRegisteryUtilities : public vtkObject
   // Description:
   // Set value in a given key.
   int SetValue(const char *subkey, const char *key, 
-	       const char *value);
+               const char *value);
 
   // Description:
   // Open the registry at toplevel/subkey.
   int Open(const char *toplevel, const char *subkey, 
-	   int readonly);
+           int readonly);
   
   // Description:
   // Close the registry. 
@@ -124,12 +124,12 @@ class VTK_EXPORT vtkKWRegisteryUtilities : public vtkObject
   // Description:
   // Set value in a given key.
   virtual int SetValueInternal(const char *key, 
-			       const char *value) = 0;
+                               const char *value) = 0;
 
   // Description:
   // Open the registry at toplevel/subkey.
   virtual int OpenInternal(const char *toplevel, const char *subkey, 
-			   int readonly) = 0;
+                           int readonly) = 0;
   
   // Description:
   // Close the registry. 

@@ -58,7 +58,7 @@ class VTK_EXPORT vtkKWIcon : public vtkObject
 {
 public:
   static vtkKWIcon* New();
-  vtkTypeMacro(vtkKWIcon,vtkObject);
+  vtkTypeRevisionMacro(vtkKWIcon,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

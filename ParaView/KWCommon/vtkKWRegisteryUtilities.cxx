@@ -53,6 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
+vtkCxxRevisionMacro(vtkKWRegisteryUtilities, "1.5");
+
 //-----------------------------------------------------------------------------
 vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
 {
@@ -86,13 +88,13 @@ vtkKWRegisteryUtilities::~vtkKWRegisteryUtilities()
   if ( this->Opened )
     {
     vtkErrorMacro("vtkKWRegisteryUtilities::Close should be "
-		  "called here. The registry is not closed.");
+                  "called here. The registry is not closed.");
     }
 }
 
 //-----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::Open(const char *toplevel,
-				  const char *subkey, int readonly)
+                                  const char *subkey, int readonly)
 {
   int res = 0;
   if ( this->GetLocked() )
@@ -116,7 +118,7 @@ int vtkKWRegisteryUtilities::Open(const char *toplevel,
        this->IsSpace(toplevel[vtkString::Length(toplevel)-1]) )
     {
     vtkErrorMacro("Toplevel has to start with letter or number and end"
-		  " with one");
+                  " with one");
     return 0;
     }
 
@@ -158,8 +160,8 @@ int vtkKWRegisteryUtilities::Close()
 
 //-----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::ReadValue(const char *subkey, 
-				       const char *key, 
-				       char *value)
+                                       const char *key, 
+                                       char *value)
 {  
   *value = 0;
   int res = 1;
@@ -171,7 +173,7 @@ int vtkKWRegisteryUtilities::ReadValue(const char *subkey,
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-		     vtkKWRegisteryUtilities::READONLY) )
+                     vtkKWRegisteryUtilities::READONLY) )
       {
       return 0;
       }
@@ -191,14 +193,14 @@ int vtkKWRegisteryUtilities::ReadValue(const char *subkey,
 
 //-----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::DeleteKey(const char *subkey, 
-				       const char *key)
+                                       const char *key)
 {
   int res = 1;
   int open = 0;
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-		     vtkKWRegisteryUtilities::READWRITE) )
+                     vtkKWRegisteryUtilities::READWRITE) )
       {
       return 0;
       }
@@ -226,7 +228,7 @@ int vtkKWRegisteryUtilities::DeleteValue(const char *subkey, const char *key)
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-		     vtkKWRegisteryUtilities::READWRITE) )
+                     vtkKWRegisteryUtilities::READWRITE) )
       {
       return 0;
       }
@@ -248,14 +250,14 @@ int vtkKWRegisteryUtilities::DeleteValue(const char *subkey, const char *key)
 
 //----------------------------------------------------------------------------
 int vtkKWRegisteryUtilities::SetValue(const char *subkey, const char *key, 
-				      const char *value)
+                                      const char *value)
 {
   int res = 1;
   int open = 0;
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
-		     vtkKWRegisteryUtilities::READWRITE) )
+                     vtkKWRegisteryUtilities::READWRITE) )
       {
       return 0;
       }
