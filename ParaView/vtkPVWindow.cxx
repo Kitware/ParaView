@@ -281,6 +281,8 @@ vtkPVWindow::~vtkPVWindow()
 //----------------------------------------------------------------------------
 void vtkPVWindow::PrepareForDelete()
 {
+  this->SetCurrentPVData(NULL);
+
   if (this->SourceInterfaces)
     {
     this->SourceInterfaces->Delete();
@@ -449,7 +451,6 @@ void vtkPVWindow::PrepareForDelete()
     this->ClipPlaneInterface = NULL;
     }
   
-  this->SetCurrentPVData(NULL);
   //if (this->CurrentInteractor != NULL)
   //  {
   //  this->CurrentInteractor->UnRegister(this);
