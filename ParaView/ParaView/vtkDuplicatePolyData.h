@@ -27,6 +27,7 @@
 #define __vtkDuplicatePolyData_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkSocketController.h"
 
 class vtkMultiProcessController;
 
@@ -54,6 +55,16 @@ public:
   vtkGetMacro(Synchronous, int);
   vtkBooleanMacro(Synchronous, int);
 
+  // Description:
+  // This duplicate filter works in client server mode when this
+  // controller is set.  We have a client flag to diferentiate the
+  // client and server because the socket controller is odd:
+  // Proth processes think their id is 0.
+  vtkSocketController *GetSocketController() {return this->SocketController;}
+  void SetSocketController (vtkSocketController *controller);
+  vtkSetMacro(ClientFlag,int);
+  vtkGetMacro(ClientFlag,int);
+
 protected:
   vtkDuplicatePolyData();
   ~vtkDuplicatePolyData();
@@ -61,6 +72,7 @@ protected:
   // Data generation method
   void ComputeInputUpdateExtents(vtkDataObject *output);
   void Execute();
+  void ClientExecute();
   void ExecuteInformation();
 
   vtkMultiProcessController *Controller;
@@ -69,6 +81,10 @@ protected:
   int NumberOfProcesses;
   int ScheduleLength;
   int **Schedule;
+
+  // For client server mode.
+  vtkSocketController *SocketController;
+  int ClientFlag;
 
 private:
   vtkDuplicatePolyData(const vtkDuplicatePolyData&); // Not implemented

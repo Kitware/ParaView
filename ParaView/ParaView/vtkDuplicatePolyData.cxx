@@ -20,12 +20,14 @@
 #include "vtkAppendPolyData.h"
 #include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
+#include "vtkSocketController.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.4");
+vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.5");
 vtkStandardNewMacro(vtkDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkDuplicatePolyData,Controller, vtkMultiProcessController);
+vtkCxxSetObjectMacro(vtkDuplicatePolyData,SocketController, vtkSocketController);
 
 //----------------------------------------------------------------------------
 vtkDuplicatePolyData::vtkDuplicatePolyData()
@@ -38,6 +40,9 @@ vtkDuplicatePolyData::vtkDuplicatePolyData()
   this->Schedule = NULL;
   this->ScheduleLength = 0;
   this->NumberOfProcesses = 0;
+
+  this->SocketController = NULL;
+  this->ClientFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -200,6 +205,12 @@ void vtkDuplicatePolyData::Execute()
   int numProcs, myId, partner;
   int idx;
 
+  if (this->SocketController && this->ClientFlag)
+    {
+    this->ClientExecute();
+    return;
+    }
+
   if (input == NULL)
     {
     vtkErrorMacro("Input has not been set.");
@@ -211,6 +222,10 @@ void vtkDuplicatePolyData::Execute()
     output->CopyStructure(input);
     output->GetPointData()->PassData(input->GetPointData());
     output->GetCellData()->PassData(input->GetCellData());
+    if (this->SocketController && ! this->ClientFlag)
+      {
+      this->SocketController->Send(output, 1, 18732);
+      }
     return;
     }
   
@@ -267,6 +282,26 @@ void vtkDuplicatePolyData::Execute()
   output->GetCellData()->PassData(input->GetCellData());
   append->Delete();
   append = NULL;
+
+  if (this->SocketController && ! this->ClientFlag)
+    {
+    this->SocketController->Send(output, 1, 18732);
+    }
+}
+
+
+//----------------------------------------------------------------------------
+void vtkDuplicatePolyData::ClientExecute()
+{
+  vtkPolyData *output = this->GetOutput();
+  vtkPolyData *tmp = vtkPolyData::New();
+
+  // No data is on the client, so we just have to get the data
+  // from node 0 of the server.
+  this->SocketController->Receive(tmp, 1, 18732);
+  output->CopyStructure(tmp);
+  output->GetPointData()->PassData(tmp->GetPointData());
+  output->GetCellData()->PassData(tmp->GetCellData());
 }
 
 
@@ -277,7 +312,11 @@ void vtkDuplicatePolyData::PrintSelf(ostream& os, vtkIndent indent)
   int i, j;
   
   os << indent << "Controller: (" << this->Controller << ")\n";
-  os << indent << "Synchronous: " << this->Synchronous << endl;
+  if (this->SocketController)
+    {
+    os << indent << "SocketController: (" << this->SocketController << ")\n";
+    os << indent << "ClientFlag: " << this->ClientFlag << endl;
+    }
 
   os << indent << "Schedule:\n";
   indent = indent.GetNextIndent();

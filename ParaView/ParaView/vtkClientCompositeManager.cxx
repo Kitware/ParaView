@@ -46,7 +46,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.2");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.3");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -118,6 +118,9 @@ vtkClientCompositeManager::vtkClientCompositeManager()
 
   this->Compositer = vtkCompressCompositer::New();
   //this->Compositer = vtkTreeCompositer::New();
+
+  this->Tiled = 0;
+  this->TiledDimensions[0] = this->TiledDimensions[1] = 1;
 
   this->UseChar = 1;
   this->UseRGB = 1;
@@ -293,9 +296,11 @@ void vtkClientCompositeManager::StartRender()
                      vtkCompositeManager::REN_INFO_TAG);
     }
   
-  
-  this->ReceiveAndSetColorBuffer();
-  this->RenderWindow->EraseOff();
+  if (this->Tiled == 0)
+    {
+    this->ReceiveAndSetColorBuffer();
+    this->RenderWindow->EraseOff();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -637,6 +642,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
       }
     }
 
+
   // This should be fixed.  Round off will cause window to resize. !!!!!
   renWin->SetSize(winInfo.Size[0] * winInfo.ReductionFactor,
                   winInfo.Size[1] * winInfo.ReductionFactor);
@@ -680,19 +686,47 @@ void vtkClientCompositeManager::SatelliteStartRender()
       lc = ren->GetLights();
       lc->InitTraversal();
       light = lc->GetNextItem();
-  
-      cam->SetPosition(renInfo.CameraPosition);
-      cam->SetFocalPoint(renInfo.CameraFocalPoint);
-      cam->SetViewUp(renInfo.CameraViewUp);
-      cam->SetClippingRange(renInfo.CameraClippingRange);
-      if (renInfo.ParallelScale != 0.0)
+
+      if (this->Tiled == 0)
         {
-        cam->ParallelProjectionOn();
-        cam->SetParallelScale(renInfo.ParallelScale);
+        int x, y;
+        // Figure out the tile indexes.
+        i = this->CompositeController->GetLocalProcessId() - 1;
+        y = i/this->TiledDimensions[0];
+        x = i - y*this->TiledDimensions[0];
+
+        cam->SetWindowCenter(1.0-(double)(this->TiledDimensions[0]) + 2.0*(double)x,
+                             1.0-(double)(this->TiledDimensions[1]) + 2.0*(double)y);
+        cam->SetViewAngle(asin(sin(renInfo.CameraViewAngle*3.1415926/360.0)/(double)(this->TiledDimensions[0])) * 360.0 / 3.1415926);
+        cam->SetPosition(renInfo.CameraPosition);
+        cam->SetFocalPoint(renInfo.CameraFocalPoint);
+        cam->SetViewUp(renInfo.CameraViewUp);
+        cam->SetClippingRange(renInfo.CameraClippingRange);
+        if (renInfo.ParallelScale != 0.0)
+          {
+          cam->ParallelProjectionOn();
+          cam->SetParallelScale(renInfo.ParallelScale/(double)(this->TiledDimensions[0]));
+          }
+        else
+          {
+          cam->ParallelProjectionOff();   
+          }
         }
       else
-        {
-        cam->ParallelProjectionOff();   
+        { // Not tiled display.
+        cam->SetPosition(renInfo.CameraPosition);
+        cam->SetFocalPoint(renInfo.CameraFocalPoint);
+        cam->SetViewUp(renInfo.CameraViewUp);
+        cam->SetClippingRange(renInfo.CameraClippingRange);
+        if (renInfo.ParallelScale != 0.0)
+          {
+          cam->ParallelProjectionOn();
+          cam->SetParallelScale(renInfo.ParallelScale);
+          }
+        else
+          {
+          cam->ParallelProjectionOff();   
+          }
         }
       if (light)
         {
@@ -700,6 +734,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
         light->SetFocalPoint(renInfo.LightFocalPoint);
         }
       ren->SetBackground(renInfo.Background);
+      // Should not have reduction when using tiled display.
       ren->SetViewport(0, 0, 1.0/(float)this->ReductionFactor, 
                        1.0/(float)this->ReductionFactor);
       }
@@ -713,6 +748,11 @@ void vtkClientCompositeManager::SatelliteEndRender()
 {  
   int numProcs, myId;
   int front = 1;
+
+  if (this->Tiled)
+    { // Do not need to composite if we are rendering a tiled display. 
+    return;
+    }
 
   myId = this->CompositeController->GetLocalProcessId();
   numProcs = this->CompositeController->GetNumberOfProcesses();
@@ -909,6 +949,10 @@ void vtkClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
         ren->AddObserver(vtkCommand::ResetCameraEvent,cbc);
         cbc->Delete();
         }
+      }
+     if (this->Tiled && this->ClientFlag == 0)
+      { 
+      renWin->FullScreenOn();
       }
     }
 }
@@ -1281,6 +1325,12 @@ void vtkClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "CompositeController: (" << this->CompositeController << ")\n"; 
   os << indent << "ClientController: (" << this->ClientController << ")\n"; 
+
+  if (this->Tiled)
+    {
+    os << indent << "Tiled display with dimensions: " 
+       << this->TiledDimensions[0] << ", " << this->TiledDimensions[1] << endl;
+    }
 }
 
 

@@ -123,6 +123,16 @@ public:
   void SetCompositer(vtkCompositer *c);
   vtkGetObjectMacro(Compositer,vtkCompositer);
 
+  // Description:
+  // These parameters allow this object to manage a tiled display.
+  // When the flag is on, the nodes (starting in lower left)
+  // render tiles of a larger display defined by TiledDimensions.
+  vtkSetMacro(Tiled,int);
+  vtkGetMacro(Tiled,int);
+  vtkBooleanMacro(Tiled,int);
+  vtkSetVector2Macro(TiledDimensions,int);
+  vtkGetVector2Macro(TiledDimensions,int);
+
 //BTX
   enum Tags {
     RENDER_RMI_TAG=12721,
@@ -139,6 +149,9 @@ protected:
   vtkMultiProcessController* CompositeController;
   vtkSocketController* ClientController;
   vtkCompositer *Compositer;
+
+  int Tiled;
+  int TiledDimensions[2];
 
   int ClientFlag;
   unsigned long StartTag;
