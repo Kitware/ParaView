@@ -109,6 +109,8 @@ protected:
 
   void Update();
   int Insert(const char* name, int y, int directory);
+  void GetFiles(vtkStringList* files);
+  int StringGreater(char* str1, char* str2);
 
   //vtkDirectory*     DirectoryTool;
   char*             DirectoryToolTclName;
