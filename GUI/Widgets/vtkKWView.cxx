@@ -86,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.130");
+vtkCxxRevisionMacro(vtkKWView, "1.131");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1566,7 +1566,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.130 $");
+  this->ExtractRevision(os,"$Revision: 1.131 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1643,18 +1643,9 @@ void vtkKWView::SetBackgroundColor( double r, double g, double b )
 }
 
 //----------------------------------------------------------------------------
-double* vtkKWView::GetBackgroundColor( )
+void vtkKWView::GetBackgroundColor(double *r, double *g, double *b)
 {
-  return this->GetRenderer()->GetBackground( );
-}
-
-//----------------------------------------------------------------------------
-void vtkKWView::GetBackgroundColor( double *r, double *g, double *b )
-{
-  double *ff = this->GetRenderer()->GetBackground( );
-  *r = ff[0];
-  *g = ff[1];
-  *b = ff[2];
+  this->GetRenderer()->GetBackground(*r, *g, *b);
 }
 
 

@@ -50,11 +50,6 @@ public:
   vtkSetStringMacro(BarColor);
   vtkGetStringMacro(BarColor);
 
-  // Description:
-  // Set get the color of the background, the default is gray.
-  vtkSetStringMacro(BackgroundColor);
-  vtkGetStringMacro(BackgroundColor);
-
 protected:
   vtkKWProgressGauge();
   ~vtkKWProgressGauge();

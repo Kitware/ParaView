@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.22");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.23");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -32,13 +32,11 @@ vtkKWProgressGauge::vtkKWProgressGauge()
   this->Height = 20;
   this->Value = 0;
   this->BarColor = vtkString::Duplicate("blue");
-  this->BackgroundColor = 0;
 }
 
 
 vtkKWProgressGauge::~vtkKWProgressGauge()
 {
-  this->SetBackgroundColor(0);
   delete [] this->BarColor;
   this->BarColor = NULL;
 }
@@ -183,8 +181,6 @@ void vtkKWProgressGauge::SetHeight(int height)
 void vtkKWProgressGauge::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "BackgroundColor: " 
-     << (this->BackgroundColor?this->BackgroundColor:"none") << endl;
   os << indent << "BarColor: " << (this->BarColor?this->BarColor:"none") 
      << endl;
   os << indent << "Height: " << this->GetHeight() << endl;
