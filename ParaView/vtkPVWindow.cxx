@@ -75,7 +75,6 @@ vtkPVWindow::vtkPVWindow()
   this->ResetCameraButton = vtkKWPushButton::New();
   this->PreviousSourceButton = vtkKWPushButton::New();
   this->NextSourceButton = vtkKWPushButton::New();
-  this->CurrentSource = NULL;
   this->Sources = vtkKWCompositeCollection::New();
   
   this->ApplicationAreaFrame = vtkKWLabeledFrame::New();
@@ -95,12 +94,6 @@ vtkPVWindow::~vtkPVWindow()
   this->PreviousSourceButton = NULL;
   this->NextSourceButton->Delete();
   this->NextSourceButton = NULL;
-  
-  if (this->CurrentSource != NULL)
-    {
-    this->CurrentSource->Delete();
-    this->CurrentSource = NULL;
-    }
   
   this->SourceList->Delete();
   this->SourceList = NULL;
@@ -367,7 +360,7 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
 //----------------------------------------------------------------------------
 vtkPVSource* vtkPVWindow::GetCurrentSource()
 {
-  return this->CurrentSource;
+  return vtkPVSource::SafeDownCast(this->GetMainView()->GetSelectedComposite());
 }
 
 //----------------------------------------------------------------------------
@@ -404,14 +397,14 @@ void vtkPVWindow::PreviousSource()
 //----------------------------------------------------------------------------
 vtkPVSource* vtkPVWindow::GetNextSource()
 {
-  int pos = this->Sources->IsItemPresent(this->CurrentSource);
+  int pos = this->Sources->IsItemPresent(this->GetCurrentSource());
   return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos));
 }
 
 //----------------------------------------------------------------------------
 vtkPVSource* vtkPVWindow::GetPreviousSource()
 {
-  int pos = this->Sources->IsItemPresent(this->CurrentSource);
+  int pos = this->Sources->IsItemPresent(this->GetCurrentSource());
   return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos-2));
 }
 

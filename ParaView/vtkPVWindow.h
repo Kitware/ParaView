@@ -106,7 +106,6 @@ protected:
   vtkKWPushButton *PreviousSourceButton;
   vtkKWPushButton *NextSourceButton;
 
-  vtkPVSource *CurrentSource;
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;
   vtkPVSourceList *SourceList;
