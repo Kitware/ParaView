@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVAdvancedReaderModule.h"
 
+#include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
@@ -21,7 +22,6 @@
 #include "vtkPVData.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVWidgetCollection.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkString.h"
 #include "vtkVector.txx"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.18");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.19");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -71,18 +71,18 @@ int vtkPVAdvancedReaderModule::ReadFileInformation(const char* fname)
     }
   
   // We need to update the widgets.
-  vtkPVWidget *pvw;
+  vtkPVWidgetProperty *pvwProp;
   
-  vtkPVWidgetCollection* widgets = this->GetWidgets();
-  if (widgets)
+  vtkCollection* props = this->GetWidgetProperties();
+  if (props)
     {
-    vtkCollectionIterator *it = widgets->NewIterator();
+    vtkCollectionIterator *it = props->NewIterator();
     it->InitTraversal();
 
-    for (int i = 0; i < widgets->GetNumberOfItems(); i++)
+    for (int i = 0; i < props->GetNumberOfItems(); i++)
       {
-      pvw = static_cast<vtkPVWidget*>(it->GetObject());
-      pvw->ModifiedCallback();
+      pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+      pvwProp->GetWidget()->ModifiedCallback();
       it->GoToNextItem();
       }
     it->Delete();
