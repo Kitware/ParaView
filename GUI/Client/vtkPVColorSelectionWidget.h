@@ -70,8 +70,7 @@ protected:
   vtkKWWidget* Target;
   char* ColorSelectionCommand;
 
-  void AddArray(const char* pre_text, 
-    vtkPVDataSetAttributesInformation* attrInfo, int field_type);
+  void AddArray(vtkPVDataSetAttributesInformation* attrInfo, int field_type);
 
 
   int FormLabel(vtkPVArrayInformation* arrayInfo, int field, char *label);

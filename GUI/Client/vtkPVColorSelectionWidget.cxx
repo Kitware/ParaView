@@ -24,7 +24,7 @@
 #include "vtkPVArrayInformation.h"
 
 vtkStandardNewMacro(vtkPVColorSelectionWidget);
-vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.1.2.3");
 //-----------------------------------------------------------------------------
 vtkPVColorSelectionWidget::vtkPVColorSelectionWidget()
 {
@@ -66,14 +66,14 @@ void vtkPVColorSelectionWidget::Update(int remove_all /*=1*/)
   vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
   vtkPVDataSetAttributesInformation* attrInfo = dataInfo->
     GetPointDataInformation();
-  this->AddArray("Point", attrInfo, vtkSMDisplayProxy::POINT_FIELD_DATA);
+  this->AddArray(attrInfo, vtkSMDisplayProxy::POINT_FIELD_DATA);
   
   attrInfo = dataInfo->GetCellDataInformation();
-  this->AddArray("Cell", attrInfo, vtkSMDisplayProxy::CELL_FIELD_DATA);
+  this->AddArray(attrInfo, vtkSMDisplayProxy::CELL_FIELD_DATA);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVColorSelectionWidget::AddArray(const char* pre_text,
+void vtkPVColorSelectionWidget::AddArray(
   vtkPVDataSetAttributesInformation* attrInfo, int field_type)
 {
   int numArrays = attrInfo->GetNumberOfArrays();
