@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.2");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.3");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -205,13 +205,13 @@ vtkPVWindow::vtkPVWindow()
 
   // Allow the user to interactively resize the properties parent.
   this->MiddleFrame->SetSeparatorSize(5);
-  this->MiddleFrame->SetFrame1MinimumSize(200);
-
 #ifdef _WIN32  
-  this->MiddleFrame->SetFrame1Size(300);
+  this->MiddleFrame->SetFrame1Size(330);
 #else
   this->MiddleFrame->SetFrame1Size(330);
 #endif
+  this->MiddleFrame->SetFrame1MinimumSize(200);
+
   this->MiddleFrame->SetFrame2MinimumSize(200);
 
   // Frame used for animations.
@@ -3776,7 +3776,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.2 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.3 $");
 }
 
 //----------------------------------------------------------------------------
