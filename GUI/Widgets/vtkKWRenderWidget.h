@@ -234,6 +234,7 @@ public:
   // Setup offscreen rendering (e.g., for screenshots)
   vtkBooleanMacro(OffScreenRendering, int);
   virtual void SetOffScreenRendering(int);
+  virtual int GetOffScreenRendering();
   
   // Description:
   // Method that processes the events

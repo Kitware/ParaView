@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.80");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.81");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -746,6 +746,16 @@ void vtkKWRenderWidget::SetParentWindow(vtkKWWindow *window)
     }
   
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRenderWidget::GetOffScreenRendering()
+{
+  if (this->GetRenderWindow())
+    {
+    return this->GetRenderWindow()->GetOffScreenRendering();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
