@@ -2,6 +2,7 @@ SOURCE_FILES( KWWidgets_SRCS
 kwinit
 vtkKWLoadSaveDialog
 vtkKWHashTable
+vtkKWHashTableIterator
 vtkKWPointerArray
 vtkKWComposite 
 vtkKWView 
@@ -30,6 +31,7 @@ vtkKWOptionMenu
 vtkKWProgressGauge 
 vtkKWPushButton 
 vtkKWRadioButton 
+vtkKWRegisteryUtilities
 vtkKWSaveImageDialog 
 vtkKWScale 
 vtkKWSerializer 
@@ -56,17 +58,26 @@ vtkKWView
 
 IF (WIN32)
   SOURCE_FILES( KWWidgets_SRCS 
-    vtkKWRegisteryUtilities
     vtkKWWin32RegisteryUtilities
   )
   WRAP_EXCLUDE_FILES(
-    vtkKWRegisteryUtilities
     vtkKWWin32RegisteryUtilities
-    vtkKWTclCommand
+  )
+ELSE (WIN32)
+  SOURCE_FILES( KWWidgets_SRCS 
+    vtkKWUNIXRegisteryUtilities
+  )
+  WRAP_EXCLUDE_FILES(
+    vtkKWUNIXRegisteryUtilities
   )
 ENDIF (WIN32)
   
-WRAP_EXCLUDE_FILES(kwinit vtktcl vtkKWHashTable vtkKWTclCommand)
+WRAP_EXCLUDE_FILES(kwinit 
+  vtktcl 
+  vtkKWHashTable 
+  vtkKWTclCommand
+  vtkKWRegisteryUtilities
+  )
 
 VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
 ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)

@@ -51,9 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWWindowCollection.h"
-#ifdef _WIN32
-#include "vtkKWWin32RegisteryUtilities.h"
-#endif
+#include "vtkKWRegisteryUtilities.h"
 #include "KitwareLogo.h"
 #include "vtkKWPointerArray.h"
 
@@ -799,12 +797,10 @@ void vtkKWWindow::CreateStatusImage()
 
 void vtkKWWindow::StoreRecentMenuToRegistry(char *key)
 {
-
-#ifdef _WIN32
   char KeyNameP[10];
   char CmdNameP[10];
   unsigned int i;
-  vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
+  vtkKWRegisteryUtilities *reg = vtkKWRegisteryUtilities::New();
   reg->SetTopLevel( key ? key : this->GetClassName() );
 
   for (i = 0; i < this->NumberOfRecentFiles; i++)
@@ -825,17 +821,15 @@ void vtkKWWindow::StoreRecentMenuToRegistry(char *key)
       }
     }
   reg->Delete();
-#endif
 }
 
 void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
 {
-#ifdef _WIN32
   char KeyNameP[10];
   char CmdNameP[10];
-  vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
+  vtkKWRegisteryUtilities *reg = vtkKWRegisteryUtilities::New();
   if ( reg->Open( key ? key : this->GetClassName(),
-		  "MRU", vtkKWWin32RegisteryUtilities::READONLY ) )
+		  "MRU", vtkKWRegisteryUtilities::READONLY ) )
     {
     int i;
     char File[1024];
@@ -862,7 +856,6 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
     }
   reg->Delete();
   this->UpdateRecentMenu(key);
-#endif
 }
 
 void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
@@ -887,7 +880,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.53 $");
+  this->ExtractRevision(os,"$Revision: 1.54 $");
 }
 
 int vtkKWWindow::ExitDialog()

@@ -41,12 +41,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkKWRegisteryUtilities.h"
+#ifdef _WIN32
+#  include "vtkKWWin32RegisteryUtilities.h"
+#else // _WIN32
+#  include "vtkKWUNIXRegisteryUtilities.h"
+#endif // _WIN32
+
+#include "vtkObjectFactory.h"
+
+vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
+{
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkKWRegisteryUtilities");
+  if(ret)
+    {
+      return static_cast<vtkKWRegisteryUtilities*>(ret);
+    }
+#ifdef _WIN32
+  return vtkKWWin32RegisteryUtilities::New();
+#else // _WIN32
+  return vtkKWUNIXRegisteryUtilities::New();
+#endif // _WIN32
+}
 
 vtkKWRegisteryUtilities::vtkKWRegisteryUtilities()
 {
   this->TopLevel = 0;
-  this->Opened = 0;
-  this->Locked = 0;
+  this->Opened   = 0;
+  this->Locked   = 0;
+  this->Changed  = 0;
+  this->Empty    = 1;
 }
 
 vtkKWRegisteryUtilities::~vtkKWRegisteryUtilities()
@@ -56,8 +79,6 @@ vtkKWRegisteryUtilities::~vtkKWRegisteryUtilities()
     {
     vtkErrorMacro("vtkKWRegisteryUtilities::Close should be "
 		  "called here. The registry is not closed.");
-    // this->Close();
-    int i = *(int *)0;
     }
 }
 
@@ -78,13 +99,15 @@ int vtkKWRegisteryUtilities::Open(const char *toplevel,
     }
   if ( !toplevel )
     {
-    cout << "vtkKWRegisteryUtilities::Opened() Toplevel not defined" << endl;
+    vtkErrorMacro("vtkKWRegisteryUtilities::Opened() Toplevel not defined");
     return 0;
     }
 
-  if ( this->IsSpace(toplevel[0]) || this->IsSpace(toplevel[strlen(toplevel)-1]) )
+  if ( this->IsSpace(toplevel[0]) || 
+       this->IsSpace(toplevel[strlen(toplevel)-1]) )
     {
-    vtkErrorMacro("Toplevel has to start with letter or number and end with one");
+    vtkErrorMacro("Toplevel has to start with letter or number and end"
+		  " with one");
     return 0;
     }
 
@@ -102,8 +125,7 @@ int vtkKWRegisteryUtilities::Open(const char *toplevel,
     {
     this->Opened = 1;
     this->SetTopLevel( toplevel );
-    cout << "Registry opened" << endl;
-    }
+        }
   return res;
 }
 
@@ -119,14 +141,14 @@ int vtkKWRegisteryUtilities::Close()
     {
     this->Opened = 0;
     this->SetLocked(0);
-    cout << "Registry Closed" << endl;
+    this->Changed = 0;
     }
   return res;
 }
 
 int vtkKWRegisteryUtilities::ReadValue(const char *subkey, 
-				       char *value, 
-				       const char *key)
+				       const char *key, 
+				       char *value)
 {
   int res = 1;
   int open = 0;
@@ -139,7 +161,7 @@ int vtkKWRegisteryUtilities::ReadValue(const char *subkey,
       }
     open = 1;
     }
-  res = this->ReadValueInternal(value, key);
+  res = this->ReadValueInternal(key, value);
 
   if ( open )
     {
@@ -168,6 +190,7 @@ int vtkKWRegisteryUtilities::DeleteKey(const char *subkey,
     }
 
   res = this->DeleteKeyInternal(key);
+  this->Changed = 1;
 
   if ( open )
     {
@@ -194,6 +217,7 @@ int vtkKWRegisteryUtilities::DeleteValue(const char *subkey, const char *key)
     }
 
   res = this->DeleteValueInternal(key);
+  this->Changed = 1;
 
   if ( open )
     {
@@ -221,6 +245,7 @@ int vtkKWRegisteryUtilities::SetValue(const char *subkey, const char *key,
     }
 
   res = this->SetValueInternal( key, value );
+  this->Changed = 1;
   
   if ( open )
     {

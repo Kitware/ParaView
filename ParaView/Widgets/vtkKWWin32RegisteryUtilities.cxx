@@ -83,8 +83,8 @@ int vtkKWWin32RegisteryUtilities::CloseInternal()
   return res;
 }
 
-int vtkKWWin32RegisteryUtilities::ReadValueInternal(char *value, 
-						    const char *key)
+int vtkKWWin32RegisteryUtilities::ReadValueInternal(const char *key,
+						    char *value)
 {
   int res = 1;
   DWORD dwType, dwSize;  

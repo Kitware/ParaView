@@ -55,7 +55,7 @@ public:
 
   // Description:
   // Read a value from the registry.
-  virtual int ReadValueInternal(char *value, const char *key); 
+  virtual int ReadValueInternal(const char *key, char *value); 
 
   // Description:
   // Delete a key from the registry.
@@ -80,9 +80,13 @@ public:
 protected:
   vtkKWUNIXRegisteryUtilities();
   virtual ~vtkKWUNIXRegisteryUtilities();
+  vtkSetStringMacro(SubKey);
+
+  char *CreateKey(const char *key);
 
 private:
   vtkKWHashTable *Entries;
+  char *SubKey;
 };
 
 #endif

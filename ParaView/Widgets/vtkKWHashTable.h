@@ -55,10 +55,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // This is the initial number of buckets
 #define KW_HASHTABLE_INITIAL_NUMBER_OF_BUCKETS 101
 
-class vtkKWHashTableItem;
+class vtkKWHashTableIterator;
+
+// Hash table vtkKWHashTableItem structure
+class vtkKWHashTableItem
+{
+public:
+  vtkKWHashTableItem();
+  ~vtkKWHashTableItem();
+  void Set( vtkKWHashTableItem * );
+  void *Data;
+  unsigned long Key;
+  unsigned int Valid;
+  vtkKWHashTableItem *Next;
+  static int Count;
+};
 
 class VTK_EXPORT vtkKWHashTable : public vtkKWObject
 {
+  friend class vtkKWHashTableIterator;
 public: 
   static vtkKWHashTable *New();
   vtkTypeMacro(vtkKWHashTable,vtkObject);
@@ -137,6 +152,10 @@ public:
   // Description:
   // Hashing function from string into unsigned long
   static unsigned long HashString( const char* s );
+
+  // Description:
+  // Get the iterator for the hash table.
+  vtkKWHashTableIterator* Iterator();
 
 private:
   vtkKWHashTable();
