@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.19");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.20");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -2730,7 +2730,7 @@ int vtkRedistributePolyData::DoubleCheckArrays(vtkPolyData* input)
     int* zeroSanity;
     this->Controller->Receive(&zeroLength, 1, 0, 77431);
     zeroSanity = new int[zeroLength];
-    this->Controller->Receive(zeroSanity, length, 0, 77432);
+    this->Controller->Receive(zeroSanity, zeroLength, 0, 77432);
     // Compare
     if (length != zeroLength)
       {
