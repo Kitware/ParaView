@@ -49,8 +49,6 @@ protected:
   vtkPVCutEntry();
   ~vtkPVCutEntry();
   
-  virtual int ComputeWidgetRange();
-
   vtkPVCutEntry(const vtkPVCutEntry&); // Not implemented
   void operator=(const vtkPVCutEntry&); // Not implemented
 

@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.51");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -44,6 +44,7 @@ vtkPVContourEntry::vtkPVContourEntry()
 
   this->ArrayMenu = NULL;
   
+  this->DomainName = "scalar_range";
 }
 
 //-----------------------------------------------------------------------------
@@ -59,7 +60,7 @@ int vtkPVContourEntry::ComputeWidgetRange()
   vtkSMDoubleRangeDomain* dom = 0;
   if (prop)
     {
-    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("scalar_range"));
+    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain(this->DomainName));
     }
   if (dom)
     {
@@ -76,6 +77,12 @@ int vtkPVContourEntry::ComputeWidgetRange()
       }
     this->UseWidgetRange = 1;
     return 1;
+    }
+  else
+    {
+    vtkErrorMacro(<< "Required domain " 
+                  << this->DomainName 
+                  << " could not be found.");
     }
   return 0;
 }
@@ -190,11 +197,12 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMDoubleRangeDomain *rangeDomain = vtkSMDoubleRangeDomain::SafeDownCast(
-    prop->GetDomain("scalar_range"));
+    prop->GetDomain(this->DomainName));
     
 
   if (!rangeDomain)
     {
+    vtkErrorMacro("Required domain scalar_range could not be found");
     return;
     }
 

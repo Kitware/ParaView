@@ -19,10 +19,12 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMProperty.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCutEntry);
-vtkCxxRevisionMacro(vtkPVCutEntry, "1.6");
+vtkCxxRevisionMacro(vtkPVCutEntry, "1.7");
 
 vtkCxxSetObjectMacro(vtkPVCutEntry, InputMenu, vtkPVInputMenu);
 
@@ -36,39 +38,13 @@ vtkPVCutEntry::vtkPVCutEntry()
 {
   this->CommandFunction = vtkPVCutEntryCommand;
   this->InputMenu = NULL;
+  this->DomainName = "bounds";
 }
 
 //-----------------------------------------------------------------------------
 vtkPVCutEntry::~vtkPVCutEntry()
 {
   this->SetInputMenu(NULL);
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVCutEntry::ComputeWidgetRange()
-{
-  if (!this->InputMenu)
-    {
-    return 0;
-    }
-  vtkPVSource* input = this->InputMenu->GetCurrentValue();
-  if (!input)
-    {
-    return 0;
-    }
-  
-  double bounds[6];
-  input->GetDataInformation()->GetBounds(bounds);
-  float length = sqrt(
-    static_cast<double>(
-      (bounds[1]-bounds[0])*(bounds[1]-bounds[0])+
-      (bounds[3]-bounds[2])*(bounds[3]-bounds[2])+
-      (bounds[5]-bounds[4])*(bounds[5]-bounds[4])));
-  
-  this->WidgetRange[0] = -length;
-  this->WidgetRange[1] =  length;
-  this->UseWidgetRange = 1;
-  return 1;
 }
 
 //----------------------------------------------------------------------------

@@ -82,6 +82,8 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,      
                         vtkPVXMLPackageParser* parser);
 
+  const char* DomainName;
+
 };
 
 #endif
