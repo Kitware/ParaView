@@ -20,7 +20,6 @@
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProp3D.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVDataInformation.h"
@@ -30,7 +29,6 @@
 #include "vtkKWCheckButton.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkProperty.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
 #include "vtkString.h"
@@ -40,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.40");
+vtkCxxRevisionMacro(vtkPVPart, "1.41");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,

@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.17");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.18");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -306,7 +306,6 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
     return;
     }  
   
-  // I would like to move the addition of the prop into vtkPVPart sometime.
   num = pvs->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {

@@ -34,8 +34,6 @@ class vtkPVClassNameInformation;
 class vtkPVDataInformation;
 class vtkPVPartDisplay;
 class vtkPolyDataMapper;
-class vtkProp;
-class vtkProperty;
 
 class VTK_EXPORT vtkPVPart : public vtkKWObject
 {
