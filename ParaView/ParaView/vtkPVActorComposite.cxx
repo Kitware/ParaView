@@ -262,18 +262,33 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // This allows us to debug the parallel features of the
   // application and VTK on only one process.
   int debugNum = numProcs;
-  if (getenv("PV_DEBUG_HALF") != NULL)
+  if (getenv("PV_DEBUG_ZERO") != NULL)
     {
-    debugNum *= 2;
+    for (id = 0; id < numProcs; ++id)
+      {
+      pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
+			  this->MapperTclName, debugNum-1);
+      pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id-1);
+      pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
+			  this->LODMapperTclName, debugNum-1);
+      pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id-1);
+      vtkErrorMacro("Piece: " << (id-1) << " of " << (debugNum-1));
+      }
     }
-  for (id = 0; id < numProcs; ++id)
-    {
-    pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-			this->MapperTclName, debugNum);
-    pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
-    pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-			this->LODMapperTclName, debugNum);
-    pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id);
+  else {
+    if (getenv("PV_DEBUG_HALF") != NULL)
+      {
+      debugNum *= 2;
+      }
+    for (id = 0; id < numProcs; ++id)
+      {
+      pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
+			    this->MapperTclName, debugNum);
+      pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
+      pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
+		  	this->LODMapperTclName, debugNum);
+      pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id);
+      }
     }
 }
 
