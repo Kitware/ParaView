@@ -29,7 +29,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.24");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -318,6 +318,12 @@ int vtkPVPointSourceWidget::ReadXMLAttributes(vtkPVXMLElement *element,
   if (input_menu)
     {
     vtkPVXMLElement *ime = element->LookupElement(input_menu);
+    if (!ime)
+      {
+      vtkErrorMacro("Couldn't find InputMenu element " << input_menu);
+      return 0;
+      }
+    
     vtkPVWidget *w = this->GetPVWidgetFromParser(ime, parser);
     vtkPVInputMenu *imw = vtkPVInputMenu::SafeDownCast(w);
     if (!imw)

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.10");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.11");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -432,6 +432,12 @@ int vtkPVSelectCTHArrays::ReadXMLAttributes(vtkPVXMLElement* element,
   if (input_menu)
     {
     vtkPVXMLElement* ime = element->LookupElement(input_menu);
+    if (!ime)
+      {
+      vtkErrorMacro("Couldn't find InputMenu element " << input_menu);
+      return 0;
+      }
+    
     vtkPVWidget* w = this->GetPVWidgetFromParser(ime, parser);
     vtkPVInputMenu* imw = vtkPVInputMenu::SafeDownCast(w);
     if(!imw)

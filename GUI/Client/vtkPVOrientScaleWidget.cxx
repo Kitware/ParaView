@@ -33,7 +33,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.15");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -656,6 +656,12 @@ int vtkPVOrientScaleWidget::ReadXMLAttributes(vtkPVXMLElement *element,
   if (input_menu)
     {
     vtkPVXMLElement *ime = element->LookupElement(input_menu);
+    if (!ime)
+      {
+      vtkErrorMacro("Couldn't find InputMenu element " << input_menu);
+      return 0;
+      }
+    
     vtkPVWidget *w = this->GetPVWidgetFromParser(ime, parser);
     vtkPVInputMenu *imw = vtkPVInputMenu::SafeDownCast(w);
     if (!imw)
