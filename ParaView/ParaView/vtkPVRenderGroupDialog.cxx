@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.1.2.2");
 
 int vtkPVRenderGroupDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -466,9 +466,20 @@ void vtkPVRenderGroupDialog::ComputeDisplayStringRoot(const char* str)
     i++;
     }
   
-  this->DisplayStringRoot = new char[len+1];
-  strncpy(this->DisplayStringRoot, str, len);
-  this->DisplayStringRoot[len] = '\0';
+  if (len == -1)
+    {
+    len = static_cast<int>(strlen(str));
+    this->DisplayStringRoot = new char[len+2];
+    strcpy(this->DisplayStringRoot, str);
+    this->DisplayStringRoot[len] = '.';
+    this->DisplayStringRoot[len+1] = '\0';
+    }
+  else
+    {
+    this->DisplayStringRoot = new char[len+1];
+    strncpy(this->DisplayStringRoot, str, len);
+    this->DisplayStringRoot[len] = '\0';
+    }
 }
 
 
