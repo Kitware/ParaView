@@ -72,7 +72,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.1");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.2");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -102,6 +102,7 @@ int vtkPVProcessModule::Start(int argc, char **argv)
   if (this->Controller == NULL)
     {
     this->Controller = vtkDummyController::New();
+    vtkMultiProcessController::SetGlobalController(this->Controller);
     }
 
   vtkPVApplication *app = this->GetPVApplication();
