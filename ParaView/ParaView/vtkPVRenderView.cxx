@@ -182,8 +182,15 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   // Get rid of render window created by the superclass
   this->RenderWindow->Delete();
   this->RenderWindow = (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
+
   this->RenderWindowTclName = NULL;
   this->SetRenderWindowTclName("RenWin1");
+
+  if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
+      (pvApp->GetController()->GetNumberOfProcesses() > 1))
+    {
+    pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
+    }
 
   this->Composite = 0;
 #ifdef VTK_USE_MPI
