@@ -27,7 +27,7 @@
 #include "vtkPoints.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkXMLWriter, "1.7");
+vtkCxxRevisionMacro(vtkXMLWriter, "1.7.2.1");
 vtkCxxSetObjectMacro(vtkXMLWriter, Compressor, vtkDataCompressor);
 
 //----------------------------------------------------------------------------
@@ -214,11 +214,11 @@ void vtkXMLWriter::WriteFileAttributes()
   // Write the byte order for the file.
   if(this->ByteOrder == vtkXMLWriter::BigEndian)
     {
-    os << " byte_order=\"big\"";
+    os << " byte_order=\"BigEndian\"";
     }
   else
     {
-    os << " byte_order=\"little\"";
+    os << " byte_order=\"LittleEndian\"";
     }
   
   // Write the compressor that will be used for the file.

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkBase64InputStream.h"
 #include "vtkDataCompressor.h"
 
-vtkCxxRevisionMacro(vtkXMLDataParser, "1.4");
+vtkCxxRevisionMacro(vtkXMLDataParser, "1.4.2.1");
 vtkStandardNewMacro(vtkXMLDataParser);
 vtkCxxSetObjectMacro(vtkXMLDataParser, Compressor, vtkDataCompressor);
 
@@ -191,11 +191,11 @@ void vtkXMLDataParser::SetupByteOrder()
 {
   const char* byte_order = this->RootElement->GetAttribute("byte_order");
   if(!byte_order) { return; }
-  if(strcmp(byte_order, "big") == 0)
+  if(strcmp(byte_order, "BigEndian") == 0)
     {
     this->ByteOrder = vtkXMLDataParser::BigEndian;
     }
-  else if(strcmp(byte_order, "little") == 0)
+  else if(strcmp(byte_order, "LittleEndian") == 0)
     {
     this->ByteOrder = vtkXMLDataParser::LittleEndian;
     }
