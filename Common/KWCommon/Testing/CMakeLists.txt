@@ -1,5 +1,4 @@
 SUBDIRS(Cxx)
-SUBDIRS(Tcl)
 
 IF (VTK_WRAP_PYTHON)
   SUBDIRS(Python)
