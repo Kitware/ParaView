@@ -124,6 +124,8 @@ ADD_DEFINITIONS(-DPARAVIEW_NEW_SOURCE_ORGANIZATION)
 SET(VTK_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/VTK
   ${ParaView_BINARY_DIR}/VTK
+  ${ParaView_SOURCE_DIR}/VTK/Utilities
+  ${ParaView_BINARY_DIR}/VTK/Utilities
   )
 SET(kits Common Filtering IO Imaging Rendering Parallel Graphics Hybrid)
 IF(VTK_USE_PATENTED)
@@ -135,9 +137,6 @@ FOREACH(kit ${kits})
     ${ParaView_BINARY_DIR}/VTK/${kit}
     )
 ENDFOREACH(kit)
-SET(VTKEXPAT_INCLUDE_DIR
-  ${ParaView_SOURCE_DIR}/VTK/Utilities/expat
-  ${ParaView_BINARY_DIR}/VTK/Utilities/expat)
 
 IF(VTK_USE_SYSTEM_ZLIB)
   SET(VTK_ZLIB_LIBRARIES ${ZLIB_LIBRARIES})
@@ -146,11 +145,11 @@ IF(VTK_USE_SYSTEM_ZLIB)
 ELSE(VTK_USE_SYSTEM_ZLIB)
   SET(VTK_ZLIB_LIBRARIES vtkzlib)
   SET(VTK_ZLIB_INCLUDE_DIRS
-    ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
-    ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
+    ${ParaView_SOURCE_DIR}/VTK/Utilities
+    ${ParaView_BINARY_DIR}/VTK/Utilities)
   SET(VTKZLIB_INCLUDE_DIR
-    ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
-    ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
+    ${ParaView_SOURCE_DIR}/VTK/Utilities
+    ${ParaView_BINARY_DIR}/VTK/Utilities)
 ENDIF(VTK_USE_SYSTEM_ZLIB)
 
 #########################################################################
