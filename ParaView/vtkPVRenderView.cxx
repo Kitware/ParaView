@@ -918,6 +918,10 @@ void vtkPVRenderView::AddActorsToTclScript(ofstream *file)
       }
     }
 
+  int *windowSize = this->GetVTKWindow()->GetSize();
+  *file << this->RenderWindowTclName << " SetSize "
+        << windowSize[0] << " " << windowSize[1] << "\n";
+
   // No longer necessary because the above loop does all props. 
   //for (i = 0; i < this->GetRenderer()->GetActors2D()->GetNumberOfItems(); i++)
   //  {
