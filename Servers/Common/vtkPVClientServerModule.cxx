@@ -132,7 +132,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.5");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -149,7 +149,6 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->Arguments = NULL;
   this->ReturnValue = 0;
 
-  this->RenderServerHostName = 0;
   this->HostName = 0;
   this->Username = 0;
   this->Port = 0;
