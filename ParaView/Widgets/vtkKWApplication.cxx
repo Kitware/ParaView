@@ -75,7 +75,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.106");
+vtkCxxRevisionMacro(vtkKWApplication, "1.107");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -602,10 +602,15 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 
   while (this->Windows && this->Windows->GetNumberOfItems())
     {
-    Tcl_DoOneEvent(0);
+    this->DoOneTclEvent();
     }
   
   //Tk_MainLoop();
+}
+
+void vtkKWApplication::DoOneTclEvent()
+{
+  Tcl_DoOneEvent(0);
 }
 
 void vtkKWApplication::DisplayHelp(vtkKWWindow* master)

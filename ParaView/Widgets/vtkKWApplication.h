@@ -279,6 +279,10 @@ protected:
   vtkKWApplication();
   ~vtkKWApplication();
 
+  // Description:
+  // Do one tcl event and whatever application might want to do.
+  virtual void DoOneTclEvent();
+
   Tk_Window MainWindow;
   Tcl_Interp *MainInterp;
   vtkKWWindowCollection *Windows;
