@@ -76,16 +76,27 @@ public:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void Reset() = 0;
+  virtual void Reset();
 
   // Description:
   // Set the widget visibility.
   void SetVisibility();
   void SetVisibility(int val);
+  void SetVisibilityNoTrace(int val);
 
   // Description:
   // Set modified to 1 when value has changed.
   void SetValueChanged();
+
+  // Description:
+  // This method is called when the source that contains this widget
+  // is selected. 
+  virtual void Select();
+
+  // Description:
+  // This method is called when the source that contains this widget
+  // is deselected. 
+  virtual void Deselect();
 
 protected:
   vtkPV3DWidget();
@@ -124,6 +135,8 @@ protected:
   vtkKWLabeledFrame* LabeledFrame;
   vtkKWCheckButton* Visibility;
   int ValueChanged;
+  int Placed;
+  int Visible;
 
 private:  
   vtkPV3DWidget(const vtkPV3DWidget&); // Not implemented

@@ -91,6 +91,8 @@ vtkPV3DWidget::vtkPV3DWidget()
   this->Frame        = vtkKWFrame::New();
   this->ValueChanged = 0;
   this->Widget3D = 0;
+  this->Visible = 0;
+  this->Placed = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -152,12 +154,6 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 
   this->ChildCreate(pvApp);
   
-  vtkDataSet* data = this->PVSource->GetPVOutput()->GetVTKData();
-  if (data)
-    {
-    this->Widget3D->SetInput(data);
-    this->Widget3D->PlaceWidget();
-    }
   vtkPVGenericRenderWindowInteractor* iren = 
     this->PVSource->GetPVWindow()->GetGenericInteractor();
   if (iren)
@@ -179,6 +175,18 @@ void vtkPV3DWidget::CopyProperties(vtkPVWidget* clone,
 }
 
 //----------------------------------------------------------------------------
+void vtkPV3DWidget::Reset()
+{
+  vtkDataSet* data = this->PVSource->GetPVOutput()->GetVTKData();
+  if (this->Placed || data != this->Widget3D->GetInput())
+    {
+    this->Widget3D->SetInput(data);
+    this->Widget3D->PlaceWidget();
+    }
+  this->ModifiedFlag = 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkPV3DWidget::SetValueChanged()
 {
   this->ValueChanged = 1;
@@ -197,6 +205,30 @@ void vtkPV3DWidget::SetVisibility(int visibility)
   this->Widget3D->SetEnabled(visibility);
   this->AddTraceEntry("$kw(%s) SetVisibility %d", 
 		      this->GetTclName(), visibility);
+  this->Visible = visibility;
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::Select()
+{
+  cout << "Select called" << endl;
+  if ( this->Visible )
+    {
+    this->SetVisibilityNoTrace(1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::Deselect()
+{
+  cout << "Deselect called" << endl;
+  this->SetVisibilityNoTrace(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::SetVisibilityNoTrace(int visibility)
+{
+  this->Widget3D->SetEnabled(visibility);  
 }
 
 //----------------------------------------------------------------------------
