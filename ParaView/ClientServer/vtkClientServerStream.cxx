@@ -1577,7 +1577,7 @@ void vtkClientServerStreamPrintValue(const vtkClientServerStream* self,
   T arg;
   self->GetArgument(m, a, &arg);
   vtkClientServerStream::Types type = self->GetArgumentType(m, a);
-  os << "  Argument " << a << " = " << self->GetStringFromType(type)
+  os << "Argument " << a << " = " << self->GetStringFromType(type)
      << " {" << static_cast<PrintType>(arg) << "}\n";
 }
 
@@ -1593,7 +1593,7 @@ void vtkClientServerStreamPrintArray(const vtkClientServerStream* self,
   T* arg = new T[length];
   self->GetArgument(m, a, arg, length);
   vtkClientServerStream::Types type = self->GetArgumentType(m, a);
-  os << "  Argument " << a << " = " << self->GetStringFromType(type) << " {";
+  os << "Argument " << a << " = " << self->GetStringFromType(type) << " {";
   const char* space = "";
   for(vtkTypeUInt32 i=0; i < length; ++i)
     {
@@ -1607,19 +1607,35 @@ void vtkClientServerStreamPrintArray(const vtkClientServerStream* self,
 //----------------------------------------------------------------------------
 void vtkClientServerStream::Print(ostream& os) const
 {
+  vtkIndent indent;
+  this->Print(os, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerStream::Print(ostream& os, vtkIndent indent) const
+{
   for(int m=0; m < this->GetNumberOfMessages(); ++m)
     {
-    this->PrintMessage(os, m);
+    this->PrintMessage(os, m, indent);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkClientServerStream::PrintMessage(ostream& os, int message) const
 {
-  os << "Message " << message << " = ";
+  vtkIndent indent;
+  this->PrintMessage(os, message, indent);
+}
+
+//----------------------------------------------------------------------------
+void vtkClientServerStream::PrintMessage(ostream& os, int message,
+                                         vtkIndent indent) const
+{
+  os << indent << "Message " << message << " = ";
   os << this->GetStringFromCommand(this->GetCommand(message)) << "\n";
   for(int a=0; a < this->GetNumberOfArguments(message); ++a)
     {
+    os << indent.GetNextIndent();
     switch(this->GetArgumentType(message, a))
       {
       VTK_CSS_TEMPLATE_MACRO(value, vtkClientServerStreamPrintValue
@@ -1630,7 +1646,7 @@ void vtkClientServerStream::PrintMessage(ostream& os, int message) const
         {
         const char* arg;
         this->GetArgument(message, a, &arg);
-        os << "  Argument " << a << " = string_value ";
+        os << "Argument " << a << " = string_value ";
         if(arg)
           {
           os << "{" << arg << "}\n";
@@ -1644,13 +1660,13 @@ void vtkClientServerStream::PrintMessage(ostream& os, int message) const
         {
         vtkClientServerID arg;
         this->GetArgument(message, a, &arg);
-        os << "  Argument " << a << " = id_value {" << arg.ID << "}\n";
+        os << "Argument " << a << " = id_value {" << arg.ID << "}\n";
         } break;
       case vtkClientServerStream::vtk_object_pointer:
         {
         vtkObjectBase* arg;
         this->GetArgument(message, a, &arg);
-        os << "  Argument " << a << " = vtk_object_pointer ";
+        os << "Argument " << a << " = vtk_object_pointer ";
         if(arg)
           {
           os << "{" << arg->GetClassName() << " (" << arg << ")}\n";
@@ -1662,11 +1678,11 @@ void vtkClientServerStream::PrintMessage(ostream& os, int message) const
         } break;
       case vtkClientServerStream::LastResult:
         {
-        os << "  Argument " << a << " = LastResult\n";
+        os << "Argument " << a << " = LastResult\n";
         } break;
       default:
         {
-        os << "  Argument " << a << " = invalid\n";
+        os << "Argument " << a << " = invalid\n";
         } break;
       }
     }

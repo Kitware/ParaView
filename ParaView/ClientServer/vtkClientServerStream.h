@@ -276,7 +276,9 @@ public:
   // Description:
   // Print the contents of the stream in a human-readable form.
   void Print(ostream&) const;
+  void Print(ostream&, vtkIndent) const;
   void PrintMessage(ostream&, int message) const;
+  void PrintMessage(ostream&, int message, vtkIndent) const;
 
 protected:
   // Write arbitrary data to the stream.  Used internally.
