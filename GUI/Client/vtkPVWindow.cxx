@@ -219,7 +219,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.646");
+vtkCxxRevisionMacro(vtkPVWindow, "1.647");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -324,6 +324,7 @@ vtkPVWindow::vtkPVWindow()
   this->AnimationInterface->SetApplication(this->GetApplication());
 
   this->LowerFrame = vtkKWSplitFrame::New();
+  this->LowerFrame->SetFrame1Size(480);
 
   this->TimerLogDisplay = NULL;
   this->ErrorLogDisplay = NULL;
@@ -1101,9 +1102,9 @@ void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
 
   this->AddToolbar(this->InteractorToolbar, VTK_PV_TOOLBARS_INTERACTION_LABEL);
   this->AddToolbar(this->Toolbar, VTK_PV_TOOLBARS_TOOLS_LABEL);
-  this->AddToolbar(this->AnimationToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL);
+  this->AddToolbar(this->AnimationToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL, 0);
   this->AddToolbar(this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL);
-  this->HideToolbar(this->AnimationToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL);
+//  this->HideToolbar(this->AnimationToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL);
 
   this->InteractorToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->InteractorToolbar->Create(app);
@@ -1396,15 +1397,20 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   this->LowerFrame->SetFrame1MinimumSize(1);
   this->LowerFrame->SetFrame2MinimumSize(1);
-  this->LowerFrame->SetFrame1Size(480);
   this->LowerFrame->Frame2VisibilityOff();
+
   this->LowerFrame->SetSeparatorSize(5);
   this->LowerFrame->SetOrientationToVertical();
   this->LowerFrame->SetParent(this->ViewFrame);
   this->LowerFrame->Create(app);
   this->Script("pack %s -side top -fill both -expand t",
                this->LowerFrame->GetWidgetName());
-  
+  int hvisibility = 0;
+//if (app->HasRegisteryValue(2, "RunTime", "HorizontalPaneVisibility"))
+//  {
+//  hvisibility = app->GetIntRegisteryValue(2, "RunTime", "HorizontalPaneVisibility");
+//  }
+  this->SetHorizontalPaneVisibility(hvisibility);
   
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   pvApp->SetBalloonHelpDelay(1);
@@ -4128,6 +4134,7 @@ void vtkPVWindow::ShowCurrentSourceProperties()
     return;
     }
 
+  this->GetCurrentPVSource()->ResetCallback();
   this->GetCurrentPVSource()->Pack();
 }
 
@@ -4202,6 +4209,8 @@ void vtkPVWindow::SetHorizontalPaneVisibility(int arg)
         VTK_PV_SHOW_HORZPANE_LABEL);
       }
     }
+//  this->GetApplication()->SetRegisteryValue(2, "RunTime",
+//    "HorizontalPaneVisibility", "%d", arg);
 }
 
 //----------------------------------------------------------------------------
@@ -5352,6 +5361,36 @@ void vtkPVWindow::SetInteractorEventInformation(int x, int y, int ctrl,
 void vtkPVWindow::InvokeInteractorEvent(const char *event)
 {
   this->Interactor->InvokeEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::SaveWindowGeometry()
+{
+  this->Superclass::SaveWindowGeometry();
+//  this->AnimationManager->SaveWindowGeometry();
+  if (this->IsCreated())
+    {
+    this->GetApplication()->SetRegisteryValue(
+      2, "Geometry", "WindowHorzizontalFrame1Size",
+      "%d", this->LowerFrame->GetFrame1Size());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::RestoreWindowGeometry()
+{
+  this->Superclass::RestoreWindowGeometry();
+//  this->AnimationManager->RestoreWindowGeometry();
+  if (this->GetApplication()->HasRegisteryValue(
+      2, "Geometry", "WindowHorzizontalFrame1Size"))
+    {
+    int reg_size = this->GetApplication()->GetIntRegisteryValue(
+      2, "Geometry", "WindowHorzizontalFrame1Size");
+    if (reg_size >= this->LowerFrame->GetFrame1MinimumSize())
+      {
+      this->LowerFrame->SetFrame1Size(reg_size);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -37,7 +37,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.63");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.64");
 
 //===========================================================================
 //***************************************************************************
@@ -334,24 +334,28 @@ void vtkPV3DWidget::PlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPV3DWidget::ExecuteEvent(vtkObject*, unsigned long event, void*)
+void vtkPV3DWidget::ExecuteEvent(vtkObject* obj, unsigned long event, void*calldata)
 {
   //Interactive rendering enabling/disabling code should eventually
   //move to the SM3DWidget
-  
-  if ( event == vtkCommand::StartInteractionEvent && this->PVSource )
+ 
+  if (vtkSM3DWidgetProxy::SafeDownCast(obj))
     {
-    this->PVSource->GetPVWindow()->InteractiveRenderEnabledOn();
+    if ( event == vtkCommand::StartInteractionEvent && this->PVSource )
+      {
+      this->PVSource->GetPVWindow()->InteractiveRenderEnabledOn();
+      }
+    else if ( event == vtkCommand::EndInteractionEvent && this->PVSource )
+      {
+      this->PVSource->GetPVWindow()->InteractiveRenderEnabledOff();
+      }
+    else
+      {
+      this->ModifiedCallback();
+      }
+    this->Render();
     }
-  else if ( event == vtkCommand::EndInteractionEvent && this->PVSource )
-    {
-    this->PVSource->GetPVWindow()->InteractiveRenderEnabledOff();
-    }
-  else
-    {
-    this->ModifiedCallback();
-    }
-  this->Render();
+  this->Superclass::ExecuteEvent(obj, event, calldata);
 }
 
 //----------------------------------------------------------------------------

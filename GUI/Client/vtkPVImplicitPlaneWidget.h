@@ -192,6 +192,8 @@ protected:
 
   void CommonReset();
 
+  void SetupPropertyObservers();
+
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
@@ -203,7 +205,6 @@ protected:
                                        vtkArrayMap<vtkPVWidget*, 
                                        vtkPVWidget*>* map);
 //ETX
-
 private:
   vtkPVImplicitPlaneWidget(const vtkPVImplicitPlaneWidget&); // Not implemented
   void operator=(const vtkPVImplicitPlaneWidget&); // Not implemented

@@ -40,15 +40,18 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
-#include "vtkSMSourceProxy.h" 
+#include "vtkSMSourceProxy.h"
+#include "vtkCommand.h"
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.51");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
+
+//*****************************************************************************
 //----------------------------------------------------------------------------
 vtkPVSphereWidget::vtkPVSphereWidget()
 {
@@ -555,24 +558,52 @@ void vtkPVSphereWidget::Create( vtkKWApplication *app)
         }
       }
     }
+  this->SetupPropertyObservers();
 }
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::SetupPropertyObservers()
+{
+  vtkSMProperty*p = this->ImplicitFunctionProxy->GetProperty("Center");
+  if (p)
+    {
+    this->AddPropertyObservers(p);
+    }
+  p = this->ImplicitFunctionProxy->GetProperty("Radius");
+  if (p)
+    {
+    this->AddPropertyObservers(p);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
-  if(l == vtkKWEvent::WidgetModifiedEvent)
+  if (vtkSM3DWidgetProxy::SafeDownCast(wdg))
     {
-    double center[3];
-    double radius;
-    this->WidgetProxy->UpdateInformation();
-    this->GetCenterInternal(center);
-    radius = this->GetRadiusInternal();
-    this->CenterEntry[0]->SetValue(center[0]);
-    this->CenterEntry[1]->SetValue(center[1]);
-    this->CenterEntry[2]->SetValue(center[2]);
-    this->RadiusEntry->SetValue(radius);
-    this->Render();
-    this->ModifiedCallback();
-    this->ValueChanged = 0;
+    if(l == vtkKWEvent::WidgetModifiedEvent)
+      {
+      double center[3];
+      double radius;
+      this->WidgetProxy->UpdateInformation();
+      this->GetCenterInternal(center);
+      radius = this->GetRadiusInternal();
+      this->CenterEntry[0]->SetValue(center[0]);
+      this->CenterEntry[1]->SetValue(center[1]);
+      this->CenterEntry[2]->SetValue(center[2]);
+      this->RadiusEntry->SetValue(radius);
+      this->Render();
+      this->ModifiedCallback();
+      this->ValueChanged = 0;
+      }
+    }
+  if (vtkSMProperty::SafeDownCast(wdg))
+    {
+    switch(l)
+      {
+    case vtkCommand::ModifiedEvent:
+      this->ResetInternal();
+      break;
+      }
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
 }

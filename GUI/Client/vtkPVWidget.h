@@ -35,6 +35,7 @@ class vtkPVXMLElement;
 class vtkPVXMLPackageParser;
 class vtkPVWindow;
 class vtkSMProperty;
+class vtkPVWidgetObserver;
 
 //BTX
 template <class key, class data> 
@@ -308,7 +309,15 @@ protected:
   virtual void SaveInBatchScriptForPart(ofstream *file, 
                                         vtkClientServerID);
 
+  //BTX
+  friend class vtkPVWidgetObserver;
+  vtkPVWidgetObserver* Observer;
+  virtual void ExecuteEvent(vtkObject* obj, unsigned long event,
+    void* calldata);
+  //ETX
 
+  void AddPropertyObservers(vtkSMProperty* property);
+  void RemovePropertyObservers(vtkSMProperty* property);
 private:
   vtkSMProperty* SMProperty;
 

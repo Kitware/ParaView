@@ -171,6 +171,8 @@ protected:
     vtkArrayMap<vtkPVWidget*, 
     vtkPVWidget*>* map);
   //ETX
+  
+  void SetupPropertyObservers();
 private:
   vtkPVSphereWidget(const vtkPVSphereWidget&); // Not implemented
   void operator=(const vtkPVSphereWidget&); // Not implemented

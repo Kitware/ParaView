@@ -17,7 +17,6 @@
 #include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
-#include "vtkKWEvent.h"
 #include "vtkCollection.h"
 #include "vtkArrayMap.txx"
 #include "vtkLinkedList.txx"
@@ -26,6 +25,7 @@
 #include "vtkPVXMLPackageParser.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkCommand.h"
 
 #include <ctype.h>
 
@@ -42,10 +42,32 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 
 #endif
 
-vtkCxxSetObjectMacro(vtkPVWidget, SMProperty, vtkSMProperty);
+//*****************************************************************************
+class vtkPVWidgetObserver : public vtkCommand
+{
+public:
+  static vtkPVWidgetObserver* New()
+    { return new vtkPVWidgetObserver; }
+  
+  void SetPVWidget(vtkPVWidget* wid)
+    {
+    this->PVWidget = wid;
+    }
+  virtual void Execute(vtkObject* obj, unsigned long event, void* calldata)
+    {
+    if (this->PVWidget)
+      {
+      this->PVWidget->ExecuteEvent(obj, event, calldata);
+      }
+    }
+protected:
+  vtkPVWidgetObserver() { this->PVWidget = 0; }
+  vtkPVWidget* PVWidget;
+};
 
+//*****************************************************************************
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.58");
+vtkCxxRevisionMacro(vtkPVWidget, "1.59");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -73,11 +95,16 @@ vtkPVWidget::vtkPVWidget()
   this->SupportsAnimation = 1;
 
   this->HideGUI = 0;
+  this->Observer = vtkPVWidgetObserver::New();
+  this->Observer->SetPVWidget(this);
 }
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::~vtkPVWidget()
 {
+  this->Observer->SetPVWidget(0);
+  this->Observer->Delete();
+
   this->SetModifiedCommandObjectTclName(NULL);
   this->SetModifiedCommandMethod(NULL);
   this->SetAcceptedCommandObjectTclName(NULL);
@@ -89,6 +116,40 @@ vtkPVWidget::~vtkPVWidget()
   this->SetSMPropertyName(0);
 }
 
+
+//-----------------------------------------------------------------------------
+void vtkPVWidget::SetSMProperty(vtkSMProperty* prop)
+{
+  if (this->SMProperty != prop)
+    {
+    vtkSMProperty *temp = this->SMProperty;
+    this->SMProperty = prop;
+    if (this->SMProperty != NULL) 
+      { 
+      this->SMProperty->Register(this); 
+      this->AddPropertyObservers(this->SMProperty);
+      }
+
+    if (temp != NULL)
+      {
+      this->RemovePropertyObservers(temp);
+      temp->UnRegister(this);
+      }
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWidget::AddPropertyObservers(vtkSMProperty* property)
+{
+  property->AddObserver(vtkCommand::ModifiedEvent, this->Observer);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWidget::RemovePropertyObservers(vtkSMProperty* property)
+{
+  property->RemoveObserver(this->Observer);
+}
 
 //-----------------------------------------------------------------------------
 void vtkPVWidget::SetModifiedCommand(const char* cmdObject, 
@@ -220,6 +281,20 @@ void vtkPVWidget::AnimationMenuCallback(vtkPVAnimationInterfaceEntry* ai)
 vtkPVApplication *vtkPVWidget::GetPVApplication() 
 {
   return vtkPVApplication::SafeDownCast(this->GetApplication());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWidget::ExecuteEvent(vtkObject* obj, unsigned long event, void*)
+{
+  if (vtkSMProperty::SafeDownCast(obj))
+    {
+    switch (event)
+      {
+    case vtkCommand::ModifiedEvent:
+      this->ModifiedFlag = 1;
+      break;
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

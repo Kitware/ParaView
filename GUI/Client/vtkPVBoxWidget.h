@@ -195,6 +195,7 @@ protected:
   double RotationGUI[3];
   double ScaleGUI[3];
 
+  void SetupPropertyObservers();
 private:
   vtkPVBoxWidget(const vtkPVBoxWidget&); // Not implemented
   void operator=(const vtkPVBoxWidget&); // Not implemented

@@ -575,6 +575,10 @@ protected:
   int OpenWithReader(const char *fileName, vtkPVReaderModule* reader);
   vtkPVReaderModule* InitializeRead(vtkPVReaderModule* proto, 
                                     const char *fileName);
+  // Description:
+  // Save/Restore window geometry
+  virtual void SaveWindowGeometry();
+  virtual void RestoreWindowGeometry();
 
   // Main render window
   vtkPVRenderView *MainView;

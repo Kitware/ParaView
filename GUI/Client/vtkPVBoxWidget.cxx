@@ -38,9 +38,10 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.46");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -649,7 +650,7 @@ void vtkPVBoxWidget::Create( vtkKWApplication *app)
         }
       }
     }
-
+  this->SetupPropertyObservers();
   instanceCount++;
 }
 
@@ -882,13 +883,43 @@ double* vtkPVBoxWidget::GetScaleFromGUI()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
+void vtkPVBoxWidget::ExecuteEvent(vtkObject* wdg, unsigned long event, void* p)
 {
-  if(l == vtkKWEvent::WidgetModifiedEvent)
+  if(vtkSM3DWidgetProxy::SafeDownCast(wdg) && event == vtkKWEvent::WidgetModifiedEvent)
     {//case to update the display values from iVars
     this->UpdateFromBox();
     }
-  this->Superclass::ExecuteEvent(wdg, l, p);
+  if (vtkSMProperty::SafeDownCast(wdg))
+    {
+    switch(event)
+      {
+    case vtkCommand::ModifiedEvent:
+      this->ResetInternal();
+      break;
+      }
+    }
+  this->Superclass::ExecuteEvent(wdg, event, p);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::SetupPropertyObservers()
+{
+  const char* properties[] = {"Scale","Position","Rotation", 0 };
+  int i;
+  for (i=0;properties[i]; i++)
+    {
+    vtkSMProperty* pT = this->BoxTransformProxy->GetProperty(properties[i]);
+    vtkSMProperty* pB = this->BoxProxy->GetProperty(properties[i]);
+    
+    if (pT)
+      {
+      this->AddPropertyObservers(pT);
+      }
+    if (pB)
+      {
+      this->AddPropertyObservers(pB);
+      }
+    } 
 }
 
 //----------------------------------------------------------------------------

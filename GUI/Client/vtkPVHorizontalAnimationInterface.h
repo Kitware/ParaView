@@ -73,6 +73,11 @@ public:
 
   vtkGetObjectMacro(ParentTree, vtkPVAnimationCueTree);
 
+  // Description:
+  // Save restore window geometry.
+  virtual void SaveWindowGeometry();
+  virtual void RestoreWindowGeometry();
+
 protected:
   vtkPVHorizontalAnimationInterface();
   ~vtkPVHorizontalAnimationInterface();

@@ -204,6 +204,11 @@ public:
 
   virtual void ValidateAndAddSpecialCues();
 
+  // Description:
+  // Save/Restore window geometry
+  virtual void SaveWindowGeometry();
+  virtual void RestoreWindowGeometry();
+
 protected:
   vtkPVAnimationManager();
   ~vtkPVAnimationManager();

@@ -57,7 +57,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.5");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.6");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1099,6 +1099,19 @@ vtkPVAnimationCueTree* vtkPVAnimationManager::GetAnimationCueTreeForSource(
     }
   return NULL;
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::SaveWindowGeometry()
+{
+  this->HAnimationInterface->SaveWindowGeometry();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::RestoreWindowGeometry()
+{
+  this->HAnimationInterface->RestoreWindowGeometry();
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::PrintSelf(ostream& os, vtkIndent indent)
 {

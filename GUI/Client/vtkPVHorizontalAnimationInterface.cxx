@@ -30,7 +30,7 @@
 #include "vtkPVAnimationManager.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.2");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.3");
 
 //*****************************************************************************
 class vtkPVHorizontalAnimationInterfaceObserver : public vtkCommand
@@ -107,6 +107,7 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char
   
   this->SplitFrame->SetParent(this->ScrollFrame->GetFrame());
   this->SplitFrame->Create(app);
+  this->SplitFrame->SetFrame1Size(120);
   this->Script("bind %s <Configure> {%s ResizeCallback}",
     this->GetWidgetName(), this->GetTclName());
   this->Script("pack %s -side top -fill both -expand t",
@@ -264,7 +265,31 @@ void vtkPVHorizontalAnimationInterface::ResizeCallback()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+void vtkPVHorizontalAnimationInterface::RestoreWindowGeometry()
+{
+  if (this->GetApplication()->HasRegisteryValue(2, "Geometry", 
+      "AnimationFrame1Size"))
+    {
+    int reg_size = this->GetApplication()->GetIntRegisteryValue(
+      2, "Geometry", "AnimationFrame1Size");
+    if (reg_size >= this->SplitFrame->GetFrame1MinimumSize())
+      {
+      this->SplitFrame->SetFrame1Size(reg_size);
+      }
+    }
+}
+
 //-----------------------------------------------------------------------------
+void vtkPVHorizontalAnimationInterface::SaveWindowGeometry()
+{
+  if (this->IsCreated())
+    {
+    this->GetApplication()->SetRegisteryValue(
+      2, "Geometry", "AnimationFrame1Size", "%d",
+      this->SplitFrame->GetFrame1Size());
+    }
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVHorizontalAnimationInterface::SaveState(ofstream* file)
 {

@@ -42,10 +42,11 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
+#include "vtkCommand.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.45");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -83,6 +84,7 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
 //----------------------------------------------------------------------------
 vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
 {
+
   this->SetInputMenu(NULL);
   int i;
   this->Labels[0]->Delete();
@@ -720,54 +722,67 @@ void vtkPVImplicitPlaneWidget::Create(vtkKWApplication *app)
         }
       }
     }
+  this->SetupPropertyObservers();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
 
-  double center[3];
-  double normal[3];
-  this->WidgetProxy->UpdateInformation();
-  this->GetCenterInternal(center);
-  this->GetNormalInternal(normal);
-  
-  if(l == vtkKWEvent::WidgetModifiedEvent)
+  if (vtkSM3DWidgetProxy::SafeDownCast(wdg))
     {
-    this->CenterEntry[0]->SetValue(center[0]);
-    this->CenterEntry[1]->SetValue(center[1]);
-    this->CenterEntry[2]->SetValue(center[2]);
+    double center[3];
+    double normal[3];
+    this->WidgetProxy->UpdateInformation();
+    this->GetCenterInternal(center);
+    this->GetNormalInternal(normal);
 
-    this->NormalEntry[0]->SetValue(normal[0]);
-    this->NormalEntry[1]->SetValue(normal[1]);
-    this->NormalEntry[2]->SetValue(normal[2]);
+    if(l == vtkKWEvent::WidgetModifiedEvent)
+      {
+      this->CenterEntry[0]->SetValue(center[0]);
+      this->CenterEntry[1]->SetValue(center[1]);
+      this->CenterEntry[2]->SetValue(center[2]);
 
-    this->Render();
-    this->ModifiedCallback();
-    this->ValueChanged = 0;
+      this->NormalEntry[0]->SetValue(normal[0]);
+      this->NormalEntry[1]->SetValue(normal[1]);
+      this->NormalEntry[2]->SetValue(normal[2]);
+
+      this->Render();
+      this->ModifiedCallback();
+      this->ValueChanged = 0;
+      }
+    else
+      {
+      vtkSMDoubleVectorProperty *oProp = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->ImplicitFunctionProxy->GetProperty("Origin"));
+
+      vtkSMDoubleVectorProperty *nProp = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->ImplicitFunctionProxy->GetProperty("Normal"));
+
+      if (oProp)
+        {
+        oProp->SetUncheckedElement(0, center[0]);
+        oProp->SetUncheckedElement(1, center[1]);
+        oProp->SetUncheckedElement(2, center[2]);
+        }
+      if (nProp)
+        {
+        nProp->SetUncheckedElement(0, normal[0]);
+        nProp->SetUncheckedElement(1, normal[1]);
+        nProp->SetUncheckedElement(2, normal[2]);
+        }
+      oProp->UpdateDependentDomains();
+      nProp->UpdateDependentDomains();
+      }
     }
-  else
+  if (vtkSMProperty::SafeDownCast(wdg))
     {
-    vtkSMDoubleVectorProperty *oProp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->ImplicitFunctionProxy->GetProperty("Origin"));
-    
-    vtkSMDoubleVectorProperty *nProp = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->ImplicitFunctionProxy->GetProperty("Normal"));
-    
-    if (oProp)
+    switch (l)
       {
-      oProp->SetUncheckedElement(0, center[0]);
-      oProp->SetUncheckedElement(1, center[1]);
-      oProp->SetUncheckedElement(2, center[2]);
+    case vtkCommand::ModifiedEvent:
+      this->ResetInternal();
+      break;
       }
-    if (nProp)
-      {
-      nProp->SetUncheckedElement(0, normal[0]);
-      nProp->SetUncheckedElement(1, normal[1]);
-      nProp->SetUncheckedElement(2, normal[2]);
-      }
-    oProp->UpdateDependentDomains();
-    nProp->UpdateDependentDomains();
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
 }
@@ -1042,6 +1057,27 @@ void vtkPVImplicitPlaneWidget::UpdateEnableState()
   this->PropagateEnableState(this->OffsetLabel);
   this->PropagateEnableState(this->OffsetEntry);
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::SetupPropertyObservers()
+{
+  vtkSMProperty* p = this->ImplicitFunctionProxy->GetProperty("Origin");
+  if (p)
+    {
+    this->AddPropertyObservers(p);
+    }
+  p = this->ImplicitFunctionProxy->GetProperty("Normal");
+  if (p)
+    {
+    this->AddPropertyObservers(p);
+    }
+  p = this->ImplicitFunctionProxy->GetProperty("Offset");
+  if (p)
+    {
+    this->AddPropertyObservers(p);
+    }
+}
+
 
 //-----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::UpdateVTKObjects()
