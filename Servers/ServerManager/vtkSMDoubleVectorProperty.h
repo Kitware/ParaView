@@ -137,11 +137,6 @@ protected:
   // modified properties.
   virtual void AppendCommandToStream(
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
-
-  // Description:
-  // If InformationOnly is set, uses the Command to get values
-  // from the server and assign them to the property.
-  virtual void UpdateInformation(int serverids, vtkClientServerID objectId);
 //ETX
 
   vtkSMDoubleVectorPropertyInternals* Internals;

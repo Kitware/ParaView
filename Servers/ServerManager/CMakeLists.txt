@@ -18,6 +18,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMFieldDataDomain.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMIdTypeVectorProperty.cxx
+  vtkSMInformationHelper.cxx
   vtkSMInputArrayDomain.cxx
   vtkSMInputProperty.cxx
   vtkSMIntRangeDomain.cxx
@@ -34,6 +35,8 @@ SET( ServerManagerCommon_SRCS
   vtkSMProxyIterator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
+  vtkSMSimpleIntInformationHelper.cxx
+  vtkSMSimpleStringInformationHelper.cxx
   vtkSMSourceProxy.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringVectorProperty.cxx
@@ -52,6 +55,7 @@ SET( ServerManager_SRCS
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkSMDomain.cxx
+  vtkSMInformationHelper.cxx
   vtkSMVectorProperty.cxx
   ABSTRACT
   )

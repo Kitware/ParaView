@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntVectorProperty);
-vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.18");
+vtkCxxRevisionMacro(vtkSMIntVectorProperty, "1.19");
 
 struct vtkSMIntVectorPropertyInternals
 {
@@ -96,75 +96,6 @@ void vtkSMIntVectorProperty::AppendCommandToStream(
         }
       *str << vtkClientServerStream::End;
       }
-    }
-}
-
-//---------------------------------------------------------------------------
-void vtkSMIntVectorProperty::UpdateInformation( 
-  int serverIds, vtkClientServerID objectId )
-{
-  if (!this->InformationOnly)
-    {
-    return;
-    }
-
-  vtkClientServerStream str;
-  str << vtkClientServerStream::Invoke 
-      << objectId << this->Command
-      << vtkClientServerStream::End;
-
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
-
-  const vtkClientServerStream& res = 
-    pm->GetLastResult(vtkProcessModule::GetRootId(serverIds));
-
-  int numMsgs = res.GetNumberOfMessages();
-  if (numMsgs < 1)
-    {
-    return;
-    }
-
-  int numArgs = res.GetNumberOfArguments(0);
-  if (numArgs < 1)
-    {
-    return;
-    }
-
-  int argType = res.GetArgumentType(0, 0);
-
-  if (argType == vtkClientServerStream::int32_value ||
-      argType == vtkClientServerStream::int16_value ||
-      argType == vtkClientServerStream::int8_value)
-    {
-    int ires;
-    int retVal = res.GetArgument(0, 0, &ires);
-    if (!retVal)
-      {
-      vtkErrorMacro("Error getting argument.");
-      return;
-      }
-    this->SetNumberOfElements(1);
-    this->SetElement(0, ires);
-    }
-  else if (argType == vtkClientServerStream::int32_array)
-    {
-    vtkTypeUInt32 length;
-    res.GetArgumentLength(0, 0, &length);
-    if (length >= 128)
-      {
-      vtkErrorMacro("Only arguments of length 128 or less are supported");
-      return;
-      }
-    int values[128];
-    int retVal = res.GetArgument(0, 0, values, length);
-    if (!retVal)
-      {
-      vtkErrorMacro("Error getting argument.");
-      return;
-      }
-    this->SetNumberOfElements(length);
-    this->SetElements(values);
     }
 }
 

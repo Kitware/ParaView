@@ -41,6 +41,7 @@ class vtkClientServerStream;
 class vtkPVXMLElement;
 class vtkSMDomain;
 class vtkSMDomainIterator;
+class vtkSMInformationHelper;
 class vtkSMProxy;
 class vtkSMXMLParser;
 //BTX
@@ -159,7 +160,7 @@ protected:
   // this method fills the vector with the values obtained from
   // the server using the Command (using the provided server id
   // -only root node- and object id).
-  virtual void UpdateInformation(int, vtkClientServerID) {};
+  virtual void UpdateInformation(int serverids, vtkClientServerID objectId);
   //ETX
 
   // Description:
@@ -230,6 +231,9 @@ protected:
 
   vtkSetMacro(InformationOnly, int);
   int InformationOnly;
+
+  void SetInformationHelper(vtkSMInformationHelper* helper);
+  vtkSMInformationHelper* InformationHelper;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented

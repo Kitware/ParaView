@@ -19,6 +19,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
+#include "vtkSMInformationHelper.h"
 #include "vtkSMInstantiator.h"
 #include "vtkSMProperty.h"
 #include "vtkSMProxy.h"
@@ -30,9 +31,10 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.18");
+vtkCxxRevisionMacro(vtkSMProperty, "1.19");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
+vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
 
 int vtkSMProperty::CheckDomains = 1;
 int vtkSMProperty::ModifiedAtCreation = 1;
@@ -49,6 +51,7 @@ vtkSMProperty::vtkSMProperty()
   this->DomainIterator->SetProperty(this);
   this->Proxy = 0;
   this->InformationOnly = 0;
+  this->InformationHelper = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -59,6 +62,7 @@ vtkSMProperty::~vtkSMProperty()
   this->SetXMLName(0);
   this->DomainIterator->Delete();
   this->SetProxy(0);
+  this->SetInformationHelper(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -169,6 +173,20 @@ void vtkSMProperty::UpdateDependentDomains()
   for (; iter != this->PInternals->Dependents.end(); iter++)
     {
     iter->GetPointer()->Update(this);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::UpdateInformation(int serverIds, vtkClientServerID objectId)
+{
+  if (!this->InformationOnly)
+    {
+    return;
+    }
+
+  if (this->InformationHelper)
+    {
+    this->InformationHelper->UpdateProperty(serverIds, objectId, this);
     }
 }
 
@@ -287,21 +305,39 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     ostrstream name;
     name << "vtkSM" << domainEl->GetName() << ends;
     object = vtkInstantiator::CreateInstance(name.str());
-    delete[] name.str();
-    vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
-    if (domain)
+    if (object)
       {
-      if (domain->ReadXMLAttributes(this, domainEl))
+      vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
+      vtkSMInformationHelper* ih = vtkSMInformationHelper::SafeDownCast(object);
+      if (domain)
         {
-        const char* dname = domainEl->GetAttribute("name");
-        if (dname)
+        if (domain->ReadXMLAttributes(this, domainEl))
           {
-          domain->SetXMLName(dname);
-          this->AddDomain(dname, domain);
+          const char* dname = domainEl->GetAttribute("name");
+          if (dname)
+            {
+            domain->SetXMLName(dname);
+            this->AddDomain(dname, domain);
+            }
           }
         }
-      domain->Delete();
+      else if (ih)
+        {
+        this->SetInformationHelper(ih);
+        }
+      else
+        {
+        vtkErrorMacro("Object created (type: " << name.str()
+                      << ") is not of a recognized type.");
+        }
+      object->Delete();
       }
+    else
+      {
+      vtkErrorMacro("Could not create object of type: " << name.str()
+                    << ". Did you specify wrong xml element?");
+      }
+    delete[] name.str();
     }
 
   this->SetProxy(0);

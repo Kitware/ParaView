@@ -765,7 +765,9 @@
      <StringVectorProperty 
         name="XMLFileNameInfo"
         command="GetXMLFileName"
-        information_only="1"/>
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="XMLFileName"
@@ -781,7 +783,9 @@
      <StringVectorProperty 
         name="FilePrefixInfo"
         command="GetFilePrefix"
-        information_only="1"/>
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="FilePrefix"
@@ -797,7 +801,9 @@
      <StringVectorProperty 
         name="FilePatternInfo"
         command="GetFilePattern"
-        information_only="1"/>
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="FilePattern"
@@ -813,7 +819,9 @@
      <IntVectorProperty 
         name="FileRangeInfo"
         command="GetFileRange"
-        information_only="1"/>
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="FileRange"
@@ -830,7 +838,9 @@
      <IntVectorProperty 
         name="TimeStepRangeInfo"
         command="GetTimeStepRange"
-        information_only="1"/>
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="TimeStep"
