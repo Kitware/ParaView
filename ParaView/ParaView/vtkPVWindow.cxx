@@ -1613,7 +1613,8 @@ int vtkPVWindow::Open(char *openFileName)
       // Add that source to the list of sources.
       if (rm->ReadFile(openFileName, clone) == VTK_OK && clone)
         {
-        this->GetSourceList("Sources")->AddItem(clone);
+	this->AddPVSource("Sources", clone);
+	this->AddPVSource("RenderingSources", clone);
         if (clone->GetAcceptAfterRead())
           {
           clone->Accept(0);
@@ -2757,22 +2758,21 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
     if(sourceList)
       {
       col = this->GetSourceList(sourceList);
+      if ( col )
+	{
+	col->AddItem(clone);
+	}
+      else
+	{
+	vtkWarningMacro("The specified source list (" 
+			<< (sourceList ? sourceList : "Sources") 
+			<< ") could not be found.");
+	}
       }
     else
       {
-      col = this->GetSourceList("Sources");
+      this->AddPVSource("Sources", clone);
       this->AddPVSource("RenderingSources", clone);
-      }
-    
-    if (col)
-      {
-      col->AddItem(clone);
-      }
-    else
-      {
-      vtkWarningMacro("The specified source list (" 
-                      << (sourceList ? sourceList : "Sources") 
-                      << ") could not be found.")
       }
     clone->Delete();
     }

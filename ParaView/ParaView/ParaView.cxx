@@ -144,7 +144,8 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
       vtkGenericWarningMacro("Could not get application pointer.");
       return;
       }  
-    
+
+    app->SetupTrapsForSignals(myId);   
     app->SetController(controller);
     app->Script("wm withdraw .");
     app->Start(pvArgs->argc,pvArgs->argv);
@@ -184,6 +185,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
       vtkGenericWarningMacro("Could not get application pointer.");
       return;
       }  
+    app->SetupTrapsForSignals(myId);   
     app->SetController(controller);
     controller->AddRMI(vtkPVSlaveScript, (void *)(app), 
 		       VTK_PV_SLAVE_SCRIPT_RMI_TAG);
