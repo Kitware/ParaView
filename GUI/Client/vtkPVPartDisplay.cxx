@@ -48,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.42");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.43");
 
 
 //----------------------------------------------------------------------------
@@ -702,9 +702,6 @@ void vtkPVPartDisplay::VolumeRenderModeOff()
 void vtkPVPartDisplay::InitializeTransferFunctions(vtkPVArrayInformation *arrayInfo,
                                                    vtkPVDataInformation *dataInfo )
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  
   // need to initialize only if there are no points in the function
   if ( this->VolumeOpacity->GetSize() == 0 )
     {
