@@ -45,11 +45,12 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.4");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
+  this->MPIMToNSocketConnectionID.ID = 0;
   this->MachinesFileName = 0;
   this->RenderNodePort = 0;
   this->ReverseConnection = 0;
