@@ -20,15 +20,6 @@ $Application SendStringToClientAndServer {
   Invoke result() Barrier
 }
 
-#delete main file:
-file delete -force "$TempDir/tmpchombo3d.pvd"
-# Delete the temporary file's pieces.
-for {set i 0} { $i < 16 } { incr i } {
-  catch { file delete -force "$TempDir/tmpchombo3d/tmpchombo3d_$i.vti" }
-}
-#delete directory
-file delete -force "$TempDir/tmpchombo3d"
-
 $kw(vtkTemp4) SetCenterOfRotation 4.000000 4.000000 4.000000
 $kw(vtkTemp4) SetCenterOfRotation 4.000000 4.000000 4.000000
 set kw(vtkTemp1014) [$kw(vtkTemp4) CreatePVSource CellDataToPointData]
@@ -60,5 +51,14 @@ $kw(vtkTemp18) SetCameraState 10.542 21.511 -16.692  4.000 4.000 4.000  0.972 -0
 
 source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc
+
+#delete main file:
+catch { file delete -force "$TempDir/tmpchombo3d.pvd" }
+# Delete the temporary file's pieces.
+for {set i 0} { $i < 16 } { incr i } {
+  catch { file delete -force "$TempDir/tmpchombo3d/tmpchombo3d_$i.vti" }
+}
+#delete directory
+catch { file delete -force "$TempDir/tmpchombo3d" }
 
 $Application Exit
