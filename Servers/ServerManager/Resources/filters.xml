@@ -1232,6 +1232,14 @@
         default_values="0.0" >
        <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
+
+     <IntVectorProperty
+        name="CopyInput"
+        command="SetCopyInput"
+        number_of_elements="1"
+        default_values="1">
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
    <!-- End ReflectionFilter -->
    </SourceProxy>
 
