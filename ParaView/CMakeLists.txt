@@ -110,7 +110,7 @@ LINK_LIBRARIES (vtkKWWidgetsTCL
 
 
 IF (VTK_USE_PATENTED)
- LINK_LIBRARIES(vtkPatentedTcl vtkPatented)
+ LINK_LIBRARIES(vtkPatentedTCL vtkPatented)
 ENDIF (VTK_USE_PATENTED)
 
 LINK_LIBRARIES (Expat)
