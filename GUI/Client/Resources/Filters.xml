@@ -1659,6 +1659,7 @@ The Warp (vector) filter translates the points of the input data set using a spe
                input_name="Input"/>
     <BoundsDisplay show_hide_frame="1"
                    label="Input Bounds"
+                   property="InputBounds"
                    trace_name="Input Bounds"
                    input_menu="im1"/>
     <SelectWidget type="object"
@@ -1710,6 +1711,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
                input_name="Input"/>
     <BoundsDisplay show_hide_frame="1"
                    label="Input Bounds"
+                   property="InputBounds"
                    trace_name="Input Bounds"
                    input_menu="im1"/>
     <SelectWidget type="object"

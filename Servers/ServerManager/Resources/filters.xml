@@ -1697,6 +1697,15 @@
      </ProxyProperty>
 
      <DoubleVectorProperty
+        name="InputBounds">
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
         name="ContourValues"
         command="SetValue"
         repeat_command="1"
@@ -1732,6 +1741,15 @@
                <Group name="implicit_functions"/>
            </ProxyGroupDomain>
      </ProxyProperty>
+
+     <DoubleVectorProperty
+        name="InputBounds">
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+     </DoubleVectorProperty>
 
      <IntVectorProperty 
         name="InsideOut" 
