@@ -80,6 +80,19 @@ public:
   // entry values. Bound to <KeyPress-Return>.
   void SetPoint1();
   void SetPoint2();
+  void SetPoint1(float x, float y, float z);
+  void SetPoint2(float x, float y, float z);
+
+  // Description:
+  // Set the resolution of the line widget.
+  void SetResolution();
+  void SetResolution(float f);
+
+  // Description:
+  // Set the tcl variables that are modified when accept is called.
+  void SetPoint1Method(const char* wname, const char* varname);
+  void SetPoint2Method(const char* wname, const char* varname);
+  void SetResolutionMethod(const char* wname, const char* varname);
     
 //BTX
   // Description:
@@ -117,6 +130,22 @@ protected:
   vtkKWEntry* Point2[3];
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
+  vtkKWLabel* ResolutionLabel;
+  vtkKWEntry* ResolutionEntry;
+
+  vtkSetStringMacro(Point1Variable);
+  vtkSetStringMacro(Point2Variable);
+  vtkSetStringMacro(ResolutionVariable);
+  vtkSetStringMacro(Point1Object);
+  vtkSetStringMacro(Point2Object);
+  vtkSetStringMacro(ResolutionObject);
+
+  char *Point1Variable;
+  char *Point2Variable;
+  char *ResolutionVariable;
+  char *Point1Object;
+  char *Point2Object;
+  char *ResolutionObject;
 
 private:  
   vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented

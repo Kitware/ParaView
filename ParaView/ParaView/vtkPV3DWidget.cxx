@@ -244,7 +244,11 @@ void vtkPV3DWidget::SetFrameLabel(const char* label)
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::PlaceWidget()
 {
-  vtkDataSet* data = this->PVSource->GetPVInput()->GetVTKData();
+  vtkDataSet* data = 0;
+  if ( this->PVSource->GetPVInput() )
+    {
+    data = this->PVSource->GetPVInput()->GetVTKData();
+    }
   if (this->Placed || data != this->Widget3D->GetInput())
     {
     this->Widget3D->SetInput(data);
