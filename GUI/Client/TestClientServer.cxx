@@ -26,6 +26,7 @@
 #include <kwsys/Process.h>
 #include <kwsys/stl/string>
 #include <kwsys/stl/vector>
+#include <vtkstd/string>
 
 void ReportCommand(const char* const* command, const char* name);
 int ReportStatus(kwsysProcess* process, const char* name);
@@ -45,11 +46,26 @@ int main(int argc, char* argv[])
 {
   int argStart = 1;
   int testRenderServer = 0;
+  vtkstd::string mpiRun;
+  const char* mpiOption = "--use-mpi=";
+  const int length = strlen(mpiOption);
+  double timeOut = 1400;
+  
   if(argc > 1)
     {
-    if(strcmp(argv[1], "--test-render-server") == 0)
+    int index = 1;
+    if(strncmp(argv[index], mpiOption, length) == 0)
+       {
+       mpiRun = argv[index];
+       mpiRun = mpiRun.substr(length, mpiRun.size() - length);
+       argStart = 2;
+       fprintf(stderr, "Run test with mpi run \'%s\'\n", mpiRun.c_str());
+       index++;
+       argStart = index;
+       }
+    if(strcmp(argv[index], "--test-render-server") == 0)
       {
-      argStart = 2;
+      argStart = index+1;
       testRenderServer = 1;
       fprintf(stderr, "Test Render Server\n");
       }
@@ -91,6 +107,12 @@ int main(int argc, char* argv[])
     {
     // Construct the server process command line.
     kwsys_stl::vector<const char*> renderServerCommand;
+    if(mpiRun.size())
+      {
+      renderServerCommand.push_back(mpiRun.c_str());
+      renderServerCommand.push_back("-np");
+      renderServerCommand.push_back("2");
+      }
     renderServerCommand.push_back(paraview.c_str());
     renderServerCommand.push_back("--render-server");
     renderServerCommand.push_back(0);
@@ -100,7 +122,13 @@ int main(int argc, char* argv[])
   
   // Construct the server process command line.
   kwsys_stl::vector<const char*> serverCommand;
-  serverCommand.push_back(paraview.c_str());
+  if(mpiRun.size())
+    {
+    serverCommand.push_back(mpiRun.c_str());
+    serverCommand.push_back("-np");
+    serverCommand.push_back("3");
+    }
+  serverCommand.push_back(paraview.c_str()); 
   serverCommand.push_back("--server");
   serverCommand.push_back(0);
   ReportCommand(&serverCommand[0], "server");
@@ -127,12 +155,12 @@ int main(int argc, char* argv[])
   kwsysProcess_SetCommand(client, &clientCommand[0]);
 
   // Kill the processes if they are taking too long.
-  kwsysProcess_SetTimeout(server, 1400);
-  kwsysProcess_SetTimeout(client, 1400);
+  kwsysProcess_SetTimeout(server, timeOut);
+  kwsysProcess_SetTimeout(client, timeOut);
   if(renderServer)
     {
     fprintf(stderr, "start render server\n");
-    kwsysProcess_SetTimeout(renderServer, 1400);
+    kwsysProcess_SetTimeout(renderServer, timeOut);
     kwsysProcess_Execute(renderServer);
     PauseForServerStart();
     }
