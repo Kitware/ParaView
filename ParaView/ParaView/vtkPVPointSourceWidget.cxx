@@ -26,7 +26,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.14");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -78,7 +78,7 @@ vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
 //-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
 {
-  float pt[3];
+  double pt[3];
   float rad;
   float num;
   

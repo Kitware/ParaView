@@ -15,21 +15,22 @@
 #include "vtkPVLODActor.h"
 
 #include "vtkMapper.h"
+#include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkProperty.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
 #include "vtkTransform.h"
-#include "vtkRenderer.h"
 
 #include <math.h>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODActor);
-vtkCxxRevisionMacro(vtkPVLODActor, "1.19");
+vtkCxxRevisionMacro(vtkPVLODActor, "1.20");
 
 vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 
@@ -187,10 +188,10 @@ void vtkPVLODActor::ReleaseGraphicsResources(vtkWindow *renWin)
 
 
 // Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
-float *vtkPVLODActor::GetBounds()
+double *vtkPVLODActor::GetBounds()
 {
   int i,n;
-  float *bounds, bbox[24], *fptr;
+  double *bounds, bbox[24], *fptr;
   vtkMapper *mapper = this->GetMapper();
 
   vtkDebugMacro( << "Getting Bounds" );
@@ -211,9 +212,8 @@ float *vtkPVLODActor::GetBounds()
   // Check for the special case when the actor is empty.
   if (bounds[0] > bounds[1])
     { 
-    memcpy( this->MapperBounds, bounds, 6*sizeof(float) );
-    this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
-    this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+    memcpy( this->MapperBounds, bounds, 6*sizeof(double) );
+    vtkMath::UninitializeBounds(this->Bounds);
     this->BoundsMTime.Modified();
     return this->Bounds;
     }
@@ -223,12 +223,12 @@ float *vtkPVLODActor::GetBounds()
   // of caching. If the values returned this time are different, or
   // the modified time of this class is newer than the cached time,
   // then we need to rebuild.
-  if ( ( memcmp( this->MapperBounds, bounds, 6*sizeof(float) ) != 0 ) ||
+  if ( ( memcmp( this->MapperBounds, bounds, 6*sizeof(double) ) != 0 ) ||
        ( this->GetMTime() > this->BoundsMTime ) )
     {
     vtkDebugMacro( << "Recomputing bounds..." );
 
-    memcpy( this->MapperBounds, bounds, 6*sizeof(float) );
+    memcpy( this->MapperBounds, bounds, 6*sizeof(double) );
 
     // fill out vertices of a bounding box
     bbox[ 0] = bounds[1]; bbox[ 1] = bounds[3]; bbox[ 2] = bounds[5];
@@ -255,8 +255,8 @@ float *vtkPVLODActor::GetBounds()
     this->Transform->Pop();  
   
     // now calc the new bounds
-    this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
-    this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+    this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
+    this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
     for (i = 0; i < 8; i++)
       {
       for (n = 0; n < 3; n++)

@@ -25,7 +25,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.7");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.8");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -111,7 +111,7 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
       endpoint[cc]   /= endpoint[3];
       }
 
-    float move[3];
+    double move[3];
     pvs->GetPVOutput()->GetActorTranslate(move);
     
     for ( cc = 0; cc < 3; cc ++ )

@@ -105,9 +105,9 @@ public:
   // Description:
   // Sets the color range of all the mappers (all procs) and updates
   // the user interface as well.
-  void SetScalarRange(float min, float max);
-  void SetScalarRangeInternal(float min, float max);
-  float *GetScalarRange() {return this->ScalarRange;}
+  void SetScalarRange(double min, double max);
+  void SetScalarRangeInternal(double min, double max);
+  double *GetScalarRange() {return this->ScalarRange;}
       
   // Description:
   // Looks at all of the data object for a global range.
@@ -252,7 +252,7 @@ protected:
   int InstanceCount;
 
   int NumberOfColors;
-  float ScalarRange[2];
+  double ScalarRange[2];
   int VectorMode;
   int VectorComponent;
 

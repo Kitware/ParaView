@@ -33,7 +33,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPVAxesActor, "1.5");
+vtkCxxRevisionMacro(vtkPVAxesActor, "1.6");
 vtkStandardNewMacro(vtkPVAxesActor);
 
 vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedTip, vtkPolyData );
@@ -269,9 +269,9 @@ void vtkPVAxesActor::ReleaseGraphicsResources(vtkWindow *win)
   this->ZAxisLabel->ReleaseGraphicsResources( win );
 }
 
-void vtkPVAxesActor::GetBounds(float bounds[6])
+void vtkPVAxesActor::GetBounds(double bounds[6])
 {
-  float *bds = this->GetBounds();
+  double *bds = this->GetBounds();
   bounds[0] = bds[0];
   bounds[1] = bds[1];
   bounds[2] = bds[2];
@@ -281,9 +281,9 @@ void vtkPVAxesActor::GetBounds(float bounds[6])
 }
 
 // Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
-float *vtkPVAxesActor::GetBounds()
+double *vtkPVAxesActor::GetBounds()
 {
-  float bounds[6];
+  double bounds[6];
   int i;
   
   this->XAxisShaft->GetBounds(this->Bounds);
@@ -526,18 +526,17 @@ void vtkPVAxesActor::UpdateProps()
   
   
   float scale[3];
-  float bounds[6];
+  double bounds[6];
 
-  double dbounds[6];
   (vtkPolyDataMapper::SafeDownCast(this->XAxisShaft->GetMapper()))->
-    GetInput()->GetBounds( dbounds );
+    GetInput()->GetBounds( bounds );
   
   int i;
   for ( i = 0; i < 3; i++ )
     {
     scale[i] = 
       this->NormalizedShaftLength[i]*this->TotalLength[i] / 
-      (dbounds[3] - dbounds[2]);
+      (bounds[3] - bounds[2]);
     }
   
   vtkTransform *xTransform = vtkTransform::New();
@@ -551,15 +550,15 @@ void vtkPVAxesActor::UpdateProps()
   yTransform->Scale( scale[1], scale[1], scale[1] );
   zTransform->Scale( scale[2], scale[2], scale[2] );
 
-  xTransform->Translate( -(dbounds[0]+dbounds[1])/2,
-                         -dbounds[2],
-                         -(dbounds[4]+dbounds[5])/2 );
-  yTransform->Translate( -(dbounds[0]+dbounds[1])/2,
-                         -dbounds[2],
-                         -(dbounds[4]+dbounds[5])/2 );
-  zTransform->Translate( -(dbounds[0]+dbounds[1])/2,
-                         -dbounds[2],
-                         -(dbounds[4]+dbounds[5])/2 );
+  xTransform->Translate( -(bounds[0]+bounds[1])/2,
+                         -bounds[2],
+                         -(bounds[4]+bounds[5])/2 );
+  yTransform->Translate( -(bounds[0]+bounds[1])/2,
+                         -bounds[2],
+                         -(bounds[4]+bounds[5])/2 );
+  zTransform->Translate( -(bounds[0]+bounds[1])/2,
+                         -bounds[2],
+                         -(bounds[4]+bounds[5])/2 );
   
   
 
@@ -572,7 +571,7 @@ void vtkPVAxesActor::UpdateProps()
   zTransform->Delete();
   
   (vtkPolyDataMapper::SafeDownCast(this->XAxisTip->GetMapper()))->
-    GetInput()->GetBounds( dbounds );
+    GetInput()->GetBounds( bounds );
   
   xTransform = vtkTransform::New();
   yTransform = vtkTransform::New();
@@ -601,15 +600,15 @@ void vtkPVAxesActor::UpdateProps()
                      this->NormalizedTipLength[2], 
                      this->NormalizedTipLength[2] );
   
-  xTransform->Translate( -(dbounds[0]+dbounds[1])/2,
-                         -dbounds[2],
-                         -(dbounds[4]+dbounds[5])/2 );
-  yTransform->Translate( -(dbounds[0]+dbounds[1])/2,
-                         -dbounds[2],
-                         -(dbounds[4]+dbounds[5])/2 );
-  zTransform->Translate( -(dbounds[0]+dbounds[1])/2,
-                         -dbounds[2],
-                         -(dbounds[4]+dbounds[5])/2 );
+  xTransform->Translate( -(bounds[0]+bounds[1])/2,
+                         -bounds[2],
+                         -(bounds[4]+bounds[5])/2 );
+  yTransform->Translate( -(bounds[0]+bounds[1])/2,
+                         -bounds[2],
+                         -(bounds[4]+bounds[5])/2 );
+  zTransform->Translate( -(bounds[0]+bounds[1])/2,
+                         -bounds[2],
+                         -(bounds[4]+bounds[5])/2 );
 
   
   this->XAxisTip->SetUserTransform( xTransform );

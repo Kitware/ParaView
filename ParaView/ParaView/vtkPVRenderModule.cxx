@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.16");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.17");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -138,7 +138,7 @@ vtkPVRenderModule::~vtkPVRenderModule()
 void vtkPVRenderModuleResetCameraClippingRange(
   vtkObject *caller, unsigned long vtkNotUsed(event),void *clientData, void *)
 {
-  float bds[6];
+  double bds[6];
   double range1[2];
   double range2[2];
 
@@ -252,7 +252,7 @@ void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderModule::ComputeVisiblePropBounds(float bds[6])
+void vtkPVRenderModule::ComputeVisiblePropBounds(double bds[6])
 {
   double* tmp;
   vtkObject* object;
@@ -260,8 +260,8 @@ void vtkPVRenderModule::ComputeVisiblePropBounds(float bds[6])
   vtkPVPart* part;
 
   // Compute the bounds for our sources.
-  bds[0] = bds[2] = bds[4] = VTK_LARGE_FLOAT;
-  bds[1] = bds[3] = bds[5] = -VTK_LARGE_FLOAT;
+  bds[0] = bds[2] = bds[4] = VTK_DOUBLE_MAX;
+  bds[1] = bds[3] = bds[5] = -VTK_DOUBLE_MAX;
   this->PartDisplays->InitTraversal();
   while ( (object = this->PartDisplays->GetNextItemAsObject()) )
     {

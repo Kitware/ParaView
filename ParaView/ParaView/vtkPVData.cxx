@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.236");
+vtkCxxRevisionMacro(vtkPVData, "1.237");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1345,7 +1345,7 @@ float* vtkPVData::GetActorColor()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetColorRange(float min, float max)
+void vtkPVData::SetColorRange(double min, double max)
 {
   if (this->PVColorMap == NULL)
     {
@@ -1357,7 +1357,7 @@ void vtkPVData::SetColorRange(float min, float max)
 
 //----------------------------------------------------------------------------
 // Hack for now.
-void vtkPVData::SetColorRangeInternal(float min, float max)
+void vtkPVData::SetColorRangeInternal(double min, double max)
 {
   if (this->PVColorMap == NULL)
     {
@@ -2538,7 +2538,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
   if (this->CubeAxesCheck->GetState())
     {
     char cubeAxesBatchName[128];
-    float bounds[6];
+    double bounds[6];
     this->CubeAxes->GetBounds(bounds);
     sprintf(cubeAxesBatchName, "cubeAxes%d", this->InstanceCount);
     *file << "vtkCubeAxesActor2D " << cubeAxesBatchName << "\n\t"
@@ -2700,9 +2700,9 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::GetColorRange(float *range)
+void vtkPVData::GetColorRange(double *range)
 {
-  float *tmp;
+  double *tmp;
   range[0] = 0.0;
   range[1] = 1.0;
   
@@ -2761,7 +2761,7 @@ void vtkPVData::OpacityChangedEndCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::GetActorTranslate(float* point)
+void vtkPVData::GetActorTranslate(double* point)
 {
   vtkPVPart *part;
 
@@ -2780,7 +2780,7 @@ void vtkPVData::GetActorTranslate(float* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorTranslateNoTrace(float x, float y, float z)
+void vtkPVData::SetActorTranslateNoTrace(double x, double y, double z)
 {
   vtkPVPart *part;
   int idx, num;
@@ -2807,7 +2807,7 @@ void vtkPVData::SetActorTranslateNoTrace(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorTranslate(float x, float y, float z)
+void vtkPVData::SetActorTranslate(double x, double y, double z)
 {
   this->SetActorTranslateNoTrace(x, y, z);
   if ( this->GetPVRenderView() )
@@ -2820,7 +2820,7 @@ void vtkPVData::SetActorTranslate(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorTranslate(float* point)
+void vtkPVData::SetActorTranslate(double* point)
 {
   this->SetActorTranslate(point[0], point[1], point[2]);
 }
@@ -2828,7 +2828,7 @@ void vtkPVData::SetActorTranslate(float* point)
 //----------------------------------------------------------------------------
 void vtkPVData::ActorTranslateCallback()
 {
-  float point[3];
+  double point[3];
   point[0] = this->TranslateThumbWheel[0]->GetValue();
   point[1] = this->TranslateThumbWheel[1]->GetValue();
   point[2] = this->TranslateThumbWheel[2]->GetValue();
@@ -2842,7 +2842,7 @@ void vtkPVData::ActorTranslateCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::ActorTranslateEndCallback()
 {
-  float point[3];
+  double point[3];
   point[0] = this->TranslateThumbWheel[0]->GetValue();
   point[1] = this->TranslateThumbWheel[1]->GetValue();
   point[2] = this->TranslateThumbWheel[2]->GetValue();
@@ -2850,7 +2850,7 @@ void vtkPVData::ActorTranslateEndCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::GetActorScale(float* point)
+void vtkPVData::GetActorScale(double* point)
 {
   vtkPVPart *part;
 
@@ -2869,7 +2869,7 @@ void vtkPVData::GetActorScale(float* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorScaleNoTrace(float x, float y, float z)
+void vtkPVData::SetActorScaleNoTrace(double x, double y, double z)
 {
   vtkPVPart *part;
   int idx, num;
@@ -2896,7 +2896,7 @@ void vtkPVData::SetActorScaleNoTrace(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorScale(float x, float y, float z)
+void vtkPVData::SetActorScale(double x, double y, double z)
 {
   this->SetActorScaleNoTrace(x, y, z);
   if ( this->GetPVRenderView() )
@@ -2909,7 +2909,7 @@ void vtkPVData::SetActorScale(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorScale(float* point)
+void vtkPVData::SetActorScale(double* point)
 {
   this->SetActorScale(point[0], point[1], point[2]);
 }
@@ -2917,7 +2917,7 @@ void vtkPVData::SetActorScale(float* point)
 //----------------------------------------------------------------------------
 void vtkPVData::ActorScaleCallback()
 {
-  float point[3];
+  double point[3];
   point[0] = this->ScaleThumbWheel[0]->GetValue();
   point[1] = this->ScaleThumbWheel[1]->GetValue();
   point[2] = this->ScaleThumbWheel[2]->GetValue();
@@ -2931,7 +2931,7 @@ void vtkPVData::ActorScaleCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::ActorScaleEndCallback()
 {
-  float point[3];
+  double point[3];
   point[0] = this->ScaleThumbWheel[0]->GetValue();
   point[1] = this->ScaleThumbWheel[1]->GetValue();
   point[2] = this->ScaleThumbWheel[2]->GetValue();
@@ -2939,7 +2939,7 @@ void vtkPVData::ActorScaleEndCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::GetActorOrientation(float* point)
+void vtkPVData::GetActorOrientation(double* point)
 {
   vtkPVPart *part;
 
@@ -2959,7 +2959,7 @@ void vtkPVData::GetActorOrientation(float* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorOrientationNoTrace(float x, float y, float z)
+void vtkPVData::SetActorOrientationNoTrace(double x, double y, double z)
 {
   vtkPVPart *part;
   int idx, num;
@@ -2986,7 +2986,7 @@ void vtkPVData::SetActorOrientationNoTrace(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorOrientation(float x, float y, float z)
+void vtkPVData::SetActorOrientation(double x, double y, double z)
 {
   this->SetActorOrientationNoTrace(x, y, z);
   if ( this->GetPVRenderView() )
@@ -2999,7 +2999,7 @@ void vtkPVData::SetActorOrientation(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorOrientation(float* point)
+void vtkPVData::SetActorOrientation(double* point)
 {
   this->SetActorOrientation(point[0], point[1], point[2]);
 }
@@ -3007,7 +3007,7 @@ void vtkPVData::SetActorOrientation(float* point)
 //----------------------------------------------------------------------------
 void vtkPVData::ActorOrientationCallback()
 {
-  float point[3];
+  double point[3];
   point[0] = this->OrientationScale[0]->GetValue();
   point[1] = this->OrientationScale[1]->GetValue();
   point[2] = this->OrientationScale[2]->GetValue();
@@ -3021,7 +3021,7 @@ void vtkPVData::ActorOrientationCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::ActorOrientationEndCallback()
 {
-  float point[3];
+  double point[3];
   point[0] = this->OrientationScale[0]->GetValue();
   point[1] = this->OrientationScale[1]->GetValue();
   point[2] = this->OrientationScale[2]->GetValue();
@@ -3029,7 +3029,7 @@ void vtkPVData::ActorOrientationEndCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::GetActorOrigin(float* point)
+void vtkPVData::GetActorOrigin(double* point)
 {
   vtkPVPart *part;
 
@@ -3048,7 +3048,7 @@ void vtkPVData::GetActorOrigin(float* point)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorOriginNoTrace(float x, float y, float z)
+void vtkPVData::SetActorOriginNoTrace(double x, double y, double z)
 {
   vtkPVPart *part;
   int idx, num;
@@ -3075,7 +3075,7 @@ void vtkPVData::SetActorOriginNoTrace(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorOrigin(float x, float y, float z)
+void vtkPVData::SetActorOrigin(double x, double y, double z)
 {
   this->SetActorOriginNoTrace(x, y, z);
   if ( this->GetPVRenderView() )
@@ -3088,7 +3088,7 @@ void vtkPVData::SetActorOrigin(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetActorOrigin(float* point)
+void vtkPVData::SetActorOrigin(double* point)
 {
   this->SetActorOrigin(point[0], point[1], point[2]);
 }
@@ -3096,7 +3096,7 @@ void vtkPVData::SetActorOrigin(float* point)
 //----------------------------------------------------------------------------
 void vtkPVData::ActorOriginCallback()
 {
-  float point[3];
+  double point[3];
   point[0] = this->OriginThumbWheel[0]->GetValue();
   point[1] = this->OriginThumbWheel[1]->GetValue();
   point[2] = this->OriginThumbWheel[2]->GetValue();
@@ -3110,7 +3110,7 @@ void vtkPVData::ActorOriginCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::ActorOriginEndCallback()
 {
-  float point[3];
+  double point[3];
   point[0] = this->OriginThumbWheel[0]->GetValue();
   point[1] = this->OriginThumbWheel[1]->GetValue();
   point[2] = this->OriginThumbWheel[2]->GetValue();
@@ -3123,7 +3123,7 @@ void vtkPVData::UpdateActorControlResolutions()
   double bounds[6];
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
 
-  float res, oneh, half;
+  double res, oneh, half;
 
   // Update the resolution according to the bounds
   // Set res to 1/20 of the range, rounding to nearest .1 or .5 form.
@@ -3131,7 +3131,7 @@ void vtkPVData::UpdateActorControlResolutions()
   int i;
   for (i = 0; i < 3; i++)
     {
-    float delta = bounds[i * 2 + 1] - bounds[i * 2];
+    double delta = bounds[i * 2 + 1] - bounds[i * 2];
     if (delta <= 0)
       {
       res = 0.1;

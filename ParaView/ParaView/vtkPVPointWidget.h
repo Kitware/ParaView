@@ -57,9 +57,9 @@ public:
 //ETX
 
   void SetPosition();
-  void SetPosition(float,float,float);
-  void SetPositionInternal(float,float,float);
-  void GetPosition(float pt[3]);
+  void SetPosition(double,double,double);
+  void SetPositionInternal(double,double,double);
+  void GetPosition(double pt[3]);
 
   // Description:
   // For saving the widget into a VTK tcl script.
@@ -100,8 +100,8 @@ protected:
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
 
-  float LastAcceptedPosition[3];
-  vtkSetVector3Macro(LastAcceptedPosition, float);
+  double LastAcceptedPosition[3];
+  vtkSetVector3Macro(LastAcceptedPosition, double);
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);

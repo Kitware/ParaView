@@ -35,7 +35,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.29");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.30");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -125,8 +125,8 @@ void vtkPVSphereWidget::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::ActualPlaceWidget()
 {
-  float center[3];
-  float radius;
+  double center[3];
+  double radius;
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
@@ -152,14 +152,14 @@ void vtkPVSphereWidget::AcceptInternal(vtkClientServerID sourceID)
     vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
       this->Application); 
     vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    float val[3];
+    double val[3];
     int cc;
     for ( cc = 0; cc < 3; cc ++ )
       {
       val[cc] = atof( this->CenterEntry[cc]->GetValue() );
       }
     this->SetCenterInternal(val);
-    float rad = atof(this->RadiusEntry->GetValue());
+    double rad = atof(this->RadiusEntry->GetValue());
     this->SetRadiusInternal(rad);
     pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
                     << "SetCenter" << val[0] << val[1] << val[2] 
@@ -178,8 +178,8 @@ void vtkPVSphereWidget::AcceptInternal(vtkClientServerID sourceID)
 //---------------------------------------------------------------------------
 void vtkPVSphereWidget::Trace(ofstream *file)
 {
-  float rad;
-  float val[3];
+  double rad;
+  double val[3];
   int cc;
   
   if ( ! this->InitializeTrace(file))
@@ -410,10 +410,10 @@ void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
   vtkSphereWidget *widget = vtkSphereWidget::SafeDownCast(wdg);
   if ( widget )
     {
-    float val[3];
+    double val[3];
     widget->GetCenter(val); 
     this->SetCenter(val[0], val[1], val[2]);
-    float rad = widget->GetRadius();
+    double rad = widget->GetRadius();
     this->SetRadius(rad);
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
@@ -427,7 +427,7 @@ int vtkPVSphereWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
-void vtkPVSphereWidget::SetCenterInternal(float x, float y, float z)
+void vtkPVSphereWidget::SetCenterInternal(double x, double y, double z)
 { 
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
@@ -444,7 +444,7 @@ void vtkPVSphereWidget::SetCenterInternal(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::SetCenter(float x, float y, float z)
+void vtkPVSphereWidget::SetCenter(double x, double y, double z)
 {
   this->SetCenterInternal(x, y, z);
   this->ModifiedCallback();
@@ -453,7 +453,7 @@ void vtkPVSphereWidget::SetCenter(float x, float y, float z)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetCenter()
 {
-  float val[3];
+  double val[3];
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
@@ -471,7 +471,7 @@ void vtkPVSphereWidget::SetCenter()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::SetRadiusInternal(float r)
+void vtkPVSphereWidget::SetRadiusInternal(double r)
 {
   this->RadiusEntry->SetValue(r); 
   if ( this->Widget3DID.ID )
@@ -487,7 +487,7 @@ void vtkPVSphereWidget::SetRadiusInternal(float r)
 
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::SetRadius(float r)
+void vtkPVSphereWidget::SetRadius(double r)
 {
   this->SetRadiusInternal(r);
   this->ModifiedCallback();
@@ -498,7 +498,7 @@ void vtkPVSphereWidget::SetRadius()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  float val;
+  double val;
   val = atof(this->RadiusEntry->GetValue());
   pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
                   << "SetRadius" << val

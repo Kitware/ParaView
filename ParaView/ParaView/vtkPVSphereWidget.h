@@ -68,16 +68,16 @@ public:
 //ETX
 
   void SetCenter();
-  void SetCenter(float,float,float);
-  void SetCenterInternal(float,float,float);
-  void SetCenter(float c[3]) { this->SetCenter(c[0], c[1], c[2]); }
-  void SetCenterInternal(float c[3]) 
+  void SetCenter(double,double,double);
+  void SetCenterInternal(double,double,double);
+  void SetCenter(double c[3]) { this->SetCenter(c[0], c[1], c[2]); }
+  void SetCenterInternal(double c[3]) 
     { 
       this->SetCenterInternal(c[0], c[1], c[2]); 
     }
   void SetRadius();
-  void SetRadius(float);
-  void SetRadiusInternal(float);
+  void SetRadius(double);
+  void SetRadiusInternal(double);
 
   // Description:
   // Called when the PVSources reset button is called.
@@ -123,10 +123,10 @@ protected:
 
   vtkClientServerID SphereID;
 
-  float LastAcceptedCenter[3];
-  float LastAcceptedRadius;
-  vtkSetVector3Macro(LastAcceptedCenter, float);
-  vtkSetMacro(LastAcceptedRadius, float);
+  double LastAcceptedCenter[3];
+  double LastAcceptedRadius;
+  vtkSetVector3Macro(LastAcceptedCenter, double);
+  vtkSetMacro(LastAcceptedRadius, double);
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);

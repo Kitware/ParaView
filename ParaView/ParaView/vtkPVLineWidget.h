@@ -42,12 +42,12 @@ public:
   // entry values. Bound to <KeyPress-Return>.
   void SetPoint1();
   void SetPoint2();
-  void SetPoint1(float x, float y, float z);
-  void SetPoint2(float x, float y, float z);
-  void GetPoint1(float pt[3]);
-  void GetPoint2(float pt[3]);
-  void SetPoint1Internal(float x, float y, float z);
-  void SetPoint2Internal(float x, float y, float z);
+  void SetPoint1(double x, double y, double z);
+  void SetPoint2(double x, double y, double z);
+  void GetPoint1(double pt[3]);
+  void GetPoint2(double pt[3]);
+  void SetPoint1Internal(double x, double y, double z);
+  void SetPoint2Internal(double x, double y, double z);
 
   // Description:
   // Set the resolution of the line widget.
@@ -173,12 +173,12 @@ protected:
 
   int ShowResolution;
 
-  float LastAcceptedPoint1[3];
-  float LastAcceptedPoint2[3];
-  float LastAcceptedResolution;
-  vtkSetVector3Macro(LastAcceptedPoint1, float);
-  vtkSetVector3Macro(LastAcceptedPoint2, float);
-  vtkSetMacro(LastAcceptedResolution, float);
+  double LastAcceptedPoint1[3];
+  double LastAcceptedPoint2[3];
+  double LastAcceptedResolution;
+  vtkSetVector3Macro(LastAcceptedPoint1, double);
+  vtkSetVector3Macro(LastAcceptedPoint2, double);
+  vtkSetMacro(LastAcceptedResolution, double);
   
   // Description:
   // Used internally. Method to save widget parameters into vtk tcl script.

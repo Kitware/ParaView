@@ -52,10 +52,10 @@ public:
                                    vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
-  void SetCenter(float,float,float);
-  virtual void SetCenter(float f[3]) { this->SetCenter(f[0], f[1], f[2]); }
-  void SetNormal(float,float,float);
-  virtual void SetNormal(float f[3]) { this->SetNormal(f[0], f[1], f[2]); }
+  void SetCenter(double,double,double);
+  virtual void SetCenter(double f[3]) { this->SetCenter(f[0], f[1], f[2]); }
+  void SetNormal(double,double,double);
+  virtual void SetNormal(double f[3]) { this->SetNormal(f[0], f[1], f[2]); }
 
   // Description:
   // For saving the widget into a VTK tcl script.

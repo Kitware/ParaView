@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.46");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.47");
 
 
 //=========================================================================
@@ -688,10 +688,10 @@ void vtkPVTreeComposite::SetRenderWindowFloatPixelData(vtkFloatArray *pixels,
 
 //----------------------------------------------------------------------------
 void vtkPVTreeComposite::ComputeVisiblePropBounds(vtkRenderer *ren, 
-                                                  float bounds[6])
+                                                  double bounds[6])
 {
-  float tmp[6];
-  float *pbds;
+  double tmp[6];
+  double *pbds;
   int id, num;
   int numProps;
   vtkProp    *prop;
@@ -709,8 +709,8 @@ void vtkPVTreeComposite::ComputeVisiblePropBounds(vtkRenderer *ren,
     this->Controller->TriggerRMI(id,COMPUTE_VISIBLE_PROP_BOUNDS_RMI_TAG);
     }
 
-  bounds[0] = bounds[2] = bounds[4] = VTK_LARGE_FLOAT;
-  bounds[1] = bounds[3] = bounds[5] = -VTK_LARGE_FLOAT;
+  bounds[0] = bounds[2] = bounds[4] = VTK_DOUBLE_MAX;
+  bounds[1] = bounds[3] = bounds[5] = -VTK_DOUBLE_MAX;
   
   // Are there any pickable visible props?
   props = ren->GetProps();
@@ -733,9 +733,9 @@ void vtkPVTreeComposite::ComputeVisiblePropBounds(vtkRenderer *ren,
       pbds = prop->GetBounds();
       // make sure we haven't got bogus bounds
       if ( pbds != NULL &&
-           pbds[0] > -VTK_LARGE_FLOAT && pbds[1] < VTK_LARGE_FLOAT &&
-           pbds[2] > -VTK_LARGE_FLOAT && pbds[3] < VTK_LARGE_FLOAT &&
-           pbds[4] > -VTK_LARGE_FLOAT && pbds[5] < VTK_LARGE_FLOAT )
+           pbds[0] > -VTK_DOUBLE_MAX && pbds[1] < VTK_DOUBLE_MAX &&
+           pbds[2] > -VTK_DOUBLE_MAX && pbds[3] < VTK_DOUBLE_MAX &&
+           pbds[4] > -VTK_DOUBLE_MAX && pbds[5] < VTK_DOUBLE_MAX )
         {
         if (pbds[0] < bounds[0])
           {
@@ -783,7 +783,7 @@ void vtkPVTreeComposite::ComputeVisiblePropBoundsRMI()
 {
   vtkRendererCollection *rens;
   vtkRenderer* ren;
-  float bounds[6];
+  double bounds[6];
   
   rens = this->RenderWindow->GetRenderers();
   rens->InitTraversal();

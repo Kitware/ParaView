@@ -59,7 +59,7 @@ public:
   // Avoid having the cross hairs contribute to the bounds unless
   // it is the only actor.  This method considers Pickable flag.
   virtual void ComputeVisiblePropBounds(vtkRenderer *ren, 
-                                        float bounds[6]);
+                                        double bounds[6]);
 
 
   // Description:

@@ -49,7 +49,7 @@
 #include "vtkPVProcessModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.70");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.71");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1419,7 +1419,7 @@ void vtkPVColorMap::ScalarBarCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarRange(float min, float max)
+void vtkPVColorMap::SetScalarRange(double min, double max)
 {
   this->SetScalarRangeInternal(min, max);
   this->AddTraceEntry("$kw(%s) SetScalarRange %g %g", this->GetTclName(),
@@ -1428,7 +1428,7 @@ void vtkPVColorMap::SetScalarRange(float min, float max)
 
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
+void vtkPVColorMap::SetScalarRangeInternal(double min, double max)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
@@ -1793,7 +1793,7 @@ void vtkPVColorMap::UpdateScalarBarTitle()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ColorRangeEntryCallback()
 {
-  float min, max;
+  double min, max;
 
   min = this->ColorRangeMinEntry->GetEntry()->GetValueAsFloat();
   max = this->ColorRangeMaxEntry->GetEntry()->GetValueAsFloat();

@@ -84,39 +84,39 @@ public:
   // Description:
   // Translate the actor to the specified location. Also modify the
   // entry widget that controles the translation.
-  void SetActorTranslate(float* p);
-  void SetActorTranslate(float x, float y, float z);
-  void SetActorTranslateNoTrace(float x, float y, float z);
-  void GetActorTranslate(float* p);
+  void SetActorTranslate(double* p);
+  void SetActorTranslate(double x, double y, double z);
+  void SetActorTranslateNoTrace(double x, double y, double z);
+  void GetActorTranslate(double* p);
   void ActorTranslateCallback();
   void ActorTranslateEndCallback();
   
   // Description:
   // Scale the actor. Also modify the entry widget that controles the scaling.
-  void SetActorScale(float* p);
-  void SetActorScale(float x, float y, float z);
-  void SetActorScaleNoTrace(float x, float y, float z);
-  void GetActorScale(float* p);
+  void SetActorScale(double* p);
+  void SetActorScale(double x, double y, double z);
+  void SetActorScaleNoTrace(double x, double y, double z);
+  void GetActorScale(double* p);
   void ActorScaleCallback();
   void ActorScaleEndCallback();
   
   // Description:
   // Orient the actor. 
   // Also modify the entry widget that controles the orientation.
-  void SetActorOrientation(float* p);
-  void SetActorOrientation(float x, float y, float z);
-  void SetActorOrientationNoTrace(float x, float y, float z);
-  void GetActorOrientation(float* p);
+  void SetActorOrientation(double* p);
+  void SetActorOrientation(double x, double y, double z);
+  void SetActorOrientationNoTrace(double x, double y, double z);
+  void GetActorOrientation(double* p);
   void ActorOrientationCallback();
   void ActorOrientationEndCallback();
   
   // Description:
   // Set the actor origin. 
   // Also modify the entry widget that controles the origin.
-  void SetActorOrigin(float* p);
-  void SetActorOrigin(float x, float y, float z);
-  void SetActorOriginNoTrace(float x, float y, float z);
-  void GetActorOrigin(float* p);
+  void SetActorOrigin(double* p);
+  void SetActorOrigin(double x, double y, double z);
+  void SetActorOriginNoTrace(double x, double y, double z);
+  void GetActorOrigin(double* p);
   void ActorOriginCallback();
   void ActorOriginEndCallback();
   
@@ -158,12 +158,12 @@ public:
   // Description:
   // Sets the color range of all the mappers (all procs) and updates
   // the user interface as well.
-  void SetColorRange(float min, float max);
+  void SetColorRange(double min, double max);
 
   // Description:
   // This computes the union of the range of the data (current color by)
   // across all process. Of cousre it returns the range.
-  void GetColorRange(float range[2]);
+  void GetColorRange(double range[2]);
   
   // Description:
   // Casts to vtkPVApplication.
@@ -304,7 +304,7 @@ protected:
   void ColorByPropertyInternal();
   void ColorByPointFieldInternal(const char *name, int numComps);
   void ColorByCellFieldInternal(const char *name, int numComps);
-  void SetColorRangeInternal(float min, float max);
+  void SetColorRangeInternal(double min, double max);
   void SetActorColor(float r, float g, float b);
 
   // A flag that helps UpdateProperties determine 

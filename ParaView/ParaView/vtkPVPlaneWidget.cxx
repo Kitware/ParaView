@@ -33,7 +33,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVPlaneWidget);
-vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.39");
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -103,7 +103,7 @@ void vtkPVPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
   vtkPlaneWidget *widget = vtkPlaneWidget::SafeDownCast(wdg);
   if ( widget )
     {
-    float val[3];
+    double val[3];
     widget->GetCenter(val); 
     this->SetCenterInternal(val[0], val[1], val[2]);
     widget->GetNormal(val);
@@ -121,7 +121,7 @@ int vtkPVPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlaneWidget::SetCenter(float x, float y, float z)
+void vtkPVPlaneWidget::SetCenter(double x, double y, double z)
 {
   this->CenterEntry[0]->SetValue(x);
   this->CenterEntry[1]->SetValue(y);
@@ -137,7 +137,7 @@ void vtkPVPlaneWidget::SetCenter(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPlaneWidget::SetNormal(float x, float y, float z)
+void vtkPVPlaneWidget::SetNormal(double x, double y, double z)
 {
   this->NormalEntry[0]->SetValue(x);
   this->NormalEntry[1]->SetValue(y);

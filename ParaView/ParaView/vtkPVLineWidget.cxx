@@ -32,7 +32,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.44");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.45");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -129,14 +129,14 @@ void vtkPVLineWidget::SetResolutionLabelTextName(const char* varname)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetPoint1Internal(float x, float y, float z)
+void vtkPVLineWidget::SetPoint1Internal(double x, double y, double z)
 {
   this->Point1[0]->SetValue(x);
   this->Point1[1]->SetValue(y);
   this->Point1[2]->SetValue(z);
  
   int i;
-  float pos[3];
+  double pos[3];
   for (i=0; i<3; i++)
     {
     pos[i] = this->Point1[i]->GetValueAsFloat();
@@ -153,14 +153,14 @@ void vtkPVLineWidget::SetPoint1Internal(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetPoint1(float x, float y, float z)
+void vtkPVLineWidget::SetPoint1(double x, double y, double z)
 {
   this->SetPoint1Internal(x, y, z);
   this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::GetPoint1(float pt[3])
+void vtkPVLineWidget::GetPoint1(double pt[3])
 {
   if (this->Application == NULL)
     {
@@ -173,14 +173,14 @@ void vtkPVLineWidget::GetPoint1(float pt[3])
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetPoint2Internal(float x, float y, float z)
+void vtkPVLineWidget::SetPoint2Internal(double x, double y, double z)
 {
   this->Point2[0]->SetValue(x);
   this->Point2[1]->SetValue(y);
   this->Point2[2]->SetValue(z);
  
   int i;
-  float pos[3];
+  double pos[3];
   for (i=0; i<3; i++)
     {
     pos[i] = this->Point2[i]->GetValueAsFloat();
@@ -198,14 +198,14 @@ void vtkPVLineWidget::SetPoint2Internal(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetPoint2(float x, float y, float z)
+void vtkPVLineWidget::SetPoint2(double x, double y, double z)
 {
   this->SetPoint2Internal(x, y, z);
   this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::GetPoint2(float pt[3])
+void vtkPVLineWidget::GetPoint2(double pt[3])
 {
   if (this->Application == NULL)
     {
@@ -224,7 +224,7 @@ void vtkPVLineWidget::SetPoint1()
     {
     return;
     }
-  float pos[3];
+  double pos[3];
   int i;
   for (i=0; i<3; i++)
     {
@@ -242,7 +242,7 @@ void vtkPVLineWidget::SetPoint2()
     {
     return;
     }
-  float pos[3];
+  double pos[3];
   int i;
   for (i=0; i<3; i++)
     {
@@ -379,7 +379,7 @@ void vtkPVLineWidget::UpdateVTKObject(vtkClientServerID sourceID)
 void vtkPVLineWidget::ActualPlaceWidget()
 {
   double bds[6];
-  float x, y, z;
+  double x, y, z;
 
   if ( this->PVSource->GetPVInput(0) )
     {
@@ -582,7 +582,7 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     {
     return;
     }
-  float val[3];
+  double val[3];
   int i;
   widget->GetPoint1(val);
   for (i=0; i<3; i++)

@@ -47,7 +47,7 @@ public:
 
   // Get the bounds for this Prop as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
   // in world coordinates. NULL means that the bounds are not defined.
-  virtual float *GetBounds();
+  virtual double *GetBounds();
 
 //BTX  
   // Description:
@@ -85,7 +85,7 @@ protected:
   ~vtkCompositeProp();
 
   vtkPropCollection *Props;
-  float Bounds[6];
+  double Bounds[6];
 
 private:
   vtkCompositeProp(const vtkCompositeProp&);  // Not implemented.

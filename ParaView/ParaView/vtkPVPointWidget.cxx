@@ -35,7 +35,7 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.24");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.25");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -283,7 +283,7 @@ void vtkPVPointWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     vtkErrorMacro( "This is not a point widget" );
     return;
     }
-  float val[3];
+  double val[3];
   widget->GetPosition(val); 
   this->SetPosition(val[0], val[1], val[2]);
 
@@ -312,7 +312,7 @@ void vtkPVPointWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::SetPositionInternal(float x, float y, float z)
+void vtkPVPointWidget::SetPositionInternal(double x, double y, double z)
 { 
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   this->PositionEntry[0]->SetValue(x);
@@ -328,14 +328,14 @@ void vtkPVPointWidget::SetPositionInternal(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::SetPosition(float x, float y, float z)
+void vtkPVPointWidget::SetPosition(double x, double y, double z)
 {
   this->SetPositionInternal(x, y, z);
   this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::GetPosition(float pt[3])
+void vtkPVPointWidget::GetPosition(double pt[3])
 {
   if (pt == NULL || this->Application == NULL)
     {
@@ -350,7 +350,7 @@ void vtkPVPointWidget::GetPosition(float pt[3])
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::SetPosition()
 {
-  float val[3];
+  double val[3];
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {

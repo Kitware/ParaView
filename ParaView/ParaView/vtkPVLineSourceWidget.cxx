@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.11");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -139,7 +139,7 @@ void vtkPVLineSourceWidget::Deselect()
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
 {
-  float pt[3];
+  double pt[3];
   
   if (this->SourceID.ID == 0 || this->LineWidget == NULL)
     {

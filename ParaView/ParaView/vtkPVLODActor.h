@@ -73,7 +73,7 @@ public:
 
   // Description:
   // Get the bounds of the current mapper.
-  float *GetBounds();
+  double *GetBounds();
 
 protected:
   vtkPVLODActor();

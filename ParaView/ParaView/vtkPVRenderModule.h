@@ -59,7 +59,7 @@ public:
   // Description:
   // Compute the bounding box of all the visibile props
   // Used in ResetCamera() and ResetCameraClippingRange()
-  void ComputeVisiblePropBounds( float bounds[6] ); 
+  void ComputeVisiblePropBounds( double bounds[6] ); 
   
   // Description:
   // This method is executed in all processes.

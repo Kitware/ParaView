@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.24");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -219,8 +219,8 @@ void vtkPVImplicitPlaneWidget::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ActualPlaceWidget()
 {
-  float center[3];
-  float normal[3];
+  double center[3];
+  double normal[3];
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
@@ -257,7 +257,7 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
     }
   if ( this->PlaneID.ID != 0 )
     {
-    float val[3];
+    double val[3];
     int cc;
     for ( cc = 0; cc < 3; cc ++ )
       {
@@ -284,7 +284,7 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
 //---------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
 {
-  float val[3];
+  double val[3];
   int cc;
 
   if ( ! this->InitializeTrace(file))
@@ -692,7 +692,7 @@ int vtkPVImplicitPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::SetCenterInternal(float x, float y, float z)
+void vtkPVImplicitPlaneWidget::SetCenterInternal(double x, double y, double z)
 {
   this->CenterEntry[0]->SetValue(x);
   this->CenterEntry[1]->SetValue(y);
@@ -709,14 +709,14 @@ void vtkPVImplicitPlaneWidget::SetCenterInternal(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::SetCenter(float x, float y, float z)
+void vtkPVImplicitPlaneWidget::SetCenter(double x, double y, double z)
 {
   this->SetCenterInternal(x,y,z);
   this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::SetNormalInternal(float x, float y, float z)
+void vtkPVImplicitPlaneWidget::SetNormalInternal(double x, double y, double z)
 {
   this->NormalEntry[0]->SetValue(x);
   this->NormalEntry[1]->SetValue(y);
@@ -733,7 +733,7 @@ void vtkPVImplicitPlaneWidget::SetNormalInternal(float x, float y, float z)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::SetNormal(float x, float y, float z)
+void vtkPVImplicitPlaneWidget::SetNormal(double x, double y, double z)
 {
   this->SetNormalInternal(x, y, z);
   this->ModifiedCallback();
@@ -742,7 +742,7 @@ void vtkPVImplicitPlaneWidget::SetNormal(float x, float y, float z)
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetCenter()
 {
-  float val[3];
+  double val[3];
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
@@ -757,7 +757,7 @@ void vtkPVImplicitPlaneWidget::SetCenter()
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetNormal()
 {
-  float val[3];
+  double val[3];
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {

@@ -96,7 +96,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.282");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.283");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1302,7 +1302,7 @@ void vtkPVRenderView::Configured()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCamera()
 {
-  float bds[6];
+  double bds[6];
 
 
   this->GetPVApplication()->GetRenderModule()->ComputeVisiblePropBounds(bds);
@@ -1601,11 +1601,11 @@ vtkPVWindow *vtkPVRenderView::GetPVWindow()
 void vtkPVRenderView::SaveInBatchScript(ofstream* file)
 {
   vtkCamera *camera;
-  float position[3];
-  float focalPoint[3];
-  float viewUp[3];
-  float viewAngle;
-  float clippingRange[2];
+  double position[3];
+  double focalPoint[3];
+  double viewUp[3];
+  double viewAngle;
+  double clippingRange[2];
   float *color;
   int *size;
 
@@ -1644,9 +1644,9 @@ void vtkPVRenderView::SaveInBatchScript(ofstream* file)
 void vtkPVRenderView::SaveState(ofstream* file)
 {
   vtkCamera *camera;
-  float position[3];
-  float focalPoint[3];
-  float viewUp[3];
+  double position[3];
+  double focalPoint[3];
+  double viewUp[3];
   float *color;
 
   color = this->Renderer->GetBackground();
