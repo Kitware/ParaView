@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.13");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.14");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -107,7 +107,6 @@ void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkPVScalarRangeLabel::Update()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVArrayInformation *ai;
 
   if (this->ArrayMenu == NULL)
