@@ -63,10 +63,7 @@ $kw(vtkTemp287) SetLineWidth 1
 $kw(vtkTemp287) SetPointSize 1
 $kw(vtkTemp287) SetInterpolationToFlat
 
-
-set kw(vtkTemp80) [$kw(vtkTemp1) GetRotateCameraInteractor]
-$kw(vtkTemp80) SetCameraState 4.145 5.676 5.818  0.124 -0.063 0.701  -0.232 0.733 -0.640
-
+[$kw(vtkTemp1) GetMainView] SetCameraState 4.145 5.676 5.818  0.124 -0.063 0.701  -0.232 0.733 -0.640
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300

@@ -71,10 +71,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProbe.h"
 #include "vtkPVExtractGeometryByScalar.h"
 
-#include "vtkKWInteractor.h"
-#include "vtkKWFlyInteractor.h"
-#include "vtkKWRotateCameraInteractor.h"
-#include "vtkKWTranslateCameraInteractor.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTclInteractor.h"
 #include "vtkKWCompositeCollection.h"
@@ -85,6 +81,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVWizard.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkGenericRenderWindowInteractor.h"
+#include "vtkPVInteractorStyleTranslateCamera.h"
+#include "vtkPVInteractorStyleRotateCamera.h"
+#include "vtkPVInteractorStyleCenterOfRotation.h"
+#include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkPVInteractorStyleFly.h"
+
+#include "vtkAxes.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkActor.h"
 
 #include "vtkPVDemoPaths.h"
 
@@ -119,8 +126,7 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
-{  
-
+{
   this->SetWindowClass("ParaView");
 
   this->CommandFunction = vtkPVWindowCommand;
@@ -129,18 +135,14 @@ vtkPVWindow::vtkPVWindow()
   this->SelectMenu = vtkKWMenu::New();
   this->GlyphMenu = vtkKWMenu::New();
   this->AdvancedMenu = vtkKWMenu::New();
-  this->InteractorToolbar = vtkKWToolbar::New();
+  this->InteractorStyleToolbar = vtkKWToolbar::New();
 
-  this->FlyInteractor = vtkKWFlyInteractor::New();
-  this->FlyInteractor->SetTraceReferenceObject(this);
-  this->FlyInteractor->SetTraceReferenceCommand("GetFlyInteractor");
-  this->RotateCameraInteractor = vtkKWRotateCameraInteractor::New();
-  this->RotateCameraInteractor->SetTraceReferenceObject(this);
-  this->RotateCameraInteractor->SetTraceReferenceCommand("GetRotateCameraInteractor");
-  this->TranslateCameraInteractor = vtkKWTranslateCameraInteractor::New();
-  this->TranslateCameraInteractor->SetTraceReferenceObject(this);
-  this->TranslateCameraInteractor->SetTraceReferenceCommand("GetTranslateCameraInteractor");
-  this->SelectPointInteractor = vtkKWSelectPointInteractor::New();
+  this->FlyButton = vtkKWRadioButton::New();
+  this->RotateCameraButton = vtkKWRadioButton::New();
+  this->TranslateCameraButton = vtkKWRadioButton::New();
+  this->TrackballCameraButton = vtkKWRadioButton::New();
+  
+  this->GenericInteractor = vtkPVGenericRenderWindowInteractor::New();
   
   this->Toolbar = vtkKWToolbar::New();
   this->CalculatorButton = vtkKWPushButton::New();
@@ -153,18 +155,43 @@ vtkPVWindow::vtkPVWindow()
   this->ProbeButton = vtkKWPushButton::New();
   this->ExtractVoidsButton = vtkKWPushButton::New();
 
-  this->FrameRateLabel = vtkKWLabel::New();
-  this->FrameRateScale = vtkKWScale::New();
-
-  this->ReductionLabel = vtkKWLabel::New();
-  this->ReductionCheck = vtkKWCheckButton::New();
-  
   this->Sources = vtkCollection::New();
   this->GlyphSources = vtkCollection::New();
   
   this->ApplicationAreaFrame = vtkKWLabeledFrame::New();
   
-  this->CameraStyle = vtkInteractorStyleTrackballCamera::New();
+  this->TrackballCameraStyle = vtkInteractorStyleTrackballCamera::New();
+  this->TranslateCameraStyle = vtkPVInteractorStyleTranslateCamera::New();
+  this->RotateCameraStyle = vtkPVInteractorStyleRotateCamera::New();
+  this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
+  this->FlyStyle = vtkPVInteractorStyleFly::New();
+  
+  this->PickCenterToolbar = vtkKWToolbar::New();
+  this->PickCenterButton = vtkKWPushButton::New();
+  this->ResetCenterButton = vtkKWPushButton::New();
+  this->CenterEntryOpenButton = vtkKWPushButton::New();
+  this->CenterEntryCloseButton = vtkKWPushButton::New();
+  this->CenterEntryFrame = vtkKWWidget::New();
+  this->CenterXLabel = vtkKWLabel::New();
+  this->CenterXEntry = vtkKWEntry::New();
+  this->CenterYLabel = vtkKWLabel::New();
+  this->CenterYEntry = vtkKWEntry::New();
+  this->CenterZLabel = vtkKWLabel::New();
+  this->CenterZEntry = vtkKWEntry::New();
+
+  this->FlySpeedToolbar = vtkKWToolbar::New();
+  this->FlySpeedLabel = vtkKWLabel::New();
+  this->FlySpeedScale = vtkKWScale::New();
+  
+  this->CenterSource = vtkAxes::New();
+  this->CenterSource->SymmetricOn();
+  this->CenterSource->ComputeNormalsOff();
+  this->CenterMapper = vtkPolyDataMapper::New();
+  this->CenterMapper->SetInput(this->CenterSource->GetOutput());
+  this->CenterActor = vtkActor::New();
+  this->CenterActor->PickableOff();
+  this->CenterActor->SetMapper(this->CenterMapper);
+  this->CenterActor->VisibilityOff();
   
   this->SourceInterfaces = vtkCollection::New();
   this->CurrentPVData = NULL;
@@ -265,36 +292,40 @@ void vtkPVWindow::PrepareForDelete()
     this->SourceInterfaces = NULL;
     }
 
-  if (this->InteractorToolbar)
+  if (this->InteractorStyleToolbar)
     {
-    this->InteractorToolbar->Delete();
-    this->InteractorToolbar = NULL;
+    this->InteractorStyleToolbar->Delete();
+    this->InteractorStyleToolbar = NULL;
     }
 
-  if (this->FlyInteractor)
+  if (this->FlyStyle)
     {
-    this->FlyInteractor->Delete();
-    this->FlyInteractor = NULL;
+    this->FlyStyle->Delete();
+    this->FlyStyle = NULL;
     }
 
-  if (this->RotateCameraInteractor)
+  if (this->RotateCameraStyle)
     {
-    // Circular reference.
-    this->RotateCameraInteractor->PrepareForDelete();
-    this->RotateCameraInteractor->Delete();
-    this->RotateCameraInteractor = NULL;
+    this->RotateCameraStyle->Delete();
+    this->RotateCameraStyle = NULL;
     }
-  if (this->TranslateCameraInteractor)
+  if (this->TranslateCameraStyle)
     {
-    this->TranslateCameraInteractor->Delete();
-    this->TranslateCameraInteractor = NULL;
+    this->TranslateCameraStyle->Delete();
+    this->TranslateCameraStyle = NULL;
     }
-  if (this->SelectPointInteractor)
+  if (this->CenterOfRotationStyle)
     {
-    this->SelectPointInteractor->Delete();
-    this->SelectPointInteractor = NULL;
+    this->CenterOfRotationStyle->Delete();
+    this->CenterOfRotationStyle = NULL;
     }
   
+  if (this->GenericInteractor)
+    {
+    this->GenericInteractor->Delete();
+    this->GenericInteractor = NULL;
+    }
+
   if (this->CalculatorButton)
     {
     this->CalculatorButton->Delete();
@@ -349,47 +380,112 @@ void vtkPVWindow::PrepareForDelete()
     this->ExtractVoidsButton = NULL;
     }
   
-  if (this->FrameRateLabel)
-    {
-    this->FrameRateLabel->Delete();
-    this->FrameRateLabel = NULL;
-    }
-  
-  if (this->FrameRateScale)
-    {
-    this->FrameRateScale->Delete();
-    this->FrameRateScale = NULL;
-    }
-
-
-  if (this->ReductionLabel)
-    {
-    this->ReductionLabel->Delete();
-    this->ReductionLabel = NULL;
-    }
-
-  if (this->ReductionCheck)
-    {
-    this->ReductionCheck->Delete();
-    this->ReductionCheck = NULL;
-    }
-  
   if (this->Toolbar)
     {
     this->Toolbar->Delete();
     this->Toolbar = NULL;
     }
 
+  if (this->PickCenterButton)
+    {
+    this->PickCenterButton->Delete();
+    this->PickCenterButton = NULL;
+    }
+  
+  if (this->ResetCenterButton)
+    {
+    this->ResetCenterButton->Delete();
+    this->ResetCenterButton = NULL;
+    }
+  
+  if (this->CenterEntryOpenButton)
+    {
+    this->CenterEntryOpenButton->Delete();
+    this->CenterEntryOpenButton = NULL;
+    }
+  
+  if (this->CenterEntryCloseButton)
+    {
+    this->CenterEntryCloseButton->Delete();
+    this->CenterEntryCloseButton = NULL;
+    }
+  
+  if (this->CenterXLabel)
+    {
+    this->CenterXLabel->Delete();
+    this->CenterXLabel = NULL;
+    }
+  
+  if (this->CenterXEntry)
+    {
+    this->CenterXEntry->Delete();
+    this->CenterXEntry = NULL;
+    }
+  
+  if (this->CenterYLabel)
+    {
+    this->CenterYLabel->Delete();
+    this->CenterYLabel = NULL;
+    }
+  
+  if (this->CenterYEntry)
+    {
+    this->CenterYEntry->Delete();
+    this->CenterYEntry = NULL;
+    }
+  
+  if (this->CenterZLabel)
+    {
+    this->CenterZLabel->Delete();
+    this->CenterZLabel = NULL;
+    }
+  
+  if (this->CenterZEntry)
+    {
+    this->CenterZEntry->Delete();
+    this->CenterZEntry = NULL;
+    }
+  
+  if (this->CenterEntryFrame)
+    {
+    this->CenterEntryFrame->Delete();
+    this->CenterEntryFrame = NULL;
+    }
+  
+  if (this->PickCenterToolbar)
+    {
+    this->PickCenterToolbar->Delete();
+    this->PickCenterToolbar = NULL;
+    }
+
+  if (this->FlySpeedLabel)
+    {
+    this->FlySpeedLabel->Delete();
+    this->FlySpeedLabel = NULL;
+    }
+  
+  if (this->FlySpeedScale)
+    {
+    this->FlySpeedScale->Delete();
+    this->FlySpeedScale = NULL;
+    }
+  
+  if (this->FlySpeedToolbar)
+    {
+    this->FlySpeedToolbar->Delete();
+    this->FlySpeedToolbar = NULL;
+    }
+  
   if (this->ApplicationAreaFrame)
     {
     this->ApplicationAreaFrame->Delete();
     this->ApplicationAreaFrame = NULL;
     }
   
-  if (this->CameraStyle)
+  if (this->TrackballCameraStyle)
     {
-    this->CameraStyle->Delete();
-    this->CameraStyle = NULL;
+    this->TrackballCameraStyle->Delete();
+    this->TrackballCameraStyle = NULL;
     }
   
   if (this->MainView)
@@ -453,8 +549,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   vtkPVSourceInterface *sInt;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
-  vtkKWInteractor *interactor;
-  vtkKWRadioButton *button;
   vtkKWWidget *pushButton;
   
   if (pvApp == NULL)
@@ -575,9 +669,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   
   this->Script( "wm withdraw %s", this->GetWidgetName());
 
-  this->InteractorToolbar->SetParent(this->GetToolbarFrame());
-  this->InteractorToolbar->Create(app);
-  this->InteractorToolbar->SetHeight(25);
+  this->InteractorStyleToolbar->SetParent(this->GetToolbarFrame());
+  this->InteractorStyleToolbar->Create(app);
+  this->InteractorStyleToolbar->SetHeight(25);
 
   this->Toolbar->SetParent(this->GetToolbarFrame());
   this->Toolbar->Create(app);
@@ -641,42 +735,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
                this->ProbeButton->GetWidgetName(),
                this->ExtractVoidsButton->GetWidgetName());
   
-  // No trace
-  this->FrameRateScale->SetParent(this->GetToolbarFrame());
-  this->FrameRateScale->Create(app, "-resolution 0.1 -orient horizontal");
-  this->FrameRateScale->SetRange(0, 50);
-  this->FrameRateScale->SetValue(3.0);
-  this->FrameRateScale->SetCommand(this, "FrameRateScaleCallback");
-  this->FrameRateScale->SetBalloonHelpString(
-    "This slider adjusts the desired frame rate for interaction.  The level of detail is adjusted to achieve the desired rate.");
-  this->Script("pack %s -side right -fill none -expand no",
-               this->FrameRateScale->GetWidgetName());
-  
-  this->FrameRateLabel->SetParent(this->GetToolbarFrame());
-  this->FrameRateLabel->Create(app, "");
-  this->FrameRateLabel->SetLabel("Frame Rate");
-  this->Script("pack %s -side right -fill none -expand no",
-               this->FrameRateLabel->GetWidgetName());
-
-  // No trace
-  this->ReductionCheck->SetParent(this->GetToolbarFrame());
-  this->ReductionCheck->Create(app, "");
-  this->ReductionCheck->SetState(1);
-  this->ReductionCheck->SetCommand(this, "ReductionCheckCallback");
-  this->ReductionCheck->SetBalloonHelpString("If selected, tree compositing will scale the size of the render window based on how long the previous render took.");
-  this->Script("pack %s -side right -fill none -expand no",
-               this->ReductionCheck->GetWidgetName());
-
-  this->ReductionLabel->SetParent(this->GetToolbarFrame());
-  this->ReductionLabel->Create(app, "");
-  this->ReductionLabel->SetLabel("Reduction");
-  this->ReductionLabel->SetBalloonHelpString("If selected, tree compositing will scale the size of the render window based on how long the previous render took.");
-  this->Script("pack %s -side right -fill none -expand no",
-               this->ReductionLabel->GetWidgetName());
-
-  
   this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
-               this->InteractorToolbar->GetWidgetName(),
+               this->InteractorStyleToolbar->GetWidgetName(),
                this->Toolbar->GetWidgetName());
   
   this->CreateDefaultPropertiesParent();
@@ -711,7 +771,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Set up the button to reset the camera.
   pushButton = vtkKWWidget::New();
-  pushButton->SetParent(this->InteractorToolbar);
+  pushButton->SetParent(this->InteractorStyleToolbar);
   pushButton->Create(app, "button", "-image KWResetViewButton -bd 0");
   pushButton->SetCommand(this, "ResetCameraCallback");
   this->Script( "pack %s -side left -fill none -expand no",
@@ -721,72 +781,167 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   pushButton->Delete();
   pushButton = NULL;
 
-  // set up the interactors
-  // The interactors (selection and events) add no trace entries.
-  interactor = this->FlyInteractor;
-  interactor->SetParent(this->GetToolbarFrame());
-  interactor->SetRenderView(this->GetMainView());
-  interactor->Create(this->Application, "");
-  button = vtkKWRadioButton::New();
-  button->SetParent(this->InteractorToolbar);
-  button->Create(app, "-indicatoron 0 -image KWFlyButton -selectimage KWActiveFlyButton -bd 0");
-  button->SetBalloonHelpString(
+  // set up the interactor styles
+  // The interactor styles (selection and events) add no trace entries.
+  
+  // fly interactor style
+  this->FlyButton->SetParent(this->InteractorStyleToolbar);
+  this->FlyButton->Create(app, "-indicatoron 0 -image KWFlyButton -selectimage KWActiveFlyButton -bd 0");
+  this->FlyButton->SetBalloonHelpString(
     "Fly View Mode\n   Left Button: Fly toward mouse position.\n   Right Button: Fly backward");
-  this->Script("%s configure -command {%s SetInteractor %s}", 
-               button->GetWidgetName(), this->MainView->GetTclName(), 
-               interactor->GetTclName());
+  this->Script("%s configure -command {%s ChangeInteractorStyle 0}",
+               this->FlyButton->GetWidgetName(), this->GetTclName());
+  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
+               this->FlyButton->GetWidgetName());
+
+  // rotate camera interactor style
+  this->RotateCameraButton->SetParent(this->InteractorStyleToolbar);
+  this->RotateCameraButton->Create(app, "-indicatoron 0 -image KWRotateViewButton -selectimage KWActiveRotateViewButton -bd 0");
+  this->RotateCameraButton->SetBalloonHelpString(
+    "Rotate View Mode\n   Left Button: Rotate.\n  Shift + LeftButton: Z roll.\n   Right Button: Behaves like translate view mode.");
+  this->Script("%s configure -command {%s ChangeInteractorStyle 1}",
+               this->RotateCameraButton->GetWidgetName(), this->GetTclName());
+  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
+               this->RotateCameraButton->GetWidgetName());
+
+  // translate camera interactor style
+  this->TranslateCameraButton->SetParent(this->InteractorStyleToolbar);
+  this->TranslateCameraButton->Create(app, "-indicatoron 0 -image KWTranslateViewButton -selectimage KWActiveTranslateViewButton -bd 0");
+  this->TranslateCameraButton->SetBalloonHelpString(
+    "Translate View Mode\n   Left Button: Translate.\n   Right Button: Zoom.");
+  this->Script("%s configure -command {%s ChangeInteractorStyle 2}", 
+               this->TranslateCameraButton->GetWidgetName(), this->GetTclName());
+  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
+               this->TranslateCameraButton->GetWidgetName());
+
+  // trackball camera interactor style
+  this->TrackballCameraButton->SetParent(this->InteractorStyleToolbar);
+  this->TrackballCameraButton->Create(app, "-text Trackball");
+  this->TrackballCameraButton->SetBalloonHelpString(
+    "Trackball Camera Mode\n   Left Button: Rotate.\n   Shift + Left Button: Pan.\n   Right Button: Zoom.  (Zoom direction is reversed from Translate View Mode)");
+  this->Script("%s configure -command {%s ChangeInteractorStyle 3}",
+               this->TrackballCameraButton->GetWidgetName(), this->GetTclName());
+  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2",
+               this->TrackballCameraButton->GetWidgetName());
+  this->TrackballCameraButton->SetState(1);
   
-  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
-               button->GetWidgetName());
-  interactor->SetToolbarButton(button);
-  button->Delete();
-  button = NULL;
-
-  interactor = this->RotateCameraInteractor;
-  interactor->SetParent(this->GetToolbarFrame());
-  interactor->SetRenderView(this->GetMainView());
-  interactor->Create(this->Application, "");
-  button = vtkKWRadioButton::New();
-  button->SetParent(this->InteractorToolbar);
-  button->Create(app, "-indicatoron 0 -image KWRotateViewButton -selectimage KWActiveRotateViewButton -bd 0");
-  button->SetBalloonHelpString(
-    "Rotate View Mode\n   Left Button: Rotate. This depends on where you click on the screen. Near the center of rotation gives XY rotation (view coordinates). Far from the center gives you Z roll.\n   Right Button: Behaves like translate view mode.");
-  this->Script("%s configure -command {%s SetInteractor %s}", 
-               button->GetWidgetName(), this->MainView->GetTclName(), 
-               interactor->GetTclName());
-
-  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
-               button->GetWidgetName());
-  interactor->SetToolbarButton(button);
-  button->Delete();
-  button = NULL;
-
-  interactor = this->TranslateCameraInteractor;
-  interactor->SetParent(this->GetToolbarFrame());
-  interactor->SetRenderView(this->GetMainView());
-  interactor->Create(this->Application, "");
-  button = vtkKWRadioButton::New();
-  button->SetParent(this->InteractorToolbar);
-  button->Create(app, "-indicatoron 0 -image KWTranslateViewButton -selectimage KWActiveTranslateViewButton -bd 0");
-  button->SetBalloonHelpString(
-    "Translate View Mode\n   Left button: Translate. This depends on where you click on the screen. Near the middle of the screen gives you XY translation. Near the top or bottom of the screen gives you zoom along Z.\n   Right Button: Zoom.");
-  this->Script("%s configure -command {%s SetInteractor %s}", 
-               button->GetWidgetName(), this->MainView->GetTclName(), 
-               interactor->GetTclName());
-
-  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2", 
-               button->GetWidgetName());
-  interactor->SetToolbarButton(button);
-  button->Delete();
-  button = NULL;
-
-  this->SelectPointInteractor->SetRenderView(this->GetMainView());
-  
-  this->Script("%s SetInteractor %s", this->GetMainView()->GetTclName(),
-               this->RotateCameraInteractor->GetTclName());
-  this->RotateCameraInteractor->SetCenter(0.0, 0.0, 0.0);
+  this->RotateCameraStyle->SetCenter(0.0, 0.0, 0.0);
   this->MainView->ResetCamera();
 
+  this->PickCenterToolbar->SetParent(this->GetToolbarFrame());
+  this->PickCenterToolbar->Create(app);
+  this->PickCenterToolbar->SetHeight(25);
+  
+  this->PickCenterButton->SetParent(this->PickCenterToolbar);
+  this->PickCenterButton->Create(app, "-image KWPickCenterButton -bd 1");
+  this->PickCenterButton->SetCommand(this, "ChangeInteractorStyle 4");
+  
+  this->ResetCenterButton->SetParent(this->PickCenterToolbar);
+  this->ResetCenterButton->Create(app, "-bd 1");
+  this->ResetCenterButton->SetLabel("Reset");
+  this->ResetCenterButton->SetCommand(this, "ResetCenterCallback");
+  this->ResetCenterButton->SetBalloonHelpString("Reset the center of rotation to the center of the current data set.");
+  
+  this->CenterEntryOpenButton->SetParent(this->PickCenterToolbar);
+  this->CenterEntryOpenButton->Create(app, "-bd 1");
+  this->CenterEntryOpenButton->SetLabel(">");
+  this->CenterEntryOpenButton->SetCommand(this, "CenterEntryOpenCallback");
+  
+  this->Script("pack %s %s %s -side left -expand no -fill none -pady 2",
+               this->PickCenterButton->GetWidgetName(),
+               this->ResetCenterButton->GetWidgetName(),
+               this->CenterEntryOpenButton->GetWidgetName());
+  
+  this->CenterEntryFrame->SetParent(this->PickCenterToolbar);
+  this->CenterEntryFrame->Create(app, "frame", "");
+  
+  this->CenterEntryCloseButton->SetParent(this->CenterEntryFrame);
+  this->CenterEntryCloseButton->Create(app, "-bd 1");
+  this->CenterEntryCloseButton->SetLabel("<");
+  this->CenterEntryCloseButton->SetCommand(this, "CenterEntryCloseCallback");
+  
+  this->CenterXLabel->SetParent(this->CenterEntryFrame);
+  this->CenterXLabel->Create(app, "");
+  this->CenterXLabel->SetLabel("X");
+  
+  this->CenterXEntry->SetParent(this->CenterEntryFrame);
+  this->CenterXEntry->Create(app, "-width 7");
+  this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
+               this->CenterXEntry->GetWidgetName(), this->GetTclName());
+  this->CenterXEntry->SetValue(this->RotateCameraStyle->GetCenter()[0], 3);
+  
+  this->CenterYLabel->SetParent(this->CenterEntryFrame);
+  this->CenterYLabel->Create(app, "");
+  this->CenterYLabel->SetLabel("Y");
+  
+  this->CenterYEntry->SetParent(this->CenterEntryFrame);
+  this->CenterYEntry->Create(app, "-width 7");
+  this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
+               this->CenterYEntry->GetWidgetName(), this->GetTclName());
+  this->CenterYEntry->SetValue(this->RotateCameraStyle->GetCenter()[1], 3);
+
+  this->CenterZLabel->SetParent(this->CenterEntryFrame);
+  this->CenterZLabel->Create(app, "");
+  this->CenterZLabel->SetLabel("Z");
+  
+  this->CenterZEntry->SetParent(this->CenterEntryFrame);
+  this->CenterZEntry->Create(app, "-width 7");
+  this->Script("bind %s <KeyPress-Return> {%s CenterEntryCallback}",
+               this->CenterZEntry->GetWidgetName(), this->GetTclName());
+  this->CenterZEntry->SetValue(this->RotateCameraStyle->GetCenter()[2], 3);
+
+  this->Script("pack %s %s %s %s %s %s %s -side left",
+               this->CenterXLabel->GetWidgetName(),
+               this->CenterXEntry->GetWidgetName(),
+               this->CenterYLabel->GetWidgetName(),
+               this->CenterYEntry->GetWidgetName(),
+               this->CenterZLabel->GetWidgetName(),
+               this->CenterZEntry->GetWidgetName(),
+               this->CenterEntryCloseButton->GetWidgetName());
+
+  this->MainView->GetRenderer()->AddActor(this->CenterActor);
+  
+  this->FlySpeedToolbar->SetParent(this->GetToolbarFrame());
+  this->FlySpeedToolbar->Create(app);
+  this->FlySpeedToolbar->SetHeight(25);
+  
+  this->FlySpeedLabel->SetParent(this->FlySpeedToolbar);
+  this->FlySpeedLabel->Create(app, "");
+  this->FlySpeedLabel->SetLabel("Fly Speed");
+  
+  this->FlySpeedScale->SetParent(this->FlySpeedToolbar);
+  this->FlySpeedScale->Create(app, "");
+  this->FlySpeedScale->SetRange(0.0, 50.0);
+  this->FlySpeedScale->SetValue(20.0);
+  this->FlySpeedScale->SetCommand(this, "FlySpeedScaleCallback");
+  this->Script("pack %s %s -side left", 
+               this->FlySpeedLabel->GetWidgetName(),
+               this->FlySpeedScale->GetWidgetName());
+  
+  this->GenericInteractor->SetPVRenderView(this->MainView);
+  this->GenericInteractor->SetInteractorStyle(this->TrackballCameraStyle);
+  
+  // set up bindings for the interactor  
+  const char *wname = this->MainView->GetVTKWidget()->GetWidgetName();
+  const char *tname = this->GetTclName();
+  this->Script("bind %s <B1-Motion> {}", wname);
+  this->Script("bind %s <B3-Motion> {}", wname);
+  this->Script("bind %s <Shift-B1-Motion> {}", wname);
+  this->Script("bind %s <Shift-B3-Motion> {}", wname);
+  
+  this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%b %%x %%y}",
+               wname, tname);
+  this->Script("bind %s <Shift-Any-ButtonPress> {%s AShiftButtonPress %%b %%x %%y}",
+               wname, tname);
+  this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
+               wname, tname);
+  this->Script("bind %s <Shift-Any-ButtonRelease> {%s AShiftButtonRelease %%b %%x %%y}",
+               wname, tname);
+  this->Script("bind %s <Motion> {%s MouseMotion %%x %%y}",
+               wname, tname);
+  this->Script("bind %s <Configure> {%s Configure %%w %%h}",
+               wname, tname);
+  
   this->AnimationInterface->SetWindow(this);
   this->AnimationInterface->SetView(this->GetMainView());
   this->AnimationInterface->SetParent(this->MainView->GetPropertiesParent());
@@ -835,6 +990,202 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     // Load Modules should really look for wizards.
     this->AdvancedMenu->InsertCommand(2, "CTH Wizard", this, "WizardCallback",0);
     }
+}
+
+void vtkPVWindow::CenterEntryOpenCallback()
+{
+  this->Script("catch {eval pack forget %s}",
+               this->CenterEntryOpenButton->GetWidgetName());
+  this->Script("pack %s -side left -expand no -fill none -pady 2",
+               this->CenterEntryFrame->GetWidgetName());
+}
+
+void vtkPVWindow::CenterEntryCloseCallback()
+{
+  this->Script("catch {eval pack forget %s}",
+               this->CenterEntryFrame->GetWidgetName());
+  this->Script("pack %s -side left -expand no -fill none -pady 2",
+               this->CenterEntryOpenButton->GetWidgetName());
+}
+
+void vtkPVWindow::CenterEntryCallback()
+{
+  float x = this->CenterXEntry->GetValueAsFloat();
+  float y = this->CenterYEntry->GetValueAsFloat();
+  float z = this->CenterZEntry->GetValueAsFloat();
+  this->RotateCameraStyle->SetCenter(x, y, z);
+  this->CenterActor->SetPosition(x, y, z);
+  this->MainView->EventuallyRender();
+}
+
+void vtkPVWindow::ResetCenterCallback()
+{
+  if ( ! this->CurrentPVData)
+    {
+    return;
+    }
+  
+  float center[3];
+  this->CurrentPVData->GetVTKData()->GetCenter(center);
+  this->RotateCameraStyle->SetCenter(center);
+  this->CenterXEntry->SetValue(center[0], 3);
+  this->CenterYEntry->SetValue(center[1], 3);
+  this->CenterZEntry->SetValue(center[2], 3);
+  this->CenterActor->SetPosition(center);
+  this->ResizeCenterActor();
+  this->MainView->EventuallyRender();
+}
+
+void vtkPVWindow::FlySpeedScaleCallback()
+{
+  this->FlyStyle->SetSpeed(this->FlySpeedScale->GetValue());
+}
+
+void vtkPVWindow::ResizeCenterActor()
+{
+  float bounds[6];
+  
+  int vis = this->CenterActor->GetVisibility();
+  this->CenterActor->VisibilityOff();
+  this->MainView->ComputeVisiblePropBounds(bounds);
+  if ((bounds[0] < bounds[1]) && (bounds[2] < bounds[3]) &&
+      (bounds[4] < bounds[5]))
+    {
+    this->CenterActor->SetScale(0.25 * (bounds[1]-bounds[0]),
+                                0.25 * (bounds[3]-bounds[2]),
+                                0.25 * (bounds[5]-bounds[4]));
+    }
+  else
+    {
+    this->CenterActor->SetScale(1, 1, 1);
+    this->CenterActor->VisibilityOn();
+    this->ResetCameraCallback();
+    this->CenterActor->VisibilityOff();
+    }
+    
+  this->CenterActor->SetVisibility(vis);
+}
+
+void vtkPVWindow::ChangeInteractorStyle(int index)
+{
+  this->Script("catch {eval pack forget %s}",
+               this->PickCenterToolbar->GetWidgetName());
+  this->Script("catch {eval pack forget %s}",
+               this->FlySpeedToolbar->GetWidgetName());
+  
+  switch (index)
+    {
+    case 0:
+      this->RotateCameraButton->SetState(0);
+      this->TranslateCameraButton->SetState(0);
+      this->TrackballCameraButton->SetState(0);
+      this->CenterActor->VisibilityOff();
+      this->GenericInteractor->SetInteractorStyle(this->FlyStyle);
+      this->Script("pack %s -side left",
+                   this->FlySpeedToolbar->GetWidgetName());
+      break;
+    case 1:
+      this->FlyButton->SetState(0);
+      this->TranslateCameraButton->SetState(0);
+      this->TrackballCameraButton->SetState(0);
+      this->GenericInteractor->SetInteractorStyle(this->RotateCameraStyle);
+      this->Script("pack %s -side left",
+                   this->PickCenterToolbar->GetWidgetName());
+      this->ResizeCenterActor();
+      this->CenterActor->VisibilityOn();
+      break;
+    case 2:
+      this->FlyButton->SetState(0);
+      this->RotateCameraButton->SetState(0);
+      this->TrackballCameraButton->SetState(0);
+      this->GenericInteractor->SetInteractorStyle(this->TranslateCameraStyle);
+      this->CenterActor->VisibilityOff();
+      break;
+    case 3:
+      this->FlyButton->SetState(0);
+      this->RotateCameraButton->SetState(0);
+      this->TranslateCameraButton->SetState(0);
+      this->GenericInteractor->SetInteractorStyle(this->TrackballCameraStyle);
+      this->CenterActor->VisibilityOff();
+      break;
+    case 4:
+      this->GenericInteractor->SetInteractorStyle(this->CenterOfRotationStyle);
+      this->CenterActor->VisibilityOff();
+      break;
+    }
+  this->MainView->EventuallyRender();
+}
+
+void vtkPVWindow::AButtonPress(int button, int x, int y)
+{
+  // not binding middle button
+  if (button == 1)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y);
+    this->GenericInteractor->LeftButtonPressEvent();
+    }
+  else if (button == 3)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y);
+    this->GenericInteractor->RightButtonPressEvent();
+    }
+}
+
+void vtkPVWindow::AShiftButtonPress(int button, int x, int y)
+{
+  // not binding middle button
+  if (button == 1)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
+    this->GenericInteractor->LeftButtonPressEvent();
+    }
+  else if (button == 3)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
+    this->GenericInteractor->RightButtonPressEvent();
+    }
+}
+
+void vtkPVWindow::AButtonRelease(int button, int x, int y)
+{
+  // not binding middle button
+  if (button == 1)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y);
+    this->GenericInteractor->LeftButtonReleaseEvent();
+    }
+  else if (button == 3)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y);
+    this->GenericInteractor->RightButtonReleaseEvent();
+    }
+}
+
+void vtkPVWindow::AShiftButtonRelease(int button, int x, int y)
+{
+  // not binding middle button
+  if (button == 1)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
+    this->GenericInteractor->LeftButtonReleaseEvent();
+    }
+  else if (button == 3)
+    {
+    this->GenericInteractor->SetEventInformationFlipY(x, y, 0, 1);
+    this->GenericInteractor->RightButtonReleaseEvent();
+    }
+}
+
+void vtkPVWindow::MouseMotion(int x, int y)
+{
+  this->GenericInteractor->SetEventInformationFlipY(x, y);
+  this->GenericInteractor->MouseMoveEvent();
+}
+
+void vtkPVWindow::Configure(int width, int height)
+{
+  this->GenericInteractor->UpdateSize(width, height);
+  this->GenericInteractor->ConfigureEvent();
 }
 
 //----------------------------------------------------------------------------
@@ -1834,26 +2185,6 @@ void vtkPVWindow::ResetCameraCallback()
   this->MainView->ResetCamera();
   this->MainView->EventuallyRender();
 }
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::FrameRateScaleCallback()
-{
-  float newRate = this->FrameRateScale->GetValue();
-  if (newRate <= 0.0)
-    {
-    newRate = 0.00001;
-    }
-  this->GetMainView()->SetInteractiveUpdateRate(newRate);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::ReductionCheckCallback()
-{
-  int reduce = this->ReductionCheck->GetState();
-  this->GetMainView()->SetUseReductionFactor(reduce);
-}
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::UpdateSelectMenu()
@@ -3855,8 +4186,3 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 //  "</Filter>\n"
 //  "\n"
 //  "</Interfaces>\n";
-
-
-
-
-

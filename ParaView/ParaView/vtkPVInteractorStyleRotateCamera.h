@@ -1,11 +1,11 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkKWTranslateCameraInteractor.h
+  Module:    vtkPVInteractorStyleRotateCamera.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
-
+  
 Copyright (c) 2000-2001 Kitware Inc. 469 Clifton Corporate Parkway,
 Clifton Park, NY, 12065, USA.
 All rights reserved.
@@ -39,63 +39,58 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWTranslateCameraInteractor
+// .NAME vtkPVInteractorStyleRotateCamera - interactive manipulation of the camera
 // .SECTION Description
-// This is not much of a widget, but it works with a panel
-// to enable the user to xy translate the camera as well as zoom.
-// It zooms when the top third or bottom third
-// of the screen is first selected.  The middle third pans xy.
+// vtkPVInteractorStyleRotateCamera allows the user to interactively
+// manipulate the camera, the viewpoint of the scene.
+// The left button is for rotation; shift + left button is for rolling;
+// the right button is for panning; and shift + right button is for zooming.
 
-#ifndef __vtkKWTranslateCameraInteractor_h
-#define __vtkKWTranslateCameraInteractor_h
+#ifndef __vtkPVInteractorStyleRotateCamera_h
+#define __vtkPVInteractorStyleRotateCamera_h
 
-#include "vtkKWInteractor.h"
-#include "vtkCameraInteractor.h"
+#include "vtkInteractorStyle.h"
 
-class vtkPVRenderView;
-
-class VTK_EXPORT vtkKWTranslateCameraInteractor : public vtkKWInteractor
+class VTK_EXPORT vtkPVInteractorStyleRotateCamera : public vtkInteractorStyle
 {
 public:
-  static vtkKWTranslateCameraInteractor* New();
-  vtkTypeMacro(vtkKWTranslateCameraInteractor,vtkKWInteractor);
+  static vtkPVInteractorStyleRotateCamera *New();
+  vtkTypeRevisionMacro(vtkPVInteractorStyleRotateCamera, vtkInteractorStyle);
+  void PrintSelf(ostream& os, vtkIndent indent);
+  
+  // Description:
+  // Event bindings controlling the effects of pressing mouse buttons
+  // or moving the mouse.
+  virtual void OnMouseMove();
+  virtual void OnLeftButtonDown();
+  virtual void OnLeftButtonUp();
+  virtual void OnRightButtonDown();
+  virtual void OnRightButtonUp();
+  
+  // Description:
+  // These methods are for the interactions for this interactor style.
+  virtual void Rotate();
+  virtual void Roll();
+  virtual void Pan();
+  virtual void Zoom();
 
   // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, char *args);
+  // Set the center of rotation
+  vtkSetVector3Macro(Center, float);
+  vtkGetVector3Macro(Center, float);
+  
+protected:
+  vtkPVInteractorStyleRotateCamera();
+  ~vtkPVInteractorStyleRotateCamera();
+  vtkPVInteractorStyleRotateCamera(const vtkPVInteractorStyleRotateCamera&) {};
+  void operator=(const vtkPVInteractorStyleRotateCamera&) {};
 
-  // Description:
-  // When the active interactor is changed, these methods allow
-  // it to change its state.  This may similar to a composite.
-  void Select();
-  void Deselect();
-
-  void AButtonPress(int num, int x, int y);
-  void AButtonRelease(int num, int x, int y);
-  void Button1Motion(int x, int y);
-  void Button3Motion(int x, int y);
-
-  // Changes the cursor based on mouse position.
-  void MotionCallback(int x, int y);
-
-protected: 
-  vtkKWTranslateCameraInteractor();
-  ~vtkKWTranslateCameraInteractor();
-  vtkKWTranslateCameraInteractor(const vtkKWTranslateCameraInteractor&) {};
-  void operator=(const vtkKWTranslateCameraInteractor&) {};
-
-  vtkKWWidget *Label;
-
-  // The vtk object which manipulates the camera.
-  vtkCameraInteractor *Helper;
-
-  void InitializeCursors();
-  char *PanCursorName;
-  char *ZoomCursorName;
-  vtkSetStringMacro(PanCursorName);
-  vtkSetStringMacro(ZoomCursorName);
-  int CursorState;
+  void ResetLights();
+  void TransformCamera(vtkTransform *transform, vtkCamera *camera);
+  
+  float ZoomScale;
+  float Center[3];
+  float DisplayCenter[2];
 };
-
 
 #endif

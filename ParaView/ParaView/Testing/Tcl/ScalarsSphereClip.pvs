@@ -21,8 +21,7 @@ $kw(vtkTemp313) SetValue {ImageValues}
 set kw(vtkTemp314) [$kw(vtkTemp288) GetPVWidget {Offset}]
 $kw(vtkTemp314) SetValue 200
 $kw(vtkTemp288) AcceptCallback
-set kw(vtkTemp75) [$kw(vtkTemp1) GetRotateCameraInteractor]
-$kw(vtkTemp75) SetCameraState -33.506 28.392 54.140  0.000 0.000 0.000  0.071 0.901 -0.428
+[$kw(vtkTemp1) GetMainView] SetCameraState -33.506 28.392 54.140  0.000 0.000 0.000  0.071 0.901 -0.428
 set kw(vtkTemp337) [$kw(vtkTemp1) ClipCallback]
 set kw(vtkTemp351) [$kw(vtkTemp337) GetPVWidget {Clip Function}]
 $kw(vtkTemp351) SetCurrentValue {Sphere}
@@ -32,8 +31,8 @@ $kw(vtkTemp359) SetValue 10 0 0
 $kw(vtkTemp337) AcceptCallback
 set kw(vtkTemp389) [$kw(vtkTemp1) CreatePVSource vtkDataSetSurfaceFilter]
 $kw(vtkTemp389) AcceptCallback
-$kw(vtkTemp75) SetCameraState 53.415 25.363 36.925  0.000 0.000 0.000  -0.077 0.871 -0.486
-$kw(vtkTemp75) SetCameraState 32.613 15.486 22.545  -20.802 -9.878 -14.380  -0.077 0.871 -0.486
+[$kw(vtkTemp1) GetMainView] SetCameraState 53.415 25.363 36.925  0.000 0.000 0.000  -0.077 0.871 -0.486
+[$kw(vtkTemp1) GetMainView] SetCameraState 32.613 15.486 22.545  -20.802 -9.878 -14.380  -0.077 0.871 -0.486
 
 
 

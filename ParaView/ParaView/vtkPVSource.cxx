@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWCompositeCollection.h"
-#include "vtkKWRotateCameraInteractor.h"
+#include "vtkPVInteractorStyleRotateCamera.h"
 #include "vtkSource.h"
 #include "vtkPVData.h"
 #include "vtkPVApplication.h"
@@ -651,19 +651,6 @@ void vtkPVSource::Accept(int hideFlag)
         input->SetVisibilityInternal(0);
         }
       }
-    // The best test I could come up with to only reset
-    // the camera when the first source is created.
-    if (window->GetSources()->GetNumberOfItems() == 1)
-      {
-      float bds[6];
-      ac->GetBounds(bds);
-      window->GetRotateCameraInteractor()->SetCenter(
-                    0.5*(bds[0]+bds[1]), 
-                    0.5*(bds[2]+bds[3]),
-                    0.5*(bds[4]+bds[5]));
-      window->GetMainView()->ResetCamera();
-      }
-
     // Set the current data of the window.
     if ( ! hideFlag)
       {
@@ -672,6 +659,20 @@ void vtkPVSource::Accept(int hideFlag)
     else
       {
       this->GetPVOutput()->SetVisibilityInternal(0);
+      }
+
+    // The best test I could come up with to only reset
+    // the camera when the first source is created.
+    if (window->GetSources()->GetNumberOfItems() == 1)
+      {
+      float bds[6];
+      ac->GetBounds(bds);
+      window->GetRotateCameraStyle()->SetCenter(
+                    0.5*(bds[0]+bds[1]), 
+                    0.5*(bds[2]+bds[3]),
+                    0.5*(bds[4]+bds[5]));
+      window->ResetCenterCallback();
+      window->GetMainView()->ResetCamera();
       }
 
     // Remove the local grab
@@ -687,7 +688,7 @@ void vtkPVSource::Accept(int hideFlag)
 
   // Update the selection menu.
   window->UpdateSelectMenu();
-  
+
   // Regenerate the data property page in case something has changed.
   if (this->NumberOfPVOutputs > 0)
     {

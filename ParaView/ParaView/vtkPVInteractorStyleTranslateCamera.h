@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVWorldPointPicker.h
+  Module:    vtkPVInteractorStyleTranslateCamera.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,46 +39,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVWorldPointPicker - Picker to use with parallel compositing.
+// .NAME vtkPVInteractorStyleTranslateCamera - interactive manipulation of the camera
 // .SECTION Description
-// vtkPVWorldPointPicker uses the compositied z buffer to select the world point.
+// vtkPVInteractorStyleTranslateCamera allows the user to interactively
+// manipulate camera, the viewpoint of the scene.
+// The left button is for panning, and the right button is for zooming.
 
-// .SECTION See Also
-// vtkWorldPointPicker vtkTreeComposite
+#ifndef __vtkPVInteractorStyleTranslateCamera_h
+#define __vtkPVInteractorStyleTranslateCamera_h
 
-#ifndef __vtkPVWorldPointPicker_h
-#define __vtkPVWorldPointPicker_h
+#include "vtkInteractorStyle.h"
 
-#include "vtkWorldPointPicker.h"
-#include "vtkPVTreeComposite.h"
-
-
-class VTK_EXPORT vtkPVWorldPointPicker : public vtkWorldPointPicker
+class VTK_EXPORT vtkPVInteractorStyleTranslateCamera : public vtkInteractorStyle
 {
 public:
-  static vtkPVWorldPointPicker *New();
-  vtkTypeMacro(vtkPVWorldPointPicker,vtkWorldPointPicker);
+  static vtkPVInteractorStyleTranslateCamera *New();
+  vtkTypeRevisionMacro(vtkPVInteractorStyleTranslateCamera, vtkInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent);
-
+  
   // Description:
-  // To use compositied z buffer value, we must have access to the compositer.
-  vtkSetObjectMacro(Composite, vtkPVTreeComposite);
-  vtkGetObjectMacro(Composite, vtkPVTreeComposite);
-
+  // Event bindings controlling the effects of pressing mouse buttons
+  // or moving the mouse.
+  virtual void OnMouseMove();
+  virtual void OnLeftButtonDown();
+  virtual void OnLeftButtonUp();
+  virtual void OnRightButtonDown();
+  virtual void OnRightButtonUp();
+  
   // Description:
-  // A pick method that uses composited zbuffer.
-  int Pick(float selectionX, float selectionY, 
-	   float selectionZ, vtkRenderer *renderer);
+  // These methods are for the interactions for this interactor style.
+  virtual void Pan();
+  virtual void Zoom();
   
 protected:
-  vtkPVWorldPointPicker();
-  ~vtkPVWorldPointPicker();
-  vtkPVWorldPointPicker(const vtkPVWorldPointPicker&) {};
-  void operator=(const vtkPVWorldPointPicker&) {};
+  vtkPVInteractorStyleTranslateCamera();
+  ~vtkPVInteractorStyleTranslateCamera();
+  vtkPVInteractorStyleTranslateCamera(const vtkPVInteractorStyleTranslateCamera&) {};
+  void operator=(const vtkPVInteractorStyleTranslateCamera&) {};
 
-  vtkPVTreeComposite *Composite;
+  void ResetLights();
+
+  float ZoomScale;
 };
 
 #endif
-
-

@@ -1,7 +1,7 @@
 /*=========================================================================
-  
+
   Program:   ParaView
-  Module:    vtkInteractor.h
+  Module:    vtkPVInteractorStyleFly.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,70 +39,53 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkInteractor - Super class for camera and part interactors.
+// .NAME vtkPVInteractorStyleFly - interactive manipulation of the camera
 // .SECTION Description
-// vtkInteractor provides methods neede by all interactors.  It provides
-// to cordinate system of the camera in the form of three ortho-normal
-// axes, computes the near and far range of actors, and provides a transform.
-// It also managers the renderer.
+// vtkPVInteractorStyleFly allows the user to interactively manipulate the
+// camera (the viewpoint) to fly around the scene.
 
-// .SECTION see also
-// vtkPartsInteractor vtkCameraInteractor
+#ifndef __vtkPVInteractorStyleFly
+#define __vtkPVInteractorStyleFly
 
-#ifndef __vtkInteractor_h
-#define __vtkInteractor_h
+#include "vtkInteractorStyle.h"
 
-#include "vtkObject.h"
-class vtkRenderer;
-class vtkTransform;
-class vtkMatrix4x4;
-class vtkCamera;
-
-
-class VTK_EXPORT vtkInteractor : public vtkObject
+class VTK_EXPORT vtkPVInteractorStyleFly : public vtkInteractorStyle
 {
- public:
-  static vtkInteractor *New() {return new vtkInteractor;};
-  vtkTypeMacro(vtkInteractor,vtkObject);
+public:
+  static vtkPVInteractorStyleFly *New();
+  vtkTypeRevisionMacro(vtkPVInteractorStyleFly, vtkInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent);
-
+  
   // Description:
-  // The interactor needs a renderer before any methods are called.
-  // The size of ther render is used to interpret xy points in display
-  // coordinates, and to get the active camera.
-  virtual void SetRenderer(vtkRenderer *ren);
-  vtkGetObjectMacro(Renderer, vtkRenderer);
-
+  // Event bindings controlling the effects of pressing mouse buttons.
+  virtual void OnLeftButtonDown();
+  virtual void OnLeftButtonUp();
+  virtual void OnRightButtonDown();
+  virtual void OnRightButtonUp();
+  
   // Description:
-  // Given a unit vector placed at the world point "inPt", this
-  // method returns the maximum length in view coordinates.
-  // world point has 3 components (no w).
-  float GetScaleAtPoint(float *inPt);
-  float GetScaleAtPoint(float x, float y, float z)
-    { float p[3]; p[0]=x; p[1]=y; p[2]=z; return this->GetScaleAtPoint(p);}
-
-  // putting some of this here until I find a better place.
-  // input == output OK
-  void InterpolateCamera(vtkCamera *cam1, vtkCamera *cam2, 
-                         float k, vtkCamera *camOut);
-
+  // These methods are for the interactions for this interactor style.
+  virtual void Fly(float speed);
+  
+  // Description:
+  // Set the fly speed
+  vtkSetMacro(Speed, float);
+  
 protected:
-  vtkInteractor();
-  ~vtkInteractor();
-  vtkInteractor(const vtkInteractor&) {};
-  void operator=(const vtkInteractor&) {};
-
-  vtkRenderer *Renderer;
-  vtkTransform *Transform;
-
-  // xyz axes of the renderers active camera coordinate system.
+  vtkPVInteractorStyleFly();
+  ~vtkPVInteractorStyleFly();
+  vtkPVInteractorStyleFly(const vtkPVInteractorStyleFly&) {};
+  void operator=(const vtkPVInteractorStyleFly&) {};
+  
+  void ComputeCameraAxes();
+  void ResetLights();
+  
+  // Used to signal the fly loop to stop.
+  int FlyFlag;
+  float Speed;
   double CameraXAxis[3];
   double CameraYAxis[3];
   double CameraZAxis[3];
-
-  void ComputeCameraAxes();
 };
 
 #endif
-
-

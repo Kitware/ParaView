@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkKWSelectPointInteractor.h
+  Module:    vtkPVGenericRenderWindowInteractor.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,66 +39,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWSelectPointInteractor
+// .NAME vtkPVGenericRenderWindowInteractor
 // .SECTION Description
-// This is the interactor used by vtkPVProbeFilter to select points.
 
-#ifndef __vtkKWSelectPointInteractor_h
-#define __vtkKWSelectPointInteractor_h
+#ifndef __vtkPVGenericRenderWindowInteractor_h
+#define __vtkPVGenericRenderWindowInteractor_h
 
-#include "vtkKWInteractor.h"
-#include "vtkCursor3D.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkActor.h"
+#include "vtkGenericRenderWindowInteractor.h"
+#include "vtkPVRenderView.h"
 
-class vtkPVProbe;
-
-class VTK_EXPORT vtkKWSelectPointInteractor : public vtkKWInteractor
+class VTK_EXPORT vtkPVGenericRenderWindowInteractor : public vtkGenericRenderWindowInteractor
 {
 public:
-  static vtkKWSelectPointInteractor* New();
-  vtkTypeMacro(vtkKWSelectPointInteractor,vtkKWInteractor);
-
-  // Description:
-  // Set/Get the selected point.
-  vtkGetVector3Macro(SelectedPoint, float);
-  void SetSelectedPoint(float point[3]);
-  void SetSelectedPoint(float X, float Y, float Z);
-  void SetSelectedPointX(float X);
-  void SetSelectedPointY(float Y);
-  void SetSelectedPointZ(float Z);  
+  static vtkPVGenericRenderWindowInteractor *New();
+  vtkTypeMacro(vtkPVGenericRenderWindowInteractor, vtkGenericRenderWindowInteractor);
   
-  void SetBounds(float bounds[6]);
+  void SetPVRenderView(vtkPVRenderView *view);
+  vtkGetObjectMacro(PVRenderView, vtkPVRenderView);
 
-  // mouse callbacks
-  void MotionCallback(int x, int y);
-  void Button1Motion(int x, int y);
-  
-  void SetPVProbe(vtkPVProbe *probe);
-  void SetCursorVisibility(int value);
+  void Render();
   
 protected:
-  vtkKWSelectPointInteractor();
-  ~vtkKWSelectPointInteractor();
-  vtkKWSelectPointInteractor(const vtkKWSelectPointInteractor&) {};
-  void operator=(const vtkKWSelectPointInteractor&) {};
-
-  void GetSphereCoordinates(int i, float coords[3]);
-  void ColorSphere(int i, float rgb[3]);
+  vtkPVGenericRenderWindowInteractor();
+  ~vtkPVGenericRenderWindowInteractor();
   
-  float SelectedPoint[3];
-  vtkCursor3D *Cursor;
-  vtkPolyDataMapper *CursorMapper;
-  vtkActor *CursorActor;
-  vtkActor *XSphere1Actor; // id = 0
-  vtkActor *XSphere2Actor; // id = 1
-  vtkActor *YSphere1Actor; // id = 2
-  vtkActor *YSphere2Actor; // id = 3
-  vtkActor *ZSphere1Actor; // id = 4
-  vtkActor *ZSphere2Actor; // id = 5
-  int CurrentSphereId;
-  float Bounds[6];
-  vtkPVProbe *PVProbe;
+  vtkPVRenderView *PVRenderView;
+
+private:
+  vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&);
+  void operator=(const vtkPVGenericRenderWindowInteractor&);
 };
 
 #endif

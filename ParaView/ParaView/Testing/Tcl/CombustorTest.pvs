@@ -19,6 +19,9 @@ proc AdjustContourValue { cnt val } {
 # hack to get the window.
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
+#change to rotate camera interactor style
+$pvWindow ChangeInteractorStyle 1
+
 # Create the reader
 set pInt [$pvWindow GetSourceInterface "vtkPLOT3DReader"]
 set pvPlot3D [$pInt CreateCallback]
@@ -158,11 +161,3 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 
 Application Exit
-
-
-
-
-
-
-
-

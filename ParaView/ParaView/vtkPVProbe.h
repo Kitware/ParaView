@@ -50,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
-#include "vtkKWSelectPointInteractor.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkPVData.h"
 #include "vtkPVArrayMenu.h"
@@ -71,17 +70,11 @@ public:
   virtual void SetPVInput(vtkPVData *input);
 
   // Description:
-  // Set the interactor to use for choosing a point for probing.
-  void SetInteractor();
-  vtkGetObjectMacro(Interactor, vtkKWSelectPointInteractor);
-  
-  // Description:
   // Called when the accept button is clicked.
   void UpdateProbe();
 
   // Description:
   // Methods to call when this pv source is selected/deselected
-  void Select();
   void Deselect();
 
   // Description:
@@ -109,12 +102,6 @@ public:
   void SetCurrentEndPoint(int id);
 
   // Description:
-  // Change the 3D cursor to match the values in the UI.
-  void ChangeXPosition();
-  void ChangeYPosition();
-  void ChangeZPosition();
-
-  // Description:
   // Write out the part of the tcl script cooresponding to vtkPVProbe
   void SaveInTclScript(ofstream *file);
   
@@ -138,7 +125,6 @@ protected:
   
   vtkKWLabel *DimensionalityLabel;
   vtkKWOptionMenu *DimensionalityMenu;
-  vtkKWRadioButton *SelectPointButton;
   vtkKWWidget *ProbeFrame;
 
   vtkPVArrayMenu *ScalarArrayMenu;
@@ -166,8 +152,6 @@ protected:
   vtkKWCheckButton *ShowXYPlotToggle;
   vtkKWLabeledEntry *DivisionsEntry;
   
-  vtkKWSelectPointInteractor *Interactor;
-  
   int Dimensionality; // point = 0, line = 1
   int CurrentEndPoint;
   
@@ -175,7 +159,6 @@ protected:
   vtkSetStringMacro(XYPlotTclName);
 
   int InstanceCount;
-  vtkKWInteractor* PreviousInteractor;
 };
 
 #endif

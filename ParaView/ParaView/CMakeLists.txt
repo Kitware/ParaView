@@ -1,16 +1,8 @@
 SOURCE_FILES( ParaView_SRCS
-vtkCameraInteractor 
 vtkDummyRenderer
 vtkDummyRenderWindow
-vtkInteractor 
 vtkKWBoundsDisplay
-vtkKWCenterOfRotation 
 vtkKWExtractGeometryByScalar
-vtkKWFlyInteractor 
-vtkKWInteractor 
-vtkKWRotateCameraInteractor 
-vtkKWSelectPointInteractor
-vtkKWTranslateCameraInteractor 
 vtkPVAnimationInterface
 vtkPVApplication 
 vtkPVArrayCalculator 
@@ -32,8 +24,13 @@ vtkPVExtentEntry
 vtkPVExtentTranslator 
 vtkPVExtractGeometryByScalar
 vtkPVFileEntry
+vtkPVGenericRenderWindowInteractor
 vtkPVGlyph3D 
 vtkPVInputMenu 
+vtkPVInteractorStyleCenterOfRotation
+vtkPVInteractorStyleFly
+vtkPVInteractorStyleRotateCamera
+vtkPVInteractorStyleTranslateCamera
 vtkPVLabel
 vtkPVLabeledToggle
 vtkPVLODActor

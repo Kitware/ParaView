@@ -45,13 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkPVRenderView.h"
-#include "vtkKWInteractor.h"
 #include "vtkPVApplication.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkPVWindow.h"
+#include "vtkKWScale.h"
+#include "vtkKWCheckButton.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -111,7 +112,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->NavigationWindow = vtkPVNavigationWindow::New();
   this->NavigationFrame = vtkKWLabeledFrame::New();
 
-  this->CurrentInteractor = NULL;
   this->EventuallyRenderFlag = 0;
   this->RenderPending = NULL;
 
@@ -128,6 +128,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->InterruptRenderCheck = vtkKWCheckButton::New();
   this->CompositeWithFloatCheck = vtkKWCheckButton::New();
   this->CompositeWithRGBACheck = vtkKWCheckButton::New();
+  this->ReductionCheck = vtkKWCheckButton::New();
+  this->FrameRateFrame = vtkKWWidget::New();
+  this->FrameRateLabel = vtkKWLabel::New();
+  this->FrameRateScale = vtkKWScale::New();
 }
 
 //----------------------------------------------------------------------------
@@ -140,12 +144,6 @@ vtkPVRenderView::~vtkPVRenderView()
 
   this->NavigationWindow->Delete();
   this->NavigationWindow = NULL;
-
-  if (this->CurrentInteractor != NULL)
-    {
-    this->CurrentInteractor->UnRegister(this);
-    this->CurrentInteractor = NULL;
-    }
 
   // Tree Composite
   if (this->Composite)
@@ -200,6 +198,16 @@ vtkPVRenderView::~vtkPVRenderView()
 
   this->CompositeWithRGBACheck->Delete();
   this->CompositeWithRGBACheck = NULL;
+  
+  this->ReductionCheck->Delete();
+  this->ReductionCheck = NULL;
+  
+  this->FrameRateLabel->Delete();
+  this->FrameRateLabel = NULL;
+  this->FrameRateScale->Delete();
+  this->FrameRateScale = NULL;
+  this->FrameRateFrame->Delete();
+  this->FrameRateFrame = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -314,6 +322,10 @@ void vtkPVRenderView::PrepareForDelete()
 			     this->TriangleStripsCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
 			     this->ImmediateModeCheck->GetState());
+    pvapp->SetRegisteryValue(2, "RunTime", "UseReduction", "%d",
+                             this->ReductionCheck->GetState());
+    pvapp->SetRegisteryValue(2, "RunTime", "FrameRate", "%f",
+                             this->FrameRateScale->GetValue());
 #ifdef VTK_USE_MPI
     pvapp->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
 			     this->InterruptRenderCheck->GetState());
@@ -513,6 +525,47 @@ void vtkPVRenderView::CreateViewProperties()
     }
   this->ImmediateModeCheck->SetCommand(this, "ImmediateModeCallback");
   this->ImmediateModeCheck->SetBalloonHelpString("Toggle the use of immediate mode rendering (when off, display lists are used)");
+
+  this->ReductionCheck->SetParent(this->RenderParametersFrame->GetFrame());
+  this->ReductionCheck->Create(this->Application, "-text Reduction");
+  this->ReductionCheck->SetCommand(this, "ReductionCheckCallback");
+  if (pvapp && pvwindow &&
+      pvapp->GetRegisteryValue(2, "RunTime", "UseReduction", 0))
+    {
+    this->ReductionCheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseReduction"));
+    }
+  else
+    {
+    this->ReductionCheck->SetState(1);
+    }
+  this->ReductionCheck->SetBalloonHelpString("If selected, tree compositing will scale the size of the render window based on how long the previous render took.");
+
+  this->FrameRateFrame->SetParent(this->RenderParametersFrame->GetFrame());
+  this->FrameRateFrame->Create(this->Application, "frame", "");
+
+  this->FrameRateLabel->SetParent(this->FrameRateFrame);
+  this->FrameRateLabel->Create(this->Application, "");
+  this->FrameRateLabel->SetLabel("Frame Rate");
+  this->FrameRateScale->SetParent(this->FrameRateFrame);
+  this->FrameRateScale->Create(this->Application, "-resolution 0.1 -orient horizontal");
+  this->FrameRateScale->SetRange(0, 50);
+  if (pvapp && pvwindow &&
+      pvapp->GetRegisteryValue(2, "RunTime", "FrameRate", 0))
+    {
+    this->FrameRateScale->SetValue(
+      pvwindow->GetFloatRegisteryValue(2, "RunTime", "FrameRate"));
+    }
+  else
+    {
+    this->FrameRateScale->SetValue(3.0);
+    }
+  this->FrameRateScale->SetCommand(this, "FrameRateScaleCallback");
+  this->FrameRateScale->SetBalloonHelpString(
+    "This slider adjusts the desired frame rate for interaction.  The level of detail is adjusted to achieve the desired rate.");
+  this->Script("pack %s %s -side left -fill x",
+               this->FrameRateLabel->GetWidgetName(),
+               this->FrameRateScale->GetWidgetName());
   
 #ifdef VTK_USE_MPI
   this->InterruptRenderCheck->SetParent(this->RenderParametersFrame->GetFrame());
@@ -565,18 +618,38 @@ void vtkPVRenderView::CreateViewProperties()
     }
   this->CompositeWithRGBACheck->SetBalloonHelpString("Toggle the use of RGB/RGBA values when compositing. This is here to bypass some bugs in some graphics card drivers.");
   
-  this->Script("pack %s %s %s %s %s -side top -anchor w",
+  this->Script("pack %s %s %s %s %s %s %s -side top -anchor w",
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName(),
+               this->ReductionCheck->GetWidgetName(),
+               this->FrameRateFrame->GetWidgetName(),
                this->InterruptRenderCheck->GetWidgetName(),
                this->CompositeWithFloatCheck->GetWidgetName(),
                this->CompositeWithRGBACheck->GetWidgetName());
 #else
-  this->Script("pack %s %s -side top -anchor w",
+  this->Script("pack %s %s %s %s -side top -anchor w",
                this->TriangleStripsCheck->GetWidgetName(),
-               this->ImmediateModeCheck->GetWidgetName());
+               this->ImmediateModeCheck->GetWidgetName(),
+               this->ReductionCheck->GetWidgetName(),
+               this->FrameRateFrame->GetWidgetName());
 
 #endif
+}
+
+void vtkPVRenderView::FrameRateScaleCallback()
+{
+  float newRate = this->FrameRateScale->GetValue();
+  if (newRate <= 0.0)
+    {
+    newRate = 0.00001;
+    }
+  this->SetInteractiveUpdateRate(newRate);
+}
+
+void vtkPVRenderView::ReductionCheckCallback()
+{
+  int reduce = this->ReductionCheck->GetState();
+  this->SetUseReductionFactor(reduce);
 }
 
 void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
@@ -633,7 +706,6 @@ void vtkPVRenderView::ComputeVisiblePropBounds(float bounds[6])
     }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCamera()
 {
@@ -658,6 +730,25 @@ void vtkPVRenderView::ResetCamera()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetCameraState(float p0, float p1, float p2,
+                                     float fp0, float fp1, float fp2,
+                                     float up0, float up1, float up2)
+{
+  vtkCamera *cam; 
+  
+  // This is to trace effects of loaded scripts. 
+  this->AddTraceEntry("$kw(%s) SetCameraState %.3f %.3f %.3f  %.3f %.3f %.3f  %.3f %.3f %.3f", 
+                      this->GetTclName(), p0, p1, p2, fp0, fp1, fp2, up0, up1, up2); 
+  
+  cam = this->GetRenderer()->GetActiveCamera(); 
+  cam->SetPosition(p0, p1, p2); 
+  cam->SetFocalPoint(fp0, fp1, fp2); 
+  cam->SetViewUp(up0, up1, up2); 
+  
+  this->EventuallyRender(); 
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCameraClippingRange()
 {
   this->GetRenderer()->ResetCameraClippingRange();
@@ -669,60 +760,6 @@ void vtkPVRenderView::AddBindings()
                this->VTKWidget->GetWidgetName(), this->GetTclName());
 }
     
-//----------------------------------------------------------------------------
-void vtkPVRenderView::AButtonPress(int num, int x, int y)
-{
-  if (this->CurrentInteractor)
-    {
-    this->CurrentInteractor->AButtonPress(num, x, y);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::AButtonRelease(int num, int x, int y)
-{
-  if (this->CurrentInteractor)
-    {
-    this->CurrentInteractor->AButtonRelease(num, x, y);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::Button1Motion(int x, int y)
-{
-  if (this->CurrentInteractor)
-    {
-    this->CurrentInteractor->Button1Motion(x, y);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::Button2Motion(int x, int y)
-{
-  if (this->CurrentInteractor)
-    {
-    this->CurrentInteractor->Button2Motion(x, y);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::Button3Motion(int x, int y)
-{
-  if (this->CurrentInteractor)
-    {
-    this->CurrentInteractor->Button3Motion(x, y);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::MotionCallback(int x, int y)
-{
-  if (this->CurrentInteractor)
-    {
-    this->CurrentInteractor->MotionCallback(x, y);
-    }
-}
-
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVRenderView::GetPVApplication()
 {
@@ -931,40 +968,6 @@ void vtkPVRenderView::EventuallyRenderCallBack()
       + this->Composite->GetSetBuffersTime();
     pvApp->AddLogEntry("StillRender", this->StillRenderTime);
     pvApp->AddLogEntry("StillCcomposite", this->StillCompositeTime);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVRenderView::SetInteractor(vtkKWInteractor *interactor)
-{
-  vtkKWInteractor *old = this->CurrentInteractor;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (old == interactor)
-    {
-    return;
-    }
-  if (interactor)
-    {
-    interactor->Register(this);
-    }
-  this->CurrentInteractor = interactor;
-
-
-  // Now let the interactors do their thing.
-  if (old)
-    {
-    old->Deselect();
-    old->UnRegister(this);
-    }
-  if (interactor)
-    {
-    interactor->Select();
-    if (interactor->GetTraceInitialized() )
-      {
-      pvApp->AddTraceEntry("$kw(%s) SetInteractor $kw(%s)",
-                           this->GetTclName(), interactor->GetTclName());
-      }
     }
 }
 

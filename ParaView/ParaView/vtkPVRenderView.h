@@ -60,11 +60,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 
 class vtkPVApplication;
-class vtkKWInteractor;
 class vtkLabeledFrame;
 class vtkPVTreeComposite;
 class vtkPVNavigationWindow;
 class vtkPVWindow;
+class vtkKWScale;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
@@ -96,6 +96,12 @@ public:
   // Description:
   // Method called by the toolbar reset camera button.
   void ResetCamera();
+  
+  // Description:
+  // Specify the position, focal point, and view up of the camera.
+  void SetCameraState(float p0, float p1, float p2,
+                      float fp0, float fp1, float fp2,
+                      float up0, float up1, float up2);
 
   // Description:
   // Reset the camera clipping range based on the bounds of the
@@ -151,21 +157,8 @@ public:
   // Get the frame for the navigation window
   vtkGetObjectMacro(NavigationFrame, vtkKWLabeledFrame);
   
-  void AButtonPress(int num, int x, int y);
-  void AButtonRelease(int num, int x, int y);
-  void Button1Motion(int x, int y);
-  void Button2Motion(int x, int y);
-  void Button3Motion(int x, int y);
-  void MotionCallback(int x, int y);
-  
   void AddBindings();
   
-  // Description:
-  // Bound events are forwarded to this interactor.
-  void SetInteractor(vtkKWInteractor *interactor);
-  vtkKWInteractor *GetInteractor() 
-    {return this->CurrentInteractor;}
-
   // Description:
   // Save the renderer and render window to a file.
   void SaveInTclScript(ofstream *file, int vtkFlag);
@@ -232,6 +225,14 @@ public:
   // Description:
   // A convience method to get the PVWindow.
   vtkPVWindow *GetPVWindow();
+
+  // Description:
+  // Callback for reduction check
+  void ReductionCheckCallback();
+  
+  // Description:
+  // Callback for frame rate slider
+  void FrameRateScaleCallback();
   
 protected:
 
@@ -260,14 +261,16 @@ protected:
   vtkKWWidget       *NavigationCanvas;
   vtkKWWidget       *NavScrollBar;
 
-  vtkKWInteractor *CurrentInteractor;
-
   vtkKWLabeledFrame *RenderParametersFrame;
   vtkKWCheckButton *TriangleStripsCheck;
   vtkKWCheckButton *ImmediateModeCheck;
   vtkKWCheckButton *InterruptRenderCheck;
   vtkKWCheckButton *CompositeWithFloatCheck;
   vtkKWCheckButton *CompositeWithRGBACheck;
+  vtkKWCheckButton *ReductionCheck;  
+  vtkKWWidget *FrameRateFrame;
+  vtkKWLabel *FrameRateLabel;
+  vtkKWScale *FrameRateScale;
 
   vtkPVNavigationWindow *NavigationWindow;
   

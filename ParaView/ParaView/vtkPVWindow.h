@@ -49,20 +49,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWindow.h"
 #include "vtkPVSource.h"
-#include "vtkInteractorStyleTrackballCamera.h"
 
 class vtkPVRenderView;
 class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
 class vtkKWPushButton;
+class vtkKWRadioButton;
 class vtkKWLabel;
 class vtkKWCheckButton;
-class vtkKWInteractor;
 class vtkPVAnimationInterface;
 class vtkKWRotateCameraInteractor;
 class vtkKWCompositeCollection;
 class vtkKWTclInteractor;
+class vtkPVGenericRenderWindowInteractor;
+class vtkGenericRenderWindowInteractor;
+class vtkPVInteractorStyleTranslateCamera;
+class vtkPVInteractorStyleRotateCamera;
+class vtkInteractorStyleTrackballCamera;
+class vtkPVInteractorStyleCenterOfRotation;
+class vtkPVInteractorStyleFly;
+class vtkAxes;
+class vtkActor;
+class vtkPolyDataMapper;
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
@@ -122,8 +131,6 @@ public:
   vtkGetObjectMacro(GlyphMenu, vtkKWMenu);
   vtkGetObjectMacro(SourceMenu, vtkKWMenu);
   vtkGetObjectMacro(FilterMenu, vtkKWMenu);
-  
-  vtkGetObjectMacro(SelectPointInteractor, vtkKWInteractor);
   
   // Description:
   // Callback from the reset camera button.
@@ -210,14 +217,6 @@ public:
   // Callback from the extract voids button.
   vtkPVSource *ExtractVoidsCallback();
   
-  // Description:
-  // Callback from the frame rate scale.
-  void FrameRateScaleCallback();
-
-  // Description:
-  // Callback from the reduction check.
-  void ReductionCheckCallback();
-  
   virtual void Close();
 
   // Stuff for creating a log file for times.
@@ -244,7 +243,7 @@ public:
   vtkGetObjectMacro(GlyphButton, vtkKWPushButton);
   vtkGetObjectMacro(ProbeButton, vtkKWPushButton);
   vtkGetObjectMacro(ExtractVoidsButton, vtkKWPushButton);
-  vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
+  vtkGetObjectMacro(InteractorStyleToolbar, vtkKWToolbar);
 
   // Description:
   // Get a source interface from the class name.
@@ -253,13 +252,10 @@ public:
   vtkPVSource *CreatePVSource(const char *className);
   
   // Description:
-  // Access to the interactors from tcl.
-  // This is required for things like setting its center of rotation,
-  // and tracing.
-  vtkKWRotateCameraInteractor *GetRotateCameraInteractor()
-    {return this->RotateCameraInteractor;}
-  vtkGetObjectMacro(TranslateCameraInteractor, vtkKWInteractor);
-  vtkGetObjectMacro(FlyInteractor, vtkKWInteractor);
+  // Access to the interactor styles from tcl.
+  vtkGetObjectMacro(RotateCameraStyle, vtkPVInteractorStyleRotateCamera);
+  vtkGetObjectMacro(TranslateCameraStyle, vtkPVInteractorStyleTranslateCamera);
+  vtkGetObjectMacro(FlyStyle, vtkPVInteractorStyleFly);
   
   // Description:
   // This list contains all the sources created by the user.
@@ -300,6 +296,37 @@ public:
   int LoadModule(const char *name);
   int GetModuleLoaded(const char *name);
 
+  // Description:
+  // Callbacks for generic render window interactor
+  void AButtonPress(int button, int x, int y);
+  void AShiftButtonPress(int button, int x, int y);
+  void AButtonRelease(int button, int x, int y);
+  void AShiftButtonRelease(int button, int x, int y);
+  void MouseMotion(int x, int y);
+  void Configure(int width, int height);
+  
+  // Description:
+  // Change the current interactor style
+  void ChangeInteractorStyle(int index);
+
+  // Description:
+  // Callbacks for center of rotation widgets
+  void CenterEntryOpenCallback();
+  void CenterEntryCloseCallback();
+  void CenterEntryCallback();
+  void ResetCenterCallback();
+
+  // Description
+  // Access to these widgets from outside vtkPVWindow
+  // (in vtkPVInteractorStyleCenterOfRotation)
+  vtkGetObjectMacro(CenterXEntry, vtkKWEntry);
+  vtkGetObjectMacro(CenterYEntry, vtkKWEntry);
+  vtkGetObjectMacro(CenterZEntry, vtkKWEntry);
+
+  // Description:
+  // Callback for fly speed widget
+  void FlySpeedScaleCallback();
+  
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -313,14 +340,19 @@ protected:
   vtkKWMenu *SelectMenu;
   vtkKWMenu *GlyphMenu;
   
-  vtkInteractorStyleTrackballCamera *CameraStyle;
+  vtkInteractorStyleTrackballCamera *TrackballCameraStyle;
+  vtkPVInteractorStyleTranslateCamera *TranslateCameraStyle;
+  vtkPVInteractorStyleRotateCamera *RotateCameraStyle;
+  vtkPVInteractorStyleCenterOfRotation *CenterOfRotationStyle;
+  vtkPVInteractorStyleFly *FlyStyle;
   
-  vtkKWToolbar *InteractorToolbar;
-  vtkKWPushButton *CameraStyleButton;
-  vtkKWInteractor *FlyInteractor;
-  vtkKWRotateCameraInteractor *RotateCameraInteractor;
-  vtkKWInteractor *TranslateCameraInteractor;
-  vtkKWInteractor *SelectPointInteractor;
+  vtkKWToolbar *InteractorStyleToolbar;
+  vtkKWRadioButton *FlyButton;
+  vtkKWRadioButton *RotateCameraButton;
+  vtkKWRadioButton *TranslateCameraButton;
+  vtkKWRadioButton *TrackballCameraButton;
+  
+  vtkPVGenericRenderWindowInteractor *GenericInteractor;
   
   vtkKWToolbar *Toolbar;
   vtkKWPushButton *CalculatorButton;
@@ -333,11 +365,29 @@ protected:
   vtkKWPushButton *ProbeButton;
   vtkKWPushButton *ExtractVoidsButton;
   
-  vtkKWLabel *FrameRateLabel;
-  vtkKWScale *FrameRateScale;
-
-  vtkKWLabel *ReductionLabel;
-  vtkKWCheckButton *ReductionCheck;
+  // widgets for setting center of rotation for rotate camera interactor style
+  vtkKWToolbar *PickCenterToolbar;
+  vtkKWPushButton *PickCenterButton;
+  vtkKWPushButton *ResetCenterButton;
+  vtkKWPushButton *CenterEntryOpenButton;
+  vtkKWPushButton *CenterEntryCloseButton;
+  vtkKWWidget *CenterEntryFrame;
+  vtkKWLabel *CenterXLabel;
+  vtkKWEntry *CenterXEntry;
+  vtkKWLabel *CenterYLabel;
+  vtkKWEntry *CenterYEntry;
+  vtkKWLabel *CenterZLabel;
+  vtkKWEntry *CenterZEntry;
+  
+  // widgets for setting fly speed for fly interactor style
+  vtkKWToolbar *FlySpeedToolbar;
+  vtkKWLabel *FlySpeedLabel;
+  vtkKWScale *FlySpeedScale;
+  
+  vtkAxes *CenterSource;
+  vtkPolyDataMapper *CenterMapper;
+  vtkActor *CenterActor;
+  void ResizeCenterActor();
   
   vtkCollection *Sources;
   // Special list of static sources that can be used for glyphing.

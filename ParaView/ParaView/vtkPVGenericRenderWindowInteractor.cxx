@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkKWFlyInteractor.h
+  Module:    vtkPVGenericRenderWindowInteractor.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,60 +39,60 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWFlyInteractor
-// .SECTION Description
-// This widget gets displayed when fly mode is selected.
 
-#ifndef __vtkKWFlyInteractor_h
-#define __vtkKWFlyInteractor_h
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVRenderView.h"
+#include "vtkObjectFactory.h"
 
-#include "vtkKWInteractor.h"
-#include "vtkCameraInteractor.h"
-#include "vtkKWScale.h"
-#include "tk.h"
-
-class vtkPVRenderView;
-
-class VTK_EXPORT vtkKWFlyInteractor : public vtkKWInteractor
+vtkPVGenericRenderWindowInteractor* vtkPVGenericRenderWindowInteractor::New()
 {
-public:
-  static vtkKWFlyInteractor* New();
-  vtkTypeMacro(vtkKWFlyInteractor,vtkKWInteractor);
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVGenericRenderWindowInteractor");
+  if(ret)
+    {
+    return (vtkPVGenericRenderWindowInteractor*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVGenericRenderWindowInteractor;
+}
 
-  // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, char *args);
+vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
+{
+  this->PVRenderView = NULL;
+}
 
-  // Description:
-  // When the active interactor is changed, these methods allow
-  // it to change its state.  This may similar to a composite.
-  void Select();
-  void Deselect();
+vtkPVGenericRenderWindowInteractor::~vtkPVGenericRenderWindowInteractor()
+{
+  this->SetPVRenderView(NULL);
+}
 
-  void AButtonPress(int num, int x, int y);
-  void AButtonRelease(int num, int x, int y);
+void vtkPVGenericRenderWindowInteractor::SetPVRenderView(vtkPVRenderView *view)
+{
+  if (this->PVRenderView != view)
+    {
+    // to avoid circular references
+    this->PVRenderView = view;
+    if (this->PVRenderView != NULL)
+      {
+      this->SetRenderWindow(this->PVRenderView->GetRenderWindow());
+      }
+    }
+}
 
-protected: 
-  vtkKWFlyInteractor();
-  ~vtkKWFlyInteractor();
-  vtkKWFlyInteractor(const vtkKWFlyInteractor&) {};
-  void operator=(const vtkKWFlyInteractor&) {};
-
-  void CreateCursor();
-  Tk_Window RenderTkWindow;
-  Tk_Cursor PlaneCursor; 
-
-  vtkKWWidget *Label;
-  vtkKWScale *SpeedSlider;
-
-  // The vtk object which manipulates the camera.
-  vtkCameraInteractor *Helper;
-
-  // Used to signle the fly loop to stop.
-  int FlyFlag;
-};
-
-
-#endif
-
+void vtkPVGenericRenderWindowInteractor::Render()
+{
+  if ( ! this->PVRenderView)
+    {
+    return;
+    }
+  
+  if (this->RenderWindow->GetDesiredUpdateRate() == this->StillUpdateRate)
+    {
+    this->PVRenderView->EventuallyRender();
+    }
+  else
+    {
+    this->PVRenderView->Render();
+    }
+}
 
