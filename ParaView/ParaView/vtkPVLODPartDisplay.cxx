@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.1");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.2");
 
 
 
@@ -121,6 +121,9 @@ vtkPVLODPartDisplayInformation* vtkPVLODPartDisplay::GetInformation()
     }
   this->GetPVApplication()->GetProcessModule()->GatherInformation(
                  this->Information, this->LODDeciTclName);
+
+  this->InformationIsValid = 1;
+
   return this->Information;  
 }
 

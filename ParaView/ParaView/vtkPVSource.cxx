@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.302");
+vtkCxxRevisionMacro(vtkPVSource, "1.303");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2096,6 +2096,7 @@ void vtkPVSource::SetAcceptButtonColorToRed()
     return;
     }
   this->AcceptButtonRed = 1;
+  this->DataInformationValid = 0;
   this->Script("%s configure -background red1",
                this->AcceptButton->GetWidgetName());
   this->Script("%s configure -activebackground red1",
