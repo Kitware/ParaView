@@ -20,15 +20,13 @@
 
 // .NAME vtkPVLookmarkManager - Interface panel to interact with lookmarks.
 // .SECTION Description
-// This class manages interactions with lookmarks
+// This class manages interactions with lookmarks.
 // 
 // The menu bar contains the following menus:
-// @verbatim
 // File Menu    -> Lookmark File manipulations
 // Edit Menu    -> Performs operations on lookmarks and folders
 // Help         -> Brings up help dialog boxes
 // 
-// @endverbatim
 // .SECTION See Also
 // vtkPVLookmark, vtkKWLookmark, vtkKWLookmarkFolder, vtkXMLLookmarkElement
 
@@ -43,7 +41,6 @@ class vtkKWLookmark;
 class vtkPVLookmark;
 class vtkXMLDataElement;
 class vtkKWIcon;
-class vtkKWCheckButton;
 class vtkKWFrame;
 class vtkKWPushButton;
 class vtkKWWidget;
@@ -51,7 +48,6 @@ class vtkPVApplication;
 class vtkPVSource;
 class vtkPVRenderView;
 class vtkRenderWindow;
-class vtkKWRadioButtonSet;
 class vtkKWMenu;
 class vtkKWMessageDialog;
 class vtkKWText;

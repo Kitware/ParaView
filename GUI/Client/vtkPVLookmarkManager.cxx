@@ -26,8 +26,6 @@
 #include "vtkPVStringEntry.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVFileEntry.h"
-#include "vtkPVXMLParser.h"
-#include "vtkPVXMLElement.h"
 #include "vtkPVLookmark.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
@@ -35,18 +33,13 @@
 #include "vtkPVWindow.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkPVVectorEntry.h"
-#include "vtkPVContainerWidget.h"
 #include "vtkPVSelectionList.h"
 #include "vtkPVScale.h"
-#include "vtkPVClipDataSet.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVBoxWidget.h"
 #include "vtkPVArraySelection.h"
 #include "vtkPVSelectWidget.h"
-#include "vtkPVArrayMenu.h"
 #include "vtkPVCameraIcon.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVSourceCollection.h"
@@ -56,18 +49,14 @@
 #include "vtkPVBasicDSPFilterWidget.h"
 #endif
 
-#include "vtkKWLabeledCheckButton.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWLookmark.h"
 #include "vtkKWLookmarkFolder.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWDirectoryUtilities.h"
 #include "vtkKWLoadSaveDialog.h"
-#include "vtkKWMessageDialog.h"
 #include "vtkKWIcon.h"
 #include "vtkKWText.h"
-#include "vtkKWLabeledRadioButtonSet.h"
-#include "vtkKWRadioButtonSet.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -78,16 +67,13 @@
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWWindow.h"
 #include "vtkKWTclInteractor.h"
-#include "vtkKWRegisteryUtilities.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWSplashScreen.h"
 
 #include "vtkXMLUtilities.h"
 #include "vtkXMLDataParser.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLLookmarkElement.h"
-//#include "vtkXMLLookmarkWriter.h"
 
 #include "vtkBase64Utilities.h"
 #include "vtkRenderWindow.h"
@@ -114,18 +100,17 @@
 #include "vtkClientServerStream.h"
 #include "vtkClientServerID.h"
 
-#include <vtkstd/string>
-
 #ifndef _WIN32
   #include <sys/wait.h>
   #include <unistd.h>
 #endif
 #include <vtkstd/vector>
+#include <vtkstd/string>
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.7");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.8");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
