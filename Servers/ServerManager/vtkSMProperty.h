@@ -163,6 +163,7 @@ protected:
   friend class vtkSMDomainIterator;
   friend class vtkSMSourceProxy;
   friend class vtkSMDomain;
+  friend class vtkPVPointSourceWidget;
 
   // Description:
   // Append a command to update the vtk object with the property values(s).

@@ -23,19 +23,12 @@
 
 #include "vtkPVObjectWidget.h"
 
+class vtkSMSourceProxy;
 class VTK_EXPORT vtkPVSourceWidget : public vtkPVObjectWidget
 {
 public:
   vtkTypeRevisionMacro(vtkPVSourceWidget, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // The Tcl name of the contained VTK source.
-  vtkGetMacro(SourceID,vtkClientServerID);
-
-  // Description:
-  // The Tcl name of the output of the contained VTK source.
-  vtkGetMacro(OutputID,vtkClientServerID);
 
   // Description:
   // A method for saving a widget into a VTK Tcl script.
@@ -44,6 +37,11 @@ public:
   // Return SourceID for Source, and OutputID for Output.
   virtual vtkClientServerID GetObjectByName(const char*);
 
+  // Description:
+  // Provide access to the source proxy used by this widget.
+  vtkGetObjectMacro(SourceProxy, vtkSMSourceProxy);
+  vtkGetStringMacro(SourceProxyName);
+
 protected:
   vtkPVSourceWidget();
   ~vtkPVSourceWidget();
@@ -51,6 +49,10 @@ protected:
   vtkClientServerID SourceID;
   vtkClientServerID OutputID;
 
+  vtkSMSourceProxy *SourceProxy;
+  char *SourceProxyName;
+  vtkSetStringMacro(SourceProxyName);
+  
   // Description:
   // A method for saving a widget into a VTK Tcl script.
   virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);

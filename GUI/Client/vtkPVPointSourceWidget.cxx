@@ -25,14 +25,17 @@
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMBoundsDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 
 int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.32");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -86,31 +89,39 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
   float rad;
   float num;
   
-  if (this->OutputID.ID == 0 || this->PointWidget == NULL)
+  if (!this->SourceProxy)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
+    vtkErrorMacro("Source proxy must be set to save to a batch script.");
+    return;
+    }
+  
+  vtkClientServerID sourceID = this->SourceProxy->GetID(0);
+  
+  if (sourceID.ID == 0 || this->PointWidget == NULL)
+    {
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;
     } 
 
   *file << endl;
-  *file << "set pvTemp" <<  this->OutputID.ID
+  *file << "set pvTemp" << sourceID
         << " [$proxyManager NewProxy sources PointSource]"
         << endl;
   *file << "  $proxyManager RegisterProxy sources pvTemp"
-        << this->OutputID.ID << " $pvTemp" << this->OutputID.ID
+        << sourceID << " $pvTemp" << sourceID
         << endl;
-  *file << " $pvTemp" << this->OutputID.ID << " UnRegister {}" << endl;
+  *file << "  $pvTemp" << sourceID << " UnRegister {}" << endl;
 
   this->PointWidget->GetPosition(pt);
-  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Center] "
+  *file << "  [$pvTemp" << sourceID << " GetProperty Center] "
         << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;
   this->NumberOfPointsWidget->GetValue(&num, 1);
-  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty NumberOfPoints] "
+  *file << "  [$pvTemp" << sourceID << " GetProperty NumberOfPoints] "
         << "SetElements1 " << static_cast<int>(num) << endl;
   this->RadiusWidget->GetValue(&rad, 1);
-  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Radius] "
+  *file << "  [$pvTemp" << sourceID << " GetProperty Radius] "
         << "SetElements1 " << rad << endl;
-  *file << "  $pvTemp" << this->OutputID.ID << " UpdateVTKObjects" << endl;
+  *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
   *file << endl;
 }
 
@@ -125,15 +136,17 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     return;
     }
 
-  char name[256];
-  sprintf(name, "PointSourceWidget%d", vtkPVPointSourceWidget::InstanceCount);
-
-  char outputName[256];
-  sprintf(outputName, "PointSourceWidgetOutput%d", 
-          vtkPVPointSourceWidget::InstanceCount++);
-
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  static int proxyNum = 0;
+  vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
+  this->SourceProxy = vtkSMSourceProxy::SafeDownCast(
+    pm->NewProxy("sources", "PointSource"));
+  ostrstream str;
+  str << "PointSource" << proxyNum << ends;
+  this->SetSourceProxyName(str.str());
+  pm->RegisterProxy("sources", this->SourceProxyName, this->SourceProxy);
+  proxyNum++;
+  str.rdbuf()->freeze(0);
+  this->SourceProxy->CreateVTKObjects(1);
 
   this->RadiusWidget->SetObjectID(this->SourceID);
   this->RadiusWidget->SetVariableName("Radius");
@@ -141,6 +154,17 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->RadiusWidget->SetLabel("Radius");
   this->RadiusWidget->SetModifiedCommand(this->GetPVSource()->GetTclName(), 
                                        "SetAcceptButtonColorToModified");
+  vtkSMProperty *prop = this->SourceProxy->GetProperty("Radius");
+  vtkSMBoundsDomain *bd = vtkSMBoundsDomain::New();
+  vtkPVInputMenu *input = vtkPVInputMenu::SafeDownCast(
+    this->GetPVSource()->GetPVWidget("Input"));
+  if (input)
+    {
+    bd->AddRequiredProperty(input->GetSMProperty(), "Input");
+    }
+  prop->AddDomain("bounds", bd);
+  this->RadiusWidget->SetSMProperty(prop);
+  bd->Delete();
   
   this->RadiusWidget->Create(app);
   if (this->RadiusWidget->GetSMPropertyName())
@@ -157,26 +181,6 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     this->Script("pack %s -side top -fill both -expand true",
                  this->RadiusWidget->GetWidgetName());
     }
-  
-  if (pvApp)
-    {
-    this->SourceID = pm->NewStreamObject("vtkPointSource");
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->SourceID << "SetNumberOfPoints"
-                    << this->DefaultNumberOfPoints
-                    << vtkClientServerStream::End;
-    float radius;
-    this->RadiusWidget->GetValue(&radius, 1);
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << this->SourceID << "SetRadius" << radius
-                    << vtkClientServerStream::End;
-
-    this->OutputID = pm->NewStreamObject("vtkPolyData");
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->SourceID << "SetOutput" << this->OutputID 
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
-    }
 
   this->PointWidget->SetObjectID(this->SourceID);
   this->PointWidget->SetVariableName("Center");
@@ -190,10 +194,14 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->NumberOfPointsWidget->SetLabel("Number of Points");
   this->NumberOfPointsWidget->SetModifiedCommand(
     this->GetPVSource()->GetTclName(), "SetAcceptButtonColorToModified");
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->SourceProxy->GetProperty("NumberOfPoints"));
+  this->NumberOfPointsWidget->SetSMProperty(ivp);
   
   this->NumberOfPointsWidget->Create(app);
   float numPts = static_cast<float>(this->DefaultNumberOfPoints);
   this->NumberOfPointsWidget->SetValue(&numPts, 1);
+  ivp->SetElement(0, numPts);
   if (this->ShowEntries)
     {
     this->Script("pack %s -side top -fill both -expand true",
@@ -201,6 +209,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     }
   
   this->PointWidget->Create(app);
+  
   this->Script("pack %s -side top -fill both -expand true",
                this->PointWidget->GetWidgetName());
 
@@ -227,9 +236,21 @@ int vtkPVPointSourceWidget::GetModifiedFlag()
 //-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::ResetInternal()
 {
-  // Ignore the source passed in.  We are updating our
-  // own point source.
-  this->PointWidget->ResetInternal();
+  if (this->AcceptCalled)
+    {
+    vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->SourceProxy->GetProperty("Center"));
+    if (dvp)
+      {
+      this->PointWidget->SetPosition(dvp->GetElement(0), dvp->GetElement(1),
+                                     dvp->GetElement(2));
+      }
+    }
+  else
+    {
+    this->PointWidget->PositionResetCallback();
+    }
+
   this->RadiusWidget->ResetInternal();
   this->NumberOfPointsWidget->ResetInternal();
   if (this->AcceptCalled)
@@ -239,53 +260,43 @@ void vtkPVPointSourceWidget::ResetInternal()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::AcceptInternal(vtkClientServerID)
+void vtkPVPointSourceWidget::Accept()
 {
-  // Ignore the source passed in.  We are updating our
-  // own point source.
-  if (this->GetModifiedFlag())
+  int modFlag = this->GetModifiedFlag();
+
+  if (modFlag)
     {
-    this->PointWidget->AcceptInternal(this->SourceID);
-    this->AcceptRadiusAndNumberOfPointsInternal();
+    vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->SourceProxy->GetProperty("Center"));
+    if (dvp)
+      {
+      double center[3];
+      this->PointWidget->GetPosition(center);
+      dvp->SetElement(0, center[0]);
+      dvp->SetElement(1, center[1]);
+      dvp->SetElement(2, center[2]);
+      }
+    this->RadiusWidget->Accept();
+    this->NumberOfPointsWidget->Accept();
+    this->SourceProxy->UpdateVTKObjects();
+    this->SourceProxy->UpdatePipeline();
     }
   this->ModifiedFlag = 0;
-}
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
 
-//-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::AcceptRadiusAndNumberOfPointsInternal()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (this->SourceID.ID && pvApp)
-    {
-    vtkPVProcessModule *pm = pvApp->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke << this->SourceID
-                    << "SetNumberOfPoints"
-                    << this->NumberOfPointsWidget->GetEntry(0)->GetValueAsInt()
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << this->SourceID
-                    << "SetRadius"
-                    << this->RadiusWidget->GetEntry(0)->GetValueAsFloat()
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
-    this->RadiusWidget->SetAcceptCalled(1);
-    this->NumberOfPointsWidget->SetAcceptCalled(1);
-    }
-  
-  vtkSMDoubleVectorProperty *prop1 = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->RadiusWidget->GetSMProperty());
-  if (prop1)
-    {
-    prop1->SetElement(0, this->RadiusWidget->GetEntry(0)->GetValueAsFloat());
-    }
-  
-  vtkSMIntVectorProperty *prop2 = vtkSMIntVectorProperty::SafeDownCast(
-    this->NumberOfPointsWidget->GetSMProperty());
-  if (prop2)
-    {
-    prop2->SetElement(0, this->NumberOfPointsWidget->GetEntry(0)->
-                      GetValueAsInt());
-    }
+  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -370,19 +381,6 @@ int vtkPVPointSourceWidget::ReadXMLAttributes(vtkPVXMLElement *element,
     this->ShowEntries = 1;
     }
 
-  const char *radius_property = element->GetAttribute("radius_property");
-  if (radius_property)
-    {
-    this->RadiusWidget->SetSMPropertyName(radius_property);
-    }
-  
-  const char *num_points_property =
-    element->GetAttribute("number_of_points_property");
-  if (num_points_property)
-    {
-    this->NumberOfPointsWidget->SetSMPropertyName(num_points_property);
-    }
-  
   return 1;
 }
 

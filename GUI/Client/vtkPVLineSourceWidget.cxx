@@ -19,11 +19,14 @@
 #include "vtkPVLineWidget.h"
 #include "vtkPVSource.h"
 #include "vtkPVProcessModule.h"
-
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.22");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.23");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -56,18 +59,17 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
     return;
     }
 
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  if (pvApp)
-    {
-    this->SourceID = pm->NewStreamObject("vtkLineSource");
-    this->OutputID = pm->NewStreamObject("vtkPolyData");
-    pm->GetStream() << vtkClientServerStream::Invoke << this->SourceID 
-                    << "SetOutput" << this->OutputID << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
-    }
-
-
+  static int proxyNum = 0;
+  vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
+  this->SourceProxy = vtkSMSourceProxy::SafeDownCast(
+    pm->NewProxy("sources", "LineSource"));
+  ostrstream str;
+  str << "LineSource" << proxyNum << ends;
+  this->SetSourceProxyName(str.str());
+  pm->RegisterProxy("sources", this->SourceProxyName, this->SourceProxy);
+  proxyNum++;
+  str.rdbuf()->freeze(0);
+  this->SourceProxy->CreateVTKObjects(1);
 
   this->LineWidget->SetPoint1VariableName("Point1");
   this->LineWidget->SetPoint2VariableName("Point2");
@@ -100,19 +102,85 @@ void vtkPVLineSourceWidget::ResetInternal()
 {
   if (this->AcceptCalled)
     {
+    vtkSMDoubleVectorProperty *pt1p = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->SourceProxy->GetProperty("Point1"));
+    vtkSMDoubleVectorProperty *pt2p = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->SourceProxy->GetProperty("Point2"));
+    vtkSMIntVectorProperty *resp = vtkSMIntVectorProperty::SafeDownCast(
+      this->SourceProxy->GetProperty("Resolution"));
+    if (pt1p)
+      {
+      this->LineWidget->SetPoint1(pt1p->GetElement(0), pt1p->GetElement(1),
+                                  pt1p->GetElement(2));
+      }
+    if (pt2p)
+      {
+      this->LineWidget->SetPoint2(pt2p->GetElement(0), pt2p->GetElement(1),
+                                  pt2p->GetElement(2));
+      }
+    if (resp)
+      {
+      this->LineWidget->SetResolution(resp->GetElement(0));
+      }
     this->ModifiedFlag = 0;
     }
-  // Ignore the source passed in.  Modify our one source.
-  this->LineWidget->ResetInternal();
+  else
+    {
+    this->LineWidget->ActualPlaceWidget();
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineSourceWidget::AcceptInternal(vtkClientServerID)
+void vtkPVLineSourceWidget::Accept()
 {
-  // Ignore the source passed in.  Modify our one source.
-  this->LineWidget->AcceptInternal(this->SourceID);
+  int modFlag = this->GetModifiedFlag();
   
+  if (modFlag)
+    {
+    vtkSMDoubleVectorProperty *pt1p = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->SourceProxy->GetProperty("Point1"));
+    vtkSMDoubleVectorProperty *pt2p = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->SourceProxy->GetProperty("Point2"));
+    vtkSMIntVectorProperty *resp = vtkSMIntVectorProperty::SafeDownCast(
+      this->SourceProxy->GetProperty("Resolution"));
+    double pt[3];
+    if (pt1p)
+      {
+      this->LineWidget->GetPoint1(pt);
+      pt1p->SetElement(0, pt[0]);
+      pt1p->SetElement(1, pt[1]);
+      pt1p->SetElement(2, pt[2]);
+      }
+    if (pt2p)
+      {
+      this->LineWidget->GetPoint2(pt);
+      pt2p->SetElement(0, pt[0]);
+      pt2p->SetElement(1, pt[1]);
+      pt2p->SetElement(2, pt[2]);
+      }
+    if (resp)
+      {
+      resp->SetElement(0, this->LineWidget->GetResolution());
+      }
+    this->SourceProxy->UpdateVTKObjects();
+    this->SourceProxy->UpdatePipeline();
+    }
   this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -142,31 +210,37 @@ void vtkPVLineSourceWidget::Deselect()
 void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
 {
   double pt[3];
-  
-  if (this->OutputID.ID == 0 || this->LineWidget == NULL)
+
+  if (!this->SourceProxy)
     {
-    vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
+    vtkErrorMacro("Source proxy must be set to save to a batch script.");
+    return;
+    }
+  
+  vtkClientServerID sourceID = this->SourceProxy->GetID(0);
+  
+  if (sourceID.ID == 0 || this->LineWidget == NULL)
+    {
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
     return;
     } 
 
   *file << endl;
-  *file << "set pvTemp" <<  this->OutputID.ID
-        << " [$proxyManager NewProxy sources LineSource]"
-        << endl;
+  *file << "set pvTemp" << sourceID
+        << " [$proxyManager NewProxy sources LineSource]" << endl;
   *file << "  $proxyManager RegisterProxy sources pvTemp"
-        << this->OutputID.ID << " $pvTemp" << this->OutputID.ID
-        << endl;
-  *file << " $pvTemp" << this->OutputID.ID << " UnRegister {}" << endl;
+        << sourceID << " $pvTemp" << sourceID << endl;
+  *file << "  $pvTemp" << sourceID << " UnRegister {}" << endl;
 
   this->LineWidget->GetPoint1(pt);
-  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Point1] "
+  *file << "  [$pvTemp" << sourceID << " GetProperty Point1] "
         << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;
   this->LineWidget->GetPoint2(pt);
-  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Point2] "
+  *file << "  [$pvTemp" << sourceID << " GetProperty Point2] "
         << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;
-  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Resolution] "
+  *file << "  [$pvTemp" << sourceID << " GetProperty Resolution] "
         << "SetElements1 " << this->LineWidget->GetResolution() << endl;
-  *file << "  $pvTemp" << this->OutputID.ID << " UpdateVTKObjects" << endl;
+  *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
   *file << endl;
 }
 

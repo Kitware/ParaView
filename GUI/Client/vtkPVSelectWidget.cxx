@@ -26,15 +26,18 @@
 #include "vtkStringList.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
+#include "vtkPVSourceWidget.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollectionIterator.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMSourceProxy.h"
 
 #include <vtkstd/string>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.53");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.54");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -184,46 +187,67 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
     }
 
   widget->SaveInBatchScript(file);
- 
-  if(this->ElementType == OBJECT)
-    { 
-    // TODO Fix this hack.
-    vtkPVObjectWidget* ow = vtkPVObjectWidget::SafeDownCast(widget);
-    if (strcmp(this->GetCurrentVTKValue(), "Output") == 0)
+
+  vtkSMInputProperty *ip = vtkSMInputProperty::SafeDownCast(
+    this->GetSMProperty());
+  vtkPVSourceWidget *sw = vtkPVSourceWidget::SafeDownCast(
+    this->Widgets->GetItemAsObject(this->CurrentIndex));
+  if (ip && sw)
+    {
+    vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+    if (!sourceID.ID || !this->SMPropertyName)
       {
-      *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-            << " GetProperty " << this->VariableName
-            << "] AddProxy ";
-      if (ow)
+      vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+      return;
+      }
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+          << this->SMPropertyName << "] RemoveAllProxies" << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+          << this->SMPropertyName << "] AddProxy $pvTemp"
+          << sw->GetSourceProxy()->GetID(0);
+    }
+  else
+    {
+    if(this->ElementType == OBJECT)
+      { 
+      // TODO Fix this hack.
+      vtkPVObjectWidget* ow = vtkPVObjectWidget::SafeDownCast(widget);
+      if (strcmp(this->GetCurrentVTKValue(), "Output") == 0)
         {
-        vtkClientServerID id = ow->GetObjectByName(this->GetCurrentVTKValue());
-        *file << "$pvTemp" << id.ID;
+        *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+              << " GetProperty " << this->VariableName
+              << "] AddProxy ";
+        if (ow)
+          {
+          vtkClientServerID id = ow->GetObjectByName(this->GetCurrentVTKValue());
+          *file << "$pvTemp" << id.ID;
+          }
+        else
+          {
+          *file << "{}" ;
+          }
         }
       else
         {
-        *file << "{}" ;
+        *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+              <<  " GetProperty " << this->VariableName << "] AddProxy ";
+        if (ow)
+          {
+          vtkClientServerID id = ow->GetObjectByName(this->GetCurrentVTKValue());
+          *file << "$pvTemp" << id.ID;
+          }
+        else
+          {
+          *file << "{}" ;
+          }
         }
       }
     else
       {
       *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-            <<  " GetProperty " << this->VariableName << "] AddProxy ";
-      if (ow)
-        {
-        vtkClientServerID id = ow->GetObjectByName(this->GetCurrentVTKValue());
-        *file << "$pvTemp" << id.ID;
-        }
-      else
-        {
-        *file << "{}" ;
-        }
+            <<  " GetProperty " << this->VariableName << "] SetElements1 ";
+      *file << this->Property->GetString();
       }
-    }
-  else
-    {
-    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-          <<  " GetProperty " << this->VariableName << "] SetElements1 ";
-    *file << this->Property->GetString();
     }
   *file << endl;
 }
@@ -244,39 +268,70 @@ void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
   // Command to update the UI.
   this->Property->SetStringType(this->ElementType);
 
+  int modFlag = this->GetModifiedFlag();
+  
   const char* value = this->GetCurrentVTKValue();
   if (!value)
     {
     return;
     }
 
-  if(this->ElementType == OBJECT)
-    { 
-    vtkPVObjectWidget* ow = vtkPVObjectWidget::SafeDownCast(
-      this->Widgets->GetItemAsObject(this->CurrentIndex));
-    if (ow)
-      {
-      vtkClientServerID id = 
-        ow->GetObjectByName(this->GetCurrentVTKValue());
-      this->Property->SetObjectID(id);
-      }
-    else
-      {
-      vtkClientServerID id = { 0 };
-      this->Property->SetObjectID(id);
-      }
+  vtkSMInputProperty *ip = vtkSMInputProperty::SafeDownCast(
+    this->GetSMProperty());
+  vtkPVSourceWidget *sw = vtkPVSourceWidget::SafeDownCast(
+    this->Widgets->GetItemAsObject(this->CurrentIndex));
+  if (ip && sw)
+    {
+    ip->RemoveAllProxies();
+    ip->AddProxy(sw->GetSourceProxy());
     }
-  this->Property->SetString(value);
-  this->Property->SetVTKSourceID(sourceId);
-  this->Property->AcceptInternal();
-
+  else
+    {
+    if(this->ElementType == OBJECT)
+      { 
+      vtkPVObjectWidget* ow = vtkPVObjectWidget::SafeDownCast(
+        this->Widgets->GetItemAsObject(this->CurrentIndex));
+      if (ow)
+        {
+        vtkClientServerID id = 
+          ow->GetObjectByName(this->GetCurrentVTKValue());
+        this->Property->SetObjectID(id);
+        }
+      else
+        {
+        vtkClientServerID id = { 0 };
+        this->Property->SetObjectID(id);
+        }
+      }
+    this->Property->SetString(value);
+    this->Property->SetVTKSourceID(sourceId);
+    this->Property->AcceptInternal();
+    }
+  
   if (this->CurrentIndex >= 0)
     {
     vtkPVWidget *widget = (vtkPVWidget*)this->Widgets->GetItemAsObject(this->CurrentIndex);
-    widget->AcceptInternal(sourceId);
+    if (ip)
+      {
+      widget->Accept();
+      }
+    else
+      {
+      widget->AcceptInternal(sourceId);
+      }
     }
 
   this->ModifiedFlag = 0;
+  if (ip && modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -718,10 +773,13 @@ void vtkPVSelectWidget::SetProperty(vtkPVWidgetProperty *prop)
   if (this->Property)
     {
     this->Property->Register(this);
-    char *cmd = new char[strlen(this->VariableName)+4];
-    sprintf(cmd, "Set%s", this->VariableName);
-    this->Property->SetVTKCommand(cmd);
-    delete [] cmd;
+    if (this->VariableName)
+      {
+      char *cmd = new char[strlen(this->VariableName)+4];
+      sprintf(cmd, "Set%s", this->VariableName);
+      this->Property->SetVTKCommand(cmd);
+      delete [] cmd;
+      }
     }
 }
 

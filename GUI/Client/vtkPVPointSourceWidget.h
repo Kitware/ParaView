@@ -77,7 +77,7 @@ public:
   // Description:
   // The methods get called when the Accept button is pressed. 
   // It sets the VTK objects value using this widgets value.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -121,8 +121,6 @@ protected:
   virtual int ReadXMLAttributes(vtkPVXMLElement *element,
                                 vtkPVXMLPackageParser *parser);
 
-  void AcceptRadiusAndNumberOfPointsInternal();
-  
   vtkPVPointWidget* PointWidget;
 
   static int InstanceCount;

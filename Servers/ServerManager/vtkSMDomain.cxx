@@ -21,7 +21,7 @@
 #include <vtkstd/map>
 #include "vtkStdString.h"
 
-vtkCxxRevisionMacro(vtkSMDomain, "1.8");
+vtkCxxRevisionMacro(vtkSMDomain, "1.9");
 
 struct vtkSMDomainInternals
 {
@@ -110,8 +110,7 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
               vtkSMProperty* req = prop->NewProperty(name);
               if (req)
                 {
-                req->AddDependent(this);
-                this->Internals->RequiredProperties[function] = req;
+                this->AddRequiredProperty(req, function);
                 }
               }
             }
@@ -120,6 +119,25 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
       }
     }
   return 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDomain::AddRequiredProperty(vtkSMProperty *prop,
+                                      const char *function)
+{
+  if (!prop)
+    {
+    return;
+    }
+  
+  if (!function)
+    {
+    vtkErrorMacro("Missing name of function for new required property.");
+    return;
+    }
+  
+  prop->AddDependent(this);
+  this->Internals->RequiredProperties[function] = prop;
 }
 
 //---------------------------------------------------------------------------

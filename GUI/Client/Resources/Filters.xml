@@ -1959,7 +1959,7 @@ The Pick filter operates on any type of data and produces unstructured grid outp
     <SelectWidget type="object"
                   label="Probe object"
                   trace_name="Probe object"
-                  variable="Input">
+                  property="Input">
       <Item label="Point"
             value="Output">
       <PointSourceWidget trace_name="Point"
@@ -2008,14 +2008,12 @@ The Probe filter operates on any type of data and produces polygonal output (a p
     <SelectWidget type="object"
                   trace_name="Seed"
                   label="Seed"
-                  variable="Source">
+                  property="Source">
       <Item label="Point Cloud"
             value="Output">
         <PointSourceWidget trace_name="Point"
                            radius_scale_factor=".1"
-                           radius_property="Radius"
                            input_menu="im"
-                           number_of_points_property="NumberOfPoints"
                            default_number_of_points="100"
                            show_entries="1"/>
       </Item>

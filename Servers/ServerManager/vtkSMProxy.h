@@ -157,6 +157,8 @@ protected:
   friend class vtkSMProxyObserver;
   friend class vtkSMSourceProxy;
   friend class vtkSMPropertyIterator;
+  friend class vtkPVPointSourceWidget;
+  friend class vtkPVLineSourceWidget;
 
   // Temporary
   friend class vtkPVSource;

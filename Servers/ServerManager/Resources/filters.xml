@@ -2175,8 +2175,8 @@
 
    <SourceProxy name="Probe" class="vtkPProbeFilter">
     <InputProperty
-       name="Input"
-       command="SetInput">
+       name="Source"
+       command="SetSource">
           <ProxyGroupDomain name="groups">
             <Group name="sources"/>
           </ProxyGroupDomain>
@@ -2188,8 +2188,8 @@
      </InputProperty>
 
      <InputProperty
-        name="Source"
-        command="SetSource">
+        name="Input"
+        command="SetInput">
            <ProxyGroupDomain name="groups">
              <Group name="sources"/>
            </ProxyGroupDomain>

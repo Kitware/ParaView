@@ -61,6 +61,10 @@ public:
   // domain.
   vtkGetStringMacro(XMLName);
 
+  // Description:
+  // Add a new required property to this domain.
+  void AddRequiredProperty(vtkSMProperty *prop, const char *function);
+
 protected:
   vtkSMDomain();
   ~vtkSMDomain();

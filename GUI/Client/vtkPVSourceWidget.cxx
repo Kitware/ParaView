@@ -17,20 +17,23 @@
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
 {
   this->SourceID.ID = 0;
   this->OutputID.ID = 0;
+  this->SourceProxy = 0;
+  this->SourceProxyName = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::~vtkPVSourceWidget()
 {
-
   if (this->OutputID.ID)
     {
     vtkPVApplication* pvApp = 
@@ -55,6 +58,15 @@ vtkPVSourceWidget::~vtkPVSourceWidget()
 
   this->SourceID.ID = 0;
   this->OutputID.ID = 0;
+
+  vtkSMObject::GetProxyManager()->UnRegisterProxy("source",
+                                                  this->SourceProxyName);
+  this->SetSourceProxyName(0);
+  if (this->SourceProxy)
+    {
+    this->SourceProxy->Delete();
+    this->SourceProxy = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -96,10 +108,9 @@ void vtkPVSourceWidget::SaveInBatchScriptForPart(ofstream *file,
 void vtkPVSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "Source Tcl name: " << (this->SourceID)
-     << endl;
-  os << "Output Tcl Name: " << (this->OutputID)
-     << endl;
+  os << "SourceProxy: " << this->SourceProxy << endl;
+  os << "SourceProxyName: "
+     << (this->SourceProxyName ? this->SourceProxyName : "(none)") << endl;
 }
 
 //----------------------------------------------------------------------------
