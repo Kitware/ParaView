@@ -182,6 +182,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetLODDeciTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODDeciTclName, this->GeometryTclName);
+  pvApp->BroadcastScript("%s CopyCellDataOn", this->LODDeciTclName);
   pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
   pvApp->BroadcastScript("%s UseInternalTrianglesOff", this->LODDeciTclName);
   //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
