@@ -60,6 +60,7 @@ if { [catch {set fp [open "out.txt" w]}] == 0 } {
 
 # Continue with the rest of the test.
  
+[$pv(vtkTemp176) GetCurrentValue] SetVisibility 1
 $pv(vtkTemp176) SetCurrentValue $pv(vtkTemp234)
 $pv(vtkTemp167) AcceptCallback
 

@@ -42,6 +42,7 @@ $pv(vtkTemp247) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp182)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp190) [$pv(vtkTemp182) GetPVWidget {Input}]
+[$pv(vtkTemp190) GetCurrentValue] SetVisibility 1
 $pv(vtkTemp190) SetCurrentValue $pv(vtkTemp247)
 $pv(vtkTemp182) AcceptCallback
 

@@ -22,6 +22,8 @@ set kw(vtkTemp126) [$kw(vtkTemp99) GetPVWidget {Phi Resolution}]
 $kw(vtkTemp126) SetValue 16
 $kw(vtkTemp99) AcceptCallback
 
+$kw(vtkTemp44) SetBackgroundColor 0 0 0
+
 set kw(vtkTemp167) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
 set kw(vtkTemp177) [$kw(vtkTemp167) GetPVWidget {Center}]
 $kw(vtkTemp177) SetValue 2 0 0
@@ -51,6 +53,9 @@ $kw(vtkTemp267) AcceptCallback
 
 # Change the input.
 $kw(vtkTemp273) SetCurrentValue $kw(vtkTemp209)
+
+# We have to manually turn this back on.
+$kw(vtkTemp240) SetVisibility 1
 
 # Lets see if the array menu has the correct value.
 # Create a text files with the current menu value.

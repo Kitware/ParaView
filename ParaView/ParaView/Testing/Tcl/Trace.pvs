@@ -58,6 +58,7 @@ set pv(vtkTemp265) [$pv(vtkTemp1) CreatePVSource vtkDataSetSurfaceFilter]
 set pv(vtkTemp274) [$pv(vtkTemp265) GetPVWidget {Input}]
 $pv(vtkTemp274) SetCurrentValue $pv(vtkTemp230)
 $pv(vtkTemp265) AcceptCallback
+[$pv(vtkTemp274) GetCurrentValue] SetVisibility 1
 $pv(vtkTemp274) SetCurrentValue $pv(vtkTemp98)
 $pv(vtkTemp265) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
