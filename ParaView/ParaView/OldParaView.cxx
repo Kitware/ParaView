@@ -7,7 +7,7 @@ int main()
     "*                                     *\n"
     "* ParaView executable has changed!    *\n"
     "* Please use lowercase executable     *\n"
-    "* name.                               *\n"
+    "* name (paraview).                    *\n"
     "*                                     *\n"
     "* Thank you.                          *\n"
     "*                                     *\n"
