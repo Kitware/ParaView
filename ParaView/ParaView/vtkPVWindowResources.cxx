@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 
 #include "vtkPVApplication.h"
-#include "vtkKwTkUtilities.h"
+#include "vtkKWTkUtilities.h"
 
 // Logo
 
