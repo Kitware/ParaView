@@ -143,6 +143,12 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
 					   outputTclName));
     pvApp->BroadcastScript("%s ShallowCopy [%s GetOutput %d]",
 			   outputTclName, tclName, i);
+    if (d->IsA("vtkStructuredGrid"))
+      {
+      pvApp->BroadcastScript(
+        "%s SetPointVisibility [[%s GetOutput %d] GetPointVisibility]",
+        outputTclName, tclName, i);
+      }
     pvd = vtkPVData::New();
     pvd->SetApplication(pvApp);
     pvd->SetVTKData(d, outputTclName);
