@@ -663,6 +663,7 @@ protected:
   vtkPVApplicationSettingsInterface *ApplicationSettingsInterface;
   vtkKWUserInterfaceNotebookManager *UserInterfaceManager;
 
+  vtkClientServerID ServerFileListingID;
 private:
 
 //BTX

@@ -145,7 +145,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.19");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.20");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -295,11 +295,20 @@ vtkPVWindow::vtkPVWindow()
   this->ApplicationSettingsInterface = 0;
 
   this->InteractorID.ID = 0;
+  this->ServerFileListingID.ID = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
+  if(this->ServerFileListingID.ID)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    vtkPVProcessModule *pm = pvApp->GetProcessModule();
+    pm->DeleteStreamObject(this->ServerFileListingID);
+    pm->SendStreamToServer();
+    }
+
   if (this->InteractorID.ID)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1688,9 +1697,21 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
 int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->RootScript("file readable {%s}", fileName);
-  const char* result = pm->GetRootResult();
-  if(result && strcmp("1", result) == 0)
+  if(!this->ServerFileListingID.ID)
+    {
+    this->ServerFileListingID = pm->NewStreamObject("vtkPVServerFileListing");
+    }
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->ServerFileListingID << "FileIsReadable"
+                  << fileName
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
+  int readable = 0;
+  if(!pm->GetLastServerResult().GetArgument(0, 0, readable))
+    {
+    vtkErrorMacro("Error checking whether file is readable on server.");
+    }
+  if(readable)
     {
     return VTK_OK;
     }
