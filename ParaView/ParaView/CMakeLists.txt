@@ -5,6 +5,12 @@ SET( ParaView_SRCS
   vtkColorByPart.cxx
   vtkCompleteArrays.cxx
   vtkCompositeProp.cxx
+  vtkCTHData.cxx
+  vtkCTHDataToPolyDataFilter.cxx
+  vtkCTHExtractAMRPart.cxx
+  vtkCTHFractal.cxx
+  vtkCTHOutlineFilter.cxx
+  vtkCTHSource.cxx
   vtkExtractCTHPart.cxx
   vtkGroup.cxx
   vtkKWBoundsDisplay.cxx
@@ -65,6 +71,7 @@ SET( ParaView_SRCS
   vtkPVFieldMenu.cxx
   vtkPVFileEntry.cxx
   vtkPVGenericRenderWindowInteractor.cxx
+  vtkPVGeometryFilter.cxx
   vtkPVGhostLevelDialog.cxx
   vtkPVGlyphFilter.cxx
   vtkPVGroupInputsWidget.cxx

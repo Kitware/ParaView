@@ -193,7 +193,32 @@
                  type="int" length="3" 
                  help="Determines the erosion neighborhood."/>
   </Module>
-
+  <Module name="CTHPartAMR" menu_name="Extract CTH Parts" root_name="CTHPartAMR" 
+          module_type="Filter"
+          long_help="Create a surface from a CTH volume fraction." 
+          short_help="Extract a part from a CTH dataset.">
+    <Filter class="vtkCTHExtractAMRPart">
+      <Input name="Input" class="vtkCTHData" > 
+        <ArrayRequirement attribute="Cell" components="1" /> 
+      </Input> 
+    </Filter>
+    <InputMenu id="im" label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <SelectCTHArrays input_menu="im" trace_name="ArraySelection" 
+               help="Select the volume fraction arrays for generating parts." />
+    <SelectWidget variable="Clipping">
+      <Item label="On" value="1">
+        <ImplicitPlaneWidget use_label="0" trace_name="Plane"
+              variable="ClipPlane" 
+              input_menu="im" 
+              help="Adjusts the parameters of the plane to clip with."/>
+      </Item>
+      <Item label="Off"  value="0">
+        <DummyWidget/>
+      </Item>
+    </SelectWidget>
+  </Module>
   <Module name="CTHPart" menu_name="Extract CTH Parts" root_name="CTHPart" 
           module_type="Filter"
           long_help="Create a surface from a CTH volume fraction." 
@@ -463,7 +488,13 @@ help="Set the name of the array to hold the results of this computation"/>
   <LabeledToggle label="Non-manifold" trace_name="NonManifoldTraversal" variable="NonManifoldTraversal" help="Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops."/>
   <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this off if you do not want to process ghost levels and do not mind seams."/>
 </Module>
-
+<Module name="CTHOutlineFilter" menu_name="Outline (CTH AMR)" root_name="CTHOutline" module_type="Filter">
+  <Filter class="vtkCTHOutlineFilter">
+    <Input name="Input" class="vtkCTHData" /> 
+  </Filter>
+  <InputMenu label="Input" help="Set the input to this filter."
+             input_name="Input" />
+</Module>
 <Module name="StructuredGridOutlineFilter" menu_name="Outline (curvilinear)" root_name="GOutline" module_type="Filter">
   <Filter class="vtkStructuredGridOutlineFilter">
     <Input name="Input" class="vtkStructuredGrid" /> 
