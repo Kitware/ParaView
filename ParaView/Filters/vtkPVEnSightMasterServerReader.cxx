@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.18");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.19");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -399,7 +399,22 @@ void vtkPVEnSightMasterServerReader::Execute()
         }
       }
     }
-  
+    
+  // The superclass thinks it is reading the whole data set.
+  // This subclass tells the output that it is only a piece.
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  for (i = 0; i < this->NumberOfOutputs; ++i)
+    {
+    if (this->Outputs[i])
+      {
+      // This gets transfered to the Piece/NumberOfPieces
+      // when 'DataHasBeenGenerated' is called.
+      this->Outputs[i]->SetUpdatePiece(piece);
+      this->Outputs[i]->SetUpdateNumberOfPieces(numProcs);
+      this->Outputs[i]->SetMaximumNumberOfPieces(-1);
+      }
+    }
+
   // Set the extent translator on the outputs.
   this->ExtentTranslator->SetProcessId(piece);
   for(i=0; i < this->Internal->NumberOfOutputs; ++i)
@@ -445,23 +460,6 @@ void vtkPVEnSightMasterServerReader::SuperclassExecuteData()
     const_cast<char*>(this->Internal->PieceFileNames[piece].c_str());
   this->Superclass::Execute();
   this->CaseFileName = temp;
-
-  // We should be able to run with more processes than ensight partitions.
-  int idx;
-  
-  // The superclass thinks it is reading the whole data set.
-  // This subclass tells the output that it is only a piece.
-  for (idx = 0; idx < this->NumberOfOutputs; ++idx)
-    {
-    if (this->Outputs[idx])
-      {
-      // This gets transfered to the Piece/NumberOfPieces
-      // when 'DataHasBeenGenerated' is called.
-      this->Outputs[idx]->SetUpdatePiece(piece);
-      this->Outputs[idx]->SetUpdateNumberOfPieces(this->NumberOfPieces);
-      this->Outputs[idx]->SetMaximumNumberOfPieces(-1);
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
