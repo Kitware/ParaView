@@ -226,6 +226,7 @@ protected:
   
   void PackWidget();
   void UpdateEntryResolution();
+  void RefreshValue();
 
   // Update the enable state. This should propagate similar calls to the
   // internal widgets.

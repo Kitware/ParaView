@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.59");
+vtkCxxRevisionMacro(vtkKWScale, "1.60");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -573,6 +573,8 @@ void vtkKWScale::DisplayPopupScaleCallback()
   this->Script("wm transient %s %s", 
                this->TopLevel->GetWidgetName(),
                this->GetWidgetName());
+
+  this->RefreshValue();
 }
 
 // ---------------------------------------------------------------------------
@@ -589,6 +591,8 @@ void vtkKWScale::WithdrawPopupScaleCallback()
 
   this->Script("wm withdraw %s",
                this->TopLevel->GetWidgetName());
+
+  this->RefreshValue();
 }
 
 // ---------------------------------------------------------------------------
@@ -647,6 +651,17 @@ void vtkKWScale::SetValue(float num)
   this->Value = num;
   this->Modified();
 
+  this->RefreshValue();
+
+  if (this->Command && !this->DisableCommands)
+    {
+    this->Script("eval %s", this->Command);
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWScale::RefreshValue()
+{
   if (this->Scale && this->Scale->IsCreated())
     {
     int was_disabled = !this->Scale->GetEnabled();
@@ -655,7 +670,7 @@ void vtkKWScale::SetValue(float num)
       this->Scale->SetEnabled(1);
       }
     this->Script("%s set %f", 
-                 this->Scale->GetWidgetName(), num);
+                 this->Scale->GetWidgetName(), this->Value);
     if (was_disabled)
       {
       this->Scale->SetEnabled(0);
@@ -665,11 +680,6 @@ void vtkKWScale::SetValue(float num)
   if (this->Entry && this->Entry->IsCreated())
     {
     this->Entry->SetValue(this->Value, this->EntryResolution);
-    }
-
-  if (this->Command && !this->DisableCommands)
-    {
-    this->Script("eval %s", this->Command);
     }
 }
 
