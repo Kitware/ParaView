@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.521");
+vtkCxxRevisionMacro(vtkPVWindow, "1.522");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3651,7 +3651,7 @@ int vtkPVWindow::SaveTrace(const char* filename)
 
   if (trace)
     {
-    trace->open(pvApp->GetTraceFileName(), ios::in | ios::app );
+    trace->open(pvApp->GetTraceFileName(), ios::out | ios::app );
     }
   
   newTrace.flush();
