@@ -63,6 +63,8 @@ int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWApplication::vtkKWApplication()
 {
+  this->CommandFunction = vtkKWApplicationCommand;
+  
   this->ApplicationName = new char[strlen("Kitware")+1];
   strcpy(this->ApplicationName, "Kitware" );
 
