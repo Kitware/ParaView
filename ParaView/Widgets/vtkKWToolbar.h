@@ -72,36 +72,36 @@ public:
   // Description:
   // Determines whether the toolbar is resizable. When you use Pack(),
   // do not provide options like -fill or -expand.
-  void SetResizable(int);
+  virtual void SetResizable(int);
   vtkGetMacro(Resizable, int);
   vtkBooleanMacro(Resizable, int);
 
   // Description:
   // Callbacks to ensure all widgets are visible (only
   // if the were added with AddWidget)
-  void ScheduleResize();
-  void Resize();
+  virtual void ScheduleResize();
+  virtual void Resize();
 
   // Description:
   // Update/refresh the widgets layout/aspect
-  void UpdateWidgets();
+  virtual void UpdateWidgets();
 
   // Description:
   // Update/refresh the toolbar layout/aspect (does not include the widgets)
-  void Update();
+  virtual void Update();
 
   // Description:
   // Pack the toolbar. Do not use Tk 'pack' since the toolbar has more
   // fancy things to do after packing.
-  void Pack(const char*);
-  void Pack() { this->Pack(""); };
+  virtual void Pack(const char*);
+  virtual void Pack() { this->Pack(""); };
 
   // Description:
   // Add a widget to the toolbar, insert a widget before 'location' (or at
   // beginning of list if 'location' is not found), remove widget.
-  void AddWidget(vtkKWWidget* widget);
-  void InsertWidget(vtkKWWidget* location, vtkKWWidget* widget);
-  void RemoveWidget(vtkKWWidget* widget);
+  virtual void AddWidget(vtkKWWidget* widget);
+  virtual void InsertWidget(vtkKWWidget* location, vtkKWWidget* widget);
+  virtual void RemoveWidget(vtkKWWidget* widget);
 
   // Description:
   // Convenience method to create and add a specific type of widget 
@@ -111,7 +111,8 @@ public:
                                    const char *variable_name,
                                    vtkKWObject *object, 
                                    const char *method, 
-                                   const char *help = 0);
+                                   const char *help = 0,
+                                   const char *extra = 0);
   
   // Description:
   // Returns the main frame of the toolbar. Put all the widgets
@@ -125,7 +126,7 @@ public:
 
   // Description:
   // Set/Get the flat aspect of the toolbar (flat or 3D GUI style)
-  void SetFlatAspect(int);
+  virtual void SetFlatAspect(int);
   vtkBooleanMacro(FlatAspect, int);
   vtkGetMacro(FlatAspect, int);
   static int GetGlobalFlatAspect();
@@ -137,7 +138,7 @@ public:
 
   // Description:
   // Set/Get the flat aspect of the widgets (flat or 3D GUI style)
-  void SetWidgetsFlatAspect(int);
+  virtual void SetWidgetsFlatAspect(int);
   vtkBooleanMacro(WidgetsFlatAspect, int);
   vtkGetMacro(WidgetsFlatAspect, int);
   static int GetGlobalWidgetsFlatAspect();
@@ -146,6 +147,14 @@ public:
     { vtkKWToolbar::SetGlobalWidgetsFlatAspect(1); };
   static void GlobalWidgetsFlatAspectOff() 
     { vtkKWToolbar::SetGlobalWidgetsFlatAspect(0); };
+
+  // Description:
+  // Set/Get the padding that will be applied around each widget when 
+  // WidgetsFlatAspect is On (default to 1 on Windows, 2 otherwise).
+  virtual void SetWidgetsFlatPadX(int);
+  vtkGetMacro(WidgetsFlatPadX, int);
+  virtual void SetWidgetsFlatPadY(int);
+  vtkGetMacro(WidgetsFlatPadY, int);
   
 protected:
   vtkKWToolbar();
@@ -164,6 +173,9 @@ protected:
 //BTX
   vtkVector<vtkKWWidget*>* Widgets;
 //ETX
+
+  int WidgetsFlatPadX;
+  int WidgetsFlatPadY;
 
   int FlatAspect;
   int WidgetsFlatAspect;

@@ -83,7 +83,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.26");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.27");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -112,6 +112,12 @@ vtkKWToolbar::vtkKWToolbar()
 
   this->DefaultOptionsWidget = vtkKWRadioButton::New();
   this->DefaultOptionsWidget->SetParent(this);
+
+#if defined(WIN32)
+  this->WidgetsFlatPadX = this->WidgetsFlatPadY = 1;
+#else
+  this->WidgetsFlatPadX = this->WidgetsFlatPadY = 2;
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -192,7 +198,8 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
                                                const char *variable_name, 
                                                vtkKWObject *object, 
                                                const char *method,
-                                               const char *help)
+                                               const char *help,
+                                               const char *extra)
 {
   if (!this->IsCreated())
     {
@@ -222,6 +229,10 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
   if (help)
     {
     rb->SetBalloonHelpString(help);
+    }
+  if (extra)
+    {
+    this->Script("%s configure %s", rb->GetWidgetName(), extra);
     }
 
   this->AddWidget(rb);
@@ -409,6 +420,10 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
       {
       this->Script("winfo reqwidth %s", widget->GetWidgetName());
       totReqWidth += this->GetIntegerResult(this->Application);
+      if (this->WidgetsFlatAspect)
+        {
+        totReqWidth += this->WidgetsFlatPadX;
+        }
       }
     it->GoToNextItem();
     }
@@ -431,7 +446,12 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
       if (it->GetData(widget) == VTK_OK)
         {
         s << "grid " << widget->GetWidgetName() << " -row " 
-          << row << " -column " << num << " -sticky news " << endl;
+          << row << " -column " << num << " -sticky news";
+        if (this->WidgetsFlatAspect)
+          {
+          s << " -padx " << this->WidgetsFlatPadX << " -pady " << this->WidgetsFlatPadY;
+          }
+        s << endl;
         num++;
         if ( num == numPerRow ) 
           { 
@@ -451,7 +471,7 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
 //----------------------------------------------------------------------------
 void vtkKWToolbar::UpdateWidgetsLayout()
 {
-  if (this->Widgets->GetNumberOfItems() <= 0)
+  if (!this->IsCreated() || this->Widgets->GetNumberOfItems() <= 0)
     {
     return;
     }
@@ -484,7 +504,13 @@ void vtkKWToolbar::UpdateWidgetsLayout()
     }
   it->Delete();
 
-  s << " -sticky news -row 0" << ends;
+  s << " -sticky news -row 0";
+  if (this->WidgetsFlatAspect)
+    {
+    s << " -padx " << this->WidgetsFlatPadX 
+      << " -pady " << this->WidgetsFlatPadY;
+    }
+  s << ends;
   this->Script(s.str());
   s.rdbuf()->freeze(0);
 }
@@ -493,6 +519,34 @@ void vtkKWToolbar::UpdateWidgetsLayout()
 void vtkKWToolbar::UpdateWidgets()
 {
   this->UpdateWidgetsAspect();
+  this->UpdateWidgetsLayout();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::SetWidgetsFlatPadX(int arg)
+{
+  if (arg == this->WidgetsFlatPadX)
+    {
+    return;
+    }
+
+  this->WidgetsFlatPadX = arg;
+  this->Modified();
+
+  this->UpdateWidgetsLayout();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::SetWidgetsFlatPadY(int arg)
+{
+  if (arg == this->WidgetsFlatPadX)
+    {
+    return;
+    }
+
+  this->WidgetsFlatPadY = arg;
+  this->Modified();
+
   this->UpdateWidgetsLayout();
 }
 
@@ -622,4 +676,6 @@ void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Resizable: " << (this->Resizable ? "On" : "Off") << endl;
   os << indent << "FlatAspect: " << (this->FlatAspect ? "On" : "Off") << endl;
   os << indent << "WidgetsFlatAspect: " << (this->WidgetsFlatAspect ? "On" : "Off") << endl;
+  os << indent << "WidgetsFlatPadX: " << this->WidgetsFlatPadX << endl;
+  os << indent << "WidgetsFlatPadY: " << this->WidgetsFlatPadY << endl;
 }
