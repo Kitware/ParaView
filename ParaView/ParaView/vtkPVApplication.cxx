@@ -422,8 +422,12 @@ void vtkPVApplication::Start(int argc, char*argv[])
 					  index) 
        == VTK_OK )
     {
-    this->BroadcastScript("vtkGraphicsFactory _graphics_fact\n_graphics_fact SetUseMesaClasses 1\n_graphics_fact Delete");
-    this->BroadcastScript("vtkImagingFactory _imaging_fact\n_imaging_fact SetUseMesaClasses 1\n_imaging_fact Delete");
+    this->BroadcastScript("vtkGraphicsFactory _graphics_fact\n"
+			  "_graphics_fact SetUseMesaClasses 1\n"
+			  "_graphics_fact Delete");
+    this->BroadcastScript("vtkImagingFactory _imaging_fact\n"
+			  "_imaging_fact SetUseMesaClasses 1\n"
+			  "_imaging_fact Delete");
     }
 
   vtkPVWindow *ui = vtkPVWindow::New();
