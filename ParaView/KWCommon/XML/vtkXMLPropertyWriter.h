@@ -50,16 +50,25 @@ class VTK_EXPORT vtkXMLPropertyWriter : public vtkXMLObjectWriter
 public:
   static vtkXMLPropertyWriter* New();
   vtkTypeRevisionMacro(vtkXMLPropertyWriter,vtkXMLObjectWriter);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Return the name of the root element of the XML tree this writer
   // is supposed to write.
   virtual char* GetRootElementName();
 
+  // Description:
+  // Output part of the object selectively
+  vtkBooleanMacro(OutputShadingOnly, int);
+  vtkGetMacro(OutputShadingOnly, int);
+  vtkSetMacro(OutputShadingOnly, int);
+
 protected:
-  vtkXMLPropertyWriter() {};
+  vtkXMLPropertyWriter();
   ~vtkXMLPropertyWriter() {};  
   
+  int OutputShadingOnly;
+
   // Description:
   // Add the root element attributes.
   // Return 1 on success, 0 otherwise.

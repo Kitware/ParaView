@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLPiecewiseFunctionWriter.h"
 
 vtkStandardNewMacro(vtkXMLVolumePropertyWriter);
-vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.6");
+vtkCxxRevisionMacro(vtkXMLVolumePropertyWriter, "1.7");
 
 //----------------------------------------------------------------------------
 char* vtkXMLVolumePropertyWriter::GetRootElementName()
@@ -83,6 +83,12 @@ char* vtkXMLVolumePropertyWriter::GetGradientOpacityElementName()
 }
 
 //----------------------------------------------------------------------------
+vtkXMLVolumePropertyWriter::vtkXMLVolumePropertyWriter()
+{
+  this->OutputShadingOnly = 0;
+}
+
+//----------------------------------------------------------------------------
 int vtkXMLVolumePropertyWriter::AddAttributes(vtkXMLDataElement *elem)
 {
   if (!this->Superclass::AddAttributes(elem))
@@ -95,6 +101,11 @@ int vtkXMLVolumePropertyWriter::AddAttributes(vtkXMLDataElement *elem)
     {
     vtkWarningMacro(<< "The VolumeProperty is not set!");
     return 0;
+    }
+
+  if (this->OutputShadingOnly)
+    {
+    return 1;
     }
 
   elem->SetIntAttribute(
@@ -137,16 +148,27 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
     elem->AddNestedElement(comp_elem);
     comp_elem->Delete();
     comp_elem->SetName(this->GetComponentElementName());
+
     comp_elem->SetIntAttribute("Index", c_idx);
-    comp_elem->SetIntAttribute("ColorChannels", obj->GetColorChannels(c_idx));
+
     comp_elem->SetIntAttribute("Shade", obj->GetShade(c_idx));
     comp_elem->SetFloatAttribute("Ambient", obj->GetAmbient(c_idx));
     comp_elem->SetFloatAttribute("Diffuse", obj->GetDiffuse(c_idx));
     comp_elem->SetFloatAttribute("Specular", obj->GetSpecular(c_idx));
     comp_elem->SetFloatAttribute(
       "SpecularPower", obj->GetSpecularPower(c_idx));
+
+    if (this->OutputShadingOnly)
+      {
+      continue;
+      }
+
+    comp_elem->SetIntAttribute(
+      "ColorChannels", obj->GetColorChannels(c_idx));
+
     comp_elem->SetIntAttribute(
       "DisableGradientOpacity", obj->GetDisableGradientOpacity(c_idx));
+
     comp_elem->SetFloatAttribute(
       "ComponentWeight", obj->GetComponentWeight(c_idx));
     
@@ -200,4 +222,11 @@ int vtkXMLVolumePropertyWriter::AddNestedElements(vtkXMLDataElement *elem)
   return 1;
 }
 
+//----------------------------------------------------------------------------
+void vtkXMLVolumePropertyWriter::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 
+  os << indent << "OutputShadingOnly: "
+     << (this->OutputShadingOnly ? "On" : "Off") << endl;
+}

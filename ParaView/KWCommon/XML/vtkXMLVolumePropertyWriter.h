@@ -50,6 +50,7 @@ class VTK_EXPORT vtkXMLVolumePropertyWriter : public vtkXMLObjectWriter
 public:
   static vtkXMLVolumePropertyWriter* New();
   vtkTypeRevisionMacro(vtkXMLVolumePropertyWriter,vtkXMLObjectWriter);
+  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Return the name of the root element of the XML tree this writer
@@ -65,10 +66,18 @@ public:
   static char* GetScalarOpacityElementName();
   static char* GetGradientOpacityElementName();
 
+  // Description:
+  // Output part of the object selectively
+  vtkBooleanMacro(OutputShadingOnly, int);
+  vtkGetMacro(OutputShadingOnly, int);
+  vtkSetMacro(OutputShadingOnly, int);
+
 protected:
-  vtkXMLVolumePropertyWriter() {};
+  vtkXMLVolumePropertyWriter();
   ~vtkXMLVolumePropertyWriter() {};  
   
+  int OutputShadingOnly;
+
   // Description:
   // Add the root element attributes.
   // Return 1 on success, 0 otherwise.

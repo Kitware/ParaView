@@ -40,12 +40,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLPropertyWriter);
-vtkCxxRevisionMacro(vtkXMLPropertyWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLPropertyWriter, "1.3");
 
 //----------------------------------------------------------------------------
 char* vtkXMLPropertyWriter::GetRootElementName()
 {
   return "Property";
+}
+
+//----------------------------------------------------------------------------
+vtkXMLPropertyWriter::vtkXMLPropertyWriter()
+{
+  this->OutputShadingOnly = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -63,12 +69,6 @@ int vtkXMLPropertyWriter::AddAttributes(vtkXMLDataElement *elem)
     return 0;
     }
 
-  elem->SetIntAttribute("Interpolation", obj->GetInterpolation());
-
-  elem->SetIntAttribute("Representation", obj->GetRepresentation());
-
-  elem->SetVectorAttribute("Color", 3, obj->GetColor());
-
   elem->SetFloatAttribute("Ambient", obj->GetAmbient());
 
   elem->SetFloatAttribute("Diffuse", obj->GetDiffuse());
@@ -77,13 +77,24 @@ int vtkXMLPropertyWriter::AddAttributes(vtkXMLDataElement *elem)
 
   elem->SetFloatAttribute("SpecularPower", obj->GetSpecularPower());
 
-  elem->SetFloatAttribute("Opacity", obj->GetOpacity());
+  if (this->OutputShadingOnly)
+    {
+    return 1;
+    }
+
+  elem->SetIntAttribute("Interpolation", obj->GetInterpolation());
+
+  elem->SetIntAttribute("Representation", obj->GetRepresentation());
+
+  elem->SetVectorAttribute("Color", 3, obj->GetColor());
 
   elem->SetVectorAttribute("AmbientColor", 3, obj->GetAmbientColor());
 
   elem->SetVectorAttribute("DiffuseColor", 3, obj->GetDiffuseColor());
 
   elem->SetVectorAttribute("SpecularColor", 3, obj->GetSpecularColor());
+
+  elem->SetFloatAttribute("Opacity", obj->GetOpacity());
 
   elem->SetIntAttribute("EdgeVisibility", obj->GetEdgeVisibility());
 
@@ -105,4 +116,11 @@ int vtkXMLPropertyWriter::AddAttributes(vtkXMLDataElement *elem)
   return 1;
 }
 
+//----------------------------------------------------------------------------
+void vtkXMLPropertyWriter::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 
+  os << indent << "OutputShadingOnly: "
+     << (this->OutputShadingOnly ? "On" : "Off") << endl;
+}
