@@ -138,11 +138,6 @@ vtkPVSource::~vtkPVSource()
   this->SetVTKSource(NULL, NULL);
 
   this->SetName(NULL);
-  this->Properties->Delete();
-  this->Properties = NULL;
-
-  this->ParameterFrame->Delete();
-  this->ParameterFrame = NULL;
 
   this->Widgets->Delete();
   this->Widgets = NULL;
@@ -156,27 +151,33 @@ vtkPVSource::~vtkPVSource()
   this->DeleteButton->Delete();
   this->DeleteButton = NULL;
   
-  this->InputMenuFrame->Delete();
-  this->InputMenuFrame = NULL;
-
   this->InputMenuLabel->Delete();
   this->InputMenuLabel = NULL;
   
   this->InputMenu->Delete();
   this->InputMenu = NULL;
   
-  this->ScalarOperationFrame->Delete();
-  this->ScalarOperationFrame = NULL;
-  
+  this->InputMenuFrame->Delete();
+  this->InputMenuFrame = NULL;
+
   this->ScalarOperationLabel->Delete();
   this->ScalarOperationLabel = NULL;
 
   this->ScalarOperationMenu->Delete();
   this->ScalarOperationMenu = NULL;
   
+  this->ScalarOperationFrame->Delete();
+  this->ScalarOperationFrame = NULL;
+  
   this->DisplayNameLabel->Delete();
   this->DisplayNameLabel = NULL;
   
+  this->ParameterFrame->Delete();
+  this->ParameterFrame = NULL;
+
+  this->Properties->Delete();
+  this->Properties = NULL;
+
   if (this->ChangeScalarsFilterTclName)
     {
     this->GetPVApplication()->BroadcastScript("%s Delete", 
@@ -517,6 +518,11 @@ void vtkPVSource::UpdateScalars()
 {
   char *newScalars = this->ScalarOperationMenu->GetValue();
   vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (strcmp(newScalars, "") == 0)
+    {
+    return;
+    }
   
   if (this->DefaultScalarsName)
     {
