@@ -1,3 +1,4 @@
+Application ExitOnReturnOn
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
@@ -149,6 +150,8 @@ for {set i 55} {$i < 56} {incr i 1} {
     RenWin1 Render
     update
 }
+
+$pvWindow SaveSessionFile "vtkParaViewTestingCombustorTest.session"
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
