@@ -92,6 +92,11 @@ public:
   virtual void SetEnabled(int);
 
   // Description:
+  // Iterate over all panels and call Update() for each one. This will refresh
+  // the panels (provided that Update() has been reimplemented).
+  virtual void Update();
+
+  // Description:
   // Add a panel to the manager.
   // Note that you most probably do not need to call this method, since setting
   // a panel's UserInterfaceManager ivar will add the panel automatically 
