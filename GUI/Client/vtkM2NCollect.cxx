@@ -33,7 +33,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkM2NCollect, "1.8");
+vtkCxxRevisionMacro(vtkM2NCollect, "1.9");
 vtkStandardNewMacro(vtkM2NCollect);
 
 vtkCxxSetObjectMacro(vtkM2NCollect,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
@@ -295,5 +295,9 @@ void vtkM2NCollect::ExchangeData(int inSize, char* inBuf, int outSize, char* out
 void vtkM2NCollect::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "RenderServerMode: " << this->RenderServerMode << "\n";
+  os << indent << "ClientMode: " << this->ClientMode << "\n";
+  os << indent << "ServerMode: " << this->ServerMode << "\n";
+  
 }
 
