@@ -38,7 +38,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0"
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -58,7 +59,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -89,7 +91,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -109,7 +112,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -140,7 +144,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -160,7 +165,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -191,7 +197,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -211,7 +218,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -242,7 +250,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -262,7 +271,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -293,7 +303,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -306,13 +317,15 @@
         information_only="1">
         <ArraySelectionInformationHelper attribute_name="Point"/>
      </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -344,7 +357,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -364,7 +378,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -395,7 +410,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -415,7 +431,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -446,7 +463,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -466,7 +484,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -497,7 +516,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -517,7 +537,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -589,7 +610,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0"
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -609,7 +631,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -639,7 +662,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -901,7 +925,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -921,7 +946,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -1043,7 +1069,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0"
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -1063,7 +1090,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -1225,7 +1253,8 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -1245,7 +1274,8 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -1271,7 +1301,8 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="BlockArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="BlockArrayInfo" function="ArrayList"/>
@@ -1291,7 +1322,8 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="MaterialArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="MaterialArrayInfo" function="ArrayList"/>
@@ -1311,7 +1343,8 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="HierarchyArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="HierarchyArrayInfo" function="ArrayList"/>
@@ -1390,7 +1423,8 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="VariableArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="VariableArrayInfo" function="ArrayList"/>
@@ -1410,7 +1444,8 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="BlockArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="BlockArrayInfo" function="ArrayList"/>
@@ -1459,7 +1494,8 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -1479,7 +1515,8 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
