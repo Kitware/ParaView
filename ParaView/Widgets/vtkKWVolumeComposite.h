@@ -132,11 +132,6 @@ public:
   void RegisterIntermixIntersectingGeometry();
   void DeregisterIntermixIntersectingGeometry();
 
-  // Description:
-  // Use or stop using cursor.
-  void UseCursor();
-  void StopUsingCursor();
-  
 protected:
   vtkKWVolumeComposite();
   ~vtkKWVolumeComposite();
@@ -178,8 +173,6 @@ protected:
   int                                  CanDoHardwareCursor;
 
   int                                  UseIntermixIntersectingGeometry;
-
-  int                                  Use3DCursor;
 
 private:
   vtkKWVolumeComposite(const vtkKWVolumeComposite&); // Not implemented

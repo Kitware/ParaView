@@ -68,7 +68,6 @@ int vtkKWVolumeCompositeCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWVolumeComposite::vtkKWVolumeComposite()
 {
-  this->Use3DCursor = 0;
   vtkFiniteDifferenceGradientEstimator *gradientEstimator;
   vtkRecursiveSphereDirectionEncoder   *directionEncoder;
 
@@ -514,7 +513,7 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.34 $");
+  this->ExtractRevision(os,"$Revision: 1.35 $");
 }
 
 vtkProp *vtkKWVolumeComposite::GetProp() 
@@ -554,24 +553,6 @@ void vtkKWVolumeComposite::DeregisterIntermixIntersectingGeometry()
       {
       this->VolumeProMapper->IntermixIntersectingGeometryOff();
       }
-    }
-}
-
-void vtkKWVolumeComposite::UseCursor()
-{
-  if ( !this->Use3DCursor )
-    {
-    this->RegisterIntermixIntersectingGeometry();
-    this->Use3DCursor = 1;
-    }
-}
-
-void vtkKWVolumeComposite::StopUsingCursor()
-{
-  if ( this->Use3DCursor )
-    {    
-    this->DeregisterIntermixIntersectingGeometry();
-    this->Use3DCursor = 0;
     }
 }
 
