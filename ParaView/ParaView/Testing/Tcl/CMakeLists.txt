@@ -42,6 +42,10 @@ CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ImageReader.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ImageReader.tcl)
 
+CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl)
+
 ADD_TEST(BlowTest ${PARAVIEW_EXECUTABLE}
                   ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/BlowTest.tcl)
 
@@ -74,3 +78,6 @@ ADD_TEST(EnSight ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(ImageReader ${PARAVIEW_EXECUTABLE}
                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ImageReader.tcl)
+
+ADD_TEST(ConeCubeCylSQ ${PARAVIEW_EXECUTABLE}
+                 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl)
