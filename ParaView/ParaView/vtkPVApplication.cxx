@@ -124,7 +124,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.233");
+vtkCxxRevisionMacro(vtkPVApplication, "1.234");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -144,6 +144,9 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkpvfilterstcl_Init(Tcl_Interp *interp);
+#if defined(PARAVIEW_BUILD_DEVELOPMENT) && defined(PARAVIEW_BLT_LIBRARY)
+extern "C" int Blt_Init(Tcl_Interp *interp);
+#endif
 
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
 extern "C" int Vtkpvdevelopmenttcl_Init(Tcl_Interp *interp);
@@ -310,6 +313,9 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
   if (vtkKWApplication::GetWidgetVisibility())
     {
     Vtktkrenderwidget_Init(interp);
+#if defined(PARAVIEW_BUILD_DEVELOPMENT) && defined(PARAVIEW_BLT_LIBRARY)
+    Blt_Init(interp);
+#endif
     }
    
   Vtkkwparaviewtcl_Init(interp);
