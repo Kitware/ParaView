@@ -116,7 +116,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.367");
+vtkCxxRevisionMacro(vtkPVWindow, "1.368");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3027,7 +3027,7 @@ void vtkPVWindow::EnableToolbarButtons()
     const char* key = 0;
     if (it->GetData(button) == VTK_OK && button && it->GetKey(key) && key)
       {
-      vtkPVSource* proto;
+      vtkPVSource* proto = 0;
       if ( this->Prototypes->GetItem(key, proto) == VTK_OK && proto)
         {
         if ( proto->GetIsValidInput(this->CurrentPVData) )
@@ -3611,7 +3611,7 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
   while(!it->IsDoneWithTraversal())
     {
     vtkPVReaderModule* rm = 0;
-    int retVal = it->GetData(rm);
+    it->GetData(rm);
     if ( rm == prototype )
       {
       found = 1;
@@ -3740,7 +3740,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.367 $");
+  this->ExtractRevision(os,"$Revision: 1.368 $");
 }
 
 //----------------------------------------------------------------------------

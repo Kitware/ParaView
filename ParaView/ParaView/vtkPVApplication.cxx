@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.142");
+vtkCxxRevisionMacro(vtkPVApplication, "1.143");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -898,11 +898,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
 }
 
 
+#ifdef VTK_USE_MPI
 //----------------------------------------------------------------------------
 vtkMultiProcessController *vtkPVApplication::NewController(int minId, int maxId)
 {
-#ifdef VTK_USE_MPI
-
   vtkMPICommunicator* localComm = vtkMPICommunicator::New();
   vtkMPIGroup* localGroup= vtkMPIGroup::New();
   vtkMPIController* localController = vtkMPIController::New();
@@ -922,12 +921,14 @@ vtkMultiProcessController *vtkPVApplication::NewController(int minId, int maxId)
   localComm->UnRegister(0);
 
   return localController;
-
-#else
-  return NULL;
-#endif
-
 }
+#else
+//----------------------------------------------------------------------------
+vtkMultiProcessController *vtkPVApplication::NewController(int minId, int maxId)
+{
+  return NULL;
+}
+#endif
 
 
 //----------------------------------------------------------------------------
@@ -1398,7 +1399,7 @@ vtkObject *vtkPVApplication::TclToVTKObject(const char *tclName)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::DisplayAbout(vtkKWWindow *master)
+void vtkPVApplication::DisplayAbout(vtkKWWindow* vtkNotUsed(master))
 {
 //    ostrstream str;
 //    str << this->GetApplicationName() << " was developed by Kitware Inc." << endl

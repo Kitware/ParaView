@@ -97,7 +97,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.83");
+vtkCxxRevisionMacro(vtkKWView, "1.84");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -859,7 +859,7 @@ void vtkKWView::Print(HDC ghdc, HDC adc)
               0.0, 0.0, 1.0, 1.0);
 }
 
-void vtkKWView::Print(HDC ghdc, HDC adc,
+void vtkKWView::Print(HDC ghdc, HDC,
                       int printerPageSizeX, int printerPageSizeY,
                       int printerDPIX, int printerDPIY,
                       float minX, float minY, float scaleX, float scaleY)
@@ -1471,7 +1471,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.83 $");
+  this->ExtractRevision(os,"$Revision: 1.84 $");
 }
 
 //----------------------------------------------------------------------------

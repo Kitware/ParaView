@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.5");
+vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.6");
 vtkStandardNewMacro(vtkPVTrackballRotate);
 
 //-------------------------------------------------------------------------
@@ -69,7 +69,7 @@ vtkPVTrackballRotate::~vtkPVTrackballRotate()
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballRotate::OnButtonDown(int x, int y, vtkRenderer *ren,
-                                        vtkRenderWindowInteractor* rwi)
+                                        vtkRenderWindowInteractor*)
 {
   this->LastX = x;
   this->LastY = y;
@@ -79,13 +79,11 @@ void vtkPVTrackballRotate::OnButtonDown(int x, int y, vtkRenderer *ren,
 
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRotate::OnButtonUp(int x, int y, vtkRenderer *ren,
-                                    vtkRenderWindowInteractor *rwi)
+void vtkPVTrackballRotate::OnButtonUp(int x, int y, vtkRenderer *,
+                                    vtkRenderWindowInteractor *)
 {
   this->LastX = x;
   this->LastY = y;
-
-  rwi->Render();
 }
 
 //-------------------------------------------------------------------------

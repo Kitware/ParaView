@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.9");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.10");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -106,7 +106,7 @@ void vtkPVJoystickFly::OnButtonDown(int x, int y, vtkRenderer *ren,
 
 
 //-------------------------------------------------------------------------
-void vtkPVJoystickFly::OnButtonUp(int, int, vtkRenderer* ren,
+void vtkPVJoystickFly::OnButtonUp(int, int, vtkRenderer*,
                                   vtkRenderWindowInteractor* rwi)
 {
   this->FlyFlag = 0;

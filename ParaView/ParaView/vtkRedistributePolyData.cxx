@@ -95,7 +95,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.11");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.12");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -1456,7 +1456,7 @@ void vtkRedistributePolyData::SendCellSizes
   vtkIdType cellId,i;
   vtkIdType numCells; 
 
-  int myId = this->Controller->GetLocalProcessId();
+  //int myId = this->Controller->GetLocalProcessId();
 
   // ... Allocate maximum possible number of points (use total from
   //     all of input) ...
@@ -1586,7 +1586,7 @@ void vtkRedistributePolyData::SendCells
 
   vtkIdType cellId,i;
 
-  int myId = this->Controller->GetLocalProcessId();
+  //int myId = this->Controller->GetLocalProcessId();
 
   // ... Allocate maximum possible number of points (use total from
   //     all of input) ...
@@ -2166,7 +2166,7 @@ void vtkRedistributePolyData::FindMemReq
 //*****************************************************************
 // Copy the attribute data from one id to another. Make sure CopyAllocate() has// been invoked before using this method.
 void vtkRedistributePolyData::SendDataArrays
-(vtkDataSetAttributes* fromPd, vtkDataSetAttributes* toPd,
+(vtkDataSetAttributes* fromPd, vtkDataSetAttributes* vtkNotUsed(toPd),
  vtkIdType numToCopy, int sendTo, vtkIdType* fromId, 
  int typetag)
 {
@@ -2190,7 +2190,7 @@ void vtkRedistributePolyData::SendDataArrays
 // CopyAllocate() has// been invoked before using this method.
 
 void vtkRedistributePolyData::SendCellBlockDataArrays
-(vtkDataSetAttributes* fromPd, vtkDataSetAttributes* toPd,
+(vtkDataSetAttributes* fromPd, vtkDataSetAttributes* vtkNotUsed(toPd),
  vtkIdType numToCopy, int sendTo, 
  vtkIdType startCell, int typetag )
 //*******************************************************************

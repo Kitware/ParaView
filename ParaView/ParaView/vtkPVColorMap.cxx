@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.18");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.19");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -404,7 +404,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::DisplayPopupMenu(int x, int y)
 {
-  vtkKWApplication *app = this->Application;
+  //vtkKWApplication *app = this->Application;
 
   this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
 }
@@ -966,7 +966,9 @@ void vtkPVColorMap::ColorRangeEntryCallback()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::RGBToHSV(float rgb[3], float hsv[3])
 {
-  float hue, sat, val;
+  float hue = 0;
+  float sat = 0;
+  float val = 0;
   float lx, ly, lz;
 
   if (rgb[0] <= 0.0 && rgb[1] <= 0.0 && rgb[2] <= 0.0)

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.2");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.3");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -65,7 +65,7 @@ vtkPVTrackballMoveActor::~vtkPVTrackballMoveActor()
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballMoveActor::OnButtonDown(int x, int y, vtkRenderer *,
-                                     vtkRenderWindowInteractor *rwi)
+                                           vtkRenderWindowInteractor *)
 {
   this->LastX = x;
   this->LastY = y;
@@ -74,17 +74,15 @@ void vtkPVTrackballMoveActor::OnButtonDown(int x, int y, vtkRenderer *,
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballMoveActor::OnButtonUp(int x, int y, vtkRenderer *,
-                                    vtkRenderWindowInteractor *rwi)
+                                         vtkRenderWindowInteractor *)
 {
   this->LastX = x;
   this->LastY = y;
-
-  rwi->Render();
 }
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
-                                     vtkRenderWindowInteractor *rwi)
+                                          vtkRenderWindowInteractor *rwi)
 {
   if (ren == NULL)
     {

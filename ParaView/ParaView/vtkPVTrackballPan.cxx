@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballPan, "1.2");
+vtkCxxRevisionMacro(vtkPVTrackballPan, "1.3");
 vtkStandardNewMacro(vtkPVTrackballPan);
 
 //-------------------------------------------------------------------------
@@ -63,7 +63,7 @@ vtkPVTrackballPan::~vtkPVTrackballPan()
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballPan::OnButtonDown(int x, int y, vtkRenderer *,
-                                     vtkRenderWindowInteractor *rwi)
+                                     vtkRenderWindowInteractor *)
 {
   this->LastX = x;
   this->LastY = y;
@@ -72,12 +72,10 @@ void vtkPVTrackballPan::OnButtonDown(int x, int y, vtkRenderer *,
 
 //-------------------------------------------------------------------------
 void vtkPVTrackballPan::OnButtonUp(int x, int y, vtkRenderer *,
-                                    vtkRenderWindowInteractor *rwi)
+                                    vtkRenderWindowInteractor *)
 {
   this->LastX = x;
   this->LastY = y;
-
-  rwi->Render();
 }
 
 //-------------------------------------------------------------------------
