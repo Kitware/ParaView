@@ -20,7 +20,7 @@
 #include "vtkPVDataSetAttributesInformation.h"
 
 vtkStandardNewMacro(vtkPVVolumePropertyWidget);
-vtkCxxRevisionMacro(vtkPVVolumePropertyWidget, "1.1");
+vtkCxxRevisionMacro(vtkPVVolumePropertyWidget, "1.2");
 
 vtkCxxSetObjectMacro(vtkPVVolumePropertyWidget, DataInformation,
                      vtkPVDataInformation);
@@ -42,6 +42,16 @@ vtkPVVolumePropertyWidget::~vtkPVVolumePropertyWidget()
 void vtkPVVolumePropertyWidget::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "DataInformation: ";
+  if( this->DataInformation )
+    {
+    this->DataInformation->PrintSelf( os << endl, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
 
 
