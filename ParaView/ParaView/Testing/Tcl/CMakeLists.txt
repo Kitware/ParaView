@@ -16,7 +16,7 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                CalcInput
                Calculator
                ClipCut
-	       ColorMap
+               ColorMap
                CombustorTest
 #               Composite
                ConeCubeCylSQ
@@ -28,10 +28,10 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                EnSight
                Extrusion
                ExtractGrid
-	       ExtractPart
+               ExtractPart
                Glyph
-	       Group
-         Transform
+               Group
+               Transform
                ImageReader
                Mandelbrot
                ProbeLine
@@ -42,7 +42,7 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                ScalarsSphereClip
                SphereTest
                TestDemo
-	       TestPackage
+               TestPackage
                Threshold
                ThresholdAttrMode
                Trace
@@ -51,32 +51,39 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                TestPolyDataIO
                TestUnstructuredGridIO
                TestRectilinearGridIO
-	       TestImageDataIO
+               TestImageDataIO
                VolumeGroup    )
 
+IF (NOT PARAVIEW_MPI_PREFLAGS)
+  SET (PARAVIEW_MPI_PREFLAGS ${VTK_MPI_PREFLAGS})
+ENDIF (NOT PARAVIEW_MPI_PREFLAGS)
+
+IF (NOT PARAVIEW_MPI_POSTFLAGS)
+  SET (PARAVIEW_MPI_POSTFLAGS ${VTK_MPI_POSTFLAGS})
+ENDIF (NOT PARAVIEW_MPI_POSTFLAGS)
 
 IF(RUN_WITH_MPI)
   FOREACH (tfile ${PROJECT_TESTS})
-    ADD_TEST(${tfile}-MPI ${VTK_MPIRUN_EXE} ${VTK_MPI_PREFLAGS} 
+    ADD_TEST(${tfile}-MPI ${VTK_MPIRUN_EXE} ${PARAVIEW_MPI_PREFLAGS} 
       ${PARAVIEW_EXECUTABLE} --disable-registry
       ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
       -D ${PARAVIEW_SOURCE_DIR}/Data 
       -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
       -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
-      ${VTK_MPI_POSTFLAGS})
-    IF (PV_TEST_COMPOSITING)
-      ADD_TEST(${tfile}-COMPOSITE-MPI ${VTK_MPIRUN_EXE} ${VTK_MPI_PREFLAGS} 
+      ${PARAVIEW_MPI_POSTFLAGS})
+    IF (PARAVIEW_TEST_COMPOSITING)
+      ADD_TEST(${tfile}-COMPOSITE-MPI ${VTK_MPIRUN_EXE} ${PARAVIEW_MPI_PREFLAGS} 
         ${PARAVIEW_EXECUTABLE} --disable-registry
         ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
         -UC
         -D ${PARAVIEW_SOURCE_DIR}/Data 
         -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
         -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
-        ${VTK_MPI_POSTFLAGS})
-    ENDIF (PV_TEST_COMPOSITING)
+        ${PARAVIEW_MPI_POSTFLAGS})
+    ENDIF (PARAVIEW_TEST_COMPOSITING)
   ENDFOREACH(tfile)
-
 ENDIF(RUN_WITH_MPI)
+
 FOREACH (tfile ${PROJECT_TESTS})
   ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE} --disable-registry
     ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
