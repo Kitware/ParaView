@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.118");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.119");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1424,7 +1424,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
                     << "SetWriter"
                     << pvAnimWriterID
                     << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+    pm->GetStream() << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
                     << "GetController"
                     << vtkClientServerStream::End;
     pm->GetStream() << vtkClientServerStream::Invoke << pvAnimHelperID
