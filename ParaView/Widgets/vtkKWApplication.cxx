@@ -75,7 +75,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.112");
+vtkCxxRevisionMacro(vtkKWApplication, "1.113");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1001,7 +1001,7 @@ int vtkKWApplication::GetRegisteryValue(int level, const char* subkey,
     {
     return 0;
     }
-  char buffer[100];
+  char buffer[1024];
   sprintf(buffer, "%s\\%s", 
           this->GetApplicationVersionName(),
           subkey);
