@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.12");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.13");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -194,12 +194,12 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
          << this->ShowMostRecentPanelsCheckButton->GetWidgetName() << endl;
 
   // --------------------------------------------------------------
-  // Interface settings : Drag & Drop
+  // Interface customization
 
   // Not really supported by ParaView... (only in App Settings notebook)
 
   tk_cmd << "pack forget " 
-         << this->DragAndDropFrame->GetWidgetName() << endl;
+         << this->InterfaceCustomizationFrame->GetWidgetName() << endl;
 
   // --------------------------------------------------------------
   // Pack 
