@@ -21,7 +21,7 @@
 #include "vtkCompositeDataVisitor.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkCompositeDataSet, "1.1");
+vtkCxxRevisionMacro(vtkCompositeDataSet, "1.2");
 
 //----------------------------------------------------------------------------
 vtkCompositeDataSet::vtkCompositeDataSet()
@@ -67,6 +67,7 @@ double* vtkCompositeDataSet::GetBounds()
 // Compute the data bounding box from data points.
 void vtkCompositeDataSet::ComputeBounds()
 {
+  int fixme; // should work recursively 
   int j;
 
   if ( this->GetMTime() > this->ComputeBoundsTime )
@@ -110,6 +111,8 @@ void vtkCompositeDataSet::ComputeBounds()
 //----------------------------------------------------------------------------
 void vtkCompositeDataSet::ComputeNumberOfPoints()
 {
+  int fixme; // should work recursively 
+
   if ( this->GetMTime() > this->ComputeNPtsTime )
     {
     this->NumberOfPoints = 0;
@@ -138,6 +141,8 @@ void vtkCompositeDataSet::ComputeNumberOfPoints()
 //----------------------------------------------------------------------------
 void vtkCompositeDataSet::ComputeNumberOfCells()
 {
+  int fixme; // should work recursively 
+
   if ( this->GetMTime() > this->ComputeNCellsTime )
     {
     this->NumberOfPoints = 0;
