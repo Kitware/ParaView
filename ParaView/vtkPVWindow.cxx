@@ -1017,6 +1017,7 @@ void vtkPVWindow::GlyphCallback()
   this->GetMainView()->AddComposite(glyph);
   glyph->CreateProperties();
   glyph->PackScalarsMenu();
+  glyph->PackVectorsMenu();
   glyph->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(glyph);
 
@@ -3418,6 +3419,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->DefaultScalarsOn();
   sInt->SetInputClassName("vtkPointSet");
   sInt->SetOutputClassName("vtkPointSet");
+  sInt->DefaultScalarsOn();
   // Method
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("ScaleFactor");
@@ -3473,6 +3475,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetRootName("WarpV");
   sInt->SetInputClassName("vtkPointSet");
   sInt->SetOutputClassName("vtkPointSet");
+  sInt->DefaultVectorsOn();
   // Method
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("ScaleFactor");

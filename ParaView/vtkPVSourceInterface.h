@@ -71,7 +71,13 @@ public:
   vtkBooleanMacro(DefaultScalars, int);
   vtkGetMacro(DefaultScalars, int);
   vtkSetMacro(DefaultScalars, int);
-  
+
+  // Description:
+  // Does this filter operate on vectors?
+  vtkBooleanMacro(DefaultVectors, int);
+  vtkGetMacro(DefaultVectors, int);
+  vtkSetMacro(DefaultVectors, int);
+
   // Description:
   // Access to the method interfaces.
   void AddMethodInterface(vtkPVMethodInterface *methonInt);
@@ -110,6 +116,7 @@ protected:
   char *DataFileName;
   
   int DefaultScalars;
+  int DefaultVectors;
   
   vtkCollection *MethodInterfaces;
   

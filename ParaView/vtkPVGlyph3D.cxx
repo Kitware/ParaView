@@ -369,7 +369,7 @@ void vtkPVGlyph3D::Save(ofstream *file)
   char *charFound;
   int pos;
   
-  if (this->DefaultScalarsName)
+  if (this->ChangeScalarsFilterTclName)
     {
     *file << "vtkFieldDataToAttributeDataFilter "
           << this->ChangeScalarsFilterTclName << "\n\t"
@@ -406,8 +406,21 @@ void vtkPVGlyph3D::Save(ofstream *file)
           << " SetInputFieldToPointDataField\n";
     *file << this->ChangeScalarsFilterTclName
           << " SetOutputAttributeDataToPointData\n";
-    *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
-          << this->DefaultScalarsName << " 0\n\n";
+    if (this->DefaultScalarsName)
+      {
+      *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
+            << this->DefaultScalarsName << " 0\n";
+      }
+    else if (this->DefaultVectorsName)
+      {
+      *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
+            << this->DefaultScalarsName << " 0\n";
+      *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 1 "
+            << this->DefaultScalarsName << " 1\n";
+      *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 2 "
+            << this->DefaultScalarsName << " 2\n";
+      }
+    *file << "\n";
     }
 
   *file << this->VTKSource->GetClassName() << " "
@@ -415,7 +428,7 @@ void vtkPVGlyph3D::Save(ofstream *file)
   
   *file << "\t" << this->VTKSourceTclName << " SetInput [";
 
-  if (!this->DefaultScalarsName)
+  if (!this->ChangeScalarsFilterTclName)
     {
     if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
                 "EnSight", 7) == 0)

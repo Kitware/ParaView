@@ -80,10 +80,14 @@ vtkPVSource::vtkPVSource()
   this->ScalarOperationFrame = vtkKWWidget::New();
   this->ScalarOperationLabel = vtkKWLabel::New();
   this->ScalarOperationMenu = vtkKWOptionMenu::New();
+  this->VectorOperationFrame = vtkKWWidget::New();
+  this->VectorOperationLabel = vtkKWLabel::New();
+  this->VectorOperationMenu = vtkKWOptionMenu::New();
   this->DisplayNameLabel = vtkKWLabel::New();
   
   this->ChangeScalarsFilterTclName = NULL;
   this->DefaultScalarsName = NULL;
+  this->DefaultVectorsName = NULL;
   
   this->Widgets = vtkKWWidgetCollection::New();
   this->LastSelectionList = NULL;
@@ -150,7 +154,16 @@ vtkPVSource::~vtkPVSource()
   
   this->ScalarOperationFrame->Delete();
   this->ScalarOperationFrame = NULL;
+
+  this->VectorOperationLabel->Delete();
+  this->VectorOperationLabel = NULL;
+
+  this->VectorOperationMenu->Delete();
+  this->VectorOperationMenu = NULL;
   
+  this->VectorOperationFrame->Delete();
+  this->VectorOperationFrame = NULL;
+
   this->DisplayNameLabel->Delete();
   this->DisplayNameLabel = NULL;
   
@@ -171,6 +184,11 @@ vtkPVSource::~vtkPVSource()
     {
     delete [] this->DefaultScalarsName;
     this->DefaultScalarsName = NULL;
+    }
+  if (this->DefaultVectorsName)
+    {
+    delete [] this->DefaultVectorsName;
+    this->DefaultVectorsName = NULL;
     }
   
   if (this->LastSelectionList)
@@ -423,6 +441,20 @@ void vtkPVSource::CreateProperties()
   this->ScalarOperationMenu->SetParent(this->ScalarOperationFrame);
   this->ScalarOperationMenu->Create(this->Application, "");
   this->ScalarOperationMenu->SetBalloonHelpString("Select which array to use as point scalars for this filter");
+
+  this->VectorOperationFrame->SetParent(this->ParameterFrame->GetFrame());
+  this->VectorOperationFrame->Create(this->Application, "frame", "");    
+  this->Script("pack %s -side top -fill x -expand t",
+               this->VectorOperationFrame->GetWidgetName());
+
+  this->VectorOperationLabel->SetParent(this->VectorOperationFrame);
+  this->VectorOperationLabel->Create(this->Application, "");
+  this->VectorOperationLabel->SetLabel("Point Vectors:");
+  this->VectorOperationLabel->SetBalloonHelpString("Select which array to use as point vectors for this filter");
+  
+  this->VectorOperationMenu->SetParent(this->VectorOperationFrame);
+  this->VectorOperationMenu->Create(this->Application, "");
+  this->VectorOperationMenu->SetBalloonHelpString("Select which array to use as point vectors for this filter");
   
   // Isolate events to this window untill accept or reset is pressed.
   this->Script("grab set %s", this->ParameterFrame->GetWidgetName());
@@ -480,6 +512,54 @@ void vtkPVSource::UpdateScalarsMenu()
   this->UpdateScalars();
 }
 
+void vtkPVSource::UpdateVectorsMenu()
+{
+  int i, defaultSet = 0;
+  vtkFieldData *fd;
+  const char *arrayName;
+
+  if (this->GetNumberOfPVInputs() == 0)
+    {
+    return;
+    }
+  
+  // Set up some logic to set the default array if this is the first pass.
+  // Retain previous value if not.
+  arrayName = this->VectorOperationMenu->GetValue();
+  if (arrayName && arrayName[0] != '\0')
+    {
+    defaultSet = 1;
+    } 
+
+  fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetFieldData();
+  
+  if (fd)
+    {
+    this->VectorOperationMenu->ClearEntries();
+    for (i = 0; i < fd->GetNumberOfArrays(); i++)
+      {
+      if (fd->GetArray(i)->GetNumberOfComponents() == 3)
+        {
+        this->VectorOperationMenu->AddEntryWithCommand(fd->GetArrayName(i),
+                                                       this, "ChangeVectors");
+        if (!defaultSet)
+          {
+          arrayName = fd->GetArrayName(i);
+          if (arrayName && arrayName[0] != '\0')
+            {
+            defaultSet = 1;
+            } 
+          }
+        }
+      }
+    }
+  if (defaultSet)
+    {
+    this->VectorOperationMenu->SetValue(arrayName);
+    }
+  this->UpdateVectors();
+}
+
 void vtkPVSource::PackScalarsMenu()
 {
   this->UpdateScalarsMenu();
@@ -488,11 +568,26 @@ void vtkPVSource::PackScalarsMenu()
                this->ScalarOperationMenu->GetWidgetName());
 }
 
+void vtkPVSource::PackVectorsMenu()
+{
+  this->UpdateVectorsMenu();
+  this->Script("pack %s %s -side left -fill x",
+               this->VectorOperationLabel->GetWidgetName(),
+               this->VectorOperationMenu->GetWidgetName());
+}
+
 //----------------------------------------------------------------------------
 void vtkPVSource::ChangeScalars()
 {
   this->ChangeAcceptButtonColor();
   this->UpdateScalars();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::ChangeVectors()
+{
+  this->ChangeAcceptButtonColor();
+  this->UpdateVectors();
 }
 
 //----------------------------------------------------------------------------
@@ -543,6 +638,62 @@ void vtkPVSource::UpdateScalars()
   pvApp->BroadcastScript("%s SetScalarComponent 0 %s 0",
                          this->ChangeScalarsFilterTclName,
                          this->DefaultScalarsName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::UpdateVectors()
+{
+  char *newVectors = this->VectorOperationMenu->GetValue();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (strcmp(newVectors, "") == 0)
+    {
+    return;
+    }
+  
+  if (this->DefaultVectorsName)
+    {
+    if (strcmp(newVectors, this->DefaultVectorsName) == 0)
+      {
+      return;
+      }
+    }
+
+  if (this->DefaultVectorsName)
+    {
+    delete [] this->DefaultVectorsName;
+    this->DefaultVectorsName = NULL;
+    }
+  this->SetDefaultVectorsName(newVectors);
+
+  if (!this->ChangeScalarsFilterTclName)
+    {
+    char tclName[256];
+    sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
+    this->SetChangeScalarsFilterTclName(tclName);
+    // I don't know why we are not using "MakeTclObject".
+    pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
+                          this->ChangeScalarsFilterTclName);
+    pvApp->BroadcastScript("%s SetInput [%s GetInput]",
+                           this->ChangeScalarsFilterTclName,
+                           this->VTKSourceTclName);
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
+                           this->VTKSourceTclName,
+                           this->ChangeScalarsFilterTclName);
+    }
+  pvApp->BroadcastScript("%s SetInputFieldToPointDataField",
+                         this->ChangeScalarsFilterTclName);
+  pvApp->BroadcastScript("%s SetOutputAttributeDataToPointData",
+                         this->ChangeScalarsFilterTclName);
+  pvApp->BroadcastScript("%s SetVectorComponent 0 %s 0",
+                         this->ChangeScalarsFilterTclName,
+                         this->DefaultVectorsName);
+  pvApp->BroadcastScript("%s SetVectorComponent 1 %s 1",
+                         this->ChangeScalarsFilterTclName,
+                         this->DefaultVectorsName);
+  pvApp->BroadcastScript("%s SetVectorComponent 2 %s 2",
+                         this->ChangeScalarsFilterTclName,
+                         this->DefaultVectorsName);
 }
 
 //----------------------------------------------------------------------------
@@ -987,7 +1138,8 @@ void vtkPVSource::UpdateProperties()
     input = this->GetNthPVInput(idx);
     input->Update();
     }
-  this->UpdateScalarsMenu();  
+  this->UpdateScalarsMenu();
+  this->UpdateVectorsMenu();
 }
   
 //----------------------------------------------------------------------------
@@ -1242,7 +1394,7 @@ void vtkPVSource::Save(ofstream *file)
   char* extension;
   int pos;
   
-  if (this->DefaultScalarsName)
+  if (this->ChangeScalarsFilterTclName)
     {
     *file << "vtkFieldDataToAttributeDataFilter "
           << this->ChangeScalarsFilterTclName << "\n\t"
@@ -1276,8 +1428,21 @@ void vtkPVSource::Save(ofstream *file)
           << " SetInputFieldToPointDataField\n";
     *file << this->ChangeScalarsFilterTclName
           << " SetOutputAttributeDataToPointData\n";
-    *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
-          << this->DefaultScalarsName << " 0\n\n";
+    if (this->DefaultScalarsName)
+      {
+      *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
+            << this->DefaultScalarsName << " 0\n";
+      }
+    if (this->DefaultVectorsName)
+      {
+      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 0 "
+            << this->DefaultVectorsName << " 0\n";
+      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 1 "
+            << this->DefaultVectorsName << " 1\n";
+      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 2 "
+            << this->DefaultVectorsName << " 2\n";
+      }
+    *file << "\n";
     }
   
   if (this->VTKSource)
@@ -1304,7 +1469,7 @@ void vtkPVSource::Save(ofstream *file)
     sprintf(tclName, this->Name);
     }
   
-  if (this->NumberOfPVInputs > 0 && !this->DefaultScalarsName)
+  if (this->NumberOfPVInputs > 0 && !this->ChangeScalarsFilterTclName)
     {
     *file << "\t" << tclName << " SetInput [";
     if (strcmp(this->GetNthPVInput(0)->GetPVSource()->GetInterface()->
@@ -1336,7 +1501,7 @@ void vtkPVSource::Save(ofstream *file)
             << " GetOutput]\n";
       }
     }
-  else if (this->DefaultScalarsName)
+  else if (this->ChangeScalarsFilterTclName)
     {
     *file << this->VTKSourceTclName << " SetInput ["
           << this->ChangeScalarsFilterTclName << " GetOutput]\n";

@@ -48,6 +48,7 @@ vtkPVSourceInterface::vtkPVSourceInterface()
   this->OutputClassName = NULL;
   this->DataFileName = NULL;
   this->DefaultScalars = 0;
+  this->DefaultVectors = 0;
   
   this->MethodInterfaces = vtkCollection::New();
 
@@ -155,6 +156,10 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   if (this->DefaultScalars)
     {
     pvs->PackScalarsMenu();
+    }
+  if (this->DefaultVectors)
+    {
+    pvs->PackVectorsMenu();
     }
   
   pvs->CreateInputList(this->InputClassName);

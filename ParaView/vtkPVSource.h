@@ -110,10 +110,19 @@ public:
   // If this VTK source operates on scalars, pack the menu to choose which
   // array to use as scalars.
   void PackScalarsMenu();
-  
+
+  // Description:
+  // If this VTK source operates on vectors, pack the menu to choose which
+  // array to use as vectors.
+  void PackVectorsMenu();
+
   // Description:
   // Tcl callback to change which array to use as scalars
   void ChangeScalars();
+
+  // Description:
+  // Tcl callback to change which array to use as vectors
+  void ChangeVectors();
   
   // Description:
   // This just returns the application typecast correctly.
@@ -275,6 +284,8 @@ protected:
   void              UpdateProperties();
   void              UpdateScalarsMenu();
   void              UpdateScalars();
+  void              UpdateVectorsMenu();
+  void              UpdateVectors();
 
   vtkKWLabeledFrame *ParameterFrame;
   
@@ -289,12 +300,18 @@ protected:
   vtkKWOptionMenu *ScalarOperationMenu;
   vtkKWLabel *ScalarOperationLabel;
   vtkKWWidget *ScalarOperationFrame;
+  vtkKWOptionMenu *VectorOperationMenu;
+  vtkKWLabel *VectorOperationLabel;
+  vtkKWWidget *VectorOperationFrame;
   vtkKWLabel *DisplayNameLabel;
   
   char *ChangeScalarsFilterTclName;
   char *DefaultScalarsName;
   vtkSetStringMacro(ChangeScalarsFilterTclName);
   vtkSetStringMacro(DefaultScalarsName);
+  
+  char *DefaultVectorsName;
+  vtkSetStringMacro(DefaultVectorsName);
   
   vtkPVSelectionList *LastSelectionList;
 
