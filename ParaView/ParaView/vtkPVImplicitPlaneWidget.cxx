@@ -71,6 +71,7 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
 
   vtkImplicitPlaneWidget *plane = vtkImplicitPlaneWidget::New();
   plane->SetPlaceFactor(1.0);
+  plane->OutlineTranslationOff();
   this->Widget3D = plane;
   this->Labels[0] = vtkKWLabel::New();
   this->Labels[1] = vtkKWLabel::New();  
