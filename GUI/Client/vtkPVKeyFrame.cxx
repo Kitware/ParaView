@@ -43,7 +43,7 @@
 #include "vtkKWPushButton.h"
 #include "vtkSMStringVectorProperty.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.5");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.6");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -331,6 +331,14 @@ void vtkPVKeyFrame::InitializeKeyValueUsingProperty(vtkSMProperty* property, int
     {
     vtkErrorMacro("Invalid property or index");
     return;
+    }
+  if (vtkSMVectorProperty::SafeDownCast(property))
+    {
+    if ((int)(vtkSMVectorProperty::SafeDownCast(property)->GetNumberOfElements()) <= index)
+      {
+      vtkErrorMacro("Invalid index " << index << " for property : " << property->GetXMLName());
+      return;
+      }
     }
   if (vtkSMDoubleVectorProperty::SafeDownCast(property))
     {
