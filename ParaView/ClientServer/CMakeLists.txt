@@ -140,4 +140,4 @@ ENDFOREACH(CLASS)
 VTK_WRAP_ClientServer(vtkParaViewCSWrapped vtkClientServerWrappedList ${ClientServer_RESOLVED_CLASSES})
 
 ADD_LIBRARY(vtkParaViewCSWrapped ${vtkClientServerWrappedList})
-TARGET_LINK_LIBRARIES (vtkParaViewCSWrapped vtkClientServer vtkHybrid vtkParallel)
+TARGET_LINK_LIBRARIES (vtkParaViewCSWrapped vtkClientServer vtkKWParaViewTCL vtkHybrid vtkParallel)

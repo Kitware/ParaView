@@ -21,7 +21,7 @@ int main()
   vtkClientServerStream::Commands cnew = vtkClientServerStream::New;
   vtkClientServerStream::Commands invoke = vtkClientServerStream::Invoke;
   vtkClientServerStream::Types end = vtkClientServerStream::End;
-  vtkClientServerID result = {0};
+  vtkClientServerStream::Types result = vtkClientServerStream::LastResult;
   vtkClientServerID renWin = GetUniqueID();
   vtkClientServerID ren1 = GetUniqueID();
   vtkClientServerID iren = GetUniqueID();

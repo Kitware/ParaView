@@ -73,9 +73,12 @@ public:
   int ProcessOneMessage(const vtkClientServerStream& css, int message);
 
   // Description:
-  // Get the message for an ID.  Special id 0 retrieves the result of
-  // the last command.
+  // Get the message for an ID.  ID 0 always returns a NULL message.
   const vtkClientServerStream* GetMessageFromID(vtkClientServerID id);
+
+  // Description:
+  // Get the last result message.
+  const vtkClientServerStream* GetLastResult() const;
 
   // Description:
   // Return a pointer to a vtkObjectBase for an ID whose message
@@ -147,10 +150,6 @@ protected:
   // Expand all the id_value arguments of a message.
   int ExpandMessage(const vtkClientServerStream& in, int inIndex,
                     vtkClientServerStream& out);
-
-  // Assign the last result to the given ID.  Returns 1 for success, 0
-  // for failure.
-  int AssignResultToID(vtkClientServerID id);
 
 private:
 

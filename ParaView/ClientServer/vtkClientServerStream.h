@@ -70,6 +70,7 @@ public:
     string_value,
     id_value,
     vtk_object_pointer,
+    LastResult,
     End
   };
 

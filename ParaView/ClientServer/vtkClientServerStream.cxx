@@ -312,6 +312,17 @@ vtkClientServerStream::operator << (vtkClientServerStream::Argument a)
     this->Internal->ValueOffsets.push_back(
       this->Internal->Data.end()-this->Internal->Data.begin());
 
+    // If the argument is a vtk_object_pointer, we need to store a
+    // reference to the object.
+    vtkTypeUInt32 tp;
+    memcpy(&tp, a.Data, sizeof(tp));
+    if(tp == vtkClientServerStream::vtk_object_pointer)
+      {
+      vtkObjectBase* obj;
+      memcpy(&obj, a.Data+sizeof(tp), sizeof(obj));
+      this->Internal->Objects.push_back(obj);
+      }
+
     // Write the data to the stream.
     return this->Write(a.Data, a.Size);
     }
@@ -890,6 +901,19 @@ int vtkClientServerStream::GetArgument(int message, int argument,
         memcpy(value, data, sizeof(*value));
         result = 1;
         } break;
+      case vtkClientServerStream::id_value:
+        {
+        // Copy the value out of the stream.
+        vtkClientServerID id;
+        memcpy(&id.ID, data, sizeof(id.ID));
+        // ID value 0 can be converted to a NULL pointer.
+        if(id.ID == 0)
+          {
+          *value = 0;
+          return 1;
+          }
+        return 0;
+        } break;
       default:
         break;
       }
@@ -1074,6 +1098,9 @@ int vtkClientServerStream::ParseData()
           data = this->ParseArray(order, data, end, 8); break;
         case vtkClientServerStream::string_value:
           data = this->ParseString(order, data, end); break;
+        case vtkClientServerStream::LastResult:
+          // There are no data for this type.  Do nothing.
+          break;
         case vtkClientServerStream::End:
           this->ParseEnd(); foundEnd = 1; break;
 
@@ -1365,6 +1392,10 @@ vtkClientServerStream::GetArgument(int message, int argument) const
         {
         result.Size = sizeof(tp) + sizeof(vtkObjectBase*);
         } break;
+      case vtkClientServerStream::LastResult:
+        {
+        result.Size = sizeof(tp);
+        } break;
       case vtkClientServerStream::End:
       default:
         result.Data = 0;
@@ -1442,6 +1473,7 @@ static const char* const vtkClientServerStreamTypeNames[] =
   "string_value",
   "id_value",
   "vtk_object_pointer",
+  "LastResult",
   "End",
   0
 };
@@ -1614,6 +1646,10 @@ void vtkClientServerStream::PrintMessage(ostream& os, int message) const
           {
           os << "(null)\n";
           }
+        } break;
+      case vtkClientServerStream::LastResult:
+        {
+        os << "  Argument " << a << " = LastResult\n";
         } break;
       default:
         {

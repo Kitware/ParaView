@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.9");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.10");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -253,7 +253,7 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
     if(this->LastResultMessage->GetNumberOfMessages() > 0)
       {
       *this->LogStream << "Result ";
-      this->LastResultMessage->Print(*this->LogStream); 
+      this->LastResultMessage->Print(*this->LogStream);
      }
     else
       {
@@ -307,6 +307,29 @@ vtkClientServerInterpreter
   if(css.GetNumberOfArguments(midx) == 2 &&
      css.GetArgument(midx, 0, &cname) && css.GetArgument(midx, 1, &id))
     {
+    // Make sure the given ID is valid.
+    if(id.ID == 0)
+      {
+      *this->LastResultMessage
+        << vtkClientServerStream::Error << "Cannot create object with ID 0."
+        << vtkClientServerStream::End;
+      return 0;
+      }
+
+    // Make sure the ID doesn't exist.
+    vtkClientServerStream* tmp;
+    if(this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
+      {
+      ostrstream error;
+      error << "Attempt to create object with existing ID " << id.ID << "."
+            << ends;
+      *this->LastResultMessage
+        << vtkClientServerStream::Error << error.str()
+        << vtkClientServerStream::End;
+      error.rdbuf()->freeze(0);
+      return 0;
+      }
+
     // Find a NewInstance function that knows about the class.
     int created = 0;
     for(vtkClientServerInterpreterInternals::NewInstanceFunctionsType::iterator
@@ -419,9 +442,17 @@ vtkClientServerInterpreter
 
   // Get the ID to delete.
   vtkClientServerID id;
-  if(msg.GetNumberOfArguments(midx) == 1 &&
-     msg.GetArgument(midx, 0, &id) && id.ID > 0)
+  if(msg.GetNumberOfArguments(midx) == 1 && msg.GetArgument(midx, 0, &id))
     {
+    // Make sure the given ID is valid.
+    if(id.ID == 0)
+      {
+      *this->LastResultMessage
+        << vtkClientServerStream::Error << "Cannot delete object with ID 0."
+        << vtkClientServerStream::End;
+      return 0;
+      }
+
     // Find the ID in the map.
     vtkClientServerStream* item = 0;
     if(this->IDToMessageMap->GetItem(id.ID, item) != VTK_OK)
@@ -470,15 +501,27 @@ vtkClientServerInterpreter
   vtkClientServerID id;
   if(msg.GetNumberOfArguments(midx) == 1 && msg.GetArgument(midx, 0, &id))
     {
+    // Make sure the given ID is valid.
+    if(id.ID == 0)
+      {
+      this->LastResultMessage->Reset();
+      *this->LastResultMessage
+        << vtkClientServerStream::Error << "Cannot assign result to ID 0."
+        << vtkClientServerStream::End;
+      return 0;
+      }
+
     // Make sure the ID doesn't exist.
     vtkClientServerStream* tmp;
     if(this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
       {
       this->LastResultMessage->Reset();
+      ostrstream error;
+      error << "Attempt to assign existing ID " << id.ID << "." << ends;
       *this->LastResultMessage
-        << vtkClientServerStream::Error
-        << "Attempt to assign ID that already exists."
+        << vtkClientServerStream::Error << error.str()
         << vtkClientServerStream::End;
+      error.rdbuf()->freeze(0);
       return 0;
       }
 
@@ -523,22 +566,39 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
       vtkClientServerID id;
       in.GetArgument(inIndex, a, &id);
 
-      // If the ID is in the map, expand it.  Otherwise, leave it.
-      const vtkClientServerStream* tmp = this->GetMessageFromID(id);
-      if(tmp)
+      if(id.ID > 0)
         {
-        for(int b=0; b < tmp->GetNumberOfArguments(0); ++b)
+        // If the ID is in the map, expand it.  Otherwise, leave it.
+        if(const vtkClientServerStream* tmp = this->GetMessageFromID(id))
           {
-          out << tmp->GetArgument(0, b);
+          for(int b=0; b < tmp->GetNumberOfArguments(0); ++b)
+            {
+            out << tmp->GetArgument(0, b);
+            }
+          }
+        else
+          {
+          out << in.GetArgument(inIndex, a);
           }
         }
       else
         {
-        out << in.GetArgument(inIndex, a);
+        // Transform a 0 id into a NULL pointer.
+        out << static_cast<vtkObjectBase*>(0);
+        }
+      }
+    else if(in.GetArgumentType(inIndex, a) ==
+            vtkClientServerStream::LastResult)
+      {
+      // Insert the last result value.
+      for(int b=0; b < this->LastResultMessage->GetNumberOfArguments(0); ++b)
+        {
+        out << this->LastResultMessage->GetArgument(0, b);
         }
       }
     else
       {
+      // Just copy the argument.
       out << in.GetArgument(inIndex, a);
       }
     }
@@ -550,43 +610,31 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
 }
 
 //----------------------------------------------------------------------------
-int vtkClientServerInterpreter::AssignResultToID(vtkClientServerID id)
-{
-  // Make sure the ID doesn't exist.
-  vtkClientServerStream* tmp;
-  if(this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
-    {
-    vtkErrorMacro("Attempt to assign ID " << id.ID
-                  << " that is already in the hash table.");
-    return 0;
-    }
-
-  // Copy the result to store it in the map.
-  vtkClientServerStream& lrm = *this->LastResultMessage;
-  vtkClientServerStream* copy = new vtkClientServerStream(lrm);
-  this->IDToMessageMap->SetItem(id.ID, copy);
-  return 1;
-}
-
-//----------------------------------------------------------------------------
 const vtkClientServerStream*
 vtkClientServerInterpreter::GetMessageFromID(vtkClientServerID id)
 {
-  // Look for special LastReturnMessage.
-  if(id.ID == 0)
+  if(id.ID > 0)
     {
-    return this->LastResultMessage;
+    // Find the message in the map.
+    vtkClientServerStream* tmp;
+    if(this->IDToMessageMap->GetItem(id.ID, tmp) != VTK_OK)
+      {
+      vtkErrorMacro("Attempt to get message for ID " << id.ID
+                    << " that is not in the hash table.");
+      return 0;
+      }
+    return tmp;
     }
-
-  // Find the message in the map.
-  vtkClientServerStream* tmp;
-  if(this->IDToMessageMap->GetItem(id.ID, tmp) != VTK_OK)
+  else
     {
-    vtkErrorMacro("Attempt to get message for ID " << id.ID
-                  << " that is not in the hash table.");
     return 0;
     }
-  return tmp;
+}
+
+//----------------------------------------------------------------------------
+const vtkClientServerStream* vtkClientServerInterpreter::GetLastResult() const
+{
+  return this->LastResultMessage;
 }
 
 //----------------------------------------------------------------------------
@@ -602,8 +650,14 @@ int vtkClientServerInterpreter::NewInstance(vtkObjectBase* obj,
   // call in generated code.
   obj->Delete();
 
-  // Enter the last result into the map with the given id.
-  return this->AssignResultToID(id);
+  // Copy the result to store it in the map.  The result itself
+  // remains unchanged.  The ProcessCommandNew method already checked
+  // that the id does not exist in the map, so the insertion does not
+  // have to be checked.
+  vtkClientServerStream* entry =
+    new vtkClientServerStream(*this->LastResultMessage);
+  this->IDToMessageMap->SetItem(id.ID, entry);
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -618,15 +672,22 @@ vtkClientServerInterpreter
 vtkClientServerCommandFunction
 vtkClientServerInterpreter::GetCommandFunction(vtkObjectBase* obj)
 {
-  // Lookup the function for this object's class.
-  vtkClientServerCommandFunction res = 0;
-  const char* cname = obj->GetClassName();
-  this->ClassToFunctionMap->GetItem(cname, res);
-  if(!res)
+  if(obj)
     {
-    vtkErrorMacro("Cannot find command function for \"" << cname << "\".");
+    // Lookup the function for this object's class.
+    vtkClientServerCommandFunction res = 0;
+    const char* cname = obj->GetClassName();
+    this->ClassToFunctionMap->GetItem(cname, res);
+    if(!res)
+      {
+      vtkErrorMacro("Cannot find command function for \"" << cname << "\".");
+      }
+    return res;
     }
-  return res;
+  else
+    {
+    return 0;
+    }
 }
 
 //----------------------------------------------------------------------------
