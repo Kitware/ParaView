@@ -6,6 +6,7 @@ IF ( VTK_BINARY_DIR )
   LOAD_CACHE(${VTK_BINARY_DIR})
   INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
   SUBDIRS(Widgets ParaView)
+  SUBDIR_DEPENDS(ParaView Widgets)
 ENDIF (VTK_BINARY_DIR )
 
 INCLUDE (${CMAKE_ROOT}/Modules/FindMPI.cmake)
@@ -49,3 +50,14 @@ ENDIF (WIN32)
 
 # Include the standard Dart testing module
 INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
+
+SET (PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/ParaView)
+
+# Add the testing directories
+IF(BUILD_TESTING)
+  IF (DART_ROOT)
+    SUBDIRS(ParaView/Testing)
+    SUBDIR_DEPENDS(ParaView/Testing ParaView)
+  ENDIF (DART_ROOT)
+ENDIF(BUILD_TESTING)
+
