@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.25");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.26");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -668,47 +668,41 @@ void vtkKWRenderWidget::SetCornerTextColor(float r, float g, float b)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 {
+  if (this->GetHeaderAnnotationVisibility() == v)
+    {
+    return;
+    }
+
   if (v)
     {
-    if (this->HeaderProp->GetVisibility() &&
-        this->HasProp(this->HeaderProp))
-      {
-      return;
-      }
     this->HeaderProp->VisibilityOn();
     if (!this->HasProp(this->HeaderProp))
       {
       this->AddProp(this->HeaderProp);
       }
-    this->Render();
     }
   else
     {
-    if (!this->HeaderProp->GetVisibility() ||
-        !this->HasProp(this->HeaderProp))
-      {
-      return;
-      }
     this->HeaderProp->VisibilityOff();
     if (this->HasProp(this->HeaderProp))
       {
       this->RemoveProp(this->HeaderProp);
       }
-    this->Render();
     }
+
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
 int vtkKWRenderWidget::GetHeaderAnnotationVisibility()
 {
-  return (this->HasProp(this->HeaderProp) ||
-          this->HeaderProp->GetVisibility());
+  return (this->HasProp(this->HeaderProp) && this->HeaderProp->GetVisibility());
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderTextColor(float r, float g, float b)
 {
-  this->HeaderProp->GetProperty()->SetColor(r, g, b);
+  this->HeaderProp->GetTextProperty()->SetColor(r, g, b);
   if (this->GetHeaderAnnotationVisibility())
     {
     this->Render();
@@ -718,7 +712,12 @@ void vtkKWRenderWidget::SetHeaderTextColor(float r, float g, float b)
 //----------------------------------------------------------------------------
 float* vtkKWRenderWidget::GetHeaderTextColor()
 {
-  return this->HeaderProp->GetProperty()->GetColor();
+  float *color = this->HeaderProp->GetTextProperty()->GetColor();
+  if (color[0] == -1 && color[1] == -1 && color[2] == -1)
+    {
+    color = this->HeaderProp->GetProperty()->GetColor();
+    }
+  return color;
 }
 
 //----------------------------------------------------------------------------
