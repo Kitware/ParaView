@@ -27,7 +27,7 @@
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.2");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -314,7 +314,7 @@ void vtkPVAnimationCueTree::ExecuteEvent(vtkObject* wdg, unsigned long event, vo
     {
     // scale all the children.
     double new_bounds[2];
-    if (this->GetTimeBounds(new_bounds));
+    if (this->GetTimeBounds(new_bounds))
       {
       this->ScaleChildren(this->LastParameterBounds, new_bounds);
       this->SetLastParameterBounds(new_bounds);
