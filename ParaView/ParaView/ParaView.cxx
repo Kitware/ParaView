@@ -34,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVMPIProcessModule.h"
 #include "vtkPVClientServerModule.h"
 #include "vtkPVApplication.h"
+#include "vtkOutputWindow.h"
 
 #include "vtkObject.h"
 #include "vtkTclUtil.h"
@@ -42,6 +43,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 int MyMain(int argc, char *argv[])
 {
   int retVal = 0;
+  int startVal = 0;
   int myId = 0;
   vtkPVProcessModule *pm;
   vtkPVApplication *app;
@@ -58,7 +60,10 @@ int MyMain(int argc, char *argv[])
   // initialization would clean things up.
   MPI_Comm_rank(MPI_COMM_WORLD,&myId); 
 #endif
-
+  
+  // Don't prompt the user with startup errors.
+  vtkOutputWindow::GetInstance()->PromptUserOff();
+  
   // The server is a special case.  We do not initialize Tk for process 0.
   // I would rather have application find this command line option, but
   // I cannot create an application before I initialize Tcl.
@@ -86,6 +91,7 @@ int MyMain(int argc, char *argv[])
   app = vtkPVApplication::New();
   if (myId == 0 && app->ParseCommandLineArguments(argc, argv))
     {
+    retVal = 1;
     app->SetStartGUI(0);
     }
 
@@ -108,7 +114,10 @@ int MyMain(int argc, char *argv[])
   pm->SetApplication(app);
   app->SetProcessModule(pm);
 
-  retVal = pm->Start(argc, argv);
+  // Start the application's event loop.  This will enable
+  // vtkOutputWindow's user prompting for any further errors now that
+  // startup is completed.
+  startVal = pm->Start(argc, argv);
 
   // Clean up for exit.
   app->Delete();
@@ -116,7 +125,7 @@ int MyMain(int argc, char *argv[])
   pm = NULL;
   Tcl_DeleteInterp(interp);
 
-  return retVal;
+  return (retVal?retVal:startVal);
 }
 
 

@@ -114,7 +114,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.180");
+vtkCxxRevisionMacro(vtkPVApplication, "1.181");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -678,8 +678,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 {
   int i;
   int index=-1;
-  
-  vtkOutputWindow::GetInstance()->PromptUserOn();
 
   // This should really be part of Parsing !!!!!!
   if (argv)
@@ -959,8 +957,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
     return;
     }
 
-  // Done in ParseCommandLineArguments also.
-  // Which place should it be !!!
   vtkOutputWindow::GetInstance()->PromptUserOn();
 
   // set the font size to be small
