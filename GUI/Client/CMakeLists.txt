@@ -31,6 +31,14 @@ IF(PARAVIEW_BUILD_DEVELOPMENT)
 ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
 SET( ParaViewServerNonWrapped_SRCS
+  vtkRMObject.cxx
+  vtkRM3DWidget.cxx
+  vtkRMBoxWidget.cxx
+  vtkRMImplicitPlaneWidget.cxx
+  vtkRMLineWidget.cxx
+  vtkRMPointWidget.cxx
+  vtkRMSphereWidget.cxx
+  vtkRMScalarBarWidget.cxx
   )
 
 SET( ParaViewExtraWrapper_SRCS
@@ -38,8 +46,8 @@ SET( ParaViewExtraWrapper_SRCS
   ${PVGUI_SOURCE_DIR}/Widgets/vtkKWObject.h
   )
 
-  SET(ParaViewServer_SRCS ${ParaViewServer_SRCS}
-    )
+SET(ParaViewServer_SRCS ${ParaViewServer_SRCS}
+  )
 
 SET( ParaViewClientNotWrapped_SRCS
   vtkPVAxesActor.cxx
@@ -60,14 +68,6 @@ SET( ParaViewClientNotWrapped_SRCS
 SET( ParaViewClient_SRCS
   vtkKWBoundsDisplay.cxx
   vtkPV3DWidget.cxx
-  vtkRMObject.cxx
-  vtkRM3DWidget.cxx
-  vtkRMBoxWidget.cxx
-  vtkRMImplicitPlaneWidget.cxx
-  vtkRMLineWidget.cxx
-  vtkRMPointWidget.cxx
-  vtkRMSphereWidget.cxx
-  vtkRMScalarBarWidget.cxx
   vtkPVAdvancedReaderModule.cxx
   vtkPVAnimationInterface.cxx
   vtkPVAnimationInterfaceEntry.cxx
@@ -297,7 +297,7 @@ FOREACH(external EXODUS SAF)
     IF(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
       INCLUDE(${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
     ELSE(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
-      MESSAGE(SEND_ERROR "Cannot find ${external} sources directory")
+      MESSAGE(SEND_ERROR "Cannot find ${external} sources directory: ${${external}_SOURCE_DIR}")
     ENDIF(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
   ENDIF(PARAVIEW_USE_${external})
 ENDFOREACH(external)
