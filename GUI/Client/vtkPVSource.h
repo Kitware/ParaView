@@ -482,6 +482,8 @@ protected:
 
   void SetPVInputInternal(int idx, vtkPVSource *input, int doInit);
 
+  void SaveFilterInBatchScript(ofstream *file);
+
   // Description:
   // This method collects data information from all processes.
   void GatherDataInformation();

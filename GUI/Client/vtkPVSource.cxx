@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.346");
+vtkCxxRevisionMacro(vtkPVSource, "1.347");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1835,9 +1835,16 @@ void vtkPVSource::SetPVOutput(vtkPVData *pvd)
   this->Modified();
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveInBatchScript(ofstream *file)
+{
+  this->SaveFilterInBatchScript(file);
+  // Add the mapper, actor, scalar bar actor ...
+  this->GetPVOutput()->SaveInBatchScript(file);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
 {
   int i, numWidgets;
 
@@ -1899,8 +1906,6 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
   *file << "  $pvTemp" <<  this->GetVTKSourceID(0)
         << " UpdateVTKObjects" << endl;
 
-  // Add the mapper, actor, scalar bar actor ...
-  this->GetPVOutput()->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
