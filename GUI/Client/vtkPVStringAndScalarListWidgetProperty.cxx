@@ -16,13 +16,15 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVObjectWidget.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 #include "vtkPVWidget.h"
 #include "vtkStringList.h"
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkPVStringAndScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.8");
+vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.9");
 
 vtkPVStringAndScalarListWidgetProperty::vtkPVStringAndScalarListWidgetProperty()
 {
@@ -118,6 +120,30 @@ const char* vtkPVStringAndScalarListWidgetProperty::GetString(int idx)
 int vtkPVStringAndScalarListWidgetProperty::GetNumberOfStrings()
 {
   return this->Strings->GetNumberOfStrings();
+}
+
+void vtkPVStringAndScalarListWidgetProperty::SetAnimationTimeInBatch(
+  ofstream *file, float val)
+{
+  if (this->Widget->GetPVSource())
+    {
+    vtkPVObjectWidget* ov = vtkPVObjectWidget::SafeDownCast(this->Widget);
+    if (ov)
+      {
+      *file << "if { [[$pvTemp" <<  ov->GetPVSource()->GetVTKSourceID(0) 
+            << " GetProperty " << ov->GetVariableName() 
+            << "] GetClassName] == \"vtkSMIntVectorProperty\"} {" << endl;
+      *file << "  set value [expr round(" << val << ")]" << endl;
+      *file << "} else {" << endl;
+      *file << "  set value " << val << endl;
+      *file << "}" << endl;
+      *file << "[$pvTemp" << ov->GetPVSource()->GetVTKSourceID(0)
+            << " GetProperty " << ov->GetVariableName()
+            << "] SetElement 1 $value"<< endl;
+      *file << "$pvTemp" << ov->GetPVSource()->GetVTKSourceID(0)
+            << " UpdateVTKObjects" << endl;
+      }
+    }
 }
 
 void vtkPVStringAndScalarListWidgetProperty::PrintSelf(ostream &os,

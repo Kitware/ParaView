@@ -67,6 +67,8 @@ public:
   // Description:
   // Get the total number of strings being sent to the specified VTK object.
   int GetNumberOfStrings();
+
+  virtual void SetAnimationTimeInBatch(ofstream *file, float val);
   
 protected:
   vtkPVStringAndScalarListWidgetProperty();

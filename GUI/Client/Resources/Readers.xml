@@ -426,7 +426,7 @@
                  length="3"
                  default_value="1 1 1"
                  help="Set the number of steps to skip between each point (structured data only)."/>
-    <XDMFParameters trace_name="xdmf_parameters"
+    <XDMFParameters trace_name="xdmf_parameters" variable="ParameterIndex"
                     label="Parameters" />
   </Module>
 #endif

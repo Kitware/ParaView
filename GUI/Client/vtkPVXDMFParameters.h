@@ -24,6 +24,7 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkKWScale;
 class vtkPVXDMFParametersInternals;
+class vtkPVStringAndScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVXDMFParameters : public vtkPVObjectWidget
 {
@@ -112,6 +113,16 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  // Description:
+  // Create the right property for use with this widget 
+  // (vtkPVStringAndScalarListWidgetProperty).
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+
+  // Description:
+  // Set/get the property to use with this widget.
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* GetProperty();
+
 protected:
   vtkPVXDMFParameters();
   ~vtkPVXDMFParameters();
@@ -120,6 +131,7 @@ protected:
   vtkPVXDMFParametersInternals* Internals;
   vtkKWLabeledFrame* Frame;
 
+  vtkPVStringAndScalarListWidgetProperty* Property;
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
