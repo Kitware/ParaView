@@ -13,7 +13,9 @@
         name="TimestepAsIndex"
         command="SetTimestepAsIndex"
         number_of_elements="1" 
-        default_values="0"/>
+        default_values="0">
+        <IntRangeDomain name="range"/>
+     </IntVectorProperty>
    <!-- End PVDReader -->
    </SourceProxy>
                     
