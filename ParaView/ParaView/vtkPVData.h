@@ -252,7 +252,7 @@ public:
     
   // Description:
   // Get the name of the cube axes actor.
-  vtkGetStringMacro(CubeAxesTclName);
+  vtkGetObjectMacro(CubeAxes, vtkCubeAxesActor2D);
 
   // Description:
   // Access to pointSize for scripting.
@@ -395,8 +395,7 @@ protected:
   vtkKWScale*        OpacityScale;
 
   vtkKWCheckButton *CubeAxesCheck;
-  char* CubeAxesTclName;
-  vtkSetStringMacro(CubeAxesTclName);
+  vtkCubeAxesActor2D* CubeAxes;
 
   vtkKWPushButton *ResetCameraButton;
 
