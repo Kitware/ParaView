@@ -10,9 +10,10 @@ if {[info exists argc]} {
 
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource GlyphArrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource GlyphCone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource GlyphSphere]
+
 set pv(vtkTemp100) [$pv(vtkTemp1) Open $DataDir/Data/vox8_bin.vtk]
 set pv(vtkTemp138) [$pv(vtkTemp1) ProbeCallback]
 $pv(vtkTemp138) UsePoint

@@ -139,8 +139,10 @@ public:
   virtual void PreAcceptCallback();
 
   // Description:
-  // Internal method; called by AcceptCallback
-  void Accept();
+  // Internal method; called by AcceptCallback.
+  // Hide flag is used for hidding creation of 
+  // the glyph sources from the user.
+  void Accept(int hideFlag);
   
   // Description:
   // Called when the reset button is pressed.

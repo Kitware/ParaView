@@ -114,7 +114,11 @@ public:
   
   // Decription:
   // This method is called to create another source.
-  virtual vtkPVSource *CreateCallback();
+  // Name is usually NULL.  Names are specified for creating glyph sources.
+  // In this case, the creation of the source is hidden from the user.
+  virtual vtkPVSource *CreateCallback(const char* name);
+  // Needed for old scripts that did not have name ...
+  vtkPVSource *CreateCallback(){return this->CreateCallback(NULL);}
 
   // Description:
   // Save this interface to a file.

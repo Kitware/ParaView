@@ -569,13 +569,13 @@ void vtkPVSource::PreAcceptCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::AcceptCallback()
 {
-  this->Accept();
+  this->Accept(0);
   this->GetPVApplication()->AddTraceEntry("$kw(%s) AcceptCallback",
                                           this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::Accept()
+void vtkPVSource::Accept(int hideFlag)
 {
   vtkPVWindow *window;
 
@@ -591,9 +591,6 @@ void vtkPVSource::Accept()
                this->AcceptButton->GetWidgetName());
 #endif
   
-    // All PVSources are initialized automatically.
-    this->SetTraceInitialized(1);
-
   // We need to pass the parameters from the UI to the VTK objects before
   // we check whether to insert ExtractPieces.  Otherwise, we'll get errors
   // about unspecified file names, etc., when ExecuteInformation is called on
@@ -648,16 +645,26 @@ void vtkPVSource::Accept()
       }
 
     // Set the current data of the window.
-    window->SetCurrentPVData(this->GetNthPVOutput(0));
-    
+    if ( ! hideFlag)
+      {
+      window->SetCurrentPVData(this->GetNthPVOutput(0));
+      }
+    else
+      {
+      this->SetVisibility(0);
+      }
+
     // Remove the local grab
     this->Script("grab release %s", this->ParameterFrame->GetWidgetName());    
     this->Initialized = 1;
     }
 
-  window->GetMainView()->SetSelectedComposite(this);
+  if (hideFlag == 0)
+    {
+    window->GetMainView()->SetSelectedComposite(this);
+    }
   window->GetMenuProperties()->CheckRadioButton(
-    window->GetMenuProperties(), "Radio", 2);
+                                  window->GetMenuProperties(), "Radio", 2);
   this->UpdateProperties();
   this->GetPVRenderView()->EventuallyRender();
 

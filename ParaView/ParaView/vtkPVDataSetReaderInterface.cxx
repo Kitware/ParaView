@@ -76,7 +76,7 @@ vtkPVDataSetReaderInterface* vtkPVDataSetReaderInterface::New()
 
 
 //----------------------------------------------------------------------------
-vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
+vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback(const char* name)
 {
   char *tclName, *extentTclName, *tmp;
   char *outputTclName;
@@ -90,6 +90,11 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   int extensionPosition;
   char *endingSlash = NULL;
   int slashPosition;
+
+  if (name != NULL)
+    {
+    vtkWarningMacro("Ignoring name.");
+    }
 
   // Create a name for the reader.
   if (!this->GetDataFileName())
@@ -225,7 +230,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
 
   pvd->InsertExtractPiecesIfNecessary();
 
-  pvs->Accept();
+  pvs->Accept(0);
 
   // so we get prompted for a filename if another data set reader is created
   this->SetDataFileName(NULL);

@@ -89,6 +89,8 @@ void vtkPVGlyph3D::SetGlyphSource(vtkPVData *source)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
+  this->SetNthPVInput(1, source);
+
   if (source)
     {
     source->Register(this);

@@ -72,7 +72,7 @@ vtkPVEnSightReaderInterface* vtkPVEnSightReaderInterface::New()
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
+vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback(const char* name)
 {
   char *tclName, *outputTclName, *srcTclName, *tmp;
   vtkDataSet *d;
@@ -88,6 +88,11 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
   char *newTclName;
   char *result;
   
+  if (name != NULL)
+    {
+    vtkWarningMacro("Ignoring name.");
+    }
+
   // Create the vtkSource.
   if (!this->GetDataFileName())
     {
@@ -196,6 +201,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetPreviousPVSource %d]",
                          pvs->GetTclName(), this->PVWindow->GetTclName(),
                          numOutputs - 1  - i);
+    pvs->SetTraceInitialized(1);
 
     srcTclName = new char[strlen(tclName)+2 + ((i+1)%10)+1];
     sprintf(srcTclName, "%s_%d", tclName, i+1);
@@ -203,7 +209,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     this->PVWindow->AddPVSource(pvs);
     this->PVWindow->ShowCurrentSourceProperties();
     pvs->SetPVOutput(pvd);
-    pvs->Accept();
+    pvs->Accept(0);
     
     pvs->Delete();
     pvd->Delete();

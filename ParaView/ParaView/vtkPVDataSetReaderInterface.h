@@ -60,7 +60,7 @@ public:
   static vtkPVDataSetReaderInterface* New();
   vtkTypeMacro(vtkPVDataSetReaderInterface, vtkPVSourceInterface);
 
-  vtkPVSource* CreateCallback();
+  vtkPVSource* CreateCallback(const char* name);
   
   void SaveInTclScript(ofstream *file, const char *sourceName);
   

@@ -388,9 +388,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 {
   vtkPVSourceInterface *sInt;
   vtkPVSource *pvs;
-  vtkPVData   *pvd;
-  vtkSource   *s;
-  vtkDataSet  *d;
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
   vtkKWInteractor *interactor;
   vtkKWRadioButton *button;
@@ -501,7 +498,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
     if (sInt->GetInputClassName() == NULL)
       {
       // Remove "vtk" from the class name to get the menu item name.
-      this->SourceMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
+      this->SourceMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback {}");
       }
     }
 
@@ -717,79 +714,30 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   this->Script( "wm deiconify %s", this->GetWidgetName());  
 
+  
+
   // Create the sources that can be used for glyphing.
   // ===== Arrow
-  s = (vtkSource *)(pvApp->MakeTclObject("vtkArrowSource", "pvGlyphArrow"));
-  pvs = vtkPVSource::New();
-  pvs->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
-  pvs->SetApplication(pvApp);
-  pvs->SetVTKSource(s, "pvGlyphArrow");
-  pvs->SetName("Arrow");
-  //pvs->SetInterface(this->CutPlaneInterface);
-  //pvs->CreateProperties();
-  // Create the output.
-  pvd = vtkPVData::New();
-  pvd->SetPVApplication(pvApp);
-  // Create the object through tcl on all processes.
-  d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphArrowOutput"));
-  pvd->SetVTKData(d, "pvGlyphArrowOutput");
-  // Connect the source and data.
-  pvs->SetPVOutput(pvd);
-  pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
-			 pvd->GetVTKDataTclName());
+  sInt = this->GetSourceInterface("vtkArrowSource");
+  pvs = sInt->CreateCallback("GlyphArrow");
+  pvs->Accept(1);
   this->GlyphSources->AddItem(pvs);
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetGlyphSource %s]", 
-                       pvs->GetTclName(), this->GetTclName(), pvs->GetName());
-  pvs->Delete();
-  pvd->Delete();
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetGlyphSource GlyphArrow]", 
+                       pvs->GetTclName(), this->GetTclName());
+  pvs->SetTraceInitialized(1);
   // ===== Cone
-  s = (vtkSource *)(pvApp->MakeTclObject("vtkConeSource", "pvGlyphCone"));
-  pvs = vtkPVSource::New();
-  pvs->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
-  pvs->SetApplication(pvApp);
-  pvs->SetVTKSource(s, "pvGlyphCone");
-  pvs->SetName("Cone");
-  //pvs->SetInterface(this->CutPlaneInterface);
-  //pvs->CreateProperties();
-  // Create the output.
-  pvd = vtkPVData::New();
-  pvd->SetPVApplication(pvApp);
-  // Create the object through tcl on all processes.
-  d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphConeOutput"));
-  pvd->SetVTKData(d, "pvGlyphConeOutput");
-  // Connect the source and data.
-  pvs->SetPVOutput(pvd);
-  pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
-			 pvd->GetVTKDataTclName());
+  sInt = this->GetSourceInterface("vtkConeSource");
+  pvs = sInt->CreateCallback("GlyphCone");
+  pvs->Accept(1);
   this->GlyphSources->AddItem(pvs);
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetGlyphSource %s]", 
-                       pvs->GetTclName(), this->GetTclName(), pvs->GetName());
-  pvs->Delete();
-  pvd->Delete();
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetGlyphSource GlyphCone]", 
+                       pvs->GetTclName(), this->GetTclName());
+  pvs->SetTraceInitialized(1);
   // ===== Sphere
-  s = (vtkSource *)(pvApp->MakeTclObject("vtkSphereSource", "pvGlyphSphere"));
-  pvs = vtkPVSource::New();
-  pvs->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
-  pvs->SetApplication(pvApp);
-  pvs->SetVTKSource(s, "pvGlyphSphere");
-  pvs->SetName("Sphere");
-  //pvs->SetInterface(this->CutPlaneInterface);
-  //pvs->CreateProperties();
-  // Create the output.
-  pvd = vtkPVData::New();
-  pvd->SetPVApplication(pvApp);
-  // Create the object through tcl on all processes.
-  d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphSphereOutput"));
-  pvd->SetVTKData(d, "pvGlyphSphereOutput");
-  // Connect the source and data.
-  pvs->SetPVOutput(pvd);
-  pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
-			 pvd->GetVTKDataTclName());
+  sInt = this->GetSourceInterface("vtkSphereSource");
+  pvs = sInt->CreateCallback("GlyphSphere");
+  pvs->Accept(1);
   this->GlyphSources->AddItem(pvs);
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetGlyphSource %s]", 
-                       pvs->GetTclName(), this->GetTclName(), pvs->GetName());
-  pvs->Delete();
-  pvd->Delete();
 
   // Show glyph sources in menu.
   this->UpdateSelectMenu();
@@ -1037,10 +985,12 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   
   delete [] rootName;
 
-  pvs = sInt->CreateCallback();
+  pvs = sInt->CreateCallback(NULL);
   this->GetPVApplication()->AddTraceEntry("set kw(%s) [$kw(%s) Open %s]",
                                           pvs->GetTclName(),
                                           this->GetTclName(), openFileName);
+  pvs->SetTraceInitialized(1);
+
   if ( pvs )
     {
     // Store MRU
@@ -1441,7 +1391,7 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
       {
       if (sInt->GetIsValidInput(pvd))
         {
-        this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
+        this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback {}");
         }
       }
     this->Script("%s entryconfigure \"VTK Filters\" -state normal",
@@ -1721,6 +1671,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
 
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) CalculatorCallback]", 
                       calc->GetTclName(), this->GetTclName());
+  calc->SetTraceInitialized(1);
 
   this->GetMainView()->AddComposite(calc);
   calc->CreateProperties();
@@ -1803,6 +1754,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
 
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) CutPlaneCallback]", 
                        cutPlane->GetTclName(), this->GetTclName());
+  cutPlane->SetTraceInitialized(1);
 
   this->GetMainView()->AddComposite(cutPlane);
   cutPlane->CreateProperties();
@@ -1882,6 +1834,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
 
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ThresholdCallback]", 
                        threshold->GetTclName(), this->GetTclName());
+  threshold->SetTraceInitialized(1);
 
   this->GetMainView()->AddComposite(threshold);
   threshold->CreateProperties();
@@ -1965,6 +1918,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
 
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ClipPlaneCallback]", 
                        clipPlane->GetTclName(), this->GetTclName());
+  clipPlane->SetTraceInitialized(1);
 
   this->GetMainView()->AddComposite(clipPlane);
   clipPlane->CreateProperties();
@@ -2049,6 +2003,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
 
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ContourCallback]", 
                        contour->GetTclName(), this->GetTclName());
+  contour->SetTraceInitialized(1);
 
   this->GetMainView()->AddComposite(contour);
   contour->CreateProperties();
@@ -2128,6 +2083,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
 
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GlyphCallback]", 
                        pvGlyph->GetTclName(), this->GetTclName());
+  pvGlyph->SetTraceInitialized(1);
 
   this->GetMainView()->AddComposite(pvGlyph);
   pvGlyph->CreateProperties();
@@ -2206,6 +2162,7 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
 
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ProbeCallback]", 
                        probe->GetTclName(), this->GetTclName());
+  probe->SetTraceInitialized(1);
 
   this->GetMainView()->AddComposite(probe);
   probe->CreateProperties();
@@ -2419,7 +2376,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char *className)
     vtkErrorMacro("Could not create source: " << className);
     return NULL;
     }
-  pvs = sInt->CreateCallback();
+  pvs = sInt->CreateCallback(NULL);
 
   return pvs;
 }

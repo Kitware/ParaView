@@ -520,7 +520,7 @@ void vtkPVProbe::AcceptCallback()
   int component;
 
   // This can't be an accept command because this calls SetInput for the
-  // vtkProbeFilter, and vtkPVSource::AcceptCallback expects that the the
+  // vtkProbeFilter, and vtkPVSource::AcceptCallback expects that the
   // input has already been set.
   this->UpdateProbe();
   

@@ -54,11 +54,8 @@ int vtkPVSourceInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkPVSourceInterface::vtkPVSourceInterface()
-{
-  static int instanceCount = 0;
-  
+{  
   this->InstanceCount = 1;
-  ++instanceCount;
   
   this->SourceClassName = NULL;
   this->RootName = NULL;
@@ -111,9 +108,9 @@ void vtkPVSourceInterface::SetPVWindow(vtkPVWindow *w)
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource *vtkPVSourceInterface::CreateCallback()
+vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name)
 {
-  char tclName[100], extentTclName[100];
+  char tclName[100], otherTclName[100];
   const char *outputDataType;
   vtkDataSet *d;
   vtkPVData *pvd;
@@ -145,7 +142,18 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     }
 
   // Create the vtkSource.
-  sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
+  if (name && name[0] == '\0')
+    { // Tcl passes an emty string.
+    name = NULL;
+    }
+  if (name)
+    {
+    sprintf(tclName, "%s", name);
+    }
+  else
+    {
+    sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
+    }
   // Create the object through tcl on all processes.
   s = (vtkSource *)(pvApp->MakeTclObject(this->SourceClassName, tclName));
   if (s == NULL)
@@ -161,10 +169,16 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvs->SetInterface(this);
   pvs->SetVTKSource(s, tclName);
   pvs->SetName(tclName);  
-  
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) CreatePVSource %s]", 
-                       pvs->GetTclName(), this->PVWindow->GetTclName(),
-                       this->SourceClassName);
+
+  // If a name is specified, then we are creating a glyph source.  We do not want
+  // to trace the creation of these sources.
+  if (name == NULL)
+    {  
+    pvApp->AddTraceEntry("set kw(%s) [$kw(%s) CreatePVSource %s]", 
+                         pvs->GetTclName(), this->PVWindow->GetTclName(),
+                         this->SourceClassName);
+    pvs->SetTraceInitialized(1);
+    }
 
   // Set the input if necessary.
   if (this->InputClassName)
@@ -172,7 +186,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     pvs->SetPVInput(current);
     }
   
-  // Add the new Source to the View, and make it current.
+  // Add the new Source to the View.
   this->PVWindow->GetMainView()->AddComposite(pvs);
   pvs->CreateProperties();
 
@@ -193,16 +207,19 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
                       "Select the input vectors to process.");
     }
 
-  this->PVWindow->AddPVSource(pvs);
-  this->PVWindow->ShowCurrentSourceProperties();
+  if (name == NULL )
+    {
+    this->PVWindow->AddPVSource(pvs);
+    this->PVWindow->ShowCurrentSourceProperties();
+    }
 
   // Create the output.
   pvd = vtkPVData::New();
   pvd->SetPVApplication(pvApp);
-  sprintf(tclName, "%sOutput%d", this->RootName, this->InstanceCount);
+  sprintf(otherTclName, "%sOutput", tclName);
   // Create the object through tcl on all processes.
-  d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
-  pvd->SetVTKData(d, tclName);
+  d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, otherTclName));
+  pvd->SetVTKData(d, otherTclName);
 
   // Connect the source and data.
   pvs->SetPVOutput(pvd);
@@ -214,19 +231,18 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 
   if (!this->InputClassName)
     {
-    sprintf(extentTclName, "%s%dTranslator", this->RootName,
-	    this->InstanceCount);
-    pvApp->BroadcastScript("vtkPVExtentTranslator %s", extentTclName);
+    sprintf(otherTclName, "%sTranslator", tclName);
+    pvApp->BroadcastScript("vtkPVExtentTranslator %s", otherTclName);
     pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
-			   extentTclName, pvs->GetVTKSourceTclName());
+			   otherTclName, pvs->GetVTKSourceTclName());
     pvApp->BroadcastScript("%s SetExtentTranslator %s",
-			   pvd->GetVTKDataTclName(), extentTclName);
+			   pvd->GetVTKDataTclName(), otherTclName);
     // Hold onto name so it can be deleted.
-    pvs->SetExtentTranslatorTclName(extentTclName);
+    pvs->SetExtentTranslatorTclName(otherTclName);
     // Not as load balanced, but more efficient reading.
     if (s->IsA("vtkPOPReader"))
       {
-      //pvApp->BroadcastScript("%s SetSplitModeToYSlab", extentTclName);
+      //pvApp->BroadcastScript("%s SetSplitModeToYSlab", otherTclName);
       }
     }
   else
