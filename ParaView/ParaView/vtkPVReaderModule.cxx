@@ -85,7 +85,7 @@ void vtkPVReaderModule::CreateProperties()
   this->FileEntry->SetPVSource(this);
   this->FileEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->FileEntry->SetModifiedCommand(this->GetTclName(), 
-				      "SetAcceptButtonColorToRed");
+                                      "SetAcceptButtonColorToRed");
   this->FileEntry->SetObjectVariable(this->VTKSourceTclName, "FileName");
   this->FileEntry->Create(this->GetPVApplication());
   this->AddPVWidget(this->FileEntry);
@@ -95,7 +95,7 @@ void vtkPVReaderModule::CreateProperties()
 
 //----------------------------------------------------------------------------
 int vtkPVReaderModule::ClonePrototype(int makeCurrent, 
-				      vtkPVReaderModule*& clone )
+                                      vtkPVReaderModule*& clone )
 {
   clone = 0;
 
@@ -119,7 +119,17 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
     this->Iterator->GetData(val);
     if (strcmp(ext, val) == 0)
       {
-      return 1;
+      // The extension matches, see if the reader can read the file.
+      this->Script("%s vtkPVReaderModuleCanReadFileTemp",
+                   this->SourceClassName);
+      this->Script("vtkPVReaderModuleCanReadFileTemp CanReadFile {%s}",
+                   fname);
+      int result = this->GetIntegerResult(this->Application);
+      this->Script("vtkPVReaderModuleCanReadFileTemp Delete");
+      if(result)
+        {
+        return 1;
+        }
       }
     this->Iterator->GoToNextItem();
     }
@@ -145,12 +155,12 @@ int vtkPVReaderModule::ReadFile(const char* fname, vtkPVReaderModule*& clone)
   if (this->ClonePrototype(1, clone) != VTK_OK)
     {
     vtkErrorMacro("Error creating reader " << this->GetClassName()
-		  << endl);
+                  << endl);
     clone = 0;
     return VTK_ERROR;
     }
   this->Script("%s Set%s %s", clone->GetVTKSourceTclName(), 
-	       clone->FileEntry->GetVariableName(), fname);
+               clone->FileEntry->GetVariableName(), fname);
 
   const char* ext = this->ExtractExtension(fname);
   clone->FileEntry->SetExtension(ext+1);
@@ -162,8 +172,8 @@ int vtkPVReaderModule::ReadFile(const char* fname, vtkPVReaderModule*& clone)
       { 
       vtkPVApplication* pvApp=this->GetPVApplication();
       pvApp->AddTraceEntry("set kw(%s) [%s GetCurrentPVSource]", 
-			   clone->GetTclName(), 
-			   pvApp->GetMainWindow()->GetTclName());
+                           clone->GetTclName(), 
+                           pvApp->GetMainWindow()->GetTclName());
       clone->SetTraceInitialized(1);
       }
     }
