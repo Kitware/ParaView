@@ -280,7 +280,7 @@ void vtkPVActorComposite::CreateProperties()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();  
     
-  this->Properties->SetParent(this->GetPVData()->GetPVSource()->GetNotebook()->GetFrame("Data"));
+  this->Properties->SetParent(this->GetPVData()->GetPVSource()->GetNotebook()->GetFrame("Display"));
   this->Properties->Create(this->Application, "frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());

@@ -271,6 +271,7 @@ protected:
   vtkKWOptionMenu *ScalarOperationMenu;
   vtkKWLabel *ScalarOperationLabel;
   vtkKWWidget *ScalarOperationFrame;
+  vtkKWLabel *DisplayNameLabel;
   
   char *ChangeScalarsFilterTclName;
   char *DefaultScalarsName;

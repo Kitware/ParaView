@@ -79,7 +79,8 @@ vtkPVSource::vtkPVSource()
   this->ScalarOperationFrame = vtkKWWidget::New();
   this->ScalarOperationLabel = vtkKWLabel::New();
   this->ScalarOperationMenu = vtkKWOptionMenu::New();
-
+  this->DisplayNameLabel = vtkKWLabel::New();
+  
   this->ChangeScalarsFilterTclName = NULL;
   this->DefaultScalarsName = NULL;
   
@@ -169,6 +170,9 @@ vtkPVSource::~vtkPVSource()
   
   this->ScalarOperationFrame->Delete();
   this->ScalarOperationFrame = NULL;
+  
+  this->DisplayNameLabel->Delete();
+  this->DisplayNameLabel = NULL;
   
   if (this->ChangeScalarsFilterTclName)
     {
@@ -328,22 +332,29 @@ vtkPVApplication* vtkPVSource::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVSource::CreateProperties()
 {
+  char displayName[256];
   vtkPVApplication *app = this->GetPVApplication();
   
   // invoke super
   this->vtkKWComposite::CreateProperties();  
 
   // Set up the pages of the notebook.
-  this->Notebook->AddPage("Source");
-  this->Notebook->AddPage("Data");
+  this->Notebook->AddPage("Parameters");
+  this->Notebook->AddPage("Display");
   this->Notebook->SetMinimumHeight(500);
-  this->Properties->SetParent(this->Notebook->GetFrame("Source"));
+  this->Properties->SetParent(this->Notebook->GetFrame("Parameters"));
   this->Properties->Create(this->Application,"frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());
   
   // Setup the source page of the notebook.
 
+  this->DisplayNameLabel->SetParent(this->Properties);
+  sprintf(displayName, "Name: %s", this->VTKSourceTclName);
+  this->DisplayNameLabel->Create(app, "");
+  this->DisplayNameLabel->SetLabel(displayName);
+  this->Script("pack %s", this->DisplayNameLabel->GetWidgetName());
+  
   this->ParameterFrame->SetParent(this->Properties);
   this->ParameterFrame->Create(this->Application);
   this->ParameterFrame->SetLabel("Parameters");
