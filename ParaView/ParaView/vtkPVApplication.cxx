@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.2");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.3");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1440,6 +1440,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   
   //********
   // Simple test for Client/Server wrapper of vtkObject
+#if 0
   vtkClientServerStream& stream = this->ProcessModule->GetStream();
   vtkClientServerID instance_id = stream.GetUniqueID();
   stream << vtkClientServerStream::New << "vtkObject" 
@@ -1450,6 +1451,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   stream.Reset();
   stream << vtkClientServerStream::Delete << instance_id 
          << vtkClientServerStream::End;
+#endif
   //********
   
   
