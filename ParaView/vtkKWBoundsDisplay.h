@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkCutPlane.h
+  Program:   Visualization Toolkit
+  Module:    vtkKWBoundsDisplay.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,55 +39,50 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkCutPlane - SImple version
+// .NAME vtkKWBoundsDisplay - an entry with a label
 // .SECTION Description
-// vtkCutPlane is a simple version of the super class.
-// The need for this should go away once all attributes are put in field.
+// The LabeledEntry creates an entry with a label in front of it; both are
+// contained in a frame
 
 
-#ifndef __vtkCutPlane_h
-#define __vtkCutPlane_h
+#ifndef __vtkKWBoundsDisplay_h
+#define __vtkKWBoundsDisplay_h
 
-#include "vtkCutter.h"
-#include "vtkPlane.h"
+#include "vtkKWLabeledFrame.h"
 
+class vtkKWApplication;
+class vtkKWLabel;
 
-class VTK_EXPORT vtkCutPlane : public vtkCutter
+class VTK_EXPORT vtkKWBoundsDisplay : public vtkKWLabeledFrame
 {
 public:
-  void PrintSelf(ostream& os, vtkIndent indent);
-  vtkTypeMacro(vtkCutPlane,vtkCutter);
-  static vtkCutPlane *New();
+  static vtkKWBoundsDisplay* New();
+  vtkTypeMacro(vtkKWBoundsDisplay, vtkKWLabeledFrame);
 
   // Description:
-  // Direct acces to the plane parameters
-  vtkSetVector3Macro(Origin, float);
-  vtkGetVector3Macro(Origin, float);
-  vtkSetVector3Macro(Normal, float);
-  vtkGetVector3Macro(Normal, float);
+  // Create a Tk widget
+  void Create(vtkKWApplication *app);
 
   // Description:
-  // Offset of the plane from the origin.
-  // Units are respect to normal.
-  vtkSetMacro(Offset, float);
-  vtkGetMacro(Offset, float);
+  // Set the bounds to display.
+  void SetBounds(float bounds[6]);
+  vtkGetVector6Macro(Bounds, float);
 
 protected:
-  vtkCutPlane();
-  ~vtkCutPlane();
-  vtkCutPlane(const vtkCutPlane&) {};
-  void operator=(const vtkCutPlane&) {};
+  vtkKWBoundsDisplay();
+  ~vtkKWBoundsDisplay();
+  vtkKWBoundsDisplay(const vtkKWBoundsDisplay&) {};
+  void operator=(const vtkKWBoundsDisplay&) {};
 
-  void Execute(); //generate output data
+  void UpdateWidgets();
 
-  float Normal[3];
-  float Origin[3];
-  float Offset;
-  
-  vtkPlane *PlaneFunction;
-  
+  vtkKWLabel *XRangeLabel;
+  vtkKWLabel *YRangeLabel;
+  vtkKWLabel *ZRangeLabel;
+
+  float Bounds[6];
+
 };
 
+
 #endif
-
-

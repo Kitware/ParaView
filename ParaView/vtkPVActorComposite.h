@@ -65,6 +65,7 @@ class vtkPVApplication;
 class vtkPVRenderView;
 class vtkPVData;
 class vtkKWCheckButton;
+class vtkKWBoundsDisplay;
 class vtkScalarBarActor;
 class vtkCubeAxesActor2D;
 
@@ -244,10 +245,7 @@ protected:
   char *Name;
   vtkKWLabel *NumCellsLabel;
   vtkKWLabel *NumPointsLabel;
-  vtkKWLabel *BoundsLabel;
-  vtkKWLabel *XRangeLabel;
-  vtkKWLabel *YRangeLabel;
-  vtkKWLabel *ZRangeLabel;
+  vtkKWBoundsDisplay *BoundsDisplay;
   
   vtkKWScale *AmbientScale;
   

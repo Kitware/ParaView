@@ -39,10 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkObjectFactory.h"
 #include "vtkPVActorComposite.h"
 #include "vtkKWWidget.h"
 #include "vtkKWView.h"
-#include "vtkObjectFactory.h"
+#include "vtkKWBoundsDisplay.h"
 #include "vtkKWWindow.h"
 #include "vtkKWCheckButton.h"
 #include "vtkPVApplication.h"
@@ -109,10 +110,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->NumCellsLabel = vtkKWLabel::New();
   this->NumPointsLabel = vtkKWLabel::New();
   
-  this->BoundsLabel = vtkKWLabel::New();
-  this->XRangeLabel = vtkKWLabel::New();
-  this->YRangeLabel = vtkKWLabel::New();
-  this->ZRangeLabel = vtkKWLabel::New();
+  this->BoundsDisplay = vtkKWBoundsDisplay::New();
   
   this->AmbientScale = vtkKWScale::New();
 
@@ -250,7 +248,15 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
 			 this->LODMapperTclName);
   
   // Hard code assignment based on processes.
-  numProcs = pvApp->GetController()->GetNumberOfProcesses() ;
+  numProcs = pvApp->GetController()->GetNumberOfProcesses();
+
+  // Special debug situation. Only generate half the data.
+  // This allows us to debug the parallel features of the
+  // application and VTK on only one process.
+  if (getenv("PV_HALF_DEBUG") != NULL)
+    {
+    numProcs *= 2;
+    }
   for (id = 0; id < numProcs; ++id)
     {
     pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
@@ -275,14 +281,8 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->NumPointsLabel->Delete();
   this->NumPointsLabel = NULL;
   
-  this->BoundsLabel->Delete();
-  this->BoundsLabel = NULL;
-  this->XRangeLabel->Delete();
-  this->XRangeLabel = NULL;
-  this->YRangeLabel->Delete();
-  this->YRangeLabel = NULL;
-  this->ZRangeLabel->Delete();
-  this->ZRangeLabel = NULL;
+  this->BoundsDisplay->Delete();
+  this->BoundsDisplay = NULL;
   
   this->AmbientScale->Delete();
   this->AmbientScale = NULL;
@@ -438,15 +438,8 @@ void vtkPVActorComposite::CreateProperties()
   this->NumPointsLabel->SetParent(this->StatsFrame);
   this->NumPointsLabel->Create(this->Application, "");
   
-  this->BoundsLabel->SetParent(this->Properties);
-  this->BoundsLabel->Create(this->Application, "");
-  this->BoundsLabel->SetLabel("bounds:");
-  this->XRangeLabel->SetParent(this->Properties);
-  this->XRangeLabel->Create(this->Application, "");
-  this->YRangeLabel->SetParent(this->Properties);
-  this->YRangeLabel->Create(this->Application, "");
-  this->ZRangeLabel->SetParent(this->Properties);
-  this->ZRangeLabel->Create(this->Application, "");
+  this->BoundsDisplay->SetParent(this->Properties);
+  this->BoundsDisplay->Create(this->Application);
   
   this->AmbientScale->SetParent(this->Properties);
   this->AmbientScale->Create(this->Application, "-showvalue 1");
@@ -491,7 +484,7 @@ void vtkPVActorComposite::CreateProperties()
   this->ColorRangeMinEntry->SetParent(this->ColorRangeFrame);
   this->ColorRangeMinEntry->Create(this->Application);
   this->ColorRangeMinEntry->SetLabel("Min:");
-  this->ColorRangeMinEntry->GetEntry()->SetWidth(5);
+  this->ColorRangeMinEntry->GetEntry()->SetWidth(7);
   this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
                this->ColorRangeMinEntry->GetEntry()->GetWidgetName(),
                this->GetTclName());
@@ -501,7 +494,7 @@ void vtkPVActorComposite::CreateProperties()
   this->ColorRangeMaxEntry->SetParent(this->ColorRangeFrame);
   this->ColorRangeMaxEntry->Create(this->Application);
   this->ColorRangeMaxEntry->SetLabel("Max:");
-  this->ColorRangeMaxEntry->GetEntry()->SetWidth(5);
+  this->ColorRangeMaxEntry->GetEntry()->SetWidth(7);
   this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
                this->ColorRangeMaxEntry->GetEntry()->GetWidgetName(),
                this->GetTclName());
@@ -587,15 +580,8 @@ void vtkPVActorComposite::CreateProperties()
   this->Script("pack %s %s -side left",
                this->NumCellsLabel->GetWidgetName(),
                this->NumPointsLabel->GetWidgetName());
-  this->Script("pack %s",
-	       this->BoundsLabel->GetWidgetName());
-  this->Script("pack %s",
-	       this->XRangeLabel->GetWidgetName());
-  this->Script("pack %s",
-	       this->YRangeLabel->GetWidgetName());
-  this->Script("pack %s",
-	       this->ZRangeLabel->GetWidgetName());
-  this->Script("pack %s -fill x", this->ColorFrame->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", this->BoundsDisplay->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", this->ColorFrame->GetWidgetName());
   this->Script("pack %s %s -side left",
                this->ColorMenuLabel->GetWidgetName(),
                this->ColorMenu->GetWidgetName());
@@ -697,47 +683,12 @@ void vtkPVActorComposite::UpdateProperties()
   sprintf(tmp, "number of points: %d",
           this->GetPVData()->GetNumberOfPoints());
   this->NumPointsLabel->SetLabel(tmp);
-
-  if ((bounds[0] > VTK_FLOAT_MIN) && (bounds[1] < VTK_FLOAT_MAX) &&
-      (bounds[0] < bounds[1]))
-    {
-    sprintf(tmp, "x range: %f to %f", bounds[0], bounds[1]);
-    this->XRangeLabel->SetLabel(tmp);
-    }
-  else
-    {
-    validBounds = 0;
-    }
-  if ((bounds[2] > VTK_FLOAT_MIN) && (bounds[3] < VTK_FLOAT_MAX) &&
-      (bounds[0] < bounds[1]))
-    {
-    sprintf(tmp, "y range: %f to %f", bounds[2], bounds[3]);
-    this->YRangeLabel->SetLabel(tmp);
-    }
-  else
-    {
-    validBounds = 0;
-    }
-  if ((bounds[4] > VTK_FLOAT_MIN) && (bounds[5] < VTK_FLOAT_MAX) &&
-      (bounds[0] < bounds[1]))
-    {
-    sprintf(tmp, "z range: %f to %f", bounds[4], bounds[5]);
-    this->ZRangeLabel->SetLabel(tmp);
-    }
-  else
-    {
-    validBounds = 0;
-    }
-
-  if (!validBounds)
-    {
-    this->XRangeLabel->SetLabel("invalid bounds");
-    }
+  
+  this->BoundsDisplay->SetBounds(bounds);  
   
   // This doesn't need to be set currently because we're not packing
   // the AmbientScale.
-//  this->AmbientScale->SetValue(this->Property->GetAmbient());
-
+  //  this->AmbientScale->SetValue(this->Property->GetAmbient());
 
   currentColorBy = this->ColorMenu->GetValue();
   this->ColorMenu->ClearEntries();

@@ -65,6 +65,8 @@ vtkCutPlane::vtkCutPlane()
   this->Normal[0] = 0.0;
   this->Normal[1] = 0.0;
   this->Normal[2] = 1.0;
+
+  this->Offset = 0.0;
  
   this->PlaneFunction = vtkPlane::New();
   this->SetCutFunction(this->PlaneFunction);
@@ -81,6 +83,7 @@ void vtkCutPlane::Execute()
   this->PlaneFunction->SetOrigin(this->Origin);
   this->PlaneFunction->SetNormal(this->Normal);
   
+  this->SetValue(0, this->Offset);
   this->vtkCutter::Execute();
 }
 

@@ -145,6 +145,10 @@ public:
   void CalculatorCallback();
   
   // Description:
+  // Callback from the CutPlane button.
+  void CutPlaneCallback();
+
+  // Description:
   // Callback from the threshold button.
   void ThresholdCallback();
 
@@ -178,6 +182,7 @@ public:
   void WriteData();
 
   vtkGetObjectMacro(CalculatorButton, vtkKWPushButton);
+  vtkGetObjectMacro(CutPlaneButton, vtkKWPushButton);
   vtkGetObjectMacro(ThresholdButton, vtkKWPushButton);
   vtkGetObjectMacro(ContourButton, vtkKWPushButton);
   vtkGetObjectMacro(GlyphButton, vtkKWPushButton);
@@ -217,6 +222,7 @@ protected:
   
   vtkKWToolbar *Toolbar;
   vtkKWPushButton *CalculatorButton;
+  vtkKWPushButton *CutPlaneButton;
   vtkKWPushButton *ThresholdButton;
   vtkKWPushButton *ContourButton;
   vtkKWPushButton *GlyphButton;

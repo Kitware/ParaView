@@ -5,6 +5,7 @@ vtkCutMaterial
 vtkCutPlane 
 vtkImageOutlineFilter 
 vtkInteractor 
+vtkKWBoundsDisplay
 vtkKWCenterOfRotation 
 vtkKWFlyInteractor 
 vtkKWInteractor 
@@ -16,6 +17,7 @@ vtkPVActorComposite
 vtkPVAnimationInterface
 vtkPVApplication 
 vtkPVArrayCalculator 
+vtkPVCutPlane
 vtkPVContour 
 vtkPVData 
 vtkPVDataSetReaderInterface 

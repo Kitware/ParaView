@@ -1001,6 +1001,8 @@ void vtkPVSource::AcceptCallback()
   this->Script("%s configure -state normal",
                window->GetCalculatorButton()->GetWidgetName());
   this->Script("%s configure -state normal",
+               window->GetCutPlaneButton()->GetWidgetName());
+  this->Script("%s configure -state normal",
                window->GetThresholdButton()->GetWidgetName());
   this->Script("%s configure -state normal",
                window->GetContourButton()->GetWidgetName());

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkCutPlane.h
+  Module:    vtkPVCutPlane.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,55 +39,71 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkCutPlane - SImple version
+// .NAME vtkPVCutPlane - A class to handle the special case of cutting
+// with an implict plane
 // .SECTION Description
-// vtkCutPlane is a simple version of the super class.
-// The need for this should go away once all attributes are put in field.
 
 
-#ifndef __vtkCutPlane_h
-#define __vtkCutPlane_h
+#ifndef __vtkPVCutPlane_h
+#define __vtkPVCutPlane_h
 
-#include "vtkCutter.h"
-#include "vtkPlane.h"
+#include "vtkPVSource.h"
+class vtkKWBoundsDisplay;
 
-
-class VTK_EXPORT vtkCutPlane : public vtkCutter
+class VTK_EXPORT vtkPVCutPlane : public vtkPVSource
 {
 public:
-  void PrintSelf(ostream& os, vtkIndent indent);
-  vtkTypeMacro(vtkCutPlane,vtkCutter);
-  static vtkCutPlane *New();
+  static vtkPVCutPlane* New();
+  vtkTypeMacro(vtkPVCutPlane, vtkPVSource);
+    
+  void CreateProperties();
 
   // Description:
-  // Direct acces to the plane parameters
-  vtkSetVector3Macro(Origin, float);
-  vtkGetVector3Macro(Origin, float);
-  vtkSetVector3Macro(Normal, float);
-  vtkGetVector3Macro(Normal, float);
+  // Callback that set the center to the middle of the bounds.
+  void CenterResetCallback();
+
+  // Descript:
+  // Callbacks to set the normal.
+  void NormalCameraCallback();
+  void NormalXCallback();
+  void NormalYCallback();
+  void NormalZCallback();
 
   // Description:
-  // Offset of the plane from the origin.
-  // Units are respect to normal.
-  vtkSetMacro(Offset, float);
-  vtkGetMacro(Offset, float);
-
+  // Also Update the bounds display.
+  virtual void UpdateParameterWidgets();
+    
 protected:
-  vtkCutPlane();
-  ~vtkCutPlane();
-  vtkCutPlane(const vtkCutPlane&) {};
-  void operator=(const vtkCutPlane&) {};
+  vtkPVCutPlane();
+  ~vtkPVCutPlane();
+  vtkPVCutPlane(const vtkPVCutPlane&) {};
+  void operator=(const vtkPVCutPlane&) {};
 
-  void Execute(); //generate output data
+  vtkKWBoundsDisplay *BoundsDisplay;
 
-  float Normal[3];
-  float Origin[3];
-  float Offset;
-  
-  vtkPlane *PlaneFunction;
-  
+  vtkKWWidget *CenterFrame;
+  vtkKWLabel *CenterLabel;
+  vtkKWEntry *CenterXEntry;
+  vtkKWEntry *CenterYEntry; 
+  vtkKWEntry *CenterZEntry;
+  vtkKWPushButton *CenterResetButton;
+
+  vtkKWWidget *NormalFrame;
+  vtkKWLabel *NormalLabel;
+  vtkKWEntry *NormalXEntry;
+  vtkKWEntry *NormalYEntry; 
+  vtkKWEntry *NormalZEntry;
+
+  vtkKWWidget *NormalButtonFrame;
+  vtkKWPushButton *NormalCameraButton;
+  vtkKWPushButton *NormalXButton;
+  vtkKWPushButton *NormalYButton;
+  vtkKWPushButton *NormalZButton;
+
+  vtkKWWidget *OffsetFrame;
+  vtkKWLabel *OffsetLabel;
+  vtkKWEntry *OffsetEntry;
+
 };
 
 #endif
-
-

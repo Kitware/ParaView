@@ -393,7 +393,7 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
   char* tempName;
   char *charFound;
   int pos;
-  vtkPVSourceInterface *pvsInterface;
+  vtkPVSourceInterface *pvsInterface = this->GetInterface();
   
   if (this->ChangeScalarsFilterTclName)
     {

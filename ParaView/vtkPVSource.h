@@ -166,7 +166,7 @@ public:
   // Description:
   // This method resets the UI values (Widgets added with the following methods).
   // It uses the GetCommand supplied to the interface.
-  void UpdateParameterWidgets();
+  virtual void UpdateParameterWidgets();
   
   //---------------------------------------------------------------------
   // This is a poor way to create widgets.  Another method that integrates
