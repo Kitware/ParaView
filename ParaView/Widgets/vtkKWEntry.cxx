@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.47");
+vtkCxxRevisionMacro(vtkKWEntry, "1.48");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -237,7 +237,7 @@ void vtkKWEntry::SetValue(const char *s)
 void vtkKWEntry::SetValue(int i)
 {
   char *val = this->GetValue();
-  if (val && *val && i = this->GetValueAsInt())
+  if (val && *val && i == this->GetValueAsInt())
     {
     return;
     }
