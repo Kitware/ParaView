@@ -35,7 +35,7 @@
 // .SECTION See Also
 // vtkSubdivisionAlgorithm
 
-#include <vtkSubdivisionAlgorithm.h>
+#include "vtkSubdivisionAlgorithm.h"
 
 class vtkCell;
 class vtkDataSet;

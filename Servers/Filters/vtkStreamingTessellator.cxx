@@ -11,10 +11,10 @@
  * Edit vtkStreamingTessellatorGenerator.py instead.
  */
 
-#include <vtkObjectFactory.h>
+#include "vtkObjectFactory.h"
 
-#include <vtkStreamingTessellator.h>
-#include <vtkSubdivisionAlgorithm.h>
+#include "vtkStreamingTessellator.h"
+#include "vtkSubdivisionAlgorithm.h"
 #undef UGLY_ASPECT_RATIO_HACK
 #undef DBG_MIDPTS
 
@@ -29,7 +29,7 @@
 #  define VTK_TESSELLATOR_INCR_SUBCASE_COUNT(cs,sc)
 #endif // PARAVIEW_DEBUG_TESSELLATOR
 
-vtkCxxRevisionMacro(vtkStreamingTessellator,"1.5");
+vtkCxxRevisionMacro(vtkStreamingTessellator,"1.6");
 vtkStandardNewMacro(vtkStreamingTessellator);
 
 void vtkStreamingTessellator::PrintSelf( ostream& os, vtkIndent indent )

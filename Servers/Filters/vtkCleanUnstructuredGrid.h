@@ -29,7 +29,7 @@
 #ifndef __vtkCleanUnstructuredGrid_h
 #define __vtkCleanUnstructuredGrid_h
 
-#include <vtkDataSetToUnstructuredGridFilter.h>
+#include "vtkDataSetToUnstructuredGridFilter.h"
 
 class vtkUnstructuredGrid;
 class vtkPointLocator;

@@ -31,7 +31,7 @@
 // .SECTION See Also
 // vtkDataSetSubdivisionAlgorithm vtkStreamingTessellator
 
-#include <vtkObject.h>
+#include "vtkObject.h"
 
 class vtkDataSetAttributes;
 class vtkMatrix4x4;

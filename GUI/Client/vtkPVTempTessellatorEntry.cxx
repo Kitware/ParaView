@@ -9,30 +9,30 @@
 
 #include "vtkPVTempTessellatorEntry.h"
 
-#include <vtkObjectFactory.h>
+#include "vtkObjectFactory.h"
 
-#include <vtkKWLabeledFrame.h>
-#include <vtkKWFrame.h>
-#include <vtkKWListBox.h>
-#include <vtkKWCheckButton.h>
-#include <vtkKWEntry.h>
-#include <vtkKWLabel.h>
-#include <vtkKWApplication.h>
+#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrame.h"
+#include "vtkKWListBox.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
+#include "vtkKWApplication.h"
 
-#include <vtkPVSource.h>
-#include <vtkPVInputMenu.h>
-#include <vtkPVDataSetAttributesInformation.h>
-#include <vtkPVDataInformation.h>
-#include <vtkPVArrayInformation.h>
-#include <vtkPVScalarListWidgetProperty.h>
-#include <vtkPVXMLElement.h>
+#include "vtkPVSource.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVArrayInformation.h"
+#include "vtkPVScalarListWidgetProperty.h"
+#include "vtkPVXMLElement.h"
 
 #define PLAIN "#007700"
 #define EMPHS "#004400"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.11");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.12");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData

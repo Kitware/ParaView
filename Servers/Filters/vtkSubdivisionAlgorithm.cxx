@@ -7,12 +7,12 @@
  * statement of authorship are reproduced on all copies.
  */
 
-#include <vtkSubdivisionAlgorithm.h>
-#include <vtkStreamingTessellator.h>
-#include <vtkDataSetAttributes.h>
-#include <vtkMatrix4x4.h>
+#include "vtkSubdivisionAlgorithm.h"
+#include "vtkStreamingTessellator.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkMatrix4x4.h"
 
-vtkCxxRevisionMacro(vtkSubdivisionAlgorithm,"1.2");
+vtkCxxRevisionMacro(vtkSubdivisionAlgorithm,"1.3");
 
 void vtkSubdivisionAlgorithm::PrintSelf( ostream& os, vtkIndent indent )
 {
