@@ -30,7 +30,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.3");
+vtkCxxRevisionMacro(vtkPickFilter, "1.4");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -139,10 +139,12 @@ void vtkPickFilter::CellExecute()
   double pcoords[3];
   double dist2;
   double bestDist2 = VTK_LARGE_FLOAT;
-  double weights[48]; // maximum numer of points.
+  double* weights;
   vtkIdType numCells;
   vtkIdType bestId = -1;
 
+
+  weights = new double[input->GetMaxCellSize()];
   numCells = input->GetNumberOfCells();
   for (cellId=0; cellId < numCells; cellId++)
     {
@@ -160,6 +162,8 @@ void vtkPickFilter::CellExecute()
       bestDist2 = dist2;
       }
     }
+  delete [] weights;
+  weights = NULL;
 
   // Keep only the best seed cell among the processes.
   vtkIdList* regionCellIds = vtkIdList::New();
