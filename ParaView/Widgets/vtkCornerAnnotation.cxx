@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTextMapper.h"
 #include "vtkImageMapToWindowLevelColors.h"
 #include "vtkImageActor.h"
+#include "vtkViewport.h"
 
 
 //------------------------------------------------------------------------------

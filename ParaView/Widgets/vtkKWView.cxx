@@ -72,6 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWindow.h"
 #include "vtkWindow.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkProperty2D.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -1326,7 +1327,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.69 $");
+  this->ExtractRevision(os,"$Revision: 1.70 $");
 }
 
 void vtkKWView::SetupMemoryRendering(
