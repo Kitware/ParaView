@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.7");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.8");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -704,6 +704,13 @@ void vtkPVXMLPackageParser::CreateWriter(vtkPVXMLElement* we)
   if(parallel && (strcmp(parallel, "1") == 0))
     {
     pwm->SetParallel(1);
+    }
+  
+  // Check for the data mode method attribute.
+  const char* data_mode_method = we->GetAttribute("data_mode_method");
+  if(data_mode_method)
+    {
+    pwm->SetDataModeMethod(data_mode_method);
     }
   
   // Add the writer.

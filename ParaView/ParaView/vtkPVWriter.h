@@ -86,6 +86,12 @@ public:
   vtkBooleanMacro(Parallel, int);
   
   // Description:
+  // Get/Set the method called to set the writer's data mode.  Default
+  // is no method.
+  vtkSetStringMacro(DataModeMethod);
+  vtkGetStringMacro(DataModeMethod);
+  
+  // Description:
   // Check whether this writer supports the given VTK data set's type.
   int CanWriteData(vtkDataSet* data, int parallel);
   
@@ -108,6 +114,7 @@ protected:
   char* Description;
   char* Extension;
   int Parallel;
+  char* DataModeMethod;
 };
 
 #endif

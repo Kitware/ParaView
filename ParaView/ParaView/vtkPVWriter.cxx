@@ -56,6 +56,7 @@ vtkPVWriter::vtkPVWriter()
   this->Description = 0;
   this->Extension = 0;
   this->Parallel = 0;
+  this->DataModeMethod = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +66,7 @@ vtkPVWriter::~vtkPVWriter()
   this->SetWriterClassName(0);
   this->SetDescription(0);
   this->SetExtension(0);
+  this->SetDataModeMethod(0);
 }
 
 //----------------------------------------------------------------------------
@@ -72,14 +74,16 @@ void vtkPVWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "InputClassName: " 
-     << (this->InputClassName?this->InputClassName:"null") << endl;
+     << (this->InputClassName?this->InputClassName:"(none)") << endl;
   os << indent << "WriterClassName: " 
-     << (this->WriterClassName?this->WriterClassName:"null") << endl;
+     << (this->WriterClassName?this->WriterClassName:"(none)") << endl;
   os << indent << "Description: " 
-     << (this->Description?this->Description:"null") << endl;
+     << (this->Description?this->Description:"(none)") << endl;
   os << indent << "Extension: " 
-     << (this->Extension?this->Extension:"null") << endl;
+     << (this->Extension?this->Extension:"(none)") << endl;
   os << indent << "Parallel: " << this->Parallel << endl;
+  os << indent << "DataModeMethod: " 
+     << (this->DataModeMethod?this->DataModeMethod:"(none)") << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -105,6 +109,10 @@ void vtkPVWriter::Write(const char* fileName, const char* dataTclName,
     pvApp->BroadcastScript("%s writer", this->WriterClassName);
     pvApp->BroadcastScript("writer SetFileName %s", fileName);
     pvApp->BroadcastScript("writer SetInput %s", dataTclName);
+    if(this->DataModeMethod)
+      {
+      pvApp->BroadcastScript("writer %s", this->DataModeMethod);
+      }
     pvApp->BroadcastScript("writer Write");
     pvApp->BroadcastScript("writer Delete");
     }
@@ -113,6 +121,10 @@ void vtkPVWriter::Write(const char* fileName, const char* dataTclName,
     pvApp->BroadcastScript("%s writer", this->WriterClassName);
     pvApp->BroadcastScript("writer SetFileName %s", fileName);
     pvApp->BroadcastScript("writer SetInput %s", dataTclName);
+    if(this->DataModeMethod)
+      {
+      pvApp->BroadcastScript("writer %s", this->DataModeMethod);
+      }
     pvApp->BroadcastScript("writer SetNumberOfPieces %d", numProcs);
     pvApp->BroadcastScript("writer SetGhostLevel %d", ghostLevel);
     this->Script("writer SetStartPiece 0");
