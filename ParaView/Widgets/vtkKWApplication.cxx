@@ -73,7 +73,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.96.2.3");
+vtkCxxRevisionMacro(vtkKWApplication, "1.96.2.4");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -139,7 +139,8 @@ vtkKWApplication::vtkKWApplication()
     this->BalloonHelpWindow->Create(
       this, "toplevel", "-background black -borderwidth 1 -relief flat");
     this->BalloonHelpLabel->Create(
-      this, "label", "-background LightYellow -justify left -wraplength 2i");
+      this, "label", "-background LightYellow -foreground black -justify left "
+                     "-wraplength 2i");
     this->Script("pack %s", this->BalloonHelpLabel->GetWidgetName());
     this->Script("wm overrideredirect %s 1", 
                  this->BalloonHelpWindow->GetWidgetName());
