@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.36");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.37");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -620,7 +620,6 @@ void vtkPVMinMax::UpdateEnableState()
 void vtkPVMinMax::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "SetCommand: " << (this->SetCommand?this->SetCommand:"none") << endl;
   os << "PackVertically: " << this->PackVertically << endl;
   os << "MinScale: " << this->MinScale << endl;
   os << "MaxScale: " << this->MaxScale << endl;

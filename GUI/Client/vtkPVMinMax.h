@@ -58,12 +58,6 @@ public:
   void SetArrayMenu(vtkPVArrayMenu* widget);
 
   // Description:
-  // These commands are used to set/get values on/from the
-  // underlying VTK object.
-  vtkSetStringMacro(SetCommand);
-  vtkGetStringMacro(SetCommand);
-
-  // Description:
   // Callback for min scale
   void MinValueCallback();
   
@@ -166,8 +160,6 @@ protected:
   vtkKWScale *MaxScale;
   vtkKWWidget *MinFrame;
   vtkKWWidget *MaxFrame;
-
-  char *SetCommand;
 
   char* MinHelp;
   char* MaxHelp;
