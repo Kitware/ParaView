@@ -440,6 +440,7 @@ ADD_CUSTOM_COMMAND(
   COMMAND ${CMD}
   ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources
+  vtkPVDefaultModules Interface GetInterfaces
   Filters Manipulators Readers Sources Writers)
 
 SET_SOURCE_FILES_PROPERTIES(vtkPVInitialize.cxx PROPERTIES OBJECT_DEPENDS 

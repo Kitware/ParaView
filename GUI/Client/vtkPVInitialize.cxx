@@ -15,42 +15,32 @@
 #include "vtkPVInitialize.h"
 
 #include "vtkObjectFactory.h"
-//#include "vtkPVDefaultModules.h"
-#include "vtkPVGeneratedModules.h"
 #include "vtkPVWindow.h"
+
+#include "vtkToolkits.h" // Needed for vtkPVGeneratedModules
+#include "vtkPVConfig.h" // Needed for vtkPVGeneratedModules
+#include "vtkPVGeneratedModules.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInitialize);
-vtkCxxRevisionMacro(vtkPVInitialize, "1.6");
+vtkCxxRevisionMacro(vtkPVInitialize, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVInitialize::vtkPVInitialize()
 {
-  this->StandardFiltersString = 0;
-  this->StandardManipulatorsString = 0;
-  this->StandardReadersString = 0;
-  this->StandardSourcesString = 0;
-  this->StandardWritersString = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVInitialize::~vtkPVInitialize()
 {
-  this->SetStandardFiltersString(0);
-  this->SetStandardManipulatorsString(0);
-  this->SetStandardReadersString(0);
-  this->SetStandardSourcesString(0);
-  this->SetStandardWritersString(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVInitialize::Initialize(vtkPVWindow* win)
 {
-  win->ReadSourceInterfacesFromString(this->GetStandardSourcesInterfaces());
-  win->ReadSourceInterfacesFromString(this->GetStandardFiltersInterfaces());
-  win->ReadSourceInterfacesFromString(this->GetStandardReadersInterfaces());
-  win->ReadSourceInterfacesFromString(this->GetStandardManipulatorsInterfaces());
-  win->ReadSourceInterfacesFromString(this->GetStandardWritersInterfaces());
+  char* init_string = vtkPVDefaultModulesGetInterfaces();
+  win->ReadSourceInterfacesFromString(init_string);
+  delete [] init_string;
 }
 
 //----------------------------------------------------------------------------

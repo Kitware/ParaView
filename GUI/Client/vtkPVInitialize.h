@@ -42,24 +42,6 @@ protected:
   vtkPVInitialize();
   ~vtkPVInitialize();
 
-  char* GetStandardFiltersInterfaces();
-  char* GetStandardManipulatorsInterfaces();
-  char* GetStandardReadersInterfaces();
-  char* GetStandardSourcesInterfaces();
-  char* GetStandardWritersInterfaces();
-
-  char* StandardFiltersString;
-  char* StandardManipulatorsString;
-  char* StandardReadersString;
-  char* StandardSourcesString;
-  char* StandardWritersString;
-
-  vtkSetStringMacro(StandardFiltersString);
-  vtkSetStringMacro(StandardManipulatorsString);
-  vtkSetStringMacro(StandardReadersString);
-  vtkSetStringMacro(StandardSourcesString);
-  vtkSetStringMacro(StandardWritersString);
-
 private:
   vtkPVInitialize(const vtkPVInitialize&); // Not implemented
   void operator=(const vtkPVInitialize&); // Not implemented
