@@ -49,8 +49,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVTreeComposite_h
 
 #include "vtkTreeComposite.h"
-#include "vtkMPIController.h"
 #include "vtkPVRenderView.h"
+
+#ifdef _WIN32
+
+
+
+class VTK_EXPORT vtkPVTreeComposite : public vtkTreeComposite
+{
+public:
+  vtkPVTreeComposite() {};
+  static vtkPVTreeComposite *New() { return new vtkPVTreeComposite;}
+  vtkTypeMacro(vtkPVTreeComposite,vtkTreeComposite);
+
+  void SetRenderView(vtkPVRenderView *v) {v = v;}  
+  
+protected:
+  vtkPVTreeComposite(const vtkPVTreeComposite&) {};
+  void operator=(const vtkPVTreeComposite&) {};
+};
+
+
+#else
+
+/*
+
+#include "vtkMultiProcessController.h"
 
 class VTK_EXPORT vtkPVTreeComposite : public vtkTreeComposite
 {
@@ -75,17 +99,17 @@ protected:
   ~vtkPVTreeComposite();
   vtkPVTreeComposite(const vtkPVTreeComposite&) {};
   void operator=(const vtkPVTreeComposite&) {};
-  
+
+  int LocalProcessId;
+  int RenderAborted;
+  vtkPVRenderView *RenderView;
+
   int SatelliteFinalAbortCheck();
   int SatelliteAbortCheck();
   int RootAbortCheck();
   int RootFinalAbortCheck();
   
   vtkMPIController *MPIController;
-  int LocalProcessId;
-  int RenderAborted;
-
-  vtkPVRenderView *RenderView;
 
 //BTX  
   // For the asynchronous receives.
@@ -98,7 +122,15 @@ protected:
   // waiting in a blocking receive.  It expects to be pinged so
   // it can check for abort requests.
   int RootWaiting;
+
   
 };
 
+*/
+
+// ifndef _WIN32
+#endif
+
+
+// ifndef __vtkPVTreeComposite_h
 #endif

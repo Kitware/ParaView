@@ -29,8 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkToolkits.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkPVTreeComposite.h"
-
+#include "vtkTreeComposite.h"
 #include "vtkPVRenderView.h"
 #include "vtkKWInteractor.h"
 #include "vtkPVApplication.h"
@@ -115,7 +114,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   //this->RenderWindow->SetAbortCheckMethod(PVRenderViewAbortCheck, (void*)this);
   
   // Create the compositer.
-  this->Composite = (vtkPVTreeComposite*)pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1");
+  this->Composite = (vtkTreeComposite*)pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1");
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TreeComp1");
 
@@ -132,19 +131,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  pvApp->BroadcastScript("%s Delete", this->RendererTclName);
-  this->SetRendererTclName(NULL);
-  this->Renderer = NULL;
-  
-  pvApp->BroadcastScript("%s Delete", this->RenderWindowTclName);
-  this->SetRenderWindowTclName(NULL);
-  this->RenderWindow = NULL;
-  
-  pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
-  this->SetCompositeTclName(NULL);
-  this->Composite = NULL;
+  this->PrepareForDelete();
   
   this->NavigationFrame->Delete();
   this->NavigationFrame = NULL;
@@ -157,6 +144,50 @@ vtkPVRenderView::~vtkPVRenderView()
     this->CurrentInteractor = NULL;
     }
 }
+
+//----------------------------------------------------------------------------
+// Here we are going to change only the satellite procs.
+void vtkPVRenderView::PrepareForDelete()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (this->Composite)
+    {
+    vtkErrorMacro("Deleting TreeComposite.");
+    this->Composite->DebugOn();
+    pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
+    this->SetCompositeTclName(NULL);
+    this->Composite = NULL;
+    }
+
+  if (this->Renderer)
+    {
+    vtkErrorMacro("Deleting Renderer.");
+    this->Renderer->DebugOn();
+    pvApp->BroadcastScript("%s Delete", this->RendererTclName);
+    this->SetRendererTclName(NULL);
+    this->Renderer = NULL;
+    }
+
+  if (this->RenderWindow)
+    {
+    vtkErrorMacro("Deleting RenderWindow.");
+    this->RenderWindow->DebugOn();
+    pvApp->BroadcastScript("%s Delete", this->RenderWindowTclName);
+    this->SetRenderWindowTclName(NULL);
+    this->RenderWindow = NULL;
+    }
+
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::Close()
+{
+  this->PrepareForDelete();
+  vtkKWView::Close();
+}
+
 
 //----------------------------------------------------------------------------
 // Here we are going to change only the satellite procs.

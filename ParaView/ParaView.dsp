@@ -241,14 +241,6 @@ SOURCE=.\vtkKWInteractorTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkKWRenderView.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkKWRenderViewTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkKWRotateCameraInteractor.cxx
 # End Source File
 # Begin Source File
@@ -345,6 +337,14 @@ SOURCE=.\vtkPVEnSightReaderInterfaceTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVExtentTranslator.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVExtentTranslatorTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVGlyph3D.cxx
 # End Source File
 # Begin Source File
@@ -422,6 +422,10 @@ SOURCE=.\vtkPVThreshold.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVThresholdTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVTreeCompositeTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -856,26 +860,6 @@ InputName=vtkKWInteractor
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkKWRenderView.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkKWRenderView.h
-InputName=vtkKWRenderView
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkKWRotateCameraInteractor.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -1125,6 +1109,26 @@ InputName=vtkPVEnSightReaderInterface
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVExtentTranslator.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVExtentTranslator.h
+InputName=vtkPVExtentTranslator
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVGlyph3D.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -1323,6 +1327,26 @@ SOURCE=.\vtkPVThreshold.h
 # Begin Custom Build
 InputPath=.\vtkPVThreshold.h
 InputName=vtkPVThreshold
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVTreeComposite.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVTreeComposite.h
+InputName=vtkPVTreeComposite
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

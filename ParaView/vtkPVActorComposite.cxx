@@ -42,7 +42,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkCubeAxesActor2D.h"
 #include "vtkTimerLog.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVTreeComposite.h"
+#include "vtkTreeComposite.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()

@@ -5,9 +5,6 @@ ClientData vtkCameraInteractorNewCommand();
 int vtkClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkClipPlaneNewCommand();
-int vtkCutMaterialCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkCutMaterialNewCommand();
 int vtkCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkCutPlaneNewCommand();
@@ -80,6 +77,9 @@ ClientData vtkPVDataSetReaderInterfaceNewCommand();
 int vtkPVEnSightReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVEnSightReaderInterfaceNewCommand();
+int vtkPVExtentTranslatorCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVExtentTranslatorNewCommand();
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVGlyph3DNewCommand();
@@ -160,8 +160,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkCameraInteractorCommand);
   vtkTclCreateNew(interp,(char *) "vtkClipPlane", vtkClipPlaneNewCommand,
                   vtkClipPlaneCommand);
-  vtkTclCreateNew(interp,(char *) "vtkCutMaterial", vtkCutMaterialNewCommand,
-                  vtkCutMaterialCommand);
   vtkTclCreateNew(interp,(char *) "vtkCutPlane", vtkCutPlaneNewCommand,
                   vtkCutPlaneCommand);
   vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
@@ -210,6 +208,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVDataSetReaderInterfaceCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVEnSightReaderInterface", vtkPVEnSightReaderInterfaceNewCommand,
                   vtkPVEnSightReaderInterfaceCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVExtentTranslator", vtkPVExtentTranslatorNewCommand,
+                  vtkPVExtentTranslatorCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVGlyph3D", vtkPVGlyph3DNewCommand,
                   vtkPVGlyph3DCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVInputMenu", vtkPVInputMenuNewCommand,

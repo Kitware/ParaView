@@ -45,10 +45,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
+#include "vtkTreeComposite.h"
 
 class vtkPVApplication;
 class vtkKWInteractor;
-class vtkPVTreeComposite;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
@@ -118,7 +118,7 @@ public:
 
   // Description:
   // This is for an experiment on rendering timing.  It should be temporary.
-  vtkPVTreeComposite *GetComposite() {return this->Composite;}
+  vtkTreeComposite *GetComposite() {return this->Composite;}
 
   // Description:
   // Update the navigation window for a particular source
@@ -148,6 +148,16 @@ public:
   // Description:
   // Change the background color.
   void SetBackgroundColor(float r, float g, float b);
+
+  // Description:
+  // Close the view - called from the vtkkwwindow. This default method
+  // will simply call Close() for all the composites. Can be overridden.
+  virtual void Close();
+
+  // Description:
+  // This method Sets all IVars to NULL and unregisters
+  // vtk objects.  This should eliminate circular references.
+  void PrepareForDelete();
   
 protected:
 
@@ -158,7 +168,7 @@ protected:
 
   int Interactive;
 
-  vtkPVTreeComposite *Composite;
+  vtkTreeComposite *Composite;
   char *CompositeTclName;
   vtkSetStringMacro(CompositeTclName);
 
