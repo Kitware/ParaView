@@ -67,17 +67,13 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
 
 // The applications Initialize Tcl also initializes Tk and needs a DISPLAY env variable set.
 // This is a temporary solution.
-#define ET_TCL_LIBRARY "C:/Program Files/Tcl/lib/tcl8.2"
 Tcl_Interp *vtkPVInitializeTcl()
 {
   Tcl_Interp *interp;
   
-  putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
-
-  Tcl_FindExecutable("ParaView");
   interp = Tcl_CreateInterp();
-  Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
-  Et_DoInit(interp);
+  // vtkKWApplication depends on this variable being set.
+  Et_Interp = interp;
   
   // initialize VTK
   Vtktcl_Init(interp);
@@ -167,21 +163,17 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     //putenv("DISPLAY=:0.0");
     //putenv("DISPLAY=www.kitware.com:2.0");
     
-    cerr << "I1\n";
     vtkKWApplication::SetWidgetVisibility(0);
     //Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
-    cerr << "I2\n";
     Tcl_Interp *interp = vtkPVInitializeTcl();
     
     // We should use the application tcl name in the future.
     // All object in the satellite processes must be created through tcl.
     // (To assign the correct name).
-    cerr << "interp: " << Et_Interp << endl;
     if (Tcl_Eval(interp, "vtkPVApplication Application") != TCL_OK)
       {
       cerr << "Error returned from tcl script.\n" << interp->result << endl;
       }
-    cerr << "Finished \n";
     int    error;
     vtkPVApplication *app = (vtkPVApplication *)(
       vtkTclGetPointerFromObject("Application","vtkPVApplication",
