@@ -21,6 +21,8 @@
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
+template class VTK_EXPORT vtkAbstractList<void*>;
+template class VTK_EXPORT vtkAbstractList<vtkObject*>;
 template class VTK_EXPORT vtkVector<void*>;
 template class VTK_EXPORT vtkVector<vtkObject*>;
 template class VTK_EXPORT vtkQueue<void*>;
