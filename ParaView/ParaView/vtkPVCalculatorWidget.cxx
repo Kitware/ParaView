@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.16");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.17");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -537,6 +537,19 @@ void vtkPVCalculatorWidget::ChangeAttributeMode(const char* newMode)
   char menuEntry[256];
   char* name;
 
+  if (!strcmp(newMode, "point"))
+    {
+    this->AttributeModeMenu->SetValue("Point Data");
+    this->AddTraceEntry("$kw(%s) ChangeAttributeMode {%s}",
+                        this->GetTclName(), newMode);
+    }
+  if (!strcmp(newMode, "cell"))
+    {
+    this->AttributeModeMenu->SetValue("Cell Data");
+    this->AddTraceEntry("$kw(%s) ChangeAttributeMode {%s}",
+                        this->GetTclName(), newMode);
+    }
+  
   this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
   this->VectorsMenu->GetMenu()->DeleteAllMenuItems();
   this->FunctionLabel->SetLabel("");
@@ -765,6 +778,17 @@ void vtkPVCalculatorWidget::Trace(ofstream *file)
     return;
     }
 
+  if (!strcmp(this->AttributeModeMenu->GetValue(), "Point Data"))
+    {
+    *file << "$kw(" << this->GetTclName() << ") ChangeAttributeMode {point}"
+          << endl;
+    }
+  if (!strcmp(this->AttributeModeMenu->GetValue(), "Cell Data"))
+    {
+    *file << "$kw(" << this->GetTclName() << ") ChangeAttributeMode {cell}"
+          << endl;
+    }
+  
   for (idx = 0; idx < this->NumberOfScalarVariables; ++ idx)
     {
     *file << "$kw(" << this->GetTclName() << ") AddScalarVariable {"
