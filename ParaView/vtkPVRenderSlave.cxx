@@ -82,32 +82,33 @@ void vtkPVRenderSlave::Render()
   unsigned char *pdata;
   int *window_size;
   int length;
-  int myId, numProcs, masterId;
-  float message[15];
+  int myId, numProcs;
+  vtkPVRenderSlaveInfo info;
   vtkMultiProcessController *controller;
 
   controller = this->PVSlave->GetController();
   myId = controller->GetLocalProcessId();
   numProcs = controller->GetNumberOfProcesses();
-  // Makes an assumption about how the tasks are setup.
-  masterId = numProcs - 1;
-  
+  // Makes an assumption about how the tasks are setup (UI id is 0).
   // Receive the camera information.
-  controller->Receive(message, 15, masterId, 133);
+  controller->Receive((char*)(&info), sizeof(struct vtkPVRenderSlaveInfo), 0, 133);
   vtkCamera *cam = this->Renderer->GetActiveCamera();
   vtkLightCollection *lc = this->Renderer->GetLights();
   lc->InitTraversal();
   vtkLight *light = lc->GetNextItem();
   
-  cam->SetPosition(message);
-  cam->SetFocalPoint(message+3);
-  cam->SetViewUp(message+6);
+  cam->SetPosition(info.CameraPosition);
+  cam->SetFocalPoint(info.CameraFocalPoint);
+  cam->SetViewUp(info.CameraViewUp);
+  cam->SetClippingRange(info.CameraClippingRange);
   if (light)
     {
-    light->SetPosition(message+9);
-    light->SetFocalPoint(message+12);
+    light->SetPosition(info.LightPosition);
+    light->SetFocalPoint(info.LightFocalPoint);
     }
   
+  this->RenderWindow->SetSize(info.WindowSize);
+ 
   vtkTimerLog *timer = vtkTimerLog::New();
   cerr << "    -Start Render\n";
   timer->StartTimer();
@@ -127,7 +128,7 @@ void vtkPVRenderSlave::Render()
   cerr << "    -Stop GetData: " << timer->GetElapsedTime() << endl;
   timer->Delete();
   
-  controller->Send((char*)pdata, length, masterId, 99);
+  controller->Send((char*)pdata, length, 0, 99);
 }
 
 
@@ -137,12 +138,10 @@ void vtkPVRenderSlave::TransmitBounds()
 {
   float bounds[6];
   vtkMultiProcessController *controller;
-  int masterId;
   
   this->Renderer->ComputeVisiblePropBounds(bounds);
   controller = this->PVSlave->GetController();
 
-  // Makes an assumption about how the tasks are setup.
-  masterId = controller->GetNumberOfProcesses() - 1;
-  controller->Send(bounds, 6, masterId, 112);  
+  // Makes an assumption about how the tasks are setup (UI id is 0).
+  controller->Send(bounds, 6, 0, 112);  
 }

@@ -89,7 +89,6 @@ public:
   // perform arguement substitution.
   void Script(char *EventString, ...);
   void SimpleScript(char *EventString);
-  void SlaveScript(int otherId);
 //ETX
 
 protected:

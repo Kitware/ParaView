@@ -54,6 +54,7 @@ public:
   // If a result string is passed in, the results are place in it. 
   void RemoteScript(int remoteId, char *EventString, ...);
   void RemoteSimpleScript(int remoteId, char *str);
+  void BroadcastSimpleScript(char *str);
 //ETX
   
   // Description:

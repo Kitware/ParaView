@@ -67,9 +67,19 @@ public:
   void MotionCallback(int x, int y);
 
   // Description:
+  // Compute the bounding box of all the visibile props
+  // Used in ResetCamera() and ResetCameraClippingRange()
+  void ComputeVisiblePropBounds( float bounds[6] ); 
+  
+  // Description:
   // Method called by the toolbar reset camera button.
   void ResetCamera();
-  
+
+  // Description:
+  // Reset the camera clipping range based on the bounds of the
+  // visible actors. This ensures that no props are cut off
+  void ResetCameraClippingRange();
+ 
 protected:
 
   vtkPVRenderView();

@@ -31,7 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkMultiProcessController.h"
 #include "vtkDummyRenderWindowInteractor.h"
 #include "vtkObjectFactory.h"
-#include "vtkRayCaster.h"
+#include "vtkPVRenderSlave.h"
 
 #include "vtkTimerLog.h"
 
@@ -42,6 +42,8 @@ void vtkPVRenderViewStartRender(void *arg)
 {
   vtkPVRenderView *rv = (vtkPVRenderView*)arg;
   vtkPVApplication *pvApp = (vtkPVApplication*)(rv->GetApplication());
+  struct vtkPVRenderSlaveInfo info;
+  int id, num;
   int *windowSize;
   
   if (TIMER == NULL)
@@ -50,28 +52,38 @@ void vtkPVRenderViewStartRender(void *arg)
     }
   TIMER->StartTimer();
   cerr << "  -Start Remote Render\n";
-  // Make sure the render slave size matches our size
-  windowSize = rv->GetRenderWindow()->GetSize();
-  pvApp->RemoteScript(0, "[RenderSlave GetRenderWindow] SetSize %d %d", 
-		      windowSize[0], windowSize[1]);
 
-  pvApp->RemoteSimpleScript(0, "RenderSlave Render");
-
+  // Get a global (across all processes) clipping range.
+  rv->ResetCameraClippingRange();
+  
   // Make sure the render slave has the same camera we do.
-  float message[15];
   vtkMultiProcessController *controller = pvApp->GetController();
   vtkCamera *cam = rv->GetRenderer()->GetActiveCamera();
   vtkLightCollection *lc = rv->GetRenderer()->GetLights();
   lc->InitTraversal();
   vtkLight *light = lc->GetNextItem();
   
-  cam->GetPosition(message);
-  cam->GetFocalPoint(message+3);
-  cam->GetViewUp(message+6);
-  light->GetPosition(message+9);
-  light->GetFocalPoint(message+12);
-  controller->Send(message, 15, 0, 133);
+  cam->GetPosition(info.CameraPosition);
+  cam->GetFocalPoint(info.CameraFocalPoint);
+  cam->GetViewUp(info.CameraViewUp);
+  cam->GetClippingRange(info.CameraClippingRange);
+  light->GetPosition(info.LightPosition);
+  light->GetFocalPoint(info.LightFocalPoint);
+
+  // Make sure the render slave size matches our size
+  windowSize = rv->GetRenderWindow()->GetSize();
+  info.WindowSize[0] = windowSize[0];
+  info.WindowSize[1] = windowSize[1];
+
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    pvApp->RemoteSimpleScript(id, "RenderSlave Render");
+    controller->Send((char*)(&info), sizeof(struct vtkPVRenderSlaveInfo), id, 133);
+    }
   
+  // Turn swap buffers off before the render so the end render method has a chance
+  // to add to the back buffer.
   rv->GetRenderWindow()->SwapBuffersOff();
 }
 
@@ -85,7 +97,8 @@ void vtkPVRenderViewEndRender(void *arg)
   int length;
   unsigned char *pdata, *pTmp;
   unsigned char *overlay, *endPtr;
-
+  int id, num;
+  
   windowSize = renWin->GetSize();
   length = 3*(windowSize[0] * windowSize[1]);
 
@@ -102,13 +115,17 @@ void vtkPVRenderViewEndRender(void *arg)
   // Get the results from the remote processes.
   pdata = new unsigned char[length];
   
+  // This will hold the place for compositing.
   controller = pvApp->GetController();
-  controller->Receive((char*)pdata, length, 0, 99);
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    controller->Receive((char*)pdata, length, id, 99);
+    }
   
   TIMER->StopTimer();
   cerr << "  -End Remote Render: " << TIMER->GetElapsedTime() << endl;
   
-
   // merge the two images.
   TIMER->StartTimer();
   cerr << "  -Start Merge\n";  
@@ -134,8 +151,7 @@ void vtkPVRenderViewEndRender(void *arg)
   cerr << "  -End Put Image: " << TIMER->GetElapsedTime() << endl;
 
   renWin->SwapBuffersOn();  
-  renWin->Frame();
-  
+  renWin->Frame(); 
   delete [] pdata;
 }
 
@@ -198,6 +214,8 @@ void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
 {
+  int id, num;
+  
   if (this->Application)
     {
     vtkErrorMacro("RenderView already created");
@@ -214,39 +232,63 @@ void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
   
   // Setup the remote renderers.
   vtkPVApplication *pvApp = (vtkPVApplication*)app;
-  pvApp->RemoteSimpleScript(0, "vtkPVRenderSlave RenderSlave");
-  // The global "Slave" was setup when the process was initiated.
-  pvApp->RemoteSimpleScript(0, "RenderSlave SetPVSlave Slave");
-  
-  // lets show something as a test.
-  pvApp->RemoteSimpleScript(0, "vtkConeSource ConeSource");
-  pvApp->RemoteSimpleScript(0, "vtkPolyDataMapper ConeMapper");
-  pvApp->RemoteSimpleScript(0, "ConeMapper SetInput [ConeSource GetOutput]");
-  pvApp->RemoteSimpleScript(0, "vtkActor ConeActor");
-  pvApp->RemoteSimpleScript(0, "ConeActor SetMapper ConeMapper");
-  pvApp->RemoteSimpleScript(0, "[RenderSlave GetRenderer] AddActor ConeActor");
-  
+  num = pvApp->GetController()->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    pvApp->RemoteSimpleScript(id, "vtkPVRenderSlave RenderSlave");
+    // The global "Slave" was setup when the process was initiated.
+    pvApp->RemoteSimpleScript(id, "RenderSlave SetPVSlave Slave");
+    }
   // The start and end methods merge the processes renderers.
   this->GetRenderer()->SetStartRenderMethod(vtkPVRenderViewStartRender, this);
-  this->GetRenderer()->SetEndRenderMethod(vtkPVRenderViewEndRender, this);
+  this->GetRenderer()->SetEndRenderMethod(vtkPVRenderViewEndRender, this);  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ComputeVisiblePropBounds(float bounds[6])
+{
+  float tmp[6];
+  int id, num;
+  
+  vtkPVApplication *pvApp = (vtkPVApplication*)(this->Application);
+  vtkMultiProcessController *controller = pvApp->GetController();
+  
+  num = controller->GetNumberOfProcesses();  
+  for (id = 1; id < num; ++id)
+    {
+    pvApp->RemoteSimpleScript(id, "RenderSlave TransmitBounds");
+    }
+  
+  controller->Receive(bounds, 6, 1, 112);
+  for (id = 2; id < num; ++id)
+    {
+    controller->Receive(tmp, 6, id, 112);
+    if (tmp[0] < bounds[0]) {bounds[0] = tmp[0];}
+    if (tmp[1] > bounds[1]) {bounds[1] = tmp[1];}
+    if (tmp[2] < bounds[2]) {bounds[2] = tmp[2];}
+    if (tmp[3] > bounds[3]) {bounds[3] = tmp[3];}
+    if (tmp[4] < bounds[4]) {bounds[4] = tmp[4];}
+    if (tmp[5] > bounds[5]) {bounds[5] = tmp[5];}
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCamera()
 {
   float bounds[6];
-  vtkPVApplication *pvApp = (vtkPVApplication*)(this->Application);
-  vtkMultiProcessController *controller = pvApp->GetController();
-  
-  pvApp->RemoteSimpleScript(0, "RenderSlave TransmitBounds");
 
-  controller->Receive(bounds, 6, 0, 112);
-  
+  this->ComputeVisiblePropBounds(bounds);
   this->GetRenderer()->ResetCamera(bounds);
-  this->Render();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ResetCameraClippingRange()
+{
+  float bounds[6];
 
+  this->ComputeVisiblePropBounds(bounds);
+  this->GetRenderer()->ResetCameraClippingRange(bounds);
+}
 
 //----------------------------------------------------------------------------
 // Called by a binding, so I must flip y.

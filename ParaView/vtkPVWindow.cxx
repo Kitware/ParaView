@@ -149,8 +149,27 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
 
 //----------------------------------------------------------------------------
+// Setup the pipeline
 void vtkPVWindow::SetupTest()
 {
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  int id, num;
+  
+  // Lets show a cone as a test.
+  num = pvApp->GetController()->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    pvApp->RemoteSimpleScript(id, "vtkConeSource ConeSource");
+    pvApp->RemoteSimpleScript(id, "vtkPolyDataMapper ConeMapper");
+    pvApp->RemoteSimpleScript(id, "ConeMapper SetInput [ConeSource GetOutput]");
+    pvApp->RemoteSimpleScript(id, "vtkActor ConeActor");
+    pvApp->RemoteSimpleScript(id, "ConeActor SetMapper ConeMapper");
+    pvApp->RemoteSimpleScript(id, "[RenderSlave GetRenderer] AddActor ConeActor");
+    // Shift to discount UI process
+    pvApp->RemoteScript(id, "[ConeSource GetOutput] SetUpdateExtent %d %d", id-1, num-1);
+    }
+  
+  // Setup an interactor style
   vtkInteractorStylePlaneSource *planeStyle = 
                       vtkInteractorStylePlaneSource::New();
   vtkInteractorStyle *style = vtkInteractorStyleCamera::New();
@@ -212,6 +231,9 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
 
   vtkKWWindow::SerializeToken(is,token);
 }
+
+
+
 
 
 

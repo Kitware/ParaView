@@ -39,6 +39,23 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkRenderer.h"
 
 
+//BTX
+// A structure to communicate renderer info.
+struct vtkPVRenderSlaveInfo 
+{
+  float CameraPosition[3];
+  float CameraFocalPoint[3];
+  float CameraViewUp[3];
+  float CameraClippingRange[2];
+  float LightPosition[3];
+  float LightFocalPoint[3];
+  int WindowSize[2];
+};
+//ETX
+
+
+
+
 class VTK_EXPORT vtkPVRenderSlave : public vtkObject
 {
 public:

@@ -47,13 +47,9 @@ extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 
 Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 {
-  cerr << "Start UI Initialize\n";
-
   Tcl_Interp *interp = vtkKWApplication::InitializeTcl(argc,argv);
   Vtktkrenderwidget_Init(interp);
   Vtkkwparaviewtcl_Init(interp);
-  
-  cerr << "End UI Initialize\n";
   
   return interp;
 }
@@ -94,7 +90,6 @@ void vtkPVApplication::RemoteScript(int id, char *format, ...)
 
   this->RemoteSimpleScript(id, event);
 }
-
 //----------------------------------------------------------------------------
 void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
 {
@@ -108,12 +103,21 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
     return;
     }
 
-  this->Controller->TriggerRMI(remoteId, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+  cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
+  
+  this->Controller->TriggerRMI(remoteId, str, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+}
 
-  this->Controller->Send(&length, 1, remoteId, VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG);
-  this->Controller->Send(str, length, remoteId, VTK_PV_SLAVE_SCRIPT_COMMAND_TAG);
-
-  //cerr << "Master: " << str << endl;
+//----------------------------------------------------------------------------
+void vtkPVApplication::BroadcastSimpleScript(char *str)
+{
+  int id, num;
+  
+  num = this->Controller->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    this->RemoteSimpleScript(id, str);
+    }
 }
 
 
@@ -163,7 +167,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->Windows->AddItem(ui);
   ui->Create(this,"");
   
-  if (argc > 1)
+  if (argc > 1 && argv[1])
     {
     // if a tcl script was passed in as an arg then load it
     if (!strcmp(argv[1] + strlen(argv[1]) - 4,".tcl"))

@@ -46,7 +46,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
 {
   vtkPVSlave *self = (vtkPVSlave *)(localArg);
 
-  self->SlaveScript(remoteProcessId);
+  self->SimpleScript((char*)remoteArg);
 }
 
 
@@ -185,34 +185,14 @@ void vtkPVSlave::SimpleScript(char *event)
   vtkOutputWindow::GetInstance()->DisplayText(event);
   vtkOutputWindow::GetInstance()->DisplayText("\n");
 #endif
-    
+  
+  cerr << this->Controller->GetLocalProcessId() << ": interp (" << this->Interp << "): " << event << endl;  
+  
   if (Tcl_Eval(this->Interp, event) != TCL_OK)
     {
     vtkGenericWarningMacro("In Script (" << this->Interp << "): " 
 			   << event << "\nReceived Error: " << this->Interp->result);
     }
-}
-
-
-void vtkPVSlave::SlaveScript(int otherId)
-{
-  int length;
-  char *str, *result;
-  vtkMultiProcessController *controller;
-
-  // Receive string to evaluate.
-  this->Controller->Receive(&length, 1, otherId, VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG);
-  if (length <= 0)
-    {
-    cerr << "ERROR: NULL script\n";
-    }
-  str = new char[length];
-  this->Controller->Receive(str, length, otherId, VTK_PV_SLAVE_SCRIPT_COMMAND_TAG);
-
-  // Evalute string ...
-  this->SimpleScript(str);
-  
-  delete [] str;
 }
 
 
