@@ -382,6 +382,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->InsertCommand(4, "Open Log File", this, "StartLog");
   this->MenuFile->InsertCommand(5, "Close Log File", this, "StopLog");
 
+  // Save current data in VTK format
+  this->MenuFile->InsertCommand(6, "Save Data", this, "WriteData");
+  
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->Application, "-tearoff 0");
   this->Menu->InsertCascade(2, "Select", this->SelectMenu, 0);
@@ -743,6 +746,32 @@ void vtkPVWindow::Open()
     }
 }
 
+void vtkPVWindow::WriteData()
+{
+  if (!this->CurrentPVData)
+    {
+    return;
+    }
+  
+  char filename[256];
+  
+  this->Script("tk_getSaveFile -filetypes {{{VTK files} {.vtk}}} -defaultextension .vtk -initialfile data.vtk");
+  sprintf(filename, "%s", this->Application->GetMainInterp()->result);
+  
+  if (strcmp(filename, "") == 0)
+    {
+    return;
+    }
+  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->MakeTclObject("vtkDataSetWriter", "writer");
+  pvApp->BroadcastScript("writer SetFileName %s", filename);
+  pvApp->BroadcastScript("writer SetInput %s",
+                         this->GetCurrentPVData()->GetVTKDataTclName());
+  pvApp->BroadcastScript("writer SetFileTypeToBinary");
+  pvApp->BroadcastScript("writer Write");
+  pvApp->BroadcastScript("writer Delete");
+}
 
 //============================================================================
 // These methods have things in common, 

@@ -173,6 +173,9 @@ public:
   // Stuff for creating a log file for times.
   void StartLog();
   void StopLog();
+  
+  // Write current data to a VTK file
+  void WriteData();
 
   vtkGetObjectMacro(CalculatorButton, vtkKWPushButton);
   vtkGetObjectMacro(ThresholdButton, vtkKWPushButton);
