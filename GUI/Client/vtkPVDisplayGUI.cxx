@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.2");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.3");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1664,8 +1664,6 @@ void vtkPVDisplayGUI::SetRepresentation(const char* repr)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DrawWireframe()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
   if (this->GetPVSource()->GetInitialized())
     {
     this->AddTraceEntry("$kw(%s) DrawWireframe", this->GetTclName());
@@ -1684,8 +1682,6 @@ void vtkPVDisplayGUI::DrawWireframe()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DrawPoints()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if (this->GetPVSource()->GetInitialized())
     {
     this->AddTraceEntry("$kw(%s) DrawPoints", this->GetTclName());
@@ -1722,8 +1718,6 @@ void vtkPVDisplayGUI::DrawVolume()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DrawSurface()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if (this->GetPVSource()->GetInitialized())
     {
     this->AddTraceEntry("$kw(%s) DrawSurface", this->GetTclName());
@@ -1744,8 +1738,6 @@ void vtkPVDisplayGUI::DrawSurface()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DrawOutline()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   if (this->GetPVSource()->GetInitialized())
     {
     this->AddTraceEntry("$kw(%s) DrawOutline", this->GetTclName());
@@ -1820,8 +1812,6 @@ void vtkPVDisplayGUI::SetInterpolation(const char* repr)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetInterpolationToFlat()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", 
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Flat");
@@ -1837,8 +1827,6 @@ void vtkPVDisplayGUI::SetInterpolationToFlat()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetInterpolationToGouraud()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
   this->AddTraceEntry("$kw(%s) SetInterpolationToGouraud", 
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Gouraud");
@@ -2119,8 +2107,6 @@ void vtkPVDisplayGUI::SetPointSize(int size)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangePointSize()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   this->PVSource->GetPartDisplay()->SetPointSize(this->PointSizeThumbWheel->GetValue());
  
   if ( this->GetPVRenderView() )
@@ -2156,8 +2142,6 @@ void vtkPVDisplayGUI::SetLineWidth(int width)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangeLineWidth()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   this->PVSource->GetPartDisplay()->SetLineWidth(this->LineWidthThumbWheel->GetValue());
 
   if ( this->GetPVRenderView() )
