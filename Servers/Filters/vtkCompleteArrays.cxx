@@ -36,7 +36,7 @@
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
-vtkCxxRevisionMacro(vtkCompleteArrays, "1.5");
+vtkCxxRevisionMacro(vtkCompleteArrays, "1.6");
 vtkStandardNewMacro(vtkCompleteArrays);
 
 vtkCxxSetObjectMacro(vtkCompleteArrays,Controller,vtkMultiProcessController);
@@ -59,7 +59,6 @@ vtkCompleteArrays::~vtkCompleteArrays()
     this->Controller->UnRegister(this);
     this->Controller = NULL;
     }
-
 }
 
 //-----------------------------------------------------------------------------

@@ -39,7 +39,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkCaveRenderManager, "1.1");
+vtkCxxRevisionMacro(vtkCaveRenderManager, "1.2");
 vtkStandardNewMacro(vtkCaveRenderManager);
 
 // Structures to communicate render info.
@@ -512,7 +512,7 @@ void vtkCaveRenderManager::InternalSatelliteStartRender(vtkPVCaveClientInfo *inf
   vtkLight *light;
   vtkRenderWindow* renWin = this->RenderWindow;
 
-  // Delay swapping buffers untill all processes are finished.
+  // Delay swapping buffers until all processes are finished.
   if (this->Controller)
     {
     renWin->SwapBuffersOff();  
@@ -522,7 +522,7 @@ void vtkCaveRenderManager::InternalSatelliteStartRender(vtkPVCaveClientInfo *inf
   rens = renWin->GetRenderers();
   rens->InitTraversal();
   // NOTE:  We are now receiving first!!!!!  
-  // This will probably cause a bug based on the folloing comment
+  // This will probably cause a bug based on the following comment
   // about getting the active camera.
   // "We put this before receive because we want the pipeline to be
   // updated the first time if the camera does not exist and we want

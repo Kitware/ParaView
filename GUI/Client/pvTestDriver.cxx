@@ -119,6 +119,12 @@ void pvTestDriver::CollectConfiguredOptions()
 # ifdef VTK_MPI_POSTFLAGS
   SeparateArguments(VTK_MPI_POSTFLAGS, this->MPIPostFlags);
 # endif  
+# ifdef VTK_MPI_CLIENT_FLAGS
+  this->SeparateArguments(VTK_MPI_CLIENT_FLAGS, this->MPIClientFlags);
+# endif
+# ifdef VTK_MPI_SERVER_FLAGS
+  SeparateArguments(VTK_MPI_SERVER_FLAGS, this->MPIServerFlags);
+# endif  
   char buf[1024];
   sprintf(buf, "%d", serverNumProc);
   this->MPIServerNumProcessFlag = buf;
