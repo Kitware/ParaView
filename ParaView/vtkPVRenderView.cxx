@@ -831,11 +831,14 @@ void vtkPVRenderView::AddActorsToFile(ofstream *file)
   
   for (i = 0; i < this->GetRenderer()->GetActors()->GetNumberOfItems(); i++)
     {
-    *file << this->RendererTclName << " AddActor ";
     this->Script("set tempValue [[%s GetActors] GetItemAsObject %d]",
                  this->RendererTclName, i);
     result = this->Application->GetMainInterp()->result;
-    *file << result << "\n";
+    if (strncmp(result, "vtkTemp", 7) != 0)
+      {
+      *file << this->RendererTclName << " AddActor ";
+      *file << result << "\n";
+      }
     }
   *file << "\n";
   

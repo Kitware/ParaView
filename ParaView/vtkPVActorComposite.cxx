@@ -1428,11 +1428,6 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
         << this->ActorTclName << " SetMapper " << this->MapperTclName << "\n\t"
         << "[" << this->ActorTclName << " GetProperty] SetRepresentationTo"
         << this->Actor->GetProperty()->GetRepresentationAsString() << "\n\t"
-        << this->ActorTclName << " SetVisibility "
-        << this->Actor->GetVisibility() << "\n\n";
-
-  *file << "vtkActor " << this->ActorTclName << "\n\t"
-        << this->ActorTclName << " SetMapper " << this->MapperTclName << "\n\t"
         << "[" << this->ActorTclName << " GetProperty] SetInterpolationTo"
         << this->Actor->GetProperty()->GetInterpolationAsString() << "\n\t"
         << this->ActorTclName << " SetVisibility "
