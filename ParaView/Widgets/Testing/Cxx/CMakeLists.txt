@@ -5,6 +5,6 @@ ADD_TEST(TestHashTable ${CXX_TEST_PATH}/TestHashTable)
 ADD_TEST(TestPointerArray ${CXX_TEST_PATH}/TestPointerArray)
 
 LINK_LIBRARIES( 
-    vtkKWWidgetsTcl
+    vtkKWWidgetsTCL
     vtkCommon
 )
