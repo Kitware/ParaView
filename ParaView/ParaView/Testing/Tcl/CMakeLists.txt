@@ -81,6 +81,10 @@ IF (VTK_USE_MPI)
               ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/RotateTranslate.pvs 
               -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
 
+      ADD_TEST(ScalarRangeLabel-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ScalarRangeLabel.pvs 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
       ADD_TEST(ScalarSelection-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
               ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ScalarSelection.pvs 
               -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
@@ -187,6 +191,10 @@ ADD_TEST(ProbePoint ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(RotateTranslate ${PARAVIEW_EXECUTABLE}
          ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/RotateTranslate.pvs 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
+
+ADD_TEST(ScalarRangeLabel ${PARAVIEW_EXECUTABLE}
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ScalarRangeLabel.pvs 
          -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(ScalarSelection ${PARAVIEW_EXECUTABLE}
