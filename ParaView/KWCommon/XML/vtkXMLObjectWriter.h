@@ -64,7 +64,9 @@ public:
   vtkGetObjectMacro(Object, vtkObject);
 
   // Description:
-  // Create an XML representation of the object
+  // Create an XML representation of the object (in-place) by setting
+  // the name, attributes and nested element of 'elem' according to the
+  // current 'Object'.
   // Return 1 on success, 0 otherwise.
   virtual int Create(vtkXMLDataElement *elem);
 
@@ -78,6 +80,22 @@ public:
   // Return the name of the root element of the XML tree this writer
   // is supposed to write.
   virtual char* GetRootElementName() = 0;
+
+  // Description:
+  // Convenience method to create an XML representation of the object
+  // (see Create()) and insert that representation (XML data element) 
+  // inside 'parent'.
+  // Return 1 on success, 0 otherwise.
+  virtual int CreateInElement(vtkXMLDataElement *parent);
+
+  // Description:
+  // Convenience method to create a simple XML parent element with 
+  // name 'name', insert it inside 'grandparent', then create an XML 
+  // representation of the objet inside that parent (see CreateInElement()), 
+  // thus creating a 2nd nested element.
+  // Return 1 on success, 0 otherwise.
+  virtual int CreateInNestedElement(vtkXMLDataElement *grandparent, 
+                                    const char *name);
 
 protected:
   vtkXMLObjectWriter();

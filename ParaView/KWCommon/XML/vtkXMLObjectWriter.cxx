@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLUtilities.h"
 #include "vtkXMLDataElement.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLObjectWriter, "1.3");
 
 vtkCxxSetObjectMacro(vtkXMLObjectWriter, Object, vtkObject);
 
@@ -111,6 +111,61 @@ int vtkXMLObjectWriter::Create(vtkXMLDataElement *elem)
   elem->SetName(this->GetRootElementName());
   this->AddAttributes(elem);
   this->AddNestedElements(elem);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLObjectWriter::CreateInElement(vtkXMLDataElement *parent)
+{
+  if (!parent)
+    {
+    return 0;
+    }
+
+  // Don't bother inserting if we can't create the final element
+
+  vtkXMLDataElement *nested_elem = vtkXMLDataElement::New();
+  if (!this->Create(nested_elem))
+    {
+    nested_elem->Delete();
+    return 0;
+    }
+
+  // Insert the element
+
+  parent->AddNestedElement(nested_elem);
+  nested_elem->Delete();
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLObjectWriter::CreateInNestedElement(vtkXMLDataElement *grandparent, 
+                                              const char *name)
+{
+  if (!grandparent || !name || !*name)
+    {
+    return 0;
+    }
+
+  // Create the first nested element (parent)
+
+  vtkXMLDataElement *parent = vtkXMLDataElement::New();
+
+  // Create and insert the element inside the parent
+
+  if (!this->CreateInElement(parent))
+    {
+    parent->Delete();
+    return 0;
+    }
+
+  // Set the parent name and insert it into grandparent
+
+  parent->SetName(name);
+  grandparent->AddNestedElement(parent);
+  parent->Delete();
 
   return 1;
 }
