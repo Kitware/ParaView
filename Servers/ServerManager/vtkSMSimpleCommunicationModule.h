@@ -36,7 +36,7 @@ public:
 
   // Description:
   virtual void SendStreamToServers(
-    vtkClientServerStream* stream, int numServers, int* serverIDs);
+    vtkClientServerStream* stream, int numServers, const int* serverIDs);
 
   // Description:
   void Connect();

@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSimpleCommunicationModule);
-vtkCxxRevisionMacro(vtkSMSimpleCommunicationModule, "1.1");
+vtkCxxRevisionMacro(vtkSMSimpleCommunicationModule, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMSimpleCommunicationModule::vtkSMSimpleCommunicationModule()
@@ -44,7 +44,7 @@ vtkSMSimpleCommunicationModule::~vtkSMSimpleCommunicationModule()
 // TODO this is only a partial implementation. Have to check for duplicated
 // entries in the server list etc.
 void vtkSMSimpleCommunicationModule::SendStreamToServers(
-  vtkClientServerStream* stream, int numServers, int* serverIDs)
+  vtkClientServerStream* stream, int numServers, const int* serverIDs)
 {
   for (int i=0; i<numServers; i++)
     {
@@ -63,6 +63,10 @@ void vtkSMSimpleCommunicationModule::SendStreamToServer(
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
+  if (!pm->GetStreamPointer())
+    {
+    return;
+    }
   pm->GetStream() = *stream;
 
   if (serverid == 0)
