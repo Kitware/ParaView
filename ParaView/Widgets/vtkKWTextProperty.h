@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
+class vtkActor2D;
 class vtkKWApplication;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
@@ -70,8 +71,16 @@ public:
 
   // Description:
   // Set/Get the text property to control.
-  void SetTextProperty(vtkTextProperty*);
+  virtual void SetTextProperty(vtkTextProperty*);
   vtkGetObjectMacro(TextProperty, vtkTextProperty);
+
+  // Description:
+  // Set/Get the actor that uses TextProperty. This is optional, but might
+  // help to solve some backward compatibility issues. For example, the
+  // default vtkTextProperty color is -1, -1, -1 to specify to the mapper
+  // that the vtkActor2D color has to be used instead.
+  virtual void SetActor2D(vtkActor2D*);
+  vtkGetObjectMacro(Actor2D, vtkActor2D);
 
   // Description:
   // Show color to be changed.
@@ -124,6 +133,8 @@ public:
   // GUI components callbacks
   void ChangeColorButtonCallback(float, float, float);
   void SetColor(float, float, float);
+  void SetColor(float *v) { this->SetColor(v[0], v[1], v[2]); };
+  float* GetColor();
   void FontFamilyOptionMenuCallback();
   void SetFontFamily(int);
   void BoldCheckButtonCallback();
@@ -147,6 +158,7 @@ protected:
   void UpdateCopyButton();
 
   vtkTextProperty *TextProperty;
+  vtkActor2D *Actor2D;
 
   int ShowColor;
   vtkKWChangeColorButton *ChangeColorButton;

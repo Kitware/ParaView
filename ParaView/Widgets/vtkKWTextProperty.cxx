@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWTextProperty.h"
 
+#include "vtkActor2D.h"
 #include "vtkKWApplication.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
@@ -48,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWOptionMenu.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
+#include "vtkProperty2D.h"
 #include "vtkTextProperty.h"
 
 #define VTK_KW_TEXT_PROP_ARIAL   "Arial"
@@ -114,15 +116,18 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.1.2.1");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.1.2.2");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
+
+vtkCxxSetObjectMacro(vtkKWTextProperty, Actor2D, vtkActor2D);
 
 // ----------------------------------------------------------------------------
 vtkKWTextProperty::vtkKWTextProperty()
 {
   this->TextProperty = NULL;
+  this->Actor2D = NULL;
 
   this->ShowColor = 1;
   this->ChangeColorButton = vtkKWChangeColorButton::New();
@@ -152,6 +157,7 @@ vtkKWTextProperty::vtkKWTextProperty()
 vtkKWTextProperty::~vtkKWTextProperty()
 {
   this->SetTextProperty(NULL);
+  this->SetActor2D(NULL);
 
   this->ChangeColorButton->Delete();
   this->ChangeColorButton = NULL;
@@ -429,16 +435,10 @@ void vtkKWTextProperty::SetTextProperty(vtkTextProperty *_arg)
     return;
     }
 
-  if (this->TextProperty != NULL) 
-    { 
-    // this->TextProperty->UnRegister(this); 
-    }
-
   this->TextProperty = _arg;
   
   if (this->TextProperty != NULL) 
     { 
-    //this->TextProperty->Register(this); 
     this->UpdateInterface();
     }
 
@@ -477,11 +477,44 @@ void vtkKWTextProperty::SetColor(float r, float g, float b)
 }
 
 // ----------------------------------------------------------------------------
+float* vtkKWTextProperty::GetColor() 
+{
+  int use_actor_color = 0;
+  if (!this->TextProperty)
+    {
+    use_actor_color = 1;
+    }
+  else
+    {
+    // This test is done to maintain backward compatibility (see
+    // vtkOpenGL...TextMapper). The default vtkTextProperty color is
+    // -1, -1, -1 so that the mappers know that they have to use
+    // the actor's color instead.
+    float *rgb = this->TextProperty->GetColor();
+    if (rgb[0] < 0.0 && rgb[1] < 0.0 && rgb[2] < 0.0)
+      {
+      use_actor_color = 1;
+      }
+    }
+
+  if (use_actor_color && this->Actor2D && this->Actor2D->GetProperty())
+    {
+    return this->Actor2D->GetProperty()->GetColor();
+    }
+  else if (this->TextProperty)
+    {
+    return this->TextProperty->GetColor();
+    }
+  return 0;
+}
+
+// ----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateColorButton()
 {
   if (this->ChangeColorButton->IsCreated() && this->TextProperty)
     {
-    this->ChangeColorButton->SetColor(this->TextProperty->GetColor());
+    this->ChangeColorButton->SetColor(this->GetColor());
+
     this->Script("grid %s %s",
                  (this->ShowColor ? "" : "remove"), 
                  this->ChangeColorButton->GetWidgetName());
@@ -758,8 +791,7 @@ void vtkKWTextProperty::CopyValuesFrom(vtkKWTextProperty *widget)
     vtkTextProperty *tprop = widget->GetTextProperty();
     if (tprop)
       {
-      float *rgb = tprop->GetColor();
-      this->SetColor(rgb[0], rgb[1], rgb[2]);
+      this->SetColor(widget->GetColor());
       this->SetFontFamily(tprop->GetFontFamily());
       this->SetBold(tprop->GetBold());
       this->SetItalic(tprop->GetItalic());
@@ -780,6 +812,15 @@ void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
   else
     {
     os << indent << "TextProperty: None" << endl;
+    }
+  if (this->Actor2D)
+    {
+    os << indent << "Actor2D:\n";
+    this->Actor2D->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << indent << "Actor2D: None" << endl;
     }
   os << indent << "ShowColor: " << (this->ShowColor ? "On" : "Off") << endl;
   os << indent << "ShowFontFamily: " 
