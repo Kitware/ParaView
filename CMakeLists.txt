@@ -114,6 +114,7 @@ SET(VTK_HEADER_TESTING_PY "${ParaView_SOURCE_DIR}/VTK/Common/Testing/HeaderTesti
 SET(VTK_PRINT_SELF_CHECK_TCL "${ParaView_SOURCE_DIR}/VTK/Common/Testing/Tcl/PrintSelfCheck.tcl")
 SET(VTK_FIND_STRING_TCL "${ParaView_SOURCE_DIR}/VTK/Common/Testing/Tcl/FindString.tcl")
 
+SET(VTK_USE_PATENTED ON CACHE INTERNAL "" FORCE)
 SET(VTK_USE_RENDERING ON CACHE INTERNAL "" FORCE)
 SET(VTK_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
 SET(VTK_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
@@ -135,7 +136,7 @@ OPTION(VTK_USE_PATENTED "Build VTK with patented support" OFF)
 # Specify python build so that we can use vtkTkRenderWidget with no
 # vtkRenderWindow wrapped.
 ADD_DEFINITIONS(-DVTK_PYTHON_BUILD)
-
+ADD_DEFINITIONS(-DVTK_LEAN_AND_MEAN)
 OPTION(PARAVIEW_ENABLE_FPE
   "Build ParaView with Floating Point Exceptions turned on" OFF)
 MARK_AS_ADVANCED(PARAVIEW_ENABLE_FPE)
