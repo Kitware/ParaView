@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Resources/vtkKWArrowDown.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.6");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.7");
 
 vtkCxxSetObjectMacro(vtkKWSelectionFrame, SelectObject, vtkKWObject);
 
@@ -116,6 +116,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
                                 image_KWArrowDown_buffer_length);
   this->Script("%s configure -image %s -indicatoron 0",
                this->SelectionList->GetWidgetName(), imageName);
+  delete [] imageName;
 
   this->Title->Create(app, "-bg #008 -fg #fff");
   this->Title->SetLabel("<Click to Select>");
