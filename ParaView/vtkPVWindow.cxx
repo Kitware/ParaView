@@ -160,7 +160,6 @@ vtkPVWindow::~vtkPVWindow()
   //  }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 {
@@ -348,14 +347,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   button->Delete();
   button = NULL;
 
-
-
+  this->GetPVApplication()->BroadcastScript("%s SetInteractor %s",
+                                            this->GetMainView()->GetTclName(),
+                                            this->FlyInteractor->GetTclName());
   
-  this->Script( "wm deiconify %s", this->GetWidgetName());
-  
+  this->Script( "wm deiconify %s", this->GetWidgetName());  
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
@@ -375,7 +372,6 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::NewWindow()
@@ -486,7 +482,6 @@ void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
   this->MainView->Serialize(os,indent);
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
 {
@@ -533,7 +528,6 @@ vtkPVSource* vtkPVWindow::GetPreviousPVSource()
   int pos = this->Sources->IsItemPresent(this->GetCurrentPVSource());
   return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos-2));
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
@@ -870,7 +864,6 @@ vtkPVApplication *vtkPVWindow::GetPVApplication()
 {
   return vtkPVApplication::SafeDownCast(this->Application);
 }
-
 
 //----------------------------------------------------------------------------
 // Lets experiment with an interface prototype.

@@ -488,16 +488,6 @@ void vtkPVActorComposite::UpdateProperties()
   this->ColorMenu->ClearEntries();
   this->ColorMenu->AddEntryWithCommand("Property",
 	                               this, "ColorByProperty");
-  if (this->GetPVData()->GetVTKData()->GetPointData()->GetScalars())
-    {
-    this->ColorMenu->AddEntryWithCommand("Point Scalars",
-					     this, "ColorByPointScalars");
-    }
-  if (this->GetPVData()->GetVTKData()->GetCellData()->GetScalars())
-    {
-    this->ColorMenu->AddEntryWithCommand("Cell Scalars",
-					     this, "ColorByCellScalars");
-    }
   fieldData = this->GetPVData()->GetVTKData()->GetPointData()->GetFieldData();
   if (fieldData)
     {
@@ -618,40 +608,14 @@ void vtkPVActorComposite::ColorByProperty()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   pvApp->BroadcastScript("%s ScalarVisibilityOff", this->MapperTclName);
-
+  float *color;
+  
   // No scalars visible.  Turn off scalar bar.
   this->SetScalarBarVisibility(0);
 
-  this->GetView()->Render();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::ColorByPointScalars()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
-  pvApp->BroadcastScript("%s SetScalarModeToUsePointData",
-                         this->MapperTclName);
-
-  this->ScalarBar->SetTitle("Point Scalars");  
-    
-  this->ResetColorRange();
-  this->GetView()->Render();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::ColorByCellScalars()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
-  pvApp->BroadcastScript("%s SetScalarModeToUseCellData",
-                         this->MapperTclName);
-
-  this->ScalarBar->SetTitle("Cell Scalars");  
-  
-  this->ResetColorRange();
+  color = this->ColorButton->GetColor();
+  pvApp->BroadcastScript("[%s GetProperty] SetColor %f %f %f",
+                         this->ActorTclName, color[0], color[1], color[2]);
   this->GetView()->Render();
 }
 
@@ -793,6 +757,7 @@ void vtkPVActorComposite::Initialize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   float bounds[6];
+  vtkDataArray *array;
   
   if (this->PVData->GetVTKData()->IsA("vtkPolyData"))
     {
@@ -831,10 +796,17 @@ void vtkPVActorComposite::Initialize()
   this->CubeAxes->SetBounds(bounds);
   this->CubeAxes->SetCamera(this->GetView()->GetRenderer()->GetActiveCamera());
   
-  // Mapper needs an input, so the mode needs to be set first.
-  //this->ResetColorRange();
-  this->ColorByProperty();
-  this->ColorMenu->SetValue("Property");
+  if (array = this->PVData->GetVTKData()->GetPointData()->GetActiveScalars())
+    {
+    char *arrayName = (char*)array->GetName();
+    this->ColorByPointFieldComponent(arrayName, 0);
+    this->ColorMenu->SetValue(arrayName);
+    }
+  else
+    {
+    this->ColorByProperty();
+    this->ColorMenu->SetValue("Property");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -918,6 +890,7 @@ void vtkPVActorComposite::Select(vtkKWView *v)
 void vtkPVActorComposite::Deselect(vtkKWView *v)
 {
   this->SetScalarBarVisibility(0);
+  this->SetCubeAxesVisibility(0);
 
   // invoke super
   this->vtkKWComposite::Deselect(v);

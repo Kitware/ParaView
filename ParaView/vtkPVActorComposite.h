@@ -145,8 +145,6 @@ public:
   // Description:
   // Methods called when item chosen from ColorMenu
   void ColorByProperty();
-  void ColorByPointScalars();
-  void ColorByCellScalars();
   void ColorByPointFieldComponent(char *name, int comp);
   void ColorByCellFieldComponent(char *name, int comp);
 
