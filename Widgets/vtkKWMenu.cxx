@@ -108,7 +108,7 @@ void vtkKWMenu::AddGeneric(const char* addtype,
   str << ends;
   
   this->Application->SimpleScript(str.str());
-  delete [] str.str();
+  str.rdbuf()->freeze(0);
   if(!help)
     {
     help = label;
@@ -141,7 +141,7 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype,
     help = label;
     }
   this->Application->SimpleScript(str.str());
-  delete [] str.str();
+  str.rdbuf()->freeze(0);
   this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
 	       label, help);
 
@@ -154,7 +154,7 @@ void vtkKWMenu::AddCascade(const char* label, vtkKWMenu* menu,
   str << this->GetWidgetName() << " add cascade -label \"" << label << "\" -menu " 
       << menu->GetWidgetName() << " -underline " << underline << ends;
   this->Application->SimpleScript(str.str());
-  delete [] str.str();
+  str.rdbuf()->freeze(0);
   if(!help)
     {
     help = label;
@@ -177,7 +177,7 @@ void  vtkKWMenu::InsertCascade(int position,
       << " cascade -label \"" << label << "\" -menu " 
       << menu->GetWidgetName() << " -underline " << underline << ends;
   this->Application->SimpleScript(str.str());
-  delete [] str.str(); 
+  str.rdbuf()->freeze(0);
   if(!help)
     {
     help = label;
@@ -193,7 +193,7 @@ void  vtkKWMenu::AddCheckButton(const char* label, vtkKWObject* Object,
   ostrstream str;
   str << "-variable " << this->GetWidgetName() << "TempVar" << count++ << ends;
   this->AddGeneric("checkbutton", label, Object, MethodAndArgString, str.str(), help);
-  delete [] str.str();
+  str.rdbuf()->freeze(0);
 }
 
 
@@ -206,7 +206,7 @@ void vtkKWMenu::InsertCheckButton(int position,
   str << "-variable " << this->GetWidgetName() << count++ << "TempVar " << ends;
   this->InsertGeneric(position, "checkbutton", label, Object, 
 		      MethodAndArgString, str.str(), help);
-  delete [] str.str();
+  str.rdbuf()->freeze(0);
 }
 
 
@@ -243,7 +243,7 @@ void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonV
   str << "-value " << value << " -variable " << buttonVar << ends;
   this->AddGeneric("radiobutton", label, Object,
 		   MethodAndArgString, str.str(), help);
-  delete [] str.str();
+  str.rdbuf()->freeze(0);
 }
 
 
@@ -257,7 +257,7 @@ void vtkKWMenu::InsertRadioButton(int position, int value, const char* label,
   str << "-value " << value << " -variable " << buttonVar << ends;
   this->InsertGeneric(position, "radiobutton", label, Object,
 		      MethodAndArgString, str.str(), help);
-  delete [] str.str();
+  str.rdbuf()->freeze(0);
 }
 
 void vtkKWMenu::Invoke(int position)
