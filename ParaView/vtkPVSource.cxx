@@ -510,99 +510,8 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
 }  
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddXYZEntry(char *label, char *setCmd, char *getCmd)
-{
-  vtkKWWidget *frame;
-  vtkKWLabel *labelWidget;
-  vtkKWEntry *xEntry, *yEntry, *zEntry;
-
-  // First a frame to hold the other widgets.
-  frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s", frame->GetWidgetName());
-
-  // Now a label
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(label);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
-  // X
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel("X");
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
-  xEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(xEntry);
-  xEntry->SetParent(frame);
-  xEntry->Create(this->Application, "-width 5");
-  this->Script("pack %s -side left", xEntry->GetWidgetName());
-
-  // Y
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel("Y");
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
-  yEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(yEntry);
-  yEntry->SetParent(frame);
-  yEntry->Create(this->Application, "-width 5");
-  this->Script("pack %s -side left", yEntry->GetWidgetName());
-
-  // Z
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel("Z");
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
-  zEntry = vtkKWEntry::New();
-  this->Widgets->AddItem(zEntry);
-  zEntry->SetParent(frame);
-  zEntry->Create(this->Application, "-width 5");
-  this->Script("pack %s -side left", zEntry->GetWidgetName());
-
-  // Get initial value from the vtk source.
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
-               xEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 1]", 
-               yEntry->GetTclName(), this->GetTclName(), getCmd); 
-  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 2]", 
-               zEntry->GetTclName(), this->GetTclName(), getCmd); 
-
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects are going to have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
-                          this->GetTclName(), setCmd, xEntry->GetTclName(),
-                          yEntry->GetTclName(), zEntry->GetTclName());
-
-  frame->Delete();
-  xEntry->Delete();
-  yEntry->Delete();
-  zEntry->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::AddRangeEntry(char *label, char *setCmd, char *getCmd)
+void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l1,
+				  char *setCmd, char *getCmd)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -630,7 +539,7 @@ void vtkPVSource::AddRangeEntry(char *label, char *setCmd, char *getCmd)
   this->Widgets->AddItem(labelWidget);
   labelWidget->SetParent(frame);
   labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel("Min");
+  labelWidget->SetLabel(l1);
   this->Script("pack %s -side left", labelWidget->GetWidgetName());
   labelWidget->Delete();
   labelWidget = NULL;
@@ -638,7 +547,7 @@ void vtkPVSource::AddRangeEntry(char *label, char *setCmd, char *getCmd)
   minEntry = vtkKWEntry::New();
   this->Widgets->AddItem(minEntry);
   minEntry->SetParent(frame);
-  minEntry->Create(this->Application, "-width 6");
+  minEntry->Create(this->Application, "-width 7");
   this->Script("pack %s -side left", minEntry->GetWidgetName());
 
   // Max
@@ -646,7 +555,7 @@ void vtkPVSource::AddRangeEntry(char *label, char *setCmd, char *getCmd)
   this->Widgets->AddItem(labelWidget);
   labelWidget->SetParent(frame);
   labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel("Max");
+  labelWidget->SetLabel(l2);
   this->Script("pack %s -side left", labelWidget->GetWidgetName());
   labelWidget->Delete();
   labelWidget = NULL;
@@ -654,7 +563,7 @@ void vtkPVSource::AddRangeEntry(char *label, char *setCmd, char *getCmd)
   maxEntry = vtkKWEntry::New();
   this->Widgets->AddItem(maxEntry);
   maxEntry->SetParent(frame);
-  maxEntry->Create(this->Application, "-width 6");
+  maxEntry->Create(this->Application, "-width 7");
   this->Script("pack %s -side left", maxEntry->GetWidgetName());
 
   // Get initial value from the vtk source.
@@ -675,8 +584,215 @@ void vtkPVSource::AddRangeEntry(char *label, char *setCmd, char *getCmd)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddSlider(char *label, char *setCmd, char *getCmd, 
-			    float min, float max, float resolution)
+void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
+				  char *setCmd, char *getCmd)
+{
+  vtkKWWidget *frame;
+  vtkKWLabel *labelWidget;
+  vtkKWEntry *xEntry, *yEntry, *zEntry;
+
+  // First a frame to hold the other widgets.
+  frame = vtkKWWidget::New();
+  this->Widgets->AddItem(frame);
+  frame->SetParent(this->ParameterFrame->GetFrame());
+  frame->Create(this->Application, "frame", "");
+  this->Script("pack %s", frame->GetWidgetName());
+
+  // Now a label
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(label);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  // X
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(l1);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  xEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(xEntry);
+  xEntry->SetParent(frame);
+  xEntry->Create(this->Application, "-width 6");
+  this->Script("pack %s -side left", xEntry->GetWidgetName());
+
+  // Y
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(l2);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  yEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(yEntry);
+  yEntry->SetParent(frame);
+  yEntry->Create(this->Application, "-width 6");
+  this->Script("pack %s -side left", yEntry->GetWidgetName());
+
+  // Z
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(l3);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  zEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(zEntry);
+  zEntry->SetParent(frame);
+  zEntry->Create(this->Application, "-width 6");
+  this->Script("pack %s -side left", zEntry->GetWidgetName());
+
+  // Get initial value from the vtk source.
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
+               xEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 1]", 
+               yEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 2]", 
+               zEntry->GetTclName(), this->GetTclName(), getCmd); 
+
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects are going to have to have the same Tcl name!
+  this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
+                          this->GetTclName(), setCmd, xEntry->GetTclName(),
+                          yEntry->GetTclName(), zEntry->GetTclName());
+
+  frame->Delete();
+  xEntry->Delete();
+  yEntry->Delete();
+  zEntry->Delete();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
+				  char *l4, char *setCmd, char *getCmd)
+{
+  vtkKWWidget *frame;
+  vtkKWLabel *labelWidget;
+  vtkKWEntry *xEntry, *yEntry, *zEntry, *wEntry;
+
+  // First a frame to hold the other widgets.
+  frame = vtkKWWidget::New();
+  this->Widgets->AddItem(frame);
+  frame->SetParent(this->ParameterFrame->GetFrame());
+  frame->Create(this->Application, "frame", "");
+  this->Script("pack %s", frame->GetWidgetName());
+
+  // Now a label
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(label);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  // X
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(l1);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  xEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(xEntry);
+  xEntry->SetParent(frame);
+  xEntry->Create(this->Application, "-width 5");
+  this->Script("pack %s -side left", xEntry->GetWidgetName());
+
+  // Y
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(l2);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  yEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(yEntry);
+  yEntry->SetParent(frame);
+  yEntry->Create(this->Application, "-width 5");
+  this->Script("pack %s -side left", yEntry->GetWidgetName());
+
+  // Z
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(l3);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  zEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(zEntry);
+  zEntry->SetParent(frame);
+  zEntry->Create(this->Application, "-width 5");
+  this->Script("pack %s -side left", zEntry->GetWidgetName());
+
+  // W
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(l4);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  wEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(wEntry);
+  wEntry->SetParent(frame);
+  wEntry->Create(this->Application, "-width 5");
+  this->Script("pack %s -side left", wEntry->GetWidgetName());
+
+  // Get initial value from the vtk source.
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
+               xEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 1]", 
+               yEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 2]", 
+               zEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 3]", 
+               wEntry->GetTclName(), this->GetTclName(), getCmd); 
+
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects are going to have to have the same Tcl name!
+  this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
+                          this->GetTclName(), setCmd, xEntry->GetTclName(),
+                          yEntry->GetTclName(), zEntry->GetTclName(), wEntry->GetTclName());
+
+  frame->Delete();
+  xEntry->Delete();
+  yEntry->Delete();
+  zEntry->Delete();
+  wEntry->Delete();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
+			   float min, float max, float resolution)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;

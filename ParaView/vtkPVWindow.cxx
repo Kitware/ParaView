@@ -138,7 +138,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CreateMenu->Create(this->Application,"-tearoff 0");
   this->Menu->InsertCascade(2,"Create",this->CreateMenu,0);
 
-  this->CreateMenu->AddCommand("Volume", this, "NewVolume");
+  this->CreateMenu->AddCommand("ImageReader", this, "NewVolume");
   this->CreateMenu->AddCommand("Fractal Volume", this, "FractalVolume");
   this->CreateMenu->AddCommand("Cone", this, "NewCone");
   this->CreateMenu->AddCommand("Sphere", this, "NewSphere");
@@ -329,7 +329,7 @@ void vtkPVWindow::NewVolume()
   reader = vtkPVImageReader::New();
   reader->Clone(pvApp);
   
-  reader->SetName("volume");
+  reader->SetName("image reader");
   this->MainView->AddComposite(reader);
   this->SetCurrentSource(reader);
   

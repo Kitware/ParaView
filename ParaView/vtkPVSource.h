@@ -112,12 +112,27 @@ public:
   // Description:
   // A method used to broadcast changes resulting from widgets.
   void AcceptHelper(char *method, char *args);
+  
+  // Description:
+  // Create an entry for a single value.  Label is put to left of entry.
   void AddLabeledEntry(char *label, char *setCmd, char *getCmd);
+  
+  // Description:
+  // Create an entry for items with multiple elements.
+  // The primary label is put to the left.  The element labels
+  // (l1,l2,l3, ...) are put in from of the individual entry boxes.
+  void AddVector2Entry(char *label, char *l1, char *l2,
+		       char *setCmd, char *getCmd);
+  void AddVector3Entry(char *label, char *l1, char *l2, char *l3,
+		       char *setCmd, char *getCmd);
+  void AddVector4Entry(char *label, char *l1, char *l2, char *l3, char *l4,
+		       char *setCmd, char *getCmd);
+  
+  // Description:
+  // Special widget controls (not entries).
   void AddLabeledToggle(char *label, char *setCmd, char *getCmd);
-  void AddXYZEntry(char *label, char *setCmd, char *getCmd);
-  void AddRangeEntry(char *label, char *setCmd, char *getCmd);
-  void AddSlider(char *label, char *setCmd, char *getCmd, 
-		 float min, float max, float resolution);
+  void AddScale(char *label, char *setCmd, char *getCmd, 
+		float min, float max, float resolution);
 
   // Description:
   // Set the vtk source that will be a part of the pipeline.
