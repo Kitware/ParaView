@@ -28,7 +28,7 @@
 #include "vtkPolyDataToPolyDataFilter.h"
 #include "vtkImplicitFunction.h"
 
-class VTK_GRAPHICS_EXPORT vtkPVUpdateSupressor : public vtkPolyDataToPolyDataFilter
+class VTK_EXPORT vtkPVUpdateSupressor : public vtkPolyDataToPolyDataFilter
 {
 public:
   vtkTypeRevisionMacro(vtkPVUpdateSupressor,vtkPolyDataToPolyDataFilter);
