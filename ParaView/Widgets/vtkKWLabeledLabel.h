@@ -70,6 +70,12 @@ public:
   void SetLabel2(const char *);
   
   // Description:
+  // Set the widget packing order to be horizontal (default).
+  virtual void SetPackHorizontally(int);
+  vtkBooleanMacro(PackHorizontally, int);
+  vtkGetMacro(PackHorizontally, int);
+
+  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
@@ -78,6 +84,8 @@ public:
 protected:
   vtkKWLabeledLabel();
   ~vtkKWLabeledLabel();
+
+  int PackHorizontally;
 
   vtkKWLabel *Label2;
 

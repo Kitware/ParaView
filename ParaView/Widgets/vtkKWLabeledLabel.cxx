@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledLabel);
-vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.7");
+vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.8");
 
 int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -56,6 +56,8 @@ int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWLabeledLabel::vtkKWLabeledLabel()
 {
   this->CommandFunction = vtkKWLabeledLabelCommand;
+
+  this->PackHorizontally = 1;
 
   this->Label2 = vtkKWLabel::New();
 }
@@ -115,19 +117,43 @@ void vtkKWLabeledLabel::Pack()
 
   ostrstream tk_cmd;
 
-  tk_cmd << "pack ";
-
-  if (this->ShowLabel)
+  if (this->PackHorizontally)
     {
-    tk_cmd << this->Label->GetWidgetName() << " ";
+    if (this->ShowLabel)
+      {
+      tk_cmd << "pack " << this->Label->GetWidgetName() 
+             << " -side left -anchor nw" << endl;
+      }
+    tk_cmd << "pack " << this->Label2->GetWidgetName() 
+           << " -side left -anchor nw" << endl;
     }
-
-  tk_cmd << this->Label2->GetWidgetName() 
-         << " -side left -anchor nw" << endl;
+  else
+    {
+    if (this->ShowLabel)
+      {
+      tk_cmd << "pack " << this->Label->GetWidgetName() 
+             << " -side top -anchor nw" << endl;
+      }
+    tk_cmd << "pack " << this->Label2->GetWidgetName() 
+           << " -side top -anchor nw -padx 10" << endl;
+    }
   
   tk_cmd << ends;
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledLabel::SetPackHorizontally(int _arg)
+{
+  if (this->PackHorizontally == _arg)
+    {
+    return;
+    }
+  this->PackHorizontally = _arg;
+  this->Modified();
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -178,4 +204,6 @@ void vtkKWLabeledLabel::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Label2: " << this->Label2 << endl;
+  os << indent << "PackHorizontally: " 
+     << (this->PackHorizontally ? "On" : "Off") << endl;
 }
