@@ -67,11 +67,6 @@ IF(UNIX)
     CACHE FILEPATH "Path to tk stub library")
   SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tk8.4.5/generic 
     CACHE PATH "Path to tk include")
-  IF (CMAKE_MAJOR_VERSION MATCHES [1-9][0-9]*)
-    IF (CMAKE_MINOR_VERSION MATCHES [3-9][0-9]*)
-      SET(CMAKE_ESCAPES_SC 1)
-    ENDIF (CMAKE_MINOR_VERSION MATCHES [3-9][0-9]*)
-  ENDIF (CMAKE_MAJOR_VERSION MATCHES [1-9][0-9]*)
   
   # On UNIX, Tcl needs the math library.
   IF(UNIX)
@@ -84,17 +79,10 @@ IF(UNIX)
     LINK_LIBRARIES(-lXt ${CMAKE_X_LIBS})
   ENDIF(CMAKE_HAS_X)
   
-  IF (CMAKE_ESCAPES_SC)
-    ADD_CUSTOM_TARGET(maketcl ALL 
-      cd ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix\; "$(MAKE)" )
-    ADD_CUSTOM_TARGET(maketk ALL 
-      cd ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix\; "$(MAKE)" )
-  ELSE (CMAKE_ESCAPES_SC)
-    ADD_CUSTOM_TARGET(maketcl ALL 
-      cd ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix; "$(MAKE)" )
-    ADD_CUSTOM_TARGET(maketk ALL 
-      cd ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix; "$(MAKE)" )
-  ENDIF (CMAKE_ESCAPES_SC)
+  ADD_CUSTOM_TARGET(maketcl ALL 
+    cd ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix\; "$(MAKE)" )
+  ADD_CUSTOM_TARGET(maketk ALL 
+    cd ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix\; "$(MAKE)" )
   
 ELSE(UNIX)
   SET(PV_TCL_DIR ${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win)
