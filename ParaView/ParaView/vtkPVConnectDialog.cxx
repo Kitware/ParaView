@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.3");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.4");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
@@ -232,4 +232,7 @@ vtkPVConnectDialog::~vtkPVConnectDialog()
 void vtkPVConnectDialog::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "SSHUser: " << (this->SSHUser?this->SSHUser:"(none)") << endl;
+  os << indent << "NumberOfProcesses: " << this->NumberOfProcesses << endl;
+  os << indent << "MultiProcessMode: " << this->MultiProcessMode << endl;
 }
