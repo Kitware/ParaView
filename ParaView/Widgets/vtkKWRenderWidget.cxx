@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.61");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.62");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -254,7 +254,7 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetupBindings()
+void vtkKWRenderWidget::AddBindings()
 {
   // First remove the old one so that bindings don't get duplicated
 
@@ -287,11 +287,7 @@ void vtkKWRenderWidget::SetupBindings()
                  this->GetWidgetName(), tname);
     }
   
-  this->SetupInteractionBindings();
-
-  // Observers
-
-  this->AddObservers();
+  this->AddInteractionBindings();
 }
 
 //----------------------------------------------------------------------------
@@ -314,14 +310,10 @@ void vtkKWRenderWidget::RemoveBindings()
     }
 
   this->RemoveInteractionBindings();
-
-  // Observers
-
-  this->RemoveObservers();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetupInteractionBindings()
+void vtkKWRenderWidget::AddInteractionBindings()
 {
   // First remove the old one so that bindings don't get duplicated
 
@@ -583,7 +575,23 @@ void vtkKWRenderWidget::SetParentWindow(vtkKWWindow *window)
     {
     return;
     }
+
+  // Remove old observers 
+  // (some of them may use the parent window, to display progress for example)
+
+  if (this->ParentWindow)
+    {
+    this->RemoveObservers();
+    }
+
   this->ParentWindow = window;
+
+  // Reinstall observers
+
+  if (this->ParentWindow)
+    {
+    this->AddObservers();
+    }
   
   this->Modified();
 }
@@ -912,7 +920,8 @@ void vtkKWRenderWidget::RemoveObservers()
 
   if (this->RenderWindow)
     {
-    this->RenderWindow->RemoveObserver(this->Observer);
+    this->RenderWindow->RemoveObservers(
+      vtkCommand::CursorChangedEvent, this->Observer);
     }
 }
 
@@ -973,8 +982,11 @@ void vtkKWRenderWidget::ProcessEvent(vtkObject *vtkNotUsed(caller),
           cptr = "hand2";
           break;
         }
-      this->Script("%s config -cursor %s", 
-                   this->GetParentWindow()->GetWidgetName(), cptr);
+      if (this->GetParentWindow())
+        {
+        this->Script("%s config -cursor %s", 
+                     this->GetParentWindow()->GetWidgetName(), cptr);
+        }
     }
 }
 
@@ -987,7 +999,7 @@ void vtkKWRenderWidget::UpdateEnableState()
 
   if (this->Enabled)
     {
-    this->SetupInteractionBindings();
+    this->AddInteractionBindings();
     }
   else
     {

@@ -112,13 +112,13 @@ public:
   virtual void Close();
   
   // Description:
-  // Setup/remove the widget bindings.
-  // SetupBindings(), which sets up general bindings like Expose or Configure
-  // events, will ultimately call SetupInteractionBindings() which sets up
+  // Add/remove the widget bindings.
+  // AddBindings(), which sets up general bindings like Expose or Configure
+  // events, will ultimately call AddInteractionBindings() which sets up
   // interaction bindings (mouse events, keyboard events, etc.).
-  virtual void SetupBindings();
+  virtual void AddBindings();
   virtual void RemoveBindings();
-  virtual void SetupInteractionBindings();
+  virtual void AddInteractionBindings();
   virtual void RemoveInteractionBindings();
   
   // Description:
