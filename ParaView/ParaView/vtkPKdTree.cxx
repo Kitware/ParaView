@@ -20,7 +20,7 @@
 #include <queue>
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPKdTree, "1.1.2.2");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -96,7 +96,7 @@ void vtkPKdTree::SetController(vtkMultiProcessController *c)
   if (this->Controller != NULL)
     {
     this->Controller->UnRegister(this);
-    this->Controller == NULL;
+    this->Controller = NULL;
     }
   if (c == NULL)
     {
