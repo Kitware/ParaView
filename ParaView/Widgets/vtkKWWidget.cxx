@@ -39,12 +39,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWWidget.h"
+
+#include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWWindow.h"
 #include "vtkKWWidgetCollection.h"
+#include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
+#include "vtkString.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
@@ -52,6 +54,7 @@ vtkStandardNewMacro( vtkKWWidget );
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
 
+//------------------------------------------------------------------------------
 vtkKWWidget::vtkKWWidget()
 {
   this->WidgetName               = NULL;
@@ -65,10 +68,12 @@ vtkKWWidget::vtkKWWidget()
   this->BalloonHelpString        = NULL;  
   this->BalloonHelpJustification = 0;
   this->BalloonHelpInitialized   = 0;
+  this->Enabled                  = 1;
 
   this->TraceName = NULL;
 }
 
+//------------------------------------------------------------------------------
 vtkKWWidget::~vtkKWWidget()
 {
   if (this->BalloonHelpString)
@@ -91,6 +96,7 @@ vtkKWWidget::~vtkKWWidget()
   this->SetTraceName(NULL);
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::SetParent(vtkKWWidget *p)
 {
   if (this->Parent && p)
@@ -113,6 +119,7 @@ void vtkKWWidget::SetParent(vtkKWWidget *p)
     }
 }
 
+//------------------------------------------------------------------------------
 const char *vtkKWWidget::GetWidgetName()
 {
   static unsigned long count = 0;
@@ -141,6 +148,7 @@ const char *vtkKWWidget::GetWidgetName()
   return this->WidgetName;
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::Create(vtkKWApplication *app, const char *name, 
                          const char *args)
 {
@@ -152,8 +160,21 @@ void vtkKWWidget::Create(vtkKWApplication *app, const char *name,
     }
   this->SetApplication(app);
   this->Script("%s %s %s",name,this->GetWidgetName(),args);
+
+  const char* type = this->GetType();
+  if ( !vtkString::Equals(type, "Frame") && 
+       !vtkString::Equals(type, "Menu")  && 
+       !vtkString::Equals(type, "Canvas") && 
+       !vtkString::Equals(type, "Scrollbar") && 
+       !vtkString::Equals(type, "Toplevel") )
+    {
+    this->Script("%s configure -state %s", 
+		 this->GetWidgetName(),
+		 (this->Enabled ? "normal" : "disabled"));
+    }
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::SetUpBalloonHelpBindings()
 {
   this->Script("bind %s <Enter> {+%s BalloonHelpTrigger %s}", 
@@ -169,7 +190,7 @@ void vtkKWWidget::SetUpBalloonHelpBindings()
                this->GetWidgetName(), this->Application->GetTclName());  
 }
 
-
+//------------------------------------------------------------------------------
 int  vtkKWWidget::GetNetReferenceCount() 
 {
   int childCounts = 0;
@@ -184,6 +205,7 @@ int  vtkKWWidget::GetNetReferenceCount()
     2*this->Children->GetNumberOfItems();
 }
 
+//------------------------------------------------------------------------------
 // Removing items in the middle of a traversal is a bad thing.
 // UnRegister will handle removing all of the children.
 void vtkKWWidget::RemoveChild(vtkKWWidget *w) 
@@ -195,6 +217,7 @@ void vtkKWWidget::RemoveChild(vtkKWWidget *w)
 }
 
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::UnRegister(vtkObjectBase *o)
 {
   if (!this->DeletingChildren)
@@ -218,41 +241,48 @@ void vtkKWWidget::UnRegister(vtkObjectBase *o)
   this->vtkObject::UnRegister(o);
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::Focus()
 {
   this->Script( "focus %s", this->GetWidgetName() );
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::SetBind(vtkKWObject* CalledObject, const char *Event, const char *CommandString)
 {
   this->Application->Script("bind %s %s { %s %s }", this->GetWidgetName(), 
 			    Event, CalledObject->GetTclName(), CommandString);
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::SetBind(const char *Event, const char *CommandString)
 {
   this->Application->Script("bind %s %s { %s }", this->GetWidgetName(), 
 			    Event, CommandString);
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::SetBind(const char *event, const char *widget, const char *command)
 {
   this->Application->Script("bind %s %s { %s %s }", this->GetWidgetName(), 
 			    event, widget, command);
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::SetBindAll(const char *event, const char *widget, const char *command)
 {
   this->Application->Script("bind all %s { %s %s }", 
 			    event, widget, command);
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::SetBindAll(const char *event, const char *command)
 {
   this->Application->Script("bind all %s { %s }", 
 			    event, command);
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandString)
 {
   char* command = this->CreateCommand(CalledObject, CommandString);
@@ -260,6 +290,7 @@ void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandStri
   delete [] command;
 }
 
+//------------------------------------------------------------------------------
 char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * CommandString)
 {
   ostrstream event;
@@ -270,6 +301,7 @@ char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * Command
   return event.str();
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::SetBalloonHelpString(const char *str)
 {
 //    if (this->Application == NULL)
@@ -304,13 +336,15 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
     }
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.32 $");
+  this->ExtractRevision(os,"$Revision: 1.33 $");
 }
 
+//------------------------------------------------------------------------------
 vtkKWWindow* vtkKWWidget::GetWindow()
 {
   vtkKWWindow* win =0;
@@ -350,6 +384,7 @@ vtkKWWidget *vtkKWWidget::GetChildWidget(const char *traceName)
 }
        
 
+//------------------------------------------------------------------------------
 int vtkKWWidget::InitializeTrace()
 {
   // There is no need to do anything if there is no trace file.
@@ -400,6 +435,7 @@ int vtkKWWidget::InitializeTrace()
   return 1;
 }  
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::GetRGBColor(const char* color,
 			      int *rr, int *gg, int *bb)
 {
@@ -412,7 +448,45 @@ void vtkKWWidget::GetRGBColor(const char* color,
   *gg = static_cast<int>((static_cast<float>(g) / 65535.0)*255.0);
   *bb = static_cast<int>((static_cast<float>(b) / 65535.0)*255.0); 
 }
-  
+
+//------------------------------------------------------------------------------
+const char* vtkKWWidget::GetType()
+{
+  if ( this->Application )
+    {
+    this->Script("winfo class %s", this->GetWidgetName());
+    return this->Application->GetMainInterp()->result;
+    }
+  return "None";
+}
+
+//------------------------------------------------------------------------------
+void vtkKWWidget::SetEnabled(int e)
+{
+  if ( this->Enabled == e )
+    {
+    return;
+    }
+  this->Enabled = e;
+
+  if ( this->Application )
+    {
+    const char* type = this->GetType();
+
+    if ( !vtkString::Equals(type, "Frame") && 
+	 !vtkString::Equals(type, "Menu")  && 
+	 !vtkString::Equals(type, "Canvas") && 
+	 !vtkString::Equals(type, "Scrollbar") && 
+	 !vtkString::Equals(type, "Toplevel"))
+      {
+      this->Script("%s configure -state %s", this->GetWidgetName(),
+		   (this->Enabled ? "normal" : "disabled"));
+      }
+    }
+  this->Modified();
+}
+
+//------------------------------------------------------------------------------
 void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
 {
   ostrstream str;
@@ -423,6 +497,7 @@ void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
   str.rdbuf()->freeze(0);
 }
 
+//------------------------------------------------------------------------------
 void vtkKWWidget::AddChild(vtkKWWidget *w) 
 {
   this->Children->AddItem(w);

@@ -98,6 +98,10 @@ public:
   // The calling is done via TCL wrappers for the KWObject.
   virtual void SetCommand( vtkKWObject* Object, 
 			   const char* MethodAndArgString);
+
+  // Description:
+  // Get the string type of a widget.
+  virtual const char* GetType();
   
   // Description:
   // A method to set binding on the object.
@@ -128,6 +132,12 @@ public:
   // This method sets binding:
   // bind all event { command }  
   void SetBindAll(const char *event, const char *command);
+
+  // Description:
+  // Set or get enabled state.
+  void SetEnabled(int);
+  vtkBooleanMacro(Enabled, int);
+  vtkGetMacro(Enabled, int);
 
   // Description:
   // Set focus to this widget.
@@ -204,6 +214,8 @@ protected:
   // is unfortunate, but necessary.  With out this name set, the
   // trace cannot be initialized for this widget.
   char *TraceName;
+  int Enabled;
+
 private:
   vtkKWWidget(const vtkKWWidget&); // Not implemented
   void operator=(const vtkKWWidget&); // Not implemented
