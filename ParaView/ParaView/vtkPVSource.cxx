@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.14");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.15");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1865,7 +1865,6 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
   numSources = this->GetNumberOfVTKSources();
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
-    *file << this->GetVTKSource(sourceIdx)->GetClassName()
     *file << this->GetSourceClassName()
           << " pvTemp" << this->GetVTKSourceID(sourceIdx) << "\n";
     }
