@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.177");
+vtkCxxRevisionMacro(vtkKWWindow, "1.178");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1233,6 +1233,10 @@ void vtkKWWindow::UpdateRecentFilesMenu()
       delete [] short_file;
       }
     }
+
+  // Update the menu state to disable/enable this menu
+
+  this->UpdateMenuState();
 }
 
 //----------------------------------------------------------------------------
@@ -1682,6 +1686,33 @@ void vtkKWWindow::UpdateEnableState()
       this->Script("wm protocol %s WM_DELETE_WINDOW "
                    "{%s SetStatusText \"Can not close while UI is disabled\"}",
                    this->GetWidgetName(), this->GetTclName());
+      }
+    }
+
+  // Update the menus
+
+  this->UpdateMenuState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::UpdateMenuState()
+{
+  int menu_enabled = this->Enabled ? vtkKWMenu::Normal : vtkKWMenu::Disabled;
+
+  // Most Recent Files
+
+  if (this->MenuRecentFiles && this->MenuRecentFiles->IsCreated())
+    {
+    vtkKWMenu *parent = 
+      vtkKWMenu::SafeDownCast(this->MenuRecentFiles->GetParent());
+    if (parent)
+      {
+      int index = parent->GetCascadeIndex(this->MenuRecentFiles);
+      if (index >= 0)
+        {
+        int nb_items = this->MenuRecentFiles->GetNumberOfItems();
+        parent->SetState(index,  nb_items ? menu_enabled :vtkKWMenu::Disabled);
+        }
       }
     }
 }

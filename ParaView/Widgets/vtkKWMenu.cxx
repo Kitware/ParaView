@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.47");
+vtkCxxRevisionMacro(vtkKWMenu, "1.48");
 
 
 
@@ -248,6 +248,25 @@ void  vtkKWMenu::InsertCascade(int position,
                this->GetTclName(), label, help);
 
   this->SetCascade(label, menu);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetCascadeIndex(vtkKWMenu* menu)
+{
+  if (menu && menu->IsCreated())
+    {
+    int nb_of_items = this->GetNumberOfItems();
+    for (int i = 0; i < nb_of_items; i++)
+      {
+      const char *menu_opt = this->GetItemOption(i, "-menu");
+      if (menu_opt && !strcmp(menu_opt, menu->GetWidgetName()))
+        {
+        return i;
+        }
+      }
+    }
+
+  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -935,14 +954,27 @@ void vtkKWMenu::RestoreMenuState(vtkArrayMap<const char*, int>* states)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWMenu::HasItemOption(int idx, const char *option)
+{
+  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+    {
+    return 0;
+    }
+ 
+  return !this->Application->EvaluateBooleanExpression(
+    "catch {%s entrycget %d %s}",
+    this->GetWidgetName(), idx, option);
+}
+
+//----------------------------------------------------------------------------
 const char* vtkKWMenu::GetItemOption(int idx, const char *option)
 {
-  if ( !this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems() )
+  if (!this->HasItemOption(idx, option))
     {
     return 0;
     }
   return this->Script("%s entrycget %d %s", 
-    this->GetWidgetName(), idx, option);
+                      this->GetWidgetName(), idx, option);
 }
 
 //----------------------------------------------------------------------------
