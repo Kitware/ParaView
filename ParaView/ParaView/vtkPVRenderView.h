@@ -210,6 +210,10 @@ public:
   void InterruptRenderCallback();
   
   // Description:
+  // Callback for the use char check button
+  void UseCharCallback();
+  
+  // Description:
   // Get the triangle strips check button.
   vtkGetObjectMacro(TriangleStripsCheck, vtkKWCheckButton);
   
@@ -246,6 +250,7 @@ protected:
   vtkKWCheckButton *TriangleStripsCheck;
   vtkKWCheckButton *ImmediateModeCheck;
   vtkKWCheckButton *InterruptRenderCheck;
+  vtkKWCheckButton *UseCharCheck;
   
   int EventuallyRenderFlag;
   char* RenderPending;

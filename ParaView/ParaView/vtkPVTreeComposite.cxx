@@ -172,6 +172,8 @@ vtkPVTreeComposite::vtkPVTreeComposite()
   this->RenderView = NULL;
   this->Printing = 0;
   this->Initialized = 0;
+  
+  this->UseChar = 1;
 }
 
   

@@ -123,6 +123,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->TriangleStripsCheck = vtkKWCheckButton::New();
   this->ImmediateModeCheck = vtkKWCheckButton::New();
   this->InterruptRenderCheck = vtkKWCheckButton::New();
+  this->UseCharCheck = vtkKWCheckButton::New();
 }
 
 //----------------------------------------------------------------------------
@@ -289,6 +290,8 @@ vtkPVRenderView::~vtkPVRenderView()
   this->ImmediateModeCheck = NULL;
   this->InterruptRenderCheck->Delete();
   this->InterruptRenderCheck = NULL;
+  this->UseCharCheck->Delete();
+  this->UseCharCheck = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -457,10 +460,16 @@ void vtkPVRenderView::CreateViewProperties()
   this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
   this->InterruptRenderCheck->SetState(1);
   
-  this->Script("pack %s %s %s -side top -anchor w",
+  this->UseCharCheck->SetParent(this->GeneralProperties);
+  this->UseCharCheck->Create(this->Application, "-text \"Use char Pixel Values\"");
+  this->UseCharCheck->SetCommand(this, "UseCharCallback");
+  this->UseCharCheck->SetState(1);
+  
+  this->Script("pack %s %s %s %s -side top -anchor w",
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName(),
-               this->InterruptRenderCheck->GetWidgetName());
+               this->InterruptRenderCheck->GetWidgetName(),
+               this->UseCharCheck->GetWidgetName());
 }
 
 void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
@@ -1089,6 +1098,17 @@ void vtkPVRenderView::InterruptRenderCallback()
     this->GetPVApplication()->BroadcastScript("%s SetEnableAbort %d",
                                               this->CompositeTclName,
                                               this->InterruptRenderCheck->GetState());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::UseCharCallback()
+{
+  if (this->Composite)
+    {
+    this->GetPVApplication()->BroadcastScript("%s SetUseChar %d",
+                                              this->CompositeTclName,
+                                              this->UseCharCheck->GetState());
     }
 }
 
