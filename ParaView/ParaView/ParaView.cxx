@@ -25,17 +25,18 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-#include "vtkObject.h"
-#include "vtkMultiProcessController.h"
-#include "vtkPVApplication.h"
-#include "vtkTclUtil.h"
 #include "vtkToolkits.h"
-
 #ifdef VTK_USE_MPI
 # include <mpi.h>
 #else
 # include "vtkDummyController.h"
 #endif
+
+#include "vtkMultiProcessController.h"
+#include "vtkPVApplication.h"
+
+#include "vtkObject.h"
+#include "vtkTclUtil.h"
 
 
 // external global variable.
@@ -61,7 +62,6 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
   
   self->SimpleScript((char*)remoteArg);
 }
-
 
 // Each process starts with this method.  One process is designated as
 // "master" and starts the application.  The other processes are slaves to
