@@ -25,6 +25,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRegressionTestImage.h"
 #include "vtkClipDataSet.h"
+#include "vtkCutter.h"
 
 int main(int argc, char * argv[])
 {
@@ -47,6 +48,11 @@ int main(int argc, char * argv[])
   clip->SetClipFunction( clipPlane );
   clip->Update(); //discard
 
+  vtkCutter *cutter = vtkCutter::New();
+  cutter->SetInput( data );
+  cutter->SetCutFunction (clipPlane );
+  cutter->Update(); //discard
+
   vtkCTHExtractAMRPart *extract = vtkCTHExtractAMRPart::New();
   extract->SetInput( fractal->GetOutput());
   extract->SetClipPlane (clipPlane);
@@ -64,6 +70,7 @@ int main(int argc, char * argv[])
 
   vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
   mapper->SetInput( extract->GetOutput() );
+  mapper->SelectColorArray( "Fractal Volume Fraction" );
   
   vtkActor *actor = vtkActor::New();
   actor->SetMapper( mapper );
@@ -95,6 +102,7 @@ int main(int argc, char * argv[])
   data->Delete();
   clipPlane->Delete();
   clip->Delete();
+  cutter->Delete();
   extract->Delete();
   outline->Delete();
   outlineMapper->Delete();
