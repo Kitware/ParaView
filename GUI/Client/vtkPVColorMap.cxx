@@ -64,7 +64,7 @@
 #include "vtkKWMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.110");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.111");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2029,7 +2029,7 @@ void vtkPVColorMap::UpdateMap(int width, int height)
   this->MapHeight = height;
 
   vtkProcessModule* pm =vtkProcessModule::GetProcessModule();
-  vtkLookupTable* lut;
+  vtkLookupTable* lut = NULL;
   if (this->LookupTableProxy)
     {
     lut = vtkLookupTable::SafeDownCast(
