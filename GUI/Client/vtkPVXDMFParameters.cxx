@@ -17,7 +17,7 @@
 #include "vtkArrayMap.txx"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
-#include "vtkKWEvent.h"
+#include "vtkCommand.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
@@ -150,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.30");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()

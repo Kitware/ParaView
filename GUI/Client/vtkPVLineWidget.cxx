@@ -31,7 +31,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
 
-#include "vtkKWEvent.h"
+#include "vtkCommand.h"
 #include "vtkSMLineWidgetProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.61");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.62");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()

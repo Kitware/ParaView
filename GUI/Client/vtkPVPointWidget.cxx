@@ -15,7 +15,7 @@
 #include "vtkPVPointWidget.h"
 
 #include "vtkKWEntry.h"
-#include "vtkKWEvent.h"
+#include "vtkCommand.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
@@ -36,7 +36,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.44");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.45");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

@@ -15,7 +15,7 @@
 #include "vtkPVVectorEntry.h"
 
 #include "vtkKWEntry.h"
-#include "vtkKWEvent.h"
+#include "vtkCommand.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.68");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.69");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()

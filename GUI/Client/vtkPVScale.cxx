@@ -16,7 +16,7 @@
 
 #include "vtkArrayMap.txx"
 #include "vtkKWEntry.h"
-#include "vtkKWEvent.h"
+#include "vtkCommand.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.57");
+vtkCxxRevisionMacro(vtkPVScale, "1.58");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
