@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWMessageDialog_h
 
 #include "vtkKWDialog.h"
+
 class vtkKWApplication;
 class vtkKWCheckButton;
 class vtkKWLabel;
@@ -52,23 +53,6 @@ public:
   vtkTypeRevisionMacro(vtkKWMessageDialog,vtkKWDialog);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //BTX
-  enum {Message = 0,
-        YesNo,
-        OkCancel};
-
-  enum {RememberYes   = 0x00002,
-        RememberNo    = 0x00004,
-        ErrorIcon     = 0x00008,
-        WarningIcon   = 0x00010,
-        QuestionIcon  = 0x00020,
-        YesDefault    = 0x00040,
-        NoDefault     = 0x00080,
-        OkDefault     = 0x00100,
-        CancelDefault = 0x00200,
-        Beep          = 0x00400};
-  //ETX
-  
   // Description:
   // Create a Tk widget
   virtual void Create(vtkKWApplication *app, const char *args);
@@ -85,11 +69,22 @@ public:
 
   // Description:
   // Set the style of the message box
+  //BTX
+  enum 
+  {
+    Message = 0,
+    YesNo,
+    OkCancel,
+    OkOtherCancel
+  };
+  //ETX
   vtkSetMacro(Style,int);
   vtkGetMacro(Style,int);
   void SetStyleToMessage() {this->SetStyle(vtkKWMessageDialog::Message);};
   void SetStyleToYesNo() {this->SetStyle(vtkKWMessageDialog::YesNo);};
   void SetStyleToOkCancel() {this->SetStyle(vtkKWMessageDialog::OkCancel);};
+  void SetStyleToOkOtherCancel() 
+    {this->SetStyle(vtkKWMessageDialog::OkOtherCancel);};
 
   // Description:
   // Set or get the message dialog name
@@ -98,6 +93,22 @@ public:
 
   // Description:
   // Set different options for the dialog.
+  //BTX
+  enum 
+  {
+    RememberYes    = 0x00002,
+    RememberNo     = 0x00004,
+    ErrorIcon      = 0x00008,
+    WarningIcon    = 0x00010,
+    QuestionIcon   = 0x00020,
+    YesDefault     = 0x00040,
+    NoDefault      = 0x00080,
+    OkDefault      = 0x00100,
+    CancelDefault  = 0x00200,
+    Beep           = 0x00400,
+    PackVertically = 0x00800
+  };
+  //ETX
   vtkSetMacro(Options, int);
   vtkGetMacro(Options, int);
 
@@ -112,6 +123,12 @@ public:
   // the style is OkCancel.
   vtkSetStringMacro(CancelButtonText);
   vtkGetStringMacro(CancelButtonText);
+
+  // Description:
+  // The label displayed on the other button. Only used when
+  // the style is OkOtherCancel.
+  vtkSetStringMacro(OtherButtonText);
+  vtkGetStringMacro(OtherButtonText);
 
   // Description:
   // Utility methods to create various dialog windows.
@@ -147,6 +164,11 @@ public:
   // Accessor for OK and cancel button
   vtkGetObjectMacro(OKButton, vtkKWWidget);
   vtkGetObjectMacro(CancelButton, vtkKWWidget);
+  vtkGetObjectMacro(OtherButton, vtkKWWidget);
+
+  // Description::
+  // Close this Dialog (for the third button)
+  virtual void Other();
 
 protected:
   vtkKWMessageDialog();
@@ -168,9 +190,11 @@ protected:
   vtkKWWidget     *ButtonFrame;
   vtkKWWidget     *OKButton;
   vtkKWWidget     *CancelButton;  
+  vtkKWWidget     *OtherButton;  
   vtkKWLabel      *Icon;
   vtkKWWidget     *OKFrame;
   vtkKWWidget     *CancelFrame;
+  vtkKWWidget     *OtherFrame;
   vtkKWCheckButton *CheckButton;
 
   // Description:
@@ -180,6 +204,7 @@ protected:
   
   char* OKButtonText;
   char* CancelButtonText;
+  char* OtherButtonText;
 
 private:
   vtkKWMessageDialog(const vtkKWMessageDialog&); // Not implemented
