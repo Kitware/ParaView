@@ -96,7 +96,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.196");
+vtkCxxRevisionMacro(vtkPVData, "1.197");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -598,21 +598,6 @@ void vtkPVData::Update()
   // Now done as a callback.
   //this->GatherDataInformation();
 }
-
-
-//----------------------------------------------------------------------------
-// Depending on when this is called, we may be able to get rid of it. !!!!!
-// We could call this when the PVPart is created.
-void vtkPVData::InsertExtractPiecesIfNecessary()
-{
-  vtkPVPart *part;
-  this->PVParts->InitTraversal();
-  while ( (part = (vtkPVPart*)(this->PVParts->GetNextItemAsObject())) )
-    {
-    part->InsertExtractPiecesIfNecessary();
-    }
-}
-
 
 
 
@@ -3041,7 +3026,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.196 $");
+  this->ExtractRevision(os,"$Revision: 1.197 $");
 }
 
 //----------------------------------------------------------------------------

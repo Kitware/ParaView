@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.272");
+vtkCxxRevisionMacro(vtkPVSource, "1.273");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1079,19 +1079,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     { // This is the first time, create the data.
     this->InitializeData();
     }
-
-  // This adds an extract filter only when the MaximumNumberOfPieces is 1.
-  // This is only the case the first time the accept is called.
-  int i;
-  int numOutputs = this->GetNumberOfPVOutputs();
-  for (i=0; i<numOutputs; i++)
-    {
-    if (this->GetNthPVOutput(i))
-      {
-      this->GetNthPVOutput(i)->InsertExtractPiecesIfNecessary();
-      }
-    }
-
+    
   // Initialize the output if necessary.
   if ( ! this->Initialized)
     { // This is the first time, initialize data.    
@@ -2332,6 +2320,10 @@ int vtkPVSource::InitializeData()
       part->SetCollectionDecision(this->GetPVWindow()->MakeCollectionDecision());
       part->SetLODCollectionDecision(this->GetPVWindow()->MakeLODCollectionDecision());
 
+      // We need to add the extract pieces filter before we set the ExtentTranslator
+      // Or we will get a memory leak.
+      part->InsertExtractPiecesIfNecessary();
+
       // Create the extent translator
       if (input)
         {
@@ -2552,7 +2544,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.272 $");
+  this->ExtractRevision(os,"$Revision: 1.273 $");
 }
 
 //----------------------------------------------------------------------------
