@@ -1098,6 +1098,8 @@ vtkPVSource *vtkPVWindow::OpenXML(const char *openFileName,
   // Create the widgets.  
   pvs->AddFileEntry("FileName", "FileName","xml", 
                     "XML may support different file types in the future.");
+  pvs->AddVector3Entry("Stride", "X", "Y", "Z", "Stride", 
+                       "Integer values for subsampling the volume.");
   pvs->AddArraySelection("Cell", "Choose which arrays to load"); 
 
   // The location/order of this is important.  (Geoemtry empty input.)

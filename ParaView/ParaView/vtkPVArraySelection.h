@@ -106,6 +106,7 @@ protected:
   vtkKWPushButton* AllOnButton;
   vtkKWPushButton* AllOffButton;
 
+  vtkKWWidget *CheckFrame;
   vtkCollection* ArrayCheckButtons;
 
   // Description:

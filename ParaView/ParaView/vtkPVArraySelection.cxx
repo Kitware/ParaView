@@ -74,6 +74,7 @@ vtkPVArraySelection::vtkPVArraySelection()
   this->AllOnButton = vtkKWPushButton::New();
   this->AllOffButton = vtkKWPushButton::New();
 
+  this->CheckFrame = vtkKWWidget::New();
   this->ArrayCheckButtons = vtkCollection::New();
 
   this->FileName = NULL;
@@ -96,6 +97,9 @@ vtkPVArraySelection::~vtkPVArraySelection()
 
   this->AllOffButton->Delete();
   this->AllOffButton = NULL;
+
+  this->CheckFrame->Delete();
+  this->CheckFrame = NULL;
 
   this->ArrayCheckButtons->Delete();
   this->ArrayCheckButtons = NULL;
@@ -141,6 +145,8 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
 
   this->ButtonFrame->SetParent(this->LabeledFrame->GetFrame());
   this->ButtonFrame->Create(app, "frame", "");
+  app->Script("pack %s -fill x -side top -expand t",
+              this->ButtonFrame->GetWidgetName());
 
   this->AllOnButton->SetParent(this->ButtonFrame);
   this->AllOnButton->Create(app, "");
@@ -156,6 +162,11 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   app->Script("pack %s -fill x -side left -expand t",
               this->AllOffButton->GetWidgetName());
 
+  this->CheckFrame->SetParent(this->LabeledFrame->GetFrame());
+  this->CheckFrame->Create(app, "frame", "");
+  app->Script("pack %s -fill both -side top -expand t",
+              this->CheckFrame->GetWidgetName());
+
   // This creates the check buttons and packs the button frame.
   this->Reset();
 }
@@ -165,6 +176,7 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
 void vtkPVArraySelection::Reset()
 {
   vtkKWCheckButton* checkButton;
+  int row = 0;
 
   // See if we need to create new check buttons.
   this->Script("%s GetFileName", this->VTKReaderTclName);
@@ -175,13 +187,9 @@ void vtkPVArraySelection::Reset()
 
     // Clear out any old check buttons.
     this->Script("catch {eval pack forget [pack slaves %s]}",
-                 this->ButtonFrame->GetParent()->GetWidgetName());
+                 this->CheckFrame->GetWidgetName());
     this->ArrayCheckButtons->RemoveAllItems();
-  
-    // Pack the button frame.
-    this->Script("pack %s -side top -fill x -expand t", 
-                 this->ButtonFrame->GetWidgetName());
-    
+      
     // Create new check buttons.
     if (this->VTKReaderTclName)
       {
@@ -192,12 +200,13 @@ void vtkPVArraySelection::Reset()
       for (idx = 0; idx < numArrays; ++idx)
         {
         checkButton = vtkKWCheckButton::New();
-        checkButton->SetParent(this->LabeledFrame->GetFrame());
+        checkButton->SetParent(this->CheckFrame);
         checkButton->Create(this->Application, "");
         this->Script("%s SetText [%s GetNameOf%sArray %d]", 
                      checkButton->GetTclName(), 
                      this->VTKReaderTclName, this->AttributeName, idx);
-        this->Script("pack %s -side top -fill none -expand 0", checkButton->GetWidgetName());
+        this->Script("grid %s -row %d -sticky w", checkButton->GetWidgetName(), row);
+        ++row;
         checkButton->SetCommand(this, "ModifiedCallback");
         this->ArrayCheckButtons->AddItem(checkButton);
         checkButton->Delete();
