@@ -808,7 +808,7 @@
         name="Bold"
         command="SetBold"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
       
@@ -816,7 +816,7 @@
         name="Italic"
         command="SetItalic"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -824,7 +824,7 @@
         name="Shadow"
         command="SetShadow"
         number_of_elements="1"
-        default_values="1">
+        default_values="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
       <!-- End of TextProperty -->

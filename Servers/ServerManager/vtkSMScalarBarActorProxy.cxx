@@ -20,8 +20,10 @@
 #include "vtkClientServerStream.h"
 #include "vtkClientServerID.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMIntVectorProperty.h"
+
 vtkStandardNewMacro(vtkSMScalarBarActorProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.1.2.2");
+vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.1.2.3");
 //-----------------------------------------------------------------------------
 vtkSMScalarBarActorProxy::vtkSMScalarBarActorProxy()
 {
@@ -42,11 +44,14 @@ void vtkSMScalarBarActorProxy::CreateVTKObjects(int numObjects)
 
   this->Superclass::CreateVTKObjects(numObjects);
 
+  vtkSMProxy* labelTextProperty = this->GetSubProxy("LabelTextProperty");
+  vtkSMProxy* titleTextProperty = this->GetSubProxy("TitleTextProperty");
+  
   vtkSMProxyProperty* pp;
   pp = vtkSMProxyProperty::SafeDownCast(this->GetProperty("TitleTextProperty"));
   if (pp)
     {
-    pp->AddProxy(this->GetSubProxy("TitleTextProperty"));
+    pp->AddProxy(titleTextProperty);
     }
   else
     {
@@ -56,13 +61,39 @@ void vtkSMScalarBarActorProxy::CreateVTKObjects(int numObjects)
   pp = vtkSMProxyProperty::SafeDownCast(this->GetProperty("LabelTextProperty"));
   if (pp)
     {
-    pp->AddProxy(this->GetSubProxy("LabelTextProperty"));
+    pp->AddProxy(labelTextProperty);
     }
   else
     {
     vtkErrorMacro("Failed to find property LabelTextProperty.");
     }
 
+  // Let's set bold/shadow/italic on the text properties.
+  vtkSMIntVectorProperty* ivp;
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    labelTextProperty->GetProperty("Bold"));
+  ivp->SetElement(0, 1);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    labelTextProperty->GetProperty("Shadow"));
+  ivp->SetElement(0, 1);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    labelTextProperty->GetProperty("Italic"));
+  ivp->SetElement(0, 1);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    titleTextProperty->GetProperty("Bold"));
+  ivp->SetElement(0, 1);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    titleTextProperty->GetProperty("Shadow"));
+  ivp->SetElement(0, 1);
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    titleTextProperty->GetProperty("Italic"));
+  ivp->SetElement(0, 1);
   this->UpdateVTKObjects();
 }
 
