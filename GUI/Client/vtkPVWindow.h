@@ -522,6 +522,10 @@ public:
                                      const char *keysym);
   void InvokeInteractorEvent(const char *event);
 
+  // Description:
+  // Call AcceptCallback() on the current source.
+  void AcceptCurrentSource();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.381");
+vtkCxxRevisionMacro(vtkPVSource, "1.382");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkKWNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,InformationGUI,vtkPVInformationGUI);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayGUI,vtkPVDisplayGUI);
@@ -735,7 +735,8 @@ void vtkPVSource::CreateProperties()
                              "-text Accept");
   this->AcceptButton->SetCommand(this, "PreAcceptCallback");
   this->AcceptButton->SetBalloonHelpString(
-    "Cause the current values in the user interface to take effect");
+    "Cause the current values in the user interface to take effect "
+    "(key shortcut: Ctrl+Enter)");
 
   this->ResetButton->SetParent(frame);
   this->ResetButton->Create(this->GetApplication(), "-text Reset");
@@ -2128,6 +2129,10 @@ void vtkPVSource::SaveState(ofstream *file)
   *file << "set kw(" << this->GetTclName() << ") "
         << "[$kw(" << this->GetPVWindow()->GetTclName() << ") "
         << "CreatePVSource " << this->GetModuleName() << "]" << endl;
+
+  // Call accept.
+  *file << "$kw(" << this->GetTclName() << ") SetLabel " 
+        << this->GetLabel() << endl;
 
   // Let the PVWidgets set up the object.
   numWidgets = this->Widgets->GetNumberOfItems();

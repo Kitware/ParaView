@@ -129,7 +129,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.606");
+vtkCxxRevisionMacro(vtkPVWindow, "1.607");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1137,6 +1137,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                this->CenterZLabel->GetWidgetName(),
                this->CenterZEntry->GetWidgetName());
 
+  this->Script("bind %s <Control-KeyPress-Return> {%s AcceptCurrentSource}",
+               this->GetWidgetName(), 
+               this->GetTclName());
+  this->Script("bind %s <Control-KeyPress-q> {%s Close}",
+               this->GetWidgetName(), 
+               this->GetTclName());
+
   if (pvApp->GetRegisteryValue(2, "RunTime", "CenterActorVisibility", 0))
     {
     if (
@@ -1375,6 +1382,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   
   // Update the enable state
   this->UpdateEnableState();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::AcceptCurrentSource()
+{
+  if (this->CurrentPVSource)
+    {
+    this->CurrentPVSource->AcceptCallback();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -3378,7 +3394,7 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
   // This call seemed to trigger creation of the parts.
   //  This conditional will keep the parts from being created when
   // the half finished source is set to be the current.
-  if (pvs && pvs->GetInitialized())
+  if (!pvs || pvs->GetInitialized())
     {
     this->UpdateEnableState();
     }
