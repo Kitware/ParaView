@@ -95,7 +95,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.296");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.297");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -219,6 +219,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->MenuLabelSwitchBackAndForthToViewProperties = 0;
   
   this->Renderer2D = vtkRenderer::New();
+  // Keep the zbuffer for picking.
+  this->Renderer2D->EraseOff();
 }
 
 //----------------------------------------------------------------------------
