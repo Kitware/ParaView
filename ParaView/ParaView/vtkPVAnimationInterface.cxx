@@ -168,7 +168,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.98");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.99");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1811,9 +1811,10 @@ void vtkPVAnimationInterface::UpdateNewScript()
       vtkPVAnimationInterfaceEntry* entry
         = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
       entry->Prepare();
-      if ( entry->GetPVSource() && entry->GetPVSource()->GetVTKSourceID().ID != 0 )
+      // TODO: Why is this referring to only 1 VTK source (0)?
+      if ( entry->GetPVSource() && entry->GetPVSource()->GetVTKSourceID(0).ID != 0 )
         {
-        smap[entry->GetPVSource()->GetVTKSourceID().ID] = 1;
+        smap[entry->GetPVSource()->GetVTKSourceID(0).ID] = 1;
         cnt ++;
         }
       if ( entry->GetDirty() )
