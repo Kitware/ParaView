@@ -65,6 +65,11 @@
           data_mode_method="SetFileTypeToBinary"
           extension=".vtk"
           file_description="Legacy VTK Files"/>
+  <Writer input="vtkImageData"
+          class="vtkPVWriter"
+          writer="vtkMetaImageWriter"
+          extension=".mhd"
+          file_description="Meta Image Files"/>
 #ifdef PARAVIEW_LINK_XDMF
   <Writer input="vtkDataSet"
           class="vtkPVWriter"
