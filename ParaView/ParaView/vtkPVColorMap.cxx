@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.62");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.63");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -550,11 +550,6 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarFrame->Create(this->Application, 0);
   this->ScalarBarFrame->SetLabel("Scalar Bar");
 
-  ostrstream onchangecommand;
-  onchangecommand << "[" << this->GetTclName() 
-                  << " GetPVRenderView] EventuallyRender" << ends;
-
-
   // Scalar bar : Visibility
 
   this->ScalarBarCheck->SetParent(this->ScalarBarFrame->GetFrame());
@@ -601,7 +596,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->TitleTextPropertyWidget->SetActor2D(
     this->ScalarBar->GetScalarBarActor());
   this->TitleTextPropertyWidget->Create(this->Application);
-  this->TitleTextPropertyWidget->SetOnChangeCommand(onchangecommand.str());
+  this->TitleTextPropertyWidget->SetChangedCommand(this, "RenderView");
   this->TitleTextPropertyWidget->SetTraceReferenceObject(this);
   this->TitleTextPropertyWidget->SetTraceReferenceCommand(
     "GetTitleTextPropertyWidget");
@@ -658,7 +653,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->LabelTextPropertyWidget->SetActor2D(
     this->ScalarBar->GetScalarBarActor());
   this->LabelTextPropertyWidget->Create(this->Application);
-  this->LabelTextPropertyWidget->SetOnChangeCommand(onchangecommand.str());
+  this->LabelTextPropertyWidget->SetChangedCommand(this, "RenderView");
   this->LabelTextPropertyWidget->SetTraceReferenceObject(this);
   this->LabelTextPropertyWidget->SetTraceReferenceCommand(
     "GetLabelTextPropertyWidget");
@@ -720,8 +715,6 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->Script("pack %s %s -side top -expand t -fill both -anchor w",
                this->ScalarBarTitleFrame->GetWidgetName(),
                this->ScalarBarLabelFormatFrame->GetWidgetName());
-
-  onchangecommand.rdbuf()->freeze(0);
 
   // Back button
 
@@ -887,6 +880,15 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->UpdateScalarBarTitle();
 
   this->ScalarBar->GetScalarBarActor()->SetLookupTable(this->LookupTable);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::RenderView()
+{
+  if (this->PVRenderView)
+    {
+    this->PVRenderView->EventuallyRender();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1137,10 +1139,7 @@ void vtkPVColorMap::SetScalarBarLabelFormat(const char* name)
     {
     this->ScalarBar->GetScalarBarActor()->SetLabelFormat(
       this->ScalarBarLabelFormat);
-    if (this->PVRenderView)
-      {
-      this->PVRenderView->EventuallyRender();
-      }
+    this->RenderView();
     }
 
   this->Modified();
@@ -1776,10 +1775,7 @@ void vtkPVColorMap::UpdateScalarBarTitle()
     ostr.rdbuf()->freeze(0);    
     }
 
-  if (this->PVRenderView)
-    {
-    this->PVRenderView->EventuallyRender();
-    }
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
@@ -1989,7 +1985,7 @@ void vtkPVColorMap::VectorModeMagnitudeCallback()
   this->Script("pack forget %s",
                this->VectorComponentMenu->GetWidgetName());
   this->UpdateScalarBarTitle();
-  this->PVRenderView->EventuallyRender();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
@@ -2011,7 +2007,7 @@ void vtkPVColorMap::VectorModeComponentCallback()
   this->Script("pack %s -side left -expand f -fill both -padx 2",
                this->VectorComponentMenu->GetWidgetName());
   this->UpdateScalarBarTitle();
-  this->PVRenderView->EventuallyRender();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
@@ -2079,7 +2075,7 @@ void vtkPVColorMap::SetScalarBarPosition1(float x, float y)
   sact->GetPositionCoordinate()->SetValue(x, y);
   this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %f %f", 
                       this->GetTclName(), x, y);
-  this->PVRenderView->EventuallyRender();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
@@ -2089,7 +2085,7 @@ void vtkPVColorMap::SetScalarBarPosition2(float x, float y)
   sact->GetPosition2Coordinate()->SetValue(x,y);
   this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %f %f", 
                       this->GetTclName(), x, y);
-  this->PVRenderView->EventuallyRender();
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
@@ -2099,7 +2095,7 @@ void vtkPVColorMap::SetScalarBarOrientation(int o)
   sact->SetOrientation(o);
   this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d", 
                       this->GetTclName(), o);
-  this->PVRenderView->EventuallyRender();  
+  this->RenderView();
 }
 
 //----------------------------------------------------------------------------
@@ -2114,7 +2110,7 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
       break;
     case vtkCommand::EndInteractionEvent:
       this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOff();
-      this->PVRenderView->EventuallyRender();
+      this->RenderView();
       vtkScalarBarActor* sact = this->ScalarBar->GetScalarBarActor();
       float *pos1 = sact->GetPositionCoordinate()->GetValue();
       float *pos2 = sact->GetPosition2Coordinate()->GetValue();

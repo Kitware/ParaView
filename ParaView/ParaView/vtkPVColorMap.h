@@ -297,6 +297,9 @@ protected:
   vtkSetStringMacro(LookupTableTclName);
 
   vtkPVRenderView *PVRenderView;
+
+  virtual void RenderView();
+
   int Initialized;
   int ScalarBarVisibility;
   int InternalScalarBarVisibility;
