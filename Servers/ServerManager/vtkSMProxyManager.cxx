@@ -29,7 +29,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.23.6.2");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.23.6.3");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -147,7 +147,10 @@ int vtkSMProxyManager::ProxyElementExists(const char* groupName,
     if (it2 != it->second.end())
       {
       vtkPVXMLElement* element = it2->second.GetPointer();
-      return 1;
+      if (element)
+        {
+        return 1;
+        }
       }
     }
   return 0;
