@@ -108,7 +108,7 @@ protected:
 
   int CursorState;
 
-  void InitializeTrace();
+  virtual int InitializeTrace();
 };
 
 

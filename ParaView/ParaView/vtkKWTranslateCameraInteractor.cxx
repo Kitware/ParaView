@@ -147,11 +147,7 @@ void vtkKWTranslateCameraInteractor::AButtonPress(int num, int x, int y)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
-    if ( ! this->TraceInitialized )
-      {
-      this->InitializeTrace();
-      }
-    pvApp->AddTraceEntry("$pv(%s) AButtonPress %d %d %d",
+    this->AddTraceEntry("$kw(%s) AButtonPress %d %d %d",
                          this->GetTclName(), num, x, y);
     }
 
@@ -188,11 +184,7 @@ void vtkKWTranslateCameraInteractor::Button1Motion(int x, int y)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
-    if ( ! this->TraceInitialized )
-      {
-      this->InitializeTrace();
-      }
-    pvApp->AddTraceEntry("$pv(%s) Button1Motion %d %d",
+    this->AddTraceEntry("$kw(%s) Button1Motion %d %d",
                          this->GetTclName(), x, y);
     }
 
@@ -207,11 +199,7 @@ void vtkKWTranslateCameraInteractor::Button3Motion(int x, int y)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
-    if ( ! this->TraceInitialized )
-      {
-      this->InitializeTrace();
-      }
-    pvApp->AddTraceEntry("$pv(%s) Button3Motion %d %d",
+    this->AddTraceEntry("$kw(%s) Button3Motion %d %d",
                          this->GetTclName(), x, y);
     }
 
@@ -226,11 +214,7 @@ void vtkKWTranslateCameraInteractor::AButtonRelease(int num, int x, int y)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
-    if ( ! this->TraceInitialized )
-      {
-      this->InitializeTrace();
-      }
-    pvApp->AddTraceEntry("$pv(%s) AButtonRelease %d %d %d",
+    this->AddTraceEntry("$kw(%s) AButtonRelease %d %d %d",
                          this->GetTclName(), num, x, y);
     }
 
@@ -249,11 +233,7 @@ void vtkKWTranslateCameraInteractor::MotionCallback(int x, int y)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
-    if ( ! this->TraceInitialized )
-      {
-      this->InitializeTrace();
-      }
-    pvApp->AddTraceEntry("$pv(%s) MotionCallback %d %d",
+    this->AddTraceEntry("$kw(%s) MotionCallback %d %d",
                          this->GetTclName(), x, y);
     }
 
@@ -304,15 +284,21 @@ void vtkKWTranslateCameraInteractor::InitializeCursors()
   this->SetPanCursorName("fleur");
 }
 
-void vtkKWTranslateCameraInteractor::InitializeTrace()
+int vtkKWTranslateCameraInteractor::InitializeTrace()
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
-  vtkPVWindow *pvWindow = vtkPVWindow::SafeDownCast(this->GetWindow());
+  vtkKWWindow *pvWindow = this->GetWindow();
   
-  if (pvApp && pvWindow)
+  if (this->TraceInitialized)
     {
-    pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetTranslateCameraInteractor]",
-                         this->GetTclName(), pvWindow->GetTclName());
+    return 1;
     }
-  this->SetTraceInitialized(1);
+
+  if (this->Application && pvWindow)
+    {
+    this->TraceInitialized = 1;
+    this->AddTraceEntry("set kw(%s) [$kw(%s) GetTranslateCameraInteractor]",
+                         this->GetTclName(), pvWindow->GetTclName());
+    return 1;
+    }
+  return 0;
 }

@@ -589,13 +589,15 @@ void vtkKWApplication::DisplayAbout(vtkKWWindow *win)
   delete[] msg;
 }
 
+
 //----------------------------------------------------------------------------
-void vtkKWApplication::AddTraceEntry(char *format, ...)
+void vtkKWApplication::AddTraceEntry(const char *format, ...)
 {
   if (this->TraceFile == NULL)
     {
     return;
     }
+  
   char event[6000];
 
   va_list var_args;
@@ -605,4 +607,3 @@ void vtkKWApplication::AddTraceEntry(char *format, ...)
 
   *(this->TraceFile) << event << endl;
 }
-

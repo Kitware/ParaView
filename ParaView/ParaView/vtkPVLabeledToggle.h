@@ -58,7 +58,7 @@ public:
 
   // Description:
   // Setting the label also sets the name.
-  void SetLabel(const char *str) {this->Label->SetLabel(str); this->SetName(str);}
+  void SetLabel(const char *str) {this->Label->SetLabel(str); this->SetTraceName(str);}
   const char* GetLabel() { return this->Label->GetLabel();}
 
   void Create(vtkKWApplication *pvApp, char *help);

@@ -160,7 +160,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvs->SetVTKSource(s, tclName);
   pvs->SetName(tclName);  
   
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) CreatePVSource %s]", 
+  pvApp->AddTraceEntry("set kw(%s) [$pv(%s) CreatePVSource %s]", 
                        pvs->GetTclName(), this->PVWindow->GetTclName(),
                        this->SourceClassName);
 

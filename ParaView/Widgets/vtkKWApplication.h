@@ -143,14 +143,13 @@ public:
   static int GetWidgetVisibility();
   vtkBooleanMacro(WidgetVisibility, int);
   
-//BTX
   // Description:
-  // This can be esed to trace the actions of the user.
-  // It only works when the TraceFile has been set.
-  void AddTraceEntry(char *format, ...);
+  // This can be used to trace the application.
+  // Look at vtkKWWidgets to see how it is used.
   ofstream *GetTraceFile() {return this->TraceFile;}
+//BTX
+  void AddTraceEntry(const char *format, ...);
 //ETX
-
   virtual int GetApplicationKey() {return -1;};
 
 

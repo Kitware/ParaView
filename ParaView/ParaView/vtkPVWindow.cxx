@@ -580,11 +580,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CreateMainView(pvApp);
 
   // Initialize a couple of variables in the trace file.
-  pvApp->AddTraceEntry("set pv(%s) [Application GetMainWindow]",
+  pvApp->AddTraceEntry("set kw(%s) [Application GetMainWindow]",
                        this->GetTclName());
   // We have to set this variable after the window variable is set,
   // so it has to be done here.
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetMainView]",
+  pvApp->AddTraceEntry("set kw(%s) [$pv(%s) GetMainView]",
                        this->GetMainView()->GetTclName(), this->GetTclName());
 
   // Set up the button to reset the camera.
@@ -693,7 +693,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   this->GlyphSources->AddItem(pvs);
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetGlyphSource %s]", 
+  pvApp->AddTraceEntry("set kw(%s) [$pv(%s) GetGlyphSource %s]", 
                        pvs->GetTclName(), this->GetTclName(), pvs->GetName());
   pvs->Delete();
   pvd->Delete();
@@ -717,7 +717,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   this->GlyphSources->AddItem(pvs);
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetGlyphSource %s]", 
+  pvApp->AddTraceEntry("set kw(%s) [$pv(%s) GetGlyphSource %s]", 
                        pvs->GetTclName(), this->GetTclName(), pvs->GetName());
   pvs->Delete();
   pvd->Delete();
@@ -741,7 +741,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   this->GlyphSources->AddItem(pvs);
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetGlyphSource %s]", 
+  pvApp->AddTraceEntry("set kw(%s) [$pv(%s) GetGlyphSource %s]", 
                        pvs->GetTclName(), this->GetTclName(), pvs->GetName());
   pvs->Delete();
   pvd->Delete();
@@ -1000,7 +1000,7 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   delete [] rootName;
 
   pvs = sInt->CreateCallback();
-  this->GetPVApplication()->AddTraceEntry("set pv(%s) [$pv(%s) Open %s]",
+  this->GetPVApplication()->AddTraceEntry("set kw(%s) [$kw(%s) Open %s]",
                                           pvs->GetTclName(),
                                           this->GetTclName(), openFileName);
 
@@ -1018,7 +1018,7 @@ void vtkPVWindow::WriteVTKFile(char *filename)
     return;
     }
 
-  pvApp->AddTraceEntry("$pv(%s) WriteVTKFile %s", this->GetTclName(),
+  pvApp->AddTraceEntry("$kw(%s) WriteVTKFile %s", this->GetTclName(),
                        filename);
  
   pvApp->BroadcastScript("vtkDataSetWriter writer");
@@ -1048,7 +1048,7 @@ void vtkPVWindow::WritePVTKFile(char *filename, int ghostLevel)
     numProcs = pvApp->GetController()->GetNumberOfProcesses();
     }
 
-  pvApp->AddTraceEntry("$pv(%s) WritePVTKFile %s", this->GetTclName(),
+  pvApp->AddTraceEntry("$kw(%s) WritePVTKFile %s", this->GetTclName(),
                        filename, ghostLevel);
 
   pvApp->BroadcastScript("vtkPDataSetWriter writer");
@@ -1391,13 +1391,13 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
   this->MainView->SetSelectedComposite(comp);  
   if (comp)
     {
-    this->GetPVApplication()->AddTraceEntry("$pv(%s) SetCurrentPVSource $pv(%s)", 
+    this->GetPVApplication()->AddTraceEntry("$kw(%s) SetCurrentPVSource $pv(%s)", 
                         this->GetTclName(), comp->GetTclName());
     this->SetCurrentPVData(comp->GetPVOutput());
     }
   else
     {
-    this->GetPVApplication()->AddTraceEntry("$pv(%s) SetCurrentPVSource NULL", 
+    this->GetPVApplication()->AddTraceEntry("$kw(%s) SetCurrentPVSource NULL", 
                         this->GetTclName());
     this->SetCurrentPVData(NULL);
     }
@@ -1454,7 +1454,7 @@ vtkKWCompositeCollection* vtkPVWindow::GetGlyphSources()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ResetCameraCallback()
 {
-  this->GetPVApplication()->AddTraceEntry("$pv(%s) ResetCameraCallback", 
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) ResetCameraCallback", 
                                           this->GetTclName());
 
   this->MainView->ResetCamera();
@@ -1629,7 +1629,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   calc->SetPVInput(this->GetCurrentPVData());
   calc->SetName(tclName);  
 
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) CalculatorCallback]", 
+  pvApp->AddTraceEntry("set kw(%s) [$pv(%s) CalculatorCallback]", 
                       calc->GetTclName(), this->GetTclName());
 
   this->GetMainView()->AddComposite(calc);
@@ -1710,7 +1710,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   cutPlane->SetPVInput(current);
   cutPlane->SetName(tclName);
 
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) CutPlaneCallback]", 
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) CutPlaneCallback]", 
                        cutPlane->GetTclName(), this->GetTclName());
 
   this->GetMainView()->AddComposite(cutPlane);
@@ -1788,7 +1788,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   threshold->SetPVInput(current);
   threshold->SetName(tclName);
 
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) ThresholdCallback]", 
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ThresholdCallback]", 
                        threshold->GetTclName(), this->GetTclName());
 
   this->GetMainView()->AddComposite(threshold);
@@ -1870,7 +1870,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   clipPlane->SetPVInput(current);
   clipPlane->SetName(tclName);
 
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) ClipPlaneCallback]", 
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ClipPlaneCallback]", 
                        clipPlane->GetTclName(), this->GetTclName());
 
   this->GetMainView()->AddComposite(clipPlane);
@@ -1951,14 +1951,14 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   contour->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   contour->SetApplication(pvApp);
   contour->SetVTKSource(s, tclName);
-  contour->SetPVInput(current);
   contour->SetName(tclName);
 
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) ContourCallback]", 
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ContourCallback]", 
                        contour->GetTclName(), this->GetTclName());
 
   this->GetMainView()->AddComposite(contour);
   contour->CreateProperties();
+  contour->SetPVInput(current);
   this->AddPVSource(contour);
 
   // Create the output.
@@ -1980,6 +1980,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
     "%s SetExtentTranslator [%s GetExtentTranslator]",
     pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
 
+  contour->UpdateScalarRangeLabel();
   contour->Delete();
   pvd->Delete();
   
@@ -2031,7 +2032,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   pvGlyph->SetPVInput(current);
   pvGlyph->SetName(tclName);
 
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GlyphCallback]", 
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GlyphCallback]", 
                        pvGlyph->GetTclName(), this->GetTclName());
 
   this->GetMainView()->AddComposite(pvGlyph);
@@ -2108,7 +2109,7 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   probe->SetPVInput(current);
   probe->SetName(tclName);
 
-  pvApp->AddTraceEntry("set pv(%s) [$pv(%s) ProbeCallback]", 
+  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) ProbeCallback]", 
                        probe->GetTclName(), this->GetTclName());
 
   this->GetMainView()->AddComposite(probe);
@@ -2164,7 +2165,7 @@ void vtkPVWindow::ShowWindowProperties()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourceProperties()
 {
-  this->GetPVApplication()->AddTraceEntry("$pv(%s) ShowCurrentSourceProperties",
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) ShowCurrentSourceProperties",
                                           this->GetTclName());
 
   this->ShowProperties();
@@ -2192,7 +2193,7 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowAnimationProperties()
 {
-  this->GetPVApplication()->AddTraceEntry("$pv(%s) ShowAnimationProperties",
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) ShowAnimationProperties",
                                           this->GetTclName());
 
   this->AnimationInterface->UpdateSourceMenu();

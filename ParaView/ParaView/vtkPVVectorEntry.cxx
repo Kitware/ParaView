@@ -92,7 +92,7 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
     }
   
   // For getting the widget in a script.
-  this->SetName(label);
+  this->SetTraceName(label);
 
   this->SetApplication(pvApp);
 
@@ -150,6 +150,7 @@ void vtkPVVectorEntry::Accept()
   vtkKWEntry *entry;
   vtkPVApplication *pvApp = this->GetPVApplication();
   ofstream *traceFile = pvApp->GetTraceFile();
+  int traceFlag = 0;
   char acceptCmd[1024];
 
   if ( ! this->ModifiedFlag)
@@ -158,9 +159,14 @@ void vtkPVVectorEntry::Accept()
     }
 
   // Start the trace entry and the accept command.
-  if (traceFile)
+  if (traceFile && this->InitializeTrace())
     {
-    *traceFile << "$pv(" << this->GetTclName() << ") SetValue";
+    traceFlag = 1;
+    }
+
+  if (traceFlag)
+    {
+    *traceFile << "$kw(" << this->GetTclName() << ") SetValue";
     }
   sprintf(acceptCmd, "%s Set%s ", this->ObjectTclName, this->VariableName);
 
@@ -168,14 +174,14 @@ void vtkPVVectorEntry::Accept()
   this->Entries->InitTraversal();
   while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
     {
-    if (traceFile)
+    if (traceFlag)
       {
       *traceFile << " " << entry->GetValue();
       }
     strcat(acceptCmd, entry->GetValue());
     strcat(acceptCmd, " ");
     }
-  if (traceFile)
+  if (traceFlag)
     {
     *traceFile << endl;
     }

@@ -108,7 +108,7 @@ void vtkPVClipPlane::CreateProperties()
   planeWidget->SetModifiedCommand(this->GetTclName(),"ChangeAcceptButtonColor");
   planeWidget->Create(this->Application);
   this->Script("pack %s -side top -fill x", planeWidget->GetWidgetName());
-  planeWidget->SetName("Plane");
+  planeWidget->SetTraceName("Plane");
   this->Widgets->AddItem(planeWidget);
   // This makes the assumption that the vtkClipDataSet filter 
   // has already been set.  In the future we could also implement 

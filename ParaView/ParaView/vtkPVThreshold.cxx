@@ -219,16 +219,16 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
 
   if ( ! this->TraceInitialized)
     {
-    pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetAttributeModeMenu]",
+    pvApp->AddTraceEntry("set kw(%s) [$pv(%s) GetAttributeModeMenu]",
                          this->AttributeModeMenu->GetTclName(),
                          this->GetTclName());
     this->TraceInitialized = 1;
     }
   
-  pvApp->AddTraceEntry("$pv(%s) SetValue \"%s\"",
+  pvApp->AddTraceEntry("$kw(%s) SetValue \"%s\"",
                        this->AttributeModeMenu->GetTclName(),
                        this->AttributeModeMenu->GetValue());
-  pvApp->AddTraceEntry("$pv(%s) ChangeAttributeMode %s",
+  pvApp->AddTraceEntry("$kw(%s) ChangeAttributeMode %s",
                        this->GetTclName(), newMode);
   
   this->ChangeAcceptButtonColor();
@@ -257,7 +257,6 @@ void vtkPVThreshold::UpdateScalars()
   float range[2];
   int attributeMode;
   
-  this->vtkPVSource::UpdateScalars();
   //arrayName = this->ScalarOperationMenu->GetValue();
   attributeMode = ((vtkThreshold*)this->GetVTKSource())->GetAttributeMode();
   

@@ -272,6 +272,12 @@ public:
   vtkGetMacro(NumberOfPVOutputs, int);
   vtkPVData **GetPVOutputs() { return this->PVOutputs; };
 
+  // Description:
+  // Event procedure for initializing PVWidget traces.
+  // Used internally.
+  static void InitializePVWidgetTrace(vtkObject* o, unsigned long event, 
+                                      void* clientData, void* callData);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();

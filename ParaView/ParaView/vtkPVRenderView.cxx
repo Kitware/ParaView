@@ -951,7 +951,7 @@ void vtkPVRenderView::SetInteractor(vtkKWInteractor *interactor)
     interactor->Select();
     if (interactor->GetTraceInitialized() )
       {
-      pvApp->AddTraceEntry("$pv(%s) SetInteractor $pv(%s)",
+      pvApp->AddTraceEntry("$kw(%s) SetInteractor $pv(%s)",
                            this->GetTclName(), interactor->GetTclName());
       }
     }

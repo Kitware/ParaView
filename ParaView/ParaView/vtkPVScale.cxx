@@ -84,7 +84,7 @@ void vtkPVScale::Create(vtkKWApplication *pvApp, char *label,
     }
 
   // For getting the widget in a script.
-  this->SetName(label);
+  this->SetTraceName(label);
   
   this->SetApplication(pvApp);
 
@@ -139,7 +139,7 @@ void vtkPVScale::Accept()
 
   if (this->ModifiedFlag)
     {  
-    pvApp->AddTraceEntry("$pv(%s) SetValue %f", this->GetTclName(), 
+    pvApp->AddTraceEntry("$kw(%s) SetValue %f", this->GetTclName(), 
                          this->Scale->GetValue());
     }
 

@@ -595,7 +595,7 @@ void vtkPVArrayCalculator::AddScalarVariable(const char* variableName,
                          this->GetVTKSourceTclName(),
                          variableName, arrayName, component);
   
-  pvApp->AddTraceEntry("$pv(%s) AddScalarVariable %s %s %d",
+  pvApp->AddTraceEntry("$kw(%s) AddScalarVariable %s %s %d",
                        this->GetTclName(), variableName, arrayName, component);
 }
 
@@ -609,7 +609,7 @@ void vtkPVArrayCalculator::AddVectorVariable(const char* variableName,
                          this->GetVTKSourceTclName(),
                          variableName, arrayName);
   
-  pvApp->AddTraceEntry("$pv(%s) AddVectorVariable %s %s",
+  pvApp->AddTraceEntry("$kw(%s) AddVectorVariable %s %s",
                        this->GetTclName(), variableName, arrayName);
 }
 
@@ -621,7 +621,7 @@ void vtkPVArrayCalculator::UpdateVTKSourceParameters()
   if (this->ModifiedFlag)
     {
     // The calculator UI is not a widget so we have to manage it here.
-    pvApp->AddTraceEntry("$pv(%s) SetFunctionLabel {%s}",
+    pvApp->AddTraceEntry("$kw(%s) SetFunctionLabel {%s}",
                          this->GetTclName(), this->FunctionLabel->GetLabel());
 
     // Format a command to move value from widget to vtkObjects (on all processes).

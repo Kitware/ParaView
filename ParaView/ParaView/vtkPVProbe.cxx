@@ -515,8 +515,8 @@ void vtkPVProbe::AcceptCallback()
 
   if (this->Dimensionality == 0)
     {
-    pvApp->AddTraceEntry("$pv(%s) UsePoint", this->GetTclName());
-    pvApp->AddTraceEntry("[$pv(%s) GetInteractor] SetSelectedPoint %f %f %f",
+    pvApp->AddTraceEntry("$kw(%s) UsePoint", this->GetTclName());
+    pvApp->AddTraceEntry("[$kw(%s) GetInteractor] SetSelectedPoint %f %f %f",
                          this->GetTclName(),
                          this->SelectedXEntry->GetValueAsFloat(),
                          this->SelectedYEntry->GetValueAsFloat(),
@@ -524,27 +524,27 @@ void vtkPVProbe::AcceptCallback()
     }
   else
     {
-    pvApp->AddTraceEntry("$pv(%s) UseLine", this->GetTclName());
-    pvApp->AddTraceEntry("$pv(%s) UpdateScalars", this->GetTclName());
-    pvApp->AddTraceEntry("[$pv(%s) GetEndPointMenu] SetValue \"End Point 1\"",
+    pvApp->AddTraceEntry("$kw(%s) UseLine", this->GetTclName());
+    pvApp->AddTraceEntry("$kw(%s) UpdateScalars", this->GetTclName());
+    pvApp->AddTraceEntry("[$kw(%s) GetEndPointMenu] SetValue \"End Point 1\"",
                          this->GetTclName());
-    pvApp->AddTraceEntry("$pv(%s) SetCurrentEndPoint 1",
+    pvApp->AddTraceEntry("$kw(%s) SetCurrentEndPoint 1",
                          this->GetTclName());
-    pvApp->AddTraceEntry("[$pv(%s) GetInteractor] SetSelectedPoint %f %f %f",
+    pvApp->AddTraceEntry("[$kw(%s) GetInteractor] SetSelectedPoint %f %f %f",
                          this->GetTclName(),
                          this->End1XEntry->GetValueAsFloat(),
                          this->End1YEntry->GetValueAsFloat(),
                          this->End1ZEntry->GetValueAsFloat());
-    pvApp->AddTraceEntry("[$pv(%s) GetEndPointMenu] SetValue \"End Point 2\"",
+    pvApp->AddTraceEntry("[$kw(%s) GetEndPointMenu] SetValue \"End Point 2\"",
                          this->GetTclName());
-    pvApp->AddTraceEntry("$pv(%s) SetCurrentEndPoint 2",
+    pvApp->AddTraceEntry("$kw(%s) SetCurrentEndPoint 2",
                          this->GetTclName());
-    pvApp->AddTraceEntry("[$pv(%s) GetInteractor] SetSelectedPoint %f %f %f",
+    pvApp->AddTraceEntry("[$kw(%s) GetInteractor] SetSelectedPoint %f %f %f",
                          this->GetTclName(),
                          this->End2XEntry->GetValueAsFloat(),
                          this->End2YEntry->GetValueAsFloat(),
                          this->End2ZEntry->GetValueAsFloat());
-    pvApp->AddTraceEntry("[$pv(%s) GetShowXYPlotToggle] SetState %d",
+    pvApp->AddTraceEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
                          this->GetTclName(),
                          this->ShowXYPlotToggle->GetState());
     }

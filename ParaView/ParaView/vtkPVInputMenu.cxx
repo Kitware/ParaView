@@ -90,7 +90,7 @@ vtkPVInputMenu::~vtkPVInputMenu()
 void vtkPVInputMenu::SetLabel(const char* label)
 {
   this->Label->SetLabel(label);
-  this->SetName(label);
+  this->SetTraceName(label);
 }
 
 //----------------------------------------------------------------------------
@@ -251,14 +251,14 @@ void vtkPVInputMenu::Accept()
     {
     this->Script("%s Set%s %s", this->PVSource->GetTclName(), this->InputName,
                  this->CurrentValue->GetPVOutput()->GetTclName());
-    pvApp->AddTraceEntry("$pv(%s) SetCurrentValue $pv(%s)", 
+    pvApp->AddTraceEntry("$kw(%s) SetCurrentValue $pv(%s)", 
                          this->GetTclName(), 
                          this->CurrentValue->GetTclName());
     }
   else
     {
     this->Script("%s Set%s {}", this->PVSource->GetTclName(), this->InputName);
-    pvApp->AddTraceEntry("$pv(%s) SetCurrentValue {}", 
+    pvApp->AddTraceEntry("$kw(%s) SetCurrentValue {}", 
                          this->GetTclName());
     }
 }

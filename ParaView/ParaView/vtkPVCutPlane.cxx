@@ -108,7 +108,7 @@ void vtkPVCutPlane::CreateProperties()
   planeWidget->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   planeWidget->Create(this->Application);
   this->Script("pack %s -side top -fill x", planeWidget->GetWidgetName());
-  planeWidget->SetName("Plane");
+  planeWidget->SetTraceName("Plane");
   this->Widgets->AddItem(planeWidget);
   if (this->VTKSourceTclName != NULL)
     {

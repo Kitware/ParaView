@@ -120,7 +120,7 @@ void vtkPVArrayMenu::SetDataSetCommand(const char* objTclName,
 void vtkPVArrayMenu::SetLabel(const char* label)
 {
   this->Label->SetLabel(label);
-  this->SetName(label);
+  this->SetTraceName(label);
 }
 
 //----------------------------------------------------------------------------
@@ -365,7 +365,7 @@ void vtkPVArrayMenu::Accept()
                            this->InputName,
                            attributeName,
                            this->ArrayName);
-    pvApp->AddTraceEntry("$pv(%s) SetValue %s", 
+    pvApp->AddTraceEntry("$kw(%s) SetValue %s", 
                          this->GetTclName(), 
                          this->ArrayName);
     }
@@ -375,7 +375,7 @@ void vtkPVArrayMenu::Accept()
                            this->ObjectTclName,
                            this->InputName,
                            attributeName);
-    pvApp->AddTraceEntry("$pv(%s) SetValue {}", this->GetTclName());
+    pvApp->AddTraceEntry("$kw(%s) SetValue {}", this->GetTclName());
     }
 
   if (this->ShowComponentMenu)
@@ -385,7 +385,7 @@ void vtkPVArrayMenu::Accept()
                            this->InputName,
                            attributeName,
                            this->SelectedComponent);
-    pvApp->AddTraceEntry("$pv(%s) SetSelectedComponent %s", 
+    pvApp->AddTraceEntry("$kw(%s) SetSelectedComponent %s", 
                          this->GetTclName(), 
                          this->ArrayName);
     }

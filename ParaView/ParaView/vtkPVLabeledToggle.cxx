@@ -133,7 +133,7 @@ void vtkPVLabeledToggle::Accept()
     return;
     }
 
-  pvApp->AddTraceEntry("$pv(%s) SetState %d", this->GetTclName(), 
+  pvApp->AddTraceEntry("$kw(%s) SetState %d", this->GetTclName(), 
                        this->GetState());
 
   pvApp->BroadcastScript("%s Set%s %d", this->ObjectTclName, 

@@ -116,7 +116,7 @@ int vtkPVSelectionList::Create(vtkKWApplication *app)
 void vtkPVSelectionList::SetLabel(const char* label) 
 {
   // For getting the widget in a script.
-  this->SetName(label);
+  this->SetTraceName(label);
   this->Label->SetLabel(label);
 }
   
@@ -128,7 +128,7 @@ void vtkPVSelectionList::Accept()
 
   if (this->ModifiedFlag)
     {  
-    pvApp->AddTraceEntry("$pv(%s) SetCurrentValue {%d}", this->GetTclName(), 
+    pvApp->AddTraceEntry("$kw(%s) SetCurrentValue {%d}", this->GetTclName(), 
                          this->GetCurrentValue());
     }
 

@@ -648,9 +648,8 @@ void vtkPVApplication::StartRecordingScript(char *filename)
     }
 
   // Initialize a couple of variables in the trace file.
-  this->AddTraceEntry("set pv(%s) [Application GetMainWindow]",
-                       this->GetMainWindow()->GetTclName());
-
+  this->AddTraceEntry("set kw(%s) [Application GetMainWindow]",
+                      this->GetMainWindow()->GetTclName());
 }
 
 //----------------------------------------------------------------------------

@@ -193,7 +193,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     // Now this is a bit of a hack to get tcl variables of these multiple sources.
     // It is important that this trace entry occurs before the source is set to current,
     // because the set current source adds its own trace which uses the variable.
-    pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPreviousPVSource %d]",
+    pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetPreviousPVSource %d]",
                          pvs->GetTclName(), this->PVWindow->GetTclName(),
                          numOutputs - 1  - i);
 

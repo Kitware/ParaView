@@ -93,28 +93,15 @@ public:
   vtkGetMacro(ModifiedFlag,int);
   
   // Description:
-  // With this name, you can get this widget from the PVSource.
-  // It is to allow access to this widget from a script.
-  // In most widgets, it is the same as the label.
-  vtkSetStringMacro(Name);
-  vtkGetStringMacro(Name);
-
-  // Description:
   // Conveniance method that casts the application to a PV application.
   vtkPVApplication *GetPVApplication() 
     {return vtkPVApplication::SafeDownCast(this->Application);}
 
   // Description:
-  // The owner of this object is responsible for setting the variable
-  // in the trace file that refers to this object.  This flag should
-  // be set to indicate whether the variable has been set in the trace.
-  // The variable is just the array pv index by the objects Tcl name.
-  vtkSetMacro(TraceVariableInitialized,int);
-  vtkGetMacro(TraceVariableInitialized,int);
-
-  // Description:
   // Save this widget to a file.  
-  virtual void SaveInTclScript(ofstream *file, const char *sourceName);  
+  virtual void SaveInTclScript(ofstream *file, const char *sourceName);
+  
+  virtual int InitializeTrace();  
 
 protected:
   vtkPVWidget();
@@ -122,9 +109,6 @@ protected:
   vtkPVWidget(const vtkPVWidget&) {};
   void operator=(const vtkPVWidget&) {};
 
-  vtkStringList *AcceptCommands;
-  vtkStringList *ResetCommands;
-  
   char *ObjectTclName;
   char *VariableName;
   vtkSetStringMacro(ObjectTclName);
@@ -135,16 +119,14 @@ protected:
   vtkSetStringMacro(ModifiedCommandObjectTclName);
   vtkSetStringMacro(ModifiedCommandMethod);
   
-  // This flag indicates that a variable has been defined in the 
-  // trace file for this widget.
-  int TraceVariableInitialized;
   // This flag indicates that the widget has changed and should be
   // added to the trace file.
   int ModifiedFlag;
 
-  // This name allows access to this widget from a script.
-  // In most widgets, it is the same as the label.
-  char *Name;
+  // Event for initializing the trace.
+
+
+
 };
 
 #endif

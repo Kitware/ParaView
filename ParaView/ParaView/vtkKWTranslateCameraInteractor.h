@@ -96,7 +96,7 @@ protected:
   vtkSetStringMacro(ZoomCursorName);
   int CursorState;
   
-  void InitializeTrace();
+  virtual int InitializeTrace();
 };
 
 

@@ -101,7 +101,7 @@ vtkPVContourEntry* vtkPVContourEntry::New()
 void vtkPVContourEntry::SetLabel(const char* str)
 {
   this->ContourValuesLabel->SetLabel(str);
-  this->SetName(str);
+  this->SetTraceName(str);
 }
 
 //----------------------------------------------------------------------------
@@ -227,7 +227,7 @@ void vtkPVContourEntry::Accept()
 
   if (this->ModifiedFlag)
     {  
-    pvApp->AddTraceEntry("$pv(%s) RemoveAllValues", 
+    pvApp->AddTraceEntry("$kw(%s) RemoveAllValues", 
                          this->GetTclName());
     pvApp->BroadcastScript("%s SetNumberOfContours %d",
                            this->PVSource->GetVTKSourceTclName(), numContours);
@@ -238,7 +238,7 @@ void vtkPVContourEntry::Accept()
       pvApp->BroadcastScript("%s SetValue %d %f",
                              this->PVSource->GetVTKSourceTclName(),
                              i, value);
-      pvApp->AddTraceEntry("$pv(%s) AddValue %f", 
+      pvApp->AddTraceEntry("$kw(%s) AddValue %f", 
                            this->GetTclName(), value);
       }
     }

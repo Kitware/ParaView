@@ -86,7 +86,7 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp, char *label,
     }
 
   // For getting the widget in a script.
-  this->SetName(label);
+  this->SetTraceName(label);
   
   this->SetApplication(pvApp);
   
@@ -149,7 +149,7 @@ void vtkPVStringEntry::Accept()
 
   if (this->ModifiedFlag)
     {
-    pvApp->AddTraceEntry("$pv(%s) SetValue {%s}", this->GetTclName(), 
+    pvApp->AddTraceEntry("$kw(%s) SetValue {%s}", this->GetTclName(), 
                          this->GetValue());
     }
 

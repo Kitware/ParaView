@@ -212,11 +212,7 @@ void vtkKWRotateCameraInteractor::AButtonPress(int num, int x, int y)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
-    if ( ! this->TraceInitialized )
-      {
-      this->InitializeTrace();
-      }
-    pvApp->AddTraceEntry("$pv(%s) AButtonPress %d %d %d",
+    this->AddTraceEntry("$kw(%s) AButtonPress %d %d %d",
                          this->GetTclName(), num, x, y);
     }
   
@@ -262,11 +258,7 @@ void vtkKWRotateCameraInteractor::AButtonRelease(int num, int x, int y)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
-    if ( ! this->TraceInitialized )
-      {
-      this->InitializeTrace();
-      }
-    pvApp->AddTraceEntry("$pv(%s) AButtonRelease %d %d %d",
+    this->AddTraceEntry("$kw(%s) AButtonRelease %d %d %d",
                          this->GetTclName(), num, x, y);
     }
 
@@ -283,11 +275,7 @@ void vtkKWRotateCameraInteractor::Button1Motion(int x, int y)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
-    if ( ! this->TraceInitialized )
-      {
-      this->InitializeTrace();
-      }
-    pvApp->AddTraceEntry("$pv(%s) Button1Motion %d %d",
+    this->AddTraceEntry("$kw(%s) Button1Motion %d %d",
                          this->GetTclName(), x, y);
     }
 
@@ -325,11 +313,7 @@ void vtkKWRotateCameraInteractor::Button3Motion(int x, int y)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
-    if ( ! this->TraceInitialized )
-      {
-      this->InitializeTrace();
-      }
-    pvApp->AddTraceEntry("$pv(%s) Button3Motion %d %d",
+    this->AddTraceEntry("$kw(%s) Button3Motion %d %d",
                          this->GetTclName(), x, y);
     }
   
@@ -345,11 +329,7 @@ void vtkKWRotateCameraInteractor::MotionCallback(int x, int y)
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (this->Tracing)
     {
-    if ( ! this->TraceInitialized )
-      {
-      this->InitializeTrace();
-      }
-    pvApp->AddTraceEntry("$pv(%s) MotionCallback %d %d",
+    this->AddTraceEntry("$kw(%s) MotionCallback %d %d",
                          this->GetTclName(), x, y);
     }
   
@@ -476,15 +456,22 @@ void vtkKWRotateCameraInteractor::UpdateRollCursor(double px, double py)
 #endif
 }
 
-void vtkKWRotateCameraInteractor::InitializeTrace()
+int vtkKWRotateCameraInteractor::InitializeTrace()
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
-  vtkPVWindow *pvWindow = vtkPVWindow::SafeDownCast(this->GetWindow());
+  vtkKWWindow *kwWin = this->GetWindow();
   
-  if (pvApp && pvWindow)
+  if (this->TraceInitialized)
     {
-    pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetRotateCameraInteractor]",
-                         this->GetTclName(), pvWindow->GetTclName());
+    return 1;
     }
-  this->SetTraceInitialized(1);
+
+  if (kwWin && this->Application)
+    {
+    // Set the variable becasue AddTraceEntry also calls InitializeTrace.
+    this->TraceInitialized = 1;
+    this->AddTraceEntry("set kw(%s) [$kw(%s) GetRotateCameraInteractor]",
+                         this->GetTclName(), kwWin->GetTclName());
+    return 1;
+    }
+  return 0;
 }

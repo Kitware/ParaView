@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
+#include "vtkKWEvent.h"
 
 //----------------------------------------------------------------------------
 vtkPVWidget* vtkPVWidget::New()
@@ -59,29 +60,19 @@ vtkPVWidget* vtkPVWidget::New()
 //----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
 {
-  this->AcceptCommands = vtkStringList::New();
-  this->ResetCommands = vtkStringList::New();
-
   this->ObjectTclName = NULL;
   this->VariableName = NULL;
 
   this->ModifiedCommandObjectTclName = NULL;
   this->ModifiedCommandMethod = NULL;
 
-  this->TraceVariableInitialized = 0;
   // Start modified because empty widgets do not match their variables.
   this->ModifiedFlag = 1;
-  this->Name = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVWidget::~vtkPVWidget()
 {
-  this->AcceptCommands->Delete();
-  this->AcceptCommands = NULL;
-  this->ResetCommands->Delete();
-  this->ResetCommands = NULL;
-  
   this->SetObjectTclName(NULL);
   this->SetVariableName(NULL);
 
@@ -119,28 +110,12 @@ void vtkPVWidget::SaveInTclScript(ofstream *file, const char *sourceName)
 //----------------------------------------------------------------------------
 void vtkPVWidget::Accept()
 {
-  int num, i;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  num = this->AcceptCommands->GetNumberOfStrings();
-  for (i = 0; i < num; i++)
-    {
-    pvApp->BroadcastScript(this->AcceptCommands->GetString(i));
-    }
-
   this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWidget::Reset()
 {
-  int num, i;
-  num = this->ResetCommands->GetNumberOfStrings();
-  for (i = 0; i < num; i++)
-    {
-    this->Script(this->ResetCommands->GetString(i));
-    }
-
   // We want the modifiedCallbacks to occur before we reset this flag.
   this->Script("update");
   this->ModifiedFlag = 0;
@@ -157,3 +132,19 @@ void vtkPVWidget::ModifiedCallback()
                  this->ModifiedCommandMethod);
     }
 }
+
+//----------------------------------------------------------------------------
+int vtkPVWidget::InitializeTrace()
+{
+  if (this->TraceInitialized)
+    {
+    return 1;
+    }
+
+  this->InvokeEvent(vtkKWEvent::InitializeTraceEvent, 0);
+  this->TraceInitialized = 1;
+}
+
+
+
+ 

@@ -135,6 +135,11 @@ public:
   char* CreateCommand(vtkKWObject* Object, const char* MethodAndArgString);
 
   // Description:
+  // Get the containing vtkKWWindow for this Widget if there is one.
+  // NOTE: this may return NULL if the Widget is not in a window.
+  vtkKWWindow* GetWindow();
+
+  // Description:
   // Setting this string enables balloon help for this widget.
   virtual void SetBalloonHelpString(const char *str);
   vtkGetStringMacro(BalloonHelpString);
@@ -149,9 +154,14 @@ public:
     this->SetBalloonHelpJustification(2);};
   
   // Description:
-  // Get the containing vtkKWWindow for this Widget if there is one.
-  // NOTE: this may return NULL if the Widget is not in a window.
-  vtkKWWindow* GetWindow();
+  // These method are for supporting tracing the widgets activity.
+  // GetChildWidget is used only for initializing the widget relative
+  // to its parent.  The trace name has to be set by the parent
+  // for GetChildWidget to work.
+  vtkSetStringMacro(TraceName);
+  vtkGetStringMacro(TraceName);
+  vtkKWWidget *GetChildWidget(const char* traceName);
+
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
@@ -164,11 +174,29 @@ protected:
   vtkKWWidgetCollection *Children; 
   int DeletingChildren;
 
+  // Ballon help
   char  *BalloonHelpString;
   int   BalloonHelpJustification;
   int   BalloonHelpInitialized;
   void  SetUpBalloonHelpBindings();
   
+  // Tracing support:
+  // This flag indicates that a variable has been defined in the 
+  // trace file for this widget.
+  int TraceInitialized;
+  // We need a unique way to get the widget from the parent.  This
+  // is unfortunate, but necessary.  With out this name set, the
+  // trace cannot be initialized for this widget.
+  char *TraceName;
+  // The subclass can use this method to initialize the widget in the trace file.
+  // It returns 1 if successful.
+  virtual int InitializeTrace();
+  // Convenience method that initializes and handles formating the trace command.
+  // The formated string should contain a command that looks like:
+  // "$kw(%s) SetValue %d", this->GetTclName(), this->GetValue().  
+//BTX
+  int AddTraceEntry(const char *EventString, ...);
+//ETX
 };
 
 

@@ -105,7 +105,7 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp, char *minLabel,
     }
 
   // For getting the widget in a script.
-  this->SetName(minLabel);
+  this->SetTraceName(minLabel);
   
   this->SetApplication(pvApp);
 
@@ -219,9 +219,9 @@ void vtkPVMinMax::Accept()
 
   if (this->ModifiedFlag)
     {  
-    pvApp->AddTraceEntry("$pv(%s) SetMinValue %f", this->GetTclName(), 
+    pvApp->AddTraceEntry("$kw(%s) SetMinValue %f", this->GetTclName(), 
                          this->MinScale->GetValue());
-    pvApp->AddTraceEntry("$pv(%s) SetMaxValue %f", this->GetTclName(), 
+    pvApp->AddTraceEntry("$kw(%s) SetMaxValue %f", this->GetTclName(), 
                          this->MaxScale->GetValue());
     }
 

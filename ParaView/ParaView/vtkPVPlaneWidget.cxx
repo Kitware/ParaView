@@ -326,25 +326,11 @@ void vtkPVPlaneWidget::Accept()
 
   if ( this->CenterEntry->GetModifiedFlag())
     {
-    if ( ! this->CenterEntry->GetTraceVariableInitialized())
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetCenterEntry]",
-                           this->CenterEntry->GetTclName(), 
-                           this->GetTclName());
-      this->CenterEntry->SetTraceVariableInitialized(1);
-      }
     this->CenterEntry->Accept();
     }
 
   if ( this->NormalEntry->GetModifiedFlag())
     {
-    if ( ! this->NormalEntry->GetTraceVariableInitialized())
-      {
-      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetNormalEntry]",
-                           this->NormalEntry->GetTclName(), 
-                           this->GetTclName());
-      this->NormalEntry->SetTraceVariableInitialized(1);
-      }
     this->NormalEntry->Accept();
     }
 
