@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWindow.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWWidgetCollection.h"
-#include "vtkScaledTextActor.h"
+#include "vtkTextActor.h"
 #include "vtkKWText.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWChangeColorButton.h"
@@ -160,7 +160,7 @@ vtkKWView::vtkKWView()
   this->HeaderMapper->SetVerticalJustificationToTop();
   this->HeaderMapper->SetFontSize(15);  
   this->HeaderMapper->ShadowOff();  
-  this->HeaderProp = vtkScaledTextActor::New();
+  this->HeaderProp = vtkTextActor::New();
   this->HeaderProp->GetPositionCoordinate()->SetValue(0.2,0.88);
   this->HeaderProp->SetMapper(this->HeaderMapper);
   this->HeaderComposite = vtkKWGenericComposite::New();
@@ -1318,7 +1318,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.63 $");
+  this->ExtractRevision(os,"$Revision: 1.64 $");
 }
 
 void vtkKWView::SetupMemoryRendering(

@@ -76,7 +76,7 @@ class vtkRenderer;
 class vtkRenderWindow;
 class vtkTextMapper;
 class vtkKWGenericComposite;
-class vtkScaledTextActor;
+class vtkTextActor;
 class vtkKWText;
 
 class VTK_EXPORT vtkKWView : public vtkKWWidget
@@ -381,7 +381,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   vtkKWCheckButton       *HeaderButton;
   vtkKWWidget            *HeaderLabel;
   vtkKWEntry             *HeaderEntry;
-  vtkScaledTextActor     *HeaderProp;
+  vtkTextActor     *HeaderProp;
   vtkTextMapper          *HeaderMapper;
 
   vtkKWWidget            *GeneralProperties;
