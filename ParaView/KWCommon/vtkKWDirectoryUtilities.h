@@ -79,7 +79,7 @@ public:
   
   // Description:
   // Tests whether a file is a directory.  Returns 1 for yes, 0 for no.
-  int FileIsDirectory(const char* name);
+  static int FileIsDirectory(const char* name);
   
   //BTX
   // Description:
