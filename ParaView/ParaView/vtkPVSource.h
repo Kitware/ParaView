@@ -206,23 +206,31 @@ public:
   // from the widget values.
   virtual void UpdateVTKSourceParameters();
 
-  void AddVTKSource(const char *tclName);
-  void RemoveAllVTKSources();
-  int GetNumberOfVTKSources();
   //BTX
-  vtkClientServerID GetVTKSourceID(int idx);
-  //ETX
-  unsigned int GetVTKSourceIDAsInt(int idx);
-  // Legacy
-  //BTX
-  vtkClientServerID GetVTKSourceID() {return this->GetVTKSourceID(0);}
-  //ETX
-  unsigned int GetVTKSourceIDAsInt() {return this->GetVTKSourceIDAsInt(0);}
-
-
-  //BTX
+  // Description:
+  // Given and ID, add a VTK source to the list of maintained
+  // VTK sources.
   void AddVTKSource(vtkClientServerID);
   //ETX
+
+  // Description:
+  // Given and ID, remove a VTK source to the list of maintained
+  // VTK source. This call also removes the reference of this PVSource
+  // on the VTK source residing on the server.
+  void RemoveAllVTKSources();
+
+  // Description:
+  // Returns the number of VTK sources referenced by the PVSource.
+  int GetNumberOfVTKSources();
+
+  //BTX
+  // Description:
+  // Given an index, return the ID of a VTK source.
+  vtkClientServerID GetVTKSourceID(int idx);
+  //ETX
+  // Description:
+  // Give an index, return the ID of a VTK source as unsigned int.
+  unsigned int GetVTKSourceIDAsInt(int idx);
 
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
@@ -492,7 +500,6 @@ protected:
   int HideInformationPage;
 //BTX
   vtkClientServerIDList* VTKSourceIDs;
-  vtkClientServerIDList* VTKSourceOuputIDs;
 //ETX
   // One output. Now used only to hold UI
   vtkPVData *PVOutput;
