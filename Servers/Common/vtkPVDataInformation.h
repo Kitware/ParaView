@@ -24,6 +24,7 @@
 #define __vtkPVDataInformation_h
 
 #include "vtkPVInformation.h"
+#include "vtkTypeFromNative.h" // This is required to get the 64 bit int definition.
 
 class vtkCollection;
 class vtkCompositeDataSet;
@@ -60,8 +61,8 @@ public:
   vtkGetMacro(DataSetType, int);
   const char *GetDataSetTypeAsString();
   int DataSetTypeIsA(const char* type);
-  vtkGetMacro(NumberOfPoints, vtkIdType);
-  vtkGetMacro(NumberOfCells, vtkIdType);
+  vtkGetMacro(NumberOfPoints, vtkTypeInt64);
+  vtkGetMacro(NumberOfCells, vtkTypeInt64);
   vtkGetMacro(MemorySize, int);
   vtkGetMacro(NumberOfDataSets, int);
   vtkGetVector6Macro(Bounds, double);
@@ -101,8 +102,8 @@ protected:
   // Data information collected from remote processes.
   int            DataSetType;
   int            NumberOfDataSets;
-  vtkIdType      NumberOfPoints;
-  vtkIdType      NumberOfCells;
+  vtkTypeInt64   NumberOfPoints;
+  vtkTypeInt64   NumberOfCells;
   int            MemorySize;
   double         Bounds[6];
   int            Extent[6];
