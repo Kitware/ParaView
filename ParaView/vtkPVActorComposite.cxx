@@ -714,8 +714,13 @@ void vtkPVActorComposite::UpdateProperties()
           this->GetPVData()->GetNumberOfPoints());
   this->NumPointsLabel->SetLabel(tmp);
   
-  this->BoundsDisplay->SetBounds(bounds);  
-  
+  this->BoundsDisplay->SetBounds(bounds);
+  if (this->CubeAxesTclName)
+    {  
+    this->Script("%s SetBounds %f %f %f %f %f %f",
+                 this->CubeAxesTclName, bounds[0], bounds[1], bounds[2],
+                 bounds[3], bounds[4], bounds[5]);
+    }
   // This doesn't need to be set currently because we're not packing
   // the AmbientScale.
   //  this->AmbientScale->SetValue(this->Property->GetAmbient());

@@ -121,6 +121,7 @@ vtkPVRenderView::vtkPVRenderView()
 void PVRenderViewAbortCheck(void *arg)
 {
   vtkPVRenderView *me = (vtkPVRenderView*)arg;
+  int abort;
 
   // if we are printing then do not abort
   if (me->GetPrinting())
@@ -128,11 +129,16 @@ void PVRenderViewAbortCheck(void *arg)
     return;
     }
   
-  if (me->ShouldIAbort() == 2)
+  abort = me->ShouldIAbort();
+  if (abort == 1)
     {
-    cerr << "Abort Event\n";
-    //("Abort 2");
     me->GetRenderWindow()->SetAbortRender(1);
+    me->EventuallyRender();
+    }
+  if (abort == 2)
+    {
+    //("Abort 2");
+    me->GetRenderWindow()->SetAbortRender(2);
     }
 }
 
@@ -884,6 +890,7 @@ void vtkPVRenderView::EventuallyRenderCallBack()
   this->RenderWindow->SetDesiredUpdateRate(0.000001);
   //this->SetRenderModeToStill();
 
+  // I do not know if these are necessary here.
   abort = this->ShouldIAbort();
   if (abort)
     {
