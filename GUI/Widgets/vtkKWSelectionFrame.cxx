@@ -20,9 +20,10 @@
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWIcon.h"
+#include "vtkKWToolbarSet.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.21");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
@@ -30,6 +31,7 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->TitleBar              = vtkKWFrame::New();
   this->Title                 = vtkKWLabel::New();
   this->SelectionList         = vtkKWMenuButton::New();
+  this->ToolbarSet            = vtkKWToolbarSet::New();
   this->TitleBarRightSubframe = vtkKWFrame::New();
   this->BodyFrame             = vtkKWFrame::New();
 
@@ -52,8 +54,9 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->TitleBackgroundSelectedColor[1] = 0.0;
   this->TitleBackgroundSelectedColor[2] = 0.5;
 
-  this->Selected = 0;
+  this->Selected          = 0;
   this->ShowSelectionList = 1;
+  this->ShowToolbarSet    = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -81,6 +84,12 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
     {
     this->TitleBarRightSubframe->Delete();
     this->TitleBarRightSubframe = NULL;
+    }
+
+  if (this->ToolbarSet)
+    {
+    this->ToolbarSet->Delete();
+    this->ToolbarSet = NULL;
     }
 
   if (this->BodyFrame)
@@ -137,6 +146,12 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
 
   this->TitleBarRightSubframe->SetParent(this->TitleBar);
   this->TitleBarRightSubframe->Create(app, NULL);
+
+  // The toobar
+
+  this->ToolbarSet->SetParent(this);
+  this->ToolbarSet->ShowBottomSeparatorOff();
+  this->ToolbarSet->Create(app, NULL);
 
   // The body frame
 
@@ -196,6 +211,13 @@ void vtkKWSelectionFrame::Pack()
            << " -side right -anchor e -padx 4" << endl;
     }
   
+  if (this->ShowToolbarSet && this->ToolbarSet->IsCreated())
+    {
+    tk_cmd << "pack " << this->ToolbarSet->GetWidgetName()
+           << " -side top -fill x -expand no -padx 1 -pady 1" << endl;
+    this->ToolbarSet->PackToolbars();
+    }
+
   if (this->BodyFrame->IsCreated())
     {
     tk_cmd << "pack " << this->BodyFrame->GetWidgetName()
@@ -231,6 +253,13 @@ void vtkKWSelectionFrame::Bind()
            << " SelectCallback}" << endl;
     }
 
+  if (this->ToolbarSet && this->ToolbarSet->IsCreated())
+    {
+    tk_cmd << "bind " << this->ToolbarSet->GetWidgetName() 
+           << " <ButtonPress-1> {" << this->GetTclName() 
+           << " SelectCallback}" << endl;
+    }
+
   if (this->Title && this->Title->IsCreated())
     {
     tk_cmd << "bind " << this->Title->GetWidgetName() 
@@ -262,6 +291,12 @@ void vtkKWSelectionFrame::UnBind()
   if (this->SelectionList && this->SelectionList->IsCreated())
     {
     tk_cmd << "bind " << this->SelectionList->GetWidgetName() 
+           << " <ButtonPress-1> {}" << endl;
+    }
+
+  if (this->ToolbarSet && this->ToolbarSet->IsCreated())
+    {
+    tk_cmd << "bind " << this->ToolbarSet->GetWidgetName() 
            << " <ButtonPress-1> {}" << endl;
     }
 
@@ -378,6 +413,20 @@ void vtkKWSelectionFrame::SetShowSelectionList(int arg)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetShowToolbarSet(int arg)
+{
+  if (this->ShowToolbarSet == arg)
+    {
+    return;
+    }
+
+  this->ShowToolbarSet = arg;
+
+  this->Modified();
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::UpdateColors()
 {
   if (!this->IsCreated())
@@ -474,30 +523,12 @@ void vtkKWSelectionFrame::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->TitleBar)
-    {
-    this->TitleBar->SetEnabled(this->Enabled);
-    }
-
-  if (this->SelectionList)
-    {
-    this->SelectionList->SetEnabled(this->Enabled);
-    }
-
-  if (this->Title)
-    {
-    this->Title->SetEnabled(this->Enabled);
-    }
-
-  if (this->TitleBarRightSubframe)
-    {
-    this->TitleBarRightSubframe->SetEnabled(this->Enabled);
-    }
-
-  if (this->BodyFrame)
-    {
-    this->BodyFrame->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->TitleBar);
+  this->PropagateEnableState(this->SelectionList);
+  this->PropagateEnableState(this->Title);
+  this->PropagateEnableState(this->TitleBarRightSubframe);
+  this->PropagateEnableState(this->ToolbarSet);
+  this->PropagateEnableState(this->BodyFrame);
 
   if (this->Enabled)
     {
@@ -518,6 +549,7 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TitleBarRightSubframe: " << this->TitleBarRightSubframe
      << endl;
   os << indent << "SelectionList: " << this->SelectionList << endl;
+  os << indent << "ToolbarSet: " << this->ToolbarSet << endl;
   os << indent << "TitleColor: ("
      << this->TitleColor[0] << ", " 
      << this->TitleColor[1] << ", " 
@@ -534,8 +566,8 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
      << this->TitleBackgroundSelectedColor[0] << ", " 
      << this->TitleBackgroundSelectedColor[1] << ", " 
      << this->TitleBackgroundSelectedColor[2] << ")" << endl;
-  os << indent << "SelectionList: " << this->SelectionList << endl;
   os << indent << "Selected: " << (this->Selected ? "On" : "Off") << endl;
   os << indent << "ShowSelectionList: " << (this->ShowSelectionList ? "On" : "Off") << endl;
+  os << indent << "ShowToolbarSet: " << (this->ShowToolbarSet ? "On" : "Off") << endl;
 }
 

@@ -22,6 +22,7 @@
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWMenuButton;
+class vtkKWToolbarSet;
 
 class VTK_EXPORT vtkKWSelectionFrame : public vtkKWWidget
 {
@@ -58,6 +59,7 @@ public:
   virtual void SetShowSelectionList(int);
   vtkGetMacro(ShowSelectionList, int);
   vtkBooleanMacro(ShowSelectionList, int);
+  vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
 
   // Description:
   // Set the select command, called when the frame is selected by the user
@@ -86,6 +88,18 @@ public:
     { this->SetTitleBackgroundSelectedColor(rgb[0], rgb[1], rgb[2]); };
   
   // Description:
+  // Set the selection list (array of num strings) and the command
+  // that will be called when a selection is made by the user. 
+  // This command will be passed both the selected string and 
+  // a pointer to this object.
+  // The selection list is represented as a pull down menu, which
+  // visibility can be set.
+  virtual void SetShowToolbarSet(int);
+  vtkGetMacro(ShowToolbarSet, int);
+  vtkBooleanMacro(ShowToolbarSet, int);
+  vtkGetObjectMacro(ToolbarSet, vtkKWToolbarSet);
+
+  // Description:
   // Callbacks
   virtual void SelectionListCallback(const char *menuItem);
   virtual void SelectCallback();
@@ -103,7 +117,6 @@ public:
   // Access to sub-widgets
   vtkGetObjectMacro(TitleBarRightSubframe, vtkKWFrame);
   vtkGetObjectMacro(BodyFrame, vtkKWFrame);
-  vtkGetObjectMacro(SelectionList, vtkKWMenuButton);
   
 protected:
   vtkKWSelectionFrame();
@@ -111,6 +124,7 @@ protected:
   
   vtkKWFrame      *TitleBar;
   vtkKWMenuButton *SelectionList;
+  vtkKWToolbarSet *ToolbarSet;
   vtkKWLabel      *Title;
   vtkKWFrame      *TitleBarRightSubframe;
   vtkKWFrame      *BodyFrame;
@@ -132,6 +146,7 @@ protected:
 
   int Selected;
   int ShowSelectionList;
+  int ShowToolbarSet;
 
 private:
   vtkKWSelectionFrame(const vtkKWSelectionFrame&);  // Not implemented
