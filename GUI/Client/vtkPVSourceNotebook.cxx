@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.2");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.3");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -582,5 +582,9 @@ void vtkPVSourceNotebook::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "AutoAccept: " << this->AutoAccept << endl;
+  os << indent << "AcceptButtonRed: " << this->AcceptButtonRed << endl;
+  os << indent << "DisplayGUI: " << this->DisplayGUI << endl;
+  os << indent << "MainParameterFrame: " << this->MainParameterFrame << endl;
+  os << indent << "PVSource: " << this->PVSource << endl;  
 }
 
