@@ -47,6 +47,19 @@ if ![file exists $DataDir/small.pop] {
     set DataDirLocal 0
 }
 
+if ![file exists $DataDir/small.pop] {
+    if ![file exists small.pop] {
+	vtkKWMessageDialog _adialog
+	_adialog Create Application ""
+	_adialog SetText "Could not find the data file Dat.pvtk\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
+	_adialog Invoke
+	_adialog Delete
+	set FoundFiles 0
+    }
+} else {
+    set DataDirLocal 0
+}
+
 if $DataDirLocal {
     set DataDir "."
 }
@@ -294,6 +307,129 @@ proc POPRun {pvCont pvFloor pvExtractGrid pvContour} {
 
 }
 
+proc ParticleDemoInit {} {
+    global DataDir
+    
+    # hack to get the window.
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    
+    # Load the model of the continents.
+    .control.main.info configure -text "Reading points"
+    set pvParticles [$pvWindow Open "$DataDir/Dat.pvtk"]
+
+    .control.main.info configure -text "Masking points"
+    set sInt [$pvWindow GetSourceInterface "vtkMaskPoints"]
+    set pvMask [$sInt CreateCallback]
+    [$pvMask GetVTKSource] SetOnRatio 20 
+    [$pvMask GetVTKSource] GenerateVerticesOn
+    $pvMask UpdateParameterWidgets
+    $pvMask AcceptCallback
+
+    .control.main.info configure -text "Cliping points"
+    set pvClip [$pvWindow ClipPlaneCallback]
+    [$pvClip GetVTKSource] SetNormal -1 0 0
+    [$pvClip GetVTKSource] SetOrigin 544.5 544.5 756
+    [$pvClip GetVTKSource] SetOffset -546
+    $pvClip UpdateParameterWidgets
+    $pvClip AcceptCallback
+
+    set pvClipOutput [$pvClip GetNthPVOutput 0]
+    $pvClipOutput SetPointSize 2
+    $pvClipOutput SetScalarRange 7 12
+
+    return "$pvParticles $pvClip $pvClipOutput"
+}
+
+proc ParticleDemoRun {pvParticles pvClip pvClipOutput} {
+
+    global ShouldStop
+
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    set pvView [$pvWindow GetMainView]
+    $pvWindow SetCurrentPVSource $pvClip
+    
+    .control.main.info configure -text "Animating"
+
+    # Show whole data set.
+    [$pvClip GetVTKSource] SetOffset -546.0
+    $pvClip UpdateParameterWidgets
+    $pvClip AcceptCallback
+
+    $pvClipOutput SetCubeAxesVisibility 0
+
+    # Zoom out a little to leave room for diagonal.
+    set camera [Ren1 GetActiveCamera]
+    $camera SetPosition 6121 544.5 756
+    $camera SetFocalPoint 544.5 544.5 756
+    $camera SetClippingRange 4436 7024
+    $camera SetViewUp 0 1 0
+    $camera SetViewAngle 30
+    $camera Azimuth 30
+    $camera Elevation 30
+
+    $pvView EventuallyRender
+    update
+
+    $pvClipOutput SetScalarBarVisibility 1
+    $pvClipOutput SetScalarBarOrientationToHorizontal
+    $pvClipOutput SetVisibility 1
+
+    update
+    
+    for {set i 0} {$i < 30} {incr i 1} {
+	set camera [Ren1 GetActiveCamera]
+	$camera Azimuth 9
+	$pvView EventuallyRender
+	update
+
+	.control.main.info configure -text "rotate $i"
+	if $ShouldStop {
+	    $pvView EventuallyRender
+	    return
+	}
+    }
+    
+    # zoom out a little to leave room for diagonal.
+    set camera [Ren1 GetActiveCamera]
+    $camera SetPosition 4551 267 756
+    $camera SetFocalPoint 554 267 756
+    $camera SetClippingRange 2798 5517
+    $camera SetViewUp 0 1 0
+    $camera SetViewAngle 30
+
+    $pvView EventuallyRender
+    update
+
+    # Move the clip plane through the data.
+    $pvClipOutput SetCubeAxesVisibility 1
+    for {set offset -540} {$offset <= 540} {set offset [expr $offset +50.0]} {
+	[$pvClip GetVTKSource] SetOffset $offset
+	$pvClip UpdateParameterWidgets
+	$pvClip AcceptCallback
+
+	update
+	if $ShouldStop {
+	    $pvView EventuallyRender
+	    return
+	}
+
+	.control.main.info configure -text "clip $offset"
+    }
+
+    $pvClipOutput SetCubeAxesVisibility 0
+
+
+    # Show the high resolution data set.
+    $pvClipOutput SetVisibility 0
+    $pvParticles SetVisibility 1
+    $pvView EventuallyRender
+    update
+    after 2000
+    $pvParticles SetVisibility 0
+    $pvView EventuallyRender
+}
+
+
 # hack to get the window.
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
@@ -313,7 +449,8 @@ if $FoundFiles {
 	set pvNextSource [$pvMySources GetNextItemAsObject]
     }
 
-    set Demos { POP }
+    #    set Demos { POP }
+    set Demos { ParticleDemo }
     set length [llength $Demos]
 
     if ![info exists pvDemoShouldStop] {
