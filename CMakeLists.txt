@@ -304,6 +304,74 @@ IF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPlus")
 ENDIF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPlus")
 
 #########################################################################
+# Import external projects, such as EXODUS and SAF
+
+SET(PARAVIEW_ADDITIONAL_LIBRARIES)
+
+#
+# Imported project adds libraries
+#
+MACRO(PARAVIEW_LINK_LIBRARIES LIBS)
+  SET(PARAVIEW_ADDITIONAL_LIBRARIES ${PARAVIEW_ADDITIONAL_LIBRARIES} ${LIBS})
+ENDMACRO(PARAVIEW_LINK_LIBRARIES LIBS)
+
+#
+# Adds extra ParaView link directories
+#
+MACRO(PARAVIEW_EXTRA_LINK_DIRECTORIES DIRS)
+  SET(current_dirs ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
+  FOREACH(dir ${DIRS})
+    IF(${current_dirs} MATCHES ${dir})
+    ELSE(${current_dirs} MATCHES ${dir})
+      SET(current_dirs ${current_dirs} ${dir})
+    ENDIF(${current_dirs} MATCHES ${dir})
+  ENDFOREACH(dir)
+  SET(PARAVIEW_EXTRA_LINK_DIRECTORIES "${current_dirs}" CACHE INTERNAL "")
+ENDMACRO(PARAVIEW_EXTRA_LINK_DIRECTORIES)
+
+#
+# Imported project adds source files
+# This ones need to be fixed, so that first are not wrapped. This will be fixed
+# once the server changes are merged.
+#
+SET(ExtraParaViewServerNonWrapped_SRCS)
+SET(ExtraParaViewClient_SRCS)
+SET(ExtraParaViewBinary_SRCS)
+SET(ExtraParaViewServer_SRCS)
+
+MACRO(PARAVIEW_INCLUDE_SOURCES SRCS)
+  SET(ExtraParaViewServerNonWrapped_SRCS
+    ${ExtraParaViewServerNonWrapped_SRCS} ${SRCS})
+ENDMACRO(PARAVIEW_INCLUDE_SOURCES SRCS)
+MACRO(PARAVIEW_INCLUDE_CLIENT_SOURCES SRCS)
+  SET(ExtraParaViewClient_SRCS ${ExtraParaViewClient_SRCS} ${SRCS})
+ENDMACRO(PARAVIEW_INCLUDE_CLIENT_SOURCES)
+MACRO(PARAVIEW_INCLUDE_EXECUTABLE_SOURCES SRCS)
+  SET(ExtraParaViewBinary_SRCS ${ExtraParaViewBinary_SRCS} ${SRCS})
+ENDMACRO(PARAVIEW_INCLUDE_EXECUTABLE_SOURCES SRCS)
+MACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
+  SET(ExtraParaViewServer_SRCS ${ExtraParaViewServer_SRCS} ${SRCS})
+ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
+
+FOREACH(external EXODUS SAF)
+  OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
+  MARK_AS_ADVANCED(PARAVIEW_USE_${external})
+  IF(PARAVIEW_USE_${external})
+    FIND_PATH(${external}_SOURCE_DIR 
+      ${external}ParaViewImport.cmake
+      ../vtkSNL/IO
+      ../../vtkSNL/IO
+      ../../../vtkSNL/IO)
+
+    IF(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
+      INCLUDE(${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
+    ELSE(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
+      MESSAGE(SEND_ERROR "Cannot find ${external} sources directory: ${${external}_SOURCE_DIR}")
+    ENDIF(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
+  ENDIF(PARAVIEW_USE_${external})
+ENDFOREACH(external)
+
+#########################################################################
 # Configure Server
 SET(PVFILTERS_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/Servers/Filters

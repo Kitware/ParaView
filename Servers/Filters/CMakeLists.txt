@@ -119,7 +119,7 @@ ENDIF (VTK_USE_PATENTED)
 SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
 SET(VTK_BINARY_DIR "${PVFilters_BINARY_DIR}")
 INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
-VTK_EXPORT_KIT("PVFilters" "PVFILTERS" "${Filters_SRCS}")
+VTK_EXPORT_KIT("PVFilters" "PVFILTERS" "${Filters_SRCS};${ExtraParaViewServer_SRCS}")
 SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 
 INCLUDE_DIRECTORIES(
@@ -149,8 +149,9 @@ VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
   "${PVFilters_BINARY_DIR}" "")
 
 # Create filters library.
-ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkPVCommon vtkPVCommonCS vtkXdmfCS vtkHybridCS vtkParallelCS vtkKWCommon)
+ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS}
+  ${ExtraParaViewServer_SRCS} ${ExtraParaViewServerNonWrapped_SRCS})
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkPVCommon vtkPVCommonCS vtkXdmfCS vtkHybridCS vtkParallelCS vtkKWCommon ${PARAVIEW_ADDITIONAL_LIBRARIES})
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)
