@@ -230,6 +230,22 @@ vtkPVWindow::~vtkPVWindow()
 {
   this->PrepareForDelete();
 
+  this->FlyButton->Delete();
+  this->FlyButton = NULL;
+  this->RotateCameraButton->Delete();
+  this->RotateCameraButton = NULL;
+  this->TranslateCameraButton->Delete();
+  this->TranslateCameraButton = NULL;
+  this->TrackballCameraButton->Delete();
+  this->TrackballCameraButton = NULL;
+
+  this->CenterSource->Delete();
+  this->CenterSource = NULL;
+  this->CenterMapper->Delete();
+  this->CenterMapper = NULL;
+  this->CenterActor->Delete();
+  this->CenterActor = NULL;
+
   this->Sources->Delete();
   this->Sources = NULL;
 
@@ -262,6 +278,9 @@ vtkPVWindow::~vtkPVWindow()
 //----------------------------------------------------------------------------
 void vtkPVWindow::CloseNoPrompt()
 {
+  // Trying to get rid of circular references.
+  this->GenericInteractor->SetInteractorStyle(NULL);
+
   if (this->TclInteractor )
     {
     this->TclInteractor->SetMasterWindow(NULL);
@@ -539,6 +558,8 @@ void vtkPVWindow::PrepareForDelete()
 //----------------------------------------------------------------------------
 void vtkPVWindow::Close()
 {
+  this->GenericInteractor->SetInteractorStyle(NULL);
+
   vtkKWWindow::Close();
 }
 
