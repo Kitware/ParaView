@@ -20,7 +20,7 @@
 #ifndef __vtkPVIceTRenderModule_h
 #define __vtkPVIceTRenderModule_h
 
-#include "vtkPVMultiDisplayRenderModule.h"
+#include "vtkPVCompositeRenderModule.h"
 
 class vtkCompositeRenderManager;
 

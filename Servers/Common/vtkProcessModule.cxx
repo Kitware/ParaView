@@ -43,7 +43,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.7");
+vtkCxxRevisionMacro(vtkProcessModule, "1.8");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -176,6 +176,8 @@ void vtkProcessModule::GatherInformationInternal(const char*,
 
   this->TemporaryInformation->CopyFromObject(object);
 }
+
+//----------------------------------------------------------------------------
 vtkTypeUInt32 vtkProcessModule::CreateSendFlag(vtkTypeUInt32 servers)
 {
   if(servers)

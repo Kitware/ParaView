@@ -21,7 +21,7 @@
 // of the remote image. (No zbuffer).
 
 // .SECTION see also
-// vtkMultiProcessController vtkRenderWindow vtkCompositeManager.
+// vtkMultiProcessController vtkRenderWindow vtkPVTreeComposite
 
 #ifndef __vtkIceTClientCompositeManager_h
 #define __vtkIceTClientCompositeManager_h
