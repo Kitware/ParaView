@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkARLReaderModule);
-vtkCxxRevisionMacro(vtkARLReaderModule, "1.1");
+vtkCxxRevisionMacro(vtkARLReaderModule, "1.2");
 
 int vtkARLReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -81,7 +81,8 @@ vtkARLReaderModule::~vtkARLReaderModule()
 int vtkARLReaderModule::Initialize(const char* fname, 
                                    vtkPVReaderModule*& clone)
 { 
-  if (this->ClonePrototypeInternal(static_cast<vtkPVSource*>(clone)) != VTK_OK)
+  if (this->ClonePrototypeInternal(reinterpret_cast<vtkPVSource*&>(clone)) 
+      != VTK_OK)
     {
     vtkErrorMacro("Error creating reader " << this->GetClassName()
                   << endl);
