@@ -266,6 +266,7 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
     "Error:",
     "mpirun can *only* be used with MPI programs",
     "due to signal",
+    "failure",
     0
   };
   
