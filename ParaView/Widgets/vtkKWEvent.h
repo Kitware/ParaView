@@ -177,6 +177,7 @@ class VTK_EXPORT vtkKWEvent
     VolumeHeaderAnnotationColorChangedEvent,
     VolumeHeaderAnnotationTextChangedEvent,
     VolumeHeaderAnnotationVisibilityChangedEvent,
+    VolumeMaterialPropertyChangedEvent,
     VolumeMouseBindingChangedEvent,
     VolumeOrientationMarkerColorChangedEvent,
     VolumeOrientationMarkerVisibilityChangedEvent,
