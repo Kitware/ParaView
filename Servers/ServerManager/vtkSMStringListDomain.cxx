@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.5");
 
 struct vtkSMStringListDomainInternals
 {
@@ -90,6 +90,11 @@ void vtkSMStringListDomain::RemoveAllStrings()
 //---------------------------------------------------------------------------
 int vtkSMStringListDomain::IsInDomain(vtkSMProperty* property)
 {
+  if (this->IsOptional)
+    {
+    return 1;
+    }
+
   if (!property)
     {
     return 0;

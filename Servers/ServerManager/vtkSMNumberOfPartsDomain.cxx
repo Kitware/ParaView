@@ -20,7 +20,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfPartsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfPartsDomain::vtkSMNumberOfPartsDomain()
@@ -62,6 +62,11 @@ int vtkSMNumberOfPartsDomain::IsInDomain(vtkSMProperty* property)
 //---------------------------------------------------------------------------
 int vtkSMNumberOfPartsDomain::IsInDomain(vtkSMSourceProxy* proxy)
 {
+  if (this->IsOptional)
+    {
+    return 1;
+    }
+
   if (!proxy)
     {
     return 0;

@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.5");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -49,6 +49,11 @@ vtkSMInputArrayDomain::~vtkSMInputArrayDomain()
 //---------------------------------------------------------------------------
 int vtkSMInputArrayDomain::IsInDomain(vtkSMProperty* property)
 {
+  if (this->IsOptional)
+    {
+    return 1;
+    }
+
   if (!property)
     {
     return 0;

@@ -19,7 +19,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMBooleanDomain);
-vtkCxxRevisionMacro(vtkSMBooleanDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMBooleanDomain, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMBooleanDomain::vtkSMBooleanDomain()
@@ -34,6 +34,11 @@ vtkSMBooleanDomain::~vtkSMBooleanDomain()
 //---------------------------------------------------------------------------
 int vtkSMBooleanDomain::IsInDomain(vtkSMProperty* property)
 {
+  if (this->IsOptional)
+    {
+    return 1;
+    }
+
   if (!property)
     {
     return 0;

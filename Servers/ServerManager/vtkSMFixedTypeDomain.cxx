@@ -22,7 +22,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFixedTypeDomain);
-vtkCxxRevisionMacro(vtkSMFixedTypeDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMFixedTypeDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMFixedTypeDomain::vtkSMFixedTypeDomain()
@@ -37,6 +37,11 @@ vtkSMFixedTypeDomain::~vtkSMFixedTypeDomain()
 //---------------------------------------------------------------------------
 int vtkSMFixedTypeDomain::IsInDomain(vtkSMProperty* property)
 {
+  if (this->IsOptional)
+    {
+    return 1;
+    }
+
   if (!property)
     {
     return 0;

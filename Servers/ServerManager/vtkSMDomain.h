@@ -76,6 +76,10 @@ protected:
 
   vtkSMDomainInternals* Internals;
 
+  vtkSetMacro(IsOptional, int);
+  vtkGetMacro(IsOptional, int);
+  int IsOptional;
+
 private:
   vtkSMDomain(const vtkSMDomain&); // Not implemented
   void operator=(const vtkSMDomain&); // Not implemented

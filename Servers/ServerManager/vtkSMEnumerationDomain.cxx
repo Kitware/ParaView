@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMEnumerationDomain);
-vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.5");
 
 struct vtkSMEnumerationDomainInternals
 {
@@ -69,6 +69,11 @@ const char* vtkSMEnumerationDomain::GetEntryText(unsigned int idx)
 //---------------------------------------------------------------------------
 int vtkSMEnumerationDomain::IsInDomain(vtkSMProperty* property)
 {
+  if (this->IsOptional)
+    {
+    return 1;
+    }
+
   if (!property)
     {
     return 0;

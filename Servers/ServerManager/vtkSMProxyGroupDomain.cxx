@@ -26,7 +26,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyGroupDomain);
-vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.6");
+vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.7");
 
 struct vtkSMProxyGroupDomainInternals
 {
@@ -48,6 +48,11 @@ vtkSMProxyGroupDomain::~vtkSMProxyGroupDomain()
 //---------------------------------------------------------------------------
 int vtkSMProxyGroupDomain::IsInDomain(vtkSMProperty* property)
 {
+  if (this->IsOptional)
+    {
+    return 1;
+    }
+
   if (!property)
     {
     return 0;

@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.4");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -52,6 +52,11 @@ vtkSMIntRangeDomain::~vtkSMIntRangeDomain()
 //---------------------------------------------------------------------------
 int vtkSMIntRangeDomain::IsInDomain(vtkSMProperty* property)
 {
+  if (this->IsOptional)
+    {
+    return 1;
+    }
+
   if (!property)
     {
     return 0;
