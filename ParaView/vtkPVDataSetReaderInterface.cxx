@@ -135,6 +135,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   pvs->SetInterface(this);
   pvs->SetVTKSource(s, tclName);
   pvs->SetName(tclName);  
+  pvApp->BroadcastScript("%s SetFileName %s", tclName, this->GetDataFileName());
   
   // Add the new Source to the View, and make it current.
   this->PVWindow->GetMainView()->AddComposite(pvs);
@@ -147,7 +148,6 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
 
 
   sprintf(outputTclName, "%sOutput", tclName);
-  s->SetFileName(this->GetDataFileName());
   s->UpdateInformation();
   switch (s->GetDataType())
     {

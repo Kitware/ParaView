@@ -372,9 +372,9 @@ void vtkPVCutPlane::NormalCameraCallback()
     }
   cam->GetViewPlaneNormal(normal);
 
-  this->NormalXEntry->SetValue(normal[0], 5);
-  this->NormalYEntry->SetValue(normal[1], 5);
-  this->NormalZEntry->SetValue(normal[2], 5);
+  this->NormalXEntry->SetValue(-normal[0], 5);
+  this->NormalYEntry->SetValue(-normal[1], 5);
+  this->NormalZEntry->SetValue(-normal[2], 5);
 }
 
 //----------------------------------------------------------------------------

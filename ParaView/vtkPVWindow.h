@@ -156,6 +156,10 @@ public:
   void CutPlaneCallback();
 
   // Description:
+  // Callback from the ClipPlane button.
+  void ClipPlaneCallback();
+
+  // Description:
   // Callback from the threshold button.
   void ThresholdCallback();
 
@@ -190,6 +194,7 @@ public:
 
   vtkGetObjectMacro(CalculatorButton, vtkKWPushButton);
   vtkGetObjectMacro(CutPlaneButton, vtkKWPushButton);
+  vtkGetObjectMacro(ClipPlaneButton, vtkKWPushButton);
   vtkGetObjectMacro(ThresholdButton, vtkKWPushButton);
   vtkGetObjectMacro(ContourButton, vtkKWPushButton);
   vtkGetObjectMacro(GlyphButton, vtkKWPushButton);
@@ -205,6 +210,12 @@ public:
   // Access to the RotateCamera interactor for thinks like setting its center of roation.
   vtkKWRotateCameraInteractor *GetRotateCameraInteractor()
     {return this->RotateCameraInteractor;}
+
+  // Description:
+  // Ability to disable and enable the filter buttons on the toolbar.
+  // Most of the manipulation is internal to window.
+  void DisableFilterButtons();
+  void EnableFilterButtons();
 
 protected:
   vtkPVWindow();
@@ -230,6 +241,7 @@ protected:
   vtkKWToolbar *Toolbar;
   vtkKWPushButton *CalculatorButton;
   vtkKWPushButton *CutPlaneButton;
+  vtkKWPushButton *ClipPlaneButton;
   vtkKWPushButton *ThresholdButton;
   vtkKWPushButton *ContourButton;
   vtkKWPushButton *GlyphButton;
@@ -269,8 +281,10 @@ protected:
   vtkPVAnimationInterface *AnimationInterface;
 
   // Interfaces for "special" filters.
+  // The Threshold interface does not actually work.
   vtkPVSourceInterface *ThresholdInterface;
   vtkPVSourceInterface *CutPlaneInterface;
+  vtkPVSourceInterface *ClipPlaneInterface;
   
 private:
   static const char* StandardSourceInterfaces;

@@ -62,6 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataSetReaderInterface.h"
 #include "vtkPVArrayCalculator.h"
 #include "vtkPVCutPlane.h"
+#include "vtkPVClipPlane.h"
 #include "vtkPVThreshold.h"
 #include "vtkPVContour.h"
 #include "vtkPVGlyph3D.h"
@@ -114,6 +115,7 @@ vtkPVWindow::vtkPVWindow()
   this->Toolbar = vtkKWToolbar::New();
   this->CalculatorButton = vtkKWPushButton::New();
   this->CutPlaneButton = vtkKWPushButton::New();
+  this->ClipPlaneButton = vtkKWPushButton::New();
   this->ThresholdButton = vtkKWPushButton::New();
   this->ContourButton = vtkKWPushButton::New();
   this->GlyphButton = vtkKWPushButton::New();
@@ -179,6 +181,51 @@ vtkPVWindow::vtkPVWindow()
   this->CutPlaneInterface->SetRootName("CutPlane");
   this->CutPlaneInterface->SetInputClassName("vtkDataSet");
   this->CutPlaneInterface->SetOutputClassName("vtkPolyData");
+  // Offset:
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Offset");
+  mInt->SetSetCommand("SetOffset");
+  mInt->SetGetCommand("GetOffset");
+  mInt->AddFloatArgument();
+  this->CutPlaneInterface->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Center:
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Origin");
+  mInt->SetSetCommand("SetOrigin");
+  mInt->SetGetCommand("GetOrigin");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  this->CutPlaneInterface->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Normal:
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Normal");
+  mInt->SetSetCommand("SetNormal");
+  mInt->SetGetCommand("GetNormal");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  this->CutPlaneInterface->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+
+
+  // I plan to offload the animation, reseting, synchrinization and saving
+  // tasks of the interface to pvSourceWidgets.  Until then,
+  // this is the easiest way to get ClipPlane working is with an interface
+  // (even though it is not created with an interface).
+  // The threshold interface above is just an uncompleted experiment.
+  this->ClipPlaneInterface = vtkPVSourceInterface::New();
+  //this->ClipPlaneInterface->SetApplication(???):
+  this->ClipPlaneInterface->SetPVWindow(this);
+  this->ClipPlaneInterface->SetSourceClassName("vtkClipPlane");
+  this->ClipPlaneInterface->SetRootName("ClipPlane");
+  this->ClipPlaneInterface->SetInputClassName("vtkDataSet");
+  this->ClipPlaneInterface->SetOutputClassName("vtkUnstructuredGrid");
   // Offset:
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Offset");
@@ -280,6 +327,12 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->CutPlaneButton->Delete();
     this->CutPlaneButton = NULL;
+    }
+  
+  if (this->ClipPlaneButton)
+    {
+    this->ClipPlaneButton->Delete();
+    this->ClipPlaneButton = NULL;
     }
   
   if (this->ThresholdButton)
@@ -388,6 +441,12 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->CutPlaneInterface->Delete();
     this->CutPlaneInterface = NULL;
+    }
+  
+  if (this->ClipPlaneInterface)
+    {
+    this->ClipPlaneInterface->Delete();
+    this->ClipPlaneInterface = NULL;
     }
   
   this->SetCurrentPVData(NULL);
@@ -511,7 +570,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CutPlaneButton->Create(app, "-text Cut");
   //this->CutPlaneButton->Create(app, "-image PVCutPlaneButton");
   this->CutPlaneButton->SetCommand(this, "CutPlaneCallback");
-  this->CutPlaneButton->SetBalloonHelpString("Cut with an implicit plane");
+  this->CutPlaneButton->SetBalloonHelpString("Cut with an implicit plane. It is identical to generating point scalars from an implicit plane, and taking an iso surface. This filter typically reduces the dimensionality of the data.  A 3D input data set will produce an 2D output plane.");
+
+  this->ClipPlaneButton->SetParent(this->Toolbar);
+  this->ClipPlaneButton->Create(app, "-text Clip");
+  //this->CutPlaneButton->Create(app, "-image PVClipPlaneButton");
+  this->ClipPlaneButton->SetCommand(this, "ClipPlaneCallback");
+  this->ClipPlaneButton->SetBalloonHelpString("Clip with an implicit plane.  Takes a portion of the data set away and does not reduce the dimensionality of the data set.  A 3d input data set will produce a 3d output data set.");
 
   this->ThresholdButton->SetParent(this->Toolbar);
   this->ThresholdButton->Create(app, "-image PVThresholdButton");
@@ -534,9 +599,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->ProbeButton->SetCommand(this, "ProbeCallback");
   this->ProbeButton->SetBalloonHelpString("Probe");
   
-  this->Script("pack %s %s %s %s %s %s -side left -pady 0 -fill none -expand no",
+  this->Script("pack %s %s %s %s %s %s %s -side left -pady 0 -fill none -expand no",
                this->CalculatorButton->GetWidgetName(),
                this->CutPlaneButton->GetWidgetName(),
+               this->ClipPlaneButton->GetWidgetName(),
                this->ThresholdButton->GetWidgetName(),
                this->ContourButton->GetWidgetName(),
                this->GlyphButton->GetWidgetName(),
@@ -992,10 +1058,6 @@ void vtkPVWindow::SaveInTclScript()
       {
       ((vtkPVArrayCalculator*)pvs)->SaveInTclScript(file);
       }
-    else if (pvs->IsA("vtkPVCutPlane"))
-      {
-      ((vtkPVCutPlane*)pvs)->SaveInTclScript(file);
-      }
     else if (pvs->IsA("vtkPVContour"))
       {
       ((vtkPVContour*)pvs)->SaveInTclScript(file);
@@ -1079,11 +1141,6 @@ void vtkPVWindow::SaveWorkspace()
                "vtkPVArrayCalculator") == 0)
       {
       ((vtkPVArrayCalculator*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
-      }
-    else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
-                    "vtkPVCutPlane") == 0)
-      {
-      ((vtkPVCutPlane*)sources->GetItemAsObject(sourceCount))->SaveInTclScript(file);
       }
     else if (strcmp(sources->GetItemAsObject(sourceCount)->GetClassName(),
                     "vtkPVContour") == 0)
@@ -1268,6 +1325,30 @@ void vtkPVWindow::ReductionCheckCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::DisableFilterButtons()
+{
+  this->Script("%s configure -state disabled",
+               this->CalculatorButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->CutPlaneButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ClipPlaneButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ThresholdButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ContourButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->GlyphButton->GetWidgetName());
+  this->Script("%s configure -state disabled",
+               this->ProbeButton->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::EnableFilterButtons()
+{
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::CalculatorCallback()
 {
   static int instanceCount = 1;
@@ -1340,18 +1421,7 @@ void vtkPVWindow::CalculatorCallback()
     this->Script("%s entryconfigure %d -state disabled",
                  this->Menu->GetWidgetName(), i);
     }
-  this->Script("%s configure -state disabled",
-               this->CalculatorButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->CutPlaneButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ThresholdButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ContourButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->GlyphButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ProbeButton->GetWidgetName());
+  this->DisableFilterButtons();
 }
 
 //----------------------------------------------------------------------------
@@ -1425,19 +1495,9 @@ void vtkPVWindow::CutPlaneCallback()
     this->Script("%s entryconfigure %d -state disabled",
                  this->Menu->GetWidgetName(), i);
     }
-  this->Script("%s configure -state disabled",
-               this->CalculatorButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->CutPlaneButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ThresholdButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ContourButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->GlyphButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ProbeButton->GetWidgetName());
+  this->DisableFilterButtons();
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ThresholdCallback()
@@ -1514,19 +1574,83 @@ void vtkPVWindow::ThresholdCallback()
     this->Script("%s entryconfigure %d -state disabled",
                  this->Menu->GetWidgetName(), i);
     }
-  this->Script("%s configure -state disabled",
-               this->CalculatorButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->CutPlaneButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ThresholdButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ContourButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->GlyphButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ProbeButton->GetWidgetName());
+  this->DisableFilterButtons();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ClipPlaneCallback()
+{
+  static int instanceCount = 1;
+  char tclName[256];
+  vtkSource *s;
+  vtkDataSet *d;
+  vtkPVClipPlane *clipPlane;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVData *pvd;
+  const char* outputDataType;
+  int numMenus, i;
+  
+  // Determine the output type.
+  outputDataType = "vtkUnstructuredGrid";
+  
+  // Create the vtkSource.
+  sprintf(tclName, "%s%d", "ClipPlane", instanceCount);
+  // Create the object through tcl on all processes.
+  // I would like to get rid of the pointer, and do everything
+  // through the tcl name.
+  // vtkClipPlane will be going away, and we will create the 
+  // implicit function here.
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkClipPlane", tclName));
+  if (s == NULL)
+    {
+    vtkErrorMacro("Could not get pointer from object.");
+    return;
+    }
+  
+  clipPlane = vtkPVClipPlane::New();
+  clipPlane->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
+  clipPlane->SetApplication(pvApp);
+  clipPlane->SetVTKSource(s, tclName);
+  clipPlane->SetNthPVInput(0, this->GetCurrentPVData());
+  clipPlane->SetName(tclName);
+  clipPlane->SetInterface(this->ClipPlaneInterface);
+
+  this->GetMainView()->AddComposite(clipPlane);
+  clipPlane->CreateProperties();
+  clipPlane->CreateInputList("vtkDataSet");
+  this->SetCurrentPVSource(clipPlane);
+
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  sprintf(tclName, "%sOutput%d", "ClipPlane", instanceCount);
+  // Create the object through tcl on all processes.
+
+  d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
+  pvd->SetVTKData(d, tclName);
+
+  // Connect the source and data.
+  clipPlane->SetNthPVOutput(0, pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", clipPlane->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  
+  clipPlane->Delete();
+  pvd->Delete();
+  
+  ++instanceCount;
+
+  this->Script("%s index end", this->Menu->GetWidgetName());
+  numMenus = atoi(pvApp->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state disabled",
+                 this->Menu->GetWidgetName(), i);
+    }
+  this->DisableFilterButtons();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ContourCallback()
@@ -1606,18 +1730,7 @@ void vtkPVWindow::ContourCallback()
     this->Script("%s entryconfigure %d -state disabled",
                  this->Menu->GetWidgetName(), i);
     }
-  this->Script("%s configure -state disabled",
-               this->CalculatorButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->CutPlaneButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ThresholdButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ContourButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->GlyphButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ProbeButton->GetWidgetName());
+  this->DisableFilterButtons();
 }
 
 //----------------------------------------------------------------------------
@@ -1695,18 +1808,7 @@ void vtkPVWindow::GlyphCallback()
     this->Script("%s entryconfigure %d -state disabled",
                  this->Menu->GetWidgetName(), i);
     }
-  this->Script("%s configure -state disabled",
-               this->CalculatorButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->CutPlaneButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ThresholdButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ContourButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->GlyphButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ProbeButton->GetWidgetName());
+  this->DisableFilterButtons();
 }
 
 //----------------------------------------------------------------------------
@@ -1783,18 +1885,7 @@ void vtkPVWindow::ProbeCallback()
     this->Script("%s entryconfigure %d -state disabled",
                  this->Menu->GetWidgetName(), i);
     }
-  this->Script("%s configure -state disabled",
-               this->CalculatorButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->CutPlaneButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ThresholdButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ContourButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->GlyphButton->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->ProbeButton->GetWidgetName());
+  this->DisableFilterButtons();
 }
 
 //----------------------------------------------------------------------------
@@ -2359,7 +2450,11 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <Boolean name=\"UseFeaturePoints\" help=\"Select whether to use feature point quadrics to align piece boundaries\"/>\n"
 "</Filter>\n"
 "\n"
-"<Filter class=\"vtkShrinkPolyData\" root=\"Shrink\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
+"<Filter class=\"vtkShrinkFilter\" root=\"Shrink\" input=\"vtkDataSet\" output=\"vtkUnstructuredGrid\">\n"
+"  <Scalar name=\"ShrinkFactor\" type=\"float\" help=\"Set the amount to shrink by\"/>\n"
+"</Filter>\n"
+"\n"
+"<Filter class=\"vtkShrinkPolyData\" root=\"ShrinkPD\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
 "  <Scalar name=\"ShrinkFactor\" type=\"float\" help=\"Set the amount to shrink by\"/>\n"
 "</Filter>\n"
 "\n"

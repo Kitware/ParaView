@@ -48,15 +48,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkClipPlane_h
 #define __vtkClipPlane_h
 
-#include "vtkClipPolyData.h"
+#include "vtkClipDataSet.h"
 #include "vtkPlane.h"
 
 
-class VTK_EXPORT vtkClipPlane : public vtkClipPolyData
+class VTK_EXPORT vtkClipPlane : public vtkClipDataSet
 {
 public:
   void PrintSelf(ostream& os, vtkIndent indent);
-  vtkTypeMacro(vtkClipPlane,vtkClipPolyData);
+  vtkTypeMacro(vtkClipPlane,vtkClipDataSet);
   static vtkClipPlane *New();
 
   // Description:
@@ -65,6 +65,12 @@ public:
   vtkGetVector3Macro(Origin, float);
   vtkSetVector3Macro(Normal, float);
   vtkGetVector3Macro(Normal, float);
+
+  // Description:
+  // Offset of the plane from the origin.
+  // Units are respect to normal.
+  vtkSetMacro(Offset, float);
+  vtkGetMacro(Offset, float);
 
 protected:
   vtkClipPlane();
@@ -76,6 +82,7 @@ protected:
 
   float Normal[3];
   float Origin[3];
+  float Offset;
   
   vtkPlane *PlaneFunction;
   

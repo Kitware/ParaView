@@ -65,6 +65,8 @@ vtkClipPlane::vtkClipPlane()
   this->Normal[0] = 0.0;
   this->Normal[1] = 0.0;
   this->Normal[2] = 1.0;
+
+  this->Offset = 0.0;
  
   this->PlaneFunction = vtkPlane::New();
   this->SetClipFunction(this->PlaneFunction);
@@ -81,14 +83,14 @@ void vtkClipPlane::Execute()
   this->PlaneFunction->SetOrigin(this->Origin);
   this->PlaneFunction->SetNormal(this->Normal);
   
-  this->vtkClipPolyData::Execute();
+  this->SetValue(this->Offset);
+  this->vtkClipDataSet::Execute();
 }
 
 
-void vtkClipPlane::PrintSelf(ostream& os, 
-                                                  vtkIndent indent)
+void vtkClipPlane::PrintSelf(ostream& os, vtkIndent indent)
 {
-  vtkClipPolyData::PrintSelf(os,indent);
+  vtkClipDataSet::PrintSelf(os,indent);
 
   os << indent << "Origin: " << this->Origin[0] << ", "
      << this->Origin[1] << ", " << this->Origin[2] << endl;

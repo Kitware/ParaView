@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVGeometryFilter.h"
+#include "vtkGeometryFilter.h"
 #include "vtkExtractEdges.h"
 #include "vtkOutlineSource.h"
 #include "vtkStructuredGridOutlineFilter.h"
@@ -265,6 +266,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid *input)
 
 
   vtkDataSetSurfaceFilter *surface = vtkDataSetSurfaceFilter::New();
+  //vtkGeometryFilter *surface = vtkGeometryFilter::New();
   surface->SetInput(input);
   vtkExtractEdges *edges = vtkExtractEdges::New();
   edges->SetInput(surface->GetOutput());

@@ -123,6 +123,9 @@ vtkMapper *vtkPVLODActor::SelectMapper()
     return this->LODMapper;
     }
 
+  cerr << "tpp: " << timePerPoint << ", numpts: " 
+       << this->Mapper->GetInput()->GetNumberOfPoints() << ", mytime: " << myTime << endl;
+
   return this->Mapper;
 }
 
