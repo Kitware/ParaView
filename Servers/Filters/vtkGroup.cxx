@@ -20,7 +20,7 @@
 #include "vtkCellData.h"
 #include "vtkFieldData.h"
 
-vtkCxxRevisionMacro(vtkGroup, "1.5");
+vtkCxxRevisionMacro(vtkGroup, "1.6");
 vtkStandardNewMacro(vtkGroup);
 
 //----------------------------------------------------------------------------
@@ -113,7 +113,6 @@ void vtkGroup::ExecuteInformation()
     else
       {
       output->CopyInformation(input);
-      output->SetPipelineMTime(input->GetPipelineMTime());
       }
     } 
 }

@@ -21,7 +21,7 @@
 #include "vtkFieldData.h"
 #include "vtkIntArray.h"
 
-vtkCxxRevisionMacro(vtkSelectInputs, "1.3");
+vtkCxxRevisionMacro(vtkSelectInputs, "1.4");
 vtkStandardNewMacro(vtkSelectInputs);
 
 //----------------------------------------------------------------------------
@@ -244,6 +244,11 @@ void vtkSelectInputs::ComputeInputUpdateExtents(vtkDataObject *)
         input->SetUpdateExtent( output->GetUpdateExtent() );
         }
       ++count;
+      }
+    else
+      {
+      // This input is not selected.  Ask for empty data.
+      input->SetUpdateExtent(0, 1, 0);
       }
     } 
 }

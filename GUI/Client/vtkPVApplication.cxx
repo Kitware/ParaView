@@ -33,6 +33,7 @@
 #include "vtkDirectory.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
+#include "vtkGarbageCollector.h"
 #include "vtkIntArray.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWDialog.h"
@@ -110,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.317");
+vtkCxxRevisionMacro(vtkPVApplication, "1.318");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1781,4 +1782,15 @@ void vtkPVApplication::SetOptions(vtkPVGUIClientOptions* op)
   this->Options = op;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetGarbageCollectionGlobalDebugFlag(int flag)
+{
+  vtkGarbageCollector::SetGlobalDebugFlag(flag);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::GetGarbageCollectionGlobalDebugFlag()
+{
+  return vtkGarbageCollector::GetGlobalDebugFlag();
+}
 

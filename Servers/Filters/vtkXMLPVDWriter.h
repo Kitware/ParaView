@@ -122,6 +122,9 @@ protected:
   // The observer to report progress from the internal writer.
   vtkCallbackCommand* ProgressObserver;  
   
+  // Garbage collection support.
+  virtual void ReportReferences(vtkGarbageCollector*);
+  virtual void RemoveReferences();
 private:
   vtkXMLPVDWriter(const vtkXMLPVDWriter&);  // Not implemented.
   void operator=(const vtkXMLPVDWriter&);  // Not implemented.

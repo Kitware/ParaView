@@ -16,6 +16,7 @@
 
 #include "vtkCallbackCommand.h"
 #include "vtkErrorCode.h"
+#include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
@@ -68,7 +69,7 @@ int vtkXMLPVDWriterRemoveDirectory(const char* dirname)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.6");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.7");
 
 class vtkXMLPVDWriterInternals
 {
@@ -589,4 +590,23 @@ vtkstd::string vtkXMLPVDWriterInternals::CreatePieceFileName(int index)
   fname = fn_with_warning_C4701.str();
   fn_with_warning_C4701.rdbuf()->freeze(0);
   return fname;
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVDWriter::ReportReferences(vtkGarbageCollector* collector)
+{
+  this->Superclass::ReportReferences(collector);
+  int size = static_cast<int>(this->Internal->Writers.size());
+  for(int i=0; i < size; ++i)
+    {
+    collector->ReportReference(this->Internal->Writers[i].GetPointer(),
+                               "Writer");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVDWriter::RemoveReferences()
+{
+  this->Internal->Writers.resize(0);
+  this->Superclass::RemoveReferences();
 }

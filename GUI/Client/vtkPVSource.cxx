@@ -61,7 +61,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.377");
+vtkCxxRevisionMacro(vtkPVSource, "1.378");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1737,7 +1737,7 @@ void vtkPVSource::RemoveAllPVInputs()
         {
         vtkClientServerID sourceID = this->GetVTKSourceID(idx);
         stream << vtkClientServerStream::Invoke 
-               << sourceID << "RemoveAllInputs"
+               << sourceID << "SetInputConnection" << 0 << 0
                << vtkClientServerStream::End;
         }
       pm->SendStream(vtkProcessModule::DATA_SERVER);

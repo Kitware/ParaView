@@ -27,7 +27,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.13");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -232,7 +232,7 @@ unsigned int vtkSMProxyProperty::GetNumberOfUncheckedProxies()
 //---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyProperty::GetProxy(unsigned int idx)
 {
-  return this->PPInternals->Proxies[idx];
+  return this->PPInternals->Proxies[idx].GetPointer();
 }
 
 //---------------------------------------------------------------------------

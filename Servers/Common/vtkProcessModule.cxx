@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkProcessModule.h"
 
+#include "vtkAlgorithm.h"
 #include "vtkCallbackCommand.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
@@ -24,7 +25,6 @@
 #include "vtkInstantiator.h"
 #include "vtkToolkits.h"
 #include "vtkPVProgressHandler.h"
-#include "vtkProcessObject.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVOptions.h"
 #include "vtkProcessModuleGUIHelper.h"
@@ -45,7 +45,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.9");
+vtkCxxRevisionMacro(vtkProcessModule, "1.10");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -555,7 +555,7 @@ void vtkProcessModule::InterpreterCallback(unsigned long, void* pinfo)
 }
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::RegisterProgressEvent(vtkProcessObject* po, int id)
+void vtkProcessModule::RegisterProgressEvent(vtkAlgorithm* po, int id)
 {
   po->AddObserver(vtkCommand::ProgressEvent, this->Observer);
   this->ProgressHandler->RegisterProgressEvent(po, id);

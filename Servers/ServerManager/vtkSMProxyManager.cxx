@@ -29,7 +29,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.22");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.23");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -158,7 +158,7 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* group, const char* name)
       it->second.find(name);
     if (it2 != it->second.end())
       {
-      return it2->second;
+      return it2->second.GetPointer();
       }
     }
   return 0;
@@ -175,7 +175,7 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* name)
       it->second.find(name);
     if (it2 != it->second.end())
       {
-      return it2->second;
+      return it2->second.GetPointer();
       }
     }
   return 0;

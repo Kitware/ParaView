@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.18");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.19");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -391,10 +391,10 @@ void vtkRedistributePolyData::Execute()
   if (inputCellArrays[3]) { outputStrips = vtkSmartPointer<vtkCellArray>::New(); }
 
   vtkCellArray *outputCellArrays[NUM_CELL_TYPES];
-  outputCellArrays[0] = outputVerts;
-  outputCellArrays[1] = outputLines;
-  outputCellArrays[2] = outputPolys;
-  outputCellArrays[3] = outputStrips; 
+  outputCellArrays[0] = outputVerts.GetPointer();
+  outputCellArrays[1] = outputLines.GetPointer();
+  outputCellArrays[2] = outputPolys.GetPointer();
+  outputCellArrays[3] = outputStrips.GetPointer(); 
 
   vtkIdType* ptr = 0; 
   for (type=0; type<NUM_CELL_TYPES; type ++)

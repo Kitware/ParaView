@@ -25,6 +25,7 @@
 
 #include "vtkClientServerID.h" // Needed for UniqueID ...
 
+class vtkAlgorithm;
 class vtkMultiProcessController;
 class vtkPVInformation;
 class vtkPVRenderModule;
@@ -36,6 +37,7 @@ class vtkPVProgressHandler;
 class vtkProcessObject;
 class vtkProcessModuleGUIHelper;
 class vtkPVOptions;
+
 //BTX
 struct vtkProcessModuleInternals;
 //ETX
@@ -202,7 +204,7 @@ public:
 
   // Description:
   // Register object with progress handler.
-  void RegisterProgressEvent(vtkProcessObject* po, int id);
+  void RegisterProgressEvent(vtkAlgorithm* po, int id);
 
   // Description:
   virtual void SendPrepareProgress();

@@ -19,7 +19,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMDomainIterator);
-vtkCxxRevisionMacro(vtkSMDomainIterator, "1.1");
+vtkCxxRevisionMacro(vtkSMDomainIterator, "1.2");
 
 struct vtkSMDomainIteratorInternals
 {
@@ -135,7 +135,7 @@ vtkSMDomain* vtkSMDomainIterator::GetDomain()
   if (this->Internals->DomainIterator != 
       this->Property->PInternals->Domains.end())
     {
-    return this->Internals->DomainIterator->second;
+    return this->Internals->DomainIterator->second.GetPointer();
     }
 
   return 0;

@@ -27,7 +27,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.8");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.9");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -322,6 +322,7 @@ void vtkXMLCollectionReader::SetupOutputInformation()
   // Create the readers for each data set to be read.
   int i;
   int n = static_cast<int>(this->Internal->RestrictedDataSets.size());
+  vtkDebugMacro("Setting number of outputs to " << n << ".");
   this->SetNumberOfOutputs(n);
   this->Internal->Readers.resize(n);
   for(i=0; i < n; ++i)
@@ -414,14 +415,10 @@ void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index)
     if(!(this->Outputs[index] && strcmp(this->Outputs[index]->GetClassName(),
                                         out->GetClassName()) == 0))
       {
-      if(this->Outputs[index])
-        {
-        this->Outputs[index]->Delete();
-        }
-      
       // Need to create an instance.  This reader is its source.
-      this->Outputs[index] = out->NewInstance();
-      this->Outputs[index]->SetSource(this);
+      vtkDataObject* newOut = out->NewInstance();
+      this->SetNthOutput(index, newOut);
+      newOut->Delete();
       }
     
     // Share the data between the internal reader's output and our
@@ -431,11 +428,7 @@ void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index)
   else
     {
     // We do not have a reader for this output, remove it.
-    if(this->Outputs[index])
-      {
-      this->Outputs[index]->Delete();
-      this->Outputs[index] = 0;
-      }
+    this->SetNthOutput(index, 0);
     }
 }
 

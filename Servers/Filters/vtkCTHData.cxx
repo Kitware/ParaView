@@ -39,7 +39,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.13");
+vtkCxxRevisionMacro(vtkCTHData, "1.14");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -1423,18 +1423,17 @@ vtkIdType vtkCTHData::GetNumberOfCells()
 void vtkCTHData::SetUpdateExtent(int piece, int numPieces,
                                           int ghostLevel)
 {
-  this->UpdatePiece = piece;
-  this->UpdateNumberOfPieces = numPieces;
-  this->UpdateGhostLevel = ghostLevel;
-  this->UpdateExtentInitialized = 1;
+  this->SetUpdatePiece(piece);
+  this->SetUpdateNumberOfPieces(numPieces);
+  this->SetUpdateGhostLevel(ghostLevel);
 }
 
 //----------------------------------------------------------------------------
 void vtkCTHData::GetUpdateExtent(int &piece, int &numPieces,
                                           int &ghostLevel)
 {
-  piece = this->UpdatePiece;
-  numPieces = this->UpdateNumberOfPieces;
-  ghostLevel = this->UpdateGhostLevel;
+  piece = this->GetUpdatePiece();
+  numPieces = this->GetUpdateNumberOfPieces();
+  ghostLevel = this->GetUpdateGhostLevel();
 }
 

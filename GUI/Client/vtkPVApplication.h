@@ -278,6 +278,12 @@ public:
   vtkPVOptions* GetOptions();
   //ETX
 
+  // Description:
+  // Get/Set the global VTK garbage collection debugging flag.
+  // Methods provided here to allow use from test scripts.
+  void SetGarbageCollectionGlobalDebugFlag(int flag);
+  int GetGarbageCollectionGlobalDebugFlag();
+  
 protected:
   vtkPVApplication();
   ~vtkPVApplication();

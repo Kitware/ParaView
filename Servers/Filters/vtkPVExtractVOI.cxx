@@ -20,12 +20,14 @@
 #include "vtkExtractRectilinearGrid.h"
 #include "vtkGarbageCollector.h"
 #include "vtkImageData.h"
+#include "vtkInformation.h"
 #include "vtkInstantiator.h"
 #include "vtkObjectFactory.h"
 #include "vtkRectilinearGrid.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkStructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVExtractVOI, "1.3");
+vtkCxxRevisionMacro(vtkPVExtractVOI, "1.4");
 vtkStandardNewMacro(vtkPVExtractVOI);
 
 //----------------------------------------------------------------------------
@@ -103,7 +105,11 @@ void vtkPVExtractVOIComputeInputUpdateExtents(
   filter->SetVOI(self->GetVOI());
   filter->SetSampleRate(self->GetSampleRate());
   filter->SetInput(input);
-  filter->PropagateUpdateExtent(output);
+  vtkInformation* innerInfo = filter->GetOutput()->GetPipelineInformation();
+  vtkInformation* outerInfo = output->GetPipelineInformation();
+  innerInfo->CopyEntry(outerInfo, vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT());
+  innerInfo->CopyEntry(outerInfo, vtkStreamingDemandDrivenPipeline::UPDATE_EXTENT_INITIALIZED());
+  filter->GetOutput()->PropagateUpdateExtent();
 }
 
 //----------------------------------------------------------------------------
@@ -163,7 +169,7 @@ void vtkPVExtractVOIExecuteInformation(
   filter->SetVOI(self->GetVOI());
   filter->SetSampleRate(self->GetSampleRate());
   filter->SetInput(input);
-  filter->UpdateInformation();
+  filter->GetOutput()->UpdateInformation();
   self->GetOutput()->ShallowCopy(filter->GetOutput());
 }
 

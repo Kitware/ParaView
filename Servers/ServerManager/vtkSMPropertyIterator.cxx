@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.3");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.4");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -191,13 +191,13 @@ vtkSMProperty* vtkSMPropertyIterator::GetProperty()
   if (this->Internals->PropertyIterator != 
       this->Proxy->Internals->Properties.end())
     {
-    return this->Internals->PropertyIterator->second.Property;
+    return this->Internals->PropertyIterator->second.Property.GetPointer();
     }
 
   if (this->Internals->ProxyIterator != 
       this->Proxy->Internals->SubProxies.end())
     {
-    return this->Internals->SubPropertyIterator->second.Property;
+    return this->Internals->SubPropertyIterator->second.Property.GetPointer();
     }
 
   return 0;

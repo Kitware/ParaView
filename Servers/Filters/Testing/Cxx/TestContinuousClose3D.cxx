@@ -12,6 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkImageData.h"
 #include "vtkImageReader.h"
 #include "vtkPVImageContinuousDilate3D.h"
 #include "vtkPVImageContinuousErode3D.h"
