@@ -32,7 +32,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.36");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.37");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -1259,8 +1259,7 @@ void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app, const
     }
 
   this->Superclass::CreateLabel(app, args);
-  vtkKWTkUtilities::ChangeFontWeightToBold(
-    app->GetMainInterp(), this->GetLabel()->GetWidgetName());
+  vtkKWTkUtilities::ChangeFontWeightToBold(this->GetLabel());
 }
 
 //----------------------------------------------------------------------------
@@ -1347,7 +1346,7 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
     icon->SetImage(vtkKWIcon::ICON_GRID_LINEAR);
     img_name = this->HistogramLogModeOptionMenu->GetWidgetName();
     img_name += ".img0";
-    vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
+    vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
                                   img_name.c_str(), 
                                   icon->GetData(),
                                   icon->GetWidth(),
@@ -1360,7 +1359,7 @@ void vtkKWParameterValueFunctionEditor::CreateHistogramLogModeOptionMenu(
     icon->SetImage(vtkKWIcon::ICON_GRID_LOG);
     img_name = this->HistogramLogModeOptionMenu->GetWidgetName();
     img_name += ".img1";
-    vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
+    vtkKWTkUtilities::UpdatePhoto(this->GetApplication(),
                                   img_name.c_str(), 
                                   icon->GetData(),
                                   icon->GetWidth(),
@@ -5207,26 +5206,47 @@ void vtkKWParameterValueFunctionEditor::RedrawHistogram()
     if (image_mtime > this->LastHistogramBuildTime ||
         secondary_image_mtime > this->LastHistogramBuildTime)
       {
-      Tcl_Interp *interp = this->GetApplication()->GetMainInterp();
+      vtkImageBlend *blend = NULL;
+      vtkImageData *img_data = NULL;
       if (image && secondary_image)
         {
         vtkImageBlend *blend = vtkImageBlend::New();
         blend->AddInput(image);
         blend->AddInput(secondary_image);
-        blend->Update();
-        vtkKWTkUtilities::UpdatePhoto(
-          interp, img_name.str(), blend->GetOutput(), canv);
-        blend->Delete();
+        img_data = blend->GetOutput();
         }
       else if (image)
         {
-        vtkKWTkUtilities::UpdatePhoto(
-          interp, img_name.str(), image,canv);
+        img_data = image;
         }
       else if (secondary_image)
         {
+        img_data = secondary_image;
+        }
+      if (img_data)
+        {
+        img_data->Update();
+        int *wext = img_data->GetWholeExtent();
+        int width = wext[1] - wext[0] + 1;
+        int height = wext[3] - wext[2] + 1;
+        int pixel_size = img_data->GetNumberOfScalarComponents();
+        const unsigned char *pixels = 
+          static_cast<const unsigned char*>(img_data->GetScalarPointer());
+        unsigned long buffer_length =  width * height * pixel_size;
         vtkKWTkUtilities::UpdatePhoto(
-          interp, img_name.str(), secondary_image, canv);
+          this->GetApplication(), 
+          img_name.str(), 
+          pixels, 
+          width, height,
+          pixel_size,
+          buffer_length,
+          canv,
+          NULL,
+          vtkKWTkUtilities::UPDATE_PHOTO_OPTION_FLIP_V);
+        }
+      if (blend)
+        {
+        blend->Delete();
         }
       this->LastHistogramBuildTime = (image_mtime > secondary_image_mtime 
                                       ? image_mtime : secondary_image_mtime);
