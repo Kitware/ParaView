@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.26.2.1");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.26.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -170,6 +170,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << vtkClientServerStream::Invoke
       << this->CollectID << "SetMoveModeToPassThrough"
       << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 
     // For the render server feature.
     pm->GetStream()
@@ -177,7 +178,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << this->CollectID << "SetMPIMToNSocketConnection" 
       << pm->GetMPIMToNSocketConnectionID()
       << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+    pm->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
     }
   else
     { 
@@ -422,10 +423,20 @@ void vtkPVCompositePartDisplay::SetCollectionDecision(int v)
     {
     if (this->CollectionDecision)
       {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->CollectID << "SetMoveModeToCollect"
-        << vtkClientServerStream::End;
+      if (pvApp->GetUseTiledDisplay())
+        {
+        pm->GetStream()
+          << vtkClientServerStream::Invoke
+          << this->CollectID << "SetMoveModeToClone"
+          << vtkClientServerStream::End;
+        }
+      else
+        {
+        pm->GetStream()
+          << vtkClientServerStream::Invoke
+          << this->CollectID << "SetMoveModeToCollect"
+          << vtkClientServerStream::End;
+        }
       }
     else
       {
