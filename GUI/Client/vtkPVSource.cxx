@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.361");
+vtkCxxRevisionMacro(vtkPVSource, "1.362");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -76,6 +76,8 @@ vtkPVSource::vtkPVSource()
   this->CommandFunction = vtkPVSourceCommand;
 
   this->Parts = vtkCollection::New();
+
+  this->DataInformationValid = 0;
 
   this->NumberOfOutputsInformation = vtkPVNumberOfOutputsInformation::New();
   
