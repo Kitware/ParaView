@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCustomReader);
-vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.3");
+vtkCxxRevisionMacro(vtkPVSelectCustomReader, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVSelectCustomReader::vtkPVSelectCustomReader() 
@@ -69,6 +69,12 @@ vtkPVSelectCustomReader::~vtkPVSelectCustomReader()
 vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win, 
                                                          const char* openFileName) 
 {
+  ostrstream str2;
+  str2 << "Opening file " << openFileName << " with a custom reader "
+       << "may results in unpredictable result such as ParaView may "
+       << "crash. Make sure to pick the right reader." << ends;
+  this->SetDialogText(str2.str());
+  str2.rdbuf()->freeze(0);
   vtkKWApplication* app = win->GetApplication();
   this->SetStyleToOkCancel();
   this->SetOptions( vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
@@ -83,18 +89,6 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
   label->SetLabel(str1.str());
   label->Create(app, 0);
   str1.rdbuf()->freeze(0);
-
-  vtkKWLabel* label1 = vtkKWLabel::New();
-  label1->SetParent(frame);
-  label1->SetWidth(300);
-  label1->SetLineType(vtkKWLabel::MultiLine);
-  ostrstream str2;
-  str2 << "Opening file " << openFileName << " with a custom reader "
-       << "may results in unpredictable result such as ParaView may "
-       << "crash. Make sure to pick the right reader." << ends;
-  label1->SetLabel(str2.str());
-  label1->Create(app, 0);
-  str2.rdbuf()->freeze(0);
 
   vtkKWListBox* listbox = vtkKWListBox::New();
   listbox->SetParent(frame);
@@ -112,10 +106,9 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
       
   vtkPVReaderModule* result = 0;
 
-  this->Script("pack %s %s %s -padx 5 -pady 5 -side top", 
+  this->Script("pack %s %s -padx 5 -pady 5 -side top", 
                label->GetWidgetName(),
-               listbox->GetWidgetName(),
-               label1->GetWidgetName());
+               listbox->GetWidgetName());
 
   vtkLinkedListIterator<vtkPVReaderModule*>* it = 
     win->GetReaderList()->NewIterator();
@@ -150,7 +143,6 @@ vtkPVReaderModule* vtkPVSelectCustomReader::SelectReader(vtkPVWindow* win,
   // Cleanup
   listbox->Delete();
   label->Delete();
-  label1->Delete();
 
   return result;
 }
