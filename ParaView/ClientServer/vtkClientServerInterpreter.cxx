@@ -6,41 +6,26 @@
   Date:      $Date$
   Version:   $Revision$
 
-Copyright (c) 1998-1999 Kitware Inc. 469 Clifton Corporate Parkway,
-Clifton Park, NY, 12065, USA.
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-All rights reserved. No part of this software may be reproduced, distributed,
-or modified, in any form or by any means, without permission in writing from
-Kitware Inc.
-
-IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY FOR
-DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
-OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES THEREOF,
-EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING,
-BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
-"AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
-MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 #include "vtkClientServerInterpreter.h"
 
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
-#include "vtkDataSet.h"
 #include "vtkHashMap.txx"
 #include "vtkObjectFactory.h"
-#include "vtkProcessObject.h"
-#include "vtkSource.h"
 
 #include <vtkstd/vector>
 
-#include <numeric>
-
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.4");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.5");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -110,13 +95,15 @@ vtkClientServerInterpreter::GetObjectFromID(vtkClientServerID id)
       }
     else
       {
-      vtkGenericWarningMacro("attempt to get an object for an ID whose message does not contain only an object");
+      vtkErrorMacro("Attempt to get an object for ID " << id.ID
+                    << " whose message does not contain exactly one object.");
       return 0;
       }
     }
   else
     {
-    vtkGenericWarningMacro("attempt to get an object for an ID that is not in the hash table" << id.ID);
+    vtkErrorMacro("Attempt to get object for ID " << id.ID
+                  << " that is not present in the hash table.");
     return 0;
     }
 }
@@ -164,7 +151,14 @@ int vtkClientServerInterpreter::ProcessStream(const vtkClientServerStream& css)
     {
     if(!this->ProcessOneMessage(css, i))
       {
-      /* TODO: Diagnostics and debugging display.  */
+      const char* errorMessage;
+      if(this->LastResultMessage->GetNumberOfMessages() > 0 &&
+         this->LastResultMessage->GetCommand(0) ==
+         vtkClientServerStream::Error &&
+         this->LastResultMessage->GetArgument(0, 0, &errorMessage))
+        {
+        vtkErrorMacro(<< errorMessage);
+        }
       return 0;
       }
     }
@@ -177,7 +171,8 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
                                               int message)
 {
   // Look for known commands in the message.
-  switch(css.GetCommand(message))
+  vtkClientServerStream::Commands cmd = css.GetCommand(message);
+  switch(cmd)
     {
     case vtkClientServerStream::New:
       return this->ProcessCommandNew(css, message);
@@ -191,10 +186,12 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
       break;
     }
 
-  vtkGenericWarningMacro("Received unknown messgae type");
+  vtkErrorMacro("Message " << message << " with type "
+                << static_cast<int>(cmd) << " ("
+                << vtkClientServerStream::GetStringFromCommand(cmd)
+                << ") cannot be executed.");
   return 0;
 }
-
 
 //----------------------------------------------------------------------------
 int
@@ -204,8 +201,7 @@ vtkClientServerInterpreter
   // Make sure we have some instance creation functions registered.
   if(this->Internal->NewInstanceFunctions.size() == 0)
     {
-    vtkGenericWarningMacro(
-      "Attempt to use vtkClientServerInterpreter with no NewInstanceFunctions set");
+    vtkErrorMacro("Attempt to create object with no NewInstanceFunctions.");
     return 0;
     }
 
@@ -236,7 +232,7 @@ vtkClientServerInterpreter
       }
     else
       {
-      vtkGenericWarningMacro("Attempt to create unsupported type " << cname);
+      vtkErrorMacro("Cannot create object of type \"" << cname << "\".");
       }
     }
   return 0;
@@ -251,6 +247,9 @@ vtkClientServerInterpreter
   vtkClientServerStream msg;
   this->ExpandMessage(css, midx, msg);
 
+  // Reset the result to empty before processing the message.
+  this->LastResultMessage->Reset();
+
   // Get the object and method to be invoked.
   vtkObjectBase* obj;
   const char* method;
@@ -260,7 +259,8 @@ vtkClientServerInterpreter
     // Log the invocation.
     if(this->LogStream)
       {
-      *this->LogStream << "----------------------------------------------\n";
+      *this->LogStream << "---------------------------------------"
+                       << "---------------------------------------\n";
       msg.Print(*this->LogStream);
       }
 
@@ -268,24 +268,15 @@ vtkClientServerInterpreter
     if(vtkClientServerCommandFunction func = this->GetCommandFunction(obj))
       {
       // Try to invoke the method.
-      this->LastResultMessage->Reset();
-      if(func(this, obj, method, msg, *this->LastResultMessage) != 0)
+      if(func(this, obj, method, msg, *this->LastResultMessage) == 0)
         {
-        const char* errorMessage;
-        if(this->LastResultMessage->GetNumberOfMessages() > 0 &&
-           this->LastResultMessage->GetCommand(0) ==
-           vtkClientServerStream::Error &&
-           this->LastResultMessage->GetArgument(0, 0, &errorMessage))
+        // Success.  Log the result.
+        if(this->LogStream)
           {
-          vtkErrorMacro(<< errorMessage);
+          this->LastResultMessage->Print(*this->LogStream);
           }
-        return 0;
+        return 1;
         }
-      if(this->LogStream)
-        {
-        this->LastResultMessage->Print(*this->LogStream);
-        }
-      return 1;
       }
     }
   return 0;
@@ -388,8 +379,8 @@ int vtkClientServerInterpreter::AssignResultToID(vtkClientServerID id)
   vtkClientServerStream* tmp;
   if(this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
     {
-    vtkGenericWarningMacro(
-      "attempt to create an ID that is already in the hash table: " << id.ID);
+    vtkErrorMacro("Attempt to assign ID " << id.ID
+                  << " that is already in the hash table.");
     return 0;
     }
 
@@ -414,8 +405,8 @@ vtkClientServerInterpreter::GetMessageFromID(vtkClientServerID id)
   vtkClientServerStream* tmp;
   if(this->IDToMessageMap->GetItem(id.ID, tmp) != VTK_OK)
     {
-    vtkGenericWarningMacro(
-      "attempt to get an ID that is not in the hash table: " << id.ID);
+    vtkErrorMacro("Attempt to get message for ID " << id.ID
+                  << " that is not in the hash table.");
     return 0;
     }
   return tmp;
