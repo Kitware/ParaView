@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.52");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.53");
 
 
 //=========================================================================
@@ -289,6 +289,16 @@ void vtkPVTreeComposite::StartRender()
     }
 }
 
+
+
+//-------------------------------------------------------------------------
+// No need to turn swap buffers off.
+void vtkPVTreeComposite::PreRenderProcessing()
+{
+}
+
+
+
 //-------------------------------------------------------------------------
 void vtkPVTreeComposite::InternalStartRender()
 {
@@ -421,9 +431,9 @@ void vtkPVTreeComposite::InternalStartRender()
       }
     if (light)
       {
+      lightInfoDouble.Type = (double)(light->GetLightType());
       light->GetPosition(lightInfoDouble.Position);
       light->GetFocalPoint(lightInfoDouble.FocalPoint);
-      cout << "Server light position: " << lightInfoDouble.Position[0] << " " << lightInfoDouble.Position[0] << " " << lightInfoDouble.Position[2] << endl;      
       }
     ren->GetBackground(renInfoDouble.Background);
     
@@ -1276,7 +1286,6 @@ void vtkPVTreeComposite::SetRenderWindow(vtkRenderWindow *renWin)
       }
     if ( this->Controller && this->Controller->GetLocalProcessId() != 0 )
       {
-      ren = rens->GetNextItem();
       if (ren)
         {
         ren->RemoveObserver(this->StartRenderTag);

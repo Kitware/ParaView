@@ -113,11 +113,10 @@ protected:
 
   int  CheckForData();
   int  ShouldIComposite();
-
   void InternalStartRender();
-
   void MagnifyFullFloatImage();
-  
+  virtual void PreRenderProcessing();
+
 //BTX
 
   enum Tags {
