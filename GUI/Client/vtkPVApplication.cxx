@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.271");
+vtkCxxRevisionMacro(vtkPVApplication, "1.272");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -606,6 +606,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Start ParaView as a server (use MPI run).",
   "--render-server" , "-rs", 
   "Start ParaView as a server (use MPI run).",
+  "--render-server-host", "-rsh",
+  "Tell the client where to look for the render server (default: localhost). Used with --client option.", 
   "--host", "-h",
   "Tell the client where to look for the server (default: localhost). Used with --client option or --server -rc options.", 
   "--user", "",
