@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkPVXMLParser, "1.7");
+vtkCxxRevisionMacro(vtkPVXMLParser, "1.8");
 vtkStandardNewMacro(vtkPVXMLParser);
 
 //----------------------------------------------------------------------------
@@ -138,6 +138,17 @@ vtkPVXMLElement* vtkPVXMLParser::PopOpenElement()
 void vtkPVXMLParser::PrintXML(ostream& os)
 {
   this->RootElement->PrintXML(os, vtkIndent());
+}
+
+//----------------------------------------------------------------------------
+int vtkPVXMLParser::ParseXML()
+{
+  if (this->RootElement)
+    {
+    this->RootElement->Delete();
+    this->RootElement = 0;
+    }
+  return this->Superclass::ParseXML();
 }
 
 //----------------------------------------------------------------------------

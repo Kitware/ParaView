@@ -66,6 +66,10 @@ protected:
   // Counter to assign unique element ids to those that don't have any.
   unsigned int ElementIdIndex;
 
+  // Called by Parse() to read the stream and call ParseBuffer.  Can
+  // be replaced by subclasses to change how input is read.
+  virtual int ParseXML();
+
 private:
   vtkPVXMLParser(const vtkPVXMLParser&);  // Not implemented.
   void operator=(const vtkPVXMLParser&);  // Not implemented.
