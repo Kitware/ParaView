@@ -62,7 +62,10 @@ vtkKWApplication::vtkKWApplication()
 {
   this->ApplicationName = new char[strlen("Kitware")+1];
   strcpy(this->ApplicationName, "Kitware" );
-  
+
+  this->ApplicationVersionName = new char[strlen("Kitware10")+1];
+  strcpy(this->ApplicationVersionName, "Kitware10" );
+
   // setup tcl stuff
   //this->MainInterp = Tcl_CreateInterp();
   this->MainInterp = vtkTclGetGlobalInterp();
@@ -106,6 +109,7 @@ vtkKWApplication::vtkKWApplication()
 vtkKWApplication::~vtkKWApplication()
 {
   this->SetApplicationName(NULL);
+  this->SetApplicationVersionName(NULL);
 
   this->BalloonHelpWindow->Delete();
   this->BalloonHelpWindow = NULL;
@@ -158,6 +162,29 @@ void vtkKWApplication::SetApplicationName(const char *_arg)
    else 
     { 
     this->ApplicationName = NULL; 
+    } 
+  this->Modified(); 
+}
+
+void vtkKWApplication::SetApplicationVersionName(const char *_arg)
+{
+  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting ApplicationVersionName to " << _arg ); 
+  if ( this->ApplicationVersionName && _arg && (!strcmp(this->ApplicationVersionName,_arg)))
+    { 
+    return;
+    } 
+  if (this->ApplicationVersionName) 
+    { 
+    delete [] this->ApplicationVersionName; 
+    } 
+  if (_arg) 
+    { 
+    this->ApplicationVersionName = new char[strlen(_arg)+1]; 
+    strcpy(this->ApplicationVersionName,_arg); 
+    } 
+   else 
+    { 
+    this->ApplicationVersionName = NULL; 
     } 
   this->Modified(); 
 }
@@ -219,14 +246,7 @@ void vtkKWApplication::DisplayHelp()
   char temp[1024];
   char fkey[1024];
   char loc[1024];
-  if ( !(strcmp( this->ApplicationName, "VolView" ) ) )
-    {
-    sprintf(fkey,"Software\\Kitware\\%i\\Inst",0);  
-    }
-  else if ( !(strcmp( this->ApplicationName, "GoFly" ) ) )
-    {
-    sprintf(fkey,"Software\\Kitware\\%i\\Inst",2);  
-    }
+  sprintf(fkey,"Software\\Kitware\\%i\\Inst",this->GetApplicationKey());  
   HKEY hKey;
   if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
 		  0, KEY_READ, &hKey) == ERROR_SUCCESS)

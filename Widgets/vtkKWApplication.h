@@ -87,6 +87,12 @@ public:
   // Set/Get the ApplicationName
   void SetApplicationName(const char *);
   vtkGetStringMacro(ApplicationName);
+
+  // Description:
+  // Set/Get the ApplicationVersionName - this is the name + version number
+  void SetApplicationVersionName(const char *);
+  vtkGetStringMacro(ApplicationVersionName);
+
   
 //BTX
   // Description:
@@ -112,6 +118,7 @@ protected:
   Tcl_Interp *MainInterp;
   vtkKWWindowCollection *Windows;
   char *ApplicationName;
+  char *ApplicationVersionName;
 
   // For Balloon help
   vtkKWWidget *BalloonHelpWindow;
@@ -119,6 +126,7 @@ protected:
   char *BalloonHelpPending;
   vtkSetStringMacro(BalloonHelpPending);
 
+  virtual int GetApplicationKey() {return -1;};
 };
 
 #endif
