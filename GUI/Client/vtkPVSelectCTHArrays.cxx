@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.17");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.18");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -220,7 +220,6 @@ void vtkPVSelectCTHArrays::Accept()
   // Putting this here simplifies subclasses AcceptInternal methods.
   if (modFlag)
     {
-    vtkPVApplication *pvApp = this->GetPVApplication();
     ofstream* file = pvApp->GetTraceFile();
     if (file)
       {
