@@ -253,6 +253,14 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Setup offscreen rendering (e.g., for screenshots)
+  void SetupOffScreenRendering();
+  
+  // Description:
+  // Return to normal rendering after rendering offscreen
+  virtual void ResumeNormalRendering();
+  
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
@@ -287,6 +295,8 @@ protected:
   virtual void AddObservers();
   virtual void RemoveObservers();
   vtkKWRenderWidgetCallbackCommand *Observer;
+  
+  int PreviousRenderMode;
   
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.64");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.65");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -109,6 +109,8 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->CollapsingRenders = 0;
   
   this->Observer = vtkKWRenderWidgetCallbackCommand::New();
+  
+  this->PreviousRenderMode = vtkKWRenderWidget::STILL_RENDER;
 }
 
 //----------------------------------------------------------------------------
@@ -1008,6 +1010,23 @@ void vtkKWRenderWidget::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetupOffScreenRendering()
+{
+  this->PreviousRenderMode = this->GetRenderMode();
+  this->SetRenderModeToSingle();
+  this->SetPrinting(1);
+  this->GetRenderWindow()->SetOffScreenRendering(1);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::ResumeNormalRendering()
+{
+  this->SetPrinting(0);
+  this->GetRenderWindow()->SetOffScreenRendering(0);
+  this->SetRenderMode(this->PreviousRenderMode);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -1034,4 +1053,3 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->DistanceUnits ? this->DistanceUnits : "(none)") << endl;
   os << indent << "EventIdentifier: " << this->EventIdentifier << endl;
 }
-
