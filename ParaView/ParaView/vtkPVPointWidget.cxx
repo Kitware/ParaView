@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.20");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -141,9 +141,9 @@ void vtkPVPointWidget::ResetInternal(const char* sourceTclName)
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::AcceptInternal(const char* sourceTclName)  
 {
-  this->SetPosition(this->PositionEntry[0]->GetValueAsFloat(),
-                    this->PositionEntry[1]->GetValueAsFloat(),
-                    this->PositionEntry[2]->GetValueAsFloat());
+  this->SetPositionInternal(this->PositionEntry[0]->GetValueAsFloat(),
+                            this->PositionEntry[1]->GetValueAsFloat(),
+                            this->PositionEntry[2]->GetValueAsFloat());
 
   this->UpdateVTKObject();
   
@@ -334,7 +334,7 @@ void vtkPVPointWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::SetPosition(float x, float y, float z)
+void vtkPVPointWidget::SetPositionInternal(float x, float y, float z)
 {
   this->PositionEntry[0]->SetValue(x, 5);
   this->PositionEntry[1]->SetValue(y, 5);
@@ -344,8 +344,14 @@ void vtkPVPointWidget::SetPosition(float x, float y, float z)
     this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
                                               this->Widget3DTclName, x, y, z);
     }
-  this->ModifiedCallback();
   this->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPointWidget::SetPosition(float x, float y, float z)
+{
+  this->SetPositionInternal(x, y, z);
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
