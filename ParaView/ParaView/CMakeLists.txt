@@ -1,4 +1,4 @@
-SOURCE_FILES( ParaView_SRCS
+SET( ParaView_SRCS
 vtkAllToNRedistributePolyData.cxx
 vtkBalancedRedistributePolyData.cxx
 vtkCompositeProp.cxx
@@ -103,45 +103,41 @@ vtkPVXMLPackageParser.cxx
 vtkPVXMLParser.cxx
 vtkStringList.cxx 
 vtkTiledDisplayManager.cxx
+vtkARLReaderModule.cxx
 )
 
-WRAP_EXCLUDE_FILES(
+SET_SOURCE_FILES_PROPERTIES(
   vtkPVApplicationResources
   vtkPVWindowResources
-)
+  WRAP_EXCLUDE
+  )
 
 IF (VTK_USE_MPI)
-  SOURCE_FILES( ParaView_SRCS vtkPVEnSightVerifier.cxx )
+  SET( ParaView_SRCS ${ParaView_SRCS} vtkPVEnSightVerifier.cxx )
 ENDIF (VTK_USE_MPI)
 
-ABSTRACT_FILES(
-vtkPVObjectWidget
-vtkPVWidget
-vtkPV3DWidget
-vtkPVJoystickFly
-vtkPVSourceWidget
-)
+SET_SOURCE_FILES_PROPERTIES(
+  vtkPVObjectWidget
+  vtkPVWidget
+  vtkPV3DWidget
+  vtkPVJoystickFly
+  vtkPVSourceWidget
+  ABSTRACT
+  )
 
 # Setup vtkInstantiator registration for this library's classes.
 VTK_MAKE_INSTANTIATOR(vtkParaViewInstantiator PVInstantiator_SRCS
-                      ParaView_SRCS
+                      ${ParaView_SRCS}
                       EXPORT_MACRO VTK_EXPORT
                       HEADER_LOCATION ${PARAVIEW_BINARY_DIR}/ParaView)
 
-VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS PVInstantiator_SRCS ParaView_SRCS)
-ADD_LIBRARY(vtkKWParaViewTCL ParaViewTCL_SRCS PVInstantiator_SRCS ParaView_SRCS)
+VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS ${PVInstantiator_SRCS} ${ParaView_SRCS})
+ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS} ${ParaView_SRCS})
 
 TARGET_LINK_LIBRARIES (vtkKWParaViewTCL
                        vtkKWWidgetsTCL 
-                       vtkKWCommonTCL
-                       vtkParallelTCL
-		       vtkHybridTCL
-                       vtkRenderingTCL)
+                       )
 
-
-IF (VTK_USE_PATENTED)
- TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkPatentedTCL)
-ENDIF (VTK_USE_PATENTED)
 
 CONFIGURE_FILE(
      ${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h.in
@@ -158,34 +154,15 @@ CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVConfig.h.in
 
 INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView)
 
-SOURCE_FILES(ParaViewBinary_SRCS
-	     ParaView.cxx)
+SET(ParaViewBinary_SRCS
+    ParaView.cxx)
 
 IF(WIN32)
   SOURCE_FILES(ParaViewBinary_SRCS
                ParaView.rc)
 ENDIF(WIN32)
 
-ADD_EXECUTABLE(ParaView WIN32 ParaViewBinary_SRCS) 
-
-IF (VTK_MANGLE_MESA)
-  IF (MESA_INCLUDE_PATH)
-    INCLUDE_DIRECTORIES(${MESA_INCLUDE_PATH})
-  ENDIF(MESA_INCLUDE_PATH)     
-  LINK_LIBRARIES (${MESA_LIBRARY})
-ENDIF(VTK_MANGLE_MESA)
-
-IF(CMAKE_HAS_X)
-   LINK_LIBRARIES(-lXt)
-   LINK_LIBRARIES(${CMAKE_X_LIBS})
-   ADD_DEFINITIONS(${CMAKE_X_CFLAGS})
-ENDIF(CMAKE_HAS_X)
-
-IF (WIN32)
-  IF (TK_XLIB_PATH)
-    INCLUDE_DIRECTORIES(${TK_XLIB_PATH})
-  ENDIF (TK_XLIB_PATH) 
-ENDIF (WIN32)
+ADD_EXECUTABLE(ParaView WIN32 ${ParaViewBinary_SRCS}) 
 
 TARGET_LINK_LIBRARIES (ParaView
                        vtkKWParaViewTCL)

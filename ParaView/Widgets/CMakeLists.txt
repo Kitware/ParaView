@@ -1,6 +1,6 @@
 PROJECT(Widgets)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
-SOURCE_FILES( KWWidgets_SRCS
+SET( KWWidgets_SRCS
 vtkCornerAnnotation.cxx
 vtkKWActorComposite.cxx 
 vtkKWApplication.cxx 
@@ -52,31 +52,34 @@ vtkKWXtEmbeddedWidget.cxx
 ${VTK_SOURCE_DIR}/Wrapping/Tcl/vtktcl.c
 )
 
-ABSTRACT_FILES(
-vtkKWComposite 
-vtkKWView 
-)
+SET_SOURCE_FILES_PROPERTIES(
+  vtkKWComposite.cxx
+  vtkKWView.cxx
+  ABSTRACT
+  )
 
-WRAP_EXCLUDE_FILES(
-  vtktcl 
-  vtkKWEvent
-  vtkKWTkUtilities
-)
+SET_SOURCE_FILES_PROPERTIES(
+  ${VTK_SOURCE_DIR}/Wrapping/Tcl/vtktcl.c
+  vtkKWEvent.cxx
+  vtkKWTkUtilities.cxx
+  WRAP_EXCLUDE
+  )
 
 OPTION(USE_INSTALLED_TCLTK_PACKAGES "Use the intalled Tcl/Tk packages instead of kwinit." OFF)
 MARK_AS_ADVANCED(USE_INSTALLED_TCLTK_PACKAGES)
 
 IF (NOT USE_INSTALLED_TCLTK_PACKAGES)
-  SOURCE_FILES( KWWidgets_SRCS
+  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
     kwinit.c
   )
-  WRAP_EXCLUDE_FILES(
+  SET_SOURCE_FILES_PROPERTIES(
     kwinit 
-  )
+    WRAP_EXCLUDE
+    )
 ENDIF (NOT USE_INSTALLED_TCLTK_PACKAGES)
 
 IF (WIN32)
-  SOURCE_FILES( KWWidgets_SRCS
+  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
     kwappicon.c
   )
   WRAP_EXCLUDE_FILES(
@@ -84,57 +87,22 @@ IF (WIN32)
   )
 ENDIF (WIN32)
 
-VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
-ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
+VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS ${KWWidgets_SRCS})
+ADD_LIBRARY(vtkKWWidgetsTCL ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
 
-LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg )
-
-IF (VTK_USE_PARALLEL)
-  LINK_LIBRARIES(vtkParallelTCL vtkParallel)
-  IF (WIN32)
-   LINK_LIBRARIES( wsock32 )
-  ENDIF (WIN32)
-ENDIF (VTK_USE_PARALLEL)
-
-IF (VTK_USE_PATENTED)
-  LINK_LIBRARIES(vtkPatentedTCL vtkPatented)
-ENDIF (VTK_USE_PATENTED)
-
-IF (VTK_USE_HYBRID)
-  LINK_LIBRARIES(vtkHybridTCL vtkHybrid)
-ENDIF (VTK_USE_HYBRID)
-
-IF (WIN32)
-  IF (TK_XLIB_PATH)
-    INCLUDE_DIRECTORIES(${TK_XLIB_PATH})
-  ENDIF (TK_XLIB_PATH) 
-ENDIF (WIN32)
-
-LINK_LIBRARIES (
+TARGET_LINK_LIBRARIES (vtkKWWidgetsTCL
 vtkKWCommonTCL
-vtkRenderingTCL 
-vtkImagingTCL 
-vtkGraphicsTCL 
-vtkIOTCL
-vtkFilteringTCL   
-vtkCommonTCL 
-vtkRendering
-vtkImaging
-vtkGraphics
-vtkIO
-vtkFiltering
-vtkCommon 
+vtkParallelTCL
+vtkHybridTCL
+vtkParallel
+vtkHybrid
 ${TCL_LIBRARY}
 ${TK_LIBRARY}
 )
 
-IF(CMAKE_HAS_X)
-   LINK_LIBRARIES(-lXt)
-   LINK_LIBRARIES(${CMAKE_X_LIBS})
-   ADD_DEFINITIONS(${CMAKE_X_CFLAGS})
-ENDIF(CMAKE_HAS_X)
-
-INSTALL_TARGETS(/lib vtkKWWidgetsTCL)
+IF (VTK_USE_PATENTED)
+  TARGET_LINK_LIBRARIES(vtkKWWidgetsTCL vtkPatentedTCL vtkPatented)
+ENDIF (VTK_USE_PATENTED)
 
 SET(VTK_WRAP_HINTS ${Widgets_SOURCE_DIR}/hints)
 
