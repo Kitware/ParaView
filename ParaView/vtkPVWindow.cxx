@@ -31,6 +31,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 #include "vtkKWDialog.h"
 
+#include "vtkInteractorStylePlaneSource.h"
+
+
 //--------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
 {
@@ -97,7 +100,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // create the main view
   // we keep a handle to them as well
-  this->MainView = vtkKWRenderView::New();
+  this->MainView = vtkPVRenderView::New();
   this->MainView->SetParent(this->ViewFrame);
   this->MainView->Create(this->Application,"-width 200 -height 200");
   this->AddView(this->MainView);
@@ -114,6 +117,20 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   sprintf(cmd,"%s Open", this->GetTclName());
   
   this->Script( "wm deiconify %s", this->GetWidgetName());
+
+  this->SetupTest();
+}
+
+
+void vtkPVWindow::SetupTest()
+{
+  vtkInteractorStylePlaneSource *planeStyle = 
+                      vtkInteractorStylePlaneSource::New();
+  this->MainView->SetInteractorStyle(planeStyle);
+
+  vtkActor *actor = planeStyle->GetPlaneActor();
+
+  this->MainView->GetRenderer()->AddActor(actor);
 }
 
 

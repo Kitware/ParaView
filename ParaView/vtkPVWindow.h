@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVWindow_h
 
 #include "vtkKWWindow.h"
-#include "vtkKWRenderView.h"
+#include "vtkPVRenderView.h"
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
@@ -56,14 +56,19 @@ public:
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
   virtual void SerializeToken(istream& is,const char token[1024]);
     
+  // Description:
+  // Access to the RenderView.
+  vtkGetObjectMacro(MainView, vtkPVRenderView);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
   vtkPVWindow(const vtkPVWindow&) {};
   void operator=(const vtkPVWindow&) {};
 
-  void CloseData();
-  vtkKWRenderView *MainView;
+  void SetupTest();
+
+  vtkPVRenderView *MainView;
   vtkKWWidget *RetrieveMenu;
   vtkKWWidget *CreateMenu;
 };

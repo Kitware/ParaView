@@ -113,6 +113,14 @@ SOURCE=.\vtkPVApplicationTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVRenderView.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVRenderViewTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVWindow.cxx
 # End Source File
 # Begin Source File
@@ -163,6 +171,26 @@ InputName=vtkPVApplication
 # Begin Custom Build
 InputPath=.\vtkPVApplication.h
 InputName=vtkPVApplication
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVRenderView.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVRenderView.h
+InputName=vtkPVRenderView
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
