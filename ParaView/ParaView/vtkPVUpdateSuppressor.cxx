@@ -22,7 +22,7 @@
 #include "vtkPolyData.h"
 #include "vtkCollection.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.9.2.1");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.9.2.2");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -85,7 +85,8 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   // connected to a pipeline.
   if (input && input->GetSource() && 
        (input->GetSource()->IsA("vtkCollectPolyData") ||
-        input->GetSource()->IsA("vtkPVDuplicatePolyData")))
+        input->GetSource()->IsA("vtkPVDuplicatePolyData") ||
+        input->GetSource()->IsA("vtkMPIDuplicatePolyData")))
     {
     input->GetSource()->Modified();
     }
