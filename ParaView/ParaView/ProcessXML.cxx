@@ -8,12 +8,42 @@ class Output
 public:
   Output()
     {
+    this->MaxLen = 32000;
+    this->CurrentPosition = 0;
     }
   ~Output()
     {
     this->Stream.rdbuf()->freeze(0);
+    this->InitStream.rdbuf()->freeze(0);
     }
+
   ostrstream Stream;
+  ostrstream InitStream;
+
+  int MaxLen;
+  long CurrentPosition;
+  int Count;
+
+  void PrintHeader(const char* title, const char* file)
+    {
+    this->Stream << endl
+      << "// From file " << file << endl
+      << "static const char* vtkPVInitializeStandard" << title << "Interfaces" << this->Count 
+      << " =" << endl;
+    this->CurrentPosition = this->Stream.tellp();
+    this->InitStream << "  ostr << vtkPVInitializeStandard" << title << "Interfaces" 
+      << this->Count << ";" << endl;
+    }
+
+  void CheckSplit(const char* title, const char* file)
+    {
+    if ( (this->Stream.tellp() - this->CurrentPosition) > this->MaxLen )
+      {
+      this->Count ++;
+      this->Stream << ";" << endl;
+      this->PrintHeader(title, file);
+      }
+    }
 
   int ProcessFile(const char* file, const char* title)
     {
@@ -24,36 +54,77 @@ public:
       return VTK_ERROR;
       }
     int ch;
-    this->Stream << "// Define the " << title << " interfaces." << endl
+    int start = 1;
+    int preproc = 0;
+    int in_ifdef = 0;
+    int in_endif = 0;
+    int preproc_cnt = 0;
+
+    this->InitStream
+      << "// Define the " << title << " interfaces." << endl
       << "//" << endl 
       << "// Generated from file: " << file << endl
       << "//" << endl
-      << "const char* vtkPVInitialize::Standard" << title << "Interfaces =" 
-      << endl << "\"";
-    int start = 1;
-    int preproc = 0;
+      << "char* vtkPVInitialize::GetStandard" << title << "Interfaces()" << endl
+      << "{" << endl
+      << "  ostrstream ostr;" << endl;
+
+    this->Count = 0;
+    this->PrintHeader(title, file);
+    this->Stream << "\"";
     while ( ( ch = fgetc(fp) ) != EOF )
       {
       if ( preproc )
         {
-        this->Stream << (unsigned char)ch;
+        preproc_cnt ++;
         if ( ch == '\n' )
           {
           preproc = 0;
-          this->Stream << "\"";
+          if ( in_endif )
+            {
+            in_ifdef = 0;
+            in_endif = 0;
+            this->Stream << " // End of ifdef";
+            this->CheckSplit(title, file);
+            }
+          this->Stream << endl << "\"";
+          }
+        else
+          {
+          if ( preproc_cnt == 1 )
+            {
+            if ( ch == 'i' )
+              {
+              in_ifdef = 1;
+              }
+            else if ( ch == 'e' )
+              {
+              in_ifdef = 2;
+              }
+            }
+          else if ( preproc_cnt == 2 && in_ifdef == 2 && ch == 'n' )
+            {
+            in_endif = 1;
+            }
+          this->Stream << (unsigned char)ch;
           }
         }
       else
         {
         if ( ch == '\n' )
           {
-          this->Stream << "\\n\"" << endl << "\"";
+          this->Stream << "\\n\"" << endl;
+          this->CheckSplit(title, file);
+          this->Stream << "\"";
           start = 1;
           }
         else if ( start && ch == '#' )
           {
           preproc = 1;
-          this->Stream << "\\n\"" << endl << "#";
+          this->Stream << "\\n\"" << endl;
+          this->CheckSplit(title, file);
+          this->Stream << "#";
+          preproc_cnt = 0;
           }
         else if ( ch == '\\' )
           {
@@ -73,6 +144,13 @@ public:
         }
       }
     this->Stream << "\\n\";" << endl;
+    this->InitStream 
+      << "  ostr << ends;" << endl
+      << "  this->SetStandard" << title << "String(ostr.str());" << endl
+      << "  ostr.rdbuf()->freeze(0);" << endl
+      << "  return this->Standard" << title << "String;" << endl
+      << "}" << endl << endl;
+    
     fclose(fp);
     return VTK_OK;
     }
@@ -111,6 +189,10 @@ int main(int argc, char* argv[])
       return 1;
       }
     }
+  ot.InitStream << ends;
+  ot.Stream << endl << endl << ot.InitStream.str() << endl;
+  ot.InitStream.rdbuf()->freeze(0);
+  
   ot.Stream << "" << endl
     << "#endif" << endl;
   ot.Stream << ends;
