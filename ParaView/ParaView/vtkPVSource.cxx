@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.9");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.10");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2006,7 +2006,7 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
         stream << vtkClientServerStream::Invoke << pvs->GetVTKSourceID(sourceCount) <<
           "GetNumberOfOutputs" << vtkClientServerStream::End;
         pm->SendStreamToServer();
-        if(pm->GetLastServerResult().GetArgument(0, 0, &numOutputs))
+        if(!pm->GetLastServerResult().GetArgument(0, 0, &numOutputs))
           {
           vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
           }
@@ -2437,7 +2437,7 @@ int vtkPVSource::InitializeData()
     stream << vtkClientServerStream::Invoke << sourceID <<
       "GetNumberOfOutputs" << vtkClientServerStream::End;
     pm->SendStreamToServer();
-    if(pm->GetLastServerResult().GetArgument(0, 0, &numOutputs))
+    if(!pm->GetLastServerResult().GetArgument(0, 0, &numOutputs))
       {
       vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
       }
