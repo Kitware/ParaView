@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModule::vtkPVIceTRenderModule()
@@ -216,6 +216,8 @@ void vtkPVIceTRenderModule::SetProcessModule(vtkProcessModule *pm)
 void vtkPVIceTRenderModule::SetUseCompositeCompression(int)
 {
   // IceT does not have this option.
+  // The purpose of this function is to override default behavior in
+  // vtkPVCompositeRenderModule::SetUseCompositeCompression which create an error
 }
 
 //----------------------------------------------------------------------------
