@@ -154,7 +154,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.19");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.20");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -645,6 +645,24 @@ void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
   vtkDataObject* deciData;
   vtkDataSet* data;
 
+  int hack = 1;
+  if (hack == 1)
+    {
+    Sleep(1500);
+    hack = 0;
+    }
+
+  if (this->GetPVApplication()->GetClientMode())
+    { // Client just receives information from the server.
+    this->SocketController->Receive(&length, 1, 1, 398798);
+    msg = new unsigned char[length];
+    this->SocketController->Receive(msg, length, 1, 398799);
+    this->TemporaryInformation->CopyFromMessage(msg);
+    delete [] msg;
+    msg = NULL;
+    return;
+    }
+
   if (deci == NULL)
     {
     vtkErrorMacro("Deci tcl name must be wrong.");
@@ -685,17 +703,6 @@ void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
   if (data == NULL)
     {
     vtkErrorMacro("It couldn't be a vtkDataObject???");
-    return;
-    }
-
-  if (this->ClientMode)
-    { // Client just receives information from the server.
-    this->SocketController->Receive(&length, 1, 1, 398798);
-    msg = new unsigned char[length];
-    this->SocketController->Receive(msg, length, 1, 398799);
-    this->TemporaryInformation->CopyFromMessage(msg);
-    delete [] msg;
-    msg = NULL;
     return;
     }
 

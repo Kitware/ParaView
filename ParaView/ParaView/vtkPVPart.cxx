@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.7");
+vtkCxxRevisionMacro(vtkPVPart, "1.8");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -576,14 +576,15 @@ void vtkPVPart::SetVTKData(vtkDataSet *data, const char *tclName)
     this->VTKDataTclName = new char[strlen(tclName) + 1];
     strcpy(this->VTKDataTclName, tclName);
     // Connect the data to the pipeline for displaying the data.
+    pvApp->BroadcastScript("%s SetInput %s",
+                           this->GeometryTclName,
+                           this->VTKDataTclName);
     // Disconnect the client dataDisplay/renderer from the
     // Pipeline.  We had trouble with ExecuteInfomration being called
     // on the client for readers.
-    if ( ! pvApp->GetClientMode())
+    if (pvApp->GetClientMode())
       {
-      pvApp->BroadcastScript("%s SetInput %s",
-                             this->GeometryTclName,
-                             this->VTKDataTclName);
+      this->Script("%s SetInput {}", this->GeometryTclName);
       }
     }
 
