@@ -82,8 +82,6 @@ protected:
   
   vtkKWCheckButton *ShowXYPlotToggle;
   
-  int Dimensionality; // point = 0, line = 1
-  
   vtkXYPlotWidget* XYPlotWidget;
   vtkXYPlotWidgetObserver* XYPlotObserver;
 

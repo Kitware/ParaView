@@ -50,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.127");
+vtkCxxRevisionMacro(vtkPVProbe, "1.128");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -406,35 +406,6 @@ void vtkPVProbe::AcceptCallbackInternal()
 void vtkPVProbe::Deselect(int doPackForget)
 {
   this->vtkPVSource::Deselect(doPackForget);
-}
-
-//----------------------------------------------------------------------------
-int vtkPVProbe::GetDimensionality()
-{
-  if (!this->GetVTKSourceID(0).ID)
-    {
-    return 0;
-    }
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(0)
-                  << "GetInput" 
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << vtkClientServerStream::LastResult 
-                  << "GetSource"
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << vtkClientServerStream::LastResult 
-                  << "GetClassName"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT);
-  const char* name = 0;
-  pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0,0,&name);
-  if ( name && vtkString::Equals(name, "vtkLineSource") )
-    {
-    return 1;
-    }
-  return 0;
 }
 
 //----------------------------------------------------------------------------
