@@ -41,7 +41,7 @@ public:
   // Description:
   // Methods for setting the value of the VTKReader from the widget.
   // User internally when user hits Accept.
-  virtual void Accept();
+  virtual void AcceptInternal(vtkClientServerID id);
 
   // Description:
   // Methods for setting the value of the widget from the VTKReader.
