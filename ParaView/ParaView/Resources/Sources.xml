@@ -344,15 +344,11 @@
                resolution="0.001" range="0.0001 1" default_value="0.3333"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Changing thickness maintains the outside diameter of the toroid."/>
-  <Scale label="Theta roundness" trace_name="ThetaRoundness" 
-               variable="ThetaRoundness" default_value="1.0" resolution="0.01"
-               range="0 1" display_entry="1" display_value="0"
-               entry_and_label_on_top="0"
+  <VectorEntry label="Theta roundness" trace_name="ThetaRoundness" 
+               variable="ThetaRoundness" type="float" default_value="1.0"
                help="Values range from 0 (rectangular) to 1 (circular) to higher order." />
-  <Scale label="Phi roundness" trace_name="PhiRoundness" 
-               variable="PhiRoundness" default_value="1.0" resolution="0.01"
-               range="0 1" display_entry="1" display_value="0"
-               entry_and_label_on_top="0"
+  <VectorEntry label="Phi roundness" trace_name="PhiRoundness" 
+               variable="PhiRoundness" type="float" default_value="1.0"
                help="Values range from 0 (rectangular) to 1 (circular) to higher order."/>
   <VectorEntry variable="Size" trace_name="Size"
                type="float" default_value="0.5"
