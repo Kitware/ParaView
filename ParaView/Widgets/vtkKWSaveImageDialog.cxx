@@ -41,13 +41,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWApplication.h"
 #include "vtkKWSaveImageDialog.h"
+#include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 
 #include "vtkKWMessageDialog.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.14");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.14.2.1");
 
 
 
@@ -67,9 +68,21 @@ void vtkKWSaveImageDialog::Invoke()
   int done = 0;
   char *path = NULL;
   
+  this->Application->SetDialogUp(1);
   while (!done)
     {
-    this->Script("tk_getSaveFile -title {Save As Image} -defaultextension {.bmp} -filetypes {{{Windows Bitmap} {.bmp}} {{JPEG Images} {.jpg}} {{PNG Images} {.png}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
+    ostrstream command;
+    command << "tk_getSaveFile -title {Save As Image} -defaultextension {.bmp} -filetypes {{{Windows Bitmap} {.bmp}} {{JPEG Images} {.jpg}} {{PNG Images} {.png}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}";
+    
+    vtkKWWindow* window = this->GetWindow();
+    if (window)
+      {
+      command << " -parent " << window->GetWidgetName();
+      }
+    command << ends;
+    this->Script(command.str());
+    command.rdbuf()->freeze(0);
+    
     if (path)
       {
       free(path);
@@ -114,6 +127,7 @@ void vtkKWSaveImageDialog::Invoke()
     this->SetFileName(NULL);
     }
   free(path);
+  this->Application->SetDialogUp(0);
 }
 
 void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* /*args*/)
