@@ -66,6 +66,10 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkClientServerInterpreter.h"
 static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 
+#ifdef PPARAVIEW_BUILD_WITH_ADAPTOR
+#include "vtkPVAdaptor.h"
+#endif
+
 #ifdef PARAVIEW_ENABLE_FPE
 void u_fpu_setup()
 {
@@ -159,8 +163,13 @@ int main(int argc, char* argv[])
   // Only the root server processes args.
   
   vtkProcessModule* pm = vtkPVCreateProcessModule::CreateProcessModule(options);
-
+  
   pm->Initialize();
+  
+#ifdef PPARAVIEW_BUILD_WITH_ADAPTOR
+  vtkPVAdaptorCreatePrototypes();
+#endif
+  
   ParaViewInitializeInterpreter(pm);
 
   // Start the application's event loop.  This will enable
@@ -184,7 +193,11 @@ int main(int argc, char* argv[])
   MPI_Finalize();
 #endif
   options->Delete();
-
+  
+#ifdef PPARAVIEW_BUILD_WITH_ADAPTOR
+  vtkPVAdaptorDispose();
+#endif
+  
   return (retVal?retVal:startVal);
 }
 
@@ -192,6 +205,7 @@ int main(int argc, char* argv[])
 // ClientServer wrapper initialization functions.
 extern "C" void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
+extern "C" void vtkGenericFilteringCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkImagingCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkGraphicsCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkIOCS_Initialize(vtkClientServerInterpreter*);
@@ -217,6 +231,7 @@ void ParaViewInitializeInterpreter(vtkProcessModule* pm)
   // Initialize built-in wrapper modules.
   vtkCommonCS_Initialize(pm->GetInterpreter());
   vtkFilteringCS_Initialize(pm->GetInterpreter());
+  vtkGenericFilteringCS_Initialize(pm->GetInterpreter());
   vtkImagingCS_Initialize(pm->GetInterpreter());
   vtkGraphicsCS_Initialize(pm->GetInterpreter());
   vtkIOCS_Initialize(pm->GetInterpreter());
