@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.9");
+vtkCxxRevisionMacro(vtkPVPick, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -140,11 +140,12 @@ void vtkPVPick::UpdateGUI()
     {
     return;
     }
-  if (d->GetNumberOfCells() > 0)
-    {
-    this->InsertDataLabel("Cell", 0, d->GetCellData());
-    }
   vtkIdType num, idx;
+  num = d->GetNumberOfCells();
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->InsertDataLabel("Cell", idx, d->GetCellData());
+    }
   num = d->GetNumberOfPoints();
   for (idx = 0; idx < num; ++idx)
     {
