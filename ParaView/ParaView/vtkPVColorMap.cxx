@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.41");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.42");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -440,7 +440,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ColorEditorFrame->Create(this->Application, "frame", "");
 
   this->StartColorButton->SetParent(this->ColorEditorFrame);
-  this->StartColorButton->SetText("");
+  this->StartColorButton->ShowLabelOff();
   this->StartColorButton->Create(this->Application, "");
   this->StartColorButton->SetColor(1.0, 0.0, 0.0);
   this->StartColorButton->SetCommand(this, "StartColorButtonCallback");
@@ -454,7 +454,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                this->GetTclName(), "%w %h");
 
   this->EndColorButton->SetParent(this->ColorEditorFrame);
-  this->EndColorButton->SetText("");
+  this->EndColorButton->ShowLabelOff();
   this->EndColorButton->Create(this->Application, "");
   this->EndColorButton->SetColor(0.0, 0.0, 1.0);
   this->EndColorButton->SetCommand(this, "EndColorButtonCallback");
