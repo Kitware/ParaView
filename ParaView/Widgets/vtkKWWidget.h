@@ -64,7 +64,7 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app,const char *name, const char *args);
+  virtual void Create(vtkKWApplication *app,const char *name, const char *args);
   int IsCreated() { return (this->Application != 0); }
 
   // Description:
