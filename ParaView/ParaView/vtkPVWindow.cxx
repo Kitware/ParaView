@@ -1994,9 +1994,9 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
     "%s SetExtentTranslator [%s GetExtentTranslator]",
     pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
     // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
-    pvApp->BroadcastScript(
-      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
-      probe->GetVTKSourceTclName(), current->GetVTKDataTclName());
+    //pvApp->BroadcastScript(
+    //  "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
+    //  probe->GetVTKSourceTclName(), current->GetVTKDataTclName());
 
   probe->Delete();
   pvd->Delete();

@@ -902,7 +902,7 @@ void vtkPVSource::AcceptCallback()
   
   // This adds an extract filter only when the MaximumNumberOfPieces is 1.
   // This is only the case the first time the accept is called.
-  if (this->GetNthPVOutput(0))
+  if (this->GetNthPVOutput(0) && ! this->IsA("vtkPVProbe"))
     {
     this->GetNthPVOutput(0)->InsertExtractPiecesIfNecessary();
     }
