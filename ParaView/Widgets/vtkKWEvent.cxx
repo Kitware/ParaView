@@ -60,6 +60,8 @@ static const char *vtkKWEventStrings[] = {
   "Cursor3DOffEvent",
   "Cursor3DOnEvent",
   "Cursor3DPositionChangedEvent",
+  "Cursor3DPositionChangingEvent",
+  "CursorInteractivityChangedEvent",
   "Cursor3DTypeChangedEvent",
   "Cursor3DXColorChangedEvent",
   "Cursor3DYColorChangedEvent",

@@ -69,6 +69,8 @@ class VTK_EXPORT vtkKWEvent
     Cursor3DOffEvent,
     Cursor3DOnEvent,
     Cursor3DPositionChangedEvent,
+    Cursor3DPositionChangingEvent,
+    CursorInteractivityChangedEvent,
     Cursor3DTypeChangedEvent,
     Cursor3DXColorChangedEvent,
     Cursor3DYColorChangedEvent,
