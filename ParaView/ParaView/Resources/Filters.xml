@@ -47,7 +47,7 @@
       </Input>
     </Filter>
     <Documentation>
-The Append Attributes filter takes multiple input datasets with the same geometry and merges their point and cell attributes to produce a single output containing all the point and cell attributes of the inputs. Any inputs without the same number of points and cells as the first input are ignored.
+The Append Attributes filter takes multiple input datasets with the same geometry and merges their point and cell attributes to produce a single output containing all the point and cell attributes of the inputs. Any inputs without the same number of points and cells as the first input are ignored. The input data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
     </Documentation>
   </Module>
   <Module name="AppendPolyData"
@@ -63,7 +63,7 @@ The Append Attributes filter takes multiple input datasets with the same geometr
       </Input>
     </Filter>
     <Documentation>
-The Append Geometry filter operates on multiple polygonal datasets. It merges their geometry into a single data set. Only the point and cell attributes that all of the input data sets have in common will appear in the output.
+The Append Geometry filter operates on multiple polygonal data sets. The data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets. It merges their geometry into a single data set. Only the point and cell attributes that all of the input data sets have in common will appear in the output.
     </Documentation>
   </Module>
   <Module name="Append"
@@ -79,7 +79,7 @@ The Append Geometry filter operates on multiple polygonal datasets. It merges th
       </Input>
     </Filter>
     <Documentation>
-The Append Datasets filter operates on multiple datasets of any type (polygonal, structured, etc.). It merges their geometry into a single data set. Only the point and cell attributes that all of the input data sets have in common will appear in the output.
+The Append Datasets filter operates on multiple datasets of any type (polygonal, structured, etc.). It merges their geometry into a single data set. Only the point and cell attributes that all of the input data sets have in common will appear in the output. The input data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
     </Documentation>
   </Module>
   <Module name="CellCenters"
@@ -126,7 +126,7 @@ The Cell Centers filter places a point at the center of each cell in the input d
                    help=" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output."
                    default_value="0"/>
     <Documentation>
-The Cell Data to Point Data filter averages the values of the cell attributes of the cells surrounding a point to compute point attributes. The Input menu allows the user to select the data set to which this filter will be applied. If the Pass cell data option is checked, then the input cell attributes will also be copied to the cell attributes of the output; otherwise the output will only have point attributes. The CellDataToPointData filter operates on any type of data set, and the output data set is of the same type as the input.
+The Cell Data to Point Data filter averages the values of the cell attributes of the cells surrounding a point to compute point attributes. The Input menu allows the user to select the data set to which this filter will be applied. If the Pass cell data option is checked, then the input cell attributes will also be copied to the cell attributes of the output; otherwise the output will only have point attributes. The Cell Data to Point Data filter operates on any type of data set, and the output data set is of the same type as the input.
     </Documentation>
   </Module>
   <Module name="CleanPolyData"
@@ -205,7 +205,7 @@ If the Piece invariant option is checked, the whole data set will be processed a
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
-The Clean to Grid filter merges points that are within a tolerance of 1/100,000 of the length of the diagonal of the bounding box of the data set. It also converts the data set to an unstructured grid. The Input menu allows the user to select the data set to which this filter will be applied. The CleanToGrid filter operates on any type of data set.
+The Clean to Grid filter merges points that are within a tolerance of 1/100,000 of the length of the diagonal of the bounding box of the data set. It also converts the data set to an unstructured grid. The Input menu allows the user to select the data set to which this filter will be applied. The Clean to Grid filter operates on any type of data set.
     </Documentation>
   </Module>
   <Module name="PVConnectivityFilter"
@@ -389,7 +389,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
                 help="Set the minimum and maximum point for elevation"/>
     <Documentation>
 The Elevation filter generates point scalar values for an input data set along a specified direction vector. The Input menu allows the user to select the data set to which this filter will be applied. Use the Scalar range entry boxes to specify the minimum and maximum scalar value to be generated. The Low Point and High Point define a line onto which each point of the dataset is projected. The minimum scalar value is associated with the Low Point and the maximum scalar value is associated with the High Point. The scalar value for each point in the data set is determined by the location along the line to with that point projects.
-The line can be specifed interactively using the 3D line widget. See section ?.? for more information about this widget.
+The line can be specifed interactively using the 3D line widget. See section 6.4 for more information about this widget.
     </Documentation>
   </Module>
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
@@ -456,6 +456,10 @@ The line can be specifed interactively using the 3D line widget. See section ?.?
       </Item>
     </SelectWidget>
     <Documentation>
+Extract CTH Parts is a specialized filter for visualizing the data from a CTH simulation. It first converts the selected cell-centered arrays to point-centered ones. It then contours each array at a value of 0.5. The user has the option of clipping the resulting surface(s) with a plane.
+If the Show All option is on, all the cell-centered scalar (single-component) arrays will be displayed in the array selection box; otherwise only the ones with "Fraction" or "fraction" in the name will be shown. (This behavior is because by default the CTH volume fraction arrays should be listed.) Clicking on the name of a particular array selects it. To choose multiple contiguous array names, click the first one and press the Shift key while clicking the last name you wish to select. If the names are not contigous, press the Ctrl key while selecting the names from the list. The selected arrays will be contoured.
+If you wish to clip the contour surfaces with a plane, select "On" from the menu in the Clipping section on this Parameters tab. You can interactively position and orient the plane using the plane widget. (See the 3D Widgets section for the details of using this widget or manually setting the plane's parameters.)
+This filter only operates on unstructured data. It produces polygonal output.
     </Documentation>
   </Module>
   <Module name="ExtractEdges"
@@ -878,11 +882,6 @@ The Median filter operates on image data and produces image data output. It repl
                    trace_name="Consistency"
                    help="Turn on/off the enforcement of consistent polygon ordering."
                    default_value="1"/>
-    <LabeledToggle label="Cell normals"
-                   trace_name="ComputeCellNormals"
-                   variable="ComputeCellNormals"
-                   help="Turn on/off the computation of cell normals."
-                   default_value="0"/>
     <LabeledToggle label="Flip normals"
                    trace_name="FlipNormals"
                    variable="FlipNormals"
@@ -893,12 +892,22 @@ The Median filter operates on image data and produces image data output. It repl
                    variable="NonManifoldTraversal"
                    help="Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops."
                    default_value="1"/>
+    <LabeledToggle label="Cell normals"
+                   trace_name="ComputeCellNormals"
+                   variable="ComputeCellNormals"
+                   help="Turn on/off the computation of cell normals."
+                   default_value="0"/>
     <LabeledToggle label="Piece invariant"
                    trace_name="PieceInvariant"
                    variable="PieceInvariant"
                    help="Turn this off if you do not want to process ghost levels and do not mind seams."
                    default_value="1"/>
     <Documentation>
+The Normals generation filter generates surface normals at the points of the input polygonal data set to provide smooth shading of the data set. The resulting data set is also polygonal. The filter works by calculating a normal vector for each polygon in the data set and then averaging the normals at the shared points.
+In creating surface normals, if the angle between two polygons at a shared edge is larger than the value of the Feature angle slider, then that edge is considered a feature edge. If Splitting is turned on, then the mesh will be split along feature edges, allowing points to be duplicated. Because the duplicated points are no longer shared between the polygons meeting at the feature edge, a normal at these points will be created per polygon rather than averaging the polygon normals to produce one normal at each point. This allows the feature edges to remain "sharp" after shading.
+Generally the normals for a data set should either all point inward or all point outward. If the Consistency check is on, then this filter will reorder the points of cells that whose normal vectors are oriented the opposite direction from the rest of those in the data set. If the Flip normals option is checked, this filter will reverse the normal direction (and reorder the points) for all polygons in the data set. You might want to do this if your viewing position will be inside the data set instead of outside of it. Sometimes you may have more than two polygons sharing an edge (i.e., a non-manifold edge). When this is the case and the Consistency option is checked, then if the Non-manifold check is on, this filter will try to maintain consistent normals across non-manifold edge, but doing this can corrupt the ordering of polygons at these edges.
+This filter computes the normals at the points in the data set. In the process of doing this it computes polygon normals too. If you want these normals to be passed to the output of this filter, turn on the Cell normals option.
+If this filter is run in parallel, the resulting data set will have seams along the processor boundaries unless the Piece invariant check box is marked.
     </Documentation>
   </Module>
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
@@ -992,6 +1001,7 @@ The Outline Corners filter generates the corners of a bounding box for the input
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
+The Part Id Scalars filter assigns a unique scalar value to each part in the input. The input parts must have been collected together either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
     </Documentation>
   </Module>
   <Module name="PieceScalars"
@@ -1015,6 +1025,7 @@ The Outline Corners filter generates the corners of a bounding box for the input
                    help="Select whether to use random colors for the various pieces"
                    default_value="0"/>
     <Documentation>
+The Process Id Scalars filter assigns a unique scalar value to each piece of the input according to which processor it resides on.
     </Documentation>
   </Module>
     <!--
@@ -1057,13 +1068,14 @@ The Outline Corners filter generates the corners of a bounding box for the input
                    help="If on, then the input point data is passed through to the output; otherwise, only generated cell data is placed into the output."
                    default_value="0"/>
     <Documentation>
+The Point Data to Cell Data filter averages the values of the point attributes of the points of a cell to compute cell attributes. The Input menu allows the user to select the data set to which this filter will be applied. If the Pass point data option is checked, then the input point attributes will also be copied to the point attributes of the output; otherwise the output will only have dell attributes. The Point Data to Cell Data filter operates on any type of data set, and the output data set is of the same type as the input.
     </Documentation>
   </Module>
   <Module name="QuadricClustering"
           menu_name="Quadric Clustering"
           root_name="QC"
           module_type="Filter"
-          long_help="This filter is the same filter used to generate level of detail for ParaView.  It uses a structure grid of bins and merges all points contained in each bin."
+          long_help="This filter is the same filter used to generate level of detail for ParaView.  It uses a structured grid of bins and merges all points contained in each bin."
           short_help="Simplify polygonal models.">
     <Filter class="vtkQuadricClustering">
       <Input name="Input"
@@ -1102,6 +1114,9 @@ The Outline Corners filter generates the corners of a bounding box for the input
                    help="Should cell data be copied from output to input?"
                    default_value="0"/>
     <Documentation>
+The Quadric Clustering filter produces a reduced-resolution polygonal approximation of the input polygonal data set. This filter is the one used by ParaView for computing LODs. It uses spatial binning to reduce the number of points in the data set; points that lie within the same spatial bin are collapsed into one representative point. The Divisions entries specify the number of bins along the X, Y, and Z axes of the data set. If Use input points is on, the representative point for each bin is selected from one of the input points that lies in that bin; the input point that produces the least error is chosen. Without this option selected, the location of the representative point is calculated to produce the least error possible for that bin, but the point will most likely not be one of the input points.
+To better align pieces of the data set assigned to different processors, select Use feature edges and Use feature points. Use feature edges adjusts the representative points that contain boundary edges (along processor divisions), and Use feature points further influences the position of the feature points along the boundaries.
+The Copy cell data toggle controls whether cell-centered data from the input should be copied to the output.
     </Documentation>
   </Module>
   <Module name="BrownianPoints"
@@ -1133,14 +1148,15 @@ The Outline Corners filter generates the corners of a bounding box for the input
                  type="float"
                  default_value="1.0"/>
     <Documentation>
+The Random Vectors filter generates a point-centered array of random vectors. It uses a random number generator to determine the components of the vectors. The Min. speed and Max. speed values determine the range of the vector magnitudes. This filter operates on any type of data set, and the output data set will be of the same type as the input.
     </Documentation>
   </Module>
   <Module name="ReflectionFilter"
           menu_name="Reflection"
           root_name="Reflect"
           module_type="Filter"
-          long_help="This filter takes the union of the input and its reflection over an axis alligned plane."
-          short_help="Reflect input over an axis alligned plane.">
+          long_help="This filter takes the union of the input and its reflection over an axis-aligned plane."
+          short_help="Reflect input over an axis aligned plane.">
     <Filter class="vtkReflectionFilter">
       <Input name="Input"
              class="vtkDataSet"/>
@@ -1172,7 +1188,7 @@ The Outline Corners filter generates the corners of a bounding box for the input
       <Item name="Z Max"
             value="5"/>
     </SelectionList>
-    <!-- dependent on scalar range of the data -->
+    <!-- reasonable value dependent on bounds of the data -->
     <VectorEntry label="Center"
                  trace_name="Center"
                  variable="Center"
@@ -1180,6 +1196,7 @@ The Outline Corners filter generates the corners of a bounding box for the input
                  help="The center of the mirror plane."
                  default_value="0.0"/>
     <Documentation>
+The Reflection filter reflects the input data set across the specified plane. The output is the union of the input data set and its reflection. If the value chosen from the Plane menu is X, Y, or Z, the value of the Center entry determines where the plane is placed along the specified axis. The other six entries, X Min, X Max, etc., place the reflection plane at the specified face of the bounding box of the input data set. This filter operates on any type of data set producing an unstructured grid output.
     </Documentation>
   </Module>
   <Module name="RibbonFilter"
@@ -1187,7 +1204,7 @@ The Outline Corners filter generates the corners of a bounding box for the input
           root_name="Ribbon"
           module_type="Filter"
           long_help="This filter generates ribon surface from lines.  It is useful for displaying streamlines."
-          short_help="Create ribon surfaces from lines.">
+          short_help="Create ribbon surfaces from lines.">
     <Filter class="vtkPVRibbonFilter">
       <Input name="Input"
              class="vtkPolyData">
