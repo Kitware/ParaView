@@ -286,6 +286,7 @@ void vtkKWView::CreateViewProperties()
   this->CornerAnnotation->SetLabel("Corner Annotation");
   this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
                this->CornerAnnotation->GetWidgetName());
+  this->PropertiesCreated = 1;
 }
 
 void vtkKWView::SetHeaderTextColor( float r, float g, float b )
@@ -317,7 +318,6 @@ void vtkKWView::ShowViewProperties()
   if (!this->PropertiesCreated)
     {
     this->CreateViewProperties();
-    this->PropertiesCreated = 1;
     }
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
@@ -899,7 +899,6 @@ void vtkKWView::SerializeToken(istream& is, const char token[1024])
   if (!this->PropertiesCreated)
     {
     this->CreateViewProperties();
-    this->PropertiesCreated = 1;
     }
 
   // if this file is from an old version then look for the 
@@ -953,5 +952,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.13 $");
+  this->ExtractRevision(os,"$Revision: 1.14 $");
 }
