@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.131");
+vtkCxxRevisionMacro(vtkKWApplication, "1.132");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -162,17 +162,6 @@ vtkKWApplication::vtkKWApplication()
 
   this->HasSplashScreen = 0;
   this->ShowSplashScreen = 1;
-
-  if (this->HasRegisteryValue(
-    2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY))
-    {
-    this->ShowBalloonHelp = this->GetIntRegisteryValue(
-      2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY);
-    }
-  else
-    {
-    this->ShowBalloonHelp = 1;
-    }
 
   this->ApplicationExited = 0;
 }
@@ -692,8 +681,18 @@ void vtkKWApplication::Start(char *arg)
 //----------------------------------------------------------------------------
 void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 { 
-  // Go to set it here since we do not have the application name in the
-  // constructor.
+  while (this->Windows && this->Windows->GetNumberOfItems())
+    {
+    this->DoOneTclEvent();
+    }
+  
+  //Tk_MainLoop();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::GetApplicationSettingsFromRegistery()
+{ 
+  // Show balloon help ?
 
   if (this->HasRegisteryValue(
     2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY))
@@ -706,12 +705,31 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
     this->ShowBalloonHelp = 1;
     }
 
-  while (this->Windows && this->Windows->GetNumberOfItems())
+  // Save window geometry ?
+
+  if (this->HasRegisteryValue(
+    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
     {
-    this->DoOneTclEvent();
+    this->SaveWindowGeometry = this->GetIntRegisteryValue(
+      2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY);
     }
-  
-  //Tk_MainLoop();
+  else
+    {
+    this->SaveWindowGeometry = (this->RegisteryLevel < 0 ? 0 : 1);
+    }
+
+  // Show splash screen ?
+
+  if (this->HasRegisteryValue(
+    2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY))
+    {
+    this->ShowSplashScreen = this->GetIntRegisteryValue(
+      2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY);
+    }
+  else
+    {
+    this->ShowSplashScreen = 1;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1310,6 +1328,8 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ApplicationExited: " << this->ApplicationExited << endl;
   os << indent << "ApplicationInstallationDirectory: " 
      << (this->ApplicationInstallationDirectory ? ApplicationInstallationDirectory : "None") << endl;
+  os << indent << "SaveWindowGeometry: " 
+     << (this->SaveWindowGeometry ? "On" : "Off") << endl;
 }
 
 

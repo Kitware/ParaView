@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.164");
+vtkCxxRevisionMacro(vtkKWWindow, "1.165");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -493,10 +493,7 @@ void vtkKWWindow::CloseNoPrompt()
   // If it's the last win, save its geometry
 
   if (this->Application->GetWindows()->GetNumberOfItems() <= 1 &&
-      this->Application->HasRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
-      this->Application->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
+      this->Application->GetSaveWindowGeometry())
     {
     this->Script("wm geometry %s", this->GetWidgetName());
     this->Application->SetRegisteryValue(
@@ -656,16 +653,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
 
   // Restore window geometry
 
-  if (this->Application->HasRegisteryValue(
-    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
-      this->Application->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+  if (this->Application->GetSaveWindowGeometry() &&
       this->Application->HasRegisteryValue(
         2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
     {
     char geometry[40];
     if (this->Application->GetRegisteryValue(
-      2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
+          2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
       {
       this->Script("wm geometry %s %s", wname, geometry);
       }

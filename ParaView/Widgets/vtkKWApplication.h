@@ -288,6 +288,12 @@ public:
   vtkBooleanMacro(ShowSplashScreen, int);
 
   // Description:
+  // Save windows geometry.
+  vtkGetMacro(SaveWindowGeometry, int);
+  vtkSetMacro(SaveWindowGeometry, int);
+  vtkBooleanMacro(SaveWindowGeometry, int);
+
+  // Description:
   // At the end of Exit(), this is set to true. Other objects
   // can use this to cleanup properly.
   vtkGetMacro(ApplicationExited, int);
@@ -354,6 +360,10 @@ protected:
   vtkKWSplashScreen *SplashScreen;
   int HasSplashScreen;
   int ShowSplashScreen;
+
+  int SaveWindowGeometry;
+
+  virtual void GetApplicationSettingsFromRegistery();
 
   // About dialog
 

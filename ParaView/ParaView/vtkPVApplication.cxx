@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.215");
+vtkCxxRevisionMacro(vtkPVApplication, "1.216");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -362,16 +362,6 @@ vtkPVApplication::vtkPVApplication()
   delete[] tclname;
 
   this->HasSplashScreen = 1;
-  if (this->HasRegisteryValue(
-    2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY))
-    {
-    this->ShowSplashScreen = this->GetIntRegisteryValue(
-      2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY);
-    }
-  else
-    {
-    this->ShowSplashScreen = 1;
-    }
 
   this->TraceFileName = 0;
   this->Argv0 = 0;
@@ -380,6 +370,12 @@ vtkPVApplication::vtkPVApplication()
 
   this->BatchScriptName = 0;
   this->RunBatchScript = 0;
+
+  // Get application settings from registery. 
+  // We can only do it now since it requires the application name
+  // (i.e., it could not be done in the superclass constructor)
+
+  this->GetApplicationSettingsFromRegistery();
 }
 
 //----------------------------------------------------------------------------

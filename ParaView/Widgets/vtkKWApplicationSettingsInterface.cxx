@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.15");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.16");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -67,7 +67,7 @@ vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
 
   this->InterfaceSettingsFrame = 0;
   this->ConfirmExitCheckButton = 0;
-  this->SaveGeometryCheckButton = 0;
+  this->SaveWindowGeometryCheckButton = 0;
   this->ShowSplashScreenCheckButton = 0;
   this->ShowBalloonHelpCheckButton = 0;
 
@@ -97,10 +97,10 @@ vtkKWApplicationSettingsInterface::~vtkKWApplicationSettingsInterface()
     this->ConfirmExitCheckButton = NULL;
     }
 
-  if (this->SaveGeometryCheckButton)
+  if (this->SaveWindowGeometryCheckButton)
     {
-    this->SaveGeometryCheckButton->Delete();
-    this->SaveGeometryCheckButton = NULL;
+    this->SaveWindowGeometryCheckButton->Delete();
+    this->SaveWindowGeometryCheckButton = NULL;
     }
 
   if (this->ShowSplashScreenCheckButton)
@@ -212,19 +212,19 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   // --------------------------------------------------------------
   // Interface settings : Save application geometry on exit ?
 
-  if (!this->SaveGeometryCheckButton)
+  if (!this->SaveWindowGeometryCheckButton)
     {
-    this->SaveGeometryCheckButton = vtkKWCheckButton::New();
+    this->SaveWindowGeometryCheckButton = vtkKWCheckButton::New();
     }
 
-  this->SaveGeometryCheckButton->SetParent(frame);
-  this->SaveGeometryCheckButton->Create(app, 0);
-  this->SaveGeometryCheckButton->SetText("Save window geometry on exit");
-  this->SaveGeometryCheckButton->SetCommand(this, "SaveGeometryCallback");
-  this->SaveGeometryCheckButton->SetBalloonHelpString(
+  this->SaveWindowGeometryCheckButton->SetParent(frame);
+  this->SaveWindowGeometryCheckButton->Create(app, 0);
+  this->SaveWindowGeometryCheckButton->SetText("Save window geometry on exit");
+  this->SaveWindowGeometryCheckButton->SetCommand(this, "SaveWindowGeometryCallback");
+  this->SaveWindowGeometryCheckButton->SetBalloonHelpString(
     "Save the window size and location on exit and restore it on startup.");
 
-  tk_cmd << "pack " << this->SaveGeometryCheckButton->GetWidgetName()
+  tk_cmd << "pack " << this->SaveWindowGeometryCheckButton->GetWidgetName()
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
@@ -351,63 +351,32 @@ void vtkKWApplicationSettingsInterface::Update()
   if (this->ConfirmExitCheckButton)
     {
     this->ConfirmExitCheckButton->SetState(
-      this->Application->GetMessageDialogResponse(VTK_KW_EXIT_DIALOG_NAME) ?0:1);
+      this->Application->GetMessageDialogResponse(VTK_KW_EXIT_DIALOG_NAME)
+      ? 0 : 1);
     }
 
   // Interface settings : Save application geometry on exit ?
 
-  if (this->SaveGeometryCheckButton)
+  if (this->SaveWindowGeometryCheckButton)
     {
-    if (this->Application->HasRegisteryValue(
-          2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
-      {
-      this->SaveGeometryCheckButton->SetState(
-        this->Application->GetIntRegisteryValue(
-          2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY));
-      }
-    else
-      {
-      this->Application->SetRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", 1);
-      this->SaveGeometryCheckButton->SetState(1);
-      }
+    this->SaveWindowGeometryCheckButton->SetState(
+      this->Application->GetSaveWindowGeometry());
     }
   
   // Interface settings : Show splash screen ?
 
-  if (this->Application->GetHasSplashScreen() && 
-      this->ShowSplashScreenCheckButton)
+  if (this->ShowSplashScreenCheckButton)
     {
-    if (this->Application->HasRegisteryValue(
-          2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY))
-      {
-      this->ShowSplashScreenCheckButton->SetState(
-        this->Application->GetIntRegisteryValue(
-          2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY));
-      }
-    else
-      {
-      this->ShowSplashScreenCheckButton->SetState(
-        this->Application->GetShowSplashScreen());
-      }
+    this->ShowSplashScreenCheckButton->SetState(
+      this->Application->GetShowSplashScreen());
     }
 
   // Interface settings : Show balloon help ?
 
   if (this->ShowBalloonHelpCheckButton)
     {
-    if (this->Application->HasRegisteryValue(
-          2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY))
-      {
-      this->ShowBalloonHelpCheckButton->SetState(
-        this->Application->GetIntRegisteryValue(
-          2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY));
-      }
-    else
-      {
-      this->ShowBalloonHelpCheckButton->SetState(
-        this->Application->GetShowBalloonHelp());
-      }
+    this->ShowBalloonHelpCheckButton->SetState(
+      this->Application->GetShowBalloonHelp());
     }
 
   // Toolbar settings : flat frame
@@ -423,9 +392,6 @@ void vtkKWApplicationSettingsInterface::Update()
       }
     else
       {
-      this->Application->SetRegisteryValue(
-        2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY, "%d",
-        vtkKWToolbar::GetGlobalFlatAspect());
       this->FlatFrameCheckButton->SetState(
         vtkKWToolbar::GetGlobalFlatAspect());
       }
@@ -444,9 +410,6 @@ void vtkKWApplicationSettingsInterface::Update()
       }
     else
       {
-      this->Application->SetRegisteryValue(
-        2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY, "%d",
-        vtkKWToolbar::GetGlobalWidgetsFlatAspect());
       this->FlatButtonsCheckButton->SetState(
         vtkKWToolbar::GetGlobalWidgetsFlatAspect());
       }
@@ -471,75 +434,103 @@ void vtkKWApplicationSettingsInterface::Update()
 //----------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::ConfirmExitCallback()
 {
- if (this->IsCreated())
-   {
-   this->GetApplication()->SetMessageDialogResponse(
-     VTK_KW_EXIT_DIALOG_NAME, this->ConfirmExitCheckButton->GetState() ? 0 : 1);
-   }
+  if (!this->ConfirmExitCheckButton || 
+      !this->ConfirmExitCheckButton->IsCreated())
+    {
+    return;
+    }
+
+  this->GetApplication()->SetMessageDialogResponse(
+    VTK_KW_EXIT_DIALOG_NAME, 
+    this->ConfirmExitCheckButton->GetState() ? 0 : 1);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::SaveGeometryCallback()
+void vtkKWApplicationSettingsInterface::SaveWindowGeometryCallback()
 {
- if (this->IsCreated())
-   {
-   this->GetApplication()->SetRegisteryValue(
-     2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", 
-     this->SaveGeometryCheckButton->GetState());
-   }
+  if (!this->SaveWindowGeometryCheckButton || 
+      !this->SaveWindowGeometryCheckButton->IsCreated())
+    {
+    return;
+    }
+  
+  int state = this->SaveWindowGeometryCheckButton->GetState() ? 1 : 0;
+  
+  this->GetApplication()->SetRegisteryValue(
+    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", state);
+  
+  this->GetApplication()->SetSaveWindowGeometry(state);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::ShowSplashScreenCallback()
 {
- if (this->IsCreated())
-   {
-   int flag = this->ShowSplashScreenCheckButton->GetState() ? 1 : 0;
-   this->GetApplication()->SetRegisteryValue(
-     2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY, "%d", flag);
-   this->GetApplication()->SetShowSplashScreen(flag);
-   }
+  if (!this->ShowSplashScreenCheckButton ||
+      !this->ShowSplashScreenCheckButton->IsCreated())
+    {
+    return;
+    }
+
+  int state = this->ShowSplashScreenCheckButton->GetState() ? 1 : 0;
+ 
+  this->GetApplication()->SetRegisteryValue(
+    2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY, "%d", state);
+
+  this->GetApplication()->SetShowSplashScreen(state);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
 {
-  if (this->IsCreated())
-   {
-   int flag = this->ShowBalloonHelpCheckButton->GetState() ? 1 : 0;
-   this->GetApplication()->SetRegisteryValue(
-     2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY, "%d", flag);
-   this->GetApplication()->SetShowBalloonHelp(flag);
-   }
+  if (!this->ShowBalloonHelpCheckButton ||
+      !this->ShowBalloonHelpCheckButton->IsCreated())
+    {
+    return;
+    }
+
+  int state = this->ShowBalloonHelpCheckButton->GetState() ? 1 : 0;
+
+  this->GetApplication()->SetRegisteryValue(
+    2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY, "%d", state);
+
+  this->GetApplication()->SetShowBalloonHelp(state);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::FlatFrameCallback()
 {
-  if (this->IsCreated())
+  if (!this->FlatFrameCheckButton ||
+      !this->FlatFrameCheckButton->IsCreated())
     {
-    this->GetApplication()->SetRegisteryValue(
-      2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY, "%d", 
-      this->FlatFrameCheckButton->GetState() ? 1 : 0);
-    if (this->Window)
-      {
-      this->Window->UpdateToolbarAspect();
-      }
+    return;
+    }
+
+  this->GetApplication()->SetRegisteryValue(
+    2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY, "%d", 
+    this->FlatFrameCheckButton->GetState() ? 1 : 0);
+
+  if (this->Window)
+    {
+    this->Window->UpdateToolbarAspect();
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::FlatButtonsCallback()
 {
-  if (this->IsCreated())
+  if (!this->FlatButtonsCheckButton ||
+      !this->FlatButtonsCheckButton->IsCreated())
     {
-    this->GetApplication()->SetRegisteryValue(
-      2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY, "%d", 
-      this->FlatButtonsCheckButton->GetState() ? 1 : 0); 
-    if (this->Window)
-      {
-      this->Window->UpdateToolbarAspect();
-      }
+    return;
+    }
+
+  this->GetApplication()->SetRegisteryValue(
+    2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY, "%d", 
+    this->FlatButtonsCheckButton->GetState() ? 1 : 0); 
+
+  if (this->Window)
+    {
+    this->Window->UpdateToolbarAspect();
     }
 }
 
@@ -560,9 +551,9 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
     this->ConfirmExitCheckButton->SetEnabled(this->Enabled);
     }
 
-  if (this->SaveGeometryCheckButton)
+  if (this->SaveWindowGeometryCheckButton)
     {
-    this->SaveGeometryCheckButton->SetEnabled(this->Enabled);
+    this->SaveWindowGeometryCheckButton->SetEnabled(this->Enabled);
     }
 
   if (this->ShowSplashScreenCheckButton)
