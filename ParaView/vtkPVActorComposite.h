@@ -217,7 +217,11 @@ public:
   vtkGetStringMacro(CubeAxesTclName);
 
   // Description:
-  // Callbacks for point size and line width sliders
+  // Access to pointSize for scripting.
+  void SetPointSize(int size);
+
+  // Description:
+  // Callbacks for point size and line width sliders.
   void ChangePointSize();
   void ChangeLineWidth();
 

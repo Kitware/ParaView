@@ -1566,6 +1566,13 @@ void vtkPVActorComposite::SetScalarBarOrientationToHorizontal()
   this->ScalarBarOrientationCallback();
 }
 
+void vtkPVActorComposite::SetPointSize(int size)
+{
+  this->PointSizeScale->SetValue(size);
+  this->ChangePointSize();
+}
+
+
 void vtkPVActorComposite::ChangePointSize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
