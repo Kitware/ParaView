@@ -114,7 +114,7 @@ void pvTestDriver::CollectConfiguredOptions()
   return;
 # endif
 # ifdef VTK_MPI_PREFLAGS
-  this->SeparateArguments(VTK_MPI_PREFLAGS, this->MPIFlags);
+  this->SeparateArguments(VTK_MPI_PREFLAGS, this->MPIPreFlags);
 # endif
 # ifdef VTK_MPI_POSTFLAGS
   SeparateArguments(VTK_MPI_POSTFLAGS, this->MPIPostFlags);
@@ -207,9 +207,9 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
      commandLine.push_back(this->MPIRun.c_str());
      commandLine.push_back(this->MPINumProcessFlag.c_str());
      commandLine.push_back(numProc);
-     for(unsigned int i = 0; i < this->MPIFlags.size(); ++i)
+     for(unsigned int i = 0; i < this->MPIPreFlags.size(); ++i)
        {
-       commandLine.push_back(this->MPIFlags[i].c_str());
+       commandLine.push_back(this->MPIPreFlags[i].c_str());
        }
     }
   commandLine.push_back(paraView);
@@ -295,7 +295,6 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
     "error in locking authority file",
     0
   };
-  (void)nonErrors;
   
   if(this->AllowErrorInOutput)
     {

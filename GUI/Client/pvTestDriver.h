@@ -32,6 +32,7 @@ public:
   int Main(int argc, char* argv[]);
   pvTestDriver();
   ~pvTestDriver();
+
 protected:
   void SeparateArguments(const char* str, 
                          vtkstd::vector<vtkstd::string>& flags);
@@ -60,23 +61,43 @@ protected:
                           vtkstd::vector<char>& out, vtkstd::vector<char>& err,
                           int* foundWaiting);
 private:
+  // fullpath to paraview executable
   vtkstd::string ParaView;
+  // fullpath to paraview server executable
   vtkstd::string ParaViewServer;
+  // fullpath to paraview renderserver executable
   vtkstd::string ParaViewRenderServer;
+  // fullpath to mpirun executable
   vtkstd::string MPIRun;
-  vtkstd::vector<vtkstd::string> MPIFlags;
+
+  // This specify the preflags and post flags that can be set using:
+  // VTK_MPI_PREFLAGS / VTK_MPI_POSTFLAGS at config time
+  vtkstd::vector<vtkstd::string> MPIPreFlags;
   vtkstd::vector<vtkstd::string> MPIPostFlags;
+  
+  // MPIClientFlags / MPIServerFlags allows you to specify flags specific for 
+  // the client or the server
+  vtkstd::vector<vtkstd::string> MPIClientFlags;
+  vtkstd::vector<vtkstd::string> MPIServerFlags;
+  
+  // Specify the number of process flag, this can be set using: VTK_MPI_NUMPROC_FLAG. 
+  // This is then split into : 
+  // MPIClientNumProcessFlag, MPIServerNumProcessFlag & MPIRenderServerNumProcessFlag
   vtkstd::string MPINumProcessFlag;
   vtkstd::string MPIClientNumProcessFlag;
   vtkstd::string MPIServerNumProcessFlag;
   vtkstd::string MPIRenderServerNumProcessFlag;
+
   vtkstd::string CurrentPrintLineName;
+
   int RenderServerNumProcesses;
   double TimeOut;
   int TestRenderServer;
   int TestServer;
   int ArgStart;
   int AllowErrorInOutput;
+  
+  // Specify if the -rc flag was passed or not
   int ReverseConnection;
 };
 
