@@ -976,7 +976,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.40 $");
+  this->ExtractRevision(os,"$Revision: 1.41 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1036,6 +1036,8 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
     {
     int ii;
     int lastI, lastJ;
+    lastI = 0;
+    lastJ = 0;
     for(ii=0; ii<=15; ii++)
       {
       if ( filename[ii] == '/' )
@@ -1043,18 +1045,22 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
 	lastI = ii;
 	}
       }
-    for(ii=strlen(filename); static_cast<unsigned int>(ii)>=(strlen(filename)-25); ii--)
+    for(ii=strlen(filename); 
+        static_cast<unsigned int>(ii)>=(strlen(filename)-25); ii--)
       {
       if ( filename[ii] == '/' )
 	{
 	lastJ = ii;
 	}
       }
+    if (!lastJ)
+      {
+      lastJ = ii;
+      }
     char format[20];
     sprintf(format, "  %%.%ds...%%s", lastI+1);
     sprintf(file, format, filename, filename + lastJ);
     }
-  //sprintf(file, "%d %.40s%s", i, filename, (strlen(filename)>40)?"...":"");
 
   if ( !this->RecentFiles )
     {
