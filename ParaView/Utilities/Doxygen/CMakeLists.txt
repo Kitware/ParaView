@@ -23,7 +23,7 @@ IF (BUILD_DOCUMENTATION)
     ${PARAVIEW_SOURCE_DIR}/Utilities/Doxygen/doc_makeall.sh.in
     ${PARAVIEW_BINARY_DIR}/Utilities/Doxygen/doc_makeall.sh)
 
-  ADD_CUSTOM_TARGET(vtkParaViewDoxygenDoc
+  ADD_CUSTOM_TARGET(ParaViewDoxygenDoc
     ${BASH}
     ${PARAVIEW_BINARY_DIR}/Utilities/Doxygen/doc_makeall.sh)
 
