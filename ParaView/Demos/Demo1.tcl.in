@@ -6,7 +6,7 @@ if [info exists tmpPvDataDir] {
 
 set FoundFiles 1
 
-if ![file exists $DataDir/combxy.bin] {
+if ![file exists $DataDir/combxyz.bin] {
     vtkKWMessageDialog _adialog
     _adialog Create Application ""
     _adialog SetText "Could not find the data file combxyz.bin.\n This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
