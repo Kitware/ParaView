@@ -220,7 +220,7 @@ void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
 
   if ( this->LightboxID == 0 )
     {
-    this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, ""  ); // ANDY Problems
+    this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, 0  ); // ANDY Problems
     }
 }
 
@@ -243,7 +243,7 @@ void vtkKWCornerAnnotation::OnDisplayCorner()
 
   if ( this->LightboxID == 0 )
     {
-    this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, ""  ); // ANDY Problems
+    this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, 0  ); // ANDY Problems
     }
 }
 
@@ -279,7 +279,7 @@ void vtkKWCornerAnnotation::CornerChanged(int i)
 
   if ( this->LightboxID == 0 )
     {
-    this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, ""  ); // ANDY Problems
+    this->View->GetWindow()->InvokeEvent( vtkKWObject::LightboxCornerAnnoChangedEvent, 0  ); // ANDY Problems
     }
 }
 
@@ -379,6 +379,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.14 $");
+  this->ExtractRevision(os,"$Revision: 1.15 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
