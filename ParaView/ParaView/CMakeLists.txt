@@ -216,13 +216,16 @@ IF (PARAVIEW_USE_ICE_T)
     vtkDesktopDeliveryClient.cxx
     vtkDesktopDeliveryServer.cxx
     #vtkIceTComposite.cxx
-    vtkIceTRenderer.cxx
-    vtkIceTRenderManager.cxx
     vtkIceTFactory.cxx
     vtkPVIceTDisplayRenderModuleUI.cxx
     vtkPVIceTDisplayRenderModule.cxx
     vtkPVIceTRenderModuleUI.cxx
     vtkPVIceTRenderModule.cxx
+    )
+  SET( ParaViewServer_SRCS
+    ${ParaViewServer_SRCS}
+    vtkIceTRenderManager.cxx
+    vtkIceTRenderer.cxx
     vtkIceTClientCompositeManager.cxx
     )
   SET_SOURCE_FILES_PROPERTIES(
@@ -386,6 +389,8 @@ IF(WIN32 AND TK_RESOURCE_FILE)
 ENDIF(WIN32 AND TK_RESOURCE_FILE)
 
 ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS}) 
+ADD_EXECUTABLE(foo foo.cxx)
+TARGET_LINK_LIBRARIES(foo vtkKWParaViewTCL)
 CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/TestClientServer.h.in
   ${PARAVIEW_BINARY_DIR}/ParaView/TestClientServer.h
   ESCAPE_QUOTES)

@@ -144,7 +144,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.57");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.58");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -431,6 +431,9 @@ void vtkPVClientServerModule::Connect()
         }
       if (this->ClientMode)
         {
+        char servers[1024];
+        servers[0] = 0;
+        pvApp->GetRegisteryValue(2, "RunTime", "Servers", servers);
         this->Script("wm withdraw .");
         vtkPVConnectDialog* dialog = 
           vtkPVConnectDialog::New();
@@ -440,6 +443,7 @@ void vtkPVClientServerModule::Connect()
         dialog->SetNumberOfProcesses(this->NumberOfProcesses);
         dialog->SetMultiProcessMode(this->MultiProcessMode);
         dialog->Create(this->GetPVApplication(), 0);
+        dialog->SetListOfServers(servers);
         int res = dialog->Invoke();
         if ( res )
           {
@@ -450,6 +454,8 @@ void vtkPVClientServerModule::Connect()
           this->MultiProcessMode = dialog->GetMultiProcessMode();
           start = 1;
           }
+        pvApp->SetRegisteryValue(2, "RunTime", "Servers",
+          dialog->GetListOfServers());
         dialog->Delete();
 
         if ( !res )

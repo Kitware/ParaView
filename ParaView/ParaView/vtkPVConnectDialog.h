@@ -35,6 +35,7 @@ class vtkKWLabel;
 class vtkKWScale;
 class vtkKWLabeledEntry;
 class vtkKWApplication;
+class vtkStringList;
 
 class VTK_EXPORT vtkPVConnectDialog : public vtkKWMessageDialog
 {
@@ -50,6 +51,9 @@ public:
   void SetPort(int pt);
   int GetPort();
   void MPICheckBoxCallback();
+
+  void SetListOfServers(const char* list);
+  const char* GetListOfServers();
 
   vtkSetMacro(MultiProcessMode, int);
   vtkGetMacro(MultiProcessMode, int);
@@ -76,6 +80,12 @@ protected:
   int PortInt;
   int MultiProcessMode;
   int NumberOfProcesses;
+
+  vtkStringList *Servers;
+
+  vtkSetStringMacro(ListOfServersString);
+  char* ListOfServersString;
+
 
 private:
   vtkPVConnectDialog(const vtkPVConnectDialog&); // Not implemented

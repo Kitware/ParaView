@@ -101,7 +101,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.246");
+vtkCxxRevisionMacro(vtkPVApplication, "1.247");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -237,7 +237,28 @@ public:
       {
       cout << "Errors while exiting ParaView:" << endl;
       }
+#ifdef WIN32
+    ostrstream str;
+    this->FlushErrors(str);
+    str << ends;
+    char *vtkmsg = new char [strlen(str.str()) + 100];
+#ifdef UNICODE
+    wchar_t *wmsg = new wchar_t [mbstowcs(NULL, vtkmsg, 32000)];
+    mbstowcs(wmsg, vtkmsg, 32000);
+    delete [] wmsg;
+#else
+    if (MessageBox(NULL, vtkmsg, "Error",
+        MB_ICONERROR | MB_OKCANCEL) == IDCANCEL) 
+      { 
+      vtkObject::GlobalWarningDisplayOff(); 
+      }
+#endif
+    delete [] vtkmsg;
+
+    str.rdbuf()->freeze(0);
+#else
     this->FlushErrors(cout);
+#endif
     }
   
   void FlushErrors(ostream& os)

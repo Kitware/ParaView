@@ -25,12 +25,13 @@
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVWindow.h"
+#include "vtkStringList.h"
 
 #include "vtkstd/string"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.12");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.13");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -56,7 +57,6 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
   this->Username->Create(app, 0);
   this->Username->SetValue(this->SSHUser);
   this->Hostname->SetParent(frame);
-  this->Hostname->GetEntry()->PullDownOn();
   this->Hostname->Create(app, 0);
   this->Hostname->SetLabel("@");
   this->Port->SetParent(frame);
@@ -216,6 +216,7 @@ vtkPVConnectDialog::vtkPVConnectDialog()
 {
   this->Username = vtkKWEntry::New();
   this->Hostname = vtkKWLabeledEntry::New();
+  this->Hostname->GetEntry()->PullDownOn();
   this->Port = vtkKWLabeledEntry::New();
   this->Label = vtkKWLabel::New();
   this->MPINumberOfServers = vtkKWScale::New();
@@ -226,6 +227,9 @@ vtkPVConnectDialog::vtkPVConnectDialog()
   this->MultiProcessMode = 0;
   this->NumberOfProcesses = 2;
   this->SSHUser = 0;
+
+  this->ListOfServersString = 0;
+  this->Servers = vtkStringList::New();
 }
 
 //----------------------------------------------------------------------------
@@ -238,8 +242,65 @@ vtkPVConnectDialog::~vtkPVConnectDialog()
   this->MPINumberOfServers->Delete();
   this->MPIMode->Delete();
   this->SetSSHUser(0);
+  this->SetListOfServersString(0);
+  this->Servers->Delete();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVConnectDialog::SetListOfServers(const char* list)
+{
+  std::cout << "vtkPVConnectDialog::SetListOfServers(" << list << ")" << endl;
+  vtkstd::string cserv;
+  vtkstd::string::size_type cc;
+  for ( cc = 0; list[cc]; cc ++ )
+    {
+    if ( list[cc] == ';' )
+      {
+      this->Servers->AddUniqueString(cserv.c_str());
+      cserv = "";
+      }
+    else
+      {
+      cserv.append(1, list[cc]);
+      }
+    }
+  if ( cserv.size() )
+    {
+    this->Servers->AddUniqueString(cserv.c_str());
+    }
+  for ( cc = 0; cc < this->Servers->GetLength(); cc ++ )
+    {
+    cout << "Add to the entry: " << this->Servers->GetString(cc) << endl;
+    this->Hostname->GetEntry()->AddValue(this->Servers->GetString(cc));
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVConnectDialog::GetListOfServers()
+{
+  cout << "GetListOfServers" << endl;
+  vtkstd::string servlist;
+  int cc;
+
+  this->Servers->AddUniqueString(this->Hostname->GetEntry()->GetValue());
+  for ( cc = 0; cc < this->Hostname->GetEntry()->GetNumberOfValues(); cc ++ )
+    {
+    const char* server = this->Hostname->GetEntry()->GetValueFromIndex(cc);
+    cout << "Add server: " << server << endl;
+    this->Servers->AddUniqueString(server);
+    }
+
+  for ( cc = 0; cc < this->Servers->GetLength(); cc ++ )
+    {
+    if ( cc )
+      {
+      servlist += ";";
+      }
+    servlist += this->Servers->GetString(cc);
+    }
+  this->SetListOfServersString(servlist.c_str());
+  return this->ListOfServersString;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::PrintSelf(ostream& os, vtkIndent indent)
