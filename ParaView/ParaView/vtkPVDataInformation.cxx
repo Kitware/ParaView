@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.14");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.15");
 
 
 //----------------------------------------------------------------------------
@@ -164,6 +164,14 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet* data)
     }
   iter->Delete();
   this->DataSetType = data->GetDataObjectType();
+}
+#else
+class vtkCompositeDataSet
+{
+};
+//----------------------------------------------------------------------------
+void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet*)
+{
 }
 #endif
 
