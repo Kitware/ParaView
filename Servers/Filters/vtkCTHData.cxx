@@ -21,6 +21,7 @@
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkGenericCell.h"
+#include "vtkInformation.h"
 #include "vtkIntArray.h"
 #include "vtkLargeInteger.h"
 #include "vtkLine.h"
@@ -38,7 +39,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.12");
+vtkCxxRevisionMacro(vtkCTHData, "1.13");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -71,6 +72,10 @@ vtkCTHData::vtkCTHData()
 
   this->NumberOfGhostLevels = 0;
 
+  this->Information->Set(vtkDataObject::DATA_EXTENT_TYPE(), VTK_PIECES_EXTENT);
+  this->Information->Set(vtkDataObject::DATA_PIECE_NUMBER(), -1);
+  this->Information->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(), 1);
+  this->Information->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(), 0);
 }
 
 //----------------------------------------------------------------------------
@@ -97,6 +102,16 @@ void vtkCTHData::Initialize()
   this->Superclass::Initialize();
   this->BlockOrigins->Initialize();
   this->BlockSpacings->Initialize();
+
+  this->Information->Set(vtkDataObject::DATA_PIECE_NUMBER(), -1);
+  this->Information->Set(vtkDataObject::DATA_NUMBER_OF_PIECES(), 0);
+  this->Information->Set(vtkDataObject::DATA_NUMBER_OF_GHOST_LEVELS(), 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHData::GetExtent(int extent[6])
+{
+  this->Information->Get(vtkDataObject::DATA_EXTENT(), extent);
 }
 
 //----------------------------------------------------------------------------
@@ -948,6 +963,8 @@ vtkIdType vtkCTHData::FindPoint(double x[3])
   double *origin;
   double *spacing;
   int *dims;
+  int extent[6];
+  this->GetExtent(extent);
 
   // But force.
   // Loop through all blocks.
@@ -966,7 +983,7 @@ vtkIdType vtkCTHData::FindPoint(double x[3])
       {
       d = x[i] - origin[i];
       loc[i] = (int) ((d / spacing[i]) + 0.5);
-      if ( loc[i] < this->Extent[i*2])
+      if ( loc[i] < extent[i*2])
         {
         loc[i] = 0;
         }
