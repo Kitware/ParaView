@@ -179,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.182");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.183");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -962,8 +962,9 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
         vtkSMDomain *smDomain = entry->GetCurrentSMDomain();
         if (smProp && smDomain)
           {
-          float t = atof(this->Script(entry->GetTimeEquation()));
-          smDomain->SetAnimationValue(smProp, entry->GetAnimationElement(), t);
+          float teq = atof(this->Script(entry->GetTimeEquation()));
+          smDomain->SetAnimationValue(
+            smProp, entry->GetAnimationElement(), teq);
           if (entry->GetPVSource() && entry->GetPVSource()->GetProxy())
             {
             entry->GetPVSource()->UpdateVTKObjects();
@@ -1786,8 +1787,6 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
   int timeIdx;
   char countStr[10];
 
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
-
   vtkPVAnimationBatchHelper *helper = vtkPVAnimationBatchHelper::New();
 
   // Loop through all of the time steps.
@@ -1813,12 +1812,12 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
         vtkSMDomain *dom = entry->GetCurrentSMDomain();
         if (dom)
           {
-          float t = atof(this->Script(entry->GetTimeEquation()));
+          float teq = atof(this->Script(entry->GetTimeEquation()));
           helper->SetAnimationValueInBatch(
             file, entry->GetCurrentSMDomain(), entry->GetCurrentSMProperty(),
             entry->GetPVSource()->GetVTKSourceID(0),
             entry->GetAnimationElement(),
-            t);
+            teq);
           }
         }
       }
