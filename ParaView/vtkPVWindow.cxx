@@ -47,7 +47,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageReader.h"
 #include "vtkPVImage.h"
 #include "vtkPVSourceList.h"
-
+#include "vtkPVActorComposite.h"
 
 
 //----------------------------------------------------------------------------
@@ -337,11 +337,12 @@ vtkPVSource* vtkPVWindow::GetCurrentSource()
 void vtkPVWindow::NextSource()
 {
   vtkPVSource *composite = this->GetNextSource();
+
   if (composite != NULL)
     {
-    this->GetCurrentSource()->GetProp()->VisibilityOff();
+    this->GetCurrentSource()->GetPVData()->GetActorComposite()->VisibilityOff();
     this->SetCurrentSource(composite);
-    this->GetCurrentSource()->GetProp()->VisibilityOn();
+    this->GetCurrentSource()->GetPVData()->GetActorComposite()->VisibilityOn();
     }
   
   this->MainView->Render();
@@ -354,9 +355,9 @@ void vtkPVWindow::PreviousSource()
   vtkPVSource *composite = this->GetPreviousSource();
   if (composite != NULL)
     {
-    this->GetCurrentSource()->GetProp()->VisibilityOff();
+    this->GetCurrentSource()->GetPVData()->GetActorComposite()->VisibilityOff();
     this->SetCurrentSource(composite);
-    this->GetCurrentSource()->GetProp()->VisibilityOn();
+    this->GetCurrentSource()->GetPVData()->GetActorComposite()->VisibilityOn();
     }
   
   this->MainView->Render();
@@ -387,7 +388,6 @@ vtkKWCompositeCollection* vtkPVWindow::GetSources()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ResetCameraCallback()
 {
-  
   this->MainView->ResetCamera();
   this->MainView->Render();
 }

@@ -46,7 +46,6 @@ vtkPVShrinkPolyData::vtkPVShrinkPolyData()
   this->ShrinkFactorScale = vtkKWScale::New();
   this->ShrinkFactorScale->SetParent(this->Properties);
   this->Shrink = vtkShrinkPolyData::New();
-  
 }
 
 //----------------------------------------------------------------------------
@@ -128,7 +127,7 @@ void vtkPVShrinkPolyData::ShrinkFactorChanged()
     this->SetOutput(pvd);
     a = window->GetPreviousSource()->GetPVData()->GetAssignment();
     pvd->SetAssignment(a);
-    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+    this->GetInput()->GetActorComposite()->VisibilityOff();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
     this->CreateDataPage();
@@ -164,4 +163,5 @@ void vtkPVShrinkPolyData::SetInput(vtkPVPolyData *pvData)
     }  
   
   this->GetShrink()->SetInput(pvData->GetPolyData());
+  this->Input = pvData;
 }

@@ -59,7 +59,6 @@ public:
   vtkSetMacro(OutlineFlag,int);
   vtkGetMacro(OutlineFlag,int);
   vtkBooleanMacro(OutlineFlag,int);
-  
 
   void SetImageData(vtkImageData *image);
   vtkImageData *GetImageData();

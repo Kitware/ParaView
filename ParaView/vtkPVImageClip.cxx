@@ -182,6 +182,7 @@ void vtkPVImageClip::SetInput(vtkPVImage *pvi)
     }  
   
   this->GetImageClip()->SetInput(pvi->GetImageData());
+  this->Input = pvi;
 }
 
 //----------------------------------------------------------------------------
@@ -223,31 +224,34 @@ void vtkPVImageClip::ExtentsChanged()
   vtkPVWindow *window = this->GetWindow();
   vtkPVAssignment *a;
   
-  pvi = vtkPVImage::New();
-  pvi->Clone(pvApp);
-  pvi->OutlineFlagOff();
-  
-  this->SetOutput(pvi);
-
-  a = window->GetPreviousSource()->GetPVData()->GetAssignment();
-  pvi->SetAssignment(a);
-  
   this->ImageClip->SetOutputWholeExtent(this->ClipXMinEntry->GetValueAsInt(),
 					this->ClipXMaxEntry->GetValueAsInt(),
 					this->ClipYMinEntry->GetValueAsInt(),
 					this->ClipYMaxEntry->GetValueAsInt(),
 					this->ClipZMinEntry->GetValueAsInt(),
 					this->ClipZMaxEntry->GetValueAsInt());
+  
+  if (this->GetPVData() == NULL)
+    {
+    pvi = vtkPVImage::New();
+    pvi->Clone(pvApp);
+    pvi->OutlineFlagOff();
+    this->SetOutput(pvi);
+    a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+    pvi->SetAssignment(a);
+    this->GetPVData()->GetData()->
+      SetUpdateExtent(this->GetPVData()->GetData()->GetWholeExtent());
+    this->GetInput()->GetActorComposite()->VisibilityOff();
+    this->CreateDataPage();
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
+    }
+  
+//  window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
   this->ImageClip->Modified();
   this->ImageClip->Update();
   
-  window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
-  
   this->GetView()->Render();
-  
-  this->CreateDataPage();
-  
-  ac = this->GetPVData()->GetActorComposite();
-  window->GetMainView()->AddComposite(ac);
   window->GetMainView()->SetSelectedComposite(this);
+  this->GetWindow()->ResetCameraCallback();
 }

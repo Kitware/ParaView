@@ -99,7 +99,6 @@ void vtkPVPolyData::Glyph()
 
   glyph = vtkPVGlyph3D::New();
   glyph->Clone(pvApp);
-
   
   glyph->SetInput(this);
   glyph->SetScaleModeToDataScalingOff();

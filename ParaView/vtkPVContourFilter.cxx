@@ -103,9 +103,8 @@ void vtkPVContourFilter::SetInput(vtkPVData *pvData)
     }  
   
   this->GetContour()->SetInput(pvData->GetData());
+  this->Input = pvData;
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVContourFilter::SetOutput(vtkPVPolyData *pvd)
@@ -160,12 +159,14 @@ void vtkPVContourFilter::ContourValueChanged()
     this->SetOutput(pvd);
     a = window->GetPreviousSource()->GetPVData()->GetAssignment();
     pvd->SetAssignment(a);
-    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff(); 
+//    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff(); 
+    this->GetInput()->GetActorComposite()->VisibilityOff();
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
     }
   window->GetMainView()->SetSelectedComposite(this);
+
   this->GetView()->Render();
 }
 

@@ -96,6 +96,8 @@ public:
   virtual void SetName(const char *name);
   char* GetName();
 
+  vtkGetObjectMacro(Input, vtkPVData);
+  
 protected:
   vtkPVSource();
   ~vtkPVSource();

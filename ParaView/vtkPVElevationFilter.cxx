@@ -350,7 +350,8 @@ void vtkPVElevationFilter::ElevationParameterChanged()
     this->SetOutput(newData);
     a = window->GetPreviousSource()->GetPVData()->GetAssignment();
     newData->SetAssignment(a);
-    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+//    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+    this->GetInput()->GetActorComposite()->VisibilityOff();
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
@@ -358,6 +359,8 @@ void vtkPVElevationFilter::ElevationParameterChanged()
   
   this->GetView()->Render();
   window->GetMainView()->SetSelectedComposite(this);
+  
+  this->GetWindow()->ResetCameraCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -372,6 +375,7 @@ void vtkPVElevationFilter::SetInput(vtkPVData *pvData)
     }  
   
   this->GetElevation()->SetInput(pvData->GetData());
+  this->Input = pvData;
 }
 
 

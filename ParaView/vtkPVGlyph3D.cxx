@@ -115,6 +115,7 @@ void vtkPVGlyph3D::SetInput(vtkPVData *pvData)
     }  
   
   this->GetGlyph()->SetInput(pvData->GetData());
+  this->Input = pvData;
 }
 
 
@@ -198,11 +199,13 @@ void vtkPVGlyph3D::ShowGlyphSource()
   vtkPVWindow *window = 
 		vtkPVWindow::SafeDownCast(this->GetView()->GetParentWindow());
   
-  this->VisibilityOff();
+  this->GetPVData()->GetActorComposite()->VisibilityOff();
   window->SetCurrentSource(this->GlyphSource);
-  this->GlyphSource->VisibilityOn();
+  this->GlyphSource->GetPVData()->GetActorComposite()->VisibilityOn();
   this->GlyphSource->GetView()->Render();
   window->GetSourceList()->Update();
+  
+  this->GetWindow()->ResetCameraCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -227,7 +230,9 @@ void vtkPVGlyph3D::ScaleFactorChanged()
     cone = vtkPVConeSource::New();
     cone->Clone(pvApp);
     cone->SetName("glyph cone");
+    this->SetGlyphSource(cone);
     window->GetMainView()->AddComposite(cone);
+    window->SetCurrentSource(cone);
     // Accept
     coneOut = vtkPVPolyData::New();
     coneOut->Clone(pvApp);
@@ -252,13 +257,15 @@ void vtkPVGlyph3D::ScaleFactorChanged()
     this->SetOutput(pvd);
     a = window->GetPreviousSource()->GetPVData()->GetAssignment();
     pvd->SetAssignment(a);
-    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+//    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+    this->GetInput()->GetActorComposite()->VisibilityOff();
     this->CreateDataPage();
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
     }
-
+  
   window->GetMainView()->SetSelectedComposite(this);
+
   this->GetView()->Render();
 }
 

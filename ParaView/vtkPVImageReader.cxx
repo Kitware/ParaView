@@ -142,31 +142,44 @@ void vtkPVImageReader::ImageAccepted()
   vtkPVActorComposite *ac;
   vtkPVWindow *window = this->GetWindow();
   
-  image = vtkPVImage::New();
-  image->Clone(pvApp);
-  a = vtkPVAssignment::New();
-  a->Clone(pvApp);
-  a->SetOriginalImage(image);
-
   // Does not actually read.  Just sets the file name ...
   this->ReadImage();
   
-  this->SetOutput(image);
-  image->SetAssignment(a);
+  if (this->GetPVData() == NULL)
+    {
+    image = vtkPVImage::New();
+    image->Clone(pvApp);
+    a = vtkPVAssignment::New();
+    a->Clone(pvApp);
+    a->SetOriginalImage(image);
+    
+    this->SetOutput(image);
+    image->SetAssignment(a);
+    
+    this->CreateDataPage();
   
-  this->GetView()->Render();
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
+    }
   
-  this->CreateDataPage();
-  
-  ac = this->GetPVData()->GetActorComposite();
-  window->GetMainView()->AddComposite(ac);
+  if (window->GetPreviousSource() != NULL)
+    {
+    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+    }
   window->GetMainView()->SetSelectedComposite(this);
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImageReader::OpenFile()
 {
+  char *path;
+  
   // We need to figure out what to do if the image is stored in multiple files
   // (so we only need a file prefix, not a file).
   this->Script("tk_getOpenFile -title \"Open Image File\"");
+  
+  path = 
+    strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
+	   this->Application->GetMainInterp()->result);
 }

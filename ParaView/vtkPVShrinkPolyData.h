@@ -58,11 +58,11 @@ public:
   vtkGetObjectMacro(Shrink, vtkShrinkPolyData);
 
   // Description:
-  // The methods executes on all processes.
+  // The methods execute on all processes.
   void SetInput(vtkPVPolyData *pvData);
   
   // Description:
-  // The methods executes on all processes.
+  // The methods execute on all processes.
   void SetShrinkFactor(float factor);
 
 protected:
