@@ -86,6 +86,7 @@ public:
   vtkGetMacro( VolumeProID, int );
   vtkGetMacro( LowResVolumeProID, int );
 
+  vtkGetObjectMacro( RayCastMapper, vtkVolumeRayCastMapper );
   vtkGetObjectMacro( HiResTextureMapper, vtkVolumeTextureMapper2D );
   vtkGetObjectMacro( MedResTextureMapper, vtkVolumeTextureMapper2D );
   vtkGetObjectMacro( LowResTextureMapper, vtkVolumeTextureMapper2D );

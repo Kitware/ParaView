@@ -1026,6 +1026,14 @@ void vtkKWView::SetupBindings()
   this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
                wname, tname);
 
+  this->Script(
+    "bind %s <Shift-Any-ButtonPress> {%s AShiftButtonPress %%b %%x %%y}",
+    wname, tname);
+
+  this->Script(
+    "bind %s <Shift-Any-ButtonRelease> {%s AShiftButtonRelease %%b %%x %%y}",
+    wname, tname);
+
   this->Script("bind %s <B1-Motion> {%s Button1Motion %%x %%y}",
                wname, tname);
 
@@ -1035,7 +1043,13 @@ void vtkKWView::SetupBindings()
   this->Script("bind %s <B3-Motion> {%s Button3Motion %%x %%y}", 
                wname, tname);
 
-  this->Script("bind %s <Shift-B1-Motion> {%s Button2Motion %%x %%y}", 
+  this->Script("bind %s <Shift-B1-Motion> {%s ShiftButton1Motion %%x %%y}", 
+               wname, tname);
+
+  this->Script("bind %s <Shift-B2-Motion> {%s ShiftButton2Motion %%x %%y}", 
+               wname, tname);
+  
+  this->Script("bind %s <Shift-B3-Motion> {%s ShiftButton3Motion %%x %%y}", 
                wname, tname);
 
   this->Script("bind %s <KeyPress> {%s AKeyPress %%A %%x %%y}", 
@@ -1228,7 +1242,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.42 $");
+  this->ExtractRevision(os,"$Revision: 1.43 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
