@@ -20,7 +20,7 @@
 #include <vtkFloatArray.h>
 #include <vtkMath.h>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.1.2.1");
+vtkCxxRevisionMacro(vtkKdTree, "1.1.2.2");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -2508,6 +2508,8 @@ void vtkKdTree::PrintSelf(ostream& os, vtkIndent indent)
 
   //os << indent << "NumberOfUsers: " << this->NumberOfUsers << endl;
   //os << indent << "Users: " << this->Users << endl;
+  os << indent << "Level: " << this->Level << endl;
+  os << indent << "MaxLevel: " << this->MaxLevel << endl;
 
 }
 
