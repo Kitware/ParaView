@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCameraIcon.h"
 
 #include "vtkCamera.h"
+#include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkImageResample.h"
 #include "vtkKWIcon.h"
@@ -56,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.4");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVContour.h"
 
 #include "vtkContourFilter.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWFrame.h"
 #include "vtkKWMessageDialog.h"
@@ -58,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.53");
+vtkCxxRevisionMacro(vtkPVContour, "1.54");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,

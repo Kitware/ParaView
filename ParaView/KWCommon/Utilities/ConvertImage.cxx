@@ -1,4 +1,5 @@
 #include "vtkBase64Utility.h"
+#include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkPNGReader.h"
 

@@ -41,9 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWTkUtilities.h"
 
-#include "vtkObjectFactory.h"
-#include "vtkImageFlip.h"
 #include "vtkBase64Utility.h"
+#include "vtkImageData.h"
+#include "vtkImageFlip.h"
+#include "vtkObjectFactory.h"
 
 // This has to be here because on HP varargs are included in 
 // tcl.h and they have different prototypes for va_start so
@@ -57,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.10");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.11");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
