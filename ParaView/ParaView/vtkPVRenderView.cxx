@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.190");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.191");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1829,9 +1829,12 @@ void vtkPVRenderView::SetLODThresholdInternal(int threshold)
 
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    pvd = pvs->GetPVOutput();
-    // The performs the check and enables or disables decimation LOD.
-    pvd->UpdateProperties();
+    if (pvs->GetInitialized())
+      {
+      pvd = pvs->GetPVOutput();
+      // The performs the check and enables or disables decimation LOD.
+      pvd->UpdateProperties();
+      }
     }
 }
 
@@ -2236,7 +2239,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.190 $");
+  this->ExtractRevision(os,"$Revision: 1.191 $");
 }
 
 //------------------------------------------------------------------------------
