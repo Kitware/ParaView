@@ -97,6 +97,7 @@ class VTK_EXPORT vtkKWEvent
     ChangePrinterDPIEvent,
     ChangeMouseOperationsEvent,
     ChangeStandardInteractivityEvent,
+    SwitchToVolumeProEvent,
     // PV
     InitializeTraceEvent
   };

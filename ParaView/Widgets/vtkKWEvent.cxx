@@ -88,6 +88,7 @@ static const char *vtkKWEventStrings[] = {
   "ChangePrinterDPIEvent",
   "ChangeMouseOperationsEvent",
   "ChangeStandardInteractivityEvent",
+  "SwitchToVolumeProEvent",
   "InitializeTraceEvent"
 };
 
