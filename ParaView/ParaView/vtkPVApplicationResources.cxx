@@ -293,37 +293,29 @@ void vtkPVApplication::CreateSplashScreen()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::DisplayAbout(vtkKWWindow* master)
+void vtkPVApplication::ConfigureAbout()
 {
-  if ( !this->AboutDialog )
-    {
-    ostrstream str;
-    str << this->GetApplicationName() << " was developed by Kitware Inc." << endl
-        << "http://www.paraview.org" << endl
-        << "http://www.kitware.com" << endl
-        << "This is version " << this->MajorVersion << "." << this->MinorVersion
-        << ", release " << this->GetApplicationReleaseName() << ends;
+  // Configure as if it was a vtkKWApplication, so that the splash
+  // screen eventually makes its way to the dialog. We will
+  // override the text and title anyway here.
+
+  this->Superclass::ConfigureAbout();
+
+  ostrstream str, title;
+
+  str << this->GetApplicationName() << " was developed by Kitware Inc." << endl
+      << "http://www.paraview.org" << endl
+      << "http://www.kitware.com" << endl
+      << "This is version " << this->MajorVersion << "." << this->MinorVersion
+      << ", release " << this->GetApplicationReleaseName() << ends;
+
+  title << "About " << this->GetApplicationName() << ends;
     
-    char* msg = str.str();
-    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
-    dlg->SetTitle("About ParaView");
-    dlg->SetMasterWindow(master);
-    dlg->Create(this,"");
-    vtkKWLabel* label = vtkKWLabel::New();
-    label->SetParent(dlg->GetTopFrame());
-    label->Create(this,0);
-    this->Script("pack %s", label->GetWidgetName());
-    dlg->SetText(msg);
-    this->AboutDialog = dlg;
-    label->Delete();
-    delete[] msg;
-    }
+  this->AboutDialog->SetText(str.str());
+  this->AboutDialog->SetTitle(title.str());
 
-  this->AboutDialog->Invoke();  
-  this->AboutDialog->Delete();
-  this->AboutDialog = 0;
-
-  //this->SplashScreen->ShowWithBind();
+  str.rdbuf()->freeze(0);
+  title.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

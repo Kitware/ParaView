@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.213");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -313,7 +313,6 @@ vtkPVApplication::vtkPVApplication()
   this->SetApplicationReleaseName("1");
 
 
-  this->AboutDialog = 0;
   this->Display3DWidgets = 0;
   this->ProcessId = 0;
   this->RunningParaViewScript = 0;
@@ -386,11 +385,6 @@ vtkPVApplication::vtkPVApplication()
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
-  if ( this->AboutDialog )
-    {
-    this->AboutDialog->Delete();
-    this->AboutDialog = 0;
-    }
   this->SetProcessModule(NULL);
   this->SetRenderModule(NULL);
   this->SetRenderModuleName(NULL);
@@ -1416,11 +1410,6 @@ void vtkPVApplication::Exit()
   this->SetRenderModule(NULL);
   
   this->vtkKWApplication::Exit();
-  if ( this->AboutDialog )
-    {
-    this->AboutDialog->Delete();
-    this->AboutDialog = 0;
-    }
 
   this->ProcessModule->Exit();
 

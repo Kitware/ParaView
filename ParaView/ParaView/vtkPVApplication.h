@@ -196,7 +196,6 @@ public:
   // Display the on-line help and about dialog for this application.
   // Over-writing vtkKWApplication defaults.
   void DisplayHelp(vtkKWWindow* master);
-  virtual void DisplayAbout(vtkKWWindow *master);
 
   // For locating help (.chm) on Windows.
   virtual int GetApplicationKey() 
@@ -347,8 +346,10 @@ protected:
   vtkPVApplication();
   ~vtkPVApplication();
 
+  virtual void CreateSplashScreen();
+  virtual void ConfigureAbout();
+
   void CreateButtonPhotos();
-  void CreateSplashScreen();
   void CreatePhoto(char *name, 
                    unsigned char *data, 
                    int width, int height, int pixel_size, 
@@ -405,8 +406,6 @@ protected:
   int RunningParaViewScript;
   
   vtkPVOutputWindow *OutputWindow;
-
-  vtkKWMessageDialog* AboutDialog;
 
   static int CheckForArgument(int argc, char* argv[], const char* arg,
                               int& index);
