@@ -23,7 +23,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkCellArray.h"
 
-vtkCxxRevisionMacro(vtkXMLPUnstructuredGridReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLPUnstructuredGridReader, "1.2");
 vtkStandardNewMacro(vtkXMLPUnstructuredGridReader);
 
 //----------------------------------------------------------------------------
@@ -109,8 +109,12 @@ void vtkXMLPUnstructuredGridReader::SetupOutputData()
   cellTypes->SetNumberOfTuples(this->GetNumberOfCells());
   vtkCellArray* outCells = vtkCellArray::New();
   
-  output->SetCells(cellTypes, 0, outCells);
+  vtkIntArray* locations = vtkIntArray::New();
+  locations->SetNumberOfTuples(this->GetNumberOfCells());
   
+  output->SetCells(cellTypes, locations, outCells);
+  
+  locations->Delete();
   outCells->Delete();
   cellTypes->Delete();
 }
@@ -132,11 +136,31 @@ int vtkXMLPUnstructuredGridReader::ReadPieceData()
   
   vtkPointSet* ips = this->GetPieceInputAsPointSet(this->Piece);
   vtkUnstructuredGrid* input = static_cast<vtkUnstructuredGrid*>(ips);
-  vtkUnstructuredGrid* output = this->GetOutput();
+  vtkUnstructuredGrid* output = this->GetOutput();  
+  
+  // Save the start location where the new cell connectivity will be
+  // appended.
+  vtkIdType startLoc = 0;
+  if(output->GetCells()->GetData())
+    {
+    startLoc = output->GetCells()->GetData()->GetNumberOfTuples();
+    }
   
   // Copy the Cells.
   this->CopyCellArray(this->TotalNumberOfCells, input->GetCells(),
                       output->GetCells());
+  
+  // Copy the cell locations with offset adjustment.
+  vtkIntArray* inLocations = input->GetCellLocationsArray();
+  vtkIntArray* outLocations = output->GetCellLocationsArray();
+  int* inLocs = inLocations->GetPointer(0);
+  int* outLocs = outLocations->GetPointer(this->StartCell);
+  vtkIdType numCells = inLocations->GetNumberOfTuples();
+  vtkIdType i;
+  for(i=0;i < numCells; ++i)
+    {
+    outLocs[i] = inLocs[i] + startLoc;
+    }
   
   // Copy the cooresponding cell types.
   vtkUnsignedCharArray* inTypes = input->GetCellTypesArray();
