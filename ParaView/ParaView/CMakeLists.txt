@@ -23,6 +23,7 @@ vtkPVEnSightReaderInterface
 vtkPVExtentTranslator 
 vtkPVGlyph3D 
 vtkPVInputMenu 
+vtkPVLabeledToggle
 vtkPVLODActor
 vtkPVMethodInterface 
 vtkPVProbe
@@ -33,6 +34,7 @@ vtkPVSourceInterface
 vtkPVSourceInterfaceParser
 vtkPVThreshold 
 vtkPVTreeComposite 
+vtkPVWidget
 vtkPVWindow 
 vtkPVWorldPointPicker 
 vtkSimpleFieldDataToAttributeDataFilter 

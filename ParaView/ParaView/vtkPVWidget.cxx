@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkStringList.h
+  Program:   Visualization Toolkit
+  Module:    vtkPVWidget.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,55 +39,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWAssignment - An object for assigning data to processors.
-// .SECTION Description
-// A vtkStringList holds a data piece/extent specification for a process.
-// It is really just a parallel object wrapper for vtkPVExtentTranslator.
+#include "vtkPVWidget.h"
+#include "vtkObjectFactory.h"
 
-#ifndef __vtkStringList_h
-#define __vtkStringList_h
-
-#include "vtkObject.h"
-
-
-class VTK_EXPORT vtkStringList : public vtkObject
+//----------------------------------------------------------------------------
+vtkPVWidget* vtkPVWidget::New()
 {
-public:
-  static vtkStringList* New();
-  vtkTypeMacro(vtkStringList,vtkObject);
-  
-//BTX
-  // Description:
-  // Add a command and format it any way you like/
-  void AddString(const char *EventString, ...);
-//ETX
-  
-  // Description:
-  // Random access.
-  void SetString(int idx, const char *str);
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVWidget");
+  if (ret)
+    {
+    return (vtkPVWidget*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVWidget;
+}
 
-  // Description:
-  // Get the length of the list.
-  int GetLength() { return this->NumberOfStrings;}
-  
-  // Description:
-  // Get a command from its index.
-  char *GetString(int idx);
-  
-  vtkGetMacro(NumberOfStrings, int);
-  
-protected:
-  vtkStringList();
-  ~vtkStringList();
-  vtkStringList(const vtkStringList&) {};
-  void operator=(const vtkStringList&) {};
-  
-  int NumberOfStrings;
-  int StringArrayLength;
-  char **Strings;
-  void Reallocate(int num);
-  void DeleteStrings();
+vtkPVWidget::vtkPVWidget()
+{
+  this->AcceptCommands = vtkStringList::New();
+  this->ResetCommands = vtkStringList::New();
+}
 
-};
+vtkPVWidget::~vtkPVWidget()
+{
+  this->AcceptCommands->Delete();
+  this->AcceptCommands = NULL;
+  this->ResetCommands->Delete();
+  this->ResetCommands = NULL;
+}
 
-#endif
+void vtkPVWidget::SetPVSource(vtkPVSource *source)
+{
+  this->PVSource = source;
+}

@@ -76,7 +76,6 @@ vtkPVArraySelection::vtkPVArraySelection()
   this->NumberOfComponents = 1;
   this->UsePointData = 1;
   
-  this->PVSource = NULL;
   this->EntryCallback = NULL;
   this->VTKData = NULL;
 }
@@ -136,7 +135,11 @@ void vtkPVArraySelection::FillMenu()
   const char *arrayName, *defaultArrayName;
   vtkDataArray *dataArray;
 
-  if ( ! this->PVSource || ! this->EntryCallback)
+  if ( ! this->PVSource)
+    {
+    vtkErrorMacro("Must set PVSource before calling FillMenu");
+    }
+  if ( ! this->EntryCallback)
     {
     vtkErrorMacro("Must call SetCommand before FillMenu");
     return;
@@ -228,12 +231,6 @@ void vtkPVArraySelection::SetUsePointData(int val)
     }
   
   this->UsePointData = val;
-}
-
-void vtkPVArraySelection::SetPVSource(vtkPVSource *source)
-{
-  // avoiding circular reference counting
-  this->PVSource = source;
 }
 
 void vtkPVArraySelection::SetVTKData(vtkDataSet *dataSet)

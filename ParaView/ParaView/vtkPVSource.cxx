@@ -63,6 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputMenu.h"
 #include "vtkUnstructuredGridSource.h"
 #include "vtkPVArraySelection.h"
+#include "vtkPVLabeledToggle.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -1040,15 +1041,30 @@ void vtkPVSource::UpdateParameterWidgets()
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateVTKSourceParameters()
 {
-  int i;
-
+  int i, j, numStrings;
+  vtkKWWidget *widget;
+  vtkStringList *acceptCommands;
   // Call the commands to set ivars from widget values.
   for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
     {
     // This is not broadcast because the helper method takes 
     // care of the broadcast.
     this->Script(this->AcceptCommands->GetString(i));
-    }  
+    }
+  this->Widgets->InitTraversal();
+  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+    {
+    widget = this->Widgets->GetNextKWWidget();
+    if (widget->IsA("vtkPVWidget"))
+      {
+      acceptCommands = ((vtkPVWidget*)widget)->GetAcceptCommands();
+      numStrings = acceptCommands->GetNumberOfStrings();
+      for (j = 0; j < numStrings; j++)
+        {
+        this->Script(acceptCommands->GetString(j));
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1509,9 +1525,9 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
-                                                char *getCmd, char* help,
-                                                vtkKWObject *o)
+vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
+                                                  char *getCmd, char* help,
+                                                  vtkKWObject *o)
 {
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
@@ -1520,58 +1536,17 @@ vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
     tclName = o->GetTclName();
     }
 
-  // A frame to hold the other widgets.
-  vtkKWWidget *frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
-
-  // Now a label
-  if (label && label[0] != '\0')
-    {
-    vtkKWLabel *labelWidget = vtkKWLabel::New();
-    this->Widgets->AddItem(labelWidget);
-    labelWidget->SetParent(frame);
-    labelWidget->Create(this->Application, "-width 18 -justify right");
-    labelWidget->SetLabel(label);
-    if (help)
-      {
-      labelWidget->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", labelWidget->GetWidgetName());
-    labelWidget->Delete();
-    labelWidget = NULL;
-    }
+  vtkPVLabeledToggle *toggle = vtkPVLabeledToggle::New();
+  this->Widgets->AddItem(toggle);
+  toggle->SetParent(this->ParameterFrame->GetFrame());
+  toggle->SetPVSource(this);
+  toggle->Create(this->Application, label, setCmd, getCmd, help, tclName);
+  this->Script("pack %s -fill x -expand t", toggle->GetWidgetName());
   
-  // Now the check button
-  vtkKWCheckButton *check = vtkKWCheckButton::New();
-  this->Widgets->AddItem(check);
-  check->SetParent(frame);
-  check->Create(this->Application, "");
-  check->SetCommand(this, "ChangeAcceptButtonColor");
-  if (help)
-    {
-    check->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left", check->GetWidgetName());
-
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetState [%s %s]",
-                                 check->GetTclName(), tclName, getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
-          this->GetTclName(), tclName, setCmd, check->GetTclName()); 
-
-  this->Script("pack %s -side left", check->GetWidgetName());
-
-  frame->Delete();
-  check->Delete();
+  toggle->Delete();
 
   // Although it has been deleted, it did not destruct.
-  // We need to change this into a PVWidget.
-  return check;
+  return toggle;
 }  
 //----------------------------------------------------------------------------
 vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,

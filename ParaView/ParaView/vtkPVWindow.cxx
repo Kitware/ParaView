@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWCheckButton.h"
 #include "vtkPVArraySelection.h"
 #include "vtkToolkits.h"
 

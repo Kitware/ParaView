@@ -68,8 +68,8 @@ vtkPVGlyph3D::vtkPVGlyph3D()
   this->VectorModeFrame = vtkKWWidget::New();
   this->VectorModeLabel = vtkKWLabel::New();
   this->VectorModeMenu = vtkKWOptionMenu::New();
-  this->OrientCheck = vtkKWCheckButton::New();
-  this->ScaleCheck = vtkKWCheckButton::New();
+  this->OrientCheck = vtkPVLabeledToggle::New();
+  this->ScaleCheck = vtkPVLabeledToggle::New();
   this->ScaleEntry = vtkKWLabeledEntry::New();
 
   // Glyph adds too its input, so sould not replace it.
@@ -237,33 +237,21 @@ void vtkPVGlyph3D::CreateProperties()
                this->VectorModeMenu->GetWidgetName());
   
   this->OrientCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->OrientCheck->Create(pvApp, "-text Orient");
-  this->OrientCheck->SetState(1);
-  this->OrientCheck->SetCommand(this, "ChangeAcceptButtonColor");
-  this->OrientCheck->SetBalloonHelpString("Select whether to orient the glyphs");
-  
-  this->ResetCommands->AddString("%s SetState [%s GetOrient]",
-                                 this->OrientCheck->GetTclName(),
-                                 this->GetVTKSourceTclName()); 
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s SetOrient [%s GetState]",
-                                  this->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  this->OrientCheck->GetTclName());
+  this->OrientCheck->SetPVSource(this);
+  this->OrientCheck->Create(pvApp, "Orient", "SetOrient", "GetOrient",
+                            "Select whether to orient the glyphs",
+                            this->GetVTKSourceTclName());
+  this->OrientCheck->GetCheckButton()->SetState(1);
+  this->Widgets->AddItem(this->OrientCheck);
   
   this->ScaleCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ScaleCheck->Create(pvApp, "-text Scale");
-  this->ScaleCheck->SetState(1);
-  this->ScaleCheck->SetCommand(this, "ChangeAcceptButtonColor");
-  this->ScaleCheck->SetBalloonHelpString("Select whether to scale the glyphs");
+  this->ScaleCheck->SetPVSource(this);
+  this->ScaleCheck->Create(pvApp, "Scale", "SetScaling", "GetScaling",
+                           "Select whether to scale the glyphs",
+                           this->GetVTKSourceTclName());
+  this->ScaleCheck->GetCheckButton()->SetState(1);
+  this->Widgets->AddItem(this->ScaleCheck);
   
-  this->ResetCommands->AddString("%s SetState [%s GetScaling]",
-                                 this->ScaleCheck->GetTclName(),
-                                 this->GetVTKSourceTclName()); 
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s SetScaling [%s GetState]",
-                                  this->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  this->ScaleCheck->GetTclName());
-
   this->ScaleEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->ScaleEntry->Create(pvApp);
   this->ScaleEntry->SetLabel("Scale Factor:");
@@ -535,9 +523,9 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
     }
   
   *file << this->VTKSourceTclName << " SetOrient "
-        << this->OrientCheck->GetState() << "\n\t";
+        << this->OrientCheck->GetCheckButton()->GetState() << "\n\t";
   *file << this->VTKSourceTclName << " SetScaling "
-        << this->ScaleCheck->GetState() << "\n\t";
+        << this->ScaleCheck->GetCheckButton()->GetState() << "\n\t";
   *file << this->VTKSourceTclName << " SetScaleFactor "
         << this->ScaleEntry->GetValueAsFloat() << "\n\n";
   

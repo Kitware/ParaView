@@ -64,9 +64,9 @@ vtkPVContour::vtkPVContour()
   this->NewValueEntry = vtkKWEntry::New();
   this->AddValueButton = vtkKWPushButton::New();
   this->DeleteValueButton = vtkKWPushButton::New();
-  this->ComputeNormalsCheck = vtkKWCheckButton::New();
-  this->ComputeGradientsCheck = vtkKWCheckButton::New();
-  this->ComputeScalarsCheck = vtkKWCheckButton::New();
+  this->ComputeNormalsCheck = vtkPVLabeledToggle::New();
+  this->ComputeGradientsCheck = vtkPVLabeledToggle::New();
+  this->ComputeScalarsCheck = vtkPVLabeledToggle::New();
   
   this->ScalarRangeLabel = vtkKWLabel::New();
 
@@ -176,52 +176,32 @@ void vtkPVContour::CreateProperties()
   this->DeleteValueButton->SetBalloonHelpString("Remove the currently selected contour value from the list");
   
   this->ComputeNormalsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ComputeNormalsCheck->Create(pvApp, "-text \"Compute Normals\"");
-  this->ComputeNormalsCheck->SetState(1);
-  this->ComputeNormalsCheck->SetCommand(this, "ChangeAcceptButtonColor");
-  this->ComputeNormalsCheck->SetBalloonHelpString("Select whether to compute normals");
-  
-  this->ResetCommands->AddString("%s SetState [%s %s]",
-                                 this->ComputeNormalsCheck->GetTclName(),
-                                 this->GetVTKSourceTclName(),
-                                 "GetComputeNormals");
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
-                                  this->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "SetComputeNormals",
-                                  this->ComputeNormalsCheck->GetTclName());
+  this->ComputeNormalsCheck->SetPVSource(this);
+  this->ComputeNormalsCheck->Create(pvApp, "Compute Normals",
+                                    "SetComputeNormals", "GetComputeNormals",
+                                    "Select whether to compute normals",
+                                    this->GetVTKSourceTclName());
+  this->ComputeNormalsCheck->GetCheckButton()->SetState(1);
+  this->Widgets->AddItem(this->ComputeNormalsCheck);
 
   this->ComputeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ComputeGradientsCheck->Create(pvApp, "-text \"Compute Gradients\"");
-  this->ComputeGradientsCheck->SetState(0);
-  this->ComputeGradientsCheck->SetCommand(this, "ChangeAcceptButtonColor");
-  this->ComputeGradientsCheck->SetBalloonHelpString("Select whether to compute gradients");
+  this->ComputeGradientsCheck->SetPVSource(this);
+  this->ComputeGradientsCheck->Create(pvApp, "Compute Gradients",
+                                      "SetComputeGradients",
+                                      "GetComputeGradients",
+                                      "Select whether to compute gradients",
+                                      this->GetVTKSourceTclName());
+  this->ComputeGradientsCheck->GetCheckButton()->SetState(0);
+  this->Widgets->AddItem(this->ComputeGradientsCheck);
   
-  this->ResetCommands->AddString("%s SetState [%s %s]",
-                                 this->ComputeGradientsCheck->GetTclName(),
-                                 this->GetVTKSourceTclName(),
-                                 "GetComputeGradients");
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
-                                  this->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "SetComputeGradients",
-                                  this->ComputeGradientsCheck->GetTclName());
-
   this->ComputeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ComputeScalarsCheck->Create(pvApp, "-text \"Compute Scalars\"");
-  this->ComputeScalarsCheck->SetState(1);
-  this->ComputeScalarsCheck->SetCommand(this, "ChangeAcceptButtonColor");
-  this->ComputeScalarsCheck->SetBalloonHelpString("Select whether to compute scalars");
-  
-  this->ResetCommands->AddString("%s SetState [%s %s]",
-                                 this->ComputeScalarsCheck->GetTclName(),
-                                 this->GetVTKSourceTclName(),
-                                 "GetComputeScalars");
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
-                                  this->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "SetComputeScalars",
-                                  this->ComputeScalarsCheck->GetTclName());
+  this->ComputeScalarsCheck->SetPVSource(this);
+  this->ComputeScalarsCheck->Create(pvApp, "ComputeScalars",
+                                    "SetComputeScalars", "GetComputeScalars",
+                                    "Select whether to compute scalars",
+                                    this->GetVTKSourceTclName());
+  this->ComputeScalarsCheck->GetCheckButton()->SetState(1);
+  this->Widgets->AddItem(this->ComputeScalarsCheck);
 
   this->Script("pack %s %s %s %s -anchor w -padx 10",
                this->DeleteValueButton->GetWidgetName(),
@@ -459,11 +439,11 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
     }
 
   *file << this->VTKSourceTclName << " SetComputeNormals "
-        << this->ComputeNormalsCheck->GetState() << "\n\t"
+        << this->ComputeNormalsCheck->GetCheckButton()->GetState() << "\n\t"
         << this->VTKSourceTclName << " SetComputeGradients "
-        << this->ComputeGradientsCheck->GetState() << "\n\t"
+        << this->ComputeGradientsCheck->GetCheckButton()->GetState() << "\n\t"
         << this->VTKSourceTclName << " SetComputeScalars "
-        << this->ComputeScalarsCheck->GetState() << "\n\n";
+        << this->ComputeScalarsCheck->GetCheckButton()->GetState() << "\n\n";
   
   this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVSource.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWCheckButton.h"
+#include "vtkPVLabeledToggle.h"
 #include "vtkKWEntry.h"
 #include "vtkKWListBox.h"
 
@@ -100,9 +100,9 @@ protected:
   vtkKWEntry* NewValueEntry;
   vtkKWPushButton* AddValueButton;
   vtkKWPushButton* DeleteValueButton;
-  vtkKWCheckButton* ComputeNormalsCheck;
-  vtkKWCheckButton* ComputeGradientsCheck;
-  vtkKWCheckButton* ComputeScalarsCheck;
+  vtkPVLabeledToggle* ComputeNormalsCheck;
+  vtkPVLabeledToggle* ComputeGradientsCheck;
+  vtkPVLabeledToggle* ComputeScalarsCheck;
   vtkKWLabel *ScalarRangeLabel;
   
   void GetDataArrayRange(float range[2]);

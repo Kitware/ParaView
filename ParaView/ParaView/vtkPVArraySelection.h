@@ -47,18 +47,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVArraySelection_h
 #define __vtkPVArraySelection_h
 
-#include "vtkPVSource.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkDataSet.h"
 #include "vtkKWLabel.h"
+#include "vtkPVWidget.h"
 
 class vtkKWRadioButton;
 
-class VTK_EXPORT vtkPVArraySelection : public vtkKWWidget
+class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
 {
 public:
   static vtkPVArraySelection* New();
-  vtkTypeMacro(vtkPVArraySelection, vtkKWWidget);
+  vtkTypeMacro(vtkPVArraySelection, vtkPVWidget);
   
   // Description:
   // Create a Tk widget
@@ -69,12 +69,6 @@ public:
   // Defaults to 1.
   vtkSetMacro(NumberOfComponents, int);
   vtkGetMacro(NumberOfComponents, int);
-
-  // Description:
-  // Set the vtkPVSource to get the data arrays from and to call the
-  // MenuEntryCommand on
-  void SetPVSource(vtkPVSource *source);
-  vtkGetObjectMacro(PVSource, vtkPVSource);
 
   // Description:
   // If the vtkPVSource does not have PVInputs (e.g., vtkPVProbe), set
@@ -117,7 +111,6 @@ protected:
   int NumberOfComponents;
   int UsePointData;
   
-  vtkPVSource *PVSource;
   char *EntryCallback;
   vtkDataSet *VTKData;
   

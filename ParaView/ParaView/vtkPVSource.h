@@ -59,7 +59,7 @@ class vtkSource;
 class vtkPVData;
 class vtkPVWindow;
 class vtkStringList;
-class vtkKWCheckButton;
+class vtkPVLabeledToggle;
 class vtkKWScale;
 class vtkKWEntry;
 class vtkPVSelectionList;
@@ -220,8 +220,9 @@ public:
   // Description:
   // Special widget controls (not entries).
   // The methods are called on the object (VTKSource if o=NULL).
-  vtkKWCheckButton *AddLabeledToggle(char *label, char *setCmd, char *getCmd,
-                                     char* help, vtkKWObject *o = NULL);
+  vtkPVLabeledToggle *AddLabeledToggle(char *label, char *setCmd,
+                                       char *getCmd, char* help,
+                                       vtkKWObject *o = NULL);
   vtkKWScale *AddScale(char *label, char *setCmd, char *getCmd, 
                        float min, float max, float resolution,
                        char* help, vtkKWObject *o = NULL);
@@ -330,12 +331,8 @@ protected:
   vtkPVInputMenu *InputMenu;
   vtkKWLabel *InputMenuLabel;
   vtkKWWidget *InputMenuFrame;
-//  vtkKWOptionMenu *ScalarOperationMenu;
-//  vtkKWLabel *ScalarOperationLabel;
   vtkKWWidget *ScalarOperationFrame;
   vtkPVArraySelection *ScalarOperationMenu;
-//  vtkKWOptionMenu *VectorOperationMenu;
-//  vtkKWLabel *VectorOperationLabel;
   vtkKWWidget *VectorOperationFrame;
   vtkPVArraySelection *VectorOperationMenu;
   vtkKWLabel *DisplayNameLabel;

@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkStringList.h
+  Program:   Visualization Toolkit
+  Module:    vtkPVLabeledToggle.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,55 +39,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWAssignment - An object for assigning data to processors.
+// .NAME vtkPVLabeledToggle -
 // .SECTION Description
-// A vtkStringList holds a data piece/extent specification for a process.
-// It is really just a parallel object wrapper for vtkPVExtentTranslator.
 
-#ifndef __vtkStringList_h
-#define __vtkStringList_h
+#ifndef __vtkPVLabeledToggle_h
+#define __vtkPVLabeledToggle_h
 
-#include "vtkObject.h"
+#include "vtkPVWidget.h"
+#include "vtkKWApplication.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWLabel.h"
 
-
-class VTK_EXPORT vtkStringList : public vtkObject
+class VTK_EXPORT vtkPVLabeledToggle : public vtkPVWidget
 {
 public:
-  static vtkStringList* New();
-  vtkTypeMacro(vtkStringList,vtkObject);
-  
-//BTX
-  // Description:
-  // Add a command and format it any way you like/
-  void AddString(const char *EventString, ...);
-//ETX
-  
-  // Description:
-  // Random access.
-  void SetString(int idx, const char *str);
+  static vtkPVLabeledToggle* New();
+  vtkTypeMacro(vtkPVLabeledToggle, vtkPVWidget);
 
-  // Description:
-  // Get the length of the list.
-  int GetLength() { return this->NumberOfStrings;}
+  void Create(vtkKWApplication *pvApp, char *label, char *setCmd,
+              char *getCmd, char *help, const char *tclName);
   
-  // Description:
-  // Get a command from its index.
-  char *GetString(int idx);
-  
-  vtkGetMacro(NumberOfStrings, int);
+  vtkGetObjectMacro(Label, vtkKWLabel);
+  vtkGetObjectMacro(CheckButton, vtkKWCheckButton);
   
 protected:
-  vtkStringList();
-  ~vtkStringList();
-  vtkStringList(const vtkStringList&) {};
-  void operator=(const vtkStringList&) {};
+  vtkPVLabeledToggle();
+  ~vtkPVLabeledToggle();
+  vtkPVLabeledToggle(const vtkPVLabeledToggle&) {};
+  void operator=(const vtkPVLabeledToggle&) {};
   
-  int NumberOfStrings;
-  int StringArrayLength;
-  char **Strings;
-  void Reallocate(int num);
-  void DeleteStrings();
-
+  vtkKWLabel *Label;
+  vtkKWCheckButton *CheckButton;
 };
 
 #endif

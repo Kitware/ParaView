@@ -56,6 +56,7 @@ class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
 class vtkKWPushButton;
+class vtkKWCheckButton;
 class vtkKWInteractor;
 class vtkPVAnimationInterface;
 class vtkKWRotateCameraInteractor;

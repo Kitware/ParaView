@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkKWLabel.h"
 #include "vtkPVInputMenu.h"
-#include "vtkKWCheckButton.h"
+#include "vtkPVLabeledToggle.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkGlyph3D.h"
 
@@ -118,8 +118,8 @@ protected:
   vtkKWWidget *VectorModeFrame;
   vtkKWLabel *VectorModeLabel;
   vtkKWOptionMenu *VectorModeMenu;
-  vtkKWCheckButton *OrientCheck;
-  vtkKWCheckButton *ScaleCheck;
+  vtkPVLabeledToggle *OrientCheck;
+  vtkPVLabeledToggle *ScaleCheck;
   vtkKWLabeledEntry *ScaleEntry;
 };
 
