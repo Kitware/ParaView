@@ -148,10 +148,15 @@ public:
   // GetLimitedEditionModeAndWarn will return the limited edition mode ; if 
   // the mode is true, it will also display a popup warning stating that a
   // feature (string parameter) is not available in this mode.
+  // Also set/Get the name of the Limited Edition Mode, as displayed in the
+  // GUI or after the application name in the title bar 
+  // (default to: limited edition). 
   virtual void SetLimitedEditionMode(int arg);
   vtkBooleanMacro(LimitedEditionMode, int);
   vtkGetMacro(LimitedEditionMode, int);
   virtual int GetLimitedEditionModeAndWarn(const char *feature);
+  vtkSetStringMacro(LimitedEditionModeName);
+  vtkGetStringMacro(LimitedEditionModeName);
 
   // Description:
   // Set/Get the directory in which the current application is supposed
@@ -377,6 +382,7 @@ protected:
 
   int ExitStatus;
   int LimitedEditionMode;
+  char *LimitedEditionModeName;
 
   ofstream *TraceFile;
 

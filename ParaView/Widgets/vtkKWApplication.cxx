@@ -82,7 +82,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.141");
+vtkCxxRevisionMacro(vtkKWApplication, "1.142");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -103,6 +103,9 @@ vtkKWApplication::vtkKWApplication()
   this->ApplicationReleaseName = vtkString::Duplicate("unknown");
   this->ApplicationPrettyName = NULL;
   this->ApplicationInstallationDirectory = NULL;
+
+  this->LimitedEditionModeName = NULL;
+  this->SetLimitedEditionModeName("limited edition");
 
   this->InExit = 0;
   this->DialogUp = 0;
@@ -188,6 +191,7 @@ vtkKWApplication::vtkKWApplication()
 //----------------------------------------------------------------------------
 vtkKWApplication::~vtkKWApplication()
 {
+  this->SetLimitedEditionModeName(NULL);
   this->SetBalloonHelpPending(NULL);
 
   if (this->BalloonHelpWindow)
@@ -1423,12 +1427,14 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
       }
     feature_str << ends;
 
+    const char *lem_name = this->GetLimitedEditionModeName() 
+      ? this->GetLimitedEditionModeName() : "limited edition";
+
     ostrstream msg_str;
     msg_str << this->GetApplicationName() 
-            << " is running in Limited Edition Mode. "
+            << " is running in " << lem_name << " mode. "
             << "The feature you are trying to use" << feature_str.str() 
             << " is not available in this mode. "
-            << "You may consider acquiring the Full Version to unlock it."
             << ends;
 
     vtkKWMessageDialog::PopupMessage(
@@ -1447,9 +1453,16 @@ const char* vtkKWApplication::GetApplicationPrettyName()
 {
   ostrstream pretty_str;
   pretty_str << (this->ApplicationName ? this->ApplicationName : "")
-             << " " << this->MajorVersion << "." << this->MinorVersion
-             << (this->LimitedEditionMode ? " LE" : "")
-             << ends;
+             << " " << this->MajorVersion << "." << this->MinorVersion;
+  if (this->LimitedEditionMode)
+    {
+    const char *lem_name = this->GetLimitedEditionModeName() 
+      ? this->GetLimitedEditionModeName() : "limited edition";
+    char *upfirst = vtkString::Duplicate(lem_name);
+    pretty_str << " " << vtkString::ToUpperFirst(upfirst);
+    delete [] upfirst;
+    }
+  pretty_str << ends;
 
   this->SetApplicationPrettyName(pretty_str.str());
   pretty_str.rdbuf()->freeze(0);
@@ -1581,4 +1594,7 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LimitedEditionMode: " 
      << (this->LimitedEditionMode ? "On" : "Off") << endl;
   os << indent << "CharacterEncoding: " << this->CharacterEncoding << "\n";
+  os << indent << "LimitedEditionModeName: " 
+     << (this->LimitedEditionModeName ? this->LimitedEditionModeName
+         : "None") << endl;
 }
