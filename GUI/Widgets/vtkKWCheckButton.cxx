@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.29");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -127,6 +127,12 @@ void vtkKWCheckButton::SetState(int s)
 {
   if (this->IsCreated())
     {
+    int was_disabled = !this->Enabled;
+    if (was_disabled)
+      {
+      this->SetEnabled(1);
+      }
+
     if (s)
       {
       this->Script("%s select",this->GetWidgetName());
@@ -134,6 +140,11 @@ void vtkKWCheckButton::SetState(int s)
     else
       {
       this->Script("%s deselect",this->GetWidgetName());
+      }
+
+    if (was_disabled)
+      {
+      this->SetEnabled(0);
       }
     }
 }
