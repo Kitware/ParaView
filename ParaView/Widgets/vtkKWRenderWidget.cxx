@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.35");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.36");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -884,15 +884,18 @@ void vtkKWRenderWidget::SerializeSelf(ostream& os, vtkIndent indent)
 
   if (this->GetHeaderAnnotationText())
     {
-    os << indent << "HeaderAnnotationText " 
-       << this->GetHeaderAnnotationText() << endl;
+    os << indent << "HeaderAnnotationText ";
+    vtkKWSerializer::WriteSafeString(os, this->GetHeaderAnnotationText());
+    os << endl;
     }
 
   // Units
 
   if (this->GetUnits())
     {
-    os << indent << "Units " << this->GetUnits() << endl;
+    os << indent << "Units ";
+    vtkKWSerializer::WriteSafeString(os, this->GetUnits());
+    os << endl;
     }
 
   // Camera
@@ -969,8 +972,7 @@ void vtkKWRenderWidget::SerializeToken(istream& is, const char token[1024])
   if (!strcmp(token, "HeaderAnnotationText"))
     {
     buffer[0] = '\0';
-    vtkKWSerializer::EatWhiteSpace(&is);
-    is.getline(buffer, 1024);
+    vtkKWSerializer::GetNextToken(&is, buffer);
     this->SetHeaderAnnotationText(buffer);
     return;
     }
@@ -980,8 +982,7 @@ void vtkKWRenderWidget::SerializeToken(istream& is, const char token[1024])
   if (!strcmp(token, "Units"))
     {
     buffer[0] = '\0';
-    vtkKWSerializer::EatWhiteSpace(&is);
-    is.getline(buffer, 1024);
+    vtkKWSerializer::GetNextToken(&is, buffer);
     this->SetUnits(buffer);
     return;
     }
@@ -1069,7 +1070,7 @@ void vtkKWRenderWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os, indent);
   os << indent << "vtkKWRenderWidget ";
-  this->ExtractRevision(os, "$Revision: 1.35 $");
+  this->ExtractRevision(os, "$Revision: 1.36 $");
 }
 
 //----------------------------------------------------------------------------
