@@ -84,10 +84,10 @@ public:
   void InsertCommand(int position, const char* label, vtkKWObject* Object,
 		     const char* MethodAndArgString );
   
-  char* CreateRadioButtonVar(vtkKWObject* Object, const char* varname);
+  char* CreateRadioButtonVariable(vtkKWObject* Object, const char* varname);
   
-  void InsertRadioButton(int value, int position, const char* label, const char* buttonVar, 
-			 vtkKWObject* Called, 
+  void InsertRadioButton(int position, int value, const char* label, 
+                         const char* buttonVar, vtkKWObject* Called, 
 			 const char* MethodAndArgString);
   void Invoke(int position);
   void DeleteMenuItem(int position);

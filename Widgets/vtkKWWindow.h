@@ -111,8 +111,10 @@ public:
   // Add to the menu a list of recently used files. Specify a key,
   // which if it is null it will just use the classname. The command
   // is the command to execute when a file is selected.
-  virtual void AddRecentFilesToMenu(char *key, char *command);
-  virtual void AddRecentFile(char *key, char *name, char *command);
+  virtual void AddRecentFilesToMenu(char *key, vtkKWObject *target, 
+                                    const char *command);
+  virtual void AddRecentFile(char *key, char *name, vtkKWObject *target,
+                             const char *command);
   
   // Description:
   // Return the index of the entry above the MRU File list

@@ -2665,7 +2665,8 @@ void ReadAValue(HKEY hKey,char *val,char *key, char *adefault)
 }
 #endif
 
-void vtkKWWindow::AddRecentFilesToMenu(char *key, char *command)
+void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target, 
+                                       const char *command)
 {
 #ifdef _WIN32
   int i;
@@ -2692,18 +2693,19 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, char *command)
     {
     char File[1024];
     
-    this->Script( "%s insert [expr [%s index Close] -1] separator",
-                  this->GetMenuFile()->GetWidgetName(), 
-                  this->GetMenuFile()->GetWidgetName());
+    this->GetMenuFile()->InsertSeparator(
+      this->GetMenuFile()->GetIndex("Close") - 1);
+
     for (i = 0; i < 4; i++)
       {
       ReadAValue(hKey, File,KeyName[i],"");
       if (strlen(File) > 1)
         {
-        this->Script("%s insert [expr [%s index Close] -1] command -label {%s} -command {%s {%s}}",
-                     this->GetMenuFile()->GetWidgetName(), 
-                     this->GetMenuFile()->GetWidgetName(), 
-                     File, command, File);
+        char cmd[1024];
+        sprintf(cmd,"%s %s",command, File);
+        this->GetMenuFile()->InsertCommand(
+          this->GetMenuFile()->GetIndex("Close") - 1,
+          File, target, cmd);
         this->NumberOfMRUFiles++;
         }    
       }
@@ -2713,7 +2715,8 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, char *command)
 #endif
 }
 
-void vtkKWWindow::AddRecentFile(char *key, char *name,char *command)
+void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
+                                const char *command)
 {
 #ifdef _WIN32
   char fkey[1024];
@@ -2750,18 +2753,16 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,char *command)
     // if this is the first addition
     if (!this->NumberOfMRUFiles)
       {
-      this->Script( "%s insert [expr [%s index Close] -1] separator",
-                    this->GetMenuFile()->GetWidgetName(), 
-                    this->GetMenuFile()->GetWidgetName());
+      this->GetMenuFile()->InsertSeparator(
+        this->GetMenuFile()->GetIndex("Close") - 1);
       }
     
     // remove the old entry number 4
     ReadAValue(hKey, File,"File4","");
     if (strlen(File) > 1)
       {
-      this->Script("%s delete [expr [%s index Close] -2]",
-                   this->GetMenuFile()->GetWidgetName(),
-                   this->GetMenuFile()->GetWidgetName());
+      this->GetMenuFile()->DeleteMenuItem(
+        this->GetMenuFile()->GetIndex("Close") - 2);
       this->NumberOfMRUFiles--;
       }
     
@@ -2783,18 +2784,17 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,char *command)
     // add the new entry
     if (strlen(File) > 1)
       {
-      this->Script(
-        "%s insert %d command -label {%s} -command {%s {%s}}",
-        this->GetMenuFile()->GetWidgetName(),
-        this->GetFileMenuIndex() + 2,name, command, name);
+      char cmd[1024];
+      sprintf(cmd,"%s %s",command, File);
+      this->GetMenuFile()->InsertCommand(
+        this->GetFileMenuIndex()+2,name,target,cmd);
       }
     else
       {
-      this->Script(
-        "%s insert [expr [%s index Close] -1] command -label {%s} -command {%s {%s}}",
-        this->GetMenuFile()->GetWidgetName(), 
-        this->GetMenuFile()->GetWidgetName(), 
-        name, command, name);
+      char cmd[1024];
+      sprintf(cmd,"%s %s",command, File);
+      this->GetMenuFile()->InsertCommand(
+        this->GetMenuFile()->GetIndex("Close")-1,name,target,cmd);
       }
     }
   RegCloseKey(hKey);
@@ -2805,9 +2805,7 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,char *command)
 int vtkKWWindow::GetFileMenuIndex()
 {
   // first find Close
-  this->Script("%s index Close",this->GetMenuFile()->GetWidgetName());
-  int clidx = vtkKWObject::GetIntegerResult(this->Application);
-  
+  int clidx = this->GetMenuFile()->GetIndex("Close");  
   if (this->NumberOfMRUFiles > 0)
     {
     return clidx - this->NumberOfMRUFiles - 2;

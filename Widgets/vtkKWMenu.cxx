@@ -171,7 +171,8 @@ void vtkKWMenu::InsertCommand(int position, const char* label, vtkKWObject* Obje
 		      MethodAndArgString, NULL);
 }
 
-char* vtkKWMenu::CreateRadioButtonVar(vtkKWObject* Object, const char* varname)
+char* vtkKWMenu::CreateRadioButtonVariable(vtkKWObject* Object, 
+                                           const char* varname)
 {
   ostrstream str;
   str << Object->GetTclName() << varname << ends;
@@ -190,8 +191,8 @@ void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonV
 }
 
 
-void vtkKWMenu::InsertRadioButton(int value, 
-				  int position, const char* label, const char* buttonVar, 
+void vtkKWMenu::InsertRadioButton(int position, int value, const char* label, 
+                                  const char* buttonVar, 
 				  vtkKWObject* Object, 
 				  const char* MethodAndArgString)
 {
