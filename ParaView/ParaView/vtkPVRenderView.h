@@ -222,13 +222,6 @@ public:
   vtkPVWindow *GetPVWindow();
 
   // Description:
-  // Used to temporarily disable rendering. Useful for collecting a few
-  // renders and flusing them out at the end with one render
-  vtkSetMacro(DisableRenderingFlag, int);
-  vtkGetMacro(DisableRenderingFlag, int);
-  vtkBooleanMacro(DisableRenderingFlag, int);
-
-  // Description:
   // Get the widget that controls the interactor styles.
   vtkGetObjectMacro(ManipulatorControl3D, vtkPVInteractorStyleControl);
   vtkGetObjectMacro(ManipulatorControl2D, vtkPVInteractorStyleControl);
@@ -335,9 +328,6 @@ protected:
 
   vtkPVInteractorStyleControl *ManipulatorControl2D;
   vtkPVInteractorStyleControl *ManipulatorControl3D;
-
-  int DisableRenderingFlag;
-
 
   // Camera icons
   vtkKWLabeledFrame* CameraIconsFrame;

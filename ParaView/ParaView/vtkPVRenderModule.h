@@ -85,7 +85,6 @@ public:
   // Used in ResetCamera() and ResetCameraClippingRange()
   void ComputeVisiblePropBounds( float bounds[6] ); 
   
-
   // Description:
   // This method is executed in all processes.
   void AddPVSource(vtkPVSource *pvs);
@@ -104,7 +103,7 @@ public:
   // My version.
   vtkRenderer *GetRenderer();
   vtkRenderWindow *GetRenderWindow();
-  const char *GetRenderWindowTclName() {return this->RenderWindowTclName;}
+  //const char *GetRenderWindowTclName() {return this->RenderWindowTclName;}
 
   // Description:
   // Change the background color.
@@ -112,13 +111,10 @@ public:
   virtual void SetBackgroundColor(float *c) {this->SetBackgroundColor(c[0],c[1],c[2]);}
 
   // Description:
-  // Get the tcl name of the renderer.
+  // These are still used in a couple of cases (cube axes ...)
+  // They will eventually be removed.
   vtkGetStringMacro(RendererTclName);
-    
-  // Description:
-  // The render view keeps track of these times but does not use them.
-  vtkGetMacro(StillRenderTime, double);
-  vtkGetMacro(InteractiveRenderTime, double);
+  vtkGetStringMacro(RenderWindowTclName);
   
   // Description:
   // Callback for the triangle strips check button
@@ -132,17 +128,6 @@ public:
   // Change between parallel or perspective camera.
   // Since this is a camera manipulation, it does not have to be here.
   void SetUseParallelProjection(int val);
-
-  // Description:
-  // Used to temporarily disable rendering. Useful for collecting a few
-  // renders and flusing them out at the end with one render
-  vtkSetMacro(DisableRenderingFlag, int);
-  vtkGetMacro(DisableRenderingFlag, int);
-  vtkBooleanMacro(DisableRenderingFlag, int);
-
-  // Description:
-  // Get the size of the render window.
-  int* GetRenderWindowSize();
 
   // Description:
   // Controls whether the render module invokes abort check events.

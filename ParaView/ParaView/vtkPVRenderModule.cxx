@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.8");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.9");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -100,8 +100,6 @@ vtkPVRenderModule::vtkPVRenderModule()
   this->StillRenderTime          = 0;
 
   this->ResetCameraClippingRangeTag = 0;
-
-  this->DisableRenderingFlag = 0;
 
   this->RenderInterruptsEnabled = 1;
 
@@ -208,6 +206,12 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   
   this->RenderWindow = 
     (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
+
+  if (pvApp->GetUseStereoRendering())
+    {
+    this->RenderWindow->StereoCapableWindowOn();
+    this->RenderWindow->StereoRenderOn();
+    }
 
   this->SetRenderWindowTclName("RenWin1");
   
@@ -484,28 +488,16 @@ void vtkPVRenderModule::SetUseImmediateMode(int val)
     }
 }
 
-//----------------------------------------------------------------------------
-int* vtkPVRenderModule::GetRenderWindowSize()
-{
-  if ( this->GetRenderWindow() )
-    {
-    return this->GetRenderWindow()->GetSize();
-    }
-  return 0;
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "InteractiveRenderTime: " 
-     << this->GetInteractiveRenderTime() << endl;
+     << this->InteractiveRenderTime << endl;
   os << indent << "RendererTclName: " 
      << (this->GetRendererTclName()?this->GetRendererTclName():"<none>") << endl;
-  os << indent << "StillRenderTime: " << this->GetStillRenderTime() << endl;
-  os << indent << "DisableRenderingFlag: " 
-     << (this->DisableRenderingFlag ? "on" : "off") << endl;
+  os << indent << "StillRenderTime: " << this->StillRenderTime << endl;
   os << indent << "RenderInterruptsEnabled: " 
      << (this->RenderInterruptsEnabled ? "on" : "off") << endl;
 

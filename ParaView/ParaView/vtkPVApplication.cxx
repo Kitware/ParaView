@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.196");
+vtkCxxRevisionMacro(vtkPVApplication, "1.197");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -325,6 +325,7 @@ vtkPVApplication::vtkPVApplication()
   this->Username = 0;
   this->UseSoftwareRendering = 0;
   this->UseSatelliteSoftware = 0;
+  this->UseStereoRendering = 0;
   this->StartEmpty = 0;
   this->PlayDemo = 0;
 
@@ -553,6 +554,10 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Tell the client what username to send to server when establishing SSH connection.",
   "--port", "",
   "Specify the port client and server will use (--port=11111).  Client and servers ports must match.", 
+  "--stereo", "",
+  "Tell the application to enable stero rendering (only when running on a single process).",
+  "--render-module-name", "",
+  "User specified rendering module (--render-module-name=...)",
   "--start-empty" , "-e", 
   "Start ParaView without any default modules.", 
   "--disable-registry", "-dr", 
@@ -825,6 +830,12 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->RegisteryLevel = 0;
     }
 
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--stereo",
+                                          index) == VTK_OK)
+    {
+    this->UseStereoRendering = 1;
+    }
+
 #ifdef VTK_USE_MPI
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-rendering-group",
                                           index) == VTK_OK ||
@@ -972,6 +983,22 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->StartEmpty = 1;
     }
 
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-module",
+                                            index) == VTK_OK)
+    {
+    // Strip string to equals sign.
+    const char* newarg=0;
+    int len = (int)(strlen(argv[index]));
+    for (int i=0; i<len; i++)
+      {
+      if (argv[index][i] == '=')
+        {
+        newarg = &(argv[index][i+1]);
+        }
+      }
+    this->SetRenderModuleName(newarg);
+    }
+    
 #ifdef VTK_USE_MANGLED_MESA
   
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
@@ -1717,6 +1744,9 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "TileDimensions: " << this->TileDimensions[0]
        << ", " << this->TileDimensions[1] << endl;
     }
+
+  os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
+  os << indent << "RenderModuleName: " << this->RenderModuleName << endl;
 
   if (this->ClientMode)
     {

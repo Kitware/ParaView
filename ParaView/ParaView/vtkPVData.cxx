@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.203");
+vtkCxxRevisionMacro(vtkPVData, "1.204");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1911,11 +1911,10 @@ void vtkPVData::CenterCamera()
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
-    // Why do I broadcast here?  It should not be necessary.
-    pvApp->BroadcastScript("%s ResetCamera %f %f %f %f %f %f",
-                           tclName, bounds[0], bounds[1], bounds[2],
-                           bounds[3], bounds[4], bounds[5]);
-    pvApp->BroadcastScript("%s ResetCameraClippingRange", tclName);
+    pvApp->Script("%s ResetCamera %f %f %f %f %f %f",
+                  tclName, bounds[0], bounds[1], bounds[2],
+                  bounds[3], bounds[4], bounds[5]);
+    pvApp->Script("%s ResetCameraClippingRange", tclName);
     if ( this->GetPVRenderView() )
       {
       this->GetPVRenderView()->EventuallyRender();
@@ -2906,7 +2905,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.203 $");
+  this->ExtractRevision(os,"$Revision: 1.204 $");
 }
 
 //----------------------------------------------------------------------------

@@ -112,7 +112,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.254");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.255");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -197,7 +197,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->ManipulatorControl3D = vtkPVInteractorStyleControl::New();
   this->ManipulatorControl3D->SetRegisteryName("3D");
 
-  this->DisableRenderingFlag = 0;
   this->NavigationFrame = vtkKWLabeledFrame::New();
   this->NavigationWindow = vtkPVNavigationWindow::New();
   this->SelectionWindow = vtkPVSourceList::New();
@@ -1288,11 +1287,6 @@ void vtkPVRenderView::UpdateTclButAvoidRendering()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRender()
 {
-  if (this->DisableRenderingFlag)
-    {
-    return;
-    }
-
   if (this->EventuallyRenderFlag)
     {
     return;
@@ -1610,7 +1604,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.254 $");
+  this->ExtractRevision(os,"$Revision: 1.255 $");
 }
 
 //------------------------------------------------------------------------------
@@ -1760,8 +1754,6 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetNavigationFrame() << endl;
   os << indent << "TriangleStripsCheck: " 
      << this->GetTriangleStripsCheck() << endl;
-  os << indent << "DisableRenderingFlag: " 
-     << (this->DisableRenderingFlag ? "on" : "off") << endl;
   os << indent << "ManipulatorControl2D: " 
      << this->ManipulatorControl2D << endl;
   os << indent << "ManipulatorControl3D: " 

@@ -93,8 +93,6 @@ public:
   // RenderingModule has the rendering abstraction.  
   // It creates the render window and any composit manager.  
   // It also creates part displays which handle level of details.
-  vtkSetStringMacro(RenderModuleName);
-  vtkGetStringMacro(RenderModuleName);
   void SetRenderModule(vtkPVRenderModule *module);
   vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
 
@@ -289,6 +287,12 @@ public:
   vtkGetMacro(Port,int);
 
   // Description:
+  // Variable set by command line arguments --client or -c
+  // Client mode tries to connect to a server through a socket.
+  // The client does not have any local partitioned data.
+  vtkGetMacro(UseStereoRendering,int);
+
+  // Description:
   // Set by the command line arguments --use-software-rendering or -r
   // Requires ParaView is linked with mangled mesa.
   // Supports off screen rendering.
@@ -312,6 +316,11 @@ public:
   // All processes have this set to the same value.
   vtkSetMacro(NumberOfPipes, int);
   vtkGetMacro(NumberOfPipes, int);
+
+  // Description:
+  // This root class name will eventually be replaced
+  // with an XML specification of rendering module classes.
+  vtkGetStringMacro(RenderModuleName);
 
   // Description:
   // This is used (Unix only) to obtain the path of the executable.
@@ -350,6 +359,7 @@ protected:
   vtkPVProcessModule *ProcessModule;
   vtkPVRenderModule *RenderModule;
   char* RenderModuleName;
+  vtkSetStringMacro(RenderModuleName);
 
   // For running with SGI pipes.
   int NumberOfPipes;
@@ -376,6 +386,7 @@ protected:
   int Port;
   int UseSoftwareRendering;
   int UseSatelliteSoftware;
+  int UseStereoRendering;
   int StartEmpty;
   int PlayDemo;
   int UseRenderingGroup;
