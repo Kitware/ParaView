@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.4");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.5");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -140,14 +140,23 @@ void vtkMPIMoveData::Execute()
   vtkDataSet* input = this->GetInput();
   vtkDataSet* output = this->GetOutput();
 
-  // Special case: client and no data server.
+  // Duplicate with everything running on one MPIgroup (including single process).
+  // GatherAll.  Allthough we do not support tiled display without client server,
+  // this case is used for picking and plotting.
   if (this->Server == -1 || 
       (this->Server == 0 && this->ClientDataServerSocketController == 0))
     {
-    if (input)
-      {
-      output->ShallowCopy(input);
-      }
+    this->DataServerGatherAll(input, output);
+    return;
+    }
+
+  // PassThrough with everything running on one MPIgroup (including single process).
+  // This is used for composite rendering.
+  // Just copy.  
+  if (this->Server == -1 || 
+      (this->Server == 0 && this->ClientDataServerSocketController == 0))
+    {
+    output->ShallowCopy(input);
     return;
     }
 
@@ -310,11 +319,18 @@ void vtkMPIMoveData::DataServerAllToN(vtkDataSet* inData,
 
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::DataServerGatherAll(vtkDataSet* input, 
-                                          vtkDataSet* output)
+                                         vtkDataSet* output)
 {
-#ifdef VTK_USE_MPI
   int idx;
   int numProcs= this->Controller->GetNumberOfProcesses();
+
+  if (numProcs <= 1)
+    {
+    output->ShallowCopy(input);
+    return;
+    }
+
+#ifdef VTK_USE_MPI
   vtkMPICommunicator* com = vtkMPICommunicator::SafeDownCast(
                                          this->Controller->GetCommunicator()); 
 
