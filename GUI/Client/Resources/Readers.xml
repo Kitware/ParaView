@@ -216,6 +216,7 @@
     <Source class="vtkAMRSpyPlotReader"/>
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
+           display_entry="1" display_value="0"
            help="Set the current timestep."/>
   </Module>
   <Module name="plyreader"
