@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWBWidgets.h"
 #include "vtkKWDirectoryUtilities.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
@@ -86,7 +87,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.146");
+vtkCxxRevisionMacro(vtkKWApplication, "1.147");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1115,10 +1116,13 @@ void vtkKWApplication::ConfigureAbout()
                    this->AboutDialogImage->GetWidgetName(), img_name);
       this->Script("pack %s -side top", 
                    this->AboutDialogImage->GetWidgetName());
-      int width = vtkKWTkUtilities::GetPhotoWidth(this->MainInterp, img_name);
-      if (width > this->AboutDialog->GetTextWidth())
+      int w = vtkKWTkUtilities::GetPhotoWidth(this->MainInterp, img_name);
+      int h = vtkKWTkUtilities::GetPhotoHeight(this->MainInterp, img_name);
+      this->AboutDialog->GetTopFrame()->SetWidth(w);
+      this->AboutDialog->GetTopFrame()->SetHeight(h);
+      if (w > this->AboutDialog->GetTextWidth())
         {
-        this->AboutDialog->SetTextWidth(width);
+        this->AboutDialog->SetTextWidth(w);
         }
       }
     }
