@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkPVContour.h
+  Program:   Visualization Toolkit
+  Module:    vtkPVScalarRangeLabel.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,42 +39,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVContour - A class to handle the UI for vtkContour
+// .NAME vtkPVScalarRangeLabel - Shows the scalar range of and array.
 // .SECTION Description
+// This label gets an array from an array menu, and shows its scalar range.
+// It shows nothing right now if the array has more than one component.
 
 
-#ifndef __vtkPVContour_h
-#define __vtkPVContour_h
+#ifndef __vtkPVScalarRangeLabel_h
+#define __vtkPVScalarRangeLabel_h
 
-#include "vtkPVSource.h"
-class vtkPVArrayMenu;
+#include "vtkPVWidget.h"
+#include "vtkPVArrayMenu.h"
+#include "vtkKWLabeledFrame.h"
 
-class VTK_EXPORT vtkPVContour : public vtkPVSource
+class vtkKWApplication;
+
+class VTK_EXPORT vtkPVScalarRangeLabel : public vtkPVWidget
 {
 public:
-  static vtkPVContour* New();
-  vtkTypeMacro(vtkPVContour, vtkPVSource);
-    
-  // Description:
-  // Set up the UI for this source
-  void CreateProperties();
-  
-  // Description:
-  // Save this source to a file.
-  void SaveInTclScript(ofstream* file);
+  static vtkPVScalarRangeLabel* New();
+  vtkTypeMacro(vtkPVScalarRangeLabel, vtkPVWidget);
 
   // Description:
-  // This does the same thing as the superclass, but also
-  // checks fopr scalars.
-  virtual void SetPVInput(vtkPVData* input);
-  
+  // Create a Tk widget
+  void Create(vtkKWApplication *app);
+
+  // Description:
+  // The scalar range display gets its array object from the array menu.
+  // This is not reference counted because we want to avoid reference loops.
+  void SetArrayMenu(vtkPVArrayMenu *aMenu) {this->ArrayMenu = aMenu;}
+  vtkGetObjectMacro(ArrayMenu, vtkPVArrayMenu);
+
+  // Description:
+  // This calculates new range to display (using the array menu).
+  virtual void Update();
+
 protected:
-  vtkPVContour();
-  ~vtkPVContour();
-  vtkPVContour(const vtkPVContour&) {};
-  void operator=(const vtkPVContour&) {};
-  
-  vtkPVArrayMenu* ArrayMenu;
+  vtkPVScalarRangeLabel();
+  ~vtkPVScalarRangeLabel();
+  vtkPVScalarRangeLabel(const vtkPVScalarRangeLabel&) {};
+  void operator=(const vtkPVScalarRangeLabel&) {};
+
+  vtkPVArrayMenu *ArrayMenu;
+  vtkKWLabel *Label;
+  float Min;
+  float Max;
 };
+
 
 #endif

@@ -34,6 +34,7 @@ vtkPVPlaneWidget
 vtkPVMinMax
 vtkPVProbe
 vtkPVRenderView 
+vtkPVScalarRangeLabel 
 vtkPVScale 
 vtkPVSelectionList 
 vtkPVSource 

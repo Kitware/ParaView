@@ -82,10 +82,6 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->ComponentMenu = vtkKWOptionMenu::New();
 
   this->InputMenu = NULL;
-
-  //this->DataSetCommandObjectTclName = NULL;
-  //this->DataSetCommandMethod = NULL;
-  //this->DataSet = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -105,22 +101,8 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
   this->ComponentMenu->Delete();
   this->ComponentMenu = NULL;
 
-  //this->SetDataSetCommandObjectTclName(NULL);
-  //this->SetDataSetCommandMethod(NULL);
-  //this->SetDataSet(NULL);
-
   this->SetInputMenu(NULL);
 }
-
-
-//----------------------------------------------------------------------------
-//void vtkPVArrayMenu::SetDataSetCommand(const char* objTclName, 
-//                                       const char* method)
-//{
-//  this->SetDataSetCommandObjectTclName(objTclName);
-//  this->SetDataSetCommandMethod(method);
-//}
-
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SetLabel(const char* label)
@@ -160,7 +142,7 @@ void vtkPVArrayMenu::SetFieldSelection(int field)
       return;
     }
 
-  this->UpdateArrayMenu();
+  this->Update();
 }
 
 
@@ -291,6 +273,7 @@ void vtkPVArrayMenu::ArrayMenuEntryCallback(const char* name)
   this->SetArrayName(name);
   this->UpdateComponentMenu();
   this->ModifiedCallback();
+  this->vtkPVWidget::Update();
 }
 
 //----------------------------------------------------------------------------
@@ -303,6 +286,7 @@ void vtkPVArrayMenu::ComponentMenuEntryCallback(int comp)
 
   this->SelectedComponent = comp;
   this->ModifiedCallback();
+  this->vtkPVWidget::Update();
 }
 
 
@@ -316,10 +300,41 @@ void vtkPVArrayMenu::SetValue(const char* name)
 
   this->ArrayMenu->SetValue(name);
   this->SetArrayName(name);
-  this->UpdateComponentMenu();
   this->ModifiedCallback();
+  this->Update();
 }
 
+//----------------------------------------------------------------------------
+vtkDataArray *vtkPVArrayMenu::GetVTKArray()
+{
+  vtkDataSet *ds;
+
+  if (this->InputMenu == NULL)
+    {
+    return NULL;
+    }
+  ds = this->InputMenu->GetVTKData();
+  if (ds == NULL)
+    {
+    return NULL;
+    }
+
+  switch (this->FieldSelection)
+    {
+    case vtkDataSet::DATA_OBJECT_FIELD:
+      vtkErrorMacro("We do not handle data object fields yet.");
+      return NULL;
+    case vtkDataSet::POINT_DATA_FIELD:
+      return ds->GetPointData()->GetArray(this->ArrayName);
+      break;
+    case vtkDataSet::CELL_DATA_FIELD:
+      return ds->GetCellData()->GetArray(this->ArrayName);
+      break;
+    }
+
+  vtkErrorMacro("Unknown field.");
+  return NULL; 
+}
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SetSelectedComponent(int comp)
@@ -334,10 +349,8 @@ void vtkPVArrayMenu::SetSelectedComponent(int comp)
   this->ComponentMenu->SetValue(label);
   this->SelectedComponent = comp;
   this->ModifiedCallback();
+  this->vtkPVWidget::Update();
 }
-
-
-
 
 
 //----------------------------------------------------------------------------
@@ -445,13 +458,16 @@ void vtkPVArrayMenu::Reset()
     }
 
   this->ModifiedFlag = 0;
-
-  this->UpdateArrayMenu();
-
+  this->Update();
 }
 
 
-
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::Update()
+{
+  this->UpdateArrayMenu();
+  this->vtkPVWidget::Update();
+}
 
 
 //----------------------------------------------------------------------------
@@ -464,6 +480,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
   const char *first = NULL;
   const char* attributeName;
   vtkDataSetAttributes *field;
+  vtkDataSet *ds;
 
   attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(this->AttributeType);
   if (attributeName == NULL)
@@ -475,15 +492,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
   // Regenerate the menu, and look for the specified array.
   this->ArrayMenu->ClearEntries();
 
-  // We have to get the data set incase an input has changed. 
-  //if (this->DataSetCommandMethod == NULL || this->DataSetCommandObjectTclName == NULL)
-  //  {
-  //  vtkErrorMacro("DataSetCommand has not been set.")
-  //  return;
-  //  }
-  //this->Script("%s SetDataSet [%s %s]", this->GetTclName(),
-  //             this->DataSetCommandObjectTclName, this->DataSetCommandMethod);
-  
+  // We have to get the data set incase an input has changed.   
   if (this->InputMenu == NULL)
     {
     this->SetArrayName(NULL);
@@ -491,30 +500,22 @@ void vtkPVArrayMenu::UpdateArrayMenu()
     vtkErrorMacro("Input menu has not been set.");
     return;
     } 
-  vtkPVSource *pvs = this->InputMenu->GetCurrentValue();
-  if (pvs == NULL)
+  ds = this->InputMenu->GetVTKData();
+  if (ds == NULL)
     {
     this->SetArrayName(NULL);
     this->ArrayMenu->SetValue("None");
-    vtkErrorMacro("Input menu has no value.");
-    return;
-    }
-  this->DataSet = pvs->GetPVOutput()->GetVTKData();
-  if (this->DataSet == NULL)
-    {
-    this->SetArrayName(NULL);
-    this->ArrayMenu->SetValue("None");
-    vtkDebugMacro("Could not find vtk data set.");
+    vtkErrorMacro("COuld not get datra set from input menu.");
     return;
     }
 
   switch (this->FieldSelection)
     {
     case vtkDataSet::POINT_DATA_FIELD:
-      field = this->DataSet->GetPointData();
+      field = ds->GetPointData();
       break;
     case vtkDataSet::CELL_DATA_FIELD:
-      field = this->DataSet->GetCellData();
+      field = ds->GetCellData();
       break;
     default:
       vtkErrorMacro("Unknown field type.");
@@ -593,6 +594,7 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   vtkDataArray *array;
   int currentComponent;
   vtkDataSetAttributes *field;
+  vtkDataSet *ds;
 
   if (this->Application == NULL)
     {
@@ -605,15 +607,7 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   this->ArrayNumberOfComponents = 1;
   this->SelectedComponent = 0;
 
-  // Make sure the data set is the latest.
-  //if (this->DataSetCommandMethod == NULL || this->DataSetCommandObjectTclName == NULL)
-  //  {
-  //  vtkErrorMacro("DataSetCommand has not been set.")
-  //  return;
-  //  }
-  //this->Script("%s SetDataSet [%s %s]", this->GetTclName(),
-  //             this->DataSetCommandObjectTclName, this->DataSetCommandMethod);
-  
+  // We have to get the data set incase an input has changed.   
   if (this->InputMenu == NULL)
     {
     this->SetArrayName(NULL);
@@ -621,17 +615,12 @@ void vtkPVArrayMenu::UpdateComponentMenu()
     vtkErrorMacro("Input menu has not been set.");
     return;
     } 
-  vtkPVSource *pvs = this->InputMenu->GetCurrentValue();
-  if (pvs == NULL)
+  ds = this->InputMenu->GetVTKData();
+  if (ds == NULL)
     {
     this->SetArrayName(NULL);
     this->ArrayMenu->SetValue("None");
-    vtkErrorMacro("Input menu has no value.");
-    return;
-    }  
-  if (this->DataSet == NULL)
-    {
-    vtkErrorMacro("Could not find vtk data set.");
+    vtkErrorMacro("COuld not get datra set from input menu.");
     return;
     }
 
@@ -639,10 +628,10 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   switch (this->FieldSelection)
     {
     case vtkDataSet::POINT_DATA_FIELD:
-      field = this->DataSet->GetPointData();
+      field = ds->GetPointData();
       break;
     case vtkDataSet::CELL_DATA_FIELD:
-      field = this->DataSet->GetCellData();
+      field = ds->GetCellData();
       break;
     default:
       vtkErrorMacro("Unknown field type.");

@@ -1,0 +1,194 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkPVScalarRangeLabel.cxx
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+Copyright (c) 2000-2001 Kitware Inc. 469 Clifton Corporate Parkway,
+Clifton Park, NY, 12065, USA.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ * Neither the name of Kitware nor the names of any contributors may be used
+   to endorse or promote products derived from this software without specific 
+   prior written permission.
+
+ * Modified source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+#include "vtkKWApplication.h"
+#include "vtkPVScalarRangeLabel.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVData.h"
+#include "vtkKWLabel.h"
+#include "vtkObjectFactory.h"
+
+//----------------------------------------------------------------------------
+vtkPVScalarRangeLabel* vtkPVScalarRangeLabel::New()
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVScalarRangeLabel");
+  if(ret)
+    {
+    return (vtkPVScalarRangeLabel*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVScalarRangeLabel;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVScalarRangeLabelCommand(ClientData cd, Tcl_Interp *interp,
+			     int argc, char *argv[]);
+
+//----------------------------------------------------------------------------
+vtkPVScalarRangeLabel::vtkPVScalarRangeLabel()
+{
+  this->CommandFunction = vtkPVScalarRangeLabelCommand;
+
+  this->Label = vtkKWLabel::New();
+  this->ArrayMenu = NULL;
+
+  this->Min = VTK_LARGE_FLOAT;
+  this->Max = -VTK_LARGE_FLOAT;
+}
+
+//----------------------------------------------------------------------------
+vtkPVScalarRangeLabel::~vtkPVScalarRangeLabel()
+{
+  this->Label->Delete();
+  this->Label = NULL;
+  this->SetArrayMenu(NULL);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
+{
+  // must set the application
+  if (this->Application)
+    {
+    vtkErrorMacro("ScalarRangeLabel already created");
+    return;
+    }
+  this->SetApplication(app);
+
+  this->Script("frame %s", this->GetWidgetName());
+  this->Label->SetParent(this);
+  this->Label->SetLabel("");
+  this->Label->Create(app, "");
+  this->Script("pack %s -side top -expand t -fill x", 
+               this->Label->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScalarRangeLabel::Update()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  int id, num;
+  vtkPVInputMenu *inputMenu;
+  vtkPVData *pvd;
+  vtkDataArray *array;
+  float range[2];
+  float temp[2];
+
+  if (this->ArrayMenu == NULL)
+    {
+    vtkErrorMacro("Array menu has not been set.");
+    return;
+    }
+
+  array = this->ArrayMenu->GetVTKArray();
+  if (array == NULL || array->GetName() == NULL)
+    {
+    this->Min = VTK_LARGE_FLOAT;
+    this->Max = -VTK_LARGE_FLOAT;
+    this->Label->SetLabel("Missing Array");
+    return;
+    }
+
+  inputMenu = this->ArrayMenu->GetInputMenu();
+  if (inputMenu == NULL)
+    {
+    vtkErrorMacro("Could not find input menu.");
+    return;
+    }
+
+  pvd = inputMenu->GetPVData();
+  if (pvd == NULL)
+    {
+    vtkErrorMacro("Could not find PVData.");
+    return;
+    }
+
+  range[0] = VTK_LARGE_FLOAT;
+  range[1] = -VTK_LARGE_FLOAT;
+  pvApp->BroadcastScript("Application SendDataArrayRange %s %s",
+                         pvd->GetVTKDataTclName(),
+                         array->GetName());
+  
+  array->GetRange(range, 0);  
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; id++)
+    {
+    controller->Receive(temp, 2, id, 1976);
+    // try to protect against invalid ranges.
+    if (range[0] > range[1])
+      {
+      range[0] = temp[0];
+      range[1] = temp[1];
+      }
+    else if (temp[0] < temp[1])
+      {
+      if (temp[0] < range[0])
+        {
+        range[0] = temp[0];
+        }
+      if (temp[1] > range[1])
+        {
+        range[1] = temp[1];
+        }
+      }
+    }
+
+  char str[512];
+  if (range[0] > range[1])
+    {
+    sprintf(str, "Invalid Data Range");
+    }
+  else
+    {
+    sprintf(str, "Scalar Range: %f to %f", range[0], range[1]);
+    }
+
+  this->Min = range[0];
+  this->Max = range[1];
+  this->Label->SetLabel(str);
+}
+
+
+
+

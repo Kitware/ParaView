@@ -40,14 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVContour.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVScalarRangeLabel.h"
 #include "vtkPVContourEntry.h"
+#include "vtkPVLabeledToggle.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSourceInterface.h"
 #include "vtkContourFilter.h"
 #include "vtkPVData.h"
 #include "vtkPVApplication.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkPVInputMenu.h"
 #include "vtkPVWindow.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkObjectFactory.h"
@@ -60,8 +62,7 @@ vtkPVContour::vtkPVContour()
 {
   this->CommandFunction = vtkPVContourCommand;
   
-  this->ScalarArrayMenu = NULL;
-  this->ScalarRangeLabel = vtkKWLabel::New();
+  this->ArrayMenu = NULL;
 
   this->ReplaceInputOff();
 }
@@ -69,12 +70,10 @@ vtkPVContour::vtkPVContour()
 //----------------------------------------------------------------------------
 vtkPVContour::~vtkPVContour()
 {
-  this->ScalarRangeLabel->Delete();
-  this->ScalarRangeLabel = NULL;
-  if (this->ScalarArrayMenu)
+  if (this->ArrayMenu)
     {
-    this->ScalarArrayMenu->UnRegister(this);
-    this->ScalarArrayMenu = NULL;    
+    this->ArrayMenu->Delete();
+    this->ArrayMenu = NULL;
     }
 }
 
@@ -93,11 +92,13 @@ vtkPVContour* vtkPVContour::New()
 //----------------------------------------------------------------------------
 void vtkPVContour::CreateProperties()
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVContourEntry *entry;
-  vtkPVLabeledToggle *computeScalarsCheck;
-  vtkPVLabeledToggle *computeNormalsCheck;
-  vtkPVLabeledToggle *computeGradientsCheck;
+  vtkPVApplication*      pvApp = this->GetPVApplication();
+  vtkPVArrayMenu*        arrayMenu;
+  vtkPVScalarRangeLabel* rangeLabel;
+  vtkPVContourEntry*     entry;
+  vtkPVLabeledToggle*    computeScalarsCheck;
+  vtkPVLabeledToggle*    computeNormalsCheck;
+  vtkPVLabeledToggle*    computeGradientsCheck;
 
   this->vtkPVSource::CreateProperties();
 
@@ -105,13 +106,21 @@ void vtkPVContour::CreateProperties()
                      "Set the input to this filter.",
                      this->GetPVWindow()->GetSources()); 
   
-  this->ScalarArrayMenu = this->AddArrayMenu("Scalars", vtkDataSetAttributes::SCALARS, 1,
-                                 "Choose which scalar array you want to contour.");
-  this->ScalarArrayMenu->Register(this);
-  this->ScalarArrayMenu->SetModifiedCommand(this->GetTclName(), "ScalarArrayMenuCallback");
 
-  this->ScalarRangeLabel->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ScalarRangeLabel->Create(pvApp, "");
+  arrayMenu = this->AddArrayMenu("Scalars", vtkDataSetAttributes::SCALARS, 1,
+                                 "Choose which scalar array you want to contour.");
+  this->ArrayMenu = arrayMenu;
+  this->ArrayMenu->Register(this);
+
+  rangeLabel = vtkPVScalarRangeLabel::New();
+  rangeLabel->SetArrayMenu(arrayMenu);
+  arrayMenu->AddDependant(rangeLabel);
+  rangeLabel->SetParent(this->GetParameterFrame()->GetFrame());
+  rangeLabel->Create(pvApp);
+  this->AddPVWidget(rangeLabel);
+  this->Script("pack %s", rangeLabel->GetWidgetName());
+  rangeLabel->Delete();
+  rangeLabel = NULL;
   
   entry = vtkPVContourEntry::New();
   entry->SetPVSource(this);
@@ -120,12 +129,9 @@ void vtkPVContour::CreateProperties()
   entry->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   entry->Create(pvApp);
   this->AddPVWidget(entry);
-
-  this->Script("pack %s %s", this->ScalarRangeLabel->GetWidgetName(),
-               entry->GetWidgetName());
+  this->Script("pack %s", entry->GetWidgetName());
   entry->Delete();
   entry = NULL;
-
   
   computeNormalsCheck = vtkPVLabeledToggle::New();
   computeNormalsCheck->SetParent(this->GetParameterFrame()->GetFrame());
@@ -185,100 +191,21 @@ void vtkPVContour::SetPVInput(vtkPVData *input)
     }
   this->vtkPVSource::SetPVInput(input);
 
-  if (this->ScalarArrayMenu == NULL)
+  if (this->ArrayMenu == NULL)
     {
     vtkErrorMacro("Please set the input after you create the properties.  We need to check for scalars.");
     return;
     }
 
-  this->ScalarArrayMenu->Reset();
-  if (this->ScalarArrayMenu->GetValue() == NULL)
+  this->ArrayMenu->Reset();
+  if (this->ArrayMenu->GetValue() == NULL)
     {
     vtkKWMessageDialog::PopupMessage(this->Application, 
-                            vtkKWMessageDialog::Warning, "Warning", 
-                            "Input does not have scalars to contour.");
-    }
-
-  this->UpdateScalarRangeLabel();
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVContour::ScalarArrayMenuCallback()
-{
-  this->ChangeAcceptButtonColor();
-  this->UpdateScalarRangeLabel();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVContour::UpdateScalarRangeLabel()
-{
-  float range[2];
-  char label[100];
-  
-  this->GetDataArrayRange(range);
-  if (range[0] == 1.0 && range[1] == 0.0)
-    {
-    sprintf(label, "Invalid Data Range");
-    }
-  else
-    {
-    sprintf(label, "Data Range: %f to %f", range[0], range[1]);
-    }
-  this->ScalarRangeLabel->SetLabel(label);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVContour::GetDataArrayRange(float range[2])
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  int id, num;
-  vtkDataArray *array;
-  float temp[2];
-  const char *arrayName;
-
-  arrayName = this->ScalarArrayMenu->GetValue();
-  
-  array = this->GetPVInput()->GetVTKData()->GetPointData()->
-                  GetScalars(arrayName);
-
-  range[0] = 1.0;
-  range[1] = 0.0;
-  if (array == NULL || array->GetName() == NULL)
-    {
-    return;
-    }
-  
-  pvApp->BroadcastScript("Application SendDataArrayRange %s %s",
-                         this->GetPVInput()->GetVTKDataTclName(),
-                         array->GetName());
-  
-  array->GetRange(range, 0);  
-  num = controller->GetNumberOfProcesses();
-  for (id = 1; id < num; id++)
-    {
-    controller->Receive(temp, 2, id, 1976);
-    // try to protect against invalid ranges.
-    if (range[0] > range[1])
-      {
-      range[0] = temp[0];
-      range[1] = temp[1];
-      }
-    else if (temp[0] < temp[1])
-      {
-      if (temp[0] < range[0])
-        {
-        range[0] = temp[0];
-        }
-      if (temp[1] > range[1])
-        {
-        range[1] = temp[1];
-        }
-      }
+                                     vtkKWMessageDialog::Warning, "Warning", 
+                                     "Input does not have scalars to contour.");
     }
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVContour::SaveInTclScript(ofstream* file)

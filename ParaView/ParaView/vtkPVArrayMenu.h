@@ -54,7 +54,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWLabel.h"
-#include "vtkDataSet.h"
 
 
 class vtkPVInputMenu;
@@ -132,24 +131,9 @@ public:
 
   // Description:
   // This input menu supplies the data set.  We do not refernce count it to avoid a reference loop.
-  void SetInputMenu(vtkPVInputMenu *im) { this->InputMenu = im;};
+  void SetInputMenu(vtkPVInputMenu *im) { this->InputMenu = im;}
+  vtkPVInputMenu* GetInputMenu() {return this->InputMenu;}
   
-
-  // -----
-
-  // Description:
-  // We need a method to get the vtkDataSet. obj->Method() must return a data set.  
-  // This is necessary because the input to the filter/mapper might change.
-  //void SetDataSetCommand(const char* objTclName, const char* method);
-
-  // Description:
-  // This is used internally (by DataSetCommand).  If you set a data set yourself,
-  // it will just be overwritten.
-  //vtkSetObjectMacro(DataSet, vtkDataSet);
-  //vtkGetObjectMacro(DataSet, vtkDataSet);
-
-  // -----
-
   // Description:
   // Gets called when the accept button is pressed.
   // This method may add an entry to the trace file.
@@ -165,6 +149,10 @@ public:
   // Can also be used from a script.
   void SetValue(const char* name);
   const char* GetValue() { return this->ArrayName;}
+
+  // Description:
+  // A convenience method that reutrns the VTK array selected.
+  vtkDataArray *GetVTKArray();
 
   // Description:
   // This is the number of components the selected array has.
@@ -189,7 +177,7 @@ public:
 
   // Description:
   // This is called to update the menus if soething (InputMenu) changes.
-  virtual void Update() {this->UpdateArrayMenu();};
+  virtual void Update();
 
 protected:
   vtkPVArrayMenu();
@@ -227,14 +215,6 @@ protected:
 
   // Resets the values based on the array.
   void UpdateComponentMenu();
-
-
-  // For getting the data set.
-  //char* DataSetCommandObjectTclName;
-  //vtkSetStringMacro(DataSetCommandObjectTclName);
-  //char* DataSetCommandMethod;
-  //vtkSetStringMacro(DataSetCommandMethod);
-  vtkDataSet *DataSet;
 };
 
 #endif

@@ -1990,7 +1990,6 @@ vtkPVSource *vtkPVWindow::ContourCallback()
     "%s SetExtentTranslator [%s GetExtentTranslator]",
     pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
 
-  contour->UpdateScalarRangeLabel();
   contour->Delete();
   pvd->Delete();
   

@@ -220,7 +220,29 @@ void vtkPVInputMenu::SetCurrentValue(vtkPVSource *pvs)
   this->Update();
 }
 
+//----------------------------------------------------------------------------
+vtkPVData *vtkPVInputMenu::GetPVData()
+{
+  vtkPVSource *pvs = this->GetCurrentValue();
 
+  if (pvs == NULL)
+    {
+    return NULL;
+    }
+  return pvs->GetPVOutput();
+}
+
+//----------------------------------------------------------------------------
+vtkDataSet *vtkPVInputMenu::GetVTKData()
+{
+  vtkPVSource *pvs = this->GetCurrentValue();
+
+  if (pvs == NULL)
+    {
+    return NULL;
+    }
+  return pvs->GetPVOutput()->GetVTKData();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::ModifiedCallback()
