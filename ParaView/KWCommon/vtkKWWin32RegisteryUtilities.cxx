@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
-vtkCxxRevisionMacro(vtkKWWin32RegisteryUtilities, "1.3");
+vtkCxxRevisionMacro(vtkKWWin32RegisteryUtilities, "1.4");
 vtkStandardNewMacro( vtkKWWin32RegisteryUtilities );
 
 vtkKWWin32RegisteryUtilities::vtkKWWin32RegisteryUtilities()
@@ -121,4 +121,10 @@ int vtkKWWin32RegisteryUtilities::SetValueInternal(const char *key,
                         (CONST BYTE *)(const char *)value, 
                         len+1) == ERROR_SUCCESS );
   return res;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWin32RegisteryUtilities::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
 }
