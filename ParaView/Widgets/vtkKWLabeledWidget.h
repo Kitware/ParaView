@@ -74,6 +74,10 @@ public:
   void SetLabel(const char *);
   
   // Description:
+  // Convenience method to set the label width.
+  void SetLabelWidth(int width);
+  
+  // Description:
   // Show/Hide the label.
   virtual void SetShowLabel(int);
   vtkBooleanMacro(ShowLabel, int);
