@@ -75,7 +75,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.9");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.10");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -143,6 +143,7 @@ vtkPVAnimationCue::vtkPVAnimationCue()
   this->PropertyStatusManager = NULL;
   this->Name = NULL;
   this->TclNameCommand = 0;
+  this->KeyFramesCreatedCount = 0;
 }
 
 
@@ -439,9 +440,8 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
   pvAM->SetCurrentTime(time);
 
   
-  static int num_objects = 0;
   ostrstream str ;
-  str << "KeyFrameName_" << num_objects++ << ends;
+  str << "KeyFrameName_" << this->KeyFramesCreatedCount++ << ends;
   
   vtkPVKeyFrame* keyframe = pvAM->NewKeyFrame(type);
   keyframe->SetName(str.str());
@@ -462,9 +462,6 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
   keyframe->Delete();
 
   this->InitializeKeyFrameUsingCurrentState(keyframe);
-
-
-
   this->TimeLine->SelectPoint(id);
   return id;
 }

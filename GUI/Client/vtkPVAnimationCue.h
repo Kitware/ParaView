@@ -346,6 +346,12 @@ protected:
   void UnregisterProxies();
   int ProxiesRegistered;
 
+  // Description:
+  // Keyframes assigned unique names. The names are dependent on the 
+  // order for the cue in which they are created. KeyFramesCreatedCount
+  // keeps track of the order.
+  int KeyFramesCreatedCount;
+
 private:
   vtkPVAnimationCue(const vtkPVAnimationCue&); // Not implemented.
   void operator=(const vtkPVAnimationCue&); // Not implemented.
