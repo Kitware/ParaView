@@ -1,0 +1,62 @@
+set kw(vtkTemp5) [$Application GetMainWindow]
+set kw(vtkTemp24) [$kw(vtkTemp5) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp24) $argv $argc
+
+set kw(vtkTemp178) [$kw(vtkTemp5) GetAnimationInterface]
+[$kw(vtkTemp5) GetRotateCameraButton] SetState 1
+$kw(vtkTemp5) ChangeInteractorStyle 1
+set kw(vtkTemp999) [$kw(vtkTemp5) CreatePVSource SphereSource]
+set kw(vtkTemp1005) [$kw(vtkTemp999) GetPVWidget {Center}]
+$kw(vtkTemp1005) SetValue 0 0 0
+set kw(vtkTemp1011) [$kw(vtkTemp999) GetPVWidget {Radius}]
+$kw(vtkTemp1011) SetValue 0.5
+set kw(vtkTemp1017) [$kw(vtkTemp999) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp1017) SetValue 8
+set kw(vtkTemp1022) [$kw(vtkTemp999) GetPVWidget {Start Theta}]
+$kw(vtkTemp1022) SetValue 0
+set kw(vtkTemp1027) [$kw(vtkTemp999) GetPVWidget {End Theta}]
+$kw(vtkTemp1027) SetValue 360
+set kw(vtkTemp1032) [$kw(vtkTemp999) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp1032) SetValue 8
+set kw(vtkTemp1037) [$kw(vtkTemp999) GetPVWidget {Start Phi}]
+$kw(vtkTemp1037) SetValue 0
+set kw(vtkTemp1042) [$kw(vtkTemp999) GetPVWidget {End Phi}]
+$kw(vtkTemp1042) SetValue 180
+$kw(vtkTemp999) AcceptCallback
+
+set kw(vtkTemp1161) [$kw(vtkTemp5) CreatePVSource ElevationFilter]
+set kw(vtkTemp1187) [$kw(vtkTemp1161) GetPVWidget {Input}]
+$kw(vtkTemp1187) SetCurrentValue $kw(vtkTemp999)
+set kw(vtkTemp1168) [$kw(vtkTemp1161) GetPVWidget {ScalarRange}]
+$kw(vtkTemp1168) SetValue 0 1
+set kw(vtkTemp1173) [$kw(vtkTemp1161) GetPVWidget {Line}]
+$kw(vtkTemp1173) SetPoint1 0 -0.48746 0
+$kw(vtkTemp1173) SetPoint2 0 0.48746 0
+$kw(vtkTemp1173) SetResolution 20
+$kw(vtkTemp1161) AcceptCallback
+
+set kw(vtkTemp1361) [$kw(vtkTemp5) CreatePVSource TempTessellatorFilter]
+set kw(vtkTemp1381) [$kw(vtkTemp1361) GetPVWidget {Input}]
+$kw(vtkTemp1381) SetCurrentValue $kw(vtkTemp1161)
+set kw(vtkTemp1369) [$kw(vtkTemp1361) GetPVWidget {OutputDimension}]
+$kw(vtkTemp1369) SetValue 1
+set kw(vtkTemp1372) [$kw(vtkTemp1361) GetPVWidget {ChordError}]
+$kw(vtkTemp1372) SetValue 0.001
+set kw(vtkTemp1379) [$kw(vtkTemp1361) GetPVWidget {FieldError2}]
+$kw(vtkTemp1379) ResetFieldCriteria
+  $kw(vtkTemp1379) SetFieldCriterion 0 1e-005
+  $kw(vtkTemp1379) SetFieldCriterion 1 -1
+set kw(vtkTemp1380) [$kw(vtkTemp1361) GetPVWidget {MaximumNumberOfSubdivisions}]
+$kw(vtkTemp1380) SetValue 8
+$kw(vtkTemp1361) AcceptCallback
+set kw(vtkTemp1385) [$kw(vtkTemp1361) GetPVOutput]
+$kw(vtkTemp1385) ColorByPointField {Elevation} 1
+
+$kw(vtkTemp24) SetOrientationAxesVisibility 0
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit

@@ -66,6 +66,7 @@ SET(PROJECT_TESTS
   Trace
   VectorTextSpace
   Write
+  Tessellate
   TestPolyDataIO
   TestUnstructuredGridIO
   TestRectilinearGridIO
