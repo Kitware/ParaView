@@ -24,7 +24,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkStructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVExtractVOI, "1.1");
+vtkCxxRevisionMacro(vtkPVExtractVOI, "1.2");
 vtkStandardNewMacro(vtkPVExtractVOI);
 
 //----------------------------------------------------------------------------
@@ -239,6 +239,41 @@ void vtkPVExtractVOI::ExecuteData(vtkDataObject*)
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVExtractVOI::SetSampleRateI(int ratei)
+{
+  if (this->SampleRate[0] == ratei)
+    {
+    return;
+    }
+  
+  this->SampleRate[0] = ratei;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVExtractVOI::SetSampleRateJ(int ratej)
+{
+  if (this->SampleRate[1] == ratej)
+    {
+    return;
+    }
+  
+  this->SampleRate[1] = ratej;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVExtractVOI::SetSampleRateK(int ratek)
+{
+  if (this->SampleRate[2] == ratek)
+    {
+    return;
+    }
+  
+  this->SampleRate[2] = ratek;
+  this->Modified();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVExtractVOI::PrintSelf(ostream& os, vtkIndent indent)
@@ -260,5 +295,3 @@ void vtkPVExtractVOI::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Include Boundary: " 
      << (this->IncludeBoundary ? "On\n" : "Off\n");
 }
-
-
