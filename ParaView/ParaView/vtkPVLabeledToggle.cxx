@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.15");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -165,6 +165,12 @@ void vtkPVLabeledToggle::Disable()
 //----------------------------------------------------------------------------
 void vtkPVLabeledToggle::Accept()
 {
+  this->Accept(this->ObjectTclName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::Accept(const char* sourceTclName)
+{
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (this->ModifiedFlag)
@@ -173,7 +179,7 @@ void vtkPVLabeledToggle::Accept()
                         this->GetState());
     }
 
-  pvApp->BroadcastScript("%s Set%s %d", this->ObjectTclName, 
+  pvApp->BroadcastScript("%s Set%s %d", sourceTclName, 
                          this->VariableName, this->GetState());
 
   this->ModifiedFlag = 0;
@@ -183,18 +189,23 @@ void vtkPVLabeledToggle::Accept()
 //----------------------------------------------------------------------------
 void vtkPVLabeledToggle::Reset()
 {
+  this->Reset(this->ObjectTclName);
+}
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::Reset(const char* sourceTclName)
+{
   if ( ! this->ModifiedFlag)
     {
     return;
     }
 
   this->Script("%s SetState [%s Get%s]", this->CheckButton->GetTclName(),
-               this->ObjectTclName, this->VariableName);
+               sourceTclName, this->VariableName);
 
   this->ModifiedFlag = 0;
-
 }
 
+//----------------------------------------------------------------------------
 vtkPVLabeledToggle* vtkPVLabeledToggle::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
