@@ -32,6 +32,7 @@ vtkKWRadioButton
 vtkKWSaveImageDialog 
 vtkKWScale 
 vtkKWSerializer 
+vtkKWSplitFrame
 vtkKWText 
 vtkKWToolbar 
 vtkKWWidget 
