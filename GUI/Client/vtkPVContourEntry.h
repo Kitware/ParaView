@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVContourEntry maintains a list of floats for contouring.
+// .NAME vtkPVContourEntry - Maintains a list of floats for contouring.
+//
 // .SECTION Description
 // This widget lets the user add or delete floats from a list.
 // It is used for contours.

@@ -12,14 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVConnectDialog
+// .NAME vtkPVConnectDialog - Class to encapsulate all of the process initialization
+//
 // .SECTION Description
-// A class to encapaulate all of the process initialization,
+// A class to encapsulate all of the process initialization,
 // distributed data model and duplication  of the pipeline.
 // Filters and compositers will still need a controller, 
-// but every thing else should be handled here.  This class 
+// but every thing else should be handled here. This class 
 // sets up the default MPI processes with the user interface
-// running on process 0.  I plan to make an alternative module
+// running on process 0. I plan to make an alternative module
 // for client server mode, where the client running the UI 
 // is not in the MPI group but links to the MPI group through 
 // a socket connection.

@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVApplication
+// .NAME vtkPVApplication - Subclass of vtkKWApplication specific to the application
+//
 // .SECTION Description
 // A subclass of vtkKWApplication specific to this application.
 

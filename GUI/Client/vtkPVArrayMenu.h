@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVArrayMenu menu for selecting arrays from the input.
+// .NAME vtkPVArrayMenu - Menu for selecting arrays from the input.
+//
 // .SECTION Description
 // This menu is pretty general, but expects a certain pattern to the 
 // set get method.  It may be better to have explicit set/get method strings.

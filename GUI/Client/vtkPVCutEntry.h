@@ -12,7 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCutEntry maintains a list of floats for cutting.
+// .NAME vtkPVCutEntry - Maintains a list of floats for cutting.
+//
 // .SECTION Description
 // This widget lets the user add or delete floats from a list.
 // It is used for cut plane offsets.

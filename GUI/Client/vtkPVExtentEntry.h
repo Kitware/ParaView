@@ -12,11 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVExtentEntry -
+// .NAME vtkPVExtentEntry - Special behavior for animations
+//
 // .SECTION Description
 // Although I could make this a subclass of vtkPVVector Entry,
 // Vector entry is too general, and some inherited method may be confusing.
-// The resaon I created this class is to get a special behavior
+// The reason I created this class is to get a special behavior
 // for animations.
 
 #ifndef __vtkPVExtentEntry_h
