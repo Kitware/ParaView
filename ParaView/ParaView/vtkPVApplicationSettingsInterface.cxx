@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.4");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.5");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -234,7 +234,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     }
 
   this->ToolbarSettingsFrame->SetParent(
-    this->GetPageWidget(VTK_KW_ASI_PREFERENCES_LABEL));
+    this->GetPageWidget(VTK_KW_APPLICATION_SETTINGS_UIP_LABEL));
   this->ToolbarSettingsFrame->ShowHideFrameOn();
   this->ToolbarSettingsFrame->Create(app, 0);
   this->ToolbarSettingsFrame->SetLabel("Toolbar Settings");

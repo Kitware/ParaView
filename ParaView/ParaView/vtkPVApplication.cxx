@@ -113,7 +113,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.176");
+vtkCxxRevisionMacro(vtkPVApplication, "1.177");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -318,10 +318,10 @@ vtkPVApplication::vtkPVApplication()
 
   this->HasSplashScreen = 1;
   if (this->HasRegisteryValue(
-    2, "RunTime", VTK_KW_ASI_SHOW_SPLASH_SCREEN_REG_KEY))
+    2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY))
     {
     this->ShowSplashScreen = this->GetIntRegisteryValue(
-      2, "RunTime", VTK_KW_ASI_SHOW_SPLASH_SCREEN_REG_KEY);
+      2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY);
     }
   else
     {

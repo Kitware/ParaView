@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.230");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.231");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -646,9 +646,9 @@ void vtkPVRenderView::PrepareForDelete()
 
     if (pvapp->GetWindows()->GetNumberOfItems() <= 1 &&
         pvapp->HasRegisteryValue(
-          2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+          2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
         pvapp->GetIntRegisteryValue(
-          2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY))
+          2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
       {
       pvapp->SetRegisteryValue(
         2, "Geometry", VTK_PV_NAV_FRAME_SIZE_REG_KEY, "%d", 
@@ -848,9 +848,9 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->SplitFrame->SetFrame1MinimumSize(80);
 
   if (this->Application->HasRegisteryValue(
-    2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->HasRegisteryValue(
         2, "Geometry", VTK_PV_NAV_FRAME_SIZE_REG_KEY))
     {
@@ -2654,7 +2654,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.230 $");
+  this->ExtractRevision(os,"$Revision: 1.231 $");
 }
 
 //------------------------------------------------------------------------------
