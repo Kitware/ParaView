@@ -57,7 +57,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.25");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.26");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -434,7 +434,7 @@ void vtkClientCompositeManager::StartRender()
     //                 sizeof(struct vtkClientRendererInfo), 1, 
     //                 vtkCompositeManager::REN_INFO_TAG);
     // Let the socket controller deal with byte swapping.
-    controller->Send((float*)(&renInfo), 22, 1,
+    controller->Send((double*)(&renInfo), 22, 1,
                      vtkCompositeManager::REN_INFO_TAG);
 //    }
   
