@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "KitwareLogo.h"
 #include "vtkKWPointerArray.h"
 #include "vtkKWEvent.h"
+#include "vtkKWLabel.h"
 
 class vtkKWWindowMenuEntry
 {
@@ -229,7 +230,7 @@ vtkKWWindow::vtkKWWindow()
   this->StatusFrame = vtkKWWidget::New();
   this->StatusFrame->SetParent(this);
     
-  this->StatusLabel = vtkKWWidget::New();
+  this->StatusLabel = vtkKWLabel::New();
   this->StatusLabel->SetParent(this->StatusFrame);
   this->StatusImage = vtkKWWidget::New();
   this->StatusImage->SetParent(this->StatusFrame);
@@ -461,16 +462,12 @@ void vtkKWWindow::DisplayAbout()
 
 void vtkKWWindow::SetStatusText(const char *text)
 {
-  if (text) 
-    {
-    this->Script("%s configure -text \"%s\"",
-                 this->StatusLabel->GetWidgetName(), text);
-    }
-  else
-    {
-    this->Script("%s configure -text \"\"",
-                 this->StatusLabel->GetWidgetName());
-    }
+  this->StatusLabel->SetLabel(text);
+}
+
+const char *vtkKWWindow::GetStatusText()
+{
+  return this->StatusLabel->GetLabel();
 }
 
 // some common menus we provide here
@@ -604,7 +601,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
                this->StatusImageName);
   this->Script("pack %s -side left -padx 2", 
                this->StatusImage->GetWidgetName());
-  this->StatusLabel->Create(app,"label","-relief sunken -padx 3 -bd 1 -font \"Helvetica 10\" -anchor w");
+  this->StatusLabel->Create(app,"-relief sunken -padx 3 -bd 1 -font \"Helvetica 10\" -anchor w");
   this->Script("pack %s -side left -padx 2 -expand yes -fill both",
                this->StatusLabel->GetWidgetName());
   this->Script("pack %s -side bottom -fill x -pady 2",
@@ -943,7 +940,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.68 $");
+  this->ExtractRevision(os,"$Revision: 1.69 $");
 }
 
 int vtkKWWindow::ExitDialog()

@@ -57,6 +57,7 @@ class vtkKWMenu;
 class vtkKWProgressGauge;
 class vtkKWView;
 class vtkKWPointerArray;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -89,6 +90,7 @@ public:
   // Description:
   // Set the text for the status bar of this window.
   void SetStatusText(const char *);
+  const char *GetStatusText();
   
   // Description:
   // Load in a Tcl based script to drive the application. If called
@@ -269,7 +271,7 @@ protected:
   vtkKWMenu *MenuHelp;
   vtkKWWidget *StatusFrame;
   vtkKWWidget *StatusImage;
-  vtkKWWidget *StatusLabel;
+  vtkKWLabel *StatusLabel;
   vtkKWProgressGauge* ProgressGauge;
   vtkKWWidget* ProgressFrame;
   char        *StatusImageName;
