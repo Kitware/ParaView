@@ -200,6 +200,8 @@ SET( ParaViewClient_SRCS
 IF (PARAVIEW_USE_LOOKMARKS)
   SET( ParaViewClient_SRCS
     ${ParaViewClient_SRCS}
+    vtkKWLookmark.cxx
+    vtkKWLookmarkFolder.cxx
     vtkPVLookmark.cxx
     vtkPVLookmarkManager.cxx
     )

@@ -154,14 +154,6 @@ ENDFOREACH (WidgetType)
 
 # ParaView stuff, should be moved to ParaView
 
-IF (PARAVIEW_USE_LOOKMARKS)
-  SET( KWWidgets_SRCS
-    ${KWWidgets_SRCS}
-    vtkKWLookmark.cxx 
-    vtkKWLookmarkFolder.cxx 
-    )
-ENDIF (PARAVIEW_USE_LOOKMARKS)
-
 IF (WIN32)
   SET( KWWidgets_SRCS ${KWWidgets_SRCS}
     ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
