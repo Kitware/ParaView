@@ -30,7 +30,7 @@
 #include "vtkPoints.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkExtractUserDefinedPiece, "1.1");
+vtkCxxRevisionMacro(vtkExtractUserDefinedPiece, "1.2");
 vtkStandardNewMacro(vtkExtractUserDefinedPiece);
 
 vtkExtractUserDefinedPiece::vtkExtractUserDefinedPiece()
@@ -204,9 +204,11 @@ void vtkExtractUserDefinedPiece::Execute()
   cellTags->Delete();
   pointOwnership->Delete();
 }
-void vtkExtractUserDefinedPiece::ComputeCellTagsWithFunction(vtkIntArray *tags,
-                                              vtkIdList *pointOwnership,
-                                              int piece, int numPieces)
+void vtkExtractUserDefinedPiece::
+ComputeCellTagsWithFunction(vtkIntArray *tags,
+                            vtkIdList *pointOwnership,
+                            int vtkNotUsed(piece), 
+                            int vtkNotUsed(numPieces))
 {
   vtkUnstructuredGrid *input;
   int j;

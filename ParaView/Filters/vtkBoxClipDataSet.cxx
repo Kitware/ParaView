@@ -34,7 +34,7 @@
 #include <math.h>
 #include <stdio.h>
 
-vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.5");
+vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.6");
 vtkStandardNewMacro(vtkBoxClipDataSet);
 
 //----------------------------------------------------------------------------
@@ -385,11 +385,11 @@ void vtkBoxClipDataSet::SetBoxClip(float *n0,float *o0,float *n1,float *o1,
   for (int i=0; i<3; i++)
     {
     N0[i] = (double)n0[i]; O0[i] = (double)o0[i];
-    N1[i] = (double)n0[i]; O1[i] = (double)o0[i];
-    N2[i] = (double)n0[i]; O2[i] = (double)o0[i];
-    N3[i] = (double)n0[i]; O3[i] = (double)o0[i];
-    N4[i] = (double)n0[i]; O4[i] = (double)o0[i];
-    N5[i] = (double)n0[i]; O5[i] = (double)o0[i];
+    N1[i] = (double)n1[i]; O1[i] = (double)o1[i];
+    N2[i] = (double)n2[i]; O2[i] = (double)o2[i];
+    N3[i] = (double)n3[i]; O3[i] = (double)o3[i];
+    N4[i] = (double)n4[i]; O4[i] = (double)o4[i];
+    N5[i] = (double)n5[i]; O5[i] = (double)o5[i];
     }
 
   this->SetBoxClip(N0, O0, N1, O1, N2, O2, N3, O3, N4, O4, N5, O5);

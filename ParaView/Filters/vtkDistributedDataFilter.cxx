@@ -91,7 +91,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.10");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.11");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -746,7 +746,8 @@ int vtkDistributedDataFilter::PairWiseDataExchange(int *yourSize,
 #ifdef VTK_USE_MPI
   int i;
 
-  vtkMPIController *mpiContr = vtkMPIController::SafeDownCast(this->Controller);
+  vtkMPIController *mpiContr = 
+    vtkMPIController::SafeDownCast(this->Controller);
 
   if (mpiContr == NULL)
     {
@@ -775,15 +776,12 @@ int vtkDistributedDataFilter::PairWiseDataExchange(int *yourSize,
     source = (iam + nprocs - offset) % nprocs;
 
     // Post to get count from source
-
     mpiContr->NoBlockReceive(mySize + source, 1, source, tag, req);
 
     // Send count to target
-
     mpiContr->Send(yourSize + target, 1, target, tag);
 
     // Wait for source
-
     req.Wait();
     }
 
@@ -834,28 +832,25 @@ int vtkDistributedDataFilter::PairWiseDataExchange(int *yourSize,
     }
 
   // Now do pairwise exchanges of the data
-
   for (offset = 1; offset < nprocs; offset++)
     {
     target = (iam + offset) % nprocs;
     source = (iam + nprocs - offset) % nprocs;
   
     // Post to get data from source
-
     if (mySize[source] > 0)
       {
-      mpiContr->NoBlockReceive(myData[source], mySize[source], source, tag, req);
+      mpiContr->NoBlockReceive(myData[source], mySize[source], source, 
+                               tag, req);
       }
 
     // Send data to target
-  
     if (yourSize[target] > 0)
       {
       mpiContr->Send(yourData[target], yourSize[target], target, tag);
       }
   
     // Wait for source 
-  
     if (mySize[source] > 0)
       {
       req.Wait();
@@ -870,15 +865,19 @@ int vtkDistributedDataFilter::PairWiseDataExchange(int *yourSize,
 
   delete [] myData;
   delete [] mySize;
+#else
+  (void)yourSize;
+  (void)tag;
+  (void)yourData;
 #endif
 
   return 0;
 }
 
 #ifdef VTK_USE_MPI
-vtkUnstructuredGrid 
-  *vtkDistributedDataFilter::MPIRedistribute(vtkMPIController *mpiContr,
-                                             vtkDataSet *in)
+vtkUnstructuredGrid *vtkDistributedDataFilter::MPIRedistribute(
+  vtkMPIController *vtkNotUsed(mpiContr),
+  vtkDataSet *in)
 {
   int proc;
   int me = this->MyId;
