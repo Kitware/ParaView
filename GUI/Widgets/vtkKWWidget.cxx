@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.99");
+vtkCxxRevisionMacro(vtkKWWidget, "1.100");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -38,28 +38,27 @@ int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkKWWidget::vtkKWWidget()
 {
+  this->CommandFunction          = vtkKWWidgetCommand;
+
   this->WidgetName               = NULL;
   this->Parent                   = NULL;
-  this->CommandFunction          = vtkKWWidgetCommand;
-  this->Children                 = vtkKWWidgetCollection::New();
 
-  // Make tracking memory leaks easier.
-
-  this->Children->Register(this);
-  this->Children->Delete();
+  this->Children                 = NULL;
   this->DeletingChildren         = 0;
+
   this->BalloonHelpString        = NULL;  
   this->BalloonHelpJustification = 0;
   this->BalloonHelpInitialized   = 0;
-  this->Enabled                  = 1;
 
-  this->TraceName = NULL;
+  this->TraceName                = NULL;
+
+  this->Enabled                  = 1;
 
   // Drag and Drop
 
-  this->DragAndDropTargets = NULL;
-  this->EnableDragAndDrop = 0;
-  this->DragAndDropAnchor = this;
+  this->DragAndDropTargets       = NULL;
+  this->EnableDragAndDrop        = 0;
+  this->DragAndDropAnchor        = this;
 }
 
 //----------------------------------------------------------------------------
@@ -76,8 +75,12 @@ vtkKWWidget::~vtkKWWidget()
     {
     this->SetBalloonHelpString(NULL);
     }
-  this->Children->UnRegister(this);
-  this->Children = NULL;
+
+  if (this->Children)
+    {
+    this->Children->UnRegister(this);
+    this->Children = NULL;
+    }
   
   if (this->Application)
     {
@@ -180,49 +183,129 @@ void vtkKWWidget::SetUpBalloonHelpBindings()
 }
 
 //----------------------------------------------------------------------------
-int  vtkKWWidget::GetNetReferenceCount() 
+vtkKWWidgetCollection* vtkKWWidget::GetChildren()
 {
-  int childCounts = 0;
-  vtkKWWidget *child;
-  
-  for (this->Children->InitTraversal(); 
-       (child = this->Children->GetNextKWWidget());)
+  // Lazy evaluation. Create the children collection only when it is needed
+
+  if (!this->Children)
     {
-    childCounts += child->GetNetReferenceCount();
+    this->Children = vtkKWWidgetCollection::New();
+
+    // Make tracking memory leaks easier.
+
+    this->Children->Register(this);
+    this->Children->Delete();
     }
-  return this->ReferenceCount + childCounts - 
-    2*this->Children->GetNumberOfItems();
+  return this->Children;
 }
 
 //----------------------------------------------------------------------------
-// Removing items in the middle of a traversal is a bad thing.
-// UnRegister will handle removing all of the children.
+int vtkKWWidget::HasChildren()
+{
+  if (!this->Children)
+    {
+    return 0;
+    }
+  return this->Children->GetNumberOfItems() ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWidget::RemoveChild(vtkKWWidget *w) 
 {
-  if ( ! this->DeletingChildren)
+  // Removing items in the middle of a traversal is a bad thing.
+  // UnRegister will handle removing all of the children.
+
+  if (!this->DeletingChildren && this->HasChildren())
     {
-    this->Children->RemoveItem(w);
+    this->GetChildren()->RemoveItem(w);
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkKWWidget::AddChild(vtkKWWidget *w) 
+{
+  this->GetChildren()->AddItem(w);
+}
+
+//----------------------------------------------------------------------------
+int  vtkKWWidget::GetNetReferenceCount() 
+{
+  int childCounts = 0;
+
+  if (this->HasChildren())
+    {
+    vtkKWWidget *child;
+    vtkKWWidgetCollection *children = this->GetChildren();
+    children->InitTraversal();
+    while ((child = children->GetNextKWWidget()))
+      {
+      childCounts += child->GetNetReferenceCount();
+      }
+    childCounts -= 2 * children->GetNumberOfItems();
+    }
+
+  return this->ReferenceCount + childCounts;
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget *vtkKWWidget::GetChildWidgetWithName(const char *name)
+{
+  if (name && this->HasChildren())
+    {
+    vtkKWWidget *child;
+    vtkKWWidgetCollection *children = this->GetChildren();
+    children->InitTraversal();
+    while ((child = children->GetNextKWWidget()))
+      {
+      const char *wname = child->GetWidgetName();
+      if (wname && !strcmp(wname, name))
+        {
+        return child;
+        }
+      }
+    }
+
+  return NULL;
+}
+       
+//----------------------------------------------------------------------------
+vtkKWWidget *vtkKWWidget::GetChildWidgetWithTraceName(const char *traceName)
+{
+  if (traceName && this->HasChildren())
+    {
+    vtkKWWidget *child;
+    vtkKWWidgetCollection *children = this->GetChildren();
+    children->InitTraversal();
+    while ((child = children->GetNextKWWidget()))
+      {
+      const char *tname = child->GetTraceName();
+      if (tname && strcmp(traceName, tname) == 0)
+        {
+        return child;
+        }
+      }
+    }
+  return NULL;
+}
 
 //----------------------------------------------------------------------------
 void vtkKWWidget::UnRegister(vtkObjectBase *o)
 {
-  if (!this->DeletingChildren && this->Children)
+  if (!this->DeletingChildren && this->HasChildren())
     {
     // delete the children if we are about to be deleted
-    if (this->ReferenceCount == this->Children->GetNumberOfItems() + 1)
+    vtkKWWidgetCollection *children = this->GetChildren();
+    if (this->ReferenceCount == children->GetNumberOfItems() + 1)
       {
       vtkKWWidget *child;
-  
+      
       this->DeletingChildren = 1;
-      this->Children->InitTraversal();
-      while ((child = this->Children->GetNextKWWidget()))
+      children->InitTraversal();
+      while ((child = children->GetNextKWWidget()))
         {
         child->SetParent(NULL);
         }
-      this->Children->RemoveAllItems();
+      children->RemoveAllItems();
       this->DeletingChildren = 0;
       }
     }
@@ -331,7 +414,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.99 $");
+  this->ExtractRevision(os,"$Revision: 1.100 $");
 }
 
 //----------------------------------------------------------------------------
@@ -351,46 +434,7 @@ vtkKWWindow* vtkKWWidget::GetWindow()
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget *vtkKWWidget::GetChildWidgetWithName(const char *name)
-{
-  if (name)
-    {
-    vtkKWWidget *child;
-    this->Children->InitTraversal();
-    while ((child = this->Children->GetNextKWWidget()))
-      {
-      const char *wname = child->GetWidgetName();
-      if (wname && !strcmp(wname, name))
-        {
-        return child;
-        }
-      }
-    }
-
-  return NULL;
-}
-       
-//----------------------------------------------------------------------------
 // Methods for tracing.
-
-vtkKWWidget *vtkKWWidget::GetChildWidgetWithTraceName(const char *traceName)
-{
-  vtkKWWidget *child;
-
-  this->Children->InitTraversal();
-  while ( (child = this->Children->GetNextKWWidget()) )
-    {
-    if (child->GetTraceName())
-      {
-      if (strcmp(traceName, child->GetTraceName()) == 0)
-        {
-        return child;
-        }
-      }
-    }
-  return NULL;
-}
-       
 
 //----------------------------------------------------------------------------
 int vtkKWWidget::InitializeTrace(ofstream* file)
@@ -923,12 +967,6 @@ void vtkKWWidget::UnpackChildren()
   this->Script("catch {eval pack forget [pack slaves %s]} \n "
                "catch {eval grid forget [grid slaves %s]}",
                this->GetWidgetName(),this->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::AddChild(vtkKWWidget *w) 
-{
-  this->Children->AddItem(w);
 }
 
 //----------------------------------------------------------------------------
@@ -1872,16 +1910,16 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "BalloonHelpJustification: " 
-    << this->GetBalloonHelpJustification() << endl;
+     << this->GetBalloonHelpJustification() << endl;
   os << indent << "BalloonHelpString: " 
-    << (this->BalloonHelpString ? this->BalloonHelpString : "none") << endl;
-  os << indent << "Children: " << this->GetChildren() << endl;
+     << (this->BalloonHelpString ? this->BalloonHelpString : "None") << endl;
+  os << indent << "Children: " << this->Children << endl;
   os << indent << "Parent: " << this->GetParent() << endl;
-  os << indent << "TraceName: " << (this->TraceName?this->TraceName:"none") 
-    << endl;
-  os << indent << "Enabled: " << (this->Enabled ? "on" : "off") << endl;
+  os << indent << "TraceName: " 
+     << (this->TraceName ? this->TraceName : "None") << endl;
+  os << indent << "Enabled: " << (this->Enabled ? "On" : "Off") << endl;
   os << indent << "EnableDragAndDrop: " 
-    << (this->EnableDragAndDrop ? "On" : "Off") << endl;
+     << (this->EnableDragAndDrop ? "On" : "Off") << endl;
   os << indent << "DragAndDropAnchor: " << this->DragAndDropAnchor << endl;
 }
 

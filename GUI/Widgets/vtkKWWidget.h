@@ -72,10 +72,16 @@ public:
 
   // Description:
   // Add/Remove/Get a child to this Widget
+  // The children collection is lazy evaluated/created, i.e. GetChildren() 
+  // will create the collection if it does not exist, otherwise it is
+  // not allocated/created. In subclasses, use HasChildren() to check
+  // that this widget has children instead of accessing GetChildren() which
+  // would automatically allocate the collection. 
   void AddChild(vtkKWWidget *w);
   void RemoveChild(vtkKWWidget *w);
+  int HasChildren();
   //BTX
-  vtkGetObjectMacro(Children,vtkKWWidgetCollection);
+  virtual vtkKWWidgetCollection* GetChildren();
   //ETX
   vtkKWWidget *GetChildWidgetWithName(const char *);
   
@@ -345,25 +351,27 @@ protected:
   ~vtkKWWidget();
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
-  char *WidgetName;
-  vtkKWWidget *Parent;
-  vtkKWWidgetCollection *Children; 
-  int DeletingChildren;
-
   //BTX
   friend class vtkKWFrame;
   //ETX
+
+  char        *WidgetName;
   vtkSetStringMacro(WidgetName);
 
+  vtkKWWidget *Parent;
+  int         DeletingChildren;
+
   // Ballon help
+
   char  *BalloonHelpString;
   int   BalloonHelpJustification;
   int   BalloonHelpInitialized;
   void  SetUpBalloonHelpBindings();
   
   // We need a unique way to get the widget from the parent.  This
-  // is unfortunate, but necessary.  With out this name set, the
+  // is unfortunate, but necessary.  Without this name set, the
   // trace cannot be initialized for this widget.
+
   char *TraceName;
   int Enabled;
 
@@ -420,6 +428,14 @@ protected:
   virtual void PropagateEnableState(vtkKWWidget* widget);
 
 private:
+  
+  // In private: to allow lazy evaluation. GetChildren() will create the
+  // collection if it does not exist. For example, there is no need for
+  // children for all terminal widgets. In subclasses, use HasChildren()
+  // to avoid accessing GetChildren(). 
+
+  vtkKWWidgetCollection *Children; 
+
   vtkKWWidget(const vtkKWWidget&); // Not implemented
   void operator=(const vtkKWWidget&); // Not implemented
 };

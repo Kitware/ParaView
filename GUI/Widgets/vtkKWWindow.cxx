@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.187");
+vtkCxxRevisionMacro(vtkKWWindow, "1.188");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -933,20 +933,26 @@ void vtkKWWindow::UnRegister(vtkObjectBase *o)
   if (!this->DeletingChildren)
     {
     // delete the children if we are about to be deleted
-    if (this->ReferenceCount == this->Views->GetNumberOfItems() + 
-        this->Children->GetNumberOfItems() + 1)
+    if (this->ReferenceCount == 
+        (this->Views->GetNumberOfItems() + 1 +
+         (this->HasChildren() ? this->GetChildren()->GetNumberOfItems() : 0)))
       {
       if (!(this->Views->IsItemPresent((vtkKWView *)o) ||
-            this->Children->IsItemPresent((vtkKWWidget *)o)))
+            (this->HasChildren() && 
+             this->GetChildren()->IsItemPresent((vtkKWWidget *)o))))
         {
         vtkKWWidget *child;
         vtkKWView *v;
         
         this->DeletingChildren = 1;
-        this->Children->InitTraversal();
-        while ((child = this->Children->GetNextKWWidget()))
+        if (this->HasChildren())
           {
-          child->SetParent(NULL);
+          vtkKWWidgetCollection *children = this->GetChildren();
+          children->InitTraversal();
+          while ((child = children->GetNextKWWidget()))
+            {
+            child->SetParent(NULL);
+            }
           }
         // deselect if required
         if (this->SelectedView)

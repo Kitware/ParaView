@@ -86,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.127");
+vtkCxxRevisionMacro(vtkKWView, "1.128");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1368,20 +1368,28 @@ void vtkKWView::UnRegister(vtkObjectBase *o)
   if (!this->DeletingChildren)
     {
     // delete the children if we are about to be deleted
-    if (this->ReferenceCount == this->Composites->GetNumberOfItems() + 
-        this->Children->GetNumberOfItems() + 2)
+    // the last '1' is for the CornerAnnotation ref
+    if (this->ReferenceCount == 
+        (this->Composites->GetNumberOfItems() + 1 +
+         (this->HasChildren() ? this->GetChildren()->GetNumberOfItems() : 0) + 
+         1))
       {
       if (!(this->Composites->IsItemPresent((vtkKWComposite *)o) ||
-            this->Children->IsItemPresent((vtkKWWidget *)o)))
+            (this->HasChildren() && 
+             this->GetChildren()->IsItemPresent((vtkKWWidget *)o))))
         {
         vtkKWWidget *child;
         vtkKWComposite *c;
         
         this->DeletingChildren = 1;
-        this->Children->InitTraversal();
-        while ((child = this->Children->GetNextKWWidget()))
+        if (this->HasChildren())
           {
-          child->SetParent(NULL);
+          vtkKWWidgetCollection *children = this->GetChildren();
+          children->InitTraversal();
+          while ((child = children->GetNextKWWidget()))
+            {
+            child->SetParent(NULL);
+            }
           }
         this->Composites->InitTraversal();
         while ((c = this->Composites->GetNextKWComposite()))
@@ -1556,7 +1564,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.127 $");
+  this->ExtractRevision(os,"$Revision: 1.128 $");
 }
 
 //----------------------------------------------------------------------------
