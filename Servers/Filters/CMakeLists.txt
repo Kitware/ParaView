@@ -27,8 +27,11 @@ SET(Filters_SRCS
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
   vtkCTHData.cxx
+  vtkCTHDataToCTHDataFilter.cxx
   vtkCTHDataToPolyDataFilter.cxx
   vtkCTHExtractAMRPart.cxx
+  vtkCTHAMRCellToPointData.cxx
+  vtkCTHAMRContour.cxx
   vtkCTHFractal.cxx
   vtkCTHOutlineFilter.cxx
   vtkCTHSource.cxx
@@ -79,6 +82,7 @@ SET(Filters_SRCS
   )
 
 SET_SOURCE_FILES_PROPERTIES( 
+  vtkCTHDataToCTHDataFilter.cxx
   vtkCTHDataToPolyDataFilter.cxx
   vtkSubdivisionAlgorithm.cxx 
   vtkPVRenderViewProxy.cxx
