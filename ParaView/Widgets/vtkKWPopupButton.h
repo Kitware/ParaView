@@ -69,7 +69,9 @@ public:
   virtual void DisplayPopupCallback();
   virtual void WithdrawPopupCallback();
 
-  void SetPopupTitle(const char* title);
+  // Description:
+  // Set/Get popup title
+  virtual void SetPopupTitle(const char* title);
   vtkGetStringMacro(PopupTitle);
 
 protected:
