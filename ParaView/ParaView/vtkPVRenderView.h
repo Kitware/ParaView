@@ -72,6 +72,7 @@ class vtkPVSourceList;
 class vtkPVTreeComposite;
 class vtkPVWindow;
 class vtkPVSourcesNavigationWindow;
+class vtkPVCameraIcon;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
@@ -290,6 +291,15 @@ public:
   virtual vtkKWWidget *GetSourceParent();
   vtkKWSplitFrame *GetSplitFrame() {return this->SplitFrame;}
 
+  // Description:
+  // Store current camera at a specified position. This stores all the
+  // camera parameters and generates a small icon.
+  void StoreCurrentCamera(int position);
+  
+  // Description:
+  // Restore current camera from a specified position.
+  void RestoreCurrentCamera(int position);  
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
@@ -367,6 +377,10 @@ protected:
   vtkPVInteractorStyleControl *ManipulatorControl3D;
 
   int DisableRenderingFlag;
+
+  // Camera icons
+  vtkKWLabeledFrame* CameraIconsFrame;
+  vtkPVCameraIcon* CameraIcons[6];
 
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

@@ -16,6 +16,7 @@ vtkPVArrayCalculator.cxx
 vtkPVArrayMenu.cxx 
 vtkPVArraySelection.cxx
 vtkPVBoundsDisplay.cxx
+vtkPVCameraIcon.cxx
 vtkPVCameraManipulator.cxx
 vtkPVColorMap.cxx
 vtkPVComponentSelection.cxx

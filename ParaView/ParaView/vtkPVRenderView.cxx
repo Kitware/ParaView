@@ -42,21 +42,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 
 #include "vtkCamera.h"
-#include "vtkPVConfig.h"
 #include "vtkCollectionIterator.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCornerAnnotation.h"
 #include "vtkKWFrame.h"
-#include "vtkKWSplitFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
+#include "vtkKWSplitFrame.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVCameraIcon.h"
+#include "vtkPVConfig.h"
 #include "vtkPVData.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
@@ -169,6 +170,13 @@ vtkPVRenderView::vtkPVRenderView()
   this->ParaViewOptionsFrame = vtkKWLabeledFrame::New();
   this->NavigationWindowButton = vtkKWRadioButton::New();
   this->SelectionWindowButton = vtkKWRadioButton::New();
+
+  int cc;
+  for ( cc = 0; cc < 6; cc ++ )
+    {
+    this->CameraIcons[cc] = vtkPVCameraIcon::New();
+    }
+  this->CameraIconsFrame = vtkKWLabeledFrame::New();
 }
 
 //----------------------------------------------------------------------------
@@ -353,6 +361,19 @@ vtkPVRenderView::~vtkPVRenderView()
   this->FrameRateScale = NULL;
   this->FrameRateFrame->Delete();
   this->FrameRateFrame = NULL;
+
+  this->CameraIconsFrame->Delete();
+  this->CameraIconsFrame = 0;
+  int cc;
+  for ( cc = 0; cc < 6; cc ++ )
+    {
+    if ( this->CameraIcons[cc] )
+      {
+      this->CameraIcons[cc]->SetRenderView(0);
+      this->CameraIcons[cc]->Delete();
+      this->CameraIcons[cc] = 0;
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -492,6 +513,16 @@ void vtkPVRenderView::PrepareForDelete()
     this->SelectionWindow->PrepareForDelete();
     this->SelectionWindow->Delete();
     this->SelectionWindow = 0;
+    }
+  int cc;
+  for ( cc = 0; cc < 6; cc ++ )
+    {
+    if ( this->CameraIcons[cc] )
+      {
+      this->CameraIcons[cc]->SetRenderView(0);
+      this->CameraIcons[cc]->Delete();
+      this->CameraIcons[cc] = 0;
+      }
     }
 }
 
@@ -966,8 +997,33 @@ void vtkPVRenderView::CreateViewProperties()
   this->ManipulatorControl3D->Create(pvapp, 0);
   this->ManipulatorControl3D->SetLabel("3D Movements");
 
+  int cc;
+  this->CameraIconsFrame->SetParent(page);
+  this->CameraIconsFrame->ShowHideFrameOn();
+  this->CameraIconsFrame->Create(this->Application);
+  this->CameraIconsFrame->SetLabel("Stored Camera Positions");
+  vtkKWWidget* cframe = this->CameraIconsFrame->GetFrame();
+  for ( cc = 0; cc < 6; cc ++ )
+    {
+    int x, y;
+    this->CameraIcons[cc]->SetRenderView(this);
+    this->CameraIcons[cc]->SetParent(cframe);
+    this->CameraIcons[cc]->Create(this->Application);
+
+    x = cc % 3;
+    y = cc / 3;
+
+    this->Script("grid configure %s -column %d -row %d "
+                 "-padx 0 -pady 0 -ipadx 0 -ipady 0 -sticky news",
+                 this->CameraIcons[cc]->GetWidgetName(),
+                 x, y);
+                 
+    }
+
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->StandardViewsFrame->GetWidgetName());
+  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->CameraIconsFrame->GetWidgetName());
   this->Script("pack %s %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->ManipulatorControl2D->GetWidgetName(),
                this->ManipulatorControl3D->GetWidgetName());
@@ -982,6 +1038,8 @@ void vtkPVRenderView::CreateViewProperties()
     {
     this->ShowNavigationWindowCallback(0);
     }
+
+  
 }
 
 //----------------------------------------------------------------------------
@@ -1749,6 +1807,24 @@ void vtkPVRenderView::SetupCameraManipulators()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::StoreCurrentCamera(int position)
+{
+  if ( this->CameraIcons[position] )
+    {
+    this->CameraIcons[position]->StoreCamera();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::RestoreCurrentCamera(int position)
+{
+  if ( this->CameraIcons[position] )
+    {
+    this->CameraIcons[position]->RestoreCamera();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SerializeSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeSelf(os, indent);
@@ -1776,7 +1852,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.176 $");
+  this->ExtractRevision(os,"$Revision: 1.177 $");
 }
 
 //------------------------------------------------------------------------------

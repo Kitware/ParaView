@@ -3229,7 +3229,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.333 $");
+  this->ExtractRevision(os,"$Revision: 1.334 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3305,7 +3305,7 @@ void vtkPVWindow::SerializeSource(ostream& os, vtkIndent indent,
     vtkPVSource* inputsource = source->GetInputPVSource();
     os << indent << "Module " << source->GetName() << " " 
        << source->GetModuleName() << " " 
-       << (inputsource?inputsource->GetTclName():"None") << " ";
+       << (inputsource?inputsource->GetName():"None") << " ";
     source->Serialize(os, indent.GetNextIndent());
     writtenMap->SetItem(static_cast<void*>(source), 1);
     }
