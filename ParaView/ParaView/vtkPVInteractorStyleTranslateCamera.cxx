@@ -40,10 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVInteractorStyleTranslateCamera.h"
-#include "vtkObjectFactory.h"
-#include "vtkCommand.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleTranslateCamera, "1.1");
+#include "vtkCamera.h"
+#include "vtkCommand.h"
+#include "vtkLight.h"
+#include "vtkObjectFactory.h"
+#include "vtkRenderer.h"
+
+vtkCxxRevisionMacro(vtkPVInteractorStyleTranslateCamera, "1.2");
 vtkStandardNewMacro(vtkPVInteractorStyleTranslateCamera);
 
 //-------------------------------------------------------------------------

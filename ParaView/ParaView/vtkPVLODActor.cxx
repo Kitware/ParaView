@@ -39,13 +39,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include <stdlib.h>
-#include <math.h>
 #include "vtkPVLODActor.h"
-#include "vtkRenderWindow.h"
-#include "vtkTimerLog.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkProperty.h"
+#include "vtkRenderWindow.h"
+#include "vtkTexture.h"
+#include "vtkTimerLog.h"
+
+#include <math.h>
 
 //-----------------------------------------------------------------------------
 vtkPVLODActor* vtkPVLODActor::New()

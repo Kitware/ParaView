@@ -16,13 +16,12 @@
 
 =========================================================================*/
 #include "vtkDummyRenderer.h"
-#include "vtkGraphicsFactory.h"
+
 #include "vtkCommand.h"
+#include "vtkGraphicsFactory.h"
+#include "vtkMapper.h"
 
-#include <stdlib.h>
-#include <string.h>
-
-vtkCxxRevisionMacro(vtkDummyRenderer, "1.3");
+vtkCxxRevisionMacro(vtkDummyRenderer, "1.4");
 
 // Create a vtkDummyRenderer with a black background, a white ambient light, 
 // two-sided lighting turned on, a viewport of (0,0,1,1), and backface culling

@@ -51,6 +51,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkInteractorStyle.h"
 
+class vtkTransform;
+class vtkCamera;
+
 class VTK_EXPORT vtkPVInteractorStyleRotateCamera : public vtkInteractorStyle
 {
 public:

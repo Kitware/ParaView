@@ -41,28 +41,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVData.h"
-#include "vtkPVSource.h"
-#include "vtkKWView.h"
-#include "vtkPVWindow.h"
-#include "vtkPVApplication.h"
-#include "vtkKWMenuButton.h"
-#include "vtkObjectFactory.h"
 
-#include "vtkKWWidget.h"
+#include "vtkKWMenuButton.h"
+#include "vtkKWView.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVSource.h"
+#include "vtkPVWindow.h"
+
+#include "vtkCubeAxesActor2D.h"
+#include "vtkDataSetSurfaceFilter.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWCheckButton.h"
-#include "vtkDataSetSurfaceFilter.h"
-#include "vtkTexture.h"
-#include "vtkScalarBarActor.h"
-#include "vtkCubeAxesActor2D.h"
-#include "vtkTimerLog.h"
-#include "vtkPVRenderView.h"
-#include "vtkTreeComposite.h"
-#include "vtkPVSourceInterface.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWNotebook.h"
 #include "vtkKWFrame.h"
-
+#include "vtkKWNotebook.h"
+#include "vtkKWWidget.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVSourceInterface.h"
+#include "vtkScalarBarActor.h"
+#include "vtkTexture.h"
+#include "vtkTimerLog.h"
+#include "vtkTreeComposite.h"
+#include "vtkProperty.h"
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);

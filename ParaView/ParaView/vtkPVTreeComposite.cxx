@@ -40,8 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVTreeComposite.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkActor.h"
+#include "vtkActorCollection.h"
+#include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
+#include "vtkRendererCollection.h"
+#include "vtkRenderWindow.h"
 
 //-------------------------------------------------------------------------
 vtkPVTreeComposite* vtkPVTreeComposite::New()

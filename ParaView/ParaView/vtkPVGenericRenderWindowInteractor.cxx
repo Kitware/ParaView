@@ -41,8 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkPVGenericRenderWindowInteractor.h"
+
 #include "vtkPVRenderView.h"
 #include "vtkObjectFactory.h"
+#include "vtkRenderWindow.h"
 
 vtkPVGenericRenderWindowInteractor* vtkPVGenericRenderWindowInteractor::New()
 {

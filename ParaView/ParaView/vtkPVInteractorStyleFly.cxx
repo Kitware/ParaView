@@ -40,14 +40,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVInteractorStyleFly.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkCamera.h"
 #include "vtkCommand.h"
+#include "vtkLight.h"
+#include "vtkMath.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVApplication.h"
-#include "vtkMath.h"
+#include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.3");
+vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.4");
 vtkStandardNewMacro(vtkPVInteractorStyleFly);
 
 //-------------------------------------------------------------------------
