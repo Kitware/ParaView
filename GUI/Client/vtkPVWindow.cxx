@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.583");
+vtkCxxRevisionMacro(vtkPVWindow, "1.584");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -914,20 +914,25 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   this->WidgetName = vtkString::Duplicate(".paraview");
 
-  // Invoke super method first.
-  this->vtkKWWindow::Create(pvApp,"");
+  // Allow the user to interactively resize the properties parent.
+  // Set the left panel size (Frame1) for this app. Do it now before
+  // the superclass eventually restores the size from the registery
+
+  this->MiddleFrame->SetFrame1MinimumSize(200);
+  this->MiddleFrame->SetFrame2MinimumSize(200);
+  this->MiddleFrame->SetFrame1Size(380);
+  this->MiddleFrame->SetSeparatorSize(5);
+
+  // Invoke super method
+
+  this->Superclass::Create(app, NULL);
 
   // Hide the main window until after all user interface is initialized.
+
   this->Script( "wm withdraw %s", this->GetWidgetName());
 
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   pvApp->SetBalloonHelpDelay(1);
-
-  // Allow the user to interactively resize the properties parent.
-  // The left panel size (Frame1) is restored by vtkKWWindow
-  this->MiddleFrame->SetSeparatorSize(5);
-  this->MiddleFrame->SetFrame1MinimumSize(200);
-  this->MiddleFrame->SetFrame2MinimumSize(200);
 
   // Put the version in the status bar.
   char version[128];
