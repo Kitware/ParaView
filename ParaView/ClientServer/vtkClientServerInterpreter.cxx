@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.2");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -737,8 +737,8 @@ void vtkClientServerInterpreterSplit(const char* path,
                                      vtkstd::vector<vtkstd::string>& paths)
 {
   vtkstd::string str = path?path:"";
-  std::string::size_type lpos = 0;
-  std::string::size_type rpos = str.npos;
+  vtkstd::string::size_type lpos = 0;
+  vtkstd::string::size_type rpos = str.npos;
   while((rpos = str.find(split, lpos)) != str.npos)
     {
     if(lpos < rpos)
