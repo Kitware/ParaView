@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.24");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.25");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -339,7 +339,10 @@ void vtkPVEnSightMasterServerReader::Update()
   this->ExtentTranslator->SetProcessId(myId);
   for(i=0; i < this->Internal->NumberOfOutputs; ++i)
     {
-    this->GetOutput(i)->SetExtentTranslator(this->ExtentTranslator);
+    if( this->GetOutput(i) )
+      {
+      this->GetOutput(i)->SetExtentTranslator(this->ExtentTranslator);
+      }
     }
   
   for (i = 0; i < this->GetNumberOfOutputs(); i++)
@@ -471,7 +474,10 @@ void vtkPVEnSightMasterServerReader::Execute()
   // it back to -1 here.
   for (i=0; i < this->NumberOfOutputs; ++i)
     {
-    this->Outputs[i]->SetMaximumNumberOfPieces(-1);
+    if( this->Outputs[i] )
+      {
+      this->Outputs[i]->SetMaximumNumberOfPieces(-1);
+      }
     }
 }
 
