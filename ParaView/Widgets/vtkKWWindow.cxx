@@ -400,7 +400,12 @@ void vtkKWWindow::Close()
       return;
       }
     }
+  this->CloseNoPrompt();
+}
 
+  
+void vtkKWWindow::CloseNoPrompt()
+{
   vtkKWView *v;
 
   // Give each view a chance to close
@@ -919,7 +924,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.50 $");
+  this->ExtractRevision(os,"$Revision: 1.51 $");
 }
 
 int vtkKWWindow::ExitDialog()

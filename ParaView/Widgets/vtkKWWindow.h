@@ -76,6 +76,7 @@ public:
   // Close this window, possibly exiting the application if no more
   // windows are open.
   virtual void Close();
+  virtual void CloseNoPrompt();
 
   // Description::
   // Display help info for this window.
