@@ -1,167 +1,96 @@
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Arrow.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Arrow.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Axes.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Axes.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/BlowTest.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/BlowTest.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CalcInput.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CalcInput.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Calculator.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Calculator.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ClipCut.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ClipCut.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CombustorTest.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CombustorTest.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CutContours.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CutContours.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Delete.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Delete.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/EnSight.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/EnSight.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Extrusion.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Extrusion.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Glyph.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Glyph.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ImageReader.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ImageReader.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ProbeLine.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ProbeLine.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/RotateTranslate.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/RotateTranslate.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ScalarSelection.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ScalarSelection.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/SphereTest.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/SphereTest.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Threshold.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Threshold.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ThresholdAttrMode.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ThresholdAttrMode.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Trace.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Trace.tcl)
-
-CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/VectorTextSpace.tcl.in
-${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/VectorTextSpace.tcl)
 
 ADD_TEST(Arrow ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Arrow.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Arrow.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(Axes ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Axes.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Axes.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(BlowTest ${PARAVIEW_EXECUTABLE}
-                  ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/BlowTest.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/BlowTest.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(CalcInput ${PARAVIEW_EXECUTABLE}
-                  ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CalcInput.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CalcInput.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(Calculator ${PARAVIEW_EXECUTABLE}
-                  ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Calculator.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Calculator.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(ClipCut ${PARAVIEW_EXECUTABLE}
-                  ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ClipCut.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ClipCut.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(CombustorTest ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CombustorTest.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CombustorTest.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(ConeCubeCylSQ ${PARAVIEW_EXECUTABLE}
-                 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(CutContours ${PARAVIEW_EXECUTABLE}
-                 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CutContours.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CutContours.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(Delete ${PARAVIEW_EXECUTABLE}
-                 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Delete.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Delete.tcl         
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(EnSight ${PARAVIEW_EXECUTABLE}
-                   ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/EnSight.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/EnSight.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(Extrusion ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Extrusion.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Extrusion.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(Glyph ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Glyph.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Glyph.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(ImageReader ${PARAVIEW_EXECUTABLE}
-                   ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ImageReader.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ImageReader.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(Mandelbrot ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(ProbeLine ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ProbeLine.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ProbeLine.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(ProbePoint ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ProbePoint.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(RotateTranslate ${PARAVIEW_EXECUTABLE}
-               ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/RotateTranslate.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/RotateTranslate.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(ScalarSelection ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ScalarSelection.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ScalarSelection.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(SphereTest ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/SphereTest.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/SphereTest.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(Threshold ${PARAVIEW_EXECUTABLE}
-                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Threshold.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Threshold.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(ThresholdAttrMode ${PARAVIEW_EXECUTABLE}
-             ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ThresholdAttrMode.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ThresholdAttrMode.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(Trace ${PARAVIEW_EXECUTABLE}
-             ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Trace.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Trace.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(VectorTextSpace ${PARAVIEW_EXECUTABLE}
-             ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/VectorTextSpace.tcl)
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/VectorTextSpace.tcl 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)

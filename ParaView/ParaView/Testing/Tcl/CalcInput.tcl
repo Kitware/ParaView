@@ -1,4 +1,12 @@
-set DataDir "@PARAVIEW_DATA_ROOT@"
+    if {[info exists argc]} { 
+        set argcm1 [expr $argc - 1]
+        for {set i 0} {$i < $argcm1} {incr i} {
+            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+            }
+        }
+    } 
+
 
 # I ran into a bug where the input to the calculator could not be set,
 # (this was the trace).  I am adding the test to make sure it does 

@@ -1,4 +1,12 @@
-set DataDir "@PARAVIEW_DATA_ROOT@"
+    if {[info exists argc]} { 
+        set argcm1 [expr $argc - 1]
+        for {set i 0} {$i < $argcm1} {incr i} {
+            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+            }
+        }
+    } 
+
     
 # Test the new feature of multiple cut values.
 

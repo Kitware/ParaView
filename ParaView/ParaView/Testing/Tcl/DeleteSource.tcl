@@ -1,3 +1,11 @@
+    if {[info exists argc]} { 
+        set argcm1 [expr $argc - 1]
+        for {set i 0} {$i < $argcm1} {incr i} {
+            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+            }
+        }
+    } 
 catch {set PARAVIEW_BASELINE $env(PARAVIEW_BASELINE)}
 
 proc decipadString { str before total } {
