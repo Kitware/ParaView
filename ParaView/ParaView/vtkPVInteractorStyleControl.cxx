@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVPushButton.h"
@@ -65,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.18");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.19");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -476,7 +477,8 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
   if ( !clone )
     {
     clone = manipulator->NewInstance();
-    clone->SetApplication(this->Application);
+    vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->Application);
+    clone->SetApplication(pvApp);
     this->ManipulatorCollection->AddItem(clone); 
     clone->Delete();
     clone->AddObserver(vtkKWEvent::ManipulatorModifiedEvent, this->Observer);

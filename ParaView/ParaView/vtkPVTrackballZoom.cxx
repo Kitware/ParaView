@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballZoom, "1.1");
+vtkCxxRevisionMacro(vtkPVTrackballZoom, "1.2");
 vtkStandardNewMacro(vtkPVTrackballZoom);
 
 //-------------------------------------------------------------------------
@@ -79,8 +79,6 @@ void vtkPVTrackballZoom::OnButtonDown(int x, int y, vtkRenderer *ren,
     }
   this->LastX = x;
   this->LastY = y;
-
-  rwi->GetRenderWindow()->SetDesiredUpdateRate(rwi->GetDesiredUpdateRate());
 }
 
 
@@ -91,7 +89,6 @@ void vtkPVTrackballZoom::OnButtonUp(int x, int y, vtkRenderer *,
   this->LastX = x;
   this->LastY = y;
 
-  rwi->GetRenderWindow()->SetDesiredUpdateRate(rwi->GetStillUpdateRate());
   rwi->Render();
 }
 

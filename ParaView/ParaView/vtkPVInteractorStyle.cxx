@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.4");
+vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.5");
 vtkStandardNewMacro(vtkPVInteractorStyle);
 
 //-------------------------------------------------------------------------
@@ -143,6 +143,7 @@ void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
       {
       this->Current = manipulator;
       this->Current->Register(this);
+      this->Current->StartInteraction();
       this->Current->OnButtonDown(this->Interactor->GetEventPosition()[0],
                                   this->Interactor->GetEventPosition()[1],
                                   this->CurrentRenderer,
@@ -181,6 +182,8 @@ void vtkPVInteractorStyle::OnButtonUp(int button)
                               this->Interactor->GetEventPosition()[1],
                               this->CurrentRenderer,
                               this->Interactor);
+    this->Current->EndInteraction();
+    this->Interactor->Render();
     this->Current->UnRegister(this);
     this->Current = NULL;
     }

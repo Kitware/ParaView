@@ -41,10 +41,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPV3DWidget.h"
 
+#include "vtk3DWidget.h"
 #include "vtkCommand.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
-#include "vtk3DWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
@@ -52,10 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
-#include "vtkKWFrame.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.24");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.25");
 
 //===========================================================================
 //***************************************************************************
@@ -174,6 +174,10 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
     this->Widget3D->AddObserver(vtkCommand::InteractionEvent, 
                                 this->Observer);
     this->Widget3D->AddObserver(vtkCommand::PlaceWidgetEvent, 
+                                this->Observer);
+    this->Widget3D->AddObserver(vtkCommand::StartInteractionEvent, 
+                                this->Observer);
+    this->Widget3D->AddObserver(vtkCommand::EndInteractionEvent, 
                                 this->Observer);
     this->Widget3D->EnabledOff();
     }
@@ -306,7 +310,18 @@ void vtkPV3DWidget::PlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::ExecuteEvent(vtkObject*, unsigned long event, void*)
 {
-  if ( event != vtkCommand::PlaceWidgetEvent )
+  if ( event == vtkCommand::PlaceWidgetEvent )
+    {
+    }
+  else if ( event == vtkCommand::StartInteractionEvent )
+    {
+    this->PVSource->GetPVWindow()->InteractionOn();
+    }
+  else if ( event == vtkCommand::EndInteractionEvent )
+    {
+    this->PVSource->GetPVWindow()->InteractionOff();
+    }
+  else
     {
     this->ModifiedCallback();
     }

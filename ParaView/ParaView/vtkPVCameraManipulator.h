@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkRenderer;
 class vtkRenderWindowInteractor;
-class vtkKWApplication;
+class vtkPVApplication;
 
 class VTK_EXPORT vtkPVCameraManipulator : public vtkObject
 {
@@ -66,6 +66,9 @@ public:
   // Description:
   // Event bindings controlling the effects of pressing mouse buttons
   // or moving the mouse.
+  virtual void StartInteraction();
+  virtual void EndInteraction();
+
   virtual void OnMouseMove(int x, int y, vtkRenderer *ren,
                            vtkRenderWindowInteractor *iren);
   virtual void OnButtonDown(int x, int y, vtkRenderer *ren,
@@ -94,8 +97,8 @@ public:
   // Description:
   // In order to make calls on the application, we need a pointer to
   // it.
-  void SetApplication(vtkKWApplication*);
-  vtkGetObjectMacro(Application, vtkKWApplication);
+  void SetApplication(vtkPVApplication*);
+  vtkGetObjectMacro(Application, vtkPVApplication);
 
   // Description:
   // Set and get the manipulator name.
@@ -121,7 +124,7 @@ protected:
   float DisplayCenter[2];
   void ComputeDisplayCenter(vtkRenderer *ren);
 
-  vtkKWApplication *Application;
+  vtkPVApplication *Application;
 
 private:
   vtkPVCameraManipulator(const vtkPVCameraManipulator&); // Not implemented

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.8");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.9");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -99,7 +99,6 @@ void vtkPVJoystickFly::OnButtonDown(int x, int y, vtkRenderer *ren,
     }
   this->LastX = x;
   this->LastY = y;
-  ren->GetRenderWindow()->SetDesiredUpdateRate(rwi->GetDesiredUpdateRate());
 
   double *range = ren->GetActiveCamera()->GetClippingRange();
   this->Fly(ren, rwi, range[1], (this->In?1:-1)*this->FlySpeed*.01);
@@ -111,7 +110,6 @@ void vtkPVJoystickFly::OnButtonUp(int, int, vtkRenderer* ren,
                                   vtkRenderWindowInteractor* rwi)
 {
   this->FlyFlag = 0;
-  ren->GetRenderWindow()->SetDesiredUpdateRate(rwi->GetStillUpdateRate());
   rwi->Render();
 }
 

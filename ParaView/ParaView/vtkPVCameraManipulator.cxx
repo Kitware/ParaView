@@ -43,18 +43,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCamera.h"
 #include "vtkCommand.h"
-#include "vtkKWApplication.h"
 #include "vtkLight.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.5");
+vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.6");
 vtkStandardNewMacro(vtkPVCameraManipulator);
 
-vtkCxxSetObjectMacro(vtkPVCameraManipulator,Application,vtkKWApplication);
+vtkCxxSetObjectMacro(vtkPVCameraManipulator,Application,vtkPVApplication);
 
 //-------------------------------------------------------------------------
 vtkPVCameraManipulator::vtkPVCameraManipulator()
@@ -77,6 +78,16 @@ vtkPVCameraManipulator::~vtkPVCameraManipulator()
 {
   this->SetApplication(0);
   this->SetManipulatorName(0);
+}
+
+void vtkPVCameraManipulator::StartInteraction()
+{
+  this->Application->GetMainWindow()->InteractionOn();
+}
+
+void vtkPVCameraManipulator::EndInteraction()
+{
+  this->Application->GetMainWindow()->InteractionOff();
 }
 
 //-------------------------------------------------------------------------
