@@ -37,7 +37,7 @@
 #include "vtkCamera.h"
 #include "vtkFloatArray.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.6");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.7");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -288,7 +288,7 @@ void vtkSMRenderModuleProxy::InteractiveRender()
 
   vtkRenderWindow *renWin = this->GetRenderWindow(); 
   renWin->SetDesiredUpdateRate(5.0);
-  this->ResetCameraClippingRange();
+  this->GetRenderer()->ResetCameraClippingRange();
 
   this->BeginInteractiveRender();
   renWin->Render();
@@ -317,7 +317,7 @@ void vtkSMRenderModuleProxy::StillRender()
   // Interactive renders get called through the PVInteractorStyles
   // which cal ResetCameraClippingRange on the Renderer.
   // We could convert them to call a method on the module directly ...
-  this->ResetCameraClippingRange();
+  this->GetRenderer()->ResetCameraClippingRange();
   renWindow->SetDesiredUpdateRate(0.002);
 
   this->BeginStillRender();
@@ -615,10 +615,32 @@ void vtkSMRenderModuleProxy::ResetCamera(double bds[6])
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::ResetCameraClippingRange()
 {
-  double bounds[6];
+  double bds[6];
+  double range1[2];
+  double range2[2];
   vtkRenderer* ren = this->GetRenderer();
-  this->ComputeVisiblePropBounds(bounds);
-  ren->ResetCameraClippingRange(bounds);
+  // Get default clipping range.
+  // Includes 3D widgets but not all processes.
+  ren->GetActiveCamera()->GetClippingRange(range1);
+
+  this->ComputeVisiblePropBounds(bds);
+  ren->ResetCameraClippingRange(bds);
+  
+  // Get part clipping range.
+  // Includes all process partitions, but not 3d Widgets.
+  ren->GetActiveCamera()->GetClippingRange(range2);
+
+  // Merge
+  if (range1[0] < range2[0])
+    {
+    range2[0] = range1[0];
+    }
+  if (range1[1] > range2[1])
+    {
+    range2[1] = range1[1];
+    }
+  // Includes all process partitions and 3D Widgets.
+  ren->GetActiveCamera()->SetClippingRange(range2);
 }
 
 //-----------------------------------------------------------------------------
