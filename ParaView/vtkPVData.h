@@ -76,8 +76,8 @@ public:
   
   // Description:
   // Set/Get the scalar bar associated with this data object.
-  void SetScalarBar(vtkPVScalarBar *sb);
-  vtkPVScalarBar *GetScalarBar();
+  void SetPVScalarBar(vtkPVScalarBar *sb);
+  vtkPVScalarBar *GetPVScalarBar();
                     
   // Description:
   // General filters that can be applied to vtkDataSet.
@@ -158,7 +158,7 @@ protected:
 
   vtkPVActorComposite *ActorComposite;
   vtkKWPushButton *ActorCompositeButton;
-  vtkPVScalarBar *ScalarBar;
+  vtkPVScalarBar *PVScalarBar;
   vtkKWPushButton *ScalarBarButton;
   
   // This points to the source widget that owns this data widget.

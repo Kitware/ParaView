@@ -92,13 +92,13 @@ void vtkPVRunTimeContour::AcceptCallback()
 	this->CreateDataPage(i);
 	ac = this->GetNthPVOutput(i)->GetActorComposite();
 	window->GetMainView()->AddComposite(ac);
-	sb = this->GetNthPVOutput(i)->GetScalarBar();
+	sb = this->GetNthPVOutput(i)->GetPVScalarBar();
 	window->GetMainView()->AddComposite(sb);
 	// Make the last data invisible.
 	if (input)
 	  {
 	  input->GetActorComposite()->SetVisibility(0);
-	  input->GetScalarBar()->SetVisibility(0);
+	  input->GetPVScalarBar()->SetVisibility(0);
 	  }
 	window->GetMainView()->ResetCamera();
 	}

@@ -542,7 +542,7 @@ void vtkPVActorComposite::SetMode(int mode)
       texture->Delete();
       texture = NULL;
       
-      this->GetPVData()->GetScalarBar()->UpdateLookupTable();
+      this->GetPVData()->GetPVScalarBar()->UpdateLookupTable();
       
       return;
       }

@@ -99,11 +99,11 @@ void vtkPVPolyDataSource::InitializePVOutput(int idx)
 void vtkPVPolyDataSource::SelectInputSource()
 {
   this->GetPVOutput()->GetActorComposite()->VisibilityOff();
-  this->GetPVOutput()->GetScalarBar()->VisibilityOff();
+  this->GetPVOutput()->GetPVScalarBar()->VisibilityOff();
   this->GetWindow()->GetMainView()->
     SetSelectedComposite(this->GetPVInput()->GetPVSource());
   this->GetPVInput()->GetActorComposite()->VisibilityOn();
-  this->GetPVInput()->GetScalarBar()->VisibilityOn();
+  this->GetPVInput()->GetPVScalarBar()->VisibilityOn();
   this->GetView()->Render();
   this->GetWindow()->GetMainView()->ResetCamera();
 }

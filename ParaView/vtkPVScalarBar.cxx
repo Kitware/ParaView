@@ -329,7 +329,7 @@ void vtkPVScalarBar::SetPVData(vtkPVData *data)
     vtkPVData *tmp = this->PVData;
     this->PVData = NULL;
     // Manage double pointer.
-    tmp->SetScalarBar(NULL);
+    tmp->SetPVScalarBar(NULL);
     tmp->UnRegister(this);
     }
   
@@ -338,7 +338,7 @@ void vtkPVScalarBar::SetPVData(vtkPVData *data)
     this->PVData = data;
     data->Register(this);
     // Manage double pointer.
-    data->SetScalarBar(this);
+    data->SetPVScalarBar(this);
     this->UpdateLookupTable();
     }
 }

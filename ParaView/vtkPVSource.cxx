@@ -1472,13 +1472,13 @@ void vtkPVSource::AcceptCallback()
     this->CreateDataPage(0);
     ac = this->GetPVOutput(0)->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
-    sb = this->GetPVOutput(0)->GetScalarBar();
+    sb = this->GetPVOutput(0)->GetPVScalarBar();
     window->GetMainView()->AddComposite(sb);
     // Make the last data invisible.
     if (input)
       {
       input->GetActorComposite()->SetVisibility(0);
-      input->GetScalarBar()->SetVisibility(0);
+      input->GetPVScalarBar()->SetVisibility(0);
       }
     window->GetMainView()->ResetCamera();
     }
@@ -1584,7 +1584,7 @@ void vtkPVSource::DeleteCallback()
       }
     this->GetVTKSource()->Delete();
     this->PVOutputs[0]->GetActorComposite()->VisibilityOff();
-    this->PVOutputs[0]->GetScalarBar()->VisibilityOff();
+    this->PVOutputs[0]->GetPVScalarBar()->VisibilityOff();
     if (prev)
       {
       prev->GetPVOutput(0)->GetActorComposite()->VisibilityOn();

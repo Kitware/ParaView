@@ -277,7 +277,7 @@ void vtkPVImageClip::ExtentsChanged()
     this->GetPVOutput()->GetData()->
       SetUpdateExtent(this->GetPVOutput()->GetData()->GetWholeExtent());
     this->GetPVInput()->GetActorComposite()->VisibilityOff();
-    this->GetPVInput()->GetScalarBar()->VisibilityOff();
+    this->GetPVInput()->GetPVScalarBar()->VisibilityOff();
     this->CreateDataPage(0);
     ac = this->GetPVOutput()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
