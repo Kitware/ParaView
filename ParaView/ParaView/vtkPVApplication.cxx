@@ -100,7 +100,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.150");
+vtkCxxRevisionMacro(vtkPVApplication, "1.151");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -259,6 +259,7 @@ vtkPVApplication::vtkPVApplication()
   this->SetApplicationReleaseName("development");
 
   this->Controller = NULL;
+  this->NumberOfPipes = 1;
 
   this->UseRenderingGroup = 0;
   this->GroupFileName = 0;
