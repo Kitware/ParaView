@@ -28,11 +28,7 @@
 
 class vtkKWApplication;
 class vtkKWWidget;
-
-//BTX
-template<class DataType> class vtkLinkedList;
-template<class DataType> class vtkLinkedListIterator;
-//ETX
+class vtkKWWidgetSetInternals;
 
 class VTK_EXPORT vtkKWWidgetSet : public vtkKWWidget
 {
@@ -114,33 +110,26 @@ protected:
   int PadY;
   int ExpandWidgets;
 
-  //BTX
+  
+  // Description:
+  // To be implemented by superclasses.
+  // Allocate and create a widget of the right type.
+  // Return a pointer to the superclass though.
+  virtual vtkKWWidget* AllocateAndCreateWidget() = 0;
 
-  // A WidgetSlot associates a vtkKWWidget to a unique Id
-  // I don't want to use a map between those two, for the following reasons:
-  // a), we might need more information in the future, b) a map 
-  // Register/Unregister pointers if they are pointers to VTK objects.
- 
-  class WidgetSlot
-  {
-  public:
-    int Id;
-    vtkKWWidget *Widget;
-  };
+  // BTX
+  // PIMPL Encapsulation for STL containers
 
-  typedef vtkLinkedList<WidgetSlot*> WidgetsContainer;
-  typedef vtkLinkedListIterator<WidgetSlot*> WidgetsContainerIterator;
-  WidgetsContainer *Widgets;
+  vtkKWWidgetSetInternals *Internals;
 
   // Helper methods
 
-  virtual WidgetSlot* GetWidgetSlot(int id);
-  virtual WidgetSlot* GetNthWidgetSlot(int rank);
+  virtual vtkKWWidget* GetWidgetInternal(int id);
   virtual vtkKWWidget* AddWidgetInternal(int id);
-  virtual vtkKWWidget* AllocateAndCreateWidget() = 0;
-
   //ETX
 
+  // Description:
+  // Pack the widgets
   virtual void Pack();
 
 private:

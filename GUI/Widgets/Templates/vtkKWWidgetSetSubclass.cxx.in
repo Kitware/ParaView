@@ -20,7 +20,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKW@WidgetType@Set);
-vtkCxxRevisionMacro(vtkKW@WidgetType@Set, "1.1");
+vtkCxxRevisionMacro(vtkKW@WidgetType@Set, "1.2");
 
 int vtkKW@WidgetType@SetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -34,14 +34,7 @@ vtkKW@WidgetType@Set::vtkKW@WidgetType@Set()
 //----------------------------------------------------------------------------
 vtkKW@WidgetType@* vtkKW@WidgetType@Set::GetWidget(int id)
 {
-  vtkKW@WidgetType@Set::WidgetSlot *widget_slot = 
-    this->GetWidgetSlot(id);
-  if (!widget_slot)
-    {
-    return NULL;
-    }
-
-  return static_cast<vtkKW@WidgetType@*>(widget_slot->Widget);
+  return static_cast<vtkKW@WidgetType@*>(this->GetWidgetInternal(id));
 }
 
 //----------------------------------------------------------------------------

@@ -16,16 +16,33 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWWidget.h"
-#include "vtkLinkedList.txx"
-#include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
+
+#include <vtkstd/list>
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.1");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.2");
 
 int vtkKWWidgetSetCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
+
+//----------------------------------------------------------------------------
+class vtkKWWidgetSetInternals
+{
+public:
+
+  struct WidgetSlot
+  {
+    int Id;
+    vtkKWWidget *Widget;
+  };
+
+  typedef vtkstd::list<WidgetSlot> WidgetContainer;
+  typedef vtkstd::list<WidgetSlot>::iterator WidgetContainerIterator;
+
+  WidgetContainer Widgets;
+};
 
 //----------------------------------------------------------------------------
 vtkKWWidgetSet::vtkKWWidgetSet()
@@ -36,7 +53,10 @@ vtkKWWidgetSet::vtkKWWidgetSet()
   this->PadX = 0;
   this->PadY = 0;
   this->ExpandWidgets = 0;
-  this->Widgets = vtkKWWidgetSet::WidgetsContainer::New();
+
+  // Internal structs
+
+  this->Internals = new vtkKWWidgetSetInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -48,7 +68,7 @@ vtkKWWidgetSet::~vtkKWWidgetSet()
 
   // Delete the container
 
-  this->Widgets->Delete();
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -56,101 +76,68 @@ void vtkKWWidgetSet::DeleteAllWidgets()
 {
   // Delete all widgets
 
-  vtkKWWidgetSet::WidgetSlot *widget_slot = NULL;
-  vtkKWWidgetSet::WidgetsContainerIterator *it = 
-    this->Widgets->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  vtkKWWidgetSetInternals::WidgetContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
     {
-    if (it->GetData(widget_slot) == VTK_OK)
+    if (it->Widget)
       {
-      if (widget_slot->Widget)
-        {
-        widget_slot->Widget->Delete();
-        widget_slot->Widget = NULL;
-        }
-      delete widget_slot;
+      it->Widget->Delete();
+      it->Widget = NULL;
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  this->Widgets->RemoveAllItems();
+  this->Internals->Widgets.clear();
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidgetSet::WidgetSlot* 
-vtkKWWidgetSet::GetWidgetSlot(int id)
+vtkKWWidget* vtkKWWidgetSet::GetWidgetInternal(int id)
 {
-  vtkKWWidgetSet::WidgetSlot *widget_slot = NULL;
-  vtkKWWidgetSet::WidgetSlot *found = NULL;
-  vtkKWWidgetSet::WidgetsContainerIterator *it = 
-    this->Widgets->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  vtkKWWidgetSetInternals::WidgetContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
     {
-    if (it->GetData(widget_slot) == VTK_OK && widget_slot->Id == id)
+    if (it->Id == id)
       {
-      found = widget_slot;
-      break;
+      return it->Widget;
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
-}
-
-//----------------------------------------------------------------------------
-vtkKWWidgetSet::WidgetSlot* 
-vtkKWWidgetSet::GetNthWidgetSlot(int rank)
-{
-  vtkKWWidgetSet::WidgetSlot *widget_slot = NULL;
-  vtkKWWidgetSet::WidgetSlot *found = NULL;
-  vtkKWWidgetSet::WidgetsContainerIterator *it = 
-    this->Widgets->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(widget_slot) == VTK_OK && !rank--)
-      {
-      found = widget_slot;
-      break;
-      }
-    it->GoToNextItem();
-    }
-  it->Delete();
-
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWidgetSet::HasWidget(int id)
 {
-  return this->GetWidgetSlot(id) ? 1 : 0;
+  return this->GetWidgetInternal(id) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWidgetSet::GetNumberOfWidgets()
 {
-  return this->Widgets ? this->Widgets->GetNumberOfItems() : 0;
+  return this->Internals ? this->Internals->Widgets.size() : 0;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWWidgetSet::GetNthWidgetId(int rank)
 {
-  vtkKWWidgetSet::WidgetSlot *widget_slot = 
-    this->GetNthWidgetSlot(rank);
-
-  if (!widget_slot)
+  vtkKWWidgetSetInternals::WidgetContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
     {
-    return -1;
+    if (!rank--)
+      {
+      return it->Id;
+      }
     }
 
-  return widget_slot->Id;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -174,20 +161,17 @@ void vtkKWWidgetSet::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  vtkKWWidgetSet::WidgetSlot *widget_slot = NULL;
-  vtkKWWidgetSet::WidgetsContainerIterator *it = 
-    this->Widgets->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  vtkKWWidgetSetInternals::WidgetContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
     {
-    if (it->GetData(widget_slot) == VTK_OK)
+    if (it->Widget)
       {
-      widget_slot->Widget->SetEnabled(this->Enabled);
+      it->Widget->SetEnabled(this->Enabled);
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -213,27 +197,18 @@ vtkKWWidget* vtkKWWidgetSet::AddWidgetInternal(int id)
 
   // Add the widget slot to the manager
 
-  vtkKWWidgetSet::WidgetSlot *widget_slot = 
-    new vtkKWWidgetSet::WidgetSlot;
+  vtkKWWidgetSetInternals::WidgetSlot widget_slot;
+  widget_slot.Id = id;
+  widget_slot.Widget = this->AllocateAndCreateWidget();
+  widget_slot.Widget->SetEnabled(this->Enabled);
 
-  if (this->Widgets->AppendItem(widget_slot) != VTK_OK)
-    {
-    vtkErrorMacro("Error while adding a Widget to the set.");
-    delete widget_slot;
-    return NULL;
-    }
-  
-  // Create the widget
-
-  widget_slot->Id = id;
-  widget_slot->Widget = this->AllocateAndCreateWidget();
-  widget_slot->Widget->SetEnabled(this->Enabled);
+  this->Internals->Widgets.push_back(widget_slot);
 
   // Pack the set
 
   this->Pack();
 
-  return widget_slot->Widget;
+  return widget_slot.Widget;
 }
 
 // ----------------------------------------------------------------------------
@@ -249,44 +224,40 @@ void vtkKWWidgetSet::Pack()
   tk_cmd << "catch {eval grid forget [grid slaves " << this->GetWidgetName() 
          << "]}" << endl;
 
-  vtkKWWidgetSet::WidgetSlot *widget_slot = NULL;
-  vtkKWWidgetSet::WidgetsContainerIterator *it = 
-    this->Widgets->NewIterator();
+  vtkKWWidgetSetInternals::WidgetContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetContainerIterator end = 
+    this->Internals->Widgets.end();
 
   int col = 0;
   int row = 0;
   const char *sticky = 
     (this->ExpandWidgets ? "news" : (this->PackHorizontally ? "ews" : "nsw"));
 
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  for (; it != end; ++it)
     {
-    if (it->GetData(widget_slot) == VTK_OK)
+    tk_cmd 
+      << "grid " << it->Widget->GetWidgetName() 
+      << " -sticky " << sticky
+      << " -column " << (this->PackHorizontally ? col : row)
+      << " -row " << (this->PackHorizontally ? row : col)
+      << " -padx " << this->PadX
+      << " -pady " << this->PadY
+      << endl;
+    col++;
+    if (this->MaximumNumberOfWidgetsInPackingDirection &&
+        col >= this->MaximumNumberOfWidgetsInPackingDirection)
       {
-      tk_cmd 
-        << "grid " << widget_slot->Widget->GetWidgetName() 
-        << " -sticky " << sticky
-        << " -column " << (this->PackHorizontally ? col : row)
-        << " -row " << (this->PackHorizontally ? row : col)
-        << " -padx " << this->PadX
-        << " -pady " << this->PadY
-        << endl;
-      col++;
-      if (this->MaximumNumberOfWidgetsInPackingDirection &&
-          col >= this->MaximumNumberOfWidgetsInPackingDirection)
-        {
-        col = 0;
-        row++;
-        }
+      col = 0;
+      row++;
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
   // Weights
   
   int i;
-  int maxcol = (row > 0) ? this->MaximumNumberOfWidgetsInPackingDirection : col;
+  int maxcol = 
+    (row > 0) ? this->MaximumNumberOfWidgetsInPackingDirection : col;
   for (i = 0; i < maxcol; i++)
     {
     tk_cmd << "grid " << (this->PackHorizontally ? "column" : "row") 
@@ -378,27 +349,20 @@ void vtkKWWidgetSet::ShowWidget(int id)
 //----------------------------------------------------------------------------
 int vtkKWWidgetSet::GetWidgetVisibility(int id)
 {
-  vtkKWWidgetSet::WidgetSlot *widget_slot = 
-    this->GetWidgetSlot(id);
-
-  return (widget_slot && 
-          widget_slot->Widget &&
-          widget_slot->Widget->IsCreated() &&
-          !widget_slot->Widget->GetApplication()->EvaluateBooleanExpression(
-            "catch {grid info %s}", widget_slot->Widget->GetWidgetName()));
+  vtkKWWidget *widget = this->GetWidgetInternal(id);
+  return (widget && 
+          widget->IsCreated() &&
+          !widget->GetApplication()->EvaluateBooleanExpression(
+            "catch {grid info %s}", widget->GetWidgetName()));
 }
 
 //----------------------------------------------------------------------------
 void vtkKWWidgetSet::SetWidgetVisibility(int id, int flag)
 {
-  vtkKWWidgetSet::WidgetSlot *widget_slot = 
-    this->GetWidgetSlot(id);
-
-  if (widget_slot && widget_slot->Widget && widget_slot->Widget->IsCreated())
+  vtkKWWidget *widget = this->GetWidgetInternal(id);
+  if (widget && widget->IsCreated())
     {
-    this->Script("grid %s %s", 
-                 (flag ? "" : "remove"),
-                 widget_slot->Widget->GetWidgetName());
+    this->Script("grid %s %s", (flag ? "" : "remove"),widget->GetWidgetName());
     }
 }
 
