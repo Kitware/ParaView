@@ -1,0 +1,11 @@
+Loading Data
+
+ParaView can read several different data formats: VTK, parallel VTK, EnSight, POP, STL, and particle files.  To load a data file into ParaView, first go to the File menu and click "Open Data File".
+
+A file dialog box will open.  Select the type of file you wish to load, select the appropriate file, and click "Open".
+
+To open a particle file or a PLOT3D file, select the ParticleReader or PLOT3DReader, respectively, from the VTK | Sources menu.  These readers not available from the file dialog box.
+
+If the data is composed of 3D cells, an outline of the data will be drawn in the render window.  Click on the "Display" tab to view and change the parameters determining how the data is displayed.
+
+At the top of the Display page, the number of cells and points in the data set is listed.  Below that, the bounds of the data set (minimum and maximum coordinates) are displayed.  There is also a check button to toggle the visibility of the data set and a button to center the camera on this data set ("Set View to Data").  You can also select which scalar value in the data set to use as color.  If you instead color by "Property", you can select a single color for rendering the whole data set.  In the "Display Style" box, you can select whether to display the data as a surface, in wireframe, or as points.  (Note: When a 3D data set is loaded, the data first needs to be passed through a DataSetSurfaceFilter before it can be displayed as a surface.  This filter is listed under the VTK | Filters menu.)  The selected option in the "Interpolation" menu button determines whether normals in the data set are considered during rendering.  Gouraud shading uses the normals; flat shading does not.  There are also two sliders to change the point size and line width of the points and lines used for drawing the data set.  The last option listed on the Display page is the Cube Axes check button.  If the check button is selected, the x, y, z coordinate axes are drawn and a subset of the coordinates for each axis are drawn for reference.
