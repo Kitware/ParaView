@@ -37,7 +37,7 @@
 #include "vtkCamera.h"
 #include "vtkFloatArray.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.3");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.4");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -628,6 +628,12 @@ double vtkSMRenderModuleProxy::GetZBufferValue(int x, int y)
   val = array->GetValue(0);
   array->Delete();
   return val;  
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::ResetCamera(double bds[6])
+{
+  this->GetRenderer()->ResetCamera(bds);
 }
 
 //-----------------------------------------------------------------------------

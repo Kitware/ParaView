@@ -36,7 +36,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.46.2.1");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.46.2.2");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -254,7 +254,7 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
       pm->GetObjectFromID(this->WidgetProxy->GetID(ui)));
     if (widget)
       {
-      widget->SetRenderModule(pm->GetRenderModule());
+      widget->SetRenderModuleProxy(pvApp->GetRenderModuleProxy());
       }
     }
   

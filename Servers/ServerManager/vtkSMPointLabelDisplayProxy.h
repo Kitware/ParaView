@@ -26,6 +26,7 @@
 
 class vtkSMRenderModuleProxy;
 class vtkSMSourceProxy;
+class vtkUnstructuredGrid;
 
 class VTK_EXPORT vtkSMPointLabelDisplayProxy : public vtkSMDisplayProxy
 {
@@ -59,6 +60,13 @@ public:
   // Marks for Update.
   virtual void InvalidateGeometry();
   
+  //BTX
+  // Description:
+  // The Pick needs access to this to fill in the UI point values.
+  // TODO: I have to find a means to get rid of this!!
+  vtkUnstructuredGrid* GetCollectedData();
+  //ETX
+   
 protected:
   vtkSMPointLabelDisplayProxy();
   ~vtkSMPointLabelDisplayProxy();

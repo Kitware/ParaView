@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.63.2.2");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.63.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -787,7 +787,7 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
       pm->GetObjectFromID(this->WidgetProxy->GetID(ui)));
     if (widget)
       {
-      widget->SetRenderModule(pm->GetRenderModule());
+      widget->SetRenderModuleProxy(pvApp->GetRenderModuleProxy());
       }
     }
   

@@ -21,12 +21,12 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkCamera.h"
 
-#include "vtkPVRenderModule.h"
+#include "vtkSMRenderModuleProxy.h"
 
 
 vtkStandardNewMacro(vtkPickLineWidget);
-vtkCxxRevisionMacro(vtkPickLineWidget, "1.1");
-vtkCxxSetObjectMacro(vtkPickLineWidget,RenderModule,vtkPVRenderModule);
+vtkCxxRevisionMacro(vtkPickLineWidget, "1.1.2.1");
+/*vtkCxxSetObjectMacro(vtkPickLineWidget,RenderModuleProxy,vtkSMRenderModuleProxy);*/
 
 
 
@@ -34,21 +34,21 @@ vtkCxxSetObjectMacro(vtkPickLineWidget,RenderModule,vtkPVRenderModule);
 vtkPickLineWidget::vtkPickLineWidget()
 {
   this->EventCallbackCommand->SetCallback(vtkPickLineWidget::ProcessEvents);
-  this->RenderModule = 0;
+  this->RenderModuleProxy = 0;
   this->LastPicked = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPickLineWidget::~vtkPickLineWidget()
 {
-  this->SetRenderModule(NULL);
+  this->SetRenderModuleProxy(NULL);
 }
 
 //----------------------------------------------------------------------------
 void vtkPickLineWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "RenderModule: (" << this->RenderModule << ")\n";
+  os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
 }
 
 
@@ -98,14 +98,14 @@ void vtkPickLineWidget::OnChar()
   if (this->Interactor->GetKeyCode() == 'p' || 
       this->Interactor->GetKeyCode() == 'P' )
     {
-    if (this->RenderModule == NULL)
+    if (this->RenderModuleProxy == NULL)
       {
       vtkErrorMacro("Cannot pick without a render module.");
       return;
       }
     int X = this->Interactor->GetEventPosition()[0];
     int Y = this->Interactor->GetEventPosition()[1];
-    float z = this->RenderModule->GetZBufferValue(X, Y);
+    float z = this->RenderModuleProxy->GetZBufferValue(X, Y);
     double pt[4];
     this->ComputeDisplayToWorld(double(X),double(Y),double(z),pt);
 

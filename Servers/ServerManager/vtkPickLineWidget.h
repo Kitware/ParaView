@@ -28,7 +28,7 @@
 #include "vtkLineWidget.h"
 
 
-class vtkPVRenderModule;
+class vtkSMRenderModuleProxy;
 
 
 class VTK_EXPORT vtkPickLineWidget : public vtkLineWidget
@@ -41,8 +41,8 @@ public:
     
   // Description:
   // The render module is for picking.
-  void SetRenderModule(vtkPVRenderModule* rm);
-  vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
+  void SetRenderModuleProxy(vtkSMRenderModuleProxy* rm){ this->RenderModuleProxy = rm; }
+  vtkGetObjectMacro(RenderModuleProxy, vtkSMRenderModuleProxy);
 
   // Description:
   // We have to look for key press events too.
@@ -53,7 +53,7 @@ protected:
   ~vtkPickLineWidget();
 
   // For picking.  Use a proxy in the future.
-  vtkPVRenderModule* RenderModule;
+  vtkSMRenderModuleProxy* RenderModuleProxy;
 
   virtual void OnChar();
 

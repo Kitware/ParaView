@@ -35,7 +35,6 @@
 #include "vtkMPIMoveData.h"
 #include "vtkMultiDisplayManager.h"
 #include "vtkPickFilter.h"
-#include "vtkPickPointWidget.h"
 #include "vtkPVArrowSource.h"
 #include "vtkPVClipDataSet.h"
 #include "vtkPVCompositeBuffer.h"
@@ -130,7 +129,6 @@ int main(int , char *[])
   c = vtkMPIMoveData::New(); c->Print(cout); c->Delete();
   c = vtkMultiDisplayManager::New(); c->Print(cout); c->Delete();
   c = vtkPickFilter::New(); c->Print(cout); c->Delete();
-  c = vtkPickPointWidget::New(); c->Print(cout); c->Delete();
   c = vtkPVArrowSource::New(); c->Print(cout); c->Delete();
   c = vtkPVClipDataSet::New(); c->Print(cout); c->Delete();
   c = vtkPVCompositeBuffer::New(); c->Print(cout); c->Delete();

@@ -1,4 +1,9 @@
 PROJECT(ServerManager)
+
+SET( ServerManagerCS_SRCS
+  vtkPickPointWidget.cxx
+  vtkPickLineWidget.cxx
+  )
  
 SET( ServerManagerCommon_SRCS
   vtkSMInteractorObserverProxy.cxx
@@ -119,6 +124,7 @@ SET( ServerManagerNonWrapped_SRCS
   )
 
 SET( ServerManager_SRCS
+  ${ServerManagerCS_SRCS}
   ${ServerManagerCommon_SRCS}
   ${ServerManagerNonWrapped_SRCS}
   )
@@ -181,7 +187,7 @@ INCLUDE_DIRECTORIES(
 # Create ClientServer wrappers for ParaView classes.
 INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
 SET(VTK_BINARY_DIR "${ServerManager_BINARY_DIR}")
-VTK_EXPORT_KIT("PVServerManager" "PVSERVERMANAGER" "${ServerManagerCommon_SRCS}")
+VTK_EXPORT_KIT("PVServerManager" "PVSERVERMANAGER" "${ServerManagerCommon_SRCS};${ServerManagerCS_SRCS}")
 
 SET(KIT_WRAP_DEPS "")
 SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/Servers/ServerManager/Utilities")

@@ -1519,6 +1519,12 @@
         command="InvalidateGeometry"
         update_self="1">
       </Property>
+
+      <SubProxy>
+        <Proxy name="Collect" proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+
       <SubProxy>
         <Proxy name="UpdateSuppressor"
           proxygroup="filters" proxyname="UpdateSuppressor">

@@ -76,7 +76,7 @@
 #include "vtkVolumeProperty.h"
 #include "vtkPVOptions.h"
 #include "vtkStdString.h"
-
+#include "vtkSMRenderModuleProxy.h"
 
 #define VTK_PV_OUTLINE_LABEL "Outline"
 #define VTK_PV_SURFACE_LABEL "Surface"
@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.2");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.3");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1810,7 +1810,7 @@ void vtkPVDisplayGUI::Initialize()
 void vtkPVDisplayGUI::CenterCamera()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkRenderer* ren = pvApp->GetProcessModule()->GetRenderModule()->GetRenderer();
+  vtkSMRenderModuleProxy* renderModule = pvApp->GetRenderModuleProxy();
 
   double bounds[6];
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
@@ -1821,10 +1821,8 @@ void vtkPVDisplayGUI::CenterCamera()
                                 0.5*(bounds[2]+bounds[3]),
                                 0.5*(bounds[4]+bounds[5]));
     window->ResetCenterCallback();
-
-    ren->ResetCamera(bounds[0], bounds[1], bounds[2], 
-                     bounds[3], bounds[4], bounds[5]);
-    ren->ResetCameraClippingRange();
+    renderModule->ResetCamera(bounds);
+    renderModule->ResetCameraClippingRange();
         
     if ( this->GetPVRenderView() )
       {

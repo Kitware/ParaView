@@ -76,8 +76,6 @@ SET(Filters_SRCS
   vtkPVXMLElement.cxx
   vtkPVXMLParser.cxx
   vtkPickFilter.cxx
-  vtkPickLineWidget.cxx
-  vtkPickPointWidget.cxx
   vtkProjectedTetrahedraMapper.cxx
   vtkSelectInputs.cxx
   vtkSortDataArray.cxx

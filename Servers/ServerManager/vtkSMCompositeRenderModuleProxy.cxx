@@ -26,7 +26,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.1.2.2");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.1.2.3");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -416,17 +416,22 @@ double vtkSMCompositeRenderModuleProxy::GetZBufferValue(int x, int y)
     {
     return this->Superclass::GetZBufferValue(x,y);
     }
-/*
+
   // Only MPI has a pointer to a composite.
-  vtkPVProcessModule* pm = this->ProcessModule;
-  if(this->CompositeID.ID)
+  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
+    vtkProcessModule::GetProcessModule());
+  if (!this->CompositeManagerProxy)
     {
-    vtkPVTreeComposite *composite = 
-      vtkPVTreeComposite::SafeDownCast( pm->GetObjectFromID( this->CompositeID ));
-    if( composite ) // we know this is a vtkPVTreeComposite
-      {
-      return composite->GetZ(x, y);
-      }
+    vtkErrorMacro("CompositeManagerProxy not defined!");
+    return 0;
+    }
+
+  vtkPVTreeComposite *composite = 
+    vtkPVTreeComposite::SafeDownCast( pm->GetObjectFromID( 
+        this->CompositeManagerProxy->GetID(0)));
+  if( composite ) // we know this is a vtkPVTreeComposite
+    {
+    return composite->GetZ(x, y);
     }
 
   // If client-server...
@@ -434,8 +439,9 @@ double vtkSMCompositeRenderModuleProxy::GetZBufferValue(int x, int y)
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
-           << this->CompositeID << "GetZBufferValue" << x << y
-           << vtkClientServerStream::End;
+      << this->CompositeManagerProxy->GetID(0) 
+      << "GetZBufferValue" << x << y
+      << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT, stream);
     float z = 0;
     if(pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0, 0, &z))
@@ -450,9 +456,6 @@ double vtkSMCompositeRenderModuleProxy::GetZBufferValue(int x, int y)
 
   vtkErrorMacro("Unknown RenderModule mode.");
   return 0;
-  */
-  vtkErrorMacro("TODO: NOt yet implemented!");
-  return 0; 
 }
 
 

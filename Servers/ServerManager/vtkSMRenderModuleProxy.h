@@ -104,6 +104,10 @@ public:
   // This is necessary for picking the center of rotation.
   virtual double GetZBufferValue(int x, int y);
 
+  // Description:
+  // Reset camera to the given bounds.
+  void ResetCamera(double bds[6]);
+
 protected:
   vtkSMRenderModuleProxy();
   ~vtkSMRenderModuleProxy();

@@ -24,6 +24,8 @@
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVOptions.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkMPIMoveData.h"
 
 vtkStandardNewMacro(vtkSMPointLabelDisplayProxy);
 vtkCxxRevisionMacro(vtkSMPointLabelDisplayProxy, "Revision: 1.1$");
@@ -335,6 +337,21 @@ void vtkSMPointLabelDisplayProxy::MarkConsumersAsModified()
 {
   this->Superclass::MarkConsumersAsModified();
   this->InvalidateGeometry();
+}
+
+//-----------------------------------------------------------------------------
+vtkUnstructuredGrid* vtkSMPointLabelDisplayProxy::GetCollectedData()
+{
+  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+
+  vtkMPIMoveData* dp = vtkMPIMoveData::SafeDownCast(
+    pm->GetObjectFromID(this->CollectProxy->GetID(0)));
+  if (dp == NULL)
+    {
+    return NULL;
+    }
+
+  return dp->GetUnstructuredGridOutput();
 }
 
 //-----------------------------------------------------------------------------
