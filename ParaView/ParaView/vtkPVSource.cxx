@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.265");
+vtkCxxRevisionMacro(vtkPVSource, "1.266");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1092,6 +1092,17 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 
     pvd->CreateProperties();
 
+    // Make the last data invisible.
+    input = this->GetPVInput(0);
+    if (input)
+      {
+      if (this->ReplaceInput && input->GetPropertiesCreated() && hideSource)
+        {
+        input->SetVisibilityInternal(0);
+        }
+      }
+
+
     this->UnGrabFocus();
 
     // Set the current data of the window.
@@ -1148,16 +1159,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       this->GetPVOutput()->GetPVPart()->Update();
       }
     pvd->UpdateProperties();
-    }
-
-  // Make the last data invisible.
-  input = this->GetPVInput(0);
-  if (input)
-    {
-    if (this->ReplaceInput && input->GetPropertiesCreated() && hideSource)
-      {
-      input->SetVisibilityInternal(0);
-      }
     }
 
   this->Script("update");  
@@ -2502,7 +2503,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.265 $");
+  this->ExtractRevision(os,"$Revision: 1.266 $");
 }
 
 //----------------------------------------------------------------------------
