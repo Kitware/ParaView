@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.42");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.43");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -163,6 +163,28 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
   
   this->Observer->Delete();
   this->Observer = NULL;
+}
+
+//----------------------------------------------------------------------------
+vtkRenderer* vtkKWRenderWidget::GetNthRenderer(int id)
+{
+  if (id != 0)
+    {
+    return NULL;
+    }
+
+  return this->Renderer;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRenderWidget::GetRendererId(vtkRenderer *ren)
+{
+  if (!ren || ren != this->Renderer)
+    {
+    return -1;
+    }
+
+  return 0;
 }
 
 //----------------------------------------------------------------------------

@@ -206,6 +206,14 @@ public:
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
 
   // Description:
+  // If the widget supports multiple renderers:
+  // GetNthRenderer() gets the Nth renderer (or NULL if it does not exist),
+  // GetRendererId() gets the id of a given renderer (or -1 if this renderer
+  // does not belong to this widget)
+  virtual vtkRenderer* GetNthRenderer(int id);
+  virtual int GetRendererId(vtkRenderer*);
+
+  // Description:
   // Get the VTK widget
   vtkGetObjectMacro(VTKWidget, vtkKWWidget);
   
