@@ -340,14 +340,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->RenderWindow->SetDesiredUpdateRate(1.0);
   this->Renderer = vtkRenderer::New();
   this->RenderWindow->AddRenderer(this->Renderer);  
-
-  vtkMesaRenderWindow *mesaRenderWindow;
-  vtkMesaRenderer *mesaRenderer;
-  
-  mesaRenderWindow = vtkMesaRenderWindow::New();
-  mesaRenderWindow->SetOffScreenRendering(1);
-  mesaRenderer = vtkMesaRenderer::New();
-  mesaRenderWindow->AddRenderer(mesaRenderer);
 }
 
 //----------------------------------------------------------------------------
@@ -378,10 +370,7 @@ void vtkPVRenderView::OffScreenRenderingOn()
   this->Renderer->Delete();
   this->Renderer = NULL;
   this->RenderWindow->Delete();
-  this->RenderWindow = NULL;
-  
-  cerr << "Offscreen on" << endl;
-  
+  this->RenderWindow = NULL;  
   
   vtkMesaRenderWindow *mesaRenderWindow;
   vtkMesaRenderer *mesaRenderer;

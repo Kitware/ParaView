@@ -25,6 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+#include "vtkKWLabeledEntry.h"
 
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
@@ -47,6 +48,13 @@ vtkPVSource::vtkPVSource()
   this->Properties = vtkKWWidget::New();
   
   this->DataCreated = 0;
+
+  
+  this->Widgets = vtkKWWidgetCollection::New();
+  
+  this->NumberOfAcceptCommands = 0;
+  this->AcceptCommandArrayLength = 0;
+  this->AcceptCommands = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +73,12 @@ vtkPVSource::~vtkPVSource()
     }
   this->SetName(NULL);
   this->Properties->Delete();
+
+
+  this->Widgets->Delete();
+  this->Widgets = NULL;
+
+  this->DeleteAcceptCommands();
 }
 
 //----------------------------------------------------------------------------
@@ -311,4 +325,230 @@ int vtkPVSource::GetVisibility()
   return p->GetVisibility();
 }
 
+
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd)
+{
+  vtkKWLabeledEntry *entry = vtkKWLabeledEntry::New();
+  this->Widgets->AddItem(entry);
+  entry->SetParent(this->Properties);
+  entry->Create(this->Application);
+  entry->SetLabel(label);
+
+  // Get initial value from the vtk source.
+  this->Script("%s SetValue [[%s GetVTKSource] %s]", 
+               entry->GetTclName(), this->GetTclName(), getCmd); 
+
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects are going to have to have the same Tcl name!
+  this->AddAcceptCommand("%s AcceptHelper %s [%s GetValue]",
+                          this->GetTclName(), setCmd, entry->GetTclName()); 
+
+  this->Script("pack %s", entry->GetWidgetName());
+  entry->Delete();
+}  
+//----------------------------------------------------------------------------
+void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
+{
+  // First a frame to hold the other widgets.
+  vtkKWWidget *frame = vtkKWWidget::New();
+  this->Widgets->AddItem(frame);
+  frame->SetParent(this->Properties);
+  frame->Create(this->Application, "frame", "");
+  this->Script("pack %s", frame->GetWidgetName());
+
+  // Now a label
+  vtkKWLabel *labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(label);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+
+  // Now the check button
+  vtkKWCheckButton *check = vtkKWCheckButton::New();
+  this->Widgets->AddItem(check);
+  check->SetParent(frame);
+  check->Create(this->Application, "");
+  this->Script("pack %s -side left", check->GetWidgetName());
+
+  // Get initial value from the vtk source.
+  this->Script("%s SetState [[%s GetVTKSource] %s]", 
+               check->GetTclName(), this->GetTclName(), getCmd); 
+
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects are going to have to have the same Tcl name!
+  this->AddAcceptCommand("%s AcceptHelper %s [%s GetState]",
+                          this->GetTclName(), setCmd, check->GetTclName()); 
+
+  this->Script("pack %s -side left", check->GetWidgetName());
+
+  frame->Delete();
+  labelWidget->Delete();
+  check->Delete();
+}  
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AddXYZEntry(char *label, char *setCmd, char *getCmd)
+{
+  vtkKWWidget *frame;
+  vtkKWLabel *labelWidget;
+  vtkKWEntry *xEntry, *yEntry, *zEntry;
+
+  // First a frame to hold the other widgets.
+  frame = vtkKWWidget::New();
+  this->Widgets->AddItem(frame);
+  frame->SetParent(this->Properties);
+  frame->Create(this->Application, "frame", "");
+  this->Script("pack %s", frame->GetWidgetName());
+
+  // Now a label
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel(label);
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  // X
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel("X");
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  xEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(xEntry);
+  xEntry->SetParent(frame);
+  xEntry->Create(this->Application, "-width 4");
+  this->Script("pack %s -side left", xEntry->GetWidgetName());
+
+  // Y
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel("Y");
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  yEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(yEntry);
+  yEntry->SetParent(frame);
+  yEntry->Create(this->Application, "-width 4");
+  this->Script("pack %s -side left", yEntry->GetWidgetName());
+
+  // Z
+  labelWidget = vtkKWLabel::New();
+  this->Widgets->AddItem(labelWidget);
+  labelWidget->SetParent(frame);
+  labelWidget->Create(this->Application, "");
+  labelWidget->SetLabel("Z");
+  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  labelWidget->Delete();
+  labelWidget = NULL;
+
+  zEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(zEntry);
+  zEntry->SetParent(frame);
+  zEntry->Create(this->Application, "-width 4");
+  this->Script("pack %s -side left", zEntry->GetWidgetName());
+
+  // Get initial value from the vtk source.
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
+               xEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 1]", 
+               yEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 2]", 
+               zEntry->GetTclName(), this->GetTclName(), getCmd); 
+
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects are going to have to have the same Tcl name!
+  this->AddAcceptCommand("%s AcceptHelper %s {[%s GetValue] [%s GetValue] [%s GetValue]}",
+                          this->GetTclName(), setCmd, xEntry->GetTclName(),
+                          yEntry->GetTclName(), zEntry->GetTclName());
+
+  frame->Delete();
+  xEntry->Delete();
+  yEntry->Delete();
+  zEntry->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AcceptHelper(char *method, char *args)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->Script("[%s GetVTKSource] %s %s", this->GetTclName(),
+                method, args);
+
+  vtkErrorMacro("[" << this->GetTclName() << " GetVTKSource] " 
+                << method << " " << args);
+
+
+  pvApp->BroadcastScript("[%s GetVTKSource] %s %s", this->GetTclName(),
+                         method, args);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AddAcceptCommand(const char *format, ...)
+{
+  static char event[16000];
+
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(event, format, var_args);
+  va_end(var_args);
+
+  // Check to see if we need to extent to array of commands.
+  if (this->AcceptCommandArrayLength <= this->NumberOfAcceptCommands)
+    { // Yes.
+    int i;
+    // Allocate a new array
+    this->AcceptCommandArrayLength += 20;
+    char **tmp = new char* [this->AcceptCommandArrayLength];
+    // Copy array elements.
+    for (i = 0; i < this->NumberOfAcceptCommands; ++i)
+      {
+      tmp[i] = this->AcceptCommands[i];
+      }
+    // Delete the old array.
+    if (this->AcceptCommands)
+      {
+      delete [] this->AcceptCommands;
+      this->AcceptCommands = NULL;
+      }
+    // Set the new array.
+    this->AcceptCommands = tmp;
+    tmp = NULL;
+    }
+
+  // Allocate the string for and set the new command.
+  this->AcceptCommands[this->NumberOfAcceptCommands] 
+              = new char[strlen(event) + 2];
+  strcpy(this->AcceptCommands[this->NumberOfAcceptCommands], event);
+  this->NumberOfAcceptCommands += 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::DeleteAcceptCommands()
+{
+  int i;
+
+  for (i = 0; i < this->NumberOfAcceptCommands; ++i)
+    {
+    delete [] this->AcceptCommands[i];
+    this->AcceptCommands[i] = NULL;
+    }
+  delete [] this->AcceptCommands;
+  this->AcceptCommands = NULL;
+  this->NumberOfAcceptCommands = 0;
+  this->AcceptCommandArrayLength = 0;
+}
 

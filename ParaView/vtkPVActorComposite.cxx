@@ -58,6 +58,8 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   this->Properties = vtkKWWidget::New();
   this->Name = NULL;
+
+  this->Mapper->ImmediateModeRenderingOn();
   
   this->NumCellsLabel = vtkKWLabel::New();
   this->BoundsLabel = vtkKWLabel::New();

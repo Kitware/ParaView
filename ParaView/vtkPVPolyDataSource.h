@@ -51,6 +51,7 @@ public:
   // be done through the PV interface so that all
   // clones can be syncronized.
   vtkGetObjectMacro(PolyDataSource, vtkPolyDataSource);
+  vtkSetObjectMacro(PolyDataSource, vtkPolyDataSource);
 
   // Description:
   // This method gets called when the accept button is pressed
@@ -74,10 +75,6 @@ protected:
   ~vtkPVPolyDataSource();
   vtkPVPolyDataSource(const vtkPVPolyDataSource&) {};
   void operator=(const vtkPVPolyDataSource&) {};
-
-  // Description:
-  // Convenience method for reference counting.
-  vtkSetObjectMacro(PolyDataSource, vtkPolyDataSource);
   
   vtkPolyDataSource *PolyDataSource;
 };

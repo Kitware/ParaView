@@ -240,7 +240,6 @@ void vtkPVPolyData::Decimate()
 {
   vtkMultiProcessController *controller;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int myId;
   
   controller = pvApp->GetController();
   

@@ -41,12 +41,6 @@ vtkPVConeSource::vtkPVConeSource()
 {
   this->CommandFunction = vtkPVConeSourceCommand;
   
-  this->HeightEntry = vtkKWLabeledEntry::New();
-  this->HeightEntry->SetParent(this->Properties);
-  this->RadiusEntry = vtkKWLabeledEntry::New();
-  this->RadiusEntry->SetParent(this->Properties);
-  this->ResolutionEntry = vtkKWLabeledEntry::New();
-  this->ResolutionEntry->SetParent(this->Properties);
   this->Accept = vtkKWPushButton::New();
   this->Accept->SetParent(this->Properties);
 
@@ -58,13 +52,6 @@ vtkPVConeSource::vtkPVConeSource()
 //----------------------------------------------------------------------------
 vtkPVConeSource::~vtkPVConeSource()
 {
-  this->HeightEntry->Delete();
-  this->HeightEntry = NULL;
-  this->RadiusEntry->Delete();
-  this->RadiusEntry = NULL;
-  this->ResolutionEntry->Delete();
-  this->ResolutionEntry = NULL;
-
   this->Accept->Delete();
   this->Accept = NULL;
     
@@ -82,22 +69,16 @@ void vtkPVConeSource::CreateProperties()
 {  
   this->vtkPVPolyDataSource::CreateProperties();
   
-  this->RadiusEntry->Create(this->Application);
-  this->RadiusEntry->SetLabel("Radius:");
-  this->RadiusEntry->SetValue(this->GetConeSource()->GetRadius(), 2);
-  this->HeightEntry->Create(this->Application);
-  this->HeightEntry->SetLabel("Height:");
-  this->HeightEntry->SetValue(this->GetConeSource()->GetHeight(), 2);
-  this->ResolutionEntry->Create(this->Application);
-  this->ResolutionEntry->SetLabel("Resolution:");
-  this->ResolutionEntry->SetValue(this->GetConeSource()->GetResolution());
   this->Accept->Create(this->Application, "-text Accept");
   this->Accept->SetCommand(this, "ConeParameterChanged");
-  this->Script("pack %s %s %s %s",
-	       this->Accept->GetWidgetName(),
-               this->RadiusEntry->GetWidgetName(),
-               this->HeightEntry->GetWidgetName(),
-               this->ResolutionEntry->GetWidgetName());
+  this->Script("pack %s", this->Accept->GetWidgetName());
+
+  this->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
+  this->AddLabeledEntry("Height:", "SetHeight", "GetHeight");
+  this->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
+  this->AddLabeledEntry("Angle:", "SetAngle", "GetAngle");
+  this->AddLabeledToggle("Capping:", "SetCapping", "GetCapping");
+
 }
 
 //----------------------------------------------------------------------------
@@ -129,10 +110,6 @@ void vtkPVConeSource::ConeParameterChanged()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetWindow();
  
-  this->SetRadius(this->RadiusEntry->GetValueAsFloat());
-  this->SetHeight(this->HeightEntry->GetValueAsFloat());
-  this->SetResolution(this->ResolutionEntry->GetValueAsInt());
-
   if (this->GetPVData() == NULL)
     { // This is the first time, initialize data.  
     this->GetConeSource()->SetStartMethod(StartConeSourceProgress, this);
@@ -148,50 +125,20 @@ void vtkPVConeSource::ConeParameterChanged()
   
   window->GetMainView()->SetSelectedComposite(this);
 
-  window->GetMainView()->ResetCamera();
+  // ####
+  int i;
+  for (i = 0; i < this->NumberOfAcceptCommands; ++i)
+    {
+    this->Script(this->AcceptCommands[i]);
+    }
+  // ####
+  
+    window->GetMainView()->ResetCamera();
   this->GetView()->Render();
   window->GetSourceList()->Update();
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVConeSource::SetRadius(float rad)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  this->GetConeSource()->SetRadius(rad);
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetRadius %f", this->GetTclName(), rad);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVConeSource::SetHeight(float height)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  this->GetConeSource()->SetHeight(height);
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetHeight %f", this->GetTclName(), height);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVConeSource::SetResolution(int res)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  this->GetConeSource()->SetResolution(res);
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetResolution %d", this->GetTclName(), res);
-    }
-}
 
 //----------------------------------------------------------------------------
 vtkConeSource *vtkPVConeSource::GetConeSource() 

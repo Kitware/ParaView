@@ -98,6 +98,13 @@ public:
   // Sources have no props.
   vtkProp *GetProp() {return NULL;}
   
+    // Description:
+  // A method used to broadcast changes resulting from widgets.
+  void AcceptHelper(char *method, char *args);
+  void AddLabeledEntry(char *label, char *setCmd, char *getCmd);
+  void AddLabeledToggle(char *label, char *setCmd, char *getCmd);
+  void AddXYZEntry(char *label, char *setCmd, char *getCmd);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -116,6 +123,19 @@ protected:
   vtkKWWidget *Properties;
   
   int DataCreated;
+
+
+  vtkKWWidgetCollection *Widgets;
+
+//BTX
+  // List of strings
+  int NumberOfAcceptCommands;
+  int AcceptCommandArrayLength;
+  char **AcceptCommands;
+  void AddAcceptCommand(const char *EventString, ...);
+  void DeleteAcceptCommands();
+//ETX
+
 };
 
 #endif

@@ -63,10 +63,9 @@ public:
   void SphereParameterChanged();
 
   // Description:
-  // These are parallel versions of the vtkSphereSource's methods.
-  void SetRadius(float rad);
-  void SetPhiResolution(int res);
-  void SetThetaResolution(int res);
+  // A method needed by the auto UI.  
+  // It should be moved to a superclass.
+  vtkSource *GetVTKSource () { return this->PolyDataSource;}
 
 protected:
   vtkPVSphereSource();
@@ -74,9 +73,6 @@ protected:
   vtkPVSphereSource(const vtkPVSphereSource&) {};
   void operator=(const vtkPVSphereSource&) {};
   
-  vtkKWLabeledEntry *RadiusEntry;
-  vtkKWLabeledEntry *PhiResolutionEntry;
-  vtkKWLabeledEntry *ThetaResolutionEntry;
   vtkKWPushButton *Accept;
 };
 

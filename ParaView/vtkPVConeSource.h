@@ -63,10 +63,9 @@ public:
   void ConeParameterChanged();
 
   // Description:
-  // These are parallel versions of the vtkConeSource's methods.
-  void SetRadius(float rad);
-  void SetHeight(float height);
-  void SetResolution(int res);
+  // A method needed by the auto UI.  
+  // It should be moved to a superclass.
+  vtkSource *GetVTKSource () { return this->PolyDataSource;}
 
 protected:
   vtkPVConeSource();
@@ -74,10 +73,7 @@ protected:
   vtkPVConeSource(const vtkPVConeSource&) {};
   void operator=(const vtkPVConeSource&) {};
   
-  vtkKWLabeledEntry *HeightEntry;
-  vtkKWLabeledEntry *RadiusEntry;
-  vtkKWLabeledEntry *ResolutionEntry;
-  vtkKWPushButton *Accept;
+ vtkKWPushButton *Accept;
 };
 
 #endif
