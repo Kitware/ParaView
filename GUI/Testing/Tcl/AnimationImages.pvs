@@ -37,15 +37,9 @@ $kw(vtkTemp164) SetNumberOfFrames 3
 $kw(vtkTemp187) SetTimeStart 20.000000
 $kw(vtkTemp187) SetTimeEnd 200.000000
 
-# Fix the size of the image
-set MainView [[$Application GetMainWindow] GetMainView]
-$MainView SetRenderWindowSize 300 300
-update
-#[[$Application GetMainWindow] GetMainView] ForceRender
-
 # Save animation images
 puts $TempDir/AnimationImages
-$kw(vtkTemp164) SaveImages "$TempDir/AnimationImages" {png}
+$kw(vtkTemp164) SaveImages "$TempDir/AnimationImages" {png} 300 300
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {

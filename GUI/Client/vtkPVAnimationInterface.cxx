@@ -182,7 +182,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.137");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.138");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1267,7 +1267,58 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     *ext = '\0';
     ++ext;
 
-    this->SaveImages(fileRoot, ext);
+    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+    dlg->SetMasterWindow(this->Window);
+    dlg->Create(this->GetApplication(), "");
+    dlg->SetText(
+      "Specify the width and height of the images to be saved from this "
+      "animation. Each dimension must be a multiple of 4. Each will be "
+      "resized to the next largest multiple of 4 if it does not meet this "
+      "criterion.");
+    vtkKWWidget *frame = vtkKWWidget::New();
+    frame->SetParent(dlg->GetTopFrame());
+    frame->Create(this->GetApplication(), "frame", "");
+
+    int origWidth = this->View->GetRenderWindowSize()[0];
+    int origHeight = this->View->GetRenderWindowSize()[1];
+
+    vtkKWLabeledEntry *widthEntry = vtkKWLabeledEntry::New();
+    widthEntry->SetLabel("Width:");
+    widthEntry->SetParent(frame);
+    widthEntry->Create(this->GetApplication(), "");
+    widthEntry->GetEntry()->SetValue(origWidth);
+
+    vtkKWLabeledEntry *heightEntry = vtkKWLabeledEntry::New();
+    heightEntry->SetLabel("Height:");
+    heightEntry->SetParent(frame);
+    heightEntry->Create(this->GetApplication(), "");
+    heightEntry->GetEntry()->SetValue(origHeight);
+
+    this->Script("pack %s %s -side left -fill both -expand t",
+                 widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
+    this->Script("pack %s -side top -pady 5", frame->GetWidgetName());
+
+    dlg->Invoke();
+
+    int width = widthEntry->GetEntry()->GetValueAsInt();
+    int height = heightEntry->GetEntry()->GetValueAsInt();
+    if ((width % 4) > 0)
+      {
+      width += 4 - (width % 4);
+      }
+    if ((height % 4) > 0)
+      {
+      height += 4 - (height % 4);
+      }
+    
+    widthEntry->Delete();
+    heightEntry->Delete();
+    frame->Delete();
+    dlg->Delete();
+
+    this->SaveImages(fileRoot, ext, width, height);
+    this->View->SetRenderWindowSize(origWidth, origHeight);
+    
     delete [] fileRoot;
     fileRoot = NULL;
     ext = NULL;
@@ -1279,7 +1330,8 @@ void vtkPVAnimationInterface::SaveImagesCallback()
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveImages(const char* fileRoot, 
-                                         const char* ext) 
+                                         const char* ext,
+                                         int width, int height)
 {
   this->SavingData = 1;
   this->GetWindow()->UpdateEnableState();
@@ -1292,10 +1344,24 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   int fileCount;
   int t;
 
+  int *size = this->View->GetRenderWindowSize();
+  int magnification = 1;
+  if (size[0] < width || size[1] < height)
+    {
+    int xMag = width / size[0] + 1;
+    int yMag = height / size[1] + 1;
+    magnification = (xMag > yMag) ? xMag : yMag;
+    width /= magnification;
+    height /= magnification;
+    }
+  
+  this->View->SetRenderWindowSize(width, height);
+  
   this->AddTraceEntry("$kw(%s) SaveImages {%s} {%s}",
                       this->GetTclName(), fileRoot, ext);
   winToImage = vtkWindowToImageFilter::New();
   winToImage->SetInput(this->View->GetRenderWindow());
+  winToImage->SetMagnification(magnification);
   if (strcmp(ext,"jpg") == 0)
     {
     writer = vtkJPEGWriter::New();
