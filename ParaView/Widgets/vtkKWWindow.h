@@ -184,6 +184,8 @@ protected:
   vtkKWWindow(const vtkKWWindow&) {};
   void operator=(const vtkKWWindow&) {};
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
+  
+  int ExitDialog();
 
   vtkKWNotebook *Notebook;
   virtual void CreateStatusImage();
@@ -211,6 +213,7 @@ protected:
 
   int SupportHelp;
   char *WindowClass;
+  int ExitingApplication;
 };
 
 
