@@ -38,7 +38,7 @@ class vtkKWMenuButton;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
-class vtkPVTextProperty;
+class vtkPVTextPropertyEditor;
 class vtkPVApplication;
 class vtkPVRenderView;
 class vtkPVColorMapObserver;
@@ -203,8 +203,8 @@ public:
   // Description:
   // GUI components access
   vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
-  vtkGetObjectMacro(TitleTextPropertyWidget, vtkPVTextProperty);
-  vtkGetObjectMacro(LabelTextPropertyWidget, vtkPVTextProperty);
+  vtkGetObjectMacro(TitleTextPropertyWidget, vtkPVTextPropertyEditor);
+  vtkGetObjectMacro(LabelTextPropertyWidget, vtkPVTextPropertyEditor);
 
   // Call backs from the vector mode frame.
   void VectorModeMagnitudeCallback();
@@ -338,8 +338,8 @@ protected:
   vtkKWLabel*        ScalarBarLabelFormatLabel;
   vtkKWEntry*        ScalarBarLabelFormatEntry;
   
-  vtkPVTextProperty *TitleTextPropertyWidget;
-  vtkPVTextProperty *LabelTextPropertyWidget;
+  vtkPVTextPropertyEditor *TitleTextPropertyWidget;
+  vtkPVTextPropertyEditor *LabelTextPropertyWidget;
   
   // For the map image.
   unsigned char *MapData;

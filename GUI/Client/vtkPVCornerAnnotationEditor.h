@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkPVCornerAnnotation.h
+  Module:    vtkPVCornerAnnotationEditor.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,27 +11,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCornerAnnotation - a corner annotation widget
+// .NAME vtkPVCornerAnnotationEditor - a corner annotation widget
 // .SECTION Description
 // A class that provides a UI for vtkCornerAnnotation. User can set the
 // text for each corner, set the color of the text, and turn the annotation
 // on and off.
 
-#ifndef __vtkPVCornerAnnotation_h
-#define __vtkPVCornerAnnotation_h
+#ifndef __vtkPVCornerAnnotationEditor_h
+#define __vtkPVCornerAnnotationEditor_h
 
-#include "vtkKWCornerAnnotation.h"
+#include "vtkKWCornerAnnotationEditor.h"
 
 class vtkCornerAnnotation;
 class vtkKWView;
 class vtkPVRenderView;
 class vtkPVTraceHelper;
 
-class VTK_EXPORT vtkPVCornerAnnotation : public vtkKWCornerAnnotation
+class VTK_EXPORT vtkPVCornerAnnotationEditor : public vtkKWCornerAnnotationEditor
 {
 public:
-  static vtkPVCornerAnnotation* New();
-  vtkTypeRevisionMacro(vtkPVCornerAnnotation,vtkKWCornerAnnotation);
+  static vtkPVCornerAnnotationEditor* New();
+  vtkTypeRevisionMacro(vtkPVCornerAnnotationEditor,vtkKWCornerAnnotationEditor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -73,8 +73,8 @@ public:
   vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
 
 protected:
-  vtkPVCornerAnnotation();
-  ~vtkPVCornerAnnotation();
+  vtkPVCornerAnnotationEditor();
+  ~vtkPVCornerAnnotationEditor();
 
   void SetCornerTextInternal(const char* text, int corner);
 
@@ -86,8 +86,8 @@ protected:
   vtkPVTraceHelper* TraceHelper;
 
 private:
-  vtkPVCornerAnnotation(const vtkPVCornerAnnotation&); // Not implemented
-  void operator=(const vtkPVCornerAnnotation&); // Not Implemented
+  vtkPVCornerAnnotationEditor(const vtkPVCornerAnnotationEditor&); // Not implemented
+  void operator=(const vtkPVCornerAnnotationEditor&); // Not Implemented
 };
 
 #endif

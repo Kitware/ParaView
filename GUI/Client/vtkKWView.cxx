@@ -24,7 +24,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
-#include "vtkPVCornerAnnotation.h"
+#include "vtkPVCornerAnnotationEditor.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.7");
+vtkCxxRevisionMacro(vtkKWView, "1.8");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -142,7 +142,7 @@ vtkKWView::vtkKWView()
   this->ProgressGauge->SetParent(this->Frame2);
 
   this->AnnotationProperties = vtkKWFrame::New();
-  this->CornerAnnotation = vtkPVCornerAnnotation::New();
+  this->CornerAnnotation = vtkPVCornerAnnotationEditor::New();
   this->CornerAnnotation->GetTraceHelper()->SetReferenceHelper(
     this->GetTraceHelper());
   this->CornerAnnotation->GetTraceHelper()->SetReferenceCommand("GetCornerAnnotation");

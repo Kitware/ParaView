@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWCornerAnnotation.cxx
+  Module:    vtkKWCornerAnnotationEditor.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWCornerAnnotation.h"
+#include "vtkKWCornerAnnotationEditor.h"
 
 #include "vtkCornerAnnotation.h"
 #include "vtkKWCheckButton.h"
@@ -25,22 +25,22 @@
 #include "vtkKWRenderWidget.h"
 #include "vtkKWScale.h"
 #include "vtkKWText.h"
-#include "vtkKWTextProperty.h"
+#include "vtkKWTextPropertyEditor.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
 #include "vtkTextProperty.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.87");
+vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.1");
 
-int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
+int vtkKWCornerAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkKWCornerAnnotation::vtkKWCornerAnnotation()
+vtkKWCornerAnnotationEditor::vtkKWCornerAnnotationEditor()
 {
-  this->CommandFunction = vtkKWCornerAnnotationCommand;
+  this->CommandFunction = vtkKWCornerAnnotationEditorCommand;
 
   this->AnnotationChangedEvent = vtkKWEvent::ViewAnnotationChangedEvent;
 
@@ -61,7 +61,7 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
   this->CornerFrame             = vtkKWFrame::New();
   this->PropertiesFrame         = vtkKWFrame::New();
   this->MaximumLineHeightScale  = vtkKWScale::New();
-  this->TextPropertyWidget      = vtkKWTextProperty::New();
+  this->TextPropertyWidget      = vtkKWTextPropertyEditor::New();
   this->TextPropertyPopupButton = NULL;
 
   for (int i = 0; i < 4; i++)
@@ -71,7 +71,7 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 }
 
 //----------------------------------------------------------------------------
-vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
+vtkKWCornerAnnotationEditor::~vtkKWCornerAnnotationEditor()
 {
   // GUI
 
@@ -126,7 +126,7 @@ vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetRenderWidget(vtkKWRenderWidget *_arg)
+void vtkKWCornerAnnotationEditor::SetRenderWidget(vtkKWRenderWidget *_arg)
 { 
   if (this->RenderWidget == _arg) 
     {
@@ -165,13 +165,13 @@ void vtkKWCornerAnnotation::SetRenderWidget(vtkKWRenderWidget *_arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::Close()
+void vtkKWCornerAnnotationEditor::Close()
 {
   this->SetVisibility(0);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::Create(vtkKWApplication *app, 
+void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app, 
                                    const char *args)
 {
   // Create the superclass widgets
@@ -360,7 +360,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::Update()
+void vtkKWCornerAnnotationEditor::Update()
 {
   this->Superclass::Update();
 
@@ -412,7 +412,7 @@ void vtkKWCornerAnnotation::Update()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::Render() 
+void vtkKWCornerAnnotationEditor::Render() 
 {
   if (this->RenderWidget)
     {
@@ -421,7 +421,7 @@ void vtkKWCornerAnnotation::Render()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWCornerAnnotation::GetVisibility() 
+int vtkKWCornerAnnotationEditor::GetVisibility() 
 {
   // Note that the visibility here is based on the real visibility of the
   // annotation, not the state of the checkbutton
@@ -433,7 +433,7 @@ int vtkKWCornerAnnotation::GetVisibility()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetVisibility(int state)
+void vtkKWCornerAnnotationEditor::SetVisibility(int state)
 {
   // In vtkKWView mode, add/remove the composite
   // In vtkKWRenderWidget mode, add/remove the prop
@@ -469,7 +469,7 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::CheckButtonCallback() 
+void vtkKWCornerAnnotationEditor::CheckButtonCallback() 
 {
   if (this->CheckButton && this->CheckButton->IsCreated())
     {
@@ -478,7 +478,7 @@ void vtkKWCornerAnnotation::CheckButtonCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetMaximumLineHeight(float v)
+void vtkKWCornerAnnotationEditor::SetMaximumLineHeight(float v)
 {
   if (!this->CornerAnnotation ||
       this->CornerAnnotation->GetMaximumLineHeight() == v)
@@ -499,7 +499,7 @@ void vtkKWCornerAnnotation::SetMaximumLineHeight(float v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::MaximumLineHeightCallback()
+void vtkKWCornerAnnotationEditor::MaximumLineHeightCallback()
 {
   if (this->IsCreated() && this->MaximumLineHeightScale)
     {
@@ -509,7 +509,7 @@ void vtkKWCornerAnnotation::MaximumLineHeightCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::MaximumLineHeightEndCallback()
+void vtkKWCornerAnnotationEditor::MaximumLineHeightEndCallback()
 {
   if (this->IsCreated() && this->MaximumLineHeightScale)
     {
@@ -518,7 +518,7 @@ void vtkKWCornerAnnotation::MaximumLineHeightEndCallback()
 }
 
 //----------------------------------------------------------------------------
-double *vtkKWCornerAnnotation::GetTextColor() 
+double *vtkKWCornerAnnotationEditor::GetTextColor() 
 {
   if (this->TextPropertyWidget)
     {
@@ -529,7 +529,7 @@ double *vtkKWCornerAnnotation::GetTextColor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetTextColor(double r, double g, double b)
+void vtkKWCornerAnnotationEditor::SetTextColor(double r, double g, double b)
 {
   // The following call with eventually trigger the TextPropertyCallback 
   // (see Create()).
@@ -545,7 +545,7 @@ void vtkKWCornerAnnotation::SetTextColor(double r, double g, double b)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::TextPropertyCallback()
+void vtkKWCornerAnnotationEditor::TextPropertyCallback()
 {
   if (this->GetVisibility())
     {
@@ -556,7 +556,7 @@ void vtkKWCornerAnnotation::TextPropertyCallback()
 }
 
 //----------------------------------------------------------------------------
-char *vtkKWCornerAnnotation::GetCornerText(int i)
+char *vtkKWCornerAnnotationEditor::GetCornerText(int i)
 {
   if (this->CornerAnnotation)
     {
@@ -567,7 +567,7 @@ char *vtkKWCornerAnnotation::GetCornerText(int i)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetCornerText(const char *text, int corner) 
+void vtkKWCornerAnnotationEditor::SetCornerText(const char *text, int corner) 
 {
   if (this->CornerAnnotation &&
       (!this->GetCornerText(corner) ||
@@ -587,7 +587,7 @@ void vtkKWCornerAnnotation::SetCornerText(const char *text, int corner)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::CornerTextCallback(int i) 
+void vtkKWCornerAnnotationEditor::CornerTextCallback(int i) 
 {
   if (this->IsCreated() && this->CornerText[i])
     {
@@ -596,7 +596,7 @@ void vtkKWCornerAnnotation::CornerTextCallback(int i)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::UpdateEnableState()
+void vtkKWCornerAnnotationEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
@@ -636,7 +636,7 @@ void vtkKWCornerAnnotation::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SendChangedEvent()
+void vtkKWCornerAnnotationEditor::SendChangedEvent()
 {
   if (!this->CornerAnnotation)
     {
@@ -647,7 +647,7 @@ void vtkKWCornerAnnotation::SendChangedEvent()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWCornerAnnotationEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 

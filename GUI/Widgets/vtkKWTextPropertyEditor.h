@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWTextProperty.h
+  Module:    vtkKWTextPropertyEditor.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,14 +11,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWTextProperty - a GUI component that can be used to edit vtkTextProperty objects
+// .NAME vtkKWTextPropertyEditor - a GUI component that can be used to edit vtkTextProperty objects
 // .SECTION Description
-// The vtkKWTextProperty creates a set of GUI components that can be displayed
+// The vtkKWTextPropertyEditor creates a set of GUI components that can be displayed
 // and used selectively to edit all or part of a vtkTextProperty object.
 
 
-#ifndef __vtkKWTextProperty_h
-#define __vtkKWTextProperty_h
+#ifndef __vtkKWTextPropertyEditor_h
+#define __vtkKWTextPropertyEditor_h
 
 #include "vtkKWWidget.h"
 
@@ -33,11 +33,11 @@ class vtkKWPushButton;
 class vtkKWScale;
 class vtkTextProperty;
 
-class VTK_EXPORT vtkKWTextProperty : public vtkKWWidget
+class VTK_EXPORT vtkKWTextPropertyEditor : public vtkKWWidget
 {
 public:
-  static vtkKWTextProperty* New();
-  vtkTypeRevisionMacro(vtkKWTextProperty,vtkKWWidget);
+  static vtkKWTextPropertyEditor* New();
+  vtkTypeRevisionMacro(vtkKWTextPropertyEditor,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -132,7 +132,7 @@ public:
 
   // Description:
   // Copy the values from another text widget
-  virtual void CopyValuesFrom(vtkKWTextProperty*);
+  virtual void CopyValuesFrom(vtkKWTextPropertyEditor*);
 
   // GUI components callbacks
   virtual void ChangeColorButtonCallback(double, double, double);
@@ -167,8 +167,8 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-  vtkKWTextProperty();
-  ~vtkKWTextProperty();
+  vtkKWTextPropertyEditor();
+  ~vtkKWTextPropertyEditor();
 
   virtual void Pack();
 
@@ -211,8 +211,8 @@ protected:
   vtkKWPushButtonSetLabeled *PushButtonSet;
 
 private:
-  vtkKWTextProperty(const vtkKWTextProperty&); // Not implemented
-  void operator=(const vtkKWTextProperty&); // Not implemented
+  vtkKWTextPropertyEditor(const vtkKWTextPropertyEditor&); // Not implemented
+  void operator=(const vtkKWTextPropertyEditor&); // Not implemented
 };
 
 #endif

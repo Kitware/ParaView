@@ -28,7 +28,7 @@ SET( KWWidgets_SRCS
   vtkKWCheckButtonWithChangeColor.cxx
   vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
-  vtkKWCornerAnnotation.cxx 
+  vtkKWCornerAnnotationEditor.cxx 
   vtkKWDialog.cxx 
   vtkKWDragAndDropHelper.cxx
   vtkKWEntry.cxx 
@@ -41,11 +41,11 @@ SET( KWWidgets_SRCS
   vtkKWHistogram.cxx
   vtkKWHistogramSet.cxx
   vtkKWHSVColorSelector.cxx
-  vtkKWHeaderAnnotation.cxx 
+  vtkKWHeaderAnnotationEditor.cxx 
   vtkKWIcon.cxx
   vtkKWLabel.cxx
   vtkKWListBox.cxx 
-  vtkKWListSelectOrder.cxx
+  vtkKWListBoxToListBoxSelectionEditor.cxx
   vtkKWLoadSaveButton.cxx
   vtkKWLoadSaveDialog.cxx
   vtkKWMaterialPropertyWidget.cxx
@@ -83,7 +83,7 @@ SET( KWWidgets_SRCS
   vtkKWSplitFrame.cxx
   vtkKWTclInteractor.cxx
   vtkKWText.cxx 
-  vtkKWTextProperty.cxx
+  vtkKWTextPropertyEditor.cxx
   vtkKWThumbWheel.cxx
   vtkKWTkUtilities.cxx
   vtkKWToolbar.cxx 

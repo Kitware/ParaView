@@ -107,7 +107,7 @@ SET( ParaViewClient_SRCS
   vtkPVConnectDialog.cxx
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx
-  vtkPVCornerAnnotation.cxx
+  vtkPVCornerAnnotationEditor.cxx
   vtkPVCutEntry.cxx
   vtkPVDeskTopRenderModuleUI.cxx
   vtkPVDisplayGUI.cxx
@@ -174,7 +174,7 @@ SET( ParaViewClient_SRCS
   vtkPVSphereWidget.cxx
   vtkPVStringEntry.cxx
   vtkPVTempTessellatorEntry.cxx
-  vtkPVTextProperty.cxx
+  vtkPVTextPropertyEditor.cxx
   vtkPVThumbWheel.cxx
   vtkPVTimerLogDisplay.cxx
   vtkPVTraceFileDialog.cxx

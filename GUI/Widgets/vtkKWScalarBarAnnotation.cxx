@@ -25,7 +25,7 @@
 #include "vtkKWPopupButton.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
 #include "vtkKWScale.h"
-#include "vtkKWTextProperty.h"
+#include "vtkKWTextPropertyEditor.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindowInteractor.h"
@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.16");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.17");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -62,12 +62,12 @@ vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
 
   this->TitleFrame                      = vtkKWFrame::New();
   this->TitleEntry                      = vtkKWEntryLabeled::New();
-  this->TitleTextPropertyWidget         = vtkKWTextProperty::New();
+  this->TitleTextPropertyWidget         = vtkKWTextPropertyEditor::New();
   this->TitleTextPropertyPopupButton    = NULL;
 
   this->LabelFrame                      = vtkKWFrame::New();
   this->LabelFormatEntry                = vtkKWEntryLabeled::New();
-  this->LabelTextPropertyWidget         = vtkKWTextProperty::New();
+  this->LabelTextPropertyWidget         = vtkKWTextPropertyEditor::New();
   this->LabelTextPropertyPopupButton    = NULL;
 
   this->MaximumNumberOfColorsThumbWheel = vtkKWThumbWheel::New();

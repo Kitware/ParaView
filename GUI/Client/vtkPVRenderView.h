@@ -44,7 +44,7 @@ class vtkPVApplication;
 class vtkPVAxesWidget;
 class vtkPVCameraIcon;
 class vtkPVCameraControl;
-class vtkPVCornerAnnotation;
+class vtkPVCornerAnnotationEditor;
 class vtkPVData;
 class vtkPVInteractorStyleControl;
 class vtkPVSource;
@@ -69,8 +69,8 @@ public:
   // Description:
   // I wanted to get rid of these methods, but they are used
   // for corner annotation to work.
-  void AddAnnotationProp(vtkPVCornerAnnotation *c);
-  void RemoveAnnotationProp(vtkPVCornerAnnotation *c);
+  void AddAnnotationProp(vtkPVCornerAnnotationEditor *c);
+  void RemoveAnnotationProp(vtkPVCornerAnnotationEditor *c);
 
   // Description:
   // Set the application right after construction.

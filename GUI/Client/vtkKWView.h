@@ -34,7 +34,7 @@
 class vtkKWApplication;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
-class vtkPVCornerAnnotation;
+class vtkPVCornerAnnotationEditor;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWFrameLabeled;
@@ -209,7 +209,7 @@ class VTK_EXPORT vtkKWView : public vtkPVTracedWidget
 
   // Description:
   // Allow access to the UI components of interest
-  vtkGetObjectMacro(CornerAnnotation,vtkPVCornerAnnotation);
+  vtkGetObjectMacro(CornerAnnotation,vtkPVCornerAnnotationEditor);
 
   vtkSetMacro( InteractiveUpdateRate, float );
   vtkGetMacro( InteractiveUpdateRate, float );
@@ -329,7 +329,7 @@ protected:
   vtkKWView();
   ~vtkKWView();
 
-  vtkPVCornerAnnotation *CornerAnnotation;
+  vtkPVCornerAnnotationEditor *CornerAnnotation;
   
   vtkKWNotebook *Notebook;
   int InExpose;

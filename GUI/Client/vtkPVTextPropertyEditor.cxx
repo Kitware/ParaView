@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkPVTextProperty.cxx
+  Module:    vtkPVTextPropertyEditor.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,27 +11,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVTextProperty.h"
+#include "vtkPVTextPropertyEditor.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPVTraceHelper.h"
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVTextProperty);
-vtkCxxRevisionMacro(vtkPVTextProperty, "1.1");
+vtkStandardNewMacro(vtkPVTextPropertyEditor);
+vtkCxxRevisionMacro(vtkPVTextPropertyEditor, "1.1");
 
-int vtkPVTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVTextPropertyEditorCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
 
 // ----------------------------------------------------------------------------
-vtkPVTextProperty::vtkPVTextProperty()
+vtkPVTextPropertyEditor::vtkPVTextPropertyEditor()
 {
   this->TraceHelper = vtkPVTraceHelper::New();
   this->TraceHelper->SetObject(this);
 }
 
 // ----------------------------------------------------------------------------
-vtkPVTextProperty::~vtkPVTextProperty()
+vtkPVTextPropertyEditor::~vtkPVTextPropertyEditor()
 {
   if (this->TraceHelper)
     {
@@ -41,49 +41,49 @@ vtkPVTextProperty::~vtkPVTextProperty()
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVTextProperty::SetColor(double r, double g, double b) 
+void vtkPVTextPropertyEditor::SetColor(double r, double g, double b) 
 {
   this->Superclass::SetColor(r, g, b);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetColor %lf %lf %lf", this->GetTclName(), r,g,b);
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVTextProperty::SetFontFamily(int v) 
+void vtkPVTextPropertyEditor::SetFontFamily(int v) 
 {
   this->Superclass::SetFontFamily(v);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetFontFamily %d", this->GetTclName(), v);
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVTextProperty::SetBold(int v) 
+void vtkPVTextPropertyEditor::SetBold(int v) 
 {
   this->Superclass::SetBold(v);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetBold %d", this->GetTclName(), v);
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVTextProperty::SetItalic(int v) 
+void vtkPVTextPropertyEditor::SetItalic(int v) 
 {
   this->Superclass::SetItalic(v);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetItalic %d", this->GetTclName(), v);
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVTextProperty::SetShadow(int v) 
+void vtkPVTextPropertyEditor::SetShadow(int v) 
 {
   this->Superclass::SetShadow(v);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetShadow %d", this->GetTclName(), v);
 }
 
 // ----------------------------------------------------------------------------
-void vtkPVTextProperty::SetOpacity(float v) 
+void vtkPVTextPropertyEditor::SetOpacity(float v) 
 {
   this->Superclass::SetOpacity(v);
   this->GetTraceHelper()->AddEntry("$kw(%s) SetOpacity %f", this->GetTclName(), v);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTextProperty::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVTextPropertyEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "TraceHelper: " << this->TraceHelper << endl;

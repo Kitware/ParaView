@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWTextProperty.cxx
+  Module:    vtkKWTextPropertyEditor.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWTextProperty.h"
+#include "vtkKWTextPropertyEditor.h"
 
 #include "vtkActor2D.h"
 #include "vtkKWApplication.h"
@@ -99,14 +99,14 @@ static unsigned char image_copy[] =
   "5IeN/kmffsxfaQ997vz3nN7Bfrh3vj2XEvY1+9LPj4Rz+pVM55tQ==";
 
 // ----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.37");
+vtkStandardNewMacro(vtkKWTextPropertyEditor);
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.1");
 
-int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
+int vtkKWTextPropertyEditorCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
 
 // ----------------------------------------------------------------------------
-vtkKWTextProperty::vtkKWTextProperty()
+vtkKWTextPropertyEditor::vtkKWTextPropertyEditor()
 {
   this->TextProperty = NULL;
   this->Actor2D = NULL;
@@ -137,7 +137,7 @@ vtkKWTextProperty::vtkKWTextProperty()
 }
 
 // ----------------------------------------------------------------------------
-vtkKWTextProperty::~vtkKWTextProperty()
+vtkKWTextPropertyEditor::~vtkKWTextPropertyEditor()
 {
   this->SetTextProperty(NULL);
   this->SetActor2D(NULL);
@@ -192,7 +192,7 @@ vtkKWTextProperty::~vtkKWTextProperty()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::Create(vtkKWApplication *app)
+void vtkKWTextPropertyEditor::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
@@ -326,7 +326,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::Pack()
+void vtkKWTextPropertyEditor::Pack()
 {
   if (!this->IsCreated())
     {
@@ -426,13 +426,13 @@ void vtkKWTextProperty::Pack()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::Update()
+void vtkKWTextPropertyEditor::Update()
 {
   this->UpdateInterface();
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateInterface()
+void vtkKWTextPropertyEditor::UpdateInterface()
 {
   // Update enable state
 
@@ -449,7 +449,7 @@ void vtkKWTextProperty::UpdateInterface()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetTextProperty(vtkTextProperty *_arg)
+void vtkKWTextPropertyEditor::SetTextProperty(vtkTextProperty *_arg)
 {
   if (this->TextProperty == _arg)
     {
@@ -467,7 +467,7 @@ void vtkKWTextProperty::SetTextProperty(vtkTextProperty *_arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetActor2D(vtkActor2D *_arg)
+void vtkKWTextPropertyEditor::SetActor2D(vtkActor2D *_arg)
 {
   if (this->Actor2D == _arg)
     {
@@ -485,7 +485,7 @@ void vtkKWTextProperty::SetActor2D(vtkActor2D *_arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetLongFormat(int _arg)
+void vtkKWTextPropertyEditor::SetLongFormat(int _arg)
 {
   if (this->LongFormat == _arg)
     {
@@ -498,7 +498,7 @@ void vtkKWTextProperty::SetLongFormat(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetShowLabel(int _arg)
+void vtkKWTextPropertyEditor::SetShowLabel(int _arg)
 {
   if (this->ShowLabel == _arg)
     {
@@ -511,7 +511,7 @@ void vtkKWTextProperty::SetShowLabel(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetLabelOnTop(int _arg)
+void vtkKWTextPropertyEditor::SetLabelOnTop(int _arg)
 {
   if (this->LabelOnTop == _arg)
     {
@@ -524,7 +524,7 @@ void vtkKWTextProperty::SetLabelOnTop(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateLabel()
+void vtkKWTextPropertyEditor::UpdateLabel()
 {
   if (this->IsCreated() && this->Label)
     {
@@ -535,7 +535,7 @@ void vtkKWTextProperty::UpdateLabel()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetShowColor(int _arg)
+void vtkKWTextPropertyEditor::SetShowColor(int _arg)
 {
   if (this->ShowColor == _arg)
     {
@@ -548,7 +548,7 @@ void vtkKWTextProperty::SetShowColor(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetColor(double r, double g, double b) 
+void vtkKWTextPropertyEditor::SetColor(double r, double g, double b) 
 {
   double *rgb = this->GetColor();
   if (rgb[0] == r && rgb[1] == g && rgb[2] == b)
@@ -579,7 +579,7 @@ void vtkKWTextProperty::SetColor(double r, double g, double b)
 }
 
 // ----------------------------------------------------------------------------
-double* vtkKWTextProperty::GetColor() 
+double* vtkKWTextPropertyEditor::GetColor() 
 {
   int use_actor_color = 0;
   if (!this->TextProperty)
@@ -611,7 +611,7 @@ double* vtkKWTextProperty::GetColor()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateColorButton()
+void vtkKWTextPropertyEditor::UpdateColorButton()
 {
   if (this->IsCreated() && this->ChangeColorButton)
     {
@@ -627,13 +627,13 @@ void vtkKWTextProperty::UpdateColorButton()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::ChangeColorButtonCallback(double r, double g, double b) 
+void vtkKWTextPropertyEditor::ChangeColorButtonCallback(double r, double g, double b) 
 {
   this->SetColor(r, g, b);
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetShowFontFamily(int _arg)
+void vtkKWTextPropertyEditor::SetShowFontFamily(int _arg)
 {
   if (this->ShowFontFamily == _arg)
     {
@@ -646,7 +646,7 @@ void vtkKWTextProperty::SetShowFontFamily(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetFontFamily(int v) 
+void vtkKWTextPropertyEditor::SetFontFamily(int v) 
 {
   if (this->TextProperty)
     {
@@ -666,7 +666,7 @@ void vtkKWTextProperty::SetFontFamily(int v)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateFontFamilyOptionMenu()
+void vtkKWTextPropertyEditor::UpdateFontFamilyOptionMenu()
 {
   if (this->IsCreated() &&
       this->FontFamilyOptionMenu &&
@@ -694,7 +694,7 @@ void vtkKWTextProperty::UpdateFontFamilyOptionMenu()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::FontFamilyCallback() 
+void vtkKWTextPropertyEditor::FontFamilyCallback() 
 {
   if (this->FontFamilyOptionMenu->IsCreated())
     {
@@ -715,7 +715,7 @@ void vtkKWTextProperty::FontFamilyCallback()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetShowStyles(int _arg)
+void vtkKWTextPropertyEditor::SetShowStyles(int _arg)
 {
   if (this->ShowStyles == _arg)
     {
@@ -728,7 +728,7 @@ void vtkKWTextProperty::SetShowStyles(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateStylesCheckButtonSet()
+void vtkKWTextPropertyEditor::UpdateStylesCheckButtonSet()
 {
   if (this->IsCreated() && this->StylesCheckButtonSet)
     {
@@ -743,7 +743,7 @@ void vtkKWTextProperty::UpdateStylesCheckButtonSet()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetBold(int v) 
+void vtkKWTextPropertyEditor::SetBold(int v) 
 {
   if (this->TextProperty)
     {
@@ -763,7 +763,7 @@ void vtkKWTextProperty::SetBold(int v)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateBoldCheckButton()
+void vtkKWTextPropertyEditor::UpdateBoldCheckButton()
 {
   if (this->IsCreated() && 
       this->StylesCheckButtonSet &&
@@ -774,7 +774,7 @@ void vtkKWTextProperty::UpdateBoldCheckButton()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::BoldCallback() 
+void vtkKWTextPropertyEditor::BoldCallback() 
 {
   if (this->IsCreated())
     {
@@ -784,7 +784,7 @@ void vtkKWTextProperty::BoldCallback()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetItalic(int v) 
+void vtkKWTextPropertyEditor::SetItalic(int v) 
 {
   if (this->TextProperty)
     {
@@ -804,7 +804,7 @@ void vtkKWTextProperty::SetItalic(int v)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateItalicCheckButton()
+void vtkKWTextPropertyEditor::UpdateItalicCheckButton()
 {
   if (this->IsCreated() && 
       this->StylesCheckButtonSet &&
@@ -815,7 +815,7 @@ void vtkKWTextProperty::UpdateItalicCheckButton()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::ItalicCallback() 
+void vtkKWTextPropertyEditor::ItalicCallback() 
 {
   if (this->IsCreated())
     {
@@ -825,7 +825,7 @@ void vtkKWTextProperty::ItalicCallback()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetShadow(int v) 
+void vtkKWTextPropertyEditor::SetShadow(int v) 
 {
   if (this->TextProperty)
     {
@@ -845,7 +845,7 @@ void vtkKWTextProperty::SetShadow(int v)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateShadowCheckButton()
+void vtkKWTextPropertyEditor::UpdateShadowCheckButton()
 {
   if (this->IsCreated() && 
       this->StylesCheckButtonSet &&
@@ -856,7 +856,7 @@ void vtkKWTextProperty::UpdateShadowCheckButton()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::ShadowCallback() 
+void vtkKWTextPropertyEditor::ShadowCallback() 
 {
   if (this->IsCreated())
     {
@@ -866,7 +866,7 @@ void vtkKWTextProperty::ShadowCallback()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetShowOpacity(int _arg)
+void vtkKWTextPropertyEditor::SetShowOpacity(int _arg)
 {
   if (this->ShowOpacity == _arg)
     {
@@ -879,7 +879,7 @@ void vtkKWTextProperty::SetShowOpacity(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetOpacity(float v) 
+void vtkKWTextPropertyEditor::SetOpacity(float v) 
 {
   if (this->GetOpacity() == v)
     {
@@ -904,7 +904,7 @@ void vtkKWTextProperty::SetOpacity(float v)
 }
 
 // ----------------------------------------------------------------------------
-float vtkKWTextProperty::GetOpacity() 
+float vtkKWTextPropertyEditor::GetOpacity() 
 {
   int use_actor_opacity = 0;
   if (!this->TextProperty)
@@ -935,7 +935,7 @@ float vtkKWTextProperty::GetOpacity()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateOpacityScale()
+void vtkKWTextPropertyEditor::UpdateOpacityScale()
 {
   if (this->IsCreated() && 
       this->OpacityScale &&
@@ -949,7 +949,7 @@ void vtkKWTextProperty::UpdateOpacityScale()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::OpacityCallback() 
+void vtkKWTextPropertyEditor::OpacityCallback() 
 {
   if (this->OpacityScale->IsCreated())
     {
@@ -958,7 +958,7 @@ void vtkKWTextProperty::OpacityCallback()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::OpacityEndCallback() 
+void vtkKWTextPropertyEditor::OpacityEndCallback() 
 {
   if (this->OpacityScale->IsCreated())
     {
@@ -967,7 +967,7 @@ void vtkKWTextProperty::OpacityEndCallback()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetShowCopy(int _arg)
+void vtkKWTextPropertyEditor::SetShowCopy(int _arg)
 {
   if (this->ShowCopy == _arg)
     {
@@ -980,7 +980,7 @@ void vtkKWTextProperty::SetShowCopy(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-vtkKWPushButton* vtkKWTextProperty::GetCopyButton()
+vtkKWPushButton* vtkKWTextPropertyEditor::GetCopyButton()
 {
   if (this->IsCreated())
     {
@@ -991,7 +991,7 @@ vtkKWPushButton* vtkKWTextProperty::GetCopyButton()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdatePushButtonSet()
+void vtkKWTextPropertyEditor::UpdatePushButtonSet()
 {
   if (this->IsCreated() && this->PushButtonSet)
     {
@@ -1006,7 +1006,7 @@ void vtkKWTextProperty::UpdatePushButtonSet()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::CopyValuesFrom(vtkKWTextProperty *widget)
+void vtkKWTextPropertyEditor::CopyValuesFrom(vtkKWTextPropertyEditor *widget)
 {
   if (widget)
     {
@@ -1024,7 +1024,7 @@ void vtkKWTextProperty::CopyValuesFrom(vtkKWTextProperty *widget)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTextProperty::SaveInTclScript(ofstream *file, 
+void vtkKWTextPropertyEditor::SaveInTclScript(ofstream *file, 
                                         const char *tcl_name, int tabify)
 {
   static int instance_count = 0;
@@ -1082,7 +1082,7 @@ void vtkKWTextProperty::SaveInTclScript(ofstream *file,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTextProperty::UpdateEnableState()
+void vtkKWTextPropertyEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
@@ -1096,21 +1096,21 @@ void vtkKWTextProperty::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTextProperty::SetChangedCommand(
+void vtkKWTextPropertyEditor::SetChangedCommand(
   vtkKWObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->ChangedCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTextProperty::SetColorChangedCommand(
+void vtkKWTextPropertyEditor::SetColorChangedCommand(
   vtkKWObject *object, const char *method)
 {
   this->SetObjectMethodCommand(&this->ColorChangedCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWTextPropertyEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   if (this->TextProperty)

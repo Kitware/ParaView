@@ -32,7 +32,7 @@
 #include "vtkPVInputMenu.h"
 #include "vtkSMPart.h"
 #include "vtkSMPartDisplay.h"
-#include "vtkPVCornerAnnotation.h"
+#include "vtkPVCornerAnnotationEditor.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
@@ -56,7 +56,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.428");
+vtkCxxRevisionMacro(vtkPVSource, "1.429");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1159,7 +1159,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // information.
     if (this->Proxy->GetProperty("TimestepValues"))
       {
-      vtkPVCornerAnnotation* annot =
+      vtkPVCornerAnnotationEditor* annot =
         this->GetPVRenderView()->GetCornerAnnotation();
       const char* prevText = annot->GetCornerText(1);
       if (prevText && prevText[0] == '\0')

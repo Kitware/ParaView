@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWListSelectOrder.cxx
+  Module:    vtkKWListBoxToListBoxSelectionEditor.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWListSelectOrder.h"
+#include "vtkKWListBoxToListBoxSelectionEditor.h"
 
 #include "vtkKWApplication.h"
 #include "vtkKWIcon.h"
@@ -27,11 +27,11 @@
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWListSelectOrder );
-vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.13");
+vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.1");
 
 //----------------------------------------------------------------------------
-vtkKWListSelectOrder::vtkKWListSelectOrder()
+vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
 {
   this->SourceList = vtkKWListBox::New();
   this->FinalList = vtkKWListBox::New();
@@ -47,7 +47,7 @@ vtkKWListSelectOrder::vtkKWListSelectOrder()
 }
 
 //----------------------------------------------------------------------------
-vtkKWListSelectOrder::~vtkKWListSelectOrder()
+vtkKWListBoxToListBoxSelectionEditor::~vtkKWListBoxToListBoxSelectionEditor()
 {
   this->SourceList->Delete();
   this->FinalList->Delete();
@@ -63,7 +63,7 @@ vtkKWListSelectOrder::~vtkKWListSelectOrder()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
+void vtkKWListBoxToListBoxSelectionEditor::Create(vtkKWApplication *app, const char *args)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
@@ -153,7 +153,7 @@ void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::AddElement(vtkKWListBox* l1, vtkKWListBox* l2, 
+void vtkKWListBoxToListBoxSelectionEditor::AddElement(vtkKWListBox* l1, vtkKWListBox* l2, 
   const char* element, int force)
 {
   int idx = l2->GetItemIndex(element);
@@ -174,7 +174,7 @@ void vtkKWListSelectOrder::AddElement(vtkKWListBox* l1, vtkKWListBox* l2,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::AddSourceElement(const char* element, int force /* = 0 */)
+void vtkKWListBoxToListBoxSelectionEditor::AddSourceElement(const char* element, int force /* = 0 */)
 {
   this->RemoveEllipsis();
   this->AddElement(this->SourceList, this->FinalList, element, force);
@@ -182,7 +182,7 @@ void vtkKWListSelectOrder::AddSourceElement(const char* element, int force /* = 
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::AddFinalElement(const char* element, int force /* = 0 */)
+void vtkKWListBoxToListBoxSelectionEditor::AddFinalElement(const char* element, int force /* = 0 */)
 {
   this->RemoveEllipsis();
   this->AddElement(this->FinalList, this->SourceList, element, force);
@@ -190,7 +190,7 @@ void vtkKWListSelectOrder::AddFinalElement(const char* element, int force /* = 0
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::AddCallback()
+void vtkKWListBoxToListBoxSelectionEditor::AddCallback()
 {
   this->RemoveEllipsis();
   this->MoveSelectedList(this->SourceList, this->FinalList);
@@ -198,7 +198,7 @@ void vtkKWListSelectOrder::AddCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::AddAllCallback()
+void vtkKWListBoxToListBoxSelectionEditor::AddAllCallback()
 {
   this->RemoveEllipsis();
   this->MoveWholeList(this->SourceList, this->FinalList);
@@ -206,7 +206,7 @@ void vtkKWListSelectOrder::AddAllCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::RemoveCallback() 
+void vtkKWListBoxToListBoxSelectionEditor::RemoveCallback() 
 {
   this->RemoveEllipsis();
   this->MoveSelectedList(this->FinalList, this->SourceList);
@@ -214,7 +214,7 @@ void vtkKWListSelectOrder::RemoveCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::RemoveAllCallback()
+void vtkKWListBoxToListBoxSelectionEditor::RemoveAllCallback()
 {
   this->RemoveEllipsis();
   this->MoveWholeList(this->FinalList, this->SourceList);
@@ -222,7 +222,7 @@ void vtkKWListSelectOrder::RemoveAllCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::ShiftItems(vtkKWListBox* l1, int down)
+void vtkKWListBoxToListBoxSelectionEditor::ShiftItems(vtkKWListBox* l1, int down)
 {
   const char* list = this->Script("lsort -integer %s [ %s curselection ]", 
     down?"-decreasing":"",
@@ -261,19 +261,19 @@ void vtkKWListSelectOrder::ShiftItems(vtkKWListBox* l1, int down)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::UpCallback()
+void vtkKWListBoxToListBoxSelectionEditor::UpCallback()
 {
   this->ShiftItems(this->FinalList, 0);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::DownCallback()
+void vtkKWListBoxToListBoxSelectionEditor::DownCallback()
 {
   this->ShiftItems(this->FinalList, 1);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::MoveWholeList(vtkKWListBox* l1, vtkKWListBox* l2)
+void vtkKWListBoxToListBoxSelectionEditor::MoveWholeList(vtkKWListBox* l1, vtkKWListBox* l2)
 {
   this->Script("%s selection set 0 end",
     l1->GetListbox()->GetWidgetName());
@@ -281,7 +281,7 @@ void vtkKWListSelectOrder::MoveWholeList(vtkKWListBox* l1, vtkKWListBox* l2)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::MoveSelectedList(vtkKWListBox* l1, vtkKWListBox* l2)
+void vtkKWListBoxToListBoxSelectionEditor::MoveSelectedList(vtkKWListBox* l1, vtkKWListBox* l2)
 {
   const char* cselected = this->Script("%s curselection", 
     l1->GetListbox()->GetWidgetName());
@@ -289,7 +289,7 @@ void vtkKWListSelectOrder::MoveSelectedList(vtkKWListBox* l1, vtkKWListBox* l2)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::MoveList(vtkKWListBox* l1, vtkKWListBox* l2, 
+void vtkKWListBoxToListBoxSelectionEditor::MoveList(vtkKWListBox* l1, vtkKWListBox* l2, 
   const char* list)
 {
   char* selection = new char[ strlen(list) + 1 ];
@@ -322,7 +322,7 @@ void vtkKWListSelectOrder::MoveList(vtkKWListBox* l1, vtkKWListBox* l2,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWListSelectOrder::GetNumberOfElementsOnSourceList()
+int vtkKWListBoxToListBoxSelectionEditor::GetNumberOfElementsOnSourceList()
 {
   if ( this->EllipsisDisplayed )
     {
@@ -332,13 +332,13 @@ int vtkKWListSelectOrder::GetNumberOfElementsOnSourceList()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWListSelectOrder::GetNumberOfElementsOnFinalList()
+int vtkKWListBoxToListBoxSelectionEditor::GetNumberOfElementsOnFinalList()
 {
   return this->FinalList->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWListSelectOrder::GetElementFromSourceList(int idx)
+const char* vtkKWListBoxToListBoxSelectionEditor::GetElementFromSourceList(int idx)
 {
   if ( this->EllipsisDisplayed )
     {
@@ -348,13 +348,13 @@ const char* vtkKWListSelectOrder::GetElementFromSourceList(int idx)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWListSelectOrder::GetElementFromFinalList(int idx)
+const char* vtkKWListBoxToListBoxSelectionEditor::GetElementFromFinalList(int idx)
 {
   return this->FinalList->GetItem(idx);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWListSelectOrder::GetElementIndexFromSourceList(const char* element)
+int vtkKWListBoxToListBoxSelectionEditor::GetElementIndexFromSourceList(const char* element)
 {
   if ( this->EllipsisDisplayed )
     {
@@ -364,13 +364,13 @@ int vtkKWListSelectOrder::GetElementIndexFromSourceList(const char* element)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWListSelectOrder::GetElementIndexFromFinalList(const char* element)
+int vtkKWListBoxToListBoxSelectionEditor::GetElementIndexFromFinalList(const char* element)
 {
   return this->FinalList->GetItemIndex(element);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::RemoveItemsFromSourceList()
+void vtkKWListBoxToListBoxSelectionEditor::RemoveItemsFromSourceList()
 {
   this->SourceList->DeleteAll();
   this->Modified();
@@ -379,7 +379,7 @@ void vtkKWListSelectOrder::RemoveItemsFromSourceList()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::RemoveItemsFromFinalList()
+void vtkKWListBoxToListBoxSelectionEditor::RemoveItemsFromFinalList()
 {
   this->FinalList->DeleteAll();
   this->Modified();
@@ -387,7 +387,7 @@ void vtkKWListSelectOrder::RemoveItemsFromFinalList()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::DisplayEllipsis()
+void vtkKWListBoxToListBoxSelectionEditor::DisplayEllipsis()
 {
   if ( this->SourceList->GetNumberOfItems() > 0 )
     {
@@ -399,7 +399,7 @@ void vtkKWListSelectOrder::DisplayEllipsis()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::RemoveEllipsis()
+void vtkKWListBoxToListBoxSelectionEditor::RemoveEllipsis()
 {
   if ( !this->EllipsisDisplayed )
     {
@@ -411,7 +411,7 @@ void vtkKWListSelectOrder::RemoveEllipsis()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::EllipsisCallback()
+void vtkKWListBoxToListBoxSelectionEditor::EllipsisCallback()
 {
   if ( !this->EllipsisCommand )
     {
@@ -421,7 +421,7 @@ void vtkKWListSelectOrder::EllipsisCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::SetEllipsisCommand(vtkKWObject* obj, const char* command)
+void vtkKWListBoxToListBoxSelectionEditor::SetEllipsisCommand(vtkKWObject* obj, const char* command)
 {
   ostrstream str;
   str << obj->GetTclName() << " " << command << ends;
@@ -430,7 +430,7 @@ void vtkKWListSelectOrder::SetEllipsisCommand(vtkKWObject* obj, const char* comm
 }
 
 //-----------------------------------------------------------------------------
-void vtkKWListSelectOrder::UpdateEnableState()
+void vtkKWListBoxToListBoxSelectionEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
@@ -446,7 +446,7 @@ void vtkKWListSelectOrder::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWListBoxToListBoxSelectionEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   

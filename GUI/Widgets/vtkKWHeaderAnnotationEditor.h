@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWHeaderAnnotation.h
+  Module:    vtkKWHeaderAnnotationEditor.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,27 +11,27 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWHeaderAnnotation - a header annotation widget
+// .NAME vtkKWHeaderAnnotationEditor - a header annotation widget
 // .SECTION Description
 // A class that provides a UI for header annotation (vtkTextActor).
 
-#ifndef __vtkKWHeaderAnnotation_h
-#define __vtkKWHeaderAnnotation_h
+#ifndef __vtkKWHeaderAnnotationEditor_h
+#define __vtkKWHeaderAnnotationEditor_h
 
 #include "vtkKWPopupFrameCheckButton.h"
 
 class vtkKWEntryLabeled;
 class vtkKWPopupButtonLabeled;
 class vtkKWRenderWidget;
-class vtkKWTextProperty;
+class vtkKWTextPropertyEditor;
 class vtkTextActor;
 class vtkKWFrame;
 
-class VTK_EXPORT vtkKWHeaderAnnotation : public vtkKWPopupFrameCheckButton
+class VTK_EXPORT vtkKWHeaderAnnotationEditor : public vtkKWPopupFrameCheckButton
 {
 public:
-  static vtkKWHeaderAnnotation* New();
-  vtkTypeRevisionMacro(vtkKWHeaderAnnotation,vtkKWPopupFrameCheckButton);
+  static vtkKWHeaderAnnotationEditor* New();
+  vtkTypeRevisionMacro(vtkKWHeaderAnnotationEditor,vtkKWPopupFrameCheckButton);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -88,8 +88,8 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-  vtkKWHeaderAnnotation();
-  ~vtkKWHeaderAnnotation();
+  vtkKWHeaderAnnotationEditor();
+  ~vtkKWHeaderAnnotationEditor();
 
   int AnnotationChangedEvent;
 
@@ -101,7 +101,7 @@ protected:
 
   vtkKWFrame              *TextFrame;
   vtkKWEntryLabeled       *TextEntry;
-  vtkKWTextProperty       *TextPropertyWidget;
+  vtkKWTextPropertyEditor *TextPropertyWidget;
   vtkKWPopupButtonLabeled *TextPropertyPopupButton;
 
   virtual void Render();
@@ -117,8 +117,8 @@ protected:
   virtual void SendChangedEvent();
 
 private:
-  vtkKWHeaderAnnotation(const vtkKWHeaderAnnotation&); // Not implemented
-  void operator=(const vtkKWHeaderAnnotation&); // Not Implemented
+  vtkKWHeaderAnnotationEditor(const vtkKWHeaderAnnotationEditor&); // Not implemented
+  void operator=(const vtkKWHeaderAnnotationEditor&); // Not Implemented
 };
 
 #endif

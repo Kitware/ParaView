@@ -29,7 +29,7 @@
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
-#include "vtkPVCornerAnnotation.h"
+#include "vtkPVCornerAnnotationEditor.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWFrameLabeled.h"
@@ -132,7 +132,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.358");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.359");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -231,13 +231,13 @@ vtkPVRenderView::vtkPVRenderView()
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::AddAnnotationProp(vtkPVCornerAnnotation *c)  
+void vtkPVRenderView::AddAnnotationProp(vtkPVCornerAnnotationEditor *c)  
 {  
   this->GetRenderer2D()->AddViewProp(c->GetCornerAnnotation());  
 }  
    
 //----------------------------------------------------------------------------
-void vtkPVRenderView::RemoveAnnotationProp(vtkPVCornerAnnotation *c)  
+void vtkPVRenderView::RemoveAnnotationProp(vtkPVCornerAnnotationEditor *c)  
 {  
   this->GetRenderer2D()->RemoveViewProp(c->GetCornerAnnotation());  
 }  

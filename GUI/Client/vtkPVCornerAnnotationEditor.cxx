@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkPVCornerAnnotation.cxx
+  Module:    vtkPVCornerAnnotationEditor.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,14 +11,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVCornerAnnotation.h"
+#include "vtkPVCornerAnnotationEditor.h"
 
 #include "vtkCornerAnnotation.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWText.h"
 #include "vtkKWTextLabeled.h"
-#include "vtkPVTextProperty.h"
+#include "vtkPVTextPropertyEditor.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
 #include "vtkSMProperty.h"
@@ -28,14 +28,14 @@
 #include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkPVCornerAnnotation );
-vtkCxxRevisionMacro(vtkPVCornerAnnotation, "1.5");
+vtkStandardNewMacro( vtkPVCornerAnnotationEditor );
+vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.1");
 
-int vtkPVCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVCornerAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkPVCornerAnnotation::vtkPVCornerAnnotation()
+vtkPVCornerAnnotationEditor::vtkPVCornerAnnotationEditor()
 {
   this->TraceHelper = vtkPVTraceHelper::New();
   this->TraceHelper->SetObject(this);
@@ -44,23 +44,23 @@ vtkPVCornerAnnotation::vtkPVCornerAnnotation()
 
   this->View= NULL;
 
-  // Delete the vtkKWTextProperty, use the traced one, vtkPVTextProperty
+  // Delete the vtkKWTextPropertyEditor, use the traced one, vtkPVTextPropertyEditor
 
   if (this->TextPropertyWidget)
     {
     this->TextPropertyWidget->Delete();
     }
   
-  this->TextPropertyWidget = vtkPVTextProperty::New();
-  vtkPVTextProperty *pvtpropw = 
-    vtkPVTextProperty::SafeDownCast(this->TextPropertyWidget);
+  this->TextPropertyWidget = vtkPVTextPropertyEditor::New();
+  vtkPVTextPropertyEditor *pvtpropw = 
+    vtkPVTextPropertyEditor::SafeDownCast(this->TextPropertyWidget);
   pvtpropw->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
   pvtpropw->GetTraceHelper()->SetReferenceCommand(
     "GetTextPropertyWidget");
 }
 
 //----------------------------------------------------------------------------
-vtkPVCornerAnnotation::~vtkPVCornerAnnotation()
+vtkPVCornerAnnotationEditor::~vtkPVCornerAnnotationEditor()
 {
   this->SetView(NULL);
 
@@ -78,7 +78,7 @@ vtkPVCornerAnnotation::~vtkPVCornerAnnotation()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::SetView(vtkKWView *vw)
+void vtkPVCornerAnnotationEditor::SetView(vtkKWView *vw)
 { 
   vtkPVRenderView* rw = vtkPVRenderView::SafeDownCast(vw);
 
@@ -124,7 +124,7 @@ void vtkPVCornerAnnotation::SetView(vtkKWView *vw)
 } 
 
 //----------------------------------------------------------------------------
-int vtkPVCornerAnnotation::GetVisibility() 
+int vtkPVCornerAnnotationEditor::GetVisibility() 
 {
   // Note that the visibility here is based on the real visibility of the
   // annotation, not the state of the checkbutton
@@ -134,7 +134,7 @@ int vtkPVCornerAnnotation::GetVisibility()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::SetVisibility(int state)
+void vtkPVCornerAnnotationEditor::SetVisibility(int state)
 {
   // In vtkKWView mode, add/remove the composite
   // In vtkKWRenderWidget mode, add/remove the prop
@@ -171,7 +171,7 @@ void vtkPVCornerAnnotation::SetVisibility(int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::UpdateCornerText() 
+void vtkPVCornerAnnotationEditor::UpdateCornerText() 
 {
   if (this->IsCreated())
     {
@@ -187,7 +187,7 @@ void vtkPVCornerAnnotation::UpdateCornerText()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::SetCornerTextInternal(const char* text, int corner) 
+void vtkPVCornerAnnotationEditor::SetCornerTextInternal(const char* text, int corner) 
 {
   if (this->CornerAnnotation &&
       (!this->GetCornerText(corner) ||
@@ -199,7 +199,7 @@ void vtkPVCornerAnnotation::SetCornerTextInternal(const char* text, int corner)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::CornerTextCallback(int i) 
+void vtkPVCornerAnnotationEditor::CornerTextCallback(int i) 
 {
   if (this->IsCreated() && this->CornerText[i])
     {
@@ -221,7 +221,7 @@ void vtkPVCornerAnnotation::CornerTextCallback(int i)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::SetMaximumLineHeight(float v)
+void vtkPVCornerAnnotationEditor::SetMaximumLineHeight(float v)
 {
   this->Superclass::SetMaximumLineHeight(v);
   this->GetTraceHelper()->AddEntry(
@@ -229,7 +229,7 @@ void vtkPVCornerAnnotation::SetMaximumLineHeight(float v)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::SetCornerText(const char *text, int corner) 
+void vtkPVCornerAnnotationEditor::SetCornerText(const char *text, int corner) 
 {
   char* oldValue = this->CornerText[corner]->GetWidget()->GetValue();
   if (this->CornerAnnotation && (strcmp(oldValue, text)))
@@ -253,7 +253,7 @@ void vtkPVCornerAnnotation::SetCornerText(const char *text, int corner)
 
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::Update() 
+void vtkPVCornerAnnotationEditor::Update() 
 {
   // Maximum line height
 
@@ -281,7 +281,7 @@ void vtkPVCornerAnnotation::Update()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::Render() 
+void vtkPVCornerAnnotationEditor::Render() 
 {
   if (this->View)
     {
@@ -290,7 +290,7 @@ void vtkPVCornerAnnotation::Render()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::SaveState(ofstream *file)
+void vtkPVCornerAnnotationEditor::SaveState(ofstream *file)
 {
   *file << "$kw(" << this->GetTclName() << ") SetVisibility "
         << this->GetVisibility() << endl;
@@ -320,7 +320,7 @@ void vtkPVCornerAnnotation::SaveState(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVCornerAnnotationEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "View: " << this->GetView() << endl;

@@ -30,7 +30,7 @@
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
-#include "vtkKWListSelectOrder.h"
+#include "vtkKWListBoxToListBoxSelectionEditor.h"
 #include "vtkCommand.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWFrameLabeled.h"
@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.106");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.107");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -95,7 +95,7 @@ vtkPVFileEntry::vtkPVFileEntry()
 
   this->FileListPopup = vtkKWPopupButton::New();
 
-  this->FileListSelect = vtkKWListSelectOrder::New();
+  this->FileListSelect = vtkKWListBoxToListBoxSelectionEditor::New();
   this->ListObserverTag = 0;
   this->IgnoreFileListEvents = 0;
 

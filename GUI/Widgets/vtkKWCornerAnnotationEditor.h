@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWCornerAnnotation.h
+  Module:    vtkKWCornerAnnotationEditor.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,14 +11,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWCornerAnnotation - a corner annotation widget
+// .NAME vtkKWCornerAnnotationEditor - a corner annotation widget
 // .SECTION Description
 // A class that provides a UI for vtkCornerAnnotation. User can set the
 // text for each corner, set the color of the text, and turn the annotation
 // on and off.
 
-#ifndef __vtkKWCornerAnnotation_h
-#define __vtkKWCornerAnnotation_h
+#ifndef __vtkKWCornerAnnotationEditor_h
+#define __vtkKWCornerAnnotationEditor_h
 
 #include "vtkKWPopupFrameCheckButton.h"
 
@@ -30,13 +30,13 @@ class vtkKWPopupButtonLabeled;
 class vtkKWTextLabeled;
 class vtkKWRenderWidget;
 class vtkKWScale;
-class vtkKWTextProperty;
+class vtkKWTextPropertyEditor;
 
-class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWPopupFrameCheckButton
+class VTK_EXPORT vtkKWCornerAnnotationEditor : public vtkKWPopupFrameCheckButton
 {
 public:
-  static vtkKWCornerAnnotation* New();
-  vtkTypeRevisionMacro(vtkKWCornerAnnotation,vtkKWPopupFrameCheckButton);
+  static vtkKWCornerAnnotationEditor* New();
+  vtkTypeRevisionMacro(vtkKWCornerAnnotationEditor,vtkKWPopupFrameCheckButton);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -55,9 +55,9 @@ public:
   // Set/Get the vtkKWView or the vtkKWRenderWidget that owns this annotation.
   // vtkKWView and vtkKWRenderWidget are two different frameworks, choose one
   // or the other (ParaView uses vtkKWView, VolView uses vtkKWRenderWidget).
-  // Note that in vtkKWView mode, each view has a vtkKWCornerAnnotation. 
+  // Note that in vtkKWView mode, each view has a vtkKWCornerAnnotationEditor. 
   // In vtkKWRenderWidget, each widget has a vtkCornerAnnotation, which is 
-  // controlled by a unique (decoupled) vtkKWCornerAnnotation in the GUI.
+  // controlled by a unique (decoupled) vtkKWCornerAnnotationEditor in the GUI.
   virtual void SetRenderWidget(vtkKWRenderWidget*);
   vtkGetObjectMacro(RenderWidget,vtkKWRenderWidget);
 
@@ -65,7 +65,7 @@ public:
   // Description:
   // Get the underlying vtkCornerAnnotation. 
   // In vtkKWView mode, the CornerAnnotation is created automatically and 
-  // handled by this class (i.e. each vtkKWCornerAnnotation has a 
+  // handled by this class (i.e. each vtkKWCornerAnnotationEditor has a 
   // vtkCornerAnnotation).
   // In vtkKWRenderWidget, the corner prop is part of vtkKWRenderWidget, and
   // this method is just a gateway to vtkKWRenderWidget::GetCornerAnnotation().
@@ -133,11 +133,11 @@ public:
 
   // Description:
   // Access to the TextPropertyWidget from a script.
-  vtkGetObjectMacro(TextPropertyWidget, vtkKWTextProperty);
+  vtkGetObjectMacro(TextPropertyWidget, vtkKWTextPropertyEditor);
   
 protected:
-  vtkKWCornerAnnotation();
-  ~vtkKWCornerAnnotation();
+  vtkKWCornerAnnotationEditor();
+  ~vtkKWCornerAnnotationEditor();
 
   int AnnotationChangedEvent;
 
@@ -153,7 +153,7 @@ protected:
   vtkKWTextLabeled        *CornerText[4];
   vtkKWFrame              *PropertiesFrame;
   vtkKWScale              *MaximumLineHeightScale;
-  vtkKWTextProperty       *TextPropertyWidget;
+  vtkKWTextPropertyEditor *TextPropertyWidget;
   vtkKWPopupButtonLabeled *TextPropertyPopupButton;
 
   virtual void Render();
@@ -168,8 +168,8 @@ protected:
   virtual void SendChangedEvent();
 
 private:
-  vtkKWCornerAnnotation(const vtkKWCornerAnnotation&); // Not implemented
-  void operator=(const vtkKWCornerAnnotation&); // Not Implemented
+  vtkKWCornerAnnotationEditor(const vtkKWCornerAnnotationEditor&); // Not implemented
+  void operator=(const vtkKWCornerAnnotationEditor&); // Not Implemented
 };
 
 #endif

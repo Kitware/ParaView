@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkPVTextProperty.h
+  Module:    vtkPVTextPropertyEditor.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,25 +11,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTextProperty - a vtkKWTextProperty with tracing
+// .NAME vtkPVTextPropertyEditor - a vtkKWTextProperty with tracing
 // .SECTION Description
-// The vtkPVTextProperty creates a set of GUI components that can be displayed
+// The vtkPVTextPropertyEditor creates a set of GUI components that can be displayed
 // and used selectively to edit all or part of a vtkTextProperty object.
 // .SECTION See Also
 // vtkKWTextProperty
 
-#ifndef __vtkPVTextProperty_h
-#define __vtkPVTextProperty_h
+#ifndef __vtkPVTextPropertyEditor_h
+#define __vtkPVTextPropertyEditor_h
 
-#include "vtkKWTextProperty.h"
+#include "vtkKWTextPropertyEditor.h"
 
 class vtkPVTraceHelper;
 
-class VTK_EXPORT vtkPVTextProperty : public vtkKWTextProperty
+class VTK_EXPORT vtkPVTextPropertyEditor : public vtkKWTextPropertyEditor
 {
 public:
-  static vtkPVTextProperty* New();
-  vtkTypeRevisionMacro(vtkPVTextProperty,vtkKWTextProperty);
+  static vtkPVTextPropertyEditor* New();
+  vtkTypeRevisionMacro(vtkPVTextPropertyEditor,vtkKWTextPropertyEditor);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -47,14 +47,14 @@ public:
   vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
 
 protected:
-  vtkPVTextProperty();
-  ~vtkPVTextProperty();
+  vtkPVTextPropertyEditor();
+  ~vtkPVTextPropertyEditor();
 
   vtkPVTraceHelper* TraceHelper;
 
 private:
-  vtkPVTextProperty(const vtkPVTextProperty&); // Not implemented
-  void operator=(const vtkPVTextProperty&); // Not implemented
+  vtkPVTextPropertyEditor(const vtkPVTextPropertyEditor&); // Not implemented
+  void operator=(const vtkPVTextPropertyEditor&); // Not implemented
 };
 
 #endif

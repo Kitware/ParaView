@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWListSelectOrder.h
+  Module:    vtkKWListBoxToListBoxSelectionEditor.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,13 +11,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWListSelectOrder - a single line text entry widget
+// .NAME vtkKWListBoxToListBoxSelectionEditor - a composite dual-listbox selection editor
 // .SECTION Description
-// A simple widget used for collecting keyboard input from the user. This
-// widget provides support for single line input.
+// This composite widget is used to manage a selection of text entries between
+// two listboxes. The source listbox lists the available elements that can
+// be add/removed/sorted to form a selection inside a target/final listbox.
 
-#ifndef __vtkKWListSelectOrder_h
-#define __vtkKWListSelectOrder_h
+#ifndef __vtkKWListBoxToListBoxSelectionEditor_h
+#define __vtkKWListBoxToListBoxSelectionEditor_h
 
 #include "vtkKWWidget.h"
 
@@ -25,11 +26,11 @@ class vtkKWApplication;
 class vtkKWListBox;
 class vtkKWPushButton;
 
-class VTK_EXPORT vtkKWListSelectOrder : public vtkKWWidget
+class VTK_EXPORT vtkKWListBoxToListBoxSelectionEditor : public vtkKWWidget
 {
 public:
-  static vtkKWListSelectOrder* New();
-  vtkTypeRevisionMacro(vtkKWListSelectOrder,vtkKWWidget);
+  static vtkKWListBoxToListBoxSelectionEditor* New();
+  vtkTypeRevisionMacro(vtkKWListBoxToListBoxSelectionEditor,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -94,8 +95,8 @@ public:
   virtual void UpdateEnableState();
 
 protected:
-  vtkKWListSelectOrder();
-  ~vtkKWListSelectOrder();
+  vtkKWListBoxToListBoxSelectionEditor();
+  ~vtkKWListBoxToListBoxSelectionEditor();
 
   vtkKWListBox* SourceList;
   vtkKWListBox* FinalList;
@@ -120,8 +121,8 @@ protected:
   void RemoveEllipsis();
   
 private:
-  vtkKWListSelectOrder(const vtkKWListSelectOrder&); // Not implemented
-  void operator=(const vtkKWListSelectOrder&); // Not Implemented
+  vtkKWListBoxToListBoxSelectionEditor(const vtkKWListBoxToListBoxSelectionEditor&); // Not implemented
+  void operator=(const vtkKWListBoxToListBoxSelectionEditor&); // Not Implemented
 };
 
 

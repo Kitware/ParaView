@@ -25,7 +25,7 @@
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
-#include "vtkPVTextProperty.h"
+#include "vtkPVTextPropertyEditor.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidget.h"
 #include "vtkLookupTable.h"
@@ -65,7 +65,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.117");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.118");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -192,8 +192,8 @@ vtkPVColorMap::vtkPVColorMap()
 
   this->VisitedFlag = 0;
 
-  this->TitleTextPropertyWidget = vtkPVTextProperty::New();
-  this->LabelTextPropertyWidget = vtkPVTextProperty::New();
+  this->TitleTextPropertyWidget = vtkPVTextPropertyEditor::New();
+  this->LabelTextPropertyWidget = vtkPVTextPropertyEditor::New();
 
   this->LabelTextProperty = vtkTextProperty::New();
   this->TitleTextProperty = vtkTextProperty::New();

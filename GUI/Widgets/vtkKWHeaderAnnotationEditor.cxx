@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWHeaderAnnotation.cxx
+  Module:    vtkKWHeaderAnnotationEditor.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWHeaderAnnotation.h"
+#include "vtkKWHeaderAnnotationEditor.h"
 
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
@@ -23,22 +23,22 @@
 #include "vtkKWPopupButtonLabeled.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWRenderWidget.h"
-#include "vtkKWTextProperty.h"
+#include "vtkKWTextPropertyEditor.h"
 #include "vtkObjectFactory.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.12");
+vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.1");
 
-int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
+int vtkKWHeaderAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkKWHeaderAnnotation::vtkKWHeaderAnnotation()
+vtkKWHeaderAnnotationEditor::vtkKWHeaderAnnotationEditor()
 {
-  this->CommandFunction = vtkKWHeaderAnnotationCommand;
+  this->CommandFunction = vtkKWHeaderAnnotationEditorCommand;
 
   this->AnnotationChangedEvent  = vtkKWEvent::ViewAnnotationChangedEvent;
   this->PopupTextProperty       = 0;
@@ -48,12 +48,12 @@ vtkKWHeaderAnnotation::vtkKWHeaderAnnotation()
 
   this->TextFrame               = vtkKWFrame::New();
   this->TextEntry               = vtkKWEntryLabeled::New();
-  this->TextPropertyWidget      = vtkKWTextProperty::New();
+  this->TextPropertyWidget      = vtkKWTextPropertyEditor::New();
   this->TextPropertyPopupButton = NULL;
 }
 
 //----------------------------------------------------------------------------
-vtkKWHeaderAnnotation::~vtkKWHeaderAnnotation()
+vtkKWHeaderAnnotationEditor::~vtkKWHeaderAnnotationEditor()
 {
   // GUI
 
@@ -85,7 +85,7 @@ vtkKWHeaderAnnotation::~vtkKWHeaderAnnotation()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::SetRenderWidget(vtkKWRenderWidget *_arg)
+void vtkKWHeaderAnnotationEditor::SetRenderWidget(vtkKWRenderWidget *_arg)
 { 
   if (this->RenderWidget == _arg) 
     {
@@ -116,7 +116,7 @@ void vtkKWHeaderAnnotation::SetRenderWidget(vtkKWRenderWidget *_arg)
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::Create(vtkKWApplication *app, 
+void vtkKWHeaderAnnotationEditor::Create(vtkKWApplication *app, 
                                    const char *args)
 {
   // Create the superclass widgets
@@ -230,7 +230,7 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::Update()
+void vtkKWHeaderAnnotationEditor::Update()
 {
   this->Superclass::Update();
 
@@ -273,7 +273,7 @@ void vtkKWHeaderAnnotation::Update()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::Render() 
+void vtkKWHeaderAnnotationEditor::Render() 
 {
   if (this->RenderWidget)
     {
@@ -282,7 +282,7 @@ void vtkKWHeaderAnnotation::Render()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWHeaderAnnotation::GetVisibility() 
+int vtkKWHeaderAnnotationEditor::GetVisibility() 
 {
   if (!this->RenderWidget)
     {
@@ -293,7 +293,7 @@ int vtkKWHeaderAnnotation::GetVisibility()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::SetVisibility(int state)
+void vtkKWHeaderAnnotationEditor::SetVisibility(int state)
 {
   if (!this->RenderWidget)
     {
@@ -311,7 +311,7 @@ void vtkKWHeaderAnnotation::SetVisibility(int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::CheckButtonCallback() 
+void vtkKWHeaderAnnotationEditor::CheckButtonCallback() 
 {
   if (this->CheckButton && this->CheckButton->IsCreated())
     {
@@ -320,7 +320,7 @@ void vtkKWHeaderAnnotation::CheckButtonCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::TextPropertyCallback()
+void vtkKWHeaderAnnotationEditor::TextPropertyCallback()
 {
   if (this->GetVisibility())
     {
@@ -331,7 +331,7 @@ void vtkKWHeaderAnnotation::TextPropertyCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::SetHeaderText(const char *text) 
+void vtkKWHeaderAnnotationEditor::SetHeaderText(const char *text) 
 {
   if (this->RenderWidget && text &&
       (!this->RenderWidget->GetHeaderAnnotationText() || 
@@ -351,7 +351,7 @@ void vtkKWHeaderAnnotation::SetHeaderText(const char *text)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::HeaderTextCallback() 
+void vtkKWHeaderAnnotationEditor::HeaderTextCallback() 
 {
   if (this->TextEntry && this->TextEntry->IsCreated())
     {
@@ -360,7 +360,7 @@ void vtkKWHeaderAnnotation::HeaderTextCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::UpdateEnableState()
+void vtkKWHeaderAnnotationEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
@@ -386,7 +386,7 @@ void vtkKWHeaderAnnotation::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::SendChangedEvent()
+void vtkKWHeaderAnnotationEditor::SendChangedEvent()
 {
   if (!this->RenderWidget || !this->RenderWidget->GetHeaderAnnotation())
     {
@@ -397,7 +397,7 @@ void vtkKWHeaderAnnotation::SendChangedEvent()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWHeaderAnnotation::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWHeaderAnnotationEditor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
