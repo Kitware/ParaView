@@ -186,6 +186,8 @@ public:
   // Extra methods for dealing with sets of blocks with different dimensions.
   vtkIdType GetBlockStartPointId(int blockId);
   vtkIdType GetBlockStartCellId(int blockId);
+  int GetBlockIdFromPointId(vtkIdType ptId);
+  int GetBlockIdFromCellId(vtkIdType ptId);
 
 protected:
   vtkCTHData();
@@ -197,6 +199,8 @@ protected:
   vtkIdType *BlockStartCellIds;
   int *BlockNumberOfPoints;
   int *BlockNumberOfCells;
+  float AverageNumberOfCellsPerBlock;
+  float AverageNumberOfPointsPerBlock;
 
   // for the GetCell method
   vtkVertex *Vertex;
