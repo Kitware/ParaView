@@ -8,14 +8,12 @@ vtkKWView
 vtkCornerAnnotation 
 vtkKWActorComposite 
 vtkKWApplication 
-vtkKWCallbackSpecification 
 vtkKWChangeColorButton 
 vtkKWCheckButton 
 vtkKWCompositeCollection 
 vtkKWCornerAnnotation 
 vtkKWDialog 
 vtkKWEntry 
-vtkKWEventNotifier
 vtkKWExtent 
 vtkKWGenericComposite 
 vtkKWLabel 
@@ -109,3 +107,4 @@ IF(CMAKE_HAS_X)
 ENDIF(CMAKE_HAS_X)
 
 INSTALL_TARGETS(/lib vtkKWWidgetsTCL)
+
