@@ -48,7 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWOptionMenu_h
 
 #include "vtkKWWidget.h"
+
 class vtkKWApplication;
+class vtkKWMenu;
 
 class VTK_EXPORT vtkKWOptionMenu : public vtkKWWidget
 {
@@ -70,17 +72,13 @@ public:
 
   // Description:
   // Get the menu.
-  vtkGetObjectMacro(Menu, vtkKWWidget);
+  vtkGetObjectMacro(Menu, vtkKWMenu);
 
   // Description:
   // Add/Insert entries to an option menu, with or without a command.
   void AddEntry(const char *name);
-  void AddEntryWithCommand(const char *name, const char *obj,
-                           const char *method, const char *options = 0);
   void AddEntryWithCommand(const char *name, vtkKWObject *obj,
                            const char *method, const char *options = 0);
-  void AddImageEntryWithCommand(const char *image_name, const char *obj,
-                                const char *method, const char *options = 0);
   void AddImageEntryWithCommand(const char *image_name, vtkKWObject *obj,
                                 const char *method, const char *options = 0);
   void AddSeparator();
@@ -113,7 +111,8 @@ protected:
   ~vtkKWOptionMenu();
 
   char *CurrentValue;  
-  vtkKWWidget *Menu;
+  vtkKWMenu *Menu;
+
 private:
   vtkKWOptionMenu(const vtkKWOptionMenu&); // Not implemented
   void operator=(const vtkKWOptionMenu&); // Not implemented

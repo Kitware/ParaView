@@ -42,19 +42,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWOptionMenu.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.22");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.23");
 
 //-----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
 {
   this->CurrentValue = NULL;
-  this->Menu = vtkKWWidget::New();
-  this->Menu->SetParent(this);
+  this->Menu = vtkKWMenu::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -110,55 +110,19 @@ void vtkKWOptionMenu::SetCurrentImageEntry(const char *image_name)
 //-----------------------------------------------------------------------------
 const char* vtkKWOptionMenu::GetEntryLabel(int index)
 { 
-  if (this->IsCreated())
-    {
-    if (index >= 0 && index < this->GetNumberOfEntries())
-      {
-      return this->Script("%s entrycget %d -label", 
-                          this->Menu->GetWidgetName(), index);
-      }
-    }
-  return 0;
+  return this->Menu->GetItemLabel(index);
 }
 
 //-----------------------------------------------------------------------------
 int vtkKWOptionMenu::GetNumberOfEntries()
 { 
-  if (this->IsCreated())
-    {
-    const char *end = this->Script("%s index end", this->Menu->GetWidgetName());
-    if (strcmp(end, "none"))
-      {
-      return atoi(end) + 1;
-      }
-    }
-  return 0;
+  return this->Menu->GetNumberOfItems();
 }
  
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddEntry(const char *name)
 {
-  if (this->IsCreated())
-    {
-    this->Script(
-      "%s add radiobutton -label {%s} -variable %sValue",
-      this->Menu->GetWidgetName(), name, this->GetWidgetName());
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkKWOptionMenu::AddEntryWithCommand(const char *name, 
-                                          const char *obj, 
-                                          const char *method,
-                                          const char *options)
-{
-  if (this->IsCreated())
-    {
-    this->Script(
-      "%s add radiobutton -label {%s} -variable %sValue -command {%s %s} %s",
-      this->Menu->GetWidgetName(), name, this->GetWidgetName(), 
-      obj, method, (options ? options : ""));
-    }
+  this->AddEntryWithCommand(name, 0, 0, 0);
 }
 
 //-----------------------------------------------------------------------------
@@ -167,22 +131,15 @@ void vtkKWOptionMenu::AddEntryWithCommand(const char *name,
                                           const char *method,
                                           const char *options)
 {
-  this->AddEntryWithCommand(name, obj->GetTclName(), method, options);
-}
-
-//-----------------------------------------------------------------------------
-void vtkKWOptionMenu::AddImageEntryWithCommand(const char *image_name, 
-                                               const char *obj, 
-                                               const char *method,
-                                               const char *options)
-{
-  if (this->IsCreated())
+  ostrstream extra;
+  extra << "-variable " << this->GetWidgetName() << "Value";
+  if (options)
     {
-    this->Script(
-      "%s add radiobutton -image %s -selectimage %s -label {%s} -variable %sValue -command {%s %s} %s",
-      this->Menu->GetWidgetName(), image_name, image_name, image_name,
-      this->GetWidgetName(), obj, method, (options ? options : ""));
+    extra << " " << options;
     }
+  extra << ends;
+  this->Menu->AddGeneric("radiobutton", name, obj, method, extra.str(), 0);
+  extra.rdbuf()->freeze(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -191,46 +148,48 @@ void vtkKWOptionMenu::AddImageEntryWithCommand(const char *image_name,
                                                const char *method,
                                                const char *options)
 {
-  this->AddEntryWithCommand(image_name, obj->GetTclName(), method, options);
+  ostrstream extra;
+  if (image_name)
+    {
+    extra << "-image " << image_name << " -selectimage " << image_name;
+    }
+  if (options)
+    {
+    extra << " " << options;
+    }
+  extra << ends;
+  this->AddEntryWithCommand(image_name, obj, method, extra.str());
+  extra.rdbuf()->freeze(0);
 }
 
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::AddSeparator()
 {
-  if (this->IsCreated())
-    {
-    this->Script("%s add separator", this->Menu->GetWidgetName());
-    }
+  this->Menu->AddSeparator();
 }
 
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::DeleteEntry(const char* name)
 { 
-  if (name && *name)
-    {
-    this->Script("%s delete {%s}", this->Menu->GetWidgetName(), name);
-    }
+  this->Menu->DeleteMenuItem(name);
 }
 
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::DeleteEntry(int index)
 {
-  this->Script("%s delete %d", this->Menu->GetWidgetName(), index);
+  this->Menu->DeleteMenuItem(index);
 }
 
 //-----------------------------------------------------------------------------
 int vtkKWOptionMenu::HasEntry(const char *name)
 {
-  return (this->IsCreated() &&
-          !this->Application->EvaluateBooleanExpression(
-            "catch {%s index {%s}}",
-            this->Menu->GetWidgetName(), name)) ? 1 : 0;
+  return this->Menu->HasItem(name);
 }
 
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::ClearEntries()
 {
-  this->Script("%s delete 0 end", this->Menu->GetWidgetName());
+  this->Menu->DeleteAllMenuItems();
 }
 
 //-----------------------------------------------------------------------------
@@ -248,11 +207,20 @@ void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
 
   this->SetApplication(app);
 
-  // create the top level
+  // Create the menu
+
+  this->Menu->SetParent(this);
+
+  // Create the top level
+
   wname = this->GetWidgetName();
   
-  this->Script("menubutton %s -textvariable %sValue -indicatoron 1 -menu %s -relief raised -bd 2 -highlightthickness 0 -anchor c -direction flush %s", wname, wname, this->Menu->GetWidgetName(), (args?args:""));
-  this->Menu->Create(app,"menu","-tearoff 0");
+  this->Script("menubutton %s -textvariable %sValue -indicatoron 1 -menu %s "
+               "-relief raised -bd 2 -highlightthickness 0 -anchor c "
+               "-direction flush %s", 
+               wname, wname, this->Menu->GetWidgetName(), (args?args:""));
+
+  this->Menu->Create(app, "-tearoff 0");
 
   // Update enable state
 
