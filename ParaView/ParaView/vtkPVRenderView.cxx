@@ -96,7 +96,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.290");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.291");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -119,8 +119,16 @@ public:
     {
       if ( this->PVRenderView )
         {
-        this->PVRenderView->ExecuteEvent(wdg, event, calldata);
-        this->AbortFlagOn();
+        if (event == vtkCommand::StartEvent &&
+            vtkRenderer::SafeDownCast(wdg))
+          {
+          this->PVRenderView->StartRenderEvent();
+          }
+        else
+          {
+          this->PVRenderView->ExecuteEvent(wdg, event, calldata);
+          this->AbortFlagOn();
+          }
         }
     }
 
@@ -212,6 +220,17 @@ vtkPVRenderView::vtkPVRenderView()
   this->MenuLabelSwitchBackAndForthToViewProperties = 0;
   
   this->Renderer2D = vtkRenderer::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StartRenderEvent()
+{
+  // make the overlay renderer match the view of the 3d renderer
+  if (this->Renderer2D)
+    {
+    this->Renderer2D->GetActiveCamera()->SetClippingRange(
+      this->Renderer->GetActiveCamera()->GetClippingRange());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -431,6 +450,10 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindow = pvApp->GetRenderModule()->GetRenderWindow();
   this->RenderWindow->Register(this);
   this->RenderWindow->AddRenderer(this->Renderer2D);
+  
+  // the 2d renderer must be kept in sync with the main renderer
+  this->Renderer->AddObserver(
+    vtkCommand::StartEvent, this->Observer);  
   this->RenderWindow->SetNumberOfLayers(2);
   this->Renderer->SetLayer(1);
 

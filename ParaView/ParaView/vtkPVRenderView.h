@@ -221,6 +221,11 @@ public:
   void ExecuteEvent(vtkObject* wdg, unsigned long event, void* calldata);
 
   // Description:
+  // This method is called when the 3D renderer renders so that the 2D window
+  // can stay in sync
+  void StartRenderEvent();
+
+  // Description:
   // Store current camera at a specified position. This stores all the
   // camera parameters and generates a small icon.
   void StoreCurrentCamera(int position);
