@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.1");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.2");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3086,6 +3086,7 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
 
   if (pvs == this->CurrentPVSource)
     {
+    this->ShowCurrentSourceProperties();
     return;
     }
 
