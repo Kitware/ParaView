@@ -408,7 +408,7 @@ protected:
   vtkTextMapper          *HeaderMapper;
 
   vtkKWFrame             *GeneralProperties;
-  vtkKWLabeledFrame      *BackgroundFrame;
+  vtkKWLabeledFrame      *ColorsFrame;
   vtkKWChangeColorButton *BackgroundColor;
 
   vtkRenderer            *Renderer;

@@ -97,7 +97,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.85");
+vtkCxxRevisionMacro(vtkKWView, "1.86");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -184,7 +184,7 @@ vtkKWView::vtkKWView()
 
   this->GeneralProperties = vtkKWFrame::New();
 
-  this->BackgroundFrame = vtkKWLabeledFrame::New();
+  this->ColorsFrame = vtkKWLabeledFrame::New();
   this->BackgroundColor = vtkKWChangeColorButton::New();
 
   this->Printing = 0;
@@ -239,7 +239,7 @@ vtkKWView::~vtkKWView()
     this->Script("bind %s <Enter> {}",wname);
     }
   this->GeneralProperties->Delete();
-  this->BackgroundFrame->Delete();
+  this->ColorsFrame->Delete();
   this->BackgroundColor->Delete();
 
   this->AnnotationProperties->Delete();
@@ -501,15 +501,16 @@ void vtkKWView::CreateViewProperties()
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
                this->GeneralProperties->GetWidgetName());  
 
-  this->BackgroundFrame->SetParent( this->GeneralProperties->GetFrame() );
-  this->BackgroundFrame->Create( app );
-  this->BackgroundFrame->SetLabel("Background");
+  this->ColorsFrame->SetParent( this->GeneralProperties->GetFrame() );
+  this->ColorsFrame->Create( app );
+  this->ColorsFrame->SetLabel("Colors");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->BackgroundFrame->GetWidgetName());
+               this->ColorsFrame->GetWidgetName());
 
   float c[3];  c[0] = 0.0;  c[1] = 0.0;  c[2] = 0.0;
-  this->BackgroundColor->SetParent( this->BackgroundFrame->GetFrame() );
+  this->BackgroundColor->SetParent( this->ColorsFrame->GetFrame() );
   this->BackgroundColor->SetColor( c );
+  this->BackgroundColor->SetText("Set Background Color");
   this->BackgroundColor->Create( app, "" );
   this->BackgroundColor->SetCommand( this, "SetBackgroundColor" );
   this->BackgroundColor->SetBalloonHelpString("Set the background color");
@@ -1480,7 +1481,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.85 $");
+  this->ExtractRevision(os,"$Revision: 1.86 $");
 }
 
 //----------------------------------------------------------------------------
