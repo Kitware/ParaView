@@ -26,7 +26,6 @@ vtkPVActorComposite \
 vtkPVApplication \
 vtkPVCommandList \
 vtkPVData \
-vtkPVGetRemoteGhostCells \
 vtkPVImageData \
 vtkPVMethodInterface \
 vtkPVPolyData \

@@ -94,15 +94,6 @@ public:
   // class static method to initialize Tcl/Tk
   static Tcl_Interp *InitializeTcl(int argc, char *argv[]);  
 
-  // Description:
-  // These are used by the UI to create new vtkPVSources.
-  // You pass in the class name and tclName (instance name) of the
-  // vtkSource.  This method creates the vtk object and PV objects
-  // for all processes.
-  vtkPVSource *MakePVSource(const char *pvsClassName,
-                            const char *sClassName,
-                            const char *tclRoot, int instanceNum);
-
   // This constructs a vtk object (type specified by class name)
   // and uses the tclName for the tcl instance command.
   // The user must cast to the correct type, and is responsible
@@ -110,6 +101,13 @@ public:
   vtkObject *MakeTclObject(const char *className,
                            const char *tclName);
 
+  // Description:
+  // When ParaView needs to query data on other procs, it needs a way to
+  // get the information back (only VTK object on satellite procs).
+  // These methods send the requested data to proc 0 with a tag of 1966.
+  // Note:  Process 0 returns without sending.
+  void SendDataScalarRange(vtkDataSet *data);
+  
 protected:
   vtkPVApplication();
   ~vtkPVApplication() {};

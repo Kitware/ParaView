@@ -74,10 +74,9 @@ vtkPVWindow::vtkPVWindow()
 {  
   this->CommandFunction = vtkPVWindowCommand;
   this->CreateMenu = vtkKWMenu::New();
+  this->FilterMenu = vtkKWMenu::New();
   this->Toolbar = vtkKWToolbar::New();
   this->ResetCameraButton = vtkKWPushButton::New();
-  this->PreviousSourceButton = vtkKWPushButton::New();
-  this->NextSourceButton = vtkKWPushButton::New();
   this->SourceListButton = vtkKWPushButton::New();
   this->CameraStyleButton = vtkKWPushButton::New();
   
@@ -91,6 +90,7 @@ vtkPVWindow::vtkPVWindow()
   this->CameraStyle = vtkInteractorStyleTrackballCamera::New();
   
   this->SourceInterfaces = vtkCollection::New();
+  this->CurrentPVData = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -100,10 +100,6 @@ vtkPVWindow::~vtkPVWindow()
   this->Toolbar = NULL;
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
-  this->PreviousSourceButton->Delete();
-  this->PreviousSourceButton = NULL;
-  this->NextSourceButton->Delete();
-  this->NextSourceButton = NULL;
   this->SourceListButton->Delete();
   this->SourceListButton = NULL;
   this->CameraStyleButton->Delete();
@@ -122,6 +118,14 @@ vtkPVWindow::~vtkPVWindow()
   
   this->SourceInterfaces->Delete();
   this->SourceInterfaces = NULL;
+  
+  this->CreateMenu->Delete();
+  this->CreateMenu = NULL;
+  
+  this->FilterMenu->Delete();
+  this->FilterMenu = NULL;  
+  
+  this->SetCurrentPVData(NULL);
 }
 
 
@@ -151,14 +155,18 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->InsertCommand(0,"New Window", this, "NewWindow");
   this->MenuFile->InsertCommand(2, "Save Camera", this, "Save");
   this->MenuFile->InsertCommand(2, "Save", this, "SavePipeline");
-
   
   // Create the menu for creating data sources.  
   this->CreateMenu->SetParent(this->GetMenu());
   this->CreateMenu->Create(this->Application,"-tearoff 0");
   this->Menu->InsertCascade(2,"Create",this->CreateMenu,0);  
   
-  // Create all of the mehu items for sources with no inputs.
+  // Create the menu for creating data sources.  
+  this->FilterMenu->SetParent(this->GetMenu());
+  this->FilterMenu->Create(this->Application,"-tearoff 0");
+  this->Menu->InsertCascade(3,"Filter",this->FilterMenu,0);  
+  
+  // Create all of the menu items for sources with no inputs.
   this->SourceInterfaces->InitTraversal();
   while ( (sInt = (vtkPVSourceInterface*)(this->SourceInterfaces->GetNextItemAsObject())))
     {
@@ -182,12 +190,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
                this->ResetCameraButton->GetWidgetName());
   
-  this->PreviousSourceButton->SetParent(this->Toolbar);
-  this->PreviousSourceButton->Create(app, "-text Previous");
-  this->PreviousSourceButton->SetCommand(this, "PreviousSource");
-  this->NextSourceButton->SetParent(this->Toolbar);
-  this->NextSourceButton->Create(app, "-text Next");
-  this->NextSourceButton->SetCommand(this, "NextSource");
   this->SourceListButton->SetParent(this->Toolbar);
   this->SourceListButton->Create(app, "-text SourceList");
   this->SourceListButton->SetCommand(this, "ShowWindowProperties");
@@ -195,9 +197,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CameraStyleButton->Create(app, "");
   this->CameraStyleButton->SetLabel("Camera");
   this->CameraStyleButton->SetCommand(this, "UseCameraStyle");
-  this->Script("pack %s %s %s %s -side left -pady 0 -fill none -expand no",
-	       this->PreviousSourceButton->GetWidgetName(),
-	       this->NextSourceButton->GetWidgetName(),
+  this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
 	       this->SourceListButton->GetWidgetName(),
 	       this->CameraStyleButton->GetWidgetName());
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
@@ -259,17 +259,6 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
 void vtkPVWindow::UseCameraStyle()
 {
   this->GetMainView()->SetInteractorStyle(this->CameraStyle);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::SetCurrentSource(vtkPVSource *comp)
-{
-  this->MainView->SetSelectedComposite(comp);  
-  if (comp && this->Sources->IsItemPresent(comp) == 0)
-    {
-    this->Sources->AddItem(comp);
-    this->SourceList->Update();
-    }
 }
 
 
@@ -381,71 +370,65 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVWindow::GetCurrentSource()
+void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
+{
+  vtkPVSourceInterface *sInt;
+  
+  if (this->CurrentPVData)
+    {
+    this->CurrentPVData->UnRegister(this);
+    this->CurrentPVData = NULL;
+    // Remove all of the entries from the filter menu.
+    this->FilterMenu->DeleteAllMenuItems();
+    }
+  if (pvd)
+    {
+    pvd->Register(this);
+    this->CurrentPVData = pvd;
+    // Add all the appropriate filters to the filter menu.
+    this->SourceInterfaces->InitTraversal();
+    while ( (sInt = (vtkPVSourceInterface*)(this->SourceInterfaces->GetNextItemAsObject())))
+      {
+      if (sInt->GetIsValidInput(pvd))
+	{
+	this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
+	}
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVSource* vtkPVWindow::GetPreviousPVSource()
+{
+  int pos = this->Sources->IsItemPresent(this->GetCurrentPVSource());
+  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos-2));
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
+{
+  this->MainView->SetSelectedComposite(comp);  
+  if (comp)
+    {
+    this->SetCurrentPVData(comp->GetNthPVOutput(0));
+    }
+  else
+    {
+    this->SetCurrentPVData(NULL);
+    }
+  
+  if (comp && this->Sources->IsItemPresent(comp) == 0)
+    {
+    this->Sources->AddItem(comp);
+    this->SourceList->Update();
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkPVSource* vtkPVWindow::GetCurrentPVSource()
 {
   return vtkPVSource::SafeDownCast(this->GetMainView()->GetSelectedComposite());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::NextSource()
-{
-  vtkPVSource *composite = this->GetNextSource();
-  int i;
-  
-  if (composite != NULL)
-    {
-    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
-      {
-      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOff();
-      }
-    this->SetCurrentSource(composite);
-    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
-      {
-      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOn();
-      }
-    }
-  
-  this->MainView->Render();
-  this->SourceList->Update();
-  this->MainView->ResetCamera();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::PreviousSource()
-{
-  vtkPVSource *composite = this->GetPreviousSource();
-  int i;
-  
-  if (composite != NULL)
-    {
-    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
-      {
-      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOff();
-      }
-    this->SetCurrentSource(composite);
-    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
-      {
-      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOn();
-      }
-    }
-  
-  this->MainView->Render();
-  this->SourceList->Update();
-  this->MainView->ResetCamera();
-}
-
-//----------------------------------------------------------------------------
-vtkPVSource* vtkPVWindow::GetNextSource()
-{
-  int pos = this->Sources->IsItemPresent(this->GetCurrentSource());
-  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos));
-}
-
-//----------------------------------------------------------------------------
-vtkPVSource* vtkPVWindow::GetPreviousSource()
-{
-  int pos = this->Sources->IsItemPresent(this->GetCurrentSource());
-  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos-2));
 }
 
 //----------------------------------------------------------------------------
@@ -493,7 +476,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   vtkPVMethodInterface *mInt;
   vtkPVSourceInterface *sInt;
 
-  // Sphere source.
+  // ---- Sphere ----
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
@@ -520,6 +503,134 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Theta Resolution");
+  mInt->SetSetCommand("SetThetaResolution");
+  mInt->SetGetCommand("GetThetaResolution");
+  mInt->AddIntegerArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Start Theta");
+  mInt->SetSetCommand("SetStartTheta");
+  mInt->SetGetCommand("GetStartTheta");
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("End Theta");
+  mInt->SetSetCommand("SetEndTheta");
+  mInt->SetGetCommand("GetEndTheta");
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Phi Resolution");
+  mInt->SetSetCommand("SetPhiResolution");
+  mInt->SetGetCommand("GetPhiResolution");
+  mInt->AddIntegerArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Start Phi");
+  mInt->SetSetCommand("SetStartPhi");
+  mInt->SetGetCommand("GetStartPhi");
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("End Phi");
+  mInt->SetSetCommand("SetEndPhi");
+  mInt->SetGetCommand("GetEndPhi");
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Cone ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkConeSource");
+  sInt->SetRootName("Cone");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Resolution");
+  mInt->SetSetCommand("SetResolution");
+  mInt->SetGetCommand("GetResolution");
+  mInt->AddIntegerArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Radius");
+  mInt->SetSetCommand("SetRadius");
+  mInt->SetGetCommand("GetRadius");
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Height");
+  mInt->SetSetCommand("SetHeight");
+  mInt->SetGetCommand("GetHeight");
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- PieceScalars ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkPieceScalars");
+  sInt->SetRootName("ColorPieces");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- Shrink ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkShrinkPolyData");
+  sInt->SetRootName("Shrink");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ShrinkFactor");
+  mInt->SetSetCommand("SetShrinkFactor");
+  mInt->SetGetCommand("GetShrinkFactor");
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
@@ -529,7 +640,6 @@ void vtkPVWindow::ReadSourceInterfaces()
   //this->CreateMenu->AddCommand("FractalVolume", this, "CreateFractalVolume");
   //this->CreateMenu->AddCommand("STLReader", this, "CreateSTLReader");
   //this->CreateMenu->AddCommand("Cone", this, "CreateCone");
-  //this->CreateMenu->AddCommand("Sphere", this, "CreateSphere");
   //this->CreateMenu->AddCommand("Axes", this, "CreateAxes");
   //this->CreateMenu->AddCommand("Cube", this, "CreateCube");
   //this->CreateMenu->AddCommand("Cylinder", this, "CreateCylinder");
@@ -572,56 +682,6 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCone()
   //pvs->Delete();
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 }
-
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreateSphere()
-{
-  static int instanceCount = 0;
-  char sourceTclName[100];
-  vtkSource *s;
-  vtkPVPolyDataSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  ++instanceCount;
-  
-  // Create the vtkSource.
-  sprintf(sourceTclName, "%s%d", "Sphere", instanceCount);
-  // Create the object through tcl on process 0.
-  s = (vtkSource *)(pvApp->MakeTclObject("vtkSphereSource", sourceTclName));
-  if (s == NULL)
-    {
-    vtkErrorMacro("Could not get pointer from object.");
-    return NULL;
-    }
-  
-  pvs = vtkPVPolyDataSource::New();
-  pvs->SetApplication(pvApp);
-  pvs->SetVTKSource(s);
-  pvs->SetVTKSourceTclName(sourceTclName);
-  pvs->SetName(sourceTclName);
-
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);  
-  this->SetCurrentSource(pvs);
-  
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  pvs->AddVector3Entry("Center", "X","Y","Z", "SetCenter", "GetCenter");
-  pvs->AddLabeledEntry("Phi Resolution:", "SetPhiResolution", "GetPhiResolution");
-  pvs->AddLabeledEntry("Theta Resolution:", "SetThetaResolution", "GetThetaResolution");
-  pvs->AddLabeledEntry("Start Theta:", "SetStartTheta", "GetStartTheta");
-  pvs->AddLabeledEntry("End Theta:", "SetEndTheta", "GetEndTheta");
-  pvs->AddLabeledEntry("Start Phi:", "SetStartPhi", "GetStartPhi");
-  pvs->AddLabeledEntry("End Phi:", "SetEndPhi", "GetEndPhi");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about the VTK object?)
-  // We cannot create an object in tcl and delete it in C++.
-  pvs->Delete();
-
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-} 
 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateAxes()

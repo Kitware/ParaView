@@ -99,6 +99,7 @@ public:
   // Description:
   // This method is executed in all processes.
   void AddComposite(vtkKWComposite *c);
+  void RemoveComposite(vtkKWComposite *c);
 
   // Description:
   // Casts to vtkPVApplication.

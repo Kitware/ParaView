@@ -68,19 +68,25 @@ public:
   // Access to the RenderView.
   vtkGetObjectMacro(MainView, vtkPVRenderView);
 
-  void SetCurrentSource(vtkPVSource *comp);
-  vtkPVSource *GetCurrentSource();
-  vtkPVSource *GetNextSource();
-  vtkPVSource *GetPreviousSource();
+  // Description:
+  // The current source ...  Setting the current source also sets the current PVData.
+  // It also sets the selected composite to the source.
+  void SetCurrentPVSource(vtkPVSource *comp);
+  vtkPVSource *GetCurrentPVSource();
+  vtkPVSource *GetPreviousPVSource();
+  
+  // Description:
+  // The current data is the data object that will be used as input to the next filter.
+  // It is ussually the first output of the current source.  If the current source
+  // has more than one output, they can be selected through the UI.  The current data
+  // determines which filters are displayed in the filter menu.
+  void SetCurrentPVData(vtkPVData *data);
+  vtkGetObjectMacro(CurrentPVData, vtkPVData);
   
   vtkKWCompositeCollection *GetSources();
   
   // tcl callbacks for changing the interactor style
   void UseCameraStyle();
-  
-  //tcl callbacks that use GetNextComposite and GetPreviousComposite
-  void NextSource();
-  void PreviousSource();
   
   vtkGetObjectMacro(SourceList, vtkPVSourceList);
 
@@ -106,6 +112,7 @@ public:
   // Save the pipeline.
   void SavePipeline();
 
+  // Description:
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -114,13 +121,12 @@ protected:
 
   vtkPVRenderView *MainView;
   vtkKWMenu *CreateMenu;
+  vtkKWMenu *FilterMenu;
   
   vtkInteractorStyleTrackballCamera *CameraStyle;
   
   vtkKWToolbar *Toolbar;
   vtkKWPushButton *ResetCameraButton;
-  vtkKWPushButton *PreviousSourceButton;
-  vtkKWPushButton *NextSourceButton;
   vtkKWPushButton *SourceListButton;
   vtkKWPushButton *CameraStyleButton;
 
@@ -136,6 +142,8 @@ protected:
   
   void ReadSourceInterfaces();
   vtkCollection *SourceInterfaces;
+  
+  vtkPVData *CurrentPVData;
 };
 
 

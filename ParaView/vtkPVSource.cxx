@@ -39,7 +39,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVCommandList.h"
 #include "vtkCollection.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVMethodInterface.h"
+#include "vtkPVSourceInterface.h"
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -60,8 +60,6 @@ vtkPVSource::vtkPVSource()
 
   this->Properties = vtkKWWidget::New();
   
-  this->DataCreated = 0;
-
   this->NavigationFrame = vtkKWLabeledFrame::New();
   this->NavigationCanvas = vtkKWWidget::New();
   this->ParameterFrame = vtkKWLabeledFrame::New();
@@ -74,7 +72,8 @@ vtkPVSource::vtkPVSource()
   
   this->AcceptCommands = vtkPVCommandList::New();
   this->CancelCommands = vtkPVCommandList::New();
-  this->Interface = vtkCollection::New();
+  
+  this->Interface = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -152,8 +151,8 @@ vtkPVSource::~vtkPVSource()
   this->AcceptCommands = NULL;  
   this->CancelCommands->Delete();
   this->CancelCommands = NULL;
-  this->Interface->Delete();
-  this->Interface = NULL;
+
+  this->SetInterface(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -166,39 +165,43 @@ vtkPVSource* vtkPVSource::New()
 // Functions to update the progress bar
 void vtkPVSourceStartProgress(void *arg)
 {
-  vtkPVSource *me = (vtkPVSource*)arg;
-  vtkSource *vtkSource = me->GetVTKSource();
-  static char str[200];
+  //vtkPVSource *me = (vtkPVSource*)arg;
+  //vtkSource *vtkSource = me->GetVTKSource();
+  //static char str[200];
   
-  if (vtkSource && me->GetWindow())
-    {
-    sprintf(str, "Processing %s", vtkSource->GetClassName());
-    me->GetWindow()->SetStatusText(str);
-    }
+  //if (vtkSource && me->GetWindow())
+  //  {
+  //  sprintf(str, "Processing %s", vtkSource->GetClassName());
+  //  me->GetWindow()->SetStatusText(str);
+  //  }
 }
 //----------------------------------------------------------------------------
 void vtkPVSourceReportProgress(void *arg)
 {
-  vtkPVSource *me = (vtkPVSource*)arg;
-  vtkSource *vtkSource = me->GetVTKSource();
+  //vtkPVSource *me = (vtkPVSource*)arg;
+  //vtkSource *vtkSource = me->GetVTKSource();
 
-  if (me->GetWindow())
-    {
-    me->GetWindow()->GetProgressGauge()->SetValue((int)(vtkSource->GetProgress() * 100));
-    }
+  //if (me->GetWindow())
+  //  {
+  //  me->GetWindow()->GetProgressGauge()->SetValue((int)(vtkSource->GetProgress() * 100));
+  //  }
 }
 //----------------------------------------------------------------------------
 void vtkPVSourceEndProgress(void *arg)
 {
-  vtkPVSource *me = (vtkPVSource*)arg;
+  //vtkPVSource *me = (vtkPVSource*)arg;
   
-  if (me->GetWindow())
-    {
-    me->GetWindow()->SetStatusText("");
-    me->GetWindow()->GetProgressGauge()->SetValue(0);
-    }
+  //if (me->GetWindow())
+  //  {
+  //  me->GetWindow()->SetStatusText("");
+  //  me->GetWindow()->GetProgressGauge()->SetValue(0);
+  //  }
 }
+
 //----------------------------------------------------------------------------
+// Here to set the progress methods.
+// Disabled until we fix the recursive update problem.
+// Works best for one proc.
 void vtkPVSource::SetVTKSource(vtkSource *source)
 {
   if (this->VTKSource == source)
@@ -206,13 +209,6 @@ void vtkPVSource::SetVTKSource(vtkSource *source)
     return;
     }
   this->Modified();
-
-  // Get rid of the old TclName string
-  if (this->VTKSourceTclName)
-    {
-    delete this->VTKSourceTclName;
-    this->VTKSourceTclName = NULL;
-    }
 
   // Get rid of old VTKSource reference.
   if (this->VTKSource)
@@ -228,25 +224,35 @@ void vtkPVSource::SetVTKSource(vtkSource *source)
     this->VTKSource = source;
     source->Register(this);
     // Set up the progress methods.
-    source->SetStartMethod(vtkPVSourceStartProgress, this);
-    source->SetProgressMethod(vtkPVSourceReportProgress, this);
-    source->SetEndMethod(vtkPVSourceEndProgress, this);
+    //source->SetStartMethod(vtkPVSourceStartProgress, this);
+    //source->SetProgressMethod(vtkPVSourceReportProgress, this);
+    //source->SetEndMethod(vtkPVSourceEndProgress, this);
     }
 }
 
 //----------------------------------------------------------------------------
-const char *vtkPVSource::GetVTKSourceTclName()
+// Need to avoid circular includes in header.
+void vtkPVSource::SetInterface(vtkPVSourceInterface *interface)
 {
- const char *myTclName;
-
- if (this->VTKSourceTclName == NULL)
+  if (this->Interface == interface)
     {
-    // Create the new VTKSourceTclName.
-    myTclName = this->GetTclName();
-    this->VTKSourceTclName = new char[strlen(myTclName) + 17];
-    sprintf(this->VTKSourceTclName, "[%s GetVTKSource]", myTclName);
+    return;
     }
-  return this->VTKSourceTclName;
+  this->Modified();
+
+  // Get rid of old VTKInterface reference.
+  if (this->Interface)
+    {
+    // Be extra careful of circular references. (not important here...)
+    vtkPVSourceInterface *tmp = this->Interface;
+    this->Interface = NULL;
+    tmp->UnRegister(this);
+    }
+  if (interface)
+    {
+    this->Interface = interface;
+    interface->Register(this);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -332,38 +338,13 @@ void vtkPVSource::CreateProperties()
   this->DeleteButton->SetCommand(this, "DeleteCallback");
   this->Script("pack %s -side left -fill x -expand t",
                this->DeleteButton->GetWidgetName());
-  
-  // Every source has a name.
-  this->AddMethodInterface("Output", VTK_STRING, 1);
 
+  // Isolate events to this window untill accept or cancel is pressed.
+  this->Script("grab set %s", this->ParameterFrame->GetWidgetName());
+  
   this->UpdateNavigationCanvas();
   
   this->UpdateParameterWidgets();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::CreateDataPage(int idx)
-{
-  if (!this->DataCreated)
-    {
-    const char *dataPage;
-    vtkPVData *data = this->GetNthPVOutput(idx);
-    
-    if (data == NULL)
-      {
-      vtkErrorMacro("must have data before creating data page");
-      return;
-      }
-    
-    dataPage = data->GetClassName();
-    this->Notebook->AddPage(dataPage);
-    
-    data->SetParent(this->Notebook->GetFrame(dataPage));
-    data->Create("");
-    this->Script("pack %s", data->GetWidgetName());
-    
-    this->DataCreated = 1;
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -392,6 +373,20 @@ void vtkPVSource::Select(vtkKWView *v)
 
   MenuProperties->AddRadioButton(100, " Data", rbv, this, "ShowProperties");
   delete [] rbv;
+  
+  // Change the state of the delete button based on if there are any useres.
+  if (this->GetPVOutput(0) &&
+      this->GetPVOutput(0)->GetPVSourceUsers()->GetNumberOfItems() > 0)
+      {
+      this->Script("%s configure -state disabled",
+                   this->DeleteButton->GetWidgetName());
+      }
+    else
+      {
+      this->Script("%s configure -state normal",
+                   this->DeleteButton->GetWidgetName());
+      }  
+  
 }
 
 //----------------------------------------------------------------------------
@@ -456,19 +451,23 @@ void vtkPVSource::SetName (const char* arg)
 } 
 
 //----------------------------------------------------------------------------
+// We should really be dealing with the outputs.  Remove this method.
 void vtkPVSource::SetVisibility(int v)
 {
-  vtkProp * p = this->GetProp();
-  vtkPVApplication *pvApp;
+  int i;
+  vtkPVActorComposite *ac;
   
-  if (p)
+  for (i = 0; i < this->NumberOfPVOutputs; ++i)
     {
-    p->SetVisibility(v);
+    if (this->PVOutputs[i])
+      {
+      ac = this->PVOutputs[i]->GetActorComposite();
+      if (ac)
+	{
+	ac->SetVisibility(v);
+	}
+      }
     }
-  
-  pvApp = (vtkPVApplication*)(this->Application);
-  
-  //pvApp->BroadcastScript("%s SetVisibility %d", this->GetTclName(), v);
 }
 
   
@@ -491,11 +490,6 @@ int vtkPVSource::GetVisibility()
 vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd, 
                                                 vtkKWObject *o)
 {
-  if (o == NULL)
-    {
-    this->AddMethodInterface(setCmd+3, VTK_INT, 1);
-    }
-
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
   if (o)
@@ -551,11 +545,6 @@ vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char 
 vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
                                       char *ext, vtkKWObject *o)
 {
-  if (o == NULL)
-    {
-    this->AddMethodInterface(setCmd+3, VTK_STRING, 1);
-    }
-
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *entry;
@@ -634,11 +623,6 @@ vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
 vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd, char *getCmd,
                                         vtkKWObject *o)
 {
-  if (o == NULL)
-    {
-    this->AddMethodInterface(setCmd+3, VTK_STRING, 1);
-    }
-
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *entry;
@@ -696,11 +680,6 @@ vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd, char *getCmd,
 vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd,
                                          vtkKWObject *o)
 {
-  if (o == NULL)
-    {
-    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 1);
-    }
-
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *entry;
@@ -756,13 +735,8 @@ vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
-				                          char *setCmd, char *getCmd, vtkKWObject *o)
+                                  char *setCmd, char *getCmd, vtkKWObject *o)
 {
-  if (o == NULL)
-    {
-    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 2);
-    }
-
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *minEntry, *maxEntry;
@@ -850,11 +824,6 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
 void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
 				  char *setCmd, char *getCmd, vtkKWObject *o)
 {
-  if (o == NULL)
-    {
-    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 3);
-    }
-
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *xEntry, *yEntry, *zEntry;
@@ -965,11 +934,6 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
                                   char *l4, char *setCmd, char *getCmd,
                                   vtkKWObject *o)
 {
-  if (o == NULL)
-    {
-    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 4);
-    }
-
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry *xEntry, *yEntry, *zEntry, *wEntry;
@@ -1103,11 +1067,6 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
                                   char *setCmd, char *getCmd, vtkKWObject *o)
 
 {
-  if (o == NULL)
-    {
-    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 6);
-    }
-
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWEntry  *uEntry, *vEntry, *wEntry, *xEntry, *yEntry, *zEntry;
@@ -1282,11 +1241,6 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
                                   float min, float max, float resolution,
                                   vtkKWObject *o)
 {
-  if (o == NULL)
-    {
-    this->AddMethodInterface(setCmd+3, VTK_FLOAT, 1);
-    }
-
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
   vtkKWScale *slider;
@@ -1342,11 +1296,6 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
 vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd,
                                              vtkKWObject *o)
 {
-  if (o == NULL)
-    {
-    this->AddMethodInterface(setCmd+3, VTK_INT, 1);
-    }
-
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
 
@@ -1417,11 +1366,6 @@ void vtkPVSource::AddModeListItem(char *name, int value)
 //----------------------------------------------------------------------------
 void vtkPVSource::AddPVInputList()
 {
-  // The type should be VTK_OBJECT maybe.
-  // Interface will specify the vtk source input, but UI will deal with 
-  // pvSource inputs.
-  this->AddMethodInterface("Input", VTK_STRING, 1);
-
   // We are going to have to figure out how the user can select an input.
 }
 //----------------------------------------------------------------------------
@@ -1446,8 +1390,8 @@ void vtkPVSource::AcceptCallback()
     
     input = this->GetNthPVInput(0);
     this->InitializePVOutput(0);
-    this->CreateDataPage(0);
     ac = this->GetPVOutput(0)->GetActorComposite();
+    ac->ResetScalarRange();
     window->GetMainView()->AddComposite(ac);
     // Make the last data invisible.
     if (input)
@@ -1455,6 +1399,12 @@ void vtkPVSource::AcceptCallback()
       input->GetActorComposite()->SetVisibility(0);
       }
     window->GetMainView()->ResetCamera();
+
+    // Set the current data of the window.
+    window->SetCurrentPVData(this->GetNthPVOutput(0));
+    
+    // Remove the local grab
+    this->Script("grab release %s", this->ParameterFrame->GetWidgetName());    
     }
 
   window->GetMainView()->SetSelectedComposite(this);  
@@ -1476,6 +1426,9 @@ void vtkPVSource::CancelCallback()
     // inputs, but not sure how to do that since the PVData is NULL at this
     // point.
     
+    // Remove the local grab
+    this->Script("grab release %s", this->ParameterFrame->GetWidgetName());    
+    
     for (i = 0; i < this->GetNumberOfPVInputs(); i++)
       {
       this->GetNthPVInput(i)->RemovePVSourceFromUsers(this);
@@ -1483,9 +1436,8 @@ void vtkPVSource::CancelCallback()
     
     // We need to unpack the notebook for this source and pack the one for the
     // source of this source (if there is one).
-
-    prev = this->GetWindow()->GetPreviousSource();
-    this->GetWindow()->SetCurrentSource(prev);
+    prev = this->GetWindow()->GetPreviousPVSource();
+    this->GetWindow()->SetCurrentPVSource(prev);
     if (prev)
       {
       prev->ShowProperties();
@@ -1511,6 +1463,7 @@ void vtkPVSource::CancelCallback()
 //---------------------------------------------------------------------------
 void vtkPVSource::DeleteCallback()
 {
+  vtkPVActorComposite *ac;
   vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
   vtkPVSource *prev;
   int i;
@@ -1534,10 +1487,11 @@ void vtkPVSource::DeleteCallback()
     // We need to unpack the notebook for this source and pack the one for the
     // source of this source (if there is one).
 
-    prev = this->GetWindow()->GetPreviousSource();
-    this->GetWindow()->SetCurrentSource(prev);
+    prev = this->GetWindow()->GetPreviousPVSource();
+    this->GetWindow()->SetCurrentPVSource(prev);
     if (prev)
       {
+      prev->GetPVOutput(0)->GetActorComposite()->VisibilityOn();
       prev->ShowProperties();
       }
     
@@ -1545,18 +1499,15 @@ void vtkPVSource::DeleteCallback()
     this->GetWindow()->GetSourceList()->GetSources()->RemoveItem(this);
     this->GetWindow()->GetSourceList()->Update();    
 
-    // Delete the source on the other processes.  Removing it from the
-    // view's list of composites amounts to deleting the source on the
-    // local processor because it's the last thing that has a reference to it.
-    //pvApp->BroadcastScript("%s Delete", this->GetTclName());
-    //  pvApp->BroadcastScript("%s Delete", this->GetVTKSourceTclName());
-
-    this->GetVTKSource()->Delete();
-    this->PVOutputs[0]->GetActorComposite()->VisibilityOff();
-    if (prev)
+    // Remove all of the actors mappers. from the renderer.
+    for (i = 0; i < this->NumberOfPVOutputs; ++i)
       {
-      prev->GetPVOutput(0)->GetActorComposite()->VisibilityOn();
-      }
+      if (this->PVOutputs[i])
+	{
+	ac = this->GetPVOutput(i)->GetActorComposite();
+	this->GetWindow()->GetMainView()->RemoveComposite(ac);
+	}
+      }    
     
     for (i = 0; i < this->NumberOfPVOutputs; ++i)
       {
@@ -1567,9 +1518,10 @@ void vtkPVSource::DeleteCallback()
 	}
       }
     
+    
     this->GetView()->Render();
+    // I hope this will delete this source.
     this->GetWindow()->GetMainView()->RemoveComposite(this);
-    pvApp->Script("%s Delete", this->GetTclName());
     }
 }
 
@@ -1794,24 +1746,14 @@ void vtkPVSource::UpdateNavigationCanvas()
 }
 
 //----------------------------------------------------------------------------
+// Why do we need this.  Isn't show properties and Raise handled by window?
 void vtkPVSource::SelectSource(vtkPVSource *source)
 {
   if (source)
     {
-    this->GetWindow()->SetCurrentSource(source);
+    this->GetWindow()->SetCurrentPVSource(source);
     source->ShowProperties();
     source->GetNotebook()->Raise(0);
-    if (source->GetPVOutput(0) &&
-        source->GetPVOutput(0)->GetPVSourceUsers()->GetNumberOfItems() > 0)
-      {
-      this->Script("%s configure -state disabled",
-                   source->GetDeleteButton()->GetWidgetName());
-      }
-    else
-      {
-      this->Script("%s configure -state normal",
-                   source->GetDeleteButton()->GetWidgetName());
-      }
     }
 }
 
@@ -1859,6 +1801,7 @@ void vtkPVSource::SetNumberOfPVInputs(int num)
 }
 
 //---------------------------------------------------------------------------
+// In the future, this should consider the vtkPVSourceInterface.
 void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1891,9 +1834,15 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
   if (pvd)
     {
     pvd->Register(this);
+    pvd->AddPVSourceToUsers(this);
     this->PVInputs[idx] = pvd;
     }
 
+  // Relay the change to the VTK objects.  
+  // This is where we will need a SetCommand from the interface ...
+  pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  
   this->Modified();
 }
 
@@ -2140,35 +2089,6 @@ vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
 //----------------------------------------------------------------------------
 void vtkPVSource::Save(ofstream *file)
 {
-  vtkPVMethodInterface *m;
-
-  *file << "  <" << this->GetVTKSource()->GetClassName();
-  *file << "\n" << "    Name= " << this->GetVTKSourceTclName(); 
-  
-  this->Interface->InitTraversal();
-  while( (m=(vtkPVMethodInterface*)(this->Interface->GetNextItemAsObject())))
-    {
-    *file << "\n    " << m->GetVariableName() << "= ";
-    this->Script("%s Get%s", this->GetVTKSourceTclName(), m->GetVariableName());
-    *file << Tcl_GetStringResult(this->Application->GetMainInterp());
-    }
-  *file << " >\n";
-  *file << "  </" << this->GetVTKSource()->GetClassName() << ">\n";
-}
-
-
-//----------------------------------------------------------------------------
-// Obsolete.
-void vtkPVSource::AddMethodInterface(char *var, int argType, int numArgs)
-{
-  vtkPVMethodInterface *mInterface = vtkPVMethodInterface::New();
-
-  mInterface->SetVariableName(var);
-  //mInterface->SetArgumentType(argType);
-  //mInterface->SetNumberOfArguments(numArgs);
-  this->Interface->AddItem(mInterface);
-  mInterface->Delete();
-  mInterface = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -2220,4 +2140,6 @@ void vtkPVSource::InitializePVOutput(int idx)
 			 pvd->GetVTKDataTclName());    
 
 }
+
+
 

@@ -26,9 +26,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkPVImageData.h"
-#include "vtkPVImageToImageFilter.h"
-//#include "vtkPVImageClip.h"
-//#include "vtkPVImageSlice.h"
 #include "vtkPVWindow.h"
 #include "vtkImageOutlineFilter.h"
 #include "vtkGeometryFilter.h"
@@ -68,6 +65,7 @@ void vtkPVImageData::Slice()
 //----------------------------------------------------------------------------
 void vtkPVImageData::ShiftScale()
 {
+  /*
   static int instanceCount = 0;
   vtkPVImageToImageFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -95,6 +93,7 @@ void vtkPVImageData::ShiftScale()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------

@@ -457,6 +457,13 @@ void vtkPVRenderView::AddComposite(vtkKWComposite *c)
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVActorComposite *pvc = vtkPVActorComposite::SafeDownCast(c);
   
+  if (pvc == NULL)
+    {
+    // Default
+    this->vtkKWView::AddComposite(c);
+    return;
+    }
+  
   c->SetView(this);
   // never allow a composite to be added twice
   if (this->Composites->IsItemPresent(c))
@@ -464,19 +471,35 @@ void vtkPVRenderView::AddComposite(vtkKWComposite *c)
     return;
     }
   this->Composites->AddItem(c);
-  if (c->GetProp() != NULL)
+  if (pvc->GetActorTclName() != NULL)
     {
-    if (pvc)
-      {
-      pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
-			     pvc->GetActorTclName());
-      }
-    else
-      {
-      this->GetViewport()->AddProp(c->GetProp());
-      }
+    pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
+			   pvc->GetActorTclName());
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::RemoveComposite(vtkKWComposite *c)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVActorComposite *pvc = vtkPVActorComposite::SafeDownCast(c);
+
+  if (pvc == NULL)
+    {
+    // Default
+    this->vtkKWView::RemoveComposite(c);
+    return;
+    }
+  
+  c->SetView(NULL);
+  if (pvc->GetActorTclName() != NULL)
+    {
+    pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
+			   pvc->GetActorTclName());
+    }
+  this->Composites->RemoveItem(c);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render()

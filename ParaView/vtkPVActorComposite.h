@@ -80,7 +80,7 @@ public:
   // This method is meant to setup the actor/mapper
   // to best disply it input.  This will involve setting the scalar range,
   // and possibly other properties. 
-  void Initialize();
+  //void Initialize();
 
   // Description:
   // This flag turns the visibility of the prop on and off.  These methods transmit
@@ -101,7 +101,8 @@ public:
   void GetInputScalarRange(float range[2]);
   void TransmitInputScalarRange();
   void SetScalarRange(float min, float max);
-    
+  void ResetScalarRange();
+  
   // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();

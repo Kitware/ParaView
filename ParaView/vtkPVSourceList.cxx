@@ -248,7 +248,7 @@ void vtkPVSourceList::Pick(int compIdx)
 
   comp = vtkPVSource::SafeDownCast(
     this->Sources->GetItemAsObject(compIdx));
-  comp->GetWindow()->SetCurrentSource(comp);
+  comp->GetWindow()->SetCurrentPVSource(comp);
   comp->ShowProperties();
   comp->GetNotebook()->Raise(0);
   this->Update();
@@ -404,7 +404,7 @@ int vtkPVSourceList::Update(vtkPVSource *comp, int y, int in)
   sscanf(result, "%d %d %d %d %s %d", bbox, bbox+1, bbox+2, bbox+3);
   
   // Highlight the name based on the picked status. 
-  if (comp->GetWindow()->GetCurrentSource() == comp)
+  if (comp->GetWindow()->GetCurrentPVSource() == comp)
     {
     tmp = "yellow";
 

@@ -122,7 +122,7 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
     return;
     }
 
-  cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
+  //cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
   
   this->Controller->TriggerRMI(remoteId, str, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
 }
@@ -245,19 +245,30 @@ void vtkPVApplication::Exit()
   this->vtkKWApplication::Exit();
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SendDataScalarRange(vtkDataSet *data)
+{
+  float *range;
+  
+  if (this->Controller->GetLocalProcessId() == 0)
+    {
+    return;
+    }
+  range = data->GetScalarRange();
+  this->Controller->Send(range, 2, 0, 1966);
+}
+
+
+
+
+
+
+
+
 //============================================================================
 // Make instances of sources.
 //============================================================================
-
-//----------------------------------------------------------------------------
-vtkPVSource *vtkPVApplication::MakePVSource(const char *pvsClassName,
-                                            const char *sClassName,
-                                            const char *tclRoot,
-                                            int instanceNum)
-{
-  return NULL;
-}
-
 
 //----------------------------------------------------------------------------
 vtkObject *vtkPVApplication::MakeTclObject(const char *className,

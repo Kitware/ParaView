@@ -30,8 +30,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 #include "vtkKWView.h"
 #include "vtkPVWindow.h"
-#include "vtkKWApplication.h"
-#include "vtkPVCutter.h"
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
 #include "vtkKWMenuButton.h"
@@ -200,6 +198,7 @@ void vtkPVData::Contour()
 //----------------------------------------------------------------------------
 void vtkPVData::Cutter()
 {
+  /*
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVCutter *cutter = vtkPVCutter::New();
   
@@ -217,6 +216,7 @@ void vtkPVData::Cutter()
   cutter->AddPVInputList();
   
   cutter->Delete();
+  */
 }
   
 //----------------------------------------------------------------------------

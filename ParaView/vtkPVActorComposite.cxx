@@ -304,7 +304,7 @@ void vtkPVActorComposite::SetInput(vtkPVData *data)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVActorComposite::Initialize()
+void vtkPVActorComposite::ResetScalarRange()
 {
   float range[2];
 
@@ -323,13 +323,13 @@ void vtkPVActorComposite::GetInputScalarRange(float range[2])
   vtkMultiProcessController *controller = pvApp->GetController();
   int numProcs = controller->GetNumberOfProcesses();
   
-  this->Mapper->Update();
+  pvApp->BroadcastScript("%s Update", this->MapperTclName);
+  pvApp->BroadcastScript("Application SendDataScalarRange [%s GetInput]", 
+			this->MapperTclName);
   this->Mapper->GetInput()->GetScalarRange(range);
   for (idx = 1; idx < numProcs; ++idx)
     {
-    pvApp->RemoteScript(idx, "%s TransmitInputScalarRange",
-			this->GetTclName());
-    controller->Receive(tmp, 2, idx, 99399);
+    controller->Receive(tmp, 2, idx, 1966);
     if (range[0] > tmp[0])
       {
       range[0] = tmp[0];
@@ -359,7 +359,7 @@ void vtkPVActorComposite::SetScalarRange(float min, float max)
 { 
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  //pvApp->BroadcastScript("%s SetScalarRange %f %f", this->GetTclName(), min, max);
+  pvApp->BroadcastScript("%s SetScalarRange %f %f", this->MapperTclName, min, max);
 }
 
 //----------------------------------------------------------------------------
@@ -450,17 +450,12 @@ void vtkPVActorComposite::ShowProperties()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetVisibility(int v)
 {
-  vtkProp * p = this->GetProp();
   vtkPVApplication *pvApp;
-  
-  if (p)
-    {
-    p->SetVisibility(v);
-    }
-  
   pvApp = (vtkPVApplication*)(this->Application);
-  
-  //pvApp->BroadcastScript("%s SetVisibility %d", this->GetTclName(), v);
+  if (this->ActorTclName)
+    {
+    pvApp->BroadcastScript("%s SetVisibility %d", this->ActorTclName, v);
+    }
 }
   
 //----------------------------------------------------------------------------

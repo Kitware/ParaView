@@ -60,7 +60,7 @@ public:
   // Add the argument types one by one.
   void AddArgumentType(int type);
   void AddFloatArgument() {this->AddArgumentType(VTK_FLOAT);}
-  void AddIntArgument() {this->AddArgumentType(VTK_INT);}
+  void AddIntegerArgument() {this->AddArgumentType(VTK_INT);}
   void AddStringArgument() {this->AddArgumentType(VTK_STRING);}
   
   // Description:

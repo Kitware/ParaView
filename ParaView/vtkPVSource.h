@@ -47,6 +47,7 @@ class vtkKWCheckButton;
 class vtkKWScale;
 class vtkKWEntry;
 class vtkPVSelectionList;
+class vtkPVSourceInterface;
 
 class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {
@@ -68,10 +69,6 @@ public:
   virtual void ShowProperties();
 
   // Description:
-  // Create the data page.  We need an index because we can have multiple outputs.
-  void CreateDataPage(int idx);
-  
-  // Description:
   // Methods to indicate when this composite is the selected composite.
   // These methods are used by subclasses to modify the menu bar
   // for example. When a volume composite is selected it might 
@@ -91,6 +88,7 @@ public:
   virtual void SetName(const char *name);
   char* GetName();
   
+  void SetNthPVInput(int idx, vtkPVData *input);
   vtkPVData **GetPVInputs() { return this->PVInputs; };
   vtkPVData *GetNthPVInput(int idx);
   vtkGetMacro(NumberOfPVInputs, int);
@@ -188,10 +186,12 @@ public:
   
   // Description:
   // Set the vtk source that will be a part of the pipeline.
+  // The pointer to this class is used as little as possible.
+  // (VTKSourceTclName is used instead.)
   void SetVTKSource(vtkSource *source);
   vtkGetObjectMacro(VTKSource, vtkSource);
-  const char *GetVTKSourceTclName();
   vtkSetStringMacro(VTKSourceTclName);
+  vtkGetStringMacro(VTKSourceTclName);
 
   // Description:
   // A method used to broadcast changes resulting from widgets.
@@ -214,6 +214,12 @@ public:
   // Used to save the source into a file.
   void Save(ofstream *file);
 
+  // Description:
+  // This will be the new way the source gets specified.  It will use the
+  // interface directly.
+  void SetInterface(vtkPVSourceInterface *interface);
+  vtkPVSourceInterface *GetInterface() {return this->Interface;}
+  
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -239,7 +245,6 @@ protected:
   void SetNumberOfPVInputs(int num);
   
   // protected methods for setting inputs.
-  void SetNthPVInput(int idx, vtkPVData *input);
   void AddPVInput(vtkPVData *input);
   void RemovePVInput(vtkPVData *input);
   
@@ -252,8 +257,6 @@ protected:
   void              UpdateNavigationCanvas();
   vtkKWLabeledFrame *ParameterFrame;
   
-  int DataCreated;
-
   vtkKWWidgetCollection *Widgets;
 
   vtkKWPushButton *AcceptButton;
@@ -262,14 +265,13 @@ protected:
   
   vtkPVSelectionList *LastSelectionList;
 
+  // These are obsolete, and should be replaced by a reference to the vtkPVSourceInterface.
+  // Until we find a way to match up widget names and commands to the method interfaces,
+  // we will have to keep the generic strings.
   vtkPVCommandList *AcceptCommands;
   vtkPVCommandList *CancelCommands;
-  // A more generic representation of an interface.
-  vtkCollection *Interface;
 
-  // Description:
-  // A convenience method for adding method interfaces.
-  void AddMethodInterface(char *var, int argType, int numArgs);
+  vtkPVSourceInterface *Interface;
 
 };
 

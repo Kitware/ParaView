@@ -27,7 +27,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkPVData.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVGlyph3D.h"
 #include "vtkKWView.h"
 #include "vtkKWEventNotifier.h"
 
@@ -40,8 +39,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVActorComposite.h"
 #include "vtkKWMenuButton.h"
 #include "vtkDataSetMapper.h"
-
-#include "vtkPVPolyDataToPolyDataFilter.h"
 
 int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 		                     int argc, char *argv[]);
@@ -98,6 +95,7 @@ vtkPVPolyData* vtkPVPolyData::New()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Shrink()
 {
+  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -125,11 +123,13 @@ void vtkPVPolyData::Shrink()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::TubeFilter()
 {
+  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -157,11 +157,13 @@ void vtkPVPolyData::TubeFilter()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::PolyDataNormals()
 {
+  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -194,11 +196,13 @@ void vtkPVPolyData::PolyDataNormals()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Glyph()
 {
+  /*
   static int instanceCount = 0;
   vtkPVGlyph3D *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -217,11 +221,13 @@ void vtkPVPolyData::Glyph()
   
   window->SetCurrentSource(f);
   f->AddPVInputList();
+  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::LoopSubdivision()
 {
+  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -249,11 +255,13 @@ void vtkPVPolyData::LoopSubdivision()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Clean()
 {
+  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -280,11 +288,13 @@ void vtkPVPolyData::Clean()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Triangulate()
 {
+  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -313,11 +323,13 @@ void vtkPVPolyData::Triangulate()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.  
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Decimate()
 {
+  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -358,10 +370,12 @@ void vtkPVPolyData::Decimate()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 //----------------------------------------------------------------------------
 void vtkPVPolyData::QuadricClustering()
 {
+  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -392,6 +406,7 @@ void vtkPVPolyData::QuadricClustering()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
@@ -408,6 +423,7 @@ void vtkPVPolyData::ParallelDecimate()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::PieceScalars()
 {
+  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -434,6 +450,7 @@ void vtkPVPolyData::PieceScalars()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
@@ -454,8 +471,6 @@ int vtkPVPolyData::Create(char *args)
   this->FiltersMenuButton->AddCommand("Triangulate", this, "Triangulate");
   this->FiltersMenuButton->AddCommand("Decimate", this, "Decimate");
   this->FiltersMenuButton->AddCommand("QuadricClustering", this, "QuadricClustering");
-  this->FiltersMenuButton->AddCommand("GetRemoteGhostCells", this,
-				      "GetGhostCells");
   this->FiltersMenuButton->AddCommand("PolyDataNormals", this,
 				      "PolyDataNormals");
   this->FiltersMenuButton->AddCommand("TubeFilter", this,
