@@ -770,7 +770,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 	       this->GetWidgetName(), this->GetTclName());
 
 
-  this->Script("catch {load vtkARLTCL.dll}");
+  pvApp->BroadcastScript("catch {load vtkARLTCL.dll}");
   if (this->GetIntegerResult(app) == 0)
     {
     this->XDMF = 1;
@@ -1079,6 +1079,7 @@ vtkPVSource *vtkPVWindow::OpenXML(const char *openFileName,
   static int        count = 0;
   char              sourceTclName[200];
   char              outputTclName[200];
+  char              tmp[200];
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVSource*      pvs;
   vtkPVData*        pvd;
@@ -1093,11 +1094,22 @@ vtkPVSource *vtkPVWindow::OpenXML(const char *openFileName,
   sprintf(outputTclName, "%sOutput", sourceTclName);
   d = (vtkDataSet *)(pvApp->MakeTclObject("vtkRectilinearGrid", outputTclName));
   pvApp->BroadcastScript("%s SetOutput %s", sourceTclName, outputTclName);   
+  // Set the special extent translator.
+  // I do not beleive we really have to hold onto the translators tcl name ...
+  sprintf(tmp, "%sTranslator", sourceTclName);
+  pvApp->BroadcastScript("vtkPVExtentTranslator %s", tmp);
+  pvApp->BroadcastScript("%s SetOriginalSource %s",
+                         tmp, outputTclName);
+  pvApp->BroadcastScript("%s SetExtentTranslator %s",
+                         outputTclName, tmp);
+
   // Need to updat the information before Reset is called but after output is set.
   pvApp->BroadcastScript("%s UpdateInformation", sourceTclName);
 
   // Create the PVSource.
   pvs = vtkPVSource::New();
+  // Hold onto name so it can be deleted. (Not needed ?????)
+  pvs->SetExtentTranslatorTclName(tmp);
   pvs->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   pvs->SetApplication(pvApp);
   // Just trying out a different way of setting object and name.
@@ -2865,7 +2877,7 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <Boolean name=\"VertexCells\" help=\"Generate vertex as geometry of just points.\"/>\n"
 "</Filter>\n"
 "\n"
-"<Filter class=\"vtkCellDataToPointData\" root=\"CellToPoint\" input=\"vtkDataSet\" output=\"vtkDataSet\">\n"
+"<Filter class=\"vtkPCellDataToPointData\" root=\"CellToPoint\" input=\"vtkDataSet\" output=\"vtkDataSet\">\n"
 "  <Boolean name=\"PassCellData\" help=\" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output.\"/>\n"
 "</Filter>\n"
 "\n"
@@ -2944,6 +2956,17 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <Boolean name=\"PieceInvariant\" help=\"Turn this off if you do not want to process ghost levels and do not mind seams.\"/>\n"
 "</Filter>\n"
 "\n"
+"<Filter class=\"vtkQuadricClustering\" root=\"QC\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
+"  <Vector name=\"Spacing\" set=\"SetDivisionSpacing\" get=\"GetDivisionSpacing\" type=\"float\" length=\"3\" help=\"Set the spacing of the bins in each dimension\"/>\n"
+"  <Boolean name=\"UseInputPoints\" help=\"Select whether to use points from the input in the output or to calculate optimum representative points for each bin\"/>\n"
+"  <Boolean name=\"UseFeatureEdges\" help=\"Select whether to use feature edge quadrics to match up the boundaries between pieces\"/>\n"
+"  <Boolean name=\"UseFeaturePoints\" help=\"Select whether to use feature point quadrics to align piece boundaries\"/>\n"
+"</Filter>\n"
+"\n"
+"<Filter class=\"vtkRectilinearGridGeometryFilter\" root=\"GridGeom\" input=\"vtkRectilinearGrid\" output=\"vtkPolyData\">\n"
+"  <Extent name=\"Extent\" help=\"Set the min/max extents of the grid\"/>\n"
+"</Filter>\n"
+"\n"
 "<Filter class=\"vtkReflectionFilter\" root=\"Reflect\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
 "  <Selection name=\"Plane\" help=\"Select which plane of the bounding box to reflect across\">\n"
 "    <Choice name=\"X Min\" value=\"0\"/>\n"
@@ -2970,16 +2993,6 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <Scalar name=\"DeltaRadius\" type=\"float\" help=\"The change in radius during sweep process.\"/>\n"
 "</Filter>\n"
 "\n"
-"<Filter class=\"vtkQuadricClustering\" root=\"QC\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
-"  <Vector name=\"Spacing\" set=\"SetDivisionSpacing\" get=\"GetDivisionSpacing\" type=\"float\" length=\"3\" help=\"Set the spacing of the bins in each dimension\"/>\n"
-"  <Boolean name=\"UseInputPoints\" help=\"Select whether to use points from the input in the output or to calculate optimum representative points for each bin\"/>\n"
-"  <Boolean name=\"UseFeatureEdges\" help=\"Select whether to use feature edge quadrics to match up the boundaries between pieces\"/>\n"
-"  <Boolean name=\"UseFeaturePoints\" help=\"Select whether to use feature point quadrics to align piece boundaries\"/>\n"
-"</Filter>\n"
-"\n"
-"<Filter class=\"vtkRectilinearGridGeometryFilter\" root=\"GridGeom\" input=\"vtkRectilinearGrid\" output=\"vtkPolyData\">\n"
-"  <Extent name=\"Extent\" help=\"Set the min/max extents of the grid\"/>\n"
-"</Filter>\n"
 "<Filter class=\"vtkShrinkFilter\" root=\"Shrink\" input=\"vtkDataSet\" output=\"vtkUnstructuredGrid\">\n"
 "  <Scalar name=\"ShrinkFactor\" type=\"float\" help=\"Set the amount to shrink by\"/>\n"
 "</Filter>\n"
