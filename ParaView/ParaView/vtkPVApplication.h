@@ -143,6 +143,20 @@ public:
   void AddLogEntry(char *tag, float value);
 
   // Description:
+  // A start at recording macros in ParaView.  Create a custom trace file
+  // that can be loaded back into paraview.  
+  // Window variables get initialized when the file is opened.
+  // Note: The trace entries get diverted to this file.
+  // This is only used for testing at the moment.  It is restricted to using
+  // sources created after the recording is started.  The macro also cannot use
+  // the glyph sources.  To make mocro recording available to the user,
+  // then there must be a way of setting arguments (existing sources) to the 
+  // macro, and a way of prompting the user to set the arguments when the
+  // macro/script is loaded.
+  void StartRecordingScript(char *filename);
+  void StopRecordingScript();
+
+  // Description:
   // Temporary fix because empty VTK objects do not have arrays.
   // This will create arrays if they exist on other processes.
   void CompleteArrays(vtkMapper *mapper, char *mapperTclName);

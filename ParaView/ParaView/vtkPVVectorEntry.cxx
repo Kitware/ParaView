@@ -175,6 +175,10 @@ void vtkPVVectorEntry::Accept()
     strcat(acceptCmd, entry->GetValue());
     strcat(acceptCmd, " ");
     }
+  if (traceFile)
+    {
+    *traceFile << endl;
+    }
   pvApp->BroadcastScript(acceptCmd);
 
   this->ModifiedFlag = 0;  

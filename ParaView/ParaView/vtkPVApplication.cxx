@@ -622,6 +622,48 @@ void vtkPVApplication::StopLog()
     }
 }
 
+
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::StartRecordingScript(char *filename)
+{
+  if (this->TraceFile)
+    {
+    *this->TraceFile << "Application StartRecordingScript " << filename << endl;
+    this->StopRecordingScript();
+    }
+
+  this->TraceFile = new ofstream(filename, ios::out);
+  if (this->TraceFile && this->TraceFile->fail())
+    {
+    vtkErrorMacro("Could not open trace file " << filename);
+    delete this->TraceFile;
+    this->TraceFile = NULL;
+    return;
+    }
+
+  // Initialize a couple of variables in the trace file.
+  this->AddTraceEntry("set pv(%s) [Application GetMainWindow]",
+                       this->GetMainWindow()->GetTclName());
+
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::StopRecordingScript()
+{
+  if (this->TraceFile)
+    {
+    this->TraceFile->close();
+    delete this->TraceFile;
+    this->TraceFile = NULL;
+    }
+}
+
+
+
+
 //----------------------------------------------------------------------------
 void vtkPVApplication::AddLogEntry(char *tag, float val)
 {

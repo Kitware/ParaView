@@ -27,6 +27,10 @@ ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl)
 
 CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Delete.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Delete.tcl)
+
+CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/EnSight.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/EnSight.tcl)
 
@@ -78,6 +82,9 @@ ADD_TEST(CombustorTest ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(ConeCubeCylSQ ${PARAVIEW_EXECUTABLE}
                  ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl)
+
+ADD_TEST(Delete ${PARAVIEW_EXECUTABLE}
+                 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Delete.tcl)
 
 ADD_TEST(EnSight ${PARAVIEW_EXECUTABLE}
                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/EnSight.tcl)

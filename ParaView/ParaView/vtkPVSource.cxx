@@ -871,7 +871,8 @@ void vtkPVSource::DeleteCallback()
   if ( ! this->Initialized)
     {
     // Remove the local grab
-    this->Script("grab release %s", this->ParameterFrame->GetWidgetName());    
+    this->Script("grab release %s", this->ParameterFrame->GetWidgetName()); 
+    this->Script("update");   
     this->Initialized = 1;
     }
   

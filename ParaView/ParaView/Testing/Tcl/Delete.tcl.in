@@ -1,0 +1,47 @@
+set DataDir "@PARAVIEW_DATA_ROOT@"
+    
+set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+$pv(vtkTemp98) AcceptCallback
+
+# Delete before accept.
+set pv(vtkTemp181) [$pv(vtkTemp1) CreatePVSource vtkLoopSubdivisionFilter]
+$pv(vtkTemp181) DeleteCallback
+
+# Delete after accept
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Center}]
+$pv(vtkTemp110) SetValue 0.5 0 0
+set pv(vtkTemp115) [$pv(vtkTemp98) GetPVWidget {Radius}]
+$pv(vtkTemp115) SetValue 0.6
+$pv(vtkTemp98) AcceptCallback
+set pv(vtkTemp197) [$pv(vtkTemp1) CreatePVSource vtkShrinkPolyData]
+set pv(vtkTemp206) [$pv(vtkTemp197) GetPVWidget {Input}]
+$pv(vtkTemp206) SetCurrentValue $pv(vtkTemp98)
+set pv(vtkTemp211) [$pv(vtkTemp197) GetPVWidget {ShrinkFactor}]
+$pv(vtkTemp211) SetValue 0.8
+$pv(vtkTemp197) AcceptCallback
+$pv(vtkTemp197) DeleteCallback
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+
+# Add a filter that we do not delete.
+set pv(vtkTemp220) [$pv(vtkTemp1) CreatePVSource vtkElevationFilter]
+set pv(vtkTemp229) [$pv(vtkTemp220) GetPVWidget {Input}]
+$pv(vtkTemp229) SetCurrentValue $pv(vtkTemp98)
+$pv(vtkTemp220) AcceptCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/Delete.png 10
+   
+Application Exit
