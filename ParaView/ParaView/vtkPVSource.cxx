@@ -776,6 +776,7 @@ void vtkPVSource::ResetCallback()
     }
 
   this->UpdateParameterWidgets();
+  this->GetPVRenderView()->EventuallyRender();
   this->Script("update");
 
   this->SetAcceptButtonColorToWhite();
