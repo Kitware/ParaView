@@ -85,7 +85,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.5");
+vtkCxxRevisionMacro(vtkKWArguments, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
@@ -385,4 +385,12 @@ void vtkKWArguments::GenerateHelp()
 void vtkKWArguments::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  if ( this->Help )
+    {
+    os << indent << "Help: " << endl << this->Help << endl;
+    }
+  else
+    {
+    os << indent << "No help" << endl;
+    }
 }

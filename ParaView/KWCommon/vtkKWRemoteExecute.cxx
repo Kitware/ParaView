@@ -78,7 +78,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRemoteExecute );
-vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.2");
+vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWRemoteExecute::vtkKWRemoteExecute()
@@ -199,4 +199,5 @@ int vtkKWRemoteExecute::RunCommand(const char* command, const char* args[])
 void vtkKWRemoteExecute::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "RemoteHost: " << this->RemoteHost << endl;
 }
