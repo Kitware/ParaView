@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
 
-vtkCxxRevisionMacro(vtkKWMath, "1.6");
+vtkCxxRevisionMacro(vtkKWMath, "1.7");
 vtkStandardNewMacro(vtkKWMath);
 
 //----------------------------------------------------------------------------
@@ -117,6 +117,21 @@ int vtkKWMath::GetScalarRange(vtkDataArray *array, int comp, double range[2])
     return 0;
     }
 
+  // for performance on simple types use the fast cached versions
+  // LONG and INT are not in this list due to precision issues
+  // that float cannot represent
+  if (array->GetDataType() == VTK_UNSIGNED_CHAR ||
+      array->GetDataType() == VTK_CHAR ||
+      array->GetDataType() == VTK_UNSIGNED_SHORT ||
+      array->GetDataType() == VTK_SHORT ||
+      array->GetDataType() == VTK_FLOAT)
+    {
+    float tmpf[2];
+    array->GetRange(tmpf, comp);
+    range[0] = tmpf[0];
+    range[1] = tmpf[1];
+    } 
+  
   switch (array->GetDataType())
     {
     vtkTemplateMacro4(vtkKWMathGetScalarRange,
