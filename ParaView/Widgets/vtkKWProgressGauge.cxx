@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.10");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.11");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -165,8 +165,6 @@ void vtkKWProgressGauge::SetHeight(int height)
 
     this->Script("%s.display coords value [expr 0.5 * %d] [expr 0.5 * %d]", 
                  this->GetWidgetName(), this->Length, this->Height);
-
-    this->Script("update idletasks");
     }
 }
 
