@@ -72,7 +72,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.1");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.2");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -657,7 +657,8 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
   // Create the time line associated with this entry.
   this->TimeLine->SetShowLabel(0);
   this->TimeLine->SetCanvasHeight(VTK_PV_ANIMATON_ENTRY_HEIGHT);
-  this->TimeLine->SetPointMarginToCanvas(1);
+  this->TimeLine->SetPointMarginToCanvas(
+    vtkKWParameterValueFunctionEditor::PointMarginHorizontalSides);
   this->TimeLine->SetAnimationCue(this);
   this->TimeLine->SetParent(this->TimeLineFrame);
   this->TimeLine->Create(app, 0);
