@@ -885,7 +885,50 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
 
+  // ---- Cut Plane ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkCutPlane");
+  sInt->SetRootName("CutPlane");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Origin");
+  mInt->SetSetCommand("SetOrigin");
+  mInt->SetGetCommand("GetOrigin");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Normal");
+  mInt->SetSetCommand("SetNormal");
+  mInt->SetGetCommand("GetNormal");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("GenerateCutScalars");
+  mInt->SetSetCommand("SetGenerateCutScalars");
+  mInt->SetGetCommand("GetGenerateCutScalars");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
@@ -893,6 +936,68 @@ void vtkPVWindow::ReadSourceInterfaces()
 
   // ============= PolyData to PolyData Filters ==============
   
+  // ---- Cut Plane ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkClipPlane");
+  sInt->SetRootName("ClipPlane");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Origin");
+  mInt->SetSetCommand("SetOrigin");
+  mInt->SetGetCommand("GetOrigin");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Normal");
+  mInt->SetSetCommand("SetNormal");
+  mInt->SetGetCommand("GetNormal");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Value");
+  mInt->SetSetCommand("SetValue");
+  mInt->SetGetCommand("GetValue");
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("InsideOut");
+  mInt->SetSetCommand("SetInsideOut");
+  mInt->SetGetCommand("GetInsideOut");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("GenerateClipScalars");
+  mInt->SetSetCommand("SetGenerateClipScalars");
+  mInt->SetGetCommand("GetGenerateClipScalars");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- PieceScalars ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);

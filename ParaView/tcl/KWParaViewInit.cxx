@@ -1,4 +1,10 @@
 #include "vtkTclUtil.h"
+int vtkClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkClipPlaneNewCommand();
+int vtkCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkCutPlaneNewCommand();
 int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkDummyRenderWindowInteractorNewCommand();
@@ -99,6 +105,10 @@ int VTK_EXPORT Vtkkwparaviewtcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
+  vtkTclCreateNew(interp,(char *) "vtkClipPlane", vtkClipPlaneNewCommand,
+                  vtkClipPlaneCommand);
+  vtkTclCreateNew(interp,(char *) "vtkCutPlane", vtkCutPlaneNewCommand,
+                  vtkCutPlaneCommand);
   vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
                   vtkDummyRenderWindowInteractorCommand);
   vtkTclCreateNew(interp,(char *) "vtkImageOutlineFilter", vtkImageOutlineFilterNewCommand,
@@ -141,10 +151,10 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVSourceListCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
-  vtkTclCreateNew(interp,(char *) "vtkSingleContourFilter", vtkSingleContourFilterNewCommand,
-                  vtkSingleContourFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkSimpleFieldDataToAttributeDataFilter", vtkSimpleFieldDataToAttributeDataFilterNewCommand,
                   vtkSimpleFieldDataToAttributeDataFilterCommand);
+  vtkTclCreateNew(interp,(char *) "vtkSingleContourFilter", vtkSingleContourFilterNewCommand,
+                  vtkSingleContourFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkStringList", vtkStringListNewCommand,
                   vtkStringListCommand);
   return TCL_OK;

@@ -14,6 +14,8 @@ ABSTRACT = \
 vtkInteractorStyleExtent 
 
 CONCRETE = \
+vtkClipPlane \
+vtkCutPlane \
 vtkDummyRenderWindowInteractor \
 vtkImageOutlineFilter \
 vtkInteractorStyleCamera \

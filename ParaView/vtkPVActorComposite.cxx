@@ -361,7 +361,6 @@ void vtkPVActorComposite::UpdateProperties()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByProperty()
 {
-  vtkErrorMacro("CBProp");
   vtkPVApplication *pvApp = this->GetPVApplication();
   pvApp->BroadcastScript("%s ScalarVisibilityOff", this->MapperTclName);
   this->GetView()->Render();
@@ -369,7 +368,6 @@ void vtkPVActorComposite::ColorByProperty()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByPointScalars()
 {
-  vtkErrorMacro("CBPtScalars");
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
@@ -380,7 +378,6 @@ void vtkPVActorComposite::ColorByPointScalars()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByCellScalars()
 {
-  vtkErrorMacro("CBCellScalars");
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
@@ -391,7 +388,6 @@ void vtkPVActorComposite::ColorByCellScalars()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
 {
-  vtkErrorMacro("CBPtField " << name << " " << comp);
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
@@ -404,7 +400,6 @@ void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
 {
-  vtkErrorMacro("CBCellField " << name << " " << comp);
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
