@@ -33,7 +33,9 @@ The output of the 2D Glyph source is polygonal data.
 </Module>
 
 <!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
-<Module name="CTHFractal" menu_name="CTHFractal" root_name="CTHFractal"
+<Module name="CTHAMRFractal" 
+        menu_name="CTH AMR Fractal" 
+        root_name="CTHAMRFractal"
         module_type="Source" 
         long_help="Test source for CTH AMR" 
         short_help="CTH AMR">

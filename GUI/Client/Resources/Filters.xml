@@ -160,9 +160,83 @@ The flow integration fitler  integrates the dot product of a point flow vector f
 Create texture coordinates.
     </Documentation>
   </Module>
-  <Module name="CTHOutlineFilter"
-          menu_name="Outline (CTH AMR)"
-          root_name="CTHOutline"
+
+  <Module name="CTHAMRCellToPointData"
+          root_name="CTHAMRCellToPointData"
+          menu_name="CTH AMR CellToPointData"
+          module_type="Filter"
+          replace_input="0"
+          long_help="Convert an array from cell to point data."
+          short_help="Convert cell data to point data.">
+    <Filter class="vtkCTHAMRCellToPointData">
+      <Input name="Input"
+             class="vtkCTHData">
+        <ArrayRequirement attribute="Cell" components="1"/>
+      </Input>
+    </Filter>
+
+    <InputMenu trace_name="Input"
+               id="im"
+               label="Input"
+               input_name="Input"
+               property="Input"
+               help="Set the input to this filter." />
+
+    <SelectCTHArrays input_menu="im"
+                     trace_name="ArraySelection"
+                     property="AddVolumeArrayName"
+                     help="Select the cells attributes to convert to point attributes."/>
+
+    <LabeledToggle label="IgnoreGhostLevels"
+                   property="IgnoreGhostLevels"
+                   trace_name="IgnoreGhostLevels"
+                   help="Alternative algorithm" />
+  </Module>
+
+  <Module name="CTHAMRContour"
+          root_name="CTHAMRContour"
+          menu_name="CTH AMR Contour"
+          module_type="Filter"
+          replace_input="0"
+          long_help="Generate isosurfaces using cell scalars."
+          short_help="Generate isosurfaces.">
+    <Filter class="vtkCTHAMRContour">
+      <Input name="Input"
+             class="vtkCTHData">
+        <ArrayRequirement attribute="Cell" components="1"/>
+      </Input>
+    </Filter>
+
+    <InputMenu trace_name="Input"
+               id="im"
+               label="Input"
+               input_name="Input"
+               property="Input"
+               help="Set the input to this filter." />
+
+    <ArrayMenu id="am" property="SelectInputScalars"
+               field="Cell"
+               label="Scalars"
+               trace_name="Scalars"
+               input_menu="im"
+               help="Choose which scalar array you want to contour."/>
+    <LabeledToggle label="IgnoreGhostLevels"
+                   property="IgnoreGhostLevels"
+                   trace_name="IgnoreGhostLevels"
+                   help="Alternative algorithm" />
+    <ScalarRangeLabel id="srl"
+                      property="ContourValues"
+                      trace_name="ScalarRangeLabel"
+                      array_menu="am"/>
+    <ContourEntry label="Contour Values"
+                  trace_name="Contour Values"
+                  array_menu="am" property="ContourValues"
+                  help="List of current contour values." />
+  </Module>
+
+  <Module name="CTHAMROutline"
+          menu_name="CTH AMR Outline"
+          root_name="CTHAMROutline"
           module_type="Filter">
     <Filter class="vtkCTHOutlineFilter">
       <Input name="Input"
@@ -172,6 +246,7 @@ Create texture coordinates.
                help="Set the input to this filter."
                input_name="Input"/>
   </Module>
+
   <Module name="StructuredGridOutlineFilter"
           menu_name="Outline (curvilinear)"
           root_name="GOutline"
@@ -649,12 +724,12 @@ The line can be specified interactively using the 3D line widget. See section 7.
     </Documentation>
   </Module>
 <!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT-->
-  <Module name="CTHPartAMR"
-          menu_name="Extract AMR CTH Parts"
-          root_name="CTHPartAMR"
+  <Module name="CTHAMRPart"
+          menu_name="CTH AMR Extract Parts"
+          root_name="CTHAMRPart"
           module_type="Filter"
-          long_help="Create a surface from a AMR CTH volume fraction."
-          short_help="Extract a part from a CTH dataset.">
+          long_help="Create a surface from a CTH AMR volume fraction."
+          short_help="Extract a part from a CTH AMR dataset.">
     <Filter class="vtkCTHExtractAMRPart">
       <Input name="Input"
              class="vtkCTHData">
@@ -665,6 +740,10 @@ The line can be specified interactively using the 3D line widget. See section 7.
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
+    <LabeledToggle label="IgnoreGhostLevels"
+                   property="IgnoreGhostLevels"
+                   trace_name="IgnoreGhostLevels"
+                   help="Alternative algorithm" />
     <SelectCTHArrays input_menu="im"
                      trace_name="ArraySelection"
                      property="AddVolumeArrayName"
@@ -1576,7 +1655,7 @@ The Smooth filter operates on a polygonal data set by iteratively adjusting the 
           menu_name="Triangle Strips"
           root_name="Strip"
           module_type="Filter"
-          long_help="This filter uses a greedy algorythm to convert triangles into triangle strips"
+          long_help="This filter uses a greedy algorithm to convert triangles into triangle strips"
           short_help="Convert triangles into triangle strips.">
     <Filter class="vtkStripper">
       <Input name="Input"
