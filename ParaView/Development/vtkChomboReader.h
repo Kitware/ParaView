@@ -24,7 +24,7 @@
 #ifndef __vtkChomboReader_h
 #define __vtkChomboReader_h
 
-#include "vtkSource.h"
+#include "vtkHierarchicalBoxSource.h"
 
 #include "vtkAMRBox.h" // Needed for vector of vtkAMRBox
 
@@ -34,7 +34,7 @@
 
 class vtkHierarchicalBoxDataSet;
 
-class VTK_EXPORT vtkChomboReader : public vtkSource
+class VTK_EXPORT vtkChomboReader : public vtkHierarchicalBoxSource
 {
 public:
   vtkTypeRevisionMacro(vtkChomboReader,vtkSource);
@@ -45,11 +45,6 @@ public:
   // Get/Set the name of the input file.
   vtkSetStringMacro(FileName);
   vtkGetStringMacro(FileName);
-
-  // Description:
-  // Get the output of this source.
-  vtkHierarchicalBoxDataSet *GetOutput();
-  vtkHierarchicalBoxDataSet *GetOutput(int idx);
 
   // Description:
   // Get the number of components (similar to NumberOfComponents
@@ -72,7 +67,7 @@ protected:
   vtkChomboReader();
   ~vtkChomboReader();
   
-  // Standard pipeline exectution methods.
+  // Standard pipeline execution methods.
   void ExecuteInformation();
   void ExecuteData(vtkDataObject* output);
   

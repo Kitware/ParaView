@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkChomboReader, "1.3");
+vtkCxxRevisionMacro(vtkChomboReader, "1.4");
 vtkStandardNewMacro(vtkChomboReader);
 
 //----------------------------------------------------------------------------
@@ -87,24 +87,6 @@ void vtkChomboReader::CreateBoxDataType()
     }
   this->BoxDataType = boxType;
 
-}
-
-//----------------------------------------------------------------------------
-vtkHierarchicalBoxDataSet* vtkChomboReader::GetOutput()
-{
-  if (this->NumberOfOutputs < 1)
-    {
-    return NULL;
-    }
-  
-  return static_cast<vtkHierarchicalBoxDataSet*>(this->Outputs[0]);
-  
-}
-
-//----------------------------------------------------------------------------
-vtkHierarchicalBoxDataSet* vtkChomboReader::GetOutput(int idx)
-{
-  return static_cast<vtkHierarchicalBoxDataSet*>(this->vtkSource::GetOutput(idx)); 
 }
 
 //----------------------------------------------------------------------------
