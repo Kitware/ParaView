@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCornerAnnotation.h"
 
 #include "vtkCornerAnnotation.h"
-#include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
@@ -58,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.31");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.32");
 
 vtkSetObjectImplementationMacro(vtkKWCornerAnnotation,View,vtkKWView);
 
@@ -90,7 +89,7 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 
   this->MaximumLineHeightScale = vtkKWScale::New();
 
-  this->TextProperty = vtkKWTextProperty::New();
+  this->TextPropertyWidget = vtkKWTextProperty::New();
 }
 
 //----------------------------------------------------------------------------
@@ -116,8 +115,8 @@ vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
     this->MaximumLineHeightScale = NULL;
     }
 
-  this->TextProperty->Delete();
-  this->TextProperty = NULL;
+  this->TextPropertyWidget->Delete();
+  this->TextPropertyWidget = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -243,21 +242,25 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
   this->Script("pack %s -padx 2 -pady 2 -side top -anchor w -fill y", 
                this->MaximumLineHeightScale->GetWidgetName());
 
-  this->TextProperty->SetParent(this->GetFrame());
-  this->TextProperty->SetTextProperty(this->CornerProp->GetTextProperty());
-  this->TextProperty->SetActor2D(this->CornerProp);
-  this->TextProperty->Create(this->Application);
-  this->TextProperty->ShowLabelOn();
-  this->TextProperty->GetLabel()->SetLabel("Text property:");
-  this->TextProperty->SetTraceReferenceObject(this);
-  this->TextProperty->SetTraceReferenceCommand("GetTextProperty");
+  this->TextPropertyWidget->SetParent(this->GetFrame());
+  this->TextPropertyWidget->SetTextProperty(this->CornerProp->GetTextProperty());
+  this->TextPropertyWidget->SetActor2D(this->CornerProp);
+  this->TextPropertyWidget->Create(this->Application);
+  this->TextPropertyWidget->ShowLabelOn();
+  this->TextPropertyWidget->GetLabel()->SetLabel("Text property:");
+  this->TextPropertyWidget->SetTraceReferenceObject(this);
+  this->TextPropertyWidget->SetTraceReferenceCommand("GetTextPropertyWidget");
   ostrstream onchangecommand;
-  onchangecommand << "[" << this->GetTclName() << " GetView] Render" << ends;
-  this->TextProperty->SetOnChangeCommand(onchangecommand.str());
+  onchangecommand << this->GetTclName() << " OnTextChangeCallback" << ends;
+  this->TextPropertyWidget->SetOnChangeCommand(onchangecommand.str());
   onchangecommand.rdbuf()->freeze(0);
+  ostrstream oncolorchangecommand;
+  oncolorchangecommand << this->GetTclName() << " OnTextColorChangeCallback" << ends;
+  this->TextPropertyWidget->SetOnColorChangeCommand(oncolorchangecommand.str());
+  oncolorchangecommand.rdbuf()->freeze(0);
 
   this->Script("pack %s -padx 2 -pady 2 -side top -anchor nw -fill y", 
-               this->TextProperty->GetWidgetName());
+               this->TextPropertyWidget->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -308,26 +311,32 @@ void vtkKWCornerAnnotation::MaximumLineHeightEndCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
+float *vtkKWCornerAnnotation::GetTextColor() 
 {
-  float *ff = this->CornerProp->GetProperty()->GetColor();
-  if ( ff[0] == r && ff[1] == g && ff[2] == b )
-    {
-    return;
-    }
+  return this->TextPropertyWidget->GetColor();
+}
 
-  this->TextProperty->SetColor( r, g, b );
-  this->CornerProp->GetProperty()->SetColor( r, g, b );
+//----------------------------------------------------------------------------
+void vtkKWCornerAnnotation::SetTextColor(float r, float g, float b)
+{
+  // The following call with eventually trigger the OnTextColorChangeCallback
+  // and OnTextChangeCallback.
+
+  this->TextPropertyWidget->SetColor(r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCornerAnnotation::OnTextColorChangeCallback()
+{
+  float *color = this->GetTextColor();
+  this->InvokeEvent(vtkKWEvent::AnnotationColorChangedEvent, color);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCornerAnnotation::OnTextChangeCallback()
+{
   this->View->Render();
-  float color[3];
-  color[0] = r;
-  color[1] = g;
-  color[2] = b;
-  this->InvokeEvent( vtkKWEvent::AnnotationColorChangedEvent, color );
-  this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0 );
-
-  this->AddTraceEntry("$kw(%s) SetTextColor %f %f %f",
-                      this->GetTclName(), r, g, b);
+  this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -468,7 +477,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.31 $");
+  this->ExtractRevision(os,"$Revision: 1.32 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
@@ -476,12 +485,6 @@ void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 char *vtkKWCornerAnnotation::GetCornerText(int i)
 {
   return this->CornerText[i]->GetValue();
-}
-
-//----------------------------------------------------------------------------
-float *vtkKWCornerAnnotation::GetTextColor() 
-{
-  return this->CornerProp->GetProperty()->GetColor();
 }
 
 //----------------------------------------------------------------------------
