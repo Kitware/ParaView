@@ -95,7 +95,6 @@ FOREACH (tfile ${PROJECT_TESTS})
     -D ${PVClientTestData}
     -C ${PVCompareImages}
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
-    -B ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch
     -V ${PVClientTestData}/Baseline/${tfile}.png)
   # repeat the test with the client server driver
   ADD_TEST("${tfile}ClientServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
@@ -132,7 +131,7 @@ FOREACH (tfile ${PROJECT_TESTS})
     -D ${PVClientTestData}
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
     -BT ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch.tcl
-    -BC ${PVCompareImages}
+    -BC ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
     -B ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch
     -V ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch.png)
 ENDFOREACH (tfile)
