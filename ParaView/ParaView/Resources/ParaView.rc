@@ -16,8 +16,8 @@ IDI_PARAVIEWICOSMALL ICON    DISCARDABLE     "Resources/ParaViewIcon16.ico"
 #endif
 
 VS_VERSION_INFO	VERSIONINFO
- FILEVERSION	1,0
- PRODUCTVERSION	1,0
+ FILEVERSION	1,2
+ PRODUCTVERSION	1,2
  FILEOS		VOS__WINDOWS32
  FILETYPE	VFT_APP
  FILESUBTYPE	0x0L
@@ -29,10 +29,10 @@ BEGIN
             VALUE "FileDescription", "ParaView\0"
             VALUE "OriginalFilename", "paraview.exe\0"
             VALUE "CompanyName", "Kitware Inc.\0"
-            VALUE "FileVersion", "1.0\0"
+            VALUE "FileVersion", "1.2\0"
             VALUE "LegalCopyright", "Copyright \251 2003 by Kitware Inc.\0"
-            VALUE "ProductName", "ParaView 1.0 for Windows\0"
-            VALUE "ProductVersion", "1.0\0"
+            VALUE "ProductName", "ParaView 1.2 for Windows\0"
+            VALUE "ProductVersion", "1.2\0"
         END
     END
     BLOCK "VarFileInfo"
