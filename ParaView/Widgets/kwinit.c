@@ -10,6 +10,9 @@
 #pragma warning ( disable : 4244 )
 #pragma warning ( disable : 4100 )
 #pragma warning ( disable : 4210 )
+#  define vtkConvertToLong(x) ((long)(PtrToUlong(x)))
+#else
+#  define vtkConvertToLong(x) ((long)(x))
 #endif
 
 #define VTKToString(x) VTKToString0(x)
@@ -9423,7 +9426,7 @@ int vxprintf(
             longvalue = longvalue/base;
           }while( longvalue>0 );
 	}
-        length = (long)((void*)&buf[etBUFSIZE])-(long)bufpt;
+        length = vtkConvertToLong((void*)&buf[etBUFSIZE])-vtkConvertToLong(bufpt);
         for(idx=precision-length; idx>0; idx--){
           *(--bufpt) = '0';                             /* Zero pad */
 	}
