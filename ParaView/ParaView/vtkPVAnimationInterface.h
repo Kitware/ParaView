@@ -193,6 +193,12 @@ public:
   // Convenience method.
   vtkPVApplication* GetPVApplication();
 
+  // Description:
+  // Cache geoemtry callback and control.
+  void CacheGeometryCheckCallback();
+  int GetCacheGeometry();
+  void SetCacheGeometry(int flag);
+
 protected:
   vtkPVAnimationInterface();
   ~vtkPVAnimationInterface();
@@ -251,8 +257,10 @@ protected:
 
   // Should be a better way (menu?)
   vtkKWLabeledFrame* SaveFrame;
+  vtkKWWidget*       SaveButtonFrame;
   vtkKWPushButton*   SaveImagesButton;
   vtkKWPushButton*   SaveGeometryButton;
+  vtkKWCheckButton*  CacheGeometryCheck;
 
   vtkPVAnimationInterface(const vtkPVAnimationInterface&); // Not implemented
   void operator=(const vtkPVAnimationInterface&); // Not implemented

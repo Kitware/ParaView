@@ -134,7 +134,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.40");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.41");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -209,8 +209,10 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
 
   // Save button frame
   this->SaveFrame = vtkKWLabeledFrame::New();
+  this->SaveButtonFrame = vtkKWWidget::New();
   this->SaveImagesButton = vtkKWPushButton::New();
   this->SaveGeometryButton = vtkKWPushButton::New();
+  this->CacheGeometryCheck = vtkKWCheckButton::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -329,10 +331,14 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
 
   this->SaveFrame->Delete();
   this->SaveFrame = NULL;
+  this->SaveButtonFrame->Delete();
+  this->SaveButtonFrame = NULL;
   this->SaveImagesButton->Delete();
   this->SaveImagesButton = NULL;
   this->SaveGeometryButton->Delete();
   this->SaveGeometryButton = NULL;
+  this->CacheGeometryCheck->Delete();
+  this->CacheGeometryCheck = NULL;
 
   this->SetPVSource(NULL);
   this->SetControlledWidget(NULL);
@@ -698,19 +704,30 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   // Save frame stuff
   this->SaveFrame->SetParent(this);
   this->SaveFrame->ShowHideFrameOn();
-  this->SaveFrame->Create(this->Application, 0);
   this->SaveFrame->SetLabel("Save");
-  this->SaveImagesButton->SetParent(this->SaveFrame->GetFrame());
+  this->SaveFrame->Create(this->Application, 0);
+  this->SaveButtonFrame->SetParent(this->SaveFrame->GetFrame());
+  this->SaveButtonFrame->Create(this->Application, "frame", 0);
+  this->SaveImagesButton->SetParent(this->SaveButtonFrame);
   this->SaveImagesButton->Create(this->Application, 0);
   this->SaveImagesButton->SetLabel("Save Images");
   this->SaveImagesButton->SetCommand(this, "SaveImagesCallback");
-  this->SaveGeometryButton->SetParent(this->SaveFrame->GetFrame());
+  this->SaveGeometryButton->SetParent(this->SaveButtonFrame);
   this->SaveGeometryButton->Create(this->Application, 0);
   this->SaveGeometryButton->SetLabel("Save Geometry");
   this->SaveGeometryButton->SetCommand(this, "SaveGeometryCallback");
   this->Script("pack %s %s -side left -expand t -fill x -padx 2 -pady 2", 
                this->SaveImagesButton->GetWidgetName(),
                this->SaveGeometryButton->GetWidgetName());
+
+  this->CacheGeometryCheck->SetParent(this->SaveFrame->GetFrame());
+  this->CacheGeometryCheck->Create(this->Application, 0);
+  this->CacheGeometryCheck->SetText("Cache Geometry");
+  this->CacheGeometryCheck->SetCommand(this, "CacheGeometryCheckCallback");
+
+  this->Script("pack %s %s -side top -expand t -fill x -padx 2 -pady 2", 
+               this->SaveButtonFrame->GetWidgetName(),
+               this->CacheGeometryCheck->GetWidgetName());
 
   // Pack frames
 
@@ -1052,8 +1069,18 @@ void vtkPVAnimationInterface::SetCurrentTime(float time)
       }
     
     // Generate the cache, or use previous cache.
-    this->Window->CacheUpdate(timeIdx, total);
-  
+    if (this->GetCacheGeometry())
+      {
+      this->Window->CacheUpdate(timeIdx, total);
+      }
+    else
+      {
+      if (this->PVSource)
+        {
+        this->PVSource->MarkSourcesForUpdate(1);
+        }
+      }
+
     if (this->View)
       {
       this->View->EventuallyRender();
@@ -1449,7 +1476,6 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot) 
 {
-  int numSources, sourceIdx;
   vtkPVSource* source;
   const char* sourceName;
   int numParts, partIdx;
@@ -1580,6 +1606,29 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
     *file << "Writer Write\n"; 
     *file << "}\n\n";
     }
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::CacheGeometryCheckCallback()
+{
+  if ( ! this->GetCacheGeometry())
+    {
+    this->Window->RemoveAllCaches();
+    }
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVAnimationInterface::GetCacheGeometry()
+{
+  return this->CacheGeometryCheck->GetState();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SetCacheGeometry(int flag)
+{
+  this->CacheGeometryCheck->SetState(flag);
+  this->CacheGeometryCheckCallback();
 }
 
 //-----------------------------------------------------------------------------
