@@ -50,7 +50,7 @@ vtkKWWidgetCollection.cxx
 vtkKWWindow.cxx 
 vtkKWWindowCollection.cxx 
 vtkKWXtEmbeddedWidget.cxx 
-${VTK_SOURCE_DIR}/Wrapping/Tcl/vtktcl.c
+${VTK_TCL_HOME}/vtktcl.c
 )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -60,7 +60,7 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  ${VTK_SOURCE_DIR}/Wrapping/Tcl/vtktcl.c
+  ${VTK_TCL_HOME}/vtktcl.c
   vtkKWEvent.cxx
   vtkKWTkUtilities.cxx
   WRAP_EXCLUDE
