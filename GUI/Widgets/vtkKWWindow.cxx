@@ -43,7 +43,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.209");
+vtkCxxRevisionMacro(vtkKWWindow, "1.210");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -381,20 +381,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->Toolbars->Create(app, "");
   this->Toolbars->ShowBottomSeparatorOn();
 
-  // Restore Window Geometry
-
-  if (app->GetSaveWindowGeometry())
-    {
-    this->RestoreWindowGeometry();
-    }
-  else
-    {
-    this->Script("wm geometry %s %s", 
-                 this->GetWidgetName(), VTK_KW_WINDOW_DEFAULT_GEOMETRY);
-    }
 
   // Split frame
-
   this->MiddleFrame->SetParent(this);
   this->MiddleFrame->Create(app);
 
@@ -408,6 +396,18 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->Script("pack %s -side right -fill both -expand yes",
                this->ViewFrame->GetWidgetName());
+
+  // Restore Window Geometry
+
+  if (app->GetSaveWindowGeometry())
+    {
+    this->RestoreWindowGeometry();
+    }
+  else
+    {
+    this->Script("wm geometry %s %s", 
+                 this->GetWidgetName(), VTK_KW_WINDOW_DEFAULT_GEOMETRY);
+    }
 
   // Window properties / Application settings (leading to preferences)
 
