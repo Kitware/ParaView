@@ -46,20 +46,24 @@ public:
   vtkBooleanMacro(Selected, int);
 
   // Description:
-  // Set the selection list (array for num strings) and the command
+  // Set the selection list (array of num strings) and the command
   // that will be called when a selection is made by the user. 
   // This command will be passed both the selected string and 
   // a pointer to this object.
+  // The selection list is represented as a pull down menu, which
+  // visibility can be set.
   virtual void SetSelectionList(int num, const char **list);
-  virtual void SetSelectListEntryCommand(
+  virtual void SetSelectionListCommand(
     vtkKWObject *object, const char *method);
+  virtual void SetShowSelectionList(int);
+  vtkGetMacro(ShowSelectionList, int);
+  vtkBooleanMacro(ShowSelectionList, int);
 
   // Description:
   // Set the select command, called when the frame is selected by the user
   // (click in title bar).
   // This command will be passed a pointer to this object.
-  virtual void SetSelectCommand(
-    vtkKWObject *object, const char *method);
+  virtual void SetSelectCommand(vtkKWObject *object, const char *method);
 
   // Description:
   // Set/Get the title foregroud/background color (in both normal and 
@@ -83,7 +87,7 @@ public:
   
   // Description:
   // Callbacks
-  virtual void SelectListEntryCallback(const char *menuItem);
+  virtual void SelectionListCallback(const char *menuItem);
   virtual void SelectCallback();
   
   // Description:
@@ -123,10 +127,11 @@ protected:
   float TitleBackgroundColor[3];
   float TitleBackgroundSelectedColor[3];
 
-  char *SelectListEntryCommand;
+  char *SelectionListCommand;
   char *SelectCommand;
 
   int Selected;
+  int ShowSelectionList;
 
 private:
   vtkKWSelectionFrame(const vtkKWSelectionFrame&);  // Not implemented
