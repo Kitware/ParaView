@@ -63,7 +63,7 @@ public:
   virtual void Accept();
   virtual void AcceptInternal() {}
 
-  virtual void SetAnimationTime(float time) {}
+  virtual void SetAnimationTime(float) {}
   // BTX
   vtkSetMacro(VTKSourceID,vtkClientServerID);
   // ETX
