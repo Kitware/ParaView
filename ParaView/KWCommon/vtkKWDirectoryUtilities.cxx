@@ -83,7 +83,7 @@ static inline int Chdir(const char* dir)
 #define _unlink unlink
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.14");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.15");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -730,6 +730,8 @@ int vtkKWDirectoryUtilities::FileHasSignature(const char *filename,
     {
     res = (!strncmp(buffer, signature, signature_len) ? 1 : 0);
     }
+
+  delete [] buffer;
 
   fclose(fp);
   return res;
