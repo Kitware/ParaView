@@ -27,7 +27,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -210,10 +210,10 @@ void vtkSMDisplayerProxy::UpdateVTKObjects()
 {
   this->Superclass::UpdateVTKObjects();
 
-  this->PushProperty("ScalarVisibility", this->ClientServerID, 0);
+  this->PushProperty("ScalarVisibility", this->SelfID, 0);
   this->SetPropertyModifiedFlag("ScalarVisibility", 0);
   
-  this->PushProperty("Representation", this->ClientServerID, 0);
+  this->PushProperty("Representation", this->SelfID, 0);
   this->SetPropertyModifiedFlag("Representation", 0);
 
   this->ActorProxy->UpdateVTKObjects();
