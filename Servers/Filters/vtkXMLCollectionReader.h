@@ -119,10 +119,10 @@ protected:
   // that the output will exist.
   virtual void Update();
   
-  // We need to replace UpdateData to update only the one output from
-  // which the request came.
-  virtual void UpdateData(vtkDataObject* output);
-  
+  // We need to replace MarkGeneratedOutputs to mark only the one
+  // output from which the request came.
+  virtual void MarkGeneratedOutputs(vtkDataObject* output);
+
   virtual void ExecuteAttributes();
   virtual int ReadPrimaryElement(vtkXMLDataElement* ePrimary);
   virtual void SetupEmptyOutput();
