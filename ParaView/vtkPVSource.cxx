@@ -564,6 +564,7 @@ void vtkPVSource::AcceptCallback()
     if (input)
       {
       input->SetVisibility(0);
+      input->GetVisibilityCheck()->SetState(0);
       }
     window->GetMainView()->ResetCamera();
 

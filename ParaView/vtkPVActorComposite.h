@@ -95,6 +95,7 @@ public:
   int GetVisibility();
   vtkBooleanMacro(Visibility, int);
   void VisibilityCheckCallback();
+  vtkGetObjectMacro(VisibilityCheck, vtkKWCheckButton);
   
   // Description:
   // ONLY SET THIS IF YOU ARE A PVDATA!
