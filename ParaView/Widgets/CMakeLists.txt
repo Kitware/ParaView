@@ -92,14 +92,18 @@ SET_SOURCE_FILES_PROPERTIES(
   WRAP_EXCLUDE
   )
 
+INCLUDE_DIRECTORIES(
+  ${KWCommon_SOURCE_DIR}/XML
+  ${Widgets_SOURCE_DIR}/XML
+)
+
+SET (KWWidgets_SRCS ${KWWidgets_SRCS}
+  ${Widgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationReader.cxx
+  ${Widgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationWriter.cxx
+)
+
 IF (NOT DO_NOT_BUILD_XML_RW)
-  INCLUDE_DIRECTORIES(
-    ${KWCommon_SOURCE_DIR}/XML
-    ${Widgets_SOURCE_DIR}/XML
-  )
   SET (KWWidgets_SRCS ${KWWidgets_SRCS}
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationReader.cxx
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationWriter.cxx
     ${Widgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetReader.cxx
     ${Widgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetWriter.cxx
     ${Widgets_SOURCE_DIR}/XML/vtkXMLKWWindowReader.cxx
