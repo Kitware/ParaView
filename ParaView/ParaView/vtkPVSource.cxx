@@ -963,8 +963,6 @@ void vtkPVSource::SetNumberOfPVInputs(int num)
 // In the future, this should consider the vtkPVSourceInterface.
 void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
   if (idx < 0)
     {
     vtkErrorMacro(<< "SetNthPVInput: " << idx << ", cannot set input. ");

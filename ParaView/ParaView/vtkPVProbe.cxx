@@ -783,12 +783,6 @@ void vtkPVProbe::UsePoint()
 void vtkPVProbe::UseLine()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int error;
-  vtkDataSet *dataSet = 
-    (vtkDataSet*)(vtkTclGetPointerFromObject(this->ProbeSourceTclName,
-                                             "vtkDataSet",
-                                             pvApp->GetMainInterp(),
-                                             error));
   
   this->Dimensionality = 1;
   this->Script("catch {eval pack forget [pack slaves %s]}",

@@ -170,7 +170,7 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
 {
   float range[2];
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkDataSet *thresholdInput = this->GetPVInput()->GetVTKData();
+//  vtkDataSet *thresholdInput = this->GetPVInput()->GetVTKData();
 
   if ( ! this->TraceInitialized)
     {

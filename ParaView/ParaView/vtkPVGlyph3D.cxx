@@ -116,8 +116,6 @@ vtkPVData* vtkPVGlyph3D::GetGlyphSource()
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::CreateProperties()
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  
   this->vtkPVSource::CreateProperties();
     
   this->AddInputMenu("Input", "PVInput", "vtkPolyData",
