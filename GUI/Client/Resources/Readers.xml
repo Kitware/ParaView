@@ -214,6 +214,9 @@
           extensions=".spcth"
           file_description="SpyPlot CTH AMR dataset">
     <Source class="vtkAMRSpyPlotReader"/>
+    <Scale property="TimeStep"
+           label="Time step" trace_name="TimeStep"
+           help="Set the current timestep."/>
   </Module>
   <Module name="plyreader"
           class="vtkPVReaderModule" root_name="PLY"
