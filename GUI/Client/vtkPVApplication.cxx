@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.322");
+vtkCxxRevisionMacro(vtkPVApplication, "1.323");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -241,7 +241,6 @@ public:
          this->Windows->GetLastKWWindow() )
       {
       vtkKWWindow *win = this->Windows->GetLastKWWindow();
-      char buffer[4096];      
       const char *message = strstr(t, "): ");
       char type[1024], file[1024];
       int line;
@@ -258,6 +257,7 @@ public:
           rmessage[last] = 0;
           last--;
           }
+        char *buffer = new char[strlen(file) + strlen(rmessage) + 256];
         sprintf(buffer, "There was a VTK %s in file: %s (%d)\n %s", 
                 (error ? "Error" : "Warning"),
                 file, line,
@@ -275,6 +275,7 @@ public:
           win->WarningMessage(buffer);
           }
         delete [] rmessage;
+        delete [] buffer;
         }
       }
     else
