@@ -160,6 +160,7 @@ class VTK_EXPORT vtkKWEvent
     VolumeReformatBoxVisibilityChangedEvent,
     VolumeReformatChangedEvent,
     VolumeReformatManipulationStyleChangedEvent,
+    VolumeReformatPlaneChangedEvent,
     VolumeReformatThicknessChangedEvent,
     VolumeScalarBarColorChangedEvent,
     VolumeScalarBarTitleChangedEvent,
