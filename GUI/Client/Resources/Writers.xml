@@ -65,6 +65,11 @@
           data_mode_method="SetFileTypeToBinary"
           extension=".vtk"
           file_description="Legacy VTK Files"/>
+  <Writer input="vtkPolyData" 
+          class="vtkPVWriter"
+          writer="vtkPLYWriter"
+          extension=".ply"
+          file_description="PLY Polygonal File Format"/>
   <Writer input="vtkImageData"
           class="vtkPVWriter"
           writer="vtkMetaImageWriter"

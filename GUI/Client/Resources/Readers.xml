@@ -187,6 +187,13 @@
           file_description="VRML 2 Files">
     <Source class="vtkVRMLSource"/>
   </Module>
+  <Module name="plyreader"
+          class="vtkPVReaderModule" root_name="PLY"
+          module_type="Reader"
+          extensions=".ply"
+          file_description="PLY Polygonal File Format">
+    <Source class="vtkPLYReader"/>
+  </Module>
   <Module name="pdbreader"
           class="vtkPVReaderModule" root_name="PDB"
           module_type="Reader"
