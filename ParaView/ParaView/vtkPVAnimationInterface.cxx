@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.2");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1807,11 +1807,12 @@ void vtkPVAnimationInterface::SaveState(ofstream* file)
 void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ControlledWidget: " << this->GetControlledWidget();
-  os << indent << "NumberOfFrames: " << this->GetNumberOfFrames();
-  os << indent << "Loop: " << this->GetLoop();
-  os << indent << "View: " << this->GetView();
-  os << indent << "Window: " << this->GetWindow();
+  os << indent << "ControlledWidget: " << this->GetControlledWidget() << endl;
+  os << indent << "NumberOfFrames: " << this->GetNumberOfFrames() << endl;
+  os << indent << "Loop: " << this->GetLoop() << endl;
+  os << indent << "View: " << this->GetView() << endl;
+  os << indent << "Window: " << this->GetWindow() << endl;
+  os << indent << "ScriptAvailable: " << this->ScriptAvailable << endl;
 }
 
 
