@@ -63,6 +63,8 @@ vtkPVContour::vtkPVContour()
   this->ComputeNormalsCheck = vtkKWCheckButton::New();
   this->ComputeGradientsCheck = vtkKWCheckButton::New();
   this->ComputeScalarsCheck = vtkKWCheckButton::New();
+  
+  this->ScalarRangeLabel = vtkKWLabel::New();
 }
 
 //----------------------------------------------------------------------------
@@ -88,6 +90,8 @@ vtkPVContour::~vtkPVContour()
   this->ComputeGradientsCheck = NULL;
   this->ComputeScalarsCheck->Delete();
   this->ComputeScalarsCheck = NULL;
+  this->ScalarRangeLabel->Delete();
+  this->ScalarRangeLabel = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -127,7 +131,11 @@ void vtkPVContour::CreateProperties()
   this->NewValueFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->NewValueFrame->Create(pvApp, "frame", "");
   
-  this->Script("pack %s %s %s", this->ContourValuesLabel->GetWidgetName(),
+  this->ScalarRangeLabel->SetParent(this->GetParameterFrame()->GetFrame());
+  this->ScalarRangeLabel->Create(pvApp, "");
+  
+  this->Script("pack %s %s %s %s", this->ScalarRangeLabel->GetWidgetName(),
+               this->ContourValuesLabel->GetWidgetName(),
                this->ContourValuesList->GetWidgetName(),
                this->NewValueFrame->GetWidgetName());
   
@@ -269,6 +277,46 @@ void vtkPVContour::ContourValuesResetCallback()
     {
     sprintf(newValue, "%f", contour->GetValue(i));
     this->ContourValuesList->AppendUnique(newValue);
+    }
+}
+
+void vtkPVContour::UpdateScalars()
+{
+  float range[2];
+  char label[100];
+  // call the superclass method
+  this->vtkPVSource::UpdateScalars();
+  
+  this->GetDataArrayRange(range);
+  sprintf(label, "Data Range: %f to %f", range[0], range[1]);
+  this->ScalarRangeLabel->SetLabel(label);
+}
+
+void vtkPVContour::GetDataArrayRange(float range[2])
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  int id, num;
+  float temp[2];
+  
+  pvApp->BroadcastScript("Application SendDataArrayRange %s %s",
+                         this->GetNthPVInput(0)->GetVTKDataTclName(),
+                         this->DefaultScalarsName);
+  this->GetNthPVInput(0)->GetVTKData()->GetPointData()->
+    GetArray(this->DefaultScalarsName)->GetRange(range, 0);
+  
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; id++)
+    {
+    controller->Receive(temp, 2, id, 1976);
+    if (temp[0] < range[0])
+      {
+      range[0] = temp[0];
+      }
+    if (temp[1] > range[1])
+      {
+      range[1] = temp[1];
+      }
     }
 }
 

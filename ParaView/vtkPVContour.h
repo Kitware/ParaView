@@ -92,6 +92,10 @@ protected:
   vtkKWCheckButton* ComputeNormalsCheck;
   vtkKWCheckButton* ComputeGradientsCheck;
   vtkKWCheckButton* ComputeScalarsCheck;
+  vtkKWLabel *ScalarRangeLabel;
+  
+  virtual void UpdateScalars();
+  void GetDataArrayRange(float range[2]);
 };
 
 #endif

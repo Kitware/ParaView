@@ -443,6 +443,18 @@ void vtkPVApplication::SendMapperColorRange(vtkPolyDataMapper *mapper)
   this->Controller->Send(range, 2, 0, 1969);
 }
 
+void vtkPVApplication::SendDataArrayRange(vtkDataSet *data, char *arrayName)
+{
+  float range[2];
+  
+  if (this->Controller->GetLocalProcessId == 0)
+    {
+    return;
+    }
+  
+  data->GetPointData()->GetArray(arrayName)->GetRange(range, 0);
+  this->Controller->Send(range, 2, 0, 1976);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::CreateButtonPhotos()
