@@ -77,11 +77,13 @@ public:
   //int IsInteractive() { return this->Interactive; }
   
   // Description:
-  // I do not know why we cannot do everything through
-  // server stream messages.
+  // It would be nice to keep renderers private.
   vtkRenderWindow *GetRenderWindow();
   vtkRenderer *GetRenderer();
   vtkRenderer *GetRenderer2D();
+  vtkClientServerID GetRenderWindowID() { return this->RenderWindowID;}
+  vtkClientServerID GetRendererID() { return this->RendererID;}
+  vtkClientServerID GetRenderer2DID() { return this->Renderer2DID;}
 
   // Description:
   // Change the background color.
@@ -135,10 +137,6 @@ public:
   // This method is called when the 3D renderer renders so that the 2D window
   // can stay in sync
   void StartRenderEvent();
-
-  vtkClientServerID GetRenderWindowID() { return this->RenderWindowID;}
-  vtkClientServerID GetRendererID() { return this->RendererID;}
-  vtkClientServerID GetRenderer2DID() { return this->Renderer2DID;}
 
 protected:
   vtkPVRenderModule();
