@@ -357,8 +357,11 @@ void vtkPVGlyph3D::ChangeSource()
   tclName = this->GlyphSourceMenu->GetValue();
   this->SetGlyphSourceTclName(tclName);
   
-  pvApp->BroadcastScript("%s SetSource %s",
-			 this->GetVTKSourceTclName(), tclName);
+  if (strcmp(this->GlyphSourceTclName, "") != 0)
+    {
+    pvApp->BroadcastScript("%s SetSource %s",
+                           this->GetVTKSourceTclName(), tclName);
+    }
 }
 
 void vtkPVGlyph3D::Save(ofstream *file)
