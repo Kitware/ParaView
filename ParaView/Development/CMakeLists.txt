@@ -58,12 +58,18 @@ IF(NOT PARAVIEW_NO_HDF5)
      )
 ENDIF(NOT PARAVIEW_NO_HDF5)
 
-VTK_WRAP_TCL2(vtkPVDevelopmentTCL DevelopmentTCL_SRCS ${Development_SRCS})
-ADD_LIBRARY(vtkPVDevelopmentTCL ${DevelopmentTCL_SRCS} ${Development_SRCS})
+ADD_LIBRARY(vtkPVDevelopment ${Development_SRCS})
+TARGET_LINK_LIBRARIES(vtkPVDevelopment vtkHybrid)
 
-TARGET_LINK_LIBRARIES(vtkPVDevelopmentTCL
-  vtkHybridTCL
-  )
+# Create TCL wrappers for development library.
+VTK_WRAP_TCL2(vtkPVDevelopmentTCL DevelopmentTCL_SRCS ${Development_SRCS})
+ADD_LIBRARY(vtkPVDevelopmentTCL ${DevelopmentTCL_SRCS})
+TARGET_LINK_LIBRARIES(vtkPVDevelopmentTCL vtkHybridTCL vtkPVDevelopment)
+
+# Create ClientServer wrappers for development library.
+VTK_WRAP_ClientServer(vtkPVDevelopmentCS DevelopmentCS_SRCS ${Development_SRCS})
+ADD_LIBRARY(vtkPVDevelopmentCS ${DevelopmentCS_SRCS})
+TARGET_LINK_LIBRARIES(vtkPVDevelopmentCS vtkHybridCS vtkPVDevelopment)
 
 IF(NOT PARAVIEW_NO_HDF5)
   TARGET_LINK_LIBRARIES(vtkPVDevelopmentTCL ${PARAVIEW_HDF5_LIBRARIES})

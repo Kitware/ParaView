@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkOutputWindow.h"
 #include "vtkPVApplication.h"
 #include "vtkPVClientServerModule.h"
+#include "vtkPVConfig.h"
 #include "vtkPVMPIProcessModule.h"
 
 #include "vtkObject.h"
@@ -391,6 +392,9 @@ extern void vtkParaViewServerCS_Initialize(vtkClientServerInterpreter*);
 #ifdef PARAVIEW_LINK_XDMF
 extern void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
 #endif
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
+extern void vtkPVDevelopmentCS_Initialize(vtkClientServerInterpreter *);
+#endif
 
 //----------------------------------------------------------------------------
 void ParaViewInitializeInterpreter(vtkPVProcessModule* pm)
@@ -411,5 +415,8 @@ void ParaViewInitializeInterpreter(vtkPVProcessModule* pm)
   vtkParaViewServerCS_Initialize(pm->GetInterpreter());
 #ifdef PARAVIEW_LINK_XDMF
   vtkXdmfCS_Initialize(pm->GetInterpreter());
+#endif
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
+  vtkPVDevelopmentCS_Initialize(pm->GetInterpreter());
 #endif
 }
