@@ -202,6 +202,11 @@ SET( ParaViewClient_SRCS
   #  vtkPVRenderGroupDialog.cxx
   )
 
+SET_SOURCE_FILES_PROPERTIES(
+  vtkPVObjectWidget.cxx
+  ABSTRACT
+  )
+
 SET(ParaViewBinary_SRCS
   ParaView.cxx)
 
