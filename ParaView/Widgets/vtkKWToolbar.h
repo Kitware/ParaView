@@ -68,15 +68,38 @@ public:
   void Create(vtkKWApplication *app);
 
   // Description:
+  // Determines whether the toolbar is resizable. When you use Pack(),
+  // do not provide options like -fill or -expand.
+  void SetResizable(int);
+  vtkGetMacro(Resizable, int);
+  vtkBooleanMacro(Resizable, int);
+
+  // Description:
   // Callbacks to ensure all widgets are visible (only
   // if the were added with AddWidget)
   void ScheduleResize();
   void Resize();
+
+  // Description:
+  // Update/refresh the widgets layout/aspect
   void UpdateWidgets();
 
   // Description:
-  // Add a widget to the toolbar.
+  // Update/refresh the toolbar layout/aspect (does not include the widgets)
+  void Update();
+
+  // Description:
+  // Pack the toolbar. Do not use Tk 'pack' since the toolbar has more
+  // fancy things to do after packing.
+  void Pack(const char*);
+  void Pack() { this->Pack(""); };
+
+  // Description:
+  // Add a widget to the toolbar, insert a widget before 'location' (or at
+  // beginning of list if 'location' is not found), remove widget.
   void AddWidget(vtkKWWidget* widget);
+  void InsertWidget(vtkKWWidget* location, vtkKWWidget* widget);
+  void RemoveWidget(vtkKWWidget* widget);
 
   // Description:
   // Returns the main frame of the toolbar. Put all the widgets
@@ -121,6 +144,10 @@ protected:
 
   vtkKWWidget* Frame;
   vtkKWWidget* Separator;
+
+  void ConstrainWidgetsLayout();
+  void UpdateWidgetsLayout();
+  void UpdateWidgetsAspect();
   
 //BTX
   vtkVector<vtkKWWidget*>* Widgets;
@@ -128,8 +155,7 @@ protected:
 
   int FlatAspect;
   int WidgetsFlatAspect;
-
-  void Pack();
+  int Resizable;
 
 private:
   vtkKWToolbar(const vtkKWToolbar&); // Not implemented

@@ -77,7 +77,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.18");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.19");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -99,6 +99,8 @@ vtkKWToolbar::vtkKWToolbar()
 
   this->FlatAspect = vtkKWToolbar::GetGlobalFlatAspect();
   this->WidgetsFlatAspect = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
+
+  this->Resizable = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -113,10 +115,61 @@ vtkKWToolbar::~vtkKWToolbar()
   this->Widgets->Delete();
 }
 
-
-void vtkKWToolbar::AddWidget(vtkKWWidget* widget)
+//----------------------------------------------------------------------------
+void vtkKWToolbar::AddWidget(vtkKWWidget *widget)
 {
-  this->Widgets->AppendItem(widget);
+  if (this->Widgets->AppendItem(widget) == VTK_OK)
+    {
+    this->UpdateWidgets();
+    }
+  else
+    {
+    vtkErrorMacro("Unable to add widget to toolbar");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::InsertWidget(vtkKWWidget *location, vtkKWWidget *widget)
+{
+  int res;
+  if (!location)
+    {
+    res = this->Widgets->PrependItem(widget);
+    }
+
+  vtkIdType loc;
+  if (this->Widgets->FindItem(location, loc) == VTK_OK)
+    {
+    res = this->Widgets->InsertItem(loc, widget);
+    }
+  else
+    {
+    res = this->Widgets->PrependItem(widget);
+    }
+
+  if (res)
+    {
+    this->UpdateWidgets();
+    }
+  else
+    {
+    vtkErrorMacro("Unable to insert widget in toolbar");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::RemoveWidget(vtkKWWidget *widget)
+{
+  vtkIdType loc;
+  if (this->Widgets->FindItem(widget, loc) == VTK_OK)
+    {
+    if (this->Widgets->RemoveItem(loc) == VTK_OK)
+      {
+      this->UpdateWidgets();
+      return;
+      }
+    }
+  vtkErrorMacro("Unable to remove widget from toolbar");
 }
 
 //----------------------------------------------------------------------------
@@ -137,10 +190,8 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
 
   // Create the main frame for this widget
 
-  this->Script("frame %s ", this->GetWidgetName());
-  this->Script("pack %s -side left -anchor nw -expand y -fill both",
-               this->GetWidgetName());
-  
+  this->Script("frame %s", this->GetWidgetName());
+
   this->Script("bind %s <Configure> {%s ScheduleResize}",
                this->GetWidgetName(), this->GetTclName());
 
@@ -151,7 +202,8 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
   // Create a "toolbar separator" for the flat aspect
 
   this->Separator->Create(app, "frame", "-bd 2 -relief raised");
-  this->Pack();
+
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -166,98 +218,223 @@ void vtkKWToolbar::ScheduleResize()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWToolbar::UpdateWidgets()
-{
-  if ( this->Widgets->GetNumberOfItems() > 0 )
-    {
-    vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
-    
-    int totReqWidth=0;
-    while ( !it->IsDoneWithTraversal() )
-      {
-      vtkKWWidget* widget = 0;
-      if (it->GetData(widget) == VTK_OK)
-        {
-        this->Script("winfo reqwidth %s", widget->GetWidgetName());
-        totReqWidth += this->GetIntegerResult(this->Application);
-        }
-      it->GoToNextItem();
-      }
-
-    this->Script("winfo width %s", this->GetWidgetName());
-    int width = this->GetIntegerResult(this->Application);
-
-    int widthWidget = totReqWidth / this->Widgets->GetNumberOfItems();
-    int numPerRow = width / widthWidget;
-
-    if ( numPerRow > 0 )
-      {
-      int row = 0;
-      ostrstream s;
-      it->InitTraversal();
-      int num = 0;
-      while ( !it->IsDoneWithTraversal() )
-        {
-        vtkKWWidget* widget = 0;
-        if (it->GetData(widget) == VTK_OK)
-          {
-          s << "grid " << widget->GetWidgetName() << " -row " 
-            << row << " -column " << num << " -sticky nsew " << endl;
-          num++;
-          if ( num == numPerRow ) { row++; num=0;}
-          if (this->WidgetsFlatAspect)
-            {
-            s << "catch { " << widget->GetWidgetName() << " config -relief flat }" << endl;
-            }
-          else
-            {
-            s << "catch { " << widget->GetWidgetName() << " config -relief raised }" << endl;
-            }
-          }
-        it->GoToNextItem();
-        }
-      s << ends;
-      this->Script(s.str());
-      s.rdbuf()->freeze(0);
-      }
-    it->Delete();
-
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWToolbar::Resize()
 {
   this->UpdateWidgets();
   this->Expanding = 0;
 }
 
+//----------------------------------------------------------------------------
+void vtkKWToolbar::UpdateWidgetsAspect()
+{
+  if (this->Widgets->GetNumberOfItems() <= 0)
+    {
+    return;
+    }
+
+  vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
+  ostrstream s;
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    vtkKWWidget* widget = 0;
+    // Change the relief of buttons (let's say that everything that
+    // has a -command will qualify, -state could have been used, or
+    // a match on the widget type, etc.
+    if (it->GetData(widget) == VTK_OK && 
+        widget->HasConfigurationOption("-command"))
+      {
+      int use_relief = widget->HasConfigurationOption("-relief");
+      if (widget->HasConfigurationOption("-indicatoron"))
+        {
+        this->Script("%s cget -indicatoron", widget->GetWidgetName());
+        use_relief = this->GetIntegerResult(this->Application);
+        }
+        
+      if (use_relief)
+        {
+        s << widget->GetWidgetName() << " config -relief " 
+          << (this->WidgetsFlatAspect ? "flat" : "raised") << endl;
+        }
+      else
+        {
+        // Can not use -relief, try to hack -bd by specifying
+        // an empty border using the negative current value
+        if (widget->HasConfigurationOption("-bd"))
+          {
+          this->Script("%s cget -bd", widget->GetWidgetName());
+          int bd = this->GetIntegerResult(this->Application);
+          s << widget->GetWidgetName() << " config -bd "
+            << (this->WidgetsFlatAspect ? -abs(bd) : abs(bd)) << endl;
+          }
+        }
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  s << ends;
+  this->Script(s.str());
+  s.rdbuf()->freeze(0);
+}
 
 //----------------------------------------------------------------------------
-void vtkKWToolbar::Pack()
+void vtkKWToolbar::ConstrainWidgetsLayout()
+{
+  if (this->Widgets->GetNumberOfItems() <= 0)
+    {
+    return;
+    }
+
+  int totReqWidth = 0;
+
+  vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
+    
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    vtkKWWidget* widget = 0;
+    if (it->GetData(widget) == VTK_OK)
+      {
+      this->Script("winfo reqwidth %s", widget->GetWidgetName());
+      totReqWidth += this->GetIntegerResult(this->Application);
+      }
+    it->GoToNextItem();
+    }
+
+  this->Script("winfo width %s", this->GetWidgetName());
+  int width = this->GetIntegerResult(this->Application);
+
+  int widthWidget = totReqWidth / this->Widgets->GetNumberOfItems();
+  int numPerRow = width / widthWidget;
+
+  if ( numPerRow > 0 )
+    {
+    int row = 0, num = 0;
+    ostrstream s;
+
+    it->InitTraversal();
+    while (!it->IsDoneWithTraversal())
+      {
+      vtkKWWidget* widget = 0;
+      if (it->GetData(widget) == VTK_OK)
+        {
+        s << "grid " << widget->GetWidgetName() << " -row " 
+          << row << " -column " << num << " -sticky news " << endl;
+        num++;
+        if ( num == numPerRow ) 
+          { 
+          row++; 
+          num=0;
+          }
+        }
+      it->GoToNextItem();
+      }
+    s << ends;
+    this->Script(s.str());
+    s.rdbuf()->freeze(0);
+    }
+  it->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::UpdateWidgetsLayout()
+{
+  if (this->Widgets->GetNumberOfItems() <= 0)
+    {
+    return;
+    }
+
+  this->Script("catch {eval grid forget [grid slaves %s]}",
+               this->GetFrame()->GetWidgetName());
+
+  // If this toolbar is resizable, then constrain it to the current size
+
+  if (this->Resizable)
+    {
+    this->ConstrainWidgetsLayout();
+    return;
+    }
+
+  ostrstream s;
+  s << "grid "; 
+
+  vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    vtkKWWidget* widget = 0;
+    if (it->GetData(widget) == VTK_OK)
+      {
+      s << " " << widget->GetWidgetName();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  s << " -sticky news -row 0" << ends;
+  this->Script(s.str());
+  s.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::UpdateWidgets()
+{
+  this->UpdateWidgetsAspect();
+  this->UpdateWidgetsLayout();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::Update()
 {
   if (this->FlatAspect)
     {
-    this->Script("%s config -relief flat -bd 0", 
-                 this->GetWidgetName());
-    this->Script("pack %s -padx 2 -pady 2", 
-                 this->GetWidgetName());
-    this->Script("pack %s -side left -anchor nw -expand n -fill y -ipadx 2",
-                 this->Frame->GetWidgetName());
-    this->Script("pack %s -before %s -side left -anchor nw -expand n -fill y -ipadx 1",
-                 this->Separator->GetWidgetName(),
-                 this->Frame->GetWidgetName());
+    this->Script(
+      "%s config -relief flat -bd 0", 
+      this->GetWidgetName());
+
+    this->Script(
+      "pack %s -ipadx 2 -ipady 0 -padx 0 -pady 3 -side left -anchor nw -fill both -expand n",
+      this->Frame->GetWidgetName());
+
+    this->Script(
+      "pack %s -ipadx 1 -side left -anchor nw -fill y -expand n -before %s",
+      this->Separator->GetWidgetName(),
+      this->Frame->GetWidgetName());
     }
   else
     {
-    this->Script("%s config -relief raised -bd 1", 
+    this->Script(
+      "%s config -relief raised -bd 1", 
+      this->GetWidgetName());
+
+    this->Script(
+      "pack forget %s", 
+      this->Separator->GetWidgetName());
+
+    this->Script(
+      "pack %s -ipadx 2 -ipady 2 -padx 1 -pady 0 -side left -anchor nw -fill both -expand n",
+      this->Frame->GetWidgetName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::Pack(const char *options)
+{
+  this->Script("pack %s -padx 2 -pady 2 -anchor n %s", 
+               this->GetWidgetName(), options);
+
+  if (this->Resizable)
+    {
+    this->Script("pack %s -fill both -expand y", 
                  this->GetWidgetName());
-    this->Script("pack %s -padx 2 -pady 2", 
+    }
+  else
+    {
+    this->Script("pack %s -fill both -expand n", 
                  this->GetWidgetName());
-    this->Script("pack forget %s", 
-                 this->Separator->GetWidgetName());
-    this->Script("pack %s -side left -anchor nw -expand n -fill y -ipadx 2 -ipady 2",
-                 this->Frame->GetWidgetName());
     }
 }
 
@@ -270,7 +447,12 @@ void vtkKWToolbar::SetFlatAspect(int f)
     }
   this->FlatAspect = f;
   this->Modified();
-  this->Pack();
+  this->Update();
+  this->UpdateWidgets();
+  if (this->IsPacked())
+    {
+    this->Pack();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -283,6 +465,23 @@ void vtkKWToolbar::SetWidgetsFlatAspect(int f)
   this->WidgetsFlatAspect = f;
   this->Modified();
   this->UpdateWidgets();
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWToolbar::SetResizable(int r)
+{
+  if (this->Resizable == r)
+    {
+    return;
+    }
+  this->Resizable = r;
+  this->Modified();
+  this->Update();
+  this->UpdateWidgets();
+  if (this->IsPacked())
+    {
+    this->Pack();
+    }
 }
 
 //----------------------------------------------------------------------------
