@@ -30,6 +30,7 @@ class vtkIdList;
 class vtkIntArray;
 class vtkPoints;
 class vtkDataSet;
+class vtkAppendFilter;
 
 class VTK_EXPORT vtkPickFilter : public vtkUnstructuredGridSource
 {
@@ -44,6 +45,7 @@ public:
   void AddInput(vtkDataObject*){vtkErrorMacro("NotDefined");}
   vtkDataSet* GetInput(int idx);
   void RemoveInput(vtkDataSet* input);
+  void RemoveInput(vtkDataObject*){vtkErrorMacro("NotDefined");}
   void RemoveAllInputs();
 
   // Description:
@@ -89,8 +91,11 @@ protected:
   void PointExecute();
   void CellExecute();
   int CompareProcesses(double bestDist2);
-
   void CreateOutput(vtkIdList* regionCellIds);
+
+  void IdExecute();
+  int CellIdExecute(vtkDataSet* input, int inputIdx,  vtkAppendFilter* append);
+  int PointIdExecute(vtkDataSet* input, int inputIdx, vtkAppendFilter* append);
 
   // Flag that toggles between picking cells or picking points.
   int PickCell;

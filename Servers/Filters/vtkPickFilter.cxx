@@ -25,12 +25,14 @@
 #include "vtkPointData.h"
 #include "vtkCellData.h"
 #include "vtkToolkits.h"
+#include "vtkAppendFilter.h"
+#include "vtkExtractCells.h"
 
 #ifdef VTK_USE_MPI
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.8");
+vtkCxxRevisionMacro(vtkPickFilter, "1.9");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -110,6 +112,12 @@ void vtkPickFilter::RemoveAllInputs()
 //-----------------------------------------------------------------------------
 void vtkPickFilter::Execute()
 {
+  if (this->UseIdToPick)
+    {
+    this->IdExecute();
+    return;
+    }
+
   this->BestInputIndex = -1;
 
   if (this->PickCell)
@@ -497,4 +505,251 @@ void vtkPickFilter::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 
+//-----------------------------------------------------------------------------
+// Execute for each input, then append the separate outputs.
+// Completely separate logic for picking by id
+void vtkPickFilter::IdExecute()
+{
+  int numInputs, idx;
+  vtkAppendFilter* append = vtkAppendFilter::New();
+
+  numInputs = this->GetNumberOfInputs();
+  for (idx = 0; idx < numInputs; ++idx)
+    {
+    if (this->PickCell)
+      {
+      this->CellIdExecute(this->GetInput(idx), idx, append);
+      }
+    else
+      {
+      this->PointIdExecute(this->GetInput(idx), idx, append);
+      }
+    }
+  
+  // We do not need to send the data to process 0.  Keep it distributed.
+  //if (this->Controller->GetLocalProcessId() > 0)
+  //  {
+  //  append->Update();
+  //  this->Controller->Send(append->GetOutput(),0, 38843);
+  //  }
+  //else
+  //  {
+  //  int numProcs = this->Controller->GetNumberOfProcesses();
+  //  for (idx = 1; idx < numProcs; ++idx)
+  //    {
+  //    vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
+  //    this->Controller->Receive(tmp, idx, 38843);
+  //    append->AddInput(tmp);
+  //    tmp->Delete();
+  //    }
+  //  append->Update();
+  //  vtkUnstructuredGrid* output = this->GetOutput();
+  //  output->CopyStructure(append->GetOutput());
+  //  output->GetPointData()->PassData(append->GetOutput()->GetPointData());
+  //  output->GetCellData()->PassData(append->GetOutput()->GetCellData());
+  //  output->GetFieldData()->PassData(append->GetOutput()->GetFieldData());
+  //  }
+  
+  append->Update();
+  vtkUnstructuredGrid* output = this->GetOutput();
+  output->CopyStructure(append->GetOutput());
+  output->GetPointData()->PassData(append->GetOutput()->GetPointData());
+  output->GetCellData()->PassData(append->GetOutput()->GetCellData());
+  output->GetFieldData()->PassData(append->GetOutput()->GetFieldData());
+    
+  append->Delete();
+}
+
+//-----------------------------------------------------------------------------
+// Execute for each input, then append the separate outputs.
+int vtkPickFilter::PointIdExecute(vtkDataSet* input, int inputIdx, 
+                                  vtkAppendFilter* append)
+{
+  vtkIdType bestId;
+  vtkIdType pointId, numPoints;
+
+  vtkDataArray* globalIds;
+  globalIds = input->GetPointData()->GetArray(this->GlobalIdArrayName);
+  numPoints = input->GetNumberOfPoints();
+
+  if (globalIds == 0)
+    {
+    if (this->Id >= 0 && this->Id < numPoints)
+      {
+      bestId = this->Id;
+      }
+    }
+  else
+    { // search for the id in the global id array.
+    for (pointId=0; pointId < numPoints; pointId++)
+      {
+      if (globalIds->GetComponent(pointId,0) == this->Id)
+        { // This assumes that there is only one point with the global id.
+        bestId = pointId ;
+        }
+      }
+    }
+
+  if (bestId == -1)
+    {
+    return 0;
+    }
+
+  // Extract the cell out of the input.
+  vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
+  // Do not put verticies for point.  Cell is confusing in UI.  
+  // Labels display the point just fine.
+  //tmp->Allocate(1);
+  //vtkIdList* vertPtIds = vtkIdList::New();
+  //vertPtIds->InsertNextId(0);
+  //tmp->InsertNextCell(VTK_VERTEX, vertPtIds);
+  //vertPtIds->Delete();
+  //vertPtIds = 0;
+
+  double pt[3];
+  tmp->GetPointData()->CopyAllocate(input->GetPointData(), 1);
+  tmp->GetPointData()->CopyData(input->GetPointData(), bestId, 0);
+  input->GetPoint(bestId, pt);
+  vtkPoints* newPts = vtkPoints::New();
+  newPts->InsertNextPoint(pt);
+  tmp->SetPoints(newPts);
+  newPts->Delete();
+
+  // Add an array that shows which part this point comes from.
+  if (this->GetNumberOfInputs() > 1)
+    {
+    vtkIntArray* partArray = vtkIntArray::New();
+    partArray->SetNumberOfTuples(1);
+    partArray->SetComponent(0, 0, inputIdx);
+    partArray->SetName("PartIndex");
+    tmp->GetPointData()->AddArray(partArray);
+    partArray->Delete();
+    partArray = 0;
+    }
+
+  // Add an array that shows which process this point comes from.
+  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
+    {
+    vtkIntArray* procArray = vtkIntArray::New();
+    procArray->SetNumberOfTuples(1);
+    procArray->SetComponent(0, 0, this->Controller->GetLocalProcessId());
+    procArray->SetName("Process");
+    tmp->GetPointData()->AddArray(procArray);
+    procArray->Delete();
+    procArray = 0;
+    }
+
+  append->AddInput(tmp);
+  tmp->Delete();
+  tmp = 0;
+
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+// Execute for each input, then append the separate outputs.
+int vtkPickFilter::CellIdExecute(vtkDataSet* input, int inputIdx, 
+                                 vtkAppendFilter* append)
+{
+  vtkIdType cellId;
+  vtkIdType numCells;
+  vtkIdType bestId = -1;
+
+  vtkDataArray* globalIds;
+  globalIds = input->GetCellData()->GetArray(this->GlobalIdArrayName);
+  numCells = input->GetNumberOfCells();
+
+  if (globalIds == 0)
+    {
+    if (this->Id >= 0 && this->Id < numCells)
+      {
+      bestId = this->Id;
+      }
+    }
+  else
+    { // search for the id in the global id array.
+    for (cellId=0; cellId < numCells; cellId++)
+      {
+      if (globalIds->GetComponent(cellId,0) == this->Id)
+        { // This assumes that there is only one cell with the global id.
+        bestId = cellId ;
+        }
+      }
+    }
+
+  if (bestId == -1)
+    {
+    return 0;
+    }
+
+  // Extract the cell out of the input.
+  vtkExtractCells* extractCells = vtkExtractCells::New();
+  vtkDataSet* inputCopy = input->NewInstance();
+  inputCopy->CopyStructure(input);
+  inputCopy->GetPointData()->PassData(input->GetPointData());
+  inputCopy->GetCellData()->PassData(input->GetCellData());
+  inputCopy->GetFieldData()->PassData(input->GetFieldData());
+  extractCells->SetInput(inputCopy);
+  extractCells->AddCellRange(bestId, bestId);
+  extractCells->Update();
+
+  // I do not know if this is allowed.  Add arrays after 
+  // the filter has executed.  It works ...
+  
+  // Add a point and cell array that shows the id.
+  vtkIntArray* idArray = vtkIntArray::New();
+  idArray->SetNumberOfTuples(1);
+  idArray->SetComponent(0, 0, bestId);
+  idArray->SetName("Id");
+  extractCells->GetOutput()->GetCellData()->AddArray(idArray);
+  idArray->Delete();
+  idArray = 0;
+  
+  // Finding point ids is a little harder.
+  vtkIdList* cellPtIds = vtkIdList::New();
+  input->GetCellPoints(bestId, cellPtIds);
+  vtkIdType num, idx, ptId;
+  num = cellPtIds->GetNumberOfIds();
+  idArray = vtkIntArray::New();
+  idArray->SetNumberOfTuples(num);
+  for (idx = 0; idx < num; ++idx)
+    {
+    ptId = cellPtIds->GetId(idx);
+    idArray->SetComponent(idx, 0, ptId);
+    }
+  idArray->SetName("Id");
+  extractCells->GetOutput()->GetPointData()->AddArray(idArray);
+  idArray->Delete();
+  idArray = 0;
+  cellPtIds->Delete();
+  cellPtIds = 0;
+  
+  // Add an array that shows which part this point comes from.
+  if (this->GetNumberOfInputs() > 1)
+    {
+    vtkIntArray* partArray = vtkIntArray::New();
+    partArray->SetNumberOfTuples(1);
+    partArray->SetComponent(0, 0, inputIdx);
+    partArray->SetName("PartIndex");
+    extractCells->GetOutput()->GetCellData()->AddArray(partArray);
+    partArray->Delete();
+    partArray = 0;
+    }
+  // Add an array that shows which process this point comes from.
+  if (this->Controller && this->Controller->GetNumberOfProcesses() > 1)
+    {
+    vtkIntArray* procArray = vtkIntArray::New();
+    procArray->SetNumberOfTuples(1);
+    procArray->SetComponent(0, 0, this->Controller->GetLocalProcessId());
+    procArray->SetName("Process");
+    extractCells->GetOutput()->GetCellData()->AddArray(procArray);
+    procArray->Delete();
+    procArray = 0;
+    }
+
+  append->AddInput(extractCells->GetOutput());
+  extractCells->Delete();
+  inputCopy->Delete();
+  return 1;
+}
 
