@@ -132,7 +132,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.2");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.2.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -421,7 +421,13 @@ void vtkPVClientServerModule::ConnectToRemote()
     {
     start = 1;
     }
-  while (!comm->ConnectTo(this->HostName, this->Port))
+  int port = this->Port;
+  if(this->RenderServerMode && !this->ClientMode)
+    {
+    port = this->RenderServerPort;
+    }
+  cout << "Connect to " << this->HostName << ":" << port << endl;
+  while (!comm->ConnectTo(this->HostName, port))
     {  
     // Do not bother trying to start the client if reverse connection is specified.
     // only try the ConnectTo once if it is a server in reverse mode
@@ -430,7 +436,7 @@ void vtkPVClientServerModule::ConnectToRemote()
       // This is the "reverse-connection" server condition.  
       // For now just fail if connection is not found.
       vtkErrorMacro("Server error: Could not connect to the client. " 
-                    << this->HostName << " " << this->Port);
+                    << this->HostName << " " << port);
       comm->Delete();
       commRenderServer->Delete();
       if(this->GUIHelper)
@@ -480,6 +486,8 @@ void vtkPVClientServerModule::ConnectToRemote()
   
   if(this->ClientMode && this->RenderServerMode)
     {
+    cout << "Connect to " << this->RenderServerHostName << ":" 
+         << this->RenderServerPort << endl;
     if(commRenderServer->ConnectTo(this->RenderServerHostName, this->RenderServerPort))
       {
       this->RenderServerSocket = vtkSocketController::New();
@@ -516,16 +524,33 @@ void vtkPVClientServerModule::ConnectToRemote()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SetupWaitForConnection()
 {
+  int needTwoSockets = 0;
+  if(this->RenderServerMode && this->ClientMode)
+    {
+    needTwoSockets = 1;
+    this->RenderServerSocket = vtkSocketController::New();
+    }
+  
   this->SocketController = vtkSocketController::New();
   this->SocketController->Initialize();
   this->ProgressHandler->SetSocketController(this->SocketController);
   vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
-  
+  vtkSocketCommunicator* comm2 = 0;
+  int sock2 = 0;
+  if(needTwoSockets)
+    {
+    comm2 = vtkSocketCommunicator::New();
+    cout << "Listen on port: " << this->GetRenderServerPort() << endl;
+    sock2 = comm2->OpenSocket(this->GetRenderServerPort());
+    }
   int port= this->GetPort();
-  if(this->RenderServerMode)
+  if((!needTwoSockets && this->RenderServerMode) ||
+     (!this->ClientMode && this->RenderServerMode))
     {
     port = this->GetRenderServerPort();
     }
+  cout << "Listen on port: " << port << endl;
+  int sock = comm->OpenSocket(port);
   if ( this->ClientMode )
     {
     cout << "Waiting for server..." << endl;
@@ -540,13 +565,27 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     }
 
   // Establish connection
-  if (!comm->WaitForConnection(port))
+  if (!comm->WaitForConnectionOnSocket(sock))
     {
     vtkErrorMacro("Wait timed out or could not initialize socket.");
     comm->Delete();
     this->ReturnValue = 1;
     return;
     }
+  cout << "connected to port " << port << "\n";
+    // Establish connection
+  if (comm2 && !comm2->WaitForConnectionOnSocket(sock2))
+    {
+    vtkErrorMacro("Wait timed out or could not initialize render server socket.");
+    comm->Delete();
+    this->ReturnValue = 1;
+    return;
+    }
+  if(comm2)
+    {
+    cout << "connected to port " << this->GetRenderServerPort() << "\n";
+    }
+  
   if ( this->ClientMode )
     {
     cout << "Server connected." << endl;
@@ -556,8 +595,14 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     cout << "Client connected." << endl;
     }
   this->SocketController->SetCommunicator(comm);
+  if(comm2)
+    {
+    this->RenderServerSocket->SetCommunicator(comm2);
+    comm2->Delete();
+    comm2 = 0;
+    }
   comm->Delete();
-  comm = NULL;
+  comm = 0;
 }
 
 
@@ -1007,22 +1052,17 @@ void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
   this->Interpreter->ProcessStream(msg, len);
 }
 
+  
 //----------------------------------------------------------------------------
-const vtkClientServerStream& vtkPVClientServerModule::GetLastClientResult()
-{
-  return this->Superclass::GetLastServerResult();
-}
-
-//----------------------------------------------------------------------------
-const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
+const vtkClientServerStream& vtkPVClientServerModule::GetLastDataServerResult()
 {
   if(!this->ClientMode)
     {
-    vtkErrorMacro("GetLastServerResult() should not be called on the server.");
+    vtkErrorMacro("GetLastDataServerResult() should not be called on the server.");
     this->LastServerResultStream->Reset();
     *this->LastServerResultStream
       << vtkClientServerStream::Error
-      << "vtkPVClientServerModule::GetLastServerResult() should not be called on the server."
+      << "vtkPVClientServerModule::GetLastDataServerResult() should not be called on the server."
       << vtkClientServerStream::End;
     return *this->LastServerResultStream;
     }
@@ -1034,12 +1074,45 @@ const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
     this->LastServerResultStream->Reset();
     *this->LastServerResultStream
       << vtkClientServerStream::Error
-      << "vtkPVClientServerModule::GetLastServerResult() received no data from the server."
+      << "vtkPVClientServerModule::GetLastDataServerResult() received no data from the server."
       << vtkClientServerStream::End;
     return *this->LastServerResultStream;
     }
   unsigned char* result = new unsigned char[length];
   this->SocketController->Receive((char*)result, length, 1, VTK_PV_ROOT_RESULT_TAG);
+  this->LastServerResultStream->SetData(result, length);
+  delete [] result;
+  return *this->LastServerResultStream;
+}
+
+  
+//----------------------------------------------------------------------------
+const vtkClientServerStream& vtkPVClientServerModule::GetLastRenderServerResult()
+{
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("GetLastRenderServerResult() should not be called on the server.");
+    this->LastServerResultStream->Reset();
+    *this->LastServerResultStream
+      << vtkClientServerStream::Error
+      << "vtkPVClientServerModule::GetLastRenderServerResult() should not be called on the server."
+      << vtkClientServerStream::End;
+    return *this->LastServerResultStream;
+    }
+  int length;
+  this->RenderServerSocket->TriggerRMI(1, "", VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
+  this->RenderServerSocket->Receive(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
+  if(length <= 0)
+    {
+    this->LastServerResultStream->Reset();
+    *this->LastServerResultStream
+      << vtkClientServerStream::Error
+      << "vtkPVClientServerModule::GetLastRenderServerResult() received no data from the server."
+      << vtkClientServerStream::End;
+    return *this->LastServerResultStream;
+    }
+  unsigned char* result = new unsigned char[length];
+  this->RenderServerSocket->Receive((char*)result, length, 1, VTK_PV_ROOT_RESULT_TAG);
   this->LastServerResultStream->SetData(result, length);
   delete [] result;
   return *this->LastServerResultStream;

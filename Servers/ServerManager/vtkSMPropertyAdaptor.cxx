@@ -31,7 +31,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPropertyAdaptor);
-vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.2");
+vtkCxxRevisionMacro(vtkSMPropertyAdaptor, "1.2.2.1");
 
 //---------------------------------------------------------------------------
 vtkSMPropertyAdaptor::vtkSMPropertyAdaptor()
@@ -292,6 +292,24 @@ unsigned int vtkSMPropertyAdaptor::GetNumberOfElements()
   if (this->StringVectorProperty)
     {
     return this->StringVectorProperty->GetNumberOfElements();
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMPropertyAdaptor::GetEnumerationElementIndex(const char* element)
+{
+  if ( !element )
+    {
+    return 0;
+    }
+  unsigned int cc;
+  for ( cc = 0; cc < this->GetNumberOfEnumerationEntries(); cc ++ )
+    {
+    if ( strcmp(element, this->GetEnumerationValue(cc)) == 0 )
+      {
+      return cc;
+      }
     }
   return 0;
 }

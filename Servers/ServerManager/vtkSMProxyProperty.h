@@ -119,7 +119,7 @@ protected:
 
   // Description:
   // Saves the state of the object in XML format. 
-  virtual void SaveState(const char* name,  ofstream* file, vtkIndent indent);
+  virtual void SaveState(const char* name,  ostream* file, vtkIndent indent);
 
   // Previous proxies are used by the ProxyProperty internally.
   // All proxies added with AddProxy() will become "consumers" of

@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.9.2.1");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.9.2.2");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -232,7 +232,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
 
   this->ScalarOpacityRampLabel = vtkKWLabel::New();
   this->ScalarOpacityRampLabel->SetParent( this->ScalarOpacityFrame->GetFrame() );
-  this->ScalarOpacityRampLabel->Create( this->GetApplication(), "" );
+  this->ScalarOpacityRampLabel->Create( this->GetApplication(), "-anchor w");
   this->ScalarOpacityRampLabel->SetLabel("Scalar Opacity Ramp:");
   this->ScalarOpacityRampLabel->SetBalloonHelpString(
     "Set the range for the scalar opacity ramp used to display the volume rendered data." );
@@ -245,7 +245,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   
   this->ScalarOpacityStartValueLabel = vtkKWLabel::New();
   this->ScalarOpacityStartValueLabel->SetParent( this->ScalarOpacityFrame->GetFrame() );
-  this->ScalarOpacityStartValueLabel->Create( this->GetApplication(), "" );
+  this->ScalarOpacityStartValueLabel->Create( this->GetApplication(), "-anchor w");
   this->ScalarOpacityStartValueLabel->SetLabel("Ramp Start Opacity:");  
   
   this->ScalarOpacityStartValueScale = vtkKWScale::New();
@@ -260,7 +260,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   
   this->ScalarOpacityEndValueLabel = vtkKWLabel::New();
   this->ScalarOpacityEndValueLabel->SetParent( this->ScalarOpacityFrame->GetFrame() );
-  this->ScalarOpacityEndValueLabel->Create( this->GetApplication(), "" );
+  this->ScalarOpacityEndValueLabel->Create( this->GetApplication(), "-anchor w" );
   this->ScalarOpacityEndValueLabel->SetLabel("Ramp End Opacity:");  
 
   this->ScalarOpacityEndValueScale = vtkKWScale::New();
@@ -275,8 +275,8 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
 
   this->ScalarOpacityUnitDistanceLabel = vtkKWLabel::New();
   this->ScalarOpacityUnitDistanceLabel->SetParent( this->ScalarOpacityFrame->GetFrame() );
-  this->ScalarOpacityUnitDistanceLabel->Create( this->GetApplication(), "" );
-  this->ScalarOpacityUnitDistanceLabel->SetLabel("Unit Distance");
+  this->ScalarOpacityUnitDistanceLabel->Create( this->GetApplication(), "-anchor w" );
+  this->ScalarOpacityUnitDistanceLabel->SetLabel("Unit Distance:");
   
   this->ScalarOpacityUnitDistanceScale = vtkKWScale::New();
   this->ScalarOpacityUnitDistanceScale->SetParent( this->ScalarOpacityFrame->GetFrame() );
@@ -307,9 +307,12 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
                this->ScalarOpacityUnitDistanceLabel->GetWidgetName(),
                this->ScalarOpacityUnitDistanceScale->GetWidgetName() );
 
+  this->Script("grid columnconfigure %s 1 -weight 1",
+               this->ScalarOpacityRampLabel->GetParent()->GetWidgetName());
+
   this->ColorRampLabel = vtkKWLabel::New();
   this->ColorRampLabel->SetParent( this->ColorFrame->GetFrame() );
-  this->ColorRampLabel->Create( this->GetApplication(), "" );
+  this->ColorRampLabel->Create( this->GetApplication(), "-anchor w" );
   this->ColorRampLabel->SetLabel("Color Ramp:");
   this->ColorRampLabel->SetBalloonHelpString(
     "Set the range for the color ramp used to display the volume rendered data." );
@@ -363,6 +366,8 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   this->Script("grid %s -columnspan 2 -sticky nsew -padx 2 -pady 2", 
                this->ColorEditorFrame->GetWidgetName());
   
+  this->Script("grid columnconfigure %s 1 -weight 1",
+               this->ColorRampLabel->GetParent()->GetWidgetName());
   
   // Back button
   this->BackButton = vtkKWPushButton::New();
@@ -374,24 +379,6 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
                this->ScalarOpacityFrame->GetWidgetName(),
                this->ColorFrame->GetWidgetName(),
                this->BackButton->GetWidgetName());
-  
-
-  int weights[2];
-  weights[0] = 0;
-  weights[1] = 1;  
-
-  float factors[2];
-  factors[0] = 1.5;
-  factors[1] = 1.0;
-  
-  const char *widgets[2];
-  widgets[0] = this->ScalarOpacityFrame->GetFrame()->GetWidgetName();
-  widgets[1] = this->ColorFrame->GetFrame()->GetWidgetName();
-  
-  vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
-    pvApp->GetMainInterp(), 2, widgets, NULL, NULL);
-    
-
 }
 
 

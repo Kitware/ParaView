@@ -2,18 +2,16 @@ SET(TEST_PATH "ParaView")
 # initialize these to emtpy
 SET(PARAVIEW_MPI_RUN_ONE )
 SET(PARAVIEW_CS_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver)
+# always use pvTestDriver so that per test timeouts can be done
+SET(PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver)
+# the default timeout to use
+SET (TIMEOUT)
+#SET (TIMEOUT --timeout 100)
 IF (VTK_USE_MPI)
   SEPARATE_ARGUMENTS(VTK_MPI_PREFLAGS)
   SEPARATE_ARGUMENTS(VTK_MPI_POSTFLAGS)
   IF (VTK_MPIRUN_EXE)
     SET(PARAVIEW_MPI_POST_FLAGS ${VTK_MPI_POSTFLAGS})
-    # This is the tricky part.
-    # if we have mpirun, then do not run paraview directly,
-    # because some mpi implementations require that mpi programs
-    # be run only with mpirun.  So change the paraview executable
-    # to be pvTestDriver instead of paraview.  The pvTestDriver
-    # command knows about mpi and will use the correct mpi settings.
-    # These are configured into pvTestDriverConfig.h.
     SET(PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/pvTestDriver)
     # some runs of paraview must never be run with more than one mpi
     # process.  This is a special option to pvTestDriver that forces
@@ -92,7 +90,9 @@ ENDIF(VTK_USE_MPI)
 
 FOREACH (tfile ${PROJECT_TESTS})
   ADD_TEST(${tfile}-ParaView 
-    ${PARAVIEW_EXECUTABLE} --disable-registry
+    ${PARAVIEW_EXECUTABLE} 
+    ${TIMEOUT}
+    --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
     -D ${PVClientTestData}
     -C ${PVCompareImages}
@@ -102,7 +102,9 @@ FOREACH (tfile ${PROJECT_TESTS})
   # repeat test in composite mode if test composite is on
   IF (PARAVIEW_TEST_COMPOSITING)
     ADD_TEST(${tfile}-ParaView-COMPOSITE-MPI 
-      ${PARAVIEW_EXECUTABLE} --disable-registry 
+      ${PARAVIEW_EXECUTABLE}     
+      ${TIMEOUT}
+      --disable-registry 
       ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
       -UC
       -D ${PVClientTestData}
@@ -115,6 +117,7 @@ FOREACH (tfile ${PROJECT_TESTS})
   ADD_TEST("${tfile}ClientServer-ParaView" 
     ${PARAVIEW_CS_EXECUTABLE} 
     --test-server
+    ${TIMEOUT}
     --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
     -D ${PVClientTestData}
@@ -125,6 +128,7 @@ FOREACH (tfile ${PROJECT_TESTS})
   ADD_TEST("${tfile}RenderServer-ParaView" 
     ${PARAVIEW_CS_EXECUTABLE}
     --test-render-server
+    ${TIMEOUT}
     --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
     -D ${PVClientTestData}
@@ -132,6 +136,67 @@ FOREACH (tfile ${PROJECT_TESTS})
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
     -V ${PVClientTestData}/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
+
+# add some tests for the various ways that connections 
+# can be made
+
+# test render server with a reverse connection
+# between the servers and the client.  The client
+# will start first and wait for the servers to connect to it.
+ADD_TEST("ArrowRenderServer-ParaView-rc" 
+  ${PARAVIEW_CS_EXECUTABLE}
+  --test-render-server
+  --test-rc
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/Arrow.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/Arrow.png)
+
+# test the render server where the render server
+# connects to the data server, the default is for the
+# data server to connect to the render server
+ADD_TEST("ArrowRenderServer-ParaView-r2d" 
+  ${PARAVIEW_CS_EXECUTABLE}
+  --test-r2d
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/Arrow.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/Arrow.png)
+
+# same test as -r2d, but this time do a reverse
+# connection between the servers and the client like
+# the -rc test
+ADD_TEST("ArrowRenderServer-ParaView-r2d-rc" 
+  ${PARAVIEW_CS_EXECUTABLE}
+  --test-r2d 
+  --test-rc
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/Arrow.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/Arrow.png)
+
+# test the reverse connection for one server
+# and no render server
+ADD_TEST("ArrowServer-ParaView-rc" 
+  ${PARAVIEW_CS_EXECUTABLE}
+  --test-server
+  --test-rc
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/Arrow.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/Arrow.png)
 
 # remove the following for the batch tests
 REMOVE (PROJECT_TESTS
@@ -146,7 +211,10 @@ REMOVE (PROJECT_TESTS
 FOREACH (tfile ${PROJECT_TESTS})
   # test batch
   ADD_TEST(${tfile}-batch-ParaView 
-    ${PARAVIEW_EXECUTABLE} ${PARAVIEW_MPI_RUN_ONE} --disable-registry
+    ${PARAVIEW_EXECUTABLE}     
+    ${TIMEOUT}
+    ${PARAVIEW_MPI_RUN_ONE} 
+    --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
     -D ${PVClientTestData}
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
@@ -179,14 +247,19 @@ FOREACH(test otherPrint TestSetGet)
 ENDFOREACH(test)
 
 ADD_TEST(OtherTests-ParaView 
-  ${PARAVIEW_EXECUTABLE} ${PARAVIEW_MPI_RUN_ONE} --disable-registry --start-empty
+  ${PARAVIEW_EXECUTABLE} 
+  ${TIMEOUT}
+  ${PARAVIEW_MPI_RUN_ONE} --disable-registry --start-empty
   ${PVClientTests_SOURCE_DIR}/Tcl/Other.pvs
   -D ${PVClientTestData}
   -A ${VTK_TCL_HOME}
   )
 
 ADD_TEST (AnimationImages-ParaView 
-  ${PARAVIEW_EXECUTABLE} ${PARAVIEW_MPI_RUN_ONE} --disable-registry
+  ${PARAVIEW_EXECUTABLE} 
+  ${TIMEOUT}
+  ${PARAVIEW_MPI_RUN_ONE} 
+  --disable-registry
   ${PVClientTests_SOURCE_DIR}/Tcl/AnimationImages.pvs
   -D ${PVClientTestData}
   -T ${ParaView_BINARY_DIR}/Testing/Temporary

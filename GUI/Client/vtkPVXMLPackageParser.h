@@ -29,7 +29,6 @@ class vtkArrayMap;
 class vtkPVSource;
 class vtkPVWindow;
 class vtkPVWidget;
-class vtkPVInputRequirement;
 
 class VTK_EXPORT vtkPVXMLPackageParser : public vtkPVXMLParser
 {
@@ -83,7 +82,6 @@ protected:
 private:
   // Used by GetPVWidget.  Do not call directly.
   vtkPVWidget* CreatePVWidget(vtkPVXMLElement* element);
-  vtkPVInputRequirement* CreatePVInputRequirement(vtkPVXMLElement* element);
 
 private:
   vtkPVXMLPackageParser(const vtkPVXMLPackageParser&);  // Not implemented.

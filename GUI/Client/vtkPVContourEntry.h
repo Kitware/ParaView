@@ -23,7 +23,6 @@
 #include "vtkPVValueList.h"
 
 class vtkPVArrayMenu;
-class vtkPVWidgetProperty;
 
 class VTK_EXPORT vtkPVContourEntry : public vtkPVValueList
 {
@@ -33,15 +32,13 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
+  // Called when the Accept button is pressed.
+  virtual void Accept();
+
+  // Description:
   // We need to make the callback here so the animation selection
   // can be traced properly.
   void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
-
-  //BTX
-  // Description:
-  // Gets called when the accept button is pressed.
-  virtual void AcceptInternal(vtkClientServerID);
-  //ETX
 
   // Description:
   // Gets called when the reset button is pressed.
@@ -53,20 +50,6 @@ public:
   virtual void SetArrayMenu(vtkPVArrayMenu*);
   vtkGetObjectMacro(ArrayMenu, vtkPVArrayMenu);
 
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
-  // Description:
-  // Get the VTK commands.
-  vtkSetStringMacro(SetNumberCommand);
-  vtkSetStringMacro(SetContourCommand);
-  
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -85,11 +68,6 @@ protected:
   ~vtkPVContourEntry();
   
   vtkPVArrayMenu *ArrayMenu;
-  
-  void UpdateProperty();
-
-  char *SetNumberCommand;
-  char *SetContourCommand;
   
   virtual int ComputeWidgetRange();
   

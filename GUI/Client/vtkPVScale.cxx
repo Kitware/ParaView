@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.42");
+vtkCxxRevisionMacro(vtkPVScale, "1.42.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -285,6 +285,14 @@ void vtkPVScale::Accept()
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
 
+  if (!dvp && !ivp)
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
+    }
+
   if (this->EntryFlag)
     {
     float entryValue;
@@ -359,9 +367,18 @@ void vtkPVScale::ResetInternal()
     pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
                     << str.str() << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+    if (ivp)
+      {
+      int range[2] = { 0, 0 };
+      pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0, range, 2);
+      this->Scale->SetRange(range[0], range[1]);
+      }
+    else if (dvp)
+      {
     double range[2] = { 0, 0 };
-    pm->GetLastServerResult().GetArgument(0,0, range, 2);
-    this->Scale->SetRange(range);
+      pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0, range, 2);
+      this->Scale->SetRange(range[0], range[1]);
+      }
     }
 
   if (dvp)
@@ -526,6 +543,7 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   
   ai->SetCurrentSMProperty(prop);
   ai->SetCurrentSMDomain(dom);
+  ai->SetAnimationElement(0);
   
   if (dom)
     {
@@ -541,6 +559,11 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
         ai->SetTimeStart(min);
         ai->SetTimeEnd(max);
         }
+      else
+        {
+        ai->SetTimeStart(this->GetRangeMin());
+        ai->SetTimeEnd(this->GetRangeMax());
+        }
       }
     else if (dDom)
       {
@@ -550,6 +573,11 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
         {
         ai->SetTimeStart(min);
         ai->SetTimeEnd(max);
+        }
+      else
+        {
+        ai->SetTimeStart(this->GetRangeMin());
+        ai->SetTimeEnd(this->GetRangeMax());
         }
       }
     }

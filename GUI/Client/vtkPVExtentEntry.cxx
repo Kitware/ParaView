@@ -30,13 +30,15 @@
 #include "vtkPVMinMax.h"
 #include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVExtentWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMExtentDomain.h"
+#include "vtkSMIntRangeDomain.h"
+#include "vtkSMIntVectorProperty.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.39");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.39.2.1");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -57,8 +59,6 @@ vtkPVExtentEntry::vtkPVExtentEntry()
 
   this->Range[0] = this->Range[2] = this->Range[4] = -VTK_LARGE_INTEGER;
   this->Range[1] = this->Range[3] = this->Range[5] = VTK_LARGE_INTEGER;
-
-  this->Property = NULL;
 
   this->AnimationAxis = 0;
   this->UseCellExtent = 0;
@@ -82,8 +82,6 @@ vtkPVExtentEntry::~vtkPVExtentEntry()
     this->MinMax[i]->Delete();
     this->MinMax[i] = 0;
     }
-  
-  this->SetProperty(NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -91,15 +89,36 @@ void vtkPVExtentEntry::Update()
 {
   this->Superclass::Update();
 
-  vtkPVSource *input = this->InputMenu->GetCurrentValue();
-  if (input == NULL)
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMExtentDomain *dom = 0;
+  
+  if (prop)
+    {
+    dom = vtkSMExtentDomain::SafeDownCast(prop->GetDomain("extent"));
+    }
+  
+  if (!prop || !dom)
     {
     this->SetRange(0, 0, 0, 0, 0, 0);
     this->SetValue(0, 0, 0, 0, 0, 0);
     }
   else
     {
-    int *ext = input->GetDataInformation()->GetExtent();
+    int ext[6], i, exists;
+    for (i = 0; i < 3; i++)
+      {
+      ext[2*i] = dom->GetMinimum(i, exists);
+      if (!exists)
+        {
+        ext[2*i] = 0;
+        }
+      ext[2*i+1] = dom->GetMaximum(i, exists);
+      if (!exists)
+        {
+        ext[2*i+1] = 0;
+        }
+      }
+    
     if (!this->UseCellExtent)
       {
       this->SetRange(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
@@ -223,31 +242,68 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::SaveInBatchScript(ofstream *file)
 {
-  int cc;
-  for ( cc = 0; cc < this->Property->GetNumberOfScalars(); cc ++ )
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  
+  if (sourceID.ID == 0 || !this->SMPropertyName)
     {
-    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-          <<  " GetProperty " << this->VariableName << "] SetElement "
-          << cc << " " << this->Property->GetScalar(cc) << endl;
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
+    }
+  
+  int cc;
+  for (cc = 0; cc < 3; cc++)
+    {
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+          << this->SMPropertyName << "] SetElement " << 2*cc << " "
+          << this->MinMax[cc]->GetMinValue() << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+          << this->SMPropertyName << "] SetElement " << 2*cc+1 << " "
+          << this->MinMax[cc]->GetMaxValue() << endl;
     }
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVExtentEntry::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVExtentEntry::Accept()
 {
-  float values[6];
-  values[0] = this->MinMax[0]->GetMinValue();
-  values[1] = this->MinMax[0]->GetMaxValue();
-  values[2] = this->MinMax[1]->GetMinValue();
-  values[3] = this->MinMax[1]->GetMaxValue();
-  values[4] = this->MinMax[2]->GetMinValue();
-  values[5] = this->MinMax[2]->GetMaxValue();
+  int modFlag = this->GetModifiedFlag();
+  int i;
+  
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (ivp)
+    {
+    ivp->SetNumberOfElements(6);
+    for (i = 0; i < 3; i++)
+      {
+      ivp->SetElement(2*i, static_cast<int>(this->MinMax[i]->GetMinValue()));
+      ivp->SetElement(2*i+1, static_cast<int>(this->MinMax[i]->GetMaxValue()));
+      }
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
+    }
 
-  this->Property->SetVTKSourceID(sourceID);
-  this->Property->SetScalars(6, values);
-  this->Property->AcceptInternal();
   
   this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -275,14 +331,22 @@ void vtkPVExtentEntry::ResetInternal()
     return;
     }
 
-  float *values = this->Property->GetScalars();
-  this->SetValue(static_cast<int>(values[0]), static_cast<int>(values[1]),
-                 static_cast<int>(values[2]), static_cast<int>(values[3]),
-                 static_cast<int>(values[4]), static_cast<int>(values[5]));
-  
   if (this->AcceptCalled)
     {
+    vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->GetSMProperty());
+    if (ivp)
+      {
+      this->SetValue(ivp->GetElement(0), ivp->GetElement(1),
+                     ivp->GetElement(2), ivp->GetElement(3),
+                     ivp->GetElement(4), ivp->GetElement(5));
+      }
+  
     this->ModifiedFlag = 0;
+    }
+  else
+    {
+    this->Update();
     }
 }
 
@@ -330,65 +394,22 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
   if (v5 < range[0]) {v5 = static_cast<int>(range[0]);}
   if (v5 > range[1]) {v5 = static_cast<int>(range[1]);}
 
-  float values[6];
-  
   if ( v1 >= v0 )
     {
-    if ( (float)v1 < this->MinMax[0]->GetMinValue() )
-      {
       this->MinMax[0]->SetMinValue(v0);
       this->MinMax[0]->SetMaxValue(v1);
-      values[0] = v0;
-      values[1] = v1;
-      }
-    else
-      {
-      this->MinMax[0]->SetMaxValue(v1);
-      this->MinMax[0]->SetMinValue(v0);
-      values[0] = v1;
-      values[1] = v0;
-      }
     }
 
   if ( v3 >= v2 )
     {
-    if ( (float)v3 < this->MinMax[1]->GetMinValue() )
-      {
       this->MinMax[1]->SetMinValue(v2);
       this->MinMax[1]->SetMaxValue(v3);
-      values[2] = v2;
-      values[3] = v3;
-      }
-    else
-      {
-      this->MinMax[1]->SetMaxValue(v3);
-      this->MinMax[1]->SetMinValue(v2);
-      values[2] = v3;
-      values[3] = v2;
-      }
     }
 
   if ( v5 >= v4 )
     {
-    if ( (float)v5 < this->MinMax[2]->GetMinValue() )
-      {
       this->MinMax[2]->SetMinValue(v4);
       this->MinMax[2]->SetMaxValue(v5);
-      values[4] = v4;
-      values[5] = v5;
-      }
-    else
-      {
-      this->MinMax[2]->SetMaxValue(v5);
-      this->MinMax[2]->SetMinValue(v4);
-      values[4] = v5;
-      values[5] = v4;
-      }
-    }
-  
-  if (!this->AcceptCalled)
-    {
-    this->Property->SetScalars(6, values);
     }
   
   this->ModifiedCallback();
@@ -407,75 +428,94 @@ void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   cascadeMenu->Create(this->GetApplication(), "-tearoff 0");
   menu->AddCascade(this->GetTraceName(), cascadeMenu, 0,
                              "Choose a plane of the extent to animate.");  
-  // X
+  // i min
   sprintf(methodAndArgs, "AnimationMenuCallback %s 0", ai->GetTclName());
-  cascadeMenu->AddCommand("X Axis", this, methodAndArgs, 0, "");
-  // Y
+  cascadeMenu->AddCommand("I Min", this, methodAndArgs, 0, "");
+  // i max
   sprintf(methodAndArgs, "AnimationMenuCallback %s 1", ai->GetTclName());
-  cascadeMenu->AddCommand("Y Axis", this, methodAndArgs, 0, "");
-  // Z
+  cascadeMenu->AddCommand("I Max", this, methodAndArgs, 0, "");
+  // j min
   sprintf(methodAndArgs, "AnimationMenuCallback %s 2", ai->GetTclName());
-  cascadeMenu->AddCommand("Z Axis", this, methodAndArgs, 0, "");
+  cascadeMenu->AddCommand("J Min", this, methodAndArgs, 0, "");
+  // j max
+  sprintf(methodAndArgs, "AnimationMenuCallback %s 3", ai->GetTclName());
+  cascadeMenu->AddCommand("J Max", this, methodAndArgs, 0, "");
+  // k min
+  sprintf(methodAndArgs, "AnimationMenuCallback %s 4", ai->GetTclName());
+  cascadeMenu->AddCommand("K Min", this, methodAndArgs, 0, "");
+  // k min
+  sprintf(methodAndArgs, "AnimationMenuCallback %s 5", ai->GetTclName());
+  cascadeMenu->AddCommand("K Max", this, methodAndArgs, 0, "");
 
   cascadeMenu->Delete();
   cascadeMenu = NULL;
+
+  vtkSMProperty *prop = this->GetSMProperty();
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(prop->GetDomain("extent"));
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
                                              int mode)
 {
-  int ext[6];
-
   if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) %d", 
       this->GetTclName(), ai->GetTclName(), mode);
     }
 
-
-  // Get the whole extent to set up defaults.
-  // Now I can imagine that we will need a more flexible way of getting 
-  // the whole extent from sources (in the future.
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << this->ObjectID << "GetInput"
-                  << vtkClientServerStream::End
-                  << vtkClientServerStream::Invoke
-                  << vtkClientServerStream::LastResult << "GetWholeExtent"
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-  if(!pm->GetLastServerResult().GetArgument(0, 0, ext, 6))
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMExtentDomain *dom = 0;
+  if (prop)
     {
-    vtkErrorMacro("Bad return value from GetWholeExtent");
+    dom = vtkSMExtentDomain::SafeDownCast(prop->GetDomain("extent"));
     }
 
-  if (mode == 0)
+  if (!prop || !dom)
     {
-    ai->SetLabelAndScript("X Axis", NULL, this->GetTraceName());
-    ai->SetTimeStart(ext[0]);
-    ai->SetTimeEnd(ext[1]);
+    vtkErrorMacro("Error getting extent domain.");
+    return;
     }
-  else if (mode == 1)
+  
+  int exists = 0, val;
+
+  switch (mode)
     {
-    ai->SetLabelAndScript("Y Axis", NULL, this->GetTraceName());
-    ai->SetTimeStart(ext[2]);
-    ai->SetTimeEnd(ext[3]);
-    }
-  else if (mode == 2)
-    {
-    ai->SetLabelAndScript("Z Axis", NULL, this->GetTraceName());
-    ai->SetTimeStart(ext[4]);
-    ai->SetTimeEnd(ext[5]);
-    }
-  else
-    {
-    vtkErrorMacro("Bad extent animation mode.");
+    case 0:
+      ai->SetLabelAndScript("I Min", NULL, this->GetTraceName());
+      break;
+    case 1:
+      ai->SetLabelAndScript("I Max", NULL, this->GetTraceName());
+      break;
+    case 2:
+      ai->SetLabelAndScript("J Min", NULL, this->GetTraceName());
+      break;
+    case 3:
+      ai->SetLabelAndScript("J Max", NULL, this->GetTraceName());
+      break;
+    case 4:
+      ai->SetLabelAndScript("K Min", NULL, this->GetTraceName());
+      break;
+    case 5:
+      ai->SetLabelAndScript("K Max", NULL, this->GetTraceName());
+      break;
+    default:
+      vtkErrorMacro("Bad animation extent");
+      return;
     }
 
-  this->SetAnimationAxis(mode);
-  ai->SetCurrentProperty(this->Property);
+  val = dom->GetMinimum(mode/2, exists);
+  if (exists)
+    {
+    ai->SetTimeStart(val);
+    }
+  val = dom->GetMaximum(mode/2, exists);
+  if (exists)
+    {
+    ai->SetTimeEnd(val);
+    }
+  ai->SetAnimationElement(mode);
   ai->Update();
 }
 
@@ -564,32 +604,6 @@ int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   imw->Delete();
 
   return 1;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVExtentEntry::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVExtentWidgetProperty::SafeDownCast(prop);
-  if (this->Property)
-    {
-    char *cmd = new char[strlen(this->VariableName)+4];
-    sprintf(cmd, "Set%s", this->VariableName);
-    int numScalars = 6;
-    this->Property->SetVTKCommands(1, &cmd, &numScalars);
-    delete [] cmd;
-    }
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVExtentEntry::GetProperty()
-{
-  return this->Property;
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVExtentEntry::CreateAppropriateProperty()
-{
-  return vtkPVExtentWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------

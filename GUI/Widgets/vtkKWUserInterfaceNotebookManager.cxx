@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.24");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.24.2.1");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -398,6 +398,7 @@ int vtkKWUserInterfaceNotebookManager::HidePanel(
     return 0;
     }
 
+  this->Notebook->UnpinPagesMatchingTag(tag);
   this->Notebook->HidePagesMatchingTag(tag);
 
   return 1;

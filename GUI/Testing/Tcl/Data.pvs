@@ -17,7 +17,7 @@ if {[info exists argc]} {
 } 
 
 $kw(vtkTemp44) SetOrientationAxesVisibility 0
-$kw(vtkTemp44) SetBackgroundColor 0 0 0
+$kw(vtkTemp44) SetRendererBackgroundColor 0 0 0
 set kw(vtkTemp92) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set kw(vtkTemp96) [$kw(vtkTemp1) GetPVSource GlyphSources Cone0]
 set kw(vtkTemp100) [$kw(vtkTemp1) GetPVSource GlyphSources Sphere0]
@@ -42,8 +42,6 @@ set kw(vtkTemp193) [$kw(vtkTemp186) GetPVWidget {Scalars}]
 $kw(vtkTemp193) SetValue scalars
 set kw(vtkTemp196) [$kw(vtkTemp186) GetPVWidget {Contour Values}]
 $kw(vtkTemp196) RemoveAllValues
-$kw(vtkTemp196) AddValue 0.100000
-$kw(vtkTemp196) AddValue 0.300000
 $kw(vtkTemp196) AddValue 0.500000
 $kw(vtkTemp196) AddValue 0.700000
 $kw(vtkTemp196) AddValue 0.900000

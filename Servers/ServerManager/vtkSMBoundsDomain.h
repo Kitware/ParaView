@@ -12,8 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBoundsDomain -
+// .NAME vtkSMBoundsDomain - double range domain based on data set bounds
 // .SECTION Description
+// vtkSMBoundsDomain is a subclass of vtkSMDoubleRangeDomain. In its Update
+// method, it determines the minimum and maximum coordinates of each dimension
+// of the bounding  box of the data set with which it is associated. It
+// requires a vtkSMSourceProxy to do this.
 // .SECTION See Also
 // vtkSMDoubleRangeDomain
 
@@ -36,12 +40,32 @@ public:
   // properties. Overwritten by sub-classes.
   virtual void Update(vtkSMProperty*);
 
+  // Description:
+  vtkSetClampMacro(Mode, int, 0, 1);
+  vtkGetMacro(Mode, int);
+
+//BTX
+  enum Modes
+  {
+    NORMAL,
+    MAGNITUDE
+  };
+//ETX
+
 protected:
   vtkSMBoundsDomain();
   ~vtkSMBoundsDomain();
 
   void Update(vtkSMProxyProperty *pp);
+
+  // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
   
+  int Mode;
+
+  virtual void SaveState(const char*, ostream*, vtkIndent) {}
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented
   void operator=(const vtkSMBoundsDomain&); // Not implemented

@@ -30,7 +30,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.43");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.43.2.1");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -146,7 +146,7 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
                     << tmpID << "CanReadFile" << fname
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER);
-    pm->GetLastServerResult().GetArgument(0, 0, &canRead);
+    pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &canRead);
     pm->DeleteStreamObject(tmpID);
     pm->GetStream() << vtkClientServerStream::Invoke
                     << pm->GetProcessModuleID()

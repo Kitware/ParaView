@@ -21,11 +21,10 @@
 #include "vtkClientServerStream.h"
 
 #include "vtkPVObjectWidget.h"
-#include "vtkPVSelectTimeSet.h"
 #include "vtkPVSource.h"
 
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.12");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.12.2.1");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -163,13 +162,6 @@ void vtkPVScalarListWidgetProperty::SetAnimationTimeInBatch(
       *file << "[$pvTemp" << ov->GetPVSource()->GetVTKSourceID(0)
             << " GetProperty " << ov->GetVariableName()
             << "] SetElement 0 $value"<< endl;
-      }
-    vtkPVSelectTimeSet* st = vtkPVSelectTimeSet::SafeDownCast(this->Widget);
-    if (st)
-      {
-      *file << "[$pvTemp" << st->GetPVSource()->GetVTKSourceID(0)
-            << " GetProperty " << st->GetSetCommand()
-            << "] SetElement 0 [expr round(" << val << ")]" << endl;
       }
     *file << "$pvTemp" << this->Widget->GetPVSource()->GetVTKSourceID(0)
           << " UpdateVTKObjects" << endl;

@@ -46,7 +46,7 @@ protected:
   // Description:
   // Saves the state of the object in XML format. Should
   // be overwritten by proxies and properties.
-  virtual void SaveState(const char*, ofstream*, vtkIndent) {};
+  virtual void SaveState(const char*, ostream*, vtkIndent) {};
 
 private:
   vtkSMObject(const vtkSMObject&); // Not implemented

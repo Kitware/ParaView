@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMBoundsDomain.cxx
+  Module:    vtkSMExtentDomain.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,30 +12,29 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMBoundsDomain.h"
+#include "vtkSMExtentDomain.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVXMLElement.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 
-vtkStandardNewMacro(vtkSMBoundsDomain);
-vtkCxxRevisionMacro(vtkSMBoundsDomain, "1.2.2.1");
+vtkStandardNewMacro(vtkSMExtentDomain);
+vtkCxxRevisionMacro(vtkSMExtentDomain, "1.2");
 
 //---------------------------------------------------------------------------
-vtkSMBoundsDomain::vtkSMBoundsDomain()
-{
-  this->Mode = vtkSMBoundsDomain::NORMAL;
-}
-
-//---------------------------------------------------------------------------
-vtkSMBoundsDomain::~vtkSMBoundsDomain()
+vtkSMExtentDomain::vtkSMExtentDomain()
 {
 }
 
 //---------------------------------------------------------------------------
-void vtkSMBoundsDomain::Update(vtkSMProperty*)
+vtkSMExtentDomain::~vtkSMExtentDomain()
+{
+}
+
+//---------------------------------------------------------------------------
+void vtkSMExtentDomain::Update(vtkSMProperty*)
 {
   this->RemoveAllMinima();
   this->RemoveAllMaxima();
@@ -49,13 +48,13 @@ void vtkSMBoundsDomain::Update(vtkSMProperty*)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
+void vtkSMExtentDomain::Update(vtkSMProxyProperty *pp)
 {
   unsigned int i, j;
   unsigned int numProxs = pp->GetNumberOfUncheckedProxies();
-  for (i=0; i<numProxs; i++)
+  for (i = 0; i < numProxs; i++)
     {
-    vtkSMSourceProxy* sp = 
+    vtkSMSourceProxy* sp =
       vtkSMSourceProxy::SafeDownCast(pp->GetUncheckedProxy(i));
     if (sp)
       {
@@ -64,23 +63,12 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
         {
         return;
         }
-      double bounds[6];
-      info->GetBounds(bounds);
-      if (this->Mode == vtkSMBoundsDomain::NORMAL)
+      int extent[6];
+      info->GetExtent(extent);
+      for (j = 0; j < 3; j++)
         {
-        for (j = 0; j < 3; j++)
-          {
-          this->AddMinimum(j, bounds[2*j]);
-          this->AddMaximum(j, bounds[2*j+1]);
-          }
-        }
-      else if (this->Mode == vtkSMBoundsDomain::MAGNITUDE)
-        {
-        double magn = sqrt((bounds[1]-bounds[0]) * (bounds[1]-bounds[0]) +
-                           (bounds[3]-bounds[2]) * (bounds[3]-bounds[2]) +
-                           (bounds[5]-bounds[4]) * (bounds[5]-bounds[4]));
-        this->AddMinimum(0, -magn);
-        this->AddMaximum(0,  magn);
+        this->AddMinimum(j, extent[2*j]);
+        this->AddMaximum(j, extent[2*j+1]);
         }
       return;
       }
@@ -88,37 +76,46 @@ void vtkSMBoundsDomain::Update(vtkSMProxyProperty *pp)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMBoundsDomain::ReadXMLAttributes(
-  vtkSMProperty* prop, vtkPVXMLElement* element)
+void vtkSMExtentDomain::SetAnimationValue(vtkSMProperty *property, int idx,
+                                          double value)
 {
-  this->Superclass::ReadXMLAttributes(prop, element);
-
-  const char* mode = element->GetAttribute("mode");
-
-  if (mode)
+  int compare;
+  int animValue = (int)(floor(value));
+  
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property);
+  if (ivp)
     {
-    if (strcmp(mode, "normal") == 0)
+    switch (idx)
       {
-      this->Mode = vtkSMBoundsDomain::NORMAL;
-      }
-    else if (strcmp(mode, "magnitude") == 0)
-      {
-      this->Mode = vtkSMBoundsDomain::MAGNITUDE;
-      }
-    else
-      {
-      vtkErrorMacro("Unrecognized mode: " << mode);
-      return 0;
+      case 0:
+      case 2:
+      case 4:
+        compare = ivp->GetElement(idx+1);
+        if (animValue > compare)
+          {
+          ivp->SetElement(idx+1, animValue);
+          }
+        ivp->SetElement(idx, animValue);
+        break;
+      case 1:
+      case 3:
+      case 5:
+        compare = ivp->GetElement(idx-1);
+        if (animValue < compare)
+          {
+          ivp->SetElement(idx-1, animValue);
+          }
+        ivp->SetElement(idx, animValue);
+        break;
+      default:
+        vtkErrorMacro("Invalid extent index.");
+        break;
       }
     }
-  
-  return 1;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMBoundsDomain::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMExtentDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
-  os << indent << "Mode: " << this->Mode << endl;
 }

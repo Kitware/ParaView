@@ -20,7 +20,6 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkCollection.h"
-#include "vtkPVInputRequirement.h"
 #include "vtkPVConfig.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
@@ -30,14 +29,13 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.12");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.12.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
 {
   this->Name = NULL;
   this->Type = NULL;
-  this->Requirements = vtkCollection::New();
 }
 
 //----------------------------------------------------------------------------
@@ -45,14 +43,6 @@ vtkPVInputProperty::~vtkPVInputProperty()
 {  
   this->SetName(NULL);
   this->SetType(NULL);
-  this->Requirements->Delete();
-  this->Requirements = NULL;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVInputProperty::AddRequirement(vtkPVInputRequirement *ir)
-{
-  this->Requirements->AddItem(ir);
 }
 
 //----------------------------------------------------------------------------
@@ -83,41 +73,10 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVInputProperty::GetIsValidField(
-  int field, vtkPVDataSetAttributesInformation* fieldInfo)
-{
-  vtkPVInputRequirement *ir;
-
-  // First check the field has the correct arrays.
-  this->Requirements->InitTraversal();
-  while ( (ir = 
-           (vtkPVInputRequirement*)(this->Requirements->GetNextItemAsObject())))
-    {
-    if ( ! ir->GetIsValidField(field, fieldInfo) )
-      {
-      return 0;
-      }
-    }
-
-  return 1;
-}
-
-
-
-//----------------------------------------------------------------------------
 void vtkPVInputProperty::Copy(vtkPVInputProperty *in)
 {
   this->SetName(in->GetName());
   this->SetType(in->GetType());
-  this->Requirements->RemoveAllItems();
-  
-  vtkPVInputRequirement *ir;
-  in->Requirements->InitTraversal();
-  while ( (ir = 
-           (vtkPVInputRequirement*)(in->Requirements->GetNextItemAsObject())))
-    {
-    this->AddRequirement(ir);
-    }
 }
 
 //----------------------------------------------------------------------------

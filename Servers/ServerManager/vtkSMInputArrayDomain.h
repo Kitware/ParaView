@@ -98,7 +98,7 @@ protected:
   // be overwritten by subclass if adding ivars.
   virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
 
-  virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
+  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
 
   int AttributeInfoContainsArray(vtkSMSourceProxy* proxy,
                                  vtkPVDataSetAttributesInformation* attrInfo);

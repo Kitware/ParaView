@@ -24,6 +24,13 @@
         <DoubleRangeDomain min="0" />
       </DoubleVectorProperty>
 
+     <IntVectorProperty 
+        name="Capping" 
+        command="SetCapping" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
    <!-- End Cone -->
    </SourceProxy>
   </ProxyGroup>

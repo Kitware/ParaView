@@ -59,7 +59,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.166");
+vtkCxxRevisionMacro(vtkKWApplication, "1.166.2.1");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -81,7 +81,10 @@ vtkKWApplication::vtkKWApplication()
   this->ApplicationPrettyName = NULL;
   this->ApplicationInstallationDirectory = NULL;
 
-  this->LimitedEditionModeName = vtkString::Duplicate("limited edition");
+  this->LimitedEditionModeName = NULL;
+  char name[1024];
+  sprintf(name, "%s Limited Edition", this->ApplicationName);
+  this->SetLimitedEditionModeName(name);
 
   this->EmailFeedbackAddress = NULL;
 
@@ -1040,7 +1043,7 @@ void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
   if (!this->AboutDialog->IsCreated())
     {
     this->AboutDialog->SetMasterWindow(master);
-    this->AboutDialog->SetOptions(	
+    this->AboutDialog->SetOptions(
       this->AboutDialog->GetOptions() | vtkKWMessageDialog::NoDecoration);
     this->AboutDialog->Create(this, "-bd 1 -relief solid");
     }
@@ -1056,10 +1059,7 @@ void vtkKWApplication::ConfigureAbout()
   if (this->HasSplashScreen && 
       this->SplashScreen)
     {
-    if (!this->SplashScreen->GetImageName())
-      {
       this->CreateSplashScreen();
-      }
     const char *img_name = this->SplashScreen->GetImageName();
     if (img_name)
       {
@@ -1105,13 +1105,27 @@ void vtkKWApplication::ConfigureAbout()
 //----------------------------------------------------------------------------
 void vtkKWApplication::AddAboutText(ostream &os)
 {
-  os << this->GetApplicationPrettyName() 
-     << " (" 
-     << this->GetApplicationVersionName() 
-     << " " 
-     << this->GetApplicationReleaseName()
-     << ")" 
-     << endl;
+  os << this->GetApplicationPrettyName();
+  const char *app_ver_name = this->GetApplicationVersionName();
+  const char *app_rel_name = this->GetApplicationReleaseName();
+  if ((app_ver_name && *app_ver_name) || (app_rel_name && *app_rel_name))
+    {
+    os << " (";
+    if (app_ver_name && *app_ver_name)
+      {
+      os << app_ver_name;
+      if (app_rel_name && *app_rel_name)
+        {
+        os << " ";
+        }
+      }
+    if (app_rel_name && *app_rel_name)
+      {
+      os << app_rel_name;
+      }
+    os << ")";
+    }
+  os << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -1446,11 +1460,10 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
     feature_str << ends;
 
     const char *lem_name = this->GetLimitedEditionModeName() 
-      ? this->GetLimitedEditionModeName() : "limited edition";
+      ? this->GetLimitedEditionModeName() : "Limited Edition";
 
     ostrstream msg_str;
-    msg_str << this->GetApplicationName() 
-            << " is running in " << lem_name << " mode. "
+    msg_str << "You are running in \"" << lem_name << "\" mode. "
             << "The feature you are trying to use" << feature_str.str() 
             << " is not available in this mode. "
             << ends;
@@ -1470,17 +1483,27 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
 const char* vtkKWApplication::GetApplicationPrettyName()
 {
   ostrstream pretty_str;
-  pretty_str << (this->ApplicationName ? this->ApplicationName : "")
-             << " " << this->MajorVersion << "." << this->MinorVersion;
   if (this->LimitedEditionMode)
     {
-    const char *lem_name = this->GetLimitedEditionModeName() 
-      ? this->GetLimitedEditionModeName() : "limited edition";
-    char *upfirst = vtkString::Duplicate(lem_name);
-    pretty_str << " " << vtkString::ToUpperFirst(upfirst);
-    delete [] upfirst;
+    const char *lem_name = this->GetLimitedEditionModeName();
+    if (lem_name)
+      {
+      pretty_str << lem_name << " ";
+      }
+    else
+      {
+      if (this->ApplicationName)
+        {
+        pretty_str << this->ApplicationName << " ";
+        }
+      pretty_str << "Limited Edition ";
+      }
     }
-  pretty_str << ends;
+  else if (this->ApplicationName)
+    {
+    pretty_str << this->ApplicationName << " ";
+    }
+  pretty_str << this->MajorVersion << "." << this->MinorVersion << ends;
 
   this->SetApplicationPrettyName(pretty_str.str());
   pretty_str.rdbuf()->freeze(0);
@@ -1914,7 +1937,7 @@ void vtkKWApplication::AddEmailFeedbackBody(ostream &os)
 //----------------------------------------------------------------------------
 void vtkKWApplication::AddEmailFeedbackSubject(ostream &os)
 {
-  os << this->GetApplicationName() << " User Feedback";
+  os << this->GetApplicationPrettyName() << " User Feedback";
 }
 
 //----------------------------------------------------------------------------

@@ -137,19 +137,30 @@ protected:
   // modified properties.
   virtual void AppendCommandToStream(
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
+
+  // Description:
+  virtual void UpdateInformation(vtkClientServerID objectId);
 //ETX
 
   vtkSMDoubleVectorPropertyInternals* Internals;
 
   int ArgumentIsArray;
 
-  virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
+  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
 
   // Description:
   // Sets the size of unchecked elements. Usually this is
   // the same as the number of elements but can be different
   // before a domain check is performed.
   virtual void SetNumberOfUncheckedElements(unsigned int num);
+
+  // Description:
+  // If SetNumberCommand is set, it is called before Command
+  // with the number of arguments as the parameter.
+  vtkSetStringMacro(SetNumberCommand);
+  vtkGetStringMacro(SetNumberCommand);
+
+  char* SetNumberCommand;
 
 private:
   vtkSMDoubleVectorProperty(const vtkSMDoubleVectorProperty&); // Not implemented

@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.194");
+vtkCxxRevisionMacro(vtkKWWindow, "1.194.2.1");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -296,7 +296,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
                wname, this->GetTitle());
 
   this->Script("wm iconname %s {%s}",
-               wname, app->GetApplicationName());
+               wname, app->GetApplicationPrettyName());
 
   // Restore window geometry
 
@@ -380,7 +380,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->MenuHelp->AddSeparator();
   ostrstream about_label;
-  about_label << "About " << app->GetApplicationName() << ends;
+  about_label << "About " << app->GetApplicationPrettyName() << ends;
   this->MenuHelp->AddCommand(about_label.str(), this, "DisplayAbout", 0);
   about_label.rdbuf()->freeze(0);
 
@@ -1338,11 +1338,12 @@ int vtkKWWindow::ExitDialog()
     return 1;
     }
   ostrstream title;
-  title << "Exit " << this->GetApplication()->GetApplicationName() << ends;
+  title << "Exit " << this->GetApplication()->GetApplicationPrettyName() 
+        << ends;
   char* ttl = title.str();
   ostrstream str;
   str << "Are you sure you want to exit " 
-      << this->GetApplication()->GetApplicationName() << "?" << ends;
+      << this->GetApplication()->GetApplicationPrettyName() << "?" << ends;
   char* msg = str.str();
   
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
@@ -1671,12 +1672,15 @@ void vtkKWWindow::UpdateEnableState()
   this->Superclass::UpdateEnableState();
 
   // Update the toolbars
+
   this->PropagateEnableState(this->Toolbars);
 
   // Update the notebook
+
   this->PropagateEnableState(this->Notebook);
 
   // Update the Tcl interactor
+
   this->PropagateEnableState(this->TclInteractor);
 
   this->PropagateEnableState(this->SelectedView);
@@ -1738,6 +1742,22 @@ void vtkKWWindow::UpdateMenuState()
             index,  nb_items ? menu_enabled :vtkKWMenu::Disabled);
           }
         }
+      }
+    }
+
+  // Update the About entry, since the pretty name also depends on the
+  // limited edition mode
+
+  if (this->MenuHelp)
+    {
+    int pos = this->MenuHelp->GetIndexOfCommand(this, "DisplayAbout");
+    if (pos >= 0)
+      {
+      ostrstream label;
+      label << "-label {About " 
+            << this->GetApplication()->GetApplicationPrettyName() << "}"<<ends;
+      this->MenuHelp->ConfigureItem(pos, label.str());
+      label.rdbuf()->freeze(0);
       }
     }
 }

@@ -25,7 +25,6 @@
 
 class vtkKWApplication;
 class vtkKWBoundsDisplay;
-class vtkPVInputMenu;
 
 class VTK_EXPORT vtkPVBoundsDisplay : public vtkPVWidget
 {
@@ -37,11 +36,6 @@ public:
   // Description:
   // Create a Tk widget
   virtual void Create(vtkKWApplication *app);
-
-  // Description:
-  // The bounds display gets its data object from the input menu.
-  virtual void SetInputMenu(vtkPVInputMenu*);
-  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
 
   // Description:
   // This calculates new bounds to display (using the input menu).
@@ -97,7 +91,6 @@ protected:
 
   int ShowHideFrame;
   vtkKWBoundsDisplay *Widget;
-  vtkPVInputMenu *InputMenu;
 
   vtkPVBoundsDisplay(const vtkPVBoundsDisplay&); // Not implemented
   void operator=(const vtkPVBoundsDisplay&); // Not implemented

@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.6.2.1");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.6.2.2");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -226,7 +226,7 @@ int vtkSMInputArrayDomain::AttributeInfoContainsArray(
 
 //---------------------------------------------------------------------------
 void vtkSMInputArrayDomain::SaveState(
-  const char* name, ofstream* file, vtkIndent indent)
+  const char* name, ostream* file, vtkIndent indent)
 {
   *file << indent 
         << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"

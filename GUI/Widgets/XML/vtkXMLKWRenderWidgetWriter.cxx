@@ -24,7 +24,7 @@
 #include "vtkXMLTextActorWriter.h"
 
 vtkStandardNewMacro(vtkXMLKWRenderWidgetWriter);
-vtkCxxRevisionMacro(vtkXMLKWRenderWidgetWriter, "1.7");
+vtkCxxRevisionMacro(vtkXMLKWRenderWidgetWriter, "1.7.6.1");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWRenderWidgetWriter::GetRootElementName()
@@ -65,7 +65,9 @@ int vtkXMLKWRenderWidgetWriter::AddAttributes(vtkXMLDataElement *elem)
     return 0;
     }
 
-  elem->SetVectorAttribute("BackgroundColor", 3, obj->GetBackgroundColor());
+  double rgb[3];
+  obj->GetRendererBackgroundColor(rgb, rgb + 1, rgb + 2);
+  elem->SetVectorAttribute("RendererBackgroundColor", 3, rgb);
 
   elem->SetAttribute("DistanceUnits", obj->GetDistanceUnits());
 

@@ -146,7 +146,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.21");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.21.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -227,7 +227,7 @@ void vtkPVXDMFParameters::UpdateFromReader()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     vtkClientServerStream parameters;
-    if(!pm->GetLastServerResult().GetArgument(0, 0, &parameters))
+    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &parameters))
       {
       vtkErrorMacro("Error getting parameters from server.");
       return;

@@ -70,6 +70,11 @@ public:
   const char* GetEnumerationValue(unsigned int idx);
 
   // Description:
+  // If the property is of type ENUMERATION, returns a
+  // current index of a value.
+  unsigned int GetEnumerationElementIndex(const char* element);
+
+  // Description:
   // Returns the number of property elements.
   unsigned int GetNumberOfElements();
 
@@ -124,6 +129,8 @@ protected:
   char Maximum[128];
   char EnumValue[128];
   char ElemValue[128];
+
+  virtual void SaveState(const char*, ostream*, vtkIndent) {}
 
 private:
   vtkSMPropertyAdaptor(const vtkSMPropertyAdaptor&); // Not implemented

@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.58");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.58.2.1");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -172,6 +172,13 @@ void vtkPVArrayMenu::Accept()
     {
     svp->SetNumberOfElements(1);
     svp->SetElement(0, this->ArrayName);
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
     }
 
   this->ModifiedFlag = 0;

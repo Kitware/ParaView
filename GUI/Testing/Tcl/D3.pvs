@@ -158,7 +158,7 @@ $kw(vtkTemp1507) SetStartHSV 0.6667 1 1
 $kw(vtkTemp1507) SetEndHSV 0 1 1
 $kw(vtkTemp1507) VectorModeMagnitudeCallback
 $kw(vtkTemp1507) SetScalarBarVisibility 0
-$kw(vtkTemp24) SetBackgroundColor 0.33 0.35 0.43
+$kw(vtkTemp24) SetRendererBackgroundColor 0.33 0.35 0.43
 $kw(vtkTemp24) ParallelProjectionOff
 $kw(vtkTemp24) SetCameraState 28.2618 0.755978 3.41474 -40.9233 -1.09466 -4.94457 -0.0244488 0.999522 -0.0189332
 $kw(vtkTemp24) SetUseTriangleStrips 0

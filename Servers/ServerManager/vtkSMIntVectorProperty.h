@@ -128,7 +128,7 @@ protected:
 
   int ArgumentIsArray;
 
-  virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
+  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
 
   // Description:
   // Sets the size of unchecked elements. Usually this is
@@ -143,6 +143,9 @@ protected:
   // modified properties.
   virtual void AppendCommandToStream(
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
+
+  // Description:
+  virtual void UpdateInformation(vtkClientServerID objectId);
   //ETX
 
 private:

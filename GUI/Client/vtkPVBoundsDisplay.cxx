@@ -24,13 +24,14 @@
 #include "vtkPVInputMenu.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMBoundsDomain.h"
+#include "vtkSMProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.20");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.20.2.1");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
-vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
 int vtkPVBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
@@ -42,7 +43,6 @@ vtkPVBoundsDisplay::vtkPVBoundsDisplay()
   this->CommandFunction = vtkPVBoundsDisplayCommand;
 
   this->Widget = vtkKWBoundsDisplay::New();
-  this->InputMenu = 0;
   this->ShowHideFrame = 0;
   this->FrameLabel = 0;
 }
@@ -52,7 +52,6 @@ vtkPVBoundsDisplay::~vtkPVBoundsDisplay()
 {
   this->Widget->Delete();
   this->Widget = NULL;
-  this->SetInputMenu(NULL);
   this->SetFrameLabel(0);
 }
 
@@ -101,24 +100,34 @@ void vtkPVBoundsDisplay::Update()
 {
   this->Superclass::Update();
 
-  vtkPVSource *input;
-  double bds[6];
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMBoundsDomain *dom = 0;
 
-  if (this->InputMenu == NULL)
+  if (prop)
     {
-    vtkErrorMacro("Input menu has not been set.");
+    dom = vtkSMBoundsDomain::SafeDownCast(prop->GetDomain("bounds"));
+    }
+
+  if (!prop || !dom)
+    {
     return;
     }
 
-  input = this->InputMenu->GetCurrentValue();
-  if (input == NULL)
+  int exists, i;
+  double bds[6];
+
+  for (i = 0; i < 3; i++)
     {
-    bds[0] = bds[2] = bds[4] = VTK_LARGE_FLOAT;
-    bds[1] = bds[3] = bds[5] = -VTK_LARGE_FLOAT;
+    bds[2*i] = dom->GetMinimum(i, exists);
+    if (!exists)
+    {
+      bds[2*i] = VTK_LARGE_FLOAT;
     }
-  else
+    bds[2*i+1] = dom->GetMaximum(i, exists);
+    if (!exists)
     {
-    input->GetDataInformation()->GetBounds(bds);
+      bds[2*i+1] = -VTK_LARGE_FLOAT;
+      }
     }
 
   this->Widget->SetBounds(bds);
@@ -128,7 +137,6 @@ void vtkPVBoundsDisplay::Update()
 void vtkPVBoundsDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "InputMenu: " << this->GetInputMenu();
   os << indent << "ShowHideFrame: " << this->GetShowHideFrame();
   os << indent << "Widget: " << this->GetWidget();
 }
@@ -161,15 +169,6 @@ vtkPVWidget* vtkPVBoundsDisplay::ClonePrototypeInternal(vtkPVSource* pvSource,
       vtkErrorMacro("Internal error. Could not downcast pointer.");
       pvWidget->Delete();
       return 0;
-      }
-    
-    if (this->InputMenu)
-      {
-      // This will either clone or return a previously cloned
-      // object.
-      vtkPVInputMenu* im = this->InputMenu->ClonePrototype(pvSource, map);
-      pvBounds->SetInputMenu(im);
-      im->Delete();
       }
     }
   else
@@ -253,7 +252,6 @@ int vtkPVBoundsDisplay::ReadXMLAttributes(vtkPVXMLElement* element,
     return 0;
     }
   imw->AddDependent(this);
-  this->SetInputMenu(imw);
   imw->Delete();
   
   return 1;
@@ -265,7 +263,6 @@ void vtkPVBoundsDisplay::UpdateEnableState()
   this->Superclass::UpdateEnableState();
 
   this->PropagateEnableState(this->Widget);
-  this->PropagateEnableState(this->InputMenu);
 }
 
 

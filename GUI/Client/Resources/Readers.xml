@@ -158,8 +158,8 @@
       <Item name="big endian" value="0"/>
       <Item name="little endian" value="1"/>
     </SelectionList>
-    <SelectTimeSet label="Select time value"
-                   trace_name="TimeSet" set_command="SetTimeValue"/>
+    <SelectTimeSet label="Select time value" property="SetTimeValue"
+                   trace_name="TimeSet"/>
     <ArraySelection attribute_name="Point"
                     trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell"
@@ -263,13 +263,6 @@
           file_description="Stereo Lithography">
     <Source class="vtkSTLReader"/>
   </Module>
-  <Module name="byureader"
-          class="vtkPVReaderModule" root_name="BYU"
-          module_type="Reader"
-          extensions=".g"
-          file_description="BYU Files">
-    <Source class="vtkBYUReader"/>
-  </Module>
   <Module name="gaussiancubereader"
           class="vtkPVAdvancedReaderModule"
           root_name="GaussianCube"
@@ -314,7 +307,7 @@
     <Source class="vtkPVEnSightMasterServerReader"/>
     <SelectTimeSet label="Select time value"
                    trace_name="TimeSet"
-                   set_command="SetTimeValue"/>
+                   property="SetTimeValue"/>
     <ArraySelection attribute_name="Point"
                     trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell"
@@ -498,6 +491,14 @@
                    property="GenerateFileIdArray"
                    trace_name="global_file_ids"
                    help="Select whether the reader generates cell based disk file ids"/>
+  </Module>
+#else
+    <Module name="byureader"
+          class="vtkPVReaderModule" root_name="BYU"
+          module_type="Reader"
+          extensions=".g"
+          file_description="BYU Files">
+    <Source class="vtkBYUReader"/>
   </Module>
 #endif
 #ifdef PARAVIEW_USE_SAF

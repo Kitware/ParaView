@@ -109,13 +109,27 @@ public:
   vtkSMPropertyIterator* NewPropertyIterator();
 
   // Description:
+  // Returns the number of consumers. Consumers are proxies
+  // that point to this proxy through a property (usually 
+  // vtkSMProxyProperty)
   unsigned int GetNumberOfConsumers();
 
   // Description:
+  // Returns the consumer of given index. Consumers are proxies
+  // that point to this proxy through a property (usually 
+  // vtkSMProxyProperty)
   vtkSMProxy* GetConsumerProxy(unsigned int idx);
 
   // Description:
+  // Returns the corresponding property of the consumer of given 
+  // index. Consumers are proxies that point to this proxy through 
+  // a property (usually vtkSMProxyProperty)
   vtkSMProperty* GetConsumerProperty(unsigned int idx);
+
+  // Description:
+  // Updates all property informations by calling the method
+  // and populating the values.
+  virtual void UpdateInformation();
   
 protected:
   vtkSMProxy();
@@ -253,6 +267,7 @@ protected:
                    vtkSMProperty* prop);
 
   // Description:
+  // Remove a property from the list.
   void RemoveProperty(const char* name);
 
   // Description:
@@ -272,15 +287,21 @@ protected:
   vtkSMProxy* GetSubProxy(const char* name);
 
   // Description:
+  // Called by a proxy property, this adds the property,proxy
+  // pair to the list of consumers.
   void AddConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
 
   // Description:
+  // Remove the property,proxy pair from the list of consumers.
   void RemoveConsumer(vtkSMProperty* property, vtkSMProxy* proxy);
 
   // Description:
+  // Remove all consumers.
   void RemoveAllConsumers();
 
   // Description:
+  // Calls MarkConsumersAsModified() on all consumers. Sub-classes
+  // should add their functionality and call this.
   virtual void MarkConsumersAsModified();
 
   // Description:
@@ -289,9 +310,13 @@ protected:
   vtkSMProperty* NewProperty(const char* name);
 
   // Description:
+  // Return a property of the given name from self or one of
+  // the sub-proxies. If selfOnly is set, the sub-proxies are
+  // not checked.
   virtual vtkSMProperty* GetProperty(const char* name, int selfOnly);
 
   // Description:
+  // Read attributes from an XML element.
   int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
   char* VTKClassName;
@@ -306,7 +331,7 @@ protected:
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
 
-  virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
+  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
 
 private:
   vtkSMProxyInternals* Internals;

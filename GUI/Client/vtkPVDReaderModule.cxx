@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.10.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -82,7 +82,7 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
     << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   int index = -1;
-  this->HaveTime = (pm->GetLastServerResult().GetArgument(0, 0, &index) &&
+  this->HaveTime = (pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &index) &&
                     index >= 0)? 1 : 0;
 
   // If we have time, we need to behave as an advanced reader module.
@@ -100,7 +100,7 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     int numValues = 0;
-    if(!pm->GetLastServerResult().GetArgument(0, 0, &numValues))
+    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &numValues))
       {
       vtkErrorMacro("Error getting number of timesteps from reader.");
       numValues = 0;

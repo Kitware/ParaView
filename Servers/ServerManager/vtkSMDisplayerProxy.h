@@ -76,6 +76,7 @@ protected:
   void DrawPoints();
   void DrawSurface();
 
+  virtual void SaveState(const char*, ostream*, vtkIndent) {}
 private:
   vtkSMDisplayerProxy(const vtkSMDisplayerProxy&); // Not implemented
   void operator=(const vtkSMDisplayerProxy&); // Not implemented

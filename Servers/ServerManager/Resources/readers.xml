@@ -12,7 +12,8 @@
      <IntVectorProperty 
         name="TimestepAsIndex"
         command="SetTimestepAsIndex"
-        number_of_elements="1" />
+        number_of_elements="1" 
+        default_values="0"/>
    <!-- End PVDReader -->
    </SourceProxy>
                     
@@ -311,6 +312,7 @@
          command="SetTimeValue"
          number_of_elements="1"
          default_values="0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <StringVectorProperty
@@ -569,6 +571,7 @@
          command="SetTimeValue"
          number_of_elements="1"
          default_values="0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <StringVectorProperty
@@ -752,12 +755,16 @@
      <IntVectorProperty 
         name="FileRange"
         command="SetFileRange"
-        number_of_elements="2" />
+        number_of_elements="2" 
+        default_values="0 0"/>
 
      <IntVectorProperty 
         name="TimeStep"
         command="SetTimeStep"
-        number_of_elements="1" />
+        number_of_elements="1"
+        default_values="0">
+       <IntRangeDomain name="range"/>
+     </IntVectorProperty>
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -824,7 +831,7 @@
         name="GenerateGlobalElementIdArray" 
         command="SetGenerateGlobalElementIdArray" 
         number_of_elements="1"
-        default_values="1" > 
+        default_values="0" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -832,9 +839,24 @@
         name="GenerateFileIdArray" 
         command="SetGenerateFileIdArray" 
         number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="ApplyDisplacements" 
+        command="SetApplyDisplacements" 
+        number_of_elements="1"
         default_values="1" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
+
+     <DoubleVectorProperty 
+        name="DisplacementMagnitude" 
+        command="SetDisplacementMagnitude" 
+        number_of_elements="1"
+        default_values="1" > 
+     </DoubleVectorProperty>
    <!-- End ExodusReader -->
    </SourceProxy>
 

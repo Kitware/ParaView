@@ -72,6 +72,7 @@ private:
   int TestServer;
   int ArgStart;
   int AllowErrorInOutput;
+  int ReverseConnection;
 };
 
 #endif

@@ -135,7 +135,7 @@ protected:
   // Description:
   // Saves the state of the object in XML format. Should
   // be overwritten by proxies and properties.
-  virtual void SaveState(const char*, ofstream*, vtkIndent) {};
+  virtual void SaveState(const char*, ostream*, vtkIndent);
 
   // Description:
   // Given an XML element and group name create a proxy 

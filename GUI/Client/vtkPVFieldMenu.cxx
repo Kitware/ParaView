@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.16");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.16.2.1");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -163,6 +163,13 @@ void vtkPVFieldMenu::Accept()
     {
     ivp->SetNumberOfElements(1);
     ivp->SetElement(0, this->Value);
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
     }
 
   this->ModifiedFlag = 0;

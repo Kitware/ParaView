@@ -33,7 +33,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.15");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.15.2.1");
 
 struct vtkSMSourceProxyInternals
 {
@@ -91,6 +91,7 @@ void vtkSMSourceProxy::UpdateInformation()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(this->Servers, command, 0);
   
+  this->Superclass::UpdateInformation();
 }
 
 //---------------------------------------------------------------------------

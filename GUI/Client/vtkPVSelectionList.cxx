@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.46");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.46.2.1");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -210,6 +210,13 @@ void vtkPVSelectionList::Accept()
     {
     ivp->SetNumberOfElements(1);
     ivp->SetElement(0, this->CurrentValue);
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
     }
   
   this->ModifiedFlag = 0;

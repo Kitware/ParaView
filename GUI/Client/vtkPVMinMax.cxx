@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.33");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.33.2.1");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -257,12 +257,16 @@ void vtkPVMinMax::Accept()
     this->GetSMProperty());
   if (prop)
     {
-    int checkDomains = vtkSMProperty::GetCheckDomains();
-    vtkSMProperty::SetCheckDomains(0);
     prop->SetNumberOfElements(2);
     prop->SetElement(0, this->GetMinValue());
     prop->SetElement(1, this->GetMaxValue());
-    vtkSMProperty::SetCheckDomains(checkDomains);
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
     }
   
   this->ModifiedFlag = 0;
@@ -332,7 +336,7 @@ void vtkPVMinMax::Update()
   vtkSMDoubleRangeDomain* dom = 0;
   if (prop)
     {
-    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("array_range"));
+    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("range"));
     }
   if (dom)
     {

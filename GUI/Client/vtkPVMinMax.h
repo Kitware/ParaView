@@ -35,6 +35,7 @@ public:
   virtual void Create(vtkKWApplication *pvApp);
 
   // Description:
+  // Called when the Accept button is pressed.
   virtual void Accept();
 
   // Description:

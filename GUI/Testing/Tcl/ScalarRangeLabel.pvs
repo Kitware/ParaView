@@ -28,7 +28,7 @@ if { [catch {set fp [open "out.txt" w]}] != 0 } {
 }
 
 $kw(vtkTemp44) SetOrientationAxesVisibility 0
-$kw(vtkTemp44) SetBackgroundColor 0 0 0
+$kw(vtkTemp44) SetRendererBackgroundColor 0 0 0
 set kw(vtkTemp90) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set kw(vtkTemp94) [$kw(vtkTemp1) GetPVSource GlyphSources Cone0]
 set kw(vtkTemp98) [$kw(vtkTemp1) GetPVSource GlyphSources Sphere0]

@@ -76,12 +76,10 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.40");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.40.2.1");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
-vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMProperty,
-                     vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
 
@@ -117,6 +115,7 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->TraceName = 0;
   this->TimeStart = 0;
   this->TimeEnd = 100;
+  this->AnimationElement = 0;
   this->TimeEquationStyle = 0;
   this->TimeEquationPhase = 0.;
   this->TimeEquationFrequency = 1.;
@@ -1029,6 +1028,44 @@ void vtkPVAnimationInterfaceEntry::MarkScriptEditorDirty()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SetCurrentSMProperty(vtkSMProperty *prop)
+{
+  if (prop != this->CurrentSMProperty)
+    {
+    if (this->CurrentSMProperty)
+      {
+      this->CurrentSMProperty->UnRegister(this);
+      }
+    this->CurrentSMProperty = prop;
+    if (this->CurrentSMProperty)
+      {
+      this->CurrentSMProperty->Register(this);
+      vtkPVApplication *app = this->GetPVApplication();
+      if (app)
+        {
+        app->GetRenderModule()->InvalidateAllGeometries();
+        }
+      }
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SetAnimationElement(int elem)
+{
+  if (elem != this->AnimationElement)
+    {
+    this->AnimationElement = elem;
+    vtkPVApplication *app = this->GetPVApplication();
+    if (app)
+      {
+      app->GetRenderModule()->InvalidateAllGeometries();
+      }
+    this->Modified();
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetCustomScript(const char* script)
 {
   this->CustomScript = 1;
@@ -1288,4 +1325,6 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CurrentSMDomain: " << this->CurrentSMDomain << endl;
   
   os << indent << "CustomScript: " << this->CustomScript << endl;
+  
+  os << indent << "AnimationElement: " << this->AnimationElement << endl;
 }

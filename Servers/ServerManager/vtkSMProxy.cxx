@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMProxy, "1.17.2.1");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -496,6 +496,28 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxy::UpdateInformation()
+{
+  this->CreateVTKObjects(1);
+  int numObjects = this->Internals->IDs.size();
+
+  if (numObjects > 0)
+    {
+    vtkSMProxyInternals::PropertyInfoMap::iterator it;
+    for (it  = this->Internals->Properties.begin();
+         it != this->Internals->Properties.end();
+         ++it)
+      {
+      vtkSMProperty* prop = it->second.Property.GetPointer();
+      if (prop->GetInformationOnly())
+        {
+        prop->UpdateInformation(this->Internals->IDs[0]);
+        }
+      }
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxy::UpdateVTKObjects()
 {
   vtkClientServerStream str;
@@ -538,7 +560,9 @@ void vtkSMProxy::UpdateVTKObjects()
        ++it)
     {
     vtkSMProperty* prop = it->second.Property.GetPointer();
-    if (it->second.ModifiedFlag && !prop->GetImmediateUpdate())
+    if (it->second.ModifiedFlag && 
+        !prop->GetImmediateUpdate() && 
+        !prop->GetInformationOnly())
       {
       if (prop->GetUpdateSelf())
         {
@@ -855,7 +879,7 @@ int vtkSMProxy::ReadXMLAttributes(
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::SaveState(const char* name, ofstream* file, vtkIndent indent)
+void vtkSMProxy::SaveState(const char* name, ostream* file, vtkIndent indent)
 {
   *file << indent
         << "<Proxy group=\"" 

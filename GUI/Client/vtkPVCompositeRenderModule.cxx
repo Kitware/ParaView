@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.21");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.21.2.1");
 
 
 
@@ -586,7 +586,7 @@ float vtkPVCompositeRenderModule::GetZBufferValue(int x, int y)
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT);
     float z = 0;
-    if(pm->GetLastClientResult().GetArgument(0, 0, &z))
+    if(pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0, 0, &z))
       {
       return z;
       }

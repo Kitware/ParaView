@@ -227,8 +227,13 @@
      <IntVectorProperty 
         name="OutputWholeExtent" 
         command="SetOutputWholeExtent" 
-        number_of_elements="6"> 
-       <IntRangeDomain name="range"/>
+        number_of_elements="6"
+        default_values="0 0 0 0 0 0"> 
+       <ExtentDomain name="extent">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ExtentDomain>
      </IntVectorProperty>
    <!-- End ImageClip -->
    </SourceProxy>
@@ -428,6 +433,9 @@
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkCTHData"/>
+           </DataTypeDomain>
       </InputProperty>
    <!-- End CTHOutlineAMR -->
    </SourceProxy>
@@ -440,6 +448,9 @@
             <Group name="sources"/>
             <Group name="filters"/>
           </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkCTHData"/>
+          </DataTypeDomain>
      </InputProperty>
 
      <ProxyProperty name="ClipPlane" command="SetClipPlane">
@@ -491,9 +502,9 @@
      <IntVectorProperty 
         name="InputMask" 
         command="SetInputMask"
-        number_of_elements="1"
         repeat_command="1"
-        number_of_elements_per_command="2" />
+        number_of_elements_per_command="1"
+        use_index="1"/>
    <!-- End ExtractParts -->
    </SourceProxy>
 
@@ -1194,15 +1205,18 @@
           <DataTypeDomain name="input_type">
             <DataType value="vtkPolyData"/>
           </DataTypeDomain>
-          <InputArrayDomain name="input_array" attribute_type="point"
-                            number_of_components="3"/>
+          <InputArrayDomain name="input_array1" attribute_type="point"
+                            number_of_components="3" optional="1"/>
+          <InputArrayDomain name="input_array2" attribute_type="point"
+                            number_of_components="1" optional="1"/>
      </InputProperty>
 
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list" attribute_type="Scalars">
+           <ArrayListDomain name="array_list" attribute_type="Scalars"
+                            input_domain_name="input_array2">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1213,7 +1227,8 @@
         name="SelectInputVectors" 
         command="SelectInputVectors" 
         number_of_elements="1"> 
-           <ArrayListDomain name="array_list" attribute_type="Vectors">
+           <ArrayListDomain name="array_list" attribute_type="Vectors"
+                            input_domain_name="input_array1">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1440,19 +1455,22 @@
      <IntVectorProperty
         name="OutputDimension"
         command="SetOutputDimension"
-        number_of_elements="1">
+        number_of_elements="1"
+        default_values="3">
        <IntRangeDomain name="range" min="1" max="3"/>
      </IntVectorProperty>
 
      <DoubleVectorProperty
         name="ChordError"
         command="SetChordError"
-        number_of_elements="1"/>
+        number_of_elements="1"
+        default_values="1e-3"/>
 
      <IntVectorProperty
         name="MaximumNumberOfSubdivisions"
         command="SetMaximumNumberOfSubdivisions"
-        number_of_elements="1">
+        number_of_elements="1"
+        default_values="8">
        <IntRangeDomain name="range" min="0" max="8"/>
      </IntVectorProperty>
    <!-- End TempTessellatorFilter -->
@@ -1693,11 +1711,26 @@
      </ProxyProperty>
 
      <DoubleVectorProperty
+        name="InputBounds">
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+     </DoubleVectorProperty>
+
+     <DoubleVectorProperty
         name="ContourValues"
         command="SetValue"
         repeat_command="1"
+        set_number_command="SetNumberOfContours"
         number_of_elements_per_command="1"
         use_index="1">
+          <BoundsDomain name="range" mode="magnitude">
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </BoundsDomain>
      </DoubleVectorProperty>
    <!-- End Cut -->
    </SourceProxy>
@@ -1723,6 +1756,15 @@
            </ProxyGroupDomain>
      </ProxyProperty>
 
+     <DoubleVectorProperty
+        name="InputBounds">
+       <BoundsDomain name="bounds">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </BoundsDomain>
+     </DoubleVectorProperty>
+
      <IntVectorProperty 
         name="InsideOut" 
         command="SetInsideOut" 
@@ -1747,7 +1789,7 @@
         command="SetValue"
         number_of_elements="1"
         default_values="0.0" >
-          <ArrayRangeDomain name="array_range">
+          <ArrayRangeDomain name="range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
@@ -1802,8 +1844,9 @@
      <DoubleVectorProperty 
         name="ThresholdBetween" 
         command="ThresholdBetween"
-        number_of_elements="2">
-          <ArrayRangeDomain name="array_range">
+        number_of_elements="2"
+        default_values="0 0">
+          <ArrayRangeDomain name="range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
@@ -1854,11 +1897,12 @@
      <DoubleVectorProperty
         name="ContourValues"
         command="SetValue"
+        set_number_command="SetNumberOfContours"
         number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="1"
         use_index="1">
-          <ArrayRangeDomain name="array_range">
+          <ArrayRangeDomain name="range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
@@ -2012,7 +2056,14 @@
      <IntVectorProperty 
         name="VOI" 
         command="SetVOI"
-        number_of_elements="6"/>
+        number_of_elements="6"
+        default_values="0 0 0 0 0 0">
+       <ExtentDomain name="extent">
+         <RequiredProperties>
+            <Property name="Input" function="Input"/>
+         </RequiredProperties>
+       </ExtentDomain>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="SampleRateI" 

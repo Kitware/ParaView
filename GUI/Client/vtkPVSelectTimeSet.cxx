@@ -24,15 +24,16 @@
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 #include <vtkstd/string>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.39");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.39.2.1");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -59,9 +60,6 @@ vtkPVSelectTimeSet::vtkPVSelectTimeSet()
   
   this->TimeSets = vtkDataArrayCollection::New();
   
-  this->Property = 0;
-  
-  this->SetCommand = 0;
   this->ServerSideID.ID = 0;
 }
 
@@ -74,7 +72,6 @@ vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
   this->TimeLabel->Delete();
   this->SetFrameLabel(0);
   this->TimeSets->Delete();
-  this->SetSetCommand(0);
   if(this->ServerSideID.ID)
     {
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
@@ -227,15 +224,24 @@ void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name,
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SaveInBatchScript(ofstream *file)
 {
-  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-        <<  " GetProperty " << this->SetCommand << "] SetElements1 "
-        << this->Property->GetScalar(0) << endl;
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  
+  if (sourceID.ID == 0 || !this->SMPropertyName)
+    {
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
+    }
+  
+  *file << "  [$pvTemp" << sourceID <<  " GetProperty "
+        << this->SMPropertyName << "] SetElements1 " << this->TimeValue << endl;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectTimeSet::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVSelectTimeSet::Accept()
 {
-  if (this->ModifiedFlag)
+  int modFlag = this->GetModifiedFlag();
+  
+  if (modFlag)
     {
     this->Script("%s selection get", this->Tree->GetWidgetName());
     this->AddTraceEntry("$kw(%s) SetTimeValueCallback {%s}", 
@@ -243,11 +249,36 @@ void vtkPVSelectTimeSet::AcceptInternal(vtkClientServerID sourceID)
                         this->GetApplication()->GetMainInterp()->result);
     }
 
-  this->Property->SetVTKSourceID(sourceID);
-  this->Property->SetScalars(1, &this->TimeValue);
-  this->Property->AcceptInternal();
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (dvp)
+    {
+    dvp->SetElement(0, this->TimeValue);
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
+    }
 
   this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -291,7 +322,15 @@ void vtkPVSelectTimeSet::ResetInternal()
   char timeValueText[32];
   char indices[32];
 
-  float actualTimeValue = this->Property->GetScalar(0);
+  float actualTimeValue = 0;
+  
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (dvp)
+    {
+    actualTimeValue = dvp->GetElement(0);
+    }
+  
   int matchFound = 0;
 
   this->ModifiedFlag = 0;
@@ -343,6 +382,11 @@ void vtkPVSelectTimeSet::ResetInternal()
     }
   
   this->SetTimeValue(actualTimeValue);
+  
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -372,11 +416,29 @@ void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   // I do not under stand why the trace name is used for the
   // menu entry, but Berk must know.
   ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
-  ai->SetCurrentProperty(this->Property);
+
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMDomain *rangeDomain = prop->GetDomain("range");
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(rangeDomain);
+  ai->SetAnimationElement(0);
+
+  vtkSMDoubleRangeDomain *doubleRangeDomain =
+    vtkSMDoubleRangeDomain::SafeDownCast(rangeDomain);
+  int minExists = 0, maxExists = 0;
+  if (doubleRangeDomain)
+    {
+    double min = doubleRangeDomain->GetMinimum(0, minExists);
+    double max = doubleRangeDomain->GetMaximum(0, maxExists);
+    if (minExists && maxExists)
+      {
+      ai->SetTimeStart(min);
+      ai->SetTimeEnd(max);
+      }
+    }
+  
   ai->Update();
 }
-
-
 
 //-----------------------------------------------------------------------------
 vtkPVSelectTimeSet* vtkPVSelectTimeSet::ClonePrototype(vtkPVSource* pvSource,
@@ -396,7 +458,6 @@ void vtkPVSelectTimeSet::CopyProperties(vtkPVWidget* clone,
   if (pvts)
     {
     pvts->SetLabel(this->FrameLabel);
-    pvts->SetSetCommand(this->SetCommand);
     }
   else 
     {
@@ -417,8 +478,6 @@ int vtkPVSelectTimeSet::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     this->SetLabel(label);
     }
-  
-  this->SetSetCommand(element->GetAttribute("set_command"));
   
   return 1;
 }
@@ -444,7 +503,7 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   vtkClientServerStream timeSets;
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &timeSets))
+  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &timeSets))
     {
     vtkErrorMacro("Error getting time sets from server.");
     return;
@@ -472,12 +531,13 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
     timeSet->Delete();
     }
   
-  if (this->Property->GetNumberOfScalars() == 0 &&
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (dvp && !this->AcceptCalled &&
       this->TimeSets->GetNumberOfItems() > 0)
     {
-    vtkFloatArray *ts =
-      vtkFloatArray::SafeDownCast(this->TimeSets->GetItem(0));
-    this->Property->SetScalars(1, ts->GetPointer(0));
+    dvp->SetElement(0, this->TimeSets->GetItem(0)->GetComponent(0, 0));
     }
 }
 
@@ -498,34 +558,9 @@ void vtkPVSelectTimeSet::SaveInBatchScriptForPart(ofstream *file,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectTimeSet::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
-  if (this->Property)
-    {
-    int numScalars = 1;
-    this->Property->SetVTKCommands(1, &this->SetCommand, &numScalars);
-    }
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVSelectTimeSet::GetProperty()
-{
-  return this->Property;
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVSelectTimeSet::CreateAppropriateProperty()
-{
-  return vtkPVScalarListWidgetProperty::New();
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "TimeValue: " << this->TimeValue << endl;
   os << indent << "LabeledFrame: " << this->LabeledFrame << endl;
-  os << indent << "SetCommand: "
-     << (this->SetCommand ? this->SetCommand : "(none)") << endl;
 }

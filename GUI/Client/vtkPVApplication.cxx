@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.297");
+vtkCxxRevisionMacro(vtkPVApplication, "1.297.2.1");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -511,6 +511,10 @@ vtkPVApplication::vtkPVApplication()
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
+  // Remove the ParaView output window so errors during exit will
+  // still be displayed.
+  vtkOutputWindow::SetInstance(0);
+
   this->SetProcessModule(NULL);
   this->SetRenderModule(NULL);
   this->SetRenderModuleName(NULL);
@@ -1863,9 +1867,6 @@ void vtkPVApplication::Exit()
       }
     }
   
-  // Remove the ParaView output window so errors during exit will
-  // still be displayed.
-  vtkOutputWindow::SetInstance(0);
 
   this->vtkKWApplication::Exit();
 
@@ -2288,12 +2289,6 @@ int vtkPVApplication::GetNumberOfPartitions()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SendStringToClientAndServer(const char* str)
-{
-  this->GetProcessModule()->SendStringToClientAndServer(str);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
 {
   (void)event;
@@ -2332,7 +2327,7 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
                   << pm->GetProcessModuleID() << "GetDemoPath"
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &demoDataPath))
+  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &demoDataPath))
     {
     demoDataPath = 0;
     }
@@ -2444,3 +2439,71 @@ int vtkPVApplication::GetGlobalLODFlag()
   return vtkPVProcessModule::GetGlobalLODFlag();
 }
 
+//----------------------------------------------------------------------------
+int vtkPVApplication::SendStringToClient(const char* str)
+{
+  if(!this->ProcessModule->GetStream().StreamFromString(str))
+    {
+    return 0;
+    }
+  this->ProcessModule->SendStream(vtkProcessModule::CLIENT);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::SendStringToClientAndServer(const char* str)
+{
+  if(!this->ProcessModule->GetStream().StreamFromString(str))
+    {
+    return 0;
+    }
+  this->ProcessModule->SendStream(vtkProcessModule::CLIENT |
+                                  vtkProcessModule::DATA_SERVER);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::SendStringToClientAndServerRoot(const char* str)
+{
+  if(!this->ProcessModule->GetStream().StreamFromString(str))
+    {
+    return 0;
+    }
+  this->ProcessModule->SendStream(vtkProcessModule::CLIENT |
+                                  vtkProcessModule::DATA_SERVER_ROOT);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::SendStringToServer(const char* str)
+{
+  if(!this->ProcessModule->GetStream().StreamFromString(str))
+    {
+    return 0;
+    }
+  this->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::SendStringToServerRoot(const char* str)
+{
+  if(!this->ProcessModule->GetStream().StreamFromString(str))
+    {
+    return 0;
+    }
+  this->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVApplication::GetStringFromServer()
+{
+  return this->ProcessModule->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).StreamToString();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVApplication::GetStringFromClient()
+{
+  return this->ProcessModule->GetLastResult(vtkProcessModule::CLIENT).StreamToString();
+}

@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.21");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.21.2.1");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -136,6 +136,8 @@ void vtkKWSplashScreen::Show()
   int w = 0, h = 0;
   if (this->ImageName)
     {
+    this->Script("%s itemconfigure image -image %s", 
+                 this->Canvas->GetWidgetName(), this->ImageName);
     this->Script("concat [%s cget -width] [%s cget -height]", 
                  this->ImageName, this->ImageName);
     sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &w, &h);

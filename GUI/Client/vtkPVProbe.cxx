@@ -50,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.123");
+vtkCxxRevisionMacro(vtkPVProbe, "1.123.2.1");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -430,7 +430,7 @@ int vtkPVProbe::GetDimensionality()
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT);
   const char* name = 0;
-  pm->GetLastClientResult().GetArgument(0,0,&name);
+  pm->GetLastResult(vtkProcessModule::CLIENT).GetArgument(0,0,&name);
   if ( name && vtkString::Equals(name, "vtkLineSource") )
     {
     return 1;

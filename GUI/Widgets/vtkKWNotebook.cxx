@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.63");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.63.2.1");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -1722,6 +1722,42 @@ void vtkKWNotebook::UnpinPage(vtkKWNotebook::Page *page)
 
   page->Pinned = 0;
   this->UpdatePageTabBackgroundColor(page, this->CurrentId == page->Id);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::PinPagesMatchingTag(int tag)
+{
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+      {
+      this->PinPage(page);
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWNotebook::UnpinPagesMatchingTag(int tag)
+{
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+      {
+      this->UnpinPage(page);
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------

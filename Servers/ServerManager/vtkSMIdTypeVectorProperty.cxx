@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.1");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.1.2.1");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
@@ -271,6 +271,12 @@ int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
         this->SetElement(i, initVal[i]);
         }
       }
+    else
+      {
+      vtkErrorMacro("No default value is specified for property: "
+                    << this->GetXMLName()
+                    << ". This might lead to stability problems");
+      }
     delete[] initVal;
     }
 
@@ -279,7 +285,7 @@ int vtkSMIdTypeVectorProperty::ReadXMLAttributes(vtkSMProxy* parent,
 
 //---------------------------------------------------------------------------
 void vtkSMIdTypeVectorProperty::SaveState(
-  const char* name, ofstream* file, vtkIndent indent)
+  const char* name, ostream* file, vtkIndent indent)
 {
   unsigned int size = this->GetNumberOfElements();
   *file << indent << "<Property name=\"" << (this->XMLName?this->XMLName:"")

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.53");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.53.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -86,17 +86,20 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
   this->SetProperty(NULL);
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetLabel(const char* label)
 {
   this->SetEntryLabel(label);
   this->LabelWidget->SetLabel(label);
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetSubLabel(int i, const char* sublabel)
 {
   this->SubLabelTxts->SetString(i, sublabel);
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
 {
 
@@ -270,6 +273,7 @@ void vtkPVVectorEntry::Accept()
 
   this->Entries->InitTraversal();
   
+  int propFound = 0;
   switch (this->DataType)
     {
     case VTK_FLOAT:
@@ -279,6 +283,7 @@ void vtkPVVectorEntry::Accept()
         this->GetSMProperty());
       if (dvp)
         {
+        propFound = 1;
         dvp->SetNumberOfElements(this->VectorLength);
         for (i = 0; i < this->VectorLength; i++)
           {
@@ -295,6 +300,7 @@ void vtkPVVectorEntry::Accept()
         this->GetSMProperty());
       if (ivp)
         {
+        propFound = 1;
         ivp->SetNumberOfElements(this->VectorLength);
         for (i = 0; i < this->VectorLength; i++)
           {
@@ -307,6 +313,14 @@ void vtkPVVectorEntry::Accept()
       }
     }
   
+  if (!propFound)
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
+    }
+
   this->ModifiedFlag = 0;
   
   // I put this after the accept internal, because
@@ -630,6 +644,7 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     
     ai->SetCurrentSMProperty(prop);
     ai->SetCurrentSMDomain(rangeDomain);
+    ai->SetAnimationElement(0);
 
     if (rangeDomain)
       {
@@ -678,6 +693,7 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VectorLength: " << this->VectorLength << endl;
 }
 
+//-----------------------------------------------------------------------------
 vtkPVVectorEntry* vtkPVVectorEntry::ClonePrototype(vtkPVSource* pvSource,
   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {

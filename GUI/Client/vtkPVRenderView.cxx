@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.332");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.332.2.1");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -884,7 +884,8 @@ void vtkPVRenderView::CreateViewProperties()
   vtkPVWindow* pvwindow = this->GetPVWindow();
   vtkPVApplication* pvapp = this->GetPVApplication();
 
-  this->BackgroundColor->SetBalloonHelpString("Change the background color of the 3D View window");
+  this->RendererBackgroundColor->SetBalloonHelpString(
+    "Change the background color of the 3D View window");
   // This used to be in vtkPVWindow.
   // I moved it here because I had to move Save color to this class.
   // I also think it belongs here.
@@ -897,7 +898,7 @@ void vtkPVRenderView::CreateViewProperties()
     rgb[1] = 0.35;
     rgb[2] = 0.43;
     }
-  this->SetBackgroundColor(rgb);
+  this->SetRendererBackgroundColor(rgb[0], rgb[1], rgb[2]);
 
   // Render parameters
 
@@ -1358,7 +1359,7 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetBackgroundColor(double r, double g, double b)
+void vtkPVRenderView::SetRendererBackgroundColor(double r, double g, double b)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
  
@@ -1374,10 +1375,10 @@ void vtkPVRenderView::SetBackgroundColor(double r, double g, double b)
   this->GetPVWindow()->SaveColor(2, "RenderViewBG", rgb); 
  
   // Set the color of the interface button.
-  this->BackgroundColor->SetColor(r, g, b);
+  this->RendererBackgroundColor->SetColor(r, g, b);
   // Since setting the color of the button from a script does
   // not invoke the callback, We also trace the view.
-  this->AddTraceEntry("$kw(%s) SetBackgroundColor %f %f %f",
+  this->AddTraceEntry("$kw(%s) SetRendererBackgroundColor %f %f %f",
                       this->GetTclName(), r, g, b);
   pvApp->GetRenderModule()->SetBackgroundColor(r, g, b);
   this->EventuallyRender();
@@ -1901,7 +1902,7 @@ void vtkPVRenderView::SaveState(ofstream* file)
   double *color;
 
   color = this->GetRenderer()->GetBackground();
-  *file << "$kw(" << this->GetTclName() << ") SetBackgroundColor " 
+  *file << "$kw(" << this->GetTclName() << ") SetRendererBackgroundColor " 
         << color[0] << " " << color[1] << " " << color[2] << endl;
 
   camera = this->GetRenderer()->GetActiveCamera();

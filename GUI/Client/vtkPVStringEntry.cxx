@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.36");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.36.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -170,6 +170,13 @@ void vtkPVStringEntry::Accept()
     {
     svp->SetElement(0, this->GetValue());
     }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
+    }
   
   this->ModifiedFlag = 0;
   
@@ -220,7 +227,7 @@ void vtkPVStringEntry::ResetInternal()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
     const char* value;
-    if(pm->GetLastServerResult().GetArgument(0, 0, &value))
+    if(pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &value))
       {
       this->SetValue(value);
       }

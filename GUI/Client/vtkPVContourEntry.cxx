@@ -19,16 +19,16 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkPVArrayMenu.h"
-#include "vtkPVContourWidgetProperty.h"
 #include "vtkPVScalarRangeLabel.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.47");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.47.4.1");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -42,83 +42,87 @@ vtkPVContourEntry::vtkPVContourEntry()
 {
   this->CommandFunction = vtkPVContourEntryCommand;
 
-  this->SuppressReset = 1;
-  
   this->ArrayMenu = NULL;
   
-  this->SetNumberCommand = NULL;
-  this->SetContourCommand = NULL;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVContourEntry::~vtkPVContourEntry()
 {
   this->SetArrayMenu(NULL);
-  this->SetSetNumberCommand(NULL);
-  this->SetSetContourCommand(NULL);
 }
 
 //-----------------------------------------------------------------------------
 int vtkPVContourEntry::ComputeWidgetRange()
 {
-  if (!this->ArrayMenu)
+  vtkSMProperty* prop = this->GetSMProperty();
+  vtkSMDoubleRangeDomain* dom = 0;
+  if (prop)
     {
-    vtkErrorMacro("Array menu has not been set.");
-    return 0;
+    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("range"));
     }
-
-  vtkPVArrayInformation* ai = this->ArrayMenu->GetArrayInformation();
-  if (ai == NULL || ai->GetName() == NULL)
+  if (dom)
     {
-    return 0;
+    int exists;
+    double rg = dom->GetMinimum(0, exists);
+    if (exists)
+      {
+      this->WidgetRange[0] = rg;
     }
-
-  ai->GetComponentRange(0, this->WidgetRange);
+    rg = dom->GetMaximum(0, exists);
+    if (exists)
+    {
+      this->WidgetRange[1] = rg;
+    }
   this->UseWidgetRange = 1;
   return 1;
+    }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVContourEntry::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVContourEntry::Accept()
 {
-  int i;
-  int numContours;
+  int modFlag = this->GetModifiedFlag();
 
-  if (sourceID.ID == 0)
+  this->Superclass::Accept();
+
+  vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (prop)
     {
-    return;
+    int numContours = this->ContourValues->GetNumberOfContours();
+    prop->SetNumberOfElements(numContours);
+    for(int i=0; i<numContours; i++)
+      {
+      prop->SetElement(i, this->ContourValues->GetValue(i));
+      }
+    }
+  else
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
     }
 
-  this->Superclass::AcceptInternal(sourceID);
+  this->ModifiedFlag = 0;
 
-  numContours = this->ContourValues->GetNumberOfContours();
-
-  char **cmds = new char*[numContours+1];
-  int *numScalars = new int[numContours+1];
-
-  this->UpdateProperty();
-  
-  cmds[0] = new char[20];
-  sprintf(cmds[0], this->SetNumberCommand);
-  numScalars[0] = 1;
-  
-  for (i = 0; i < numContours; i++)
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
     {
-    cmds[i+1] = new char[9];
-    sprintf(cmds[i+1], this->SetContourCommand);
-    numScalars[i+1] = 2;
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+    {
+      this->Trace(file);
+      }
     }
   
-  this->Property->SetVTKSourceID(sourceID);
-  this->Property->SetVTKCommands(numContours+1, cmds, numScalars);
-  this->Property->AcceptInternal();
+  this->AcceptCalled = 1;
   
-  for (i = 0; i < numContours+1; i++)
-    {
-    delete [] cmds[i];
-    }
-  delete [] cmds;
-  delete [] numScalars;
 }
 
 //-----------------------------------------------------------------------------
@@ -126,20 +130,20 @@ void vtkPVContourEntry::SaveInBatchScript(ofstream *file)
 {
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
 
-  int i;
-  float value;
-  int numContours;
-
-  numContours = (this->Property->GetNumberOfScalars() - 1) / 2;
+  vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (prop)
+    {
+    unsigned int numContours = prop->GetNumberOfElements();
 
   *file << "  [$pvTemp" << sourceID.ID << " GetProperty ContourValues] "
         << "SetNumberOfElements " << numContours << endl;
-  for (i = 0; i < numContours; i++)
+    for (unsigned int i = 0; i < numContours; i++)
     {
-    value = this->Property->GetScalar(2*(i+1));
     *file << "  ";
     *file << "[$pvTemp" << sourceID.ID << " GetProperty ContourValues] "
-          << "SetElement " << i << " " << value << endl;
+            << "SetElement " << i << " " << prop->GetElement(i) << endl;
+      }
     }
 }
 
@@ -148,25 +152,21 @@ void vtkPVContourEntry::SaveInBatchScript(ofstream *file)
 // this would be much easier.  We would not have to rely on Tcl calls.
 void vtkPVContourEntry::ResetInternal()
 {
-  int i;
-  int numContours;
-  
-  if (this->PVSource == NULL)
-    {
-    vtkErrorMacro("PVSource not set.");
-    return;
-    }
-
-  numContours = (this->Property->GetNumberOfScalars()-1)/2;
-  float *scalars = this->Property->GetScalars();
-  
   // The widget has been modified.  
   // Now set the widget back to reflect the contours in the filter.
   this->ContourValuesList->DeleteAll();
   this->ContourValues->SetNumberOfContours(0);
-  for (i = 0; i < numContours; i++)
+
+  vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (prop)
     {
-    this->AddValue(scalars[2*(i+1)]);
+    unsigned int numContours = prop->GetNumberOfElements();
+
+    for (unsigned int i = 0; i < numContours; i++)
+    {
+      this->AddValue(prop->GetElement(i));
+      }
     }
 
   // Since the widget now matches the fitler, it is no longer modified.
@@ -186,13 +186,32 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     }
   
   ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
-  ai->SetCurrentProperty(this->Property);
-  if (this->UseWidgetRange)
+  ai->SetAnimationElement(0);
+
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMDoubleRangeDomain *rangeDomain = vtkSMDoubleRangeDomain::SafeDownCast(
+    prop->GetDomain("range"));
+    
+
+  if (!rangeDomain)
     {
-    ai->SetTimeStart(this->WidgetRange[0]);
-    ai->SetTimeEnd(this->WidgetRange[1]);
+    return;
     }
+
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(rangeDomain);
+
+  int minExists, maxExists;
+  double min = rangeDomain->GetMinimum(0, minExists);
+  double max = rangeDomain->GetMaximum(0, maxExists);
+  if (minExists && maxExists)
+    {
+    ai->SetTimeStart(min);
+    ai->SetTimeEnd(max);
+    }
+
   ai->Update();
+
 }
 
 //----------------------------------------------------------------------------
@@ -213,8 +232,6 @@ void vtkPVContourEntry::CopyProperties(
       pvce->SetArrayMenu(am);
       am->Delete();
       }
-    pvce->SetSetNumberCommand(this->SetNumberCommand);
-    pvce->SetSetContourCommand(this->SetContourCommand);
     }
   else 
     {
@@ -251,45 +268,7 @@ int vtkPVContourEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     amw->Delete();  
     }
 
-  this->SetSetNumberCommand(element->GetAttribute("set_number_command"));
-  this->SetSetContourCommand(element->GetAttribute("set_contour_command"));
-  
   return 1;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::UpdateProperty()
-{
-  int numContours = this->ContourValues->GetNumberOfContours();
-  float *scalars = new float[2*numContours+1];
-  scalars[0] = numContours;
-  int i;
-  
-  for (i = 0; i < numContours; i++)
-    {
-    scalars[2*i+1] = i;
-    scalars[2*(i+1)] = this->ContourValues->GetValue(i);
-    }
-  this->Property->SetScalars(2*numContours+1, scalars);
-  delete [] scalars;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVContourEntry::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVContourWidgetProperty::SafeDownCast(prop);
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVContourEntry::GetProperty()
-{
-  return this->Property;
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVContourEntry::CreateAppropriateProperty()
-{
-  return vtkPVContourWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------
@@ -305,8 +284,4 @@ void vtkPVContourEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ArrayMenu: " << this->GetArrayMenu() << endl;
-  os << indent << "SetContourCommand: "
-     << (this->SetContourCommand ? this->SetContourCommand : "(none)") << endl;
-  os << indent << "SetNumberCommand: "
-     << (this->SetNumberCommand ? this->SetNumberCommand : "(none)") << endl;
 }

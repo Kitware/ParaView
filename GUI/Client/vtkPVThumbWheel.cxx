@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.6");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.6.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -222,6 +222,7 @@ void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   
   ai->SetCurrentSMProperty(prop);
   ai->SetCurrentSMDomain(rangeDomain);
+  ai->SetAnimationElement(0);
   
   if (rangeDomain)
     {

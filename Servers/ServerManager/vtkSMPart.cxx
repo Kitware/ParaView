@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.5");
+vtkCxxRevisionMacro(vtkSMPart, "1.5.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream, 1);
     int num =0;
-    pm->GetLastServerResult().GetArgument(0,0,&num);
+    pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&num);
     if (num != 1)
       { // The source can already produce pieces.
       return;
@@ -166,7 +166,7 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
                     << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream, 1);
     int num =0;
-    pm->GetLastServerResult().GetArgument(0,0,&num);
+    pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&num);
     if (num != 1)
       { // The source can already produce pieces.
       return;
@@ -290,7 +290,7 @@ void vtkSMPart::CreateTranslatorIfNecessary()
            << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream, 1);
     char* classname = 0;
-    if(!pm->GetLastServerResult().GetArgument(0,0,&classname))
+    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&classname))
       {
       vtkErrorMacro(<< "Faild to get server result.");
       }

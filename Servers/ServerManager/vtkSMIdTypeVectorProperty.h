@@ -128,7 +128,7 @@ protected:
 
   int ArgumentIsArray;
 
-  virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
+  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
 
   // Description:
   // Sets the size of unchecked elements. Usually this is

@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.23");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.23.2.1");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -68,7 +68,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   int canread = 0;
-  if(!pm->GetLastServerResult().GetArgument(0,0,&canread))
+  if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0,0,&canread))
     {
     vtkErrorMacro(<< "Faild to get server result.");
     return;

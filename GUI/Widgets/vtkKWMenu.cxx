@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.52");
+vtkCxxRevisionMacro(vtkKWMenu, "1.52.2.1");
 
 
 
@@ -694,6 +694,30 @@ int vtkKWMenu::GetIndex(const char* menuname)
 {
   this->Script("%s index {%s}", this->GetWidgetName(), menuname);
   return vtkKWObject::GetIntegerResult(this->GetApplication());
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetIndexOfCommand(
+  vtkKWObject* Object, const char* MethodAndArgString)
+{
+  if (Object && MethodAndArgString)
+    {
+    ostrstream str;
+    str << Object->GetTclName() << " " << MethodAndArgString << ends;
+    int nb_of_items = this->GetNumberOfItems();
+    for (int i = 0; i < nb_of_items; i++)
+      {
+      const char *command_opt = this->GetItemOption(i, "-command");
+      if (command_opt && !strcmp(command_opt, str.str()))
+        {
+        str.rdbuf()->freeze(0);
+        return i;
+        }
+      }
+    str.rdbuf()->freeze(0);
+    }
+
+  return -1;
 }
 
 //----------------------------------------------------------------------------

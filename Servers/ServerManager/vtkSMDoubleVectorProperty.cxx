@@ -17,11 +17,12 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.13");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.13.2.1");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -34,6 +35,7 @@ vtkSMDoubleVectorProperty::vtkSMDoubleVectorProperty()
 {
   this->Internals = new vtkSMDoubleVectorPropertyInternals;
   this->ArgumentIsArray = 0;
+  this->SetNumberCommand = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -49,6 +51,13 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
   if (!this->Command || this->IsReadOnly)
     {
     return;
+    }
+
+  if (this->SetNumberCommand)
+    {
+    *str << vtkClientServerStream::Invoke 
+         << objectId << this->SetNumberCommand << this->GetNumberOfElements()
+         << vtkClientServerStream::End;
     }
 
   if (!this->RepeatCommand)
@@ -96,6 +105,95 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
       *str << vtkClientServerStream::End;
       }
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleVectorProperty::UpdateInformation( vtkClientServerID objectId )
+{
+  if (!this->InformationOnly)
+    {
+    return;
+    }
+
+  vtkClientServerStream str;
+  str << vtkClientServerStream::Invoke 
+      << objectId << this->Command
+      << vtkClientServerStream::End;
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(vtkProcessModule::DATA_SERVER, str, 0);
+
+  const vtkClientServerStream& res = pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT);
+
+  int numMsgs = res.GetNumberOfMessages();
+  if (numMsgs < 1)
+    {
+    return;
+    }
+
+  int numArgs = res.GetNumberOfArguments(0);
+  if (numArgs < 1)
+    {
+    return;
+    }
+
+  int argType = res.GetArgumentType(0, 0);
+
+  if (argType == vtkClientServerStream::float64_value ||
+      argType == vtkClientServerStream::float32_value)
+    {
+    double ires;
+    int retVal = res.GetArgument(0, 0, &ires);
+    if (!retVal)
+      {
+      vtkErrorMacro("Error getting argument.");
+      return;
+      }
+    this->SetNumberOfElements(1);
+    this->SetElement(0, ires);
+    }
+  else if (argType == vtkClientServerStream::float64_array)
+    {
+    vtkTypeUInt32 length;
+    res.GetArgumentLength(0, 0, &length);
+    if (length >= 128)
+      {
+      vtkErrorMacro("Only arguments of length 128 or less are supported");
+      return;
+      }
+    double values[128];
+    int retVal = res.GetArgument(0, 0, values, length);
+    if (!retVal)
+      {
+      vtkErrorMacro("Error getting argument.");
+      return;
+      }
+    this->SetNumberOfElements(length);
+    this->SetElements(values);
+    }
+  else if (argType == vtkClientServerStream::float32_array)
+    {
+    vtkTypeUInt32 length;
+    res.GetArgumentLength(0, 0, &length);
+    if (length >= 128)
+      {
+      vtkErrorMacro("Only arguments of length 128 or less are supported");
+      return;
+      }
+    float values[128];
+    int retVal = res.GetArgument(0, 0, values, length);
+    if (!retVal)
+      {
+      vtkErrorMacro("Error getting argument.");
+      return;
+      }
+    this->SetNumberOfElements(length);
+    for (unsigned int i=0; i<length; i++)
+      {
+      this->SetElement(i, values[i]);
+      }
+    }
+
 }
 
 //---------------------------------------------------------------------------
@@ -259,6 +357,12 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     this->SetArgumentIsArray(arg_is_array); 
     }
 
+  const char* numCommand = element->GetAttribute("set_number_command");
+  if (numCommand)
+    {
+    this->SetSetNumberCommand(numCommand);
+    }
+
   int numElems = this->GetNumberOfElements();
   if (numElems > 0)
     {
@@ -278,6 +382,12 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
         }
       this->SetElements(initVal);
       }
+    else
+      {
+      vtkErrorMacro("No default value is specified for property: "
+                    << this->GetXMLName()
+                    << ". This might lead to stability problems");
+      }
     delete[] initVal;
     }
     
@@ -286,7 +396,7 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 
 //---------------------------------------------------------------------------
 void vtkSMDoubleVectorProperty::SaveState(
-  const char* name, ofstream* file, vtkIndent indent)
+  const char* name, ostream* file, vtkIndent indent)
 {
   unsigned int size = this->GetNumberOfElements();
   *file << indent << "<Property name=\"" << (this->XMLName?this->XMLName:"")

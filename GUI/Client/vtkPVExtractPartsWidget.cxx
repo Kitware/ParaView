@@ -25,12 +25,12 @@
 #include "vtkPVData.h"
 #include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
+#include "vtkSMIntVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.18.2.1");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -46,8 +46,6 @@ vtkPVExtractPartsWidget::vtkPVExtractPartsWidget()
 
   this->PartSelectionList = vtkKWListBox::New();
   this->PartLabelCollection = vtkCollection::New();
-  
-  this->Property = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -64,8 +62,6 @@ vtkPVExtractPartsWidget::~vtkPVExtractPartsWidget()
   this->PartSelectionList = NULL;
   this->PartLabelCollection->Delete();
   this->PartLabelCollection = NULL;
-  
-  this->SetProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -113,23 +109,22 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
                this->PartSelectionList->GetWidgetName());
 
   int num = this->PVSource->GetPVInput(0)->GetNumberOfParts();
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (ivp)
+    {
   int i;
-  float *scalars = new float[2*num];
   
   for (i = 0; i < num; i++)
     {
-    scalars[2*i] = i;
-    scalars[2*i+1] = 1;
+      ivp->SetElement(i, 1);
+      }
     }
-  
-  this->Property->SetScalars(num*2, scalars);
-  delete [] scalars;
   
   // There is no current way to get a modified call back, so assume
   // the user will change the list.  This widget will only be used once anyway.
   this->ModifiedCallback();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVExtractPartsWidget::Inactivate()
@@ -158,44 +153,51 @@ void vtkPVExtractPartsWidget::Inactivate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
+void vtkPVExtractPartsWidget::Accept()
 {
   int num, idx;
+  int modFlag = this->GetModifiedFlag();
 
   num = this->PartSelectionList->GetNumberOfItems();
 
-  if (this->ModifiedFlag)
+  if (modFlag)
     {
     this->Inactivate();
     }
 
   // Now loop through the input mask setting the selection states.
-  float *scalars = new float[num*2];
-  char **cmds = new char*[num];
-  int *numScalars = new int[num];
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (!ivp)
+    {
+    vtkErrorMacro(
+      "Could not find property of name: "
+      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
+      << " for widget: " << this->GetTraceName());
+    return;
+    }
   
   for (idx = 0; idx < num; ++idx)
     {
-    scalars[2*idx] = idx;
-    scalars[2*idx+1] = this->PartSelectionList->GetSelectState(idx);
-    cmds[idx] = new char[13];
-    strcpy(cmds[idx], "SetInputMask");
-    numScalars[idx] = 2;
+    ivp->SetElement(idx, this->PartSelectionList->GetSelectState(idx));
     }
-  this->Property->SetVTKCommands(num, cmds, numScalars);
-  this->Property->SetScalars(num*2, scalars);
-  this->Property->SetVTKSourceID(vtkSourceID);
-  this->Property->AcceptInternal();
-  
-  for (idx = 0; idx < num; idx++)
-    {
-    delete [] cmds[idx];
-    }
-  delete [] cmds;
-  delete [] scalars;
-  delete [] numScalars;
   
   this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+    {
+      this->Trace(file);
+      }
+    }
+  
+  this->AcceptCalled = 1;
 }
 
 
@@ -203,12 +205,6 @@ void vtkPVExtractPartsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
 void vtkPVExtractPartsWidget::SetSelectState(int idx, int val)
 {
   this->PartSelectionList->SetSelectState(idx, val);
-  
-  if (!this->AcceptCalled)
-    {
-    float *scalars = this->Property->GetScalars();
-    scalars[2*idx+1] = val;
-    }
 }
 
 
@@ -217,16 +213,19 @@ void vtkPVExtractPartsWidget::Trace(ofstream *file)
 {
   int idx, num;
 
-  if ( ! this->InitializeTrace(file))
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+
+  if ( ! this->InitializeTrace(file) || !ivp)
     {
     return;
     }
 
-  num = this->Property->GetNumberOfScalars() / 2;
+  num = this->PartSelectionList->GetNumberOfItems();
   for (idx = 0; idx < num; ++idx)
     {
     *file << "$kw(" << this->GetTclName() << ") SetSelectState "
-          << idx << " " << this->Property->GetScalars()[2*idx+1] << endl;
+          << idx << " " << ivp->GetElement(idx) << endl;
     }
 }
 
@@ -247,12 +246,18 @@ void vtkPVExtractPartsWidget::ResetInternal()
     this->PartSelectionList->InsertEntry(idx, part->GetName());
     }
 
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (!ivp)
+    {
+    return;
+    }
+  
   // Now loop through the input mask setting the selection states.
-  float *scalars = this->Property->GetScalars();
   for (idx = 0; idx < num; ++idx)
     {
     this->PartSelectionList->SetSelectState(
-      idx, static_cast<int>(scalars[2*idx+1]));
+      idx, ivp->GetElement(idx));
     }
 
   // Because list box does not notify us when it is modified ...
@@ -300,43 +305,26 @@ void vtkPVExtractPartsWidget::SaveInBatchScript(ofstream *file)
 
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
 
-  vtkPVScalarListWidgetProperty* property =
-    vtkPVScalarListWidgetProperty::SafeDownCast(this->Property);
+  if (sourceID.ID == 0 || !this->SMPropertyName)
+    {
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
+    }
 
-  num = property->GetNumberOfScalars();
+  num = this->PartSelectionList->GetNumberOfItems();
 
-  *file << "  [$pvTemp" << sourceID.ID 
-        << " GetProperty InputMask] SetNumberOfElements "
+  *file << "  [$pvTemp" << sourceID << " GetProperty "
+        << this->SMPropertyName << "] SetNumberOfElements "
         << num << endl;
 
   // Now loop through the input mask setting the selection states.
-  for (idx = 0; idx < num; idx+=2)
+  for (idx = 0; idx < num; idx++)
     {
-    *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty InputMask] SetElement "
-          << idx << " " << property->GetScalar(idx) << endl;
-    *file << "  [$pvTemp" << sourceID.ID 
-          << " GetProperty InputMask] SetElement "
-          << idx+1 << " " << property->GetScalar(idx+1) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty "
+          << this->SMPropertyName << "] SetElement "
+          << idx << " " << this->PartSelectionList->GetSelectState(idx)
+          << endl;
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVExtractPartsWidget::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVExtractPartsWidget::GetProperty()
-{
-  return this->Property;
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVExtractPartsWidget::CreateAppropriateProperty()
-{
-  return vtkPVScalarListWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------

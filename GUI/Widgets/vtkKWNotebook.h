@@ -136,6 +136,7 @@ public:
   // title, the page which match both title *and* tag is considered.
   // If the currently selected page is hidden, it is unselected first and
   // the first visible tab (if any) becomes selected instead.
+  // A pinned page tab can not be hidden (see PinPage()/UnpinPage()).
   void ShowPage(int id);
   void ShowPage(const char *title);
   void ShowPage(const char *title, int tag);
@@ -231,6 +232,12 @@ public:
   int  GetPagePinned(const char *title);
   int  GetPagePinned(const char *title, int tag);
   
+  // Description:
+  // Convenience methods provided to pin/unpin all page tabs 
+  // matching a given tag.
+  void PinPagesMatchingTag(int tag);
+  void UnpinPagesMatchingTag(int tag);
+
   // Description:
   // Allow pages to be pinned.
   virtual void SetPagesCanBePinned(int);

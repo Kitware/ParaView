@@ -137,7 +137,7 @@ $kw(vtkTemp1490) SetSelectState 3 0
 $kw(vtkTemp1490) SetSelectState 4 0
 $kw(vtkTemp1490) SetSelectState 5 1
 $kw(vtkTemp1484) AcceptCallback
-$kw(vtkTemp17) SetBackgroundColor 0.000000 0.000000 0.000000
+$kw(vtkTemp17) SetRendererBackgroundColor 0.000000 0.000000 0.000000
 $kw(vtkTemp572) SetVisibility 1
 set kw(vtkTemp1612) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
 $kw(vtkTemp17) SetCameraState 3.582 -1.893 4.982  0.989 0.381 -0.476  -0.722 0.446 0.529

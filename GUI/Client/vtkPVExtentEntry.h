@@ -30,7 +30,6 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkPVInputMenu;
 class vtkPVMinMax;
-class vtkPVExtentWidgetProperty;
 
 class VTK_EXPORT vtkPVExtentEntry : public vtkPVObjectWidget
 {
@@ -93,7 +92,7 @@ public:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -105,15 +104,6 @@ public:
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
-
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
 
   // Description:
   // Set/get which axis to animate.
@@ -153,7 +143,6 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
-  vtkPVExtentWidgetProperty *Property;
   int AnimationAxis;
   int UseCellExtent;
   

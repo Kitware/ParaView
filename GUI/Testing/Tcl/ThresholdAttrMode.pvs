@@ -12,7 +12,7 @@ if {[info exists argc]} {
 set pv(vtkTemp1) [$Application GetMainWindow]
 set pv(vtkTemp44) [$pv(vtkTemp1) GetMainView]
 $pv(vtkTemp44) SetOrientationAxesVisibility 0
-$pv(vtkTemp44) SetBackgroundColor 0 0 0
+$pv(vtkTemp44) SetRendererBackgroundColor 0 0 0
 set pv(vtkTemp90) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set pv(vtkTemp94) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
 set pv(vtkTemp98) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]

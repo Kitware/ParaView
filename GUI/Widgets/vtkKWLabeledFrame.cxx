@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.38");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.38.2.1");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -224,11 +224,11 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
                this->GetLabelIcon()->GetWidgetName());
 
   const char *lem_name = app->GetLimitedEditionModeName() 
-    ? app->GetLimitedEditionModeName() : "limited edition";
+    ? app->GetLimitedEditionModeName() : "Limited Edition";
   
   ostrstream balloon_str;
-  balloon_str << "This feature is not available in " << lem_name 
-              << " mode." << ends;
+  balloon_str << "This feature is not available in \"" << lem_name 
+              << "\" mode." << ends;
   this->GetLabelIcon()->SetBalloonHelpString(balloon_str.str());
   balloon_str.rdbuf()->freeze(0);
 
