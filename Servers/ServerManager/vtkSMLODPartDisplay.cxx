@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.17");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.18");
 
 
 //----------------------------------------------------------------------------
@@ -537,9 +537,6 @@ void vtkSMLODPartDisplay::SetLODResolution(int res)
 //----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::Update()
 {
-  vtkPVProcessModule* pm =
-    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
-
   if ( ! this->GeometryIsValid && this->UpdateSuppressorProxy )
     {
     vtkClientServerStream stream;
@@ -558,7 +555,7 @@ void vtkSMLODPartDisplay::Update()
     }
 
   // Try delaying the update of the LOD path if it is not necessary.
-  if ( ! this->LODGeometryIsValid && pm->GetGlobalLODFlag() && 
+  if ( ! this->LODGeometryIsValid && vtkPVProcessModule::GetGlobalLODFlag() && 
        this->LODUpdateSuppressorProxy )
     {
     vtkClientServerStream stream;
