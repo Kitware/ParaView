@@ -336,18 +336,19 @@ vtkPVRenderView::vtkPVRenderView()
   
   this->Interactive = 0;
   
-  this->RenderWindow = vtkRenderWindow::New();
   this->RenderWindow->SetDesiredUpdateRate(1.0);
-  this->Renderer = vtkRenderer::New();
-  this->RenderWindow->AddRenderer(this->Renderer);  
 }
 
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
+  this->SetInteractorStyle(NULL);
+
+  // We are having problems with renderWindow being deleted after the RenderWidget.
+  this->Interactor->SetRenderWindow(NULL);
+
   this->Interactor->Delete();
   this->Interactor = NULL;
-  this->SetInteractorStyle(NULL);
 }
 
 //----------------------------------------------------------------------------

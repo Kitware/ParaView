@@ -29,7 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkMultiProcessController.h"
 #include "vtkPVApplication.h"
 #include "vtkTclUtil.h"
-#include "kwinit.h"
+//#include "kwinit.h"
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
@@ -67,13 +67,14 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
 
 // The applications Initialize Tcl also initializes Tk and needs a DISPLAY env variable set.
 // This is a temporary solution.
+// Not used,  Transitioning to vtkKWApplication.
 Tcl_Interp *vtkPVInitializeTcl()
 {
   Tcl_Interp *interp;
   
   interp = Tcl_CreateInterp();
   // vtkKWApplication depends on this variable being set.
-  Et_Interp = interp;
+  //Et_Interp = interp;
   
   // initialize VTK
   Vtktcl_Init(interp);
@@ -133,6 +134,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   
   if (myId ==  0)
     { // The last process is for UI.
+
     // We need to pass the local controller to the UI process.
     Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     
@@ -164,8 +166,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     //putenv("DISPLAY=www.kitware.com:2.0");
     
     vtkKWApplication::SetWidgetVisibility(0);
-    //Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
-    Tcl_Interp *interp = vtkPVInitializeTcl();
+    Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     
     // We should use the application tcl name in the future.
     // All object in the satellite processes must be created through tcl.
