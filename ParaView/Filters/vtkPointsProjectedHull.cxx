@@ -20,7 +20,7 @@
 #include "vtkPointsProjectedHull.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.12");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.13");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;
@@ -217,8 +217,8 @@ int vtkPointsProjectedHull::rectangleIntersection(double hmin, double hmax,
 //
 extern "C" 
 {
-  static int incrVertAxis(const void *p1, const void *p2);
-  static int ccw(const void *p1, const void *p2);
+  int vtkPointsProjectedHullIncrVertAxis(const void *p1, const void *p2);
+  int vtkPointsProjectedHullCCW(const void *p1, const void *p2);
 }
 int vtkPointsProjectedHull::grahamScanAlgorithm(int dir)
 {
@@ -258,7 +258,7 @@ int i,j;
     hullPts[i*2 + 1] = this->Pts[i*3 + vertAxis];
     }
 
-  qsort(hullPts, this->Npts, sizeof(double) * 2, incrVertAxis);
+  qsort(hullPts, this->Npts, sizeof(double) * 2, vtkPointsProjectedHullIncrVertAxis);
 
   int firstId = 0;
 
@@ -283,7 +283,7 @@ int i,j;
     hullPts[1] = firstPt[1];
     }
   // If there are duplicates of the first point in the
-  // projection, the ccw sort will fail.
+  // projection, the vtkPointsProjectedHullCCW sort will fail.
 
   int dups = 0;
 
@@ -315,7 +315,7 @@ int i,j;
   //   P2 makes a greater angle than P1 if it is left of the line
   //   formed by firstPt - P1.
 
-  qsort(hullPts+2, nHullPts - 1, sizeof(double)*2, ccw);
+  qsort(hullPts+2, nHullPts - 1, sizeof(double)*2, vtkPointsProjectedHullCCW);
 
   // Remove sequences of duplicate points, and remove interior
   //   points on the same ray from the initial point
@@ -679,7 +679,7 @@ int vtkPointsProjectedHull::rectangleOutside1DPolygon(double hmin, double hmax,
 
 extern "C"
 {
-  static int incrVertAxis(const void *p1, const void *p2)
+  int vtkPointsProjectedHullIncrVertAxis(const void *p1, const void *p2)
   {
   double *a, *b;
 
@@ -691,7 +691,7 @@ extern "C"
       else                   return 1;
   }
 
-  static int ccw(const void *p1, const void *p2)
+  int vtkPointsProjectedHullCCW(const void *p1, const void *p2)
   {
   double *a, *b;
   double val;
