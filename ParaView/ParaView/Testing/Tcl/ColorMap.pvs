@@ -74,7 +74,6 @@ $kw(vtkTemp1) ShowAnimationProperties
 set kw(vtkTemp67) [$kw(vtkTemp1) GetAnimationInterface]
 $kw(vtkTemp67) SetPVSource $kw(vtkTemp300)
 $kw(vtkTemp67) SetCurrentTime 0.000000
-$kw(vtkTemp67) CurrentTimeCallback
 $kw(vtkTemp16) ResetCameraClippingRange
 update
 
