@@ -302,8 +302,8 @@ protected:
 
   virtual void InvokeCommand(const char *command);
   virtual void InvokePointCommand(const char *command, int id);
-  virtual void SetCommand(char **command, 
-                          vtkKWObject *object, const char *method);
+  virtual void SetObjectMethodCommand(char **command, 
+                                      vtkKWObject *object, const char *method);
 
   // GUI
 
