@@ -14,9 +14,8 @@
 #include "vtkKWWin32RegisteryUtilities.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 
-vtkCxxRevisionMacro(vtkKWWin32RegisteryUtilities, "1.8");
+vtkCxxRevisionMacro(vtkKWWin32RegisteryUtilities, "1.9");
 vtkStandardNewMacro( vtkKWWin32RegisteryUtilities );
 
 #define BUFFER_SIZE 8192
@@ -95,7 +94,7 @@ int vtkKWWin32RegisteryUtilities::SetValueInternal(const char *key,
                                                    const char *value)
 {
   int res = 1;
-  DWORD len = (DWORD) vtkString::Length(value);
+  DWORD len = (DWORD)(value ? strlen(value) : 0);
   res = ( RegSetValueEx(this->HKey, key, 0, REG_SZ, 
                         (CONST BYTE *)(const char *)value, 
                         len+1) == ERROR_SUCCESS );

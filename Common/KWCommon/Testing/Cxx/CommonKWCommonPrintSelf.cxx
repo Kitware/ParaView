@@ -19,7 +19,6 @@
 #include "vtkKWRegisteryUtilities.h"
 #include "vtkKWRemoteExecute.h"
 #include "vtkKWSerializer.h"
-#include "vtkString.h"
 
 #ifdef _WIN32
 # include "vtkKWWin32RegisteryUtilities.h"
@@ -41,7 +40,6 @@ int main(int , char* [])
 #else
   c = vtkKWUNIXRegisteryUtilities::New(); c->Print( cout ); c->Delete();
 #endif
-  c = vtkString::New(); c->Print( cout ); c->Delete();
 
   return 0;
 }

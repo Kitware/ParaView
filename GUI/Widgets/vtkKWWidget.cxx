@@ -24,14 +24,15 @@
 #include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
-#include "vtkString.h"
 #include "vtkWindows.h"
+
+#include <kwsys/SystemTools.hxx>
 
 #include "X11/Xutil.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.109");
+vtkCxxRevisionMacro(vtkKWWidget, "1.110");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -468,7 +469,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.109 $");
+  this->ExtractRevision(os,"$Revision: 1.110 $");
 }
 
 //----------------------------------------------------------------------------
@@ -846,7 +847,7 @@ const char* vtkKWWidget::ConvertInternalStringToTclString(
   char *clean_str = NULL;
   if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
     {
-    clean_str = vtkString::RemoveChars(str, "{}");
+    clean_str = kwsys::SystemTools::RemoveChars(str, "{}");
     str = clean_str;
     }
 
@@ -910,7 +911,7 @@ const char* vtkKWWidget::ConvertTclStringToInternalString(
   char *clean_str = NULL;
   if (no_curly_braces && (strchr(str, '{') || strchr(str, '}')))
     {
-    clean_str = vtkString::RemoveChars(str, "{}");
+    clean_str = kwsys::SystemTools::RemoveChars(str, "{}");
     str = clean_str;
     }
 

@@ -15,11 +15,12 @@
 
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
+
+#include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.23");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.24");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -31,7 +32,7 @@ vtkKWProgressGauge::vtkKWProgressGauge()
   this->Length = 100;
   this->Height = 20;
   this->Value = 0;
-  this->BarColor = vtkString::Duplicate("blue");
+  this->BarColor = kwsys::SystemTools::DuplicateString("blue");
 }
 
 

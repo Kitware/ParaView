@@ -16,15 +16,16 @@
 #include "vtkKWApplication.h"
 #include "vtkKWSerializer.h"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 #include "vtkTclUtil.h"
 
 #include <stdarg.h>
 #include <ctype.h>
 
+#include <kwsys/SystemTools.hxx>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.46");
+vtkCxxRevisionMacro(vtkKWObject, "1.47");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -91,7 +92,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.46 $");
+  this->ExtractRevision(os,"$Revision: 1.47 $");
 }
 
 //----------------------------------------------------------------------------
@@ -165,7 +166,7 @@ const char *vtkKWObject::GetTclName()
 
   vtkTclGetObjectFromPointer(this->GetApplication()->GetMainInterp(), 
                              (void *)this, "vtkKWObject");
-  this->TclName = vtkString::Duplicate(
+  this->TclName = kwsys::SystemTools::DuplicateString(
     this->GetApplication()->GetMainInterp()->result);
   return this->TclName;
 }
@@ -433,11 +434,16 @@ void vtkKWObject::AddTraceEntry(const char *format, ...)
 //----------------------------------------------------------------------------
 int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
 {
+  if (!format)
+    {
+    return 0;
+    }
+
   // Quick-hack attempt at estimating the length of the string.
   // Should never under-estimate.
   
   // Start with the length of the format string itself.
-  int length = vtkString::Length(format);
+  int length = strlen(format);
   
   // Increase the length for every argument in the format.
   const char* cur = format;
@@ -460,7 +466,7 @@ int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
             char* s = va_arg(ap, char*);
             if(s)
               {
-              length += vtkString::Length(s);
+              length += strlen(s);
               }
             } break;
           case 'e':

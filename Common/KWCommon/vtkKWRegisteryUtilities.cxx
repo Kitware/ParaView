@@ -15,7 +15,6 @@
 
 #include "vtkDebugLeaks.h"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 
 #ifdef _WIN32
 #  include "vtkKWWin32RegisteryUtilities.h"
@@ -25,7 +24,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWRegisteryUtilities, "1.10");
+vtkCxxRevisionMacro(vtkKWRegisteryUtilities, "1.11");
 
 //----------------------------------------------------------------------------
 vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
@@ -88,7 +87,7 @@ int vtkKWRegisteryUtilities::Open(const char *toplevel,
     }
 
   if ( this->IsSpace(toplevel[0]) || 
-       this->IsSpace(toplevel[vtkString::Length(toplevel)-1]) )
+       this->IsSpace(toplevel[strlen(toplevel)-1]) )
     {
     vtkErrorMacro("Toplevel has to start with letter or number and end"
                   " with one");
@@ -266,7 +265,7 @@ char *vtkKWRegisteryUtilities::Strip(char *str)
     {
     return NULL;
     }  
-  len = vtkString::Length(str);
+  len = strlen(str);
   nstr = str;
   for( cc=0; cc<len; cc++ )
     {
@@ -276,7 +275,7 @@ char *vtkKWRegisteryUtilities::Strip(char *str)
       }
     nstr ++;
     }
-  for( cc=(vtkString::Length(nstr)-1); cc>=0; cc-- )
+  for( cc=(strlen(nstr)-1); cc>=0; cc-- )
     {
     if ( !this->IsSpace( nstr[cc] ) )
       {

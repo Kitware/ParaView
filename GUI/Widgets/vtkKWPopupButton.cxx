@@ -18,11 +18,12 @@
 #include "vtkKWFrame.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
+
+#include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.14");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.15");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -183,7 +184,7 @@ void vtkKWPopupButton::SetPopupTitle(const char* title)
     return;
     }
 
-  if ( vtkString::Equals(this->PopupTitle, title) )
+  if (this->PopupTitle && title && !strcmp(this->PopupTitle, title))
     {
     return;
     }
@@ -196,7 +197,7 @@ void vtkKWPopupButton::SetPopupTitle(const char* title)
 
   if ( title )
     {
-    this->PopupTitle = vtkString::Duplicate(title);
+    this->PopupTitle = kwsys::SystemTools::DuplicateString(title);
 
     if (this->IsCreated() && this->PopupTopLevel->IsCreated())
       {

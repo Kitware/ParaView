@@ -14,13 +14,12 @@
 #include "vtkKWSerializer.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 
 #include <ctype.h>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSerializer );
-vtkCxxRevisionMacro(vtkKWSerializer, "1.7");
+vtkCxxRevisionMacro(vtkKWSerializer, "1.8");
 
 //----------------------------------------------------------------------------
 // Internal function used to consume whitespace when reading in
@@ -159,7 +158,7 @@ void vtkKWSerializer::ReadNextToken(istream *is, const char *tok,
 void vtkKWSerializer::WriteSafeString(ostream& os, const char *val)
 {
   int i;
-  int len = vtkString::Length(val);
+  int len = val ? strlen(val) : 0;
   
   os << '"';
   for (i = 0; i < len; i++)

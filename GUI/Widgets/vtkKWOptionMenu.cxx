@@ -16,11 +16,12 @@
 #include "vtkKWApplication.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
+
+#include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.33");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -94,10 +95,10 @@ void vtkKWOptionMenu::UpdateOptionMenuLabel()
       }
     else
       {
-      char *cropped = vtkString::Duplicate(this->GetValue());
-      vtkString::CropString(cropped, (size_t)this->MaximumLabelWidth);
-      this->Script("%s configure -text {%s}", wname, cropped);
-      delete [] cropped;
+      kwsys_stl::string cropped = 
+        kwsys::SystemTools::CropString(
+          this->GetValue(), (size_t)this->MaximumLabelWidth);
+      this->Script("%s configure -text {%s}", wname, cropped.c_str());
       }
     }
 }

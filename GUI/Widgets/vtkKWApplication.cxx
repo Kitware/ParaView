@@ -28,7 +28,6 @@
 #include "vtkKWWindowCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
-#include "vtkString.h"
 #include "vtkKWText.h"
 #include "vtkTclUtil.h"
 
@@ -61,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.184");
+vtkCxxRevisionMacro(vtkKWApplication, "1.185");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -75,11 +74,13 @@ vtkKWApplication::vtkKWApplication()
   this->BalloonHelpWidget = 0;
   this->CommandFunction = vtkKWApplicationCommand;
   
-  this->ApplicationName = vtkString::Duplicate("Kitware");
+  this->ApplicationName = kwsys::SystemTools::DuplicateString("Kitware");
   this->MajorVersion = 1;
   this->MinorVersion = 0;
-  this->ApplicationVersionName = vtkString::Duplicate("Kitware10");
-  this->ApplicationReleaseName = vtkString::Duplicate("unknown");
+  this->ApplicationVersionName = 
+    kwsys::SystemTools::DuplicateString("Kitware10");
+  this->ApplicationReleaseName = 
+    kwsys::SystemTools::DuplicateString("unknown");
   this->ApplicationPrettyName = NULL;
   this->ApplicationInstallationDirectory = NULL;
 
@@ -90,7 +91,8 @@ vtkKWApplication::vtkKWApplication()
 
   this->EmailFeedbackAddress = NULL;
 
-  this->DisplayHelpStartingPage = vtkString::Duplicate("Introduction.htm");
+  this->DisplayHelpStartingPage = 
+    kwsys::SystemTools::DuplicateString("Introduction.htm");
 
   this->InExit = 0;
   this->DialogUp = 0;
@@ -324,7 +326,7 @@ int vtkKWApplication::EvaluateBooleanExpression(const char* format, ...)
   const char* result = this->ScriptInternal(format, var_args1, var_args2);
   va_end(var_args1);
   va_end(var_args2);
-  if(vtkString::Equals(result, "1" ))
+  if(result && !strcmp(result, "1"))
     {
     return 1;
     }
@@ -407,7 +409,7 @@ const char* vtkKWApplication::SimpleScript(const char* script)
   char* buffer = event;  
   
   // Make sure we have a script.
-  int length = vtkString::Length(script);
+  int length = script ? strlen(script) : 0;
   if(length < 1)
     {
     return 0;
@@ -1372,7 +1374,7 @@ int vtkKWApplication::SelfTest()
 int vtkKWApplication::LoadTclScript(const char* filename)
 {
   int res = 1;
-  char* file = vtkString::Duplicate(filename);
+  char* file = kwsys::SystemTools::DuplicateString(filename);
   // add this window as a variable
   if ( Tcl_EvalFile(Et_Interp, file) != TCL_OK )
     {
@@ -1456,7 +1458,7 @@ int vtkKWApplication::BooleanRegisteryCheck(int level,
   int allset = 0;
   if ( this->GetRegisteryValue(level, subkey, key, buffer) )
     {
-    if ( !strncmp(buffer+1, trueval+1, vtkString::Length(trueval)-1) )
+    if (buffer && trueval && !strncmp(buffer+1, trueval+1, strlen(trueval)-1))
       {
       allset = 1;
       }

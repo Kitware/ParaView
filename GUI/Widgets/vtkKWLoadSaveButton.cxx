@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.4");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.5");
 
 int vtkKWLoadSaveButtonCommand(ClientData cd, Tcl_Interp *interp,
                                int argc, char *argv[]);
@@ -177,7 +177,7 @@ void vtkKWLoadSaveButton::UpdateFileName()
       new_fname = fname;
       }
     new_fname = 
-      kwsys::SystemTools::Crop(new_fname, this->MaximumFileNameLength);
+      kwsys::SystemTools::CropString(new_fname, this->MaximumFileNameLength);
     this->SetLabel(new_fname.c_str());
     }
 } 

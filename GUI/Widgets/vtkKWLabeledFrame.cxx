@@ -20,11 +20,12 @@
 #include "vtkKWLabeledLabel.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
+
+#include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.39");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.40");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -91,33 +92,23 @@ void vtkKWLabeledFrame::SetLabel(const char *text)
     return;
     }
 
-  const char *ptr;
-  char *buffer = 0;
-
   if (vtkKWLabeledFrame::LabelCase == VTK_KW_LABEL_CASE_USER_SPECIFIED)
     {
-    ptr = text;
+    this->GetLabel()->SetLabel(text);
     }
   else
     {
-    buffer = vtkString::Duplicate(text);
+    kwsys_stl::string res;
     switch (vtkKWLabeledFrame::LabelCase)
       {
       case VTK_KW_LABEL_CASE_UPPERCASE_FIRST:
-        vtkString::ToUpperFirst(buffer);
+        res = kwsys::SystemTools::CapitalizedWords(text);
         break;
       case VTK_KW_LABEL_CASE_LOWERCASE_FIRST:
-        vtkString::ToLowerFirst(buffer);
+        res = kwsys::SystemTools::UnCapitalizedWords(text);
         break;
       }
-    ptr = buffer;
-    }
-
-  this->GetLabel()->SetLabel(ptr);
-
-  if (vtkKWLabeledFrame::LabelCase != VTK_KW_LABEL_CASE_USER_SPECIFIED)
-    {
-    delete [] buffer;
+    this->GetLabel()->SetLabel(res.c_str());
     }
 }
 

@@ -35,15 +35,16 @@
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
+
+#include <kwsys/SystemTools.hxx>
 
 #define VTK_KW_HIDE_PROPERTIES_LABEL "Hide Left Panel" 
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.210");
+vtkCxxRevisionMacro(vtkKWWindow, "1.211");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -99,7 +100,7 @@ void vtkKWRecentFileEntry::SetFileName(const char *file)
     }
   if (file)
     {
-    this->FileName = vtkString::Duplicate(file);
+    this->FileName = kwsys::SystemTools::DuplicateString(file);
     }
 }
 
@@ -112,7 +113,7 @@ void vtkKWRecentFileEntry::SetCommand(const char *command)
     }
   if (command)
     {
-    this->Command = vtkString::Duplicate(command);
+    this->Command = kwsys::SystemTools::DuplicateString(command);
     }
 }
 
@@ -1042,7 +1043,8 @@ void vtkKWWindow::LoadScript()
   int enabled = this->GetEnabled();
   this->SetEnabled(0);
   if (loadScriptDialog->Invoke() && 
-      vtkString::Length(loadScriptDialog->GetFileName()) > 0)
+      loadScriptDialog->GetFileName() && 
+      strlen(loadScriptDialog->GetFileName()) > 0)
     {
     FILE *fin = fopen(loadScriptDialog->GetFileName(), "r");
     if (!fin)
@@ -1230,7 +1232,7 @@ void vtkKWWindow::AddRecentFilesMenu(
           1, "MRU", KeyNameP, FileName) &&
         this->GetApplication()->GetRegisteryValue(
           1, "MRU", CmdNameP, Command) &&
-        vtkString::Length(FileName) >= 1)
+        strlen(FileName) >= 1)
       {
       this->InsertRecentFile(FileName, target, Command);
       }
@@ -1260,11 +1262,11 @@ void vtkKWWindow::UpdateRecentFilesMenu()
     if (this->RecentFilesVector->GetItem(cc, rfe) == VTK_OK && rfe &&
         rfe->GetFileName() && rfe->GetTarget() && rfe->GetCommand())
       {
-      char *short_file = vtkString::Duplicate(rfe->GetFileName());
-      vtkString::CropString(short_file, 40);
+      kwsys_stl::string short_file = 
+        kwsys::SystemTools::CropString(rfe->GetFileName(), 40);
       ostrstream label;
       ostrstream cmd;
-      label << idx << " " << short_file << ends;
+      label << idx << " " << short_file.c_str() << ends;
       cmd << rfe->GetCommand() << " {" << rfe->GetFileName() << "}" << ends;
       this->MenuRecentFiles->AddCommand(
         label.str(), rfe->GetTarget(), cmd.str(), (idx < 10 ? 0 : -1),
@@ -1272,7 +1274,6 @@ void vtkKWWindow::UpdateRecentFilesMenu()
       idx++;
       label.rdbuf()->freeze(0);
       cmd.rdbuf()->freeze(0);
-      delete [] short_file;
       }
     }
 
