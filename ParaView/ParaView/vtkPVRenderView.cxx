@@ -424,9 +424,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   // This should be a part of a module.
   pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} {TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
 
-  Sleep(15000);
-
-
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TreeComp1");
 
