@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.142");
+vtkCxxRevisionMacro(vtkPVData, "1.143");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1555,6 +1555,25 @@ void vtkPVData::UpdateProperties()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::SetActorColor(float r, float g, float b)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  pvApp->BroadcastScript("%s SetColor %f %f %f", 
+                         this->PropertyTclName, r, g, b);
+
+  // Add a bit of specular when just coloring by property.
+  pvApp->BroadcastScript("%s SetSpecular 0.1", 
+                         this->PropertyTclName);
+
+  pvApp->BroadcastScript("%s SetSpecularPower 100.0", 
+                         this->PropertyTclName);
+
+  pvApp->BroadcastScript("%s SetSpecularColor 1.0 1.0 1.0", 
+                         this->PropertyTclName);
+}  
+
+//----------------------------------------------------------------------------
 void vtkPVData::ChangeActorColor(float r, float g, float b)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1567,11 +1586,7 @@ void vtkPVData::ChangeActorColor(float r, float g, float b)
   this->AddTraceEntry("$kw(%s) ChangeActorColor %f %f %f",
                       this->GetTclName(), r, g, b);
 
-  pvApp->BroadcastScript("%s SetDiffuseColor %f %f %f",
-                         this->PropertyTclName, r, g, b);
-  pvApp->BroadcastScript("%s SetAmbientColor 1.0 1.0 1.0",
-                         this->PropertyTclName);
-  
+  this->SetActorColor(r, g, b);
   this->ColorButton->SetColor(r, g, b);
 
   if ( this->GetPVRenderView() )
@@ -1722,6 +1737,7 @@ void vtkPVData::ColorRangeEntryCallback()
 void vtkPVData::ColorByProperty()
 {
   this->AddTraceEntry("$kw(%s) ColorByProperty", this->GetTclName());
+  this->ColorMenu->SetValue("Property");
   this->ColorByPropertyInternal();
 }
 
@@ -1731,16 +1747,10 @@ void vtkPVData::ColorByPropertyInternal()
   vtkPVApplication *pvApp = this->GetPVApplication();
   pvApp->BroadcastScript("%s ScalarVisibilityOff", this->MapperTclName);
   pvApp->BroadcastScript("%s ScalarVisibilityOff", this->LODMapperTclName);
-  float *color;
-  
-  color = this->ColorButton->GetColor();
-  pvApp->BroadcastScript("%s SetColor %f %f %f", 
-                         this->PropertyTclName, color[0], color[1], color[2]);
-  // Add a bit of specular when just coloring by property.
-  pvApp->BroadcastScript("%s SetSpecular 0.1", this->PropertyTclName);
-  pvApp->BroadcastScript("%s SetSpecularPower 100.0", this->PropertyTclName);
-  pvApp->BroadcastScript("%s SetSpecularColor 1.0 1.0 1.0", this->PropertyTclName);
-  
+
+  float *color = this->ColorButton->GetColor();
+  this->SetActorColor(color[0], color[1], color[2]);
+
   this->SetPVColorMap(NULL);
 
   this->Script("pack forget %s", this->ScalarBarFrame->GetWidgetName());
@@ -2863,7 +2873,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.142 $");
+  this->ExtractRevision(os,"$Revision: 1.143 $");
 }
 
 //----------------------------------------------------------------------------

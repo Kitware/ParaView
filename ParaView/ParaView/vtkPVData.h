@@ -400,6 +400,7 @@ protected:
   void ColorByPointFieldComponentInternal(const char *name, int comp);
   void ColorByCellFieldComponentInternal(const char *name, int comp);
   void SetColorRangeInternal(float min, float max);
+  void SetActorColor(float r, float g, float b);
 
   // Problems with vtkLODActor led me to use these.
   vtkProperty *Property;
