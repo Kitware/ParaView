@@ -19,10 +19,10 @@
 #include "vtkProcessModule.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
-#include "vtkKWMath.h"
+#include "vtkMath.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.10");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -127,8 +127,8 @@ void vtkSMLookupTableProxy::Build()
             (numColors)*j;
         lab[2] = valueRange[0]+(valueRange[1]-valueRange[0])/
             (numColors)*j;
-        vtkKWMath::LabToXYZ(lab,xyz);
-        vtkKWMath::XYZToRGB(xyz,rgba);
+        vtkMath::LabToXYZ(lab,xyz);
+        vtkMath::XYZToRGB(xyz,rgba);
         stream << vtkClientServerStream::Invoke
                << this->GetID(i) << "SetTableValue" << j
                << rgba[0] << rgba[1] << rgba[2] << rgba[3] 

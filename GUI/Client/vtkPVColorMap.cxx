@@ -61,10 +61,10 @@
 #include "vtkSMProxy.h"
 #include "vtkKWEvent.h"
 #include "vtkMath.h"
-#include "vtkKWMath.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.113");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.114");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1428,11 +1428,11 @@ void vtkPVColorMap::SetColorSchemeToLabBlueRed()
 
   double rgb[3];
   double xyz[3];
-  vtkKWMath::LabToXYZ(startHSV,xyz);
-  vtkKWMath::XYZToRGB(xyz,rgb);
+  vtkMath::LabToXYZ(startHSV,xyz);
+  vtkMath::XYZToRGB(xyz,rgb);
   this->StartColorButton->SetColor(rgb[0],rgb[1],rgb[2]);
-  vtkKWMath::LabToXYZ(endHSV,xyz);
-  vtkKWMath::XYZToRGB(xyz,rgb);
+  vtkMath::LabToXYZ(endHSV,xyz);
+  vtkMath::XYZToRGB(xyz,rgb);
   this->EndColorButton->SetColor(rgb[0],rgb[1],rgb[2]);
 
 /*  this->SetHueRangeInternal(hr);
@@ -1494,8 +1494,8 @@ void vtkPVColorMap::SetStartHSV(double h, double s, double v)
   if (hsv[0] > 1.1)
     { // Detect the Sandia hack for changing the interpolation.
     double xyz[3];
-    vtkKWMath::LabToXYZ(hsv,xyz);
-    vtkKWMath::XYZToRGB(xyz,rgb);
+    vtkMath::LabToXYZ(hsv,xyz);
+    vtkMath::XYZToRGB(xyz,rgb);
     this->StartColorButton->SetColor(rgb[0],rgb[1],rgb[2]);    
     }
   else
@@ -1623,8 +1623,8 @@ void vtkPVColorMap::SetEndHSV(double h, double s, double v)
   if (hsv[0] > 1.1)
     { // Detect the Sandia hack for changing the interpolation.
     double xyz[3];
-    vtkKWMath::LabToXYZ(hsv,xyz);
-    vtkKWMath::XYZToRGB(xyz,rgb);
+    vtkMath::LabToXYZ(hsv,xyz);
+    vtkMath::XYZToRGB(xyz,rgb);
     this->EndColorButton->SetColor(rgb[0],rgb[1],rgb[2]);    
     }
   else

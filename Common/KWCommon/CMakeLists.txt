@@ -18,7 +18,6 @@ SET( KWCommon_SRCS
   vtkContainer.cxx
   vtkKWArguments.cxx
   vtkKWGenericMovieWriter.cxx
-  vtkKWMath.cxx
   vtkKWProcessStatistics.cxx
   vtkKWRegisteryUtilities.cxx
   vtkKWRemoteExecute.cxx
