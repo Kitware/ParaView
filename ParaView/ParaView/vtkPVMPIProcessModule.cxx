@@ -87,7 +87,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.8");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.9");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -309,8 +309,10 @@ int vtkPVMPIProcessModule::GetNumberOfPartitions()
 // This method is broadcast to all processes.
 void vtkPVMPIProcessModule::GatherDataInformation(vtkSource *deci)
 {
-  vtkDataObject** inputs;
+  vtkDataObject** dataObjects;
   vtkSource* geo;
+  vtkDataObject* geoData;
+  vtkDataObject* deciData;
   vtkDataSet* data;
   int length;
   unsigned char *msg;
@@ -327,25 +329,33 @@ void vtkPVMPIProcessModule::GatherDataInformation(vtkSource *deci)
   // This is a bit of a hack. Maybe we should have a PVPart object
   // on all processes.
   // Sanity checks to avoid slim chance of segfault.
-  inputs = deci->GetInputs(); 
-  if (inputs == NULL || inputs[0] == NULL)
+  dataObjects = deci->GetOutputs(); 
+  if (dataObjects == NULL || dataObjects[0] == NULL)
+    {
+    vtkErrorMacro("Could not get deci output.");
+    return;
+    }
+  deciData = dataObjects[0];
+  dataObjects = deci->GetInputs(); 
+  if (dataObjects == NULL || dataObjects[0] == NULL)
     {
     vtkErrorMacro("Could not get deci input.");
     return;
     }
-  geo = inputs[0]->GetSource();
+  geoData = dataObjects[0];
+  geo = geoData->GetSource();
   if (geo == NULL)
     {
     vtkErrorMacro("Could not get geo.");
     return;
     }
-  inputs = geo->GetInputs(); 
-  if (inputs == NULL || inputs[0] == NULL)
+  dataObjects = geo->GetInputs(); 
+  if (dataObjects == NULL || dataObjects[0] == NULL)
     {
     vtkErrorMacro("Could not get geo input.");
     return;
     }
-  data = vtkDataSet::SafeDownCast(inputs[0]);
+  data = vtkDataSet::SafeDownCast(dataObjects[0]);
   if (data == NULL)
     {
     vtkErrorMacro("It couldn't be a vtkDataObject???");
@@ -356,6 +366,8 @@ void vtkPVMPIProcessModule::GatherDataInformation(vtkSource *deci)
   if (myId != 0)
     {
     tmp->CopyFromData(data);
+    tmp->SetGeometryMemorySize(geoData->GetActualMemorySize());
+    tmp->SetLODMemorySize(deciData->GetActualMemorySize());
     msg = tmp->NewMessage(length);
     this->Controller->Send(&length, 1, 0, 398798);
     this->Controller->Send(msg, length, 0, 398799);
@@ -370,6 +382,8 @@ void vtkPVMPIProcessModule::GatherDataInformation(vtkSource *deci)
   int numProcs = this->Controller->GetNumberOfProcesses();
   int idx;
   this->TemporaryInformation->CopyFromData(data);
+  this->TemporaryInformation->SetGeometryMemorySize(geoData->GetActualMemorySize());
+  this->TemporaryInformation->SetLODMemorySize(deciData->GetActualMemorySize());
   for (idx = 1; idx < numProcs; ++idx)
     {
     this->Controller->Receive(&length, 1, idx, 398798);

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -64,6 +64,8 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
   this->MemorySize = 0;
+  this->GeometryMemorySize = 0;
+  this->LODMemorySize = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
   this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
@@ -101,6 +103,8 @@ void vtkPVDataInformation::Initialize()
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
   this->MemorySize = 0;
+  this->GeometryMemorySize = 0;
+  this->LODMemorySize = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
   this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
@@ -123,6 +127,8 @@ void vtkPVDataInformation::DeepCopy(vtkPVDataInformation *dataInfo)
   this->NumberOfPoints = dataInfo->GetNumberOfPoints();
   this->NumberOfCells = dataInfo->GetNumberOfCells();
   this->MemorySize = dataInfo->GetMemorySize();
+  this->GeometryMemorySize = dataInfo->GetGeometryMemorySize();
+  this->LODMemorySize = dataInfo->GetLODMemorySize();
 
   bounds = dataInfo->GetBounds();
   for (idx = 0; idx < 6; ++idx)
@@ -238,6 +244,8 @@ void vtkPVDataInformation::AddInformation(vtkPVDataInformation *info)
   this->NumberOfPoints += info->GetNumberOfPoints();
   this->NumberOfCells += info->GetNumberOfCells();
   this->MemorySize += info->GetMemorySize();
+  this->GeometryMemorySize += info->GetGeometryMemorySize();
+  this->LODMemorySize += info->GetLODMemorySize();
 
   // Bounds are only a little harder.
   bounds = info->GetBounds();
@@ -375,8 +383,8 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
   // - vtkIdType for numberOfCells
   length += 2*sizeof(vtkIdType);
 
-  // 1 unsigned longs for memory size.
-  length += sizeof(unsigned long);
+  // 3 unsigned longs for memory size.
+  length += 3*sizeof(unsigned long);
 
   // - 6 doubles for bounds.
   // - 6 integers for extent.
@@ -419,6 +427,10 @@ unsigned char* vtkPVDataInformation::NewMessage(int &length)
   tmp += sizeof(vtkIdType);
   // Memory Size
   *((unsigned long*)tmp) = this->MemorySize;
+  tmp += sizeof(unsigned long);
+  *((unsigned long*)tmp) = this->GeometryMemorySize;
+  tmp += sizeof(unsigned long);
+  *((unsigned long*)tmp) = this->LODMemorySize;
   tmp += sizeof(unsigned long);
 
   // Bounds
@@ -486,6 +498,10 @@ void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
 
   this->MemorySize = *((unsigned long*)tmp);
   tmp += sizeof(unsigned long);
+  this->GeometryMemorySize = *((unsigned long*)tmp);
+  tmp += sizeof(unsigned long);
+  this->LODMemorySize = *((unsigned long*)tmp);
+  tmp += sizeof(unsigned long);
 
   // Bounds
   for (idx = 0; idx < 6; ++idx)
@@ -529,6 +545,8 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
   os << indent << "NumberOfCells: " << this->NumberOfCells << endl;
   os << indent << "MemorySize: " << this->MemorySize << endl;
+  os << indent << "GeometryMemorySize: " << this->GeometryMemorySize << endl;
+  os << indent << "LODMemorySize: " << this->LODMemorySize << endl;
   os << indent << "Bounds: " << this->Bounds[0] << ", " << this->Bounds[1] 
      << ", " << this->Bounds[2] << ", " << this->Bounds[3] 
      << ", " << this->Bounds[4] << ", " << this->Bounds[5] << endl;

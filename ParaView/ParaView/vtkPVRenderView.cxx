@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.237");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.238");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1911,7 +1911,6 @@ int vtkPVRenderView::UpdateAllPVData(int interactive)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   int abort;
   int renderLocally;
 
@@ -2681,7 +2680,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.237 $");
+  this->ExtractRevision(os,"$Revision: 1.238 $");
 }
 
 //------------------------------------------------------------------------------

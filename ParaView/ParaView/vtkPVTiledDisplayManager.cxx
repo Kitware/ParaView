@@ -43,7 +43,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.5");
+vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.6");
 vtkStandardNewMacro(vtkPVTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
@@ -782,11 +782,9 @@ void vtkPVTiledDisplayManager::Composite()
 {
   static int firstRender = 1;
   int myId = this->Controller->GetLocalProcessId();
-  int numProcs = this->NumberOfProcesses;
   vtkPVTiledDisplayProcess *tdp;
   vtkPVTiledDisplayElement *tde;
   int i, x, y, idx;
-  int bufSize=0;
   int tileId = this->Schedule->Processes[myId]->TileId;
   vtkFloatArray*        zData;
   vtkUnsignedCharArray* pData;
@@ -1035,7 +1033,7 @@ void vtkPVTiledDisplayManager::SatelliteStartRender()
   // Initialize to get rid of a warning.
   winInfo.Size[0] = winInfo.Size[1] = 0;
   winInfo.NumberOfRenderers = 1;
-  winInfo.ReductionFactor = 1.0;
+  winInfo.ReductionFactor = 1;
 
   // Receive the window size.
   controller->Receive((char*)(&winInfo), 

@@ -149,7 +149,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.15");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.16");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -634,8 +634,10 @@ void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
   int length;
   unsigned char *msg;
   int myId = this->Controller->GetLocalProcessId();
-  vtkDataObject** inputs;
+  vtkDataObject** dataObjects;
   vtkSource* geo;
+  vtkDataObject* geoData;
+  vtkDataObject* deciData;
   vtkDataSet* data;
 
   if (deci == NULL)
@@ -648,25 +650,33 @@ void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
   // This is a bit of a hack. Maybe we should have a PVPart object
   // on all processes.
   // Sanity checks to avoid slim chance of segfault.
-  inputs = deci->GetInputs(); 
-  if (inputs == NULL || inputs[0] == NULL)
+  dataObjects = deci->GetOutputs(); 
+  if (dataObjects == NULL || dataObjects[0] == NULL)
+    {
+    vtkErrorMacro("Could not get deci output.");
+    return;
+    }
+  deciData = dataObjects[0];
+  dataObjects = deci->GetInputs(); 
+  if (dataObjects == NULL || dataObjects[0] == NULL)
     {
     vtkErrorMacro("Could not get deci input.");
     return;
     }
-  geo = inputs[0]->GetSource();
+  geoData = dataObjects[0];
+  geo = geoData->GetSource();
   if (geo == NULL)
     {
     vtkErrorMacro("Could not get geo.");
     return;
     }
-  inputs = deci->GetInputs(); 
-  if (inputs == NULL || inputs[0] == NULL)
+  dataObjects = geo->GetInputs(); 
+  if (dataObjects == NULL || dataObjects[0] == NULL)
     {
     vtkErrorMacro("Could not get geo input.");
     return;
     }
-  data = vtkDataSet::SafeDownCast(inputs[0]);
+  data = vtkDataSet::SafeDownCast(dataObjects[0]);
   if (data == NULL)
     {
     vtkErrorMacro("It couldn't be a vtkDataObject???");
@@ -688,6 +698,8 @@ void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
     {
     vtkPVDataInformation *tmp = vtkPVDataInformation::New();
     tmp->CopyFromData(data);
+    tmp->SetGeometryMemorySize(geoData->GetActualMemorySize());
+    tmp->SetLODMemorySize(deciData->GetActualMemorySize());
     msg = tmp->NewMessage(length);
     this->Controller->Send(&length, 1, 0, 398798);
     this->Controller->Send(msg, length, 0, 398799);
@@ -704,6 +716,8 @@ void vtkPVClientServerModule::GatherDataInformation(vtkSource *deci)
   vtkPVDataInformation *tmp1 = vtkPVDataInformation::New();
   vtkPVDataInformation *tmp2 = vtkPVDataInformation::New();
   tmp1->CopyFromData(data);
+  tmp1->SetGeometryMemorySize(geoData->GetActualMemorySize());
+  tmp1->SetLODMemorySize(deciData->GetActualMemorySize());
   for (idx = 1; idx < numProcs; ++idx)
     {
     this->Controller->Receive(&length, 1, idx, 398798);

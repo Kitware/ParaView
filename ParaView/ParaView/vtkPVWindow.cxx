@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.415");
+vtkCxxRevisionMacro(vtkPVWindow, "1.416");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2573,7 +2573,6 @@ void vtkPVWindow::SaveState()
 void vtkPVWindow::SaveState(const char* filename)
 {
   vtkPVSource *pvs;
-  char *path = NULL;
   ofstream* file;    
   
   file = new ofstream(filename, ios::out);
@@ -3909,7 +3908,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.415 $");
+  this->ExtractRevision(os,"$Revision: 1.416 $");
 }
 
 //-----------------------------------------------------------------------------

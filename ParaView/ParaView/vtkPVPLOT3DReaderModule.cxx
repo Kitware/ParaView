@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.12");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.13");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -80,11 +80,8 @@ vtkPVPLOT3DReaderModule::~vtkPVPLOT3DReaderModule()
 //----------------------------------------------------------------------------
 void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
 {
-  const char* tclName = this->GetVTKSourceTclName();
-  vtkPVData *pvd = 0;
   int i;
   vtkPVWindow* window = this->GetPVWindow();
-  vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPLOT3DReader* reader = vtkPLOT3DReader::SafeDownCast(
     this->GetVTKSource());
 

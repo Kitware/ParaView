@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.4");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -81,8 +81,6 @@ vtkPVGroupInputsWidget::~vtkPVGroupInputsWidget()
 //----------------------------------------------------------------------------
 void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 {
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
-
   if (this->Application)
     {
     vtkErrorMacro("PVWidget already created");

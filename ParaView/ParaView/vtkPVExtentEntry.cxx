@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.17");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.18");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -294,20 +294,20 @@ void vtkPVExtentEntry::SetValue(int v0, int v1, int v2,
 
   // First, restrict value to current range.
   this->MinMax[0]->GetRange(range);
-  if (v0 < range[0]) {v0 = range[0];}
-  if (v0 > range[1]) {v0 = range[1];}
-  if (v1 < range[0]) {v1 = range[0];}
-  if (v1 > range[1]) {v1 = range[1];}
+  if (v0 < range[0]) {v0 = static_cast<int>(range[0]);}
+  if (v0 > range[1]) {v0 = static_cast<int>(range[1]);}
+  if (v1 < range[0]) {v1 = static_cast<int>(range[0]);}
+  if (v1 > range[1]) {v1 = static_cast<int>(range[1]);}
   this->MinMax[1]->GetRange(range);
-  if (v2 < range[0]) {v2 = range[0];}
-  if (v2 > range[1]) {v2 = range[1];}
-  if (v3 < range[0]) {v3 = range[0];}
-  if (v3 > range[1]) {v3 = range[1];}
+  if (v2 < range[0]) {v2 = static_cast<int>(range[0]);}
+  if (v2 > range[1]) {v2 = static_cast<int>(range[1]);}
+  if (v3 < range[0]) {v3 = static_cast<int>(range[0]);}
+  if (v3 > range[1]) {v3 = static_cast<int>(range[1]);}
   this->MinMax[2]->GetRange(range);
-  if (v4 < range[0]) {v4 = range[0];}
-  if (v4 > range[1]) {v4 = range[1];}
-  if (v5 < range[0]) {v5 = range[0];}
-  if (v5 > range[1]) {v5 = range[1];}
+  if (v4 < range[0]) {v4 = static_cast<int>(range[0]);}
+  if (v4 > range[1]) {v4 = static_cast<int>(range[1]);}
+  if (v5 < range[0]) {v5 = static_cast<int>(range[0]);}
+  if (v5 > range[1]) {v5 = static_cast<int>(range[1]);}
 
   if ( v1 >= v0 )
     {
