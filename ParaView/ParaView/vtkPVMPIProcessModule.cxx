@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.5");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.6");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -221,6 +221,16 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
   this->Controller->SingleMethodExecute();
 
   this->Controller->Finalize();
+
+  this->GetStream()
+    << vtkClientServerStream::Delete
+    << this->GetApplicationID()
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Delete
+    << this->GetProcessModuleID()
+    << vtkClientServerStream::End;
+  this->ClientInterpreter->ProcessStream(this->GetStream());
+  this->GetStream().Reset();
 
   return this->ReturnValue;
 }
