@@ -21,7 +21,7 @@
 #include "vtkClientServerID.h"
 #include "vtkSMProxyProperty.h"
 vtkStandardNewMacro(vtkSMScalarBarActorProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMScalarBarActorProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkSMScalarBarActorProxy::vtkSMScalarBarActorProxy()
 {
@@ -44,10 +44,24 @@ void vtkSMScalarBarActorProxy::CreateVTKObjects(int numObjects)
 
   vtkSMProxyProperty* pp;
   pp = vtkSMProxyProperty::SafeDownCast(this->GetProperty("TitleTextProperty"));
-  pp->AddProxy(this->GetSubProxy("TitleTextProperty"));
+  if (pp)
+    {
+    pp->AddProxy(this->GetSubProxy("TitleTextProperty"));
+    }
+  else
+    {
+    vtkErrorMacro("Failed to find property TitleTextProperty.");
+    }
 
   pp = vtkSMProxyProperty::SafeDownCast(this->GetProperty("LabelTextProperty"));
-  pp->AddProxy(this->GetSubProxy("LabelTextProperty"));
+  if (pp)
+    {
+    pp->AddProxy(this->GetSubProxy("LabelTextProperty"));
+    }
+  else
+    {
+    vtkErrorMacro("Failed to find property LabelTextProperty.");
+    }
 
   this->UpdateVTKObjects();
 }

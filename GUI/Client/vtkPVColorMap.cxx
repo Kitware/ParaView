@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.116.2.2");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.116.2.3");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -743,44 +743,53 @@ void vtkPVColorMap::GetLabelTextPropertyInternal()
 {
   vtkSMDoubleVectorProperty* dvp;
   vtkSMIntVectorProperty* ivp;
-  
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty proxy.");
+    return;
+    }
+ 
+  vtkSMProxy* textProperty = pp->GetProxy(0);
+
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatColor"));
+    textProperty->GetProperty("Color"));
   if (dvp)
     {
     this->LabelTextProperty->SetColor(dvp->GetElements());
     }
   
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatOpacity"));
+    textProperty->GetProperty("Opacity"));
   if (dvp)
     {
     this->LabelTextProperty->SetOpacity(dvp->GetElement(0));
     }
   
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatFont"));
+    textProperty->GetProperty("FontFamily"));
   if (ivp)
     {
     this->LabelTextProperty->SetFontFamily(ivp->GetElement(0));
     }
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatBold"));
+    textProperty->GetProperty("Bold"));
   if (ivp)
     {
     this->LabelTextProperty->SetBold(ivp->GetElement(0));
     }
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatItalic"));
+    textProperty->GetProperty("Italic"));
   if (ivp)
     {
     this->LabelTextProperty->SetItalic(ivp->GetElement(0));
     }
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatShadow"));
+    textProperty->GetProperty("Shadow"));
   if (ivp)
     {
     this->LabelTextProperty->SetShadow(ivp->GetElement(0));
@@ -793,44 +802,54 @@ void vtkPVColorMap::GetTitleTextPropertyInternal()
 {
   vtkSMDoubleVectorProperty* dvp;
   vtkSMIntVectorProperty* ivp;
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty proxy.");
+    return;
+    }
+ 
+  vtkSMProxy* textProperty = pp->GetProxy(0);
   
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatColor"));
+    textProperty->GetProperty("Color"));
   if (dvp)
     {
     this->TitleTextProperty->SetColor(dvp->GetElements());
     }
   
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatOpacity"));
+    textProperty->GetProperty("Opacity"));
   if (dvp)
     {
     this->TitleTextProperty->SetOpacity(dvp->GetElement(0));
     }
   
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatFont"));
+    textProperty->GetProperty("FontFamily"));
   if (ivp)
     {
     this->TitleTextProperty->SetFontFamily(ivp->GetElement(0));
     }
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatBold"));
+    textProperty->GetProperty("Bold"));
   if (ivp)
     {
     this->TitleTextProperty->SetBold(ivp->GetElement(0));
     }
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatItalic"));
+    textProperty->GetProperty("Italic"));
   if (ivp)
     {
     this->TitleTextProperty->SetItalic(ivp->GetElement(0));
     }
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatShadow"));
+    textProperty->GetProperty("Shadow"));
   if (ivp)
     {
     this->TitleTextProperty->SetShadow(ivp->GetElement(0));
@@ -2315,11 +2334,18 @@ void vtkPVColorMap::SetTitleShadow(int shadow)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetTitleColorInternal(double r, double g, double b)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    }
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatColor"));
+    pp->GetProxy(0)->GetProperty("Color"));
   if (!dvp)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatColor");
+    vtkErrorMacro("ScalarBarProxy does not have property Color");
     return;
     }
   dvp->SetElement(0,r);
@@ -2331,8 +2357,16 @@ void vtkPVColorMap::SetTitleColorInternal(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetTitleOpacityInternal(double opacity)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    } 
+  
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatOpacity"));
+    pp->GetProxy(0)->GetProperty("Opacity"));
   if (!dvp)
     {
     vtkErrorMacro("ScalarBarProxy does not have property TitleFormatOpacity");
@@ -2345,11 +2379,18 @@ void vtkPVColorMap::SetTitleOpacityInternal(double opacity)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetTitleFontFamilyInternal(int font)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    }
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatFont"));
+    pp->GetProxy(0)->GetProperty("FontFamily"));
   if (!ivp)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatFont");
+    vtkErrorMacro("ScalarBarProxy does not have property FontFamily");
     return;
     }
   ivp->SetElement(0,font);
@@ -2359,11 +2400,19 @@ void vtkPVColorMap::SetTitleFontFamilyInternal(int font)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetTitleBoldInternal(int bold)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    }
+
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatBold"));
+    pp->GetProxy(0)->GetProperty("Bold"));
   if (!ivp)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatBold");
+    vtkErrorMacro("ScalarBarProxy does not have property Bold");
     return;
     }
   ivp->SetElement(0,bold);
@@ -2373,11 +2422,19 @@ void vtkPVColorMap::SetTitleBoldInternal(int bold)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetTitleItalicInternal(int italic)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    }
+  
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatItalic"));
+    pp->GetProxy(0)->GetProperty("Italic"));
   if (!ivp)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatItalic");
+    vtkErrorMacro("ScalarBarProxy does not have property Italic");
     return;
     }
   ivp->SetElement(0,italic);
@@ -2387,11 +2444,19 @@ void vtkPVColorMap::SetTitleItalicInternal(int italic)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetTitleShadowInternal(int shadow)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("TitleTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    }
+  
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("TitleFormatShadow"));
+    pp->GetProxy(0)->GetProperty("Shadow"));
   if (!ivp)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property TitleFormatShadow");
+    vtkErrorMacro("ScalarBarProxy does not have property Shadow");
     return;
     }
   ivp->SetElement(0,shadow);
@@ -2461,13 +2526,22 @@ void vtkPVColorMap::SetLabelShadow(int shadow)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetLabelColorInternal(double r, double g, double b)
 {
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatColor"));
-  if (!dvp)
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatColor");
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
     return;
     }
+
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    pp->GetProxy(0)->GetProperty("Color"));
+  if (!dvp)
+    {
+    vtkErrorMacro("ScalarBarProxy does not have property Color");
+    return;
+    }
+
   dvp->SetElement(0,r);
   dvp->SetElement(1,g);
   dvp->SetElement(2,b);
@@ -2477,11 +2551,19 @@ void vtkPVColorMap::SetLabelColorInternal(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetLabelOpacityInternal(double opacity)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    }
+
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatOpacity"));
+    pp->GetProxy(0)->GetProperty("Opacity"));
   if (!dvp)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatOpacity");
+    vtkErrorMacro("ScalarBarProxy does not have property Opacity");
     return;
     }
   dvp->SetElement(0,opacity);
@@ -2491,11 +2573,18 @@ void vtkPVColorMap::SetLabelOpacityInternal(double opacity)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetLabelFontFamilyInternal(int font)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    }
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatFont"));
+    pp->GetProxy(0)->GetProperty("FontFamily"));
   if (!ivp)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatFont");
+    vtkErrorMacro("ScalarBarProxy does not have property FontFamily");
     return;
     }
   ivp->SetElement(0,font);
@@ -2505,11 +2594,18 @@ void vtkPVColorMap::SetLabelFontFamilyInternal(int font)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetLabelBoldInternal(int bold)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    }
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatBold"));
+    pp->GetProxy(0)->GetProperty("Bold"));
   if (!ivp)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatBold");
+    vtkErrorMacro("ScalarBarProxy does not have property Bold");
     return;
     }
   ivp->SetElement(0,bold);
@@ -2519,11 +2615,18 @@ void vtkPVColorMap::SetLabelBoldInternal(int bold)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetLabelItalicInternal(int italic)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    }
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatItalic"));
+    pp->GetProxy(0)->GetProperty("Italic"));
   if (!ivp)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatItalic");
+    vtkErrorMacro("ScalarBarProxy does not have property Italic");
     return;
     }
   ivp->SetElement(0,italic);
@@ -2533,11 +2636,18 @@ void vtkPVColorMap::SetLabelItalicInternal(int italic)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetLabelShadowInternal(int shadow)
 {
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->ScalarBarProxy->GetProperty("LabelTextProperty"));
+  if (!pp || pp->GetNumberOfProxies() < 1)
+    {
+    vtkErrorMacro("Failed to find LabelTextProperty Proxy on ScalarBarProxy.");
+    return;
+    }
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->ScalarBarProxy->GetProperty("LabelFormatShadow"));
+    pp->GetProxy(0)->GetProperty("Shadow"));
   if (!ivp)
     {
-    vtkErrorMacro("ScalarBarProxy does not have property LabelFormatShadow");
+    vtkErrorMacro("ScalarBarProxy does not have property Shadow");
     return;
     }
   ivp->SetElement(0,shadow);

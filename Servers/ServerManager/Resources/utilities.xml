@@ -1214,117 +1214,18 @@
 
       <!--label text property -->
       <SubProxy>
-        <Proxy name="LabelTextProperty" class="vtkTextProperty">
-          <DoubleVectorProperty
-            name="LabelFormatColor"
-            command="SetColor"
-            number_of_elements="3"
-            argument_is_array="1"
-            default_values="1.0 1.0 1.0">
-          </DoubleVectorProperty>
-
-          <DoubleVectorProperty
-            name="LabelFormatOpacity"
-            command="SetOpacity"
-            number_of_elements="1"
-            default_values="1.0">
-          </DoubleVectorProperty>
-
-          <IntVectorProperty
-            name="LabelFormatFont"
-            command="SetFontFamily"
-            number_of_elements="1"
-            default_values="0">
-            <EnumerationDomain name="enum">
-              <Entry value="0" text="Arial"/>
-              <Entry value="1" text="Courier"/>
-              <Entry value="2" text="Times"/>
-            </EnumerationDomain>
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="LabelFormatBold"
-            command="SetBold"
-            number_of_elements="1"
-            default_values="1">
-            <BooleanDomain name="bool"/>
-          </IntVectorProperty>
-          
-          <IntVectorProperty
-            name="LabelFormatItalic"
-            command="SetItalic"
-            number_of_elements="1"
-            default_values="1">
-            <BooleanDomain name="bool"/>
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="LabelFormatShadow"
-            command="SetShadow"
-            number_of_elements="1"
-            default_values="1">
-            <BooleanDomain name="bool"/>
-          </IntVectorProperty>
-          </Proxy>
+        <Proxy name="LabelTextProperty"
+          proxygroup="properties" proxyname="TextProperty">
+        </Proxy>
       </SubProxy>
 
       <!--title text property -->
       <SubProxy>
-        <Proxy name="TitleTextProperty" class="vtkTextProperty">
-          <DoubleVectorProperty
-            name="TitleFormatColor"
-            command="SetColor"
-            number_of_elements="3"
-            argument_is_array="1"
-            default_values="1.0 1.0 1.0">
-          </DoubleVectorProperty>
-
-          <DoubleVectorProperty
-            name="TitleFormatOpacity"
-            command="SetOpacity"
-            number_of_elements="1"
-            default_values="1.0">
-          </DoubleVectorProperty>
-
-          <IntVectorProperty
-            name="TitleFormatFont"
-            command="SetFontFamily"
-            number_of_elements="1"
-            default_values="0">
-            <EnumerationDomain name="enum">
-              <Entry value="0" text="Arial"/>
-              <Entry value="1" text="Courier"/>
-              <Entry value="2" text="Times"/>
-            </EnumerationDomain>
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="TitleFormatBold"
-            command="SetBold"
-            number_of_elements="1"
-            default_values="1">
-            <BooleanDomain name="bool"/>
-          </IntVectorProperty>
-          
-          <IntVectorProperty
-            name="TitleFormatItalic"
-            command="SetItalic"
-            number_of_elements="1"
-            default_values="1">
-            <BooleanDomain name="bool"/>
-          </IntVectorProperty>
-
-          <IntVectorProperty
-            name="TitleFormatShadow"
-            command="SetShadow"
-            number_of_elements="1"
-            default_values="1">
-            <BooleanDomain name="bool"/>
-          </IntVectorProperty>
+        <Proxy name="TitleTextProperty" 
+          proxygroup="properties" proxyname="TextProperty">
         </Proxy>
       </SubProxy>
     </ScalarBarActorProxy>
-
     <!-- End of ProxyGroup annotations -->
   </ProxyGroup>
 
