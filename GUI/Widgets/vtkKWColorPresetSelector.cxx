@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.1");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.2");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -412,7 +412,6 @@ void vtkKWColorPresetSelector::CreateDefaultPresets()
 
   double black[3]       = { 0.0, 0.0, 0.0 };
   double white[3]       = { 1.0, 1.0, 1.0 };
-  double gray[3]        = { 0.3, 0.3, 0.3 };
   double red[3]         = { 1.0, 0.3, 0.3 };
   double red_pure[3]    = { 1.0, 0.0, 0.0 };
   double green[3]       = { 0.3, 1.0, 0.3 };
@@ -911,5 +910,7 @@ void vtkKWColorPresetSelector::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "HideGradientPresets: " 
      << (this->HideGradientPresets ? "On" : "Off") << endl;
+
+  os << indent << "PreviewSize: " << this->PreviewSize << endl;
 }
 
