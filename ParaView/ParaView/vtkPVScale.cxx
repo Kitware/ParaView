@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.28");
+vtkCxxRevisionMacro(vtkPVScale, "1.29");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -503,8 +503,6 @@ void vtkPVScale::UpdateVTKSourceInternal(vtkClientServerID sourceID,
     pm->GetStream() << method.c_str();
     }
   pm->GetStream() << value << vtkClientServerStream::End;
-  cout << "Value = " << value << endl;
-  pm->GetStream().Print(cout);
   pm->SendStreamToServer();
   this->Property->SetScalars(1, &value);
 }
