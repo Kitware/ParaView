@@ -101,18 +101,18 @@ IF (try_file)
   # behalf to the new location. That code should be removed in a week
   # or so (mid january)
   FIND_PATH(TK_INTERNAL_PATH tkWinInt.h
-    ${TCLTK_POSSIBLE_INCLUDE_PATHS}
-  )
+    ${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/internals/tk8.4
+    )
   SET (TK_INTERNAL_PATH_LEGACY 
-       "${VTK_SOURCE_DIR}/Rendering/tkInternals/tk${TCL_TK_VERSION}")
+    "${VTK_SOURCE_DIR}/Rendering/tkInternals/tk${TCL_TK_VERSION}")
   SET (TK_INTERNAL_PATH_TRY 
-       "${VTK_SOURCE_DIR}/Utilities/TclTk/internals/tk${TCL_TK_VERSIOND}")
+    "${VTK_SOURCE_DIR}/Utilities/TclTk/internals/tk${TCL_TK_VERSIOND}")
   IF ("${TK_INTERNAL_PATH}" MATCHES "${TK_INTERNAL_PATH_LEGACY}")
     SET(TK_INTERNAL_PATH  
-        ${TK_INTERNAL_PATH_TRY} CACHE PATH ${DOC_STRING} FORCE)
+      ${TK_INTERNAL_PATH_TRY} CACHE PATH ${DOC_STRING} FORCE)
   ELSE ("${TK_INTERNAL_PATH}" MATCHES "${TK_INTERNAL_PATH_LEGACY}")
     FIND_PATH(TK_INTERNAL_PATH 
-              ${try_file} ${TK_INTERNAL_PATH_TRY} DOC ${DOC_STRING})
+      ${try_file} ${TK_INTERNAL_PATH_TRY} DOC ${DOC_STRING})
     MARK_AS_ADVANCED(TK_INTERNAL_PATH)
   ENDIF ("${TK_INTERNAL_PATH}" MATCHES "${TK_INTERNAL_PATH_LEGACY}")
 ENDIF (try_file)
