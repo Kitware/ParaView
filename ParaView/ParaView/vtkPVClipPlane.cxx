@@ -328,18 +328,20 @@ void vtkPVClipPlane::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVClipPlane::AcceptCallback()
 {
-  if (this->Application && this->VTKSourceTclName)
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (pvApp && this->VTKSourceTclName)
     {
-    this->Script("%s SetOrigin %f %f %f", this->VTKSourceTclName,
-                 this->CenterXEntry->GetTclName(), 
-                 this->CenterYEntry->GetTclName(), 
-                 this->CenterZEntry->GetTclName());
-    this->Script("%s SetNormal %f %f %f", this->VTKSourceTclName,
-                 this->NormalXEntry->GetTclName(), 
-                 this->NormalYEntry->GetTclName(), 
-                 this->NormalZEntry->GetTclName());
-    this->Script("%s SetOffset %f", this->VTKSourceTclName,
-                 this->OffsetEntry->GetTclName());
+    pvApp->BroadcastScript("%s SetOrigin %f %f %f", this->VTKSourceTclName,
+                 this->CenterXEntry->GetValueAsFloat(), 
+                 this->CenterYEntry->GetValueAsFloat(), 
+                 this->CenterZEntry->GetValueAsFloat());
+    pvApp->BroadcastScript("%s SetNormal %f %f %f", this->VTKSourceTclName,
+                 this->NormalXEntry->GetValueAsFloat(), 
+                 this->NormalYEntry->GetValueAsFloat(), 
+                 this->NormalZEntry->GetValueAsFloat());
+    pvApp->BroadcastScript("%s SetOffset %f", this->VTKSourceTclName,
+                 this->OffsetEntry->GetValueAsFloat());
     }
   this->vtkPVSource::AcceptCallback();
 }
