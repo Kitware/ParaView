@@ -191,6 +191,10 @@ public:
   // In vtkKWView mode, displays and updates the property ui display
   virtual void ShowProperties();
 
+  // Description:
+  // Export the corner annotation to a file.
+  void SaveState(ofstream *file);
+  
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();

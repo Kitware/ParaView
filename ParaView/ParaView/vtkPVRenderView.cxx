@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWCornerAnnotation.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
@@ -111,7 +112,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.265.2.4");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.265.2.5");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1526,8 +1527,12 @@ void vtkPVRenderView::SaveState(ofstream* file)
   *file << "$kw(" << this->GetTclName() << ") SetCameraState " 
         << position[0] << " " << position[1] << " " << position[2] << " "
         << focalPoint[0] << " " << focalPoint[1] << " " << focalPoint[2] << " "
-        << viewUp[0] << " " << viewUp[1] << " " << viewUp[2] << endl; 
-
+        << viewUp[0] << " " << viewUp[1] << " " << viewUp[2] << endl;
+  
+  *file << "set kw(" << this->CornerAnnotation->GetTclName() 
+        << ") [$kw(" << this->GetTclName() << ") GetCornerAnnotation]" << endl;
+  
+  this->CornerAnnotation->SaveState(file); 
 }
 
 //----------------------------------------------------------------------------
