@@ -1,14 +1,12 @@
-;NSIS Modern User Interface version 1.70
-;Basic Example Script
-;Written by Joost Verburg
+; ParaView install script designed for a nmake build
 
 ;--------------------------------
 ; You must define these values
 
   !define VERSION "1.6"
-  !define PATCH  "1"
-  !define PV_BIN "C:\martink\ParaView16Rel"
-  !define PV_SRC "C:\martink\ParaView16"
+  !define PATCH  "2"
+  !define PV_BIN "C:\martink\ParaView\ParaView16Rel"
+  !define PV_SRC "C:\martink\ParaView\ParaView16"
 
 
 ;--------------------------------
@@ -67,9 +65,9 @@
 Section "Dummy Section" SecDummy
 
   SetOutPath "$INSTDIR\bin"
-  File "${PV_BIN}\bin\release\paraview.exe"
-  File "${PV_BIN}\bin\release\tcl84.dll"
-  File "${PV_BIN}\bin\release\tk84.dll"
+  File "${PV_BIN}\bin\paraview.exe"
+  File "${PV_BIN}\bin\tcl84.dll"
+  File "${PV_BIN}\bin\tk84.dll"
   File "C:\martink\msvcr71.dll"
   File "C:\martink\msvcp71.dll"
   
