@@ -161,8 +161,8 @@ protected:
 
   // Do this as a proprocessing step.
   void CompleteInputArrays(vtkPolyData* input);
-  void ReceiveInputArrays(vtkAttributeData* attr, int recFrom);
-  void SendInputArrays(vtkAttributeData* attr, int sendTo);
+  void ReceiveInputArrays(vtkDataSetAttributes* attr, int recFrom);
+  void SendInputArrays(vtkDataSetAttributes* attr, int sendTo);
 
   vtkMultiProcessController *Controller;
   //vtkPointLocator *Locator;
