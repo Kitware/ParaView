@@ -24,6 +24,7 @@ class vtkSMKeyFrameProxy;
 class vtkKWThumbWheel;
 class vtkPVWidget;
 class vtkKWLabel;
+class vtkKWPushButton;
 class vtkPVKeyFrameObserver;
 class vtkPVAnimationCue;
 
@@ -63,6 +64,8 @@ public:
   
   void ValueChangedCallback();
   void TimeChangedCallback();
+  void MinimumCallback();
+  void MaximumCallback();
 
   virtual void PrepareForDisplay();
  
@@ -99,6 +102,8 @@ protected:
 
   vtkKWLabel* ValueLabel;
   vtkKWWidget* ValueWidget; // the type of this widget will be decided at runtime.
+  vtkKWPushButton* MinButton;
+  vtkKWPushButton* MaxButton;
  
   vtkPVAnimationCue* AnimationCue;
   char* Name;

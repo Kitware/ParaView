@@ -40,8 +40,9 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
+#include "vtkKWPushButton.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.2");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.3");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -86,6 +87,8 @@ vtkPVKeyFrame::vtkPVKeyFrame()
   this->ValueWidget = NULL;
   this->AnimationCue = NULL;
   this->Name = NULL;
+  this->MinButton = vtkKWPushButton::New();
+  this->MaxButton = vtkKWPushButton::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -117,6 +120,8 @@ vtkPVKeyFrame::~vtkPVKeyFrame()
   this->TimeLabel->Delete();
   this->ValueLabel->Delete();
   this->TimeThumbWheel->Delete();
+  this->MinButton->Delete();
+  this->MaxButton->Delete();
   this->SetName(NULL);
 }
 
@@ -190,19 +195,38 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
   this->ValueLabel->SetLabel("Value:");
   this->CreateValueWidget();
 
-  this->Script("grid %s %s -sticky ew",
+  this->MinButton->SetParent(this);
+  this->MinButton->Create(this->GetApplication(),0);
+  this->MinButton->SetLabel("min");
+  this->MinButton->SetBalloonHelpString("Set the value to the minimum possible, given the "
+    "current state of the system.");
+  this->MinButton->SetCommand(this,"MinimumCallback");
+  this->MaxButton->SetParent(this);
+  this->MaxButton->Create(this->GetApplication(),0);
+  this->MaxButton->SetLabel("max");
+  this->MaxButton->SetBalloonHelpString("Set the value to the maximum possible, given the "
+    "current state of the system.");
+  this->MaxButton->SetCommand(this, "MaximumCallback");
+
+  this->Script("grid %s %s x x x -sticky w",
     this->TimeLabel->GetWidgetName(),
     this->TimeThumbWheel->GetWidgetName());
   if (this->ValueWidget)
     {
-    this->Script("grid %s %s -sticky w",
+    this->Script("grid %s %s x x x -sticky w",
       this->ValueLabel->GetWidgetName(),
       this->ValueWidget->GetWidgetName());
     }
 
   this->Script("grid columnconfigure %s 0 -weight 0",
     this->GetWidgetName());
-  this->Script("grid columnconfigure %s 1 -weight 2",
+  this->Script("grid columnconfigure %s 1 -weight 0",
+    this->GetWidgetName());
+  this->Script("grid columnconfigure %s 2 -weight 0",
+    this->GetWidgetName());
+  this->Script("grid columnconfigure %s 3 -weight 0",
+    this->GetWidgetName());
+  this->Script("grid columnconfigure %s 4 -weight 2",
     this->GetWidgetName());
 }
 
@@ -284,6 +308,30 @@ void vtkPVKeyFrame::CreateValueWidget()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVKeyFrame::MinimumCallback()
+{
+  this->InitializeKeyValueDomainUsingCurrentState();
+  vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
+  if (!pvWheel || !pvWheel->GetClampMinimumValue())
+    {
+    return;
+    }
+  this->SetKeyValue(pvWheel->GetMinimumValue());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVKeyFrame::MaximumCallback()
+{
+  this->InitializeKeyValueDomainUsingCurrentState();
+  vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
+  if (!pvWheel || !pvWheel->GetClampMaximumValue())
+    {
+    return;
+    }
+  this->SetKeyValue(pvWheel->GetMaximumValue());
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVKeyFrame::InitializeKeyValueUsingCurrentState()
 {
   if (!this->ValueWidget)
@@ -340,24 +388,33 @@ void vtkPVKeyFrame::InitializeKeyValueDomainUsingCurrentState()
     double min;
     double max;
     min = drd->GetMinimum(index, exists);
+    int col = 2;
     if (exists)
       {
       wheel->SetMinimumValue(min);
       wheel->ClampMinimumValueOn();
+      this->Script("grid %s -column %d -row 1", 
+        this->MinButton->GetWidgetName(), col);
+      col++;
       }
     else
       {
       wheel->ClampMinimumValueOff();
+      this->Script("grid forget %s", this->MinButton->GetWidgetName());
       }
+    
     max = drd->GetMaximum(index, exists);
     if (exists)
       {
       wheel->SetMaximumValue(max);
       wheel->ClampMaximumValueOn();
+      this->Script("grid %s -column %d -row 1", 
+        this->MaxButton->GetWidgetName(), col);
       }
     else
       {
       wheel->ClampMaximumValueOff();
+      this->Script("grid forget %s", this->MaxButton->GetWidgetName());
       }
     }
   else if (ird)
@@ -372,25 +429,33 @@ void vtkPVKeyFrame::InitializeKeyValueDomainUsingCurrentState()
     int exists = 0;
     int min;
     int max;
+    int col = 2;
     min = ird->GetMinimum(index, exists);
     if (exists)
       {
       wheel->SetMinimumValue(min);
       wheel->ClampMinimumValueOn();
+      this->Script("grid %s -column %d -row 1", 
+        this->MinButton->GetWidgetName(), col);
+      col++;
       }
     else
       {
       wheel->ClampMinimumValueOff();
+      this->Script("grid forget %s", this->MinButton->GetWidgetName());
       }
     max = ird->GetMaximum(index, exists);
     if (exists)
       {
       wheel->SetMaximumValue(max);
       wheel->ClampMaximumValueOn();
+      this->Script("grid %s -column %d -row 1", 
+        this->MaxButton->GetWidgetName(), col);
       }
     else
       {
       wheel->ClampMaximumValueOff();
+      this->Script("grid forget %s", this->MaxButton->GetWidgetName());
       }
     } 
 }
