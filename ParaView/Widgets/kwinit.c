@@ -10151,7 +10151,7 @@ static Tcl_ChannelType builtinChannelType = {
     Et_FileWatch,               /* Watch for events on console. */
     Et_FileHandle,              /* Get a handle from the device. */
     0
-#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 3)
+#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 3) && (TCL_RELEASE_SERIAL > 0)
     ,0, 0, 0
 #endif
 };
