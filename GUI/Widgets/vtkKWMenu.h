@@ -152,8 +152,10 @@ public:
   void DeleteAllMenuItems();
   
   // Description:
-  // Returns the integer index of the menu item by string
+  // Returns the integer index of the menu item by string, or by the
+  // command (object/method) pair associated to it.
   int GetIndex(const char* item);
+  int GetIndexOfCommand(vtkKWObject* Object, const char* MethodAndArgString);
 
   // Description:
   // Get the command for the entry at index. This is what is returned by
