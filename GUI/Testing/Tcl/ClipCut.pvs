@@ -1,3 +1,8 @@
+# Fix the size of the image.
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
+update
+
 $Application ExitOnReturnOn
 
 set pv(vtkTemp1) [$Application GetMainWindow]
@@ -106,9 +111,7 @@ $pv(vtkTemp446) AcceptCallback
 #     source "[$Application GetTraceFileName]"
 #  }
 
-# Fix the size of the image.
-set MainView [[$Application GetMainWindow] GetMainView]
-$MainView SetRenderWindowSize 300 300
+[[$Application GetMainWindow] GetMainView] ForceRender
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 
