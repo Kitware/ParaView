@@ -1558,7 +1558,27 @@ void vtkPVWindow::WriteVTKFile(char *filename)
 
   pvApp->AddTraceEntry("$kw(%s) WriteVTKFile %s", this->GetTclName(),
                        filename);
- 
+  
+  if(this->Application->EvaluateBooleanExpression(
+       "info exists vtkXMLDataSetWriter"))
+    {
+    int len = vtkString::Length(filename);
+    if(len > 5)
+      {
+      const char* fn = filename + len-5;
+      if(strcmp(fn, ".xvtk") == 0)
+        {
+        pvApp->BroadcastScript("vtkXMLDataSetWriter writer");
+        pvApp->BroadcastScript("writer SetFileName %s", filename);
+        pvApp->BroadcastScript("writer SetInput %s",
+                               this->GetCurrentPVData()->GetVTKDataTclName());
+        pvApp->BroadcastScript("writer Write");
+        pvApp->BroadcastScript("writer Delete");
+        return;
+        }
+      }
+    }  
+  
   pvApp->BroadcastScript("vtkDataSetWriter writer");
   pvApp->BroadcastScript("writer SetFileName %s", filename);
   pvApp->BroadcastScript("writer SetInput %s",
@@ -1627,7 +1647,20 @@ void vtkPVWindow::WriteData()
 
   if (numProcs == 1)
     {
-    this->Script("tk_getSaveFile -filetypes {{{VTK files} {.vtk}}} -defaultextension .vtk -initialfile data.vtk");
+    if(this->Application->EvaluateBooleanExpression(
+         "info exists vtkXMLDataSetWriter"))
+      {
+      this->Script("tk_getSaveFile -filetypes {"
+                   "{{VTK files} {.vtk}} "
+                   "{{VTK XML files} {.xvtk}} "
+                   "} -defaultextension .vtk -initialfile data.vtk");
+      }
+    else
+      {
+      this->Script("tk_getSaveFile -filetypes {"
+                   "{{VTK files} {.vtk}} "
+                   "} -defaultextension .vtk -initialfile data.vtk");
+      }
     
     filename 
       = vtkString::Duplicate(this->Application->GetMainInterp()->result);
@@ -1643,7 +1676,9 @@ void vtkPVWindow::WriteData()
     {
     int ghostLevel;
 
-    this->Script("tk_getSaveFile -filetypes {{{PVTK files} {.pvtk}}} -defaultextension .pvtk -initialfile data.pvtk");
+    this->Script("tk_getSaveFile -filetypes {"
+                 "{{PVTK files} {.pvtk}} "
+                 "} -defaultextension .pvtk -initialfile data.pvtk");
     filename 
       = vtkString::Duplicate(this->Application->GetMainInterp()->result);
     if (strcmp(filename, "") == 0)
