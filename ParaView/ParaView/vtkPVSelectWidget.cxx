@@ -109,11 +109,12 @@ int vtkPVSelectWidget::Create(vtkKWApplication *app)
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app);
-  this->Script("pack %s -side left", this->LabeledFrame->GetWidgetName());
+  this->Script("pack %s -side left -fill x -expand true", 
+               this->LabeledFrame->GetWidgetName());
 
   this->Menu->SetParent(this->LabeledFrame->GetFrame());
   this->Menu->Create(app, "");
-  this->Script("pack %s -side left", this->Menu->GetWidgetName());
+  this->Script("pack %s -side top", this->Menu->GetWidgetName());
 
   return 1;
 }
@@ -134,7 +135,7 @@ void vtkPVSelectWidget::Accept()
 
   if (this->ModifiedFlag)
     {  
-    this->AddTraceEntry("$kw(%s) SetCurrentValue {%d}", this->GetTclName(), 
+    this->AddTraceEntry("$kw(%s) SetCurrentValue {%s}", this->GetTclName(), 
                          this->GetCurrentValue());
     }
 
@@ -158,8 +159,9 @@ void vtkPVSelectWidget::Accept()
 //----------------------------------------------------------------------------
 void vtkPVSelectWidget::Reset()
 {
-
-  this->Script("%s SetCurrentVTKValue [%s Get%s]",
+  // Catch incase the value is not set by default.
+  // We default to the first in the list.
+  this->Script("catch {%s SetCurrentVTKValue [%s Get%s]}",
                this->GetTclName(),
                this->ObjectTclName,
                this->VariableName);
@@ -199,6 +201,12 @@ void vtkPVSelectWidget::SetCurrentVTKValue(const char *val)
 {
   int idx;
   
+  if (val == NULL || val[0] == '\0')
+    {
+    // We do not allow an empty selection.
+    return;
+    }
+
   idx = this->FindIndex(val, this->Values);
   if (idx < 0 || idx == this->CurrentIndex)
     {
@@ -223,19 +231,32 @@ const char* vtkPVSelectWidget::GetCurrentVTKValue()
 void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw, 
                                 const char* vtkVal)
 {
+  char str[512];
+
   this->Labels->AddString(labelVal);
   this->Values->AddString(vtkVal);
   this->Widgets->AddItem(pvw);
 
-  // So we get the modified callbacks of these widgets.
-  pvw->AddDependant(this);
-
   this->Menu->AddEntryWithCommand(labelVal, this, "MenuCallback");
-  if (this->Application && this->Menu->GetValue() == NULL)
+  if (this->Application && this->CurrentIndex < 0)
     {
     this->Menu->SetValue(labelVal);
     this->SetCurrentIndex(0);
     }
+
+  pvw->SetTraceReferenceObject(this);
+  pvw->SetTraceName(labelVal);
+  sprintf(str, "GetPVWidget {%s}", labelVal);
+  pvw->SetTraceReferenceCommand(str);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidget *vtkPVSelectWidget::GetPVWidget(const char* label)
+{
+  int idx;
+
+  idx = this->FindIndex(label, this->Labels);
+  return (vtkPVWidget*)(this->Widgets->GetItemAsObject(idx));
 }
 
 //----------------------------------------------------------------------------
@@ -286,17 +307,19 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
     {
     return;
     }
+
   // Unpack the old widget.
   if (this->CurrentIndex >= 0)
     {
     pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
     this->Script("pack forget %s", pvw->GetWidgetName());
     }
+  this->CurrentIndex = idx;
+ 
   // Pack the new widget.
   pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
   this->Script("pack %s -side top -fill both -expand t", pvw->GetWidgetName());
-
-  this->CurrentIndex = idx;
+  pvw->Reset();
 
   this->ModifiedCallback();
 }

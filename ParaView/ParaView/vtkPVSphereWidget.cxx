@@ -58,15 +58,13 @@ vtkPVSphereWidget::vtkPVSphereWidget()
 {
   this->CommandFunction = vtkPVSphereWidgetCommand;
 
-  this->ResetButton = vtkKWPushButton::New();
-
   this->CenterEntry = vtkPVVectorEntry::New();
   this->CenterEntry->SetTraceReferenceObject(this);
   this->CenterEntry->SetTraceReferenceCommand("GetCenterEntry");
 
   this->RadiusEntry = vtkPVVectorEntry::New();
   this->RadiusEntry->SetTraceReferenceObject(this);
-  this->RadiusEntry->SetTraceReferenceCommand("GetNormalEntry");
+  this->RadiusEntry->SetTraceReferenceCommand("GetRadiusEntry");
 
   this->SphereTclName = NULL;
 
@@ -77,8 +75,6 @@ vtkPVSphereWidget::vtkPVSphereWidget()
 //----------------------------------------------------------------------------
 vtkPVSphereWidget::~vtkPVSphereWidget()
 {
-  this->ResetButton->Delete();
-  this->ResetButton = NULL;
   this->CenterEntry->Delete();
   this->CenterEntry = NULL;
   this->RadiusEntry->Delete();
@@ -138,58 +134,20 @@ void vtkPVSphereWidget::Create(vtkKWApplication *app)
   this->Script("frame %s", this->GetWidgetName());
  
   this->CenterEntry->SetParent(this);
-  this->CenterEntry->SetObjectVariable(sphereTclName, "Origin");
+  this->CenterEntry->SetObjectVariable(sphereTclName, "Center");
   this->CenterEntry->SetModifiedCommand(this->GetTclName(), 
                                         "ModifiedCallback");
   this->CenterEntry->Create(this->Application, "Center", 3, NULL, NULL);
   this->Script("pack %s -side top -fill x",
                this->CenterEntry->GetWidgetName());
 
-  this->CenterResetButton->SetParent(this);
-  this->CenterResetButton->Create(this->Application, "");
-  this->CenterResetButton->SetLabel("Set Sphere Center to Center of Bounds");
-  this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 
-  this->Script("pack %s -side top -fill x -padx 2",
-               this->CenterResetButton->GetWidgetName());
-
-  // Normal -------------------------
-  this->NormalEntry->SetParent(this);
-  this->NormalEntry->SetObjectVariable(sphereTclName, "Normal");
-  this->NormalEntry->SetModifiedCommand(this->GetTclName(), 
+  this->RadiusEntry->SetParent(this);
+  this->RadiusEntry->SetObjectVariable(sphereTclName, "Radius");
+  this->RadiusEntry->SetModifiedCommand(this->GetTclName(), 
                                         "ModifiedCallback");
-  this->NormalEntry->Create(this->Application, "Normal", 3, NULL, NULL);
+  this->RadiusEntry->Create(this->Application, "Radius", 1, NULL, NULL);
   this->Script("pack %s -side top -fill x",
-               this->NormalEntry->GetWidgetName());
-
-  this->NormalButtonFrame->SetParent(this);
-  this->NormalButtonFrame->Create(this->Application, "frame", "");
-  this->Script("pack %s -side top -fill x -padx 2",
-               this->NormalButtonFrame->GetWidgetName());
-
-  this->NormalCameraButton->SetParent(this->NormalButtonFrame);
-  this->NormalCameraButton->Create(this->Application, "");
-  this->NormalCameraButton->SetLabel("Use Camera Normal");
-  this->NormalCameraButton->SetCommand(this, "NormalCameraCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalCameraButton->GetWidgetName());
-  this->NormalXButton->SetParent(this->NormalButtonFrame);
-  this->NormalXButton->Create(this->Application, "");
-  this->NormalXButton->SetLabel("X Normal");
-  this->NormalXButton->SetCommand(this, "NormalXCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalXButton->GetWidgetName());
-  this->NormalYButton->SetParent(this->NormalButtonFrame);
-  this->NormalYButton->Create(this->Application, "");
-  this->NormalYButton->SetLabel("Y Normal");
-  this->NormalYButton->SetCommand(this, "NormalYCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalYButton->GetWidgetName());
-  this->NormalZButton->SetParent(this->NormalButtonFrame);
-  this->NormalZButton->Create(this->Application, "");
-  this->NormalZButton->SetLabel("Z Normal");
-  this->NormalZButton->SetCommand(this, "NormalZCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalZButton->GetWidgetName());
+               this->RadiusEntry->GetWidgetName());
 
   // Initialize the center of the sphere based on the input bounds.
   if (this->PVSource)
@@ -199,117 +157,20 @@ void vtkPVSphereWidget::Create(vtkKWApplication *app)
       {
       float bds[6];
       input->GetBounds(bds);
-      pvApp->BroadcastScript("%s SetOrigin %f %f %f", sphereTclName,
+      pvApp->BroadcastScript("%s SetCenter %f %f %f", sphereTclName,
                              0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                              0.5*(bds[4]+bds[5]));
+      pvApp->BroadcastScript("%s SetRadius %f", sphereTclName,
+                             0.5*(bds[1]-bds[0]));
       }
     }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVSphereWidget::CenterResetCallback()
-{
-  vtkPVData *input;
-  float bds[6];
-
-  if (this->PVSource == NULL)
-    {
-    vtkErrorMacro("PVSource has not been set.");
-    return;
-    }
-
-  input = this->PVSource->GetPVInput();
-  if (input == NULL)
-    {
-    return;
-    }
-  input->GetBounds(bds);
-
-  this->CenterEntry->GetEntry(0)->SetValue(0.5*(bds[0]+bds[1]), 3);
-  this->CenterEntry->GetEntry(1)->SetValue(0.5*(bds[2]+bds[3]), 3);
-  this->CenterEntry->GetEntry(2)->SetValue(0.5*(bds[4]+bds[5]), 3);
-
-  this->CenterEntry->ModifiedCallback();
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVSphereWidget::NormalCameraCallback()
-{
-  vtkKWView *view;
-  vtkRenderer *ren;
-  vtkCamera *cam;
-  double normal[3];
-
-  if (this->PVSource == NULL)
-    {
-    vtkErrorMacro("PVSource has not been set.");
-    return;
-    }
-
-  view = this->PVSource->GetView();
-  if (view == NULL)
-    {
-    vtkErrorMacro("Could not get the view/camera to set the normal.");
-    return;
-    }
-  ren = vtkRenderer::SafeDownCast(view->GetViewport());
-  if (ren == NULL)
-    {
-    vtkErrorMacro("Could not get the renderer/camera to set the normal.");
-    return;
-    }
-  cam = ren->GetActiveCamera();
-  if (cam == NULL)
-    {
-    vtkErrorMacro("Could not get the camera to set the normal.");
-    return;
-    }
-  cam->GetViewSphereNormal(normal);
-
-  this->NormalEntry->GetEntry(0)->SetValue(-normal[0], 5);
-  this->NormalEntry->GetEntry(1)->SetValue(-normal[1], 5);
-  this->NormalEntry->GetEntry(2)->SetValue(-normal[2], 5);
-
-  this->NormalEntry->ModifiedCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSphereWidget::NormalXCallback()
-{
-  this->NormalEntry->GetEntry(0)->SetValue(1.0, 1);
-  this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
-
-  this->NormalEntry->ModifiedCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSphereWidget::NormalYCallback()
-{
-  this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(1)->SetValue(1.0, 1);
-  this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
-
-  this->NormalEntry->ModifiedCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSphereWidget::NormalZCallback()
-{
-  this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(2)->SetValue(1.0, 1);
-
-  this->NormalEntry->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::Reset()
 {
   this->CenterEntry->Reset();
-  this->NormalEntry->Reset();
+  this->RadiusEntry->Reset();
 
   this->ModifiedFlag = 0;
 }
@@ -323,10 +184,9 @@ void vtkPVSphereWidget::Accept()
     {
     this->CenterEntry->Accept();
     }
-
-  if ( this->NormalEntry->GetModifiedFlag())
+  if ( this->RadiusEntry->GetModifiedFlag())
     {
-    this->NormalEntry->Accept();
+    this->RadiusEntry->Accept();
     }
 
   // Set this here to keep this widget like others.
@@ -356,7 +216,7 @@ void vtkPVSphereWidget::SaveInTclScript(ofstream *file)
         << " " << this->SphereTclName << endl;
 
   this->CenterEntry->SaveInTclScript(file);
-  this->NormalEntry->SaveInTclScript(file);
+  this->RadiusEntry->SaveInTclScript(file);
 }
 
 

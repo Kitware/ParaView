@@ -28,8 +28,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
-#include "vtkPVSourceInterface.h"
-#include "vtkPVMethodInterface.h"
 #include "vtkKWEntry.h"
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
@@ -64,7 +62,6 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->StopFlag = 0;
 
   this->PVSource = NULL;
-  this->MethodInterfaceIndex = -1;
 
   this->View = NULL;
   this->Window = NULL;
@@ -113,6 +110,8 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->MethodLabel->SetParent(this->SourceMethodFrame);
   this->MethodMenuButton = vtkKWMenuButton::New();
   this->MethodMenuButton->SetParent(this->SourceMethodFrame);
+
+  this->ControlledWidget = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -215,6 +214,7 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
     }
 
   this->SetPVSource(NULL);
+  this->SetControlledWidget(NULL);
   this->SetView(NULL);
   this->SetWindow(NULL);
 }
@@ -448,6 +448,11 @@ void vtkPVAnimationInterface::CurrentTimeCallback()
     {
     pvApp->BroadcastScript("set pvTime %f", this->GetCurrentTime());
     pvApp->BroadcastScript("catch {%s}", this->ScriptEditor->GetValue());
+    if (this->ControlledWidget)
+      {
+      this->ControlledWidget->ModifiedCallback();
+      this->ControlledWidget->Reset();
+      }
     if (this->View)
       {
       this->View->Render();
@@ -524,7 +529,6 @@ void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source)
     this->SourceMenuButton->SetButtonText("None");
     }
 
-  this->MethodInterfaceIndex = -1;
   this->UpdateMethodMenu();
 }
 
@@ -651,9 +655,9 @@ void vtkPVAnimationInterface::UpdateMethodMenu()
   // Remove all previous items form the menu.
   this->MethodMenuButton->GetMenu()->DeleteAllMenuItems();
 
+  this->MethodMenuButton->SetButtonText("None");
   if (this->PVSource == NULL)
     {
-    this->MethodMenuButton->SetButtonText("None");
     return;
     }
   
@@ -666,77 +670,6 @@ void vtkPVAnimationInterface::UpdateMethodMenu()
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVAnimationInterface::SetMethodInterfaceIndex(int idx)
-{
-  vtkPVSourceInterface *sInt;
-  vtkCollection *mInts;
-  vtkPVMethodInterface *mInt;
-
-  this->MethodInterfaceIndex = idx;
-
-  if (this->MethodInterfaceIndex < 0)
-    {
-    this->SourceMenuButton->SetButtonText("None");
-    // Do not erase the users script if they are editing it.
-    if ( ! this->ScriptCheckButton->GetState())
-      {
-      this->ScriptEditor->SetValue("");
-      }
-    return;
-    }
-
-  if (this->PVSource == NULL)
-    {
-    vtkErrorMacro("Method set with no source.");
-    return;
-    }
-
-  sInt = this->PVSource->GetInterface();
-  mInts = sInt->GetMethodInterfaces();
-  mInt = (vtkPVMethodInterface*)(mInts->GetItemAsObject(idx));
-
-
-  // Do not change the users custom script (if they are editing it).
-  if ( ! this->ScriptCheckButton->GetState())
-    {
-    if (mInt)
-      {
-      this->MethodMenuButton->SetButtonText(mInt->GetVariableName());
-      char str[1024];
-      if (mInt->GetArgumentType(0) == VTK_FLOAT)
-        {
-        sprintf(str, "%s Set%s $pvTime", this->PVSource->GetVTKSourceTclName(),
-                mInt->GetVariableName());
-        }
-      else if (mInt->GetArgumentType(0) == VTK_INT)
-        {
-        sprintf(str, "%s Set%s [expr int($pvTime)]", this->PVSource->GetVTKSourceTclName(),
-                mInt->GetVariableName());
-        }
-      else if (mInt->GetArgumentType(0) == VTK_STRING)
-        {
-        // Do the best we can for a default.
-        // Append the time onto the current value of the string.
-        this->Script("%s Get%s", this->PVSource->GetVTKSourceTclName(),
-                     mInt->GetVariableName());
-        sprintf(str, "%s Get%s \"%s[expr int($pvTime)]\"", this->PVSource->GetVTKSourceTclName(),
-                mInt->GetVariableName(),
-                this->Application->GetMainInterp()->result);
-        }
-      else
-        {
-        vtkErrorMacro("We do not handle this argument type yet.");
-        return;
-        }
-      this->ScriptEditor->SetValue(str);
-      }
-    else
-      {
-      vtkErrorMacro("Method not found.");
-      }
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetWindow(vtkPVWindow *window)

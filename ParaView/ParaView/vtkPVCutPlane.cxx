@@ -45,7 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCompositeCollection.h"
 #include "vtkPVData.h"
 #include "vtkPVContourEntry.h"
+#include "vtkPVSelectWidget.h"
 #include "vtkPVPlaneWidget.h"
+#include "vtkPVSphereWidget.h"
 #include "vtkPVInputMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWScrollableFrame.h"
@@ -83,8 +85,20 @@ vtkPVCutPlane* vtkPVCutPlane::New()
 void vtkPVCutPlane::CreateProperties()
 {
   vtkPVInputMenu *inputMenu;
+  vtkPVSelectWidget  *selectWidget;
   vtkPVPlaneWidget  *planeWidget;
+  vtkPVSphereWidget  *sphereWidget;
   vtkPVContourEntry *contourEntry;
+
+  // This makes the assumption that the vtkCutDataSet filter 
+  // has already been set.  In the future we could also implement 
+  // the virtual method "SetVTKSource" to catch the condition when
+  // the VTKSource is set after the properties are created.
+  if (this->VTKSourceTclName == NULL)
+    {
+    vtkErrorMacro("VTKSource must be set before properties are created.");
+    return;
+    }
 
   this->vtkPVSource::CreateProperties();
  
@@ -94,32 +108,42 @@ void vtkPVCutPlane::CreateProperties()
 
   this->AddBoundsDisplay(inputMenu);
 
+  selectWidget = vtkPVSelectWidget::New();
+  selectWidget->SetParent(this->GetParameterFrame()->GetFrame());
+  selectWidget->Create(this->Application);
+  selectWidget->SetLabel("Cut Function");
+  selectWidget->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
+  selectWidget->SetObjectVariable(this->VTKSourceTclName, "CutFunction");
+  this->AddPVWidget(selectWidget);
+  this->Script("pack %s -side top -fill x -expand 1", 
+               selectWidget->GetWidgetName());
+
+  
   // The Plane widget makes its owns VTK object (vtkPlane) so we do not
   // need to make the association.
   planeWidget = vtkPVPlaneWidget::New();
-  planeWidget->SetParent(this->GetParameterFrame()->GetFrame());
+  planeWidget->SetParent(selectWidget->GetFrame());
   planeWidget->SetPVSource(this);
-  planeWidget->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
-  planeWidget->Create(this->Application);
-  this->Script("pack %s -side top -fill x", planeWidget->GetWidgetName());
-  planeWidget->SetTraceName("Plane");
-  this->AddPVWidget(planeWidget);
+  planeWidget->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
+  planeWidget->Create(this->Application);  
+  selectWidget->AddItem("Plane", planeWidget, planeWidget->GetPlaneTclName());
+  
+  // The Plane widget makes its owns VTK object (vtkPlane) so we do not
+  // need to make the association.
+  sphereWidget = vtkPVSphereWidget::New();
+  sphereWidget->SetParent(selectWidget->GetFrame());
+  sphereWidget->SetPVSource(this);
+  sphereWidget->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
+  sphereWidget->Create(this->Application);
+  selectWidget->AddItem("Sphere", sphereWidget, sphereWidget->GetSphereTclName());
 
-  // This makes the assumption that the vtkClipDataSet filter 
-  // has already been set.  In the future we could also implement 
-  // the virtual method "SetVTKSource" to catch the condition when
-  // the VTKSource is set after the properties are created.
-  if (this->VTKSourceTclName != NULL)
-    {
-    planeWidget->SetObjectVariable(this->VTKSourceTclName, "CutFunction");
-    }
-  else
-    {
-    vtkErrorMacro("VTKSource must be set before properties are created.");
-    }
-  planeWidget->CenterResetCallback();
   planeWidget->Delete();
   planeWidget = NULL;
+  sphereWidget->Delete();
+  sphereWidget = NULL;
+  selectWidget->Delete();
+  selectWidget = NULL;
+
 
   contourEntry = vtkPVContourEntry::New();
   contourEntry->SetPVSource(this);

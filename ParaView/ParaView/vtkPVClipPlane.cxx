@@ -40,7 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVClipPlane.h"
+#include "vtkPVSelectWidget.h"
 #include "vtkPVPlaneWidget.h"
+#include "vtkPVSphereWidget.h"
+#include "vtkPVArrayMenu.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkPVWindow.h"
@@ -83,8 +86,21 @@ vtkPVClipPlane* vtkPVClipPlane::New()
 void vtkPVClipPlane::CreateProperties()
 {
   vtkPVInputMenu *inputMenu;
+  vtkPVSelectWidget *selectWidget;
   vtkPVPlaneWidget *planeWidget;
+  vtkPVSphereWidget *sphereWidget;
+  vtkPVArrayMenu *arrayMenu;
   vtkPVVectorEntry *offsetEntry;
+
+  // This makes the assumption that the vtkClipDataSet filter 
+  // has already been set.  In the future we could also implement 
+  // the virtual method "SetVTKSource" to catch the condition when
+  // the VTKSource is set after the properties are created.
+  if (this->VTKSourceTclName == NULL)
+    {
+    vtkErrorMacro("VTKSource must be set before properties are created.");
+    return;
+    }
 
   this->vtkPVSource::CreateProperties();
  
@@ -94,32 +110,62 @@ void vtkPVClipPlane::CreateProperties()
 
   this->AddBoundsDisplay(inputMenu);
 
+  
+  selectWidget = vtkPVSelectWidget::New();
+  selectWidget->SetParent(this->GetParameterFrame()->GetFrame());
+  selectWidget->Create(this->Application);
+  selectWidget->SetLabel("Clip Function");
+  selectWidget->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
+  selectWidget->SetObjectVariable(this->VTKSourceTclName, "ClipFunction");
+  this->AddPVWidget(selectWidget);
+  this->Script("pack %s -side top -fill x -expand 1", 
+               selectWidget->GetWidgetName());
+
+  
   // The Plane widget makes its owns VTK object (vtkPlane) so we do not
   // need to make the association.
   planeWidget = vtkPVPlaneWidget::New();
-  planeWidget->SetParent(this->GetParameterFrame()->GetFrame());
+  planeWidget->SetParent(selectWidget->GetFrame());
   planeWidget->SetPVSource(this);
   planeWidget->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
-  planeWidget->Create(this->Application);
-  this->Script("pack %s -side top -fill x", planeWidget->GetWidgetName());
-  planeWidget->SetTraceName("Plane");
-  this->AddPVWidget(planeWidget);
+  planeWidget->Create(this->Application);  
+  selectWidget->AddItem("Plane", planeWidget, planeWidget->GetPlaneTclName());
+  
+  // The Plane widget makes its owns VTK object (vtkPlane) so we do not
+  // need to make the association.
+  sphereWidget = vtkPVSphereWidget::New();
+  sphereWidget->SetParent(selectWidget->GetFrame());
+  sphereWidget->SetPVSource(this);
+  sphereWidget->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
+  sphereWidget->Create(this->Application);
+  selectWidget->AddItem("Sphere", sphereWidget, sphereWidget->GetSphereTclName());
 
+  // Put an option to clip by scalar array.
+  arrayMenu = vtkPVArrayMenu::New();
+  arrayMenu->SetNumberOfComponents(1);
+  arrayMenu->SetInputName("Input");
+  arrayMenu->SetAttributeType(vtkDataSetAttributes::SCALARS);
+  arrayMenu->SetObjectTclName(this->VTKSourceTclName);
+  arrayMenu->SetLabel("Scalars");
 
-  // This makes the assumption that the vtkClipDataSet filter 
-  // has already been set.  In the future we could also implement 
-  // the virtual method "SetVTKSource" to catch the condition when
-  // the VTKSource is set after the properties are created.
-  if (this->VTKSourceTclName != NULL)
-    {
-    planeWidget->SetObjectVariable(this->VTKSourceTclName, "ClipFunction");
-    }
-  else
-    {
-    vtkErrorMacro("VTKSource must be set before properties are created.");
-    }
+  arrayMenu->SetParent(selectWidget->GetFrame());
+  arrayMenu->SetModifiedCommand(this->GetTclName(),"SetAcceptButtonColorToRed");
+  arrayMenu->Create(this->Application);
+  arrayMenu->SetBalloonHelpString("Choose the clipping scalar array.");
+  selectWidget->AddItem("Scalars", arrayMenu, "");
+
+  // Set up the dependancy so that the array menu updates when the input changes.
+  inputMenu->AddDependant(arrayMenu);
+  arrayMenu->SetInputMenu(inputMenu);  
+
+  arrayMenu->Delete();
+  arrayMenu = NULL;
   planeWidget->Delete();
   planeWidget = NULL;
+  sphereWidget->Delete();
+  sphereWidget = NULL;
+  selectWidget->Delete();
+  selectWidget = NULL;
 
   // Offset -------------------------
   offsetEntry = vtkPVVectorEntry::New();

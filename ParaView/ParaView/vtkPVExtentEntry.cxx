@@ -313,4 +313,5 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
     {
     vtkErrorMacro("Bad extent animation mode.");
     }
+  ai->SetControlledWidget(this);
 }

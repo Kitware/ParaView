@@ -47,6 +47,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWText.h"
+#include "vtkPVWidget.h"
 class vtkKWLabeledEntry;
 class vtkKWMenuButton;
 class vtkPVWindow;
@@ -117,10 +118,6 @@ public:
   vtkGetObjectMacro(PVSource,vtkPVSource);
 
   // Description:
-  // A callback that sets the method to vary of the source.
-  void SetMethodInterfaceIndex(int idx);
-
-  // Description:
   // Rebuild the source menu to select the current source list.
   void UpdateSourceMenu();
 
@@ -148,6 +145,12 @@ public:
   // Description:
   // Make the tcl script save the images of the animation.
   void SaveInTclScript(ofstream *file, const char *fileRoot);
+
+  // Description:
+  // If the animation is controlling a specific PVWidget, then
+  // this widget will be updated to reflect the new value.
+  // The menu sets it here.
+  vtkSetObjectMacro(ControlledWidget, vtkPVWidget);
 
 protected:
   vtkPVAnimationInterface();
@@ -194,11 +197,7 @@ protected:
 
   // The source selected.
   vtkPVSource *PVSource;
-
-  // The method selected.
-  int MethodInterfaceIndex;
-  // The argument selected.
-  int ArgumentIndex;
+  vtkPVWidget *ControlledWidget;
 
   // The formated string to evaluate.
   char *ScriptString;

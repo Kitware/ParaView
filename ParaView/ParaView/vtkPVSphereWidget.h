@@ -61,8 +61,12 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Callback that set the center to the middle of the bounds.
-  void CenterResetCallback();
+  // This widget needs access to the PVSource for reseting the center to
+  // the middle of the data bounds.
+  // Note: There is no reference counting for fear of reference loops.
+  // The pvSource owns this widget.
+  void SetPVSource(vtkPVSource *pvs) {this->PVSource = pvs;}
+  vtkPVSource *GetPVSource() {return this->PVSource;}
 
   // Description:
   // Called when the PVSources reset button is called.
@@ -102,7 +106,6 @@ protected:
 
   vtkPVSource *PVSource;
 
-  vtkKWPushButton  *CenterResetButton;
   vtkPVVectorEntry *CenterEntry;
 
   vtkPVVectorEntry *RadiusEntry;

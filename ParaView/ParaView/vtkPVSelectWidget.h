@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVObjectWidget.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
+#include "vtkKWLabeledFrame.h"
 
 class vtkStringList;
 class vtkKWOptionMenu;
@@ -70,9 +71,14 @@ public:
   int Create(vtkKWApplication *app);
 
   // Description:
-  // Add widgets to the possible selection.
+  // Add widgets to the possible selection.  The vtkValue
+  // is value used to set the vtk object variable.
   void AddItem(const char* labelVal, vtkPVWidget *pvw, const char* vtkVal);
   
+  // Description:
+  // Access to the widgets for tracing.
+  vtkPVWidget *GetPVWidget(const char* label);
+
   // Description:
   // Set the label of the menu.
   void SetLabel(const char *label);
@@ -96,6 +102,16 @@ public:
   // Description:
   // This method gets called when the menu changes.
   void MenuCallback();
+
+  // Description:
+  // All sub widgets should have this frame as their parent.
+  vtkKWWidget *GetFrame() {return this->LabeledFrame->GetFrame();}
+
+  // Description:
+  // Methods used internally by accept and reset to 
+  // Set and Get the widget selection.
+  const char* GetCurrentVTKValue();
+  void SetCurrentVTKValue(const char* val);
     
 protected:
   vtkPVSelectWidget();
@@ -103,10 +119,6 @@ protected:
   vtkPVSelectWidget(const vtkPVSelectWidget&) {};
   void operator=(const vtkPVSelectWidget&) {};
 
-  // Description:
-  // Methods used internally by accept and reset to look up the vtk value.
-  const char* GetCurrentVTKValue();
-  void SetCurrentVTKValue(const char* val);
   int FindIndex(const char* str, vtkStringList *list);
   void SetCurrentIndex(int idx);
 

@@ -47,7 +47,8 @@ set BoundsDisplay [$kw(vtkTemp209) GetPVWidget {BoundsDisplay}]
 puts $fp [[$BoundsDisplay GetWidget] GetBounds]
 
 $kw(vtkTemp209) AcceptCallback
-set kw(vtkTemp217) [$kw(vtkTemp209) GetPVWidget {Plane}]
+set kw(vtkTemp216) [$kw(vtkTemp209) GetPVWidget {Clip Function}]
+set kw(vtkTemp217) [$kw(vtkTemp216) GetPVWidget {Plane}]
 set kw(vtkTemp218) [$kw(vtkTemp217) GetNormalEntry]
 $kw(vtkTemp218) SetValue -0.04923 0.99878 0.00259
 $kw(vtkTemp209) AcceptCallback

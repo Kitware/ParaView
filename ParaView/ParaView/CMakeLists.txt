@@ -43,6 +43,7 @@ vtkPVScalarRangeLabel
 vtkPVScale 
 vtkPVSelectionList
 vtkPVSelectWidget 
+vtkPVSphereWidget
 vtkPVSource 
 vtkPVSourceInterface 
 vtkPVSourceInterfaceParser

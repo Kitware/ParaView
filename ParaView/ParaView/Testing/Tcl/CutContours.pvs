@@ -20,7 +20,9 @@ $pv(vtkTemp110) SetValue 0 0 4
 $pv(vtkTemp98) AcceptCallback
 set pv(vtkTemp182) [$pv(vtkTemp1) ClipPlaneCallback]
 $pv(vtkTemp182) AcceptCallback
-set pv(vtkTemp191) [$pv(vtkTemp182) GetPVWidget {Plane}]
+
+set pv(vtkTemp192) [$pv(vtkTemp182) GetPVWidget {Clip Function}]
+set pv(vtkTemp191) [$pv(vtkTemp192) GetPVWidget {Plane}]
 set pv(vtkTemp193) [$pv(vtkTemp191) GetNormalEntry]
 $pv(vtkTemp193) SetValue 0.80121 0.53206 0.27383
 $pv(vtkTemp182) AcceptCallback
@@ -33,7 +35,8 @@ $pv(vtkTemp182) AcceptCallback
 $pv(vtkTemp194) SetValue -0.5
 $pv(vtkTemp182) AcceptCallback
 set pv(vtkTemp213) [$pv(vtkTemp1) CutPlaneCallback]
-set pv(vtkTemp222) [$pv(vtkTemp213) GetPVWidget {Plane}]
+set pv(vtkTemp214) [$pv(vtkTemp213) GetPVWidget {Cut Function}]
+set pv(vtkTemp222) [$pv(vtkTemp214) GetPVWidget {Plane}]
 set pv(vtkTemp224) [$pv(vtkTemp222) GetNormalEntry]
 $pv(vtkTemp224) SetValue -0.26920 0.86444 -0.42458
 set pv(vtkTemp227) [$pv(vtkTemp213) GetPVWidget {Cut Values}]

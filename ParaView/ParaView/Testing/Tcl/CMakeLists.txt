@@ -26,6 +26,7 @@ IF (VTK_USE_MPI)
                RotateTranslate
                ScalarRangeLabel
                ScalarSelection
+               ScalarsSphereClip
                SphereTest
                Threshold
                ThresholdAttrMode
@@ -70,6 +71,7 @@ FOREACH (tfile
          RotateTranslate
          ScalarRangeLabel
          ScalarSelection
+         ScalarsSphereClip
          SphereTest
          Threshold
          ThresholdAttrMode

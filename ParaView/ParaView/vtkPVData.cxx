@@ -1788,12 +1788,7 @@ void vtkPVData::VisibilityCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::SetVisibility(int v)
 {
-  if (this->VisibilityCheck->GetState() != v)
-    {
-    // Here incase this is called from a script.
-    this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
-    }
-
+  this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
   this->SetVisibilityInternal(v);
 }
   

@@ -31,7 +31,8 @@ $kw(vtkTemp279) AcceptCallback
 set kw(vtkTemp75) [$kw(vtkTemp1) GetRotateCameraInteractor]
 $kw(vtkTemp75) SetCameraState -1.717 -2.853 9.108  -0.750 -0.625 1.000  0.901 0.378 0.211
 set kw(vtkTemp325) [$kw(vtkTemp1) CreatePVSource vtkReflectionFilter]
-set kw(vtkTemp336) [$kw(vtkTemp325) GetPVWidget {Plane}]
+set kw(vtkTemp326) [$kw(vtkTemp325) GetPVWidget {Clip Function}]
+set kw(vtkTemp336) [$kw(vtkTemp326) GetPVWidget {Plane}]
 $kw(vtkTemp336) SetCurrentValue {1}
 $kw(vtkTemp325) AcceptCallback
 $kw(vtkTemp336) SetCurrentValue {0}
