@@ -67,7 +67,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.7");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.8");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 //*****************************************************************************
@@ -698,10 +698,6 @@ void vtkPVAnimationScene::Play()
 void vtkPVAnimationScene::Stop()
 {
   this->AnimationSceneProxy->Stop();
-  if (this->Window)
-    {
-    this->Window->UpdateEnableState();
-    }
   this->AddTraceEntry("$kw(%s) Stop", this->GetTclName());
 }
 
