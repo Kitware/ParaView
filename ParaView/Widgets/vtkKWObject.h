@@ -53,9 +53,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWObject_h
 #define __vtkKWObject_h
 
-class vtkKWApplication;
 #include "vtkObject.h"
+
+// This has to be here because on HP varargs are included in 
+// tcl.h and they have different prototypes for va_start so
+// the build fails. Defining HAS_STDARG prevents that.
+#if defined(__hpux) && !defined(HAS_STDARG)
+#  define HAS_STDARG
+#endif
+
 #include "tcl.h"
+
+class vtkKWApplication;
 
 class VTK_EXPORT vtkKWObject : public vtkObject
 {
