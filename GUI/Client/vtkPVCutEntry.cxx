@@ -29,7 +29,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCutEntry);
-vtkCxxRevisionMacro(vtkPVCutEntry, "1.6.2.1");
+vtkCxxRevisionMacro(vtkPVCutEntry, "1.6.2.2");
 
 vtkCxxSetObjectMacro(vtkPVCutEntry, InputMenu, vtkPVInputMenu);
 
@@ -113,7 +113,7 @@ void vtkPVCutEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
       sw->GetPVWidget(sw->GetCurrentValue()));
     }
 
-  double min, max;
+  double min = 0, max = 0;
 
   if (ipw)
     {

@@ -53,7 +53,7 @@ public:
   // This method gets called when the user selects this widget to animate.
   // It sets up the script and animation parameters.
   virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, int Mode);
-  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai) {};
+  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *) {};
 
   // Description:
   // The label.
