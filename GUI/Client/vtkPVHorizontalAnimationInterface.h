@@ -28,7 +28,6 @@ class vtkKWApplication;
 class vtkKWSplitFrame;
 class vtkCollection;
 class vtkCollectionIterator;
-class vtkPVHorizontalAnimationInterfaceObserver;
 class vtkPVAnimationCueTree;
 class vtkPVAnimationCue;
 
@@ -91,10 +90,6 @@ protected:
   vtkCollectionIterator* AnimationEntriesIterator;
 
   vtkPVAnimationCueTree* ParentTree;
-  //BTX
-  vtkPVHorizontalAnimationInterfaceObserver* Observer;
-  friend class vtkPVHorizontalAnimationInterfaceObserver;
-  //ETX
   void InitializeObservers(vtkPVAnimationCue* cue);
   void ExecuteEvent(vtkObject* obj, unsigned long event, void* calldata);
 

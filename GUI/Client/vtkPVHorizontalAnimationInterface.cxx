@@ -32,36 +32,8 @@
 #include "vtkKWParameterValueFunctionEditor.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.5");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.6");
 
-//*****************************************************************************
-class vtkPVHorizontalAnimationInterfaceObserver : public vtkCommand
-{
-public:
-  static vtkPVHorizontalAnimationInterfaceObserver* New()
-    {
-    return new vtkPVHorizontalAnimationInterfaceObserver;
-    }
-  void SetHorizontalAnimationInterface(vtkPVHorizontalAnimationInterface* t)
-    {
-    this->HorizontalAnimationInterface = t;
-    }
-  virtual void Execute(vtkObject* obj, unsigned long event, void* calldata)
-    {
-    if (this->HorizontalAnimationInterface)
-      {
-      this->HorizontalAnimationInterface->ExecuteEvent(obj, event, calldata);
-      }
-    }
-protected:
-  vtkPVHorizontalAnimationInterfaceObserver()
-    {
-    this->HorizontalAnimationInterface = 0;
-    }
-  vtkPVHorizontalAnimationInterface* HorizontalAnimationInterface;
-};
-
-//*****************************************************************************
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
 {
@@ -71,8 +43,6 @@ vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
   this->ScrollFrame = vtkKWFrame::New();
   this->AnimationEntries = vtkCollection::New();
   this->AnimationEntriesIterator = this->AnimationEntries->NewIterator();
-  this->Observer = vtkPVHorizontalAnimationInterfaceObserver::New();
-  this->Observer->SetHorizontalAnimationInterface(this);
   this->ParentTree = vtkPVAnimationCueTree::New();
   this->ParentTree->SetTraceReferenceObject(this);
   this->ParentTree->SetTraceReferenceCommand("GetParentTree");
@@ -87,7 +57,6 @@ vtkPVHorizontalAnimationInterface::~vtkPVHorizontalAnimationInterface()
   this->PropertiesFrame->Delete();
   this->AnimationEntries->Delete();
   this->AnimationEntriesIterator->Delete();
-  this->Observer->Delete();
   this->ParentTree->Delete();
 }
 
@@ -205,30 +174,10 @@ void vtkPVHorizontalAnimationInterface::InitializeObservers(
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVHorizontalAnimationInterface::ExecuteEvent(vtkObject* obj,
-  unsigned long event, void* )
+void vtkPVHorizontalAnimationInterface::ExecuteEvent(vtkObject* ,
+  unsigned long , void* )
 {
-  vtkPVAnimationCue* cue = vtkPVAnimationCue::SafeDownCast(obj);
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
-    this->GetApplication());
- 
-  vtkPVVerticalAnimationInterface* vInterface = 
-    pvApp->GetMainWindow()->GetAnimationManager()->GetVAnimationInterface();
-  if (cue)
-    {
-    switch(event)
-      {
-    case vtkKWEvent::FocusOutEvent:
-      if (cue == vInterface->GetAnimationCue())
-        {
-        vInterface->SetAnimationCue(NULL);
-        }
-      break;
-    case vtkKWEvent::FocusInEvent:
-      vInterface->SetAnimationCue(cue);
-      break;
-      }
-    }
+
 }
 
 //-----------------------------------------------------------------------------
