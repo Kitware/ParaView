@@ -50,7 +50,7 @@ RELEASE_ROOT_NAME="ParaViewReleaseRoot"
 RELEASE_ROOT="${HOME}/${RELEASE_ROOT_NAME}"
 
 RELEASE_UTILITIES="ParaViewReleaseUtilities"
-RELEASE_UTILITIES_CVS="ParaView/Utilities/Release"
+RELEASE_UTILITIES_CVS="ParaViewComplete/ParaView/Utilities/Release"
 
 # Installation prefix used during tarball creation.  Tarballs are
 # relative to the installation prefix and do not include this in their
@@ -339,18 +339,25 @@ checkout()
 {
     [ -z "${DONE_checkout}" ] || return 0 ; DONE_checkout="yes"
     config || return 1
-    echo "Exporting ${CVS_MODULE} from cvs ..." &&
+    echo "Updating ${CVS_MODULE} from cvs ..." &&
     (
-        rm -rf ${PROJECT}-${VERSION} &&
-        rm -rf CheckoutTemp &&
-        mkdir CheckoutTemp &&
-        cd CheckoutTemp &&
-        cvs -q -z3 -d $CVSROOT export -r ${TAG} ${CVS_MODULE} &&
-        rm -rf ${CVS_MODULE}/Xdmf/Utilities/expat &&
-        rm -rf ${CVS_MODULE}/Xdmf/Utilities/zlib &&
-        mv ${CVS_MODULE} ../${PROJECT}-${VERSION} &&
-        cd .. &&
-        rm -rf CheckoutTemp
+        if [ -d ${PROJECT}-${VERSION}/CVS ]; then
+            cd ${PROJECT}-${VERSION} &&
+            cvs -q -z3 -d $CVSROOT update -dAP -r ${TAG} &&
+            rm -rf Xdmf/Utilities/expat &&
+            rm -rf Xdmf/Utilities/zlib
+        else
+            rm -rf ${PROJECT}-${VERSION} &&
+            rm -rf CheckoutTemp &&
+            mkdir CheckoutTemp &&
+            cd CheckoutTemp &&
+            cvs -q -z3 -d $CVSROOT co -r ${TAG} ${CVS_MODULE} &&
+            rm -rf ${CVS_MODULE}/Xdmf/Utilities/expat &&
+            rm -rf ${CVS_MODULE}/Xdmf/Utilities/zlib &&
+            mv ${CVS_MODULE} ../${PROJECT}-${VERSION} &&
+            cd .. &&
+            rm -rf CheckoutTemp
+        fi
     ) >Logs/checkout.log 2>&1 || error_log Logs/checkout.log
 }
 
@@ -386,7 +393,7 @@ source_tarball()
     (
         mkdir -p Tarballs &&
         rm -rf Tarballs/${PROJECT}-${VERSION}.tar* &&
-        tar cvf Tarballs/${PROJECT}-${VERSION}.tar ${PROJECT}-${VERSION} &&
+        tar cvf Tarballs/${PROJECT}-${VERSION}.tar --exclude CVS ${PROJECT}-${VERSION} &&
         gzip -c Tarballs/${PROJECT}-${VERSION}.tar >Tarballs/${PROJECT}-${VERSION}.tar.gz &&
         compress -cf Tarballs/${PROJECT}-${VERSION}.tar >Tarballs/${PROJECT}-${VERSION}.tar.Z &&
         rm -rf Tarballs/${PROJECT}-${VERSION}.tar
