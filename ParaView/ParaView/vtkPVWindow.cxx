@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.515");
+vtkCxxRevisionMacro(vtkPVWindow, "1.516");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1290,6 +1290,9 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
+  this->AddTraceEntry("$kw(%s) SetCenterOfRotation %f %f %f",
+                      this->GetTclName(), x, y, z);
   
   this->CenterXEntry->SetValue(x);
   this->CenterYEntry->SetValue(y);
@@ -2871,6 +2874,12 @@ void vtkPVWindow::SaveState(const char* filename)
   // Save state of the animation interface
   this->AnimationInterface->SaveState(file);
 
+  // Save the center of rotation
+  *file << "$kw(" << this->GetTclName() << ") SetCenterOfRotation "
+        << this->CenterXEntry->GetValueAsFloat() << " "
+        << this->CenterYEntry->GetValueAsFloat() << " "
+        << this->CenterZEntry->GetValueAsFloat() << endl;
+  
   file->flush();
   if (file->fail())
     {
