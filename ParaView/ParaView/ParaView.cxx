@@ -241,9 +241,6 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
 
 #ifdef VTK_USE_MPI
 
-  controller->CreateOutputWindow();
-
-
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
   controller->SingleMethodExecute();
   
