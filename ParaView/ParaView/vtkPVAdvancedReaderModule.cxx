@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.7");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -108,7 +108,7 @@ int vtkPVAdvancedReaderModule::Initialize(const char* fname,
     {
     return retVal;
     }
-
+  return VTK_OK;
 }
 
 //----------------------------------------------------------------------------
