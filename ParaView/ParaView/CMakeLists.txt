@@ -10,6 +10,7 @@ SET( ParaViewShared_SRCS
   vtkPVProcessModule.cxx
   vtkPVTreeComposite.cxx
   vtkStringList.cxx
+  vtkPVProgressHandler.cxx
   )
 
 SET( ParaViewServer_SRCS

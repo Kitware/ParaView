@@ -66,7 +66,11 @@ public:
   void SetNumberOfFrames(int t);
   vtkGetMacro(NumberOfFrames, int);
 
-  void SetCurrentTime(int time, int trace = 1);
+  void SetCurrentTime(int time)
+    {
+    this->SetCurrentTime(time, 1);
+    }
+  void SetCurrentTime(int time, int trace);
   int GetCurrentTime();
 
   // Description:
@@ -218,6 +222,10 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Get whether animation is playing.
+  vtkGetMacro(InPlay, int);
  
 protected:
   vtkPVAnimationInterface();

@@ -493,6 +493,12 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
   virtual void UpdateMenuState();
+
+  // Description:
+  // Set the progress. All progresses 0 or 100 will be ignored.
+  void SetProgress(const char* text, int val);
+  void StartProgress();
+  void EndProgress(int enabled);
   
 protected:
   vtkPVWindow();
@@ -648,6 +654,9 @@ protected:
   int ToolbarButtonsDisabled;
 
   int InDemo;
+
+  double LastProgress;
+  int ExpectProgress;
 
   vtkPVApplicationSettingsInterface *ApplicationSettingsInterface;
   vtkKWUserInterfaceNotebookManager *UserInterfaceManager;

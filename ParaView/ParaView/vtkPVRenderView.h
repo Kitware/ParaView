@@ -287,6 +287,12 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
+  // Block render requests. If the render requests come, they will be blocked
+  // and when unblocked render will be called.
+  void StartBlockingRender();
+  void EndBlockingRender();
+ 
+  // Description:
   // Access to these widgets from a script.
   vtkGetObjectMacro(StandardViewsFrame, vtkKWLabeledFrame);
   vtkGetObjectMacro(CameraIconsFrame, vtkKWLabeledFrame);
@@ -334,6 +340,8 @@ protected:
   vtkKWRadioButton *SelectionWindowButton;
   
   int EventuallyRenderFlag;
+  int DoingEventuallyRender;
+  int BlockRender;
   char* RenderPending;
   vtkSetStringMacro(RenderPending);
 

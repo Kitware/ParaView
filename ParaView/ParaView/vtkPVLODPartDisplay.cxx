@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.16");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.17");
 
 
 //----------------------------------------------------------------------------
@@ -159,6 +159,11 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << this->LODDeciID << "AddObserver" << "EndEvent" << cmd
+    << vtkClientServerStream::End;
+  pm->GetStream() 
+    << vtkClientServerStream::Invoke 
+    << pm->GetApplicationID() << "RegisterProgressEvent"
+    << this->LODDeciID << this->LODDeciID.ID
     << vtkClientServerStream::End;
   pm->GetStream()
     << vtkClientServerStream::Invoke

@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.114");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.115");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -736,6 +736,7 @@ void vtkPVAnimationInterface::PrepareAnimationInterface(vtkPVWindow* win)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateInterface()
 {
+  /*
   if ( !this->AnimationEntries )
     {
     return;
@@ -769,6 +770,7 @@ void vtkPVAnimationInterface::UpdateInterface()
     if (this->InPlay)
       {
       this->GoToBeginningButton->EnabledOff();
+      this->GoToBeginningButton->EnabledOn();
       }
     else
       {
@@ -800,29 +802,9 @@ void vtkPVAnimationInterface::UpdateInterface()
       this->NumberOfFramesEntry->EnabledOn();
       }
     }
+    */
 
-  if (this->TimeScale && this->TimeScale->IsCreated())
-    {
-    this->TimeScale->SetRange(0, this->NumberOfFrames-1);
-    this->TimeScale->SetResolution(1);
-    this->TimeRange->SetWholeRange(0, this->NumberOfFrames-1);
-    this->TimeRange->SetResolution(1);
-    if (this->InPlay)
-      {
-      // We do not disable it so that the slider will still be updated
-      // during "Play"
-      this->TimeScale->UnBind();
-      }
-    else
-      {
-      this->TimeScale->Bind();
-      }
-    }
-
-  if (this->LoopCheckButton && this->LoopCheckButton->IsCreated())
-    {
-    this->LoopCheckButton->SetState(this->Loop);
-    }
+  this->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -1039,6 +1021,10 @@ void vtkPVAnimationInterface::Play()
     return;
     }
   this->InPlay = 1;
+  if ( this->Window )
+    {
+    this->Window->UpdateEnableState();
+    }
 
   // Make sure we have the up to date entries for end and step.
 
@@ -1082,6 +1068,7 @@ void vtkPVAnimationInterface::Play()
       }
     while (t < this->GetGlobalEnd() && !this->StopFlag)
       {
+      t = this->GetCurrentTime();
       ++t;
       if (t > this->GetGlobalEnd())
         {
@@ -1101,6 +1088,10 @@ void vtkPVAnimationInterface::Play()
   this->UpdateInterface();
 
   this->UnRegister(this);
+  if ( this->Window )
+    {
+    this->Window->UpdateEnableState();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -2026,19 +2017,30 @@ void vtkPVAnimationInterface::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->TopFrame);
-  this->PropagateEnableState(this->ControlFrame);
-  this->PropagateEnableState(this->ControlButtonFrame);
-  this->PropagateEnableState(this->PlayButton);
+  int enabled = this->Enabled;
+
+  // These widgets are always off except when playing:
+  this->Enabled = this->InPlay;
   this->PropagateEnableState(this->StopButton);
+
+  // These widgets are on when playing or when gui enabled
+  this->Enabled = enabled || this->InPlay;
   this->PropagateEnableState(this->GoToBeginningButton);
   this->PropagateEnableState(this->GoToEndButton);
   this->PropagateEnableState(this->LoopCheckButton);
+  this->PropagateEnableState(this->AnimationDelayScale);
+  this->PropagateEnableState(this->CacheGeometryCheck);
+
+  // These widgets are disabled when playing
+  this->Enabled = enabled && !this->InPlay;
+  this->PropagateEnableState(this->PlayButton);
+  this->PropagateEnableState(this->TopFrame);
+  this->PropagateEnableState(this->ControlFrame);
+  this->PropagateEnableState(this->ControlButtonFrame);
   this->PropagateEnableState(this->TimeScale);
   this->PropagateEnableState(this->TimeFrame);
   this->PropagateEnableState(this->NumberOfFramesEntry);
   this->PropagateEnableState(this->TimeRange);
-  this->PropagateEnableState(this->AnimationDelayScale);
   this->PropagateEnableState(this->ActionFrame);
   this->PropagateEnableState(this->ScriptCheckButtonFrame);
   this->PropagateEnableState(this->ScriptCheckButton);
@@ -2049,7 +2051,6 @@ void vtkPVAnimationInterface::UpdateEnableState()
   this->PropagateEnableState(this->SaveButtonFrame);
   this->PropagateEnableState(this->SaveImagesButton);
   this->PropagateEnableState(this->SaveGeometryButton);
-  this->PropagateEnableState(this->CacheGeometryCheck);
   this->PropagateEnableState(this->AnimationEntriesFrame);
   this->PropagateEnableState(this->AddItemButton);
   this->PropagateEnableState(this->DeleteItemButton);
@@ -2067,6 +2068,32 @@ void vtkPVAnimationInterface::UpdateEnableState()
         widget->SetEnabled(this->Enabled);
         }
       }
+    }
+
+  // These widgets are always enabled when gui enabled:
+  this->Enabled = enabled;
+
+  if (this->TimeScale && this->TimeScale->IsCreated())
+    {
+    this->TimeScale->SetRange(0, this->NumberOfFrames-1);
+    this->TimeScale->SetResolution(1);
+    this->TimeRange->SetWholeRange(0, this->NumberOfFrames-1);
+    this->TimeRange->SetResolution(1);
+    if (this->InPlay)
+      {
+      // We do not disable it so that the slider will still be updated
+      // during "Play"
+      this->TimeScale->UnBind();
+      }
+    else
+      {
+      this->TimeScale->Bind();
+      }
+    }
+
+  if (this->LoopCheckButton && this->LoopCheckButton->IsCreated())
+    {
+    this->LoopCheckButton->SetState(this->Loop);
     }
 }
 
@@ -2098,4 +2125,5 @@ void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "Window: " << this->GetWindow() << endl;
   os << indent << "ScriptAvailable: " << this->ScriptAvailable << endl;
+  os << indent << "InPlay: " << this->InPlay << endl;
 }

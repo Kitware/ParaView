@@ -95,6 +95,7 @@
 #include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkClientServerStream.h"
+#include "vtkTimerLog.h"
 
 #include <vtkstd/map>
 
@@ -123,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.524");
+vtkCxxRevisionMacro(vtkPVWindow, "1.525");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -131,6 +132,9 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 //-----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {
+  this->LastProgress = 0;
+  this->ExpectProgress = 0;
+  
   this->InDemo = 0;
   this->Interactor = 0;
 
@@ -2918,6 +2922,11 @@ void vtkPVWindow::SaveWorkspace()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateSourceMenu()
 {
+  if ( this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+    {
+    return;
+    }
+
   if (!this->SourceMenu)
     {
     vtkWarningMacro("Source menu does not exist. Can not update.");
@@ -2993,6 +3002,11 @@ void vtkPVWindow::UpdateSourceMenu()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateFilterMenu()
 {
+  if ( this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+    {
+    return;
+    }
+
   if ( this->InDemo )
     {
     return;
@@ -3253,6 +3267,11 @@ void vtkPVWindow::ResetCameraCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateSelectMenu()
 {
+  if ( this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+    {
+    return;
+    }
+
   if (!this->SelectMenu)
     {
     vtkWarningMacro("Selection menu does not exist. Can not update.");
@@ -3630,7 +3649,7 @@ int vtkPVWindow::SaveTrace(const char* filename)
     return 0;
     }
 
-  if (trace)
+  if (trace && *trace && trace->is_open())
     {
     trace->close();
     }
@@ -4343,6 +4362,12 @@ void vtkPVWindow::UpdateEnableState()
     return;
     }
 
+  int enabled = this->Enabled;
+  if ( this->AnimationInterface && this->AnimationInterface->GetInPlay() )
+    {
+    this->Enabled = 0;
+    }
+
   this->Superclass::UpdateEnableState();
 
 
@@ -4438,6 +4463,8 @@ void vtkPVWindow::UpdateEnableState()
   it->Delete();
 
   this->UpdateMenuState();
+
+  this->Enabled = enabled;
 }
 
 //----------------------------------------------------------------------------
@@ -4506,6 +4533,54 @@ void vtkPVWindow::UpdateMenuState()
     this->UpdateSelectMenu();
     this->UpdateFilterMenu();
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::SetProgress(const char* text, int val)
+{
+  if ( !this->ExpectProgress )
+    {
+    return;
+    }
+  double lastprog = vtkTimerLog::GetCurrentTime();
+  if ( lastprog - this->LastProgress < .5 )
+    {
+    return;
+    }
+  this->LastProgress = lastprog;
+  if ( val == 0 || val > 100 )
+    {
+    return;
+    }
+  this->SetEnabled(0);
+  this->SetStatusText(text);
+  this->GetProgressGauge()->SetValue(val);
+  this->Script("update");
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::StartProgress()
+{
+  this->MainView->StartBlockingRender();
+  this->ExpectProgress = 1;
+  this->LastProgress = vtkTimerLog::GetCurrentTime();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::EndProgress(int enabled)
+{
+  this->ExpectProgress = 0;
+  this->GetProgressGauge()->SetValue(100);
+  this->GetProgressGauge()->SetValue(0);
+  this->SetStatusText("");
+
+  this->MainView->EndBlockingRender();
+
+  if ( !enabled || this->Enabled )
+    {
+    return;
+    }
+  this->EnabledOn();
 }
 
 //-----------------------------------------------------------------------------

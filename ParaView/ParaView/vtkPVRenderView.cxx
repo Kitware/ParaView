@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.311");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.312");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -145,6 +145,7 @@ int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
+  this->DoingEventuallyRender = 0;
   this->RenderModule = NULL;
 
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
@@ -163,6 +164,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->SplitFrame = vtkKWSplitFrame::New();
 
   this->EventuallyRenderFlag = 0;
+  this->BlockRender = 0;
   this->RenderPending = NULL;
 
   this->MenuEntryUnderline = 4;
@@ -1510,7 +1512,28 @@ void vtkPVRenderView::UpdateTclButAvoidRendering()
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StartBlockingRender()
+{
+  vtkDebugMacro("Start blocking render requests");
+  if ( this->BlockRender > 0 )
+    {
+    return;
+    }
+  this->BlockRender = 1;
+}
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::EndBlockingRender()
+{
+  vtkDebugMacro("Stop blocking render requests");
+  if ( this->BlockRender > 1 && !this->DoingEventuallyRender)
+    {
+    vtkDebugMacro("There was a render request, so call render");
+    this->EventuallyRender();
+    }
+  this->BlockRender = 0;
+}
 
 
 //----------------------------------------------------------------------------
@@ -1521,7 +1544,7 @@ void vtkPVRenderView::EventuallyRender()
     return;
     }
   this->EventuallyRenderFlag = 1;
-  //cout << "EventuallyRender()" << endl;
+  vtkDebugMacro("Enqueue EventuallyRender request");
 
   // Keep track of whether there is a render pending so that if a render is
   // pending when this object is deleted, we can cancel the "after" command.
@@ -1530,12 +1553,20 @@ void vtkPVRenderView::EventuallyRender()
   this->Script("update idletasks");
   this->Script("after idle {%s EventuallyRenderCallBack}",this->GetTclName());
   this->SetRenderPending(this->Application->GetMainInterp()->result);
-
 }
                       
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRenderCallBack()
 {
+  this->DoingEventuallyRender = 1;
+  if ( this->BlockRender )
+    {
+    this->BlockRender = 2;
+    this->EventuallyRenderFlag = 0;
+    this->DoingEventuallyRender = 0;
+    return;
+    }
+
   int abort;
 
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1544,10 +1575,10 @@ void vtkPVRenderView::EventuallyRenderCallBack()
   if (this->EventuallyRenderFlag == 0 || !this->RenderPending)
     {
     vtkErrorMacro("Inconsistent EventuallyRenderFlag");
+    this->DoingEventuallyRender = 0;
     return;
     }
   // We could get rid of the flag and use the pending ivar.
-  this->EventuallyRenderFlag = 0;
   this->SetRenderPending(NULL);
 
   // I do not know if these are necessary here.
@@ -1558,11 +1589,15 @@ void vtkPVRenderView::EventuallyRenderCallBack()
       {
       this->EventuallyRender();
       }
+    this->DoingEventuallyRender = 0;
+    this->EventuallyRenderFlag = 0;
     return;
     }
 
   pvApp->SetGlobalLODFlag(0);
   pvApp->GetRenderModule()->StillRender();
+  this->DoingEventuallyRender = 0;
+  this->EventuallyRenderFlag = 0;
 }
 
 //----------------------------------------------------------------------------

@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.21");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.22");
 
 
 //----------------------------------------------------------------------------
@@ -416,6 +416,7 @@ void vtkPVPartDisplay::SendForceUpdate()
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
   //cout << "vtkPVLODPartDisplay::ForceUpdate" << endl;
+
   pm->SendStreamToClientAndServer();
   //cout << "vtkPVLODPartDisplay::ForceUpdate - done" << endl;
 }

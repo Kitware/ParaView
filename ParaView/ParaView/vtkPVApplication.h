@@ -36,6 +36,7 @@ class vtkPolyDataMapper;
 class vtkProbeFilter;
 class vtkProcessObject;
 class vtkPVApplicationObserver;
+class vtkPVProgressHandler;
 
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
@@ -161,7 +162,7 @@ public:
   // pointers to all filters.
   void LogStartEvent(char* str);
   void LogEndEvent(char* str);
-  void RegisterProgressEvent(vtkProcessObject* po);
+  void RegisterProgressEvent(vtkProcessObject* po, int id);
 
   // Description:
   // More timer log access methods.  Static methods are not accessible 
@@ -348,12 +349,28 @@ public:
   // Execute event on callback
   void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
 
+
+  // Description:
+  void SendPrepareProgress();
+  void SendCleanupPendingProgress();
+
+  // Description:
+  // This method is called before progress reports start comming.
+  void PrepareProgress();
+
+  // Description:
+  // This method is called after force update to clenaup all the pending
+  // progresses.
+  void CleanupPendingProgress();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
 
   virtual void CreateSplashScreen();
   virtual void AddAboutText(ostream &);
+
+  void ProgressEvent(vtkObject *o, int val, const char* filter);
 
   void CreateButtonPhotos();
   void CreatePhoto(const char *name, 
@@ -370,8 +387,6 @@ protected:
 
   // For running with SGI pipes.
   int NumberOfPipes;
-
-  int ProcessId;
 
   int Display3DWidgets;
 
@@ -446,6 +461,9 @@ protected:
   int CrashOnErrors;
 
   vtkPVApplicationObserver* Observer;
+  vtkPVProgressHandler* ProgressHandler;
+  int ProgressEnabled;
+  int ProgressRequests;
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented

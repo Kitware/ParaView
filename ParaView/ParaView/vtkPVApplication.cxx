@@ -78,8 +78,9 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkGraphicsFactory.h"
 #include "vtkImagingFactory.h"
+#include "vtkSocketController.h"
 
-#include "vtkKWProgressGauge.h"
+#include "vtkPVProgressHandler.h"
 
 // #include "vtkPVRenderGroupDialog.h"
 
@@ -101,9 +102,11 @@
 #include <vtkstd/vector>
 #include <vtkstd/string>
 
+#define PVAPPLICATION_PROGRESS_TAG 31415
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.252");
+vtkCxxRevisionMacro(vtkPVApplication, "1.253");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -112,12 +115,6 @@ int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
 
 
 
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
-{
-  this->ProcessModule = pm;
-}
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -139,6 +136,7 @@ public:
       {
       this->Application->ExecuteEvent(wdg, event, calldata);
       }
+    this->AbortFlagOn();
     }
 
   void SetApplication(vtkPVApplication* app)
@@ -177,7 +175,7 @@ static void vtkPVAppProcessMessage(vtkObject* vtkNotUsed(object),
 {
   vtkPVApplication *self = static_cast<vtkPVApplication*>( clientdata );
   const char* message = static_cast<char*>( calldata );
-  cout << "# Error or warning: " << message << endl;
+  cerr << "# Error or warning: " << message << endl;
   self->AddTraceEntry("# Error or warning:");
   int cc;
   ostrstream str;
@@ -198,6 +196,7 @@ static void vtkPVAppProcessMessage(vtkObject* vtkNotUsed(object),
 // initialze the class variables
 int vtkPVApplication::GlobalLODFlag = 0;
 
+//----------------------------------------------------------------------------
 // Output window which prints out the process id
 // with the error or warning messages
 class VTK_EXPORT vtkPVOutputWindow : public vtkOutputWindow
@@ -288,8 +287,8 @@ public:
         delete [] vtkmsg;
         str.rdbuf()->freeze(0);
 #else
-        cout << "Errors while exiting ParaView:" << endl;
-       this->FlushErrors(cout);
+        cerr << "Errors while exiting ParaView:" << endl;
+        this->FlushErrors(cerr);
 #endif
         }
     }
@@ -336,8 +335,10 @@ private:
   void operator=(const vtkPVOutputWindow&);
 };
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOutputWindow);
 
+//----------------------------------------------------------------------------
 Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, 
                                             char *argv[], 
                                             ostream *err)
@@ -384,8 +385,11 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->ProgressEnabled = 0;
+  this->ProgressRequests = 0;
   this->Observer = vtkPVApplicationObserver::New();
   this->Observer->SetApplication(this);
+  this->ProgressHandler = vtkPVProgressHandler::New();
   vtkPVApplication::MainApplication = this;
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   this->OutputWindow = window;
@@ -405,7 +409,6 @@ vtkPVApplication::vtkPVApplication()
 
 
   this->Display3DWidgets = 0;
-  this->ProcessId = 0;
   this->RunningParaViewScript = 0;
 
   this->ProcessModule = NULL;
@@ -472,6 +475,7 @@ vtkPVApplication::vtkPVApplication()
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
+  this->ProgressHandler->Cleanup();
   this->SetProcessModule(NULL);
   this->SetRenderModule(NULL);
   this->SetRenderModuleName(NULL);
@@ -488,10 +492,17 @@ vtkPVApplication::~vtkPVApplication()
   this->SetDemoPath(NULL);
   vtkOutputWindow::SetInstance(0);
   this->OutputWindow->Delete();
+  this->ProgressHandler->Delete();
+  this->ProgressHandler = 0;
   this->Observer->Delete();
+  this->Observer = 0;
 }
 
-
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
+{
+  this->ProcessModule = pm;
+}
   
 //----------------------------------------------------------------------------
 vtkMultiProcessController* vtkPVApplication::GetController()
@@ -605,6 +616,7 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "" 
 };
 
+//----------------------------------------------------------------------------
 char* vtkPVApplication::CreateHelpString()
 {
   ostrstream error;
@@ -1124,6 +1136,18 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
+  if ( ! this->ProcessModule )
+    {
+    vtkErrorMacro("No process module");
+    vtkPVApplication::Abort();
+    }
+  vtkSocketController* sc = this->GetSocketController();
+  if ( sc && sc->GetCommunicator() )
+    {
+    vtkDebugMacro("Setup observer for progress");
+    sc->GetCommunicator()->AddObserver(
+      vtkCommand::WrongTagEvent, this->Observer);
+    }
   // Find the installation directory (now that we have the app name)
   this->FindApplicationInstallationDirectory();
 
@@ -1704,9 +1728,10 @@ void vtkPVApplication::LogStartEvent(char* str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::RegisterProgressEvent(vtkProcessObject* po)
+void vtkPVApplication::RegisterProgressEvent(vtkProcessObject* po, int id)
 {
   po->AddObserver(vtkCommand::ProgressEvent, this->Observer);
+  this->ProgressHandler->RegisterProgressEvent(po, id);
 }
 
 //----------------------------------------------------------------------------
@@ -1775,10 +1800,8 @@ void vtkPVApplication::TrapsForSignals(int signal)
   vtkPVWindow *win = vtkPVApplication::MainApplication->GetMainWindow();
   if ( !win )
     {
-    cout << "Call exit on application" << endl;
     vtkPVApplication::MainApplication->Exit();
     }
-  cout << "Call exit on window" << endl;
   win->Exit();
 }
 
@@ -1789,7 +1812,7 @@ void vtkPVApplication::ErrorExit()
   // exits the code without calling destructors. By adding this,
   // destructors are called before the exit.
   {
-  cout << "There was a major error! Trying to exit..." << endl;
+  cerr << "There was a major error! Trying to exit..." << endl;
   char name[] = "ErrorApplication";
   char *n = name;
   char** args = &n;
@@ -1860,7 +1883,6 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ProcessModule: " << this->ProcessModule << endl;;
   os << indent << "RunningParaViewScript: " 
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
-  os << indent << "Current Process Id: " << this->ProcessId << endl;
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
   os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off")
      << endl; 
@@ -2002,26 +2024,114 @@ char* vtkPVApplication::GetDemoPath()
   return this->DemoPath;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVApplication::EnableTestErrors()
 {
   this->OutputWindow->EnableTestErrors();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVApplication::DisableTestErrors()
 {
   this->OutputWindow->DisableTestErrors();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVApplication::Abort()
 {
   vtkPVApplication::MainApplication->OutputWindow->FlushErrors(cerr);
   abort();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
 {
-  (void)o;
-  (void)event;
-  (void)calldata;
+  switch ( event ) 
+    {
+  case vtkCommand::ProgressEvent:
+      {
+      int progress = static_cast<int>(*reinterpret_cast<double*>(calldata)* 100.0);
+      this->ProgressEvent(o, progress, 0);
+      }
+    break;
+  case vtkCommand::WrongTagEvent:
+      {
+      int tag = -1;
+      int len = -1;
+      char val = -1;
+      const char* data = reinterpret_cast<const char*>(calldata);
+      const char* ptr = data;
+      memcpy(&tag, ptr, sizeof(tag));
+      if ( tag != PVAPPLICATION_PROGRESS_TAG )
+        {
+        vtkErrorMacro("Internal ParaView Error: Socket Communicator received wrong tag: " << tag);
+        abort();
+        return;
+        }
+      ptr += sizeof(tag);
+      memcpy(&len, ptr, sizeof(len));
+      ptr += sizeof(len);
+      val = *ptr;
+      ptr ++;
+      if ( val < 0 || val > 100 )
+        {
+        vtkErrorMacro("Received progres not in the range 0 - 100: " << (int)val);
+        return;
+        }
+      this->ProgressEvent(o, val, ptr);
+      }
+    break;
+    }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVApplication::SendPrepareProgress()
+{
+  this->GetMainWindow()->StartProgress();
+  vtkPVProcessModule *pm = this->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  stream << vtkClientServerStream::Invoke << pm->GetApplicationID()
+    << "PrepareProgress" << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+  this->ProgressEnabled = this->GetMainWindow()->GetEnabled();
+  this->ProgressRequests ++;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SendCleanupPendingProgress()
+{
+  if ( this->ProgressRequests < 0 )
+    {
+    vtkErrorMacro("Internal ParaView Error: Progress requests went below zero");
+    vtkPVApplication::Abort();
+    }
+  this->ProgressRequests --;
+  if ( this->ProgressRequests > 0 )
+    {
+    return;
+    }
+  vtkPVProcessModule *pm = this->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  stream << vtkClientServerStream::Invoke << pm->GetApplicationID()
+         << "CleanupPendingProgress" << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+  this->GetMainWindow()->EndProgress(this->ProgressEnabled);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::PrepareProgress()
+{
+  this->ProgressHandler->PrepareProgress(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::CleanupPendingProgress()
+{
+  this->ProgressHandler->CleanupPendingProgress(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::ProgressEvent(vtkObject *o, int val, const char* str)
+{
+  this->ProgressHandler->InvokeProgressEvent(this, o, val, str);
+}

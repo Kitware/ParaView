@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.16");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.17");
 
 
 
@@ -103,6 +103,8 @@ void vtkPVCompositeRenderModule::StillRender()
   int localRender;
 
   vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+
+  this->PVApplication->SendPrepareProgress();
 
   // Find out whether we are going to render localy.
   this->PartDisplays->InitTraversal();
@@ -224,7 +226,7 @@ void vtkPVCompositeRenderModule::StillRender()
     this->RenderWindow->Render();
   //  }
   vtkTimerLog::MarkEndEvent("Still Render");
-  
+  this->PVApplication->SendCleanupPendingProgress();
 }
 
 
@@ -240,6 +242,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   int localRender;
   int useLOD;
   vtkPVProcessModule* pm = this->PVApplication->GetProcessModule();
+  this->PVApplication->SendPrepareProgress();
 
   // Compute memory totals.
   this->PartDisplays->InitTraversal();
@@ -376,6 +379,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
       + this->Composite->GetGetBuffersTime()
       + this->Composite->GetSetBuffersTime();
     }
+  this->PVApplication->SendCleanupPendingProgress();
 }
 
 

@@ -47,6 +47,8 @@
 
 #include <vtkstd/string>
 
+#include <unistd.h>
+
 int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
 
@@ -60,7 +62,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.37");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.38");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -391,6 +393,9 @@ void vtkPVProcessModule::InitializeInterpreter()
 
   // Create the interpreter and supporting stream.
   this->Interpreter = vtkClientServerInterpreter::New();
+  char buffer[1024];
+  sprintf(buffer, "/tmp/ParaViewLog.%d.log", getpid());
+  this->Interpreter->SetLogFile(buffer);
   this->ClientServerStream = new vtkClientServerStream;
 
   // Setup a callback for the interpreter to report errors.

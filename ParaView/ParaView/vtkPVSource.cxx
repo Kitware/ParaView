@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.340");
+vtkCxxRevisionMacro(vtkPVSource, "1.341");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -533,7 +533,6 @@ void vtkPVSource::GatherDataInformation()
     this->GetPVOutput()->UpdateProperties();
     }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVSource::Update()
@@ -1282,8 +1281,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     return;
     } 
 
-  int enabled = this->GetPVWindow()->GetEnabled();
-  this->GetPVWindow()->SetEnabled(0);
+  this->GetPVApplication()->SendPrepareProgress();
 
   window = this->GetPVWindow();
 
@@ -1317,10 +1315,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       { // I suppose we should try and delete the source.
       vtkErrorMacro("Could not get output.");
       this->DeleteCallback();    
-      if ( enabled )
-        {
-        this->GetPVWindow()->EnabledOn();
-        }
+      this->GetPVApplication()->SendCleanupPendingProgress();
       return;
       }
 
@@ -1427,10 +1422,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     {
     window->UpdateFilterMenu();
     }
-  if ( enabled )
-    {
-    this->GetPVWindow()->EnabledOn();
-    }
+
+  this->GetPVApplication()->SendCleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------
@@ -2387,7 +2380,7 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
                     << vtkClientServerStream::End;
     pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID()
                     << "RegisterProgressEvent"
-                    << sourceId
+                    << sourceId << sourceId.ID
                     << vtkClientServerStream::End;
     
     pvs->AddVTKSource(sourceId);

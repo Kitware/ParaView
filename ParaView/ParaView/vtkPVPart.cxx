@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.41");
+vtkCxxRevisionMacro(vtkPVPart, "1.42");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -205,6 +205,7 @@ void vtkPVPart::GatherDataInformation()
     return;
     }
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  pvApp->SendPrepareProgress();
 
   // This does nothing if the geometry is already up to date.
   if (this->PartDisplay)
@@ -262,6 +263,7 @@ void vtkPVPart::GatherDataInformation()
       }    
     this->SetName(str);
     }
+  pvApp->SendCleanupPendingProgress();
 }
 
 
