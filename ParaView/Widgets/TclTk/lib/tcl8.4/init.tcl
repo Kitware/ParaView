@@ -220,10 +220,12 @@ proc unknown args {
 		# construct the stack trace.
 		#
 		set cinfo $args
-		if {[string length $cinfo] > 150} {
-		    set cinfo "[string range $cinfo 0 149]..."
+		set ellipsis ""
+		while {[string bytelength $cinfo] > 150} {
+		    set cinfo [string range $cinfo 0 end-1]
+		    set ellipsis "..."
 		}
-		append cinfo "\"\n    (\"uplevel\" body line 1)"
+		append cinfo $ellipsis "\"\n    (\"uplevel\" body line 1)"
 		append cinfo "\n    invoked from within"
 		append cinfo "\n\"uplevel 1 \$args\""
 		#

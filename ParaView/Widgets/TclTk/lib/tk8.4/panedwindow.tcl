@@ -111,8 +111,8 @@ proc ::tk::panedwindow::Motion {w x y} {
     set id [$w identify $x $y]
     if {([llength $id] == 2) && \
 	    (!$::tk_strictMotif || [string equal [lindex $id 1] "handle"])} {
-	if { ![info exists Priv(panecursor)] } {
-	    set Priv(panecursor) [$w cget -cursor]
+	if { ![info exists Priv($w,panecursor)] } {
+	    set Priv($w,panecursor) [$w cget -cursor]
 	    if { [string equal [$w cget -sashcursor] ""] } {
 		if { [string equal [$w cget -orient] "horizontal"] } {
 		    $w configure -cursor sb_h_double_arrow
@@ -122,17 +122,17 @@ proc ::tk::panedwindow::Motion {w x y} {
 	    } else {
 		$w configure -cursor [$w cget -sashcursor]
 	    }
-	    if {[info exists Priv(pwAfterId)]} {
-		after cancel $Priv(pwAfterId)
+	    if {[info exists Priv($w,pwAfterId)]} {
+		after cancel $Priv($w,pwAfterId)
 	    }
-	    set Priv(pwAfterId) [after 150 \
+	    set Priv($w,pwAfterId) [after 150 \
 		    [list ::tk::panedwindow::Cursor $w]]
 	}
 	return
     }
-    if { [info exists Priv(panecursor)] } {
-	$w configure -cursor $Priv(panecursor)
-	unset Priv(panecursor)
+    if { [info exists Priv($w,panecursor)] } {
+	$w configure -cursor $Priv($w,panecursor)
+	unset Priv($w,panecursor)
     }
 }
 
@@ -150,15 +150,16 @@ proc ::tk::panedwindow::Motion {w x y} {
 #
 proc ::tk::panedwindow::Cursor {w} {
     variable ::tk::Priv
-    if {[info exists Priv(panecursor)]} {
-	if {[winfo containing [winfo pointerx $w] [winfo pointery $w]] == $w} {
-	    set Priv(pwAfterId) [after 150 [list ::tk::panedwindow::Cursor $w]]
+    if {[info exists Priv($w,panecursor)]} {
+	if {[winfo containing [winfo pointerx $w] [winfo pointery $w]] eq $w} {
+	    set Priv($w,pwAfterId) [after 150 \
+		    [list ::tk::panedwindow::Cursor $w]]
 	} else {
-	    $w configure -cursor $Priv(panecursor)
-	    unset Priv(panecursor)
-	    if {[info exists Priv(pwAfterId)]} {
-		after cancel $Priv(pwAfterId)
-		unset Priv(pwAfterId)
+	    $w configure -cursor $Priv($w,panecursor)
+	    unset Priv($w,panecursor)
+	    if {[info exists Priv($w,pwAfterId)]} {
+		after cancel $Priv($w,pwAfterId)
+		unset Priv($w,pwAfterId)
 	    }
 	}
     }
@@ -174,8 +175,8 @@ proc ::tk::panedwindow::Cursor {w} {
 #   Restores the default cursor
 #
 proc ::tk::panedwindow::Leave {w} {
-    if {[info exists ::tk::Priv(panecursor)]} {
-        $w configure -cursor $::tk::Priv(panecursor)
-        unset ::tk::Priv(panecursor)
+    if {[info exists ::tk::Priv($w,panecursor)]} {
+        $w configure -cursor $::tk::Priv($w,panecursor)
+        unset ::tk::Priv($w,panecursor)
     }
 }
