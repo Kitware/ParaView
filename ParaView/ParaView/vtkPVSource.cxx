@@ -449,11 +449,11 @@ void vtkPVSource::Select()
 {
   vtkPVData *data;
   
+//  this->Script("update idletasks");
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->ParametersParent->GetWidgetName());
   // The update is needed to work around a packing problem which
   // occur for large windows. Do not remove.
-  this->Script("update idletasks");
   this->Script("pack %s -side top -fill x",
                this->GetPVRenderView()->GetNavigationFrame()->GetWidgetName());
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
