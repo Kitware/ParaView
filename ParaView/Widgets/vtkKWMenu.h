@@ -71,11 +71,17 @@ public:
   // Append a CheckButton menu item to the current menu.
   void AddCheckButton(const char* label, vtkKWObject* Object, 
 		      const char* MethodAndArgString , const char* help = 0);
+  void AddCheckButton(const char* label, vtkKWObject* Object, 
+		      const char* MethodAndArgString , int underline,
+		      const char* help = 0);
 
   // Description: 
   // Append a standard menu item and command to the current menu.
   void AddCommand(const char* label, vtkKWObject* Object,
 		  const char* MethodAndArgString , const char* help = 0);
+  void AddCommand(const char* label, vtkKWObject* Object,
+		  const char* MethodAndArgString , int underline, 
+		  const char* help = 0);
 
   // Description: 
   // Append a radio menu item and command to the current menu.
@@ -83,6 +89,10 @@ public:
   void AddRadioButton(int value, const char* label, const char* buttonVar, 
 		      vtkKWObject* Called, 
 		      const char* MethodAndArgString, const char* help = 0);
+  void AddRadioButton(int value, const char* label, const char* buttonVar, 
+		      vtkKWObject* Called, 
+		      const char* MethodAndArgString, int underline,  
+		      const char* help = 0);
 
   // Description:
   // Same as add commands, but insert at a given integer position.
@@ -95,11 +105,18 @@ public:
   void InsertCheckButton(int position, 
 			 const char* label, vtkKWObject* Object, 
 			 const char* MethodAndArgString , const char* help = 0);
+  void InsertCheckButton(int position, 
+			 const char* label, vtkKWObject* Object, 
+			 const char* MethodAndArgString , 
+			 int underline, const char* help = 0);
   
   // Description:
   // Insert a menu item at a given position.
   void InsertCommand(int position, const char* label, vtkKWObject* Object,
 		     const char* MethodAndArgString , const char* help = 0);
+  void InsertCommand(int position, const char* label, vtkKWObject* Object,
+		     const char* MethodAndArgString , 
+		     int underline, const char* help = 0);
   
   // Description: 
   // Add a radio button menu item.  You must create a variable to store
@@ -110,6 +127,10 @@ public:
   void InsertRadioButton(int position, int value, const char* label, 
                          const char* buttonVar, vtkKWObject* Called, 
 			 const char* MethodAndArgString, const char* help = 0);
+  void InsertRadioButton(int position, int value, const char* label, 
+                         const char* buttonVar, vtkKWObject* Called, 
+			 const char* MethodAndArgString, 
+			 int underline, const char* help = 0);
 
   // Description:
   // Call the menu item callback at the given index
