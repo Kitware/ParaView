@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.14");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.15");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -76,8 +76,9 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
 
 void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char* /*args*/)
 {
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("Load Save Dialog already created");
     return;
