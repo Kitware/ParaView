@@ -140,14 +140,16 @@ void vtkKWScrollableFrame::ResizeFrame()
 
   int bbox[4];
   this->CalculateBBox(this->Canvas, "all", bbox);
-  this->Script("%s configure -width %d -scrollregion \"%d %d %d %d\" "
+  this->Script("%s configure  -scrollregion \"%d %d %d %d\" "
 	       "-yscrollincrement 0.1i", this->Canvas->GetWidgetName(), 
-	       widthFrame - 4,
 	       bbox[0], bbox[1], bbox[2], bbox[3]);
 }
 
 void vtkKWScrollableFrame::ResizeCanvas()
 {
+  this->Script("winfo width %s", this->Frame->GetWidgetName());
+  int widthFrame = this->GetIntegerResult(this->Application);
+
   int bbox[4], heightCanvas, heightFrame;
 
   this->CalculateBBox(this->Canvas, "all", bbox);
@@ -156,7 +158,9 @@ void vtkKWScrollableFrame::ResizeCanvas()
   heightCanvas = this->GetIntegerResult(this->Application);
   if (heightFrame > heightCanvas)
     {
-    this->Script("pack %s -fill both -expand t -side left", 
+    this->Script("pack forget %s", this->Canvas->GetWidgetName());
+    this->Script("pack %s -fill both -expand t -side left", this->Canvas->GetWidgetName());
+    this->Script("pack %s -fill both -expand t -side right", 
 		 this->ScrollBar->GetWidgetName());
     }
   else
@@ -167,4 +171,5 @@ void vtkKWScrollableFrame::ResizeCanvas()
 	       this->Canvas->GetWidgetName(),
 	       this->FrameId,
 	       this->Canvas->GetWidgetName());
+
 }
