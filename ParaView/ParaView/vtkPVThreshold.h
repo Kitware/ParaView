@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWOptionMenu.h"
-//#include "vtkKWScale.h"
 #include "vtkPVMinMax.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkThreshold.h"
@@ -71,15 +70,14 @@ public:
   void ChangeAttributeMode(const char* newMode);
 
   // Description:
-  // Tcl callbacks for the upper value and lower value scales
-//  void UpperValueCallback();
-//  void LowerValueCallback();
-
-  // Description:
   // Save this source to a file.
   void SaveInTclScript(ofstream *file);
 
   virtual void UpdateScalars();
+
+  // Description:
+  // Access to AttributeModeMenu from tcl
+  vtkGetObjectMacro(AttributeModeMenu, vtkKWOptionMenu);
   
 protected:
   vtkPVThreshold();
@@ -90,10 +88,10 @@ protected:
   vtkKWWidget* AttributeModeFrame;
   vtkKWLabel* AttributeModeLabel;
   vtkKWOptionMenu* AttributeModeMenu;
-//  vtkKWScale* UpperValueScale;
-//  vtkKWScale* LowerValueScale;
   vtkPVMinMax *MinMaxScale;
   vtkPVLabeledToggle* AllScalarsCheck;
+  
+  int TraceInitialized;
 };
 
 #endif

@@ -1,0 +1,35 @@
+set DataDir "@PARAVIEW_DATA_ROOT@"
+
+set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
+$pv(vtkTemp98) AcceptCallback
+set pv(vtkTemp180) [$pv(vtkTemp1) CreatePVSource vtkElevationFilter]
+set pv(vtkTemp194) [$pv(vtkTemp180) GetPVWidget {LowPoint}]
+$pv(vtkTemp194) SetValue 0 0 -1
+$pv(vtkTemp180) AcceptCallback
+set pv(vtkTemp214) [$pv(vtkTemp1) CreatePVSource vtkPointDataToCellData]
+set pv(vtkTemp227) [$pv(vtkTemp214) GetPVWidget {PassPointData}]
+$pv(vtkTemp227) SetState 1
+$pv(vtkTemp214) AcceptCallback
+set pv(vtkTemp237) [$pv(vtkTemp1) ThresholdCallback]
+set pv(vtkTemp247) [$pv(vtkTemp237) GetAttributeModeMenu]
+$pv(vtkTemp247) SetValue "Cell Data"
+$pv(vtkTemp237) ChangeAttributeMode cell
+set pv(vtkTemp251) [$pv(vtkTemp237) GetPVWidget {Lower Threshold}]
+$pv(vtkTemp251) SetMinValue 0.350250
+$pv(vtkTemp251) SetMaxValue 0.607100
+$pv(vtkTemp237) AcceptCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/ThresholdAttrMode.png 10
+   
+Application Exit

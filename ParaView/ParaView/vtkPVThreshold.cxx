@@ -64,6 +64,8 @@ vtkPVThreshold::vtkPVThreshold()
   this->AttributeModeMenu = vtkKWOptionMenu::New();
   this->MinMaxScale = vtkPVMinMax::New();
   this->AllScalarsCheck = vtkPVLabeledToggle::New();
+  
+  this->TraceInitialized = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -167,6 +169,20 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkDataSet *thresholdInput = this->GetNthPVInput(0)->GetVTKData();
   char *arrayName = this->ScalarOperationMenu->GetValue();
+
+  if ( ! this->TraceInitialized)
+    {
+    pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetAttributeModeMenu]",
+                         this->AttributeModeMenu->GetTclName(),
+                         this->GetTclName());
+    this->TraceInitialized = 1;
+    }
+  
+  pvApp->AddTraceEntry("$pv(%s) SetValue \"%s\"",
+                       this->AttributeModeMenu->GetTclName(),
+                       this->AttributeModeMenu->GetValue());
+  pvApp->AddTraceEntry("$pv(%s) ChangeAttributeMode %s",
+                       this->GetTclName(), newMode);
   
   this->ChangeAcceptButtonColor();
   
@@ -344,10 +360,6 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
     {
     *file << "CellData\n\t";
     }
-  
-//  *file << this->VTKSourceTclName << " ThresholdBetween "
-//        << this->MinMaxScale->GetMinValue() << " "
-//        << this->MinMaxScale->GetMaxValue() << "\n\t";
   
   this->MinMaxScale->SaveInTclScript(file, this->VTKSourceTclName);
   *file << "\t";
