@@ -87,8 +87,6 @@ protected:
   vtkQueue();
   virtual ~vtkQueue();
 
-  vtkIdType GetNumberOfItemsInTheQueue();
-
   vtkIdType Start;
   vtkIdType End;
 
