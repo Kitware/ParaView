@@ -29,7 +29,7 @@
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.4");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.4.6.1");
 
 //-------------------------------------------------------------------
 
@@ -187,11 +187,27 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
 
     for (type=0; type<NUM_CELL_TYPES; type++) 
       {
+      float weightTotalOfRemainingProcesses = 1.0;
+      vtkIdType numCellsLeftToDivideUp = totalCells[type];
       goalNumCells[type] = new vtkIdType [numProcs]; 
       for (id = 0; id < numProcs; id++) 
         {
+        // Round here instead of truncating.
+        if (weightTotalOfRemainingProcesses > 0)
+          {
         goalNumCells[type][id] = 
-          static_cast<vtkIdType>( totalCells[type] * Weights[id] );
+            static_cast<vtkIdType>((static_cast<float>(numCellsLeftToDivideUp) * (Weights[id]/weightTotalOfRemainingProcesses)) + 0.5);
+          }
+        else
+          {
+          goalNumCells[type][id] = 0;
+          }
+        numCellsLeftToDivideUp -= goalNumCells[type][id];
+        weightTotalOfRemainingProcesses -= Weights[id];
+       
+        // Put this back until I can fix the tests.
+        //goalNumCells[type][id] = 
+        //  static_cast<vtkIdType>(numCellsLeftToDivideUp * Weights[id]);
         if (goalNumCells[type][id]==0) { numProcZero[type]++;}
         }
       }
@@ -205,6 +221,12 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         sumCells += goalNumCells[type][id];
         }
       leftovers[type] = totalCells[type] - sumCells;
+      // sanity check before I get rid of this variable.
+      if (leftovers[type] != 0)
+        {
+        vtkErrorMacro("non zero leftover[" <<type<< "] = " << leftovers[type]);
+        leftovers[type] = 0;
+        }
       }
     }
 

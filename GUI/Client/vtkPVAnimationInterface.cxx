@@ -183,7 +183,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.135.2.2");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.135.2.3");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1695,7 +1695,7 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
         }
       }
 
-    *file << "$Ren1 UpdateVTKObjects" << endl;
+    *file << "  $Ren1 UpdateVTKObjects" << endl;
     
     if (imageFileName)
       {
@@ -1716,7 +1716,7 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
         {
         *ext = '\0';
         ++ext;
-        *file << "$Ren1 WriteImage {" << root << countStr
+        *file << "  $Ren1 WriteImage {" << root << countStr
               << "." << ext << "} " << writerName << "\n";
          }
        else

@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.585.2.1");
+vtkCxxRevisionMacro(vtkPVWindow, "1.585.2.2");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2683,7 +2683,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   else
     {
     *file << endl << "$Ren1 UpdateVTKObjects" << endl;
-    if (imageFileName)
+    if (imageFileName && *imageFileName && writerName)
       {
       *file 
         << "$Ren1 WriteImage {" << imageFileName << "} " << writerName
@@ -4222,6 +4222,8 @@ vtkPVVolumeAppearanceEditor* vtkPVWindow::GetVolumeAppearanceEditor()
     this->VolumeAppearanceEditor->
       SetPVRenderView(this->GetMainView());
     this->VolumeAppearanceEditor->Create(this->GetPVApplication());
+    this->VolumeAppearanceEditor->SetTraceReferenceObject(this);
+    this->VolumeAppearanceEditor->SetTraceReferenceCommand("GetVolumeAppearanceEditor");
     }
   
   return this->VolumeAppearanceEditor;

@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.366");
+vtkCxxRevisionMacro(vtkPVSource, "1.366.2.1");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -186,6 +186,7 @@ vtkPVSource::~vtkPVSource()
     {
     proxm->UnRegisterProxy(this->GetName());
     }
+  this->Proxy = 0;
 
   // Do not use SetName() or SetLabel() here. These make
   // the navigation window update when it should not.
@@ -2136,7 +2137,7 @@ int vtkPVSource::GetNumberOfProcessorsValid()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
+int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone)
 {
 
   int retVal = this->ClonePrototypeInternal(clone);
@@ -2147,6 +2148,7 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
 
   vtkPVSource *current = this->GetPVWindow()->GetCurrentPVSource();
   retVal = clone->InitializeClone(current, makeCurrent);
+
 
   if (retVal != VTK_OK)
     {

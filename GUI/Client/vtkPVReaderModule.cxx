@@ -30,7 +30,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.43.2.1");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.43.2.2");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -97,12 +97,13 @@ void vtkPVReaderModule::CreateProperties()
 
 //----------------------------------------------------------------------------
 int vtkPVReaderModule::CloneAndInitialize(int makeCurrent, 
-                                          vtkPVReaderModule*& clone )
+                                          vtkPVReaderModule*& clone)
 {
   clone = 0;
 
   vtkPVSource* pvs = 0;
-  int retVal = this->Superclass::CloneAndInitialize(makeCurrent, pvs);
+  int retVal = 
+    this->Superclass::CloneAndInitialize(makeCurrent, pvs);
   if (retVal == VTK_OK)
     {
     clone = vtkPVReaderModule::SafeDownCast(pvs);
@@ -349,7 +350,7 @@ void vtkPVReaderModule::AddPVFileEntry(vtkPVFileEntry* fileEntry)
 //----------------------------------------------------------------------------
 void vtkPVReaderModule::SetReaderFileName(const char* fname)
 {
-  if (this->FileEntry )
+  if (this->FileEntry)
     {
     this->FileEntry->SetValue(fname);
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();

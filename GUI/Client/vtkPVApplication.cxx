@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.297.2.2");
+vtkCxxRevisionMacro(vtkPVApplication, "1.297.2.3");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1545,7 +1545,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
   vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
   vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
-  if (rm == NULL)
+  if (rm == 0)
     {
     vtkErrorMacro("Could not create render module " << rmClassName);
     this->SetRenderModuleName("RenderModule");
