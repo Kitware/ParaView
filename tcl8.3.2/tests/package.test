@@ -1,0 +1,71 @@
+# This file contains tests for the ::package::* commands.
+# Note that the tests are limited to Tcl scripts only, there are no shared
+# libraries against which to test.
+#
+# Sourcing this file into Tcl runs the tests and generates output for
+# errors.  No output means no errors were found.
+#
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import -force ::tcltest::*
+}
+
+test package-1.1 {pkg::create gives error on insufficient args} {
+    catch {::pkg::create}
+} 1
+test package-1.2 {pkg::create gives error on bad args} {
+    catch {::pkg::create -foo bar -bar baz -baz boo}
+} 1
+test package-1.3 {pkg::create gives error on no value given} {
+    catch {::pkg::create -name foo -version 1.0 -source test.tcl -load}
+} 1
+test package-1.4 {pkg::create gives error on no name given} {
+    catch {::pkg::create -version 1.0 -source test.tcl -load foo.so}
+} 1
+test package-1.5 {pkg::create gives error on no version given} {
+    catch {::pkg::create -name foo -source test.tcl -load foo.so}
+} 1
+test package-1.6 {pkg::create gives error on no source or load options} {
+    catch {::pkg::create -name foo -version 1.0 -version 2.0}
+} 1
+test package-1.7 {pkg::create gives correct output for 1 direct source} {
+    ::pkg::create -name foo -version 1.0 -source test.tcl
+} {package ifneeded foo 1.0 [list source [file join $dir test.tcl]]}
+test package-1.8 {pkg::create gives correct output for 2 direct sources} {
+    ::pkg::create -name foo -version 1.0 -source test.tcl -source test2.tcl
+} {package ifneeded foo 1.0 [list source [file join $dir test.tcl]]\n[list source [file join $dir test2.tcl]]}
+test package-1.9 {pkg::create gives correct output for 1 direct load} {
+    ::pkg::create -name foo -version 1.0 -load test.so
+} {package ifneeded foo 1.0 [list load [file join $dir test.so]]}
+test package-1.10 {pkg::create gives correct output for 2 direct loads} {
+    ::pkg::create -name foo -version 1.0 -load test.so -load test2.so
+} {package ifneeded foo 1.0 [list load [file join $dir test.so]]\n[list load [file join $dir test2.so]]}
+test package-1.11 {pkg::create gives correct output for 1 lazy source} {
+    ::pkg::create -name foo -version 1.0 -source {test.tcl {foo bar}}
+} {package ifneeded foo 1.0 [list tclPkgSetup $dir foo 1.0 {{test.tcl source {foo bar}}}]}
+test package-1.12 {pkg::create gives correct output for 2 lazy sources} {
+    ::pkg::create -name foo -version 1.0 -source {test.tcl {foo bar}} \
+	    -source {test2.tcl {baz boo}}
+} {package ifneeded foo 1.0 [list tclPkgSetup $dir foo 1.0 {{test.tcl source {foo bar}} {test2.tcl source {baz boo}}}]}
+test package-1.13 {pkg::create gives correct output for 1 lazy load} {
+    ::pkg::create -name foo -version 1.0 -load {test.so {foo bar}}
+} {package ifneeded foo 1.0 [list tclPkgSetup $dir foo 1.0 {{test.so load {foo bar}}}]}
+test package-1.14 {pkg::create gives correct output for 2 lazy loads} {
+    ::pkg::create -name foo -version 1.0 -load {test.so {foo bar}} \
+	    -load {test2.so {baz boo}}
+} {package ifneeded foo 1.0 [list tclPkgSetup $dir foo 1.0 {{test.so load {foo bar}} {test2.so load {baz boo}}}]}
+test package-1.15 {pkg::create gives correct output for 1 each, direct} {
+    ::pkg::create -name foo -version 1.0 -source test.tcl -load test2.so
+} {package ifneeded foo 1.0 [list load [file join $dir test2.so]]\n[list source [file join $dir test.tcl]]}
+test package-1.16 {pkg::create gives correct output for 1 direct, 1 lazy} {
+    ::pkg::create -name foo -version 1.0 -source test.tcl \
+	    -source {test2.tcl {foo bar}}
+} {package ifneeded foo 1.0 [list source [file join $dir test.tcl]]\n[list tclPkgSetup $dir foo 1.0 {{test2.tcl source {foo bar}}}]}
+
+::tcltest::cleanupTests
+return

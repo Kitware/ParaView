@@ -1,0 +1,73 @@
+# This file is a Tcl script to test the bgerror command.
+# It is organized in the standard fashion for Tcl tests.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    source [file join [pwd] [file dirname [info script]] defs.tcl]
+}
+
+test bgerror-1.1 {bgerror / tkerror compat} {
+    set errRes {}
+    proc tkerror {err} {
+	global errRes;
+	set errRes $err;
+    }
+    after 0 {error err1}
+    vwait errRes;
+    set errRes;
+} err1
+
+test bgerror-1.2 {bgerror / tkerror compat / accumulation} {
+    set errRes {}
+    proc tkerror {err} {
+	global errRes;
+	lappend errRes $err;
+    }
+    after 0 {error err1}
+    after 0 {error err2}
+    after 0 {error err3}
+    update
+    set errRes;
+} {err1 err2 err3}
+
+test bgerror-1.3 {bgerror / tkerror compat / accumulation / break} {
+    set errRes {}
+    proc tkerror {err} {
+	global errRes;
+	lappend errRes $err;
+	return -code break "skip!";
+    }
+    after 0 {error err1}
+    after 0 {error err2}
+    after 0 {error err3}
+    update
+    set errRes;
+} err1
+
+catch {rename tkerror {}}
+
+# some testing of the default error dialog
+# would be needed too, but that's not easy at all
+# to emulate.
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+
