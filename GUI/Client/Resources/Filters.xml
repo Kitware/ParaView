@@ -151,11 +151,10 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
            display_entry="1"
            entry_and_label_on_top="0" display_value="0"/>
     <ThumbWheel label="Absolute tolerance"
-                variable="AbsoluteTolerance"
+                property="AbsoluteTolerance"
                 trace_name="AbsoluteTolerance"
                 resolution="0.01"
                 minimum_value="0"
-                default_value="1.0"
                 help="The tolerance in absolute terms."/>
     <LabeledToggle label="Tolerance is absolute"
                    trace_name="ToleranceIsAbsolute"
@@ -775,23 +774,21 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
                input_name="Input"/>
     <ThumbWheel label="On ratio"
                 trace_name="OnRatio"
-                variable="OnRatio"
+                property="OnRatio"
                 resolution="1"
-                default_value="2"
                 minimum_value="1"
                 help="The ratio of points retained."/>
     <ThumbWheel label="Max. points"
                 trace_name="MaximumNumberOfPoints"
-                variable="MaximumNumberOfPoints"
+                property="MaximumNumberOfPoints"
                 help="Limit the number of points."
                 resolution="1"
-                minimum_value="0"
-                default_value="5000"/>
-    <ThumbWheel variable="Offset"
+                minimum_value="0"/>
+    <ThumbWheel label="Offset"
                 trace_name="Offset"
+                proeprty="Offset"
                 resolution="1"
                 minimum_value="0"
-                default_value="0"
                 help="Start with this point."/>
     <LabeledToggle label="Random" trace_name="Random"
                    property="RandomMode"
@@ -1088,17 +1085,15 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
                input_name="Input"/>
     <ThumbWheel label="Min. speed"
                 trace_name="MinimumSpeed"
-                variable="MinimumSpeed"
+                property="MinimumSpeed"
                 resolution="0.01"
                 minimum_value="0"
-                default_value="0"
                 help="The minimum size of the random point vectors generated."/>
     <ThumbWheel label="Max. speed"
                 trace_name="MaximumSpeed"
-                variable="MaximumSpeed"
+                property="MaximumSpeed"
                 resolution="0.01"
                 minimum_value="0"
-                default_value="1"
                 help="The maximum size of the random point vectors generated."/>
     <Documentation>
 The Random Vectors filter generates a point-centered array of random vectors. It uses a random number generator to determine the components of the vectors. The Min. speed and Max. speed values determine the range of the vector magnitudes. This filter operates on any type of data set, and the output data set will be of the same type as the input.
@@ -1237,11 +1232,11 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ThumbWheel variable="Resolution"
+    <ThumbWheel label="Resolution"
                 trace_name="Resolution"
+                property="Resolution"
                 resolution="1"
-                minimum_value="1"
-                default_value="12"/>
+                minimum_value="1"/>
     <LabeledToggle label="Capping"
                    trace_name="Capping"
                    property="Capping"/>
@@ -1332,10 +1327,9 @@ The Shrink filter causes the individual cells of a data set to break apart from 
                input_name="Input"/>
     <ThumbWheel label="Num. iterations"
                 trace_name="NumberOfIterations"
-                variable="NumberOfIterations"
+                property="NumberOfIterations"
                 resolution="1"
                 minimum_value="0"
-                default_value="20"
                 help="Number of iterations. More iterations produce better smoothing."/>
     <Scale variable="Convergence"
            trace_name="Convergence"
@@ -1523,11 +1517,10 @@ The Transform filter allows you to specify the position, size, and orientation o
                help="Set the input to this filter."
                input_name="Input"/>
     <ThumbWheel label="Num. sides"
-                variable="NumberOfSides"
+                property="NumberOfSides"
                 trace_name="NumberOfSides"
                 resolution="1"
                 minimum_value="3"
-                default_value="6"
                 help="Set the number of sides for the tube"/>
     <LabeledToggle label="Capping"
                    trace_name="Capping"
@@ -1936,10 +1929,9 @@ The Contour filter operates on any type of data set, but the input is required t
                        default_scale_mode ="1"/>
     <ThumbWheel label="Max. Number of Glyphs"
                 trace_name="Max Glyphs"
-                variable="MaximumNumberOfPoints"
+                property="MaximumNumberOfPoints"
                 resolution="1"
                 minimum_value="0"
-                default_value="5000"
                 help="Set the maximum number of points to glyph"/>
     <LabeledToggle label="Mask Points"
                    trace_name="MaskPoints"
@@ -2251,29 +2243,26 @@ This filter operates on any type of data set, provided it has point-centered vec
     <ContainerWidget pack_direction="left" trace_name="SampleRate">
       <Item>
         <ThumbWheel label="Sample Rate"
-                    variable="SampleRateI"
+                    property="SampleRateI"
                     trace_name="SampleRateI"
                     resolution="1"
                     minimum_value="1"
-                    default_value="1"
                     help="Set the sampling rate for each dimension."/>
       </Item>
       <Item>
         <ThumbWheel label=""
-                    variable="SampleRateJ"
+                    property="SampleRateJ"
                     trace_name="SampleRateJ"
                     resolution="1"
                     minimum_value="1"
-                    default_value="1"
                     help="Set the sampling rate for each dimension."/>
       </Item>
       <Item>
         <ThumbWheel label=""
-                    variable="SampleRateK"
+                    property="SampleRateK"
                     trace_name="SampleRateK"
                     resolution="1"
                     minimum_value="1"
-                    default_value="1"
                     help="Set the sampling rate for each dimension."/>
       </Item>
     </ContainerWidget>

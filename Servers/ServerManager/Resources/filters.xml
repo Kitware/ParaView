@@ -136,6 +136,7 @@
         command="SetAbsoluteTolerance"
         number_of_elements="1"
         default_values="1.0" >
+       <DoubleRangeDomain name="range" min="0"/>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -1936,7 +1937,7 @@
         command="SetMaximumNumberOfPoints" 
         number_of_elements="1"
         default_values="5000" >
-       <IntRangeDomain name="range"/>
+       <IntRangeDomain name="range" min="0"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1980,17 +1981,23 @@
      <IntVectorProperty 
         name="SampleRateI" 
         command="SetSampleRateI"
-        number_of_elements="1"/>
+        number_of_elements="1">
+       <IntRangeDomain name="range" min="1"/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="SampleRateJ" 
         command="SetSampleRateJ"
-        number_of_elements="1"/>
+        number_of_elements="1">
+       <IntRangeDomain name="range" min="1"/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="SampleRateK" 
         command="SetSampleRateK"
-        number_of_elements="1"/>
+        number_of_elements="1">
+       <IntRangeDomain name="range" min="1"/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="IncludeBoundary" 

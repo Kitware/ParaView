@@ -22,14 +22,17 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
-#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLPackageParser.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntRangeDomain.h"
+#include "vtkSMIntVectorProperty.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.5");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.6");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -38,9 +41,6 @@ vtkPVThumbWheel::vtkPVThumbWheel()
   this->Label->SetParent(this);
   this->ThumbWheel = vtkKWThumbWheel::New();
   this->ThumbWheel->SetParent(this);
-  this->Property = NULL;
-  this->AcceptedValueInitialized = 0;
-  this->DefaultValue = 0.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -48,7 +48,6 @@ vtkPVThumbWheel::~vtkPVThumbWheel()
 {
   this->Label->Delete();
   this->ThumbWheel->Delete();
-  this->SetProperty(NULL);
 }
 
 //-----------------------------------------------------------------------------
@@ -94,20 +93,11 @@ void vtkPVThumbWheel::Create(vtkKWApplication *pvApp)
 void vtkPVThumbWheel::SetValue(float val)
 {
   float oldVal = static_cast<float>(this->ThumbWheel->GetValue());
-  if (oldVal == val)
-    {
-    return;
-    }
-
-  if (this->Property && !this->AcceptedValueInitialized)
-    {
-    this->Property->SetScalars(1, &val);
-    this->AcceptedValueInitialized = 1;
-    }
-  
   this->ThumbWheel->SetValue(val);
-  
-  this->ModifiedCallback();
+  if (oldVal != val)
+    {
+    this->ModifiedCallback();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -186,11 +176,24 @@ vtkPVThumbWheel* vtkPVThumbWheel::ClonePrototype(
 //-----------------------------------------------------------------------------
 void vtkPVThumbWheel::SaveInBatchScript(ofstream *file)
 {
-  float scalar = this->ThumbWheel->GetValue();
-
-  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-        <<  " GetProperty " << this->VariableName << "] SetElements1 "
-        << scalar << endl;
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  
+  if (sourceID.ID == 0 || !this->SMPropertyName)
+    {
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
+    }
+  
+  *file << "  if { [[$pvTemp" << sourceID << " GetProperty "
+        << this->SMPropertyName
+        << "] GetClassName] == \"vtkSMIntVectorProperty\"} {" << endl;
+  *file << "    set value [expr round(" << this->GetValue() << ")]" << endl;
+  *file << "  } else {" << endl;
+  *file << "    set value " << this->GetValue() << endl;
+  *file << "  }" << endl;
+  
+  *file << "  [$pvTemp" << sourceID << " GetProperty "
+        << this->SMPropertyName << "] SetElement 0 $value" << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -213,19 +216,47 @@ void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     }
   
   ai->SetLabelAndScript(this->Label->GetLabel(), NULL, this->GetTraceName());
-  ai->SetCurrentProperty(this->Property);
-  ai->SetTimeStart(this->ThumbWheel->GetMinimumValue());
-  ai->SetTimeEnd(this->ThumbWheel->GetMinimumValue());
+
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMDomain *rangeDomain = prop->GetDomain("range");
+  
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(rangeDomain);
+  
+  if (rangeDomain)
+    {
+    vtkSMDoubleRangeDomain *drd =
+      vtkSMDoubleRangeDomain::SafeDownCast(rangeDomain);
+    vtkSMIntRangeDomain *ird =
+      vtkSMIntRangeDomain::SafeDownCast(rangeDomain);
+    int minExists = 0;
+    if (drd)
+      {
+      double min = drd->GetMinimum(0, minExists);
+      if (minExists)
+        {
+        ai->SetTimeStart(min);
+        ai->SetTimeEnd(min);
+        }
+      }
+    else if (ird)
+      {
+      int min = ird->GetMinimum(0, minExists);
+      if (minExists)
+        {
+        ai->SetTimeStart(min);
+        ai->SetTimeEnd(min);
+        }
+      }
+    }
+  
   ai->Update();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVThumbWheel::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVThumbWheel::Accept()
 {
-  if (!sourceID.ID)
-    {
-    return;
-    }
+  int modFlag = this->GetModifiedFlag();
   
   float scalar = this->ThumbWheel->GetValue();
   float entryValue = this->ThumbWheel->GetEntry()->GetValueAsFloat();
@@ -234,18 +265,59 @@ void vtkPVThumbWheel::AcceptInternal(vtkClientServerID sourceID)
     scalar = entryValue;
     this->ThumbWheel->SetValue(entryValue);
     }
-  this->Property->SetScalars(1, &scalar);
-  this->Property->SetVTKSourceID(sourceID);
-  this->Property->AcceptInternal();
+  
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+
+  if (dvp)
+    {
+    dvp->SetElement(0, this->GetValue());
+    }
+  else if (ivp)
+    {
+    ivp->SetElement(0, static_cast<int>(this->GetValue()));
+    }
+
   this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVThumbWheel::ResetInternal()
 {
-  if (this->Property)
+  vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+
+  if (dvp)
     {
-    this->SetValue(this->Property->GetScalar(0));
+    this->SetValue(dvp->GetElement(0));
+    }
+  else if (ivp)
+    {
+    this->SetValue(ivp->GetElement(0));
+    }
+  
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
     }
 }
 
@@ -259,33 +331,6 @@ void vtkPVThumbWheel::Trace(ofstream *file)
   
   *file << "$kw(" << this->GetTclName() << ") SetValue "
         << this->GetValue() << endl;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVThumbWheel::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
-  if (this->Property)
-    {
-    this->Property->SetScalars(1, &this->DefaultValue);
-    char *cmd = new char[strlen(this->VariableName)+4];
-    sprintf(cmd, "Set%s", this->VariableName);
-    int numVars = 1;
-    this->Property->SetVTKCommands(1, &cmd, &numVars);
-    delete [] cmd;
-    }
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVThumbWheel::GetProperty()
-{
-  return this->Property;
-}
-
-//-----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVThumbWheel::CreateAppropriateProperty()
-{
-  return vtkPVScalarListWidgetProperty::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -306,7 +351,6 @@ void vtkPVThumbWheel::CopyProperties(vtkPVWidget *clone, vtkPVSource *source,
   if (pvtw)
     {
     pvtw->SetMinimumValue(this->ThumbWheel->GetMinimumValue());
-    pvtw->SetDefaultValue(this->GetDefaultValue());
     pvtw->SetResolution(this->ThumbWheel->GetResolution());
     pvtw->SetLabel(this->Label->GetLabel());
     }
@@ -351,24 +395,6 @@ int vtkPVThumbWheel::ReadXMLAttributes(vtkPVXMLElement *element,
     min = 0;
     }
   this->SetMinimumValue(min);
-  
-  // Setup the default value.
-  float default_value;
-  if (!element->GetScalarAttribute("default_value", &default_value))
-    {
-    this->SetDefaultValue(min);
-    }
-  else
-    {
-    if (default_value < min)
-      {
-      this->SetDefaultValue(min);
-      }
-    else
-      {
-      this->SetDefaultValue(default_value);
-      }
-    }
   
   return 1;
 }

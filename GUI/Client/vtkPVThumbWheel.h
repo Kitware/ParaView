@@ -22,7 +22,6 @@
 
 class vtkKWLabel;
 class vtkKWThumbWheel;
-class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVThumbWheel : public vtkPVObjectWidget
 {
@@ -65,22 +64,13 @@ public:
 
   // Description:
   // Move widget state to vtk object or back.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   virtual void ResetInternal();
 //ETX
 
   // Description:
   // For saving state.
   virtual void Trace(ofstream *file);
-  
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
   // Description:
   // Update the "enable" state of the widget and its internal parts.
@@ -110,14 +100,6 @@ protected:
 
   vtkKWLabel *Label;
   vtkKWThumbWheel *ThumbWheel;
-  
-  vtkPVScalarListWidgetProperty *Property;
-  
-  int AcceptedValueInitialized;
-  
-  float DefaultValue;
-  vtkSetMacro(DefaultValue, float);
-  vtkGetMacro(DefaultValue, float);
   
 //BTX
   virtual void CopyProperties(vtkPVWidget *clone, vtkPVSource *source,
