@@ -181,7 +181,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.95");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.96");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1415,7 +1415,6 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
       {
       if(source->GetVisibility())
         {
-        const char* sourceName = source->GetName();
         int numParts = source->GetNumberOfParts();
         for(int partIdx = 0; partIdx < numParts; ++partIdx)
           {
