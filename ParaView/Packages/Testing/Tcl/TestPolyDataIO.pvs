@@ -28,7 +28,7 @@ update
 
 # Write the vtkPolyData.
 vtkXMLPolyDataWriter writer
-writer SetFileName "sPolyData.xml"
+writer SetFileName "sPolyData.xvtk"
 writer SetInput [[$kw(vtkTemp281) GetVTKSource] GetOutput]
 writer Write
 writer Delete
@@ -38,7 +38,7 @@ $kw(vtkTemp281) DeleteCallback
 $kw(vtkTemp231) DeleteCallback
 
 # Read the vtkPolyData from the temporary file.
-$kw(vtkTemp1) Open "sPolyData.xml"
+$kw(vtkTemp1) Open "sPolyData.xvtk"
 set kw(vtkTemp231) [vtkTemp1 GetCurrentPVSource]
 
 update
@@ -56,4 +56,4 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
 
 # Delete the temporary file.
-catch { file delete -force "sPolyData.xml" }
+catch { file delete -force "sPolyData.xvtk" }
