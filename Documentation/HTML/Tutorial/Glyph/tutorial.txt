@@ -1,0 +1,67 @@
+1. Start ParaView (see <link> for information on how to launch ParaView)
+
+2. Create a Plot3D file reader by selecting PLOT3DReader from VTK -> Sources
+   menu. Click Browse next to the XYZFileName entry and locate combxyz.bin
+   in the ParaView data directory. Next, click Browse next to the QFileName
+   entry and locate combq.bin in the data directory. Click accept.
+
+   <outline.jpg>
+
+3. Create a glyph filter by clicking the Glyph button on the toolbar.
+
+   <toolbar-glyph.jpg>
+
+4. Click Accept to generate glyph with default values: Glyphs are 
+   three-dimensional arrows (determined by "Glyph Source"), they
+   are oriented with the momentum vector (determined by the Orient
+   check button and "Point Vectors" menu) and scaled with the density 
+   function (determined by "Scale Mode"). Please note that this will
+   generate 56x32x24 glyphs which, depending on your processor and 
+   graphics card's performance might take some time. If you have a
+   slow processor or graphics card, you might want to skip this step
+   and move on to step 6.
+
+   <glyphs1.jpg>
+
+5. You will notice that because of the large number of glyphs, it takes
+   a long time to fully render the scene. However, unless your computer
+   is old, it should be possible to interact with the scene with acceptable
+   speeds. This is because ParaView uses LOD (Level of Detail) actors to
+   achieve acceptable rendering times while the user is interacting with
+   a scene. This is accomplished by reducing the detail (number of polygons)
+   as the requested frame rate increases. The requested frame rate can
+   be changed from the toolbar. Experiment with different frame rate
+   settings.
+
+   <framerate.jpg>
+
+6. It is also possible to achieve better interactivity and a less cluttered
+   picture by reducing the number of data points which are glyphed.
+   First, remove the glyph filter by clicking Delete on the source notebook.
+
+
+7. Next create a masking filter by selecting MaskPoints from then 
+   VTK -> Filters menu. Set the OnRatio to 40. This is the ratio of the
+   points retained: 1 out of every 40 points will be retained. Turn on
+   random point selection by clicking on the Random checkbox. Click Accept.
+   Note that the outline of the solution domain might disappear as a result
+   of this action. You can turn it back on by going back to the Plot3D source
+   (click on Plot3D1 in the Navigation window, switch to the display notebook
+   and check the visibility option). Now, create a glyph filter. This time, 
+   change the "Scale Mode" to Vector  so that glyphs are scaled by the  
+   magnitude of the vectors. Reduce the  Scale Factor to 0.005 (otherwise 
+   the arrows will be very large) and click Accept.
+
+   <result.jpg>
+   
+   Note that since the problem geometry is represented by a structured
+   grid, it is possible to sub-sample the points in a more appropriate
+   way. You can use a structured grid extraction filter ( ExtactGrid 
+   filter from VTK -> Filters -available only when a structured grid
+   source is active- ) instead of masking points randomly. The extraction
+   filter allows you sub-sample the grid by setting sampling rates in
+   x, y and z directions. The following image was obtained by using
+   an ExtractGrid filter with a VOI (volume of interest) of ((4,55),
+   (3,31), (3,23)) and sampling rate of (3,3,3).
+
+   <extract.jpg>
