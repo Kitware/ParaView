@@ -13,6 +13,7 @@
 
 =========================================================================*/
 #include "vtkUnstructuredGridReader.h"
+#include "vtkTestUtilitites.h"
 #include "vtkTesting.h"
 #include "vtkCleanUnstructuredGrid.h"
 #include "vtkGlyphSource2D.h"
