@@ -50,7 +50,7 @@ public:
 
   // Description:
   // Create an image. Subclasses of vtkDummyRenderer must implement this method.
-  virtual void DeviceRender() =0;
+  virtual void DeviceRender();
   
   // Description:
   // Render the overlay actors. This gets called from the RenderWindow
@@ -58,10 +58,19 @@ public:
   // buffers have been swapped.
   void RenderOverlay();
 
+  virtual float GetPickedZ();
   
 protected:
   vtkDummyRenderer();
   ~vtkDummyRenderer();
+
+//BTX
+  virtual void DevicePickRender();
+  virtual void StartPick(unsigned int pickFromSize);
+  virtual void UpdatePickId();
+  virtual void DonePick(); 
+  virtual unsigned int GetPickedId();
+//ETX
 
 private:
   vtkDummyRenderer(const vtkDummyRenderer&);  // Not implemented.

@@ -50,6 +50,12 @@ public:
   // synchronize this process.
   virtual void Render();
 
+  virtual float *GetZbufferData(int x1, int y1, int x2, int y2);
+  virtual float *GetRGBAPixelData(int x1,int y1,int x2,int y2,int front);
+  virtual unsigned char* GetRGBACharPixelData(int x1,int y1,int x2,int y2,
+                                    int front);
+
+  virtual void SetMultiSamples(int i) {i = i;}
 
 protected:
   vtkDummyRenderWindow();
