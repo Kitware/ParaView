@@ -70,13 +70,19 @@ static Tcl_Interp *Et_Interp = 0;
 #include "kwappicon.h"
 #endif
 
-#include <tclInt.h>
+// I need those two Tcl functions. They usually are declared in tclIntDecls.h,
+// but Unix build do not have access to VTK's tkInternals include path.
+// Since the signature has not changed for years (at least since 8.2),
+// let's just prototype them.
+
+EXTERN Tcl_Obj* TclGetLibraryPath _ANSI_ARGS_((void));
+EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.139");
+vtkCxxRevisionMacro(vtkKWApplication, "1.140");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
