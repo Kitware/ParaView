@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.30");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.31");
 
 
 //----------------------------------------------------------------------------
@@ -722,6 +722,27 @@ void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VolumeColorID: "       << this->VolumeColorID.ID       << endl;
   os << indent << "VolumeTetraFilterID: " << this->VolumeTetraFilterID.ID << endl;
   os << indent << "VolumeFieldFilterID: " << this->VolumeFieldFilterID.ID << endl;
+  os << indent << "Mapper: ";
+  if (this->Mapper)
+    {
+    this->Mapper->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)";
+    }
+  os << endl;
+
+  os << indent << "Prop: ";
+  if (this->Prop)
+    {
+    this->Prop->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)";
+    }
+  os << endl;
   
 }
 

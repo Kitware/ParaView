@@ -50,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.121");
+vtkCxxRevisionMacro(vtkPVProbe, "1.122");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -195,7 +195,7 @@ void vtkPVProbe::CreateProperties()
   this->ShowXYPlotToggle->SetParent(this->ProbeFrame);
   this->ShowXYPlotToggle->Create(pvApp, "-text \"Show XY-Plot\"");
   this->ShowXYPlotToggle->SetState(1);
-  this->Script("%s configure -command {%s SetAcceptButtonColorToGreen}",
+  this->Script("%s configure -command {%s SetAcceptButtonColorToModified}",
                this->ShowXYPlotToggle->GetWidgetName(), this->GetTclName());
 
   this->Script("pack %s",

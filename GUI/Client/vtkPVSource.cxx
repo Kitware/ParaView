@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.353");
+vtkCxxRevisionMacro(vtkPVSource, "1.354");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1290,7 +1290,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
 
   window = this->GetPVWindow();
 
-  this->SetAcceptButtonColorToWhite();
+  this->SetAcceptButtonColorToUnmodified();
   this->GetPVRenderView()->UpdateTclButAvoidRendering();
   
   // We need to pass the parameters from the UI to the VTK objects before
@@ -1461,7 +1461,7 @@ void vtkPVSource::ResetCallback()
     this->GetPVRenderView()->EventuallyRender();
     this->Script("update");
 
-    this->SetAcceptButtonColorToWhite();
+    this->SetAcceptButtonColorToUnmodified();
     }
 }
 
@@ -2135,7 +2135,7 @@ vtkPVInputProperty* vtkPVSource::GetInputProperty(const char* name)
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetAcceptButtonColorToGreen()
+void vtkPVSource::SetAcceptButtonColorToModified()
 {
   if (this->AcceptButtonRed)
     {
@@ -2149,7 +2149,7 @@ void vtkPVSource::SetAcceptButtonColorToGreen()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetAcceptButtonColorToWhite()
+void vtkPVSource::SetAcceptButtonColorToUnmodified()
 {
   if (!this->AcceptButtonRed)
     {
@@ -2224,7 +2224,7 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
     }
 
   // Accept button is always red when a source is first created.
-  clone->SetAcceptButtonColorToGreen();
+  clone->SetAcceptButtonColorToModified();
 
   return VTK_OK;
 }

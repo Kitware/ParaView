@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.18");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -75,7 +75,7 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
   this->LineWidget->SetResolutionVariableName("Resolution");
   this->LineWidget->SetPVSource(this->GetPVSource());
   this->LineWidget->SetModifiedCommand(this->GetPVSource()->GetTclName(), 
-                                       "SetAcceptButtonColorToGreen");
+                                       "SetAcceptButtonColorToModified");
   
   this->LineWidget->Create(this->Application);
   this->Script("pack %s -side top -fill both -expand true",

@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.550");
+vtkCxxRevisionMacro(vtkPVWindow, "1.551");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3102,7 +3102,7 @@ void vtkPVWindow::UpdateFilterMenu()
       ++numFilters;
       }
 
-  // If there are no sources, disable the menu.
+    // If there are no sources, disable the menu.
     if (numFilters > 0)
       {
       this->PropagateEnableState(this->FilterMenu);
@@ -3140,7 +3140,7 @@ void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
 
   if (pvs)
     {
-    pvs->SetAcceptButtonColorToWhite();
+    pvs->SetAcceptButtonColorToUnmodified();
     if (pvs->InitializeTrace(NULL))
       {
       this->GetPVApplication()->AddTraceEntry(

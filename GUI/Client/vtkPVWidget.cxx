@@ -41,7 +41,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.46");
+vtkCxxRevisionMacro(vtkPVWidget, "1.47");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -351,7 +351,7 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
 
   clone->SetPVSource(pvSource);
   clone->SetModifiedCommand(pvSource->GetTclName(), 
-                            "SetAcceptButtonColorToGreen");
+                            "SetAcceptButtonColorToModified");
 }
 
 //-----------------------------------------------------------------------------

@@ -252,10 +252,10 @@ public:
   virtual void SaveState(ofstream *file);
 
   // Description:
-  // Make the Accept button turn red/white when one of the parameters 
+  // Make the Accept button turn green/white when one of the parameters 
   // has changed.
-  void SetAcceptButtonColorToGreen();
-  void SetAcceptButtonColorToWhite();
+  void SetAcceptButtonColorToModified();
+  void SetAcceptButtonColorToUnmodified();
   
   // Description:
   // This flag determines whether a source will make its input invisible or
