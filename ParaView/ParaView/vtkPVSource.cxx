@@ -64,10 +64,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
 #include "vtkString.h"
+#include "vtkVector.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.234");
+vtkCxxRevisionMacro(vtkPVSource, "1.235");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -126,9 +127,10 @@ vtkPVSource::vtkPVSource()
 
   this->VisitedFlag = 0;
 
-  this->InputClassName = 0;
   this->OutputClassName = 0;
   this->SourceClassName = 0;
+
+  this->InputClassNames = vtkVector<const char*>::New();
 
   this->IsPermanent = 0;
 
@@ -219,9 +221,11 @@ vtkPVSource::~vtkPVSource()
     }
   this->SetView(NULL);
 
-  this->SetInputClassName(0);
   this->SetOutputClassName(0);
   this->SetSourceClassName(0);
+
+  this->InputClassNames->Delete();
+  this->InputClassNames = 0;
 
   this->SetModuleName(0);
 }
@@ -1445,17 +1449,39 @@ void vtkPVSource::AddPVWidget(vtkPVWidget *pvw)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSource::AddInputClassName(const char* classname)
+{
+  this->InputClassNames->AppendItem(classname);
+}
+
+//----------------------------------------------------------------------------
+vtkIdType vtkPVSource::GetNumberOfInputClasses()
+{
+  return this->InputClassNames->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
 int vtkPVSource::GetIsValidInput(vtkPVData *pvd)
 {
   vtkDataObject *data;
-  
-  if (this->InputClassName == NULL)
+
+  int match = 0;
+  vtkIdType numItems = this->InputClassNames->GetNumberOfItems();
+  for(int i=0; i<numItems; i++)
     {
-    return 0;
+    const char* item;
+    if ( this->InputClassNames->GetItem(i, item) == VTK_OK )
+      {
+      data = pvd->GetVTKData();
+      if ( data && data->IsA(item) )
+        {
+        match = 1;
+        break;
+        }
+      }
     }
-  
-  data = pvd->GetVTKData();
-  return data->IsA(this->InputClassName);
+
+  return match;
 }
 
 //----------------------------------------------------------------------------
@@ -1540,7 +1566,17 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
   pvs->SetApplication(this->Application);
   pvs->SetReplaceInput(this->ReplaceInput);
   pvs->SetParametersParent(this->ParametersParent);
-  pvs->SetInputClassName(this->InputClassName);
+
+  vtkIdType numItems = this->InputClassNames->GetNumberOfItems();
+  vtkIdType id;
+  for(id=0; id<numItems; id++)
+    {
+    const char* item;
+    if ( this->InputClassNames->GetItem(id, item) == VTK_OK )
+      {
+      pvs->AddInputClassName(item);
+      }
+    }
   pvs->SetOutputClassName(this->OutputClassName);
   pvs->SetSourceClassName(this->SourceClassName);
 
@@ -1584,7 +1620,7 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
   pvs->SetVTKSource(vtksource, tclName);
   pvs->SetView(this->GetPVWindow()->GetMainView());
   // Set the input if necessary.
-  if (pvs->InputClassName)
+  if (pvs->InputClassNames->GetNumberOfItems() > 0)
     {
     pvs->SetPVInput(current);
     }
@@ -1641,7 +1677,7 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
                          pvd->GetVTKDataTclName());   
 
   // Create the extent translator
-  if (pvs->InputClassName)
+  if (pvs->InputClassNames->GetNumberOfItems())
     {
     pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
                            pvd->GetVTKDataTclName(), 
@@ -1670,8 +1706,8 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
 
   // Copy all widgets
   vtkPVWidget *pvWidget, *clonedWidget;
-  int i;
   this->Widgets->InitTraversal();
+  int i;
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
     pvWidget = this->Widgets->GetNextPVWidget();
@@ -1871,7 +1907,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.234 $");
+  this->ExtractRevision(os,"$Revision: 1.235 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1901,8 +1937,7 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "VisitedFlag: " << this->GetVisitedFlag() << endl;
   os << indent << "Widgets: " << this->GetWidgets() << endl;
-  os << indent << "InputClassName: " 
-     << (this->InputClassName?this->InputClassName:"null") << endl;
+  os << indent << "InputClassNames: " << this->InputClassNames << endl;
   os << indent << "IsPermanent: " << this->IsPermanent << endl;
   os << indent << "OutputClassName: " 
      << (this->OutputClassName?this->OutputClassName:"null") << endl;

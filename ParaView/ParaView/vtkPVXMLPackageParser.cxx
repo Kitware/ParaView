@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.11");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.12");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -403,7 +403,27 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
     vtkErrorMacro("Filter module missing input attribute.");
     return;
     }
-  pvm->SetInputClassName(input);
+
+  const char* start = input;
+  const char* end = 0;
+  
+  // Parse the space-separated list.
+  while(*start)
+    {
+    while(*start && vtkPVXMLPackageParserIsSpace(*start)) { ++start; }
+    end = start;
+    while(*end && !vtkPVXMLPackageParserIsSpace(*end)) { ++end; }
+    int length = end-start;
+    if(length)
+      {
+      char* entry = new char[length+1];
+      strncpy(entry, start, length);
+      entry[length] = '\0';
+      pvm->AddInputClassName(entry);
+      delete [] entry;
+      }
+    start = end;
+    }
 
   // Determines whether the input of this filter will remain
   // visible

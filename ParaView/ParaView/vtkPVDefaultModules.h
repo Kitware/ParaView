@@ -326,7 +326,7 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "             input_name=\"PVInput\" input_type=\"vtkDataSet\"/>\n"
 "</Module>\n"
 "\n"
-"<Module name=\"ExtractGrid\" root_name=\"ExtractGrid\" input=\"vtkStructuredGrid\" output=\"vtkStructuredGrid\" module_type=\"Filter\">\n"
+"<Module name=\"ExtractGrid\" root_name=\"ExtractGrid\" input=\"vtkStructuredGrid vtkStructuredPoints vtkImageData vtkRectilinearGrid\" output=\"vtkStructuredGrid\" module_type=\"Filter\">\n"
 "  <Filter type=\"vtkExtractGrid\"/>\n"
 "  <InputMenu label=\"Input\" help=\"Set the input to this filter.\"\n"
 "             input_name=\"PVInput\" input_type=\"vtkStructuredGrid\"/>\n"

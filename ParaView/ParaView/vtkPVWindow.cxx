@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.350");
+vtkCxxRevisionMacro(vtkPVWindow, "1.351");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2381,9 +2381,10 @@ void vtkPVWindow::UpdateSourceMenu()
     proto = 0;
     if (it->GetData(proto) == VTK_OK)
       {
-      // Check if this is a source. We do not want to add filters
-      // to the source lists.
-      if (proto && !proto->GetInputClassName() && !proto->GetToolbarModule())
+      // Check if this is a source (or a toolbar module). We do not want to 
+      // add those to the source lists.
+      if (proto && proto->GetNumberOfInputClasses() == 0 && 
+          !proto->GetToolbarModule())
         {
         numFilters++;
         char methodAndArgs[150];
@@ -3552,7 +3553,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.350 $");
+  this->ExtractRevision(os,"$Revision: 1.351 $");
 }
 
 //----------------------------------------------------------------------------

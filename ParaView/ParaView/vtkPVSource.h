@@ -77,6 +77,11 @@ class vtkSource;
 class vtkStringList;
 class vtkPVInputMenu;
 
+//BTX
+template <class DType> 
+class vtkVector;
+//ETX
+
 class VTK_EXPORT vtkPVSource : public vtkKWObject
 {
 public:
@@ -275,8 +280,8 @@ public:
 
   // Description:
   // For now we are supporting only one input and output.
-  vtkSetStringMacro(InputClassName);
-  vtkGetStringMacro(InputClassName);
+  void AddInputClassName(const char* classname);
+  vtkIdType GetNumberOfInputClasses();
   vtkSetStringMacro(OutputClassName);
   vtkGetStringMacro(OutputClassName);
   vtkSetStringMacro(SourceClassName);
@@ -424,7 +429,6 @@ protected:
   vtkKWPushButton *DeleteButton;
   vtkKWLabel *DisplayNameLabel;
     
-  char *InputClassName;
   char *OutputClassName;
   char *SourceClassName;
 
@@ -448,6 +452,10 @@ protected:
   virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
 
   int ToolbarModule;
+
+//BTX
+  vtkVector<const char*>* InputClassNames;
+//ETX
 
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented
