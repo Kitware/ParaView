@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.14");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.15");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -85,8 +85,7 @@ void vtkPVDataSetReaderModule::InitializePrototype()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVDataSetReaderModule::Initialize(const char* fname, 
-                                         vtkPVReaderModule*& clone)
+int vtkPVDataSetReaderModule::Initialize(const char*, vtkPVReaderModule*&)
 {
 
   return VTK_OK;

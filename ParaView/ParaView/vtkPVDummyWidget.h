@@ -72,12 +72,12 @@ public:
 
   // Description:
   // Trying out a ne protocal.
-  virtual void AcceptInternal(const char* sourceTclName) { this->ModifiedFlag = 0;}
-  virtual void ResetIntenral(const char* sourceTclName) { this->ModifiedFlag = 0;}
+  virtual void AcceptInternal(const char*) { this->ModifiedFlag = 0;}
+  virtual void ResetIntenral(const char*) { this->ModifiedFlag = 0;}
 
   // Description:
   // Empty method to keep superclass from complaining.
-  virtual void Trace(ofstream *file) {};
+  virtual void Trace(ofstream*) {};
 
 protected:
   vtkPVDummyWidget();

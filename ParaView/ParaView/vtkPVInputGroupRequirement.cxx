@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputGroupRequirement);
-vtkCxxRevisionMacro(vtkPVInputGroupRequirement, "1.1");
+vtkCxxRevisionMacro(vtkPVInputGroupRequirement, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVInputGroupRequirement::vtkPVInputGroupRequirement()
@@ -62,7 +62,7 @@ vtkPVInputGroupRequirement::vtkPVInputGroupRequirement()
 
 //----------------------------------------------------------------------------
 int vtkPVInputGroupRequirement::ReadXMLAttributes(vtkPVXMLElement* element,
-                                                 vtkPVXMLPackageParser* parser)
+                                                  vtkPVXMLPackageParser*)
 {
   const char* rAttr;
 

@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.38");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.39");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -975,7 +975,7 @@ void vtkKWRenderWidget::SerializeSelf(ostream& os, vtkIndent indent)
 void vtkKWRenderWidget::SerializeToken(istream& is, const char *token)
 {
   float fval, fbuffer3[3];
-  int i;
+  int i, ival;
   char buffer[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
 
   // Background color
@@ -1020,8 +1020,8 @@ void vtkKWRenderWidget::SerializeToken(istream& is, const char *token)
     
     if (!strcmp(token, "CornerAnnotationMinimumFontSize"))
       {
-      is >> fval;
-      anno->SetMinimumFontSize(fval);
+      is >> ival;
+      anno->SetMinimumFontSize(ival);
       return;
       }
 
@@ -1127,7 +1127,7 @@ void vtkKWRenderWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os, indent);
   os << indent << "vtkKWRenderWidget ";
-  this->ExtractRevision(os, "$Revision: 1.38 $");
+  this->ExtractRevision(os, "$Revision: 1.39 $");
 }
 
 //----------------------------------------------------------------------------

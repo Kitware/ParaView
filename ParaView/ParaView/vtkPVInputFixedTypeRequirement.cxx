@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputFixedTypeRequirement);
-vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.1");
+vtkCxxRevisionMacro(vtkPVInputFixedTypeRequirement, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVInputFixedTypeRequirement::vtkPVInputFixedTypeRequirement()
@@ -62,8 +62,8 @@ vtkPVInputFixedTypeRequirement::vtkPVInputFixedTypeRequirement()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVInputFixedTypeRequirement::ReadXMLAttributes(vtkPVXMLElement* element,
-                                                 vtkPVXMLPackageParser* parser)
+int vtkPVInputFixedTypeRequirement::ReadXMLAttributes(vtkPVXMLElement*,
+                                                      vtkPVXMLPackageParser*)
 {
   return 1;
 }

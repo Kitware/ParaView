@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.6");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -224,7 +224,7 @@ void vtkPVGroupInputsWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::ResetInternal(const char* vtkSourceTclName)
+void vtkPVGroupInputsWidget::ResetInternal(const char*)
 {
   int idx;
   vtkPVWindow *pvWin;
@@ -261,7 +261,7 @@ void vtkPVGroupInputsWidget::ResetInternal(const char* vtkSourceTclName)
 
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::SaveInBatchScript(ofstream *file)
+void vtkPVGroupInputsWidget::SaveInBatchScript(ofstream*)
 {
 }
 

@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.36");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.37");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -552,7 +552,7 @@ int vtkPVEnSightReaderModule::VerifyParts(vtkPVApplication *, const char*)
 
 
 //----------------------------------------------------------------------------
-int vtkPVEnSightReaderModule::Initialize(const char* fname, 
+int vtkPVEnSightReaderModule::Initialize(const char*, 
                                          vtkPVReaderModule*& clone)
 {
   clone = 0;

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.21");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.22");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -220,7 +220,7 @@ void vtkPVSphereWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::UpdateVTKObject(const char* sourceTclName)
+void vtkPVSphereWidget::UpdateVTKObject(const char*)
 {
 }
 
