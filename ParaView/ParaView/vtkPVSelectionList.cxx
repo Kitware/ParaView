@@ -116,7 +116,7 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
   char tmp[1024];
   int i, numItems = this->Names->GetLength();
   char *name;
-  for(int i=0; i<numItems; i++)
+  for(i=0; i<numItems; i++)
     {
     name = this->Names->GetString(i);
     if (name)
@@ -257,7 +257,7 @@ void vtkPVSelectionList::CopyProperties(vtkPVWidget* clone,
     pvsl->SetLabel(this->Label->GetLabel());
     int i, numItems = this->Names->GetLength();
     char *name;
-    for(int i=0; i<numItems; i++)
+    for(i=0; i<numItems; i++)
       {
       name = this->Names->GetString(i);
       if (name)

@@ -134,7 +134,8 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
   justifyFrame->Delete();
   int len = this->Widgets->GetNumberOfItems();
   vtkPVWidget* widget;
-  for(int i=0; i<len; i++)
+  int i;
+  for(i=0; i<len; i++)
     {
     widget = static_cast<vtkPVWidget*>(this->Widgets->GetItemAsObject(i));
     if (!widget->GetApplication())
@@ -145,7 +146,7 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
 
   len = this->Labels->GetLength();
   char* label;
-  for(int i=0; i<len; i++)
+  for(i=0; i<len; i++)
     {
     label = this->Labels->GetString(i);
     this->Menu->AddEntryWithCommand(label, this, "MenuCallback");
