@@ -107,6 +107,10 @@ public:
   // something fancy, it should overwrite it.
   virtual void ActualPlaceWidget();
 
+  // Description:
+  // Get the 3D Widget.
+  vtkGetObjectMacro(Widget3D, vtk3DWidget);
+
 protected:
   vtkPV3DWidget();
   ~vtkPV3DWidget();
