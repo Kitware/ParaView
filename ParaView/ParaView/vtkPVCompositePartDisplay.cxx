@@ -61,12 +61,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.5.2.3");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.5.2.4");
 
 
 //----------------------------------------------------------------------------
 vtkPVCompositePartDisplay::vtkPVCompositePartDisplay()
 {
+  // When created, collection is off.
+  // I set these to -1 to ensure the decision is propagated.
   this->CollectionDecision = -1;
   this->LODCollectionDecision = -1;
 

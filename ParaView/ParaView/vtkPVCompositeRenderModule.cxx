@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.5");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.6");
 
 
 
@@ -73,8 +73,8 @@ vtkPVCompositeRenderModule::vtkPVCompositeRenderModule()
   this->InteractiveCompositeTime = 0;
   this->StillCompositeTime       = 0;
 
-  this->CollectionDecision = 1;
-  this->LODCollectionDecision = 1;
+  this->CollectionDecision = -1;
+  this->LODCollectionDecision = -1;
 
   this->ReductionFactor = 2;
   this->SquirtLevel = 0;
@@ -178,21 +178,19 @@ void vtkPVCompositeRenderModule::StillRender()
     }
 
   // Switch the compositer to local/composite mode.
-  if (this->LocalRender != localRender)
+  if (this->CompositeTclName)
     {
-    if (this->CompositeTclName)
+    if (localRender)
       {
-      if (localRender)
-        {
-        this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
-        }
-      else
-        {
-        this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
-        }
-      this->LocalRender = localRender;
+      this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
       }
-    }
+    else
+      {
+      this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
+      }
+    // Save this so we know where to get the z buffer.
+    this->LocalRender = localRender;
+   }
 
 
   // Still Render can get called some funky ways.
@@ -278,28 +276,26 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 
   // Switch the compositer to local/composite mode.
-  if (this->LocalRender != localRender)
+  if (this->CompositeTclName)
     {
-    if (this->CompositeTclName)
+    if (localRender)
       {
-      if (localRender)
-        {
-        this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
-        }
-      else
-        {
-        this->PVApplication->Script("%s UseCompositingOn", 
-                                    this->CompositeTclName);
-        }
-      this->LocalRender = localRender;
+      this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
       }
+    else
+      {
+      this->PVApplication->Script("%s UseCompositingOn", 
+                                  this->CompositeTclName);
+      }
+    // Save this so we know where to get the z buffer.
+    this->LocalRender = localRender;
     }
 
   // Handle squirt compression.
   if (this->PVApplication->GetClientMode())
     {
-    this->PVApplication->Script("%s UseCompositingOn; %s SetSquirtLevel %d", 
-                                this->CompositeTclName, this->CompositeTclName,
+    this->PVApplication->Script("%s SetSquirtLevel %d", 
+                                this->CompositeTclName,
                                 this->SquirtLevel);
     }
 
