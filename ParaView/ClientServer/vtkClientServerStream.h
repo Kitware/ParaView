@@ -199,26 +199,31 @@ public:
 
   // Description:
   // Stream operators for special types.
-  vtkClientServerStream & operator << (vtkClientServerStream::Commands);
-  vtkClientServerStream & operator << (vtkClientServerStream::Types);
-  vtkClientServerStream & operator << (vtkClientServerStream::Argument);
-  vtkClientServerStream & operator << (vtkClientServerStream::Array);
-  vtkClientServerStream & operator << (vtkClientServerID);
-  vtkClientServerStream & operator << (vtkObjectBase*);
+  vtkClientServerStream& operator << (vtkClientServerStream::Commands);
+  vtkClientServerStream& operator << (vtkClientServerStream::Types);
+  vtkClientServerStream& operator << (vtkClientServerStream::Argument);
+  vtkClientServerStream& operator << (vtkClientServerStream::Array);
+  vtkClientServerStream& operator << (vtkClientServerID);
+  vtkClientServerStream& operator << (vtkObjectBase*);
 
   // Description:
   // Stream operators for native types.
-  vtkClientServerStream & operator << (short x) ; // integers
-  vtkClientServerStream & operator << (unsigned short x) ; // integers
-  vtkClientServerStream & operator << (int x) ; // integers
-  vtkClientServerStream & operator << (unsigned int x) ; // integers
-  vtkClientServerStream & operator << (long l) ; // long integers
-  vtkClientServerStream & operator << (unsigned long l) ; // long integers
-  vtkClientServerStream & operator << (char ch) ;  // characters
-  vtkClientServerStream & operator << (unsigned char ch) ;  // characters
-  vtkClientServerStream & operator << (float fl ) ;  // floats
-  vtkClientServerStream & operator << (double dbl);  // double floats
-  vtkClientServerStream & operator << (const char *str);   // strings
+  vtkClientServerStream& operator << (char value);
+  vtkClientServerStream& operator << (short value);
+  vtkClientServerStream& operator << (int value);
+  vtkClientServerStream& operator << (long value);
+  vtkClientServerStream& operator << (signed char value);
+  vtkClientServerStream& operator << (unsigned char value);
+  vtkClientServerStream& operator << (unsigned short value);
+  vtkClientServerStream& operator << (unsigned int value);
+  vtkClientServerStream& operator << (unsigned long value);
+#ifdef VTK_TYPE_INT64_NOT_STANDARD
+  vtkClientServerStream& operator << (vtkTypeInt64 value);
+  vtkClientServerStream& operator << (vtkTypeUInt64 value);
+#endif
+  vtkClientServerStream& operator << (float value);
+  vtkClientServerStream& operator << (double value);
+  vtkClientServerStream& operator << (const char *value);
 
   // Description:
   // Allow arrays to be passed into the stream.
@@ -226,10 +231,15 @@ public:
   static vtkClientServerStream::Array InsertArray(const short*, int);
   static vtkClientServerStream::Array InsertArray(const int*, int);
   static vtkClientServerStream::Array InsertArray(const long*, int);
+  static vtkClientServerStream::Array InsertArray(const signed char*, int);
   static vtkClientServerStream::Array InsertArray(const unsigned char*, int);
   static vtkClientServerStream::Array InsertArray(const unsigned short*, int);
   static vtkClientServerStream::Array InsertArray(const unsigned int*, int);
   static vtkClientServerStream::Array InsertArray(const unsigned long*, int);
+#ifdef VTK_TYPE_INT64_NOT_STANDARD
+  static vtkClientServerStream::Array InsertArray(const vtkTypeInt64*, int);
+  static vtkClientServerStream::Array InsertArray(const vtkTypeUInt64*, int);
+#endif
   static vtkClientServerStream::Array InsertArray(const float*, int);
   static vtkClientServerStream::Array InsertArray(const double*, int);
 
