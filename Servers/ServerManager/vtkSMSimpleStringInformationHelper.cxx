@@ -20,7 +20,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleStringInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleStringInformationHelper, "1.2");
+vtkCxxRevisionMacro(vtkSMSimpleStringInformationHelper, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleStringInformationHelper::vtkSMSimpleStringInformationHelper()
@@ -41,6 +41,11 @@ void vtkSMSimpleStringInformationHelper::UpdateProperty(
     {
     vtkErrorMacro("A null property or a property of a different type was "
                   "passed when vtkSMStringVectorProperty was needed.");
+    return;
+    }
+
+  if (!prop->GetCommand())
+    {
     return;
     }
 

@@ -20,7 +20,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleDoubleInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleDoubleInformationHelper, "1.2");
+vtkCxxRevisionMacro(vtkSMSimpleDoubleInformationHelper, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleDoubleInformationHelper::vtkSMSimpleDoubleInformationHelper()
@@ -41,6 +41,11 @@ void vtkSMSimpleDoubleInformationHelper::UpdateProperty(
     {
     vtkErrorMacro("A null property or a property of a different type was "
                   "passed when vtkSMDoubleVectorProperty was needed.");
+    return;
+    }
+
+  if (!prop->GetCommand())
+    {
     return;
     }
 

@@ -20,7 +20,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleIntInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleIntInformationHelper, "1.2");
+vtkCxxRevisionMacro(vtkSMSimpleIntInformationHelper, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleIntInformationHelper::vtkSMSimpleIntInformationHelper()
@@ -41,6 +41,11 @@ void vtkSMSimpleIntInformationHelper::UpdateProperty(
     {
     vtkErrorMacro("A null property or a property of a different type was "
                   "passed when vtkSMIntVectorProperty was needed.");
+    return;
+    }
+
+  if (!prop->GetCommand())
+    {
     return;
     }
 
