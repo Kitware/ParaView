@@ -316,10 +316,6 @@ void vtkInteractorStylePlane::TranslateZ(int vtkNotUsed(dx), int dy)
 void vtkInteractorStylePlane::HandleIndicator(int x, int y) 
 {
   this->FindPokedRenderer(x, y);
-//  if (!this->CurrentRenderer->GetActors()->IsItemPresent(this->CrossHairActor))
-//      {
-//      this->CurrentRenderer->AddActor(this->CrossHairActor);
-//      }
   
   return;
 }
@@ -430,6 +426,8 @@ void vtkInteractorStylePlane::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkInteractorStylePlane::ShowCrosshair()
 {
+  // need to call FindPokedRenderer to make sure CurrentRenderer isn't NULL
+  this->FindPokedRenderer(0, 0);
   if (!this->CurrentRenderer->GetActors()->IsItemPresent(this->CrossHairActor))
       {
       this->CurrentRenderer->AddActor(this->CrossHairActor);
@@ -440,6 +438,8 @@ void vtkInteractorStylePlane::ShowCrosshair()
 //----------------------------------------------------------------------------
 void vtkInteractorStylePlane::HideCrosshair()
 {
+  // need to call FindPokedRenderer to make sure CurrentRenderer isn't NULL
+  this->FindPokedRenderer(0, 0);
   if (this->CurrentRenderer->GetActors()->IsItemPresent(this->CrossHairActor))
       {
       this->CurrentRenderer->RemoveActor(this->CrossHairActor);
