@@ -62,6 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkPVApplication;
 class vtkKWInteractor;
+class vtkLabeledFrame;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
@@ -228,6 +229,8 @@ protected:
   vtkPVRenderView(const vtkPVRenderView&) {};
   void operator=(const vtkPVRenderView&) {};
 
+  void CalculateBBox(char* name, int bbox[4]);
+
   int Interactive;
 
   int UseReductionFactor;
@@ -247,6 +250,7 @@ protected:
 
   vtkKWInteractor *CurrentInteractor;
 
+  vtkKWLabeledFrame *RenderParametersFrame;
   vtkKWCheckButton *TriangleStripsCheck;
   vtkKWCheckButton *ImmediateModeCheck;
   vtkKWCheckButton *InterruptRenderCheck;
