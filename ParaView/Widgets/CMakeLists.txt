@@ -52,7 +52,6 @@ ${VTK_SOURCE_DIR}/Wrapping/Tcl/vtktcl
 ABSTRACT_FILES(
 vtkKWComposite 
 vtkKWView 
-vtkKWFileDialog
 )
 
 
