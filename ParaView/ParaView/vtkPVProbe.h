@@ -27,7 +27,6 @@ class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkXYPlotWidget;
-class vtkPVPlotDisplay;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -61,7 +60,10 @@ protected:
   vtkPVProbe();
   ~vtkPVProbe();
   
-  vtkPVPlotDisplay* PlotDisplay;
+  // The plot should really be separated into a plot object like 
+  // vtkPVColorMap or vtkPVPartDisplay.  Lets wait until Berk finishes
+  // his UI separation before we make this change.
+  vtkClientServerID XYPlotActorID;
   
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  
@@ -78,12 +80,17 @@ protected:
   
   int Dimensionality; // point = 0, line = 1
   
+  char* XYPlotTclName;
+  vtkSetStringMacro(XYPlotTclName);
+
   vtkXYPlotWidget* XYPlotWidget;
 
   int GetDimensionality();
 
   int InstanceCount;
   
+  vtkClientServerID ServerSideID;
+
   void HSVtoRGB(float h, float s, float v, float *r, float *g, float *b);
 
   vtkPVProbe(const vtkPVProbe&); // Not implemented
