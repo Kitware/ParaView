@@ -48,16 +48,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageLabel );
-vtkCxxRevisionMacro(vtkKWImageLabel, "1.15");
+vtkCxxRevisionMacro(vtkKWImageLabel, "1.16");
 
 vtkKWImageLabel::vtkKWImageLabel()
 {
-  this->ImageDataLabel = 0;
+  this->ImageDataName = 0;
 }
 
 vtkKWImageLabel::~vtkKWImageLabel()
 {
-  this->SetImageDataLabel(0);
+  this->SetImageDataName(0);
 }
 
 void vtkKWImageLabel::Create(vtkKWApplication *app, const char *args)
@@ -75,21 +75,21 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
                                    int pixel_size)
 {
   this->Script("image create photo -width %d -height %d", width, height);
-  this->SetImageDataLabel(this->Application->GetMainInterp()->result);
+  this->SetImageDataName(this->Application->GetMainInterp()->result);
 
   if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
-                                     this->ImageDataLabel,
+                                     this->ImageDataName,
                                      data, 
                                      width, height, pixel_size,
                                      this->GetWidgetName()))
     {
-    vtkWarningMacro("Error updating Tk photo " << this->ImageDataLabel);
+    vtkWarningMacro("Error updating Tk photo " << this->ImageDataName);
     return;
     }
 
   this->Script("%s configure -image %s", 
                this->GetWidgetName(), 
-               this->ImageDataLabel);
+               this->ImageDataName);
 }
 
 //----------------------------------------------------------------------------

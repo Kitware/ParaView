@@ -68,17 +68,20 @@ public:
   void SetImageData(vtkKWIcon *icon);
   void SetImageData(const unsigned char* data, int width, int height, int pixel_size = 4);
   
+  // Description:
+  // Get the TK name of the image.
+  vtkGetStringMacro(ImageDataName);
+
 protected:
   vtkKWImageLabel();
   ~vtkKWImageLabel();
 
   // Description:
-  // Set and get the TK name of the image.
-  vtkSetStringMacro(ImageDataLabel);
-  vtkGetStringMacro(ImageDataLabel);
+  // Set the TK name of the image.
+  vtkSetStringMacro(ImageDataName);
 
 private:
-  char *ImageDataLabel;
+  char *ImageDataName;
 
   vtkKWImageLabel(const vtkKWImageLabel&); // Not implemented
   void operator=(const vtkKWImageLabel&); // Not implemented

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.2");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -90,6 +90,7 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
   this->SetApplication(app);
 
   this->Script("toplevel %s", this->GetWidgetName());
+
   this->Script("wm withdraw %s", this->GetWidgetName());
   this->Script("wm overrideredirect %s 1", this->GetWidgetName());
 
@@ -112,18 +113,14 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
 //-----------------------------------------------------------------------------
 void vtkKWSplashScreen::Show()
 {
-  // This is needed to get the proper geometry info (see below)
-
-  this->Script("update");
-
   int sw, sh;
   this->Script("concat [winfo screenwidth %s] [winfo screenheight %s]",
                this->GetWidgetName(), this->GetWidgetName());
   sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &sw, &sh);
 
   int w, h;
-  this->Script("concat [winfo reqwidth %s] [winfo reqheight %s]",
-               this->GetWidgetName(), this->GetWidgetName());
+  const char *photo  = this->Image->GetImageDataName();
+  this->Script("concat [%s cget -width] [%s cget -height]", photo, photo);
   sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &w, &h);
 
   int x = (sw - w) / 2;
