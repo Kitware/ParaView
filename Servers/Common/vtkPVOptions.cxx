@@ -41,7 +41,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.23");
+vtkCxxRevisionMacro(vtkPVOptions, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -160,7 +160,7 @@ void vtkPVOptions::Initialize()
                     vtkPVOptions::PVCLIENT);
   this->AddArgument("--render-module", 0, &this->RenderModuleName,
                     "User specified rendering module.",
-                    vtkPVOptions::PVRENDER_SERVER| vtkPVOptions::PVSERVER);
+                    vtkPVOptions::PVCLIENT| vtkPVOptions::PVRENDER_SERVER| vtkPVOptions::PVSERVER);
   this->AddBooleanArgument("--use-offscreen-rendering", 0, &this->UseOffscreenRendering,
                            "Render offscreen on the satellite processes."
                            " This option only works with software rendering or mangled mesa on Unix.",
