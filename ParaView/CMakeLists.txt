@@ -207,6 +207,7 @@ ENDIF(NOT PARAVIEW_NO_HDF5)
 #-----------------------------------------------------------------------------
 # Tell the KW components where to install their libraries.
 SET(KW_INSTALL_LIB_DIR /lib/paraview-${PARAVIEW_VERSION})
+SET(KW_INSTALL_INCLUDE_DIR /include/paraview-${PARAVIEW_VERSION})
 
 #-----------------------------------------------------------------------------
 # Create the kwsys library for KWCommon.
@@ -312,3 +313,38 @@ ENDIF(BUILD_TESTING)
  INSTALL_FILES(/share/paraview-${PARAVIEW_VERSION}/Data .vtk Data/Data/blow)
 
 ENDIF (PARAVIEW_CAN_BUILD)
+
+#-----------------------------------------------------------------------------
+# Help outside projects build ParaView plugin packages.
+
+EXPORT_LIBRARY_DEPENDENCIES(${PARAVIEW_BINARY_DIR}/ParaViewLibraryDepends.cmake)
+
+# For ParaView from build tree:
+SET(VTK_WRAP_ClientServer_EXE_CONFIG ${VTK_WRAP_ClientServer_EXE})
+SET(PARAVIEW_CMAKE_EXTENSIONS_DIR ${PARAVIEW_BINARY_DIR}/ClientServer/CMake)
+SET(PARAVIEW_USE_FILE ${PARAVIEW_SOURCE_DIR}/ParaViewUse.cmake)
+SET(PARAVIEW_INCLUDE_DIRS ${PARAVIEW_SOURCE_DIR}/ClientServer
+  ${PARAVIEW_BINARY_DIR}/ClientServer)
+SET(PARAVIEW_LIBRARY_DIRS ${LIBRARY_OUTPUT_PATH})
+SET(PARAVIEW_LIBRARY_DEPENDS_FILE ${PARAVIEW_BINARY_DIR}/ParaViewLibraryDepends.cmake)
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaViewConfig.cmake.in
+               ${PARAVIEW_BINARY_DIR}/ParaViewConfig.cmake @ONLY IMMEDIATE)
+
+# For installed ParaView:
+SET(VTK_WRAP_ClientServer_EXE_CONFIG ${CMAKE_INSTALL_PREFIX}/lib/paraview-${PARAVIEW_VERSION}/vtkWrapClientServer)
+SET(PARAVIEW_CMAKE_EXTENSIONS_DIR ${CMAKE_INSTALL_PREFIX}/lib/paraview-${PARAVIEW_VERSION}/CMake)
+SET(PARAVIEW_USE_FILE ${CMAKE_INSTALL_PREFIX}/lib/paraview-${PARAVIEW_VERSION}/ParaViewUse.cmake)
+SET(PARAVIEW_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include/paraview-${PARAVIEW_VERSION})
+SET(PARAVIEW_LIBRARY_DIRS ${CMAKE_INSTALL_PREFIX}/lib/paraview-${PARAVIEW_VERSION})
+SET(PARAVIEW_LIBRARY_DEPENDS_FILE ${CMAKE_INSTALL_PREFIX}/lib/paraview-${PARAVIEW_VERSION}/ParaViewLibraryDepends.cmake)
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaViewConfig.cmake.in
+               ${PARAVIEW_BINARY_DIR}/Utilities/ParaViewConfig.cmake @ONLY IMMEDIATE)
+
+INSTALL_FILES(/lib/paraview-${PARAVIEW_VERSION}/CMake FILES
+  ${PARAVIEW_BINARY_DIR}/ClientServer/CMake/${CMAKE_SHARED_MODULE_PREFIX}cmVTK_WRAP_ClientServer${CMAKE_SHARED_MODULE_SUFFIX}
+  )
+INSTALL_FILES(/lib/paraview-${PARAVIEW_VERSION} FILES
+  ${PARAVIEW_SOURCE_DIR}/ParaViewUse.cmake
+  ${PARAVIEW_BINARY_DIR}/ParaViewLibraryDepends.cmake
+  ${PARAVIEW_BINARY_DIR}/Utilities/ParaViewConfig.cmake
+  )

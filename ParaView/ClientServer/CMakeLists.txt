@@ -55,9 +55,15 @@ ADD_LIBRARY(vtkClientServer
 TARGET_LINK_LIBRARIES(vtkClientServer vtkCommon)
 
 IF(PARAVIEW_SOURCE_DIR)
-  IF(BUILD_SHARED_LIBS)
-    INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkClientServer)
-  ENDIF(BUILD_SHARED_LIBS)
+  INSTALL_FILES(${KW_INSTALL_INCLUDE_DIR} FILES
+    ${VTKCS_BINARY_DIR}/vtkClientServerConfigure.h
+    ${VTKCS_SOURCE_DIR}/vtkClientServerID.h
+    ${VTKCS_SOURCE_DIR}/vtkClientServerInterpreter.h
+    ${VTKCS_SOURCE_DIR}/vtkClientServerStream.h
+    ${VTKCS_SOURCE_DIR}/vtkType.h
+    ${VTKCS_SOURCE_DIR}/vtkTypeFromNative.h
+    )
+  INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkClientServer)
 ENDIF(PARAVIEW_SOURCE_DIR)
 
 # Macro to create ClientServer wrappers classes in a single VTK kit.
