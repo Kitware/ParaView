@@ -96,7 +96,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.285");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.286");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1523,6 +1523,27 @@ void vtkPVRenderView::TriangleStripsCallback()
   this->EventuallyRender();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ParallelProjectionOn()
+{
+  if (!this->ParallelProjectionCheck->GetState())
+    {
+    this->ParallelProjectionCheck->SetState(1);
+    }
+  this->Renderer->GetActiveCamera()->ParallelProjectionOn();
+  this->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ParallelProjectionOff()
+{
+  if (this->ParallelProjectionCheck->GetState())
+    {
+    this->ParallelProjectionCheck->SetState(0);
+    }
+  this->Renderer->GetActiveCamera()->ParallelProjectionOff();
+  this->EventuallyRender();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ParallelProjectionCallback()
@@ -1531,14 +1552,15 @@ void vtkPVRenderView::ParallelProjectionCallback()
   if (this->ParallelProjectionCheck->GetState())
     {
     vtkTimerLog::MarkEvent("--- Enable parallel projection.");
-    this->Renderer->GetActiveCamera()->ParallelProjectionOn();
+    this->ParallelProjectionOn();
+    this->AddTraceEntry("$kw(%s) ParallelProjectionOn", this->GetTclName());
     }
   else
     {
     vtkTimerLog::MarkEvent("--- Disable parallel projection.");
-    this->Renderer->GetActiveCamera()->ParallelProjectionOff();
+    this->ParallelProjectionOff();
+    this->AddTraceEntry("$kw(%s) ParallelProjectionOff", this->GetTclName());
     }
-  this->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------

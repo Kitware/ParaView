@@ -160,8 +160,14 @@ public:
   void PrepareForDelete();
   
   // Description:
+  // Get the parallel projection check button
+  vtkGetObjectMacro(ParallelProjectionCheck, vtkKWCheckButton);
+
+  // Description:
   // Callback for toggling between parallel and perspective.
   void ParallelProjectionCallback();
+  void ParallelProjectionOn();
+  void ParallelProjectionOff();
   
   // Description:
   // Callback for the triangle strips check button
