@@ -17,19 +17,16 @@
 #include "vtkDataArray.h"
 #include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
-#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayMenu.h"
-#include "vtkPVData.h"
-#include "vtkPVDataInformation.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVInputMenu.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.21");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.22");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -79,25 +76,33 @@ void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkPVScalarRangeLabel::Update()
 {
-  vtkPVArrayInformation *ai;
+  this->Range[0] = VTK_LARGE_FLOAT;
+  this->Range[1] = -VTK_LARGE_FLOAT;
 
-  if (this->ArrayMenu == NULL)
+  vtkSMProperty* prop = this->GetSMProperty();
+  vtkSMDoubleRangeDomain* dom = 0;
+  if (prop)
     {
-    vtkErrorMacro("Array menu has not been set.");
-    return;
+    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("array_range"));
     }
-
-  ai = this->ArrayMenu->GetArrayInformation();
-  if (ai == NULL || ai->GetName() == NULL)
+  if (!prop || !dom)
     {
-    this->Range[0] = VTK_LARGE_FLOAT;
-    this->Range[1] = -VTK_LARGE_FLOAT;
     this->Label->SetLabel("Missing Array");
     this->Superclass::Update();
     return;
     }
 
-  ai->GetComponentRange(0, this->Range);
+  int exists;
+  double rg = dom->GetMinimum(0, exists);
+  if (exists)
+    {
+    this->Range[0] = rg;
+    }
+  rg = dom->GetMaximum(0, exists);
+  if (exists)
+    {
+    this->Range[1] = rg;
+    }
 
   char str[512];
   if (this->Range[0] > this->Range[1])
@@ -108,9 +113,10 @@ void vtkPVScalarRangeLabel::Update()
     {
     sprintf(str, "Scalar Range: %f to %f", this->Range[0], this->Range[1]);
     }
-
   this->Label->SetLabel(str);
+
   this->Superclass::Update();
+
 }
 
 //----------------------------------------------------------------------------

@@ -30,10 +30,12 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMSourceProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.60");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.61");
 
 
 //----------------------------------------------------------------------------
@@ -153,7 +155,14 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
     }
 
   // Has to meet all requirments from XML filter description.
-  if ( ! this->GetInputProperty()->GetIsValidInput(pvs,this->PVSource))
+  vtkSMInputProperty* ip = this->GetInputProperty();
+  if ( !ip )
+    {
+    return 0;
+    }
+  ip->RemoveAllUncheckedProxies();
+  ip->AddUncheckedProxy(pvs->GetProxy());
+  if (!ip->IsInDomains())
     {
     return 0;
     }
@@ -197,6 +206,22 @@ void vtkPVInputMenu::MenuEntryCallback(vtkPVSource *pvs)
   this->CurrentValue = pvs;
   this->ModifiedCallback();
   this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::Update()
+{
+  vtkSMInputProperty* ip = this->GetInputProperty();
+  if (ip)
+    {
+    ip->RemoveAllUncheckedProxies();
+    if (this->CurrentValue)
+      {
+      ip->AddUncheckedProxy(this->CurrentValue->GetProxy());
+      }
+    ip->UpdateDependantDomains();
+    }
+  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------
@@ -288,9 +313,9 @@ int vtkPVInputMenu::GetPVInputIndex()
 }
 
 //----------------------------------------------------------------------------
-vtkPVInputProperty* vtkPVInputMenu::GetInputProperty()
+vtkSMInputProperty* vtkPVInputMenu::GetInputProperty()
 {
-  return this->PVSource->GetInputProperty(this->InputName);
+  return vtkSMInputProperty::SafeDownCast(this->GetSMProperty());
 }
 
 //----------------------------------------------------------------------------

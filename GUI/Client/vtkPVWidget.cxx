@@ -24,6 +24,8 @@
 #include "vtkPVWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLPackageParser.h"
+#include "vtkSMProperty.h"
+#include "vtkSMSourceProxy.h"
 
 #include <ctype.h>
 
@@ -40,8 +42,10 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 
 #endif
 
+vtkCxxSetObjectMacro(vtkPVWidget, SMProperty, vtkSMProperty);
+
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.48");
+vtkCxxRevisionMacro(vtkPVWidget, "1.49");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -65,6 +69,8 @@ vtkPVWidget::vtkPVWidget()
   this->UseWidgetRange = 0;
   this->WidgetRange[0] = 0;
   this->WidgetRange[1] = 0;
+  this->SMProperty = 0;
+  this->SMPropertyName = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -77,6 +83,8 @@ vtkPVWidget::~vtkPVWidget()
 
   this->Dependents->Delete();
   this->Dependents = NULL;
+  this->SetSMProperty(0);
+  this->SetSMPropertyName(0);
 }
 
 
@@ -312,6 +320,7 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   clone->SetTraceNameState(this->TraceNameState);
   clone->SetBalloonHelpString(this->GetBalloonHelpString());
   clone->SetDebug(this->GetDebug());
+  clone->SetSMPropertyName(this->GetSMPropertyName());
   clone->SuppressReset = this->SuppressReset;
   
   // Now copy the dependencies
@@ -361,6 +370,25 @@ static int vtkPVWidgetIsSpace(char c)
 }
 
 //-----------------------------------------------------------------------------
+vtkSMProperty* vtkPVWidget::GetSMProperty()
+{
+  if (this->SMProperty)
+    {
+    return this->SMProperty;
+    }
+
+  if (!this->GetPVSource() || !this->GetPVSource()->GetProxy())
+    {
+    return 0;
+    }
+
+  this->SetSMProperty(
+    this->GetPVSource()->GetProxy()->GetProperty(this->GetSMPropertyName()));
+
+  return this->SMProperty;
+}
+
+//-----------------------------------------------------------------------------
 int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
                                    vtkPVXMLPackageParser* parser)
 {
@@ -383,10 +411,12 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     // return 0;
     }
 
-  if(!element->GetScalarAttribute("suppress_reset", &this->SuppressReset))
+  element->GetScalarAttribute("suppress_reset", &this->SuppressReset);
+
+  const char* property = element->GetAttribute("property");
+  if (property)
     {
-    // Just use the widgets default if XML does not specify.
-    //this->SuppressReset = 0;
+    this->SetSMPropertyName(property);
     }
 
   const char* deps = element->GetAttribute("dependents");

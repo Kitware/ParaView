@@ -8,7 +8,7 @@
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Balance the number of cells on all processes."
                input_name="Input"/>
     <Documentation>
@@ -24,7 +24,7 @@ The Balance filter is available when ParaView is run in parallel. It does load-b
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Redistribute polydata to a subset of processes."
                input_name="Input"/>
     <VectorEntry label="Number of Processes" trace_name="NumberOfProcesses"
@@ -93,7 +93,7 @@ The Append Datasets filter operates on multiple data sets of any type (polygonal
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <LabeledToggle label="Generate vertices"
@@ -118,7 +118,7 @@ The Cell Centers filter places a point at the center of each cell in the input d
         <FixedTypeRequirement/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <LabeledToggle label="Pass cell data"
@@ -139,7 +139,7 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <LabeledToggle label="Piece invariant"
@@ -202,7 +202,7 @@ If the Piece invariant option is checked, the whole data set will be processed a
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
@@ -219,7 +219,7 @@ The Clean to Grid filter merges points that are within a tolerance of 1/100,000 
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
@@ -236,7 +236,7 @@ The Connectivity filter assigns a region id to connected components of the input
       <Input name="Input"
              class="vtkImageData"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -259,7 +259,7 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <LabeledToggle label="Invert mean curvature"
@@ -289,7 +289,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <Scale label="Reduction target"
@@ -333,7 +333,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <SelectionList label="Boundary Cells" variable="BoundaryMode"
@@ -368,7 +368,7 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
         <FixedTypeRequirement/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -405,7 +405,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
         <ArrayRequirement attribute="Cell" components="1"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -437,7 +437,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
         <ArrayRequirement attribute="Cell" components="1"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -472,7 +472,7 @@ This filter only operates on unstructured data. It produces polygonal output.
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
@@ -507,7 +507,7 @@ The Extract Parts filter operates on any type of data, but its input reader/sour
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
@@ -529,7 +529,7 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
         <FixedTypeRequirement/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <StringEntry variable="ResultArrayName"
@@ -585,7 +585,7 @@ The Calculator filter is available on the Toolbar.
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <LabeledToggle label="Boundary edges"
@@ -641,11 +641,11 @@ This filter operates on polygonal data and produces polygonal output.
         <ArrayRequirement attribute="Point" components="1"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input"
+    <ArrayMenu input_name="Input" property="SelectInputScalars"
                attribute_type="Scalars" label="Scalars"
                trace_name="ArrayMenu"
                input_menu="im" number_of_components="1"
@@ -673,11 +673,11 @@ The Gradient filter computes the gradient vector at each point in an image or vo
         <ArrayRequirement attribute="Point" components="1"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input"
+    <ArrayMenu input_name="Input" property="SelectInputScalars"
                attribute_type="Scalars" label="Scalars"
                trace_name="ArrayMenu"
                input_menu="im"
@@ -722,7 +722,7 @@ The Group Parts filter causes different data sets to be grouped into a collectio
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <!-- ScaleFactor value chosen does not change processing speed of this filter or cause it to crash. -->
@@ -762,7 +762,7 @@ The Piece invariant check box determines whether the output will be the same reg
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <Scale label="Number of divisions"
@@ -788,7 +788,7 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <ThumbWheel label="On ratio"
@@ -833,11 +833,11 @@ The Input menu allows the user to select the data set to which this filter will 
         <ArrayRequirement attribute="Point" components="1"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im" label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input"
+    <ArrayMenu input_name="Input" property="SelectInputScalars"
                attribute_type="Scalars"
                label="Scalars"
                trace_name="Scalars"
@@ -865,7 +865,7 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <Scale label="Feature angle"
@@ -921,7 +921,7 @@ If this filter is run in parallel, the resulting data set will have seams along 
       <Input name="Input"
              class="vtkCTHData"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
   </Module>
@@ -933,7 +933,7 @@ If this filter is run in parallel, the resulting data set will have seams along 
       <Input name="Input"
              class="vtkStructuredGrid"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
   </Module>
@@ -949,7 +949,7 @@ If this filter is run in parallel, the resulting data set will have seams along 
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input" label="Input"
+    <InputMenu trace_name="Input" label="Input" property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
@@ -967,7 +967,7 @@ The Outline filter generates an axis-aligned bounding box for the input data set
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -998,7 +998,7 @@ The Outline Corners filter generates the corners of a bounding box for the input
         <GroupRequirement quantity="Multiple"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1017,7 +1017,7 @@ The Part Id Scalars filter assigns a unique scalar value to each part in the inp
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1043,7 +1043,7 @@ The Process Id Scalars filter assigns a unique scalar value to each piece of the
       <FixedTypeRequirement/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1066,7 +1066,7 @@ The Point Data to Cell Data filter averages the values of the point attributes o
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1114,7 +1114,7 @@ The Copy cell data toggle controls whether cell-centered data from the input sho
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1146,7 +1146,7 @@ The Random Vectors filter generates a point-centered array of random vectors. It
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1200,19 +1200,19 @@ The Reflection filter reflects the input data set across the specified plane. If
         <ArrayRequirement attribute="Point" components="3"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input"
+    <ArrayMenu input_name="Input" property="SelectInputVectors"
                trace_name="Vectors"
                attribute_type="Vectors"
                label="Vectors"
                input_menu="im"
                number_of_components="3"
                help="Select the input normals to process."/>
-    <ArrayMenu input_name="Input"
+    <ArrayMenu input_name="Input" property="SelectInputScalars"
                trace_name="Scalars"
                attribute_type="Scalars"
                label="Scalars"
@@ -1268,7 +1268,7 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1312,7 +1312,7 @@ The Capping check box controls whether to close the open ends of the swept surfa
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1340,7 +1340,7 @@ The Shrink filter causes the individual cells of a data set to break apart from 
       <Input name="Input"
              class="vtkPolyData" />
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1362,7 +1362,7 @@ The Shrink filter causes the individual cells of a data set to break apart from 
       <Input name="Input"
            class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1396,7 +1396,7 @@ The Smooth filter operates on a polygonal data set by iteratively adjusting the 
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1446,6 +1446,7 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
       <Input name="Input" class="vtkUnstructuredGrid"/>
     </Filter>
     <InputMenu label="Input" trace_name="Input" id="tess_source_select"
+               property="Input"
                help="Set the input to this filter."
                input_name="Input"/>
     <Scale label="Output Dimension" trace_name="OutputDimension"
@@ -1488,7 +1489,7 @@ The Max Num Of Subdivisions setting specifies the maximum number of times an edg
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1506,7 +1507,7 @@ The Tetrahedralize filter converts the 3D cells of any type of data set to tetra
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1524,7 +1525,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
       <Input name="Input"
              class="vtkPointSet"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
@@ -1553,7 +1554,7 @@ The Transform filter allows you to specify the position, size, and orientation o
       <Input name="Input"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im"
                label="Input"
                help="Set the input to this filter."
@@ -1610,12 +1611,12 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
         <ArrayRequirement attribute="Point" components="1"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input"
+    <ArrayMenu input_name="Input" property="SelectInputScalars"
                attribute_type="Scalars"
                trace_name="Scalars"
                label="Scalars"
@@ -1665,12 +1666,12 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
         <ArrayRequirement attribute="Point" components="3"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input"
+    <ArrayMenu input_name="Input" property="SelectInputVectors"
                attribute_type="Vectors"
                trace_name="Vectors"
                label="Vectors"
@@ -1707,7 +1708,7 @@ The Warp (vector) filter translates the points of the input data set using a spe
              class="vtkDataSet"/>
     </Filter>
 #endif
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im1"
                label="Input"
                help="Set the input to this filter."
@@ -1758,7 +1759,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im1"
                label="Input"
                help="Set the input to this filter."
@@ -1793,10 +1794,12 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
       <Item label="Scalars">
         <ContainerWidget trace_name="ScalarClip">
           <Item>
-            <ScalarRangeLabel trace_name="ScalarRange" array_menu="it3.am1"/>
+            <ScalarRangeLabel property="Value" 
+                              trace_name="ScalarRange" 
+                              array_menu="it3.am1"/>
           </Item>
           <Item id="it3">
-          <ArrayMenu id="am1"
+          <ArrayMenu id="am1" property="SelectInputScalars"
                      input_name="Input"
                      attribute_type="Scalars"
                      trace_name="Scalars"
@@ -1839,7 +1842,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
         <ArrayRequirement components="1"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im"
                label="Input"
                input_name="Input"
@@ -1847,8 +1850,9 @@ This filter operates on all types of data sets, and it returns unstructured grid
     <FieldMenu id="fm"
                trace_name="FieldMenu"
                input_menu="im"
+               property="AttributeMode"
                help="Choose cell or point field to threshold." />
-    <ArrayMenu id="am"
+    <ArrayMenu id="am" property="SelectInputScalars"
                input_name="Input"
                attribute_type="Scalars"
                trace_name="Scalars"
@@ -1857,6 +1861,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
                help="Choose the threshold scalar array."/>
     <MinMax trace_name="MinMax"
             array_menu="am"
+            property="ThresholdBetween"
             min_label="Lower Threshold"
             max_label="Upper Threshold"
             min_help="Choose the lower value of the threshold"
@@ -1899,9 +1904,10 @@ The Threshold filter extracts the portions of the input data set whose scalars l
                id="im"
                label="Input"
                input_name="Input"
+               property="Input"
                help="Set the input to this filter." />
     // Do not change the tracename of the array menu, it is used by vtkPVContour
-    <ArrayMenu id="am"
+    <ArrayMenu id="am" property="SelectInputScalars"
                input_name="Input"
                attribute_type="Scalars"
                label="Scalars"
@@ -1910,6 +1916,7 @@ The Threshold filter extracts the portions of the input data set whose scalars l
                number_of_components="1"
                help="Choose which scalar array you want to contour."/>
     <ScalarRangeLabel id="srl"
+                      property="ContourValues"
                       trace_name="ScalarRangeLabel"
                       array_menu="am"/>
     <ContourEntry label="Contour Values"
@@ -1954,12 +1961,12 @@ The Contour filter operates on any type of data set, but the input is required t
       <Input name="Source"
              class="vtkPolyData"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <InputMenu trace_name="Glyph"
+    <InputMenu trace_name="Glyph" property="Source"
                id="im2"
                label="Glyph"
                help="Select the glyph source."
@@ -2011,7 +2018,7 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
              class="vtkDataSet">
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im"
                label="Input"
                help="Set the input to this filter."
@@ -2084,12 +2091,12 @@ The Probe filter operates on any type of data and produces polygonal output (a p
         <ArrayRequirement attribute="Point" components="3"/>
       </Input>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im"
                label="Input"
                help="Set the input to this filter."
                input_name="Input"/>
-    <ArrayMenu input_name="Input"
+    <ArrayMenu input_name="Input" property="SelectInputVectors"
                attribute_type="Vectors"
                trace_name="Vectors"
                label="Vectors"
@@ -2285,7 +2292,7 @@ This filter operates on any type of data set, provided it has point-centered vec
       <Input name="Input"
              class="vtkStructuredData"/>
     </Filter>
-    <InputMenu trace_name="Input"
+    <InputMenu trace_name="Input" property="Input"
                id="im"
                label="Input"
                help="Set the input to this filter."
@@ -2345,13 +2352,13 @@ The Extract Grid filter returns a subgrid of a structured input data set (unifor
       </Input> 
     </Filter> 
     // Do not change the tracename of the input menu, it is used by vtkPVContour 
-    <InputMenu trace_name="Input" 
+    <InputMenu trace_name="Input" property="Input"
                id="im" 
                label="Input" 
                input_name="Input" 
                help="Set the input to this filter." /> 
     // Do not change the tracename of the array menu, it is used by vtkPVContour 
-    <ArrayMenu id="am" 
+    <ArrayMenu id="am" property="SelectInputScalars"
                input_name="Input" 
                attribute_type="Scalars" 
                label="Scalars" 

@@ -62,13 +62,14 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.363");
+vtkCxxRevisionMacro(vtkPVSource, "1.364");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
 
 vtkCxxSetObjectMacro(vtkPVSource, View, vtkKWView);
+vtkCxxSetObjectMacro(vtkPVSource, Proxy, vtkSMSourceProxy);
 
 //----------------------------------------------------------------------------
 vtkPVSource::vtkPVSource()
@@ -181,7 +182,7 @@ vtkPVSource::~vtkPVSource()
     }
 
   vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
-  if (proxm)
+  if (proxm && this->GetName())
     {
     proxm->UnRegisterProxy(this->GetName());
     }
@@ -1553,6 +1554,12 @@ void vtkPVSource::UpdateVTKSourceParameters()
     it->GoToNextItem();
     }
   it->Delete();
+
+  if (this->Proxy)
+    {
+    this->Proxy->UpdateVTKObjects();
+    }
+
 }
 
 
@@ -2448,4 +2455,14 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfOutputsInformation: "
      << this->NumberOfOutputsInformation << endl;
   os << indent << "SourceGrabbed: " << (this->SourceGrabbed?"on":"off") << endl;
+  os << indent << "Proxy: ";
+  if (this->Proxy)
+    {
+    os << endl;
+    this->Proxy->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }

@@ -32,11 +32,13 @@
 #include "vtkPVXMLElement.h"
 #include "vtkParaViewInstantiator.h"
 #include "vtkSMApplication.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkStringList.h"
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.34");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.35");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -442,6 +444,19 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
   // Add the source prototype.
   pvm->InitializePrototype();
   this->Window->AddPrototype(name, pvm);
+
+  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  if (pm)
+    {
+    vtkSMSourceProxy* proxy = vtkSMSourceProxy::SafeDownCast(
+      pm->GetProxy("filters_prototypes", name));
+    if (proxy)
+      {
+      pvm->SetProxy(proxy);
+      proxy->Delete();
+      }
+    }
+  
   pvm->Delete();
 }
 

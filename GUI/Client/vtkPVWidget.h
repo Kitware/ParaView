@@ -35,6 +35,7 @@ class vtkPVWidgetProperty;
 class vtkPVXMLElement;
 class vtkPVXMLPackageParser;
 class vtkPVWindow;
+class vtkSMProperty;
 
 //BTX
 template <class key, class data> 
@@ -219,6 +220,11 @@ public:
   // Set/get the property to use with this widget.  Overridden in subclasses.
   virtual void SetProperty(vtkPVWidgetProperty *) {}
   virtual vtkPVWidgetProperty* GetProperty() { return NULL; }
+
+  // Description:
+  // Set/get the SM property to use with this widget..
+  vtkSMProperty* GetSMProperty();
+  void SetSMProperty(vtkSMProperty* prop);
   
   // Description:
   // Create the right property for use with this widget.  Overridden in
@@ -259,6 +265,11 @@ protected:
   int UseWidgetRange;
   double WidgetRange[2];
 
+  char* SMPropertyName;
+
+  vtkSetStringMacro(SMPropertyName);
+  vtkGetStringMacro(SMPropertyName);
+
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
@@ -272,9 +283,6 @@ protected:
 
   int TraceNameState;
 
-  vtkPVWidget(const vtkPVWidget&); // Not implemented
-  void operator=(const vtkPVWidget&); // Not implemented
-
   vtkPVWidget* GetPVWidgetFromParser(vtkPVXMLElement* element,
                                      vtkPVXMLPackageParser* parser);
   vtkPVWindow* GetPVWindowFormParser(vtkPVXMLPackageParser* parser);
@@ -284,6 +292,13 @@ protected:
   // This is the way Accept and Reset should work.
   virtual void SaveInBatchScriptForPart(ofstream *file, 
                                         vtkClientServerID);
+
+
+private:
+  vtkSMProperty* SMProperty;
+
+  vtkPVWidget(const vtkPVWidget&); // Not implemented
+  void operator=(const vtkPVWidget&); // Not implemented
 
 };
 

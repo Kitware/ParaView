@@ -29,6 +29,7 @@ class vtkKWOptionMenu;
 class vtkPVData;
 class vtkPVInputProperty;
 class vtkPVSourceCollection;
+class vtkSMInputProperty;
 
 class VTK_EXPORT vtkPVInputMenu : public vtkPVWidget
 {
@@ -121,6 +122,13 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  // Description:
+  // The methods get called when reset is called.  
+  // It can also get called on its own.  If the widget has options 
+  // or configuration values dependent on the VTK object, this method
+  // set these configuation object using the VTK object.
+  virtual void Update();
+
 protected:
   vtkPVInputMenu();
   ~vtkPVInputMenu();
@@ -157,9 +165,7 @@ protected:
 
   // Description:
   // Get the property for this input.
-  vtkPVInputProperty* GetInputProperty();
-  void SetInputProperty(vtkPVInputProperty *prop);
-  vtkPVInputProperty *InputProperty;
+  vtkSMInputProperty* GetInputProperty();
 
   // Description:
   // Adds a collection of sources to the menu.

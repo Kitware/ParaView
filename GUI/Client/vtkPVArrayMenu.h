@@ -44,6 +44,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
+  virtual void Accept();
+
+  // Description:
   // Create the widget.
   virtual void Create(vtkKWApplication *app);
 
@@ -52,29 +55,6 @@ public:
   // from a script.
   void SetLabel (const char* label);
   const char* GetLabel();
-
-  // Description:
-  // This is a method that the field menu calls.  The user can call
-  // it also.  It determines whether the array menu has point or cell arrays
-  // to select.
-  void SetFieldSelection(int field);
-  int GetFieldSelection() {return this->FieldSelection;}
-
-  // Description:
-  // When NumberOfComponents is 1, this option allows components to
-  // be selected from multidimensional arrays.  
-  // A second component menu is displayed.
-  void SetShowComponentMenu(int flag);
-  vtkGetMacro(ShowComponentMenu, int);
-  vtkBooleanMacro(ShowComponentMenu, int);
-
-  // Description:
-  // Only arrays with this number of components are added to the menu.
-  // If this value is 0 or less, then all arrays are added to the menu.
-  // The default value is 1.  If "ShowComponentMenu" is on, then all
-  // arrays are added to the menu.
-  void SetNumberOfComponents(int num);
-  vtkGetMacro(NumberOfComponents, int);
 
   // Description:
   // This is one value that lets this widget interact with its associated 
@@ -115,17 +95,6 @@ public:
   //ETX
 
   // Description:
-  // This is the number of components the selected array has.
-  vtkGetMacro(ArrayNumberOfComponents, int);
-
-  // Description:
-  // Set the selected component.  This is only aplicable when 
-  // "ShowComponentMenu" is on. It can be used in scripts.
-  void SetSelectedComponent(int comp);
-  vtkGetMacro(SelectedComponent, int);
-
-
-  // Description:
   // Direct access to the ArrayName is used internally by the Reset method. 
   // The methods "SetValue" should be used instead of this method.
   vtkSetStringMacro(ArrayName);
@@ -134,7 +103,6 @@ public:
   // Description:
   // These are internal methods that are called when a menu is changed.
   void ArrayMenuEntryCallback(const char* name);
-  void ComponentMenuEntryCallback(int comp);
 
   // Description:
   // This is called to update the menus if something (InputMenu) changes.
@@ -154,15 +122,6 @@ public:
   virtual void Trace(ofstream *file);
 
   // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -181,23 +140,11 @@ protected:
 
   vtkPVDataSetAttributesInformation *GetFieldInformation();
 
-  // Gets called when the accept button is pressed.
-  virtual void AcceptInternal(vtkClientServerID);
-
   // Gets called when the reset button is pressed.
   virtual void ResetInternal();
 
-
   // The selected array name in the menu.  Current value of the widget.
   char *ArrayName;
-  int ArrayNumberOfComponents;
-  int SelectedComponent;
-
-  int NumberOfComponents;
-  int ShowComponentMenu;
-
-  // Selection only used if no field menu.
-  int FieldSelection;
 
   // This is where we get the data object arrays to populate our menu.
   vtkPVInputMenu *InputMenu;
@@ -206,19 +153,16 @@ protected:
   // These are options that allow the widget to interact with its associated object.
   char*       InputName;
   int         AttributeType;
-  vtkClientServerID ObjectID;
 
   // Subwidgets.
   vtkKWLabel *Label;
   vtkKWOptionMenu *ArrayMenu;
-  vtkKWOptionMenu *ComponentMenu;
 
   // Resets the values based on the array.
   void UpdateArrayMenu();
 
-  // Resets the values based on the array.
-  void UpdateComponentMenu();
-  
+  void UpdateProperty();
+
   vtkPVStringAndScalarListWidgetProperty *Property;
   
 //BTX

@@ -15,21 +15,24 @@
 #include "vtkPVMinMax.h"
 
 #include "vtkArrayMap.txx"
+#include "vtkClientServerStream.h"
 #include "vtkKWLabel.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVArrayMenu.h"
-#include "vtkPVScalarListWidgetProperty.h"
-#include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
-#include "vtkClientServerStream.h"
+#include "vtkPVXMLElement.h"
+#include "vtkSMDoubleRangeDomain.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.32");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.33");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -227,26 +230,6 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 void vtkPVMinMax::SetMinValue(float val)
 {
   this->MinScale->SetValue(val);
-  float *scalars = NULL;
-
-  if (this->Property)
-    {
-    scalars = this->Property->GetScalars();
-    }
-  
-  if (!this->AcceptCalled && scalars)
-    {
-    scalars[0] = val;
-    }
-  if (val > this->MaxScale->GetValue())
-    {
-    this->MaxScale->SetValue(val);
-    if (!this->AcceptCalled && scalars)
-      {
-      scalars[1] = val;
-      }
-    }
-
   this->ModifiedCallback();
 }
 
@@ -254,26 +237,6 @@ void vtkPVMinMax::SetMinValue(float val)
 void vtkPVMinMax::SetMaxValue(float val)
 {
   this->MaxScale->SetValue(val);
-  float *scalars = NULL;
-  
-  if (this->Property)
-    {
-    scalars = this->Property->GetScalars();
-    }
-  
-  if (!this->AcceptCalled && scalars)
-    {
-    scalars[1] = val;
-    }
-  if (val < this->MinScale->GetValue())
-    {
-    this->MinScale->SetValue(val);
-    if (!this->AcceptCalled && scalars)
-      {
-      scalars[0] = val;
-      }
-    }
-  
   this->ModifiedCallback();
 }
 
@@ -286,16 +249,38 @@ void vtkPVMinMax::SaveInBatchScript(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVMinMax::Accept()
 {
-  float scalars[2];
-  scalars[0] = this->GetMinValue();
-  scalars[1] = this->GetMaxValue();
-  this->Property->SetScalars(2, scalars);
-  this->Property->SetVTKSourceID(sourceID);
-  this->Property->AcceptInternal();
+  int modFlag = this->GetModifiedFlag();
+
+  vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  if (prop)
+    {
+    int checkDomains = vtkSMProperty::GetCheckDomains();
+    vtkSMProperty::SetCheckDomains(0);
+    prop->SetNumberOfElements(2);
+    prop->SetElement(0, this->GetMinValue());
+    prop->SetElement(1, this->GetMaxValue());
+    vtkSMProperty::SetCheckDomains(checkDomains);
+    }
   
   this->ModifiedFlag = 0;
+
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -316,16 +301,20 @@ void vtkPVMinMax::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::ResetInternal()
 {
+  if (!this->AcceptCalled)
+    {
+    this->Update();
+    return;
+    }
   if ( this->MinScale->IsCreated() )
     {
-    // Command to update the UI.
-    float *values = this->Property->GetScalars();
-    this->SetMinValue(values[0]);
-    this->SetMaxValue(values[1]);
-    }
-  if (this->AcceptCalled)
-    {
-    this->ModifiedFlag = 0;
+    vtkSMDoubleVectorProperty* prop = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->GetSMProperty());
+    if (prop)
+      {
+      this->SetMinValue(prop->GetElement(0));
+      this->SetMaxValue(prop->GetElement(1));
+      }
     }
 }
 
@@ -336,20 +325,29 @@ void vtkPVMinMax::Update()
   double range[2];
   double oldRange[2];
 
-  vtkPVArrayInformation *ai;
+  range[0] = VTK_LARGE_FLOAT;
+  range[1] = -VTK_LARGE_FLOAT;
 
-  if (this->ArrayMenu == NULL)
+  vtkSMProperty* prop = this->GetSMProperty();
+  vtkSMDoubleRangeDomain* dom = 0;
+  if (prop)
     {
-    return;
+    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("array_range"));
     }
-
-  ai = this->ArrayMenu->GetArrayInformation();
-  if (ai == NULL || ai->GetName() == NULL)
+  if (dom)
     {
-    return;
+    int exists;
+    double rg = dom->GetMinimum(0, exists);
+    if (exists)
+      {
+      range[0] = rg;
+      }
+    rg = dom->GetMaximum(0, exists);
+    if (exists)
+      {
+      range[1] = rg;
+      }
     }
-
-  ai->GetComponentRange(0, range);
 
   if (range[0] > range[1])
     {

@@ -478,6 +478,12 @@ public:
   // Is the source grabbed.
   vtkGetMacro(SourceGrabbed, int);
  
+  // Description:
+  // Returns the proxy object (server manager) used
+  // by PVSource.
+  void SetProxy(vtkSMSourceProxy* proxy);
+  vtkGetObjectMacro(Proxy, vtkSMSourceProxy);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -567,7 +573,6 @@ protected:
 
   char *SourceClassName;
 
-  vtkGetObjectMacro(Proxy, vtkSMSourceProxy);
   vtkSMSourceProxy* Proxy;
 
   // Whether the source should make its input invisible.

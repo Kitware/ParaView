@@ -22,14 +22,15 @@
 #include "vtkCollection.h"
 #include "vtkPVInputRequirement.h"
 #include "vtkPVConfig.h"
-//#ifdef PARAVIEW_BUILD_DEVELOPMENT
+#include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
+
 #include "vtkCTHData.h"
-//#endif
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.11");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -57,113 +58,28 @@ void vtkPVInputProperty::AddRequirement(vtkPVInputRequirement *ir)
 //----------------------------------------------------------------------------
 int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
 {
-  vtkPVDataInformation *info;
-  vtkPVInputRequirement *ir;
-
   if (input->GetPVOutput() == NULL)
     {
     return 0;
     }
 
-  info = input->GetDataInformation();
-
-  // First check the data has the correct arrays.
-  this->Requirements->InitTraversal();
-  while ( (ir = 
-           (vtkPVInputRequirement*)(this->Requirements->GetNextItemAsObject())))
+  vtkSMSourceProxy* proxy = pvs->GetProxy();
+  if (!proxy)
     {
-    if ( ! ir->GetIsValidInput(input, pvs) )
-      {
-      return 0;
-      }
+    //cout << "< " << pvs->GetSourceClassName() << endl;
+    return 0;
     }
-
-  // vtkPVDataInformation has a similar check.
-  // We should merge DataInformations check with this !!!!!! ....
-
-  // Also, this could be just another requirment instead of an input property attribute.
- 
-  // Special sets of types.
-  if (this->Type == NULL)
+  vtkSMProxyProperty* property = vtkSMProxyProperty::SafeDownCast(
+    proxy->GetProperty(this->GetName()));
+  if (!property)
     {
-    return 1;
+    //cout << ">" << this->GetName() << endl;
+    return 0;
     }
-  if (strcmp(this->Type, "vtkDataSet") == 0)
-    {
-    if ( info->GetDataSetType() == VTK_DATA_SET ||
-         info->GetDataSetType() == VTK_POINT_SET ||
-         info->GetDataSetType() == VTK_IMAGE_DATA ||
-         info->GetDataSetType() == VTK_RECTILINEAR_GRID ||
-         info->GetDataSetType() == VTK_STRUCTURED_GRID ||
-         info->GetDataSetType() == VTK_STRUCTURED_POINTS ||
-         info->GetDataSetType() == VTK_POLY_DATA ||
-         info->GetDataSetType() == VTK_UNSTRUCTURED_GRID ||
-//#ifdef PARAVIEW_BUILD_DEVELOPMENT
-         info->GetDataSetType() == VTK_CTH_DATA ||
-//#endif
-         info->GetDataSetType() == VTK_UNIFORM_GRID )
-      {
-      return 1;
-      }
-    }
-  if (strcmp(this->Type, "vtkStructuredData") == 0)
-    {
-    if (info->GetDataSetType() == VTK_IMAGE_DATA ||
-        info->GetDataSetType() == VTK_RECTILINEAR_GRID ||
-        info->GetDataSetType() == VTK_STRUCTURED_GRID)
-      {
-      return 1;
-      }
-    }
-  if (strcmp(this->Type, "vtkPointSet") == 0)
-    {
-    if (info->GetDataSetType() == VTK_POLY_DATA ||
-        info->GetDataSetType() == VTK_UNSTRUCTURED_GRID ||
-        info->GetDataSetType() == VTK_STRUCTURED_GRID)
-      {
-      return 1;
-      }
-    }
-
-  // Standard matches
-  if (strcmp(this->Type, "vtkPolyData") == 0 &&
-      info->GetDataSetType() == VTK_POLY_DATA)
-    {
-    return 1;
-    }
-  if (strcmp(this->Type, "vtkUnstructuredGrid") == 0 &&
-      info->GetDataSetType() == VTK_UNSTRUCTURED_GRID)
-    {
-    return 1;
-    }
-  if (strcmp(this->Type, "vtkImageData") == 0 &&
-      info->GetDataSetType() == VTK_IMAGE_DATA)
-    {
-    return 1;
-    }
-  if (strcmp(this->Type, "vtkRectilinearGrid") == 0 &&
-      info->GetDataSetType() == VTK_RECTILINEAR_GRID)
-    {
-    return 1;
-    }
-  if (strcmp(this->Type, "vtkStructuredGrid") == 0 &&
-      info->GetDataSetType() == VTK_STRUCTURED_GRID)
-    {
-    return 1;
-    }
-  //#ifdef PARAVIEW_BUILD_DEVELOPMENT
-  if (strcmp(this->Type, "vtkCTHData") == 0 &&
-      info->GetDataSetType() == VTK_CTH_DATA)
-    {
-    return 1;
-    }
-  //#endif
-  if (strcmp(this->Type, "vtkHierarchicalBoxDataSet") == 0 &&
-      info->GetDataSetType() == VTK_HIERARCHICAL_BOX_DATA_SET)
-    {
-    return 1;
-    }
-  return 0;
+  property->RemoveAllUncheckedProxies();
+  property->AddUncheckedProxy(input->GetProxy());
+  
+  return property->IsInDomains();
 }
 
 //----------------------------------------------------------------------------

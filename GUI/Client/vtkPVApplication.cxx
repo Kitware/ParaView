@@ -67,6 +67,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkSMApplication.h"
+#include "vtkSMProperty.h"
+#include "vtkSMProxyManager.h"
 #include "vtkShortArray.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
@@ -108,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.286");
+vtkCxxRevisionMacro(vtkPVApplication, "1.287");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1397,6 +1399,10 @@ void vtkPVApplication::Initialize()
 #endif
 
   this->SMApplication->Initialize();
+  vtkSMProperty::SetModifiedAtCreation(0);
+
+  vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+  proxm->InstantiateGroupPrototypes("filters");
 
   this->ApplicationInitialized = 1;
 }

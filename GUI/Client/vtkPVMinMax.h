@@ -35,6 +35,9 @@ public:
   virtual void Create(vtkKWApplication *pvApp);
 
   // Description:
+  virtual void Accept();
+
+  // Description:
   // This calculates new range to display (using the array menu).
   virtual void Update();
 
@@ -126,14 +129,6 @@ public:
   vtkPVMinMax* ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
-
-  //BTX
-  // Description:
-  // Called when accept button is pushed.  
-  // Sets objects variable to the widgets value.
-  // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(vtkClientServerID);
-  //ETX
 
   // Description:
   // Called when the reset button is pushed.

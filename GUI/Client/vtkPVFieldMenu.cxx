@@ -23,16 +23,18 @@
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVIndexWidgetProperty.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkSMEnumerationDomain.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMIntVectorProperty.h"
 #include "vtkSource.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.14");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.15");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -51,8 +53,6 @@ vtkPVFieldMenu::vtkPVFieldMenu()
   this->FieldMenu = vtkKWOptionMenu::New();
   this->Value = vtkDataSet::POINT_DATA_FIELD;  
   
-  this->Property = NULL;
-  this->PropertyInitialized = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -65,7 +65,6 @@ vtkPVFieldMenu::~vtkPVFieldMenu()
 
   this->SetInputMenu(NULL);
   
-  this->SetProperty(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -129,13 +128,22 @@ void vtkPVFieldMenu::SetValue(int field)
     return;
     }
 
-  if (field == vtkDataSet::POINT_DATA_FIELD)
+  vtkSMProperty* prop = this->GetSMProperty();
+  if (prop)
     {
-    this->FieldMenu->SetValue("Point Data");
-    }
-  else if (field == vtkDataSet::CELL_DATA_FIELD)
-    {
-    this->FieldMenu->SetValue("Cell Data");
+    vtkSMEnumerationDomain* edom = vtkSMEnumerationDomain::SafeDownCast(
+      prop->GetDomain("field_list"));
+    if (edom)
+      {
+      unsigned int numEntries = edom->GetNumberOfEntries();
+      for (unsigned int i=0; i<numEntries; i++)
+        {
+        if (field == edom->GetEntryValue(i))
+          {
+          this->FieldMenu->SetValue(edom->GetEntryText(i));
+          }
+        }
+      }
     }
   
   this->Value = field;
@@ -144,50 +152,35 @@ void vtkPVFieldMenu::SetValue(int field)
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataSetAttributesInformation* vtkPVFieldMenu::GetFieldInformation()
+void vtkPVFieldMenu::Accept()
 {
-  vtkPVSource *input;
+  int modFlag = this->GetModifiedFlag();
 
-  if (this->InputMenu == NULL)
-    {
-    return NULL;
-    }
-  input = this->InputMenu->GetCurrentValue();
-  if (input == NULL)
-    {
-    return NULL;
-    }
-
-  switch (this->Value)
-    {
-    case vtkDataSet::DATA_OBJECT_FIELD:
-      vtkErrorMacro("We do not handle data object fields yet.");
-      return NULL;
-    case vtkDataSet::POINT_DATA_FIELD:
-      return input->GetDataInformation()->GetPointDataInformation();
-      break;
-    case vtkDataSet::CELL_DATA_FIELD:
-      return input->GetDataInformation()->GetCellDataInformation();
-      break;
-    }
-
-  vtkErrorMacro("Unknown field.");
-  return NULL; 
-}
-
-//----------------------------------------------------------------------------
-void vtkPVFieldMenu::AcceptInternal(vtkClientServerID sourceID)
-{
-  if (sourceID.ID &&
-      (this->Value == vtkDataSet::POINT_DATA_FIELD ||
-       this->Value == vtkDataSet::CELL_DATA_FIELD))
-    {
-    this->Property->SetVTKSourceID(sourceID);
-    this->Property->SetIndex(this->Value);
-    this->Property->AcceptInternal();
-    }
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
   
+  if (ivp)
+    {
+    ivp->SetNumberOfElements(1);
+    ivp->SetElement(0, this->Value);
+    }
+
   this->ModifiedFlag = 0;
+
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 //---------------------------------------------------------------------------
@@ -206,11 +199,13 @@ void vtkPVFieldMenu::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVFieldMenu::ResetInternal()
 {
-  // Get the selected array form the VTK filter.
-//  this->Script("%s SetValue [%s GetAttributeMode]",
-//               this->GetTclName(), 
-//               sourceTclName);
-  this->SetValue(this->Property->GetIndex());
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (ivp)
+    {
+    this->SetValue(ivp->GetElement(0));
+    }
 
   if (this->AcceptCalled)
     {
@@ -237,83 +232,79 @@ void vtkPVFieldMenu::SaveInBatchScript(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVFieldMenu::UpdateProperty()
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (ivp)
+    {
+    ivp->SetUncheckedElement(0, this->Value);
+    ivp->UpdateDependantDomains();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVFieldMenu::Update()
 {
-  int cellFlag, pointFlag;
-  vtkPVInputProperty* inProp = this->GetInputProperty();
+  vtkSMProperty* prop = this->GetSMProperty();
+  if (prop)
+    {
+    vtkSMEnumerationDomain* edom = vtkSMEnumerationDomain::SafeDownCast(
+      prop->GetDomain("field_list"));
+    if (edom)
+      {
+      int valSet = 0;
+      unsigned int numEntries = edom->GetNumberOfEntries();
+      for (unsigned int i=0; i<numEntries; i++)
+        {
+        if (this->Value == edom->GetEntryValue(i))
+          {
+          valSet = 1;
+          }
+        }
+      if (!valSet)
+        {
+        if (numEntries > 0)
+          {
+          this->Value = edom->GetEntryValue(0);
+          }
+        }
+      }
+    }
+
+  this->UpdateProperty();
 
   this->FieldMenu->ClearEntries();
-  if (this->InputMenu == NULL || inProp == NULL )
+  if (prop)
     {
-    // Add both.
-    this->FieldMenu->AddEntryWithCommand("Point Data", this,
-                                         "SetValue 1");
-    this->FieldMenu->AddEntryWithCommand("Cell Data", this,
-                                         "SetValue 2");
-    this->FieldMenu->SetCurrentEntry("Point Data");
-    this->vtkPVWidget::Update();
-    return;
-    }  
+    vtkSMEnumerationDomain* edom = vtkSMEnumerationDomain::SafeDownCast(
+      prop->GetDomain("field_list"));
+    if (edom)
+      {
+      const char* valid = 0;
+      unsigned int numEntries = edom->GetNumberOfEntries();
+      for (unsigned int i=0; i<numEntries; i++)
+        {
+        ostrstream com;
+        com << "SetValue " << edom->GetEntryValue(i) << ends;
+        this->FieldMenu->AddEntryWithCommand(
+          edom->GetEntryText(i), this, com.str());
+        delete[] com.str();
+        if (this->Value == edom->GetEntryValue(i))
+          {
+          valid = edom->GetEntryText(i);
+          }
+        }
+      if (valid)
+        {
+        this->FieldMenu->SetCurrentEntry(valid);
+        }
+      }
+     }
 
-  vtkPVSource* pvs = this->InputMenu->GetCurrentValue();
-  if (pvs == NULL)
-    {
-    return;
-    }
-  vtkPVDataInformation* dataInfo = pvs->GetDataInformation();
-  if (dataInfo == NULL)
-    {
-    return;
-    }
-  
-  pointFlag = cellFlag = 0;
-  if (inProp->GetIsValidField(vtkDataSet::POINT_DATA_FIELD,
-                              dataInfo->GetPointDataInformation()))
-    {
-    this->FieldMenu->AddEntryWithCommand("Point Data", this,
-                                         "SetValue 1");
-    pointFlag = 1;
-    }
-
-  if (inProp->GetIsValidField(vtkDataSet::CELL_DATA_FIELD,
-                              dataInfo->GetCellDataInformation()))
-    {
-    this->FieldMenu->AddEntryWithCommand("Cell Data", this,
-                                         "SetValue 2");
-    cellFlag = 1;
-    }
-  if (! cellFlag && ! pointFlag)
-    {
-    vtkErrorMacro("No valid fields.");
-    this->FieldMenu->SetCurrentEntry("None");
-    }
-  if (! cellFlag)
-    {
-    this->FieldMenu->SetCurrentEntry("Point Data");
-    this->Value = vtkDataSet::POINT_DATA_FIELD;
-    }
-  else if (! pointFlag)
-    {
-    this->FieldMenu->SetCurrentEntry("Cell Data");
-    this->Value = vtkDataSet::CELL_DATA_FIELD;
-    }
-  else if (this->Value == vtkDataSet::POINT_DATA_FIELD)
-    {
-    this->FieldMenu->SetCurrentEntry("Point Data");
-    }
-  else
-    {
-    this->FieldMenu->SetCurrentEntry("Cell Data");
-    }
-
-  if (!this->PropertyInitialized)
-    {
-    this->Property->SetIndex(this->Value);
-    this->PropertyInitialized = 1;
-    }
-  
   // This updates any array menu dependent on this widget.
-  this->vtkPVWidget::Update();
+  this->Superclass::Update();
 }
 
 
@@ -419,25 +410,6 @@ int vtkPVFieldMenu::ReadXMLAttributes(vtkPVXMLElement* element,
   imw->Delete();
     
   return 1;
-}
-
-void vtkPVFieldMenu::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVIndexWidgetProperty::SafeDownCast(prop);
-  if (this->Property)
-    {
-    this->Property->SetVTKCommand("SetAttributeMode");
-    }
-}
-
-vtkPVWidgetProperty* vtkPVFieldMenu::GetProperty()
-{
-  return this->Property;
-}
-
-vtkPVWidgetProperty* vtkPVFieldMenu::CreateAppropriateProperty()
-{
-  return vtkPVIndexWidgetProperty::New();
 }
 
 //----------------------------------------------------------------------------

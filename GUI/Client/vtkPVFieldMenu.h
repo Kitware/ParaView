@@ -89,19 +89,10 @@ public:
   // Description:
   // Called when the accept or reset button is pressed.
   // This internal version is passed VTK source name,
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   virtual void ResetInternal();
   //ETX
 
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-  
   // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
@@ -126,15 +117,14 @@ protected:
   vtkKWOptionMenu* FieldMenu;
   vtkPVInputMenu* InputMenu;
 
+  void UpdateProperty();
+
   // Description:
   // The property filters the allowable values of this menu..
   vtkPVInputProperty* GetInputProperty();
 
   int Value;  
 
-  vtkPVIndexWidgetProperty *Property;
-  int PropertyInitialized;
-  
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
