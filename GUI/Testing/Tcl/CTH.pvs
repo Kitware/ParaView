@@ -36,11 +36,11 @@ $kw(vtkTemp989) SetVisibility 0
 $kw(vtkTemp19) SetCameraState 0.866 6.447 -14.321  -5.268 -8.670 19.261  0.986 -0.101 0.135
 $kw(vtkTemp19) SetCameraState 0.485 -3.504 15.369  -4.756 4.713 -20.671  0.935 -0.291 -0.202
 set kw(vtkTemp1011) [$kw(vtkTemp973) GetPVOutput]
-$kw(vtkTemp1011) ColorByCellField {Pressure} 1
-$kw(vtkTemp1011) ColorByCellField {Void Volume Fraction} 1
-$kw(vtkTemp1011) ColorByCellField {Mass for Armor Plate} 1
+$kw(vtkTemp1011) ColorByArray {Pressure} 4
+$kw(vtkTemp1011) ColorByArray {Void Volume Fraction} 4
+$kw(vtkTemp1011) ColorByArray {Mass for Armor Plate} 4
 $kw(vtkTemp19) SetCameraState 4.441 1.790 14.559  -10.076 -2.407 -19.581  0.896 -0.277 -0.347
-$kw(vtkTemp1011) ColorByCellField {Z Velocity} 1
+$kw(vtkTemp1011) ColorByArray {Z Velocity} 4
 
 
 # Retrace
@@ -48,11 +48,11 @@ update
 $Application StopRecordingScript
 [ $Application GetMainWindow ] DeleteAllSources
 # Source the trace to regenerate the sources.
-if {[catch {set channel [open test.tmp w]}] == 0 } {
-   close $channel
-   file delete -force test.tmp
-   source "[$Application GetTraceFileName]"
-}
+# if {[catch {set channel [open test.tmp w]}] == 0 } {
+#    close $channel
+#    file delete -force test.tmp
+#    source "[$Application GetTraceFileName]"
+# }
 
 source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc
