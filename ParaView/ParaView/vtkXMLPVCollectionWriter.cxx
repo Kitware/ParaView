@@ -58,7 +58,7 @@ int vtkXMLPVCollectionWriterMakeDirectory(const char* dirname)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVCollectionWriter);
-vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.6.2.2");
+vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.6.2.3");
 
 class vtkXMLPVCollectionWriterInternals
 {
@@ -411,6 +411,14 @@ void vtkXMLPVCollectionWriter::CreateWriters()
       w->SetEndPiece(this->Piece);
       w->SetNumberOfPieces(this->NumberOfPieces);
       w->SetGhostLevel(this->GhostLevel);
+      if(this->WriteCollectionFileInitialized)
+        {
+        w->SetWriteSummaryFile(this->WriteCollectionFile);
+        }
+      else
+        {
+        w->SetWriteSummaryFile((this->Piece == 0)? 1:0);
+        }
       }
     }
 }

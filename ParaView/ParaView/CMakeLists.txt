@@ -139,6 +139,7 @@ SET( ParaView_SRCS
   vtkPVSourcesNavigationWindow.cxx
   vtkPVSphereWidget.cxx
   vtkPVStringEntry.cxx
+  vtkPVSummaryHelper.cxx
   vtkPVThresholdFilter.cxx
   vtkPVTiledDisplayManager.cxx
   vtkPVTimerLogDisplay.cxx
