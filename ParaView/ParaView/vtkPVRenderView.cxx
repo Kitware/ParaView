@@ -118,7 +118,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.272");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.273");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1094,13 +1094,13 @@ void vtkPVRenderView::StandardViewCallback(float x, float y, float z)
   vtkCamera *cam = this->Renderer->GetActiveCamera();
   cam->SetFocalPoint(0.0, 0.0, 0.0);
   cam->SetPosition(x, y, z);
-  if (x == 0.0)
+  if (y == 0.0)
     {
-    cam->SetViewUp(1.0, 0.0, 0.0);
+    cam->SetViewUp(0.0, 1.0, 0.0);
     }
   else
     {
-    cam->SetViewUp(0.0, 1.0, 0.0);
+    cam->SetViewUp(1.0, 0.0, 0.0);
     }
 
   this->ResetCamera();
