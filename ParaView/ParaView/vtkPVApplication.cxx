@@ -60,7 +60,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWSplashScreen.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkLongArray.h"
 #include "vtkMapper.h"
@@ -100,7 +99,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.155");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
