@@ -196,6 +196,11 @@ public:
   const char* GetItemOption(const char *item, const char *option);
 
   // Description:
+  // Set the compound image of an entry
+  void SetItemCompoundImage(int position, const char *imagename);
+  void SetItemCompoundImage(const char *item, const char *imagename);
+
+  // Description:
   // Checks if an item is in the menu
   int HasItem(const char* item);
 

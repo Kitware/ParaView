@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.43");
+vtkCxxRevisionMacro(vtkKWMenu, "1.44");
 
 
 
@@ -955,6 +955,25 @@ const char* vtkKWMenu::GetItemOption(const char *item, const char *option)
 const char* vtkKWMenu::GetItemCommand(int idx)
 {
   return this->GetItemOption(idx, "-command");
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemCompoundImage(int idx, const char *imagename)
+{
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
+  if (!this->IsCreated() || idx < 0 || idx >= this->GetNumberOfItems())
+    {
+    return;
+    }
+  this->Script("%s entryconfigure %d -compound center -image %s -hidemargin 0", 
+               this->GetWidgetName(), idx, imagename);
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetItemCompoundImage(const char *item, const char *imagename)
+{
+  this->SetItemCompoundImage(this->GetIndex(item), imagename);
 }
 
 //----------------------------------------------------------------------------
