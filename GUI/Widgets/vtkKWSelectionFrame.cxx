@@ -26,7 +26,7 @@
 #include <vtkstd/list>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.27");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.28");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -370,7 +370,6 @@ void vtkKWSelectionFrame::UnBind()
 void vtkKWSelectionFrame::SetTitle(const char *title)
 {
   this->Title->SetLabel(title);
-  cout << this->GetTclName() << " : " << title << endl;
 }
 
 //----------------------------------------------------------------------------
