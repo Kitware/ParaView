@@ -102,13 +102,17 @@ vtkKWWindow::~vtkKWWindow()
   this->Notebook->Delete();
   this->SetPropertiesParent(NULL);
   this->SetSelectedView(NULL);
-  this->Views->Delete();
+  if (this->Views)
+    {
+    this->Views->Delete();
+    this->Views = NULL;
+    }
   this->Menu->Delete();
   this->MenuFile->Delete();
   this->MenuHelp->Delete();
   this->ToolbarFrame->Delete();
-  this->MiddleFrame->Delete();
   this->ViewFrame->Delete();
+  this->MiddleFrame->Delete();
   this->StatusFrame->Delete();
   this->StatusImage->Delete();
   this->StatusLabel->Delete();
@@ -737,5 +741,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.16 $");
+  this->ExtractRevision(os,"$Revision: 1.17 $");
 }
