@@ -28,8 +28,7 @@ set kw(vtkTemp266) [$kw(vtkTemp257) GetPVWidget {Filename}]
 $kw(vtkTemp266) SetValue "$DataDir/Data/RectGrid2.vtk"
 
 # Choose the file name/type based on whether we are in parallel mode.
-set kw(vtkTemp1000) [$Application GetController]
-set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
+set nprocs [$Application GetNumberOfPartitions]
 
 set ext "vtr"
 if {$nprocs > 1} { set ext "pvtr" }
@@ -62,8 +61,8 @@ $kw(vtkTemp319) AcceptCallback
 [$kw(vtkTemp319) GetPVOutput] SetColorRange 0 10
 
 # Fix the size of the image.
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 

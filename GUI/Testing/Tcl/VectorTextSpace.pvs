@@ -51,13 +51,10 @@ set pv(vtkTemp176) [$pv(vtkTemp167) GetPVWidget {Input}]
 # This might be more general.
 # out.txt is a special name
 if { [catch {set fp [open "out.txt" w]}] == 0 } {
-  set pvSources [$pv(vtkTemp176) GetSources]
-  $pvSources InitTraversal
-  set pvs [$pvSources GetNextItemAsObject]
-  while { $pvs != {} } {
+  for { set i 0 } { $i < [ $pv(vtkTemp176) GetNumberOfSources ] } { incr i } {
+    set pvs [$pv(vtkTemp176) GetSource $i]
     set pvsName [$pvs GetName]
     puts $fp $pvsName
-    set pvs [$pvSources GetNextItemAsObject]
   }
   close $fp
 
@@ -76,8 +73,8 @@ $pv(vtkTemp176) SetCurrentValue $pv(vtkTemp234)
 $pv(vtkTemp167) AcceptCallback
 
 # Fix the size of the image.
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 

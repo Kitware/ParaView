@@ -22,8 +22,7 @@ $kw(vtkTemp1) SetUseMessageDialog 0
 set pvWindow $kw(vtkTemp1)
 
 # Choose the file name/type based on whether we are in parallel mode.
-set kw(vtkTemp1000) [$Application GetController]
-set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
+set nprocs [$Application GetNumberOfPartitions]
 
 set ext "vtk"
 if {$nprocs > 1} { set ext "pvtp" }
@@ -37,8 +36,8 @@ if { [catch {
   
   # Barrier after write.  We don't want to delete files before they
   # are written.
-  [$Application GetProcessModule] SendStringToClientAndServer {
-    Invoke id(1) GetController
+  $Application SendStringToClientAndServer {
+    Invoke id(2) GetController
     Invoke result() Barrier
   }
 

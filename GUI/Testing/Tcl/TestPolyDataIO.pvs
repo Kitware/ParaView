@@ -38,8 +38,7 @@ $kw(vtkTemp999) SetPoint2 0 0 1
 $kw(vtkTemp295) AcceptCallback
 
 # Choose the file name/type based on whether we are in parallel mode.
-set kw(vtkTemp1000) [$Application GetController]
-set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
+set nprocs [$Application GetNumberOfPartitions]
 
 set ext "vtp"
 if {$nprocs > 1} { set ext "pvtp" }
@@ -58,8 +57,8 @@ $kw(vtkTemp337) AcceptCallback
 update
 
 # Fix the size of the image.
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 

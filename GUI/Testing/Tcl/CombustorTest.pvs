@@ -83,8 +83,8 @@ if {[$Application GetExitStatus]} {
 $VOIEntry SetValue 0 56 0 32 0 0 
 $pvExtract AcceptCallback
 
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 
 [$pvExtract GetPVOutput] SetVisibility 0
 
@@ -101,13 +101,8 @@ $pvGlyph AcceptCallback
 
 set cntOutput [$cInt GetPVOutput]
 
-set Ren1 [[[$Application GetMainWindow] GetMainView] GetRenderer]
-set camera [$Ren1 GetActiveCamera]
-$camera SetPosition -29.1076 -40.3242 38.8874
-$camera SetFocalPoint 8.255 0 29.7631
-$camera SetViewUp -0.00809309 0.227813 0.973671
-$camera SetViewAngle 30
-$camera SetClippingRange 34.7159 82.3051
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetCameraState -29.1076 -40.3242 38.8874 8.255 0 29.7631 -0.00809309 0.227813 0.973671
 
 # Vary isosuface
 $cntOutput SetVisibility 1
@@ -130,11 +125,11 @@ $cntOutput ColorByPointField Momentum 3
 $cntOutput SetScalarBarVisibility 1
 $cInt UpdateParameterWidgets
 
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 
 for {set i 0} {$i < 1} {incr i 1} {
-    $camera Azimuth 10
+    [ $MainView GetCameraControl ] Azimuth 10
     [[$Application GetMainWindow] GetMainView] Render
     update
 }
@@ -144,11 +139,7 @@ $cntOutput SetScalarBarVisibility 0
 
 # Here goes cut-plane (see end of this file)
 
-$camera SetPosition -28.8139 1.07506 33.8794
-$camera SetFocalPoint 26.5733 -0.117269 27.8723
-$camera SetViewUp 0.10793 0.00506272 0.994146
-$camera SetViewAngle 30
-$camera SetClippingRange 18.5955 61.8423
+$MainView SetCameraState -28.8139 1.07506 33.8794 26.5733 -0.117269 27.8723 0.10793 0.00506272 0.994146
 
 $VOIEntry SetValue 0 56 0 32 0 0 
 $pvExtract AcceptCallback
@@ -158,11 +149,7 @@ $pvExtract AcceptCallback
 [$pvGlyph GetPVOutput] SetVisibility 1
 [$pvGlyph GetPVOutput] ColorByProperty
 
-$camera SetPosition 36.8437 -0.196199 53.7392
-$camera SetFocalPoint -5.92921 -0.324064 18.022
-$camera SetViewUp -0.639592 -0.0625532 0.766165
-$camera SetViewAngle 30
-$camera SetClippingRange 15.0904 64.6074
+$MainView SetCameraState 36.8437 -0.196199 53.7392 -5.92921 -0.324064 18.022 -0.639592 -0.0625532 0.766165
 
 $VOIEntry SetValue 0 0 0 32 3 20
 $pvExtract AcceptCallback
