@@ -40,3 +40,8 @@ IF (CXX_TEST_PATH)
     ENDFOREACH (file)
   ENDFOREACH(config)
 ENDIF (CXX_TEST_PATH)
+
+FOREACH(file ${files})
+  GET_FILENAME_COMPONENT(dest ${file} PATH)
+  INSTALL_FILES(${KW_INSTALL_LIB_DIR}/TclTk/${dest} FILES ${file})
+ENDFOREACH(file)

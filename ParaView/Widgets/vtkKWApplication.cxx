@@ -86,7 +86,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.145");
+vtkCxxRevisionMacro(vtkKWApplication, "1.146");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -571,18 +571,30 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
     {
     char directory[1024], buffer[1024];
+    const char* dir = 0;
     vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
-    util->GetFilenamePath(nameofexec, directory);
-    strcpy(directory, util->ConvertToUnixSlashes(directory));
-    util->Delete();
+    dir = util->GetFilenamePath(nameofexec, directory);
+    sprintf(buffer, "%s/..%s/TclTk", dir, KW_INSTALL_LIB_DIR);
+    if (vtkKWDirectoryUtilities::FileExists(buffer) )
+      {
+      // Installed KW application
+      dir = util->CollapseDirectory(buffer);
+      sprintf(tcl_library, "%s/lib/tcl%s", dir, TCL_VERSION);
+      sprintf(tk_library, "%s/lib/tk%s", dir, TK_VERSION);
+      }
+    else
+      {
+      // Build tree or windows
+      strcpy(directory, util->ConvertToUnixSlashes(directory));
+      util->Delete();
 
-    sprintf(tcl_library, "%s/TclTk/lib/tcl%s", directory, TCL_VERSION);
-    sprintf(tk_library, "%s/TclTk/lib/tk%s", directory, TK_VERSION);
+      sprintf(tcl_library, "%s/TclTk/lib/tcl%s", directory, TCL_VERSION);
+      sprintf(tk_library, "%s/TclTk/lib/tk%s", directory, TK_VERSION);
+      }
 
     // At this point this is useless, since the call to Tcl_FindExecutable
     // already used the contents of the env variable. Anyway, let's just
     // set them to comply with the path that we are about to set
-
     sprintf(buffer, "TCL_LIBRARY=%s", tcl_library);
     putenv(buffer);
     sprintf(buffer, "TK_LIBRARY=%s", tk_library);
