@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.14");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.15");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -231,35 +231,41 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app,
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetValue(float arg)
+void vtkKWThumbWheel::SetValue(double arg)
 {
+  if (this->ClampMinimumValue && arg < this->MinimumValue)
+    {
+    arg = this->MinimumValue;
+    }
+  if (this->ClampMaximumValue && arg > this->MaximumValue)
+    {
+    arg = this->MaximumValue;
+    }
+
   if (this->Value == arg)
     {
     return;
     }
 
   this->Value = arg;
-  if (this->ClampMinimumValue && this->Value < this->MinimumValue)
-    {
-    this->Value = this->MinimumValue;
-    }
-  if (this->ClampMaximumValue && this->Value > this->MaximumValue)
-    {
-    this->Value = this->MaximumValue;
-    }
-
   this->Modified();
 
-  if (this->Entry && this->Entry->IsCreated())
-    {
-    this->Entry->SetValue(this->Value);
-    }
+  this->RefreshValue();
   
   this->InvokeCommand();
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetResolution(float arg)
+void vtkKWThumbWheel::RefreshValue()
+{
+  if (this->Entry && this->Entry->IsCreated())
+    {
+    this->Entry->SetValue(this->Value);
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWThumbWheel::SetResolution(double arg)
 {
   if (this->Resolution == arg)
     {
@@ -268,11 +274,6 @@ void vtkKWThumbWheel::SetResolution(float arg)
 
   this->Resolution = arg;
   this->Modified();
-
-  if (this->Entry && this->Entry->IsCreated())
-    {
-    this->Entry->SetValue(this->Value);
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -376,7 +377,7 @@ void vtkKWThumbWheel::ResizeThumbWheelCallback()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetSizeOfNotches(float arg)
+void vtkKWThumbWheel::SetSizeOfNotches(double arg)
 {
   if (this->SizeOfNotches == arg)
     {
@@ -840,8 +841,8 @@ void vtkKWThumbWheel::WithdrawPopupCallback()
 // ---------------------------------------------------------------------------
 void vtkKWThumbWheel::EntryCallback()
 {
-  float value = this->Entry->GetValueAsFloat();
-  float old_value = this->GetValue();
+  double value = this->Entry->GetValueAsFloat();
+  double old_value = this->GetValue();
   this->SetValue(value);
 
   if (value != old_value)
@@ -854,7 +855,7 @@ void vtkKWThumbWheel::EntryCallback()
 // Return normalized mouse position relative to the thumbwheel.
 // i.e. if the mouse is "inside" the thumbwheel, the range is [0.0, 1.0]
 // (< 0.0 if position < lower limit , > 1.0 if position > upper limit)
-float vtkKWThumbWheel::GetMousePositionInThumbWheel()
+double vtkKWThumbWheel::GetMousePositionInThumbWheel()
 {
   this->Script("concat [winfo pointerx %s] [winfo rootx %s]",
                this->GetWidgetName(), this->ThumbWheel->GetWidgetName());
@@ -862,8 +863,8 @@ float vtkKWThumbWheel::GetMousePositionInThumbWheel()
   int x, tx;
   sscanf(this->Application->GetMainInterp()->result, "%d %d", &x, &tx);
 
-  return (float)(x - tx - VTK_KW_TW_BORDER_SIZE) / 
-    (float)(this->ThumbWheelWidth - 1);
+  return (double)(x - tx - VTK_KW_TW_BORDER_SIZE) / 
+    (double)(this->ThumbWheelWidth - 1);
 }
 
 // ---------------------------------------------------------------------------
@@ -908,10 +909,10 @@ void vtkKWThumbWheel::PerformLinearMotionCallback()
   // pos: mouse position relative to the wheel range [0.0, 1.0]
   // distance: distance between current pos and starting pos
 
-  float pos = this->GetMousePositionInThumbWheel();
-  float distance = pos - this->StartLinearMotionState.MousePosition;
+  double pos = this->GetMousePositionInThumbWheel();
+  double distance = pos - this->StartLinearMotionState.MousePosition;
 
-  float new_value = 
+  double new_value = 
     this->StartLinearMotionState.Value + 
     (distance / this->LinearThreshold) * this->Resolution;
 
@@ -923,7 +924,7 @@ void vtkKWThumbWheel::PerformLinearMotionCallback()
 
   // If the resolution implies an integer, round the value
 
-  if ((float)((int)this->Resolution) == this->Resolution)
+  if ((double)((int)this->Resolution) == this->Resolution)
     {
     this->SetValue((int)(new_value));
     }
@@ -977,7 +978,7 @@ void vtkKWThumbWheel::PerformNonLinearMotionCallback()
   // angle: angle corresponding  to that xn
   // yn:    sin(angle), i.e. [0.0, 1.0]
 
-  float pos = this->GetMousePositionInThumbWheel();
+  double pos = this->GetMousePositionInThumbWheel();
   if (pos < 0.0)
     {
     pos = 0.0;
@@ -986,29 +987,29 @@ void vtkKWThumbWheel::PerformNonLinearMotionCallback()
     {
     pos = 1.0;
     }
-  float xn = pos * 2.0 - 1.0;
+  double xn = pos * 2.0 - 1.0;
   double yn = sin(acos(xn));
-  float direction = (xn < 0.0 ? -1.0 : 1.0);
+  double direction = (xn < 0.0 ? -1.0 : 1.0);
 
   // Compute the non-linear increment corresponding to that position, and
   // add it to the increment buffer which will be added to the value (can
   // not update value directly since it can be rounded/clamped by SetValue)
 
-  float inc = 
+  double inc = 
     ((1.0 - yn) * (this->NonLinearMaximumMultiplier - 0.0) + 0.0) * this->Resolution;
   this->StartNonLinearMotionState.Increment += inc * direction;
-  float new_value = this->StartNonLinearMotionState.Value + 
+  double new_value = this->StartNonLinearMotionState.Value + 
     this->StartNonLinearMotionState.Increment;
 
   // Update thumbwheel aspect (accelerates depending on the position)
 
-  float shift = (0.0704321 + (1.0 - yn) * 0.00543) * direction;
+  double shift = (0.0704321 + (1.0 - yn) * 0.00543) * direction;
   this->ThumbWheelShift += shift;
   this->UpdateThumbWheelImage(pos);
 
   // If the resolution implies an integer, round the value
 
-  if ((float)((int)this->Resolution) == this->Resolution)
+  if ((double)((int)this->Resolution) == this->Resolution)
     {
     this->SetValue((int)(new_value));
     }
@@ -1282,16 +1283,16 @@ void vtkKWThumbWheel::UpdateEnableState()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::UpdateThumbWheelImage(float pos)
+void vtkKWThumbWheel::UpdateThumbWheelImage(double pos)
 {
   // Show position indicator ? Compute range
 
   int posx_start = 0, posx_end = 0;
-  float indicator_hsv[3];
+  double indicator_hsv[3];
   if (this->DisplayThumbWheelPositionIndicator && 
       this->State == vtkKWThumbWheel::InMotion)
     {
-    int posx = (int)(pos * (float)(this->ThumbWheelWidth - 1));
+    int posx = (int)(pos * (double)(this->ThumbWheelWidth - 1));
     posx_start = posx - (int)floor((double)(VTK_KW_TW_INDICATOR_SIZE - 1) * 0.5);
     posx_end = posx + (int)floor((double)(VTK_KW_TW_INDICATOR_SIZE) * 0.5);
     if (posx_start < 0)
@@ -1399,21 +1400,21 @@ void vtkKWThumbWheel::UpdateThumbWheelImage(float pos)
         this->State == vtkKWThumbWheel::InMotion &&
         x >= posx_start && x <= posx_end)
       {
-      float r, g, b;
+      double r, g, b;
 
-      vtkMath::HSVToRGB(indicator_hsv[0], indicator_hsv[1], (float)gray / 255.0,
+      vtkMath::HSVToRGB(indicator_hsv[0], indicator_hsv[1], (double)gray / 255.0,
                         &r, &g, &b);
       *img_ptr++ = (int)(r * 255.0);
       *img_ptr++ = (int)(g * 255.0);
       *img_ptr++ = (int)(b * 255.0);
 
-      vtkMath::HSVToRGB(indicator_hsv[0], indicator_hsv[1], (float)gray_s0/255.0,
+      vtkMath::HSVToRGB(indicator_hsv[0], indicator_hsv[1], (double)gray_s0/255.0,
                         &r, &g, &b);
       *img_ptr_s0++ = (int)(r * 255.0);
       *img_ptr_s0++ = (int)(g * 255.0);
       *img_ptr_s0++ = (int)(b * 255.0);
 
-      vtkMath::HSVToRGB(indicator_hsv[0], indicator_hsv[1], (float)gray_s1/255.0,
+      vtkMath::HSVToRGB(indicator_hsv[0], indicator_hsv[1], (double)gray_s1/255.0,
                         &r, &g, &b);
       *img_ptr_s1++ = (int)(r * 255.0);
       *img_ptr_s1++ = (int)(g * 255.0);
