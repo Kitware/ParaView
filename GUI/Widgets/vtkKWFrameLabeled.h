@@ -45,7 +45,7 @@ public:
 
   // Description:
   // Set the label for the frame.
-  void SetLabel(const char *);
+  void SetLabelText(const char *);
   
   // Description:
   // Ask the frame to readjust its tops margin according to the content of
@@ -83,7 +83,7 @@ public:
 
   // Description:
   // Globally override the case of the label to ensure GUI consistency.
-  // This will change the label when SetLabel() is called.
+  // This will change the label when SetLabelText() is called.
   static void SetLabelCase(int v);
   static int GetLabelCase();
   static void SetLabelCaseToUserSpecified() 

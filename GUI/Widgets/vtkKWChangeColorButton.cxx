@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.48");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.49");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -45,7 +45,7 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
   
   this->ButtonDown = 0;
 
-  this->SetLabel("Set Color...");
+  this->GetLabel()->SetText("Set Color...");
 }
 
 //----------------------------------------------------------------------------
@@ -509,7 +509,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.48 $");
+  this->ExtractRevision(os,"$Revision: 1.49 $");
 }
 
 //----------------------------------------------------------------------------

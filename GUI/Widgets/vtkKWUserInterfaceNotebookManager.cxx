@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.28");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.29");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -619,7 +619,7 @@ char* vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLabel(
       }
     if (frame)
       {
-      return frame->GetLabel()->GetLabel();
+      return frame->GetLabel()->GetText();
       }
     }
 

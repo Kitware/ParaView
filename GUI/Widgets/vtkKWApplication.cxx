@@ -60,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.186");
+vtkCxxRevisionMacro(vtkKWApplication, "1.187");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -911,7 +911,7 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
     }
 
   // make sure it is really pending
-  this->BalloonHelpLabel->SetLabel(widget->GetBalloonHelpString());
+  this->BalloonHelpLabel->SetText(widget->GetBalloonHelpString());
 
   // Get the position of the mouse in the renderer.
   this->Script( "winfo pointerx %s", widget->GetWidgetName());

@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.6");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.7");
 
 int vtkKWLoadSaveButtonCommand(ClientData cd, Tcl_Interp *interp,
                                int argc, char *argv[]);
@@ -87,9 +87,9 @@ void vtkKWLoadSaveButton::Create(vtkKWApplication *app, const char *args)
 
   // No filename yet, set it to empty
 
-  if (!this->GetLabel())
+  if (!this->GetText())
     {
-    this->SetLabel("");
+    this->SetText("");
     }
 
   // Create the load/save dialog
@@ -156,13 +156,13 @@ void vtkKWLoadSaveButton::UpdateFileName()
   const char *fname = this->GetFileName();
   if (!fname || !*fname)
     {
-    this->SetLabel(NULL);
+    this->SetText(NULL);
     return;
     }
 
   if (this->MaximumFileNameLength <= 0 && !this->TrimPathFromFileName)
     {
-    this->SetLabel(fname);
+    this->SetText(fname);
     }
   else
     {
@@ -177,7 +177,7 @@ void vtkKWLoadSaveButton::UpdateFileName()
       }
     new_fname = 
       kwsys::SystemTools::CropString(new_fname, this->MaximumFileNameLength);
-    this->SetLabel(new_fname.c_str());
+    this->SetText(new_fname.c_str());
     }
 } 
 

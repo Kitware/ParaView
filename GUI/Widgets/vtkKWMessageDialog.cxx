@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.66");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.67");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -123,7 +123,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   this->Label->Create(app,NULL);
   if ( this->DialogText )
     {
-    this->Label->SetLabel(this->DialogText);
+    this->Label->SetText(this->DialogText);
     }
 
   this->Script("pack %s -side top -fill x -padx 20 -pady 5",
@@ -276,7 +276,7 @@ void vtkKWMessageDialog::SetText(const char *txt)
   this->SetDialogText(txt);
   if (this->Label)
     {
-    this->Label->SetLabel(this->DialogText);
+    this->Label->SetText(this->DialogText);
     }
 }
 

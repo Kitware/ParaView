@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.29");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.30");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
@@ -198,7 +198,7 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
 
   this->Title->SetParent(this->TitleBar);
   this->Title->Create(app, "-justify left -anchor w");
-  this->Title->SetLabel("<Click to Select>");
+  this->Title->SetText("<Click to Select>");
   
   // The subframe on the right
 
@@ -370,13 +370,13 @@ void vtkKWSelectionFrame::UnBind()
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetTitle(const char *title)
 {
-  this->Title->SetLabel(title);
+  this->Title->SetText(title);
 }
 
 //----------------------------------------------------------------------------
 const char* vtkKWSelectionFrame::GetTitle()
 {
-  return this->Title->GetLabel();
+  return this->Title->GetText();
 }
 
 //----------------------------------------------------------------------------

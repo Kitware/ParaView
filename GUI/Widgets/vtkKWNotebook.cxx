@@ -59,7 +59,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.64");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.65");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -737,7 +737,7 @@ int vtkKWNotebook::AddPage(const char *title,
   page->Label = vtkKWLabel::New();
   page->Label->SetParent(page->TabFrame);
   page->Label->Create(this->GetApplication(), "-highlightthickness 0");
-  page->Label->SetLabel(page->Title);
+  page->Label->SetText(page->Title);
   if (balloon)
     {
     page->Label->SetBalloonHelpString(balloon);

@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.4");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
@@ -266,8 +266,8 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
     
     this->PopupButton->SetParent(this);
     this->PopupButton->Create(app, 0);
-    this->PopupButton->SetLabel("Edit material:");
-    this->PopupButton->GetWidget()->SetLabel("");
+    this->PopupButton->GetLabel()->SetText("Edit material:");
+    this->PopupButton->GetWidget()->SetText("");
     this->PopupButton->GetWidget()->SetPopupTitle("Material Properties");
 
     this->Script("pack %s -side left -anchor w -fill x",
@@ -289,7 +289,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
     this->MaterialPropertiesFrame->SetParent(this);
     }
   this->MaterialPropertiesFrame->Create(app, 0);
-  this->MaterialPropertiesFrame->SetLabel("Material Properties");
+  this->MaterialPropertiesFrame->SetLabelText("Material Properties");
 
   this->Script("pack %s -padx 0 -pady 0 -fill x -expand yes -anchor w",
                this->MaterialPropertiesFrame->GetWidgetName());
@@ -408,7 +408,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
   this->PreviewLabel->SetLabelPositionToTop();
   this->PreviewLabel->ExpandWidgetOff();
   this->PreviewLabel->Create(app, "");
-  this->PreviewLabel->SetLabel("Preview:");
+  this->PreviewLabel->GetLabel()->SetText("Preview:");
   
   this->Script("pack %s -side left -padx 2 -pady 2 -anchor nw",
                this->PreviewLabel->GetWidgetName());
@@ -418,7 +418,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
 
   this->PresetPushButtonSet->SetParent(this->PresetsFrame);
   this->PresetPushButtonSet->SetLabelPositionToTop();
-  this->PresetPushButtonSet->SetLabel("Presets:");
+  this->PresetPushButtonSet->GetLabel()->SetText("Presets:");
   this->PresetPushButtonSet->Create(app);
   this->PresetPushButtonSet->ExpandWidgetOff();
 

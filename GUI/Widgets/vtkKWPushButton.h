@@ -34,13 +34,13 @@ public:
 
   // Description:
   // Convenience method to set the contents label.
-  virtual void SetLabel(const char *label);
-  virtual char *GetLabel();
+  virtual void SetText(const char *label);
+  virtual char *GetText();
 
   // Description:
-  // Convenience method to set/get the label width.
-  virtual void SetLabelWidth(int width);
-  virtual int GetLabelWidth();
+  // Convenience method to set/get the text width (in chars).
+  virtual void SetWidth(int width);
+  virtual int GetWidth();
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -55,8 +55,8 @@ protected:
   vtkKWPushButton();
   ~vtkKWPushButton();
 
-  vtkSetStringMacro(ButtonLabel);
-  char* ButtonLabel;
+  vtkSetStringMacro(ButtonText);
+  char* ButtonText;
 
 private:
   vtkKWPushButton(const vtkKWPushButton&); // Not implemented

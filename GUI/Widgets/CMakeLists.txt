@@ -100,11 +100,13 @@ SET( KWWidgets_SRCS
   )
 
 # The "set of widgets" are automatically generated from some core widgets
-# (i.e., CheckButton => vtkKWCheckButtonSet)
+# (i.e., CheckButton => vtkKWCheckButtonSet).
+# If you modify this list, please update the README.txt file accordingly.
 
 FOREACH (WidgetType 
     CheckButton 
     Entry
+    Label
     LabelLabeled
     PushButton
     RadioButton
@@ -123,6 +125,7 @@ ENDFOREACH (WidgetType)
 
 # The "labeled widgets" are automatically generated from some core widgets
 # (i.e., CheckButton => vtkKWCheckButtonLabeled)
+# If you modify this list, please update the README.txt file accordingly.
 
 FOREACH (WidgetType 
     CheckButton 

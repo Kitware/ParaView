@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.15");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.16");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -114,7 +114,7 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
 
   this->PopupCloseButton->SetParent(PopupTopLevel);
   this->PopupCloseButton->Create(app, 0);
-  this->PopupCloseButton->SetLabel("Close");
+  this->PopupCloseButton->SetText("Close");
 
   tk_cmd << "pack " << this->PopupCloseButton->GetWidgetName() 
          << " -side top -expand false -fill x -pady 2" << endl;

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.85");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.86");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -192,13 +192,13 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
 
   if (this->PopupMode)
     {
-    this->PopupButton->SetLabel("Edit...");
+    this->PopupButton->SetText("Edit...");
     }
 
   // --------------------------------------------------------------
   // Edit the labeled frame
 
-  this->Frame->SetLabel("Corner annotation");
+  this->Frame->SetLabelText("Corner annotation");
 
   // --------------------------------------------------------------
   // Edit the check button (Annotation visibility)
@@ -235,10 +235,10 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
       text->GetTextWidget()->GetWidgetName(), this->GetTclName(), i);
     }
 
-  this->CornerText[0]->SetLabel("Lower left:");
-  this->CornerText[1]->SetLabel("Lower right:");
-  this->CornerText[2]->SetLabel("Upper left:");
-  this->CornerText[3]->SetLabel("Upper right:");
+  this->CornerText[0]->GetLabel()->SetText("Lower left:");
+  this->CornerText[1]->GetLabel()->SetText("Lower right:");
+  this->CornerText[2]->GetLabel()->SetText("Upper left:");
+  this->CornerText[3]->GetLabel()->SetText("Upper right:");
 
   this->CornerText[0]->SetBalloonHelpString(
     "Set the lower left corner annotation. The text will automatically scale "
@@ -322,8 +322,8 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
       }
     this->TextPropertyPopupButton->SetParent(this->PropertiesFrame);
     this->TextPropertyPopupButton->Create(app);
-    this->TextPropertyPopupButton->SetLabel("Text properties:");
-    this->TextPropertyPopupButton->GetWidget()->SetLabel("Edit...");
+    this->TextPropertyPopupButton->GetLabel()->SetText("Text properties:");
+    this->TextPropertyPopupButton->GetWidget()->SetText("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
                  this->TextPropertyPopupButton->GetWidget()
                  ->GetPopupFrame()->GetWidgetName());
@@ -346,7 +346,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->TextPropertyWidget->LabelOnTopOn();
   this->TextPropertyWidget->ShowLabelOn();
   this->TextPropertyWidget->Create(app);
-  this->TextPropertyWidget->GetLabel()->SetLabel("Text properties:");
+  this->TextPropertyWidget->GetLabel()->SetText("Text properties:");
   this->TextPropertyWidget->SetTraceReferenceObject(this);
   this->TextPropertyWidget->SetTraceReferenceCommand("GetTextPropertyWidget");
   this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");

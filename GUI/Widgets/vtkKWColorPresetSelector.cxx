@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.4");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.5");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -607,9 +607,9 @@ void vtkKWColorPresetSelector::Create(vtkKWApplication *app,
 
   this->Superclass::Create(app, args);
 
-  if (!this->HasLabel() || !this->GetLabel()->GetLabel())
+  if (!this->HasLabel() || !this->GetLabel()->GetText())
     {
-    this->SetLabel("Color Presets:");
+    this->GetLabel()->SetText("Color Presets:");
     }
   this->SetBalloonHelpString(
     "Preset transfer functions for mapping scalar value to color. Select a "

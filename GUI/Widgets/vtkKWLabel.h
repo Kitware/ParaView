@@ -14,7 +14,7 @@
 // .NAME vtkKWLabel - label widget
 // .SECTION Description
 // A simple widget that represents a label. The label can be set with 
-// the SetLabel method.
+// the SetText method.
 
 #ifndef __vtkKWLabel_h
 #define __vtkKWLabel_h
@@ -35,8 +35,8 @@ public:
   
   // Description:
   // Set the text on the label.
-  virtual void SetLabel(const char*);
-  vtkGetStringMacro(Label);
+  virtual void SetText(const char*);
+  vtkGetStringMacro(Text);
 
   // Description:
   // Set the way label treats long text. 
@@ -82,7 +82,7 @@ protected:
   virtual void UpdateText();
 
 private:
-  char* Label;
+  char* Text;
   int LineType;
   int Width;
   int AdjustWrapLengthToWidth;

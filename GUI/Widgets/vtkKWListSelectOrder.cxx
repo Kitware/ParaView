@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListSelectOrder );
-vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.12");
+vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWListSelectOrder::vtkKWListSelectOrder()
@@ -85,22 +85,22 @@ void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
 
   this->AddButton->SetParent(frame->GetFrame());
   this->AddButton->Create(app,0);
-  this->AddButton->SetLabel("Add");
+  this->AddButton->SetText("Add");
   this->AddButton->SetCommand(this, "AddCallback");
 
   this->AddAllButton->SetParent(frame->GetFrame());
   this->AddAllButton->Create(app,0);
-  this->AddAllButton->SetLabel("Add All");
+  this->AddAllButton->SetText("Add All");
   this->AddAllButton->SetCommand(this, "AddAllCallback");
 
   this->RemoveButton->SetParent(frame->GetFrame());
   this->RemoveButton->Create(app,0);
-  this->RemoveButton->SetLabel("Remove");
+  this->RemoveButton->SetText("Remove");
   this->RemoveButton->SetCommand(this, "RemoveCallback");
 
   this->RemoveAllButton->SetParent(frame->GetFrame());
   this->RemoveAllButton->Create(app,0);
-  this->RemoveAllButton->SetLabel("RemoveAll");
+  this->RemoveAllButton->SetText("RemoveAll");
   this->RemoveAllButton->SetCommand(this, "RemoveAllCallback");
 
   this->Script("pack %s %s %s %s -side top -fill x",
@@ -130,12 +130,12 @@ void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
 
   this->UpButton->SetParent(btframe->GetFrame());
   this->UpButton->Create(app, 0);
-  this->UpButton->SetLabel("Up");
+  this->UpButton->SetText("Up");
   this->UpButton->SetCommand(this, "UpCallback");
 
   this->DownButton->SetParent(btframe->GetFrame());
   this->DownButton->Create(app, 0);
-  this->DownButton->SetLabel("Down");
+  this->DownButton->SetText("Down");
   this->DownButton->SetCommand(this, "DownCallback");
 
   this->Script("pack %s %s -side left -fill x",

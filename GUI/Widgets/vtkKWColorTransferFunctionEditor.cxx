@@ -30,7 +30,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.22");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.23");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -436,22 +436,22 @@ void vtkKWColorTransferFunctionEditor::UpdatePointEntriesLabel()
     {
     for (int i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
-      this->ValueEntries[i]->SetLabel("");
+      this->ValueEntries[i]->GetLabel()->SetText("");
       }
     return;
     }
 
   if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_HSV)
     {
-    this->ValueEntries[0]->SetLabel("H:");
-    this->ValueEntries[1]->SetLabel("S:");
-    this->ValueEntries[2]->SetLabel("V:");
+    this->ValueEntries[0]->GetLabel()->SetText("H:");
+    this->ValueEntries[1]->GetLabel()->SetText("S:");
+    this->ValueEntries[2]->GetLabel()->SetText("V:");
     }
   else if (this->ColorTransferFunction->GetColorSpace() == VTK_CTF_RGB)
     {
-    this->ValueEntries[0]->SetLabel("R:");
-    this->ValueEntries[1]->SetLabel("G:");
-    this->ValueEntries[2]->SetLabel("B:");
+    this->ValueEntries[0]->GetLabel()->SetText("R:");
+    this->ValueEntries[1]->GetLabel()->SetText("G:");
+    this->ValueEntries[2]->GetLabel()->SetText("B:");
     }
 }
 

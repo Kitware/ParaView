@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.1");
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.2");
 
 int vtkKWFrameLabeledCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -85,7 +85,7 @@ vtkKWLabel* vtkKWFrameLabeled::GetLabelIcon()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFrameLabeled::SetLabel(const char *text)
+void vtkKWFrameLabeled::SetLabelText(const char *text)
 {
   if (!text)
     {
@@ -94,7 +94,7 @@ void vtkKWFrameLabeled::SetLabel(const char *text)
 
   if (vtkKWFrameLabeled::LabelCase == VTK_KW_LABEL_CASE_USER_SPECIFIED)
     {
-    this->GetLabel()->SetLabel(text);
+    this->GetLabel()->SetText(text);
     }
   else
     {
@@ -108,7 +108,7 @@ void vtkKWFrameLabeled::SetLabel(const char *text)
         res = kwsys::SystemTools::UnCapitalizedWords(text);
         break;
       }
-    this->GetLabel()->SetLabel(res.c_str());
+    this->GetLabel()->SetText(res.c_str());
     }
 }
 

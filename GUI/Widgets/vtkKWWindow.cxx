@@ -43,7 +43,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.213");
+vtkCxxRevisionMacro(vtkKWWindow, "1.214");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -699,13 +699,13 @@ void vtkKWWindow::DisplayAbout()
 //----------------------------------------------------------------------------
 void vtkKWWindow::SetStatusText(const char *text)
 {
-  this->StatusLabel->SetLabel(text);
+  this->StatusLabel->SetText(text);
 }
 
 //----------------------------------------------------------------------------
 const char *vtkKWWindow::GetStatusText()
 {
-  return this->StatusLabel->GetLabel();
+  return this->StatusLabel->GetText();
 }
 
 //----------------------------------------------------------------------------

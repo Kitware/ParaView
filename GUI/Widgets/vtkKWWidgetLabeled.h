@@ -61,7 +61,7 @@ public:
   // Convenience method to set the contents label.
   // IMPORTANT: this method will create the label on the fly, use it only if
   // you are confident that you will indeed display the label.
-  virtual void SetLabel(const char *);
+  virtual void SetLabelText(const char *);
   
   // Description:
   // Convenience method to set/get the label width.

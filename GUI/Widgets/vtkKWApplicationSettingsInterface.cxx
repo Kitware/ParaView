@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.25");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.26");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -197,7 +197,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->InterfaceSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->InterfaceSettingsFrame->ShowHideFrameOn();
   this->InterfaceSettingsFrame->Create(app, 0);
-  this->InterfaceSettingsFrame->SetLabel("Interface Settings");
+  this->InterfaceSettingsFrame->SetLabelText("Interface Settings");
     
   tk_cmd << "pack " << this->InterfaceSettingsFrame->GetWidgetName()
          << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 " 
@@ -314,7 +314,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->InterfaceCustomizationFrame->SetParent(this->GetPagesParentWidget());
   this->InterfaceCustomizationFrame->ShowHideFrameOn();
   this->InterfaceCustomizationFrame->Create(app, 0);
-  this->InterfaceCustomizationFrame->SetLabel("Interface Customization");
+  this->InterfaceCustomizationFrame->SetLabelText("Interface Customization");
     
   tk_cmd << "pack " << this->InterfaceCustomizationFrame->GetWidgetName()
          << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 " 
@@ -354,7 +354,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   this->ResetDragAndDropButton->SetParent(frame);
   this->ResetDragAndDropButton->Create(app, 0);
-  this->ResetDragAndDropButton->SetLabel("Reset Interface To Default State");
+  this->ResetDragAndDropButton->SetText("Reset Interface To Default State");
   this->ResetDragAndDropButton->SetCommand(this, "ResetDragAndDropCallback");
   this->ResetDragAndDropButton->SetBalloonHelpString(
     "Reset the placement of all user interface elements, discarding any "
@@ -375,7 +375,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->ToolbarSettingsFrame->SetParent(this->GetPagesParentWidget());
   this->ToolbarSettingsFrame->ShowHideFrameOn();
   this->ToolbarSettingsFrame->Create(app, 0);
-  this->ToolbarSettingsFrame->SetLabel("Toolbar Settings");
+  this->ToolbarSettingsFrame->SetLabelText("Toolbar Settings");
     
   tk_cmd << "pack " << this->ToolbarSettingsFrame->GetWidgetName()
          << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 "  

@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.23");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.24");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -454,14 +454,14 @@ void vtkKWThumbWheel::SetDisplayLabel(int arg)
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetLabel(const char *label)
+vtkKWLabel* vtkKWThumbWheel::GetLabel()
 {
   if (!this->Label)
     {
     this->CreateLabel();
     }
 
-  this->Label->SetLabel(label);
+  return this->Label;
 }
 
 // ---------------------------------------------------------------------------

@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.11");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.12");
 
 int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -139,13 +139,13 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
 
   if (this->PopupMode)
     {
-    this->PopupButton->SetLabel("Edit...");
+    this->PopupButton->SetText("Edit...");
     }
 
   // --------------------------------------------------------------
   // Edit the labeled frame
 
-  this->Frame->SetLabel("Header annotation");
+  this->Frame->SetLabelText("Header annotation");
 
   // --------------------------------------------------------------
   // Edit the check button (Annotation visibility)
@@ -169,7 +169,7 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
 
   this->TextEntry->SetParent(this->TextFrame);
   this->TextEntry->Create(app, 0);
-  this->TextEntry->SetLabel("Header:");
+  this->TextEntry->GetLabel()->SetText("Header:");
   this->TextEntry->GetWidget()->SetWidth(20);
   this->TextEntry->GetWidget()->BindCommand(this, "HeaderTextCallback");
 
@@ -192,8 +192,8 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
       }
     this->TextPropertyPopupButton->SetParent(this->TextFrame);
     this->TextPropertyPopupButton->Create(app);
-    this->TextPropertyPopupButton->SetLabel("Header properties:");
-    this->TextPropertyPopupButton->GetWidget()->SetLabel("Edit...");
+    this->TextPropertyPopupButton->GetLabel()->SetText("Header properties:");
+    this->TextPropertyPopupButton->GetWidget()->SetText("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
                  this->TextPropertyPopupButton->GetWidget()
                  ->GetPopupFrame()->GetWidgetName());
@@ -216,7 +216,7 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
   this->TextPropertyWidget->LabelOnTopOn();
   this->TextPropertyWidget->ShowLabelOn();
   this->TextPropertyWidget->Create(app);
-  this->TextPropertyWidget->GetLabel()->SetLabel("Header properties:");
+  this->TextPropertyWidget->GetLabel()->SetText("Header properties:");
   this->TextPropertyWidget->SetChangedCommand(this, "TextPropertyCallback");
 
   this->Script("pack %s -padx 2 -pady %d -side top -anchor nw -fill y", 

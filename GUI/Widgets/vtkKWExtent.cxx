@@ -15,11 +15,12 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWRange.h"
+#include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.32");
+vtkCxxRevisionMacro(vtkKWExtent, "1.33");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -79,7 +80,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->XRange->Create(app, "");
   this->XRange->SetCommand(this, "ExtentChangedCallback");
   this->XRange->AdjustResolutionOn();
-  this->XRange->SetLabel("X (Units)");
+  this->XRange->GetLabel()->SetText("X (Units)");
   
   this->YRange->SetParent(this);
   this->YRange->ShowLabelOn();
@@ -87,7 +88,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->YRange->Create(app, "");
   this->YRange->AdjustResolutionOn();
   this->YRange->SetCommand(this, "ExtentChangedCallback");
-  this->YRange->SetLabel("Y (Units)");
+  this->YRange->GetLabel()->SetText("Y (Units)");
 
   this->ZRange->SetParent(this);
   this->ZRange->ShowLabelOn();
@@ -95,7 +96,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->ZRange->Create(app, "");
   this->ZRange->AdjustResolutionOn();
   this->ZRange->SetCommand(this, "ExtentChangedCallback");
-  this->ZRange->SetLabel("Z (Units)");
+  this->ZRange->GetLabel()->SetText("Z (Units)");
   
   // Pack the label and the option menu
 

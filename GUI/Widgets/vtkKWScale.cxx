@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.80");
+vtkCxxRevisionMacro(vtkKWScale, "1.81");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -265,7 +265,7 @@ void vtkKWScale::DisplayLabel(const char *label)
     this->Label->SetEnabled(this->Enabled);
     }
 
-  this->Label->SetLabel(label);
+  this->Label->SetText(label);
 
   this->PackWidget();
 }
@@ -325,7 +325,7 @@ void vtkKWScale::PackWidget()
   if (this->Label && this->Label->IsCreated())
     {
     this->Script("pack forget %s", this->Label->GetWidgetName());
-    const char *res = this->Label->GetLabel();
+    const char *res = this->Label->GetText();
     is_label_empty = (!res || !*res);
     if (!is_label_empty)
       {
@@ -862,7 +862,7 @@ void vtkKWScale::Resize()
   
   if (width < this->ShortWidth)
     {
-    this->Label->SetLabel("");
+    this->Label->SetText("");
     if (this->RangeMinLabel && this->RangeMinLabel->IsCreated())
       {
       this->Script("%s configure -text {}",
@@ -892,7 +892,7 @@ void vtkKWScale::Resize()
     {
     this->Script("%s configure -sliderlength 20",
                  this->Scale->GetWidgetName());
-    this->Label->SetLabel(this->ShortLabel);
+    this->Label->SetText(this->ShortLabel);
     this->PackRange = 0;
     this->PackEntry = 1;
     this->PackWidget();
@@ -901,7 +901,7 @@ void vtkKWScale::Resize()
     {
     this->Script("%s configure -sliderlength 25",
                  this->Scale->GetWidgetName());
-    this->Label->SetLabel(this->NormalLabel);
+    this->Label->SetText(this->NormalLabel);
     this->PackRange = 0;
     this->PackEntry = 1;
     this->PackWidget();
@@ -910,7 +910,7 @@ void vtkKWScale::Resize()
     {
     this->Script("%s configure -sliderlength 30",
                  this->Scale->GetWidgetName());
-    this->Label->SetLabel(this->NormalLabel);
+    this->Label->SetText(this->NormalLabel);
     
     if (this->RangeMinLabel && this->RangeMinLabel->IsCreated())
       {
@@ -947,7 +947,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     this->RangeMinLabel->SetParent(this);
     sprintf(labelText, "(%g)", this->Range[0]);
     this->RangeMinLabel->Create(this->GetApplication(), "");
-    this->RangeMinLabel->SetLabel(labelText);
+    this->RangeMinLabel->SetText(labelText);
     this->RangeMinLabel->SetEnabled(this->Enabled);
     }
   if ( ! this->RangeMaxLabel)
@@ -956,7 +956,7 @@ void vtkKWScale::SetDisplayRange(int flag)
     this->RangeMaxLabel->SetParent(this);
     sprintf(labelText, "(%g)", this->Range[1]);
     this->RangeMaxLabel->Create(this->GetApplication(), "");
-    this->RangeMaxLabel->SetLabel(labelText);
+    this->RangeMaxLabel->SetText(labelText);
     this->RangeMaxLabel->SetEnabled(this->Enabled);
     }
   this->Modified();

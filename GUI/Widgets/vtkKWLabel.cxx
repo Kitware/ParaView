@@ -21,14 +21,14 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.32");
+vtkCxxRevisionMacro(vtkKWLabel, "1.33");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
 {
   this->CommandFunction         = vtkKWLabelCommand;
 
-  this->Label                   = NULL;
+  this->Text                    = NULL;
   this->LineType                = vtkKWLabel::SingleLine;
   this->Width                   = 0;
   this->AdjustWrapLengthToWidth = 0;
@@ -37,39 +37,39 @@ vtkKWLabel::vtkKWLabel()
 //----------------------------------------------------------------------------
 vtkKWLabel::~vtkKWLabel()
 {
-  if (this->Label)
+  if (this->Text)
     {
-    delete [] this->Label;
-    this->Label = NULL;
+    delete [] this->Text;
+    this->Text = NULL;
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabel::SetLabel(const char* _arg)
+void vtkKWLabel::SetText(const char* _arg)
 {
-  if (this->Label == NULL && _arg == NULL) 
+  if (this->Text == NULL && _arg == NULL) 
     { 
     return;
     }
 
-  if (this->Label && _arg && (!strcmp(this->Label, _arg))) 
+  if (this->Text && _arg && (!strcmp(this->Text, _arg))) 
     {
     return;
     }
 
-  if (this->Label) 
+  if (this->Text) 
     { 
-    delete [] this->Label; 
+    delete [] this->Text; 
     }
 
   if (_arg)
     {
-    this->Label = new char[strlen(_arg) + 1];
-    strcpy(this->Label, _arg);
+    this->Text = new char[strlen(_arg) + 1];
+    strcpy(this->Text, _arg);
     }
   else
     {
-    this->Label = NULL;
+    this->Text = NULL;
     }
 
   this->Modified();
@@ -82,13 +82,13 @@ void vtkKWLabel::UpdateText()
 {
   if (this->IsCreated())
     {
-    this->SetTextOption(this->Label); // NULL is handled correctly as ""
+    this->SetTextOption(this->Text); // NULL is handled correctly as ""
 
     // Whatever the label, -image always takes precedence, unless it's empty
     // so change it accordingly
     
     if (this->LineType != vtkKWLabel::MultiLine && 
-        this->Label && *this->Label)
+        this->Text && *this->Text)
       {
       this->Script("%s configure -image {}", this->GetWidgetName());
       }
@@ -137,7 +137,7 @@ void vtkKWLabel::SetLineType( int type )
     if (this->LineType != type)
       {
       const char *wname = this->GetWidgetName();
-      this->SetLabel(this->GetTextOption());
+      this->SetText(this->GetTextOption());
       this->Script("destroy %s", wname);
       if (this->LineType == vtkKWLabel::MultiLine)
         {
@@ -249,9 +249,9 @@ void vtkKWLabel::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AdjustWrapLengthToWidth: " 
      << (this->AdjustWrapLengthToWidth ? "On" : "Off") << endl;
   os << indent << "Label: ";
-  if (this->Label)
+  if (this->Text)
     {
-    os << this->Label << endl;
+    os << this->Text << endl;
     }
   else
     {

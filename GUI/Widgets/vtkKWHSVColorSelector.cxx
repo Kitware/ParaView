@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.3");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.4");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -137,13 +137,13 @@ void vtkKWHSVColorSelector::Create(vtkKWApplication *app,
 
   this->HueSatLabel->SetParent(this);
   this->HueSatLabel->Create(app, "-bd 0");
-  this->HueSatLabel->SetLabel("Hue/Saturation:");
+  this->HueSatLabel->SetText("Hue/Saturation:");
 
   // Create the Value label
 
   this->ValueLabel->SetParent(this);
   this->ValueLabel->Create(app, "-bd 0");
-  this->ValueLabel->SetLabel("Value:");
+  this->ValueLabel->SetText("Value:");
 
   // Set the bindings
 

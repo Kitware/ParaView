@@ -159,8 +159,7 @@ public:
   virtual void SetDisplayLabel(int flag);
   vtkGetMacro(DisplayLabel, int);
   vtkBooleanMacro(DisplayLabel, int);  
-  virtual void SetLabel(const char *label);
-  vtkGetObjectMacro(Label, vtkKWLabel);
+  virtual vtkKWLabel* GetLabel();
 
   // Description:
   // Set/Get the position of the label and/or entry (on top, or on the side).

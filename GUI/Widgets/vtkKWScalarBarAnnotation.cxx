@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.15");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.16");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -205,13 +205,13 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
 
   if (this->PopupMode)
     {
-    this->PopupButton->SetLabel("Edit...");
+    this->PopupButton->SetText("Edit...");
     }
 
   // --------------------------------------------------------------
   // Edit the labeled frame
 
-  this->Frame->SetLabel("Scalar Bar");
+  this->Frame->SetLabelText("Scalar Bar");
 
   // --------------------------------------------------------------
   // Edit the check button (Annotation visibility)
@@ -247,7 +247,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
 
   this->TitleEntry->SetParent(this->TitleFrame);
   this->TitleEntry->Create(app, 0);
-  this->TitleEntry->SetLabel("Title:");
+  this->TitleEntry->GetLabel()->SetText("Title:");
   this->TitleEntry->GetWidget()->SetWidth(20);
   this->TitleEntry->GetWidget()->BindCommand(this, "ScalarBarTitleCallback");
 
@@ -270,8 +270,8 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
       }
     this->TitleTextPropertyPopupButton->SetParent(this->TitleFrame);
     this->TitleTextPropertyPopupButton->Create(app);
-    this->TitleTextPropertyPopupButton->SetLabel("Title properties:");
-    this->TitleTextPropertyPopupButton->GetWidget()->SetLabel("Edit...");
+    this->TitleTextPropertyPopupButton->GetLabel()->SetText("Title properties:");
+    this->TitleTextPropertyPopupButton->GetWidget()->SetText("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
                  this->TitleTextPropertyPopupButton->GetWidget()
                  ->GetPopupFrame()->GetWidgetName());
@@ -294,7 +294,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->TitleTextPropertyWidget->LabelOnTopOn();
   this->TitleTextPropertyWidget->ShowLabelOn();
   this->TitleTextPropertyWidget->Create(app);
-  this->TitleTextPropertyWidget->GetLabel()->SetLabel("Title properties:");
+  this->TitleTextPropertyWidget->GetLabel()->SetText("Title properties:");
   this->TitleTextPropertyWidget->SetChangedCommand(
     this, "TitleTextPropertyCallback");
 
@@ -317,7 +317,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
 
   this->LabelFormatEntry->SetParent(this->LabelFrame);
   this->LabelFormatEntry->Create(app, 0);
-  this->LabelFormatEntry->SetLabel("Label format:");
+  this->LabelFormatEntry->GetLabel()->SetText("Label format:");
   this->LabelFormatEntry->GetWidget()->SetWidth(20);
   this->LabelFormatEntry->GetWidget()->BindCommand(
     this, "ScalarBarLabelFormatCallback");
@@ -336,8 +336,8 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
       }
     this->LabelTextPropertyPopupButton->SetParent(this->LabelFrame);
     this->LabelTextPropertyPopupButton->Create(app);
-    this->LabelTextPropertyPopupButton->SetLabel("Label properties:");
-    this->LabelTextPropertyPopupButton->GetWidget()->SetLabel("Edit...");
+    this->LabelTextPropertyPopupButton->GetLabel()->SetText("Label properties:");
+    this->LabelTextPropertyPopupButton->GetWidget()->SetText("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
                  this->LabelTextPropertyPopupButton->GetWidget()
                  ->GetPopupFrame()->GetWidgetName());
@@ -357,7 +357,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->LabelTextPropertyWidget->LabelOnTopOn();
   this->LabelTextPropertyWidget->ShowLabelOn();
   this->LabelTextPropertyWidget->Create(app);
-  this->LabelTextPropertyWidget->GetLabel()->SetLabel(
+  this->LabelTextPropertyWidget->GetLabel()->SetText(
     "Label text properties:");
   this->LabelTextPropertyWidget->SetChangedCommand(
     this, "LabelTextPropertyCallback");
@@ -378,7 +378,7 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->MaximumNumberOfColorsThumbWheel->SetResolution(1);
   this->MaximumNumberOfColorsThumbWheel->Create(app, "");
   this->MaximumNumberOfColorsThumbWheel->DisplayLabelOn();
-  this->MaximumNumberOfColorsThumbWheel->SetLabel("Maximum number of colors:");
+  this->MaximumNumberOfColorsThumbWheel->GetLabel()->SetText("Maximum number of colors:");
   this->MaximumNumberOfColorsThumbWheel->DisplayEntryOn();
   this->MaximumNumberOfColorsThumbWheel->DisplayEntryAndLabelOnTopOff();
   this->MaximumNumberOfColorsThumbWheel->GetEntry()->SetWidth(5);

@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.24");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.25");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -139,7 +139,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   sprintf(buttonCommand, "-command \"wm withdraw %s\"", wname);
   this->DismissButton->SetParent(this->ButtonFrame);
   this->DismissButton->Create(app, buttonCommand);
-  this->DismissButton->SetLabel("Dismiss");
+  this->DismissButton->SetText("Dismiss");
   this->Script("pack %s -side left -expand 1 -fill x",
                this->DismissButton->GetWidgetName());
 
@@ -151,7 +151,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   
   this->CommandLabel->SetParent(this->CommandFrame);
   this->CommandLabel->Create(app, "");
-  this->CommandLabel->SetLabel("Command:");
+  this->CommandLabel->SetText("Command:");
   
   this->CommandEntry->SetParent(this->CommandFrame);
   this->CommandEntry->Create(app, "-width 40 -highlightthickness 1");

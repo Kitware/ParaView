@@ -32,7 +32,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.33");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.34");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -1325,7 +1325,7 @@ void vtkKWParameterValueFunctionEditor::CreateParameterEntry(
     this->ParameterEntry->SetParent(this);
     this->ParameterEntry->Create(app, "");
     this->ParameterEntry->GetWidget()->SetWidth(9);
-    this->ParameterEntry->SetLabel("P:");
+    this->ParameterEntry->GetLabel()->SetText("P:");
 
     this->UpdateParameterEntry(this->SelectedPoint);
 
@@ -5725,7 +5725,7 @@ void vtkKWParameterValueFunctionEditor::UpdateRangeLabel()
     }
 
   ranges << ends;
-  this->RangeLabel->SetLabel(ranges.str());
+  this->RangeLabel->SetText(ranges.str());
   ranges.rdbuf()->freeze(0);
 }
 

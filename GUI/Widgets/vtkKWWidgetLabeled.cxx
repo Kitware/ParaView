@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetLabeled);
-vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.1");
+vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.2");
 
 int vtkKWWidgetLabeledCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -124,9 +124,9 @@ void vtkKWWidgetLabeled::CreateLabel(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWidgetLabeled::SetLabel(const char *text)
+void vtkKWWidgetLabeled::SetLabelText(const char *text)
 {
-  this->GetLabel()->SetLabel(text);
+  this->GetLabel()->SetText(text);
 }
 
 //----------------------------------------------------------------------------

@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.35");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.36");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -339,19 +339,19 @@ void vtkKWTextProperty::Pack()
 
   if (this->LongFormat)
     {
-    this->ChangeColorButton->SetLabel("Color:");
+    this->ChangeColorButton->GetLabel()->SetText("Color:");
     this->ChangeColorButton->ShowLabelOn();
 
     this->FontFamilyOptionMenu->GetWidget()->IndicatorOn();
-    this->FontFamilyOptionMenu->SetLabel("Font:");
+    this->FontFamilyOptionMenu->GetLabel()->SetText("Font:");
     this->FontFamilyOptionMenu->ShowLabelOn();
 
-    this->StylesCheckButtonSet->SetLabel("Style:");
+    this->StylesCheckButtonSet->GetLabel()->SetText("Style:");
     this->StylesCheckButtonSet->ShowLabelOn();
 
     this->OpacityScale->DisplayLabel("Opacity:");
 
-    this->PushButtonSet->SetLabel("Functions:");
+    this->PushButtonSet->GetLabel()->SetText("Functions:");
     this->PushButtonSet->ShowLabelOn();
 
     int row = 0, col = 0;
