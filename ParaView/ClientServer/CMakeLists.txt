@@ -1,8 +1,41 @@
+PROJECT(VTKCS)
+
+# Support building this project outside of ParaView.
+IF(NOT PARAVIEW_SOURCE_DIR)
+  FIND_PACKAGE(VTK)
+
+  IF(NOT VTK_FOUND)
+    MESSAGE(FATAL_ERROR "VTK is required.  Please set VTK_DIR.")
+  ENDIF(NOT VTK_FOUND)
+
+  INCLUDE(${VTK_USE_FILE})
+  INCLUDE_DIRECTORIES(${VTKCS_SOURCE_DIR})
+  INCLUDE_DIRECTORIES(${VTKCS_BINARY_DIR})
+
+  # load the ClientServer command
+  IF (COMMAND VTK_WRAP_ClientServer)
+  ELSE (COMMAND VTK_WRAP_ClientServer)
+    TRY_COMPILE(COMPILE_OK
+      ${VTKCS_BINARY_DIR}/CMake
+      ${VTKCS_SOURCE_DIR}/CMake
+      ClientServer_LOADED_COMMANDS OUTPUT_VARIABLE TRYOUT)
+    IF (COMPILE_OK)
+      LOAD_COMMAND(VTK_WRAP_ClientServer
+        ${VTKCS_BINARY_DIR}/CMake
+        ${VTKCS_BINARY_DIR}/CMake/Debug)
+    ELSE (COMPILE_OK)
+      MESSAGE("failed to compile ParaView ClientServer extensions to CMake:\n${TRYOUT}")
+    ENDIF (COMPILE_OK)
+  ENDIF (COMMAND VTK_WRAP_ClientServer)
+  UTILITY_SOURCE(VTK_WRAP_ClientServer_EXE vtkWrapClientServer Wrapping vtkWrapClientServer.c)
+  MARK_AS_ADVANCED(VTK_WRAP_ClientServer_EXE)
+ENDIF(NOT PARAVIEW_SOURCE_DIR)
+
 # Configure the vtkClientServer library.
 SET(VTK_CLIENT_SERVER_BUILD_SHARED ${BUILD_SHARED_LIBS})
 CONFIGURE_FILE(
-  ${PARAVIEW_SOURCE_DIR}/ClientServer/vtkClientServerConfigure.h.in
-  ${PARAVIEW_BINARY_DIR}/ClientServer/vtkClientServerConfigure.h
+  ${VTKCS_SOURCE_DIR}/vtkClientServerConfigure.h.in
+  ${VTKCS_BINARY_DIR}/vtkClientServerConfigure.h
   @ONLY IMMEDIATE
   )
 
@@ -17,9 +50,12 @@ ADD_LIBRARY(vtkClientServer
   vtkTypeFromNative.h
   )
 TARGET_LINK_LIBRARIES(vtkClientServer vtkKWCommonTCL)
-IF(BUILD_SHARED_LIBS)
-  INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkClientServer)
-ENDIF(BUILD_SHARED_LIBS)
+
+IF(PARAVIEW_SOURCE_DIR)
+  IF(BUILD_SHARED_LIBS)
+    INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkClientServer)
+  ENDIF(BUILD_SHARED_LIBS)
+ENDIF(PARAVIEW_SOURCE_DIR)
 
 # Macro to create ClientServer wrappers classes in a single VTK kit.
 MACRO(PV_WRAP_VTK_CS kit ukit deps)
@@ -46,9 +82,11 @@ MACRO(PV_WRAP_VTK_CS kit ukit deps)
   FOREACH(dep ${deps})
     TARGET_LINK_LIBRARIES(vtk${kit}CS vtk${dep}CS)
   ENDFOREACH(dep)
-  IF(BUILD_SHARED_LIBS)
-    INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtk${kit}CS)
-  ENDIF(BUILD_SHARED_LIBS)
+  IF(PARAVIEW_SOURCE_DIR)
+    IF(BUILD_SHARED_LIBS)
+      INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtk${kit}CS)
+    ENDIF(BUILD_SHARED_LIBS)
+  ENDIF(PARAVIEW_SOURCE_DIR)
 ENDMACRO(PV_WRAP_VTK_CS)
 
 # Build the vtkClientServer wrapping utility first.
@@ -60,10 +98,13 @@ IF(VTK_USE_PATENTED)
   SUBDIRS(Patented)
 ENDIF(VTK_USE_PATENTED)
 
-IF(PARAVIEW_LINK_XDMF)
-  IF(XDMF_SOURCE_DIR)
-    SUBDIRS(Xdmf)
-  ELSE(XDMF_SOURCE_DIR)
-    MESSAGE(FATAL_ERROR "Need Xdmf source dir to do client server wrapping of Xdmf")
-  ENDIF(XDMF_SOURCE_DIR)
-ENDIF(PARAVIEW_LINK_XDMF)
+# Build vtkClientServer wrappers for Xdmf if it is available.
+IF(PARAVIEW_SOURCE_DIR)
+  IF(PARAVIEW_LINK_XDMF)
+    IF(XDMF_SOURCE_DIR)
+      SUBDIRS(Xdmf)
+    ELSE(XDMF_SOURCE_DIR)
+      MESSAGE(FATAL_ERROR "Need Xdmf source dir to do client server wrapping of Xdmf")
+    ENDIF(XDMF_SOURCE_DIR)
+  ENDIF(PARAVIEW_LINK_XDMF)
+ENDIF(PARAVIEW_SOURCE_DIR)
