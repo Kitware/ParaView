@@ -199,10 +199,10 @@ void vtkKWTclInteractor::Evaluate()
   
   this->Script("%s configure -state normal",
                this->DisplayText->GetWidgetName());
-  this->Script("%s insert end [list %s] %d",
+  this->Script("%s insert end [concat {%s}] %d",
                this->DisplayText->GetWidgetName(),
                this->CommandEntry->GetValue(), this->CommandIndex);
-  this->Script("set commandList [linsert $commandList end [list %s]]",
+  this->Script("set commandList [linsert $commandList end [concat {%s}]]",
                this->CommandEntry->GetValue());
   this->Script("%s insert end \"\n\"", this->DisplayText->GetWidgetName());
   this->Script("%s insert end [eval [list %s]]",
