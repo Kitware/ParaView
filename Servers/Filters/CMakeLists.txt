@@ -57,6 +57,9 @@ IF (VTK_USE_PATENTED)
   SET(Filters_SRCS ${Filters_SRCS} vtkPVKitwareContourFilter.cxx)
 ENDIF (VTK_USE_PATENTED)
 
+SET(VTK_BINARY_DIR "${PVFilters_BINARY_DIR}")
+INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
+VTK_EXPORT_KIT("PVFilters" "PVFILTERS" "${Filters_SRCS}")
 
 INCLUDE_DIRECTORIES(${PVFilters_BINARY_DIR})
 CONFIGURE_FILE(${PVFilters_SOURCE_DIR}/vtkPVFiltersConfig.h.in
@@ -73,3 +76,20 @@ TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_HDF5_LIBRARIES})
 
 ADD_EXECUTABLE(vtkTestFilters test.cxx)
 TARGET_LINK_LIBRARIES(vtkTestFilters vtkPVFilters)
+
+# load the ClientServer command
+INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
+CS_INITIALIZE_WRAP()
+INCLUDE_DIRECTORIES(
+  ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
+  ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
+  )
+
+# Wrap PVFilters
+INCLUDE_DIRECTORIES(
+  ${ParaView_SOURCE_DIR}/Servers/Filters
+  )
+SET(KIT_WRAP_DEPS Parallel)
+SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/Servers/Filters/Utilities")
+PV_WRAP_VTK_CS(PVFilters PVFILTERS "${KIT_WRAP_DEPS}")
+
