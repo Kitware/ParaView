@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.56");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.57");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -448,7 +448,9 @@ vtkKWNotebook::Page* vtkKWNotebook::GetFirstPackedPageNotMatchingTag(int tag)
 
   char **slaves = 0;
   int nb_slaves = vtkKWTkUtilities::GetSlaves(
-    this->Application->GetMainInterp(),this->TabsFrame->GetWidgetName(),&slaves);
+    this->Application->GetMainInterp(),
+    this->TabsFrame->GetWidgetName(),
+    &slaves);
   if (!nb_slaves)
     {
     return NULL;
@@ -520,7 +522,8 @@ unsigned int vtkKWNotebook::GetNumberOfVisiblePages()
 int vtkKWNotebook::GetVisiblePageId(int idx)
 {
   // As a convenience, if ShowOnlyMostRecentPages is On, return the 
-  // GetMostRecentPageId, since it provides a better clue about the tab ordering.
+  // GetMostRecentPageId, since it provides a better clue about the tab 
+  // ordering.
 
   if (this->ShowOnlyMostRecentPages)
     {
@@ -572,7 +575,8 @@ int vtkKWNotebook::AreTabsVisible()
 {
   int visible_pages = this->GetNumberOfVisiblePages();
   return 
-    (visible_pages > 1 || (visible_pages == 1 && this->AlwaysShowTabs)) ? 1 : 0;
+    (visible_pages > 1 || 
+     (visible_pages == 1 && this->AlwaysShowTabs)) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -612,6 +616,35 @@ vtkKWWidget *vtkKWNotebook::GetFrame(const char *title, int tag)
     return page->Frame->GetFrame();
     }
   return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWNotebook::GetPageIdFromFrameWidgetName(const char *frame_wname)
+{
+  if (!this->IsCreated() || !frame_wname)
+    {
+    return -1;
+    }
+
+  int found = -1;
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && 
+        page->Frame->IsCreated() &&
+        !strcmp(page->Frame->GetWidgetName(), frame_wname))
+      {
+      found = page->Id;
+      break;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return found;
 }
 
 //----------------------------------------------------------------------------
@@ -810,6 +843,29 @@ void vtkKWNotebook::UnBindPage(vtkKWNotebook::Page *page)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWNotebook::HasPage(int id)
+{
+  return this->GetPage(id) ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWNotebook::HasPage(const char *title, int tag)
+{
+  return this->GetPage(title, tag) ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWNotebook::GetPageId(const char *title, int tag)
+{
+  vtkKWNotebook::Page *page = this->GetPage(title, tag);
+  if (page)
+    {
+    return page->Id;
+    }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWNotebook::RemovePage(int id)
 {
   return this->RemovePage(this->GetPage(id));
@@ -937,7 +993,8 @@ void vtkKWNotebook::RaisePage(vtkKWNotebook::Page *page)
 
   this->CurrentId = page->Id;
 
-  // A raised page becomes automatically visible (i.e., it's a way to unhide it)
+  // A raised page becomes automatically visible 
+  // (i.e., it's a way to unhide it)
 
   page->Visibility = 1;
 
@@ -1023,8 +1080,9 @@ void vtkKWNotebook::ShowPageTab(vtkKWNotebook::Page *page)
     {
     this->AddToMostRecentPages(page);
 
-    // Also, if we show only the most recent pages, the expected behaviour would
-    // be to bring the page so that it is packed as the first one in the list.
+    // Also, if we show only the most recent pages, the expected behaviour 
+    // would be to bring the page so that it is packed as the first one 
+    // in the list.
     // If ShowAllPagesWithSameTag is Off, just pack the tab in front of all
     // others, otherwise try to pack in front of the first page that has a
     // different tag, so that pages with the same tag will still be packed
@@ -1912,7 +1970,8 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
       char color[10];
       sprintf(color, "#%02x%02x%02x", 
               VTK_KW_NB_TAB_PIN_R, VTK_KW_NB_TAB_PIN_G, VTK_KW_NB_TAB_PIN_B);
-      cmd << page->TabFrame->GetWidgetName() << " config -bg " << color << endl;
+      cmd << page->TabFrame->GetWidgetName() 
+          << " config -bg " << color << endl;
       vtkKWTkUtilities::ChangeFontSlantToItalic(
         this->Application->GetMainInterp(),
         page->Label->GetWidgetName());
@@ -1948,7 +2007,8 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
 
     if (page->Icon)
       {
-      this->Script("%s config -bg %s", page->ImageLabel->GetWidgetName(), shade);
+      this->Script("%s config -bg %s", 
+                   page->ImageLabel->GetWidgetName(), shade);
       // Reset the imagelabel so that the icon is blended with the background
       page->ImageLabel->SetImageOption(page->Icon);
       }
@@ -1957,7 +2017,8 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
 
     if (!page->Pinned)
       {
-      cmd << page->TabFrame->GetWidgetName() << " config -bg " << shade << endl;
+      cmd << page->TabFrame->GetWidgetName() 
+          << " config -bg " << shade << endl;
       }
     else
       {
@@ -1981,7 +2042,8 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
       sprintf(shade, "#%02x%02x%02x", 
               (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
     
-      cmd << page->TabFrame->GetWidgetName() << " config -bg " << shade << endl;
+      cmd << page->TabFrame->GetWidgetName() 
+          << " config -bg " << shade << endl;
       }
     }
 
@@ -1989,8 +2051,8 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
   this->Script(cmd.str());
   cmd.rdbuf()->freeze(0);
 
-  // If the page that has just been update was the selected page, update
-  // the mask position since the color has an influence on the mask size (win32)
+  // If the page that has just been update was the selected page, update the
+  // mask position since the color has an influence on the mask size (win32)
 
 #if _WIN32
   if (this->CurrentId == page->Id)
@@ -2113,10 +2175,10 @@ void vtkKWNotebook::UpdateMaskPosition()
     sscanf(res, "%d %d", &tab_width, &body_y);
 
     // Now basically the mask:
-    //   - starts right after the inner left border of the selected tab 
-    //     horizontally, and at the begginning of the body top border vertically
-    //   - ends right before the inner right border of the selected tab 
-    //     horizontally, and at the end of the body top border vertically
+    // - starts right after the inner left border of the selected tab 
+    //   horizontally, and at the begginning of the body top border vertically
+    // - ends right before the inner right border of the selected tab 
+    //   horizontally, and at the end of the body top border vertically
 
     int x0 = tabs_x + tab_x + VTK_KW_NB_TAB_BD;
     int y0 = body_y;
@@ -2455,10 +2517,10 @@ void vtkKWNotebook::ConstrainVisiblePages()
 
   if (this->ShowOnlyMostRecentPages && 
       this->NumberOfMostRecentPages > 0 && 
-      this->MostRecentPages->GetNumberOfItems() > this->NumberOfMostRecentPages)
+      this->MostRecentPages->GetNumberOfItems() >this->NumberOfMostRecentPages)
     {
     int diff = 
-      this->MostRecentPages->GetNumberOfItems() - this->NumberOfMostRecentPages;
+      this->MostRecentPages->GetNumberOfItems()-this->NumberOfMostRecentPages;
 
     vtkIdType key = 0;
     vtkKWNotebook::Page *page = NULL;

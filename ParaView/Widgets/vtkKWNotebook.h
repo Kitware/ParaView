@@ -82,6 +82,12 @@ public:
   int AddPage(const char *title);
 
   // Description:
+  // Does it have a given page
+  int HasPage(int id);
+  int HasPage(const char *title, int tag);
+  int GetPageId(const char *title, int tag);
+
+  // Description:
   // Accessors
   char* GetPageTitle(int id);
 
@@ -125,6 +131,7 @@ public:
   vtkKWWidget *GetFrame(int id);
   vtkKWWidget *GetFrame(const char *title);
   vtkKWWidget *GetFrame(const char *title, int tag);
+  int GetPageIdFromFrameWidgetName(const char *frame_wname);
 
   // Description:
   // Remove a page from the notebook.
