@@ -75,7 +75,6 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->XRangeLabel = vtkKWLabel::New();
   this->YRangeLabel = vtkKWLabel::New();
   this->ZRangeLabel = vtkKWLabel::New();
-  this->ScalarRangeLabel = vtkKWLabel::New();
   
   this->AmbientScale = vtkKWScale::New();
 
@@ -162,8 +161,6 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->YRangeLabel = NULL;
   this->ZRangeLabel->Delete();
   this->ZRangeLabel = NULL;
-  this->ScalarRangeLabel->Delete();
-  this->ScalarRangeLabel = NULL;
   
   this->AmbientScale->Delete();
   this->AmbientScale = NULL;
@@ -232,8 +229,6 @@ void vtkPVActorComposite::CreateProperties()
   this->YRangeLabel->Create(this->Application, "");
   this->ZRangeLabel->SetParent(this->Properties);
   this->ZRangeLabel->Create(this->Application, "");
-  this->ScalarRangeLabel->SetParent(this->Properties);
-  this->ScalarRangeLabel->Create(this->Application, "");
   
   //this->ColorByCellCheck->SetParent(this->Properties);
   //this->ColorByCellCheck->Create(this->Application, "-text {Color By Cell Data:}");
@@ -264,8 +259,6 @@ void vtkPVActorComposite::CreateProperties()
   this->Script("pack %s",
 	       this->ZRangeLabel->GetWidgetName());
   this->Script("pack %s",
-	       this->ScalarRangeLabel->GetWidgetName());
-  this->Script("pack %s",
 	       this->ColorMenuLabel->GetWidgetName());
   this->Script("pack %s",
                this->ColorMenu->GetWidgetName());
@@ -277,7 +270,6 @@ void vtkPVActorComposite::UpdateProperties()
 {
   char tmp[350], cmd[1024];
   float bounds[6];
-  float range[2];
   int i, j, numArrays, numComps;
   vtkFieldData *fieldData;
   vtkPVApplication *pvApp = this->GetPVApplication();  
@@ -292,7 +284,6 @@ void vtkPVActorComposite::UpdateProperties()
   
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
   this->GetPVData()->GetBounds(bounds);
-  this->GetPVData()->GetScalarRange(range);
       
   sprintf(tmp, "number of cells: %d", 
 	  this->GetPVData()->GetNumberOfCells());
@@ -304,8 +295,6 @@ void vtkPVActorComposite::UpdateProperties()
   this->YRangeLabel->SetLabel(tmp);
   sprintf(tmp, "z range: %f to %f", bounds[4], bounds[5]);
   this->ZRangeLabel->SetLabel(tmp);
-  sprintf(tmp, " Scalar Range: %f to %f", range[0], range[1]);
-  this->ScalarRangeLabel->SetLabel(tmp);
   
     
   this->AmbientScale->SetValue(this->GetActor()->GetProperty()->GetAmbient());
@@ -561,17 +550,6 @@ void vtkPVActorComposite::SetInput(vtkPVData *data)
     vtkDataTclName = data->GetVTKDataTclName();
     }
     
-}
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::GetInputScalarRange(float range[2]) 
-{ 
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  int numProcs = controller->GetNumberOfProcesses();
-  
-  pvApp->BroadcastScript("%s Update", this->MapperTclName);
-  this->GetPVData()->GetScalarRange(range);
 }
 
 //----------------------------------------------------------------------------

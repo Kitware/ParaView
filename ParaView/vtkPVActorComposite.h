@@ -101,7 +101,6 @@ public:
   // Description:
   // Parallel methods for computing the scalar range from the input,
   /// and setting the scalar range of the mapper.
-  void GetInputScalarRange(float range[2]);
   void SetScalarRange(float min, float max);
   
   // Description:
@@ -166,7 +165,6 @@ protected:
   vtkKWLabel *XRangeLabel;
   vtkKWLabel *YRangeLabel;
   vtkKWLabel *ZRangeLabel;
-  vtkKWLabel *ScalarRangeLabel;
   
   vtkKWScale *AmbientScale;
   

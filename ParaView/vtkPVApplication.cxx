@@ -253,25 +253,6 @@ void vtkPVApplication::Exit()
 
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SendDataScalarRange(vtkDataSet *data)
-{
-  float range[2];
-  
-  if (this->Controller->GetLocalProcessId() == 0)
-    {
-    return;
-    }
-  data->GetScalarRange(range);
-  if (data->GetNumberOfPoints() == 0 && data->GetNumberOfCells() == 0)
-    {
-    range[0] = VTK_LARGE_FLOAT;
-    range[1] = -VTK_LARGE_FLOAT;
-    }
-  this->Controller->Send(range, 2, 0, 1966);
-}
-
-
-//----------------------------------------------------------------------------
 void vtkPVApplication::SendDataBounds(vtkDataSet *data)
 {
   float *bounds;

@@ -476,7 +476,7 @@ void vtkPVSource::AcceptCallback()
   
   // Initialize the output if necessary.
   if ( ! this->Initialized)
-    { // This is the first time, initialize data.    
+    { // This is the first 2time, initialize data.    
     vtkPVData *input;
     vtkPVActorComposite *ac;
     

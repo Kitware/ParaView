@@ -97,11 +97,6 @@ public:
   vtkGetStringMacro(VTKDataTclName);  
   
   // Description:
-  // This method collects the scalar range from all processes.
-  // It expects the data to be up to date.
-  void GetScalarRange(float range[2]);
-
-  // Description:
   // This method collects the bounds from all processes.
   // It expects the data to be up to date.
   void GetBounds(float bounds[6]);

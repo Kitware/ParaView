@@ -169,53 +169,6 @@ int vtkPVData::Create(char *args)
 
 //----------------------------------------------------------------------------
 // Data is expected to be updated.
-void vtkPVData::GetScalarRange(float range[2])
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  float tmp[2];
-  int id, num;
-  
-  if (this->VTKData == NULL)
-    {
-    range[0] = 0.0;
-    range[1] = 1.0;
-    return;
-    }
-
-  pvApp->BroadcastScript("Application SendDataScalarRange %s", 
-			this->VTKDataTclName);
-  
-  this->VTKData->GetScalarRange(range);
-  if (this->VTKData->GetNumberOfPoints() == 0 && this->VTKData->GetNumberOfCells() == 0)
-    {
-    range[0] = VTK_LARGE_FLOAT;
-    range[1] = -VTK_LARGE_FLOAT;
-    }  
-  
-  num = controller->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    controller->Receive(tmp, 2, id, 1966);
-    if (tmp[0] < range[0])
-      {
-      range[0] = tmp[0];
-      }
-    if (tmp[1] > range[1])
-      {
-      range[1] = tmp[1];
-      }
-    }
-  
-  if (range[0] > range[1])
-    {
-    range[0] = 0.0;
-    range[1] = 1.0;
-    }  
-}
-
-//----------------------------------------------------------------------------
-// Data is expected to be updated.
 void vtkPVData::GetBounds(float bounds[6])
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
