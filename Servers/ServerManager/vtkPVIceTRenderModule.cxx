@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.12");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModule::vtkPVIceTRenderModule()
@@ -117,9 +117,12 @@ void vtkPVIceTRenderModule::SetProcessModule(vtkProcessModule *pm)
     pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }
 
-  stream << vtkClientServerStream::Invoke << this->RenderWindowID 
-         << "FullScreenOn" 
-         << vtkClientServerStream::End;
+  if (!getenv("PV_ICET_WINDOW_BORDERS"))
+    {
+    stream << vtkClientServerStream::Invoke << this->RenderWindowID 
+           << "FullScreenOn" 
+           << vtkClientServerStream::End;
+    }
   pvm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
 
   if (pvm->GetOptions()->GetUseStereoRendering())
