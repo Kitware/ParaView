@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.385");
+vtkCxxRevisionMacro(vtkPVSource, "1.386");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkKWNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,InformationGUI,vtkPVInformationGUI);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayGUI,vtkPVDisplayGUI);
@@ -248,6 +248,10 @@ vtkPVSource::~vtkPVSource()
   this->ButtonFrame->Delete();
   this->ButtonFrame = NULL;
 
+  // Since the notebook is now shared and remains around after 
+  // this source deletes.  This parameters from as a child will 
+  // not be deleted either.  Parent keeps a list of children.
+  this->Parameters->SetParent(0);
   this->Parameters->Delete();
   this->Parameters = NULL;
     
