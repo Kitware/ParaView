@@ -120,6 +120,11 @@ protected:
   virtual int ReadPrimaryElement(vtkXMLDataElement* ePrimary);
   virtual void SetupEmptyOutput();
   virtual int FillOutputPortInformation(int, vtkInformation* info);
+
+  virtual int ProcessRequest(vtkInformation *request,
+                             vtkInformationVector **inputVector,
+                             vtkInformationVector *outputVector);
+
   virtual int RequestDataObject(vtkInformation *request,
                                 vtkInformationVector **inputVector,
                                 vtkInformationVector *outputVector);

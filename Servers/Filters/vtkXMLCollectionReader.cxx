@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.12");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.13");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -277,6 +277,26 @@ int vtkXMLCollectionReader::FillOutputPortInformation(int, vtkInformation *info)
 {
   info->Set(vtkDataObject::DATA_TYPE_NAME(), "vtkDataObject");
   return 1;
+}
+
+
+int vtkXMLCollectionReader::ProcessRequest(vtkInformation* request,
+                                  vtkInformationVector** inputVector,
+                                  vtkInformationVector* outputVector)
+{
+  if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_NOT_GENERATED()))
+    {
+    // Mark all outputs as not generated so that the executive does
+    // not try to handle initialization/finalization of the outputs.
+    // We will do it here.
+    int i;
+    for(i=0; i < outputVector->GetNumberOfInformationObjects(); ++i)
+      {
+      vtkInformation* outInfo = outputVector->GetInformationObject(i);
+      outInfo->Set(vtkDemandDrivenPipeline::DATA_NOT_GENERATED(), 1);
+      }
+    }
+  return this->Superclass::ProcessRequest(request, inputVector, outputVector);
 }
 
 
