@@ -179,6 +179,16 @@ protected:
     vtkPVWidget*>* map);
   //ETX
 
+
+  // Description:
+  // Methods to obtain the position/rotation/scale values from
+  // the vtkSMBoxWidgetProxy object. These methods do not call
+  // UpdateInformation(), hence, it is expeceted that the information
+  // properties have been updated before calling these methods.
+  void GetPositionInternal(double position[3]);
+  void GetRotationInternal(double rotation[3]);
+  void GetScaleInternal(double scale[3]);
+  
   double* GetPositionFromGUI();
   double* GetRotationFromGUI();
   double* GetScaleFromGUI();

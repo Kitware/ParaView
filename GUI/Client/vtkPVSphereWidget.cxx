@@ -43,7 +43,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSourceProxy.h" 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.47");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.48");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -269,6 +269,8 @@ void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
     return;
     }
   
+  this->WidgetProxy->SaveInBatchScript(file);
+
   vtkClientServerID sphereID = this->ImplicitFunctionProxy->GetID(0);
 
   *file << endl;
@@ -290,6 +292,12 @@ void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
       << sdvp->GetElement(1) << " "
       << sdvp->GetElement(2)
       << endl;
+    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Center]"
+      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) 
+      << endl;
+    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Center]"
+      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+      << " GetProperty Center]" << endl;
     }
 
   sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -299,11 +307,16 @@ void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
     *file << "  [$pvTemp" << sphereID.ID << " GetProperty Radius] "
       << "SetElements1 "
       << sdvp->GetElement(0) << endl << endl;
+    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Radius]"
+      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) 
+      << endl;
+    *file << "  [$pvTemp" << sphereID.ID << " GetProperty Radius]"
+      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+      << " GetProperty Radius]" << endl;
     }
   *file << "  $pvTemp" << sphereID.ID << " UpdateVTKObjects" << endl;
   *file << endl;
 
-  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
@@ -628,6 +641,8 @@ double vtkPVSphereWidget::GetRadiusInternal()
 void vtkPVSphereWidget::SetCenter(double x, double y, double z)
 {
   this->SetCenterInternal(x, y, z);
+  this->AddTraceEntry("$kw(%s) SetCenter %f %f %f",
+    this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
 
@@ -646,7 +661,6 @@ void vtkPVSphereWidget::SetCenter()
     } 
   this->SetCenterInternal(val[0],val[1],val[2]);
   this->Render();
-  this->ModifiedCallback();
   this->ValueChanged = 0;
 }
 
@@ -688,6 +702,7 @@ void vtkPVSphereWidget::SetRadiusInternal(double r)
 void vtkPVSphereWidget::SetRadius(double r)
 {
   this->SetRadiusInternal(r);
+  this->AddTraceEntry("$kw(%s) SetRadius %f ", this->GetTclName(), r);
   this->ModifiedCallback();
 }
 
@@ -702,7 +717,6 @@ void vtkPVSphereWidget::SetRadius()
   val = atof(this->RadiusEntry->GetValue());
   this->SetRadiusInternal(val);
   this->Render();
-  this->ModifiedCallback();
   this->ValueChanged = 0;
 }
 

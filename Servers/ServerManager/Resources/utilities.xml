@@ -110,7 +110,7 @@
       </ProxyProperty>
     </Proxy>
 
-    <Proxy name="Box" class="vtkBox">
+    <Proxy name="BoxOld" class="vtkBox">
       <DoubleVectorProperty
         name="Transform"
         command="SetTransform"
@@ -123,7 +123,37 @@
         number_of_elements="6"
         default_values="0 1 0 1 0 1" />
     </Proxy>
-
+    
+    <BoxProxy name="Box" class="vtkBox">
+      <DoubleVectorProperty
+        name="Bounds"
+        command="SetBounds"
+        number_of_elements="6"
+        default_values="0 1 0 1 0 1" >
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        update_self="1"
+        default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Rotation"
+        command="SetRotation"
+        number_of_elements="3"
+        update_self="1"
+        default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        update_self="1"
+        default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+    </BoxProxy>
+    
     <Proxy name="Sphere" class="vtkSphere">
       <DoubleVectorProperty
         name="Center"
@@ -156,6 +186,31 @@
         argument_is_array="1"
         default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
     </Proxy>
+    
+    <TransformProxy name="Transform2" class="vtkTransform">
+      <!--Transform proxy with unconventional interface, used by BoxWidget -->
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="3"
+        update_self="1"
+        default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Rotation"
+        command="SetRotation"
+        number_of_elements="3"
+        update_self="1"
+        default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        update_self="1"
+        default_values="0.0 0.0 0.0" >
+      </DoubleVectorProperty>
+    </TransformProxy>
   </ProxyGroup>
 
   <ProxyGroup name="matrices">
@@ -203,25 +258,14 @@
 
   <ProxyGroup name="3d_widgets">
     <LineWidgetProxy name="LineWidgetProxy" class="vtkPickLineWidget">
-      <DoubleVectorProperty
-        name="PlaceWidget"
-        command="PlaceWidget"
-        number_of_elements="6"
+      <IntVectorProperty
+        name="IgnorePlaceWidgetChanges"
+        command="SetIgnorePlaceWidgetChanges"
+        number_of_elements="1"
         update_self="1"
-        argument_is_array="1"
-        default_values="0.0 1.0 0.0 1.0 0.0 1.0" />
-      <DoubleVectorProperty
-        name="Point1"
-        command="SetPoint1"
-        number_of_elements="3"
-        update_self ="1"
-        default_values="0.0 0.0 0.0" />
-      <DoubleVectorProperty
-        name="Point2"
-        command="SetPoint2"
-        number_of_elements="3"
-        update_self ="1"
-        default_values="0.0 0.0 0.0" />
+        default_values="0" >
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
       <DoubleVectorProperty
         name="Point1Info"
         command="GetPoint1"
@@ -241,12 +285,6 @@
         <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
       <IntVectorProperty
-        name="Resolution"
-        command="SetResolution"
-        number_of_elements="1"
-        update_self ="1"
-        default_values="20" />
-      <IntVectorProperty
         name="ResolutionInfo"
         command="GetResolution"
         number_of_elements="1"
@@ -255,6 +293,34 @@
         default_values="20">
         <SimpleIntInformationHelper/>
       </IntVectorProperty>
+      <DoubleVectorProperty
+        name="PlaceWidget"
+        command="PlaceWidget"
+        number_of_elements="6"
+        update_self="1"
+        argument_is_array="1"
+        default_values="0.0 1.0 0.0 1.0 0.0 1.0" />
+      <DoubleVectorProperty
+        name="Point1"
+        command="SetPoint1"
+        number_of_elements="3"
+        update_self ="1"
+        information_property="Point1Info"
+        default_values="0.0 0.0 0.0" />
+      <DoubleVectorProperty
+        name="Point2"
+        command="SetPoint2"
+        number_of_elements="3"
+        update_self ="1"
+        information_property="Point2Info"
+        default_values="0.0 0.0 0.0" />
+      <IntVectorProperty
+        name="Resolution"
+        command="SetResolution"
+        number_of_elements="1"
+        update_self ="1"
+        information_property="ResolutionInfo"
+        default_values="20" />
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"
@@ -266,6 +332,23 @@
     </LineWidgetProxy>
 
     <PointWidgetProxy name="PointWidgetProxy" class="vtkPickPointWidget">
+      <IntVectorProperty
+        name="IgnorePlaceWidgetChanges"
+        command="SetIgnorePlaceWidgetChanges"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0" >
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="PositionInfo"
+        command="GetPosition"
+        number_of_elements="3"
+        update_self="1"
+        information_only="1"
+        default_values="0.0 0.0 0.0" >
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
       <DoubleVectorProperty
         name="PlaceWidget"
         command="PlaceWidget"
@@ -278,16 +361,8 @@
         command="SetPosition"
         number_of_elements="3"
         update_self="1"
+        information_property="PositionInfo"
         default_values="0.0 0.0 0.0" />
-      <DoubleVectorProperty
-        name="PositionInfo"
-        command="GetPosition"
-        number_of_elements="3"
-        update_self="1"
-        information_only="1"
-        default_values="0.0 0.0 0.0" >
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"
@@ -297,7 +372,34 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
     </PointWidgetProxy>
+    
     <SphereWidgetProxy name="SphereWidgetProxy" class="vtkSphereWidget">
+      <IntVectorProperty
+        name="IgnorePlaceWidgetChanges"
+        command="SetIgnorePlaceWidgetChanges"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0" >
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="CenterInfo"
+        command="GetCenter"
+        number_of_elements="3"
+        update_self="1"
+        information_only="1"
+        default_values="0.0 0.0 0.0" >
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="RadiusInfo"
+        command="GetRadius"
+        number_of_elements="1"
+        update_self="1"
+        information_only="1"
+        default_values="1.0" >
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
       <DoubleVectorProperty
         name="PlaceWidget"
         command="PlaceWidget"
@@ -310,31 +412,15 @@
         command="SetCenter"
         number_of_elements="3"
         update_self="1"
+        information_property="CenterInfo"
         default_values="0.0 0.0 0.0" />
-      <DoubleVectorProperty
-        name="CenterInfo"
-        command="GetCenter"
-        number_of_elements="3"
-        update_self="1"
-        information_only="1"
-        default_values="0.0 0.0 0.0" >
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Radius"
         command="SetRadius"
         number_of_elements="1"
         update_self="1"
-        default_values="1.0" />
-      <DoubleVectorProperty
-        name="RadiusInfo"
-        command="GetRadius"
-        number_of_elements="1"
-        update_self="1"
-        information_only="1"
-        default_values="1.0" >
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
+        information_property="RadiusInfo"
+        default_values="1.0" /> 
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"
@@ -346,6 +432,32 @@
     </SphereWidgetProxy>
 
     <ImplicitPlaneWidgetProxy name="ImplicitPlaneWidgetProxy" class="vtkImplicitPlaneWidget">
+      <IntVectorProperty
+        name="IgnorePlaceWidgetChanges"
+        command="SetIgnorePlaceWidgetChanges"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0" >
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="CenterInfo"
+        command="GetCenter"
+        number_of_elements="3"
+        update_self="1"
+        information_only="1"
+        default_values="0.0 0.0 0.0" >
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="NormalInfo"
+        command="GetNormal"
+        number_of_elements="3"
+        update_self="1"
+        information_only="1"
+        default_values="0.0 0.0 0.0" >
+        <SimpleDoubleInformationHelper/>
+      </DoubleVectorProperty>
       <DoubleVectorProperty
         name="PlaceWidget"
         command="PlaceWidget"
@@ -358,31 +470,15 @@
         command="SetCenter"
         number_of_elements="3"
         update_self="1"
+        information_property="CenterInfo"
         default_values="0.0 0.0 0.0" />
-      <DoubleVectorProperty
-        name="CenterInfo"
-        command="GetCenter"
-        number_of_elements="3"
-        update_self="1"
-        information_only="1"
-        default_values="0.0 0.0 0.0" >
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Normal"
         command="SetNormal"
         number_of_elements="3"
         update_self="1"
+        information_property="NormalInfo"
         default_values="0.0 0.0 0.0" />
-      <DoubleVectorProperty
-        name="NormalInfo"
-        command="GetNormal"
-        number_of_elements="3"
-        update_self="1"
-        information_only="1"
-        default_values="0.0 0.0 0.0" >
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
       <IntVectorProperty
         name="DrawPlane"
         command="SetDrawPlane"
@@ -402,31 +498,14 @@
     </ImplicitPlaneWidgetProxy>
 
     <BoxWidgetProxy name="BoxWidgetProxy" class="vtkBoxWidget">
-      <DoubleVectorProperty
-        name="PlaceWidget"
-        command="PlaceWidget"
-        number_of_elements="6"
+      <IntVectorProperty
+        name="IgnorePlaceWidgetChanges"
+        command="SetIgnorePlaceWidgetChanges"
+        number_of_elements="1"
         update_self="1"
-        argument_is_array="1"
-        default_values="0.0 1.0 0.0 1.0 0.0 1.0" />
-      <DoubleVectorProperty
-        name="Position"
-        command="SetPosition"
-        number_of_elements="3"
-        update_self="1"
-        default_values="0.0 0.0 0.0" />
-      <DoubleVectorProperty
-        name="Rotation"
-        command="SetRotation"
-        number_of_elements="3"
-        update_self="1"
-        default_values="0.0 0.0 0.0" />
-      <DoubleVectorProperty
-        name="Scale"
-        command="SetScale"
-        number_of_elements="3"
-        update_self="1"
-        default_values="0.0 0.0 0.0" />
+        default_values="0" >
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
       <DoubleVectorProperty
         name="PositionInfo"
         command="GetPosition"
@@ -455,22 +534,33 @@
         <SimpleDoubleInformationHelper/>
       </DoubleVectorProperty>
       <DoubleVectorProperty
-        name="Matrix"
-        command="SetMatrix"
-        number_of_elements="16"
-        argument_is_array="1"
+        name="PlaceWidget"
+        command="PlaceWidget"
+        number_of_elements="6"
         update_self="1"
-        default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+        argument_is_array="1"
+        default_values="0.0 1.0 0.0 1.0 0.0 1.0" />
       <DoubleVectorProperty
-        name="MatrixInfo"
-        command="GetMatrix"
-        number_of_elements="16"
+        name="Position"
+        command="SetPosition"
+        number_of_elements="3"
         update_self="1"
-        information_only="1"
-        argument_is_array="1"
-        default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0">
-        <SimpleDoubleInformationHelper/>
-      </DoubleVectorProperty>
+        information_property="PositionInfo"
+        default_values="0.0 0.0 0.0" />
+      <DoubleVectorProperty
+        name="Rotation"
+        command="SetRotation"
+        number_of_elements="3"
+        update_self="1"
+        information_property="RotationInfo"
+        default_values="0.0 0.0 0.0" />
+      <DoubleVectorProperty
+        name="Scale"
+        command="SetScale"
+        number_of_elements="3"
+        update_self="1"
+        information_property="ScaleInfo"
+        default_values="0.0 0.0 0.0" />
       <IntVectorProperty
         name="Visibility"
         command="SetVisibility"

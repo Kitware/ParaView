@@ -51,7 +51,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.41");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.42");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -379,6 +379,8 @@ void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
 {
+  this->WidgetProxy->SaveInBatchScript(file);
+
   vtkClientServerID planeID = this->ImplicitFunctionProxy->GetID(0);
   *file << endl;
   *file << "set pvTemp" <<  planeID.ID
@@ -398,6 +400,11 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
       << sdvp->GetElement(0) << " " 
       << sdvp->GetElement(1) << " " 
       << sdvp->GetElement(2) << endl;
+    *file << "  [$pvTemp" << planeID.ID << " GetProperty Origin]"
+      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) << endl;
+    *file << "  [$pvTemp" << planeID.ID << " GetProperty Origin]"
+      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+      << " GetProperty Center]" << endl;
     }
 
   sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -409,11 +416,15 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
       << sdvp->GetElement(0) << " " 
       << sdvp->GetElement(1) << " " 
       << sdvp->GetElement(2) << endl;
+    *file << "  [$pvTemp" << planeID.ID << " GetProperty Normal]"
+      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) << endl;
+    *file << "  [$pvTemp" << planeID.ID << " GetProperty Normal]"
+      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+      << " GetProperty Normal]" << endl;
     }
   *file << "  $pvTemp" << planeID.ID << " UpdateVTKObjects" << endl;
   *file << endl;
 
-  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
@@ -803,6 +814,8 @@ void vtkPVImplicitPlaneWidget::SetCenterInternal(double x, double y, double z)
 void vtkPVImplicitPlaneWidget::SetCenter(double x, double y, double z)
 {
   this->SetCenterInternal(x,y,z);
+  this->AddTraceEntry("$kw(%s) SetCenter %f %f %f",
+    this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
 
@@ -848,6 +861,8 @@ void vtkPVImplicitPlaneWidget::SetNormalInternal(double x, double y, double z)
 void vtkPVImplicitPlaneWidget::SetNormal(double x, double y, double z)
 {
   this->SetNormalInternal(x, y, z);
+  this->AddTraceEntry("$kw(%s) SetNormal %f %f %f",
+    this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
 
@@ -888,7 +903,6 @@ void vtkPVImplicitPlaneWidget::SetCenter()
     }
   this->SetCenter(val[0], val[1], val[2]);
   this->Render();
-  this->ModifiedCallback();
   this->ValueChanged = 0;
 }
 
@@ -907,7 +921,6 @@ void vtkPVImplicitPlaneWidget::SetNormal()
     }
   this->SetNormal(val[0], val[1], val[2]);
   this->Render();
-  this->ModifiedCallback();
   this->ValueChanged = 0;
 }
 

@@ -190,6 +190,7 @@ protected:
   // this proxy belongs to. Can be used to figure out the origin of the
   // proxy.
   vtkSetStringMacro(XMLGroup);
+  vtkGetStringMacro(XMLGroup);
 
   // Description:
   // Given the number of objects (numObjects), class name (VTKClassName)

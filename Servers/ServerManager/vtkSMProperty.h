@@ -152,6 +152,19 @@ public:
   // property has to be specified in the xml configuration file.
   vtkGetObjectMacro(InformationProperty, vtkSMProperty);
 
+  // Description:
+  // ControllerProxy is pointer to the proxy whose property (ControllerProperty) is
+  // mapped to the current property. This is useful for 3DWidgets. The properties of
+  // the implicit function proxy controlled by the 3DWidget will have these set to the 
+  // corresponing property of the 3DWidget. Thus, providing hints about which implicit function
+  // property is controlled by which 3DWidget and what property.
+  // This goes mostly unnoticed in ParaView, but useful for ARL.
+  // If these are set, then they are saved in the XML during SaveState as a
+  // element <ControllerProperty name="propertyname" />. ARL notices such elements and
+  // creates a property value dependency among the controlee and the controller property.
+  void SetControllerProxy(vtkSMProxy* proxy);
+  void SetControllerProperty(vtkSMProperty* property);
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -246,6 +259,18 @@ protected:
   static int CheckDomains;
   static int ModifiedAtCreation;
 
+  // ControllerProxy is pointer to the proxy whose property (ControllerProperty) is
+  // mapped to the current property. This is useful for 3DWidgets. The properties of
+  // the implicit function proxy controlled by the 3DWidget will have these set to the 
+  // corresponing property of the 3DWidget. Thus, providing hints about which implicit function
+  // property is controlled by which 3DWidget and what property.
+  // This goes mostly unnoticed in ParaView, but useful for ARL. 
+  // If these are set, then they are saved in the XML during SaveState as a
+  // element <ControllerProperty name="propertyname" />. ARL notices such elements and
+  // creates a property value dependency among the controlee and the controller property.
+  vtkSMProxy* ControllerProxy;
+  vtkSMProperty* ControllerProperty;
+  
   // Set during xml parsing only. Do not use outside ReadXMLAttributes().
   vtkSMProxy* Proxy;
   void SetProxy(vtkSMProxy* proxy);

@@ -28,7 +28,7 @@
 #include "vtkSM3DWidgetProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.28");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -194,15 +194,15 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
   vtkErrorMacro("Source proxy must be set to save to a batch script.");
   return;
   }
-
+  
   vtkClientServerID sourceID = this->SourceProxy->GetID(0);
-
   if (sourceID.ID == 0)
   {
   vtkErrorMacro("Sanity check failed. " << this->GetClassName());
   return;
   } 
 
+  this->WidgetProxy->SaveInBatchScript(file);
   *file << endl;
   *file << "set pvTemp" << sourceID
     << " [$proxyManager NewProxy sources LineSource]" << endl;
@@ -215,11 +215,17 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
     this->SourceProxy->GetProperty("Point1"));
   if(dvp)
     {
-  *file << "  [$pvTemp" << sourceID << " GetProperty Point1] "
-    << "SetElements3 " 
-    << dvp->GetElement(0) << " " 
-    << dvp->GetElement(1) << " " 
-    << dvp->GetElement(2) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty Point1] "
+      << "SetElements3 " 
+      << dvp->GetElement(0) << " " 
+      << dvp->GetElement(1) << " " 
+      << dvp->GetElement(2) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty Point1]"
+      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0)
+      << endl;
+    *file << " [$pvTemp" << sourceID << " GetProperty Point1]"
+      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+      << " GetProperty Point1]" << endl;
     }
   
   dvp = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -231,6 +237,12 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
       << dvp->GetElement(0) << " " 
       << dvp->GetElement(1) << " " 
       << dvp->GetElement(2) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty Point2]"
+      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0)
+      << endl;
+    *file << " [$pvTemp" << sourceID << " GetProperty Point2]"
+      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+      << " GetProperty Point2]" << endl;
     }
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->SourceProxy->GetProperty("Resolution"));
@@ -238,11 +250,15 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
     {
     *file << "  [$pvTemp" << sourceID << " GetProperty Resolution] "
       << "SetElements1 " << ivp->GetElement(0) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty Resolution]"
+      << " SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0)
+      << endl;
+    *file << " [$pvTemp" << sourceID << " GetProperty Resolution]"
+      << " SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+      << " GetProperty Resolution]" << endl;
     }
   *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
   *file << endl;
-
-  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------

@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.39");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -107,6 +107,8 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
     return;
     } 
 
+  this->WidgetProxy->SaveInBatchScript(file);
+  
   *file << endl;
   *file << "set pvTemp" << sourceID
         << " [$proxyManager NewProxy sources PointSource]"
@@ -125,6 +127,13 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
       << dvp->GetElement(0) << " " 
       << dvp->GetElement(1) << " " 
       << dvp->GetElement(2) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty Center]"
+      << " SetControllerProxy $pvTemp" 
+      << this->WidgetProxy->GetID(0) << endl;
+    *file << "  [$pvTemp" << sourceID << " GetProperty Center]"
+      << " SetControllerProperty [$pvTemp"
+      << this->WidgetProxy->GetID(0) 
+      << " GetProperty Position]" << endl; 
     }
 
   this->NumberOfPointsWidget->GetValue(&num, 1);
@@ -137,7 +146,6 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
   *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
   *file << endl;
 
-  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //-----------------------------------------------------------------------------

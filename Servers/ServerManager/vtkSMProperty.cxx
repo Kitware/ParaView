@@ -25,17 +25,18 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSubPropertyIterator.h"
 #include "vtkSmartPointer.h"
-
+#include "vtkSMProxyManager.h"
 #include <vtkstd/vector>
 
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.22");
+vtkCxxRevisionMacro(vtkSMProperty, "1.23");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
+vtkCxxSetObjectMacro(vtkSMProperty, ControllerProperty, vtkSMProperty);
 
 int vtkSMProperty::CheckDomains = 1;
 int vtkSMProperty::ModifiedAtCreation = 1;
@@ -54,6 +55,8 @@ vtkSMProperty::vtkSMProperty()
   this->InformationOnly = 0;
   this->InformationHelper = 0;
   this->InformationProperty = 0;
+  this->ControllerProxy = 0;
+  this->ControllerProperty = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -66,6 +69,8 @@ vtkSMProperty::~vtkSMProperty()
   this->SetProxy(0);
   this->SetInformationHelper(0);
   this->SetInformationProperty(0);
+  this->SetControllerProperty(0);
+  this->SetControllerProxy(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -100,6 +105,12 @@ int vtkSMProperty::IsInDomains()
     this->DomainIterator->Next();
     }
   return 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::SetControllerProxy(vtkSMProxy* proxy)
+{
+  this->ControllerProxy = proxy;
 }
 
 //---------------------------------------------------------------------------
@@ -360,6 +371,18 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
 //---------------------------------------------------------------------------
 void vtkSMProperty::SaveState(const char* name, ostream* file, vtkIndent indent)
 {
+  if (this->ControllerProxy && this->ControllerProperty)
+    {
+    vtkSMProxyManager *pxm = this->GetProxyManager();
+    //NOTE: this operation is slow :(.
+    const char* name = pxm->GetProxyName(this->ControllerProxy->GetXMLGroup(),this->ControllerProxy);
+    if (name)
+      {
+    *file << "    <ControllerProperty name=\""
+      << name << "." << this->ControllerProperty->GetXMLName() 
+      << "\" />" << endl;
+      }
+    }
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())
     {

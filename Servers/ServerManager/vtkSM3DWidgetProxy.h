@@ -33,8 +33,21 @@ public:
 
   // Description:
   // Sends a PlaceWidget event to the 3DWidget.
+  // A PlaceWidget call on most of the 3DWidgets (eg. ImplicitPlane)
+  // leads to changes in some of the properties of the widget (such as
+  // center/normal). These changes are accepted or totally ignored
+  // depending on the status of the IgnorePlaceWidgetChanges flag.
   virtual void PlaceWidget(double bds[6]);
 
+  // Description:
+  // A PlaceWidget call on most of the 3DWidgets (eg. ImplicitPlane)
+  // leads to changes in some of the properties of the widget (such as
+  // center/normal). This flag indicates if the changes to the widget 
+  // due to a call to PlaceWidget are to be accepted or ignored.
+  // They are ignored when this flag is set and accepted otherwise.
+  // By default, this flag is not set, hence the changes are accepted.
+  vtkSetMacro(IgnorePlaceWidgetChanges,int);
+  
   // Description:
   // Sets Visibility of the 3DWidget. Internally
   // call SetEnabled.
@@ -53,6 +66,17 @@ protected:
   vtkSM3DWidgetProxy();
   ~vtkSM3DWidgetProxy();
 
+  // Description:
+  // Indicator if the positions suggested on PlaceWidget call on a
+  // VTK object are to be ignored. If set, the suggestions are rejected.
+  // If not set the suggestions are accepted.
+  int IgnorePlaceWidgetChanges; 
+
+  // Description:
+  // Indicator if the PlaceWidget message
+  // must be sent to the Servers.
+  int Placed; 
+ 
   double Bounds[6]; //PlaceWidget bounds
 
   friend class vtkPV3DWidget;

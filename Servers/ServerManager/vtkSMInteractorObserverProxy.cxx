@@ -21,10 +21,10 @@
 #include "vtkPVRenderModule.h"
 #include "vtkClientServerStream.h"
 #include "vtkSMDisplayWindowProxy.h"
-
+#include "vtkKWEvent.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.6");
 
 //===========================================================================
 //***************************************************************************
@@ -106,6 +106,7 @@ void vtkSMInteractorObserverProxy::UpdateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMInteractorObserverProxy::ExecuteEvent(vtkObject*, unsigned long event, void*)
 {
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
   if ( event == vtkCommand::StartInteractionEvent )
     {
     this->InvokeEvent(vtkCommand::StartInteractionEvent);
@@ -120,6 +121,7 @@ void vtkSMInteractorObserverProxy::ExecuteEvent(vtkObject*, unsigned long event,
     }
   else
     {
+    // So the the client object changes are sent over to the Servers
     this->UpdateVTKObjects();
     }
 }

@@ -42,7 +42,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.39");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -376,6 +376,8 @@ void vtkPVPointWidget::SetPositionInternal(double x, double y, double z)
 void vtkPVPointWidget::SetPosition(double x, double y, double z)
 {
   this->SetPositionInternal(x, y, z);
+  this->AddTraceEntry("$kw(%s) SetPosition %f %f %f",
+    this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
 
@@ -415,7 +417,7 @@ void vtkPVPointWidget::SetPosition()
     val[cc] = atof(this->PositionEntry[cc]->GetValue());
     }
   this->SetPositionInternal(val[0], val[1], val[2]);
-  this->ModifiedCallback();
+  this->Render();
   this->ValueChanged = 0;
 }
 

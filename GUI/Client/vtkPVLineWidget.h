@@ -165,6 +165,7 @@ protected:
 
   void SetPoint1Internal(double x, double y, double z);
   void SetPoint2Internal(double x, double y, double z);
+  void SetResolutionInternal(int res);
 
   // Description:
   // These methods assume that the Property has been

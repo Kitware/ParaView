@@ -31,82 +31,50 @@ public:
   vtkTypeRevisionMacro(vtkSMBoxWidgetProxy, vtkSM3DWidgetProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //Description:
-  //Get/Set routines. These update the iVars, send messages to the
-  //Server to update values and invoke WidgetMidifiedEvent which
-  //can be observed to update the GUI values.
-  void SetPosition(double x, double y, double z);
-  double* GetPosition(); 
-  void GetPosition(double &x, double &y, double&z);
-  void GetPosition(double position[3]);
-  
-  //Description:
-  //Get/Set routines. These update the iVars, send messages to the
-  //Server to update values and invoke WidgetMidifiedEvent which
-  //can be observed to update the GUI values.
-  void SetRotation(double x, double y, double z);
-  double* GetRotation();
-  void GetRotation(double &x, double &y, double &z);
-  void GetRotation(double rotation[3]);
-  
-  //Description:
-  //Get/Set routines. These update the iVars, send messages to the
-  //Server to update values and invoke WidgetMidifiedEvent which
-  //can be observed to update the GUI values.
-  void SetScale(double x, double y, double z);
-  double* GetScale();
-  void GetScale(double &x, double &y, double &z);
-  void GetScale(double scale[3]);
-  
   // Description:
-  // Set/Get the transformation matrix.
-  // Added to simplify Accept/Reset for the vtkPVBoxWidget
-  //BTX
-  void SetMatrix(vtkMatrix4x4* mat);
-  void GetMatrix(vtkMatrix4x4* mat);
-  void GetMatrix(double elements[16]); 
-  //ETX
-  void SetMatrix(double elements[16]);
-  double* GetMatrix();
-  //BTX
-  vtkGetObjectMacro(BoxTransform,vtkTransform);
+  // Get/Set methods for the iVars.
+  // On UpdateVTKObjects(), these iVars are used to compute 
+  // a transformation matrix which is set on the 3DWidget object
+  // on the Server(and Client).
+  vtkSetVector3Macro(Position,double);
+  vtkGetVector3Macro(Position,double);
+  vtkSetVector3Macro(Scale,double);
+  vtkGetVector3Macro(Scale,double);
+  vtkSetVector3Macro(Rotation,double);
+  vtkGetVector3Macro(Rotation,double);
+ 
+  // Description:
+  // Called to push the values onto the VTK object.
+  virtual void UpdateVTKObjects();
 
-  void ResetInternal();
-  void UpdateVTKObject();
-
+  // Save the proxy state in the batch file.
   virtual void SaveInBatchScript(ofstream *file);
-  //ETX
+
 protected:
   //BTX
   vtkSMBoxWidgetProxy();
   ~vtkSMBoxWidgetProxy();
-
-  void GetPositionInternal();
-  void GetRotationInternal();
-  void GetScaleInternal();
-
-  void SetPositionNoEvent(double x, double y, double z);
-  void SetScaleNoEvent(double x, double y, double z);
-  void SetRotationNoEvent(double x, double y, double z);
-
+  
+  // Description:
+  // Set/Get the transformation matrix.
+  // Position/Rotation/Scale are not directly used by the 3DWidget.
+  // Hence we compose the transformation maxtrix from these iVars.
+  // These methods set/get the transformation maxtrix.
+  void SetMatrix(vtkMatrix4x4* mat);
+  void GetMatrix(vtkMatrix4x4* mat);
+  
   // Description:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
-
   virtual void CreateVTKObjects(int numObjects); 
 
   vtkTransform*      BoxTransform;
-
-  //Description:
-  //Sends the updated transform matrix to the server.
-  void Update();
 
   //Current iVars.
   double Position[3];
   double Rotation[3];
   double Scale[3];
 
-  double Matrix[4][4];
 private:
   vtkSMBoxWidgetProxy(const vtkSMBoxWidgetProxy&); // Not implemented
   void operator=(const vtkSMBoxWidgetProxy&); // Not implemented

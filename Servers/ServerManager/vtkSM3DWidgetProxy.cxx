@@ -23,11 +23,13 @@
 #include "vtkInteractorObserver.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.5");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.6");
 
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
 {
+  this->Placed = 1;
+  this->IgnorePlaceWidgetChanges = 0;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = 0.0;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = 1.0;
 }
@@ -51,7 +53,25 @@ void vtkSM3DWidgetProxy::InitializeObservers(vtkInteractorObserver* widget3D)
 //----------------------------------------------------------------------------
 void vtkSM3DWidgetProxy::UpdateVTKObjects()
 {
+  this->Placed = 1;
   this->Superclass::UpdateVTKObjects();
+  if (!this->Placed)
+    {
+    // We send a PlaceWidget message only when the bounds have been 
+    // changed (achieved by the this->Placed flag).
+    unsigned int cc;
+    vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
+    for(cc=0; cc < this->GetNumberOfIDs(); cc++)
+      {
+      pm->GetStream() << vtkClientServerStream::Invoke << this->GetID(cc)
+        << "PlaceWidget" 
+        << this->Bounds[0] << this->Bounds[1] << this->Bounds[2] 
+        << this->Bounds[3] 
+        << this->Bounds[4] << this->Bounds[5] << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      } 
+    this->Placed = 1;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -74,29 +94,8 @@ void vtkSM3DWidgetProxy::PlaceWidget(double bds[6])
   this->Bounds[4] = bds[4];
   this->Bounds[5] = bds[5];
 
-  unsigned int cc;
-    
-  vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  for(cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    pm->GetStream() << vtkClientServerStream::Invoke << this->GetID(cc)
-      << "PlaceWidget" 
-      << bds[0] << bds[1] << bds[2] << bds[3] 
-      << bds[4] << bds[5] << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    }
-  //Since call to PlaceWidget with bounds as an argument does not invoke a 
-  //PlaceWidgetEvent, we trigger an artificial event.
-  for(cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    vtkInteractorObserver* wdg = vtkInteractorObserver::SafeDownCast(
-      pm->GetObjectFromID(this->GetID(cc)));
-    if (wdg)
-      {
-      wdg->InvokeEvent(vtkCommand::PlaceWidgetEvent);
-      }
-    }
-
+  this->Placed = 0;
+  
 }
 
 //----------------------------------------------------------------------------
@@ -149,6 +148,8 @@ void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
     *file << "  [$Ren1 GetProperty Displayers] AddProxy $pvTemp"
       << id.ID << endl;
 
+    *file << "  [$pvTemp" << id.ID << " GetProperty IgnorePlaceWidgetChanges]"
+      << " SetElements1 1" << endl;
     for(int i=0;i < 6; i++)
       {
       *file << "  [$pvTemp" << id.ID << " GetProperty PlaceWidget] "
@@ -170,4 +171,7 @@ void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
 void vtkSM3DWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  
+  os << indent << "IgnorePlaceWidgetChanges: " 
+    << this->IgnorePlaceWidgetChanges << endl;
 }

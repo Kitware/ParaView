@@ -51,7 +51,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.42");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.43");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -140,15 +140,24 @@ void vtkPVBoxWidget::ResetInternal()
     {
     return;
     }
-  
-  vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->BoxTransformProxy->GetProperty("Matrix"));
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->WidgetProxy->GetProperty("Matrix"));
-  if(dvp && sdvp)
+  const char* properties[] = {"Scale","Position","Rotation", 0 };
+  int i;
+  for (i=0;properties[i]; i++)
     {
-    dvp->SetElements(sdvp->GetElements());
+    vtkSMDoubleVectorProperty* sdvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->BoxTransformProxy->GetProperty(properties[i]));
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->WidgetProxy->GetProperty(properties[i]));
+    if (sdvp && dvp)
+      {
+      dvp->SetElements(sdvp->GetElements());
+      }
+    else
+      {
+      vtkErrorMacro("BoxTransformProxy or WidgetProxy has missing property " << properties[i]);
+      }
     }
+  
   this->WidgetProxy->UpdateVTKObjects(); 
   this->Superclass::ResetInternal();
 }
@@ -173,38 +182,41 @@ void vtkPVBoxWidget::PlaceWidget(double bds[6])
 void vtkPVBoxWidget::Accept()
 {
   int modFlag = this->GetModifiedFlag();
-
+  
+  double values[3][3];
   this->WidgetProxy->UpdateInformation();
-  vtkSMDoubleVectorProperty *matProperty = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->WidgetProxy->GetProperty("MatrixInfo"));
-  if (matProperty)
+  this->GetScaleInternal(values[0]);
+  this->GetPositionInternal(values[1]);
+  this->GetRotationInternal(values[2]);
+
+  const char* properties[] = { "Scale","Position","Rotation", 0 };
+  int i;
+  for (i=0; properties[i]; i++)
     {
-    //Set matrix on Transform Proxy
-    vtkSMDoubleVectorProperty *matProp =
-      vtkSMDoubleVectorProperty::SafeDownCast(
-        this->BoxTransformProxy->GetProperty("Matrix"));
-    if (matProp)
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->BoxProxy->GetProperty(properties[i]));
+    if (dvp)
       {
-      matProp->SetElements(matProperty->GetElements());
-      }
-    this->BoxTransformProxy->UpdateVTKObjects();
-    //Set transform on Box proxy
-    vtkSMDoubleVectorProperty *transProperty = vtkSMDoubleVectorProperty::SafeDownCast(
-      this->BoxProxy->GetProperty("Transform"));
-    if (transProperty)
-      {
-      vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
-      matrix->DeepCopy(matProperty->GetElements());
-      matrix->Invert();
-      transProperty->SetElements(reinterpret_cast<double*>(matrix->Element));
-      matrix->Delete();
+      dvp->SetElements(values[i]);
       }
     else
       {
-      vtkErrorMacro("BoxProxy does not have Transform property");
+      vtkErrorMacro("BoxProxy does not have "<< properties[i] <<" property");
+      }  
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->BoxTransformProxy->GetProperty(properties[i]));
+    if (dvp)
+      {
+      dvp->SetElements(values[i]);
       }
-    this->BoxProxy->UpdateVTKObjects();
+    else
+      {
+      vtkErrorMacro("BoxTransformProxy does not have "<< properties[i] <<" property");
+      }
     }
+  this->BoxProxy->UpdateVTKObjects();
+  this->BoxTransformProxy->UpdateVTKObjects();
+  
   this->ModifiedFlag = 0;
   // I put this after the accept internal, because
   // vtkPVGroupWidget inactivates and builds an input list ...
@@ -267,36 +279,47 @@ void vtkPVBoxWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
 {
-
+  this->WidgetProxy->SaveInBatchScript(file);
+  
   *file << endl;
-  vtkSMDoubleVectorProperty* matrixProperty = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->BoxTransformProxy->GetProperty("Matrix"));
-  if (matrixProperty)
+  int i;
+  if (this->BoxTransformProxy)
     {
     vtkClientServerID boxTransformID = this->BoxTransformProxy->GetID(0);
-
     *file << "set pvTemp" << boxTransformID.ID
-      << " [$proxyManager NewProxy transforms Transform]"
+      << " [$proxyManager NewProxy transforms Transform2]"
       << endl;
     *file << "  $proxyManager RegisterProxy transforms pvTemp" << boxTransformID.ID
       << " $pvTemp" << boxTransformID.ID << endl;
     *file << "  $pvTemp" << boxTransformID.ID << " UnRegister {}" << endl;
-    for (int i=0; i < 16; i++)
+
+    //NOw, set the properties of the BoxTransformProxy
+    const char *properties[] = { "Rotation", "Scale", "Position" , 0};
+    for (i=0; properties[i] != 0; i++)
       {
-      *file << "  [$pvTemp" << boxTransformID.ID
-        << " GetProperty Matrix] SetElement " << i
-        << " " << matrixProperty->GetElement(i) 
-        << endl;
+      vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->BoxProxy->GetProperty(properties[i]));
+      if (dvp)
+        {
+        *file << "  [$pvTemp" << boxTransformID.ID << " GetProperty " << properties[i] 
+          << "] SetElement 0 " << dvp->GetElement(0) << endl;
+        *file << "  [$pvTemp" << boxTransformID.ID << " GetProperty " << properties[i] 
+          << "] SetElement 1 " << dvp->GetElement(1) << endl;
+        *file << "  [$pvTemp" << boxTransformID.ID << " GetProperty " << properties[i] 
+          << "] SetElement 2 " << dvp->GetElement(2) << endl;
+        *file << "  [$pvTemp" << boxTransformID.ID << " GetProperty " << properties[i]
+          << "] SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) << endl;
+        *file << "  [$pvTemp" << boxTransformID.ID << " GetProperty " << properties[i]
+          << "] SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+          << " GetProperty " << properties[i] << "]" << endl;
+        }
       }
     *file << "  $pvTemp" << boxTransformID.ID
       << " UpdateVTKObjects"  << endl;
     *file << endl;
     }
 
-
-  matrixProperty = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->BoxProxy->GetProperty("Transform"));
-  if(matrixProperty)
+  if (this->BoxProxy)
     {
     vtkClientServerID boxID = this->BoxProxy->GetID(0);
     *file << "set pvTemp" << boxID.ID
@@ -304,30 +327,41 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
     *file << "  $proxyManager RegisterProxy implicit_functions pvTemp" << boxID.ID
       << " $pvTemp" << boxID.ID << endl;
     *file << "  $pvTemp" << boxID.ID << " UnRegister {}" << endl;
-    for (int i=0; i < 16; i++)
-      {
-      *file << "  [$pvTemp" << boxID.ID
-        << " GetProperty Transform] SetElement " << i
-        << " " << matrixProperty->GetElement(i) 
-        << endl;
-      }
 
+    //Now, set the properties of the BoxProxy
     vtkSMDoubleVectorProperty *dvp = vtkSMDoubleVectorProperty::SafeDownCast(
       this->BoxProxy->GetProperty("Bounds"));
     if (dvp)
       {
-      for(int i=0;i<6;i++)
+      for( i=0;i<6;i++)
         {
-        *file << "  [$pvTemp" << boxID.ID
-          << " GetProperty Bounds] SetElement " << i << " "
-          << dvp->GetElement(i)
-          << endl;
+        *file << "  [$pvTemp" << boxID.ID << " GetProperty Bounds] SetElement " 
+          << i << " "  << dvp->GetElement(i) << endl;
         }
       }
+    const char *properties[] = { "Rotation", "Scale", "Position" , 0};
+    for (i=0; properties[i] != 0; i++)
+      {
+      dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->BoxProxy->GetProperty(properties[i]));
+      if (dvp)
+        {
+        *file << "  [$pvTemp" << boxID.ID << " GetProperty " << properties[i] 
+          << "] SetElement 0 " << dvp->GetElement(0) << endl;
+        *file << "  [$pvTemp" << boxID.ID << " GetProperty " << properties[i] 
+          << "] SetElement 1 " << dvp->GetElement(1) << endl;
+        *file << "  [$pvTemp" << boxID.ID << " GetProperty " << properties[i] 
+          << "] SetElement 2 " << dvp->GetElement(2) << endl;
+        *file << "  [$pvTemp" << boxID.ID << " GetProperty " << properties[i]
+          << "] SetControllerProxy $pvTemp" << this->WidgetProxy->GetID(0) << endl;
+        *file << "  [$pvTemp" << boxID.ID << " GetProperty " << properties[i]
+          << "] SetControllerProperty [$pvTemp" << this->WidgetProxy->GetID(0)
+          << " GetProperty " << properties[i] << "]" << endl;
 
+        }
+      }
     *file << "  $pvTemp" << boxID.ID << " UpdateVTKObjects" << endl;
     }
-  this->WidgetProxy->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
@@ -585,7 +619,7 @@ void vtkPVBoxWidget::Create( vtkKWApplication *app)
   this->BoxProxy->CreateVTKObjects(1);
   str1.rdbuf()->freeze(0);
 
-  this->BoxTransformProxy = pm->NewProxy("transforms", "Transform");
+  this->BoxTransformProxy = pm->NewProxy("transforms", "Transform2");
   ostrstream str2;
   str2 << "vtkPVBoxWidget_BoxTransform" << instanceCount << ends;
   this->SetBoxTransformProxyName(str2.str());
@@ -612,7 +646,6 @@ void vtkPVBoxWidget::SetScale()
     }
   this->SetScale(val[0],val[1],val[2]);
   this->Render();
-  this->ModifiedCallback();
   this->ValueChanged = 0;
 }
 
@@ -631,7 +664,6 @@ void vtkPVBoxWidget::SetTranslate()
     }
   this->SetTranslate(val[0],val[1],val[2]);
   this->Render();
-  this->ModifiedCallback();
   this->ValueChanged = 0;
 }
 
@@ -650,7 +682,6 @@ void vtkPVBoxWidget::SetOrientation()
     }
   this->SetOrientation(val[0],val[1],val[2]);
   this->Render();
-  this->ModifiedCallback();
   this->ValueChanged = 0;
 }
 
@@ -661,11 +692,13 @@ void vtkPVBoxWidget::SetOrientationInternal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Rotation"));
   if (dvp)
     {
-    dvp->SetElement(0,x);
-    dvp->SetElement(1,y);
-    dvp->SetElement(2,z);
+    dvp->SetElements3(x,y,z);
     }
   this->WidgetProxy->UpdateVTKObjects();
+
+  this->OrientationScale[0]->GetEntry()->SetValue(x);
+  this->OrientationScale[1]->GetEntry()->SetValue(y);
+  this->OrientationScale[2]->GetEntry()->SetValue(z);
 }
 
 //----------------------------------------------------------------------------
@@ -675,11 +708,13 @@ void vtkPVBoxWidget::SetTranslateInternal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Position"));
   if (dvp)
     {
-    dvp->SetElement(0,x);
-    dvp->SetElement(1,y);
-    dvp->SetElement(2,z);
+    dvp->SetElements3(x,y,z);
     }
   this->WidgetProxy->UpdateVTKObjects();
+
+  this->TranslateThumbWheel[0]->GetEntry()->SetValue(x);
+  this->TranslateThumbWheel[1]->GetEntry()->SetValue(y);
+  this->TranslateThumbWheel[2]->GetEntry()->SetValue(z);
 }
 
 //----------------------------------------------------------------------------
@@ -689,11 +724,13 @@ void vtkPVBoxWidget::SetScaleInternal(double x, double y, double z)
     this->WidgetProxy->GetProperty("Scale"));
   if(dvp)
     {
-    dvp->SetElement(0,x);
-    dvp->SetElement(1,y);
-    dvp->SetElement(2,z);
+    dvp->SetElements3(x,y,z);
     }
   this->WidgetProxy->UpdateVTKObjects();
+  
+  this->ScaleThumbWheel[0]->GetEntry()->SetValue(x);
+  this->ScaleThumbWheel[1]->GetEntry()->SetValue(y);
+  this->ScaleThumbWheel[2]->GetEntry()->SetValue(z);
 }
 
 //----------------------------------------------------------------------------
@@ -705,6 +742,7 @@ void vtkPVBoxWidget::SetOrientation(double px, double py, double pz)
   this->SetOrientationInternal(px, py, pz);
   this->AddTraceEntry("$kw(%s) SetOrientation %f %f %f",
     this->GetTclName(), px, py, pz);  
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -713,6 +751,7 @@ void vtkPVBoxWidget::SetScale(double px, double py, double pz)
   this->SetScaleInternal(px, py, pz);
   this->AddTraceEntry("$kw(%s) SetScale %f %f %f",
     this->GetTclName(), px, py, pz);  
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -721,6 +760,46 @@ void vtkPVBoxWidget::SetTranslate(double px, double py, double pz)
   this->SetTranslateInternal(px, py, pz);
   this->AddTraceEntry("$kw(%s) SetTranslate %f %f %f",
     this->GetTclName(), px, py, pz);  
+  this->ModifiedCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::GetScaleInternal(double scale[3])
+{
+ vtkSMDoubleVectorProperty *dvpScale = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("ScaleInfo")); 
+ if (dvpScale)
+   {
+   scale[0] = dvpScale->GetElement(0);
+   scale[1] = dvpScale->GetElement(1);
+   scale[2] = dvpScale->GetElement(2);
+   }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::GetRotationInternal(double rotation[3])
+{
+  vtkSMDoubleVectorProperty *dvpRotation = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("RotationInfo"));
+  if (dvpRotation)
+    {
+    rotation[0] = dvpRotation->GetElement(0);
+    rotation[1] = dvpRotation->GetElement(1);
+    rotation[2] = dvpRotation->GetElement(2);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::GetPositionInternal(double position[3])
+{
+  vtkSMDoubleVectorProperty *dvpPosition = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->WidgetProxy->GetProperty("PositionInfo"));
+  if (dvpPosition)
+    {
+    position[0] = dvpPosition->GetElement(0);
+    position[1] = dvpPosition->GetElement(1);
+    position[2] = dvpPosition->GetElement(2);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -728,40 +807,29 @@ void vtkPVBoxWidget::UpdateFromBox()
 {
   this->WidgetProxy->UpdateInformation();
 
-  vtkSMDoubleVectorProperty *dvpScale = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->WidgetProxy->GetProperty("ScaleInfo"));
-  vtkSMDoubleVectorProperty *dvpRotation = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->WidgetProxy->GetProperty("RotationInfo"));
-  vtkSMDoubleVectorProperty *dvpPosition = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->WidgetProxy->GetProperty("PositionInfo"));
+  double scale[3], position[3], rotation[3];
+  this->GetScaleInternal(scale);
+  this->GetPositionInternal(position);
+  this->GetRotationInternal(rotation);
 
-  if(dvpScale)
-    {
-    this->ScaleThumbWheel[0]->SetValue(dvpScale->GetElement(0));
-    this->ScaleThumbWheel[1]->SetValue(dvpScale->GetElement(1));
-    this->ScaleThumbWheel[2]->SetValue(dvpScale->GetElement(2));
-    }
+  this->ScaleThumbWheel[0]->SetValue(scale[0]);
+  this->ScaleThumbWheel[1]->SetValue(scale[1]);
+  this->ScaleThumbWheel[2]->SetValue(scale[2]);
 
-  if(dvpPosition)
-    {
-    this->TranslateThumbWheel[0]->SetValue(dvpPosition->GetElement(0));
-    this->TranslateThumbWheel[1]->SetValue(dvpPosition->GetElement(1));
-    this->TranslateThumbWheel[2]->SetValue(dvpPosition->GetElement(2));
-    }
+  this->TranslateThumbWheel[0]->SetValue(position[0]);
+  this->TranslateThumbWheel[1]->SetValue(position[1]);
+  this->TranslateThumbWheel[2]->SetValue(position[2]);
 
-  if(dvpRotation)
-    {
-    double orientation[3];
-    orientation[0] = dvpRotation->GetElement(0);
-    orientation[1] = dvpRotation->GetElement(1);
-    orientation[2] = dvpRotation->GetElement(2);
-    if ( orientation[0] < 0 ) { orientation[0] += 360; }
-    if ( orientation[1] < 0 ) { orientation[1] += 360; }
-    if ( orientation[2] < 0 ) { orientation[2] += 360; }
-    this->OrientationScale[0]->SetValue(orientation[0]);
-    this->OrientationScale[1]->SetValue(orientation[1]);
-    this->OrientationScale[2]->SetValue(orientation[2]);
-    }
+  double orientation[3];
+  orientation[0] = rotation[0];
+  orientation[1] = rotation[1];
+  orientation[2] = rotation[2];
+  if ( orientation[0] < 0 ) { orientation[0] += 360; }
+  if ( orientation[1] < 0 ) { orientation[1] += 360; }
+  if ( orientation[2] < 0 ) { orientation[2] += 360; }
+  this->OrientationScale[0]->SetValue(orientation[0]);
+  this->OrientationScale[1]->SetValue(orientation[1]);
+  this->OrientationScale[2]->SetValue(orientation[2]);
 }
 
 //----------------------------------------------------------------------------

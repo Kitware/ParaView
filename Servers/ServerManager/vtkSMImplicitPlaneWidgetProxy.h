@@ -40,11 +40,7 @@ public:
   virtual void SaveInBatchScript(ofstream *file);
 
   // Description:
-  // In vtkImplicitPlaneWidget, PlaceWidget uses the bounds on the input
-  // to position the center of the widget, rather than the argument bounds.
-  // Hence, we have to explicitly position the center.
-  virtual void PlaceWidget(double bds[6]);
-
+  // Push the property values to the VTK object on the Servers.
   virtual void UpdateVTKObjects();
 protected:
   vtkSMImplicitPlaneWidgetProxy();

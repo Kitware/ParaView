@@ -18,14 +18,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
-#include "vtkKWEvent.h"
 #include "vtkCommand.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.6");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -88,31 +87,9 @@ void vtkSMImplicitPlaneWidgetProxy::CreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMImplicitPlaneWidgetProxy::PlaceWidget(double bds[6])
-{
-  if (this->Bounds[0] == bds[0] &&
-    this->Bounds[1] == bds[1] &&
-    this->Bounds[2] == bds[2] &&
-    this->Bounds[3] == bds[3] &&
-    this->Bounds[4] == bds[4] &&
-    this->Bounds[5] == bds[5])
-    {
-    return;
-    }
-  double normal[3];
-  this->GetNormal(normal);
-  this->Superclass::PlaceWidget(bds);
-  double center[3];
-  center[0] = (bds[0]+bds[1])/2;
-  center[1] = (bds[2]+bds[3])/2;
-  center[2] = (bds[4]+bds[5])/2;
-  this->SetCenter(center);
-  this->SetNormal(normal);
-}
-
-//----------------------------------------------------------------------------
 void vtkSMImplicitPlaneWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void *p)
 {
+
   vtkImplicitPlaneWidget *widget = vtkImplicitPlaneWidget::SafeDownCast(wdg);
   if ( !widget )
     {
@@ -121,14 +98,30 @@ void vtkSMImplicitPlaneWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long e
   double center[3],normal[3];
   widget->GetOrigin(center); 
   widget->GetNormal(normal);
-  //Just set the iVars
-  this->SetCenter(center);
-  this->SetNormal(normal);
+  if (event == vtkCommand::PlaceWidgetEvent && !this->IgnorePlaceWidgetChanges)
+    {
+    //this case is here only since the vtkImplicitPlaneWidget doesn;t behave as 
+    //expected. The center is not repositioned properly (to the center of the bounds).
+    //Hence, we do that explicitly.
+    center[0] = (this->Bounds[0] + this->Bounds[1]) /2;
+    center[1] = (this->Bounds[2] + this->Bounds[3]) /2;
+    center[2] = (this->Bounds[4] + this->Bounds[5]) /2;
+    // we do not accept the normal suggestion, since vtkImplicitPlaneWidget::PlaceWidget
+    // totally resets the normal, which is not necessary. Hence, we will ignore it.
+    normal[0] = this->Normal[0];
+    normal[1] = this->Normal[1];
+    normal[2] = this->Normal[2];
+    }
+  if (event != vtkCommand::PlaceWidgetEvent || !this->IgnorePlaceWidgetChanges)
+    {
+    //Just set the iVars
+    this->SetCenter(center);
+    this->SetNormal(normal);
+    }
   if (!widget->GetDrawPlane() && event == vtkCommand::InteractionEvent)
     { 
     this->SetDrawPlane(1);
     }
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
   this->Superclass::ExecuteEvent(wdg,event,p);
 }
 

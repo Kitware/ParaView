@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.57");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.58");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -167,6 +167,8 @@ void vtkPVLineWidget::SetPoint1Internal(double x, double y, double z)
 void vtkPVLineWidget::SetPoint1(double x, double y, double z)
 {
   this->SetPoint1Internal(x, y, z);
+  this->AddTraceEntry("$kw(%s) SetPoint1 %f %f %f",
+    this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
 
@@ -223,6 +225,8 @@ void vtkPVLineWidget::SetPoint2Internal(double x, double y, double z)
 void vtkPVLineWidget::SetPoint2(double x, double y, double z)
 {
   this->SetPoint2Internal(x, y, z);
+  this->AddTraceEntry("$kw(%s) SetPoint2 %f %f %f",
+    this->GetTclName(), x, y, z);
   this->ModifiedCallback();
 }
 
@@ -262,7 +266,7 @@ void vtkPVLineWidget::SetPoint1()
     pos[i] = this->Point1[i]->GetValueAsFloat();
     }
   this->SetPoint1(pos[0], pos[1], pos[2]);
-  this->ModifiedCallback();
+  this->Render();
   this->ValueChanged = 0;
 }
 
@@ -280,12 +284,12 @@ void vtkPVLineWidget::SetPoint2()
     pos[i] = this->Point2[i]->GetValueAsFloat();
     }
   this->SetPoint2(pos[0], pos[1], pos[2]);
-  this->ModifiedCallback();
+  this->Render();
   this->ValueChanged = 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SetResolution(int i)
+void vtkPVLineWidget::SetResolutionInternal(int res)
 {
   if(!this->IsCreated())
     {
@@ -294,8 +298,16 @@ void vtkPVLineWidget::SetResolution(int i)
     }
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->WidgetProxy->GetProperty("Resolution"));
-  ivp->SetElements1(i);
+  ivp->SetElements1(res);
   this->WidgetProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::SetResolution(int res)
+{
+  this->SetResolutionInternal(res);
+  this->AddTraceEntry("$kw(%s) SetResolution %d", this->GetTclName(), res);
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -328,7 +340,7 @@ void vtkPVLineWidget::SetResolution()
     }
   int res = this->ResolutionEntry->GetValueAsInt();
   this->SetResolution(res);
-  this->ModifiedCallback();
+  this->Render();
   this->ValueChanged = 0; 
 }
 

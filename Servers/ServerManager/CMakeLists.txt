@@ -15,6 +15,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMArraySelectionInformationHelper.cxx
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
+  vtkSMBoxProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDisplayWindowProxy.cxx
   vtkSMDisplayerProxy.cxx
@@ -53,6 +54,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMSubPropertyIterator.cxx
+  vtkSMTransformProxy.cxx
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx

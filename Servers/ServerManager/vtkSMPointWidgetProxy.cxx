@@ -16,13 +16,13 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
-#include "vtkKWEvent.h"
+#include "vtkCommand.h"
 #include "vtkClientServerStream.h"
 #include "vtkPickPointWidget.h"
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.4");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
@@ -89,9 +89,11 @@ void vtkSMPointWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,voi
     }
   double val[3];
   widget->GetPosition(val); 
-  //Update ivars to reflect the VTK object values
-  this->SetPosition(val[0], val[1], val[2]);
-  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent);
+  if (event != vtkCommand::PlaceWidgetEvent || !this->IgnorePlaceWidgetChanges)
+    {
+    //Update ivars to reflect the VTK object values
+    this->SetPosition(val);
+    }
   this->Superclass::ExecuteEvent(wdg,event,p);
 }
 

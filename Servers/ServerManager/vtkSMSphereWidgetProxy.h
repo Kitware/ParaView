@@ -14,10 +14,12 @@
 =========================================================================*/
 // .NAME vtkSMSphereWidgetProxy
 // .SECTION Description
-
+// vtkSMSphereWidgetProxy is the proxy for vtkSphereWidget. 
+// It maintains iVars for Center and Radius of the vtkSphereWidget.
+// These values are pushed onto the vtkSphereWidget on
+// UpdateVTKObjects(). 
 #ifndef __vtkSMSphereWidgetProxy_h
 #define __vtkSMSphereWidgetProxy_h
-
 
 #include "vtkSM3DWidgetProxy.h"
 
@@ -51,7 +53,13 @@ protected:
   
   // Description:
   // Execute event of the 3D Widget.
+  // When the user interacts with the 3DWidget on the client, events are fired.
+  // Since this class listens to such events, it leads to a call to ExecuteEvent.
+  // This method updates the iVars based on the values on the client 3DWidget and
+  // calls Superclass ExecuteEvent which triggers a WidgetModifiedEvent indicating that
+  // widget has been manipulated. 
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
+
   virtual void CreateVTKObjects(int numObjects); 
 
   double Center[3];
