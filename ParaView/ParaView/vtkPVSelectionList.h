@@ -102,6 +102,11 @@ public:
   // This method gets called when the user selects an entry.
   // Use this method if you want to programmatically change the selection.
   void SelectCallback(const char *name, int value);
+
+  // Description:
+  // This class redefines SetBalloonHelpString since it
+  // has to forward the call to the widgets (label and selection) it contains.
+  virtual void SetBalloonHelpString(const char *str);
   
 //BTX
   // Description:

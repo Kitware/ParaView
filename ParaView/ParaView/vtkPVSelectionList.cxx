@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.27");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.28");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -83,6 +83,40 @@ vtkPVSelectionList::~vtkPVSelectionList()
   this->Menu = NULL;
   this->Names->Delete();
   this->Names = NULL;
+}
+
+void vtkPVSelectionList::SetBalloonHelpString(const char *str)
+{
+
+  // A little overkill.
+  if (this->BalloonHelpString == NULL && str == NULL)
+    {
+    return;
+    }
+
+  // This check is needed to prevent errors when using
+  // this->SetBalloonHelpString(this->BalloonHelpString)
+  if (str != this->BalloonHelpString)
+    {
+    // Normal string stuff.
+    if (this->BalloonHelpString)
+      {
+      delete [] this->BalloonHelpString;
+      this->BalloonHelpString = NULL;
+      }
+    if (str != NULL)
+      {
+      this->BalloonHelpString = new char[strlen(str)+1];
+      strcpy(this->BalloonHelpString, str);
+      }
+    }
+  
+  if ( this->Application && !this->BalloonHelpInitialized )
+    {
+    this->Label->SetBalloonHelpString(this->BalloonHelpString);
+    this->Menu->SetBalloonHelpString(this->BalloonHelpString);
+    this->BalloonHelpInitialized = 1;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -132,6 +166,7 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
     {
     this->Menu->SetValue(name);
     }
+  this->SetBalloonHelpString(this->BalloonHelpString);
 
 }
 
