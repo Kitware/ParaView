@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 
 
-vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.9");
+vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.10");
 vtkStandardNewMacro(vtkTiledDisplaySchedule);
 
 
@@ -454,7 +454,7 @@ void vtkTiledDisplaySchedule::InitializeTiles(int numTiles, int numProcs)
 {
   int  tIdx, pIdx;
   int sum, max;
-  int* totalProcessLengths;
+  int* totalProcessLengths=0;
   vtkTiledDisplaySchedule* ts;
   vtkTiledDisplayProcess* p;
   int i, j;
@@ -572,6 +572,7 @@ void vtkTiledDisplaySchedule::InitializeTiles(int numTiles, int numProcs)
     tileSchedules[tIdx] = NULL;
     }
   delete [] tileSchedules;
+  delete [] totalProcessLengths;
 }
 
 //-------------------------------------------------------------------------
