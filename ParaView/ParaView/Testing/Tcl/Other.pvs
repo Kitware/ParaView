@@ -8,7 +8,7 @@ if {[info exists argc]} {
         }
     }
 } 
-
+update
 $Application DisableTestErrors 
 after idle { This will test TCL error reporting }
 update idletasks
