@@ -343,8 +343,7 @@ ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
 
 # Create ClientServer wrappers for ParaView classes.
 VTK_WRAP_ClientServer(vtkParaViewServerCS ParaViewServerCS_SRCS
-  ${ParaViewShared_SRCS} ${ParaViewServer_SRCS}
-  ${ParaViewExtraWrapper_SRCS})
+  "${ParaViewShared_SRCS};${ParaViewServer_SRCS};${ParaViewExtraWrapper_SRCS}")
 ADD_LIBRARY(vtkParaViewServerCS ${ParaViewServerCS_SRCS}
   ${ParaViewServer_SRCS})
 TARGET_LINK_LIBRARIES(vtkParaViewServerCS vtkPVFiltersCS vtkKWWidgetsTCL vtkKWParaViewTCL)

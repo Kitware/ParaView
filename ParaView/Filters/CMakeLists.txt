@@ -85,7 +85,7 @@ IF (VTK_USE_PATENTED)
 ENDIF (VTK_USE_PATENTED)
 
 # Create ClientServer wrappers for filters library.
-VTK_WRAP_ClientServer(vtkPVFiltersCS FiltersCS_SRCS ${Filters_SRCS})
+VTK_WRAP_ClientServer(vtkPVFiltersCS FiltersCS_SRCS "${Filters_SRCS}")
 ADD_LIBRARY(vtkPVFiltersCS ${FiltersCS_SRCS})
 TARGET_LINK_LIBRARIES(vtkPVFiltersCS vtkParallelCS vtkHybridCS vtkPVFilters)
 IF (VTK_USE_PATENTED)
