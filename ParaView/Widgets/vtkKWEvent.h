@@ -53,11 +53,12 @@ class VTK_EXPORT vtkKWEvent
   static const char* GetStringFromEventId(unsigned long event);
   enum {
     KWWidgetEvents = 2000,
-    // VV
-    WindowLevelChangedEvent = 2000,
+    // VV    
+    WindowLevelChangedEvent = 2000,    
     WindowLevelChangingEvent,
     WindowLevelChangedImageCompositeEvent,
     WindowLevelChangingImageCompositeEvent,
+    ViewSelectedEvent,
     ColorImageEvent,
     GradientOpacityFunctionChangedEvent,
     GradientOpacityStateChangedEvent,

@@ -49,6 +49,7 @@ static const char *vtkKWEventStrings[] = {
   "WindowLevelChangingEvent",
   "WindowLevelChangedImageCompositeEvent",
   "WindowLevelChangingImageCompositeEvent",
+  "ViewSelectedEvent",
   "ColorImageEvent",
   "GradientOpacityFunctionChangedEvent",
   "GradientOpacityStateChangedEvent",
