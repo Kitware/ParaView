@@ -250,6 +250,52 @@ Create texture coordinates.
                input_name="Input"/>
   </Module>
 
+  <Module name="CTHAMRSurface"
+          root_name="CTHAMRSurface"
+          menu_name="CTH AMR Surface"
+          module_type="Filter"
+          replace_input="1"
+          long_help="Show the outer surface of the AMR data set."
+          short_help="Generate the outer surface.">
+    <Filter class="vtkCTHAMRSurface">
+      <Input name="Input"
+             class="vtkCTHData">
+      </Input>
+    </Filter>
+
+    <InputMenu trace_name="Input"
+               id="im"
+               label="Input"
+               input_name="Input"
+               property="Input"
+               help="Set the input to this filter." />
+
+    <LabeledToggle label="-X face visibility"
+                   property="NegativeXVisibility"
+                   trace_name="NegativeXVisibility"
+                   help="Visibility of the six face orientations." />
+    <LabeledToggle label="+X face visibility"
+                   property="PositiveXVisibility"
+                   trace_name="PositiveXVisibility"
+                   help="Visibility of the six face orientations." />
+    <LabeledToggle label="-Y face visibility"
+                   property="NegativeYVisibility"
+                   trace_name="NegativeYVisibility"
+                   help="Visibility of the six face orientations." />
+    <LabeledToggle label="+Y face visibility"
+                   property="PositiveYVisibility"
+                   trace_name="PositiveYVisibility"
+                   help="Visibility of the six face orientations." />
+    <LabeledToggle label="-Z face visibility"
+                   property="NegativeZVisibility"
+                   trace_name="NegativeZVisibility"
+                   help="Visibility of the six face orientations." />
+    <LabeledToggle label="+Z face visibility"
+                   property="PositiveZVisibility"
+                   trace_name="PositiveZVisibility"
+                   help="Visibility of the six face orientations." />
+  </Module>
+
   <Module name="StructuredGridOutlineFilter"
           menu_name="Outline (curvilinear)"
           root_name="GOutline"

@@ -724,6 +724,70 @@
    <!-- End CTHAMRContour -->
    </SourceProxy>
 
+   <SourceProxy name="CTHAMRSurface" class="vtkCTHAMRSurface">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkCTHData"/>
+          </DataTypeDomain>
+     </InputProperty>
+
+     <IntVectorProperty 
+        name="NegativeXVisibility" 
+        command="SetNegativeXVisibility" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="PositiveXVisibility" 
+        command="SetPositiveXVisibility" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="NegativeYVisibility" 
+        command="SetNegativeYVisibility" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="PositiveYVisibility" 
+        command="SetPositiveYVisibility" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="NegativeZVisibility" 
+        command="SetNegativeZVisibility" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="PositiveZVisibility" 
+        command="SetPositiveZVisibility" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+   <!-- End CTHAMRSurface -->
+   </SourceProxy>
+
    <SourceProxy name="CTHPart" class="vtkExtractCTHPart">
     <InputProperty
        name="Input"
