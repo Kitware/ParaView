@@ -58,23 +58,13 @@ public:
 
   // Description:
   // Return the name of the element used inside that tree to
-  // store the handle property.
-  static char* GetHandlePropertyElementName();
-
-  // Description:
-  // Return the name of the element used inside that tree to
-  // store the selected handle property.
-  static char* GetSelectedHandlePropertyElementName();
-
-  // Description:
-  // Return the name of the element used inside that tree to
-  // store the plane property.
-  static char* GetImagePlanePropertyElementName();
-
-  // Description:
-  // Return the name of the element used inside that tree to
-  // store the selected plane property.
-  static char* GetSelectedImagePlanePropertyElementName();
+  // store the properties.
+  static char* GetPlanePropertyElementName();
+  static char* GetSelectedPlanePropertyElementName();
+  static char* GetCursorPropertyElementName();
+  static char* GetMarginPropertyElementName();
+  static char* GetTexturePlanePropertyElementName();
+  static char* GetTextPropertyElementName();
 
 protected:
   vtkXMLImagePlaneWidgetWriter() {};
