@@ -29,7 +29,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.12");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -248,6 +248,11 @@ void vtkPVAxesWidget::UpdateCursorIcon()
     this->MouseCursorState = vtkPVAxesWidget::Outside;
     }
 
+  if (pState == this->MouseCursorState)
+    {
+    return;
+    }
+  
   if (this->MouseCursorState == vtkPVAxesWidget::Outside)
     {
     this->Renderer->RemoveActor(this->OutlineActor);
@@ -257,11 +262,6 @@ void vtkPVAxesWidget::UpdateCursorIcon()
     this->Renderer->AddActor(this->OutlineActor);
     }
   this->Interactor->Render();
-  
-  if (pState == this->MouseCursorState)
-    {
-    return;
-    }
   
   this->SetMouseCursor(this->MouseCursorState);
 }
