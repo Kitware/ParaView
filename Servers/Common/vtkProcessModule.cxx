@@ -42,7 +42,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.2");
+vtkCxxRevisionMacro(vtkProcessModule, "1.3");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -492,73 +492,6 @@ void vtkProcessModule::InterpreterCallback(unsigned long, void* pinfo)
     vtkErrorMacro("Aborting execution for debugging purposes.");
     abort();
     }
-}
-
-//----------------------------------------------------------------------------
-int vtkProcessModule::SendStringToClient(const char* str)
-{
-  if(!this->ClientServerStream->StreamFromString(str))
-    {
-    return 0;
-    }
-  this->SendStream(vtkProcessModule::CLIENT);
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkProcessModule::SendStringToClientAndServer(const char* str)
-{
-  if(!this->ClientServerStream->StreamFromString(str))
-    {
-    return 0;
-    }
-  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkProcessModule::SendStringToClientAndServerRoot(const char* str)
-{
-  if(!this->ClientServerStream->StreamFromString(str))
-    {
-    return 0;
-    }
-  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER_ROOT);
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkProcessModule::SendStringToServer(const char* str)
-{
-  if(!this->ClientServerStream->StreamFromString(str))
-    {
-    return 0;
-    }
-  this->SendStream(vtkProcessModule::DATA_SERVER);
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkProcessModule::SendStringToServerRoot(const char* str)
-{
-  if(!this->ClientServerStream->StreamFromString(str))
-    {
-    return 0;
-    }
-  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkProcessModule::GetStringFromServer()
-{
-  return this->GetLastServerResult().StreamToString();
-}
-
-//----------------------------------------------------------------------------
-const char* vtkProcessModule::GetStringFromClient()
-{
-  return this->GetLastClientResult().StreamToString();
 }
 
 //----------------------------------------------------------------------------

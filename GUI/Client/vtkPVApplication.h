@@ -380,11 +380,6 @@ public:
   int GetNumberOfPartitions();
   
   // Description:
-  // Send string to client and server. This is here so that tcl scripts can
-  // access it.
-  void SendStringToClientAndServer(const char*);
-
-  // Description:
   // Play the demo
   void PlayDemo(int fromDashboard);
   
@@ -393,6 +388,24 @@ public:
   // its description. Memory is allocated, a pointer is return, it's up to
   // the caller to delete it.
   char* GetTextRepresentation(vtkPVSource* comp);
+
+  // Description:
+  // Send the stream represented by the given string to the client,
+  // server, or both.  This should not be called by C++ code and is
+  // provided only for debugging and testing purposes.  Returns 1 if
+  // the string is successfully parsed and 0 otherwise.
+  virtual int SendStringToClient(const char*);
+  virtual int SendStringToClientAndServer(const char*);
+  virtual int SendStringToClientAndServerRoot(const char*);
+  virtual int SendStringToServer(const char*);
+  virtual int SendStringToServerRoot(const char*);
+
+  // Description:
+  // Get a result stream represented by a string.  This should not be
+  // called by C++ code and is provided only for debugging and testing
+  // purposes.
+  virtual const char* GetStringFromServer();
+  virtual const char* GetStringFromClient();
 
 protected:
   vtkPVApplication();

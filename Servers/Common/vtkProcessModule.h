@@ -147,25 +147,6 @@ public:
   virtual void SendStreamToServerRootTemp(vtkClientServerStream* stream);
 //ETX
 
-  // Description:
-  // Send the stream represented by the given string to the client,
-  // server, or both.  This should not be called by C++ code and is
-  // provided only for debugging and testing purposes.  Returns 1 if
-  // the string is successfully parsed and 0 otherwise.
-  virtual int SendStringToClient(const char*);
-  virtual int SendStringToClientAndServer(const char*);
-  virtual int SendStringToClientAndServerRoot(const char*);
-  virtual int SendStringToServer(const char*);
-  virtual int SendStringToServerRoot(const char*);
-
-  // Description:
-  // Get a result stream represented by a string.  This should not be
-  // called by C++ code and is provided only for debugging and testing
-  // purposes.
-  virtual const char* GetStringFromServer();
-  virtual const char* GetStringFromClient();
-
-
   //BTX
   // Description:
   // Get the interpreter used on the local process.

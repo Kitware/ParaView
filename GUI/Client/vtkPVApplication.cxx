@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.297");
+vtkCxxRevisionMacro(vtkPVApplication, "1.298");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2288,12 +2288,6 @@ int vtkPVApplication::GetNumberOfPartitions()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SendStringToClientAndServer(const char* str)
-{
-  this->GetProcessModule()->SendStringToClientAndServer(str);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
 {
   (void)event;
@@ -2444,3 +2438,71 @@ int vtkPVApplication::GetGlobalLODFlag()
   return vtkPVProcessModule::GetGlobalLODFlag();
 }
 
+//----------------------------------------------------------------------------
+int vtkPVApplication::SendStringToClient(const char* str)
+{
+  if(!this->ProcessModule->GetStream().StreamFromString(str))
+    {
+    return 0;
+    }
+  this->ProcessModule->SendStream(vtkProcessModule::CLIENT);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::SendStringToClientAndServer(const char* str)
+{
+  if(!this->ProcessModule->GetStream().StreamFromString(str))
+    {
+    return 0;
+    }
+  this->ProcessModule->SendStream(vtkProcessModule::CLIENT |
+                                  vtkProcessModule::DATA_SERVER);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::SendStringToClientAndServerRoot(const char* str)
+{
+  if(!this->ProcessModule->GetStream().StreamFromString(str))
+    {
+    return 0;
+    }
+  this->ProcessModule->SendStream(vtkProcessModule::CLIENT |
+                                  vtkProcessModule::DATA_SERVER_ROOT);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::SendStringToServer(const char* str)
+{
+  if(!this->ProcessModule->GetStream().StreamFromString(str))
+    {
+    return 0;
+    }
+  this->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::SendStringToServerRoot(const char* str)
+{
+  if(!this->ProcessModule->GetStream().StreamFromString(str))
+    {
+    return 0;
+    }
+  this->ProcessModule->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVApplication::GetStringFromServer()
+{
+  return this->ProcessModule->GetLastServerResult().StreamToString();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVApplication::GetStringFromClient()
+{
+  return this->ProcessModule->GetLastClientResult().StreamToString();
+}
