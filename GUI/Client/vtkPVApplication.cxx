@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.278");
+vtkCxxRevisionMacro(vtkPVApplication, "1.279");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -414,7 +414,6 @@ vtkPVApplication::vtkPVApplication()
 {
   this->ApplicationInitialized = 0;
   this->MachinesFileName = 0;
-  this->CaveConfigurationFileName = 0;
   this->ProgressEnabled = 0;
   this->ProgressRequests = 0;
   this->Observer = vtkPVApplicationObserver::New();
@@ -605,8 +604,6 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Run ParaView as client (MPI run, 1 process) (ParaView Data Server and Render Server must be started first).", 
   "--machines" , "-m", 
   "Specify the network configurations file for the render server (--machines=cfgfile).",
-  "--cave-configuration" , "-cc", 
-  "Specify the file that defines the displays for a cave. It is used only with CaveREnderModule. (--cave-configuration=ccfile).",
   "--server" , "-v", 
   "Start ParaView as a server (use MPI run).",
   "--render-server" , "-rs", 
@@ -1092,24 +1089,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       this->SetMachinesFileName(newarg);
       }
     
-    if ( vtkPVApplication::CheckForArgument(argc, argv, "--cave-configuration",
-                                            index) == VTK_OK ||
-         vtkPVApplication::CheckForArgument(argc, argv, "-cc", 
-                                            index) == VTK_OK)
-      {
-      // Strip string to equals sign.
-      const char* newarg=0;
-      int len = (int)(strlen(argv[index]));
-      for (i=0; i<len; i++)
-        {
-        if (argv[index][i] == '=')
-          {
-          newarg = &(argv[index][i+1]);
-          }
-        }
-      this->SetCaveConfigurationFileName(newarg);
-      this->SetRenderModuleName("CaveRenderModule");
-      }
   
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--render-node-port",
                                             index) == VTK_OK)
@@ -1188,18 +1167,9 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 //      }
 #endif
 
-  // Set the tiled display flag if any tiled display option is used.
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-tiled-display",
                                           index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-td",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-x",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-tdx",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-y",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-tdy",
                                           index) == VTK_OK )
     {
     if (!this->ClientMode)
@@ -1210,7 +1180,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       {
       this->UseTiledDisplay = 1;
       
-      if ( vtkPVApplication::CheckForArgument(argc, argv,"--tile-dimensions-x",
+      if ( vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-x",
                                               index) == VTK_OK ||
            vtkPVApplication::CheckForArgument(argc, argv, "-tdx",
                                               index) == VTK_OK )
@@ -1227,7 +1197,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
           }
         this->TileDimensions[0] = atoi(newarg);
         }
-      if ( vtkPVApplication::CheckForArgument(argc, argv,"--tile-dimensions-y",
+      if ( vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-y",
                                               index) == VTK_OK ||
            vtkPVApplication::CheckForArgument(argc, argv, "-tdy",
                                               index) == VTK_OK )
