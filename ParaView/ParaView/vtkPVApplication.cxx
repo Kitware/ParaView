@@ -144,7 +144,7 @@ vtkPVApplication::vtkPVApplication()
   this->Log = NULL;
   this->LogFileName = NULL;
 
-  this->TraceFile = new ofstream("ParaViewTrace.tcl", ios::out);
+  this->TraceFile = new ofstream("ParaViewTrace.pvs", ios::out);
   if (this->TraceFile && this->TraceFile->fail())
     {
     delete this->TraceFile;
@@ -366,7 +366,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   if (argc > 1 && argv[1])
     {
     // if a tcl script was passed in as an arg then load it
-    if (!strcmp(argv[1] + strlen(argv[1]) - 4,".tcl"))
+    if (!strcmp(argv[1] + strlen(argv[1]) - 4,".pvs"))
       {
       ui->LoadScript(argv[1]);
       }

@@ -181,7 +181,9 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindow = (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
   this->RenderWindowTclName = NULL;
   this->SetRenderWindowTclName("RenWin1");
-  
+
+  this->Composite = 0;
+#ifdef VTK_USE_MPI
   // Create the compositer.
   str = getenv("PV_DISABLE_COMPOSITE_INTERRUPTS");
   if ( str != NULL)
@@ -195,7 +197,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TreeComp1");
-
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
 			 this->RendererTclName);
   pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
@@ -206,9 +207,11 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
     {
     pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
     }
+#else
 
+  pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
+			 this->RendererTclName);
   // Tree compositer handles aborts now.
-#ifndef VTK_USE_MPI
   this->RenderWindow->SetAbortCheckMethod(PVRenderViewAbortCheck, (void*)this);
 #endif
   
@@ -340,14 +343,18 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     }
   this->SetApplication(app);
 
+
   // Application has to be set before we can get a tcl name.
   // Otherwise I would have done this in "CreateRenderObjects".
   // Create the compositer.
   if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") == NULL)
     {
-    // Since the render view is only on process 0, do not broadcast.
-    this->GetPVApplication()->Script("%s SetRenderView %s", 
-			                          this->CompositeTclName, this->GetTclName());
+    if (this->Composite)
+      {
+      // Since the render view is only on process 0, do not broadcast.
+      this->GetPVApplication()->Script("%s SetRenderView %s", 
+				       this->CompositeTclName, this->GetTclName());
+      }
     }
 
   // create the frame
@@ -855,15 +862,21 @@ void vtkPVRenderView::Render()
     return;
     }
 
-  this->StartRender();
+  if (this->Composite)
+    {
+    this->StartRender();
+    }
   this->RenderWindow->Render();
 
-  this->InteractiveRenderTime = this->Composite->GetMaxRenderTime();
-  this->InteractiveCompositeTime = this->Composite->GetCompositeTime()
-                                     + this->Composite->GetGetBuffersTime()
-                                     + this->Composite->GetSetBuffersTime();
-  pvApp->AddLogEntry("InteractiveRender", this->InteractiveRenderTime);
-  pvApp->AddLogEntry("InteractiveCcomposite", this->InteractiveCompositeTime);
+  if (this->Composite)
+    {
+    this->InteractiveRenderTime = this->Composite->GetMaxRenderTime();
+    this->InteractiveCompositeTime = this->Composite->GetCompositeTime()
+      + this->Composite->GetGetBuffersTime()
+      + this->Composite->GetSetBuffersTime();
+    pvApp->AddLogEntry("InteractiveRender", this->InteractiveRenderTime);
+    pvApp->AddLogEntry("InteractiveCcomposite", this->InteractiveCompositeTime);
+    }
 
 }
 
@@ -912,15 +925,21 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     }
 
   this->ResetCameraClippingRange();
-  this->StartRender();
+  if (this->Composite)
+    {
+    this->StartRender();
+    }
   this->RenderWindow->Render();
 
-  this->StillRenderTime = this->Composite->GetMaxRenderTime();
-  this->StillCompositeTime = this->Composite->GetCompositeTime()
-                               + this->Composite->GetGetBuffersTime()
-                               + this->Composite->GetSetBuffersTime();
-  pvApp->AddLogEntry("StillRender", this->StillRenderTime);
-  pvApp->AddLogEntry("StillCcomposite", this->StillCompositeTime);
+  if (this->Composite)
+    {
+    this->StillRenderTime = this->Composite->GetMaxRenderTime();
+    this->StillCompositeTime = this->Composite->GetCompositeTime()
+      + this->Composite->GetGetBuffersTime()
+      + this->Composite->GetSetBuffersTime();
+    pvApp->AddLogEntry("StillRender", this->StillRenderTime);
+    pvApp->AddLogEntry("StillCcomposite", this->StillCompositeTime);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -255,6 +255,10 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #else
 int main(int argc, char *argv[])
 {
+
+  vtkMultiProcessController *controller = vtkMultiProcessController::New();  
+  controller->Initialize(&argc, &argv);
+
   int retVal = 0;
   // New processes need these args to initialize.
   vtkPVArgs pvArgs;
@@ -262,12 +266,8 @@ int main(int argc, char *argv[])
   pvArgs.argv = argv;
   pvArgs.RetVal = &retVal;
 
-  vtkMultiProcessController *controller = vtkMultiProcessController::New();  
-  controller->Initialize(&argc, &argv);
 
-#ifndef VTK_USE_MPI
-  controller->SetNumberOfProcesses(1);
-#endif
+#ifdef VTK_USE_MPI
 
   controller->CreateOutputWindow();
 
@@ -277,6 +277,13 @@ int main(int argc, char *argv[])
   
   controller->Finalize();
   controller->Delete();
+
+#else
+  controller->SetNumberOfProcesses(1);
+  vtkMultiProcessController::SetGlobalController(controller);
+  Process_Init(controller, (void *)(&pvArgs)); 
+  controller->Delete();
+#endif
   
   return retVal;
 }

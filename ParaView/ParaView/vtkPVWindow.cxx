@@ -167,6 +167,8 @@ vtkPVWindow::vtkPVWindow()
   this->AnimationInterface = vtkPVAnimationInterface::New();
 
   this->TclInteractor = NULL;
+
+  this->SetScriptExtension(".pvs");
 }
 
 //----------------------------------------------------------------------------
@@ -823,7 +825,7 @@ void vtkPVWindow::PlayDemo()
   reg->SetTopLevel(temp);
   if (reg->ReadValue("Inst", loc, "Loc"))
     {
-    sprintf(temp1,"%s/Demos/Demo1.tcl",loc);
+    sprintf(temp1,"%s/Demos/Demo1.pvs",loc);
     sprintf(temp2,"%s/Data/blow.vtk",loc);
     }
 
@@ -835,7 +837,6 @@ void vtkPVWindow::PlayDemo()
     this->Application->Script("set tmpPvDataDir [string map {\\\\ /} {%s/Data}]", loc);
     }
 
-  vtkDebugMacro(<<temp1);
   ifstream fptr(temp1, ios::in  PV_NOCREATE);
   if (!fptr.fail())
     {
@@ -868,7 +869,7 @@ void vtkPVWindow::PlayDemo()
 
   for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
     {
-    sprintf(temp1, "%s/Demos/Demo1.tcl", *dir);
+    sprintf(temp1, "%s/Demos/Demo1.pvs", *dir);
     ifstream fptr(temp1, ios::in  PV_NOCREATE);
     if (!fptr.fail())
       {
@@ -880,11 +881,10 @@ void vtkPVWindow::PlayDemo()
 
   if (!found)
     {
-      vtkDebugMacro("Booo");
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->Create(this->Application,"");
     dlg->SetText(
-      "Could not find Demo1.tcl in the installation or\n"
+      "Could not find Demo1.pvs in the installation or\n"
       "build directory. Please make sure that ParaView\n"
       "is installed properly.");
     dlg->Invoke();  
@@ -1151,7 +1151,7 @@ void vtkPVWindow::SaveInTclScript()
   file = new ofstream(filename, ios::out);
   if (file->fail())
     {
-    vtkErrorMacro("Could not open file pipeline.tcl");
+    vtkErrorMacro("Could not open file " << filename);
     delete file;
     file = NULL;
     return;
@@ -1228,7 +1228,7 @@ void vtkPVWindow::SaveWorkspace()
   vtkPVSource *pvs;
   char *filename;
   
-  this->Script("tk_getSaveFile -filetypes {{{ParaView Files} {.pv}} {{All Files} {.*}}} -defaultextension .tcl");
+  this->Script("tk_getSaveFile -filetypes {{{ParaView Files} {.pvw}} {{All Files} {.*}}} -defaultextension .pvw");
   filename = this->Application->GetMainInterp()->result;
   
   if (strcmp(filename, "") == 0)
@@ -1239,7 +1239,7 @@ void vtkPVWindow::SaveWorkspace()
   file = new ofstream(filename, ios::out);
   if (file->fail())
     {
-    vtkErrorMacro("Could not open file pipeline.pv");
+    vtkErrorMacro("Could not open file pipeline.pvw");
     delete file;
     file = NULL;
     return;
