@@ -2433,7 +2433,7 @@ void vtkPVData::GetArrayComponentRange(float *range, int pointDataFlag,
       range[0] = temp[0];
       range[1] = temp[1];
       }
-    else if (temp[0] < temp[1])
+    else if (temp[0] <= temp[1])
       {
       if (temp[0] < range[0])
         {
