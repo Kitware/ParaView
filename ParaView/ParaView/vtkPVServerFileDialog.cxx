@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.8");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.9");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -905,14 +905,19 @@ void vtkPVServerFileDialog::Update()
     char* result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
     this->SetLastPath(result);
     delete [] result;
-    result = NULL;
     }
 
   // Read the list of subdirectories and files.
-  if(!this->GetPVApplication()->GetProcessModule()
-     ->GetDirectoryListing(this->LastPath, dirs, files))
+  if(!(this->GetPVApplication()->GetProcessModule()
+       ->GetDirectoryListing(this->LastPath, dirs, files)))
     {
     vtkErrorMacro("Cannot open directory: " << this->LastPath);
+    this->GetPVApplication()->GetProcessModule()->RootScript("pwd");
+    char* result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
+    this->SetLastPath(result);
+    delete [] result;
+    this->GetPVApplication()->GetProcessModule()
+      ->GetDirectoryListing(this->LastPath, dirs, files);
     }
   
   this->Script("%s delete all", this->FileList->GetWidgetName());
@@ -947,16 +952,13 @@ void vtkPVServerFileDialog::Update()
 //----------------------------------------------------------------------------
 int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
 {
-  int x, yNext; 
+  int x=10;
+  int yNext = y+17;
   static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
   char *result = 0;
   char *tmp;
 
-  yNext = y + 17;
-
   // Create an image on the left of the label.
-  x = 10;
-
   this->Script("%s create image %d %d", this->FileList->GetWidgetName(), 
                x + image_icon_max_width / 2, y);
   if (this->Application->GetMainInterp()->result)
