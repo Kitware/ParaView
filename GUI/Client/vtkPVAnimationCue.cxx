@@ -44,6 +44,8 @@
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkKWRange.h"
+
 #define VTK_PV_ANIMATON_ENTRY_HEIGHT 20
 
 /* 
@@ -72,7 +74,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.4");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.5");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -673,8 +675,10 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
 
   this->Frame->SetParent(this);
   ostrstream frame_options;
+  int height = (this->TimeLine->GetShowParameterRange())? 
+    this->TimeLine->GetParameterRange()->GetThickness() : 0;
   frame_options << "-relief flat -height " 
-    << VTK_PV_ANIMATON_ENTRY_HEIGHT
+    << this->TimeLine->GetCanvasHeight() + height
     << ends;
   this->Frame->Create(app,frame_options.str());
   frame_options.rdbuf()->freeze(0);
@@ -689,6 +693,7 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
   this->Label->ConfigureOptions(label_text.str());
   label_text.rdbuf()->freeze(0);
 
+  this->Script("pack propagate %s 0", this->Frame->GetWidgetName());
   this->Script("bind %s <ButtonPress-1> {%s GetFocus}",
     this->Label->GetWidgetName(), this->GetTclName());
   this->Image->SetParent(this->Frame);
@@ -814,11 +819,13 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event, void* 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::PackWidget()
 {
+  int label_frame_width = 1;
   if (!this->IsCreated())
     {
     vtkErrorMacro("Widget must be created before packing");
     return;
     }
+  
   if (this->ShowTimeLine)
     {
     this->Script("pack %s -anchor n -side top -fill x -expand t",
@@ -836,24 +843,30 @@ void vtkPVAnimationCue::PackWidget()
     {
     this->Script("pack %s -anchor w -side left",
       this->Image->GetWidgetName());
+    this->Script("winfo reqwidth %s", this->Image->GetWidgetName());
+    label_frame_width += vtkKWObject::GetIntegerResult(this->GetApplication());
     }
+  
   this->Script("pack %s -anchor w -side left",
     this->Label->GetWidgetName());
+  this->Script("winfo reqwidth %s", this->Label->GetWidgetName());
+  label_frame_width += vtkKWObject::GetIntegerResult(this->GetApplication());
 
-  if (this->TimeLine->GetShowParameterRange())
-    {
-  this->Script("pack %s -anchor nw -side top -fill x -expand t -pady 8",
-    this->Frame->GetWidgetName());
-    }
-  else
-    {
   this->Script("pack %s -anchor nw -side top -fill x -expand t",
     this->Frame->GetWidgetName());
-    }
-
   
   this->Script("pack %s -anchor n -side top -fill x -expand t",
     this->GetWidgetName());
+
+  // Set the label width properly, since we have disabled pack propagate on the frame
+  // containig the label.
+  if (label_frame_width != 1)
+    {
+    ostrstream str;
+    str << "-width " << label_frame_width << ends;
+    this->Frame->ConfigureOptions(str.str());
+    str.rdbuf()->freeze(0);
+    }
 }
 
 //-----------------------------------------------------------------------------
