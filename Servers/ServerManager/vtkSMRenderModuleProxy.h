@@ -96,9 +96,14 @@ public:
   void ComputeVisiblePropBounds(double bounds[6]);
 
   // Description:
+  // Returns the display collection.
+  vtkGetObjectMacro(Displays, vtkCollection);
+
+  // Description:
   // Get the value of the z buffer at a position. 
   // This is necessary for picking the center of rotation.
   virtual double GetZBufferValue(int x, int y);
+
 protected:
   vtkSMRenderModuleProxy();
   ~vtkSMRenderModuleProxy();
