@@ -10,9 +10,9 @@ SET(Filters_SRCS
   vtkPVServerSelectTimeSet.cxx
   vtkPVServerXDMFParameters.cxx
   vtkPVExtentTranslator.cxx
+  vtkPickLineWidget.cxx
   vtkPickPointWidget.cxx
   vtkPVSummaryHelper.cxx
-
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
   vtkPVGenericRenderWindowInteractor.cxx
