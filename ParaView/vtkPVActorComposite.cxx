@@ -66,6 +66,20 @@ vtkPVActorComposite::vtkPVActorComposite()
 {
   static int instanceCount = 0;
   
+  this->Property = NULL;
+  this->PropertyTclName = NULL;
+  this->Prop = NULL;
+  this->PropTclName = NULL;
+  this->LODDeciTclName = NULL;
+  this->MapperTclName = NULL;
+  this->LODMapperTclName = NULL;
+  this->OutlineTclName = NULL;
+  this->GeometryTclName = NULL;
+  this->OutputPortTclName = NULL;
+  this->AppendPolyDataTclName = NULL;
+  this->ScalarBarTclName = NULL;
+  this->CubeAxesTclName = NULL;
+
   // Create a unique id for creating tcl names.
   ++instanceCount;
   this->InstanceCount = instanceCount;
@@ -118,18 +132,6 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   //this->TextureFilter = NULL;
   
-  this->ActorTclName = NULL;
-  this->LODDeciTclName = NULL;
-  this->MapperTclName = NULL;
-  this->LODMapperTclName = NULL;
-  this->OutlineTclName = NULL;
-  this->GeometryTclName = NULL;
-  this->OutputPortTclName = NULL;
-  this->AppendPolyDataTclName = NULL;
-  
-  this->ScalarBarTclName = NULL;
-
-  this->CubeAxesTclName = NULL;
 }
 
 
@@ -187,22 +189,28 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
                          this->LODMapperTclName, this->MapperTclName);
  
   // Get rid of previous object created by the superclass.
+  // Maybe we should not be a subclass of vtkActorComposite!
   if (this->Actor)
     {
     this->Actor->Delete();
     this->Actor = NULL;
     }
+
   // Make a new tcl object.
   sprintf(tclName, "Actor%d", this->InstanceCount);
-//  this->Actor = (vtkActor*)pvApp->MakeTclObject("vtkActor", tclName);
-  this->Actor = (vtkActor*)pvApp->MakeTclObject("vtkLODActor", tclName);
-  this->ActorTclName = NULL;
-  this->SetActorTclName(tclName);
+  this->Prop = (vtkProp*)pvApp->MakeTclObject("vtkLODProp3D", tclName);
+  //this->Actor = (vtkLODProp3D*)pvApp->MakeTclObject("vtkLODProp3D", tclName);
+  this->SetPropTclName(tclName);
+
+  // Make a new tcl object.
+  sprintf(tclName, "Property%d", this->InstanceCount);
+  this->Property = (vtkProperty*)pvApp->MakeTclObject("vtkProperty", tclName);
+  this->SetPropertyTclName(tclName);
   
-  pvApp->BroadcastScript("%s SetMapper %s", this->ActorTclName, 
-			this->MapperTclName);
-  pvApp->BroadcastScript("%s AddLODMapper %s", this->ActorTclName,
-			 this->LODMapperTclName);
+  pvApp->BroadcastScript("%s AddLOD %s %s 1.0", this->PropTclName, 
+			 this->MapperTclName, this->PropertyTclName);
+  pvApp->BroadcastScript("%s AddLOD %s %s 0.05", this->PropTclName,
+			 this->LODMapperTclName, this->PropertyTclName);
   
   // Hard code assignment based on processes.
   numProcs = pvApp->GetController()->GetNumberOfProcesses() ;
@@ -287,9 +295,13 @@ vtkPVActorComposite::~vtkPVActorComposite()
   pvApp->BroadcastScript("%s Delete", this->LODMapperTclName);
   this->SetLODMapperTclName(NULL);
 
-  pvApp->BroadcastScript("%s Delete", this->ActorTclName);
-  this->SetActorTclName(NULL);
-  this->Actor = NULL;
+  pvApp->BroadcastScript("%s Delete", this->PropTclName);
+  this->SetPropTclName(NULL);
+  this->Prop = NULL;
+
+  pvApp->BroadcastScript("%s Delete", this->PropertyTclName);
+  this->SetPropertyTclName(NULL);
+  this->Property = NULL;
 
   if (this->OutputPortTclName)
     {
@@ -553,7 +565,7 @@ void vtkPVActorComposite::UpdateProperties()
   this->ZRangeLabel->SetLabel(tmp);
   
     
-  this->AmbientScale->SetValue(this->GetActor()->GetProperty()->GetAmbient());
+  this->AmbientScale->SetValue(this->Property->GetAmbient());
 
 
   currentColorBy = this->ColorMenu->GetValue();
@@ -634,8 +646,8 @@ void vtkPVActorComposite::ChangeActorColor(float r, float g, float b)
     return;
     }
   
-  pvApp->BroadcastScript("[%s GetProperty] SetColor %f %f %f",
-                         this->ActorTclName, r, g, b);
+  pvApp->BroadcastScript("%s GetProperty SetColor %f %f %f",
+                         this->PropertyTclName, r, g, b);
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -742,8 +754,8 @@ void vtkPVActorComposite::ColorByProperty()
   float *color;
   
   color = this->ColorButton->GetColor();
-  pvApp->BroadcastScript("[%s GetProperty] SetColor %f %f %f", 
-			 this->ActorTclName, color[0], color[1], color[2]);
+  pvApp->BroadcastScript("%s SetColor %f %f %f", 
+			 this->PropertyTclName, color[0], color[1], color[2]);
   
   // No scalars visible.  Turn off scalar bar.
   this->SetScalarBarVisibility(0);
@@ -803,13 +815,12 @@ void vtkPVActorComposite::DrawWireframe()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  if (this->ActorTclName)
+  if (this->PropertyTclName)
     {
-    pvApp->BroadcastScript("[%s GetProperty] SetRepresentationToWireframe",
-			   this->ActorTclName);
+    pvApp->BroadcastScript("%s SetRepresentationToWireframe",
+                           this->PropertyTclName);
     }
   
-  //this->GetActor()->GetProperty()->SetRepresentationToWireframe();
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -818,13 +829,12 @@ void vtkPVActorComposite::DrawSurface()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  if (this->ActorTclName)
+  if (this->PropertyTclName)
     {
-    pvApp->BroadcastScript("[%s GetProperty] SetRepresentationToSurface",
-			   this->ActorTclName);
+    pvApp->BroadcastScript("%s SetRepresentationToSurface",
+                           this->PropertyTclName);
     }
   
-  //this->GetActor()->GetProperty()->SetRepresentationToSurface();
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -833,13 +843,12 @@ void vtkPVActorComposite::DrawPoints()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  if (this->ActorTclName)
+  if (this->PropertyTclName)
     {
-    pvApp->BroadcastScript("[%s GetProperty] SetRepresentationToPoints",
-			   this->ActorTclName);
+    pvApp->BroadcastScript("%s SetRepresentationToPoints",
+			   this->PropertyTclName);
     }
   
-  //this->GetActor()->GetProperty()->SetRepresentationToPoints();
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -849,13 +858,12 @@ void vtkPVActorComposite::SetInterpolationToFlat()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  if (this->ActorTclName)
+  if (this->PropertyTclName)
     {
-    pvApp->BroadcastScript("[%s GetProperty] SetInterpolationToFlat",
-			   this->ActorTclName);
+    pvApp->BroadcastScript("%s SetInterpolationToFlat",
+                           this->PropertyTclName);
     }
   
-  //this->GetActor()->GetProperty()->SetRepresentationToWireframe();
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -865,13 +873,12 @@ void vtkPVActorComposite::SetInterpolationToGouraud()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  if (this->ActorTclName)
+  if (this->PropertyTclName)
     {
-    pvApp->BroadcastScript("[%s GetProperty] SetInterpolationToGouraud",
-			   this->ActorTclName);
+    pvApp->BroadcastScript("%s SetInterpolationToGouraud",
+                           this->PropertyTclName);
     }
   
-  //this->GetActor()->GetProperty()->SetRepresentationToWireframe();
   this->GetPVRenderView()->EventuallyRender();
 }
 
@@ -893,7 +900,7 @@ void vtkPVActorComposite::AmbientChanged()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetAmbient(float ambient)
 {
-  this->GetActor()->GetProperty()->SetAmbient(ambient);
+  this->Property->SetAmbient(ambient);
 }
 
 
@@ -1138,9 +1145,9 @@ void vtkPVActorComposite::SetVisibility(int v)
 {
   vtkPVApplication *pvApp;
   pvApp = (vtkPVApplication*)(this->Application);
-  if (this->ActorTclName)
+  if (this->PropTclName)
     {
-    pvApp->BroadcastScript("%s SetVisibility %d", this->ActorTclName, v);
+    pvApp->BroadcastScript("%s SetVisibility %d", this->PropTclName, v);
     }
   if (v == 0 && this->GeometryTclName)
     {
@@ -1488,14 +1495,14 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
     }
   *file << "\n";
   
-  *file << "vtkActor " << this->ActorTclName << "\n\t"
-        << this->ActorTclName << " SetMapper " << this->MapperTclName << "\n\t"
-        << "[" << this->ActorTclName << " GetProperty] SetRepresentationTo"
-        << this->Actor->GetProperty()->GetRepresentationAsString() << "\n\t"
-        << "[" << this->ActorTclName << " GetProperty] SetInterpolationTo"
-        << this->Actor->GetProperty()->GetInterpolationAsString() << "\n\t"
-        << this->ActorTclName << " SetVisibility "
-        << this->Actor->GetVisibility() << "\n\n";
+  *file << "vtkActor " << this->PropTclName << "\n\t"
+        << this->PropTclName << " SetMapper " << this->MapperTclName << "\n\t"
+        << "[" << this->PropTclName << " GetProperty] SetRepresentationTo"
+        << this->Property->GetRepresentationAsString() << "\n\t"
+        << "[" << this->PropTclName << " GetProperty] SetInterpolationTo"
+        << this->Property->GetInterpolationAsString() << "\n\t"
+        << this->PropTclName << " SetVisibility "
+        << this->Prop->GetVisibility() << "\n\n";
   
   if (this->ScalarBarCheck->GetState())
     {

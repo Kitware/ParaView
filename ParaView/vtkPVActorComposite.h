@@ -142,7 +142,7 @@ public:
 
   // Description:
   // Tcl name of the actor across all processes.
-  vtkGetStringMacro(ActorTclName);
+  vtkGetStringMacro(PropTclName);
   
   // Description:
   // Methods called when item chosen from ColorMenu
@@ -209,6 +209,11 @@ protected:
   vtkPVActorComposite(const vtkPVActorComposite&) {};
   void operator=(const vtkPVActorComposite&) {};
   
+  // Problems with vtkLODActor led me to use these.
+  vtkProperty *Property;
+  vtkProp *Prop;
+  
+  // Not properties does not mean the same thing as vtk.
   vtkKWWidget *Properties;
   char *Name;
   vtkKWLabel *NumCellsLabel;
@@ -253,8 +258,11 @@ protected:
   // Super class stores a vtkPolyDataInput, this is a more general input.
   vtkDataSet *DataSetInput;
 
-  char *ActorTclName;
-  vtkSetStringMacro(ActorTclName);
+  char *PropTclName;
+  vtkSetStringMacro(PropTclName);
+  
+  char *PropertyTclName;
+  vtkSetStringMacro(PropertyTclName);
   
   char *MapperTclName;
   vtkSetStringMacro(MapperTclName);
