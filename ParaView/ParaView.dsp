@@ -101,6 +101,18 @@ SOURCE=.\vtkDummyRenderWindowInteractor.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkDummyRenderWindowInteractorTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleCamera.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleCameraTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkInteractorStyleExtent.cxx
 # End Source File
 # Begin Source File
@@ -162,6 +174,14 @@ SOURCE=.\vtkPVApplication.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVApplicationTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVAssignment.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVAssignmentTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -269,14 +289,6 @@ SOURCE=.\vtkPVPolyDataTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVRenderSlave.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVRenderSlaveTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVRenderView.cxx
 # End Source File
 # Begin Source File
@@ -290,14 +302,6 @@ SOURCE=.\vtkPVShrinkPolyData.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVShrinkPolyDataTcl.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVSlave.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVSlaveTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -322,6 +326,60 @@ SOURCE=.\vtkPVWindowTcl.cxx
 # Begin Source File
 
 SOURCE=.\vtkDummyRenderWindowInteractor.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkDummyRenderWindowInteractor.h
+InputName=vtkDummyRenderWindowInteractor
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkDummyRenderWindowInteractor.h
+InputName=vtkDummyRenderWindowInteractor
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleCamera.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkInteractorStyleCamera.h
+InputName=vtkInteractorStyleCamera
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkInteractorStyleCamera.h
+InputName=vtkInteractorStyleCamera
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
@@ -483,6 +541,35 @@ InputName=vtkPVApplication
 # Begin Custom Build
 InputPath=.\vtkPVApplication.h
 InputName=vtkPVApplication
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVAssignment.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkPVAssignment.h
+InputName=vtkPVAssignment
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVAssignment.h
+InputName=vtkPVAssignment
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -754,26 +841,6 @@ InputName=vtkPVPolyData
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVRenderSlave.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVRenderSlave.h
-InputName=vtkPVRenderSlave
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVRenderView.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -803,26 +870,6 @@ SOURCE=.\vtkPVShrinkPolyData.h
 # Begin Custom Build
 InputPath=.\vtkPVShrinkPolyData.h
 InputName=vtkPVShrinkPolyData
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVSlave.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVSlave.h
-InputName=vtkPVSlave
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
