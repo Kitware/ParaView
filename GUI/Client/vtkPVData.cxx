@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.292.2.3");
+vtkCxxRevisionMacro(vtkPVData, "1.292.2.4");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1200,7 +1200,7 @@ void vtkPVData::UpdatePropertiesInternal()
     }
 
   vtkPVDataInformation* dataInfo = source->GetDataInformation();
-  char tmp[350], cmd[1024], volCmd[1024], defCmd[350];
+  char cmd[1024], volCmd[1024], defCmd[350];
   double bounds[6];
   int i, numArrays, numComps;
   vtkPVDataSetAttributesInformation *attrInfo;

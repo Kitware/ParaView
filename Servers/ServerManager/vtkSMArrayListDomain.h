@@ -40,7 +40,10 @@ class vtkPVDataSetAttributesInformation;
 class vtkSMInputArrayDomain;
 class vtkSMProxyProperty;
 class vtkSMSourceProxy;
-class vtkSMArrayListDomainInternals;
+
+//BTX
+struct vtkSMArrayListDomainInternals;
+//ETX
 
 class VTK_EXPORT vtkSMArrayListDomain : public vtkSMStringListDomain
 {

@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.58.2.2");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.58.2.3");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -372,7 +372,8 @@ void vtkPVArrayMenu::UpdateArrayMenu()
       property->GetDomain("array_list"));
     unsigned int numStrings = dom->GetNumberOfStrings();
     
-    for (unsigned int i=0; i<numStrings; i++)
+    unsigned int i;
+    for (i=0; i<numStrings; i++)
       {
       ostrstream aname;
       const char* arrayName = dom->GetString(i);
@@ -393,8 +394,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
 
       aname << this->ArrayName;
 
-      unsigned int numStrings = dom->GetNumberOfStrings();
-      for (unsigned int i=0; i<numStrings; i++)
+      for (i=0; i<numStrings; i++)
         {
         const char* arrayName = dom->GetString(i);
         if (strcmp(arrayName, this->ArrayName) == 0)
