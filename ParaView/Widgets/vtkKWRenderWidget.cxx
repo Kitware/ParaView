@@ -40,22 +40,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkKWRenderWidget.h"
-#include "vtkObjectFactory.h"
 
+#include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
 #include "vtkKWEventMap.h"
 #include "vtkKWGenericRenderWindowInteractor.h"
 #include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
 #include "vtkProp.h"
-#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.4");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.5");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -77,6 +78,10 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->EventMap = vtkKWEventMap::New();
   
   this->InExpose = 0;
+
+  this->CornerAnnotation = vtkCornerAnnotation::New();
+  this->CornerAnnotation->SetMaximumLineHeight(0.07);
+  this->CornerAnnotation->VisibilityOff();
 }
 
 vtkKWRenderWidget::~vtkKWRenderWidget()
@@ -90,6 +95,12 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
   this->Interactor->SetInteractorStyle(NULL);
   this->Interactor->Delete();
   this->EventMap->Delete();
+
+  if (this->CornerAnnotation)
+    {
+    this->CornerAnnotation->Delete();
+    this->CornerAnnotation = NULL;
+    }
 }
 
 void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
