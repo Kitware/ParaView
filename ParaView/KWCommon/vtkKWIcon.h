@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObject.h"
 class vtkKWApplication;
 class vtkKWIcon;
+class vtkImageData;
 
 class VTK_EXPORT vtkKWIcon : public vtkObject
 {
@@ -63,6 +64,7 @@ public:
   // Description:
   // Set image data.
   void SetImageData(const unsigned char* data, int width, int height);
+  void SetImageData(vtkImageData*);
 
 //BTX
   // Description:
@@ -85,6 +87,7 @@ public:
     ICON_TRANSFER,
     ICON_WARNING,
     ICON_SHRINK,
+    ICON_EMPTY,
     ICON_EXPAND,
     ICON_SMALLERROR,
     ICON_SMALLERRORRED,
