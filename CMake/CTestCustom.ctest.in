@@ -4,6 +4,23 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   otherPrint-ParaView
   Example-vtkLocal
   Example-vtkMy
+
+  # These tests do not actually run any VTK code
+  PrintSelf-KWWidgets	
+  PrintSelf-ParaView
+  PrintSelf-PVServer-Common
+  PrintSelf-PVServer-Filters
+  PrintSelf-PVServer-ServerManager
+  PrintSelf-PVServer-StreamInterpreter
+  TestSetObjectMacro-KWWidgets
+  TestSetObjectMacro-ParaView
+  TestSetObjectMacro-PVServer-Common
+  TestSetObjectMacro-PVServer-Filters
+  TestSetObjectMacro-PVServer-ServerManager
+  TestSetObjectMacro-PVServer-StreamInterpreter
+  
+  # this one runs python which then runs two program so no memory checking there
+  Sockets-image
   )
 
 SET(CTEST_CUSTOM_WARNING_MATCH
@@ -19,6 +36,9 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "tk8.4.5/[^/]+/../[^/]+/[^.]+.c[:\"]"
   "tk8.4.5/[^/]+/[^/]+/[^.]+.c[:\"]"
   "tk8.4.5/[^/]+/[^/]+.c[:\"]"
+  "xtree.[0-9]+. : warning C4702: unreachable code"
+  "warning LNK4221"
+  "variable .var_args[2]*. is used before its value is set"
   "jobserver unavailable"
   )
 
