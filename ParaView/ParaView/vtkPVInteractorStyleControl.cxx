@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.21");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.22");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -579,7 +579,7 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   this->Script("frame %s -borderwidth 0 -relief flat",wname);
   
   this->LabeledFrame->ShowHideFrameOn();
-  this->LabeledFrame->Create(app);
+  this->LabeledFrame->Create(app, 0);
   this->LabeledFrame->SetLabel("Camera Manipulators Control");
 
   vtkKWFrame *frame = vtkKWFrame::New();

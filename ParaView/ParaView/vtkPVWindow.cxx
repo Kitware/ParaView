@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.396");
+vtkCxxRevisionMacro(vtkPVWindow, "1.397");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1746,7 +1746,7 @@ void vtkPVWindow::AddPreferencesProperties()
   this->ToolbarSettingsFrame->SetParent(
     this->Notebook->GetFrame(VTK_KW_PREFERENCES_PAGE_LABEL));
   this->ToolbarSettingsFrame->ShowHideFrameOn();
-  this->ToolbarSettingsFrame->Create(this->Application);
+  this->ToolbarSettingsFrame->Create(this->Application, 0);
   this->ToolbarSettingsFrame->SetLabel("Toolbar Settings");
   
   // Flat aspect ?
@@ -3911,7 +3911,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.396 $");
+  this->ExtractRevision(os,"$Revision: 1.397 $");
 }
 
 //----------------------------------------------------------------------------

@@ -83,7 +83,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.182");
+vtkCxxRevisionMacro(vtkPVData, "1.183");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -964,7 +964,7 @@ void vtkPVData::CreateProperties()
     this->Properties->SetParent(
       this->GetPVSource()->GetNotebook()->GetFrame("Display"));
     }
-  this->Properties->Create(this->Application, 1);
+  this->Properties->Create(this->Application, "-scrollable");
 
   // We are going to 'grid' most of it, so let's define some const
 
@@ -979,7 +979,7 @@ void vtkPVData::CreateProperties()
 
   this->ViewFrame->SetParent(this->Properties->GetFrame());
   this->ViewFrame->ShowHideFrameOn();
-  this->ViewFrame->Create(this->Application);
+  this->ViewFrame->Create(this->Application, 0);
   this->ViewFrame->SetLabel("View");
  
   this->VisibilityCheck->SetParent(this->ViewFrame->GetFrame());
@@ -1043,7 +1043,7 @@ void vtkPVData::CreateProperties()
 
   this->ColorFrame->SetParent(this->Properties->GetFrame());
   this->ColorFrame->ShowHideFrameOn();
-  this->ColorFrame->Create(this->Application);
+  this->ColorFrame->Create(this->Application, 0);
   this->ColorFrame->SetLabel("Color");
 
   this->ColorMenuLabel->SetParent(this->ColorFrame->GetFrame());
@@ -1082,7 +1082,7 @@ void vtkPVData::CreateProperties()
 
   this->DisplayStyleFrame->SetParent(this->Properties->GetFrame());
   this->DisplayStyleFrame->ShowHideFrameOn();
-  this->DisplayStyleFrame->Create(this->Application);
+  this->DisplayStyleFrame->Create(this->Application, 0);
   this->DisplayStyleFrame->SetLabel("Display Style");
 
   this->AmbientScale->SetParent(this->Properties->GetFrame());
@@ -1227,7 +1227,7 @@ void vtkPVData::CreateProperties()
 
   this->ActorControlFrame->SetParent(this->Properties->GetFrame());
   this->ActorControlFrame->ShowHideFrameOn();
-  this->ActorControlFrame->Create(this->Application);
+  this->ActorControlFrame->Create(this->Application, 0);
   this->ActorControlFrame->SetLabel("Actor Control");
 
   this->TranslateLabel->SetParent(this->ActorControlFrame->GetFrame());
@@ -1438,11 +1438,11 @@ void vtkPVData::CreateProperties()
     this->InformationFrame->SetParent(
       this->GetPVSource()->GetNotebook()->GetFrame("Information"));
     }
-  this->InformationFrame->Create(this->Application, 1);
+  this->InformationFrame->Create(this->Application, "-scrollable");
 
   this->StatsFrame->SetParent(this->InformationFrame->GetFrame());
   this->StatsFrame->ShowHideFrameOn();
-  this->StatsFrame->Create(this->Application);
+  this->StatsFrame->Create(this->Application, 0);
   this->StatsFrame->SetLabel("Statistics");
 
   this->TypeLabel->SetParent(this->StatsFrame->GetFrame());
@@ -3278,7 +3278,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.182 $");
+  this->ExtractRevision(os,"$Revision: 1.183 $");
 }
 
 //----------------------------------------------------------------------------

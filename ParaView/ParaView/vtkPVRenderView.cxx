@@ -105,7 +105,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.219");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.220");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -856,7 +856,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   this->NavigationFrame->SetParent(this->SplitFrame->GetFrame1());
   this->NavigationFrame->ShowHideFrameOff();
-  this->NavigationFrame->Create(this->Application);  
+  this->NavigationFrame->Create(this->Application, 0);
   this->NavigationFrame->SetLabel("Navigation");
   this->Script("pack %s -fill both -expand t -side top", 
                this->NavigationFrame->GetWidgetName());
@@ -1066,7 +1066,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->RenderParametersFrame->SetParent(this->GeneralProperties->GetFrame());
   this->RenderParametersFrame->ShowHideFrameOn();
-  this->RenderParametersFrame->Create(this->Application);
+  this->RenderParametersFrame->Create(this->Application,0);
   this->RenderParametersFrame->SetLabel("Advanced Render Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->RenderParametersFrame->GetWidgetName());
@@ -1148,7 +1148,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->LODFrame->SetParent(this->GeneralProperties->GetFrame());
   this->LODFrame->ShowHideFrameOn();
-  this->LODFrame->Create(this->Application);
+  this->LODFrame->Create(this->Application,0);
   this->LODFrame->SetLabel("LOD Parameters");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->LODFrame->GetWidgetName());
@@ -1332,7 +1332,7 @@ void vtkPVRenderView::CreateViewProperties()
     this->ParallelRenderParametersFrame->SetParent( 
       this->GeneralProperties->GetFrame() );
     this->ParallelRenderParametersFrame->ShowHideFrameOn();
-    this->ParallelRenderParametersFrame->Create(this->Application);
+    this->ParallelRenderParametersFrame->Create(this->Application,0);
     this->ParallelRenderParametersFrame->SetLabel(
       "Parallel Rendering Parameters");
 
@@ -1416,7 +1416,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->InterfaceSettingsFrame->SetParent(this->GeneralProperties->GetFrame());
   this->InterfaceSettingsFrame->ShowHideFrameOn();
-  this->InterfaceSettingsFrame->Create(this->Application);
+  this->InterfaceSettingsFrame->Create(this->Application,0);
   this->InterfaceSettingsFrame->SetLabel("3D Interface Settings");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->InterfaceSettingsFrame->GetWidgetName());
@@ -1457,14 +1457,14 @@ void vtkPVRenderView::CreateViewProperties()
 
   vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(page);
-  frame->Create(this->Application, 1);
+  frame->Create(this->Application, "-scrollable");
   this->Script("pack %s -fill both -expand yes", frame->GetWidgetName());
 
   // Camera: standard views
 
   this->StandardViewsFrame->SetParent( frame->GetFrame() );
   this->StandardViewsFrame->ShowHideFrameOn();
-  this->StandardViewsFrame->Create(this->Application);
+  this->StandardViewsFrame->Create(this->Application, 0);
   this->StandardViewsFrame->SetLabel("Standard Views");
 
   const char *views_grid_settings = " -padx 1 -pady 1 -ipadx 5 -sticky ew";
@@ -1528,7 +1528,7 @@ void vtkPVRenderView::CreateViewProperties()
   int cc;
   this->CameraIconsFrame->SetParent(frame->GetFrame());
   this->CameraIconsFrame->ShowHideFrameOn();
-  this->CameraIconsFrame->Create(this->Application);
+  this->CameraIconsFrame->Create(this->Application, 0);
   this->CameraIconsFrame->SetLabel("Stored Camera Positions");
 
   vtkKWWidget* cframe = this->CameraIconsFrame->GetFrame();
@@ -2632,7 +2632,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.219 $");
+  this->ExtractRevision(os,"$Revision: 1.220 $");
 }
 
 //------------------------------------------------------------------------------

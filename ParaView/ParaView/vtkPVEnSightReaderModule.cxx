@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.27");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.28");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -301,7 +301,7 @@ int vtkPVEnSightReaderModule::InitialVariableSelection(const char* tclName,
     {
     lf = vtkKWLabeledFrame::New();
     lf->SetParent(dialog);
-    lf->Create(this->Application);
+    lf->Create(this->Application, 0);
     lf->SetLabel("Byte Order");
 
     endianness = vtkKWOptionMenu::New();

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.18");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.19");
 
 //----------------------------------------------------------------------------
 int vtkPVArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -129,7 +129,7 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->ShowHideFrameOn();
-  this->LabeledFrame->Create(app);
+  this->LabeledFrame->Create(app, 0);
   if (strcmp(this->AttributeName, "Point") == 0)
     {
     this->LabeledFrame->SetLabel("Point Arrays");

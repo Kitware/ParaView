@@ -125,7 +125,7 @@ static unsigned char image_goto_end[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.31");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.32");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -351,7 +351,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   this->ControlFrame->SetParent(this);
   this->ControlFrame->ShowHideFrameOn();
-  this->ControlFrame->Create(this->Application);
+  this->ControlFrame->Create(this->Application, 0);
   this->ControlFrame->SetLabel("Animation Control");
 
   this->ControlButtonFrame->SetParent(this->ControlFrame->GetFrame());
@@ -587,7 +587,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   this->ActionFrame->SetParent(this);
   this->ActionFrame->ShowHideFrameOn();
-  this->ActionFrame->Create(this->Application);
+  this->ActionFrame->Create(this->Application, 0);
   this->ActionFrame->SetLabel("Action");
 
   // Action frame: Source/Method

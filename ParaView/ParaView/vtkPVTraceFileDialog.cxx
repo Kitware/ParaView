@@ -41,12 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVTraceFileDialog.h"
 
+#include "vtkKWFrame.h"
 #include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.2");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.3");
 
 int vtkPVTraceFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

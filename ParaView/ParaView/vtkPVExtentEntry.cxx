@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.12");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.13");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -182,7 +182,7 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
 
-  this->LabeledFrame->Create(pvApp);
+  this->LabeledFrame->Create(pvApp, 0);
   // Now a label
   if (this->Label && this->Label[0] != '\0')
     {

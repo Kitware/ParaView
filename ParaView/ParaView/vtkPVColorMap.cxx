@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.38");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.39");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -379,7 +379,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   this->ColorMapFrame->SetParent(this);
   this->ColorMapFrame->ShowHideFrameOn();
-  this->ColorMapFrame->Create(this->Application);
+  this->ColorMapFrame->Create(this->Application, 0);
   this->ColorMapFrame->SetLabel("Color Map");
 
   // Color map: parameter name
@@ -528,7 +528,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     {
     this->VectorFrame->SetParent(this);
     this->VectorFrame->ShowHideFrameOn();
-    this->VectorFrame->Create(this->Application);
+    this->VectorFrame->Create(this->Application, 0);
     this->VectorFrame->SetLabel("Vector");
 
     this->VectorModeMenu->SetParent(this->VectorFrame->GetFrame());
@@ -552,7 +552,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   this->ScalarBarFrame->SetParent(this);
   this->ScalarBarFrame->ShowHideFrameOn();
-  this->ScalarBarFrame->Create(this->Application);
+  this->ScalarBarFrame->Create(this->Application, 0);
   this->ScalarBarFrame->SetLabel("Scalar Bar");
 
   ostrstream onchangecommand;

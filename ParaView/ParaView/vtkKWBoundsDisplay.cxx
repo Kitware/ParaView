@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.6");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.7");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -89,7 +89,7 @@ void vtkKWBoundsDisplay::Create(vtkKWApplication *app)
     return;
     }
 
-  this->vtkKWLabeledFrame::Create(app);
+  this->vtkKWLabeledFrame::Create(app, 0);
   this->SetLabel("Bounds");
 
   this->XRangeLabel->SetParent(this->GetFrame());

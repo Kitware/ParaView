@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayCalculator);
-vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.48");
+vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.49");
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -270,7 +270,7 @@ void vtkPVArrayCalculator::CreateProperties()
   
   this->CalculatorFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->CalculatorFrame->ShowHideFrameOn();
-  this->CalculatorFrame->Create(pvApp);
+  this->CalculatorFrame->Create(pvApp, 0);
   this->CalculatorFrame->SetLabel("Calculator");
   this->Script("pack %s -fill x -expand t -side top",
                this->CalculatorFrame->GetWidgetName());

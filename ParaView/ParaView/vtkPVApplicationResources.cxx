@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSplashScreen.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWFrame.h"
 
 #include "vtkPNGReader.h"
 

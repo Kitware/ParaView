@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.18");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -105,7 +105,7 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
 
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->ShowHideFrameOn();
-  this->LabeledFrame->Create(app);
+  this->LabeledFrame->Create(app, 0);
   if (this->EntryLabel)
     {
     this->LabeledFrame->SetLabel(this->EntryLabel);

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.28");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.29");
 
 //===========================================================================
 //***************************************************************************
@@ -142,7 +142,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
   if (this->UseLabel)
     {
     this->LabeledFrame->SetParent(this);
-    this->LabeledFrame->Create(pvApp);
+    this->LabeledFrame->Create(pvApp, 0);
     this->LabeledFrame->SetLabel("3D Widget");
     
     this->Script("pack %s -fill both -expand 1", 

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.12");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -140,7 +140,7 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
   wname = this->GetWidgetName();
   this->Script("frame %s -relief flat -borderwidth 2", wname);
 
-  this->LabeledFrame->Create(this->Application);
+  this->LabeledFrame->Create(this->Application, 0);
   if (this->FrameLabel)
     {
     this->LabeledFrame->SetLabel(this->FrameLabel);

@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.249");
+vtkCxxRevisionMacro(vtkPVSource, "1.250");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -535,7 +535,7 @@ void vtkPVSource::CreateProperties()
 
   this->ParameterFrame->SetParent(this->MainParameterFrame);
 
-  this->ParameterFrame->Create(this->Application, 1);
+  this->ParameterFrame->Create(this->Application, "-scrollable");
   this->Script("pack %s -fill both -expand t -side top", 
                this->ParameterFrame->GetWidgetName());
 
@@ -2130,7 +2130,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.249 $");
+  this->ExtractRevision(os,"$Revision: 1.250 $");
 }
 
 //----------------------------------------------------------------------------
