@@ -85,6 +85,7 @@ void vtkGetRemoteGhostCells::Execute()
   vtkGenericCell *cell = vtkGenericCell::New();
   vtkGhostLevels *ghostLevels = vtkGhostLevels::New();
   float *myPoints, *remotePoints;
+  float tempPoints[3000];
   int numRemotePoints;
   vtkIdList *insertedCells = vtkIdList::New();
   vtkIdList *newCells = vtkIdList::New();
@@ -212,12 +213,23 @@ void vtkGetRemoteGhostCells::Execute()
       }
     currentPoints->Reset();
     numPoints = pointIncr;
+    
     for (id = 0; id < numProcs; id++)
       {
       if (id != myId)
 	{
 	this->Controller->Send((int*)(&numPoints), 1, id, VTK_NUM_POINTS_TAG);
-	this->Controller->Send(myPoints, numPoints*3, id,
+	for (i = 0; i < numPoints; i++)
+	  {
+	  if ( (i > 0) && ((i % 1000) == 0) )
+	    {
+	    this->Controller->Send(tempPoints, 3000, id, VTK_POINT_COORDS_TAG);
+	    }
+	  tempPoints[(i%1000) * 3] = myPoints[i*3];
+	  tempPoints[(i%1000) * 3 + 1] = myPoints[i*3+1];
+	  tempPoints[(i%1000) * 3 + 2] = myPoints[i*3+2];
+	  }
+	this->Controller->Send(tempPoints, (numPoints%1000)*3, id,
 			       VTK_POINT_COORDS_TAG);
 	}
       }
@@ -232,8 +244,25 @@ void vtkGetRemoteGhostCells::Execute()
 	this->Controller->Receive((int*)(&numRemotePoints), 1, id,
 				  VTK_NUM_POINTS_TAG);
 	remotePoints = new float[numRemotePoints*3];
-	this->Controller->Receive(remotePoints, numRemotePoints*3, id,
-				  VTK_POINT_COORDS_TAG);
+	for (i = 0; i < numRemotePoints; i++)
+	  {
+	  if ((i % 1000) == 0)
+	    {
+	    if ((1000 - numPoints + i) < 0)
+	      {
+	      this->Controller->Receive(tempPoints, 3000, id,
+					VTK_POINT_COORDS_TAG);
+	      }
+	    else
+	      {
+	      this->Controller->Receive(tempPoints, (numPoints % 1000) * 3,
+					id, VTK_POINT_COORDS_TAG);
+	      }
+	    }
+	  remotePoints[i*3] = tempPoints[(i%1000) * 3];
+	  remotePoints[i*3+1] = tempPoints[(i%1000) * 3 + 1];
+	  remotePoints[i*3+2] = tempPoints[(i%1000) * 3 + 2];
+	  }
 	for (i = 0; i < numRemotePoints; i++)
 	  {
 	  point[0] = remotePoints[i*3];
