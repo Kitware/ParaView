@@ -75,7 +75,7 @@ protected:
   ~vtkPVXMLPackageParser();
   
   // Get the vtkPVWidget corresponding to the given vtkPVXMLElement.
-  vtkPVWidget* GetPVWidget(vtkPVXMLElement* element);
+  vtkPVWidget* GetPVWidget(vtkPVXMLElement* element, vtkPVSource* pvm);
   
   // Get the vtkPVWindow currently being stored.
   vtkPVWindow* GetPVWindow();
