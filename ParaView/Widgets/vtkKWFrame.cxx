@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
-vtkCxxRevisionMacro(vtkKWFrame, "1.11");
+vtkCxxRevisionMacro(vtkKWFrame, "1.12");
 
 vtkKWFrame::vtkKWFrame()
 {
@@ -70,13 +70,7 @@ vtkKWFrame::~vtkKWFrame()
 
 
 void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
-{
-  
-  if (args)
-    {
-    int a = *(int *)0;
-    }
-  
+{  
   const char *wname;
   
   // Set the application

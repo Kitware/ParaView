@@ -104,7 +104,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.105");
+vtkCxxRevisionMacro(vtkKWView, "1.106");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -467,7 +467,8 @@ void vtkKWView::CreateViewProperties()
   ico->Delete();
   
   this->AnnotationProperties->SetParent(this->Notebook->GetFrame("Annotate"));
-  this->AnnotationProperties->Create(app,"-scrollable");
+  this->AnnotationProperties->ScrollableOn();
+  this->AnnotationProperties->Create(app,0);
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
@@ -1524,7 +1525,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.105 $");
+  this->ExtractRevision(os,"$Revision: 1.106 $");
 }
 
 //----------------------------------------------------------------------------
