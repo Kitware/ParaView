@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.243");
+vtkCxxRevisionMacro(vtkPVSource, "1.244");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -994,6 +994,7 @@ void vtkPVSource::ResetCallback()
 void vtkPVSource::DeleteCallback()
 {
   int i;
+  int initialized = this->Initialized;
   vtkPVData *ac;
   vtkPVSource *prev = NULL;
   vtkPVSource *current = 0;
@@ -1143,7 +1144,10 @@ void vtkPVSource::DeleteCallback()
       }
     }
   
-  this->GetPVRenderView()->EventuallyRender();
+  if ( initialized )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
   
   // This should delete this source.
   // "this" will no longer be valid after the call.
@@ -2044,7 +2048,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.243 $");
+  this->ExtractRevision(os,"$Revision: 1.244 $");
 }
 
 //----------------------------------------------------------------------------
