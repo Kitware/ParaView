@@ -33,7 +33,6 @@ $pvWindow ErrorMessage "This is an error"
 $pvWindow WarningMessage "This is a warning"
 $pvWindow DisableToolbarButtons
 $pvWindow EnableToolbarButtons
-$pvWindow PrintRecentFiles
 
 $pvWindow HideProperties
 $pvWindow ShowProperties
