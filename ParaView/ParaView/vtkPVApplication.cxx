@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.212");
+vtkCxxRevisionMacro(vtkPVApplication, "1.213");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -246,11 +246,17 @@ private:
 
 vtkStandardNewMacro(vtkPVOutputWindow);
 
-Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
+Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, 
+                                            char *argv[], 
+                                            ostream *err)
 {
 
-  Tcl_Interp *interp = vtkKWApplication::InitializeTcl(argc,argv);
-  
+  Tcl_Interp *interp = vtkKWApplication::InitializeTcl(argc, argv, err);
+  if (!interp)
+    {
+    return interp;
+    }
+
   //  if (Vtkparalleltcl_Init(interp) == TCL_ERROR) 
   //  {
    // cerr << "Init Parallel error\n";
@@ -272,6 +278,10 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
   char* script = vtkString::Duplicate(vtkPVApplication::LoadComponentProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
+    if (err)
+      {
+      *err << Tcl_GetStringResult(interp) << endl;
+      }
     // ????
     }  
   delete [] script;
@@ -279,6 +289,10 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
   script = vtkString::Duplicate(vtkPVApplication::ExitProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
+    if (err)
+      {
+      *err << Tcl_GetStringResult(interp) << endl;
+      }
     // ????
     }  
   delete [] script;

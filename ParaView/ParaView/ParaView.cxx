@@ -120,7 +120,23 @@ int MyMain(int argc, char *argv[])
     { // DO not initialize Tk.
     vtkKWApplication::SetWidgetVisibility(0);
     }
-  interp = vtkPVApplication::InitializeTcl(argc,argv);
+
+  ostrstream err;
+  interp = vtkPVApplication::InitializeTcl(argc, argv, &err);
+  err << ends;
+  if (!interp)
+    {
+#ifdef _WIN32
+    ::MessageBox(0, err.str(), 
+                 "ParaView error: InitializeTcl failed", MB_ICONERROR|MB_OK);
+#else
+    cerr << "ParaView error: InitializeTcl failed" << endl 
+         << err.str() << endl;
+#endif
+    err.rdbuf()->freeze(0);
+    return 0;
+    }
+  err.rdbuf()->freeze(0);
 
   // Create the application to parse the command line arguments.
   app = vtkPVApplication::New();
@@ -164,8 +180,6 @@ int MyMain(int argc, char *argv[])
       }
 #endif
     }
-
-
 
   // Create the process module for initializing the processes.
   // Only the root server processes args.

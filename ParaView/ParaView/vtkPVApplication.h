@@ -140,8 +140,12 @@ public:
   virtual void Exit();
   
   // Description:
-  // class static method to initialize Tcl/Tk
-  static Tcl_Interp *InitializeTcl(int argc, char *argv[]);
+  // Initialize Tcl/Tk
+  // Return NULL on error (eventually provides an ostream where detailed
+  // error messages will be stored).
+  //BTX
+  static Tcl_Interp *InitializeTcl(int argc, char *argv[], ostream *err = 0);
+  //ETX
 
 //BTX
 #ifdef PV_HAVE_TRAPS_FOR_SIGNALS
