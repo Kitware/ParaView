@@ -79,6 +79,11 @@ vtkPOPReader::vtkPOPReader()
   this->ArrayFileNames = NULL;
   this->ArrayOffsets = NULL;
 
+  this->UFlowFileName = NULL;
+  this->UFlowFileOffset = 0;
+  this->VFlowFileName = NULL;
+  this->VFlowFileOffset = 0;
+
   this->DepthValues = vtkFloatArray::New();
 } 
 
@@ -195,8 +200,6 @@ void vtkPOPReader::Execute()
   int ext[6];
   int i;
 
-  cerr << "Executing POP reader.\n";
-
   output = this->GetOutput();
   
   // Set up the extent of the grid image.
@@ -224,15 +227,10 @@ void vtkPOPReader::Execute()
   ext[4] = 0;
   ext[5] = 1;
   image->SetUpdateExtent(ext);
-  cerr << "Executing to read grid.\n";
   image->Update();
-  cerr << "Executing to read grid: Done\n";
   
   // Create the grid points from the grid image.
   points = this->ReadPoints(image);
-
-  cerr << "Done creating points.\n";
-
   output->SetPoints(points);
   points->Delete();
   points = NULL;
@@ -254,7 +252,6 @@ void vtkPOPReader::Execute()
       reader->SetFileName(this->ArrayFileNames[i]);
       reader->SetHeaderSize(this->ArrayOffsets[i] * 4 
 			    * this->Dimensions[0] * this->Dimensions[1]);
-      cerr << "Setting header size to: " << reader->GetHeaderSize() << endl;
       // Just in case.
       //reader->SetHeaderSize(0);
       output->GetUpdateExtent(ext);
@@ -262,10 +259,6 @@ void vtkPOPReader::Execute()
       image->SetUpdateExtent(ext);
       cerr << "Reading arrray.\n";
       image->Update();
-
-
-
-      cerr << "Reading arrray: Done\n";
       array = image->GetPointData()->GetScalars()->GetData();
       array->SetName(this->ArrayNames[i]);
       
@@ -277,7 +270,9 @@ void vtkPOPReader::Execute()
   reader = NULL;
   wrap->Delete();
   wrap = NULL;
-  cerr << "Finihsed Executing.\n";
+
+  // If there is flow defined.
+  this->ReadFlow();
 }
 
 
@@ -389,6 +384,9 @@ void vtkPOPReader::ReadInformationFile()
 
   this->DeleteArrays();
   this->DepthValues->Reset();
+  this->SetUFlowFileName(NULL);
+  this->SetVFlowFileName(NULL);
+  this->UFlowFileOffset = this->VFlowFileOffset = NULL;
   file = new ifstream(this->FileName, ios::in);
   
   while (1)
@@ -433,6 +431,56 @@ void vtkPOPReader::ReadInformationFile()
           return;
           }
         this->AddArrayName(str, str2, offset);
+        }
+      }
+
+    else if (strcmp(str, "Flow") == 0)
+      {
+      char *tmp = NULL;
+      char str2[256];
+      unsigned long offset;
+      *file >> num;
+      for (i = 0; i < num; ++i)
+        {
+        *file >> str;
+        *file >> str2;
+        *file >> offset;
+
+        if (file->fail())
+          {
+          vtkErrorMacro("Error reading flow component " << i);    
+          delete file;
+          return;
+          }
+  
+        if (strcmp(str,"u") == 0)
+          {
+          if (str2[0] != '/' && str2[1] != ':')
+            {
+            tmp = this->MakeFileName(str2);
+            this->SetUFlowFileName(tmp);
+            delete [] tmp;
+            }
+          else
+            {
+            this->SetUFlowFileName(str2);
+            }
+          this->UFlowFileOffset = offset;
+          }
+        else if (strcmp(str,"v") == 0)
+          {
+          if (str2[0] != '/' && str2[1] != ':')
+            {
+            tmp = this->MakeFileName(str2);
+            this->SetVFlowFileName(tmp);
+            delete [] tmp;
+            }
+          else
+            {
+            this->SetVFlowFileName(str2);
+            }
+          this->VFlowFileOffset = offset;
+          }
         }
       }
 
@@ -545,7 +593,169 @@ char *vtkPOPReader::MakeFileName(char *name)
 }
 
   
+
+//----------------------------------------------------------------------------
+void vtkPOPReader::ReadFlow()
+{
+  vtkStructuredGrid *output;
+  vtkDataArray *array;
+  vtkImageData *uImage, *vImage, *fImage;
+  int updateExt[6], wholeExt[6], ext[6];
+  int idx, u, v, w;
+  float *pf, *pu, *pv;
+  float v0, v2, w0, w1, u0, u2;
+  int uvInc0, uvInc1, wInc2;
+  int vMin, vMax, wMax, wMin;
+
+  if (this->UFlowFileName == NULL || this->VFlowFileName == NULL)
+    {
+    return;
+    }
+
+  output = this->GetOutput();
+
+  ext[0] = ext[2] = ext[4] = 0;
+  ext[1] = this->Dimensions[0]-1;
+  ext[3] = this->Dimensions[1]-1;
+  ext[5] = this->DepthValues->GetNumberOfTuples()-1;
+
+  vMin = ext[2];
+  vMax = ext[3];
+  wMax = ext[5];
+
+  vtkImageReader *reader = vtkImageReader::New();
+  reader->SetFileDimensionality(3);
+  reader->SetDataExtent(ext);
+  reader->SetDataByteOrderToBigEndian();
+  reader->SetNumberOfScalarComponents(1);
+  reader->SetDataScalarTypeToFloat();
+  reader->SetHeaderSize(0);
+  vtkImageWrapPad *wrap = vtkImageWrapPad::New();
+  wrap->SetInput(reader->GetOutput());
+  // To complete the last row (shared with the first row).
+  ++ext[1];
+  // We will need ghost cells. Poles are discontinuities.
+  // U is cyclical
+  --ext[0];
+  ++ext[1];
+  wrap->SetOutputWholeExtent(ext);
+  
+  // Figure out what extent we need for the request.
+  wrap->GetOutputWholeExtent(wholeExt);
+  output->GetUpdateExtent(updateExt);
+  if (wholeExt[1] != updateExt[1])
+    {
+    vtkErrorMacro("Requested extent does not have bottom slice required for correct completion of the flow vectors.");
+    }
+
+  output->GetUpdateExtent(ext);
+  for (idx = 0; idx < 3; ++idx)
+    {
+    --ext[idx*2];
+    ++ext[idx*2+1];
+    if (ext[idx*2] < wholeExt[idx*2])
+      {
+      ext[idx*2] = wholeExt[idx*2];
+      }
+    if (ext[idx*2+1] > wholeExt[idx*2+1])
+      {
+      ext[idx*2+1] = wholeExt[idx*2+1];
+      }
+    }
+
+  uImage = vtkImageData::New();
+  reader->SetFileName(this->UFlowFileName);
+  reader->SetHeaderSize(this->UFlowFileOffset * 4 
+                  * this->Dimensions[0] * this->Dimensions[1]);
+  wrap->SetOutput(uImage);
+  uImage->SetUpdateExtent(ext);
+  uImage->Update();
+
+  vImage = vtkImageData::New();
+  reader->SetFileName(this->VFlowFileName);
+  reader->SetHeaderSize(this->VFlowFileOffset * 4 
+                  * this->Dimensions[0] * this->Dimensions[1]);
+  wrap->SetOutput(vImage);
+  vImage->SetUpdateExtent(ext);
+  vImage->Update();
+
+  uvInc0 = 1;
+  uvInc1 = ext[1]-ext[0]+1;
+
+  reader->Delete();
+  reader = NULL;
+  wrap->Delete();
+  wrap = NULL;
+
+  fImage = vtkImageData::New();
+  fImage->SetExtent(updateExt);
+  fImage->SetNumberOfScalarComponents(3);
+  fImage->SetScalarType(VTK_FLOAT);
+  fImage->AllocateScalars();
+
+  wInc2 = (updateExt[1]-updateExt[0])*(updateExt[3]-updateExt[2])*3;
+
+  // Central differences is good, but I do not like it for the
+  // z/propagation direction (alternation).  Normal difference
+  // produces a shift.  As a start, I will use it any way.
+  // I could always average the top and bottom versions...
+
+  // Now do the computation from bottom to top.
+  pf = (float*)fImage->GetScalarPointer(updateExt[0],updateExt[2],updateExt[4]);
+  pu = (float*)uImage->GetScalarPointer(updateExt[0],updateExt[2],updateExt[4]);
+  pv = (float*)vImage->GetScalarPointer(updateExt[0],updateExt[2],updateExt[4]);
+  
+  for (w = updateExt[4]; w <= updateExt[5]; ++w)
+    {
+    for (v = updateExt[2]; v <= updateExt[3]; ++v)
+      {
+      for (u = updateExt[0]; u <= updateExt[1]; ++u)
+        {
+        // Find the five important values for this point.
+        // U is circular so does not have boundary checks.
+        v0 = v2 = w0 = 0.0;
+        u0 = pu[-uvInc0];
+        u2 = pu[uvInc0];
+        if (v > vMin)
+          {
+          v0 = pv[-uvInc1];
+          }
+        if (v < vMax)
+          {
+          v2 = pv[uvInc0];
+          }
+        if (w > wMin)
+          {
+          w0 = pf[-wInc2+2];
+          }
+        // Now fill the vector for this point.
+        pf[0] =  *pu;
+        pf[1] =  *pv;
+        pf[2] = w0 + 0.5 * (u0 - u2 + v0 - v2);
+        // Move to the next point. Do not worry about continue increments.
+        }
+      }
+    }
+    
+  // Delete 
+  reader->Delete();
+  wrap->Delete();
+  uImage->Delete();
+  vImage->Delete();
+
+  array = fImage->GetPointData()->GetScalars()->GetData();
+  array->SetName("Flow");
       
+  output->GetPointData()->AddArray(array);
+  fImage->ReleaseData();
+  fImage->Delete();
+}
+
+
+
+
+
+
   
 //----------------------------------------------------------------------------
 void vtkPOPReader::PrintSelf(ostream& os, vtkIndent indent)

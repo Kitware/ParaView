@@ -1224,15 +1224,15 @@ void vtkPVActorComposite::SetMode(int mode)
 	                		   this->PVData->GetVTKDataTclName());
   if (mode == VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
     {
-    pvApp->BroadcastScript("%s SetSetModeToSurface", this->GeometryTclName);
+    pvApp->BroadcastScript("%s SetModeToSurface", this->GeometryTclName);
     }
   else if (mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
     {
-    pvApp->BroadcastScript("%s SetSetModeToImageOutline", this->GeometryTclName); 
+    pvApp->BroadcastScript("%s SetModeToImageOutline", this->GeometryTclName); 
     }
   else if (mode == VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
     {
-    pvApp->BroadcastScript("%s SetSetModeToSurface", this->GeometryTclName);
+    pvApp->BroadcastScript("%s SetModeToSurface", this->GeometryTclName);
     }  
 }
 

@@ -30,6 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkStringList.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkPVWindow.h"
+#include "vtkObjectFactory.h"
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -105,7 +106,14 @@ vtkPVGlyph3D::~vtkPVGlyph3D()
 //----------------------------------------------------------------------------
 vtkPVGlyph3D* vtkPVGlyph3D::New()
 {
-  return new vtkPVGlyph3D();
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVGlyph3D");
+  if(ret)
+    {
+    return (vtkPVGlyph3D*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVGlyph3D;
 }
 
 //----------------------------------------------------------------------------

@@ -66,6 +66,11 @@ public:
   // This file contains the latitude and longitude of the grid.  
   // It must be double with no header.
   vtkGetStringMacro(GridFileName);
+
+  // Description:
+  // These files contains the u and v components of the flow.
+  vtkGetStringMacro(UFlowFileName);
+  vtkGetStringMacro(VFlowFileName);
   
   // Description:
   // This file contains information about all the files.
@@ -88,6 +93,7 @@ protected:
   
   void ReadInformationFile();
   vtkPoints *ReadPoints(vtkImageData *image);
+  void ReadFlow();
   // NOT USED
   vtkPoints *GeneratePoints();
   
@@ -109,6 +115,14 @@ protected:
   char **ArrayNames;
   char **ArrayFileNames;  
   unsigned long *ArrayOffsets;
+
+  char *UFlowFileName;
+  vtkSetStringMacro(UFlowFileName);
+  unsigned long UFlowFileOffset;
+  char *VFlowFileName;
+  vtkSetStringMacro(VFlowFileName);
+  unsigned long VFlowFileOffset;
+  
 
   int IsFileName(char *name);
   char *MakeFileName(char *name);
