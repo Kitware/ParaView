@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.305");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.306");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -298,6 +298,14 @@ vtkRenderer* vtkPVRenderView::GetRenderer2D()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ShowNavigationWindowCallback(int registery)
 {
+  if (!this->Application)
+    {
+    return;
+    }
+  
+  this->AddTraceEntry("$kw(%s) ShowNavigationWindowCallback %d",
+                      this->GetTclName(), registery);
+  
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->NavigationFrame->GetFrame()->GetWidgetName());
   this->Script("pack %s -fill both -expand t -side top -anchor n", 
@@ -322,6 +330,10 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registery)
     {
     return;
     }
+  
+  this->AddTraceEntry("$kw(%s) ShowSelectionWindowCallback %d",
+                      this->GetTclName(), registery);
+  
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->NavigationFrame->GetFrame()->GetWidgetName());
   this->Script("pack %s -fill both -expand t -side top -anchor n", 
