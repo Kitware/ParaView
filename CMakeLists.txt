@@ -74,13 +74,13 @@ IF(USE_INCLUDED_TCLTK)
 
     # On UNIX, Tcl needs the math library.
     IF(UNIX)
-      SET(TCL_LIBRARY ${TCL_LIBRARY} -lm)
+      LINK_LIBRARIES(-lm)
     ENDIF(UNIX)
 
     # If using X with Tk, we need to link to X when we link
     # to Tk in order to support static linking.
     IF(CMAKE_HAS_X)
-      SET(TK_LIBRARY ${TK_LIBRARY} -lXt ${CMAKE_X_LIBS})
+      LINK_LIBRARIES(-lXt ${CMAKE_X_LIBS})
     ENDIF(CMAKE_HAS_X)
 
     IF (CMAKE_ESCAPES_SC)
