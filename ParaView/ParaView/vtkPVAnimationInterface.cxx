@@ -144,7 +144,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.58");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.59");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -367,12 +367,12 @@ public:
   const char* GetTimeEquation(float vtkNotUsed(tmax))
     {
     this->UpdateStartEndValueFromEntry();
-    float max = this->TimeEnd;
-    float min = this->TimeStart;
-    float range = vtkABS(max - min);
+    float cmax = this->TimeEnd;
+    float cmin = this->TimeStart;
+    float range = vtkABS(cmax - cmin);
 
     // formula is:
-    // (((((time - tmin) / trange) / tstep) * range) + min) * step
+    // (((((time - tmin) / trange) / tstep) * range) + cmin) * step
     ostrstream str;
     str << "set pvTime [ expr ";
     if ( this->TypeIsInt )
@@ -380,18 +380,18 @@ public:
       str << "round";
       }
     str << "(((";
-    if ( max < min )
+    if ( cmax < cmin )
       {
       str << "1 - ";
       }
     str << "$globalPVTime) * " << range << ") + ";
-    if ( max < min )
+    if ( cmax < cmin )
       {
-      str << max;
+      str << cmax;
       }
     else
       {
-      str << min;
+      str << cmin;
       }
     str << " ) ]";
     // add deug? ; puts $pvTime";
