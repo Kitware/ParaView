@@ -89,6 +89,9 @@ vtkCornerAnnotation::vtkCornerAnnotation()
   this->ImageActor = NULL;
   this->LastImageActor = 0;
   this->WindowLevel = NULL;
+  
+  this->LevelShift = 0;
+  this->LevelScale = 1;
 }
 
 vtkCornerAnnotation::~vtkCornerAnnotation()
@@ -133,6 +136,7 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia,
     {
     window = wl->GetWindow();
     level = wl->GetLevel();    
+    level = level * this->LevelScale + this->LevelShift;
     }
   
   // search for tokens, replace and then assign to TextMappers

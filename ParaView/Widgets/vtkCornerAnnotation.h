@@ -106,6 +106,16 @@ public:
   // looking at window level changes
   void SetWindowLevel(vtkImageMapToWindowLevelColors*);
   vtkGetObjectMacro(WindowLevel,vtkImageMapToWindowLevelColors);
+
+  // Description:
+  // Set the value to shift the level by.
+  vtkSetMacro(LevelShift, float);
+  vtkGetMacro(LevelShift, float);
+  
+  // Description:
+  // Set the value to scale the level by.
+  vtkSetMacro(LevelScale, float);
+  vtkGetMacro(LevelScale, float);
   
 protected:
   vtkCornerAnnotation();
@@ -114,6 +124,8 @@ protected:
   float MaximumLineHeight;
 
   vtkImageMapToWindowLevelColors *WindowLevel;
+  float LevelShift;
+  float LevelScale;
   vtkImageActor *ImageActor;
   vtkImageActor *LastImageActor;
 
