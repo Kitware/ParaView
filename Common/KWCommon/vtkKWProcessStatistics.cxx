@@ -13,13 +13,14 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.5");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.6");
 
 #ifdef __linux
 #include <sys/procfs.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/utsname.h> // int uname(struct utsname *buf);
 #elif __hpux
 #include <sys/param.h>
 #include <sys/pstat.h>
@@ -174,24 +175,93 @@ int vtkKWProcessStatistics::QueryMemory()
   this->AvailablePhysicalMemory = ap>>10;
   return 1;
 #elif __linux
-  FILE *fd;
-  fd = fopen("/proc/meminfo", "r" );
+  
+  char buffer[1024]; // for skipping unused lines
+  
+  int linuxMajor = 0;
+  int linuxMinor = 0;
+  
+  // Find the Linux kernel version first
+  struct utsname unameInfo;
+  int errorFlag = uname(&unameInfo);
+  if( errorFlag!=0 )
+    {
+    vtkErrorMacro("Problem calling uname(): " << strerror(errno) );
+    return 0;
+    }
+ 
+  if( unameInfo.release!=0 && strlen(unameInfo.release)>=3 )
+    {
+    // release looks like "2.6.3-15mdk-i686-up-4GB"
+    char majorChar=unameInfo.release[0];
+    char minorChar=unameInfo.release[2];
+    
+    if( isdigit(majorChar) )
+      {
+      linuxMajor=majorChar-'0';
+      }
+    
+    if( isdigit(minorChar) )
+      {
+      linuxMinor=minorChar-'0';
+      }
+    }
+  
+  FILE *fd = fopen("/proc/meminfo", "r" );
   if ( !fd ) 
     {
     vtkErrorMacro("Problem opening /proc/meminfo");
     return 0;
     }
-  unsigned long temp;
-  char buffer[1024];
-  fgets(buffer, sizeof(buffer), fd);
-  fscanf(fd, "Mem: %lu %lu %lu %lu %lu %lu\n",
-         &tp, &temp, &ap, &temp, &temp, &temp);
-  fscanf(fd, "Swap: %lu %lu %lu\n", &tv, &temp, &av);  
+  
+  if( linuxMajor>=3 || ( (linuxMajor>=2) && (linuxMinor>=6) ) )
+    {
+    // new /proc/meminfo format since kernel 2.6.x
+    // Rigorously, this test should check from the developping version 2.5.x
+    // that introduced the new format...
+    
+    long freeMem;
+    long buffersMem;
+    long cachedMem;
+    
+    fscanf(fd,"MemTotal:%ld kB\n", &this->TotalPhysicalMemory);
+    fscanf(fd,"MemFree:%ld kB\n", &freeMem);
+    fscanf(fd,"Buffers:%ld kB\n", &buffersMem);
+    fscanf(fd,"Cached:%ld kB\n", &cachedMem);
+    
+    this->AvailablePhysicalMemory=freeMem+cachedMem+buffersMem;
+    
+    // Skip SwapCached, Active, Inactive, HighTotal, HighFree, LowTotal
+    // and LowFree.
+    int i=0;
+    while(i<7)
+      {
+      fgets(buffer, sizeof(buffer), fd); // skip a line
+      ++i;
+      }
+    
+    fscanf(fd,"SwapTotal:%ld kB\n", &this->TotalVirtualMemory);
+    fscanf(fd,"SwapFree:%ld kB\n", &this->AvailableVirtualMemory);
+    }
+  else
+    {
+    // /proc/meminfo format for kernel older than 2.6.x
+    
+    unsigned long temp;
+    unsigned long cachedMem;
+    unsigned long buffersMem;
+    fgets(buffer, sizeof(buffer), fd); // Skip "total: used:..."
+    
+    fscanf(fd, "Mem: %lu %lu %lu %lu %lu %lu\n",
+         &tp, &temp, &ap, &temp, &buffersMem, &cachedMem);
+    fscanf(fd, "Swap: %lu %lu %lu\n", &tv, &temp, &av);
+    
+    this->TotalVirtualMemory = tv>>10;
+    this->TotalPhysicalMemory = tp>>10;
+    this->AvailableVirtualMemory = av>>10;
+    this->AvailablePhysicalMemory = (ap+buffersMem+cachedMem)>>10;
+    }
   fclose( fd );
-  this->TotalVirtualMemory = tv>>10;
-  this->TotalPhysicalMemory = tp>>10;
-  this->AvailableVirtualMemory = av>>10;
-  this->AvailablePhysicalMemory = ap>>10;
   return 1;
 #elif __hpux
   struct pst_static pst;
