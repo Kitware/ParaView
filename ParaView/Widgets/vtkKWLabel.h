@@ -100,6 +100,8 @@ protected:
   vtkKWLabel();
   ~vtkKWLabel();
 
+  virtual void UpdateBindings();
+
 private:
   char* Label;
   int LineType;

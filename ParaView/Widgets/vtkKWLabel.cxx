@@ -49,7 +49,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.20");
+vtkCxxRevisionMacro(vtkKWLabel, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -114,6 +114,10 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
                  wname, this->Label, this->Width, (args?args:""));
     }
 
+  // Set bindings (if any)
+  
+  this->UpdateBindings();
+
   // Update enable state
 
   this->UpdateEnableState();
@@ -173,18 +177,7 @@ void vtkKWLabel::SetAdjustWrapLengthToWidth(int v)
   this->AdjustWrapLengthToWidth = v;
   this->Modified();
 
-  if (this->IsCreated())
-    {
-    if (this->AdjustWrapLengthToWidth)
-      {
-      this->Script("bind %s <Configure> {%s AdjustWrapLengthToWidthCallback}",
-                   this->GetWidgetName(), this->GetTclName());
-      }
-    else
-      {
-      this->Script("bind %s <Configure>", this->GetWidgetName());
-      }
-    }
+  this->UpdateBindings();
 }
 
 //----------------------------------------------------------------------------
@@ -211,6 +204,25 @@ void vtkKWLabel::AdjustWrapLengthToWidthCallback()
   if (width < (wraplength - 5) || width > (wraplength + 5))
     {
     this->Script("%s config -wraplength %d", this->GetWidgetName(), width);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWLabel::UpdateBindings()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  if (this->AdjustWrapLengthToWidth)
+    {
+    this->Script("bind %s <Configure> {%s AdjustWrapLengthToWidthCallback}",
+                 this->GetWidgetName(), this->GetTclName());
+    }
+  else
+    {
+    this->Script("bind %s <Configure>", this->GetWidgetName());
     }
 }
 
