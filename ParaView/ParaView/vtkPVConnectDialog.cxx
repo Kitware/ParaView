@@ -53,9 +53,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVWindow.h"
 
+#include "vtkstd/string"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.4");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.5");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
@@ -81,6 +83,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
   this->Username->Create(app, 0);
   this->Username->SetValue(this->SSHUser);
   this->Hostname->SetParent(frame);
+  this->Hostname->GetEntry()->PullDownOn();
   this->Hostname->Create(app, 0);
   this->Hostname->SetLabel("@");
   this->Port->SetParent(frame);
@@ -131,6 +134,28 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
   this->SetHostname(this->HostnameString);
   this->SetPort(this->PortInt);
   this->MPINumberOfServers->EnabledOff();
+
+  char servers[1024];
+  if ( app->GetRegisteryValue(2, "RunTime", "ConnectionServers", servers) )
+    {
+    const char* server = servers;
+    size_t cc;
+    for ( cc = 0; cc < strlen(servers); cc ++ )
+      {
+      if ( servers[cc] == ',' )
+        {
+        servers[cc] = 0;
+        cout << "Found server: [" << server << "]" << endl;
+        server = servers + cc + 1;
+        this->Hostname->GetEntry()->AddValue(server);
+        }
+      }
+    if ( strlen(server) )
+      {
+      cout << "Last server: " << server << endl;
+      this->Hostname->GetEntry()->AddValue(server);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -148,6 +173,19 @@ void vtkPVConnectDialog::OK()
     this->MultiProcessMode = 0;
     }
   this->SetSSHUser(this->Username->GetValue());
+
+  int cc;
+  vtkstd::string servers;
+  servers = this->Hostname->GetValue();
+  for ( cc = 0; cc < this->Hostname->GetEntry()->GetNumberOfValues(); cc ++ )
+    {
+    servers += ",";
+    cout << "Store server: " << this->Hostname->GetEntry()->GetValueFromIndex(cc) << endl;
+    servers += this->Hostname->GetEntry()->GetValueFromIndex(cc);
+    }
+  cout << "Servers: " << servers << endl;
+  this->Application->SetRegisteryValue(2, "RunTime", "ConnectionServers", servers.c_str());
+
   this->Superclass::OK();
 }
 

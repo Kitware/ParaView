@@ -157,6 +157,8 @@ public:
     };
 //ETX
   
+  static void ErrorCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
+  
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();

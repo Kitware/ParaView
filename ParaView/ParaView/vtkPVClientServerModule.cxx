@@ -75,6 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
+#include "vtkCallbackCommand.h"
 #include "vtkKWRemoteExecute.h"
 #include "vtkPVConnectDialog.h"
 #ifndef _WIN32
@@ -207,7 +208,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.33");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.34");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -273,6 +274,13 @@ void vtkPVClientServerInit(vtkMultiProcessController *, void *arg )
 }
 
 //----------------------------------------------------------------------------
+void vtkPVClientServerModule::ErrorCallback(vtkObject *caller, 
+  unsigned long eid, void *clientdata, void *calldata)
+{
+  cout << (char*)calldata << endl;
+}
+
+//----------------------------------------------------------------------------
 // This method is a bit long, we should probably break it up 
 // to simplify it. !!!!!
 void vtkPVClientServerModule::Initialize()
@@ -298,6 +306,11 @@ void vtkPVClientServerModule::Initialize()
     // Get the host name from the command line arguments
     this->SetHostname(pvApp->GetHostName());
     this->SetUsername(pvApp->GetUsername());
+    vtkCallbackCommand* cb = vtkCallbackCommand::New();
+    cb->SetCallback(vtkPVClientServerModule::ErrorCallback);
+    cb->SetClientData(this);
+    comm->AddObserver(vtkCommand::ErrorEvent, cb);
+    cb->Delete();
 
     // Get the port from the command line arguments
     this->Port = pvApp->GetPort();
