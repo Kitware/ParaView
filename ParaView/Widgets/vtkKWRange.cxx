@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.13");
+vtkCxxRevisionMacro(vtkKWRange, "1.14");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -89,6 +89,7 @@ vtkKWRange::vtkKWRange()
   this->Thickness          = 19;
   this->InternalThickness  = 0.5;
   this->Orientation        = vtkKWRange::ORIENTATION_HORIZONTAL;
+  this->Inverted           = 0;
   this->SliderSize         = 3;
   this->ShowEntries        = 0;
   this->LabelPosition      = vtkKWRange::POSITION_SIDE1;
@@ -275,11 +276,11 @@ void vtkKWRange::Pack()
      SIDE2:     [--------------]               [--------------]
                        L                       E1            E2
 
-             0 1 2      3       4 5
-         +-------------------------
-        0|       E      L       E
-        1|   L E [--------------] E
-        2|       E      L       E
+             0 1  2      3       4  5
+         +----------------------------
+        0|        E0     L       E1
+        1|   L E0 [--------------]  E1
+        2|        E0     L       E1
   */
 
   // We need a 6x3 grid
@@ -292,7 +293,7 @@ void vtkKWRange::Pack()
   sprintf(colconfig, " %s ", is_horiz ? "columnconfigure" : "rowconfigure");
   sprintf(stickydir, " -sticky %s ", is_horiz ? "ew" : "ns");
 
-  int row, col, col1, col2;
+  int row, col;
 
   // Label
 
@@ -316,13 +317,13 @@ void vtkKWRange::Pack()
     {
     row = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 
       (this->EntriesPosition == vtkKWRange::POSITION_SIDE1 ? 0 : 2);
-    col1 = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 2;
-    col2 = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 5 : 4;
-    tk_cmd << "grid " << this->Entries[0]->GetWidgetName() 
-           << o_row << row << o_col << col1
+    int col0 = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 2;
+    int col1 = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 5 : 4;
+    tk_cmd << "grid " << this->Entries[this->Inverted ? 1 : 0]->GetWidgetName()
+           << o_row << row << o_col << col0
            << " -sticky " << (is_horiz ? "w" : "n") << endl;
-    tk_cmd << "grid " << this->Entries[1]->GetWidgetName() 
-           << o_row << row << o_col << col2
+    tk_cmd << "grid " << this->Entries[this->Inverted ? 0 : 1]->GetWidgetName()
+           << o_row << row << o_col << col1
            << " -sticky " << (is_horiz ? "e" : "s") << endl;
     }
 
@@ -730,6 +731,21 @@ void vtkKWRange::SetOrientation(int arg)
   this->Orientation = arg;
 
   this->Modified();
+
+  this->Pack();
+
+  this->RedrawCanvas();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRange::SetInverted(int arg)
+{
+  if (this->Inverted == arg)
+    {
+    return;
+    }
+
+  this->Inverted = arg;
 
   this->Pack();
 
@@ -1419,10 +1435,21 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
 
   pos_range = pos_max - pos_min;
 
-  pos[0] = pos_min + (int)((float)pos_range * 
-                         ((this->Range[0]-this->WholeRange[0]) / whole_range));
-  pos[1] = pos_min + (int)((float)pos_range * 
-                         ((this->Range[1]-this->WholeRange[0]) / whole_range));
+  pos[0] = (int)((float)pos_range * 
+                 ((this->Range[0] - this->WholeRange[0]) / whole_range));
+  pos[1] = (int)((float)pos_range * 
+                 ((this->Range[1] - this->WholeRange[0]) / whole_range));
+
+  if (this->Inverted)
+    {
+    pos[0] = pos_max - pos[0];
+    pos[1] = pos_max - pos[1];
+    }
+  else
+    {
+    pos[0] += pos_min;
+    pos[1] += pos_min;
+    }
 
   // Leave room for the slider so that it remains inside the widget
 
@@ -1437,6 +1464,7 @@ void vtkKWRange::GetSlidersPositions(int pos[2])
       pos[i] = pos_max - this->SliderSize;
       }
     }
+
 }
 
 //----------------------------------------------------------------------------
@@ -1947,8 +1975,17 @@ void vtkKWRange::SliderMotionCallback(int slider_idx, int x, int y)
     max = atoi(this->Script("%s cget -height", canv)) - 1;
     }
 
-  float new_value = this->WholeRange[0] + 
-    ((float)(pos - min) / (float)(max - min)) * whole_range;
+  float new_value;
+  if (this->Inverted)
+    {
+    new_value = (float)(max - pos);
+    }
+  else
+    {
+    new_value = (float)(pos - min);
+    }
+  new_value = 
+    this->WholeRange[0] + (new_value / (float)(max - min)) * whole_range;
 
   if (slider_idx == vtkKWRange::SLIDER_INDEX_1)
     {
@@ -1990,6 +2027,10 @@ void vtkKWRange::RangeMotionCallback(int x, int y)
 
   float rel_delta = whole_range * 
     (float)((pos - this->StartInteractionPos) - min) / (float)(max - min);
+  if (this->Inverted)
+    {
+    rel_delta = -rel_delta;
+    }
 
   float new_range[2];
   new_range[0] = this->StartInteractionRange[0] + rel_delta;
@@ -2033,6 +2074,8 @@ void vtkKWRange::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Thickness: " << this->Thickness << endl;
   os << indent << "InternalThickness: " << this->InternalThickness << endl;
   os << indent << "Orientation: "<< this->Orientation << endl;
+  os << indent << "Inverted: "
+     << (this->Inverted ? "On" : "Off") << endl;
   os << indent << "SliderSize: "<< this->SliderSize << endl;
   os << indent << "DisableCommands: "
      << (this->DisableCommands ? "On" : "Off") << endl;

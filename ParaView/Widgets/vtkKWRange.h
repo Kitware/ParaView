@@ -116,6 +116,14 @@ public:
     { this->SetOrientation(vtkKWRange::ORIENTATION_VERTICAL); };
 
   // Description:
+  // Set/Get the order of the sliders (inverted means that the first slider
+  // will be associated to Range[1], the last to Range[0])
+  virtual void SetInverted(int);
+  vtkBooleanMacro(Inverted, int);
+  vtkGetMacro(Inverted, int);
+  
+
+  // Description:
   // Set/Get the desired narrow dimension of the widget. For horizontal widget
   // this is the widget height, for vertical this is the width.
   // In the current implementation, this controls the sliders narrow dim.
@@ -263,6 +271,7 @@ protected:
   float Range[2];
   float Resolution;
   int   AdjustResolution;
+  int   Inverted;
   int   Thickness;
   float InternalThickness;
   int   Orientation;
