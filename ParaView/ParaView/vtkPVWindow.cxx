@@ -142,7 +142,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.477");
+vtkCxxRevisionMacro(vtkPVWindow, "1.478");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -874,14 +874,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Hide the main window until after all user interface is initialized.
   this->Script( "wm withdraw %s", this->GetWidgetName());
-
-  // If we have a user interface manager, it's time to create it
-
-  vtkKWUserInterfaceManager *uim = this->GetUserInterfaceManager();
-  if (uim && !uim->IsCreated())
-    {
-    uim->Create(app);
-    }
 
   // Allow the user to interactively resize the properties parent.
   // The left panel size (Frame1) is restored by vtkKWWindow
