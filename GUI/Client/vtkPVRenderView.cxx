@@ -137,7 +137,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.340");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.341");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2567,4 +2567,31 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "OrientationAxes: " << this->OrientationAxes << endl;
   os << indent << "OrientationAxesFrame: " << this->OrientationAxesFrame
      << endl;
+  os << indent << "DisplayGUI: ";
+  if( this->DisplayGUI )
+    {
+    this->DisplayGUI->PrintSelf(os << endl, indent.GetNextIndent() );
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  os << indent << "SourceNotebook: ";
+  if( this->SourceNotebook )
+    {
+    this->SourceNotebook->PrintSelf(os << endl, indent.GetNextIndent() );
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  os << indent << "InformationGUI: ";
+  if( this->InformationGUI )
+    {
+    this->InformationGUI->PrintSelf(os << endl, indent.GetNextIndent() );
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }

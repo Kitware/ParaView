@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.379");
+vtkCxxRevisionMacro(vtkPVSource, "1.380");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkKWNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,InformationGUI,vtkPVInformationGUI);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayGUI,vtkPVDisplayGUI);
@@ -2687,4 +2687,14 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     os << "(none)" << endl;
     }
   os << indent << "ColorMap: " << this->PVColorMap << endl;    
+  os << indent << "PartDisplay: ";
+  if( this->PartDisplay )
+    {
+    this->PartDisplay->PrintSelf(os << endl, indent.GetNextIndent() );
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  os << indent << "CubeAxesVisibility: " << this->CubeAxesVisibility << endl;
 }
