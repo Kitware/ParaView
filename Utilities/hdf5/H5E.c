@@ -213,7 +213,7 @@ H5E_t *H5E_get_stack(void);
  * The error stack.  Eventually we'll have some sort of global table so each
  * thread has it's own stack.  The stacks will be created on demand when the
  * thread first calls H5E_push().  */
-H5E_t   H5E_stack_g[1]={};
+H5E_t   H5E_stack_g[1]={{0,{0}}};
 #define H5E_get_my_stack()  (H5E_stack_g+0)
 #endif
 

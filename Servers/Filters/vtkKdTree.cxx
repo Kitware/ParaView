@@ -43,7 +43,7 @@
 #include <algorithm>
 #include <vtkstd/set>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.18");
+vtkCxxRevisionMacro(vtkKdTree, "1.19");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -2853,6 +2853,10 @@ void vtkKdTree::__printTree(vtkKdNode *kd, int depth, int v)
 void vtkKdTree::_printTree(int v)
 {
   vtkKdTree::__printTree(this->Top, 0, v);
+}
+void vtkKdTree::PrintRegion(int id)
+{
+  this->RegionList[id]->PrintNode(0);
 }
 void vtkKdTree::PrintTree()
 {   

@@ -193,7 +193,7 @@ public:
   
   // Description:
   //    Print out leaf node data for given id
-  void PrintRegion(int id){ this->RegionList[id]->PrintNode(0);}
+  void PrintRegion(int id);
   
   // Description:
   //   Create a list for each of the requested regions, listing
