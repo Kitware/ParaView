@@ -97,7 +97,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.145");
+vtkCxxRevisionMacro(vtkPVApplication, "1.146");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -241,6 +241,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->AboutDialog = 0;
   this->Display3DWidgets = 0;
   this->ProcessId = 0;
   this->RunningParaViewScript = 0;
@@ -339,6 +340,11 @@ void vtkPVApplication::SetController(vtkMultiProcessController *c)
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
+  if ( this->AboutDialog )
+    {
+    this->AboutDialog->Delete();
+    this->AboutDialog = 0;
+    }
   this->SetController(NULL);
   if ( this->TraceFile )
     {
@@ -940,6 +946,11 @@ void vtkPVApplication::Exit()
   myId = this->Controller->GetLocalProcessId();
   
   this->vtkKWApplication::Exit();
+  if ( this->AboutDialog )
+    {
+    this->AboutDialog->Delete();
+    this->AboutDialog = 0;
+    }
 
   for (id = 0; id < num; ++id)
     {
@@ -1395,29 +1406,6 @@ vtkObject *vtkPVApplication::TclToVTKObject(const char *tclName)
     }
   
   return o;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::DisplayAbout(vtkKWWindow* vtkNotUsed(master))
-{
-//    ostrstream str;
-//    str << this->GetApplicationName() << " was developed by Kitware Inc." << endl
-//        << "http://www.paraview.org" << endl
-//        << "http://www.kitware.com" << endl
-//        << "This is version " << this->MajorVersion << "." << this->MinorVersion
-//        << ", release " << this->GetApplicationReleaseName() << ends;
-
-//    char* msg = str.str();
-//    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
-//    dlg->SetTitle("About ParaView");
-//    dlg->SetMasterWindow(master);
-//    dlg->Create(this,"");
-//    dlg->SetText(msg);
-//    dlg->Invoke();  
-//    dlg->Delete(); 
-//    delete[] msg;
-
-  this->SplashScreen->ShowWithBind();
 }
 
 void vtkPVApplication::DisplayHelp(vtkKWWindow* master)

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.23");
+vtkCxxRevisionMacro(vtkKWDialog, "1.24");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -80,15 +80,15 @@ int vtkKWDialog::Invoke()
 
   this->Application->SetDialogUp(1);
 
+  int width, height, x, y;
+  int sw, sh;
+  this->Script("concat [ winfo screenwidth %s ] [ winfo screenheight %s ]",
+               this->GetMasterWindow()->GetWidgetName(), 
+               this->GetMasterWindow()->GetWidgetName());
+  sscanf(this->GetApplication()->GetMainInterp()->result,
+         "%d %d", &sw, &sh);
   if ( this->GetMasterWindow() )
     {
-    int width, height, x, y;
-    int sw, sh;
-    this->Script("concat [ winfo screenwidth %s ] [ winfo screenheight %s ]",
-                 this->GetMasterWindow()->GetWidgetName(), 
-                 this->GetMasterWindow()->GetWidgetName());
-    sscanf(this->GetApplication()->GetMainInterp()->result,
-           "%d %d", &sw, &sh);
     this->Script("wm geometry %s", this->GetMasterWindow()->GetWidgetName());
     sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
            &width, &height, &x, &y);
@@ -102,17 +102,35 @@ int vtkKWDialog::Invoke()
       {
       y = sh - 200;
       }
-
-    this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
-                 x, y);
     }
+  else
+    {
+    x = sw / 2;
+    y = sh / 2;
+    }
+
   this->Script("update idletasks");
 
   // map the window
   this->Script("wm deiconify %s",this->GetWidgetName());
+
+  sscanf(this->Script("wm geometry %s", this->GetWidgetName()),  "%dx%d+",
+         &width, &height);
+  if ( x > width/2 )
+    {
+    x -= width/2;
+    }
+  if ( y > height/2 )
+    {
+    y -= height/2;
+    }
+
+  this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
+               x, y);
+
   this->Script("focus %s",this->GetWidgetName());
   this->Script("update idletasks");
-  //this->Script("grab %s",this->GetWidgetName());
+  this->Script("grab %s",this->GetWidgetName());
   if ( this->Beep )
     {
     this->Script("bell");

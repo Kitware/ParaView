@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWImageLabel.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWMessageDialog.h"
 
 #include "vtkPNGReader.h"
 
@@ -243,6 +244,43 @@ void vtkPVApplication::CreateSplashScreen()
                       image_PVSplashScreen_height,
                       image_PVSplashScreen_pixel_size);
   this->SplashScreen->Show();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::DisplayAbout(vtkKWWindow* master)
+{
+  if ( !this->AboutDialog )
+    {
+    cout << "Master: " << master << endl;
+    ostrstream str;
+    str << this->GetApplicationName() << " was developed by Kitware Inc." << endl
+        << "http://www.paraview.org" << endl
+        << "http://www.kitware.com" << endl
+        << "This is version " << this->MajorVersion << "." << this->MinorVersion
+        << ", release " << this->GetApplicationReleaseName() << ends;
+    
+    char* msg = str.str();
+    vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+    dlg->SetTitle("About ParaView");
+    dlg->SetMasterWindow(master);
+    dlg->Create(this,"");
+    vtkKWImageLabel* label = vtkKWImageLabel::New();
+    label->SetParent(dlg->GetMessageDialogFrame());
+    label->Create(this,0);
+    label->SetImageData(image_PVSplashScreen,
+                        image_PVSplashScreen_width, 
+                        image_PVSplashScreen_height,
+                        image_PVSplashScreen_pixel_size);
+    this->Script("pack %s", label->GetWidgetName());
+    dlg->SetText(msg);
+    this->AboutDialog = dlg;
+    label->Delete();
+    delete[] msg;
+    }
+
+  this->AboutDialog->Invoke();  
+
+  //this->SplashScreen->ShowWithBind();
 }
 
 //----------------------------------------------------------------------------

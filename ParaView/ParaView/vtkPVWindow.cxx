@@ -116,7 +116,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.372");
+vtkCxxRevisionMacro(vtkPVWindow, "1.373");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1899,6 +1899,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
       // Create
       vtkKWDialog *dialog = vtkKWDialog::New();
       dialog->Create(app, 0);
+      dialog->SetMasterWindow(this);
       dialog->SetTitle("Open Data With...");
       vtkKWLabel* label = vtkKWLabel::New();
       label->SetParent(dialog);
@@ -3778,7 +3779,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.372 $");
+  this->ExtractRevision(os,"$Revision: 1.373 $");
 }
 
 //----------------------------------------------------------------------------

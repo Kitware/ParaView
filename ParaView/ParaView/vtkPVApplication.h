@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWApplication.h"
 
 class vtkDataSet;
+class vtkKWMessageDialog;
 class vtkMapper;
 class vtkMultiProcessController;
 class vtkPVOutputWindow;
@@ -292,6 +293,8 @@ protected:
   vtkMultiProcessController *Controller;
   
   vtkPVOutputWindow *OutputWindow;
+
+  vtkKWMessageDialog* AboutDialog;
 
   static int CheckForArgument(int argc, char* argv[], const char* arg,
                               int& index);

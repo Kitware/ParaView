@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.201");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.202");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1692,6 +1692,7 @@ void vtkPVRenderView::EventuallyRender()
     return;
     }
   this->EventuallyRenderFlag = 1;
+  //cout << "EventuallyRender()" << endl;
 
   // Keep track of whether there is a render pending so that if a render is
   // pending when this object is deleted, we can cancel the "after" command.
@@ -1706,6 +1707,7 @@ void vtkPVRenderView::EventuallyRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRenderCallBack()
 {
+  //cout << "EventuallyRenderCallback()" << endl;
   int abort;
   vtkPVApplication *pvApp = this->GetPVApplication();
   this->UpdateAllPVData();
@@ -2382,7 +2384,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.201 $");
+  this->ExtractRevision(os,"$Revision: 1.202 $");
 }
 
 //------------------------------------------------------------------------------
