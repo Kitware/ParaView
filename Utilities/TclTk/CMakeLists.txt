@@ -119,7 +119,7 @@ ENDIF(UNIX)
 # See vtkTclTkMacros.cmake for full documentation about
 # VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR
 
-SET(TCL_TK_COPY_SUPPORT_LIBRARY 1)
+SET(TCL_TK_COPY_SUPPORT_LIBRARY 1 CACHE INTERNAL "ParaView links against its own version of Tcl/TK" FORCE)
 SET(TCL_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tcl8.4.5/library)
 SET(TK_SUPPORT_LIBRARY_PATH ${TclTk_SOURCE_DIR}/tk8.4.5/library)
 
