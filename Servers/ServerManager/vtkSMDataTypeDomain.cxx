@@ -27,7 +27,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.5");
 
 struct vtkSMDataTypeDomainInternals
 {
@@ -128,6 +128,31 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy)
 
   for (unsigned int i=0; i<numTypes; i++)
     {
+    // Unfortunately, vtkDataSet and vtkPointSet have to be handled
+    // specially. These classes are abstract and can not be instantiated.
+    if (strcmp(info->GetDataClassName(), "vtkDataSet") == 0)
+      {
+      if (strcmp(this->GetDataType(i), "vtkDataSet") == 0)
+        {
+        return 1;
+        }
+      else
+        {
+        continue;
+        }
+      }
+    if (strcmp(info->GetDataClassName(), "vtkPointSet") == 0)
+      {
+      if ( (strcmp(this->GetDataType(i), "vtkPointSet") == 0) ||
+           (strcmp(this->GetDataType(i), "vtkDataSet") == 0))
+        {
+        return 1;
+        }
+      else
+        {
+        continue;
+        }
+      }
     if (dobj->IsA(this->GetDataType(i)))
       {
       return 1;
