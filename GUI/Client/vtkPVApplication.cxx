@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.341");
+vtkCxxRevisionMacro(vtkPVApplication, "1.342");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -998,10 +998,10 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   // Application Icon 
 #ifdef _WIN32
-  this->Script("SetApplicationIcon {} %d big",
+  this->Script("vtkKWSetApplicationIcon {} %d big",
                IDI_PARAVIEWICO);
   // No, we can't set the same icon, even if it has both 32x32 and 16x16
-  this->Script("SetApplicationIcon {} %d small",
+  this->Script("vtkKWSetApplicationIcon {} %d small",
                IDI_PARAVIEWICOSMALL);
 #endif
 
