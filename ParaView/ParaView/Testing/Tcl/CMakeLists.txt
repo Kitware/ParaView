@@ -76,11 +76,11 @@ IF(VTK_FIND_STRING_TCL)
            "vtkSetObjectMacro")
 ENDIF(VTK_FIND_STRING_TCL)
 
-ADD_TEST(otherPrint ${PARAVIEW_EXECUTABLE}
+ADD_TEST(otherPrint ${PARAVIEW_EXECUTABLE} --disable-registry
          ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/otherPrint.pvs
          -A  ${VTK_TCL_HOME})
 
-ADD_TEST(OtherTests ${PARAVIEW_EXECUTABLE} --start-empty
+ADD_TEST(OtherTests ${PARAVIEW_EXECUTABLE} --disable-registry --start-empty
          ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Other.pvs
          -D ${PARAVIEW_SOURCE_DIR}/Data 
          -A ${VTK_TCL_HOME})
