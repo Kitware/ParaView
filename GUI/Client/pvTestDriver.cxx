@@ -49,7 +49,7 @@ pvTestDriver::~pvTestDriver()
 
 // now implement the pvTestDriver class
 
-void pvTestDriver::SeparateArguments(const char* str, 
+void pvTestDriver::SeparateArguments(const char* str,
                                      vtkstd::vector<vtkstd::string>& flags)
 {
   vtkstd::string arg = str;
@@ -65,7 +65,7 @@ void pvTestDriver::SeparateArguments(const char* str,
     flags.push_back(arg.substr(pos1, pos2-pos1));
     pos1 = pos2+1;
     pos2 = arg.find_first_of(" ;", pos1+1);
-    } 
+    }
   flags.push_back(arg.substr(pos1, pos2-pos1));
 }
 
@@ -94,7 +94,7 @@ void pvTestDriver::CollectConfiguredOptions()
   this->ParaView += "/paraview";
   this->ParaViewClient += "/pvclient";
   this->ParaViewRenderServer += "/pvrenderserver";
-  this->ParaViewServer += "/pvserver"; 
+  this->ParaViewServer += "/pvserver";
   this->ParaViewDataServer += "/pvdataserver";
 
   // now find all the mpi information if mpi run is set
@@ -127,14 +127,14 @@ void pvTestDriver::CollectConfiguredOptions()
 # endif
 # ifdef VTK_MPI_POSTFLAGS
   this->SeparateArguments(VTK_MPI_POSTFLAGS, this->MPIPostFlags);
-# endif  
+# endif
   char buf[1024];
   sprintf(buf, "%d", serverNumProc);
   this->MPIServerNumProcessFlag = buf;
   sprintf(buf, "%d", renderNumProc);
   this->MPIRenderServerNumProcessFlag = buf;
   this->MPIClientNumProcessFlag = "1";
-  
+
 #endif // VTK_USE_MPI
 
 # ifdef VTK_MPI_CLIENT_PREFLAGS
@@ -142,13 +142,13 @@ void pvTestDriver::CollectConfiguredOptions()
 # endif
 # ifdef VTK_MPI_CLIENT_POSTFLAGS
   this->SeparateArguments(VTK_MPI_CLIENT_POSTFLAGS, this->MPIClientPostFlags);
-# endif  
+# endif
 # ifdef VTK_MPI_SERVER_PREFLAGS
   this->SeparateArguments(VTK_MPI_SERVER_PREFLAGS, this->MPIServerPreFlags);
 # endif
 # ifdef VTK_MPI_SERVER_POSTFLAGS
   this->SeparateArguments(VTK_MPI_SERVER_POSTFLAGS, this->MPIServerPostFlags);
-# endif  
+# endif
 
 // For remote testing (via ssh)
 # ifdef PV_SSH_FLAGS
@@ -235,26 +235,26 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       fprintf(stderr, "Extras server postflags were specified: %s\n", argv[i+1]);
       }
     }
-  
+
   // check for the Other.pvs test
   // This test should allow error to be in the output of the test.
   for(i =1; i < argc; ++i)
     {
     int len = strlen(argv[i]) - 9;
     if(len > 0 && (strncmp(argv[i]+len, "Other.pvs", 9) == 0 ||
-                   strncmp(argv[i]+len, "ByteOrder.pvs", 13)))
+                   strncmp(argv[i]+len, "ByteOrder.pvs", 13) == 0))
       {
       this->AllowErrorInOutput = 1;
       }
     }
-  
+
   return 1;
 }
 
-void 
+void
 pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
                                 const char* paraView,
-                                const char* paraviewFlags, 
+                                const char* paraviewFlags,
                                 const char* numProc,
                                 int argStart,
                                 int argCount,
@@ -309,7 +309,7 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
       {
       commandLine.push_back("-rc");
       }
-    
+
     for(unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
       {
       commandLine.push_back(MPIPostFlags[i].c_str());
@@ -338,8 +338,8 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
       {
       commandLine.push_back(paraviewFlags);
       }
-    
-    // remaining flags for the test 
+
+    // remaining flags for the test
     for(int ii = argStart; ii < argCount; ++ii)
       {
       commandLine.push_back(argv[ii]);
@@ -443,7 +443,7 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
     "WARNING: Far depth failed sanity check, resetting.", //Ice-T
     0
   };
-  
+
   if(this->AllowErrorInOutput)
     {
     return 0;
@@ -471,10 +471,10 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
           }
         if ( !found )
           {
-          cerr << "pvTestDriver: ***** Test will fail, because the string: \"" 
-            << possibleMPIErrors[i] 
-            << "\"\npvTestDriver: ***** was found in the following output from the " 
-            << pname << ":\n\"" 
+          cerr << "pvTestDriver: ***** Test will fail, because the string: \""
+            << possibleMPIErrors[i]
+            << "\"\npvTestDriver: ***** was found in the following output from the "
+            << pname << ":\n\""
             << it->c_str() << "\"\n";
           return 1;
           }
@@ -502,8 +502,8 @@ int pvTestDriver::Main(int argc, char* argv[])
   if(!this->ProcessCommandLine(argc, argv))
     {
     return 1;
-    } 
-  
+    }
+
   // mpi code
   // Allocate process managers.
   kwsysProcess* renderServer = 0;
@@ -552,7 +552,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     this->ReportCommand(&renderServerCommand[0], "renderserver");
     kwsysProcess_SetCommand(renderServer, &renderServerCommand[0]);
     }
-  
+
   kwsys_stl::vector<const char*> serverCommand;
   if(server)
     {
@@ -561,8 +561,8 @@ int pvTestDriver::Main(int argc, char* argv[])
       {
       serverExe = this->ParaViewDataServer.c_str();
       }
-    
-      
+
+
     this->CreateCommandLine(serverCommand,
                             serverExe,
                             "--server",
@@ -664,7 +664,7 @@ int pvTestDriver::Main(int argc, char* argv[])
       return -1;
       }
     }
-  
+
   // Report the output of the processes.
   int clientPipe = 1;
   int serverPipe = 1;
@@ -705,7 +705,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     }
   if(renderServer)
     {
-    kwsysProcess_WaitForExit(renderServer, 0); 
+    kwsysProcess_WaitForExit(renderServer, 0);
     }
 #ifdef PV_TEST_CLEAN_COMMAND
   // If any executable did not exit properly, run a user-specified
@@ -760,7 +760,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     }
   if(mpiError)
     {
-    cerr << "pvTestDriver: Error string found in ouput, pvTestDriver returning " 
+    cerr << "pvTestDriver: Error string found in ouput, pvTestDriver returning "
          << mpiError << "\n";
     return mpiError;
     }
@@ -783,6 +783,7 @@ void pvTestDriver::ReportCommand(const char* const* command, const char* name)
 int pvTestDriver::ReportStatus(kwsysProcess* process, const char* name)
 {
   int result = 1;
+  cout << "Report status (" << name << "): " << kwsysProcess_GetState(process) << endl;
   switch(kwsysProcess_GetState(process))
     {
     case kwsysProcess_State_Starting:
