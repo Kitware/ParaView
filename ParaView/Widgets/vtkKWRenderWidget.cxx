@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.46");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.47");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -123,9 +123,6 @@ vtkKWRenderWidget::vtkKWRenderWidget()
     {
     cam->ParallelProjectionOn();
     }
-
-  this->ScalarShift = 0;
-  this->ScalarScale = 1;  
 
   this->CollapsingRenders = 0;
   
@@ -896,8 +893,6 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RenderState: " << this->RenderState << endl;
   os << indent << "Renderer: " << this->Renderer << endl;
   os << indent << "CollapsingRenders: " << this->CollapsingRenders << endl;
-  os << indent << "ScalarShift: " << this->ScalarShift << endl;
-  os << indent << "ScalarScale: " << this->ScalarScale << endl;
   os << indent << "Units: " << (this->Units ? this->Units : "(none)") << endl;
   os << indent << "EventIdentifier: " << this->EventIdentifier << endl;
 }

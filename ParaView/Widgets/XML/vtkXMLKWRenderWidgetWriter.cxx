@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLKWRenderWidgetWriter);
-vtkCxxRevisionMacro(vtkXMLKWRenderWidgetWriter, "1.3");
+vtkCxxRevisionMacro(vtkXMLKWRenderWidgetWriter, "1.4");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWRenderWidgetWriter::GetRootElementName()
@@ -88,10 +88,6 @@ int vtkXMLKWRenderWidgetWriter::AddAttributes(vtkXMLDataElement *elem)
   elem->SetVectorAttribute("BackgroundColor", 3, obj->GetBackgroundColor());
 
   elem->SetAttribute("Units", obj->GetUnits());
-
-  elem->SetFloatAttribute("ScalarShift", obj->GetScalarShift());
-
-  elem->SetFloatAttribute("ScalarScale", obj->GetScalarScale());
 
   return 1;
 }

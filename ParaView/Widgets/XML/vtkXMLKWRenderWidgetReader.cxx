@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLKWRenderWidgetWriter.h"
 
 vtkStandardNewMacro(vtkXMLKWRenderWidgetReader);
-vtkCxxRevisionMacro(vtkXMLKWRenderWidgetReader, "1.3");
+vtkCxxRevisionMacro(vtkXMLKWRenderWidgetReader, "1.4");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWRenderWidgetReader::GetRootElementName()
@@ -70,7 +70,7 @@ int vtkXMLKWRenderWidgetReader::Parse(vtkXMLDataElement *elem)
 
   // Get attributes
 
-  float fbuffer3[3], fval;
+  float fbuffer3[3];
   const char *cptr;
   int ival;
 
@@ -83,16 +83,6 @@ int vtkXMLKWRenderWidgetReader::Parse(vtkXMLDataElement *elem)
   if (cptr)
     {
     obj->SetUnits(cptr);
-    }
-
-  if (elem->GetScalarAttribute("ScalarShift", fval))
-    {
-    obj->SetScalarShift(fval);
-    }
-
-  if (elem->GetScalarAttribute("ScalarScale", fval))
-    {
-    obj->SetScalarScale(fval);
     }
 
   // Get nested elements
