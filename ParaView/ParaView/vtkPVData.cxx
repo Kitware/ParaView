@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.215");
+vtkCxxRevisionMacro(vtkPVData, "1.216");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2922,8 +2922,8 @@ void vtkPVData::UpdateActorControlResolutions()
     else
       {
       oneh = log10(delta * 0.051234);
-      half = 0.5 * pow(10, ceil(oneh));
-      res = (oneh > log10(half) ? half : pow(10, floor(oneh)));
+      half = 0.5 * pow(10.0f, ceil(oneh));
+      res = (oneh > log10(half) ? half : pow(10.0f, floor(oneh)));
       // cout << "up i: " << i << ", delta: " << delta << ", oneh: " << oneh << ", half: " << half << ", res: " << res << endl;
       }
     this->TranslateThumbWheel[i]->SetResolution(res);
