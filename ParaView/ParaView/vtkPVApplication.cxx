@@ -124,7 +124,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.232");
+vtkCxxRevisionMacro(vtkPVApplication, "1.233");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -144,6 +144,10 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkpvfilterstcl_Init(Tcl_Interp *interp);
+
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
+extern "C" int Vtkpvdevelopmenttcl_Init(Tcl_Interp *interp);
+#endif
 
 #ifdef PARAVIEW_LINK_XDMF
 extern "C" int Vtkxdmftcl_Init(Tcl_Interp *interp);
@@ -299,12 +303,10 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
     }
 
   Vtkpvfilterstcl_Init(interp);
-  //  if (Vtkparalleltcl_Init(interp) == TCL_ERROR) 
-  //  {
-   // cerr << "Init Parallel error\n";
-   // }
+#ifdef PARAVIEW_BUILD_DEVELOPMENT
+  Vtkpvdevelopmenttcl_Init(interp);
+#endif
 
-  // Why is this here?  Doesn't the superclass initialize this?
   if (vtkKWApplication::GetWidgetVisibility())
     {
     Vtktkrenderwidget_Init(interp);
@@ -1571,6 +1573,18 @@ void vtkPVApplication::SetSourcesBrowserAlwaysShowName(int v)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVApplication::Close(vtkKWWindow *win)
+{
+  if (this->Windows->GetNumberOfItems() == 1)
+    {
+    // Try to get the render window to destruct before the render widget.
+    this->SetRenderModule(NULL);
+    }
+
+  this->Superclass::Close(win);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplication::Exit()
 {  
   // Avoid recursive exit calls during window destruction.
@@ -1594,9 +1608,6 @@ void vtkPVApplication::Exit()
   // still be displayed.
   vtkOutputWindow::SetInstance(0);
 
-  // Try to get the render window to destruct before the render widget.
-  this->SetRenderModule(NULL);
-  
   this->vtkKWApplication::Exit();
 
   this->ProcessModule->Exit();

@@ -136,6 +136,10 @@ public:
   int AcceptEvaluation();
 
   // Description:
+  // This method is invoked when a window closes
+  virtual void Close(vtkKWWindow *);
+
+  // Description:
   // We need to kill the slave processes
   virtual void Exit();
   
