@@ -147,6 +147,10 @@ public:
   // Description:
   // Return the integer index of the menu item by string
   int GetIndex(const char* menuname);
+
+  // Description:
+  // Checks if an item is in the menu
+  int IsItemPresent(const char* menuname);
   
   // Description:
   // Call back for active menu item doc line help

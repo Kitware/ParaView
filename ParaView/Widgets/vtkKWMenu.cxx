@@ -442,6 +442,12 @@ int vtkKWMenu::GetIndex(const char* menuname)
   return vtkKWObject::GetIntegerResult(this->Application);
 }
 
+int vtkKWMenu::IsItemPresent(const char* menuname)
+{
+  this->Script("catch {%s index {%s}}", this->GetWidgetName(), menuname);
+  return !vtkKWObject::GetIntegerResult(this->Application);
+}
+
 void vtkKWMenu::AddSeparator()
 {
   this->Script( "%s add separator", this->GetWidgetName());
