@@ -13,6 +13,32 @@ vlink="#000000" alink="#000000">
 <!--#include virtual="/ParaView/HTML/SideBar.html"-->
 
     <td width="550" valign="top" bgcolor="#FFFFFF">
+    <div align="left">
+    <font size=5>Install </font> and build ParaView differently depending on the
+    operating system. Either way, you must build and install 
+    <a href="http://public.kitware.com/CMake">CMake</a>, 
+    <a href="http://www.visualizationtoolkit.org/">VTK</a>, and 
+    <a href="ftp://tcl.activestate.com/pub/tcl/tcl8_2/">Tcl/Tk 8.2.3</a> 
+    prior to compiling and installing ParaView.
+    <p>
+    <b><font size=3>Run CMake</font></b><br>
+    Once this software is installed, you are ready to build and install ParaView.
+    Run CMake, indicating the location of the ParaView source directory, and where
+    you wish to place any ParaView object files and and any libraries (the build directory).
+    Normally when you run CMake, you will be presented with a GUI that allows
+    you to specify this information plus compile options, paths, etc. as shown 
+    in the following.
+    <p>
+    <img align="right" src=/ParaView/Art/CMake.jpg border=0>
+    <p>
+    Once you configure the build process, you are ready to begin compiling.
+    <ul>
+    <li>On Unix, cd into the build directory, and type "make".</li><br><br>
+    <li>On Windows MSVC systems, load the workspace created by CMake.
+    Choose the configuration you would like to build (e.g., Debug, Release, etc.)
+    and compile</li>
+    </ul>
+    </div>
     </td>
 </tr>
 
