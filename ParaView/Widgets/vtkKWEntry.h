@@ -103,6 +103,7 @@ public:
   void AddValue(const char* value);
   void DeleteValue(int idx);
   int GetValueIndex(const char* value);
+  const char* GetValueFromIndex(int idx);
   int GetNumberOfValues();
   void DeleteAllValues();
 

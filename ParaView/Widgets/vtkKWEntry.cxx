@@ -47,6 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWIcon.h"
 #include "vtkKWListBox.h"
 
+#ifdef _MSC_VER
+#pragma warning (push, 2)
+#endif
+
 #include <vector>
 #include <string>
 
@@ -70,7 +74,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.21");
+vtkCxxRevisionMacro(vtkKWEntry, "1.22");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -432,6 +436,16 @@ void vtkKWEntry::DeleteValue(int idx)
     this->Internals->Dirty = 1;
     this->Modified();
     }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWEntry::GetValueFromIndex(int idx)
+{
+  if ( idx >= this->GetNumberOfValues() )
+    {
+    return 0;
+    }
+  return this->Internals->Entries[idx].c_str();
 }
 
 //----------------------------------------------------------------------------
