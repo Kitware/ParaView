@@ -95,7 +95,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.67");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.68");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -867,7 +867,7 @@ vtkPVWidgetProperty* vtkPVFileEntry::CreateAppropriateProperty()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
+void vtkPVFileEntry::ExecuteEvent(vtkObject*, unsigned long event, void*)
 {
   if ( event == vtkCommand::ModifiedEvent && !this->IgnoreFileListEvents )
     {
