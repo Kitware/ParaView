@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.10");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.11");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -111,6 +111,8 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->StartTimeEntry = vtkKWLabeledEntry::New();
   this->EndTimeEntry = vtkKWLabeledEntry::New();
   this->TimeRange = vtkKWRange::New();
+  this->ScriptEditorFrame = vtkKWFrame::New();
+  this->ScriptEditorScroll = vtkKWWidget::New();
   this->ScriptEditor = vtkKWText::New();
   this->DummyFrame = vtkKWFrame::New();
 
@@ -222,8 +224,13 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->StartTimeEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->EndTimeEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->TimeRange->SetParent(this->TimeScriptEntryFrame->GetFrame());
-  this->ScriptEditor->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->DummyFrame->SetParent(this->TimeScriptEntryFrame->GetFrame());
+
+  this->ScriptEditorFrame->SetParent(this->TimeScriptEntryFrame->GetFrame());
+  this->ScriptEditorFrame->Create(pvApp, 0);
+
+  this->ScriptEditor->SetParent(this->ScriptEditorFrame->GetFrame());
+  this->ScriptEditorScroll->SetParent(this->ScriptEditorFrame->GetFrame());
 
   this->SourceMenuButton->GetMenu()->SetTearOff(0);
   this->MethodMenuButton->GetMenu()->SetTearOff(0);
@@ -238,7 +245,8 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->StartTimeEntry->Create(pvApp, 0);
   this->EndTimeEntry->Create(pvApp, 0);
   this->TimeRange->Create(pvApp, 0);
-  this->ScriptEditor->Create(pvApp, "-height 5");
+  this->ScriptEditor->Create(pvApp, "-height 8");
+  this->ScriptEditorScroll->Create(pvApp, "scrollbar", "-orient vertical");
   this->DummyFrame->Create(pvApp, "-height 1");
 
   this->StartTimeEntry->SetLabel("Start value");
@@ -291,10 +299,31 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
     w->GetWidgetName(),
     w->GetWidgetName(),
     w->GetWidgetName());
+
+  pvApp->Script(
+    "grid %s %s -sticky news", 
+    this->ScriptEditor->GetWidgetName(),
+    this->ScriptEditorScroll->GetWidgetName());
+
+  pvApp->Script(
+    "%s configure -yscrollcommand {%s set}",
+    this->ScriptEditor->GetWidgetName(),
+    this->ScriptEditorScroll->GetWidgetName());
+  pvApp->Script(
+    "%s configure -command {%s yview}",
+    this->ScriptEditorScroll->GetWidgetName(),
+    this->ScriptEditor->GetWidgetName());
+  pvApp->Script(
+    "grid rowconfigure %s 0 -weight 1\n"
+    "grid columnconfigure %s 0 -weight 1",
+    this->ScriptEditor->GetParent()->GetWidgetName(),
+    this->ScriptEditor->GetParent()->GetWidgetName());
+
   frame->Delete();
   this->UpdateStartEndValueToEntry();
   this->SetupBinds();
 
+  this->SetLabelAndScript("None", 0);
   this->SwitchScriptTime(-1);
 }
 
@@ -302,6 +331,8 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 {
   this->ScriptEditor->Delete();
+  this->ScriptEditorFrame->Delete();
+  this->ScriptEditorScroll->Delete();
   this->DummyFrame->Delete();
   this->TimeScriptEntryFrame->Delete();
   this->SetPVSource(0);
@@ -330,7 +361,7 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
   vtkKWApplication* pvApp = this->StartTimeEntry->GetApplication();
   pvApp->Script("pack forget %s %s %s %s",
     this->DummyFrame->GetWidgetName(),
-    this->ScriptEditor->GetWidgetName(),
+    this->ScriptEditorFrame->GetWidgetName(),
     this->StartTimeEntry->GetWidgetName(),
     this->EndTimeEntry->GetWidgetName());
   if ( i > 0)
@@ -343,7 +374,7 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
   else if ( ! i )
     {
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
-      this->ScriptEditor->GetWidgetName());
+      this->ScriptEditorFrame->GetWidgetName());
     }
   else
     {
@@ -408,6 +439,7 @@ void vtkPVAnimationInterfaceEntry::NoMethodCallback()
   this->Dirty = 1;
   this->SetCurrentMethod(0);
   this->SetScript(0);
+  this->SetLabelAndScript("None", 0);
   this->UpdateMethodMenu();
   this->Parent->UpdateNewScript();
   this->SwitchScriptTime(-1);
@@ -419,6 +451,10 @@ void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
   this->Dirty = 1;
   this->SetCurrentMethod(0);
   this->UpdateMethodMenu();
+  if ( vtkString::Length(this->Script) == 0 )
+    {
+    this->SetLabelAndScript("Script", 0);
+    }
   this->Parent->UpdateNewScript();
   this->SwitchScriptTime(0);
   this->GetMethodMenuButton()->SetButtonText("Script");
@@ -663,6 +699,22 @@ void vtkPVAnimationInterfaceEntry::SetParent(vtkPVAnimationInterface* ai)
 void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
                                                 const char* script)
 {
+  vtkstd::string new_script;
+  if ( this->GetPVSource() && this->GetPVSource()->GetTclName() )
+    {
+    new_script = "# globalPVTime is provided by the animation\n"
+      "# interface for convenience.\n"
+      "# It varies linearly between 0 and 1 (0 at the\n"
+      "# first frame, 1 at the last frame).\n"
+      "\n"
+      "# The source modified is: ";
+    new_script += this->GetPVSource()->GetName();
+    new_script += "\n";
+    }
+  if ( script )
+    {
+    new_script += script;
+    }
   if ( !vtkString::Equals(this->CurrentMethod, label) )
     {
     this->SetCurrentMethod(label);
@@ -670,9 +722,9 @@ void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
     this->Dirty = 1;
     }
   this->GetMethodMenuButton()->SetButtonText(label);
-  if ( !vtkString::Equals(this->Script, script) )
+  if ( !vtkString::Equals(this->Script, new_script.c_str()) )
     {
-    this->SetScript(script);
+    this->SetScript(new_script.c_str());
     //cout << __LINE__ << " Dirty" << endl;
     this->Dirty = 1;
     }

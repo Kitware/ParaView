@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.77");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.78");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -563,8 +563,8 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->ScriptCheckButtonFrame->Create(this->Application, "frame", "");
 
 
-  this->Script("pack %s -side top -expand t -fill x", 
-               this->ScriptCheckButtonFrame->GetWidgetName());
+  //this->Script("pack %s -side top -expand t -fill x", 
+  //             this->ScriptCheckButtonFrame->GetWidgetName());
 
   this->ScriptCheckButton->SetParent(this->ScriptCheckButtonFrame);
   this->ScriptCheckButton->Create(this->Application, "-text {Script Editor}");
@@ -611,10 +611,16 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   // Pack frames
 
-  this->Script("pack %s %s %s %s -side top -expand t -fill x -padx 2 -pady 2", 
+  this->Script("pack %s %s -side top -expand t -fill x -padx 2 -pady 2", 
                this->ControlFrame->GetWidgetName(),
                this->AnimationEntriesFrame->GetWidgetName(),
                this->ActionFrame->GetWidgetName(),
+               this->SaveFrame->GetWidgetName());
+
+  //this->Script("pack %s -side top -expand t -fill x -padx 2 -pady 2", 
+  //             this->ActionFrame->GetWidgetName());
+
+  this->Script("pack %s -side top -expand t -fill x -padx 2 -pady 2", 
                this->SaveFrame->GetWidgetName());
 
   this->TimeRange->SetWholeRange(0, this->NumberOfFrames-1);

@@ -182,7 +182,9 @@ protected:
 
   vtkKWFrame*        DummyFrame;
 
-  vtkKWText *ScriptEditor;
+  vtkKWText*         ScriptEditor;
+  vtkKWFrame*        ScriptEditorFrame;
+  vtkKWWidget*       ScriptEditorScroll;
 
   vtkKWObject*       SaveStateObject;
   char*              SaveStateScript;
