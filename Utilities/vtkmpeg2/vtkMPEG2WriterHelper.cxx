@@ -154,7 +154,7 @@ int vtkMPEG2WriterInternal::RemoveImage(const char* fname)
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPEG2WriterHelper);
-vtkCxxRevisionMacro(vtkMPEG2WriterHelper, "1.4");
+vtkCxxRevisionMacro(vtkMPEG2WriterHelper, "1.5");
 
 //---------------------------------------------------------------------------
 vtkMPEG2WriterHelper::vtkMPEG2WriterHelper()
@@ -171,7 +171,6 @@ vtkMPEG2WriterHelper::~vtkMPEG2WriterHelper()
 {
   delete this->Internals;
   this->SetFileName(0);
-  this->SetInput(0);
 }
 
 //----------------------------------------------------------------------------
