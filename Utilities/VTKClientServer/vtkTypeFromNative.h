@@ -90,8 +90,7 @@ VTK_TYPE_FROM_NATIVE(unsigned long, vtkTypeUInt64);
 #if defined(VTK_SIZEOF___INT64) && (VTK_SIZEOF___INT64 == 8)
 VTK_TYPE_FROM_NATIVE(__int64, vtkTypeInt64);
 VTK_TYPE_FROM_NATIVE(unsigned __int64, vtkTypeUInt64);
-#endif
-#if defined(VTK_SIZEOF_LONG_LONG) && (VTK_SIZEOF_LONG_LONG == 8)
+#elif defined(VTK_SIZEOF_LONG_LONG) && (VTK_SIZEOF_LONG_LONG == 8)
 VTK_TYPE_FROM_NATIVE(long long, vtkTypeInt64);
 VTK_TYPE_FROM_NATIVE(unsigned long long, vtkTypeUInt64);
 #endif
