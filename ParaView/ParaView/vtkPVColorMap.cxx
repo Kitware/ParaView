@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.7");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.24.2.8");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1315,4 +1315,5 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScalarRange: " << this->ScalarRange[0] << ", "
      << this->ScalarRange[1] << endl;
   os << indent << "VisitedFlag: " << this->VisitedFlag << endl;
+  os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
 }
