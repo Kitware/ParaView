@@ -125,6 +125,14 @@ ADD_EXECUTABLE(ParaView WIN32 ParaView.cxx)
 
 LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg vtktiff )
 
+# add in freetype
+IF (VTK_USE_FREETYPE)
+  LINK_LIBRARIES(
+    vtkftgl
+    vtkfreetype
+  )
+ENDIF (VTK_USE_FREETYPE)
+
 IF (VTK_MANGLE_MESA)
   IF (MESA_INCLUDE_PATH)
     INCLUDE_DIRECTORIES(${MESA_INCLUDE_PATH})

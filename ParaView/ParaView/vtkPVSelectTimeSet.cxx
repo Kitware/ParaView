@@ -147,20 +147,20 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
   this->Script("pack %s", this->TimeLabel->GetWidgetName());
   
   this->TreeFrame->Create(this->Application, "ScrolledWindow", 
-			  "-relief sunken -borderwidth 2");
+                          "-relief sunken -borderwidth 2");
 
   this->Tree->Create(this->Application, "Tree", 
-		     "-background white -borderwidth 0 -width 15 -padx 2 "
-		     "-redraw 1 -relief flat -selectbackground red");
+                     "-background white -borderwidth 0 -width 15 -padx 2 "
+                     "-redraw 1 -relief flat -selectbackground red");
   this->Script("%s bindText <ButtonPress-1>  {%s SetTimeValueCallback}",
-	       this->Tree->GetWidgetName(), this->GetTclName());
+               this->Tree->GetWidgetName(), this->GetTclName());
   this->Script("%s setwidget %s", this->TreeFrame->GetWidgetName(),
-	       this->Tree->GetWidgetName());
+               this->Tree->GetWidgetName());
 
   this->Script("pack %s -expand t -fill x", this->TreeFrame->GetWidgetName());
 
   this->Script("pack %s -side top -expand t -fill x", 
-	       this->Frame->GetWidgetName());
+               this->Frame->GetWidgetName());
 
 }
 
@@ -184,17 +184,17 @@ void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
   if ( strncmp(item, "timeset", strlen("timeset")) == 0 )
     {
     this->Script("if [%s itemcget %s -open] "
-		 "{%s closetree %s} else {%s opentree %s}", 
-		 this->Tree->GetWidgetName(), item,
-		 this->Tree->GetWidgetName(), item,
-		 this->Tree->GetWidgetName(), item);
+                 "{%s closetree %s} else {%s opentree %s}", 
+                 this->Tree->GetWidgetName(), item,
+                 this->Tree->GetWidgetName(), item,
+                 this->Tree->GetWidgetName(), item);
     return;
     }
 
   this->Script("%s selection set %s", this->Tree->GetWidgetName(),
-	       item);
+               item);
   this->Script("%s itemcget %s -data", this->Tree->GetWidgetName(),
-	       item);
+               item);
   const char* result = this->Application->GetMainInterp()->result;
   if (result[0] == '\0' || !this->Reader)
     {
@@ -218,19 +218,19 @@ void vtkPVSelectTimeSet::AddRootNode(const char* name, const char* text)
     return;
     }
   this->Script("%s insert end root %s -text {%s}", this->Tree->GetWidgetName(),
-	       name, text);
+               name, text);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name, 
-				      const char* text, const char* data)
+                                      const char* text, const char* data)
 {
   if (!this->Application)
     {
     return;
     }
   this->Script("%s insert end %s %s -text {%s} -data %s", 
-	       this->Tree->GetWidgetName(), parent, name, text, data);
+               this->Tree->GetWidgetName(), parent, name, text, data);
 }
 
 
@@ -243,12 +243,12 @@ void vtkPVSelectTimeSet::Accept()
     {
     this->Script("%s selection get", this->Tree->GetWidgetName());
     this->AddTraceEntry("$kw(%s) SetTimeValueCallback {%s}", 
-			this->GetTclName(), 
-			this->Application->GetMainInterp()->result);
+                        this->GetTclName(), 
+                        this->Application->GetMainInterp()->result);
     }
 
   pvApp->BroadcastScript("%s SetTimeValue {%12.5e}",
-			 this->ObjectTclName, this->GetTimeValue());
+                         this->ObjectTclName, this->GetTimeValue());
 
   this->ModifiedFlag = 0;
 }
@@ -268,7 +268,7 @@ void vtkPVSelectTimeSet::Reset()
     }
 
   this->Script("%s delete [%s nodes root]", this->Tree->GetWidgetName(),
-	       this->Tree->GetWidgetName());
+               this->Tree->GetWidgetName());
   
   if (!this->Reader)
     {
@@ -308,19 +308,22 @@ void vtkPVSelectTimeSet::Reset()
       float timeValue = da->GetTuple1(tuple);
       sprintf(timeValueName, "time%d_%-12.5e", timeSetId, timeValue);
       sprintf(timeValueText, "%-12.5e", timeValue);
-      sprintf(indices, "{%d %d}", timeSetId-1, tuple);
+      ostrstream str;
+      str << "{" << timeSetId-1 << " " << tuple << "}" << ends;
+      sprintf(indices, "%s", str.str());
+      str.rdbuf()->freeze(0);
       this->AddChildNode(timeSetName, timeValueName, timeValueText, indices);
       if (actualTimeValue == timeValue && !matchFound)
-	{
-	matchFound=1;
-	this->Script("%s selection set %s", this->Tree->GetWidgetName(),
-		     timeValueName);
-	}
+        {
+        matchFound=1;
+        this->Script("%s selection set %s", this->Tree->GetWidgetName(),
+                     timeValueName);
+        }
       }
     if (timeSetId == 1)
       {
       this->Script("%s opentree %s", this->Tree->GetWidgetName(), 
-		   timeSetName);
+                   timeSetName);
       }
     }
 
@@ -330,7 +333,7 @@ void vtkPVSelectTimeSet::Reset()
 
 //----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-						   vtkPVAnimationInterface *ai)
+                                                   vtkPVAnimationInterface *ai)
 {
   char methodAndArgs[500];
 
@@ -342,7 +345,7 @@ void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 
 //----------------------------------------------------------------------------
 vtkPVSelectTimeSet* vtkPVSelectTimeSet::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVSelectTimeSet::SafeDownCast(clone);
@@ -350,8 +353,8 @@ vtkPVSelectTimeSet* vtkPVSelectTimeSet::ClonePrototype(vtkPVSource* pvSource,
 
 //----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::CopyProperties(vtkPVWidget* clone, 
-				      vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                      vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVSelectTimeSet* pvts = vtkPVSelectTimeSet::SafeDownCast(clone);

@@ -1342,6 +1342,10 @@ void vtkPVApplication::TrapsForSignals(int signal)
 //----------------------------------------------------------------------------
 void vtkPVApplication::ErrorExit()
 {
+  // This { is here because compiler is smart enough to know that exit
+  // exits the code without calling destructors. By adding this,
+  // destructors are called before the exit.
+  {
   cout << "There was a major error! Trying to exit..." << endl;
   char name[] = "ErrorApplication";
   char *n = name;
@@ -1382,6 +1386,7 @@ void vtkPVApplication::ErrorExit()
       << ends;
   Tcl_GlobalEval(interp, str.str());
   str.rdbuf()->freeze(0);
+  }
   exit(1);
 }
 
