@@ -10,15 +10,25 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
      <IntVectorProperty 
+        name="TimestepIndexRangeInfo"
+        command="GetTimestepIndexRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+     <IntVectorProperty 
         name="TimestepAsIndex"
         command="SetTimestepAsIndex"
-        number_of_elements="1" 
+        number_of_elements="1"
         default_values="0">
-        <IntRangeDomain name="range"/>
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="TimestepIndexRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
      </IntVectorProperty>
    <!-- End PVDReader -->
    </SourceProxy>
-                    
+
    <SourceProxy name="XMLPolyDataReader" 
                 class="vtkXMLPolyDataReader">
      <StringVectorProperty
@@ -27,20 +37,48 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0"
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
@@ -52,20 +90,48 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
@@ -77,20 +143,48 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
@@ -102,20 +196,48 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
@@ -127,20 +249,48 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
@@ -152,20 +302,49 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
@@ -177,20 +356,48 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
@@ -202,20 +409,48 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
@@ -227,20 +462,48 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
@@ -252,20 +515,48 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End XMLRectilinearGridReader -->
    </SourceProxy>
 
@@ -285,7 +576,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+       <StringListDomain name="files"/>
+     </StringVectorProperty>
    <!-- End pvtkfile -->
    </SourceProxy>
 
@@ -317,13 +610,32 @@
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0"
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -331,7 +643,14 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End ensight -->
    </SourceProxy>
 
@@ -342,18 +661,34 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
       <IntVectorProperty
          name="Stride"
          command="SetStride"
          number_of_elements="3"
          default_values="1 1 1" >
+        <IntRangeDomain name="range" min="1 1 1" />
       </IntVectorProperty>
    <!-- End HDF5RawImageReader -->
    </SourceProxy>
@@ -395,12 +730,14 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
-      <IntVectorProperty
-         name="TimeStep"
-         command="SetTimeStep"
-         number_of_elements="1"
-         default_values="0" >
-      </IntVectorProperty>
+
+     <IntVectorProperty
+        name="TimeStep"
+        command="SetTimeStep"
+        number_of_elements="1"
+        default_values="0" >
+       <IntRangeDomain name="range"/>
+     </IntVectorProperty>
    <!-- End xyzreader -->
    </SourceProxy>
 
@@ -415,7 +752,9 @@
      <StringVectorProperty
         name="QFileName"
         command="SetQFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+       <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="BinaryFile" 
@@ -430,6 +769,7 @@
         command="SetMultiGrid" 
         number_of_elements="1"
         default_values="0" > 
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -437,6 +777,7 @@
         command="SetHasByteCount" 
         number_of_elements="1"
         default_values="0" > 
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -444,6 +785,7 @@
         command="SetIBlanking" 
         number_of_elements="1"
         default_values="0" > 
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -451,6 +793,7 @@
         command="SetTwoDimensionalGeometry" 
         number_of_elements="1"
         default_values="0" > 
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -458,6 +801,7 @@
         command="SetForceRead" 
         number_of_elements="1"
         default_values="0" > 
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -506,6 +850,7 @@
          command="SetHBScale"
          number_of_elements="1"
          default_values="1.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -513,6 +858,7 @@
          command="SetBScale"
          number_of_elements="1"
          default_values="1.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
    <!-- End gaussiancubereader -->
    </SourceProxy>
@@ -530,6 +876,7 @@
          command="SetRadius"
          number_of_elements="1"
          default_values="60000" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -537,6 +884,7 @@
         command="SetClipExtent" 
         number_of_elements="6"
         default_values="-2147483647 2147483647 -2147483647 2147483647 -2147483647 2147483647" > 
+       <IntRangeDomain name="range"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -544,6 +892,7 @@
         command="SetNumberOfGhostLevels" 
         number_of_elements="1"
         default_values="1" > 
+       <IntRangeDomain name="range"/>
      </IntVectorProperty>
    <!-- End popreader -->
    </SourceProxy>
@@ -576,13 +925,32 @@
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
-     <StringVectorProperty
+      <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+    <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -590,7 +958,14 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End ensightMS -->
    </SourceProxy>
 
@@ -599,7 +974,9 @@
      <StringVectorProperty
         name="FilePrefix"
         command="SetFilePrefix"
-        number_of_elements="1" />
+        number_of_elements="1">
+       <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="FilePattern"
@@ -641,13 +1018,14 @@
         name="FileDimensionality"
         command="SetFileDimensionality"
         number_of_elements="1" 
-        default_values="2" />
+        default_values="3" />
 
       <DoubleVectorProperty
          name="DataOrigin"
          command="SetDataOrigin"
          number_of_elements="3"
          default_values="0.0 0.0 0.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -655,19 +1033,24 @@
          command="SetDataSpacing"
          number_of_elements="3"
          default_values="1.0 1.0 1.0" >
+        <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
      <IntVectorProperty 
         name="DataExtent"
         command="SetDataExtent"
         number_of_elements="6" 
-        default_values="0 0 0 0 0 0" />
+        default_values="0 0 0 0 0 0" >
+       <IntRangeDomain name="range"/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="NumberOfScalarComponents"
         command="SetNumberOfScalarComponents"
         number_of_elements="1" 
-        default_values="1" />
+        default_values="1" >
+       <IntRangeDomain name="range"/>
+     </IntVectorProperty>
 
      <StringVectorProperty
         name="ScalarArrayName"
@@ -686,13 +1069,32 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
 
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0"
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -700,13 +1102,21 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
 
       <IntVectorProperty
          name="Stride"
          command="SetStride"
          number_of_elements="3"
          default_values="1 1 1" >
+        <IntRangeDomain name="range" min="1 1 1" />
       </IntVectorProperty>
 
      <StringVectorProperty
@@ -720,13 +1130,25 @@
         number_of_elements="0" 
         repeat_command="1"/> 
 
+     <StringVectorProperty 
+        name="ParametersInfo"
+        information_only="1">
+        <XDMFInformationHelper/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="ParameterIndex"
         command="SetParameterIndex"
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0"> 
+       <XDMFPropertyDomain name="range">
+          <RequiredProperties>
+             <Property name="ParametersInfo" function="ParameterRanges"/>
+          </RequiredProperties>
+       </XDMFPropertyDomain>
+     </StringVectorProperty>
    <!-- End XdmfReader -->
    </SourceProxy>
 
@@ -739,34 +1161,103 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
 
+     <StringVectorProperty 
+        name="XMLFileNameInfo"
+        command="GetXMLFileName"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="XMLFileName"
         command="SetXMLFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+       <StringListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="XMLFileNameInfo" function="XMLFileName"/>
+          </RequiredProperties>
+       </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="FilePrefixInfo"
+        command="GetFilePrefix"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="FilePrefix"
         command="SetFilePrefix"
-        number_of_elements="1" />
+        number_of_elements="1" >
+       <StringListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="FilePrefixInfo" function="Prefix"/>
+          </RequiredProperties>
+       </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="FilePatternInfo"
+        command="GetFilePattern"
+        information_only="1">
+        <SimpleStringInformationHelper/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="FilePattern"
         command="SetFilePattern"
-        number_of_elements="1" />
+        number_of_elements="1" >
+       <StringListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="FilePatternInfo" function="Pattern"/>
+          </RequiredProperties>
+       </StringListDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="FileRangeInfo"
+        command="GetFileRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="FileRange"
         command="SetFileRange"
         number_of_elements="2" 
-        default_values="0 0"/>
+        default_values="0 0">
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="FileRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="TimeStepRangeInfo"
+        command="GetTimeStepRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="TimeStep"
         command="SetTimeStep"
         number_of_elements="1"
         default_values="0">
-       <IntRangeDomain name="range"/>
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="TimeStepRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
      </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -774,7 +1265,20 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -782,7 +1286,14 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0"
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="DisplayType"
@@ -790,21 +1301,32 @@
         number_of_elements="1" 
         default_values="1"/>
 
+     <StringVectorProperty 
+        name="BlockArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Block"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="BlockArrayStatus"
         command="SetBlockArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="BlockArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="BlockArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
 
-     <StringVectorProperty
-        name="PartArrayStatus"
-        command="SetPartArrayStatus"
-        number_of_elements="2" 
-        repeat_command="1"
-        number_of_elements_per_command="2"
-        element_types="2 0" /> 
+     <StringVectorProperty 
+        name="MaterialArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Material"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="MaterialArrayStatus"
@@ -812,7 +1334,35 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="MaterialArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="MaterialArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="HierarchyArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Hierarchy"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="HierarchyArrayStatus"
+        command="SetHierarchyArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" 
+        information_property="HierarchyArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="HierarchyArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="GenerateBlockIdCellArray" 
@@ -847,6 +1397,14 @@
      </IntVectorProperty>
 
      <IntVectorProperty 
+        name="ExodusModelMetadata" 
+        command="SetExodusModelMetadata" 
+        number_of_elements="1"
+        default_values="0" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
         name="ApplyDisplacements" 
         command="SetApplyDisplacements" 
         number_of_elements="1"
@@ -859,7 +1417,7 @@
         command="SetDisplacementMagnitude" 
         number_of_elements="1"
         default_values="1" > 
-        <DoubleRangeDomain name="range"/>
+       <DoubleRangeDomain name="range"/>
      </DoubleVectorProperty>
    <!-- End ExodusReader -->
    </SourceProxy>
@@ -873,13 +1431,32 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
 
+     <StringVectorProperty 
+        name="VariableArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Variable"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="VariableArrayStatus"
         command="SetVariableArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="VariableArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="VariableArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="BlockArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Block"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="BlockArrayStatus"
@@ -887,12 +1464,34 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="BlockArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="BlockArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <IntVectorProperty 
+        name="TimeStepRangeInfo"
+        command="GetTimeStepRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
 
      <IntVectorProperty 
         name="TimeStep"
         command="SetTimeStep"
-        number_of_elements="1" />
+        number_of_elements="1"
+        default_values="0">
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="TimeStepRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
+
    <!-- End SAFReader -->
    </SourceProxy>
 
@@ -905,13 +1504,32 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
 
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="PointArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Point"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="PointArrayStatus"
@@ -919,7 +1537,14 @@
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0" /> 
+        element_types="2 0" 
+        information_property="PointArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="PointArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
    <!-- End AVSucdReader -->
    </SourceProxy>
 
