@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.2");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.3");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -327,8 +327,12 @@ void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app,
   this->ColorSpaceOptionMenu->SetParent(this->InfoFrame);
   this->ColorSpaceOptionMenu->Create(app, "-padx 1 -pady 1");
   this->ColorSpaceOptionMenu->IndicatorOff();
+  this->ColorSpaceOptionMenu->SetBalloonHelpString(
+    "Change the interpolation color space to RGB or HSV.");
+
   this->ColorSpaceOptionMenu->AddEntryWithCommand(
     VTK_KW_CTF_EDITOR_RGB_LABEL, this, "ColorSpaceToRGBCallback");
+
   this->ColorSpaceOptionMenu->AddEntryWithCommand(
     VTK_KW_CTF_EDITOR_HSV_LABEL, this, "ColorSpaceToHSVCallback");
 
