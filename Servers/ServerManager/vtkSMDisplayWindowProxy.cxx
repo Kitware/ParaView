@@ -31,7 +31,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.20");
 vtkCxxSetObjectMacro(vtkSMDisplayWindowProxy,RenderModule,vtkPVRenderModule);
 
 struct vtkSMDisplayWindowProxyInternals
@@ -45,9 +45,12 @@ vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
 {
   this->SetVTKClassName("vtkRenderWindow");
 
+  this->SetServers(vtkProcessModule::DATA_SERVER|vtkProcessModule::CLIENT);
+
   // TODO revise this: where should windowtoimage be?
   this->WindowToImage = vtkSMProxy::New();
-  this->WindowToImage->SetServers(vtkProcessModule::CLIENT);
+  this->WindowToImage->SetServers(
+    vtkProcessModule::GetRootId(vtkProcessModule::DATA_SERVER));
   
   this->DWInternals = new vtkSMDisplayWindowProxyInternals;
   this->RenderModule = 0;
@@ -68,6 +71,27 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
+  vtkSMProxy* rendererProxy = this->GetSubProxy("renderer");
+  if (rendererProxy)
+    {
+    rendererProxy->SetServers(this->Servers);
+    }
+  vtkSMProxy* cameraProxy = this->GetSubProxy("camera");
+  if (cameraProxy)
+    {
+    cameraProxy->SetServers(this->Servers);
+    }
+  vtkSMProxy* interactorProxy = this->GetSubProxy("interactor");
+  if (interactorProxy)
+    {
+    interactorProxy->SetServers(this->Servers);
+    }
+  vtkSMProxy* compositeProxy = this->GetSubProxy("composite");
+  if (compositeProxy)
+    {
+    compositeProxy->SetServers(this->Servers);
+    }
+
   this->Superclass::CreateVTKObjects(numObjects);
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
@@ -87,7 +111,6 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
     }
 #endif
 
-  vtkSMProxy* rendererProxy = this->GetSubProxy("renderer");
   if (!rendererProxy)
     {
     vtkErrorMacro("No renderer sub-proxy was defined. Please make sure that "
@@ -103,7 +126,6 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
       }
     }
 
-  vtkSMProxy* cameraProxy = this->GetSubProxy("camera");
   if (!cameraProxy)
     {
     vtkErrorMacro("No camera sub-proxy was defined. Please make sure that "
@@ -121,7 +143,6 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
       }
     }
 
-  vtkSMProxy* interactorProxy = this->GetSubProxy("interactor");
   if (!interactorProxy)
     {
     vtkErrorMacro("No interactor sub-proxy was defined. Please make sure that "
@@ -139,7 +160,6 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
           << vtkClientServerStream::End;
       }
     }
-  vtkSMProxy* compositeProxy = this->GetSubProxy("composite");
   if (!compositeProxy)
     {
     vtkErrorMacro("No composite sub-proxy was defined. Please make sure that "
@@ -328,7 +348,8 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
   vtkClientServerStream str;
 
   vtkSMProxy* imageWriter = vtkSMProxy::New();
-  imageWriter->SetServers(vtkProcessModule::CLIENT);
+  imageWriter->SetServers(
+    vtkProcessModule::GetRootId(vtkProcessModule::DATA_SERVER));
 
   imageWriter->SetVTKClassName(writerName);
   imageWriter->CreateVTKObjects(1);
@@ -439,7 +460,8 @@ void vtkSMDisplayWindowProxy::StillRender()
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   // Call render on the client only. The composite manager should
   // take care of the rest.
-  pm->SendStream(vtkProcessModule::CLIENT, str, 0);
+  //pm->SendStream(vtkProcessModule::CLIENT, str, 0);
+  pm->SendStream(vtkProcessModule::DATA_SERVER, str, 0);
   str.Reset();
 }
 
