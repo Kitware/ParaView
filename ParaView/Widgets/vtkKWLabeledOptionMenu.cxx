@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledOptionMenu);
-vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.4");
+vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.5");
 
 int vtkKWLabeledOptionMenuCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -57,6 +57,8 @@ int vtkKWLabeledOptionMenuCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWLabeledOptionMenu::vtkKWLabeledOptionMenu()
 {
   this->CommandFunction = vtkKWLabeledOptionMenuCommand;
+
+  this->PackHorizontally = 1;
 
   this->OptionMenu = vtkKWOptionMenu::New();
 }
@@ -112,17 +114,43 @@ void vtkKWLabeledOptionMenu::Pack()
 
   ostrstream tk_cmd;
 
-  tk_cmd << "pack ";
-  if (this->ShowLabel)
+  if (this->PackHorizontally)
     {
-    tk_cmd << this->Label->GetWidgetName() << " ";
+    if (this->ShowLabel)
+      {
+      tk_cmd << "pack " << this->Label->GetWidgetName() 
+             << " -side left -anchor nw" << endl;
+      }
+    tk_cmd << "pack " << this->OptionMenu->GetWidgetName() 
+           << " -side left -anchor nw -fill both" << endl;
     }
-  tk_cmd << this->OptionMenu->GetWidgetName() 
-         << " -side left -anchor nw -fill both" << endl;
+  else
+    {
+    if (this->ShowLabel)
+      {
+      tk_cmd << "pack " << this->Label->GetWidgetName() 
+             << " -side top -anchor nw" << endl;
+      }
+    tk_cmd << "pack " << this->OptionMenu->GetWidgetName() 
+           << " -side top -anchor nw -padx 10 -fill both" << endl;
+    }
   
   tk_cmd << ends;
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledOptionMenu::SetPackHorizontally(int _arg)
+{
+  if (this->PackHorizontally == _arg)
+    {
+    return;
+    }
+  this->PackHorizontally = _arg;
+  this->Modified();
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -164,4 +192,7 @@ void vtkKWLabeledOptionMenu::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "OptionMenu: " << this->OptionMenu << endl;
+
+  os << indent << "PackHorizontally: " 
+     << (this->PackHorizontally ? "On" : "Off") << endl;
 }

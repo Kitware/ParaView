@@ -69,6 +69,12 @@ public:
   vtkGetObjectMacro(OptionMenu, vtkKWOptionMenu);
 
   // Description:
+  // Set the widget packing order to be horizontal (default).
+  virtual void SetPackHorizontally(int);
+  vtkBooleanMacro(PackHorizontally, int);
+  vtkGetMacro(PackHorizontally, int);
+
+  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
@@ -79,6 +85,8 @@ protected:
   ~vtkKWLabeledOptionMenu();
 
   vtkKWOptionMenu *OptionMenu;
+
+  int PackHorizontally;
 
   // Pack or repack the widget
 
