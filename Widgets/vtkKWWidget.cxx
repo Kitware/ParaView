@@ -193,10 +193,8 @@ char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * Command
   event << this->GetWidgetName() << " configure -command {" 
 	<< CalledObject->GetTclName() 
 	<< " " << CommandString << "} " << ends;
-  char *rval = new char [strlen(event.str())+1];
-  strcpy(rval,event.str());
-  event.rdbuf()->freeze(0);
-  return rval;
+
+  return event.str();
 }
 
 void vtkKWWidget::SetBalloonHelpString(char *str)
@@ -249,7 +247,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.8 $");
+  this->ExtractRevision(os,"$Revision: 1.9 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()

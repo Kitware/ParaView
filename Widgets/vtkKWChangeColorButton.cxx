@@ -221,9 +221,7 @@ void vtkKWChangeColorButton::SetCommand( vtkKWObject* CalledObject,
   ostrstream command;
   command << CalledObject->GetTclName() << " " << CommandString << ends;
 
-  this->Command = new char [strlen(command.str())+1];
-  strcpy(this->Command,command.str());
-  command.rdbuf()->freeze(0);
+  this->Command = command.str();
 }
 
 // Description:
@@ -257,5 +255,5 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.6 $");
+  this->ExtractRevision(os,"$Revision: 1.7 $");
 }

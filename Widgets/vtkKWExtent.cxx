@@ -235,10 +235,12 @@ void vtkKWExtent::ExtentSelected()
 
 void vtkKWExtent::SetCommand(vtkKWObject* CalledObject, const char *CommandString)
 { 
+  if (this->Command)
+    {
+    delete [] this->Command;
+    }
   ostrstream command;
   command << CalledObject->GetTclName() << " " << CommandString << ends;
 
-  this->Command = new char [strlen(command.str())+1];
-  strcpy(this->Command,command.str());
-  command.rdbuf()->freeze(0);
+  this->Command = command.str();
 }
