@@ -143,7 +143,7 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia)
   // search for tokens, replace and then assign to TextMappers
   for (i = 0; i < 4; i++)
     {
-    if (strlen(this->CornerText[i]))
+    if (this->CornerText[i] && strlen(this->CornerText[i]))
       {
       text = new char [strlen(this->CornerText[i])+1000];
       text2 = new char [strlen(this->CornerText[i])+1000];
