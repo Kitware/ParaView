@@ -84,7 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.30");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.31");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -1147,7 +1147,15 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
     page->Frame->GetBackgroundColor(&fr, &fg, &fb);
 
     float fh, fs, fv;
-    vtkMath::RGBToHSV(fr, fg, fb, &fh, &fs, &fv);
+    if (fr == fg && fg == fb)
+      {
+      fh = fs = 0.0;
+      fv = fr;
+      }
+    else
+      {
+      vtkMath::RGBToHSV(fr, fg, fb, &fh, &fs, &fv);
+      }
 
     float r, g, b;
     fv *= VTK_KW_NB_TAB_UNSELECTED_VALUE;
@@ -1174,10 +1182,19 @@ void vtkKWNotebook::UpdatePageTabBackgroundColor(vtkKWNotebook::Page *page,
       }
     else
       {
-      vtkMath::RGBToHSV((float)VTK_KW_NB_TAB_PIN_R / 255.0, 
-                        (float)VTK_KW_NB_TAB_PIN_G / 255.0,
-                        (float)VTK_KW_NB_TAB_PIN_B / 255.0,
-                        &fh, &fs, &fv);
+      fr = (float)VTK_KW_NB_TAB_PIN_R / 255.0;
+      fg = (float)VTK_KW_NB_TAB_PIN_G / 255.0;
+      fb = (float)VTK_KW_NB_TAB_PIN_B / 255.0;
+
+      if (fr == fg && fg == fb)
+        {
+        fh = fs = 0.0;
+        fv = fr;
+        }
+      else
+        {
+        vtkMath::RGBToHSV(fr, fg, fb, &fh, &fs, &fv);
+        }
 
       fv *= VTK_KW_NB_TAB_UNSELECTED_VALUE;
       vtkMath::HSVToRGB(fh, fs, fv, &r, &g, &b);
