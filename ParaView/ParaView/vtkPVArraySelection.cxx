@@ -65,7 +65,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.31");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.32");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -162,6 +162,21 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   else if (strcmp(this->AttributeName, "Cell") == 0)
     {
     this->LabeledFrame->SetLabel("Cell Arrays");
+    }
+  else 
+    {
+    ostrstream str;
+    if ( this->AttributeName && this->AttributeName[0] )
+      {
+    str << this->AttributeName;
+      }
+    else
+      {
+      str << "Unnamed";
+      }
+    str << " Arrays" << ends;
+    this->LabeledFrame->SetLabel(str.str());
+    str.rdbuf()->freeze(0);
     }
   app->Script("pack %s -fill x -expand t -side top",
               this->LabeledFrame->GetWidgetName());
