@@ -199,7 +199,8 @@ void vtkPVAnimation::SetCurrent(float time)
 
   this->Script("set time %f", time);
   pvApp->BroadcastScript("set time %f", time);
-  this->Script(this->Method);
+  this->Script("catch \"%s\"", this->Method);
+  //this->Script(this->Method);
   pvApp->BroadcastScript(this->Method);
 
   this->TimeScale->SetValue(time);
