@@ -169,8 +169,8 @@ public:
 
   // Description:
   // Set command of the menu entry with a given index.
-  void SetCommand(int index, vtkKWObject* object, const char* MethodAndArgString);
-  void SetCommand(const char* item, vtkKWObject* object, const char* method);
+  void SetEntryCommand(int index, vtkKWObject* object, const char* MethodAndArgString);
+  void SetEntryCommand(const char* item, vtkKWObject* object, const char* method);
 
 //BTX
   enum { Normal = 0, Active, Disabled };

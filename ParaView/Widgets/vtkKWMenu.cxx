@@ -479,7 +479,7 @@ void vtkKWMenu::SetState(const char* item, int state)
   this->SetState(index, state);
 }
 
-void vtkKWMenu::SetCommand(int index, vtkKWObject* object, 
+void vtkKWMenu::SetEntryCommand(int index, vtkKWObject* object, 
 			   const char* MethodAndArgString)
 {
   ostrstream str;
@@ -490,7 +490,7 @@ void vtkKWMenu::SetCommand(int index, vtkKWObject* object,
   str.rdbuf()->freeze(0);
 }
 
-void vtkKWMenu::SetCommand(const char* item, vtkKWObject* object, 
+void vtkKWMenu::SetEntryCommand(const char* item, vtkKWObject* object, 
 			   const char* MethodAndArgString)
 {
   if ( !this->IsItemPresent(item) )
@@ -498,6 +498,6 @@ void vtkKWMenu::SetCommand(const char* item, vtkKWObject* object,
     return;
     }
   int index = this->GetIndex(item);
-  this->SetCommand(index, object, MethodAndArgString);
+  this->SetEntryCommand(index, object, MethodAndArgString);
 }
 
