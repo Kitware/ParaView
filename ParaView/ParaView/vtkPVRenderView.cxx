@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.214");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -786,7 +786,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
                                            "SourcesBrowser", 
                                            "SelectionWindow", 0))
     {
-    if ( this->Application->BooleanRegisteryCheck(2, "SourcesBrowser",
+    if ( this->Application->BooleanRegisteryCheck(2, "RunTime", "SourcesBrowser",
                                                   "SelectionWindow") )
       {
       this->ShowSelectionWindowCallback(0);
@@ -2341,7 +2341,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213 $");
+  this->ExtractRevision(os,"$Revision: 1.214 $");
 }
 
 //------------------------------------------------------------------------------
