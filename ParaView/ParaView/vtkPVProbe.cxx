@@ -47,7 +47,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.109");
+vtkCxxRevisionMacro(vtkPVProbe, "1.110");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -89,6 +89,7 @@ vtkPVProbe::vtkPVProbe()
   this->RequiredNumberOfInputParts = 1;
   
   this->ServerSideID.ID = 0;
+  this->XYPlotActorID.ID = 0;
 }
 
 vtkPVProbe::~vtkPVProbe()
@@ -100,6 +101,18 @@ vtkPVProbe::~vtkPVProbe()
     pm->SendStreamToServerRoot();
     }
   
+  if (this->XYPlotActorID.ID)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    if ( pvApp )
+      {
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      pm->DeleteStreamObject(this->XYPlotActorID);
+      pm->SendStreamToClientAndServer();
+      }
+    this->XYPlotActorID.ID = 0;
+    }
+
   if ( this->XYPlotWidget )
     {
     this->XYPlotWidget->SetEnabled(0);
@@ -134,6 +147,7 @@ void vtkPVProbe::CreateProperties()
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->GetVTKSourceID(0)
                   << "SetSpatialMatch" << 2
                   << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 
   this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ProbeFrame->Create(pvApp, "frame", "");
@@ -168,12 +182,43 @@ void vtkPVProbe::CreateProperties()
 
   if ( !this->XYPlotWidget )
     {
+    // Actor will be in server manager.  Widget will be in UI.
+    this->XYPlotActorID = pm->NewStreamObject("vtkXYPlotActor");
+    pm->SendStreamToClientAndServer();
+
     this->XYPlotWidget = vtkXYPlotWidget::New();
-    vtkXYPlotActor* xyp = this->XYPlotWidget->GetXYPlotActor();
-    xyp->GetPositionCoordinate()->SetValue(0.05, 0.05, 0);
-    xyp->GetPosition2Coordinate()->SetValue(0.8, 0.3, 0);
-    xyp->SetNumberOfXLabels(5);
-    xyp->SetXTitle("Line Divisions");
+    this->XYPlotWidget->SetXYPlotActor(vtkXYPlotActor::SafeDownCast(
+                                    pm->GetObjectFromID(this->XYPlotActorID)));
+
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "GetPositionCoordinate" 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << vtkClientServerStream::LastResult 
+                    << "SetValue" << 0.05 << 0.05 << 0
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "GetPosition2Coordinate" 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << vtkClientServerStream::LastResult 
+                    << "SetValue" << 0.8 << 0.3 << 0
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "SetNumberOfLabels" << 5 
+                    << vtkClientServerStream::End;
+    // This is stupid and has to change!
+    int fixme;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "SetXTitle" << "Line Divisions" 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
+
+
     pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID()
                     << "GetController"
                     << vtkClientServerStream::End;
@@ -182,12 +227,6 @@ void vtkPVProbe::CreateProperties()
                     << vtkClientServerStream::LastResult
                     << vtkClientServerStream::End; 
     pm->SendStreamToServer();
-    // Special condition to signal the client.
-    // Because both processes of the Socket controller think they are 0!!!!
-//    if (pvApp->GetClientMode())
-//      {
-//      this->Script("%s SetController {}", this->GetVTKSourceTclName());
-//      }
     
     vtkPVGenericRenderWindowInteractor* iren = 
       this->GetPVWindow()->GetInteractor();
@@ -337,25 +376,55 @@ void vtkPVProbe::AcceptCallbackInternal()
     {
     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
 
-    vtkXYPlotActor* xyp = this->XYPlotWidget->GetXYPlotActor();
-    xyp->RemoveAllInputs();
-    xyp->SetYTitle(0);
-    xyp->PlotPointsOn();
-    xyp->PlotLinesOn();
-    xyp->GetProperty()->SetColor(1, .8, .8);
-    xyp->GetProperty()->SetPointSize(2);
-    xyp->SetLegendPosition(.4, .6);
-    xyp->SetLegendPosition2(.5, .25);
-    
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "RemoveAllInputs" 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "SetYTitle" << ""
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "PlotPointsOn" 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "GetProperty" 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << vtkClientServerStream::LastResult 
+                    << "SetColor" << 1 << 0.8 << 0.8
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "GetProperty" 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << vtkClientServerStream::LastResult 
+                    << "SetPointSize" << 2
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "SetLegendPosition" << 0.4 << 0.6 
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorID 
+                    << "SetLegendPosition2" << 0.5 << 0.25 
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
+
     float cstep = 1.0 / numArrays;
     float ccolor = 0;
     arrayCount = 0;
+    vtkXYPlotActor* xyp = this->XYPlotWidget->GetXYPlotActor();
     for ( i = 0; i < numArrays; i++)
       {
       arrayInfo = pdi->GetArrayInformation(i);
       arrayName = arrayInfo->GetName();
       if (arrayInfo->GetNumberOfComponents() == 1)
         {
+        // Replacing this wiull tak a little more work.
         xyp->AddInput(probeOutput, arrayName, 0);
         xyp->SetPlotLabel(i, arrayName);
         float r, g, b;

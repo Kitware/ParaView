@@ -60,6 +60,10 @@ protected:
   vtkPVProbe();
   ~vtkPVProbe();
   
+  // The plot should really be separated into a plot object like 
+  // vtkPVColorMap or vtkPVPartDisplay.  Lets wait until Berk finishes
+  // his UI separation before we make this change.
+  vtkClientServerID XYPlotActorID;
   
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  
