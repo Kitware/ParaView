@@ -35,15 +35,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWPiecewiseFunctionEditor.h"
 
+#include "vtkKWEvent.h"
+#include "vtkKWLabel.h"
+#include "vtkKWRange.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
-#include "vtkMath.h"
-#include "vtkKWRange.h"
-#include "vtkKWLabeledLabel.h"
-#include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.14");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.15");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -428,7 +428,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointLabelWithFunctionPoint(int id)
   
   if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
     {
-    this->PointLabel->SetLabel2("");
+    this->PointLabel->SetLabel("");
     return;
     }
 
@@ -441,7 +441,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointLabelWithFunctionPoint(int id)
 
   char range[1024];
   sprintf(range, format, id, point[0], point[1]);
-  this->PointLabel->SetLabel2(range);
+  this->PointLabel->SetLabel(range);
 }
 
 //----------------------------------------------------------------------------

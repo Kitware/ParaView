@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.14");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.15");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -74,8 +74,6 @@ vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.14");
 //----------------------------------------------------------------------------
 vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
 {
-  int i;
-
   this->HideParameterRange      = 0;
   this->HideValueRange          = 0;
   this->CanvasHeight            = 50;
@@ -113,13 +111,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->TitleFrame              = vtkKWFrame::New();
   this->InfoFrame               = vtkKWFrame::New();
   this->RangeLabel              = vtkKWLabel::New();
-  this->PointLabel              = vtkKWLabeledLabel::New();
-
-  this->Icons                   = new vtkKWImageLabel* [VTK_KW_RANGE_NB_ICONS];
-  for (i = 0; i < VTK_KW_RANGE_NB_ICONS; i++)
-    {
-    this->Icons[i]              = vtkKWImageLabel::New();
-    }
+  this->PointLabel              = vtkKWLabel::New();
 
   this->LastRedrawCanvasElementsTime      = 0;
   this->LastRelativeVisibleParameterRange = 0.0;
@@ -145,8 +137,6 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
 //----------------------------------------------------------------------------
 vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
 {
-  int i;
-
   // Commands
 
   if (this->PointAddedCommand)
@@ -246,13 +236,6 @@ vtkKWParameterValueFunctionEditor::~vtkKWParameterValueFunctionEditor()
     this->RangeLabel->Delete();
     this->RangeLabel = NULL;
     }
-
-  for (i = 0; i < VTK_KW_RANGE_NB_ICONS; i++)
-    {
-    this->Icons[i]->Delete();
-    this->Icons[i] = NULL;
-    }
-  delete [] this->Icons;
 
   if (this->SynchronizeCallbackCommand)
     {
@@ -426,25 +409,7 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app,
   // Create the point label
 
   this->PointLabel->SetParent(this->InfoFrame);
-  this->PointLabel->Create(app, "");
-  this->PointLabel->SetLabelAnchor(vtkKWWidget::ANCHOR_W);
-  this->Script("%s config -bd 0", 
-               this->PointLabel->GetLabel()->GetWidgetName());
-  this->Script("%s config -bd 0", 
-               this->PointLabel->GetLabel2()->GetWidgetName());
-
-  // Create some icons
-
-  for (int i = 0; i < VTK_KW_RANGE_NB_ICONS; i++)
-    {
-    this->Icons[i]->Create(app, "");
-    }
-
-  this->Icons[ICON_AXES]->SetImageData(vtkKWIcon::ICON_AXES);
-  this->Icons[ICON_MOVE]->SetImageData(vtkKWIcon::ICON_MOVE);
-  this->Icons[ICON_MOVE_H]->SetImageData(vtkKWIcon::ICON_MOVE_H);
-  this->Icons[ICON_MOVE_V]->SetImageData(vtkKWIcon::ICON_MOVE_V);
-  this->Icons[ICON_TRASHCAN]->SetImageData(vtkKWIcon::ICON_TRASHCAN);
+  this->PointLabel->Create(app, "-bd 0");
 
   // Set the bindings
 
@@ -2481,35 +2446,33 @@ void vtkKWParameterValueFunctionEditor::MovePointCallback(
     this->LastConstrainedMove = CONSTRAINED_MOVE_FREE;
     }
 
-  // Update the icon to show which interaction is going on
+  // Update cursor to show which interaction is going on
 
+  char *cursor;
   if (warn_delete)
     {
-    this->PointLabel->GetLabel()->SetImageDataName(
-      this->Icons[ICON_TRASHCAN]->GetImageDataName());
+    cursor = "icon";
     }
   else
     {
     if (move_h_only && move_v_only)
       {
-      this->PointLabel->GetLabel()->SetImageDataName("");
+      cursor = "diamond_cross";
       }
     else if (move_h_only)
       {
-      this->PointLabel->GetLabel()->SetImageDataName(
-        this->Icons[ICON_MOVE_H]->GetImageDataName());
+      cursor = "sb_h_double_arrow";
       }
     else if (move_v_only)
       {
-      this->PointLabel->GetLabel()->SetImageDataName(
-        this->Icons[ICON_MOVE_V]->GetImageDataName());
+      cursor = "sb_v_double_arrow";
       }
     else
       {
-      this->PointLabel->GetLabel()->SetImageDataName(
-        this->Icons[ICON_MOVE]->GetImageDataName());
+      cursor = "fleur";
       }
     }
+  this->Script("%s config -cursor %s", this->Canvas->GetWidgetName(), cursor);
 
   // Now update the point given those coords, and update the info label
 
@@ -2549,7 +2512,10 @@ void vtkKWParameterValueFunctionEditor::EndInteractionCallback(int x, int y)
 
   // Remove any interaction icon
 
-  this->PointLabel->GetLabel()->SetImageDataName("");
+  if (this->IsCreated())
+    {
+    this->Script("%s config -cursor {}", this->Canvas->GetWidgetName());
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.14");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.15");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -379,7 +379,7 @@ void vtkKWColorTransferFunctionEditor::UpdatePointLabelWithFunctionPoint(int id)
   
   if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
     {
-    this->PointLabel->SetLabel2("");
+    this->PointLabel->SetLabel("");
     return;
     }
 
@@ -402,7 +402,7 @@ void vtkKWColorTransferFunctionEditor::UpdatePointLabelWithFunctionPoint(int id)
     {
     sprintf(range, format, id, parameter, rgb[0], rgb[1], rgb[2]);
     }
-  this->PointLabel->SetLabel2(range);
+  this->PointLabel->SetLabel(range);
 }
 
 //----------------------------------------------------------------------------

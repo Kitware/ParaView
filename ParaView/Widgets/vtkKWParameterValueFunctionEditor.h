@@ -47,7 +47,6 @@ class vtkCallbackCommand;
 class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
-class vtkKWLabeledLabel;
 class vtkKWRange;
 
 //BTX
@@ -351,7 +350,7 @@ public:
   vtkGetObjectMacro(TitleFrame, vtkKWFrame);
   vtkGetObjectMacro(InfoFrame, vtkKWFrame);
   vtkGetObjectMacro(RangeLabel, vtkKWLabel);
-  vtkGetObjectMacro(PointLabel, vtkKWLabeledLabel);
+  vtkGetObjectMacro(PointLabel, vtkKWLabel);
 
   // Description:
   // Update the whole UI depending on the value of the Ivars
@@ -409,19 +408,7 @@ protected:
   vtkKWFrame        *TitleFrame;
   vtkKWFrame        *InfoFrame;
   vtkKWLabel        *RangeLabel;
-  vtkKWLabeledLabel *PointLabel;
-
-  //BTX
-  enum 
-  {
-    ICON_AXES = 0,
-    ICON_MOVE,
-    ICON_MOVE_H,
-    ICON_MOVE_V,
-    ICON_TRASHCAN
-  };
-  vtkKWImageLabel   **Icons;
-  //ETX
+  vtkKWLabel        *PointLabel;
 
   // Description:
   // Bind/Unbind all components.
