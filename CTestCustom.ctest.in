@@ -1,0 +1,5 @@
+SET(CTEST_CUSTOM_MEMCHECK_IGNORE
+  ${CTEST_CUSTOM_MEMCHECK_IGNORE}
+  TestSetGet
+  otherPrint-ParaView
+  )

@@ -4,9 +4,9 @@ SUBDIRS(VTK)
 SUBDIR_DEPENDS(ParaView VTK)
 
 SET (LIBRARY_OUTPUT_PATH ${ParaViewComplete_BINARY_DIR}/bin CACHE INTERNAL
-      "Single output directory for building all libraries.")
+  "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${ParaViewComplete_BINARY_DIR}/bin CACHE INTERNAL
-      "Single output directory for building all executables.")
+  "Single output directory for building all executables.")
 
 # force these to be ON by default as they are required by ParaView
 OPTION (VTK_USE_HYBRID "Build the hybrid directory classes" ON)
@@ -50,7 +50,7 @@ IF(UNIX)
       "${ParaViewComplete_SOURCE_DIR}/tk8.4.5/unix/configure --disable-shared"
       ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix)
   ENDIF(RUN_CONFIGURE)
-  
+
   SET (TCL_TCLSH ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix/tclsh 
     CACHE FILEPATH "tclshell exec" FORCE)
   SET(TCL_LIBRARY ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix/libtcl8.4.a 
@@ -67,23 +67,23 @@ IF(UNIX)
     CACHE FILEPATH "Path to tk stub library")
   SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tk8.4.5/generic 
     CACHE PATH "Path to tk include")
-  
+
   # On UNIX, Tcl needs the math library.
   IF(UNIX)
     LINK_LIBRARIES(-lm)
   ENDIF(UNIX)
-  
+
   # If using X with Tk, we need to link to X when we link
   # to Tk in order to support static linking.
   IF(CMAKE_HAS_X)
     LINK_LIBRARIES(-lXt ${CMAKE_X_LIBS})
   ENDIF(CMAKE_HAS_X)
-  
+
   ADD_CUSTOM_TARGET(maketcl ALL 
     cd ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix\; "$(MAKE)" )
   ADD_CUSTOM_TARGET(maketk ALL 
     cd ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix\; "$(MAKE)" )
-  
+
 ELSE(UNIX)
   SET(PV_TCL_DIR ${ParaViewComplete_SOURCE_DIR}/TclTk8.4.5Win)
   SET(TCL_LIBRARY ${PV_TCL_DIR}/lib/tcl84.lib CACHE FILEPATH
@@ -132,19 +132,22 @@ ENDIF (WIN32)
 # try to find the data files for VTKData
 #
 FIND_PATH(VTK_DATA_ROOT VTKData.readme ${VTK_SOURCE_DIR}/../VTKData 
-                                       ${VTK_SOURCE_DIR}/../../VTKData 
-                                       $ENV{VTK_DATA_ROOT} DOC 
- "If you have VTK data files (used in tests and examples), where is it located?")
+  ${VTK_SOURCE_DIR}/../../VTKData 
+  $ENV{VTK_DATA_ROOT} DOC 
+  "If you have VTK data files (used in tests and examples), where is it located?")
 
 MARK_AS_ADVANCED(CLEAR VTK_USE_MPI MPI_EXTRA_LIBRARY MPI_INCLUDE_PATH 
-                       MPI_LIBRARY)
+  MPI_LIBRARY)
 MARK_AS_ADVANCED(BUILD_EXAMPLES VTK_WRAP_TCL VTK_WRAP_JAVA VTK_WRAP_PYTHON 
-                 VTK_USE_HYBRID VTK_USE_PARALLEL VTK_USE_RENDERING 
-                 VTK_USE_VOLUMEPRO VTK_USE_ANSI_STDLIB VTK_USE_X TK_WISH 
-                 TCL_TCLSH PARAVIEW_DATA_ROOT TCL_LIBRARY_DEBUG
-                 TCL_STUB_LIBRARY_DEBUG TK_LIBRARY_DEBUG TK_STUB_LIBRARY_DEBUG
-                 VTK_USE_VIDEO_FOR_WINDOWS VTK_USE_MATROX_IMAGING)
+  VTK_USE_HYBRID VTK_USE_PARALLEL VTK_USE_RENDERING 
+  VTK_USE_VOLUMEPRO VTK_USE_ANSI_STDLIB VTK_USE_X TK_WISH 
+  TCL_TCLSH PARAVIEW_DATA_ROOT TCL_LIBRARY_DEBUG
+  TCL_STUB_LIBRARY_DEBUG TK_LIBRARY_DEBUG TK_STUB_LIBRARY_DEBUG
+  VTK_USE_VIDEO_FOR_WINDOWS VTK_USE_MATROX_IMAGING)
 MARK_AS_ADVANCED(USE_INCLUDED_TCLTK TCL_INCLUDE_PATH TCL_LIBRARY 
-                 TCL_STUB_LIBRARY TK_INCLUDE_PATH TK_LIBRARY TK_STUB_LIBRARY 
-                 HTML_HELP_PATH HTML_HELP_LIBRARY)
+  TCL_STUB_LIBRARY TK_INCLUDE_PATH TK_LIBRARY TK_STUB_LIBRARY 
+  HTML_HELP_PATH HTML_HELP_LIBRARY)
+
+CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/CTestCustom.ctest.in
+  ${ParaViewComplete_BINARY_DIR}/CTestCustom.ctest @ONLY)
 
