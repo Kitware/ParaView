@@ -424,7 +424,12 @@ protected:
   void VolumeRenderModeOff();
 
   int VolumeRenderMode;
-  
+
+  int MapScalarsVisible;
+  int EditColorMapVisible;
+  int ColorButtonVisible;
+  int ScalarBarVisible;
+
   vtkPVColorMap *PVColorMap;
 
   // Adding point labelling back in.  This only works in single-process mode.
