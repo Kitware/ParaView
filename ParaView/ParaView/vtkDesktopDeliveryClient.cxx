@@ -33,7 +33,7 @@
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.11");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.12");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -284,7 +284,7 @@ void vtkDesktopDeliveryClient::ComputeVisiblePropBounds(vtkRenderer *ren,
 }
 
 void vtkDesktopDeliveryClient
-    ::SetImageReductionFactorForUpdateRate(float DesiredUpdateRate)
+    ::SetImageReductionFactorForUpdateRate(double DesiredUpdateRate)
 {
   this->Superclass::SetImageReductionFactorForUpdateRate(DesiredUpdateRate);
   if (this->Squirt)
