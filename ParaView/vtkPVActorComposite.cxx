@@ -180,11 +180,12 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->MakeTclObject("vtkQuadricClustering", tclName);
   this->LODDeciTclName = NULL;
   this->SetLODDeciTclName(tclName);
-  pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
-  pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
-  pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODDeciTclName, this->GeometryTclName);
+  pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
+  pvApp->BroadcastScript("%s UseInternalTrianglesOff", this->LODDeciTclName);
+  //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
+  //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
 
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
   pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
@@ -550,12 +551,13 @@ void vtkPVActorComposite::UpdateProperties()
 
   vtkDebugMacro( << "Start timer");
   vtkTimerLog *timer = vtkTimerLog::New();
+
+  // Update and time the filter.
   timer->StartTimer();
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
-  pvApp->BroadcastScript("%s Update", this->LODMapperTclName);
+  // Get bounds to time completion (not just triggering) of update.
   this->GetPVData()->GetBounds(bounds);
   timer->StopTimer();
-
   time = timer->GetElapsedTime();
   if (time > 0.05)
     {
@@ -568,8 +570,22 @@ void vtkPVActorComposite::UpdateProperties()
 
   vtkDebugMacro(<< "Stop timer : " << this->PVData->GetVTKDataTclName() << " : took " 
                   << time << " seconds.");
-  timer->Delete();
-  
+
+
+  // Time creation of the LOD
+  timer->StartTimer();
+  pvApp->BroadcastScript("%s Update", this->LODMapperTclName);
+  // Get bounds to time completion (not just triggering) of update.
+  this->GetPVData()->GetBounds(bounds);
+  timer->StopTimer();
+  time = timer->GetElapsedTime();
+  if (time > 0.05)
+    {
+    pvApp->AddLogEntry("DeciTime", time);
+    }
+
+
+  timer->Delete(); 
   
   sprintf(tmp, "number of cells: %d", 
 	  this->GetPVData()->GetNumberOfCells());
