@@ -61,6 +61,7 @@ class vtkCollection;
 class vtkCollectionIterator;
 class vtkKWRange;
 class vtkPVAnimationInterfaceEntry;
+class vtkPVAnimationInterfaceObserver;
 
 class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
 {
@@ -207,6 +208,9 @@ public:
   // Return true if the animation is available.
   vtkGetMacro(ScriptAvailable, int);
 
+  // Description:
+  // For event handling.
+  void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
 protected:
   vtkPVAnimationInterface();
   ~vtkPVAnimationInterface();
@@ -284,6 +288,9 @@ protected:
   // Description:
   // Empty the entry frame
   void EmptyEntryFrame();
+
+  unsigned long ErrorEventTag;
+  vtkPVAnimationInterfaceObserver* Observer;
 
   vtkPVAnimationInterface(const vtkPVAnimationInterface&); // Not implemented
   void operator=(const vtkPVAnimationInterface&); // Not implemented

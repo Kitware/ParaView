@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.43.2.4");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.43.2.5");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -250,10 +250,6 @@ void vtkPVFileEntry::SetTimeStep(int ts)
     }
   char* name = new char [ this->FileNameLength ];
   sprintf(name, this->Format, this->Path, this->Prefix, ts, this->Ext);
-  if ( !vtkKWDirectoryUtilities::FileExists(name) )
-    {
-    vtkErrorMacro("File " << name << " does not exists. Something went wrong.");
-    }
   this->SetValue(name);
   delete [] name;
 }
@@ -445,7 +441,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     for ( cc = med-cnt; cc < med+cnt; cc ++ )
       {
       sprintf(rfname, format, path, file, cc, ext);
-      if ( vtkKWDirectoryUtilities::FileExists(rfname) )
+      if ( files->GetIndex(rfname+strlen(path)+1) >= 0 )
         {
         this->Entry->AddValue(rfname);
         //cout << "File: " << rfname << endl;
@@ -477,7 +473,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     for ( cc = med-cnt; cc < med+cnt; cc ++ )
       {
       sprintf(rfname, secondformat, path, file, cc, ext);
-      if ( vtkKWDirectoryUtilities::FileExists(rfname) )
+      if ( files->GetIndex(rfname+strlen(path)+1) >= 0 )
         {
         this->Entry->AddValue(rfname);
         //cout << "File: " << rfname << endl;
@@ -737,4 +733,5 @@ void vtkPVFileEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << "Extension: " << (this->Extension?this->Extension:"none") << endl;
+  os << "Range: " << this->Range[0] << " " << this->Range[1] << endl;
 }

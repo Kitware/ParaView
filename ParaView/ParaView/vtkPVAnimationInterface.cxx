@@ -62,6 +62,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkCollectionIterator.h"
 #include "vtkString.h"
 #include "vtkKWRange.h"
+#include "vtkCommand.h"
+#include "vtkKWEvent.h"
 
 #include <vtkstd/string>
 #include <vtkstd/map>
@@ -141,9 +143,37 @@ static unsigned char image_goto_end[] =
   "v7G98xNy/55lvJB3FlnEo7fbagas9Yv+4O9dh3laGw==";
 
 
+//===========================================================================
+//***************************************************************************
+class vtkPVAnimationInterfaceObserver: public vtkCommand
+{
+public:
+  static vtkPVAnimationInterfaceObserver *New() 
+    {return new vtkPVAnimationInterfaceObserver;};
+
+  vtkPVAnimationInterfaceObserver()
+    {
+      this->AnimationInterface = 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+                       void* calldata)
+    {
+      if ( this->AnimationInterface)
+        {
+        this->AnimationInterface->ExecuteEvent(wdg, event, calldata);
+        }
+    }
+
+  vtkPVAnimationInterface* AnimationInterface;
+};
+
+//***************************************************************************
+//===========================================================================
+
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.8");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.9");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -153,6 +183,10 @@ int vtkPVAnimationInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterface::vtkPVAnimationInterface()
 {
+  this->Observer = vtkPVAnimationInterfaceObserver::New();
+  this->Observer->AnimationInterface = this;
+  this->ErrorEventTag = 0;
+
   this->CommandFunction = vtkPVAnimationInterfaceCommand;
 
   this->NumberOfFrames = 100;
@@ -228,7 +262,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterface::~vtkPVAnimationInterface()
 {
-  this->CommandFunction = vtkPVAnimationInterfaceCommand;
+  this->Observer->Delete();
 
   if ( this->TopFrame )
     {
@@ -563,8 +597,8 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->ScriptCheckButtonFrame->Create(this->Application, "frame", "");
 
 
-  this->Script("pack %s -side top -expand t -fill x", 
-               this->ScriptCheckButtonFrame->GetWidgetName());
+  //this->Script("pack %s -side top -expand t -fill x", 
+  //             this->ScriptCheckButtonFrame->GetWidgetName());
 
   this->ScriptCheckButton->SetParent(this->ScriptCheckButtonFrame);
   this->ScriptCheckButton->Create(this->Application, "-text {Script Editor}");
@@ -611,10 +645,14 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   // Pack frames
 
-  this->Script("pack %s %s %s %s -side top -expand t -fill x -padx 2 -pady 2", 
+  this->Script("pack %s %s -side top -expand t -fill x -padx 2 -pady 2", 
                this->ControlFrame->GetWidgetName(),
-               this->AnimationEntriesFrame->GetWidgetName(),
-               this->ActionFrame->GetWidgetName(),
+               this->AnimationEntriesFrame->GetWidgetName());
+
+  //this->Script("pack %s -side top -expand t -fill x -padx 2 -pady 2", 
+  //             this->ActionFrame->GetWidgetName());
+
+  this->Script("pack %s -side top -expand t -fill x -padx 2 -pady 2", 
                this->SaveFrame->GetWidgetName());
 
   this->TimeRange->SetWholeRange(0, this->NumberOfFrames-1);
@@ -651,6 +689,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
     "Cache geometry when doing animation. This will "
     "speedup animation after the initial run at the cost "
     "of memory.");
+
 
 }
 
@@ -772,7 +811,6 @@ void vtkPVAnimationInterface::UpdateInterface()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetNumberOfFrames(int t)
 {
-  this->AddTraceEntry("$kw(%s) SetNumberOfFrames %d", this->GetTclName(), t);
   //cout << "Set NumberOfFrames: " << t << endl;
   this->NumberOfFrames= t;
   this->NumberOfFramesEntry->SetValue(t);
@@ -782,6 +820,11 @@ void vtkPVAnimationInterface::SetNumberOfFrames(int t)
   this->TimeRange->SetRange(range[0], t);
   this->TimeScale->GetRange(range);
   this->TimeScale->SetRange(0, t-1);
+  if ( !this->IsCreated() )
+    {
+    return;
+    }
+  this->AddTraceEntry("$kw(%s) SetNumberOfFrames %d", this->GetTclName(), t);
 }
 
 //-----------------------------------------------------------------------------
@@ -867,7 +910,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
     const char* script = this->ScriptEditor->GetValue();
     pvApp->BroadcastScript(
       "set globalPVTime %g\n"
-      "catch {%s}", ctime, script);
+      "%s", ctime, script);
 
     if (this->ControlledWidget)
       {
@@ -1057,7 +1100,19 @@ const char* vtkPVAnimationInterface::GetScript()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetWindow(vtkPVWindow *window)
 {
+  if ( this->Window == window )
+    {
+    return;
+    }
+  if ( this->Window )
+    {
+    this->Window->RemoveObservers(this->ErrorEventTag);
+    }
   this->Window = window;
+  if ( this->Window )
+    {
+    this->ErrorEventTag = this->Window->AddObserver(vtkKWEvent::ErrorMessageEvent, this->Observer);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1157,9 +1212,9 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   fileName = new char[strlen(fileRoot) + strlen(ext) + 25];      
 
   // Loop through all of the time steps.
-  t = 0;
+  t = this->GetGlobalStart();
   fileCount = 0;
-  while (t < this->NumberOfFrames)
+  while (t <= this->GetGlobalEnd())
     {
     this->SetCurrentTime(t);
     this->View->EventuallyRender();
@@ -1202,7 +1257,7 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
     this->GetWindow()->SaveLastPath(saveDialog, "SaveGeometryFile");
     this->SaveGeometry(saveDialog->GetFileName(), numPartitions);
     }
-  
+
   saveDialog->Delete();
   saveDialog = NULL;
 }
@@ -1476,7 +1531,7 @@ void vtkPVAnimationInterface::ShowEntryInFrame(
     this->DeleteItemButton->EnabledOff();
     return;
     }
-  this->Script("pack %s -side top -expand 1 -fill x -fill y", entry->GetWidgetName());
+  this->Script("pack %s -side top -expand 1 -fill both", entry->GetWidgetName());
   int idx = in_idx;
   if ( idx < 0 )
     {
@@ -1747,6 +1802,16 @@ void vtkPVAnimationInterface::SaveState(ofstream* file)
 
   *file << "$kw(" << this->GetTclName() << ") SetNumberOfFrames " << numberFrames << endl;
   *file << "$kw(" << this->GetTclName() << ") SetCurrentTime " << frame << endl;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::ExecuteEvent(vtkObject *, unsigned long event, 
+  void*)
+{
+  if ( event == vtkKWEvent::ErrorMessageEvent )
+    {
+    this->Stop();
+    }
 }
 
 //-----------------------------------------------------------------------------

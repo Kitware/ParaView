@@ -57,6 +57,7 @@ class vtkPVSource;
 class vtkPVAnimationInterface;
 class vtkKWRange;
 class vtkPVAnimationInterfaceEntryObserver;
+class vtkKWText;
 
 class VTK_EXPORT vtkPVAnimationInterfaceEntry : public vtkKWObject
 {
@@ -79,8 +80,9 @@ public:
   vtkGetObjectMacro(PVSource, vtkPVSource);
   void SetPVSource(vtkPVSource* src);
 
-  vtkSetStringMacro(Script);
   vtkGetStringMacro(Script);
+  void SetScript(const char* scr);
+  void ScriptEditorCallback();
 
   vtkSetStringMacro(CurrentMethod);
   vtkGetStringMacro(CurrentMethod);
@@ -132,7 +134,13 @@ public:
 
   int GetDirty();
 
+  // Description:
+  // This is a method call when None menu entry is selected.
   void NoMethodCallback();
+
+  // Description:
+  // This is a method call when Script menu entry is selected.
+  void ScriptMethodCallback();
 
   // Description:
   // This method saves state of animation entry.
@@ -146,6 +154,17 @@ public:
     this->SaveStateObject = o;
     }
 
+  // Description:
+  // Switch between script and time
+  // i = 0 - script
+  // i > 0 - time
+  // i < 0 - none
+  void SwitchScriptTime(int i);
+
+  // Description:
+  // Set custom script
+  void SetCustomScript(const char* script);
+
 protected:
   vtkPVAnimationInterfaceEntry();
   ~vtkPVAnimationInterfaceEntry();
@@ -154,6 +173,8 @@ protected:
   vtkKWFrame *SourceMethodFrame;
   vtkKWLabel *SourceLabel;
   vtkKWMenuButton *SourceMenuButton;
+
+  vtkKWFrame *TimeScriptEntryFrame;
   vtkKWLabeledEntry *StartTimeEntry;
   vtkKWLabeledEntry *EndTimeEntry;
 
@@ -164,6 +185,11 @@ protected:
 
   vtkKWRange*        TimeRange;
 
+  vtkKWFrame*        DummyFrame;
+
+  vtkKWText*         ScriptEditor;
+  vtkKWFrame*        ScriptEditorFrame;
+  vtkKWWidget*       ScriptEditorScroll;
 
   vtkKWObject*       SaveStateObject;
   char*              SaveStateScript;
@@ -180,6 +206,8 @@ protected:
   int UpdatingEntries;
 
   int Dirty;
+
+  int CustomScript;
 
   unsigned long DeleteEventTag;
   vtkPVAnimationInterfaceEntryObserver* Observer;
