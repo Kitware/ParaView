@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.48");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -179,6 +179,7 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     }
 
   ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
+  ai->SetAnimationElement(0);
 
   vtkSMProperty *prop = this->GetSMProperty();
   vtkSMDoubleRangeDomain *rangeDomain = vtkSMDoubleRangeDomain::SafeDownCast(
