@@ -27,6 +27,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVRunTimeContour.h"
+#include "vtkPVCommandList.h"
+#include "vtkPVWindow.h"
+#include "vtkPVActorComposite.h"
+#include "vtkPVScalarBar.h"
+#include "vtkPVPolyData.h"
+#include "vtkPVImageData.h"
+#include "vtkPVAssignment.h"
 
 int vtkPVRunTimeContourCommand(ClientData cd, Tcl_Interp *interp,
 			       int argc, char *argv[]);
@@ -35,6 +42,7 @@ int vtkPVRunTimeContourCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVRunTimeContour::vtkPVRunTimeContour()
 {
   this->CommandFunction = vtkPVRunTimeContourCommand;
+  this->SetNumberOfPVOutputs(4);
 }
 
 //----------------------------------------------------------------------------
@@ -46,10 +54,105 @@ vtkPVRunTimeContour* vtkPVRunTimeContour::New()
 //----------------------------------------------------------------------------
 void vtkPVRunTimeContour::AcceptCallback()
 {
+  int i;
+  vtkPVWindow *window;
+  vtkPVData *input;
+  vtkPVActorComposite *ac;
+  vtkPVScalarBar *sb;
+
+  window = this->GetWindow();
+
   if (this->GetVTKSource())
     {
     ((vtkRunTimeContour*)this->GetVTKSource())->UpdateWidgets();
-    this->vtkPVSource::AcceptCallback();
+  
+    // Call the commands to set ivars from widget values.
+    for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
+      {
+      this->Script(this->AcceptCommands->GetCommand(i));
+      }  
+    
+    // Initialize the outputs if necessary.
+    for (i = 0; i < this->GetNumberOfPVOutputs(); i++)
+      {
+      if (this->GetNthPVOutput(i) == NULL && this->GetVTKSource())
+	{ // This is the first time, initialize data.
+	input = this->GetNthPVInput(0);
+	
+	// this probably needs to know which output we're initializing
+	if (i == 0)
+	  {
+	  this->InitializePVOutput(i);
+	  }
+	else
+	  {
+	  this->InitializePVImageOutput(i);
+	  }
+	
+	this->CreateDataPage(i);
+	ac = this->GetNthPVOutput(i)->GetActorComposite();
+	window->GetMainView()->AddComposite(ac);
+	sb = this->GetNthPVOutput(i)->GetScalarBar();
+	window->GetMainView()->AddComposite(sb);
+	// Make the last data invisible.
+	if (input)
+	  {
+	  input->GetActorComposite()->SetVisibility(0);
+	  input->GetScalarBar()->SetVisibility(0);
+	  }
+	window->GetMainView()->ResetCamera();
+	}
+      }
+    
+    window->GetMainView()->SetSelectedComposite(this);  
+    this->UpdateNavigationCanvas();
+    this->GetView()->Render();
+    window->GetSourceList()->Update();
     }
 }
 
+//----------------------------------------------------------------------------
+// I had to copy this from vtkPVImageSource because this filter has PVOutputs
+// that are vtkPVImageData, but this filter only inherits from
+// vtkPVPolyDataSource.
+void vtkPVRunTimeContour::InitializePVImageOutput(int idx)
+{
+  vtkPVImageData *output;
+  vtkPVData *input;
+  vtkPVAssignment *assignment;  
+
+  output = vtkPVImageData::New();
+  output->Clone(this->GetPVApplication());
+  this->SetNthPVImageOutput(idx, output);
+
+  input = this->GetPVInput();  
+  if (input != NULL)
+    {
+    assignment = input->GetAssignment();
+    }
+  else
+    {
+    assignment = vtkPVAssignment::New();
+    assignment->Clone(this->GetPVApplication());
+    assignment->SetOriginalImage((vtkPVImageData*)this->PVOutputs[idx]);
+    }
+  
+  output->SetAssignment(assignment);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRunTimeContour::SetNthPVImageOutput(int idx, vtkPVImageData *pvi)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetNthPVImageOutput %d %s", this->GetTclName(), idx,
+			   pvi->GetTclName());
+    }
+
+  this->vtkPVSource::SetNthPVOutput(idx, pvi);
+  vtkSource *s = this->GetVTKSource();
+  vtkImageData *i = (vtkImageData*)(s->GetOutputs()[idx]);
+  pvi->SetData(i);  
+}

@@ -30,7 +30,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVRunTimeContour_h
 
 #include "vtkPVPolyDataSource.h"
+#include "vtkPVImageSource.h"
 #include "vtkRunTimeContour.h"
+#include "vtkPVImageData.h"
 
 class VTK_EXPORT vtkPVRunTimeContour : public vtkPVPolyDataSource
 {
@@ -38,7 +40,15 @@ public:
   static vtkPVRunTimeContour* New();
   vtkTypeMacro(vtkPVRunTimeContour, vtkPVSource);
 
+  // Description:
+  // Overriding the accept callback in PVSource
   void AcceptCallback();
+
+  // Description:
+  // These were copied from vtkPVImageSource, but I needed a copy of them
+  // here since this class doesn't inherit from vtkPVImageSource.
+  void InitializePVImageOutput(int idx);
+  void SetNthPVImageOutput(int idx, vtkPVImageData *pvi);
   
 protected:
   vtkPVRunTimeContour();

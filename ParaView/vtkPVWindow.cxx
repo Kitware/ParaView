@@ -887,12 +887,19 @@ vtkPVSource* vtkPVWindow::GetCurrentSource()
 void vtkPVWindow::NextSource()
 {
   vtkPVSource *composite = this->GetNextSource();
-
+  int i;
+  
   if (composite != NULL)
     {
-    this->GetCurrentSource()->GetPVOutput()->GetActorComposite()->VisibilityOff();
+    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
+      {
+      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOff();
+      }
     this->SetCurrentSource(composite);
-    this->GetCurrentSource()->GetPVOutput()->GetActorComposite()->VisibilityOn();
+    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
+      {
+      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOn();
+      }
     }
   
   this->MainView->Render();
@@ -904,11 +911,19 @@ void vtkPVWindow::NextSource()
 void vtkPVWindow::PreviousSource()
 {
   vtkPVSource *composite = this->GetPreviousSource();
+  int i;
+  
   if (composite != NULL)
     {
-    this->GetCurrentSource()->GetPVOutput()->GetActorComposite()->VisibilityOff();
+    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
+      {
+      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOff();
+      }
     this->SetCurrentSource(composite);
-    this->GetCurrentSource()->GetPVOutput()->GetActorComposite()->VisibilityOn();
+    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
+      {
+      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOn();
+      }
     }
   
   this->MainView->Render();

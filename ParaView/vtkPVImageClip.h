@@ -63,7 +63,7 @@ public:
   // Description:
   // For now you have to set the output explicitly.  This allows you to manage
   // the object creation/tcl-names in the other processes.
-  void SetPVOutput(vtkPVImageData *pvd);
+  void SetNthPVOutput(int idx, vtkPVImageData *pvd);
   vtkPVImageData *GetPVOutput();
 
   // Description:

@@ -170,9 +170,9 @@ void vtkPVImageClip::SetPVInput(vtkPVImageData *pvi)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageClip::SetPVOutput(vtkPVImageData *pvi)
+void vtkPVImageClip::SetNthPVOutput(int idx, vtkPVImageData *pvi)
 {
-  this->vtkPVSource::SetPVOutput(pvi);
+  this->vtkPVSource::SetNthPVOutput(idx, pvi);
 
   pvi->SetData(this->ImageClip->GetOutput());
 }
@@ -180,7 +180,7 @@ void vtkPVImageClip::SetPVOutput(vtkPVImageData *pvi)
 //----------------------------------------------------------------------------
 vtkPVImageData *vtkPVImageClip::GetPVOutput()
 {
-  return vtkPVImageData::SafeDownCast(this->PVOutput);
+  return vtkPVImageData::SafeDownCast(this->PVOutputs[0]);
 }
 
 //----------------------------------------------------------------------------
@@ -271,14 +271,14 @@ void vtkPVImageClip::ExtentsChanged()
     this->GetExtentStyle()->SetCallbackMethod(ExtentCallback, this);
     pvi = vtkPVImageData::New();
     pvi->Clone(pvApp);
-    this->SetPVOutput(pvi);
-    a = window->GetPreviousSource()->GetPVOutput()->GetAssignment();
+    this->SetNthPVOutput(0, pvi);
+    a = window->GetPreviousSource()->GetPVOutput(0)->GetAssignment();
     pvi->SetAssignment(a);
     this->GetPVOutput()->GetData()->
       SetUpdateExtent(this->GetPVOutput()->GetData()->GetWholeExtent());
     this->GetPVInput()->GetActorComposite()->VisibilityOff();
     this->GetPVInput()->GetScalarBar()->VisibilityOff();
-    this->CreateDataPage();
+    this->CreateDataPage(0);
     ac = this->GetPVOutput()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
     window->GetSourceList()->Update();

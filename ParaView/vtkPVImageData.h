@@ -80,10 +80,16 @@ public:
   // Maybe we should just make the geometry filter a PVFilter.
   void SetAssignment(vtkPVAssignment *a);
   
-protected:
+  // I know these are supposed to be protected, but vtkPVRunTimeContour needs
+  // them to be public.
   vtkPVImageData();
   ~vtkPVImageData();
   vtkPVImageData(const vtkPVImageData&) {};
+  
+protected:
+//  vtkPVImageData();
+//  ~vtkPVImageData();
+//  vtkPVImageData(const vtkPVImageData&) {};
   void operator=(const vtkPVImageData&) {};
     
   vtkPVImageTextureFilter *TextureFilter;

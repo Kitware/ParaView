@@ -45,12 +45,12 @@ public:
   // This is called the first time the accept button is pressed.
   // It creates the output and assignement.  
   // The assignement is important for structured data.
-  void InitializePVOutput();
+  void InitializePVOutput(int idx);
     
   // Description:
   // Although the data is created in the initialize method,
   // this method is needed in the satellite processes to set the data.
-  void SetPVOutput(vtkPVImageData *pvi);
+  void SetNthPVOutput(int idx, vtkPVImageData *pvi);
   vtkPVImageData *GetPVOutput();
 
   vtkPVImageData *GetPVInput();

@@ -50,28 +50,28 @@ vtkPVPolyDataSource* vtkPVPolyDataSource::New()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPolyDataSource::SetPVOutput(vtkPVPolyData *pvd)
+void vtkPVPolyDataSource::SetNthPVOutput(int idx, vtkPVPolyData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(), 
+    pvApp->BroadcastScript("%s SetNthPVOutput %d %s", this->GetTclName(), idx,
 			   pvd->GetTclName());
     }
 
-  this->vtkPVSource::SetPVOutput(pvd);
+  this->vtkPVSource::SetNthPVOutput(idx, pvd);
   pvd->SetData(this->GetVTKPolyDataSource()->GetOutput());
 }
 
 //----------------------------------------------------------------------------
 vtkPVPolyData *vtkPVPolyDataSource::GetPVOutput()
 {
-  return vtkPVPolyData::SafeDownCast(this->PVOutput);
+  return vtkPVPolyData::SafeDownCast(this->PVOutputs[0]);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPolyDataSource::InitializePVOutput()
+void vtkPVPolyDataSource::InitializePVOutput(int idx)
 {
   vtkPVData *input;
   vtkPVPolyData *output;
@@ -80,7 +80,7 @@ void vtkPVPolyDataSource::InitializePVOutput()
   input = this->vtkPVSource::GetNthPVInput(0);
   output = vtkPVPolyData::New();
   output->Clone(this->GetPVApplication());
-  this->SetPVOutput(output);
+  this->SetNthPVOutput(idx, output);
   
   if (input != NULL)
     {

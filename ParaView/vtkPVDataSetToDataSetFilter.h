@@ -47,12 +47,12 @@ public:
   // Description:
   // This method gets called when the accept button is pressed
   // for the first time.  It creates a pvData and its assignement.
-  void InitializePVOutput();  
+  void InitializePVOutput(int idx);
   
   // Description:
   // Although the data is created in the initialize method,
   // this method is needed in the satellite processes to set the data.
-  void SetPVOutput(vtkPVData *pvd);
+  void SetNthPVOutput(int idx, vtkPVData *pvd);
   vtkPVData *GetPVOutput();
   vtkPVPolyData *GetPVPolyDataOutput();
   vtkPVImageData *GetPVImageDataOutput();

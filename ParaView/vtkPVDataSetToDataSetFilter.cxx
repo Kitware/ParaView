@@ -42,16 +42,14 @@ vtkPVDataSetToDataSetFilter::vtkPVDataSetToDataSetFilter()
   this->CommandFunction = vtkPVDataSetToDataSetFilterCommand;
 }
 
-
 //----------------------------------------------------------------------------
 vtkPVDataSetToDataSetFilter* vtkPVDataSetToDataSetFilter::New()
 {
   return new vtkPVDataSetToDataSetFilter();
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::InitializePVOutput()
+void vtkPVDataSetToDataSetFilter::InitializePVOutput(int idx)
 {
   vtkPVData *input;
   vtkPVData *output;
@@ -77,44 +75,44 @@ void vtkPVDataSetToDataSetFilter::InitializePVOutput()
     return;
     }
   output->Clone(this->GetPVApplication());
-  this->SetPVOutput(output);
+  this->SetNthPVOutput(idx, output);
   
   assignment = input->GetAssignment();
   output->SetAssignment(assignment);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::SetPVOutput(vtkPVData *pvd)
+void vtkPVDataSetToDataSetFilter::SetNthPVOutput(int idx, vtkPVData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkDataSetToDataSetFilter *f = this->GetVTKDataSetToDataSetFilter();
 
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(), 
+    pvApp->BroadcastScript("%s SetNthPVOutput %d %s", this->GetTclName(), idx, 
 			   pvd->GetTclName());
     }
   // This calls just does reference counting.
-  this->vtkPVSource::SetPVOutput(pvd);  
+  this->vtkPVSource::SetNthPVOutput(idx, pvd);
   pvd->SetData(f->GetOutput());
 }
 
 //----------------------------------------------------------------------------
 vtkPVData *vtkPVDataSetToDataSetFilter::GetPVOutput()
 {
-  return this->PVOutput;
+  return this->PVOutputs[0];
 }
 
 //----------------------------------------------------------------------------
 vtkPVPolyData *vtkPVDataSetToDataSetFilter::GetPVPolyDataOutput()
 {
-  return vtkPVPolyData::SafeDownCast(this->PVOutput);
+  return vtkPVPolyData::SafeDownCast(this->PVOutputs[0]);
 }
 
 //----------------------------------------------------------------------------
 vtkPVImageData *vtkPVDataSetToDataSetFilter::GetPVImageDataOutput()
 {
-  return vtkPVImageData::SafeDownCast(this->PVOutput);
+  return vtkPVImageData::SafeDownCast(this->PVOutputs[0]);
 }
 
 

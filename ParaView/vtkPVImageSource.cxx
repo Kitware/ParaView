@@ -50,28 +50,28 @@ vtkPVImageSource* vtkPVImageSource::New()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageSource::SetPVOutput(vtkPVImageData *pvi)
+void vtkPVImageSource::SetNthPVOutput(int idx, vtkPVImageData *pvi)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(), 
+    pvApp->BroadcastScript("%s SetNthPVOutput %d %s", this->GetTclName(), idx,
 			   pvi->GetTclName());
     }
 
-  this->vtkPVSource::SetPVOutput(pvi);
+  this->vtkPVSource::SetNthPVOutput(idx, pvi);
   pvi->SetData(this->GetVTKImageSource()->GetOutput());  
 }
 
 //----------------------------------------------------------------------------
 vtkPVImageData *vtkPVImageSource::GetPVOutput()
 {
-  return vtkPVImageData::SafeDownCast(this->PVOutput);
+  return vtkPVImageData::SafeDownCast(this->PVOutputs[0]);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageSource::InitializePVOutput()
+void vtkPVImageSource::InitializePVOutput(int idx)
 {
   vtkPVImageData *output;
   vtkPVData *input;
@@ -79,7 +79,7 @@ void vtkPVImageSource::InitializePVOutput()
 
   output = vtkPVImageData::New();
   output->Clone(this->GetPVApplication());
-  this->SetPVOutput(output);
+  this->SetNthPVOutput(idx, output);
 
   input = this->GetPVInput();  
   if (input != NULL)

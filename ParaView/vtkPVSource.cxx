@@ -54,7 +54,8 @@ vtkPVSource::vtkPVSource()
   
   this->PVInputs = NULL;
   this->NumberOfPVInputs = 0;
-  this->PVOutput = NULL;
+  this->PVOutputs = NULL;
+  this->NumberOfPVOutputs = 0;
   this->VTKSource = NULL;
   this->VTKSourceTclName = NULL;
 
@@ -82,11 +83,22 @@ vtkPVSource::~vtkPVSource()
 {
   int i;
   
-  if (this->PVOutput)
+  for (i = 0; i < this->NumberOfPVOutputs; i++)
     {
-    this->PVOutput->UnRegister(this);
-    this->PVOutput = NULL;
+    if (this->PVOutputs[i])
+      {
+      this->PVOutputs[i]->UnRegister(this);
+      this->PVOutputs[i] = NULL;
+      }
     }
+  
+  if (this->PVOutputs)
+    {
+    delete [] this->PVOutputs;
+    this->PVOutputs = 0;
+    }
+  
+  this->NumberOfPVOutputs = 0;
   
   for (i = 0; i < this->NumberOfPVInputs; i++)
     {
@@ -256,33 +268,6 @@ const char *vtkPVSource::GetVTKSourceTclName()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetPVOutput(vtkPVData *data)
-{
-  if (this->PVOutput == data)
-    {
-    return;
-    }
-  this->Modified();
-
-  if (this->PVOutput)
-    {
-    // extra careful for circular references
-    vtkPVData *tmp = this->PVOutput;
-    this->PVOutput = NULL;
-    // Manage double pointer.
-    tmp->SetPVSource(NULL);
-    tmp->UnRegister(this);
-    }
-  if (data)
-    {
-    this->PVOutput = data;
-    data->Register(this);
-    // Manage double pointer.
-    data->SetPVSource(this);
-    }
-}
-
-//----------------------------------------------------------------------------
 vtkPVWindow* vtkPVSource::GetWindow()
 {
   if (this->View == NULL || this->View->GetParentWindow() == NULL)
@@ -376,12 +361,12 @@ void vtkPVSource::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::CreateDataPage()
+void vtkPVSource::CreateDataPage(int idx)
 {
   if (!this->DataCreated)
     {
     const char *dataPage;
-    vtkPVData *data = this->GetPVOutput();
+    vtkPVData *data = this->GetNthPVOutput(idx);
     
     if (data == NULL)
       {
@@ -1476,18 +1461,18 @@ void vtkPVSource::AcceptCallback()
     }  
   
   // Initialize the output if necessary.
-  if (this->GetPVOutput() == NULL && this->GetVTKSource())
+  if (this->GetPVOutput(0) == NULL && this->GetVTKSource())
     { // This is the first time, initialize data.  
     vtkPVData *input;
     vtkPVActorComposite *ac;
     vtkPVScalarBar *sb;
     
     input = this->GetNthPVInput(0);
-    this->InitializePVOutput();
-    this->CreateDataPage();
-    ac = this->GetPVOutput()->GetActorComposite();
+    this->InitializePVOutput(0);
+    this->CreateDataPage(0);
+    ac = this->GetPVOutput(0)->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
-    sb = this->GetPVOutput()->GetScalarBar();
+    sb = this->GetPVOutput(0)->GetScalarBar();
     window->GetMainView()->AddComposite(sb);
     // Make the last data invisible.
     if (input)
@@ -1511,7 +1496,7 @@ void vtkPVSource::CancelCallback()
   vtkPVSource *prev;
   int i;
   
-  if (this->PVOutput == NULL)
+  if (this->PVOutputs[0] == NULL)
     { // Accept has not been called yet.  Delete the object.
     // Need to remove the data connected with this source from the list of
     // inputs, but not sure how to do that since the PVData is NULL at this
@@ -1559,17 +1544,16 @@ void vtkPVSource::DeleteCallback()
   vtkPVSource *prev;
   int i;
   
-  if (this->PVOutput == NULL)
+  if (this->PVOutputs[0] == NULL)
     {
     // Accept button hasn't been clicked yet, so this is the same
     // functionality as hitting Cancel under these circumstances.
     this->CancelCallback();
     }
-  else if (this->PVOutput->GetPVSourceUsers()->GetNumberOfItems() == 0)
+  else if (this->PVOutputs[0]->GetPVSourceUsers()->GetNumberOfItems() == 0)
     {
     // Need to remove the data connected with this source from the list of
-    // inputs, but not sure how to do that since the PVData is NULL at this
-    // point.
+    // inputs.
     
     for (i = 0; i < this->GetNumberOfPVInputs(); i++)
       {
@@ -1599,13 +1583,13 @@ void vtkPVSource::DeleteCallback()
       pvApp->BroadcastScript("%s Delete", this->GetVTKSourceTclName());
       }
     this->GetVTKSource()->Delete();
-    this->PVOutput->GetActorComposite()->VisibilityOff();
-    this->PVOutput->GetScalarBar()->VisibilityOff();
+    this->PVOutputs[0]->GetActorComposite()->VisibilityOff();
+    this->PVOutputs[0]->GetScalarBar()->VisibilityOff();
     if (prev)
       {
-      prev->GetPVOutput()->GetActorComposite()->VisibilityOn();
+      prev->GetPVOutput(0)->GetActorComposite()->VisibilityOn();
       }
-    this->SetPVOutput(NULL);
+    this->SetNthPVOutput(0, NULL);
     this->GetView()->Render();
     this->GetWindow()->GetMainView()->RemoveComposite(this);
     pvApp->Script("%s Delete", this->GetTclName());
@@ -1757,72 +1741,77 @@ void vtkPVSource::UpdateNavigationCanvas()
 
   // Put the outputs in the canvas.
   outs = NULL;
-  if (this->PVOutput)
+  if (this->PVOutputs)
     {
-    outs = this->PVOutput->GetPVSourceUsers();
-    }
-  if (outs)
-    {
-    outs->InitTraversal();
     y = 10;
-    while ( (source = outs->GetNextPVSource()) )
+//    for (i = 0; i < this->NumberOfPVOutputs; i++)
+    if (this->PVOutputs[0])
       {
-      // Draw the name of the assembly.
-      this->Script(
-         "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
-         this->NavigationCanvas->GetWidgetName(), 250, y,
-         source->GetName(), font);
+      outs = this->PVOutputs[0]->GetPVSourceUsers();
 
-      result = this->Application->GetMainInterp()->result;
-      tmp = new char[strlen(result)+1];
-      strcpy(tmp,result);
-      this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
-                   this->NavigationCanvas->GetWidgetName(), tmp,
-	           this->GetTclName(), source->GetTclName());
-      // Get the bounding box for the name. We may need to highlight it.
-      this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(), tmp);
-      delete [] tmp;
-      tmp = NULL;
-      result = this->Application->GetMainInterp()->result;
-      sscanf(result, "%d %d %d %d", bboxOut, bboxOut+1, bboxOut+2, bboxOut+3);
-
-      // Draw to output.
-      if (y == 10)
-        { // first is a special case (single line).
-        this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-                     this->NavigationCanvas->GetWidgetName(), bbox[2], yMid,
-                     245, yMid);
-        }
-      else
-        {
-        this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
-                     this->NavigationCanvas->GetWidgetName(), xMid, yMid, xMid,
-                     yMid+15);
-        yMid += 15;
-        this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-                     this->NavigationCanvas->GetWidgetName(), xMid, yMid,
-                     245, yMid);
-        }
-      if (moreOut = source->GetPVOutput())
-        {
-        if (moreOuts = moreOut->GetPVSourceUsers())
-          {
-          moreOuts->InitTraversal();
-          if (moreOuts->GetNextPVSource())
-            {
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(),
-                         bboxOut[2]+10, yMid, bboxOut[2]+12, yMid);
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(),
-                         bboxOut[2]+14, yMid, bboxOut[2]+16, yMid);
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(),
-                         bboxOut[2]+18, yMid, bboxOut[2]+20, yMid);
-            }
-          }
-        }
-      y += 15;
+      if (outs)
+	{
+	outs->InitTraversal();
+	while ( (source = outs->GetNextPVSource()) )
+	  {
+	  // Draw the name of the assembly.
+	  this->Script(
+	    "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
+	    this->NavigationCanvas->GetWidgetName(), 250, y,
+	    source->GetName(), font);
+	  
+	  result = this->Application->GetMainInterp()->result;
+	  tmp = new char[strlen(result)+1];
+	  strcpy(tmp,result);
+	  this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
+		       this->NavigationCanvas->GetWidgetName(), tmp,
+		       this->GetTclName(), source->GetTclName());
+	  // Get the bounding box for the name. We may need to highlight it.
+	  this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(), tmp);
+	  delete [] tmp;
+	  tmp = NULL;
+	  result = this->Application->GetMainInterp()->result;
+	  sscanf(result, "%d %d %d %d", bboxOut, bboxOut+1, bboxOut+2, bboxOut+3);
+	  
+	  // Draw to output.
+	  if (y == 10)
+	    { // first is a special case (single line).
+	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
+			 this->NavigationCanvas->GetWidgetName(), bbox[2], yMid,
+			 245, yMid);
+	    }
+	  else
+	    {
+	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
+			 this->NavigationCanvas->GetWidgetName(), xMid, yMid, xMid,
+			 yMid+15);
+	    yMid += 15;
+	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
+			 this->NavigationCanvas->GetWidgetName(), xMid, yMid,
+			 245, yMid);
+	    }
+	  if (moreOut = source->GetPVOutput(0))
+	    {
+	    if (moreOuts = moreOut->GetPVSourceUsers())
+	      {
+	      moreOuts->InitTraversal();
+	      if (moreOuts->GetNextPVSource())
+		{
+		this->Script("%s create line %d %d %d %d",
+			     this->NavigationCanvas->GetWidgetName(),
+			     bboxOut[2]+10, yMid, bboxOut[2]+12, yMid);
+		this->Script("%s create line %d %d %d %d",
+			     this->NavigationCanvas->GetWidgetName(),
+			     bboxOut[2]+14, yMid, bboxOut[2]+16, yMid);
+		this->Script("%s create line %d %d %d %d",
+			     this->NavigationCanvas->GetWidgetName(),
+			     bboxOut[2]+18, yMid, bboxOut[2]+20, yMid);
+		}
+	      }
+	    }
+	  y += 15;
+	  }
+	}
       }
     }
 }
@@ -1835,8 +1824,8 @@ void vtkPVSource::SelectSource(vtkPVSource *source)
     this->GetWindow()->SetCurrentSource(source);
     source->ShowProperties();
     source->GetNotebook()->Raise(0);
-    if (source->GetPVOutput() &&
-        source->GetPVOutput()->GetPVSourceUsers()->GetNumberOfItems() > 0)
+    if (source->GetPVOutput(0) &&
+        source->GetPVOutput(0)->GetPVSourceUsers()->GetNumberOfItems() > 0)
       {
       this->Script("%s configure -state disabled",
                    source->GetDeleteButton()->GetWidgetName());
@@ -2065,6 +2054,174 @@ vtkPVData *vtkPVSource::GetNthPVInput(int idx)
     }
   
   return (vtkPVData *)(this->PVInputs[idx]);
+}
+
+//---------------------------------------------------------------------------
+void vtkPVSource::SetNumberOfPVOutputs(int num)
+{
+  int idx;
+  vtkPVDataPointer *outputs;
+
+  // in case nothing has changed.
+  if (num == this->NumberOfPVOutputs)
+    {
+    return;
+    }
+  
+  // Allocate new arrays.
+  outputs = new vtkPVDataPointer[num];
+
+  // Initialize with NULLs.
+  for (idx = 0; idx < num; ++idx)
+    {
+    outputs[idx] = NULL;
+    }
+
+  // Copy old outputs
+  for (idx = 0; idx < num && idx < this->NumberOfPVOutputs; ++idx)
+    {
+    outputs[idx] = this->PVOutputs[idx];
+    }
+  
+  // delete the previous arrays
+  if (this->PVOutputs)
+    {
+    delete [] this->PVOutputs;
+    this->PVOutputs = NULL;
+    this->NumberOfPVOutputs = 0;
+    }
+  
+  // Set the new array
+  this->PVOutputs = outputs;
+  
+  this->NumberOfPVOutputs = num;
+  this->Modified();
+}
+
+//---------------------------------------------------------------------------
+void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *output)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  // Handle parallelism.
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(),
+			   output->GetTclName());
+    }
+  
+  if (idx < 0)
+    {
+    vtkErrorMacro(<< "SetNthPVOutput: " << idx << ", cannot set output. ");
+    return;
+    }
+  // Expand array if necessary.
+  if (idx >= this->NumberOfPVOutputs)
+    {
+    this->SetNumberOfPVOutputs(idx + 1);
+    }
+  
+  // does this change anything?
+  if (output == this->PVOutputs[idx])
+    {
+    return;
+    }
+  
+  if (this->PVOutputs[idx])
+    {
+    // extra careful for circular references
+    vtkPVData *tmp = this->PVOutputs[idx];
+    this->PVOutputs[idx] = NULL;
+    // Manage double pointer.
+    tmp->SetPVSource(NULL);
+    tmp->UnRegister(this);
+    }
+  else
+    {
+    this->PVOutputs[idx] = vtkPVData::New();
+    }
+  
+  if (output)
+    {
+    this->PVOutputs[idx] = output;
+    output->Register(this);
+    // Manage double pointer.
+    output->SetPVSource(this);
+    }
+
+  this->Modified();
+}
+
+//---------------------------------------------------------------------------
+void vtkPVSource::AddPVOutput(vtkPVData *output)
+{
+  int idx;
+  
+  if (output)
+    {
+    output->Register(this);
+    }
+  this->Modified();
+  
+  for (idx = 0; idx < this->NumberOfPVOutputs; ++idx)
+    {
+    if (this->PVOutputs[idx] == NULL)
+      {
+      this->PVOutputs[idx] = output;
+      return;
+      }
+    }
+  
+  this->SetNumberOfPVOutputs(this->NumberOfPVOutputs + 1);
+  this->PVOutputs[this->NumberOfPVOutputs - 1] = output;
+}
+
+//---------------------------------------------------------------------------
+void vtkPVSource::RemovePVOutput(vtkPVData *output)
+{
+  int idx, loc;
+  
+  if (!output)
+    {
+    return;
+    }
+  
+  // find the input in the list of inputs
+  loc = -1;
+  for (idx = 0; idx < this->NumberOfPVOutputs; ++idx)
+    {
+    if (this->PVOutputs[idx] == output)
+      {
+      loc = idx;
+      }
+    }
+  if (loc == -1)
+    {
+    vtkDebugMacro("tried to remove an output that was not in the list");
+    return;
+    }
+  
+  this->PVOutputs[loc]->UnRegister(this);
+  this->PVOutputs[loc] = NULL;
+
+  // if that was the last output, then shrink the list
+  if (loc == this->NumberOfPVOutputs - 1)
+    {
+    this->SetNumberOfPVOutputs(this->NumberOfPVOutputs - 1);
+    }
+  
+  this->Modified();
+}
+
+//---------------------------------------------------------------------------
+vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
+{
+  if (idx >= this->NumberOfPVOutputs)
+    {
+    return NULL;
+    }
+  
+  return (vtkPVData *)(this->PVOutputs[idx]);
 }
 
 //----------------------------------------------------------------------------

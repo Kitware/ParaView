@@ -65,14 +65,16 @@ public:
   
   // Description:
   // A way to get the output in the superclass.
-  vtkPVData *GetPVOutput() {return this->PVOutput;}
+  vtkPVData *GetPVOutput(int idx) { return this->GetNthPVOutput(idx); }
     
   // Description:
   // Create the properties object, called by InitializeProperties.
   virtual void CreateProperties();
   virtual void ShowProperties();
 
-  void CreateDataPage();
+  // Description:
+  // Create the data page.  We need an index because we can have multiple outputs.
+  void CreateDataPage(int idx);
   
   // Description:
   // Methods to indicate when this composite is the selected composite.
@@ -100,6 +102,10 @@ public:
   void SqueezePVInputArray();
   void RemoveAllPVInputs();
   
+  vtkPVData **GetPVOutputs() { return this->PVOutputs; };
+  vtkPVData *GetNthPVOutput(int idx);
+  vtkGetMacro(NumberOfPVOutputs, int);
+  
   // Description:
   // This just returns the application typecast correctly.
   vtkPVApplication* GetPVApplication();  
@@ -112,7 +118,7 @@ public:
   // Creates the output and assignment.
   // If there is an input, it uses its assignement. 
   // Otherwise, it creates a new one.
-  virtual void InitializePVOutput() {};
+  virtual void InitializePVOutput(int idx) {};
   
   // Description:
   // Called when the accept button is pressed.
@@ -221,9 +227,17 @@ protected:
   
   // Description:
   // Mangages the double pointer and reference counting.
-  virtual void SetPVOutput(vtkPVData *data);
+  virtual void SetNthPVOutput(int idx, vtkPVData *output);
   
-  vtkPVData *PVOutput;
+  void AddPVOutput(vtkPVData *output);
+  void RemovePVOutput(vtkPVData *output);
+  
+  vtkPVData **PVOutputs;
+  int NumberOfPVOutputs;
+  
+  // Called to allocate the output array.  Copies old outputs.
+  void SetNumberOfPVOutputs(int num);
+  
   vtkSource *VTKSource;
   char *VTKSourceTclName;
 
