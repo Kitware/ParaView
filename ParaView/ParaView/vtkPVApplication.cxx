@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.204");
+vtkCxxRevisionMacro(vtkPVApplication, "1.205");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1117,18 +1117,19 @@ void vtkPVApplication::Start(int argc, char*argv[])
       }
     else
       {
-      ifs >> numPipes;
+      char bfr[1024];
+      ifs.getline(bfr, 1024);
+      numPipes = atoi(bfr);
       if (numPipes > numProcs) { numPipes = numProcs; }
       if (numPipes < 1) { numPipes = 1; }
       this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);   
 
       for (id = 0; id < numPipes; ++id)
         {
-        vtkstd::string display;
-        ifs >> display;
+        ifs.getline(bfr, 1024);
         this->RemoteScript(
           id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
-          display.c_str());
+          bfr);
         }
       fileFound = 1;
       }
