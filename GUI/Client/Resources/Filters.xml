@@ -1,4 +1,200 @@
 <ModuleInterfaces>
+
+  <Module name="ImageShrink"
+          menu_name="ImageShrink"
+          root_name="ImageShrink"
+          module_type="Filter"
+          long_help="Subsamples with the option to average."
+          short_help="Reduce the size of an image by an integer factor.">
+          multiprocess_support="single_processes"
+    <Filter class="vtkImageShrink3D">
+      <Input name="Input"
+             class="vtkImageData"/>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <VectorEntry label="Shrink Factors"
+                 trace_name="ShrinkFactors"
+                 property="ShrinkFactors"
+                 type="int" length="3"
+                 help="Set the strind in x, y, and z." />
+    <Documentation>
+No documation now.
+    </Documentation>
+  </Module>
+  <Module name="SurfaceVectors"
+          button_image="PVSurfaceVectorsButton"
+	  button_visibility="0"
+          button_help="Constrain a vector field to lie on a surface.  Glyphs must be used to display the vector field."
+          root_name="SurfaceV"
+          menu_name="Surface Vectors"
+          module_type="Filter"
+          long_help="This filter constrains vectors to lie on a surface."
+          short_help="This filter constrains vectors o lie on a surface.">
+    <Filter class="vtkSurfaceVectors">
+      <Input name="Input"
+             class="vtkDataSet">
+        <ArrayRequirement attribute="Point" components="3"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <ArrayMenu property="SelectInputVectors"
+               trace_name="Vectors"
+               label="Vectors"
+               input_menu="im"
+               help="Select the input vectors to process."/>
+    <SelectionList property="ConstraintMode"
+                   label="Constraint Mode"
+                   trace_name="ConstraintMode"
+                   help="Constrain vector relative to surface.">
+      <Item name="Parallel" value="0"/>
+      <Item name="Perpendicular" value="1"/>
+      <Item name="PerpendicularScale" value="2"/>
+    </SelectionList>
+    <Documentation>
+The surface vectors filter is used for 2D data sets.  It constrains vectors to lie in a surface by removing components of the vectors normal to the local surface.
+    </Documentation>
+  </Module>
+  <Module name="IntegrateAttributes"
+          class="vtkPVPick"
+          root_name="Integrate"
+          replace_input="0"
+          menu_name="Integrate Attributes"
+          module_type="Filter"
+          long_help="This filter integrates cell and point attributes.  Use selects whether the integration is over 1D lines, 2D surfaces or 3D volumes.  Cells not of the selected dimension are ignored."
+          short_help="Integrates over lines, surfaces or vectors.">
+    <Filter class="vtkIntegrateAttributes">
+      <Input name="Input"
+             class="vtkDataSet">
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <Documentation>
+Intergates point and cell data over lines and surfaces.  It also computes length of lines, area of surface or volume.
+    </Documentation>
+  </Module>
+  
+  <Module name="IntegrateFlowThroughSurface"
+          class="vtkPVPick"
+          button_image="PVIntegrateFlowButton"
+          button_help="Integrate a vector field through a surface. 3D cells are ignored."
+	  button_visibility="0"
+          root_name="SurfaceFlow"
+          menu_name="Surface Flow"
+          module_type="Filter"
+          long_help="This filter integrates flow through a surface."
+          short_help="This filter integrates flow through a surface.">
+    <Filter class="vtkIntegrateFlowThroughSurface">
+      <Input name="Input"
+             class="vtkDataSet">
+        <ArrayRequirement attribute="Point" components="3"/>
+      </Input>
+    </Filter>
+    <InputMenu trace_name="Input" property="Input"
+               id="im"
+               label="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <ArrayMenu property="SelectInputVectors"
+               trace_name="Vectors"
+               label="Vectors"
+               input_menu="im"
+               help="Select the input vectors to process."/>
+    <Documentation>
+The flow integration fitler  integrates the dot product of a point flow vector field and surface normal.  It computes the net flow across the 2D surface..
+    </Documentation>
+  </Module>  
+<!-- #ifdef PARAVIEW_BUILD_DEVELOPMENT -->
+  <Module name="ProjectedTexture"
+          menu_name="ProjectedTexture"
+          root_name="PTexture"
+          module_type="Filter"
+          long_help="Create texture coordinates."
+          short_help="Create texture coordinates.">
+    <Filter class="vtkProjectedTexture">
+      <Input name="Input"
+             class="vtkDataSet"/>
+    </Filter>
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+    <LineWidget trace_name="Line"
+                point1_variable="Position"
+                point2_variable="FocalPoint"
+                point1_label="Position"
+                point2_label="FocalPoint"
+                use_label="1"
+                show_resolution="0"
+                help="Set the minimum and maximum point for elevation"/>
+    <VectorEntry label="Up"
+                 trace_name="Up"
+                 property="Up"
+                 type="float" length="3"
+                 help="Up vector" />
+    <VectorEntry label="AspectRatio"
+                 trace_name="AspectRatio"
+                 property="AspectRatio"
+                 type="float" length="3"
+                 help="Z is distance from projection" />
+    <VectorEntry label="T range"
+                 trace_name="TRange"
+                 property="TRange"
+                 type="float" length="2"
+                 help="Range of t coordinate" />
+    <VectorEntry label="S range"
+                 trace_name="SRange"
+                 property="SRange"
+                 type="float" length="2"
+                 help="Range of s coordinate" />
+    <Documentation>
+Create texture coordinates.
+    </Documentation>
+  </Module>
+  <Module name="CTHOutlineFilter"
+          menu_name="Outline (CTH AMR)"
+          root_name="CTHOutline"
+          module_type="Filter">
+    <Filter class="vtkCTHOutlineFilter">
+      <Input name="Input"
+             class="vtkCTHData"/>
+    </Filter>
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+  </Module>
+  <Module name="StructuredGridOutlineFilter"
+          menu_name="Outline (curvilinear)"
+          root_name="GOutline"
+            module_type="Filter">
+    <Filter class="vtkStructuredGridOutlineFilter">
+      <Input name="Input"
+             class="vtkStructuredGrid"/>
+    </Filter>
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Set the input to this filter."
+               input_name="Input"/>
+  </Module>
+<!-- #endif -->
+
+
+
+
+
+
+
+
+
+
   <Module name="Balance"
           root_name="Balance" module_type="Filter"
           multiprocess_support="multiple_processes"
@@ -507,7 +703,10 @@ The Extract Edges filter produces a wireframe version of the input data set by e
           root_name="ExtractParts"
           module_type="Filter"
           long_help="Extract a subset of parts from a group."
-          short_help="Extract a subset of parts from a group.">
+          short_help="Extract a subset of parts from a group."
+          button_image="PVUngroupButton"
+          button_help="Separate parts from a group."
+	  button_visibility="0">
     <Filter class="vtkSelectInputs">
       <Input name="Input"
              class="vtkDataSet" quantity="Multiple">
@@ -567,7 +766,7 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
                       attribute_mode_property="AttributeMode"
                       help="Enter the equation for the new array."/>
     <Documentation>
-The Calculator filter computes new data arrays as functions of existing scalar or vector arrays. The Input menu allows the user to select the data set to which this filter will be applied. The Result Array Name entry box allows the user to specify the name of the array containing the results of the computation. The Attribute Mode menu selects whether to operate on and produce results that are Pcikpoint-centered or cell-centered. If point-centered arrays are used, the resulting array will also be point-centered. The same is true for cell-centered arrays. The Calculator interface operates similarly to a scientific calculator. In creating the function to evaluate, the standard order of operations applies.
+The Calculator filter computes new data arrays as functions of existing scalar or vector arrays. The Input menu allows the user to select the data set to which this filter will be applied. The Result Array Name entry box allows the user to specify the name of the array containing the results of the computation. The Attribute Mode menu selects whether to operate on and produce results that are point-centered or cell-centered. If point-centered arrays are used, the resulting array will also be point-centered. The same is true for cell-centered arrays. The Calculator interface operates similarly to a scientific calculator. In creating the function to evaluate, the standard order of operations applies.
 Each of the calculator functions is described below. Unless otherwise noted, enclose the operand in parentheses using the ( and ) buttons.
 Clear: Erase the current function (displayed in the read-only text box above the calculator buttons).
 /: Divide one scalar by another. The operands for this function are not required to be enclosed in parentheses.
@@ -712,7 +911,10 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
           module_type="Filter"
           replace_input="1"
           long_help="Group parts."
-          short_help="Group multiple inputs into one collection.">
+          short_help="Group multiple inputs into one collection."
+          button_image="PVGroupButton"
+          button_help="Group multiple modules into one."
+	  button_visibility="0">
     <Filter class="vtkGroup">
       <Input name="Input"
              class="vtkDataSet" quantity="Multiple"/>
