@@ -176,6 +176,7 @@ public:
   // Description:
   // Called when the user presses the "Edit Color Map" button.
   void EditColorMapCallback();
+  void DataColorRangeCallback();
 
   // Description:
   // Called when the user presses the "Edit Volume Appearance" button.
@@ -326,8 +327,10 @@ protected:
   vtkKWLabel *ColorMenuLabel;
   vtkKWOptionMenu *ColorMenu;
 
-  vtkKWChangeColorButton *ColorButton;
-  vtkKWPushButton *EditColorMapButton;
+  vtkKWChangeColorButton* ColorButton;
+  vtkKWWidget*     EditColorMapButtonFrame;
+  vtkKWPushButton* EditColorMapButton;
+  vtkKWPushButton* DataColorRangeButton;
 
   vtkKWLabel *VolumeScalarsMenuLabel;
   vtkKWOptionMenu *VolumeScalarsMenu;

@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.4");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.5");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -118,7 +118,9 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
 
   this->MapScalarsCheck = vtkKWCheckButton::New();
   this->InterpolateColorsCheck = vtkKWCheckButton::New();
+  this->EditColorMapButtonFrame = vtkKWWidget::New();
   this->EditColorMapButton = vtkKWPushButton::New();
+  this->DataColorRangeButton = vtkKWPushButton::New();
   
   this->ColorButton = vtkKWChangeColorButton::New();
 
@@ -191,8 +193,12 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   this->ColorMenu->Delete();
   this->ColorMenu = NULL;
 
+  this->EditColorMapButtonFrame->Delete();
+  this->EditColorMapButtonFrame = NULL;
   this->EditColorMapButton->Delete();
   this->EditColorMapButton = NULL;
+  this->DataColorRangeButton->Delete();
+  this->DataColorRangeButton = NULL;
 
   this->MapScalarsCheck->Delete();
   this->MapScalarsCheck = NULL;  
@@ -487,15 +493,29 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
     "%s configure -command {%s InterpolateColorsCheckCallback}",
     this->InterpolateColorsCheck->GetWidgetName(),
     this->GetTclName());
-
-  this->EditColorMapButton->SetParent(this->ColorFrame->GetFrame());
+    
+  // Group these two buttons in the place of one.
+  this->EditColorMapButtonFrame->SetParent(this->ColorFrame->GetFrame());
+  this->EditColorMapButtonFrame->Create(this->GetApplication(), "frame", "");
+  // --
+  this->EditColorMapButton->SetParent(this->EditColorMapButtonFrame);
   this->EditColorMapButton->Create(this->GetApplication(), "");
-  this->EditColorMapButton->SetLabel("Edit Color Map...");
+  this->EditColorMapButton->SetLabel("Edit Color Map");
   this->EditColorMapButton->SetCommand(this,"EditColorMapCallback");
   this->EditColorMapButton->SetBalloonHelpString(
     "Edit the table used to map data attributes to pseudo colors.");
+  // --
+  this->DataColorRangeButton->SetParent(this->EditColorMapButtonFrame);
+  this->DataColorRangeButton->Create(this->GetApplication(), "");
+  this->DataColorRangeButton->SetLabel("Reset Range");
+  this->DataColorRangeButton->SetCommand(this,"DataColorRangeCallback");
+  this->DataColorRangeButton->SetBalloonHelpString(
+    "Sets the range of the color map to this module's scalar range.");
+  // --
+  this->Script("pack %s %s -side left -fill x -expand t -pady 2", 
+               this->EditColorMapButton->GetWidgetName(),
+               this->DataColorRangeButton->GetWidgetName());
 
-  
   this->Script("grid %s %s -sticky wns",
                this->ColorMenuLabel->GetWidgetName(),
                this->ColorMenu->GetWidgetName());
@@ -514,9 +534,9 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
 
   this->Script("grid %s %s -sticky wns",
                this->InterpolateColorsCheck->GetWidgetName(),
-               this->EditColorMapButton->GetWidgetName());
+               this->EditColorMapButtonFrame->GetWidgetName());
   this->Script("grid %s -sticky news -padx %d -pady %d",
-               this->EditColorMapButton->GetWidgetName(),
+               this->EditColorMapButtonFrame->GetWidgetName(),
                col_1_padx, button_pady);
 
   // Volume Appearance
@@ -899,7 +919,6 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
 
   // Information page
 
-
   this->UpdateEnableState();
 }
 
@@ -915,8 +934,24 @@ void vtkPVDisplayGUI::EditColorMapCallback()
     }
   this->Script("pack forget [pack slaves %s]",
           this->GetPVRenderView()->GetPropertiesParent()->GetWidgetName());
+          
+  this->PVSource->GetPVColorMap()->Update();
   this->Script("pack %s -side top -fill both -expand t",
           this->PVSource->GetPVColorMap()->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::DataColorRangeCallback()
+{
+  int fixme;  // we need to trace this callback.
+  if (this->PVSource)
+    {
+    vtkPVColorMap* colorMap = this->PVSource->GetPVColorMap();
+    if (colorMap)
+      {
+      colorMap->ResetScalarRangeInternal(this->PVSource);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2625,10 +2660,12 @@ void vtkPVDisplayGUI::UpdateEnableState()
   if ( this->EditColorMapButtonVisible )
     {
     this->PropagateEnableState(this->EditColorMapButton);
+    this->PropagateEnableState(this->DataColorRangeButton);
     }
   else
     {
     this->EditColorMapButton->SetEnabled(0);
+    this->DataColorRangeButton->SetEnabled(0);
     }
   if ( this->MapScalarsCheckVisible)
     {
