@@ -30,7 +30,7 @@
 #include "vtkFloatArray.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkStructuredCacheFilter, "1.1.2.2");
+vtkCxxRevisionMacro(vtkStructuredCacheFilter, "1.1.2.3");
 vtkStandardNewMacro(vtkStructuredCacheFilter);
 
 //----------------------------------------------------------------------------
@@ -472,26 +472,20 @@ void vtkStructuredCacheFilter::CopyExtent(vtkDataSet *in,
       vtkErrorMacro("Empty Extent");
       return;
       }
+    // Condition collaspes the cell data a dimenision.
     if (inExt[min] < inExt[max])
       {
-      // SanityCheck
-      if ( outExt[min] == outExt[max] || ext[min] == ext[max])
-        {
-        vtkErrorMacro("Dimension mismatch");
-        return;
-        }
       --inExt[max];
-      --outExt[max];
-      --cellExt[max];
       }
-    else
-      { // This dimensions is collasped.
-      // SanityCheck
-      if ( outExt[min] < outExt[max] || ext[min] < ext[max] )
-        {
-        vtkErrorMacro("Dimension mismatch");
-        return;
-        }
+    // Input and output may have different dimensions.
+    // Do our best and select a face of a voxel ...
+    if (outExt[min] < outExt[max])
+      {
+      --outExt[max];
+      }
+    if (cellExt[min] < cellExt[max])
+      {
+      --cellExt[max];
       }
     }  
 
