@@ -4,4 +4,5 @@ CXX="c++322s"
 CFLAGS=""
 CXXFLAGS="-Wno-deprecated"
 CMAKE="/usr/local/bin/cmake"
+MAKE="make -j 2"
 DISPLAY=:0.0
