@@ -14,9 +14,12 @@
 =========================================================================*/
 #include "vtkSMProxy.h"
 
+#include "vtkClientServerInterpreter.h"
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
+#include "vtkDebugLeaks.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkSMCommunicationModule.h"
 #include "vtkSMProperty.h"
 #include "vtkSmartPointer.h"
@@ -26,23 +29,34 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMProxy, "1.4");
 
+//---------------------------------------------------------------------------
+// Internal data structure for storing object IDs, server IDs and
+// properties. Each property has associated attributes: 
+// * ModifiedFlag : has the property been modified since last update (push)
+// * DoUpdate : should the propery be updated (pushed) during UpdateVTKObjects 
+// * ObserverTag : the tag returned by AddObserver(). Used to remove the
+// observer.
 struct vtkSMProxyInternals
 {
   struct PropertyInfo
   {
-    PropertyInfo() : ModifiedFlag(1), DoUpdate(1) {};
+    PropertyInfo() : ModifiedFlag(1), DoUpdate(1), ObserverTag(0) {};
     vtkSmartPointer<vtkSMProperty> Property;
     int ModifiedFlag;
     int DoUpdate;
+    unsigned int ObserverTag;
   };
   vtkstd::vector<vtkClientServerID > IDs;
   vtkstd::vector<int> ServerIDs;
+  // Note that the name of the property is the map key. That is the
+  // only place where name is stored
   typedef vtkstd::map<vtkStdString,  PropertyInfo> PropertyInfoMap;
   PropertyInfoMap Properties;
 };
 
+//---------------------------------------------------------------------------
 // Observer for modified event of the property
 class vtkSMProxyObserver : public vtkCommand
 {
@@ -70,6 +84,9 @@ public:
         } 
     }
 
+  // Note that Proxy is not reference counted. Since the Proxy has a reference 
+  // to the Property and the Property has a reference to the Observer, making
+  // Proxy reference counted would cause a loop.
   void SetProxy(vtkSMProxy* proxy)
     {
       this->Proxy = proxy;
@@ -94,9 +111,36 @@ protected:
 vtkSMProxy::vtkSMProxy()
 {
   this->Internals = new vtkSMProxyInternals;
+  // By default, all objects are created on server 1.
   this->Internals->ServerIDs.push_back(1);
   this->VTKClassName = 0;
   this->ObjectsCreated = 0;
+
+  vtkClientServerID nullID = { 0 };
+  this->SelfID = nullID;
+
+  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+  if (!cm)
+    {
+    vtkErrorMacro("Can not fully initialize without a global "
+                  "CommunicationModule. This object will not be fully "
+                  "functional.");
+    return;
+    }
+  this->SelfID = cm->GetUniqueID();
+  {
+  vtkClientServerStream initStream;
+  initStream << vtkClientServerStream::Assign 
+             << this->SelfID << this
+             << vtkClientServerStream::End;
+  cm->SendStreamToServer(&initStream, 0);
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  if (pm)
+    {
+    pm->GetInterpreter()->ClearLastResult();
+    }
+  }
+
 }
 
 //---------------------------------------------------------------------------
@@ -110,6 +154,39 @@ vtkSMProxy::~vtkSMProxy()
   delete this->Internals;
   this->SetVTKClassName(0);
 }
+
+//------------------------=----------------------------------------------------
+void vtkSMProxy::UnRegister(vtkObjectBase* obj)
+{
+  if ( this->SelfID.ID != 0 )
+    {
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    if ( pm && obj != pm->GetInterpreter() )
+      {
+      if (this->ReferenceCount == 2)
+        {
+        vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+        if (cm)
+          {
+          vtkClientServerID selfid = this->SelfID;
+          this->SelfID.ID = 0;
+          vtkClientServerStream deleteStream;
+          deleteStream << vtkClientServerStream::Delete 
+                       << selfid
+                       << vtkClientServerStream::End;
+          cm->SendStreamToServer(&deleteStream, 0);
+          }
+        else
+          {
+          vtkErrorMacro("There is not valid communication module assigned. "
+                        "This object can not be cleanly destroyed.");
+          }
+        }
+      }
+    }
+  this->Superclass::UnRegister(obj);
+}
+
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::ClearServerIDs()
@@ -136,7 +213,7 @@ int vtkSMProxy::GetServerID(int i)
 }
 
 //---------------------------------------------------------------------------
-int* vtkSMProxy::GetServerIDs()
+const int* vtkSMProxy::GetServerIDs()
 {
   return &this->Internals->ServerIDs[0];
 }
@@ -177,7 +254,10 @@ void vtkSMProxy::RemoveAllObservers()
        ++it)
     {
     vtkSMProperty* prop = it->second.Property.GetPointer();
-    prop->RemoveObservers(vtkCommand::ModifiedEvent);
+    if (it->second.ObserverTag > 0)
+      {
+      prop->RemoveObserver(it->second.ObserverTag);
+      }
     }
 }
 
@@ -200,29 +280,48 @@ void vtkSMProxy::AddProperty(
     vtkErrorMacro("Can not add a property without a name.");
     return;
     }
-  if (this->Internals->Properties.find(name) != 
-      this->Internals->Properties.end())
+
+  // Check if the property already exists. If it does, we will
+  // replace it (and remove the observer from it)
+  vtkSMProxyInternals::PropertyInfoMap::iterator it =
+    this->Internals->Properties.find(name);
+
+  if (it != this->Internals->Properties.end())
     {
     vtkWarningMacro("Property " << name  << " already exists. Replacing");
-    // TODO Have to remove old observer here.
+    vtkSMProperty* oldProp = it->second.Property.GetPointer();
+    if (it->second.ObserverTag > 0)
+      {
+      oldProp->RemoveObserver(it->second.ObserverTag);
+      }
     }
+
+  unsigned int tag=0;
 
   if (addObserver)
     {
     vtkSMProxyObserver* obs = vtkSMProxyObserver::New();
     obs->SetProxy(this);
     obs->SetPropertyName(name);
-    prop->AddObserver(vtkCommand::ModifiedEvent, obs);
+    // We have to store the tag in order to be able to remove
+    // the observer later.
+    tag = prop->AddObserver(vtkCommand::ModifiedEvent, obs);
     obs->Delete();
     }
 
   vtkSMProxyInternals::PropertyInfo newEntry;
   newEntry.DoUpdate = doUpdate;
   newEntry.Property = prop;
+  newEntry.ObserverTag = tag;
   this->Internals->Properties[name] = newEntry;
 }
 
 //---------------------------------------------------------------------------
+// Push the property to one object on one server.  This is usually
+// used to make the property push it's value to an object other than
+// the one managed by the proxy. Most of the time, this is the proxy
+// itself. This provides a way to make the property call a method
+// on the proxy instead of the object managed by the proxy.
 void vtkSMProxy::PushProperty(
   const char* name, vtkClientServerID id, int serverid)
 {
@@ -256,7 +355,6 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
 //---------------------------------------------------------------------------
 void vtkSMProxy::UpdateVTKObjects()
 {
-  // TODO should this be here?
   this->CreateVTKObjects(1);
   int numObjects = this->Internals->IDs.size();
 
@@ -290,21 +388,30 @@ void vtkSMProxy::UpdateVTKObjects()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::AddVTKObject(vtkClientServerID id)
+void vtkSMProxy::CreateVTKObjects(int numObjects)
 {
-  this->Internals->IDs.push_back(id);
+  if (this->ObjectsCreated)
+    {
+    return;
+    }
+  if (!this->VTKClassName)
+    {
+    vtkErrorMacro("VTKClassName is not defined. Can not create objects.");
+    return;
+    }
+  this->ObjectsCreated = 1;
 
-  vtkClientServerStream str;
-  vtkClientServerID nullID = { 0 };
-  str << vtkClientServerStream::Invoke 
-      << id << "Register" 
-      << nullID 
-      << vtkClientServerStream::End;
-
-  // TODO: This should be generalized. AddVTKObject() should take another
-  // argument that tells where the command stream should go.
   vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  cm->SendStreamToServers(&str, 
+  vtkClientServerStream stream;
+  for (int i=0; i<numObjects; i++)
+    {
+    vtkClientServerID objectId = cm->NewStreamObject(this->VTKClassName, stream);
+    
+    this->Internals->IDs.push_back(objectId);
+    }
+  // TODO: This should be generalized. This class should have an
+  // ivar describing on which "cluster" the objects should be created.
+  cm->SendStreamToServers(&stream, 
                           this->GetNumberOfServerIDs(),
                           this->GetServerIDs());
 }
@@ -331,35 +438,8 @@ void vtkSMProxy::UnRegisterVTKObjects()
                           this->GetServerIDs());
 
   this->Internals->IDs.clear();
-}
 
-//---------------------------------------------------------------------------
-void vtkSMProxy::CreateVTKObjects(int numObjects)
-{
-  if (this->ObjectsCreated)
-    {
-    return;
-    }
-  this->ObjectsCreated = 1;
-  if (!this->VTKClassName)
-    {
-    vtkErrorMacro("VTKClassName is not defined. Can not create objects.");
-    return;
-    }
-
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  vtkClientServerStream stream;
-  for (int i=0; i<numObjects; i++)
-    {
-    vtkClientServerID objectId = cm->NewStreamObject(this->VTKClassName, stream);
-    
-    this->Internals->IDs.push_back(objectId);
-    }
-  // TODO: This should be generalized. This class should have an
-  // ivar describing on which "cluster" the objects should be created.
-  cm->SendStreamToServers(&stream, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
+  this->ObjectsCreated = 0;
 }
 
 //---------------------------------------------------------------------------
