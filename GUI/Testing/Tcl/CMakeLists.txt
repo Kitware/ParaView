@@ -257,8 +257,8 @@ REMOVE (PROJECT_TESTS ${PROJECT_TESTS_NO_BATCH})
 # for each test add a batch test that will possibly run in mpi mode
 FOREACH (tfile ${PROJECT_TESTS})
   # test batch
-  ADD_TEST(${tfile}-ParaView 
-    ${PARAVIEW_EXECUTABLE}
+  ADD_TEST(${tfile}-batch-ParaView 
+    ${PARAVIEW_EXECUTABLE} 
     ${TIMEOUT}
     --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
