@@ -93,6 +93,10 @@ public:
   // Chaining method to serialize an object and its superclasses.
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
+  // Description:
+  // A chance for the composite to reset itself
+  virtual void Reset() {};
+  
 protected:
   vtkKWComposite();
   ~vtkKWComposite();
