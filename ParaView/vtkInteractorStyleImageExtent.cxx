@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkInteractorStyleImageExtent.h"
+#include "vtkObjectFactory.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineSource.h"
 #include "vtkMath.h" 
@@ -49,6 +50,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 vtkInteractorStyleImageExtent *vtkInteractorStyleImageExtent::New() 
 {
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkInteractorStyleImageExtent");
+  if(ret)
+    {
+    return (vtkInteractorStyleImageExtent*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
   return new vtkInteractorStyleImageExtent;
 }
 

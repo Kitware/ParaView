@@ -121,6 +121,10 @@ SOURCE=.\vtkInteractorStyleImageExtent.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkInteractorStyleImageExtentTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkInteractorStylePlane.cxx
 # End Source File
 # Begin Source File
@@ -129,7 +133,19 @@ SOURCE=.\vtkInteractorStylePlaneSource.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkInteractorStylePlaneSourceTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStylePlaneTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkInteractorStyleSphere.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkInteractorStyleSphereTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -234,14 +250,62 @@ InputName=vtkInteractorStyleImageExtent
 # Begin Source File
 
 SOURCE=.\vtkInteractorStylePlane.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkInteractorStylePlane.h
+InputName=vtkInteractorStylePlane
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkInteractorStylePlaneSource.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkInteractorStylePlaneSource.h
+InputName=vtkInteractorStylePlaneSource
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkInteractorStyleSphere.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkInteractorStyleSphere.h
+InputName=vtkInteractorStyleSphere
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 

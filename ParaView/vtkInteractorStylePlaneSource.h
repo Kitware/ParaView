@@ -76,7 +76,7 @@ public:
   // programmers.
   static vtkInteractorStylePlaneSource *New();
 
-  vtkTypeMacro(vtkInteractorStylePlaneSource,vtkObject);
+  vtkTypeMacro(vtkInteractorStylePlaneSource,vtkInteractorStyle);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -1,7 +1,4 @@
 #include "vtkTclUtil.h"
-int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkDummyRenderWindowInteractorNewCommand();
 int vtkInteractorStyleGridExtentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStyleGridExtentNewCommand();
@@ -57,8 +54,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
-  vtkTclCreateNew(interp,"vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
-                  vtkDummyRenderWindowInteractorCommand);
   vtkTclCreateNew(interp,"vtkInteractorStyleGridExtent", vtkInteractorStyleGridExtentNewCommand,
                   vtkInteractorStyleGridExtentCommand);
   vtkTclCreateNew(interp,"vtkInteractorStyleImageExtent", vtkInteractorStyleImageExtentNewCommand,

@@ -37,8 +37,9 @@ struct vtkPVArgs
   char **argv;
 };
 
-typedef int VTK_THREAD_RETURN_TYPE;
-#define VTK_THREAD_RETURN_VALUE 0 
+// Temporary replacement of vtkMultiThreader stuff
+//typedef int VTK_THREAD_RETURN_TYPE;
+//#define VTK_THREAD_RETURN_VALUE 0 
 
 VTK_THREAD_RETURN_TYPE Process_Init( void *arg )
 {

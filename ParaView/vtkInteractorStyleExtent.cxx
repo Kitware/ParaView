@@ -301,8 +301,10 @@ void vtkInteractorStyleExtent::TranslateXY(int dx, int dy)
   double de[3];
   double t0, t1;
   int changeFlag = 0;
-  int *ext, temp;
+  int *ext, temp, temp2;
   
+  //vtkErrorMacro("------dMouse: " << dx << ", " << dy);
+
   // change dx, dy into de[3] in extent coordinates.
   de[0] = de[1] = de[2] = 0.0;
   t0 = this->DisplayToExtentMatrix[0][0] * dx + 
@@ -323,48 +325,74 @@ void vtkInteractorStyleExtent::TranslateXY(int dx, int dy)
 
   ext = this->GetWholeExtent();
 
-  // See if we have moved to another grid point.
-  if (this->ExtentRemainder0 > 0.5 && *this->ExtentPtr0 < ext[1])
+  // For each axis, see if we have moved to another grid point.
+  // Round current remainder.
+  temp = (int)(this->ExtentRemainder0 + 0.5);
+  // New extent value with no bounds checking.
+  temp2 = temp + *(this->ExtentPtr0);
+  // Take special care not to go outside of the whole extent.
+  if (temp2 < ext[0])
     {
-    *(this->ExtentPtr0) += 1.0;
-    this->ExtentRemainder0 -= 1.0;
-    changeFlag = 1;
+    temp -= (temp2 - ext[0]);
+    temp2 = ext[0];
     }
-  if (this->ExtentRemainder0 < -0.5 && *this->ExtentPtr0 > ext[0])
+  if (temp2 > ext[1])
     {
-    *(this->ExtentPtr0) -= 1.0;
-    this->ExtentRemainder0 += 1.0;
-    changeFlag = 1;
+    temp -= (temp2 - ext[1]);
+    temp2 = ext[1];
     }
-
-  if (this->ExtentRemainder1 > 0.5 && *this->ExtentPtr1 < ext[3])
-    {
-    *(this->ExtentPtr1) += 1.0;
-    this->ExtentRemainder1 -= 1.0;
-    changeFlag = 1;
-    }
-  if (this->ExtentRemainder1 < -0.5 && *this->ExtentPtr1 > ext[2])
-    {
-    *(this->ExtentPtr1) -= 1.0;
-    this->ExtentRemainder1 += 1.0;
+  if (temp != 0)
+    { // Yes it has changed.
+    *(this->ExtentPtr0) = temp2;
+    this->ExtentRemainder0 -= temp;
     changeFlag = 1;
     }
 
-  if (this->ExtentRemainder2 > 0.5 && *this->ExtentPtr2 < ext[5])
+  // Round current remainder.
+  temp = (int)(this->ExtentRemainder1 + 0.5);
+  // New extent value with no bounds checking.
+  temp2 = temp + *(this->ExtentPtr1);
+  // Take special care not to go outside of the whole extent.
+  if (temp2 < ext[2])
     {
-    *(this->ExtentPtr2) += 1.0;
-    this->ExtentRemainder2 -= 1.0;
-    changeFlag = 1;
+    temp -= (temp2 - ext[2]);
+    temp2 = ext[2];
     }
-  if (this->ExtentRemainder2 < -0.5 && *this->ExtentPtr2 > ext[4])
+  if (temp2 > ext[3])
     {
-    *(this->ExtentPtr2) -= 1.0;
-    this->ExtentRemainder2 += 1.0;
+    temp -= (temp2 - ext[3]);
+    temp2 = ext[3];
+    }
+  if (temp != 0)
+    { // Yes it has changed.
+    *(this->ExtentPtr1) = temp2;
+    this->ExtentRemainder1 -= temp;
     changeFlag = 1;
     }
 
+  // Round current remainder.
+  temp = (int)(this->ExtentRemainder2 + 0.5);
+  // New extent value with no bounds checking.
+  temp2 = temp + *(this->ExtentPtr2);
+  // Take special care not to go outside of the whole extent.
+  if (temp2 < ext[4])
+    {
+    temp -= (temp2 - ext[4]);
+    temp2 = ext[4];
+    }
+  if (temp2 > ext[5])
+    {
+    temp -= (temp2 - ext[5]);
+    temp2 = ext[5];
+    }
+  if (temp != 0)
+    { // Yes it has changed.
+    *(this->ExtentPtr2) = temp2;
+    this->ExtentRemainder2 -= temp;
+    changeFlag = 1;
+    }
   
-  // Now we check to see if any min > max...
+  // Now we check to see if any min > max...(drag min past max).
   if (changeFlag)
     {
     //vtkErrorMacro("Extent: " << this->Extent[0] << ", " << this->Extent[1] << ", "
@@ -437,6 +465,7 @@ void vtkInteractorStyleExtent::TranslateXY(int dx, int dy)
 void vtkInteractorStyleExtent::ComputeDisplayToExtentMapping()
 {
   int id;
+  double temp;
   double v0[3], v1[3], v2[3];
   double m0, m1, m2;
   double dOrigin[4], d0[4], d1[4], d2[4];
@@ -519,8 +548,6 @@ void vtkInteractorStyleExtent::ComputeDisplayToExtentMapping()
   this->CurrentRenderer->SetWorldPoint(this->CurrentSpot[0]+(v1[0]/m1), 
 		     this->CurrentSpot[1]+(v1[1]/m1), 
 		     this->CurrentSpot[2]+(v1[2]/m1), 1.0);
-  //vtkErrorMacro("d0 : " << d0[0] << ", " << d0[1] << ", " << d0[2]);
-
   pt = this->CurrentRenderer->GetWorldPoint();
   //vtkErrorMacro("world p1: " << pt[0] << ", " << pt[1] << ", " << pt[2] << ", " << pt[3]);
   this->CurrentRenderer->WorldToDisplay();
@@ -577,6 +604,11 @@ void vtkInteractorStyleExtent::ComputeDisplayToExtentMapping()
     this->DisplayToExtentPermutation0 = 1;
     this->DisplayToExtentPermutation1 = 2;
     }
+
+  // We need to permute to truly get extent to display.
+  temp = extentToDisplayMatrix[0][1];
+  extentToDisplayMatrix[0][1] = extentToDisplayMatrix[1][0];
+  extentToDisplayMatrix[1][0] = temp;
 
   if (vtkMath::InvertMatrix(extentToDisplayMatrix, 
                             this->DisplayToExtentMatrix, 2) == 0)

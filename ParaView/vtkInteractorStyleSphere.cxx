@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkInteractorStyleSphere.h"
+#include "vtkObjectFactory.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkOutlineSource.h"
 #include "vtkMath.h" 
@@ -48,6 +49,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 vtkInteractorStyleSphere *vtkInteractorStyleSphere::New() 
 {
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkInteractorStyleSphere");
+  if(ret)
+    {
+    return (vtkInteractorStyleSphere*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
   return new vtkInteractorStyleSphere;
 }
 
