@@ -393,6 +393,10 @@ public:
   // access it.
   void SendStringToClientAndServer(const char*);
 
+  // Description:
+  // Play the demo
+  void PlayDemo(int fromDashboard);
+  
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -447,7 +451,7 @@ protected:
   int UseSatelliteSoftware;
   int UseStereoRendering;
   int StartEmpty;
-  int PlayDemo;
+  int PlayDemoFlag;
   int UseRenderingGroup;
   int UseOffscreenRendering;
   char* GroupFileName;

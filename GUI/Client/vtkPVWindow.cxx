@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.541");
+vtkCxxRevisionMacro(vtkPVWindow, "1.542");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1626,72 +1626,11 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PlayDemo()
-{
-  this->PlayDemo(0);
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::PlayDemo(int fromDashboard)
-{
-  this->Register(this);
-  this->InDemo = 1;
-  const char* demoDataPath;
-  const char* demoScriptPath;
+{ 
   vtkPVApplication* pvApp = this->GetPVApplication();
-
-
-  this->Script("catch {unset pvDemoFromDashboard}");
-  if (fromDashboard)
-    {
-    this->Script("update");
-    this->Script("set pvDemoFromDashboard 1");
-    }
-
-  // Server path
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << pm->GetApplicationID() << "GetDemoPath"
-                  << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &demoDataPath))
-    {
-    demoDataPath = 0;
-    }
-  // Client path
-  demoScriptPath = pvApp->GetDemoPath();
-
-  if (demoDataPath && demoScriptPath)
-    {
-    char temp1[1024];
-    sprintf(temp1, "%s/Demo1.pvs", 
-            demoScriptPath);
-
-    this->Script("set DemoDir {%s}", demoDataPath);
-    this->LoadScript(temp1);
-    }
-  else
-    {
-    if (this->UseMessageDialog)
-      {
-      vtkKWMessageDialog::PopupMessage(
-        this->Application, this,
-        "Warning", 
-        "Could not find Demo1.pvs in the installation or\n"
-        "build directory. Please make sure that ParaView\n"
-        "is installed properly.",
-        vtkKWMessageDialog::WarningIcon);
-      }
-    else
-      {
-      vtkWarningMacro("Could not find Demo1.pvs in the installation or "
-                      "build directory. Please make sure that ParaView "
-                      "is installed properly.");
-      }
-    }
-  this->InDemo = 0;
-  this->UpdateEnableState();
-  this->UnRegister(this);
+  pvApp->PlayDemo(0);
 }
+
 
 //-----------------------------------------------------------------------------
 int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)

@@ -13,5 +13,5 @@ if {[info exists argc]} {
     }
 } 
 
-[$Application GetMainWindow] PlayDemo 1
+$Application PlayDemo 1
 $Application Exit

@@ -248,7 +248,6 @@ public:
   // Description:
   // Play the demo.
   void PlayDemo();
-  void PlayDemo(int fromDashboard);
 
   // Description:
   // Stuff for creating a log file for times.
@@ -335,6 +334,10 @@ public:
   vtkSetMacro(UseMessageDialog, int);
   vtkGetMacro(UseMessageDialog, int);
   vtkBooleanMacro(UseMessageDialog, int);
+
+  // Description:
+  // Set for running the demo to make the gui a little faster.
+  vtkSetMacro(InDemo, int);
 
   // Description:
   // Adds package name. These names are later used when writing
