@@ -144,7 +144,6 @@ void vtkKWSerializer::FindClosingBrace(istream *is, vtkObject *obj)
   int count = 0;
   char token[1024];
   int balance = 1;
-  int res;
   
   while (balance && vtkKWSerializer::GetNextToken(is,token))
     {
