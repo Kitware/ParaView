@@ -80,7 +80,7 @@ protected:
 
   virtual void Execute();
 
-  void ExecuteBlock(vtkImageData* block, vtkAppendPolyData* append, double startProgress);
+  void ExecuteBlock(vtkImageData* block, vtkAppendPolyData* append);
   void ExecutePart(const char* arrayName, vtkImageData* block, 
                    vtkAppendPolyData* append);
 

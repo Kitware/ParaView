@@ -41,7 +41,7 @@
 #include "vtkGarbageCollector.h"
 
 
-vtkCxxRevisionMacro(vtkCTHAMRContour, "1.7");
+vtkCxxRevisionMacro(vtkCTHAMRContour, "1.8");
 vtkStandardNewMacro(vtkCTHAMRContour);
 
 //----------------------------------------------------------------------------
@@ -121,11 +121,10 @@ void vtkCTHAMRContour::Execute()
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
     double startProg = .05 + .9 * static_cast<double>(blockId)/static_cast<double>(numBlocks); 
-    double endProg = .05 + .9 * static_cast<double>(blockId+1)/static_cast<double>(numBlocks); 
     this->UpdateProgress(startProg);
     block = vtkImageData::New();
     inputCopy->GetBlock(blockId, block);
-    this->ExecuteBlock(block, tmp, startProg);
+    this->ExecuteBlock(block, tmp);
     block->Initialize();
     block->Delete();
     block = NULL;
@@ -161,13 +160,11 @@ void vtkCTHAMRContour::Execute()
 
 //-----------------------------------------------------------------------------
 void vtkCTHAMRContour::ExecuteBlock(vtkImageData* block, 
-                                    vtkAppendPolyData* tmp,
-                                    double startProg)
+                                    vtkAppendPolyData* tmp)
 {
   vtkFloatArray* pointVolumeFraction;
   const char* arrayName;
 
-  this->UpdateProgress(startProg + .3);
   arrayName = this->InputScalarsSelection;
   pointVolumeFraction = (vtkFloatArray*)(block->GetPointData()->GetArray(arrayName));
   if (pointVolumeFraction == NULL)
@@ -175,7 +172,6 @@ void vtkCTHAMRContour::ExecuteBlock(vtkImageData* block,
     vtkErrorMacro("Could not find point array.");
     } 
   
-  this->UpdateProgress(startProg);
   arrayName = this->InputScalarsSelection;
   this->ExecutePart(arrayName, block, tmp);
 }
