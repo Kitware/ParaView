@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWIcon.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.16");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.17");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
@@ -472,6 +472,7 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "BodyFrame: " << this->BodyFrame << endl;
   os << indent << "TitleBarRightSubframe: " << this->TitleBarRightSubframe
      << endl;
+  os << indent << "SelectionList: " << this->SelectionList << endl;
   os << indent << "TitleColor: ("
      << this->TitleColor[0] << ", " 
      << this->TitleColor[1] << ", " 
