@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.10");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.11");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -64,6 +64,7 @@ vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
 
   this->ShowSourcesDescriptionCheckButton = 0;
   this->ShowSourcesNameCheckButton = 0;
+  this->ShowTraceFilesCheckButton = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -83,6 +84,11 @@ vtkPVApplicationSettingsInterface::~vtkPVApplicationSettingsInterface()
     {
     this->ShowSourcesNameCheckButton->Delete();
     this->ShowSourcesNameCheckButton = NULL;
+    }
+  if (this->ShowTraceFilesCheckButton)
+    {
+    this->ShowTraceFilesCheckButton->Delete();
+    this->ShowTraceFilesCheckButton = NULL;
     }
 }
 
@@ -125,7 +131,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     "are shown in the parameters page.");
 
   tk_cmd << "pack " << this->ShowSourcesDescriptionCheckButton->GetWidgetName()
-         << "  -side top -anchor w -expand no -fill none" << endl;
+    << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
   // Interface settings : show sources name
@@ -147,8 +153,36 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
     "only to script developers.");
 
   tk_cmd << "pack " << this->ShowSourcesNameCheckButton->GetWidgetName()
-         << "  -side top -anchor w -expand no -fill none" << endl;
+    << "  -side top -anchor w -expand no -fill none" << endl;
 
+  if (!this->ShowTraceFilesCheckButton)
+    {
+    this->ShowTraceFilesCheckButton = vtkKWCheckButton::New();
+    }
+
+  this->ShowTraceFilesCheckButton->SetParent(frame);
+  this->ShowTraceFilesCheckButton->Create(app, 0);
+  this->ShowTraceFilesCheckButton->SetText(
+    "Show trace files on ParaView startup");
+  this->ShowTraceFilesCheckButton->SetCommand(
+    this, "ShowTraceFilesCallback");
+  this->ShowTraceFilesCheckButton->SetBalloonHelpString(
+    "When this advanced option is on, tracefiles will be detected and reported "
+    "during startup. Turn this off to avoid unnecessary popup messages during "
+    "startup.");
+
+  if (!app->GetRegisteryValue(2,"RunTime", 
+      VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY,0)||
+    app->GetIntRegisteryValue(2,"RunTime",VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY))
+    {
+    this->ShowTraceFilesCheckButton->SetState(1);
+    }
+  else
+    {
+    this->ShowTraceFilesCheckButton->SetState(0);
+    }
+  tk_cmd << "pack " << this->ShowTraceFilesCheckButton->GetWidgetName()
+    << "  -side top -anchor w -expand no -fill none" << endl;
   // --------------------------------------------------------------
   // Pack 
 
@@ -212,6 +246,27 @@ void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVApplicationSettingsInterface::ShowTraceFilesCallback()
+{
+  if (!this->ShowTraceFilesCheckButton ||
+    !this->ShowTraceFilesCheckButton->IsCreated())
+    {
+    return;
+    }
+
+  int flag = this->ShowTraceFilesCheckButton->GetState() ? 1 : 0;
+
+  this->GetApplication()->SetRegisteryValue(
+    2, "RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY, "%d", flag);
+
+  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
+  if (app)
+    {
+    app->SetSourcesBrowserAlwaysShowName(flag);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplicationSettingsInterface::ShowSourcesNameCallback()
 {
  if (!this->ShowSourcesNameCheckButton ||
@@ -247,6 +302,11 @@ void vtkPVApplicationSettingsInterface::UpdateEnableState()
   if (this->ShowSourcesNameCheckButton)
     {
     this->ShowSourcesNameCheckButton->SetEnabled(this->Enabled);
+    }
+
+  if (this->ShowTraceFilesCheckButton)
+    {
+    this->ShowTraceFilesCheckButton->SetEnabled(this->Enabled);
     }
 }
 

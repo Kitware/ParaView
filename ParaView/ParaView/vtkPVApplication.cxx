@@ -123,7 +123,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.219");
+vtkCxxRevisionMacro(vtkPVApplication, "1.220");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -702,6 +702,11 @@ void vtkPVApplication::DeleteTraceFiles(char* name, int all)
 //----------------------------------------------------------------------------
 int vtkPVApplication::CheckForTraceFile(char* name, unsigned int maxlen)
 {
+  if ( this->GetRegisteryValue(2,"RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY, 0) &&
+    !this->GetIntRegisteryValue(2,"RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY) )
+    {
+    return 0;
+    }
   char buf[256];
   if ( vtkDirectory::GetCurrentWorkingDirectory(buf, 256) )
     {

@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY "ShowSourcesLongHelp"
 #define VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY    "SourcesBrowserAlwaysShowName"
+#define VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY "ShowTraceFiles"
 
 class vtkKWCheckButton;
 class vtkKWLabeledFrame;
@@ -80,6 +81,7 @@ public:
   // Callback used when interaction has been performed.
   virtual void ShowSourcesDescriptionCallback();
   virtual void ShowSourcesNameCallback();
+  virtual void ShowTraceFilesCallback();
 
 protected:
   vtkPVApplicationSettingsInterface();
@@ -87,6 +89,7 @@ protected:
 
   vtkKWCheckButton *ShowSourcesDescriptionCheckButton;
   vtkKWCheckButton *ShowSourcesNameCheckButton;
+  vtkKWCheckButton *ShowTraceFilesCheckButton;
 
   // Update the enable state. This should propagate similar calls to the
   // internal widgets.
