@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.513");
+vtkCxxRevisionMacro(vtkPVWindow, "1.514");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1188,9 +1188,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     pvs->SetTraceReferenceCommand(s.str());
     s.rdbuf()->freeze(0);
     }
-
-    // We need an initial current source, why not use sphere ? 
-    this->SetCurrentPVSource(pvs);
     }
   else
     {
@@ -4278,6 +4275,14 @@ void vtkPVWindow::SetInteractiveRenderEnabled(int s)
   rwi->SetInteractiveRenderEnabled(s);
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVWindow::UpdateToolbarAspect()
+{
+  this->Superclass::UpdateToolbarAspect();
+  
+  this->DisableToolbarButtons();
+  this->EnableToolbarButtons();
+}
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
