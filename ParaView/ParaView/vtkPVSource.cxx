@@ -39,12 +39,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkPVSource.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWRotateCameraInteractor.h"
-
-#include "vtkPVSource.h"
+#include "vtkSource.h"
+#include "vtkPVData.h"
 #include "vtkPVApplication.h"
 #include "vtkKWView.h"
 #include "vtkKWScale.h"
@@ -57,7 +58,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceInterface.h"
 #include "vtkPVGlyph3D.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkPVInputMenu.h"
 #include "vtkUnstructuredGridSource.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -899,7 +902,6 @@ void vtkPVSource::AcceptCallback()
   char methodAndArg[256];
   int numSources;
   vtkPVSource *source;
-  int numMenus;
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   // This adds an extract filter only when the MaximumNumberOfPieces is 1.
@@ -999,14 +1001,7 @@ void vtkPVSource::AcceptCallback()
 
   this->Script("update");  
 
-  this->Script("%s index end", window->GetMenu()->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state normal",
-                 window->GetMenu()->GetWidgetName(), i);
-    }
+  window->EnableMenus();
 
 #ifdef _WIN32
   this->Script("%s configure -cursor arrow", window->GetWidgetName());
@@ -1042,7 +1037,7 @@ void vtkPVSource::DeleteCallback()
 {
   vtkPVData *ac;
   vtkPVSource *prev;
-  int i, numMenus;
+  int i;
   int numSources;
   char methodAndArg[256];
   vtkPVSource *source;
@@ -1066,7 +1061,7 @@ void vtkPVSource::DeleteCallback()
   for (i = 0; i < this->NumberOfPVOutputs; ++i)
     {
     if (this->PVOutputs[i] && 
-	this->PVOutputs[i]->GetNumberOfPVConsumers() > 0)
+        this->PVOutputs[i]->GetNumberOfPVConsumers() > 0)
       { // Button should be deactivated.
       vtkErrorMacro("An output is used.  We cannot delete this source.");
       return;
@@ -1132,15 +1127,8 @@ void vtkPVSource::DeleteCallback()
   
   this->GetPVRenderView()->EventuallyRender();
 
-  this->Script("%s index end", window->GetMenu()->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
+  this->GetWindow()->EnableMenus();
   
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state normal",
-                 window->GetMenu()->GetWidgetName(), i);
-    }
-
   // This should delete this source.
   this->GetWindow()->GetMainView()->RemoveComposite(this);
 }
@@ -1190,8 +1178,7 @@ void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
 
   vtkDebugMacro("AcceptHelper2 " << name << ", " << method << ", " << args);
 
-  pvApp->Script("%s %s %s", name, method, args);
-  pvApp->BroadcastScript("%s %s %s", name,  method, args);
+  pvApp->BroadcastScript("catch {%s %s %s}", name,  method, args);
 }
 
 //----------------------------------------------------------------------------

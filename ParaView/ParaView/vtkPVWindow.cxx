@@ -39,9 +39,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+#include "vtkPVWindow.h"
 #include "vtkPVApplication.h"
 #include "vtkKWToolbar.h"
-#include "vtkPVWindow.h"
 #include "vtkOutlineFilter.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWDialog.h"
@@ -77,6 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVAnimationInterface.h"
+#include "vtkPVRenderView.h"
 
 #include <ctype.h>
 
@@ -99,6 +100,9 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {  
+
+  this->SetWindowClass("ParaView");
+
   vtkPVMethodInterface *mInt;
 
   this->CommandFunction = vtkPVWindowCommand;
@@ -170,7 +174,7 @@ vtkPVWindow::vtkPVWindow()
   mInt->Delete();
   mInt = NULL;
 
-  // I plan to offload the animation, reseting, synchrinization and saving
+  // I plan to offload the animation, reseting, synchronization and saving
   // tasks of the interface to pvSourceWidgets.  Until then,
   // this is the easiest way to get CutPlane working is with an interface
   // (even though it is not created with an interface).
@@ -233,7 +237,7 @@ vtkPVWindow::vtkPVWindow()
   mInt->SetSetCommand("SetOffset");
   mInt->SetGetCommand("GetOffset");
   mInt->AddFloatArgument();
-  this->CutPlaneInterface->AddMethodInterface(mInt);
+  this->ClipPlaneInterface->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
   // Center:
@@ -244,7 +248,7 @@ vtkPVWindow::vtkPVWindow()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
-  this->CutPlaneInterface->AddMethodInterface(mInt);
+  this->ClipPlaneInterface->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
   // Normal:
@@ -255,11 +259,9 @@ vtkPVWindow::vtkPVWindow()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
-  this->CutPlaneInterface->AddMethodInterface(mInt);
+  this->ClipPlaneInterface->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
-
-
 }
 
 //----------------------------------------------------------------------------
@@ -482,6 +484,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
     }
 
   // invoke super method first
+  // Make sure the widget is name appropriately: paraview instead of a number
+  // On X11, the window name is the same as the widget name.
+  this->WidgetName = new char [strlen(".paraview")+1];
+  strcpy(this->WidgetName,".paraview");
   this->vtkKWWindow::Create(pvApp,"");
 
   // We need an application before we can read the interface.
@@ -513,7 +519,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // Save current data in VTK format
   this->MenuFile->InsertCommand(1, "Save Data", this, "WriteData");
   
-  this->MenuFile->InsertCommand(2, "Export Tcl Script", this, "SaveInTclScript");
+  this->MenuFile->InsertCommand(2, "Export VTK Script", this, "SaveInTclScript");
   //this->MenuFile->InsertCommand(3, "Save Workspace", this, "SaveWorkspace");
   
   // Log stuff
@@ -548,8 +554,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
       this->SourceMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
       }
     }
-  
-  this->SetStatusText("Version 1.0 beta");
+
+  char version[128];
+  sprintf(version,"Version %d.%d", this->GetPVApplication()->GetMajorVersion(),
+	  this->GetPVApplication()->GetMinorVersion());
+  this->SetStatusText(version);
   
   this->Script( "wm withdraw %s", this->GetWidgetName());
 
@@ -568,13 +577,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CutPlaneButton->Create(app, "-image PVCutPlaneButton");
   this->CutPlaneButton->SetCommand(this, "CutPlaneCallback");
   this->CutPlaneButton->SetBalloonHelpString("Cut with an implicit plane. It is identical to generating point scalars from an implicit plane, and taking an iso surface. This filter typically reduces the dimensionality of the data.  A 3D input data set will produce an 2D output plane.");
-
+  this->CutPlaneInterface->SetApplication(app);
+  
   this->ClipPlaneButton->SetParent(this->Toolbar);
   //this->ClipPlaneButton->Create(app, "-text Clip");
   this->ClipPlaneButton->Create(app, "-image PVClipPlaneButton");
   this->ClipPlaneButton->SetCommand(this, "ClipPlaneCallback");
   this->ClipPlaneButton->SetBalloonHelpString("Clip with an implicit plane.  Takes a portion of the data set away and does not reduce the dimensionality of the data set.  A 3d input data set will produce a 3d output data set.");
-
+  this->ClipPlaneInterface->SetApplication(app);
+  
   this->ThresholdButton->SetParent(this->Toolbar);
   this->ThresholdButton->Create(app, "-image PVThresholdButton");
   this->ThresholdButton->SetCommand(this, "ThresholdCallback");
@@ -878,13 +889,14 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
 {
   char *extension = NULL;
   vtkPVSourceInterface *sInt;
-  char rootName[100];
+  char *rootName;
   int position;
   char *endingSlash = NULL;
   char *newRootName;
   
   extension = strrchr(openFileName, '.');
   position = extension - openFileName;
+  rootName = new char[position + 1];
   strncpy(rootName, openFileName, position);
   rootName[position] = '\0';
   if ((endingSlash = strrchr(rootName, '/')))
@@ -892,8 +904,9 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
     position = endingSlash - rootName + 1;
     newRootName = new char[strlen(rootName) - position + 1];
     strcpy(newRootName, rootName + position);
-    strcpy(rootName, "");
-    strcat(rootName, newRootName);
+    delete [] rootName;
+    rootName = new char[strlen(newRootName)+1];
+    strcpy(rootName, newRootName);
     delete [] newRootName;
     }
   if (isdigit(rootName[0]))
@@ -901,8 +914,9 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
     // A VTK object names beginning with a digit is invalid.
     newRootName = new char[strlen(rootName) + 3];
     sprintf(newRootName, "PV%s", rootName);
-    strcpy(rootName, "");
-    strcat(rootName, newRootName);
+    delete [] rootName;
+    rootName = new char[strlen(newRootName)+1];
+    strcpy(rootName, newRootName);
     delete [] newRootName;
     }
   
@@ -939,6 +953,9 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
 
   sInt->SetDataFileName(openFileName);
   sInt->SetRootName(rootName);
+  
+  delete [] rootName;
+  
   return sInt->CreateCallback();
 }
 
@@ -946,7 +963,7 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
 void vtkPVWindow::WriteData()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  char filename[256];
+  char *filename;
   int numProcs;
 
   if (!this->CurrentPVData)
@@ -963,10 +980,13 @@ void vtkPVWindow::WriteData()
   if (numProcs == 1)
     {
     this->Script("tk_getSaveFile -filetypes {{{VTK files} {.vtk}}} -defaultextension .vtk -initialfile data.vtk");
+    
+    filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
     sprintf(filename, "%s", this->Application->GetMainInterp()->result);
   
     if (strcmp(filename, "") == 0)
       {
+      delete [] filename;
       return;
       }
   
@@ -984,9 +1004,11 @@ void vtkPVWindow::WriteData()
     int idx;
 
     this->Script("tk_getSaveFile -filetypes {{{PVTK files} {.pvtk}}} -defaultextension .pvtk -initialfile data.pvtk");
+    filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
     sprintf(filename, "%s", this->Application->GetMainInterp()->result);
     if (strcmp(filename, "") == 0)
       {
+      delete [] filename;
       return;
       }
   
@@ -995,6 +1017,7 @@ void vtkPVWindow::WriteData()
     ghostLevel = this->GetIntegerResult(pvApp);
     if (ghostLevel == -1)
       {
+      delete [] filename;
       return;
       }
 
@@ -1015,6 +1038,8 @@ void vtkPVWindow::WriteData()
     pvApp->BroadcastScript("writer Write");
     pvApp->BroadcastScript("writer Delete");
     }
+  
+  delete [] filename;
 }
 
 //============================================================================
@@ -1046,9 +1071,11 @@ void vtkPVWindow::SaveInTclScript()
     return;
     }
 
-  *file << "# ParaView Version 0.1\n\n";
+  *file << "# ParaView Version " << this->GetPVApplication()->GetMajorVersion()
+	<< "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
 
-  *file << "package require vtktcl_interactor\n\n"
+  *file << "package require vtk\n"
+        << "package require vtkinteraction\n"
         << "# create a rendering window and renderer\n";
   
   this->GetMainView()->SaveInTclScript(file);
@@ -1132,7 +1159,8 @@ void vtkPVWindow::SaveWorkspace()
     return;
     }
 
-  *file << "# ParaView Workspace Version 0.1\n\n";
+  *file << "# ParaView Workspace Version  " << this->GetPVApplication()->GetMajorVersion()
+	<< "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
 
   
   this->GetMainView()->SaveInTclScript(file);
@@ -1338,6 +1366,42 @@ void vtkPVWindow::ReductionCheckCallback()
   this->GetMainView()->SetUseReductionFactor(reduce);
 }
 
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::DisableMenus()
+{
+  int numMenus;
+  int i;
+
+  this->Script("%s index end", this->Menu->GetWidgetName());
+  numMenus = atoi(this->GetPVApplication()->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state disabled",
+                 this->Menu->GetWidgetName(), i);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::EnableMenus()
+{
+  int numMenus;
+  int i;
+
+  this->Script("%s index end", this->Menu->GetWidgetName());
+  numMenus = atoi(this->GetPVApplication()->GetMainInterp()->result);
+  
+  // deactivating menus and toolbar buttons (except the interactors)
+  for (i = 0; i <= numMenus; i++)
+    {
+    this->Script("%s entryconfigure %d -state normal",
+                 this->Menu->GetWidgetName(), i);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkPVWindow::DisableFilterButtons()
 {
@@ -1389,7 +1453,6 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
-  int numMenus, i;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1450,15 +1513,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return calc;
@@ -1475,7 +1530,6 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
   const char* outputDataType;
-  int numMenus, i;
   vtkPVData *current;
   
   current = this->GetCurrentPVData();
@@ -1543,15 +1597,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return cutPlane;
@@ -1569,7 +1615,6 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
   const char* outputDataType;
-  int numMenus, i;
   vtkPVData *current;
   
   // Before we do anything, let's see if we can determine the output type.
@@ -1633,15 +1678,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return threshold;
@@ -1658,7 +1695,6 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
   const char* outputDataType;
-  int numMenus, i;
   vtkPVData *current;
   
   // Before we do anything, let's see if we can determine the output type.
@@ -1727,15 +1763,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return clipPlane;
@@ -1754,7 +1782,6 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
-  int numMenus, i;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1820,15 +1847,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   // It has not really been deleted.
@@ -1847,7 +1866,6 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
-  int numMenus, i;
   
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
@@ -1910,15 +1928,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   
   ++instanceCount;
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return glyph;
@@ -1936,7 +1946,6 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
-  int i, numMenus;
   
   current = this->GetCurrentPVData();
   if (current == NULL)
@@ -1998,15 +2007,7 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   
   ++instanceCount;
   
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
-    }
+  this->DisableMenus();
   this->DisableFilterButtons();
 
   return probe;
@@ -2233,6 +2234,7 @@ int vtkPVWindow::ReadSourceInterfacesFromDirectory(const char* directory)
   vtkDirectory* dir = vtkDirectory::New();
   if(!dir->Open(directory))
     {
+    dir->Delete();
     return 0;
     }
   
@@ -2511,12 +2513,6 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  </Selection>\n"
 "</Filter>\n"
 "\n"
-"<Filter class=\"vtkInhibitPoints\" root=\"InhibPts\" input=\"vtkDataSet\" output=\"vtkPolyData\" default=\"vectors\">\n"
-"  <Scalar name=\"Scale\" type=\"float\" help=\"Set the size of the inihibition neighborhood.\"/>\n"
-"  <Scalar name=\"MagnitudeThreshold\" type=\"float\" help=\"Vectors smaller that this are not considered.\"/>\n"
-"  <Boolean name=\"GenerateVertices\" help=\"Flag to create vertex cells\"/>\n"
-"</Filter>\n"
-"\n"
 "<Filter class=\"vtkPLinearExtrusionFilter\" root=\"LinExtrude\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
 "  <Scalar name=\"ScaleFactor\" type=\"float\" help=\"Set the extrusion scale factor\"/>\n"
 "  <Vector name=\"Vector\" type=\"float\" length=\"3\" help=\"Set the direction for the extrusion\"/>\n"
@@ -2562,9 +2558,7 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <Scalar name=\"FeatureAngle\" type=\"float\" help=\"Points are duplicated along features over this angle (0->180)\"/>\n"
 "  <Boolean name=\"Splitting\" help=\"Turn on/off the splitting of sharp edges.\"/>\n"
 "  <Boolean name=\"Consistency\" help=\"Turn on/off the enforcement of consistent polygon ordering.\"/>\n"
-"  <Boolean name=\"Consistency\" help=\"Turn on/off the enforcement of consistent polygon ordering.\"/>\n"
 "  <Boolean name=\"CellNormals\" set=\"SetComputeCellNormals\" get=\"GetComputeCellNormals\" help=\"Turn on/off the computation of cell normals.\"/>\n"
-"  <Boolean name=\"Consistency\" help=\"Turn on/off the enforcement of consistent polygon ordering.\"/>\n"
 "  <Boolean name=\"FlipNormals\" help=\"Flipping reverves the meaning of front and back.\"/>\n"
 "  <Boolean name=\"NonManifold\" set=\"SetNonManifoldTraversal\" get=\"GetNonManifoldTraversal\" help=\"Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops.\"/>\n"
 "  <Boolean name=\"PieceInvariant\" help=\"Turn this off if you do not want to process ghost levels and do not mind seams.\"/>\n"

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Creating Glyphs - Step 7</title>
+</head>
+
+<body>
+<!-- Start NavBar -->
+<table cellpadding="2" cellspacing="2" border="1">
+  <tbody>
+    <tr>
+      <td valign="Top"><a href="Step5-6.html">Prev</a>
+      </td>
+      <td valign="Top"><a href="index.html">Up</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<!-- End NavBar -->
+<h1>Step 7</h1>
+Next create a masking filter by selecting MaskPoints from then 
+VTK -> Filters menu. Set the OnRatio to 40. This is the ratio of the
+points retained: 1 out of every 40 points will be retained. Turn on
+random point selection by clicking on the Random checkbox. Click Accept.
+Note that the outline of the solution domain might disappear as a result
+of this action. You can turn it back on by going back to the Plot3D source
+(click on Plot3D1 in the Navigation window, switch to the display notebook
+and check the visibility option). Now, create a glyph filter. This time, 
+change the "Scale Mode" to Vector  so that glyphs are scaled by the  
+magnitude of the vectors. Reduce the  Scale Factor to 0.005 (otherwise 
+the arrows will be very large) and click Accept.
+<p>
+<center>
+<img alt="Result" src="result.jpg"> 
+</center>
+<p>
+
+Note that since the problem geometry is represented by a structured
+grid, it is possible to sub-sample the points in a more appropriate
+way. You can use a structured grid extraction filter ( ExtactGrid 
+filter from VTK -> Filters -available only when a structured grid
+source is active- ) instead of masking points randomly. The extraction
+filter allows you sub-sample the grid by setting sampling rates in
+x, y and z directions. The following image was obtained by using
+an ExtractGrid filter with a VOI (volume of interest) of ((4,55),
+(3,31), (3,23)) and sampling rate of (3,3,3).
+
+<p>
+<center>
+<img alt="Result with ExtractGrid" src="extract.jpg"> 
+</center>
+<p>
+
+<hr>
+<table cellpadding="2" cellspacing="2" border="1">
+  <tbody>
+    <tr>
+      <td valign="Top"><a href="Step5-6.html">Prev</a>
+      </td>
+      <td valign="Top"><a href="index.html">Up</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<address></address>
+<!-- hhmts start -->
+Last modified: Thu Oct 25 09:23:21 EDT 2001
+<!-- hhmts end -->
+</body> </html>

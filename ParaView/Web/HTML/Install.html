@@ -14,30 +14,192 @@ vlink="#000000" alink="#000000">
 
     <td width="550" valign="top" bgcolor="#FFFFFF">
     <div align="left">
-    <font size=5>Install </font> and build ParaView differently depending on the
-    operating system. Either way, you must build and install 
+    <b><font size=3>Install </font></b> and build ParaView differently depending on the
+    operating system. Either way, you must build and/or install 
     <a href="http://public.kitware.com/CMake">CMake</a>, 
     <a href="http://www.visualizationtoolkit.org/">VTK</a>, and 
     <a href="ftp://tcl.activestate.com/pub/tcl/tcl8_2/">Tcl/Tk 8.2.3</a> 
-    prior to compiling and installing ParaView.
+    prior to compiling and installing ParaView. Please note that ParaView
+    <em>requires</em> Tcl/Tk 8.2.3. It will not work with any other version.
     <p>
-    <b><font size=3>Run CMake</font></b><br>
-    Once this software is installed, you are ready to build and install ParaView.
-    Run CMake, indicating the location of the ParaView source directory, and where
-    you wish to place any ParaView object files and and any libraries (the build directory).
-    Normally when you run CMake, you will be presented with a GUI that allows
-    you to specify this information plus compile options, paths, etc. as shown 
-    in the following.
+    <b><font size=3>Run CMake and Compile</font></b><br>
+    Once this software is installed, you are ready to build ParaView.
+    To compile VTK and ParaView, you will need CMake. Downloading and installation
+    instructions for CMake can be found at http://public.kitware.com/CMake
+    We highly recommend reading the CMake documentation if you are not familiar
+    with CMake: http://public.kitware.com/CMake/HTML/Documentation.html
+    (you can skip the Developer's Guide if you are not going to work with
+    CMakeLists files).
     <p>
-    <img align="right" src=/ParaView/Art/CMake.jpg border=0>
+    Once CMake is installed, you are ready to compile VTK. Detailed instructions 
+    for configuring and compiling VTK can be found in VTK/README.html. In summary,
+    configuring the VTK (and ParaView) build consists of:
+    <ol>
+    <li> Initial CMake pass </li>
+    <li> Changing configuration options (cache values) </li>
+    <li> Next CMake pass: depending on the changes you made, new configuration
+         (cache) values might appear  </li>
+    <li> If necessary, go to step (2) and repeat until all the required
+         options are set.</li>
+    </ol>
+
+    On Windows, step (1) is starting  CMakeSetup.exe and setting the source
+    directory (where the source code for VTK is) and the directory where
+    the libraries, object files and binaries will be (can be same as the source
+    directory if you want to build "in-place") and pressing "Configure".
+    Step (2) requires changing values using the user interface. Step (3)
+    requires pressing "Configure". When done, you should click "OK".
     <p>
-    Once you configure the build process, you are ready to begin compiling.
-    <ul>
-    <li>On Unix, cd into the build directory, and type "make".</li><br><br>
-    <li>On Windows MSVC systems, load the workspace created by CMake.
-    Choose the configuration you would like to build (e.g., Debug, Release, etc.)
-    and compile</li>
-    </ul>
+    On Unix/Linux, step (1) requires running cmake for the first time, for
+    example:
+<pre>
+# Create the build directory (the name is arbitrary). This is where 
+# the executables, libraries and object files will be. If building 
+# "in-place", you can skip this step and use the source directory as 
+# also the build directory.
+% mkdir vtk-build
+# Run cmake
+% cmake /path/to/vtk/source/ # for example % cmake ../VTK
+</pre>
+    Step (2) requires editing the cache file (CMakeCache.txt in the build
+    directory) with a text editor and finally, step (3) requires running
+    cmake again.
+    <p>
+    Once the configuration is completed, you can build VTK. On Linux/Unix,
+    run make in the build directory (on some platforms, you might need to use
+    gmake if you are building "out-of-place" since some versions of make do 
+    not support out-of-place builds). On Windows, load the project file 
+    (VTK.dsw in  the build directory is using Visual C++) and build the 
+    ALL_BUILD target.
+    <p>
+    The following cache entries are the most important ones when building
+    VTK for ParaView. These are taken from real CMakeCache.txt files (from
+    both a Linux, gcc and a Windows, Visual C++ build). A brief description of 
+    each entry is given here to help users configure and build VTK with the 
+    right settings. When a value in the following list is optional, it is 
+    cleared described as such.  Otherwise, the entry must be set to a proper 
+    value. Note that some entries are marked (Unix/Linux only) or (Windows only) 
+    and are only relevant to the given operating system(s). Usually, CMake 
+    will automatically set all of the other cache entries to appropriate values. 
+    However, if a package which is needed by VTK is in an unusual place or if 
+    it encounters something unexpected, CMake might not be able to find set 
+    a cache entry correctly and  you might get errors when compiling VTK. 
+    If you are not sure about what the  problem might be, you can contact 
+    the <a href="http://public.kitware.com/ParaView/HTML/MailingList.html">ParaView 
+    mailing list</a>.
+    <p>
+<pre>
+//Build VTK with shared libraries.
+BUILD_SHARED_LIBS:BOOL=OFF
+</pre>
+
+    If you are going to run ParaView in a distributed environment with
+    MPI, we recommend keeping BUILD_SHARED_LIBS off. This way, your ParaView
+    executable will not depend on many VTK and ParaView shared libraries
+    and you will have to distribute fewer shared libraries over the nodes
+    of your distributed environment. Other shared libraries (for example, tcl 
+    and tk libraries are usually shared) which ParaView is linked against will
+    have to exist (and in the path) on all nodes so that ParaView can find them
+    when running.
+
+<pre>
+//(Unix/Linux only)
+//What is the path where the file GL/gl.h can be found
+OPENGL_INCLUDE_PATH:PATH=/usr/include
+
+//Where can the GL library be found
+OPENGL_LIBRARY:FILEPATH=/usr/lib/libGL.so
+</pre>
+
+    VTK requires OpenGL. On Windows, this library is almost always found
+    automatically by CMake. On Unix/Linux, you might need to set these values
+    if CMake does not find them when first run. Mesa include files and library
+    can be used instead of OpenGL ones without having to set any other cache
+    values.
+
+<pre>
+//What is the path where the file tcl.h can be found
+TCL_INCLUDE_PATH:PATH=/usr/local/include
+
+//Where can one of the tcl, tcl84, tcl8.4, tcl83, tcl8.3, tcl82,
+// tcl8.2, tcl80 or tcl8.0 libraries be found
+TCL_LIBRARY:FILEPATH=/usr/local/lib/libtcl8.2.so
+
+//What is the path where the file tk.h can be found
+TK_INCLUDE_PATH:PATH=/usr/local/include
+
+//Where can one of the tk, tk84, tk8.4, tk83, tk8.3, tk82, tk8.2,
+// tk80 or tk8.0 libraries be found
+TK_LIBRARY:FILEPATH=/usr/local/lib/libtk8.2.so
+
+//(Windows only)
+//What is the path where the file X11/Xlib.h can be found
+TK_XLIB_PATH:PATH=NOTFOUND
+
+//wrap classes into the TCL intepreted language
+VTK_WRAP_TCL:BOOL=ON
+</pre>
+
+    ParaView requires that VTK is built with Tcl/Tk bindings (VTK_WRAP_TCL
+    has to be on). Furthermore, it requires that Tcl/Tk 8.2.3 is used. Any 
+    other version of Tcl/Tk will not work. The cache values for the Tcl/Tk 
+    include paths and libraries have to be set appropriately. On Windows, we 
+    recommend that you install Tcl/Tk 8.2.3 binaries using the default path 
+    (C:/Program Files/Tcl/lib). In this case, CMake will automatically find
+    all the necessary paths. TK_XLIB_PATH has to be set only on Windows and 
+    if you are using a source Tcl/Tk distribution.
+
+<pre>
+//Build the hybrid directory classes
+VTK_USE_HYBRID:BOOL=ON
+
+//Build the parallel directory classes
+VTK_USE_PARALLEL:BOOL=ON
+
+//Build the rendering classes used for displaying
+VTK_USE_RENDERING:BOOL=ON
+</pre>
+
+   These modules are required by ParaView and should be turned on.
+
+<pre>
+//Build the patented directory classes, these classes are patented
+// and may require a license to use
+VTK_USE_PATENTED:BOOL=ON
+</pre>
+
+    The patented module is optional. Patented classes may require a license
+    for commercial use. Check the individual header files for patent information.
+
+<pre>
+//use MPI (Message Passing Interface) library for parallel support
+VTK_USE_MPI:BOOL=OFF
+
+//What is the path where the file mpi.h can be found
+MPI_INCLUDE_PATH:PATH=/usr/local/mpi/include
+
+//Where can one of the mpi or mpich libraries be found
+MPI_LIBRARY:FILEPATH=/usr/local/mpi/lib/libmpich.a
+</pre>
+
+    MPI is supported by VTK and ParaView but is optional. If this option is on,
+    you will have to specify the MPI include path and the MPI library.
+
+    Once VTK is built, compiling ParaView is simple. Run CMake as described
+    before for VTK but using the ParaView source and binary directories and
+    set the following cache entry:
+
+<pre>
+//What is the path where the file vtkConfigure.h can be found
+VTK_BINARY_DIR:PATH=NOTFOUND
+</pre>
+
+    This entry should point to the VTK binary (build directory). This is where
+    VTK's CMakeCache.txt and vtkConfigure.h are. Once this entry is set, CMake
+    will read VTK's cache file for all the necessary information. You do not
+    have to set any other options.
+
+    Next build ParaView like you built VTK.
     </div>
     </td>
 </tr>

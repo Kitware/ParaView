@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Using the Scalar Bar</title>
+</head>
+
+<body>
+<!-- Start NavBar -->
+<table cellpadding="2" cellspacing="2" border="1">
+  <tbody>
+    <tr>
+      <td valign="Top"><a href="ViewManipulationAndBehavior.html">Prev</a>
+      </td>
+      <td valign="Top"><a href="index.html">Up</a>
+      </td>
+      <td valign="Top"><a href="Contour.html">Next</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<!-- End NavBar -->
+<h1>Using the Scalar Bar</h1>
+
+In ParaView, the scalar bar is used to display the range of values being
+displayed by color in the current data set.  The interface for controlling
+the parameters of the scalar bar is contained in the Display page.  The
+scalar bar interface is only added to the display page if the current data
+set has underlying data values.  (There is no need for a scalar bar if the
+data set only contains geometry.)
+<p>
+When a scalar bar is displayed in ParaView, the name associated with it is
+the name of the array containing the underlying data.  The scalar bar is
+also set up to display 5 labels specifying the value of the scalar bar at
+specific intervals.
+<p>
+<center>
+<img alt="Scalar Bar" src="Images/scalarBar.jpg">
+</center>
+<p>
+
+In ParaView, the user can set the visibility, orientation, colormap, and
+range of the scalar bar.  The "Reset Range" button resets the color bar
+range to the range of the data values being used to color the data set.
+The colormaps available inside ParaView are red to blue, blue to red, and
+grayscale.
+<p>
+<center>
+<img alt="Scalar Bar Frame" src="Images/scalarBarFrame.jpg">
+</center>
+<p>
+
+
+For the red to blue colormap, the minimum value is displayed in red, and
+the maximum value is displayed in blue.  Exactly the reverse is true for
+the blue to red colormap.  Grayscale maps the minimum value to black and
+the maximum one to white.
+
+<p>
+<center>
+<img alt="Color Map Options" src="Images/colorMapOptions.jpg">
+</center>
+<p>
+
+
+<hr>
+<address></address>
+<!-- hhmts start -->
+Last modified: Thu Oct 25 09:20:59 EDT 2001
+<!-- hhmts end -->
+</body> </html>

@@ -49,7 +49,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVActorComposite_h
 
 #include "vtkKWActorComposite.h"
-#include "vtkKWCheckButton.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
@@ -70,11 +69,11 @@ class vtkScalarBarActor;
 class vtkCubeAxesActor2D;
 
 
-#define VTK_PV_ACTOR_COMPOSITE_NO_MODE            0
-#define VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE      1
-#define VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE     2
-#define VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE 3
-#define VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE 4
+//#define VTK_PV_ACTOR_COMPOSITE_NO_MODE            0
+//#define VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE      1
+//#define VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE     2
+//#define VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE 3
+//#define VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE 4
 
 class VTK_EXPORT vtkPVActorComposite : public vtkKWActorComposite
 {
@@ -137,17 +136,18 @@ public:
   void AmbientChanged();
   void SetAmbient(float ambient);
   
+  // This isn't currently being used.
   // Description:
   // Different modes for displaying the input.
-  void SetMode(int mode);
-  void SetModeToDataSet()
-    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE);}
-  void SetModeToPolyData()
-    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE);}
-  void SetModeToImageOutline()
-    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE);}
-  void SetModeToImageTexture()
-    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE);}
+//  void SetMode(int mode);
+//  void SetModeToDataSet()
+//    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE);}
+//  void SetModeToPolyData()
+//    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE);}
+//  void SetModeToImageOutline()
+//    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE);}
+//  void SetModeToImageTexture()
+//    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE);}
 
   // Description:
   // We need our own set input to take any type of data (based on mode).
@@ -294,8 +294,9 @@ protected:
   // ???The data object that owns this composite???
   vtkPVData *PVData;
   
-  // How to convert data set to polydata.
-  int Mode;
+// not currently being used  
+// How to convert data set to polydata.
+//  int Mode;
   // Super class stores a vtkPolyDataInput, this is a more general input.
   vtkDataSet *DataSetInput;
 

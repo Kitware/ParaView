@@ -39,6 +39,7 @@ struct vtkPVArgs
 {
   int argc;
   char **argv;
+  int* RetVal;
 };
 
 
@@ -89,9 +90,15 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     app->SetController(controller);
     app->Script("wm withdraw .");
     app->Start(pvArgs->argc,pvArgs->argv);
+    int status = app->GetExitStatus();
     if (Tcl_Eval(interp, "Application Delete") != TCL_OK)
       {
       cerr << "Could not delete application.\n";
+      *(pvArgs->RetVal) = -1;
+      }
+    else
+      {
+      *(pvArgs->RetVal) = status;
       }
     }
   else
@@ -130,7 +137,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nShowCmd)
 {
-  int argc, tmp;
+  int argc, tmp, retVal=0;
   char *argv[500];
   vtkPVArgs pvArgs;
 
@@ -196,9 +203,11 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   pvArgs.argc = argc;
   pvArgs.argv = argv;
+  pvArgs.RetVal = &retVal;
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
   controller->SingleMethodExecute();
 
+  controller->Finalize();
   controller->Delete();
   
   free(argv[0]);
@@ -208,15 +217,17 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   free(argv[4]);
 
 //  delete [] argv[1];
-  return 0;
+  return retVal;;
 }
 #else
 int main(int argc, char *argv[])
 {
+  int retVal = 0;
   // New processes need these args to initialize.
   vtkPVArgs pvArgs;
   pvArgs.argc = argc;
   pvArgs.argv = argv;
+  pvArgs.RetVal = &retVal;
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();  
   controller->Initialize(&argc, &argv);
@@ -234,6 +245,6 @@ int main(int argc, char *argv[])
   controller->Finalize();
   controller->Delete();
   
-  return 0;
+  return retVal;
 }
 #endif

@@ -1,6 +1,5 @@
 SOURCE_FILES( ParaView_SRCS
 vtkCameraInteractor 
-vtkCutMaterial 
 vtkImageOutlineFilter 
 vtkInteractor 
 vtkKWBoundsDisplay
@@ -21,7 +20,6 @@ vtkPVData
 vtkPVDataSetReaderInterface 
 vtkPVEnSightReaderInterface 
 vtkPVExtentTranslator 
-vtkPVGeometryFilter
 vtkPVGlyph3D 
 vtkPVInputMenu 
 vtkPVLODActor
@@ -64,9 +62,7 @@ ENDIF (WIN32)
 
 ADD_EXECUTABLE(ParaView WIN32 ParaView) 
 
-LINK_LIBRARIES ( ${OPENGL_LIBRARY} )				    
 LINK_LIBRARIES( png zlib vtkjpeg )
-INCLUDE_DIRECTORIES(${OPENGL_INCLUDE_PATH})
 
 IF (VTK_MANGLE_MESA)
   IF (MESA_INCLUDE_PATH)
@@ -116,5 +112,8 @@ LINK_LIBRARIES (Expat)
 
 TARGET_LINK_LIBRARIES (ParaView
                        vtkKWParaViewTCL)
+
+INCLUDE (${PARAVIEW_BINARY_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
+INCLUDE (${PARAVIEW_SOURCE_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
 
 

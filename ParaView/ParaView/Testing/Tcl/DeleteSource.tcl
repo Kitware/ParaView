@@ -38,7 +38,7 @@ $pvShrink UpdateParameterWidgets
 $pvShrink AcceptCallback
 
 
-$pvShrink DeleteCallBack
+$pvShrink DeleteCallback
 
 
 RenWin1 SetSize 250 250

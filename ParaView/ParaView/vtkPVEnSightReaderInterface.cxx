@@ -43,6 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVEnSightReaderInterface.h"
 #include "vtkGenericEnSightReader.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVData.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVWindow.h"
 #include <ctype.h>
 
 int vtkPVEnSightReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
@@ -71,14 +74,14 @@ vtkPVEnSightReaderInterface* vtkPVEnSightReaderInterface::New()
 //----------------------------------------------------------------------------
 vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
 {
-  char tclName[100], outputTclName[100], srcTclName[100];
+  char *tclName, *outputTclName, *srcTclName, *tmp;
   vtkDataSet *d;
   vtkPVData *pvd;
   vtkGenericEnSightReader *reader;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   int numOutputs, i;
-  char fullPath[256];
+  char *fullPath;
   char *extension;
   int position;
   char *endingSlash = NULL;
@@ -99,6 +102,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
   
   extension = strrchr(this->DataFileName, '.');
   position = extension - this->DataFileName;
+  tclName = new char[position+1];
   strncpy(tclName, this->DataFileName, position);
   tclName[position] = '\0';
   
@@ -107,8 +111,9 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     position = endingSlash - tclName + 1;
     newTclName = new char[strlen(tclName) - position + 1];
     strcpy(newTclName, tclName + position);
-    strcpy(tclName, "");
-    strcat(tclName, newTclName);
+    delete [] tclName;
+    tclName = new char[strlen(newTclName)+1];
+    strcpy(tclName, newTclName);
     delete [] newTclName;
     }
   if (isdigit(tclName[0]))
@@ -116,12 +121,17 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     // A VTK object names beginning with a digit is invalid.
     newTclName = new char[strlen(tclName) + 3];
     sprintf(newTclName, "PV%s", tclName);
-    strcpy(tclName, "");
-    strcat(tclName, newTclName);
+    tclName = new char[strlen(newTclName)+1];
+    strcpy(tclName, newTclName);
     delete [] newTclName;
     }
-
-  sprintf(tclName, "%s%d", tclName, this->InstanceCount);
+  
+  tmp = new char[strlen(tclName)+1 + (this->InstanceCount%10)+1];
+  sprintf(tmp, "%s%d", tclName, this->InstanceCount);
+  delete [] tclName;
+  tclName = new char[strlen(tmp)+1];
+  strcpy(tclName, tmp);
+  delete [] tmp;
   
   // Create the object through tcl on all processes.
   reader = (vtkGenericEnSightReader *)
@@ -143,8 +153,12 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
 			 reader->GetFilePath());
   pvApp->BroadcastScript("%s SetCaseFileName %s", tclName,
 			 reader->GetCaseFileName());
+  
+  fullPath = new char[strlen(reader->GetFilePath()) +
+                     strlen(reader->GetCaseFileName()) + 1];
   sprintf(fullPath, "%s%s", reader->GetFilePath(), reader->GetCaseFileName());
   this->SetCaseFileName(fullPath);
+  delete [] fullPath;
   
   pvApp->BroadcastScript("%s Update", tclName);
   
@@ -152,6 +166,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
   
   for (i = 0; i < numOutputs; i++)
     {
+    outputTclName = new char[strlen(tclName)+7 + (i%10)+1];
     sprintf(outputTclName, "%sOutput%d", tclName, i);
     d = (vtkDataSet*)(pvApp->MakeTclObject(reader->GetOutput(i)->GetClassName(),
 					   outputTclName));
@@ -176,6 +191,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     pvs->CreateProperties();
     this->PVWindow->SetCurrentPVSource(pvs);
 
+    srcTclName = new char[strlen(tclName)+2 + ((i+1)%10)+1];
     sprintf(srcTclName, "%s_%d", tclName, i+1);
     pvs->SetName(srcTclName);
     pvs->SetNthPVOutput(0, pvd);
@@ -184,12 +200,16 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     
     pvs->Delete();
     pvd->Delete();
+    delete [] outputTclName;
+    delete [] srcTclName;
     }
 
   pvApp->BroadcastScript("%s Delete", tclName);
 
   // so we get prompted for a file name if another data set reader is created
   this->SetDataFileName(NULL);
+  
+  delete [] tclName;
   
   ++this->InstanceCount;
   return pvs;

@@ -49,8 +49,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWObject.h"
 #include "vtkPVApplication.h"
 #include "vtkPVMethodInterface.h"
-#include "vtkPVWindow.h"
+
 #include "vtkCollection.h"
+class vtkPVWindow;
+class vtkPVData;
+
 
 class VTK_EXPORT vtkPVSourceInterface : public vtkKWObject
 {

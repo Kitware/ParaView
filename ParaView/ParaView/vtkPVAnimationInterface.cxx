@@ -34,6 +34,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWView.h"
+#include "vtkKWLabeledEntry.h"
+#include "vtkKWLabel.h"
+#include "vtkKWMenuButton.h"
+#include "vtkPVWindow.h"
 
 
 // We need to:

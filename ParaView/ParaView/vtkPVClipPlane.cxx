@@ -44,6 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWLabel.h"
+#include "vtkPVApplication.h"
+#include "vtkPVData.h"
 
 int vtkPVClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

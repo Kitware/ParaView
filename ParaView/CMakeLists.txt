@@ -3,6 +3,8 @@ PROJECT(PARAVIEW)
 SET (LIBRARY_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all executables.")
 
+SET (PARAVIEW_DATA_ROOT ${PARAVIEW_SOURCE_DIR}/ParaView/data CACHE PATH "Where the Data, Baseline and Utility directories are located.")
+
 SET (PARAVIEW_CAN_BUILD 1)
 
 IF (WIN32)
@@ -34,51 +36,47 @@ IF (WIN32)
 
 ENDIF (WIN32)
 
-
-FIND_PATH( VTK_BINARY_DIR vtkConfigure.h )
-
-
-# load in the values from VTK if found
-IF ( VTK_BINARY_DIR )
-  LOAD_CACHE(${VTK_BINARY_DIR} EXCLUDE
-                                BUILD_SHARED_LIBS
-                                BUILD_TESTING
-                                LIBRARY_OUTPUT_PATH
-                                EXECUTABLE_OUTPUT_PATH
-                                MAKECOMMAND
-                               INCLUDE_INTERNALS
-                                VTK_BINARY_PATH
-                                VTK_LIBRARY_PATH)
+IF(ParaViewComplete_BINARY_DIR)  
   INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
-
-  IF ( NOT VTK_WRAP_TCL )
-    MESSAGE("ParaView requires VTK to be built with Tcl bindings. Please rebuild VTK with Tcl bindings and re-run CMake")
+  LINK_DIRECTORIES(${VTK_LIBRARY_PATH})
+  INCLUDE(${ParaViewComplete_BINARY_DIR}/VTK/UseVTK.cmake)
+ELSE(ParaViewComplete_BINARY_DIR)
+  # include module to find vtk
+  INCLUDE (${CMAKE_ROOT}/Modules/FindVTK.cmake)
+  # if vtk was found include the use vtk file
+  IF (USE_VTK_FILE)
+    INCLUDE(${USE_VTK_FILE})
+  ELSE(USE_VTK_FILE)
     SET (PARAVIEW_CAN_BUILD 0)
-  ENDIF ( NOT VTK_WRAP_TCL )
+    MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_DIR to directory where vtkConfigure.h and UseVTK.cmake are found.")
+  ENDIF (USE_VTK_FILE)
+ENDIF(ParaViewComplete_BINARY_DIR)
 
-  IF (NOT VTK_USE_HYBRID)
-    MESSAGE("ParaView requires VTK to be built with hybrid support. Please rebuild VTK with hybrid and re-run CMake")
-    SET (PARAVIEW_CAN_BUILD 0)
-  ENDIF (NOT VTK_USE_HYBRID)
+IF (PARAVIEW_CAN_BUILD)
+ IF ( NOT VTK_WRAP_TCL )
+   MESSAGE("ParaView requires VTK to be built with Tcl bindings. Please rebuild VTK with Tcl bindings and re-run CMake")
+   SET (PARAVIEW_CAN_BUILD 0)
+ ENDIF ( NOT VTK_WRAP_TCL )
 
-  IF (NOT VTK_USE_RENDERING)
-    MESSAGE("ParaView requires VTK to be built with rendering support. Please rebuild VTK with rendering and re-run CMake")
-    SET (PARAVIEW_CAN_BUILD 0)
-  ENDIF (NOT VTK_USE_RENDERING)
+ IF (NOT VTK_USE_HYBRID)
+   MESSAGE("ParaView requires VTK to be built with hybrid support. Please rebuild VTK with hybrid and re-run CMake")
+   SET (PARAVIEW_CAN_BUILD 0)
+ ENDIF (NOT VTK_USE_HYBRID)
 
-  IF (NOT VTK_USE_PARALLEL)
-    MESSAGE("ParaView requires VTK to be built with parallel support. Please rebuild VTK with parallel and re-run CMake")
-    SET (PARAVIEW_CAN_BUILD 0)
-  ENDIF (NOT VTK_USE_PARALLEL)
+ IF (NOT VTK_USE_RENDERING)
+   MESSAGE("ParaView requires VTK to be built with rendering support. Please rebuild VTK with rendering and re-run CMake")
+   SET (PARAVIEW_CAN_BUILD 0)
+ ENDIF (NOT VTK_USE_RENDERING)
 
-ELSE (VTK_BINARY_DIR )
-  SET (PARAVIEW_CAN_BUILD 0)
-  MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_DIR")
-ENDIF (VTK_BINARY_DIR )
+ IF (NOT VTK_USE_PARALLEL)
+   MESSAGE("ParaView requires VTK to be built with parallel support. Please rebuild VTK with parallel and re-run CMake")
+   SET (PARAVIEW_CAN_BUILD 0)
+ ENDIF (NOT VTK_USE_PARALLEL)
+ENDIF (PARAVIEW_CAN_BUILD)
 
 IF (PARAVIEW_CAN_BUILD)
 
- SUBDIRS(Widgets Utilities/Expat ParaView)
+ SUBDIRS(Widgets Utilities/Expat ParaView Demos)
  SUBDIR_DEPENDS(ParaView Widgets Utilities/Expat)
 
  OPTION(BUILD_SHARED_LIBS "Build ParaView with shared libraries." OFF)
@@ -119,5 +117,8 @@ IF (PARAVIEW_CAN_BUILD)
      SUBDIR_DEPENDS(ParaView/Testing ParaView)
    ENDIF (DART_ROOT)
  ENDIF(BUILD_TESTING)
+
+ INCLUDE (${PARAVIEW_BINARY_DIR}/LocalUserOptions.cmake OPTIONAL)
+ INCLUDE (${PARAVIEW_SOURCE_DIR}/LocalUserOptions.cmake OPTIONAL)
 
 ENDIF (PARAVIEW_CAN_BUILD)

@@ -44,7 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 #include "vtkPVExtentTranslator.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkPVData.h"
+#include "vtkPVWindow.h"
+#include "vtkPVRenderView.h"
 int vtkPVSourceInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 			        int argc, char *argv[]);
 
@@ -117,7 +119,6 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVMethodInterface *mInt;
-  int numMenus, i;
   vtkPVData *current = this->PVWindow->GetCurrentPVData();
   
   // Before we do anything, let see if we can determine the output type.
@@ -350,15 +351,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 
   ++this->InstanceCount;
 
-  this->Script("%s index end", this->PVWindow->GetMenu()->GetWidgetName());
-  numMenus = atoi(pvApp->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->PVWindow->GetMenu()->GetWidgetName(), i);
-    }
+  this->PVWindow->DisableMenus();
   
   return pvs;
 } 

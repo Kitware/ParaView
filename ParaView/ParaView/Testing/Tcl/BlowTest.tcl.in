@@ -1,0 +1,84 @@
+    set DataDir "@PARAVIEW_DATA_ROOT@"
+
+    # hack to get the window.
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+
+    set reader [$pvWindow Open "$DataDir/Data/blow.vtk"]
+    
+    set wInt [$pvWindow GetSourceInterface "vtkWarpVector"]
+    set pvWarp [$wInt CreateCallback]
+    $pvWarp UpdateParameterWidgets
+    $pvWarp AcceptCallback
+
+    set lsInt [$pvWindow GetSourceInterface "vtkLoopSubdivisionFilter"]
+    set pvSub [$lsInt CreateCallback] 
+    [$pvSub GetVTKSource] SetNumberOfSubdivisions 2
+    $pvSub UpdateParameterWidgets
+    $pvSub AcceptCallback
+
+    set nInt [$pvWindow GetSourceInterface "vtkPPolyDataNormals"]
+    set pvNormals [$nInt CreateCallback]
+    [$pvNormals GetVTKSource] SetFeatureAngle 60
+    $pvNormals UpdateParameterWidgets
+    $pvNormals AcceptCallback
+    
+    set warpOutput [$pvWarp GetNthPVOutput 0]
+    $warpOutput SetVisibility 0
+
+    set subOutput [$pvSub GetNthPVOutput 0]
+    $subOutput SetVisibility 0
+
+    set normalsOutput [$pvNormals GetNthPVOutput 0]
+    $normalsOutput SetVisibility 0
+
+
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    $pvWindow SetCurrentPVSource $pvWarp
+    
+    set camera [Ren1 GetActiveCamera]
+    $camera SetPosition 143.632 4.67034 -39.8384
+    $camera SetFocalPoint 2 12 4.1578e-15
+    $camera SetViewUp 0.270701 -0.00149368 0.962662
+    $camera SetViewAngle 30
+    $camera SetClippingRange 127.006 167.567
+
+    set normalsOutput [$pvNormals GetNthPVOutput 0]
+    $normalsOutput SetVisibility 1
+
+    [$pvWarp GetVectorOperationMenu] SetValue displacement1
+    $pvWarp ChangeVectors
+    $normalsOutput ColorByPointFieldComponent thickness1 0
+
+    RenWin1 SetSize 300 300
+
+    for {set i 1} {$i <= 10} {incr i 1} {
+	[$pvWarp GetVectorOperationMenu] SetValue displacement$i
+	$pvWarp ChangeVectors
+	$normalsOutput ColorByPointFieldComponent thickness$i 0
+	RenWin1 Render
+	update
+
+    }
+
+    $normalsOutput SetVisibility 0
+
+    set warpOutput [$pvWarp GetNthPVOutput 0]
+    [$pvWarp GetVectorOperationMenu] SetValue displacement1
+    $pvWarp ChangeVectors
+    $warpOutput ColorByPointFieldComponent thickness1 0
+
+    $warpOutput SetVisibility 1
+
+    for {set i 1} {$i <= 10} {incr i 1} {
+	[$pvWarp GetVectorOperationMenu] SetValue displacement$i
+	$pvWarp ChangeVectors
+	$warpOutput ColorByPointFieldComponent thickness$i 0
+	RenWin1 Render
+	update
+
+    }
+
+    source $DataDir/Utility/rtImage.tcl
+    pvImageTest $DataDir/Baseline/BlowTest.png 10
+
+    Application Exit

@@ -15,7 +15,9 @@
     <div align="left">
     <font size=5>Download </font>ParaView via CVS access. To use ParaView,
     you will also have to download and install VTK and CMake. (VTK serves 
-    as the visualization engine; CMake is the build environment.) There is 
+    as the visualization engine; CMake is the build environment.) Note that
+    the current version of ParaView requires a specific branch of the VTK
+    CVS tree, it will not compile with the main branch. There is 
     currently no method to obtain ParaView as a packaged zip or tar file. 
     Packaged releases will become available in the near future.
     <p>
@@ -25,10 +27,6 @@
     <a href="http://sources.redhat.com/cygwin/">Cygwin</a> tools on Windows
     platforms, or <a href="http://www.wincvs.org">WinCVS</a> which provides 
     a very nice GUI to CVS.
-    <p>
-    The current version of ParaView requires that you use the new VTK source 
-    tree and CMake build environment. (These changes are to be realized with the
-    release of VTK 4.0 in late 2001.) Do not use VTK 3.3 or earlier versions.
     <p>
     <hr>
     <p>
@@ -52,7 +50,7 @@
     (respond with password vtk)
     <p>
     Follow this command by checking out the source code:<br>
-    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK co VTK</b>
+    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/VTK co -r ParaView-0-2 VTK</b>
     <p>
     (Be careful that you don't check the new VTK CVS repository on top of an existing
     VTK 3.3 or earlier release. Remember, in Windows "vtk" and "VTK" are the same 
@@ -66,7 +64,7 @@
     (respond with password paraview)
     <p>
     Follow this command by checking out the source code:<br>
-    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co ParaView</b>
+    <b>cvs -d :pserver:anonymous@public.kitware.com:/cvsroot/ParaView co -r ParaView-0-2 ParaView</b>
     <p>
 
     </div>

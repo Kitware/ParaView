@@ -44,10 +44,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVSource.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVWindow.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWText.h"
+class vtkKWLabeledEntry;
+class vtkKWMenuButton;
+class vtkPVWindow;
 
 class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
 {

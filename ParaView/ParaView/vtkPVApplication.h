@@ -70,6 +70,10 @@ public:
   // Description:
   // Start running the main application.
   virtual void Start(int argc, char *argv[]);
+  virtual void Start()
+    { this->vtkKWApplication::Start(); }
+  virtual void Start(char* arg)
+    { this->vtkKWApplication::Start(arg); }
 
   
 //BTX
@@ -93,10 +97,6 @@ public:
   void SetController(vtkMultiProcessController *c);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   
-  // Description:
-  // Display the on-line help and about dialog for this application.
-  virtual void DisplayAbout(vtkKWWindow *);
-
   // Description:
   // Make sure the user accepts the license before running.
   int AcceptLicense();
@@ -148,11 +148,32 @@ public:
   void CompleteArrays(vtkMapper *mapper, char *mapperTclName);
   void SendCompleteArrays(vtkMapper *mapper);
 
+
+  // Description:
+  // This value will be returned by ParaView at exit.
+  // Use this from scripts if you want ParaView exit with an
+  // error status (for example to indicate that a regression test 
+  // failed)
+  vtkSetMacro(ExitStatus, int);
+  vtkGetMacro(ExitStatus, int);
+
+  // Description:
+  // ParaView version is always MajorVersion.MinorVersion.
+  // Change these in the constructor.
+  vtkGetMacro(MajorVersion, int);
+  vtkGetMacro(MinorVersion, int);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
   vtkPVApplication(const vtkPVApplication&) {};
   void operator=(const vtkPVApplication&) {};
+
+  // For locating help (.chm) on Windows.
+  virtual int GetApplicationKey() 
+    {
+      return 15;
+    };
   
   void *Log;
   char *LogFileName;
@@ -162,7 +183,11 @@ protected:
   void CreatePhoto(char *name, unsigned char *data, int width, int height);
   int CheckRegistration();
   int PromptRegistration(char *,char *);
-  
+
+  int ExitStatus;
+  int MajorVersion;
+  int MinorVersion;
+
   vtkMultiProcessController *Controller;
 };
 

@@ -128,8 +128,6 @@ public:
   vtkRenderer *GetRenderer();
   vtkRenderWindow *GetRenderWindow();
 
-  void OffScreenRenderingOn();
-
   // Description:
   // This is for an experiment on rendering timing.  It should be temporary.
   vtkTreeComposite *GetComposite() {return this->Composite;}

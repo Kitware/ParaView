@@ -80,6 +80,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
+#include "vtkOutputWindow.h"
+
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 //extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
@@ -124,22 +126,20 @@ int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  char name[128];
   this->CommandFunction = vtkPVApplicationCommand;
+  this->MajorVersion = 0;
+  this->MinorVersion = 2;
   this->SetApplicationName("ParaView");
+  sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
+  this->SetApplicationVersionName(name);
+  this->SetApplicationReleaseName("beta");
 
   this->Controller = NULL;
   this->Log = NULL;
   this->LogFileName = NULL;
 
-
-  // For some reason "GetObjectFromPointer" is returning vtkTemp0 instead
-  /// of Application.  Lets force it.
-  //if (this->TclName != NULL)
-  //  {
-  //  vtkErrorMacro("Expecting TclName to be NULL.");
-  //  }
-  //this->TclName = new char [strlen("Application")+1];
-  //strcpy(this->TclName,"Application");
+  this->ExitStatus = 0;
 }
 
 
@@ -325,11 +325,34 @@ int vtkPVApplication::CheckRegistration()
 void vtkPVApplication::Start(int argc, char*argv[])
 {
   
+  vtkOutputWindow::GetInstance()->PromptUserOn();
+
+  // set the font size to be small
+#ifdef _WIN32
+  this->Script("option add *font {{MS Sans Serif} 8}");
+#else
+  this->Script("option add *font -adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1");
+//  this->Script("option add *font -adobe-helvetica-medium-r-normal--11-80-100-100-p-56-iso8859-1");
+  this->Script("option add *highlightThickness 0");
+  this->Script("option add *highlightBackground #ccc");
+  this->Script("option add *activeBackground #eee");
+  this->Script("option add *activeForeground #000");
+  this->Script("option add *background #ccc");
+  this->Script("option add *foreground #000");
+  this->Script("option add *Entry.background #ffffff");
+  this->Script("option add *Text.background #ffffff");
+  this->Script("option add *Button.padX 6");
+  this->Script("option add *Button.padY 3");
+#endif
+
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
 
   this->CreateButtonPhotos();
   ui->Create(this,"");
+
+  // ui has ref. count of at least 1 because of AddItem() above
+  ui->Delete();
   
   if (argc > 1 && argv[1])
     {
@@ -338,29 +361,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
       {
       ui->LoadScript(argv[1]);
       }
-    // otherwise try to load it as a volume
-    else
-      {
-      if (strlen(argv[1]) > 1)
-        {
-        //ui->Open(argv[1]);
-        }
-      }
     }
 
-  ui->Delete();
   this->vtkKWApplication::Start(argc,argv);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVApplication::DisplayAbout(vtkKWWindow *win)
-{
-  
-  if (!this->AcceptLicense())
-    {
-    this->Exit();
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::Exit()

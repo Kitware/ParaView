@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkTreeComposite.h"
 #include "vtkPVSourceInterface.h"
+#include "vtkKWCheckButton.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
@@ -154,7 +155,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   this->PVData = NULL;
   this->DataSetInput = NULL;
-  this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
+//  this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
   
   //this->TextureFilter = NULL;  
 }
@@ -169,7 +170,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetApplication(pvApp);
   
   sprintf(tclName, "Geometry%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
+  pvApp->MakeTclObject("vtkPVGeometryFilter", tclName);
   this->SetGeometryTclName(tclName);
 
   // Get rid of previous object created by the superclass.
@@ -181,6 +182,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // Make a new tcl object.
   sprintf(tclName, "Mapper%d", this->InstanceCount);
   this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
+  this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
   pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
@@ -202,7 +204,8 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
                this->GetScalarBarTclName(), this->MapperTclName);
   
   sprintf(tclName, "LODDeci%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkQuadricClustering %s", tclName);
+  pvApp->MakeTclObject("vtkQuadricClustering", tclName);
+  this->LODDeciTclName = NULL;
   this->SetLODDeciTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODDeciTclName, this->GeometryTclName);
@@ -213,7 +216,8 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
 
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPolyDataMapper %s", tclName);
+  pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
+  this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
   pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->LODMapperTclName);
 
@@ -255,20 +259,18 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // This allows us to debug the parallel features of the
   // application and VTK on only one process.
   int debugNum = numProcs;
-  int debugStart = 0;
   if (getenv("PV_DEBUG_HALF") != NULL)
     {
     debugNum *= 2;
-    debugStart = numProcs;
     }
   for (id = 0; id < numProcs; ++id)
     {
     pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
 			this->MapperTclName, debugNum);
-    pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id+debugStart);
+    pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
     pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
 			this->LODMapperTclName, debugNum);
-    pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id+debugStart);
+    pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id);
     }
 }
 
@@ -355,32 +357,20 @@ vtkPVActorComposite::~vtkPVActorComposite()
     this->SetCubeAxesTclName(NULL);
     }
   
-  if (this->MapperTclName)
-    {
-    pvApp->BroadcastScript("%s Delete", this->MapperTclName);
-    this->SetMapperTclName(NULL);
-    this->Mapper = NULL;
-    }
+  pvApp->BroadcastScript("%s Delete", this->MapperTclName);
+  this->SetMapperTclName(NULL);
+  this->Mapper = NULL;
+  
+  pvApp->BroadcastScript("%s Delete", this->LODMapperTclName);
+  this->SetLODMapperTclName(NULL);
 
-  if (this->LODMapperTclName)
-    {
-    pvApp->BroadcastScript("%s Delete", this->LODMapperTclName);
-    this->SetLODMapperTclName(NULL);
-    }
+  pvApp->BroadcastScript("%s Delete", this->PropTclName);
+  this->SetPropTclName(NULL);
+  this->Prop = NULL;
 
-  if (this->PropTclName)
-    {
-    pvApp->BroadcastScript("%s Delete", this->PropTclName);
-    this->SetPropTclName(NULL);
-    this->Prop = NULL;
-    }
-
-  if (this->PropertyTclName)
-    {
-    pvApp->BroadcastScript("%s Delete", this->PropertyTclName);
-    this->SetPropertyTclName(NULL);
-    this->Property = NULL;
-    }
+  pvApp->BroadcastScript("%s Delete", this->PropertyTclName);
+  this->SetPropertyTclName(NULL);
+  this->Property = NULL;
 
   if (this->OutputPortTclName)
     {
@@ -1423,6 +1413,7 @@ vtkPVApplication* vtkPVActorComposite::GetPVApplication()
 }
 
 //----------------------------------------------------------------------------
+/*
 void vtkPVActorComposite::SetMode(int mode)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1454,6 +1445,7 @@ void vtkPVActorComposite::SetMode(int mode)
     pvApp->BroadcastScript("%s SetModeToSurface", this->GeometryTclName);
     }  
 }
+*/
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetScalarBarVisibility(int val)
@@ -1561,10 +1553,10 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
     }
   else
     {
-    this->Script("[%s GetPositionCoordinate] SetValue 0.25 0.05",
+    this->Script("[%s GetPositionCoordinate] SetValue 0.25 0.13",
                  this->GetScalarBarTclName());
     this->Script("%s SetOrientationToHorizontal", this->GetScalarBarTclName());
-    this->Script("%s SetHeight 0.12", this->GetScalarBarTclName());
+    this->Script("%s SetHeight 0.13", this->GetScalarBarTclName());
     this->Script("%s SetWidth 0.5", this->GetScalarBarTclName());
     }
   this->GetPVRenderView()->EventuallyRender();
@@ -1634,99 +1626,35 @@ void vtkPVActorComposite::SaveInTclScript(ofstream *file, const char *sourceName
 
   renTclName = this->GetPVRenderView()->GetRendererTclName();
 
-  if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
+  *file << "vtkPVGeometryFilter " << this->GeometryTclName << "\n\t"
+        << this->GeometryTclName << " SetInput [" << sourceName
+        << " GetOutput";
+  if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
+                             "vtkGenericEnSightReader") == 0)
     {
-    // We no longer have an explicit outline filter.  Do the equivalent VTK pipeline.
-    *file << "vtkOutlineFilter Outline" << this->InstanceCount << "\n\t"
-          << "Outline" << this->InstanceCount << " SetInput [" << sourceName
-          << " GetOutput";
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
-                               "vtkGenericEnSightReader") == 0)
+    dataTclName = this->GetPVData()->GetVTKDataTclName();
+    charFound = strrchr(dataTclName, 'O');
+    pos = charFound - dataTclName - 1;
+    newReaderNum = atoi(dataTclName + pos);
+    if (newReaderNum != readerNum)
       {
-      dataTclName = this->GetPVData()->GetVTKDataTclName();
-      charFound = strrchr(dataTclName, 'O');
-      pos = charFound - dataTclName - 1;
-      newReaderNum = atoi(dataTclName + pos);
-      if (newReaderNum != readerNum)
-        {
-        readerNum = newReaderNum;
-        outputNum = 0;
-        }
-      else
-        {
-        outputNum++;
-        }
-      *file << " " << outputNum << "]\n\n";
+      readerNum = newReaderNum;
+      outputNum = 0;
       }
     else
       {
-      *file << "]\n\n";
+      outputNum++;
       }
-    
-    *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
-          << this->MapperTclName << " SetInput [Outline"
-          << this->InstanceCount << " GetOutput]\n\t";
-    }
-  else if (this->Mode == VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
-    {
-    *file << "vtkDataSetSurfaceFilter " << this->GeometryTclName << "\n\t"
-          << this->GeometryTclName << " SetInput [" << sourceName
-          << " GetOutput";
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
-                               "vtkGenericEnSightReader") == 0)
-      {
-      dataTclName = this->GetPVData()->GetVTKDataTclName();
-      charFound = strrchr(dataTclName, 'O');
-      pos = charFound - dataTclName - 1;
-      newReaderNum = atoi(dataTclName + pos);
-      if (newReaderNum != readerNum)
-        {
-        readerNum = newReaderNum;
-        outputNum = 0;
-        }
-      else
-        {
-        outputNum++;
-        }
-      *file << " " << outputNum << "]\n\n";
-      }
-    else
-      {
-      *file << "]\n\n";
-      }
-    
-    *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
-          << this->MapperTclName << " SetInput ["
-          << this->GeometryTclName << " GetOutput]\n\t";
+    *file << " " << outputNum << "]\n\n";
     }
   else
     {
-    *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
-          << this->MapperTclName << " SetInput [" << sourceName
-          << " GetOutput";
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
-                               "vtkGenericEnSightReader") == 0)
-      {
-      dataTclName = this->GetPVData()->GetVTKDataTclName();
-      charFound = strrchr(dataTclName, 'O');
-      pos = charFound - dataTclName - 1;
-      newReaderNum = atoi(dataTclName + pos);
-      if (newReaderNum != readerNum)
-        {
-        readerNum = newReaderNum;
-        outputNum = 0;
-        }
-      else
-        {
-        outputNum++;
-        }
-      *file << " " << outputNum << "]\n\t";
-      }
-    else
-      {
-      *file << "]\n\t";
-      }
+    *file << "]\n\n";
     }
+  
+  *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
+        << this->MapperTclName << " SetInput ["
+        << this->GeometryTclName << " GetOutput]\n\t";
   
   *file << this->MapperTclName << " SetImmediateModeRendering "
         << this->Mapper->GetImmediateModeRendering() << "\n\t";

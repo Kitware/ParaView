@@ -44,6 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 #include "vtkPVSourceInterface.h"
 #include "vtkContourFilter.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWLabel.h"
+#include "vtkPVData.h"
+#include "vtkPVApplication.h"
 
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

@@ -50,7 +50,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWViewCollection.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWSplitFrame.h"
-
+#ifdef _WIN32
+#include "vtkKWRegisteryUtilities.h"
+#endif
 #include "KitwareLogo.h"
 
 //------------------------------------------------------------------------------
@@ -125,6 +127,9 @@ vtkKWWindow::vtkKWWindow()
   this->PrintTargetDPI = 100;
 
   this->SupportHelp = 1;
+
+  this->WindowClass = NULL;
+  this->SetWindowClass("KitwareWidget");
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -166,6 +171,8 @@ vtkKWWindow::~vtkKWWindow()
     {
     delete [] this->StatusImageName;
     }
+
+  this->SetWindowClass(0);
 }
 
 void vtkKWWindow::DisplayHelp()
@@ -360,7 +367,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("toplevel %s -visual best %s",wname,args);
+  this->Script("toplevel %s -visual best %s -class %s",wname,args,
+	       this->WindowClass);
   this->Script("wm title %s {%s}",wname,
                app->GetApplicationName());
   this->Script("wm iconname %s {%s}",wname,
@@ -601,21 +609,6 @@ void vtkKWWindow::CreateStatusImage()
 }
 
 
-#ifdef _WIN32
-static void ReadAValue(HKEY hKey,char *val,char *key, char *adefault)
-{
-  DWORD dwType, dwSize;
-  
-  dwType = REG_SZ;
-  dwSize = 1023;
-  if(RegQueryValueEx(hKey,key, NULL, &dwType, 
-                     (BYTE *)val, &dwSize) != ERROR_SUCCESS)
-    {
-    strcpy(val,adefault);
-    }
-}
-#endif
-
 void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
 {
 #ifdef _WIN32
@@ -650,8 +643,8 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
 
     for (i = 0; i < 4; i++)
       {
-      ReadAValue(hKey, File, KeyName[i],"");
-      ReadAValue(hKey, Cmd, CmdName[i],"Open");
+      vtkKWRegisteryUtilities::ReadAValue(hKey, File, KeyName[i],"");
+      vtkKWRegisteryUtilities::ReadAValue(hKey, Cmd, CmdName[i],"Open");
       if (strlen(File) > 1)
         {
         char *cmd = new char [strlen(Cmd) + strlen(File) + 10];
@@ -705,7 +698,7 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
   else
     {
     // if this is the same as the current File1 then ignore
-    ReadAValue(hKey, File,"File1","");
+    vtkKWRegisteryUtilities::ReadAValue(hKey, File,"File1","");
     if (!strcmp(name,File))
       {
       RegCloseKey(hKey);
@@ -720,7 +713,7 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
       }
     
     // remove the old entry number 4
-    ReadAValue(hKey, File,"File4","");
+    vtkKWRegisteryUtilities::ReadAValue(hKey, File,"File4","");
     if (strlen(File) > 1)
       {
       this->GetMenuFile()->DeleteMenuItem(
@@ -729,20 +722,20 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
       }
     
     // move the other three down
-    ReadAValue(hKey, File,"File3","");
-    ReadAValue(hKey, Cmd,"File3Cmd","");
+    vtkKWRegisteryUtilities::ReadAValue(hKey, File,"File3","");
+    vtkKWRegisteryUtilities::ReadAValue(hKey, Cmd,"File3Cmd","");
     RegSetValueEx(hKey, "File4", 0, REG_SZ, 
 		  (CONST BYTE *)(const char *)File, strlen(File)+1);
     RegSetValueEx(hKey, "File4Cmd", 0, REG_SZ, 
 		  (CONST BYTE *)(const char *)Cmd, strlen(Cmd)+1);
-    ReadAValue(hKey, File,"File2","");
-    ReadAValue(hKey, Cmd,"File2Cmd","");
+    vtkKWRegisteryUtilities::ReadAValue(hKey, File,"File2","");
+    vtkKWRegisteryUtilities::ReadAValue(hKey, Cmd,"File2Cmd","");
     RegSetValueEx(hKey, "File3", 0, REG_SZ, 
 		  (CONST BYTE *)(const char *)File, strlen(File)+1);
     RegSetValueEx(hKey, "File3Cmd", 0, REG_SZ, 
 		  (CONST BYTE *)(const char *)Cmd, strlen(Cmd)+1);
-    ReadAValue(hKey, File,"File1","");
-    ReadAValue(hKey, Cmd,"File1Cmd","");
+    vtkKWRegisteryUtilities::ReadAValue(hKey, File,"File1","");
+    vtkKWRegisteryUtilities::ReadAValue(hKey, Cmd,"File1Cmd","");
     RegSetValueEx(hKey, "File2", 0, REG_SZ, 
 		  (CONST BYTE *)(const char *)File, strlen(File)+1);
     RegSetValueEx(hKey, "File2Cmd", 0, REG_SZ, 
@@ -821,5 +814,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.28 $");
+  this->ExtractRevision(os,"$Revision: 1.29 $");
 }

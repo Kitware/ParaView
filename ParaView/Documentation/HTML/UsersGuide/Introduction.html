@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Introduction</title>
+</head>
+
+<body>
+<!-- Start NavBar -->
+<table cellpadding="2" cellspacing="2" border="1">
+  <tbody>
+    <tr>
+      <td valign="Top"><a href="index.html">Up</a>
+      </td>
+      <td valign="Top"><a href="RunningWithMPI.html">Next</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<!-- End NavBar -->
+<h1>Introduction</h1>
+
+<p>
+ParaView is a turnkey application built on top of VTK.  
+It was designed to handle large data set by distributing the 
+data across multiple computers, but can also be used as a stand-alone 
+single-process application.
+</p>
+
+<p>
+ParaView's user interface and operations are closely tied to the 
+pipeline model in VTK.  Loading data creates a VTK reader object, 
+and processing the data (i.e. creating a contour) adds a VTK filter 
+to the pipeline.  Although creating a single pipeline is easy,  
+ParaView allows the user to build complex branching pipelines,
+which can get confusing.
+</p>
+
+<p>
+ParaView has the concept of a current data set, which is ussually 
+the last data loaded, or the result of the last filtering operation.
+The current data set is used as the input to any new filter created.
+The filters listed in the VTK-Filter menu are screened so that only 
+filters that will accept the current data as input are shown. 
+The current data can be changed by using the "Select" menu or 
+by using the navigation window to move through the pipeline. 
+</p>
+
+<p>
+This navigation feature allows you change parameters of any filter, 
+even if it is in the middle of the pipeline.  The pipeline 
+automactically updates to reflect changes made to filter parameters.
+</p>
+
+
+<hr>
+<address></address>
+<!-- hhmts start -->
+Last modified: Thu Oct 25 09:18:28 EDT 2001
+<!-- hhmts end -->
+</body> </html>

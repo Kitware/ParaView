@@ -48,10 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVWindow_h
 
 #include "vtkKWWindow.h"
-#include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 
+class vtkPVRenderView;
 class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
@@ -59,6 +59,7 @@ class vtkKWPushButton;
 class vtkKWInteractor;
 class vtkPVAnimationInterface;
 class vtkKWRotateCameraInteractor;
+class vtkKWCompositeCollection;
 
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
@@ -211,6 +212,12 @@ public:
   // Access to the RotateCamera interactor for thinks like setting its center of roation.
   vtkKWRotateCameraInteractor *GetRotateCameraInteractor()
     {return this->RotateCameraInteractor;}
+
+  // Description:
+  // Ability to disable and enable the menus on the menu bar.
+  // Most of the manipulation is internal to window.
+  void DisableMenus();
+  void EnableMenus();
 
   // Description:
   // Ability to disable and enable the filter buttons on the toolbar.

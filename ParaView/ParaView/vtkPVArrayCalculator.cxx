@@ -43,6 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkStringList.h"
 #include "vtkPVSourceInterface.h"
+#include "vtkPVData.h"
+#include "vtkKWLabel.h"
+#include "vtkKWPushButton.h"
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);

@@ -52,6 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWRadioButton.h"
 #include "vtkKWSelectPointInteractor.h"
 #include "vtkKWLabeledEntry.h"
+#include "vtkPVData.h"
+
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {

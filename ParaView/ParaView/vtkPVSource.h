@@ -50,12 +50,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVSource_h
 
 #include "vtkKWComposite.h"
-#include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkPVData.h"
-#include "vtkSource.h"
-#include "vtkPVInputMenu.h"
 
+class vtkKWPushButton;
+class vtkKWOptionMenu;
+class vtkPVApplication;
+class vtkPVInputMenu;
+class vtkSource;
+class vtkPVData;
 class vtkPVWindow;
 class vtkStringList;
 class vtkKWCheckButton;
@@ -64,6 +65,8 @@ class vtkKWEntry;
 class vtkPVSelectionList;
 class vtkPVSourceInterface;
 class vtkPVRenderView;
+class vtkKWLabeledFrame;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {

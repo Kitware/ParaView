@@ -115,6 +115,14 @@ int vtkPVExtentTranslator::PieceToExtent()
   //     << this->Extent[2] << ", " << this->Extent[3] << ", " 
   //     << this->Extent[4] << ", " << this->Extent[5] << endl;    
   
+  // Consider ghost levels.
+  this->Extent[0] -= this->GhostLevel;
+  this->Extent[1] += this->GhostLevel;
+  this->Extent[2] -= this->GhostLevel;
+  this->Extent[3] += this->GhostLevel;
+  this->Extent[4] -= this->GhostLevel;
+  this->Extent[5] += this->GhostLevel;
+
   // Clip with the whole extent passed in.
   if (this->Extent[0] < this->WholeExtent[0])
     {

@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Using the Navigation Window</title>
+</head>
+
+<body>
+<!-- Start NavBar -->
+<table cellpadding="2" cellspacing="2" border="1">
+  <tbody>
+    <tr>
+      <td valign="Top"><a href="LoadingData.html">Prev</a>
+      </td>
+      <td valign="Top"><a href="index.html">Up</a>
+      </td>
+      <td valign="Top"><a href="SelectMenu.html">Next</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<!-- End NavBar -->
+<h1>Using the Navigation Window</h1>
+
+<img alt="Navigation Frame" src="Images/navigationFrame.jpg">
+<p>
+The navigation window is a graphical representation of the pipeline
+structure used in ParaView.  Items are added to the pipeline as the user
+loads data or performs filtering operations on the data.  New filtering
+operations are performed on the current data set even if this data set is
+somewhere in the middle of the pipeline.  If the data set is not at the end
+of the pipeline, the new filtering operation will cause the pipeline to branch.
+In the example shown, both elevation and extract edges filtering operations
+were performed on the ShrinkPD1 data set.
+</p>
+<p>
+The name of the currently active data set is drawn in black and is centered in
+the navigation frame.  The names of the data sets directly before and directly
+after this one in the pipeline are displayed in blue text.  These names of
+these data sets are connected by arrows to the name of the current data set,
+indicating the filtering pipeline structure.  Clicking on the data set names
+displayed in blue will <b>1)</b> make that data set active and <b>2)</b>
+bring up the user interface corresponding to that data set.
+</p>
+
+If
+there are more data sets in the pipeline that are not currently represented
+in the navigation frame, an elipsis (...) is drawn on the corresponding end
+of the navigation frame.  </p>
+<p>
+<b>Note:</b> Only data sets at the end of the pipeline can be removed from the
+pipeline.  This is done by clicking the "Delete" button on the Parameters
+page associated with that data set.
+</p>
+<p>
+See also the <a href="SelectMenu.html">Select menu documentation</a>.
+</p>
+<hr>
+<address></address>
+<!-- hhmts start -->
+Last modified: Thu Oct 25 09:20:23 EDT 2001
+<!-- hhmts end -->
+</body> </html>
