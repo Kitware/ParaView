@@ -64,8 +64,12 @@ public:
   // Description:
   // Set the select command, called when the frame is selected by the user
   // (click in title bar).
+  // the double-click command is called when the frame title is double-clicked
+  // (note that it will also invoke the select command, since the first
+  // click acts as a select event).
   // This command will be passed a pointer to this object.
   virtual void SetSelectCommand(vtkKWObject *object, const char *method);
+  virtual void SetDoubleClickCommand(vtkKWObject *object, const char *method);
 
   // Description:
   // Set/Get the title foregroud/background color (in both normal and 
@@ -103,6 +107,7 @@ public:
   // Callbacks
   virtual void SelectionListCallback(const char *menuItem);
   virtual void SelectCallback();
+  virtual void DoubleClickCallback();
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -143,6 +148,7 @@ protected:
 
   char *SelectionListCommand;
   char *SelectCommand;
+  char *DoubleClickCommand;
 
   int Selected;
   int ShowSelectionList;

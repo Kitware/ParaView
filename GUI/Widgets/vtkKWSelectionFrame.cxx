@@ -23,7 +23,7 @@
 #include "vtkKWToolbarSet.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.23");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
@@ -37,6 +37,7 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
 
   this->SelectionListCommand  = NULL;
   this->SelectCommand         = NULL;
+  this->DoubleClickCommand    = NULL;
 
   this->TitleColor[0]                   = 1.0;
   this->TitleColor[1]                   = 1.0;
@@ -108,6 +109,12 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
     {
     delete [] this->SelectCommand;
     this->SelectCommand = NULL;
+    }
+
+  if (this->DoubleClickCommand)
+    {
+    delete [] this->DoubleClickCommand;
+    this->DoubleClickCommand = NULL;
     }
 }
 
@@ -239,32 +246,26 @@ void vtkKWSelectionFrame::Bind()
 
   ostrstream tk_cmd;
 
-  if (this->TitleBar && this->TitleBar->IsCreated())
+  const int nb_widgets = 4;
+  vtkKWWidget *widgets[nb_widgets] = 
     {
-    tk_cmd << "bind " << this->TitleBar->GetWidgetName() 
-           << " <ButtonPress-1> {" << this->GetTclName() 
-           << " SelectCallback}" << endl;
-    }
-
-  if (this->SelectionList && this->SelectionList->IsCreated())
+      this->TitleBar,
+      this->SelectionList,
+      this->ToolbarSet,
+      this->Title
+    };
+      
+  for (int i = 0; i < nb_widgets; i++)
     {
-    tk_cmd << "bind " << this->SelectionList->GetWidgetName() 
-           << " <ButtonPress-1> {" << this->GetTclName() 
-           << " SelectCallback}" << endl;
-    }
-
-  if (this->ToolbarSet && this->ToolbarSet->IsCreated())
-    {
-    tk_cmd << "bind " << this->ToolbarSet->GetWidgetName() 
-           << " <ButtonPress-1> {" << this->GetTclName() 
-           << " SelectCallback}" << endl;
-    }
-
-  if (this->Title && this->Title->IsCreated())
-    {
-    tk_cmd << "bind " << this->Title->GetWidgetName() 
-           << " <ButtonPress-1> {" << this->GetTclName() 
-           << " SelectCallback}" << endl;
+    if (widgets[i] && widgets[i]->IsCreated())
+      {
+      tk_cmd << "bind " << widgets[i]->GetWidgetName() 
+             << " <ButtonPress-1> {" << this->GetTclName() 
+             << " SelectCallback}" << endl;
+      tk_cmd << "bind " << widgets[i]->GetWidgetName() 
+             << " <Double-1> {" << this->GetTclName() 
+             << " DoubleClickCallback}" << endl;
+      }
     }
 
   tk_cmd << ends;
@@ -282,28 +283,24 @@ void vtkKWSelectionFrame::UnBind()
 
   ostrstream tk_cmd;
 
-  if (this->TitleBar && this->TitleBar->IsCreated())
+  const int nb_widgets = 4;
+  vtkKWWidget *widgets[nb_widgets] = 
     {
-    tk_cmd << "bind " << this->TitleBar->GetWidgetName() 
-           << " <ButtonPress-1> {}" << endl;
-    }
-
-  if (this->SelectionList && this->SelectionList->IsCreated())
+      this->TitleBar,
+      this->SelectionList,
+      this->ToolbarSet,
+      this->Title
+    };
+      
+  for (int i = 0; i < nb_widgets; i++)
     {
-    tk_cmd << "bind " << this->SelectionList->GetWidgetName() 
-           << " <ButtonPress-1> {}" << endl;
-    }
-
-  if (this->ToolbarSet && this->ToolbarSet->IsCreated())
-    {
-    tk_cmd << "bind " << this->ToolbarSet->GetWidgetName() 
-           << " <ButtonPress-1> {}" << endl;
-    }
-
-  if (this->Title && this->Title->IsCreated())
-    {
-    tk_cmd << "bind " << this->Title->GetWidgetName() 
-           << " <ButtonPress-1> {}" << endl;
+    if (widgets[i] && widgets[i]->IsCreated())
+      {
+      tk_cmd << "bind " << widgets[i]->GetWidgetName() 
+             << " <ButtonPress-1> {}" << endl;
+      tk_cmd << "bind " << widgets[i]->GetWidgetName() 
+             << " <Double-1> {}" << endl;
+      }
     }
   
   tk_cmd << ends;
@@ -497,6 +494,13 @@ void vtkKWSelectionFrame::SetSelectCommand(vtkKWObject *object,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetDoubleClickCommand(vtkKWObject *object,
+                                                const char *method)
+{
+  this->SetObjectMethodCommand(&this->DoubleClickCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SelectionListCallback(const char *menuItem)
 {
   if (this->SelectionListCommand)
@@ -520,6 +524,18 @@ void vtkKWSelectionFrame::SelectCallback()
     {
     this->Script("eval {%s %s}",
                  this->SelectCommand, this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::DoubleClickCallback()
+{
+  this->SelectCallback();
+
+  if (this->DoubleClickCommand)
+    {
+    this->Script("eval {%s %s}",
+                 this->DoubleClickCommand, this->GetTclName());
     }
 }
 
