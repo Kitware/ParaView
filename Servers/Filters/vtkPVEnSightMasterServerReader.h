@@ -50,6 +50,11 @@ public:
   // Get the number of pieces in the file.  Valid after
   // UpdateInformation.
   vtkGetMacro(NumberOfPieces, int);
+
+  // Description:
+  // This is necessary because the outputs do not exist until after execute.
+  virtual void Update();
+
 protected:
   vtkPVEnSightMasterServerReader();
   ~vtkPVEnSightMasterServerReader();
@@ -57,6 +62,7 @@ protected:
   virtual void ExecuteInformation();
   virtual void Execute();
   int ParseMasterServerFile();
+  void Balance();
   
   void SuperclassExecuteInformation();
   void SuperclassExecuteData();
