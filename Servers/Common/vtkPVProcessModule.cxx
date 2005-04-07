@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.30");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -66,6 +66,7 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->UseImmediateMode = 1;
   this->Options = 0;
   this->ApplicationInstallationDirectory = 0;
+  this->Timer = vtkTimerLog::New();
 }
 
 //----------------------------------------------------------------------------
@@ -76,6 +77,7 @@ vtkPVProcessModule::~vtkPVProcessModule()
   this->SetApplicationInstallationDirectory(0);
   this->FinalizeInterpreter();
   this->ServerInformation->Delete();
+  this->Timer->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -321,12 +323,19 @@ void vtkPVProcessModule::SetLocalProgress(const char* filter, int progress)
 void vtkPVProcessModule::LogStartEvent(char* str)
 {
   vtkTimerLog::MarkStartEvent(str);
+  this->Timer->StartTimer();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::LogEndEvent(char* str)
 {
+  this->Timer->StopTimer();
   vtkTimerLog::MarkEndEvent(str);
+  if (strstr(str, "id:") && this->LogFile)
+    {
+    *this->LogFile << str << ", " << this->Timer->GetElapsedTime()
+                   << " seconds" << endl;
+    }
 }
 
 //----------------------------------------------------------------------------

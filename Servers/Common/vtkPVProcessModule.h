@@ -34,6 +34,7 @@ class vtkPVPart;
 class vtkPVPartDisplay;
 class vtkSource;
 class vtkStringList;
+class vtkTimerLog;
 class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
@@ -195,6 +196,7 @@ protected:
   int UseTriangleStrips;
   int UseImmediateMode;
   char* ApplicationInstallationDirectory;
+  vtkTimerLog *Timer;
 
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
