@@ -29,7 +29,7 @@ set kw(vtkTemp584) [$kw(vtkTemp544) GetPVWidget {StandardDeviation}]
 $kw(vtkTemp584) SetValue 0.5
 $kw(vtkTemp544) AcceptCallback
 set kw(vtkTemp597) [$kw(vtkTemp544) GetPVOutput]
-$kw(vtkTemp597) ColorByPointField {RTData} 1
+$kw(vtkTemp597) ColorByArray {RTData} 3
 set kw(vtkTemp743) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
 set kw(vtkTemp749) [$kw(vtkTemp743) GetPVWidget {WholeExtent}]
 $kw(vtkTemp749) SetValue -2 2 -10 10 -10 10
@@ -53,7 +53,7 @@ set kw(vtkTemp783) [$kw(vtkTemp743) GetPVWidget {StandardDeviation}]
 $kw(vtkTemp783) SetValue 0.5
 $kw(vtkTemp743) AcceptCallback
 set kw(vtkTemp796) [$kw(vtkTemp743) GetPVOutput]
-$kw(vtkTemp796) ColorByPointField {RTData} 1
+$kw(vtkTemp796) ColorByArray {RTData} 3
 
 set map [$kw(vtkTemp743) GetPVColorMap]
 $map SetScalarRangeLock 1
@@ -82,7 +82,7 @@ set kw(vtkTemp930) [$kw(vtkTemp890) GetPVWidget {StandardDeviation}]
 $kw(vtkTemp930) SetValue 0.5
 $kw(vtkTemp890) AcceptCallback
 set kw(vtkTemp943) [$kw(vtkTemp890) GetPVOutput]
-$kw(vtkTemp943) ColorByPointField {RTData} 1
+$kw(vtkTemp943) ColorByArray {RTData} 3
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp544)
 set kw(vtkTemp1037) [$kw(vtkTemp1) CreatePVSource GroupParts]
 set kw(vtkTemp1043) [$kw(vtkTemp1037) GetPVWidget {inputs}]
@@ -91,7 +91,7 @@ $kw(vtkTemp1043) SetSelectState $kw(vtkTemp544) 1
 $kw(vtkTemp1043) SetSelectState $kw(vtkTemp890) 1
 $kw(vtkTemp1037) AcceptCallback
 set kw(vtkTemp1062) [$kw(vtkTemp1037) GetPVOutput]
-$kw(vtkTemp1062) ColorByPointField {RTData} 1
+$kw(vtkTemp1062) ColorByArray {RTData} 3
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1037)
 set kw(vtkTemp1156) [$kw(vtkTemp1) CreatePVSource Contour]
 set kw(vtkTemp1178) [$kw(vtkTemp1156) GetPVWidget {Input}]
@@ -111,7 +111,7 @@ set kw(vtkTemp1175) [$kw(vtkTemp1156) GetPVWidget {Compute Scalars}]
 $kw(vtkTemp1175) SetState 1
 $kw(vtkTemp1156) AcceptCallback
 set kw(vtkTemp1198) [$kw(vtkTemp1156) GetPVOutput]
-$kw(vtkTemp1198) ColorByPointField {RTData} 1
+$kw(vtkTemp1198) ColorByArray {RTData} 3
 [$kw(vtkTemp1156) GetPVColorMap] SetScalarRange -19.420813 253.372116
 
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1037)
@@ -121,7 +121,7 @@ $kw(vtkTemp1298) SetSelectState 0 0
 $kw(vtkTemp1298) SetSelectState 1 1
 $kw(vtkTemp1292) AcceptCallback
 set kw(vtkTemp1310) [$kw(vtkTemp1292) GetPVOutput]
-$kw(vtkTemp1310) ColorByPointField {RTData} 1
+$kw(vtkTemp1310) ColorByArray {RTData} 3
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1292)
 set kw(vtkTemp1404) [$kw(vtkTemp1) CreatePVSource ExtractGrid]
 set kw(vtkTemp1427) [$kw(vtkTemp1404) GetPVWidget {Input}]
@@ -137,7 +137,7 @@ $kw(vtkTemp1424) SetValue 1
 $kw(vtkTemp1404) AcceptCallback
 set kw(vtkTemp1438) [$kw(vtkTemp1404) GetPVOutput]
 $kw(vtkTemp1438) DrawSurface
-$kw(vtkTemp1438) ColorByPointField {RTData} 1
+$kw(vtkTemp1438) ColorByArray {RTData} 3
 $kw(vtkTemp17) SetRendererBackgroundColor 0 0 0
 $kw(vtkTemp17) SetCameraState 12.8281 -41.2598 -35.7789 -1.86549 10.1548 8.9481 -0.780543 -0.522102 0.343747
 

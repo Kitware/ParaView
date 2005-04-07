@@ -14,8 +14,8 @@ set kw(vtkTemp341) [$kw(vtkTemp273) GetPVWidget {Probe object}]
 $kw(vtkTemp341) SetCurrentValue {Line}
 $kw(vtkTemp273) AcceptCallback
 set kw(vtkTemp300) [$kw(vtkTemp273) GetPVOutput]
-$kw(vtkTemp300) ColorByPointField {RTData} 1
-$kw(vtkTemp300) ColorByPointField {RTData} 1
+$kw(vtkTemp300) ColorByArray {RTData} 3
+$kw(vtkTemp300) ColorByArray {RTData} 3
 set kw(vtkTemp280) [$kw(vtkTemp341) GetPVWidget {Line}]
 $kw(vtkTemp280) SetVisibility 1
 $kw(vtkTemp280) SetPoint1 -10.00000 -10.00000 -10.00000
@@ -23,29 +23,29 @@ $kw(vtkTemp280) SetPoint2 3.59489 6.26422 6.41830
 $kw(vtkTemp280) SetResolution 10
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointField {RTData} 1
-$kw(vtkTemp300) ColorByPointField {RTData} 1
+$kw(vtkTemp300) ColorByArray {RTData} 3
+$kw(vtkTemp300) ColorByArray {RTData} 3
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointField {RTData} 1
-$kw(vtkTemp300) ColorByPointField {RTData} 1
+$kw(vtkTemp300) ColorByArray {RTData} 3
+$kw(vtkTemp300) ColorByArray {RTData} 3
 $kw(vtkTemp280) SetPoint1 -10.00000 -10.00000 -10.00000
 $kw(vtkTemp280) SetPoint2 3.59489 6.26422 6.41830
 $kw(vtkTemp280) SetResolution 50
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointField {RTData} 1
-$kw(vtkTemp300) ColorByPointField {RTData} 1
+$kw(vtkTemp300) ColorByArray {RTData} 3
+$kw(vtkTemp300) ColorByArray {RTData} 3
 $kw(vtkTemp280) SetVisibility 0
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 0
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointField {RTData} 1
+$kw(vtkTemp300) ColorByArray {RTData} 3
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointField {RTData} 1
+$kw(vtkTemp300) ColorByArray {RTData} 3
 [$kw(vtkTemp273) GetShowXYPlotToggle] SetState 0
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp300) ColorByPointField {RTData} 1
+$kw(vtkTemp300) ColorByArray {RTData} 3
 set kw(vtkTemp314) [$kw(vtkTemp1) CreatePVSource TubeFilter]
 $kw(vtkTemp314) AcceptCallback
 set kw(vtkTemp319) [$kw(vtkTemp314) GetPVWidget {NumberOfSides}]

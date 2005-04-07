@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.7");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.8");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -81,10 +81,10 @@ vtkSMXYPlotDisplayProxy::~vtkSMXYPlotDisplayProxy()
 {
   this->Observer->SetTarget(0);
   this->Observer->Delete();
+  this->XYPlotWidget->SetXYPlotActor(0);
   this->XYPlotWidget->Delete();
   this->UpdateSuppressorProxy = 0;
   this->CollectProxy = 0;
-  this->XYPlotWidget->SetXYPlotActor(0);
   this->XYPlotActorProxy = 0;
   this->PropertyProxy =0;
   this->RenderModuleProxy = 0;

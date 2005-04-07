@@ -39,7 +39,7 @@ $pv(vtkTemp201) SetScaleMode "Scalar"
 $pv(vtkTemp201) SetScaleFactor .5
 $pv(vtkTemp179) AcceptCallback
 set pv(vtkTemp180) [$pv(vtkTemp179) GetPVOutput]
-$pv(vtkTemp180) ColorByPointField "scalars" 1
+$pv(vtkTemp180) ColorByArray "scalars" 3
 
 foreach a {bmp tif ppm png  jpg} {
     $pv(vtkTemp43) SaveAsImage vtkParaViewWriteTest.$a

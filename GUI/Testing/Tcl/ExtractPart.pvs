@@ -124,7 +124,7 @@ $kw(vtkTemp1623) SetPoint2 2.52220 1.34950 -0.39080
 $kw(vtkTemp1623) SetResolution 20
 $kw(vtkTemp1612) AcceptCallback
 set kw(vtkTemp1613) [$kw(vtkTemp1612) GetPVOutput]
-$kw(vtkTemp1613) ColorByPointField "Elevation" 1
+$kw(vtkTemp1613) ColorByArray {Elevation} 3
 $kw(vtkTemp1613) SetInterpolateColorsFlag 1
 
 # Retrace

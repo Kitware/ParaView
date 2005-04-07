@@ -52,7 +52,7 @@ set kw(vtkTemp1380) [$kw(vtkTemp1361) GetPVWidget {MaximumNumberOfSubdivisions}]
 $kw(vtkTemp1380) SetValue 8
 $kw(vtkTemp1361) AcceptCallback
 set kw(vtkTemp1385) [$kw(vtkTemp1361) GetPVOutput]
-$kw(vtkTemp1385) ColorByPointField {Elevation} 1
+$kw(vtkTemp1385) ColorByArray {Elevation} 3
 
 $kw(vtkTemp24) SetOrientationAxesVisibility 0
 

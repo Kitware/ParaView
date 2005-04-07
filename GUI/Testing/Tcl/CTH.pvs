@@ -47,12 +47,12 @@ $kw(vtkTemp1011) ColorByArray {Z Velocity} 4
 update
 $Application StopRecordingScript
 [ $Application GetMainWindow ] DeleteAllSources
-# Source the trace to regenerate the sources.
-# if {[catch {set channel [open test.tmp w]}] == 0 } {
-#    close $channel
-#    file delete -force test.tmp
-#    source "[$Application GetTraceFileName]"
-# }
+#Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "[$Application GetTraceFileName]"
+}
 
 source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc

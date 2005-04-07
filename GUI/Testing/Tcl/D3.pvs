@@ -5,7 +5,7 @@ source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp43) $argv $argc
 
 set kw(vtkTemp24) [$kw(vtkTemp1) GetMainView]
-set kw(vtkTemp183) [$kw(vtkTemp1) GetAnimationInterface]
+# set kw(vtkTemp183) [$kw(vtkTemp1) GetAnimationInterface]
 [$kw(vtkTemp1) GetRotateCameraButton] SetState 1
 $kw(vtkTemp1) ChangeInteractorStyle 1
 set kw(vtkTemp247) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
@@ -31,7 +31,7 @@ set kw(vtkTemp287) [$kw(vtkTemp247) GetPVWidget {StandardDeviation}]
 $kw(vtkTemp287) SetValue 0.5
 $kw(vtkTemp247) AcceptCallback
 set kw(vtkTemp293) [$kw(vtkTemp247) GetPVOutput]
-$kw(vtkTemp293) ColorByPointField {RTData} 1
+$kw(vtkTemp293) ColorByArray {RTData} 3
 $kw(vtkTemp293) DrawOutline
 $kw(vtkTemp293) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp247)
@@ -54,7 +54,7 @@ set kw(vtkTemp570) [$kw(vtkTemp479) GetPVWidget {InsideOut}]
 $kw(vtkTemp570) SetState 0
 $kw(vtkTemp479) AcceptCallback
 set kw(vtkTemp579) [$kw(vtkTemp479) GetPVOutput]
-$kw(vtkTemp579) ColorByPointField {RTData} 1
+$kw(vtkTemp579) ColorByArray {RTData} 3
 $kw(vtkTemp579) DrawSurface
 $kw(vtkTemp579) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp479)
@@ -69,7 +69,7 @@ $kw(vtkTemp702) SetPoint2 -1.9745 4.9575 0
 $kw(vtkTemp702) SetResolution 20
 $kw(vtkTemp690) AcceptCallback
 set kw(vtkTemp720) [$kw(vtkTemp690) GetPVOutput]
-$kw(vtkTemp720) ColorByPointField {Elevation} 1
+$kw(vtkTemp720) ColorByArray {Elevation} 3
 $kw(vtkTemp720) DrawSurface
 $kw(vtkTemp720) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp690)
@@ -84,7 +84,7 @@ $kw(vtkTemp899) AddScalarVariable {Elevation} {Elevation} 0
 $kw(vtkTemp899) SetFunctionLabel {Elevation*Elevation*kHat}
 $kw(vtkTemp887) AcceptCallback
 set kw(vtkTemp912) [$kw(vtkTemp887) GetPVOutput]
-$kw(vtkTemp912) ColorByPointField {Elevation} 1
+$kw(vtkTemp912) ColorByArray {Elevation} 3
 $kw(vtkTemp912) DrawSurface
 $kw(vtkTemp912) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp887)
@@ -97,7 +97,7 @@ set kw(vtkTemp1128) [$kw(vtkTemp1119) GetPVWidget {ScaleFactor}]
 $kw(vtkTemp1128) SetValue 2
 $kw(vtkTemp1119) AcceptCallback
 set kw(vtkTemp1136) [$kw(vtkTemp1119) GetPVOutput]
-$kw(vtkTemp1136) ColorByPointField {Elevation} 1
+$kw(vtkTemp1136) ColorByArray {Elevation} 3
 $kw(vtkTemp1136) DrawSurface
 $kw(vtkTemp1136) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1119)
@@ -112,7 +112,7 @@ set kw(vtkTemp1261) [$kw(vtkTemp1247) GetPVWidget {UseMinimalMemory}]
 $kw(vtkTemp1261) SetState 0
 $kw(vtkTemp1247) AcceptCallback
 set kw(vtkTemp1268) [$kw(vtkTemp1247) GetPVOutput]
-$kw(vtkTemp1268) ColorByPointField {Elevation} 1
+$kw(vtkTemp1268) ColorByArray {Elevation} 3
 $kw(vtkTemp1268) DrawSurface
 $kw(vtkTemp1268) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1247)
@@ -123,7 +123,7 @@ set kw(vtkTemp1386) [$kw(vtkTemp1379) GetPVWidget {RandomMode}]
 $kw(vtkTemp1386) SetState 0
 $kw(vtkTemp1379) AcceptCallback
 set kw(vtkTemp1393) [$kw(vtkTemp1379) GetPVOutput]
-$kw(vtkTemp1393) ColorByPointField {Piece} 1
+$kw(vtkTemp1393) ColorByArray {Piece} 3
 $kw(vtkTemp1393) DrawSurface
 $kw(vtkTemp1393) SetVisibility 1
 set kw(vtkTemp426) [$kw(vtkTemp1) GetPVColorMap {RTData} 1]
@@ -198,9 +198,9 @@ $kw(vtkTemp237) SetCurrentManipulator 1 0 {Pan}
 $kw(vtkTemp237) SetCurrentManipulator 2 1 {Pan}
 $kw(vtkTemp237) SetCurrentManipulator 2 0 {Zoom}
 set kw(vtkTemp237) [$kw(vtkTemp24) GetManipulatorControl3D]
-$kw(vtkTemp183) SetNumberOfFrames 100
-$kw(vtkTemp183) SetCurrentTime 0
-$kw(vtkTemp183) SetCacheGeometry 1
+# $kw(vtkTemp183) SetNumberOfFrames 100
+# $kw(vtkTemp183) SetCurrentTime 0
+# $kw(vtkTemp183) SetCacheGeometry 1
 $kw(vtkTemp1) SetCenterOfRotation 0 0 0
 
 source [file join [file dirname [info script]] Compare.tcl]

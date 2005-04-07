@@ -45,7 +45,7 @@ set kw(vtkTemp1182) [$kw(vtkTemp1138) GetPVWidget {Compute Scalars}]
 $kw(vtkTemp1182) SetState 1
 $kw(vtkTemp1138) AcceptCallback
 set kw(vtkTemp1190) [$kw(vtkTemp1138) GetPVOutput]
-$kw(vtkTemp1190) ColorByPointField {phi} 1
+$kw(vtkTemp1190) ColorByArray {phi} 3
 
 $kw(vtkTemp18) SetCameraState 10.542 21.511 -16.692  4.000 4.000 4.000  0.972 -0.153 0.178
 
