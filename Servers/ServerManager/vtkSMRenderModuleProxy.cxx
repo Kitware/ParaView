@@ -39,7 +39,7 @@
 #include "vtkFloatArray.h"
 #include "vtkSMPropertyIterator.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.9");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.10");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -874,8 +874,8 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
       for (unsigned int i=0; i < pp->GetNumberOfProxies(); i++)
         {
         vtkSMProxy* proxy = pp->GetProxy(i);
-        vtkSMSimpleDisplayProxy* pDisp = 
-          vtkSMSimpleDisplayProxy::SafeDownCast(proxy);
+        vtkSMDisplayProxy* pDisp = 
+          vtkSMDisplayProxy::SafeDownCast(proxy);
         if (pDisp && !pDisp->cmGetVisibility())
           {
           continue;
