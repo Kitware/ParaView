@@ -85,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.4");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.5");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1393,7 +1393,7 @@ void vtkPVDisplayGUI::ChangeActorColor(double r, double g, double b)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ColorByArray(const char* array, int field)
 {
-  this->AddTraceEntry("$kw(%s) ColorByArray %s %d", this->GetTclName(),
+  this->AddTraceEntry("$kw(%s) ColorByArray {%s} %d", this->GetTclName(),
     array, field);
   
   this->PVSource->ColorByArray(array, field);
@@ -1436,7 +1436,7 @@ void vtkPVDisplayGUI::ColorByPropertyInternal()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::VolumeRenderByArray(const char* name, int field)
 {
-  this->AddTraceEntry("$kw(%s) VolumeRenderByArray %s %d",
+  this->AddTraceEntry("$kw(%s) VolumeRenderByArray {%s} %d",
     this->GetTclName(), name, field);
   this->VolumeScalarSelectionWidget->SetValue(name , field);
   this->PVSource->VolumeRenderByArray(name, field);
@@ -1979,7 +1979,8 @@ void vtkPVDisplayGUI::SetPointSize(int size)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangePointSize()
 {
-  this->PVSource->GetDisplayProxy()->cmSetPointSize(this->PointSizeThumbWheel->GetValue());
+  this->PVSource->GetDisplayProxy()->cmSetPointSize(
+    this->PointSizeThumbWheel->GetValue());
  
   if ( this->GetPVRenderView() )
     {
@@ -2014,7 +2015,8 @@ void vtkPVDisplayGUI::SetLineWidth(int width)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangeLineWidth()
 {
-  this->PVSource->GetDisplayProxy()->cmSetLineWidth(this->LineWidthThumbWheel->GetValue());
+  this->PVSource->GetDisplayProxy()->cmSetLineWidth(
+    this->LineWidthThumbWheel->GetValue());
 
   if ( this->GetPVRenderView() )
     {
