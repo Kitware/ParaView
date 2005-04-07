@@ -5,8 +5,7 @@
 
   !define VERSION "@PARAVIEW_VERSION@"
   !define PATCH  "@PARAVIEW_VERSION_PATCH@"
-  !define PV_BIN "@ParaView_BINARY_DIR@"
-  !define PV_SRC "@ParaView_SOURCE_DIR@"
+  !define PV_INST "@PV_INSTALL_TOP@"
 
 
 ;--------------------------------
@@ -64,20 +63,14 @@
 
 Section "Dummy Section" SecDummy
 
-  SetOutPath "$INSTDIR\bin"
-  File "${PV_BIN}\bin\paraview.exe"
-  File "${PV_BIN}\bin\pvbatch.exe"
-  File "${PV_BIN}\bin\pvserver.exe"
-  File "${PV_BIN}\bin\*.dll"
-  File "C:\martink\msvcr71.dll"
-  File "C:\martink\msvcp71.dll"
-  
+  ;Use the entire tree produced by the INSTALL target.  Keep the
+  ;list of directories here in sync with the RMDir commands below.
   SetOutPath "$INSTDIR"
-  File /r "${PV_BIN}\lib"
-  File /r "${PV_SRC}\GUI\Demos"
+  File /r "${PV_INST}\bin"
+  File /r "${PV_INST}\lib"
+  File /r "${PV_INST}\share"
 
-  SetOutPath "$INSTDIR\Data"
-  File /r "${PV_SRC}\Data\Data"
+  @NSIS_EXTRA_COMMANDS@
 
   ;Store installation folder
   WriteRegStr HKCU "Software\Kitware\ParaView ${VERSION}" "" $INSTDIR
@@ -123,11 +116,20 @@ SectionEnd
 
 Section "Uninstall"
 
-  ;ADD YOUR OWN FILES HERE...
+  ;Remove directories we installed.
+  ;Keep the list of directories here in sync with the File commands above.
+  RMDir /r "$INSTDIR\bin"
+  RMDir /r "$INSTDIR\lib"
+  RMDir /r "$INSTDIR\share"
 
+  ;Remove the uninstaller itself.
   Delete "$INSTDIR\Uninstall.exe"
 
+  ;Remove the installation directory if it is empty.
   RMDir "$INSTDIR"
+
+  ; Remove the registry entries.
+  DeleteRegKey HKCU "Software\Kitware\ParaView ${VERSION}"
 
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
     

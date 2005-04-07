@@ -81,26 +81,60 @@ SET(VTK_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 SET(KW_INSTALL_NO_DEVELOPMENT ${PV_INSTALL_NO_DEVELOPMENT})
 
 #########################################################################
-# prepare for a release 
+# Setup release scripts.
+
+# Search for system runtime libraries based on the platform.  This is
+# not complete because it is used only for the release process by the
+# developers.
+IF(CMAKE_GENERATOR MATCHES "^Visual Studio 7 .NET 2003$")
+  STRING(REGEX REPLACE "\\\\" "/" SYSTEMROOT "$ENV{SYSTEMROOT}")
+  FOREACH(lib
+      "${SYSTEMROOT}/system32/msvcp71.dll"
+      "${SYSTEMROOT}/system32/msvcr71.dll"
+      )
+    IF(EXISTS ${lib})
+      SET(PV_INSTALL_SYSTEM_RUNTIME_LIBS
+        ${PV_INSTALL_SYSTEM_RUNTIME_LIBS} ${lib})
+    ENDIF(EXISTS ${lib})
+  ENDFOREACH(lib)
+ENDIF(CMAKE_GENERATOR MATCHES "^Visual Studio 7 .NET 2003$")
+
+# Include system runtime libraries in the installation if any are
+# specified by PV_INSTALL_SYSTEM_RUNTIME_LIBS.
+IF(PV_INSTALL_SYSTEM_RUNTIME_LIBS)
+  IF(WIN32)
+    INSTALL_PROGRAMS(${PV_INSTALL_BIN_DIR} ${PV_INSTALL_SYSTEM_RUNTIME_LIBS})
+  ELSE(WIN32)
+    INSTALL_PROGRAMS(${PV_INSTALL_LIB_DIR} ${PV_INSTALL_SYSTEM_RUNTIME_LIBS})
+  ENDIF(WIN32)
+ENDIF(PV_INSTALL_SYSTEM_RUNTIME_LIBS)
+
 IF(WIN32)
-FIND_PROGRAM(NSIS_MAKENSIS NAMES makensis 
-  PATHS [HKEY_LOCAL_MACHINE\\SOFTWARE\\NSIS]
-  DOC "Where is makensis.exe located"
-)
-MARK_AS_ADVANCED(NSIS_MAKENSIS)
-FIND_PROGRAM(WINZIP_WZZIP NAMES wzzip
-  PATHS   "C:/Program Files/WinZip" 
-  DOC "Where is makensis.exe located"
-)
-MARK_AS_ADVANCED(WINZIP_WZZIP)
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/ParaView.nsi.in
-  ${ParaView_BINARY_DIR}/Utilities/Release/ParaView.nsi IMMEDIATE @ONLY)
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/Win32Release.sh.in
-  ${ParaView_BINARY_DIR}/Utilities/Release/Win32Release.sh IMMEDIATE @ONLY)
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/paraview_release.sh.in
-  ${ParaView_BINARY_DIR}/Utilities/Release/paraview_release.sh IMMEDIATE @ONLY)
+  FIND_PROGRAM(NSIS_MAKENSIS NAMES makensis
+    PATHS [HKEY_LOCAL_MACHINE\\SOFTWARE\\NSIS]
+    DOC "Where is makensis.exe located"
+    )
+  MARK_AS_ADVANCED(NSIS_MAKENSIS)
+  FIND_PROGRAM(WINZIP_WZZIP NAMES wzzip
+    PATHS   "C:/Program Files/WinZip"
+    DOC "Where is makensis.exe located"
+    )
+  MARK_AS_ADVANCED(WINZIP_WZZIP)
+  STRING(REGEX REPLACE "/" "\\\\" PV_INSTALL_TOP "${CMAKE_INSTALL_PREFIX}")
+  SET(NSIS_EXTRA_COMMANDS ";Include system runtime libraries.\n  SetOutPath \"$INSTDIR\\bin\"\n")
+  FOREACH(lib ${PV_INSTALL_SYSTEM_RUNTIME_LIBS})
+    STRING(REGEX REPLACE "/" "\\\\" LIB "${lib}")
+    SET(NSIS_EXTRA_COMMANDS "${NSIS_EXTRA_COMMANDS}  File \"${LIB}\"\n")
+  ENDFOREACH(lib)
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/ParaView.nsi.in
+    ${ParaView_BINARY_DIR}/Utilities/Release/ParaView.nsi IMMEDIATE @ONLY)
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/Win32Release.sh.in
+    ${ParaView_BINARY_DIR}/Utilities/Release/Win32Release.sh IMMEDIATE @ONLY)
+  CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/paraview_release.sh.in
+    ${ParaView_BINARY_DIR}/Utilities/Release/paraview_release.sh IMMEDIATE @ONLY)
 ENDIF(WIN32)
 
+#########################################################################
 # The client server wrapper macro needs this name for
 # BUILD_SHARED_LIBS so it can work both inside and outside the tree.
 SET(PARAVIEW_BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS}")
@@ -504,6 +538,7 @@ IF (PARAVIEW_BUILD_GUI)
   SUBDIRS(GUI)
 ENDIF (PARAVIEW_BUILD_GUI)
 
+SUBDIRS(Data)
 
 SUBDIRS(Servers/Executables)
 
