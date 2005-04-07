@@ -48,7 +48,7 @@ public:
   virtual void UpdateVTKObjects();
 
   // Save the proxy state in the batch file.
-  virtual void SaveInBatchScript(ofstream *file);
+//  virtual void SaveInBatchScript(ofstream *file);
 
 protected:
   //BTX

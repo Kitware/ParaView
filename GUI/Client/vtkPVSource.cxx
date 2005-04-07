@@ -64,7 +64,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.8");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.9");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 #if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
@@ -1531,6 +1531,11 @@ void vtkPVSource::ColorByArray(const char* arrayname, int field)
     dataInfo->GetPointDataInformation() :  dataInfo->GetCellDataInformation();
   vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
     arrayname);
+  if (!arrayInfo)
+    {
+    vtkErrorMacro("Failed to find " << arrayname);
+    return;
+    }
 
   vtkPVColorMap* colorMap = this->GetPVWindow()->GetPVColorMap(arrayname,
     arrayInfo->GetNumberOfComponents());

@@ -59,7 +59,7 @@ public:
   virtual void SetVisibility(int visible) 
     { this->SetEnabled(visible); } 
 
-  virtual void SaveInBatchScript(ofstream *file);
+//  virtual void SaveInBatchScript(ofstream *file);
 
    // Description:
    // Update the VTK object on the server by pushing the values of all 

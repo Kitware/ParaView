@@ -22,7 +22,7 @@
 #include "vtkInteractorObserver.h"
 #include "vtkSMRenderModuleProxy.h"
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.8.4.1");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.8.4.2");
 
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
@@ -144,6 +144,7 @@ void vtkSM3DWidgetProxy::CreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
+/*
 void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
 {
   for (unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
@@ -180,6 +181,7 @@ void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
     }
 
 }
+*/
 
 //----------------------------------------------------------------------------
 void vtkSM3DWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)

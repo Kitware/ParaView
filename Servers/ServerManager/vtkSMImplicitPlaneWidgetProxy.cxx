@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.7.4.1");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()
@@ -200,6 +200,7 @@ void vtkSMImplicitPlaneWidgetProxy::SaveState(const char* name, ostream* file, v
 
 
 //----------------------------------------------------------------------------
+/*
 void vtkSMImplicitPlaneWidgetProxy::SaveInBatchScript(ofstream *file)
 {
   this->Superclass::SaveInBatchScript(file);
@@ -228,6 +229,7 @@ void vtkSMImplicitPlaneWidgetProxy::SaveInBatchScript(ofstream *file)
     *file << endl;
     }
 }
+*/
 
 //----------------------------------------------------------------------------
 void vtkSMImplicitPlaneWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
