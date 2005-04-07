@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.5.4.3");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.5.4.4");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
@@ -113,7 +113,7 @@ void vtkSMPointWidgetProxy::SaveState(const char* name, ostream* file,
     }
   this->Superclass::SaveState(name,file,indent);
 }
-/*
+
 //----------------------------------------------------------------------------
 void vtkSMPointWidgetProxy::SaveInBatchScript(ofstream *file)
 {
@@ -133,7 +133,6 @@ void vtkSMPointWidgetProxy::SaveInBatchScript(ofstream *file)
     *file << endl;
     }
 }
-*/
 
 //----------------------------------------------------------------------------
 void vtkSMPointWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)

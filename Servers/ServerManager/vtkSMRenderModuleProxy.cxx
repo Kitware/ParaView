@@ -39,7 +39,7 @@
 #include "vtkFloatArray.h"
 #include "vtkSMPropertyIterator.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.10");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.11");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -874,25 +874,28 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
       for (unsigned int i=0; i < pp->GetNumberOfProxies(); i++)
         {
         vtkSMProxy* proxy = pp->GetProxy(i);
-        vtkSMDisplayProxy* pDisp = 
-          vtkSMDisplayProxy::SafeDownCast(proxy);
-        if (pDisp && !pDisp->cmGetVisibility())
+        // Some displays get saved in batch other don't,
+        // instead of mirroring that logic to determine if
+        // the display got saved in batch, we just catch the
+        // exception.
+        if (proxy->GetNumberOfIDs() == 0)
           {
-          continue;
-          }
-        *file << "  [$Ren1 GetProperty "
-          << pp->GetXMLName() << "] AddProxy $pvTemp";
-        if (pDisp || proxy->GetNumberOfIDs() == 0) 
-          // all displays always use SelfIDs while saving in batch script.
-          {
-          *file << proxy->GetSelfID() ;
+          *file << "  catch { [$Ren1 GetProperty "
+            << pp->GetXMLName() << "] AddProxy $pvTemp"
+            << proxy->GetSelfID()
+            << " } ;#--- " << proxy->GetXMLName() << endl;
           }
         else
           {
-         *file  << proxy->GetID(0);
+          for (unsigned int kk=0; kk < proxy->GetNumberOfIDs(); kk++)
+            {
+            *file << "  catch { [$Ren1 GetProperty "
+              << pp->GetXMLName() << "] AddProxy $pvTemp"
+              << proxy->GetID(kk)
+              << " } ;#--- " << proxy->GetXMLName() 
+              << " part " << kk << endl; 
+            }
           }
-        *file << "  ;#--- " << proxy->GetXMLName() << endl;
-        *file << endl;
         }
       }
     else

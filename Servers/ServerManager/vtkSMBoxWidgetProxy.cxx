@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMBoxWidgetProxy);
-vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.5.4.1");
+vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.5.4.2");
 
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()
@@ -214,7 +214,6 @@ void vtkSMBoxWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void 
   this->Superclass::ExecuteEvent(wdg, event,p);
 }
 
-/*
 //----------------------------------------------------------------------------
 void vtkSMBoxWidgetProxy::SaveInBatchScript(ofstream *file)
 {
@@ -254,7 +253,6 @@ void vtkSMBoxWidgetProxy::SaveInBatchScript(ofstream *file)
     *file << "  $pvTemp" << id.ID << " UpdateVTKObjects"<<endl;
     }
 }
-*/
 
 //----------------------------------------------------------------------------
 void vtkSMBoxWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)

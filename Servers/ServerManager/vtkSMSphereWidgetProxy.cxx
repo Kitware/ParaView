@@ -22,7 +22,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkSMSphereWidgetProxy);
-vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.6.4.1");
+vtkCxxRevisionMacro(vtkSMSphereWidgetProxy, "1.6.4.2");
 
 //----------------------------------------------------------------------------
 vtkSMSphereWidgetProxy::vtkSMSphereWidgetProxy()
@@ -117,7 +117,6 @@ void vtkSMSphereWidgetProxy::CreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-/*
 void vtkSMSphereWidgetProxy::SaveInBatchScript(ofstream *file)
 {
   this->Superclass::SaveInBatchScript(file);
@@ -140,7 +139,7 @@ void vtkSMSphereWidgetProxy::SaveInBatchScript(ofstream *file)
     *file << endl;
     }
 }
-*/
+
 //----------------------------------------------------------------------------
 void vtkSMSphereWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

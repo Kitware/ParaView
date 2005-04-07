@@ -24,7 +24,7 @@
 
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.6.4.4");
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.6.4.5");
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {
@@ -133,7 +133,6 @@ void vtkSMLineWidgetProxy::SaveState(const char* name,ostream* file,
   this->Superclass::SaveState(name,file,indent);
 }
 
-/*
 //----------------------------------------------------------------------------
 void vtkSMLineWidgetProxy::SaveInBatchScript(ofstream *file)
 {
@@ -169,7 +168,7 @@ void vtkSMLineWidgetProxy::SaveInBatchScript(ofstream *file)
     *file << endl;
     }
 }
-*/
+
 //----------------------------------------------------------------------------
 void vtkSMLineWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
 {

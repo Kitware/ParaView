@@ -37,7 +37,7 @@ public:
   // Send a SetDrawPlane event to the server.
   vtkSetMacro(DrawPlane,int);
   
-//  virtual void SaveInBatchScript(ofstream *file);
+  virtual void SaveInBatchScript(ofstream *file);
 
   // Description:
   // Push the property values to the VTK object on the Servers.

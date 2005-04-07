@@ -22,7 +22,7 @@
 #include "vtkInteractorObserver.h"
 #include "vtkSMRenderModuleProxy.h"
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.8.4.2");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.8.4.3");
 
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
@@ -144,7 +144,6 @@ void vtkSM3DWidgetProxy::CreateVTKObjects(int numObjects)
 }
 
 //----------------------------------------------------------------------------
-/*
 void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
 {
   for (unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
@@ -160,8 +159,6 @@ void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
       << id.ID << " $pvTemp" << id.ID
       << endl;
     *file << "  $pvTemp" << id.ID << " UnRegister {}" << endl;
-    *file << "  [$Ren1 GetProperty Displayers] AddProxy $pvTemp"
-      << id.ID << endl;
 
     *file << "  [$pvTemp" << id.ID << " GetProperty IgnorePlaceWidgetChanges]"
       << " SetElements1 1" << endl;
@@ -181,7 +178,6 @@ void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
     }
 
 }
-*/
 
 //----------------------------------------------------------------------------
 void vtkSM3DWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)

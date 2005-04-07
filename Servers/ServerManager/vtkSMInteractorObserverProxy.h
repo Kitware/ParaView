@@ -40,7 +40,7 @@ public:
   virtual void SetEnabled(int e);
   vtkGetMacro(Enabled,int);
 
-//  virtual void SaveInBatchScript(ofstream *) { };
+  virtual void SaveInBatchScript(ofstream *f) { } 
 
 protected:
   vtkSMInteractorObserverProxy();

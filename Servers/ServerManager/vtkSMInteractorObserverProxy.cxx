@@ -22,9 +22,12 @@
 #include "vtkClientServerID.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPropertyIterator.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.8.2.5");
+vtkCxxRevisionMacro(vtkSMInteractorObserverProxy, "1.8.2.6");
 
 //===========================================================================
 //***************************************************************************
