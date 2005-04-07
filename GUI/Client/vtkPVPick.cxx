@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.16.2.1");
+vtkCxxRevisionMacro(vtkPVPick, "1.16.2.2");
 
 
 //----------------------------------------------------------------------------
@@ -110,41 +110,7 @@ void vtkPVPick::CreateProperties()
   this->DataFrame->Create(pvApp, "frame", "");
   this->Script("pack %s",
                this->DataFrame->GetWidgetName());
-  // Create Point label display proxy.
-  ostrstream str;
-  str << this->GetSourceList() << "."
-    << this->GetName() << "." << "PickLabelDisplay"
-    << ends;
 
-  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  this->PickLabelDisplayProxy = vtkSMPointLabelDisplayProxy::SafeDownCast(
-    pxm->NewProxy("displays", "PointLabelDisplay"));
-  if (!this->PickLabelDisplayProxy)
-    {
-    vtkErrorMacro("Failed to create Pick Label Display proxy.");
-    return;
-    }
-  
-  this->SetPickLabelDisplayProxyName(str.str());
-  str.rdbuf()->freeze(0);
-  pxm->RegisterProxy("displays", this->PickLabelDisplayProxyName,
-    this->PickLabelDisplayProxy);
-
-  // Set the input.
-  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
-    this->PickLabelDisplayProxy->GetProperty("Input"));
-  if (!ip)
-    {
-    vtkErrorMacro("Failed to find property Input on PickLabelDisplayProxy.");
-    return;
-    }
-  ip->RemoveAllProxies();
-  ip->AddProxy(this->GetProxy());
-  this->PickLabelDisplayProxy->cmSetVisibility(0);
-  this->PickLabelDisplayProxy->UpdateVTKObjects();
-  
-  // Add to render module.
-  this->AddDisplayToRenderModule(this->PickLabelDisplayProxy);
 }
 
 
@@ -153,6 +119,45 @@ void vtkPVPick::AcceptCallbackInternal()
 {
   // call the superclass's method
   this->Superclass::AcceptCallbackInternal();
+
+  if (!this->PickLabelDisplayProxy)
+    {
+    // Create Point label display proxy.
+    ostrstream str;
+    str << this->GetSourceList() << "."
+      << this->GetName() << "." << "PickLabelDisplay"
+      << ends;
+
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    this->PickLabelDisplayProxy = vtkSMPointLabelDisplayProxy::SafeDownCast(
+      pxm->NewProxy("displays", "PointLabelDisplay"));
+    if (!this->PickLabelDisplayProxy)
+      {
+      vtkErrorMacro("Failed to create Pick Label Display proxy.");
+      return;
+      }
+
+    this->SetPickLabelDisplayProxyName(str.str());
+    str.rdbuf()->freeze(0);
+    pxm->RegisterProxy("displays", this->PickLabelDisplayProxyName,
+      this->PickLabelDisplayProxy);
+
+    // Set the input.
+    vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+      this->PickLabelDisplayProxy->GetProperty("Input"));
+    if (!ip)
+      {
+      vtkErrorMacro("Failed to find property Input on PickLabelDisplayProxy.");
+      return;
+      }
+    ip->RemoveAllProxies();
+    ip->AddProxy(this->GetProxy());
+    this->PickLabelDisplayProxy->cmSetVisibility(0);
+    this->PickLabelDisplayProxy->UpdateVTKObjects();
+
+    // Add to render module.
+    this->AddDisplayToRenderModule(this->PickLabelDisplayProxy);
+    }
     
   // We need to update manually for the case we are probing one point.
   this->PickLabelDisplayProxy->Update();

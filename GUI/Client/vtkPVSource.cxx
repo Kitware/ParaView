@@ -64,7 +64,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.7");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.8");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 #if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
@@ -1172,7 +1172,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
     else
       {
-      ccpp->RemoveAllProxies();
       ccpp->AddProxy(this->Proxy);
       this->CubeAxesDisplayProxy->UpdateVTKObjects();
       }
@@ -1193,7 +1192,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
     else
       {
-      ccpp->RemoveAllProxies();
       ccpp->AddProxy(this->Proxy);
       this->PointLabelDisplayProxy->UpdateVTKObjects();
       }

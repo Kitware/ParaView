@@ -65,6 +65,7 @@ void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input)
   this->CreateVTKObjects(1);
 
   this->SetupPipeline(); // Have to this earlier
+  this->SetupDefaults(); 
   
   vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
     this->CollectProxy->GetProperty("Input"));
@@ -76,7 +77,7 @@ void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input)
   ip->RemoveAllProxies();
   ip->AddProxy(input);
 
-  this->SetupDefaults();
+
 }
 
 
