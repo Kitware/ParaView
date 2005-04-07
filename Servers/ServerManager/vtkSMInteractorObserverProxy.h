@@ -65,8 +65,8 @@ protected:
   //This is needed since change the Current renderer of the vtk3DWidget
   //does not lead to a call to Enable. 
 
-  void SetCurrentRenderer(vtkSMProxy* renderer);
-  void SetInteractor(vtkSMProxy* interactor);
+  virtual void SetCurrentRenderer(vtkSMProxy* renderer);
+  virtual void SetInteractor(vtkSMProxy* interactor);
 
   virtual void CreateVTKObjects(int numObjects);
   
