@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.3");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.4");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadPNGImage(
@@ -475,6 +475,11 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
 
     out << endl << " */" << endl;
 
+    int section_idx = 0;
+    unsigned long max_bytes = 65530;
+
+    const char *pixel_byte_type = "const unsigned char";
+
     out 
       << "#define image_" << image_name << "_width         " 
       << width << endl
@@ -485,8 +490,13 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
       << "#define image_" << image_name << "_buffer_length " 
       << nb_of_bytes << endl
       << endl
-      << "static unsigned char image_" << image_name << "[] = " << endl
-      << (opt_base64 ? "  \"" : "{\n  ");
+      << "static " << pixel_byte_type << " image_" << image_name;
+    if (nb_of_bytes >= max_bytes)
+      {
+      out << "_section_" << ++section_idx;
+      }
+    out << "[] = " << endl
+        << (opt_base64 ? "  \"" : "{\n  ");
 
     // Loop over pixels
 
@@ -496,20 +506,39 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     int cc = 0;
     while (ptr < (end - 1))
       {
-      if (opt_base64)
+      if (cc % max_bytes == max_bytes - 1)
         {
-        out << *ptr;
-        if (cc % 70 == 69)
+        if (opt_base64)
           {
-          out << "\"" << endl << "  \"";
+          out << *ptr << "\";" << endl;
           }
+        else
+          {
+          out << (unsigned int)*ptr << endl << "};" << endl;
+          }
+        ++section_idx;
+        out << endl
+            << "static " << pixel_byte_type << " image_" << image_name
+            << "_section_" << section_idx << "[] = " << endl
+            << (opt_base64 ? "  \"" : "{\n  ");
         }
       else
         {
-        out << (unsigned int)*ptr << ", ";
-        if (cc % 15 == 14)
+        if (opt_base64)
           {
-          out << endl << "  ";
+          out << *ptr;
+          if (cc % 70 == 69)
+            {
+            out << "\"" << endl << "  \"";
+            }
+          }
+        else
+          {
+          out << (unsigned int)*ptr << ", ";
+          if (cc % 15 == 14)
+            {
+            out << endl << "  ";
+            }
           }
         }
       cc++;
@@ -518,14 +547,30 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
 
     if (opt_base64)
       {
-      out << *ptr << "\";";
+      out << *ptr << "\";" << endl;
       }
     else
       {
-      out << (unsigned int)*ptr << endl << "};";
+      out << (unsigned int)*ptr << endl << "};" << endl;
       }
 
-    out << endl << endl;
+    if (section_idx)
+      {
+      out << endl 
+          << "static " << pixel_byte_type << " *image_" << image_name
+          << "_sections[" << section_idx << "] = {" << endl;
+      for (int i = 1; i <= section_idx; i++)
+        {
+        out << "  image_" << image_name << "_section_" << i 
+            << (i < section_idx ? "," : "") << endl;
+        }
+      out << "};" << endl
+          << endl
+          << "#define image_" << image_name << "_nb_sections    " 
+          << section_idx << endl;
+      }
+
+    out << endl;
 
     // Free mem
 

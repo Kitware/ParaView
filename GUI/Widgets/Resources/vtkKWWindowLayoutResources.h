@@ -7,7 +7,7 @@
 #define image_KWWindowLayout1x1_pixel_size    3
 #define image_KWWindowLayout1x1_buffer_length 40
 
-static unsigned char image_KWWindowLayout1x1[] = 
+static const unsigned char image_KWWindowLayout1x1[] = 
   "eNpjYCAfPH1wg1Q0qnFU46jGwaaRPAAAa7/zXA==";
 
 /* 
@@ -19,7 +19,7 @@ static unsigned char image_KWWindowLayout1x1[] =
 #define image_KWWindowLayout1x1c_pixel_size    3
 #define image_KWWindowLayout1x1c_buffer_length 40
 
-static unsigned char image_KWWindowLayout1x1c[] = 
+static const unsigned char image_KWWindowLayout1x1c[] = 
   "eNpjYCAf/H93klQ0qnFU46jGwaaRPAAAXjoPpA==";
 
 /* 
@@ -31,7 +31,7 @@ static unsigned char image_KWWindowLayout1x1c[] =
 #define image_KWWindowLayout1x2_pixel_size    3
 #define image_KWWindowLayout1x2_buffer_length 40
 
-static unsigned char image_KWWindowLayout1x2[] = 
+static const unsigned char image_KWWindowLayout1x2[] = 
   "eNpjYCAfPH1wg1Q0qnEQahxNAKMJgAwAAFaaxu8=";
 
 /* 
@@ -43,7 +43,7 @@ static unsigned char image_KWWindowLayout1x2[] =
 #define image_KWWindowLayout1x2c_pixel_size    3
 #define image_KWWindowLayout1x2c_buffer_length 40
 
-static unsigned char image_KWWindowLayout1x2c[] = 
+static const unsigned char image_KWWindowLayout1x2c[] = 
   "eNpjYCAf/H93klQ0qnEQahxNAKMJgAwAAMJS4X8=";
 
 /* 
@@ -55,7 +55,7 @@ static unsigned char image_KWWindowLayout1x2c[] =
 #define image_KWWindowLayout2x1_pixel_size    3
 #define image_KWWindowLayout2x1_buffer_length 40
 
-static unsigned char image_KWWindowLayout2x1[] = 
+static const unsigned char image_KWWindowLayout2x1[] = 
   "eNpjYCAfPH1wAyvCLzWqcVTjqMZBpZE8AABWmsbv";
 
 /* 
@@ -67,7 +67,7 @@ static unsigned char image_KWWindowLayout2x1[] =
 #define image_KWWindowLayout2x1c_pixel_size    3
 #define image_KWWindowLayout2x1c_buffer_length 40
 
-static unsigned char image_KWWindowLayout2x1c[] = 
+static const unsigned char image_KWWindowLayout2x1c[] = 
   "eNpjYCAf/H93EivCLzWqcVTjqMZBpZE8AADCUuF/";
 
 /* 
@@ -79,7 +79,7 @@ static unsigned char image_KWWindowLayout2x1c[] =
 #define image_KWWindowLayout2x2_pixel_size    3
 #define image_KWWindowLayout2x2_buffer_length 44
 
-static unsigned char image_KWWindowLayout2x2[] = 
+static const unsigned char image_KWWindowLayout2x2[] = 
   "eNpjYCAfPH1wAyvCLzWqcbBpHE0AowmADAAAyjOdHw==";
 
 /* 
@@ -91,7 +91,7 @@ static unsigned char image_KWWindowLayout2x2[] =
 #define image_KWWindowLayout2x2c_pixel_size    3
 #define image_KWWindowLayout2x2c_buffer_length 44
 
-static unsigned char image_KWWindowLayout2x2c[] = 
+static const unsigned char image_KWWindowLayout2x2c[] = 
   "eNpjYCAf/H93EivCLzWqcbBpHE0AowmADAAA5E62Hw==";
 
 /* 
@@ -103,7 +103,7 @@ static unsigned char image_KWWindowLayout2x2c[] =
 #define image_KWWindowLayout2x3_pixel_size    3
 #define image_KWWindowLayout2x3_buffer_length 40
 
-static unsigned char image_KWWindowLayout2x3[] = 
+static const unsigned char image_KWWindowLayout2x3[] = 
   "eNpjYCAfPH1wAyvCLzVCNI6G6mioDu9QBQA923NP";
 
 /* 
@@ -115,7 +115,7 @@ static unsigned char image_KWWindowLayout2x3[] =
 #define image_KWWindowLayout2x3c_pixel_size    3
 #define image_KWWindowLayout2x3c_buffer_length 40
 
-static unsigned char image_KWWindowLayout2x3c[] = 
+static const unsigned char image_KWWindowLayout2x3c[] = 
   "eNpjYCAf/H93EivCLzVCNI6G6mioDu9QBQAGWYq/";
 
 /* 
@@ -127,7 +127,7 @@ static unsigned char image_KWWindowLayout2x3c[] =
 #define image_KWWindowLayout3x2_pixel_size    3
 #define image_KWWindowLayout3x2_buffer_length 44
 
-static unsigned char image_KWWindowLayout3x2[] = 
+static const unsigned char image_KWWindowLayout3x2[] = 
   "eNpjYCAfPH1wAxkRKTKqcbBpHE0AowmADAAAPdtzTw==";
 
 /* 
@@ -139,6 +139,6 @@ static unsigned char image_KWWindowLayout3x2[] =
 #define image_KWWindowLayout3x2c_pixel_size    3
 #define image_KWWindowLayout3x2c_buffer_length 44
 
-static unsigned char image_KWWindowLayout3x2c[] = 
+static const unsigned char image_KWWindowLayout3x2c[] = 
   "eNpjYCAf/H93EhkRKTKqcbBpHE0AowmADAAABlmKvw==";
 

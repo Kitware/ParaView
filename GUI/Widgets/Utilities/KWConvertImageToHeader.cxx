@@ -12,8 +12,10 @@
 
 =========================================================================*/
 #include "vtkKWResourceUtilities.h"
+#include "vtkOutputWindow.h"
 
 #include <kwsys/CommandLineArguments.hxx>
+#include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 int unknown_argument_handler(const char *, void *) { return 0; };
@@ -21,13 +23,17 @@ int unknown_argument_handler(const char *, void *) { return 0; };
 //----------------------------------------------------------------------------
 void display_usage(kwsys::CommandLineArguments &args)
 {
-  kwsys_ios::cerr << "Usage: " << args.GetArgv0() << " [--update] [--zlib] [--base64] header.h image.png [image.png image.png...]" << kwsys_ios::endl;
+  kwsys_stl::string exe_basename = 
+    kwsys::SystemTools::GetFilenameName(args.GetArgv0());
+  kwsys_ios::cerr << "Usage: " << exe_basename << " [--update] [--zlib] [--base64] header.h image.png [image.png image.png...]" << kwsys_ios::endl;
   kwsys_ios::cerr << args.GetHelp();
 }
 
 //----------------------------------------------------------------------------
 int main(int argc, char **argv)
 {
+  vtkOutputWindow::GetInstance()->PromptUserOn();
+
   kwsys::CommandLineArguments args;
 
   int option_update = 0;
@@ -77,6 +83,8 @@ int main(int argc, char **argv)
     option_base64 *=
       vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_BASE64;
    
+    kwsys_ios::cout << "- " << rem_argv[1] << endl;
+
     vtkKWResourceUtilities::ConvertImageToHeader(
       rem_argv[1], (const char **)&rem_argv[2], rem_argc - 2, 
       option_update | option_zlib | option_base64);

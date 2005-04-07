@@ -469,10 +469,11 @@ void vtkPVApplication::CreateSplashScreen()
 
   int i;
   unsigned char *curPos = buffer;
-  for (i = 0; i < 10; i++)
+  for (i = 0; i < image_PVSplashScreen_nb_sections; i++)
     {
-    memcpy(curPos, image_PVSplashScreen[i], strlen(image_PVSplashScreen[i]));
-    curPos += strlen(image_PVSplashScreen[i]);
+    size_t len = strlen((const char*)image_PVSplashScreen_sections[i]);
+    memcpy(curPos, image_PVSplashScreen_sections[i], len);
+    curPos += len;
     }
   
   this->CreatePhoto("PVSplashScreen", 
