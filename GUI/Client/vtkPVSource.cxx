@@ -64,7 +64,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.9");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.10");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 #if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
@@ -1518,6 +1518,12 @@ void vtkPVSource::SetDefaultColorParameters()
 //----------------------------------------------------------------------------
 void vtkPVSource::ColorByArray(const char* arrayname, int field)
 {
+  if (arrayname == 0)
+    {
+    this->ColorByArray((vtkPVColorMap*)0, 0);
+    return;
+    }
+
   if (field != vtkSMDisplayProxy::POINT_FIELD_DATA &&
     field != vtkSMDisplayProxy::CELL_FIELD_DATA)
     {
@@ -1600,6 +1606,19 @@ void vtkPVSource::ColorByArray(vtkPVColorMap* colorMap, int field)
       return;
       }
     d_svp->SetElement(0, svp->GetElement(0));
+    }
+  else
+    {
+    pp = vtkSMProxyProperty::SafeDownCast(
+      this->DisplayProxy->GetProperty("LookupTable"));
+    if (!pp)
+      {
+      vtkErrorMacro("Failed to find property LookupTable on vtkSMDisplayProxy.");
+      return;
+      }
+    pp->RemoveAllProxies();
+    // it is important to remove the LUT, otherwise, it gets saved in the
+    // batch script.
     }
 
   ivp = vtkSMIntVectorProperty::SafeDownCast(

@@ -85,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.5");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.6");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1419,7 +1419,12 @@ void vtkPVDisplayGUI::ColorByProperty()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ColorByPropertyInternal()
 {
-  this->PVSource->GetDisplayProxy()->cmSetScalarVisibility(0);
+//  this->PVSource->GetDisplayProxy()->cmSetScalarVisibility(0);
+  // NOTE: don't ever directly set the Scalar Visibility on the part display.
+  // Instead use PVSource. Since, we need to remove the LUT from the proxy 
+  // property otherwise the batch may be incorrect.
+  this->PVSource->ColorByArray((char*) 0, 0);
+
   double *color = this->ColorButton->GetColor();
   this->SetActorColor(color[0], color[1], color[2]);
 

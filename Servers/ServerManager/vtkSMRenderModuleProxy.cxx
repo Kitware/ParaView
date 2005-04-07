@@ -38,8 +38,11 @@
 #include "vtkCamera.h"
 #include "vtkFloatArray.h"
 #include "vtkSMPropertyIterator.h"
+#include "vtkWindowToImageFilter.h"
+#include "vtkImageWriter.h"
+#include "vtkInstantiator.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.11");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.12");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -904,6 +907,44 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
       }
     }
   iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::WriteImage(const char* filename,
+  const char* writerName)
+{
+  if (!filename || !writerName)
+    {
+    return;
+    }
+
+  // I am using the vtkPVRenderView approach for saving the image.
+  // instead of vtkSMDisplayWindowProxy approach of creating a proxy.
+
+  vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
+  w2i->SetInput(this->GetRenderWindow());
+  w2i->ReadFrontBufferOff();
+  w2i->ShouldRerenderOff();
+  w2i->Update();
+  
+  vtkObject* object = vtkInstantiator::CreateInstance(writerName);
+  if (!object)
+    {
+    vtkErrorMacro("Failed to create Writer " << writerName);
+    return;
+    }
+  vtkImageWriter* writer = vtkImageWriter::SafeDownCast(object);
+  if (!writer)
+    {
+    vtkErrorMacro("Object is not a vtkImageWriter: " << object->GetClassName());
+    object->Delete();
+    return;
+    }
+  writer->SetInput(w2i->GetOutput());
+  writer->SetFileName(filename);
+  writer->Write();
+  writer->Delete();
+  w2i->Delete();
 }
 
 //-----------------------------------------------------------------------------
