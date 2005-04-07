@@ -28,14 +28,13 @@
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
-#include "vtkPickPointWidget.h"
 #include "vtkRenderer.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMPointWidgetProxy.h"
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.46.2.3");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.46.2.4");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -238,23 +237,11 @@ void vtkPVPointWidget::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   int i;
-  unsigned int ui;
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
     {
     this->SetTraceName("Point");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
-    }
-  // Widget needs the RenderModule for picking
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  for (ui=0; ui<this->WidgetProxy->GetNumberOfIDs(); ui++)
-    {
-    vtkPickPointWidget* widget = vtkPickPointWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID(ui)));
-    if (widget)
-      {
-      widget->SetRenderModuleProxy(pvApp->GetRenderModuleProxy());
-      }
     }
   
   this->SetFrameLabel("Point Widget");

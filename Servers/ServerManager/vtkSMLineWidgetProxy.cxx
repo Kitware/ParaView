@@ -14,16 +14,17 @@
 =========================================================================*/
 #include "vtkSMLineWidgetProxy.h"
 
-#include "vtkPickLineWidget.h"
+#include "vtkLineWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.6.4.2");
 
+
+vtkStandardNewMacro(vtkSMLineWidgetProxy);
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.6.4.3");
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {
@@ -31,7 +32,6 @@ vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
   this->Point1[1] = this->Point1[2] = 0;
   this->Point2[0] = 0.5;
   this->Point2[1] = this->Point2[2] = 0;
-  this->SetVTKClassName("vtkPickLineWidget");
 }
 
 //----------------------------------------------------------------------------
@@ -80,22 +80,10 @@ void vtkSMLineWidgetProxy::CreateVTKObjects(int numObjects)
 
   //superclass will create the stream objects
   this->Superclass::CreateVTKObjects(numObjects);
+  
   //now do additional initialization on the streamobjects
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
- /* 
-  // Now create vtkPickPointWidget on the client.
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    stream << vtkClientServerStream::New
-      << "vtkPickLineWidget"
-      << this->GetID(cc)
-      << vtkClientServerStream::End;
-    }
-  pm->SendStream(vtkProcessModule::CLIENT, stream);
-  this->SetServers(
-    vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
-  */
   for(cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
@@ -108,7 +96,7 @@ void vtkSMLineWidgetProxy::CreateVTKObjects(int numObjects)
 //----------------------------------------------------------------------------
 void vtkSMLineWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void *p)
 {
-  vtkPickLineWidget* widget = vtkPickLineWidget::SafeDownCast(wdg);
+  vtkLineWidget* widget = vtkLineWidget::SafeDownCast(wdg);
   if (!widget)
     {
     return;

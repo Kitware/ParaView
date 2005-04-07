@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPickLineWidgetProxy.h
+  Module:    vtkSMPickPointWidgetProxy.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,34 +12,25 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPickLineWidget - Proxy with picking extensions.
+// .NAME vtkSMPickPointWidgetProxy - Proxy with picking extensions.
 // .SECTION Description
-// This class is based on vtkPickLineWidget.
-// Instead of creating a client instance on vtkPickLineWidget, the 
-// functionality of picking has been moved to the proxy, since, picking
-// needs RenderModuleProxy, and hence typically, never reside on the
-// Servers.
-// This is a subclass of vtkSMLineWidgetProxy that has key bindings for
-// picking the ends of the line widget.  I plan to have the first 'p' pick
-// the end closest to the picked point, subsequent 'p' will toggle between
-// the two ends.  We could make a new widget that would continue to
-// add line segments.
 // .SECTION See Also
-// vtkPickLineWidget
+// vtkPickPointWidget
 
-#ifndef __vtkSMPickLineWidgetProxy_h
-#define __vtkSMPickLineWidgetProxy_h
 
-#include "vtkSMLineWidgetProxy.h"
+#ifndef __vtkSMPickPointWidgetProxy_h
+#define __vtkSMPickPointWidgetProxy_h
+
+#include "vtkSMPointWidgetProxy.h"
 
 class vtkCallbackCommand;
 class vtkRenderWindowInteractor;
 
-class VTK_EXPORT vtkSMPickLineWidgetProxy : public vtkSMLineWidgetProxy
+class VTK_EXPORT vtkSMPickPointWidgetProxy : public vtkSMPointWidgetProxy
 {
 public:
-  static vtkSMPickLineWidgetProxy* New();
-  vtkTypeRevisionMacro(vtkSMPickLineWidgetProxy, vtkSMLineWidgetProxy);
+  static vtkSMPickPointWidgetProxy* New();
+  vtkTypeRevisionMacro(vtkSMPickPointWidgetProxy, vtkSMPointWidgetProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -48,8 +39,8 @@ public:
   virtual void AddToRenderModule(vtkSMRenderModuleProxy*);
   virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
 protected:
-  vtkSMPickLineWidgetProxy();
-  ~vtkSMPickLineWidgetProxy();
+  vtkSMPickPointWidgetProxy();
+  ~vtkSMPickPointWidgetProxy();
 
   // Determines the position of the widget end poins based on the 
   // pointer positions.
@@ -64,11 +55,13 @@ protected:
   unsigned long EventTag;
   vtkCallbackCommand* EventCallbackCommand;
   vtkRenderWindowInteractor* Interactor;
-  int LastPicked; // identifier for the last picked line end point.
 
 private:
-  vtkSMPickLineWidgetProxy(const vtkSMPickLineWidgetProxy&); // Not implemented.
-  void operator=(const vtkSMPickLineWidgetProxy&); // Not implemented.
+  vtkSMPickPointWidgetProxy(const vtkSMPickPointWidgetProxy&); // Not implemented.
+  void operator=(const vtkSMPickPointWidgetProxy&); // Not implemented.
+    
 };
+
+
 
 #endif

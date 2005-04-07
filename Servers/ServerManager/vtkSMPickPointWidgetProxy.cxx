@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPickLineWidgetProxy.cxx
+  Module:    vtkSMPickPointWidgetProxy.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -13,7 +13,7 @@
 
 =========================================================================*/
 
-#include "vtkSMPickLineWidgetProxy.h"
+#include "vtkSMPickPointWidgetProxy.h"
 #include "vtkObjectFactory.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCommand.h"
@@ -21,36 +21,36 @@
 #include "vtkRenderer.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkProcessModule.h"
-#include "vtkLineWidget.h"
+#include "vtkPointWidget.h"
 
-vtkStandardNewMacro(vtkSMPickLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPickLineWidgetProxy, "1.1.2.2");
+
+vtkStandardNewMacro(vtkSMPickPointWidgetProxy);
+vtkCxxRevisionMacro(vtkSMPickPointWidgetProxy, "1.1.2.1");
+
 //-----------------------------------------------------------------------------
-vtkSMPickLineWidgetProxy::vtkSMPickLineWidgetProxy()
+vtkSMPickPointWidgetProxy::vtkSMPickPointWidgetProxy()
 {
   this->EventTag = 0;
   this->Interactor = 0;
   this->EventCallbackCommand = vtkCallbackCommand::New();
   this->EventCallbackCommand->SetClientData(this);
-  this->EventCallbackCommand->SetCallback(vtkSMPickLineWidgetProxy::ProcessEvents);
-  this->LastPicked = 0;
-   
+  this->EventCallbackCommand->SetCallback(vtkSMPickPointWidgetProxy::ProcessEvents);
 }
 
 //-----------------------------------------------------------------------------
-vtkSMPickLineWidgetProxy::~vtkSMPickLineWidgetProxy()
+vtkSMPickPointWidgetProxy::~vtkSMPickPointWidgetProxy()
 {
   this->EventCallbackCommand->Delete();
 }
 
 //-----------------------------------------------------------------------------
 /*static*/
-void vtkSMPickLineWidgetProxy::ProcessEvents(vtkObject* vtkNotUsed(object), 
+void vtkSMPickPointWidgetProxy::ProcessEvents(vtkObject* vtkNotUsed(object), 
                                           unsigned long event,
                                           void* clientdata, 
                                           void* vtkNotUsed(calldata))
 {
-  vtkSMPickLineWidgetProxy* self = reinterpret_cast<vtkSMPickLineWidgetProxy*>(
+  vtkSMPickPointWidgetProxy* self = reinterpret_cast<vtkSMPickPointWidgetProxy*>(
     clientdata);
   if (!self)
     {
@@ -67,7 +67,7 @@ void vtkSMPickLineWidgetProxy::ProcessEvents(vtkObject* vtkNotUsed(object),
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMPickLineWidgetProxy::OnChar()
+void vtkSMPickPointWidgetProxy::OnChar()
 {
   if (!this->ObjectsCreated || this->GetNumberOfIDs() < (unsigned int)1)
     {
@@ -76,8 +76,8 @@ void vtkSMPickLineWidgetProxy::OnChar()
     }
 
   vtkRenderer* ren = this->CurrentRenderModuleProxy->GetRenderer();
-  
-  if (ren && this->Interactor->GetKeyCode() == 'p' || 
+
+  if (ren && this->Interactor->GetKeyCode() == 'p' ||
     this->Interactor->GetKeyCode() == 'P' )
     {
     if (this->CurrentRenderModuleProxy == NULL)
@@ -89,51 +89,13 @@ void vtkSMPickLineWidgetProxy::OnChar()
     int Y = this->Interactor->GetEventPosition()[1];
     float z = this->CurrentRenderModuleProxy->GetZBufferValue(X, Y);
     double pt[4];
-
+    
     // ComputeDisplayToWorld
     ren->SetDisplayPoint(double(X), double(Y), z);
     ren->DisplayToWorld();
     ren->GetWorldPoint(pt);
 
-    if (this->LastPicked == 0)
-      { // Choose the closest point.
-      const double *pt1 = this->GetPoint1();
-      const double *pt2 = this->GetPoint2();
-      double d1, d2, tmp[3];
-      tmp[0] = pt1[0]-pt[0]; 
-      tmp[1] = pt1[1]-pt[1]; 
-      tmp[2] = pt1[2]-pt[2];
-      d1 = tmp[0]*tmp[0] + tmp[1]*tmp[1] + tmp[2]*tmp[2];
-      tmp[0] = pt2[0]-pt[0]; 
-      tmp[1] = pt2[1]-pt[1]; 
-      tmp[2] = pt2[2]-pt[2];
-      d2 = tmp[0]*tmp[0] + tmp[1]*tmp[1] + tmp[2]*tmp[2];
-      this->LastPicked = 1;
-      if (d2 < d1)
-        {
-        this->LastPicked = 2;
-        }
-      }
-    else
-      { // toggle point
-      if (this->LastPicked == 1)
-        {
-        this->LastPicked = 2;
-        }
-      else
-        {
-        this->LastPicked = 1;
-        }
-      }
-
-    if (this->LastPicked == 1)
-      {
-      this->SetPoint1(pt[0], pt[1], pt[2]);
-      }
-    else
-      {
-      this->SetPoint2(pt[0], pt[1], pt[2]);
-      }
+    this->SetPosition(pt);
     this->UpdateVTKObjects(); // This will push down the values on to the
       // server objects (and client objects).
     this->InvokeEvent(vtkCommand::WidgetModifiedEvent); //So that the GUI
@@ -141,9 +103,8 @@ void vtkSMPickLineWidgetProxy::OnChar()
     this->Interactor->Render();
     }
 }
-
 //-----------------------------------------------------------------------------
-void vtkSMPickLineWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
+void vtkSMPickPointWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
   this->Superclass::AddToRenderModule(rm);
   if (this->Interactor || !this->ObjectsCreated || this->GetNumberOfIDs() < 1)
@@ -156,7 +117,7 @@ void vtkSMPickLineWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
   if (this->Interactor)
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-    vtkLineWidget* wdg = vtkLineWidget::SafeDownCast(
+    vtkPointWidget* wdg = vtkPointWidget::SafeDownCast(
       pm->GetObjectFromID(this->GetID(0)));
     
     this->EventTag = this->Interactor->AddObserver(vtkCommand::CharEvent,
@@ -166,7 +127,7 @@ void vtkSMPickLineWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 
 
 //-----------------------------------------------------------------------------
-void vtkSMPickLineWidgetProxy::RemoveFromRenderModule(
+void vtkSMPickPointWidgetProxy::RemoveFromRenderModule(
   vtkSMRenderModuleProxy* rm)
 {
   this->Superclass::RemoveFromRenderModule(rm);
@@ -178,8 +139,9 @@ void vtkSMPickLineWidgetProxy::RemoveFromRenderModule(
     }
   this->Interactor = 0;
 }
+
 //-----------------------------------------------------------------------------
-void vtkSMPickLineWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMPickPointWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 }

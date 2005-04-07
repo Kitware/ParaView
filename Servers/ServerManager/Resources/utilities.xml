@@ -290,9 +290,7 @@
   </ProxyGroup>
   
   <ProxyGroup name="3d_widgets">
-    <LineWidgetProxy name="LineWidgetProxy" class="vtkLineWidget"
-      client_class="vtkPickLineWidget">
-      <!-- vtkPickLineWidget is only created on the client -->
+    <PickLineWidgetProxy name="LineWidgetProxy" class="vtkLineWidget">
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
         command="SetIgnorePlaceWidgetChanges"
@@ -353,10 +351,9 @@
         default_values="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
-    </LineWidgetProxy>
+    </PickLineWidgetProxy>
 
-    <PointWidgetProxy name="PointWidgetProxy" class="vtkPointWidget"
-      client_class="vtkPickPointWidget">
+    <PickPointWidgetProxy name="PointWidgetProxy" class="vtkPointWidget">
       <!-- vtkPickPointWidget object is created only on the client -->
       <IntVectorProperty
         name="IgnorePlaceWidgetChanges"
@@ -397,7 +394,7 @@
         default_values="0" >
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
-    </PointWidgetProxy>
+    </PickPointWidgetProxy>
     
     <SphereWidgetProxy name="SphereWidgetProxy" class="vtkSphereWidget">
       <IntVectorProperty

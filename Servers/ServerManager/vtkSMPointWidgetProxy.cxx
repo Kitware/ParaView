@@ -18,11 +18,11 @@
 #include "vtkPVProcessModule.h"
 #include "vtkCommand.h"
 #include "vtkClientServerStream.h"
-#include "vtkPickPointWidget.h"
+#include "vtkPointWidget.h"
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.5.4.1");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.5.4.2");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
@@ -43,26 +43,11 @@ void vtkSMPointWidgetProxy::CreateVTKObjects(int numObjects)
     return;
     }
   unsigned int cc;
-  // Create the vtkPointWidget only on render server.
-//  this->SetServers(vtkProcessModule::RENDER_SERVER);
   
   this->Superclass::CreateVTKObjects(numObjects); 
   
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  /*
-  // Now create vtkPickPointWidget on the client.
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    stream << vtkClientServerStream::New
-      << "vtkPickPointWidget"
-      << this->GetID(cc)
-      << vtkClientServerStream::End;
-    }
-  pm->SendStream(vtkProcessModule::CLIENT, stream);
-  this->SetServers(
-    vtkProcessModule::RENDER_SERVER | vtkProcessModule::CLIENT);
-  */
   for( cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
@@ -100,7 +85,7 @@ void vtkSMPointWidgetProxy::UpdateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMPointWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void *p)
 {
-  vtkPickPointWidget *widget = vtkPickPointWidget::SafeDownCast(wdg);
+  vtkPointWidget *widget = vtkPointWidget::SafeDownCast(wdg);
   if ( !widget )
     {
     vtkErrorMacro( "This is not a point widget" );

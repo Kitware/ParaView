@@ -46,14 +46,6 @@ protected:
   vtkSMInteractorObserverProxy();
   ~vtkSMInteractorObserverProxy();
 
-  // Some 3DWidgets create special widgets on the client side
-  // and different ones on the serverside. (eg Point/Line).
-  // The XML attribute "class" specifies the server side VTKClassName.
-  // If client side VTKClassName (attribute "client_class") is specified
-  // then that object will be created on the client side.
-  char* ClientSideVTKClassName;
-  vtkSetStringMacro(ClientSideVTKClassName);
-  
   void SetCurrentRenderModuleProxy(vtkSMRenderModuleProxy* rm);
 
   // I keep this pointer since some interactor observers may need to access
@@ -79,9 +71,6 @@ protected:
   friend class vtkSMInteractorObserverProxyObserver;
 //ETX
 
-  // Description:
-  // Read attributes from an XML element.
-  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 private:
   vtkSMInteractorObserverProxy(const vtkSMInteractorObserverProxy&); // Not implemented
   void operator=(const vtkSMInteractorObserverProxy&); // Not implemented

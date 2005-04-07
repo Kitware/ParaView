@@ -65,6 +65,8 @@ SET( ServerManagerCommon_SRCS
   vtkSMObject.cxx
   vtkSMPVDWriterProxy.cxx
   vtkSMPart.cxx
+  vtkSMPickLineWidgetProxy.cxx
+  vtkSMPickPointWidgetProxy.cxx
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMPropertyIterator.cxx

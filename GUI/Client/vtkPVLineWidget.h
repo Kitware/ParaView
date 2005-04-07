@@ -28,7 +28,6 @@
 
 class vtkKWEntry;
 class vtkKWLabel;
-class vtkPickLineWidget;
 
 class VTK_EXPORT vtkPVLineWidget : public vtkPV3DWidget
 {

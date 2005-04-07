@@ -18,7 +18,6 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkPickLineWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
@@ -40,7 +39,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.63.2.3");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.63.2.4");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -778,19 +777,6 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
-  // Widget needs the RenderModule for picking
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  unsigned int ui;
-  for (ui=0; ui<this->WidgetProxy->GetNumberOfIDs(); ui++)
-    {
-    vtkPickLineWidget* widget = vtkPickLineWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID(ui)));
-    if (widget)
-      {
-      widget->SetRenderModuleProxy(pvApp->GetRenderModuleProxy());
-      }
-    }
-  
 
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
