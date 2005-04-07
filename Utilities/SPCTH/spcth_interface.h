@@ -63,20 +63,20 @@ SPCTH_EXPORT int spcth_isAMR(SPCTH* spcth);
  * Data Block accessors
  *******************************/
 
-//! How many data blocks are in the file
+/*! How many data blocks are in the file */
 SPCTH_EXPORT int spcth_getNumberOfDataBlocksForCurrentTime(SPCTH* spcth);
 
-//! What are the dimensions of the particular data block
+/*! What are the dimensions of the particular data block */
 SPCTH_EXPORT void spcth_getDataBlockDimensions(SPCTH* spcth, int block_index, int *x, int *y, int *z);
 
-//! For AMR dataset, what is the level of the particular block
+/*! For AMR dataset, what is the level of the particular block */
 SPCTH_EXPORT int spcth_getDataBlockLevel(SPCTH* spcth, int block_index);
 
-//! For rectilinear grid, get spacing vectors for the particular block
+/*! For rectilinear grid, get spacing vectors for the particular block */
 SPCTH_EXPORT int spcth_getDataBlockVectors(SPCTH* spcth, int block_index,
   double *vx, double *vy, double *vz);
 
-//! Get bounds of a particular block
+/*! Get bounds of a particular block */
 SPCTH_EXPORT int spcth_getDataBlockBounds(SPCTH* spcth, int block_index, double *bounds);
 
 /*******************************
@@ -91,4 +91,4 @@ SPCTH_EXPORT int spcth_getCellFieldData(SPCTH* spcth, int block_index, int field
 }
 #endif
 
-#endif //SPCTH_INTERFACE_H
+#endif /* SPCTH_INTERFACE_H */
