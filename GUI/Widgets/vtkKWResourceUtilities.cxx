@@ -18,6 +18,10 @@
 #include "vtkObjectFactory.h"
 
 #include "vtk_png.h"
+#include "vtk_zlib.h"
+
+#include <kwsys/SystemTools.hxx>
+#include <kwsys/Base64.h>
 
 #ifdef _MSC_VER
 // Let us get rid of this funny warning on /W4:
@@ -28,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.2");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.3");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadPNGImage(
@@ -307,6 +311,235 @@ int vtkKWResourceUtilities::WritePNGImage(
     }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWResourceUtilities::ConvertImageToHeader(
+  const char *header_filename,
+  const char **image_filenames,
+  int nb_images,
+  int options)
+{
+  // Check parameters
+
+  if (!image_filenames || nb_images <= 0 || !header_filename)
+    {
+    vtkGenericWarningMacro("Unable to convert image, invalid parameters!");
+    return 0;
+    }
+
+  // Options
+
+  int opt_update = 
+    options & vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_UPDATE;
+  int opt_zlib = 
+    options & vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_ZLIB;
+  int opt_base64 = 
+    options & vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_BASE64;
+
+  // Update only, bail out if the header is more recent than all the images
+
+  if (opt_update && kwsys::SystemTools::FileExists(header_filename))
+    {
+    long int header_mod_time = 
+      kwsys::SystemTools::ModifiedTime(header_filename);
+    int up_to_date = 1;
+    for (int img_idx = 0; img_idx < nb_images; img_idx++)
+      {
+      if (image_filenames[img_idx] && 
+          (kwsys::SystemTools::ModifiedTime(image_filenames[img_idx]) >
+           header_mod_time))
+        {
+        up_to_date = 0;
+        break;
+        }
+      }
+    if (up_to_date)
+      {
+      return 1;
+      }
+    }
+
+  // Open header file
+
+  ofstream out(header_filename, ios::out);
+  if (out.fail())
+    {
+    vtkGenericWarningMacro("Unable to open header file " << header_filename);
+    return 0;
+    }
+
+  // Loop over the images
+
+  int all_ok = 1;
+
+  for (int img_idx = 0; img_idx < nb_images; img_idx++)
+    {
+    const char *image_filename = image_filenames[img_idx];
+
+    // Is the filename valid ?
+
+    if (!image_filename)
+      {
+      continue;
+      }
+
+    // Image exists ?
+
+    if (!kwsys::SystemTools::FileExists(image_filename))
+      {
+      vtkGenericWarningMacro("Unable to find image " << image_filename);
+      all_ok = 0;
+      continue;
+      }
+
+    // Read as PNG
+
+    int width, height, pixel_size;
+    unsigned char *image_buffer = NULL;
+
+    if (!vtkKWResourceUtilities::ReadPNGImage(
+          image_filename, &width, &height, &pixel_size, &image_buffer))
+      {
+      vtkGenericWarningMacro("Unable to read PNG image " << image_filename);
+      all_ok = 0;
+      continue;
+      }
+
+    unsigned long nb_of_pixels = width * height;
+    unsigned long nb_of_bytes = nb_of_pixels * pixel_size;
+
+    unsigned char *data_ptr = image_buffer;
+
+    // Zlib the buffer
+
+    unsigned char *zlib_buffer = NULL;
+    if (opt_zlib)
+      {
+      unsigned long zlib_buffer_size = 
+        (unsigned long)((float)nb_of_bytes * 1.2 + 12);
+      zlib_buffer = new unsigned char [zlib_buffer_size];
+      if (compress2(zlib_buffer, &zlib_buffer_size, 
+                    data_ptr, nb_of_bytes, 
+                    Z_BEST_COMPRESSION) != Z_OK)
+        {
+        vtkGenericWarningMacro("Unable to compress image buffer!");
+        delete [] zlib_buffer;
+        delete [] image_buffer;
+        all_ok = 0;
+        continue;
+        }
+      data_ptr = zlib_buffer;
+      nb_of_bytes = zlib_buffer_size;
+      }
+  
+    // Base64 the buffer
+
+    unsigned char *base64_buffer = NULL;
+    if (opt_base64)
+      {
+      base64_buffer = new unsigned char [nb_of_bytes * 2];
+      nb_of_bytes = 
+        kwsysBase64_Encode(data_ptr, nb_of_bytes, base64_buffer, 0);
+      if (nb_of_bytes == 0)
+        {
+        vtkGenericWarningMacro("Unable to base64 image buffer!");
+        delete [] zlib_buffer;
+        delete [] base64_buffer;
+        delete [] image_buffer;
+        all_ok = 0;
+        continue;
+        }
+      data_ptr = base64_buffer;
+      }
+    
+    // Output the image in the header
+
+    kwsys_stl::string image_basename = 
+      kwsys::SystemTools::GetFilenameName(image_filename);
+    kwsys_stl::string image_name = 
+      kwsys::SystemTools::GetFilenameWithoutExtension(image_basename);
+  
+    out << "/* " << endl
+        << " * Resource generated for image:" << endl
+        << " *    " << image_basename.c_str();
+
+    if (opt_base64 || opt_zlib)
+      {
+      out << " (" 
+          << (opt_zlib ? "zlib" : "") 
+          << (opt_zlib && opt_base64 ? ", " : "") 
+          << (opt_base64 ? "base64" : "")
+          << ")";
+      }
+
+    out << endl << " */" << endl;
+
+    out 
+      << "#define image_" << image_name << "_width         " 
+      << width << endl
+      << "#define image_" << image_name << "_height        " 
+      << height << endl
+      << "#define image_" << image_name << "_pixel_size    " 
+      << pixel_size << endl
+      << "#define image_" << image_name << "_buffer_length " 
+      << nb_of_bytes << endl
+      << endl
+      << "static unsigned char image_" << image_name << "[] = " << endl
+      << (opt_base64 ? "  \"" : "{\n  ");
+
+    // Loop over pixels
+
+    unsigned char *ptr = data_ptr;
+    unsigned char *end = data_ptr + nb_of_bytes;
+
+    int cc = 0;
+    while (ptr < (end - 1))
+      {
+      if (opt_base64)
+        {
+        out << *ptr;
+        if (cc % 70 == 69)
+          {
+          out << "\"" << endl << "  \"";
+          }
+        }
+      else
+        {
+        out << (unsigned int)*ptr << ", ";
+        if (cc % 15 == 14)
+          {
+          out << endl << "  ";
+          }
+        }
+      cc++;
+      ptr++;
+      }
+
+    if (opt_base64)
+      {
+      out << *ptr << "\";";
+      }
+    else
+      {
+      out << (unsigned int)*ptr << endl << "};";
+      }
+
+    out << endl << endl;
+
+    // Free mem
+
+    delete [] base64_buffer;
+    delete [] zlib_buffer;
+    delete [] image_buffer;
+
+    } // Next file
+
+  // Close file, free objects
+
+  out.close();
+
+  return all_ok;
 }
 
 //----------------------------------------------------------------------------

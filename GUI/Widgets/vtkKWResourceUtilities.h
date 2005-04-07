@@ -58,6 +58,40 @@ public:
                            int pixel_size,
                            unsigned char *pixels);
 
+  // Description:
+  // Convert 'nb_images' images (stored in an array of filenames given by 
+  // 'image_filenames') into a C/C++ header given by 'header_filename'.
+  // Note that only PNG images are supported at the moment.
+  // The structure and contents of each image are decoded and 
+  // written into a form that can be used programatically. 
+  // For example, the file foobar.png is converted into:
+  //   #define image_foobar_width         19
+  //   #define image_foobar_height        19
+  //   #define image_foobar_pixel_size    3
+  //   #define image_foobar_buffer_length 40
+  //   static unsigned char image_foobar[] = 
+  //     "eNpjYCAfPH1wg1Q0qnFU46jGwaaRPAAAa7/zXA==";
+  // Several options can be combined into the 'options' parameter.
+  //   CONVERT_IMAGE_TO_HEADER_OPTION_ZLIB: 
+  //    => Compress the pixels using zlib
+  //   CONVERT_IMAGE_TO_HEADER_OPTION_BASE64: 
+  //    => Encode the pixels in base64
+  //   CONVERT_IMAGE_TO_HEADER_OPTION_UPDATE: 
+  //    => Update the header file only if one of the image is newer
+  //BTX
+  enum
+  {
+    CONVERT_IMAGE_TO_HEADER_OPTION_ZLIB   = 1,
+    CONVERT_IMAGE_TO_HEADER_OPTION_BASE64 = 2,
+    CONVERT_IMAGE_TO_HEADER_OPTION_UPDATE = 4
+  };
+  //ETX
+  static int ConvertImageToHeader(
+    const char *header_filename,
+    const char **image_filenames,
+    int nb_images,
+    int options);
+
 protected:
   vtkKWResourceUtilities() {};
   ~vtkKWResourceUtilities() {};
