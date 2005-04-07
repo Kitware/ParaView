@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.365");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.366");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -218,7 +218,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->FillLightLabel      = vtkKWLabel::New();
   this->BackLightLabel      = vtkKWLabel::New();
   this->HeadLightLabel      = vtkKWLabel::New();
-  for ( int cc = 0; cc < 4; cc ++ )
+  int cc;
+  for ( cc = 0; cc < 4; cc ++ )
     {
     this->KeyLightScale[cc]  = vtkKWScale::New();
     this->FillLightScale[cc] = vtkKWScale::New();
@@ -239,7 +240,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->OrientationAxesTextColor = vtkKWChangeColorButton::New();
   this->OrientationAxes = vtkPVAxesWidget::New();
 
-  for ( int cc = 0; cc < 6; cc ++ )
+  for ( cc = 0; cc < 6; cc ++ )
     {
     this->CameraIcons[cc] = vtkPVCameraIcon::New();
     }
@@ -1208,7 +1209,8 @@ void vtkPVRenderView::CreateViewProperties()
   char endcommand[100];
   vtkstd::string p;
   vtkLightKit::LightKitSubType subtype;
-  for ( int cc = 0; cc < 4; cc ++ )
+  int cc;
+  for ( cc = 0; cc < 4; cc ++ )
     {
     subtype = vtkLightKit::GetSubType(vtkLightKit::TKeyLight, cc);
     this->KeyLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
@@ -1579,7 +1581,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->CameraIconsFrame->SetLabelText("Stored Camera Positions");
 
   vtkKWWidget* cframe = this->CameraIconsFrame->GetFrame();
-  for ( int cc = 0; cc < 6; cc ++ )
+  for ( cc = 0; cc < 6; cc ++ )
     {
     int x, y;
     this->CameraIcons[cc]->SetRenderView(this);
