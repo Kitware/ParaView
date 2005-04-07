@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.6");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.7");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -558,7 +558,31 @@ void vtkSMSimpleDisplayProxy::SetRepresentation(int representation)
     ivp->SetElement(0, representation);
     this->PropertyProxy->UpdateVTKObjects();
     }
+  // Handle specularity and lighting. All but surface turns shading off.
+  double diffuse = 0.0;
+  double ambient = 1.0;
+  double specularity = 0.0;
 
+  if (representation == vtkSMDisplayProxy::SURFACE)
+    {
+    diffuse = 1.0;
+    ambient = 0.0;
+    // Turn on specularity when coloring by property.
+    if ( !this->cmGetScalarVisibility())
+      {
+      specularity = 0.1;
+      }
+    }
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->PropertyProxy->GetProperty("Ambient"));
+  dvp->SetElement(0, ambient);
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->PropertyProxy->GetProperty("Diffuse"));
+  dvp->SetElement(0, diffuse);
+  dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->PropertyProxy->GetProperty("Specular"));
+  dvp->SetElement(0, specularity);
+  
   // We need to invalidate geometry so the representation changes are passed thru 
   // the update suppressor.
   this->InvalidateGeometry();
