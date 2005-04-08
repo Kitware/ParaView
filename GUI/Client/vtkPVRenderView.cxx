@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.366");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.367");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -380,7 +380,8 @@ vtkPVRenderView::~vtkPVRenderView()
   this->FillLightLabel->Delete();
   this->BackLightLabel->Delete();
   this->HeadLightLabel->Delete();
-  for ( int cc = 0; cc < 4; cc ++ )
+  int cc;
+  for ( cc = 0; cc < 4; cc ++ )
     {
     this->KeyLightScale[cc]->Delete();
     this->FillLightScale[cc]->Delete();
@@ -467,7 +468,7 @@ vtkPVRenderView::~vtkPVRenderView()
   
   this->CameraIconsFrame->Delete();
   this->CameraIconsFrame = 0;
-  for ( int cc = 0; cc < 6; cc ++ )
+  for ( cc = 0; cc < 6; cc ++ )
     {
     if ( this->CameraIcons[cc] )
       {

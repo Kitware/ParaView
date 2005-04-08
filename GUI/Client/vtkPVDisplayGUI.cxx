@@ -85,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.28");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.29");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2859,6 +2859,7 @@ void vtkPVDisplayGUI::UpdateActorControlResolutions()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVDisplayGUI::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
