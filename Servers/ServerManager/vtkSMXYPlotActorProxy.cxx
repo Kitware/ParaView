@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.1.2.3");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.1.2.4");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
 
 class vtkSMXYPlotActorProxyInternals
@@ -160,13 +160,14 @@ void vtkSMXYPlotActorProxy::SetupInputs()
   for (iter = this->Internals->ArrayNames.begin(); 
     iter != this->Internals->ArrayNames.end(); ++iter)
     {
+    arrayname = (*iter).c_str();
     stream << vtkClientServerStream::Invoke
       << sourceID << "AddInput"
       << this->Input->GetPart(0)->GetID(0)
-      << (*iter).c_str() << 0 /*component no*/
+      << arrayname << 0 /*component no*/
       << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke
-      << sourceID << "SetPlotLabel" << arrayCount << (*iter).c_str()
+      << sourceID << "SetPlotLabel" << arrayCount << arrayname
       << vtkClientServerStream::End;
     
     double r, g , b;
@@ -177,7 +178,6 @@ void vtkSMXYPlotActorProxy::SetupInputs()
       << arrayCount << r << g << b 
       << vtkClientServerStream::End;
 
-    arrayname = (*iter).c_str();
     color += color_step;
     arrayCount++;
     }
@@ -186,7 +186,7 @@ void vtkSMXYPlotActorProxy::SetupInputs()
     this->GetProperty("LegendVisibility"));
   if (ivp)
     {
-    ivp->SetElement(0, ( (arrayCount > 1)? 1 : 0));
+    ivp->SetElement(0, ( arrayCount > 1 ? 1 : 0));
     }
   else
     {
