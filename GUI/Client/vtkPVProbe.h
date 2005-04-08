@@ -68,6 +68,9 @@ protected:
   
   vtkKWCheckButton *ShowXYPlotToggle;
 
+  int CanShowPlot; // Flag indicating if the input is such that we can show 
+    // the plot display.
+
 private:
   vtkPVProbe(const vtkPVProbe&); // Not implemented
   void operator=(const vtkPVProbe&); // Not implemented

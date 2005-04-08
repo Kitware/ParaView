@@ -43,7 +43,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.4");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.5");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -75,6 +75,7 @@ vtkPVProbe::vtkPVProbe()
   
   this->PlotDisplayProxy = 0; 
   this->PlotDisplayProxyName = 0;
+  this->CanShowPlot = 0;
 }
 
 vtkPVProbe::~vtkPVProbe()
@@ -162,7 +163,7 @@ void vtkPVProbe::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVProbe::SetVisibilityNoTrace(int val)
 {
-  if (this->PlotDisplayProxy)
+  if (this->PlotDisplayProxy && this->CanShowPlot)
     {
     this->PlotDisplayProxy->cmSetVisibility(val);
     }
@@ -310,13 +311,14 @@ void vtkPVProbe::AcceptCallbackInternal()
       {
       vtkErrorMacro("Failed to find property ArrayNames.");
       }
-      
     this->PlotDisplayProxy->cmSetVisibility(1);
     }
   else
     {
     this->PlotDisplayProxy->cmSetVisibility(0);
     }
+
+  this->CanShowPlot = (numPts > 1)? 1: 0;
     
 }
  
