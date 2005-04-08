@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.26");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.26.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -386,51 +386,31 @@ const char* vtkPVProcessModule::GetDemoPath()
 
   this->SetDemoPath(NULL);
 
-#ifdef _WIN32  
-
-  if (this->GetApplicationInstallationDirectory())
+  if (this->Options)
     {
-    sprintf(temp1, "%s/Demos/Demo1.pvs",
-            this->GetApplicationInstallationDirectory());
-    if (stat(temp1, &fs) == 0) 
+    vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
+    const char* selfPath = util->FindSelfPath(
+      this->Options->GetArgv0());
+    if (selfPath)
       {
-      sprintf(temp1, "%s/Demos",
-              this->GetApplicationInstallationDirectory());
-      this->SetDemoPath(temp1);
-      found=1;
+      const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
+      char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
+      sprintf(newPath, "%s/%s", selfPath, relPath);
+
+      char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
+      sprintf(demoFile, "%s/Demo1.pvs", newPath);
+
+      if (stat(demoFile, &fs) == 0) 
+        {
+        this->SetDemoPath(newPath);
+        found = 1;
+        }
+      delete[] demoFile;
+      delete[] newPath;
       }
+    util->Delete();
     }
-
-#else
-
-  if (!this->Options)
-    {
-    return 0;
-    }
-  vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
-  const char* selfPath = util->FindSelfPath(
-    this->Options->GetArgv0());
-  if (selfPath)
-    {
-    const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
-    char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
-    sprintf(newPath, "%s/%s", selfPath, relPath);
-
-    char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
-    sprintf(demoFile, "%s/Demo1.pvs", newPath);
-
-    if (stat(demoFile, &fs) == 0) 
-      {
-      this->SetDemoPath(newPath);
-      found = 1;
-      }
-    delete[] demoFile;
-    delete[] newPath;
-    }
-  util->Delete();
-
-#endif // _WIN32  
-
+  
   if (!found)
     {
     // Look in binary and installation directories
