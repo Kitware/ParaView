@@ -16,7 +16,7 @@
 
 #include "vtkCollectionIterator.h"
 #include "vtkKWApplication.h"
-#include "vtkKWDragAndDropHelper.h"
+#include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWLabel.h"
 #include "vtkKWNotebook.h"
@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.35");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.36");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -600,7 +600,7 @@ int vtkKWUserInterfaceNotebookManager::CanWidgetBeDragAndDropped(
       {
       if (anchor)
         {
-        *anchor = frame->GetDragAndDropHelper()->GetAnchor();
+        *anchor = frame->GetDragAndDropTargetSet()->GetSourceAnchor();
         }
       return 1;
       }
@@ -680,19 +680,19 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanelDragAndDrop(
       {
       if (this->EnableDragAndDrop)
         {
-        if (!widget->GetDragAndDropHelper()->HasTarget(this->Notebook))
+        if (!widget->GetDragAndDropTargetSet()->HasTarget(this->Notebook))
           {
-          widget->GetDragAndDropHelper()->EnableOn();
-          widget->GetDragAndDropHelper()->SetAnchor(anchor);
-          widget->GetDragAndDropHelper()->SetTargetEndCommand(
+          widget->GetDragAndDropTargetSet()->EnableOn();
+          widget->GetDragAndDropTargetSet()->SetSourceAnchor(anchor);
+          widget->GetDragAndDropTargetSet()->SetTargetEndCommand(
             this->Notebook, this, "DragAndDropEndCallback");
           }
         }
       else
         {
-        if (widget->GetDragAndDropHelper()->HasTarget(this->Notebook))
+        if (widget->GetDragAndDropTargetSet()->HasTarget(this->Notebook))
           {
-          widget->GetDragAndDropHelper()->RemoveTarget(this->Notebook);
+          widget->GetDragAndDropTargetSet()->RemoveTarget(this->Notebook);
           }
         }
       }

@@ -28,7 +28,7 @@
 class vtkKWIcon;
 class vtkKWWidgetCollection;
 class vtkKWWindow;
-class vtkKWDragAndDropHelper;
+class vtkKWDragAndDropTargetSet;
 
 class VTK_EXPORT vtkKWWidget : public vtkKWObject
 {
@@ -210,12 +210,12 @@ public:
   // Description:
   // Query if there are drag and drop targets between this widget and
   // other widgets. Get the targets.
-  // IMPORTANT: the vtkKWDragAndDropHelper object is lazy-allocated, i.e.
-  // allocated only when it is needed, as GetDragAndDropHelper() is called.
+  // IMPORTANT: the vtkKWDragAndDropTargetSet object is lazy-allocated, i.e.
+  // allocated only when it is needed, as GetDragAndDropTargetSet() is called.
   // Therefore, to check if the instance *has* drag and drop targets, use 
-  // HasDragAndDropHelper(), not GetDragAndDropHelper().
-  virtual int HasDragAndDropHelper();
-  virtual vtkKWDragAndDropHelper* GetDragAndDropHelper();
+  // HasDragAndDropTargetSet(), not GetDragAndDropTargetSet().
+  virtual int HasDragAndDropTargetSet();
+  virtual vtkKWDragAndDropTargetSet* GetDragAndDropTargetSet();
 
   // Description:
   // Some constant that can be used to specify anchoring
@@ -328,7 +328,7 @@ private:
 
   vtkKWWidgetCollection *Children; 
 
-  vtkKWDragAndDropHelper* DragAndDropHelper;
+  vtkKWDragAndDropTargetSet* DragAndDropTargetSet;
 
   int WidgetIsCreated;
 

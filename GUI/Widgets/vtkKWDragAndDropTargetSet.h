@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWDragAndDropHelper.h
+  Module:    vtkKWDragAndDropTargetSet.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,25 +11,33 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWDragAndDropHelper - a set of drag and drop targets
+// .NAME vtkKWDragAndDropTargetSet - a set of drag and drop targets
 // .SECTION Description
 // This class is a container for a set of drag and drop targets.
-// It provides method to add basic drag and drop callbacks between a source
-// and one or more targets.
+// It provides methods to set drag and drop callbacks between a *single*
+// source and one or more targets. 
+// This is *not* a general drag and drop framework, where DnD types would
+// be created and objects would register themselves as source and/or sinks
+// for any of those types. This is a simpler framework to perform specific
+// DnD actions between a know source and known targets.
+// An instance of this class is available in vtkKWWidget and can be used
+// to register DnD actions between that vtkKWWidget source and some targets.
+// .SECTION See Also
+// vtkKWWidget
 
-#ifndef __vtkKWDragAndDropHelper_h
-#define __vtkKWDragAndDropHelper_h
+#ifndef __vtkKWDragAndDropTargetSet_h
+#define __vtkKWDragAndDropTargetSet_h
 
 #include "vtkKWObject.h"
 
 class vtkKWWidget;
-class vtkKWDragAndDropHelperInternals;
+class vtkKWDragAndDropTargetSetInternals;
 
-class VTK_EXPORT vtkKWDragAndDropHelper : public vtkKWObject
+class VTK_EXPORT vtkKWDragAndDropTargetSet : public vtkKWObject
 {
 public:
-  static vtkKWDragAndDropHelper* New();
-  vtkTypeRevisionMacro(vtkKWDragAndDropHelper,vtkKWObject);
+  static vtkKWDragAndDropTargetSet* New();
+  vtkTypeRevisionMacro(vtkKWDragAndDropTargetSet,vtkKWObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -46,14 +54,15 @@ public:
   vtkGetObjectMacro(Source, vtkKWWidget);
 
   // Description:
-  // Set/Get the Drag and Drop anchor widget. This is the actual widget
-  // (or part of) that the user drags and drops. It NULL, it defaults to the
-  // Source widget automatically. The anchor widget can be used to specify
-  // that a sub-part of the Source widget is to be dragged & dropped, not
-  // the whole Source widget.
+  // Set/Get the optional Drag and Drop source anchor widget. This is the 
+  // actual widget that the user drags and drops (i.e. the actual widget the
+  // user starts the interaction with). It NULL, it defaults to the
+  // Source widget automatically. The anchor widget is a convenient way to 
+  // specify that a sub-part of the Source widget is to be dragged & dropped, 
+  // not the whole Source widget. 
   // Make sure you have called SetApplication(..) on the instance before.
-  virtual void SetAnchor(vtkKWWidget*);
-  vtkGetObjectMacro(Anchor, vtkKWWidget);
+  virtual void SetSourceAnchor(vtkKWWidget*);
+  vtkGetObjectMacro(SourceAnchor, vtkKWWidget);
 
   // Description:
   // Add/Query/Remove a Drag & Drop target. 
@@ -71,7 +80,7 @@ public:
   // The EndCommand of all targets that contain the drop coordinates is called
   // when Drag & Drop ends.
   // Note that the each command is passed the absolute/screen (x,y) mouse 
-  // coordinates, the Source widget and the Anchor widget (which are the
+  // coordinates, the Source widget and the SourceAnchor widget (which are the
   // same most of the times), i.e. the last 4 parameters are: int, int, 
   // vtkKWWidget*, vtkKWWidget*). Additionally, EndCommand is passed a 5th 
   // parameter, the target (vtkKWWidget *).
@@ -104,8 +113,8 @@ public:
   virtual void SetEndCommand(vtkKWObject *object, const char *method);
 
 protected:
-  vtkKWDragAndDropHelper();
-  ~vtkKWDragAndDropHelper();
+  vtkKWDragAndDropTargetSet();
+  ~vtkKWDragAndDropTargetSet();
 
   // Drag and Drop
 
@@ -129,8 +138,8 @@ protected:
 
   // PIMPL Encapsulation for STL containers
 
-  vtkKWDragAndDropHelperInternals *Internals;
-  friend class vtkKWDragAndDropHelperInternals;
+  vtkKWDragAndDropTargetSetInternals *Internals;
+  friend class vtkKWDragAndDropTargetSetInternals;
 
   TargetSlot* GetTarget(vtkKWWidget *target);
 
@@ -138,7 +147,7 @@ protected:
 
   int Enable;
 
-  vtkKWWidget *Anchor;
+  vtkKWWidget *SourceAnchor;
   vtkKWWidget *Source;
 
   char *StartCommand;
@@ -151,8 +160,8 @@ protected:
 
 private:
   
-  vtkKWDragAndDropHelper(const vtkKWDragAndDropHelper&); // Not implemented
-  void operator=(const vtkKWDragAndDropHelper&); // Not implemented
+  vtkKWDragAndDropTargetSet(const vtkKWDragAndDropTargetSet&); // Not implemented
+  void operator=(const vtkKWDragAndDropTargetSet&); // Not implemented
 };
 
 #endif

@@ -14,7 +14,7 @@
 #include "vtkKWFrameLabeled.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWDragAndDropHelper.h"
+#include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.5");
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.6");
 
 int vtkKWFrameLabeledCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -363,13 +363,13 @@ void vtkKWFrameLabeled::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-vtkKWDragAndDropHelper* vtkKWFrameLabeled::GetDragAndDropHelper()
+vtkKWDragAndDropTargetSet* vtkKWFrameLabeled::GetDragAndDropTargetSet()
 {
-  int exist = this->HasDragAndDropHelper();
-  vtkKWDragAndDropHelper *targets = this->Superclass::GetDragAndDropHelper();
+  int exist = this->HasDragAndDropTargetSet();
+  vtkKWDragAndDropTargetSet *targets = this->Superclass::GetDragAndDropTargetSet();
   if (!exist)
     {
-    targets->SetAnchor(this->GetLabel());
+    targets->SetSourceAnchor(this->GetLabel());
     }
   return targets;
 }

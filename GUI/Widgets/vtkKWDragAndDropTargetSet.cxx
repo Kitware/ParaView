@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWDragAndDropHelper.cxx
+  Module:    vtkKWDragAndDropTargetSet.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
 
 =========================================================================*/
 
-#include "vtkKWDragAndDropHelper.h"
+#include "vtkKWDragAndDropTargetSet.h"
 
 #include "vtkObjectFactory.h"
 #include "vtkKWWidget.h"
@@ -23,25 +23,25 @@
 #include <vtkstd/algorithm>
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWDragAndDropHelper );
-vtkCxxRevisionMacro(vtkKWDragAndDropHelper, "1.2");
+vtkStandardNewMacro( vtkKWDragAndDropTargetSet );
+vtkCxxRevisionMacro(vtkKWDragAndDropTargetSet, "1.1");
 
-int vtkKWDragAndDropHelperCommand(ClientData cd, Tcl_Interp *interp,
+int vtkKWDragAndDropTargetSetCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-class vtkKWDragAndDropHelperInternals
+class vtkKWDragAndDropTargetSetInternals
 {
 public:
 
-  typedef vtkstd::list<vtkKWDragAndDropHelper::TargetSlot*> TargetsContainer;
-  typedef vtkstd::list<vtkKWDragAndDropHelper::TargetSlot*>::iterator TargetsContainerIterator;
+  typedef vtkstd::list<vtkKWDragAndDropTargetSet::TargetSlot*> TargetsContainer;
+  typedef vtkstd::list<vtkKWDragAndDropTargetSet::TargetSlot*>::iterator TargetsContainerIterator;
 
   TargetsContainer Targets;
 };
 
 //----------------------------------------------------------------------------
-vtkKWDragAndDropHelper::TargetSlot::TargetSlot()
+vtkKWDragAndDropTargetSet::TargetSlot::TargetSlot()
 {
   this->Target         = NULL;
   this->StartCommand   = NULL;
@@ -50,7 +50,7 @@ vtkKWDragAndDropHelper::TargetSlot::TargetSlot()
 }
 
 //----------------------------------------------------------------------------
-vtkKWDragAndDropHelper::TargetSlot::~TargetSlot()
+vtkKWDragAndDropTargetSet::TargetSlot::~TargetSlot()
 {
   this->Target = NULL;
   this->SetStartCommand(NULL);
@@ -59,7 +59,7 @@ vtkKWDragAndDropHelper::TargetSlot::~TargetSlot()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::TargetSlot::SetStartCommand(const char *arg)
+void vtkKWDragAndDropTargetSet::TargetSlot::SetStartCommand(const char *arg)
 {
   if ((this->StartCommand == NULL && arg == NULL) ||
       (this->StartCommand && arg && (!strcmp(this->StartCommand,arg))))
@@ -84,7 +84,7 @@ void vtkKWDragAndDropHelper::TargetSlot::SetStartCommand(const char *arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::TargetSlot::SetPerformCommand(const char *arg)
+void vtkKWDragAndDropTargetSet::TargetSlot::SetPerformCommand(const char *arg)
 {
   if ((this->PerformCommand == NULL && arg == NULL) ||
       (this->PerformCommand && arg && (!strcmp(this->PerformCommand,arg))))
@@ -109,7 +109,7 @@ void vtkKWDragAndDropHelper::TargetSlot::SetPerformCommand(const char *arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::TargetSlot::SetEndCommand(const char *arg)
+void vtkKWDragAndDropTargetSet::TargetSlot::SetEndCommand(const char *arg)
 {
   if ((this->EndCommand == NULL && arg == NULL) ||
       (this->EndCommand && arg && (!strcmp(this->EndCommand,arg))))
@@ -134,24 +134,24 @@ void vtkKWDragAndDropHelper::TargetSlot::SetEndCommand(const char *arg)
 }
 
 //----------------------------------------------------------------------------
-vtkKWDragAndDropHelper::vtkKWDragAndDropHelper()
+vtkKWDragAndDropTargetSet::vtkKWDragAndDropTargetSet()
 {
   this->Enable         = 1;
   this->Source         = NULL;
-  this->Anchor         = NULL;
+  this->SourceAnchor   = NULL;
 
   this->StartCommand   = NULL;
   this->PerformCommand = NULL;
   this->EndCommand     = NULL;
 
-  this->Internals = new vtkKWDragAndDropHelperInternals;
+  this->Internals = new vtkKWDragAndDropTargetSetInternals;
 }
 
 //----------------------------------------------------------------------------
-vtkKWDragAndDropHelper::~vtkKWDragAndDropHelper()
+vtkKWDragAndDropTargetSet::~vtkKWDragAndDropTargetSet()
 {
   this->Source = NULL;
-  this->Anchor = NULL;
+  this->SourceAnchor = NULL;
 
   if (this->StartCommand)
     {
@@ -174,13 +174,13 @@ vtkKWDragAndDropHelper::~vtkKWDragAndDropHelper()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::DeleteAllTargets()
+void vtkKWDragAndDropTargetSet::DeleteAllTargets()
 {
   if (this->Internals)
     {
-    vtkKWDragAndDropHelperInternals::TargetsContainerIterator it = 
+    vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator it = 
       this->Internals->Targets.begin();
-    vtkKWDragAndDropHelperInternals::TargetsContainerIterator end = 
+    vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator end = 
       this->Internals->Targets.end();
     for (; it != end; ++it)
       {
@@ -193,7 +193,7 @@ void vtkKWDragAndDropHelper::DeleteAllTargets()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::SetEnable(int arg)
+void vtkKWDragAndDropTargetSet::SetEnable(int arg)
 {
   if (this->Enable == arg)
     {
@@ -214,7 +214,7 @@ void vtkKWDragAndDropHelper::SetEnable(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::SetSource(vtkKWWidget *arg)
+void vtkKWDragAndDropTargetSet::SetSource(vtkKWWidget *arg)
 {
   if (this->Source == arg)
     {
@@ -230,23 +230,23 @@ void vtkKWDragAndDropHelper::SetSource(vtkKWWidget *arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::SetAnchor(vtkKWWidget *arg)
+void vtkKWDragAndDropTargetSet::SetSourceAnchor(vtkKWWidget *arg)
 {
-  if (this->Anchor == arg)
+  if (this->SourceAnchor == arg)
     {
     return;
     }
 
   this->RemoveBindings();
 
-  this->Anchor = arg;
+  this->SourceAnchor = arg;
   this->Modified();
 
   this->AddBindings();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::SetStartCommand(
+void vtkKWDragAndDropTargetSet::SetStartCommand(
   vtkKWObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
@@ -254,7 +254,7 @@ void vtkKWDragAndDropHelper::SetStartCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::SetPerformCommand(
+void vtkKWDragAndDropTargetSet::SetPerformCommand(
   vtkKWObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
@@ -262,7 +262,7 @@ void vtkKWDragAndDropHelper::SetPerformCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::SetEndCommand(
+void vtkKWDragAndDropTargetSet::SetEndCommand(
   vtkKWObject *object, const char *method)
 {
   this->SetObjectMethodCommand(
@@ -270,7 +270,7 @@ void vtkKWDragAndDropHelper::SetEndCommand(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::AddBindings()
+void vtkKWDragAndDropTargetSet::AddBindings()
 {
   if (!this->GetApplication())
     {
@@ -278,7 +278,7 @@ void vtkKWDragAndDropHelper::AddBindings()
     return;
     }
 
-  vtkKWWidget *anchor = this->Anchor ? this->Anchor : this->Source;
+  vtkKWWidget *anchor = this->SourceAnchor ? this->SourceAnchor : this->Source;
   if (!anchor || !anchor->IsCreated())
     {
     return;
@@ -293,7 +293,7 @@ void vtkKWDragAndDropHelper::AddBindings()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::RemoveBindings()
+void vtkKWDragAndDropTargetSet::RemoveBindings()
 {
   if (!this->GetApplication())
     {
@@ -301,7 +301,7 @@ void vtkKWDragAndDropHelper::RemoveBindings()
     return;
     }
 
-  vtkKWWidget *anchor = this->Anchor ? this->Anchor : this->Source;
+  vtkKWWidget *anchor = this->SourceAnchor ? this->SourceAnchor : this->Source;
   if (!anchor || !anchor->IsCreated())
     {
     return;
@@ -316,14 +316,14 @@ void vtkKWDragAndDropHelper::RemoveBindings()
 }
 
 //----------------------------------------------------------------------------
-vtkKWDragAndDropHelper::TargetSlot*
-vtkKWDragAndDropHelper::GetTarget(vtkKWWidget *widget)
+vtkKWDragAndDropTargetSet::TargetSlot*
+vtkKWDragAndDropTargetSet::GetTarget(vtkKWWidget *widget)
 {
   if (this->Internals)
     {
-    vtkKWDragAndDropHelperInternals::TargetsContainerIterator it = 
+    vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator it = 
       this->Internals->Targets.begin();
-    vtkKWDragAndDropHelperInternals::TargetsContainerIterator end = 
+    vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator end = 
       this->Internals->Targets.end();
     for (; it != end; ++it)
       {
@@ -338,17 +338,17 @@ vtkKWDragAndDropHelper::GetTarget(vtkKWWidget *widget)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWDragAndDropHelper::AddTarget(vtkKWWidget *widget)
+int vtkKWDragAndDropTargetSet::AddTarget(vtkKWWidget *widget)
 {
-  vtkKWDragAndDropHelper::TargetSlot *found = this->GetTarget(widget);
+  vtkKWDragAndDropTargetSet::TargetSlot *found = this->GetTarget(widget);
   if (found)
     {
     vtkErrorMacro("The Drag & Drop target already exists.");
     return 0;
     }
 
-  vtkKWDragAndDropHelper::TargetSlot *target_slot = 
-    new vtkKWDragAndDropHelper::TargetSlot;
+  vtkKWDragAndDropTargetSet::TargetSlot *target_slot = 
+    new vtkKWDragAndDropTargetSet::TargetSlot;
   this->Internals->Targets.push_back(target_slot);
   target_slot->Target = widget;
 
@@ -356,15 +356,15 @@ int vtkKWDragAndDropHelper::AddTarget(vtkKWWidget *widget)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWDragAndDropHelper::RemoveTarget(vtkKWWidget *widget)
+int vtkKWDragAndDropTargetSet::RemoveTarget(vtkKWWidget *widget)
 {
-  vtkKWDragAndDropHelper::TargetSlot *found = this->GetTarget(widget);
+  vtkKWDragAndDropTargetSet::TargetSlot *found = this->GetTarget(widget);
   if (!found)
     {
     return 0;
     }
   
-  vtkKWDragAndDropHelperInternals::TargetsContainerIterator pos = 
+  vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator pos = 
     vtkstd::find(this->Internals->Targets.begin(),
                  this->Internals->Targets.end(),
                  found);
@@ -382,20 +382,20 @@ int vtkKWDragAndDropHelper::RemoveTarget(vtkKWWidget *widget)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWDragAndDropHelper::HasTarget(vtkKWWidget *widget)
+int vtkKWDragAndDropTargetSet::HasTarget(vtkKWWidget *widget)
 {
-  vtkKWDragAndDropHelper::TargetSlot *found = this->GetTarget(widget);
+  vtkKWDragAndDropTargetSet::TargetSlot *found = this->GetTarget(widget);
   return found ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWDragAndDropHelper::GetNumberOfTargets()
+int vtkKWDragAndDropTargetSet::GetNumberOfTargets()
 {
   return this->Internals ? this->Internals->Targets.size() : 0;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWDragAndDropHelper::SetTargetStartCommand(vtkKWWidget *target, 
+int vtkKWDragAndDropTargetSet::SetTargetStartCommand(vtkKWWidget *target, 
                                                    vtkKWObject *object, 
                                                    const char *method)
 {
@@ -410,7 +410,7 @@ int vtkKWDragAndDropHelper::SetTargetStartCommand(vtkKWWidget *target,
     return 0;
     }
 
-  vtkKWDragAndDropHelper::TargetSlot *found = this->GetTarget(target);
+  vtkKWDragAndDropTargetSet::TargetSlot *found = this->GetTarget(target);
   if (!found)
     {
     this->AddTarget(target);
@@ -430,7 +430,7 @@ int vtkKWDragAndDropHelper::SetTargetStartCommand(vtkKWWidget *target,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWDragAndDropHelper::SetTargetPerformCommand(vtkKWWidget *target, 
+int vtkKWDragAndDropTargetSet::SetTargetPerformCommand(vtkKWWidget *target, 
                                                      vtkKWObject *object, 
                                                      const char *method)
 {
@@ -445,7 +445,7 @@ int vtkKWDragAndDropHelper::SetTargetPerformCommand(vtkKWWidget *target,
     return 0;
     }
 
-  vtkKWDragAndDropHelper::TargetSlot *found = this->GetTarget(target);
+  vtkKWDragAndDropTargetSet::TargetSlot *found = this->GetTarget(target);
   if (!found)
     {
     this->AddTarget(target);
@@ -465,7 +465,7 @@ int vtkKWDragAndDropHelper::SetTargetPerformCommand(vtkKWWidget *target,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWDragAndDropHelper::SetTargetEndCommand(vtkKWWidget *target, 
+int vtkKWDragAndDropTargetSet::SetTargetEndCommand(vtkKWWidget *target, 
                                            vtkKWObject *object, 
                                            const char *method)
 {
@@ -480,7 +480,7 @@ int vtkKWDragAndDropHelper::SetTargetEndCommand(vtkKWWidget *target,
     return 0;
     }
 
-  vtkKWDragAndDropHelper::TargetSlot *found = this->GetTarget(target);
+  vtkKWDragAndDropTargetSet::TargetSlot *found = this->GetTarget(target);
   if (!found)
     {
     this->AddTarget(target);
@@ -500,7 +500,7 @@ int vtkKWDragAndDropHelper::SetTargetEndCommand(vtkKWWidget *target,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::StartCallback(int x, int y)
+void vtkKWDragAndDropTargetSet::StartCallback(int x, int y)
 {
   if (!this->Enable)
     {
@@ -517,7 +517,8 @@ void vtkKWDragAndDropHelper::StartCallback(int x, int y)
     // Set the cursor and invert foreground/background to better show what
     // is dragged
 
-    vtkKWWidget *anchor = this->Anchor ? this->Anchor : this->Source;
+    vtkKWWidget *anchor = 
+      this->SourceAnchor ? this->SourceAnchor : this->Source;
     if (anchor && anchor->IsCreated())
       {
       this->Script("[winfo toplevel %s] config -cursor hand2", 
@@ -536,9 +537,9 @@ void vtkKWDragAndDropHelper::StartCallback(int x, int y)
 
     // Call each target's StartCommand
 
-    vtkKWDragAndDropHelperInternals::TargetsContainerIterator it = 
+    vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator it = 
       this->Internals->Targets.begin();
-    vtkKWDragAndDropHelperInternals::TargetsContainerIterator end = 
+    vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator end = 
       this->Internals->Targets.end();
     for (; it != end; ++it)
       {
@@ -549,22 +550,23 @@ void vtkKWDragAndDropHelper::StartCallback(int x, int y)
           vtkErrorMacro("Error! Source's application not set!");
           continue;
           }
-        if (this->Anchor && !this->Anchor->GetApplication())
+        if (this->SourceAnchor && !this->SourceAnchor->GetApplication())
           {
-          vtkErrorMacro("Error! Anchor's application not set!");
+          vtkErrorMacro("Error! SourceAnchor's application not set!");
           continue;
           }
-        this->Script("eval %s %d %d %s %s", 
-                     (*it)->StartCommand, x, y, 
-                     this->Source ? this->Source->GetTclName() : "", 
-                     this->Anchor ? this->Anchor->GetTclName() : "");
+        this->Script(
+          "eval %s %d %d %s %s", 
+          (*it)->StartCommand, x, y, 
+          this->Source ? this->Source->GetTclName() : "", 
+          this->SourceAnchor ? this->SourceAnchor->GetTclName() : "");
         }
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::PerformCallback(int x, int y)
+void vtkKWDragAndDropTargetSet::PerformCallback(int x, int y)
 {
   if (!this->Enable)
     {
@@ -580,9 +582,9 @@ void vtkKWDragAndDropHelper::PerformCallback(int x, int y)
     {
     // Call each target's PerformCommand
 
-    vtkKWDragAndDropHelperInternals::TargetsContainerIterator it = 
+    vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator it = 
       this->Internals->Targets.begin();
-    vtkKWDragAndDropHelperInternals::TargetsContainerIterator end = 
+    vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator end = 
       this->Internals->Targets.end();
     for (; it != end; ++it)
       {
@@ -593,22 +595,23 @@ void vtkKWDragAndDropHelper::PerformCallback(int x, int y)
           vtkErrorMacro("Error! Source's application not set!");
           continue;
           }
-        if (this->Anchor && !this->Anchor->GetApplication())
+        if (this->SourceAnchor && !this->SourceAnchor->GetApplication())
           {
-          vtkErrorMacro("Error! Anchor's application not set!");
+          vtkErrorMacro("Error! SourceAnchor's application not set!");
           continue;
           }
-        this->Script("eval %s %d %d %s %s", 
-                     (*it)->PerformCommand, x, y, 
-                     this->Source ? this->Source->GetTclName() : "", 
-                     this->Anchor ? this->Anchor->GetTclName() : "");
+        this->Script(
+          "eval %s %d %d %s %s", 
+          (*it)->PerformCommand, x, y, 
+          this->Source ? this->Source->GetTclName() : "", 
+          this->SourceAnchor ? this->SourceAnchor->GetTclName() : "");
         }
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::EndCallback(int x, int y)
+void vtkKWDragAndDropTargetSet::EndCallback(int x, int y)
 {
   if (!this->Enable)
     {
@@ -619,7 +622,8 @@ void vtkKWDragAndDropHelper::EndCallback(int x, int y)
     {
     // Reset the cursor and the background/foreground colors
 
-    vtkKWWidget *anchor = this->Anchor ? this->Anchor : this->Source;
+    vtkKWWidget *anchor = 
+      this->SourceAnchor ? this->SourceAnchor : this->Source;
     if (anchor && anchor->IsCreated())
       {
       this->Script("[winfo toplevel %s] config -cursor {}", 
@@ -638,9 +642,9 @@ void vtkKWDragAndDropHelper::EndCallback(int x, int y)
 
     // Find if the cursor is in a target, and call its EndCommand
 
-    vtkKWDragAndDropHelperInternals::TargetsContainerIterator it = 
+    vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator it = 
       this->Internals->Targets.begin();
-    vtkKWDragAndDropHelperInternals::TargetsContainerIterator end = 
+    vtkKWDragAndDropTargetSetInternals::TargetsContainerIterator end = 
       this->Internals->Targets.end();
     for (; it != end; ++it)
       {
@@ -654,16 +658,17 @@ void vtkKWDragAndDropHelper::EndCallback(int x, int y)
           vtkErrorMacro("Error! Source's application not set!");
           continue;
           }
-        if (this->Anchor && !this->Anchor->GetApplication())
+        if (this->SourceAnchor && !this->SourceAnchor->GetApplication())
           {
-          vtkErrorMacro("Error! Anchor's application not set!");
+          vtkErrorMacro("Error! SourceAnchor's application not set!");
           continue;
           }
-        this->Script("eval %s %d %d %s %s %s", 
-                     (*it)->EndCommand, x, y, 
-                     this->Source ? this->Source->GetTclName() : "", 
-                     this->Anchor ? this->Anchor->GetTclName() : "",
-                     (*it)->Target->GetTclName());
+        this->Script(
+          "eval %s %d %d %s %s %s", 
+          (*it)->EndCommand, x, y, 
+          this->Source ? this->Source->GetTclName() : "", 
+          this->SourceAnchor ? this->SourceAnchor->GetTclName() : "",
+          (*it)->Target->GetTclName());
         }
       }
     }
@@ -675,12 +680,12 @@ void vtkKWDragAndDropHelper::EndCallback(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWDragAndDropHelper::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWDragAndDropTargetSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Enable: " 
      << (this->Enable ? "On" : "Off") << endl;
   os << indent << "Source: " << this->Source << endl;
-  os << indent << "Anchor: " << this->Anchor << endl;
+  os << indent << "SourceAnchor: " << this->SourceAnchor << endl;
 }

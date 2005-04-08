@@ -214,7 +214,7 @@ protected:
 
   // Description:
   // Sets up the drag and drop targets for each lookmark and folder in manager. Often called after a change to the lookmark manager (such as Add, Remove, etc.)
-  void ResetDragAndDropTargetsAndCallbacks();
+  void ResetDragAndDropTargetSetAndCallbacks();
   // Description:
   // Perform the actual D&D given a widget and its target location.
   // It will call AddDragAndDropEntry() and pack the widget to its new location

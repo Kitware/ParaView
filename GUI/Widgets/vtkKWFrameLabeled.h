@@ -119,7 +119,7 @@ public:
   // Get the drag and drop framework.
   // Override the superclass to allow the frame to be dragged using
   // the label.
-  virtual vtkKWDragAndDropHelper* GetDragAndDropHelper();
+  virtual vtkKWDragAndDropTargetSet* GetDragAndDropTargetSet();
 
 protected:
 

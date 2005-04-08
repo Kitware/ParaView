@@ -30,7 +30,7 @@ SET( KWWidgets_SRCS
   vtkKWColorTransferFunctionEditor.cxx
   vtkKWCornerAnnotationEditor.cxx 
   vtkKWDialog.cxx 
-  vtkKWDragAndDropHelper.cxx
+  vtkKWDragAndDropTargetSet.cxx
   vtkKWEntry.cxx 
   vtkKWEvent.cxx
   vtkKWEventMap.cxx

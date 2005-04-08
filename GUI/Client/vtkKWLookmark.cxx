@@ -23,7 +23,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCheckButtonLabeled.h"
-#include "vtkKWDragAndDropHelper.h"
+#include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWIcon.h"
@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.4");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.5");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -181,7 +181,7 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkMainFrame->SetLabelText("Lookmark");
 //  this->LmkMainFrame->GetLabel()->SetBind(this, "<Double-1>", "EditLookmarkCallback");
 
-  this->GetDragAndDropHelper()->SetAnchor(
+  this->GetDragAndDropTargetSet()->SetSourceAnchor(
     this->LmkMainFrame->GetLabel());
 
   this->SeparatorFrame->SetParent(this);
