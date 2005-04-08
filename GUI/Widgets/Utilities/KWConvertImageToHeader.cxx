@@ -25,7 +25,7 @@ void display_usage(kwsys::CommandLineArguments &args)
 {
   kwsys_stl::string exe_basename = 
     kwsys::SystemTools::GetFilenameName(args.GetArgv0());
-  cerr << "Usage: " << exe_basename << " [--update] [--zlib] [--base64] header.h image.png [image.png image.png...]" << kwsys_ios::endl;
+  cerr << "Usage: " << exe_basename << " [--update] [--zlib] [--base64] header.h image.png [image.png image.png...]" << endl;
   cerr << args.GetHelp();
 }
 
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 
   if (rem_argc < 3)
     {
-    cerr << "Invalid or missing arguments" << kwsys_ios::endl;
+    cerr << "Invalid or missing arguments" << endl;
     display_usage(args);
     res = 0;
     }
