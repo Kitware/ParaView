@@ -4598,8 +4598,8 @@ if ![info exists DemoDir] {
         extract_init
         iso_init
         threshold_init
-        warp_init
         stream_init
+        warp_init
         while {1} {
             iso_run
             warp_run

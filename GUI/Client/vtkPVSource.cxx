@@ -64,7 +64,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.10");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.11");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 #if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
@@ -1314,6 +1314,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // Update the selection menu.
   window->UpdateSelectMenu();
 
+  // TODO: this->UpdateProperties already updated notebook...
+  // why are we doing it twice?
   // Regenerate the data property page in case something has changed.
   if (this->Notebook)
     {
