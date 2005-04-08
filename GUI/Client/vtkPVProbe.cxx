@@ -43,7 +43,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.3");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.4");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -305,6 +305,10 @@ void vtkPVProbe::AcceptCallbackInternal()
       svp->SetNumberOfElements(1);
       svp->SetElement(0, arrayInfo->GetName());
       this->PlotDisplayProxy->UpdateVTKObjects();
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property ArrayNames.");
       }
       
     this->PlotDisplayProxy->cmSetVisibility(1);

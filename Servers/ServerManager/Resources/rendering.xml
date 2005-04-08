@@ -1695,6 +1695,9 @@
           name="XYPlotActor" 
           proxygroup="annotations" proxyname="XYPlotActor">
         </Proxy>
+        <ExposedProperties>
+          <Property name="ArrayNames" />
+        </ExposedProperties>
       </SubProxy>
 
     </XYPlotDisplayProxy>
