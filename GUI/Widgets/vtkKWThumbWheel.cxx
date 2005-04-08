@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.26");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.27");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -1115,57 +1115,64 @@ void vtkKWThumbWheel::SetBalloonHelpString(const char *string)
 {
   // Interaction modes
 
-  ostrstream modes;
-  modes << string << " (";
-
-  int i;
-  for (i = 0 ; i < 3; i++)
+  if (string)
     {
-    if (this->InteractionModes[i] == VTK_KW_TW_MODE_NONE)
-      {
-      continue;
-      }
-    switch (i)
-      {
-      case 0:
-        modes << "left";
-        break;
-      case 1:
-        modes << "middle";
-        break;
-      case 2:
-        modes << "right";
-        break;
-      }
+    ostrstream modes;
+    modes << string << " (";
 
-    modes << " button: ";
-
-    switch (this->InteractionModes[i])
+    int i;
+    for (i = 0 ; i < 3; i++)
       {
-      case VTK_KW_TW_MODE_LINEAR_MOTION:
-        modes << "linear";
-        break;
-      case VTK_KW_TW_MODE_NONLINEAR_MOTION:
-        modes << "non-linear";
-        break;
-      case VTK_KW_TW_MODE_TOGGLE_CENTER_INDICATOR:
-        modes << "toggle center indicator";
-        break;
-      default:
-        modes << "unknown";
-      }
+      if (this->InteractionModes[i] == VTK_KW_TW_MODE_NONE)
+        {
+        continue;
+        }
+      switch (i)
+        {
+        case 0:
+          modes << "left";
+          break;
+        case 1:
+          modes << "middle";
+          break;
+        case 2:
+          modes << "right";
+          break;
+        }
+
+      modes << " button: ";
+
+      switch (this->InteractionModes[i])
+        {
+        case VTK_KW_TW_MODE_LINEAR_MOTION:
+          modes << "linear";
+          break;
+        case VTK_KW_TW_MODE_NONLINEAR_MOTION:
+          modes << "non-linear";
+          break;
+        case VTK_KW_TW_MODE_TOGGLE_CENTER_INDICATOR:
+          modes << "toggle center indicator";
+          break;
+        default:
+          modes << "unknown";
+        }
     
-    if ((i == 0 && (this->InteractionModes[1] != VTK_KW_TW_MODE_NONE ||
-                    this->InteractionModes[2] != VTK_KW_TW_MODE_NONE)) ||
-        (i == 1 && this->InteractionModes[2] != VTK_KW_TW_MODE_NONE))
-      {
-      modes << ", ";
+      if ((i == 0 && (this->InteractionModes[1] != VTK_KW_TW_MODE_NONE ||
+                      this->InteractionModes[2] != VTK_KW_TW_MODE_NONE)) ||
+          (i == 1 && this->InteractionModes[2] != VTK_KW_TW_MODE_NONE))
+        {
+        modes << ", ";
+        }
       }
-    }
 
-  modes << ")" << ends;
-  this->ThumbWheel->SetBalloonHelpString(modes.str());
-  modes.rdbuf()->freeze(0);
+    modes << ")" << ends;
+    this->ThumbWheel->SetBalloonHelpString(modes.str());
+    modes.rdbuf()->freeze(0);
+    }
+  else
+    {
+    this->ThumbWheel->SetBalloonHelpString(string);
+    }
 
   if (this->Entry)
     {
@@ -1179,10 +1186,17 @@ void vtkKWThumbWheel::SetBalloonHelpString(const char *string)
 
   if (this->PopupMode && this->PopupPushButton)
     {
-    ostrstream temp;
-    temp << string << " (press this button to display a thumbwheel)" << ends;
-    this->PopupPushButton->SetBalloonHelpString(temp.str());
-    temp.rdbuf()->freeze(0);
+    if (string)
+      {
+      ostrstream temp;
+      temp << string << " (press this button to display a thumbwheel)" << ends;
+      this->PopupPushButton->SetBalloonHelpString(temp.str());
+      temp.rdbuf()->freeze(0);
+      }
+    else
+      {
+      this->PopupPushButton->SetBalloonHelpString(string);
+      }
     }
 }
 
