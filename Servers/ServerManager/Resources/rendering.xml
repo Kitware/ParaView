@@ -1844,8 +1844,6 @@
           <Property name="Color" />
           <Property name="Opacity" />
           <Property name="Specular" />
-          <Property name="Ambient" />
-          <Property name="Diffuse" />
         </ExposedProperties>
       </SubProxy>
     

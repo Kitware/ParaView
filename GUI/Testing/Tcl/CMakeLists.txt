@@ -275,7 +275,8 @@ FOREACH (tfile ${PROJECT_TESTS})
     -BT ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch.tcl
     -BC ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
     -B ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch
-    -BV ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch.png
+#    -BV ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch.png
+    -BV ${PVClientTestData}/Baseline/${tfile}.png
     )
 ENDFOREACH (tfile)
 
