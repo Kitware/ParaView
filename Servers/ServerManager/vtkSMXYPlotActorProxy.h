@@ -21,6 +21,7 @@
 #define __vtkSMXYPlotActorProxy_h
 
 #include "vtkSMProxy.h"
+
 class vtkSMSourceProxy;
 class vtkSMXYPlotActorProxyInternals;
 

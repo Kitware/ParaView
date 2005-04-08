@@ -43,7 +43,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.5");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.6");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -297,21 +297,27 @@ void vtkPVProbe::AcceptCallbackInternal()
 
   if (this->ShowXYPlotToggle->GetState() && numPts > 1)
     {
-    vtkPVArrayInformation* arrayInfo = 
-      this->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(0);
+    int numArrays = this->GetDataInformation()->GetPointDataInformation()->GetNumberOfArrays();
     vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
       this->PlotDisplayProxy->GetProperty("ArrayNames"));
     if (svp)
       {
-      svp->SetNumberOfElements(1);
-      svp->SetElement(0, arrayInfo->GetName());
-      this->PlotDisplayProxy->UpdateVTKObjects();
+      //svp->SetNumberOfElements(numArrays);
+      for(int i=0; i<numArrays; i++)
+        {
+        vtkPVArrayInformation* arrayInfo = 
+          this->GetDataInformation()->GetPointDataInformation()->GetArrayInformation(i);
+        if( arrayInfo->GetNumberOfComponents() == 1 )
+          {
+          svp->SetElement(i, arrayInfo->GetName());
+          }
+        }
+      this->PlotDisplayProxy->cmSetVisibility(1); //Call UpdateVTKObjects
       }
     else
       {
       vtkErrorMacro("Failed to find property ArrayNames.");
       }
-    this->PlotDisplayProxy->cmSetVisibility(1);
     }
   else
     {

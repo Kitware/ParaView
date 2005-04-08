@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-
 #include "vtkSMXYPlotDisplayProxy.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMInputProperty.h"
@@ -27,7 +27,6 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVOptions.h"
 #include "vtkSMRenderModuleProxy.h"
-#include "vtkCoordinate.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindowInteractor.h"
@@ -60,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.8");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.9");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {

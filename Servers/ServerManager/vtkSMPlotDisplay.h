@@ -21,18 +21,12 @@
 #ifndef __vtkSMPlotDisplay_h
 #define __vtkSMPlotDisplay_h
 
-
 #include "vtkSMDisplay.h"
 
 
-class vtkDataSet;
 class vtkPVProcessModule;
-class vtkPVDataInformation;
-class vtkPolyDataMapper;
-class vtkProp;
 class vtkSMSourceProxy;
 class vtkSMProxy;
-class vtkPVColorMap;
 class vtkPolyData;
 class vtkXYPlotWidget;
 
