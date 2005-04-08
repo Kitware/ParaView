@@ -25,8 +25,8 @@ void display_usage(kwsys::CommandLineArguments &args)
 {
   kwsys_stl::string exe_basename = 
     kwsys::SystemTools::GetFilenameName(args.GetArgv0());
-  kwsys_ios::cerr << "Usage: " << exe_basename << " [--update] [--zlib] [--base64] header.h image.png [image.png image.png...]" << kwsys_ios::endl;
-  kwsys_ios::cerr << args.GetHelp();
+  cerr << "Usage: " << exe_basename << " [--update] [--zlib] [--base64] header.h image.png [image.png image.png...]" << kwsys_ios::endl;
+  cerr << args.GetHelp();
 }
 
 //----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 
   if (rem_argc < 3)
     {
-    kwsys_ios::cerr << "Invalid or missing arguments" << kwsys_ios::endl;
+    cerr << "Invalid or missing arguments" << kwsys_ios::endl;
     display_usage(args);
     res = 0;
     }
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     option_base64 *=
       vtkKWResourceUtilities::CONVERT_IMAGE_TO_HEADER_OPTION_BASE64;
    
-    kwsys_ios::cout << "- " << rem_argv[1] << endl;
+    cout << "- " << rem_argv[1] << endl;
 
     vtkKWResourceUtilities::ConvertImageToHeader(
       rem_argv[1], (const char **)&rem_argv[2], rem_argc - 2, 
