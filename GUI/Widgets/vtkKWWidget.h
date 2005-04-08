@@ -208,15 +208,6 @@ public:
   vtkGetStringMacro(BalloonHelpString);
 
   // Description:
-  // Adjusts the placement of the baloon help
-  vtkSetMacro(BalloonHelpJustification,int);
-  vtkGetMacro(BalloonHelpJustification,int);  
-  void SetBalloonHelpJustificationToLeft(){
-    this->SetBalloonHelpJustification(0);};
-  void SetBalloonHelpJustificationToRight(){
-    this->SetBalloonHelpJustification(2);};
-  
-  // Description:
   // Query if there are drag and drop targets between this widget and
   // other widgets. Get the targets.
   // IMPORTANT: the vtkKWDragAndDropHelper object is lazy-allocated, i.e.
@@ -307,9 +298,6 @@ protected:
   // Ballon help
 
   char  *BalloonHelpString;
-  int   BalloonHelpJustification;
-  int   BalloonHelpInitialized;
-  void  SetUpBalloonHelpBindings();
   
   int Enabled;
 

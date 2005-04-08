@@ -42,7 +42,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.218");
+vtkCxxRevisionMacro(vtkKWWindow, "1.219");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -1083,7 +1083,7 @@ int vtkKWWindow::GetHelpMenuIndex()
 //----------------------------------------------------------------------------
 int vtkKWWindow::ExitDialog()
 {
-  this->GetApplication()->SetBalloonHelpWidget(0);
+  //this->GetApplication()->GetBalloonHelpWidget(0);
   if ( this->ExitDialogWidget )
     {
     return 1;

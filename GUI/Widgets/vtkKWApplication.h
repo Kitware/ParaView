@@ -29,6 +29,7 @@ class vtkKWLabel;
 class vtkKWMessageDialog;
 class vtkKWMessageDialog;
 class vtkKWRegistryHelper;
+class vtkKWBalloonHelpManager;
 class vtkKWSplashScreen;
 class vtkKWWidget;
 class vtkKWWindow;
@@ -175,26 +176,6 @@ public:
   int SelfTest();
 
   // Description:
-  // Internal Balloon help callbacks.
-  void BalloonHelpTrigger(vtkKWWidget *widget);
-  void BalloonHelpDisplay(vtkKWWidget *widget);
-  void BalloonHelpCancel();
-  void BalloonHelpWithdraw();
-  void SetBalloonHelpWidget(vtkKWWidget *widget);
-
-  // Description:
-  // Set the delay for the balloon help in seconds.
-  // To disable balloon help, set it to 0.
-  vtkSetClampMacro(BalloonHelpDelay, int, 0, 5);
-  vtkGetMacro(BalloonHelpDelay, int);
-
-  // Description:
-  // Show balloon help.
-  virtual void SetShowBalloonHelp(int);
-  vtkGetMacro(ShowBalloonHelp, int);
-  vtkBooleanMacro(ShowBalloonHelp, int);
-
-  // Description:
   // This variable can be used to hide the user interface.  
   // When WidgetVisibility is off, The cherat methods of vtkKWWidgets 
   // should not create the TK widgets.
@@ -339,6 +320,10 @@ public:
   // Convenience method to get the operating system version
   virtual int GetSystemVersion(ostream &os);
 
+  // Description:
+  // Return the Balloon Help helper object. 
+  vtkKWBalloonHelpManager *GetBalloonHelpManager();
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -374,14 +359,6 @@ protected:
 
   int ApplicationExited;
 
-  // For Balloon help
-  vtkKWWidget *BalloonHelpWindow;
-  vtkKWLabel *BalloonHelpLabel;
-  char *BalloonHelpPending;
-  vtkSetStringMacro(BalloonHelpPending);
-  vtkKWWidget *BalloonHelpWidget;
-  int ShowBalloonHelp;
-
   vtkGetStringMacro(DisplayHelpStartingPage);
   vtkSetStringMacro(DisplayHelpStartingPage);
   char *DisplayHelpStartingPage;
@@ -396,11 +373,12 @@ protected:
 
   vtkKWRegistryHelper *RegistryHelper;
   int RegistryLevel;
-  int BalloonHelpDelay;
 
   int UseMessageDialogs;
 
   int ExitOnReturn;
+
+  vtkKWBalloonHelpManager *BalloonHelpManager;
 
   // Splash screen
 

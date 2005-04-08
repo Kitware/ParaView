@@ -21,6 +21,7 @@
 #include "vtkKWMessageDialog.h"
 #include "vtkKWObject.h"
 #include "vtkKWRegistryHelper.h"
+#include "vtkKWBalloonHelpManager.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetsConfigure.h"
@@ -60,7 +61,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.193");
+vtkCxxRevisionMacro(vtkKWApplication, "1.194");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -71,7 +72,6 @@ int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkKWApplication::vtkKWApplication()
 {
-  this->BalloonHelpWidget = 0;
   this->CommandFunction = vtkKWApplicationCommand;
   
   this->ApplicationName = kwsys::SystemTools::DuplicateString("Kitware");
@@ -103,6 +103,8 @@ vtkKWApplication::vtkKWApplication()
   this->RegistryHelper = 0;
   this->RegistryLevel = 10;
 
+  this->BalloonHelpManager = 0;
+
   this->UseMessageDialogs = 1;  
 
   this->CharacterEncoding = VTK_ENCODING_UNKNOWN;
@@ -113,21 +115,6 @@ vtkKWApplication::vtkKWApplication()
   this->AboutDialog      = 0;
   this->AboutDialogImage = 0;
   this->AboutRuntimeInfo = 0;
-
-  // add the application as $app
-
-  if (vtkKWApplication::WidgetVisibility)
-    {
-    this->BalloonHelpWindow = vtkKWWidget::New();
-    this->BalloonHelpLabel = vtkKWLabel::New();
-    }
-  else
-    {
-    this->BalloonHelpWindow = 0;
-    this->BalloonHelpLabel = 0;
-    }
-  this->BalloonHelpPending = NULL;
-  this->BalloonHelpDelay = 2;
 
   // setup tcl stuff
   this->MainInterp = Et_Interp;
@@ -147,16 +134,6 @@ vtkKWApplication::vtkKWApplication()
 
   if (vtkKWApplication::WidgetVisibility)
     {
-    this->BalloonHelpWindow->Create(
-      this, "toplevel", "-background black -bd 1 -relief flat");
-    this->BalloonHelpLabel->SetParent(this->BalloonHelpWindow);    
-    this->BalloonHelpLabel->Create(
-      this, "-background LightYellow -foreground black -justify left "
-      "-wraplength 2i");
-    this->Script("pack %s", this->BalloonHelpLabel->GetWidgetName());
-    this->Script("wm overrideredirect %s 1", 
-                 this->BalloonHelpWindow->GetWidgetName());
-    this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
     this->SplashScreen = vtkKWSplashScreen::New();
     }
   else
@@ -170,7 +147,6 @@ vtkKWApplication::vtkKWApplication()
 
   this->ApplicationExited = 0;
 
-  this->ShowBalloonHelp = 1;
   this->SaveWindowGeometry = 1;
   this->ShowSplashScreen = 1;
 }
@@ -179,21 +155,6 @@ vtkKWApplication::vtkKWApplication()
 vtkKWApplication::~vtkKWApplication()
 {
   this->SetLimitedEditionModeName(NULL);
-  this->SetBalloonHelpPending(NULL);
-
-  if (this->BalloonHelpWindow)
-    {
-    this->BalloonHelpWindow->Delete();
-    this->BalloonHelpWindow = NULL;
-    }
-
-  if (this->BalloonHelpLabel)
-    {
-    this->BalloonHelpLabel->Delete();
-    this->BalloonHelpLabel = NULL;
-    }
-
-  this->SetBalloonHelpWidget(0);
 
   if (this->AboutDialogImage)
     {
@@ -234,6 +195,13 @@ vtkKWApplication::~vtkKWApplication()
   if (this->RegistryHelper )
     {
     this->RegistryHelper->Delete();
+    this->RegistryHelper = NULL;
+    }
+
+  if (this->BalloonHelpManager )
+    {
+    this->BalloonHelpManager->Delete();
+    this->BalloonHelpManager = NULL;
     }
 }
 
@@ -505,24 +473,16 @@ void vtkKWApplication::Exit()
       }
     }
   
-  this->SetBalloonHelpPending(NULL);
-
-  if (this->BalloonHelpWindow)
-    {
-    this->BalloonHelpWindow->Delete();
-    this->BalloonHelpWindow = NULL;
-    }
-
-  if (this->BalloonHelpLabel)
-    {
-    this->BalloonHelpLabel->Delete();
-    this->BalloonHelpLabel = NULL;
-    }
-
   if (this->SplashScreen)
     {
     this->SplashScreen->Delete();
     this->SplashScreen = NULL;
+    }
+
+  if (this->BalloonHelpManager )
+    {
+    this->BalloonHelpManager->Delete();
+    this->BalloonHelpManager = NULL;
     }
 
   this->Cleanup();
@@ -771,8 +731,9 @@ void vtkKWApplication::GetApplicationSettingsFromRegistry()
   if (this->HasRegistryValue(
     2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY))
     {
-    this->ShowBalloonHelp = this->GetIntRegistryValue(
-      2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY);
+    this->GetBalloonHelpManager()->SetShow(
+      this->GetIntRegistryValue(
+        2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY));
     }
 
   // Save window geometry ?
@@ -846,175 +807,6 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
   dlg->Invoke();  
   dlg->Delete();
 #endif
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
-{
-  if ( this->InExit )
-    {
-    return;
-    }
-  if ( !widget->IsCreated() )
-    {
-    return;
-    }
-  const char *result;
-
-  // If there is no help string, return
-
-  if (!this->ShowBalloonHelp || 
-      !widget->GetBalloonHelpString() || 
-      this->BalloonHelpDelay <= 0)
-    {
-    this->SetBalloonHelpPending(NULL);
-    return;
-    }
-  
-  this->BalloonHelpCancel();
-  this->SetBalloonHelpWidget(widget);
-  result = this->Script("after %d {catch {%s BalloonHelpDisplay %s}}", 
-                        this->BalloonHelpDelay * 1000,
-                        this->GetTclName(), widget->GetTclName());
-  this->SetBalloonHelpPending(result);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
-{
-  if ( this->InExit )
-    {
-    return;
-    }
-  if (!this->ShowBalloonHelp ||
-      !this->BalloonHelpLabel || 
-      !this->BalloonHelpWindow ||
-      !widget->GetParent())
-    {
-    return;
-    }
-  int x, y;
-
-  // If there is no help string, return
-  if ( !widget->GetBalloonHelpString() )
-    {
-    this->SetBalloonHelpPending(NULL);
-    return;
-    }
-
-  // make sure it is really pending
-  this->BalloonHelpLabel->SetText(widget->GetBalloonHelpString());
-
-  // Get the position of the mouse in the renderer.
-  x = atoi(this->Script( "winfo pointerx %s", widget->GetWidgetName()));
-  y = atoi(this->Script( "winfo pointery %s", widget->GetWidgetName()));
-
-  // Get the position of the parent widget of the one needing help
-  int xw = atoi(
-    this->Script( "winfo rootx %s", widget->GetParent()->GetWidgetName()));
-
-  // get the size of the balloon window
-  int dx = atoi(
-    this->Script("winfo reqwidth %s",this->BalloonHelpLabel->GetWidgetName()));
-  
-  // get the size of the parent window of the one needing help
-  int dxw = atoi(
-    this->Script( "winfo width %s", widget->GetParent()->GetWidgetName()));
-  
-  // Set the position of the window relative to the mouse.
-  int just = widget->GetBalloonHelpJustification();
-
-  // just 0 == left just 2 == right
-  if (just)
-    {
-    if (x + dx > xw + dxw)
-      {
-      x = xw + dxw - dx;
-      }
-    }
-  // with left justification (default) still try to keep the 
-  // help from going past the right edge of the widget
-  else
-    {
-     // if it goes too far right
-    if (x + dx > xw + dxw)
-      {
-      // move it to the left
-      x = xw + dxw - dx;
-      // but not past the left edge of the parent widget
-      if (x < xw)
-        {
-        x = xw;
-        }
-      }
-    }
-  
-  this->Script("wm geometry %s +%d+%d",
-               this->BalloonHelpWindow->GetWidgetName(), x, y+15);
-  this->Script("update");
-
-  // map the window
-  if (this->BalloonHelpPending)
-    {
-    this->Script("wm deiconify %s", this->BalloonHelpWindow->GetWidgetName());
-    this->Script("raise %s", this->BalloonHelpWindow->GetWidgetName());
-    }
-  
-  this->SetBalloonHelpPending(NULL);
-
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::BalloonHelpCancel()
-{
-  if ( this->InExit )
-    {
-    return;
-    }
-  if (this->BalloonHelpPending)
-    {
-    this->Script("after cancel %s", this->BalloonHelpPending);
-    this->SetBalloonHelpPending(NULL);
-    }
-  if ( this->BalloonHelpWindow )
-    {
-    this->Script("wm withdraw %s",this->BalloonHelpWindow->GetWidgetName());
-    }
-  this->SetBalloonHelpWidget(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::BalloonHelpWithdraw()
-{
-  if ( this->InExit )
-    {
-    return;
-    }
-  if ( !this->BalloonHelpLabel || !this->BalloonHelpWindow )
-    {
-    return;
-    }
-  this->Script("wm withdraw %s",this->BalloonHelpWindow->GetWidgetName());
-  if ( this->BalloonHelpWidget )
-    {
-    this->BalloonHelpTrigger(this->BalloonHelpWidget);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::SetShowBalloonHelp(int v)
-{
-  if (this->ShowBalloonHelp == v)
-    {
-    return;
-    }
-  this->ShowBalloonHelp = v;
-  this->Modified();
-
-  if (!this->ShowBalloonHelp)
-    {
-    this->BalloonHelpCancel();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -1184,22 +976,14 @@ vtkKWRegistryHelper *vtkKWApplication::GetRegistryHelper()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::SetBalloonHelpWidget( vtkKWWidget *widget )
+vtkKWBalloonHelpManager *vtkKWApplication::GetBalloonHelpManager()
 {
-  if ( this->InExit && widget )
+  if (!this->BalloonHelpManager)
     {
-    return;
+    this->BalloonHelpManager = vtkKWBalloonHelpManager::New();
+    this->BalloonHelpManager->SetApplication(this);
     }
-  if ( this->BalloonHelpWidget )
-    {
-    this->BalloonHelpWidget->UnRegister(this);
-    this->BalloonHelpWidget = 0;
-    }
-  if ( widget )
-    {
-    this->BalloonHelpWidget = widget;
-    this->BalloonHelpWidget->Register(this);
-    }  
+  return this->BalloonHelpManager;
 }
 
 //----------------------------------------------------------------------------
@@ -2045,8 +1829,6 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->GetEmailFeedbackAddress() ? this->GetEmailFeedbackAddress() :
          "(none)")
      << endl;
-  os << indent << "ShowBalloonHelp: " << (this->ShowBalloonHelp ? "on":"off") << endl;
-  os << indent << "BalloonHelpDelay: " << this->GetBalloonHelpDelay() << endl;
   os << indent << "DialogUp: " << this->GetDialogUp() << endl;
   os << indent << "ExitStatus: " << this->GetExitStatus() << endl;
   os << indent << "RegistryLevel: " << this->GetRegistryLevel() << endl;
@@ -2061,6 +1843,14 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   else
     {
     os << indent << "SplashScreen: (none)" << endl;
+    }
+  if (this->BalloonHelpManager)
+    {
+    os << indent << "BalloonHelpManager: " << this->BalloonHelpManager << endl;
+    }
+  else
+    {
+    os << indent << "BalloonHelpManager: (none)" << endl;
     }
   os << indent << "HasSplashScreen: " << (this->HasSplashScreen ? "on":"off") << endl;
   os << indent << "ShowSplashScreen: " << (this->ShowSplashScreen ? "on":"off") << endl;

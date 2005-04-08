@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.62");
+vtkCxxRevisionMacro(vtkPVScale, "1.63");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -72,35 +72,16 @@ void vtkPVScale::SetLabel(const char* label)
 //----------------------------------------------------------------------------
 void vtkPVScale::SetBalloonHelpString(const char *str)
 {
+  this->Superclass::SetBalloonHelpString(str);
 
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  if (this->LabelWidget)
     {
-    return;
+    this->LabelWidget->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  if (this->Scale)
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
-    }
-  
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
-    {
-    this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
-    this->Scale->SetBalloonHelpString(this->BalloonHelpString);
-    this->BalloonHelpInitialized = 1;
+    this->Scale->SetBalloonHelpString(str);
     }
 }
 
@@ -215,7 +196,6 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
     }
   this->SetDisplayEntryAndLabelOnTop(this->EntryAndLabelOnTopFlag);
   
-  this->SetBalloonHelpString(this->BalloonHelpString);
   this->Script("pack %s -side left -fill x -expand t", 
                this->Scale->GetWidgetName());
 }

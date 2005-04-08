@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.44");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.45");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -63,35 +63,16 @@ void vtkPVStringEntry::SetLabel(const char* label)
 //----------------------------------------------------------------------------
 void vtkPVStringEntry::SetBalloonHelpString(const char *str)
 {
+  this->Superclass::SetBalloonHelpString(str);
 
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  if (this->LabelWidget)
     {
-    return;
+    this->LabelWidget->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  if (this->Entry)
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
-    }
-  
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
-    {
-    this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
-    this->Entry->SetBalloonHelpString(this->BalloonHelpString);
-    this->BalloonHelpInitialized = 1;
+    this->Entry->SetBalloonHelpString(str);
     }
 }
 
@@ -130,10 +111,6 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp)
   this->Entry->Create(pvApp, "");
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->Entry->GetWidgetName(), this->GetTclName());
-  if (this->BalloonHelpString)
-    {
-    this->SetBalloonHelpString(this->BalloonHelpString);
-    }
   this->Script("pack %s -side left -fill x -expand t",
                this->Entry->GetWidgetName());
 }

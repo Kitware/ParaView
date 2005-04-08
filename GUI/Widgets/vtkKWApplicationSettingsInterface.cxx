@@ -25,6 +25,7 @@
 #include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWBalloonHelpManager.h"
 
 //----------------------------------------------------------------------------
 
@@ -32,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.27");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.28");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -471,7 +472,7 @@ void vtkKWApplicationSettingsInterface::Update()
   if (this->ShowBalloonHelpCheckButton)
     {
     this->ShowBalloonHelpCheckButton->SetState(
-      this->GetApplication()->GetShowBalloonHelp());
+      this->GetApplication()->GetBalloonHelpManager()->GetShow());
     }
 
   // Interface settings : show most recent panels
@@ -629,7 +630,7 @@ void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
   this->GetApplication()->SetRegistryValue(
     2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY, "%d", state);
 
-  this->GetApplication()->SetShowBalloonHelp(state);
+  this->GetApplication()->GetBalloonHelpManager()->SetShow(state);
 }
 
 //----------------------------------------------------------------------------

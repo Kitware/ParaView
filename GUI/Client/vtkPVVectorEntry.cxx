@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.72");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.73");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -90,33 +90,15 @@ void vtkPVVectorEntry::SetLabel(const char* label)
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
 {
+  this->Superclass::SetBalloonHelpString(str);
 
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  if (this->LabelWidget)
     {
-    return;
+    this->LabelWidget->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  if (this->Entries)
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
-    }
-
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
-    {
-    this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
     this->Entries->InitTraversal();
     int numItems = this->Entries->GetNumberOfItems();
     int i;
@@ -124,7 +106,6 @@ void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
       {
       this->Entries->GetNextKWWidget()->SetBalloonHelpString(str);
       }
-    this->BalloonHelpInitialized = 1;
     }
 }
 
@@ -180,7 +161,6 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
     this->Entries->AddItem(entry);
     entry->Delete();
     }
-  this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
 //-----------------------------------------------------------------------------

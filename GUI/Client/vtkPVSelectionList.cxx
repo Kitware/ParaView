@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.55");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.56");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -65,35 +65,16 @@ vtkPVSelectionList::~vtkPVSelectionList()
 
 void vtkPVSelectionList::SetBalloonHelpString(const char *str)
 {
+  this->Superclass::SetBalloonHelpString(str);
 
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  if (this->Label)
     {
-    return;
+    this->Label->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  if (this->Menu)
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
-    }
-  
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
-    {
-    this->Label->SetBalloonHelpString(this->BalloonHelpString);
-    this->Menu->SetBalloonHelpString(this->BalloonHelpString);
-    this->BalloonHelpInitialized = 1;
+    this->Menu->SetBalloonHelpString(str);
     }
 }
 
@@ -156,7 +137,6 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
     {
     this->Menu->SetValue(name);
     }
-  this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
 

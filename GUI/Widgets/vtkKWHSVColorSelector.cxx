@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.5");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.6");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -552,32 +552,6 @@ void vtkKWHSVColorSelector::SetBalloonHelpString(
   if (this->ValueLabel)
     {
     this->ValueLabel->SetBalloonHelpString(string);
-    }
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWHSVColorSelector::SetBalloonHelpJustification(int j)
-{
-  this->Superclass::SetBalloonHelpJustification(j);
-
-  if (this->HueSatWheelCanvas)
-    {
-    this->HueSatWheelCanvas->SetBalloonHelpJustification(j);
-    }
-
-  if (this->ValueBoxCanvas)
-    {
-    this->ValueBoxCanvas->SetBalloonHelpJustification(j);
-    }
-
-  if (this->HueSatLabel)
-    {
-    this->HueSatLabel->SetBalloonHelpJustification(j);
-    }
-
-  if (this->ValueLabel)
-    {
-    this->ValueLabel->SetBalloonHelpJustification(j);
     }
 }
 

@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.23");
+vtkCxxRevisionMacro(vtkPVValueList, "1.24");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -247,8 +247,6 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   this->Script("pack %s -side left -padx 2",
                this->AddValueButton->GetWidgetName());
   
-  this->SetBalloonHelpString(this->BalloonHelpString);
-
   this->GenerateFrame->SetParent(this);
   this->GenerateFrame->Create(app, "");
   this->GenerateFrame->SetLabelText("Generate range of values");
@@ -406,34 +404,11 @@ void vtkPVValueList::Update()
 //-----------------------------------------------------------------------------
 void vtkPVValueList::SetBalloonHelpString(const char *str)
 {
+  this->Superclass::SetBalloonHelpString(str);
 
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  if (this->ContourValuesList)
     {
-    return;
-    }
-
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
-    {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
-    }
-  
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
-    {
-    this->ContourValuesList->SetBalloonHelpString(this->BalloonHelpString);
-    this->BalloonHelpInitialized = 1;
+    this->ContourValuesList->SetBalloonHelpString(str);
     }
 }
 

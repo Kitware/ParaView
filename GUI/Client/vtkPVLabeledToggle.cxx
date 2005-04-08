@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.36");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -49,35 +49,16 @@ vtkPVLabeledToggle::~vtkPVLabeledToggle()
 //----------------------------------------------------------------------------
 void vtkPVLabeledToggle::SetBalloonHelpString(const char *str)
 {
+  this->Superclass::SetBalloonHelpString(str);
 
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  if (this->Label)
     {
-    return;
+    this->Label->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  if (this->CheckButton)
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
-    }
-  
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
-    {
-    this->Label->SetBalloonHelpString(this->BalloonHelpString);
-    this->CheckButton->SetBalloonHelpString(this->BalloonHelpString);
-    this->BalloonHelpInitialized = 1;
+    this->CheckButton->SetBalloonHelpString(str);
     }
 }
 
@@ -99,10 +80,6 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp)
   // Now the check button
   this->CheckButton->Create(pvApp, "");
   this->CheckButton->SetCommand(this, "ModifiedCallback");
-  if (this->BalloonHelpString)
-    {
-    this->SetBalloonHelpString(this->BalloonHelpString);
-    }
   this->Script("pack %s -side left", this->CheckButton->GetWidgetName());
 }
 

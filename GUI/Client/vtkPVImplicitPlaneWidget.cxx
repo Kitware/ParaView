@@ -48,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.53");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -490,52 +490,66 @@ vtkPVWidget* vtkPVImplicitPlaneWidget::ClonePrototypeInternal(
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetBalloonHelpString(const char *str)
 {
+  this->Superclass::SetBalloonHelpString(str);
 
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  if (this->Labels[0])
     {
-    return;
+    this->Labels[0]->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  if (this->Labels[1])
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
+    this->Labels[1]->SetBalloonHelpString(str);
     }
 
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
+  if (this->CenterResetButton)
     {
-    this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
-    this->Labels[1]->SetBalloonHelpString(this->BalloonHelpString);
+    this->CenterResetButton->SetBalloonHelpString(str);
+    }
 
-    this->CenterResetButton->SetBalloonHelpString(this->BalloonHelpString);
-    this->NormalCameraButton->SetBalloonHelpString(this->BalloonHelpString);
-    this->NormalXButton->SetBalloonHelpString(this->BalloonHelpString);
-    this->NormalYButton->SetBalloonHelpString(this->BalloonHelpString);
-    this->NormalZButton->SetBalloonHelpString(this->BalloonHelpString);
+  if (this->NormalCameraButton)
+    {
+    this->NormalCameraButton->SetBalloonHelpString(str);
+    }
 
-    for (int i=0; i<3; i++)
+  if (this->NormalXButton)
+    {
+    this->NormalXButton->SetBalloonHelpString(str);
+    }
+
+  if (this->NormalYButton)
+    {
+    this->NormalYButton->SetBalloonHelpString(str);
+    }
+
+  if (this->NormalZButton)
+    {
+    this->NormalZButton->SetBalloonHelpString(str);
+    }
+
+  for (int i=0; i<3; i++)
+    {
+    if (this->CoordinateLabel[i])
       {
-      this->CoordinateLabel[i]->SetBalloonHelpString(this->BalloonHelpString);
-      this->CenterEntry[i]->SetBalloonHelpString(this->BalloonHelpString);
-      this->NormalEntry[i]->SetBalloonHelpString(this->BalloonHelpString);
+      this->CoordinateLabel[i]->SetBalloonHelpString(str);
       }
-
-    this->OffsetEntry->SetBalloonHelpString(this->BalloonHelpString);
-    this->OffsetLabel->SetBalloonHelpString(this->BalloonHelpString);
-
-    this->BalloonHelpInitialized = 1;
+    if (this->CenterEntry[i])
+      {
+      this->CenterEntry[i]->SetBalloonHelpString(str);
+      }
+    if (this->NormalEntry[i])
+      {
+      this->NormalEntry[i]->SetBalloonHelpString(str);
+      }
+    }
+  
+  if (this->OffsetEntry)
+    {
+    this->OffsetEntry->SetBalloonHelpString(str);
+    }
+  if (this->OffsetLabel)
+    {
+    this->OffsetLabel->SetBalloonHelpString(str);
     }
 }
 
@@ -696,7 +710,6 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
       this->SetNormal(0, 0, 1);
       }
     }
-  this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
 //----------------------------------------------------------------------------

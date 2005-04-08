@@ -21,12 +21,13 @@
 #include "vtkKWWindow.h"
 #include "vtkKWDragAndDropHelper.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWBalloonHelpManager.h"
 
 #include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.115");
+vtkCxxRevisionMacro(vtkKWWidget, "1.116");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -43,8 +44,6 @@ vtkKWWidget::vtkKWWidget()
   this->DeletingChildren         = 0;
 
   this->BalloonHelpString        = NULL;  
-  this->BalloonHelpJustification = 0;
-  this->BalloonHelpInitialized   = 0;
 
   this->Enabled                  = 1;
 
@@ -206,6 +205,14 @@ int vtkKWWidget::Create(vtkKWApplication *app,
     */
    
     this->UpdateEnableState();
+
+    // If the balloon help string has been set, make sure the bindings
+    // are set too, now that we have been created
+
+    if (this->BalloonHelpString)
+      {
+      this->GetApplication()->GetBalloonHelpManager()->AddBindings(this);
+      }
     }
 
   return 1;
@@ -215,22 +222,6 @@ int vtkKWWidget::Create(vtkKWApplication *app,
 int vtkKWWidget::IsCreated()
 {
   return (this->GetApplication() != NULL && this->WidgetIsCreated);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SetUpBalloonHelpBindings()
-{
-  this->Script("bind %s <Enter> {+%s BalloonHelpTrigger %s}", 
-               this->GetWidgetName(), this->GetApplication()->GetTclName(),
-               this->GetTclName());
-  this->Script("bind %s <ButtonPress> {+%s BalloonHelpWithdraw}", 
-               this->GetWidgetName(), this->GetApplication()->GetTclName());
-  this->Script("bind %s <KeyPress> {+%s BalloonHelpWithdraw}", 
-               this->GetWidgetName(), this->GetApplication()->GetTclName());
-  this->Script("bind %s <Leave> {+%s BalloonHelpCancel}", 
-               this->GetWidgetName(), this->GetApplication()->GetTclName());
-  this->Script("bind %s <B1-Motion> {+%s BalloonHelpWithdraw}", 
-               this->GetWidgetName(), this->GetApplication()->GetTclName());  
 }
 
 //----------------------------------------------------------------------------
@@ -408,29 +399,26 @@ void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandStri
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetBalloonHelpString(const char *str)
 {
-  // A little overkill.
   if (this->BalloonHelpString == NULL && str == NULL)
     {
     return;
     }
 
-  // Normal string stuff.
   if (this->BalloonHelpString)
     {
     delete [] this->BalloonHelpString;
     this->BalloonHelpString = NULL;
     }
+
   if (str != NULL)
     {
-    this->BalloonHelpString = new char[strlen(str)+1];
+    this->BalloonHelpString = new char[strlen(str) + 1];
     strcpy(this->BalloonHelpString, str);
     }
   
-  if ( this->BalloonHelpString && this->GetApplication() && 
-       !this->BalloonHelpInitialized )
+  if (this->BalloonHelpString && this->GetApplication() && this->IsCreated())
     {
-    this->SetUpBalloonHelpBindings();
-    this->BalloonHelpInitialized = 1;
+    this->GetApplication()->GetBalloonHelpManager()->AddBindings(this);
     }
 }
 
@@ -1144,8 +1132,6 @@ int vtkKWWidget::TakeScreenDump(const char* fname,
 void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "BalloonHelpJustification: " 
-     << this->GetBalloonHelpJustification() << endl;
   os << indent << "BalloonHelpString: " 
      << (this->BalloonHelpString ? this->BalloonHelpString : "None") << endl;
   os << indent << "Children: " << this->Children << endl;

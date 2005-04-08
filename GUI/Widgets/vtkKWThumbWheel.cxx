@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.25");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.26");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -1183,27 +1183,6 @@ void vtkKWThumbWheel::SetBalloonHelpString(const char *string)
     temp << string << " (press this button to display a thumbwheel)" << ends;
     this->PopupPushButton->SetBalloonHelpString(temp.str());
     temp.rdbuf()->freeze(0);
-    }
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWThumbWheel::SetBalloonHelpJustification(int j)
-{
-  this->ThumbWheel->SetBalloonHelpJustification(j);
-
-  if (this->Entry)
-    {
-    this->Entry->SetBalloonHelpJustification(j);
-    }
-
-  if (this->Label)
-    {
-    this->Label->SetBalloonHelpJustification(j);
-    }
-
-  if (this->PopupMode && this->PopupPushButton)
-    {
-    this->PopupPushButton->SetBalloonHelpJustification(j);
     }
 }
 

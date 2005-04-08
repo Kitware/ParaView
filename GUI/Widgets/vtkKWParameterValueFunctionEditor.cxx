@@ -32,7 +32,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.39");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.40");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -3799,37 +3799,6 @@ void vtkKWParameterValueFunctionEditor::SetBalloonHelpString(
   if (this->ParameterEntry)
     {
     this->ParameterEntry->SetBalloonHelpString(string);
-    }
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::SetBalloonHelpJustification(int j)
-{
-  this->Superclass::SetBalloonHelpJustification(j);
-
-  if (this->Canvas)
-    {
-    this->Canvas->SetBalloonHelpJustification(j);
-    }
-
-  if (this->ParameterRange)
-    {
-    this->ParameterRange->SetBalloonHelpJustification(j);
-    }
-
-  if (this->ValueRange)
-    {
-    this->ValueRange->SetBalloonHelpJustification(j);
-    }
-
-  if (this->RangeLabel)
-    {
-    this->RangeLabel->SetBalloonHelpJustification(j);
-    }
-
-  if (this->ParameterEntry)
-    {
-    this->ParameterEntry->SetBalloonHelpJustification(j);
     }
 }
 

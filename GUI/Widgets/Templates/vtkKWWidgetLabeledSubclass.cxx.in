@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKW@WidgetType@Labeled);
-vtkCxxRevisionMacro(vtkKW@WidgetType@Labeled, "1.1");
+vtkCxxRevisionMacro(vtkKW@WidgetType@Labeled, "1.2");
 
 int vtkKW@WidgetType@LabeledCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -168,17 +168,6 @@ void vtkKW@WidgetType@Labeled::SetBalloonHelpString(const char *string)
   if (this->Widget)
     {
     this->Widget->SetBalloonHelpString(string);
-    }
-}
-
-// ---------------------------------------------------------------------------
-void vtkKW@WidgetType@Labeled::SetBalloonHelpJustification(int j)
-{
-  this->Superclass::SetBalloonHelpJustification(j);
-
-  if (this->Widget)
-    {
-    this->Widget->SetBalloonHelpJustification(j);
     }
 }
 

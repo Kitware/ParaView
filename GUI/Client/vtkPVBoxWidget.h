@@ -43,11 +43,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // This class redefines SetBalloonHelpString since it
-  // has to forward the call to a widget it contains.
-  virtual void SetBalloonHelpString(const char *str);
-
-  // Description:
   // Called when the PVSources reset button is called.
   virtual void ResetInternal();
 

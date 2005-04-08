@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.53");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -426,39 +426,6 @@ vtkPVWidget* vtkPVBoxWidget::ClonePrototypeInternal(
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::SetBalloonHelpString(const char *str)
-{
-
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
-    {
-    return;
-    }
-
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
-    {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
-    }
-
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
-    {
-    this->BalloonHelpInitialized = 1;
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
 {
   if ((this->GetTraceHelper()->GetObjectNameState() == 
@@ -607,9 +574,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
       this->ActualPlaceWidget();
       }
     }
-
-  this->SetBalloonHelpString(this->BalloonHelpString);
 }
+
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::Create( vtkKWApplication *app)
 {

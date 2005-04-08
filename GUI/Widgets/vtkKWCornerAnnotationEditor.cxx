@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.1");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.2");
 
 int vtkKWCornerAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -244,7 +244,6 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app,
     "Set the lower left corner annotation. The text will automatically scale "
     "to fit within the allocated space");
 
-  this->CornerText[1]->SetBalloonHelpJustificationToRight();
   this->CornerText[1]->SetBalloonHelpString(
     "Set the lower right corner annotation. The text will automatically scale "
     "to fit within the allocated space");
@@ -253,7 +252,6 @@ void vtkKWCornerAnnotationEditor::Create(vtkKWApplication *app,
     "Set the upper left corner annotation. The text will automatically scale "
     "to fit within the allocated space");
 
-  this->CornerText[3]->SetBalloonHelpJustificationToRight();
   this->CornerText[3]->SetBalloonHelpString(
     "Set the upper right corner annotation. The text will automatically scale "
     "to fit within the allocated space");

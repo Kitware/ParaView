@@ -204,7 +204,6 @@ public:
   // Setting this string enables balloon help for this widget.
   // Override to pass down to children for cleaner behavior.
   virtual void SetBalloonHelpString(const char *str);
-  virtual void SetBalloonHelpJustification(int j);
 
   // Description:
   // Bind/Unbind all components so that values can be changed, but

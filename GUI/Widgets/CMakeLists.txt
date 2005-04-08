@@ -21,6 +21,7 @@ SET( KWWidgets_SRCS
   vtkKWApplication.cxx 
   vtkKWApplicationSettingsInterface.cxx
   vtkKWBWidgets.cxx
+  vtkKWBalloonHelpManager.cxx
   vtkKWCanvas.cxx 
   vtkKWChangeColorButton.cxx 
   vtkKWCheckButton.cxx 
@@ -37,10 +38,10 @@ SET( KWWidgets_SRCS
   vtkKWFrame.cxx
   vtkKWFrameLabeled.cxx 
   vtkKWGenericRenderWindowInteractor.cxx
-  vtkKWHistogram.cxx
-  vtkKWHistogramSet.cxx
   vtkKWHSVColorSelector.cxx
   vtkKWHeaderAnnotationEditor.cxx 
+  vtkKWHistogram.cxx
+  vtkKWHistogramSet.cxx
   vtkKWIcon.cxx
   vtkKWLabel.cxx
   vtkKWListBox.cxx 

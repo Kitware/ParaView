@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.40");
+vtkCxxRevisionMacro(vtkKWRange, "1.41");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -1354,25 +1354,6 @@ void vtkKWRange::SetBalloonHelpString(const char *string)
     if (this->Entries[i])
       {
       this->Entries[i]->SetBalloonHelpString(string);
-      }
-    }
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWRange::SetBalloonHelpJustification(int j)
-{
-  this->Superclass::SetBalloonHelpJustification(j);
-
-  if (this->Canvas)
-    {
-    this->Canvas->SetBalloonHelpJustification(j);
-    }
-
-  for (int i = 0; i < VTK_KW_RANGE_NB_ENTRIES; i++)
-    {
-    if (this->Entries[i])
-      {
-      this->Entries[i]->SetBalloonHelpJustification(j);
       }
     }
 }

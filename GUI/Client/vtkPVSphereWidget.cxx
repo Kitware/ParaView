@@ -46,7 +46,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.58");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.59");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -385,44 +385,38 @@ vtkPVWidget* vtkPVSphereWidget::ClonePrototypeInternal(
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetBalloonHelpString(const char *str)
 {
+  this->Superclass::SetBalloonHelpString(str);
 
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  if (this->Labels[0])
     {
-    return;
+    this->Labels[0]->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  if (this->Labels[1])
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
+    this->Labels[1]->SetBalloonHelpString(str);
     }
 
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
+  if (this->RadiusEntry)
     {
-    this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
-    this->Labels[1]->SetBalloonHelpString(this->BalloonHelpString);
+    this->RadiusEntry->SetBalloonHelpString(str);
+    }
 
-    this->RadiusEntry->SetBalloonHelpString(this->BalloonHelpString);
-    this->CenterResetButton->SetBalloonHelpString(this->BalloonHelpString);
-    for (int i=0; i<3; i++)
+  if (this->CenterResetButton)
+    {
+    this->CenterResetButton->SetBalloonHelpString(str);
+    }
+
+  for (int i=0; i<3; i++)
+    {
+    if (this->CoordinateLabel[i])
       {
-      this->CoordinateLabel[i]->SetBalloonHelpString(this->BalloonHelpString);
-      this->CenterEntry[i]->SetBalloonHelpString(this->BalloonHelpString);
+      this->CoordinateLabel[i]->SetBalloonHelpString(str);
       }
-
-    this->BalloonHelpInitialized = 1;
+    if (this->CenterEntry[i])
+      {
+      this->CenterEntry[i]->SetBalloonHelpString(str);
+      }
     }
 }
 
@@ -529,8 +523,6 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
       this->SetRadius(0.5*(bds[1]-bds[0]));
       }
     }
-
-  this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
 //----------------------------------------------------------------------------

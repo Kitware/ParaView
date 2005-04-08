@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.107");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.108");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -157,36 +157,21 @@ const char* vtkPVFileEntry::GetLabel()
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::SetBalloonHelpString(const char *str)
 {
+  this->Superclass::SetBalloonHelpString(str);
 
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  if (this->LabelWidget)
     {
-    return;
+    this->LabelWidget->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  if (this->Entry)
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
+    this->Entry->SetBalloonHelpString(str);
     }
-  
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
+
+  if (this->BrowseButton)
     {
-    this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
-    this->Entry->SetBalloonHelpString(this->BalloonHelpString);
-    this->BrowseButton->SetBalloonHelpString(this->BalloonHelpString);
-    this->BalloonHelpInitialized = 1;
+    this->BrowseButton->SetBalloonHelpString(str);
     }
 }
 
@@ -230,10 +215,6 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
   this->BrowseButton->SetText("Browse");
   this->BrowseButton->SetCommand(this, "BrowseCallback");
 
-  if (this->BalloonHelpString)
-    {
-    this->SetBalloonHelpString(this->BalloonHelpString);
-    }
   this->Script("pack %s -side left", this->BrowseButton->GetWidgetName());
   this->Script("pack %s -fill both -expand 1", frame->GetWidgetName());
 

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.14");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.15");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -84,10 +84,6 @@ void vtkPVThumbWheel::Create(vtkKWApplication *pvApp)
   this->ThumbWheel->GetEntry()->SetBind(this, "<KeyRelease>",
                                         "ModifiedCallback");
   
-  if (this->BalloonHelpString)
-    {
-    this->SetBalloonHelpString(this->BalloonHelpString);
-    }
   this->Script("pack %s -side left -fill x -expand 1", this->ThumbWheel->GetWidgetName());
 }
 
@@ -139,34 +135,16 @@ void vtkPVThumbWheel::SetLabel(const char *str)
 //-----------------------------------------------------------------------------
 void vtkPVThumbWheel::SetBalloonHelpString(const char *str)
 {
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  this->Superclass::SetBalloonHelpString(str);
+
+  if (this->Label)
     {
-    return;
+    this->Label->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  if (this->ThumbWheel)
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
-    }
-  
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
-    {
-    this->Label->SetBalloonHelpString(this->BalloonHelpString);
-    this->ThumbWheel->SetBalloonHelpString(this->BalloonHelpString);
-    this->BalloonHelpInitialized = 1;
+    this->ThumbWheel->SetBalloonHelpString(str);
     }
 }
 

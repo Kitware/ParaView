@@ -237,7 +237,6 @@ public:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
-  virtual void SetBalloonHelpJustification(int j);
 
   // Description:
   // Callbacks

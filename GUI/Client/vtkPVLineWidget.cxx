@@ -41,7 +41,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.64");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.65");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -728,45 +728,39 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetBalloonHelpString(const char *str)
 {
+  this->Superclass::SetBalloonHelpString(str);
 
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  if (this->Labels[0])
     {
-    return;
+    this->Labels[0]->SetBalloonHelpString(str);
+    }
+  if (this->Labels[1])
+    {
+    this->Labels[1]->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  if (this->ResolutionLabel)
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
-      {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
-      }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
+    this->ResolutionLabel->SetBalloonHelpString(str);
     }
-
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
+  if (this->ResolutionEntry)
     {
-    this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
-    this->Labels[1]->SetBalloonHelpString(this->BalloonHelpString);
-
-    this->ResolutionLabel->SetBalloonHelpString(this->BalloonHelpString);
-    this->ResolutionEntry->SetBalloonHelpString(this->BalloonHelpString);
-    for (int i=0; i<3; i++)
+    this->ResolutionEntry->SetBalloonHelpString(str);
+    }
+  for (int i=0; i<3; i++)
+    {
+    if (this->CoordinateLabel[i])
       {
-      this->CoordinateLabel[i]->SetBalloonHelpString(this->BalloonHelpString);
-      this->Point1[i]->SetBalloonHelpString(this->BalloonHelpString);
-      this->Point2[i]->SetBalloonHelpString(this->BalloonHelpString);
+      this->CoordinateLabel[i]->SetBalloonHelpString(str);
       }
-
-    this->BalloonHelpInitialized = 1;
+    if (this->Point1[i])
+      {
+      this->Point1[i]->SetBalloonHelpString(str);
+      }
+    if (this->Point2[i])
+      {
+      this->Point2[i]->SetBalloonHelpString(str);
+      }
     }
 }
 
@@ -906,8 +900,6 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
     this->GetTclName());
 
   this->SetResolution(20);
-
-  this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
 //----------------------------------------------------------------------------

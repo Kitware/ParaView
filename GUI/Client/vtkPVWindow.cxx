@@ -22,6 +22,7 @@
 #include "vtkDataSet.h"
 #include "vtkDirectory.h"
 #include "vtkImageData.h"
+#include "vtkKWBalloonHelpManager.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
@@ -138,7 +139,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.679");
+vtkCxxRevisionMacro(vtkPVWindow, "1.680");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1241,7 +1242,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->SetHorizontalPaneVisibility(hvisibility);
   
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pvApp->SetBalloonHelpDelay(1);
+  pvApp->GetBalloonHelpManager()->SetDelay(1);
 
   // Put the version in the status bar.
   char version[128];

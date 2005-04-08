@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.47");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.48");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -102,8 +102,6 @@ void vtkPVMinMax::SetMaximumLabel(const char* label)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetMinimumHelp(const char* help)
 {
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
   if (help != this->MinHelp)
     {
     this->SetMinHelp(help);
@@ -119,8 +117,6 @@ void vtkPVMinMax::SetMinimumHelp(const char* help)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::SetMaximumHelp(const char* help)
 {
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
   if (help != this->MaxHelp)
     {
     this->SetMaxHelp(help);

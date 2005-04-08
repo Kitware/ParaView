@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetLabeled);
-vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.3");
+vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.4");
 
 int vtkKWWidgetLabeledCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -115,7 +115,6 @@ void vtkKWWidgetLabeled::CreateLabel(vtkKWApplication *app, const char *args)
   // -bd 0 -highlightthickness 0 -padx 0 -pady 0");
 
   label->SetBalloonHelpString(this->GetBalloonHelpString());
-  label->SetBalloonHelpJustification(this->GetBalloonHelpJustification());
 
   // Since we have just created the label on the fly, it is likely that 
   // it needs to be displayed somehow, which is usually Pack()'s job
@@ -215,22 +214,6 @@ void vtkKWWidgetLabeled::SetBalloonHelpString(const char *string)
   if (this->Label)
     {
     this->Label->SetBalloonHelpString(string);
-    }
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWWidgetLabeled::SetBalloonHelpJustification(int j)
-{
-  this->Superclass::SetBalloonHelpJustification(j);
-
-  // Do not use GetLabel() here, otherwise the label will be created 
-  // on the fly, and we do not want this. Once the label gets created when
-  // there is a real need for it, its Enabled state will be set correctly
-  // anyway.
-
-  if (this->Label)
-    {
-    this->Label->SetBalloonHelpJustification(j);
     }
 }
 

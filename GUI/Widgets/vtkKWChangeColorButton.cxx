@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.52");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.53");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -406,17 +406,6 @@ void vtkKWChangeColorButton::SetBalloonHelpString(const char *string)
   if (this->ColorButton)
     {
     this->ColorButton->SetBalloonHelpString(string);
-    }
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWChangeColorButton::SetBalloonHelpJustification(int j)
-{
-  this->Superclass::SetBalloonHelpJustification(j);
-
-  if (this->ColorButton)
-    {
-    this->ColorButton->SetBalloonHelpJustification(j);
     }
 }
 

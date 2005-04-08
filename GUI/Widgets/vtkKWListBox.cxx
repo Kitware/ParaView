@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.32");
+vtkCxxRevisionMacro(vtkKWListBox, "1.33");
 
 
 //----------------------------------------------------------------------------
@@ -332,14 +332,6 @@ void vtkKWListBox::SetBalloonHelpString(const char *str)
 {
   this->Listbox->SetBalloonHelpString( str );
   this->Scrollbar->SetBalloonHelpString( str );
-}
-
-
-//----------------------------------------------------------------------------
-void vtkKWListBox::SetBalloonHelpJustification( int j )
-{
-  this->Listbox->SetBalloonHelpJustification( j );
-  this->Scrollbar->SetBalloonHelpJustification( j );
 }
 
 //----------------------------------------------------------------------------

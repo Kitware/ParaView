@@ -40,7 +40,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.53");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -122,38 +122,19 @@ void vtkPVExtentEntry::Update()
 
 void vtkPVExtentEntry::SetBalloonHelpString( const char *str )
 {
-  // A little overkill.
-  if (this->BalloonHelpString == NULL && str == NULL)
+  this->Superclass::SetBalloonHelpString(str);
+
+  if (this->LabeledFrame)
     {
-    return;
+    this->LabeledFrame->SetBalloonHelpString(str);
     }
 
-  // This check is needed to prevent errors when using
-  // this->SetBalloonHelpString(this->BalloonHelpString)
-  if (str != this->BalloonHelpString)
+  for (int i=0; i<3; i++)
     {
-    // Normal string stuff.
-    if (this->BalloonHelpString)
+    if (this->MinMax[i])
       {
-      delete [] this->BalloonHelpString;
-      this->BalloonHelpString = NULL;
+      this->MinMax[i]->SetBalloonHelpString(str);
       }
-    if (str != NULL)
-      {
-      this->BalloonHelpString = new char[strlen(str)+1];
-      strcpy(this->BalloonHelpString, str);
-      }
-    }
-  
-  if ( this->GetApplication() && !this->BalloonHelpInitialized )
-    {
-    this->LabeledFrame->SetBalloonHelpString(this->BalloonHelpString);
-    for (int i=0; i<3; i++)
-      {
-      this->MinMax[i]->SetBalloonHelpString(this->BalloonHelpString);
-      }
-
-    this->BalloonHelpInitialized = 1;
     }
 }
 
@@ -225,8 +206,6 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 
   this->Script("pack %s -side left -fill x -expand t", 
                this->LabeledFrame->GetWidgetName());
-
-  this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
 

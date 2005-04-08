@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.83");
+vtkCxxRevisionMacro(vtkKWScale, "1.84");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -794,27 +794,6 @@ void vtkKWScale::SetBalloonHelpString(const char *string)
     temp << string << " (press this button to display a scale)" << ends;
     this->PopupPushButton->SetBalloonHelpString(temp.str());
     temp.rdbuf()->freeze(0);
-    }
-}
-
-// ---------------------------------------------------------------------------
-void vtkKWScale::SetBalloonHelpJustification(int j)
-{
-  this->Scale->SetBalloonHelpJustification(j);
-
-  if (this->Entry)
-    {
-    this->Entry->SetBalloonHelpJustification(j);
-    }
-
-  if (this->Label)
-    {
-    this->Label->SetBalloonHelpJustification(j);
-    }
-
-  if (this->PopupScale && this->PopupPushButton)
-    {
-    this->PopupPushButton->SetBalloonHelpJustification(j);
     }
 }
 

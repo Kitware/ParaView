@@ -62,7 +62,6 @@ public:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
-  virtual void SetBalloonHelpJustification(int j);
 
   // Description:
   // Set the label to be outside the color button. Default is inside.
