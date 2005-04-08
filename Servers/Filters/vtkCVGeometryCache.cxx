@@ -24,7 +24,7 @@
 
 #include <vtkstd/vector>
 
-vtkCxxRevisionMacro(vtkCVGeometryCache, "1.1.2.1");
+vtkCxxRevisionMacro(vtkCVGeometryCache, "1.1.2.2");
 vtkStandardNewMacro(vtkCVGeometryCache);
 
 struct vtkCVGeometryCacheInternal
@@ -93,7 +93,6 @@ void vtkCVGeometryCache::AddGeometry(vtkMapper* mapper)
     {
     return;
     }
-  cout << "adding geometry" << endl;
   vtkPolyData* copy = vtkPolyData::New();
   copy->ShallowCopy(orig);
   this->Internal->PolyDatas.push_back(copy);

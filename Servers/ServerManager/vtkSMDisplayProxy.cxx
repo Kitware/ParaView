@@ -20,7 +20,7 @@
 
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMInputProperty.h"
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.7");
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.8");
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
 {
@@ -31,7 +31,6 @@ vtkSMDisplayProxy::vtkSMDisplayProxy()
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::~vtkSMDisplayProxy()
 {
-  cout << "vtkSMDisplayProxy::~vtkSMDisplayProxy()" << endl;
   this->GeometryInformation->Delete();
 }
 

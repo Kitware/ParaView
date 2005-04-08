@@ -35,14 +35,7 @@ public:
 
   void SetApplication(vtkPVApplication*);
 
-  void TraverseAllCues();
-
-  void RemoveAllCues();
-
-
-  void SaveAllGeometry();
-
-  void PlayAll();
+  void Process();
 
 protected:
   vtkPVComparativeVisManager();
@@ -52,10 +45,17 @@ protected:
   vtkPVComparativeVisManagerInternals* Internal;
 
   void TraverseCue(vtkPVAnimationCue* cue);
-  void SaveGeometry();
+  void StoreGeometry();
   void PlayOne(unsigned int idx);
+  void GetIndices(unsigned int gidx);
+  void GetIndex(unsigned int paramIdx, unsigned int gidx);
+  void TraverseAllCues();
+  void RemoveAllCues();
+  void ConnectAllGeometry();
 
   void ExecuteEvent(vtkObject* , unsigned long event, unsigned int paramIdx);
+
+  static void AddBounds(double bounds[6], double totalB[6]);
 
 //BTX
   friend class vtkCVAnimationSceneObserver;

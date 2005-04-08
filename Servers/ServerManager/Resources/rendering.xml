@@ -586,9 +586,17 @@
       </IntVectorProperty>
 
       <Property name="Render" command="Render">
-      </Property>
+      </Property>    
+
+      <IntVectorProperty
+         name="RenderWindowSize"
+         command="GetSize"
+         number_of_elements="2"
+         information_only="1"
+         default_values="0 0">
+         <SimpleIntInformationHelper/>
+      </IntVectorProperty>
     </Proxy>
-    
   </ProxyGroup>
 
   <ProxyGroup name="mappers">
@@ -703,6 +711,13 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
+      <ProxyProperty name="ClippingPlanes" 
+                     command="AddClippingPlane"
+                     repeat_command="1">
+         <ProxyGroupDomain name="groups">
+          <Group name="implicit_functions"/>
+         </ProxyGroupDomain>
+      </ProxyProperty>
     </SourceProxy>
 
     <SourceProxy name="UnstructuredGridVolumeRayCastMapper" 
@@ -1189,6 +1204,7 @@
         <ExposedProperties>
           <Property name="OffScreenRendering" />
           <Property name="FullScreen" />
+          <Property name="RenderWindowSize" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
@@ -1827,6 +1843,7 @@
           <Property name="UseLookupTableScalarRange" />
           <Property name="ScalarMode" />
           <Property name="ColorArray" />
+          <Property name="ClippingPlanes" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>

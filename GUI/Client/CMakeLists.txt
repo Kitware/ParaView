@@ -56,6 +56,7 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVAnimationBatchHelper.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
+  vtkInteractorStyleTrackballMultiActor.cxx
   vtkPVInteractorStyle.cxx
   vtkPVInteractorStyleCenterOfRotation.cxx
   vtkPVWidgetCollection.cxx

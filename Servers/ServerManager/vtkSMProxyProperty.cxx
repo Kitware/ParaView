@@ -28,7 +28,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.4");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.5");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -42,6 +42,7 @@ vtkSMProxyProperty::vtkSMProxyProperty()
 {
   this->PPInternals = new vtkSMProxyPropertyInternals;
   this->CleanCommand = 0;
+  this->RepeatCommand = 0;
   this->SetSaveable(1);
 }
 
@@ -121,7 +122,7 @@ void vtkSMProxyProperty::AppendCommandToStream(
 
     unsigned int numIDs = proxy->GetNumberOfIDs();
     // Determine now the IDs are added.
-    if (numConsIDs == numIDs)
+    if (numConsIDs == numIDs && !this->RepeatCommand)
       {
       // One to One Mapping between the IDs.
       for (unsigned int i = 0; i < numIDs; i++)
@@ -136,9 +137,9 @@ void vtkSMProxyProperty::AppendCommandToStream(
           }
         }
       }
-    else if (numConsIDs == 1)
+    else if (numConsIDs == 1 || this->RepeatCommand)
       {
-      // One to Many Mapping.
+      // One (or many) to Many Mapping.
       for (unsigned int i=0 ; i < numIDs; i++)
         {
         *str << vtkClientServerStream::Invoke << objectId << this->Command
@@ -320,6 +321,14 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
     { 
     this->SetCleanCommand(clean_command); 
     }
+
+  int repeat_command;
+  int retVal = element->GetScalarAttribute("repeat_command", &repeat_command);
+  if(retVal) 
+    { 
+    this->SetRepeatCommand(repeat_command); 
+    }
+
   return ret;
 }
 

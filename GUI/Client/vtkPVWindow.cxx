@@ -98,6 +98,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMProxyProperty.h"
 
+
 #include "vtkPVConfig.h"  // Needed for PARAVIEW_USE_LOOKMARKS
 #ifdef PARAVIEW_USE_LOOKMARKS
 #  include "vtkPVLookmarkManager.h"
@@ -137,7 +138,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.8");
+vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.9");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -671,10 +672,10 @@ void vtkPVWindow::PrepareForDelete()
   if (this->GetApplication())
     {
     this->GetApplication()->SetRegistryValue(2, 
-                                              "RunTime", 
-                                              "CenterActorVisibility",
-                                              "%d", 
-                                              this->CenterActorVisibility);
+                                             "RunTime", 
+                                             "CenterActorVisibility",
+                                             "%d", 
+                                             this->CenterActorVisibility);
     }
 
   if (this->SourceMenu)
