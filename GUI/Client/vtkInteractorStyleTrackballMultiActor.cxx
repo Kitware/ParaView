@@ -27,7 +27,7 @@
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkInteractorStyleTrackballMultiActor, "1.1.2.1");
+vtkCxxRevisionMacro(vtkInteractorStyleTrackballMultiActor, "1.1.2.2");
 vtkStandardNewMacro(vtkInteractorStyleTrackballMultiActor);
 
 vtkCxxSetObjectMacro(vtkInteractorStyleTrackballMultiActor,Application,vtkPVApplication);
@@ -267,7 +267,7 @@ void vtkInteractorStyleTrackballMultiActor::Rotate()
     vtkActorCollection* actors = this->CurrentRenderer->GetActors();
     actors->InitTraversal(cookie);
     vtkActor* actor=0;
-    while (actor=actors->GetNextActor(cookie))
+    while ((actor = actors->GetNextActor(cookie)))
       {
       this->Prop3DTransform(actor, 2, rotate, scale);
       }
@@ -305,7 +305,7 @@ void vtkInteractorStyleTrackballMultiActor::Pan()
   vtkActorCollection* actors = this->CurrentRenderer->GetActors();
   actors->InitTraversal(cookie);
   vtkActor* actor=0;
-  while (actor=actors->GetNextActor(cookie))
+  while ((actor=actors->GetNextActor(cookie)))
     {
     // Use initial center as the origin from which to pan
     
@@ -389,7 +389,7 @@ void vtkInteractorStyleTrackballMultiActor::UniformScale()
   vtkActorCollection* actors = this->CurrentRenderer->GetActors();
   actors->InitTraversal(cookie);
   vtkActor* actor=0;
-  while (actor=actors->GetNextActor(cookie))
+  while ((actor=actors->GetNextActor(cookie)))
     {
     this->Prop3DTransform(actor, 0, rotate, scale);
     }

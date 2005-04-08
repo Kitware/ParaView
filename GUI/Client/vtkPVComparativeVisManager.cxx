@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.1.2.4");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -457,7 +457,6 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
     this->GetIndices(i);
     vtkPVComparativeVisManagerInternals::ProxiesType::iterator iter2 = 
       this->Internal->Displays[i].begin();
-    double* bounds = &this->Internal->Bounds[i][0];
     double xPos = cellSpacing[0]*this->Internal->Indices[0];
     double yPos = cellSpacing[1]*this->Internal->Indices[1]; 
 
