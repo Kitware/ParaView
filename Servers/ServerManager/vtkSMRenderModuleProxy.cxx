@@ -42,7 +42,7 @@
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.12");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.13");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -127,53 +127,63 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
 
   if (!this->RendererProxy)
     {
-    vtkErrorMacro("Renderer subproxy must be defined in the configuration file.");
+    vtkErrorMacro("Renderer subproxy must be defined in the "
+                  "configuration file.");
     return;
     }
   if (!this->Renderer2DProxy)
     {
-    vtkErrorMacro("Renderer2D subproxy must be defined in the configuration file.");
+    vtkErrorMacro("Renderer2D subproxy must be defined in the "
+                  "configuration file.");
     return;
     }
   if (!this->ActiveCameraProxy)
     {
-    vtkErrorMacro("ActiveCamera subproxy must be defined in the configuration file.");
+    vtkErrorMacro("ActiveCamera subproxy must be defined in the "
+                  "configuration file.");
     return;
     }
   if (!this->RenderWindowProxy)
     {
-    vtkErrorMacro("RenderWindow subproxy must be defined in the configuration file.");
+    vtkErrorMacro("RenderWindow subproxy must be defined in the configuration "
+                  "file.");
     return;
     }
   if (!this->InteractorProxy)
     {
-    vtkErrorMacro("Interactor subproxy must be defined in the configuration file.");
+    vtkErrorMacro("Interactor subproxy must be defined in the configuration "
+                  "file.");
     return;
     }
 
-  // I don't directly use this->SetServers() to set the servers of the subproxies,
-  // as the subclasses may have special subproxies that have specific servers on which
-  // they want those to be created.
-  this->SetServersSelf(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->RendererProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->Renderer2DProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER); 
-  // Camera vtkObject is only created on the client. 
-  // This is so as we don't change the active camera on the
-  // servers as creation renderer (like IceT Tile renderer) fail if the active camera
-  // on  the renderer is modified.
+  // I don't directly use this->SetServers() to set the servers of the
+  // subproxies, as the subclasses may have special subproxies that have
+  // specific servers on which they want those to be created.
+  this->SetServersSelf(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->RendererProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->Renderer2DProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER); 
+  // Camera vtkObject is only created on the client.  This is so as we
+  // don't change the active camera on the servers as creation renderer
+  // (like IceT Tile renderer) fail if the active camera on the renderer is
+  // modified.
   this->ActiveCameraProxy->SetServers(vtkProcessModule::CLIENT);
-  this->RenderWindowProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
-  this->InteractorProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->RenderWindowProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+  this->InteractorProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 
   this->Superclass::CreateVTKObjects(numObjects);
 
   vtkPVProcessModule* pvm = vtkPVProcessModule::SafeDownCast(
     vtkProcessModule::GetProcessModule());
 
-  // Set the active camera for the renderers.
-  // We can't use the Proxy Property since Camera is only create on the CLIENT.
-  // Proxy properties don't take intersection of servers on which they are created 
-  // before setting as yet.
+  // Set the active camera for the renderers.  We can't use the Proxy
+  // Property since Camera is only create on the CLIENT.  Proxy properties
+  // don't take intersection of servers on which they are created before
+  // setting as yet.
   vtkCamera *camera = vtkCamera::SafeDownCast(
     pvm->GetObjectFromID(this->ActiveCameraProxy->GetID(0)));
   if (!camera)
@@ -275,7 +285,8 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
   cbc->SetClientData((void*)this);
   // ren will delete the cbc when the observer is removed.
   this->ResetCameraClippingRangeTag = 
-    this->GetRenderer()->AddObserver(vtkCommand::ResetCameraClippingRangeEvent,cbc);
+    this->GetRenderer()->AddObserver(
+      vtkCommand::ResetCameraClippingRangeEvent,cbc);
   cbc->Delete();
 
   vtkCallbackCommand* abc = vtkCallbackCommand::New();
@@ -372,7 +383,8 @@ void vtkSMRenderModuleProxy::RemoveAllDisplays()
   vtkCollectionIterator* iter = this->Displays->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMDisplayProxy* disp = vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    vtkSMDisplayProxy* disp = 
+      vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
     disp->RemoveFromRenderModule(this);
     }
   iter->Delete();  
@@ -385,7 +397,8 @@ void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
   vtkCollectionIterator* iter = this->Displays->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMDisplayProxy* disp = vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    vtkSMDisplayProxy* disp = 
+      vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
     if (!disp || !this->GetDisplayVisibility(disp))
       {
       continue;
@@ -411,7 +424,8 @@ void vtkSMRenderModuleProxy::InvalidateAllGeometries()
   vtkCollectionIterator* iter = this->Displays->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMDisplayProxy* disp = vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    vtkSMDisplayProxy* disp = 
+      vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
     if (!disp)
       {
       continue;
@@ -433,7 +447,8 @@ void vtkSMRenderModuleProxy::UpdateAllDisplays()
   vtkCollectionIterator* iter = this->Displays->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMDisplayProxy* disp = vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    vtkSMDisplayProxy* disp = 
+      vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
     if (!disp || !disp->cmGetVisibility())
       {
       // Some displays don't need updating.
@@ -451,7 +466,8 @@ void vtkSMRenderModuleProxy::SetUseTriangleStrips(int val)
   vtkCollectionIterator* iter = this->Displays->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMDisplayProxy* disp = vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    vtkSMDisplayProxy* disp = 
+      vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
     if (!disp)
       {
       continue;
@@ -482,7 +498,8 @@ void vtkSMRenderModuleProxy::SetUseImmediateMode(int val)
   vtkCollectionIterator* iter = this->Displays->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
-    vtkSMDisplayProxy* disp = vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
+    vtkSMDisplayProxy* disp = 
+      vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
     if (!disp)
       {
       continue;
@@ -543,8 +560,8 @@ vtkSMDisplayProxy* vtkSMRenderModuleProxy::CreateDisplayProxy()
   vtkSMDisplayProxy *pDisp = vtkSMDisplayProxy::SafeDownCast(p);
   if (!pDisp)
     {
-    vtkErrorMacro("'displays' ," <<  this->DisplayXMLName << " must be a subclass of "
-      "vtkSMDisplayProxy.");
+    vtkErrorMacro(<< "'displays' ," <<  this->DisplayXMLName 
+                  << " must be a subclass of vtkSMDisplayProxy.");
     p->Delete();
     return NULL;
     }
@@ -791,8 +808,8 @@ void vtkSMRenderModuleProxy::SynchronizeCameraProperties()
       }
     vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
       cur_property);
-    vtkSMDoubleVectorProperty* info_dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      info_property);
+    vtkSMDoubleVectorProperty* info_dvp = 
+      vtkSMDoubleVectorProperty::SafeDownCast(info_property);
     if (dvp && info_dvp)
       {
       dvp->SetElements(info_dvp->GetElements());
@@ -919,7 +936,8 @@ void vtkSMRenderModuleProxy::WriteImage(const char* filename,
     }
 
   // I am using the vtkPVRenderView approach for saving the image.
-  // instead of vtkSMDisplayWindowProxy approach of creating a proxy.
+
+        // instead of vtkSMDisplayWindowProxy approach of creating a proxy.
 
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(this->GetRenderWindow());
