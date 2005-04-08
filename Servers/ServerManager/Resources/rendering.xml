@@ -1895,6 +1895,11 @@
         <ShareProperties subproxy="Mapper">
           <Exception name="Input" />
         </ShareProperties>
+        <ExposedProperties>
+          <Property name="SelectScalarArray" />
+          <Property name="ScalarMode" />
+        </ExposedProperties>
+        
       </SubProxy>
 
       <SubProxy>

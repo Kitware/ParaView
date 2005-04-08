@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.27.2.1");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.27.2.2");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -365,6 +365,14 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
 
     vtkPiecewiseFunction* opacityFunc = vtkPiecewiseFunction::New();
     vtkColorTransferFunction* colorFunc = vtkColorTransferFunction::New();
+    // Add some default points to the transfer functions.
+    // These don't matter really, we just add them so that 
+    // they don't flash errors until, they are populated with correct
+    // values.
+    opacityFunc->AddPoint(0,0);
+    opacityFunc->AddPoint(1,1);
+    colorFunc->AddRGBPoint(0, 1, 1, 1);
+    colorFunc->AddRGBPoint(1, 1, 1, 1);
     this->InternalVolumeProperty->SetScalarOpacity(opacityFunc);
     this->InternalVolumeProperty->SetColor(colorFunc);
     opacityFunc->Delete();
