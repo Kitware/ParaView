@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWMostRecentFilesHelper.cxx
+  Module:    vtkKWMostRecentFilesManager.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,7 +11,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWMostRecentFilesHelper.h"
+#include "vtkKWMostRecentFilesManager.h"
 
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
@@ -22,10 +22,10 @@
 
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesHelper, "1.1");
-vtkStandardNewMacro(vtkKWMostRecentFilesHelper );
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.1");
+vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
-int vtkKWMostRecentFilesHelperCommand(ClientData cd, Tcl_Interp *interp,
+int vtkKWMostRecentFilesManagerCommand(ClientData cd, Tcl_Interp *interp,
                                          int argc, char *argv[]);
 
 #define VTK_KW_MRF_REGISTRY_FILENAME_KEYNAME_PATTERN "File%d"
@@ -33,15 +33,15 @@ int vtkKWMostRecentFilesHelperCommand(ClientData cd, Tcl_Interp *interp,
 #define VTK_KW_MRF_REGISTRY_MAX_ENTRIES 50
 
 //----------------------------------------------------------------------------
-class vtkKWMostRecentFilesHelperInternals
+class vtkKWMostRecentFilesManagerInternals
 {
 public:
 
-  class MostRecentFileEntry
+  class FileEntry
   {
   public:
-    MostRecentFileEntry() { this->TargetObject = NULL; };
-    ~MostRecentFileEntry() {};
+    FileEntry() { this->TargetObject = NULL; };
+    ~FileEntry() {};
     
     const char *GetFileName() 
       { return this->FileName.c_str(); }
@@ -68,44 +68,44 @@ public:
     vtkstd::string TargetCommand;
   };
 
-  typedef vtkstd::list<MostRecentFileEntry*> MostRecentFileEntriesContainer;
-  typedef vtkstd::list<MostRecentFileEntry*>::iterator MostRecentFileEntriesContainerIterator;
+  typedef vtkstd::list<FileEntry*> FileEntriesContainer;
+  typedef vtkstd::list<FileEntry*>::iterator FileEntriesContainerIterator;
 
-  MostRecentFileEntriesContainer MostRecentFileEntries;
+  FileEntriesContainer MostRecentFileEntries;
 };
 
 //----------------------------------------------------------------------------
-vtkKWMostRecentFilesHelper::vtkKWMostRecentFilesHelper()
+vtkKWMostRecentFilesManager::vtkKWMostRecentFilesManager()
 {
   this->DefaultTargetObject   = NULL;
   this->DefaultTargetCommand  = NULL;
   this->RegistryKey           = NULL;
-  this->MostRecentFilesMenu   = NULL;
+  this->Menu   = NULL;
 
   this->SetRegistryKey("MRU");
 
-  this->MaximumNumberOfMostRecentFilesInRegistry = 10;
-  this->MaximumNumberOfMostRecentFilesInMenu = 10;
+  this->MaximumNumberOfFilesInRegistry = 10;
+  this->MaximumNumberOfFilesInMenu = 10;
 
-  this->Internals = new vtkKWMostRecentFilesHelperInternals;
+  this->Internals = new vtkKWMostRecentFilesManagerInternals;
 }
 
 //----------------------------------------------------------------------------
-vtkKWMostRecentFilesHelper::~vtkKWMostRecentFilesHelper()
+vtkKWMostRecentFilesManager::~vtkKWMostRecentFilesManager()
 {
   this->SetDefaultTargetCommand(NULL);
   this->SetRegistryKey(NULL);
 
-  if (this->MostRecentFilesMenu)
+  if (this->Menu)
     {
-    this->MostRecentFilesMenu->Delete();
-    this->MostRecentFilesMenu = NULL;
+    this->Menu->Delete();
+    this->Menu = NULL;
     }
 
   if (this->Internals)
     {
-    vtkKWMostRecentFilesHelperInternals::MostRecentFileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
-    vtkKWMostRecentFilesHelperInternals::MostRecentFileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
+    vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
+    vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
     for (; it != end; ++it)
       {
       if (*it)
@@ -118,7 +118,7 @@ vtkKWMostRecentFilesHelper::~vtkKWMostRecentFilesHelper()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::AddMostRecentFileInternal(
+void vtkKWMostRecentFilesManager::AddFileInternal(
   const char *filename, 
   vtkKWObject *target_object, 
   const char *target_command)
@@ -130,8 +130,8 @@ void vtkKWMostRecentFilesHelper::AddMostRecentFileInternal(
 
   // Find if already inserted (and delete it)
 
-  vtkKWMostRecentFilesHelperInternals::MostRecentFileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
-  vtkKWMostRecentFilesHelperInternals::MostRecentFileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
   for (; it != end; ++it)
     {
     if (*it && (*it)->IsEqual(filename, target_object, target_command))
@@ -144,8 +144,8 @@ void vtkKWMostRecentFilesHelper::AddMostRecentFileInternal(
 
   // Create new entry and prepend to container
 
-  vtkKWMostRecentFilesHelperInternals::MostRecentFileEntry
-    *entry = new vtkKWMostRecentFilesHelperInternals::MostRecentFileEntry;
+  vtkKWMostRecentFilesManagerInternals::FileEntry
+    *entry = new vtkKWMostRecentFilesManagerInternals::FileEntry;
   entry->SetFileName(filename);
   entry->SetTargetObject(target_object);
   entry->SetTargetCommand(target_command);
@@ -154,7 +154,7 @@ void vtkKWMostRecentFilesHelper::AddMostRecentFileInternal(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::AddMostRecentFile(
+void vtkKWMostRecentFilesManager::AddFile(
   const char *filename, 
   vtkKWObject *target_object, 
   const char *target_command)
@@ -168,14 +168,14 @@ void vtkKWMostRecentFilesHelper::AddMostRecentFile(
   vtkstd::string filename_expanded = 
     this->GetApplication()->ExpandFileName(filename);
 
-  this->AddMostRecentFileInternal(
+  this->AddFileInternal(
     filename_expanded.c_str(), target_object, target_command);
 
-  this->UpdateMostRecentFilesMenu();
+  this->UpdateMenu();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::SetDefaultTargetObject(vtkKWObject *_arg)
+void vtkKWMostRecentFilesManager::SetDefaultTargetObject(vtkKWObject *_arg)
 {
   if (this->DefaultTargetObject == _arg) 
     { 
@@ -186,11 +186,11 @@ void vtkKWMostRecentFilesHelper::SetDefaultTargetObject(vtkKWObject *_arg)
 
   this->Modified();
 
-  this->UpdateMostRecentFilesMenu();
+  this->UpdateMenu();
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::SetDefaultTargetCommand(const char* _arg)
+void vtkKWMostRecentFilesManager::SetDefaultTargetCommand(const char* _arg)
 {
   if (this->DefaultTargetCommand == NULL && _arg == NULL) 
     { 
@@ -217,19 +217,19 @@ void vtkKWMostRecentFilesHelper::SetDefaultTargetCommand(const char* _arg)
 
   this->Modified();
 
-  this->UpdateMostRecentFilesMenu();
+  this->UpdateMenu();
 } 
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::SaveMostRecentFilesToRegistry()
+void vtkKWMostRecentFilesManager::SaveFilesToRegistry()
 {
-  this->SaveMostRecentFilesToRegistry(
+  this->SaveFilesToRegistry(
     this->RegistryKey, 
-    this->MaximumNumberOfMostRecentFilesInRegistry);
+    this->MaximumNumberOfFilesInRegistry);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::SaveMostRecentFilesToRegistry(
+void vtkKWMostRecentFilesManager::SaveFilesToRegistry(
   const char *reg_key, int max_nb)
 {
   if (!this->GetApplication())
@@ -248,8 +248,8 @@ void vtkKWMostRecentFilesHelper::SaveMostRecentFilesToRegistry(
 
   // Store all most recent files entries to registry
 
-  vtkKWMostRecentFilesHelperInternals::MostRecentFileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
-  vtkKWMostRecentFilesHelperInternals::MostRecentFileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
   int count = 0;
   for (; it != end && count < max_nb; ++it)
     {
@@ -288,15 +288,15 @@ void vtkKWMostRecentFilesHelper::SaveMostRecentFilesToRegistry(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::LoadMostRecentFilesFromRegistry()
+void vtkKWMostRecentFilesManager::LoadFilesFromRegistry()
 {
-  this->LoadMostRecentFilesFromRegistry(
+  this->LoadFilesFromRegistry(
     this->RegistryKey, 
-    this->MaximumNumberOfMostRecentFilesInRegistry);
+    this->MaximumNumberOfFilesInRegistry);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::LoadMostRecentFilesFromRegistry(
+void vtkKWMostRecentFilesManager::LoadFilesFromRegistry(
   const char *reg_key, int max_nb)
 {
   if (!this->GetApplication())
@@ -326,48 +326,48 @@ void vtkKWMostRecentFilesHelper::LoadMostRecentFilesFromRegistry(
           1, reg_key, command_key, command) &&
         strlen(filename) >= 1)
       {
-      this->AddMostRecentFileInternal(filename, NULL, command);
+      this->AddFileInternal(filename, NULL, command);
       max_nb--;
       }
     }
 
-  this->UpdateMostRecentFilesMenu();
+  this->UpdateMenu();
 }
 
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::SetMaximumNumberOfMostRecentFilesInMenu(int _arg)
+void vtkKWMostRecentFilesManager::SetMaximumNumberOfFilesInMenu(int _arg)
 {
-  if (this->MaximumNumberOfMostRecentFilesInMenu == _arg || _arg < 0)
+  if (this->MaximumNumberOfFilesInMenu == _arg || _arg < 0)
     {
     return;
     }
 
-  this->MaximumNumberOfMostRecentFilesInMenu = _arg;
+  this->MaximumNumberOfFilesInMenu = _arg;
   this->Modified();
 
-  this->UpdateMostRecentFilesMenu();
+  this->UpdateMenu();
 }
 
 //----------------------------------------------------------------------------
-vtkKWMenu* vtkKWMostRecentFilesHelper::GetMostRecentFilesMenu()
+vtkKWMenu* vtkKWMostRecentFilesManager::GetMenu()
 { 
-  if (!this->MostRecentFilesMenu)
+  if (!this->Menu)
     {
-    this->MostRecentFilesMenu = vtkKWMenu::New();
+    this->Menu = vtkKWMenu::New();
     }
-  return this->MostRecentFilesMenu;
+  return this->Menu;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::UpdateMostRecentFilesMenu()
+void vtkKWMostRecentFilesManager::UpdateMenu()
 { 
-  this->PopulateMostRecentFilesMenu(
-    this->MostRecentFilesMenu, this->MaximumNumberOfMostRecentFilesInMenu);
+  this->PopulateMenu(
+    this->Menu, this->MaximumNumberOfFilesInMenu);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::PopulateMostRecentFilesMenu(
+void vtkKWMostRecentFilesManager::PopulateMenu(
   vtkKWMenu *menu, int max_nb)
 { 
   if (!menu)
@@ -385,8 +385,8 @@ void vtkKWMostRecentFilesHelper::PopulateMostRecentFilesMenu(
 
   // Fill the menu
   
-  vtkKWMostRecentFilesHelperInternals::MostRecentFileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
-  vtkKWMostRecentFilesHelperInternals::MostRecentFileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator it = this->Internals->MostRecentFileEntries.begin();
+  vtkKWMostRecentFilesManagerInternals::FileEntriesContainerIterator end = this->Internals->MostRecentFileEntries.end();
   int count = 0;
   for (; it != end && count < max_nb; ++it)
     {
@@ -429,18 +429,18 @@ void vtkKWMostRecentFilesHelper::PopulateMostRecentFilesMenu(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::UpdateMostRecentFilesMenuStateInParent()
+void vtkKWMostRecentFilesManager::UpdateMenuStateInParent()
 {
-  if (this->MostRecentFilesMenu && this->MostRecentFilesMenu->IsCreated())
+  if (this->Menu && this->Menu->IsCreated())
     {
     vtkKWMenu *parent = 
-      vtkKWMenu::SafeDownCast(this->MostRecentFilesMenu->GetParent());
+      vtkKWMenu::SafeDownCast(this->Menu->GetParent());
     if (parent)
       {
-      int index = parent->GetCascadeIndex(this->MostRecentFilesMenu);
+      int index = parent->GetCascadeIndex(this->Menu);
       if (index >= 0)
         {
-        int nb_items = this->MostRecentFilesMenu->GetNumberOfItems();
+        int nb_items = this->Menu->GetNumberOfItems();
         int menu_enabled = 
           parent->GetEnabled() ? vtkKWMenu::Normal : vtkKWMenu::Disabled;
         parent->SetState(
@@ -451,14 +451,14 @@ void vtkKWMostRecentFilesHelper::UpdateMostRecentFilesMenuStateInParent()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesHelper::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWMostRecentFilesManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "MaximumNumberOfMostRecentFilesInRegistry: " 
-     << this->MaximumNumberOfMostRecentFilesInRegistry << endl;
-  os << indent << "MaximumNumberOfMostRecentFilesInMenu: " 
-     << this->MaximumNumberOfMostRecentFilesInMenu << endl;
+  os << indent << "MaximumNumberOfFilesInRegistry: " 
+     << this->MaximumNumberOfFilesInRegistry << endl;
+  os << indent << "MaximumNumberOfFilesInMenu: " 
+     << this->MaximumNumberOfFilesInMenu << endl;
   os << indent << "DefaultTargetObject: " 
      << this->DefaultTargetObject << endl;
   os << indent << "DefaultTargetCommand: " 

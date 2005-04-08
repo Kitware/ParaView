@@ -21,6 +21,8 @@
 // bindings automatically for this widget (see AddBindings()). These bindings
 // will trigger the manager callbacks to display the balloon help string
 // appropriately.
+// .SECTION See Also
+// vtkKWApplication vtkKWWidget
 
 #ifndef __vtkKWBalloonHelpManager_h
 #define __vtkKWBalloonHelpManager_h

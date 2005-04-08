@@ -35,7 +35,7 @@ class vtkKWTclInteractor;
 class vtkKWToolbarSet;
 class vtkKWToolbar;
 class vtkKWUserInterfaceManager;
-class vtkKWMostRecentFilesHelper;
+class vtkKWMostRecentFilesManager;
 
 #define VTK_KW_PAGE_SETUP_MENU_LABEL      "Page Setup"
 #define VTK_KW_RECENT_FILES_MENU_LABEL    "Open Recent File"
@@ -361,7 +361,7 @@ protected:
 
   // Recent files
 
-  vtkKWMostRecentFilesHelper *MostRecentFilesHelper;
+  vtkKWMostRecentFilesManager *MostRecentFilesManager;
 
   // Description:
   // Display the exit dialog.

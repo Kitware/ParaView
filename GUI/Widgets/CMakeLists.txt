@@ -52,7 +52,7 @@ SET( KWWidgets_SRCS
   vtkKWMenu.cxx 
   vtkKWMenuButton.cxx 
   vtkKWMessageDialog.cxx 
-  vtkKWMostRecentFilesHelper.cxx
+  vtkKWMostRecentFilesManager.cxx
   vtkKWMultiColumnList.cxx
   vtkKWNotebook.cxx 
   vtkKWObject.cxx 
