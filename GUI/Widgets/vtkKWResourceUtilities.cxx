@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWResourceUtilities);
-vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.4");
+vtkCxxRevisionMacro(vtkKWResourceUtilities, "1.5");
 
 //----------------------------------------------------------------------------
 int vtkKWResourceUtilities::ReadPNGImage(
@@ -481,16 +481,16 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     const char *pixel_byte_type = "const unsigned char";
 
     out 
-      << "#define image_" << image_name << "_width         " 
+      << "#define image_" << image_name.c_str() << "_width         " 
       << width << endl
-      << "#define image_" << image_name << "_height        " 
+      << "#define image_" << image_name.c_str() << "_height        " 
       << height << endl
-      << "#define image_" << image_name << "_pixel_size    " 
+      << "#define image_" << image_name.c_str() << "_pixel_size    " 
       << pixel_size << endl
-      << "#define image_" << image_name << "_buffer_length " 
+      << "#define image_" << image_name.c_str() << "_buffer_length " 
       << nb_of_bytes << endl
       << endl
-      << "static " << pixel_byte_type << " image_" << image_name;
+      << "static " << pixel_byte_type << " image_" << image_name.c_str();
     if (nb_of_bytes >= max_bytes)
       {
       out << "_section_" << ++section_idx;
@@ -518,7 +518,7 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
           }
         ++section_idx;
         out << endl
-            << "static " << pixel_byte_type << " image_" << image_name
+            << "static " << pixel_byte_type << " image_" << image_name.c_str()
             << "_section_" << section_idx << "[] = " << endl
             << (opt_base64 ? "  \"" : "{\n  ");
         }
@@ -557,16 +557,16 @@ int vtkKWResourceUtilities::ConvertImageToHeader(
     if (section_idx)
       {
       out << endl 
-          << "static " << pixel_byte_type << " *image_" << image_name
+          << "static " << pixel_byte_type << " *image_" << image_name.c_str()
           << "_sections[" << section_idx << "] = {" << endl;
       for (int i = 1; i <= section_idx; i++)
         {
-        out << "  image_" << image_name << "_section_" << i 
+        out << "  image_" << image_name.c_str() << "_section_" << i 
             << (i < section_idx ? "," : "") << endl;
         }
       out << "};" << endl
           << endl
-          << "#define image_" << image_name << "_nb_sections    " 
+          << "#define image_" << image_name.c_str() << "_nb_sections    " 
           << section_idx << endl;
       }
 
