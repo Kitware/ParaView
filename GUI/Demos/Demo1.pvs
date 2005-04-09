@@ -1470,7 +1470,6 @@ proc iso_run {} {
     }
 
   ChangeDemoText "Running Isosurface/Contour Demo :\n Contours and isosurfaces can be extracted from all data types using scalars or vector components. The results can be colored by any other variable or processed further. When possible, structured data contours/isosurfaces are extracted with fast and efficient algorithms which make use of the special data layout."
-
   $iso(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
   $iso(vtkTemp457) RemoveAllValues
@@ -1509,7 +1508,7 @@ proc iso_run {} {
 
   set iso(vtkTemp450) [$iso(vtkTemp447) GetParentTree]
   set iso(vtkTemp782) [$iso(vtkTemp450) GetChild "Sources.[$iso(vtkTemp449) GetName]"]
-  set iso(vtkTemp790) [$iso(vtkTemp782) GetChild "Sources.[$iso(vtkTemp449) GetName].ContourValues.0"]
+  set iso(vtkTemp790) [$iso(vtkTemp782) GetChild "Sources.[$iso(vtkTemp449) GetName].ContourValues.-1"]
   $iso(vtkTemp790) GetFocus
   $iso(vtkTemp790) RemoveAllKeyFrames
 
@@ -1518,7 +1517,7 @@ proc iso_run {} {
   set tempid [$iso(vtkTemp790) CreateAndAddKeyFrame 0 0]
   set iso(vtkTemp1228) [$iso(vtkTemp790) GetKeyFrame $tempid ]
   #State of a Key Frame 
-  $iso(vtkTemp1228) SetKeyValue -0.00951249
+  $iso(vtkTemp1228) SetKeyValue 0
   $iso(vtkTemp1228) SetKeyTime 0
 
   set tempid [$iso(vtkTemp790) CreateAndAddKeyFrame 1 0]
@@ -4594,19 +4593,19 @@ if ![info exists DemoDir] {
         set parallelState  [[$rv GetParallelProjectionCheck] GetState]
         $rv ParallelProjectionOff
 
-        clip_init
-        extract_init
-        iso_init
-        threshold_init
-        warp_init
-        stream_init
+#       clip_init
+#       extract_init
+       iso_init
+#       threshold_init
+#       warp_init
+#       stream_init
         while {1} {
-            iso_run
-            warp_run
-            stream_run
-             extract_run
-            clip_run
-            threshold_run
+           iso_run
+#           warp_run
+#           stream_run
+#            extract_run
+#           clip_run
+#           threshold_run
             break     
             if $pvDemoShouldStop {
                 break

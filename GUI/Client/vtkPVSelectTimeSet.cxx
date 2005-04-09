@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.53");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.54");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -286,6 +286,17 @@ void vtkPVSelectTimeSet::Trace(ofstream *file)
 
 
 //-----------------------------------------------------------------------------
+int vtkPVSelectTimeSet::GetNumberOfTimeSteps()
+{
+  int num =0;
+  for (int i=0; i < this->TimeSets->GetNumberOfItems(); i ++ )
+    {
+    num += this->TimeSets->GetItem(i)->GetNumberOfTuples();
+    }
+  return num;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::CommonReset()
 {
   // Command to update the UI.
@@ -521,6 +532,9 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
     return;
     }
 
+  double min = VTK_LARGE_FLOAT;
+  double max = -VTK_LARGE_FLOAT;
+  
   // There is one time set per message.
   for(int m=0; m < timeSets.GetNumberOfMessages(); ++m)
     {
@@ -538,9 +552,25 @@ void vtkPVSelectTimeSet::SetTimeSetsFromReader()
         return;
         }
       timeSet->SetTuple1(i, value);
+      min = (min > value)? value : min;
+      max = (max < value)? value : max;
       }
     this->TimeSets->AddItem(timeSet);
     timeSet->Delete();
+    }
+
+  if (min != VTK_LARGE_FLOAT && max != -VTK_LARGE_FLOAT)
+    {
+    // It's the resposibility of the Widget to keep the domain in Sync.
+    vtkSMDoubleRangeDomain* domain = vtkSMDoubleRangeDomain::SafeDownCast(
+      this->GetSMProperty()->GetDomain("range"));
+    if (domain)
+      {
+      domain->RemoveAllMinima();
+      domain->RemoveAllMaxima();
+      domain->AddMinimum(0,min);
+      domain->AddMaximum(0,max);
+      }
     }
   
 }

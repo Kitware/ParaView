@@ -1074,11 +1074,14 @@
       </DoubleVectorProperty>
     
       <DoubleVectorProperty
-        name="KeyValue"
+        name="KeyValues"
         command="SetKeyValue"
         number_of_elements="1"
         update_self="1"
-        default_values="0.0">
+        default_values="0.0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
       </DoubleVectorProperty>
     </KeyFrameProxy>
       
@@ -1093,11 +1096,14 @@
       </DoubleVectorProperty>
     
       <DoubleVectorProperty
-        name="KeyValue"
+        name="KeyValues"
         command="SetKeyValue"
         number_of_elements="1"
         update_self="1"
-        default_values="0.0">
+        default_values="0.0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
       </DoubleVectorProperty>
     </BooleanKeyFrameProxy>
 
@@ -1113,11 +1119,14 @@
       </DoubleVectorProperty>
     
       <DoubleVectorProperty
-        name="KeyValue"
+        name="KeyValues"
         command="SetKeyValue"
         number_of_elements="1"
         update_self="1"
-        default_values="0.0">
+        default_values="0.0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
       </DoubleVectorProperty>
     </RampKeyFrameProxy>
 
@@ -1132,11 +1141,14 @@
       </DoubleVectorProperty>
     
       <DoubleVectorProperty
-        name="KeyValue"
+        name="KeyValues"
         command="SetKeyValue"
         number_of_elements="1"
         update_self="1"
-        default_values="0.0">
+        default_values="0.0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -1180,7 +1192,10 @@
         command="SetKeyValue"
         number_of_elements="1"
         update_self="1"
-        default_values="0.0">
+        default_values="0.0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
       </DoubleVectorProperty>
 
       <DoubleVectorProperty

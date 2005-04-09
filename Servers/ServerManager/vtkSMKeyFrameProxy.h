@@ -25,6 +25,8 @@
 #define __vtkSMKeyFrameProxy_h
 
 #include "vtkSMProxy.h"
+
+class vtkSMKeyFrameProxyInternals;
 class vtkSMAnimationCueProxy;
 struct vtkClientServerID;
 
@@ -47,9 +49,18 @@ public:
 
   // Description:
   // Get/Set the animated value at this key frame.
-  vtkSetMacro(KeyValue, double);
-  vtkGetMacro(KeyValue, double);
+  // Note that is the number of values is adjusted to fit the index
+  // specified in SetKeyValue.
+  void SetKeyValue(double val) { this->SetKeyValue(0, val); }
+  void SetKeyValue(unsigned int index, double val);
+  double GetKeyValue() { return this->GetKeyValue(0); }
+  double GetKeyValue(unsigned int index);
 
+  // Description:
+  // Set/Get the number of key values this key frame currently stores.
+  unsigned int GetNumberOfKeyValues();
+  void SetNumberOfKeyValues(unsigned int num);
+  
   // Description:
   // This method will do the actual interpolation.
   // currenttime is normalized to the time range between
@@ -64,7 +75,7 @@ protected:
   ~vtkSMKeyFrameProxy();
 
   double KeyTime;
-  double KeyValue;
+  vtkSMKeyFrameProxyInternals* Internals;
 
 private:
   vtkSMKeyFrameProxy(const vtkSMKeyFrameProxy&); // Not implemented.

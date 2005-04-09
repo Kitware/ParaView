@@ -17,26 +17,69 @@
 #include "vtkObjectFactory.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.2");
-vtkStandardNewMacro(vtkSMKeyFrameProxy);
+#include <vtkstd/vector>
+//----------------------------------------------------------------------------
+class vtkSMKeyFrameProxyInternals 
+{
+public:
+  typedef vtkstd::vector<double> VectorOfDoubles;
+  VectorOfDoubles KeyValues;
+};
+//----------------------------------------------------------------------------
 
+
+vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.3");
+vtkStandardNewMacro(vtkSMKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
 {
-  this->KeyValue = 0.0;
   this->KeyTime = -1.0;
   this->ObjectsCreated = 1; //no serverside objects for this proxy.
+  this->Internals = new vtkSMKeyFrameProxyInternals;
 }
 
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::~vtkSMKeyFrameProxy()
 {
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMKeyFrameProxy::UpdateValue(double vtkNotUsed(currenttime), 
   vtkSMAnimationCueProxy* vtkNotUsed(cueProxy), vtkSMKeyFrameProxy* vtkNotUsed(next))
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkSMKeyFrameProxy::SetKeyValue(unsigned int index, double value)
+{
+  if (index >= this->GetNumberOfKeyValues())
+    {
+    this->SetNumberOfKeyValues(index+1);
+    }
+  this->Internals->KeyValues[index] = value;
+}
+
+//----------------------------------------------------------------------------
+double vtkSMKeyFrameProxy::GetKeyValue(unsigned int index)
+{
+  if (index >= this->GetNumberOfKeyValues())
+    {
+    return 0.0;
+    }
+  return this->Internals->KeyValues[index];
+}
+
+//----------------------------------------------------------------------------
+void vtkSMKeyFrameProxy::SetNumberOfKeyValues(unsigned int num)
+{
+  this->Internals->KeyValues.resize(num);
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkSMKeyFrameProxy::GetNumberOfKeyValues()
+{
+  return this->Internals->KeyValues.size();
 }
 
 //----------------------------------------------------------------------------
@@ -52,8 +95,17 @@ void vtkSMKeyFrameProxy::SaveInBatchScript(ofstream* file)
     << this->GetXMLName()
     <<" pvTemp" << id << " $pvTemp" << id << endl;
   *file << "  $pvTemp" << id << " UnRegister {}" << endl;
-  *file << "  [$pvTemp" << id << " GetProperty KeyValue]"
-    << " SetElements1 " << this->KeyValue << endl;
+
+  vtkSMKeyFrameProxyInternals::VectorOfDoubles::iterator iter = 
+    this->Internals->KeyValues.begin();
+  int i = 0;
+  for (; iter != this->Internals->KeyValues.end(); ++iter)
+    {
+    *file << "  [$pvTemp" << id << " GetProperty KeyValues]"
+      << " SetElement " << i << " " << (*iter) << endl;
+    i++;
+    }
+
   *file << "  [$pvTemp" << id << " GetProperty KeyTime]"
     << " SetElements1 " << this->KeyTime << endl;
   *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
@@ -63,6 +115,5 @@ void vtkSMKeyFrameProxy::SaveInBatchScript(ofstream* file)
 void vtkSMKeyFrameProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "KeyValue: " << this->KeyValue << endl;
   os << indent << "KeyTime: " << this->KeyTime << endl;
 }

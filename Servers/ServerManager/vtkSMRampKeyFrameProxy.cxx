@@ -16,10 +16,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
+#include "vtkSMVectorProperty.h"
 #include "vtkSMAnimationCueProxy.h"
 #include "vtkSMSourceProxy.h"
-vtkCxxRevisionMacro(vtkSMRampKeyFrameProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMRampKeyFrameProxy, "1.2");
 vtkStandardNewMacro(vtkSMRampKeyFrameProxy);
 
 //----------------------------------------------------------------------------
@@ -43,23 +43,51 @@ void vtkSMRampKeyFrameProxy::UpdateValue(double currenttime,
     {
     return;
     }
-  double vmax = next->GetKeyValue();
-  double vmin = this->GetKeyValue();
-  double value = vmin + currenttime * (vmax - vmin);
-
   vtkSMDomain *domain = cueProxy->GetAnimatedDomain();
   vtkSMProperty *property = cueProxy->GetAnimatedProperty();
   vtkSMProxy *proxy = cueProxy->GetAnimatedProxy();
+  int animated_element = cueProxy->GetAnimatedElement();
 
-  if (domain && property)
+  if (!proxy || !domain || !property)
     {
-    domain->SetAnimationValue(property, cueProxy->GetAnimatedElement(),
-      value);
+    vtkErrorMacro("Cue does not have domain or property set!");
+    return;
     }
-  if (proxy)
+
+  if (animated_element != -1)
     {
-    proxy->UpdateVTKObjects();
+    double vmax = next->GetKeyValue();
+    double vmin = this->GetKeyValue();
+    double value = vmin + currenttime * (vmax - vmin);
+    domain->SetAnimationValue(property, animated_element, value);
     }
+  else
+    {
+    unsigned int start_novalues = this->GetNumberOfKeyValues();
+    unsigned int end_novalues = next->GetNumberOfKeyValues();
+    unsigned int min = (start_novalues < end_novalues)? start_novalues :
+      end_novalues;
+    unsigned int i;
+    // interpolate comman indices.
+    for (i=0; i < min; i++)
+      {
+      double vmax = next->GetKeyValue(i);
+      double vmin = this->GetKeyValue(i);
+      double value = vmin + currenttime * (vmax - vmin);
+      domain->SetAnimationValue(property, i, value);
+      }
+    // add any additional indices in start key frame.
+    for (i = min; i < start_novalues; i++)
+      {
+      domain->SetAnimationValue(property, i, this->GetKeyValue(i));
+      }
+    vtkSMVectorProperty * vp = vtkSMVectorProperty::SafeDownCast(property);
+    if(vp)
+      {
+      vp->SetNumberOfElements(start_novalues);
+      }
+    }
+  proxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

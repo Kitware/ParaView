@@ -16,9 +16,9 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
+#include "vtkSMVectorProperty.h"
 #include "vtkSMAnimationCueProxy.h"
-vtkCxxRevisionMacro(vtkSMBooleanKeyFrameProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMBooleanKeyFrameProxy, "1.3");
 vtkStandardNewMacro(vtkSMBooleanKeyFrameProxy);
 
 //----------------------------------------------------------------------------
@@ -41,16 +41,32 @@ void vtkSMBooleanKeyFrameProxy::UpdateValue(double ,
   vtkSMDomain *domain = cueProxy->GetAnimatedDomain();
   vtkSMProperty *property = cueProxy->GetAnimatedProperty();
   vtkSMProxy *proxy = cueProxy->GetAnimatedProxy();
+  int animated_element = cueProxy->GetAnimatedElement();
 
-  if (domain && property)
+  if (!proxy || !domain || !property)
     {
-    domain->SetAnimationValue(property, cueProxy->GetAnimatedElement(),
-      this->GetKeyValue());
+    vtkErrorMacro("Cue does not have domain or property set!");
+    return;
     }
-  if (proxy)
+ 
+  if (animated_element != -1)
     {
-    proxy->UpdateVTKObjects();
+    domain->SetAnimationValue(property, animated_element, this->GetKeyValue());
     }
+  else
+    {
+    unsigned int max = this->GetNumberOfKeyValues();
+    for (unsigned int i=0; i < max; i++)
+      {
+      domain->SetAnimationValue(property, i, this->GetKeyValue(i));
+      }
+    vtkSMVectorProperty * vp = vtkSMVectorProperty::SafeDownCast(property);
+    if(vp)
+      {
+      vp->SetNumberOfElements(max);
+      }
+    }
+  proxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

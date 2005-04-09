@@ -16,12 +16,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkSMDomain.h"
 #include "vtkSMProxy.h"
-#include "vtkSMProperty.h"
+#include "vtkSMVectorProperty.h"
 #include "vtkSMAnimationCueProxy.h"
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkSMSinusoidKeyFrameProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMSinusoidKeyFrameProxy, "1.3");
 vtkStandardNewMacro(vtkSMSinusoidKeyFrameProxy);
 
 //----------------------------------------------------------------------------
@@ -63,27 +63,55 @@ void vtkSMSinusoidKeyFrameProxy::UpdateValue(double currenttime,
     return;
     }
 
+  vtkSMDomain *domain = cueProxy->GetAnimatedDomain();
+  vtkSMProperty *property = cueProxy->GetAnimatedProperty();
+  vtkSMProxy *proxy = cueProxy->GetAnimatedProxy();
+  int animated_element = cueProxy->GetAnimatedElement();
+
+  if (!proxy || !domain || !property)
+    {
+    vtkErrorMacro("Cue does not have domain or property set!");
+    return;
+    }
+
   // ( start + (end-start)*sin( 2*pi* (freq*t + phase/360) )/2 )
   double t = sin ( 8.0 * atan(static_cast<double>(1.0)) *  
     (this->Frequency* currenttime + this->Phase/360.0)) /  2.0;
 
-  double vmin = this->GetKeyValue();
-  double vmax = vmin + this->Offset; 
-  double value = vmin + t * (vmax - vmin);
-
-  vtkSMDomain *domain = cueProxy->GetAnimatedDomain();
-  vtkSMProperty *property = cueProxy->GetAnimatedProperty();
-  vtkSMProxy *proxy = cueProxy->GetAnimatedProxy();
-
-  if (domain && property)
+  if (animated_element != -1)
     {
-    domain->SetAnimationValue(property, cueProxy->GetAnimatedElement(),
-      value);
+    double vmin = this->GetKeyValue();
+    double vmax = vmin + this->Offset; 
+    double value = vmin + t * (vmax - vmin);
+    domain->SetAnimationValue(property, animated_element, value);
     }
-  if (proxy)
+  else
     {
-    proxy->UpdateVTKObjects();
+    unsigned int start_novalues = this->GetNumberOfKeyValues();
+    unsigned int end_novalues = next->GetNumberOfKeyValues();
+    unsigned int min = (start_novalues < end_novalues)? start_novalues :
+      end_novalues;
+    unsigned int i;
+    // interpolate comman indices.
+    for (i=0; i < min; i++)
+      {
+      double vmax = next->GetKeyValue(i);
+      double vmin = this->GetKeyValue(i);
+      double value = vmin + t * (vmax - vmin);
+      domain->SetAnimationValue(property, i, value);
+      }
+    // add any additional indices in start key frame.
+    for (i = min; i < start_novalues; i++)
+      {
+      domain->SetAnimationValue(property, i, this->GetKeyValue(i));
+      }
+    vtkSMVectorProperty * vp = vtkSMVectorProperty::SafeDownCast(property);
+    if(vp)
+      {
+      vp->SetNumberOfElements(start_novalues);
+      }
     }
+  proxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

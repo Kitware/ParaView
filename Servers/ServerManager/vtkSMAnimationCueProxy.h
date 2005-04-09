@@ -40,15 +40,27 @@ public:
   // Saves the proxy to batch script.
   virtual void SaveInBatchScript(ofstream*);
   
+  // Description:
+  // Pointer to the proxy whose property is being animated by this cue.
   void SetAnimatedProxy(vtkSMProxy* proxy);
   vtkGetObjectMacro(AnimatedProxy, vtkSMProxy);
 
+  // Description:
+  // the XMLName of the property of the AnimatedProxy that is being
+  // animated by this cue.
   vtkGetStringMacro(AnimatedPropertyName);
   vtkSetStringMacro(AnimatedPropertyName);
 
+  // Description:
+  // The domain name for the domain of the property to be used
+  // to change the property value when animating. 
   vtkGetStringMacro(AnimatedDomainName);
   vtkSetStringMacro(AnimatedDomainName);
-  
+
+  // Description:
+  // The index of the element of the property this cue animates.
+  // If the index is -1, the cue will animate all the elements
+  // of the animated property.
   vtkSetMacro(AnimatedElement, int);
   vtkGetMacro(AnimatedElement, int);
     

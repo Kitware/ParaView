@@ -43,8 +43,9 @@
 #include "vtkKWPushButton.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.8");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.9");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -236,48 +237,74 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
 void vtkPVKeyFrame::CreateValueWidget()
 {
   vtkSMAnimationCueProxy* cueProxy = this->AnimationCue->GetCueProxy();
+  vtkSMProperty* property = cueProxy->GetAnimatedProperty();
   vtkSMDomain* domain = cueProxy->GetAnimatedDomain();
-  if (!domain)
+  int animated_element = cueProxy->GetAnimatedElement();
+
+  if (!domain || !property)
     {
-    vtkErrorMacro("Animated domain not specified!");
+    vtkErrorMacro("Animated domain/property not specified!");
     //don't create a value widget.
     return;
     }
-  // 3 Types of widgets: SelectionList, Checkbox and thumbwheel.
+  // 4 Types of widgets: SelectionList, Checkbox, Thumbwheel
+  // and PVContourEntry.
   vtkSMBooleanDomain* bd = vtkSMBooleanDomain::SafeDownCast(domain);
   vtkSMEnumerationDomain* ed = vtkSMEnumerationDomain::SafeDownCast(domain);
   vtkSMStringListDomain* sld = vtkSMStringListDomain::SafeDownCast(domain);
-  if (bd)
+
+  if (animated_element==-1)
     {
-    // Widget is check box.
-    vtkKWCheckButton* kwCB = vtkKWCheckButton::New();
-    kwCB->SetParent(this);
-    kwCB->Create(this->GetApplication(), 0);
-    kwCB->SetCommand(this, "ValueChangedCallback");
-    this->ValueWidget = kwCB;
-    }
-  else if (ed || sld)
-    {
-    vtkPVSelectionList* pvList = vtkPVSelectionList::New();
-    pvList->SetParent(this);
-    pvList->SetLabelVisibility(0);
-    pvList->Create(this->GetApplication());
-    pvList->SetModifiedCommand(this->GetTclName(), "ValueChangedCallback");
-    this->ValueWidget = pvList;
+    // For now, I will only support multiple value widgets for double vector
+    // property alone (since I use the vtkPVContourEntry (which accepts only
+    // doubles).
+    if (!vtkSMDoubleVectorProperty::SafeDownCast(property))
+      {
+      vtkWarningMacro("Array List domains are currently supported for "
+        " vtkSMDoubleVectorProperty alone.");
+      return;
+      }
+    vtkPVContourEntry* valueList = vtkPVContourEntry::New();
+    valueList->SetParent(this);
+    valueList->SetSMProperty(property);
+    valueList->Create(this->GetApplication());
+    valueList->SetModifiedCommand(this->GetTclName(),"ValueChangedCallback");
+    this->ValueWidget = valueList;
     }
   else
     {
-    vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::New();
-    pvWheel->SetParent(this);
-    pvWheel->PopupModeOn();
-    pvWheel->Create(this->GetApplication(), 0);
-    pvWheel->DisplayEntryOn();
-    pvWheel->DisplayLabelOff();
-    pvWheel->DisplayEntryAndLabelOnTopOff();
-    pvWheel->ExpandEntryOn();
-    pvWheel->SetEntryCommand(this, "ValueChangedCallback");
-    pvWheel->SetEndCommand(this, "ValueChangedCallback");
-    this->ValueWidget = pvWheel;
+    if (bd)
+      {
+      // Widget is check box.
+      vtkKWCheckButton* kwCB = vtkKWCheckButton::New();
+      kwCB->SetParent(this);
+      kwCB->Create(this->GetApplication(), 0);
+      kwCB->SetCommand(this, "ValueChangedCallback");
+      this->ValueWidget = kwCB;
+      }
+    else if (ed || sld)
+      {
+      vtkPVSelectionList* pvList = vtkPVSelectionList::New();
+      pvList->SetParent(this);
+      pvList->SetLabelVisibility(0);
+      pvList->Create(this->GetApplication());
+      pvList->SetModifiedCommand(this->GetTclName(), "ValueChangedCallback");
+      this->ValueWidget = pvList;
+      }
+    else
+      {
+      vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::New();
+      pvWheel->SetParent(this);
+      pvWheel->PopupModeOn();
+      pvWheel->Create(this->GetApplication(), 0);
+      pvWheel->DisplayEntryOn();
+      pvWheel->DisplayLabelOff();
+      pvWheel->DisplayEntryAndLabelOnTopOff();
+      pvWheel->ExpandEntryOn();
+      pvWheel->SetEntryCommand(this, "ValueChangedCallback");
+      pvWheel->SetEndCommand(this, "ValueChangedCallback");
+      this->ValueWidget = pvWheel;
+      }
     }
 }
 
@@ -328,9 +355,23 @@ void vtkPVKeyFrame::MaximumCallback()
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::InitializeKeyValueUsingProperty(vtkSMProperty* property, int index)
 {
-  if (!property || index < 0)
+  if (!property )
     {
-    vtkErrorMacro("Invalid property or index");
+    vtkErrorMacro("Invalid property");
+    return;
+    }
+
+  if (index == -1)
+    {
+    vtkPVContourEntry* contourEntry = vtkPVContourEntry::SafeDownCast(
+      this->ValueWidget);
+    if (contourEntry)
+      {
+      contourEntry->Initialize(); // since we have set the SMProperty pointer
+        // for this widget properly, it will update itself!
+      this->ValueChangedCallback(); // I call this so that the values in the
+        //contour widget are set as values on the this key frame.
+      }
     return;
     }
   if (vtkSMVectorProperty::SafeDownCast(property))
@@ -393,7 +434,11 @@ void vtkPVKeyFrame::UpdateDomain()
   // TODO: Actually, it would have been neat if we could compare the MTimes for the
   // widgets and the domains, but so happens that none of the
   // PVWidgets or SMDomains update MTime properly. Should correct that first.
-
+  if (index == -1)
+    {
+    return;
+    }
+  
   if (bd)
     {
     // Domain does not change for boolean.
@@ -517,6 +562,18 @@ void vtkPVKeyFrame::ValueChangedCallback()
       vtkKWThumbWheel::SafeDownCast(this->ValueWidget)->GetEntry()->
       GetValueAsFloat());
     }
+  else if (vtkPVContourEntry::SafeDownCast(this->ValueWidget))
+    {
+    vtkPVContourEntry* contourEntry = 
+      vtkPVContourEntry::SafeDownCast(this->ValueWidget);
+    
+    int numContours = contourEntry->GetNumberOfValues();
+    this->SetNumberOfKeyValues(numContours);
+    for (int i=0; i < numContours; i++)
+      {
+      this->SetKeyValue(i, contourEntry->GetValue(i));
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -630,16 +687,26 @@ double vtkPVKeyFrame::GetKeyTime()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVKeyFrame::SetKeyValue(double val)
+void vtkPVKeyFrame::SetKeyValue(int index, double val)
 {
-  this->KeyFrameProxy->SetKeyValue(val);
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyValue %f", this->GetTclName(), val);
+  this->KeyFrameProxy->SetKeyValue(index, val);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyValue %d %f", 
+    this->GetTclName(), index, val);
 }
 
 //-----------------------------------------------------------------------------
-double vtkPVKeyFrame::GetKeyValue()
+void vtkPVKeyFrame::SetNumberOfKeyValues(int num)
 {
-  return this->KeyFrameProxy->GetKeyValue();
+  this->KeyFrameProxy->SetNumberOfKeyValues(num);
+  
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetNumberOfKeyValues %d", 
+    this->GetTclName(), num);
+}
+
+//-----------------------------------------------------------------------------
+double vtkPVKeyFrame::GetKeyValue(int index)
+{
+  return this->KeyFrameProxy->GetKeyValue(index);
 }
 
 //-----------------------------------------------------------------------------
@@ -656,9 +723,17 @@ void vtkPVKeyFrame::UpdateEnableState()
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::SaveState(ofstream* file)
 {
+  if (!this->KeyFrameProxy)
+    {
+    return;
+    }
   *file << "#State of a Key Frame " <<endl;
-  *file << "$kw(" << this->GetTclName() << ") SetKeyValue "
-    << this->GetKeyValue() << endl;
+  
+  for (unsigned int i=0; i < this->KeyFrameProxy->GetNumberOfKeyValues(); i++)
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetKeyValue " << i << " "
+      << this->GetKeyValue(i) << endl;
+    }
   *file << "$kw(" << this->GetTclName() << ") SetKeyTime "
     << this->GetKeyTime() << endl;
 }

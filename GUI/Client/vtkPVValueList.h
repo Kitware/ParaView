@@ -91,7 +91,15 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
- 
+
+  // Description:
+  // Method to obatin the number of contour values.
+  int GetNumberOfValues();
+
+  // Description:
+  // Obtain the contour value at a particular index.
+  double GetValue(int index);
+
 protected:
   vtkPVValueList();
   ~vtkPVValueList();

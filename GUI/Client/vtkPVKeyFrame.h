@@ -44,8 +44,14 @@ public:
   void SetKeyTime(double time);
   double GetKeyTime();
 
-  void SetKeyValue(double value);
-  double GetKeyValue();
+  void SetKeyValue(double value) { this->SetKeyValue(0, value); }
+  void SetKeyValue(int index, double value);
+  double GetKeyValue() { return this->GetKeyValue(0); }
+  double GetKeyValue(int index);
+
+  // Description:
+  // Set the number of key values for this keyt frame.
+  void SetNumberOfKeyValues(int num);
 
   // Description:
   // Initialized Key Value using current animated property value.

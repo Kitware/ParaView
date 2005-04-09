@@ -654,7 +654,8 @@
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1"> 
+        number_of_elements="1"
+        animateable="0"> 
           <ArrayListDomain name="array_list" attribute_type="Scalars">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
@@ -669,7 +670,8 @@
         number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="1"
-        use_index="1">
+        use_index="1"
+        animateable="1">
           <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
@@ -682,7 +684,8 @@
         name="IgnoreGhostLevels" 
         command="SetIgnoreGhostLevels" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" 
+        animateable="0"> 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -2183,7 +2186,8 @@
         repeat_command="1"
         set_number_command="SetNumberOfContours"
         number_of_elements_per_command="1"
-        use_index="1">
+        use_index="1"
+        animateable="1">
           <BoundsDomain name="bounds" mode="magnitude">
             <RequiredProperties>
               <Property name="Input" function="Input"/>
@@ -2345,7 +2349,8 @@
      <StringVectorProperty 
         name="SelectInputScalars" 
         command="SelectInputScalars" 
-        number_of_elements="1"> 
+        number_of_elements="1"
+        animateable="0"> 
           <ArrayListDomain name="array_list" attribute_type="Scalars">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
@@ -2360,7 +2365,8 @@
         number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="1"
-        use_index="1">
+        use_index="1"
+        animateable="1">
           <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
@@ -2373,7 +2379,8 @@
         name="ComputeNormals" 
         command="SetComputeNormals" 
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1" 
+        animateable="0"> 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -2381,7 +2388,8 @@
         name="ComputeGradients" 
         command="SetComputeGradients" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" 
+        animateable="0"> 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -2389,7 +2397,8 @@
         name="ComputeScalars" 
         command="SetComputeScalars" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" 
+        animateable="0"> 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End Contour -->
@@ -2947,7 +2956,8 @@
         number_of_elements="0"
         repeat_command="1"
         number_of_elements_per_command="1"
-        use_index="1">
+        use_index="1"
+        animateable="1">
           <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
@@ -2960,7 +2970,8 @@
         name="ComputeNormals" 
         command="SetComputeNormals" 
         number_of_elements="1"
-        default_values="1" > 
+        default_values="1" 
+        animateable="0"> 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -2968,7 +2979,8 @@
         name="ComputeGradients" 
         command="SetComputeGradients" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" 
+        animateable="0"> 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -2976,7 +2988,8 @@
         name="ComputeScalars" 
         command="SetComputeScalars" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="0" 
+        animateable="0"> 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
@@ -3017,7 +3030,8 @@
         repeat_command="1"
         set_number_command="SetNumberOfContours"
         number_of_elements_per_command="1"
-        use_index="1">
+        use_index="1"
+        animateable="1">
           <BoundsDomain name="bounds" mode="magnitude">
             <RequiredProperties>
               <Property name="Input" function="Input"/>

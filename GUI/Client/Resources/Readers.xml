@@ -183,7 +183,8 @@
       <Item name="little endian" value="1"/>
     </SelectionList>
     <SelectTimeSet label="Select time value" property="SetTimeValue"
-                   trace_name="TimeSet"/>
+                   trace_name="TimeSet"
+                   keeps_timesteps="1"/>
     <ArraySelection label_text="Point Arrays"
                     property="PointArrayStatus"
                     trace_name="PointArrays"/>

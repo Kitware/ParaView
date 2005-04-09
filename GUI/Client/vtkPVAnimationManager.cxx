@@ -62,7 +62,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.27");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.28");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -506,7 +506,20 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
       continue;
       }
     int numOfElements = vproperty->GetNumberOfElements();
-    if (numOfElements > 1)
+    int has_repeat_command = vproperty->GetRepeatCommand();
+    // Generally, for every element in the propety, we create a separate track,
+    // except for those properties that have the repeat command set. (We can later
+    // change this to be a special attribute, but for now, repeat commmand suffices).
+    // For those that have repeat command set, a single track is created, which 
+    // manages the property (AnimatedElement for that cue is set to -1).
+    if (numOfElements == 1 || has_repeat_command)
+      {
+      int element_index = (has_repeat_command)? -1: 0;
+      this->SetupCue(pvSource, pvCueTree, proxy, property->GetXMLName(),NULL,
+        element_index,  property->GetXMLName());
+      property_added++;
+      }
+    else
       {
       vtkPVAnimationCueTree* cueTree = vtkPVAnimationCueTree::New();
       cueTree->SetLabelText(property->GetXMLName());
@@ -529,12 +542,6 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
         str.rdbuf()->freeze(0);
         property_added++;
         }
-      }
-    else
-      {
-      this->SetupCue(pvSource, pvCueTree, proxy, property->GetXMLName(),NULL,0,
-        property->GetXMLName());
-      property_added++;
       }
     }
   iter->Delete();

@@ -282,6 +282,8 @@ protected:
   vtkPVAnimationManagerObserver* Observer;
   void ExecuteEvent(vtkObject* obj, unsigned long event, void* calldata);
 //ETX
+
+  // Helper method to set up the cue for a particular property.
   void SetupCue(vtkPVSource* pvSource, vtkPVAnimationCueTree* parent, vtkSMProxy* proxy, 
     const char* propertyname, const char* domainname, int element, 
     const char* label);

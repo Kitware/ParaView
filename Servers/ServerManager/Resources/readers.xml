@@ -632,7 +632,8 @@
          name="SetTimeValue"
          command="SetTimeValue"
          number_of_elements="1"
-         default_values="0.0" >
+         default_values="0.0" 
+         animateable="1">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
@@ -1007,7 +1008,8 @@
          name="SetTimeValue"
          command="SetTimeValue"
          number_of_elements="1"
-         default_values="0.0" >
+         default_values="0.0" 
+         animateable="1">
         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 

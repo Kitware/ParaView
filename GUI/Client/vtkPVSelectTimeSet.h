@@ -103,7 +103,10 @@ public:
   // Description:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
- 
+
+  // Description:
+  // Get the number of timesteps if any.
+  int GetNumberOfTimeSteps();
 protected:
   vtkPVSelectTimeSet();
   ~vtkPVSelectTimeSet();

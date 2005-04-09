@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.24");
+vtkCxxRevisionMacro(vtkPVValueList, "1.25");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -522,6 +522,23 @@ void vtkPVValueList::AddValue(double val)
 {
   this->AddValueNoModified(val);
   this->ModifiedCallback();
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVValueList::GetNumberOfValues()
+{
+  return this->ContourValues->GetNumberOfContours();
+}
+
+//-----------------------------------------------------------------------------
+double vtkPVValueList::GetValue(int index)
+{
+  if (index >= this->ContourValues->GetNumberOfContours())
+    {
+    vtkErrorMacro("Invalid index " << index);
+    return 0;
+    }
+  return this->ContourValues->GetValue(index);
 }
 
 //-----------------------------------------------------------------------------

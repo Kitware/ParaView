@@ -24,6 +24,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
+#include "vtkPVSelectTimeSet.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkVector.txx"
@@ -33,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.61");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.62");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -387,6 +388,13 @@ int vtkPVReaderModule::GetNumberOfTimeSteps()
   if (pvScale)
     {
     return static_cast<int>(pvScale->GetRangeMax() - pvScale->GetRangeMin());
+    }
+
+  vtkPVSelectTimeSet* pvSelectTimeSet = vtkPVSelectTimeSet::SafeDownCast(
+    pvWidget);
+  if (pvSelectTimeSet)
+    {
+    return pvSelectTimeSet->GetNumberOfTimeSteps();
     }
   return 0;
 }
