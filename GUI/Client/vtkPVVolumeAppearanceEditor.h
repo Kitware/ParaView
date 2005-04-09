@@ -102,6 +102,10 @@ public:
   // Save State
   void SaveState(ofstream *file);
 
+  // Description:
+  // Trace method to refresh the GUI from the Proxy.
+  void RefreshGUI();
+
 protected:
   vtkPVVolumeAppearanceEditor();
   ~vtkPVVolumeAppearanceEditor();

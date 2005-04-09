@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.27.2.2");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.27.2.3");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -221,6 +221,14 @@ void vtkPVVolumeAppearanceEditor::VolumePropertyInternalCallback()
   this->SetColorSpace( color->GetColorSpace() );
   pDisp->UpdateVTKObjects();
   this->RenderView();
+  this->AddTraceEntry("$kw(%s) RefreshGUI", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVVolumeAppearanceEditor::RefreshGUI()
+{
+  this->UpdateFromProxy();
+  this->VolumePropertyWidget->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -381,9 +389,7 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
     this->VolumePropertyWidget->SetVolumeProperty(
       this->InternalVolumeProperty); 
     }
-
-  this->UpdateFromProxy();
-  this->VolumePropertyWidget->Update();
+  this->RefreshGUI();
 }
 
 //----------------------------------------------------------------------------
