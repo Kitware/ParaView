@@ -62,7 +62,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.28");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.29");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -826,7 +826,8 @@ void vtkPVAnimationManager::StartRecording()
     return;
     }
   this->InRecording = 1;
-  this->RecordingIncrement = 0.1;
+//  this->RecordingIncrement = 0.1;
+  this->RecordingIncrement = 1.0;
   this->HAnimationInterface->StartRecording();
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
@@ -869,12 +870,19 @@ void vtkPVAnimationManager::RecordState()
   double curbounds[2] = {0, 0};
   this->HAnimationInterface->GetTimeBounds(curbounds);
   double parameter = curbounds[1];
-  if (parameter + this->RecordingIncrement > 1)
+  while (parameter + this->RecordingIncrement > 1)
     {
-    curbounds[1] -= this->RecordingIncrement;
-    this->HAnimationInterface->SetTimeBounds(curbounds,1);
-    parameter -= this->RecordingIncrement;
-    this->RecordingIncrement *= ( 1.0 - this->RecordingIncrement); 
+    double scale_factor = 1.0 / (parameter + this->RecordingIncrement);
+    curbounds[1] *= scale_factor;
+    curbounds[0] *= scale_factor;
+    parameter = curbounds[1];
+    this->HAnimationInterface->SetTimeBounds(curbounds, 1);
+    this->RecordingIncrement *= scale_factor;
+    if (this->RecordingIncrement == 0)
+      {
+      vtkErrorMacro("Recording error!");
+      return;
+      }
     }
   this->Script("update");
   this->HAnimationInterface->RecordState(parameter, this->RecordingIncrement,

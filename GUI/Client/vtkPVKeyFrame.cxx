@@ -45,7 +45,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.9");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.10");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -184,6 +184,7 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
   this->TimeThumbWheel->SetParent(this);
   this->TimeThumbWheel->PopupModeOn();
   this->TimeThumbWheel->SetValue(0.0);
+  this->TimeThumbWheel->SetMinimumValue(0.0);
   this->TimeThumbWheel->SetResolution(0.01);
   this->TimeThumbWheel->Create(app, NULL);
   this->TimeThumbWheel->DisplayEntryOn();
