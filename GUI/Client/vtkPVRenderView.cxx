@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.367");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.368");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3095,7 +3095,8 @@ void vtkPVRenderView::UpdateEnableState()
   this->PropagateEnableState(this->FillLightLabel);
   this->PropagateEnableState(this->BackLightLabel);
   this->PropagateEnableState(this->HeadLightLabel);
-  for ( int cc = 0; cc < 4; cc ++ )
+  int cc;
+  for ( cc = 0; cc < 4; cc ++ )
     {
     this->PropagateEnableState(this->KeyLightScale[cc]);
     this->PropagateEnableState(this->FillLightScale[cc]);
@@ -3121,7 +3122,7 @@ void vtkPVRenderView::UpdateEnableState()
   this->PropagateEnableState(this->ManipulatorControl3D);
   this->PropagateEnableState(this->CameraControlFrame);
   this->PropagateEnableState(this->CameraIconsFrame);
-  for ( int cc = 0; cc < 6; cc ++ )
+  for ( cc = 0; cc < 6; cc ++ )
     {
     this->PropagateEnableState(this->CameraIcons[cc]);
     }
