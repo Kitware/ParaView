@@ -24,7 +24,7 @@
 #include "vtkSMInputProperty.h"
 
 vtkStandardNewMacro(vtkSMAxesProxy);
-vtkCxxRevisionMacro(vtkSMAxesProxy, "1.1.4.3");
+vtkCxxRevisionMacro(vtkSMAxesProxy, "1.1.4.4");
 //---------------------------------------------------------------------------
 vtkSMAxesProxy::vtkSMAxesProxy()
 {
@@ -106,7 +106,7 @@ void vtkSMAxesProxy::CreateVTKObjects(int numObjects)
 
   this->UpdateVTKObjects();
 
-  this->cmSetVisibility(0);
+//  this->cmSetVisibility(0);
 }
 
 //---------------------------------------------------------------------------
