@@ -43,7 +43,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.6");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.7");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -328,6 +328,17 @@ void vtkPVProbe::AcceptCallbackInternal()
     
 }
  
+//----------------------------------------------------------------------------
+void vtkPVProbe::SaveInBatchScript(ofstream* file)
+{
+  this->Superclass::SaveInBatchScript(file);
+  if (this->CanShowPlot)
+    {
+    *file << "  # Save the XY Plot" << endl;
+    this->PlotDisplayProxy->SaveInBatchScript(file);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 {

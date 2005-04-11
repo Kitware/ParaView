@@ -46,6 +46,12 @@ public:
   // Control the visibility of the pick display as well.
   virtual void SetVisibilityNoTrace(int val);
 
+  // Description:
+  // Save the pipeline to a batch file which can be run without
+  // a user interface.
+  // Overridden to save the plot display in batch.
+  virtual void SaveInBatchScript(ofstream *file);
+
 protected:
   vtkPVProbe();
   ~vtkPVProbe();
