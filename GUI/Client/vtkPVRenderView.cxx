@@ -130,7 +130,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.357.2.4");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.357.2.5");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2479,4 +2479,5 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
 }

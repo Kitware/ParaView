@@ -1198,7 +1198,7 @@
         command="SetPosition"
         number_of_elements="2"
         update_self="1"
-        default_values="0.81 0.25"
+        default_values="0.87 0.25"
         animateable="0">
         <DoubleRangeDomain name="range" min="0 0" max="1 1" />
       </DoubleVectorProperty>

@@ -907,7 +907,7 @@
         name="Bold"
         command="SetBold"
         number_of_elements="1"
-        default_values="0"
+        default_values="1"
         animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
@@ -916,7 +916,7 @@
         name="Italic"
         command="SetItalic"
         number_of_elements="1"
-        default_values="0">
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -924,7 +924,7 @@
         name="Shadow"
         command="SetShadow"
         number_of_elements="1"
-        default_values="0">
+        default_values="1">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -1123,6 +1123,8 @@
         clean_command="RemoveAllDisplays">
         <ProxyGroupDomain name="groups">
           <Group name="displays" />
+          <Group name="axes" />
+          <Group name="3d_widgets" />
         </ProxyGroupDomain>
       </ProxyProperty>
       <IntVectorProperty

@@ -51,6 +51,12 @@ public:
   // Called when the delete button is pressed.
   virtual void DeleteCallback();
 
+  // Description:
+  // Save the pipeline to a batch file which can be run without
+  // a user interface. Overridden to save PickLabelDisplayProxy
+  // in batch
+  virtual void SaveInBatchScript(ofstream *file);
+
 protected:
   vtkPVPick();
   ~vtkPVPick();

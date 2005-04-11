@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.16.2.2");
+vtkCxxRevisionMacro(vtkPVPick, "1.16.2.3");
 
 
 //----------------------------------------------------------------------------
@@ -88,6 +88,17 @@ void vtkPVPick::SetVisibilityNoTrace(int val)
   this->Superclass::SetVisibilityNoTrace(val);
 }
 
+
+void vtkPVPick::SaveInBatchScript(ofstream *file)
+{
+  this->Superclass::SaveInBatchScript(file);
+  if (this->PickLabelDisplayProxy)
+    {
+    *file << "# Save PickLabelDisplayProxy " << endl;
+    this->PickLabelDisplayProxy->SaveInBatchScript(file);
+    }
+  
+}
 
 //----------------------------------------------------------------------------
 void vtkPVPick::DeleteCallback()

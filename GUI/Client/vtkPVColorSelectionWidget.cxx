@@ -24,7 +24,7 @@
 #include "vtkPVArrayInformation.h"
 
 vtkStandardNewMacro(vtkPVColorSelectionWidget);
-vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.1.2.4");
 //-----------------------------------------------------------------------------
 vtkPVColorSelectionWidget::vtkPVColorSelectionWidget()
 {
@@ -170,4 +170,6 @@ void vtkPVColorSelectionWidget::SetValue(const char* val)
 void vtkPVColorSelectionWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Target: " << this->Target << endl;
+  os << indent << "ColorSelectionCommand: " << this->ColorSelectionCommand << endl;
 }

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.9.10.1");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.9.10.2");
 vtkCxxSetObjectMacro(vtkPVRenderModuleUI, RenderModuleProxy, vtkSMRenderModuleProxy);
 //----------------------------------------------------------------------------
 
@@ -80,5 +80,6 @@ void vtkPVRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "OutlineThreshold: " << this->OutlineThreshold << endl;
+  os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
 }
 
