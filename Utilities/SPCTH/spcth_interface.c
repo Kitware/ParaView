@@ -157,11 +157,11 @@ int spcth_getDataBlockBounds(SPCTH* spcth, int block_index, double *bounds) {
     }
 
   bounds[0] = blk->x[0];
-  bounds[1] = blk->x[blk->Nx+1];
+  bounds[1] = blk->x[blk->Nx];
   bounds[2] = blk->y[0];
-  bounds[3] = blk->y[blk->Ny+1];
+  bounds[3] = blk->y[blk->Ny];
   bounds[4] = blk->z[0];
-  bounds[5] = blk->z[blk->Nz+1];
+  bounds[5] = blk->z[blk->Nz];
 
   /* Successfully populated bounds */
   return 1;
