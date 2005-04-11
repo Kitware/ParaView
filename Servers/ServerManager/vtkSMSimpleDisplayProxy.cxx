@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.7");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.8");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -385,6 +385,7 @@ void vtkSMSimpleDisplayProxy::SetupDefaults()
       vtkErrorMacro("Failed to find property Specular on PropertyProxy.");
       return;
       }
+    dvp->SetElement(0, 0.1);
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
       this->PropertyProxy->GetProperty("SpecularPower"));
@@ -392,7 +393,8 @@ void vtkSMSimpleDisplayProxy::SetupDefaults()
       {
       vtkErrorMacro("Failed to find property SpecularPower on PropertyProxy.");
       return;
-      } 
+      }
+    dvp->SetElement(0, 100);
 
     dvp = vtkSMDoubleVectorProperty::SafeDownCast(
       this->PropertyProxy->GetProperty("SpecularColor"));
