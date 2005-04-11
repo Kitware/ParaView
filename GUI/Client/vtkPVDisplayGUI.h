@@ -271,23 +271,6 @@ public:
   vtkGetObjectMacro(ResetCameraButton, vtkKWPushButton);
   vtkGetObjectMacro(ActorControlFrame, vtkKWFrameLabeled);
 
-  // Description:
-  // Used during state file loading to restore the transfer functions
-  void ClearVolumeOpacity();
-  void AddVolumeOpacity( double scalar,
-                         double opacity );
-  void ClearVolumeColor();
-  void AddVolumeColor( double scalar,
-                       double r, double g, double b );
-
-  void SetVolumeOpacityUnitDistance( double d );
-    
-  // Description:
-  // Checks to see if volume render mode is on and if so, saves the command
-  // to the script file. 
-  void SaveVolumeRenderStateDisplay(ofstream *os);
-
-
 protected:
   vtkPVDisplayGUI();
   ~vtkPVDisplayGUI();

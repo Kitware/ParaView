@@ -60,7 +60,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.12");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.13");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -2150,6 +2150,62 @@ void vtkPVSource::SaveStateVisibility(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveStateDisplay(ofstream *file)
 {
+  vtkSMPropertyIterator* iter = this->DisplayProxy->NewPropertyIterator();
+  *file << "# Saving state of the Display Proxy associated with the source" 
+    << endl;
+  
+  *file << "set pvDisp(" << this->GetTclName() 
+    << ") [$kw(" << this->GetTclName()
+    << ") GetDisplayProxy] " << endl;
+
+  // Even in state we have to use ServerManager API for displays.
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty* p = iter->GetProperty();
+    if (!p->GetSaveable())
+      {
+      continue;
+      }
+
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
+    vtkSMDoubleVectorProperty* dvp = 
+      vtkSMDoubleVectorProperty::SafeDownCast(p);
+    vtkSMStringVectorProperty* svp =
+      vtkSMStringVectorProperty::SafeDownCast(p);
+    if (ivp)
+      {
+      for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
+        {
+        *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
+          << p->GetXMLName() << "] SetElement " << i << " "
+          << ivp->GetElement(i)
+          << endl;
+        }
+      }
+    else if (dvp)
+      {
+      for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
+        {
+        *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
+          << p->GetXMLName() << "] SetElement " << i << " "
+          << dvp->GetElement(i)
+          << endl;
+        }
+      }
+    else if (svp)
+      {
+      for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
+        {
+        *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
+          << p->GetXMLName() << "] SetElement " << i << " {"
+          <<  ( (svp->GetElement(i)? svp->GetElement(i) : "" )) << "}"
+          << endl;
+        }
+      }
+    }
+  *file << "$pvDisp(" << this->GetTclName() << ") UpdateVTKObjects" << endl;
+  iter->Delete();
+  // We didn;t save the LUT in the above code. 
   // Set the color map here for simplicity.
   if (this->PVColorMap)
     {
@@ -2157,17 +2213,17 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
       vtkSMDisplayProxy::POINT_FIELD_DATA)
       {
       *file << "[$kw(" << this->GetTclName()
-            << ") GetPVOutput] ColorByPointField {" 
+            << ") GetPVOutput] ColorByArray {" 
             << this->PVColorMap->GetArrayName() << "} " 
-            << this->PVColorMap->GetNumberOfVectorComponents() << endl;
+            << 3 << endl;
       }
     if (this->DisplayProxy->cmGetScalarMode() == 
       vtkSMDisplayProxy::CELL_FIELD_DATA)
       {
       *file << "[$kw(" << this->GetTclName()
-            << ") GetPVOutput] ColorByCellField {" 
+            << ") GetPVOutput] ColorByArray {" 
             << this->PVColorMap->GetArrayName() << "} " 
-            << this->PVColorMap->GetNumberOfVectorComponents() << endl;
+            << 4 << endl;
       }
     }
   else
@@ -2175,31 +2231,11 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
     *file << "[$kw(" << this->GetTclName()
           << ") GetPVOutput] ColorByProperty\n";
     }
-
-  // Add command to switch to Volume Render mode if required
-  this->GetPVOutput()->SaveVolumeRenderStateDisplay(file);
-
-  // Save the options from the display GUI.
-  char dispTclName[512];
-  sprintf(dispTclName, "$pvDisp(%s)", this->GetTclName());
-  *file << "set " << dispTclName+1 
-        << " [$kw(" << this->GetTclName() << ") GetDisplayProxy]" << endl;
-  vtkIndent indent;
-
-  // TODO: Save display state.
-//  this->GetPartDisplay()->SavePVState(file, dispTclName, indent);
-
-  *file << "$kw(" << this->GetTclName()
-        << ") SetCubeAxesVisibility " << this->GetCubeAxesVisibility() << endl; 
-
-  *file << "$kw(" << this->GetTclName()
-        << ") SetPointLabelVisibility " << this->GetPointLabelVisibility() << endl; 
-
-  // Make sure the GUI is upto date.  
-  *file << "[$kw(" << this->GetTclName()
-        << ") GetPVOutput] Update\n"; 
+  // We don;t have to save volume rendering state, as
+  // that will get saved automatically when we iterated over 
+  // the properties.
 }
-  
+
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveState(ofstream *file)
 {

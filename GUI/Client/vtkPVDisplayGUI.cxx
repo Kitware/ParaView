@@ -85,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.6");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.7");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2038,93 +2038,6 @@ void vtkPVDisplayGUI::ChangeLineWidthEndCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::SetVolumeOpacityUnitDistance( double d )
-{
-  vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    pDisp->GetProperty("ScalarOpacityUnitDistance"));
-  if (!dvp)
-    {
-    vtkErrorMacro("Failed to find property ScalarOpacityUnitDistance on DisplayProxy.");
-    return;
-    }
-  dvp->SetElement(0, d);
-  pDisp->UpdateVTKObjects();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ClearVolumeOpacity()
-{
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkClientServerStream stream;
-
-  vtkSMProxy *volume = this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy();
-  stream 
-    << vtkClientServerStream::Invoke 
-    << volume->GetID(0) << "RemoveAllPoints" 
-    << vtkClientServerStream::End;
-  pm->SendStream(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
-#endif
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::AddVolumeOpacity( double scalar, double opacity )
-{
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkClientServerStream stream;
-
-  vtkSMProxy *volume = this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy();
-  stream 
-    << vtkClientServerStream::Invoke 
-    << volume->GetID(0) << "AddPoint" << scalar << opacity 
-    << vtkClientServerStream::End;
-  pm->SendStream(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
-#endif
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::ClearVolumeColor()
-{
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkClientServerStream stream;
-
-  vtkSMProxy *volume = this->PVSource->GetPartDisplay()->GetVolumeColorProxy();
-  stream 
-    << vtkClientServerStream::Invoke 
-    << volume->GetID(0) << "RemoveAllPoints" 
-    << vtkClientServerStream::End;
-  pm->SendStream(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
-#endif
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::AddVolumeColor( double scalar, double r, double g, double b )
-{
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkClientServerStream stream;
-
-  vtkSMProxy *volume = this->PVSource->GetPartDisplay()->GetVolumeColorProxy();
-  stream 
-    << vtkClientServerStream::Invoke 
-    << volume->GetID(0) << "AddRGBPoint" << scalar << r << g << b 
-    << vtkClientServerStream::End;
-  pm->SendStream(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
-#endif
-}
-
-//----------------------------------------------------------------------------
 void vtkPVDisplayGUI::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -2157,11 +2070,7 @@ void vtkPVDisplayGUI::SetOpacity(float val)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::OpacityChangedCallback()
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   this->PVSource->GetDisplayProxy()->cmSetOpacity(this->OpacityScale->GetValue());
-#else
-  this->PVSource->GetPartDisplay()->SetOpacity(this->OpacityScale->GetValue());
-#endif
 
   if ( this->GetPVRenderView() )
     {
@@ -2180,19 +2089,11 @@ void vtkPVDisplayGUI::OpacityChangedEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorTranslate(double* point)
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
   if (pDisp)
     {
     pDisp->cmGetPosition(point);
     }
-#else
-  vtkSMPartDisplay* pDisp = this->PVSource->GetPartDisplay();
-  if (pDisp)
-    {
-    pDisp->GetTranslate(point);
-    }
-#endif
   else
     {
     point[0] = this->TranslateThumbWheel[0]->GetValue();
@@ -2207,13 +2108,9 @@ void vtkPVDisplayGUI::SetActorTranslateNoTrace(double x, double y, double z)
   this->TranslateThumbWheel[0]->SetValue(x);
   this->TranslateThumbWheel[1]->SetValue(y);
   this->TranslateThumbWheel[2]->SetValue(z);
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   double pos[3];
   pos[0] = x; pos[1] = y; pos[2] = z;
   this->PVSource->GetDisplayProxy()->cmSetPosition(pos);
-#else
-  this->PVSource->GetPartDisplay()->SetTranslate(x, y, z);
-#endif
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
 }
@@ -2666,53 +2563,3 @@ void vtkPVDisplayGUI::UpdateEnableState()
   
 }
 
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::SaveVolumeRenderStateDisplay(ofstream *file)
-{
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-  if(this->VolumeRenderMode)
-    {
-    *file << "[$kw(" << this->GetPVSource()->GetTclName()
-          << ") GetPVOutput] DrawVolume" << endl;
-//    *file << "[$kw(" << this->GetPVSource()->GetTclName()
-//          << ") GetPVOutput] ShowVolumeAppearanceEditor" << endl;
-
-    vtkStdString command(this->VolumeScalarsMenu->GetValue());
-
-    // The form of the command is of the form
-    // vtkTemp??? ColorBy???Field {Field Name} NumComponents
-    // The field name is between the first and last braces, and
-    // the number of components is at the end of the string.
-    vtkStdString::size_type firstspace = command.find_first_of(' ');
-    vtkStdString::size_type lastspace = command.find_last_of(' ');
-    vtkStdString name = command.substr(firstspace+1, lastspace-firstspace-1);
-  //  vtkStdString numCompsStr = command.substr(command.find_last_of(' '));
-
-    // have to visit this panel in order to initialize vars
-//    this->ShowVolumeAppearanceEditor();
-
-    if ( command.c_str() && strlen(command.c_str()) > 6 )
-      {
-      vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
-      vtkPVArrayInformation *arrayInfo;
-      int colorField = this->PVSource->GetPartDisplay()->GetColorField();
-      if (colorField == vtkDataSet::POINT_DATA_FIELD)
-        {
-        vtkPVDataSetAttributesInformation *attrInfo
-          = dataInfo->GetPointDataInformation();
-        arrayInfo = attrInfo->GetArrayInformation(name.c_str());
-        if(arrayInfo)
-          *file << "[$kw(" << this->GetPVSource()->GetTclName() << ") GetPVOutput] VolumeRenderPointField {" << arrayInfo->GetName() << "} " << arrayInfo->GetNumberOfComponents() << endl;
-        }
-      else
-        {
-        vtkPVDataSetAttributesInformation *attrInfo
-          = dataInfo->GetCellDataInformation();
-        arrayInfo = attrInfo->GetArrayInformation(name.c_str());
-        if(arrayInfo)
-          *file << "[$kw(" << this->GetPVSource()->GetTclName() << ") GetPVOutput] VolumeRenderCellField {" << arrayInfo->GetName() << "} " << arrayInfo->GetNumberOfComponents() << endl;
-        }
-      }
-    }
-#endif
-}
