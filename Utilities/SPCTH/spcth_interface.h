@@ -66,7 +66,7 @@ SPCTH_EXPORT int spcth_isAMR(SPCTH* spcth);
 /*! How many data blocks are in the file */
 SPCTH_EXPORT int spcth_getNumberOfDataBlocksForCurrentTime(SPCTH* spcth);
 
-/*! What are the dimensions of the particular data block */
+/*! Number of cells on each axis */
 SPCTH_EXPORT void spcth_getDataBlockDimensions(SPCTH* spcth, int block_index, int *x, int *y, int *z);
 
 /*! For AMR dataset, what is the level of the particular block */
