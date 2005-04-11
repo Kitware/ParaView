@@ -22,7 +22,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMIceTRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.1.2.2");
+vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.1.2.3");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTRenderModuleProxy::vtkSMIceTRenderModuleProxy()
@@ -40,7 +40,7 @@ vtkSMIceTRenderModuleProxy::~vtkSMIceTRenderModuleProxy()
 //-----------------------------------------------------------------------------
 void vtkSMIceTRenderModuleProxy::InitializeCompositingPipeline()
 {
-
+  vtkSMIntVectorProperty* ivp;
   vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
     vtkProcessModule::GetProcessModule());
   int *tileDims =  pm->GetOptions()->GetTileDimensions();
@@ -50,7 +50,7 @@ void vtkSMIceTRenderModuleProxy::InitializeCompositingPipeline()
 
   if (!getenv("PV_ICET_WINDOW_BORDERS"))
     {
-    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
       this->RenderWindowProxy->GetProperty("FullScreen"));
     if (ivp)
       {
