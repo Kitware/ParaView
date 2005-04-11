@@ -23,8 +23,8 @@
 #
 
 # Release version number.
-TAG="ParaView-2-0-0"
-VERSION="2.0.0"
+TAG="ParaView-2-0-1"
+VERSION="2.0.1"
 PARAVIEW_VERSION="2.0"
 RELEASE="1"
 
