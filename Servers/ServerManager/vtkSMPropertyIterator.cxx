@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5.6.3");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5.6.4");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -142,10 +142,16 @@ void vtkSMPropertyIterator::Next()
     return;
     }
 
+  int iterating_base_properties = 0; 
+    // flag indicating if before the current call to the Next(),
+    // the property that was current was a property
+    // on the proxy and not on the subproxies.
+  
   // If we are still in the root proxy, move to the next element.
   if (this->Internals->PropertyIterator != 
     this->Proxy->Internals->Properties.end())
     {
+    iterating_base_properties = 1;
     this->Internals->PropertyIterator++;
     if (this->Internals->PropertyIterator !=
       this->Proxy->Internals->Properties.end())
@@ -159,7 +165,15 @@ void vtkSMPropertyIterator::Next()
     {
     return;
     }
-
+  // if iterating_base_properties, the subproperty iterator
+  // would have been set to the first exposed property by
+  // call to Begin. Hence we don't neet to adjust the subproperty 
+  // iterator on this call to Next().
+  if (iterating_base_properties)
+    {
+    return;
+    }
+  
   // If we moved past the elements in the root proxy, move to the 
   // sub-proxy elements.
   int property_is_exposed = 0;
