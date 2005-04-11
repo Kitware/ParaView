@@ -23,7 +23,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMMultiDisplayRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMMultiDisplayRenderModuleProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMMultiDisplayRenderModuleProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkSMMultiDisplayRenderModuleProxy::vtkSMMultiDisplayRenderModuleProxy()
 {
@@ -106,6 +106,16 @@ void vtkSMMultiDisplayRenderModuleProxy::InitializeCompositingPipeline()
   pm->SendStream(this->CompositeManagerProxy->GetServers(), stream);
  
   this->Superclass::InitializeCompositingPipeline();
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CompositeManagerProxy->GetProperty("UseCompositing"));
+  if (ivp)
+    {
+    // In multi display mode, the server windows must be shown immediately.
+    ivp->SetElement(0, 1); 
+    }
+
+  this->CompositeManagerProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 #include "vtkPVOptions.h"
 
 vtkStandardNewMacro(vtkSMIceTRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.1.2.2");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTRenderModuleProxy::vtkSMIceTRenderModuleProxy()
@@ -65,6 +65,16 @@ void vtkSMIceTRenderModuleProxy::InitializeCompositingPipeline()
   // client as well, but it doesn;t seem to have any effect on the client.
   // verify that it is fine.
   this->Superclass::InitializeCompositingPipeline();
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->CompositeManagerProxy->GetProperty("UseCompositing"));
+  if (ivp)
+    {
+    // In multi display mode, the server windows must be shown immediately.
+    ivp->SetElement(0, 1); 
+    }
+
+  this->CompositeManagerProxy->UpdateVTKObjects();
 }
 
 
