@@ -970,7 +970,7 @@ This filter operates on polygonal data and produces polygonal output.
   <Module name="Gradient"
           menu_name="Gradient" root_name="Grad"
           module_type="Filter">
-    <Filter class="vtkPVImageGradient">
+    <Filter class="vtkImageGradient">
       <Input name="Input"
              class="vtkImageData">
         <ArrayRequirement attribute="Point" components="1"/>
@@ -997,7 +997,7 @@ The Gradient filter computes the gradient vector at each point in an image or vo
           menu_name="Gradient Magnitude"
           root_name="GradM"
           module_type="Filter">
-    <Filter class="vtkPVImageGradientMagnitude">
+    <Filter class="vtkImageGradientMagnitude">
       <Input name="Input"
              class="vtkImageData">
         <ArrayRequirement attribute="Point" components="1"/>
@@ -1149,7 +1149,7 @@ The Input menu allows the user to select the data set to which this filter will 
   </Module>
   <Module name="Median"
           root_name="Median" module_type="Filter">
-    <Filter class="vtkPVImageMedian3D">
+    <Filter class="vtkImageMedian3D">
       <Input name="Input"
              class="vtkImageData">
         <ArrayRequirement attribute="Point" components="1"/>
@@ -1904,7 +1904,7 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
           module_type="Filter"
           long_help="This filter moves point coordinates along a vector scaled by a point attribute.  It can be used to produce carpet plots."
           short_help="Warp point scalars into a spatial elevation plot.">
-    <Filter class="vtkPVWarpScalar">
+    <Filter class="vtkWarpScalar">
       <Input name="Input"
              class="vtkPointSet">
         <ArrayRequirement attribute="Point" components="1"/>

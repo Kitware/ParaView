@@ -1034,7 +1034,7 @@
    <!-- End FeatureEdges -->
    </SourceProxy>
 
-   <SourceProxy name="Gradient" class="vtkPVImageGradient">
+   <SourceProxy name="Gradient" class="vtkImageGradient">
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1072,7 +1072,7 @@
    <!-- End Gradient -->
    </SourceProxy>
 
-   <SourceProxy name="GradientMagnitude" class="vtkPVImageGradientMagnitude">
+   <SourceProxy name="GradientMagnitude" class="vtkImageGradientMagnitude">
      <InputProperty
         name="Input"
         command="SetInput">
@@ -1256,7 +1256,7 @@
    <!-- End MaskPoints -->
    </SourceProxy>
 
-   <SourceProxy name="Median" class="vtkPVImageMedian3D">
+   <SourceProxy name="Median" class="vtkImageMedian3D">
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2050,7 +2050,7 @@
    <!-- End TubeFilter -->
    </SourceProxy>
 
-   <SourceProxy name="WarpScalar" class="vtkPVWarpScalar">
+   <SourceProxy name="WarpScalar" class="vtkWarpScalar">
      <InputProperty
         name="Input"
         command="SetInput">
