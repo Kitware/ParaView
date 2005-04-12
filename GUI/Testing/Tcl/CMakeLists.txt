@@ -251,6 +251,7 @@ SET (PROJECT_TESTS_NO_BATCH
   DefaultAnimation
   DeleteSource
   MouseInteraction
+  OrientationWidget
   RecordAnimation
   TestDemo
   TestPackage
