@@ -36,9 +36,10 @@
 #include "vtkProcessModule.h"
 #include "vtkTimerLog.h"
 #include "vtkDynamicLoader.h"
+#include <kwsys/ios/sstream>
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.5");
+vtkCxxRevisionMacro(vtkPVMain, "1.6");
 
 
 
@@ -150,21 +151,23 @@ int vtkPVMain::Run(vtkPVOptions* options,
 #endif
 
   int display_help = 0;
+  kwsys_ios::ostringstream sscerr;
   if ( !options->Parse(argc, argv) )
     {
     if ( options->GetUnknownArgument() )
       {
-      cerr << "Got unknown argument: " << options->GetUnknownArgument() << endl;
+      sscerr << "Got unknown argument: " << options->GetUnknownArgument() << endl;
       }
     if ( options->GetErrorMessage() )
       {
-      cerr << "Error: " << options->GetErrorMessage() << endl;
+      sscerr << "Error: " << options->GetErrorMessage() << endl;
       }
     display_help = 1;
     }
   if ( display_help || options->GetHelpSelected() )
     {
-    cerr << options->GetHelp() << endl;
+    sscerr << options->GetHelp() << endl;
+    vtkOutputWindow::GetInstance()->DisplayText( sscerr.str().c_str() );
     return 1;
     }
 
