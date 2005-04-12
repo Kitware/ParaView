@@ -1288,7 +1288,7 @@
       </SubProxy>
     </MultiDisplayRenderModuleProxy>
 
-    <IceTDesktopRenderModuleProxy name="DeskTopRenderModule" 
+    <IceTDesktopRenderModuleProxy name="IceTDesktopRenderModule" 
       base_proxygroup="rendermodules" base_proxyname="CompositeRenderModule">
       <SubProxy>
         <Proxy name="DisplayManager" proxygroup="composite_managers"

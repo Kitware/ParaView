@@ -112,7 +112,7 @@ SET( ParaViewClient_SRCS
   vtkPVContourEntry.cxx
   vtkPVCornerAnnotation.cxx
   vtkPVCutEntry.cxx
-  vtkPVDeskTopRenderModuleUI.cxx
+  vtkPVIceTDesktopRenderModuleUI.cxx
   vtkPVDisplayGUI.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx

@@ -472,9 +472,6 @@ public:
   void SetDisplayProxy(vtkSMDisplayProxy* pdisp);
   vtkGetObjectMacro(DisplayProxy, vtkSMDisplayProxy);
 
-  // Description:
-  // Set the color map and the field to use.
-  void ColorByArray(vtkPVColorMap* colorMap, int field);
 
   // Description:
   // Set the volume rendering array and Scalar Mode.
@@ -483,6 +480,8 @@ public:
   // Description:
   // Sets the array name and field type to color with.
   // This also sets the LUT on the mapper.
+  // field (3 == PointFieldData, 4==CellFieldData)
+  // enums in vtkSMDisplayProxy
   void ColorByArray(const char* arrayname, int field);
 
   // Description:
@@ -495,6 +494,10 @@ public:
 protected:
   vtkPVSource();
   ~vtkPVSource();
+
+  // Description:
+  // Set the color map and the field to use.
+  void ColorByArray(vtkPVColorMap* colorMap, int field);
 
   void SetPVInputInternal(const char* name, 
                           int idx, 

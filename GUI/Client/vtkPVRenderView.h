@@ -54,7 +54,6 @@ class vtkPVTreeComposite;
 class vtkPVWindow;
 class vtkPVRenderModuleUI;
 class vtkPVRenderViewObserver;
-class vtkPVRenderModule;
 class vtkSMRenderModuleProxy;
 class vtkTimerLog;
 

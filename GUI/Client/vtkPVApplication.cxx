@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.344.2.3");
+vtkCxxRevisionMacro(vtkPVApplication, "1.344.2.4");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -544,8 +544,7 @@ int vtkPVApplication::SetupRenderModule()
       // Client server configuration without Tiles.
       if (pm->GetServerInformation()->GetUseIceT())
         {
-        renderModuleName = "DeskTopRenderModule";
-        //TODO: change name.
+        renderModuleName = "IceTDesktopRenderModule";
         }
       else
         {
