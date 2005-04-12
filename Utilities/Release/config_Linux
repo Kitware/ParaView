@@ -1,8 +1,17 @@
 PLATFORM="x86-linux"
-CC="gcc"
-CXX="g++"
+CC="/opt/i686-gcc-335/bin/gcc"
+CXX="/opt/i686-gcc-335/bin/g++"
 CFLAGS=""
 CXXFLAGS="-Wno-deprecated"
 CMAKE="/usr/local/bin/cmake"
 MAKE="make -j 2"
 DISPLAY=:0.0
+
+#-----------------------------------------------------------------------------
+write_cache()
+{
+    write_standard_cache
+    cat >> CMakeCache.txt <<EOF
+PV_INSTALL_SYSTEM_RUNTIME_LIBS:STRING=/opt/i686-gcc-335/lib/libstdc++.so.5;/opt/i686-gcc-335/lib/libgcc_s.so
+EOF
+}
