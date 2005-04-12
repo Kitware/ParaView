@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.2");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.3");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -133,7 +133,7 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
     }
   this->SocketCommunicator = vtkSocketCommunicator::New();
   // open a socket on a random port
-  cerr << "open with port " << this->PortNumber << "\n";
+  vtkDebugMacro( << "open with port " << this->PortNumber );
   int sock = this->SocketCommunicator->OpenSocket(this->PortNumber);
   // find out the random port picked
   int port = this->SocketCommunicator->GetPort(sock);
