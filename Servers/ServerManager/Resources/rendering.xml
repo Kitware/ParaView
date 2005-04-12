@@ -1120,7 +1120,7 @@
         name="Displays"
         command="AddDisplay"
         update_self="1"
-        clean_command="RemoveAllDisplays">
+        remove_command="RemoveDisplay">
         <ProxyGroupDomain name="groups">
           <Group name="displays" />
           <Group name="axes" />

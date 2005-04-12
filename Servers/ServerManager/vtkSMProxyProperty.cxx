@@ -24,11 +24,12 @@
 #include "vtkPVXMLElement.h"
 
 #include <vtkstd/vector>
+#include <vtkstd/algorithm>
 
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.5");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.6");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -43,6 +44,7 @@ vtkSMProxyProperty::vtkSMProxyProperty()
   this->PPInternals = new vtkSMProxyPropertyInternals;
   this->CleanCommand = 0;
   this->RepeatCommand = 0;
+  this->RemoveCommand = 0;
   this->SetSaveable(1);
 }
 
@@ -51,6 +53,7 @@ vtkSMProxyProperty::~vtkSMProxyProperty()
 {
   delete this->PPInternals;
   this->SetCleanCommand(0);
+  this->SetRemoveCommand(0);
 }
 
 //---------------------------------------------------------------------------
@@ -68,11 +71,88 @@ void vtkSMProxyProperty::UpdateAllInputs()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyProperty::AppendCommandToStreamWithRemoveCommand(
+  vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId )
+{
+  if (!this->RemoveCommand || this->InformationOnly)
+    {
+    return;
+    }
+  unsigned int numProxies = this->GetNumberOfProxies();
+  if (numProxies < 1)
+    {
+    return;
+    }
+
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > proxiesToRemove;
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> > proxiesToAdd;
+ 
+  // Determine the proxies in the PreviousProxies but not in Proxies.
+  // These are the proxies to remove.
+  vtkstd::back_insert_iterator<
+    vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii_remove(proxiesToRemove);
+  vtkstd::set_difference(this->PPInternals->PreviousProxies.begin(),
+    this->PPInternals->PreviousProxies.end(),
+    this->PPInternals->Proxies.begin(),
+    this->PPInternals->Proxies.end(),
+    ii_remove);
+  
+  // Determine the proxies in the Proxies but not in PreviousProxies.
+  // These are the proxies to add.
+  vtkstd::back_insert_iterator<
+    vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii_add(proxiesToAdd);
+  vtkstd::set_difference(this->PPInternals->Proxies.begin(),
+    this->PPInternals->Proxies.end(),
+    this->PPInternals->PreviousProxies.begin(),
+    this->PPInternals->PreviousProxies.end(),
+    ii_add   );
+
+  // Remove the proxies to remove.
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> >::iterator iter1;
+  for (iter1 = proxiesToRemove.begin(); iter1 != proxiesToRemove.end(); ++iter1)
+    {
+    vtkSMProxy* toAppend = iter1->GetPointer();
+    this->AppendProxyToStream(toAppend, cons, str, objectId, 1);
+    toAppend->RemoveConsumer(this, cons);
+    }
+
+  // Add the proxies to add.
+  vtkstd::vector<vtkSmartPointer<vtkSMProxy> >::iterator iter;
+  iter  = proxiesToAdd.begin();
+  for ( ; iter != proxiesToAdd.end(); ++iter)
+    {
+    vtkSMProxy *toAppend = iter->GetPointer();
+    // Keep track of all proxies that point to this as a
+    // consumer so that we can remove this from the consumer
+    // list later if necessary.
+    toAppend->AddConsumer(this, cons);
+    this->AppendProxyToStream(toAppend, cons, str, objectId, 0);
+    }
+ 
+  // Set PreviousProxies to match the current Proxies.
+  // (which is same as PreviousProxies - proxiesToRemove + proxiesToAdd).
+  this->PPInternals->PreviousProxies.clear();
+  vtkstd::back_insert_iterator<
+    vtkstd::vector<vtkSmartPointer<vtkSMProxy> > > ii(
+    this->PPInternals->PreviousProxies);
+  vtkstd::copy(this->PPInternals->Proxies.begin(),
+    this->PPInternals->Proxies.end(),
+    ii);
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyProperty::AppendCommandToStream(
   vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId )
 {
   if (!this->Command || this->InformationOnly)
     {
+    return;
+    }
+
+  if (this->RemoveCommand)
+    {
+    this->AppendCommandToStreamWithRemoveCommand(
+      cons, str, objectId);
     return;
     }
 
@@ -94,67 +174,80 @@ void vtkSMProxyProperty::AppendCommandToStream(
   // Remove all previous proxies before adding new ones.
   this->RemoveAllPreviousProxies();
 
-  unsigned int numConsIDs = cons->GetNumberOfIDs();
   
   for (unsigned int idx=0; idx < numProxies; idx++)
     {
     vtkSMProxy* proxy = this->GetProxy(idx);
-    if (!proxy)
-      {
-      vtkClientServerID nullID = { 0 };
-      *str << vtkClientServerStream::Invoke << objectId << this->Command
-        << nullID << vtkClientServerStream::End;
-      continue;
-      }
-  
     // Keep track of all proxies that point to this as a
     // consumer so that we can remove this from the consumer
-    // list later if necessary
-    this->AddPreviousProxy(proxy);
+    // list later if necessarythis->AddPreviousProxy(proxy);
     proxy->AddConsumer(this, cons);
+    this->AppendProxyToStream(proxy, cons, str, objectId, 0);
+    }
+}
 
-    if (this->UpdateSelf)
-      {
-      *str << vtkClientServerStream::Invoke << objectId << this->Command
-        << proxy << vtkClientServerStream::End;
-      continue;
-      }
+//---------------------------------------------------------------------------
+void vtkSMProxyProperty::AppendProxyToStream(vtkSMProxy* toAppend,
+  vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId,
+  int remove /*=0*/)
+{
+  const char* command = (remove)? this->RemoveCommand : this->Command;
+  if (!command)
+    {
+    vtkErrorMacro("Command not specified!"); //sanity check.
+    return;
+    }
 
-    unsigned int numIDs = proxy->GetNumberOfIDs();
-    // Determine now the IDs are added.
-    if (numConsIDs == numIDs && !this->RepeatCommand)
+  if (!toAppend)
+    {
+    vtkClientServerID nullID = { 0 };
+    *str << vtkClientServerStream::Invoke << objectId << command 
+      << nullID << vtkClientServerStream::End;
+    return;
+    }
+
+  if (this->UpdateSelf)
+    {
+    *str << vtkClientServerStream::Invoke << objectId << command 
+      << toAppend << vtkClientServerStream::End;
+    return;
+    }
+
+  unsigned int numConsIDs = cons->GetNumberOfIDs();
+  unsigned int numIDs = toAppend->GetNumberOfIDs();
+  // Determine now the IDs are added.
+  if (numConsIDs == numIDs && !this->RepeatCommand)
+    {
+    // One to One Mapping between the IDs.
+    for (unsigned int i = 0; i < numIDs; i++)
       {
-      // One to One Mapping between the IDs.
-      for (unsigned int i = 0; i < numIDs; i++)
+      if (cons->GetID(i) == objectId)
         {
-        if (cons->GetID(i) == objectId)
-          {
-          // This check is essential since AppendCommandToStream is called
-          // for all IDs in cons.
-          *str << vtkClientServerStream::Invoke << objectId << this->Command
-            << proxy->GetID(i)
-            << vtkClientServerStream::End;
-          }
+        // This check is essential since AppendCommandToStream is called
+        // for all IDs in cons.
+        *str << vtkClientServerStream::Invoke << objectId << command 
+          << toAppend->GetID(i)
+          << vtkClientServerStream::End;
         }
       }
-    else if (numConsIDs == 1 || this->RepeatCommand)
+    }
+  else if (numConsIDs == 1 || this->RepeatCommand)
+    {
+    // One (or many) to Many Mapping.
+    for (unsigned int i=0 ; i < numIDs; i++)
       {
-      // One (or many) to Many Mapping.
-      for (unsigned int i=0 ; i < numIDs; i++)
-        {
-        *str << vtkClientServerStream::Invoke << objectId << this->Command
-          << proxy->GetID(i) << vtkClientServerStream::End;
-        }
+      *str << vtkClientServerStream::Invoke << objectId << command
+        << toAppend->GetID(i) << vtkClientServerStream::End;
       }
-    else if (numIDs == 1)
-      {
-      // Many to One Mapping.
-      // No need to loop since AppendCommandToStream is called
-      // for all IDs in cons.
-      *str << vtkClientServerStream::Invoke << objectId << this->Command
-        << proxy->GetID(0)
-        << vtkClientServerStream::End;
-      }
+    }
+  else if (numIDs == 1)
+    {
+    // Many to One Mapping.
+    // No need to loop since AppendCommandToStream is called
+    // for all IDs in cons.
+    *str << vtkClientServerStream::Invoke << objectId << command 
+      << toAppend->GetID(0)
+      << vtkClientServerStream::End;
     }
 }
 
@@ -329,6 +422,11 @@ int vtkSMProxyProperty::ReadXMLAttributes(vtkSMProxy* parent,
     this->SetRepeatCommand(repeat_command); 
     }
 
+  const char* remove_command = element->GetAttribute("remove_command");
+  if (remove_command)
+    {
+    this->SetRemoveCommand(remove_command);
+    }
   return ret;
 }
 

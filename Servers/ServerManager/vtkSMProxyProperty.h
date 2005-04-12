@@ -28,6 +28,16 @@
 // If B has 1 ID and A has more than one, than vtkObject represented by B is 
 // set on all the server objects of A.
 // 
+// ProxyProperty supports attribute "remove_command". Note that if RemoveCommand 
+// is set,  the clean_command is ignored. When RemoveCommand is set, only the 
+// changes in the proxies (by AddProxy/RemoveProxy) are progaated to servers 
+// .ie. those proxies not 
+// present in the previous call to AppendCommandToStream are set on the 
+// servers using this->Command
+// and those missing during current call are removed from the servers using 
+// this->RemoveCommand. Note that a property with "RemoveCommand" set should 
+// not be shared among more than 1 proxies.
+// 
 //TODO: Update comment
 // .SECTION See Also
 // vtkSMProperty
@@ -165,6 +175,18 @@ protected:
   char* CleanCommand;
 
   // Description:
+  // Remove command is the command called to remove the VTK
+  // object on the server-side. If set, CleanCommand is ignored.
+  // Instead for every proxy that was absent from the proxies
+  // previously pushed, the RemoveCommand is invoked.
+  // NOTE: Do not share properties that have RemoveCommand set
+  // among proxies, as they will not work. If required,
+  // the support can be added.
+  vtkSetStringMacro(RemoveCommand);
+  vtkGetStringMacro(RemoveCommand);
+  char* RemoveCommand;
+  
+  // Description:
   // Set the appropriate ivars from the xml element. Should
   // be overwritten by subclass if adding ivars.
   virtual int ReadXMLAttributes(vtkSMProxy* parent, 
@@ -174,6 +196,12 @@ protected:
   vtkGetMacro(RepeatCommand, int);
   int RepeatCommand;
 
+  void AppendCommandToStreamWithRemoveCommand(
+  vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId );
+
+
+  void AppendProxyToStream(vtkSMProxy* toAppend,
+  vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId, int remove=0 );
 private:
   vtkSMProxyProperty(const vtkSMProxyProperty&); // Not implemented
   void operator=(const vtkSMProxyProperty&); // Not implemented
