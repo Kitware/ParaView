@@ -62,7 +62,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.29");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.30");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -870,7 +870,7 @@ void vtkPVAnimationManager::RecordState()
   double curbounds[2] = {0, 0};
   this->HAnimationInterface->GetTimeBounds(curbounds);
   double parameter = curbounds[1];
-  while (parameter + this->RecordingIncrement > 1)
+  if (parameter + this->RecordingIncrement > 1)
     {
     double scale_factor = 1.0 / (parameter + this->RecordingIncrement);
     curbounds[1] *= scale_factor;

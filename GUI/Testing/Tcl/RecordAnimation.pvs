@@ -30,123 +30,33 @@ $kw(vtkTemp481) StartRecording
 $kw(vtkTemp677) SetValue 87.65
 $kw(vtkTemp659) AcceptCallback
 $kw(vtkTemp481) RecordState
-set kw(vtkTemp446) [$kw(vtkTemp727) GetHAnimationInterface]
-set kw(vtkTemp449) [$kw(vtkTemp446) GetParentTree]
-set kw(vtkTemp702) [$kw(vtkTemp449) GetChild "Sources.[$kw(vtkTemp659) GetName]"]
-set kw(vtkTemp722) [$kw(vtkTemp702) GetChild "Sources.[$kw(vtkTemp659) GetName].StartTheta.0"]
-set kw(vtkTemp729) [$kw(vtkTemp722) GetKeyFrame "KeyFrameName_0"]
-$kw(vtkTemp729) SetKeyTime 0.000000
-$kw(vtkTemp729) SetKeyValue 0.000000
-$kw(vtkTemp729) SetKeyValue 87.650000
-$kw(vtkTemp729) SetKeyValue 0.000000
-$kw(vtkTemp729) SetKeyValue 0.000000
-set kw(vtkTemp734) [$kw(vtkTemp722) GetKeyFrame "KeyFrameName_1"]
-$kw(vtkTemp734) SetKeyTime 0.100000
-$kw(vtkTemp734) SetKeyValue 0.000000
-$kw(vtkTemp734) SetKeyValue 87.650000
+
 $kw(vtkTemp677) SetValue 178.43
 $kw(vtkTemp659) AcceptCallback
 $kw(vtkTemp481) RecordState
-set kw(vtkTemp739) [$kw(vtkTemp722) GetKeyFrame "KeyFrameName_2"]
-$kw(vtkTemp739) SetKeyTime 0.200000
-$kw(vtkTemp739) SetKeyValue 0.000000
-$kw(vtkTemp739) SetKeyValue 178.430000
+
 $kw(vtkTemp677) SetValue 228.52
 $kw(vtkTemp659) AcceptCallback
 $kw(vtkTemp481) RecordState
-set kw(vtkTemp744) [$kw(vtkTemp722) GetKeyFrame "KeyFrameName_3"]
-$kw(vtkTemp744) SetKeyTime 0.300000
-$kw(vtkTemp744) SetKeyValue 0.000000
-$kw(vtkTemp744) SetKeyValue 228.520000
+
 $kw(vtkTemp682) SetValue 297.39
 $kw(vtkTemp659) AcceptCallback
 $kw(vtkTemp481) RecordState
-set kw(vtkTemp714) [$kw(vtkTemp702) GetChild "Sources.[$kw(vtkTemp659) GetName].EndTheta.0"]
-set kw(vtkTemp749) [$kw(vtkTemp714) GetKeyFrame "KeyFrameName_0"]
-$kw(vtkTemp749) SetKeyTime 0.000000
-$kw(vtkTemp749) SetKeyValue 0.000000
-$kw(vtkTemp749) SetKeyValue 297.390000
-set kw(vtkTemp754) [$kw(vtkTemp714) GetKeyFrame "KeyFrameName_1"]
-$kw(vtkTemp754) SetKeyTime 0.300000
-$kw(vtkTemp754) SetKeyValue 0.000000
-$kw(vtkTemp754) SetKeyValue 297.390000
-$kw(vtkTemp754) SetKeyValue 360.000000
-$kw(vtkTemp749) SetKeyValue 360.000000
-set kw(vtkTemp759) [$kw(vtkTemp714) GetKeyFrame "KeyFrameName_2"]
-$kw(vtkTemp759) SetKeyTime 0.400000
-$kw(vtkTemp759) SetKeyValue 0.000000
-$kw(vtkTemp759) SetKeyValue 297.390000
+
 $kw(vtkTemp677) SetValue 62.61
 $kw(vtkTemp682) SetValue 209.74
 $kw(vtkTemp692) SetValue 54.78
 $kw(vtkTemp697) SetValue 136.17
 $kw(vtkTemp659) AcceptCallback
 $kw(vtkTemp481) RecordState
-set kw(vtkTemp712) [$kw(vtkTemp702) GetChild "Sources.[$kw(vtkTemp659) GetName].EndPhi.0"]
-set kw(vtkTemp764) [$kw(vtkTemp712) GetKeyFrame "KeyFrameName_0"]
-$kw(vtkTemp764) SetKeyTime 0.000000
-$kw(vtkTemp764) SetKeyValue 0.000000
-$kw(vtkTemp764) SetKeyValue 136.170000
-set kw(vtkTemp769) [$kw(vtkTemp712) GetKeyFrame "KeyFrameName_1"]
-$kw(vtkTemp769) SetKeyTime 0.400000
-$kw(vtkTemp769) SetKeyValue 0.000000
-$kw(vtkTemp769) SetKeyValue 136.170000
-$kw(vtkTemp769) SetKeyValue 180.000000
-$kw(vtkTemp764) SetKeyValue 180.000000
-set kw(vtkTemp774) [$kw(vtkTemp712) GetKeyFrame "KeyFrameName_2"]
-$kw(vtkTemp774) SetKeyTime 0.500000
-$kw(vtkTemp774) SetKeyValue 0.000000
-$kw(vtkTemp774) SetKeyValue 136.170000
-set kw(vtkTemp779) [$kw(vtkTemp714) GetKeyFrame "KeyFrameName_3"]
-$kw(vtkTemp779) SetKeyTime 0.500000
-$kw(vtkTemp779) SetKeyValue 0.000000
-$kw(vtkTemp779) SetKeyValue 209.740000
-set kw(vtkTemp720) [$kw(vtkTemp702) GetChild "Sources.[$kw(vtkTemp659) GetName].StartPhi.0"]
-set kw(vtkTemp784) [$kw(vtkTemp720) GetKeyFrame "KeyFrameName_0"]
-$kw(vtkTemp784) SetKeyTime 0.000000
-$kw(vtkTemp784) SetKeyValue 0.000000
-$kw(vtkTemp784) SetKeyValue 54.780000
-set kw(vtkTemp789) [$kw(vtkTemp720) GetKeyFrame "KeyFrameName_1"]
-$kw(vtkTemp789) SetKeyTime 0.400000
-$kw(vtkTemp789) SetKeyValue 0.000000
-$kw(vtkTemp789) SetKeyValue 54.780000
-$kw(vtkTemp789) SetKeyValue 0.000000
-$kw(vtkTemp784) SetKeyValue 0.000000
-set kw(vtkTemp794) [$kw(vtkTemp720) GetKeyFrame "KeyFrameName_2"]
-$kw(vtkTemp794) SetKeyTime 0.500000
-$kw(vtkTemp794) SetKeyValue 0.000000
-$kw(vtkTemp794) SetKeyValue 54.780000
-set kw(vtkTemp799) [$kw(vtkTemp722) GetKeyFrame "KeyFrameName_4"]
-$kw(vtkTemp799) SetKeyTime 0.400000
-$kw(vtkTemp799) SetKeyValue 0.000000
-$kw(vtkTemp799) SetKeyValue 62.610000
-$kw(vtkTemp799) SetKeyValue 228.520000
-set kw(vtkTemp804) [$kw(vtkTemp722) GetKeyFrame "KeyFrameName_5"]
-$kw(vtkTemp804) SetKeyTime 0.500000
-$kw(vtkTemp804) SetKeyValue 0.000000
-$kw(vtkTemp804) SetKeyValue 62.610000
+
 $kw(vtkTemp677) SetValue 0
 $kw(vtkTemp682) SetValue 360
 $kw(vtkTemp692) SetValue 0
 $kw(vtkTemp697) SetValue 180
 $kw(vtkTemp659) AcceptCallback
 $kw(vtkTemp481) RecordState
-set kw(vtkTemp809) [$kw(vtkTemp712) GetKeyFrame "KeyFrameName_3"]
-$kw(vtkTemp809) SetKeyTime 0.600000
-$kw(vtkTemp809) SetKeyValue 0.000000
-$kw(vtkTemp809) SetKeyValue 180.000000
-set kw(vtkTemp814) [$kw(vtkTemp714) GetKeyFrame "KeyFrameName_4"]
-$kw(vtkTemp814) SetKeyTime 0.600000
-$kw(vtkTemp814) SetKeyValue 0.000000
-$kw(vtkTemp814) SetKeyValue 360.000000
-set kw(vtkTemp819) [$kw(vtkTemp720) GetKeyFrame "KeyFrameName_3"]
-$kw(vtkTemp819) SetKeyTime 0.600000
-$kw(vtkTemp819) SetKeyValue 0.000000
-$kw(vtkTemp819) SetKeyValue 0.000000
-set kw(vtkTemp824) [$kw(vtkTemp722) GetKeyFrame "KeyFrameName_6"]
-$kw(vtkTemp824) SetKeyTime 0.600000
-$kw(vtkTemp824) SetKeyValue 0.000000
-$kw(vtkTemp824) SetKeyValue 0.000000
+
 $kw(vtkTemp481) StopRecording
 $kw(vtkTemp481) SetFrameRate 3
 $kw(vtkTemp481) SetCurrentTime 0.000000
@@ -154,7 +64,7 @@ $kw(vtkTemp481) Play
 $kw(vtkTemp481) SetCurrentTime 0.000000
 $kw(vtkTemp4) ShowAnimationPanes
 $kw(vtkTemp4) SetHorizontalPaneVisibility 1
-$kw(vtkTemp481) SetCurrentTime 5.110000
+$kw(vtkTemp481) SetCurrentTime 8.9000 
 
 #Retrace
 update
