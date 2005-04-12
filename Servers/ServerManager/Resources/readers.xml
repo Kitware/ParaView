@@ -720,8 +720,8 @@
       </IntVectorProperty>
    <!-- End HDF5RawImageReader -->
    </SourceProxy>
-
-   <SourceProxy name="spcthreader" class="vtkAMRSpyPlotReader">
+#if 1
+   <SourceProxy name="amrspcthreader" class="vtkAMRSpyPlotReader">
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
@@ -770,6 +770,57 @@
      </StringVectorProperty>
    <!-- End spcthreader-->
    </SourceProxy>
+#endif
+   <SourceProxy name="spcthreader" class="vtkSpyPlotReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+     <IntVectorProperty 
+        name="TimeStepRangeInfo"
+        command="GetTimeStepRange"
+        information_only="1">
+        <SimpleIntInformationHelper/>
+     </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="TimeStep"
+        command="SetTimeStep"
+        number_of_elements="1"
+        animateable="1"
+        default_values="0">
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="TimeStepRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
+     </IntVectorProperty>
+
+     <StringVectorProperty 
+        name="CellArrayInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="Cell"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="CellArrayStatus"
+        command="SetCellArrayStatus"
+        number_of_elements="0" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="CellArrayInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="CellArrayInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+   <!-- End spcthreader-->
+   </SourceProxy>
+
 
    <SourceProxy name="vrmlreader" class="vtkVRMLSource">
      <StringVectorProperty

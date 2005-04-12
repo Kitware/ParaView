@@ -386,10 +386,10 @@
             value="1"/>
     </SelectionList>
   </Module>
-  <Module name="spcthreader"
+  <Module name="amrspcthreader"
           class="vtkPVAdvancedReaderModule" root_name="SPCTH"
           module_type="Reader"
-          extensions=".spcth"
+          extensions=".amrspcth"
           file_description="SpyPlot CTH AMR dataset">
     <Source class="vtkAMRSpyPlotReader"/>
     <Scale property="TimeStep"
@@ -401,6 +401,23 @@
                     property="CellArrayStatus"
                     trace_name="CellArrays"/>
   </Module>
+
+ <Module name="spcthreader"
+          class="vtkPVAdvancedReaderModule" root_name="SPCTH"
+          module_type="Reader"
+          extensions=".spcth"
+          file_description="SpyPlot CTH dataset">
+    <Source class="vtkSpyPlotReader"/>
+    <Scale property="TimeStep"
+           label="Time step" trace_name="TimeStep"
+           keeps_timesteps="1"
+           display_entry="1" display_value="0"
+           help="Set the current timestep."/>
+    <ArraySelection label_text="Cell Arrays"
+                    property="CellArrayStatus"
+                    trace_name="CellArrays"/>
+  </Module>
+
   <Module name="HDF5RawImageReader"
           root_name="HDF5RawImageReader"
           output="vtkImageData"
