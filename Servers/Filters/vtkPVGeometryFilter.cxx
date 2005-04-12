@@ -46,7 +46,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkGenericDataSet.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.50");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.51");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -282,7 +282,9 @@ int vtkPVGeometryFilter::RequestCompositeData(vtkInformation*,
       vtkPolyData* tmpOut = vtkPolyData::New();
       this->ExecuteBlock(ds, tmpOut, 0);
       append->AddInput(tmpOut);
-      tmpOut->Delete();
+      // Call FastDelete() instead of Delete() to avoid garbage
+      // collection checks. This improves the preformance significantly
+      tmpOut->FastDelete();
       numInputs++;
       }
     iter->GoToNextItem();
