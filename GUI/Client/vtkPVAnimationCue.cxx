@@ -76,7 +76,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.19");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.20");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -824,9 +824,9 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event, void* 
       return;
 
     case vtkKWParameterValueFunctionEditor::SelectionChangedEvent:
-      // raise this event on this cue, so that the VAnimationInterface (if it is listening)
-      // will know that selection has changed and will update to show the right
-      // key frame.
+      // raise this event on this cue, so that the VAnimationInterface (if
+      // it is listening) will know that selection has changed and will
+      // update to show the right key frame.
       this->InvokeEvent(event, calldata);
       return;
 
