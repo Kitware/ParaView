@@ -82,7 +82,7 @@ Section "Dummy Section" SecDummy
     
   ;Create shortcuts
   CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-  CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Kitware ParaView.lnk" "$INSTDIR\bin\paraview.exe"
+  CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\paraview.lnk" "$INSTDIR\bin\paraview.exe"
   CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
   
   !insertmacro MUI_STARTMENU_WRITE_END
@@ -134,7 +134,7 @@ Section "Uninstall"
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
     
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
-  Delete "$SMPROGRAMS\$MUI_TEMP\Kitware ParaView.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\paraview.lnk"
   
   ;Delete empty start menu parent diretories
   StrCpy $MUI_TEMP "$SMPROGRAMS\$MUI_TEMP"
