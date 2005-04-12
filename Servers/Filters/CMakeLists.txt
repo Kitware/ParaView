@@ -80,6 +80,7 @@ SET(Filters_SRCS
   vtkProjectedTetrahedraMapper.cxx
   vtkSelectInputs.cxx
   vtkSortDataArray.cxx
+  vtkSpyPlotReader.cxx
   vtkStreamingTessellator.cxx
   vtkSubdivisionAlgorithm.cxx
   vtkSurfaceVectors.cxx
