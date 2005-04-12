@@ -33,7 +33,7 @@
 #include "vtkPVRibbonFilter.h"
 #include "vtkPVThresholdFilter.h"
 #include "vtkPVLinearExtrusionFilter.h"
-#include "vtkPVWarpScalar.h"
+#include "vtkWarpScalar.h"
 #include "vtkDataSetMapper.h"
 
 int main(int argc, char* argv[])
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
   threshold->SetInput( ribbon->GetOutput() );
   threshold->ThresholdBetween(0.25, 0.75);
 
-  vtkPVWarpScalar *warp = vtkPVWarpScalar::New();
+  vtkWarpScalar *warp = vtkWarpScalar::New();
   warp->SetInput( threshold->GetOutput() );
   warp->XYPlaneOn();
   warp->SetScaleFactor(0.5);

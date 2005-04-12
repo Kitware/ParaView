@@ -14,12 +14,12 @@
 =========================================================================*/
 #include "vtkImageData.h"
 #include "vtkImageReader.h"
-#include "vtkPVImageContinuousDilate3D.h"
-#include "vtkPVImageContinuousErode3D.h"
-#include "vtkPVImageMedian3D.h"
-#include "vtkPVImageGradient.h"
+#include "vtkImageContinuousDilate3D.h"
+#include "vtkImageContinuousErode3D.h"
+#include "vtkImageMedian3D.h"
+#include "vtkImageGradient.h"
 #include "vtkImageViewer.h"
-#include "vtkPVImageGradientMagnitude.h"
+#include "vtkImageGradientMagnitude.h"
 #include "vtkTestUtilities.h"
 #include "vtkTesting.h"
 
@@ -41,23 +41,23 @@ int main(int argc, char* argv[])
 
   delete [] fname;
 
-  vtkPVImageContinuousDilate3D *dilate = vtkPVImageContinuousDilate3D::New();
+  vtkImageContinuousDilate3D *dilate = vtkImageContinuousDilate3D::New();
   dilate->SetInput(reader->GetOutput());
   dilate->SetKernelSize( 11, 11, 1);
 
-  vtkPVImageContinuousErode3D *erode = vtkPVImageContinuousErode3D::New();
+  vtkImageContinuousErode3D *erode = vtkImageContinuousErode3D::New();
   erode->SetInput (dilate->GetOutput());
   erode->SetKernelSize(11,11,1);
   
-  vtkPVImageMedian3D *median = vtkPVImageMedian3D::New();
+  vtkImageMedian3D *median = vtkImageMedian3D::New();
   median->SetInput( erode->GetOutput() );
   
-  vtkPVImageGradient *gradient = vtkPVImageGradient::New();
+  vtkImageGradient *gradient = vtkImageGradient::New();
   gradient->SetInput( median->GetOutput() );
   gradient->SetDimensionality (3);
   gradient->Update(); //discard gradient
 
-  vtkPVImageGradientMagnitude *magnitude = vtkPVImageGradientMagnitude::New();
+  vtkImageGradientMagnitude *magnitude = vtkImageGradientMagnitude::New();
   magnitude->SetInput( erode->GetOutput() );
   magnitude->SetDimensionality (3);
 

@@ -50,11 +50,6 @@
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkPVGlyphFilter.h"
-#include "vtkPVImageContinuousDilate3D.h"
-#include "vtkPVImageContinuousErode3D.h"
-#include "vtkPVImageGradient.h"
-#include "vtkPVImageGradientMagnitude.h"
-#include "vtkPVImageMedian3D.h"
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkPVLODActor.h"
 #include "vtkPVLODPartDisplayInformation.h"
@@ -70,7 +65,6 @@
 #include "vtkPVThresholdFilter.h"
 #include "vtkPVTreeComposite.h"
 #include "vtkPVUpdateSuppressor.h"
-#include "vtkPVWarpScalar.h"
 #include "vtkPVWarpVector.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
@@ -145,11 +139,6 @@ int main(int , char *[])
   c = vtkPVGenericRenderWindowInteractor::New(); c->Print(cout); c->Delete();
   c = vtkPVGeometryFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVGlyphFilter::New(); c->Print(cout); c->Delete();
-  c = vtkPVImageContinuousDilate3D::New(); c->Print(cout); c->Delete();
-  c = vtkPVImageContinuousErode3D::New(); c->Print(cout); c->Delete();
-  c = vtkPVImageGradient::New(); c->Print(cout); c->Delete();
-  c = vtkPVImageGradientMagnitude::New(); c->Print(cout); c->Delete();
-  c = vtkPVImageMedian3D::New(); c->Print(cout); c->Delete();
   c = vtkPVLinearExtrusionFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVLODActor::New(); c->Print(cout); c->Delete();
   c = vtkPVLODPartDisplayInformation::New(); c->Print(cout); c->Delete();
@@ -165,7 +154,6 @@ int main(int , char *[])
   c = vtkPVThresholdFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVTreeComposite::New(); c->Print(cout); c->Delete();
   c = vtkPVUpdateSuppressor::New(); c->Print(cout); c->Delete();
-  c = vtkPVWarpScalar::New(); c->Print(cout); c->Delete();
   c = vtkPVWarpVector::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLElement::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLParser::New(); c->Print(cout); c->Delete();

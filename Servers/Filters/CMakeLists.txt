@@ -49,11 +49,6 @@ SET(Filters_SRCS
   vtkPVGeometryFilter.cxx
   vtkPVGeometryInformation.cxx
   vtkPVGlyphFilter.cxx
-  vtkPVImageContinuousDilate3D.cxx
-  vtkPVImageContinuousErode3D.cxx
-  vtkPVImageGradient.cxx
-  vtkPVImageGradientMagnitude.cxx
-  vtkPVImageMedian3D.cxx
   vtkPVLODActor.cxx
   vtkPVLODVolume.cxx
   vtkPVLinearExtrusionFilter.cxx
@@ -70,7 +65,6 @@ SET(Filters_SRCS
   vtkPVThresholdFilter.cxx
   vtkPVTreeComposite.cxx
   vtkPVUpdateSuppressor.cxx
-  vtkPVWarpScalar.cxx
   vtkPVWarpVector.cxx
   vtkPVXMLElement.cxx
   vtkPVXMLParser.cxx
