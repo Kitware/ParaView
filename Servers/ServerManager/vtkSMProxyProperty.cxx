@@ -29,7 +29,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.6");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.14.6.7");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -181,7 +181,10 @@ void vtkSMProxyProperty::AppendCommandToStream(
     // Keep track of all proxies that point to this as a
     // consumer so that we can remove this from the consumer
     // list later if necessarythis->AddPreviousProxy(proxy);
-    proxy->AddConsumer(this, cons);
+    if (proxy)
+      {
+      proxy->AddConsumer(this, cons);
+      }
     this->AppendProxyToStream(proxy, cons, str, objectId, 0);
     }
 }
