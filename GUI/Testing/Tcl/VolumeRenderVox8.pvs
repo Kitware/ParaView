@@ -1,4 +1,3 @@
-$Application ExitOnReturnOn
 
 set kw(vtkTemp5) [$Application GetMainWindow]
 set kw(vtkTemp24) [$kw(vtkTemp5) GetMainView]
@@ -51,7 +50,7 @@ $kw(vtkTemp1187) SetVisibility 1
 $kw(vtkTemp1187) DrawVolume
 $kw(vtkTemp24) SetCameraState -2.443 -3.984 4.451  1.000 1.000 1.000  -0.384 0.690 0.613
 $kw(vtkTemp24) SetCameraState 5.820 -3.332 3.569  1.000 1.000 1.000  -0.554 -0.129 0.823
-$kw(vtkTemp1187) VolumeRenderPointField {yRamp} 1
+$kw(vtkTemp1187) VolumeRenderByArray {yRamp} 3
 $kw(vtkTemp24) SetCameraState 5.351 -2.781 4.920  1.000 1.000 1.000  -0.682 -0.027 0.731
 $kw(vtkTemp24) SetCameraState 6.208 -3.526 5.692  1.857 0.256 1.772  -0.682 -0.027 0.731
 $kw(vtkTemp24) SetCameraState 6.208 -3.526 5.692  1.880 0.351 1.839  -0.682 -0.027 0.731
@@ -65,19 +64,18 @@ set kw(vtkTemp1452) [$kw(vtkTemp1422) GetPVOutput]
 $kw(vtkTemp1452) DrawSurface
 $kw(vtkTemp5) SetCurrentPVSourceCallback $kw(vtkTemp1176)
 
-
-set kw(vtkTemp311) [$kw(vtkTemp5) GetVolumeAppearanceEditor]
-$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.900000 1.000000
-$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 1.000000
-$kw(vtkTemp311) SetColorRamp 0.129920 1.000000 0.000000 0.000000 0.900000 0.800000 0.000000 1.000000
-$kw(vtkTemp311) SetColorRamp 0.129920 1.000000 0.000000 0.000000 0.872800 0.800000 0.000000 1.000000
-$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.990000
-$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.980000
-$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.980000
-$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.980000
-$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.040000 0.868000 0.980000
-$kw(vtkTemp311) SetScalarOpacityUnitDistance 0.290000
-$kw(vtkTemp311) SetScalarOpacityUnitDistance 0.380000
+# set kw(vtkTemp311) [$kw(vtkTemp5) GetVolumeAppearanceEditor]
+# $kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.900000 1.000000
+# $kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 1.000000
+# $kw(vtkTemp311) SetColorRamp 0.129920 1.000000 0.000000 0.000000 0.900000 0.800000 0.000000 1.000000
+# $kw(vtkTemp311) SetColorRamp 0.129920 1.000000 0.000000 0.000000 0.872800 0.800000 0.000000 1.000000
+# $kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.990000
+# $kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.980000
+# $kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.980000
+# $kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.980000
+# $kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.040000 0.868000 0.980000
+# $kw(vtkTemp311) SetScalarOpacityUnitDistance 0.290000
+# $kw(vtkTemp311) SetScalarOpacityUnitDistance 0.380000
 $kw(vtkTemp24) SetCameraState 3.161 -4.844 6.550  1.452 0.085 1.925  -0.839 0.188 0.511
 $kw(vtkTemp24) SetCameraState 4.256 -3.987 6.843  1.627 0.237 1.960  -0.812 0.148 0.565
 
