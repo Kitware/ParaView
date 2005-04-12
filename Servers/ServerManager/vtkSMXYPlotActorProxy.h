@@ -20,16 +20,15 @@
 #ifndef __vtkSMXYPlotActorProxy_h
 #define __vtkSMXYPlotActorProxy_h
 
-#include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
 
-class vtkSMSourceProxy;
 class vtkSMXYPlotActorProxyInternals;
 
-class VTK_EXPORT vtkSMXYPlotActorProxy : public vtkSMProxy
+class VTK_EXPORT vtkSMXYPlotActorProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMXYPlotActorProxy* New();
-  vtkTypeRevisionMacro(vtkSMXYPlotActorProxy, vtkSMProxy);
+  vtkTypeRevisionMacro(vtkSMXYPlotActorProxy, vtkSMSourceProxy);
   void PrintSelf(ostream &os , vtkIndent indent);
 
   // Description:
