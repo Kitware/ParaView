@@ -85,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.7");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.8");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1338,6 +1338,7 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
   
   if (!vtkSMSimpleDisplayProxy::SafeDownCast(pDisp)->GetHasVolumePipeline())
     {
+    this->VolumeRenderMode = 0;
     return;
     }
   this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
