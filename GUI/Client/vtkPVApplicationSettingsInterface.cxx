@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.20");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.21");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -42,6 +42,7 @@ vtkPVApplicationSettingsInterface::vtkPVApplicationSettingsInterface()
   this->ShowSourcesDescriptionCheckButton = 0;
   this->ShowSourcesNameCheckButton = 0;
   this->ShowTraceFilesCheckButton = 0;
+  this->CreateLogFilesCheckButton = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -72,6 +73,11 @@ vtkPVApplicationSettingsInterface::~vtkPVApplicationSettingsInterface()
     {
     this->ShowTraceFilesCheckButton->Delete();
     this->ShowTraceFilesCheckButton = NULL;
+    }
+  if (this->CreateLogFilesCheckButton)
+    {
+    this->CreateLogFilesCheckButton->Delete();
+    this->CreateLogFilesCheckButton = NULL;
     }
 }
 
@@ -190,6 +196,36 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   tk_cmd << "pack " << this->ShowTraceFilesCheckButton->GetWidgetName()
     << "  -side top -anchor w -expand no -fill none" << endl;
 
+  // --------------------------------------------------------------
+  // Interface settings : create log files
+
+  if (!this->CreateLogFilesCheckButton)
+    {
+    this->CreateLogFilesCheckButton = vtkKWCheckButton::New();
+    }
+
+  this->CreateLogFilesCheckButton->SetParent(frame);
+  this->CreateLogFilesCheckButton->Create(app, 0);
+  this->CreateLogFilesCheckButton->SetText(
+    "Create per node log files on ParaView startup");
+  this->CreateLogFilesCheckButton->SetCommand(
+    this, "CreateLogFilesCallback");
+  this->CreateLogFilesCheckButton->SetBalloonHelpString(
+    "When this option is on, a log file will be created per server node "
+    "to record information about activity on that node.");
+
+  if (app->GetIntRegistryValue(2,"RunTime",
+                               VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY))
+    {
+    this->CreateLogFilesCheckButton->SetState(1);
+    }
+  else
+    {
+    this->CreateLogFilesCheckButton->SetState(0);
+    }
+
+  tk_cmd << "pack " << this->CreateLogFilesCheckButton->GetWidgetName()
+    << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
   // Interface settings : show most recent panels
@@ -320,12 +356,21 @@ void vtkPVApplicationSettingsInterface::ShowTraceFilesCallback()
 
   this->GetApplication()->SetRegistryValue(
     2, "RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY, "%d", flag);
+}
 
-  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
-  if (app)
+//----------------------------------------------------------------------------
+void vtkPVApplicationSettingsInterface::CreateLogFilesCallback()
+{
+  if (!this->CreateLogFilesCheckButton ||
+      !this->CreateLogFilesCheckButton->IsCreated())
     {
-    app->SetSourcesBrowserAlwaysShowName(flag);
+    return;
     }
+
+  int flag = this->CreateLogFilesCheckButton->GetState() ? 1 : 0;
+
+  this->GetApplication()->SetRegistryValue(
+    2, "RunTime", VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY, "%d", flag);
 }
 
 //----------------------------------------------------------------------------

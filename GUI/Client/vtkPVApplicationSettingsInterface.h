@@ -30,6 +30,7 @@
 #define VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY "ShowSourcesLongHelp"
 #define VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY    "SourcesBrowserAlwaysShowName"
 #define VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY "ShowTraceFiles"
+#define VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY "CreateLogFiles"
 
 class vtkKWCheckButton;
 class vtkKWFrameLabeled;
@@ -56,6 +57,7 @@ public:
   virtual void ShowSourcesDescriptionCallback();
   virtual void ShowSourcesNameCallback();
   virtual void ShowTraceFilesCallback();
+  virtual void CreateLogFilesCallback();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -78,6 +80,7 @@ protected:
   vtkKWCheckButton *ShowSourcesNameCheckButton;
   vtkKWCheckButton *ShowTraceFilesCheckButton;
   vtkKWCheckButton *AutoAcceptCheckButton;
+  vtkKWCheckButton *CreateLogFilesCheckButton;
 
   int AutoAccept;
 

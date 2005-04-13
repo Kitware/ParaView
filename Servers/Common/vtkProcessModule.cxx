@@ -46,7 +46,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.19");
+vtkCxxRevisionMacro(vtkProcessModule, "1.20");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -788,8 +788,10 @@ ofstream* vtkProcessModule::GetLogFile()
 }
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::CreateLogFile(const char *prefix)
+void vtkProcessModule::CreateLogFile()
 {
+  const char *prefix = this->DetermineLogFilePrefix();
+  
   if (!prefix)
     {
     return;

@@ -139,7 +139,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.680");
+vtkCxxRevisionMacro(vtkPVWindow, "1.681");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1630,6 +1630,18 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                this->GetMenuView()->GetWidgetName(),
                VTK_PV_VIEW_MENU_LABEL);
 
+  // Create per-node log files.
+  if (pvApp->GetIntRegistryValue(2,"RunTime",
+                                 VTK_PV_ASI_CREATE_LOG_FILES_REG_KEY))
+    {
+    stream << vtkClientServerStream::Invoke
+           << pm->GetProcessModuleID()
+           << "CreateLogFile"
+           << vtkClientServerStream::End;
+    pm->SendStream(
+      vtkProcessModule::DATA_SERVER|vtkProcessModule::RENDER_SERVER, stream);
+    }
+  
   if ( this->MainView )
     {
     this->MainView->SetupCameraManipulators();     

@@ -191,6 +191,8 @@ protected:
   // Create connection between render server and data server
   void InitializeRenderServer();
   
+  virtual const char* DetermineLogFilePrefix();
+
   int NumberOfServerProcesses;
   vtkSocketController* SocketController;
   vtkSocketController* RenderServerSocket;

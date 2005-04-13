@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.32");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -94,8 +94,6 @@ int vtkPVProcessModule::Start(int argc, char **argv)
     this->Controller = vtkDummyController::New();
     vtkMultiProcessController::SetGlobalController(this->Controller);
     }
-
-  this->CreateLogFile("NodeLog");
 
   return this->GUIHelper->RunGUIStart(argc, argv, 1, 0);
 }

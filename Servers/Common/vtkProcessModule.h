@@ -255,7 +255,7 @@ public:
   // Get a pointer to the log file.
   ofstream* GetLogFile();
 
-  virtual void CreateLogFile(const char *filePrefix);
+  virtual void CreateLogFile();
 
 protected:
   vtkProcessModule();
@@ -289,6 +289,8 @@ protected:
                                           unsigned long eid,
                                           void* cd, void* d);
   virtual void InterpreterCallback(unsigned long eid, void*);
+
+  virtual const char* DetermineLogFilePrefix() { return "NodeLog"; }
 
   vtkMultiProcessController *Controller;
   vtkPVInformation *TemporaryInformation;

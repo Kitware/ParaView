@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.28");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.29");
 
 
 //----------------------------------------------------------------------------
@@ -880,32 +880,6 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
   this->Controller = vtkMPIController::New();
   vtkMultiProcessController::SetGlobalController(this->Controller);
   this->Controller->Initialize(&argc, &argv, 1);
-  if (this->Options)
-    {
-    switch (this->Options->GetProcessType())
-      {
-      case vtkPVOptions::PVCLIENT:
-        // don't need a log for the client
-        break;
-      case vtkPVOptions::PVSERVER:
-        this->CreateLogFile("ServerNodeLog");
-        break;
-      case vtkPVOptions::PVRENDER_SERVER:
-        this->CreateLogFile("RenderServerNodeLog");
-        break;
-      case vtkPVOptions::PVDATA_SERVER:
-        this->CreateLogFile("DataServerNodeLog");
-        break;
-      default:
-        this->CreateLogFile("NodeLog");
-        break;
-      }
-    }
-  else
-    {
-    this->CreateLogFile("NodeLog");
-    }
-
   this->Controller->SetSingleMethod(vtkPVClientServerInit, (void *)(this));
   this->Controller->SingleMethodExecute();
   this->Controller->Finalize(1);
@@ -1475,5 +1449,31 @@ void vtkPVClientServerModule::SetProcessEnvironmentVariable(int processId,
   if (controller && controller->GetLocalProcessId() == processId)
     {
     this->Superclass::SetProcessEnvironmentVariable(processId, var);
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVClientServerModule::DetermineLogFilePrefix()
+{
+  if (this->Options)
+    {
+    switch (this->Options->GetProcessType())
+      {
+      case vtkPVOptions::PVCLIENT:
+        // don't need a log for the client
+        return NULL;
+      case vtkPVOptions::PVSERVER:
+        return "ServerNodeLog";
+      case vtkPVOptions::PVRENDER_SERVER:
+        return "RenderServerNodeLog";
+      case vtkPVOptions::PVDATA_SERVER:
+        return "DataServerNodeLog";
+      default:
+        return "NodeLog";
+      }
+    }
+  else
+    {
+    return "NodeLog";
     }
 }
