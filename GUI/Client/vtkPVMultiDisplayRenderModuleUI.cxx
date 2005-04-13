@@ -13,7 +13,6 @@
 
 =========================================================================*/
 #include "vtkPVMultiDisplayRenderModuleUI.h"
-#include "vtkPVMultiDisplayRenderModule.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWCheckButton.h"
 
@@ -21,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.6");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.6.10.1");
 
 int vtkPVMultiDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
