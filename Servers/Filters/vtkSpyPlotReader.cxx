@@ -45,7 +45,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.1");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.2");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -344,7 +344,7 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     }
 
   ifstream ifs(this->FileName);
-  if(!ifs.is_open())
+  if(!ifs)
     {
     vtkErrorMacro("Error opening file " << this->FileName);
     return 0;
