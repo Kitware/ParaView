@@ -21,7 +21,7 @@
 #include "vtkProp3D.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkMultiActorHelper, "1.1.2.1");
+vtkCxxRevisionMacro(vtkMultiActorHelper, "1.1.2.2");
 vtkStandardNewMacro(vtkMultiActorHelper);
 
 //----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ void vtkMultiActorHelper::UniformScale(double scaleFactor)
   vtkCollectionSimpleIterator cookie;
   this->Actors->InitTraversal(cookie);
   vtkActor* actor=0;
-  while (actor=this->Actors->GetNextActor(cookie))
+  while ( (actor=this->Actors->GetNextActor(cookie)))
     {
     double scale[3];
     scale[0] = scale[1] = scale[2] = scaleFactor;
