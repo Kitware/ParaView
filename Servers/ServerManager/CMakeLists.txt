@@ -37,8 +37,8 @@ SET( ServerManagerCommon_SRCS
   vtkSMCompositeRenderModuleProxy.cxx
   vtkSMDataTypeDomain.cxx
   vtkSMDisplayProxy.cxx
-  vtkSMDisplayWindowProxy.cxx
-  vtkSMDisplayerProxy.cxx
+#  vtkSMDisplayWindowProxy.cxx
+#  vtkSMDisplayerProxy.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleRangeDomain.cxx
