@@ -45,7 +45,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.4");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.5");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -774,6 +774,66 @@ int vtkSpyPlotReader::RequestData(
             }
           }
         }
+      // Mark the bounding cells as ghost cells of level 1.
+      vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
+      ghostArray->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
+      ghostArray->SetName("vtkGhostLevels"); //("vtkGhostLevels");
+      cd->AddArray(ghostArray);
+      ghostArray->Delete();
+      unsigned char *ptr =static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
+      
+      int k=0;
+      while(k<dims[2])
+        {
+        int kIsGhost;
+        if(dims[2]==1)
+          {
+          kIsGhost=0;
+          }
+        else
+          {
+          kIsGhost=k==0 || (k==dims[2]-1);
+          }
+        
+        int j=0;
+        while(j<dims[1])
+          {
+          int jIsGhost=kIsGhost;
+          if(!jIsGhost)
+            {
+            if(dims[1]>1)
+              {
+              jIsGhost=j==0 || (j==dims[1]-1);
+              }
+            }
+          
+          int i=0;
+          while(i<dims[0])
+            {
+            int isGhost=jIsGhost;
+            if(!isGhost)
+              {
+              if(dims[0]>1)
+                {
+                isGhost=i==0 || (i==dims[0]-1);
+                }
+              }
+            if(isGhost)
+              {
+              (*ptr)=1;
+              }
+            else
+              {
+              (*ptr)=0;
+              }
+            ++ptr;
+            ++i;
+            }
+          ++j;
+          }
+        ++k;
+        }
+      
       //this->MergeVectors(cd);
       }
     }
