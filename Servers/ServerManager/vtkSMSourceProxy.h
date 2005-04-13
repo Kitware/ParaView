@@ -39,7 +39,6 @@ class vtkPVDataSetAttributesInformation;
 struct vtkSMSourceProxyInternals;
 //ETX
 class vtkSMPart;
-class vtkSMPartDisplay;
 class vtkSMProperty;
 
 class VTK_EXPORT vtkSMSourceProxy : public vtkSMProxy

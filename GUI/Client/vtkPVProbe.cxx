@@ -31,7 +31,6 @@
 #include "vtkPolyData.h"
 #include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
-#include "vtkSMPlotDisplay.h"
 
 #include "vtkSMXYPlotDisplayProxy.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -43,7 +42,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.8");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.9");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);

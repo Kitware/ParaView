@@ -27,7 +27,6 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkSMPart.h"
-#include "vtkSMPartDisplay.h"
 #include "vtkSMProperty.h"
 #include "vtkSmartPointer.h"
 #include "vtkCollection.h"
@@ -35,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.25.4.2");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.25.4.3");
 
 struct vtkSMSourceProxyInternals
 {
