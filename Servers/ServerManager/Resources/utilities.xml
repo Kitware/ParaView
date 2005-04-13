@@ -1269,6 +1269,16 @@
       <ProxyProperty name="AddGeometry" command="AddGeometry" repeat_command="1">
       </ProxyProperty>
     </SourceProxy>
+    <Proxy name="MultiActorHelper" class="vtkMultiActorHelper">
+      <ProxyProperty name="Actors" command="AddActor" repeat_command="1"/>
+      <DoubleVectorProperty
+         name="UniformScale"
+         command="UniformScale"
+         number_of_elements="1" 
+         default_values="1">
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+    </Proxy>
   </ProxyGroup>
 
 

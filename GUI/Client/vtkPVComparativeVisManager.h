@@ -20,6 +20,7 @@
 
 #include "vtkObject.h"
 
+class vtkInteractorStyleTrackballMultiActor;
 class vtkPVAnimationCue;
 class vtkPVApplication;
 //BTX
@@ -60,6 +61,8 @@ protected:
 //BTX
   friend class vtkCVAnimationSceneObserver;
 //ETX
+
+  vtkInteractorStyleTrackballMultiActor* IStyle;
 
 private:
   vtkPVComparativeVisManager(const vtkPVComparativeVisManager&); // Not implemented.

@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.1.2.5");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.1.2.6");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -98,6 +98,7 @@ vtkPVComparativeVisManager::vtkPVComparativeVisManager()
 {
   this->Application = 0;
   this->Internal = new vtkPVComparativeVisManagerInternals;
+  this->IStyle = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -105,6 +106,10 @@ vtkPVComparativeVisManager::~vtkPVComparativeVisManager()
 {
   this->SetApplication(0);
   delete this->Internal;
+  if (this->IStyle)
+    {
+    this->IStyle->Delete();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -131,7 +136,7 @@ void vtkPVComparativeVisManager::TraverseAllCues()
   this->Internal->NumberOfParameterValues.resize(numCues);
   unsigned int numParams=1;
   unsigned int i;
-  int num=5;
+  int num=4;
   for(i=0; i<numCues; i++)
     {
     this->Internal->NumberOfParameterValues[i] = num;
@@ -191,20 +196,16 @@ void vtkPVComparativeVisManager::Process()
   this->TraverseAllCues();
 
   vtkPVWindow* window = this->Application->GetMainWindow();
-  vtkInteractorStyleTrackballMultiActor* istyle = 
+  this->IStyle = 
     vtkInteractorStyleTrackballMultiActor::New();
-  istyle->SetApplication(this->Application);
+  this->IStyle->SetApplication(this->Application);
   window->ChangeInteractorStyle(2);
-  window->GetInteractor()->SetInteractorStyle(istyle);
-  window->vtkKWWindow::SetToolbarVisibility(
-    window->GetToolbar(), "Tools", 0);
-  window->vtkKWWindow::SetToolbarVisibility(
-    window->GetToolbar(), "Camera", 0);
-  window->vtkKWWindow::SetToolbarVisibility(
-    window->GetToolbar(), "Interaction", 0);
+  window->GetInteractor()->SetInteractorStyle(this->IStyle);
   window->SetCurrentPVSource(0);
   window->SetPropertiesVisiblity(0);
-  istyle->Delete();
+  window->SetToolbarVisibility("tools", 0);
+  window->SetToolbarVisibility("camera", 0);
+  window->SetToolbarVisibility("interaction", 0);
 
   this->PlayOne(0);
 
@@ -451,6 +452,25 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
     bb[3] = biggestBounds[2] +
       (biggestBounds[3]-biggestBounds[2])*cellSpacing[1]/dataHeight;
     }
+  
+  vtkSMProxyManager* proxMan = vtkSMProxyManager::GetProxyManager();
+  vtkSMProxy* multiActorHelper = 
+    proxMan->NewProxy("ComparativeVisHelpers", "MultiActorHelper");
+  vtkSMProxyProperty* actorsP = vtkSMProxyProperty::SafeDownCast(
+    multiActorHelper->GetProperty("Actors"));
+
+  vtkCollection* displays = ren->GetDisplays();
+  vtkCollectionIterator* iter = displays->NewIterator();
+  for(iter->GoToFirstItem(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkSMSimpleDisplayProxy* pDisp = vtkSMSimpleDisplayProxy::SafeDownCast(
+      iter->GetCurrentObject());
+    if (pDisp && pDisp->GetVisibilityCM())
+      {
+      pDisp->SetVisibilityCM(0);
+      }
+    }
+  iter->Delete();
 
   for(i=0; i<numEntries; i++)
     {
@@ -462,7 +482,9 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
 
     for(; iter2 != this->Internal->Displays[i].end(); iter2++)
       {
-      vtkSMProxy* display = iter2->GetPointer();
+      vtkSMSimpleDisplayProxy* display = vtkSMSimpleDisplayProxy::SafeDownCast(
+        iter2->GetPointer());
+      actorsP->AddProxy(display->GetActorProxy());
       vtkSMDoubleVectorProperty* position = 
         vtkSMDoubleVectorProperty::SafeDownCast(
           display->GetProperty("Position"));
@@ -483,6 +505,8 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
 
       vtkSMProxy* planeR = 
         proxM->NewProxy("implicit_functions", "Plane");
+      planeR->SetServers(
+        vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
       clipPlanes->AddProxy(planeR);
       vtkSMDoubleVectorProperty* porigin =
         vtkSMDoubleVectorProperty::SafeDownCast(
@@ -497,6 +521,8 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
 
       vtkSMProxy* planeL = 
         proxM->NewProxy("implicit_functions", "Plane");
+      planeL->SetServers(
+        vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
       clipPlanes->AddProxy(planeL);
       porigin =
         vtkSMDoubleVectorProperty::SafeDownCast(
@@ -511,6 +537,8 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
       
       vtkSMProxy* planeD = 
         proxM->NewProxy("implicit_functions", "Plane");
+      planeD->SetServers(
+        vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
       clipPlanes->AddProxy(planeD);
       porigin =
         vtkSMDoubleVectorProperty::SafeDownCast(
@@ -525,6 +553,8 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
 
       vtkSMProxy* planeU = 
         proxM->NewProxy("implicit_functions", "Plane");
+      planeU->SetServers(
+        vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
       clipPlanes->AddProxy(planeU);
       porigin =
         vtkSMDoubleVectorProperty::SafeDownCast(
@@ -538,6 +568,12 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
       planeU->Delete();
       }
     }
+  //multiActorHelper->UpdateVTKObjects();
+  vtkSMDoubleVectorProperty* us = vtkSMDoubleVectorProperty::SafeDownCast(
+    multiActorHelper->GetProperty("UniformScale"));
+  us->SetElement(0, 1.2);
+  //multiActorHelper->UpdateVTKObjects();
+  multiActorHelper->Delete();
 
   vtkSMDoubleVectorProperty* position = 
     vtkSMDoubleVectorProperty::SafeDownCast(

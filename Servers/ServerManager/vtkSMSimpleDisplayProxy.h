@@ -132,6 +132,7 @@ protected:
   // the input geometry
   friend class vtkPVComparativeVisManager;
   vtkGetObjectMacro(MapperProxy, vtkSMProxy);
+  vtkGetObjectMacro(ActorProxy, vtkSMProxy);
 //ETX
 
   vtkSMProxy *GeometryFilterProxy;

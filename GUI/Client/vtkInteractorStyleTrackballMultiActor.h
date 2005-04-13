@@ -34,7 +34,7 @@
 
 class vtkPVApplication;
 
-class VTK_RENDERING_EXPORT vtkInteractorStyleTrackballMultiActor : public vtkInteractorStyle
+class VTK_EXPORT vtkInteractorStyleTrackballMultiActor : public vtkInteractorStyle
 {
 public:
   static vtkInteractorStyleTrackballMultiActor *New();

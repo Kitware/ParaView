@@ -34,6 +34,7 @@ SET(Filters_SRCS
   vtkMPIMoveData.cxx
   vtkMazeSource.cxx
   vtkMergeArrays.cxx
+  vtkMultiActorHelper.cxx
   vtkMultiDisplayManager.cxx
   vtkPVArrowSource.cxx
   vtkPVClipDataSet.cxx
