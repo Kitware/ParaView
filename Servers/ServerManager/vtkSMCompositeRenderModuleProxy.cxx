@@ -26,7 +26,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.1.2.5");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.1.2.6");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -474,4 +474,10 @@ double vtkSMCompositeRenderModuleProxy::GetZBufferValue(int x, int y)
 void vtkSMCompositeRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
+  os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
+  os << indent << "CompositeThreshold: " << this->CompositeThreshold << endl;
+  os << indent << "CollectionDecision: " << this->CollectionDecision << endl;
+  os << indent << "LODCollectionDecision: " << this->LODCollectionDecision << endl;
+  
 }

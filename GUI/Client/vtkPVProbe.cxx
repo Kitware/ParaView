@@ -42,7 +42,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.9");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.10");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -157,29 +157,6 @@ void vtkPVProbe::CreateProperties()
   this->Script("pack %s",
                this->ShowXYPlotToggle->GetWidgetName());
 
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::SetVisibilityNoTrace(int val)
-{
-  if (this->PlotDisplayProxy && this->CanShowPlot)
-    {
-    this->PlotDisplayProxy->SetVisibilityCM(val);
-    }
-  this->Superclass::SetVisibilityNoTrace(val);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::AcceptCallbackInternal()
-{
-  this->AddTraceEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
-                      this->GetTclName(),
-                      this->ShowXYPlotToggle->GetState());
-  
-  // call the superclass's method
-  this->vtkPVSource::AcceptCallbackInternal();
-   
   if (!this->PlotDisplayProxy)
     {
     vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
@@ -201,6 +178,39 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->SetPlotDisplayProxyName(str.str());
     str.rdbuf()->freeze(0);
     pxm->RegisterProxy("displays", this->PlotDisplayProxyName, this->PlotDisplayProxy);
+
+    // We cannot set the input here itself,
+    // since the Probe proxy is not yet created and setting it as input
+    // calls a CreateParts() on it, which leads to errors.
+    // Hence, we defer it until after initializaiton.
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProbe::SetVisibilityNoTrace(int val)
+{
+  if (this->PlotDisplayProxy && this->CanShowPlot)
+    {
+    this->PlotDisplayProxy->SetVisibilityCM(val);
+    }
+  this->Superclass::SetVisibilityNoTrace(val);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVProbe::AcceptCallbackInternal()
+{
+  this->AddTraceEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
+                      this->GetTclName(),
+                      this->ShowXYPlotToggle->GetState());
+ 
+  int initialized = this->GetInitialized();
+  
+  // call the superclass's method
+  this->vtkPVSource::AcceptCallbackInternal();
+   
+  if (!initialized)
+    {
     vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
       this->PlotDisplayProxy->GetProperty("Input"));
     if (!ip)
@@ -210,9 +220,10 @@ void vtkPVProbe::AcceptCallbackInternal()
       }
     ip->RemoveAllProxies();
     ip->AddProxy(this->GetProxy());
-    this->PlotDisplayProxy->UpdateVTKObjects();
+    this->PlotDisplayProxy->SetVisibilityCM(0); // also calls UpdateVTKObjects().
     this->AddDisplayToRenderModule(this->PlotDisplayProxy);
     }
+  
   // We need to update manually for the case we are probing one point.
   int numPts = this->GetDataInformation()->GetNumberOfPoints();
 

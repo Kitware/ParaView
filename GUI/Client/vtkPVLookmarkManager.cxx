@@ -95,8 +95,6 @@
 
 #include "vtkCamera.h"
 #include "vtkPVProcessModule.h"
-#include "vtkClientServerStream.h"
-#include "vtkClientServerID.h"
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 
@@ -112,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17.2.4");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17.2.5");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------

@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.10");
+vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.11");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3525,15 +3525,10 @@ void vtkPVWindow::RemovePVSource(const char* listname, vtkPVSource *pvs)
     vtkPVSourceCollection* col = this->GetSourceList(listname);
     if (col)
       {
-      vtkSMProxy*p = pvs->GetProxy();
       col->RemoveItem(pvs);
       this->MainView->UpdateNavigationWindow(this->CurrentPVSource, 0);
       this->UpdateSelectMenu();
       this->UpdateAnimationInterface();
-      if (p)
-        {
-        cout << endl;
-        }
       }
     }
 }

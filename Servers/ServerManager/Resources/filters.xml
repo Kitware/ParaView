@@ -1937,6 +1937,12 @@
         default_values="3">
        <IntRangeDomain name="range" min="0" max="8"/>
      </IntVectorProperty>
+
+     <Property
+        name="ResetFieldCriteria"
+        command="ResetFieldCriteria"
+        immediate_update="1">
+     </Property>
    <!-- End TempTessellatorFilter -->
    </SourceProxy>
 

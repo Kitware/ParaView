@@ -20,7 +20,7 @@
 
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMInputProperty.h"
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.9");
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.10");
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
 {
@@ -37,6 +37,11 @@ vtkSMDisplayProxy::~vtkSMDisplayProxy()
 //-----------------------------------------------------------------------------
 vtkPVGeometryInformation* vtkSMDisplayProxy::GetGeometryInformation()
 {
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Objects not created yet!");
+    return 0;
+    }
   if (!this->GeometryInformationIsValid)
     {
     this->GatherGeometryInformation();
@@ -468,6 +473,7 @@ void vtkSMDisplayProxy::SetScalarArrayCM(const char* arrayname)
   if (!svp)
     {
     vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
+    return;
     }
   svp->SetElement(0, arrayname);
   this->UpdateVTKObjects();
@@ -483,6 +489,7 @@ const char* vtkSMDisplayProxy::GetScalarArrayCM()
   if (!svp)
     {
     vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
+    return 0;
     }
   return svp->GetElement(0);
 }

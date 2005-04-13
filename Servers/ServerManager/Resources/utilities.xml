@@ -1281,5 +1281,39 @@
     </Proxy>
   </ProxyGroup>
 
+  <ProxyGroup name="file_listing">
+    <ServerFileListingProxy name="ServerFileListing" 
+      class="vtkPVServerFileListing">
+      <IntVectorProperty
+        name="ActiveFileIsDirectory"
+        command="GetActiveFileIsDirectory"
+        number_of_elements="1"
+        information_only="1">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+      <IntVectorProperty
+        name="ActiveFileIsReadable"
+        command="GetActiveFileIsReadable"
+        number_of_elements="1"
+        information_only="1">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
+
+      <StringVectorProperty
+        name="ActiveFileName"
+        command="SetActiveFileName"
+        number_of_elements="1">
+      </StringVectorProperty>
+     
+      <StringVectorProperty
+        name="CurrentWorkingDirectory"
+        command="GetCurrentWorkingDirectory"
+        number_of_elements="1"
+        information_only="1">
+        <SimpleStringInformationHelper />
+      </StringVectorProperty>
+    </ServerFileListingProxy>
+  </ProxyGroup>
+
 
 </ServerManagerConfiguration>

@@ -17,7 +17,6 @@ if {$nprocs > 1} { set ext "pvtp" }
 
 $pvWindow Open "$DataDir/Data/blow data.vtk"
 if { [catch {
-  $pvWindow ShowAnimationProperties
   $pvWindow ShowCurrentSourceProperties
   $pvWindow WriteVTKFile vtkParaViewWriteTest.$ext
   $pvWindow WriteVTKFile vtkParaViewWriteTestGhost.$ext 3

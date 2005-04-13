@@ -15,7 +15,6 @@
 #include "vtkPVCameraIcon.h"
 
 #include "vtkCamera.h"
-#include "vtkClientServerStream.h"
 #include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkImageResample.h"
@@ -34,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.22.2.2");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.22.2.3");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 

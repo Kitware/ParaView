@@ -20,7 +20,6 @@
 #ifndef __vtkPVApplication_h
 #define __vtkPVApplication_h
 
-#include "vtkPVConfig.h"
 #include "vtkKWApplication.h"
 class vtkPVProcessModule;
 

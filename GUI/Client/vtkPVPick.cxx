@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.16.2.4");
+vtkCxxRevisionMacro(vtkPVPick, "1.16.2.5");
 
 
 //----------------------------------------------------------------------------
@@ -123,15 +123,6 @@ void vtkPVPick::CreateProperties()
   this->Script("pack %s",
                this->DataFrame->GetWidgetName());
 
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVPick::AcceptCallbackInternal()
-{
-  // call the superclass's method
-  this->Superclass::AcceptCallbackInternal();
-
   if (!this->PickLabelDisplayProxy)
     {
     // Create Point label display proxy.
@@ -164,12 +155,20 @@ void vtkPVPick::AcceptCallbackInternal()
       }
     ip->RemoveAllProxies();
     ip->AddProxy(this->GetProxy());
-    this->PickLabelDisplayProxy->SetVisibilityCM(0);
-    this->PickLabelDisplayProxy->UpdateVTKObjects();
+    this->PickLabelDisplayProxy->SetVisibilityCM(0); // also calls UpdateVTKObjects
 
     // Add to render module.
     this->AddDisplayToRenderModule(this->PickLabelDisplayProxy);
     }
+
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVPick::AcceptCallbackInternal()
+{
+  // call the superclass's method
+  this->Superclass::AcceptCallbackInternal();
     
   // We need to update manually for the case we are probing one point.
   this->PickLabelDisplayProxy->Update();

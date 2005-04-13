@@ -16,12 +16,13 @@
 // .SECTION Description
 // A dialog to replace Tk's Open and Save file dialogs.
 // We will develop the dialog for local (opening) files first ...
+// This creates a vtkSMServerFileListingProxy to obtain the information.
+// This proxy is not registered with the ProxyManager.
 
 #ifndef __vtkPVServerFileDialog_h
 #define __vtkPVServerFileDialog_h
 
 #include "vtkKWLoadSaveDialog.h"
-#include "vtkClientServerID.h" // Need vtkClientServerID.
 
 class vtkIntArray;
 class vtkKWApplication;
@@ -35,6 +36,7 @@ class vtkKWPushButton;
 class vtkKWWindow;
 class vtkPVApplication;
 class vtkStringList;
+class vtkSMProxy;
 
 class VTK_EXPORT vtkPVServerFileDialog : public vtkKWLoadSaveDialog
 {
@@ -131,8 +133,9 @@ protected:
   int               CheckExtension(const char* name);
 
   // Server-side helper.
-  vtkClientServerID ServerSideID;
   void CreateServerSide();
+
+  vtkSMProxy* ServerFileListingProxy;
 
   vtkKWWidget* ScrollBar;
   // Description:

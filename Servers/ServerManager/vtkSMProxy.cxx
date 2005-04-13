@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.33.2.5");
+vtkCxxRevisionMacro(vtkSMProxy, "1.33.2.6");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1282,4 +1282,7 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "XMLName: "
      << (this->XMLName ? this->XMLName : "(null)")
      << endl;
+  os << indent << "XMLGroup: " 
+    << (this->XMLGroup ? this->XMLGroup : "(null)")
+    << endl;
 }

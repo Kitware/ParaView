@@ -19,7 +19,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMPropertyIterator);
-vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5.6.4");
+vtkCxxRevisionMacro(vtkSMPropertyIterator, "1.5.6.5");
 
 struct vtkSMPropertyIteratorInternals
 {
@@ -284,6 +284,6 @@ vtkSMProperty* vtkSMPropertyIterator::GetProperty()
 void vtkSMPropertyIterator::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
+  os << indent << "TraverseSubProxies: " << this->TraverseSubProxies << endl;
   os << indent << "Proxy: " << this->Proxy << endl;
 }

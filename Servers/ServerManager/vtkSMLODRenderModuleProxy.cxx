@@ -59,7 +59,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMLODRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.1.2.2");
+vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.1.2.3");
 //-----------------------------------------------------------------------------
 vtkSMLODRenderModuleProxy::vtkSMLODRenderModuleProxy()
 {
@@ -262,5 +262,7 @@ int vtkSMLODRenderModuleProxy::GetUseLODDecision()
 void vtkSMLODRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "LODThreshold: " << this->LODThreshold << endl;
+  os << indent << "LODResolution: " << this->LODResolution << endl;
   
 }

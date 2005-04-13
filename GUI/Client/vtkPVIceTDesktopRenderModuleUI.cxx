@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDesktopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVIceTDesktopRenderModuleUI, "1.1.2.2");
 
 int vtkPVIceTDesktopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -34,7 +34,6 @@ int vtkPVIceTDesktopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
 vtkPVIceTDesktopRenderModuleUI::vtkPVIceTDesktopRenderModuleUI()
 {
   this->CommandFunction = vtkPVIceTDesktopRenderModuleUICommand;
-  cout << "vtkPVIceTDesktopRenderModuleUICommand"<<endl;
 }
 
 

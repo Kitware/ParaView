@@ -59,7 +59,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.9");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.10");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -622,4 +622,5 @@ void vtkSMXYPlotDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
     << endl;
   os << indent << "XYPlotActorProxy: " << this->XYPlotActorProxy
     << endl;
+  os << indent << "Visibility: " << this->Visibility << endl;
 }

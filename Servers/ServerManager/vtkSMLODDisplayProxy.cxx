@@ -23,7 +23,7 @@
 #include "vtkPVLODPartDisplayInformation.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -68,7 +68,7 @@ vtkPVLODPartDisplayInformation* vtkSMLODDisplayProxy::GetLODInformation()
     {
     return this->LODInformation;
     }
-  if ( ! vtkProcessModule::GetProcessModule() )
+  if ( ! vtkProcessModule::GetProcessModule() || !this->ObjectsCreated)
     {
     return 0;
     }

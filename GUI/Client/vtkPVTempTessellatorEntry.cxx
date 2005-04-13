@@ -28,13 +28,14 @@
 #include "vtkPVXMLElement.h"
 
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMSourceProxy.h"
 
 #define PLAIN "#007700"
 #define EMPHS "#004400"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.19.2.1");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.19.2.2");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -447,18 +448,19 @@ void vtkPVTempTessellatorEntry::SetFieldCriterion( int fnum, float crit )
 
 void vtkPVTempTessellatorEntry::Accept()
 {
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
-  if (!sourceID.ID)
+  vtkSMProxy* proxy = this->PVSource->GetProxy();
+  if (!proxy)
     {
     return;
     }
-  
-  vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
-  vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke
-         << sourceID << "ResetFieldCriteria"
-         << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+  vtkSMProperty* p = proxy->GetProperty("ResetFieldCriteria");
+  if (!p)
+    {
+    vtkErrorMacro("Failed to find ResetFieldCriteria.");
+    return;
+    }
+  p->Modified(); // immediate update proerty...no need to call
+      // UpdateVTKObjects
   
   this->UpdateProperty();
 

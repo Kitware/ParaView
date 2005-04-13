@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.9");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.10");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -940,11 +940,6 @@ void vtkSMSimpleDisplayProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PropertyProxy: " << this->PropertyProxy << endl;
   os << indent << "ActorProxy: " << this->ActorProxy << endl;
   os << indent << "GeometryIsValid: " << this->GeometryIsValid << endl;
-
-  vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
-  vtkPVUpdateSuppressor* sup = vtkPVUpdateSuppressor::SafeDownCast(
-        pm->GetObjectFromID(this->UpdateSuppressorProxy->GetID(0)));
-  os << indent << "Update suppressor output: " << endl;
-  sup->GetOutput()->PrintSelf(os, indent.GetNextIndent());
+  os << indent << "HasVolumePipeline: " << this->HasVolumePipeline << endl;
+  os << indent << "VolumeRenderMode: " << this->VolumeRenderMode << endl;
 }

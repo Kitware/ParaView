@@ -21,7 +21,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkPVOptions.h"
 vtkStandardNewMacro(vtkSMCompositeDisplayProxy);
-vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMCompositeDisplayProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkSMCompositeDisplayProxy::vtkSMCompositeDisplayProxy()
 {
@@ -270,6 +270,10 @@ void vtkSMCompositeDisplayProxy::SetupCollectionFilter(vtkSMProxy* collectProxy)
 //-----------------------------------------------------------------------------
 vtkPVLODPartDisplayInformation* vtkSMCompositeDisplayProxy::GetLODInformation()
 {
+  if (!this->ObjectsCreated)
+    {
+    return 0;
+    }
   if ( ! this->GeometryIsValid)
     { // Update but with collection filter off.
     this->CollectionDecision = 0;
@@ -320,7 +324,7 @@ void vtkSMCompositeDisplayProxy::SetCollectionDecision(int v)
 //-----------------------------------------------------------------------------
 void vtkSMCompositeDisplayProxy::SetLODCollectionDecision(int v)
 {
-  if (v == this->LODCollectionDecision)
+  if (!this->ObjectsCreated || v == this->LODCollectionDecision)
     {
     return;
     }
@@ -354,4 +358,7 @@ void vtkSMCompositeDisplayProxy::SetLODCollectionDecision(int v)
 void vtkSMCompositeDisplayProxy::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "CollectionDecision: " << this->CollectionDecision << endl;
+  os << indent << "LODCollectionDecision: " << this->LODCollectionDecision 
+    << endl;
 }

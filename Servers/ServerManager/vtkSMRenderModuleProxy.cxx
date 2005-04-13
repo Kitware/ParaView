@@ -42,7 +42,7 @@
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.14");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.15");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -936,4 +936,12 @@ void vtkSMRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "RenderInterruptsEnabled: " << this->RenderInterruptsEnabled 
     << endl;
+  os << indent << "Displays: " << this->Displays << endl;
+  os << indent << "Renderer: " << this->Renderer << endl;
+  os << indent << "Renderer2D: " << this->Renderer2D << endl;
+  os << indent << "RenderWindow: " << this->RenderWindow << endl;
+  os << indent << "Interactor: " << this->Interactor << endl;
+  os << indent << "ActiveCamera: " << this->ActiveCamera << endl;
+
+  
 }

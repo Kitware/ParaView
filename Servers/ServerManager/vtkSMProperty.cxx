@@ -31,7 +31,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.27.4.2");
+vtkCxxRevisionMacro(vtkSMProperty, "1.27.4.3");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -458,6 +458,7 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
      <<  (this->XMLName ? this->XMLName : "(null)") << endl;
   os << indent << "InformationProperty: " << this->InformationProperty << endl;
   os << indent << "Animateable: " << this->Animateable << endl;
+  os << indent << "Saveable: " << this->Saveable << endl;
 
   vtkSMSubPropertyIterator* iter = vtkSMSubPropertyIterator::New();
   iter->SetProperty(this);

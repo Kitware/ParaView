@@ -77,6 +77,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMRenderModuleProxy.cxx
+  vtkSMServerFileListingProxy.cxx
   vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetProxy.cxx
   vtkSMSimpleIntInformationHelper.cxx
