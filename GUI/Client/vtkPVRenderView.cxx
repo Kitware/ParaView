@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.368");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.369");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2160,7 +2160,7 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
 double vtkPVRenderView::GetLight(int /*vtkLightKit::LightKitType*/ type, 
                                  int /*vtkLightKit::LightKitSubType*/ subtype)
 {
-  double value;
+  double value = 0;
   switch ( type )
     {
     case vtkLightKit::TKeyLight:
