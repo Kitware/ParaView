@@ -45,7 +45,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.5");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.6");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -628,7 +628,6 @@ int vtkSpyPlotReader::RequestData(
     for ( block = 0; block < number_of_blocks; ++ block )
       {
       int cc;
-//      vtkImageData* ug = vtkImageData::New();
       int dims[3];
       spcth_getDataBlockDimensions(spcth, block, dims, dims+1, dims+2);
       
@@ -657,6 +656,7 @@ int vtkSpyPlotReader::RequestData(
         
         // add at the end of the level list.
         vtkUniformGrid* ug = vtkUniformGrid::New();
+//      vtkImageData* ug = vtkImageData::New();
         hb->SetDataSet(level, hb->GetNumberOfDataSets(level), ug);
         ug->Delete();
       
@@ -757,17 +757,8 @@ int vtkSpyPlotReader::RequestData(
           
           array->SetName(fname);
           array->SetNumberOfComponents(1);
-          // TODO: 2d images
-          cout<<"dims[0]="<<dims[0]<<" dims[1]="<<dims[1]<<" dims[2]="<<dims[2]<<endl;
-          cout<<"(dims[0]-1)*(dims[1]-1)*(dims[2]-1)="<<(dims[0]-1)*(dims[1]-1)*(dims[2]-1)<<endl;
-//           array->SetNumberOfTuples((dims[0]-1)*(dims[1]-1)*(dims[2]-1));
-          array->SetNumberOfTuples((dims[0])*(dims[1])*(dims[2]));
+          array->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
           
-            
-          vtkDebugMacro("Field " << fname << " (" << field << ") ");
-          
-          assert("check array_exists" && array!=0);
-          assert("check pointer_exists" && array->GetVoidPointer(0)!=0);
           if (!spcth_getCellFieldData(spcth, block,field, static_cast<double*>(array->GetVoidPointer(0)))) 
             {
             vtkErrorMacro("Problem reading block: " << block << ", field: " << field << endl);
@@ -840,7 +831,7 @@ int vtkSpyPlotReader::RequestData(
   
 #endif //  if 0 skip loading for valgrind test
   // All files seem to have 1 ghost level.
-  this->AddGhostLevelArray(1);
+//  this->AddGhostLevelArray(1);
  
   // At this processor has its own blocks
   // They have to exchange the blocks they have get a unique id for
@@ -994,7 +985,6 @@ int vtkSpyPlotReader::RequestData(
       }
     ++level;
     }
-  
   return 1;
 }
 
@@ -1023,6 +1013,10 @@ int vtkSpyPlotReader::SetUpdateBlocks(
   updateInfo->Delete();
   
   int numLevels=compositeInfo->GetNumberOfLevels();
+  
+  vtkDataObject *doOutput=info->Get(vtkCompositeDataSet::COMPOSITE_DATA_SET());
+  vtkHierarchicalDataSet *hb=vtkHierarchicalDataSet::SafeDownCast(doOutput); 
+  
   updateInfo->SetNumberOfLevels(numLevels);
   int level=0;
   while(level<numLevels)
@@ -1035,7 +1029,7 @@ int vtkSpyPlotReader::SetUpdateBlocks(
     int found=0;
     while(!found && i<numBlocks)
       {
-      found=updateInfo->GetInformation(level,i)!=0;
+      found=hb->GetDataSet(level,i)!=0;
       ++i;
       }
     if(found)
@@ -1044,11 +1038,10 @@ int vtkSpyPlotReader::SetUpdateBlocks(
       int done=0;
       while(!done && i<numBlocks)
         {
-        vtkInformation *levelInfo=updateInfo->GetInformation(level,i);
-        done=levelInfo==0;
+        done=hb->GetDataSet(level,i)==0;
         if(!done)
           {
-          levelInfo->Set(vtkCompositeDataPipeline::MARKED_FOR_UPDATE(),1);
+          updateInfo->GetInformation(level,i)->Set(vtkCompositeDataPipeline::MARKED_FOR_UPDATE(),1);
           }
         ++i;
         }
