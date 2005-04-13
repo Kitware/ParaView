@@ -1307,7 +1307,7 @@
 
       
     <IceTRenderModuleProxy name="IceTRenderModule"
-      base_proxygroup="rendermodules" base_proxyname="DeskTopRenderModule">
+      base_proxygroup="rendermodules" base_proxyname="IceTDesktopRenderModule">
     </IceTRenderModuleProxy>
 
   </ProxyGroup>
