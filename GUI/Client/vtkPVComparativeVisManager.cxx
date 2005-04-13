@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.1.2.4");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.1.2.5");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -306,7 +306,7 @@ void vtkPVComparativeVisManager::StoreGeometry()
     {
     vtkSMSimpleDisplayProxy* pDisp = vtkSMSimpleDisplayProxy::SafeDownCast(
       iter->GetCurrentObject());
-    if (pDisp && pDisp->cmGetVisibility())
+    if (pDisp && pDisp->GetVisibilityCM())
       {
       vtkSMProxyManager* proxMan = vtkSMProxyManager::GetProxyManager();
       vtkSMProxy* proxy = 

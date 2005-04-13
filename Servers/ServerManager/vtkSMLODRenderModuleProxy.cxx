@@ -20,9 +20,12 @@
 #include "vtkSMLODDisplayProxy.h"
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVDataInformation.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMInputProperty.h"
+#include "vtkSMSourceProxy.h"
 #include "vtkTimerLog.h"
 #include "vtkCommand.h"
 
@@ -56,7 +59,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMLODRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.1.2.1");
+vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkSMLODRenderModuleProxy::vtkSMLODRenderModuleProxy()
 {
@@ -188,11 +191,29 @@ void vtkSMLODRenderModuleProxy::ComputeTotalVisibleMemorySize()
     {
     vtkSMLODDisplayProxy* pDisp = vtkSMLODDisplayProxy::SafeDownCast(
       iter->GetCurrentObject());
-    if (pDisp && this->GetDisplayVisibility(pDisp))
+    if (pDisp && pDisp->GetVisibilityCM())
       {
       vtkPVLODPartDisplayInformation* info = pDisp->GetLODInformation();
-      //TODO: how to do volume? it needs PVSouce!! ?
-      this->TotalVisibleGeometryMemorySize += info->GetGeometryMemorySize();
+      
+      if (pDisp->GetVolumeRenderMode())
+        {
+        // If we are volume rendering, count size of total geometry, not
+        // just the surface.  This is not perfect because the source
+        // may have been tetrahedralized.
+        vtkSMInputProperty* pp = vtkSMInputProperty::SafeDownCast(
+          pDisp->GetProperty("Input"));
+        if (pp && pp->GetNumberOfProxies() > 0)
+          {
+          vtkPVDataInformation* info2 = vtkSMSourceProxy::SafeDownCast(
+            pp->GetProxy(0))->GetDataInformation();
+          this->TotalVisibleGeometryMemorySize += 
+            info2->GetMemorySize();
+          }
+        }
+      else
+        {
+        this->TotalVisibleGeometryMemorySize += info->GetGeometryMemorySize();
+        }
       this->TotalVisibleLODGeometryMemorySize += info->GetLODGeometryMemorySize();
       }
     }

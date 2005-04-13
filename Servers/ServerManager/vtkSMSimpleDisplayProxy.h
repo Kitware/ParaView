@@ -76,11 +76,24 @@ public:
   // Flag indicating if the display supports a volume rendering 
   // representation.
   vtkGetMacro(HasVolumePipeline, int);
+  
+  // Description:
+  // Flag indicating if the display is currently rendered
+  // as a volume. Typically, one would not use this flag,
+  // instead check status of the property "Representation".
+  // Here, only for RenderModuleProxy.
+  vtkGetMacro(VolumeRenderMode, int);
 
   // Description:
   // Method to initlaize the Volume Transfer functions 
   // (ie. Opacity Function & Color Transfer fuction).
   void ResetTransferFunctions();
+
+  // Description:
+  // This method will set the subproxy GeometryFilterProxy
+  // as the input (using property "Input") on the argument
+  // onProxy.
+  void SetInputAsGeometryFilter(vtkSMProxy* onProxy);
 
 protected:
   vtkSMSimpleDisplayProxy();

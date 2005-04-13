@@ -42,7 +42,7 @@
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.13");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.14");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -84,6 +84,12 @@ vtkSMRenderModuleProxy::vtkSMRenderModuleProxy()
   this->ResetCameraClippingRangeTag = 0;
   this->AbortCheckTag = 0;
   this->RenderInterruptsEnabled = 1;
+
+  this->Renderer = 0;
+  this->Renderer2D = 0;
+  this->RenderWindow = 0;
+  this->Interactor = 0;
+  this->ActiveCamera = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -109,6 +115,12 @@ vtkSMRenderModuleProxy::~vtkSMRenderModuleProxy()
   this->RenderWindowProxy = 0;
   this->InteractorProxy = 0;
   this->SetDisplayXMLName(0);
+
+  this->Renderer = 0;
+  this->Renderer2D = 0;
+  this->RenderWindow = 0;
+  this->Interactor = 0;
+  this->ActiveCamera = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -179,22 +191,26 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
 
   vtkPVProcessModule* pvm = vtkPVProcessModule::SafeDownCast(
     vtkProcessModule::GetProcessModule());
+  
+  // Set all the client side pointers.
+  this->Renderer2D = vtkRenderer::SafeDownCast(
+    pvm->GetObjectFromID(this->Renderer2DProxy->GetID(0)));
+  this->Renderer = vtkRenderer::SafeDownCast(
+    pvm->GetObjectFromID(this->RendererProxy->GetID(0)));
+  this->RenderWindow = vtkRenderWindow::SafeDownCast(
+    pvm->GetObjectFromID(this->RenderWindowProxy->GetID(0)));
+  this->Interactor = vtkRenderWindowInteractor::SafeDownCast(
+    pvm->GetObjectFromID(this->InteractorProxy->GetID(0)));
+  this->ActiveCamera = vtkCamera::SafeDownCast(
+    pvm->GetObjectFromID(this->ActiveCameraProxy->GetID(0)));
+  
 
   // Set the active camera for the renderers.  We can't use the Proxy
   // Property since Camera is only create on the CLIENT.  Proxy properties
   // don't take intersection of servers on which they are created before
   // setting as yet.
-  vtkCamera *camera = vtkCamera::SafeDownCast(
-    pvm->GetObjectFromID(this->ActiveCameraProxy->GetID(0)));
-  if (!camera)
-    {
-    vtkErrorMacro("Failed to create Camera.");
-    }
-  else
-    {
-    this->GetRenderer()->SetActiveCamera(camera);
-    this->GetRenderer2D()->SetActiveCamera(camera);
-    }
+  this->GetRenderer()->SetActiveCamera(this->ActiveCamera);
+  this->GetRenderer2D()->SetActiveCamera(this->ActiveCamera);
   
   if (pvm->GetOptions()->GetUseStereoRendering())
     {
@@ -399,7 +415,7 @@ void vtkSMRenderModuleProxy::CacheUpdate(int idx, int total)
     {
     vtkSMDisplayProxy* disp = 
       vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
-    if (!disp || !this->GetDisplayVisibility(disp))
+    if (!disp || !disp->GetVisibilityCM())
       {
       continue;
       }
@@ -449,7 +465,7 @@ void vtkSMRenderModuleProxy::UpdateAllDisplays()
     {
     vtkSMDisplayProxy* disp = 
       vtkSMDisplayProxy::SafeDownCast(iter->GetCurrentObject());
-    if (!disp || !disp->cmGetVisibility())
+    if (!disp || !disp->GetVisibilityCM())
       {
       // Some displays don't need updating.
       continue;
@@ -523,25 +539,6 @@ void vtkSMRenderModuleProxy::SetUseImmediateMode(int val)
     }
 }
     
-
-//-----------------------------------------------------------------------------
-int vtkSMRenderModuleProxy::GetDisplayVisibility(vtkSMDisplayProxy* pDisp)
-{
-  if (!pDisp)
-    {
-    return 0;
-    }
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    pDisp->GetProperty("Visibility"));
-  if (!ivp)
-    {
-    vtkErrorMacro("Failed to find property Visibility on vtkSMDisplayProxy.");
-    return 0;
-    }
-  return ivp->GetElement(0);
-}
-
-
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy* vtkSMRenderModuleProxy::CreateDisplayProxy()
 {
@@ -568,38 +565,6 @@ vtkSMDisplayProxy* vtkSMRenderModuleProxy::CreateDisplayProxy()
   return pDisp;
 }
 
-//-----------------------------------------------------------------------------
-vtkRenderWindowInteractor* vtkSMRenderModuleProxy::GetInteractor()
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  return vtkRenderWindowInteractor::SafeDownCast(
-    pm->GetObjectFromID(this->InteractorProxy->GetID(0)));
-    
-}
-
-//-----------------------------------------------------------------------------
-vtkRenderer* vtkSMRenderModuleProxy::GetRenderer()
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  return vtkRenderer::SafeDownCast(
-    pm->GetObjectFromID(this->RendererProxy->GetID(0))); 
-}
-
-//-----------------------------------------------------------------------------
-vtkRenderer* vtkSMRenderModuleProxy::GetRenderer2D()
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  return vtkRenderer::SafeDownCast(
-    pm->GetObjectFromID(this->Renderer2DProxy->GetID(0))); 
-}
-
-//-----------------------------------------------------------------------------
-vtkRenderWindow* vtkSMRenderModuleProxy::GetRenderWindow()
-{
-  return vtkRenderWindow::SafeDownCast(
-    vtkProcessModule::GetProcessModule()->GetObjectFromID(
-      this->RenderWindowProxy->GetID(0)));
-}
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::SetBackgroundColor(double rgb[3])
 {
@@ -677,7 +642,7 @@ void vtkSMRenderModuleProxy::ComputeVisiblePropBounds(double bds[6])
     {
     vtkSMDisplayProxy* pDisp = vtkSMDisplayProxy::SafeDownCast(
       iter->GetCurrentObject());
-    if (pDisp && this->GetDisplayVisibility(pDisp) )
+    if (pDisp && pDisp->GetVisibilityCM() )
       {
       double *tmp = pDisp->GetGeometryInformation()->GetBounds();
       if (tmp[0] < bds[0]) { bds[0] = tmp[0]; }  

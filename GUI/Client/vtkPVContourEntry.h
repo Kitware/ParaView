@@ -37,11 +37,6 @@ public:
   virtual void Accept();
 
   // Description:
-  // We need to make the callback here so the animation selection
-  // can be traced properly.
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
   // Initialize widget after creation
   virtual void Initialize();
 
@@ -67,11 +62,6 @@ public:
   // Description:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
-
-  // Description:
-  // Resets the animation entries (start and end) to values obtained
-  // from the range domain
-  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai);
 
 protected:
   vtkPVContourEntry();

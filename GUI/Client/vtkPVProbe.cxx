@@ -43,7 +43,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.7");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.8");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -165,7 +165,7 @@ void vtkPVProbe::SetVisibilityNoTrace(int val)
 {
   if (this->PlotDisplayProxy && this->CanShowPlot)
     {
-    this->PlotDisplayProxy->cmSetVisibility(val);
+    this->PlotDisplayProxy->SetVisibilityCM(val);
     }
   this->Superclass::SetVisibilityNoTrace(val);
 }
@@ -312,7 +312,7 @@ void vtkPVProbe::AcceptCallbackInternal()
           svp->SetElement(i, arrayInfo->GetName());
           }
         }
-      this->PlotDisplayProxy->cmSetVisibility(1); //Call UpdateVTKObjects
+      this->PlotDisplayProxy->SetVisibilityCM(1); //Call UpdateVTKObjects
       }
     else
       {
@@ -321,7 +321,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     }
   else
     {
-    this->PlotDisplayProxy->cmSetVisibility(0);
+    this->PlotDisplayProxy->SetVisibilityCM(0);
     }
 
   this->CanShowPlot = (numPts > 1)? 1: 0;

@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.8");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.9");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -570,7 +570,7 @@ void vtkSMSimpleDisplayProxy::SetRepresentation(int representation)
     diffuse = 1.0;
     ambient = 0.0;
     // Turn on specularity when coloring by property.
-    if ( !this->cmGetScalarVisibility())
+    if ( !this->GetScalarVisibilityCM())
       {
       specularity = 0.1;
       }
@@ -911,6 +911,23 @@ void vtkSMSimpleDisplayProxy::GatherGeometryInformation()
   information->Delete();
   // Skip generation of names.
   this->GeometryInformationIsValid = 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSimpleDisplayProxy::SetInputAsGeometryFilter(vtkSMProxy *onProxy)
+{
+  if (!onProxy || !this->GeometryFilterProxy)
+    {
+    return;
+    }
+  vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
+    onProxy->GetProperty("Input"));
+  if (!ip)
+    {
+    vtkErrorMacro("Failed to find proeprty Input.");
+    return;
+    }
+  ip->AddProxy(this->GeometryFilterProxy);
 }
 
 //-----------------------------------------------------------------------------

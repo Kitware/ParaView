@@ -21,7 +21,6 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
@@ -35,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.71");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.71.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -557,159 +556,6 @@ void vtkPVVectorEntry::SaveInBatchScript(ofstream *file)
       }
     *file << endl;
     }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-  vtkPVAnimationInterfaceEntry *ai)
-{
-  char methodAndArgs[500];
-  char command[200];
-  
-  if (this->Entries->GetNumberOfItems() == 1)
-    {
-    sprintf(methodAndArgs, "AnimationMenuCallback %s 0", ai->GetTclName()); 
-    menu->AddCommand(this->LabelWidget->GetText(), this, methodAndArgs, 0,"");
-    }
-  else
-    {
-    vtkKWMenu *cascadeMenu = vtkKWMenu::New();
-    cascadeMenu->SetParent(menu);
-    cascadeMenu->Create(this->GetApplication(), "-tearoff 0");
-    menu->AddCascade(this->GetTraceName(), cascadeMenu, 0,
-                     "Choose a vector component to animate.");
-    int i;
-    for (i = 0; i < this->Entries->GetNumberOfItems(); i++)
-      {
-      sprintf(command, "Component %d", i);
-      sprintf(methodAndArgs, "AnimationMenuCallback %s %d",
-              ai->GetTclName(), i);
-      cascadeMenu->AddCommand(command, this, methodAndArgs, 0, "");
-      }
-    cascadeMenu->Delete();
-    cascadeMenu = NULL;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVVectorEntry::ResetAnimationRange(
-  vtkPVAnimationInterfaceEntry *ai, int idx)
-{
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMDomain *rangeDomain = prop->GetDomain("range");
-
-  if (rangeDomain)
-    {
-    vtkSMIntRangeDomain *intRangeDomain =
-      vtkSMIntRangeDomain::SafeDownCast(rangeDomain);
-    vtkSMDoubleRangeDomain *doubleRangeDomain =
-      vtkSMDoubleRangeDomain::SafeDownCast(rangeDomain);
-    int minExists = 0, maxExists = 0;
-    if (intRangeDomain)
-      {
-      int min = intRangeDomain->GetMinimum(idx, minExists);
-      int max = intRangeDomain->GetMaximum(idx, maxExists);
-      if (minExists)
-        {
-        ai->SetTimeStart(min);
-        }
-      if (maxExists)
-        {
-        ai->SetTimeEnd(max);
-        }
-      }
-    else if (doubleRangeDomain)
-      {
-      double min = doubleRangeDomain->GetMinimum(idx, minExists);
-      double max = doubleRangeDomain->GetMaximum(idx, maxExists);
-      if (minExists)
-        {
-        ai->SetTimeStart(min);
-        }
-      if (maxExists)
-        {
-        ai->SetTimeEnd(max);
-        }
-      }
-    }
-  else
-    {
-    vtkErrorMacro("Could not find required domain (range)");
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
-                                             int idx)
-{
-  if (ai->InitializeTrace(NULL))
-    {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
-                        this->GetTclName(), ai->GetTclName());
-    }
-
-  this->Superclass::AnimationMenuCallback(ai);
-
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMDomain *rangeDomain = prop->GetDomain("range");
-
-  int enableReset = 0;
-  if (rangeDomain)
-    {
-    vtkSMIntRangeDomain *intRangeDomain =
-      vtkSMIntRangeDomain::SafeDownCast(rangeDomain);
-    vtkSMDoubleRangeDomain *doubleRangeDomain =
-      vtkSMDoubleRangeDomain::SafeDownCast(rangeDomain);
-    int minExists = 0, maxExists = 0;
-    if (intRangeDomain)
-      {
-      intRangeDomain->GetMinimum(idx, minExists);
-      intRangeDomain->GetMaximum(idx, maxExists);
-      if (minExists || maxExists)
-        {
-        enableReset = 1;
-        }
-      }
-    else if (doubleRangeDomain)
-      {
-      doubleRangeDomain->GetMinimum(idx, minExists);
-      doubleRangeDomain->GetMaximum(idx, maxExists);
-      if (minExists || maxExists)
-        {
-        enableReset = 1;
-        }
-      }
-    }
-
-  if (enableReset)
-    {
-    char methodAndArgs[500];
-    
-    sprintf(methodAndArgs, "ResetAnimationRange %s %d", ai->GetTclName(), idx);
-    ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
-    ai->SetResetRangeButtonState(1);
-    ai->UpdateEnableState();
-    }
-
-  if (this->Entries->GetNumberOfItems() == 1)
-    {
-    ai->SetLabelAndScript(this->LabelWidget->GetText(), NULL,
-                          this->GetTraceName());
-    }
-  else
-    {
-    char label[200];
-    sprintf(label, "%s (%d)", this->LabelWidget->GetText(), idx);
-    ai->SetLabelAndScript(label, NULL, this->GetTraceName());
-    }
-  
-
-  ai->SetCurrentSMProperty(prop);
-  ai->SetCurrentSMDomain(rangeDomain);
-  ai->SetAnimationElement(idx);
-
-  this->ResetAnimationRange(ai, idx);
-  ai->Update();
 }
 
 //-----------------------------------------------------------------------------

@@ -182,7 +182,6 @@ public:
 
   // Description:
   // Callback to show the animation page.
-  void ShowAnimationProperties();
   void ShowAnimationPanes();
 
   // Description:
@@ -191,15 +190,6 @@ public:
   vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
   vtkGetObjectMacro(PickCenterToolbar, vtkKWToolbar);
  
-  // Description:
-  // Animation Toolbar callbacks
-  void PlayCallback();
-  void StopCallback();
-  void GoToBeginningCallback();
-  void GoToEndCallback();
-  void GoToPreviousCallback();
-  void GoToNextCallback();
-
   // Description:
   // Access from script for regression test.
   void SaveBatchScript(const char *filename);
@@ -210,11 +200,6 @@ public:
   void SaveSMState();
   void SaveSMState(const char *filename);
   
-  // Description:
-  // DEPRECATED:....TODO----to remove when the old Animation code is removed.
-  void SaveGeometryInBatchFile(ofstream *file, const char* filename,
-    int timeIdx) ;
-
   // Description:
   // Save the pipeline as a tcl script. Callback from menu.
   // Promps for a file name.
@@ -340,7 +325,6 @@ public:
   
   // Description:
   // Access to the animation interface for scripting.
-  vtkGetObjectMacro(AnimationInterface, vtkPVAnimationInterface);
   vtkGetObjectMacro(AnimationManager, vtkPVAnimationManager);
 
   // Description:
@@ -672,7 +656,6 @@ protected:
   // The animation interface. I put it in window because
   // if we ever get more that one renderer, the animation
   // will save out the window with all renderers.
-  vtkPVAnimationInterface *AnimationInterface;
   vtkPVAnimationManager* AnimationManager;
 
   // Initialization methods called from create.

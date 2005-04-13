@@ -108,17 +108,6 @@ public:
   void TimestepChangedCallback();
 
   // Description:
-  // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                         vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
-  // This method gets called when the user selects this widget to animate.
-  // It sets up the script and animation parameters.
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
-
-
-  // Description:
   // Set the current time step.
   void SetTimeStep(int ts);
 
@@ -148,11 +137,6 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
 
-  // Description:
-  // Resets the animation entries (start and end) to values obtained
-  // from the range domain
-  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai);
- 
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();

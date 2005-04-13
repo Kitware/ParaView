@@ -21,7 +21,6 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
@@ -33,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.13");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.13.2.1");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -195,86 +194,6 @@ void vtkPVThumbWheel::SaveInBatchScript(ofstream *file)
   
   *file << "  [$pvTemp" << sourceID << " GetProperty "
         << this->SMPropertyName << "] SetElement 0 $value" << endl;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVThumbWheel::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                vtkPVAnimationInterfaceEntry *ai)
-{
-  char methodAndArgs[500];
-
-  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-  menu->AddCommand(this->Label->GetText(), this, methodAndArgs, 0,"");
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVThumbWheel::ResetAnimationRange(vtkPVAnimationInterfaceEntry *ai)
-{
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMDomain *rangeDomain = prop->GetDomain("range");
-  
-  if (rangeDomain)
-    {
-    vtkSMDoubleRangeDomain *drd =
-      vtkSMDoubleRangeDomain::SafeDownCast(rangeDomain);
-    vtkSMIntRangeDomain *ird =
-      vtkSMIntRangeDomain::SafeDownCast(rangeDomain);
-    int minExists = 0;
-    if (drd)
-      {
-      double min = drd->GetMinimum(0, minExists);
-      if (minExists)
-        {
-        ai->SetTimeStart(min);
-        ai->SetTimeEnd(min);
-        }
-      }
-    else if (ird)
-      {
-      int min = ird->GetMinimum(0, minExists);
-      if (minExists)
-        {
-        ai->SetTimeStart(min);
-        ai->SetTimeEnd(min);
-        }
-      }
-    }
-  else
-    {
-    vtkErrorMacro("Could not find required domain (range)");
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
-{
-  if (ai->InitializeTrace(NULL))
-    {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
-                        this->GetTclName(), ai->GetTclName());
-    }
-  
-  this->Superclass::AnimationMenuCallback(ai);
-
-  ai->SetLabelAndScript(this->Label->GetText(), NULL, this->GetTraceName());
-
-  char methodAndArgs[500];
-  
-  sprintf(methodAndArgs, "ResetAnimationRange %s", ai->GetTclName());
-  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
-  ai->SetResetRangeButtonState(1);
-  ai->UpdateEnableState();
-
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMDomain *rangeDomain = prop->GetDomain("range");
-  
-  ai->SetCurrentSMProperty(prop);
-  ai->SetCurrentSMDomain(rangeDomain);
-  ai->SetAnimationElement(0);
-
-  this->ResetAnimationRange(ai);
-
-  ai->Update();
 }
 
 //-----------------------------------------------------------------------------

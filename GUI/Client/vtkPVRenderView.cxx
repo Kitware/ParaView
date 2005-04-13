@@ -50,13 +50,11 @@
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCameraControl.h"
 #include "vtkPVCameraIcon.h"
-#include "vtkPVCompositeRenderModule.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkSMPart.h"
-#include "vtkSMPartDisplay.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModuleUI.h"
 #include "vtkPVRenderView.h"
@@ -130,7 +128,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.357.2.5");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.357.2.6");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -996,7 +994,6 @@ void vtkPVRenderView::CreateViewProperties()
   char* rmuiClassName;
   const char* rmname = this->GetPVApplication()->GetRenderModuleProxy()
     ->GetXMLName();
-//  const char* rmname = "CompositeRenderModule";
   rmuiClassName = new char[strlen(rmname) + 20];
   sprintf(rmuiClassName, "vtkPV%sUI", rmname);
   vtkObject* rmui = vtkInstantiator::CreateInstance(rmuiClassName);

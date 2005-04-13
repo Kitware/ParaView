@@ -51,7 +51,7 @@
 #include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMPartDisplay.h"
+#include "vtkSMSimpleDisplayProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -74,7 +74,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.22.2.2");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.22.2.3");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -571,9 +571,6 @@ void vtkPVAnimationScene::SaveGeometry(const char* filename)
   svp->SetElement(0,filename);
   animWriter->UpdateVTKObjects();
 
-//  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-//    animWriter->GetProperty("Input"));
-  
   vtkPVSourceCollection* sources = this->Window->GetSourceList("Sources");
   sources->InitTraversal();
   vtkPVSource* source;
@@ -581,14 +578,8 @@ void vtkPVAnimationScene::SaveGeometry(const char* filename)
     {
     if (source->GetVisibility())
       {
-//      pp->RemoveAllProxies();
-//      pp->AddProxy(source->GetPartDisplay());
-//      animWriter->UpdateVTKObjects();
-        //TODO: Since vtkSMPartDisplay is does not belong to any group,
-        //we have a little difficulty is using the property interface.
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-        animWriter->AddInput(source->GetPartDisplay());
-#endif
+      vtkSMSimpleDisplayProxy::SafeDownCast(source->GetDisplayProxy())
+        ->SetInputAsGeometryFilter(animWriter);
       }
     }
 

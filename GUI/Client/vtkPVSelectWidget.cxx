@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.65");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.65.2.1");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -576,16 +576,6 @@ int vtkPVSelectWidget::FindIndex(const char* str, vtkStringList *list)
    
   vtkErrorMacro("Could not find value " << str);
   return -1;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVSelectWidget::AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai)
-{
-  vtkPVWidget* pv = this->GetPVWidget(this->GetCurrentValue());
-  if ( pv )
-    {
-    pv->AddAnimationScriptsToMenu(menu, ai);
-    }
 }
 
 //-----------------------------------------------------------------------------

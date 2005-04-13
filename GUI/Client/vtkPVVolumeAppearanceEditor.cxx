@@ -22,7 +22,6 @@
 #include "vtkPVSource.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkKWScale.h"
-#include "vtkSMPartDisplay.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPiecewiseFunction.h"
@@ -40,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.27.2.3");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.27.2.4");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -357,7 +356,7 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
 
   this->VolumePropertyWidget->SetDataInformation(dataInfo);
   this->VolumePropertyWidget->SetArrayName(this->ArrayInfo->GetName());
-  if (this->PVSource->GetDisplayProxy()->cmGetScalarMode() == 
+  if (this->PVSource->GetDisplayProxy()->GetScalarModeCM() == 
     vtkSMDisplayProxy::POINT_FIELD_DATA)
     {
     this->VolumePropertyWidget->SetScalarModeToUsePointFieldData();

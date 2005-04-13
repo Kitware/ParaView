@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.16.2.3");
+vtkCxxRevisionMacro(vtkPVPick, "1.16.2.4");
 
 
 //----------------------------------------------------------------------------
@@ -83,12 +83,13 @@ void vtkPVPick::SetVisibilityNoTrace(int val)
 {
   if (this->PickLabelDisplayProxy)
     {
-    this->PickLabelDisplayProxy->cmSetVisibility(val);
+    this->PickLabelDisplayProxy->SetVisibilityCM(val);
     }
   this->Superclass::SetVisibilityNoTrace(val);
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVPick::SaveInBatchScript(ofstream *file)
 {
   this->Superclass::SaveInBatchScript(file);
@@ -163,7 +164,7 @@ void vtkPVPick::AcceptCallbackInternal()
       }
     ip->RemoveAllProxies();
     ip->AddProxy(this->GetProxy());
-    this->PickLabelDisplayProxy->cmSetVisibility(0);
+    this->PickLabelDisplayProxy->SetVisibilityCM(0);
     this->PickLabelDisplayProxy->UpdateVTKObjects();
 
     // Add to render module.
@@ -172,7 +173,7 @@ void vtkPVPick::AcceptCallbackInternal()
     
   // We need to update manually for the case we are probing one point.
   this->PickLabelDisplayProxy->Update();
-  this->PickLabelDisplayProxy->cmSetVisibility(1);
+  this->PickLabelDisplayProxy->SetVisibilityCM(1);
   this->Notebook->GetDisplayGUI()->DrawWireframe();
   this->Notebook->GetDisplayGUI()->ColorByProperty();
   this->Notebook->GetDisplayGUI()->ChangeActorColor(0.8, 0.0, 0.2);

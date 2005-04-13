@@ -81,19 +81,6 @@ public:
   vtkGetStringMacro(ScriptValue);
 
   // Description:
-  // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
-  // Called when menu item (above) is selected.  Neede for tracing.
-  // Would not be necessary if menus traced invocations.
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, int idx);
-  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
-    {
-      this->AnimationMenuCallback(ai, 0);
-    }
-
-  // Description:
   // This is the data type the vtk object is expecting.
   vtkSetMacro(DataType, int); 
   vtkGetMacro(DataType, int); 
@@ -152,11 +139,6 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
  
-  // Description:
-  // Resets the animation entries (start and end) to values obtained
-  // from the range domain
-  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai, int idx);
-
 protected:
   vtkPVVectorEntry();
   ~vtkPVVectorEntry();

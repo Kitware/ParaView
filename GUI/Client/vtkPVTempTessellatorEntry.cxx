@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.19");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.19.2.1");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -371,11 +371,6 @@ void vtkPVTempTessellatorEntry::PointDataSelectedCallback()
     }
 }
 
-void vtkPVTempTessellatorEntry::AddAnimationScriptsToMenu( 
-  vtkKWMenu* , vtkPVAnimationInterfaceEntry* )
-{
-}
-
 void vtkPVTempTessellatorEntry::SetLabel( const char* label )
 {
   this->Data->CriteriaFrame->SetLabelText( label );
@@ -447,12 +442,6 @@ void vtkPVTempTessellatorEntry::SetFieldCriterion( int fnum, float crit )
   d->CriterionValue->SetValue( crit );
   this->ChangeCriterionCallback();
 
-  this->ModifiedCallback();
-}
-
-void vtkPVTempTessellatorEntry::AnimationMenuCallback( vtkPVAnimationInterfaceEntry* )
-{
-  cout << "AnimationMenuCallback called." << endl;
   this->ModifiedCallback();
 }
 

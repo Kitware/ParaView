@@ -20,7 +20,7 @@
 
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMInputProperty.h"
-vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.8");
+vtkCxxRevisionMacro(vtkSMDisplayProxy, "1.1.2.9");
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy::vtkSMDisplayProxy()
 {
@@ -45,7 +45,7 @@ vtkPVGeometryInformation* vtkSMDisplayProxy::GetGeometryInformation()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetInterpolation(int flag)
+void vtkSMDisplayProxy::SetInterpolationCM(int flag)
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("Interpolation"));
@@ -59,7 +59,7 @@ void vtkSMDisplayProxy::cmSetInterpolation(int flag)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMDisplayProxy::cmGetInterpolation()
+int vtkSMDisplayProxy::GetInterpolationCM()
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("Interpolation"));
@@ -72,7 +72,7 @@ int vtkSMDisplayProxy::cmGetInterpolation()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetPointSize(double size)
+void vtkSMDisplayProxy::SetPointSizeCM(double size)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("PointSize"));
@@ -86,7 +86,7 @@ void vtkSMDisplayProxy::cmSetPointSize(double size)
 }
 
 //-----------------------------------------------------------------------------
-double vtkSMDisplayProxy::cmGetPointSize()
+double vtkSMDisplayProxy::GetPointSizeCM()
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("PointSize"));
@@ -99,7 +99,7 @@ double vtkSMDisplayProxy::cmGetPointSize()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetLineWidth(double width)
+void vtkSMDisplayProxy::SetLineWidthCM(double width)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("LineWidth"));
@@ -113,7 +113,7 @@ void vtkSMDisplayProxy::cmSetLineWidth(double width)
 }
 
 //-----------------------------------------------------------------------------
-double vtkSMDisplayProxy::cmGetLineWidth()
+double vtkSMDisplayProxy::GetLineWidthCM()
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("LineWidth"));
@@ -126,7 +126,7 @@ double vtkSMDisplayProxy::cmGetLineWidth()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetScalarMode(int mode)
+void vtkSMDisplayProxy::SetScalarModeCM(int mode)
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("ScalarMode"));
@@ -140,7 +140,7 @@ void vtkSMDisplayProxy::cmSetScalarMode(int mode)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMDisplayProxy::cmGetScalarMode()
+int vtkSMDisplayProxy::GetScalarModeCM()
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("ScalarMode"));
@@ -153,7 +153,7 @@ int vtkSMDisplayProxy::cmGetScalarMode()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetOpacity(double op)
+void vtkSMDisplayProxy::SetOpacityCM(double op)
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Opacity"));
@@ -168,7 +168,7 @@ void vtkSMDisplayProxy::cmSetOpacity(double op)
 }
 
 //-----------------------------------------------------------------------------
-double vtkSMDisplayProxy::cmGetOpacity()
+double vtkSMDisplayProxy::GetOpacityCM()
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Opacity"));
@@ -181,7 +181,7 @@ double vtkSMDisplayProxy::cmGetOpacity()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetColorMode(int mode)
+void vtkSMDisplayProxy::SetColorModeCM(int mode)
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("ColorMode"));
@@ -195,7 +195,7 @@ void vtkSMDisplayProxy::cmSetColorMode(int mode)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMDisplayProxy::cmGetColorMode()
+int vtkSMDisplayProxy::GetColorModeCM()
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("ColorMode"));
@@ -208,7 +208,7 @@ int vtkSMDisplayProxy::cmGetColorMode()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetColor(double rgb[3])
+void vtkSMDisplayProxy::SetColorCM(double rgb[3])
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Color"));
@@ -222,7 +222,7 @@ void vtkSMDisplayProxy::cmSetColor(double rgb[3])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmGetColor(double rgb[3])
+void vtkSMDisplayProxy::GetColorCM(double rgb[3])
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Color"));
@@ -237,7 +237,7 @@ void vtkSMDisplayProxy::cmGetColor(double rgb[3])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetInterpolateScalarsBeforeMapping(int flag)
+void vtkSMDisplayProxy::SetInterpolateScalarsBeforeMappingCM(int flag)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("InterpolateScalarsBeforeMapping"));
@@ -251,7 +251,7 @@ void vtkSMDisplayProxy::cmSetInterpolateScalarsBeforeMapping(int flag)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMDisplayProxy::cmGetInterpolateScalarsBeforeMapping()
+int vtkSMDisplayProxy::GetInterpolateScalarsBeforeMappingCM()
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("InterpolateScalarsBeforeMapping"));
@@ -264,7 +264,7 @@ int vtkSMDisplayProxy::cmGetInterpolateScalarsBeforeMapping()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetScalarVisibility(int v)
+void vtkSMDisplayProxy::SetScalarVisibilityCM(int v)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("ScalarVisibility"));
@@ -278,7 +278,7 @@ void vtkSMDisplayProxy::cmSetScalarVisibility(int v)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMDisplayProxy::cmGetScalarVisibility()
+int vtkSMDisplayProxy::GetScalarVisibilityCM()
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("ScalarVisibility"));
@@ -291,7 +291,7 @@ int vtkSMDisplayProxy::cmGetScalarVisibility()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetPosition(double pos[3])
+void vtkSMDisplayProxy::SetPositionCM(double pos[3])
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Position"));
@@ -305,7 +305,7 @@ void vtkSMDisplayProxy::cmSetPosition(double pos[3])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmGetPosition(double pos[3])
+void vtkSMDisplayProxy::GetPositionCM(double pos[3])
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Position"));
@@ -319,7 +319,7 @@ void vtkSMDisplayProxy::cmGetPosition(double pos[3])
   pos[2] = dvp->GetElement(2);
 }
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmGetScale(double pos[3])
+void vtkSMDisplayProxy::GetScaleCM(double pos[3])
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Scale"));
@@ -334,7 +334,7 @@ void vtkSMDisplayProxy::cmGetScale(double pos[3])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetScale(double pos[3])
+void vtkSMDisplayProxy::SetScaleCM(double pos[3])
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Scale"));
@@ -348,7 +348,7 @@ void vtkSMDisplayProxy::cmSetScale(double pos[3])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmGetOrientation(double pos[3])
+void vtkSMDisplayProxy::GetOrientationCM(double pos[3])
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Orientation"));
@@ -363,7 +363,7 @@ void vtkSMDisplayProxy::cmGetOrientation(double pos[3])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetOrientation(double pos[3])
+void vtkSMDisplayProxy::SetOrientationCM(double pos[3])
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Orientation"));
@@ -377,7 +377,7 @@ void vtkSMDisplayProxy::cmSetOrientation(double pos[3])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmGetOrigin(double pos[3])
+void vtkSMDisplayProxy::GetOriginCM(double pos[3])
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Origin"));
@@ -392,7 +392,7 @@ void vtkSMDisplayProxy::cmGetOrigin(double pos[3])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetOrigin(double pos[3])
+void vtkSMDisplayProxy::SetOriginCM(double pos[3])
 {
   vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
     this->GetProperty("Origin"));
@@ -406,7 +406,7 @@ void vtkSMDisplayProxy::cmSetOrigin(double pos[3])
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetRepresentation(int r)
+void vtkSMDisplayProxy::SetRepresentationCM(int r)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("Representation"));
@@ -420,7 +420,7 @@ void vtkSMDisplayProxy::cmSetRepresentation(int r)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMDisplayProxy::cmGetRepresentation()
+int vtkSMDisplayProxy::GetRepresentationCM()
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("Representation"));
@@ -433,7 +433,7 @@ int vtkSMDisplayProxy::cmGetRepresentation()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetVisibility(int v)
+void vtkSMDisplayProxy::SetVisibilityCM(int v)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("Visibility"));
@@ -447,7 +447,7 @@ void vtkSMDisplayProxy::cmSetVisibility(int v)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMDisplayProxy::cmGetVisibility()
+int vtkSMDisplayProxy::GetVisibilityCM()
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("Visibility"));
@@ -460,7 +460,7 @@ int vtkSMDisplayProxy::cmGetVisibility()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetScalarArray(const char* arrayname)
+void vtkSMDisplayProxy::SetScalarArrayCM(const char* arrayname)
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetProperty("SelectScalarArray"));
@@ -475,7 +475,7 @@ void vtkSMDisplayProxy::cmSetScalarArray(const char* arrayname)
 }
 
 //-----------------------------------------------------------------------------
-const char* vtkSMDisplayProxy::cmGetScalarArray()
+const char* vtkSMDisplayProxy::GetScalarArrayCM()
 {
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetProperty("SelectScalarArray"));
@@ -488,7 +488,7 @@ const char* vtkSMDisplayProxy::cmGetScalarArray()
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMDisplayProxy::cmSetImmediateModeRendering(int i)
+void vtkSMDisplayProxy::SetImmediateModeRenderingCM(int i)
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("ImmediateModeRendering"));
@@ -502,7 +502,7 @@ void vtkSMDisplayProxy::cmSetImmediateModeRendering(int i)
 }
 
 //-----------------------------------------------------------------------------
-int vtkSMDisplayProxy::cmGetImmediateModeRendering()
+int vtkSMDisplayProxy::GetImmediateModeRenderingCM()
 {
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetProperty("ImmediateModeRendering"));

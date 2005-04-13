@@ -50,8 +50,8 @@ public:
   
   // Description:
   // Convenience method to get/set the Interpolation for this proxy.
-  int cmGetInterpolation();
-  void cmSetInterpolation(int interpolation);
+  int GetInterpolationCM();
+  void SetInterpolationCM(int interpolation);
   
   //BTX
   enum {POINTS=0, WIREFRAME, SURFACE,  OUTLINE, VOLUME};
@@ -61,109 +61,109 @@ public:
   
   // Description:
   // Convenience method to get/set Point Size.
-  void cmSetPointSize(double size);
-  double cmGetPointSize();
+  void SetPointSizeCM(double size);
+  double GetPointSizeCM();
 
   // Description:
   // Convenience method to get/set Line Width.
-  void cmSetLineWidth(double width);
-  double cmGetLineWidth();
+  void SetLineWidthCM(double width);
+  double GetLineWidthCM();
 
   // Description:
   // Convenience method to get/set Scalar Mode.
-  void cmSetScalarMode(int  mode);
-  int cmGetScalarMode();
+  void SetScalarModeCM(int  mode);
+  int GetScalarModeCM();
 
   // Description:
   // Convenience method to get/set ScalarArray (Volume Mapper).
-  void cmSetScalarArray(const char* arrayname);
-  const char* cmGetScalarArray();
+  void SetScalarArrayCM(const char* arrayname);
+  const char* GetScalarArrayCM();
   
   // Description:
   // Convenience method to get/set Opacity.
-  void cmSetOpacity(double op);
-  double cmGetOpacity();
+  void SetOpacityCM(double op);
+  double GetOpacityCM();
 
   // Description:
   // Convenience method to get/set ColorMode.
-  void cmSetColorMode(int mode);
-  int cmGetColorMode();
+  void SetColorModeCM(int mode);
+  int GetColorModeCM();
 
   // Description:
   // Convenience method to get/set Actor color.
-  void cmSetColor(double rgb[3]);
-  void cmGetColor(double rgb[3]);
-  void cmSetColor(double r, double g, double b)
+  void SetColorCM(double rgb[3]);
+  void GetColorCM(double rgb[3]);
+  void SetColorCM(double r, double g, double b)
     { 
     double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
-    this->cmSetColor(rgb);
+    this->SetColorCM(rgb);
     }
     
     
   // Description:
   // Convenience method to get/set InterpolateColorsBeforeMapping property.
-  void cmSetInterpolateScalarsBeforeMapping(int flag);
-  int cmGetInterpolateScalarsBeforeMapping();
+  void SetInterpolateScalarsBeforeMappingCM(int flag);
+  int GetInterpolateScalarsBeforeMappingCM();
 
   // Description:
   // Convenience method to get/set ScalarVisibility property.
-  void cmSetScalarVisibility(int);
-  int cmGetScalarVisibility();
+  void SetScalarVisibilityCM(int);
+  int GetScalarVisibilityCM();
 
   // Description:
   // Convenience method to get/set Position property.
-  void cmSetPosition(double pos[3]);
-  void cmGetPosition(double pos[3]);
-  void cmSetPosition(double r, double g, double b)
+  void SetPositionCM(double pos[3]);
+  void GetPositionCM(double pos[3]);
+  void SetPositionCM(double r, double g, double b)
     { 
     double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
-    this->cmSetPosition(rgb);
+    this->SetPositionCM(rgb);
     }
 
   // Description:
   // Convenience method to get/set Scale property.
-  void cmSetScale(double scale[3]);
-  void cmGetScale(double scale[3]);
-  void cmSetScale(double r, double g, double b)
+  void SetScaleCM(double scale[3]);
+  void GetScaleCM(double scale[3]);
+  void SetScaleCM(double r, double g, double b)
     { 
     double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
-    this->cmSetScale(rgb);
+    this->SetScaleCM(rgb);
     } 
    
   // Description:
   // Convenience method to get/set Orientation property.
-  void cmSetOrientation(double orientation[3]);
-  void cmGetOrientation(double orientation[3]);
-  void cmSetOrientation(double r, double g, double b)
+  void SetOrientationCM(double orientation[3]);
+  void GetOrientationCM(double orientation[3]);
+  void SetOrientationCM(double r, double g, double b)
     { 
     double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
-    this->cmSetOrientation(rgb);
+    this->SetOrientationCM(rgb);
     }
 
   // Description
   // Convenience method to get/set Origin property.
-  void cmGetOrigin(double origin[3]);
-  void cmSetOrigin(double origin[3]);
-  void cmSetOrigin(double r, double g, double b)
+  void GetOriginCM(double origin[3]);
+  void SetOriginCM(double origin[3]);
+  void SetOriginCM(double r, double g, double b)
     { 
     double rgb[3]; rgb[0] = r; rgb[1] = g; rgb[2] =b;
-    this->cmSetOrigin(rgb);
+    this->SetOriginCM(rgb);
     }
 
   // Description:
   // Convenience method to get/set Visibility property.
-  void cmSetVisibility(int v);
-  int cmGetVisibility();
+  void SetVisibilityCM(int v);
+  int GetVisibilityCM();
 
   // Description:
   // Convenience method to get/set Representation.
-  void cmSetRepresentation(int r);
-  int cmGetRepresentation();
+  void SetRepresentationCM(int r);
+  int GetRepresentationCM();
 
   // Description:
   // Convenience method to get/set ImmediateModeRendering property.
-  void cmSetImmediateModeRendering(int f);
-  int cmGetImmediateModeRendering();
+  void SetImmediateModeRenderingCM(int f);
+  int GetImmediateModeRenderingCM();
  
   // Description:
   // Save the display in batch script. This will eventually get 

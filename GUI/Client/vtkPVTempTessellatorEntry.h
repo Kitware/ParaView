@@ -85,15 +85,6 @@ public:
   // field.
   virtual void PointDataSelectedCallback();
 
-  // Description:
-  // Add a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu( vtkKWMenu* menu, vtkPVAnimationInterfaceEntry* ai );
-
-  // Description:
-  // A function called whenever a user decides to animate tessellation criteria
-  // with our animation script.
-  void AnimationMenuCallback( vtkPVAnimationInterfaceEntry* ai );
-
   //BTX
   // Description:
   // Called when Accept is pressed

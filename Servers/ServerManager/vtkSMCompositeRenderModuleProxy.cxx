@@ -26,7 +26,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.1.2.4");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.1.2.5");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -178,7 +178,7 @@ void vtkSMCompositeRenderModuleProxy::StillRender()
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkSMCompositeDisplayProxy::SafeDownCast(object);
-    if (pDisp && this->GetDisplayVisibility(pDisp))
+    if (pDisp && pDisp->GetVisibilityCM())
       {
       this->SetCollectionDecision(pDisp, this->LocalRender);
       }
@@ -224,7 +224,7 @@ void vtkSMCompositeRenderModuleProxy::InteractiveRender()
   while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkSMCompositeDisplayProxy::SafeDownCast(object);
-    if (pDisp && this->GetDisplayVisibility(pDisp))
+    if (pDisp && pDisp->GetVisibilityCM())
       {
       // TODO: should the two decision be kept independent.
       // Why con't combine them using Shared properties and simplify

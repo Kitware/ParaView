@@ -85,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.8");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.9");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1004,8 +1004,8 @@ void vtkPVDisplayGUI::ShowVolumeAppearanceEditor()
     return;
     }
 
-  const char* arrayname = source->GetDisplayProxy()->cmGetScalarArray();
-  int colorField = source->GetDisplayProxy()->cmGetScalarMode();
+  const char* arrayname = source->GetDisplayProxy()->GetScalarArrayCM();
+  int colorField = source->GetDisplayProxy()->GetScalarModeCM();
   
   if (arrayname)
     {
@@ -1073,7 +1073,7 @@ void vtkPVDisplayGUI::UpdateInternal()
   this->UpdateColorGUI();
     
   // Representation menu.
-  switch(pDisp->cmGetRepresentation())
+  switch(pDisp->GetRepresentationCM())
     {
   case vtkSMDisplayProxy::OUTLINE:
     this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
@@ -1095,7 +1095,7 @@ void vtkPVDisplayGUI::UpdateInternal()
     }
 
   // Interpolation menu.
-  switch (pDisp->cmGetInterpolation())
+  switch (pDisp->GetInterpolationCM())
     {
   case vtkSMDisplayProxy::FLAT:
     this->InterpolationMenu->SetValue("Flat");
@@ -1106,9 +1106,9 @@ void vtkPVDisplayGUI::UpdateInternal()
   default:
     vtkErrorMacro("Unknown representation.");
     }
-  this->PointSizeThumbWheel->SetValue(pDisp->cmGetPointSize());
-  this->PointSizeThumbWheel->SetValue(pDisp->cmGetLineWidth());
-  this->OpacityScale->SetValue(pDisp->cmGetOpacity());
+  this->PointSizeThumbWheel->SetValue(pDisp->GetPointSizeCM());
+  this->PointSizeThumbWheel->SetValue(pDisp->GetLineWidthCM());
+  this->OpacityScale->SetValue(pDisp->GetOpacityCM());
 
   // Update actor control resolutions
   this->UpdateActorControl();
@@ -1170,7 +1170,7 @@ void vtkPVDisplayGUI::UpdateScalarBarVisibilityCheck()
     this->ScalarBarCheckVisible = 0;
     }
   else if (this->MapScalarsCheckVisible && 
-    !this->PVSource->GetDisplayProxy()->cmGetColorMode())
+    !this->PVSource->GetDisplayProxy()->GetColorModeCM())
     {
     this->ScalarBarCheckVisible = 0;
     }
@@ -1206,7 +1206,7 @@ void vtkPVDisplayGUI::UpdateColorMenu()
 
   if (colorMap)
     {
-    colorField = this->PVSource->GetDisplayProxy()->cmGetScalarMode();
+    colorField = this->PVSource->GetDisplayProxy()->GetScalarModeCM();
     }
   dataInfo = this->PVSource->GetDataInformation();
     
@@ -1229,7 +1229,7 @@ void vtkPVDisplayGUI::UpdateColorMenu()
       colorMap = this->PVSource->GetPVColorMap();
       if (colorMap)
         {
-        colorField = this->PVSource->GetDisplayProxy()->cmGetScalarMode();
+        colorField = this->PVSource->GetDisplayProxy()->GetScalarModeCM();
         }
       else
         {
@@ -1272,7 +1272,7 @@ void vtkPVDisplayGUI::UpdateColorMenu()
 void vtkPVDisplayGUI::UpdateColorButton()
 {
   double rgb[3];
-  this->PVSource->GetDisplayProxy()->cmGetColor(rgb);
+  this->PVSource->GetDisplayProxy()->GetColorCM(rgb);
   this->ColorButton->SetColor(rgb[0], rgb[1], rgb[2]);
   
   // We could look at the color menu's value too.
@@ -1292,7 +1292,7 @@ void vtkPVDisplayGUI::UpdateEditColorMapButton()
     this->EditColorMapButtonVisible = 0;
     }
   else if (this->MapScalarsCheckVisible && 
-    !this->PVSource->GetDisplayProxy()->cmGetColorMode())
+    !this->PVSource->GetDisplayProxy()->GetColorModeCM())
     {
     this->EditColorMapButtonVisible = 0;
     }
@@ -1307,9 +1307,9 @@ void vtkPVDisplayGUI::UpdateEditColorMapButton()
 void vtkPVDisplayGUI::UpdateInterpolateColorsCheck()
 {
   if (this->PVSource->GetPVColorMap() == 0 ||
-    (!this->PVSource->GetDisplayProxy()->cmGetInterpolateScalarsBeforeMapping() && 
+    (!this->PVSource->GetDisplayProxy()->GetInterpolateScalarsBeforeMappingCM() && 
      this->MapScalarsCheckVisible) ||
-    this->PVSource->GetDisplayProxy()->cmGetScalarMode() 
+    this->PVSource->GetDisplayProxy()->GetScalarModeCM() 
     == vtkDataSet::CELL_DATA_FIELD)
     {
     this->InterpolateColorsCheckVisible = 0;
@@ -1319,7 +1319,7 @@ void vtkPVDisplayGUI::UpdateInterpolateColorsCheck()
     {
     this->InterpolateColorsCheckVisible = 1;
     this->InterpolateColorsCheck->SetState(
-      !this->PVSource->GetDisplayProxy()->cmGetInterpolateScalarsBeforeMapping());
+      !this->PVSource->GetDisplayProxy()->GetInterpolateScalarsBeforeMappingCM());
     }
   this->UpdateEnableState();
 }
@@ -1356,7 +1356,7 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
   p->Modified();
 */
   this->VolumeRenderMode = 
-    (pDisp->cmGetRepresentation() == vtkSMDisplayProxy::VOLUME)? 1 : 0;
+    (pDisp->GetRepresentationCM() == vtkSMDisplayProxy::VOLUME)? 1 : 0;
   this->VolumeScalarSelectionWidget->SetPVSource(this->PVSource);
   this->VolumeScalarSelectionWidget->SetColorSelectionCommand(
     "VolumeRenderByArray");
@@ -1368,7 +1368,7 @@ void vtkPVDisplayGUI::SetActorColor(double r, double g, double b)
   this->ActorColor[0] = r;
   this->ActorColor[1] = g;
   this->ActorColor[2] = b;
-  this->PVSource->GetDisplayProxy()->cmSetColor(this->ActorColor);
+  this->PVSource->GetDisplayProxy()->SetColorCM(this->ActorColor);
 }  
 
 //----------------------------------------------------------------------------
@@ -1420,7 +1420,7 @@ void vtkPVDisplayGUI::ColorByProperty()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ColorByPropertyInternal()
 {
-//  this->PVSource->GetDisplayProxy()->cmSetScalarVisibility(0);
+//  this->PVSource->GetDisplayProxy()->SetScalarVisibilityCM(0);
   // NOTE: don't ever directly set the Scalar Visibility on the part display.
   // Instead use PVSource. Since, we need to remove the LUT from the proxy 
   // property otherwise the batch may be incorrect.
@@ -1469,7 +1469,7 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
     // See if the array satisfies conditions necessary for direct coloring.  
     vtkPVDataInformation* dataInfo = this->PVSource->GetDataInformation();
     vtkPVDataSetAttributesInformation* attrInfo;
-    if (this->PVSource->GetDisplayProxy()->cmGetScalarMode() == vtkSMDisplayProxy::POINT_FIELD_DATA)
+    if (this->PVSource->GetDisplayProxy()->GetScalarModeCM() == vtkSMDisplayProxy::POINT_FIELD_DATA)
       {
       attrInfo = dataInfo->GetPointDataInformation();
       }
@@ -1486,11 +1486,11 @@ void vtkPVDisplayGUI::UpdateMapScalarsCheck()
         { // I would like to have two as an option also ...
         // One component causes more trouble than it is worth.
         this->MapScalarsCheckVisible = 1;
-        this->MapScalarsCheck->SetState(this->PVSource->GetDisplayProxy()->cmGetColorMode());
+        this->MapScalarsCheck->SetState(this->PVSource->GetDisplayProxy()->GetColorModeCM());
         }
       else
         { // Keep VTK from directly coloring single component arrays.
-        this->PVSource->GetDisplayProxy()->cmSetColorMode(1);
+        this->PVSource->GetDisplayProxy()->SetColorModeCM(1);
         }
       }
     }
@@ -1540,7 +1540,7 @@ void vtkPVDisplayGUI::DrawWireframe()
     }
   this->RepresentationMenu->SetValue(VTK_PV_WIREFRAME_LABEL);
   this->VolumeRenderModeOff();
-  this->PVSource->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::WIREFRAME);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::WIREFRAME);
 
   if ( this->GetPVRenderView() )
     {
@@ -1557,7 +1557,7 @@ void vtkPVDisplayGUI::DrawPoints()
     }
   this->RepresentationMenu->SetValue(VTK_PV_POINTS_LABEL);
   this->VolumeRenderModeOff();
-  this->PVSource->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::POINTS);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::POINTS);
   
   if ( this->GetPVRenderView() )
     {
@@ -1581,7 +1581,7 @@ void vtkPVDisplayGUI::DrawVolume()
     }
   this->RepresentationMenu->SetValue(VTK_PV_VOLUME_LABEL);
   this->VolumeRenderModeOn();
-  this->PVSource->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::VOLUME);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::VOLUME);
 
   if ( this->GetPVRenderView() )
     {
@@ -1601,7 +1601,7 @@ void vtkPVDisplayGUI::DrawSurface()
   
   // fixme
   // It would be better to loop over part displays from the render module.
-  this->PVSource->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::SURFACE);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::SURFACE);
 
   if ( this->GetPVRenderView() )
     {
@@ -1618,7 +1618,7 @@ void vtkPVDisplayGUI::DrawOutline()
     }
   this->RepresentationMenu->SetValue(VTK_PV_OUTLINE_LABEL);
   this->VolumeRenderModeOff();
-  this->PVSource->GetDisplayProxy()->cmSetRepresentation(vtkSMDisplayProxy::OUTLINE);
+  this->PVSource->GetDisplayProxy()->SetRepresentationCM(vtkSMDisplayProxy::OUTLINE);
 
   if ( this->GetPVRenderView() )
     {
@@ -1650,7 +1650,7 @@ void vtkPVDisplayGUI::VolumeRenderModeOff()
       pDisp->GetProperty("SelectScalarArray"));
     if (svp)
       {
-      this->ColorByArray(svp->GetElement(0), pDisp->cmGetScalarMode());
+      this->ColorByArray(svp->GetElement(0), pDisp->GetScalarModeCM());
       }
     else
       {
@@ -1686,7 +1686,7 @@ void vtkPVDisplayGUI::VolumeRenderModeOn()
         pDisp->GetProperty("ColorArray"));
       if (svp)
         {
-        this->VolumeRenderByArray(svp->GetElement(0), pDisp->cmGetScalarMode());
+        this->VolumeRenderByArray(svp->GetElement(0), pDisp->GetScalarModeCM());
         }
       else
         {
@@ -1728,7 +1728,7 @@ void vtkPVDisplayGUI::SetInterpolationToFlat()
   this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", 
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Flat");
-  this->PVSource->GetDisplayProxy()->cmSetInterpolation(vtkSMDisplayProxy::FLAT);
+  this->PVSource->GetDisplayProxy()->SetInterpolationCM(vtkSMDisplayProxy::FLAT);
 
   if ( this->GetPVRenderView() )
     {
@@ -1744,7 +1744,7 @@ void vtkPVDisplayGUI::SetInterpolationToGouraud()
                       this->GetTclName());
   this->InterpolationMenu->SetValue("Gouraud");
 
-  this->PVSource->GetDisplayProxy()->cmSetInterpolation(vtkSMDisplayProxy::GOURAND);
+  this->PVSource->GetDisplayProxy()->SetInterpolationCM(vtkSMDisplayProxy::GOURAND);
   
   if ( this->GetPVRenderView() )
     {
@@ -1940,7 +1940,7 @@ void vtkPVDisplayGUI::SetMapScalarsFlag(int val)
 
   this->UpdateEnableState();
 
-  this->PVSource->GetDisplayProxy()->cmSetColorMode(val);
+  this->PVSource->GetDisplayProxy()->SetColorModeCM(val);
   this->UpdateColorGUI();
 }
 
@@ -1963,7 +1963,7 @@ void vtkPVDisplayGUI::SetInterpolateColorsFlag(int val)
     this->InterpolateColorsCheck->SetState(val);
     }
 
-  this->PVSource->GetDisplayProxy()->cmSetInterpolateScalarsBeforeMapping(!val);
+  this->PVSource->GetDisplayProxy()->SetInterpolateScalarsBeforeMappingCM(!val);
 }
 
 //----------------------------------------------------------------------------
@@ -1985,7 +1985,7 @@ void vtkPVDisplayGUI::SetPointSize(int size)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangePointSize()
 {
-  this->PVSource->GetDisplayProxy()->cmSetPointSize(
+  this->PVSource->GetDisplayProxy()->SetPointSizeCM(
     this->PointSizeThumbWheel->GetValue());
  
   if ( this->GetPVRenderView() )
@@ -2021,7 +2021,7 @@ void vtkPVDisplayGUI::SetLineWidth(int width)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ChangeLineWidth()
 {
-  this->PVSource->GetDisplayProxy()->cmSetLineWidth(
+  this->PVSource->GetDisplayProxy()->SetLineWidthCM(
     this->LineWidthThumbWheel->GetValue());
 
   if ( this->GetPVRenderView() )
@@ -2071,7 +2071,7 @@ void vtkPVDisplayGUI::SetOpacity(float val)
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::OpacityChangedCallback()
 {
-  this->PVSource->GetDisplayProxy()->cmSetOpacity(this->OpacityScale->GetValue());
+  this->PVSource->GetDisplayProxy()->SetOpacityCM(this->OpacityScale->GetValue());
 
   if ( this->GetPVRenderView() )
     {
@@ -2093,7 +2093,7 @@ void vtkPVDisplayGUI::GetActorTranslate(double* point)
   vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
   if (pDisp)
     {
-    pDisp->cmGetPosition(point);
+    pDisp->GetPositionCM(point);
     }
   else
     {
@@ -2111,7 +2111,7 @@ void vtkPVDisplayGUI::SetActorTranslateNoTrace(double x, double y, double z)
   this->TranslateThumbWheel[2]->SetValue(z);
   double pos[3];
   pos[0] = x; pos[1] = y; pos[2] = z;
-  this->PVSource->GetDisplayProxy()->cmSetPosition(pos);
+  this->PVSource->GetDisplayProxy()->SetPositionCM(pos);
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
 }
@@ -2162,14 +2162,10 @@ void vtkPVDisplayGUI::ActorTranslateEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorScale(double* point)
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
-#else
-  vtkSMPartDisplay* pDisp = this->PVSource->GetPartDisplay();
-#endif
   if (pDisp)
     {
-    pDisp->cmGetScale(point);
+    pDisp->GetScaleCM(point);
     }
   else
     {
@@ -2185,14 +2181,9 @@ void vtkPVDisplayGUI::SetActorScaleNoTrace(double x, double y, double z)
   this->ScaleThumbWheel[0]->SetValue(x);
   this->ScaleThumbWheel[1]->SetValue(y);
   this->ScaleThumbWheel[2]->SetValue(z);
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   double scale[3];
   scale[0] = x; scale[1] = y; scale[2] = z;
-  this->PVSource->GetDisplayProxy()->cmSetScale(scale);
-#else
-  this->PVSource->GetPartDisplay()->SetScale(x, y, z);
-#endif
-
+  this->PVSource->GetDisplayProxy()->SetScaleCM(scale);
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
 }
@@ -2243,14 +2234,10 @@ void vtkPVDisplayGUI::ActorScaleEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorOrientation(double* point)
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
-#else
-  vtkSMPartDisplay* pDisp = this->PVSource->GetPartDisplay();
-#endif
   if (pDisp)
     {
-    pDisp->cmGetOrientation(point);
+    pDisp->GetOrientationCM(point);
     }
   else
     {
@@ -2266,14 +2253,9 @@ void vtkPVDisplayGUI::SetActorOrientationNoTrace(double x, double y, double z)
   this->OrientationScale[0]->SetValue(x);
   this->OrientationScale[1]->SetValue(y);
   this->OrientationScale[2]->SetValue(z);
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   double orient[3];
   orient[0] = x; orient[1] = y; orient[2] = z;
-  this->PVSource->GetDisplayProxy()->cmSetOrientation(orient);
-#else
-  this->PVSource->GetPartDisplay()->SetOrientation(x, y, z);
-#endif
-
+  this->PVSource->GetDisplayProxy()->SetOrientationCM(orient);
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
 }
@@ -2324,17 +2306,10 @@ void vtkPVDisplayGUI::ActorOrientationEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::GetActorOrigin(double* point)
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   if (this->PVSource->GetDisplayProxy())
     {
-    this->PVSource->GetDisplayProxy()->cmGetOrigin(point);
+    this->PVSource->GetDisplayProxy()->GetOriginCM(point);
     }
-#else
-  if (this->PVSource->GetPartDisplay())
-    {
-    this->PVSource->GetPartDisplay()->GetOrigin(point);
-    }
-#endif
   else
     {
     point[0] = this->OriginThumbWheel[0]->GetValue();
@@ -2349,13 +2324,9 @@ void vtkPVDisplayGUI::SetActorOriginNoTrace(double x, double y, double z)
   this->OriginThumbWheel[0]->SetValue(x);
   this->OriginThumbWheel[1]->SetValue(y);
   this->OriginThumbWheel[2]->SetValue(z);
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   double origin[3];
   origin[0] = x; origin[1] = y; origin[2] = z;
-  this->PVSource->GetDisplayProxy()->cmSetOrigin(origin);
-#else
-  this->PVSource->GetPartDisplay()->SetOrigin(x, y, z);
-#endif
+  this->PVSource->GetDisplayProxy()->SetOriginCM(origin);
 
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
@@ -2412,18 +2383,11 @@ void vtkPVDisplayGUI::UpdateActorControl()
   double scale[3];
   double origin[3];
   double orientation[3];
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkSMDisplayProxy* pDisp = this->PVSource->GetDisplayProxy();
-  pDisp->cmGetPosition(translate);
-  pDisp->cmGetScale(scale);
-  pDisp->cmGetOrientation(orientation);
-  pDisp->cmGetOrigin(origin);
-#else
-  this->PVSource->GetPartDisplay()->GetTranslate(translate);
-  this->PVSource->GetPartDisplay()->GetScale(scale);
-  this->PVSource->GetPartDisplay()->GetOrientation(orientation);
-  this->PVSource->GetPartDisplay()->GetOrigin(origin);
-#endif
+  pDisp->GetPositionCM(translate);
+  pDisp->GetScaleCM(scale);
+  pDisp->GetOrientationCM(orientation);
+  pDisp->GetOriginCM(origin);
   for (i = 0; i < 3; i++)
     {    
     this->TranslateThumbWheel[i]->SetValue(translate[i]);

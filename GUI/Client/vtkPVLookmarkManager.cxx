@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17.2.3");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17.2.4");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -3401,22 +3401,22 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
         if(strstr(ptr,"SetColor"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->cmSetColor(xval,yval,zval);
+          display->SetColorCM(xval,yval,zval);
           }
         else if(strstr(ptr,"SetRepresentation"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          display->cmSetRepresentation(val); 
+          display->SetRepresentationCM(val); 
           }
         else if(strstr(ptr,"SetUseImmediateMode"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          display->cmSetImmediateModeRendering(val); 
+          display->SetImmediateModeRenderingCM(val); 
           }
         else if(strstr(ptr,"SetScalarVisibility"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          display->cmSetScalarVisibility(val); 
+          display->SetScalarVisibilityCM(val); 
           }
         else if(strstr(ptr,"SetDirectColorFlag"))
           {
@@ -3425,7 +3425,7 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
           // color mode is Default (=1).
           // when DirectColorFlag = 1
           // color mode is MapScalars (=0).
-          display->cmSetColorMode(!val); 
+          display->SetColorModeCM(!val); 
           }
         else if(strstr(ptr,"SetInterpolateColorsFlag"))
           {
@@ -3433,47 +3433,47 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
           // "InterpolateColorsBeforeMapping". 
           // These are opposite concepts.
           val = this->GetIntegerScalarWidgetValue(ptr);
-          display->cmSetInterpolateScalarsBeforeMapping(val); 
+          display->SetInterpolateScalarsBeforeMappingCM(val); 
           }
         else if(strstr(ptr,"SetInterpolation"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          display->cmSetInterpolation(val); 
+          display->SetInterpolationCM(val); 
           }
         else if(strstr(ptr,"SetPointSize"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          display->cmSetPointSize(val); 
+          display->SetPointSizeCM(val); 
           }
         else if(strstr(ptr,"SetLineWidth"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          display->cmSetLineWidth(val); 
+          display->SetLineWidthCM(val); 
           }
         else if(strstr(ptr,"SetOpacity"))
           {
           fval = this->GetDoubleScalarWidgetValue(ptr);
-          display->cmSetOpacity(fval); 
+          display->SetOpacityCM(fval); 
           }
         else if(strstr(ptr,"SetTranslate"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->cmSetPosition(xval,yval,zval); 
+          display->SetPositionCM(xval,yval,zval); 
           }
         else if(strstr(ptr,"SetScale"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->cmSetScale(xval,yval,zval); 
+          display->SetScaleCM(xval,yval,zval); 
           }
         else if(strstr(ptr,"SetOrigin"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->cmSetOrigin(xval,yval,zval); 
+          display->SetOriginCM(xval,yval,zval); 
           }
         else if(strstr(ptr,"SetOrientation"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->cmSetOrientation(xval,yval,zval); 
+          display->SetOrientationCM(xval,yval,zval); 
           }   
         ptr = strtok(NULL,"\r\n");
         }

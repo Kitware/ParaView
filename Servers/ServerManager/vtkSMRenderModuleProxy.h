@@ -26,6 +26,7 @@ class vtkSMDisplayProxy;
 class vtkRenderWindowInteractor;
 class vtkRenderWindow;
 class vtkRenderer;
+class vtkCamera;
 
 // TODO: have to change the PVCameraManipulators to do ResetCamera on
 // the RenderModule rather than renderer.
@@ -77,10 +78,10 @@ public:
    
   // Description:
   // Must find a way to avoid exposing this.
-  vtkRenderWindowInteractor* GetInteractor();
-  vtkRenderWindow* GetRenderWindow();
-  vtkRenderer* GetRenderer();
-  vtkRenderer* GetRenderer2D();
+  vtkGetObjectMacro(Renderer, vtkRenderer);
+  vtkGetObjectMacro(Renderer2D, vtkRenderer);
+  vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
+  vtkGetObjectMacro(Interactor, vtkRenderWindowInteractor);
 
   // Description:
   // Convenience method to set the background color.
@@ -158,7 +159,7 @@ protected:
 
   // Collection of props added to the renderer2D.
   vtkCollection* Renderer2DProps;
-  
+ 
   vtkSMProxy* RendererProxy;
   vtkSMProxy* Renderer2DProxy;
   vtkSMProxy* ActiveCameraProxy;
@@ -169,6 +170,15 @@ protected:
   vtkGetObjectMacro(Renderer2DProxy, vtkSMProxy);
   vtkGetObjectMacro(ActiveCameraProxy, vtkSMProxy);
   vtkGetObjectMacro(InteractorProxy, vtkSMProxy);
+
+  // Pointer to client side objects,
+  // for convienience.
+  vtkRenderer* Renderer2D;
+  vtkRenderer* Renderer;
+  vtkRenderWindow* RenderWindow;
+  vtkRenderWindowInteractor* Interactor;
+  vtkCamera* ActiveCamera;
+  
 
   // Description:
   // Methods called by Display proxies to add/remove the
@@ -191,9 +201,6 @@ protected:
   friend class vtkSMPointLabelDisplayProxy;
   
   //ETX
-  // Just a convienience method.
-  int GetDisplayVisibility(vtkSMDisplayProxy* pDisp);
-
   // This is the XMLName of the proxy to get created when CreateDisplayProxy
   // is called. It must be a proxy belonging to the group "displays"
   // and must be a subclass of vtkSMDisplayProxy.

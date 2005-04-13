@@ -98,14 +98,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx
   vtkSMWriterProxy.cxx
-  vtkSMDisplay.cxx
-  vtkSMPartDisplay.cxx
-  vtkSMCompositePartDisplay.cxx
-  vtkSMLODPartDisplay.cxx
-  vtkSMMultiDisplayPartDisplay.cxx
   vtkSMCubeAxesDisplayProxy.cxx
-  vtkSMPlotDisplay.cxx
-  vtkSMPointLabelDisplay.cxx
   vtkSMPointLabelDisplayProxy.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx
@@ -114,14 +107,6 @@ SET( ServerManagerCommon_SRCS
 
 SET( ServerManagerNonWrapped_SRCS
   vtkPVBatchOptions.cxx
-  vtkPVCaveRenderModule.cxx
-  vtkPVCompositeRenderModule.cxx
-  vtkPVDeskTopRenderModule.cxx
-  vtkPVIceTRenderModule.cxx
-  vtkPVMultiDisplayRenderModule.cxx
-  vtkPVLODRenderModule.cxx
-  vtkPVMPIRenderModule.cxx
-  vtkPVSimpleRenderModule.cxx
   vtkSMXMLParser.cxx
   )
 
@@ -139,7 +124,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMVectorProperty.cxx
-  vtkSMDisplay.cxx
   vtkSMRenderModuleProxy.cxx
   ABSTRACT
   )

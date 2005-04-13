@@ -83,19 +83,6 @@ public:
   // This method adds parameter with value and range to the list.
   void AddXDMFParameter(const char* pname, int value, int min, int step, int max);
 
-  // Description:
-  // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                         vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
-  // This method gets called when the user selects this widget to animate.
-  // It sets up the script and animation parameters.
-  virtual void AnimationMenuCallback(
-    vtkPVAnimationInterfaceEntry *ai, const char* name, unsigned int idx);
-  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry*) {}
-
-
   //BTX
   // Description:
   // Get the frame
@@ -114,12 +101,6 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
-  // Description:
-  // Resets the animation entries (start and end) to values obtained
-  // from the range domain
-  virtual void ResetAnimationRange(
-    vtkPVAnimationInterfaceEntry* ai, const char* name);
-
 protected:
   vtkPVXDMFParameters();
   ~vtkPVXDMFParameters();

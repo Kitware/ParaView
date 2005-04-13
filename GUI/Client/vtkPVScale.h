@@ -105,15 +105,6 @@ public:
   void Trace();
 
   // Description:
-  // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
-  // Called when menu item (above) is selected.  Neede for tracing.
-  // Would not be necessary if menus traced invocations.
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
-  
-  // Description:
   // Get/Set whether to round floating point values to integers.
   vtkSetMacro(Round, int);
   vtkGetMacro(Round, int);
@@ -145,11 +136,6 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
 
-  // Description:
-  // Resets the animation entries (start and end) to values obtained
-  // from the range domain
-  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai);
- 
 protected:
   vtkPVScale();
   ~vtkPVScale();

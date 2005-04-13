@@ -77,7 +77,7 @@ SET(PROJECT_TESTS
   TestImageDataIO
   VolumeGroup
   XdmfRead
-  TestAnimationSaveLoad
+#  TestAnimationSaveLoad
   )
 
 IF(PARAVIEW_USE_EXODUS)
@@ -256,7 +256,7 @@ SET (PROJECT_TESTS_NO_BATCH
   TestDemo
   TestPackage
   Write
-  TestAnimationSaveLoad
+#  TestAnimationSaveLoad
 #  XdmfRead
 )
 REMOVE (PROJECT_TESTS ${PROJECT_TESTS_NO_BATCH})

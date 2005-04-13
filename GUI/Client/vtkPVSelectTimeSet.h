@@ -56,18 +56,6 @@ public:
   virtual void Initialize();
 
   // Description:
-  // Adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                         vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
-  // Called whenthe animation method menu item is selected.
-  // Needed for proper tracing.
-  // It would be nice if the menu and cascade menus would trace
-  // invokation of items (?relying of enumeration of menu items or label?)
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
   // This is the labeled frame around the timeset tree.
   vtkGetObjectMacro(LabeledFrame, vtkKWFrameLabeled);
 

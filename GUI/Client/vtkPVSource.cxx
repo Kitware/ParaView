@@ -51,7 +51,6 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkRenderer.h"
-#include "vtkPVAnimationInterface.h"
 #include "vtkSMCubeAxesDisplayProxy.h"
 #include "vtkSMPointLabelDisplayProxy.h"
 #include "vtkDataSetAttributes.h"
@@ -59,7 +58,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.14");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.15");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -825,9 +824,9 @@ void vtkPVSource::SetVisibilityNoTrace(int v)
   int cubeAxesVisibility = this->GetCubeAxesVisibility();
   int pointLabelVisibility = this->GetPointLabelVisibility();
 
-  this->DisplayProxy->cmSetVisibility(v); 
-  this->CubeAxesDisplayProxy->cmSetVisibility(v && cubeAxesVisibility);
-  this->PointLabelDisplayProxy->cmSetVisibility(v && pointLabelVisibility);
+  this->DisplayProxy->SetVisibilityCM(v); 
+  this->CubeAxesDisplayProxy->SetVisibilityCM(v && cubeAxesVisibility);
+  this->PointLabelDisplayProxy->SetVisibilityCM(v && pointLabelVisibility);
 
   // Handle visibility of shared colormap.
   if (this->PVColorMap)
@@ -878,7 +877,7 @@ void vtkPVSource::SetCubeAxesVisibilityNoTrace(int val)
     return;
     }
   this->CubeAxesVisibility = val;
-  this->CubeAxesDisplayProxy->cmSetVisibility(this->GetVisibility() && val);
+  this->CubeAxesDisplayProxy->SetVisibilityCM(this->GetVisibility() && val);
   
   if (this->Notebook)
     {
@@ -909,7 +908,7 @@ void vtkPVSource::SetPointLabelVisibilityNoTrace(int val)
     return;
     }
   this->PointLabelVisibility = val;
-  this->PointLabelDisplayProxy->cmSetVisibility(this->GetVisibility() && val);
+  this->PointLabelDisplayProxy->SetVisibilityCM(this->GetVisibility() && val);
   
   if (this->Notebook)
     {
@@ -934,7 +933,7 @@ int vtkPVSource::GetVisibility()
     {
     return 0;
     }
-  return this->DisplayProxy->cmGetVisibility();
+  return this->DisplayProxy->GetVisibilityCM();
 }
 
 //----------------------------------------------------------------------------
@@ -1125,7 +1124,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       ccpp->AddProxy(this->Proxy);
       this->CubeAxesDisplayProxy->UpdateVTKObjects();
       }
-    this->CubeAxesDisplayProxy->cmSetVisibility(0);
+    this->CubeAxesDisplayProxy->SetVisibilityCM(0);
     this->AddDisplayToRenderModule(this->CubeAxesDisplayProxy);
 
     // Create the Point Label Display proxies.
@@ -1145,7 +1144,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       ccpp->AddProxy(this->Proxy);
       this->PointLabelDisplayProxy->UpdateVTKObjects();
       }
-    this->PointLabelDisplayProxy->cmSetVisibility(0);
+    this->PointLabelDisplayProxy->SetVisibilityCM(0);
     this->AddDisplayToRenderModule(this->PointLabelDisplayProxy);
 
     this->SetDisplayProxy(pDisp);
@@ -1327,8 +1326,8 @@ void vtkPVSource::SetDefaultColorParameters()
       return;
       }
     double rgb[3] = { 1, 1, 1};
-    input->GetDisplayProxy()->cmGetColor(rgb);
-    this->DisplayProxy->cmSetColor(rgb);
+    input->GetDisplayProxy()->GetColorCM(rgb);
+    this->DisplayProxy->SetColorCM(rgb);
     this->DisplayProxy->UpdateVTKObjects();
     } 
     
@@ -1373,7 +1372,7 @@ void vtkPVSource::SetDefaultColorParameters()
     int colorField = -1;
     if (colorMap)
       {
-      colorField = input->GetDisplayProxy()->cmGetScalarMode();
+      colorField = input->GetDisplayProxy()->GetScalarModeCM();
 
       // Find the array in our info.
       switch (colorField)
@@ -1627,8 +1626,6 @@ void vtkPVSource::DeleteCallback()
 
   // Do this to here to release resource (decrement use count).
   this->SetPVColorMap(0);
-
-  window->GetAnimationInterface()->DeleteSource(this);
 
   if (this->Notebook)
     { // Delete call back set the cube axes visibility 
@@ -2208,7 +2205,7 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
   // Set the color map here for simplicity.
   if (this->PVColorMap)
     {
-    if (this->DisplayProxy->cmGetScalarMode() == 
+    if (this->DisplayProxy->GetScalarModeCM() == 
       vtkSMDisplayProxy::POINT_FIELD_DATA)
       {
       *file << "[$kw(" << this->GetTclName()
@@ -2216,7 +2213,7 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
             << this->PVColorMap->GetArrayName() << "} " 
             << 3 << endl;
       }
-    if (this->DisplayProxy->cmGetScalarMode() == 
+    if (this->DisplayProxy->GetScalarModeCM() == 
       vtkSMDisplayProxy::CELL_FIELD_DATA)
       {
       *file << "[$kw(" << this->GetTclName()

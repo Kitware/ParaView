@@ -80,7 +80,6 @@ SET( ParaViewClient_SRCS
   vtkPVAdvancedReaderModule.cxx
   vtkPVTimeLine.cxx
   vtkPVAnimationScene.cxx
-  vtkPVAnimationInterface.cxx
   vtkPVAnimationCue.cxx
   vtkPVAnimationCueTree.cxx
   vtkPVKeyFrame.cxx
@@ -92,7 +91,6 @@ SET( ParaViewClient_SRCS
   vtkPVComparativeVisManager.cxx
   vtkPVHorizontalAnimationInterface.cxx
   vtkPVVerticalAnimationInterface.cxx
-  vtkPVAnimationInterfaceEntry.cxx
   vtkPVApplicationResources.cxx
   vtkPVApplicationSettingsInterface.cxx
   vtkPVArrayMenu.cxx
