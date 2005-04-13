@@ -72,9 +72,10 @@ SPCTH_EXPORT void spcth_getDataBlockDimensions(SPCTH* spcth, int block_index, in
 /*! For AMR dataset, what is the level of the particular block */
 SPCTH_EXPORT int spcth_getDataBlockLevel(SPCTH* spcth, int block_index);
 
-/*! For rectilinear grid, get spacing vectors for the particular block */
+/*! For rectilinear grid, get spacing vectors for the particular block by
+  copying pointers */
 SPCTH_EXPORT int spcth_getDataBlockVectors(SPCTH* spcth, int block_index,
-  double *vx, double *vy, double *vz);
+  double **vx, double **vy, double **vz);
 
 /*! Get bounds of a particular block */
 SPCTH_EXPORT int spcth_getDataBlockBounds(SPCTH* spcth, int block_index, double *bounds);

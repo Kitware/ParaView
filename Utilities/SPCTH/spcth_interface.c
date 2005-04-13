@@ -118,7 +118,7 @@ int spcth_getDataBlockLevel(SPCTH* spcth, int block_index) {
 
 /********************************************************************/
 int spcth_getDataBlockVectors(SPCTH* spcth, int block_index,
-  double *vx, double *vy, double *vz)
+  double **vx, double **vy, double **vz)
 {
   Structured_Block_Data *blk;
   int count=0;
@@ -133,9 +133,9 @@ int spcth_getDataBlockVectors(SPCTH* spcth, int block_index,
     {
     }
 
-  vx = blk->x;
-  vy = blk->y;
-  vz = blk->z;
+  *vx = blk->x;
+  *vy = blk->y;
+  *vz = blk->z;
 
   /* Successfully populated bounds */
   return 1;

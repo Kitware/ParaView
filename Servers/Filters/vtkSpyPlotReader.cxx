@@ -45,7 +45,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.3");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.4");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -684,22 +684,56 @@ int vtkSpyPlotReader::RequestData(
         {
         vtkRectilinearGrid *rg=vtkRectilinearGrid::New();
         rg->SetExtent(extents);
-        vtkDoubleArray *xc=vtkDoubleArray::New();
-        vtkDoubleArray *yc=vtkDoubleArray::New();
-        vtkDoubleArray *zc=vtkDoubleArray::New();
-        xc->SetNumberOfTuples(dims[0]+1);
-        yc->SetNumberOfTuples(dims[1]+1);
-        zc->SetNumberOfTuples(dims[2]+1);
-        double *vx=static_cast<double *>(xc->GetVoidPointer(0));
-        double *vy=static_cast<double *>(yc->GetVoidPointer(0));
-        double *vz=static_cast<double *>(zc->GetVoidPointer(0));
-        spcth_getDataBlockVectors(spcth,block,vx,vy,vz);
-        rg->SetXCoordinates(xc);
-        rg->SetXCoordinates(yc);
-        rg->SetXCoordinates(zc);
-        xc->Delete();
-        yc->Delete();
-        zc->Delete();
+        vtkDoubleArray *coordinates[3];
+        double *rawvector[3];
+        cc=0;
+        while(cc<3)
+          {
+          if(dims[cc]==1)
+            {
+            coordinates[cc]=0;
+            }
+          else
+            {
+            coordinates[cc]=vtkDoubleArray::New();
+            coordinates[cc]->SetNumberOfTuples(dims[cc]+1);
+            }
+          ++cc;
+          }
+        spcth_getDataBlockVectors(spcth,block,&(rawvector[0]),&(rawvector[1]),
+                                  &(rawvector[2]));
+        cc=0;
+        while(cc<3)
+          {
+          if(dims[cc]>1)
+            {
+            memcpy(coordinates[cc]->GetVoidPointer(0),rawvector[cc],
+                   (dims[cc]+1)*sizeof(double));
+            }
+          ++cc;
+          }
+       
+        if(dims[0]>1)
+          {
+          rg->SetXCoordinates(coordinates[0]);
+          }
+        if(dims[1]>1)
+          {
+          rg->SetYCoordinates(coordinates[1]);
+          }
+         if(dims[2]>1)
+           {
+          rg->SetZCoordinates(coordinates[2]);
+          }
+        cc=0;
+        while(cc<3)
+          {
+          if(dims[cc]>1)
+            {
+            coordinates[cc]->Delete();
+            }
+          ++cc;
+          }
         hb->SetDataSet(0, hb->GetNumberOfDataSets(0), rg);
         rg->Delete();
         cd = rg->GetCellData();
