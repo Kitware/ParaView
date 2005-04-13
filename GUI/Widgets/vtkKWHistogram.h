@@ -169,9 +169,9 @@ public:
   public:
     ImageDescriptor();
 
-    virtual int  IsValid() const;
-    virtual int  IsEqualTo(const ImageDescriptor *desc);
-    virtual void Copy(const ImageDescriptor *desc);
+    int  IsValid() const;
+    int  IsEqualTo(const ImageDescriptor *desc);
+    void Copy(const ImageDescriptor *desc);
 
     int          DrawBackground;
     int          DrawGrid;
@@ -185,24 +185,24 @@ public:
     int          Style;
 
     double       Range[2];
-    virtual void SetRange(double range0, double range1);
-    virtual void SetRange(double range[2]);
+    void SetRange(double range0, double range1);
+    void SetRange(double range[2]);
 
     unsigned int Width;
     unsigned int Height;
-    virtual void SetDimensions(unsigned int width, unsigned int height);
+    void SetDimensions(unsigned int width, unsigned int height);
 
     double       Color[3];
-    virtual void SetColor(double color[3]);
+    void SetColor(double color[3]);
 
     double       BackgroundColor[3];
-    virtual void SetBackgroundColor(double color[3]);
+    void SetBackgroundColor(double color[3]);
 
     double       OutOfRangeColor[3];
-    virtual void SetOutOfRangeColor(double color[3]);
+    void SetOutOfRangeColor(double color[3]);
 
     double       GridColor[3];
-    virtual void SetGridColor(double color[3]);
+    void SetGridColor(double color[3]);
 
     vtkColorTransferFunction *ColorTransferFunction;
 
