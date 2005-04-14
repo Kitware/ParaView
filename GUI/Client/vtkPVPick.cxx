@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.16.2.5");
+vtkCxxRevisionMacro(vtkPVPick, "1.16.2.6");
 
 
 //----------------------------------------------------------------------------
@@ -49,6 +49,7 @@ vtkPVPick::vtkPVPick()
   
   this->PickLabelDisplayProxy = 0; 
   this->PickLabelDisplayProxyName = 0;
+  this->PickLabelDisplayProxyInitialized = 0;
 
   this->DataFrame = vtkKWWidget::New();
   this->LabelCollection = vtkCollection::New();
@@ -145,6 +146,22 @@ void vtkPVPick::CreateProperties()
     pxm->RegisterProxy("displays", this->PickLabelDisplayProxyName,
       this->PickLabelDisplayProxy);
 
+    // The input musn;t be set until the this->Proxy() has been created
+    // i.e. after initialization, else it leads to errors.
+    }
+
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVPick::AcceptCallbackInternal()
+{
+  // call the superclass's method
+  this->Superclass::AcceptCallbackInternal();
+
+  if (!this->PickLabelDisplayProxyInitialized) // the Superclass::AcceptCallbackInternal 
+      // will initialize the source.
+    {
     // Set the input.
     vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
       this->PickLabelDisplayProxy->GetProperty("Input"));
@@ -159,16 +176,8 @@ void vtkPVPick::CreateProperties()
 
     // Add to render module.
     this->AddDisplayToRenderModule(this->PickLabelDisplayProxy);
+    this->PickLabelDisplayProxyInitialized = 1;
     }
-
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVPick::AcceptCallbackInternal()
-{
-  // call the superclass's method
-  this->Superclass::AcceptCallbackInternal();
     
   // We need to update manually for the case we are probing one point.
   this->PickLabelDisplayProxy->Update();
@@ -194,7 +203,7 @@ void vtkPVPick::UpdateGUI()
 {
   this->ClearDataLabels();
   // Get the collected data from the display.
-  if (!this->PickLabelDisplayProxy)
+  if (!this->PickLabelDisplayProxyInitialized)
     {
     return;
     }

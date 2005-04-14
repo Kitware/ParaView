@@ -66,6 +66,8 @@ protected:
   char* PickLabelDisplayProxyName;
   vtkSetStringMacro(PickLabelDisplayProxyName);
 
+  int PickLabelDisplayProxyInitialized; // flag to know if the PickLabelDisplayProxy's
+    //input has been set.
   vtkSMPointLabelDisplayProxy* PickLabelDisplayProxy;
   vtkKWWidget *DataFrame;
 
