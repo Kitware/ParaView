@@ -650,14 +650,16 @@
         name="ScalarVisibility" 
         command="SetScalarVisibility"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        animateable="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <IntVectorProperty 
         name="ColorMode" 
         command="SetColorMode"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        animateable="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Default"/>
           <Entry value="1" text="MapScalars"/>
@@ -692,7 +694,8 @@
         name="ScalarMode"
         command="SetScalarMode"
         default_values="0"
-        number_of_elements="1">
+        number_of_elements="1"
+        animateable="0">
         <EnumerationDomain name="enum">
           <Entry value="0" text="Default"/>
           <Entry value="1" text="UsePointData"/>
@@ -704,7 +707,8 @@
       <StringVectorProperty 
         name="ColorArray" 
         command="SelectColorArray" 
-        number_of_elements="1"> 
+        number_of_elements="1"
+        animateable="0"> 
         <ArrayListDomain name="array_list" attribute_type="Scalars">
           <RequiredProperties>
             <Property name="Input" function="Input"/>
@@ -776,21 +780,24 @@
         name="Visibility"
         command="SetVisibility"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        animateable="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty
         name="Position"
         command="SetPosition"
         number_of_elements="2"
-        default_values="0 0">
+        default_values="0 0"
+        animateable="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Position2"
         command="SetPosition2"
         number_of_elements="2"
-        default_values="1 1">
+        default_values="1 1"
+        animateable="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <!-- End of Actor2D -->
@@ -816,35 +823,40 @@
         name="Visibility"
         command="SetVisibility"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        animateable="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <DoubleVectorProperty
         name="Position"
         command="SetPosition"
         number_of_elements="3"
-        default_values="0 0 0">
+        default_values="0 0 0"
+        animateable="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Scale"
         command="SetScale"
         number_of_elements="3"
-        default_values="1 1 1">
+        default_values="1 1 1"
+        animateable="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Orientation"
         command="SetOrientation"
         number_of_elements="3"
-        default_values="0 0 0">
+        default_values="0 0 0"
+        animateable="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Origin"
         command="SetOrigin"
         number_of_elements="3"
-        default_values="0 0 0">
+        default_values="0 0 0"
+        animateable="0">
         <DoubleRangeDomain name="range" />
       </DoubleVectorProperty>
       <!-- End of Actor -->
@@ -916,7 +928,8 @@
         name="Italic"
         command="SetItalic"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -924,7 +937,8 @@
         name="Shadow"
         command="SetShadow"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        animateable="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
@@ -944,7 +958,8 @@
         name="InterpolationType"
         command="SetInterpolationType"
         number_of_elements="1"
-        default_values="0">
+        default_values="0"
+        animateable="0">
         <EnumerationDomain name="enum" >
           <Entry value="0" text="Nearest" />
           <Entry value="1" text="Linear" />
@@ -968,7 +983,8 @@
         name="ScalarOpacityUnitDistance"
         command="SetScalarOpacityUnitDistance"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        animateable="0">
       </DoubleVectorProperty>
     </Proxy>
 
@@ -1017,7 +1033,8 @@
         name="Color"
         command="SetColor"
         number_of_elements="3"
-        default_values="1.0 1.0 1.0">
+        default_values="1.0 1.0 1.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
@@ -1076,28 +1093,32 @@
         name="Color"
         command="SetColor"
         number_of_elements="3"
-        default_values="1 1 1">
+        default_values="1 1 1"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="Opacity"
         command="SetOpacity"
         number_of_elements="1"
-        default_values="1">
+        default_values="1"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="LineWidth"
         command="SetLineWidth"
         number_of_elements="1"
-        default_values="1.0">
+        default_values="1.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0"/>
       </DoubleVectorProperty>
       <DoubleVectorProperty
         name="PointSize"
         command="SetPointSize"
         number_of_elements="1"
-        default_values="1.0">
+        default_values="1.0"
+        animateable="0">
         <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
     <!-- End of Property2D -->
@@ -1799,7 +1820,8 @@
         command="SetRepresentation"
         update_self="1"
         number_of_elements="1"
-        default_values="2">
+        default_values="2"
+        animateable="2">
         <EnumerationDomain name="enum" >
           <Entry value="0" text="Points" />
           <Entry value="1" text="Wireframe" />
@@ -1813,7 +1835,8 @@
         command="SetVisibility"
         number_of_elements="1"
         update_self="1"
-        default_values="1">
+        default_values="1"
+        animateable="1">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
       <Property

@@ -58,7 +58,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.15");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.16");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -1095,7 +1095,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
     else
       {
-      /* TODO: I am not registering Display as animateable....
       vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
       ostrstream animName_with_warning_C4701;
       animName_with_warning_C4701 << this->GetSourceList() << "." 
@@ -1105,7 +1104,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       proxm->RegisterProxy(
         "animateable", animName_with_warning_C4701.str(), pDisp);
       delete[] animName_with_warning_C4701.str();
-      */
       }
 
     // Create the Cube Axes.
