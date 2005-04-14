@@ -62,7 +62,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.30");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.31");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -566,7 +566,7 @@ int vtkPVAnimationManager::AddStringVectorProperty(vtkPVSource* pvSource,
     {
     if (svp->GetNumberOfElements() > 1)
       {
-      vtkErrorMacro("Case not handled.");
+      vtkDebugMacro("Case not handled.");
       return 0;
       }
     this->SetupCue(pvSource, pvCueTree, proxy, svp->GetXMLName(),NULL, 
@@ -577,7 +577,7 @@ int vtkPVAnimationManager::AddStringVectorProperty(vtkPVSource* pvSource,
     {
     if (svp->GetNumberOfElements() > 1)
       {
-      vtkErrorMacro("Case not handled.");
+      vtkDebugMacro("Case not handled.");
       return 0;
       }
     this->SetupCue(pvSource, pvCueTree, proxy, svp->GetXMLName(),NULL, 
