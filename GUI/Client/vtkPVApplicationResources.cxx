@@ -484,12 +484,12 @@ void vtkPVApplication::CreateSplashScreen()
                     image_PVSplashScreen_buffer_length);
   delete [] buffer;
 
-  if (!this->SplashScreen->IsCreated())
+  if (!this->GetSplashScreen()->IsCreated())
     {
-    this->SplashScreen->Create(this, NULL);
+    this->GetSplashScreen()->Create(this, NULL);
     }
-  this->SplashScreen->SetProgressMessageVerticalOffset(-17);
-  this->SplashScreen->SetImageName("PVSplashScreen");
+  this->GetSplashScreen()->SetProgressMessageVerticalOffset(-17);
+  this->GetSplashScreen()->SetImageName("PVSplashScreen");
 }
 
 //----------------------------------------------------------------------------
@@ -497,26 +497,23 @@ void vtkPVApplication::ConfigureAbout()
 {
   this->Superclass::ConfigureAbout();
 
-  if (this->HasSplashScreen && this->SplashScreen)
+  if (!this->SaveRuntimeInfoButton)
     {
-    if (!this->SaveRuntimeInfoButton)
-      {
-      this->SaveRuntimeInfoButton = vtkKWPushButton::New();
-      }
-    if (!this->SaveRuntimeInfoButton->IsCreated())
-      {
-      this->SaveRuntimeInfoButton->SetParent(
-        this->AboutDialog->GetBottomFrame());
-      this->SaveRuntimeInfoButton->SetText("Save Information");
-      this->SaveRuntimeInfoButton->Create(this, "-width 16");
-      this->SaveRuntimeInfoButton->SetCommand(this, "SaveRuntimeInformation");
-      }
-    this->Script("pack %s -side bottom",
-                 this->SaveRuntimeInfoButton->GetWidgetName());
-    this->AboutRuntimeInfo->SetHeight(14);
-    this->AboutRuntimeInfo->GetTextWidget()->ConfigureOptions(
-      "-font {Helvetica 9}");
+    this->SaveRuntimeInfoButton = vtkKWPushButton::New();
     }
+  if (!this->SaveRuntimeInfoButton->IsCreated())
+    {
+    this->SaveRuntimeInfoButton->SetParent(
+      this->AboutDialog->GetBottomFrame());
+    this->SaveRuntimeInfoButton->SetText("Save Information");
+    this->SaveRuntimeInfoButton->Create(this, "-width 16");
+    this->SaveRuntimeInfoButton->SetCommand(this, "SaveRuntimeInformation");
+    }
+  this->Script("pack %s -side bottom",
+               this->SaveRuntimeInfoButton->GetWidgetName());
+  this->AboutRuntimeInfo->SetHeight(14);
+  this->AboutRuntimeInfo->GetTextWidget()->ConfigureOptions(
+    "-font {Helvetica 9}");
 }
 
 //----------------------------------------------------------------------------
@@ -554,11 +551,11 @@ void vtkPVApplication::SaveRuntimeInformation()
 //----------------------------------------------------------------------------
 void vtkPVApplication::AddAboutText(ostream &os)
 {
-  os << this->GetApplicationName() << " was developed by Kitware Inc." << endl
+  os << this->GetName() << " was developed by Kitware Inc." << endl
      << "http://www.paraview.org" << endl
      << "http://www.kitware.com" << endl
      << "This is version " << this->MajorVersion << "." << this->MinorVersion
-     << ", release " << this->GetApplicationReleaseName() << endl;
+     << ", release " << this->GetReleaseName() << endl;
 
   ostrstream str;
   vtkIndent indent;

@@ -43,7 +43,6 @@
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkKWUserInterfaceNotebookManager.h"
-#include "vtkKWWindowCollection.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
 #include "vtkPVAnimationInterface.h"
@@ -139,7 +138,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.681");
+vtkCxxRevisionMacro(vtkPVWindow, "1.682");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1259,7 +1258,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // Init menus
 
   int use_splash = 
-    (app->GetShowSplashScreen() && app->GetWindows()->GetNumberOfItems() == 1);
+    (app->GetShowSplashScreen() && app->GetNumberOfWindows() == 1);
   if (use_splash)
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (menus)...");

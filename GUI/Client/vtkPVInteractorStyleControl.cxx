@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.45");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -369,7 +369,8 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     // This is a hack. 
     if ( value && strlen(value) > 0 && !vectorEntry ) 
       {
-      const char* val = this->GetApplication()->EvaluateString("%s", value);
+      const char* val = 
+        this->GetApplication()->Script("eval set __foo__ %s", value);
       char *rname = kwsys::SystemTools::AppendStrings("Manipulator", name);
       this->GetApplication()->SetRegistryValue(2, "RunTime", rname, val);
       delete[] rname;

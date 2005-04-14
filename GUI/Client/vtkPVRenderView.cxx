@@ -41,7 +41,6 @@
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWSplitFrame.h"
-#include "vtkKWWindowCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
@@ -141,7 +140,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.369");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.370");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -571,7 +570,7 @@ void vtkPVRenderView::PrepareForDelete()
 
     // If it's the last win, save the size of the nav frame
 
-    if (pvapp->GetWindows()->GetNumberOfItems() <= 1 &&
+    if (pvapp->GetNumberOfWindows() <= 1 &&
         pvapp->GetSaveWindowGeometry())
       {
       pvapp->SetRegistryValue(
@@ -704,7 +703,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     this->TopLevelRenderWindow->Create(app, "toplevel", "");
     this->Script("wm title %s %s", 
                  this->TopLevelRenderWindow->GetWidgetName(),
-                 app->GetApplicationName());
+                 app->GetName());
     }
 
   // Add the -rw argument

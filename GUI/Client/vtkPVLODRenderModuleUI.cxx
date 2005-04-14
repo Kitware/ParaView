@@ -31,7 +31,6 @@
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWSplitFrame.h"
-#include "vtkKWWindowCollection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -61,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.23");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.24");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

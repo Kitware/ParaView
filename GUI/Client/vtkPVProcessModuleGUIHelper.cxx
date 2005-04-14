@@ -23,7 +23,7 @@
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.13");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.14");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -49,11 +49,6 @@ int vtkPVProcessModuleGUIHelper::RunGUIStart(int argc, char **argv, int numServe
   // Initialize Tcl/Tk.
   Tcl_Interp *interp;
   vtkPVOptions* options = this->ProcessModule->GetOptions();
-  if (options->GetRenderServerMode() && !options->GetClientMode() ||
-    options->GetServerMode() || myId > 0)
-    { // DO not initialize Tk.
-    vtkKWApplication::SetWidgetVisibility(0);
-    }
 
   int retVal = 0;
   int new_argc = 0;
