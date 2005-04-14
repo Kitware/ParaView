@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.17");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.18");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -85,7 +85,7 @@ void vtkSMStringVectorProperty::AppendCommandToStream(
     for(int i=0; i<numArgs; i++)
       {
       // Convert to the appropriate type and add to stream
-      switch (this->GetElementType(0))
+      switch (this->GetElementType(i))
         {
         case INT:
           *str << atoi(this->GetElement(i));
@@ -248,8 +248,14 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     return retVal;
     }
 
-  int numEls = this->GetNumberOfElementsPerCommand();
+  int numEls = this->GetNumberOfElements();
+
+  if (this->RepeatCommand)
+    {
+    numEls = this->GetNumberOfElementsPerCommand();
+    }
   int* eTypes = new int[numEls];
+
   int numElsRead = element->GetVectorAttribute("element_types", numEls, eTypes);
   for (int i=0; i<numElsRead; i++)
     {
@@ -257,8 +263,8 @@ int vtkSMStringVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     }
   delete[] eTypes;
 
-  int numElems = this->GetNumberOfElements();
-  if (numElems > 0)
+  numEls = this->GetNumberOfElements();
+  if (numEls > 0)
     {
     const char *initVal = element->GetAttribute("default_values");
     this->SetElement(0, initVal); // what to do with > 1 element?
