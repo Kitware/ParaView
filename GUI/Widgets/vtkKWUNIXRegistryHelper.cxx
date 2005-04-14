@@ -15,8 +15,8 @@
 
 #include "vtkObjectFactory.h"
 
-#include <kwsys_stl/string>
-#include <kwsys_stl/map>
+#include <kwsys/stl/string>
+#include <kwsys/stl/map>
 
 #ifdef VTK_USE_ANSI_STDLIB
 #define VTK_IOS_NOCREATE 
@@ -27,7 +27,7 @@
 #define BUFFER_SIZE 8192
 
 vtkStandardNewMacro( vtkKWUNIXRegistryHelper );
-vtkCxxRevisionMacro(vtkKWUNIXRegistryHelper, "1.2");
+vtkCxxRevisionMacro(vtkKWUNIXRegistryHelper, "1.3");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
