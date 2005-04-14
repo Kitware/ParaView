@@ -15,11 +15,12 @@
 #include "vtkKWMultiColumnList.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
-#include <vtkstd/string>
+
+#include <kwsys/stl/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWMultiColumnList);
-vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.1");
+vtkCxxRevisionMacro(vtkKWMultiColumnList, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWMultiColumnList::vtkKWMultiColumnList()
@@ -78,7 +79,7 @@ void vtkKWMultiColumnList::Create(vtkKWApplication *app, const char *args)
     this->TableList = vtkKWWidget::New();
     }
 
-  vtkstd::string all_args(
+  kwsys_stl::string all_args(
     "-bd 0 "
     "-stretch all "
     "-labelcommand tablelist::sortByColumn "
@@ -134,7 +135,7 @@ void vtkKWMultiColumnList::CreateVerticalScrollbar(vtkKWApplication *app)
     this->VerticalScrollBar->Create(app, "scrollbar", "-orient vertical");
     if (this->TableList && this->TableList->IsCreated())
       {
-      vtkstd::string command("-command {");
+      kwsys_stl::string command("-command {");
       command += this->TableList->GetWidgetName();
       command += " yview}";
       this->VerticalScrollBar->ConfigureOptions(command.c_str());
@@ -160,7 +161,7 @@ void vtkKWMultiColumnList::CreateHorizontalScrollbar(vtkKWApplication *app)
     this->HorizontalScrollBar->Create(app, "scrollbar", "-orient horizontal");
     if (this->TableList && this->TableList->IsCreated())
       {
-      vtkstd::string command("-command {");
+      kwsys_stl::string command("-command {");
       command += this->TableList->GetWidgetName();
       command += " xview}";
       this->HorizontalScrollBar->ConfigureOptions(command.c_str());
@@ -681,7 +682,7 @@ void vtkKWMultiColumnList::InsertRow(int row_index)
     int nb_cols = this->GetNumberOfColumns();
     if (nb_cols > 0)
       {
-      vtkstd::string item;
+      kwsys_stl::string item;
       for (int i = 0; i < nb_cols; i++)
         {
         item += "\"\" ";

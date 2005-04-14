@@ -17,12 +17,11 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWMenu.h"
 
-#include <vtkstd/string>
-#include <vtkstd/list>
-
+#include <kwsys/stl/string>
+#include <kwsys/stl/list>
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.1");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.2");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
 int vtkKWMostRecentFilesManagerCommand(ClientData cd, Tcl_Interp *interp,
@@ -63,13 +62,13 @@ public:
   
   private:
     
-    vtkstd::string FileName;
+    kwsys_stl::string FileName;
     vtkKWObject *TargetObject;
-    vtkstd::string TargetCommand;
+    kwsys_stl::string TargetCommand;
   };
 
-  typedef vtkstd::list<FileEntry*> FileEntriesContainer;
-  typedef vtkstd::list<FileEntry*>::iterator FileEntriesContainerIterator;
+  typedef kwsys_stl::list<FileEntry*> FileEntriesContainer;
+  typedef kwsys_stl::list<FileEntry*>::iterator FileEntriesContainerIterator;
 
   FileEntriesContainer MostRecentFileEntries;
 };
@@ -165,8 +164,12 @@ void vtkKWMostRecentFilesManager::AddFile(
     return;
     }
 
-  vtkstd::string filename_expanded = 
-    this->GetApplication()->ExpandFileName(filename);
+  kwsys_stl::string evalstr = "eval file join {\"";
+  evalstr += filename;
+  evalstr += "\"}";
+
+  kwsys_stl::string filename_expanded = 
+    this->GetApplication()->Script(evalstr.c_str());
 
   this->AddFileInternal(
     filename_expanded.c_str(), target_object, target_command);

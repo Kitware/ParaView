@@ -16,13 +16,14 @@
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
+#include "vtkKWTkUtilities.h"
 
 #include <ctype.h>
 #include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWObject);
-vtkCxxRevisionMacro(vtkKWObject, "1.50");
+vtkCxxRevisionMacro(vtkKWObject, "1.51");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -84,8 +85,8 @@ const char* vtkKWObject::Script(const char* format, ...)
     va_list var_args1, var_args2;
     va_start(var_args1, format);
     va_start(var_args2, format);
-    const char* result =
-      this->GetApplication()->ScriptInternal(format, var_args1, var_args2);
+    const char* result = vtkKWTkUtilities::EvaluateStringFromArgs(
+      this->GetApplication(), format, var_args1, var_args2);
     va_end(var_args1);
     va_end(var_args2);
     return result;

@@ -24,8 +24,8 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/list>
-#include <vtkstd/algorithm>
+#include <kwsys/stl/list>
+#include <kwsys/stl/algorithm>
 
 // The amount of padding that is to be added to the internal vertical padding
 // of the selected tab (basically defines the additional height of the 
@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.72");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.73");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -72,9 +72,9 @@ class vtkKWNotebookInternals
 {
 public:
 
-  typedef vtkstd::list<vtkKWNotebook::Page*> PagesContainer;
-  typedef vtkstd::list<vtkKWNotebook::Page*>::iterator PagesContainerIterator;
-  typedef vtkstd::list<vtkKWNotebook::Page*>::reverse_iterator PagesContainerReverseIterator;
+  typedef kwsys_stl::list<vtkKWNotebook::Page*> PagesContainer;
+  typedef kwsys_stl::list<vtkKWNotebook::Page*>::iterator PagesContainerIterator;
+  typedef kwsys_stl::list<vtkKWNotebook::Page*>::reverse_iterator PagesContainerReverseIterator;
 
   PagesContainer Pages;
   PagesContainer MostRecentPages;
@@ -882,7 +882,7 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
   // Remove the page from the container
 
   vtkKWNotebookInternals::PagesContainerIterator pos = 
-    vtkstd::find(this->Internals->Pages.begin(),
+    kwsys_stl::find(this->Internals->Pages.begin(),
                  this->Internals->Pages.end(),
                  page);
 
@@ -1599,7 +1599,7 @@ int vtkKWNotebook::AddToMostRecentPages(vtkKWNotebook::Page *page)
     }
 
   vtkKWNotebookInternals::PagesContainerIterator pos = 
-    vtkstd::find(this->Internals->MostRecentPages.begin(),
+    kwsys_stl::find(this->Internals->MostRecentPages.begin(),
                  this->Internals->MostRecentPages.end(),
                  page);
 
@@ -1621,7 +1621,7 @@ int vtkKWNotebook::RemoveFromMostRecentPages(vtkKWNotebook::Page *page)
     }
 
   vtkKWNotebookInternals::PagesContainerIterator pos = 
-    vtkstd::find(this->Internals->MostRecentPages.begin(),
+    kwsys_stl::find(this->Internals->MostRecentPages.begin(),
                  this->Internals->MostRecentPages.end(),
                  page);
 

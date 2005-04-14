@@ -57,9 +57,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageAppend.h"
 #include "vtkImageConstantPad.h"
 
-#include <vtkstd/list>
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include <kwsys/stl/list>
+#include <kwsys/stl/vector>
+#include <kwsys/stl/string>
 
 #include "Resources/vtkKWWindowLayoutResources.h"
 
@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.12");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.13");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -80,13 +80,13 @@ class vtkKWSelectionFrameLayoutManagerInternals
 public:
   struct PoolNode
   {
-    vtkstd::string Name;
+    kwsys_stl::string Name;
     vtkKWSelectionFrame *Widget;
     int Position[2];
   };
 
-  typedef vtkstd::vector<PoolNode> PoolType;
-  typedef vtkstd::vector<PoolNode>::iterator PoolIterator;
+  typedef kwsys_stl::vector<PoolNode> PoolType;
+  typedef kwsys_stl::vector<PoolNode>::iterator PoolIterator;
 
   PoolType Pool;
 };
@@ -334,7 +334,7 @@ void vtkKWSelectionFrameLayoutManager::ReorganizeWidgetPositions()
   // Given the resolution, fill in the corresponding grid with 
   // widgets that have a valid position inside that grid
 
-  vtkstd::vector<int> grid;
+  kwsys_stl::vector<int> grid;
   grid.assign(this->Resolution[0] * this->Resolution[1], 0);
 
   vtkKWSelectionFrameLayoutManagerInternals::PoolIterator it = 
@@ -1353,18 +1353,18 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
 
   // We need a window to image filter for each widget in the grid
 
-  vtkstd::vector<vtkWindowToImageFilter*> w2i_filters;
+  kwsys_stl::vector<vtkWindowToImageFilter*> w2i_filters;
   w2i_filters.assign(nb_slots, (vtkWindowToImageFilter*)NULL);
 
   // We also need a pad filter to add a small margin for each widget 
 
-  vtkstd::vector<vtkImageConstantPad*> pad_filters;
+  kwsys_stl::vector<vtkImageConstantPad*> pad_filters;
   pad_filters.assign(nb_slots, (vtkImageConstantPad*)NULL);
 
   // We need an append filter for each row in the grid, to append
   // widgets horizontally
 
-  vtkstd::vector<vtkImageAppend*> append_filters;
+  kwsys_stl::vector<vtkImageAppend*> append_filters;
   append_filters.assign(this->Resolution[1], (vtkImageAppend*)NULL);
 
   // We need an append filter to append each rows (see above) and form

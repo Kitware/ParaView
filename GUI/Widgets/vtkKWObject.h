@@ -25,16 +25,7 @@
 
 #include "vtkObject.h"
 
-// This has to be here because on HP varargs are included in 
-// tcl.h and they have different prototypes for va_start so
-// the build fails. Defining HAS_STDARG prevents that.
-
-#if defined(__hpux) && !defined(HAS_STDARG)
-#define HAS_STDARG
-#endif
-
 #include "vtkTcl.h" // Needed for Tcl interpreter
-#include <stdarg.h> // Needed for "va_list" argument of EstimateFormatLength.
 
 class vtkKWApplication;
 

@@ -23,18 +23,18 @@
 #include "vtkKWIcon.h"
 #include "vtkKWToolbarSet.h"
 
-#include <vtkstd/list>
-#include <vtkstd/string>
+#include <kwsys/stl/list>
+#include <kwsys/stl/string>
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.30");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.31");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameInternals
 {
 public:
-  typedef vtkstd::list<vtkstd::string> PoolType;
-  typedef vtkstd::list<vtkstd::string>::iterator PoolIterator;
+  typedef kwsys_stl::list<kwsys_stl::string> PoolType;
+  typedef kwsys_stl::list<kwsys_stl::string>::iterator PoolIterator;
 
   PoolType Pool;
 };
@@ -566,7 +566,7 @@ void vtkKWSelectionFrame::UpdateSelectionList()
     return;
     }
 
-  vtkstd::string callback;
+  kwsys_stl::string callback;
 
   vtkKWMenu *menu = this->SelectionList->GetMenu();
   menu->DeleteAllMenuItems();
