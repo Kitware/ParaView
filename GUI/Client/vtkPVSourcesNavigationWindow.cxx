@@ -30,7 +30,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.21.2.2");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.21.2.3");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -343,6 +343,9 @@ void vtkPVSourcesNavigationWindow::PopupFlatInterpolationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetInterpolationCM(
     vtkSMDisplayProxy::FLAT);
+  this->PopupModule->UpdateProperties(); 
+    // so that DisplayGUI also shows
+   // the correect interpolation/representation.
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 //-----------------------------------------------------------------------------
@@ -350,6 +353,9 @@ void vtkPVSourcesNavigationWindow::PopupGouraudInterpolationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetInterpolationCM(
     vtkSMDisplayProxy::GOURAND);
+  this->PopupModule->UpdateProperties();
+    // so that DisplayGUI also shows
+   // the correect interpolation/representation.
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 //-----------------------------------------------------------------------------
@@ -357,6 +363,9 @@ void vtkPVSourcesNavigationWindow::PopupOutlineRepresentationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetRepresentationCM(
     vtkSMDisplayProxy::OUTLINE);
+  this->PopupModule->UpdateProperties();
+    // so that DisplayGUI also shows
+   // the correect interpolation/representation.
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 //-----------------------------------------------------------------------------
@@ -364,6 +373,9 @@ void vtkPVSourcesNavigationWindow::PopupSurfaceRepresentationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetRepresentationCM(
     vtkSMDisplayProxy::SURFACE);
+  this->PopupModule->UpdateProperties();
+    // so that DisplayGUI also shows
+   // the correect interpolation/representation.
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 //-----------------------------------------------------------------------------
@@ -371,6 +383,9 @@ void vtkPVSourcesNavigationWindow::PopupWireframeRepresentationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetRepresentationCM(
     vtkSMDisplayProxy::WIREFRAME);
+  this->PopupModule->UpdateProperties();
+    // so that DisplayGUI also shows
+   // the correect interpolation/representation.
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 //-----------------------------------------------------------------------------
@@ -378,6 +393,9 @@ void vtkPVSourcesNavigationWindow::PopupPointsRepresentationCallback()
 {
   this->PopupModule->GetDisplayProxy()->SetRepresentationCM(
     vtkSMDisplayProxy::POINTS);
+  this->PopupModule->UpdateProperties();
+    // so that DisplayGUI also shows
+   // the correect interpolation/representation.
   this->PopupModule->GetPVRenderView()->EventuallyRender();
 }
 
