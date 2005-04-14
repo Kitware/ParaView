@@ -33,7 +33,6 @@
 #include "vtkKWToolbarSet.h"
 #include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkKWWidgetCollection.h"
-#include "vtkKWWindowCollection.h"
 #include "vtkObjectFactory.h"
 
 #include <kwsys/SystemTools.hxx>
@@ -42,7 +41,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.220");
+vtkCxxRevisionMacro(vtkKWWindow, "1.221");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -193,7 +192,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
                wname, this->GetTitle());
 
   this->Script("wm iconname %s {%s}",
-               wname, app->GetApplicationPrettyName());
+               wname, app->GetPrettyName());
 
   // Set up standard menus
 
@@ -264,7 +263,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->MenuHelp->AddSeparator();
   ostrstream about_label;
-  about_label << "About " << app->GetApplicationPrettyName() << ends;
+  about_label << "About " << app->GetPrettyName() << ends;
   this->MenuHelp->AddCommand(about_label.str(), this, "DisplayAbout", 0);
   about_label.rdbuf()->freeze(0);
 
@@ -506,7 +505,7 @@ void vtkKWWindow::Close()
     return;
     }
   if (this->PromptBeforeClose &&
-      this->GetApplication()->GetWindows()->GetNumberOfItems() <= 1)
+      this->GetApplication()->GetNumberOfWindows() <= 1)
     {
     if ( !this->ExitDialog() )
       {
@@ -535,7 +534,7 @@ void vtkKWWindow::CloseNoPrompt()
 
   // Close this window in the application. The
   // application will exit if there are no more windows.
-  this->GetApplication()->Close(this);
+  this->GetApplication()->CloseWindow(this);
 }
 
 //----------------------------------------------------------------------------
@@ -1088,11 +1087,11 @@ int vtkKWWindow::ExitDialog()
     return 1;
     }
   ostrstream title;
-  title << "Exit " << this->GetApplication()->GetApplicationPrettyName() 
+  title << "Exit " << this->GetApplication()->GetPrettyName() 
         << ends;
   ostrstream str;
   str << "Are you sure you want to exit " 
-      << this->GetApplication()->GetApplicationPrettyName() << "?" << ends;
+      << this->GetApplication()->GetPrettyName() << "?" << ends;
   
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
   this->ExitDialogWidget = dlg2;
@@ -1308,9 +1307,9 @@ char* vtkKWWindow::GetTitle()
 {
   if (!this->Title && 
       this->GetApplication() && 
-      this->GetApplication()->GetApplicationName())
+      this->GetApplication()->GetName())
     {
-    return this->GetApplication()->GetApplicationName();
+    return this->GetApplication()->GetName();
     }
   return this->Title;
 }
@@ -1494,7 +1493,7 @@ void vtkKWWindow::UpdateMenuState()
       {
       ostrstream label;
       label << "-label {About " 
-            << this->GetApplication()->GetApplicationPrettyName() << "}"<<ends;
+            << this->GetApplication()->GetPrettyName() << "}"<<ends;
       this->MenuHelp->ConfigureItem(pos, label.str());
       label.rdbuf()->freeze(0);
       }

@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWApplication.h"
 
-#include "vtkCollectionIterator.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWBWidgets.h"
 #include "vtkKWFrame.h"
@@ -26,7 +25,6 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetsConfigure.h"
 #include "vtkKWWindow.h"
-#include "vtkKWWindowCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkKWText.h"
@@ -35,6 +33,9 @@
 #include <kwsys/SystemTools.hxx>
 
 #include <stdarg.h>
+
+#include <kwsys/stl/vector>
+#include <kwsys/stl/algorithm>
 
 #define REG_KEY_VALUE_SIZE_MAX 8192
 #define REG_KEY_NAME_SIZE_MAX 100
@@ -57,11 +58,9 @@ static Tcl_Interp *Et_Interp = 0;
 EXTERN Tcl_Obj* TclGetLibraryPath _ANSI_ARGS_((void));
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
-int vtkKWApplication::WidgetVisibility = 1;
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.194");
+vtkCxxRevisionMacro(vtkKWApplication, "1.195");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -70,23 +69,35 @@ int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
+class vtkKWApplicationInternals
+{
+public:
+  typedef kwsys_stl::vector<vtkKWWindow*> WindowsContainer;
+  typedef kwsys_stl::vector<vtkKWWindow*>::iterator WindowsContainerIterator;
+
+  WindowsContainer Windows;
+};
+
+//----------------------------------------------------------------------------
 vtkKWApplication::vtkKWApplication()
 {
+  this->Internals = new vtkKWApplicationInternals;
+
   this->CommandFunction = vtkKWApplicationCommand;
   
-  this->ApplicationName = kwsys::SystemTools::DuplicateString("Kitware");
+  this->Name = kwsys::SystemTools::DuplicateString("Kitware");
   this->MajorVersion = 1;
   this->MinorVersion = 0;
-  this->ApplicationVersionName = 
+  this->VersionName = 
     kwsys::SystemTools::DuplicateString("Kitware10");
-  this->ApplicationReleaseName = 
+  this->ReleaseName = 
     kwsys::SystemTools::DuplicateString("unknown");
-  this->ApplicationPrettyName = NULL;
-  this->ApplicationInstallationDirectory = NULL;
+  this->PrettyName = NULL;
+  this->InstallationDirectory = NULL;
 
   this->LimitedEditionModeName = NULL;
   char name[1024];
-  sprintf(name, "%s Limited Edition", this->ApplicationName);
+  sprintf(name, "%s Limited Edition", this->Name);
   this->SetLimitedEditionModeName(name);
 
   this->EmailFeedbackAddress = NULL;
@@ -105,12 +116,8 @@ vtkKWApplication::vtkKWApplication()
 
   this->BalloonHelpManager = 0;
 
-  this->UseMessageDialogs = 1;  
-
   this->CharacterEncoding = VTK_ENCODING_UNKNOWN;
   this->SetCharacterEncoding(VTK_ENCODING_ISO_8859_1);
-
-  this->Windows = vtkKWWindowCollection::New();  
 
   this->AboutDialog      = 0;
   this->AboutDialogImage = 0;
@@ -132,16 +139,9 @@ vtkKWApplication::vtkKWApplication()
   //this->Script("set Application %s",this->MainInterp->result);  
   this->Script("set Application %s",this->GetTclName());
 
-  if (vtkKWApplication::WidgetVisibility)
-    {
-    this->SplashScreen = vtkKWSplashScreen::New();
-    }
-  else
-    {
-    this->SplashScreen = NULL;
-    }
+  this->SplashScreen = NULL;
 
-  this->ExitOnReturn = 0;
+  this->ExitAfterLoadScript = 0;
 
   this->HasSplashScreen = 0;
 
@@ -154,6 +154,8 @@ vtkKWApplication::vtkKWApplication()
 //----------------------------------------------------------------------------
 vtkKWApplication::~vtkKWApplication()
 {
+  delete this->Internals;
+
   this->SetLimitedEditionModeName(NULL);
 
   if (this->AboutDialogImage)
@@ -174,19 +176,14 @@ vtkKWApplication::~vtkKWApplication()
     this->AboutDialog = NULL;
     }
 
-  if (this->Windows)
-    {
-    this->Windows->Delete();
-    this->Windows = NULL;
-    this->MainInterp = NULL;
-    vtkObjectFactory::UnRegisterAllFactories();
-    }
+  this->MainInterp = NULL;
+  vtkObjectFactory::UnRegisterAllFactories();
 
-  this->SetApplicationName(NULL);
-  this->SetApplicationVersionName(NULL);
-  this->SetApplicationReleaseName(NULL);
-  this->SetApplicationPrettyName(NULL);
-  this->SetApplicationInstallationDirectory(NULL);
+  this->SetName(NULL);
+  this->SetVersionName(NULL);
+  this->SetReleaseName(NULL);
+  this->SetPrettyName(NULL);
+  this->SetInstallationDirectory(NULL);
 
   this->SetEmailFeedbackAddress(NULL);
 
@@ -212,7 +209,7 @@ void vtkKWApplication::SetApplication(vtkKWApplication*)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::FindApplicationInstallationDirectory()
+void vtkKWApplication::FindInstallationDirectory()
 {
   const char *nameofexec = Tcl_GetNameOfExecutable();
   if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
@@ -228,20 +225,20 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
     // method and strip it yourself.
     // directory[strlen(directory) - 4] = '\0';
     kwsys::SystemTools::ConvertToUnixSlashes(directory);
-    this->SetApplicationInstallationDirectory(directory.c_str());
+    this->SetInstallationDirectory(directory.c_str());
     }
   else
     {
     char setup_key[REG_KEY_NAME_SIZE_MAX];
-    sprintf(setup_key, "%s\\Setup", this->GetApplicationVersionName());
-    vtkKWRegistryHelper *reg 
-      = this->GetRegistryHelper(this->GetApplicationName());
+    sprintf(setup_key, "%s\\Setup", this->GetVersionName());
+    vtkKWRegistryHelper *reg = this->GetRegistryHelper();
+    reg->SetTopLevel(this->GetName());
     char installed_path[REG_KEY_VALUE_SIZE_MAX];
     if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
       {
       kwsys_stl::string directory(installed_path);
       kwsys::SystemTools::ConvertToUnixSlashes(directory);
-      this->SetApplicationInstallationDirectory(directory.c_str());
+      this->SetInstallationDirectory(directory.c_str());
       }
     else
       {
@@ -250,11 +247,11 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
         {
         kwsys_stl::string directory(installed_path);
         kwsys::SystemTools::ConvertToUnixSlashes(directory);
-        this->SetApplicationInstallationDirectory(directory.c_str());
+        this->SetInstallationDirectory(directory.c_str());
         }
       else
         {
-        this->SetApplicationInstallationDirectory(0);
+        this->SetInstallationDirectory(0);
         }
       reg->SetGlobalScope(0);
       }
@@ -262,18 +259,15 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWApplication::EvaluateString(const char* format, ...)
-{  
-  ostrstream str;
-  str << "eval set vtkKWApplicationEvaluateStringTemporaryString " 
-      << format << ends;
+const char* vtkKWApplication::Script(const char* format, ...)
+{
   va_list var_args1, var_args2;
   va_start(var_args1, format);
   va_start(var_args2, format);
-  const char* result = this->ScriptInternal(str.str(), var_args1, var_args2);
+  const char* result = vtkKWTkUtilities::EvaluateStringFromArgs(
+    this, format, var_args1, var_args2);
   va_end(var_args1);
   va_end(var_args2);
-  str.rdbuf()->freeze(0);
   return result;
 }
 
@@ -283,135 +277,36 @@ int vtkKWApplication::EvaluateBooleanExpression(const char* format, ...)
   va_list var_args1, var_args2;
   va_start(var_args1, format);
   va_start(var_args2, format);
-  const char* result = this->ScriptInternal(format, var_args1, var_args2);
+  const char* result = vtkKWTkUtilities::EvaluateStringFromArgs(
+    this, format, var_args1, var_args2);
   va_end(var_args1);
   va_end(var_args2);
-  if(result && !strcmp(result, "1"))
-    {
-    return 1;
-    }
-  return 0;
+
+  return (result && !strcmp(result, "1")) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWApplication::ExpandFileName(const char* format, ...)
+void vtkKWApplication::AddWindow(vtkKWWindow *win)
 {
-  ostrstream str;
-  str << "eval file join {\"" << format << "\"}" << ends;
-  va_list var_args1, var_args2;
-  va_start(var_args1, format);
-  va_start(var_args2, format);
-  const char* result = this->ScriptInternal(str.str(), var_args1, var_args2);  
-  va_end(var_args1);
-  va_end(var_args2);
-  str.rdbuf()->freeze(0);
-  return result;
+  if (this->Internals)
+    {
+    this->Internals->Windows.push_back(win);
+    win->Register(this);
+    }
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWApplication::Script(const char* format, ...)
+void vtkKWApplication::CloseWindow(vtkKWWindow *win)
 {
-  va_list var_args1, var_args2;
-  va_start(var_args1, format);
-  va_start(var_args2, format);
-  const char* result = this->ScriptInternal(format, var_args1, var_args2);
-  va_end(var_args1);
-  va_end(var_args2);
-  return result;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWApplication::ScriptInternal(const char* format,
-                                             va_list var_args1,
-                                             va_list var_args2)
-{
-  // We need a place to construct the script.
-  char event[1600];
-  char* buffer = event;
-  
-  // Estimate the length of the result string.  Never underestimates.
-  int length = kwsys::SystemTools::EstimateFormatLength(format, var_args1);
-  
-  // If our stack-allocated buffer is too small, allocate on one on
-  // the heap that will be large enough.
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-  
-  // Print to the string.
-  vsprintf(buffer, format, var_args2);
-  
-  // Evaluate the string in Tcl.
-  if(Tcl_GlobalEval(this->MainInterp, buffer) != TCL_OK)
-    {
-    vtkErrorMacro("\n    Script: \n" << buffer
-                  << "\n    Returned Error on line "
-                  << this->MainInterp->errorLine << ": \n"  
-                  << Tcl_GetStringResult(this->MainInterp) << endl);
-    }
-  
-  // Free the buffer from the heap if we allocated it.
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-  
-  // Convert the Tcl result to its string representation.
-  return Tcl_GetStringResult(this->MainInterp);
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWApplication::SimpleScript(const char* script)
-{
-  // Tcl might modify the script in-place.  We need a temporary copy.
-  char event[1600];
-  char* buffer = event;  
-  
-  // Make sure we have a script.
-  int length = script ? strlen(script) : 0;
-  if(length < 1)
-    {
-    return 0;
-    }
-  
-  // If our stack-allocated buffer is too small, allocate on one on
-  // the heap that will be large enough.
-  if(length > 1599)
-    {
-    buffer = new char[length+1];
-    }
-  
-  // Copy the string to our buffer.
-  strcpy(buffer, script);
-  
-  // Evaluate the string in Tcl.
-  if(Tcl_GlobalEval(this->MainInterp, buffer) != TCL_OK)
-    {
-    vtkErrorMacro("\n    Script: \n" << buffer
-                  << "\n    Returned Error on line "
-                  << this->MainInterp->errorLine << ": \n"  
-                  << Tcl_GetStringResult(this->MainInterp) << endl);
-    }
-  
-  // Free the buffer from the heap if we allocated it.
-  if(buffer != event)
-    {
-    delete [] buffer;
-    }
-  
-  // Convert the Tcl result to its string representation.
-  return Tcl_GetStringResult(this->MainInterp);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::Close(vtkKWWindow *win)
-{
-  if ( this->Windows )
+  if (this->Internals && win)
     {
     win->PrepareForDelete();
-    this->Windows->RemoveItem(win);
-    if (this->Windows->GetNumberOfItems() < 1)
+    this->Internals->Windows.erase(
+      kwsys_stl::find(this->Internals->Windows.begin(),
+                      this->Internals->Windows.end(),
+                      win));
+    win->UnRegister(this);
+    if (this->GetNumberOfWindows() < 1)
       {
       this->Exit();
       }
@@ -419,16 +314,23 @@ void vtkKWApplication::Close(vtkKWWindow *win)
 }
 
 //----------------------------------------------------------------------------
-vtkKWWindowCollection *vtkKWApplication::GetWindows()
+vtkKWWindow* vtkKWApplication::GetNthWindow(int rank)
 {
-  return this->Windows;
+  if (this->Internals && rank >= 0 && rank < this->GetNumberOfWindows())
+    {
+    return this->Internals->Windows[rank];
+    }
+  return NULL;
 }
 
-
 //----------------------------------------------------------------------------
-void vtkKWApplication::AddWindow(vtkKWWindow *w)
+int vtkKWApplication::GetNumberOfWindows()
 {
-  this->Windows->AddItem(w);
+  if (this->Internals)
+    {
+    return this->Internals->Windows.size();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -460,19 +362,6 @@ void vtkKWApplication::Exit()
     this->AboutDialog = NULL;
     }
 
-  vtkKWWindow* win = 0;
-  this->Windows->InitTraversal();
-  
-  while (this->Windows && (win = this->Windows->GetNextKWWindow()))
-    {
-    win->SetPromptBeforeClose(0);
-    win->Close();
-    if (this->Windows)
-      {
-      this->Windows->InitTraversal();
-      }
-    }
-  
   if (this->SplashScreen)
     {
     this->SplashScreen->Delete();
@@ -485,6 +374,18 @@ void vtkKWApplication::Exit()
     this->BalloonHelpManager = NULL;
     }
 
+  // Close all windows
+
+  while (this->GetNumberOfWindows())
+    {
+    vtkKWWindow *win = this->GetNthWindow(0);
+    if (win)
+      {
+      win->SetPromptBeforeClose(0);
+      win->Close();
+      }
+    }
+  
   this->Cleanup();
 
   this->ApplicationExited = 1;
@@ -642,20 +543,17 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   // Init Tk
 
-  if (vtkKWApplication::WidgetVisibility)
+  status = Tk_Init(interp);
+  if (status != TCL_OK)
     {
-    status = Tk_Init(interp);
-    if (status != TCL_OK)
+    if (err)
       {
-      if (err)
-        {
-        *err << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
-        }
-      return NULL;
+      *err << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
       }
-    
-    Tcl_StaticPackage(interp, (char *)"Tk", Tk_Init, 0);
+    return NULL;
     }
+  
+  Tcl_StaticPackage(interp, (char *)"Tk", Tk_Init, 0);
     
   // create the SetApplicationIcon command
 #ifdef _WIN32
@@ -676,12 +574,9 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   // Initialize Widgets
 
-  if (vtkKWApplication::WidgetVisibility)
-    {
-    Kwwidgetstcl_Init(interp);
+  Kwwidgetstcl_Init(interp);
 
-    vtkKWBWidgets::Initialize(interp);
-    }
+  vtkKWBWidgets::Initialize(interp);
 
   return interp;
 }
@@ -715,7 +610,7 @@ void vtkKWApplication::Start()
 //----------------------------------------------------------------------------
 void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 { 
-  while (this->Windows && this->Windows->GetNumberOfItems())
+  while (this->GetNumberOfWindows())
     {
     this->DoOneTclEvent();
     }
@@ -772,11 +667,11 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
 {
 #ifdef _WIN32
   ostrstream temp;
-  if (this->ApplicationInstallationDirectory)
+  if (this->InstallationDirectory)
     {
-    temp << this->ApplicationInstallationDirectory << "/";
+    temp << this->InstallationDirectory << "/";
     }
-  temp << this->ApplicationName << ".chm";
+  temp << this->Name << ".chm";
   if (this->DisplayHelpStartingPage)
     {
     temp << "::/" << this->DisplayHelpStartingPage;
@@ -810,18 +705,6 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::SetWidgetVisibility(int v)
-{
-  vtkKWApplication::WidgetVisibility = v;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWApplication::GetWidgetVisibility() 
-{
-  return vtkKWApplication::WidgetVisibility;
-}
-
-//----------------------------------------------------------------------------
 void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
 {
   if (this->InExit)
@@ -850,8 +733,7 @@ void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
 //----------------------------------------------------------------------------
 void vtkKWApplication::ConfigureAbout()
 {
-  if (this->HasSplashScreen && 
-      this->SplashScreen)
+  if (this->HasSplashScreen)
     {
     this->CreateSplashScreen();
     const char *img_name = this->SplashScreen->GetImageName();
@@ -866,26 +748,6 @@ void vtkKWApplication::ConfigureAbout()
         this->AboutDialogImage->SetParent(this->AboutDialog->GetTopFrame());
         this->AboutDialogImage->Create(this, 0);
         }
-
-      if (!this->AboutRuntimeInfo)
-        {
-        this->AboutRuntimeInfo = vtkKWText::New();
-        }
-      if (!this->AboutRuntimeInfo->IsCreated())
-        {
-        this->AboutRuntimeInfo->SetParent(this->AboutDialog->GetBottomFrame());
-        this->AboutRuntimeInfo->Create(this, "-setgrid true");
-        this->AboutRuntimeInfo->SetWidth(60);
-        this->AboutRuntimeInfo->SetHeight(8);
-        this->AboutRuntimeInfo->SetWrapToWord();
-        this->AboutRuntimeInfo->EditableTextOff();
-        this->AboutRuntimeInfo->UseVerticalScrollbarOn();
-        double r, g, b;
-        this->AboutRuntimeInfo->GetTextWidget()->GetParent()
-          ->GetBackgroundColor(&r, &g, &b);
-        this->AboutRuntimeInfo->GetTextWidget()->SetBackgroundColor(r, g, b);
-        }
-
       this->Script("%s config -image {%s}",
                    this->AboutDialogImage->GetWidgetName(), img_name);
       this->Script("pack %s -side top", 
@@ -898,16 +760,35 @@ void vtkKWApplication::ConfigureAbout()
         {
         this->AboutDialog->SetTextWidth(w);
         }
-
-      this->Script("pack %s -side top -padx 2 -expand 1 -fill both",
-                   this->AboutRuntimeInfo->GetWidgetName());
-      this->Script("pack %s -side bottom",  // -expand 1 -fill both
-                   this->AboutDialog->GetMessageDialogFrame()->GetWidgetName());
+      this->Script(
+        "pack %s -side bottom",  // -expand 1 -fill both
+        this->AboutDialog->GetMessageDialogFrame()->GetWidgetName());
       }
     }
 
+  if (!this->AboutRuntimeInfo)
+    {
+    this->AboutRuntimeInfo = vtkKWText::New();
+    }
+  if (!this->AboutRuntimeInfo->IsCreated())
+    {
+    this->AboutRuntimeInfo->SetParent(this->AboutDialog->GetBottomFrame());
+    this->AboutRuntimeInfo->Create(this, "-setgrid true");
+    this->AboutRuntimeInfo->SetWidth(60);
+    this->AboutRuntimeInfo->SetHeight(8);
+    this->AboutRuntimeInfo->SetWrapToWord();
+    this->AboutRuntimeInfo->EditableTextOff();
+    this->AboutRuntimeInfo->UseVerticalScrollbarOn();
+    double r, g, b;
+    this->AboutRuntimeInfo->GetTextWidget()->GetParent()
+      ->GetBackgroundColor(&r, &g, &b);
+    this->AboutRuntimeInfo->GetTextWidget()->SetBackgroundColor(r, g, b);
+    this->Script("pack %s -side top -padx 2 -expand 1 -fill both",
+                 this->AboutRuntimeInfo->GetWidgetName());
+    }
+
   ostrstream title;
-  title << "About " << this->GetApplicationPrettyName() << ends;
+  title << "About " << this->GetPrettyName() << ends;
   this->AboutDialog->SetTitle(title.str());
   title.rdbuf()->freeze(0);
 
@@ -923,9 +804,9 @@ void vtkKWApplication::ConfigureAbout()
 //----------------------------------------------------------------------------
 void vtkKWApplication::AddAboutText(ostream &os)
 {
-  os << this->GetApplicationPrettyName();
-  const char *app_ver_name = this->GetApplicationVersionName();
-  const char *app_rel_name = this->GetApplicationReleaseName();
+  os << this->GetPrettyName();
+  const char *app_ver_name = this->GetVersionName();
+  const char *app_rel_name = this->GetReleaseName();
   if ((app_ver_name && *app_ver_name) || (app_rel_name && *app_rel_name))
     {
     os << " (";
@@ -958,11 +839,13 @@ void vtkKWApplication::AddAboutCopyrights(ostream &os)
 }
 
 //----------------------------------------------------------------------------
-vtkKWRegistryHelper *vtkKWApplication::GetRegistryHelper( const char*toplevel )
+vtkKWSplashScreen *vtkKWApplication::GetSplashScreen()
 {
-  vtkKWRegistryHelper *reg_helper = this->GetRegistryHelper();
-  reg_helper->SetTopLevel(toplevel);
-  return reg_helper;
+  if ( !this->SplashScreen )
+    {
+    this->SplashScreen = vtkKWSplashScreen::New();
+    }
+  return this->SplashScreen;
 }
 
 //----------------------------------------------------------------------------
@@ -1020,15 +903,15 @@ int vtkKWApplication::SetRegistryValue(int level, const char* subkey,
   char buffer[REG_KEY_NAME_SIZE_MAX];
   char value[REG_KEY_VALUE_SIZE_MAX];
   sprintf(buffer, "%s\\%s", 
-          this->GetApplication()->GetApplicationVersionName(),
+          this->GetApplication()->GetVersionName(),
           subkey);
   va_list var_args;
   va_start(var_args, format);
   vsprintf(value, format, var_args);
   va_end(var_args);
   
-  vtkKWRegistryHelper *reg 
-    = this->GetRegistryHelper(this->GetApplicationName());
+  vtkKWRegistryHelper *reg = this->GetRegistryHelper();
+  reg->SetTopLevel(this->GetName());
   res = reg->SetValue(buffer, key, value);
   return res;
 }
@@ -1047,11 +930,11 @@ int vtkKWApplication::GetRegistryValue(int level, const char* subkey,
     }
   char buffer[REG_KEY_NAME_SIZE_MAX];
   sprintf(buffer, "%s\\%s", 
-          this->GetApplicationVersionName(),
+          this->GetVersionName(),
           subkey);
 
-  vtkKWRegistryHelper *reg 
-    = this->GetRegistryHelper(this->GetApplicationName());
+  vtkKWRegistryHelper *reg = this->GetRegistryHelper();
+  reg->SetTopLevel(this->GetName());
   res = reg->ReadValue(buffer, key, buff);
   if ( *buff && value )
     {
@@ -1073,11 +956,11 @@ int vtkKWApplication::DeleteRegistryValue(int level, const char* subkey,
   int res = 0;
   char buffer[REG_KEY_NAME_SIZE_MAX];
   sprintf(buffer, "%s\\%s", 
-          this->GetApplicationVersionName(),
+          this->GetVersionName(),
           subkey);
   
-  vtkKWRegistryHelper *reg 
-    = this->GetRegistryHelper(this->GetApplicationName());
+  vtkKWRegistryHelper *reg = this->GetRegistryHelper();
+  reg->SetTopLevel(this->GetName());
   res = reg->DeleteValue(buffer, key);
   return res;
 }
@@ -1091,44 +974,23 @@ int vtkKWApplication::HasRegistryValue(int level, const char* subkey,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::SelfTest()
-{
-  int res = 0;
-  this->EvaluateString("foo");
-  res += (!this->EvaluateBooleanExpression("proc a {} { return 1; }; a"));
-  res += this->EvaluateBooleanExpression("proc a {} { return 0; }; a");
-
-  return (res == 0);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWApplication::LoadTclScript(const char* filename)
-{
-  int res = 1;
-  char* file = kwsys::SystemTools::DuplicateString(filename);
-  // add this window as a variable
-  if ( Tcl_EvalFile(Et_Interp, file) != TCL_OK )
-    {
-    res = 0;
-    }
-  delete [] file;
-  return res;
-}
-
-//----------------------------------------------------------------------------
 int vtkKWApplication::LoadScript(const char* filename)
 {
   int res = 1;
-  if ( !vtkKWApplication::LoadTclScript(filename) )
+  kwsys_stl::string filename_copy(filename);
+  if (Tcl_EvalFile(Et_Interp, filename_copy.c_str()) != TCL_OK)
     {
-    vtkErrorMacro("\n    Script: \n" << filename 
+    vtkErrorMacro("\n    Script: \n" << filename_copy.c_str()
                   << "\n    Returned Error on line "
                   << this->MainInterp->errorLine << ": \n      "  
                   << Tcl_GetStringResult(this->MainInterp) << endl);
     res = 0;
-    this->SetExitStatus(1);
+    if (this->ExitAfterLoadScript)
+      {
+      this->SetExitStatus(1);
+      }
     }
-  if ( this->ExitOnReturn )
+  if (this->ExitAfterLoadScript)
     {
     this->Exit();
     }
@@ -1215,16 +1077,14 @@ void vtkKWApplication::SetLimitedEditionMode(int v)
 //----------------------------------------------------------------------------
 void vtkKWApplication::UpdateEnableStateForAllWindows()
 {
-  vtkCollectionIterator *it = this->Windows->NewIterator();
-  for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+  for (int i = 0; i < this->GetNumberOfWindows(); i++)
     {
-    vtkKWWindow* win = vtkKWWindow::SafeDownCast(it->GetCurrentObject());
+    vtkKWWindow* win = this->GetNthWindow(i);
     if (win)
       {
       win->UpdateEnableState();
       }
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1249,7 +1109,7 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
             << ends;
 
     vtkKWMessageDialog::PopupMessage(
-      this, 0, this->GetApplicationPrettyName(), msg_str.str(), 
+      this, 0, this->GetPrettyName(), msg_str.str(), 
       vtkKWMessageDialog::WarningIcon);
 
     feature_str.rdbuf()->freeze(0);
@@ -1260,7 +1120,7 @@ int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
 }
 
 //----------------------------------------------------------------------------
-const char* vtkKWApplication::GetApplicationPrettyName()
+const char* vtkKWApplication::GetPrettyName()
 {
   ostrstream pretty_str;
   if (this->LimitedEditionMode)
@@ -1272,23 +1132,23 @@ const char* vtkKWApplication::GetApplicationPrettyName()
       }
     else
       {
-      if (this->ApplicationName)
+      if (this->Name)
         {
-        pretty_str << this->ApplicationName << " ";
+        pretty_str << this->Name << " ";
         }
       pretty_str << "Limited Edition ";
       }
     }
-  else if (this->ApplicationName)
+  else if (this->Name)
     {
-    pretty_str << this->ApplicationName << " ";
+    pretty_str << this->Name << " ";
     }
   pretty_str << this->MajorVersion << "." << this->MinorVersion << ends;
 
-  this->SetApplicationPrettyName(pretty_str.str());
+  this->SetPrettyName(pretty_str.str());
   pretty_str.rdbuf()->freeze(0);
 
-  return this->ApplicationPrettyName;
+  return this->PrettyName;
 }
 
 //----------------------------------------------------------------------------
@@ -1379,11 +1239,11 @@ int vtkKWApplication::GetCheckForUpdatesPath(ostream &
   )
 {
 #ifdef _WIN32
-  this->FindApplicationInstallationDirectory();
-  if (this->ApplicationInstallationDirectory)
+  this->FindInstallationDirectory();
+  if (this->InstallationDirectory)
     {
     ostrstream upd;
-    upd << this->ApplicationInstallationDirectory << "/WiseUpdt.exe" << ends;
+    upd << this->InstallationDirectory << "/WiseUpdt.exe" << ends;
     int res = kwsys::SystemTools::FileExists(upd.str());
     upd.rdbuf()->freeze(0);
     if (res)
@@ -1696,11 +1556,11 @@ int vtkKWApplication::CanEmailFeedback()
 //----------------------------------------------------------------------------
 void vtkKWApplication::AddEmailFeedbackBody(ostream &os)
 {
-  os << this->GetApplicationPrettyName() 
+  os << this->GetPrettyName() 
      << " (" 
-     << this->GetApplicationVersionName() 
+     << this->GetVersionName() 
      << " " 
-     << this->GetApplicationReleaseName()
+     << this->GetReleaseName()
      << ")" << endl;
 
   this->GetSystemVersion(os);
@@ -1717,7 +1577,7 @@ void vtkKWApplication::AddEmailFeedbackBody(ostream &os)
 //----------------------------------------------------------------------------
 void vtkKWApplication::AddEmailFeedbackSubject(ostream &os)
 {
-  os << this->GetApplicationPrettyName() << " User Feedback";
+  os << this->GetPrettyName() << " User Feedback";
 }
 
 //----------------------------------------------------------------------------
@@ -1816,15 +1676,15 @@ void vtkKWApplication::EmailFeedback()
 void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ApplicationName: " << this->GetApplicationName() << endl;
+  os << indent << "Name: " << this->GetName() << endl;
   os << indent << "MajorVersion: " << this->MajorVersion << endl;
   os << indent << "MinorVersion: " << this->MinorVersion << endl;
-  os << indent << "ApplicationReleaseName: " 
-     << this->GetApplicationReleaseName() << endl;
-  os << indent << "ApplicationVersionName: " 
-     << this->GetApplicationVersionName() << endl;
-  os << indent << "ApplicationPrettyName: " 
-     << this->GetApplicationPrettyName() << endl;
+  os << indent << "ReleaseName: " 
+     << this->GetReleaseName() << endl;
+  os << indent << "VersionName: " 
+     << this->GetVersionName() << endl;
+  os << indent << "PrettyName: " 
+     << this->GetPrettyName() << endl;
   os << indent << "EmailFeedbackAddress: "
      << (this->GetEmailFeedbackAddress() ? this->GetEmailFeedbackAddress() :
          "(none)")
@@ -1832,9 +1692,7 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DialogUp: " << this->GetDialogUp() << endl;
   os << indent << "ExitStatus: " << this->GetExitStatus() << endl;
   os << indent << "RegistryLevel: " << this->GetRegistryLevel() << endl;
-  os << indent << "UseMessageDialogs: " << this->GetUseMessageDialogs() 
-     << endl;
-  os << indent << "ExitOnReturn: " << (this->ExitOnReturn ? "on":"off") << endl;
+  os << indent << "ExitAfterLoadScript: " << (this->ExitAfterLoadScript ? "on":"off") << endl;
   os << indent << "InExit: " << (this->InExit ? "on":"off") << endl;
   if (this->SplashScreen)
     {
@@ -1855,8 +1713,8 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "HasSplashScreen: " << (this->HasSplashScreen ? "on":"off") << endl;
   os << indent << "ShowSplashScreen: " << (this->ShowSplashScreen ? "on":"off") << endl;
   os << indent << "ApplicationExited: " << this->ApplicationExited << endl;
-  os << indent << "ApplicationInstallationDirectory: " 
-     << (this->ApplicationInstallationDirectory ? ApplicationInstallationDirectory : "None") << endl;
+  os << indent << "InstallationDirectory: " 
+     << (this->InstallationDirectory ? InstallationDirectory : "None") << endl;
   os << indent << "SaveWindowGeometry: " 
      << (this->SaveWindowGeometry ? "On" : "Off") << endl;
   os << indent << "LimitedEditionMode: " 

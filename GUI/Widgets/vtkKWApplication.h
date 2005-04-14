@@ -33,8 +33,8 @@ class vtkKWBalloonHelpManager;
 class vtkKWSplashScreen;
 class vtkKWWidget;
 class vtkKWWindow;
-class vtkKWWindowCollection;
 class vtkKWText;
+class vtkKWApplicationInternals;
 
 class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
@@ -57,159 +57,107 @@ public:
   virtual void Start(int argc, char *argv[]);
 
   // Description:
-  // Initialize Tcl/Tk
-  // Return NULL on error (eventually provides an ostream where detailed
-  // error messages will be stored).
-  //BTX
-  static Tcl_Interp *InitializeTcl(int argc, char *argv[], ostream *err = 0);
-  //ETX
-  
-  // Description:
-  // Get the interpreter being used by this application
-  Tcl_Interp *GetMainInterp() {return this->MainInterp;};
-
-  // Description:
-  // The method to invoke when the user exits the app
+  // This method is invoked when the user exits the app
   virtual void Exit();
 
   // Description:
-  // This method is invoked when a window closes
-  virtual void Close(vtkKWWindow *);
+  // Set/Get the value returned by the application at exit.
+  // This can be used from scripts to set an error status
+  vtkSetMacro(ExitStatus, int);
+  vtkGetMacro(ExitStatus, int);
 
   // Description:
-  // Display the on-line help and about dialog for this application.
-  virtual void DisplayHelp(vtkKWWindow *master);
-  virtual void DisplayAbout(vtkKWWindow *master);
+  // Add/Close a window to this application.
+  // Note that AddWindow() will increase the reference count of the window
+  // that is added, CloseWindow() will decrease it. Once the last window is
+  // closed, Exit() is called.
+  virtual void AddWindow(vtkKWWindow *w);
+  virtual void CloseWindow(vtkKWWindow *);
 
   // Description:
-  // Set or get the ExitOnReturn flag. If this flag is set, then 
-  // the next tcl script will make application exit when return.
-  // Useful for tests. 
-  vtkSetClampMacro(ExitOnReturn, int, 0, 1);
-  vtkBooleanMacro(ExitOnReturn, int);
-  vtkGetMacro(ExitOnReturn, int);
+  // Get the number of windows, retrieve a window
+  virtual int GetNumberOfWindows();
+  virtual vtkKWWindow* GetNthWindow(int rank);
 
   // Description:
-  // Add a window to this application.
-  void AddWindow(vtkKWWindow *w);
-  //BTX
-  vtkKWWindowCollection *GetWindows();
-  //ETX
-  
-  // Description:
-  // Set/Get the ApplicationName
-  vtkSetStringMacro(ApplicationName);
-  vtkGetStringMacro(ApplicationName);
+  // Set/Get the application name.
+  // Also check the LimitedEditionModeName variable if you plan on running
+  // the application in limited edition mode.
+  vtkSetStringMacro(Name);
+  vtkGetStringMacro(Name);
 
   // Description:
-  // Set/Get the major and minor version.
+  // Get the major and minor application version.
+  vtkSetMacro(MajorVersion, int);
   vtkGetMacro(MajorVersion, int);
+  vtkSetMacro(MinorVersion, int);
   vtkGetMacro(MinorVersion, int);
 
   // Description:
-  // Set/Get the ApplicationVersionName - this is the name + version number
-  // (no spaces, usually used as the master key to store registry settings,
-  //  ex: VolView20, ParaView1.1, etc)
-  vtkSetStringMacro(ApplicationVersionName);
-  vtkGetStringMacro(ApplicationVersionName);
+  // Set/Get the application version name - this is the application name
+  // postfixed with the version number (major/minor), no spaces.
+  // It is typically used as the master key to store registry settings
+  // (ex: VolView20, ParaView1.1, etc.)
+  vtkSetStringMacro(VersionName);
+  vtkGetStringMacro(VersionName);
 
   // Description:
-  // Set/Get the ApplicationReleaseName - this is the release of the 
-  // application version, typically: beta1, beta2, final, patch1, patch2
-  vtkSetStringMacro(ApplicationReleaseName);
-  vtkGetStringMacro(ApplicationReleaseName);
+  // Set/Get the application release name - this is the release of the 
+  // application version (if any), typically: beta1, beta2, final, patch1, etc.
+  vtkSetStringMacro(ReleaseName);
+  vtkGetStringMacro(ReleaseName);
 
   // Description:
-  // Get the "pretty" name for the application. This is most of the time
-  // used as windows/dialog title, About box, etc. It combines the application
-  // name, its mode (limited edition or not) and its version.
-  virtual const char* GetApplicationPrettyName();
+  // Convenience method to get the "pretty" name of the application. 
+  // This is typically used for windows or dialogs title, About boxes, etc. 
+  // It combines the application name, its version, and other relevant
+  // informations (like its limited edition mode).
+  virtual const char* GetPrettyName();
 
   // Descrition:
   // Set/Get if the application is running in limited edition mode.
-  // GetLimitedEditionModeAndWarn will return the limited edition mode ; if 
-  // the mode is true, it will also display a popup warning stating that a
-  // feature (string parameter) is not available in this mode.
-  // Also set/Get the name of the application when in Limited Edition Mode, 
-  // as displayed in the GUI or after in the title bar instead of the app name.
+  // This can be used throughout the whole UI to enable or disable
+  // features on the fly. Make sure it is *not* wrapped !
   //BTX 
   virtual void SetLimitedEditionMode(int arg);
   vtkBooleanMacro(LimitedEditionMode, int);
   vtkGetMacro(LimitedEditionMode, int);
   //ETX
+
+  // Descrition:
+  // Convenience method that will return the limited edition mode and 
+  // optionally warn the user ; if the limited edition mode is true, 
+  // it will display a popup warning stating that 'feature' is not available
+  // in this mode.
   virtual int GetLimitedEditionModeAndWarn(const char *feature);
+
+  // Descrition:
+  // Set/Get the name of the application when it runs in limited edition mode.
+  // This is used by GetPrettyName() for example, instead of the Name variable.
   vtkSetStringMacro(LimitedEditionModeName);
   vtkGetStringMacro(LimitedEditionModeName);
 
   // Description:
   // Set/Get the directory in which the current application is supposed
-  // to be installed.
-  vtkGetStringMacro(ApplicationInstallationDirectory);
+  // to be installed. 
+  vtkGetStringMacro(InstallationDirectory);
+  vtkSetStringMacro(InstallationDirectory);
   
   // Description:
-  // Load script from a file. Resturn if script was successful.
-  static int LoadTclScript(const char* filename);
+  // Load and evaluate a Tcl script from a file. 
+  // Return 1 if successful, 0 otherwise
   int LoadScript(const char* filename);
 
   // Description:
-  // A convienience method to invoke some tcl script code and
-  // perform arguement substitution.
-  const char* SimpleScript(const char* script);
-  //BTX
-  virtual const char* Script(const char* format, ...);
-  const char* EvaluateString(const char* format, ...);
-  const char* ExpandFileName(const char* format, ...);
-  int EvaluateBooleanExpression(const char* format, ...);
-  //ETX
-  
-  // Description:
-  // Internal implementation method for Script invocation.  This
-  // function needs to walk through the var_args list twice.  The only
-  // portable way to do this is to pass two copies of the list's start
-  // pointer.
-  const char* ScriptInternal(const char* format, va_list var_args1,
-                             va_list var_args2);
-  //ETX
-
-  // Description:
-  // Test some of the features that cannot be tested from the tcl.
-  int SelfTest();
-
-  // Description:
-  // This variable can be used to hide the user interface.  
-  // When WidgetVisibility is off, The cherat methods of vtkKWWidgets 
-  // should not create the TK widgets.
-  static void SetWidgetVisibility(int v);
-  static int GetWidgetVisibility();
-  vtkBooleanMacro(WidgetVisibility, int);
-  
-  // Description:
-  // Get application key
-  virtual int GetApplicationKey() {return -1;};
-
-  //BTX
-  // Description:
-  // Return the Registry object. It is created on first use
-  // and deleted on exiting the application.
-  vtkKWRegistryHelper *GetRegistryHelper( const char* toplevel);
-  vtkKWRegistryHelper *GetRegistryHelper( );
-  //ETX
-
-  // Description:
-  // Set or get the current registry level. If the called
-  // registry level is lower than current one, the operation is 
-  // successfull. Registry level -1 means to ignore all the 
-  // registry operations.
-  vtkSetClampMacro(RegistryLevel, int, -1, 10);
-  vtkGetMacro(RegistryLevel, int);
-
-  // Description:
-  // This value will be returned by application1 at exit.
-  // Use this from scripts if you want ParaView exit with an
-  // error status (for example to indicate that a regression test 
-  // failed)
-  vtkSetMacro(ExitStatus, int);
-  vtkGetMacro(ExitStatus, int);
+  // Set/Get the "exit after load script" flag. If this flag is set, then 
+  // the application will automatically Exit() after a call to LoadScript(). 
+  // This is mainly used for testing purposes. Even though a Tcl script
+  // can end with an explicit call to Exit on the application Tcl object,
+  // this call may never be reached it the script contains an error. Setting
+  // this variable will make sure the application will exit anyway.
+  vtkSetClampMacro(ExitAfterLoadScript, int, 0, 1);
+  vtkBooleanMacro(ExitAfterLoadScript, int);
+  vtkGetMacro(ExitAfterLoadScript, int);
 
   // Description:
   // When a modal dialog is up, this flag should be set.
@@ -217,12 +165,6 @@ public:
   // it will refuse to exit
   vtkSetMacro(DialogUp, int);
   vtkGetMacro(DialogUp, int);
-
-  // Description:
-  // This method will suppress all message dialogs.
-  // There is no way back for now.
-  void SupressMessageDialogs() { this->UseMessageDialogs = 0; }
-  vtkGetMacro(UseMessageDialogs, int);
 
   // Description:
   // This method returns a message dialog response.
@@ -235,6 +177,21 @@ public:
   // Set the message dialog response. Set 1 for ok/yes and -1 for 
   // cancel/no.
   void SetMessageDialogResponse(const char* dialogname, int response);
+
+  // Description:
+  // Return the Registry object. It is created on first use
+  // and deleted on exiting the application.
+  //BTX
+  vtkKWRegistryHelper *GetRegistryHelper();
+  //ETX
+
+  // Description:
+  // Set/get the current registry level. If the called
+  // registry level is lower than current one, the operation is 
+  // successfull. Registry level -1 means to ignore all the 
+  // registry operations.
+  vtkSetClampMacro(RegistryLevel, int, -1, 10);
+  vtkGetMacro(RegistryLevel, int);
 
   //Description:
   // Set or get the registry value for the application.
@@ -264,9 +221,15 @@ public:
                                const char* key);
   int   GetIntRegistryValue(int level, const char* subkey, const char* key);
   
+  // Descrition:
+  // Get those application settings that are stored in the registry
+  // Should be called once the application name is known (and the registry
+  // level set).
+  virtual void GetApplicationSettingsFromRegistry();
+
   // Description:
   // Get the splash screen, if this app have/show a splash screen.
-  vtkGetObjectMacro(SplashScreen, vtkKWSplashScreen);
+  virtual vtkKWSplashScreen* GetSplashScreen();
   vtkGetMacro(HasSplashScreen, int);
   vtkGetMacro(ShowSplashScreen, int);
   vtkSetMacro(ShowSplashScreen, int);
@@ -286,12 +249,6 @@ public:
   // Description:
   // This return 1 when application is exiting.
   vtkGetMacro(InExit, int);
-
-  // Descrition:
-  // Get those application settings that are stored in the registry
-  // Should be called once the application name is known (and the registry
-  // level set).
-  virtual void GetApplicationSettingsFromRegistry();
 
   // Description:
   // Get/Set the internal character encoding of the application.
@@ -313,6 +270,11 @@ public:
   vtkGetStringMacro(EmailFeedbackAddress);
 
   // Description:
+  // Display the on-line help and about dialog for this application.
+  virtual void DisplayHelp(vtkKWWindow *master);
+  virtual void DisplayAbout(vtkKWWindow *master);
+
+  // Description:
   // Convenience method to call UpdateEnableState on all windows
   virtual void UpdateEnableStateForAllWindows();
 
@@ -324,34 +286,56 @@ public:
   // Return the Balloon Help helper object. 
   vtkKWBalloonHelpManager *GetBalloonHelpManager();
 
+  // Description:
+  // Convenience methods to evaluate Tcl script/code and
+  // perform argument substitutions.
+  //BTX
+  virtual const char* Script(const char* format, ...);
+  int EvaluateBooleanExpression(const char* format, ...);
+  //ETX
+  
+  // Description:
+  // Get the interpreter being used by this application
+  Tcl_Interp *GetMainInterp() {return this->MainInterp;};
+
+  // Description:
+  // Initialize Tcl/Tk
+  // Return NULL on error (eventually provides an ostream where detailed
+  // error messages will be stored).
+  //BTX
+  static Tcl_Interp *InitializeTcl(int argc, char *argv[], ostream *err = 0);
+  //ETX
+  
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
 
+  Tk_Window MainWindow;
+  Tcl_Interp *MainInterp;
+
   // Description:
-  // Do one tcl event and whatever application might want to do.
+  // Do one tcl event and enter the event loop, allowing the application
+  // interface to actually run.
   virtual void DoOneTclEvent();
 
   // Description:
   // Cleanup everything before exiting.
   virtual void Cleanup() { };
 
-  Tk_Window MainWindow;
-  Tcl_Interp *MainInterp;
-  vtkKWWindowCollection *Windows;
-
-  char *ApplicationName;
-  char *ApplicationVersionName;
-  char *ApplicationReleaseName;
+  // Description:
+  // Application name and version
+  char *Name;
+  char *VersionName;
+  char *ReleaseName;
   int MajorVersion;
   int MinorVersion;
+  char *PrettyName;
+  vtkSetStringMacro(PrettyName);
 
-  char *ApplicationPrettyName;
-  vtkSetStringMacro(ApplicationPrettyName);
-
-  vtkSetStringMacro(ApplicationInstallationDirectory);
-  char *ApplicationInstallationDirectory;
-  virtual void FindApplicationInstallationDirectory();
+  // Description:
+  // Application installation directory
+  char *InstallationDirectory;
+  virtual void FindInstallationDirectory();
 
   virtual void AddEmailFeedbackBody(ostream &);
   virtual void AddEmailFeedbackSubject(ostream &);
@@ -363,7 +347,6 @@ protected:
   vtkSetStringMacro(DisplayHelpStartingPage);
   char *DisplayHelpStartingPage;
 
-  static int WidgetVisibility;
   int InExit;
   int DialogUp;
 
@@ -371,19 +354,15 @@ protected:
   int LimitedEditionMode;
   char *LimitedEditionModeName;
 
-  vtkKWRegistryHelper *RegistryHelper;
   int RegistryLevel;
 
   int UseMessageDialogs;
 
-  int ExitOnReturn;
-
-  vtkKWBalloonHelpManager *BalloonHelpManager;
+  int ExitAfterLoadScript;
 
   // Splash screen
 
   virtual void CreateSplashScreen() {};
-  vtkKWSplashScreen *SplashScreen;
   int HasSplashScreen;
   int ShowSplashScreen;
 
@@ -419,7 +398,16 @@ protected:
 
   virtual int GetCheckForUpdatesPath(ostream &path);
 
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWApplicationInternals *Internals;
+
 private:
+
+  vtkKWRegistryHelper *RegistryHelper;
+  vtkKWSplashScreen *SplashScreen;
+  vtkKWBalloonHelpManager *BalloonHelpManager;
+
   vtkKWApplication(const vtkKWApplication&);   // Not implemented.
   void operator=(const vtkKWApplication&);  // Not implemented.
 };
