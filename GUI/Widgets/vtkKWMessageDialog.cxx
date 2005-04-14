@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.67");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.68");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -307,11 +307,6 @@ int vtkKWMessageDialog::Invoke()
     return 0;
     }
   this->InvokeEvent(vtkKWEvent::MessageDialogInvokeEvent, this->DialogText);
-
-  if (!this->GetApplication()->GetUseMessageDialogs())
-    {
-    return 0;
-    }
 
   if ( this->DialogName )
     {

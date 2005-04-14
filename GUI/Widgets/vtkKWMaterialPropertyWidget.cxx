@@ -30,20 +30,19 @@
 #include "vtkObjectFactory.h"
 
 #include <kwsys/SystemTools.hxx>
-
-#include <vtkstd/list>
+#include <kwsys/stl/list>
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.7");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.8");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
 {
 public:
 
-  typedef vtkstd::list<vtkKWMaterialPropertyWidget::Preset*> PresetsContainer;
-  typedef vtkstd::list<vtkKWMaterialPropertyWidget::Preset*>::iterator PresetsContainerIterator;
+  typedef kwsys_stl::list<vtkKWMaterialPropertyWidget::Preset*> PresetsContainer;
+  typedef kwsys_stl::list<vtkKWMaterialPropertyWidget::Preset*>::iterator PresetsContainerIterator;
 
   PresetsContainer Presets;
 };

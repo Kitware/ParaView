@@ -19,20 +19,20 @@
 #include "vtkKWHistogram.h"
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/list>
-#include <vtkstd/algorithm>
+#include <kwsys/stl/list>
+#include <kwsys/stl/algorithm>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWHistogramSet);
-vtkCxxRevisionMacro(vtkKWHistogramSet, "1.2");
+vtkCxxRevisionMacro(vtkKWHistogramSet, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkKWHistogramSetInternals
 {
 public:
 
-  typedef vtkstd::list<vtkKWHistogramSet::HistogramSlot*> HistogramsContainer;
-  typedef vtkstd::list<vtkKWHistogramSet::HistogramSlot*>::iterator HistogramsContainerIterator;
+  typedef kwsys_stl::list<vtkKWHistogramSet::HistogramSlot*> HistogramsContainer;
+  typedef kwsys_stl::list<vtkKWHistogramSet::HistogramSlot*>::iterator HistogramsContainerIterator;
 
   HistogramsContainer Histograms;
 };
@@ -314,7 +314,7 @@ int vtkKWHistogramSet::RemoveHistogram(const char *name)
     }
 
   vtkKWHistogramSetInternals::HistogramsContainerIterator pos = 
-    vtkstd::find(this->Internals->Histograms.begin(),
+    kwsys_stl::find(this->Internals->Histograms.begin(),
                  this->Internals->Histograms.end(),
                  histogram_slot);
 

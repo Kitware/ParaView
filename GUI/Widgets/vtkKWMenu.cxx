@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.60");
+vtkCxxRevisionMacro(vtkKWMenu, "1.61");
 
 
 
@@ -131,7 +131,7 @@ void vtkKWMenu::AddGeneric(const char* addtype,
 
   str << ends;
   
-  this->GetApplication()->SimpleScript(str.str());
+  this->Script(str.str());
   str.rdbuf()->freeze(0);
 
   if(!help)
@@ -172,7 +172,7 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype,
 
   str << ends;
   
-  this->GetApplication()->SimpleScript(str.str());
+  this->GetApplication()->Script(str.str());
   str.rdbuf()->freeze(0);
 
   if(!help)
@@ -193,7 +193,7 @@ void vtkKWMenu::AddCascade(const char* label,
   ostrstream str;
   str << this->GetWidgetName() << " add cascade -label {" << label << "}"
       << " -underline " << underline << ends;
-  this->GetApplication()->SimpleScript(str.str());
+  this->GetApplication()->Script(str.str());
   str.rdbuf()->freeze(0);
 
   if(!help)
@@ -217,7 +217,7 @@ void  vtkKWMenu::InsertCascade(int position,
   
   str << this->GetWidgetName() << " insert " << position 
       << " cascade -label {" << label << "} -underline " << underline << ends;
-  this->GetApplication()->SimpleScript(str.str());
+  this->GetApplication()->Script(str.str());
   str.rdbuf()->freeze(0);
 
   if(!help)

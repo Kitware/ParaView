@@ -27,10 +27,10 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/string>
+#include <kwsys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.24");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.25");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -1311,7 +1311,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
       {
       if (this->ShowColorRamp)
         {
-        vtkstd::string image_name(
+        kwsys_stl::string image_name(
           this->Script("%s cget -image", this->ColorRamp->GetWidgetName()));
         tk_cmd << canv << " create image 0 0 -anchor nw "
                << " -image " << image_name.c_str() 
