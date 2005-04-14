@@ -1,4 +1,4 @@
-$Application ExitOnReturnOn
+$Application ExitAfterLoadScriptOn
 
     if {[info exists argc]} { 
         set argcm1 [expr $argc - 1]

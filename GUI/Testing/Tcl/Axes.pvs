@@ -1,4 +1,4 @@
-$Application ExitOnReturnOn
+$Application ExitAfterLoadScriptOn
 
 set pv(vtkTemp1) [$Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]

@@ -4553,7 +4553,7 @@ if ![info exists DemoDir] {
     _adialog Delete
 } else {
 
-    #$Application ExitOnReturnOn
+    #$Application ExitAfterLoadScriptOn
 
     set foundFiles 1
 

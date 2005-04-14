@@ -14,13 +14,13 @@ if { ![$Application GetExitStatus] } {
         [[$Application GetMainWindow] GetMainView] SaveAsImage ${batchName}session.png
 
         [$Application GetMainWindow] SaveBatchScript "$batchName.pvb" 0 "$batchName.png" {}
-        $Application ExitOnReturnOff
+        $Application ExitAfterLoadScriptOff
         $Application DestroyGUI
         update
 
         $Application LoadScript "$batchName.pvb"
         catch { file delete -force "$batchName.pvb" }
-        $Application ExitOnReturnOn
+        $Application ExitAfterLoadScriptOn
 
         set batchValid {}
         for {set i  1} {$i < [expr $argc - 1]} {incr i} {

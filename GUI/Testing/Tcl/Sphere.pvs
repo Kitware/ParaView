@@ -1,4 +1,4 @@
-$Application ExitOnReturnOn
+$Application ExitAfterLoadScriptOn
 
 set pvWindow [$Application GetMainWindow]
 set kw(vtkTemp22) [$pvWindow GetMainView]
