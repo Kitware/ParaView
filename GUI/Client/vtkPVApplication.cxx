@@ -42,7 +42,6 @@
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWSplashScreen.h"
-#include "vtkKWWindowCollection.h"
 #include "vtkLongArray.h"
 #include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
@@ -112,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.345");
+vtkCxxRevisionMacro(vtkPVApplication, "1.346");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -238,10 +237,10 @@ public:
     // can see the output in the console.
     cerr << t << "\n";
 #endif
-    if ( this->Windows && this->Windows->GetNumberOfItems() &&
-         this->Windows->GetLastKWWindow() )
+    if ( this->Application && this->Application->GetNumberOfWindows())
       {
-      vtkKWWindow *win = this->Windows->GetLastKWWindow();
+      vtkKWWindow *win = this->Application->GetNthWindow(
+        this->Application->GetNumberOfWindows() - 1);
       const char *message = strstr(t, "): ");
       char type[1024], file[1024];
       int line;
@@ -291,7 +290,7 @@ public:
   
   vtkPVOutputWindow()
   {
-    this->Windows = 0;
+    this->Application = 0;
     this->ErrorOccurred = 0;
     this->TestErrors = 1;
     this->CrashOnErrors = 0;
@@ -316,17 +315,21 @@ public:
     this->Errors.erase(this->Errors.begin(), this->Errors.end());
     }
 
-  void SetWindowCollection(vtkKWWindowCollection *windows)
+  void SetApplication(vtkKWApplication *app)
     {
-    vtkKWWindowCollection* wins = this->Windows;
-    this->Windows = windows;
-    if ( !wins && this->Windows && this->Errors.size() > 0 )
+    vtkKWApplication* old_app = this->Application;
+    this->Application = app;
+    if (!old_app && this->Application && this->Errors.size() > 0)
       {
       ostrstream str;
       this->FlushErrors(str);
       str << ends;
-      vtkKWWindow *win = this->Windows->GetLastKWWindow();
-      win->ErrorMessage(str.str());
+      vtkKWWindow *win = this->Application->GetNthWindow(
+        this->Application->GetNumberOfWindows() - 1);
+      if (win)
+        {
+        win->ErrorMessage(str.str());
+        }
       str.rdbuf()->freeze(0);
       }
     }
@@ -342,7 +345,7 @@ public:
   void EnableTestErrors() { this->TestErrors = 1; }
   void DisableTestErrors() { this->TestErrors = 0; }
 protected:
-  vtkKWWindowCollection *Windows;
+  vtkKWApplication *Application;
   int ErrorOccurred;
   int TestErrors;
   int CrashOnErrors;
@@ -371,13 +374,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
   Vtkpvdevelopmenttcl_Init(interp);
 #endif
 
-  if (vtkKWApplication::GetWidgetVisibility())
-    {
-    Vtktkrenderwidget_Init(interp);
-#if defined(PARAVIEW_BUILD_DEVELOPMENT) && defined(PARAVIEW_BLT_LIBRARY)
-    Blt_Init(interp);
-#endif
-    }
+  Vtktkrenderwidget_Init(interp);
    
   Vtkkwparaview_Init(interp);
   Vtkpvservermanagertcl_Init(interp); 
@@ -411,13 +408,13 @@ vtkPVApplication::vtkPVApplication()
   vtkOutputWindow::SetInstance(this->OutputWindow);
   this->MajorVersion = PARAVIEW_VERSION_MAJOR;
   this->MinorVersion = PARAVIEW_VERSION_MINOR;
-  this->SetApplicationName("ParaView");
+  this->SetName("ParaView");
   char name[128];
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
-  this->SetApplicationVersionName(name);
+  this->SetVersionName(name);
   char patch[128];
   sprintf(patch, "%d", PARAVIEW_VERSION_PATCH);
-  this->SetApplicationReleaseName(patch);
+  this->SetReleaseName(patch);
 
   this->Display3DWidgets = 0;
 
@@ -533,8 +530,7 @@ vtkSocketController* vtkPVApplication::GetSocketController()
 //----------------------------------------------------------------------------
 vtkPVWindow *vtkPVApplication::GetMainWindow()
 {
-  this->Windows->InitTraversal();
-  return (vtkPVWindow*)(this->Windows->GetNextItemAsObject());
+  return vtkPVWindow::SafeDownCast(this->GetNthWindow(0));
 }
 
 //----------------------------------------------------------------------------
@@ -853,7 +849,7 @@ void vtkPVApplication::Initialize()
     }
 
   // Find the installation directory (now that we have the app name)
-  this->FindApplicationInstallationDirectory();
+  this->FindInstallationDirectory();
 
 #ifdef VTK_USE_MANGLED_MESA
   if (this->Options->GetUseSoftwareRendering())
@@ -998,7 +994,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   if (this->ShowSplashScreen)
     {
     this->CreateSplashScreen();
-    this->SplashScreen->SetProgressMessage("Initializing application...");
+    this->GetSplashScreen()->SetProgressMessage("Initializing application...");
     }
 
   // Application Icon 
@@ -1022,7 +1018,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if (this->ShowSplashScreen)
     {
-    this->SplashScreen->SetProgressMessage("Creating icons...");
+    this->GetSplashScreen()->SetProgressMessage("Creating icons...");
     }
 
   this->CreateButtonPhotos();
@@ -1034,7 +1030,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if (this->ShowSplashScreen)
     {
-    this->SplashScreen->SetProgressMessage("Creating UI...");
+    this->GetSplashScreen()->SetProgressMessage("Creating UI...");
     }
 
   ui->Create(this,"");
@@ -1044,7 +1040,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   this->Script("proc bgerror { m } "
                "{ global Application; $Application DisplayTCLError $m }");
-  this->OutputWindow->SetWindowCollection( this->Windows );
+  this->OutputWindow->SetApplication(this);
 
   this->Script(
     "proc smGet {group source property {index 0} {form s}} {\n"
@@ -1076,14 +1072,14 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // Check if there is an existing ParaViewTrace file.
   if (this->ShowSplashScreen)
     {
-    this->SplashScreen->SetProgressMessage("Looking for old trace files...");
+    this->GetSplashScreen()->SetProgressMessage("Looking for old trace files...");
     }
   char traceName[128];
   int foundTrace = this->CheckForTraceFile(traceName, 128);
 
   if (this->ShowSplashScreen)
     {
-    this->SplashScreen->Hide();
+    this->GetSplashScreen()->Hide();
     }
 
   const char* loadedTraceName = 0;
@@ -1201,7 +1197,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     {
     this->vtkKWApplication::Start(argc,argv);
     }
-  this->OutputWindow->SetWindowCollection(0);
+  this->OutputWindow->SetApplication(NULL);
 
   // Break a circular reference.
   this->ProcessModule->SetRenderModule(NULL);
@@ -1285,15 +1281,15 @@ void vtkPVApplication::SetSourcesBrowserAlwaysShowName(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::Close(vtkKWWindow *win)
+void vtkPVApplication::CloseWindow(vtkKWWindow *win)
 {
-  if (this->Windows->GetNumberOfItems() == 1)
+  if (this->GetNumberOfWindows() == 1)
     {
     // Try to get the render window to destruct before the render widget.
     this->ProcessModule->SetRenderModule(NULL);
     }
 
-  this->Superclass::Close(win);
+  this->Superclass::CloseWindow(win);
 }
 
 //----------------------------------------------------------------------------
@@ -1616,6 +1612,16 @@ void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* cal
     */
 }
 
+//----------------------------------------------------------------------------
+int vtkPVApplication::SelfTest()
+{
+  int res = 0;
+  this->Script("eval set _foo_ foo");
+  res += (!this->EvaluateBooleanExpression("proc a {} { return 1; }; a"));
+  res += this->EvaluateBooleanExpression("proc a {} { return 0; }; a");
+
+  return (res == 0);
+}
 
 //-----------------------------------------------------------------------------
 void vtkPVApplication::PlayDemo(int fromDashboard)
@@ -1725,11 +1731,11 @@ vtkKWLoadSaveDialog* vtkPVApplication::NewLoadSaveDialog()
   
 }
 
-void vtkPVApplication::FindApplicationInstallationDirectory()
+void vtkPVApplication::FindInstallationDirectory()
 {
-  this->Superclass::FindApplicationInstallationDirectory();
+  this->Superclass::FindInstallationDirectory();
   
-  if (!this->ApplicationInstallationDirectory)
+  if (!this->InstallationDirectory)
     {
     return;
     }
@@ -1739,11 +1745,11 @@ void vtkPVApplication::FindApplicationInstallationDirectory()
   // made if the path is retrieved from the registry, or if the binary
   // is a 'build'.
 
-  int length = strlen(this->ApplicationInstallationDirectory);
+  int length = strlen(this->InstallationDirectory);
   if (length >= 4 &&
-      !strcmp(this->ApplicationInstallationDirectory + length - 4, "/bin"))
+      !strcmp(this->InstallationDirectory + length - 4, "/bin"))
     {
-    this->ApplicationInstallationDirectory[length - 4] = '\0';
+    this->InstallationDirectory[length - 4] = '\0';
     }
 }
 

@@ -99,7 +99,7 @@ public:
 
   // Description:
   // This method is invoked when a window closes
-  virtual void Close(vtkKWWindow *);
+  virtual void CloseWindow(vtkKWWindow *);
 
   // Description:
   // We need to kill the slave processes
@@ -159,12 +159,6 @@ public:
   // Display the on-line help and about dialog for this application.
   // Over-writing vtkKWApplication defaults.
   void DisplayHelp(vtkKWWindow* master);
-
-  // For locating help (.chm) on Windows.
-  virtual int GetApplicationKey() 
-    {
-      return 15;
-    };
 
   // Description:
   // Tells the process modules whether to start the main
@@ -295,6 +289,10 @@ public:
   // Save to a file the information available in the "About ParaView" dialog.
   void SaveRuntimeInformation();
 
+  // Description:
+  // Test some of the features that cannot be tested from the tcl.
+  int SelfTest();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -314,7 +312,7 @@ protected:
   int CheckRegistration();
   int PromptRegistration(char *,char *);
 
-  virtual void FindApplicationInstallationDirectory();
+  virtual void FindInstallationDirectory();
 
   vtkPVProcessModule *ProcessModule;
 
