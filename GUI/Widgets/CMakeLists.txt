@@ -99,7 +99,6 @@ SET( KWWidgets_SRCS
   vtkKWWidgetLabeled.cxx 
   vtkKWWidgetSet.cxx 
   vtkKWWindow.cxx 
-  vtkKWWindowCollection.cxx 
   )
 
 # The "set of widgets" are automatically generated from some core widgets
@@ -184,7 +183,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 
   vtkKWWidgetCollection.cxx
-  vtkKWWindowCollection.cxx
   WRAP_EXCLUDE
   )
 
