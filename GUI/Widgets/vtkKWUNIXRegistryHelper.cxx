@@ -15,8 +15,8 @@
 
 #include "vtkObjectFactory.h"
 
-#include "vtkStdString.h"
-#include <vtkstd/map>
+#include <kwsys_stl/string>
+#include <kwsys_stl/map>
 
 #ifdef VTK_USE_ANSI_STDLIB
 #define VTK_IOS_NOCREATE 
@@ -27,14 +27,14 @@
 #define BUFFER_SIZE 8192
 
 vtkStandardNewMacro( vtkKWUNIXRegistryHelper );
-vtkCxxRevisionMacro(vtkKWUNIXRegistryHelper, "1.1");
+vtkCxxRevisionMacro(vtkKWUNIXRegistryHelper, "1.2");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
 class vtkKWUNIXRegistryHelperInternals
 {
 public:
-  typedef vtkstd::map<vtkStdString, vtkStdString> StringToStringMap;
+  typedef kwsys_stl::map<kwsys_stl::string, kwsys_stl::string> StringToStringMap;
   StringToStringMap EntriesMap;
 };
 //****************************************************************************

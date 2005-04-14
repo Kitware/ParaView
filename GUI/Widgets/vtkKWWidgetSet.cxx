@@ -18,11 +18,11 @@
 #include "vtkKWWidget.h"
 #include "vtkObjectFactory.h"
 
-#include <vtkstd/list>
+#include <kwsys/stl/list>
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.3");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.4");
 
 int vtkKWWidgetSetCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -38,8 +38,8 @@ public:
     vtkKWWidget *Widget;
   };
 
-  typedef vtkstd::list<WidgetSlot> WidgetsContainer;
-  typedef vtkstd::list<WidgetSlot>::iterator WidgetsContainerIterator;
+  typedef kwsys_stl::list<WidgetSlot> WidgetsContainer;
+  typedef kwsys_stl::list<WidgetSlot>::iterator WidgetsContainerIterator;
 
   WidgetsContainer Widgets;
 };

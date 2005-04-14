@@ -25,12 +25,12 @@
 #define VTK_KW_TOOLBAR_RELIEF_SEP "sunken"
 #endif
 
-#include <vtkstd/list>
+#include <kwsys/stl/list>
 
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.9");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.10");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -40,8 +40,8 @@ class vtkKWToolbarSetInternals
 {
 public:
 
-  typedef vtkstd::list<vtkKWToolbarSet::ToolbarSlot*> ToolbarsContainer;
-  typedef vtkstd::list<vtkKWToolbarSet::ToolbarSlot*>::iterator ToolbarsContainerIterator;
+  typedef kwsys_stl::list<vtkKWToolbarSet::ToolbarSlot*> ToolbarsContainer;
+  typedef kwsys_stl::list<vtkKWToolbarSet::ToolbarSlot*>::iterator ToolbarsContainerIterator;
 
   ToolbarsContainer Toolbars;
 };
