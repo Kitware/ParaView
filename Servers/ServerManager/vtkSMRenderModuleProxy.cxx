@@ -42,7 +42,7 @@
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.15");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.1.2.16");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -446,8 +446,7 @@ void vtkSMRenderModuleProxy::InvalidateAllGeometries()
       {
       continue;
       }
-    vtkSMProperty *p = vtkSMIntVectorProperty::SafeDownCast(
-      disp->GetProperty("InvalidateGeometry"));
+    vtkSMProperty *p = disp->GetProperty("InvalidateGeometry");
     if (p)
       {
       p->Modified();

@@ -3341,7 +3341,8 @@
       </Property>
       <Property
         name="RemoveAllCaches"
-        command="RemoveAllCaches">
+        command="RemoveAllCaches"
+        immediate_update="1">
       </Property>
       <IntVectorProperty
         name="CacheUpdate"
