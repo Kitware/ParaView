@@ -41,7 +41,123 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.45");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.46");
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::EvaluateString(
+    Tcl_Interp *interp,
+    const char* format, 
+    ...)
+{
+  va_list var_args1, var_args2;
+  va_start(var_args1, format);
+  va_start(var_args2, format);
+  const char* result = vtkKWTkUtilities::EvaluateStringFromArgs(
+    interp, format, var_args1, var_args2);
+  va_end(var_args1);
+  va_end(var_args2);
+  return result;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::EvaluateString(
+  vtkKWApplication *app,  
+  const char* format, 
+  ...)
+{
+  va_list var_args1, var_args2;
+  va_start(var_args1, format);
+  va_start(var_args2, format);
+  const char* result = vtkKWTkUtilities::EvaluateStringFromArgs(
+    app, format, var_args1, var_args2);
+  va_end(var_args1);
+  va_end(var_args2);
+  return result;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::EvaluateStringFromArgs(
+  Tcl_Interp *interp,
+  const char* format,
+  va_list var_args1,
+  va_list var_args2)
+{
+  return vtkKWTkUtilities::EvaluateStringFromArgsInternal(
+    interp,
+    NULL,
+    format,
+    var_args1,
+    var_args2);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::EvaluateStringFromArgs(
+  vtkKWApplication *app,  
+  const char* format,
+  va_list var_args1,
+  va_list var_args2)
+{
+  if (!app)
+    {
+    return NULL;
+    }
+  return vtkKWTkUtilities::EvaluateStringFromArgs(
+    app->GetMainInterp(),
+    format,
+    var_args1,
+    var_args2);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTkUtilities::EvaluateStringFromArgsInternal(
+  Tcl_Interp *interp,
+  vtkObject *dummy,
+  const char* format,
+  va_list var_args1,
+  va_list var_args2)
+{
+  const int buffer_on_stack_length = 1600;
+  char buffer_on_stack[buffer_on_stack_length];
+  char* buffer = buffer_on_stack;
+  
+  // Estimate the length of the result string.  Never underestimates.
+
+  int length = kwsys::SystemTools::EstimateFormatLength(format, var_args1);
+  
+  // If our stack-allocated buffer is too small, allocate on one on
+  // the heap that will be large enough.
+
+  if(length > buffer_on_stack_length - 1)
+    {
+    buffer = new char[length + 1];
+    }
+  
+  // Print to the buffer.
+
+  vsprintf(buffer, format, var_args2);
+  
+  // Evaluate the string in Tcl.
+
+  if (Tcl_GlobalEval(interp, buffer) != TCL_OK && dummy)
+    {
+    vtkErrorWithObjectMacro(
+      dummy, "\n    Script: \n" << buffer
+      << "\n    Returned Error on line "
+      << interp->errorLine << ": \n"  
+      << Tcl_GetStringResult(interp) << endl);
+    }
+  
+  // Free the buffer from the heap if we allocated it.
+
+  if (buffer != buffer_on_stack)
+    {
+    delete [] buffer;
+    }
+  
+  // Convert the Tcl result to its string representation.
+
+  return Tcl_GetStringResult(interp);
+}
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,

@@ -20,6 +20,16 @@
 
 #include "vtkObject.h"
 
+// This has to be here because on HP varargs are included in 
+// tcl.h and they have different prototypes for va_start so
+// the build fails. Defining HAS_STDARG prevents that.
+
+#if defined(__hpux) && !defined(HAS_STDARG)
+#define HAS_STDARG
+#endif
+
+#include <stdarg.h> // Needed for "va_list" argument of EstimateFormatLength.
+
 class vtkKWWidget;
 class vtkKWApplication;
 struct Tcl_Interp;
@@ -30,6 +40,29 @@ public:
   static vtkKWTkUtilities* New();
   vtkTypeRevisionMacro(vtkKWTkUtilities,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Evaluate a Tcl string. The string is passed to printf() first (as format
+  // specifier) along with the remaining arguments.
+  // The second prototype can be used by similar variable arguments method: it
+  // needs to walk through the var_args list twice though. The only
+  // portable way to do this is to pass two copies of the list's start
+  // pointer.
+  // Convenience methods are provided to specify a vtkKWApplication
+  // instead of the Tcl interpreter.
+  // Return a pointer to the Tcl interpreter result buffer.
+  //BTX
+  static const char* EvaluateString(
+    Tcl_Interp *interp, const char *format, ...);
+  static const char* EvaluateString(
+    vtkKWApplication *app, const char *format, ...);
+  //ETX
+  static const char* EvaluateStringFromArgs(
+    Tcl_Interp *interp, const char *format, 
+    va_list var_args1, va_list var_args2);
+  static const char* EvaluateStringFromArgs(
+    vtkKWApplication *app, const char *format, 
+    va_list var_args1, va_list var_args2);
 
   // Description:
   // Get the RGB components (0..255) that correspond to 'color' (say, #223344)
@@ -393,6 +426,10 @@ protected:
   static int ChangeFontSlant(Tcl_Interp *interp, const char *widget, int);
   static int ChangeFontSlant(Tcl_Interp *interp, 
                              const char *font, char *new_font, int);
+
+  static const char* EvaluateStringFromArgsInternal(
+    Tcl_Interp *interp, vtkObject *dummy, const char *format, 
+    va_list var_args1, va_list var_args2);
 
 private:
   vtkKWTkUtilities(const vtkKWTkUtilities&); // Not implemented
