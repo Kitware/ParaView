@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.26.2.1");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -150,6 +150,10 @@ vtkPVOrientScaleWidget::~vtkPVOrientScaleWidget()
   this->SetSMOrientModeProperty(NULL);
   this->SetSMScaleModeProperty(NULL);
   this->SetSMScaleFactorProperty(NULL);
+  this->SetCurrentOrientMode(NULL);
+  this->SetCurrentScalars(NULL);
+  this->SetCurrentVectors(NULL);
+  this->SetCurrentScaleMode(NULL);
 }
 
 //----------------------------------------------------------------------------
