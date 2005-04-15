@@ -20,7 +20,6 @@
 #include "vtkCollection.h"
 #include "vtkArrayMap.txx"
 #include "vtkLinkedList.txx"
-#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkSMProperty.h"
@@ -68,7 +67,7 @@ protected:
 
 //*****************************************************************************
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.61");
+vtkCxxRevisionMacro(vtkPVWidget, "1.62");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -91,7 +90,6 @@ vtkPVWidget::vtkPVWidget()
   this->SMProperty = 0;
   this->SMPropertyName = 0;
 
-  this->SupportsAnimation = 1;
 
   this->HideGUI = 0;
   this->Observer = vtkPVWidgetObserver::New();
@@ -270,12 +268,6 @@ void vtkPVWidget::AcceptedCallback()
     }
 }
 
-//-----------------------------------------------------------------------------
-void vtkPVWidget::AnimationMenuCallback(vtkPVAnimationInterfaceEntry* ai)
-{
-  ai->SetResetRangeButtonState(0);
-  ai->UpdateEnableState();
-}
 
 //-----------------------------------------------------------------------------
 vtkPVApplication *vtkPVWidget::GetPVApplication() 
@@ -367,7 +359,6 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
   clone->SetBalloonHelpString(this->GetBalloonHelpString());
   clone->SetDebug(this->GetDebug());
   clone->SetSMPropertyName(this->GetSMPropertyName());
-  clone->SupportsAnimation = this->SupportsAnimation;
   clone->HideGUI = this->HideGUI;
   clone->KeepsTimeStep = this->KeepsTimeStep;
 
@@ -444,11 +435,6 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   const char* help = element->GetAttribute("help");
   if(help) { this->SetBalloonHelpString(help); }
   
-  if(!element->GetScalarAttribute("animation_support", &this->SupportsAnimation))
-    {
-    this->SupportsAnimation = 1;
-    }
-
   if(!element->GetScalarAttribute("hide_gui", &this->HideGUI))
     {
     this->HideGUI = 0;
@@ -522,6 +508,5 @@ void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-  os << indent << "SupportsAnimation: " << this->SupportsAnimation << endl;
   os << indent << "KeepsTimeStep: " << this->KeepsTimeStep << endl;
 }

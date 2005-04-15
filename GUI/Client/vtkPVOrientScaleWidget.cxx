@@ -40,7 +40,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.28");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -151,6 +151,10 @@ vtkPVOrientScaleWidget::~vtkPVOrientScaleWidget()
   this->SetSMOrientModeProperty(NULL);
   this->SetSMScaleModeProperty(NULL);
   this->SetSMScaleFactorProperty(NULL);
+  this->SetCurrentOrientMode(NULL);
+  this->SetCurrentScalars(NULL);
+  this->SetCurrentVectors(NULL);
+  this->SetCurrentScaleMode(NULL);
 }
 
 //----------------------------------------------------------------------------

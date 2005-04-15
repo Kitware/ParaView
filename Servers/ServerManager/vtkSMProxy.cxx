@@ -28,9 +28,11 @@
 #include "vtkSMProxyInternals.h"
 
 #include <vtkstd/algorithm>
+#include <vtkstd/set>
+#include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.33");
+vtkCxxRevisionMacro(vtkSMProxy, "1.34");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -124,7 +126,8 @@ vtkSMProxy::vtkSMProxy()
     {
     pm->GetInterpreter()->ClearLastResult();
     }
-
+  this->InUpdateVTKObjects = 0;
+  this->SelfPropertiesModified = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -271,7 +274,8 @@ vtkSMProperty* vtkSMProxy::GetProperty(const char* name, int selfOnly)
         this->Internals->SubProxies.begin();
       for( ; it2 != this->Internals->SubProxies.end(); it2++)
         {
-        vtkSMProperty* prop = it2->second.GetPointer()->GetProperty(name);
+        vtkSMProperty* prop = it2->second.GetPointer()->
+          GetExposedProperty(name);
         if (prop)
           {
           return prop;
@@ -495,15 +499,18 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
       }
     it->second.ModifiedFlag = 0;
     }
+  else
+    {
+    this->SelfPropertiesModified = 1;
+    }
 }
 
 //---------------------------------------------------------------------------
 void vtkSMProxy::UpdateInformation()
 {
   this->CreateVTKObjects(1);
-  int numObjects = this->Internals->IDs.size();
 
-  if (numObjects > 0)
+  if (this->ObjectsCreated)
     {
     vtkSMProxyInternals::PropertyInfoMap::iterator it;
     // Update all properties.
@@ -548,11 +555,44 @@ void vtkSMProxy::UpdateInformation()
 }
 
 //---------------------------------------------------------------------------
+int vtkSMProxy::ArePropertiesModified(int selfOnly /*=0*/)
+{
+  if (this->SelfPropertiesModified)
+    {
+    return 1;
+    }
+
+  if (!selfOnly)
+    {
+    vtkSMProxyInternals::ProxyMap::iterator it2 =
+      this->Internals->SubProxies.begin();
+    for( ; it2 != this->Internals->SubProxies.end(); it2++)
+      {
+      if (it2->second.GetPointer()->ArePropertiesModified())
+        {
+        return 1;
+        }
+      }
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxy::UpdateVTKObjects()
 {
+  if (this->InUpdateVTKObjects)
+    {
+    return;
+    }
+  this->InUpdateVTKObjects = 1;
+  
   vtkClientServerStream str;
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendPrepareProgress();
+
+  int old_SelfPropertiesModified = this->SelfPropertiesModified;
+  
+  this->SelfPropertiesModified = 0;
 
   // Make each property push their values to each VTK object
   // referred by the proxy. This is done by appending all
@@ -564,20 +604,23 @@ void vtkSMProxy::UpdateVTKObjects()
   // number of objects to create is based on the number of inputs
   // in the case of filters)
   vtkSMProxyInternals::PropertyInfoMap::iterator it;
-  for (it  = this->Internals->Properties.begin();
-       it != this->Internals->Properties.end();
-       ++it)
+  if (old_SelfPropertiesModified)
     {
-    vtkSMProperty* prop = it->second.Property.GetPointer();
-    if (prop->IsA("vtkSMInputProperty"))
+    for (it  = this->Internals->Properties.begin();
+      it != this->Internals->Properties.end();
+      ++it)
       {
-      if (it->second.ModifiedFlag && !prop->GetImmediateUpdate())
+      vtkSMProperty* prop = it->second.Property.GetPointer();
+      if (prop->IsA("vtkSMInputProperty"))
         {
-        if (prop->GetUpdateSelf())
+        if (it->second.ModifiedFlag && !prop->GetImmediateUpdate())
           {
-          this->PushProperty(it->first.c_str(), 
-                             this->SelfID, 
-                             vtkProcessModule::CLIENT);
+          if (prop->GetUpdateSelf())
+            {
+            this->PushProperty(it->first.c_str(), 
+              this->SelfID, 
+              vtkProcessModule::CLIENT);
+            }
           }
         it->second.ModifiedFlag = 0;
         }
@@ -585,37 +628,42 @@ void vtkSMProxy::UpdateVTKObjects()
     }
 
   this->CreateVTKObjects(1);
-  int numObjects = this->Internals->IDs.size();
 
-  for (it  = this->Internals->Properties.begin();
-       it != this->Internals->Properties.end();
-       ++it)
+  if (old_SelfPropertiesModified)
     {
-    vtkSMProperty* prop = it->second.Property.GetPointer();
-    if (it->second.ModifiedFlag && 
+    int numObjects = this->Internals->IDs.size();
+
+    for (it  = this->Internals->Properties.begin();
+      it != this->Internals->Properties.end();
+      ++it)
+      {
+      vtkSMProperty* prop = it->second.Property.GetPointer();
+      if (it->second.ModifiedFlag && 
         !prop->GetImmediateUpdate() && 
         !prop->GetInformationOnly())
-      {
-      if (prop->GetUpdateSelf())
         {
-        this->PushProperty(it->first.c_str(), 
-                           this->SelfID, 
-                           vtkProcessModule::CLIENT);
-        }
-      else
-        {
-        for (int i=0; i<numObjects; i++)
+        if (prop->GetUpdateSelf())
           {
-          prop->AppendCommandToStream(this, &str, this->Internals->IDs[i]);
+          this->PushProperty(it->first.c_str(), 
+            this->SelfID, 
+            vtkProcessModule::CLIENT);
+          }
+        else
+          {
+          for (int i=0; i<numObjects; i++)
+            {
+            prop->AppendCommandToStream(this, &str, this->Internals->IDs[i]);
+            }
           }
         }
       it->second.ModifiedFlag = 0;
       }
+    if (str.GetNumberOfMessages() > 0)
+      {
+      pm->SendStream(this->Servers, str);
+      }
     }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }
+
   pm->SendCleanupPendingProgress();
 
   vtkSMProxyInternals::ProxyMap::iterator it2 =
@@ -629,6 +677,14 @@ void vtkSMProxy::UpdateVTKObjects()
   // loose its caches when it Updated the VTK objects.
   // It has to be called separately now.
   //this->MarkConsumersAsModified();
+
+  this->InUpdateVTKObjects = 0;
+  // If any properties got modified while pushing them,
+  // we need to call UpdateVTKObjects again.
+  if (this->ArePropertiesModified())
+    {
+    this->UpdateVTKObjects();
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -655,29 +711,27 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
-  if (!this->VTKClassName)
-    {
-    vtkErrorMacro("VTKClassName is not defined. Can not create objects.");
-    return;
-    }
   this->ObjectsCreated = 1;
 
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream stream;
-  for (int i=0; i<numObjects; i++)
+  if (this->VTKClassName)
     {
-    vtkClientServerID objectId = pm->NewStreamObject(this->VTKClassName, stream);
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    vtkClientServerStream stream;
+    for (int i=0; i<numObjects; i++)
+      {
+      vtkClientServerID objectId = pm->NewStreamObject(this->VTKClassName, stream);
 
-    this->Internals->IDs.push_back(objectId);
+      this->Internals->IDs.push_back(objectId);
 
-    stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-      << "RegisterProgressEvent"
-      << objectId << static_cast<int>(objectId.ID)
-      << vtkClientServerStream::End;
-    }
-  if (stream.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, stream);
+      stream << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
+        << "RegisterProgressEvent"
+        << objectId << static_cast<int>(objectId.ID)
+        << vtkClientServerStream::End;
+      }
+    if (stream.GetNumberOfMessages() > 0)
+      {
+      pm->SendStream(this->Servers, stream);
+      }
     }
 
   vtkSMProxyInternals::ProxyMap::iterator it2 =
@@ -816,7 +870,6 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name)
     {
     return property;
     }
-
   vtkPVXMLElement* element = this->XMLElement;
   if (!element)
     {
@@ -835,8 +888,26 @@ vtkSMProperty* vtkSMProxy::NewProperty(const char* name)
         break;
         }
       }
+    propElement = 0;
     }
+  if (!propElement)
+    {
+    return 0;
+    }
+  return this->NewProperty(name, propElement);
 
+}
+
+//----------------------------------------------------------------------------
+vtkSMProperty* vtkSMProxy::NewProperty(const char* name, 
+  vtkPVXMLElement* propElement)
+{
+  vtkSMProperty* property = this->GetProperty(name, 1);
+  if (property)
+    {
+    return property;
+    }
+  
   if (!propElement)
     {
     return 0;
@@ -887,8 +958,47 @@ int vtkSMProxy::ReadXMLAttributes(
     {
     this->SetXMLName(xmlname);
     }
+  if (!this->CreateProxyHierarchy(pm, element))
+    {
+    return 0;
+    }
+  this->SetXMLElement(0);
+  return 1;
+}
 
+//---------------------------------------------------------------------------
+int vtkSMProxy::CreateProxyHierarchy(vtkSMProxyManager* pm,
+  vtkPVXMLElement* element)
+{
+  const char* base_group = element->GetAttribute("base_proxygroup");
+  const char* base_name = element->GetAttribute("base_proxyname");
+  if (base_group && base_name)
+    {
+    // Obtain the interface from the base interface.
+    vtkPVXMLElement* base_element = pm->GetProxyElement(base_group,
+      base_name);
+    if (!base_element || !this->CreateProxyHierarchy(pm, base_element))
+      {
+      vtkErrorMacro("Base interface cannot be found.");
+      return 0;
+      }
+    }
   // Create all sub-proxies and properties
+  if (!this->CreateSubProxiesAndProperties(pm, element))
+    {
+    return 0;
+    }
+  return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxy::CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
+  vtkPVXMLElement *element)
+{
+  if (!element || !pm)
+    {
+    return 0;
+    }
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
     {
     vtkPVXMLElement* propElement = element->GetNestedElement(i);
@@ -926,6 +1036,8 @@ int vtkSMProxy::ReadXMLAttributes(
             vtkErrorMacro("Failed to create subproxy.");
             return 0;
             }
+          this->SetupSharedProperties(subproxy, propElement);
+          this->SetupExposedProperties(subproxy, propElement);
           this->AddSubProxy(name, subproxy);
           subproxy->Delete();
           }
@@ -936,13 +1048,117 @@ int vtkSMProxy::ReadXMLAttributes(
       const char* name = propElement->GetAttribute("name");
       if (name)
         {
-        this->NewProperty(name);
+        this->NewProperty(name, propElement);
         }
       }
     }
-
-  this->SetXMLElement(0);
   return 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetupExposedProperties(vtkSMProxy* subproxy, 
+  vtkPVXMLElement *element)
+{
+  if (!subproxy || !element)
+    {
+    return;
+    }
+
+  for (unsigned int i=0; i < element->GetNumberOfNestedElements(); i++)
+    {
+    vtkPVXMLElement* exposedElement = element->GetNestedElement(i);
+    if (strcmp(exposedElement->GetName(), "ExposedProperties")!=0)
+      {
+      continue;
+      }
+     for (unsigned int j=0; 
+       j < exposedElement->GetNumberOfNestedElements(); j++)
+       {
+       vtkPVXMLElement* propertyElement = exposedElement->GetNestedElement(j);
+       if (strcmp(propertyElement->GetName(), "Property") != 0)
+         {
+         vtkErrorMacro("ExposedProperties can only have Property tags.");
+         continue;
+         }
+       const char* name = propertyElement->GetAttribute("name");
+       if (!name || !name[0])
+         {
+         vtkErrorMacro("Attribute name is required!");
+         continue;
+         }
+       subproxy->ExposeProperty(name);
+       }
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy, 
+  vtkPVXMLElement *element)
+{
+  if (!subproxy || !element)
+    {
+    return;
+    }
+
+  for (unsigned int i=0; i < element->GetNumberOfNestedElements(); i++)
+    {
+    vtkPVXMLElement* propElement = element->GetNestedElement(i);
+    if (strcmp(propElement->GetName(), "ShareProperties")==0)
+      {
+      const char* name = propElement->GetAttribute("subproxy");
+      if (!name || !name[0])
+        {
+        continue;
+        }
+      vtkSMProxy* src_subproxy = this->GetSubProxy(name);
+      if (!src_subproxy)
+        {
+        vtkErrorMacro("Subproxy " << name << " must be defined before "
+          "its properties can be shared with another subproxy.");
+        continue;
+        }
+      // Read the exceptions.
+      vtkstd::set<vtkstd::string> exceptions;
+      for (unsigned int j=0; j < propElement->GetNumberOfNestedElements(); j++)
+        {
+        vtkPVXMLElement* exceptionProp = propElement->GetNestedElement(j);
+        if (strcmp(exceptionProp->GetName(), "Exception") != 0)
+          {
+          continue;
+          }
+        const char* exp_name = exceptionProp->GetAttribute("name");
+        if (!exp_name)
+          {
+          vtkErrorMacro("Exception tag must have the attribute 'name'.");
+          continue;
+          }
+        exceptions.insert(exceptions.end(), vtkstd::string(exp_name));
+        }
+      // Iterate over src_subproxy properties and
+      // replace the subproxy properties except those in exceptions.
+      vtkSMPropertyIterator* piter = vtkSMPropertyIterator::New();
+      piter->SetProxy(src_subproxy);
+      for (piter->Begin(); !piter->IsAtEnd(); piter->Next())
+        {
+        const char* pname = piter->GetKey();
+        if (exceptions.find(vtkstd::string(pname)) !=
+          exceptions.end())
+          {
+          continue;
+          }
+        // Check is subproxy has this property. If not, the property
+        // cannot be shared. For a property to be shared, it must be defined 
+        // on both proxies.
+        if (!subproxy->GetProperty(pname))
+          {
+          continue;
+          }
+        subproxy->RemoveProperty(pname);
+        subproxy->AddProperty(pname, piter->GetProperty());
+        }
+      piter->Delete();
+      }
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -978,6 +1194,84 @@ vtkSMPropertyIterator* vtkSMProxy::NewPropertyIterator()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxy::DeepCopy(vtkSMProxy* src)
+{
+  this->DeepCopy(src, 0);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::DeepCopy(vtkSMProxy* src, const char* exceptionClass)
+{
+  if (!src)
+    {
+    return;
+    }
+
+  vtkSMProxyInternals::ProxyMap::iterator it2 =
+    src->Internals->SubProxies.begin();
+  for( ; it2 != src->Internals->SubProxies.end(); it2++)
+    {
+    vtkSMProxy* sub = this->GetSubProxy(it2->first.c_str());
+    if (sub)
+      {
+      sub->DeepCopy(it2->second, exceptionClass); 
+      }
+    }
+
+  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+  iter->SetTraverseSubProxies(0);
+  for(iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    const char* key = iter->GetKey();
+    vtkSMProperty* dest = iter->GetProperty();
+    if (key && dest)
+      {
+      vtkSMProperty* source = src->GetProperty(key);
+      if (source)
+        {
+        if (!exceptionClass || !dest->IsA(exceptionClass))
+          {
+          dest->DeepCopy(source);
+          }
+        }
+      }
+    }
+
+  iter->Delete();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::ExposeProperty(const char* name)
+{
+  this->Internals->ExposedPropertyNames.insert(vtkStdString(name));
+}
+
+//---------------------------------------------------------------------------
+vtkSMProperty* vtkSMProxy::GetExposedProperty(const char* name)
+{
+  if ( this->Internals->ExposedPropertyNames.find(name) ==
+    this->Internals->ExposedPropertyNames.end())
+    {
+    return 0; // property has not been exposed.
+    }
+
+  vtkSMProperty* toReturn = 0;
+  vtkSMPropertyIterator* iter = this->NewPropertyIterator();
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    const char* key = iter->GetKey();
+    vtkSMProperty* property = iter->GetProperty();
+    if (strcmp(name, key) == 0)
+      {
+      toReturn = property;
+      break;
+      }
+    }
+  iter->Delete();
+  return toReturn;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -988,4 +1282,7 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "XMLName: "
      << (this->XMLName ? this->XMLName : "(null)")
      << endl;
+  os << indent << "XMLGroup: " 
+    << (this->XMLGroup ? this->XMLGroup : "(null)")
+    << endl;
 }

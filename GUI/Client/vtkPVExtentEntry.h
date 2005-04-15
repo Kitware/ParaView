@@ -46,20 +46,6 @@ public:
   void SetValue(int v1, int v2, int v3, int v4, int v5, int v6);
   
   // Description:
-  // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                         vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
-  // This method gets called when the user selects this widget to animate.
-  // It sets up the script and animation parameters.
-  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai, int Mode);
-  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
-    {
-      this->AnimationMenuCallback(ai, 0);
-    }
-
-  // Description:
   // The label.
   vtkSetStringMacro(Label);
   vtkGetStringMacro(Label);
@@ -127,11 +113,6 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
 
-  // Description:
-  // Resets the animation entries (start and end) to values obtained
-  // from the range domain
-  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai, int idx);
-  
 protected:
   vtkPVExtentEntry();
   ~vtkPVExtentEntry();

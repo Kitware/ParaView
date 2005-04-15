@@ -25,7 +25,6 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
@@ -151,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.34");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.35");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -460,82 +459,6 @@ int vtkPVXDMFParameters::ReadXMLAttributes(vtkPVXMLElement* element,
 
   return 1;
 
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVXDMFParameters::AddAnimationScriptsToMenu(
-  vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai)
-{
-  if ( !this->VTKReaderID.ID )
-    {
-    return;
-    }
-
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    this->GetSMProperty());
-  
-  if (svp)
-    {
-    char methodAndArgs[1024];
-    char name[1024];
-    unsigned int numProps = svp->GetNumberOfElements()/2;
-    for (unsigned int i=0; i<numProps; i++)
-      {
-      sprintf(methodAndArgs, 
-              "AnimationMenuCallback %s %s %d", 
-              ai->GetTclName(), 
-              svp->GetElement(2*i),
-              i);
-      sprintf(name, "%s_%s", this->GetTraceHelper()->GetObjectName(), svp->GetElement(2*i));
-      menu->AddCommand(name, this, methodAndArgs, 0,"");
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVXDMFParameters::ResetAnimationRange(
-  vtkPVAnimationInterfaceEntry *ai, const char *name)
-{
-  vtkPVXDMFParametersInternals::Parameter *p = 
-    this->Internals->GetParameter(name);
-
-  ai->SetTimeStart(p->Min);
-  ai->SetTimeEnd(p->Max);
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVXDMFParameters::AnimationMenuCallback(
-  vtkPVAnimationInterfaceEntry *ai, const char *name, unsigned int idx)
-{
-  if (ai->GetTraceHelper()->Initialize())
-    {
-    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s) {%s}", 
-                        this->GetTclName(), ai->GetTclName(), name);
-    }
-  
-  this->Superclass::AnimationMenuCallback(ai);
-
-  char label[1024];
-  sprintf(label, "%s_%s", this->GetTraceHelper()->GetObjectName(), name);
-  ai->SetLabelAndScript(label, NULL, this->GetTraceHelper()->GetObjectName());
-
-  char methodAndArgs[500];
-  
-  sprintf(methodAndArgs, 
-          "ResetAnimationRange %s %s", ai->GetTclName(), name);
-  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
-  ai->SetResetRangeButtonState(1);
-  ai->UpdateEnableState();
-
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMDomain *rangeDomain = prop->GetDomain("range");
-  
-  ai->SetCurrentSMProperty(prop);
-  ai->SetCurrentSMDomain(rangeDomain);
-  ai->SetAnimationElement(idx);
-  this->ResetAnimationRange(ai, name);
-  ai->SetTypeToInt();
-  ai->Update();
 }
 
 //----------------------------------------------------------------------------

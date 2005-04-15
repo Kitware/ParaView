@@ -13,7 +13,7 @@
 
 =========================================================================*/
 #include "vtkPVProcessModuleGUIHelper.h"
-
+#include "vtkPVConfig.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVClientServerModule.h"
@@ -23,7 +23,7 @@
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.14");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.15");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -123,10 +123,6 @@ int vtkPVProcessModuleGUIHelper::ActualRun(int argc, char **argv)
   if (this->PVApplication->GetStartGUI())
     {
     this->PVApplication->Script("wm withdraw .");
-    if ( !this->ProcessModule->SetupRenderModule() )
-      {
-      return -1;
-      }
     this->PVApplication->Start(argc, argv);
     }
   else

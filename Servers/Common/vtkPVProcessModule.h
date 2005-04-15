@@ -136,6 +136,12 @@ public:
   vtkPVServerInformation* GetServerInformation() { return this->ServerInformation;}
 
   // Description:
+  // Rendering options such as TileDimensions and  OffscreenRendering
+  // may be set only on the server. This method updates the Client options
+  // to those on the server.
+  void SynchronizeServerClientOptions();
+
+  // Description:
   // We need to get the data path for the demo on the server.
   const char* GetDemoPath();
 
@@ -175,9 +181,6 @@ public:
   // Get and Set the application installation directory
   vtkSetStringMacro(ApplicationInstallationDirectory);
   vtkGetStringMacro(ApplicationInstallationDirectory);
-
-  // Create and start using render module
-  virtual int SetupRenderModule();
 
 protected:
   vtkPVProcessModule();

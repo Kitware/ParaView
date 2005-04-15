@@ -21,7 +21,6 @@
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
@@ -34,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.54");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.55");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -402,63 +401,6 @@ void vtkPVSelectTimeSet::ResetInternal()
 {
   this->CommonReset();
   this->ModifiedFlag = 0;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                   vtkPVAnimationInterfaceEntry *ai)
-{
-  char methodAndArgs[500];
-
-  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-  // I do not under stand why the trace name is used for the
-  // menu entry, but Berk must know.
-  menu->AddCommand(this->GetTraceHelper()->GetObjectName(), this, methodAndArgs, 0, "");
-}
-
-
-//-----------------------------------------------------------------------------
-// What a pain.  I need this method for tracing.
-// Maybe the animation should call PVwidget methods and not vtk object methods.
-void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
-{
-  if (ai->GetTraceHelper()->Initialize())
-    {
-    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
-                        this->GetTclName(), ai->GetTclName());
-    }
-  
-  this->Superclass::AnimationMenuCallback(ai);
-
-  // I do not under stand why the trace name is used for the
-  // menu entry, but Berk must know.
-  ai->SetLabelAndScript(this->GetTraceHelper()->GetObjectName(), NULL, this->GetTraceHelper()->GetObjectName());
-
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMDomain *rangeDomain = prop->GetDomain("range");
-  ai->SetCurrentSMProperty(prop);
-  ai->SetCurrentSMDomain(rangeDomain);
-  ai->SetAnimationElement(0);
-
-  vtkSMDoubleRangeDomain *doubleRangeDomain =
-    vtkSMDoubleRangeDomain::SafeDownCast(rangeDomain);
-  int minExists = 0, maxExists = 0;
-  if (doubleRangeDomain)
-    {
-    double min = doubleRangeDomain->GetMinimum(0, minExists);
-    double max = doubleRangeDomain->GetMaximum(0, maxExists);
-    if (minExists && maxExists)
-      {
-      ai->SetTimeStart(min);
-      ai->SetTimeEnd(max);
-      }
-    }
-  else
-    {
-    vtkErrorMacro("Could not find required domain (range)");
-    }
-  
-  ai->Update();
 }
 
 //-----------------------------------------------------------------------------

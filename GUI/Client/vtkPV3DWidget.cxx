@@ -13,32 +13,30 @@
 
 =========================================================================*/
 #include "vtkPV3DWidget.h"
-
+#include "vtkPVConfig.h"
 #include "vtkCommand.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkPVDisplayGUI.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVRenderView.h"
+
 #include "vtkPVSource.h"
-#include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVTraceHelper.h"
 
-#include "vtkKWEvent.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSM3DWidgetProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMProxyProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.68");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.69");
 
 //===========================================================================
 //***************************************************************************
@@ -99,6 +97,18 @@ vtkPV3DWidget::~vtkPV3DWidget()
   this->SetWidgetProxyName(0);
   if (this->WidgetProxy)
     {
+    
+    vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+    if (rm)
+      {
+      vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+        rm->GetProperty("Displays"));
+      if (pp)
+        {
+        pp->RemoveProxy(this->WidgetProxy);
+        rm->UpdateVTKObjects();
+        }
+      }
     this->WidgetProxy->Delete();
     this->WidgetProxy = 0;
     }
@@ -174,7 +184,24 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
   pxm->RegisterProxy("3d_widgets",this->WidgetProxyName, this->WidgetProxy);
   proxyNum++;
   str.rdbuf()->freeze(0);
+  this->WidgetProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->WidgetProxy->CreateVTKObjects(1);
+
+  // Add to the render module.
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    rm->GetProperty("Displays"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Displays on RenderModuleProxy.");
+    }
+  else
+    {
+    pp->AddProxy(this->WidgetProxy);
+    rm->UpdateVTKObjects();
+    }
+
   this->InitializeObservers(this->WidgetProxy);
   this->ChildCreate(pvApp);
 }
@@ -184,6 +211,7 @@ void vtkPV3DWidget::InitializeObservers(vtkSM3DWidgetProxy* widgetproxy)
 {
   if(widgetproxy)
     {
+    // TODO: verify if we need the Start and End Interaction events at all.
     widgetproxy->AddObserver(vtkCommand::WidgetModifiedEvent,this->Observer);
     widgetproxy->AddObserver(vtkCommand::StartInteractionEvent,this->Observer);
     widgetproxy->AddObserver(vtkCommand::EndInteractionEvent,this->Observer);
@@ -337,24 +365,12 @@ void vtkPV3DWidget::PlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::ExecuteEvent(vtkObject* obj, unsigned long event, void*calldata)
 {
-  //Interactive rendering enabling/disabling code should eventually
-  //move to the SM3DWidget
- 
   if (vtkSM3DWidgetProxy::SafeDownCast(obj))
     {
-    if ( event == vtkCommand::StartInteractionEvent && this->PVSource )
-      {
-      this->PVSource->GetPVWindow()->InteractiveRenderEnabledOn();
-      }
-    else if ( event == vtkCommand::EndInteractionEvent && this->PVSource )
-      {
-      this->PVSource->GetPVWindow()->InteractiveRenderEnabledOff();
-      }
-    else
+    if (event == vtkCommand::WidgetModifiedEvent)
       {
       this->ModifiedCallback();
       }
-    this->Render();
     }
   this->Superclass::ExecuteEvent(obj, event, calldata);
 }
@@ -378,7 +394,7 @@ void vtkPV3DWidget::Render()
 {
   if ( this->Placed )
     {
-    this->GetPVApplication()->GetMainWindow()->GetInteractor()->Render();
+    this->GetPVApplication()->GetRenderModuleProxy()->StillRender();
     }
 }
 

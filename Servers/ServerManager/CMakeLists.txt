@@ -1,5 +1,10 @@
 PROJECT(ServerManager)
 
+SET( ServerManagerCS_SRCS
+  vtkPickPointWidget.cxx
+  vtkPickLineWidget.cxx
+  )
+ 
 SET( ServerManagerCommon_SRCS
   vtkSMInteractorObserverProxy.cxx
   vtkSM3DWidgetProxy.cxx
@@ -27,9 +32,13 @@ SET( ServerManagerCommon_SRCS
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxProxy.cxx
+  vtkSMCaveRenderModuleProxy.cxx
+  vtkSMCompositeDisplayProxy.cxx
+  vtkSMCompositeRenderModuleProxy.cxx
   vtkSMDataTypeDomain.cxx
-  vtkSMDisplayWindowProxy.cxx
-  vtkSMDisplayerProxy.cxx
+  vtkSMDisplayProxy.cxx
+#  vtkSMDisplayWindowProxy.cxx
+#  vtkSMDisplayerProxy.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleRangeDomain.cxx
@@ -38,6 +47,8 @@ SET( ServerManagerCommon_SRCS
   vtkSMExtentDomain.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFixedTypeDomain.cxx
+  vtkSMIceTDesktopRenderModuleProxy.cxx
+  vtkSMIceTRenderModuleProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneProxy.cxx
   vtkSMInformationHelper.cxx
@@ -46,10 +57,16 @@ SET( ServerManagerCommon_SRCS
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLookupTableProxy.cxx
+  vtkSMLODDisplayProxy.cxx
+  vtkSMLODRenderModuleProxy.cxx
+  vtkSMMultiDisplayProxy.cxx
+  vtkSMMultiDisplayRenderModuleProxy.cxx
   vtkSMNumberOfPartsDomain.cxx
   vtkSMObject.cxx
   vtkSMPVDWriterProxy.cxx
   vtkSMPart.cxx
+  vtkSMPickLineWidgetProxy.cxx
+  vtkSMPickPointWidgetProxy.cxx
   vtkSMProperty.cxx
   vtkSMPropertyAdaptor.cxx
   vtkSMPropertyIterator.cxx
@@ -59,11 +76,17 @@ SET( ServerManagerCommon_SRCS
   vtkSMProxyIterator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
+  vtkSMRenderModuleProxy.cxx
+  vtkSMServerFileListingProxy.cxx
+  vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetProxy.cxx
   vtkSMSimpleIntInformationHelper.cxx
+  vtkSMSimpleDisplayProxy.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
   vtkSMSimpleProxyInformationHelper.cxx
+  vtkSMSimpleRenderModuleProxy.cxx
   vtkSMSimpleStringInformationHelper.cxx
+  vtkSMMPIRenderModuleProxy.cxx
   vtkSMSourceProxy.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
@@ -76,31 +99,20 @@ SET( ServerManagerCommon_SRCS
   vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx
   vtkSMWriterProxy.cxx
-  vtkSMDisplay.cxx
-  vtkSMPartDisplay.cxx
-  vtkSMCompositePartDisplay.cxx
-  vtkSMLODPartDisplay.cxx
-  vtkSMMultiDisplayPartDisplay.cxx
-  vtkSMCubeAxesDisplay.cxx
-  vtkSMPlotDisplay.cxx
-  vtkSMPointLabelDisplay.cxx
+  vtkSMCubeAxesDisplayProxy.cxx
+  vtkSMPointLabelDisplayProxy.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
+  vtkSMXYPlotActorProxy.cxx
+  vtkSMXYPlotDisplayProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
   vtkPVBatchOptions.cxx
-  vtkPVCaveRenderModule.cxx
-  vtkPVCompositeRenderModule.cxx
-  vtkPVDeskTopRenderModule.cxx
-  vtkPVIceTRenderModule.cxx
-  vtkPVMultiDisplayRenderModule.cxx
-  vtkPVLODRenderModule.cxx
-  vtkPVMPIRenderModule.cxx
-  vtkPVSimpleRenderModule.cxx
   vtkSMXMLParser.cxx
   )
 
 SET( ServerManager_SRCS
+  ${ServerManagerCS_SRCS}
   ${ServerManagerCommon_SRCS}
   ${ServerManagerNonWrapped_SRCS}
   )
@@ -109,10 +121,11 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMInteractorObserverProxy.cxx
   vtkSM3DWidgetProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
+  vtkSMDisplayProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMVectorProperty.cxx
-  vtkSMDisplay.cxx
+  vtkSMRenderModuleProxy.cxx
   ABSTRACT
   )
 
@@ -161,7 +174,7 @@ INCLUDE_DIRECTORIES(
 # Create ClientServer wrappers for ParaView classes.
 INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
 SET(VTK_BINARY_DIR "${ServerManager_BINARY_DIR}")
-VTK_EXPORT_KIT("PVServerManager" "PVSERVERMANAGER" "${ServerManagerCommon_SRCS}")
+VTK_EXPORT_KIT("PVServerManager" "PVSERVERMANAGER" "${ServerManagerCommon_SRCS};${ServerManagerCS_SRCS}")
 
 SET(KIT_WRAP_DEPS "")
 SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/Servers/ServerManager/Utilities")

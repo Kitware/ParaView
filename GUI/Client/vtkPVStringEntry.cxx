@@ -15,7 +15,6 @@
 #include "vtkPVStringEntry.h"
 
 #include "vtkArrayMap.txx"
-#include "vtkClientServerStream.h"
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
@@ -31,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.45");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.46");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()

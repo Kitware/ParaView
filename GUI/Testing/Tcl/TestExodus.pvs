@@ -6,7 +6,6 @@ set kw(vtkTemp23) [$kw(vtkTemp4) GetMainView]
 source [file join [file dirname [info script]] CommandLineOptions.tcl]
 ParseCommandLine $kw(vtkTemp23) $argv $argc
 
-set kw(vtkTemp177) [$kw(vtkTemp4) GetAnimationInterface]
 [$kw(vtkTemp4) GetRotateCameraButton] SetState 1
 $kw(vtkTemp4) ChangeInteractorStyle 1
 set kw(vtkTemp1076) [$kw(vtkTemp4) InitializeReadCustom "ExodusReader" "$DataDir/Data/box.ex2"]
@@ -53,18 +52,11 @@ set kw(vtkTemp1144) [$kw(vtkTemp1076) GetPVWidget {global_file_ids}]
 $kw(vtkTemp1144) SetState 1
 $kw(vtkTemp1076) AcceptCallback
 set kw(vtkTemp1162) [$kw(vtkTemp1076) GetPVOutput]
-$kw(vtkTemp1162) ColorByPointField {disp} 3
+$kw(vtkTemp1162) ColorByArray {disp} 3
 $kw(vtkTemp1162) SetMapScalarsFlag 1
 $kw(vtkTemp1162) SetInterpolateColorsFlag 0
 $kw(vtkTemp1162) DrawSurface
 $kw(vtkTemp1162) SetVisibility 1
-$kw(vtkTemp1162) ClearVolumeOpacity
-$kw(vtkTemp1162) AddVolumeOpacity 1 0
-$kw(vtkTemp1162) AddVolumeOpacity 27 1
-$kw(vtkTemp1162) ClearVolumeColor
-$kw(vtkTemp1162) AddVolumeColor 1 1 0 0
-$kw(vtkTemp1162) AddVolumeColor 27 0.8 0 1
-$kw(vtkTemp1162) SetVolumeOpacityUnitDistance 5.06455
 set kw(vtkTemp1277) [$kw(vtkTemp4) GetPVColorMap {BlockId} 1]
 $kw(vtkTemp1277) SetScalarRange 1 1.001
 $kw(vtkTemp1277) SetStartHSV 0.6667 1 1
@@ -131,9 +123,6 @@ $kw(vtkTemp248) SetCurrentManipulator 0 1 {Roll}
 $kw(vtkTemp248) SetCurrentManipulator 1 0 {Pan}
 $kw(vtkTemp248) SetCurrentManipulator 2 1 {Pan}
 $kw(vtkTemp248) SetCurrentManipulator 2 0 {Zoom}
-$kw(vtkTemp177) SetNumberOfFrames 100
-$kw(vtkTemp177) SetCurrentTime 0
-$kw(vtkTemp177) SetCacheGeometry 1
 $kw(vtkTemp4) SetCenterOfRotation 5 5 5
 
 source [file join [file dirname [info script]] Compare.tcl]

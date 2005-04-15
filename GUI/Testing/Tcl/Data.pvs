@@ -39,7 +39,7 @@ $kw(vtkTemp186) AcceptCallback
 set kw(vtkTemp214) [$kw(vtkTemp186) GetPVOutput]
 $kw(vtkTemp214) SetLineWidth 1
 $kw(vtkTemp214) SetPointSize 1
-$kw(vtkTemp214) ColorByCellField scalars 1
+$kw(vtkTemp214) ColorByArray {scalars} 4
 set kw(vtkTemp220) [$kw(vtkTemp1) CreatePVSource CubeSource]
 set kw(vtkTemp239) [$kw(vtkTemp220) GetPVWidget {Center}]
 $kw(vtkTemp239) SetValue 0 2 2

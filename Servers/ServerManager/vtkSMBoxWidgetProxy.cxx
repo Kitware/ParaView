@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMBoxWidgetProxy);
-vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.6");
 
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()

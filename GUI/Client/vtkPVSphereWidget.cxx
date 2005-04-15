@@ -46,7 +46,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.59");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.60");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -596,7 +596,6 @@ void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
       this->CenterEntry[1]->SetValue(center[1]);
       this->CenterEntry[2]->SetValue(center[2]);
       this->RadiusEntry->SetValue(radius);
-      this->Render();
       this->ModifiedCallback();
       this->ValueChanged = 0;
       }

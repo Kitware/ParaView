@@ -110,7 +110,7 @@ AdjustContourValue $cInt 0.3
 
 $pvWindow SetCurrentPVSource $cInt
 set cntOutput [$cInt GetPVOutput]
-$cntOutput ColorByPointField Momentum 3
+$cntOutput ColorByArray {Momentum} 3
 $cntOutput SetScalarBarVisibility 1
 $cInt Reset
 
@@ -149,7 +149,7 @@ $pvExtract AcceptCallback
 [[$Application GetMainWindow] GetMainView] Render
 
 set extOutput [$pvExtract GetPVOutput]
-$extOutput ColorByPointField {Density} 1
+$extOutput ColorByArray {Density} 3
 $extOutput SetScalarBarVisibility 1
 
 $pvWindow SetCurrentPVSource $pvExtract

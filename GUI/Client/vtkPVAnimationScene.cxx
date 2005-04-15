@@ -14,49 +14,60 @@
 =========================================================================*/
 
 #include "vtkPVAnimationScene.h"
-#include "vtkObjectFactory.h"
-#include "vtkCommand.h"
+
 #include "vtkAnimationScene.h"
-#include "vtkKWFrameLabeled.h"
-#include "vtkKWFrame.h"
-#include "vtkKWPushButton.h"
+#include "vtkCommand.h"
+#include "vtkErrorCode.h"
+#include "vtkImageWriter.h"
+#include "vtkJPEGWriter.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWEntry.h"
+#include "vtkKWEvent.h"
+#include "vtkKWFrame.h"
+#include "vtkKWFrameLabeled.h"
+#include "vtkKWGenericMovieWriter.h"
 #include "vtkKWIcon.h"
+#include "vtkKWLabel.h"
+#include "vtkKWMenuButton.h"
+#include "vtkKWMessageDialog.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWThumbWheel.h"
-#include "vtkKWMenuButton.h"
-#include "vtkKWLabel.h"
-#include "vtkSMAnimationSceneProxy.h"
-#include "vtkSMAnimationCueProxy.h"
-#include "vtkSMProxyManager.h"
-#include "vtkKWEntry.h"
+#include "vtkKWToolbarSet.h"
+#include "vtkMPEG2Writer.h"
+#include "vtkObjectFactory.h"
+#include "vtkPNGWriter.h"
 #include "vtkPVAnimationCue.h"
 #include "vtkPVAnimationManager.h"
+#include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
+#include "vtkPVSourceCollection.h"
+#include "vtkPVVCRControl.h"
 #include "vtkPVWindow.h"
-#include "vtkKWEvent.h"
 #include "vtkProcessModule.h"
-#include "vtkPVRenderModule.h"
-#include "vtkImageWriter.h"
-#include "vtkKWGenericMovieWriter.h"
-#include "vtkWindowToImageFilter.h"
 #include "vtkRenderWindow.h"
-#include "vtkJPEGWriter.h"
-#include "vtkTIFFWriter.h"
-#include "vtkPNGWriter.h"
-#include "vtkMPEG2Writer.h"
-#include "vtkKWMessageDialog.h"
-#include "vtkSMXMLPVAnimationWriterProxy.h"
-#include "vtkSMProxyProperty.h"
+#include "vtkSMAnimationCueProxy.h"
+#include "vtkSMAnimationSceneProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMSimpleDisplayProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkSMStringVectorProperty.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSource.h"
-#include "vtkSMPartDisplay.h"
 #include "vtkErrorCode.h"
 #include "vtkPVVCRControl.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkSMXMLPVAnimationWriterProxy.h"
+#include "vtkTIFFWriter.h"
+#include "vtkWindowToImageFilter.h"
+
+// Some header file is defining CurrentTime so undef it
+#undef CurrentTime
 
 #ifdef _WIN32
   #include "vtkAVIWriter.h"
@@ -69,7 +80,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.24");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.25");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -566,9 +577,6 @@ void vtkPVAnimationScene::SaveGeometry(const char* filename)
   svp->SetElement(0,filename);
   animWriter->UpdateVTKObjects();
 
-//  vtkSMProxyProperty *pp = vtkSMProxyProperty::SafeDownCast(
-//    animWriter->GetProperty("Input"));
-  
   vtkPVSourceCollection* sources = this->Window->GetSourceList("Sources");
   sources->InitTraversal();
   vtkPVSource* source;
@@ -576,12 +584,8 @@ void vtkPVAnimationScene::SaveGeometry(const char* filename)
     {
     if (source->GetVisibility())
       {
-//      pp->RemoveAllProxies();
-//      pp->AddProxy(source->GetPartDisplay());
-//      animWriter->UpdateVTKObjects();
-        //TODO: Since vtkSMPartDisplay is does not belong to any group,
-        //we have a little difficulty is using the property interface.
-        animWriter->AddInput(source->GetPartDisplay());
+      vtkSMSimpleDisplayProxy::SafeDownCast(source->GetDisplayProxy())
+        ->SetInputAsGeometryFilter(animWriter);
       }
     }
 
@@ -622,7 +626,7 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
     return;
     }
   
-  vtkAnimationCue::AnimationCueInfo *info = reinterpret_cast<
+  vtkAnimationCue::AnimationCueInfo *cueInfo = reinterpret_cast<
     vtkAnimationCue::AnimationCueInfo*>(calldata);
 
   switch(event)
@@ -634,14 +638,32 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
       {
       double etime = this->AnimationSceneProxy->GetEndTime();
       double stime = this->AnimationSceneProxy->GetStartTime();
-      double ntime = (etime==stime)?  0 : (info->CurrentTime - stime) / (etime - stime);
+      double ntime = 
+        (etime==stime)?  0 : (cueInfo->CurrentTime - stime) / (etime - stime);
       this->AnimationManager->SetTimeMarker(ntime);
-      this->TimeScale->SetValue(info->CurrentTime);
+      this->TimeScale->SetValue(cueInfo->CurrentTime);
       if (this->AnimationManager->GetUseGeometryCache())
         {
-        int index = static_cast<int>((info->CurrentTime - stime) * this->GetFrameRate());
-        int maxindex = static_cast<int>((etime - stime) * this->GetFrameRate())+1; 
-        vtkProcessModule::GetProcessModule()->GetRenderModule()->CacheUpdate(index, maxindex);
+        int index = 
+          static_cast<int>((cueInfo->CurrentTime - stime) * this->GetFrameRate());
+        int maxindex = 
+          static_cast<int>((etime - stime) * this->GetFrameRate())+1; 
+        vtkPVApplication* pvApp =
+          vtkPVApplication::SafeDownCast(this->GetApplication());
+        if (pvApp)
+          {
+          vtkSMRenderModuleProxy* rm = pvApp->GetRenderModuleProxy();
+          if (rm)
+            {
+            vtkSMIntVectorProperty* cu =
+            vtkSMIntVectorProperty::SafeDownCast(rm->GetProperty("CacheUpdate"));
+            if (cu)
+              {
+              cu->SetElements2(index, maxindex);
+              rm->UpdateVTKObjects();
+              }
+            }
+          }
         this->GeometryCached = 1;
         }
       if (this->RenderView)
@@ -651,7 +673,7 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
       if (event != vtkCommand::EndAnimationCueEvent)
         {
         this->SaveImages();
-        this->SaveGeometry(info->CurrentTime);
+        this->SaveGeometry(cueInfo->CurrentTime);
         }
       }
     break;
@@ -972,10 +994,15 @@ void vtkPVAnimationScene::InvalidateAllGeometries()
 {
   if (this->GeometryCached)
     {
-    vtkPVRenderModule* rm = vtkProcessModule::GetProcessModule()->GetRenderModule();
-    if (rm)
+    vtkPVApplication* pvApp =
+      vtkPVApplication::SafeDownCast(this->GetApplication());
+    if (pvApp)
       {
-      rm->InvalidateAllGeometries();
+      vtkSMRenderModuleProxy* rm = pvApp->GetRenderModuleProxy();
+      if (rm)
+        {
+        rm->InvalidateAllGeometries();
+        }
       }
     }
   this->GeometryCached = 0;

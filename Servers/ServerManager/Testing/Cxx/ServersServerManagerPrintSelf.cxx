@@ -13,20 +13,7 @@
 
 =========================================================================*/
 
-#include "vtkPVCaveRenderModule.h"
 #include "vtkSMAxesProxy.h"
-#include "vtkSMCompositePartDisplay.h"
-#include "vtkPVCompositeRenderModule.h"
-#include "vtkSMDisplay.h"
-#include "vtkSMLODPartDisplay.h"
-#include "vtkPVLODRenderModule.h"
-#include "vtkPVMPIRenderModule.h"
-#include "vtkSMMultiDisplayPartDisplay.h"
-#include "vtkPVMultiDisplayRenderModule.h"
-#include "vtkSMPartDisplay.h"
-#include "vtkSMPointLabelDisplay.h"
-#include "vtkSMPlotDisplay.h"
-#include "vtkPVSimpleRenderModule.h"
 #include "vtkSMScalarBarWidgetProxy.h"
 #include "vtkSM3DWidgetProxy.h"
 #include "vtkSMBoxWidgetProxy.h"
@@ -42,8 +29,6 @@
 #include "vtkSMBooleanDomain.h"
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMDataTypeDomain.h"
-#include "vtkSMDisplayerProxy.h"
-#include "vtkSMDisplayWindowProxy.h"
 #include "vtkSMDomain.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMDoubleRangeDomain.h"
@@ -82,34 +67,36 @@
 #include "vtkSMXDMFPropertyDomain.h"
 #include "vtkSMXMLParser.h"
 
+// Display Proxies
+#include "vtkSMSimpleDisplayProxy.h"
+#include "vtkSMCompositeDisplayProxy.h"
+#include "vtkSMMultiDisplayProxy.h"
+#include "vtkSMXYPlotDisplayProxy.h"
+#include "vtkSMXYPlotActorProxy.h"
+#include "vtkSMScalarBarActorProxy.h"
+
+// Render Modules.
+#include "vtkSMSimpleRenderModuleProxy.h"
+#include "vtkSMCompositeRenderModuleProxy.h"
+#include "vtkSMCaveRenderModuleProxy.h"
+#include "vtkSMLODRenderModuleProxy.h"
+#include "vtkSMMultiDisplayRenderModuleProxy.h"
+
 #ifdef PARAVIEW_USE_ICE_T
-#include "vtkPVDeskTopRenderModule.h"
-#include "vtkPVIceTDisplayRenderModule.h"
-#include "vtkPVIceTRenderModule.h"
 #include "vtkSMProcessModule.h"
 #include "vtkSMPropertyInternals.h"
 #include "vtkSMProxyInternals.h"
 #include "vtkSMProxyManagerInternals.h"
 #include "vtkSMSimpleDoubleInformationHelper.h"
+#include "vtkSMIceTDesktopRenderModuleProxy.h"
+#include "vtkSMIceTRenderModuleProxy.h"
+
 #endif  //PARAVIEW_USE_ICE_T
 
 int main(int , char *[])
 {
   vtkObject *c;
-  c = vtkPVCaveRenderModule::New(); c->Print( cout ); c->Delete();
   c = vtkSMAxesProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMCompositePartDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkPVCompositeRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkSMDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkSMLODPartDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkPVLODRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkPVMPIRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkSMMultiDisplayPartDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkPVMultiDisplayRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPartDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPointLabelDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkSMPlotDisplay::New(); c->Print( cout ); c->Delete();
-  c = vtkPVSimpleRenderModule::New(); c->Print( cout ); c->Delete();
   c = vtkSMScalarBarWidgetProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSM3DWidgetProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMBoxWidgetProxy::New(); c->Print( cout ); c->Delete();
@@ -125,8 +112,6 @@ int main(int , char *[])
   c = vtkSMBooleanDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMBoundsDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMDataTypeDomain::New(); c->Print( cout ); c->Delete();
-  c = vtkSMDisplayerProxy::New(); c->Print( cout ); c->Delete();
-  c = vtkSMDisplayWindowProxy::New(); c->Print( cout ); c->Delete();
   c = vtkSMDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMDomainIterator::New(); c->Print( cout ); c->Delete();
   c = vtkSMDoubleRangeDomain::New(); c->Print( cout ); c->Delete();
@@ -165,15 +150,28 @@ int main(int , char *[])
   c = vtkSMXDMFPropertyDomain::New(); c->Print( cout ); c->Delete();
   c = vtkSMXMLParser::New(); c->Print( cout ); c->Delete();
 
+  c = vtkSMSimpleDisplayProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMCompositeDisplayProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMMultiDisplayProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMXYPlotDisplayProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMXYPlotActorProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMScalarBarActorProxy::New(); c->Print( cout ); c->Delete();
+
+  // Render Modules.
+  c = vtkSMSimpleRenderModuleProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMCompositeRenderModuleProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMCaveRenderModuleProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMLODRenderModuleProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMMultiDisplayRenderModuleProxy::New(); c->Print( cout ); c->Delete();
+
 #ifdef PARAVIEW_USE_ICE_T
-  c = vtkPVDeskTopRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkPVIceTDisplayRenderModule::New(); c->Print( cout ); c->Delete();
-  c = vtkPVIceTRenderModule::New(); c->Print( cout ); c->Delete();
   c = vtkSMProcessModule::New(); c->Print( cout ); c->Delete();
   c = vtkSMPropertyInternals::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxyInternals::New(); c->Print( cout ); c->Delete();
   c = vtkSMProxyManagerInternals::New(); c->Print( cout ); c->Delete();
   c = vtkSMSimpleDoubleInformationHelper::New(); c->Print( cout ); c->Delete();
+  c = vtkSMIceTDesktopRenderModuleProxy::New(); c->Print( cout ); c->Delete();
+  c = vtkSMIceTRenderModuleProxy::New(); c->Print( cout ); c->Delete();
 #endif  //PARAVIEW_USE_ICE_T
 
   return 0;

@@ -14,25 +14,24 @@
 =========================================================================*/
 #include "vtkSMLineWidgetProxy.h"
 
-#include "vtkPickLineWidget.h"
+#include "vtkLineWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
 #include "vtkCommand.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+
 
 vtkStandardNewMacro(vtkSMLineWidgetProxy);
-vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.6");
-
+vtkCxxRevisionMacro(vtkSMLineWidgetProxy, "1.7");
 //----------------------------------------------------------------------------
 vtkSMLineWidgetProxy::vtkSMLineWidgetProxy()
 {
-  this->Resolution = 1;
   this->Point1[0] = -0.5;
   this->Point1[1] = this->Point1[2] = 0;
   this->Point2[0] = 0.5;
   this->Point2[1] = this->Point2[2] = 0;
-  this->SetVTKClassName("vtkPickLineWidget");
 }
 
 //----------------------------------------------------------------------------
@@ -62,13 +61,6 @@ void vtkSMLineWidgetProxy::UpdateVTKObjects()
         << "SetPoint2" << this->Point2[0] << this->Point2[1] 
         <<  this->Point2[2]
         << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << this->GetID(cc)
-        << "SetResolution" << this->Resolution
-        << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke 
-        << id
-        << "SetAlignToNone" <<  vtkClientServerStream::End;
     }
   if (str.GetNumberOfMessages() > 0)
     {
@@ -83,12 +75,16 @@ void vtkSMLineWidgetProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
+  
+  unsigned int cc;
+
   //superclass will create the stream objects
   this->Superclass::CreateVTKObjects(numObjects);
+  
   //now do additional initialization on the streamobjects
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
+  for(cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
     stream << vtkClientServerStream::Invoke <<  id
@@ -100,7 +96,7 @@ void vtkSMLineWidgetProxy::CreateVTKObjects(int numObjects)
 //----------------------------------------------------------------------------
 void vtkSMLineWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void *p)
 {
-  vtkPickLineWidget* widget = vtkPickLineWidget::SafeDownCast(wdg);
+  vtkLineWidget* widget = vtkLineWidget::SafeDownCast(wdg);
   if (!widget)
     {
     return;
@@ -141,6 +137,9 @@ void vtkSMLineWidgetProxy::SaveState(const char* name,ostream* file,
 void vtkSMLineWidgetProxy::SaveInBatchScript(ofstream *file)
 {
   this->Superclass::SaveInBatchScript(file);
+  vtkSMIntVectorProperty* propResolution = vtkSMIntVectorProperty::SafeDownCast(
+    this->GetProperty("Resolution"));
+  
   for (unsigned int cc=0;cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
@@ -162,13 +161,14 @@ void vtkSMLineWidgetProxy::SaveInBatchScript(ofstream *file)
 
     *file << "  [$pvTemp" << id.ID << " GetProperty Resolution] "
       << "SetElements1 "
-      << this->Resolution 
+      << propResolution->GetElement(0)
       << endl;
 
     *file << "  $pvTemp" << id.ID << " UpdateVTKObjects" << endl;
     *file << endl;
     }
 }
+
 //----------------------------------------------------------------------------
 void vtkSMLineWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -177,5 +177,4 @@ void vtkSMLineWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
     this->Point1[1] << "," << this->Point1[2] << endl;
   os << indent << "Point2: " << this->Point2[0] << "," <<
     this->Point2[1] << "," << this->Point2[2] << endl;
-  os << indent << "Resolution: " << this->Resolution << endl;
 }

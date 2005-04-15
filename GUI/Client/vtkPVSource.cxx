@@ -12,8 +12,8 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPVConfig.h"
 #include "vtkPVSource.h"
-
 #include "vtkObjectFactory.h"
 #include "vtkPVColorMap.h"
 #include "vtkArrayMap.txx"
@@ -31,13 +31,17 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVInputMenu.h"
 #include "vtkSMPart.h"
-#include "vtkSMPartDisplay.h"
 #include "vtkPVCornerAnnotationEditor.h"
+#include "vtkSMDisplayProxy.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMProxyProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkPVInputProperty.h"
 #include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
@@ -47,18 +51,17 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkRenderer.h"
-#include "vtkPVAnimationInterface.h"
-#include "vtkSMCubeAxesDisplay.h"
-#include "vtkSMPointLabelDisplay.h"
+#include "vtkSMCubeAxesDisplayProxy.h"
+#include "vtkSMPointLabelDisplayProxy.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkPVTraceHelper.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.429");
+vtkCxxRevisionMacro(vtkPVSource, "1.430");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
-vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
+vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -97,8 +100,7 @@ vtkPVSource::vtkPVSource()
   
   this->NumberOfPVConsumers = 0;
   this->PVConsumers = 0;
-  
-  this->PartDisplay = 0;
+  this->DisplayProxy = 0;
 
   this->ParameterFrame = vtkKWFrame::New();
   this->Widgets = vtkPVWidgetCollection::New();
@@ -130,9 +132,9 @@ vtkPVSource::vtkPVSource()
   this->LabelSetByUser = 0;
 
   this->Proxy = 0;
-  this->CubeAxesDisplay = vtkSMCubeAxesDisplay::New();
+  this->CubeAxesDisplayProxy = 0;
   this->CubeAxesVisibility = 0;
-  this->PointLabelDisplay = vtkSMPointLabelDisplay::New();
+  this->PointLabelDisplayProxy = 0;
   this->PointLabelVisibility = 0;
   
   this->PVColorMap = 0;  
@@ -159,8 +161,11 @@ vtkPVSource::~vtkPVSource()
   if (proxm && this->GetName())
     {
     proxm->UnRegisterProxy(this->GetName());
-    const char* proxyName = 
-      proxm->GetProxyName("animateable", this->PartDisplay);
+    
+    const char* proxyName = 0;
+    proxyName = 
+      proxm->GetProxyName("animateable", this->DisplayProxy);
+
     if (proxyName)
       {
       proxm->UnRegisterProxy("animateable", proxyName);
@@ -172,8 +177,8 @@ vtkPVSource::~vtkPVSource()
       proxm->UnRegisterProxy("animateable", proxyName);
       }
     }
+  this->SetDisplayProxy(0);
   this->SetProxy(0);
-  this->SetPartDisplay(0);
 
   // Do not use SetName() or SetLabel() here. These make
   // the navigation window update when it should not.
@@ -207,10 +212,16 @@ vtkPVSource::~vtkPVSource()
   this->InputProperties = NULL;
 
   this->SetModuleName(0);
-  this->CubeAxesDisplay->Delete();
-  this->CubeAxesDisplay = 0;
-  this->PointLabelDisplay->Delete();
-  this->PointLabelDisplay = 0;
+  if (this->CubeAxesDisplayProxy)
+    {
+    this->CubeAxesDisplayProxy->Delete();
+    this->CubeAxesDisplayProxy = 0;
+    }
+  if (this->PointLabelDisplayProxy)
+    {
+    this->PointLabelDisplayProxy->Delete();
+    this->PointLabelDisplayProxy = 0;
+    }
 
   this->SetPVColorMap(0);
   this->SetSourceList(0);
@@ -806,17 +817,17 @@ void vtkPVSource::SetVisibility(int v)
 //----------------------------------------------------------------------------
 void vtkPVSource::SetVisibilityNoTrace(int v)
 {
-  if (this->GetVisibility() == v || this->PartDisplay == 0)
+  if (this->GetVisibility() == v || this->DisplayProxy == 0)
     {
     return;
     }
 
   int cubeAxesVisibility = this->GetCubeAxesVisibility();
   int pointLabelVisibility = this->GetPointLabelVisibility();
-  
-  this->PartDisplay->SetVisibility(v);
-  this->CubeAxesDisplay->SetVisibility(v && cubeAxesVisibility);
-  this->PointLabelDisplay->SetVisibility(v && pointLabelVisibility);
+
+  this->DisplayProxy->SetVisibilityCM(v); 
+  this->CubeAxesDisplayProxy->SetVisibilityCM(v && cubeAxesVisibility);
+  this->PointLabelDisplayProxy->SetVisibilityCM(v && pointLabelVisibility);
 
   // Handle visibility of shared colormap.
   if (this->PVColorMap)
@@ -867,7 +878,7 @@ void vtkPVSource::SetCubeAxesVisibilityNoTrace(int val)
     return;
     }
   this->CubeAxesVisibility = val;
-  this->CubeAxesDisplay->SetVisibility(this->GetVisibility() && val);
+  this->CubeAxesDisplayProxy->SetVisibilityCM(this->GetVisibility() && val);
   
   if (this->Notebook)
     {
@@ -898,7 +909,7 @@ void vtkPVSource::SetPointLabelVisibilityNoTrace(int val)
     return;
     }
   this->PointLabelVisibility = val;
-  this->PointLabelDisplay->SetVisibility(this->GetVisibility() && val);
+  this->PointLabelDisplayProxy->SetVisibilityCM(this->GetVisibility() && val);
   
   if (this->Notebook)
     {
@@ -919,11 +930,11 @@ vtkPVDisplayGUI* vtkPVSource::GetPVOutput()
 //----------------------------------------------------------------------------
 int vtkPVSource::GetVisibility()
 {
-  if ( this->GetPartDisplay() && this->GetPartDisplay()->GetVisibility() )
+  if (!this->DisplayProxy)
     {
-    return 1;
+    return 0;
     }
-  return 0;
+  return this->DisplayProxy->GetVisibilityCM();
 }
 
 //----------------------------------------------------------------------------
@@ -1056,19 +1067,28 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // I used to see if the display gui was properly set, but that was a legacy
     // check.  I removed the check.
      
+    
     // Create the display and add it to the render module.
-    vtkPVRenderModule* rm = 
-        this->GetPVApplication()->GetProcessModule()->GetRenderModule();
-    vtkSMPartDisplay *pDisp = rm->CreatePartDisplay();
+    vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+    vtkSMDisplayProxy* pDisp = rm->CreateDisplayProxy();
+
     // Parts need to be created before we set source as inpout to part display.
     // This creates the proxy parts.
     this->InitializeData();
-    // Display needs an input.
-    pDisp->SetInput(this->GetProxy());
-    // Render module keeps a list of all the displays.
-    rm->AddDisplay(pDisp);
 
-    vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+    // Generally we cannot use Input property here....since it leads to a call
+    // to CreateVTKObjects(1) (which is wrong in this case...). However,
+    // vtkSMDisplayProxy does not create itself until the Input is set,
+    // so this works fine. If fact, using it this was is essential,
+    // so that the DisplayProxy is added as a consumer of the input automatically.
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      pDisp->GetProperty("Input"));
+    pp->RemoveAllProxies();
+    pp->AddProxy(this->GetProxy());
+    pDisp->UpdateVTKObjects();
+
+    this->AddDisplayToRenderModule(pDisp);
+
     if (!this->GetSourceList())
       {
       vtkErrorMacro("SourceList should not be empty. "
@@ -1076,6 +1096,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
     else
       {
+      vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
       ostrstream animName_with_warning_C4701;
       animName_with_warning_C4701 << this->GetSourceList() << "." 
                                   << this->GetName() << "."
@@ -1086,20 +1107,46 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       delete[] animName_with_warning_C4701.str();
       }
 
+    // Create the Cube Axes.
+    this->CubeAxesDisplayProxy = vtkSMCubeAxesDisplayProxy::SafeDownCast(
+      vtkSMObject::GetProxyManager()
+      ->NewProxy("displays", "CubeAxesDisplay"));
     // Hookup cube axes display.
-    this->CubeAxesDisplay->SetInput(this->Proxy);
-    this->CubeAxesDisplay->SetVisibility(0);
-    rm->AddDisplay(this->CubeAxesDisplay);   
+    vtkSMProxyProperty* ccpp = vtkSMProxyProperty::SafeDownCast(
+      this->CubeAxesDisplayProxy->GetProperty("Input"));
+    if (!ccpp)
+      {
+      vtkErrorMacro("Failed to find property Input on CubeAxesDisplayProxy.");
+      }
+    else
+      {
+      ccpp->AddProxy(this->Proxy);
+      this->CubeAxesDisplayProxy->UpdateVTKObjects();
+      }
+    this->CubeAxesDisplayProxy->SetVisibilityCM(0);
+    this->AddDisplayToRenderModule(this->CubeAxesDisplayProxy);
 
-    // Hookup point label display.
-    this->PointLabelDisplay->SetProcessModule(this->GetPVApplication()->GetProcessModule());    
-    this->PointLabelDisplay->SetInput(this->Proxy);
-    this->PointLabelDisplay->SetVisibility(0);
-    rm->AddDisplay(this->PointLabelDisplay);   
+    // Create the Point Label Display proxies.
+    this->PointLabelDisplayProxy = vtkSMPointLabelDisplayProxy::SafeDownCast(
+      vtkSMObject::GetProxyManager()
+      ->NewProxy("displays", "PointLabelDisplay"));
     
-    // Display GUI is shared. PartDisplay and source of DisplayGUI is set
-    // when the source selected as current.
-    this->SetPartDisplay(pDisp);
+    // Hookup point label display.
+    ccpp = vtkSMProxyProperty::SafeDownCast(
+      this->PointLabelDisplayProxy->GetProperty("Input"));
+    if (!ccpp)
+      {
+      vtkErrorMacro("Failed to find property Input on PointLabelDisplayProxy");
+      }
+    else
+      {
+      ccpp->AddProxy(this->Proxy);
+      this->PointLabelDisplayProxy->UpdateVTKObjects();
+      }
+    this->PointLabelDisplayProxy->SetVisibilityCM(0);
+    this->AddDisplayToRenderModule(this->PointLabelDisplayProxy);
+
+    this->SetDisplayProxy(pDisp);
     pDisp->Delete();
 
     // Make the last data invisible.
@@ -1197,7 +1244,12 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       this->SetDefaultColorParameters();
       }
     // This executes the filter (from update suppressor)
-    this->PartDisplay->Update();
+    // TODO: verify that this needs to be done, I think not,
+    // since the InputProperty sets up a consumer linking
+    // between this->Proxy and this->DisplayProxy.
+    vtkSMProperty* p = this->DisplayProxy->GetProperty("Update");
+    p->Modified();
+    this->DisplayProxy->UpdateVTKObjects();
     this->GetPVWindow()->UpdateEnableState();
     }
 
@@ -1209,6 +1261,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // Update the selection menu.
   window->UpdateSelectMenu();
 
+  // TODO: this->UpdateProperties already updated notebook...
+  // why are we doing it twice?
   // Regenerate the data property page in case something has changed.
   if (this->Notebook)
     {
@@ -1263,9 +1317,17 @@ void vtkPVSource::SetDefaultColorParameters()
   // Inherit property color from input.
   if (input)
     {
-    float rgb[3];
-    input->GetPartDisplay()->GetColor(rgb);
-    this->GetPartDisplay()->SetColor(rgb[0], rgb[1], rgb[2]);
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      input->GetDisplayProxy()->GetProperty("Color"));
+    if (!dvp)
+      {
+      vtkErrorMacro("Failed to find property Color on input->DisplayProxy.");
+      return;
+      }
+    double rgb[3] = { 1, 1, 1};
+    input->GetDisplayProxy()->GetColorCM(rgb);
+    this->DisplayProxy->SetColorCM(rgb);
+    this->DisplayProxy->UpdateVTKObjects();
     } 
     
   // Check for new point scalars.
@@ -1280,11 +1342,7 @@ void vtkPVSource::SetDefaultColorParameters()
       }
     if (inArrayInfo == 0 ||  strcmp(arrayInfo->GetName(),inArrayInfo->GetName()) != 0)
       { // No input or different scalars: use the new scalars.
-      colorMap = this->GetPVWindow()->GetPVColorMap(arrayInfo->GetName(), 
-                                        arrayInfo->GetNumberOfComponents());
-      this->SetPVColorMap(colorMap);                                   
-      this->PartDisplay->ColorByArray(colorMap->GetProxyByName("LookupTable"), 
-                                      vtkDataSet::POINT_DATA_FIELD);
+      this->ColorByArray(arrayInfo->GetName(), vtkSMDisplayProxy::POINT_FIELD_DATA);
       return;
       }
     }
@@ -1301,11 +1359,7 @@ void vtkPVSource::SetDefaultColorParameters()
       }
     if (inArrayInfo == 0 ||  strcmp(arrayInfo->GetName(),inArrayInfo->GetName()) != 0)
       { // No input or different scalars: use the new scalars.
-      colorMap = this->GetPVWindow()->GetPVColorMap(arrayInfo->GetName(), 
-                                        arrayInfo->GetNumberOfComponents());
-      this->SetPVColorMap(colorMap);                                   
-      this->PartDisplay->ColorByArray(colorMap->GetProxyByName("LookupTable"), 
-                                      vtkDataSet::CELL_DATA_FIELD);
+      this->ColorByArray(arrayInfo->GetName(), vtkSMDisplayProxy::CELL_FIELD_DATA);
       return;
       }
     }
@@ -1317,31 +1371,28 @@ void vtkPVSource::SetDefaultColorParameters()
     int colorField = -1;
     if (colorMap)
       {
-      colorField = input->GetPartDisplay()->GetColorField();
+      colorField = input->GetDisplayProxy()->GetScalarModeCM();
+
       // Find the array in our info.
       switch (colorField)
         {
-        case vtkDataSet::POINT_DATA_FIELD:
+      case vtkSMDisplayProxy::POINT_FIELD_DATA:
           attrInfo = dataInfo->GetPointDataInformation();
           arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
           if (arrayInfo && colorMap->MatchArrayName(arrayInfo->GetName(),
                                        arrayInfo->GetNumberOfComponents()))
             {  
-            this->SetPVColorMap(colorMap);                                   
-            this->PartDisplay->ColorByArray(colorMap->GetProxyByName("LookupTable"), 
-                                            vtkDataSet::POINT_DATA_FIELD);
+            this->ColorByArray(colorMap, vtkSMDisplayProxy::POINT_FIELD_DATA);
             return;
             }
           break;
-        case vtkDataSet::CELL_DATA_FIELD:
+        case vtkSMDisplayProxy::CELL_FIELD_DATA:
           attrInfo = dataInfo->GetCellDataInformation();
           arrayInfo = attrInfo->GetArrayInformation(colorMap->GetArrayName());
           if (arrayInfo && colorMap->MatchArrayName(arrayInfo->GetName(),
                                        arrayInfo->GetNumberOfComponents()))
             {  
-            this->SetPVColorMap(colorMap);                                   
-            this->PartDisplay->ColorByArray(colorMap->GetProxyByName("LookupTable"), 
-                                            vtkDataSet::CELL_DATA_FIELD);
+            this->ColorByArray(colorMap, vtkSMDisplayProxy::CELL_FIELD_DATA);
             return;
             }
           break;
@@ -1354,8 +1405,165 @@ void vtkPVSource::SetDefaultColorParameters()
     }
 
   // Color by property.
-  this->SetPVColorMap(0);
-  this->GetPartDisplay()->SetScalarVisibility(0);
+  this->ColorByArray((vtkPVColorMap*)0, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::ColorByArray(const char* arrayname, int field)
+{
+  if (arrayname == 0)
+    {
+    this->ColorByArray((vtkPVColorMap*)0, 0);
+    return;
+    }
+
+  if (field != vtkSMDisplayProxy::POINT_FIELD_DATA &&
+    field != vtkSMDisplayProxy::CELL_FIELD_DATA)
+    {
+    vtkErrorMacro("Can color only with Point Field Data or Cell Field data.");
+    return;
+    }
+  
+  vtkPVDataInformation* dataInfo = this->GetDataInformation();
+  vtkPVDataSetAttributesInformation* attrInfo =
+    (field == vtkSMDisplayProxy::POINT_FIELD_DATA) ?
+    dataInfo->GetPointDataInformation() :  dataInfo->GetCellDataInformation();
+  vtkPVArrayInformation* arrayInfo = attrInfo->GetArrayInformation(
+    arrayname);
+  if (!arrayInfo)
+    {
+    vtkErrorMacro("Failed to find " << arrayname);
+    return;
+    }
+
+  vtkPVColorMap* colorMap = this->GetPVWindow()->GetPVColorMap(arrayname,
+    arrayInfo->GetNumberOfComponents());
+  this->ColorByArray( colorMap, field);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::ColorByArray(vtkPVColorMap* colorMap, int field)
+{
+  vtkSMProxyProperty* pp;
+  vtkSMIntVectorProperty* ivp;
+  vtkSMDoubleVectorProperty* dvp;
+
+  this->SetPVColorMap(colorMap);
+  if (colorMap)
+    {
+    pp = vtkSMProxyProperty::SafeDownCast(
+      this->DisplayProxy->GetProperty("LookupTable"));
+    if (!pp)
+      {
+      vtkErrorMacro("Failed to find property LookupTable on vtkSMDisplayProxy.");
+      return;
+      }
+    pp->RemoveAllProxies();
+    pp->AddProxy(colorMap->GetProxyByName("LookupTable"));
+
+    ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->DisplayProxy->GetProperty("ScalarMode"));
+    if (!ivp)
+      {
+      vtkErrorMacro("Failed to find property ScalarMode on vtkSMDisplayProxy.");
+      return;
+      }
+    ivp->SetElement(0, field);
+
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->DisplayProxy->GetProperty("Specular"));
+    if (!dvp)
+      {
+      vtkErrorMacro("Failed to find propery Specular on vtkSMDisplayProxy.");
+      return;
+      }
+    // Turn off specular so that it does not interfere with data.
+    dvp->SetElement(0, 0.0);
+
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+      colorMap->GetProxyByName("LookupTable")->GetProperty("ArrayName"));
+    // TODO: should the array name be removed from the LookupTable?.
+    // LookupTable has nothing to do with the arrayname.
+    // Should the ColorMap keep it instead?
+    if (!svp)
+      {
+      vtkErrorMacro("Failed to find property ArrayName on LookupTable.");
+      return;
+      }
+    vtkSMStringVectorProperty* d_svp = vtkSMStringVectorProperty::SafeDownCast(
+      this->DisplayProxy->GetProperty("ColorArray"));
+    if (!d_svp)
+      {
+      vtkErrorMacro("Failed to find property ColorArray on DisplayProxy.");
+      return;
+      }
+    d_svp->SetElement(0, svp->GetElement(0));
+    }
+  else
+    {
+    pp = vtkSMProxyProperty::SafeDownCast(
+      this->DisplayProxy->GetProperty("LookupTable"));
+    if (!pp)
+      {
+      vtkErrorMacro("Failed to find property LookupTable on vtkSMDisplayProxy.");
+      return;
+      }
+    pp->RemoveAllProxies();
+    // it is important to remove the LUT, otherwise, it gets saved in the
+    // batch script.
+    }
+
+  ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->DisplayProxy->GetProperty("ScalarVisibility"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ScalarVisibility on vtkSMDisplayProxy.");
+    return;
+    }
+  if (colorMap)
+    {
+    ivp->SetElement(0, 1);
+    }
+  else
+    {
+    ivp->SetElement(0, 0);
+    }
+  this->DisplayProxy->UpdateVTKObjects();
+}
+
+//----------------------------------------------------------------------------
+// TODO: may be this should be a convienience method on the DisplayProxy 
+// instead.
+void vtkPVSource::VolumeRenderByArray(const char* arrayname, int field)
+{
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->DisplayProxy->GetProperty("ScalarMode"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ScalarMode on DisplayProxy.");
+    return;
+    }
+  ivp->SetElement(0, field);
+
+  this->DisplayProxy->UpdateVTKObjects();
+
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->DisplayProxy->GetProperty("SelectScalarArray"));
+  if (!svp)
+    {
+    vtkErrorMacro("Failed to find property SelectScalarArray on DisplayProxy.");
+    return;
+    }
+  svp->SetElement(0, arrayname);
+  this->DisplayProxy->UpdateVTKObjects();
+
+  vtkSMProperty* p = this->DisplayProxy->GetProperty("ResetTransferFunctions");
+  if (!p)
+    {
+    vtkErrorMacro("Failed to find property ResetTransferFunctions on DisplayProxy.");
+    return;
+    }
+  p->Modified(); // immediate_update property.
 }
 
 //----------------------------------------------------------------------------
@@ -1417,8 +1625,6 @@ void vtkPVSource::DeleteCallback()
 
   // Do this to here to release resource (decrement use count).
   this->SetPVColorMap(0);
-
-  window->GetAnimationInterface()->DeleteSource(this);
 
   if (this->Notebook)
     { // Delete call back set the cube axes visibility 
@@ -1515,13 +1721,13 @@ void vtkPVSource::DeleteCallback()
   // Remove all of the actors mappers. from the renderer.
   if (this->Notebook)
     {
-    vtkSMPartDisplay* pDisp = this->GetPartDisplay();
+    vtkSMDisplayProxy* pDisp = this->GetDisplayProxy();
     if (pDisp)
       {
-      this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->CubeAxesDisplay);
-      this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PointLabelDisplay);
-      this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(pDisp);
+      this->RemoveDisplayFromRenderModule(pDisp);
       }
+    this->RemoveDisplayFromRenderModule(this->CubeAxesDisplayProxy);
+    this->RemoveDisplayFromRenderModule(this->PointLabelDisplayProxy);
     }
 
   // I doubt this is necessary (may to break a reference loop).
@@ -1544,6 +1750,41 @@ void vtkPVSource::DeleteCallback()
   // Make sure the menus reflect this change.
   // I could also use UpdateFilterMenu.  
   window->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AddDisplayToRenderModule(vtkSMDisplayProxy* pDisp)
+{
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+  if (!rm)
+    {
+    return;
+    }
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    rm->GetProperty("Displays"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Displays on vtkSMRenderModuleProxy.");
+    return;
+    }
+  pp->AddProxy(pDisp);
+  rm->UpdateVTKObjects(); 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::RemoveDisplayFromRenderModule(vtkSMDisplayProxy* pDisp)
+{
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    rm->GetProperty("Displays"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property Displays on vtkSMRenderModuleProxy.");
+    return;
+    }
+  pp->RemoveProxy(pDisp);
+  rm->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -1809,10 +2050,24 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
       {
       this->PVColorMap->SaveInBatchScript(file);
       }
-    vtkSMPartDisplay *partD = this->GetPartDisplay();
-    if (partD)
+    
+    vtkSMDisplayProxy* pDisp = this->GetDisplayProxy();
+    if (pDisp)
       {
-      partD->SaveInBatchScript(file, this->GetProxy());
+      *file << "#Display Proxy" << endl;
+      pDisp->SaveInBatchScript(file);
+      }
+    
+    if (this->GetCubeAxesVisibility())
+      {
+      *file << "#Cube Axes Display" << endl;
+      this->CubeAxesDisplayProxy->SaveInBatchScript(file);
+      }
+
+    if (this->GetPointLabelVisibility())
+      {
+      *file << "#Point Label display" << endl;
+      this->PointLabelDisplayProxy->SaveInBatchScript(file);
       }
     }
 }  
@@ -1890,22 +2145,80 @@ void vtkPVSource::SaveStateVisibility(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveStateDisplay(ofstream *file)
 {
+  vtkSMPropertyIterator* iter = this->DisplayProxy->NewPropertyIterator();
+  *file << "# Saving state of the Display Proxy associated with the source" 
+    << endl;
+  
+  *file << "set pvDisp(" << this->GetTclName() 
+    << ") [$kw(" << this->GetTclName()
+    << ") GetDisplayProxy] " << endl;
+
+  // Even in state we have to use ServerManager API for displays.
+  for (iter->Begin(); !iter->IsAtEnd(); iter->Next())
+    {
+    vtkSMProperty* p = iter->GetProperty();
+    if (!p->GetSaveable())
+      {
+      continue;
+      }
+
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(p);
+    vtkSMDoubleVectorProperty* dvp = 
+      vtkSMDoubleVectorProperty::SafeDownCast(p);
+    vtkSMStringVectorProperty* svp =
+      vtkSMStringVectorProperty::SafeDownCast(p);
+    if (ivp)
+      {
+      for (unsigned int i=0; i < ivp->GetNumberOfElements(); i++)
+        {
+        *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
+          << p->GetXMLName() << "] SetElement " << i << " "
+          << ivp->GetElement(i)
+          << endl;
+        }
+      }
+    else if (dvp)
+      {
+      for (unsigned int i=0; i < dvp->GetNumberOfElements(); i++)
+        {
+        *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
+          << p->GetXMLName() << "] SetElement " << i << " "
+          << dvp->GetElement(i)
+          << endl;
+        }
+      }
+    else if (svp)
+      {
+      for (unsigned int i=0; i < svp->GetNumberOfElements(); i++)
+        {
+        *file << "[$pvDisp(" << this->GetTclName() << ") GetProperty "
+          << p->GetXMLName() << "] SetElement " << i << " {"
+          <<  ( (svp->GetElement(i)? svp->GetElement(i) : "" )) << "}"
+          << endl;
+        }
+      }
+    }
+  *file << "$pvDisp(" << this->GetTclName() << ") UpdateVTKObjects" << endl;
+  iter->Delete();
+  // We didn;t save the LUT in the above code. 
   // Set the color map here for simplicity.
   if (this->PVColorMap)
     {
-    if (this->GetPartDisplay()->GetColorField() == vtkDataSet::POINT_DATA_FIELD)
+    if (this->DisplayProxy->GetScalarModeCM() == 
+      vtkSMDisplayProxy::POINT_FIELD_DATA)
       {
       *file << "[$kw(" << this->GetTclName()
-            << ") GetPVOutput] ColorByPointField {" 
+            << ") GetPVOutput] ColorByArray {" 
             << this->PVColorMap->GetArrayName() << "} " 
-            << this->PVColorMap->GetNumberOfVectorComponents() << endl;
+            << 3 << endl;
       }
-    if (this->GetPartDisplay()->GetColorField() == vtkDataSet::CELL_DATA_FIELD)
+    if (this->DisplayProxy->GetScalarModeCM() == 
+      vtkSMDisplayProxy::CELL_FIELD_DATA)
       {
       *file << "[$kw(" << this->GetTclName()
-            << ") GetPVOutput] ColorByCellField {" 
+            << ") GetPVOutput] ColorByArray {" 
             << this->PVColorMap->GetArrayName() << "} " 
-            << this->PVColorMap->GetNumberOfVectorComponents() << endl;
+            << 4 << endl;
       }
     }
   else
@@ -1913,30 +2226,11 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
     *file << "[$kw(" << this->GetTclName()
           << ") GetPVOutput] ColorByProperty\n";
     }
-
-  // Add command to switch to Volume Render mode if required
-  this->GetPVOutput()->SaveVolumeRenderStateDisplay(file);
-
-  // Save the options from the display GUI.
-  char dispTclName[512];
-  sprintf(dispTclName, "$pvDisp(%s)", this->GetTclName());
-  *file << "set " << dispTclName+1 
-        << " [$kw(" << this->GetTclName() << ") GetPartDisplay]" << endl;
-  vtkIndent indent;
-  this->GetPartDisplay()->SavePVState(file, dispTclName, indent);
-
-  *file << "$kw(" << this->GetTclName()
-        << ") SetCubeAxesVisibility " << this->GetCubeAxesVisibility() << endl; 
-
-  *file << "$kw(" << this->GetTclName()
-        << ") SetPointLabelVisibility " << this->GetPointLabelVisibility() << endl; 
-
-  // Make sure the GUI is upto date.  
-  *file << "[$kw(" << this->GetTclName()
-        << ") GetPVOutput] Update\n"; 
-  
+  // We don;t have to save volume rendering state, as
+  // that will get saved automatically when we iterated over 
+  // the properties.
 }
-  
+
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveState(ofstream *file)
 {
@@ -2541,14 +2835,13 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     os << "(none)" << endl;
     }
   os << indent << "ColorMap: " << this->PVColorMap << endl;    
-  os << indent << "PartDisplay: ";
-  if( this->PartDisplay )
+  if (this->DisplayProxy)
     {
-    this->PartDisplay->PrintSelf(os << endl, indent.GetNextIndent() );
+    this->DisplayProxy->PrintSelf(os << endl, indent.GetNextIndent());
     }
   else
     {
-    os << "(none)" << endl;
+    os << indent << "DisplayProxy: (none)" << endl;
     }
   os << indent << "CubeAxesVisibility: " << this->CubeAxesVisibility << endl;
   os << indent << "PointLabelVisibility: " << this->PointLabelVisibility << endl;

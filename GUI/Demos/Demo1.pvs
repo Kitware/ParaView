@@ -67,7 +67,7 @@ proc clip_init {} {
     $clip(vtkTemp413) SetValue 16
     $clip(vtkTemp384) AcceptCallback
     set clip(vtkTemp424) [$clip(vtkTemp384) GetPVOutput]
-    $clip(vtkTemp424) ColorByPointField {Normals} 3
+    $clip(vtkTemp424) ColorByArray {Normals} 3
     $clip(vtkTemp384) AcceptCallback
 
     if $pvDemoShouldStop {
@@ -79,7 +79,7 @@ proc clip_init {} {
     $clip(vtkTemp519) SetValue 0.8
     $clip(vtkTemp507) AcceptCallback
     set clip(vtkTemp525) [$clip(vtkTemp507) GetPVOutput]
-    $clip(vtkTemp525) ColorByPointField {Normals} 3
+    $clip(vtkTemp525) ColorByArray {Normals} 3
     $clip(vtkTemp507) AcceptCallback
 
     if $pvDemoShouldStop {
@@ -93,7 +93,7 @@ proc clip_init {} {
     $clip(vtkTemp589) SetNormal -0.821320 -0.387910 0.418280
     $clip(vtkTemp572) AcceptCallback
     set clip(vtkTemp629) [$clip(vtkTemp572) GetPVOutput]
-    $clip(vtkTemp629) ColorByPointField {Normals} 3
+    $clip(vtkTemp629) ColorByArray {Normals} 3
     $clip(vtkTemp572) AcceptCallback
 
     if $pvDemoShouldStop {
@@ -1704,7 +1704,7 @@ proc stream_init {} {
     $streams(vtkTemp799) SetValue 0.1
     $streams(vtkTemp786) AcceptCallback
     set streams(vtkTemp816) [$streams(vtkTemp786) GetPVOutput]
-    $streams(vtkTemp816) ColorByPointField {IntegrationTime} 1
+    $streams(vtkTemp816) ColorByArray {IntegrationTime} 3
     $streams(vtkTemp786) AcceptCallback
 
     if $pvDemoShouldStop {
@@ -1718,7 +1718,7 @@ proc stream_init {} {
     $streams(vtkTemp918) SetValue 0.1
     $streams(vtkTemp900) AcceptCallback
     set streams(vtkTemp930) [$streams(vtkTemp900) GetPVOutput]
-    $streams(vtkTemp930) ColorByPointField {IntegrationTime} 1
+    $streams(vtkTemp930) ColorByArray {IntegrationTime} 3
     $streams(vtkTemp900) AcceptCallback
 
     if $pvDemoShouldStop {
@@ -4508,7 +4508,7 @@ proc warp_run {} {
         [$warp(vtkTemp1) GetPVColorMap "thickness$i" 1] SetScalarBarVisibility 1
         [$warp(vtkTemp1) GetPVColorMap "thickness$i" 1] SetScalarRange 0.000000 2.000000
 
-        $warp(vtkTemp469) ColorByPointField "thickness$i" 1
+        $warp(vtkTemp469) ColorByArray "thickness$i" 3
         $warp(vtkTemp462) SetValue "displacement$i"
         $warp(vtkTemp450) AcceptCallback
         $warp(vtkTemp450) SetVisibility 1
@@ -4530,7 +4530,7 @@ proc warp_run {} {
         [$warp(vtkTemp1) GetPVColorMap "thickness$i" 1] SetScalarBarVisibility 1
         [$warp(vtkTemp1) GetPVColorMap "thickness$i" 1] SetScalarRange 0.000000 2.000000
 
-        $warp(vtkTemp469) ColorByPointField "thickness$i" 1
+        $warp(vtkTemp469) ColorByArray "thickness$i" 3
         $warp(vtkTemp462) SetValue "displacement$i"
         $warp(vtkTemp450) AcceptCallback
         update
@@ -4593,19 +4593,19 @@ if ![info exists DemoDir] {
         set parallelState  [[$rv GetParallelProjectionCheck] GetState]
         $rv ParallelProjectionOff
 
-#       clip_init
-#       extract_init
-       iso_init
-#       threshold_init
-#       warp_init
-#       stream_init
+        clip_init
+        extract_init
+        iso_init
+        threshold_init
+        stream_init
+        warp_init
         while {1} {
-           iso_run
-#           warp_run
-#           stream_run
-#            extract_run
-#           clip_run
-#           threshold_run
+            iso_run
+            warp_run
+            stream_run
+            extract_run
+            clip_run
+            threshold_run
             break     
             if $pvDemoShouldStop {
                 break

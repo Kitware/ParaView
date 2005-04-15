@@ -67,12 +67,14 @@ public:
   void SetServerToClient(){this->Server=vtkMPIMoveData::CLIENT;}
   void SetServerToDataServer(){this->Server=vtkMPIMoveData::DATA_SERVER;}
   void SetServerToRenderServer(){this->Server=vtkMPIMoveData::RENDER_SERVER;}
+  vtkSetClampMacro(Server, int, vtkMPIMoveData::CLIENT, vtkMPIMoveData::RENDER_SERVER);
 
   // Description:
   // Specify how the data is to be redistributed.
   void SetMoveModeToPassThrough(){this->MoveMode=vtkMPIMoveData::PASS_THROUGH;}
   void SetMoveModeToCollect(){this->MoveMode=vtkMPIMoveData::COLLECT;}
   void SetMoveModeToClone(){this->MoveMode=vtkMPIMoveData::CLONE;}
+  vtkSetClampMacro(MoveMode, int, vtkMPIMoveData::PASS_THROUGH, vtkMPIMoveData::CLONE);
 
   // Description:
   // The old classes cloned when mode was collect.  It is easier (and cleaner)

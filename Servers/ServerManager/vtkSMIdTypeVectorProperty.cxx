@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIdTypeVectorProperty);
-vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.4");
+vtkCxxRevisionMacro(vtkSMIdTypeVectorProperty, "1.5");
 
 struct vtkSMIdTypeVectorPropertyInternals
 {
@@ -51,6 +51,13 @@ void vtkSMIdTypeVectorProperty::AppendCommandToStream(
     return;
     }
 
+  if (this->CleanCommand)
+    {
+    *str << vtkClientServerStream::Invoke
+      << objectId << this->CleanCommand
+      << vtkClientServerStream::End;
+    }
+  
   if (!this->RepeatCommand)
     {
     *str << vtkClientServerStream::Invoke << objectId << this->Command;
@@ -293,6 +300,34 @@ void vtkSMIdTypeVectorProperty::SaveState(
     }
   this->Superclass::SaveState(name, file, indent);
   *file << indent << "</Property>" << endl;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIdTypeVectorProperty::DeepCopy(vtkSMProperty* src)
+{
+  this->Superclass::DeepCopy(src);
+
+  vtkSMIdTypeVectorProperty* dsrc = vtkSMIdTypeVectorProperty::SafeDownCast(
+    src);
+  if (dsrc)
+    {
+    int imUpdate = this->ImmediateUpdate;
+    this->ImmediateUpdate = 0;
+    this->SetNumberOfElements(dsrc->GetNumberOfElements());
+    this->SetNumberOfUncheckedElements(dsrc->GetNumberOfUncheckedElements());
+    memcpy(&this->Internals->Values[0], 
+           &dsrc->Internals->Values[0], 
+           this->GetNumberOfElements()*sizeof(vtkIdType));
+    memcpy(&this->Internals->UncheckedValues[0], 
+           &dsrc->Internals->UncheckedValues[0], 
+           this->GetNumberOfUncheckedElements()*sizeof(vtkIdType));
+    this->ImmediateUpdate = imUpdate;
+    }
+
+  if (this->ImmediateUpdate)
+    {
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------

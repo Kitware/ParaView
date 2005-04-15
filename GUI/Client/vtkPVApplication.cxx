@@ -12,10 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVApplication.h"
 
 #include "vtkToolkits.h"
 #include "vtkPVConfig.h"
+#include "vtkPVApplication.h"
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
 #include "vtkMPICommunicator.h"
@@ -53,6 +53,7 @@
 #include "vtkPVHelpPaths.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVProcessModuleGUIHelper.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
@@ -111,8 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.346");
-
+vtkCxxRevisionMacro(vtkPVApplication, "1.347");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -453,11 +453,15 @@ vtkPVApplication::vtkPVApplication()
   this->SMApplication = vtkSMApplication::New();
 
   this->SaveRuntimeInfoButton = NULL;
+  this->RenderModuleProxy = 0;
+  this->RenderModuleProxyName = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
+  this->SetRenderModuleProxy(0);
+
   // Remove the ParaView output window so errors during exit will
   // still be displayed.
   vtkOutputWindow::SetInstance(0);
@@ -484,6 +488,8 @@ vtkPVApplication::~vtkPVApplication()
     this->SaveRuntimeInfoButton->Delete();
     this->SaveRuntimeInfoButton = 0;
     }
+  
+
 }
 
 //----------------------------------------------------------------------------
@@ -508,7 +514,110 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
     pm->GetProgressHandler()->SetServerMode(this->Options->GetServerMode());
     }
 }
+//----------------------------------------------------------------------------
+int vtkPVApplication::SetupRenderModule()
+{
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
+    vtkProcessModule::GetProcessModule());
+  pm->SynchronizeServerClientOptions();
+
+  const char* renderModuleName = 0;
+
+  renderModuleName = pm->GetOptions()->GetRenderModuleName();
+  if (!renderModuleName)
+    {
+    // User didn't specify the render module to use.
+    if (pm->GetOptions()->GetTileDimensions()[0])
+      {
+      // Server/client says we are rendering for a Tile Display.
+      // Now decide if we must use IceT or not.
+      if (pm->GetServerInformation()->GetUseIceT())
+        {
+        renderModuleName = "IceTRenderModule";
+        }
+      else
+        {
+        renderModuleName = "MultiDisplayRenderModule";
+        }
+      }
+    else if (pm->GetOptions()->GetClientMode())
+      {
+      // Client server configuration without Tiles.
+      if (pm->GetServerInformation()->GetUseIceT())
+        {
+        renderModuleName = "IceTDesktopRenderModule";
+        }
+      else
+        {
+        renderModuleName = "MPIRenderModule"; 
+        // TODO: if I separated the MPI and ClientServer
+        // render modules, this is where I will use
+        // the ClientServerRenderModule.
+        }
+      }
+    else
+      {
+      // Not running in Client Server Mode.
+      // Use local information to choose render module.
+#ifdef VTK_USE_MPI
+      renderModuleName = "MPIRenderModule";
+#else
+      renderModuleName = "LODRenderModule";
+#endif
+      }
+    }
   
+  vtkSMProxy *p = pxm->NewProxy("rendermodules", renderModuleName);
+  
+  if (!p)
+    {
+    return 0;
+    }
+  
+  vtkSMRenderModuleProxy* rm = vtkSMRenderModuleProxy::SafeDownCast(p);
+  if (!rm)
+    {
+    vtkErrorMacro("Render Module must be a subclass of vtkSMRenderModuleProxy.");
+    p->Delete();
+    return 0;
+    }
+  rm->UpdateVTKObjects();
+  this->SetRenderModuleProxy(rm);
+  pm->GetOptions()->SetRenderModuleName(renderModuleName);
+  rm->Delete();
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetRenderModuleProxy(vtkSMRenderModuleProxy* rm)
+{
+  vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+  if (this->RenderModuleProxy)
+    {
+    if (this->RenderModuleProxyName && pxm)
+      {
+      pxm->UnRegisterProxy("rendermodules",this->RenderModuleProxyName);
+      }
+    this->SetRenderModuleProxyName(0);
+    this->RenderModuleProxy->UnRegister(this);
+    }
+  this->RenderModuleProxy = rm;
+  if (this->RenderModuleProxy)
+    {
+    this->RenderModuleProxy->Register(this);
+    if (pxm)
+      {
+      static int numObjects = 0;
+      ostrstream str;
+      str << "vtkPVApplication_RenderModule" << numObjects << ends;
+      pxm->RegisterProxy("rendermodules",str.str(), this->RenderModuleProxy);
+      this->SetRenderModuleProxyName(str.str());
+      str.rdbuf()->freeze(0);
+      }
+    }
+}
+
 //----------------------------------------------------------------------------
 vtkMultiProcessController* vtkPVApplication::GetController()
 {
@@ -891,7 +1000,11 @@ void vtkPVApplication::Initialize()
 void vtkPVApplication::Start(int argc, char*argv[])
 {
   this->Initialize();
-
+  if (!this->SetupRenderModule())
+    {
+    vtkErrorMacro("Failed to setup Render Module. Aborting.");
+    abort();
+    }
   // set the font size to be small
 #ifdef _WIN32
   this->Script("option add *font {{Tahoma} 8}");
@@ -1200,7 +1313,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->OutputWindow->SetApplication(NULL);
 
   // Break a circular reference.
-  this->ProcessModule->SetRenderModule(NULL);
+  this->SetRenderModuleProxy(0);
 }
 
 //----------------------------------------------------------------------------
@@ -1286,7 +1399,7 @@ void vtkPVApplication::CloseWindow(vtkKWWindow *win)
   if (this->GetNumberOfWindows() == 1)
     {
     // Try to get the render window to destruct before the render widget.
-    this->ProcessModule->SetRenderModule(NULL);
+    this->SetRenderModuleProxy(0);
     }
 
   this->Superclass::CloseWindow(win);
@@ -1558,6 +1671,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
 }
 
 //----------------------------------------------------------------------------

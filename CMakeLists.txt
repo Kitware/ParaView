@@ -263,6 +263,7 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
   ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
 SUBDIRS(VTK)
 
+FIND_FILE(VTK_WRAP_HINTS hints ${VTK_SOURCE_DIR}/Wrapping)
 
 # Set the ICET MPI variables from the VTK ones.
 # use a set cache internal so people don't try and use them

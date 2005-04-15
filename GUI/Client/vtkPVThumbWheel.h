@@ -89,21 +89,6 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
  
-  // Description:
-  // Called when menu item (above) is selected.  Neede for tracing.
-  // Would not be necessary if menus traced invocations.
-  void AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
-  // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(
-    vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
-  // Resets the animation entries (start and end) to values obtained
-  // from the range domain
-  virtual void ResetAnimationRange(vtkPVAnimationInterfaceEntry* ai);
-
 protected:
   vtkPVThumbWheel();
   ~vtkPVThumbWheel();

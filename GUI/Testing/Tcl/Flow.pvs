@@ -35,7 +35,7 @@ $pvWindow SetCenterOfRotation 8.255000 0.000000 29.763084
 $pv(vtkTemp533) AcceptCallback
 
 set pv(vtkTemp41) [$pv(vtkTemp533) GetPVOutput]
-$pv(vtkTemp41) ColorByPointField {Density} 1
+$pv(vtkTemp41) ColorByArray {Density} 3
 $pvWindow SetCurrentPVSourceCallback $pv(vtkTemp533)
 set pv(vtkTemp632) [$pvWindow CreatePVSource Cut]
 $pv(vtkTemp632) SetLabel {Cut0}
@@ -53,7 +53,7 @@ $pv(vtkTemp677) RemoveAllValues
 $pv(vtkTemp677) AddValue 0
 $pv(vtkTemp632) AcceptCallback
 
-$pv(vtkTemp41) ColorByPointField {Density} 1
+$pv(vtkTemp41) ColorByArray {Density} 3
 $pvWindow SetCurrentPVSourceCallback $pv(vtkTemp632)
 set pv(vtkTemp705) [$pvWindow CreatePVSource IntegrateFlowThroughSurface]
 $pv(vtkTemp705) SetLabel {SurfaceFlow0}
@@ -102,7 +102,7 @@ set pv(vtkTemp805) [$pv(vtkTemp801) GetPVWidget {ConstraintMode}]
 $pv(vtkTemp805) SetCurrentValue {0}
 $pv(vtkTemp801) AcceptCallback
 
-$pv(vtkTemp41) ColorByPointField {Density} 1
+$pv(vtkTemp41) ColorByArray {Density} 3
 $pvWindow SetCurrentPVSourceCallback $pv(vtkTemp801)
 set pv(vtkTemp811) [$pvWindow CreatePVSource Glyph]
 $pv(vtkTemp811) SetLabel {Glyph1}
@@ -158,7 +158,7 @@ set pv(vtkTemp861) [$pv(vtkTemp841) GetPVWidget {RandomMask}]
 $pv(vtkTemp861) SetState 0
 $pv(vtkTemp841) AcceptCallback
 
-$pv(vtkTemp41) ColorByPointField {Momentum} 3
+$pv(vtkTemp41) ColorByArray {Momentum} 3
 $pv(vtkTemp632) SetVisibility 1
 $pv(vtkTemp705) SetVisibility 0
 $pv(vtkTemp801) SetVisibility 0

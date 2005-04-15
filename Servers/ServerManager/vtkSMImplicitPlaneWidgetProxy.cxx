@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMImplicitPlaneWidgetProxy);
-vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMImplicitPlaneWidgetProxy, "1.8");
 
 //----------------------------------------------------------------------------
 vtkSMImplicitPlaneWidgetProxy::vtkSMImplicitPlaneWidgetProxy()

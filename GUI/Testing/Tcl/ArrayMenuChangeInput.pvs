@@ -14,6 +14,7 @@ set kw(vtkTemp290) [$kw(vtkTemp273) GetPVWidget {Theta Resolution}]
 $kw(vtkTemp290) SetValue 16
 set kw(vtkTemp299) [$kw(vtkTemp273) GetPVWidget {Phi Resolution}]
 $kw(vtkTemp299) SetValue 16
+update
 $kw(vtkTemp273) AcceptCallback
 $kw(vtkTemp22) SetRendererBackgroundColor 0.000000 0.000000 0.000000
 set kw(vtkTemp327) [$kw(vtkTemp1) CreatePVSource SphereSource]
@@ -23,6 +24,7 @@ set kw(vtkTemp344) [$kw(vtkTemp327) GetPVWidget {Theta Resolution}]
 $kw(vtkTemp344) SetValue 8
 set kw(vtkTemp353) [$kw(vtkTemp327) GetPVWidget {Phi Resolution}]
 $kw(vtkTemp353) SetValue 6
+update
 $kw(vtkTemp327) AcceptCallback
 $kw(vtkTemp1) ResetCameraCallback
 set kw(vtkTemp381) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
@@ -30,21 +32,25 @@ set kw(vtkTemp394) [$kw(vtkTemp381) GetPVWidget {Line}]
 $kw(vtkTemp394) SetPoint1 0.00000 0.00000 0.00000
 $kw(vtkTemp394) SetPoint2 0.00000 0.00000 1.00000
 $kw(vtkTemp394) SetResolution 20
+update
 $kw(vtkTemp381) AcceptCallback
 set kw(vtkTemp428) [$kw(vtkTemp1) CreatePVSource Calculator]
 set kw(vtkTemp668) [$kw(vtkTemp428) GetPVWidget {Equation}]
 $kw(vtkTemp668) AddScalarVariable Normals_0 Normals 0
 $kw(vtkTemp668) SetFunctionLabel {Normals_0}
+update
 $kw(vtkTemp428) AcceptCallback
 set kw(vtkTemp482) [$kw(vtkTemp1) CreatePVSource WarpScalar]
 set kw(vtkTemp491) [$kw(vtkTemp482) GetPVWidget {Scalars}]
 $kw(vtkTemp491) SetValue {resultArray}
+update
 $kw(vtkTemp482) AcceptCallback
 set kw(vtkTemp452) [$kw(vtkTemp428) GetPVOutput]
 $kw(vtkTemp452) SetVisibility 1
 set kw(vtkTemp506) [$kw(vtkTemp482) GetPVWidget {Input}]
 $kw(vtkTemp506) SetCurrentValue $kw(vtkTemp381)
 $kw(vtkTemp491) SetValue {Elevation}
+update
 $kw(vtkTemp482) AcceptCallback
 set kw(vtkTemp509) [$kw(vtkTemp482) GetPVOutput]
 $kw(vtkTemp509) SetVisibility 0
@@ -54,7 +60,8 @@ $kw(vtkTemp509) ColorByProperty
 
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp273)
 set kw(vtkTemp309) [$kw(vtkTemp273) GetPVOutput]
-$kw(vtkTemp309) ColorByPointField {Normals} 3
+#$kw(vtkTemp309) ColorByPointField {Normals} 3
+$kw(vtkTemp309) ColorByArray {Normals} 3
 set kw(vtkTemp310) [$kw(vtkTemp309) GetPVColorMap]
 $kw(vtkTemp310) VectorModeComponentCallback
 $kw(vtkTemp310) VectorComponentCallback 0

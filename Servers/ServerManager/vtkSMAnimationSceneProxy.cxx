@@ -19,17 +19,18 @@
 #include "vtkObjectFactory.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
-#include "vtkSMDisplayWindowProxy.h"
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.1");
+#include "vtkSMRenderModuleProxy.h"
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.2");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
-vtkCxxSetObjectMacro(vtkSMAnimationSceneProxy, DisplayWindowProxy, vtkSMDisplayWindowProxy);
+vtkCxxSetObjectMacro(vtkSMAnimationSceneProxy, RenderModuleProxy, 
+  vtkSMRenderModuleProxy);
 
 //----------------------------------------------------------------------------
 vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
 {
   this->AnimationCueProxies = vtkCollection::New();
   this->AnimationCueProxiesIterator = this->AnimationCueProxies->NewIterator();
-  this->DisplayWindowProxy = 0;
+  this->RenderModuleProxy = 0;
   
 }
 
@@ -38,7 +39,7 @@ vtkSMAnimationSceneProxy::~vtkSMAnimationSceneProxy()
 {
   this->AnimationCueProxies->Delete();
   this->AnimationCueProxiesIterator->Delete();
-  this->SetDisplayWindowProxy(0);
+  this->SetRenderModuleProxy(0);
 }
 
 //----------------------------------------------------------------------------
@@ -68,7 +69,7 @@ void vtkSMAnimationSceneProxy::SaveInBatchScript(ofstream* file)
   *file << "  [$pvTemp" << id << " GetProperty PlayMode]"
     << " SetElements1 " << this->GetPlayMode() << endl;
 //TODO: How to set this?
-  *file << "  $pvTemp" << id << " SetDisplayWindowProxy $Ren1" << endl;
+  *file << "  $pvTemp" << id << " SetRenderModuleProxy $Ren1" << endl;
   *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
   *file << endl;
   vtkCollectionIterator* iter = this->AnimationCueProxiesIterator;
@@ -241,10 +242,9 @@ int vtkSMAnimationSceneProxy::GetPlayMode()
 void vtkSMAnimationSceneProxy::StartCueInternal(void* info)
 {
   this->Superclass::StartCueInternal(info);
-  if (this->DisplayWindowProxy)
+  if (this->RenderModuleProxy)
     {
-    //this->DisplayWindowProxy->UpdateVTKObjects();
-    this->DisplayWindowProxy->StillRender();
+    this->RenderModuleProxy->StillRender();
     }
 }
 
@@ -252,10 +252,9 @@ void vtkSMAnimationSceneProxy::StartCueInternal(void* info)
 void vtkSMAnimationSceneProxy::TickInternal(void* info)
 {
   this->Superclass::TickInternal(info);
-  if (this->DisplayWindowProxy)
+  if (this->RenderModuleProxy)
     {
-    //this->DisplayWindowProxy->UpdateVTKObjects();
-    this->DisplayWindowProxy->StillRender();
+    this->RenderModuleProxy->StillRender();
     }
 }
 
@@ -263,10 +262,9 @@ void vtkSMAnimationSceneProxy::TickInternal(void* info)
 void vtkSMAnimationSceneProxy::EndCueInternal(void* info)
 {
   this->Superclass::EndCueInternal(info);
-  if (this->DisplayWindowProxy)
+  if (this->RenderModuleProxy)
     {
-    //this->DisplayWindowProxy->UpdateVTKObjects();
-    this->DisplayWindowProxy->StillRender();
+    this->RenderModuleProxy->StillRender();
     }
 }
 

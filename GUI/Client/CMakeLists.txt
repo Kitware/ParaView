@@ -56,6 +56,7 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVAnimationBatchHelper.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
+  vtkInteractorStyleTrackballMultiActor.cxx
   vtkPVInteractorStyle.cxx
   vtkPVInteractorStyleCenterOfRotation.cxx
   vtkPVWidgetCollection.cxx
@@ -79,7 +80,6 @@ SET( ParaViewClient_SRCS
   vtkPVAdvancedReaderModule.cxx
   vtkPVTimeLine.cxx
   vtkPVAnimationScene.cxx
-  vtkPVAnimationInterface.cxx
   vtkPVAnimationCue.cxx
   vtkPVAnimationCueTree.cxx
   vtkPVKeyFrame.cxx
@@ -88,9 +88,9 @@ SET( ParaViewClient_SRCS
   vtkPVExponentialKeyFrame.cxx
   vtkPVSinusoidKeyFrame.cxx
   vtkPVAnimationManager.cxx
+  vtkPVComparativeVisManager.cxx
   vtkPVHorizontalAnimationInterface.cxx
   vtkPVVerticalAnimationInterface.cxx
-  vtkPVAnimationInterfaceEntry.cxx
   vtkPVApplicationResources.cxx
   vtkPVApplicationSettingsInterface.cxx
   vtkPVArrayMenu.cxx
@@ -103,13 +103,14 @@ SET( ParaViewClient_SRCS
   vtkPVCameraManipulator.cxx
   vtkPVCaveRenderModuleUI.cxx
   vtkPVColorMap.cxx
+  vtkPVColorSelectionWidget.cxx
   vtkPVCompositeRenderModuleUI.cxx
   vtkPVConnectDialog.cxx
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx
   vtkPVCornerAnnotationEditor.cxx
   vtkPVCutEntry.cxx
-  vtkPVDeskTopRenderModuleUI.cxx
+  vtkPVIceTDesktopRenderModuleUI.cxx
   vtkPVDisplayGUI.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx

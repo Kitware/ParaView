@@ -109,10 +109,6 @@ public:
   virtual void Trace(ofstream *file);
 
   // Description:
-  // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai);
- 
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated

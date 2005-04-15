@@ -18,7 +18,6 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkPickLineWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
@@ -41,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.65");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.66");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -328,7 +327,7 @@ int vtkPVLineWidget::GetResolution()
 int vtkPVLineWidget::GetResolutionInternal()
 {
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->WidgetProxy->GetProperty("ResolutionInfo"));
+    this->WidgetProxy->GetProperty("Resolution"));
   return ivp->GetElement(0);
 }
 
@@ -719,7 +718,6 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
     res = this->GetResolutionInternal();
     this->ResolutionEntry->SetValue(res);
 
-    this->Render();
     }
   this->Superclass::ExecuteEvent(wdg, l, p);
 }
@@ -777,19 +775,6 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
       vtkPVTraceHelper::ObjectNameStateSelfInitialized);
     }
 
-  // Widget needs the RenderModule for picking
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  unsigned int ui;
-  for (ui=0; ui<this->WidgetProxy->GetNumberOfIDs(); ui++)
-    {
-    vtkPickLineWidget* widget = vtkPickLineWidget::SafeDownCast(
-      pm->GetObjectFromID(this->WidgetProxy->GetID(ui)));
-    if (widget)
-      {
-      widget->SetRenderModule(pm->GetRenderModule());
-      }
-    }
-  
 
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());

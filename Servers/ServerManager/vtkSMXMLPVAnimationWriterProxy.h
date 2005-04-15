@@ -20,19 +20,23 @@
 #ifndef __vtkSMXMLPVAnimationWriterProxy_h
 #define __vtkSMXMLPVAnimationWriterProxy_h
 
-#include "vtkSMProxy.h"
+#include "vtkSMSourceProxy.h"
 class vtkSMXMLPVAnimationWriterProxyInternals;
 class vtkSMSummaryHelperProxy;
 
-class VTK_EXPORT vtkSMXMLPVAnimationWriterProxy : public vtkSMProxy
+class VTK_EXPORT vtkSMXMLPVAnimationWriterProxy : public vtkSMSourceProxy
 {
 public:
   static vtkSMXMLPVAnimationWriterProxy* New();
-  vtkTypeRevisionMacro(vtkSMXMLPVAnimationWriterProxy, vtkSMProxy);
+  vtkTypeRevisionMacro(vtkSMXMLPVAnimationWriterProxy, vtkSMSourceProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void AddInput(vtkSMProxy* input);
-  
+  // Description:
+  // Connects filters/sinks to an input. If the filter(s) is not
+  // created, this will create it. 
+  void AddInput(vtkSMSourceProxy* input, 
+                const char* method, int , int ); 
+
   void WriteTime(double time);
 
   void Start();

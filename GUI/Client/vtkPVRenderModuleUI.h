@@ -23,7 +23,7 @@
 #include "vtkPVTracedWidget.h"
 
 class vtkPVApplication;
-class vtkPVRenderModule;
+class vtkSMRenderModuleProxy;
 
 class VTK_EXPORT vtkPVRenderModuleUI : public vtkPVTracedWidget
 {
@@ -38,13 +38,10 @@ public:
   // server information in the process module is valid.
   virtual void Initialize() {};
 
-//BTX   
   // Description:
-  // The subclass should implement this method and 
-  // downcast it to the right type.  It can then access
-  // any unique methods of the specific render module.
-  virtual void SetRenderModule(vtkPVRenderModule *rm);
-//ETX
+  // Sets the render module proxy.
+  void SetRenderModuleProxy(vtkSMRenderModuleProxy*);
+  vtkGetObjectMacro(RenderModuleProxy, vtkSMRenderModuleProxy);
 
   // Description:
   // Create the widget.
@@ -66,6 +63,9 @@ public:
 protected:
   vtkPVRenderModuleUI();
   ~vtkPVRenderModuleUI();
+
+  vtkSMRenderModuleProxy* RenderModuleProxy;
+
 
   float OutlineThreshold;
  

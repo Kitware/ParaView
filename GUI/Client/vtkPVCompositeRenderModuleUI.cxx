@@ -13,7 +13,6 @@
 
 =========================================================================*/
 #include "vtkPVCompositeRenderModuleUI.h"
-#include "vtkPVCompositeRenderModule.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWCheckButton.h"
@@ -27,10 +26,12 @@
 #include "vtkPVServerInformation.h"
 #include "vtkPVOptions.h"
 #include "vtkPVTraceHelper.h"
-
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMRenderModuleProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.23");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.24");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -40,8 +41,6 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
 {
   this->CommandFunction = vtkPVCompositeRenderModuleUICommand;
   
-  this->CompositeRenderModule = NULL;
-
   this->ParallelRenderParametersFrame = vtkKWFrameLabeled::New();
 
   this->CompositeWithFloatCheck = vtkKWCheckButton::New();
@@ -136,34 +135,6 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
   this->SquirtLevelLabel->Delete();
   this->SquirtLevelLabel = NULL;
 
-  if (this->CompositeRenderModule)
-    {
-    this->CompositeRenderModule->UnRegister(this);
-    this->CompositeRenderModule = NULL;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVCompositeRenderModuleUI::SetRenderModule(vtkPVRenderModule* rm)
-{
-  // Super class has a duplicate pointer.
-  this->Superclass::SetRenderModule(rm);
-
-  if (this->CompositeRenderModule)
-    {
-    this->CompositeRenderModule->UnRegister(this);
-    this->CompositeRenderModule = NULL;
-    }
-  this->CompositeRenderModule = vtkPVCompositeRenderModule::SafeDownCast(rm);
-  if (this->CompositeRenderModule)
-    {
-    this->CompositeRenderModule->Register(this);
-    }
-
-  if (rm != NULL && this->CompositeRenderModule == NULL)
-    {
-    vtkErrorMacro("Expecting a CompositeRenderModule.");
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -519,22 +490,22 @@ void vtkPVCompositeRenderModuleUI::SetCompositeThreshold(float threshold)
 
   this->CompositeThreshold = threshold;
 
-  this->SetCompositeThresholdInternal(threshold);
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->RenderModuleProxy->GetProperty("CompositeThreshold"));
+  if (!dvp)
+    {
+    vtkErrorMacro("Failed to find property CompositeThreshold.");
+    return;
+    }
+  dvp->SetElement(0, threshold);
+  this->RenderModuleProxy->UpdateVTKObjects();
+
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %f.", threshold);
   
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
   this->GetTraceHelper()->AddEntry("catch {$kw(%s) SetCompositeThreshold %f}",
                       this->GetTclName(), threshold);
-}
-
-//----------------------------------------------------------------------------
-// Eliminate this method ...........!!!!!!!!!!!!!!
-void vtkPVCompositeRenderModuleUI::SetCompositeThresholdInternal(float threshold)
-{
-  // This will cause collection to be re evaluated.
-  this->CompositeRenderModule->SetTotalVisibleMemorySizeValid(0);
-  this->CompositeRenderModule->SetCompositeThreshold(threshold);
 }
 
 //----------------------------------------------------------------------------
@@ -556,7 +527,7 @@ void vtkPVCompositeRenderModuleUI::CompositeWithFloatCallback(int val)
     {
     this->CompositeWithFloatCheck->SetState(val);
     }
- 
+/* TODO: 
   if (this->CompositeRenderModule->GetCompositeID())
     {
     this->CompositeRenderModule->SetUseCompositeWithFloat(val);
@@ -567,7 +538,7 @@ void vtkPVCompositeRenderModuleUI::CompositeWithFloatCallback(int val)
       }
     this->GetPVApplication()->GetMainView()->EventuallyRender();
     }
-
+*/
   if (this->CompositeWithFloatCheck->GetState())
     {
     vtkTimerLog::MarkEvent("--- Get color buffers as floats.");
@@ -597,6 +568,7 @@ void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback(int val)
     {
     this->CompositeWithRGBACheck->SetState(val);
     }
+/* TODO:
   if (this->CompositeRenderModule->GetCompositeID())
     {
     this->CompositeRenderModule->SetUseCompositeWithRGBA(val);
@@ -607,7 +579,7 @@ void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback(int val)
       }
     this->GetPVApplication()->GetMainView()->EventuallyRender();
     }
-
+*/
   if (this->CompositeWithRGBACheck->GetState())
     {
     vtkTimerLog::MarkEvent("--- Use RGBA pixels to get color buffers.");
@@ -640,7 +612,16 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
     }
 
   // Let the render module do what it needs to.
-  this->CompositeRenderModule->SetUseCompositeCompression(val);
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderModuleProxy->GetProperty("UseCompositeCompression"));
+  if (!ivp)
+    {
+//    vtkErrorMacro("Cannot find property UseCompositeCompression on "
+//      "RenderModuleProxy.");
+    return;
+    }
+  ivp->SetElement(0, val);
+  this->RenderModuleProxy->UpdateVTKObjects();
 
   if (val)
     {
@@ -722,11 +703,16 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
 
     vtkTimerLog::FormatAndMarkEvent("--- Squirt level %d.", level);
     }
- 
-  if (this->CompositeRenderModule)
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderModuleProxy->GetProperty("SquirtLevel"));
+  if (!ivp)
     {
-    this->CompositeRenderModule->SetSquirtLevel(level);
+    vtkErrorMacro("Failed to find property SquirtLevel on RenderModuleProxy.");
+    return;
     }
+  ivp->SetElement(0, level);
+  this->RenderModuleProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
@@ -785,10 +771,15 @@ void vtkPVCompositeRenderModuleUI::SetReductionFactor(int factor)
      vtkTimerLog::FormatAndMarkEvent("--- Reduction factor %d.", factor);
    }
 
-  if (this->CompositeRenderModule)
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->RenderModuleProxy->GetProperty("ReductionFactor"));
+  if (!ivp)
     {
-    this->CompositeRenderModule->SetReductionFactor(factor);
+    vtkErrorMacro("Failed to find ReductionFactor on RenderModuleProxy.");
+    return;
     }
+  ivp->SetElement(0, factor);
+  this->RenderModuleProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------

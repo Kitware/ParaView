@@ -31,7 +31,10 @@
 #include "vtkPVProcessModule.h"
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
-#include "vtkClientServerStream.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMProxy.h"
+#include "vtkSMStringVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
 
 #include <kwsys/SystemTools.hxx>
 
@@ -39,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.38");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.39");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -137,7 +140,7 @@ vtkPVServerFileDialog::vtkPVServerFileDialog()
   this->ExtensionStrings = vtkStringList::New();
 
   this->ScrollBar = vtkKWWidget::New();
-  this->ServerSideID.ID = 0;
+  this->ServerFileListingProxy = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -199,24 +202,29 @@ vtkPVServerFileDialog::~vtkPVServerFileDialog()
     this->ScrollBar->Delete();
     }
 
-  if(this->ServerSideID.ID)
+  if(this->ServerFileListingProxy)
     {
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    vtkClientServerStream stream;
-    pm->DeleteStreamObject(this->ServerSideID, stream);
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+    this->ServerFileListingProxy->Delete();
+    this->ServerFileListingProxy = 0;
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::CreateServerSide()
 {
-  if(!this->ServerSideID.ID)
+  if(!this->ServerFileListingProxy)
     {
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    vtkClientServerStream stream;
-    this->ServerSideID = pm->NewStreamObject("vtkPVServerFileListing", stream);
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
+    this->ServerFileListingProxy = pxm->NewProxy(
+      "file_listing","ServerFileListing");
+    if (!this->ServerFileListingProxy)
+      {
+      vtkErrorMacro("Failed to create proxy ServerFileListing.");
+      return;
+      }
+    this->ServerFileListingProxy->SetServers(
+      vtkProcessModule::DATA_SERVER_ROOT);
+    this->ServerFileListingProxy->UpdateVTKObjects();
     }
 }
 
@@ -581,20 +589,17 @@ void vtkPVServerFileDialog::LoadSaveCallback()
   
   vtkstd::string fileName = this->FileNameEntry->GetValue();
   
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   if(fileName[0] == '/' || fileName[1] == ':')
     {
     this->CreateServerSide();
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->ServerSideID << "FileIsDirectory" << fileName.c_str()
-           << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
-    int isdir = 0;
-    if(!pm->GetLastResult(vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &isdir))
-      {
-      vtkErrorMacro("Error checking whether file is directory on server.");
-      }
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+      this->ServerFileListingProxy->GetProperty("ActiveFileName"));
+    svp->SetElement(0, fileName.c_str());
+    this->ServerFileListingProxy->UpdateVTKObjects();
+    this->ServerFileListingProxy->UpdateInformation();
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->ServerFileListingProxy->GetProperty("ActiveFileIsDirectory"));
+    int isdir = (ivp)? ivp->GetElement(0) : 0;
     if(isdir)
       {
       this->FileNameEntry->SetValue("");
@@ -885,23 +890,14 @@ void vtkPVServerFileDialog::Update()
   vtkStringList* dirs = vtkStringList::New();
   vtkStringList* files = vtkStringList::New();
 
-  vtkClientServerStream stream;
-
   // Make sure we have a directory.
   if(!this->LastPath)
     {
     this->CreateServerSide();
-    stream << vtkClientServerStream::Invoke
-           << this->ServerSideID << "GetCurrentWorkingDirectory"
-           << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
-    const char* cwd;
-    if(!pm->GetLastResult(
-         vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd))
-      {
-      vtkErrorMacro("Error getting current working directory from server.");
-      cwd = "";
-      }
+    this->ServerFileListingProxy->UpdateInformation();
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+      this->ServerFileListingProxy->GetProperty("CurrentWorkingDirectory"));
+    const char* cwd = (svp)? svp->GetElement(0) : "";
     this->SetLastPath(cwd);
     this->ConvertLastPath();
     }
@@ -911,17 +907,10 @@ void vtkPVServerFileDialog::Update()
     {
     // Directory did not exist, use current directory instead.
     this->CreateServerSide();
-    stream << vtkClientServerStream::Invoke
-           << this->ServerSideID << "GetCurrentWorkingDirectory"
-           << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
-    const char* cwd;
-    if(!pm->GetLastResult(
-         vtkProcessModule::DATA_SERVER_ROOT).GetArgument(0, 0, &cwd))
-      {
-      vtkErrorMacro("Error getting current working directory from server.");
-      cwd = "";
-      }
+    this->ServerFileListingProxy->UpdateInformation();
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+      this->ServerFileListingProxy->GetProperty("CurrentWorkingDirectory"));
+    const char* cwd = (svp)? svp->GetElement(0) : "";
     this->SetLastPath(cwd);
     this->ConvertLastPath();
 

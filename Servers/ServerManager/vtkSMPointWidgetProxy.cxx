@@ -18,17 +18,16 @@
 #include "vtkPVProcessModule.h"
 #include "vtkCommand.h"
 #include "vtkClientServerStream.h"
-#include "vtkPickPointWidget.h"
+#include "vtkPointWidget.h"
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMPointWidgetProxy);
-vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMPointWidgetProxy, "1.6");
 
 //----------------------------------------------------------------------------
 vtkSMPointWidgetProxy::vtkSMPointWidgetProxy()
 {
   this->Position[0] = this->Position[1] = this->Position[2] = 0;
-  this->SetVTKClassName("vtkPickPointWidget");
 }
 
 //----------------------------------------------------------------------------
@@ -43,10 +42,13 @@ void vtkSMPointWidgetProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
-  this->Superclass::CreateVTKObjects(numObjects);
+  unsigned int cc;
+  
+  this->Superclass::CreateVTKObjects(numObjects); 
+  
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  for(unsigned int cc=0; cc < this->GetNumberOfIDs(); cc++)
+  for( cc=0; cc < this->GetNumberOfIDs(); cc++)
     {
     vtkClientServerID id = this->GetID(cc);
     stream << vtkClientServerStream::Invoke 
@@ -83,7 +85,7 @@ void vtkSMPointWidgetProxy::UpdateVTKObjects()
 //----------------------------------------------------------------------------
 void vtkSMPointWidgetProxy::ExecuteEvent(vtkObject *wdg, unsigned long event,void *p)
 {
-  vtkPickPointWidget *widget = vtkPickPointWidget::SafeDownCast(wdg);
+  vtkPointWidget *widget = vtkPointWidget::SafeDownCast(wdg);
   if ( !widget )
     {
     vtkErrorMacro( "This is not a point widget" );
@@ -111,6 +113,7 @@ void vtkSMPointWidgetProxy::SaveState(const char* name, ostream* file,
     }
   this->Superclass::SaveState(name,file,indent);
 }
+
 //----------------------------------------------------------------------------
 void vtkSMPointWidgetProxy::SaveInBatchScript(ofstream *file)
 {

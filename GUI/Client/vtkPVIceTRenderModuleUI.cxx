@@ -13,7 +13,6 @@
 
 =========================================================================*/
 #include "vtkPVIceTRenderModuleUI.h"
-#include "vtkPVIceTRenderModule.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWLabel.h"
 #include "vtkKWCheckButton.h"
@@ -24,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.4");
+vtkCxxRevisionMacro(vtkPVIceTRenderModuleUI, "1.5");
 
 int vtkPVIceTRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

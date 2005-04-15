@@ -23,7 +23,6 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
@@ -73,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.108");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.109");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -930,92 +929,6 @@ void vtkPVFileEntry::SaveInBatchScript(ofstream* file)
           <<  " GetProperty " << this->SMPropertyName << "] SetElement 0 {"
           << this->Entry->GetValue() << "}" << endl;
     }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                               vtkPVAnimationInterfaceEntry *ai)
-{
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMStringListDomain *dom = 0;
-
-  if (prop)
-    {
-    dom = vtkSMStringListDomain::SafeDownCast(prop->GetDomain("files"));
-    }
-  
-  if (!dom)
-    {
-    vtkErrorMacro("Required domain (files) could not be found.");
-    return;
-    }
-  
-  if ( dom->GetNumberOfStrings() > 0 )
-    {
-    char methodAndArgs[500];
-
-    sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-    menu->AddCommand(this->GetTraceHelper()->GetObjectName(), this, methodAndArgs, 0,"");
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVFileEntry::ResetAnimationRange(vtkPVAnimationInterfaceEntry *ai)
-{
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMStringListDomain *dom = 0;
-  if (prop)
-    {
-    dom = vtkSMStringListDomain::SafeDownCast(prop->GetDomain("files"));
-    }
-  
-  if (!prop || !dom)
-    {
-    vtkErrorMacro("Required property or domain (files) could not be found.");
-    return;
-    }
-
-  ai->SetTimeStart(0);
-  ai->SetTimeEnd(dom->GetNumberOfStrings()-1);
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
-{
-  if (ai->GetTraceHelper()->Initialize())
-    {
-    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
-      this->GetTclName(), ai->GetTclName());
-    }
-
-  this->Superclass::AnimationMenuCallback(ai);
-
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMStringListDomain *dom = 0;
-  if (prop)
-    {
-    dom = vtkSMStringListDomain::SafeDownCast(prop->GetDomain("files"));
-    }
-  
-  if (!prop || !dom)
-    {
-    vtkErrorMacro("Required property or domain (files) could not be found.");
-    return;
-    }
-
-  char methodAndArgs[500];
-  
-  sprintf(methodAndArgs, "ResetAnimationRange %s", ai->GetTclName());
-  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
-  ai->SetResetRangeButtonState(1);
-  ai->UpdateEnableState();
-  
-  ai->SetLabelAndScript(this->GetTraceHelper()->GetObjectName(), NULL, this->GetTraceHelper()->GetObjectName());
-  ai->SetCurrentSMProperty(prop);
-  ai->SetCurrentSMDomain(dom);
-  this->ResetAnimationRange(ai);
-  ai->SetTypeToInt();
-  ai->Update();
 }
 
 //----------------------------------------------------------------------------

@@ -95,6 +95,10 @@ public:
   enum ElementTypes{ INT, DOUBLE, STRING };
   //ETX
 
+  // Description: 
+  // Copy all property values.
+  virtual void DeepCopy(vtkSMProperty* src);
+
 protected:
   vtkSMStringVectorProperty();
   ~vtkSMStringVectorProperty();

@@ -64,11 +64,6 @@ public:
   void GenerateValuesCallback();
 
   // Description:
-  // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                         vtkPVAnimationInterfaceEntry *ai);
-
-  // Description:
   // This class redefines SetBalloonHelpString since it
   // has to forward the call to a widget it contains.
   virtual void SetBalloonHelpString(const char *str);

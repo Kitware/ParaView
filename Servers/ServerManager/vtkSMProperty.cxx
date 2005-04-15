@@ -31,7 +31,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.27");
+vtkCxxRevisionMacro(vtkSMProperty, "1.28");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -46,7 +46,7 @@ vtkSMProperty::vtkSMProperty()
 {
   this->Command = 0;
   this->ImmediateUpdate = 0;
-  this->Animateable = 0;
+  this->Animateable = 2; // By default Animateable in advanced mode only.
   this->UpdateSelf = 0;
   this->PInternals = new vtkSMPropertyInternals;
   this->XMLName = 0;
@@ -58,6 +58,7 @@ vtkSMProperty::vtkSMProperty()
   this->InformationProperty = 0;
   this->ControllerProxy = 0;
   this->ControllerProperty = 0;
+  this->Saveable = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -332,6 +333,12 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     this->SetAnimateable(animateable);
     }
 
+  int saveable;
+  if (element->GetScalarAttribute("saveable", &saveable))
+    {
+    this->SetSaveable(saveable);
+    }
+
   // Read and create domains.
   for(unsigned int i=0; i < element->GetNumberOfNestedElements(); ++i)
     {
@@ -433,6 +440,11 @@ int vtkSMProperty::GetModifiedAtCreation()
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProperty::DeepCopy(vtkSMProperty* src)
+{
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -446,6 +458,7 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
      <<  (this->XMLName ? this->XMLName : "(null)") << endl;
   os << indent << "InformationProperty: " << this->InformationProperty << endl;
   os << indent << "Animateable: " << this->Animateable << endl;
+  os << indent << "Saveable: " << this->Saveable << endl;
 
   vtkSMSubPropertyIterator* iter = vtkSMSubPropertyIterator::New();
   iter->SetProperty(this);

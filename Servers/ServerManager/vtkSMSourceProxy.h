@@ -39,7 +39,6 @@ class vtkPVDataSetAttributesInformation;
 struct vtkSMSourceProxyInternals;
 //ETX
 class vtkSMPart;
-class vtkSMPartDisplay;
 class vtkSMProperty;
 
 class VTK_EXPORT vtkSMSourceProxy : public vtkSMProxy
@@ -168,6 +167,13 @@ protected:
   // Call superclass' and then assigns a new executive 
   // (vtkCompositeDataPipeline)
   virtual void CreateVTKObjects(int numObjects);
+
+  char *ExecutiveName;
+  vtkSetStringMacro(ExecutiveName);
+
+  // Description:
+  // Read attributes from an XML element.
+  virtual int ReadXMLAttributes(vtkSMProxyManager* pm, vtkPVXMLElement* element);
 
 private:
   vtkSMSourceProxyInternals* PInternals;

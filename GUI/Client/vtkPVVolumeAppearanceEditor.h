@@ -76,24 +76,35 @@ public:
   void VolumePropertyChangingCallback();
   
   // Description
-  // These methods are for reading old state files (DEPRECATED).
-  void SetScalarOpacityRamp( double scalarStart, double opacityStart,
-                             double scalarEnd, double opacityEnd );
-  void SetColorRamp( double s1, double r1, double g1, double b1,
-                     double s2, double r2, double g2, double b2 );
-
-  // Description
   // This method can be reused for reading state files
   void SetScalarOpacityUnitDistance(double d);
+  void SetColorSpace(int s);
 
+  // Description:
+  // Set the HSV Wrap state.
+  void SetHSVWrap(int w);
+  
   // Description
-  // These methods are for adding a point to the respective function (Piecewise/ColorTransfer)
-  void AddColorPoint(double s, double r, double g, double b);
-  void AddScalarOpacityPoint(double scalar, double opacity);
+  // This is a method for trace to append the points to Color Transfer function.
+  // It's not recommended to use this to add serveral points
+  // as it's slow and cumbersome. 
+  void AppendColorPoint(double s, double r, double g, double b);
+  void RemoveAllColorPoints();
+
+  // Description:
+  // This is a method for trace to append the points to Piecewise function.
+  // It's not recommended to use this to add serveral points
+  // as it's slow and cumbersome.
+  void AppendScalarOpacityPoint(double scalar, double opacity);
+  void RemoveAllScalarOpacityPoints();
 
   // Description
   // Save State
   void SaveState(ofstream *file);
+
+  // Description:
+  // Trace method to refresh the GUI from the Proxy.
+  void RefreshGUI();
 
 protected:
   vtkPVVolumeAppearanceEditor();
@@ -109,11 +120,16 @@ protected:
   void                    RenderView();
 
   vtkPVVolumePropertyWidget *VolumePropertyWidget;
-//FIXME:
-// Once the VolumeProperty is done properly with properties should remove this 
+
+  // This is the volume property what will be manipulted by the VolumePropertyWidget.
+  // We don't directly pass on the Client object from the DisplayProxy since we want
+  // to set the properties appropriately.
   vtkVolumeProperty         *InternalVolumeProperty;
 
   void VolumePropertyInternalCallback();
+
+  // Update the widget from Display proxy.
+  void UpdateFromProxy();
 
 private:
   vtkPVVolumeAppearanceEditor(const vtkPVVolumeAppearanceEditor&); // Not implemented

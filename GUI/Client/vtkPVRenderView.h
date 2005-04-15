@@ -54,7 +54,7 @@ class vtkPVTreeComposite;
 class vtkPVWindow;
 class vtkPVRenderModuleUI;
 class vtkPVRenderViewObserver;
-class vtkPVRenderModule;
+class vtkSMRenderModuleProxy;
 class vtkTimerLog;
 class vtkSMProxy;
 
@@ -107,6 +107,11 @@ public:
   // Make snapshot of the render window.
   virtual void SaveAsImage() { this->Superclass::SaveAsImage(); }
   virtual void SaveAsImage(const char* filename) ;
+
+  // Description:
+  // Returns the RenderModuleProxy (same as the one got 
+  // from vtkPVApplication::GetRenderModuleProxy())
+  vtkGetObjectMacro(RenderModuleProxy, vtkSMRenderModuleProxy);
   
   // Description:
   // Casts to vtkPVApplication.
@@ -386,7 +391,6 @@ protected:
   vtkKWScale        *HeadLightScale[4];
   vtkKWCheckButton  *MaintainLuminanceButton;
   // Main proxy to access the vtkLightKit
-  vtkSMProxy        *LightKitProxy;
 
   vtkKWFrameLabeled *OrientationAxesFrame;
   vtkKWCheckButton *OrientationAxesCheck;
@@ -428,10 +432,7 @@ protected:
   vtkSetStringMacro(MenuLabelSwitchBackAndForthToViewProperties);
   
   vtkPVRenderViewObserver* Observer;
-
-  // Need to make sure it destructs right before this view does.
-  // It's the whole TKRenderWidget destruction pain.
-  vtkPVRenderModule* RenderModule;
+  vtkSMRenderModuleProxy* RenderModuleProxy;
 
   vtkTimerLog *RenderTimer;
   Tcl_TimerToken TimerToken;

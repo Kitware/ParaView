@@ -13,7 +13,6 @@
 
 =========================================================================*/
 #include "vtkPVCaveRenderModuleUI.h"
-#include "vtkPVCaveRenderModule.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWCheckButton.h"
 
@@ -21,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCaveRenderModuleUI, "1.1");
+vtkCxxRevisionMacro(vtkPVCaveRenderModuleUI, "1.2");
 
 int vtkPVCaveRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

@@ -63,7 +63,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.32");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.33");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -490,7 +490,7 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
     {
     vtkSMProperty* property = iter->GetProperty();
     if (property->GetInformationOnly() || vtkSMProxyProperty::SafeDownCast(property) ||
-      property->GetNumberOfDomains() == 0)
+      property->GetNumberOfDomains() == 0 || !property->GetAnimateable())
       {
       continue;
       }

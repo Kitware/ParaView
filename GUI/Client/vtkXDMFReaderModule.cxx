@@ -29,15 +29,15 @@
 #include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVColorMap.h"
-#include "vtkSMPartDisplay.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkSMDisplayProxy.h"
 
 #include <vtkstd/string>
 #include <vtkstd/map>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.34");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.35");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -496,10 +496,12 @@ void vtkXDMFReaderModule::SaveInBatchScript(ofstream *file)
       {
       this->PVColorMap->SaveInBatchScript(file);
       }
-    vtkSMPartDisplay *partD = this->GetPartDisplay();
-    if (partD)
+    
+    vtkSMDisplayProxy* pDisp = this->GetDisplayProxy();
+    if (pDisp)
       {
-      partD->SaveInBatchScript(file, this->GetProxy());
+      *file << "#Display Proxy" << endl;
+      pDisp->SaveInBatchScript(file);
       }
     }
 }

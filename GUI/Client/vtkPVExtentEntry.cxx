@@ -23,7 +23,6 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
@@ -40,7 +39,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.54");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -369,139 +368,8 @@ void vtkPVExtentEntry::SetValueInternal(int v0, int v1, int v2,
     }
 }
 
-//-----------------------------------------------------------------------------
-void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-                                                 vtkPVAnimationInterfaceEntry *ai)
-{
-  vtkKWMenu *cascadeMenu;
-  char methodAndArgs[200];
-
-  // Lets create a cascade menu to keep things neat.
-  cascadeMenu = vtkKWMenu::New();
-  cascadeMenu->SetParent(menu);
-  cascadeMenu->Create(this->GetApplication(), "-tearoff 0");
-  menu->AddCascade(this->GetTraceHelper()->GetObjectName(), cascadeMenu, 0,
-                             "Choose a plane of the extent to animate.");  
-  // i min
-  sprintf(methodAndArgs, "AnimationMenuCallback %s 0", ai->GetTclName());
-  cascadeMenu->AddCommand("I Min", this, methodAndArgs, 0, "");
-  // i max
-  sprintf(methodAndArgs, "AnimationMenuCallback %s 1", ai->GetTclName());
-  cascadeMenu->AddCommand("I Max", this, methodAndArgs, 0, "");
-  // j min
-  sprintf(methodAndArgs, "AnimationMenuCallback %s 2", ai->GetTclName());
-  cascadeMenu->AddCommand("J Min", this, methodAndArgs, 0, "");
-  // j max
-  sprintf(methodAndArgs, "AnimationMenuCallback %s 3", ai->GetTclName());
-  cascadeMenu->AddCommand("J Max", this, methodAndArgs, 0, "");
-  // k min
-  sprintf(methodAndArgs, "AnimationMenuCallback %s 4", ai->GetTclName());
-  cascadeMenu->AddCommand("K Min", this, methodAndArgs, 0, "");
-  // k min
-  sprintf(methodAndArgs, "AnimationMenuCallback %s 5", ai->GetTclName());
-  cascadeMenu->AddCommand("K Max", this, methodAndArgs, 0, "");
-
-  cascadeMenu->Delete();
-  cascadeMenu = NULL;
-}
 
 //-----------------------------------------------------------------------------
-void vtkPVExtentEntry::ResetAnimationRange(
-  vtkPVAnimationInterfaceEntry *ai, int mode)
-{
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMExtentDomain *dom = 0;
-  if (prop)
-    {
-    dom = vtkSMExtentDomain::SafeDownCast(prop->GetDomain("extent"));
-    }
-  
-  if (!prop || !dom)
-    {
-    vtkErrorMacro("Error getting property or domain (extent).");
-    return;
-    }
-  
-  int exists = 0, val;
-
-  switch (mode)
-    {
-    case 0:
-      ai->SetLabelAndScript("I Min", NULL, this->GetTraceHelper()->GetObjectName());
-      break;
-    case 1:
-      ai->SetLabelAndScript("I Max", NULL, this->GetTraceHelper()->GetObjectName());
-      break;
-    case 2:
-      ai->SetLabelAndScript("J Min", NULL, this->GetTraceHelper()->GetObjectName());
-      break;
-    case 3:
-      ai->SetLabelAndScript("J Max", NULL, this->GetTraceHelper()->GetObjectName());
-      break;
-    case 4:
-      ai->SetLabelAndScript("K Min", NULL, this->GetTraceHelper()->GetObjectName());
-      break;
-    case 5:
-      ai->SetLabelAndScript("K Max", NULL, this->GetTraceHelper()->GetObjectName());
-      break;
-    default:
-      vtkErrorMacro("Bad animation extent");
-      return;
-    }
-
-  val = dom->GetMinimum(mode/2, exists);
-  if (exists)
-    {
-    ai->SetTimeStart(val);
-    }
-  val = dom->GetMaximum(mode/2, exists);
-  if (exists)
-    {
-    ai->SetTimeEnd(val);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
-                                             int mode)
-{
-  if (ai->GetTraceHelper()->Initialize())
-    {
-    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s) %d", 
-      this->GetTclName(), ai->GetTclName(), mode);
-    }
-
-  this->Superclass::AnimationMenuCallback(ai);
-
-  vtkSMProperty *prop = this->GetSMProperty();
-  vtkSMExtentDomain *dom = 0;
-  if (prop)
-    {
-    dom = vtkSMExtentDomain::SafeDownCast(prop->GetDomain("extent"));
-    }
-  
-  if (!prop || !dom)
-    {
-    vtkErrorMacro("Error getting property or domain (extent).");
-    return;
-    }
-  
-  char methodAndArgs[500];
-  
-  sprintf(methodAndArgs, "ResetAnimationRange %s %d", ai->GetTclName(), mode);
-  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
-  ai->SetResetRangeButtonState(1);
-  ai->UpdateEnableState();
-
-  ai->SetCurrentSMProperty(prop);
-  ai->SetCurrentSMDomain(dom);
-
-  this->ResetAnimationRange(ai, mode);
-
-  ai->SetAnimationElement(mode);
-  ai->Update();
-}
-
 vtkPVExtentEntry* vtkPVExtentEntry::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -509,6 +377,7 @@ vtkPVExtentEntry* vtkPVExtentEntry::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVExtentEntry::SafeDownCast(clone);
 }
 
+//-----------------------------------------------------------------------------
 void vtkPVExtentEntry::CopyProperties(vtkPVWidget* clone, 
                                       vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)

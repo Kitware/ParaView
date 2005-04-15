@@ -77,7 +77,7 @@ SET(PROJECT_TESTS
   TestImageDataIO
   VolumeGroup
   XdmfRead
-  TestAnimationSaveLoad
+#  TestAnimationSaveLoad
   )
 
 IF(PARAVIEW_USE_EXODUS)
@@ -249,12 +249,14 @@ ADD_TEST("ArrowServer-ParaView-rc"
 SET (PROJECT_TESTS_NO_BATCH 
   #Animation
   DefaultAnimation
+  DeleteSource
   MouseInteraction
+  OrientationWidget
   RecordAnimation
   TestDemo
   TestPackage
   Write
-  TestAnimationSaveLoad
+#  TestAnimationSaveLoad
 #  XdmfRead
 )
 REMOVE (PROJECT_TESTS ${PROJECT_TESTS_NO_BATCH})
@@ -275,7 +277,7 @@ FOREACH (tfile ${PROJECT_TESTS})
     -BT ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch.tcl
     -BC ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
     -B ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch
-    -BV ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch.png
+#    -BV ${ParaView_BINARY_DIR}/Testing/Temporary/${tfile}batch.png
     )
 ENDFOREACH (tfile)
 
@@ -322,32 +324,32 @@ ADD_TEST(OtherTests-ParaView
   -D ${PVClientTestData}
   )
 
-ADD_TEST (AnimationImages-ParaView 
-  ${PARAVIEW_EXECUTABLE} 
-  ${TIMEOUT}
-  ${PARAVIEW_MPI_RUN_ONE} 
-  --disable-registry
-  ${PVClientTests_SOURCE_DIR}/Tcl/AnimationImages.pvs
-  -D ${PVClientTestData}
-  -T ${ParaView_BINARY_DIR}/Testing/Temporary
-  -C ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
-  -V ${PVClientTestData}/Baseline/AnimationImages.png
-  )
+# ADD_TEST (AnimationImages-ParaView 
+#   ${PARAVIEW_EXECUTABLE} 
+#   ${TIMEOUT}
+#   ${PARAVIEW_MPI_RUN_ONE} 
+#   --disable-registry
+#   ${PVClientTests_SOURCE_DIR}/Tcl/AnimationImages.pvs
+#   -D ${PVClientTestData}
+#   -T ${ParaView_BINARY_DIR}/Testing/Temporary
+#   -C ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
+#   -V ${PVClientTestData}/Baseline/AnimationImages.png
+#   )
 
-# Test animation in batch.
-ADD_TEST(AnimationImages-batch-ParaView
-  ${PARAVIEW_EXECUTABLE}
-  ${TIMEOUT}
-  ${PARAVIEW_MPI_RUN_ONE}
-  --disable-registry
-  ${PVClientTests_SOURCE_DIR}/Tcl/AnimationImages.pvs
-  -D ${PVClientTestData}
-  -T ${ParaView_BINARY_DIR}/Testing/Temporary
-  -BT ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch.tcl
-  -BC ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
-  -B ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch
-  -V ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch00001.png
-  )
+# # Test animation in batch.
+# ADD_TEST(AnimationImages-batch-ParaView
+#   ${PARAVIEW_EXECUTABLE}
+#   ${TIMEOUT}
+#   ${PARAVIEW_MPI_RUN_ONE}
+#   --disable-registry
+#   ${PVClientTests_SOURCE_DIR}/Tcl/AnimationImages.pvs
+#   -D ${PVClientTestData}
+#   -T ${ParaView_BINARY_DIR}/Testing/Temporary
+#   -BT ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch.tcl
+#   -BC ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
+#   -B ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch
+#   -V ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch00001.png
+#   )
 
 ADD_TEST(VolumeRenderVox8-ParaView 
   ${PARAVIEW_EXECUTABLE} 

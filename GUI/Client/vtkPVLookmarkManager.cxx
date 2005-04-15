@@ -20,7 +20,7 @@
 #include "vtkPVLookmarkManager.h"
 
 #include "vtkPVWidgetCollection.h"
-#include "vtkSMPartDisplay.h"
+#include "vtkSMDisplayProxy.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVSelectTimeSet.h"
 #include "vtkPVStringEntry.h"
@@ -32,7 +32,6 @@
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVSelectionList.h"
 #include "vtkPVScale.h"
@@ -97,8 +96,10 @@
 
 #include "vtkCamera.h"
 #include "vtkPVProcessModule.h"
-#include "vtkClientServerStream.h"
-#include "vtkClientServerID.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
+
+#include "vtkSMDisplayProxy.h"
 
 #ifndef _WIN32
   #include <sys/wait.h>
@@ -110,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.20");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.21");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -2926,48 +2927,79 @@ void vtkPVLookmarkManager::ViewLookmarkWithCurrentDataset(vtkPVLookmark *oldLook
     this->ParseAndExecuteStateScript(src,temp_script,oldLookmark,0);
 //    this->CreateLookmarkCallback();
 
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    vtkClientServerID rendererID = pm->GetRenderModule()->GetRendererID();
-
-    // create an id for the active camera of the renderer
-    vtkClientServerStream stream;
-    vtkClientServerID activeCamera = pm->GetUniqueID();
-    stream << vtkClientServerStream::Invoke 
-           << rendererID << "GetActiveCamera"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Assign 
-           << activeCamera << vtkClientServerStream::LastResult 
-           << vtkClientServerStream::End;
-
     // copy the parameters of the current camera for this class
     // into the active camera on the client and server
-    double a[3];
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetParallelScale" << camera->GetParallelScale()
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetViewAngle" << camera->GetViewAngle()
-           << vtkClientServerStream::End;
-    camera->GetClippingRange(a);
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetClippingRange" << vtkClientServerStream::InsertArray(a, 2)
-           << vtkClientServerStream::End;
-    camera->GetFocalPoint(a);
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetFocalPoint" << vtkClientServerStream::InsertArray(a, 3)
-           << vtkClientServerStream::End;
-    camera->GetPosition(a);
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetPosition" << vtkClientServerStream::InsertArray(a, 3)
-           << vtkClientServerStream::End;
-    camera->GetViewUp(a);
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetViewUp" << vtkClientServerStream::InsertArray(a, 3)
-           << vtkClientServerStream::End;
-    pm->SendStream(
-      vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
-    this->GetPVRenderView()->EventuallyRender();
+    vtkSMProxy* renderModuleProxy = this->GetPVApplication()->
+      GetRenderModuleProxy();
+    vtkSMDoubleVectorProperty* dvp;
+ 
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraPosition"));
+    if (dvp)
+      {
+      dvp->SetElements(camera->GetPosition());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraPosition.");
+      }
 
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraFocalPoint"));
+    if (dvp)
+      {
+      dvp->SetElements(camera->GetFocalPoint());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraFocalPoint.");
+      }
+  
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraViewUp"));
+    if (dvp)
+      {
+      dvp->SetElements(camera->GetViewUp());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraFocalPoint.");
+      }
+
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraViewAngle"));
+    if (dvp)
+      {
+      dvp->SetElement(0, camera->GetViewAngle());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraViewAngle.");
+      }
+
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraClippingRange"));
+    if (dvp)
+      {
+      dvp->SetElements(camera->GetClippingRange());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraClippingRange.");
+      }
+
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraParallelScale"));
+    if (dvp)
+      {
+      dvp->SetElement(0, camera->GetParallelScale());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraParallelScale.");
+      }
+    renderModuleProxy->UpdateVTKObjects(); 
+    this->GetPVRenderView()->EventuallyRender();
     camera->Delete();
     }
 
@@ -3327,12 +3359,15 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
       if(strstr(ptr,"ColorByCellField"))
         {
         field = this->GetFieldNameAndValue(ptr,&val);
-        pvData->ColorByCellField(field,val);
+        //pvData->ColorByCellField(field,val);
+        pvData->ColorByArray(field, vtkSMDisplayProxy::CELL_FIELD_DATA);
         }
       else if(strstr(ptr,"ColorByPointField"))
         {
         field = this->GetFieldNameAndValue(ptr,&val);
-        pvData->ColorByPointField(field,val);
+        //pvData->ColorByPointField(field,val);
+        pvData->ColorByArray(field, vtkSMDisplayProxy::POINT_FIELD_DATA);
+        
         }
       else if(strstr(ptr,"ColorByProperty"))
         {
@@ -3348,16 +3383,17 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
         if(strstr(ptr,"VolumeRenderPointField"))
           {
           field = this->GetFieldNameAndValue(ptr,&val);
-          pvData->VolumeRenderPointField(field,val);
+          //pvData->VolumeRenderPointField(field,val);
+          pvData->VolumeRenderByArray(field, vtkSMDisplayProxy::POINT_FIELD_DATA);
           }
         else if(strstr(ptr,"VolumeRenderCellField"))
           {
           field = this->GetFieldNameAndValue(ptr,&val);
-          pvData->VolumeRenderCellField(field,val);
+          //pvData->VolumeRenderCellField(field,val);
+          pvData->VolumeRenderByArray(field, vtkSMDisplayProxy::CELL_FIELD_DATA);
           }
         ptr = strtok(NULL,"\r\n");
         }
-
       // this line sets the partdisplay variable
       ptr+=4;
       ptr2 = ptr;
@@ -3366,83 +3402,89 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
       *ptr2='\0';
       strcpy(data,ptr);
 
-      vtkSMPartDisplay *partDisplay = reader->GetPartDisplay();
+      vtkSMDisplayProxy *display = reader->GetDisplayProxy();
       ptr = strtok(NULL,"\r\n");
       while(strstr(ptr,data)) 
         {
         if(strstr(ptr,"SetColor"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          partDisplay->SetColor(xval,yval,zval);
+          display->SetColorCM(xval,yval,zval);
           }
         else if(strstr(ptr,"SetRepresentation"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetRepresentation(val); 
+          display->SetRepresentationCM(val); 
           }
         else if(strstr(ptr,"SetUseImmediateMode"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetUseImmediateMode(val); 
+          display->SetImmediateModeRenderingCM(val); 
           }
         else if(strstr(ptr,"SetScalarVisibility"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetScalarVisibility(val); 
+          display->SetScalarVisibilityCM(val); 
           }
         else if(strstr(ptr,"SetDirectColorFlag"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetDirectColorFlag(val); 
+          // when DirectColorFlag = 0,
+          // color mode is Default (=1).
+          // when DirectColorFlag = 1
+          // color mode is MapScalars (=0).
+          display->SetColorModeCM(!val); 
           }
         else if(strstr(ptr,"SetInterpolateColorsFlag"))
           {
+          // This is "InterpolateColors" while property
+          // "InterpolateColorsBeforeMapping". 
+          // These are opposite concepts.
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetInterpolateColorsFlag(val); 
+          display->SetInterpolateScalarsBeforeMappingCM(val); 
           }
         else if(strstr(ptr,"SetInterpolation"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetInterpolation(val); 
+          display->SetInterpolationCM(val); 
           }
         else if(strstr(ptr,"SetPointSize"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetPointSize(val); 
+          display->SetPointSizeCM(val); 
           }
         else if(strstr(ptr,"SetLineWidth"))
           {
           val = this->GetIntegerScalarWidgetValue(ptr);
-          partDisplay->SetLineWidth(val); 
+          display->SetLineWidthCM(val); 
           }
         else if(strstr(ptr,"SetOpacity"))
           {
           fval = this->GetDoubleScalarWidgetValue(ptr);
-          partDisplay->SetOpacity(fval); 
+          display->SetOpacityCM(fval); 
           }
         else if(strstr(ptr,"SetTranslate"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          partDisplay->SetTranslate(xval,yval,zval); 
+          display->SetPositionCM(xval,yval,zval); 
           }
         else if(strstr(ptr,"SetScale"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          partDisplay->SetScale(xval,yval,zval); 
+          display->SetScaleCM(xval,yval,zval); 
           }
         else if(strstr(ptr,"SetOrigin"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          partDisplay->SetOrigin(xval,yval,zval); 
+          display->SetOriginCM(xval,yval,zval); 
           }
         else if(strstr(ptr,"SetOrientation"))
           {
           this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          partDisplay->SetOrientation(xval,yval,zval); 
+          display->SetOrientationCM(xval,yval,zval); 
           }   
         ptr = strtok(NULL,"\r\n");
         }
-
       break;
       }
     else

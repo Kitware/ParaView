@@ -24,7 +24,6 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
@@ -48,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.54");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -750,7 +749,6 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
       this->NormalEntry[1]->SetValue(normal[1]);
       this->NormalEntry[2]->SetValue(normal[2]);
 
-      this->Render();
       this->ModifiedCallback();
       this->ValueChanged = 0;
       }
@@ -1156,91 +1154,4 @@ void vtkPVImplicitPlaneWidget::UnregisterAnimateableProxies()
       proxyM->UnRegisterProxy("animateable", proxyName);
       }
     }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::AddAnimationScriptsToMenu(
-  vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai)
-{
-  char methodAndArgs[500];
-
-  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-  menu->AddCommand("Offset", this, methodAndArgs, 0, "");
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::ResetAnimationRange(
-  vtkPVAnimationInterfaceEntry *ai)
-{
-  vtkSMProperty *prop = this->ImplicitFunctionProxy->GetProperty("Offset");
-  vtkSMBoundsDomain *rangeDomain = vtkSMBoundsDomain::SafeDownCast(
-    prop->GetDomain("range"));
-
-  if (rangeDomain)
-    {
-    double min, max;
-    int exists;
-    min = rangeDomain->GetMinimum(0, exists);
-    if (exists)
-      {
-      ai->SetTimeStart(min);
-      }
-    else
-      {
-      ai->SetTimeStart(0);
-      }
-    max = rangeDomain->GetMaximum(0, exists);
-    if (exists)
-      {
-      ai->SetTimeEnd(max);
-      }
-    else
-      {
-      ai->SetTimeEnd(1);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::AnimationMenuCallback(
-  vtkPVAnimationInterfaceEntry *ai)
-{
-  if (ai->GetTraceHelper()->Initialize())
-    {
-    this->GetTraceHelper()->AddEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
-                        this->GetTclName(), ai->GetTclName());
-    }
-
-  char methodAndArgs[500];
-
-  sprintf(methodAndArgs, "ResetAnimationRange %s", ai->GetTclName());
-  ai->GetResetRangeButton()->SetCommand(this, methodAndArgs);
-  ai->SetResetRangeButtonState(1);
-  ai->UpdateEnableState();
-
-  ai->SetLabelAndScript(
-    "Offset", NULL, this->GetTraceHelper()->GetObjectName());
-  
-  vtkSMProperty *prop = this->ImplicitFunctionProxy->GetProperty("Offset");
-  vtkSMBoundsDomain *rangeDomain = vtkSMBoundsDomain::SafeDownCast(
-    prop->GetDomain("range"));
-
-  if (rangeDomain)
-    {
-    ai->SetCurrentSMProperty(prop);
-    ai->SetCurrentSMDomain(rangeDomain);
-    ai->SetAnimationElement(0);
-
-    this->ResetAnimationRange(ai);
-    }
-  else
-    {
-    ai->SetCurrentSMProperty(0);
-    ai->SetCurrentSMDomain(0);
-
-    ai->SetTimeStart(0);
-    ai->SetTimeEnd(0);
-    }
-
-  ai->Update();
 }

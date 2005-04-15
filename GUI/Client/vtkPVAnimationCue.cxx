@@ -76,7 +76,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.20");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.21");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -1245,7 +1245,7 @@ void vtkPVAnimationCue::UpdateCueVisibility(int advanced)
     {
     return;
     }
-  if (advanced || property->GetAnimateable())
+  if (advanced || property->GetAnimateable() == 1)
     {
     this->CueVisibility = 1;
     }

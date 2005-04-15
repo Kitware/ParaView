@@ -42,6 +42,7 @@ class vtkKWLoadSaveDialog;
 class vtkSMApplication;
 class vtkPVGUIClientOptions;
 class vtkPVOptions;
+class vtkSMRenderModuleProxy;
 
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
@@ -67,6 +68,15 @@ public:
   // processes and communication.
   void SetProcessModule(vtkPVProcessModule *module);
   vtkPVProcessModule* GetProcessModule() { return this->ProcessModule;}
+
+  // Description:
+  // RenderModuleProxy manages rendering.
+  void SetRenderModuleProxy(vtkSMRenderModuleProxy*);
+  vtkGetObjectMacro(RenderModuleProxy, vtkSMRenderModuleProxy);
+
+  // Description:
+  // Setups the Render Module.
+  int SetupRenderModule();
 
   // Description:
   // Get a file selection dialog instance.
@@ -358,6 +368,10 @@ protected:
 
   vtkPVGUIClientOptions* Options;
 
+  vtkSMRenderModuleProxy* RenderModuleProxy;
+  char* RenderModuleProxyName;
+  vtkSetStringMacro(RenderModuleProxyName);
+  
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented
   void operator=(const vtkPVApplication&); // Not implemented

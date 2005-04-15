@@ -11,7 +11,6 @@ if { ![$Application GetExitStatus] } {
 
         update
         [[$Application GetMainWindow] GetMainView] ForceRender
-        [[$Application GetMainWindow] GetMainView] SaveAsImage ${batchName}session.png
 
         [$Application GetMainWindow] SaveBatchScript "$batchName.pvb" 0 "$batchName.png" {}
         $Application ExitAfterLoadScriptOff
@@ -32,11 +31,10 @@ if { ![$Application GetExitStatus] } {
         for {set i  1} {$i < [expr $argc - 1]} {incr i} {
             if {[lindex $argv $i] == "-BC"} {
                 source [lindex $argv [expr $i + 1]]
-                $Application SetExitStatus [ComparePNG ${batchName}session $batchValid]
+                $Application SetExitStatus [ComparePNG $batchName $batchValid]
             }
         }
         catch { file delete -force "$batchName.png" }
-        catch { file delete -force "$batchNamesession.png" }
 
         $Application Exit
     }

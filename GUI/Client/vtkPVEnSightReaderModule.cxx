@@ -19,11 +19,11 @@
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVColorMap.h"
-#include "vtkSMPartDisplay.h"
+#include "vtkSMDisplayProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.56");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.57");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -87,11 +87,14 @@ void vtkPVEnSightReaderModule::SaveInBatchScript(ofstream *file)
       {
       this->PVColorMap->SaveInBatchScript(file);
       }
-    vtkSMPartDisplay *partD = this->GetPartDisplay();
-    if (partD)
+
+    vtkSMDisplayProxy* pDisp = this->GetDisplayProxy();
+    if (pDisp)
       {
-      partD->SaveInBatchScript(file, this->GetProxy());
+      *file << "#Display Proxy" << endl;
+      pDisp->SaveInBatchScript(file);
       }
+
     }
 }
 

@@ -16,7 +16,8 @@
 // .SECTION Description
 // vtkSMPropertyIterator is used to iterate over the properties of a
 // proxy. The properties of the root proxies as well as sub-proxies are
-// included in the iteration.
+// included in the iteration. For sub-proxies, only
+// exposed properties are iterated over.
 
 #ifndef __vtkSMPropertyIterator_h
 #define __vtkSMPropertyIterator_h
@@ -65,11 +66,19 @@ public:
   // Returns the property at the current iterator position.
   vtkSMProperty* GetProperty();
 
+  // Description:
+  // If TraverseSubProxies is false, only the properties belonging
+  // to the root proxy are returned. Default is true.
+  vtkSetMacro(TraverseSubProxies, int);
+  vtkGetMacro(TraverseSubProxies, int);
+
 protected:
   vtkSMPropertyIterator();
   ~vtkSMPropertyIterator();
 
   vtkSMProxy* Proxy;
+
+  int TraverseSubProxies;
 
   virtual void SaveState(const char*, ostream*, vtkIndent) {}
 

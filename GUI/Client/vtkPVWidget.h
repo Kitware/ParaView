@@ -30,7 +30,6 @@
 class vtkKWMenu;
 class vtkPVSource;
 class vtkPVApplication;
-class vtkPVAnimationInterfaceEntry;
 class vtkPVXMLElement;
 class vtkPVXMLPackageParser;
 class vtkPVWindow;
@@ -146,24 +145,6 @@ public:
   void SaveState(ofstream *file);
 
   // Description:
-  // This mehtod is used by the animation editor to access all the animation 
-  // scripts available to modify the object.  The menu commands set the
-  // script of the editor.  It would be nice if the returned script would
-  // modify the user interface as well as the pipeline.  We would then have 
-  // to find a new way of exporting the animation to a VTK script.
-  // It would also be nice if the selection of a method would also
-  // set the min/max/step animation parametets.
-  virtual void AddAnimationScriptsToMenu(
-    vtkKWMenu* vtkNotUsed(menu), 
-    vtkPVAnimationInterfaceEntry* vtkNotUsed(object) ) {};
-
-  // Description:
-  // Default implementation of method called when this widget is
-  // selected as the parameter to be animated. Disabled ResetRangeButton.
-  // Should be chained by subclasses.
-  virtual void AnimationMenuCallback(vtkPVAnimationInterfaceEntry*);
-
-  // Description:
   // Create the widget. All sub-classes should use this
   // signature because widgets are created using vtkPVWidget
   // pointers after cloning.
@@ -229,11 +210,6 @@ public:
   vtkGetVector2Macro(WidgetRange, double);
 
   // Description:
-  // If false, the corresponding widget is not displayed as an
-  // action item in the animation menu. True by default
-  vtkGetMacro(SupportsAnimation, int);
-
-  // Description:
   // If HideGUI is true, the widget is not shown in the property page.
   vtkGetMacro(HideGUI, int);
 
@@ -260,7 +236,6 @@ protected:
   // added to the trace file.
   int ModifiedFlag;
 
-  int SupportsAnimation;
 
   // This flag indicates if the widget is a widget used to keep
   // timestep information for Readers.

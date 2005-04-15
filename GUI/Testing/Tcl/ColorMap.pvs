@@ -14,7 +14,6 @@ set kw(vtkTemp999) [$kw(vtkTemp260) GetPVWidget {Line}]
 $kw(vtkTemp999) SetPoint1 0 0 0
 $kw(vtkTemp999) SetPoint2 0 0 1
 $kw(vtkTemp260) AcceptCallback
-
 set kw(vtkTemp294) [$kw(vtkTemp260) GetPVOutput]
 set kw(vtkTemp336) [$kw(vtkTemp1) GetPVColorMap {Elevation} 1]
 $kw(vtkTemp336) SetColorSchemeToBlueRed
@@ -30,7 +29,7 @@ $kw(vtkTemp294) SetInterpolationToFlat
 $kw(vtkTemp294) SetInterpolationToGouraud
 $kw(vtkTemp294) ColorByProperty
 $kw(vtkTemp294) ChangeActorColor 1.000000 0.070588 1.000000
-$kw(vtkTemp294) ColorByPointField {Elevation} 1
+$kw(vtkTemp294) ColorByArray {Elevation} 3
 $kw(vtkTemp336) SetScalarRange 0.100000 0.433010
 $kw(vtkTemp336) SetScalarRange 0.200000 0.433010
 $kw(vtkTemp336) SetScalarRange 0.000000 0.433010
@@ -71,11 +70,6 @@ $kw(vtkTemp300) AcceptCallback
 set kw(vtkTemp339) [$kw(vtkTemp300) GetPVOutput]
 $kw(vtkTemp336) SetColorSchemeToBlueRed
 $kw(vtkTemp336) SetColorSchemeToRedBlue
-$kw(vtkTemp1) ShowAnimationProperties
-set kw(vtkTemp67) [$kw(vtkTemp1) GetAnimationInterface]
-set kw(vtkTemp1032) [$kw(vtkTemp67) GetSourceEntry 0]
-$kw(vtkTemp1032) SetPVSource $kw(vtkTemp300)
-$kw(vtkTemp67) SetCurrentTime 0 1
 update
 
 # Retrace

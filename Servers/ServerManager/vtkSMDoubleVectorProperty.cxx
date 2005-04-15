@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.24");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.25");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -52,6 +52,13 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
   if (!this->Command || this->InformationOnly)
     {
     return;
+    }
+
+  if (this->CleanCommand)
+    {
+    *str << vtkClientServerStream::Invoke
+      << objectId << this->CleanCommand
+      << vtkClientServerStream::End;
     }
 
   if (this->SetNumberCommand)
@@ -324,6 +331,34 @@ void vtkSMDoubleVectorProperty::SaveState(
     }
   this->Superclass::SaveState(name, file, indent);
   *file << indent << "</Property>" << endl;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleVectorProperty::DeepCopy(vtkSMProperty* src)
+{
+  this->Superclass::DeepCopy(src);
+
+  vtkSMDoubleVectorProperty* dsrc = vtkSMDoubleVectorProperty::SafeDownCast(
+    src);
+  if (dsrc)
+    {
+    int imUpdate = this->ImmediateUpdate;
+    this->ImmediateUpdate = 0;
+    this->SetNumberOfElements(dsrc->GetNumberOfElements());
+    this->SetNumberOfUncheckedElements(dsrc->GetNumberOfUncheckedElements());
+    memcpy(&this->Internals->Values[0], 
+           &dsrc->Internals->Values[0], 
+           this->GetNumberOfElements()*sizeof(double));
+    memcpy(&this->Internals->UncheckedValues[0], 
+           &dsrc->Internals->UncheckedValues[0], 
+           this->GetNumberOfUncheckedElements()*sizeof(double));
+    this->ImmediateUpdate = imUpdate;
+    }
+
+  if (this->ImmediateUpdate)
+    {
+    this->Modified();
+    }
 }
 
 //---------------------------------------------------------------------------

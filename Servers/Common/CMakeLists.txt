@@ -2,7 +2,6 @@ PROJECT(PVCommon)
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(Common_SRCS
-  vtkPVRenderModule.cxx
   vtkPVProcessModule.cxx
   vtkPVMPIProcessModule.cxx
   vtkPVClientServerModule.cxx
@@ -29,7 +28,6 @@ SET(Common_SRCS
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkPVRenderModule
   vtkProcessModuleGUIHelper
   vtkProcessModule
   vtkPVInformation

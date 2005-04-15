@@ -26,7 +26,6 @@
 #include "vtkInstantiator.h"
 #include "vtkToolkits.h"
 #include "vtkPVProgressHandler.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPVOptions.h"
 #include "vtkProcessModuleGUIHelper.h"
 
@@ -46,8 +45,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.20");
-vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
+vtkCxxRevisionMacro(vtkProcessModule, "1.21");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -100,7 +98,6 @@ vtkProcessModule::vtkProcessModule()
   this->ProgressEnabled = 0;
   this->ProgressRequests = 0;
   this->ProgressHandler = vtkPVProgressHandler::New();
-  this->RenderModule = 0;
   this->GUIHelper = 0;
   this->LogFile = 0;
 }
@@ -126,7 +123,6 @@ vtkProcessModule::~vtkProcessModule()
     }
   this->Observer->Delete();
   this->Observer = 0;
-  this->SetRenderModule(0);
 
   delete this->Internals;
 
@@ -672,79 +668,6 @@ void vtkProcessModule::SetGUIHelper(vtkProcessModuleGUIHelper* h)
 }
 
 //----------------------------------------------------------------------------
-int vtkProcessModule::SetupRenderModule()
-{
-  const char* renderModuleName = this->Options->GetRenderModuleName();
-  // The client chooses a render module.
-  if (renderModuleName == NULL)
-    { // The render module has not been set by the user.  Choose a default.
-    if (this->Options->GetTileDimensions()[0])
-      {
-#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
-      renderModuleName = "IceTRenderModule";
-#else
-      renderModuleName = "MultiDisplayRenderModule";
-#endif
-      }
-    else if (this->Options->GetClientMode())
-      { // Client server, no tiled display.
-#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
-      renderModuleName = "DeskTopRenderModule";
-#else
-      renderModuleName = "MPIRenderModule";
-#endif        
-      }
-    else
-      { // Single process, or one MPI program
-#ifdef VTK_USE_MPI
-      renderModuleName = "MPIRenderModule";
-#else
-      renderModuleName = "LODRenderModule";
-#endif
-      }
-    }
-  
-  // Create the rendering module here.
-  char* rmClassName;
-  rmClassName = new char[strlen(renderModuleName) + 20];
-  sprintf(rmClassName, "vtkPV%s", renderModuleName);
-  vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
-  vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
-  if (rm == 0)
-    {
-    vtkErrorMacro("Could not create render module " << rmClassName);
-    renderModuleName = "RenderModule";
-    o = vtkInstantiator::CreateInstance("vtkPVRenderModule");
-    rm = vtkPVRenderModule::SafeDownCast(o);
-    if ( rm == 0 )
-      {
-      vtkErrorMacro("Could not create the render module.");
-      return 0;
-      }
-    }
-  if (this->ProcessModule == NULL)
-    {
-    vtkErrorMacro("missing ProcessModule");
-    return 0;
-    }
-  else
-    { // Looks like a circular reference to me!
-    this->SetRenderModule(rm);
-    rm->SetProcessModule(this);
-    }
-  o->Delete();
-  o = NULL;
-  rm = NULL;
-
-  delete [] rmClassName;
-  rmClassName = NULL;
-
-  this->Options->SetRenderModuleName(renderModuleName);
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
 void vtkProcessModule::SetOptions(vtkPVOptions* op)
 {
   this->Options = op;
@@ -777,7 +700,6 @@ void vtkProcessModule::Initialize()
 void vtkProcessModule::Finalize()
 {
   this->SetGUIHelper(0);
-  this->SetRenderModule(0);
   this->FinalizeInterpreter();
 }
 

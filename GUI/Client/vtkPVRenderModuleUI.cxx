@@ -15,13 +15,14 @@
 #include "vtkPVRenderModuleUI.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVRenderModule.h"
-
+#include "vtkSMRenderModuleProxy.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.9");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.10");
+vtkCxxSetObjectMacro(vtkPVRenderModuleUI, RenderModuleProxy, vtkSMRenderModuleProxy);
+//----------------------------------------------------------------------------
 
 int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -31,7 +32,7 @@ int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
 vtkPVRenderModuleUI::vtkPVRenderModuleUI()
 {
   this->CommandFunction = vtkPVRenderModuleUICommand;
-
+  this->RenderModuleProxy = 0;
   this->OutlineThreshold = 5000000.0;
 }
 
@@ -39,6 +40,7 @@ vtkPVRenderModuleUI::vtkPVRenderModuleUI()
 //----------------------------------------------------------------------------
 vtkPVRenderModuleUI::~vtkPVRenderModuleUI()
 {
+  this->SetRenderModuleProxy(0);
 }
 
 //----------------------------------------------------------------------------
@@ -61,13 +63,6 @@ vtkPVApplication* vtkPVRenderModuleUI::GetPVApplication()
 }
 
 //----------------------------------------------------------------------------
-// Not needed in superclass.
-void vtkPVRenderModuleUI::SetRenderModule(vtkPVRenderModule *)
-{
-}
-
-
-//----------------------------------------------------------------------------
 void vtkPVRenderModuleUI::Create(vtkKWApplication* app, const char *)
 {
   // Call the superclass to create the widget and set the appropriate flags
@@ -85,5 +80,6 @@ void vtkPVRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "OutlineThreshold: " << this->OutlineThreshold << endl;
+  os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
 }
 

@@ -13,8 +13,8 @@
 
 =========================================================================*/
 #include "vtkPVRenderView.h"
-#include "vtkPVRenderModule.h"
 
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkCornerAnnotation.h"
 #include "vtkInstantiator.h"
 #include "vtkBMPWriter.h"
@@ -49,14 +49,11 @@
 #include "vtkPVAxesWidget.h"
 #include "vtkPVCameraControl.h"
 #include "vtkPVCameraIcon.h"
-#include "vtkPVCompositeRenderModule.h"
-#include "vtkPVConfig.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVNavigationWindow.h"
 #include "vtkSMPart.h"
-#include "vtkSMPartDisplay.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModuleUI.h"
 #include "vtkPVRenderView.h"
@@ -85,6 +82,8 @@
 #include "vtkSMDoubleRangeDomain.h"
   
 #include <vtkstd/string>
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMIntVectorProperty.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -140,7 +139,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.370");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.371");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -150,7 +149,7 @@ int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
-  this->RenderModule = NULL;
+  this->RenderModuleProxy = 0;
 
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
     {
@@ -227,11 +226,6 @@ vtkPVRenderView::vtkPVRenderView()
     }
   this->MaintainLuminanceButton = vtkKWCheckButton::New(); 
 
-  // Create a new proxy light
-  vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
-  this->LightKitProxy = proxm->NewProxy("rendering", "LightKit");
-  this->LightKitProxy->SetServers(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER );
-
   this->OrientationAxesFrame = vtkKWFrameLabeled::New();
   this->OrientationAxesCheck = vtkKWCheckButton::New();
   this->OrientationAxesInteractiveCheck = vtkKWCheckButton::New();
@@ -274,34 +268,34 @@ void vtkPVRenderView::RemoveAnnotationProp(vtkPVCornerAnnotationEditor *c)
 //----------------------------------------------------------------------------
 vtkRenderWindow* vtkPVRenderView::GetRenderWindow()
 {
-  if (this->RenderModule == NULL)
+  if (this->RenderModuleProxy == 0)
     {
     vtkErrorMacro("Missing renderModule.");
     return NULL;
     }
-  return this->RenderModule->GetRenderWindow();
+  return this->RenderModuleProxy->GetRenderWindow();
 }
 
 //----------------------------------------------------------------------------
 vtkRenderer* vtkPVRenderView::GetRenderer()
 {
-  if (this->RenderModule == NULL)
+  if (this->RenderModuleProxy == 0)
     {
     vtkErrorMacro("Missing renderModule.");
     return NULL;
     }
-  return this->RenderModule->GetRenderer();
+  return this->RenderModuleProxy->GetRenderer();
 }
 
 //----------------------------------------------------------------------------
 vtkRenderer* vtkPVRenderView::GetRenderer2D()
 {
-  if (this->RenderModule == NULL)
+  if (this->RenderModuleProxy == 0)
     {
     vtkErrorMacro("Missing renderModule.");
     return NULL;
     }
-  return this->RenderModule->GetRenderer2D();
+  return this->RenderModuleProxy->GetRenderer2D();
 }
 
 //----------------------------------------------------------------------------
@@ -363,10 +357,10 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registry)
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
-  if (this->RenderModule)
+  if (this->RenderModuleProxy)
     {
-    this->RenderModule->UnRegister(this);
-    this->RenderModule = NULL;
+    this->RenderModuleProxy->UnRegister(this);
+    this->RenderModuleProxy = 0;
     }
 
   this->InterfaceSettingsFrame->Delete();
@@ -388,7 +382,6 @@ vtkPVRenderView::~vtkPVRenderView()
     this->HeadLightScale[cc]->Delete();
     }
   this->MaintainLuminanceButton->Delete(); 
-  this->LightKitProxy->Delete();
 
   this->OrientationAxesFrame->Delete();
   this->OrientationAxesCheck->Delete();
@@ -525,14 +518,14 @@ void PVRenderViewAbortCheck(vtkObject*, unsigned long, void* arg, void*)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
+void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *)
 {
   // Create the call back that looks for events to abort rendering.
-  pvApp->GetProcessModule()->GetRenderModule()->RemoveObservers(vtkCommand::AbortCheckEvent);
+  this->RenderModuleProxy->RemoveObservers(vtkCommand::AbortCheckEvent);
   vtkCallbackCommand* abc = vtkCallbackCommand::New();
   abc->SetCallback(PVRenderViewAbortCheck);
   abc->SetClientData(this);
-  pvApp->GetProcessModule()->GetRenderModule()->AddObserver(vtkCommand::AbortCheckEvent, abc);
+  this->RenderModuleProxy->AddObserver(vtkCommand::AbortCheckEvent, abc);
   abc->Delete();
 }
 
@@ -635,11 +628,10 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // Need to make sure it destructs right before this view does.
   // It's the whole TKRenderWidget destruction pain.
-
-  if (this->RenderModule == NULL)
+  if (this->RenderModuleProxy == 0)
     {
-    this->RenderModule = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
-    this->RenderModule->Register(this);
+    this->RenderModuleProxy = this->GetPVApplication()->GetRenderModuleProxy();
+    this->RenderModuleProxy->Register(this);
     }
 
   // Create the frames
@@ -1041,16 +1033,17 @@ void vtkPVRenderView::CreateViewProperties()
                this->ImmediateModeCheck->GetWidgetName());
 
   // Create the render module user interface.
+  this->RenderModuleUI = 0;
   char* rmuiClassName;
-  vtkProcessModule* pm = pvapp->GetProcessModule();
-  rmuiClassName = new char[strlen(pm->GetOptions()->GetRenderModuleName()) + 20];
-  sprintf(rmuiClassName, "vtkPV%sUI", pm->GetOptions()->GetRenderModuleName());
+  const char* rmname = this->RenderModuleProxy->GetXMLName();
+  rmuiClassName = new char[strlen(rmname) + 20];
+  sprintf(rmuiClassName, "vtkPV%sUI", rmname);
   vtkObject* rmui = vtkInstantiator::CreateInstance(rmuiClassName);
   vtkPVRenderModuleUI* rmuio = vtkPVRenderModuleUI::SafeDownCast(rmui);
   if ( rmuio )
     {
     this->RenderModuleUI = rmuio;
-    this->RenderModuleUI->SetRenderModule(pm->GetRenderModule());
+    this->RenderModuleUI->SetRenderModuleProxy(this->RenderModuleProxy);
     this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
     this->RenderModuleUI->Create(this->GetApplication(),0);
     this->RenderModuleUI->GetTraceHelper()->SetReferenceHelper(
@@ -1231,7 +1224,8 @@ void vtkPVRenderView::CreateViewProperties()
 
     p = vtkLightKit::GetStringFromType( vtkLightKit::TKeyLight );
     p += vtkLightKit::GetStringFromSubType( subtype );
-    InitializeScale(this->KeyLightScale[cc], this->LightKitProxy->GetProperty(p.c_str()));
+    InitializeScale(this->KeyLightScale[cc], 
+      this->RenderModuleProxy->GetProperty(p.c_str()));
 
     subtype = vtkLightKit::GetSubType(vtkLightKit::TFillLight, cc);
     this->FillLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
@@ -1252,7 +1246,8 @@ void vtkPVRenderView::CreateViewProperties()
 
     p = vtkLightKit::GetStringFromType( vtkLightKit::TFillLight );
     p += vtkLightKit::GetStringFromSubType( subtype );
-    InitializeScale(this->FillLightScale[cc], this->LightKitProxy->GetProperty(p.c_str()));
+    InitializeScale(this->FillLightScale[cc], 
+      this->RenderModuleProxy->GetProperty(p.c_str()));
 
     subtype = vtkLightKit::GetSubType(vtkLightKit::TBackLight, cc);
     this->BackLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
@@ -1273,7 +1268,8 @@ void vtkPVRenderView::CreateViewProperties()
 
     p = vtkLightKit::GetStringFromType( vtkLightKit::TBackLight );
     p += vtkLightKit::GetStringFromSubType( subtype );
-    InitializeScale(this->BackLightScale[cc], this->LightKitProxy->GetProperty(p.c_str()));
+    InitializeScale(this->BackLightScale[cc], 
+      this->RenderModuleProxy->GetProperty(p.c_str()));
 
     if( cc < 2 )
       {
@@ -1296,7 +1292,8 @@ void vtkPVRenderView::CreateViewProperties()
 
       p = vtkLightKit::GetStringFromType( vtkLightKit::THeadLight );
       p += vtkLightKit::GetStringFromSubType( subtype );
-      InitializeScale(this->HeadLightScale[cc], this->LightKitProxy->GetProperty(p.c_str()));
+      InitializeScale(this->HeadLightScale[cc], 
+        this->RenderModuleProxy->GetProperty(p.c_str()));
       }
     }
 
@@ -1695,8 +1692,6 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource,
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetRendererBackgroundColor(double r, double g, double b)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
- 
   // Save the color in registry here because there is no good place to do 
   // it upon exiting or destruction.  We have to delete the render window
   // before the TKRenderWidget, so we loose access to the background color.
@@ -1714,7 +1709,7 @@ void vtkPVRenderView::SetRendererBackgroundColor(double r, double g, double b)
   // not invoke the callback, We also trace the view.
   this->GetTraceHelper()->AddEntry("$kw(%s) SetRendererBackgroundColor %f %f %f",
                       this->GetTclName(), r, g, b);
-  pvApp->GetProcessModule()->GetRenderModule()->SetBackgroundColor(r, g, b);
+  this->RenderModuleProxy->SetBackgroundColorCM(rgb);
   this->EventuallyRender();
 }
 
@@ -1742,7 +1737,7 @@ void vtkPVRenderView::Exposed()
 // logic (see above)
 void vtkPVRenderView::Configured()
 {
-  vtkPVRenderModule* rm = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
+  vtkSMRenderModuleProxy* rm = this->RenderModuleProxy;
   if (this->BlockRender)
     {
     this->BlockRender = 2;
@@ -1759,12 +1754,10 @@ void vtkPVRenderView::Configured()
 void vtkPVRenderView::ResetCamera()
 {
   double bds[6];
-
-
-  this->GetPVApplication()->GetProcessModule()->GetRenderModule()->ComputeVisiblePropBounds(bds);
+  this->RenderModuleProxy->ComputeVisiblePropBounds(bds);
   if (bds[0] <= bds[1] && bds[2] <= bds[3] && bds[4] <= bds[5])
     {
-    this->GetRenderer()->ResetCamera(bds);
+    this->RenderModuleProxy->ResetCamera(bds);
     }
 }
 
@@ -1827,7 +1820,7 @@ void vtkPVRenderView::ForceRender()
     {
     this->CornerAnnotation->UpdateCornerText();
     pvApp->GetProcessModule()->SetGlobalLODFlag(0);
-    pvApp->GetProcessModule()->GetRenderModule()->StillRender();
+    this->RenderModuleProxy->StillRender();
     }
 }
 
@@ -1851,8 +1844,7 @@ void vtkPVRenderView::Render()
       }
     return;
     }
-
-  vtkPVRenderModule* rm = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
+  vtkSMRenderModuleProxy* rm = this->RenderModuleProxy;
   if (rm)
     {
     rm->InteractiveRender();
@@ -1979,7 +1971,7 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     if (pm)
       {
       pm->SetGlobalLODFlag(0);
-      vtkPVRenderModule* rm = pm->GetRenderModule();
+      vtkSMRenderModuleProxy* rm = this->RenderModuleProxy;
       if (rm)
         {
         rm->StillRender();
@@ -2006,14 +1998,9 @@ void vtkPVRenderView::TriangleStripsCallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetUseTriangleStrips(int state)
 {
-  vtkPVWindow *pvWin;
-  vtkPVSourceCollection *sources;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp;
-  int numParts, partIdx;
 
   this->GetTraceHelper()->AddEntry("$kw(%s) SetUseTriangleStrips %d", this->GetTclName(),
-                      state);
+    state);
 
   if (this->TriangleStripsCheck->GetState() != state)
     {
@@ -2025,30 +2012,21 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
     this->SetUseImmediateMode(1);
     }
 
-  pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pvWin = this->GetPVWindow();
-  if (pvWin == NULL)
+  vtkSMRenderModuleProxy* rm = this->RenderModuleProxy;
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    rm->GetProperty("UseTriangleStrips"));
+  if (!ivp)
     {
-    vtkErrorMacro("Missing window.");
+    vtkErrorMacro("Failed to find property UseTriangleStrips on "
+      "RenderModuleProxy.");
     return;
     }
-  sources = pvWin->GetSourceList("Sources");
-
-  // It would be nice to get the displays through the render module.  
-  sources->InitTraversal();
-  while ( (pvs = sources->GetNextPVSource()) )
-    {
-    numParts = pvs->GetNumberOfParts();
-    for (partIdx = 0; partIdx < numParts; ++partIdx)
-      {
-      pvs->GetPartDisplay()->SetUseTriangleStrips(state);
-      }
-    }
+  ivp->SetElement(0, state);
+  rm->UpdateVTKObjects();
 
   // Save this selection on the server manager so new
   // part displays will have it a s a default.
-  pm->SetUseTriangleStrips(state);
+  this->GetPVApplication()->GetProcessModule()->SetUseTriangleStrips(state);
 
   this->EventuallyRender();
 }
@@ -2062,7 +2040,17 @@ void vtkPVRenderView::ParallelProjectionOn()
     {
     this->ParallelProjectionCheck->SetState(1);
     }
-  this->GetRenderer()->GetActiveCamera()->ParallelProjectionOn();
+  vtkSMRenderModuleProxy* rm = this->RenderModuleProxy;
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    rm->GetProperty("CameraParallelProjection"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property CameraParallelProjection "
+      "on RenderModuleProxy.");
+    return;
+    }
+  ivp->SetElement(0, 1);
+  rm->UpdateVTKObjects();
   this->EventuallyRender();
 }
 
@@ -2074,7 +2062,18 @@ void vtkPVRenderView::ParallelProjectionOff()
     {
     this->ParallelProjectionCheck->SetState(0);
     }
-  this->GetRenderer()->GetActiveCamera()->ParallelProjectionOff();
+
+  vtkSMRenderModuleProxy* rm = this->RenderModuleProxy;
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    rm->GetProperty("CameraParallelProjection"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property CameraParallelProjection "
+      "on RenderModuleProxy.");
+    return;
+    }
+  ivp->SetElement(0, 0);
+  rm->UpdateVTKObjects();
   this->EventuallyRender();
 }
 
@@ -2112,13 +2111,8 @@ void vtkPVRenderView::ImmediateModeCallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetUseImmediateMode(int state)
 {
-  vtkPVWindow *pvWin;
-  vtkPVSourceCollection *sources;
-  vtkPVSource *pvs;
-  int partIdx, numParts;
-
   this->GetTraceHelper()->AddEntry("$kw(%s) SetUseImmediateMode %d", this->GetTclName(),
-                      state);
+    state);
 
   if (this->ImmediateModeCheck->GetState() != state)
     {
@@ -2130,24 +2124,18 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
     // When immediate mode is off, triangle strips must be on.
     this->SetUseTriangleStrips(1);
     }
-
-  pvWin = this->GetPVWindow();
-  if (pvWin == NULL)
+ 
+  vtkSMRenderModuleProxy* rm = this->RenderModuleProxy;
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    rm->GetProperty("UseImmediateMode"));
+  if (!ivp)
     {
-    vtkErrorMacro("Missing window.");
+    vtkErrorMacro("Failed to find property UseImmediateMode on RenderModuleProxy.");
     return;
     }
-  sources = pvWin->GetSourceList("Sources");
+  ivp->SetElement(0, state);
+  rm->UpdateVTKObjects();
   
-  sources->InitTraversal();
-  while ( (pvs = sources->GetNextPVSource()) )
-    {
-    numParts = pvs->GetNumberOfParts();
-    for (partIdx = 0; partIdx < numParts; ++partIdx)
-      {
-      pvs->GetPartDisplay()->SetUseImmediateMode(state);
-      }
-    }
   // Save this selection on the server manager so new
   // part displays will have it a s a default.
   this->GetPVApplication()->GetProcessModule()->SetUseImmediateMode(state);
@@ -2250,6 +2238,11 @@ inline int DoubleVectSetElement(vtkSMProperty *prop, double value)
   vtkSMDoubleVectorProperty *dp = vtkSMDoubleVectorProperty::SafeDownCast( prop );
   return dp->SetElements1(value);
 }
+inline int IntVectSetElement(vtkSMProperty* prop, int value)
+{
+  vtkSMIntVectorProperty* ip = vtkSMIntVectorProperty::SafeDownCast(prop);
+  return ip->SetElement(0, value);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetLightNoTrace(int type, int subtype, double value)
@@ -2338,8 +2331,8 @@ void vtkPVRenderView::SetLightNoTrace(int type, int subtype, double value)
   vtkstd::string s;
   s = vtkLightKit::GetStringFromType(type);
   s += vtkLightKit::GetStringFromSubType(subtype);
-  DoubleVectSetElement(this->LightKitProxy->GetProperty(s.c_str()), value);
-  this->LightKitProxy->UpdateVTKObjects();
+  DoubleVectSetElement(this->RenderModuleProxy->GetProperty(s.c_str()), value);
+  this->RenderModuleProxy->UpdateVTKObjects();
 
   // Do not render here (do it in the callback, since it could be either
   // Render or EventuallyRender depending on the interaction)
@@ -2382,10 +2375,10 @@ void vtkPVRenderView::SetMaintainLuminance(int s)
 {
   // Set the GUI
   this->MaintainLuminanceButton->SetState(s);
-  vtkSMProperty *prop = this->LightKitProxy->GetProperty("MaintainLuminance");
+  vtkSMProperty *prop = this->RenderModuleProxy->GetProperty("MaintainLuminance");
   vtkSMIntVectorProperty *dp = vtkSMIntVectorProperty::SafeDownCast( prop );
   dp->SetElements1(s);
-  this->LightKitProxy->UpdateVTKObjects();
+  this->RenderModuleProxy->UpdateVTKObjects();
   this->EventuallyRender();
 
   this->GetTraceHelper()->AddEntry("$kw(%s) SetMaintainLuminance %d",
@@ -2404,24 +2397,9 @@ void vtkPVRenderView::SetUseLight(int s)
 {
   // Set the GUI
   this->UseLightButton->SetState(s);
-  vtkProcessModule *pm = this->RenderModule->GetProcessModule();
-  if( s )
-    {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke << this->LightKitProxy->GetID(0)
-      << "AddLightsToRenderer" << this->RenderModule->GetRendererID() 
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER, stream);
-    }
-  else
-    {
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke << this->LightKitProxy->GetID(0)
-      << "RemoveLightsFromRenderer" << this->RenderModule->GetRendererID() 
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER, stream);
-    }
-    
+  vtkSMProperty* p = this->RenderModuleProxy->GetProperty("UseLight");
+  IntVectSetElement(p, s);
+  this->RenderModuleProxy->UpdateVTKObjects();
 
   this->EventuallyRender();
 
@@ -2439,74 +2417,13 @@ vtkPVWindow *vtkPVRenderView::GetPVWindow()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SaveInBatchScript(ofstream* file)
 {
-  int i;
-
-  *file << "set Ren1 [$proxyManager NewProxy rendering DefaultDisplayWindow]" 
-        << endl;
-  *file << "  $proxyManager RegisterProxy rendering Ren1 $Ren1" 
-        << endl;
-  *file << "  $Ren1 UnRegister {}" << endl;
-
-  double* color = this->GetRenderer()->GetBackground();
-  *file << "  [$Ren1 GetProperty BackgroundColor] SetElements3 "; 
-  for(i=0; i<3; i++)
+  *file << "# RenderModule Proxy ---------- " << endl;
+  if (this->RenderModuleProxy)
     {
-    *file << color[i] << " ";
+    this->RenderModuleProxy->SaveInBatchScript(file);
     }
-  *file << endl;
-  int *size = this->GetRenderWindow()->GetSize();
-  *file << "  [$Ren1 GetProperty Size] SetElements2 "; 
-  for(i=0; i<2; i++)
-    {
-    *file << size[i] << " ";
-    }
-  *file << endl;
-
-  vtkCamera *camera;
-  camera = this->GetRenderer()->GetActiveCamera();
-
-  double position[3];
-  camera->GetPosition(position);
-  *file << "  [$Ren1 GetProperty CameraPosition] SetElements3 ";
-  for(i=0; i<3; i++)
-    {
-    *file << position[i] << " ";
-    }
-  *file << endl;
-  
-  double focalPoint[3];
-  camera->GetFocalPoint(focalPoint);
-  *file << "  [$Ren1 GetProperty CameraFocalPoint] SetElements3 ";
-  for(i=0; i<3; i++)
-    {
-    *file << focalPoint[i] << " ";
-    }
-  *file << endl;
-
-  double viewUp[3];
-  camera->GetViewUp(viewUp);
-  *file << "  [$Ren1 GetProperty CameraViewUp] SetElements3 "; 
-  for(i=0; i<3; i++)
-    {
-    *file << viewUp[i] << " ";
-    }
-  *file << endl;
-
-  double viewAngle;
-  viewAngle = camera->GetViewAngle();
-  *file << "  [$Ren1 GetProperty CameraViewAngle] SetElements1 "
-        << viewAngle << endl;
-
-  double clippingRange[2];
-  camera->GetClippingRange(clippingRange);
-  *file << "  [$Ren1 GetProperty CameraClippingRange] SetElements2 ";
-  for(i=0; i<2; i++)
-    {
-    *file << clippingRange[i] << " ";
-    }
-  *file << endl;
+  *file << "# End of RenderModuleProxy ---- " << endl;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SaveState(ofstream* file)
@@ -3165,6 +3082,7 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
 }
 
 //----------------------------------------------------------------------------

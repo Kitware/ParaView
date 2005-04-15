@@ -33,13 +33,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Command that can be used to remove inputs. If set, this
-  // command is called before the main Command is called with
-  // all the arguments.
-  vtkSetStringMacro(CleanCommand);
-  vtkGetStringMacro(CleanCommand);
-
-  // Description:
   // Should be set to true if the "input port" this property represents
   // can accept multiple inputs (for example, an append filter)
   vtkSetMacro(MultipleInput, int);
@@ -84,8 +77,6 @@ protected:
   int PortIndex;
   
   static int InputsUpdateImmediately;
-
-  char* CleanCommand;
 
 private:
   vtkSMInputProperty(const vtkSMInputProperty&); // Not implemented

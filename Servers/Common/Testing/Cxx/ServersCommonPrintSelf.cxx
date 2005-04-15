@@ -16,7 +16,6 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVLODPartDisplayInformation.h"
-#include "vtkPVRenderModule.h"
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
 #include "vtkPVClientServerModule.h"
 #include "vtkPVMPIProcessModule.h"
@@ -41,7 +40,6 @@ int main(int, char * [])
   c = vtkMPIMToNSocketConnection::New(); c->Print(cout); c->Delete();
   c = vtkPVClassNameInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVLODPartDisplayInformation::New(); c->Print(cout); c->Delete();
-  c = vtkPVRenderModule::New(); c->Print(cout); c->Delete();
   c = vtkMPIMToNSocketConnectionPortInformation::New(); c->Print(cout); c->Delete();
   c = vtkPVClientServerModule::New(); c->Print(cout); c->Delete();
   c = vtkPVMPIProcessModule::New(); c->Print(cout); c->Delete();

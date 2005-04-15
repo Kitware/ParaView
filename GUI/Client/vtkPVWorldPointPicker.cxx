@@ -17,25 +17,23 @@
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVRenderModule.h"
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWorldPointPicker);
-vtkCxxRevisionMacro(vtkPVWorldPointPicker, "1.11");
-
-vtkCxxSetObjectMacro(vtkPVWorldPointPicker, RenderModule, vtkPVRenderModule);
+vtkCxxRevisionMacro(vtkPVWorldPointPicker, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVWorldPointPicker::vtkPVWorldPointPicker()
 {
-  this->RenderModule = NULL;
+  this->RenderModuleProxy = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVWorldPointPicker::~vtkPVWorldPointPicker()
 {
-  this->SetRenderModule(NULL);
+  this->SetRenderModuleProxy(NULL);
 }
 
 
@@ -51,7 +49,7 @@ int vtkPVWorldPointPicker::Pick(double selectionX, double selectionY,
   double *displayCoord;
   double z;
 
-  if (this->RenderModule == NULL)
+  if (this->RenderModuleProxy == NULL)
     {
     return vtkWorldPointPicker::Pick(selectionX, selectionY, selectionZ, renderer);
     }
@@ -66,7 +64,7 @@ int vtkPVWorldPointPicker::Pick(double selectionX, double selectionY,
   // Invoke start pick method if defined
   this->InvokeEvent(vtkCommand::StartPickEvent,NULL);
 
-  z = this->RenderModule->GetZBufferValue ((int) selectionX, (int) selectionY);
+  z = this->RenderModuleProxy->GetZBufferValue ((int) selectionX, (int) selectionY);
   
   // if z is 1.0, we assume the user has picked a point on the
   // screen that has not been rendered into. Use the camera's focal
@@ -119,6 +117,6 @@ void vtkPVWorldPointPicker::PrintSelf(ostream& os, vtkIndent indent)
 {
   vtkWorldPointPicker::PrintSelf(os,indent);
 
-  os << indent << "RenderModule: " << this->RenderModule << endl;
+  os << indent << "RenderModuleProxy: " << this->RenderModuleProxy << endl;
 }
 

@@ -26,7 +26,6 @@
 #include "vtkKWRange.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
@@ -35,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.25");
+vtkCxxRevisionMacro(vtkPVValueList, "1.26");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -582,16 +581,6 @@ void vtkPVValueList::Trace(ofstream *file)
             << prop->GetElement(i) << endl;
       }
     }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVValueList::AddAnimationScriptsToMenu(
-  vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai)
-{
-  char methodAndArgs[500];
-  
-  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
-  menu->AddCommand(this->GetTraceHelper()->GetObjectName(), this, methodAndArgs, 0,"");
 }
 
 //-----------------------------------------------------------------------------

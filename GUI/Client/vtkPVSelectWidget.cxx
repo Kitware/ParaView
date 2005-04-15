@@ -26,7 +26,6 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWidgetCollection.h"
-#include "vtkClientServerStream.h"
 #include "vtkCollectionIterator.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMInputProperty.h"
@@ -39,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.66");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.67");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -581,16 +580,6 @@ int vtkPVSelectWidget::FindIndex(const char* str, vtkStringList *list)
    
   vtkErrorMacro("Could not find value " << str);
   return -1;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVSelectWidget::AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterfaceEntry *ai)
-{
-  vtkPVWidget* pv = this->GetPVWidget(this->GetCurrentValue());
-  if ( pv )
-    {
-    pv->AddAnimationScriptsToMenu(menu, ai);
-    }
 }
 
 //-----------------------------------------------------------------------------

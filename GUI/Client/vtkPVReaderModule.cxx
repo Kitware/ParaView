@@ -12,6 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include "vtkPVConfig.h"
 #include "vtkPVReaderModule.h"
 
 #include "vtkObjectFactory.h"
@@ -34,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.62");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.63");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

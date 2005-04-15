@@ -26,7 +26,7 @@
 class vtkAnimationScene;
 class vtkCollection;
 class vtkCollectionIterator;
-class vtkSMDisplayWindowProxy;
+class vtkSMRenderModuleProxy;
 
 class VTK_EXPORT vtkSMAnimationSceneProxy : public vtkSMAnimationCueProxy
 {
@@ -54,8 +54,14 @@ public:
   void AddCue(vtkSMProxy* cue);
   void RemoveCue(vtkSMProxy* cue);
   
-  void SetDisplayWindowProxy(vtkSMDisplayWindowProxy*);
 
+  // Description:
+  // Set the RenderModule Proxy.
+  // This proxy must be set only in batch mode.
+  // If set, every Tick event leads to a call to StillRender on the 
+  // RenderModule.
+  void SetRenderModuleProxy(vtkSMRenderModuleProxy*);
+  
   void SetCurrentTime(double time);
 protected:
   vtkSMAnimationSceneProxy();
@@ -73,7 +79,7 @@ protected:
   vtkCollection* AnimationCueProxies;
   vtkCollectionIterator* AnimationCueProxiesIterator;
 
-  vtkSMDisplayWindowProxy* DisplayWindowProxy;
+  vtkSMRenderModuleProxy* RenderModuleProxy;
 private:
   vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&); // Not implemented.
   void operator=(const vtkSMAnimationSceneProxy&); // Not implemented.

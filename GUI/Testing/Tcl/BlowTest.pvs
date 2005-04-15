@@ -12,7 +12,6 @@ $pvWindow Open "$DataDir/Data/blow data.vtk"
 set pvWarp [$pvWindow CreatePVSource WarpVector]
 $pvWarp Reset
 $pvWarp AcceptCallback
-
 set warpOutput [$pvWarp GetPVOutput]
 $warpOutput SetVisibility 0
 $warpOutput SetInterpolateColorsFlag 1
@@ -36,16 +35,14 @@ for {set i 1} {$i <= 2} {incr i 1} {
 set warpOutput [$pvWarp GetPVOutput]
 
 [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
-[$warpOutput GetColorMenu] SetValue "Point thickness1"
-$warpOutput ColorByPointField thickness1 1
+$warpOutput ColorByArray {thickness1} 3
 $pvWarp AcceptCallback
 
 $warpOutput SetVisibility 1
 
 for {set i 8} {$i <= 10} {incr i 1} {
     [$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
-    [$warpOutput GetColorMenu] SetValue "Point thickness$i"
-    $warpOutput ColorByPointField thickness$i 1
+    $warpOutput ColorByArray thickness$i 3
     $pvWarp AcceptCallback
     update
 

@@ -17,13 +17,12 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVRenderModule.h"
 #include "vtkClientServerStream.h"
 #include "vtkRenderer.h"
 #include "vtkInteractorObserver.h"
-
+#include "vtkSMRenderModuleProxy.h"
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.8");
+vtkCxxRevisionMacro(vtkSM3DWidgetProxy, "1.9");
 
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
@@ -37,6 +36,25 @@ vtkSM3DWidgetProxy::vtkSM3DWidgetProxy()
 //----------------------------------------------------------------------------
 vtkSM3DWidgetProxy::~vtkSM3DWidgetProxy()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkSM3DWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
+{
+  this->SetInteractor(rm->GetInteractorProxy());
+  this->SetCurrentRenderer(rm->GetRendererProxy());
+  this->SetCurrentRenderModuleProxy(rm);
+}
+
+//----------------------------------------------------------------------------
+void vtkSM3DWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
+{
+  if (this->CurrentRenderModuleProxy == rm )
+    {
+    this->SetInteractor(0);
+    this->SetCurrentRenderer(0);
+    this->SetCurrentRenderModuleProxy(0);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -108,13 +126,7 @@ void vtkSM3DWidgetProxy::CreateVTKObjects(int numObjects)
     }
   this->Superclass::CreateVTKObjects(numObjects);
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
-  if(pm->GetRenderModule())
-    {
-    vtkClientServerID rendererID = pm->GetRenderModule()->GetRendererID();
-    vtkClientServerID interactorID = pm->GetRenderModule()->GetInteractorID();
-    this->SetCurrentRenderer(rendererID);
-    this->SetInteractor(interactorID);
-    }
+
   vtkClientServerStream stream;
   for (unsigned int cc=0; cc <this->GetNumberOfIDs(); cc++)
     {
@@ -147,8 +159,6 @@ void vtkSM3DWidgetProxy::SaveInBatchScript(ofstream *file)
       << id.ID << " $pvTemp" << id.ID
       << endl;
     *file << "  $pvTemp" << id.ID << " UnRegister {}" << endl;
-    *file << "  [$Ren1 GetProperty Displayers] AddProxy $pvTemp"
-      << id.ID << endl;
 
     *file << "  [$pvTemp" << id.ID << " GetProperty IgnorePlaceWidgetChanges]"
       << " SetElements1 1" << endl;

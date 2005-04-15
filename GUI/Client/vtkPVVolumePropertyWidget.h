@@ -35,9 +35,25 @@ public:
   virtual void SetDataInformation(vtkPVDataInformation*);
 //ETX
 
+  // Description:
+  // Set the array name that's being used for volume rendering.
+  vtkSetStringMacro(ArrayName);
+  vtkGetStringMacro(ArrayName);
+
+  // Description:
+  // Set the Scalar mode (whther to use Point Field Data or Cell Field Data).
+  void SetScalarModeToUsePointFieldData() 
+    { this->ScalarMode = vtkPVVolumePropertyWidget::POINT_FIELD_DATA; }
+  void SetScalarModeToUseCellFieldData() 
+    { this->ScalarMode = vtkPVVolumePropertyWidget::CELL_FIELD_DATA; }
+  vtkGetMacro(ScalarMode, int);
+
   void SetDataSet(vtkDataSet*) 
     { vtkErrorMacro( << "Don't use this method"); };
 
+  //BTX
+  enum { POINT_FIELD_DATA = 0, CELL_FIELD_DATA };
+  //ETX
  
 protected:
   vtkPVVolumePropertyWidget();
@@ -55,7 +71,9 @@ protected:
   virtual const char* GetDataSetScalarName();
   virtual int GetDataSetScalarOpacityUnitDistanceRangeAndResolution(
     double range[2], double *resolution);
-  
+ 
+  char* ArrayName;
+  int ScalarMode;
 private:
   vtkPVVolumePropertyWidget(const vtkPVVolumePropertyWidget&);  // Not implemented
   void operator=(const vtkPVVolumePropertyWidget&);  // Not implemented

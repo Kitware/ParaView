@@ -25,9 +25,7 @@ class vtkKWCheckButton;
 class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkKWWidget;
-class vtkXYPlotWidget;
-class vtkSMPlotDisplay;
-class vtkXYPlotWidgetObserver;
+class vtkSMXYPlotDisplayProxy;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -44,28 +42,24 @@ public:
   // Access to the ShowXYPlotToggle from Tcl
   vtkGetObjectMacro(ShowXYPlotToggle, vtkKWCheckButton);
 
-  //BTX
-  // Description:
-  // Get the XY Plot widget.
-  vtkGetObjectMacro(XYPlotWidget, vtkXYPlotWidget);
-  //ETX
-  
-  // Description:
-  // This method is called when event is triggered on the XYPlotWidget.
-//BTX
-  virtual void ExecuteEvent(vtkObject* wdg, unsigned long event,  
-                            void* calldata);
-//ETX
-
   // Description:
   // Control the visibility of the pick display as well.
   virtual void SetVisibilityNoTrace(int val);
+
+  // Description:
+  // Save the pipeline to a batch file which can be run without
+  // a user interface.
+  // Overridden to save the plot display in batch.
+  virtual void SaveInBatchScript(ofstream *file);
 
 protected:
   vtkPVProbe();
   ~vtkPVProbe();
   
-  vtkSMPlotDisplay* PlotDisplay;
+  vtkSMXYPlotDisplayProxy* PlotDisplayProxy;
+  char* PlotDisplayProxyName; // Name used to register the plot display proxy
+                              // with the Proxy Manager.
+  vtkSetStringMacro(PlotDisplayProxyName);
   
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  
@@ -79,9 +73,9 @@ protected:
   vtkKWLabel *PointDataLabel;
   
   vtkKWCheckButton *ShowXYPlotToggle;
-  
-  vtkXYPlotWidget* XYPlotWidget;
-  vtkXYPlotWidgetObserver* XYPlotObserver;
+
+  int CanShowPlot; // Flag indicating if the input is such that we can show 
+    // the plot display.
 
 private:
   vtkPVProbe(const vtkPVProbe&); // Not implemented

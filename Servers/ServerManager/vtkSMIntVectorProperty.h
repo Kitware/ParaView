@@ -118,6 +118,10 @@ public:
   vtkSetMacro(ArgumentIsArray, int);
   vtkBooleanMacro(ArgumentIsArray, int);
 
+  // Description: 
+  // Copy all property values.
+  virtual void DeepCopy(vtkSMProperty* src);
+
 protected:
   vtkSMIntVectorProperty();
   ~vtkSMIntVectorProperty();
