@@ -37,6 +37,7 @@
 #include "vtkSMAnimationCueProxy.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMStringListDomain.h"
+#include "vtkSMXDMFPropertyDomain.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
@@ -45,7 +46,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.10");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.11");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -292,7 +293,7 @@ void vtkPVKeyFrame::CreateValueWidget()
       pvList->SetModifiedCommand(this->GetTclName(), "ValueChangedCallback");
       this->ValueWidget = pvList;
       }
-    else
+    else // even for xdmfd we create a thumbwheel.
       {
       vtkKWThumbWheel* pvWheel = vtkKWThumbWheel::New();
       pvWheel->SetParent(this);
@@ -399,16 +400,44 @@ void vtkPVKeyFrame::InitializeKeyValueUsingProperty(vtkSMProperty* property, int
     }
   else if (vtkSMStringVectorProperty::SafeDownCast(property))
     {
-    const char* string = vtkSMStringVectorProperty::SafeDownCast(property)->
-      GetElement(index);
-    vtkPVSelectionList* pvList = vtkPVSelectionList::SafeDownCast(this->ValueWidget); 
-    if (string && pvList)
+    vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+      property);
+    vtkSMAnimationCueProxy* cueProxy = this->AnimationCue->GetCueProxy();
+    vtkSMDomain* domain = cueProxy->GetAnimatedDomain();
+    vtkSMXDMFPropertyDomain* xdmfd = 
+      vtkSMXDMFPropertyDomain::SafeDownCast(domain);
+    if (xdmfd)
       {
-      // find the index for this string in the widget / or domain.
-      int vindex = pvList->GetValue(string);
-      if (vindex != -1)
+      const char* name = xdmfd->GetString(index);
+      if (name)
         {
-        this->SetKeyValue(static_cast<double>(vindex));
+        int found = 0;
+        unsigned int idx = svp->GetElementIndex(name, found);
+        if (found)
+          {
+          int val = 0;
+          val = atoi(svp->GetElement(idx + 1));
+          this->SetKeyValue(static_cast<double>(val));
+          }
+        else
+          {
+          vtkErrorMacro("Could not find an appropriate property value "
+            "matching the domain. Can not update keyframe.");
+          }
+        }
+      }
+    else
+      {
+      const char* string = svp->GetElement(index);
+      vtkPVSelectionList* pvList = vtkPVSelectionList::SafeDownCast(this->ValueWidget); 
+      if (string && pvList)
+        {
+        // find the index for this string in the widget / or domain.
+        int vindex = pvList->GetValue(string);
+        if (vindex != -1)
+          {
+          this->SetKeyValue(static_cast<double>(vindex));
+          }
         }
       }
     }
@@ -432,6 +461,8 @@ void vtkPVKeyFrame::UpdateDomain()
   vtkSMStringListDomain* sld = vtkSMStringListDomain::SafeDownCast(domain);
   vtkSMDoubleRangeDomain* drd = vtkSMDoubleRangeDomain::SafeDownCast(domain);
   vtkSMIntRangeDomain* ird = vtkSMIntRangeDomain::SafeDownCast(domain);
+  vtkSMXDMFPropertyDomain* xdmfd =
+    vtkSMXDMFPropertyDomain::SafeDownCast(domain);
   // TODO: Actually, it would have been neat if we could compare the MTimes for the
   // widgets and the domains, but so happens that none of the
   // PVWidgets or SMDomains update MTime properly. Should correct that first.
@@ -471,6 +502,22 @@ void vtkPVKeyFrame::UpdateDomain()
         {
         pvList->AddItem(sld->GetString(cc), cc);
         }
+      }
+    }
+  else if (xdmfd)
+    {
+    vtkKWThumbWheel* wheel = vtkKWThumbWheel::SafeDownCast(this->ValueWidget);
+    wheel->SetResolution(1);
+    int minexists, maxexists;
+    int min = xdmfd->GetMinimum(index, minexists);
+    int max = xdmfd->GetMaximum(index, maxexists);
+    const char* name = xdmfd->GetString(index);
+    if (minexists && maxexists && name)
+      {
+      wheel->SetMinimumValue(min);
+      wheel->SetMaximumValue(max);
+      wheel->ClampMinimumValueOn();
+      wheel->ClampMaximumValueOn();
       }
     }
   else if (drd || ird)

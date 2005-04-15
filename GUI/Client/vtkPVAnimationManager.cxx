@@ -56,13 +56,14 @@
 #include <vtkstd/map>
 #include <vtkstd/string>
 #include "vtkPVTraceHelper.h"
+#include "vtkSMXDMFPropertyDomain.h"
 
 #include <kwsys/SystemTools.hxx>
 
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.31");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.32");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -560,9 +561,29 @@ int vtkPVAnimationManager::AddStringVectorProperty(vtkPVSource* pvSource,
   diter->Delete();
   vtkSMArrayListDomain* ald = vtkSMArrayListDomain::SafeDownCast(domain);
   vtkSMStringListDomain* sld = vtkSMStringListDomain::SafeDownCast(domain);
+  vtkSMXDMFPropertyDomain* xdmf = vtkSMXDMFPropertyDomain::SafeDownCast(domain);
+
 //TODO:  vtkSMArraySelectionDomain* asd = vtkSMArraySelectionDomain::SafeDownCast(domain);
 
-  if (ald) //must check for ald before sld.
+  if (xdmf)
+    {
+    int nos = svp->GetNumberOfElements();
+    int nos_per_command = svp->GetNumberOfElementsPerCommand();
+    if (nos_per_command != 2)
+      {
+      vtkErrorMacro("Can only handle specific XDMF case");
+      return 0;
+      }
+    int no_tracks = nos / 2;
+    for (int i=0; i < no_tracks; i++)
+      {
+      const char* name = svp->GetElement(2 * i);
+      this->SetupCue(pvSource, pvCueTree, proxy, svp->GetXMLName(),
+        0, i, name);
+      }
+    return (no_tracks > 0)? 1 : 0;
+    }
+  else if (ald) //must check for ald before sld.
     {
     if (svp->GetNumberOfElements() > 1)
       {

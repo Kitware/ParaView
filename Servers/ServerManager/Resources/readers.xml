@@ -1203,9 +1203,9 @@
                 class="vtkXdmfReader">
      <StringVectorProperty
         name="FileName"
-        animateable="1"
         command="SetFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        animateable="0">
         <StringListDomain name="files"/>
      </StringVectorProperty>
 
@@ -1222,7 +1222,8 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="CellArrayInfo"> 
+        information_property="CellArrayInfo"
+        animateable="0"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="CellArrayInfo" function="ArrayList"/>
@@ -1243,7 +1244,8 @@
         repeat_command="1"
         number_of_elements_per_command="2"
         element_types="2 0"
-        information_property="PointArrayInfo"> 
+        information_property="PointArrayInfo"
+        animateable="0"> 
        <ArraySelectionDomain name="array_list">
           <RequiredProperties>
              <Property name="PointArrayInfo" function="ArrayList"/>
@@ -1255,7 +1257,8 @@
          name="Stride"
          command="SetStride"
          number_of_elements="3"
-         default_values="1 1 1" >
+         default_values="1 1 1" 
+         animateable="0">
         <IntRangeDomain name="range" min="1 1 1" />
       </IntVectorProperty>
 
@@ -1282,7 +1285,8 @@
         number_of_elements="0" 
         repeat_command="1"
         number_of_elements_per_command="2"
-        element_types="2 0"> 
+        element_types="2 0"
+        animateable="1">
        <XDMFPropertyDomain name="range">
           <RequiredProperties>
              <Property name="ParametersInfo" function="ParameterRanges"/>
