@@ -59,7 +59,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.432");
+vtkCxxRevisionMacro(vtkPVSource, "1.433");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -1006,7 +1006,6 @@ void vtkPVSource::AcceptCallbackInternal()
   // It was an error condition (no output was created).
   this->Register(this);
 
-  int dialogAlreadyUp=0;
   // This is here to prevent the user from killing the
   // application from inside the accept callback.
   this->GetApplication()->RegisterDialogUp(this);
