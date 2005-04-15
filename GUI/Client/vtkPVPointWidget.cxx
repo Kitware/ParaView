@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.48");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.49");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -238,7 +238,6 @@ void vtkPVPointWidget::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   int i;
-  unsigned int ui;
   if ((this->GetTraceHelper()->GetObjectNameState() == 
        vtkPVTraceHelper::ObjectNameStateUninitialized ||
        this->GetTraceHelper()->GetObjectNameState() == 

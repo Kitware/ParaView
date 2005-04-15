@@ -31,7 +31,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.28");
+vtkCxxRevisionMacro(vtkSMProperty, "1.29");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -440,7 +440,7 @@ int vtkSMProperty::GetModifiedAtCreation()
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::DeepCopy(vtkSMProperty* src)
+void vtkSMProperty::DeepCopy(vtkSMProperty* )
 {
 }
 

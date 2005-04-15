@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.2");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.3");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -154,13 +154,13 @@ void vtkPVComparativeVisManager::TraverseAllCues()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVComparativeVisManager::TraverseCue(vtkPVAnimationCue* cue)
+void vtkPVComparativeVisManager::TraverseCue(vtkPVAnimationCue* cueTree)
 {
-  if (!cue)
+  if (!cueTree)
     {
     return;
     }
-  vtkPVAnimationCueTree* tree = vtkPVAnimationCueTree::SafeDownCast(cue);
+  vtkPVAnimationCueTree* tree = vtkPVAnimationCueTree::SafeDownCast(cueTree);
   if (tree)
     {
     vtkCollectionIterator* iter = tree->NewChildrenIterator();
@@ -176,9 +176,9 @@ void vtkPVComparativeVisManager::TraverseCue(vtkPVAnimationCue* cue)
     }
   else
     {
-    if (cue->GetNumberOfKeyFrames() > 0)
+    if (cueTree->GetNumberOfKeyFrames() > 0)
       {
-      this->Internal->Cues.push_back(cue);
+      this->Internal->Cues.push_back(cueTree);
       }
     }
 
