@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.16");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.17");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -67,6 +67,7 @@ vtkPVSourceNotebook::vtkPVSourceNotebook()
   this->AcceptButtonRed = 0;
   this->AutoAccept = 0;
   this->TimerToken = 0;
+  this->CloneInitializeLock = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -413,7 +414,7 @@ void vtkPVSourceNotebook::SetAutoAccept(int val)
     {
     this->AcceptButton->SetText("Auto Accept");
     // Just in case the source is already modified.
-    this->SetAcceptButtonColorToModified();
+    this->AcceptButtonCallback();
     }
   else
     {
@@ -458,7 +459,7 @@ void vtkPVSourceNotebook::SetAcceptButtonColorToModified()
     {
     return;
     }
-  if( this->PVSource ) // only accept if there is a source
+  if( !this->CloneInitializeLock ) 
     {
     this->AcceptButtonRed = 1;
     }

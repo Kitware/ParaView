@@ -266,7 +266,7 @@ The output of the Line source is polygonal data.
         short_help="Create a Mandelbrot representation"
         button_image="PVMandelbrotButton"
         button_help="Create a fractal image or volume."
-	button_visibility="0">
+        button_visibility="0">
   <Source class="vtkImageMandelbrotSource"/>
   <VectorEntry label="Extent" trace_name="Extent" property="WholeExtent" 
                type="int" length="6"
@@ -371,7 +371,7 @@ The output of the Plane source is polygonal data.
         short_help="Create a 3D sphere"
         button_image="PVSphereSourceButton"
         button_help="Create a 3D sphere."
-	button_visibility="0">
+        button_visibility="0">
   <Source class="vtkSphereSource"/>
   <VectorEntry label="Center" property="Center" trace_name="Center"
                type="float" length="3"
@@ -426,7 +426,7 @@ The output of the Sphere source is polygonal data with point normals defined.
         short_help="Create a superquadric according to the theta and phi roundness parameters"
         button_image="PVSuperquadricButton"
         button_help="Create a torus shaped surface."
-	button_visibility="0">
+        button_visibility="0">
   <Source class="vtkSuperquadricSource"/>
   <VectorEntry label="Center" property="Center" trace_name="Center"
                type="float" length="3"
@@ -479,9 +479,10 @@ The output of the Superquadric source is polygonal data with point normals and t
 <Module name="RTAnalyticSource" menu_name="Wavelet" root_name="RTSource" 
         module_type="Source" 
         long_help="Regular rectilinear grid in up to three dimensions with values varying according to a periodic function."
+        short_help="Create a Wavelet"
         button_image="PVWaveletButton"
         button_help="Regular rectilinear grid in up to three dimensions with values varying according to a periodic function."
-	button_visibility="0">
+        button_visibility="0">
   <Source class="vtkRTAnalyticSource"/>
   <VectorEntry label="Extent" trace_name="WholeExtent" property="WholeExtent" 
                 type="int" length="6"

@@ -59,7 +59,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.430");
+vtkCxxRevisionMacro(vtkPVSource, "1.431");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -2461,8 +2461,10 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone)
     return retVal;
     }
 
+  // During the initialization we make sure that nothing get acceped in the Notebook:
+  this->GetNotebook()->CloneInitializeLockOn();
   retVal = clone->InitializeClone(makeCurrent);
-
+  this->GetNotebook()->CloneInitializeLockOff();
 
   if (retVal != VTK_OK)
     {

@@ -109,7 +109,13 @@ public:
   vtkGetMacro(AutoAccept, int);
   void EventuallyAccept();
   void EventuallyAcceptCallBack();
-  
+
+  // Description:
+  // Variable used to block the Accept during the initialization/clone of PVSource
+  vtkSetMacro(CloneInitializeLock,int);
+  vtkGetMacro(CloneInitializeLock,int);
+  vtkBooleanMacro(CloneInitializeLock, int);
+
 protected:
   vtkPVSourceNotebook();
   ~vtkPVSourceNotebook();
@@ -132,9 +138,10 @@ protected:
 
   vtkKWPushButton* AcceptPullDownArrow;
   
-  // We have to manaage updates separate from the VTK pipeline.
+  // We have to manage updates separate from the VTK pipeline.
   int AcceptButtonRed;
   int AutoAccept;
+  int CloneInitializeLock;  //Used to block the SetAcceptButtonColorToUnmodified
   Tcl_TimerToken TimerToken;
 
   // Description:

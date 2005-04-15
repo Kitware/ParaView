@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.683");
+vtkCxxRevisionMacro(vtkPVWindow, "1.684");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1506,7 +1506,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
       vtkErrorMacro("Could not create glyph source: SphereSource");
       }
 
-    // ===== Sphere
+    // ===== Glyph
     pvs = this->CreatePVSource("GlyphSource2D", "GlyphSources", 0, 0);
     if (pvs)
       {
