@@ -59,7 +59,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.431");
+vtkCxxRevisionMacro(vtkPVSource, "1.432");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -1009,21 +1009,11 @@ void vtkPVSource::AcceptCallbackInternal()
   int dialogAlreadyUp=0;
   // This is here to prevent the user from killing the
   // application from inside the accept callback.
-  if (!this->GetApplication()->GetDialogUp())
-    {
-    this->GetApplication()->SetDialogUp(1);
-    }
-  else
-    {
-    dialogAlreadyUp=1;
-    }
+  this->GetApplication()->RegisterDialogUp(this);
   this->Accept(0);
   this->GetTraceHelper()->AddEntry("$kw(%s) AcceptCallback",
                                           this->GetTclName());
-  if (!dialogAlreadyUp)
-    {
-    this->GetApplication()->SetDialogUp(0);
-    }
+  this->GetApplication()->UnRegisterDialogUp(this);
 
 
   // I had trouble with this object destructing too early

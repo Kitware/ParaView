@@ -41,7 +41,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.221");
+vtkCxxRevisionMacro(vtkKWWindow, "1.222");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -416,7 +416,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   if (this->GetApplication()->HasRegistryValue(
         2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY) &&
-      !this->GetIntRegistryValue(
+      !this->GetApplication()->GetIntRegistryValue(
         2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY))
     {
     this->ShowMostRecentPanels(0);
@@ -434,7 +434,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
           2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY))
       {
       uim_nb->SetEnableDragAndDrop(
-        this->GetIntRegistryValue(
+        this->GetApplication()->GetIntRegistryValue(
           2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY));
       }
     }
@@ -1122,20 +1122,6 @@ int vtkKWWindow::ExitDialog()
 }
 
 //----------------------------------------------------------------------------
-float vtkKWWindow::GetFloatRegistryValue(int level, const char* subkey, 
-                                          const char* key)
-{
-  return this->GetApplication()->GetFloatRegistryValue(level, subkey, key);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWindow::GetIntRegistryValue(int level, const char* subkey, 
-                                      const char* key)
-{
-  return this->GetApplication()->GetIntRegistryValue(level, subkey, key);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWindow::SaveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
 {
   //  "OpenDirectory"
@@ -1207,16 +1193,6 @@ int vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
   rgb[2] = drgb[2];
   return res;
 }
-
-//----------------------------------------------------------------------------
-int vtkKWWindow::BooleanRegistryCheck(int level, 
-                                       const char* subkey,
-                                       const char* key, 
-                                       const char* trueval)
-{
-  return this->GetApplication()->BooleanRegistryCheck(level, subkey, key, trueval);
-}
-
 
 //----------------------------------------------------------------------------
 void vtkKWWindow::WarningMessage(const char* message)

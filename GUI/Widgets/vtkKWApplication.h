@@ -27,7 +27,6 @@
 
 class vtkKWLabel;
 class vtkKWMessageDialog;
-class vtkKWMessageDialog;
 class vtkKWRegistryHelper;
 class vtkKWBalloonHelpManager;
 class vtkKWSplashScreen;
@@ -65,6 +64,10 @@ public:
   // This can be used from scripts to set an error status
   vtkSetMacro(ExitStatus, int);
   vtkGetMacro(ExitStatus, int);
+
+  // Description:
+  // Get when application is exiting (set to 1 as soon as Exit() is called).
+  vtkGetMacro(InExit, int);
 
   // Description:
   // Add/Close a window to this application.
@@ -146,7 +149,7 @@ public:
   // Description:
   // Load and evaluate a Tcl script from a file. 
   // Return 1 if successful, 0 otherwise
-  int LoadScript(const char* filename);
+  virtual int LoadScript(const char* filename);
 
   // Description:
   // Set/Get the "exit after load script" flag. If this flag is set, then 
@@ -160,95 +163,76 @@ public:
   vtkGetMacro(ExitAfterLoadScript, int);
 
   // Description:
-  // When a modal dialog is up, this flag should be set.
-  // vtkKWWindow will check this at exit and if set,
-  // it will refuse to exit
-  vtkSetMacro(DialogUp, int);
-  vtkGetMacro(DialogUp, int);
-
-  // Description:
-  // This method returns a message dialog response.
-  // The string is the name of dialog and the return is:
-  // 0 for no response (display dialog), 1 for response ok/yes
-  // and -1 for response cancel/no.
-  int GetMessageDialogResponse(const char* dialogname);
-  
-  // Description:
-  // Set the message dialog response. Set 1 for ok/yes and -1 for 
-  // cancel/no.
-  void SetMessageDialogResponse(const char* dialogname, int response);
-
-  // Description:
-  // Return the Registry object. It is created on first use
-  // and deleted on exiting the application.
+  // Get the Registry object.
   //BTX
   vtkKWRegistryHelper *GetRegistryHelper();
   //ETX
 
   // Description:
-  // Set/get the current registry level. If the called
-  // registry level is lower than current one, the operation is 
-  // successfull. Registry level -1 means to ignore all the 
-  // registry operations.
+  // Set/Get the current registry level. 
+  // When setting/retrieving a value in/from the registry a 'level' has
+  // to be provided as part of the parameters. If this level is greater
+  // than the current registry level, the operation will be ignored.
+  // Set the registry level to -1 means to ignore all the registry operations.
   vtkSetClampMacro(RegistryLevel, int, -1, 10);
   vtkGetMacro(RegistryLevel, int);
 
-  //Description:
-  // Set or get the registry value for the application.
-  // When storing multiple arguments, separate with spaces.
-  // If the level is lower than current registry level, operation 
-  // will be successfull.
+  // Description:
+  // Set/get/delete/query a registry value for the application.
+  // When storing multiple arguments, separate them with spaces.
+  // Note that if the 'level' is greater than the current registry level, 
+  // the operation will be ignored.
   //BTX
-  int SetRegistryValue(int level, const char* subkey, const char* key, 
-                        const char* format, ...);
+  virtual int SetRegistryValue(
+    int level, const char* subkey, const char* key, 
+    const char* format, ...);
   //ETX
-  int GetRegistryValue(int level, const char* subkey, const char* key, 
-                        char* value);
-  int DeleteRegistryValue(int level, const char* subkey, const char* key);
-  int HasRegistryValue(int level, const char* subkey, const char* key);
+  virtual int GetRegistryValue(
+    int level, const char* subkey, const char* key, char* value);
+  virtual int DeleteRegistryValue(
+    int level, const char* subkey, const char* key);
+  virtual int HasRegistryValue(
+    int level, const char* subkey, const char* key);
   
   // Description:
-  // Perform a boolean check of the value in registry. If the value
-  // at the key is trueval, then return true, otherwise return false.
-  int BooleanRegistryCheck(int level, const char* subkey, const char* key, 
-                            const char* trueval);
-
-  // Description:
-  // Get float registry value (zero if not found).
-  // If the level is lower than current registry level, operation 
-  // will be successfull.
-  float GetFloatRegistryValue(int level, const char* subkey, 
-                               const char* key);
-  int   GetIntRegistryValue(int level, const char* subkey, const char* key);
+  // Convenience methods to retrieve a value from the registry and convert
+  // it to a type (boolean, float, int). 
+  // Return 0 if the value was not found.
+  // For GetBooleanRegistryValue(), perform a boolean check of the value in
+  // the registry. If the value at the key is equal to 'trueval', then return
+  // true, otherwise return false.
+  virtual float GetFloatRegistryValue(
+    int level, const char* subkey, const char* key);
+  virtual int GetIntRegistryValue(
+    int level, const char* subkey, const char* key);
+  virtual int GetBooleanRegistryValue(
+    int level, const char* subkey, const char* key, const char* trueval);
   
   // Descrition:
-  // Get those application settings that are stored in the registry
-  // Should be called once the application name is known (and the registry
-  // level set).
+  // Get the application settings that are stored in the registry.
+  // Do not call that method before the application name is known and the
+  // proper registry level set (if any).
   virtual void GetApplicationSettingsFromRegistry();
 
   // Description:
-  // Get the splash screen, if this app have/show a splash screen.
-  virtual vtkKWSplashScreen* GetSplashScreen();
+  // Query if this application supports a splash screen
   vtkGetMacro(HasSplashScreen, int);
+
+  // Description:
+  // Set/Get if this application should show the splash screen at startup
   vtkGetMacro(ShowSplashScreen, int);
   vtkSetMacro(ShowSplashScreen, int);
   vtkBooleanMacro(ShowSplashScreen, int);
 
   // Description:
-  // Save windows geometry.
+  // Retrieve the splash screen object
+  virtual vtkKWSplashScreen* GetSplashScreen();
+
+  // Description:
+  // Set/Get if the windows geometry should be saved (to registry).
   vtkGetMacro(SaveWindowGeometry, int);
   vtkSetMacro(SaveWindowGeometry, int);
   vtkBooleanMacro(SaveWindowGeometry, int);
-
-  // Description:
-  // At the end of Exit(), this is set to true. Other objects
-  // can use this to cleanup properly.
-  vtkGetMacro(ApplicationExited, int);
-
-  // Description:
-  // This return 1 when application is exiting.
-  vtkGetMacro(InExit, int);
 
   // Description:
   // Get/Set the internal character encoding of the application.
@@ -256,31 +240,34 @@ public:
   vtkGetMacro(CharacterEncoding, int);
   
   // Description:
-  // Test if we have some logic to check for application update and
-  // eventually perform that check.
+  // Get if we have some logic to check for application update online and
+  // perform that check.
   virtual int HasCheckForUpdates();
   virtual void CheckForUpdates();
 
   // Description:
-  // Test if we have some logic to report a bug and
-  // eventually report a bug check.
+  // Get if we have some logic to report feedback by email and
+  // email that feedback.
+  // Set/Get the email address to send that feedback to.
   virtual int CanEmailFeedback();
   virtual void EmailFeedback();
   vtkSetStringMacro(EmailFeedbackAddress);
   vtkGetStringMacro(EmailFeedbackAddress);
 
   // Description:
-  // Display the on-line help and about dialog for this application.
+  // Display the on-line help for this application.
+  // Optionally provide a master window this dialog should be the slave of.
   virtual void DisplayHelp(vtkKWWindow *master);
+
+  // Description:
+  // Set/Get the the on-line help starting page
+  vtkGetStringMacro(DisplayHelpStartingPage);
+  vtkSetStringMacro(DisplayHelpStartingPage);
+
+  // Description:
+  // Display the about dialog for this application.
+  // Optionally provide a master window this dialog should be the slave of.
   virtual void DisplayAbout(vtkKWWindow *master);
-
-  // Description:
-  // Convenience method to call UpdateEnableState on all windows
-  virtual void UpdateEnableStateForAllWindows();
-
-  // Description:
-  // Convenience method to get the operating system version
-  virtual int GetSystemVersion(ostream &os);
 
   // Description:
   // Return the Balloon Help helper object. 
@@ -305,6 +292,25 @@ public:
   //BTX
   static Tcl_Interp *InitializeTcl(int argc, char *argv[], ostream *err = 0);
   //ETX
+
+  // Description:
+  // Call RegisterDialogUp to notify the application that a modal dialog is up,
+  // and UnRegisterDialogUp when it is not anymore. GetDialogUp will return
+  // if any dialog is up. 
+  // The parameter to pass is a pointer to the dialog/toplevel/widget that is
+  // being registered/unregistered. If there is no such widget (say, if you
+  // are calling a builtin Tk function that creates and pops-up a dialog), pass
+  // the adress of the class that is invoking that call.
+  // This is used to help preventing a window or an
+  // application to exit while a dialog is still up. This is usually not
+  // a problem on Win32, since a modal dialog will prevent the user from
+  // interacting with the window and exit it, but this is not the case for
+  // other operating system where the window manager is independent from the
+  // window contents itself. In any case, inheriting from a vtkKWTopLevel
+  // or vtkKWDialog should take care of calling this function for you.
+  virtual void RegisterDialogUp(vtkKWWidget *ptr);
+  virtual void UnRegisterDialogUp(vtkKWWidget *ptr);
+  vtkGetMacro(DialogUp, int);
   
 protected:
   vtkKWApplication();
@@ -337,39 +343,53 @@ protected:
   char *InstallationDirectory;
   virtual void FindInstallationDirectory();
 
+  // Description:
+  // Add email feedback body and subject to output stream.
+  // Override this function in subclasses (and/or call the superclass) to
+  // add more information.
   virtual void AddEmailFeedbackBody(ostream &);
   virtual void AddEmailFeedbackSubject(ostream &);
   char *EmailFeedbackAddress;
 
-  int ApplicationExited;
-
-  vtkGetStringMacro(DisplayHelpStartingPage);
-  vtkSetStringMacro(DisplayHelpStartingPage);
+  // Description:
+  // On-line help starting page
   char *DisplayHelpStartingPage;
 
+  // Description:
+  // Value that is set after exit (status), flag stating that 
+  // Exit was called, flag stating if application should exit after load script
+  int ExitStatus;
   int InExit;
+  int ExitAfterLoadScript;
+
+  // Description:
+  // Number of dialog that are up. See Un/RegisterDialogUp().
   int DialogUp;
 
-  int ExitStatus;
+  // Description:
+  // Limited edition mode, name of the application when in limited edition mode
   int LimitedEditionMode;
   char *LimitedEditionModeName;
 
+  // Description:
+  // Registry level. If a call to Set/GetRegistryValue uses a level above
+  // this ivar, the operation is ignored.
   int RegistryLevel;
 
-  int UseMessageDialogs;
-
-  int ExitAfterLoadScript;
-
-  // Splash screen
-
-  virtual void CreateSplashScreen() {};
+  // Description:
+  // Flag stating if application supports splash screen, and shows it
   int HasSplashScreen;
   int ShowSplashScreen;
+  virtual void CreateSplashScreen() {};
 
+  // Description:
+  // Flag stating if the window geometry should be saved before exiting
   int SaveWindowGeometry;
 
-  // About dialog
-
+  // Description:
+  // About dialog, add text and copyrights to the about dialog.
+  // Override this function in subclasses (and/or call the superclass) to
+  // add more information.
   virtual void ConfigureAbout();
   virtual void AddAboutText(ostream &);
   virtual void AddAboutCopyrights(ostream &);
@@ -377,6 +397,8 @@ protected:
   vtkKWLabel         *AboutDialogImage;
   vtkKWText          *AboutRuntimeInfo;
 
+  // Description:
+  // Character encoding (is passed to Tcl)
   int CharacterEncoding;
 
   // Description:
@@ -396,6 +418,9 @@ protected:
   static int CheckForValuedArgument(
     int argc, char* argv[], const char *arg, int &index, int &value_pos);
 
+  // Description:
+  // Try to find the path to the online updater (for example, WiseUpdt.exe)
+  // and output that path to the ostream passed as parameter.
   virtual int GetCheckForUpdatesPath(ostream &path);
 
   // PIMPL Encapsulation for STL containers

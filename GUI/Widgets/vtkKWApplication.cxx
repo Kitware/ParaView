@@ -30,15 +30,11 @@
 #include "vtkKWText.h"
 #include "vtkTclUtil.h"
 
-#include <kwsys/SystemTools.hxx>
-
 #include <stdarg.h>
 
+#include <kwsys/SystemTools.hxx>
 #include <kwsys/stl/vector>
 #include <kwsys/stl/algorithm>
-
-#define REG_KEY_VALUE_SIZE_MAX 8192
-#define REG_KEY_NAME_SIZE_MAX 100
 
 static Tcl_Interp *Et_Interp = 0;
 
@@ -60,7 +56,7 @@ EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.195");
+vtkCxxRevisionMacro(vtkKWApplication, "1.196");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -81,49 +77,68 @@ public:
 //----------------------------------------------------------------------------
 vtkKWApplication::vtkKWApplication()
 {
-  this->Internals = new vtkKWApplicationInternals;
-
   this->CommandFunction = vtkKWApplicationCommand;
   
-  this->Name = kwsys::SystemTools::DuplicateString("Kitware");
+  // Instantiate the PIMPL Encapsulation for STL containers
+
+  this->Internals = new vtkKWApplicationInternals;
+
+  // Application name and version
+
   this->MajorVersion = 1;
   this->MinorVersion = 0;
+  this->Name = 
+    kwsys::SystemTools::DuplicateString("Sample Application");
   this->VersionName = 
-    kwsys::SystemTools::DuplicateString("Kitware10");
+    kwsys::SystemTools::DuplicateString("SampleApplication10");
   this->ReleaseName = 
     kwsys::SystemTools::DuplicateString("unknown");
   this->PrettyName = NULL;
-  this->InstallationDirectory = NULL;
 
+  // Limited Edition Mode name
+
+  this->LimitedEditionMode = 0;
   this->LimitedEditionModeName = NULL;
   char name[1024];
   sprintf(name, "%s Limited Edition", this->Name);
   this->SetLimitedEditionModeName(name);
 
-  this->EmailFeedbackAddress = NULL;
-
   this->DisplayHelpStartingPage = 
     kwsys::SystemTools::DuplicateString("Introduction.htm");
 
-  this->InExit = 0;
-  this->DialogUp = 0;
-  this->LimitedEditionMode = 0;
+  this->InstallationDirectory = NULL;
+  this->EmailFeedbackAddress  = NULL;
 
+  this->InExit     = 0;
   this->ExitStatus = 0;
+  this->ExitAfterLoadScript = 0;
 
-  this->RegistryHelper = 0;
+  this->DialogUp = 0;
+
+  this->SaveWindowGeometry = 1;
+
+  this->RegistryHelper = NULL;
   this->RegistryLevel = 10;
 
-  this->BalloonHelpManager = 0;
+  this->BalloonHelpManager = NULL;
 
   this->CharacterEncoding = VTK_ENCODING_UNKNOWN;
   this->SetCharacterEncoding(VTK_ENCODING_ISO_8859_1);
 
-  this->AboutDialog      = 0;
-  this->AboutDialogImage = 0;
-  this->AboutRuntimeInfo = 0;
+  // About dialog
 
-  // setup tcl stuff
+  this->AboutDialog      = NULL;
+  this->AboutDialogImage = NULL;
+  this->AboutRuntimeInfo = NULL;
+
+  // Splashscreen
+
+  this->SplashScreen = NULL;
+  this->HasSplashScreen = 0;
+  this->ShowSplashScreen = 1;
+
+  // Setup Tcl
+
   this->MainInterp = Et_Interp;
   if (!this->MainInterp)
     {
@@ -133,22 +148,9 @@ vtkKWApplication::vtkKWApplication()
     return;
     }
 
-  //vtkTclGetObjectFromPointer(this->MainInterp, (void *)this, 
-  //                           vtkKWApplicationCommand);
+  // As a convenience, set the 'Application' Tcl variable to ourself
 
-  //this->Script("set Application %s",this->MainInterp->result);  
   this->Script("set Application %s",this->GetTclName());
-
-  this->SplashScreen = NULL;
-
-  this->ExitAfterLoadScript = 0;
-
-  this->HasSplashScreen = 0;
-
-  this->ApplicationExited = 0;
-
-  this->SaveWindowGeometry = 1;
-  this->ShowSplashScreen = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -217,13 +219,13 @@ void vtkKWApplication::FindInstallationDirectory()
     kwsys_stl::string directory = 
       kwsys::SystemTools::GetFilenamePath(nameofexec);
     // remove the /bin from the end
-    // What the h??? no, do not *do* that: first it breaks all the apps 
-    // relying on this method to find where the binary is installed 
-    // (hello plugins ?), second this is completely hard-coded, what
-    // about msdev path, bin/release, bin/debug, etc.!
-    // If you need to remove whatever dir, just copy the result of this
-    // method and strip it yourself.
     // directory[strlen(directory) - 4] = '\0';
+    // => do not *do* that: first it breaks all the apps 
+    // relying on this method to find where the binary is installed 
+    // (hello plugins ?), second this is a hard-coded assumption, what
+    // about msdev path, bin/release, bin/debug, etc.
+    // If you need to remove whatever dir, just copy the result of this
+    // method and strip it where needed.
     kwsys::SystemTools::ConvertToUnixSlashes(directory);
     this->SetInstallationDirectory(directory.c_str());
     }
@@ -388,7 +390,6 @@ void vtkKWApplication::Exit()
   
   this->Cleanup();
 
-  this->ApplicationExited = 1;
   return;
 }
     
@@ -587,7 +588,7 @@ void vtkKWApplication::Start()
   int i;
   
   // look at Tcl for any args
-  ;
+  
   int argc = atoi(this->Script("set argc")) + 1;
   char **argv = new char *[argc];
   argv[0] = NULL;
@@ -614,8 +615,6 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
     {
     this->DoOneTclEvent();
     }
-  
-  //Tk_MainLoop();
 }
 
 //----------------------------------------------------------------------------
@@ -841,7 +840,7 @@ void vtkKWApplication::AddAboutCopyrights(ostream &os)
 //----------------------------------------------------------------------------
 vtkKWSplashScreen *vtkKWApplication::GetSplashScreen()
 {
-  if ( !this->SplashScreen )
+  if (!this->SplashScreen)
     {
     this->SplashScreen = vtkKWSplashScreen::New();
     }
@@ -851,7 +850,7 @@ vtkKWSplashScreen *vtkKWApplication::GetSplashScreen()
 //----------------------------------------------------------------------------
 vtkKWRegistryHelper *vtkKWApplication::GetRegistryHelper()
 {
-  if ( !this->RegistryHelper )
+  if (!this->RegistryHelper)
     {
     this->RegistryHelper = vtkKWRegistryHelper::New();
     }
@@ -870,41 +869,18 @@ vtkKWBalloonHelpManager *vtkKWApplication::GetBalloonHelpManager()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::GetMessageDialogResponse(const char* dialogname)
-{
-  char buffer[REG_KEY_VALUE_SIZE_MAX];
-  int retval = 0;
-  if ( this->GetRegistryValue(3, "Dialogs", dialogname, buffer) )
-    {
-    retval = atoi(buffer);
-    }
-  return retval;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::SetMessageDialogResponse(const char* dialogname, 
-                                               int response)
-{
-  this->SetRegistryValue(3, "Dialogs", dialogname, "%d", response);
-}
-
-
-//----------------------------------------------------------------------------
 int vtkKWApplication::SetRegistryValue(int level, const char* subkey, 
-                                        const char* key, 
-                                        const char* format, ...)
+                                       const char* key, 
+                                       const char* format, ...)
 {
-  if ( this->GetRegistryLevel() < 0 ||
-       this->GetRegistryLevel() < level )
+  if (this->GetRegistryLevel() < 0 || this->GetRegistryLevel() < level)
     {
     return 0;
     }
   int res = 0;
   char buffer[REG_KEY_NAME_SIZE_MAX];
   char value[REG_KEY_VALUE_SIZE_MAX];
-  sprintf(buffer, "%s\\%s", 
-          this->GetApplication()->GetVersionName(),
-          subkey);
+  sprintf(buffer, "%s\\%s", this->GetApplication()->GetVersionName(), subkey);
   va_list var_args;
   va_start(var_args, format);
   vsprintf(value, format, var_args);
@@ -918,25 +894,22 @@ int vtkKWApplication::SetRegistryValue(int level, const char* subkey,
 
 //----------------------------------------------------------------------------
 int vtkKWApplication::GetRegistryValue(int level, const char* subkey, 
-                                        const char* key, char* value)
+                                       const char* key, char* value)
 {
-  int res = 0;
-  char buff[REG_KEY_VALUE_SIZE_MAX];
-  if ( !this->GetApplication() ||
-       this->GetRegistryLevel() < 0 ||
-       this->GetRegistryLevel() < level )
+  if (!this->GetApplication() || 
+      this->GetRegistryLevel() < 0 || this->GetRegistryLevel() < level)
     {
     return 0;
     }
+  int res = 0;
+  char buff[REG_KEY_VALUE_SIZE_MAX];
   char buffer[REG_KEY_NAME_SIZE_MAX];
-  sprintf(buffer, "%s\\%s", 
-          this->GetVersionName(),
-          subkey);
+  sprintf(buffer, "%s\\%s", this->GetVersionName(), subkey);
 
   vtkKWRegistryHelper *reg = this->GetRegistryHelper();
   reg->SetTopLevel(this->GetName());
   res = reg->ReadValue(buffer, key, buff);
-  if ( *buff && value )
+  if (*buff && value)
     {
     *value = 0;
     strcpy(value, buff);
@@ -946,19 +919,15 @@ int vtkKWApplication::GetRegistryValue(int level, const char* subkey,
 
 //----------------------------------------------------------------------------
 int vtkKWApplication::DeleteRegistryValue(int level, const char* subkey, 
-                                      const char* key)
+                                          const char* key)
 {
-  if ( this->GetRegistryLevel() < 0 ||
-       this->GetRegistryLevel() < level )
+  if (this->GetRegistryLevel() < 0 || this->GetRegistryLevel() < level)
     {
     return 0;
     }
   int res = 0;
   char buffer[REG_KEY_NAME_SIZE_MAX];
-  sprintf(buffer, "%s\\%s", 
-          this->GetVersionName(),
-          subkey);
-  
+  sprintf(buffer, "%s\\%s", this->GetVersionName(), subkey);
   vtkKWRegistryHelper *reg = this->GetRegistryHelper();
   reg->SetTopLevel(this->GetName());
   res = reg->DeleteValue(buffer, key);
@@ -967,10 +936,64 @@ int vtkKWApplication::DeleteRegistryValue(int level, const char* subkey,
 
 //----------------------------------------------------------------------------
 int vtkKWApplication::HasRegistryValue(int level, const char* subkey, 
-                                        const char* key)
+                                       const char* key)
 {
   char buffer[REG_KEY_VALUE_SIZE_MAX];
   return this->GetRegistryValue(level, subkey, key, buffer);
+}
+
+//----------------------------------------------------------------------------
+float vtkKWApplication::GetFloatRegistryValue(int level, const char* subkey, 
+                                              const char* key)
+{
+  if (this->GetRegistryLevel() < 0 || this->GetRegistryLevel() < level)
+    {
+    return 0;
+    }
+  float res = 0;
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
+  if (this->GetRegistryValue(level, subkey, key, buffer))
+    {
+    res = atof(buffer);
+    }
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::GetIntRegistryValue(int level, const char* subkey, 
+                                      const char* key)
+{
+  if (this->GetRegistryLevel() < 0 || this->GetRegistryLevel() < level)
+    {
+    return 0;
+    }
+  int res = 0;
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
+  if (this->GetRegistryValue(level, subkey, key, buffer))
+    {
+    res = atoi(buffer);
+    }
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::GetBooleanRegistryValue(
+  int level, const char* subkey, const char* key, const char* trueval)
+{
+  if (this->GetRegistryLevel() < 0 || this->GetRegistryLevel() < level)
+    {
+    return 0;
+    }
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
+  int allset = 0;
+  if (this->GetRegistryValue(level, subkey, key, buffer))
+    {
+    if (buffer && trueval && !strncmp(buffer+1, trueval+1, strlen(trueval)-1))
+      {
+      allset = 1;
+      }
+    }
+  return allset;
 }
 
 //----------------------------------------------------------------------------
@@ -998,68 +1021,6 @@ int vtkKWApplication::LoadScript(const char* filename)
 }
 
 //----------------------------------------------------------------------------
-float vtkKWApplication::GetFloatRegistryValue(int level, const char* subkey, 
-                                               const char* key)
-{
-  if ( this->GetRegistryLevel() < 0 ||
-       this->GetRegistryLevel() < level )
-    {
-    return 0;
-    }
-  float res = 0;
-  char buffer[REG_KEY_VALUE_SIZE_MAX];
-  if ( this->GetRegistryValue( 
-         level, subkey, key, buffer ) )
-    {
-    res = atof(buffer);
-    }
-  return res;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWApplication::GetIntRegistryValue(int level, const char* subkey, 
-                                      const char* key)
-{
-  if ( this->GetRegistryLevel() < 0 ||
-       this->GetRegistryLevel() < level )
-    {
-    return 0;
-    }
-
-  int res = 0;
-  char buffer[REG_KEY_VALUE_SIZE_MAX];
-  if ( this->GetRegistryValue( 
-         level, subkey, key, buffer ) )
-    {
-    res = atoi(buffer);
-    }
-  return res;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWApplication::BooleanRegistryCheck(int level, 
-                                            const char* subkey,
-                                            const char* key, 
-                                            const char* trueval)
-{
-  if ( this->GetRegistryLevel() < 0 ||
-       this->GetRegistryLevel() < level )
-    {
-    return 0;
-    }
-  char buffer[REG_KEY_VALUE_SIZE_MAX];
-  int allset = 0;
-  if ( this->GetRegistryValue(level, subkey, key, buffer) )
-    {
-    if (buffer && trueval && !strncmp(buffer+1, trueval+1, strlen(trueval)-1))
-      {
-      allset = 1;
-      }
-    }
-  return allset;
-}
-
-//----------------------------------------------------------------------------
 void vtkKWApplication::SetLimitedEditionMode(int v)
 {
   if (this->LimitedEditionMode == v)
@@ -1069,22 +1030,12 @@ void vtkKWApplication::SetLimitedEditionMode(int v)
 
   this->LimitedEditionMode = v;
 
-  this->UpdateEnableStateForAllWindows();
-
-  this->Modified();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::UpdateEnableStateForAllWindows()
-{
   for (int i = 0; i < this->GetNumberOfWindows(); i++)
     {
-    vtkKWWindow* win = this->GetNthWindow(i);
-    if (win)
-      {
-      win->UpdateEnableState();
-      }
+    this->GetNthWindow(i)->UpdateEnableState();
     }
+
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -1290,257 +1241,6 @@ void vtkKWApplication::CheckForUpdates()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::GetSystemVersion(ostream &
-#ifdef _WIN32
-                                       os
-#endif
-  )
-{
-#ifdef _WIN32
-  OSVERSIONINFOEX osvi;
-  BOOL bOsVersionInfoEx;
-
-  // Try calling GetVersionEx using the OSVERSIONINFOEX structure.
-  // If that fails, try using the OSVERSIONINFO structure.
-
-  ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
-  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-
-  if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *)&osvi)))
-    {
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if (!GetVersionEx((OSVERSIONINFO *)&osvi)) 
-      {
-      return 0;
-      }
-    }
-  
-  switch (osvi.dwPlatformId)
-    {
-    // Test for the Windows NT product family.
-
-    case VER_PLATFORM_WIN32_NT:
-      
-      // Test for the specific product family.
-
-      if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
-        {
-        os << "Microsoft Windows Server 2003 family";
-        }
-
-      if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
-        {
-        os << "Microsoft Windows XP";
-        }
-
-      if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
-        {
-        os << "Microsoft Windows 2000";
-        }
-
-      if (osvi.dwMajorVersion <= 4)
-        {
-        os << "Microsoft Windows NT";
-        }
-
-      // Test for specific product on Windows NT 4.0 SP6 and later.
-
-      if (bOsVersionInfoEx)
-        {
-        // Test for the workstation type.
-
-#if (_MSC_VER >= 1300) 
-        if (osvi.wProductType == VER_NT_WORKSTATION)
-          {
-          if (osvi.dwMajorVersion == 4)
-            {
-            os << " Workstation 4.0";
-            }
-          else if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
-            {
-            os << " Home Edition";
-            }
-          else
-            {
-            os << " Professional";
-            }
-          }
-            
-        // Test for the server type.
-
-        else if (osvi.wProductType == VER_NT_SERVER)
-          {
-          if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
-            {
-            if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-              {
-              os << " Datacenter Edition";
-              }
-            else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-              {
-              os << " Enterprise Edition";
-              }
-            else if (osvi.wSuiteMask == VER_SUITE_BLADE)
-              {
-              os << " Web Edition";
-              }
-            else
-              {
-              os << " Standard Edition";
-              }
-            }
-          
-          else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
-            {
-            if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
-              {
-              os << " Datacenter Server";
-              }
-            else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-              {
-              os << " Advanced Server";
-              }
-            else
-              {
-              os << " Server";
-              }
-            }
-
-          else  // Windows NT 4.0 
-            {
-            if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
-              {
-              os << " Server 4.0, Enterprise Edition";
-              }
-            else
-              {
-              os << " Server 4.0";
-              }
-            }
-          }
-#endif // Visual Studio 7 and up
-        }
-
-      // Test for specific product on Windows NT 4.0 SP5 and earlier
-
-      else  
-        {
-        HKEY hKey;
-        #define BUFSIZE 80
-        char szProductType[BUFSIZE];
-        DWORD dwBufLen=BUFSIZE;
-        LONG lRet;
-
-        lRet = RegOpenKeyEx(
-          HKEY_LOCAL_MACHINE,
-          "SYSTEM\\CurrentControlSet\\Control\\ProductOptions",
-          0, KEY_QUERY_VALUE, &hKey);
-        if (lRet != ERROR_SUCCESS)
-          {
-          return 0;
-          }
-
-        lRet = RegQueryValueEx(hKey, "ProductType", NULL, NULL,
-                               (LPBYTE) szProductType, &dwBufLen);
-
-        if ((lRet != ERROR_SUCCESS) || (dwBufLen > BUFSIZE))
-          {
-          return 0;
-          }
-
-        RegCloseKey(hKey);
-
-        if (lstrcmpi("WINNT", szProductType) == 0)
-          {
-          os << " Workstation";
-          }
-        if (lstrcmpi("LANMANNT", szProductType) == 0)
-          {
-          os << " Server";
-          }
-        if (lstrcmpi("SERVERNT", szProductType) == 0)
-          {
-          os << " Advanced Server";
-          }
-
-        os << " " << osvi.dwMajorVersion << "." << osvi.dwMinorVersion;
-        }
-
-      // Display service pack (if any) and build number.
-
-      if (osvi.dwMajorVersion == 4 && 
-          lstrcmpi(osvi.szCSDVersion, "Service Pack 6") == 0)
-        {
-        HKEY hKey;
-        LONG lRet;
-
-        // Test for SP6 versus SP6a.
-
-        lRet = RegOpenKeyEx(
-          HKEY_LOCAL_MACHINE,
-          "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Hotfix\\Q246009",
-          0, KEY_QUERY_VALUE, &hKey);
-
-        if (lRet == ERROR_SUCCESS)
-          {
-          os << " Service Pack 6a (Build " 
-             << (osvi.dwBuildNumber & 0xFFFF) << ")";
-          }
-        else // Windows NT 4.0 prior to SP6a
-          {
-          os << " " << osvi.szCSDVersion << " (Build " 
-             << (osvi.dwBuildNumber & 0xFFFF) << ")";
-          }
-        
-        RegCloseKey(hKey);
-        }
-      else // Windows NT 3.51 and earlier or Windows 2000 and later
-        {
-        os << " " << osvi.szCSDVersion << " (Build " 
-           << (osvi.dwBuildNumber & 0xFFFF) << ")";
-        }
-
-      break;
-
-      // Test for the Windows 95 product family.
-
-    case VER_PLATFORM_WIN32_WINDOWS:
-
-      if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0)
-        {
-        os << "Microsoft Windows 95";
-        if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B')
-          {
-          os << " OSR2";
-          }
-        }
-
-      if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
-        {
-        os << "Microsoft Windows 98";
-        if (osvi.szCSDVersion[1] == 'A')
-          {
-          os << " SE";
-          }
-        }
-
-      if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
-        {
-        os << "Microsoft Windows Millennium Edition";
-        } 
-      break;
-
-    case VER_PLATFORM_WIN32s:
-      
-      os <<  "Microsoft Win32s";
-      break;
-    }
-#endif
-
-  return 1;
-}
-
-//----------------------------------------------------------------------------
 int vtkKWApplication::CanEmailFeedback()
 {
 #ifdef _WIN32
@@ -1563,7 +1263,9 @@ void vtkKWApplication::AddEmailFeedbackBody(ostream &os)
      << this->GetReleaseName()
      << ")" << endl;
 
-  this->GetSystemVersion(os);
+  kwsys_stl::string ver = 
+    kwsys::SystemTools::GetOperatingSystemNameAndVersion();
+  os << ver.c_str();
 
 #ifdef _WIN32
   SYSTEM_INFO siSysInfo;
@@ -1673,6 +1375,18 @@ void vtkKWApplication::EmailFeedback()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWApplication::RegisterDialogUp(vtkKWWidget *)
+{
+  this->DialogUp++;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::UnRegisterDialogUp(vtkKWWidget *)
+{
+  this->DialogUp--;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1712,7 +1426,6 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "HasSplashScreen: " << (this->HasSplashScreen ? "on":"off") << endl;
   os << indent << "ShowSplashScreen: " << (this->ShowSplashScreen ? "on":"off") << endl;
-  os << indent << "ApplicationExited: " << this->ApplicationExited << endl;
   os << indent << "InstallationDirectory: " 
      << (this->InstallationDirectory ? InstallationDirectory : "None") << endl;
   os << indent << "SaveWindowGeometry: " 

@@ -23,6 +23,9 @@
 
 #include "vtkObject.h"
 
+#define REG_KEY_VALUE_SIZE_MAX 8192
+#define REG_KEY_NAME_SIZE_MAX 100
+
 class VTK_EXPORT vtkKWRegistryHelper : public vtkObject
 {
 public:

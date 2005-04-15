@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.39");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.40");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -469,7 +469,7 @@ int vtkPVServerFileDialog::Invoke()
   // Get rid of back slashes.
   this->ConvertLastPath();
 
-  this->GetApplication()->SetDialogUp(1);
+  this->GetApplication()->RegisterDialogUp(this);
   this->UpdateExtensionsMenu();
   // Side effect of UpdateExtensionsMenu is to Update.
   //this->Update();
@@ -529,7 +529,7 @@ int vtkPVServerFileDialog::Invoke()
     {
     this->Script("after 100; update");
     }
-  this->GetApplication()->SetDialogUp(0);
+  this->GetApplication()->UnRegisterDialogUp(this);
   return this->ReturnValue;
 }
 

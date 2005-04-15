@@ -21,10 +21,11 @@
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWRegistryHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.68");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.69");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -310,8 +311,8 @@ int vtkKWMessageDialog::Invoke()
 
   if ( this->DialogName )
     {
-    int res = 
-      this->GetApplication()->GetMessageDialogResponse(this->DialogName);
+    int res = this->GetMessageDialogResponseFromRegistry(
+      this->GetApplication(), this->DialogName);
     if ( res == 1 )
       {
       return 1;
@@ -371,7 +372,8 @@ int vtkKWMessageDialog::Invoke()
         ires = -1;
         }
       }
-    this->GetApplication()->SetMessageDialogResponse(this->DialogName, ires);
+    this->StoreMessageDialogResponseInRegistry(
+      this->GetApplication(), this->DialogName, ires);
     }
 
   return res;
@@ -576,6 +578,33 @@ int vtkKWMessageDialog::GetHeight()
     }
 
   return height;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMessageDialog::GetMessageDialogResponseFromRegistry(
+  vtkKWApplication *app,
+  const char* dialogname)
+{
+  char buffer[REG_KEY_VALUE_SIZE_MAX];
+  int retval = 0;
+  if (app && dialogname && 
+      app->GetRegistryValue(3, "Dialogs", dialogname, buffer))
+    {
+    retval = atoi(buffer);
+    }
+  return retval;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMessageDialog::StoreMessageDialogResponseInRegistry(
+  vtkKWApplication *app,
+  const char* dialogname, 
+  int response)
+{
+  if (app && dialogname)
+    {
+    app->SetRegistryValue(3, "Dialogs", dialogname, "%d", response);
+    }
 }
 
 //----------------------------------------------------------------------------

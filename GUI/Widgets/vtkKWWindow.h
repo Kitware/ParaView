@@ -258,33 +258,6 @@ public:
   // Call render on all views
   virtual void Render();
 
-  //BTX
-  //Description:
-  // Set or get the registry value for the application.
-  // When storing multiple arguments, separate with spaces.
-  // If the level is lower than current registry level, operation 
-  // will be successfull.
-  /*
-  int SetWindowRegistryValue(int level, const char* subkey, const char* key, 
-                        const char* format, ...);
-  int GetWindowRegistryValue(int level, const char* subkey, const char* key, 
-                        char*value);
-  int DeleteRegistryValue(int level, const char* subkey, const char* key);
-  */
-  
-  // Description:
-  // Get float registry value (zero if not found).
-  // If the level is lower than current registry level, operation 
-  // will be successfull.
-  float GetFloatRegistryValue(int level, const char* subkey, 
-                               const char* key);
-  int   GetIntRegistryValue(int level, const char* subkey, const char* key);
-
-  // Description:
-  // Perform a boolean check of the value in registry. If the value 
-  // at the key is trueval, then return true, otherwise return false.
-  int BooleanRegistryCheck(int level, const char* subkey, const char* key, const char* trueval);
-  
   // Description:
   // Save or retrieve color from registry. If color does not 
   // exist, it will retrieve -1, -1 ,-1 and return 0 (1 if success).

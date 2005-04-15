@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.27");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.28");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -229,7 +229,7 @@ void vtkKWTclInteractor::Evaluate()
   this->Script("catch {eval [list %s]} _tmp_err",  
                this->CommandEntry->GetValue());
 
-  if ( this->GetApplication()->GetApplicationExited() )
+  if (this->GetApplication()->GetInExit())
     {
     this->UnRegister(this);
     return;

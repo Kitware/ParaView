@@ -139,7 +139,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.371");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.372");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -793,7 +793,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   if (app->HasRegistryValue(2, "RunTime", "SourcesBrowser"))
     {
-    if (app->BooleanRegistryCheck(2, "RunTime", 
+    if (app->GetBooleanRegistryValue(2, "RunTime", 
                                                  "SourcesBrowser",
                                                  "SelectionWindow"))
       {
@@ -969,7 +969,8 @@ void vtkPVRenderView::CreateViewProperties()
       pvapp->GetRegistryValue(2, "RunTime", "UseParallelProjection", 0))
     {
     this->ParallelProjectionCheck->SetState(
-      pvwindow->GetIntRegistryValue(2, "RunTime", "UseParallelProjection"));
+      pvwindow->GetApplication()->GetIntRegistryValue(
+        2, "RunTime", "UseParallelProjection"));
     this->ParallelProjectionCallback();
     }
   else
@@ -992,7 +993,8 @@ void vtkPVRenderView::CreateViewProperties()
       pvapp->GetRegistryValue(2, "RunTime", "UseStrips", 0))
     {
     this->TriangleStripsCheck->SetState(
-      pvwindow->GetIntRegistryValue(2, "RunTime", "UseStrips"));
+      pvwindow->GetApplication()->GetIntRegistryValue(
+        2, "RunTime", "UseStrips"));
     }
   else
     {
@@ -1013,7 +1015,8 @@ void vtkPVRenderView::CreateViewProperties()
       pvapp->GetRegistryValue(2, "RunTime", "UseImmediateMode", 0))
     {
     this->ImmediateModeCheck->SetState(
-      pvwindow->GetIntRegistryValue(2, "RunTime", "UseImmediateMode"));
+      pvwindow->GetApplication()->GetIntRegistryValue(
+        2, "RunTime", "UseImmediateMode"));
     }
   else
     {
@@ -1086,7 +1089,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->Display3DWidgets->SetCommand(this, "Display3DWidgetsCallback");
 
   if (!this->GetApplication()->GetRegistryValue(2,"RunTime","Display3DWidgets",0)||
-    this->GetPVWindow()->GetIntRegistryValue(2,"RunTime","Display3DWidgets"))
+    this->GetPVWindow()->GetApplication()->GetIntRegistryValue(
+      2,"RunTime","Display3DWidgets"))
     {
     this->SetDisplay3DWidgets(1);
     }
@@ -1378,7 +1382,8 @@ void vtkPVRenderView::CreateViewProperties()
       pvapp->GetRegistryValue(2, "RunTime", "OrientationAxesVisibility", 0))
     {
     this->OrientationAxesCheck->SetState(
-      pvwindow->GetIntRegistryValue(2, "RunTime", "OrientationAxesVisibility"));
+      pvwindow->GetApplication()->GetIntRegistryValue(
+        2, "RunTime", "OrientationAxesVisibility"));
     }
   else
     {
@@ -1400,7 +1405,8 @@ void vtkPVRenderView::CreateViewProperties()
       pvapp->GetRegistryValue(2, "RunTime", "OrientationAxesInteractivity", 0))
     {
     this->OrientationAxesInteractiveCheck->SetState(
-      pvwindow->GetIntRegistryValue(2, "RunTime", "OrientationAxesInteractivity"));
+      pvwindow->GetApplication()->GetIntRegistryValue(
+        2, "RunTime", "OrientationAxesInteractivity"));
     }
   else
     {

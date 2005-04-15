@@ -55,6 +55,7 @@
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWIcon.h"
 #include "vtkKWText.h"
+#include "vtkKWTclInteractor.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -64,7 +65,6 @@
 #include "vtkKWWidget.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWWindow.h"
-#include "vtkKWTclInteractor.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWDragAndDropTargetSet.h"
@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.21");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.22");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------

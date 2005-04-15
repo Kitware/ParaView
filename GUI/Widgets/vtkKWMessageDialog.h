@@ -159,6 +159,19 @@ public:
   virtual int GetWidth();
   virtual int GetHeight();
 
+  // Description:
+  // Convenience static method to store/retrieve a message dialog response
+  // for a given application in/from the registry.
+  // This can be used to prevent the user from answering the same question
+  // again and again (for ex: "Are you sure you want to exit the application").
+  // 'dialogname' is the name of a dialog (most likely its DialogName ivar).
+  // The 'response' is arbitrary but most likely the value returned by a
+  // call to Invoke() on the dialog.
+  static int GetMessageDialogResponseFromRegistry(
+    vtkKWApplication *app, const char *dialogname);
+  static void StoreMessageDialogResponseInRegistry(
+    vtkKWApplication *app, const char *dialogname, int response);
+
 protected:
   vtkKWMessageDialog();
   ~vtkKWMessageDialog();

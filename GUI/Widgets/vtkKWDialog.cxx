@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.43");
+vtkCxxRevisionMacro(vtkKWDialog, "1.44");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -53,7 +53,7 @@ int vtkKWDialog::Invoke()
 {
   this->Done = 0;
 
-  this->GetApplication()->SetDialogUp(1);
+  this->GetApplication()->RegisterDialogUp(this);
 
   int width, height;
 
@@ -134,7 +134,7 @@ int vtkKWDialog::Invoke()
     {
     this->ReleaseGrab();
     }
-  this->GetApplication()->SetDialogUp(0);
+  this->GetApplication()->UnRegisterDialogUp(this);
   return (this->Done-1);
 }
 

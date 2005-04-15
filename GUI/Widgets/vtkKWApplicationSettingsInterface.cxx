@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.28");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.29");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -447,8 +447,8 @@ void vtkKWApplicationSettingsInterface::Update()
   if (this->ConfirmExitCheckButton)
     {
     this->ConfirmExitCheckButton->SetState(
-      this->GetApplication()->GetMessageDialogResponse(VTK_KW_EXIT_DIALOG_NAME)
-      ? 0 : 1);
+      vtkKWMessageDialog::GetMessageDialogResponseFromRegistry(
+        this->GetApplication(), VTK_KW_EXIT_DIALOG_NAME) ? 0 : 1);
     }
 
   // Interface settings : Save application geometry on exit ?
@@ -577,7 +577,8 @@ void vtkKWApplicationSettingsInterface::ConfirmExitCallback()
     return;
     }
 
-  this->GetApplication()->SetMessageDialogResponse(
+  vtkKWMessageDialog::StoreMessageDialogResponseInRegistry(
+    this->GetApplication(),
     VTK_KW_EXIT_DIALOG_NAME, 
     this->ConfirmExitCheckButton->GetState() ? 0 : 1);
 }
