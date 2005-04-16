@@ -56,7 +56,7 @@ EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.196");
+vtkCxxRevisionMacro(vtkKWApplication, "1.197");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1401,6 +1401,10 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetPrettyName() << endl;
   os << indent << "EmailFeedbackAddress: "
      << (this->GetEmailFeedbackAddress() ? this->GetEmailFeedbackAddress() :
+         "(none)")
+     << endl;
+  os << indent << "DisplayHelpStartingPage: "
+     << (this->DisplayHelpStartingPage ? this->DisplayHelpStartingPage :
          "(none)")
      << endl;
   os << indent << "DialogUp: " << this->GetDialogUp() << endl;
