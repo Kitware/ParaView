@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.17");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.18");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -629,6 +629,7 @@ void vtkPVSourceNotebook::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "AutoAccept: " << this->AutoAccept << endl;
+  os << indent << "CloneInitializeLock: " << this->CloneInitializeLock << endl;
   os << indent << "AcceptButtonRed: " << this->AcceptButtonRed << endl;
   os << indent << "DisplayGUI: " << this->DisplayGUI << endl;
   os << indent << "MainParameterFrame: " << this->MainParameterFrame << endl;
