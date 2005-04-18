@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.685");
+vtkCxxRevisionMacro(vtkPVWindow, "1.686");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2974,7 +2974,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
       {
       *file << "set inBatch 0" << endl;
       *file << "for {set i  1} {$i < [expr $argc]} {incr i} {" << endl;
-      *file << "  if {[lindex $argv $i] == \"-BV\"} {" << endl;
+      *file << "  if {[lindex $argv $i] == \"-BT\"} {" << endl;
       *file << "    set inBatch 1" << endl;
       *file << "  }" << endl;
       *file << "}" << endl;
@@ -2982,6 +2982,11 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 //      *file << "  set xsize [[$Ren1 GetProperty Size] GetElement 0]" << endl;
 //      *file << "  set ysize [[$Ren1 GetProperty Size] GetElement 1]" << endl;
 //      *file << "  $Ren1 TileWindows [expr $xsize+30] [expr $ysize+30] 2" << endl;
+      *file << "  [$Ren1 GetProperty RenderWindowSize] "
+        " SetElement 0 300" << endl;
+      *file << "  [$Ren1 GetProperty RenderWindowSize] "
+        " SetElement 1 300" << endl;
+      *file << "  $Ren1 UpdateVTKObjects" << endl;
       *file << "}" << endl;
       *file << "$Ren1 StillRender" << endl;
       *file 
