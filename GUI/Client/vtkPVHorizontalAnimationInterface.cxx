@@ -33,7 +33,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.15");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.16");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -129,7 +129,7 @@ void vtkPVHorizontalAnimationInterface::AddAnimationCueTree(
     vtkErrorMacro("Child has already been created.");
     return;
     }
-  this->ParentTree->AddChild(pvCueTree);
+  this->ParentTree->AddChildCue(pvCueTree);
   //this->Script("update");
   //this->ResizeCallback();
 }
@@ -178,7 +178,7 @@ void vtkPVHorizontalAnimationInterface::RemoveAnimationCueTree(
 {
   this->Script("bind %s <<ResizeEvent>> {}",
     pvCueTree->GetWidgetName());
-  this->ParentTree->RemoveChild(pvCueTree);
+  this->ParentTree->RemoveChildCue(pvCueTree);
 //  this->Script("update");
 //  this->ResizeCallback();
 }

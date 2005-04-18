@@ -49,11 +49,11 @@ public:
   // Currently, child can be added only after the parent has been created
   // and the child must not have been created. This method appropriately
   // set the child parent and creates and packs it.
-  void AddChild(vtkPVAnimationCue* child);
+  void AddChildCue(vtkPVAnimationCue* child);
 
   // Description:
   // Remove a child cue.
-  void RemoveChild(vtkPVAnimationCue* child);
+  void RemoveChildCue(vtkPVAnimationCue* child);
 
   // Description:
   // Returns the first child with the given name. Method present for

@@ -63,7 +63,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.33");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.34");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -324,7 +324,7 @@ void vtkPVAnimationManager::ValidateOldSources()
       vtkPVAnimationCueTree* pvParent = this->GetAnimationCueTreeForSource(pvSource);
       if (pvParent)
         {
-        pvParent->RemoveChild(iter->second);
+        pvParent->RemoveChildCue(iter->second);
         this->Internals->PVAnimationCues.erase(iter);
         deleted = 1;
         }
@@ -444,7 +444,7 @@ void vtkPVAnimationManager::AddNewSources()
         // GetAnimationCueTreeForSource can work properly.
         pvCue->SetPVSource(pvSource);
         pvCue->SetName(proxyname);
-        pvParentTree->AddChild(pvCue);
+        pvParentTree->AddChildCue(pvCue);
         }
       }
     else
@@ -472,7 +472,7 @@ void vtkPVAnimationManager::AddNewSources()
       }
     else
       {// Cue has no animatable properties, remove it all together.
-      pvParentTree->RemoveChild(pvCue);
+      pvParentTree->RemoveChildCue(pvCue);
       }
     delete [] listname;
     delete [] sourcename;
@@ -530,7 +530,7 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
       cueTree->SetName(cueTreeName.str());
       cueTree->SetPVSource(pvSource);
       cueTreeName.rdbuf()->freeze(0);
-      pvCueTree->AddChild(cueTree);
+      pvCueTree->AddChildCue(cueTree);
       this->InitializeObservers(cueTree);
       cueTree->Delete();
        
@@ -630,7 +630,7 @@ void vtkPVAnimationManager::SetupCue(vtkPVSource* pvSource, vtkPVAnimationCueTre
   cue->SetAnimationScene(this->AnimationScene);
   cue->SetLabelText(label);
   cue->SetPVSource(pvSource);
-  parent->AddChild(cue); //class create internally.
+  parent->AddChildCue(cue); //class create internally.
   cue->Delete();
   cue->SetAnimatedProxy(proxy);
   cue->SetAnimatedPropertyName(propertyname);

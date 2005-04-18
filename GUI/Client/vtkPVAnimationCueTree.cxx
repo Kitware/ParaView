@@ -28,7 +28,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.12");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.13");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -110,7 +110,7 @@ void vtkPVAnimationCueTree::Create(vtkKWApplication* app, const char* args)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCueTree::AddChild(vtkPVAnimationCue* child)
+void vtkPVAnimationCueTree::AddChildCue(vtkPVAnimationCue* child)
 {
   if (!this->IsCreated())
     {
@@ -149,7 +149,7 @@ void vtkPVAnimationCueTree::AddChild(vtkPVAnimationCue* child)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCueTree::RemoveChild(vtkPVAnimationCue* child)
+void vtkPVAnimationCueTree::RemoveChildCue(vtkPVAnimationCue* child)
 {
   if (!this->Children->IsItemPresent(child))
     {

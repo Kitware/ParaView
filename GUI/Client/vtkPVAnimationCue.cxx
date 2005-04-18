@@ -76,7 +76,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.21");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.22");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -156,7 +156,7 @@ vtkPVAnimationCue::vtkPVAnimationCue()
 vtkPVAnimationCue::~vtkPVAnimationCue()
 {
   this->SetPVSource(NULL);
-  this->UnregisterProxies();
+  //  this->UnregisterProxies();
 
   this->Observer->SetAnimationCue(NULL);
   this->Observer->Delete();
