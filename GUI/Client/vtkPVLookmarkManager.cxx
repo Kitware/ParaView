@@ -51,7 +51,6 @@
 #include "vtkKWOptionMenu.h"
 #include "vtkKWLookmark.h"
 #include "vtkKWLookmarkFolder.h"
-#include "vtkKWWidgetCollection.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWIcon.h"
 #include "vtkKWText.h"
@@ -111,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.22");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.23");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -955,8 +954,6 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetSetAndCallbacks()
 //---------------------------------------------------------------------------
 int vtkPVLookmarkManager::IsWidgetInsideFolder(vtkKWWidget *parent, vtkKWWidget *lmkItem)
 {
-  vtkKWWidgetCollection *col;
-  vtkKWWidget *wid;
   int ret = 0;
 
   if(parent==lmkItem)
@@ -965,22 +962,14 @@ int vtkPVLookmarkManager::IsWidgetInsideFolder(vtkKWWidget *parent, vtkKWWidget 
     }
   else
     {
-    col = parent->GetChildren();
-    if(col)
+    int nb_children = parent->GetNumberOfChildren();
+    for (int i = 0; i < nb_children; i++)
       {
-      vtkCollectionIterator *it = col->NewIterator();
-      it->InitTraversal();
-      while ( !it->IsDoneWithTraversal() )
+      if (this->IsWidgetInsideFolder(parent->GetNthChild(i), lmkItem))
         {
-        wid = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-        if(this->IsWidgetInsideFolder(wid,lmkItem))
-          {
-          ret = 1;
-          break;
-          }
-        it->GoToNextItem();
+        ret = 1;
+        break;
         }
-      it->Delete();
       }
     }
   return ret;
@@ -1168,18 +1157,15 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     this->LmkFolderWidgets->InsertItem(loc,newLmkFolder);
 
     //loop through all children to this container's LabeledFrame
-    vtkKWWidgetCollection *col = lmkFolder->GetLabelFrame()->GetFrame()->GetFrame()->GetChildren();
 
-    vtkCollectionIterator *it = col->NewIterator();
-    it->InitTraversal();
-    vtkKWWidget *wid;
-    while ( !it->IsDoneWithTraversal() )
+    vtkKWWidget *parent = lmkFolder->GetLabelFrame()->GetFrame()->GetFrame();
+    int nb_children = parent->GetNumberOfChildren();
+    for (int i = 0; i < nb_children; i++)
       {
-      wid = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-      this->MoveCheckedChildren(wid,newLmkFolder->GetLabelFrame()->GetFrame()->GetFrame());
-      it->GoToNextItem();
+      this->MoveCheckedChildren(
+        parent->GetNthChild(i), 
+        newLmkFolder->GetLabelFrame()->GetFrame()->GetFrame());
       }
-    it->Delete();
 
 // need to delete the source folder
     this->RemoveItemAsDragAndDropTarget(lmkFolder);
@@ -2088,15 +2074,9 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
 
 //  this->CreateNestedXMLElements(folder->GetLabelFrame()->GetFrame()->GetFrame(),root);
 
-  vtkKWWidgetCollection *col;
-
-  col = folder->GetLabelFrame()->GetFrame()->GetFrame()->GetChildren();
-
-  vtkKWWidget *child;
   vtkKWLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
 
-  vtkCollectionIterator *it = col->NewIterator();
   int nextLmkItemIndex=0;
   int counter=0;
 
@@ -2107,12 +2087,14 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
   // the two loops are necessary because the user can change location of lmk items and
   // the vtkKWWidgetCollection of children is ordered by when the item was created, not reordered each time its packed (moved)
 
-  while(counter<col->GetNumberOfItems())
+  vtkKWWidget *parent = folder->GetLabelFrame()->GetFrame()->GetFrame();
+
+  while (counter < parent->GetNumberOfChildren())
     {
-    it->InitTraversal();
-    while ( !it->IsDoneWithTraversal() )
+    int nb_children = parent->GetNumberOfChildren();
+    for (int i = 0; i < nb_children; i++)
       {
-      child = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
+      vtkKWWidget *child = parent->GetNthChild(i);
       if(child->IsA("vtkKWLookmark"))
         {
         lookmarkWidget = vtkKWLookmark::SafeDownCast(child);
@@ -2139,11 +2121,9 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
             }
           }
         }
-      it->GoToNextItem();
       }
     counter++;
     }
-  it->Delete();
 
   infile->close();
   outfile = new ofstream(filename,ios::trunc);
@@ -2259,7 +2239,6 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
   if(lmkItem->IsA("vtkKWLookmarkFolder") || lmkItem==this->LmkScrollFrame->GetFrame())
     {
     vtkXMLDataElement *folder = NULL;
-    vtkKWWidgetCollection *col;
     if(lmkItem->IsA("vtkKWLookmarkFolder"))
       {
       vtkKWLookmarkFolder *oldLmkFolder = vtkKWLookmarkFolder::SafeDownCast(lmkItem);
@@ -2269,13 +2248,10 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
         folder->SetName("LmkFolder");
         folder->SetAttribute("Name",oldLmkFolder->GetLabelFrame()->GetLabel()->GetText());
         dest->AddNestedElement(folder);
-        col = oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()->GetChildren();
 
-        vtkKWWidget *child;
         vtkKWLookmark *lookmarkWidget;
         vtkKWLookmarkFolder *lmkFolderWidget;
 
-        vtkCollectionIterator *it = col->NewIterator();
         int nextLmkItemIndex=0;
         int counter=0;
 
@@ -2286,12 +2262,15 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
         // the two loops are necessary because the user can change location of lmk items and
         // the vtkKWWidgetCollection of children is ordered by when the item was created, not reordered each time its packed (moved)
 
-        while(counter<col->GetNumberOfItems())
+        vtkKWWidget *parent = 
+          oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame();
+        
+        while (counter < parent->GetNumberOfChildren())
           {
-          it->InitTraversal();
-          while ( !it->IsDoneWithTraversal() )
+          int nb_children = parent->GetNumberOfChildren();
+          for (int i = 0; i < nb_children; i++)
             {
-            child = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
+            vtkKWWidget *child = parent->GetNthChild(i);
             if(child->IsA("vtkKWLookmark"))
               {
               lookmarkWidget = vtkKWLookmark::SafeDownCast(child);
@@ -2318,12 +2297,9 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
                   }
                 }
               }
-            it->GoToNextItem();
             }
           counter++;
           }
-        it->Delete();
-
         folder->Delete();
         }
       }
@@ -2331,13 +2307,12 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
       {
       // destination xmldataelement stays the same
       folder = dest;
-      col = lmkItem->GetChildren();
 
-      vtkKWWidget *child;
+      vtkKWWidget *parent = lmkItem;
+      
       vtkKWLookmark *lookmarkWidget;
       vtkKWLookmarkFolder *lmkFolderWidget;
 
-      vtkCollectionIterator *it = col->NewIterator();
       int nextLmkItemIndex=0;
       int counter=0;
 
@@ -2348,12 +2323,12 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
       // the two loops are necessary because the user can change location of lmk items and
       // the vtkKWWidgetCollection of children is ordered by when the item was created, not reordered each time its packed (moved)
 
-      while(counter<col->GetNumberOfItems())
+      while (counter < parent->GetNumberOfChildren())
         {
-        it->InitTraversal();
-        while ( !it->IsDoneWithTraversal() )
+        int nb_children = parent->GetNumberOfChildren();
+        for (int i = 0; i < nb_children; i++)
           {
-          child = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
+          vtkKWWidget *child = parent->GetNthChild(i);
           if(child->IsA("vtkKWLookmark"))
             {
             lookmarkWidget = vtkKWLookmark::SafeDownCast(child);
@@ -2380,11 +2355,9 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
                 }
               }
             }
-          it->GoToNextItem();
           }
         counter++;
         }
-      it->Delete();
       }
     }
   else if(lmkItem->IsA("vtkKWLookmark"))
@@ -2440,18 +2413,13 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
     {
     // if the widget is not a lmk item, recurse with its children widgets but the same destination element as args
 
-    vtkKWWidgetCollection *col = lmkItem->GetChildren();
-    vtkKWWidget *widget;
-
-    vtkCollectionIterator *it = col->NewIterator();
-    it->InitTraversal();
-    while ( !it->IsDoneWithTraversal() )
+    vtkKWWidget *parent = lmkItem;
+    int nb_children = parent->GetNumberOfChildren();
+    for (int i = 0; i < nb_children; i++)
       {
-      widget = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-      this->CreateNestedXMLElements(widget,dest);
-      it->GoToNextItem();
+      vtkKWWidget *widget = parent->GetNthChild(i);
+      this->CreateNestedXMLElements(widget, dest);
       }
-    it->Delete();
     }
 //  writer->Delete();
 }
@@ -2728,17 +2696,14 @@ void vtkPVLookmarkManager::RemoveItemAsDragAndDropTarget(vtkKWWidget *target)
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::DecrementHigherSiblingLmkItemLocationIndices(vtkKWWidget *parent, int locationOfLmkItemBeingRemoved)
 {
-  vtkKWWidgetCollection *col = parent->GetChildren();
-  vtkKWWidget *sibling;
   vtkKWLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
   int siblingLocation=0;
 
-  vtkCollectionIterator *it = col->NewIterator();
-  it->InitTraversal();
-  while ( !it->IsDoneWithTraversal() )
+  int nb_children = parent->GetNumberOfChildren();
+  for (int i = 0; i < nb_children; i++)
     {
-    sibling = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
+    vtkKWWidget *sibling = parent->GetNthChild(i);
     if(sibling->IsA("vtkKWLookmark"))
       {
       lookmarkWidget = vtkKWLookmark::SafeDownCast(sibling);
@@ -2759,26 +2724,20 @@ void vtkPVLookmarkManager::DecrementHigherSiblingLmkItemLocationIndices(vtkKWWid
           lmkFolderWidget->SetLocation(siblingLocation-1);
         }
       }
-    it->GoToNextItem();
     }
-
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::IncrementHigherSiblingLmkItemLocationIndices(vtkKWWidget *parent, int locationOfLmkItemBeingInserted)
 {
-  vtkKWWidgetCollection *col = parent->GetChildren();
-  vtkKWWidget *sibling;
   vtkKWLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
   int siblingLocation=0;
 
-  vtkCollectionIterator *it = col->NewIterator();
-  it->InitTraversal();
-  while ( !it->IsDoneWithTraversal() )
+  int nb_children = parent->GetNumberOfChildren();
+  for (int i = 0; i < nb_children; i++)
     {
-    sibling = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
+    vtkKWWidget *sibling = parent->GetNthChild(i);
     if(sibling->IsA("vtkKWLookmark"))
       {
       lookmarkWidget = vtkKWLookmark::SafeDownCast(sibling);
@@ -2793,18 +2752,13 @@ void vtkPVLookmarkManager::IncrementHigherSiblingLmkItemLocationIndices(vtkKWWid
       if(siblingLocation>=locationOfLmkItemBeingInserted)
         lmkFolderWidget->SetLocation(siblingLocation+1);
       }
-    it->GoToNextItem();
     }
-
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::PackChildrenBasedOnLocation(vtkKWWidget *parent)
 {
   parent->UnpackChildren();
-  vtkKWWidgetCollection *col = parent->GetChildren();
-  vtkKWWidget *child;
   vtkKWLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
 
@@ -2823,15 +2777,15 @@ void vtkPVLookmarkManager::PackChildrenBasedOnLocation(vtkKWWidget *parent)
                   this->TopDragAndDropTarget->GetFrame()->GetWidgetName());
     }
 
-  vtkCollectionIterator *it = col->NewIterator();
   int nextLmkItemIndex=0;
   int counter=0;
-  while(counter<col->GetNumberOfItems())
+
+  while (counter < parent->GetNumberOfChildren())
     {
-    it->InitTraversal();
-    while ( !it->IsDoneWithTraversal() )
+    int nb_children = parent->GetNumberOfChildren();
+    for (int i = 0; i < nb_children; i++)
       {
-      child = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
+      vtkKWWidget *child = parent->GetNthChild(i);
       if(child->IsA("vtkKWLookmark"))
         {
         lookmarkWidget = vtkKWLookmark::SafeDownCast(child);
@@ -2860,12 +2814,9 @@ void vtkPVLookmarkManager::PackChildrenBasedOnLocation(vtkKWWidget *parent)
             }
           }
         }
-
-      it->GoToNextItem();
       }
     counter++;
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -3822,13 +3773,11 @@ int vtkPVLookmarkManager::GetNumberOfChildLmkItems(vtkKWWidget *parentFrame)
   int location = 0;
   vtkKWLookmark *lmkWidget;
   vtkKWLookmarkFolder *lmkFolder;
-  vtkKWWidgetCollection *col = parentFrame->GetChildren();
-  vtkKWWidget *widget;
-  vtkCollectionIterator *it = col->NewIterator();
-  it->InitTraversal();
-  while ( !it->IsDoneWithTraversal() )
+
+  int nb_children = parentFrame->GetNumberOfChildren();
+  for (int i = 0; i < nb_children; i++)
     {
-    widget = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
+    vtkKWWidget *widget = parentFrame->GetNthChild(i);
     if(widget->IsA("vtkKWLookmark"))
       {
       lmkWidget = vtkKWLookmark::SafeDownCast(widget);
@@ -3841,18 +3790,13 @@ int vtkPVLookmarkManager::GetNumberOfChildLmkItems(vtkKWWidget *parentFrame)
       if(this->LmkFolderWidgets->IsItemPresent(lmkFolder))
         location++;
       }
-    it->GoToNextItem();
     }
-  it->Delete();
   return location;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::DestroyUnusedLmkWidgets(vtkKWWidget *lmkItem)
 {
-  vtkKWWidget *widget;
-  vtkKWWidgetCollection *col;
-
   if(lmkItem->IsA("vtkKWLookmarkFolder"))
     {
     vtkKWLookmarkFolder *oldLmkFolder = vtkKWLookmarkFolder::SafeDownCast(lmkItem);
@@ -3867,32 +3811,23 @@ void vtkPVLookmarkManager::DestroyUnusedLmkWidgets(vtkKWWidget *lmkItem)
       }
     else
       {
-      col = oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()->GetChildren();
-
-      vtkCollectionIterator *it = col->NewIterator();
-      it->InitTraversal();
-      while ( !it->IsDoneWithTraversal() )
+      vtkKWWidget *parent = 
+        oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame();
+      int nb_children = parent->GetNumberOfChildren();
+      for (int i = 0; i < nb_children; i++)
         {
-        widget = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-        this->DestroyUnusedLmkWidgets(widget);
-        it->GoToNextItem();
+        this->DestroyUnusedLmkWidgets(parent->GetNthChild(i));
         }
-      it->Delete();
       }
     }
   else
     {
-    col = lmkItem->GetChildren();
-
-    vtkCollectionIterator *it = col->NewIterator();
-    it->InitTraversal();
-    while ( !it->IsDoneWithTraversal() )
+    vtkKWWidget *parent = lmkItem;
+    int nb_children = parent->GetNumberOfChildren();
+    for (int i = 0; i < nb_children; i++)
       {
-      widget = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-      this->DestroyUnusedLmkWidgets(widget);
-      it->GoToNextItem();
+      this->DestroyUnusedLmkWidgets(parent->GetNthChild(i));
       }
-    it->Delete();
     }
 }
 
@@ -3901,8 +3836,6 @@ void vtkPVLookmarkManager::DestroyUnusedLmkWidgets(vtkKWWidget *lmkItem)
 void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWWidget *packingFrame)
 {
   vtkIdType loc;
-  vtkKWWidget *widget;
-  vtkKWWidgetCollection *col;
 
   // Beginning at the Lookmark Manager's internal frame, we are going through each of its nested widgets (nestedWidget)
 
@@ -3923,17 +3856,16 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
       this->LmkFolderWidgets->InsertItem(loc,newLmkFolder);
 
       //loop through all children to this container's LabeledFrame
-      col = oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()->GetChildren();
 
-      vtkCollectionIterator *it = col->NewIterator();
-      it->InitTraversal();
-      while ( !it->IsDoneWithTraversal() )
+      vtkKWWidget *parent = 
+        oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame();
+      int nb_children = parent->GetNumberOfChildren();
+      for (int i = 0; i < nb_children; i++)
         {
-        widget = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-        this->MoveCheckedChildren(widget,newLmkFolder->GetLabelFrame()->GetFrame()->GetFrame());
-        it->GoToNextItem();
+        this->MoveCheckedChildren(
+          parent->GetNthChild(i),
+          newLmkFolder->GetLabelFrame()->GetFrame()->GetFrame());
         }
-      it->Delete();
 // deleting old folder
       this->RemoveItemAsDragAndDropTarget(oldLmkFolder);
       this->Script("destroy %s", oldLmkFolder->GetWidgetName());
@@ -3982,17 +3914,13 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
     }
   else
     {
-    col = nestedWidget->GetChildren();
-
-    vtkCollectionIterator *it = col->NewIterator();
-    it->InitTraversal();
-    while ( !it->IsDoneWithTraversal() )
+    vtkKWWidget *parent = nestedWidget;
+    int nb_children = parent->GetNumberOfChildren();
+    for (int i = 0; i < nb_children; i++)
       {
-      widget = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-      this->MoveCheckedChildren(widget,packingFrame);
-      it->GoToNextItem();
+      this->MoveCheckedChildren(
+        parent->GetNthChild(i), packingFrame);
       }
-    it->Delete();
     }
 }
 
@@ -4001,7 +3929,6 @@ void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget,
                                                  int forceRemoveFlag)
 {
   vtkIdType loc;
-  vtkKWWidget *widget;
 
   // Beginning at the Lookmark Manager's internal frame, we are going through
   // each of its nested widgets (nestedWidget)
@@ -4021,17 +3948,15 @@ void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget,
         this->LmkFolderWidgets->RemoveItem(loc);
 
         //loop through all children to this container's LabeledFrame
-        vtkCollectionIterator *it = 
-          oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()
-          ->GetChildren()->NewIterator();
-        it->InitTraversal();
-        while ( !it->IsDoneWithTraversal() )
+
+        vtkKWWidget *parent = 
+          oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame();
+        int nb_children = parent->GetNumberOfChildren();
+        for (int i = 0; i < nb_children; i++)
           {
-          widget = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-          this->RemoveCheckedChildren(widget,1);
-          it->GoToNextItem();
+          this->RemoveCheckedChildren(
+            parent->GetNthChild(i), 1);
           }
-        it->Delete();
 
         this->RemoveItemAsDragAndDropTarget(oldLmkFolder);
         this->Script("destroy %s",oldLmkFolder->GetWidgetName());
@@ -4040,19 +3965,14 @@ void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget,
         }
       else
         {
-        //loop through all children to this container's LabeledFrame
-        vtkCollectionIterator *it = 
-          oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame()
-          ->GetChildren()->NewIterator();
-        it->InitTraversal();
-        while ( !it->IsDoneWithTraversal() )
+        vtkKWWidget *parent = 
+          oldLmkFolder->GetLabelFrame()->GetFrame()->GetFrame();
+        int nb_children = parent->GetNumberOfChildren();
+        for (int i = 0; i < nb_children; i++)
           {
-          widget = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-          this->RemoveCheckedChildren(widget,0);
-          it->GoToNextItem();
+          this->RemoveCheckedChildren(
+            parent->GetNthChild(i), 0);
           }
-        it->Delete();
-
         }
       }
     }
@@ -4083,15 +4003,13 @@ void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget,
     }
   else
     {
-    vtkCollectionIterator *it = nestedWidget->GetChildren()->NewIterator();
-    it->InitTraversal();
-    while ( !it->IsDoneWithTraversal() )
+    vtkKWWidget *parent = nestedWidget;
+    int nb_children = parent->GetNumberOfChildren();
+    for (int i = 0; i < nb_children; i++)
       {
-      widget = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-      this->RemoveCheckedChildren(widget,forceRemoveFlag);
-      it->GoToNextItem();
+      this->RemoveCheckedChildren(
+        parent->GetNthChild(i), forceRemoveFlag);
       }
-    it->Delete();
     }
 }
 

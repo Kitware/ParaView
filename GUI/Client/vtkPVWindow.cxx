@@ -92,7 +92,6 @@
 #include "vtkSMAxesProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkKWWidgetCollection.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkPVTraceHelper.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -137,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.686");
+vtkCxxRevisionMacro(vtkPVWindow, "1.687");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -442,32 +441,14 @@ vtkPVWindow::~vtkPVWindow()
 //----------------------------------------------------------------------------
 void vtkPVWindow::UnRegister(vtkObjectBase *o)
 {
-  if (!this->DeletingChildren)
+  int nb_children = this->GetNumberOfChildren();
+  if (nb_children && 
+      this->ReferenceCount == nb_children + 1 + 1 &&
+      this->MainView != o &&
+      !this->HasChild((vtkKWWidget*)(o)))
     {
-    // delete the children if we are about to be deleted
-    if (this->ReferenceCount == 
-        (1 + 1 +
-         (this->HasChildren() ? this->GetChildren()->GetNumberOfItems() : 0)))
-      {
-      if (!(this->MainView == o ||
-            (this->HasChildren() && 
-             this->GetChildren()->IsItemPresent((vtkKWWidget *)o))))
-        {
-        vtkKWWidget *child;
-        this->DeletingChildren = 1;
-        if (this->HasChildren())
-          {
-          vtkKWWidgetCollection *children = this->GetChildren();
-          children->InitTraversal();
-          while ((child = children->GetNextKWWidget()))
-            {
-            child->SetParent(NULL);
-            }
-          }
-        this->MainView->SetParentWindow(0);
-        this->DeletingChildren = 0;
-        }
-      }
+    this->RemoveAllChildren();
+    this->MainView->SetParentWindow(NULL);
     }
   
   this->vtkKWWidget::UnRegister(o);

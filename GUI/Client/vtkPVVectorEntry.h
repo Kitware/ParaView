@@ -29,6 +29,7 @@ class vtkKWEntry;
 class vtkKWApplication;
 class vtkKWLabel;
 class vtkKWWidgetCollection;
+class vtkPVVectorEntryInternals;
 
 //BTX
 template<class KeyType,class DataType> class vtkArrayMap;
@@ -47,9 +48,6 @@ public:
   // I will eventually remove access to internal widgets once I figure
   // out how to get the vectors value in Tcl with any number of componenets.
   vtkGetObjectMacro(LabelWidget, vtkKWLabel);
-  //BTX
-  vtkGetObjectMacro(Entries, vtkKWWidgetCollection);
-  //ETX
   vtkKWEntry* GetEntry(int idx);
 
   // Description:
@@ -144,7 +142,6 @@ protected:
   ~vtkPVVectorEntry();
   
   vtkKWLabel *LabelWidget;
-  vtkKWWidgetCollection *Entries;
 
   vtkSetStringMacro(EntryLabel);
   vtkGetStringMacro(EntryLabel);
@@ -170,6 +167,9 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
+  // PIMPL Encapsulation for STL containers
+
+  vtkPVVectorEntryInternals *Internals;
 };
 
 #endif

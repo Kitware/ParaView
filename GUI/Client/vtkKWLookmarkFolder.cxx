@@ -30,12 +30,11 @@
 #include "vtkKWLookmark.h"
 #include "vtkKWText.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWWidgetCollection.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.5");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.6");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -311,44 +310,31 @@ int vtkKWLookmarkFolder::GetSelectionState()
 
 void vtkKWLookmarkFolder::ToggleNestedCheckBoxes(vtkKWWidget *parent, int onoff)
 {
-  vtkKWWidgetCollection *col;
-  vtkKWWidget *widget;
-  vtkKWCheckButton *checkBox;
-
-  col = parent->GetChildren();
-  if(col)
-  {
-  vtkCollectionIterator *it = col->NewIterator();
-  it->InitTraversal();
-  while ( !it->IsDoneWithTraversal() )
+  int nb_children = parent->GetNumberOfChildren();
+  for (int i = 0; i < nb_children; i++)
     {
-    widget = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-    if(widget)
+    vtkKWWidget *widget = parent->GetNthChild(i);
+    if(widget->IsA("vtkKWCheckButton") && widget->IsPacked())
       {
-      if(widget->IsA("vtkKWCheckButton") && widget->IsPacked())
+      vtkKWCheckButton *checkBox = vtkKWCheckButton::SafeDownCast(widget);
+      if(checkBox)
         {
-        checkBox = vtkKWCheckButton::SafeDownCast(widget);
-        if(checkBox)
-          checkBox->SetState(onoff);
-        //else cleanup
+        checkBox->SetState(onoff);
         }
-      else if(!widget->IsA("vtkKWCheckButtonLabeled"))
-        {
-        this->ToggleNestedCheckBoxes(widget,onoff);
-        }
+      //else cleanup
       }
-    it->GoToNextItem();
+    else if(!widget->IsA("vtkKWCheckButtonLabeled"))
+      {
+        this->ToggleNestedCheckBoxes(widget, onoff);
+      }
     }
-  it->Delete();
-  }
 }
 
 
 //----------------------------------------------------------------------------
 void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
 {
-  vtkKWWidgetCollection *col;
-  vtkKWWidget *wid, *anchor;
+  vtkKWWidget *anchor;
   vtkKWLookmark *lmkWidget;
   vtkKWLookmarkFolder *lmkFolder;
 
@@ -387,18 +373,10 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
     }
   else
     {
-    col = widget->GetChildren();
-    if(col)
+    int nb_children = widget->GetNumberOfChildren();
+    for (int i = 0; i < nb_children; i++)
       {
-      vtkCollectionIterator *it = col->NewIterator();
-      it->InitTraversal();
-      while ( !it->IsDoneWithTraversal() )
-        {
-        wid = static_cast<vtkKWWidget*>( it->GetCurrentObject() );
-        this->ToggleNestedLabels(wid,onoff);
-        it->GoToNextItem();
-        }
-      it->Delete();
+      this->ToggleNestedLabels(widget->GetNthChild(i), onoff);
       }
     }
 }

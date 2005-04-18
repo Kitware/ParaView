@@ -38,7 +38,6 @@
 #include "vtkKWSaveImageDialog.h"
 #include "vtkKWSegmentedProgressGauge.h"
 #include "vtkKWUserInterfaceManager.h"
-#include "vtkKWWidgetCollection.h"
 #include "vtkKWWindow.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
@@ -89,7 +88,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.8");
+vtkCxxRevisionMacro(vtkKWView, "1.9");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1122,33 +1121,16 @@ void vtkKWView::SetupBindings()
 //----------------------------------------------------------------------------
 void vtkKWView::UnRegister(vtkObjectBase *o)
 {
-  if (!this->DeletingChildren)
+  // Delete the children if we are about to be deleted
+  // the last extra '1' is for the CornerAnnotation ref
+
+  int nb_children = this->GetNumberOfChildren();
+  if (nb_children && 
+      this->ReferenceCount == nb_children + 1 + 1 &&
+      !this->HasChild((vtkKWWidget*)(o)))
     {
-    // delete the children if we are about to be deleted
-    // the last '1' is for the CornerAnnotation ref
-    if (this->ReferenceCount == 
-        (1 + 1 +
-         (this->HasChildren() ? this->GetChildren()->GetNumberOfItems() : 0) ))
-      {
-      if (!((this->HasChildren() && 
-             this->GetChildren()->IsItemPresent((vtkKWWidget *)o))))
-        {
-        vtkKWWidget *child;
-        
-        this->DeletingChildren = 1;
-        if (this->HasChildren())
-          {
-          vtkKWWidgetCollection *children = this->GetChildren();
-          children->InitTraversal();
-          while ((child = children->GetNextKWWidget()))
-            {
-            child->SetParent(NULL);
-            }
-          }
-        this->CornerAnnotation->SetView(NULL);
-        this->DeletingChildren = 0;
-        }
-      }
+    this->RemoveAllChildren();
+    this->CornerAnnotation->SetView(NULL);
     }
   
   this->Superclass::UnRegister(o);

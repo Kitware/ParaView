@@ -14,7 +14,6 @@
 
 #include "vtkKWUserInterfaceNotebookManager.h"
 
-#include "vtkCollectionIterator.h"
 #include "vtkKWApplication.h"
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkKWFrameLabeled.h"
@@ -22,7 +21,6 @@
 #include "vtkKWNotebook.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWUserInterfacePanel.h"
-#include "vtkKWWidgetCollection.h"
 #include "vtkObjectFactory.h"
 
 #include <kwsys/stl/list>
@@ -30,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.37");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.38");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -591,10 +589,9 @@ int vtkKWUserInterfaceNotebookManager::CanWidgetBeDragAndDropped(
     {
     vtkKWFrameLabeled *frame = 
       vtkKWFrameLabeled::SafeDownCast(widget);
-    if (!frame && widget->GetChildren()->GetNumberOfItems() == 1)
+    if (!frame && widget->GetNumberOfChildren() == 1)
       {
-      frame = vtkKWFrameLabeled::SafeDownCast(
-        widget->GetChildren()->GetLastKWWidget());
+      frame = vtkKWFrameLabeled::SafeDownCast(widget->GetNthChild(0));
       }
     if (frame)
       {
@@ -620,10 +617,9 @@ char* vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetLabel(
     {
     vtkKWFrameLabeled *frame = 
       vtkKWFrameLabeled::SafeDownCast(widget);
-    if (!frame && widget->GetChildren()->GetNumberOfItems() == 1)
+    if (!frame && widget->GetNumberOfChildren() == 1)
       {
-      frame = vtkKWFrameLabeled::SafeDownCast(
-        widget->GetChildren()->GetLastKWWidget());
+      frame = vtkKWFrameLabeled::SafeDownCast(widget->GetNthChild(0));
       }
     if (frame)
       {
@@ -665,12 +661,10 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanelDragAndDrop(
     return;
     }
 
-  vtkCollectionIterator *it = parent->GetChildren()->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  int nb_children = parent->GetNumberOfChildren();
+  for (int i = 0; i < nb_children; i++)
     {
-    vtkKWWidget *widget = vtkKWWidget::SafeDownCast(it->GetCurrentObject());
+    vtkKWWidget *widget = parent->GetNthChild(i);
     vtkKWWidget *anchor = 0;
 
     // Enable/Disable Drag & Drop for that widget, 
@@ -696,9 +690,7 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanelDragAndDrop(
           }
         }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //---------------------------------------------------------------------------
@@ -808,13 +800,11 @@ vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetFromLabelAndLocation(
   // -in the same location (for extra safety reason, since several panels
   // or pages might have a widget with the same label)
 
-  vtkCollectionIterator *child_it = 
-    panel->GetPagesParentWidget()->GetChildren()->NewIterator();
-
-  child_it->InitTraversal(); 
-  while (!child_it->IsDoneWithTraversal())
+  vtkKWWidget *parent = panel->GetPagesParentWidget();
+  int nb_children = parent->GetNumberOfChildren();
+  for (int i = 0; i < nb_children; i++)
     {
-    vtkKWWidget *child = vtkKWWidget::SafeDownCast(child_it->GetCurrentObject());
+    vtkKWWidget *child = parent->GetNthChild(i);
     if (child && child->IsPacked())
       {
       const char *label = this->GetDragAndDropWidgetLabel(child);
@@ -834,9 +824,7 @@ vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetFromLabelAndLocation(
           }
         }
       }
-    child_it->GoToNextItem();
     }
-  child_it->Delete();
 
   return found;
 }
@@ -1330,14 +1318,11 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
     return;
     }
 
-  vtkCollectionIterator *sibbling_it = 
-    panel->GetPagesParentWidget()->GetChildren()->NewIterator();
-
-  sibbling_it->InitTraversal(); 
-  while (!sibbling_it->IsDoneWithTraversal())
+  vtkKWWidget *parent = panel->GetPagesParentWidget();
+  int nb_children = parent->GetNumberOfChildren();
+  for (int i = 0; i < nb_children; i++)
     {
-    vtkKWWidget *sibbling = 
-      vtkKWWidget::SafeDownCast(sibbling_it->GetCurrentObject());
+    vtkKWWidget *sibbling = parent->GetNthChild(i);
     vtkKWWidget *anchor = 0;
 
     // If a compliant sibbling was found, move the dragged widget after it
@@ -1353,9 +1338,7 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
       this->DragAndDropWidget(widget, &from_loc, &to_loc);
       break;
       }
-    sibbling_it->GoToNextItem();
     }
-  sibbling_it->Delete();
 }
 
 //----------------------------------------------------------------------------

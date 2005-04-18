@@ -26,9 +26,9 @@
 #include "vtkKWObject.h"
 
 class vtkKWIcon;
-class vtkKWWidgetCollection;
 class vtkKWWindow;
 class vtkKWDragAndDropTargetSet;
+class vtkKWWidgetInternals;
 
 class VTK_EXPORT vtkKWWidget : public vtkKWObject
 {
@@ -74,19 +74,14 @@ public:
 
   // Description:
   // Add/Remove/Get a child to this Widget
-  // The children collection is lazy evaluated/created, i.e. GetChildren() 
-  // will create the collection if it does not exist, otherwise it is
-  // not allocated/created. In subclasses, use HasChildren() to check
-  // that this widget has children instead of accessing GetChildren() which
-  // would automatically allocate the collection. 
-  void AddChild(vtkKWWidget *w);
-  void RemoveChild(vtkKWWidget *w);
-  int HasChildren();
-  //BTX
-  virtual vtkKWWidgetCollection* GetChildren();
-  //ETX
-  vtkKWWidget *GetChildWidgetWithName(const char *);
-  
+  virtual void AddChild(vtkKWWidget *w);
+  virtual void RemoveChild(vtkKWWidget *w);
+  virtual int HasChild(vtkKWWidget *w);
+  virtual void RemoveAllChildren();
+  virtual int GetNumberOfChildren();
+  virtual vtkKWWidget* GetNthChild(int rank);
+  virtual vtkKWWidget* GetChildWidgetWithName(const char *);
+
   // Description::
   // Override Unregister since widgets have loops.
   virtual void UnRegister(vtkObjectBase *o);
@@ -293,7 +288,6 @@ protected:
   vtkSetStringMacro(WidgetName);
 
   vtkKWWidget *Parent;
-  int         DeletingChildren;
 
   // Ballon help
 
@@ -319,15 +313,12 @@ protected:
 
   virtual void PropagateEnableState(vtkKWWidget* widget);
 
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWWidgetInternals *Internals;
+
 private:
   
-  // In private: to allow lazy evaluation. GetChildren() will create the
-  // collection if it does not exist. For example, there is no need for
-  // children for all terminal widgets. In subclasses, use HasChildren()
-  // to avoid accessing GetChildren(). 
-
-  vtkKWWidgetCollection *Children; 
-
   vtkKWDragAndDropTargetSet* DragAndDropTargetSet;
 
   int WidgetIsCreated;

@@ -19,7 +19,6 @@
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWWidgetCollection.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
@@ -32,17 +31,32 @@
 #include "vtkPVTraceHelper.h"
 
 #include <kwsys/SystemTools.hxx>
+#include <kwsys/stl/vector>
+#include <kwsys/stl/algorithm>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.74");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.75");
+
+//----------------------------------------------------------------------------
+class vtkPVVectorEntryInternals
+{
+public:
+  typedef kwsys_stl::vector<vtkKWEntry*> EntriesContainer;
+  typedef kwsys_stl::vector<vtkKWEntry*>::iterator EntriesContainerIterator;
+
+  EntriesContainer Entries;
+};
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
 {
+  // Instantiate the PIMPL Encapsulation for STL containers
+
+  this->Internals = new vtkPVVectorEntryInternals;
+
   this->LabelWidget  = vtkKWLabel::New();
   this->LabelWidget->SetParent(this);
-  this->Entries      = vtkKWWidgetCollection::New();
 
   this->ScriptValue  = NULL;
   this->DataType     = VTK_FLOAT;
@@ -60,8 +74,21 @@ vtkPVVectorEntry::vtkPVVectorEntry()
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::~vtkPVVectorEntry()
 {
-  this->Entries->Delete();
-  this->Entries = NULL;
+  if (this->Internals)
+    {
+    vtkPVVectorEntryInternals::EntriesContainerIterator it = 
+      this->Internals->Entries.begin();
+    vtkPVVectorEntryInternals::EntriesContainerIterator end = 
+      this->Internals->Entries.end();
+    for (; it != end; ++it)
+      {
+      (*it)->UnRegister(this);
+      }
+
+    delete this->Internals;
+    this->Internals = NULL;
+    }
+
   this->LabelWidget->Delete();
   this->LabelWidget = NULL;
 
@@ -96,15 +123,13 @@ void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
     this->LabelWidget->SetBalloonHelpString(str);
     }
 
-  if (this->Entries)
+  vtkPVVectorEntryInternals::EntriesContainerIterator it = 
+    this->Internals->Entries.begin();
+  vtkPVVectorEntryInternals::EntriesContainerIterator end = 
+    this->Internals->Entries.end();
+  for (; it != end; ++it)
     {
-    this->Entries->InitTraversal();
-    int numItems = this->Entries->GetNumberOfItems();
-    int i;
-    for (i=0; i<numItems; i++)
-      {
-      this->Entries->GetNextKWWidget()->SetBalloonHelpString(str);
-      }
+    (*it)->SetBalloonHelpString(str);
     }
 }
 
@@ -157,7 +182,8 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
     this->Script("pack %s -side left -fill x -expand t",
       entry->GetWidgetName());
 
-    this->Entries->AddItem(entry);
+    this->Internals->Entries.push_back(entry);
+    entry->Register(this);
     entry->Delete();
     }
 }
@@ -166,13 +192,13 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
 void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
 {
   int found = 0;
-  int cc;
+  unsigned int cc;
   if (key && (!strcmp(key, "Tab") ||
               !strcmp(key, "ISO_Left_Tab") ||
               !strcmp(key, "Return") ||
               !strcmp(key, "")))
     {
-    for (cc = 0; cc < this->Entries->GetNumberOfItems(); cc ++ )
+    for (cc = 0; cc < this->Internals->Entries.size(); cc ++ )
       {
       const char* val = this->EntryValues[cc];
       if (!val || (this->GetEntry(cc)->GetValue() && 
@@ -191,7 +217,7 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
     }
   else if (key && !strcmp(key, "Escape") )
     {
-    for (cc = 0; cc < this->Entries->GetNumberOfItems(); cc ++ )
+    for (cc = 0; cc < this->Internals->Entries.size(); cc ++ )
       {
       const char* val = this->EntryValues[cc];
       if (!val || (this->GetEntry(cc)->GetValue() && 
@@ -217,8 +243,6 @@ void vtkPVVectorEntry::Accept()
   int i;
   vtkKWEntry *entry;
 
-  this->Entries->InitTraversal();
-
   int propFound = 0;
   switch (this->DataType)
     {
@@ -233,9 +257,11 @@ void vtkPVVectorEntry::Accept()
         dvp->SetNumberOfElements(this->VectorLength);
         for (i = 0; i < this->VectorLength; i++)
           {
-          entry =
-            vtkKWEntry::SafeDownCast(this->Entries->GetNextItemAsObject());
-          dvp->SetElement(i, entry->GetValueAsFloat());
+          entry = this->GetEntry(i);
+          if (entry)
+            {
+            dvp->SetElement(i, entry->GetValueAsFloat());
+            }
           }
         }
       break;
@@ -250,9 +276,11 @@ void vtkPVVectorEntry::Accept()
         ivp->SetNumberOfElements(this->VectorLength);
         for (i = 0; i < this->VectorLength; i++)
           {
-          entry =
-            vtkKWEntry::SafeDownCast(this->Entries->GetNextItemAsObject());
-          ivp->SetElement(i, entry->GetValueAsInt());
+          entry = this->GetEntry(i);
+          if (entry)
+            {
+            ivp->SetElement(i, entry->GetValueAsInt());
+            }
           }
         }
       break;
@@ -273,8 +301,6 @@ void vtkPVVectorEntry::Accept()
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::Trace(ofstream *file)
 {
-  vtkKWEntry *entry;
-
   if ( ! this->GetTraceHelper()->Initialize(file))
     {
     return;
@@ -283,10 +309,14 @@ void vtkPVVectorEntry::Trace(ofstream *file)
   *file << "$kw(" << this->GetTclName() << ") SetValue";
 
   // finish all the arguments for the trace file and the accept command.
-  this->Entries->InitTraversal();
-  while ( (entry = (vtkKWEntry*)(this->Entries->GetNextItemAsObject())) )
+
+  vtkPVVectorEntryInternals::EntriesContainerIterator it = 
+    this->Internals->Entries.begin();
+  vtkPVVectorEntryInternals::EntriesContainerIterator end = 
+    this->Internals->Entries.end();
+  for (; it != end; ++it)
     {
-    *file << " " << entry->GetValue();
+    *file << " " << (*it)->GetValue();
     }
   *file << endl;
 }
@@ -350,7 +380,7 @@ void vtkPVVectorEntry::ResetInternal()
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::SetEntryValue(int index, const char* value)
 {
-  if ( index < 0 || index >= this->Entries->GetNumberOfItems() )
+  if ( index < 0 || index >= (int)this->Internals->Entries.size() )
     {
     return;
     }
@@ -365,11 +395,11 @@ void vtkPVVectorEntry::SetEntryValue(int index, const char* value)
 //-----------------------------------------------------------------------------
 vtkKWEntry* vtkPVVectorEntry::GetEntry(int idx)
 {
-  if (idx > this->Entries->GetNumberOfItems())
+  if (idx < 0 || idx >= (int)this->Internals->Entries.size())
     {
     return NULL;
     }
-  return ((vtkKWEntry*)this->Entries->GetItemAsObject(idx));
+  return this->Internals->Entries[idx];
 }
 
 //-----------------------------------------------------------------------------
@@ -378,9 +408,9 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
   int idx;
   vtkKWEntry *entry;
 
-  if (num != this->Entries->GetNumberOfItems())
+  if (num != this->Internals->Entries.size())
     {
-    vtkErrorMacro("Componenet mismatch.");
+    vtkErrorMacro("Component mismatch.");
     return;
     }
 
@@ -407,9 +437,9 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
   int idx;
   vtkKWEntry *entry;
 
-  if (num != this->Entries->GetNumberOfItems())
+  if (num != this->Internals->Entries.size())
     {
-    vtkErrorMacro("Componenet mismatch.");
+    vtkErrorMacro("Component mismatch.");
     return;
     }
   
@@ -437,9 +467,9 @@ void vtkPVVectorEntry::GetValue(float *values, int num)
   int idx;
   vtkKWEntry *entry;
 
-  if (num != this->Entries->GetNumberOfItems())
+  if (num != this->Internals->Entries.size())
     {
-    vtkErrorMacro("Componenet mismatch.");
+    vtkErrorMacro("Component mismatch.");
     return;
     }
   for (idx = 0; idx < num; ++idx)
@@ -547,7 +577,6 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "DataType: " << this->GetDataType() << endl;
-  os << indent << "Entries: " << this->GetEntries() << endl;
   os << indent << "ScriptValue: " 
     << (this->ScriptValue?this->ScriptValue:"none") << endl;
   os << indent << "LabelWidget: " << this->LabelWidget << endl;
@@ -635,17 +664,14 @@ void vtkPVVectorEntry::UpdateEnableState()
     {
     this->LabelWidget->SetEnabled(this->Enabled);
     }
-  int cc;
-  for ( cc = 0; cc < this->VectorLength; cc ++ )
+
+  vtkPVVectorEntryInternals::EntriesContainerIterator it = 
+    this->Internals->Entries.begin();
+  vtkPVVectorEntryInternals::EntriesContainerIterator end = 
+    this->Internals->Entries.end();
+  for (; it != end; ++it)
     {
-    if ( this->Entries )
-      {
-      vtkKWWidget* w = vtkKWWidget::SafeDownCast(this->Entries->GetItemAsObject(cc));
-      if ( w )
-        {
-        w->SetEnabled(this->Enabled);
-        }
-      }
+    (*it)->SetEnabled(this->Enabled);
     }
 }
 

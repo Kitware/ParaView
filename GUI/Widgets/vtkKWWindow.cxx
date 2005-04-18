@@ -32,7 +32,6 @@
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkKWUserInterfaceNotebookManager.h"
-#include "vtkKWWidgetCollection.h"
 #include "vtkObjectFactory.h"
 
 #include <kwsys/SystemTools.hxx>
@@ -41,7 +40,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.224");
+vtkCxxRevisionMacro(vtkKWWindow, "1.225");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -885,38 +884,6 @@ void vtkKWWindow::InstallMenu(vtkKWMenu* menu)
 { 
   this->Script("%s configure -menu %s", this->GetWidgetName(),
                menu->GetWidgetName());  
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::UnRegister(vtkObjectBase *o)
-{
-  if (!this->DeletingChildren)
-    {
-    // delete the children if we are about to be deleted
-    if (this->ReferenceCount == 1 +
-        (this->HasChildren() ? this->GetChildren()->GetNumberOfItems() : 0))
-      {
-      if (!((this->HasChildren() && 
-             this->GetChildren()->IsItemPresent((vtkKWWidget *)o))))
-        {
-        vtkKWWidget *child;
-        
-        this->DeletingChildren = 1;
-        if (this->HasChildren())
-          {
-          vtkKWWidgetCollection *children = this->GetChildren();
-          children->InitTraversal();
-          while ((child = children->GetNextKWWidget()))
-            {
-            child->SetParent(NULL);
-            }
-          }
-        this->DeletingChildren = 0;
-        }
-      }
-    }
-  
-  this->Superclass::UnRegister(o);
 }
 
 //----------------------------------------------------------------------------

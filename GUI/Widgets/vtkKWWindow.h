@@ -137,10 +137,6 @@ public:
   void ShowWindowProperties();
 
   // Description::
-  // Override Unregister since widgets have loops.
-  virtual void UnRegister(vtkObjectBase *o);
-
-  // Description::
   // Add a "Recent Files" sub-menu to the File menu and fill it with the
   // most recent files stored in the registry.
   // - menuEntry is the name of the menu entry in the File menu above which 

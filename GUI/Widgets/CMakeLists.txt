@@ -96,7 +96,6 @@ SET( KWWidgets_SRCS
   vtkKWVolumeMaterialPropertyWidget.cxx
   vtkKWVolumePropertyWidget.cxx
   vtkKWWidget.cxx 
-  vtkKWWidgetCollection.cxx 
   vtkKWWidgetLabeled.cxx 
   vtkKWWidgetSet.cxx 
   vtkKWWindow.cxx 
@@ -183,7 +182,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWEvent.cxx
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 
-  vtkKWWidgetCollection.cxx
   WRAP_EXCLUDE
   )
 

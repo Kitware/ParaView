@@ -17,31 +17,46 @@
 #include "vtkKWApplication.h"
 #include "vtkKWIcon.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWWidgetCollection.h"
 #include "vtkKWWindow.h"
 #include "vtkKWDragAndDropTargetSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWBalloonHelpManager.h"
 
+#include <kwsys/stl/vector>
+#include <kwsys/stl/algorithm>
 #include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.117");
+vtkCxxRevisionMacro(vtkKWWidget, "1.118");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
+class vtkKWWidgetInternals
+{
+public:
+  typedef kwsys_stl::vector<vtkKWWidget*> WidgetsContainer;
+  typedef kwsys_stl::vector<vtkKWWidget*>::iterator WidgetsContainerIterator;
+
+  WidgetsContainer *Children;
+
+  vtkKWWidgetInternals::vtkKWWidgetInternals() { this->Children = NULL; };
+  vtkKWWidgetInternals::~vtkKWWidgetInternals() { delete this->Children; };
+};
+
+//----------------------------------------------------------------------------
 vtkKWWidget::vtkKWWidget()
 {
+  // Instantiate the PIMPL Encapsulation for STL containers
+
+  this->Internals = new vtkKWWidgetInternals;
+
   this->CommandFunction          = vtkKWWidgetCommand;
 
   this->WidgetName               = NULL;
   this->Parent                   = NULL;
-
-  this->Children                 = NULL;
-  this->DeletingChildren         = 0;
 
   this->BalloonHelpString        = NULL;  
 
@@ -55,6 +70,12 @@ vtkKWWidget::vtkKWWidget()
 //----------------------------------------------------------------------------
 vtkKWWidget::~vtkKWWidget()
 {
+  if (this->Internals)
+    {
+    delete this->Internals;
+    this->Internals = NULL;
+    }
+
   if (this->DragAndDropTargetSet)
     {
     this->DragAndDropTargetSet->Delete();
@@ -65,12 +86,6 @@ vtkKWWidget::~vtkKWWidget()
     this->SetBalloonHelpString(NULL);
     }
 
-  if (this->Children)
-    {
-    this->Children->UnRegister(this);
-    this->Children = NULL;
-    }
-  
   if (this->IsCreated())
     {
     this->Script("destroy %s",this->GetWidgetName());
@@ -225,80 +240,92 @@ int vtkKWWidget::IsCreated()
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidgetCollection* vtkKWWidget::GetChildren()
+void vtkKWWidget::AddChild(vtkKWWidget *child) 
 {
-  // Lazy allocation. Create the children collection only when it is needed
-
-  if (!this->Children)
+  if (this->Internals)
     {
-    this->Children = vtkKWWidgetCollection::New();
-
-    // Make tracking memory leaks easier.
-
-    this->Children->Register(this);
-    this->Children->Delete();
-    }
-  return this->Children;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWidget::HasChildren()
-{
-  if (!this->Children)
-    {
-    return 0;
-    }
-  return this->Children->GetNumberOfItems() ? 1 : 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::RemoveChild(vtkKWWidget *w) 
-{
-  // Removing items in the middle of a traversal is a bad thing.
-  // UnRegister will handle removing all of the children.
-
-  if (!this->DeletingChildren && this->HasChildren())
-    {
-    this->GetChildren()->RemoveItem(w);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::AddChild(vtkKWWidget *w) 
-{
-  this->GetChildren()->AddItem(w);
-}
-
-//----------------------------------------------------------------------------
-int  vtkKWWidget::GetNetReferenceCount() 
-{
-  int childCounts = 0;
-
-  if (this->HasChildren())
-    {
-    vtkKWWidget *child;
-    vtkKWWidgetCollection *children = this->GetChildren();
-    children->InitTraversal();
-    while ((child = children->GetNextKWWidget()))
+    if (!this->Internals->Children)
       {
-      childCounts += child->GetNetReferenceCount();
+      this->Internals->Children = new vtkKWWidgetInternals::WidgetsContainer;
       }
-    childCounts -= 2 * children->GetNumberOfItems();
+    this->Internals->Children->push_back(child);
+    child->Register(this);
     }
-
-  return this->ReferenceCount + childCounts;
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget *vtkKWWidget::GetChildWidgetWithName(const char *name)
+int vtkKWWidget::HasChild(vtkKWWidget *child) 
 {
-  if (name && this->HasChildren())
+  if (this->GetNumberOfChildren())
     {
-    vtkKWWidget *child;
-    vtkKWWidgetCollection *children = this->GetChildren();
-    children->InitTraversal();
-    while ((child = children->GetNextKWWidget()))
+    return kwsys_stl::find(this->Internals->Children->begin(),
+                           this->Internals->Children->end(),
+                           child) == this->Internals->Children->end() ? 0 : 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::RemoveChild(vtkKWWidget *child) 
+{
+  if (this->GetNumberOfChildren())
+    {
+    this->Internals->Children->erase(
+      kwsys_stl::find(this->Internals->Children->begin(),
+                      this->Internals->Children->end(),
+                      child));
+    child->UnRegister(this);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::RemoveAllChildren()
+{
+  int nb_children = this->GetNumberOfChildren();
+  if (nb_children)
+    {
+    do
       {
+      vtkKWWidget *child = this->GetNthChild(nb_children - 1);
+      child->SetParent(NULL);
+      // No need for:  child->UnRegister(this);
+      // => child->SetParent(NULL) will call us again with RemoveChild(child)
+      // which UnRegister child.
+      nb_children = this->GetNumberOfChildren();
+      } while (nb_children);
+    this->Internals->Children->clear();
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget* vtkKWWidget::GetNthChild(int rank)
+{
+  if (rank >= 0 && rank < this->GetNumberOfChildren())
+    {
+    return (*this->Internals->Children)[rank];
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWidget::GetNumberOfChildren()
+{
+  if (this->Internals && this->Internals->Children)
+    {
+    return this->Internals->Children->size();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget* vtkKWWidget::GetChildWidgetWithName(const char *name)
+{
+  int nb_children = this->GetNumberOfChildren();
+  if (name && nb_children)
+    {
+    for (int i = 0; i < nb_children; i++)
+      {
+      vtkKWWidget *child = this->GetNthChild(i);
       const char *wname = child->GetWidgetName();
       if (wname && !strcmp(wname, name))
         {
@@ -311,25 +338,35 @@ vtkKWWidget *vtkKWWidget::GetChildWidgetWithName(const char *name)
 }
        
 //----------------------------------------------------------------------------
+int  vtkKWWidget::GetNetReferenceCount() 
+{
+  int child_counts = 0;
+
+  int nb_children = this->GetNumberOfChildren();
+  if (nb_children)
+    {
+    for (int i = 0; i < nb_children; i++)
+      {
+      vtkKWWidget *child = this->GetNthChild(i);
+      child_counts += child->GetNetReferenceCount();
+      }
+    child_counts -= 2 * nb_children;
+    }
+
+  return this->ReferenceCount + child_counts;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWidget::UnRegister(vtkObjectBase *o)
 {
-  if (!this->DeletingChildren && this->HasChildren())
+  // Delete the children if we are about to be deleted
+
+  int nb_children = this->GetNumberOfChildren();
+  if (nb_children && 
+      this->ReferenceCount == nb_children + 1 &&
+      !this->HasChild((vtkKWWidget*)(o)))
     {
-    // delete the children if we are about to be deleted
-    vtkKWWidgetCollection *children = this->GetChildren();
-    if (this->ReferenceCount == children->GetNumberOfItems() + 1)
-      {
-      vtkKWWidget *child;
-      
-      this->DeletingChildren = 1;
-      children->InitTraversal();
-      while ((child = children->GetNextKWWidget()))
-        {
-        child->SetParent(NULL);
-        }
-      children->RemoveAllItems();
-      this->DeletingChildren = 0;
-      }
+    this->RemoveAllChildren();
     }
   
   this->Superclass::UnRegister(o);
@@ -1134,7 +1171,6 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "BalloonHelpString: " 
      << (this->BalloonHelpString ? this->BalloonHelpString : "None") << endl;
-  os << indent << "Children: " << this->Children << endl;
   os << indent << "Parent: " << this->GetParent() << endl;
   os << indent << "Enabled: " << (this->Enabled ? "On" : "Off") << endl;
   os << indent << "DragAndDropTargetSet: ";
