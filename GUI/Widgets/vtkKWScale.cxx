@@ -18,11 +18,11 @@
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkKWTopLevel.h"
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.84");
+vtkCxxRevisionMacro(vtkKWScale, "1.85");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -178,17 +178,17 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
     return;
     }
 
-  // If we need the scale to popup, create the toplevel and the pushbutton
+  // If we need the scale to popup, create the top level window accordingly
+  // and its push button
 
   if (this->PopupScale)
     {
-    this->TopLevel = vtkKWWidget::New();
-    this->TopLevel->Create(
-      app, "toplevel", "-bg black -bd 2 -relief flat");
-    this->Script("wm overrideredirect %s 1", 
-                 this->TopLevel->GetWidgetName());
-    this->Script("wm withdraw %s", 
-                 this->TopLevel->GetWidgetName());
+    this->TopLevel = vtkKWTopLevel::New();
+    this->TopLevel->Create(app, "-bg black -bd 2 -relief flat");
+    this->TopLevel->HideDecorationOn();
+    this->TopLevel->Withdraw();
+    this->TopLevel->SetMasterWindow(this);
+
     this->PopupPushButton = vtkKWPushButton::New();
     this->PopupPushButton->SetParent(this);
     this->PopupPushButton->Create(app, "-padx 0 -pady 0");
@@ -424,8 +424,8 @@ void vtkKWScale::Bind()
     this->Script("bind %s <ButtonRelease> {+%s DisableScaleValueCallbackOn}",
                  this->Scale->GetWidgetName(), this->GetTclName());
 
-    // If in popup mode, leaving the toplevel will withdraw it, unless 
-    // the user is interacting with the scale.
+    // If in popup mode and the mouse is leaving the top level window, 
+    // then withdraw it, unless the user is interacting with the scale.
 
     if (this->PopupScale &&
         this->TopLevel && this->TopLevel->IsCreated())
@@ -539,16 +539,10 @@ void vtkKWScale::DisplayPopupScaleCallback()
     y -= sy + scy;
     }
 
-  this->Script("wm geometry %s +%d+%d",
-               this->TopLevel->GetWidgetName(), x, y);
+  this->TopLevel->SetPosition(x, y);
   this->Script("update");
-  this->Script("wm deiconify %s", 
-               this->TopLevel->GetWidgetName());
-  this->Script("raise %s", 
-               this->TopLevel->GetWidgetName());
-  this->Script("wm transient %s %s", 
-               this->TopLevel->GetWidgetName(),
-               this->GetWidgetName());
+  this->TopLevel->DeIconify();
+  this->TopLevel->Raise();
 
   this->RefreshValue();
 }
@@ -565,8 +559,7 @@ void vtkKWScale::WithdrawPopupScaleCallback()
 
   // Withdraw the popup
 
-  this->Script("wm withdraw %s",
-               this->TopLevel->GetWidgetName());
+  this->TopLevel->Withdraw();
 
   this->RefreshValue();
 }

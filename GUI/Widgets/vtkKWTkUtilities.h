@@ -100,6 +100,18 @@ public:
                                  int *r, int *g, int *b);
 
   // Description:
+  // Get the geometry of a widget given by 'widget' (say, .foo.bar).
+  // The geometry is the width, height and position of the widget. 
+  // Any of them can be a NULL pointer, they will be safely ignored.
+  // Return 1 on success, 0 otherwise.
+  // A convenience method is provided to query a vtkKWWidget directly.
+  static int GetGeometry(Tcl_Interp *interp,
+                         const char *widget, 
+                         int *width, int *height, int *x, int *y);
+  static int GetGeometry(vtkKWWidget *widget,
+                         int *width, int *height, int *x, int *y);
+
+  // Description:
   // Check if a pair of screen coordinates (x, y) are within the area defined
   // by the widget given by 'widget' (say, .foo.bar).
   // Return 1 if inside, 0 otherwise.

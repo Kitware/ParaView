@@ -89,8 +89,7 @@ public:
     CancelDefault   = 0x00200,
     Beep            = 0x00400,
     PackVertically  = 0x00800,
-    InvokeAtPointer = 0x01000,
-    NoDecoration    = 0x02000
+    InvokeAtPointer = 0x01000
   };
   //ETX
   vtkSetMacro(Options, int);
@@ -156,6 +155,7 @@ public:
 
   // Description:
   // Convenience method to guess the width/height of the dialog.
+  // Override the superclass to make smarter choice given the contents.
   virtual int GetWidth();
   virtual int GetHeight();
 

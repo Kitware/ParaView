@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.46");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.47");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -181,10 +181,12 @@ void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
   command.rdbuf()->freeze(0);     
 
   int rr, gg, bb;
-  sscanf(interp->result, "%d %d %d", &rr, &gg, &bb);
-  *r = static_cast<int>((static_cast<float>(rr) / 65535.0) * 255.0);
-  *g = static_cast<int>((static_cast<float>(gg) / 65535.0) * 255.0);
-  *b = static_cast<int>((static_cast<float>(bb) / 65535.0) * 255.0); 
+  if (sscanf(interp->result, "%d %d %d", &rr, &gg, &bb) == 3)
+    {
+    *r = static_cast<int>((static_cast<float>(rr) / 65535.0) * 255.0);
+    *g = static_cast<int>((static_cast<float>(gg) / 65535.0) * 255.0);
+    *b = static_cast<int>((static_cast<float>(bb) / 65535.0) * 255.0); 
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -268,6 +270,70 @@ void vtkKWTkUtilities::GetBackgroundColor(vtkKWWidget *widget,
 }
 
 //----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetGeometry(Tcl_Interp *interp,
+                                  const char *widget, 
+                                  int *width, int *height, 
+                                  int *x, int *y)
+{
+  if (!interp || !widget)
+    {
+    return 0;
+    }
+
+  ostrstream geometry;
+  geometry << "wm geometry " << widget << ends;
+  int res = Tcl_GlobalEval(interp, geometry.str());
+  geometry.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query widget geometry! " << widget);
+    return 0;
+    }
+  
+  int ww, wh, wx, wy;
+  if (sscanf(interp->result, "%dx%d+%d+%d", &ww, &wh, &wx, &wy) != 4)
+    {
+    return 0;
+    }
+
+  if (width)
+    {
+    *width = ww;
+    }
+  if (height)
+    {
+    *height = wh;
+    }
+  if (x)
+    {
+    *x = wx;
+    }
+  if (y)
+    {
+    *y = wy;
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetGeometry(vtkKWWidget *widget,
+                                  int *width, int *height, 
+                                  int *x, int *y)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+
+  return vtkKWTkUtilities::GetGeometry(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    width, height, x, y);
+}
+
+
+//----------------------------------------------------------------------------
 int vtkKWTkUtilities::ContainsCoordinates(Tcl_Interp *interp,
                                           const char *widget, 
                                           int x, int y)
@@ -290,7 +356,10 @@ int vtkKWTkUtilities::ContainsCoordinates(Tcl_Interp *interp,
     }
   
   int ww, wh, wx, wy;
-  sscanf(interp->result, "%d %d %d %d", &ww, &wh, &wx, &wy);
+  if (sscanf(interp->result, "%d %d %d %d", &ww, &wh, &wx, &wy) != 4)
+    {
+    return 0;
+    }
 
   return (x >= wx && x < (wx + ww) && y >= wy && y < (wy + wh)) ? 1 : 0;
 }
@@ -1079,7 +1148,10 @@ int vtkKWTkUtilities::GetGridSize(Tcl_Interp *interp,
     vtkGenericWarningMacro(<< "Unable to query grid size!");
     return 0;
     }
-  sscanf(interp->result, "%d %d", nb_of_cols, nb_of_rows);
+  if (sscanf(interp->result, "%d %d", nb_of_cols, nb_of_rows) != 2)
+    {
+    return 0;
+    }
 
   return 1;
 }
@@ -1117,20 +1189,27 @@ int vtkKWTkUtilities::GetWidgetPositionInGrid(Tcl_Interp *interp,
     }
   
   const char *pos;
+  int ok = 1;
 
   pos = strstr(interp->result, "-column ");
   if (pos)
     {
-    sscanf(pos, "-column %d", col);
+    if (sscanf(pos, "-column %d", col) != 1)
+      {
+      ok = 0;
+      }
     }
 
   pos = strstr(interp->result, "-row ");
   if (pos)
     {
-    sscanf(pos, "-row %d", row);
+    if (sscanf(pos, "-row %d", row) != 1)
+      {
+      ok = 0;
+      }
     }
 
-  return 1;
+  return ok;
 }
 
 //----------------------------------------------------------------------------
@@ -1169,13 +1248,18 @@ int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
   
   // Parse (ex: -ipadx 0 -ipady 0 -padx 0 -pady 0)
 
+  int ok = 1;
+
   char *ptr;
   if (ipadx)
     {
     ptr = strstr(interp->result, "-ipadx ");
     if (ptr)
       {
-      sscanf(ptr + 7, "%d", ipadx);
+      if (sscanf(ptr + 7, "%d", ipadx) != 1)
+        {
+        ok = 0;
+        }
       }
     }
 
@@ -1184,7 +1268,10 @@ int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
     ptr = strstr(interp->result, "-ipady ");
     if (ptr)
       {
-      sscanf(ptr + 7, "%d", ipady);
+      if (sscanf(ptr + 7, "%d", ipady) != 1)
+        {
+        ok = 0;
+        }
       }
     }
 
@@ -1193,7 +1280,10 @@ int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
     ptr = strstr(interp->result, "-padx ");
     if (ptr)
       {
-      sscanf(ptr + 6, "%d", padx);
+      if (sscanf(ptr + 6, "%d", padx) != 1)
+        {
+        ok = 0;
+        }
       }
     }
 
@@ -1202,11 +1292,14 @@ int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
     ptr = strstr(interp->result, "-pady ");
     if (ptr)
       {
-      sscanf(ptr + 6, "%d", pady);
+      if (sscanf(ptr + 6, "%d", pady) != 1)
+        {
+        ok = 0;
+        }
       }
     }
 
-  return 1;
+  return ok;
 }
 
 //----------------------------------------------------------------------------
@@ -1558,9 +1651,8 @@ int vtkKWTkUtilities::GetGridColumnWidths(Tcl_Interp *interp,
         continue;
         }
       int width = 0;
-      sscanf(interp->result, "%d", &width);
-
-      if (width > (*col_widths)[col])
+      if (sscanf(interp->result, "%d", &width) == 1 && 
+          width > (*col_widths)[col])
         {
         (*col_widths)[col] = width;
         }

@@ -19,7 +19,7 @@
 #ifndef __vtkKWWindow_h
 #define __vtkKWWindow_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWTopLevel.h"
 
 class vtkKWApplication;
 class vtkKWApplicationSettingsInterface;
@@ -43,11 +43,11 @@ class vtkKWMostRecentFilesManager;
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY    "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-class VTK_EXPORT vtkKWWindow : public vtkKWWidget
+class VTK_EXPORT vtkKWWindow : public vtkKWTopLevel
 {
 public:
   static vtkKWWindow* New();
-  vtkTypeRevisionMacro(vtkKWWindow,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWWindow,vtkKWTopLevel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -230,13 +230,8 @@ public:
   vtkBooleanMacro( SupportPrint, int );
 
   // Description:
-  // Class of the window. Passed to the toplevel command.
-  vtkSetStringMacro(WindowClass);
-  vtkGetStringMacro(WindowClass);
-
-  // Description:
-  // Title of the window (if empty, try to use the app name). 
-  virtual void SetTitle(const char*);
+  // Get title of window.
+  // Override superclass to use app name if the title was not set
   virtual char* GetTitle();
 
   //Description:
@@ -392,8 +387,6 @@ protected:
   char  *ScriptType;
   int   SupportHelp;
   int   SupportPrint;
-  char  *WindowClass;
-  char  *Title;
   int   PromptBeforeClose;
   int   InExit;
 

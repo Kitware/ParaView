@@ -23,7 +23,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVGhostLevelDialog );
-vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.8");
+vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.9");
 
 int vtkPVGhostLevelDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -160,8 +160,8 @@ int vtkPVGhostLevelDialog::Invoke()
 //----------------------------------------------------------------------------
 void vtkPVGhostLevelDialog::SetGhostLevel(int level)
 {
-  this->Script("wm withdraw %s",this->GetWidgetName());
-  this->Script("grab release %s",this->GetWidgetName());
+  this->Withdraw();
+  this->ReleaseGrab();
   this->GhostLevel = level;  
   this->Done = 2;  
 }

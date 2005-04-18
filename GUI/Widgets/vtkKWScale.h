@@ -25,6 +25,7 @@ class vtkKWApplication;
 class vtkKWEntry;
 class vtkKWLabel;
 class vtkKWPushButton;
+class vtkKWTopLevel;
 
 class VTK_EXPORT vtkKWScale : public vtkKWWidget
 {
@@ -215,10 +216,10 @@ protected:
   double       Resolution;
   double       Range[2];
 
-  vtkKWWidget *Scale;
-  vtkKWEntry  *Entry;
-  vtkKWLabel  *Label;
-  vtkKWWidget *TopLevel;
+  vtkKWWidget   *Scale;
+  vtkKWEntry    *Entry;
+  vtkKWLabel    *Label;
+  vtkKWTopLevel *TopLevel;
   vtkKWPushButton *PopupPushButton;
 
   vtkKWLabel *RangeMinLabel;

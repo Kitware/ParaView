@@ -18,25 +18,25 @@
 #ifndef __vtkKWSplashScreen_h
 #define __vtkKWSplashScreen_h
 
-#include "vtkKWWidget.h"
-class vtkKWApplication;
+#include "vtkKWTopLevel.h"
+
 class vtkKWCanvas;
 
-class VTK_EXPORT vtkKWSplashScreen : public vtkKWWidget
+class VTK_EXPORT vtkKWSplashScreen : public vtkKWTopLevel
 {
 public:
   static vtkKWSplashScreen* New();
-  vtkTypeRevisionMacro(vtkKWSplashScreen,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWSplashScreen, vtkKWTopLevel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
+  // Create the widget
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Show/Hide the splash screen
-  void Show();
-  void Hide();
+  // Display the splash screen
+  // Override to center it no matter what.
+  virtual void Display();
   
   // Description:
   // Set the text of the progress message

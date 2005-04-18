@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.9");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.10");
 
 int vtkPVTraceFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -112,16 +112,16 @@ void vtkPVTraceFileDialog::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 void vtkPVTraceFileDialog::Save()
 {
-  this->Script("wm withdraw %s",this->GetWidgetName());
-  this->Script("grab release %s",this->GetWidgetName());
+  this->Withdraw();
+  this->ReleaseGrab();
   this->Done = 3;  
 }
 
 //----------------------------------------------------------------------------
 void vtkPVTraceFileDialog::Retrace()
 {
-  this->Script("wm withdraw %s",this->GetWidgetName());
-  this->Script("grab release %s",this->GetWidgetName());
+  this->Withdraw();
+  this->ReleaseGrab();
   this->Done = 4;  
 }
 

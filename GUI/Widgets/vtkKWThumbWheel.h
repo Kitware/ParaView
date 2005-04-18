@@ -25,6 +25,7 @@ class vtkKWApplication;
 class vtkKWLabel;
 class vtkKWEntry;
 class vtkKWPushButton;
+class vtkKWTopLevel;
 
 #define VTK_KW_TW_MODE_NONE                    0
 #define VTK_KW_TW_MODE_LINEAR_MOTION           1
@@ -266,10 +267,10 @@ protected:
 
   int         InteractionModes[3];
 
-  vtkKWLabel  *ThumbWheel;
-  vtkKWEntry  *Entry;
-  vtkKWLabel  *Label;
-  vtkKWWidget *TopLevel;
+  vtkKWLabel    *ThumbWheel;
+  vtkKWEntry    *Entry;
+  vtkKWLabel    *Label;
+  vtkKWTopLevel *TopLevel;
   vtkKWPushButton *PopupPushButton;
 
   void CreateEntry();

@@ -18,12 +18,13 @@
 #include "vtkKWFrame.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTopLevel.h"
 
 #include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.17");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.18");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -33,13 +34,11 @@ vtkKWPopupButton::vtkKWPopupButton()
 {
   this->CommandFunction = vtkKWPopupButtonCommand;
 
-  this->PopupTopLevel = vtkKWWidget::New();
+  this->PopupTopLevel = vtkKWTopLevel::New();
 
   this->PopupFrame = vtkKWFrame::New();
 
   this->PopupCloseButton = vtkKWPushButton::New();
-
-  this->PopupTitle = 0;
 
   this->WithdrawCommand = 0;
 }
@@ -47,8 +46,6 @@ vtkKWPopupButton::vtkKWPopupButton()
 //----------------------------------------------------------------------------
 vtkKWPopupButton::~vtkKWPopupButton()
 {
-  this->SetPopupTitle(0);
-
   if (this->PopupTopLevel)
     {
     this->PopupTopLevel->Delete();
@@ -88,17 +85,19 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
 
   ostrstream tk_cmd;
 
-  // Create the toplevel
+  // Create  top level window
 
-  this->PopupTopLevel->Create(app, "toplevel", "-bd 2 -relief flat");
+  this->PopupTopLevel->SetMasterWindow(this);
+  this->PopupTopLevel->Create(app, "-bd 2 -relief flat");
+  this->PopupTopLevel->Withdraw();
 
-  tk_cmd << "wm withdraw " << this->PopupTopLevel->GetWidgetName() << endl
-         << "wm title " << this->PopupTopLevel->GetWidgetName() 
-         << " [wm title [winfo toplevel " 
-         << this->GetWidgetName() << "]]"<< endl
-         << "wm transient " << this->PopupTopLevel->GetWidgetName() 
-         << " " << this->GetWidgetName() << endl
-         << "wm protocol " << this->PopupTopLevel->GetWidgetName()
+  if (!this->PopupTopLevel->GetTitle())
+    {
+    this->PopupTopLevel->SetTitle(
+      this->Script("wm title [winfo toplevel %s]", this->GetWidgetName()));
+    }
+
+  tk_cmd << "wm protocol " << this->PopupTopLevel->GetWidgetName()
          << " WM_DELETE_WINDOW {" 
          << this->GetTclName() << " WithdrawPopupCallback}" << endl;
 
@@ -125,12 +124,6 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   this->Script(tk_cmd.str());
   tk_cmd.rdbuf()->freeze(0);
   
-  if ( this->PopupTitle )
-    {
-    this->Script("wm title %s {%s}", 
-                 this->PopupTopLevel->GetWidgetName(), this->PopupTitle);
-    }
-
   this->Bind();
 
   // Update enable state
@@ -146,7 +139,7 @@ void vtkKWPopupButton::Bind()
     return;
     }
 
-  // Bind the button so that it popups the toplevel
+  // Bind the button so that it popups the top level window
 
   this->Script("bind %s <ButtonPress> {%s DisplayPopupCallback}",
                this->GetWidgetName(), this->GetTclName());
@@ -179,32 +172,7 @@ void vtkKWPopupButton::UnBind()
 // ---------------------------------------------------------------------------
 void vtkKWPopupButton::SetPopupTitle(const char* title)
 {
-  if ( this->PopupTitle == title )
-    {
-    return;
-    }
-
-  if (this->PopupTitle && title && !strcmp(this->PopupTitle, title))
-    {
-    return;
-    }
-
-  if ( this->PopupTitle )
-    {
-    delete [] this->PopupTitle;
-    this->PopupTitle = 0;
-    }
-
-  if ( title )
-    {
-    this->PopupTitle = kwsys::SystemTools::DuplicateString(title);
-
-    if (this->IsCreated() && this->PopupTopLevel->IsCreated())
-      {
-      this->Script("wm title %s {%s}", 
-                   this->PopupTopLevel->GetWidgetName(), this->PopupTitle);
-      }
-    }
+  this->PopupTopLevel->SetTitle(title);
 }
 
 // ---------------------------------------------------------------------------
@@ -215,7 +183,7 @@ void vtkKWPopupButton::DisplayPopupCallback()
     return;
     }
 
-  // Get the position of the mouse, the size of the toplevel.
+  // Get the position of the mouse, the size of the top level window.
 
   const char *res = 
     this->Script("concat "
@@ -252,14 +220,9 @@ void vtkKWPopupButton::DisplayPopupCallback()
     py = 0;
     }
 
-  this->Script("wm geometry %s +%d+%d",
-               this->PopupTopLevel->GetWidgetName(), px, py);
-
-  this->Script("wm deiconify %s", 
-               this->PopupTopLevel->GetWidgetName());
-  
-  this->Script("raise %s", 
-               this->PopupTopLevel->GetWidgetName());
+  this->PopupTopLevel->SetPosition(px, py);
+  this->PopupTopLevel->DeIconify();
+  this->PopupTopLevel->Raise();
 }
 
 // ---------------------------------------------------------------------------
@@ -275,8 +238,7 @@ void vtkKWPopupButton::WithdrawPopupCallback()
     return;
     }
 
-  this->Script("wm withdraw %s",
-               this->PopupTopLevel->GetWidgetName());
+  this->PopupTopLevel->Withdraw();
   if ( this->WithdrawCommand )
     {
     this->Script(this->WithdrawCommand);
@@ -335,8 +297,6 @@ void vtkKWPopupButton::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PopupTopLevel: " << this->PopupTopLevel << endl;
   os << indent << "PopupFrame: " << this->PopupFrame << endl;
   os << indent << "PopupCloseButton: " << this->PopupCloseButton << endl;
-  os << indent << "PopupTitle: " 
-     << (this->PopupTitle ? this->PopupTitle : "(none)") << endl;
   os << indent << "WithdrawCommand: "
      << (this->WithdrawCommand ? this->WithdrawCommand : "(none)") << endl;
 }

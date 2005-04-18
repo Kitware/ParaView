@@ -41,7 +41,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.222");
+vtkCxxRevisionMacro(vtkKWWindow, "1.223");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -93,8 +93,6 @@ vtkKWWindow::vtkKWWindow()
   this->PrintTargetDPI        = 100;
   this->SupportHelp           = 1;
   this->SupportPrint           = 1;
-  this->WindowClass           = NULL;
-  this->Title                 = NULL;
   this->PromptBeforeClose     = 1;
   this->ScriptExtension       = 0;
   this->ScriptType            = 0;
@@ -165,8 +163,6 @@ vtkKWWindow::~vtkKWWindow()
     this->ToolbarsMenu = NULL;
     }
   this->SetStatusImageName(0);
-  this->SetWindowClass(0);
-  this->SetTitle(0);
   this->SetScriptExtension(0);
   this->SetScriptType(0);
   this->MostRecentFilesManager->Delete();
@@ -175,24 +171,21 @@ vtkKWWindow::~vtkKWWindow()
 //----------------------------------------------------------------------------
 void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 {
-  // Call the superclass to set the appropriate flags
+  // Check if already created
 
-  if (!this->Superclass::Create(app, NULL, NULL))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro("class already created");
     return;
     }
 
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app, args);
+
   const char *wname = this->GetWidgetName();
 
-  this->Script("toplevel %s -visual best %s -class %s",
-               wname, (args ? args : ""), this->WindowClass);
-
-  this->Script("wm title %s {%s}", 
-               wname, this->GetTitle());
-
-  this->Script("wm iconname %s {%s}",
-               wname, app->GetPrettyName());
+  this->Script("wm iconname %s {%s}", wname, app->GetPrettyName());
 
   // Set up standard menus
 
@@ -1243,42 +1236,6 @@ void vtkKWWindow::ProcessErrorClick()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::SetTitle (const char* _arg)
-{
-  if (this->Title == NULL && _arg == NULL) 
-    { 
-    return;
-    }
-
-  if (this->Title && _arg && (!strcmp(this->Title, _arg))) 
-    {
-    return;
-    }
-
-  if (this->Title) 
-    { 
-    delete [] this->Title; 
-    }
-
-  if (_arg)
-    {
-    this->Title = new char[strlen(_arg)+1];
-    strcpy(this->Title, _arg);
-    }
-  else
-    {
-    this->Title = NULL;
-    }
-
-  this->Modified();
-
-  if (this->IsCreated() && this->Title)
-    {
-    this->Script("wm title %s {%s}", this->GetWidgetName(), this->GetTitle());
-    }
-} 
-
-//----------------------------------------------------------------------------
 char* vtkKWWindow::GetTitle()
 {
   if (!this->Title && 
@@ -1496,8 +1453,6 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ViewFrame: " << this->GetViewFrame() << endl;
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
   os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
-  os << indent << "Title: " 
-     << ( this->GetTitle() ? this->GetTitle() : "(none)" ) << endl;  
   os << indent << "Toolbars: " << this->GetToolbars() << endl;
 }
 

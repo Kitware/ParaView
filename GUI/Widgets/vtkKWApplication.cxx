@@ -56,7 +56,7 @@ EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.197");
+vtkCxxRevisionMacro(vtkKWApplication, "1.198");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -719,8 +719,7 @@ void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
   if (!this->AboutDialog->IsCreated())
     {
     this->AboutDialog->SetMasterWindow(master);
-    this->AboutDialog->SetOptions(
-      this->AboutDialog->GetOptions() | vtkKWMessageDialog::NoDecoration);
+    this->AboutDialog->HideDecorationOn();
     this->AboutDialog->Create(this, "-bd 1 -relief solid");
     }
 

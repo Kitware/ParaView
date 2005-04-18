@@ -18,20 +18,17 @@
 #ifndef __vtkKWDialog_h
 #define __vtkKWDialog_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWTopLevel.h"
 
-class vtkKWApplication;
-class vtkKWWindow;
-
-class VTK_EXPORT vtkKWDialog : public vtkKWWidget
+class VTK_EXPORT vtkKWDialog : public vtkKWTopLevel
 {
 public:
   static vtkKWDialog* New();
-  vtkTypeRevisionMacro(vtkKWDialog,vtkKWWidget);
+  vtkTypeRevisionMacro(vtkKWDialog,vtkKWTopLevel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
+  // Create the widget
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
@@ -41,7 +38,7 @@ public:
   virtual int Invoke();
 
   // Description:
-  // Display the dialog in a non-modal manner.
+  // Display the dialog in a modal manner.
   virtual void Display();
 
   // Description:
@@ -79,56 +76,20 @@ public:
   vtkBooleanMacro(InvokeAtPointer, int);
   vtkGetMacro(InvokeAtPointer, int);
 
-  // Description:
-  // Set the title of the dialog. Default is "Kitware Dialog".
-  void SetTitle(const char *);
-
-  // Description:
-  // Set the window to which the dialog will be slave.
-  // If set, this dialog will always be on top of the master
-  // window and will minimize with it (assuming that the windowing
-  // system supports this)
-  void SetMasterWindow(vtkKWWindow* win);
-  vtkKWWindow *GetMasterWindow();
-
-  // Description:
-  // Convenience method to guess the width/height of the dialog.
-  virtual int GetWidth();
-  virtual int GetHeight();
-
-  // Description:
-  // Return if the dialog has ever been mapped (deiconified)
-  vtkGetMacro(HasBeenMapped, int);
-
 protected:
-  // Description:
-  // Set the title string of the dialog window. Should be called before
-  // create otherwise it will have no effect.
-  vtkSetStringMacro(TitleString);
 
   vtkKWDialog();
-  ~vtkKWDialog();
+  ~vtkKWDialog() {};
 
-  void DeIconify();
-  void Withdraw();
-
-  vtkKWWindow* MasterWindow;
-
-  char *TitleString;
   int Done;
   int Beep;
   int BeepType;
   int InvokeAtPointer;
   int GrabDialog;
-  int HasBeenMapped;
 
 private:
   vtkKWDialog(const vtkKWDialog&); // Not implemented
   void operator=(const vtkKWDialog&); // Not Implemented
 };
 
-
 #endif
-
-
-

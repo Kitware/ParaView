@@ -19,6 +19,7 @@
 #include "vtkKWPushButton.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTopLevel.h"
 
 #define VTK_KW_TW_BORDER_SIZE      2
 #define VTK_KW_TW_MIN_SIZE_NOTCHES 2
@@ -31,7 +32,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.27");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.28");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -171,20 +172,16 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app,
     return;
     }
 
-  // If we need the thumbwheel to popup, create the toplevel and the pushbutton
+  // If we need the scale to popup, create the top level window accordingly
+  // and its push button
 
   if (this->PopupMode)
     {
-    this->TopLevel = vtkKWWidget::New();
-    this->TopLevel->Create(
-      app, "toplevel", "-bg black -bd 2 -relief flat");
-    this->Script("wm transient %s %s", 
-                 this->TopLevel->GetWidgetName(),
-                 this->GetWidgetName());
-    this->Script("wm overrideredirect %s 1", 
-                 this->TopLevel->GetWidgetName());
-    this->Script("wm withdraw %s", 
-                 this->TopLevel->GetWidgetName());
+    this->TopLevel = vtkKWTopLevel::New();
+    this->TopLevel->Create(app, "-bg black -bd 2 -relief flat");
+    this->TopLevel->HideDecorationOn();
+    this->TopLevel->Withdraw();
+    this->TopLevel->SetMasterWindow(this);
 
     this->PopupPushButton = vtkKWPushButton::New();
     this->PopupPushButton->SetParent(this);
@@ -691,8 +688,8 @@ void vtkKWThumbWheel::Bind()
       this->Script("bind %s <Configure> {}", this->ThumbWheel->GetWidgetName());
       }
 
-    // If in popup mode, leaving the toplevel will withdraw it, unless 
-    // the user is interacting with the scale.
+    // If in popup mode and the mouse is leaving the top level window, 
+    // then withdraw it, unless the user is interacting with the wheel.
 
     if (this->PopupMode &&
         this->TopLevel && this->TopLevel->IsCreated())
@@ -809,13 +806,10 @@ void vtkKWThumbWheel::DisplayPopupCallback()
     y -= th / 2;
     }
 
-  this->Script("wm geometry %s +%d+%d",
-               this->TopLevel->GetWidgetName(), x, y);
+  this->TopLevel->SetPosition(x, y);
   this->Script("update");
-  this->Script("wm deiconify %s", 
-               this->TopLevel->GetWidgetName());
-  this->Script("raise %s", 
-               this->TopLevel->GetWidgetName());
+  this->TopLevel->DeIconify();
+  this->TopLevel->Raise();
 }
 
 // ---------------------------------------------------------------------------
@@ -830,7 +824,7 @@ void vtkKWThumbWheel::WithdrawPopupCallback()
 
   // Withdraw the popup
 
-  this->Script("wm withdraw %s", this->TopLevel->GetWidgetName());
+  this->TopLevel->Withdraw();
 }
 
 // ---------------------------------------------------------------------------

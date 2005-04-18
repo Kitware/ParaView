@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.347");
+vtkCxxRevisionMacro(vtkPVApplication, "1.348");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1192,7 +1192,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if (this->ShowSplashScreen)
     {
-    this->GetSplashScreen()->Hide();
+    this->GetSplashScreen()->Withdraw();
     }
 
   const char* loadedTraceName = 0;

@@ -137,7 +137,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.684");
+vtkCxxRevisionMacro(vtkPVWindow, "1.685");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1156,7 +1156,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   // Hide the main window until after all user interface is initialized.
 
-  this->Script( "wm withdraw %s", this->GetWidgetName());
+  this->Withdraw();
 
   // Add Show lower pane to menu.
   this->GetMenuWindow()->AddCommand(VTK_PV_SHOW_HORZPANE_LABEL, this,
@@ -1569,7 +1569,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     this->MainView->SetupCameraManipulators();     
     }
 
-  this->Script( "wm deiconify %s", this->GetWidgetName());
+  this->DeIconify();
 
   // Enable Drag&Drop from files if tkdnd is available
   if (!app->EvaluateBooleanExpression("catch {package require tkdnd}"))

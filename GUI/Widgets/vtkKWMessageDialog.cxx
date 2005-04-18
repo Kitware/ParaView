@@ -22,10 +22,11 @@
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWRegistryHelper.h"
+#include "vtkKWWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.69");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.70");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -257,11 +258,6 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -side left -fill y",
                this->Icon->GetWidgetName());
   this->Script("pack forget %s", this->Icon->GetWidgetName());
-
-  if (this->Options & vtkKWMessageDialog::NoDecoration)
-    {
-    this->Script("wm overrideredirect %s 1", this->GetWidgetName());
-    }
 
 #ifdef KW_MESSAGEDIALOG_DEBUG
   this->Script("%s configure -bg red -height 5", this->TopFrame->GetWidgetName());
@@ -505,9 +501,9 @@ int vtkKWMessageDialog::GetWidth()
   // GetWidth() is called by vtkKWDialog when it's time to center the
   // dialog. Unfortunately, since the widget has not been mapped at that
   // time, 'winfo width' will most probably return 1, and 'winfo reqwidth'
-  // will return the default size of the toplevel. Let's try to help a bit
-  // by checking the size of the internal frames (which width can be set
-  // explicitly).
+  // will return the default size of the top level window. Let's try to
+  // help a bit by checking the size of the internal frames (which width can
+  // be set explicitly).
 
   if (this->TopFrame)
     {
@@ -555,9 +551,9 @@ int vtkKWMessageDialog::GetHeight()
   // GetHeight() is called by vtkKWDialog when it's time to center the
   // dialog. Unfortunately, since the widget has not been mapped at that
   // time, 'winfo height' will most probably return 1, and 'winfo reqheight'
-  // will return the default size of the toplevel. Let's try to help a bit
-  // by checking the size of the internal frames (which height can be set
-  // explicitly).
+  // will return the default size of the top level window. Let's try to help
+  // a bit by checking the size of the internal frames (which height can be
+  // set explicitly).
 
   if (this->TopFrame)
     {

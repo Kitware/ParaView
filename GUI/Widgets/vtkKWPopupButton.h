@@ -23,6 +23,7 @@
 #include "vtkKWPushButton.h"
 
 class vtkKWFrame;
+class vtkKWTopLevel;
 
 class VTK_EXPORT vtkKWPopupButton : public vtkKWPushButton
 {
@@ -38,7 +39,7 @@ public:
   // Description:
   // Access to sub-widgets.
   // The PopupFrame widget is the place to put your own sub-widgets.
-  vtkGetObjectMacro(PopupTopLevel, vtkKWWidget);
+  vtkGetObjectMacro(PopupTopLevel, vtkKWTopLevel);
   vtkGetObjectMacro(PopupFrame, vtkKWFrame);
   vtkGetObjectMacro(PopupCloseButton, vtkKWPushButton);
 
@@ -48,9 +49,8 @@ public:
   virtual void WithdrawPopupCallback();
 
   // Description:
-  // Set/Get popup title
+  // Convenience method to set the popup title
   virtual void SetPopupTitle(const char* title);
-  vtkGetStringMacro(PopupTitle);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -71,11 +71,9 @@ protected:
   vtkKWPopupButton();
   ~vtkKWPopupButton();
 
-  vtkKWWidget     *PopupTopLevel;
-  vtkKWFrame     *PopupFrame;
+  vtkKWTopLevel   *PopupTopLevel;
+  vtkKWFrame      *PopupFrame;
   vtkKWPushButton *PopupCloseButton;
-
-  char* PopupTitle;
 
   char* WithdrawCommand;
 

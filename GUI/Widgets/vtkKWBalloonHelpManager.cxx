@@ -15,13 +15,14 @@
 
 #include "vtkKWLabel.h"
 #include "vtkKWWidget.h"
+#include "vtkKWTopLevel.h"
 #include "vtkKWApplication.h"
 
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.1");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.2");
 
 int vtkKWBalloonHelpManagerCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -34,7 +35,7 @@ vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
   this->CurrentWidget = NULL;
   this->AfterTimerId = NULL;
 
-  this->Toplevel = NULL;
+  this->TopLevel = NULL;
   this->Label = NULL;
 
   this->Delay = 2;
@@ -47,10 +48,10 @@ vtkKWBalloonHelpManager::~vtkKWBalloonHelpManager()
   this->SetCurrentWidget(NULL);
   this->SetAfterTimerId(NULL);
 
-  if (this->Toplevel)
+  if (this->TopLevel)
     {
-    this->Toplevel->Delete();
-    this->Toplevel = NULL;
+    this->TopLevel->Delete();
+    this->TopLevel = NULL;
     }
 
   if (this->Label)
@@ -63,9 +64,9 @@ vtkKWBalloonHelpManager::~vtkKWBalloonHelpManager()
 //----------------------------------------------------------------------------
 void vtkKWBalloonHelpManager::CreateBalloon()
 {
-  if (!this->Toplevel)
+  if (!this->TopLevel)
     {
-    this->Toplevel = vtkKWWidget::New();
+    this->TopLevel = vtkKWTopLevel::New();
     }
 
   if (!this->Label)
@@ -81,19 +82,15 @@ void vtkKWBalloonHelpManager::CreateBalloon()
 
   if (app)
     {
-    if (!this->Toplevel->IsCreated())
+    if (!this->TopLevel->IsCreated())
       {
-      this->Toplevel->Create(
-        app, "toplevel", "-background black -bd 1 -relief flat");
-      app->Script("wm overrideredirect %s 1", 
-                   this->Toplevel->GetWidgetName());
-      app->Script("wm withdraw %s", 
-                   this->Toplevel->GetWidgetName());
+      this->TopLevel->HideDecorationOn();
+      this->TopLevel->Create(app, "-background black -bd 1 -relief flat");
       }
 
-    if (!this->Label->IsCreated() && this->Toplevel)
+    if (!this->Label->IsCreated() && this->TopLevel)
       {
-      this->Label->SetParent(this->Toplevel);    
+      this->Label->SetParent(this->TopLevel);    
       this->Label->Create(
         app, 
         "-bg LightYellow -foreground black -justify left -wraplength 2i");
@@ -148,10 +145,10 @@ void vtkKWBalloonHelpManager::CancelCallback()
   this->SetCurrentWidget(NULL);
 
   // Hide the balloon help
-  
-  if (this->Toplevel && this->Toplevel->IsCreated())
+
+  if (this->TopLevel)
     {
-    this->Script("wm withdraw %s", this->Toplevel->GetWidgetName());
+    this->TopLevel->Withdraw();
     }
 }
 
@@ -165,9 +162,9 @@ void vtkKWBalloonHelpManager::WithdrawCallback()
 
   // Hide the balloon help
   
-  if (this->Toplevel && this->Toplevel->IsCreated())
+  if (this->TopLevel)
     {
-    this->Script("wm withdraw %s", this->Toplevel->GetWidgetName());
+    this->TopLevel->Withdraw();
     }
 
   // Re-schedule the balloon help for the current widget (if any)
@@ -233,18 +230,17 @@ void vtkKWBalloonHelpManager::DisplayCallback(vtkKWWidget *widget)
       }
     }
 
-  // Place the toplevel
+  // Place the balloon
 
-  this->Script("wm geometry %s +%d+%d",
-              this->Toplevel->GetWidgetName(), x, y + 15);
+  this->TopLevel->SetPosition(x, y + 15);
   this->Script("update");
 
-  // Map the toplevel
+  // Map the balloon
 
   if (this->AfterTimerId)
     {
-    this->Script("wm deiconify %s", this->Toplevel->GetWidgetName());
-    this->Script("raise %s", this->Toplevel->GetWidgetName());
+    this->TopLevel->DeIconify();
+    this->TopLevel->Raise();
     }
   
   this->SetAfterTimerId(NULL);

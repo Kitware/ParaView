@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.24");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -45,16 +45,20 @@ vtkKWSplashScreen::~vtkKWSplashScreen()
 //----------------------------------------------------------------------------
 void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
 {
-  // Call the superclass to create the widget and set the appropriate flags
+  // Check if already created
 
-  if (!this->Superclass::Create(app, "toplevel", NULL))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
 
-  this->Script("wm withdraw %s", this->GetWidgetName());
-  this->Script("wm overrideredirect %s 1", this->GetWidgetName());
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app, args);
+
+  this->Withdraw();
+  this->HideDecorationOn();
 
   // Create and pack the canvas
 
@@ -64,7 +68,7 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -side top -fill both -expand y",
                this->Canvas->GetWidgetName());
 
-  this->Canvas->SetBind(this, "<ButtonPress>", "Hide");
+  this->Canvas->SetBind(this, "<ButtonPress>", "Withdraw");
 
   // Insert the image
 
@@ -113,7 +117,7 @@ void vtkKWSplashScreen::UpdateProgressMessagePosition()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSplashScreen::Show()
+void vtkKWSplashScreen::Display()
 {
   if (!this->IsCreated())
     {
@@ -150,18 +154,11 @@ void vtkKWSplashScreen::Show()
   int x = (sw - w) / 2;
   int y = (sh - h) / 2;
 
-  this->Script("wm geometry %s +%d+%d", this->GetWidgetName(), x, y);
+  this->SetPosition(x, y);
 
-  this->Script("wm deiconify %s", this->GetWidgetName());
-  this->Script("raise %s", this->GetWidgetName());
-  this->Script("focus %s", this->GetWidgetName());
+  this->Superclass::Display();
+
   this->Script("update", this->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSplashScreen::Hide()
-{
-  this->Script("wm withdraw %s", this->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -213,7 +210,7 @@ void vtkKWSplashScreen::SetProgressMessage(const char *txt)
   this->Script("catch {%s itemconfigure msg -text {%s}}",
                this->Canvas->GetWidgetName(), (str ? str : ""));
 
-  this->Show();
+  this->Display();
 }
 
 //----------------------------------------------------------------------------

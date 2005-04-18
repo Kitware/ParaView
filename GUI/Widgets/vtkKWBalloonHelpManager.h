@@ -29,8 +29,9 @@
 
 #include "vtkKWObject.h"
 
-class vtkKWWidget;
+class vtkKWTopLevel;
 class vtkKWLabel;
+class vtkKWWidget;
 
 class VTK_EXPORT vtkKWBalloonHelpManager : public vtkKWObject
 {
@@ -70,8 +71,8 @@ protected:
   int Show;
   int Delay;
 
-  vtkKWWidget *Toplevel;
-  vtkKWLabel *Label;
+  vtkKWTopLevel *TopLevel;
+  vtkKWLabel    *Label;
 
   // Description:
   // The widget which balloon help is currently being displayed or pending.

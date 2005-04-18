@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.28");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.29");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -45,12 +45,10 @@ vtkKWTclInteractor::vtkKWTclInteractor()
   
   this->DisplayText = vtkKWText::New();
   
-  this->Title = NULL;
-  this->SetTitle("VTK Interactor");
+  this->SetTitle("Tcl Interactor");
   
   this->TagNumber = 1;
   this->CommandIndex = 0;
-  this->MasterWindow = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -70,82 +68,35 @@ vtkKWTclInteractor::~vtkKWTclInteractor()
   
   this->DisplayText->Delete();
   this->DisplayText = NULL;
-  
-  this->SetTitle(NULL);
-  this->SetMasterWindow(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWTclInteractor::SetMasterWindow(vtkKWWindow* win)
-{
-  if (this->MasterWindow != win) 
-    { 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->UnRegister(this); 
-      }
-    this->MasterWindow = win; 
-    if (this->MasterWindow) 
-      { 
-      this->MasterWindow->Register(this); 
-      if (this->IsCreated())
-        {
-        this->Script("wm transient %s %s", this->GetWidgetName(), 
-                     this->MasterWindow->GetWidgetName());
-        }
-      } 
-    this->Modified(); 
-    } 
-  
 }
 
 //----------------------------------------------------------------------------
 void vtkKWTclInteractor::Create(vtkKWApplication *app)
 {
-  // Call the superclass to set the appropriate flags then create manually
+  // Check if already created
 
-  if (!this->Superclass::Create(app, NULL, NULL))
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    vtkErrorMacro(<< this->GetClassName() << " already created");
     return;
     }
 
-  const char *wname = this->GetWidgetName();
-  if (this->MasterWindow)
-    {
-    this->Script("toplevel %s -class %s", 
-                 wname,
-                 this->MasterWindow->GetClassName());
-    }
-  else
-    {
-    this->Script("toplevel %s", wname);
-    }
+  // Call the superclass to create the whole widget
 
-  this->Script("wm title %s \"%s\"", wname, this->Title);
-  this->Script("wm iconname %s \"vtk\"", wname);
-  if (this->MasterWindow)
-    {
-    this->Script("wm transient %s %s", wname, 
-                 this->MasterWindow->GetWidgetName());
-    }
-  
+  this->Superclass::Create(app, NULL);
+
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create(app, "");
   this->Script("pack %s -side bottom -fill both -expand 0 -pady 2m",
                this->ButtonFrame->GetWidgetName());
   
-  char buttonCommand[100];
-  sprintf(buttonCommand, "-command \"wm withdraw %s\"", wname);
   this->DismissButton->SetParent(this->ButtonFrame);
-  this->DismissButton->Create(app, buttonCommand);
+  this->DismissButton->Create(app, NULL);
+  this->DismissButton->SetCommand(this, "Withdraw");
   this->DismissButton->SetText("Dismiss");
   this->Script("pack %s -side left -expand 1 -fill x",
                this->DismissButton->GetWidgetName());
 
-  this->Script("wm protocol %s WM_DELETE_WINDOW {wm withdraw %s}",
-               wname, wname);
-  
   this->CommandFrame->SetParent(this);
   this->CommandFrame->Create(app, "");
   
@@ -183,7 +134,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   this->Script("bind %s <Up> {%s UpCallback}",
                this->GetWidgetName(), this->GetTclName());
   
-  this->Script("wm withdraw %s", wname);
+  this->Withdraw();
 }
 
 //----------------------------------------------------------------------------
@@ -191,21 +142,16 @@ void vtkKWTclInteractor::Display()
 {
   if (this->MasterWindow)
     {
-    int width, height;
-    
-    int x, y;
-
+    int width, height, x, y;
     const char *res = 
       this->Script("wm geometry %s", this->MasterWindow->GetWidgetName());
     sscanf(res, "%dx%d+%d+%d", &width, &height, &x, &y);
-    
     x += width / 3;
     y += height / 3;
-    
-    this->Script("wm geometry %s +%d+%d", this->GetWidgetName(), x, y);
+    this->SetPosition(x, y);
     }
 
-  this->Script("wm deiconify %s", this->GetWidgetName());
+  this->Superclass::Display();
 }
 
 //----------------------------------------------------------------------------
@@ -335,6 +281,5 @@ void vtkKWTclInteractor::UpdateEnableState()
 void vtkKWTclInteractor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Title: " << this->GetTitle() << endl;
 }
 
