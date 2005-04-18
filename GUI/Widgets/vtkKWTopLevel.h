@@ -79,11 +79,6 @@ public:
   vtkGetStringMacro(Title);
 
   // Description:
-  // Convenience method to guess the width/height of the toplevel.
-  virtual int GetWidth();
-  virtual int GetHeight();
-
-  // Description:
   // Convenience method to set/get the window position in screen pixel
   // coordinates. No effect if called before Create()
   // Return 1 on success, 0 otherwise.
@@ -96,6 +91,11 @@ public:
   // Return 1 on success, 0 otherwise.
   virtual int SetSize(int w, int h);
   virtual int GetSize(int *w, int *h);
+
+  // Description:
+  // Convenience method to guess the width/height of the toplevel.
+  virtual int GetWidth();
+  virtual int GetHeight();
 
   // Description:
   // Return if the toplevel has ever been mapped (deiconified)

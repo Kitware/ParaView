@@ -21,7 +21,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.1");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.2");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -264,14 +264,17 @@ int vtkKWTopLevel::SetSize(int w, int h)
     {
     return 0;
     }
-  this->Script("wm geometry %s %d%d", this->GetWidgetName(), w, h);
+  this->Script("wm geometry %s %dx%d", this->GetWidgetName(), w, h);
   return 1;
 }
 
 //----------------------------------------------------------------------------
 int vtkKWTopLevel::GetSize(int *w, int *h)
 {
-  return vtkKWTkUtilities::GetGeometry(this, w, h, NULL, NULL);
+  *w = this->GetWidth();
+  *h = this->GetHeight();
+  return 1;
+  //return vtkKWTkUtilities::GetGeometry(this, w, h, NULL, NULL);
 }
 
 //----------------------------------------------------------------------------
