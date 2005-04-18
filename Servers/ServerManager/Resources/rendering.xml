@@ -534,6 +534,15 @@
         default_values="0 0 0" >
         <DoubleRangeDomain name="range" min="0 0 0" max="1 1 1"/>
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+        name="Viewport"
+        command="SetViewport"
+        number_of_elements="4"
+        default_values="0 0 1 1"
+        saveable="0">
+        <DoubleRangeDomain name="range" min="0 0 0 0" max="1 1 1 1" />
+      </DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>
 
@@ -712,13 +721,23 @@
       </Property>    
 
       <IntVectorProperty
-         name="RenderWindowSize"
+         name="RenderWindowSizeInfo"
          command="GetSize"
          number_of_elements="2"
          information_only="1"
          default_values="0 0">
          <SimpleIntInformationHelper/>
       </IntVectorProperty>
+
+      <IntVectorProperty
+         name="RenderWindowSize"
+         command="SetSize"
+         number_of_elements="2"
+         information_property="RenderWindowSizeInfo"
+         default_values="400 400">
+         <IntRangeDomain name="range" min="0 0" />
+      </IntVectorProperty>
+
     </Proxy>
   </ProxyGroup>
 
@@ -1346,12 +1365,20 @@
           <!-- only the properties listed in here can be accessed externall
           for this subproxy -->
           <Property name="Background" />
+          <Property name="Viewport" />
         </ExposedProperties>
       </SubProxy>
 
       <SubProxy>
         <Proxy name="Renderer2D" proxyname="Renderer" proxygroup="renderers">
         </Proxy>
+        <ShareProperties subproxy="Renderer">
+          <Exception name="ViewProps" />
+          <Exception name="Erase" />
+          <Exception name="Layer" />
+          <Exception name="Background" />
+          <!-- sharing only Viewport property -->
+        </ShareProperties>
       </SubProxy>
 
       <SubProxy>

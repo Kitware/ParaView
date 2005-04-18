@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.3");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.4");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -414,7 +414,7 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
 
   ren->UpdateInformation();
   vtkSMIntVectorProperty* winSize =
-    vtkSMIntVectorProperty::SafeDownCast(ren->GetProperty("RenderWindowSize"));
+    vtkSMIntVectorProperty::SafeDownCast(ren->GetProperty("RenderWindowSizeInfo"));
 
   double biggestBounds[6] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, 
                              VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
