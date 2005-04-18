@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -174,7 +174,12 @@ void vtkSMSimpleDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
       num = input->GetNumberOfParts();
       }
     }
-
+  if (num == 0)
+    {
+    vtkErrorMacro("Input proxy has no output! Cannot create the display");
+    return;
+    }
+  
   // This will create all the subproxies with correct number of parts.
   if (input)
     {
@@ -525,6 +530,11 @@ void vtkSMSimpleDisplayProxy::SetupVolumeDefaults()
 //-----------------------------------------------------------------------------
 void vtkSMSimpleDisplayProxy::SetRepresentation(int representation)
 {
+  if (!this->ObjectsCreated)
+    {
+    return;
+    }
+    
   if (this->Representation == representation)
     {
     return;
@@ -754,6 +764,10 @@ void vtkSMSimpleDisplayProxy::SetVisibility(int visible)
   int geom_visibility = (!this->VolumeRenderMode && visible)? 1 : 0;
   int vol_visibility = (this->VolumeRenderMode && visible)? 1 : 0;
 
+  if (!this->ActorProxy)
+    {
+    return;
+    }
   vtkSMIntVectorProperty* ivp;
   
   ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -852,6 +866,12 @@ void vtkSMSimpleDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
     pp->AddProxy(this->VolumeActorProxy);
     }
     */
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Display proxy not created!");
+    return;
+    }
+
   rm->AddPropToRenderer(this->ActorProxy);
   if (this->HasVolumePipeline)
     {
@@ -862,6 +882,11 @@ void vtkSMSimpleDisplayProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 //-----------------------------------------------------------------------------
 void vtkSMSimpleDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 {
+  if (!this->ObjectsCreated)
+    {
+    vtkErrorMacro("Display proxy not created!");
+    return;
+    }
   /*
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetRendererProxy()->GetProperty("ViewProps"));

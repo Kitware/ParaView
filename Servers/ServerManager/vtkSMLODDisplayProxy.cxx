@@ -23,7 +23,7 @@
 #include "vtkPVLODPartDisplayInformation.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -52,6 +52,10 @@ void vtkSMLODDisplayProxy::SetLODResolution(int res)
     return;
     }
   this->LODResolution = res;
+  if (!this->LODDecimatorProxy)
+    {
+    return;
+    }
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->LODDecimatorProxy->GetProperty("NumberOfDivisions"));
   ivp->SetElement(0, this->LODResolution);
@@ -289,13 +293,16 @@ void vtkSMLODDisplayProxy::InvalidateLODGeometry()
   this->LODGeometryIsValid = 0;
   this->LODInformationIsValid = 0;
   this->InvokeEvent(vtkSMLODDisplayProxy::InformationInvalidatedEvent);
-  vtkSMProperty* p = this->LODUpdateSuppressorProxy->GetProperty("RemoveAllCaches");
-  if (!p)
+  if (this->LODUpdateSuppressorProxy)
     {
-    vtkErrorMacro("Failed to find property RemoveAllCaches on LODUpdateSuppressorProxy.");
-    return;
+    vtkSMProperty* p = this->LODUpdateSuppressorProxy->GetProperty("RemoveAllCaches");
+    if (!p)
+      {
+      vtkErrorMacro("Failed to find property RemoveAllCaches on LODUpdateSuppressorProxy.");
+      return;
+      }
+    p->Modified();
     }
-  p->Modified();
 }
 
 //-----------------------------------------------------------------------------

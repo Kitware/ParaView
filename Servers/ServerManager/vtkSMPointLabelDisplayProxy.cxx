@@ -26,7 +26,7 @@
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkMPIMoveData.h"
-
+#include "vtkPVDataInformation.h"
 vtkStandardNewMacro(vtkSMPointLabelDisplayProxy);
 vtkCxxRevisionMacro(vtkSMPointLabelDisplayProxy, "Revision: 1.1$");
 
@@ -61,6 +61,12 @@ void vtkSMPointLabelDisplayProxy::AddInput(vtkSMSourceProxy* input,
 //-----------------------------------------------------------------------------
 void vtkSMPointLabelDisplayProxy::SetInput(vtkSMSourceProxy* input)
 {
+  vtkPVDataInformation *di=input->GetDataInformation();
+  if(!di->DataSetTypeIsA("vtkDataSet") || di->GetBaseDataClassName())
+    {
+    return;
+    }
+
   this->InvalidateGeometry();
   this->CreateVTKObjects(1);
 

@@ -496,6 +496,11 @@ protected:
   ~vtkPVSource();
 
   // Description:
+  // Setups up the displays for this source
+  virtual void SetupDisplays();
+  virtual void CleanupDisplays();
+
+  // Description:
   // Set the color map and the field to use.
   void ColorByArray(vtkPVColorMap* colorMap, int field);
 

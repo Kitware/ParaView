@@ -59,7 +59,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.433");
+vtkCxxRevisionMacro(vtkPVSource, "1.434");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -145,6 +145,7 @@ vtkPVSource::vtkPVSource()
 //----------------------------------------------------------------------------
 vtkPVSource::~vtkPVSource()
 {
+  this->CleanupDisplays();
   this->RemoveAllPVInputs();
 
   this->NumberOfOutputsInformation->Delete();
@@ -164,20 +165,12 @@ vtkPVSource::~vtkPVSource()
     
     const char* proxyName = 0;
     proxyName = 
-      proxm->GetProxyName("animateable", this->DisplayProxy);
-
-    if (proxyName)
-      {
-      proxm->UnRegisterProxy("animateable", proxyName);
-      }
-    proxyName = 
       proxm->GetProxyName("animateable", this->Proxy);
     if (proxyName)
       {
       proxm->UnRegisterProxy("animateable", proxyName);
       }
     }
-  this->SetDisplayProxy(0);
   this->SetProxy(0);
 
   // Do not use SetName() or SetLabel() here. These make
@@ -212,17 +205,6 @@ vtkPVSource::~vtkPVSource()
   this->InputProperties = NULL;
 
   this->SetModuleName(0);
-  if (this->CubeAxesDisplayProxy)
-    {
-    this->CubeAxesDisplayProxy->Delete();
-    this->CubeAxesDisplayProxy = 0;
-    }
-  if (this->PointLabelDisplayProxy)
-    {
-    this->PointLabelDisplayProxy->Delete();
-    this->PointLabelDisplayProxy = 0;
-    }
-
   this->SetPVColorMap(0);
   this->SetSourceList(0);
 }
@@ -1033,6 +1015,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     return;
     } 
 
+  unsigned int previous_num_parts = this->GetProxy()->GetNumberOfParts();
+
   this->GetPVApplication()->GetProcessModule()->SendPrepareProgress();
 
   window = this->GetPVWindow();
@@ -1056,87 +1040,11 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // I used to see if the display gui was properly set, but that was a legacy
     // check.  I removed the check.
      
-    
-    // Create the display and add it to the render module.
-    vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
-    vtkSMDisplayProxy* pDisp = rm->CreateDisplayProxy();
-
     // Parts need to be created before we set source as inpout to part display.
     // This creates the proxy parts.
     this->InitializeData();
 
-    // Generally we cannot use Input property here....since it leads to a call
-    // to CreateVTKObjects(1) (which is wrong in this case...). However,
-    // vtkSMDisplayProxy does not create itself until the Input is set,
-    // so this works fine. If fact, using it this was is essential,
-    // so that the DisplayProxy is added as a consumer of the input automatically.
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      pDisp->GetProperty("Input"));
-    pp->RemoveAllProxies();
-    pp->AddProxy(this->GetProxy());
-    pDisp->UpdateVTKObjects();
-
-    this->AddDisplayToRenderModule(pDisp);
-
-    if (!this->GetSourceList())
-      {
-      vtkErrorMacro("SourceList should not be empty. "
-                    "Cannot register display for animation.");
-      }
-    else
-      {
-      vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
-      ostrstream animName_with_warning_C4701;
-      animName_with_warning_C4701 << this->GetSourceList() << "." 
-                                  << this->GetName() << "."
-                                  << "Display"
-                                  << ends;
-      proxm->RegisterProxy(
-        "animateable", animName_with_warning_C4701.str(), pDisp);
-      delete[] animName_with_warning_C4701.str();
-      }
-
-    // Create the Cube Axes.
-    this->CubeAxesDisplayProxy = vtkSMCubeAxesDisplayProxy::SafeDownCast(
-      vtkSMObject::GetProxyManager()
-      ->NewProxy("displays", "CubeAxesDisplay"));
-    // Hookup cube axes display.
-    vtkSMProxyProperty* ccpp = vtkSMProxyProperty::SafeDownCast(
-      this->CubeAxesDisplayProxy->GetProperty("Input"));
-    if (!ccpp)
-      {
-      vtkErrorMacro("Failed to find property Input on CubeAxesDisplayProxy.");
-      }
-    else
-      {
-      ccpp->AddProxy(this->Proxy);
-      this->CubeAxesDisplayProxy->UpdateVTKObjects();
-      }
-    this->CubeAxesDisplayProxy->SetVisibilityCM(0);
-    this->AddDisplayToRenderModule(this->CubeAxesDisplayProxy);
-
-    // Create the Point Label Display proxies.
-    this->PointLabelDisplayProxy = vtkSMPointLabelDisplayProxy::SafeDownCast(
-      vtkSMObject::GetProxyManager()
-      ->NewProxy("displays", "PointLabelDisplay"));
-    
-    // Hookup point label display.
-    ccpp = vtkSMProxyProperty::SafeDownCast(
-      this->PointLabelDisplayProxy->GetProperty("Input"));
-    if (!ccpp)
-      {
-      vtkErrorMacro("Failed to find property Input on PointLabelDisplayProxy");
-      }
-    else
-      {
-      ccpp->AddProxy(this->Proxy);
-      this->PointLabelDisplayProxy->UpdateVTKObjects();
-      }
-    this->PointLabelDisplayProxy->SetVisibilityCM(0);
-    this->AddDisplayToRenderModule(this->PointLabelDisplayProxy);
-
-    this->SetDisplayProxy(pDisp);
-    pDisp->Delete();
+    this->SetupDisplays();
 
     // Make the last data invisible.
     input = this->GetPVInput(0);
@@ -1227,6 +1135,11 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     }
   else
     {
+    if (this->GetProxy()->GetNumberOfParts() != previous_num_parts)
+      {
+      this->CleanupDisplays();
+      this->SetupDisplays();
+      }
     if (this->Notebook->GetDisplayGUI()->GetShouldReinitialize())
       {
       this->Notebook->GetDisplayGUI()->Initialize();
@@ -1277,6 +1190,118 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // This did not happen when the source was selected because it was
   // not initialized.
   this->GetPVWindow()->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::CleanupDisplays()
+{
+  vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+  if (this->DisplayProxy)
+    {
+    if (proxm && this->GetName())
+      {
+      proxm->UnRegisterProxy(this->GetName());
+
+      const char* proxyName = 0;
+      proxyName = 
+        proxm->GetProxyName("animateable", this->DisplayProxy);
+
+      if (proxyName)
+        {
+        proxm->UnRegisterProxy("animateable", proxyName);
+        }
+      }
+    this->RemoveDisplayFromRenderModule(this->DisplayProxy);
+    this->SetDisplayProxy(0);
+    }
+  if (this->CubeAxesDisplayProxy)
+    {
+    this->RemoveDisplayFromRenderModule(this->CubeAxesDisplayProxy);
+    this->CubeAxesDisplayProxy->Delete();
+    this->CubeAxesDisplayProxy = 0;
+    }
+  if (this->PointLabelDisplayProxy)
+    {
+    this->RemoveDisplayFromRenderModule(this->PointLabelDisplayProxy);
+    this->PointLabelDisplayProxy->Delete();
+    this->PointLabelDisplayProxy = 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetupDisplays()
+{
+  // Create the display and add it to the render module.
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+  vtkSMDisplayProxy* pDisp = rm->CreateDisplayProxy();
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    pDisp->GetProperty("Input"));
+  pp->RemoveAllProxies();
+  pp->AddProxy(this->GetProxy());
+  pDisp->UpdateVTKObjects();
+
+  this->AddDisplayToRenderModule(pDisp);
+
+  if (!this->GetSourceList())
+    {
+    vtkErrorMacro("SourceList should not be empty. "
+      "Cannot register display for animation.");
+    }
+  else
+    {
+    vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+    ostrstream animName_with_warning_C4701;
+    animName_with_warning_C4701 << this->GetSourceList() << "." 
+      << this->GetName() << "."
+      << "Display"
+      << ends;
+    proxm->RegisterProxy(
+      "animateable", animName_with_warning_C4701.str(), pDisp);
+    delete[] animName_with_warning_C4701.str();
+    }
+
+  // Create the Cube Axes.
+  this->CubeAxesDisplayProxy = vtkSMCubeAxesDisplayProxy::SafeDownCast(
+    vtkSMObject::GetProxyManager()
+    ->NewProxy("displays", "CubeAxesDisplay"));
+  // Hookup cube axes display.
+  vtkSMProxyProperty* ccpp = vtkSMProxyProperty::SafeDownCast(
+    this->CubeAxesDisplayProxy->GetProperty("Input"));
+  if (!ccpp)
+    {
+    vtkErrorMacro("Failed to find property Input on CubeAxesDisplayProxy.");
+    }
+  else
+    {
+    ccpp->AddProxy(this->Proxy);
+    this->CubeAxesDisplayProxy->UpdateVTKObjects();
+    }
+  this->CubeAxesDisplayProxy->SetVisibilityCM(0);
+  this->AddDisplayToRenderModule(this->CubeAxesDisplayProxy);
+
+  // Create the Point Label Display proxies.
+  this->PointLabelDisplayProxy = vtkSMPointLabelDisplayProxy::SafeDownCast(
+    vtkSMObject::GetProxyManager()
+    ->NewProxy("displays", "PointLabelDisplay"));
+
+  // Hookup point label display.
+  ccpp = vtkSMProxyProperty::SafeDownCast(
+    this->PointLabelDisplayProxy->GetProperty("Input"));
+  if (!ccpp)
+    {
+    vtkErrorMacro("Failed to find property Input on PointLabelDisplayProxy");
+    }
+  else
+    {
+    ccpp->AddProxy(this->Proxy);
+    this->PointLabelDisplayProxy->UpdateVTKObjects();
+    }
+  this->PointLabelDisplayProxy->SetVisibilityCM(0);
+  this->AddDisplayToRenderModule(this->PointLabelDisplayProxy);
+
+  this->SetDisplayProxy(pDisp);
+  pDisp->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1707,18 +1732,6 @@ void vtkPVSource::DeleteCallback()
       }
     }
         
-  // Remove all of the actors mappers. from the renderer.
-  if (this->Notebook)
-    {
-    vtkSMDisplayProxy* pDisp = this->GetDisplayProxy();
-    if (pDisp)
-      {
-      this->RemoveDisplayFromRenderModule(pDisp);
-      }
-    this->RemoveDisplayFromRenderModule(this->CubeAxesDisplayProxy);
-    this->RemoveDisplayFromRenderModule(this->PointLabelDisplayProxy);
-    }
-
   // I doubt this is necessary (may to break a reference loop).
   if (this->Notebook)
     {
@@ -1764,7 +1777,10 @@ void vtkPVSource::AddDisplayToRenderModule(vtkSMDisplayProxy* pDisp)
 void vtkPVSource::RemoveDisplayFromRenderModule(vtkSMDisplayProxy* pDisp)
 {
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
-
+  if (!rm)
+    {
+    return;
+    }
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     rm->GetProperty("Displays"));
   if (!pp)
