@@ -37,7 +37,7 @@ public:
   
   // Description:
   // Create tje widget
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app, const char *args);
   
   // Description:
   // Display the interactor

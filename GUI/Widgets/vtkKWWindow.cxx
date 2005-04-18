@@ -41,7 +41,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.223");
+vtkCxxRevisionMacro(vtkKWWindow, "1.224");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -1262,7 +1262,7 @@ void vtkKWWindow::DisplayCommandPrompt()
     this->TclInteractor->SetTitle(title.str());
     title.rdbuf()->freeze(0);
     this->TclInteractor->SetMasterWindow(this);
-    this->TclInteractor->Create(this->GetApplication());
+    this->TclInteractor->Create(this->GetApplication(), NULL);
     }
   
   this->TclInteractor->Display();
