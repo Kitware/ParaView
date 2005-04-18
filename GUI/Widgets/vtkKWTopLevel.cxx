@@ -21,7 +21,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.2");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.3");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -301,5 +301,6 @@ void vtkKWTopLevel::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "MasterWindow: " << this->GetMasterWindow() << endl;
   os << indent << "HasBeenMapped: " << this->GetHasBeenMapped() << endl;
+  os << indent << "HideDecoration: " << (this->HideDecoration ? "On" : "Off" ) << endl;
 }
 
