@@ -52,7 +52,6 @@ SET(PROJECT_TESTS
   Transform
   ImageReader
   Mandelbrot
-  Maze
   MouseInteraction
   OrientationWidget
   ProbeLine
