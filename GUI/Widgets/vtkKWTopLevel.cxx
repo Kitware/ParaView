@@ -16,12 +16,13 @@
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWMenu.h"
 
 #include <kwsys/stl/string>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.3");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.4");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -275,6 +276,17 @@ int vtkKWTopLevel::GetSize(int *w, int *h)
   *h = this->GetHeight();
   return 1;
   //return vtkKWTkUtilities::GetGeometry(this, w, h, NULL, NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTopLevel::InstallMenu(vtkKWMenu *menu)
+{ 
+  if (menu && menu->IsCreated() && this->IsCreated())
+    {
+    this->Script("%s configure -menu %s", 
+                 this->GetWidgetName(),
+                 menu->GetWidgetName());  
+    }
 }
 
 //----------------------------------------------------------------------------

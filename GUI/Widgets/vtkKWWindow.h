@@ -64,14 +64,6 @@ public:
   virtual void Close();
   virtual void CloseNoPrompt();
 
-  // Description::
-  // Display help info for this window.
-  virtual void DisplayHelp();
-
-  // Description::
-  // Display about info for this window.
-  virtual void DisplayAbout();
-
   // Description:
   // Set the text for the status bar of this window.
   void SetStatusText(const char *);
@@ -84,11 +76,8 @@ public:
   virtual void LoadScript(const char *name);
 
   // Description:
-  // Popup the vtk warning message
+  // Popup a warning/error message
   virtual void WarningMessage(const char* message);
-  
-  // Description:
-  // Popup the vtk error message
   virtual void ErrorMessage(const char* message);
 
   // Description:
@@ -164,10 +153,6 @@ public:
   // Description:
   // Return the index of the entry above the "About" entry in the help menu.
   int GetHelpMenuIndex();
-
-  // Description:
-  // Install a menu bar into this window.
-  void InstallMenu(vtkKWMenu* menu);
 
   // Description:
   // Callbacks used to set the print quality.

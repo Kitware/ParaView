@@ -40,7 +40,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.225");
+vtkCxxRevisionMacro(vtkKWWindow, "1.226");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -246,7 +246,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
     {
     this->Menu->AddCascade("Help", this->MenuHelp, 0);
     }
-  this->MenuHelp->AddCommand("Help", this, "DisplayHelp", 0);
+  this->MenuHelp->AddCommand("Help", this->GetApplication(), "DisplayHelp", 0);
 
   if (app->HasCheckForUpdates())
     {
@@ -256,7 +256,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->MenuHelp->AddSeparator();
   ostrstream about_label;
   about_label << "About " << app->GetPrettyName() << ends;
-  this->MenuHelp->AddCommand(about_label.str(), this, "DisplayAbout", 0);
+  this->MenuHelp->AddCommand(
+    about_label.str(), this->GetApplication(), "DisplayAbout", 0);
   about_label.rdbuf()->freeze(0);
 
   // Menubar separator
@@ -437,12 +438,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::DisplayHelp()
-{
-  this->GetApplication()->DisplayHelp(this);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWindow::CreateDefaultPropertiesParent()
 {
   if (!this->PropertiesParent)
@@ -583,12 +578,6 @@ void vtkKWWindow::RestoreWindowGeometry()
 //----------------------------------------------------------------------------
 void vtkKWWindow::Render()
 {
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::DisplayAbout()
-{
-  this->GetApplication()->DisplayAbout(this);
 }
 
 //----------------------------------------------------------------------------
@@ -880,13 +869,6 @@ void vtkKWWindow::ShowMostRecentPanels(int arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::InstallMenu(vtkKWMenu* menu)
-{ 
-  this->Script("%s configure -menu %s", this->GetWidgetName(),
-               menu->GetWidgetName());  
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWindow::LoadScript()
 {
   vtkKWLoadSaveDialog* loadScriptDialog = vtkKWLoadSaveDialog::New();
@@ -916,7 +898,7 @@ void vtkKWWindow::LoadScript()
     else
       {
       this->SaveLastPath(loadScriptDialog, "LoadScriptLastPath");
-      this->LoadScript(loadScriptDialog->GetFileName());
+      this->GetApplication()->LoadScript(loadScriptDialog->GetFileName());
       }
     }
   this->SetEnabled(enabled);
@@ -1158,10 +1140,20 @@ int vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
 void vtkKWWindow::WarningMessage(const char* message)
 {
   vtkKWMessageDialog::PopupMessage(
-    this->GetApplication(), this, "VTK Warning",
+    this->GetApplication(), this, "Warning",
     message, vtkKWMessageDialog::WarningIcon);
   this->SetErrorIcon(2);
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, (void*)message);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ErrorMessage(const char* message)
+{
+  vtkKWMessageDialog::PopupMessage(
+    this->GetApplication(), this, "Error",
+    message, vtkKWMessageDialog::ErrorIcon);
+  this->SetErrorIcon(2);
+  this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, (void*)message);
 }
 
 //----------------------------------------------------------------------------
@@ -1184,16 +1176,6 @@ void vtkKWWindow::SetErrorIcon(int s)
     {
     this->Script("pack forget %s", this->TrayImageError->GetWidgetName());
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::ErrorMessage(const char* message)
-{
-  vtkKWMessageDialog::PopupMessage(
-    this->GetApplication(), this, "VTK Error",
-    message, vtkKWMessageDialog::ErrorIcon);
-  this->SetErrorIcon(2);
-  this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, (void*)message);
 }
 
 //----------------------------------------------------------------------------

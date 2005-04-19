@@ -20,6 +20,8 @@
 
 #include "vtkKWWidget.h"
 
+class vtkKWMenu;
+
 class VTK_EXPORT vtkKWTopLevel : public vtkKWWidget
 {
 public:
@@ -110,6 +112,12 @@ public:
   vtkGetMacro(HideDecoration, int);
   vtkBooleanMacro(HideDecoration, int);
 
+  // Description:
+  // Install a menu bar into this toplevel.
+  // Note that it has no effect before a call to Create().
+  // The menu has to be Create()'ed too.
+  virtual void InstallMenu(vtkKWMenu *menu);
+
 protected:
 
   vtkKWTopLevel();
@@ -128,8 +136,4 @@ private:
   void operator=(const vtkKWTopLevel&); // Not Implemented
 };
 
-
 #endif
-
-
-
