@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.118");
+vtkCxxRevisionMacro(vtkKWWidget, "1.119");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -42,8 +42,8 @@ public:
 
   WidgetsContainer *Children;
 
-  vtkKWWidgetInternals::vtkKWWidgetInternals() { this->Children = NULL; };
-  vtkKWWidgetInternals::~vtkKWWidgetInternals() { delete this->Children; };
+  vtkKWWidgetInternals() { this->Children = NULL; };
+  ~vtkKWWidgetInternals() { delete this->Children; };
 };
 
 //----------------------------------------------------------------------------
