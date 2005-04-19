@@ -59,7 +59,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.434");
+vtkCxxRevisionMacro(vtkPVSource, "1.435");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -1135,6 +1135,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     }
   else
     {
+    this->GetProxy()->CreateParts();
     if (this->GetProxy()->GetNumberOfParts() != previous_num_parts)
       {
       this->CleanupDisplays();
