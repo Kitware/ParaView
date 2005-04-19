@@ -15,7 +15,7 @@ if { ![$Application GetExitStatus] } {
         [$Application GetMainWindow] SaveBatchScript "$batchName.pvb" 0 "$batchName.png" {}
         $Application ExitAfterLoadScriptOff
         $Application DestroyGUI
-        update
+        # update
 
         $Application LoadScript "$batchName.pvb"
         catch { file delete -force "$batchName.pvb" }
