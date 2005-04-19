@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.75");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.76");
 
 //----------------------------------------------------------------------------
 class vtkPVVectorEntryInternals
@@ -408,7 +408,7 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
   int idx;
   vtkKWEntry *entry;
 
-  if (num != this->Internals->Entries.size())
+  if (num != (int)this->Internals->Entries.size())
     {
     vtkErrorMacro("Component mismatch.");
     return;
@@ -437,7 +437,7 @@ void vtkPVVectorEntry::SetValue(float* values, int num)
   int idx;
   vtkKWEntry *entry;
 
-  if (num != this->Internals->Entries.size())
+  if (num != (int)this->Internals->Entries.size())
     {
     vtkErrorMacro("Component mismatch.");
     return;
@@ -467,7 +467,7 @@ void vtkPVVectorEntry::GetValue(float *values, int num)
   int idx;
   vtkKWEntry *entry;
 
-  if (num != this->Internals->Entries.size())
+  if (num != (int)this->Internals->Entries.size())
     {
     vtkErrorMacro("Component mismatch.");
     return;
