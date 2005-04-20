@@ -1069,6 +1069,11 @@
           <Group name="sources" />
           <Group name="filters" />
         </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="point"
+                            number_of_components="1"/>
       </InputProperty>
       <ProxyProperty
         name="Property"

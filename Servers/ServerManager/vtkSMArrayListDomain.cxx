@@ -29,7 +29,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMArrayListDomain);
-vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.5");
+vtkCxxRevisionMacro(vtkSMArrayListDomain, "1.6");
 
 struct vtkSMArrayListDomainInternals
 {
@@ -178,7 +178,6 @@ void vtkSMArrayListDomain::Update(vtkSMProxyProperty* pp)
       return;
       }
     }
-
 }
 
 //---------------------------------------------------------------------------

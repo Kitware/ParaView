@@ -1907,7 +1907,6 @@
           <Property name="ArrayNames" />
         </ExposedProperties>
       </SubProxy>
-
     </XYPlotDisplayProxy>
     
     <CubeAxesDisplayProxy name="CubeAxesDisplay">

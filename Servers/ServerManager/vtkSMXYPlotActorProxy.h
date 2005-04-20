@@ -59,6 +59,11 @@ public:
   // Method to push the property values onto server objects.
   virtual void UpdateVTKObjects();
 
+  // Description:
+  // Override the vtkSMSourceProxy UpdateInformation since we are not really a source proxy
+  // (the VTK object we are creating on the server side has not really an output)
+  void UpdateInformation();
+
 protected:
   vtkSMXYPlotActorProxy();
   ~vtkSMXYPlotActorProxy();

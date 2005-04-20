@@ -27,7 +27,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMXYPlotActorProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMXYPlotActorProxy, "1.3");
 vtkCxxSetObjectMacro(vtkSMXYPlotActorProxy, Input, vtkSMSourceProxy);
 
 class vtkSMXYPlotActorProxyInternals
@@ -108,6 +108,11 @@ void vtkSMXYPlotActorProxy::SetPosition2(double x, double y)
     {
     pm->SendStream(this->GetServers(), stream);
     }
+}
+//-----------------------------------------------------------------------------
+void vtkSMXYPlotActorProxy::UpdateInformation()
+{
+  this->vtkSMProxy::UpdateInformation();
 }
 
 //-----------------------------------------------------------------------------
