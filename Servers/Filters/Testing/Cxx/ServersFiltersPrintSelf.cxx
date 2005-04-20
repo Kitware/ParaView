@@ -57,7 +57,6 @@
 #include "vtkPVServerSelectTimeSet.h"
 #include "vtkPVServerXDMFParameters.h"
 #include "vtkPVSummaryHelper.h"
-#include "vtkPVThresholdFilter.h"
 #include "vtkPVTreeComposite.h"
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkPVXMLElement.h"
@@ -136,7 +135,6 @@ int main(int , char *[])
   c = vtkPVServerSelectTimeSet::New(); c->Print(cout); c->Delete();
   c = vtkPVServerXDMFParameters::New(); c->Print(cout); c->Delete();
   c = vtkPVSummaryHelper::New(); c->Print(cout); c->Delete();
-  c = vtkPVThresholdFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVTreeComposite::New(); c->Print(cout); c->Delete();
   c = vtkPVUpdateSuppressor::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLElement::New(); c->Print(cout); c->Delete();

@@ -31,7 +31,7 @@
 #include "vtkMergeArrays.h"
 #include "vtkPVArrowSource.h"
 #include "vtkRibbonFilter.h"
-#include "vtkPVThresholdFilter.h"
+#include "vtkThreshold.h"
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkWarpScalar.h"
 #include "vtkDataSetMapper.h"
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
   extrude->SetExtrusionTypeToNormalExtrusion();
   extrude->SetVector(1, 0, 0);
   
-  vtkPVThresholdFilter *threshold = vtkPVThresholdFilter::New();
+  vtkThreshold *threshold = vtkThreshold::New();
   threshold->SetInput( ribbon->GetOutput() );
   threshold->ThresholdBetween(0.25, 0.75);
 
