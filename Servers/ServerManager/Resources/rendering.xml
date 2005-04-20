@@ -1708,13 +1708,6 @@
         command="InitializeRMIs">
       </Property>
       <IntVectorProperty
-        name="EnableAbort"
-        command="SetEnableAbort"
-        number_of_elements="1"
-        default_values="1">
-        <BooleanDomain name="bool" />
-      </IntVectorProperty>
-      <IntVectorProperty
         name="ImageReductionFactor"
         command="SetImageReductionFactor"
         number_of_elements="1"
