@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.29");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.30");
 
 
 //----------------------------------------------------------------------------
@@ -362,7 +362,7 @@ void vtkPVClientServerModule::Initialize()
       // If the ids do not match, disable all rmis by setting
       // this->Enabled to 0.
       match = 0;
-      vtkErrorMacro("Connection ID mismatch.");
+      vtkErrorMacro("Connection ID mismatch." << connectID << " != " << this->Options->GetConnectID() );
       this->Enabled = 0;
       }
     // Tell the client the result of id check
