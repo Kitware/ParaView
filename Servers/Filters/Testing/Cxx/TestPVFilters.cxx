@@ -20,9 +20,9 @@
 #include "vtkPVGlyphFilter.h"
 #include "vtkPVGeometryFilter.h"
 #include "vtkUnstructuredGrid.h"
-#include "vtkPVContourFilter.h"
+#include "vtkContourFilter.h"
 #include "vtkPlane.h"
-#include "vtkPVClipDataSet.h"
+#include "vtkClipDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkPVLODActor.h"
 #include "vtkPolyDataMapper.h"
@@ -30,7 +30,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkMergeArrays.h"
 #include "vtkPVArrowSource.h"
-#include "vtkPVRibbonFilter.h"
+#include "vtkRibbonFilter.h"
 #include "vtkPVThresholdFilter.h"
 #include "vtkPVLinearExtrusionFilter.h"
 #include "vtkWarpScalar.h"
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
   glyph->SetSource( gs->GetOutput());
   glyph->SetScaleFactor( 0.75 );
 
-  vtkPVContourFilter *contour = vtkPVContourFilter::New();
+  vtkContourFilter *contour = vtkContourFilter::New();
   contour->SetInput( clean->GetOutput() );
   contour->SetValue( 0, 0.5 );
   
@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
   plane->SetOrigin(0.25, 0, 0);
   plane->SetNormal(-1, -1, 0);
 
-  vtkPVClipDataSet *clip = vtkPVClipDataSet::New();
+  vtkClipDataSet *clip = vtkClipDataSet::New();
   clip->SetInput( clean->GetOutput() );
   clip->SetClipFunction( plane );
   clip->GenerateClipScalarsOn();
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
   actor->SetMapper( mapper );
   
   //Now for the PVPolyData part:
-  vtkPVRibbonFilter *ribbon = vtkPVRibbonFilter::New();
+  vtkRibbonFilter *ribbon = vtkRibbonFilter::New();
   ribbon->SetInput( contour->GetOutput() );
   ribbon->SetWidth( 0.1 );
   ribbon->SetWidthFactor(5);
