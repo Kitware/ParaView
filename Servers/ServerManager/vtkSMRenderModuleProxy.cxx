@@ -41,8 +41,9 @@
 #include "vtkWindowToImageFilter.h"
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
+#include "vtkInteractorStyleTrackballCamera.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.4");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -214,7 +215,11 @@ void vtkSMRenderModuleProxy::CreateVTKObjects(int numObjects)
     pvm->GetObjectFromID(this->InteractorProxy->GetID(0)));
   this->ActiveCamera = vtkCamera::SafeDownCast(
     pvm->GetObjectFromID(this->ActiveCameraProxy->GetID(0)));
-  
+
+  //Set the defaul style for the interactor.
+  vtkInteractorStyleTrackballCamera* style = vtkInteractorStyleTrackballCamera::New();
+  this->Interactor->SetInteractorStyle(style);
+  style->Delete();
 
   // Set the active camera for the renderers.  We can't use the Proxy
   // Property since Camera is only create on the CLIENT.  Proxy properties
@@ -939,14 +944,18 @@ void vtkSMRenderModuleProxy::WriteImage(const char* filename,
     }
 
   // I am using the vtkPVRenderView approach for saving the image.
-
-        // instead of vtkSMDisplayWindowProxy approach of creating a proxy.
-
+  // instead of vtkSMDisplayWindowProxy approach of creating a proxy.
+  this->GetRenderWindow()->SwapBuffersOff();
+  this->StillRender();
+  
   vtkWindowToImageFilter* w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(this->GetRenderWindow());
   w2i->ReadFrontBufferOff();
   w2i->ShouldRerenderOff();
   w2i->Update();
+
+  this->GetRenderWindow()->SwapBuffersOn();
+  this->GetRenderWindow()->Frame();
   
   vtkObject* object = vtkInstantiator::CreateInstance(writerName);
   if (!object)
