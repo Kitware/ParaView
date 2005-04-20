@@ -717,9 +717,6 @@
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
 
-      <Property name="Render" command="Render">
-      </Property>    
-
       <IntVectorProperty
          name="RenderWindowSizeInfo"
          command="GetSize"
