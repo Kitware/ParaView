@@ -28,7 +28,6 @@
 #include "vtkDataSetSubdivisionAlgorithm.h"
 #include "vtkGroup.h"
 #include "vtkHDF5RawImageReader.h"
-#include "vtkMazeSource.h"
 #include "vtkMergeArrays.h"
 #include "vtkMPIDuplicatePolyData.h"
 #include "vtkMPIDuplicateUnstructuredGrid.h"
@@ -36,11 +35,9 @@
 #include "vtkMultiDisplayManager.h"
 #include "vtkPickFilter.h"
 #include "vtkPVArrowSource.h"
-#include "vtkPVClipDataSet.h"
 #include "vtkPVCompositeBuffer.h"
 #include "vtkPVCompositeUtilities.h"
 #include "vtkPVConnectivityFilter.h"
-#include "vtkPVContourFilter.h"
 #include "vtkPVDReader.h"
 #include "vtkPVEnSightMasterServerReader.h"
 #include "vtkPVEnSightMasterServerTranslator.h"
@@ -54,7 +51,6 @@
 #include "vtkPVLODPartDisplayInformation.h"
 //#include "vtkPVRenderModuleProxy.h"
 #include "vtkPVRenderViewProxy.h"
-#include "vtkPVRibbonFilter.h"
 #include "vtkPVServerArraySelection.h"
 #include "vtkPVServerFileListing.h"
 #include "vtkPVServerObject.h"
@@ -64,7 +60,6 @@
 #include "vtkPVThresholdFilter.h"
 #include "vtkPVTreeComposite.h"
 #include "vtkPVUpdateSuppressor.h"
-#include "vtkPVWarpVector.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVXMLParser.h"
 #include "vtkSelectInputs.h"
@@ -95,10 +90,6 @@
 # include "vtkWeightedRedistributePolyData.h"
 #endif //VTK_USE_MPI
 
-#ifdef VTK_USE_PATENTED
-# include "vtkPVKitwareContourFilter.h"
-#endif //VTK_USE_PATENTED
-
 int main(int , char *[])
 {
   vtkObject *c;
@@ -116,7 +107,6 @@ int main(int , char *[])
   c = vtkDataSetSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
   c = vtkGroup::New(); c->Print(cout); c->Delete();
   c = vtkHDF5RawImageReader::New(); c->Print(cout); c->Delete();
-  c = vtkMazeSource::New(); c->Print(cout); c->Delete();
   c = vtkMergeArrays::New(); c->Print(cout); c->Delete();
   c = vtkMPIDuplicatePolyData::New(); c->Print(cout); c->Delete();
   c = vtkMPIDuplicateUnstructuredGrid::New(); c->Print(cout); c->Delete();
@@ -124,11 +114,9 @@ int main(int , char *[])
   c = vtkMultiDisplayManager::New(); c->Print(cout); c->Delete();
   c = vtkPickFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVArrowSource::New(); c->Print(cout); c->Delete();
-  c = vtkPVClipDataSet::New(); c->Print(cout); c->Delete();
   c = vtkPVCompositeBuffer::New(); c->Print(cout); c->Delete();
   c = vtkPVCompositeUtilities::New(); c->Print(cout); c->Delete();
   c = vtkPVConnectivityFilter::New(); c->Print(cout); c->Delete();
-  c = vtkPVContourFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVDReader::New(); c->Print(cout); c->Delete();
   c = vtkPVEnSightMasterServerReader::New(); c->Print(cout); c->Delete();
   c = vtkPVEnSightMasterServerTranslator::New(); c->Print(cout); c->Delete();
@@ -142,7 +130,6 @@ int main(int , char *[])
   c = vtkPVLODPartDisplayInformation::New(); c->Print(cout); c->Delete();
 //  c = vtkPVRenderModuleProxy::New(); c->Print(cout); c->Delete();
   c = vtkPVRenderViewProxy::New(); c->Print(cout); c->Delete();
-  c = vtkPVRibbonFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVServerArraySelection::New(); c->Print(cout); c->Delete();
   c = vtkPVServerFileListing::New(); c->Print(cout); c->Delete();
   c = vtkPVServerObject::New(); c->Print(cout); c->Delete();
@@ -152,7 +139,6 @@ int main(int , char *[])
   c = vtkPVThresholdFilter::New(); c->Print(cout); c->Delete();
   c = vtkPVTreeComposite::New(); c->Print(cout); c->Delete();
   c = vtkPVUpdateSuppressor::New(); c->Print(cout); c->Delete();
-  c = vtkPVWarpVector::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLElement::New(); c->Print(cout); c->Delete();
   c = vtkPVXMLParser::New(); c->Print(cout); c->Delete();
   c = vtkSelectInputs::New(); c->Print(cout); c->Delete();
@@ -183,9 +169,6 @@ int main(int , char *[])
   c = vtkWeightedRedistributePolyData::New(); c->Print(cout); c->Delete();
 #endif //VTK_USE_MPI
 
-#ifdef VTK_USE_PATENTED
-  c = vtkPVKitwareContourFilter::New(); c->Print(cout); c->Delete(); 
-#endif //VTK_USE_PATENTED
 
   return 0;
 }
