@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.73");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.74");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -279,16 +279,16 @@ void vtkPVArrayMenu::SaveInBatchScript(ofstream *file)
     {
     ostrstream cmd_with_warning_C4701;
     cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
-                           << this->SMPropertyName << "] SetElement 0" 
+                           << this->SMPropertyName << "] SetElement 0 " 
                            << svp->GetElement(0) << endl;
     cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
-                           << this->SMPropertyName << "] SetElement 1" 
+                           << this->SMPropertyName << "] SetElement 1 " 
                            << svp->GetElement(1) << endl;
     cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
-                           << this->SMPropertyName << "] SetElement 2" 
+                           << this->SMPropertyName << "] SetElement 2 " 
                            << svp->GetElement(2) << endl;
     cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
-                           << this->SMPropertyName << "] SetElement 3" 
+                           << this->SMPropertyName << "] SetElement 3 " 
                            << svp->GetElement(3) << endl;
     cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
                            << this->SMPropertyName << "] SetElement 4 " ;
