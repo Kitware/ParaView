@@ -14,7 +14,7 @@ set pv(vtkTemp101) [$pv(vtkTemp1) GetCurrentPVSource]
 
 set pv(vtkTemp129) [$pv(vtkTemp1) CreatePVSource Threshold]
 set pv(vtkTemp137) [$pv(vtkTemp129) GetPVWidget {FieldMenu}]
-$pv(vtkTemp137) SetValue 2
+$pv(vtkTemp137) SetValue 1
 set pv(vtkTemp135) [$pv(vtkTemp129) GetPVWidget {Input}]
 $pv(vtkTemp135) SetCurrentValue $pv(vtkTemp101)
 set pv(vtkTemp141) [$pv(vtkTemp129) GetPVWidget {MinMax}]
