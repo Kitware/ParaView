@@ -50,6 +50,9 @@ public:
   int ParseConfigurationFile(const char* fname, const char* dir);
 
   // Description:
+  int ParseConfiguration(const char* configuration);
+
+  // Description:
   void AddConfigurationFile(const char* fname, const char* dir);
 
   // Description:

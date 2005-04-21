@@ -42,7 +42,7 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.14");
+vtkCxxRevisionMacro(vtkSMApplication, "1.15");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -196,6 +196,23 @@ int vtkSMApplication::ParseConfigurationFile(const char* fname, const char* dir)
   parser->SetFileName(tmppath.str());
   delete[] tmppath.str();
   int res = parser->Parse();
+  parser->ProcessConfiguration(proxyM);
+  parser->Delete();
+  return res;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMApplication::ParseConfiguration(const char* configuration)
+{
+  vtkSMProxyManager* proxyM = this->GetProxyManager();
+  if (!proxyM)
+    {
+    vtkErrorMacro("No global proxy manager defined. Can not parse file");
+    return 0;
+    }
+
+  vtkSMXMLParser* parser = vtkSMXMLParser::New();
+  int res = parser->Parse(configuration);
   parser->ProcessConfiguration(proxyM);
   parser->Delete();
   return res;
