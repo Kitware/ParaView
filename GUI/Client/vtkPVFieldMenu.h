@@ -105,10 +105,6 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
-  // Description:
-  // Save this widget to a file.
-  virtual void SaveInBatchScript(ofstream *file);
-
 protected:
   vtkPVFieldMenu();
   ~vtkPVFieldMenu();

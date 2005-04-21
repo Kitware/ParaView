@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.25");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.26");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -208,21 +208,6 @@ void vtkPVFieldMenu::ResetInternal()
   // Do we really need to update?
   // What causes dependent widgets like ArrayMenu to update?
   this->Update();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVFieldMenu::SaveInBatchScript(ofstream *file)
-{
-  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
-
-  if (sourceID.ID == 0)
-    {
-    vtkErrorMacro("Sanity check failed. ");
-    return;
-    }
-
-  *file << "  [$pvTemp" << sourceID 
-        << " GetProperty AttributeMode] SetElements1 " << this->Value << endl;
 }
 
 //----------------------------------------------------------------------------
