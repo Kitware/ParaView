@@ -46,7 +46,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.11");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.12");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -324,6 +324,7 @@ void vtkPVKeyFrame::SetValueToMinimum()
     {
     this->SetKeyValue(0);
     }
+  this->UpdateValuesFromProxy();
 }
 
 //-----------------------------------------------------------------------------
@@ -346,6 +347,7 @@ void vtkPVKeyFrame::SetValueToMaximum()
     {
     this->SetKeyValue(pvSelect->GetNumberOfItems()-1);
     } 
+  this->UpdateValuesFromProxy();
 }
 
 //-----------------------------------------------------------------------------
