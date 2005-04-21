@@ -44,7 +44,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.67");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.68");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -220,16 +220,16 @@ void vtkPVArraySelection::UpdateSelections(int fromReader)
           }
         }
       }
-    else if ( vtkSMStringListDomain* dom = vtkSMStringListDomain::SafeDownCast(
+    else if ( vtkSMStringListDomain* dom2 = vtkSMStringListDomain::SafeDownCast(
         svp->GetDomain("array_list")) )
       {
-      unsigned int numStrings = dom->GetNumberOfStrings();
+      unsigned int numStrings = dom2->GetNumberOfStrings();
 
       // Obtain parameters from the domain (that obtained them
       // from the information property that obtained them from the server)
       for(unsigned int i=0; i < numStrings; ++i)
         {
-        const char* name = dom->GetString(i);
+        const char* name = dom2->GetString(i);
         int found = 0;
         if (!found)
           {
