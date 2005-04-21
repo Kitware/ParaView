@@ -26,6 +26,7 @@ class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkSMXYPlotDisplayProxy;
+class vtkPVArraySelection;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -51,6 +52,7 @@ public:
   // a user interface.
   // Overridden to save the plot display in batch.
   virtual void SaveInBatchScript(ofstream *file);
+  void ArraySelectionInternalCallback();
 
 protected:
   vtkPVProbe();
@@ -60,6 +62,7 @@ protected:
   char* PlotDisplayProxyName; // Name used to register the plot display proxy
                               // with the Proxy Manager.
   vtkSetStringMacro(PlotDisplayProxyName);
+  vtkPVArraySelection *ArraySelection;
   
   // The real AcceptCallback method.
   virtual void AcceptCallbackInternal();  

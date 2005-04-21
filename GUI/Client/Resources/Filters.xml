@@ -8,7 +8,8 @@
           module_type="Filter"
           long_help="This filter constrains vectors to lie on a surface."
           short_help="This filter constrains vectors o lie on a surface.">
-    <Filter class="vtkSurfaceVectors">      <Input name="Input"
+    <Filter class="vtkSurfaceVectors">
+      <Input name="Input"
              class="vtkDataSet">
         <ArrayRequirement attribute="Point" components="3"/>
       </Input>
@@ -2333,7 +2334,7 @@ The Pick filter operates on any type of data and produces unstructured grid outp
       <Input name="Source"
              class="vtkDataSet">
         <GroupRequirement quantity="Single"/>
-        <ArrayRequirement attribute="Point"/>
+        <ArrayRequirement attribute="Point" components="1"/>
       </Input>
     </Filter>
     <InputMenu trace_name="Source" property="Source"

@@ -31,18 +31,20 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkSMArrayListDomain.h"
 #include "vtkPVTraceHelper.h"
 
 #include <vtkstd/string>
 #include <vtkstd/set>
 #include <vtkstd/vector>
+#include <kwsys/ios/sstream>
 
 typedef vtkstd::set<vtkstd::string> vtkPVArraySelectionArraySetBase;
 class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.66");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.67");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -188,12 +190,14 @@ void vtkPVArraySelection::UpdateSelections(int fromReader)
     }
   if (svp && prop)
     {
-    vtkSMStringListRangeDomain* dom = vtkSMStringListRangeDomain::SafeDownCast(
-      svp->GetDomain("array_list"));
-    if (dom)
+    // Checking the type of domain we are dealing with:
+    // I add to duplicate this for loop since StringListRangeDomain and StringListDomain
+    // don't share a common parent class that would allow to.
+    if( vtkSMStringListRangeDomain* dom = vtkSMStringListRangeDomain::SafeDownCast(
+        svp->GetDomain("array_list")) )
       {
       unsigned int numStrings = dom->GetNumberOfStrings();
-      
+
       // Obtain parameters from the domain (that obtained them
       // from the information property that obtained them from the server)
       for(unsigned int i=0; i < numStrings; ++i)
@@ -214,6 +218,24 @@ void vtkPVArraySelection::UpdateSelections(int fromReader)
           {
           this->Selection->DisableArray(name);
           }
+        }
+      }
+    else if ( vtkSMStringListDomain* dom = vtkSMStringListDomain::SafeDownCast(
+        svp->GetDomain("array_list")) )
+      {
+      unsigned int numStrings = dom->GetNumberOfStrings();
+
+      // Obtain parameters from the domain (that obtained them
+      // from the information property that obtained them from the server)
+      for(unsigned int i=0; i < numStrings; ++i)
+        {
+        const char* name = dom->GetString(i);
+        int found = 0;
+        if (!found)
+          {
+          continue;
+          }
+        this->Selection->EnableArray(name);
         }
       }
     else
@@ -369,19 +391,33 @@ void vtkPVArraySelection::SetPropertyFromGUI()
       vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
       const char* aname = check->GetText();
       int state = check->GetState();
-      // Only send changes to the server. If the state of the
-      // widget is the same as the state of the selection, we
-      // know that on the server side, the value does not have
-      // to change.
-      if ( (state && !this->Selection->ArrayIsEnabled(aname)) ||
-           (!state && this->Selection->ArrayIsEnabled(aname)) )
+      // Checking the type of output we need to produce:
+      // This could be done by an ivar, but I rather not add another ivar for such
+      // simple case
+      // We need to produce vector of string + bool output which *have changed*:
+      if( vtkSMStringListRangeDomain::SafeDownCast( svp->GetDomain("array_list")) )
         {
-        ostrstream str;
-        str << state << ends;
-        svp->SetElement(elemCount, aname);
-        svp->SetElement(elemCount+1, str.str());
-        elemCount += 2;
-        delete[] str.str();
+        // Only send changes to the server. If the state of the
+        // widget is the same as the state of the selection, we
+        // know that on the server side, the value does not have
+        // to change.
+        if ( (state && !this->Selection->ArrayIsEnabled(aname)) ||
+            (!state && this->Selection->ArrayIsEnabled(aname)) )
+          {
+          kwsys_ios::ostringstream str;
+          str << state;
+          svp->SetElement(elemCount++, aname);
+          svp->SetElement(elemCount++, str.str().c_str());
+          }
+        }
+      // else the output is simply a vector of all enabled properties:
+      else if( vtkSMStringListDomain::SafeDownCast( svp->GetDomain("array_list")) )
+        {
+        if( state )
+          {
+          svp->SetElement(elemCount, aname);
+          elemCount ++;
+          }
         }
       }
     svp->SetNumberOfElements(elemCount);

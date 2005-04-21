@@ -39,11 +39,16 @@
 #include "vtkSMInputProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
+#include "vtkPVArraySelection.h"
+#include "vtkSMDomain.h"
+#include "vtkSMPropertyIterator.h"
+#include "vtkSMXYPlotActorProxy.h"
 #include <vtkstd/string>
+#include <kwsys/ios/sstream>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.140");
+vtkCxxRevisionMacro(vtkPVProbe, "1.141");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -60,24 +65,24 @@ vtkPVProbe::vtkPVProbe()
   this->SelectedPointFrame = vtkKWWidget::New();
   this->SelectedPointLabel = vtkKWLabel::New();
   this->PointDataLabel = vtkKWLabel::New();
-  
+ 
   this->ShowXYPlotToggle = vtkKWCheckButton::New();
 
-  
   this->ProbeFrame = vtkKWWidget::New();
-  
-  
+
   this->ReplaceInputOff();
 
   // Special ivar in vtkPVSource just for this subclass.
   // We cannot process inputs that have more than one part.
   this->RequiredNumberOfInputParts = 1;
-  
+ 
   this->PlotDisplayProxy = 0; 
   this->PlotDisplayProxyName = 0;
   this->CanShowPlot = 0;
+  this->ArraySelection = vtkPVArraySelection::New();
 }
 
+//----------------------------------------------------------------------------
 vtkPVProbe::~vtkPVProbe()
 {  
   if (this->PlotDisplayProxy)
@@ -110,6 +115,9 @@ vtkPVProbe::~vtkPVProbe()
   
   this->ProbeFrame->Delete();
   this->ProbeFrame = NULL;  
+
+  this->ArraySelection->Delete();
+  this->ArraySelection = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -136,9 +144,7 @@ void vtkPVProbe::CreateProperties()
   // widgets for points
   this->SelectedPointFrame->SetParent(this->ProbeFrame);
   this->SelectedPointFrame->Create(pvApp, "frame", "");
-  
-  
-  
+
   this->SelectedPointLabel->SetParent(this->SelectedPointFrame);
   this->SelectedPointLabel->Create(pvApp, "");
   this->SelectedPointLabel->SetText("Point");
@@ -170,14 +176,13 @@ void vtkPVProbe::CreateProperties()
       return;
       }
 
-    ostrstream str;
+    kwsys_ios::ostringstream str;
     // SourceListName.SourceProxyName.XYPlotDisplay == name for the 
     // Display proxy.
     str << this->GetSourceList() << "."
       << this->GetName() << "."
-      << "XYPlotDisplay" << ends;
-    this->SetPlotDisplayProxyName(str.str());
-    str.rdbuf()->freeze(0);
+      << "XYPlotDisplay";
+    this->SetPlotDisplayProxyName(str.str().c_str());
     pxm->RegisterProxy("displays", this->PlotDisplayProxyName, this->PlotDisplayProxy);
 
     // We cannot set the input here itself,
@@ -185,6 +190,11 @@ void vtkPVProbe::CreateProperties()
     // calls a CreateParts() on it, which leads to errors.
     // Hence, we defer it until after initializaiton.
     }
+
+  this->ArraySelection->SetParent(this->ProbeFrame);
+  this->ArraySelection->SetPVSource(this);
+  this->ArraySelection->SetLabelText("Point Scalars");
+  this->ArraySelection->SetModifiedCommand(this->GetTclName(), "ArraySelectionInternalCallback");
 }
 
 //----------------------------------------------------------------------------
@@ -201,6 +211,7 @@ void vtkPVProbe::SetVisibilityNoTrace(int val)
 //----------------------------------------------------------------------------
 void vtkPVProbe::AcceptCallbackInternal()
 {
+  vtkPVApplication* pvApp = this->GetPVApplication();
   this->GetTraceHelper()->AddEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
                       this->GetTclName(),
                       this->ShowXYPlotToggle->GetState());
@@ -212,6 +223,7 @@ void vtkPVProbe::AcceptCallbackInternal()
    
   if (!initialized)
     {
+    // This should be done on first accept or initialization
     vtkSMInputProperty* ip = vtkSMInputProperty::SafeDownCast(
       this->PlotDisplayProxy->GetProperty("Input"));
     if (!ip)
@@ -253,18 +265,16 @@ void vtkPVProbe::AcceptCallbackInternal()
         if (numComponents > 1)
           {
           // make sure we fill buffer from the beginning
-          ostrstream arrayStrm;
-          arrayStrm << array->GetName() << ": ( " << ends;
+          kwsys_ios::ostringstream arrayStrm;
+          arrayStrm << array->GetName() << ": ( ";
           arrayData = arrayStrm.str();
-          arrayStrm.rdbuf()->freeze(0);
 
           for (j = 0; j < numComponents; j++)
             {
             // make sure we fill buffer from the beginning
-            ostrstream tempStrm;
-            tempStrm << array->GetComponent( 0, j ) << ends; 
+            kwsys_ios::ostringstream tempStrm;
+            tempStrm << array->GetComponent( 0, j );
             tempArray = tempStrm.str();
-            tempStrm.rdbuf()->freeze(0);
 
             if (j < numComponents - 1)
               {
@@ -289,11 +299,10 @@ void vtkPVProbe::AcceptCallbackInternal()
         else
           {
           // make sure we fill buffer from the beginning
-          ostrstream arrayStrm;
-          arrayStrm << array->GetName() << ": " << array->GetComponent( 0, 0 ) << endl << ends;
+          kwsys_ios::ostringstream arrayStrm;
+          arrayStrm << array->GetName() << ": " << array->GetComponent( 0, 0 ) << endl;
 
           label += arrayStrm.str();
-          arrayStrm.rdbuf()->freeze(0);
           }
         }
       }
@@ -306,14 +315,15 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
     }
 
-  if (this->ShowXYPlotToggle->GetState() && numPts > 1)
+  // Fill up the ArrayNames of the XYPlotActorProxy (subproxy of XYPlotDisplayProxy) from the
+  // input of PVProbe
+  if (!initialized)
     {
     int numArrays = this->GetDataInformation()->GetPointDataInformation()->GetNumberOfArrays();
     vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
       this->PlotDisplayProxy->GetProperty("ArrayNames"));
     if (svp)
       {
-      //svp->SetNumberOfElements(numArrays);
       for(int i=0; i<numArrays; i++)
         {
         vtkPVArrayInformation* arrayInfo = 
@@ -323,22 +333,45 @@ void vtkPVProbe::AcceptCallbackInternal()
           svp->SetElement(i, arrayInfo->GetName());
           }
         }
-      this->PlotDisplayProxy->SetVisibilityCM(1); //Call UpdateVTKObjects
+      // Trick to force a domain of the sub-proxy to depend to the parent proxy one
+      // This need to be done after the accept
+      vtkSMDomain *arrayList = svp->GetDomain( "array_list" );
+      vtkSMProperty* inputProp = this->GetProxy()->GetProperty("Input");
+      arrayList->AddRequiredProperty(inputProp, "SubInput");
+      svp->UpdateDependentDomains(); // Now forcing to update the domain
+
+      this->ArraySelection->SetSMProperty(svp);
+      this->ArraySelection->Create(pvApp);
       }
     else
       {
       vtkErrorMacro("Failed to find property ArrayNames.");
       }
     }
+
+  this->CanShowPlot = numPts > 1 ? 1: 0;
+
+  if (this->ShowXYPlotToggle->GetState() && numPts > 1)
+    {
+    this->PlotDisplayProxy->SetVisibilityCM(1);
+    this->Script("pack %s", this->ArraySelection->GetWidgetName());  
+    }
   else
     {
     this->PlotDisplayProxy->SetVisibilityCM(0);
+    this->Script("pack forget %s", this->ArraySelection->GetWidgetName());  
     }
 
-  this->CanShowPlot = (numPts > 1)? 1: 0;
-    
 }
  
+//----------------------------------------------------------------------------
+void vtkPVProbe::ArraySelectionInternalCallback()
+{
+  this->ArraySelection->Accept();
+  this->PlotDisplayProxy->UpdateVTKObjects();
+  this->GetPVRenderView()->EventuallyRender();
+}
+
 //----------------------------------------------------------------------------
 void vtkPVProbe::SaveInBatchScript(ofstream* file)
 {
@@ -347,6 +380,7 @@ void vtkPVProbe::SaveInBatchScript(ofstream* file)
     {
     *file << "  # Save the XY Plot" << endl;
     this->PlotDisplayProxy->SaveInBatchScript(file);
+    this->ArraySelection->SaveInBatchScript(file);
     }
 }
 
@@ -357,3 +391,4 @@ void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PlotDisplayProxy: " << this->PlotDisplayProxy << endl;
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
 }
+

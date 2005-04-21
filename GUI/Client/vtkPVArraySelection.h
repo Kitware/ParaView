@@ -16,6 +16,8 @@
 // .SECTION Description
 // vtkPVArraySelection is used for selecting which set of data arrays to 
 // load when a reader has the ability to selectively load arrays.
+// This class is able to deal with two different (though similar) type of domains: 
+// vtkSMStringListDomain and vtkSMStringListRangeDomain
 
 #ifndef __vtkPVArraySelection_h
 #define __vtkPVArraySelection_h
