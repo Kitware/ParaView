@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.348");
+vtkCxxRevisionMacro(vtkPVApplication, "1.349");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -987,7 +987,6 @@ void vtkPVApplication::Initialize()
 #endif
 
   this->SMApplication->Initialize();
-  vtkSMProperty::SetModifiedAtCreation(0);
   vtkSMProperty::SetCheckDomains(0);
 
   vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();

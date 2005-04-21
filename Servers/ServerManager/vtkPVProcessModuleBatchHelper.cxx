@@ -25,7 +25,7 @@
 
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.8");
+vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.9");
 vtkStandardNewMacro(vtkPVProcessModuleBatchHelper);
 
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
@@ -205,7 +205,6 @@ int vtkPVProcessModuleBatchHelper::RunGUIStart(int argc, char **argv, int numSer
   (void)numServerProcs;
 
   this->SMApplication->Initialize();
-  vtkSMProperty::SetModifiedAtCreation(0);
   vtkSMProperty::SetCheckDomains(0);
 
   vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();

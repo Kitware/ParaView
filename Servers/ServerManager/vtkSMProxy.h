@@ -218,6 +218,14 @@ public:
   // on all properties to make sure that domains that depend on the
   // information are updated.
   virtual void UpdateInformation();
+
+  // Description:
+  // Marks all properties as modified.  This will cause them all to be sent
+  // to be sent on the next call to UpdateVTKObjects.  This method is
+  // useful when the proxy is first created to make sure that the default
+  // property values in the properties is synced with the values in the
+  // actual objects.
+  virtual void MarkAllPropertiesAsModified();
   
 //BTX
   // Description:

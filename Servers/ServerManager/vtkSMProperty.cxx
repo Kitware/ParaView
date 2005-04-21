@@ -31,7 +31,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.29");
+vtkCxxRevisionMacro(vtkSMProperty, "1.30");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -39,7 +39,6 @@ vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkSMProperty, ControllerProperty, vtkSMProperty);
 
 int vtkSMProperty::CheckDomains = 1;
-int vtkSMProperty::ModifiedAtCreation = 1;
 
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
@@ -425,18 +424,6 @@ void vtkSMProperty::SetCheckDomains(int check)
 int vtkSMProperty::GetCheckDomains()
 {
   return vtkSMProperty::CheckDomains;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMProperty::SetModifiedAtCreation(int check)
-{
-  vtkSMProperty::ModifiedAtCreation = check;
-}
-
-//---------------------------------------------------------------------------
-int vtkSMProperty::GetModifiedAtCreation()
-{
-  return vtkSMProperty::ModifiedAtCreation;
 }
 
 //---------------------------------------------------------------------------

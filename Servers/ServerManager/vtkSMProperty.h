@@ -154,17 +154,6 @@ public:
   static void SetCheckDomains(int check);
 
   // Description:
-  // Static boolean used to determine whether a property is marked
-  // as modified when first created. Turn this on to get all the
-  // default values specified in the XML in the first UpdateVTKObjects.
-  // On by default.
-  // Note: if this is set to on, the proxy and the server object(s)
-  // will be out-of-sync until all property values are modified and
-  // pushed.
-  static int GetModifiedAtCreation();
-  static void SetModifiedAtCreation(int check);
-
-  // Description:
   // The name assigned by the xml parser. Used to get the property
   // from a proxy.
   vtkGetStringMacro(XMLName);
@@ -305,7 +294,6 @@ protected:
   vtkSMDomainIterator* DomainIterator;
 
   static int CheckDomains;
-  static int ModifiedAtCreation;
 
   // ControllerProxy is pointer to the proxy whose property (ControllerProperty) is
   // mapped to the current property. This is useful for 3DWidgets. The properties of
