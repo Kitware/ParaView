@@ -453,10 +453,11 @@ ENDMACRO(PARAVIEW_LINK_LIBRARIES LIBS)
 MACRO(PARAVIEW_EXTRA_LINK_DIRECTORIES DIRS)
   SET(current_dirs ${PARAVIEW_EXTRA_LINK_DIRECTORIES})
   FOREACH(dir ${DIRS})
-    IF(${current_dirs} MATCHES ${dir})
-    ELSE(${current_dirs} MATCHES ${dir})
-      SET(current_dirs ${current_dirs} ${dir})
-    ENDIF(${current_dirs} MATCHES ${dir})
+    STRING(COMPARE EQUAL "${current_dirs}" "${dir}"
+      paraview_extra_link_directories_already_there)
+    IF(NOT paraview_extra_link_directories_already_there)
+      SET(current_dirs ${current_dirs} "${dir}")
+    ENDIF(NOT paraview_extra_link_directories_already_there)
   ENDFOREACH(dir)
   SET(PARAVIEW_EXTRA_LINK_DIRECTORIES "${current_dirs}" CACHE INTERNAL "")
 ENDMACRO(PARAVIEW_EXTRA_LINK_DIRECTORIES)
@@ -498,9 +499,10 @@ FOREACH(external EXODUS SAF ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
   IF(PARAVIEW_USE_${external})
     FIND_PATH(${external}_SOURCE_DIR 
       ${external}ParaViewImport.cmake
-      ../vtkSNL/IO
-      ../../vtkSNL/IO
-      ../../../vtkSNL/IO
+      ${CMAKE_CURRENT_SOURCE_DIR}/vtkSNL/IO
+      ${CMAKE_CURRENT_SOURCE_DIR}/../vtkSNL/IO
+      ${CMAKE_CURRENT_SOURCE_DIR}/../../vtkSNL/IO
+      ${CMAKE_CURRENT_SOURCE_DIR}/../../../vtkSNL/IO
       )
 
     IF(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
