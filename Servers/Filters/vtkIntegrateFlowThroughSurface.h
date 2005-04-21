@@ -22,36 +22,32 @@
 #ifndef __vtkIntegrateFlowThroughSurface_h
 #define __vtkIntegrateFlowThroughSurface_h
 
-#include "vtkDataSetToUnstructuredGridFilter.h"
+#include "vtkUnstructuredGridAlgorithm.h"
 
-class vtkDataSet;
 class vtkIdList;
 class vtkDataSetAttributes;
 
-class VTK_EXPORT vtkIntegrateFlowThroughSurface : public vtkDataSetToUnstructuredGridFilter
+class VTK_EXPORT vtkIntegrateFlowThroughSurface : public vtkUnstructuredGridAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkIntegrateFlowThroughSurface,vtkDataSetToUnstructuredGridFilter);
+  vtkTypeRevisionMacro(vtkIntegrateFlowThroughSurface,vtkUnstructuredGridAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkIntegrateFlowThroughSurface *New();
   
-  // Description:
-  // If you want to warp by an arbitrary vector array, then set its name here.
-  // By default this is NULL and the filter will use the active vector array.
-  vtkGetStringMacro(InputVectorsSelection);
-  void SelectInputVectors(const char *fieldName) 
-    {this->SetInputVectorsSelection(fieldName);}
-
 protected:
   vtkIntegrateFlowThroughSurface();
   ~vtkIntegrateFlowThroughSurface();
 
-  vtkSetStringMacro(InputVectorsSelection);
-  char* InputVectorsSelection;
-
   // Usual data generation method
-  void Execute();
-  void ComputeInputUpdateExtent();
+  // Usual data generation method
+  virtual int RequestData(vtkInformation *, 
+                          vtkInformationVector **, 
+                          vtkInformationVector *);
+  virtual int RequestUpdateExtent(vtkInformation*,
+                                  vtkInformationVector**,
+                                  vtkInformationVector*);
+
+  virtual int FillInputPortInformation(int port, vtkInformation* info);
 
 private:
   vtkIntegrateFlowThroughSurface(const vtkIntegrateFlowThroughSurface&); // Not implemented.

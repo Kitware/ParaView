@@ -50,8 +50,10 @@
 
       <StringVectorProperty 
          name="SelectInputVectors" 
-         command="SelectInputVectors" 
-         number_of_elements="1"> 
+         command="SetInputArrayToProcess"
+         number_of_elements="5"
+         element_types="0 0 0 0 2"
+         animateable="0"> 
             <ArrayListDomain name="array_list" attribute_type="Vectors">
               <RequiredProperties>
                  <Property name="Input" function="Input"/>
@@ -107,8 +109,9 @@
 
       <StringVectorProperty 
          name="SelectInputVectors" 
-         command="SelectInputVectors" 
-         number_of_elements="1"> 
+         command="SetInputArrayToProcess"
+         number_of_elements="5"
+         element_types="0 0 0 0 2">
             <ArrayListDomain name="array_list" attribute_type="Vectors">
               <RequiredProperties>
                  <Property name="Input" function="Input"/>
@@ -653,9 +656,9 @@
 
      <StringVectorProperty 
         name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"
-        animateable="0"> 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2">
           <ArrayListDomain name="array_list" attribute_type="Scalars">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
@@ -1051,8 +1054,9 @@
 
      <StringVectorProperty 
         name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"> 
+        command="SetInputArrayToProcess"
+          number_of_elements="5"
+          element_types="0 0 0 0 2">
            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
@@ -1089,9 +1093,10 @@
 
      <StringVectorProperty 
         name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"> 
-           <ArrayListDomain name="array_list" attribute_type="Scalars">
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2">
+            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
              </RequiredProperties>
@@ -1273,8 +1278,9 @@
 
      <StringVectorProperty 
         name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"> 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2">
            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
@@ -1648,7 +1654,7 @@
    <!-- End ReflectionFilter -->
    </SourceProxy>
 
-   <SourceProxy name="RibbonFilter" class="vtkPVRibbonFilter">
+   <SourceProxy name="RibbonFilter" class="vtkRibbonFilter">
     <InputProperty
        name="Input"
        command="SetInput">
@@ -1667,8 +1673,9 @@
 
      <StringVectorProperty 
         name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"> 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2">
            <ArrayListDomain name="array_list" attribute_type="Scalars"
                             input_domain_name="input_array2">
              <RequiredProperties>
@@ -1679,8 +1686,9 @@
 
      <StringVectorProperty 
         name="SelectInputVectors" 
-        command="SelectInputVectors" 
-        number_of_elements="1"> 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2">
            <ArrayListDomain name="array_list" attribute_type="Vectors"
                             input_domain_name="input_array1">
              <RequiredProperties>
@@ -2081,8 +2089,9 @@
 
      <StringVectorProperty 
         name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"> 
+        command="SetInputArrayToProcess"
+          number_of_elements="5"
+          element_types="0 0 0 0 2">
            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
@@ -2125,7 +2134,7 @@
    <!-- End WarpScalar -->
    </SourceProxy>
 
-   <SourceProxy name="WarpVector" class="vtkPVWarpVector">
+   <SourceProxy name="WarpVector" class="vtkWarpVector">
      <InputProperty
         name="Input"
         command="SetInput">
@@ -2142,8 +2151,9 @@
 
       <StringVectorProperty 
          name="SelectInputVectors" 
-         command="SelectInputVectors" 
-         number_of_elements="1"> 
+         command="SetInputArrayToProcess"
+         number_of_elements="5"
+         element_types="0 0 0 0 2">
             <ArrayListDomain name="array_list" attribute_type="Vectors">
               <RequiredProperties>
                  <Property name="Input" function="Input"/>
@@ -2211,7 +2221,7 @@
    <!-- End Cut -->
    </SourceProxy>
 
-   <SourceProxy name="Clip" class="vtkPVClipDataSet">
+   <SourceProxy name="Clip" class="vtkClipDataSet">
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2251,8 +2261,9 @@
 
      <StringVectorProperty 
         name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"> 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2">
            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
@@ -2276,19 +2287,7 @@
    <!-- End Clip -->
    </SourceProxy>
 
-   <SourceProxy name="Threshold" class="vtkPVThresholdFilter">
-     <IntVectorProperty 
-        name="AttributeMode" 
-        command="SetAttributeMode"
-        number_of_elements="1"
-        default_values="1">
-       <FieldDataDomain name="field_list">
-             <RequiredProperties>
-                <Property name="Input" function="Input"/>
-             </RequiredProperties>
-       </FieldDataDomain>
-     </IntVectorProperty>
-
+   <SourceProxy name="Threshold" class="vtkThreshold">
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2308,14 +2307,20 @@
 
      <StringVectorProperty 
         name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"> 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2">
            <ArrayListDomain name="array_list" attribute_type="Scalars">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
                 <Property name="AttributeMode" function="FieldDataSelection"/>
              </RequiredProperties>
            </ArrayListDomain>
+           <FieldDataDomain name="field_list">
+             <RequiredProperties>
+                <Property name="Input" function="Input"/>
+             </RequiredProperties>
+           </FieldDataDomain>
      </StringVectorProperty> 
 
      <DoubleVectorProperty 
@@ -2341,11 +2346,7 @@
    <!-- End Threshold -->
    </SourceProxy>
 
-#ifdef VTK_USE_PATENTED
-   <SourceProxy name="Contour" class="vtkPVKitwareContourFilter">
-#else
-   <SourceProxy name="Contour" class="vtkPVContourFilter">
-#endif
+   <SourceProxy name="Contour" class="vtkContourFilter">
     <InputProperty
        name="Input"
        command="SetInput">
@@ -2362,8 +2363,9 @@
 
      <StringVectorProperty 
         name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
         animateable="0"> 
           <ArrayListDomain name="array_list" attribute_type="Scalars">
             <RequiredProperties>
@@ -2436,6 +2438,32 @@
                             number_of_components="3" optional="1"/>
      </InputProperty>
 
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"> 
+          <ArrayListDomain name="array_list" attribute_type="Scalars" 
+               input_domain_name="input_array1">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="SelectInputVectors" 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"> 
+          <ArrayListDomain name="array_list" attribute_type="Vectors"
+               input_domain_name="input_array2">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+     </StringVectorProperty>
+
      <InputProperty
         name="Source"
         command="SetSource">
@@ -2446,30 +2474,6 @@
              <DataType value="vtkPolyData"/>
            </DataTypeDomain>
       </InputProperty>
-
-     <StringVectorProperty 
-        name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"> 
-           <ArrayListDomain name="array_list" attribute_type="Scalars"
-                            input_domain_name="input_array1">
-             <RequiredProperties>
-                <Property name="Input" function="Input"/>
-             </RequiredProperties>
-           </ArrayListDomain>
-     </StringVectorProperty>
-
-     <StringVectorProperty 
-        name="SelectInputVectors" 
-        command="SelectInputVectors" 
-        number_of_elements="1"> 
-           <ArrayListDomain name="array_list" attribute_type="Vectors"
-                            input_domain_name="input_array2">
-             <RequiredProperties>
-                <Property name="Input" function="Input"/>
-             </RequiredProperties>
-           </ArrayListDomain>
-     </StringVectorProperty>
 
      <IntVectorProperty 
         name="SetOrient" 
@@ -2654,8 +2658,10 @@
 
      <StringVectorProperty 
         name="SelectInputVectors" 
-        command="SelectInputVectors" 
-        number_of_elements="1"> 
+        command="SetInputArrayToProcess"
+        number_of_elements="5"
+        element_types="0 0 0 0 2"
+        animateable="0"> 
            <ArrayListDomain name="array_list" attribute_type="Vectors">
              <RequiredProperties>
                 <Property name="Input" function="Input"/>
@@ -2909,17 +2915,6 @@
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
-     <StringVectorProperty 
-        name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"> 
-           <ArrayListDomain name="array_list" attribute_type="Scalars">
-             <RequiredProperties>
-                <Property name="Input" function="Input"/>
-             </RequiredProperties>
-           </ArrayListDomain>
-     </StringVectorProperty> 
-
      <DoubleVectorProperty
         name="Value"
         command="SetValue"
@@ -2928,7 +2923,6 @@
           <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
-               <Property name="SelectInputScalars" function="ArraySelection"/>
             </RequiredProperties>
           </ArrayRangeDomain>         
           <DoubleRangeDomain name="range"/>
@@ -2952,17 +2946,6 @@
                             number_of_components="1" optional="1"/>
      </InputProperty>
 
-     <StringVectorProperty 
-        name="SelectInputScalars" 
-        command="SelectInputScalars" 
-        number_of_elements="1"> 
-          <ArrayListDomain name="array_list" attribute_type="Scalars">
-            <RequiredProperties>
-               <Property name="Input" function="Input"/>
-            </RequiredProperties>
-          </ArrayListDomain>
-     </StringVectorProperty>
-
      <DoubleVectorProperty
         name="ContourValues"
         command="SetValue"
@@ -2975,7 +2958,6 @@
           <ArrayRangeDomain name="scalar_range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
-               <Property name="SelectInputScalars" function="ArraySelection"/>
             </RequiredProperties>
           </ArrayRangeDomain>         
      </DoubleVectorProperty>
@@ -3112,17 +3094,6 @@
             <DataType value="vtkDataSet"/>
           </DataTypeDomain>
       </InputProperty>
-
-     <StringVectorProperty 
-        name="SelectInputVectors" 
-        command="SelectInputVectors" 
-        number_of_elements="1"> 
-           <ArrayListDomain name="array_list" attribute_type="Vectors">
-             <RequiredProperties>
-                <Property name="Input" function="Input"/>
-             </RequiredProperties>
-           </ArrayListDomain>
-     </StringVectorProperty>
 
      <!-- This is a hack used to bypass the fact that ParaView
           does not have special proxies for things like point sources.

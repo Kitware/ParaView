@@ -52,13 +52,6 @@ public:
   void GenerateValues(int numContours, double rangeStart, double rangeEnd);
 
   // Description:
-  // If you want to contour by an arbitrary array, then set its name here.
-  // By default this in NULL and the filter will use the active scalar array.
-  vtkGetStringMacro(InputScalarsSelection);
-  virtual void SelectInputScalars(const char *fieldName) 
-    {this->SetInputScalarsSelection(fieldName);}
-
-  // Description:
   // Look at contours to compute MTime.
   unsigned long GetMTime();    
 
@@ -70,8 +63,6 @@ protected:
 
   // ----
   vtkContourValues *ContourValues;
-  char *InputScalarsSelection;
-  vtkSetStringMacro(InputScalarsSelection);
 
 private:
 

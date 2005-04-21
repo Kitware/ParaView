@@ -13,58 +13,76 @@
 
 =========================================================================*/
 #include "vtkIntegrateFlowThroughSurface.h"
-#include "vtkIntegrateAttributes.h"
-#include "vtkSurfaceVectors.h"
-#include "vtkObjectFactory.h"
-#include "vtkDataSet.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkPointData.h"
+
 #include "vtkCellData.h"
 #include "vtkDataArray.h"
+#include "vtkDataSet.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkIntegrateAttributes.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
+#include "vtkSurfaceVectors.h"
+#include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.1");
+vtkCxxRevisionMacro(vtkIntegrateFlowThroughSurface, "1.2");
 vtkStandardNewMacro(vtkIntegrateFlowThroughSurface);
 
 //-----------------------------------------------------------------------------
 vtkIntegrateFlowThroughSurface::vtkIntegrateFlowThroughSurface()
 {
-  this->InputVectorsSelection = 0;
+  // by default process active point vectors
+  this->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,
+                               vtkDataSetAttributes::VECTORS);
 }
 
 //-----------------------------------------------------------------------------
 vtkIntegrateFlowThroughSurface::~vtkIntegrateFlowThroughSurface()
 {
-  this->SetInputVectorsSelection(0);
 }
 
 //-----------------------------------------------------------------------------
-void vtkIntegrateFlowThroughSurface::ComputeInputUpdateExtent()
+int vtkIntegrateFlowThroughSurface::RequestUpdateExtent(
+                                           vtkInformation * vtkNotUsed(request),
+                                           vtkInformationVector **inputVector,
+                                           vtkInformationVector *outputVector)
 {
-  vtkDataSet* input = this->GetInput();
-  vtkUnstructuredGrid* output = this->GetOutput();
+  // get the info objects
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  
+  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), 
+              outInfo->Get(vtkStreamingDemandDrivenPipeline::
+                           UPDATE_NUMBER_OF_GHOST_LEVELS()) + 1);
 
-  input->SetUpdateExtent(output->GetUpdatePiece(), 
-                         output->GetUpdateNumberOfPieces(),
-                         output->GetUpdateGhostLevel()+1);
-
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
-void vtkIntegrateFlowThroughSurface::Execute()
+int vtkIntegrateFlowThroughSurface::RequestData(vtkInformation *vtkNotUsed(request),
+                                   vtkInformationVector **inputVector,
+                                   vtkInformationVector *outputVector)
 {
-  vtkDataSet* input = this->GetInput();
-  vtkUnstructuredGrid* output = this->GetOutput();
+  // get the info objects
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  
+  // get the input and ouptut
+  vtkDataSet *input = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkDataSet* inputCopy;
 
   inputCopy = input->NewInstance();
   inputCopy->CopyStructure(input);
-  vtkDataArray* vectors;
-  vectors = input->GetPointData()->GetVectors(this->InputVectorsSelection);
+  vtkDataArray *vectors = this->GetInputArrayToProcess(0,inputVector);
   if (vectors == 0)
     {
     vtkErrorMacro("Missing Vectors.");
     inputCopy->Delete();
-    return;
+    return 1;
     }
   inputCopy->GetPointData()->SetVectors(vectors);
   inputCopy->GetCellData()->AddArray(
@@ -92,21 +110,20 @@ void vtkIntegrateFlowThroughSurface::Execute()
   integrate = 0;
   inputCopy->Delete();
   inputCopy = 0;
+
+  return 1;
 }        
 
 //-----------------------------------------------------------------------------
 void vtkIntegrateFlowThroughSurface::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
-  if (this->InputVectorsSelection)
-    {
-    os << indent <<  "InputVectorsSelection: " 
-       <<   this->InputVectorsSelection << endl;
-    }
-  else
-    {
-    os << indent <<  "InputVectorsSelection: NULL\n"; 
-    }
 }
 
+//----------------------------------------------------------------------------
+int vtkIntegrateFlowThroughSurface::FillInputPortInformation(
+  int vtkNotUsed(port), vtkInformation* info)
+{
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+  return 1;
+}

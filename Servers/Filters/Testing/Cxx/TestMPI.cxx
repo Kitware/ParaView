@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkMazeSource.h"
+#include "vtkConeSource.h"
 #include "vtkPickFilter.h"
 #include "vtkMPIDuplicatePolyData.h"
 #include "vtkPVConnectivityFilter.h"
@@ -23,20 +23,20 @@
 
 int main(int , char* [])
 {
-  vtkMazeSource *maze = vtkMazeSource::New();
-  maze->Update(); //For GetCenter
+  vtkConeSource *cone = vtkConeSource::New();
+  cone->Update(); //For GetCenter
   
   vtkPickFilter *pick = vtkPickFilter::New();
   
   //law int fixme;  // why is this a problem.
-  //pick->SetInput( maze->GetOutput() );
-  pick->SetWorldPoint ( maze->GetOutput()->GetCenter() );
+  //pick->SetInput( cone->GetOutput() );
+  pick->SetWorldPoint ( cone->GetOutput()->GetCenter() );
   pick->GetWorldPoint ();
   pick->SetPickCell ( 1 );
   pick->Update();
 
   vtkMPIDuplicatePolyData *duplicate = vtkMPIDuplicatePolyData::New();
-  duplicate->SetInput( maze->GetOutput() );
+  duplicate->SetInput( cone->GetOutput() );
   duplicate->PassThroughOn ();
 
   vtkPVConnectivityFilter *connect = vtkPVConnectivityFilter::New();
@@ -51,7 +51,7 @@ int main(int , char* [])
   move->SetMoveModeToPassThrough ();
   move->Update();
 
-  maze->Delete();
+  cone->Delete();
   pick->Delete();
   duplicate->Delete();
   connect->Delete();

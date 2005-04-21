@@ -27,7 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.6");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.7");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -68,10 +68,10 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty*)
     return;
     }
   
-  const char* arrayName = array->GetUncheckedElement(0);
+  const char* arrayName = array->GetUncheckedElement(4);
   if (!arrayName || arrayName[0] == '\0')
     {
-    arrayName = array->GetElement(0);
+    arrayName = array->GetElement(4);
     }
 
   if (!arrayName || arrayName[0] == '\0')

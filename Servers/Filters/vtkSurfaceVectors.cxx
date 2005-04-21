@@ -13,16 +13,20 @@
 
 =========================================================================*/
 #include "vtkSurfaceVectors.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkCellType.h"
 #include "vtkDataSet.h"
-#include "vtkPointData.h"
 #include "vtkDoubleArray.h"
 #include "vtkIdList.h"
-#include "vtkCellType.h"
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 #include "vtkPolygon.h"
+#include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkTriangle.h"
 
-vtkCxxRevisionMacro(vtkSurfaceVectors, "1.1");
+vtkCxxRevisionMacro(vtkSurfaceVectors, "1.2");
 vtkStandardNewMacro(vtkSurfaceVectors);
 
 //-----------------------------------------------------------------------------
@@ -30,37 +34,55 @@ vtkStandardNewMacro(vtkSurfaceVectors);
 // flipNormals turned off, and non-manifold traversal turned on.
 vtkSurfaceVectors::vtkSurfaceVectors()
 {
-  this->InputVectorsSelection = 0;
   this->ConstraintMode = vtkSurfaceVectors::Parallel;
+
+  // by default process active point vectors
+  this->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,
+                               vtkDataSetAttributes::VECTORS);
 }
 
 //-----------------------------------------------------------------------------
 vtkSurfaceVectors::~vtkSurfaceVectors()
 {
-  this->SetInputVectorsSelection(0);
 }
 
 //-----------------------------------------------------------------------------
-void vtkSurfaceVectors::ComputeInputUpdateExtent()
+int vtkSurfaceVectors::RequestUpdateExtent(
+                                           vtkInformation * vtkNotUsed(request),
+                                           vtkInformationVector **inputVector,
+                                           vtkInformationVector *outputVector)
 {
-  vtkDataSet* input = this->GetInput();
-  vtkDataSet* output = this->GetOutput();
+  // get the info objects
+  vtkInformation* outInfo = outputVector->GetInformationObject(0);
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  
+  inInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(), 
+              outInfo->Get(vtkStreamingDemandDrivenPipeline::
+                           UPDATE_NUMBER_OF_GHOST_LEVELS()) + 1);
 
-  input->SetUpdateExtent(output->GetUpdatePiece(), 
-                         output->GetUpdateNumberOfPieces(),
-                         output->GetUpdateGhostLevel()+1);
-
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
 // Generate normals for polygon meshesPrint
-void vtkSurfaceVectors::Execute()
+//----------------------------------------------------------------------------
+int vtkSurfaceVectors::RequestData(vtkInformation *vtkNotUsed(request),
+                                   vtkInformationVector **inputVector,
+                                   vtkInformationVector *outputVector)
 {
-  vtkDataSet* input = this->GetInput();
-  vtkDataSet* output = this->GetOutput();
+  // get the info objects
+  vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  
+  // get the input and ouptut
+  vtkDataSet *input = vtkDataSet::SafeDownCast(
+    inInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkDataSet *output = vtkDataSet::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
   vtkIdType numPoints, pointId, i, cellId;
   numPoints = input->GetNumberOfPoints();
-  vtkDataArray* inVectors = input->GetPointData()->GetVectors(this->InputVectorsSelection);
+  vtkDataArray *inVectors = this->GetInputArrayToProcess(0,inputVector);
   vtkDataArray* newVectors = 0;
   vtkDoubleArray* newScalars = 0;
   vtkIdList* cellIds = vtkIdList::New();
@@ -185,6 +207,7 @@ void vtkSurfaceVectors::Execute()
   
   // Not implemented for data set.
   //output->RemoveGhostCells
+  return 1;
 }        
        
 //-----------------------------------------------------------------------------
@@ -207,16 +230,6 @@ void vtkSurfaceVectors::PrintSelf(ostream& os, vtkIndent indent)
   else
     {
     os << indent << "ConstraintMode: Unknown\n";
-    }
-
-  if (this->InputVectorsSelection)
-    {
-    os << indent <<  "InputVectorsSelection: " 
-       << this->InputVectorsSelection << endl;
-    }
-  else
-    {
-    os << indent <<  "InputVectorsSelection: NULL\n"; 
     }
 }
 

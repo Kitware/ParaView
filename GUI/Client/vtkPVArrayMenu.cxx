@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.72");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.73");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -54,7 +54,7 @@ vtkPVArrayMenu::vtkPVArrayMenu()
   this->InputMenu = NULL;
   this->FieldMenu = NULL;
 
-  this->CellData = 0;
+  this->InputAttributeIndex = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -72,6 +72,8 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
 
   this->SetInputMenu(NULL);
   this->SetFieldMenu(NULL);
+
+  this->SetInputAttributeIndex(0);
 }
 
 //----------------------------------------------------------------------------
@@ -120,6 +122,19 @@ void vtkPVArrayMenu::Create(vtkKWApplication *app)
 
   extraFrame->Delete();
   extraFrame = NULL;
+
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (svp)
+    {
+    svp->SetNumberOfElements(5);
+    svp->SetElement(0, "0");
+    svp->SetElement(1, "0");
+    svp->SetElement(2, "0");
+    svp->SetElement(3, "0");
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -189,8 +204,8 @@ void vtkPVArrayMenu::Accept()
   
   if (svp)
     {
-    svp->SetNumberOfElements(1);
-    svp->SetElement(0, this->ArrayName);
+    svp->SetElement(0, this->InputAttributeIndex);
+    svp->SetElement(4, this->ArrayName);
     }
   else
     {
@@ -257,21 +272,39 @@ void vtkPVArrayMenu::SaveInBatchScript(ofstream *file)
     return;
     }
 
-  ostrstream cmd_with_warning_C4701;
-  cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
-                         << this->SMPropertyName << "] SetElement 0 " ;
-  if (this->ArrayName)
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (svp)
     {
-    cmd_with_warning_C4701 << "{" << this->ArrayName << "}" << endl;
+    ostrstream cmd_with_warning_C4701;
+    cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
+                           << this->SMPropertyName << "] SetElement 0" 
+                           << svp->GetElement(0) << endl;
+    cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
+                           << this->SMPropertyName << "] SetElement 1" 
+                           << svp->GetElement(1) << endl;
+    cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
+                           << this->SMPropertyName << "] SetElement 2" 
+                           << svp->GetElement(2) << endl;
+    cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
+                           << this->SMPropertyName << "] SetElement 3" 
+                           << svp->GetElement(3) << endl;
+    cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
+                           << this->SMPropertyName << "] SetElement 4 " ;
+    if (this->ArrayName)
+      {
+      cmd_with_warning_C4701 << "{" << this->ArrayName << "}" << endl;
+      }
+    else
+      {
+      cmd_with_warning_C4701 << "{}"<< endl;
+      }
+    
+    cmd_with_warning_C4701 << ends;
+    *file << cmd_with_warning_C4701.str();
+    delete[] cmd_with_warning_C4701.str();
     }
-  else
-    {
-    cmd_with_warning_C4701 << "{}"<< endl;
-    }
-
-  cmd_with_warning_C4701 << ends;
-  *file << cmd_with_warning_C4701.str();
-  delete[] cmd_with_warning_C4701.str();
 }
 
 //----------------------------------------------------------------------------
@@ -282,7 +315,11 @@ void vtkPVArrayMenu::UpdateProperty()
   
   if (svp)
     {
-    svp->SetUncheckedElement(0, this->ArrayName);
+    svp->SetUncheckedElement(0, this->InputAttributeIndex);
+    svp->SetUncheckedElement(1, svp->GetElement(1));
+    svp->SetUncheckedElement(2, svp->GetElement(2));
+    svp->SetUncheckedElement(3, svp->GetElement(3));
+    svp->SetUncheckedElement(4, this->ArrayName);
     svp->UpdateDependentDomains();
     }
 
@@ -402,50 +439,6 @@ void vtkPVArrayMenu::UpdateArrayMenu()
 }
 
 //----------------------------------------------------------------------------
-vtkPVDataSetAttributesInformation *vtkPVArrayMenu::GetFieldInformation()
-{
-
-  if (this->ArrayMenu)
-    {
-    vtkPVSource *input;
-    if ( !this->InputMenu )
-      {
-      return NULL;
-      }
-    input = this->InputMenu->GetCurrentValue();
-    if (input == NULL)
-      {
-      return NULL;
-      }
-    // TODO Fix
-    if (this->CellData)
-      {
-      return input->GetDataInformation()->GetCellDataInformation();
-      }
-    else
-      {
-      return input->GetDataInformation()->GetPointDataInformation();
-      }
-    }
-  vtkErrorMacro("No input menu or field menu.");
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
-vtkPVArrayInformation *vtkPVArrayMenu::GetArrayInformation()
-{
-  vtkPVDataSetAttributesInformation* fieldInfo;
-
-  fieldInfo = this->GetFieldInformation();
-  if (fieldInfo == NULL)
-    {
-    return NULL;
-    }
-
-  return fieldInfo->GetArrayInformation(this->ArrayName);
-}
-
-//----------------------------------------------------------------------------
 vtkPVArrayMenu* vtkPVArrayMenu::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -513,7 +506,7 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
       pvam->SetFieldMenu(im);
       im->Delete();
       }
-    this->CellData = pvam->GetCellData();
+    pvam->SetInputAttributeIndex(this->InputAttributeIndex);
     }
   else 
     {
@@ -576,19 +569,15 @@ int vtkPVArrayMenu::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SetFieldMenu(imw);
     imw->Delete();
     }
-  
-  // Setup the flag to use cell data.
-  const char* field = element->GetAttribute("field");
-  if (field)
+
+  const char* idx = element->GetAttribute("input_attribute_index");
+  if (idx)
     {
-    if (strcmp(field,"Point") == 0)
-      {
-      this->CellData = 0;
-      }
-    else if (strcmp(field,"Cell") == 0)
-      {
-      this->CellData = 1;
-      }
+    this->SetInputAttributeIndex(idx);
+    }
+  else
+    {
+    this->SetInputAttributeIndex("0");
     }
 
   return 1;
@@ -632,6 +621,4 @@ void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "FieldMenu: NULL\n";
     }
-
-  os << indent << "CellData: " << this->CellData << endl;
 }

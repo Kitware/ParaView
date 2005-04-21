@@ -73,12 +73,6 @@ public:
   void SetValue(const char* name);
   const char* GetValue() { return this->ArrayName;}
 
-  //BTX
-  // Description:
-  // A convenience method that reutrns the VTK array selected.
-  vtkPVArrayInformation *GetArrayInformation();
-  //ETX
-
   // Description:
   // Direct access to the ArrayName is used internally by the Reset method. 
   // The methods "SetValue" should be used instead of this method.
@@ -123,16 +117,9 @@ public:
   // Initialize the widget after creation
   virtual void Initialize();
  
-  // Description:
-  // This flag tells the menu to use cell arrays.
-  vtkSetMacro(CellData,int);
-  vtkGetMacro(CellData,int);
-
 protected:
   vtkPVArrayMenu();
   ~vtkPVArrayMenu();
-
-  vtkPVDataSetAttributesInformation *GetFieldInformation();
 
   // Gets called when the reset button is pressed.
   virtual void ResetInternal();
@@ -152,6 +139,9 @@ protected:
   void UpdateArrayMenu();
 
   void UpdateProperty();
+
+  char* InputAttributeIndex;
+  vtkSetStringMacro(InputAttributeIndex);
 
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,

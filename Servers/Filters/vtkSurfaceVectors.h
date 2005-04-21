@@ -21,25 +21,17 @@
 #ifndef __vtkSurfaceVectors_h
 #define __vtkSurfaceVectors_h
 
-#include "vtkDataSetToDataSetFilter.h"
+#include "vtkDataSetAlgorithm.h"
 
 class vtkFloatArray;
 class vtkIdList;
-class vtkDataSet;
 
-class VTK_EXPORT vtkSurfaceVectors : public vtkDataSetToDataSetFilter
+class VTK_EXPORT vtkSurfaceVectors : public vtkDataSetAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkSurfaceVectors,vtkDataSetToDataSetFilter);
+  vtkTypeRevisionMacro(vtkSurfaceVectors,vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkSurfaceVectors *New();
-
-  // Description:
-  // If you want to warp by an arbitrary vector array, then set its name here.
-  // By default this is NULL and the filter will use the active vector array.
-  vtkGetStringMacro(InputVectorsSelection);
-  void SelectInputVectors(const char *fieldName) 
-    {this->SetInputVectorsSelection(fieldName);}
 
 //BTX
   enum ConstraintMode {
@@ -67,11 +59,13 @@ protected:
   ~vtkSurfaceVectors();
 
   // Usual data generation method
-  void Execute();
-  void ComputeInputUpdateExtent();
+  virtual int RequestData(vtkInformation *, 
+                          vtkInformationVector **, 
+                          vtkInformationVector *);
+  virtual int RequestUpdateExtent(vtkInformation*,
+                                  vtkInformationVector**,
+                                  vtkInformationVector*);
 
-  vtkSetStringMacro(InputVectorsSelection);
-  char* InputVectorsSelection;
   int   ConstraintMode;
 
 private:

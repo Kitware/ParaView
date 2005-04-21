@@ -30,12 +30,13 @@
 #include "vtkSMEnumerationDomain.h"
 #include "vtkSMInputProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkSource.h"
 #include "vtkPVTraceHelper.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.24");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.25");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -52,7 +53,7 @@ vtkPVFieldMenu::vtkPVFieldMenu()
   this->InputMenu = NULL;
   this->Label = vtkKWLabel::New();
   this->FieldMenu = vtkKWOptionMenu::New();
-  this->Value = vtkDataSet::POINT_DATA_FIELD;  
+  this->Value = vtkDataObject::FIELD_ASSOCIATION_POINTS;
   
 }
 
@@ -73,11 +74,11 @@ void vtkPVFieldMenu::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "InputMenu: " << this->InputMenu << endl;
-  if (this->Value == vtkDataSet::POINT_DATA_FIELD)
+  if (this->Value == vtkDataObject::FIELD_ASSOCIATION_POINTS)
     {
     os << indent << "Value: Point Data. \n";
     }
-  if (this->Value == vtkDataSet::CELL_DATA_FIELD)
+  if (this->Value == vtkDataObject::FIELD_ASSOCIATION_CELLS)
     {
     os << indent << "Value: Cell Data. \n";
     }
@@ -159,20 +160,15 @@ void vtkPVFieldMenu::SetValue(int field)
 //----------------------------------------------------------------------------
 void vtkPVFieldMenu::Accept()
 {
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
   
-  if (ivp)
+  if (svp)
     {
-    ivp->SetNumberOfElements(1);
-    ivp->SetElement(0, this->Value);
-    }
-  else
-    {
-    vtkErrorMacro(
-      "Could not find property of name: "
-      << (this->GetSMPropertyName()?this->GetSMPropertyName():"(null)")
-      << " for widget: " << this->GetTraceHelper()->GetObjectName());
+    ostrstream cmd_with_warning_C4701;
+    cmd_with_warning_C4701 << this->Value << ends;
+    svp->SetElement(3, cmd_with_warning_C4701.str());
+    delete[] cmd_with_warning_C4701.str();
     }
 
   this->Superclass::Accept();

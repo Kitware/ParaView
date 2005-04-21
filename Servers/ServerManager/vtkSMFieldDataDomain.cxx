@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMFieldDataDomain);
-vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMFieldDataDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMFieldDataDomain::vtkSMFieldDataDomain()
@@ -69,12 +69,12 @@ void vtkSMFieldDataDomain::Update(vtkSMSourceProxy* sp,
 
   if (this->CheckForArray(sp, info->GetPointDataInformation(), iad))
     {
-    this->AddEntry("Point Data", vtkDataSet::POINT_DATA_FIELD);
+    this->AddEntry("Point Data", vtkDataObject::FIELD_ASSOCIATION_POINTS);
     }
 
   if (this->CheckForArray(sp, info->GetCellDataInformation(), iad))
     {
-    this->AddEntry("Cell Data",  vtkDataSet::CELL_DATA_FIELD);
+    this->AddEntry("Cell Data",  vtkDataObject::FIELD_ASSOCIATION_CELLS);
     }
 
 }

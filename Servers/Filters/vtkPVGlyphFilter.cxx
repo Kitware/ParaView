@@ -23,7 +23,7 @@
 #include "vtkPolyData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.18");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.19");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -168,17 +168,6 @@ void vtkPVGlyphFilter::ReportReferences(vtkGarbageCollector* collector)
 void vtkPVGlyphFilter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "InputScalarsSelection: " 
-     << (this->InputScalarsSelection ? this->InputScalarsSelection : "(none)")
-     << endl;
-
-  os << indent << "InputVectorsSelection: " 
-     << (this->InputVectorsSelection ? this->InputVectorsSelection : "(none)")
-     << endl;
-
-  os << indent << "InputNormalsSelection: " 
-     << (this->InputNormalsSelection ? this->InputNormalsSelection : "(none)")
-     << endl;
   
   os << indent << "MaximumNumberOfPoints: " << this->GetMaximumNumberOfPoints()
      << endl;

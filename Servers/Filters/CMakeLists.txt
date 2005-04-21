@@ -32,16 +32,13 @@ SET(Filters_SRCS
   vtkMPIDuplicatePolyData.cxx
   vtkMPIDuplicateUnstructuredGrid.cxx
   vtkMPIMoveData.cxx
-  vtkMazeSource.cxx
   vtkMergeArrays.cxx
   vtkMultiActorHelper.cxx
   vtkMultiDisplayManager.cxx
   vtkPVArrowSource.cxx
-  vtkPVClipDataSet.cxx
   vtkPVCompositeBuffer.cxx
   vtkPVCompositeUtilities.cxx
   vtkPVConnectivityFilter.cxx
-  vtkPVContourFilter.cxx
   vtkPVDReader.cxx
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerTranslator.cxx
@@ -56,7 +53,6 @@ SET(Filters_SRCS
   vtkPVLinearExtrusionFilter.cxx
   vtkPVMain.cxx
   vtkPVRenderViewProxy.cxx
-  vtkPVRibbonFilter.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
@@ -64,10 +60,8 @@ SET(Filters_SRCS
   vtkPVServerTimeSteps.cxx
   vtkPVServerXDMFParameters.cxx
   vtkPVSummaryHelper.cxx
-  vtkPVThresholdFilter.cxx
   vtkPVTreeComposite.cxx
   vtkPVUpdateSuppressor.cxx
-  vtkPVWarpVector.cxx
   vtkPVXMLElement.cxx
   vtkPVXMLParser.cxx
   vtkPickFilter.cxx
@@ -129,10 +123,6 @@ IF (PARAVIEW_USE_ICE_T)
     )
 ENDIF (PARAVIEW_USE_ICE_T)
 
-
-IF (VTK_USE_PATENTED)
-  SET(Filters_SRCS ${Filters_SRCS} vtkPVKitwareContourFilter.cxx)
-ENDIF (VTK_USE_PATENTED)
 
 SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
 SET(VTK_BINARY_DIR "${PVFilters_BINARY_DIR}")

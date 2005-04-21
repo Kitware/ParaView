@@ -1515,7 +1515,7 @@ The Reflection filter reflects the input data set across the specified plane. If
           module_type="Filter"
           long_help="This filter generates ribbon surface from lines.  It is useful for displaying streamlines."
           short_help="Create ribbon surfaces from lines.">
-    <Filter class="vtkPVRibbonFilter">
+    <Filter class="vtkRibbonFilter">
       <Input name="Input"
              class="vtkPolyData">
         <ArrayRequirement attribute="Point" components="3"/>
@@ -2127,7 +2127,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
           button_help="Extract cells that satisfy a threshold criterion."
           long_help="This filter extracts cells that have point or cell scalars in the specified range."
           short_help="Extract cells that satisfy a threshold criterion.">
-    <Filter class="vtkPVThresholdFilter">
+    <Filter class="vtkThreshold">
       <Input name="Input"
              class="vtkDataSet">
         <ArrayRequirement components="1"/>
@@ -2141,7 +2141,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
     <FieldMenu id="fm"
                trace_name="FieldMenu"
                input_menu="im"
-               property="AttributeMode"
+               property="SelectInputScalars"
                help="Choose cell or point field to threshold." />
     <ArrayMenu id="am" property="SelectInputScalars"
                trace_name="Scalars"
@@ -2171,21 +2171,12 @@ The Threshold filter extracts the portions of the input data set whose scalars l
           button_help="Generate isolines or isosurfaces."
           long_help="Generate isolines or isosurfaces using point scalars."
           short_help="Generate isolines or isosurfaces.">
-#ifdef VTK_USE_PATENTED
-    <Filter class="vtkPVKitwareContourFilter">
+    <Filter class="vtkContourFilter">
       <Input name="Input"
              class="vtkDataSet">
         <ArrayRequirement attribute="Point" components="1"/>
       </Input>
     </Filter>
-#else
-    <Filter class="vtkPVContourFilter">
-      <Input name="Input"
-             class="vtkDataSet">
-        <ArrayRequirement attribute="Point" components="1"/>
-      </Input>
-    </Filter>
-#endif
     // Do not change the tracename of the input menu, it is used by vtkPVContour
     <InputMenu trace_name="Input"
                id="im"

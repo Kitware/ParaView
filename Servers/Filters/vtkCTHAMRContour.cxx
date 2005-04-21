@@ -26,29 +26,28 @@
 #include "vtkFloatArray.h"
 #include "vtkAppendPolyData.h"
 #include "vtkPolyData.h"
-#ifdef VTK_USE_PATENTED
-#  include "vtkRectilinearSynchronizedTemplates.h"
-#endif
 #include "vtkContourFilter.h"
 #include "vtkStringList.h"
 #include "vtkTimerLog.h"
 #include "vtkGarbageCollector.h"
 
 
-vtkCxxRevisionMacro(vtkCTHAMRContour, "1.12");
+vtkCxxRevisionMacro(vtkCTHAMRContour, "1.13");
 vtkStandardNewMacro(vtkCTHAMRContour);
 
 //----------------------------------------------------------------------------
 vtkCTHAMRContour::vtkCTHAMRContour()
 {
   this->ContourValues = vtkContourValues::New();
-  this->InputScalarsSelection = 0;
+
+  // by default process active point scalars
+  this->SetInputArrayToProcess(0,0,0,vtkDataObject::FIELD_ASSOCIATION_POINTS,
+                               vtkDataSetAttributes::SCALARS);
 }
 
 //----------------------------------------------------------------------------
 vtkCTHAMRContour::~vtkCTHAMRContour()
 {
-  this->SetInputScalarsSelection(0);
   this->ContourValues->Delete();
   this->ContourValues = 0;
 }
@@ -83,27 +82,6 @@ void vtkCTHAMRContour::Execute()
 
   append = vtkAppendPolyData::New();
   block = vtkRectilinearGrid::New();
-#ifdef VTK_USE_PATENTED  
-  if (input->GetDataDimension() == 3)
-    {
-    vtkRectilinearSynchronizedTemplates* contour;
-    contour = vtkRectilinearSynchronizedTemplates::New();
-    contour->ComputeNormalsOff();
-    contour->SetInput(block);
-    int numContours=this->ContourValues->GetNumberOfContours();
-    double *values=this->ContourValues->GetValues();
-    contour->SetNumberOfContours(numContours);
-    for (int i=0; i < numContours; i++)
-      {
-      contour->SetValue(i,values[i]);
-      }
-    contour->SelectInputScalars(this->InputScalarsSelection);
-    contourOutput = contour->GetOutput();
-    contourOutput->Register(this);
-    contour->Delete();
-    contour = 0;
-    }
-#endif
   if (contourOutput == 0)
     {
     vtkContourFilter* contour;
@@ -116,7 +94,7 @@ void vtkCTHAMRContour::Execute()
       {
       contour->SetValue(i,values[i]);
       }
-    contour->SelectInputScalars(this->InputScalarsSelection);
+    contour->SetInputArrayToProcess(0,this->GetInputArrayInformation(0));
     contourOutput = contour->GetOutput();
     contourOutput->Register(this);
     contour->Delete();
@@ -230,12 +208,6 @@ void vtkCTHAMRContour::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   this->ContourValues->PrintSelf(os,indent.GetNextIndent());
-
-  if (this->InputScalarsSelection)
-    {
-    os << indent << "InputScalarsSelection: " 
-       << this->InputScalarsSelection << endl;
-    }
 }
 
 
