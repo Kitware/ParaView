@@ -40,7 +40,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.29");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.30");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -563,7 +563,7 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
   if (!strcmp(scaleMode, "Scalar") && scalarProp)
     {
     const char *arrayName = this->ScalarsMenu->GetValue();
-    scalarProp->SetUncheckedElement(0, arrayName);
+    scalarProp->SetUncheckedElement(4, arrayName);
     scalarProp->UpdateDependentDomains();
     if (arrayName)
       {
@@ -578,7 +578,7 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
   else if (!strcmp(scaleMode, "Vector Magnitude") && vectorProp)
     {
     const char *arrayName = this->VectorsMenu->GetValue();
-    vectorProp->SetUncheckedElement(0, arrayName);
+    vectorProp->SetUncheckedElement(4, arrayName);
     vectorProp->UpdateDependentDomains();
     if (arrayName)
       {
@@ -593,7 +593,7 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
   else if (!strcmp(scaleMode, "Vector Components") && vectorProp)
     {
     const char *arrayName = this->VectorsMenu->GetValue();
-    vectorProp->SetUncheckedElement(0, arrayName);
+    vectorProp->SetUncheckedElement(4, arrayName);
     vectorProp->UpdateDependentDomains();
     if (arrayName)
       {
@@ -850,13 +850,13 @@ void vtkPVOrientScaleWidget::ResetInternal()
 
   if (scalarProp)
     {
-    this->ScalarsMenu->SetValue(scalarProp->GetElement(0));
-    this->SetCurrentScalars(scalarProp->GetElement(0));
+    this->ScalarsMenu->SetValue(scalarProp->GetElement(4));
+    this->SetCurrentScalars(scalarProp->GetElement(4));
     }
   if (vectorProp)
     {
-    this->VectorsMenu->SetValue(vectorProp->GetElement(0));
-    this->SetCurrentVectors(vectorProp->GetElement(0));
+    this->VectorsMenu->SetValue(vectorProp->GetElement(4));
+    this->SetCurrentVectors(vectorProp->GetElement(4));
     }    
   if (scaleFactorProp)
     {
@@ -945,10 +945,28 @@ void vtkPVOrientScaleWidget::SaveInBatchScript(ofstream* file)
     }
   
   *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
-        << this->SMScalarPropertyName << "] SetElement 0 {" 
+        << this->SMScalarPropertyName << "] SetElement 0 0" << endl;
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->SMScalarPropertyName << "] SetElement 1 0" << endl;
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->SMScalarPropertyName << "] SetElement 2 0" << endl;
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->SMScalarPropertyName << "] SetElement 3 0" << endl;
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->SMScalarPropertyName << "] SetElement 4 {" 
         << this->ScalarsMenu->GetValue() << "}" << endl;
+
+  
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->SMVectorPropertyName << "] SetElement 0 1" << endl;
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->SMVectorPropertyName << "] SetElement 1 0" << endl;
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->SMVectorPropertyName << "] SetElement 2 0" << endl;
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->SMVectorPropertyName << "] SetElement 3 0" << endl;
   *file << "  " << "[$pvTemp" << sourceID <<" GetProperty " 
-        << this->SMVectorPropertyName << "] SetElement 0 {" 
+        << this->SMVectorPropertyName << "] SetElement 4 {" 
         << this->VectorsMenu->GetValue() << "}" << endl;
   *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
         << this->SMOrientModePropertyName << "] SetElement 0 " 
