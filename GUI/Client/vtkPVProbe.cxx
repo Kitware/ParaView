@@ -48,7 +48,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.141");
+vtkCxxRevisionMacro(vtkPVProbe, "1.142");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -375,12 +375,16 @@ void vtkPVProbe::ArraySelectionInternalCallback()
 //----------------------------------------------------------------------------
 void vtkPVProbe::SaveInBatchScript(ofstream* file)
 {
+  if( this->VisitedFlag )
+    {
+    return;
+    }
+
   this->Superclass::SaveInBatchScript(file);
   if (this->CanShowPlot)
     {
     *file << "  # Save the XY Plot" << endl;
     this->PlotDisplayProxy->SaveInBatchScript(file);
-    this->ArraySelection->SaveInBatchScript(file);
     }
 }
 
