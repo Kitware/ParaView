@@ -2172,11 +2172,7 @@
    </SourceProxy>
 
 
-#ifdef VTK_USE_PATENTED
-   <SourceProxy name="Cut" class="vtkKitwareCutter">
-#else
    <SourceProxy name="Cut" class="vtkCutter">
-#endif
     <InputProperty
        name="Input"
        command="SetInput">

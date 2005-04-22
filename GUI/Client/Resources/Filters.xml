@@ -1992,17 +1992,10 @@ The Warp (vector) filter translates the points of the input data set using a spe
           button_help="Cut with an implicit plane or sphere. Cutting typically reduces the dimensionality of the data."
           long_help="This filter cuts a data set with a plane or sphere.  Cutting is similar to a contour.  It creates surfaces from volumes and lines from surfaces."
           short_help="Cut datasets with planes or spheres.">
-#ifdef VTK_USE_PATENTED
-    <Filter class="vtkKitwareCutter">
-      <Input name="Input"
-             class="vtkDataSet"/>
-    </Filter>
-#else
     <Filter class="vtkCutter">
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>
-#endif
     <InputMenu trace_name="Input" property="Input"
                id="im1"
                label="Input"
