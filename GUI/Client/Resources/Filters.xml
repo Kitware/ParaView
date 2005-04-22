@@ -2049,7 +2049,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
           button_help="Clip with an implicit plane, sphere or with scalars.Clipping does not reduce the dimensionality of the data set."
           long_help="Clip with an implicit plane, sphere or with scalars. Clipping does not reduce the dimensionality of the data set.  This output data type of this filter is always an unstructured grid."
           short_help="Clip with an implicit plane, sphere or with scalars.">
-    <Filter class="vtkClipDataSet">
+    <Filter class="vtkPVClipDataSet">
       <Input name="Input"
              class="vtkDataSet"/>
     </Filter>

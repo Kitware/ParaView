@@ -2221,7 +2221,7 @@
    <!-- End Cut -->
    </SourceProxy>
 
-   <SourceProxy name="Clip" class="vtkClipDataSet">
+   <SourceProxy name="Clip" class="vtkPVClipDataSet">
     <InputProperty
        name="Input"
        command="SetInput">
