@@ -32,18 +32,6 @@ SET(ParaViewSharedNotTclWrapped_SRCS
   vtkPVRenderViewProxyImplementation.cxx
   )
 
-IF(PARAVIEW_BUILD_DEVELOPMENT)
-  SET( ParaViewServer_SRCS
-    ${ParaViewServer_SRCS}
-    vtkCTHData.cxx
-    vtkCTHDataToPolyDataFilter.cxx
-    vtkCTHExtractAMRPart.cxx
-    vtkCTHFractal.cxx
-    vtkCTHOutlineFilter.cxx
-    vtkCTHSource.cxx
-    )
-ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
-
 SET( ParaViewExtraWrapper_SRCS
   ${PVGUI_SOURCE_DIR}/Widgets/vtkKWApplication.h
   ${PVGUI_SOURCE_DIR}/Widgets/vtkKWObject.h
@@ -304,14 +292,6 @@ TARGET_LINK_LIBRARIES(vtkKWParaView
   vtkPVServerCommonTCL 
   vtkMPEG2Encode)
 
-IF(PARAVIEW_BUILD_DEVELOPMENT)
-  FIND_LIBRARY(PARAVIEW_BLT_LIBRARY BLT
-    PATHS /usr/lib /usr/local/lib
-    DOC "Optional BLT library. This might be used for a graph widget in the future."
-    )
-  MARK_AS_ADVANCED(PARAVIEW_BLT_LIBRARY)
-ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
-
 CONFIGURE_FILE(
   ${PVGUI_SOURCE_DIR}/Client/vtkPVSourceInterfaceDirectories.h.in
   ${PVGUI_BINARY_DIR}/Client/vtkPVSourceInterfaceDirectories.h
@@ -368,18 +348,9 @@ TARGET_LINK_LIBRARIES (paraview${PV_EXE_SUFFIX}
   vtkKWParaViewCS
   vtkClientServer 
   ${PARAVIEW_ADDITIONAL_LIBRARIES})
-IF(PARAVIEW_BUILD_DEVELOPMENT)
-  IF (PARAVIEW_BLT_LIBRARY)
-    TARGET_LINK_LIBRARIES(vtkKWParaView ${PARAVIEW_BLT_LIBRARY})
-  ENDIF (PARAVIEW_BLT_LIBRARY)
-ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
 TARGET_LINK_LIBRARIES(vtkKWParaView vtkPVFilters)
 TARGET_LINK_LIBRARIES(vtkKWParaView vtkXdmfCS)
-
-IF(PARAVIEW_BUILD_DEVELOPMENT)
-  TARGET_LINK_LIBRARIES(vtkKWParaView vtkPVDevelopment)
-ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
 SET(EXE_EXT "")
 IF(WIN32)
