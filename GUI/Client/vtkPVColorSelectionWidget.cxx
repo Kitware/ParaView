@@ -24,7 +24,7 @@
 #include "vtkPVArrayInformation.h"
 
 vtkStandardNewMacro(vtkPVColorSelectionWidget);
-vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.3");
 //-----------------------------------------------------------------------------
 vtkPVColorSelectionWidget::vtkPVColorSelectionWidget()
 {
@@ -81,7 +81,7 @@ void vtkPVColorSelectionWidget::AddArray(
   char label[350];
   char command[1024];
   int setFirstValue = 0;
-  if (this->GetValue()=="")
+  if (strcmp(this->GetValue(),"") == 0)
     {
     setFirstValue = 1;
     }
