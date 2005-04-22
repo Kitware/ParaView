@@ -36,6 +36,7 @@ SET(Filters_SRCS
   vtkMultiActorHelper.cxx
   vtkMultiDisplayManager.cxx
   vtkPVArrowSource.cxx
+  vtkPVClipDataSet.cxx
   vtkPVCompositeBuffer.cxx
   vtkPVCompositeUtilities.cxx
   vtkPVConnectivityFilter.cxx
