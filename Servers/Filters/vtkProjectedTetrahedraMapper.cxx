@@ -60,7 +60,7 @@ static int tet_edges[6][2] = { {0,1}, {1,2}, {2,0},
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.8");
+vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.9");
 vtkStandardNewMacro(vtkProjectedTetrahedraMapper);
 
 vtkCxxSetObjectMacro(vtkProjectedTetrahedraMapper,
@@ -1024,10 +1024,11 @@ namespace vtkProjectedTetrahedraMapperNamespace
 
       for (i = 0; i < num_scalars; i++, c += 4, s += num_scalar_components)
         {
-        double *dc = rgb->GetColor(s[0]);
-        c[0] = static_cast<ColorType>(dc[0]);
-        c[1] = static_cast<ColorType>(dc[1]);
-        c[2] = static_cast<ColorType>(dc[2]);
+        double trgb[3];
+        rgb->GetColor(s[0], trgb);
+        c[0] = static_cast<ColorType>(trgb[0]);
+        c[1] = static_cast<ColorType>(trgb[1]);
+        c[2] = static_cast<ColorType>(trgb[2]);
         c[3] = static_cast<ColorType>(alpha->GetValue(s[0]));
         }
       }
