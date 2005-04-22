@@ -758,7 +758,7 @@
 
    <!-- End CTHAMRSurface -->
    </SourceProxy>
-
+#if 1
    <SourceProxy name="CTHPart" class="vtkExtractCTHPart">
     <InputProperty
        name="Input"
@@ -768,7 +768,7 @@
             <Group name="filters"/>
           </ProxyGroupDomain>
           <DataTypeDomain name="input_type">
-            <DataType value="vtkRectilinearGrid"/>
+            <DataType value="vtkDataSet"/>
           </DataTypeDomain>
           <InputArrayDomain name="input_array" attribute_type="cell" 
                             number_of_components="1"/>
@@ -788,7 +788,7 @@
         number_of_elements="1" /> 
    <!-- End CTHPart -->
    </SourceProxy>
-
+#endif
    <SourceProxy name="CTHAMROutline" class="vtkCTHOutlineFilter">
      <InputProperty
         name="Input"

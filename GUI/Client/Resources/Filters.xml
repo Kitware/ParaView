@@ -740,6 +740,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
     </SelectWidget>
   </Module>
 <!-- #endif -->
+#if 1
   <Module name="CTHPart"
           menu_name="Extract CTH Parts"
           root_name="CTHPart"
@@ -748,7 +749,7 @@ The line can be specified interactively using the 3D line widget. See section 7.
           short_help="Extract a part from a CTH dataset.">
     <Filter class="vtkExtractCTHPart">
       <Input name="Input"
-             class="vtkRectilinearGrid">
+             class="vtkDataSet">
         <ArrayRequirement attribute="Cell" components="1"/>
       </Input>
     </Filter>
@@ -781,6 +782,7 @@ If you wish to clip the contour surfaces with a plane, select On from the menu i
 This filter only operates on unstructured data. It produces polygonal output.
     </Documentation>
   </Module>
+#endif
   <Module name="ExtractEdges"
           menu_name="Extract Edges"
           root_name="ExtractEdges"
