@@ -31,6 +31,9 @@
 // .SECTION Implementation Details
 // - All processors read the first binary file listed in the case file to get
 // informations about the fields.
+// - All processors read all the files, but only some number of blocks per
+// files. Hence, load balancing is good even if there is only one file
+// (contrary to a method that would distribute files instead of blocks)
 // - Each block of data is already surrounded by ghost cells in the file,
 // even on part of the block that don't have actual neighbor cells.
 // - Each time step contains all the cell array name variables

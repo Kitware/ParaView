@@ -45,7 +45,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.6");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.7");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -575,57 +575,47 @@ int vtkSpyPlotReader::RequestData(
   // return the specific process number
   int processNumber = info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   int numProcessors =info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-  
-  if ( numProcessors > numFiles)
-    {
-    if(processNumber>=numFiles)
-      {
-      vtkErrorMacro("The processor id "<< processNumber <<" is greater than the number of files: the processor is not used by the Spy Reader" << endl);
-      return 1;
-      }
-    numProcessors=numFiles;
-    }
-
-  // Compute the number of files for this processor (start and end)
-  int start; // id of the first file
-  int end; // id of the last file
-  int numFilesPerProcess = numFiles / numProcessors;
-  int leftOverFiles = numFiles - (numFilesPerProcess*numProcessors);
-  if (processNumber < leftOverFiles)
-    {
-    start = (numFilesPerProcess+1) * processNumber;
-    end = start + (numFilesPerProcess+1) - 1;
-    }
-  else
-    {
-    start = numFilesPerProcess * processNumber + leftOverFiles;
-    end = start + numFilesPerProcess - 1;
-    } 
 
   vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator it;
-
-  // Loop until I hit my start file
   int block;
   int field;
   int index=0;
-  for(it = this->Map->Files.begin(); index<start; ++it,++index);
 
 #if 1 // skip loading for valgrind test
   
  
-  // Now loop and read until I hit my end file
-  for(; index<=end; ++it,++index)
+  // Read all files
+  for(it = this->Map->Files.begin(); index<numFiles; ++it,++index)
     {
     fname=it->first.c_str();
     spcth=it->second;
     vtkDebugMacro("Reading data from file: " << fname);
     
     spcth_openSpyFile(spcth,fname);
-    spcth_setTimeStep(spcth,spcth_getTimeStepValue(spcth,this->CurrentTimeStep));
+    spcth_setTimeStep(spcth,spcth_getTimeStepValue(spcth,
+                                                   this->CurrentTimeStep));
     
     int numFields = spcth_getNumberOfCellFields(spcth);
-    int number_of_blocks=spcth_getNumberOfDataBlocksForCurrentTime(spcth);
-    for ( block = 0; block < number_of_blocks; ++ block )
+    int numBlocks=spcth_getNumberOfDataBlocksForCurrentTime(spcth);
+    
+    int startBlock;
+    int endBlock;
+    
+    int numBlocksPerProcess =  numBlocks / numProcessors;
+    int leftOverBlocks=numBlocks-(numBlocksPerProcess*numProcessors);
+    if (processNumber < leftOverBlocks)
+      {
+      startBlock = (numBlocksPerProcess+1) * processNumber;
+      endBlock = startBlock + (numBlocksPerProcess+1) - 1;
+      }
+    else
+      {
+      startBlock = numBlocksPerProcess * processNumber + leftOverBlocks;
+      endBlock = startBlock + numBlocksPerProcess - 1;
+      }
+    cout<<"current processor "<<processNumber<<" go from "<<startBlock<<" to "<<endBlock<<" total="<<numBlocks<<endl;
+    // Read only the part of the file for this processNumber.
+    for ( block = startBlock; block <= endBlock; ++ block )
       {
       int cc;
       int dims[3];
@@ -768,7 +758,7 @@ int vtkSpyPlotReader::RequestData(
       // Mark the bounding cells as ghost cells of level 1.
       vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
       ghostArray->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
-      ghostArray->SetName("vtkGhostLevels"); //("vtkGhostLevels");
+      ghostArray->SetName("vtkaGhostLevels"); //("vtkGhostLevels");
       cd->AddArray(ghostArray);
       ghostArray->Delete();
       unsigned char *ptr =static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
@@ -851,7 +841,8 @@ int vtkSpyPlotReader::RequestData(
     if(left<numProcessors)
       {
       // Grab the number of levels from left child
-      this->Controller->Receive(&ulintMsgValue, 1, left, VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
+      this->Controller->Receive(&ulintMsgValue, 1, left,
+                                VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
       if(numberOfLevels<ulintMsgValue)
         {
         numberOfLevels=ulintMsgValue;
@@ -859,7 +850,8 @@ int vtkSpyPlotReader::RequestData(
       if(right<numProcessors)
         {
         // Grab the number of levels from right child
-        this->Controller->Receive(&ulintMsgValue, 1, right, VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
+        this->Controller->Receive(&ulintMsgValue, 1, right,
+                                  VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
         if(numberOfLevels<ulintMsgValue)
           {
           numberOfLevels=ulintMsgValue;
@@ -873,18 +865,22 @@ int vtkSpyPlotReader::RequestData(
     if(processNumber>0) // not root (nothing to do if root)
       {
       parent=this->GetParentProcessor(processNumber);
-      this->Controller->Send(&ulintMsgValue, 1, parent, VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
-      this->Controller->Receive(&ulintMsgValue, 1, parent, VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
+      this->Controller->Send(&ulintMsgValue, 1, parent,
+                             VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
+      this->Controller->Receive(&ulintMsgValue, 1, parent,
+                                VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
       numberOfLevels=ulintMsgValue;
       }
     
     // Send it to children.
     if(left<numProcessors)
       {
-      this->Controller->Send(&ulintMsgValue, 1, left, VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
+      this->Controller->Send(&ulintMsgValue, 1, left,
+                             VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
       if(right<numProcessors)
         {
-        this->Controller->Send(&ulintMsgValue, 1, right, VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
+        this->Controller->Send(&ulintMsgValue, 1, right,
+                               VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
         }
       }
     
@@ -908,12 +904,14 @@ int vtkSpyPlotReader::RequestData(
     if(left<numProcessors)
       {
       // Grab info the number of datasets from left child
-      this->Controller->Receive(&intMsgValue, 1, left, VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
+      this->Controller->Receive(&intMsgValue, 1, left,
+                                VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
       leftNumberOfDataSets=intMsgValue;
       if(right<numProcessors)
         {
         // Grab info the number of datasets from right child
-        this->Controller->Receive(&intMsgValue, 1, right, VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
+        this->Controller->Receive(&intMsgValue, 1, right,
+                                  VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
         rightNumberOfDataSets=intMsgValue;
         }
       }
@@ -921,17 +919,21 @@ int vtkSpyPlotReader::RequestData(
     int globalIndex;
     if(processNumber==0) // root
       {
-      totalNumberOfDataSets=numberOfDataSets+leftNumberOfDataSets+rightNumberOfDataSets;
+      totalNumberOfDataSets=numberOfDataSets+leftNumberOfDataSets
+        +rightNumberOfDataSets;
       globalIndex=0;
       }
     else
       {
       // Send local to parent, Receive global from the parent.
       intMsgValue=numberOfDataSets+leftNumberOfDataSets+rightNumberOfDataSets;
-      this->Controller->Send(&intMsgValue, 1, parent, VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
-      this->Controller->Receive(&intMsgValue, 1, parent, VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
+      this->Controller->Send(&intMsgValue, 1, parent,
+                             VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
+      this->Controller->Receive(&intMsgValue, 1, parent,
+                                VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
       totalNumberOfDataSets=intMsgValue;
-      this->Controller->Receive(&intMsgValue, 1, parent, VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
+      this->Controller->Receive(&intMsgValue, 1, parent,
+                                VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
       globalIndex=intMsgValue;
       }
     
@@ -939,15 +941,19 @@ int vtkSpyPlotReader::RequestData(
     if(left<numProcessors)
       {
       intMsgValue=totalNumberOfDataSets;
-      this->Controller->Send(&intMsgValue, 1, left, VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
+      this->Controller->Send(&intMsgValue, 1, left,
+                             VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
       intMsgValue=globalIndex+numberOfDataSets;
-      this->Controller->Send(&intMsgValue, 1, left, VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
+      this->Controller->Send(&intMsgValue, 1, left,
+                             VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
       if(right<numProcessors)
         {
         intMsgValue=totalNumberOfDataSets;
-        this->Controller->Send(&intMsgValue, 1, right, VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
+        this->Controller->Send(&intMsgValue, 1, right,
+                               VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
         intMsgValue=globalIndex+numberOfDataSets+leftNumberOfDataSets;
-        this->Controller->Send(&intMsgValue, 1, right, VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
+        this->Controller->Send(&intMsgValue, 1, right,
+                               VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
         }
       }
     
@@ -985,6 +991,32 @@ int vtkSpyPlotReader::RequestData(
       }
     ++level;
     }
+#if 0
+  //  Display the block list for each level
+  
+  level=0;
+  numberOfLevels=hb->GetNumberOfLevels();
+  while(level<numberOfLevels)
+    {
+    cout<<processNumber<<" level="<<level<<"/"<<numberOfLevels<<endl;
+    int totalNumberOfDataSets=hb->GetNumberOfDataSets(level);
+    int i=0;
+    while(i<totalNumberOfDataSets)
+      {
+      cout<<processNumber<<" dataset="<<i<<"/"<<totalNumberOfDataSets;
+      if(hb->GetDataSet(level,i)==0)
+        {
+        cout<<" Void"<<endl;
+        }
+      else
+        {
+        cout<<" Exists"<<endl;
+        }
+      ++i;
+      }
+    ++level;
+    }
+#endif
   return 1;
 }
 
