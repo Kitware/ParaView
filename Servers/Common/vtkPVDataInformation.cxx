@@ -39,7 +39,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.7");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -505,6 +505,14 @@ const char* vtkPVDataInformation::GetDataSetTypeAsString()
   if (this->DataSetType == VTK_COMPOSITE_DATA_SET)
     {
     return "vtkCompositeDataSet";
+    }
+  if (this->DataSetType == VTK_HIERARCHICAL_DATA_SET)
+    {
+    return "vtkHierarchicalDataSet";
+    }
+  if (this->DataSetType == VTK_UNIFORM_GRID)
+    {
+    return "vtkUniformGrid";
     }
   if (this->DataSetType == VTK_HIERARCHICAL_BOX_DATA_SET)
     {
