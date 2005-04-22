@@ -644,3 +644,10 @@ IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
     ENDFOREACH(ldir)
   ENDIF(NOT WIN32)
 ENDIF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
+
+#########################################################################
+# See internal_stdio_core.h.in for explanation.
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/internal_stdio_core.h.in
+               ${ParaView_BINARY_DIR}/internal/stdio_core.h
+               @ONLY IMMEDIATE)
+
