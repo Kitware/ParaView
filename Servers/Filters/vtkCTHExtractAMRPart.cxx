@@ -29,14 +29,8 @@
 #include "vtkPolyData.h"
 #include "vtkClipPolyData.h"
 #include "vtkCTHAMRCellToPointData.h"
-#ifdef VTK_USE_PATENTED
-#  include "vtkKitwareContourFilter.h"
-#  include "vtkSynchronizedTemplates3D.h"
-#  include "vtkKitwareCutter.h"
-#else
-#  include "vtkContourFilter.h"
-#  include "vtkCutter.h"
-#endif
+#include "vtkContourFilter.h"
+#include "vtkCutter.h"
 #include "vtkStringList.h"
 #include "vtkPlane.h"
 #include "vtkIdList.h"
@@ -44,7 +38,7 @@
 #include "vtkGarbageCollector.h"
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.19");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.20");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -313,23 +307,12 @@ void vtkCTHExtractAMRPart::CreateInternalPipeline()
   // of the internal synchronized templates filter (garbage collection took too long.)
   
   // Create the contour surface.
-#ifdef VTK_USE_PATENTED
-  vtkSynchronizedTemplates3D* tmp = vtkSynchronizedTemplates3D::New();
-  // vtkDataSetSurfaceFilter does not generate normals, so they will be lost.
-  tmp->ComputeNormalsOff();
-  tmp->SetInput(this->Image);
-  // I had a problem with boundary.  Hotel effect.
-  // The bondary surface was being clipped a hair under 0.5
-  tmp->SetValue(0, CTH_AMR_SURFACE_VALUE);
-  this->Contour = tmp;
-#else
   vtkContourFilter* tmp = vtkContourFilter::New();
   tmp->SetInput(this->Image);
   // I had a problem with boundary.  Hotel effect.
   // The bondary surface was being clipped a hair under 0.5
   tmp->SetValue(0, CTH_AMR_SURFACE_VALUE);
   this->Contour = tmp;  
-#endif
 
   // Create the capping surface for the contour and append.
   this->Append1 = vtkAppendPolyData::New();
@@ -353,11 +336,7 @@ void vtkCTHExtractAMRPart::CreateInternalPipeline()
     this->Clip1->SetClipFunction(this->ClipPlane);
     this->Append2->AddInput(this->Clip1->GetOutput());
     // We need to create a capping surface.
-#ifdef VTK_USE_PATENTED
-    this->Cut = vtkKitwareCutter::New();
-#else
     this->Cut = vtkCutter::New();
-#endif
     this->Cut->SetCutFunction(this->ClipPlane);
     this->Cut->SetValue(0, 0.0);
     this->Cut->SetInput(this->Image);
