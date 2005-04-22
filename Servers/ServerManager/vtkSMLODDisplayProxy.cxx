@@ -23,7 +23,7 @@
 #include "vtkPVLODPartDisplayInformation.h"
 
 vtkStandardNewMacro(vtkSMLODDisplayProxy);
-vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMLODDisplayProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMLODDisplayProxy::vtkSMLODDisplayProxy()
 {
@@ -257,9 +257,7 @@ void vtkSMLODDisplayProxy::Update()
 {
   this->Superclass::Update();
 
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
-    vtkProcessModule::GetProcessModule());
-  if (!this->LODGeometryIsValid && pm->GetGlobalLODFlag() && 
+  if (!this->LODGeometryIsValid && vtkPVProcessModule::GetGlobalLODFlag() && 
     this->LODUpdateSuppressorProxy)
     {
     this->UpdateLODPipeline();
