@@ -646,8 +646,9 @@ IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
 ENDIF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
 
 #########################################################################
+# DISABLING UNTIL A TRY-COMPILE CAN DETERMINE IF IT IS SAFE
 # See internal_stdio_core.h.in for explanation.
-CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/internal_stdio_core.h.in
-               ${ParaView_BINARY_DIR}/internal/stdio_core.h
-               @ONLY IMMEDIATE)
+#CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/internal_stdio_core.h.in
+#               ${ParaView_BINARY_DIR}/internal/stdio_core.h
+#               @ONLY IMMEDIATE)
 
