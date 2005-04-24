@@ -1308,21 +1308,24 @@
         name="ActiveFileIsDirectory"
         command="GetActiveFileIsDirectory"
         number_of_elements="1"
-        information_only="1">
+        information_only="1"
+        update_self="1">
         <SimpleIntInformationHelper />
       </IntVectorProperty>
       <IntVectorProperty
         name="ActiveFileIsReadable"
         command="GetActiveFileIsReadable"
         number_of_elements="1"
-        information_only="1">
+        information_only="1"
+        update_self="1">
         <SimpleIntInformationHelper />
       </IntVectorProperty>
 
       <StringVectorProperty
         name="ActiveFileName"
         command="SetActiveFileName"
-        number_of_elements="1">
+        number_of_elements="1"
+        update_self="1">
       </StringVectorProperty>
      
       <StringVectorProperty
