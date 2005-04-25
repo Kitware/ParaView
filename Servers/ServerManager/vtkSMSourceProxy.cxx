@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.26");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.27");
 
 struct vtkSMSourceProxyInternals
 {
@@ -171,7 +171,29 @@ void vtkSMSourceProxy::CreateVTKObjects(int numObjects)
       vtkClientServerID sourceID = this->GetID(i);
       stream << vtkClientServerStream::Invoke << sourceID
         << "SetExecutive" << execId <<  vtkClientServerStream::End;
+
+      // Keep track of how long each filter takes to execute.
+      ostrstream filterName_with_warning_C4701;
+      filterName_with_warning_C4701 << "Execute " << this->VTKClassName
+                                    << " id: " << sourceID.ID << ends;
+      vtkClientServerStream start;
+      start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
+            << "LogStartEvent" << filterName_with_warning_C4701.str()
+            << vtkClientServerStream::End;
+      vtkClientServerStream end;
+      end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
+          << "LogEndEvent" << filterName_with_warning_C4701.str()
+          << vtkClientServerStream::End;
+      delete[] filterName_with_warning_C4701.str();
+      
+      stream << vtkClientServerStream::Invoke 
+             << sourceID << "AddObserver" << "StartEvent" << start
+             << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke 
+             << sourceID << "AddObserver" << "EndEvent" << end
+             << vtkClientServerStream::End;
       }
+
 
     if (stream.GetNumberOfMessages() > 0)
       {
