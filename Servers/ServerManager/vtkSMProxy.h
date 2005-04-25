@@ -226,6 +226,11 @@ public:
   virtual void UpdateInformation();
 
   // Description:
+  // Similar to UpdateInformation() but updates only the given property.
+  // If the property does not belong to the proxy, the call is ignored.
+  virtual void UpdatePropertyInformation(vtkSMProperty* prop);
+
+  // Description:
   // Marks all properties as modified.  This will cause them all to be sent
   // to be sent on the next call to UpdateVTKObjects.  This method is
   // useful when the proxy is first created to make sure that the default

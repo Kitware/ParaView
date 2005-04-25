@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.37");
+vtkCxxRevisionMacro(vtkSMProxy, "1.38");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -519,6 +519,46 @@ void vtkSMProxy::MarkAllPropertiesAsModified()
     {
     // Not the most efficient way to set the flag, but probably the safest.
     this->SetPropertyModifiedFlag(it->first.c_str(), 1);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxy::UpdatePropertyInformation(vtkSMProperty* prop)
+{
+  // If property does not belong to this proxy do nothing.
+  int found = 0;
+  vtkSMProxyInternals::PropertyInfoMap::iterator it;
+  for (it  = this->Internals->Properties.begin();
+       it != this->Internals->Properties.end();
+       ++it)
+    {
+    if (prop == it->second.Property.GetPointer())
+      {
+      found = 1;
+      break;
+      }
+    }
+  if (!found)
+    {
+    return;
+    }
+
+  this->CreateVTKObjects(1);
+
+  if (this->ObjectsCreated)
+    {
+    if (prop->GetInformationOnly())
+      {
+      if (prop->GetUpdateSelf())
+        {
+        prop->UpdateInformation(vtkProcessModule::CLIENT, this->SelfID);
+        }
+      else
+        {
+        prop->UpdateInformation(this->Servers, this->Internals->IDs[0]);
+        }
+      prop->UpdateDependentDomains();
+      }
     }
 }
 
