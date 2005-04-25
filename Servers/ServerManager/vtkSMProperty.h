@@ -185,8 +185,14 @@ public:
   void SetControllerProperty(vtkSMProperty* property);
 
   // Description:
-  // Get/Set if the property is animateable. Non-animateable properties are shown in the
-  // GUI only in advanced mode.
+  // Properties can have one or more domains. These are assigned by
+  // the proxy manager and can be used to obtain information other
+  // than given by the type of the propery and its values.
+  void AddDomain(const char* name, vtkSMDomain* dom);
+
+  // Description: 
+  // Get/Set if the property is animateable. Non-animateable
+  // properties are shown in the GUI only in advanced mode.
   vtkSetMacro(Animateable, int);
   vtkGetMacro(Animateable, int);
 
@@ -211,7 +217,6 @@ protected:
   friend class vtkSMDomainIterator;
   friend class vtkSMSourceProxy;
   friend class vtkSMDomain;
-  friend class vtkPVPointSourceWidget;
 
   // Description:
   // Append a command to update the vtk object with the property values(s).
@@ -237,12 +242,6 @@ protected:
   // Update all proxies referred by this property (if any). Overwritten
   // by vtkSMProxyProperty and sub-classes.
   virtual void UpdateAllInputs() {};
-
-  // Description:
-  // Properties can have one or more domains. These are assigned by
-  // the proxy manager and can be used to obtain information other
-  // than given by the type of the propery and its values.
-  void AddDomain(const char* name, vtkSMDomain* dom);
 
   // Description:
   // The name assigned by the xml parser. Used to get the property
@@ -295,15 +294,17 @@ protected:
 
   static int CheckDomains;
 
-  // ControllerProxy is pointer to the proxy whose property (ControllerProperty) is
-  // mapped to the current property. This is useful for 3DWidgets. The properties of
-  // the implicit function proxy controlled by the 3DWidget will have these set to the 
-  // corresponing property of the 3DWidget. Thus, providing hints about which implicit function
-  // property is controlled by which 3DWidget and what property.
-  // This goes mostly unnoticed in ParaView, but useful for ARL. 
-  // If these are set, then they are saved in the XML during SaveState as a
-  // element <ControllerProperty name="propertyname" />. ARL notices such elements and
-  // creates a property value dependency among the controlee and the controller property.
+  // ControllerProxy is pointer to the proxy whose property
+  // (ControllerProperty) is mapped to the current property. This is useful
+  // for 3DWidgets. The properties of the implicit function proxy
+  // controlled by the 3DWidget will have these set to the corresponing
+  // property of the 3DWidget. Thus, providing hints about which implicit
+  // function property is controlled by which 3DWidget and what property.
+  // This goes mostly unnoticed in ParaView, but useful for ARL.  If these
+  // are set, then they are saved in the XML during SaveState as a element
+  // <ControllerProperty name="propertyname" />. ARL notices such elements
+  // and creates a property value dependency among the controlee and the
+  // controller property.
   vtkSMProxy* ControllerProxy;
   vtkSMProperty* ControllerProperty;
   
