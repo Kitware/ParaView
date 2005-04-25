@@ -240,6 +240,9 @@ public:
   void EnableCacheCheck();
   void DisableCacheCheck();
 
+  // Description:
+  // to free up the render module proxy.
+  void PrepareForDelete();
 protected:
   vtkPVAnimationManager();
   ~vtkPVAnimationManager();

@@ -72,10 +72,9 @@ public:
   
   // Description:
   // Set the RenderModule Proxy.
-  // This proxy must be set only in batch mode.
-  // If set, every Tick event leads to a call to StillRender on the 
-  // RenderModule.
-  void SetRenderModuleProxy(vtkSMRenderModuleProxy*);
+  // Note that it is not reference counted.
+  void SetRenderModuleProxy(vtkSMRenderModuleProxy* ren)
+    { this->RenderModuleProxy = ren; } 
   
   void SetCurrentTime(double time);
 protected:

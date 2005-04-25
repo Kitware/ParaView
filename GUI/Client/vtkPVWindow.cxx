@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.689");
+vtkCxxRevisionMacro(vtkPVWindow, "1.690");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -507,6 +507,7 @@ void vtkPVWindow::PrepareForDelete()
 
   if (this->AnimationManager)
     {
+    this->AnimationManager->PrepareForDelete();
     this->AnimationManager->Delete();
     this->AnimationManager = NULL;
     }

@@ -172,6 +172,7 @@ public:
   void SetCaching(int enable);
   int GetCaching();
 
+  void PrepareForDelete();
 protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();

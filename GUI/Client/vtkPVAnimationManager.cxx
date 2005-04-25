@@ -63,7 +63,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.35");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.36");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -976,6 +976,12 @@ void vtkPVAnimationManager::UpdateEnableState()
     }
   this->PropagateEnableState(this->HAnimationInterface);
   this->Enabled = enabled;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::PrepareForDelete()
+{
+  this->AnimationScene->PrepareForDelete();
 }
 
 //-----------------------------------------------------------------------------

@@ -80,7 +80,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.27");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.28");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -242,6 +242,22 @@ vtkPVAnimationScene::~vtkPVAnimationScene()
     this->GeometryWriter->Delete();
     this->GeometryWriter = NULL;
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::PrepareForDelete()
+{
+  if (this->AnimationSceneProxy)
+    {
+    this->AnimationSceneProxy->Stop();
+    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+      this->AnimationSceneProxy->GetProperty("RenderModule"));
+    pp->RemoveAllProxies();
+    this->AnimationSceneProxy->UpdateVTKObjects();
+    }
+  this->SetRenderView(0);
+  this->SetAnimationManager(0);
+  this->SetWindow(0);
 }
 
 //-----------------------------------------------------------------------------
