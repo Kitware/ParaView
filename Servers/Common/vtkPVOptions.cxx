@@ -42,7 +42,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.27.2.1");
+vtkCxxRevisionMacro(vtkPVOptions, "1.27.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -273,6 +273,10 @@ int vtkPVOptions::PostProcess(int, const char* const*)
     {
     this->ClientMode = 1;
     this->RenderServerMode = 2;
+    }
+  if ( this->CaveConfigurationFileName )
+    {
+    this->SetRenderModuleName("CaveRenderModule");
     }
 #ifdef PARAVIEW_ALWAYS_SECURE_CONNECTION
   if ( (this->ClientMode || this->ServerMode) && !this->ConnectID)
