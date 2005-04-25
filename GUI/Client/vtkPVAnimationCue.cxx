@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.23");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.24");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -379,9 +379,6 @@ void vtkPVAnimationCue::CreateProxy()
     DoubleVectPropertySetElement(this->CueProxy, "StartTime", 0.0);
     DoubleVectPropertySetElement(this->CueProxy, "EndTime", 1.0);
     this->CueProxy->UpdateVTKObjects(); //calls CreateVTKObjects(1) internally.
-
-    this->KeyFrameManipulatorProxy->AddObserver(
-      vtkSMKeyFrameAnimationCueManipulatorProxy::StateModifiedEvent, this->Observer);
     this->KeyFrameManipulatorProxy->AddObserver(
       vtkCommand::ModifiedEvent, this->Observer);
     }
@@ -914,13 +911,6 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event, void* 
     {
     switch (event)
       {
-    case vtkSMKeyFrameAnimationCueManipulatorProxy::StateModifiedEvent :
-      if (this->PVSource && !pvAM->GetUseGeometryCache())
-        {
-        this->PVSource->MarkSourcesForUpdate();
-        }
-      return;
-
     case vtkCommand::ModifiedEvent:
       // Triggerred when the keyframes have been changed in someway.
       this->TimeLine->ForceUpdate();

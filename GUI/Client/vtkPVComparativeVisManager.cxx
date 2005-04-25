@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.5");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.6");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -246,10 +246,10 @@ void vtkPVComparativeVisManager::PlayOne(unsigned int idx)
 
   vtkPVAnimationManager* aMan = 
     this->Application->GetMainWindow()->GetAnimationManager();
-  int prevStat = aMan->GetOverrideCache();
-  aMan->SetOverrideCache(1);
+  int prevStat = aMan->GetCacheGeometry();
+  aMan->SetCacheGeometry(0);
   player->Play();
-  aMan->SetOverrideCache(prevStat);
+  aMan->SetCacheGeometry(prevStat);
 
   observer->Delete();
   player->Delete();

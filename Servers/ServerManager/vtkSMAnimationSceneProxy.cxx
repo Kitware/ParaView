@@ -20,7 +20,7 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkSMRenderModuleProxy.h"
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.3");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 vtkCxxSetObjectMacro(vtkSMAnimationSceneProxy, RenderModuleProxy, 
   vtkSMRenderModuleProxy);
@@ -31,6 +31,7 @@ vtkSMAnimationSceneProxy::vtkSMAnimationSceneProxy()
   this->AnimationCueProxies = vtkCollection::New();
   this->AnimationCueProxiesIterator = this->AnimationCueProxies->NewIterator();
   this->RenderModuleProxy = 0;
+  this->GeometryCached = 0;
   
 }
 
@@ -54,6 +55,22 @@ void vtkSMAnimationSceneProxy::CreateVTKObjects(int numObjects)
   this->ObjectsCreated = 1;
 
   this->Superclass::CreateVTKObjects(numObjects);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::SetCaching(int enable)
+{
+  this->Superclass::SetCaching(enable);
+  vtkCollectionIterator* iter = this->AnimationCueProxies->NewIterator();
+  
+  for (iter->InitTraversal();
+    !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkSMAnimationCueProxy* cue = 
+      vtkSMAnimationCueProxy::SafeDownCast(iter->GetCurrentObject());
+    cue->SetCaching(enable);
+    }
+  iter->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -194,6 +211,7 @@ void vtkSMAnimationSceneProxy::AddCue(vtkSMProxy* proxy)
     }
   scene->AddCue(cue->GetAnimationCue());
   this->AnimationCueProxies->AddItem(cue);
+  cue->SetCaching(this->GetCaching());
 }
 
 //----------------------------------------------------------------------------
@@ -223,6 +241,13 @@ void vtkSMAnimationSceneProxy::SetPlayMode(int mode)
     {
     scene->SetPlayMode(mode);
     }
+  // Caching is disabled when play mode is real time.
+  if (mode == VTK_ANIMATION_SCENE_PLAYMODE_REALTIME && this->Caching)
+    {
+    vtkWarningMacro("Disabling caching. "
+      "Caching not available in Real Time mode.");
+    this->SetCaching(0);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -241,30 +266,68 @@ int vtkSMAnimationSceneProxy::GetPlayMode()
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::StartCueInternal(void* info)
 {
-  this->Superclass::StartCueInternal(info);
   if (this->RenderModuleProxy)
     {
     this->RenderModuleProxy->StillRender();
     }
+  this->Superclass::StartCueInternal(info);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::TickInternal(void* info)
 {
-  this->Superclass::TickInternal(info);
+  this->CacheUpdate(info);
   if (this->RenderModuleProxy)
     {
     this->RenderModuleProxy->StillRender();
     }
+  this->Superclass::TickInternal(info);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMAnimationSceneProxy::EndCueInternal(void* info)
 {
-  this->Superclass::EndCueInternal(info);
+  this->CacheUpdate(info);
   if (this->RenderModuleProxy)
     {
     this->RenderModuleProxy->StillRender();
+    }
+  this->Superclass::EndCueInternal(info);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::CacheUpdate(void* info)
+{
+  if (!this->GetCaching() || 
+      this->GetPlayMode() == VTK_ANIMATION_SCENE_PLAYMODE_REALTIME)
+    {
+    return;
+    }
+  vtkAnimationCue::AnimationCueInfo *cueInfo = reinterpret_cast<
+    vtkAnimationCue::AnimationCueInfo*>(info);
+
+  double etime = this->GetEndTime();
+  double stime = this->GetStartTime();
+
+  int index = 
+    static_cast<int>((cueInfo->CurrentTime - stime) * this->GetFrameRate());
+
+  int maxindex = 
+    static_cast<int>((etime - stime) * this->GetFrameRate()) + 1; 
+
+  if (this->RenderModuleProxy)
+    {
+    this->RenderModuleProxy->CacheUpdate(index, maxindex);
+    this->GeometryCached = 1;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationSceneProxy::CleanCache()
+{
+  if (this->GeometryCached && this->RenderModuleProxy)
+    {    
+    this->RenderModuleProxy->InvalidateAllGeometries();
     }
 }
 

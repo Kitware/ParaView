@@ -48,13 +48,28 @@ public:
   void SetFrameRate(double framerate);
   double GetFrameRate();
 
+  // Description:
+  // Note that when the play mode is set to Real Time, cacheing is
+  // disabled.
   void SetPlayMode(int mode);
   int GetPlayMode();
 
   void AddCue(vtkSMProxy* cue);
   void RemoveCue(vtkSMProxy* cue);
-  
+ 
+  // Description:
+  // Set if caching is enabled.
+  // This method synchronizes the cahcing flag on every cue.
+  virtual void SetCaching(int enable); 
 
+  // Description:
+  // This method calls InvalidateAllGeometries on the vtkSMRenderModuleProxy.
+  // However, to minimize the calls to InvalidateAllGeometries, this call
+  // keeps a flag indicating if CacheUpdate was ever called on the 
+  // Render Module and calls InvalidateAllGeometries only of the flag
+  // is set.
+  void CleanCache();
+  
   // Description:
   // Set the RenderModule Proxy.
   // This proxy must be set only in batch mode.
@@ -69,17 +84,22 @@ protected:
 
   virtual void CreateVTKObjects(int numObjects);
 
+  int GeometryCached; // flag indicating if this call asked RenderModuleProxy
+    // to CacheUpdate.
+
   // Description:
   // Callbacks for corresponding Cue events. The argument must be 
   // casted to vtkAnimationCue::AnimationCueInfo.
   virtual void StartCueInternal(void* info);
   virtual void TickInternal(void* info);
   virtual void EndCueInternal(void* info);
+  void CacheUpdate(void* info);
   
   vtkCollection* AnimationCueProxies;
   vtkCollectionIterator* AnimationCueProxiesIterator;
 
   vtkSMRenderModuleProxy* RenderModuleProxy;
+
 private:
   vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&); // Not implemented.
   void operator=(const vtkSMAnimationSceneProxy&); // Not implemented.

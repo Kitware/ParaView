@@ -21,7 +21,7 @@
 #include "vtkSMProperty.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMLinearAnimationCueManipulatorProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMLinearAnimationCueManipulatorProxy, "1.2");
 vtkStandardNewMacro(vtkSMLinearAnimationCueManipulatorProxy);
 
 //----------------------------------------------------------------------------
@@ -57,6 +57,7 @@ void vtkSMLinearAnimationCueManipulatorProxy::UpdateValue(double currenttime,
     {
     proxy->UpdateVTKObjects();
     }
+  this->InvokeEvent(vtkSMAnimationCueManipulatorProxy::StateModifiedEvent);
 }
 
 //----------------------------------------------------------------------------

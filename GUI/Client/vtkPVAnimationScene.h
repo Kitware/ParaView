@@ -167,6 +167,11 @@ public:
   void HideAnimationToolbar() { this->SetAnimationToolbarVisibility(0); }
   void SetAnimationToolbarVisibility(int visible);
 
+  // Description:
+  // Set if cache should be used for playing animation.
+  void SetCaching(int enable);
+  int GetCaching();
+
 protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();
@@ -221,8 +226,6 @@ protected:
   void CreateProxy();
   int InPlay;
   int InvokingError;
-  int GeometryCached; // flag used to indicate of any geometry has been cached at all.
-          // helps in reducing the RemoveAllGeometries calls.
 
   unsigned long ErrorEventTag;
 private:

@@ -683,6 +683,14 @@
     <!--Scene -->
     <AnimationSceneProxy name="AnimationScene" class="notused">
       <!-- No server side objects created. All properties are updateself -->
+      <ProxyProperty
+        name="RenderModule"
+        command="SetRenderModuleProxy"
+        update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="rendermodules" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
       <IntVectorProperty
         name="AnimatedElement"
         command="SetAnimatedElement"
@@ -765,6 +773,16 @@
           <Entry value="1" text="Realtime" />
         </EnumerationDomain>
       </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Caching"
+        command="SetCaching"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+
     </AnimationSceneProxy>
   </ProxyGroup>
 

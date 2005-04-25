@@ -23,12 +23,10 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.4");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
-vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, Manipulator,
-  vtkSMAnimationCueManipulatorProxy);
 //----------------------------------------------------------------------------
 
 //***************************************************************************
@@ -74,6 +72,7 @@ vtkSMAnimationCueProxy::vtkSMAnimationCueProxy()
   this->Manipulator = 0;
 
   this->AnimationCue = 0;
+  this->Caching = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -91,6 +90,17 @@ vtkSMAnimationCueProxy::~vtkSMAnimationCueProxy()
 }
 
 //----------------------------------------------------------------------------
+void vtkSMAnimationCueProxy::SetCaching(int enable)
+{
+  this->Caching = enable;
+  if (!this->Caching && this->AnimatedProxy)
+    {
+    this->AnimatedProxy->MarkConsumersAsModified();
+    }
+}
+  
+
+//----------------------------------------------------------------------------
 void vtkSMAnimationCueProxy::CreateVTKObjects(int numObjects)
 {
   if (this->ObjectsCreated)
@@ -103,6 +113,30 @@ void vtkSMAnimationCueProxy::CreateVTKObjects(int numObjects)
     //we set the objects created flag so that vtkSMProxy does not
     //attempt to create objects.
   this->Superclass::CreateVTKObjects(numObjects);
+}
+
+//----------------------------------------------------------------------------
+void vtkSMAnimationCueProxy::SetManipulator(
+  vtkSMAnimationCueManipulatorProxy* manipulator)
+{
+  if (manipulator == this->Manipulator)
+    {
+    return;
+    }
+  if (this->Manipulator)
+    {
+    this->Manipulator->RemoveObserver(this->Observer);
+    this->Manipulator->UnRegister(this);
+    this->Manipulator = 0;
+    }
+  this->Manipulator = manipulator;
+  if (this->Manipulator)
+    {
+    this->Manipulator->AddObserver(
+      vtkSMAnimationCueManipulatorProxy::StateModifiedEvent,
+      this->Observer);
+    this->Manipulator->Register(this);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -150,21 +184,33 @@ void vtkSMAnimationCueProxy::ExecuteEvent(vtkObject* obj, unsigned long event,
   void* calldata)
 {
   vtkAnimationCue* cue = vtkAnimationCue::SafeDownCast(obj);
-  if (!cue)
+  vtkSMAnimationCueManipulatorProxy* manip = 
+    vtkSMAnimationCueManipulatorProxy::SafeDownCast(obj);
+  if (cue)
     {
-    return;
+    switch (event)
+      {
+    case vtkCommand::StartAnimationCueEvent:
+      this->StartCueInternal(calldata);
+      break;
+    case vtkCommand::EndAnimationCueEvent:
+      this->EndCueInternal(calldata);
+      break;
+    case vtkCommand::AnimationCueTickEvent:
+      this->TickInternal(calldata);
+      break;
+      }
     }
-  switch (event)
+  else if (manip)
     {
-  case vtkCommand::StartAnimationCueEvent:
-    this->StartCueInternal(calldata);
-    break;
-  case vtkCommand::EndAnimationCueEvent:
-    this->EndCueInternal(calldata);
-    break;
-  case vtkCommand::AnimationCueTickEvent:
-    this->TickInternal(calldata);
-    break;
+    switch (event)
+      {
+    case vtkSMAnimationCueManipulatorProxy::StateModifiedEvent:
+      if (!this->Caching && this->AnimatedProxy)
+        {
+        this->AnimatedProxy->MarkConsumersAsModified();
+        }
+      }
     }
 }
 

@@ -192,11 +192,6 @@ public:
   void SetCurrentTime(double ntime);
 
   // Description:
-  // Indicates if the Geometry cache is to be used. Cached geometry can only be 
-  // used when the Scene play mode is Sequence.
-  int GetUseGeometryCache();
-
-  // Description:
   // Invalidates all geometry.
   void InvalidateAllGeometries();
 
@@ -229,13 +224,21 @@ public:
   vtkPVAnimationCueTree* GetAnimationCueTreeForProxy(const char* proxyname);
 
   // Description:
-  // Means to override us of cache.
-  vtkSetMacro(OverrideCache, int);
-  vtkGetMacro(OverrideCache, int);
-
-  // Description:
   // Determine if the animation manager is currently recording.
   vtkGetMacro(InRecording, int);
+
+  // Description:
+  // Enable/Disable caching. Calls SetCaching on the PVAnimationScene.
+  void SetCacheGeometry(int cache);
+  int GetCacheGeometry();
+
+  // Description:
+  // Enables/Disables if the Caching check box state. 
+  // Disabling the Cache check button also leads to a call to SetCacheGeometry(0).
+  // Enabling the Cache check button leads to a call to SetCacheGeometry with 
+  // the current state of the check button.
+  void EnableCacheCheck();
+  void DisableCacheCheck();
 
 protected:
   vtkPVAnimationManager();
@@ -299,7 +302,6 @@ protected:
   int InRecording;
   double RecordingIncrement;
 
-  int OverrideCache;
 private:
   vtkPVAnimationManager(const vtkPVAnimationManager&); // Not implemented.
   void operator=(const vtkPVAnimationManager&); // Not implemented.

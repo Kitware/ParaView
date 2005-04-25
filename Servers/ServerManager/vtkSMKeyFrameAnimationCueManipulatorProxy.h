@@ -17,6 +17,9 @@
 // Base class for manipulators that support key framing.
 // Key frames are stored in a vector ordered by their keyframe time. Ordering
 // of keyframes with same key time is arbritary.
+// vtkSMAnimationCueManipulatorProxy::StateModifiedEvent - 
+// This event is fired when the manipulator modifies the animated proxy.
+// vtkCommand::Modified - is fired when the keyframes are changed i.e. added/removed/modified.
 // 
 // .SECTION See Also
 // vtkSMAnimationCueProxy vtkSMAnimationCueManipulatorProxy
@@ -94,15 +97,7 @@ public:
   // Access the keyframe collection using the indices.
   // Keyframes are sorted according to increasing key frame time.
   vtkSMKeyFrameProxy* GetKeyFrameAtIndex(int index);
-//BTX
-  // Description:
-  // StateModifiedEvent - This event is fired when the manipulator modifies the animated proxy.
-  // vtkCommand::Modified - is fired when the keyframes are changed i.e. added/removed/modified.
-  enum
-    {
-    StateModifiedEvent = 2000
-    };
-//ETX
+
 protected:
   vtkSMKeyFrameAnimationCueManipulatorProxy();
   ~vtkSMKeyFrameAnimationCueManipulatorProxy();

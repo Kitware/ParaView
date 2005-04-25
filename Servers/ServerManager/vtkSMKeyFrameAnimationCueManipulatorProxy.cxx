@@ -20,7 +20,7 @@
 #include "vtkClientServerID.h"
 
 #include <vtkstd/vector>
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.7");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -236,7 +236,7 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::UpdateValue(double currenttime,
       ctime = (currenttime - tmin)/ (tmax-tmin);
       }
     startKF->UpdateValue(ctime, cueproxy, endKF);
-    this->InvokeEvent(vtkSMKeyFrameAnimationCueManipulatorProxy::StateModifiedEvent);
+    this->InvokeEvent(vtkSMAnimationCueManipulatorProxy::StateModifiedEvent);
     }
   // check to see if the curtime has crossed the last key frame and if
   // we should make the state of the property as left by the last key frame.
@@ -248,7 +248,7 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::UpdateValue(double currenttime,
       {
       lastKF->UpdateValue(0, cueproxy,lastKF);
       this->SendEndEvent = 0;
-      this->InvokeEvent(vtkSMKeyFrameAnimationCueManipulatorProxy::StateModifiedEvent);
+      this->InvokeEvent(vtkSMAnimationCueManipulatorProxy::StateModifiedEvent);
       }
     }
 }

@@ -80,7 +80,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.26");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.27");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -188,7 +188,6 @@ vtkPVAnimationScene::vtkPVAnimationScene()
   this->GeometryWriter = NULL;
 
   this->InvokingError = 0;
-  this->GeometryCached = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -291,6 +290,11 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   if (!this->Window)
     {
     vtkErrorMacro("Window must be set before create.");
+    return;
+    }
+  if (!this->RenderView)
+    {
+    vtkErrorMacro("RenderView must be set before create.");
     return;
     }
   this->Superclass::Create(app, "frame", args);
@@ -474,6 +478,11 @@ void vtkPVAnimationScene::CreateProxy()
   DoubleVectPropertySetElement(this->AnimationSceneProxy,"EndTime", 60.0);
   DoubleVectPropertySetElement(this->AnimationSceneProxy,"TimeMode",
     VTK_ANIMATION_CUE_TIMEMODE_RELATIVE);
+
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->AnimationSceneProxy->GetProperty("RenderModule"));
+  pp->AddProxy(this->RenderView->GetRenderModuleProxy());
+
   this->AnimationSceneProxy->UpdateVTKObjects();
 }
 
@@ -677,40 +686,14 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
   case vtkCommand::EndAnimationCueEvent:
   case vtkCommand::AnimationCueTickEvent:
       {
+      
       double etime = this->AnimationSceneProxy->GetEndTime();
       double stime = this->AnimationSceneProxy->GetStartTime();
       double ntime = 
         (etime==stime)?  0 : (cueInfo->CurrentTime - stime) / (etime - stime);
       this->AnimationManager->SetTimeMarker(ntime);
       this->TimeScale->SetValue(cueInfo->CurrentTime);
-      if (this->AnimationManager->GetUseGeometryCache())
-        {
-        int index = 
-          static_cast<int>((cueInfo->CurrentTime - stime) * this->GetFrameRate());
-        int maxindex = 
-          static_cast<int>((etime - stime) * this->GetFrameRate())+1; 
-        vtkPVApplication* pvApp =
-          vtkPVApplication::SafeDownCast(this->GetApplication());
-        if (pvApp)
-          {
-          vtkSMRenderModuleProxy* rm = pvApp->GetRenderModuleProxy();
-          if (rm)
-            {
-            vtkSMIntVectorProperty* cu =
-            vtkSMIntVectorProperty::SafeDownCast(rm->GetProperty("CacheUpdate"));
-            if (cu)
-              {
-              cu->SetElements2(index, maxindex);
-              rm->UpdateVTKObjects();
-              }
-            }
-          }
-        this->GeometryCached = 1;
-        }
-      if (this->RenderView)
-        {
-        this->RenderView->ForceRender();
-        }
+      
       if (event != vtkCommand::EndAnimationCueEvent)
         {
         this->SaveImages();
@@ -922,14 +905,20 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
     {
   case VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE:
     this->PlayModeMenuButton->SetButtonText(VTK_PV_PLAYMODE_SEQUENCE_TITLE);
+    this->AnimationManager->EnableCacheCheck();
     break;
   case VTK_ANIMATION_SCENE_PLAYMODE_REALTIME:
     this->PlayModeMenuButton->SetButtonText(VTK_PV_PLAYMODE_REALTIME_TITLE);
+    this->AnimationManager->DisableCacheCheck();
+      // disable cahce check when in real time mode.
+      // Note that when we switch the mode to realtime,
+      // the AnimationSceneProxy disables cacheing.
     break;
   default:
     vtkErrorMacro("Invalid play mode " << mode);
     return;
     }
+
   IntVectPropertySetElement(this->AnimationSceneProxy,"PlayMode", mode);
   this->AnimationSceneProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetPlayMode %d", this->GetTclName(), mode);
@@ -1034,22 +1023,22 @@ void vtkPVAnimationScene::SetFrameRate(double fps)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationScene::SetCaching(int enable)
+{
+  IntVectPropertySetElement(this->AnimationSceneProxy, "Caching", enable);
+  this->AnimationSceneProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVAnimationScene::GetCaching()
+{
+  return this->AnimationSceneProxy->GetCaching();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationScene::InvalidateAllGeometries()
 {
-  if (this->GeometryCached)
-    {
-    vtkPVApplication* pvApp =
-      vtkPVApplication::SafeDownCast(this->GetApplication());
-    if (pvApp)
-      {
-      vtkSMRenderModuleProxy* rm = pvApp->GetRenderModuleProxy();
-      if (rm)
-        {
-        rm->InvalidateAllGeometries();
-        }
-      }
-    }
-  this->GeometryCached = 0;
+  this->AnimationSceneProxy->CleanCache();
 }
 
 //-----------------------------------------------------------------------------

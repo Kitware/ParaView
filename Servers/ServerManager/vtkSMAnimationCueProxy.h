@@ -90,6 +90,12 @@ public:
   vtkSMDomain* GetAnimatedDomain();
 
   vtkGetObjectMacro(AnimationCue, vtkAnimationCue);
+
+  // Description:
+  // Get/Set if caching is enabled.
+  virtual void SetCaching(int enable);
+  vtkGetMacro(Caching, int);
+  
 //BTX
   vtkClientServerID GetID() { return this->SelfID; }
 //ETX
@@ -115,6 +121,9 @@ protected:
   friend class vtkSMAnimationCueProxyObserver;
 //ETX
 
+  int Caching; // flag indicating if the animation is to use Cache.
+    // The SMAnimationScene synchrinized this flag for all cues it maintains.
+ 
   vtkSMProxy* AnimatedProxy;
   int AnimatedElement;
   char *AnimatedPropertyName;

@@ -79,6 +79,17 @@ public:
 
   // Update the display.
   void Update();
+
+  // Description:
+  // Cache check button can be enabled/disabled.
+  // It is disbled when play mode is realtime
+  // and enabled when play mode is sequence.
+  // Note that when enabled, it syncronizes the caching state 
+  // of the AnimationManager with the current check box state.
+  // Also, when disabled, the AnimationManager will set the
+  // cacheing flag on Animation Scene to 0.
+  void EnableCacheCheck();
+  void DisableCacheCheck();
 protected:
   vtkPVVerticalAnimationInterface();
   ~vtkPVVerticalAnimationInterface();
@@ -107,6 +118,7 @@ protected:
   vtkPVKeyFrame* ActiveKeyFrame;
   void SetActiveKeyFrame(vtkPVKeyFrame*);
 
+  int EnableCacheCheckButton;
   int CacheGeometry;
 
   //BTX

@@ -63,7 +63,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.34");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.35");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -139,7 +139,6 @@ vtkPVAnimationManager::vtkPVAnimationManager()
   this->RecordingIncrement = 0.1;
 
   this->AdvancedView = 0;
-  this->OverrideCache = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -980,14 +979,27 @@ void vtkPVAnimationManager::UpdateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVAnimationManager::GetUseGeometryCache()
+void vtkPVAnimationManager::SetCacheGeometry(int cache)
 {
-  if (this->OverrideCache)
-    {
-    return 0;
-    }
-  return (this->VAnimationInterface->GetCacheGeometry() && 
-    this->AnimationScene->GetPlayMode() == VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE);
+  this->AnimationScene->SetCaching(cache);
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVAnimationManager::GetCacheGeometry()
+{
+  return this->AnimationScene->GetCaching();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::EnableCacheCheck()
+{
+  this->VAnimationInterface->EnableCacheCheck();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::DisableCacheCheck()
+{
+  this->VAnimationInterface->DisableCacheCheck();
 }
 
 //-----------------------------------------------------------------------------
@@ -1323,6 +1335,5 @@ void vtkPVAnimationManager::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnimationScene: " << this->AnimationScene << endl;
   os << indent << "ProxyIterator: " << this->ProxyIterator << endl;
   os << indent << "AdvancedView: " << this->AdvancedView << endl;
-  os << indent << "OverrideCache: " << this->OverrideCache << endl;
   os << indent << "InRecording: " << this->InRecording << endl;
 }

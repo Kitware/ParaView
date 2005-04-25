@@ -41,7 +41,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.13");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.14");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -110,6 +110,7 @@ vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
 
   this->IndexScale = vtkKWScale::New();
   this->CacheGeometry = 1;
+  this->EnableCacheCheckButton = 1;
 
   this->TitleLabelLabel = vtkKWLabel::New();
   this->TitleLabel = vtkKWLabel::New();
@@ -423,10 +424,28 @@ void vtkPVVerticalAnimationInterface::SetCacheGeometry(int cache)
     {
     return;
     }
-  this->CacheGeometry = cache;
-  this->CacheGeometryCheck->SetState(cache);
-  this->AnimationManager->InvalidateAllGeometries();
-  this->GetTraceHelper()->AddEntry("$kw(%s) SetCacheGeometry %d", this->GetTclName(), cache);
+  this->AnimationManager->SetCacheGeometry(cache);
+  this->CacheGeometry = this->AnimationManager->GetCacheGeometry();
+  this->CacheGeometryCheck->SetState(this->CacheGeometry);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SetCacheGeometry %d", 
+    this->GetTclName(), cache);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVerticalAnimationInterface::EnableCacheCheck()
+{
+  this->EnableCacheCheckButton = 1;
+  this->AnimationManager->SetCacheGeometry(
+    this->CacheGeometryCheck->GetState());
+  this->UpdateEnableState();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVerticalAnimationInterface::DisableCacheCheck()
+{
+  this->EnableCacheCheckButton = 0;
+  this->AnimationManager->SetCacheGeometry(0);
+  this->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------
@@ -596,6 +615,16 @@ void vtkPVVerticalAnimationInterface::UpdateEnableState()
   if (this->ActiveKeyFrame)
     {
     this->PropagateEnableState(this->ActiveKeyFrame);
+    }
+  if (!this->EnableCacheCheckButton && this->Enabled)
+    {
+    this->Enabled = 0;
+    this->PropagateEnableState(this->CacheGeometryCheck);
+    this->Enabled = 1;
+    }
+  else
+    {
+    this->PropagateEnableState(this->CacheGeometryCheck);
     }
 }
 
