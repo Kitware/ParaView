@@ -30,8 +30,8 @@ public:
   vtkTypeRevisionMacro(vtkMultiActorHelper,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void Rotate();
-  void Zoom();
+  void Rotate(double transform[8]);
+  void Pan(double x, double y);
   void UniformScale(double scaleFactor);
   
   void AddActor(vtkActor* actor);
@@ -43,7 +43,7 @@ protected:
   vtkActorCollection* Actors;
 
   void Prop3DTransform(vtkActor *actor, int numRotation,
-                       double **rotate, double *scale);
+                       double *rotate, double *scale);
 
 private:
   vtkMultiActorHelper(const vtkMultiActorHelper&);  // Not implemented.
