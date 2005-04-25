@@ -21,9 +21,23 @@
 #include "vtkKWThumbWheel.h"
 #include "vtkSMExponentialKeyFrameProxy.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.5");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.6");
+
+//Helper methods to down cast the property and set value.
+inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
+  const char* propertyname, double val, int index = 0)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    proxy->GetProperty(propertyname));
+  if (!dvp)
+    {
+    return 0;
+    }
+  return dvp->SetElement(index, val);
+}
 
 //-----------------------------------------------------------------------------
 vtkPVExponentialKeyFrame::vtkPVExponentialKeyFrame()
@@ -136,8 +150,8 @@ void vtkPVExponentialKeyFrame::StartPowerChangedCallback()
 //-----------------------------------------------------------------------------
 void vtkPVExponentialKeyFrame::SetBase(double base)
 {
-  vtkSMExponentialKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
-    SetBase(base);
+  DoubleVectPropertySetElement(this->KeyFrameProxy, "Base", base);
+  this->KeyFrameProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetBase %f", this->GetTclName(), base);
 }
 
@@ -151,8 +165,8 @@ double vtkPVExponentialKeyFrame::GetBase()
 //-----------------------------------------------------------------------------
 void vtkPVExponentialKeyFrame::SetStartPower(double p)
 { 
-  vtkSMExponentialKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
-    SetStartPower(p);
+  DoubleVectPropertySetElement(this->KeyFrameProxy, "StartPower", p);
+  this->KeyFrameProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetStartPower %f", this->GetTclName(), p);
 }
 
@@ -166,8 +180,8 @@ double vtkPVExponentialKeyFrame::GetStartPower()
 //-----------------------------------------------------------------------------
 void vtkPVExponentialKeyFrame::SetEndPower(double p)
 {
-  vtkSMExponentialKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
-    SetEndPower(p);
+  DoubleVectPropertySetElement(this->KeyFrameProxy, "EndPower", p);
+  this->KeyFrameProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetEndPower %f", this->GetTclName(), p);
 }
 

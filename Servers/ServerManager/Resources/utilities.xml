@@ -643,6 +643,10 @@
       <ProxyProperty name="AnimatedProxy" 
         command="SetAnimatedProxy"
         update_self="1">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
       </ProxyProperty>
 
       <StringVectorProperty
@@ -707,41 +711,6 @@
         default_values="0">
       </DoubleVectorProperty>
       
-      <ProxyProperty name="AnimatedProxy" 
-        command="SetAnimatedProxy"
-        update_self="1">
-      </ProxyProperty>
-
-      <StringVectorProperty
-        name="AnimatedPropertyName" 
-        command="SetAnimatedPropertyName"
-        number_of_elements="1"
-        update_self="1">
-      </StringVectorProperty>
-
-      <StringVectorProperty
-        name="AnimatedDomainName"
-        command="SetAnimatedDomainName"
-        number_of_elements="1"
-        update_self="1">
-      </StringVectorProperty>
-
-      <IntVectorProperty
-        name="AnimatedElement"
-        command="SetAnimatedElement"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0">
-      </IntVectorProperty>
-
-      <ProxyProperty name="Manipulator"
-        command="SetManipulator"
-        update_self="1">
-        <ProxyGroupDomain name="groups">
-          <Group name="animation_manipulators" />
-        </ProxyGroupDomain>
-      </ProxyProperty>
-
       <IntVectorProperty
         name="Loop"
         command="SetLoop"
@@ -758,9 +727,19 @@
         default_values="10">
       </DoubleVectorProperty>
 
-      <ProxyProperty name="Cue"
+      <DoubleVectorProperty
+        name="CurrentTime"
+        command="SetCurrentTime"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0"
+        saveable="0">
+      </DoubleVectorProperty>
+
+      <ProxyProperty name="Cues"
         command="AddCue"
-        update_self="1">
+        update_self="1"
+        remove_command="RemoveCue">
         <ProxyGroupDomain name="groups">
           <Group name="animation" />
         </ProxyGroupDomain>
@@ -804,13 +783,21 @@
     <KeyFrameAnimationCueManipulatorProxy name="KeyFrameAnimationCueManipulator"
       class="notused">
       <ProxyProperty
-        name="KeyFrame"
+        name="KeyFrames"
         command="AddKeyFrame"
+        remove_command="RemoveKeyFrame"
         update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="animation_keyframes" />
         </ProxyGroupDomain>
       </ProxyProperty>  
+      <IntVectorProperty
+        name="LastAddedKeyFrameIndex"
+        command="GetLastAddedKeyFrameIndex"
+        update_self="1"
+        information_only="1">
+        <SimpleIntInformationHelper />
+      </IntVectorProperty>
     </KeyFrameAnimationCueManipulatorProxy>
 
   </ProxyGroup>
@@ -836,74 +823,28 @@
         number_of_elements_per_command="1"
         use_index="1">
       </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="NumberOfKeyValues"
+        command="SetNumberOfKeyValues"
+        update_self="1"
+        number_of_elements="1"
+        default_values="1">
+        <IntRangeDomain name="range" min="0" />
+       </IntVectorProperty>
     </KeyFrameProxy>
       
-    <BooleanKeyFrameProxy name="BooleanKeyFrame" class="notused">
-      <DoubleVectorProperty
-        name="KeyTime"
-        command="SetKeyTime"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0.0">
-        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
-      </DoubleVectorProperty>
-    
-      <DoubleVectorProperty
-        name="KeyValues"
-        command="SetKeyValue"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0.0"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        use_index="1">
-      </DoubleVectorProperty>
+    <BooleanKeyFrameProxy name="BooleanKeyFrame"
+      base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
     </BooleanKeyFrameProxy>
 
     
-    <RampKeyFrameProxy name="RampKeyFrame" class="notused">
-      <DoubleVectorProperty
-        name="KeyTime"
-        command="SetKeyTime"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0.0">
-        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
-      </DoubleVectorProperty>
-    
-      <DoubleVectorProperty
-        name="KeyValues"
-        command="SetKeyValue"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0.0"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        use_index="1">
-      </DoubleVectorProperty>
+    <RampKeyFrameProxy name="RampKeyFrame"
+      base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
     </RampKeyFrameProxy>
 
-    <ExponentialKeyFrameProxy name="ExponentialKeyFrame" class="notused">
-      <DoubleVectorProperty
-        name="KeyTime"
-        command="SetKeyTime"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0.0">
-        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
-      </DoubleVectorProperty>
-    
-      <DoubleVectorProperty
-        name="KeyValues"
-        command="SetKeyValue"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0.0"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        use_index="1">
-      </DoubleVectorProperty>
-
+    <ExponentialKeyFrameProxy name="ExponentialKeyFrame" 
+      base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
       <DoubleVectorProperty
         name="Base"
         command="SetBase"
@@ -930,27 +871,8 @@
 
     </ExponentialKeyFrameProxy>
 
-    <SinusoidKeyFrameProxy name="SinusoidKeyFrame" class="notused">
-      <DoubleVectorProperty
-        name="KeyTime"
-        command="SetKeyTime"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0.0">
-        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
-      </DoubleVectorProperty>
-    
-      <DoubleVectorProperty
-        name="KeyValue"
-        command="SetKeyValue"
-        number_of_elements="1"
-        update_self="1"
-        default_values="0.0"
-        repeat_command="1"
-        number_of_elements_per_command="1"
-        use_index="1">
-      </DoubleVectorProperty>
-
+    <SinusoidKeyFrameProxy name="SinusoidKeyFrame"
+      base_proxygroup="animation_keyframes" base_proxyname="KeyFrame">
       <DoubleVectorProperty
         name="Phase"
         command="SetPhase"

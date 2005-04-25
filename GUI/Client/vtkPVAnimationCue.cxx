@@ -44,6 +44,7 @@
 #include "vtkSMIdTypeVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMStringVectorProperty.h"
 #include "vtkKWRange.h"
 #include "vtkPVTraceHelper.h"
 
@@ -76,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.22");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.23");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -105,7 +106,46 @@ protected:
     }
   vtkPVAnimationCue* AnimationCue;
 };
+
 //***************************************************************************
+//Helper methods to down cast the property and set value.
+inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
+  const char* propertyname, double val, int index = 0)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    proxy->GetProperty(propertyname));
+  if (!dvp)
+    {
+    return 0;
+    }
+  return dvp->SetElement(index, val);
+}
+
+//-----------------------------------------------------------------------------
+inline static int StringVectPropertySetElement(vtkSMProxy *proxy, 
+  const char* propertyname, const char* val, int index = 0)
+{
+  vtkSMStringVectorProperty* dvp = vtkSMStringVectorProperty::SafeDownCast(
+    proxy->GetProperty(propertyname));
+  if (!dvp)
+    {
+    return 0;
+    }
+  return dvp->SetElement(index, val);
+}
+
+//-----------------------------------------------------------------------------
+inline static int IntVectPropertySetElement(vtkSMProxy *proxy, 
+  const char* propertyname, int val, int index = 0)
+{
+  vtkSMIntVectorProperty* dvp = vtkSMIntVectorProperty::SafeDownCast(
+    proxy->GetProperty(propertyname));
+  if (!dvp)
+    {
+    return 0;
+    }
+  return dvp->SetElement(index, val);
+}
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCue::vtkPVAnimationCue()
@@ -334,10 +374,11 @@ void vtkPVAnimationCue::CreateProxy()
       pp->RemoveAllProxies();
       pp->AddProxy(this->KeyFrameManipulatorProxy);
       }
+    IntVectPropertySetElement(this->CueProxy, "TimeMode", 
+      VTK_ANIMATION_CUE_TIMEMODE_NORMALIZED);
+    DoubleVectPropertySetElement(this->CueProxy, "StartTime", 0.0);
+    DoubleVectPropertySetElement(this->CueProxy, "EndTime", 1.0);
     this->CueProxy->UpdateVTKObjects(); //calls CreateVTKObjects(1) internally.
-    this->CueProxy->SetTimeMode(VTK_ANIMATION_CUE_TIMEMODE_NORMALIZED);
-    this->CueProxy->SetStartTime(0);
-    this->CueProxy->SetEndTime(1);
 
     this->KeyFrameManipulatorProxy->AddObserver(
       vtkSMKeyFrameAnimationCueManipulatorProxy::StateModifiedEvent, this->Observer);
@@ -517,7 +558,7 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
       }
     }
 */
-  this->TimeLine->SelectPoint(id);
+//  this->TimeLine->SelectPoint(id);
   return id;
 }
 
@@ -547,7 +588,22 @@ int vtkPVAnimationCue::AddKeyFrame(vtkPVKeyFrame* keyframe)
     }
 
   this->PVKeyFrames->AddItem(keyframe);
-  return this->KeyFrameManipulatorProxy->AddKeyFrame(keyframe->GetKeyFrameProxy());
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->KeyFrameManipulatorProxy->GetProperty("KeyFrames"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property KeyFrames on "
+      "KeyFrameManipulatorProxy.");
+    return -1;
+    }
+  pp->AddProxy(keyframe->GetKeyFrameProxy());
+  this->KeyFrameManipulatorProxy->UpdateVTKObjects();
+  
+  // I hate this...but what can I do, I need the index returned by the manipulator.
+  this->KeyFrameManipulatorProxy->UpdateInformation();
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->KeyFrameManipulatorProxy->GetProperty("LastAddedKeyFrameIndex"));
+  return ivp->GetElement(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -601,7 +657,17 @@ void vtkPVAnimationCue::RemoveKeyFrame(vtkPVKeyFrame* keyframe)
     return;
     }
   keyframe->SetParent(NULL);
-  this->KeyFrameManipulatorProxy->RemoveKeyFrame(keyframe->GetKeyFrameProxy());
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->KeyFrameManipulatorProxy->GetProperty("KeyFrames"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property KeyFrames on "
+      "KeyFrameManipulatorProxy.");
+    return;
+    }
+  pp->RemoveProxy(keyframe->GetKeyFrameProxy());
+  this->KeyFrameManipulatorProxy->UpdateVTKObjects();
+
   this->PVKeyFrames->RemoveItem(keyframe);
 }
 
@@ -1056,7 +1122,16 @@ void vtkPVAnimationCue::SetAnimatedProxy(vtkSMProxy *proxy)
     vtkErrorMacro("Cue does not have any actual proxies associated with it.");
     return;
     }
-  this->CueProxy->SetAnimatedProxy(proxy);
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->CueProxy->GetProperty("AnimatedProxy"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property AnimatedProxy.");
+    return;
+    }
+  pp->RemoveAllProxies();
+  pp->AddProxy(proxy);
+  this->CueProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -1067,7 +1142,8 @@ void vtkPVAnimationCue::SetAnimatedPropertyName(const char* name)
     vtkErrorMacro("Cue does not have any actual proxies associated with it.");
     return;
     }
-  this->CueProxy->SetAnimatedPropertyName(name);
+  StringVectPropertySetElement(this->CueProxy, "AnimatedPropertyName", name);
+  this->CueProxy->UpdateVTKObjects();
   if (!this->PropertyStatusManager)
     {
     this->PropertyStatusManager = vtkSMPropertyStatusManager::New();
@@ -1096,7 +1172,8 @@ void vtkPVAnimationCue::SetAnimatedDomainName(const char* name)
     vtkErrorMacro("Cue does not have any actual proxies associated with it.");
     return;
     }
-  this->CueProxy->SetAnimatedDomainName(name);
+  StringVectPropertySetElement(this->CueProxy, "AnimatedDomainName", name);
+  this->CueProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -1107,7 +1184,8 @@ void vtkPVAnimationCue::SetAnimatedElement(int index)
     vtkErrorMacro("Cue does not have any actual proxies associated with it.");
     return;
     }
-  this->CueProxy->SetAnimatedElement(index);
+  IntVectPropertySetElement(this->CueProxy,"AnimatedElement", index);
+  this->CueProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

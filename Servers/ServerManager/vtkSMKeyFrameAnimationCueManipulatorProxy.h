@@ -49,6 +49,13 @@ public:
   int AddKeyFrame (vtkSMKeyFrameProxy* keyframe);
 
   // Description:
+  // This method returns the index of the last added key frame.
+  // Note that this index is valid only until none of the keyframes 
+  // are modified. This is even provided as a method so that
+  // this value can be accessed via properties.
+  vtkGetMacro(LastAddedKeyFrameIndex, int);
+
+  // Description:
   // Removes a key frame at the specified time, if any. 
   void RemoveKeyFrame(vtkSMKeyFrameProxy* keyframe);
  
@@ -131,6 +138,8 @@ protected:
   void ExecuteEvent(vtkObject* obj, unsigned long event, void* );
   //ETX
   int SendEndEvent;
+  int LastAddedKeyFrameIndex;
+
 private:
   vtkSMKeyFrameAnimationCueManipulatorProxy(const vtkSMKeyFrameAnimationCueManipulatorProxy&); // Not implemented.
   void operator=(const vtkSMKeyFrameAnimationCueManipulatorProxy&); // Not implemented.

@@ -80,7 +80,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.25");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.26");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -114,6 +114,45 @@ protected:
 };
 
 //*****************************************************************************
+//Helper methods to down cast the property and set value.
+inline int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
+  const char* propertyname, double val, int index = 0)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    proxy->GetProperty(propertyname));
+  if (!dvp)
+    {
+    return 0;
+    }
+  return dvp->SetElement(index, val);
+}
+
+//-----------------------------------------------------------------------------
+inline int StringVectPropertySetElement(vtkSMProxy *proxy, 
+  const char* propertyname, const char* val, int index = 0)
+{
+  vtkSMStringVectorProperty* dvp = vtkSMStringVectorProperty::SafeDownCast(
+    proxy->GetProperty(propertyname));
+  if (!dvp)
+    {
+    return 0;
+    }
+  return dvp->SetElement(index, val);
+}
+
+//-----------------------------------------------------------------------------
+inline int IntVectPropertySetElement(vtkSMProxy *proxy, 
+  const char* propertyname, int val, int index = 0)
+{
+  vtkSMIntVectorProperty* dvp = vtkSMIntVectorProperty::SafeDownCast(
+    proxy->GetProperty(propertyname));
+  if (!dvp)
+    {
+    return 0;
+    }
+  return dvp->SetElement(index, val);
+}
+
 //-----------------------------------------------------------------------------
 vtkPVAnimationScene::vtkPVAnimationScene()
 {
@@ -157,7 +196,7 @@ vtkPVAnimationScene::~vtkPVAnimationScene()
 {
   if (this->AnimationSceneProxyName)
     {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy("animation",
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("animation_scene",
       this->AnimationSceneProxyName);
     this->SetAnimationSceneProxyName(0);
     }
@@ -421,19 +460,21 @@ void vtkPVAnimationScene::CreateProxy()
   this->SetAnimationSceneProxyName(str.str());
   proxyNum++;
   str.rdbuf()->freeze(0);
-  pxm->RegisterProxy("animation", this->AnimationSceneProxyName,
+  pxm->RegisterProxy("animation_scene", this->AnimationSceneProxyName,
     this->AnimationSceneProxy);
  
-  this->AnimationSceneProxy->UpdateVTKObjects();
   this->AnimationSceneProxy->AddObserver(vtkCommand::StartAnimationCueEvent,
     this->Observer);
   this->AnimationSceneProxy->AddObserver(vtkCommand::AnimationCueTickEvent,
     this->Observer);
   this->AnimationSceneProxy->AddObserver(vtkCommand::EndAnimationCueEvent,
     this->Observer);
-  this->AnimationSceneProxy->SetStartTime(0);
-  this->AnimationSceneProxy->SetEndTime(60);
-  this->AnimationSceneProxy->SetTimeMode(VTK_ANIMATION_CUE_TIMEMODE_RELATIVE);
+  
+  DoubleVectPropertySetElement(this->AnimationSceneProxy,"StartTime",0.0);
+  DoubleVectPropertySetElement(this->AnimationSceneProxy,"EndTime", 60.0);
+  DoubleVectPropertySetElement(this->AnimationSceneProxy,"TimeMode",
+    VTK_ANIMATION_CUE_TIMEMODE_RELATIVE);
+  this->AnimationSceneProxy->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------
@@ -779,7 +820,8 @@ void vtkPVAnimationScene::SetDuration(double duration)
     }
   double ntime = this->GetNormalizedCurrentTime();
   
-  this->AnimationSceneProxy->SetEndTime(duration);
+  DoubleVectPropertySetElement(this->AnimationSceneProxy,"EndTime",duration);
+  this->AnimationSceneProxy->UpdateVTKObjects();
   this->DurationThumbWheel->SetValue(duration);
   this->TimeScale->SetRange(0, duration);
   this->TimeScale->SetValue(duration*ntime);
@@ -888,7 +930,8 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
     vtkErrorMacro("Invalid play mode " << mode);
     return;
     }
-  this->AnimationSceneProxy->SetPlayMode(mode);
+  IntVectPropertySetElement(this->AnimationSceneProxy,"PlayMode", mode);
+  this->AnimationSceneProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetPlayMode %d", this->GetTclName(), mode);
 }
 
@@ -983,7 +1026,8 @@ void vtkPVAnimationScene::SetFrameRate(double fps)
     {
     fps = this->GetFrameRate();
     }
-  this->AnimationSceneProxy->SetFrameRate(fps);
+  DoubleVectPropertySetElement(this->AnimationSceneProxy, "FrameRate", fps);
+  this->AnimationSceneProxy->UpdateVTKObjects();
   this->FrameRateThumbWheel->SetValue(fps);
   this->InvalidateAllGeometries();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetFrameRate %f", this->GetTclName(), fps);
@@ -1023,7 +1067,8 @@ void vtkPVAnimationScene::SetLoop(int loop)
     }
   this->VCRControl->SetLoopButtonState(loop);
   this->VCRToolbar->SetLoopButtonState(loop);
-  this->AnimationSceneProxy->SetLoop(loop);
+  IntVectPropertySetElement(this->AnimationSceneProxy, "Loop", loop);
+  this->AnimationSceneProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetLoop %d", this->GetTclName(), loop);
 }
 
@@ -1041,7 +1086,8 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
     vtkErrorMacro("Scene has not been created yet.");
     return;
     }
-  this->AnimationSceneProxy->SetCurrentTime(time);
+  DoubleVectPropertySetElement(this->AnimationSceneProxy, "CurrentTime", time);
+  this->AnimationSceneProxy->UpdateVTKObjects();
   this->TimeScale->SetValue(time);
   if (this->Window && this->Window->GetCurrentPVSource())
     {
@@ -1092,14 +1138,20 @@ void vtkPVAnimationScene::TimeScaleCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::AddAnimationCue(vtkPVAnimationCue *pvCue)
 {
-  this->AnimationSceneProxy->AddCue(pvCue->GetCueProxy());
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->AnimationSceneProxy->GetProperty("Cues"));
+  pp->AddProxy(pvCue->GetCueProxy());
+  this->AnimationSceneProxy->UpdateVTKObjects();
   this->InvalidateAllGeometries();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::RemoveAnimationCue(vtkPVAnimationCue* pvCue)
 {
-  this->AnimationSceneProxy->RemoveCue(pvCue->GetCueProxy());
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    this->AnimationSceneProxy->GetProperty("Cues"));
+  pp->RemoveProxy(pvCue->GetCueProxy());
+  this->AnimationSceneProxy->UpdateVTKObjects();
   this->InvalidateAllGeometries();
 }
 

@@ -1763,6 +1763,7 @@
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
+          <Group name="glyph_sources" />
         </ProxyGroupDomain>
       </InputProperty>
       <Property
@@ -1858,6 +1859,7 @@
         <ProxyGroupDomain name="groups">
           <Group name="sources" />
           <Group name="filters" />
+          <Group name="glyph_sources" />
         </ProxyGroupDomain>
         <InputArrayDomain name="input_array"
           attribute_type="point">
@@ -1917,6 +1919,7 @@
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
+          <Group name="glyph_sources" />
         </ProxyGroupDomain>
       </InputProperty>
       <Property
@@ -1962,6 +1965,7 @@
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
+          <Group name="glyph_sources" />
         </ProxyGroupDomain>
       </InputProperty>
       <Property

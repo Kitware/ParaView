@@ -46,7 +46,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.12");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.13");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -74,6 +74,32 @@ protected:
   vtkPVKeyFrame* Target;
 };
 //*****************************************************************************
+//Helper methods to down cast the property and set value.
+inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
+  const char* propertyname, double val, int index = 0)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    proxy->GetProperty(propertyname));
+  if (!dvp)
+    {
+    return 0;
+    }
+  return dvp->SetElement(index, val);
+}
+
+//-----------------------------------------------------------------------------
+inline static int IntVectPropertySetElement(vtkSMProxy *proxy, 
+  const char* propertyname, int val, int index = 0)
+{
+  vtkSMIntVectorProperty* dvp = vtkSMIntVectorProperty::SafeDownCast(
+    proxy->GetProperty(propertyname));
+  if (!dvp)
+    {
+    return 0;
+    }
+  return dvp->SetElement(index, val);
+}
+
 
 //-----------------------------------------------------------------------------
 vtkPVKeyFrame::vtkPVKeyFrame()
@@ -726,7 +752,8 @@ void vtkPVKeyFrame::SetTimeMaximumBound(double max)
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::SetKeyTime(double time)
 {
-  this->KeyFrameProxy->SetKeyTime(time);
+  DoubleVectPropertySetElement(this->KeyFrameProxy, "KeyTime", time);
+  this->KeyFrameProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyTime %f", this->GetTclName(), time);
 }
 
@@ -739,7 +766,8 @@ double vtkPVKeyFrame::GetKeyTime()
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::SetKeyValue(int index, double val)
 {
-  this->KeyFrameProxy->SetKeyValue(index, val);
+  DoubleVectPropertySetElement(this->KeyFrameProxy, "KeyValues", val, index);
+  this->KeyFrameProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetKeyValue %d %f", 
     this->GetTclName(), index, val);
 }
@@ -747,7 +775,12 @@ void vtkPVKeyFrame::SetKeyValue(int index, double val)
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::SetNumberOfKeyValues(int num)
 {
-  this->KeyFrameProxy->SetNumberOfKeyValues(num);
+  IntVectPropertySetElement(this->KeyFrameProxy, "NumberOfKeyValues", num);
+  this->KeyFrameProxy->UpdateVTKObjects();
+
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    this->KeyFrameProxy->GetProperty("KeyValues"));
+  dvp->SetNumberOfElements(num);
   
   this->GetTraceHelper()->AddEntry("$kw(%s) SetNumberOfKeyValues %d", 
     this->GetTclName(), num);

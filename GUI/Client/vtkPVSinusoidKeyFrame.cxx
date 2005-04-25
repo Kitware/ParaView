@@ -20,10 +20,24 @@
 #include "vtkKWEntry.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkSMSinusoidKeyFrameProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.6");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.7");
+
+//-----------------------------------------------------------------------------
+inline static int DoubleVectPropertySetElement(vtkSMProxy *proxy, 
+  const char* propertyname, double val, int index = 0)
+{
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+    proxy->GetProperty(propertyname));
+  if (!dvp)
+    {
+    return 0;
+    }
+  return dvp->SetElement(index, val);
+}
 
 //-----------------------------------------------------------------------------
 vtkPVSinusoidKeyFrame::vtkPVSinusoidKeyFrame()
@@ -146,8 +160,8 @@ void vtkPVSinusoidKeyFrame::FrequencyChangedCallback()
 //-----------------------------------------------------------------------------
 void vtkPVSinusoidKeyFrame::SetPhase(double base)
 {
-  vtkSMSinusoidKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
-    SetPhase(base);
+  DoubleVectPropertySetElement(this->KeyFrameProxy, "Phase", base);
+  this->KeyFrameProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetPhase %f", this->GetTclName(), base);
 }
 
@@ -161,8 +175,8 @@ double vtkPVSinusoidKeyFrame::GetPhase()
 //-----------------------------------------------------------------------------
 void vtkPVSinusoidKeyFrame::SetFrequency(double p)
 { 
-  vtkSMSinusoidKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
-    SetFrequency(p);
+  DoubleVectPropertySetElement(this->KeyFrameProxy, "Frequency", p);
+  this->KeyFrameProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetFrequency %f", this->GetTclName(), p);
 }
 
@@ -176,8 +190,8 @@ double vtkPVSinusoidKeyFrame::GetFrequency()
 //-----------------------------------------------------------------------------
 void vtkPVSinusoidKeyFrame::SetOffset(double p)
 {
-  vtkSMSinusoidKeyFrameProxy::SafeDownCast(this->KeyFrameProxy)->
-    SetOffset(p);
+  DoubleVectPropertySetElement(this->KeyFrameProxy, "Offset", p);
+  this->KeyFrameProxy->UpdateVTKObjects();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetOffset %f", this->GetTclName(), p);
 }
 
