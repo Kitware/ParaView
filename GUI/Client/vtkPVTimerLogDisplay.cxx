@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.24");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.25");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -214,6 +214,8 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->ThresholdMenu->AddEntryWithCommand("0.01", this, "SetThreshold 0.01");
   this->ThresholdMenu->AddEntryWithCommand("0.1", this, "SetThreshold 0.1");
   this->ThresholdMenu->SetCurrentEntry("0.01");
+  this->SetThreshold(0.01);
+
   this->ThresholdMenu->SetBalloonHelpString("This option filters out short duration events.");
   this->Script("pack %s %s -side left",
                this->ThresholdLabel->GetWidgetName(),
@@ -229,6 +231,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->BufferLengthMenu->AddEntryWithCommand("500", this, "SetBufferLength 500");
   this->BufferLengthMenu->AddEntryWithCommand("1000", this, "SetBufferLength 1000");
   this->BufferLengthMenu->SetCurrentEntry("500");
+  this->SetBufferLength(500);
   this->BufferLengthMenu->SetBalloonHelpString("Set how many entries the log can have.");
   this->Script("pack %s %s -side left",
                this->BufferLengthLabel->GetWidgetName(),
@@ -247,8 +250,6 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->Script("pack %s %s -side left -expand 0 -fill none",
                this->EnableLabel->GetWidgetName(),
                this->EnableCheck->GetWidgetName());
-
-
 
   this->Script("set commandList \"\"");
   
@@ -454,7 +455,7 @@ void vtkPVTimerLogDisplay::DisplayLog()
   int id;
  
   numLogs = this->TimerInformation->GetNumberOfLogs();
-
+  
   this->DisplayText->SetValue("");
   for (id = 0; id < numLogs; ++id)
     {
