@@ -1404,6 +1404,7 @@
           <Property name="OffScreenRendering" />
           <Property name="FullScreen" />
           <Property name="RenderWindowSize" />
+          <Property name="RenderWindowSizeInfo" />
         </ExposedProperties>
       </SubProxy>
       <SubProxy>
