@@ -135,6 +135,11 @@ public:
   // Enable/Disable the LightKit.
   void SetUseLight(int enable);
 
+  // Description:
+  // Called when saving server manager state.
+  // Overridden to SynchronizeCameraProperties before saving the properties.
+  virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
+
 protected:
   vtkSMRenderModuleProxy();
   ~vtkSMRenderModuleProxy();

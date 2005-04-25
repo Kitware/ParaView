@@ -43,7 +43,7 @@
 #include "vtkInstantiator.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.5");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -824,6 +824,14 @@ void vtkSMRenderModuleProxy::SynchronizeCameraProperties()
       }
     }
   iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMRenderModuleProxy::SaveState(const char* name, ostream* file, 
+  vtkIndent indent)
+{
+  this->SynchronizeCameraProperties();
+  this->Superclass::SaveState(name, file, indent);
 }
 
 //-----------------------------------------------------------------------------
