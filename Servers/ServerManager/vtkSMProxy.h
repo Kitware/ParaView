@@ -161,6 +161,12 @@ public:
   vtkGetStringMacro(VTKClassName);
 
   // Description:
+  // the type of object created by the proxy.
+  // This is used only when creating the server objects. Once the server
+  // object(s) have been created, changing this has no effect.
+  vtkSetStringMacro(VTKClassName);
+
+  // Description:
   // Overloaded to break the reference loop caused by the fact that
   // proxies store their own ClientServer ids.
   virtual void UnRegister(vtkObjectBase* obj);
@@ -281,12 +287,6 @@ protected:
   friend class vtkSMPointLabelDisplay;
   friend class vtkSMPlotDisplay;
 //ETX
-
-  // Description:
-  // the type of object created by the proxy.
-  // This is used only when creating the server objects. Once the server
-  // object(s) have been created, changing this has no effect.
-  vtkSetStringMacro(VTKClassName);
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML
@@ -467,6 +467,9 @@ protected:
   void SetXMLElement(vtkPVXMLElement* element);
   vtkPVXMLElement* XMLElement;
 
+  // the name is the name with which the proxy was registered with pxm.
+  // However, the proxy, uses SelfID to create a name for itself while 
+  // saving the state.
   virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
 
   void SetupSharedProperties(vtkSMProxy* subproxy, vtkPVXMLElement *element);

@@ -29,7 +29,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.15");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.16");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -75,11 +75,6 @@ void vtkSMProxyProperty::AppendCommandToStreamWithRemoveCommand(
   vtkSMProxy* cons, vtkClientServerStream* str, vtkClientServerID objectId )
 {
   if (!this->RemoveCommand || this->InformationOnly)
-    {
-    return;
-    }
-  unsigned int numProxies = this->GetNumberOfProxies();
-  if (numProxies < 1)
     {
     return;
     }
@@ -454,18 +449,14 @@ void vtkSMProxyProperty::SaveState(
       {
       vtkSMProxyGroupDomain* dom = vtkSMProxyGroupDomain::SafeDownCast(
         this->DomainIterator->GetDomain());
-      if (dom)
+      vtkSMProxy* proxy = this->GetProxy(idx);
+      
+      if (dom && dom->IsInDomain(proxy))
         {
-        unsigned int numGroups = dom->GetNumberOfGroups();
-        for (unsigned int j=0; j<numGroups; j++)
-          {
-          const char* proxyname = pm->IsProxyInGroup(
-            this->GetProxy(idx), dom->GetGroup(j));
-          if (proxyname)
-            {
-            proxies.push_back(proxyname);
-            }
-          }
+        ostrstream str;
+        str << "pvTemp" << this->GetProxy(idx)->GetSelfID() << ends;
+        proxies.push_back(str.str());
+        str.rdbuf()->freeze(0);
         }
       this->DomainIterator->Next();
       }

@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.36");
+vtkCxxRevisionMacro(vtkSMProxy, "1.37");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -1179,13 +1179,13 @@ void vtkSMProxy::SetupSharedProperties(vtkSMProxy* subproxy,
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProxy::SaveState(const char* name, ostream* file, vtkIndent indent)
+void vtkSMProxy::SaveState(const char* vtkNotUsed(name), ostream* file, vtkIndent indent)
 {
   *file << indent
         << "<Proxy group=\"" 
         << this->XMLGroup << "\" type=\"" 
         << this->XMLName << "\" id=\""
-        << name << "\">" << endl;
+        << "pvTemp" << this->SelfID << "\">" << endl;
 
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
 
@@ -1194,7 +1194,7 @@ void vtkSMProxy::SaveState(const char* name, ostream* file, vtkIndent indent)
     if (iter->GetProperty()->GetSaveable())
       {
       ostrstream propID;
-      propID << name << "." << iter->GetKey() << ends;
+      propID << "pvTemp" << this->SelfID << "." << iter->GetKey() << ends;
       iter->GetProperty()->SaveState(propID.str(), file, indent.GetNextIndent());
       delete [] propID.str();
       }

@@ -29,7 +29,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.24");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.25");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -441,6 +441,8 @@ void vtkSMProxyManager::SaveState(const char*, ostream* os, vtkIndent indent)
 {
 
   vtkstd::set<vtkstd::string> seen;
+  vtkstd::set<vtkSMProxy*> visited_proxies; // set of proxies already added.
+
   // First save the state of all proxies
   vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
     this->Internals->RegisteredProxyMap.begin();
@@ -468,13 +470,13 @@ void vtkSMProxyManager::SaveState(const char*, ostream* os, vtkIndent indent)
       }
     if (do_group)
       {
+      // save the states of all proxies in this group.
       for (; it2 != it->second.end(); it2++)
         {
-        const char* name = it2->first.c_str();
-        if ( seen.find(name) == seen.end() )
+        if (visited_proxies.find(it2->second) == visited_proxies.end())
           {
-          it2->second->SaveState(name, os, indent);
-          seen.insert(name);
+          it2->second->SaveState(it2->first.c_str(), os, indent);
+          visited_proxies.insert(it2->second);
           }
         }
       }
@@ -506,7 +508,10 @@ void vtkSMProxyManager::SaveState(const char*, ostream* os, vtkIndent indent)
       for (; it2 != it->second.end(); it2++)
         {
         *os << indent.GetNextIndent()
-           << "<Item name=\"" << it2->first.c_str() << "\" />" << endl;
+           << "<Item "
+           << "id=\"pvTemp" << it2->second->GetSelfID() << "\" "
+           << "name=\"" << it2->first.c_str() << "\" "
+           << "/>" << endl;
         }
       *os << indent << "</ProxyCollection>" << endl;
       }
