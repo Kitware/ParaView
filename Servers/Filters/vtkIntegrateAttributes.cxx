@@ -28,7 +28,7 @@
 #include "vtkMultiProcessController.h"
 
 
-vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.3");
+vtkCxxRevisionMacro(vtkIntegrateAttributes, "1.4");
 vtkStandardNewMacro(vtkIntegrateAttributes);
 
 //-----------------------------------------------------------------------------
@@ -261,6 +261,17 @@ void vtkIntegrateAttributes::Execute()
     this->Controller->Send(output, 0, 28877);
     // Done sending.  Reset output so satellites will have empty data.    
     output->Initialize();
+    }
+  else
+    {
+    if (output->GetPointData()->GetArray("vtkGhostLevels"))
+      {
+      output->GetPointData()->RemoveArray("vtkGhostLevels");
+      }
+    if (output->GetCellData()->GetArray("vtkGhostLevels"))
+      {
+      output->GetCellData()->RemoveArray("vtkGhostLevels");
+      }
     }
 }        
 
