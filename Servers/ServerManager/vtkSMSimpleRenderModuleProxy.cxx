@@ -18,7 +18,7 @@
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMSimpleRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMSimpleRenderModuleProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMSimpleRenderModuleProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMSimpleRenderModuleProxy::vtkSMSimpleRenderModuleProxy()
 {
@@ -30,14 +30,6 @@ vtkSMSimpleRenderModuleProxy::~vtkSMSimpleRenderModuleProxy()
 {
 }
 
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void vtkSMSimpleRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
