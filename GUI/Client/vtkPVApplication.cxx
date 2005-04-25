@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.349");
+vtkCxxRevisionMacro(vtkPVApplication, "1.350");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -610,7 +610,7 @@ void vtkPVApplication::SetRenderModuleProxy(vtkSMRenderModuleProxy* rm)
       {
       static int numObjects = 0;
       ostrstream str;
-      str << "vtkPVApplication_RenderModule" << numObjects << ends;
+      str << "RenderModule" << numObjects << ends;
       pxm->RegisterProxy("rendermodules",str.str(), this->RenderModuleProxy);
       this->SetRenderModuleProxyName(str.str());
       str.rdbuf()->freeze(0);

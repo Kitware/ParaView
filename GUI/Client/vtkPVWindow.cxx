@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.687");
+vtkCxxRevisionMacro(vtkPVWindow, "1.688");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1246,15 +1246,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // application here.
   // Create Axes proxy
   vtkSMProxyManager *pxm = vtkSMObject::GetProxyManager();
-  static int proxyNum = 0;
   this->CenterAxesProxy = vtkSMAxesProxy::SafeDownCast(
     pxm->NewProxy("axes","Axes"));
-  
-  ostrstream axes_str;
-  axes_str << "vtkPVWindow_Axes" << proxyNum << ends;
-  proxyNum++;
-  this->SetCenterAxesProxyName(axes_str.str());
-  axes_str.rdbuf()->freeze(0);
+  this->SetCenterAxesProxyName("CenterAxes");
   pxm->RegisterProxy("axes",this->CenterAxesProxyName, this->CenterAxesProxy);
   this->CenterAxesProxy->UpdateVTKObjects();
  

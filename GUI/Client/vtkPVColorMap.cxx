@@ -65,7 +65,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.119");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.120");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -301,7 +301,7 @@ vtkPVColorMap::~vtkPVColorMap()
   
   if (this->ScalarBarProxyName)
     {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy("scalarbar_widget", this->ScalarBarProxyName);
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("displays", this->ScalarBarProxyName);
     }
   this->SetScalarBarProxyName(0);
   if (this->ScalarBarProxy)
@@ -1017,7 +1017,7 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetScalarBarProxyName(str.str());
   str.rdbuf()->freeze(0);
   proxyNum++;
-  pxm->RegisterProxy("scalarbar_widget",this->ScalarBarProxyName,this->ScalarBarProxy);
+  pxm->RegisterProxy("displays",this->ScalarBarProxyName,this->ScalarBarProxy);
   this->ScalarBarProxy->SetServers(
     vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   this->ScalarBarProxy->UpdateVTKObjects();
