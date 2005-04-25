@@ -136,6 +136,11 @@ public:
   void SetUseLight(int enable);
 
   // Description:
+  // Returns the dimensions of the first node of the render server (in
+  // the argument size). Returns 1 on success, 0 on failure.
+  int GetServerRenderWindowSize(int size[2]);
+
+  // Description:
   // Called when saving server manager state.
   // Overridden to SynchronizeCameraProperties before saving the properties.
   virtual void SaveState(const char* name, ostream* file, vtkIndent indent);

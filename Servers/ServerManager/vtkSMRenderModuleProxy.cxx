@@ -43,7 +43,7 @@
 #include "vtkInstantiator.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.6");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -375,7 +375,7 @@ void vtkSMRenderModuleProxy::BeginInteractiveRender()
 //-----------------------------------------------------------------------------
 void vtkSMRenderModuleProxy::EndInteractiveRender()
 {
-  vtkTimerLog::MarkEvent("Interactive Render");
+  vtkTimerLog::MarkEndEvent("Interactive Render");
 }
 
 //-----------------------------------------------------------------------------
@@ -983,6 +983,31 @@ void vtkSMRenderModuleProxy::WriteImage(const char* filename,
   writer->Write();
   writer->Delete();
   w2i->Delete();
+}
+
+//-----------------------------------------------------------------------------
+int vtkSMRenderModuleProxy::GetServerRenderWindowSize(int size[2])
+{
+  if (!this->RenderWindowProxy)
+    {
+    return 0;
+    }
+  vtkSMIntVectorProperty* winSize =
+    vtkSMIntVectorProperty::SafeDownCast(
+      this->RenderWindowProxy->GetProperty("RenderWindowSizeInfo"));
+  if (!winSize)
+    {
+    return 0;
+    }
+  vtkTypeUInt32 servers =
+    this->RenderWindowProxy->GetServers();
+  this->RenderWindowProxy->SetServers(vtkProcessModule::RENDER_SERVER);
+  this->RenderWindowProxy->UpdatePropertyInformation(winSize);
+  this->RenderWindowProxy->SetServers(servers);
+  size[0] = winSize->GetElement(0);
+  size[1] = winSize->GetElement(1);
+  
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
