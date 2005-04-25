@@ -59,7 +59,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.435");
+vtkCxxRevisionMacro(vtkPVSource, "1.436");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -1211,6 +1211,13 @@ void vtkPVSource::CleanupDisplays()
         {
         proxm->UnRegisterProxy("animateable", proxyName);
         }
+
+      proxyName = 
+        proxm->GetProxyName("displays", this->DisplayProxy);
+      if (proxyName)
+        {
+        proxm->UnRegisterProxy("displays", proxyName);
+        }
       }
     this->RemoveDisplayFromRenderModule(this->DisplayProxy);
     this->SetDisplayProxy(0);
@@ -1232,9 +1239,17 @@ void vtkPVSource::CleanupDisplays()
 //----------------------------------------------------------------------------
 void vtkPVSource::SetupDisplays()
 {
+  vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+  
   // Create the display and add it to the render module.
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
   vtkSMDisplayProxy* pDisp = rm->CreateDisplayProxy();
+
+  // register display proxy with pxm.
+  ostrstream str;
+  str << this->GetName() << ".Display" << ends;
+  proxm->RegisterProxy("displays", str.str(), pDisp);
+  str.rdbuf()->freeze(0);
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     pDisp->GetProperty("Input"));
@@ -1251,7 +1266,6 @@ void vtkPVSource::SetupDisplays()
     }
   else
     {
-    vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
     ostrstream animName_with_warning_C4701;
     animName_with_warning_C4701 << this->GetSourceList() << "." 
       << this->GetName() << "."
