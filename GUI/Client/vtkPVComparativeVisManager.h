@@ -38,6 +38,8 @@ public:
 
   void Process();
 
+  void SetNumberOfParameterValues(unsigned int idx, unsigned int numValues);
+
 protected:
   vtkPVComparativeVisManager();
   ~vtkPVComparativeVisManager();

@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.4");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.5");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -132,22 +132,6 @@ void vtkPVComparativeVisManager::TraverseAllCues()
 
   this->TraverseCue(interface->GetParentTree());
 
-  unsigned int numCues = this->Internal->Cues.size();
-  this->Internal->NumberOfParameterValues.resize(numCues);
-  unsigned int numParams=1;
-  unsigned int i;
-  int num=4;
-  for(i=0; i<numCues; i++)
-    {
-    this->Internal->NumberOfParameterValues[i] = num;
-    numParams *= num;
-    num--;
-    if (num == 0)
-      {
-      break;
-      }
-    }
-
   this->Internal->Caches.clear();
   this->Internal->Displays.clear();
   this->Internal->Bounds.clear();
@@ -210,6 +194,22 @@ void vtkPVComparativeVisManager::Process()
   this->PlayOne(0);
 
   this->ConnectAllGeometry();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVComparativeVisManager::SetNumberOfParameterValues(
+  unsigned int idx, unsigned int numValues)
+{
+  unsigned int prevSize = this->Internal->NumberOfParameterValues.size();
+  if (idx >= prevSize)
+    {
+    this->Internal->NumberOfParameterValues.resize(idx+1);
+    for (unsigned int i=prevSize; i<idx; i++)
+      {
+      this->Internal->NumberOfParameterValues[i] = 1;
+      }
+    }
+  this->Internal->NumberOfParameterValues[idx] = numValues;
 }
 
 //-----------------------------------------------------------------------------
@@ -412,9 +412,8 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
   vtkSMRenderModuleProxy* ren =
     this->Application->GetRenderModuleProxy();
 
-  ren->UpdateInformation();
-  vtkSMIntVectorProperty* winSize =
-    vtkSMIntVectorProperty::SafeDownCast(ren->GetProperty("RenderWindowSizeInfo"));
+  int winSize[2];
+  ren->GetServerRenderWindowSize(winSize);
 
   double biggestBounds[6] = {VTK_DOUBLE_MAX, VTK_DOUBLE_MIN, 
                              VTK_DOUBLE_MAX, VTK_DOUBLE_MIN,
@@ -430,10 +429,8 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
   int ny = this->Internal->NumberOfParameterValues[1];
   double dataWidth = biggestBounds[1] - biggestBounds[0];
   double dataHeight = biggestBounds[3] - biggestBounds[2];
-  double displayWidth = 
-    winSize->GetElement(0) / (double)nx;
-  double displayHeight = 
-    winSize->GetElement(1) / (double)ny;
+  double displayWidth = winSize[0] / (double)nx;
+  double displayHeight = winSize[1] / (double)ny;
   double aspectRatio = displayHeight / displayWidth;
   double cellSpacing[2];
   double bb[4];
@@ -456,6 +453,8 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
   vtkSMProxyManager* proxMan = vtkSMProxyManager::GetProxyManager();
   vtkSMProxy* multiActorHelper = 
     proxMan->NewProxy("ComparativeVisHelpers", "MultiActorHelper");
+  multiActorHelper->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   vtkSMProxyProperty* actorsP = vtkSMProxyProperty::SafeDownCast(
     multiActorHelper->GetProperty("Actors"));
 
@@ -568,11 +567,8 @@ void vtkPVComparativeVisManager::ConnectAllGeometry()
       planeU->Delete();
       }
     }
-  //multiActorHelper->UpdateVTKObjects();
-  vtkSMDoubleVectorProperty* us = vtkSMDoubleVectorProperty::SafeDownCast(
-    multiActorHelper->GetProperty("UniformScale"));
-  us->SetElement(0, 1.2);
-  //multiActorHelper->UpdateVTKObjects();
+  
+  this->IStyle->SetHelperProxy(multiActorHelper);
   multiActorHelper->Delete();
 
   vtkSMDoubleVectorProperty* position = 
