@@ -684,6 +684,15 @@
     <AnimationSceneProxy name="AnimationScene" class="notused">
       <!-- No server side objects created. All properties are updateself -->
       <IntVectorProperty
+        name="AnimatedElement"
+        command="SetAnimatedElement"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <!-- TODO: get rid of this property -->
+      </IntVectorProperty>
+      
+      <IntVectorProperty
          name="TimeMode"
          command="SetTimeMode"
          number_of_elements="1" 
