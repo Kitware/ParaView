@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.688");
+vtkCxxRevisionMacro(vtkPVWindow, "1.689");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1558,6 +1558,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   
   // Lets see if this works.
   this->Script("pack %s -side right -anchor se", this->ToolbarMenuButton->GetWidgetName());
+
+  if ( ! this->TimerLogDisplay )
+    {
+    this->TimerLogDisplay = vtkPVTimerLogDisplay::New();
+    this->TimerLogDisplay->SetTitle("Performance Log");
+    this->TimerLogDisplay->SetMasterWindow(this);
+    this->TimerLogDisplay->Create(this->GetPVApplication());
+    }
+  
 }
 
 //----------------------------------------------------------------------------
@@ -3897,14 +3906,6 @@ vtkPVApplication *vtkPVWindow::GetPVApplication()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ShowTimerLog()
 {
-  if ( ! this->TimerLogDisplay )
-    {
-    this->TimerLogDisplay = vtkPVTimerLogDisplay::New();
-    this->TimerLogDisplay->SetTitle("Performance Log");
-    this->TimerLogDisplay->SetMasterWindow(this);
-    this->TimerLogDisplay->Create(this->GetPVApplication());
-    }
-  
   this->TimerLogDisplay->Display();
 }
 
