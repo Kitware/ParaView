@@ -73,16 +73,16 @@ public:
   // PVSource calls this when it gets modified.
   virtual void InvalidateGeometry();
 
-protected:
-  vtkSMCubeAxesDisplayProxy();
-  ~vtkSMCubeAxesDisplayProxy();
-  
   // Description:
   // Calls MarkConsumersAsModified() on all consumers. Sub-classes
   // should add their functionality and call this.
   // Overridden to clean up cached geometry as well. 
   virtual void MarkConsumersAsModified(); 
 
+protected:
+  vtkSMCubeAxesDisplayProxy();
+  ~vtkSMCubeAxesDisplayProxy();
+  
   virtual void RemoveAllCaches();
   int NumberOfCaches;
   double **Caches;

@@ -95,16 +95,15 @@ public:
   // onProxy.
   void SetInputAsGeometryFilter(vtkSMProxy* onProxy);
 
-protected:
-  vtkSMSimpleDisplayProxy();
-  ~vtkSMSimpleDisplayProxy();
- 
   // Description:
   // Calls MarkConsumersAsModified() on all consumers. Sub-classes
   // should add their functionality and call this.
   // Overridden to clean up cached geometry as well. 
   virtual void MarkConsumersAsModified(); 
 
+protected:
+  vtkSMSimpleDisplayProxy();
+  ~vtkSMSimpleDisplayProxy();
 
   virtual void SetInputInternal(vtkSMSourceProxy* input);
 

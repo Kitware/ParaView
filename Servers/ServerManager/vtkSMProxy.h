@@ -258,6 +258,10 @@ public:
   virtual void DeepCopy(vtkSMProxy* src, const char* exceptionClass);
   virtual void DeepCopy(vtkSMProxy* src);
 
+  // Description:
+  // Calls MarkConsumersAsModified() on all consumers. Sub-classes
+  // should add their functionality and call this.
+  virtual void MarkConsumersAsModified();
 
 protected:
   vtkSMProxy();
@@ -424,11 +428,6 @@ protected:
   // Description:
   // Remove all consumers.
   void RemoveAllConsumers();
-
-  // Description:
-  // Calls MarkConsumersAsModified() on all consumers. Sub-classes
-  // should add their functionality and call this.
-  virtual void MarkConsumersAsModified();
 
   // Description:
   // Creates a new proxy and initializes it by calling ReadXMLAttributes()

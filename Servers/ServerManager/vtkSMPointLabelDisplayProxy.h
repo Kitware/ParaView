@@ -66,7 +66,11 @@ public:
   // TODO: I have to find a means to get rid of this!!
   vtkUnstructuredGrid* GetCollectedData();
   //ETX
-   
+  
+  // Description:
+  // Calls MarkConsumersAsModified() on all consumers. Sub-classes
+  // should add their functionality and call this.
+  virtual void MarkConsumersAsModified();
 protected:
   vtkSMPointLabelDisplayProxy();
   ~vtkSMPointLabelDisplayProxy();
@@ -74,7 +78,6 @@ protected:
   void SetupPipeline();
   void SetupDefaults();
 
-  virtual void MarkConsumersAsModified();
   virtual void CreateVTKObjects(int numObjects);
 
   vtkSMProxy* CollectProxy;

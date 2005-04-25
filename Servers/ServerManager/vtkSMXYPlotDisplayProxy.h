@@ -73,14 +73,15 @@ public:
   // Marks for Update.
   virtual void InvalidateGeometry();
 
-protected:
-  vtkSMXYPlotDisplayProxy();
-  ~vtkSMXYPlotDisplayProxy();
   // Description:
   // Calls MarkConsumersAsModified() on all consumers. Sub-classes
   // should add their functionality and call this.
   // Overridden to clean up cached geometry as well. 
   virtual void MarkConsumersAsModified();
+
+protected:
+  vtkSMXYPlotDisplayProxy();
+  ~vtkSMXYPlotDisplayProxy();
   
   virtual void CreateVTKObjects(int numObjects);
 
