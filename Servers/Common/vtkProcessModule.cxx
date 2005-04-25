@@ -45,7 +45,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.21");
+vtkCxxRevisionMacro(vtkProcessModule, "1.22");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -302,22 +302,24 @@ void vtkProcessModule::DeleteStreamObject(
 }
 
 //----------------------------------------------------------------------------
-const vtkClientServerStream& vtkProcessModule::GetLastResult(vtkTypeUInt32 server)
+const vtkClientServerStream& vtkProcessModule::GetLastResult(
+  vtkTypeUInt32 server)
 {
-  switch(server)
+  vtkTypeUInt32 sendflag = this->CreateSendFlag(server);
+  if(sendflag & CLIENT)
     {
-    case DATA_SERVER:
-    case DATA_SERVER_ROOT:
-      return this->GetLastDataServerResult();
-      break;
-    case RENDER_SERVER:
-    case RENDER_SERVER_ROOT:
-      return this->GetLastRenderServerResult();
-      break;
-    case CLIENT:
-      return this->GetLastClientResult();
+    return this->GetLastClientResult();
     }
-  vtkWarningMacro("GetLastResult called with a bad server flag returning CLIENT result");
+  if((sendflag & DATA_SERVER) || (sendflag & DATA_SERVER_ROOT))
+    {
+    return this->GetLastDataServerResult();
+    }
+  if((sendflag & RENDER_SERVER) || (sendflag & RENDER_SERVER_ROOT))
+    {
+    return this->GetLastRenderServerResult();
+    }
+  vtkWarningMacro("GetLastResult called with a bad server flag "
+                  "returning CLIENT result");
   return this->GetLastClientResult();
 }
 
