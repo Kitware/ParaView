@@ -1229,6 +1229,23 @@
          default_values="1">
         <DoubleRangeDomain name="range" min="0"/>
       </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Rotate"
+         command="Rotate"
+         number_of_elements="8" 
+         argument_is_array="1"
+         default_values="0 0 0 0 0 0 0 0">
+        <DoubleRangeDomain name="range" min="0"/>
+      </DoubleVectorProperty>
+
+      <DoubleVectorProperty
+         name="Pan"
+         command="Pan"
+         number_of_elements="2" 
+         default_values="0 0 0 0">
+        <DoubleRangeDomain name="range"/>
+      </DoubleVectorProperty>
     </Proxy>
   </ProxyGroup>
 
