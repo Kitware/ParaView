@@ -19,6 +19,9 @@
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMIntVectorProperty.h"
+#include "vtkSMProxy.h"
 #include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
 #include "vtkProp3D.h"
@@ -27,10 +30,11 @@
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkInteractorStyleTrackballMultiActor, "1.2");
+vtkCxxRevisionMacro(vtkInteractorStyleTrackballMultiActor, "1.3");
 vtkStandardNewMacro(vtkInteractorStyleTrackballMultiActor);
 
 vtkCxxSetObjectMacro(vtkInteractorStyleTrackballMultiActor,Application,vtkPVApplication);
+vtkCxxSetObjectMacro(vtkInteractorStyleTrackballMultiActor,HelperProxy,vtkSMProxy);
 
 //----------------------------------------------------------------------------
 vtkInteractorStyleTrackballMultiActor::vtkInteractorStyleTrackballMultiActor() 
@@ -38,12 +42,14 @@ vtkInteractorStyleTrackballMultiActor::vtkInteractorStyleTrackballMultiActor()
   this->MotionFactor    = 10.0;
   this->UseObjectCenter = 0;
   this->Application = 0;
+  this->HelperProxy = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkInteractorStyleTrackballMultiActor::~vtkInteractorStyleTrackballMultiActor() 
 {
   this->SetApplication(0);
+  this->SetHelperProxy(0);
 }
 
 //----------------------------------------------------------------------------
@@ -244,44 +250,39 @@ void vtkInteractorStyleTrackballMultiActor::Rotate()
     double oldXAngle = asin(oxf) * vtkMath::RadiansToDegrees();
     double oldYAngle = asin(oyf) * vtkMath::RadiansToDegrees();
     
-    double scale[3];
-    scale[0] = scale[1] = scale[2] = 1.0;
+    double rotate[8];
 
-    double **rotate = new double*[2];
-
-    rotate[0] = new double[4];
-    rotate[1] = new double[4];
+    rotate[0] = (newXAngle - oldXAngle)*6;
+    rotate[1] = view_up[0];
+    rotate[2] = view_up[1];
+    rotate[3] = view_up[2];
     
-    rotate[0][0] = (newXAngle - oldXAngle)*6;
-    rotate[0][1] = view_up[0];
-    rotate[0][2] = view_up[1];
-    rotate[0][3] = view_up[2];
-    
-    rotate[1][0] = (oldYAngle - newYAngle)*6;
-    rotate[1][1] = view_right[0];
-    rotate[1][2] = view_right[1];
-    rotate[1][3] = view_right[2];
+    rotate[4] = (oldYAngle - newYAngle)*6;
+    rotate[5] = view_right[0];
+    rotate[6] = view_right[1];
+    rotate[7] = view_right[2];
     
 
-    vtkCollectionSimpleIterator cookie;
-    vtkActorCollection* actors = this->CurrentRenderer->GetActors();
-    actors->InitTraversal(cookie);
-    vtkActor* actor=0;
-    while ((actor = actors->GetNextActor(cookie)))
+    if (this->HelperProxy)
       {
-      this->Prop3DTransform(actor, 2, rotate, scale);
+      vtkSMDoubleVectorProperty* rot = vtkSMDoubleVectorProperty::SafeDownCast(
+        this->HelperProxy->GetProperty("Rotate"));
+      for (unsigned int i=0; i<8; i++)
+        {
+        rot->SetElement(i,rotate[i]);
+        }
+      this->HelperProxy->UpdateVTKObjects();
       }
-    cout << "Rotating" << endl;
-    
-    delete [] rotate[0];
-    delete [] rotate[1];
-    delete [] rotate;
     
     if (this->AutoAdjustCameraClippingRange)
       {
       this->CurrentRenderer->ResetCameraClippingRange();
       }
-
+    if (this->AutoAdjustCameraClippingRange)
+      {
+      this->CurrentRenderer->ResetCameraClippingRange();
+      }
+    
     rwi->Render();
     }
 }
@@ -301,55 +302,31 @@ void vtkInteractorStyleTrackballMultiActor::Pan()
 
   vtkRenderWindowInteractor *rwi = this->Interactor;
   
-  vtkCollectionSimpleIterator cookie;
-  vtkActorCollection* actors = this->CurrentRenderer->GetActors();
-  actors->InitTraversal(cookie);
-  vtkActor* actor=0;
-  while ((actor=actors->GetNextActor(cookie)))
+  if (this->HelperProxy)
     {
-    // Use initial center as the origin from which to pan
-    
-    double *obj_center = actor->GetCenter();
+    double old_pick_point[3], new_pick_point[4];
+    double motion_vector[2];
 
-    double disp_obj_center[3], new_pick_point[4];
-    double old_pick_point[4], motion_vector[3];
-    
-    this->ComputeWorldToDisplay(obj_center[0], obj_center[1], obj_center[2], 
-                                disp_obj_center);
-    
     this->ComputeDisplayToWorld((double)rwi->GetEventPosition()[0], 
                                 (double)rwi->GetEventPosition()[1], 
-                                disp_obj_center[2],
+                                0,
                                 new_pick_point);
     
-    this->ComputeDisplayToWorld(double(rwi->GetLastEventPosition()[0]), 
-                                double(rwi->GetLastEventPosition()[1]), 
-                                disp_obj_center[2],
+    this->ComputeDisplayToWorld((double)rwi->GetLastEventPosition()[0], 
+                                (double)rwi->GetLastEventPosition()[1], 
+                                0,
                                 old_pick_point);
-    
+
     motion_vector[0] = new_pick_point[0] - old_pick_point[0];
     motion_vector[1] = new_pick_point[1] - old_pick_point[1];
-    motion_vector[2] = new_pick_point[2] - old_pick_point[2];
-    
-    if (actor->GetUserMatrix() != NULL)
-      {
-      vtkTransform *t = vtkTransform::New();
-      t->PostMultiply();
-      t->SetMatrix(actor->GetUserMatrix());
-      t->Translate(motion_vector[0], motion_vector[1], motion_vector[2]);
-      actor->GetUserMatrix()->DeepCopy(t->GetMatrix());
-      t->Delete();
-      }
-    else
-      {
-      actor->AddPosition(motion_vector[0],
-                         motion_vector[1],
-                         motion_vector[2]);
-      }
+
+    vtkSMDoubleVectorProperty* pan = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->HelperProxy->GetProperty("Pan"));
+    pan->SetElement(0, motion_vector[0]);
+    pan->SetElement(1, motion_vector[1]);
+    this->HelperProxy->UpdateVTKObjects();
     }
-
-  cout << "Panning" << endl;
-
+    
   if (this->AutoAdjustCameraClippingRange)
     {
     this->CurrentRenderer->ResetCameraClippingRange();
@@ -380,26 +357,21 @@ void vtkInteractorStyleTrackballMultiActor::UniformScale()
   double yf = (double)dy / (double)center[1] * this->MotionFactor;
   double scaleFactor = pow((double)1.1, yf);
   
-  double **rotate = NULL;
-  
   double scale[3];
   scale[0] = scale[1] = scale[2] = scaleFactor;
-  
-  vtkCollectionSimpleIterator cookie;
-  vtkActorCollection* actors = this->CurrentRenderer->GetActors();
-  actors->InitTraversal(cookie);
-  vtkActor* actor=0;
-  while ((actor=actors->GetNextActor(cookie)))
+
+  if (this->HelperProxy)
     {
-    this->Prop3DTransform(actor, 0, rotate, scale);
+    vtkSMDoubleVectorProperty* us = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->HelperProxy->GetProperty("UniformScale"));
+    us->SetElement(0, scaleFactor);
+    this->HelperProxy->UpdateVTKObjects();
     }
-  
   if (this->AutoAdjustCameraClippingRange)
     {
     this->CurrentRenderer->ResetCameraClippingRange();
     }
 
-  cout << "Scaling" << endl;
   rwi->Render();
 }
 
