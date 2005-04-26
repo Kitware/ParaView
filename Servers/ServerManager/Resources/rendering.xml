@@ -1105,6 +1105,13 @@
         </EnumerationDomain>
       </IntVectorProperty>
       <ProxyProperty
+        name="GrayTransferFunction"
+        command="SetColor">
+        <ProxyGroupDomain name="groups">
+          <Group name="piecewise_functions" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <ProxyProperty
         name="ColorTransferFunction"
         command="SetColor">
         <ProxyGroupDomain name="groups">
