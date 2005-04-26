@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.55");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.56");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -725,6 +725,16 @@ void vtkPVImplicitPlaneWidget::Create(vtkKWApplication *app)
   pm->RegisterProxy("implicit_functions",str.str(),this->ImplicitFunctionProxy);
   delete[] str.str();
   this->SetupPropertyObservers();
+  // Set up controller properties. Controller properties are set so 
+  // that in the SM State, we can have a mapping from the widget to the 
+  // controlled implicit function.
+  vtkSMProperty* p = this->ImplicitFunctionProxy->GetProperty("Origin");
+  p->SetControllerProxy(this->WidgetProxy);
+  p->SetControllerProperty(this->WidgetProxy->GetProperty("Center"));
+
+  p = this->ImplicitFunctionProxy->GetProperty("Normal");
+  p->SetControllerProxy(this->WidgetProxy);
+  p->SetControllerProperty(this->WidgetProxy->GetProperty("Normal"));
 }
 
 //----------------------------------------------------------------------------

@@ -37,6 +37,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Overridden to set up control dependencies among properties.
+  virtual void Create(vtkKWApplication* app);
+
+  // Description:
   // Callbacks to set the points of the 3D widget from the
   // entry values. Bound to <KeyPress-Return>.
   void SetPoint1();

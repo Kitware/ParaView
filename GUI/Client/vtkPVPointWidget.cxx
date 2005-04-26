@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.49");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.50");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -198,6 +198,18 @@ void vtkPVPointWidget::Trace(ofstream *file)
         << this->PositionEntry[0]->GetValue() << " "
         << this->PositionEntry[1]->GetValue() << " "
         << this->PositionEntry[2]->GetValue() << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPointWidget::Create(vtkKWApplication* app)
+{
+  this->Superclass::Create(app);
+
+  vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
+  const char* variablename = (this->VariableName)? this->VariableName : "Position";
+  vtkSMProperty* p = sproxy->GetProperty(variablename);
+  p->SetControllerProxy(this->WidgetProxy);
+  p->SetControllerProperty(this->WidgetProxy->GetProperty("Position"));
 }
 
 //----------------------------------------------------------------------------

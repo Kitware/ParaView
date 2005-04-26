@@ -25,13 +25,12 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSubPropertyIterator.h"
 #include "vtkSmartPointer.h"
-#include "vtkSMProxyManager.h"
 #include <vtkstd/vector>
 
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.30");
+vtkCxxRevisionMacro(vtkSMProperty, "1.31");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -393,15 +392,12 @@ void vtkSMProperty::SaveState(const char* name, ostream* file, vtkIndent indent)
 {
   if (this->ControllerProxy && this->ControllerProperty)
     {
-    vtkSMProxyManager *pxm = this->GetProxyManager();
-    //NOTE: this operation is slow :(.
-    const char* cname = pxm->GetProxyName(this->ControllerProxy->GetXMLGroup(),this->ControllerProxy);
-    if (cname)
-      {
+    ostrstream str;
+    str << "pvTemp" << this->ControllerProxy->GetSelfID() << ends;
     *file << "    <ControllerProperty name=\""
-      << cname << "." << this->ControllerProperty->GetXMLName() 
+      << str.str() << "." << this->ControllerProperty->GetXMLName() 
       << "\" />" << endl;
-      }
+    str.rdbuf()->freeze(0);
     }
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())

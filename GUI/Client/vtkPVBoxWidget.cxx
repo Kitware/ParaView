@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.54");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -588,46 +588,32 @@ void vtkPVBoxWidget::Create( vtkKWApplication *app)
   str1 << "vtkPVBoxWidget_Box" << instanceCount << ends;
   pm->RegisterProxy("implicit_functions", str1.str(), this->BoxProxy);
   delete[] str1.str();
-  /*
-  if (this->PVSource)
-    {
-    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
-    if (sproxy)
-      {
-      const char* root = pm->GetProxyName("animateable", sproxy);
-      if (root)
-        {
-        ostrstream animName;
-        animName << root << ".Box" << ends;
-        pm->RegisterProxy("animateable", animName.str(), this->BoxProxy);
-        delete[] animName.str();
-        }
-      }
-    }
-  */
+
   this->BoxTransformProxy = pm->NewProxy("transforms", "Transform2");
   ostrstream str2;
   str2 << "vtkPVBoxWidget_BoxTransform" << instanceCount << ends;
   pm->RegisterProxy("transforms", str2.str(), this->BoxTransformProxy);
   delete[] str2.str();
-/*  if (this->PVSource)
-    {
-    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
-    if (sproxy)
-      {
-      const char* root = pm->GetProxyName("animateable", sproxy);
-      if (root)
-        {
-        ostrstream animName;
-        animName << root << ".BoxTransform" << ends;
-        pm->RegisterProxy(
-          "animateable", animName.str(), this->BoxTransformProxy);
-        delete[] animName.str();
-        }
-      }
-    }
-    */
+
   this->SetupPropertyObservers();
+
+  // Set up controller properties. Controller properties are set so 
+  // that in the SM State, we can have a mapping from the widget to the 
+  // controlled implicit function.
+  const char* properties[] = { "Rotation", "Scale", "Position", 0 };
+  int i;
+  for (i=0; properties[i] != 0 ; i++)
+    {
+    vtkSMProperty* pbox = this->BoxProxy->GetProperty(properties[i]);
+    pbox->SetControllerProxy(this->WidgetProxy);
+    pbox->SetControllerProperty(this->WidgetProxy->GetProperty(properties[i]));
+    
+    vtkSMProperty* ptrans = this->BoxTransformProxy->GetProperty(properties[i]);
+    ptrans->SetControllerProxy(this->WidgetProxy);
+    ptrans->SetControllerProperty(this->WidgetProxy->GetProperty(properties[i]));
+    }
+  
+  
   instanceCount++;
 }
 
