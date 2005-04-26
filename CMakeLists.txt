@@ -141,7 +141,13 @@ SET(PARAVIEW_BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS}")
 
 SET(CXX_TEST_PATH ${EXECUTABLE_OUTPUT_PATH})
 
-INCLUDE_DIRECTORIES(${ParaView_BINARY_DIR})
+INCLUDE_DIRECTORIES(
+  # For vtkPVConfig.h.
+  ${ParaView_BINARY_DIR}
+
+  # For possible use of internal/stdio_core.h SGI workaround.
+  ${ParaView_BINARY_DIR}/VTK/Utilities
+  )
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
   ${ParaView_BINARY_DIR}/vtkPVConfig.h
   ESCAPE_QUOTES)
@@ -644,11 +650,3 @@ IF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
     ENDFOREACH(ldir)
   ENDIF(NOT WIN32)
 ENDIF(BUILD_SHARED_LIBS AND CMAKE_SKIP_RPATH)
-
-#########################################################################
-# DISABLING UNTIL A TRY-COMPILE CAN DETERMINE IF IT IS SAFE
-# See internal_stdio_core.h.in for explanation.
-#CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/internal_stdio_core.h.in
-#               ${ParaView_BINARY_DIR}/internal/stdio_core.h
-#               @ONLY IMMEDIATE)
-
