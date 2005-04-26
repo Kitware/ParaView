@@ -26,7 +26,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.3");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -104,6 +104,10 @@ void vtkSMCompositeRenderModuleProxy::InitializeCompositingPipeline()
     }
   pp->RemoveAllProxies();
   pp->AddProxy(this->RenderWindowProxy);
+
+  // Update the server process so that the render window is set before
+  // we initialize offscreen rendering.
+  this->CompositeManagerProxy->UpdateVTKObjects();
 
   if (getenv("PV_DISABLE_COMPOSITE_INTERRUPTS"))
     {
