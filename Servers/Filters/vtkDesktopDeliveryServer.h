@@ -57,8 +57,6 @@ public:
   // processes.
   virtual void SetParallelRenderManager(vtkParallelRenderManager *prm);
   vtkGetObjectMacro(ParallelRenderManager, vtkParallelRenderManager);
-  void SetRenderManger(vtkParallelRenderManager* rm) 
-    {this->SetParallelRenderManager(rm);}
 
   virtual void SetRenderWindow(vtkRenderWindow *renWin);
 
