@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.30");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.31");
 
 
 //----------------------------------------------------------------------------
@@ -335,12 +335,24 @@ void vtkPVClientServerModule::Initialize()
       // whether to allow compositing / rendering on the server.
       // This might better be handled in the render module initialize method.
       // Find out if the server supports compositing.
+      {
       vtkPVServerInformation* serverInfo = vtkPVServerInformation::New();
       this->GatherInformation(serverInfo, this->GetProcessModuleID());
       this->ServerInformation->AddInformation(serverInfo);
       serverInfo->Delete();
       serverInfo = NULL;
-      
+      }
+
+      // If using a separate render-server then get its options too.
+      if(this->Options->GetClientMode() && this->Options->GetRenderServerMode())
+        {
+        vtkPVServerInformation* serverInfo = vtkPVServerInformation::New();
+        this->GatherInformationRenderServer(serverInfo, this->GetProcessModuleID());
+        this->ServerInformation->AddInformation(serverInfo);
+        serverInfo->Delete();
+        serverInfo = NULL;
+        }
+
       this->ReturnValue = this->GUIHelper->
         RunGUIStart(this->ArgumentCount, this->Arguments, numServerProcs, myId);
       }
