@@ -110,7 +110,7 @@
          command="SetNormal"
          number_of_elements="3"
          default_values="0.0 0.0 1.0" >
-         <DoubleRangeDomain name="range" min="-1.0 -1.0 -1.0" max="0.0 0.0 0.0"/>
+         <DoubleRangeDomain name="range"/>
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
