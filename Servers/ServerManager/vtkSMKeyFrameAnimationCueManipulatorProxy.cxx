@@ -20,7 +20,7 @@
 #include "vtkClientServerID.h"
 
 #include <vtkstd/vector>
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.8");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -422,4 +422,6 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::PrintSelf(ostream& os,
   vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "LastAddedKeyFrameIndex: " << this->LastAddedKeyFrameIndex
+    << endl;
 }

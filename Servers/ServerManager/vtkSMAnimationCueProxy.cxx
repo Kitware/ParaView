@@ -23,7 +23,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.5");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -395,4 +395,5 @@ void vtkSMAnimationCueProxy::PrintSelf(ostream& os, vtkIndent indent)
     ((this->AnimatedDomainName)? this->AnimatedDomainName : "NULL") << endl;
   os << indent << "AnimationCue: " << this->AnimationCue << endl;
   os << indent << "Manipulator: " << this->Manipulator << endl;
+  os << indent << "Caching: " << this->Caching << endl;
 }

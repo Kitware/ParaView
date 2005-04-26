@@ -30,7 +30,7 @@
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkInteractorStyleTrackballMultiActor, "1.3");
+vtkCxxRevisionMacro(vtkInteractorStyleTrackballMultiActor, "1.4");
 vtkStandardNewMacro(vtkInteractorStyleTrackballMultiActor);
 
 vtkCxxSetObjectMacro(vtkInteractorStyleTrackballMultiActor,Application,vtkPVApplication);
@@ -381,6 +381,7 @@ void vtkInteractorStyleTrackballMultiActor::PrintSelf(ostream& os, vtkIndent ind
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Application: " << this->Application << endl;
   os << indent << "UseObjectCenter: " << this->UseObjectCenter << endl;
+  os << indent << "HelperProxy: " << this->HelperProxy << endl;
 }
 
 //----------------------------------------------------------------------------
