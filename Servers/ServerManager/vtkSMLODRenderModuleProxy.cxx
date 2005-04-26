@@ -59,7 +59,7 @@ protected:
 
 //*****************************************************************************
 vtkStandardNewMacro(vtkSMLODRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMLODRenderModuleProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMLODRenderModuleProxy::vtkSMLODRenderModuleProxy()
 {
@@ -96,14 +96,13 @@ void vtkSMLODRenderModuleProxy::AddDisplay(vtkSMDisplayProxy* disp)
 //-----------------------------------------------------------------------------
 void vtkSMLODRenderModuleProxy::RemoveDisplay(vtkSMDisplayProxy* disp)
 {
-  this->Superclass::RemoveDisplay(disp);
-
   vtkSMLODDisplayProxy* pDisp = vtkSMLODDisplayProxy::SafeDownCast(disp);
-  if (!pDisp)
+  if (pDisp)
     {
-    return;
+    pDisp->RemoveObserver(this->Observer);
     }
-  pDisp->RemoveObserver(this->Observer);
+
+  this->Superclass::RemoveDisplay(disp);
 }
 //-----------------------------------------------------------------------------
 vtkSMDisplayProxy* vtkSMLODRenderModuleProxy::CreateDisplayProxy()
