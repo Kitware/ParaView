@@ -29,7 +29,7 @@
 #include "vtkPVWindow.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.33");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -112,6 +112,18 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
 
   // Call the superclass to create the widget and set the appropriate flags
   this->Superclass::Create(app);
+
+  // Set up controller properties. Controller properties are set so 
+  // that in the SM State, we can have a mapping from the widget to the 
+  // controlled implicit function.
+  vtkSMProperty* p = this->SourceProxy->GetProperty("Point1");
+  p->SetControllerProxy(this->WidgetProxy);
+  p->SetControllerProperty(this->WidgetProxy->GetProperty("Point1"));
+
+  p = this->SourceProxy->GetProperty("Point2");
+  p->SetControllerProxy(this->WidgetProxy);
+  p->SetControllerProperty(this->WidgetProxy->GetProperty("Point2"));
+  
 }
 
 //----------------------------------------------------------------------------

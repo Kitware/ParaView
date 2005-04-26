@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.67");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.68");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -471,17 +471,21 @@ void vtkPVLineWidget::Create(vtkKWApplication* app)
   // Set up controller properties. Controller properties are set so 
   // that in the SM State, we can have a mapping from the widget to the 
   // controlled implicit function.
-  const char* variablename = (this->Point1Variable)? 
-    this->Point1Variable : "Point1";
-  vtkSMProperty* p = 
-    this->GetPVSource()->GetProxy()->GetProperty(variablename);
-  p->SetControllerProxy(this->WidgetProxy);
-  p->SetControllerProperty(this->WidgetProxy->GetProperty("Point1"));
+  if (this->Point1Variable)
+    {
+    vtkSMProperty* p = 
+      this->GetPVSource()->GetProxy()->GetProperty(this->Point1Variable);
+    p->SetControllerProxy(this->WidgetProxy);
+    p->SetControllerProperty(this->WidgetProxy->GetProperty("Point1"));
+    }
 
-  variablename = (this->Point2Variable)? this->Point2Variable : "Point2";
-  p = this->GetPVSource()->GetProxy()->GetProperty(variablename);
-  p->SetControllerProxy(this->WidgetProxy);
-  p->SetControllerProperty(this->WidgetProxy->GetProperty("Point2"));
+  if (this->Point2Variable)
+    {
+    vtkSMProperty* p = 
+      this->GetPVSource()->GetProxy()->GetProperty(this->Point2Variable);
+    p->SetControllerProxy(this->WidgetProxy);
+    p->SetControllerProperty(this->WidgetProxy->GetProperty("Point2"));
+    }
   // There is no need to set up control dependency for resolution.
 }
 

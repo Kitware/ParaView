@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.46");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.47");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -257,6 +257,12 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
     this->Script("pack %s -side top -fill both -expand true",
       this->NumberOfPointsWidget->GetWidgetName());
     }
+  // Set up controller properties. Controller properties are set so 
+  // that in the SM State, we can have a mapping from the widget to the 
+  // controlled implicit function.
+  vtkSMProperty* p = this->SourceProxy->GetProperty("Center");
+  p->SetControllerProxy(this->WidgetProxy);
+  p->SetControllerProperty(this->WidgetProxy->GetProperty("Position"));
 
   this->ModifiedCallback();
 }

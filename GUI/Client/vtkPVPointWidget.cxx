@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.50");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.51");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -204,12 +204,16 @@ void vtkPVPointWidget::Trace(ofstream *file)
 void vtkPVPointWidget::Create(vtkKWApplication* app)
 {
   this->Superclass::Create(app);
-
+  // Set up controller properties. Controller properties are set so 
+  // that in the SM State, we can have a mapping from the widget to the 
+  // controlled implicit function.
   vtkSMSourceProxy* sproxy = this->GetPVSource()->GetProxy();
-  const char* variablename = (this->VariableName)? this->VariableName : "Position";
-  vtkSMProperty* p = sproxy->GetProperty(variablename);
-  p->SetControllerProxy(this->WidgetProxy);
-  p->SetControllerProperty(this->WidgetProxy->GetProperty("Position"));
+  if (this->VariableName)
+    {
+    vtkSMProperty* p = sproxy->GetProperty(this->VariableName);
+    p->SetControllerProxy(this->WidgetProxy);
+    p->SetControllerProperty(this->WidgetProxy->GetProperty("Position"));
+    }
 }
 
 //----------------------------------------------------------------------------
