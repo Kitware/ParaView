@@ -20,22 +20,30 @@
 // binary file describes a part of the dataset. However, if only a single
 // binary file describes the whole dataset, it is possible to load it directly
 // without using a case file.
+//
 // The reader supports both Spy dataset types: flat mesh and AMR
 // (Adaptive Mesh Refinement).
+//
 // It has parallel capabilities. Each processor is supposed to have access
 // to the case file and to all the binary files. All the binary files
 // have to be coherent: they describe the same fields of data.
 // Each binary file may content multiple time stamp. The time stamp to read is
 // specified with SetTimestamp().
 //
+// In parallel mode, there are two ways to distribute data over processors
+// (controlled by SetDistributeFiles() ):
+// - either by distributing blocks: all processors read all the files, but
+// only some number of blocks per files. Hence, load balancing is good even if
+// there is only one file.
+// - or by distributing files: a file is read entirely by one processor. If
+// there is only one file, all the other processors are not used at all.
+//
 // .SECTION Implementation Details
 // - All processors read the first binary file listed in the case file to get
 // informations about the fields.
-// - All processors read all the files, but only some number of blocks per
-// files. Hence, load balancing is good even if there is only one file
-// (contrary to a method that would distribute files instead of blocks)
 // - Each block of data is already surrounded by ghost cells in the file,
-// even on part of the block that don't have actual neighbor cells.
+// even on part of the block that don't have actual neighbor cells. The
+// reader removes those wrong ghost cells.
 // - Each time step contains all the cell array name variables
 
 #ifndef __vtkSpyPlotReader_h
@@ -68,7 +76,17 @@ public:
   // given in seconds.
   vtkSetMacro(TimeStep, int);
   vtkGetMacro(TimeStep, int);
-
+  
+  // Description:
+  // If true, the reader distributes files over processors. If false,
+  // the reader distributes blocks over processors. Default is false.
+  // Distributing blocks should provide a better load balancing:
+  // if there is only one file and several processors, only the first
+  // processor is used in the case of the file-distributed method.
+  vtkSetMacro(DistributeFiles,int);
+  vtkGetMacro(DistributeFiles,int);
+  vtkBooleanMacro(DistributeFiles,int);
+  
   // Description:
   // Get the time step range.
   vtkGetVector2Macro(TimeStepRange, int);
@@ -173,6 +191,8 @@ protected:
   // id 0.
   int GetParentProcessor(int proc);
   int GetLeftChildProcessor(int proc);
+  
+  int DistributeFiles;
   
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.

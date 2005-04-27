@@ -45,7 +45,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.7");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.8");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -79,6 +79,260 @@ public:
     this->Files.erase(this->Files.begin(),end);
     }
 };
+
+//-----------------------------------------------------------------------------
+class vtkBlockIterator
+{
+public:
+  // Description:
+  // Initialize the iterator with informations about processors,
+  // files and timestep.
+  virtual void Init(int numberOfProcessors,
+                    int processorId,
+                    vtkSpyPlotReaderMap *fileMap,
+                    int currentTimeStep)
+    {
+      assert("pre: fileMap_exists" && fileMap!=0);
+      
+      this->NumberOfProcessors=numberOfProcessors;
+      this->ProcessorId=processorId;
+      this->FileMap=fileMap;
+      this->CurrentTimeStep=currentTimeStep;
+      this->NumberOfFiles=this->FileMap->Files.size();
+    }
+  
+  // Description:
+  // Go to first block if any.
+  virtual void Start()=0;
+  
+  // Description:
+  // Is there no block at current position?
+  int IsOff()
+    {
+      return this->Off;
+    }
+  
+  // Description:
+  // Go to the next block if any
+  // \pre not_is_off: !IsOff()
+  void Next()
+    {
+      assert("pre: not_is_off" && !IsOff() );
+      
+      ++this->Block;
+      if(this->Block>this->BlockEnd)
+        {
+        ++this->FileIterator;
+        ++this->FileIndex;
+        this->FindFirstBlockOfCurrentOrNextFile();
+        }
+    }
+  
+  // Description:
+  // Return the block at current position.
+  // \pre not_is_off: !IsOff()
+  int GetBlock()
+    {
+      assert("pre: not_is_off" && !IsOff() );
+      return this->Block;
+    }
+  
+  // Description:
+  // Return the number of fields at current position.
+  // \pre not_is_off: !IsOff()
+  int GetNumberOfFields()
+    {
+      assert("pre: not_is_off" && !IsOff() );
+      return this->NumberOfFields;
+    }
+  
+  // Description:
+  // Return the SPCTH API handle at current position.
+  // \pre not_is_off: !IsOff()
+  SPCTH *GetSpcth()
+    {
+      assert("pre: not_is_off" && !IsOff() );
+      return this->Spcth;
+    }
+  
+protected:
+  virtual void FindFirstBlockOfCurrentOrNextFile()=0;
+  
+  int NumberOfProcessors;
+  int ProcessorId;
+  vtkSpyPlotReaderMap *FileMap;
+  int CurrentTimeStep;
+  
+  int NumberOfFiles;
+  
+  int Off;
+  int Block;
+  int NumberOfFields;
+  SPCTH *Spcth;
+  
+  vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator FileIterator;
+  int FileIndex;
+  
+  int BlockEnd;
+};
+
+class vtkBlockDistributionBlockIterator
+  : public vtkBlockIterator
+{
+public:
+  vtkBlockDistributionBlockIterator() {}
+  virtual ~vtkBlockDistributionBlockIterator() {}
+  
+  virtual void Start()
+    {
+      this->FileIterator=this->FileMap->Files.begin();
+      this->FileIndex=0;
+      this->FindFirstBlockOfCurrentOrNextFile();
+    }
+  
+protected:
+  virtual void FindFirstBlockOfCurrentOrNextFile()
+    {
+      this->Off=this->FileIndex>=this->NumberOfFiles;
+      int found=0;
+      while(!this->Off && !found)
+        {
+        const char *fname=this->FileIterator->first.c_str();
+        this->Spcth=this->FileIterator->second;
+        spcth_openSpyFile(this->Spcth,fname);
+        spcth_setTimeStep(this->Spcth,
+                          spcth_getTimeStepValue(this->Spcth,
+                                                 this->CurrentTimeStep));
+        
+        this->NumberOfFields=spcth_getNumberOfCellFields(this->Spcth);
+        
+        int numBlocks=spcth_getNumberOfDataBlocksForCurrentTime(this->Spcth);
+        
+        found=this->ProcessorId<numBlocks;
+          
+        if(found) // otherwise skip to the next file
+          {
+          int numBlocksPerProcess=numBlocks/this->NumberOfProcessors;
+          int leftOverBlocks=numBlocks-
+            (numBlocksPerProcess*this->NumberOfProcessors);
+          
+          int blockStart;
+          
+          if(this->ProcessorId<leftOverBlocks)
+            {
+            blockStart=(numBlocksPerProcess+1)*this->ProcessorId;
+            this->BlockEnd=blockStart+(numBlocksPerProcess+1)-1;
+            }
+          else
+            {
+            blockStart=numBlocksPerProcess*this->ProcessorId+leftOverBlocks;
+            this->BlockEnd=blockStart+numBlocksPerProcess-1;
+            }
+          this->Block=blockStart;
+          found=this->Block<=this->BlockEnd;
+          }
+        if(!found)
+          {
+          ++this->FileIterator;
+          ++this->FileIndex;
+          this->Off=this->FileIndex>=this->NumberOfFiles;
+          }
+        }
+    }
+};
+
+class vtkFileDistributionBlockIterator
+  : public vtkBlockIterator
+{
+public:
+  vtkFileDistributionBlockIterator() {}
+  virtual ~vtkFileDistributionBlockIterator() {}
+  virtual void Init(int numberOfProcessors,
+                    int processorId,
+                    vtkSpyPlotReaderMap *fileMap,
+                    int currentTimeStep)
+    {
+      vtkBlockIterator::Init(numberOfProcessors,processorId,fileMap,
+                             currentTimeStep);
+      
+      if(this->ProcessorId>=this->NumberOfFiles)
+        {
+        this->FileEnd=this->NumberOfFiles;
+        this->FileStart=this->FileEnd+1;
+        }
+      else
+        {
+        int numFilesPerProcess=this->NumberOfFiles/this->NumberOfProcessors;
+        int leftOverFiles=this->NumberOfFiles
+          -(numFilesPerProcess*this->NumberOfProcessors);
+        
+        if (this->ProcessorId < leftOverFiles)
+          {
+          this->FileStart = (numFilesPerProcess+1) * this->ProcessorId;
+          this->FileEnd = this->FileStart + (numFilesPerProcess+1) - 1;
+          }
+        else
+          {
+          this->FileStart=numFilesPerProcess*this->ProcessorId + leftOverFiles;
+          this->FileEnd = this->FileStart + numFilesPerProcess - 1;
+          }
+        }
+    }
+  
+  virtual void Start()
+    {
+      this->Off=this->ProcessorId>=this->NumberOfFiles; // processor not used
+      if(!this->Off)
+        {
+        // skip the first files
+        this->FileIndex=0;
+        this->FileIterator=this->FileMap->Files.begin();
+        while(this->FileIndex<this->FileStart)
+          {
+          ++this->FileIterator;
+          ++this->FileIndex;
+          }
+        
+        this->FindFirstBlockOfCurrentOrNextFile();
+        }
+    }
+  
+protected:
+  virtual void FindFirstBlockOfCurrentOrNextFile()
+    {
+      this->Off=this->FileIndex>this->FileEnd;
+      int found=0;
+      while(!this->Off && !found)
+        {
+        const char *fname=this->FileIterator->first.c_str();
+        this->Spcth=this->FileIterator->second;
+//        vtkDebugMacro("Reading data from file: " << fname);
+        
+        spcth_openSpyFile(this->Spcth,fname);
+        spcth_setTimeStep(this->Spcth,
+                          spcth_getTimeStepValue(this->Spcth,
+                                                 this->CurrentTimeStep));
+        
+        this->NumberOfFields=spcth_getNumberOfCellFields(this->Spcth);
+        
+        int numberOfBlocks;
+        numberOfBlocks=spcth_getNumberOfDataBlocksForCurrentTime(this->Spcth);
+        
+        this->BlockEnd=numberOfBlocks-1;
+        this->Block=0;
+        found=this->Block<=this->BlockEnd;
+        if(!found)
+          {
+          ++this->FileIterator;
+          ++this->FileIndex;
+          this->Off=this->FileIndex>this->FileEnd;
+          }
+        }
+    }
+  int FileStart;
+  int FileEnd;
+};
+
 //=============================================================================
 //-----------------------------------------------------------------------------
 
@@ -294,6 +548,8 @@ vtkSpyPlotReader::vtkSpyPlotReader()
 
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
+  
+  this->DistributeFiles=0; // by default, distribute blocks, not files.
 }
 
 //-----------------------------------------------------------------------------
@@ -362,7 +618,6 @@ int vtkSpyPlotReader::RequestInformation(vtkInformation *request,
     this->SetCurrentFileName(this->FileName);
     this->Map->Clean();
     this->Map->Files[this->FileName]=spcth_initialize();
-    cout<<"spydata: spcth="<<this->Map->Files[this->FileName]<<endl;
     return this->UpdateMetaData();
     }
   else
@@ -423,7 +678,6 @@ int vtkSpyPlotReader::UpdateCaseFile(const char *fname)
           f=::GetFilenamePath(this->FileName)+"/"+f;
           }
         this->Map->Files[f.c_str()]=spcth_initialize();
-        cout<<"spycase: spcth="<<this->Map->Files[f.c_str()]<<endl;
         }
       }
     }
@@ -523,7 +777,10 @@ int vtkSpyPlotReader::UpdateMetaData()
 // Magic number that encode the message ids for parallel communication
 enum
 {
-  VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS=288302,
+  VTK_MSG_SPY_READER_HAS_BOUNDS=288302,
+  VTK_MSG_SPY_READER_LOCAL_BOUNDS,
+  VTK_MSG_SPY_READER_GLOBAL_BOUNDS,
+  VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS,
   VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS,
   VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS,
   VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS,
@@ -536,11 +793,6 @@ int vtkSpyPlotReader::RequestData(
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
-  cout<<"vtkSpyPlotReader::RequestData()"<<endl;
-  // Hack to handle rectilinear grids. Find average spacing.
-  double sumSpacing[3];
-  sumSpacing[0] = sumSpacing[1] = sumSpacing[2] = 0.0;
-
   SPCTH* spcth = 0;
   const char *fname=0;
 
@@ -565,6 +817,7 @@ int vtkSpyPlotReader::RequestData(
     vtkHierarchicalDataInformation::SafeDownCast(
       info->Get(vtkCompositeDataPipeline::COMPOSITE_DATA_INFORMATION()));
 
+  hb->Initialize(); // remove all previous blocks
   hb->SetHierarchicalDataInformation(compInfo);
   
   int numFiles = this->Map->Files.size();
@@ -575,160 +828,484 @@ int vtkSpyPlotReader::RequestData(
   // return the specific process number
   int processNumber = info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER());
   int numProcessors =info->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES());
-
-  vtkSpyPlotReaderMap::MapOfStringToSPCTH::iterator it;
+  
   int block;
   int field;
-  int index=0;
+  vtkBlockIterator *blockIterator;
+  if(this->DistributeFiles)
+    {
+    cout<<"Distribute files"<<endl;
+    blockIterator=new vtkFileDistributionBlockIterator;
+    }
+  else
+    {
+    cout<<"Distribute blocks"<<endl;
+    blockIterator=new vtkBlockDistributionBlockIterator;
+    }
+  
+  blockIterator->Init(numProcessors,processNumber,this->Map,this->CurrentTimeStep);
 
 #if 1 // skip loading for valgrind test
   
- 
-  // Read all files
-  for(it = this->Map->Files.begin(); index<numFiles; ++it,++index)
+  double dsBounds[6]; // only for removing wrong ghost cells
+  int firstBlock=1;
+  
+  blockIterator->Start();
+  while(!blockIterator->IsOff())
     {
-    fname=it->first.c_str();
-    spcth=it->second;
-    vtkDebugMacro("Reading data from file: " << fname);
+    block=blockIterator->GetBlock();
+    spcth=blockIterator->GetSpcth();
+    int dims[3];
+    spcth_getDataBlockDimensions(spcth, block, dims, dims+1, dims+2);
+    double realBounds[6];
     
-    spcth_openSpyFile(spcth,fname);
-    spcth_setTimeStep(spcth,spcth_getTimeStepValue(spcth,
-                                                   this->CurrentTimeStep));
-    
-    int numFields = spcth_getNumberOfCellFields(spcth);
-    int numBlocks=spcth_getNumberOfDataBlocksForCurrentTime(spcth);
-    
-    int startBlock;
-    int endBlock;
-    
-    int numBlocksPerProcess =  numBlocks / numProcessors;
-    int leftOverBlocks=numBlocks-(numBlocksPerProcess*numProcessors);
-    if (processNumber < leftOverBlocks)
+    // Compute real bounds for the current block
+    if(this->IsAMR)
       {
-      startBlock = (numBlocksPerProcess+1) * processNumber;
-      endBlock = startBlock + (numBlocksPerProcess+1) - 1;
+      double bounds[6];
+      spcth_getDataBlockBounds(spcth, block, bounds);
+      double spacing;
+      int cc=0;
+      while(cc<3)
+        {
+        // as the file includes ghost cells,
+        // the bounding box also includes ghost cells
+        // there is then two extras endpoints in each axis
+        if(dims[cc]>1)
+          {
+          spacing=(bounds[2*cc+1]-bounds[2*cc])/dims[cc];
+          realBounds[2*cc]=bounds[2*cc]+spacing;
+          realBounds[2*cc+1]=bounds[2*cc+1]-spacing;
+          }
+        else
+          {
+          realBounds[2*cc]=0;
+          realBounds[2*cc+1]=0;
+          }
+        ++cc;
+        }
       }
     else
       {
-      startBlock = numBlocksPerProcess * processNumber + leftOverBlocks;
-      endBlock = startBlock + numBlocksPerProcess - 1;
-      }
-    cout<<"current processor "<<processNumber<<" go from "<<startBlock<<" to "<<endBlock<<" total="<<numBlocks<<endl;
-    // Read only the part of the file for this processNumber.
-    for ( block = startBlock; block <= endBlock; ++ block )
-      {
-      int cc;
-      int dims[3];
-      spcth_getDataBlockDimensions(spcth, block, dims, dims+1, dims+2);
-      
-      int extents[6];
-      cc=0;
+      double *rawvector[3];
+      spcth_getDataBlockVectors(spcth,block,&(rawvector[0]),
+                                &(rawvector[1]),&(rawvector[2]));
+      int cc=0;
       while(cc<3)
         {
-        extents[2*cc]=0;
-        if(dims[cc]==1)
+        if(dims[cc]>1)
           {
-          extents[2*cc+1]=0;
+          realBounds[2*cc]=rawvector[cc][1];
+          realBounds[2*cc+1]=rawvector[cc][dims[cc]-1];
           }
+        else
+          {
+          realBounds[2*cc]=0;
+          realBounds[2*cc+1]=0;
+          }
+        ++cc;
+        }
+      }
+    // Update the whole bounds
+    // we will be use only for removing wrong ghost cells
+    if(firstBlock)
+      {
+      int cc=0;
+      while(cc<6)
+        {
+        dsBounds[cc]=realBounds[cc];
+        ++cc;
+        }
+      firstBlock=0;
+      }
+    else
+      {
+      int cc=0;
+      while(cc<3)
+        {
+        if(realBounds[2*cc]<dsBounds[2*cc])
+          {
+          dsBounds[2*cc]=realBounds[2*cc];
+          }
+        if(realBounds[2*cc+1]>dsBounds[2*cc+1])
+          {
+          dsBounds[2*cc+1]=realBounds[2*cc+1];
+          }
+        ++cc;
+        }
+      }
+    blockIterator->Next();
+    } // while
+  
+  int parent;
+  int left=GetLeftChildProcessor(processNumber);
+  int right=left+1;
+  if(processNumber>0) // not root (nothing to do if root)
+    {
+    parent=this->GetParentProcessor(processNumber);
+    }
+  else
+    {
+    parent=0; // just to remove warnings, never used
+    }
+  
+  double otherBounds[6];
+  int leftHasBounds;
+  int rightHasBounds;
+  
+  if(left<numProcessors)
+    {
+    // TODO WARNING if the child is empty the bounds are not initialized!
+    // Grab the bounds from left child
+    this->Controller->Receive(&leftHasBounds, 1, left,
+                              VTK_MSG_SPY_READER_HAS_BOUNDS);
+    
+    if(leftHasBounds)
+      {
+      this->Controller->Receive(otherBounds, 6, left,
+                                VTK_MSG_SPY_READER_LOCAL_BOUNDS);
+      
+      if(firstBlock) // impossible the current processor is not a leaf
+        {
+        int cc=0;
+        while(cc<6)
+          {
+          dsBounds[cc]=otherBounds[cc];
+          ++cc;
+          }
+        firstBlock=0;
+        }
+      else
+        {
+        int cc=0;
+        while(cc<3)
+          {
+          if(otherBounds[2*cc]<dsBounds[2*cc])
+            {
+            dsBounds[2*cc]=otherBounds[2*cc];
+            }
+          if(otherBounds[2*cc+1]>dsBounds[2*cc+1])
+            {
+            dsBounds[2*cc+1]=otherBounds[2*cc+1];
+            }
+          ++cc;
+          }
+        }
+      }
+    
+    if(right<numProcessors)
+      {
+      // Grab the bounds from right child
+      this->Controller->Receive(&rightHasBounds, 1, right,
+                                VTK_MSG_SPY_READER_HAS_BOUNDS);
+      if(rightHasBounds)
+        {
+        this->Controller->Receive(otherBounds, 6, right,
+                                  VTK_MSG_SPY_READER_LOCAL_BOUNDS);
+        if(firstBlock)// impossible the current processor is not a leaf
+          {
+          int cc=0;
+          while(cc<6)
+            {
+            dsBounds[cc]=otherBounds[cc];
+            ++cc;
+            }
+          firstBlock=0;
+          }
+        else
+          {
+          int cc=0;
+          while(cc<3)
+            {
+            if(otherBounds[2*cc]<dsBounds[2*cc])
+              {
+              dsBounds[2*cc]=otherBounds[2*cc];
+              }
+            if(otherBounds[2*cc+1]>dsBounds[2*cc+1])
+              {
+              dsBounds[2*cc+1]=otherBounds[2*cc+1];
+              }
+            ++cc;
+            }
+          }
+        }
+      }
+    }
+  
+  // Send local to parent, Receive global from the parent.
+  if(processNumber>0) // not root (nothing to do if root)
+    {
+    int hasBounds=!firstBlock;
+    this->Controller->Send(&hasBounds, 1, parent,
+                           VTK_MSG_SPY_READER_HAS_BOUNDS);
+    if(hasBounds)
+      {
+      this->Controller->Send(dsBounds, 6, parent,
+                             VTK_MSG_SPY_READER_LOCAL_BOUNDS);
+      
+      this->Controller->Receive(dsBounds, 6, parent,
+                                VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
+      }
+    }
+  
+  if(firstBlock) // empty, no bounds, nothing to do
+    {
+    delete blockIterator;
+    return 1;
+    }
+  
+  // Send it to children.
+  if(left<numProcessors)
+    {
+    if(leftHasBounds)
+      {
+      this->Controller->Send(dsBounds, 6, left,
+                             VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
+      }
+    if(right<numProcessors)
+      {
+      if(rightHasBounds)
+        {
+        this->Controller->Send(dsBounds, 6, right,
+                               VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
+        }
+      }
+    }
+  
+  // At this point, the global bounds is set in each processor.
+  
+  cout<<processNumber<<" bounds="<<dsBounds[0]<<"; "<<dsBounds[1]<<"; "<<dsBounds[2]<<"; "<<dsBounds[3]<<"; "<<dsBounds[4]<<"; "<<dsBounds[5]<<endl;
+  
+  // Read all files
+  
+  cout<<"there is (are) "<<numFiles<<" file(s)"<<endl;
+    // Read only the part of the file for this processNumber.
+//    for ( block = startBlock; block <= endBlock; ++ block )
+  
+  blockIterator->Start();
+  while(!blockIterator->IsOff())
+    {
+    block=blockIterator->GetBlock();
+    int numFields=blockIterator->GetNumberOfFields();
+    spcth=blockIterator->GetSpcth();
+      
+    int cc;
+    int dims[3];
+    spcth_getDataBlockDimensions(spcth, block, dims, dims+1, dims+2);
+    
+    int extents[6];
+    cc=0;
+    while(cc<3)
+      {
+      extents[2*cc]=0;
+      if(dims[cc]==1)
+        {
+        extents[2*cc+1]=0;
+        }
         else
           {
           extents[2*cc+1]=dims[cc];
           }
+      ++cc;
+      }
+    vtkCellData* cd;
+    double bounds[6];
+      
+    int hasBadGhostCells;
+    int realExtents[6];
+    int realDims[3];
+      
+    if(this->IsAMR)
+      {
+      int level = spcth_getDataBlockLevel(spcth, block);
+      spcth_getDataBlockBounds(spcth, block, bounds);
+      
+      // add at the end of the level list.
+      vtkUniformGrid* ug = vtkUniformGrid::New();
+//      vtkImageData* ug = vtkImageData::New();
+      hb->SetDataSet(level, hb->GetNumberOfDataSets(level), ug);
+      ug->Delete();
+      
+      double origin[3];
+      double spacing[3];
+      cc=0;
+      while(cc<3)
+        {
+        // as the file includes ghost cells,
+        // the bounding box also includes ghost cells
+        // there is then two extras endpoints in each axis
+        spacing[cc]=(bounds[2*cc+1]-bounds[2*cc])/dims[cc];
+        // skip the first cell, which is a ghost cell
+        // otherwise it should be just bounds[2*cc]
+        origin[cc]=bounds[2*cc]; //+spacing[cc];
         ++cc;
         }
-      vtkCellData* cd;
+      ug->SetSpacing(spacing);
       
-      if(this->IsAMR)
+      hasBadGhostCells=0;
+      cc=0;
+      while(cc<3)
         {
-        int level = spcth_getDataBlockLevel(spcth, block);
-        double bounds[6];
-        spcth_getDataBlockBounds(spcth, block, bounds);
-        
-        // add at the end of the level list.
-        vtkUniformGrid* ug = vtkUniformGrid::New();
-//      vtkImageData* ug = vtkImageData::New();
-        hb->SetDataSet(level, hb->GetNumberOfDataSets(level), ug);
-        ug->Delete();
-      
-        double origin[3];
-        double spacing[3];
-        cc=0;
-        while(cc<3)
+        if(dims[cc]>1)
           {
-          // as the file includes ghost cells,
-          // the bounding box also includes ghost cells
-          // there is then two extras endpoints in each axis
-          spacing[cc]=(bounds[2*cc+1]-bounds[2*cc])/dims[cc];
-          // skip the first cell, which is a ghost cell
-          // otherwise it should be just bounds[2*cc]
-          origin[cc]=bounds[2*cc]; //+spacing[cc];
-          ++cc;
-          }
-        ug->SetExtent(extents);
-        ug->SetOrigin(origin);
-        ug->SetSpacing(spacing);
-     
-        cd = ug->GetCellData();
-        }
-      else
-        {
-        vtkRectilinearGrid *rg=vtkRectilinearGrid::New();
-        rg->SetExtent(extents);
-        vtkDoubleArray *coordinates[3];
-        double *rawvector[3];
-        cc=0;
-        while(cc<3)
-          {
-          if(dims[cc]==1)
+          if(bounds[2*cc]<dsBounds[2*cc])
             {
-            coordinates[cc]=0;
+            realExtents[2*cc]=1;
+            --extents[2*cc+1];
+            origin[cc]+=spacing[cc];
+            hasBadGhostCells=1;
             }
           else
             {
-            coordinates[cc]=vtkDoubleArray::New();
-            coordinates[cc]->SetNumberOfTuples(dims[cc]+1);
+            realExtents[2*cc]=0;
             }
-          ++cc;
-          }
-        spcth_getDataBlockVectors(spcth,block,&(rawvector[0]),&(rawvector[1]),
-                                  &(rawvector[2]));
-        cc=0;
-        while(cc<3)
-          {
-          if(dims[cc]>1)
+          if(bounds[2*cc+1]>dsBounds[2*cc+1])
             {
-            memcpy(coordinates[cc]->GetVoidPointer(0),rawvector[cc],
-                   (dims[cc]+1)*sizeof(double));
+            realExtents[2*cc+1]=dims[cc]-1;
+            --extents[2*cc+1];
+            hasBadGhostCells=1;
             }
-          ++cc;
-          }
-       
-        if(dims[0]>1)
-          {
-          rg->SetXCoordinates(coordinates[0]);
-          }
-        if(dims[1]>1)
-          {
-          rg->SetYCoordinates(coordinates[1]);
-          }
-         if(dims[2]>1)
-           {
-          rg->SetZCoordinates(coordinates[2]);
-          }
-        cc=0;
-        while(cc<3)
-          {
-          if(dims[cc]>1)
+          else
             {
-            coordinates[cc]->Delete();
+            realExtents[2*cc+1]=dims[cc];
             }
-          ++cc;
+          realDims[cc]=realExtents[2*cc+1]-realExtents[2*cc];
+//            if(realDims[cc]==0)
+//              {
+//              realDims[cc]=1;
+//              }
           }
-        hb->SetDataSet(0, hb->GetNumberOfDataSets(0), rg);
-        rg->Delete();
-        cd = rg->GetCellData();
+        else
+          {
+          realExtents[2*cc]=0;
+          realExtents[2*cc+1]=1;
+          realDims[cc]=1;
+          }
+        ++cc;
         }
-      vtkDebugMacro("Executing block: " << block);
+      
+      ug->SetExtent(extents);
+      ug->SetOrigin(origin);
+      
+      cd = ug->GetCellData();
+      }
+    else
+      {
+      vtkRectilinearGrid *rg=vtkRectilinearGrid::New();
+      vtkDoubleArray *coordinates[3];
+      double *rawvector[3];
+      
+      spcth_getDataBlockVectors(spcth,block,&(rawvector[0]),&(rawvector[1]),
+                                &(rawvector[2]));
+      
+      // compute real bounds (removing the ghostcells)
+      // we will be use only for removing wrong ghost cells
+      cc=0;
+      while(cc<3)
+        {
+        if(dims[cc]>1)
+          {
+          bounds[2*cc]=rawvector[cc][0]; // coordinates[cc]->GetValue(0);
+          bounds[2*cc+1]=rawvector[cc][dims[cc]]; // coordinates[cc]->GetValue(dims[cc]);
+          }
+        else
+          {
+          bounds[2*cc]=0;
+          bounds[2*cc+1]=0;
+          }
+        ++cc;
+        }
+      
+      hasBadGhostCells=0;
+      cc=0;
+      while(cc<3)
+        {
+        if(dims[cc]>1)
+          {
+          if(bounds[2*cc]<dsBounds[2*cc])
+            {
+            realExtents[2*cc]=1;
+            --extents[2*cc+1];
+            hasBadGhostCells=1;
+            }
+          else
+            {
+            realExtents[2*cc]=0;
+            }
+          if(bounds[2*cc+1]>dsBounds[2*cc+1])
+            {
+            realExtents[2*cc+1]=dims[cc]-1;
+            --extents[2*cc+1];
+            hasBadGhostCells=1;
+            }
+          else
+            {
+            realExtents[2*cc+1]=dims[cc];
+            }
+          realDims[cc]=realExtents[2*cc+1]-realExtents[2*cc];
+//            if(realDims[cc]==0)
+//              {
+//              realDims[cc]=1;
+//              }
+          }
+        else
+          {
+          realExtents[2*cc]=0;
+          realExtents[2*cc+1]=1;
+          realDims[cc]=1;
+          }
+        ++cc;
+        }
+      
+      rg->SetExtent(extents);
+      
+      cc=0;
+      while(cc<3)
+        {
+        if(dims[cc]==1)
+          {
+          coordinates[cc]=0;
+          }
+        else
+          {
+          coordinates[cc]=vtkDoubleArray::New();
+          coordinates[cc]->SetNumberOfTuples(realDims[cc]+1);
+          memcpy(coordinates[cc]->GetVoidPointer(0),
+                 rawvector[cc]+realExtents[2*cc],
+                 (realDims[cc]+1)*sizeof(double));
+          }
+        ++cc;
+        }
+      
+      if(dims[0]>1)
+        {
+        rg->SetXCoordinates(coordinates[0]);
+        }
+      if(dims[1]>1)
+        {
+        rg->SetYCoordinates(coordinates[1]);
+        }
+      if(dims[2]>1)
+        {
+        rg->SetZCoordinates(coordinates[2]);
+        }
+      cc=0;
+      while(cc<3)
+        {
+        if(dims[cc]>1)
+          {
+          coordinates[cc]->Delete();
+          }
+        ++cc;
+        }
+      hb->SetDataSet(0, hb->GetNumberOfDataSets(0), rg);
+      rg->Delete();
+      
+      cd = rg->GetCellData();
+      }
+    vtkDebugMacro("Executing block: " << block);
+    if(!hasBadGhostCells)
+      {
       for ( field = 0; field < numFields; field ++ )
         {
         fname = spcth_getCellFieldName(spcth, field);
@@ -758,7 +1335,7 @@ int vtkSpyPlotReader::RequestData(
       // Mark the bounding cells as ghost cells of level 1.
       vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
       ghostArray->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
-      ghostArray->SetName("vtkaGhostLevels"); //("vtkGhostLevels");
+      ghostArray->SetName("vtkGhostLevels"); //("vtkGhostLevels");
       cd->AddArray(ghostArray);
       ghostArray->Delete();
       unsigned char *ptr =static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
@@ -814,24 +1391,238 @@ int vtkSpyPlotReader::RequestData(
           }
         ++k;
         }
-      
-      //this->MergeVectors(cd);
       }
-    }
+    else // some bad ghost cells
+      {
+      // reuse this memory array for each field.
+      double *tmp=new double [dims[0]*dims[1]*dims[2]];
+      
+      int realPtDims[3];
+      int ptDims[3];
+      
+      cc=0;
+      while(cc<3)
+        {
+        realPtDims[cc]=realDims[cc]+1;
+        ptDims[cc]=dims[cc]+1;
+        ++cc;
+        }
+      
+      for ( field = 0; field < numFields; field ++ )
+        {
+        fname = spcth_getCellFieldName(spcth, field);
+        if (this->CellDataArraySelection->ArrayIsEnabled(fname))
+          {
+          vtkDataArray *array=cd->GetArray(fname);
+          if(array!=0)
+            {
+            cd->RemoveArray(fname); // if this is not the first step,
+            // make sure we have a clean array
+            }
+          
+          array = vtkDoubleArray::New();
+          cd->AddArray(array);
+          array->Delete();
+          
+          array->SetName(fname);
+          array->SetNumberOfComponents(1);
+          array->SetNumberOfTuples(realDims[0]*realDims[1]*realDims[2]);
+          
+          if (!spcth_getCellFieldData(spcth, block,field, tmp)) 
+            {
+            vtkErrorMacro("Problem reading block: " << block << ", field: " << field << endl);
+            }
+          
+          // skip some cell data.
+          int xyz[3];
+          int destXyz[3];
+          xyz[2]=realExtents[4];
+          destXyz[2]=0;
+          while(xyz[2]<realExtents[5])
+            {
+            destXyz[1]=0;
+            xyz[1]=realExtents[2];
+            while(xyz[1]<realExtents[3])
+              {
+              destXyz[0]=0;
+              xyz[0]=realExtents[0];
+              while(xyz[0]<realExtents[1])
+                {
+                static_cast<double *>(array->GetVoidPointer(0))[vtkStructuredData::ComputeCellId(realPtDims,destXyz)]=tmp[vtkStructuredData::ComputeCellId(ptDims,xyz)];
+                ++xyz[0];
+                ++destXyz[0];
+                }
+              ++xyz[1];
+              ++destXyz[1];
+              }
+            ++xyz[2];
+            ++destXyz[2];
+            }
+          }
+        }
+      
+      delete[] tmp;
+      
+      // Mark the remains ghost cell as real ghost cells of level 1.
+      vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
+      ghostArray->SetNumberOfTuples(realDims[0]*realDims[1]*realDims[2]);
+      ghostArray->SetName("vtkGhostLevels"); //("vtkGhostLevels");
+      cd->AddArray(ghostArray);
+      ghostArray->Delete();
+      unsigned char *ptr =static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
+      
+      int k=0;
+      while(k<realDims[2])
+        {
+        int kIsGhost;
+        if(realDims[2]==1)
+          {
+          kIsGhost=0;
+          }
+        else
+          {
+          kIsGhost=(k==0 && realExtents[4]==0) || (k==realDims[2]-1 && realExtents[5]==dims[2]);
+          }
+        
+        int j=0;
+        while(j<realDims[1])
+          {
+          int jIsGhost=kIsGhost;
+          if(!jIsGhost)
+            {
+            if(realDims[1]>1)
+              {
+              jIsGhost=(j==0 && realExtents[2]==0) || (j==realDims[1]-1 && realExtents[3]==dims[1]);
+              }
+            }
+          
+          int i=0;
+          while(i<realDims[0])
+            {
+            int isGhost=jIsGhost;
+            if(!isGhost)
+              {
+              if(realDims[0]>1)
+                {
+                isGhost=(i==0 && realExtents[0]==0 ) || (i==realDims[0]-1 && realExtents[1]==dims[0]);
+                }
+              }
+            if(isGhost)
+              {
+              (*ptr)=1;
+              }
+            else
+              {
+              (*ptr)=0;
+              }
+            ++ptr;
+            ++i;
+            }
+          ++j;
+          }
+        ++k;
+        }
+      }
+    //this->MergeVectors(cd);
+    blockIterator->Next();
+    } // while
+  delete blockIterator;
   
 #endif //  if 0 skip loading for valgrind test
   // All files seem to have 1 ghost level.
 //  this->AddGhostLevelArray(1);
  
-  // At this processor has its own blocks
+  // At this point, each processor has its own blocks
   // They have to exchange the blocks they have get a unique id for
   // each block over the all dataset.
   
-  // First update the number of levels.
-  int parent=0;
-  int left=GetLeftChildProcessor(processNumber);
-  int right=left+1;
+ #if 0
+  // Remove the bad ghost cells from each block
+  // Bad ghost cells are ghost cells out of the bounding box of the dataset.
   
+  unsigned int numberOfLevels=hb->GetNumberOfLevels();
+  unsigned int level=0;
+  while(level<numberOfLevels)
+    {
+    int numberOfDataSets=hb->GetNumberOfDataSets(level);
+    int i=0;
+    while(i<numberOfDataSets)
+      {
+      vtkDataObject *do=hb->GetDataSet(level,i);
+      vtkUniformGrid *ug=dynamic_cast<vtkUniformGrid *>(do);
+      if(ug!=0)
+        {
+        // Mark the bounding cells as ghost cells of level 1.
+        vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
+        ghostArray->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
+        ghostArray->SetName("vtkGhostLevels"); //("vtkGhostLevels");
+        cd->AddArray(ghostArray);
+        ghostArray->Delete();
+        unsigned char *ptr =static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
+        
+        int k=0;
+        while(k<dims[2])
+          {
+          int kIsGhost;
+          if(dims[2]==1)
+            {
+            kIsGhost=0;
+            }
+          else
+            {
+            kIsGhost=k==0 || (k==dims[2]-1);
+            }
+          
+          int j=0;
+          while(j<dims[1])
+            {
+            int jIsGhost=kIsGhost;
+            if(!jIsGhost)
+              {
+              if(dims[1]>1)
+                {
+                jIsGhost=j==0 || (j==dims[1]-1);
+                }
+              }
+            
+            int i=0;
+            while(i<dims[0])
+              {
+              int isGhost=jIsGhost;
+              if(!isGhost)
+                {
+                if(dims[0]>1)
+                  {
+                  isGhost=i==0 || (i==dims[0]-1);
+                  }
+                }
+              if(isGhost)
+                {
+                (*ptr)=1;
+                }
+              else
+                {
+                (*ptr)=0;
+                }
+              ++ptr;
+              ++i;
+              }
+            ++j;
+            }
+          ++k;
+          }
+        }
+      else // rectilinear grid case
+        {
+        vtkRectilinearGrid *rg=dynamic_cast<vtkRectilinearGrid *>(ds);
+        }
+      ++i;
+      }
+    ++level;
+    }
+#endif
+  
+  // Update the number of levels.
   unsigned int numberOfLevels=hb->GetNumberOfLevels();
   
   if(this->IsAMR)
@@ -840,21 +1631,27 @@ int vtkSpyPlotReader::RequestData(
     // Update it from the children
     if(left<numProcessors)
       {
-      // Grab the number of levels from left child
-      this->Controller->Receive(&ulintMsgValue, 1, left,
-                                VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
-      if(numberOfLevels<ulintMsgValue)
+      if(leftHasBounds)
         {
-        numberOfLevels=ulintMsgValue;
-        }
-      if(right<numProcessors)
-        {
-        // Grab the number of levels from right child
-        this->Controller->Receive(&ulintMsgValue, 1, right,
+        // Grab the number of levels from left child
+        this->Controller->Receive(&ulintMsgValue, 1, left,
                                   VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
         if(numberOfLevels<ulintMsgValue)
           {
           numberOfLevels=ulintMsgValue;
+          }
+        }
+      if(right<numProcessors)
+        {
+        if(rightHasBounds)
+          {
+          // Grab the number of levels from right child
+          this->Controller->Receive(&ulintMsgValue, 1, right,
+                                    VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
+          if(numberOfLevels<ulintMsgValue)
+            {
+            numberOfLevels=ulintMsgValue;
+            }
           }
         }
       }
@@ -864,7 +1661,7 @@ int vtkSpyPlotReader::RequestData(
     // Send local to parent, Receive global from the parent.
     if(processNumber>0) // not root (nothing to do if root)
       {
-      parent=this->GetParentProcessor(processNumber);
+//      parent=this->GetParentProcessor(processNumber);
       this->Controller->Send(&ulintMsgValue, 1, parent,
                              VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_LEVELS);
       this->Controller->Receive(&ulintMsgValue, 1, parent,
@@ -875,12 +1672,18 @@ int vtkSpyPlotReader::RequestData(
     // Send it to children.
     if(left<numProcessors)
       {
-      this->Controller->Send(&ulintMsgValue, 1, left,
-                             VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
+      if(leftHasBounds)
+        {
+        this->Controller->Send(&ulintMsgValue, 1, left,
+                               VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
+        }
       if(right<numProcessors)
         {
-        this->Controller->Send(&ulintMsgValue, 1, right,
-                               VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
+        if(rightHasBounds)
+          {
+          this->Controller->Send(&ulintMsgValue, 1, right,
+                                 VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_LEVELS);
+          }
         }
       }
     
@@ -903,16 +1706,22 @@ int vtkSpyPlotReader::RequestData(
     // Get number of dataset of each child
     if(left<numProcessors)
       {
-      // Grab info the number of datasets from left child
-      this->Controller->Receive(&intMsgValue, 1, left,
-                                VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
-      leftNumberOfDataSets=intMsgValue;
+      if(leftHasBounds)
+        {
+        // Grab info the number of datasets from left child
+        this->Controller->Receive(&intMsgValue, 1, left,
+                                  VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
+        leftNumberOfDataSets=intMsgValue;
+        }
       if(right<numProcessors)
         {
-        // Grab info the number of datasets from right child
-        this->Controller->Receive(&intMsgValue, 1, right,
-                                  VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
-        rightNumberOfDataSets=intMsgValue;
+        if(rightHasBounds)
+          {
+          // Grab info the number of datasets from right child
+          this->Controller->Receive(&intMsgValue, 1, right,
+                                    VTK_MSG_SPY_READER_LOCAL_NUMBER_OF_DATASETS);
+          rightNumberOfDataSets=intMsgValue;
+          }
         }
       }
 
@@ -940,20 +1749,26 @@ int vtkSpyPlotReader::RequestData(
     // Send it to children.
     if(left<numProcessors)
       {
-      intMsgValue=totalNumberOfDataSets;
-      this->Controller->Send(&intMsgValue, 1, left,
-                             VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
-      intMsgValue=globalIndex+numberOfDataSets;
-      this->Controller->Send(&intMsgValue, 1, left,
-                             VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
-      if(right<numProcessors)
+      if(leftHasBounds)
         {
         intMsgValue=totalNumberOfDataSets;
-        this->Controller->Send(&intMsgValue, 1, right,
+        this->Controller->Send(&intMsgValue, 1, left,
                                VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
-        intMsgValue=globalIndex+numberOfDataSets+leftNumberOfDataSets;
-        this->Controller->Send(&intMsgValue, 1, right,
+        intMsgValue=globalIndex+numberOfDataSets;
+        this->Controller->Send(&intMsgValue, 1, left,
                                VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
+        }
+      if(right<numProcessors)
+        {
+        if(rightHasBounds)
+          {
+          intMsgValue=totalNumberOfDataSets;
+          this->Controller->Send(&intMsgValue, 1, right,
+                                 VTK_MSG_SPY_READER_GLOBAL_NUMBER_OF_DATASETS);
+          intMsgValue=globalIndex+numberOfDataSets+leftNumberOfDataSets;
+          this->Controller->Send(&intMsgValue, 1, right,
+                                 VTK_MSG_SPY_READER_GLOBAL_DATASETS_INDEX);
+          }
         }
       }
     
