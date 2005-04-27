@@ -414,6 +414,10 @@
           extensions=".spcth"
           file_description="SpyPlot CTH dataset">
     <Source class="vtkSpyPlotReader"/>
+    <LabeledToggle label="Distribute files"
+                   property="DistributeFiles"
+                   trace_name="file_flag"
+                   help="Select whether, in parallel mode, if the reader distributes files or blocks"/>
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
            keeps_timesteps="1"

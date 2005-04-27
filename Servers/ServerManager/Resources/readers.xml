@@ -778,6 +778,15 @@
         number_of_elements="1">
         <StringListDomain name="files"/>
      </StringVectorProperty>
+
+ <IntVectorProperty 
+        name="DistributeFiles" 
+        command="SetDistributeFiles" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
      <IntVectorProperty 
         name="TimeStepRangeInfo"
         command="GetTimeStepRange"
