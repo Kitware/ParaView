@@ -63,7 +63,9 @@ SET(VTK_TCL_FILES
   "${VTK_SOURCE_DIR}/Common/vtkCollection.cxx"
   "${VTK_SOURCE_DIR}/Common/vtkCollectionIterator.cxx"
   "${VTK_SOURCE_DIR}/Common/vtkObject.cxx"
-  "${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx")
+  "${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx"
+  "${VTK_SOURCE_DIR}/Common/vtkTimerLog.cxx"
+)
 
 SET_SOURCE_FILES_PROPERTIES(
   "${VTK_SOURCE_DIR}/Common/vtkObjectBase.cxx"
