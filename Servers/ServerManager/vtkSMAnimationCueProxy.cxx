@@ -23,7 +23,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.6");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -309,7 +309,7 @@ void vtkSMAnimationCueProxy::SaveInBatchScript(ofstream* file)
   if (this->AnimatedDomainName)
     {
     *file << "  [$pvTemp" << id << " GetProperty AnimatedDomainName]"
-      << " SetElement 0 " << this->AnimatedDomainName << endl;
+      << " SetElement 0 {" << this->AnimatedDomainName << "}" << endl;
     }
 
   *file << "  [$pvTemp" << id << " GetProperty AnimatedElement]"

@@ -20,7 +20,7 @@
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkSMRenderModuleProxy.h"
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.5");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -96,9 +96,7 @@ void vtkSMAnimationSceneProxy::SaveInBatchScript(ofstream* file)
     if (cue)
       {
       cue->SaveInBatchScript(file);
-      *file << "  [$pvTemp" << id << " GetProperty Cue]"
-        " RemoveAllProxies" << endl;
-      *file << "  [$pvTemp" << id << " GetProperty Cue]"
+      *file << "  [$pvTemp" << id << " GetProperty Cues]"
         " AddProxy $pvTemp" << cue->GetID() << endl;
       *file << "  $pvTemp" << id << " UpdateVTKObjects" << endl;
       *file << endl;
