@@ -45,7 +45,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.8");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.9");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -237,6 +237,12 @@ protected:
           ++this->FileIndex;
           this->Off=this->FileIndex>=this->NumberOfFiles;
           }
+#if 0
+        else
+          {
+          cout<<"proc="<<this->ProcessorId<<" file="<<this->FileIndex<<" blockStart="<<this->Block<<" blockEnd="<<this->BlockEnd<<" numBlock="<<numBlocks<<endl;
+          }
+#endif
         }
     }
 };
@@ -2293,6 +2299,15 @@ void vtkSpyPlotReader::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << "FileName: " << (this->FileName?this->FileName:"(none)") << endl;
+  os << "DistributeFiles: ";
+  if(this->DistributeFiles)
+    {
+    os << "true"<<endl;
+    }
+  else
+    {
+    os << "false"<<endl;
+    }
   os << "TimeStep: " << this->TimeStep << endl;
   os << "TimeStepRange: " << this->TimeStepRange[0] << " " << this->TimeStepRange[1] << endl;
   if ( this->CellDataArraySelection )
