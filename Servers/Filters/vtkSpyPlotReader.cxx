@@ -45,7 +45,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.9");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.10");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -646,9 +646,9 @@ int vtkSpyPlotReader::UpdateCaseFile(const char *fname)
   // Check to see if this is the same filename as before
   // if so then I already have the meta info, so just return
   if(this->GetCurrentFileName()!=0 &&
-     !strcmp(fname,this->GetCurrentFileName()))
+     strcmp(fname,this->GetCurrentFileName())==0)
     {
-    return 0;
+    return 1;
     }
 
   // Set case file name and clean/initialize file map
