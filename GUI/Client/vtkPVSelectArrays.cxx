@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.5");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.6");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -433,19 +433,18 @@ void vtkPVSelectArrays::SaveInBatchScript(ofstream *file)
     return;
     }
 
-  num = this->SelectedArrayNames->GetNumberOfStrings();
-
-  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+  vtkSMStringVectorProperty* svp =
+    vtkSMStringVectorProperty::SafeDownCast(this->GetSMProperty());
+  num = svp->GetNumberOfElements();
+   *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
         << " GetProperty AddVolumeArrayName] SetNumberOfElements "
         << num << endl;
-
-  // Now loop through the input mask setting the selection states.
-  for (idx = 0; idx < num; ++idx)
-    {
+  for (idx = 0; idx < num; idx++)
+  {
     *file << "  [$pvTemp" << sourceID << " GetProperty "
-          << this->SMPropertyName << "] SetElement " << idx << " {"
-          << this->SelectedArrayNames->GetString(idx) << "}" << endl;
-    }
+      << this->SMPropertyName << "] SetElement " << idx << " {"
+      << svp->GetElement(idx) << "}" << endl;
+  }
 }
 
 
