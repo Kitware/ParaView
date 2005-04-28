@@ -34,10 +34,6 @@ class vtkPVAnimationCue;
 class vtkPVRenderView;
 class vtkPVAnimationManager;
 class vtkPVWindow;
-class vtkImageWriter;
-class vtkKWGenericMovieWriter;
-class vtkWindowToImageFilter;
-class vtkSMXMLPVAnimationWriterProxy;
 class vtkPVVCRControl;
 
 class VTK_EXPORT vtkPVAnimationScene : public vtkPVTracedWidget
@@ -197,27 +193,9 @@ protected:
   vtkKWLabel* PlayModeLabel;
   vtkKWMenuButton* PlayModeMenuButton;
   
-  vtkImageWriter* ImageWriter;
-  vtkKWGenericMovieWriter* MovieWriter;
-  vtkWindowToImageFilter* WindowToImageFilter;
-  char* FileRoot;
-  char* FileExtension;
-  int FileCount;
-  int SaveFailed;
-  vtkSetStringMacro(FileRoot);
-  vtkSetStringMacro(FileExtension);
-
-  vtkSMXMLPVAnimationWriterProxy* GeometryWriter;
-  
   vtkSMAnimationSceneProxy* AnimationSceneProxy;
   char* AnimationSceneProxyName;
   vtkSetStringMacro(AnimationSceneProxyName);
-
-  // Description:
-  // Called to dump frame into images/movie.
-  void SaveImages();
-
-  void SaveGeometry(double time);
 
   virtual void ExecuteEvent(vtkObject* , unsigned long event, void* calldata);
 //BTX

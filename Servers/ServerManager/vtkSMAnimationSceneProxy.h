@@ -14,6 +14,8 @@
 =========================================================================*/
 // .NAME vtkSMAnimationSceneProxy - proxy for vtkAnimationScene
 // .SECTION Description
+// Proxy for animation scene. Also supports writing out animation 
+// images (movie) and animation geometry.
 // .SECTION See Also
 // vtkSMProxy vtkSMAnimationCueProxy
 //
@@ -27,6 +29,9 @@ class vtkAnimationScene;
 class vtkCollection;
 class vtkCollectionIterator;
 class vtkSMRenderModuleProxy;
+class vtkImageWriter;
+class vtkKWGenericMovieWriter;
+class vtkWindowToImageFilter;
 
 class VTK_EXPORT vtkSMAnimationSceneProxy : public vtkSMAnimationCueProxy
 {
@@ -77,9 +82,28 @@ public:
     { this->RenderModuleProxy = ren; } 
   
   void SetCurrentTime(double time);
+
+  // Description:
+  // Saves the animation as a sequence of images or a movie file.
+  // The method is not accessible using property interface.
+  // Return 0 on success.
+  int SaveImages(const char* fileRoot, const char* ext, int width, int height);
+
+  // Description:
+  // Save the geometry of the animation.
+  // Note that this method is not accessible using property interface.
+  // Returns 0 on success.
+  int SaveGeometry(const char* filename);
+
 protected:
   vtkSMAnimationSceneProxy();
   ~vtkSMAnimationSceneProxy();
+
+  // Called on every tick to save images.
+  void SaveImages();
+
+  // Called on every tick to save geometry.
+  void SaveGeometry(double time);
 
   virtual void CreateVTKObjects(int numObjects);
 
@@ -98,6 +122,20 @@ protected:
   vtkCollectionIterator* AnimationCueProxiesIterator;
 
   vtkSMRenderModuleProxy* RenderModuleProxy;
+
+  // Stuff for saving Animation Images.
+  vtkImageWriter* ImageWriter;
+  vtkKWGenericMovieWriter* MovieWriter;
+  vtkWindowToImageFilter* WindowToImageFilter;
+  char* FileRoot;
+  char* FileExtension;
+  int FileCount;
+  int SaveFailed;
+  vtkSetStringMacro(FileRoot);
+  vtkSetStringMacro(FileExtension);
+
+  // Stuff for saving Geometry.
+  vtkSMProxy *GeometryWriter;
 
 private:
   vtkSMAnimationSceneProxy(const vtkSMAnimationSceneProxy&); // Not implemented.

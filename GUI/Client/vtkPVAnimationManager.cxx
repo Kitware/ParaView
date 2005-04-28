@@ -63,7 +63,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.36");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.37");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1039,35 +1039,13 @@ void vtkPVAnimationManager::SaveAnimation()
     {
     this->GetWindow()->SaveLastPath(saveDialog, "SaveAnimationFile2");
     const char* filename = saveDialog->GetFileName();  
-
-    // Split into root and extension.
-    char* fileRoot;
-    char* ptr;
-    char* ext = NULL;
-    fileRoot = new char[strlen(filename)+1];
-    strcpy(fileRoot, filename);
-    // Find extension (last .)
-    ptr = fileRoot;
-    while (*ptr != '\0')
+    kwsys_stl::string fileRoot = kwsys::SystemTools::GetFilenameName(filename);
+    kwsys_stl::string ext_stl = kwsys::SystemTools::GetFilenameExtension(filename);
+    if (ext_stl.size() >= 1)
       {
-      if (*ptr == '.')
-        {
-        ext = ptr;
-        }
-      ++ptr;
+      ext_stl.erase(0,1); // Get rid of the "." GetFilenameExtension returns.
       }
-    if (ext == NULL)
-      {
-      vtkErrorMacro(<< "Could not find extension in " << filename);
-      delete [] fileRoot;
-      fileRoot = NULL;
-      saveDialog->Delete();
-      saveDialog = NULL;
-      return;
-      }
-    // Separate the root from the extension.
-    *ext = '\0';
-    ++ext;
+    const char* ext = ext_stl.c_str();
 
     vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
     dlg->SetMasterWindow(pvWin);
@@ -1179,12 +1157,8 @@ void vtkPVAnimationManager::SaveAnimation()
     frame->Delete();
     dlg->Delete();
 
-    this->AnimationScene->SaveImages(fileRoot, ext, width, height, 0);
+    this->AnimationScene->SaveImages(fileRoot.c_str(), ext, width, height, 0);
     view->SetRenderWindowSize(origWidth, origHeight);
-
-    delete [] fileRoot;
-    fileRoot = NULL;
-    ext = NULL;
     }
 
   saveDialog->Delete();

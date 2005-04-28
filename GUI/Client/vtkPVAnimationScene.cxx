@@ -18,14 +18,11 @@
 #include "vtkAnimationScene.h"
 #include "vtkCommand.h"
 #include "vtkErrorCode.h"
-#include "vtkImageWriter.h"
-#include "vtkJPEGWriter.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
-#include "vtkKWGenericMovieWriter.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
@@ -34,9 +31,7 @@
 #include "vtkKWScale.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkKWToolbarSet.h"
-#include "vtkMPEG2Writer.h"
 #include "vtkObjectFactory.h"
-#include "vtkPNGWriter.h"
 #include "vtkPVAnimationCue.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkPVApplication.h"
@@ -62,9 +57,6 @@
 #include "vtkPVVCRControl.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkPVTraceHelper.h"
-#include "vtkSMXMLPVAnimationWriterProxy.h"
-#include "vtkTIFFWriter.h"
-#include "vtkWindowToImageFilter.h"
 
 // Some header file is defining CurrentTime so undef it
 #undef CurrentTime
@@ -80,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.28");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.29");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -179,14 +171,6 @@ vtkPVAnimationScene::vtkPVAnimationScene()
   this->ErrorEventTag = 0;
   this->InPlay  = 0;
 
-  this->WindowToImageFilter = NULL;
-  this->MovieWriter = NULL;
-  this->ImageWriter = NULL;
-  this->FileRoot = NULL;
-  this->FileExtension = NULL;
-
-  this->GeometryWriter = NULL;
-
   this->InvokingError = 0;
 }
 
@@ -219,29 +203,7 @@ vtkPVAnimationScene::~vtkPVAnimationScene()
   this->PlayModeLabel->Delete();
   this->SetRenderView(NULL);
   this->SetAnimationManager(NULL);
-  if (this->ImageWriter)
-    {
-    this->ImageWriter->Delete();
-    this->ImageWriter = NULL;
-    }
-  if (this->WindowToImageFilter)
-    {
-    this->WindowToImageFilter->Delete();
-    this->WindowToImageFilter = NULL;
-    }
-  if (this->MovieWriter)
-    {
-    this->MovieWriter->Delete();
-    this->MovieWriter = NULL;
-    }
-  this->SetFileRoot(0);
-  this->SetFileExtension(0);
 
-  if (this->GeometryWriter)
-    {
-    this->GeometryWriter->Delete();
-    this->GeometryWriter = NULL;
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -506,178 +468,32 @@ void vtkPVAnimationScene::CreateProxy()
 void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext, 
   int width, int height, int aspectRatio)
 {
-  this->GoToBeginning();
-  if (this->WindowToImageFilter || this->ImageWriter || this->MovieWriter)
-    {
-    vtkErrorMacro("Incosistent state. Save aborted.");
-    return;
-    }
-
-  int *size = this->RenderView->GetRenderWindowSize();
-  int magnification = 1;
-  // determine magnification.
-  if (size[0] < width || size[1] < height)
-    {
-    int xMag = width / size[0] + 1;
-    int yMag = height / size[1] + 1;
-    magnification = (xMag > yMag) ? xMag : yMag;
-    width /= magnification;
-    height /= magnification;
-    }
-
-  this->RenderView->SetRenderWindowSize(width, height);
-
-  this->WindowToImageFilter = vtkWindowToImageFilter::New();
-  this->WindowToImageFilter->SetInput(this->RenderView->GetRenderWindow());
-  this->WindowToImageFilter->SetMagnification(magnification);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SaveImages \"%s\" \"%s\" %d %d %d",
+    this->GetTclName(), fileRoot, ext, width, height, aspectRatio);
+  int savefailed = this->AnimationSceneProxy->SaveImages(fileRoot, ext, width, height);
   
-  if (strcmp(ext,"jpg") == 0)
-    {
-    this->ImageWriter = vtkJPEGWriter::New();
-    }
-  else if (strcmp(ext,"tif") == 0)
-    {
-    this->ImageWriter = vtkTIFFWriter::New();
-    }
-  else if (strcmp(ext,"png") == 0)
-    {
-    this->ImageWriter = vtkPNGWriter::New();
-    }
-  else if (strcmp(ext, "mp2") == 0)
-    {
-    this->MovieWriter = vtkMPEG2Writer::New();
-    }
-#ifdef _WIN32
-  else if (strcmp(ext, "avi") == 0)
-    {
-    this->MovieWriter = vtkAVIWriter::New();
-    }
-#endif
-  else
-    {
-    vtkErrorMacro("Unknown extension " << ext << ", try: jpg, tif or png.");
-    return;
-    }
-  
-  this->SetFileRoot(fileRoot);
-  this->SetFileExtension(ext);
-  this->FileCount = 0;
-  this->SaveFailed = 0;
-  if (this->ImageWriter)
-    {
-    this->ImageWriter->SetInput(this->WindowToImageFilter->GetOutput());
-    }
-  else if (this->MovieWriter)
-    {
-    ostrstream str;
-    str << fileRoot << "." << ext << ends;
-    this->MovieWriter->SetInput(this->WindowToImageFilter->GetOutput());
-    this->MovieWriter->SetFileName(str.str());
-    str.rdbuf()->freeze(0);
-    this->MovieWriter->Start();
-    }
- 
-  this->GetTraceHelper()->AddEntry("$kw(%s) SaveImages \"%s\" \"%s\" %d %d %d", this->GetTclName(),
-    fileRoot, ext, width, height, aspectRatio);
-
-  // Play the animation.
-  int oldMode = this->GetPlayMode();
-  this->SetPlayModeToSequence();
-  this->Play();
-  this->SetPlayMode(oldMode);
-
-  this->WindowToImageFilter->Delete();
-  this->WindowToImageFilter = NULL;
-  if (this->ImageWriter)
-    {
-    this->ImageWriter->Delete();
-    this->ImageWriter = NULL;
-    }
-  else if (this->MovieWriter)
-    {
-    this->MovieWriter->End();
-    this->MovieWriter->SetInput(0);
-    this->MovieWriter->Delete();
-    this->MovieWriter = NULL;
-    }
-  if (this->SaveFailed)
+  if (savefailed)
     {
     vtkKWMessageDialog::PopupMessage(
       this->GetApplication(), this->Window, "Write Error",
       "There is insufficient disk space to save the images for this "
       "animation. The file(s) already written will be deleted.");
-    if (this->ImageWriter)
-      {
-      char* fileName = new char[strlen(this->FileRoot) + strlen(this->FileExtension) + 25];
-      for (int i=0; i < this->FileCount; i++)
-        {
-        sprintf(fileName, "%s%04d.%s", this->FileRoot, i, this->FileExtension);
-        unlink(fileName);
-        }
-      delete [] fileName;
-      }
     }
-  // TODO:trace?  
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SaveGeometry(const char* filename)
 {
   // Start at the beginning.
-  this->GoToBeginning();
-  vtkSMXMLPVAnimationWriterProxy* animWriter = 
-    vtkSMXMLPVAnimationWriterProxy::SafeDownCast(vtkSMObject::GetProxyManager()
-      ->NewProxy("writers","XMLPVAnimationWriter"));
-  if (!animWriter)
-    {
-    vtkErrorMacro("Failed to create XMLPVAnimationWriter proxy.");
-    return;
-    }
-
   this->GetTraceHelper()->AddEntry("$kw(%s) SaveGeometry %s", this->GetTclName(), filename);
-
-  this->GeometryWriter = animWriter;
-
-  vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
-    animWriter->GetProperty("FileName"));
-  svp->SetElement(0,filename);
-  animWriter->UpdateVTKObjects();
-
-  vtkPVSourceCollection* sources = this->Window->GetSourceList("Sources");
-  sources->InitTraversal();
-  vtkPVSource* source;
-  while( (source = sources->GetNextPVSource()) )
-    {
-    if (source->GetVisibility())
-      {
-      vtkSMSimpleDisplayProxy::SafeDownCast(source->GetDisplayProxy())
-        ->SetInputAsGeometryFilter(animWriter);
-      }
-    }
-
-  vtkSMProperty* p = animWriter->GetProperty("Start");
-  p->Modified();
-  animWriter->UpdateVTKObjects();
-
-  // Play the animation.
-  int oldMode = this->GetPlayMode();
-  this->SetPlayModeToSequence();
-  this->Play();
-  this->SetPlayMode(oldMode);
- 
-  p = animWriter->GetProperty("Finish");
-  p->Modified();
-  animWriter->UpdateVTKObjects();
-
-  if (animWriter->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+  int error = this->AnimationSceneProxy->SaveGeometry(filename);
+  if (error == vtkErrorCode::OutOfDiskSpaceError)
     {
     vtkKWMessageDialog::PopupMessage(
       this->GetApplication(), this->Window,
       "Write Error", "There is insufficient disk space to save the geometry "
       "for this animation. The file(s) already written will be deleted.");
     }
-  animWriter->Delete();
-  this->GeometryWriter = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -709,62 +525,10 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
         (etime==stime)?  0 : (cueInfo->CurrentTime - stime) / (etime - stime);
       this->AnimationManager->SetTimeMarker(ntime);
       this->TimeScale->SetValue(cueInfo->CurrentTime);
-      
-      if (event != vtkCommand::EndAnimationCueEvent)
-        {
-        this->SaveImages();
-        this->SaveGeometry(cueInfo->CurrentTime);
-        }
       }
     break;
     }
   this->Script("update");
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationScene::SaveImages()
-{
-  if (!this->WindowToImageFilter)
-    {
-    return;
-    }
-  int errcode = 0;
-  // Saving an animation.
-  this->WindowToImageFilter->Modified();
-  this->WindowToImageFilter->ShouldRerenderOff();
-  if (this->ImageWriter)
-    {
-    char* fileName = new char[strlen(this->FileRoot) + strlen(this->FileExtension) + 25];
-    sprintf(fileName, "%s%04d.%s", this->FileRoot, this->FileCount, this->FileExtension);
-    this->ImageWriter->SetFileName(fileName);
-    this->ImageWriter->Write();
-    errcode = this->ImageWriter->GetErrorCode(); 
-    this->FileCount = (!errcode)? this->FileCount + 1 : this->FileCount; 
-    delete [] fileName;
-    }
-  else if (this->MovieWriter)
-    {
-    this->MovieWriter->Write();
-    errcode = this->MovieWriter->GetErrorCode() + this->MovieWriter->GetError();
-    }
-  if (errcode)
-    {
-    this->Stop();
-    this->SaveFailed = errcode;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationScene::SaveGeometry(double time)
-{
-  if (!this->GeometryWriter)
-    {
-    return;
-    }
-  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-    this->GeometryWriter->GetProperty("WriteTime"));
-  dvp->SetElement(0, time);
-  this->GeometryWriter->UpdateVTKObjects();
 }
 
 //-----------------------------------------------------------------------------

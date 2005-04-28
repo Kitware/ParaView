@@ -92,7 +92,7 @@ public:
   // Description:
   // This method will set the subproxy GeometryFilterProxy
   // as the input (using property "Input") on the argument
-  // onProxy.
+  // onProxy. 
   void SetInputAsGeometryFilter(vtkSMProxy* onProxy);
 
   // Description:

@@ -138,6 +138,7 @@ INCLUDE_DIRECTORIES(
   ${ParaView_SOURCE_DIR}/Servers/Common
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/ServerManager
+  ${KWCommon_INCLUDE_PATH}
 )
 
 SET(kits Common Filtering GenericFiltering IO Imaging Rendering Parallel Graphics Hybrid VolumeRendering)
@@ -186,7 +187,10 @@ ADD_LIBRARY(vtkPVServerManager
   ${vtkPVServerManagerCS_SRCS} 
   ${SMInstantiator_SRCS}
   ) 
-TARGET_LINK_LIBRARIES (vtkPVServerManager vtkPVFiltersCS vtkClientServer)
+TARGET_LINK_LIBRARIES (vtkPVServerManager 
+  vtkPVFiltersCS 
+  vtkClientServer
+  ${KWCommon_LIBRARIES})
 
 # Create Tcl wrappers for SM classes.
 IF (PARAVIEW_BUILD_GUI)
