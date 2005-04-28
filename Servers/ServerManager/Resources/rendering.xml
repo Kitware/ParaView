@@ -1188,7 +1188,7 @@
         command="SetOpacity"
         number_of_elements="1"
         default_values="1.0"
-        animateable="0">
+        animateable="1">
         <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
       <DoubleVectorProperty
