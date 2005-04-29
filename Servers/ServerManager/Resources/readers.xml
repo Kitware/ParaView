@@ -1451,6 +1451,48 @@
           </RequiredProperties>
        </ArraySelectionDomain>
      </StringVectorProperty>
+     
+     <StringVectorProperty 
+        name="SideSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="SideSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="SideSetArrayStatus"
+        command="SetSideSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="SideSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="SideSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
+     
+      <StringVectorProperty 
+        name="NodeSetInfo"
+        information_only="1">
+        <ArraySelectionInformationHelper attribute_name="NodeSet"/>
+     </StringVectorProperty>
+
+     <StringVectorProperty
+        name="NodeSetArrayStatus"
+        command="SetNodeSetArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0"
+        information_property="NodeSetInfo"> 
+       <ArraySelectionDomain name="array_list">
+          <RequiredProperties>
+             <Property name="NodeSetInfo" function="ArrayList"/>
+          </RequiredProperties>
+       </ArraySelectionDomain>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="GenerateBlockIdCellArray" 

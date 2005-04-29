@@ -18,7 +18,7 @@
     <Scale property="TimeStep"
            label="Time step" trace_name="TimeStep"
            keeps_timesteps="1"
-           help="Set the current timestep."/>	
+           help="Set the current timestep."/>
   </Module>
   <Module name="XMLPolyDataReader"
           root_name="XMLPolyDataReader"
@@ -500,6 +500,12 @@
     <ArraySelection trace_name="point_array_sel"
                     property="PointArrayStatus"
                     label_text="Node Variables" />
+    <ArraySelection trace_name="side_set_sel"
+                    property="SideSetArrayStatus"
+                    label_text="Side Sets" />
+    <ArraySelection trace_name="node_set_sel"
+                    property="NodeSetArrayStatus"
+                    label_text="Node Sets" />
 
     <SelectWidget label="Display Type"
                   property="DisplayType"
