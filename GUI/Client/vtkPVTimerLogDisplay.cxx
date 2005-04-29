@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.25");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.26");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -153,6 +153,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
     {
     this->Script("toplevel %s", wname);
     }
+  this->Script("wm withdraw %s", wname);
   this->Script("wm title %s \"%s\"", wname, this->Title);
   this->Script("wm iconname %s \"vtk\"", wname);
   if (this->MasterWindow)
@@ -253,7 +254,6 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 
   this->Script("set commandList \"\"");
   
-  this->Script("wm withdraw %s", wname);
 }
 
 //----------------------------------------------------------------------------
