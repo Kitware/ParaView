@@ -36,6 +36,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWNotebook.h"
@@ -86,7 +87,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.30");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.31");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -104,7 +105,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   this->ScalarBarCheckVisible = 1;
   this->InterpolateColorsCheckVisible = 1;
 
-  this->MainFrame = vtkKWFrame::New();
+  this->MainFrame = vtkKWFrameWithScrollbar::New();
   this->ColorFrame = vtkKWFrameLabeled::New();
   this->VolumeAppearanceFrame = vtkKWFrameLabeled::New();
   this->DisplayStyleFrame = vtkKWFrameLabeled::New();

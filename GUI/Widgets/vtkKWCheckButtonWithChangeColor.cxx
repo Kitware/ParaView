@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWCheckButtonWithChangeColor);
-vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.6");
+vtkCxxRevisionMacro(vtkKWCheckButtonWithChangeColor, "1.7");
 
 int vtkKWCheckButtonWithChangeColorCommand(ClientData cd, Tcl_Interp *interp,
                                            int argc, char *argv[]);
@@ -125,7 +125,7 @@ void vtkKWCheckButtonWithChangeColor::Update()
       this->CheckButton && this->CheckButton->IsCreated())
     {
     this->ChangeColorButton->SetEnabled(
-      this->CheckButton->GetState() ? this->Enabled : 0);
+      this->CheckButton->GetState() ? this->GetEnabled() : 0);
     }
 }
 
@@ -148,15 +148,8 @@ void vtkKWCheckButtonWithChangeColor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->CheckButton)
-    {
-    this->CheckButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->ChangeColorButton)
-    {
-    this->ChangeColorButton->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->CheckButton);
+  this->PropagateEnableState(this->ChangeColorButton);
 }
 
 //----------------------------------------------------------------------------

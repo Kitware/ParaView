@@ -80,7 +80,7 @@ public:
     {
     // Clear out any old check buttons.
     parent->Script("catch {eval pack forget [pack slaves %s]}",
-      parent->GetFrame()->GetFrame()->GetFrame()->GetWidgetName());
+      parent->GetFrame()->GetFrame()->GetWidgetName());
     vtkCollectionIterator* sit = this->GetWidgetsIterator();
     for ( sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem() )
       {
@@ -98,7 +98,7 @@ public:
       Parameter* p = &it->second;
       const vtkstd::string *name  = &it->first;
       scale = vtkKWScale::New();
-      scale->SetParent(parent->GetFrame()->GetFrame()->GetFrame());
+      scale->SetParent(parent->GetFrame()->GetFrame());
       scale->SetRange(p->Min, p->Max);
       scale->SetResolution(1);
       scale->Create(parent->GetApplication(), 0);
@@ -150,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.35");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()

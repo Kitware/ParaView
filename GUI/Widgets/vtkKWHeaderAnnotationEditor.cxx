@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.1");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotationEditor, "1.2");
 
 int vtkKWHeaderAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -364,25 +364,10 @@ void vtkKWHeaderAnnotationEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->TextFrame)
-    {
-    this->TextFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->TextEntry)
-    {
-    this->TextEntry->SetEnabled(this->Enabled);
-    }
-
-  if (this->TextPropertyWidget)
-    {
-    this->TextPropertyWidget->SetEnabled(this->Enabled);
-    }
-
-  if (this->TextPropertyPopupButton)
-    {
-    this->TextPropertyPopupButton->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->TextFrame);
+  this->PropagateEnableState(this->TextEntry);
+  this->PropagateEnableState(this->TextPropertyWidget);
+  this->PropagateEnableState(this->TextPropertyPopupButton);
 }
 
 //----------------------------------------------------------------------------

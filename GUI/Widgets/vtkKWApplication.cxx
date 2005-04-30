@@ -56,7 +56,7 @@ EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.198");
+vtkCxxRevisionMacro(vtkKWApplication, "1.199");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -103,7 +103,7 @@ vtkKWApplication::vtkKWApplication()
   sprintf(name, "%s Limited Edition", this->Name);
   this->SetLimitedEditionModeName(name);
 
-  this->DisplayHelpStartingPage = 
+  this->HelpDialogStartingPage = 
     kwsys::SystemTools::DuplicateString("Introduction.htm");
 
   this->InstallationDirectory = NULL;
@@ -189,7 +189,7 @@ vtkKWApplication::~vtkKWApplication()
 
   this->SetEmailFeedbackAddress(NULL);
 
-  this->SetDisplayHelpStartingPage(NULL);
+  this->SetHelpDialogStartingPage(NULL);
 
   if (this->RegistryHelper )
     {
@@ -203,88 +203,11 @@ vtkKWApplication::~vtkKWApplication()
     this->BalloonHelpManager = NULL;
     }
 }
-
+    
 //----------------------------------------------------------------------------
 void vtkKWApplication::SetApplication(vtkKWApplication*) 
 { 
   vtkErrorMacro( << "Do not set the Application on an Application" << endl); 
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::FindInstallationDirectory()
-{
-  const char *nameofexec = Tcl_GetNameOfExecutable();
-  if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
-    {
-    kwsys_stl::string directory = 
-      kwsys::SystemTools::GetFilenamePath(nameofexec);
-    // remove the /bin from the end
-    // directory[strlen(directory) - 4] = '\0';
-    // => do not *do* that: first it breaks all the apps 
-    // relying on this method to find where the binary is installed 
-    // (hello plugins ?), second this is a hard-coded assumption, what
-    // about msdev path, bin/release, bin/debug, etc.
-    // If you need to remove whatever dir, just copy the result of this
-    // method and strip it where needed.
-    kwsys::SystemTools::ConvertToUnixSlashes(directory);
-    this->SetInstallationDirectory(directory.c_str());
-    }
-  else
-    {
-    char setup_key[REG_KEY_NAME_SIZE_MAX];
-    sprintf(setup_key, "%s\\Setup", this->GetVersionName());
-    vtkKWRegistryHelper *reg = this->GetRegistryHelper();
-    reg->SetTopLevel(this->GetName());
-    char installed_path[REG_KEY_VALUE_SIZE_MAX];
-    if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
-      {
-      kwsys_stl::string directory(installed_path);
-      kwsys::SystemTools::ConvertToUnixSlashes(directory);
-      this->SetInstallationDirectory(directory.c_str());
-      }
-    else
-      {
-      reg->SetGlobalScope(1);
-      if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
-        {
-        kwsys_stl::string directory(installed_path);
-        kwsys::SystemTools::ConvertToUnixSlashes(directory);
-        this->SetInstallationDirectory(directory.c_str());
-        }
-      else
-        {
-        this->SetInstallationDirectory(0);
-        }
-      reg->SetGlobalScope(0);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-const char* vtkKWApplication::Script(const char* format, ...)
-{
-  va_list var_args1, var_args2;
-  va_start(var_args1, format);
-  va_start(var_args2, format);
-  const char* result = vtkKWTkUtilities::EvaluateStringFromArgs(
-    this, format, var_args1, var_args2);
-  va_end(var_args1);
-  va_end(var_args2);
-  return result;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWApplication::EvaluateBooleanExpression(const char* format, ...)
-{
-  va_list var_args1, var_args2;
-  va_start(var_args1, format);
-  va_start(var_args2, format);
-  const char* result = vtkKWTkUtilities::EvaluateStringFromArgs(
-    this, format, var_args1, var_args2);
-  va_end(var_args1);
-  va_end(var_args2);
-
-  return (result && !strcmp(result, "1")) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -387,8 +310,6 @@ void vtkKWApplication::Exit()
       win->Close();
       }
     }
-  
-  this->Cleanup();
 
   return;
 }
@@ -662,7 +583,7 @@ void vtkKWApplication::DoOneTclEvent()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
+void vtkKWApplication::DisplayHelpDialog(vtkKWWindow* master)
 {
 #ifdef _WIN32
   ostrstream temp;
@@ -671,9 +592,9 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
     temp << this->InstallationDirectory << "/";
     }
   temp << this->Name << ".chm";
-  if (this->DisplayHelpStartingPage)
+  if (this->HelpDialogStartingPage)
     {
-    temp << "::/" << this->DisplayHelpStartingPage;
+    temp << "::/" << this->HelpDialogStartingPage;
     }
   temp << ends;
   
@@ -704,7 +625,7 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
+void vtkKWApplication::DisplayAboutDialog(vtkKWWindow* master)
 {
   if (this->InExit)
     {
@@ -723,13 +644,13 @@ void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
     this->AboutDialog->Create(this, "-bd 1 -relief solid");
     }
 
-  this->ConfigureAbout();
+  this->ConfigureAboutDialog();
 
   this->AboutDialog->Invoke();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::ConfigureAbout()
+void vtkKWApplication::ConfigureAboutDialog()
 {
   if (this->HasSplashScreen)
     {
@@ -1386,6 +1307,83 @@ void vtkKWApplication::UnRegisterDialogUp(vtkKWWidget *)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWApplication::FindInstallationDirectory()
+{
+  const char *nameofexec = Tcl_GetNameOfExecutable();
+  if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
+    {
+    kwsys_stl::string directory = 
+      kwsys::SystemTools::GetFilenamePath(nameofexec);
+    // remove the /bin from the end
+    // directory[strlen(directory) - 4] = '\0';
+    // => do not *do* that: first it breaks all the apps 
+    // relying on this method to find where the binary is installed 
+    // (hello plugins ?), second this is a hard-coded assumption, what
+    // about msdev path, bin/release, bin/debug, etc.
+    // If you need to remove whatever dir, just copy the result of this
+    // method and strip it where needed.
+    kwsys::SystemTools::ConvertToUnixSlashes(directory);
+    this->SetInstallationDirectory(directory.c_str());
+    }
+  else
+    {
+    char setup_key[REG_KEY_NAME_SIZE_MAX];
+    sprintf(setup_key, "%s\\Setup", this->GetVersionName());
+    vtkKWRegistryHelper *reg = this->GetRegistryHelper();
+    reg->SetTopLevel(this->GetName());
+    char installed_path[REG_KEY_VALUE_SIZE_MAX];
+    if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
+      {
+      kwsys_stl::string directory(installed_path);
+      kwsys::SystemTools::ConvertToUnixSlashes(directory);
+      this->SetInstallationDirectory(directory.c_str());
+      }
+    else
+      {
+      reg->SetGlobalScope(1);
+      if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
+        {
+        kwsys_stl::string directory(installed_path);
+        kwsys::SystemTools::ConvertToUnixSlashes(directory);
+        this->SetInstallationDirectory(directory.c_str());
+        }
+      else
+        {
+        this->SetInstallationDirectory(0);
+        }
+      reg->SetGlobalScope(0);
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWApplication::Script(const char* format, ...)
+{
+  va_list var_args1, var_args2;
+  va_start(var_args1, format);
+  va_start(var_args2, format);
+  const char* result = vtkKWTkUtilities::EvaluateStringFromArgs(
+    this, format, var_args1, var_args2);
+  va_end(var_args1);
+  va_end(var_args2);
+  return result;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::EvaluateBooleanExpression(const char* format, ...)
+{
+  va_list var_args1, var_args2;
+  va_start(var_args1, format);
+  va_start(var_args2, format);
+  const char* result = vtkKWTkUtilities::EvaluateStringFromArgs(
+    this, format, var_args1, var_args2);
+  va_end(var_args1);
+  va_end(var_args2);
+
+  return (result && !strcmp(result, "1")) ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1402,8 +1400,8 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->GetEmailFeedbackAddress() ? this->GetEmailFeedbackAddress() :
          "(none)")
      << endl;
-  os << indent << "DisplayHelpStartingPage: "
-     << (this->DisplayHelpStartingPage ? this->DisplayHelpStartingPage :
+  os << indent << "HelpDialogStartingPage: "
+     << (this->HelpDialogStartingPage ? this->HelpDialogStartingPage :
          "(none)")
      << endl;
   os << indent << "DialogUp: " << this->GetDialogUp() << endl;

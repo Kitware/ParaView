@@ -34,10 +34,10 @@
 class vtkKWApplication;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
-class vtkPVCornerAnnotationEditor;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWFrameLabeled;
+class vtkKWFrameWithScrollbar;
 class vtkKWLabel;
 class vtkKWMenu;
 class vtkKWMenuButton;
@@ -46,6 +46,7 @@ class vtkKWSegmentedProgressGauge;
 class vtkKWText;
 class vtkKWWindow;
 class vtkKWWindow;
+class vtkPVCornerAnnotationEditor;
 class vtkRenderWindow;
 class vtkRenderer;
 class vtkTextActor;
@@ -345,9 +346,9 @@ protected:
   vtkKWWidget *Frame2;
   vtkKWWidget *ControlFrame;
 
-  vtkKWFrame             *AnnotationProperties;
+  vtkKWFrameWithScrollbar *AnnotationPropertiesFrame;
 
-  vtkKWFrame             *GeneralProperties;
+  vtkKWFrameWithScrollbar *GeneralPropertiesFrame;
   vtkKWFrameLabeled      *ColorsFrame;
   vtkKWChangeColorButton *RendererBackgroundColor;
 

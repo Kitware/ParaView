@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.350");
+vtkCxxRevisionMacro(vtkPVApplication, "1.351");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -480,8 +480,12 @@ vtkPVApplication::~vtkPVApplication()
   this->Observer->Delete();
   this->Observer = 0;
 
-  this->SMApplication->Finalize();
-  this->SMApplication->Delete();
+  if (this->SMApplication)
+    {
+    this->SMApplication->Finalize();
+    this->SMApplication->Delete();
+    this->SMApplication = NULL;
+    }
 
   if (this->SaveRuntimeInfoButton)
     {
@@ -1501,7 +1505,7 @@ void vtkPVApplication::StopRecordingScript()
 // Make instances of sources.
 //============================================================================
 
-void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
+void vtkPVApplication::DisplayHelpDialog(vtkKWWindow* master)
 {
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");

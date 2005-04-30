@@ -30,12 +30,14 @@
 #include "vtkSMInputProperty.h"
 
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithScrollbar.h"
+
 #include "vtkKWLabel.h"
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.17");
+vtkCxxRevisionMacro(vtkPVPick, "1.18");
 
 
 //----------------------------------------------------------------------------

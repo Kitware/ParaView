@@ -26,7 +26,7 @@
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.21");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.22");
 
 
 int vtkKWPiecewiseFunctionEditorCommand(ClientData cd, Tcl_Interp *interp,
@@ -369,7 +369,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
   // Disable entry if value is locked
 
   this->ValueEntry->SetEnabled(
-    this->FunctionPointValueIsLocked(id) ? 0 : this->Enabled);
+    this->FunctionPointValueIsLocked(id) ? 0 : this->GetEnabled());
 
   // Get the value
 
@@ -534,15 +534,8 @@ void vtkKWPiecewiseFunctionEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->ValueEntry)
-    {
-    this->ValueEntry->SetEnabled(this->Enabled);
-    }
-
-  if (this->WindowLevelModeCheckButton)
-    {
-    this->WindowLevelModeCheckButton->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->ValueEntry);
+  this->PropagateEnableState(this->WindowLevelModeCheckButton);
 }
 
 //----------------------------------------------------------------------------

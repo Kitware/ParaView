@@ -17,6 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWLabel.h"
 #include "vtkPVAnimationCue.h"
@@ -41,7 +42,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.14");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.15");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -86,7 +87,7 @@ protected:
 //-----------------------------------------------------------------------------
 vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
 {
-  this->TopFrame = vtkKWFrame::New();
+  this->TopFrame = vtkKWFrameWithScrollbar::New();
   this->KeyFramePropertiesFrame = vtkKWFrameLabeled::New();
   this->ScenePropertiesFrame = vtkKWFrameLabeled::New();
   this->SelectKeyFrameLabel = vtkKWLabel::New();
@@ -183,16 +184,18 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
     return;
     }
   this->TopFrame->SetParent(this);
-  this->TopFrame->ScrollableOn();
   this->TopFrame->Create(app, 0);
-  this->Script("pack %s -side top -fill both -expand t -anchor center",
+  this->Script(
+    // "pack %s -side top -expand t", // -fill both  -anchor center",
+    "pack %s -pady 2 -fill both -expand yes -anchor n",
     this->TopFrame->GetWidgetName());
 
   this->ScenePropertiesFrame->SetParent(this->TopFrame->GetFrame());
   this->ScenePropertiesFrame->ShowHideFrameOn();
   this->ScenePropertiesFrame->Create(app, 0);
   this->ScenePropertiesFrame->SetLabelText("Animation Control");
-  this->Script("pack %s -side top -fill x -expand t -padx 2 -pady 2", 
+  this->Script(
+    "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", // 
     this->ScenePropertiesFrame->GetWidgetName());
  
   // KEYFRAME PROPERTIES FRAME
@@ -200,7 +203,8 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->KeyFramePropertiesFrame->ShowHideFrameOn();
   this->KeyFramePropertiesFrame->Create(app, 0);
   this->KeyFramePropertiesFrame->SetLabelText(VTK_PV_KEYFRAME_PROPERTIES_DEFAULT_LABEL);
-  this->Script("pack %s -side top -fill x -expand t -padx 2 -pady 2", 
+  this->Script(
+    "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", // 
     this->KeyFramePropertiesFrame->GetWidgetName());
 
   this->TitleLabelLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
@@ -215,7 +219,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->PropertiesFrame->SetParent(this->KeyFramePropertiesFrame->GetFrame());
   this->PropertiesFrame->Create(app, 0);
 
-  this->IndexScale->SetParent(this->PropertiesFrame->GetFrame());
+  this->IndexScale->SetParent(this->PropertiesFrame);
   this->IndexScale->Create(app,0);
   this->IndexScale->DisplayEntry();
   this->IndexScale->DisplayEntryAndLabelOnTopOff();
@@ -227,16 +231,16 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->IndexScale->SetBalloonHelpString("Select a key frame at a particular index in the "
     "current track");
   
-  this->TypeLabel->SetParent(this->PropertiesFrame->GetFrame());
+  this->TypeLabel->SetParent(this->PropertiesFrame);
   this->TypeLabel->Create(app, 0);
   this->TypeLabel->SetText("Interpolation:");
  
-  this->TypeImage->SetParent(this->PropertiesFrame->GetFrame());
+  this->TypeImage->SetParent(this->PropertiesFrame);
   this->TypeImage->Create(app, "-relief flat");
   this->TypeImage->SetBalloonHelpString("Specify the type of interpolation "
     "following the active key frame.");
   
-  this->TypeMenuButton->SetParent(this->PropertiesFrame->GetFrame());
+  this->TypeMenuButton->SetParent(this->PropertiesFrame);
   this->TypeMenuButton->Create(app, "-image PVToolbarPullDownArrow -relief flat");
   this->TypeMenuButton->SetBalloonHelpString("Specify the type of interpolation "
     "following the active key frame.");
@@ -264,7 +268,8 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->SaveFrame->ShowHideFrameOn();
   this->SaveFrame->SetLabelText("Animation Settings");
   this->SaveFrame->Create(app, 0);
-  this->Script("pack %s -side top -fill x -expand t -padx 2 -pady 2", 
+  this->Script(
+    "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", // 
     this->SaveFrame->GetWidgetName());
 
 
@@ -612,19 +617,11 @@ void vtkPVVerticalAnimationInterface::UpdateEnableState()
   this->PropagateEnableState(this->ScenePropertiesFrame);
   this->PropagateEnableState(this->KeyFramePropertiesFrame);
   this->PropagateEnableState(this->SelectKeyFrameLabel);
-  if (this->ActiveKeyFrame)
+  this->PropagateEnableState(this->ActiveKeyFrame);
+  if (this->CacheGeometryCheck)
     {
-    this->PropagateEnableState(this->ActiveKeyFrame);
-    }
-  if (!this->EnableCacheCheckButton && this->Enabled)
-    {
-    this->Enabled = 0;
-    this->PropagateEnableState(this->CacheGeometryCheck);
-    this->Enabled = 1;
-    }
-  else
-    {
-    this->PropagateEnableState(this->CacheGeometryCheck);
+    this->CacheGeometryCheck->SetEnabled(
+      !this->EnableCacheCheckButton ? 0 : this->GetEnabled());
     }
 }
 

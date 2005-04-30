@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.119");
+vtkCxxRevisionMacro(vtkKWWidget, "1.120");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -79,6 +79,7 @@ vtkKWWidget::~vtkKWWidget()
   if (this->DragAndDropTargetSet)
     {
     this->DragAndDropTargetSet->Delete();
+    this->DragAndDropTargetSet = NULL;
     }
 
   if (this->BalloonHelpString)
@@ -88,12 +89,13 @@ vtkKWWidget::~vtkKWWidget()
 
   if (this->IsCreated())
     {
-    this->Script("destroy %s",this->GetWidgetName());
+    this->Script("destroy %s", this->GetWidgetName());
     }
 
   if (this->WidgetName)
     {
     delete [] this->WidgetName;
+    this->WidgetName = NULL;
     }
 
   this->SetParent(NULL);
@@ -573,7 +575,7 @@ void vtkKWWidget::PropagateEnableState(vtkKWWidget* widget)
     {
     return;
     }
-  widget->SetEnabled(this->Enabled);
+  widget->SetEnabled(this->GetEnabled());
 }
 
 //----------------------------------------------------------------------------
@@ -1172,7 +1174,7 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "BalloonHelpString: " 
      << (this->BalloonHelpString ? this->BalloonHelpString : "None") << endl;
   os << indent << "Parent: " << this->GetParent() << endl;
-  os << indent << "Enabled: " << (this->Enabled ? "On" : "Off") << endl;
+  os << indent << "Enabled: " << (this->GetEnabled() ? "On" : "Off") << endl;
   os << indent << "DragAndDropTargetSet: ";
   if (this->DragAndDropTargetSet)
     {

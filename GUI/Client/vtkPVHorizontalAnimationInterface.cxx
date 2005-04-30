@@ -19,6 +19,7 @@
 #include "vtkPVApplication.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithScrollbar.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkPVAnimationCue.h"
@@ -33,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.16");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.17");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -41,7 +42,7 @@ vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
   this->SplitFrame = vtkKWSplitFrame::New();
   this->TimeLineFrame = vtkKWFrame::New();
   this->PropertiesFrame = vtkKWFrame::New();
-  this->ScrollFrame = vtkKWFrame::New();
+  this->ScrollFrame = vtkKWFrameWithScrollbar::New();
   this->AnimationEntries = vtkCollection::New();
   this->AnimationEntriesIterator = this->AnimationEntries->NewIterator();
   this->ParentTree = vtkPVAnimationCueTree::New();
@@ -74,7 +75,6 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char
     }
  
   this->ScrollFrame->SetParent(this);
-  this->ScrollFrame->ScrollableOn();
   this->ScrollFrame->Create(app, "");
   this->Script("pack %s -side top -fill both -expand t",
     this->ScrollFrame->GetWidgetName());

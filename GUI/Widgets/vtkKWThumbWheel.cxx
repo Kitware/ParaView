@@ -32,7 +32,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.28");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.29");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -68,9 +68,9 @@ vtkKWThumbWheel::vtkKWThumbWheel()
   this->MaximumValue               = 0.0;
   this->ClampMaximumValue          = 0;
 
-  this->InteractionModes[0]        = VTK_KW_TW_MODE_LINEAR_MOTION;
-  this->InteractionModes[1]        = VTK_KW_TW_MODE_NONLINEAR_MOTION;
-  this->InteractionModes[2]        = VTK_KW_TW_MODE_TOGGLE_CENTER_INDICATOR;
+  this->InteractionModes[0]        = vtkKWThumbWheel::INTERACTION_MODE_LINEAR_MOTION;
+  this->InteractionModes[1]        = vtkKWThumbWheel::INTERACTION_MODE_NONLINEAR_MOTION;
+  this->InteractionModes[2]        = vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR;
 
   this->ThumbWheelPositionIndicatorColor[0] = 0.91;
   this->ThumbWheelPositionIndicatorColor[1] = 0.41;
@@ -393,7 +393,7 @@ void vtkKWThumbWheel::CreateEntry()
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
   this->Entry->Create(this->GetApplication(), "-width 7");
-  this->Entry->SetEnabled(this->Enabled);
+  this->PropagateEnableState(this->Entry);
   this->Entry->SetValue(this->GetValue());
 }
 
@@ -428,7 +428,7 @@ void vtkKWThumbWheel::CreateLabel()
   this->Label = vtkKWLabel::New();
   this->Label->SetParent(this);
   this->Label->Create(this->GetApplication(), "");
-  this->Label->SetEnabled(this->Enabled);
+  this->PropagateEnableState(this->Label);
 }
 
 // ---------------------------------------------------------------------------
@@ -499,13 +499,13 @@ void vtkKWThumbWheel::SetInteractionMode(int mode, int arg)
     }
 
   this->InteractionModes[mode] = arg;
-  if (this->InteractionModes[mode] < VTK_KW_TW_MODE_NONE)
+  if (this->InteractionModes[mode] < vtkKWThumbWheel::INTERACTION_MODE_NONE)
     {
-    this->InteractionModes[mode] = VTK_KW_TW_MODE_NONE;
+    this->InteractionModes[mode] = vtkKWThumbWheel::INTERACTION_MODE_NONE;
     }
-  else if (this->InteractionModes[mode] > VTK_KW_TW_MODE_TOGGLE_CENTER_INDICATOR)
+  else if (this->InteractionModes[mode] > vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR)
     {
-    this->InteractionModes[mode] = VTK_KW_TW_MODE_TOGGLE_CENTER_INDICATOR;
+    this->InteractionModes[mode] = vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR;
     }
   this->Modified();
 
@@ -517,7 +517,7 @@ int vtkKWThumbWheel::GetInteractionMode(int mode)
 {
   if (mode < 0 || mode > 2)
     {
-    return VTK_KW_TW_MODE_NONE;
+    return vtkKWThumbWheel::INTERACTION_MODE_NONE;
     }
   return InteractionModes[mode];
 }
@@ -532,16 +532,16 @@ char *vtkKWThumbWheel::GetInteractionModeAsString(int mode)
 
   switch (this->InteractionModes[mode])
     {
-    case VTK_KW_TW_MODE_NONE:
+    case vtkKWThumbWheel::INTERACTION_MODE_NONE:
       return (char *)"None";
       break;
-    case VTK_KW_TW_MODE_LINEAR_MOTION:
+    case vtkKWThumbWheel::INTERACTION_MODE_LINEAR_MOTION:
       return (char *)"Linear";
       break;
-    case VTK_KW_TW_MODE_NONLINEAR_MOTION:
+    case vtkKWThumbWheel::INTERACTION_MODE_NONLINEAR_MOTION:
       return (char *)"NonLinear";
       break;
-    case VTK_KW_TW_MODE_TOGGLE_CENTER_INDICATOR:
+    case vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR:
       return (char *)"ToggleCenterIndicator";
       break;
     default:
@@ -650,19 +650,19 @@ void vtkKWThumbWheel::Bind()
       int b = i + 1;
       switch (this->InteractionModes[i])
         {
-        case VTK_KW_TW_MODE_LINEAR_MOTION:
+        case vtkKWThumbWheel::INTERACTION_MODE_LINEAR_MOTION:
           this->Script("bind %s <Button-%d> {%s StartLinearMotionCallback}",
                        this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
           this->Script("bind %s <B%d-Motion> {%s PerformLinearMotionCallback}",
                        this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
           break;
-        case VTK_KW_TW_MODE_NONLINEAR_MOTION:
+        case vtkKWThumbWheel::INTERACTION_MODE_NONLINEAR_MOTION:
           this->Script("bind %s <Button-%d> {%s StartNonLinearMotionCallback}",
                        this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
           this->Script("bind %s <B%d-Motion> {}", 
                        this->ThumbWheel->GetWidgetName(), b);
           break;
-        case VTK_KW_TW_MODE_TOGGLE_CENTER_INDICATOR:
+        case vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR:
           this->Script("bind %s <Button-%d> {%s ToggleDisplayThumbWheelCenterIndicator}",
                        this->ThumbWheel->GetWidgetName(), b, this->GetTclName());
           this->Script("bind %s <B%d-Motion> {}", 
@@ -1117,7 +1117,7 @@ void vtkKWThumbWheel::SetBalloonHelpString(const char *string)
     int i;
     for (i = 0 ; i < 3; i++)
       {
-      if (this->InteractionModes[i] == VTK_KW_TW_MODE_NONE)
+      if (this->InteractionModes[i] == vtkKWThumbWheel::INTERACTION_MODE_NONE)
         {
         continue;
         }
@@ -1138,22 +1138,22 @@ void vtkKWThumbWheel::SetBalloonHelpString(const char *string)
 
       switch (this->InteractionModes[i])
         {
-        case VTK_KW_TW_MODE_LINEAR_MOTION:
+        case vtkKWThumbWheel::INTERACTION_MODE_LINEAR_MOTION:
           modes << "linear";
           break;
-        case VTK_KW_TW_MODE_NONLINEAR_MOTION:
+        case vtkKWThumbWheel::INTERACTION_MODE_NONLINEAR_MOTION:
           modes << "non-linear";
           break;
-        case VTK_KW_TW_MODE_TOGGLE_CENTER_INDICATOR:
+        case vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR:
           modes << "toggle center indicator";
           break;
         default:
           modes << "unknown";
         }
     
-      if ((i == 0 && (this->InteractionModes[1] != VTK_KW_TW_MODE_NONE ||
-                      this->InteractionModes[2] != VTK_KW_TW_MODE_NONE)) ||
-          (i == 1 && this->InteractionModes[2] != VTK_KW_TW_MODE_NONE))
+      if ((i == 0 && (this->InteractionModes[1] != vtkKWThumbWheel::INTERACTION_MODE_NONE ||
+                      this->InteractionModes[2] != vtkKWThumbWheel::INTERACTION_MODE_NONE)) ||
+          (i == 1 && this->InteractionModes[2] != vtkKWThumbWheel::INTERACTION_MODE_NONE))
         {
         modes << ", ";
         }
@@ -1199,32 +1199,13 @@ void vtkKWThumbWheel::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->Entry)
-    {
-    this->Entry->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->Entry);
+  this->PropagateEnableState(this->Label);
+  this->PropagateEnableState(this->ThumbWheel);
+  this->PropagateEnableState(this->TopLevel);
+  this->PropagateEnableState(this->PopupPushButton);
 
-  if (this->Label)
-    {
-    this->Label->SetEnabled(this->Enabled);
-    }
-
-  if (this->ThumbWheel)
-    {
-    this->ThumbWheel->SetEnabled(this->Enabled);
-    }
-
-  if (this->TopLevel)
-    {
-    this->TopLevel->SetEnabled(this->Enabled);
-    }
-
-  if (this->PopupPushButton)
-    {
-    this->PopupPushButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->Enabled)
+  if (this->GetEnabled())
     {
     this->Bind();
     }

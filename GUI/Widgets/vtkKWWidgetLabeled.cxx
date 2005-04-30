@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWidgetLabeled);
-vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.4");
+vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.5");
 
 int vtkKWWidgetLabeledCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -51,7 +51,7 @@ vtkKWLabel* vtkKWWidgetLabeled::GetLabel()
   if (!this->Label)
     {
     this->Label = vtkKWLabel::New();
-    this->Label->SetEnabled(this->Enabled);
+    this->PropagateEnableState(this->Label);
     }
 
   return this->Label;
@@ -195,10 +195,7 @@ void vtkKWWidgetLabeled::UpdateEnableState()
   // there is a real need for it, its Enabled state will be set correctly
   // anyway.
 
-  if (this->Label)
-    {
-    this->Label->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->Label);
 }
 
 // ---------------------------------------------------------------------------

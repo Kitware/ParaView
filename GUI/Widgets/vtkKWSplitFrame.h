@@ -14,7 +14,7 @@
 // .NAME vtkKWSplitFrame - A Frame that contains two adjustable sub frames.
 // .SECTION Description
 // The split frame allows the use to select the size of the two frames.
-// It uses a spearator that can be dragged interactively.
+// It uses a separator that can be dragged interactively.
 
 
 #ifndef __vtkKWSplitFrame_h
@@ -22,6 +22,7 @@
 
 #include "vtkKWWidget.h"
 class vtkKWApplication;
+class vtkKWFrame;
 
 class VTK_EXPORT vtkKWSplitFrame : public vtkKWWidget
 {
@@ -35,12 +36,12 @@ public:
   virtual void Create(vtkKWApplication *app);
   
   // Description:
-  // Get the vtkKWWidget for the left internal frame.
-  vtkKWWidget *GetFrame1() {return this->Frame1;};
+  // Get the the left internal frame.
+  vtkKWFrame *GetFrame1() {return this->Frame1;};
 
   // Description:
-  // Get the vtkKWWidget for the right internal frame.
-  vtkKWWidget *GetFrame2() {return this->Frame2;};
+  // Get the the right internal frame.
+  vtkKWFrame *GetFrame2() {return this->Frame2;};
 
   // Description:
   // Set/Get The minimum widths for the two frames.
@@ -114,9 +115,9 @@ protected:
 
   int GetTotalSeparatorSize();
 
-  vtkKWWidget *Frame1;
-  vtkKWWidget *Separator;
-  vtkKWWidget *Frame2;
+  vtkKWFrame *Frame1;
+  vtkKWFrame *Separator;
+  vtkKWFrame *Frame2;
 
   int Size;
   int Frame1Size;
@@ -133,7 +134,10 @@ protected:
   int Orientation;
 
   // Reset the actual windows to match our width IVars.
-  void Update();
+  virtual void Update();
+  virtual void AddBindings();
+  virtual void RemoveBindings();
+
 private:
   vtkKWSplitFrame(const vtkKWSplitFrame&); // Not implemented
   void operator=(const vtkKWSplitFrame&); // Not implemented

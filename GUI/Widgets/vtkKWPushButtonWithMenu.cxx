@@ -18,7 +18,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWPushButtonWithMenu );
-vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.1");
+vtkCxxRevisionMacro(vtkKWPushButtonWithMenu, "1.2");
 
 int vtkKWPushButtonWithMenuCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -95,10 +95,8 @@ vtkKWMenu* vtkKWPushButtonWithMenu::GetMenu()
 void vtkKWPushButtonWithMenu::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
-  if (this->Menu)
-    {
-    this->Menu->SetEnabled(this->Enabled);
-    }
+
+  this->PropagateEnableState(this->Menu);
 }
 
 //----------------------------------------------------------------------------

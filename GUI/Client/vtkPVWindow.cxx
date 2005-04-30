@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.690");
+vtkCxxRevisionMacro(vtkPVWindow, "1.691");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -328,8 +328,11 @@ vtkPVWindow::~vtkPVWindow()
     {
     vtkPVApplication *pvApp = this->GetPVApplication();
     vtkPVProcessModule *pm = pvApp->GetProcessModule();
-    pm->DeleteStreamObject(this->ServerFileListingID, stream);
-    pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+    if (pm)
+      {
+      pm->DeleteStreamObject(this->ServerFileListingID, stream);
+      pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
+      }
     }
   this->SetInteractor(0);
 
@@ -340,6 +343,7 @@ vtkPVWindow::~vtkPVWindow()
   if (this->ApplicationSettingsInterface)
     {
     this->ApplicationSettingsInterface->Delete();
+    this->ApplicationSettingsInterface = NULL;
     }
 
   // Then the interface manager
@@ -347,28 +351,100 @@ vtkPVWindow::~vtkPVWindow()
   if (this->UserInterfaceManager)
     {
     this->UserInterfaceManager->Delete();
+    this->UserInterfaceManager = NULL;
     }
 
-  this->ResetCameraButton->Delete();
-  this->ResetCameraButton = NULL;
-  this->RotateCameraButton->Delete();
-  this->RotateCameraButton = NULL;
-  this->TranslateCameraButton->Delete();
-  this->TranslateCameraButton = NULL;
+  if (this->ResetCameraButton)
+    {
+    this->ResetCameraButton->Delete();
+    this->ResetCameraButton = NULL;
+    }
+
+  if (this->RotateCameraButton)
+    {
+    this->RotateCameraButton->Delete();
+    this->RotateCameraButton = NULL;
+    }
+
+  if (this->TranslateCameraButton)
+    {
+    this->TranslateCameraButton->Delete();
+    this->TranslateCameraButton = NULL;
+    }
 
   if (this->SourceLists)
     {
     this->SourceLists->Delete();
     this->SourceLists = 0;
     }
-  
-  this->ToolbarButtons->Delete();
-  this->ToolbarButtons = 0;
 
-  this->PackageFiles->Delete();
-  this->PackageFiles = 0;
+  if (this->ToolbarButtons)
+    {
+    this->ToolbarButtons->Delete();
+    this->ToolbarButtons = NULL;
+    }
 
+  if (this->PackageFiles)
+    {
+    this->PackageFiles->Delete();
+    this->PackageFiles = NULL;
+    }
   
+  if (this->FileExtensions)
+    {
+    delete [] this->FileExtensions;
+    this->FileExtensions = NULL;
+    }
+
+  if (this->FileDescriptions)
+    {
+    delete [] this->FileDescriptions;
+    this->FileDescriptions = NULL;
+    }
+
+  if (this->Prototypes)
+    {
+    this->Prototypes->Delete();
+    this->Prototypes = NULL;
+    }
+
+  if (this->ReaderList)
+    {
+    this->ReaderList->Delete();
+    this->ReaderList = NULL;
+    }
+
+  if (this->Writers)
+    {
+    this->Writers->Delete();
+    this->Writers = NULL;
+    }
+
+  if (this->FileWriterList)
+    {
+    this->FileWriterList->Delete();
+    this->FileWriterList = NULL;
+    }
+    
+  if (this->MenuState)
+    {
+    this->MenuState->Delete();
+    this->MenuState = NULL;
+    }
+
+  if (this->CenterAxesProxyName)
+    {
+    vtkSMObject::GetProxyManager()->UnRegisterProxy("axes",
+      this->CenterAxesProxyName);
+    this->SetCenterAxesProxyName(NULL);
+    }
+
+  if (this->CenterAxesProxy)
+    {
+    this->CenterAxesProxy->Delete();
+    this->CenterAxesProxy = NULL;
+    }
+
   if (this->TimerLogDisplay)
     {
     this->TimerLogDisplay->Delete();
@@ -381,23 +457,7 @@ vtkPVWindow::~vtkPVWindow()
     this->ErrorLogDisplay = NULL;
     }
 
-  if (this->FileExtensions)
-    {
-    delete [] this->FileExtensions;
-    this->FileExtensions = NULL;
-    }
-  if (this->FileDescriptions)
-    {
-    delete [] this->FileDescriptions;
-    this->FileDescriptions = NULL;
-    }
-  this->Prototypes->Delete();
-  this->ReaderList->Delete();
-  this->Writers->Delete();
-  this->FileWriterList->Delete();
-  this->MenuState->Delete();
-
-  if (this->PVColorMaps)
+    if (this->PVColorMaps)
     {
     this->PVColorMaps->Delete();
     this->PVColorMaps = NULL;
@@ -407,19 +467,6 @@ vtkPVWindow::~vtkPVWindow()
     {
     this->VolumeAppearanceEditor->Delete();
     this->VolumeAppearanceEditor = NULL;
-    }
-
-  if (this->CenterAxesProxyName)
-    {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy("axes",
-      this->CenterAxesProxyName);
-    this->SetCenterAxesProxyName(0);
-    }
-
-  if (this->CenterAxesProxy)
-    {
-    this->CenterAxesProxy->Delete();
-    this->CenterAxesProxy = 0;
     }
 
 #ifdef PARAVIEW_USE_LOOKMARKS
@@ -497,12 +544,15 @@ void vtkPVWindow::PrepareForDelete()
   if (pvApp)
     {
     int state;
-    state = this->ResetCameraButton->GetCheckButtonState("ViewAngle");
-    pvApp->SetRegistryValue(2, "RunTime", "ResetViewResetsViewAngle", 
-                             "%d", state);
-    state = this->ResetCameraButton->GetCheckButtonState("CenterOfRotation");
-    pvApp->SetRegistryValue(2, "RunTime", "ResetViewResetsCenterOfRotation", 
-                             "%d", state);
+    if (this->ResetCameraButton)
+      {
+      state = this->ResetCameraButton->GetCheckButtonState("ViewAngle");
+      this->GetApplication()->SetRegistryValue(
+        2, "RunTime", "ResetViewResetsViewAngle", "%d", state);
+      state = this->ResetCameraButton->GetCheckButtonState("CenterOfRotation");
+      this->GetApplication()->SetRegistryValue(
+        2, "RunTime", "ResetViewResetsCenterOfRotation", "%d", state);
+      }
     }
 
   if (this->AnimationManager)
@@ -511,8 +561,10 @@ void vtkPVWindow::PrepareForDelete()
     this->AnimationManager->Delete();
     this->AnimationManager = NULL;
     }
+
   // Color maps have circular references because they
   // reference renderview.
+
   if (this->PVColorMaps)
     {
     this->PVColorMaps->Delete();
@@ -542,11 +594,13 @@ void vtkPVWindow::PrepareForDelete()
     this->CameraStyle3D->Delete();
     this->CameraStyle3D = NULL;
     }
+
   if (this->CameraStyle2D)
     {
     this->CameraStyle2D->Delete();
     this->CameraStyle2D = NULL;
     }
+
   if (this->CenterOfRotationStyle)
     {
     this->CenterOfRotationStyle->Delete();
@@ -558,10 +612,11 @@ void vtkPVWindow::PrepareForDelete()
     this->Toolbar->Delete();
     this->Toolbar = NULL;
     }
-  if ( this->ToolbarMenuButton )
+
+  if (this->ToolbarMenuButton)
     {
     this->ToolbarMenuButton->Delete();
-    this->ToolbarMenuButton = 0;
+    this->ToolbarMenuButton = NULL;
     }
 
   if (this->PickCenterButton)
@@ -641,6 +696,7 @@ void vtkPVWindow::PrepareForDelete()
     this->LowerFrame->Delete();
     this->LowerFrame = NULL;
     }
+
   if (this->MainView)
     {
     this->MainView->Delete();
@@ -648,11 +704,9 @@ void vtkPVWindow::PrepareForDelete()
 
   if (this->GetApplication())
     {
-    this->GetApplication()->SetRegistryValue(2, 
-                                             "RunTime", 
-                                             "CenterActorVisibility",
-                                             "%d", 
-                                             this->CenterActorVisibility);
+    this->GetApplication()->SetRegistryValue(
+      2, "RunTime", "CenterActorVisibility", "%d", 
+      this->CenterActorVisibility);
     }
 
   if (this->SourceMenu)
@@ -679,11 +733,12 @@ void vtkPVWindow::PrepareForDelete()
     this->GlyphMenu = NULL;
     }
 
-  if(this->PreferencesMenu!=NULL)
+  if (this->PreferencesMenu)
     {
-      this->PreferencesMenu->Delete();
-      this->PreferencesMenu=NULL;
+    this->PreferencesMenu->Delete();
+    this->PreferencesMenu=NULL;
     }
+
   if (this->LowerToolbars)
     {
     this->LowerToolbars->Delete();
@@ -712,10 +767,10 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // View menu: Show the application settings
 
   char *rbv = 
-    this->GetMenuView()->CreateRadioButtonVariable(
-      this->GetMenuView(),"Radio");
+    this->GetViewMenu()->CreateRadioButtonVariable(
+      this->GetViewMenu(),"Radio");
 
-  this->GetMenuView()->AddRadioButton(
+  this->GetViewMenu()->AddRadioButton(
     VTK_PV_APPSETTINGS_MENU_INDEX, 
     VTK_PV_APPSETTINGS_MENU_LABEL, 
     rbv, 
@@ -725,15 +780,15 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     "Display the application settings");
   delete [] rbv;
 
-  this->GetMenuView()->AddSeparator();
+  this->GetViewMenu()->AddSeparator();
 
   // View menu: shows the notebook for the current source and data object.
 
   rbv = 
-    this->GetMenuView()->CreateRadioButtonVariable(
-      this->GetMenuView(),"Radio");
+    this->GetViewMenu()->CreateRadioButtonVariable(
+      this->GetViewMenu(),"Radio");
 
-  this->GetMenuView()->AddRadioButton(
+  this->GetViewMenu()->AddRadioButton(
     VTK_PV_SOURCE_MENU_INDEX, 
     VTK_PV_SOURCE_MENU_LABEL, 
     rbv, 
@@ -744,10 +799,10 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   delete [] rbv;
 
   // View menu: Shows the V animation tool
-  rbv = this->GetMenuView()->CreateRadioButtonVariable(
-    this->GetMenuView(), "Radio");
+  rbv = this->GetViewMenu()->CreateRadioButtonVariable(
+    this->GetViewMenu(), "Radio");
 
-  this->GetMenuView()->AddRadioButton(
+  this->GetViewMenu()->AddRadioButton(
     VTK_PV_ANIMATION_MENU_INDEX + 1,
     " Keyframe Animation",
     rbv,
@@ -762,76 +817,76 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // We do not need Close in the file menu since we don't
   // support multiple windows (exit is enough)
 
-  this->MenuFile->DeleteMenuItem("Close");
+  this->FileMenu->DeleteMenuItem("Close");
 
   int clidx = this->GetFileMenuIndex();
 
   // Open a data file. Can support multiple file formats (see Open()).
 
-  this->MenuFile->InsertCommand(
+  this->FileMenu->InsertCommand(
     clidx++, VTK_PV_OPEN_DATA_MENU_LABEL, this, "OpenCallback",0);
 
   // Save current data in VTK format.
 
-  this->MenuFile->InsertCommand(
+  this->FileMenu->InsertCommand(
     clidx++, VTK_PV_SAVE_DATA_MENU_LABEL, this, "WriteData",0);
 
-  this->MenuFile->InsertSeparator(clidx++);
+  this->FileMenu->InsertSeparator(clidx++);
 
   // Add advanced file options
 
-  this->MenuFile->InsertCommand(clidx++, "Load Session", this, 
+  this->FileMenu->InsertCommand(clidx++, "Load Session", this, 
                                 "LoadScript", 0,
                                 "Restore a trace of actions.");
-  this->MenuFile->InsertCommand(clidx++, "Save Session State", this,
+  this->FileMenu->InsertCommand(clidx++, "Save Session State", this,
                                 "SaveState", 7,
                                 "Write the current state of ParaView "
                                 "in a file.");
-  this->MenuFile->InsertCommand(clidx++,
+  this->FileMenu->InsertCommand(clidx++,
                                 "Save Session Trace", this, 
                                 "SaveTrace", 3,
                                 "Save a trace of every action "
                                 "since start up.");
-  this->MenuFile->InsertCommand(clidx++, "Save Batch Script", this,
+  this->FileMenu->InsertCommand(clidx++, "Save Batch Script", this,
                                 "SaveBatchScript", 7,
                                 "Write a script which can run "
                                 "in batch by ParaView");
-  this->MenuFile->InsertCommand(clidx++, "Save SM State", this,
+  this->FileMenu->InsertCommand(clidx++, "Save SM State", this,
                                 "SaveSMState", 6,
                                 "Server the server manager state "
                                 "as xml.");
-  this->MenuFile->InsertCommand(clidx++,
+  this->FileMenu->InsertCommand(clidx++,
                                 "Import Package", this, 
                                 "OpenPackage", 3,
                                 "Import modules defined in a ParaView package ");
   
   this->PreferencesMenu = vtkKWMenu::New();
-  this->PreferencesMenu->SetParent(this->MenuFile);
+  this->PreferencesMenu->SetParent(this->FileMenu);
   this->PreferencesMenu->SetTearOff(0);
   this->PreferencesMenu->Create(this->GetApplication(), "");  
 
-  //this->MenuFile->InsertCascade(clidx++,"Preferences", this->PreferencesMenu, 8);
-  this->MenuFile->InsertSeparator(clidx++);
+  //this->FileMenu->InsertCascade(clidx++,"Preferences", this->PreferencesMenu, 8);
+  this->FileMenu->InsertSeparator(clidx++);
 
-  this->MenuFile->InsertCommand(clidx++, "Save Animation", this,
+  this->FileMenu->InsertCommand(clidx++, "Save Animation", this,
     "SaveAnimation", 5, "Save animation as a movie or images.");
   
-  this->MenuFile->InsertCommand(clidx++, "Save Geometry", this,
+  this->FileMenu->InsertCommand(clidx++, "Save Geometry", this,
     "SaveGeometry", 5, "Save geometry from each frame. This will create "
     "a series of .vtp files.");
   
-  this->MenuFile->InsertSeparator(clidx++);
+  this->FileMenu->InsertSeparator(clidx++);
 
   
   this->AddRecentFilesMenu(NULL, this);
   
   clidx = this->GetFileMenuIndex();
 
-  this->MenuFile->InsertSeparator(clidx++);
+  this->FileMenu->InsertSeparator(clidx++);
 
   /*
   // Open XML package
-  this->MenuFile->InsertCommand(clidx++, "Open Package", this, 
+  this->FileMenu->InsertCommand(clidx++, "Open Package", this, 
                                 "OpenPackage", 8,
                                 "Open a ParaView package and load the "
                                 "contents");
@@ -869,28 +924,28 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   // Window menu:
 
-  this->GetMenuWindow()->AddSeparator();
+  this->GetWindowMenu()->AddSeparator();
 
-  this->GetMenuWindow()->InsertCommand(
+  this->GetWindowMenu()->InsertCommand(
     4, "Command Prompt", this,
     "DisplayCommandPrompt", 8,
     "Display a prompt to interact with the ParaView engine");
 
   // Log stuff (not traced)
-  this->GetMenuWindow()->InsertCommand(
+  this->GetWindowMenu()->InsertCommand(
     5, "Timer Log", this, 
     "ShowTimerLog", 2, 
     "Show log of render events and timing");
               
   // Log stuff (not traced)
-  this->GetMenuWindow()->InsertCommand(
+  this->GetWindowMenu()->InsertCommand(
     5, "Error Log", this, 
     "ShowErrorLog", 2, 
     "Show log of all errors and warnings");
 
 #ifdef PARAVIEW_USE_LOOKMARKS
   // Display Lookmark Manager
-  this->GetMenuWindow()->InsertCommand(
+  this->GetWindowMenu()->InsertCommand(
     4, "Lookmark Manager", this, 
     "DisplayLookmarkManager", "Create and Manage Your Lookmarks");
 #endif
@@ -899,11 +954,11 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   // Edit menu
 
-  this->GetMenuEdit()->InsertCommand(5, "Delete All Modules", this, 
+  this->GetEditMenu()->InsertCommand(5, "Delete All Modules", this, 
                                      "DeleteAllSourcesCallback", 
                                      1, "Delete all modules in ParaView");
 
-  this->GetMenuEdit()->InsertCommand(6, "Delete All Keyframes", this,
+  this->GetEditMenu()->InsertCommand(6, "Delete All Keyframes", this,
     "DeleteAllKeyframesCallback", 11, "Delete all key frames in Animation");
 }
 
@@ -1141,10 +1196,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->Withdraw();
 
   // Add Show lower pane to menu.
-  this->GetMenuWindow()->AddCommand(VTK_PV_SHOW_HORZPANE_LABEL, this,
+  this->GetWindowMenu()->AddCommand(VTK_PV_SHOW_HORZPANE_LABEL, this,
     "ToggleHorizontalPaneVisibilityCallback", 0);
 
-  this->LowerToolbars->SetParent(this->ViewFrame);
+  this->LowerToolbars->SetParent(this->GetViewFrame());
   this->LowerToolbars->Create(app,0);
   this->LowerToolbars->ShowBottomSeparatorOff();
 
@@ -1152,7 +1207,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 
   this->LowerFrame->SetSeparatorSize(5);
   this->LowerFrame->SetOrientationToVertical();
-  this->LowerFrame->SetParent(this->ViewFrame);
+  this->LowerFrame->SetParent(this->GetViewFrame());
   this->LowerFrame->Create(app);
   this->Script("pack %s -side top -fill both -expand t",
                this->LowerFrame->GetWidgetName());
@@ -1395,7 +1450,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
-  this->MenuFile->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Disabled);
+  this->FileMenu->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Disabled);
 
   if (app->GetSaveWindowGeometry())
     {
@@ -1520,11 +1575,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     }
 
   // Update toolbar aspect
-  this->UpdateToolbarAspect();
+  this->UpdateToolbarState();
 
   // Make the 3D View Settings the current one.
   this->Script("%s invoke \"%s\"", 
-               this->GetMenuView()->GetWidgetName(),
+               this->GetViewMenu()->GetWidgetName(),
                VTK_PV_VIEW_MENU_LABEL);
 
   // Create per-node log files.
@@ -2007,8 +2062,8 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
                 this->MainView->GetWidgetName());  
 
   int menu_idx = this->GetHelpMenuIndex();
-  this->MenuHelp->InsertSeparator(menu_idx++);
-  this->MenuHelp->InsertCommand(
+  this->HelpMenu->InsertSeparator(menu_idx++);
+  this->HelpMenu->InsertCommand(
     menu_idx, "Play Demo", this, "PlayDemo", 0);
 }
 
@@ -3322,7 +3377,7 @@ void vtkPVWindow::UpdateFilterMenu()
   // Remove all of the entries from the filter menu.
   this->FilterMenu->DeleteAllMenuItems();
 
-  if ( !this->Enabled )
+  if ( !this->GetEnabled() )
     {
     this->FilterMenu->SetEnabled(0);
     return;
@@ -3574,7 +3629,7 @@ void vtkPVWindow::RemovePVSource(const char* listname, vtkPVSource *pvs)
 vtkPVSourceCollection* vtkPVWindow::GetSourceList(const char* listname)
 {
   vtkPVSourceCollection* col=0;
-  if (this->SourceLists->GetItem(listname, col) == VTK_OK)
+  if (this->SourceLists && this->SourceLists->GetItem(listname, col) == VTK_OK)
     {
     return col;
     }
@@ -3797,15 +3852,15 @@ void vtkPVWindow::ShowCurrentSourceProperties()
   
   this->ShowProperties();
 
-  if ( !this->GetMenuView() )
+  if ( !this->GetViewMenu() )
     {
     return;
     }
   
   // We need to update the view-menu radio button too!
 
-  this->GetMenuView()->CheckRadioButton(
-    this->GetMenuView(), "Radio", VTK_PV_SOURCE_MENU_INDEX);
+  this->GetViewMenu()->CheckRadioButton(
+    this->GetViewMenu(), "Radio", VTK_PV_SOURCE_MENU_INDEX);
 
   this->MainView->GetSplitFrame()->UnpackSiblings();
 
@@ -3832,8 +3887,8 @@ void vtkPVWindow::ShowAnimationPanes()
   this->ShowHorizontalPane();
   
   // We need to update the properties-menu radio button too!
-  this->GetMenuView()->CheckRadioButton(
-    this->GetMenuView(), "Radio", VTK_PV_ANIMATION_MENU_INDEX+1);
+  this->GetViewMenu()->CheckRadioButton(
+    this->GetViewMenu(), "Radio", VTK_PV_ANIMATION_MENU_INDEX+1);
   if (this->AnimationManager)
     {
     this->AnimationManager->ShowAnimationInterfaces();
@@ -3858,7 +3913,7 @@ void vtkPVWindow::SetHorizontalPaneVisibility(int arg)
       {
       this->LowerFrame->Frame2VisibilityOn();
       this->Script("%s entryconfigure 1 -label {%s}",
-        this->GetMenuWindow()->GetWidgetName(),
+        this->GetWindowMenu()->GetWidgetName(),
         VTK_PV_HIDE_HORZPANE_LABEL);
       }
     }
@@ -3868,7 +3923,7 @@ void vtkPVWindow::SetHorizontalPaneVisibility(int arg)
       {
       this->LowerFrame->Frame2VisibilityOff();
       this->Script("%s entryconfigure 1 -label {%s}",
-        this->GetMenuWindow()->GetWidgetName(),
+        this->GetWindowMenu()->GetWidgetName(),
         VTK_PV_SHOW_HORZPANE_LABEL);
       }
     }
@@ -4399,7 +4454,7 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
     {
     this->ReaderList->AppendItem(prototype);
     }
-  this->MenuFile->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Normal);
+  this->FileMenu->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Normal);
 }
 
 //-----------------------------------------------------------------------------
@@ -4418,7 +4473,7 @@ void vtkPVWindow::WarningMessage(const char* message)
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, wmessage);
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
-  this->SetErrorIcon(2);
+  this->SetErrorIcon(vtkKWWindow::ERROR_ICON_RED);
 }
 
 //-----------------------------------------------------------------------------
@@ -4431,7 +4486,7 @@ void vtkPVWindow::ErrorMessage(const char* message)
   this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, wmessage);
   delete [] wmessage;
   this->ErrorLogDisplay->AppendError(message);
-  this->SetErrorIcon(2);
+  this->SetErrorIcon(vtkKWWindow::ERROR_ICON_RED);
   cout << "ErrorMessage end" << endl;
   if ( this->GetPVApplication()->GetGUIClientOptions()->GetCrashOnErrors() )
     {
@@ -4440,9 +4495,9 @@ void vtkPVWindow::ErrorMessage(const char* message)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::ProcessErrorClick()
+void vtkPVWindow::ErrorIconCallback()
 {
-  this->Superclass::ProcessErrorClick();
+  this->Superclass::ErrorIconCallback();
   this->ShowErrorLog();
 }
 
@@ -4657,16 +4712,19 @@ void vtkPVWindow::DeleteAllSourcesCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::DeleteAllSources()
 {
-  this->GetTraceHelper()->AddEntry("# User selected delete all modules");
   vtkPVSourceCollection* col = this->GetSourceList("Sources");
-  while ( col->GetNumberOfItems() > 0 )
+  if (col)
     {
-    vtkPVSource* source = col->GetLastPVSource();
-    if ( !source )
+    this->GetTraceHelper()->AddEntry("# User selected delete all modules");
+    while ( col->GetNumberOfItems() > 0 )
       {
-      break;
+      vtkPVSource* source = col->GetLastPVSource();
+      if ( !source )
+        {
+        break;
+        }
+      this->DeleteSourceAndOutputs(source);
       }
-    this->DeleteSourceAndOutputs(source);
     }
 }
 
@@ -4725,9 +4783,9 @@ void vtkPVWindow::SetInteractiveRenderEnabled(int s)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::UpdateToolbarAspect()
+void vtkPVWindow::UpdateToolbarState()
 {
-  this->Superclass::UpdateToolbarAspect();
+  this->Superclass::UpdateToolbarState();
   
   this->DisableToolbarButtons();
   this->EnableToolbarButtons();
@@ -4780,42 +4838,43 @@ void vtkPVWindow::UpdateToolbarAspect()
       this->LowerToolbars->Unpack();
       }
     }
-  this->UpdateEnableState();
+
+}
+
+//----------------------------------------------------------------------------
+int vtkPVWindow::GetEnabled()
+{
+  // In general, if we are playing the animation, the UI should be entirely
+  // disabled. There will be some very specific elements that will remain
+  // enabled, and they will be taken care of in UpdateEnableState()
+
+  int enabled = this->Superclass::GetEnabled();
+  if (this->AnimationManager && this->AnimationManager->GetInPlay())
+    {
+    enabled = 0;
+    }
+
+  return enabled;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateEnableState()
 {
-  if ( this->InDemo )
+  if (this->InDemo)
     {
     return;
     }
 
-  int source_grabbed = 0;
-  if ( this->CurrentPVSource && this->CurrentPVSource->GetSourceGrabbed() )
-    {
-    source_grabbed = 1;
-    }
-
-  int enabled = this->Enabled;
-  if (this->AnimationManager && this->AnimationManager->GetInPlay() )
-    {
-    this->Enabled = 0;
-    }
-
   this->Superclass::UpdateEnableState();
 
+  // The main view is enabled (or not) even if were are playing the animation
 
-  int re = this->Enabled;
-  this->Enabled = enabled;
-  this->PropagateEnableState(this->MainView);
-  this->Enabled = re;
-
-  this->PropagateEnableState(this->Notebook);
+  if (this->MainView)
+    {
+    this->MainView->SetEnabled(this->Superclass::GetEnabled());
+    }
 
   this->PropagateEnableState(this->Toolbar);
-  this->PropagateEnableState(this->InteractorToolbar);
-  this->PropagateEnableState(this->PickCenterToolbar);
 
   this->PropagateEnableState(this->LowerFrame);
   this->PropagateEnableState(this->AnimationManager);
@@ -4826,18 +4885,8 @@ void vtkPVWindow::UpdateEnableState()
   this->PropagateEnableState(this->CenterYEntry);
   this->PropagateEnableState(this->CenterZEntry);
 
-  if ( this->ApplicationSettingsInterface )
-    {
-    this->ApplicationSettingsInterface->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->CurrentPVSource);
 
-  this->PropagateEnableState(this->TranslateCameraButton);
-  this->PropagateEnableState(this->RotateCameraButton);
-
-  if ( this->CurrentPVSource )
-    {
-    this->CurrentPVSource->SetEnabled(this->Enabled);
-    }
   if ( this->SourceLists )
     {
     const char* sourcelists[] = { 
@@ -4853,11 +4902,8 @@ void vtkPVWindow::UpdateEnableState()
         {
         for ( kk = 0; kk < col->GetNumberOfItems(); kk ++ )
           {
-          vtkPVSource* source = vtkPVSource::SafeDownCast(col->GetItemAsObject(kk));
-          if ( source )
-            {
-            source->SetEnabled(this->Enabled);
-            }
+          this->PropagateEnableState(
+            vtkPVSource::SafeDownCast(col->GetItemAsObject(kk)));
           }
         }
       }
@@ -4873,9 +4919,10 @@ void vtkPVWindow::UpdateEnableState()
     for ( cc = 0; sourcelists[cc]; cc ++ )
       {
       vtkPVSource* source = 0;
-      if ( this->Prototypes->GetItem(sourcelists[cc], source) == VTK_OK && source)
+      if (this->Prototypes->GetItem(sourcelists[cc], source) == VTK_OK && 
+          source)
         {
-        source->SetEnabled(this->Enabled);
+        this->PropagateEnableState(source);
         }
       }
     }
@@ -4887,7 +4934,7 @@ void vtkPVWindow::UpdateEnableState()
       vtkPVReaderModule* rm = 0;
       if ( this->ReaderList->GetItem(cc, rm) == VTK_OK && rm )
         {
-        rm->SetEnabled(this->Enabled);
+        this->PropagateEnableState(rm);
         }
       }
     }
@@ -4896,127 +4943,102 @@ void vtkPVWindow::UpdateEnableState()
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
-    this->PropagateEnableState(static_cast<vtkPVColorMap*>(it->GetCurrentObject()));
+    this->PropagateEnableState(
+      static_cast<vtkPVColorMap*>(it->GetCurrentObject()));
     it->GoToNextItem();
     }
   it->Delete();
 
-  if ( source_grabbed  || 
-       (this->AnimationManager && this->AnimationManager->GetInRecording()))
-    {
-    this->Enabled = 0;
-    }
-  if ( this->Enabled )
-    {
-    this->EnableToolbarButtons();
-    }
-  else
+  // If not enabled, source grabbed or recording, disable toolbar button
+
+  if (!this->GetEnabled() ||
+      (this->CurrentPVSource && this->CurrentPVSource->GetSourceGrabbed()) ||
+      (this->AnimationManager && this->AnimationManager->GetInRecording()))
     {
     this->DisableToolbarButtons();
     }
-  this->UpdateMenuState();
-  this->Enabled = enabled;
+  else
+    {
+    this->EnableToolbarButtons();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::UpdateMenuState()
 {
-  int source_grabbed = 0;
-  if ( this->CurrentPVSource && this->CurrentPVSource->GetSourceGrabbed() )
-    {
-    source_grabbed = 1;
-    }
-  int enabled = this->Enabled;
-  if ( source_grabbed )
-    {
-    this->Enabled = 0;
-    }
   this->Superclass::UpdateMenuState();
 
-  this->PropagateEnableState(this->Menu);
-  this->PropagateEnableState(this->MenuEdit);
-  if (this->AnimationManager && this->AnimationManager->GetInRecording())
-    {
-    int oe = this->Enabled;
-    this->Enabled = 1;
-    this->PropagateEnableState(this->MenuView);
-    this->PropagateEnableState(this->MenuWindow);
-    this->PropagateEnableState(this->MenuHelp);
-    this->Menu->SetState("View",  vtkKWMenu::Normal);
-    this->Menu->SetState("Window",  vtkKWMenu::Normal);
-    this->Menu->SetState("Help",  vtkKWMenu::Normal);
-    this->Enabled = oe;
-    }
-  else
-    {
-    this->PropagateEnableState(this->MenuView);
-    this->PropagateEnableState(this->MenuWindow);
-    this->PropagateEnableState(this->MenuHelp);
-    }
-  this->PropagateEnableState(this->PageMenu);
-  this->PropagateEnableState(this->MenuFile);
-  this->PropagateEnableState(this->GlyphMenu);
   this->PropagateEnableState(this->SourceMenu);
+  this->PropagateEnableState(this->FilterMenu);
+  this->PropagateEnableState(this->SelectMenu);
+  this->PropagateEnableState(this->GlyphMenu);
+  this->PropagateEnableState(this->PreferencesMenu);
 
-  if ( this->InDemo )
+  int menu_state = 
+    (this->GetEnabled() ? vtkKWMenu::Normal: vtkKWMenu::Disabled);
+
+  int in_recording = 
+    this->AnimationManager && this->AnimationManager->GetInRecording();
+
+  int source_grabbed = 
+    this->CurrentPVSource && this->CurrentPVSource->GetSourceGrabbed();
+
+  if (this->InDemo)
     {
-    this->Enabled = enabled;
     return;
     }
   
-  if ( this->Enabled || 
-       (this->AnimationManager && this->AnimationManager->GetInRecording()))
+  // Source grabbed or in recording ? Disable the root menu entries
+  // In recording (or not recording anymore) ? Re-enable View, Window, Help
+
+  if (source_grabbed || in_recording)
     {
-    int oe = this->Enabled;
-    this->Enabled = 1;
-    this->UpdateSelectMenu();
-    // Disable or enable the select menu. Checks if there are any valid
-    // entries in the menu, disables the menu if there none, enables it
-    // otherwise.
-    int menustate = ( this->Enabled ? vtkKWMenu::Normal: vtkKWMenu::Disabled);
-    vtkPVSourceCollection* sources = this->GetSourceList("Sources");
-    if (sources && sources->GetNumberOfItems())
+    if (this->Menu)
       {
-      this->PropagateEnableState(this->SelectMenu);
-      this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL,  menustate);
-      if (this->MenuView)
-        {
-        this->MenuView->SetState(VTK_PV_SOURCE_MENU_LABEL, menustate);
-        }
+      this->Menu->SetEnabled(0);
       }
-    else
-      {
-      this->SelectMenu->SetEnabled(0);
-      this->Menu->SetState(VTK_PV_SELECT_SOURCE_MENU_LABEL, vtkKWMenu::Disabled);
-      if (this->MenuView)
-        {
-        this->MenuView->SetState(VTK_PV_SOURCE_MENU_LABEL, vtkKWMenu::Disabled);
-        }
-      } 
-    this->Enabled = oe;
     }
 
-  // Since the toolbar now contains sources and filters,
-  // this has to be done outside the menu enable methods.
-  this->DisableToolbarButtons();
+  if (!source_grabbed)
+    {
+    this->Menu->SetState("View",  menu_state);
+    this->Menu->SetState("Window",  menu_state);
+    this->Menu->SetState("Help",  menu_state);
+    }
 
+  // Disable or enable the select menu. Checks if there are any valid
+  // entries in the menu, disables the menu if there none, enables it
+  // otherwise. Enable them if recording...
   
+  vtkPVSourceCollection* sources = this->GetSourceList("Sources");
+  int no_sources = !sources || !sources->GetNumberOfItems();
 
-  // Handle the fitler menu and toolbar buttons.
-  int menustate = ( this->Enabled ? vtkKWMenu::Normal: vtkKWMenu::Disabled);
+  this->UpdateSelectMenu();
+  if (this->SelectMenu)
+    {
+    this->SelectMenu->SetEnabled(no_sources ? 0 : this->GetEnabled());
+    }
+  this->Menu->SetState(
+    VTK_PV_SELECT_SOURCE_MENU_LABEL, 
+    no_sources || source_grabbed ? vtkKWMenu::Disabled : menu_state);
+  if (this->ViewMenu)
+    {
+    this->ViewMenu->SetState(
+      VTK_PV_SOURCE_MENU_LABEL, 
+      no_sources || source_grabbed ? vtkKWMenu::Disabled : menu_state);
+    }
+
+  // Handle the filter menu
+
   this->UpdateFilterMenu();
-  if ( this->FilterMenu->GetEnabled() )
-    {
-    this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL,  menustate);
-    }
-  else
-    {
-    this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL,  vtkKWMenu::Disabled);
-    }
+  this->Menu->SetState(
+    VTK_PV_VTK_FILTERS_MENU_LABEL,  
+    !this->FilterMenu->GetEnabled() || source_grabbed 
+    ? vtkKWMenu::Disabled : menu_state);
 
   // Handle the source menu and toolbar buttons.
+
   this->UpdateSourceMenu();
-  this->Enabled = enabled;
 }
 
 //-----------------------------------------------------------------------------
@@ -5073,7 +5095,7 @@ void vtkPVWindow::EndProgress(int enabled)
     }
 
   this->ModifiedEnableState = 0;
-  if ( !enabled || this->Enabled )
+  if ( !enabled || this->GetEnabled() )
     {
     this->UpdateEnableState();
     return;

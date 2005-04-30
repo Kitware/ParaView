@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBoxToListBoxSelectionEditor );
-vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.2");
+vtkCxxRevisionMacro(vtkKWListBoxToListBoxSelectionEditor, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWListBoxToListBoxSelectionEditor::vtkKWListBoxToListBoxSelectionEditor()
@@ -83,22 +83,22 @@ void vtkKWListBoxToListBoxSelectionEditor::Create(vtkKWApplication *app, const c
   frame->SetParent(this);
   frame->Create(app, 0);
 
-  this->AddButton->SetParent(frame->GetFrame());
+  this->AddButton->SetParent(frame);
   this->AddButton->Create(app,0);
   this->AddButton->SetText("Add");
   this->AddButton->SetCommand(this, "AddCallback");
 
-  this->AddAllButton->SetParent(frame->GetFrame());
+  this->AddAllButton->SetParent(frame);
   this->AddAllButton->Create(app,0);
   this->AddAllButton->SetText("Add All");
   this->AddAllButton->SetCommand(this, "AddAllCallback");
 
-  this->RemoveButton->SetParent(frame->GetFrame());
+  this->RemoveButton->SetParent(frame);
   this->RemoveButton->Create(app,0);
   this->RemoveButton->SetText("Remove");
   this->RemoveButton->SetCommand(this, "RemoveCallback");
 
-  this->RemoveAllButton->SetParent(frame->GetFrame());
+  this->RemoveAllButton->SetParent(frame);
   this->RemoveAllButton->Create(app,0);
   this->RemoveAllButton->SetText("RemoveAll");
   this->RemoveAllButton->SetCommand(this, "RemoveAllCallback");
@@ -117,7 +117,7 @@ void vtkKWListBoxToListBoxSelectionEditor::Create(vtkKWApplication *app, const c
   frame->SetParent(this);
   frame->Create(app, 0);
 
-  this->FinalList->SetParent(frame->GetFrame());
+  this->FinalList->SetParent(frame);
   this->FinalList->Create(app, 0);
   this->FinalList->GetListbox()->ConfigureOptions("-selectmode multiple");
 
@@ -125,15 +125,15 @@ void vtkKWListBoxToListBoxSelectionEditor::Create(vtkKWApplication *app, const c
     this->FinalList->GetWidgetName());
 
   vtkKWFrame* btframe = vtkKWFrame::New();
-  btframe->SetParent(frame->GetFrame());
+  btframe->SetParent(frame);
   btframe->Create(app, 0);
 
-  this->UpButton->SetParent(btframe->GetFrame());
+  this->UpButton->SetParent(btframe);
   this->UpButton->Create(app, 0);
   this->UpButton->SetText("Up");
   this->UpButton->SetCommand(this, "UpCallback");
 
-  this->DownButton->SetParent(btframe->GetFrame());
+  this->DownButton->SetParent(btframe);
   this->DownButton->Create(app, 0);
   this->DownButton->SetText("Down");
   this->DownButton->SetCommand(this, "DownCallback");

@@ -32,7 +32,7 @@
 
 #include <kwsys/stl/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.41");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.42");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -2832,7 +2832,7 @@ void vtkKWParameterValueFunctionEditor::SetParameterCursorInteractionStyle(
 
   this->Modified();
 
-  if (this->Enabled)
+  if (this->GetEnabled())
     {
     this->Bind();
     }
@@ -3710,57 +3710,18 @@ void vtkKWParameterValueFunctionEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->Canvas)
-    {
-    this->Canvas->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->Canvas);
+  this->PropagateEnableState(this->ParameterRange);
+  this->PropagateEnableState(this->ValueRange);
+  this->PropagateEnableState(this->TopLeftContainer);
+  this->PropagateEnableState(this->TopLeftFrame);
+  this->PropagateEnableState(this->UserFrame);
+  this->PropagateEnableState(this->TopRightFrame);
+  this->PropagateEnableState(this->RangeLabel);
+  this->PropagateEnableState(this->ParameterEntry);
+  this->PropagateEnableState(this->HistogramLogModeOptionMenu);
 
-  if (this->ParameterRange)
-    {
-    this->ParameterRange->SetEnabled(this->Enabled);
-    }
-
-  if (this->ValueRange)
-    {
-    this->ValueRange->SetEnabled(this->Enabled);
-    }
-
-  if (this->TopLeftContainer)
-    {
-    this->TopLeftContainer->SetEnabled(this->Enabled);
-    }
-
-  if (this->TopLeftFrame)
-    {
-    this->TopLeftFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->UserFrame)
-    {
-    this->UserFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->TopRightFrame)
-    {
-    this->TopRightFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->RangeLabel)
-    {
-    this->RangeLabel->SetEnabled(this->Enabled);
-    }
-
-  if (this->ParameterEntry)
-    {
-    this->ParameterEntry->SetEnabled(this->Enabled);
-    }
-
-  if (this->HistogramLogModeOptionMenu)
-    {
-    this->HistogramLogModeOptionMenu->SetEnabled(this->Enabled);
-    }
-
-  if (this->Enabled)
+  if (this->GetEnabled())
     {
     this->Bind();
     }
@@ -5735,7 +5696,7 @@ void vtkKWParameterValueFunctionEditor::UpdateParameterEntry(int id)
     }
 
   this->ParameterEntry->SetEnabled(
-    this->FunctionPointParameterIsLocked(id) ? 0 : this->Enabled);
+    this->FunctionPointParameterIsLocked(id) ? 0 : this->GetEnabled());
 
   // Map from the displayed parameter range to the internal parameter range
   // if needed

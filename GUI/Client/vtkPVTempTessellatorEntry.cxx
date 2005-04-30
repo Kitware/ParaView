@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.21");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.22");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -150,14 +150,14 @@ void vtkPVTempTessellatorEntry::Create( vtkKWApplication* app )
   d->EditSubframe->SetParent( d->CriteriaFrame->GetFrame() );
   d->EditSubframe->Create( app, "" );
 
-  d->CriterionEnable->SetParent( d->EditSubframe->GetFrame() );
+  d->CriterionEnable->SetParent( d->EditSubframe );
   d->CriterionEnable->Create( app, "" );
   d->CriterionEnable->SetText( "" );
   d->CriterionEnable->SetEnabled( 0 );
   d->CriterionEnable->SetCommand( this, "ToggleCriterionCallback" );
   this->Script( "%s configure -anchor w", d->CriterionEnable->GetWidgetName() );
 
-  d->CriterionValue->SetParent( d->EditSubframe->GetFrame() );
+  d->CriterionValue->SetParent( d->EditSubframe );
   d->CriterionValue->Create( app, "" );
   this->Script( "bind %s <KeyPress-Return> {+%s ChangeCriterionCallback }", d->CriterionValue->GetWidgetName(), this->GetTclName() );
   this->Script( "bind %s <KeyPress-Tab>    {+%s ChangeCriterionCallback }", d->CriterionValue->GetWidgetName(), this->GetTclName() );

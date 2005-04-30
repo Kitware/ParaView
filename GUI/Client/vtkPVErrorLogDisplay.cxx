@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
-vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.8");
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.9");
 
 int vtkPVErrorLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -66,13 +66,14 @@ void vtkPVErrorLogDisplay::Clear()
     this->ErrorMessages->RemoveAllItems();
     }
 
-  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
-  if ( app )
+  vtkPVApplication *app = 
+    vtkPVApplication::SafeDownCast(this->GetApplication());
+  if (app)
     {
     vtkKWWindow *window = app->GetMainWindow();
-    if ( window )
+    if (window)
       {
-      window->SetErrorIcon(0);
+      window->SetErrorIcon(vtkKWWindow::ERROR_ICON_NONE);
       }
     }
   this->Update();

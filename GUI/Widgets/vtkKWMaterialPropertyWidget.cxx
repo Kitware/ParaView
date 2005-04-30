@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.8");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.9");
 
 //----------------------------------------------------------------------------
 class vtkKWMaterialPropertyWidgetInternals
@@ -659,50 +659,15 @@ void vtkKWMaterialPropertyWidget::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->PopupButton)
-    {
-    this->PopupButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->MaterialPropertiesFrame)
-    {
-    this->MaterialPropertiesFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->LightingFrame)
-    {
-    this->LightingFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->AmbientScale)
-    {
-    this->AmbientScale->SetEnabled(this->Enabled);
-    }
-
-  if (this->DiffuseScale)
-    {
-    this->DiffuseScale->SetEnabled(this->Enabled);
-    }
-
-  if (this->SpecularScale)
-    {
-    this->SpecularScale->SetEnabled(this->Enabled);
-    }
-
-  if (this->SpecularPowerScale)
-    {
-    this->SpecularPowerScale->SetEnabled(this->Enabled);
-    }
-
-  if (this->PreviewLabel)
-    {
-    this->PreviewLabel->SetEnabled(this->Enabled);
-    }
-
-  if (this->PresetPushButtonSet)
-    {
-    this->PresetPushButtonSet->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->PopupButton);
+  this->PropagateEnableState(this->MaterialPropertiesFrame);
+  this->PropagateEnableState(this->LightingFrame);
+  this->PropagateEnableState(this->AmbientScale);
+  this->PropagateEnableState(this->DiffuseScale);
+  this->PropagateEnableState(this->SpecularScale);
+  this->PropagateEnableState(this->SpecularPowerScale);
+  this->PropagateEnableState(this->PreviewLabel);
+  this->PropagateEnableState(this->PresetPushButtonSet);
 }
 
 //----------------------------------------------------------------------------

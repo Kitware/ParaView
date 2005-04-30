@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKW@WidgetType@Labeled);
-vtkCxxRevisionMacro(vtkKW@WidgetType@Labeled, "1.2");
+vtkCxxRevisionMacro(vtkKW@WidgetType@Labeled, "1.3");
 
 int vtkKW@WidgetType@LabeledCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -154,10 +154,7 @@ void vtkKW@WidgetType@Labeled::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
   
- if (this->Widget)
-    {
-    this->Widget->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->Widget);
 }
 
 // ---------------------------------------------------------------------------

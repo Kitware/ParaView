@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.10");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.11");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -285,10 +285,10 @@ int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar)
   toolbar_slot->Visibility = 1;
 
   toolbar_slot->Toolbar = toolbar;
-  toolbar_slot->Toolbar->SetEnabled(this->Enabled);
+  this->PropagateEnableState(toolbar_slot->Toolbar);
 
   toolbar_slot->SeparatorFrame = vtkKWFrame::New();
-  toolbar_slot->SeparatorFrame->SetEnabled(this->Enabled);
+  this->PropagateEnableState(toolbar_slot->SeparatorFrame);
 
   // Pack the toolbars
 
@@ -446,14 +446,8 @@ void vtkKWToolbarSet::UpdateEnableState()
       {
       if (*it)
         {
-        if ((*it)->Toolbar)
-          {
-          (*it)->Toolbar->SetEnabled(this->Enabled);
-          }
-        if ((*it)->SeparatorFrame)
-          {
-          (*it)->SeparatorFrame->SetEnabled(this->Enabled);
-          }
+        this->PropagateEnableState((*it)->Toolbar);
+        this->PropagateEnableState((*it)->SeparatorFrame);
         }
       }
     }

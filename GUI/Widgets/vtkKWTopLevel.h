@@ -118,6 +118,16 @@ public:
   // The menu has to be Create()'ed too.
   virtual void InstallMenu(vtkKWMenu *menu);
 
+  // Description:
+  // Convenience method to set the command used to manage window manage 
+  // protocol WM_DELETE_WINDOW. Called when the user closes the window
+  // using the window manager.
+  // The first argument is the object that will have the method called on it.
+  // The second is the name of the method to be called and any arguments
+  // in string form.
+  virtual void SetDeleteWindowProtocolCommand(
+    vtkKWObject *obj, const char *command);
+
 protected:
 
   vtkKWTopLevel();

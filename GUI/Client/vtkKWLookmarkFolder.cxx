@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.6");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.7");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -127,14 +127,14 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
   this->MainFrame->Create(app,0);
   this->Script("pack %s -fill x -expand t -anchor nw", this->MainFrame->GetWidgetName());
 
-  this->Checkbox->SetParent(this->MainFrame->GetFrame());
+  this->Checkbox->SetParent(this->MainFrame);
   this->Checkbox->SetIndicator(1);
   this->Checkbox->Create(app, "");
   this->Checkbox->SetState(0);
   this->Checkbox->SetCommand(this, "SelectCallback");
   this->Script("pack %s -anchor nw -side left", this->Checkbox->GetWidgetName());
 
-  this->LabelFrame->SetParent(this->MainFrame->GetFrame());
+  this->LabelFrame->SetParent(this->MainFrame);
   this->LabelFrame->ShowHideFrameOn();
   this->LabelFrame->Create(app, 0);
   this->LabelFrame->SetLabelText("Folder");
@@ -145,18 +145,16 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
     this->LabelFrame->GetLabel());
 
   this->SeparatorFrame->SetParent(this);
-  this->SeparatorFrame->SetScrollable(0);
   this->SeparatorFrame->Create(app,"");
   this->Script("pack %s -anchor nw -expand t -fill x",
                  this->SeparatorFrame->GetWidgetName());
-  this->Script("%s configure -height 12",this->SeparatorFrame->GetFrame()->GetWidgetName());
+  this->Script("%s configure -height 12",this->SeparatorFrame->GetWidgetName());
 
-  this->NestedSeparatorFrame->SetParent(this->LabelFrame->GetFrame()->GetFrame());
-  this->NestedSeparatorFrame->SetScrollable(0);
+  this->NestedSeparatorFrame->SetParent(this->LabelFrame->GetFrame());
   this->NestedSeparatorFrame->Create(app,"");
   this->Script("pack %s -anchor nw -expand t -fill x",
                  this->NestedSeparatorFrame->GetWidgetName());
-  this->Script("%s configure -height 12",this->NestedSeparatorFrame->GetFrame()->GetWidgetName()); 
+  this->Script("%s configure -height 12",this->NestedSeparatorFrame->GetWidgetName()); 
 
 //  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
 
@@ -257,7 +255,7 @@ void vtkKWLookmarkFolder::Pack()
   this->Script("pack %s -anchor nw -expand t -fill x -side top", 
               this->NestedSeparatorFrame->GetWidgetName());
   this->Script("%s configure -height 12",
-              this->NestedSeparatorFrame->GetFrame()->GetWidgetName()); 
+              this->NestedSeparatorFrame->GetWidgetName()); 
   this->Script("pack %s -fill x -expand t -side left", 
               this->LabelFrame->GetWidgetName());
   this->Script("pack %s -anchor w -fill x -expand t", 
@@ -265,7 +263,7 @@ void vtkKWLookmarkFolder::Pack()
   this->Script("pack %s -anchor nw -expand t -fill x", 
               this->SeparatorFrame->GetWidgetName());
   this->Script("%s configure -height 12",
-              this->SeparatorFrame->GetFrame()->GetWidgetName());
+              this->SeparatorFrame->GetWidgetName());
 
 }
 
@@ -368,7 +366,7 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
 
 //        lmkFolder->SetSelectionFlag(onoff);
 //        }
-      lmkFolder->ToggleNestedLabels(lmkFolder->GetLabelFrame()->GetFrame()->GetFrame(), onoff);
+      lmkFolder->ToggleNestedLabels(lmkFolder->GetLabelFrame()->GetFrame(), onoff);
       }
     }
   else

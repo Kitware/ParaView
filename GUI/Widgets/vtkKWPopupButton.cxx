@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.18");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.19");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -97,9 +97,8 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
       this->Script("wm title [winfo toplevel %s]", this->GetWidgetName()));
     }
 
-  tk_cmd << "wm protocol " << this->PopupTopLevel->GetWidgetName()
-         << " WM_DELETE_WINDOW {" 
-         << this->GetTclName() << " WithdrawPopupCallback}" << endl;
+  this->PopupTopLevel->SetDeleteWindowProtocolCommand(
+    this, "WithdrawPopupCallback");
 
   // Create the frame
 
@@ -259,26 +258,15 @@ void vtkKWPopupButton::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->PopupTopLevel)
-    {
-    this->PopupTopLevel->SetEnabled(this->Enabled);
-    }
-
-  if (this->PopupFrame)
-    {
-    this->PopupFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->PopupCloseButton)
-    {
-    this->PopupCloseButton->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->PopupTopLevel);
+  this->PropagateEnableState(this->PopupFrame);
+  this->PropagateEnableState(this->PopupCloseButton);
 
   // Now given the state, bind or unbind
 
   if (this->IsCreated())
     {
-    if (this->Enabled)
+    if (this->GetEnabled())
       {
       this->Bind();
       }

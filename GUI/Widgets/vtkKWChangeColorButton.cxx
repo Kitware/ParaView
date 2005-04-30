@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.54");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.55");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -246,7 +246,7 @@ void vtkKWChangeColorButton::UpdateColorButton()
     return;
     }
 
-  if (this->Enabled)
+  if (this->GetEnabled())
     {
     if ( this->Color[0] < 0 ) { this->Color[0] = 0; }
     if ( this->Color[1] < 0 ) { this->Color[1] = 0; }
@@ -377,17 +377,14 @@ void vtkKWChangeColorButton::UpdateEnableState()
 
   // Color button
 
-  if (this->ColorButton)
-    {
-    this->ColorButton->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->ColorButton);
 
   // Now given the state, bind or unbind
 
   if (this->IsCreated())
     {
     this->UpdateColorButton();
-    if (this->Enabled)
+    if (this->GetEnabled())
       {
       this->Bind();
       }

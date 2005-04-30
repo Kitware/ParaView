@@ -51,7 +51,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
+  // Create the window
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description::
@@ -65,44 +65,52 @@ public:
   virtual void CloseNoPrompt();
 
   // Description:
-  // Set the text for the status bar of this window.
-  void SetStatusText(const char *);
-  const char *GetStatusText();
-  
-  // Description:
-  // Load in a Tcl based script to drive the application. If called
-  // without an argument it will open a file dialog.
+  // Load and evaluate a Tcl based script. 
+  // If called without an argument it will open a file dialog.
+  // This implementation basically forwards the call to 
+  // vtkKWApplication::LoadScript.
   virtual void LoadScript();
-  virtual void LoadScript(const char *name);
+  virtual void LoadScript(const char *filename);
 
   // Description:
-  // Popup a warning/error message
+  // Convenience methods to popup a warning/error message.
+  // This can be overriden in a subclass to redirect errors and warnings
+  // to log files or more elaborate log windows.
   virtual void WarningMessage(const char* message);
   virtual void ErrorMessage(const char* message);
 
   // Description:
+  // Set the text for the status bar of this window.
+  virtual void SetStatusText(const char *);
+  virtual const char *GetStatusText();
+  
+  // Description:
   // Show or hide the error / warning icon in the tray.
-  // 2 - red icon, 1 - icon, 0 - hide.
+  //BTX
+  enum 
+  {
+    ERROR_ICON_NONE = 0,
+    ERROR_ICON_BLACK,
+    ERROR_ICON_RED
+  };
+  //ETX
   virtual void SetErrorIcon(int);
-  vtkBooleanMacro(ErrorIcon, int); 
 
   // Description:
-  // Process the click on the error icon.
-  virtual void ProcessErrorClick();
-  
-  // Description:
-  // Allow windows to get at the different menu entries. In some
-  // cases the menu entry may be created if it doesn't already
-  // exist.
+  // Get the various menu objects.
+  // 'Menu' is the root menu, posted on top of the window (i.e. a menu bar).
   vtkGetObjectMacro(Menu,vtkKWMenu);
-  vtkGetObjectMacro(MenuFile,vtkKWMenu);
-  vtkKWMenu *GetMenuEdit();
-  vtkKWMenu *GetMenuView();
-  vtkKWMenu *GetMenuWindow();
+  vtkGetObjectMacro(FileMenu,vtkKWMenu);
+  vtkGetObjectMacro(HelpMenu,vtkKWMenu);
+  vtkKWMenu *GetEditMenu();
+  vtkKWMenu *GetViewMenu();
+  vtkKWMenu *GetWindowMenu();
   
   // Description:
-  // Operations on the views.
-  vtkGetObjectMacro(ViewFrame,vtkKWFrame);
+  // Get the view frame. This is a convenience method to retrieve a
+  // pointer to the large frame available for viewing. In this implementation
+  // it defaults to the frame on the right of the split bar.
+  virtual vtkKWFrame* GetViewFrame();
   
   // Description:
   // Proiperties may be bound to the window or view or
@@ -280,8 +288,9 @@ public:
   static void ProcessEvent(vtkObject *, unsigned long, void *, void *);
 
   // Description:
-  // Update the toolbar aspect once the toolbar settings have been changed
-  virtual void UpdateToolbarAspect();
+  // Update the toolbar state
+  virtual void UpdateToolbarState();
+
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -296,6 +305,11 @@ public:
   // Description:
   // Get rid of all references we own.
   virtual void PrepareForDelete() {}
+  // Description:
+  // Callbacks.
+  // Process the click on the error icon.
+  // Override it in subclasses to popup more elaborate log/error dialog.
+  virtual void ErrorIconCallback();
 
 protected:
   vtkKWWindow();
@@ -331,11 +345,11 @@ protected:
   vtkKWSplitFrame     *MiddleFrame; // Contains view frame & properties parent.
 
   vtkKWMenu *Menu;
-  vtkKWMenu *MenuFile;
-  vtkKWMenu *MenuEdit;
-  vtkKWMenu *MenuView;
-  vtkKWMenu *MenuWindow;
-  vtkKWMenu *MenuHelp;
+  vtkKWMenu *FileMenu;
+  vtkKWMenu *EditMenu;
+  vtkKWMenu *ViewMenu;
+  vtkKWMenu *WindowMenu;
+  vtkKWMenu *HelpMenu;
   vtkKWMenu *PageMenu;
   vtkKWMenu *ToolbarsMenu;
 

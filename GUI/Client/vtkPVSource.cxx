@@ -21,6 +21,7 @@
 #include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWMenu.h"
 #include "vtkPVSourceNotebook.h"
 #include "vtkKWView.h"
@@ -59,7 +60,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.437");
+vtkCxxRevisionMacro(vtkPVSource, "1.438");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -102,7 +103,7 @@ vtkPVSource::vtkPVSource()
   this->PVConsumers = 0;
   this->DisplayProxy = 0;
 
-  this->ParameterFrame = vtkKWFrame::New();
+  this->ParameterFrame = vtkKWFrameWithScrollbar::New();
   this->Widgets = vtkPVWidgetCollection::New();
     
   this->ReplaceInput = 1;
@@ -416,7 +417,7 @@ void vtkPVSource::UpdateEnableState()
     for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
       {
       pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
-      pvWidget->SetEnabled(this->Enabled);
+      this->PropagateEnableState(pvWidget);
       it->GoToNextItem();
       }
     it->Delete();
@@ -536,7 +537,6 @@ void vtkPVSource::CreateProperties()
 
   this->ParameterFrame->SetParent(this->Notebook->GetMainParameterFrame());
 
-  this->ParameterFrame->ScrollableOn();
   this->ParameterFrame->Create(this->GetApplication(),0);
 
   this->UpdateProperties();
@@ -1156,8 +1156,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     this->GetPVWindow()->UpdateEnableState();
     }
 
-  window->GetMenuView()->CheckRadioButton(
-                                  window->GetMenuView(), "Radio", 2);
+  window->GetViewMenu()->CheckRadioButton(
+                                  window->GetViewMenu(), "Radio", 2);
   this->UpdateProperties();
   this->GetPVRenderView()->EventuallyRender();
 

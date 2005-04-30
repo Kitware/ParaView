@@ -43,7 +43,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.55");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.56");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -439,22 +439,22 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     }
 
   this->SetFrameLabel("Box Widget");
-  this->ControlFrame->SetParent(this->Frame->GetFrame());
+  this->ControlFrame->SetParent(this->Frame);
   this->ControlFrame->Create(this->GetApplication(), 0);
 
-  this->TranslateLabel->SetParent(this->ControlFrame->GetFrame());
+  this->TranslateLabel->SetParent(this->ControlFrame);
   this->TranslateLabel->Create(this->GetApplication(), 0);
   this->TranslateLabel->SetText("Translate:");
   this->TranslateLabel->SetBalloonHelpString(
     "Translate the geometry relative to the dataset location.");
 
-  this->ScaleLabel->SetParent(this->ControlFrame->GetFrame());
+  this->ScaleLabel->SetParent(this->ControlFrame);
   this->ScaleLabel->Create(this->GetApplication(), 0);
   this->ScaleLabel->SetText("Scale:");
   this->ScaleLabel->SetBalloonHelpString(
     "Scale the geometry relative to the size of the dataset.");
 
-  this->OrientationLabel->SetParent(this->ControlFrame->GetFrame());
+  this->OrientationLabel->SetParent(this->ControlFrame);
   this->OrientationLabel->Create(this->GetApplication(), 0);
   this->OrientationLabel->SetText("Orientation:");
   this->OrientationLabel->SetBalloonHelpString(
@@ -463,7 +463,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
-    this->TranslateThumbWheel[cc]->SetParent(this->ControlFrame->GetFrame());
+    this->TranslateThumbWheel[cc]->SetParent(this->ControlFrame);
     this->TranslateThumbWheel[cc]->PopupModeOn();
     this->TranslateThumbWheel[cc]->SetValue(0.0);
     this->TranslateThumbWheel[cc]->SetResolution(0.001);
@@ -483,7 +483,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->TranslateThumbWheel[cc]->SetBalloonHelpString(
       "Translate the geometry relative to the dataset location.");
 
-    this->ScaleThumbWheel[cc]->SetParent(this->ControlFrame->GetFrame());
+    this->ScaleThumbWheel[cc]->SetParent(this->ControlFrame);
     this->ScaleThumbWheel[cc]->PopupModeOn();
     this->ScaleThumbWheel[cc]->SetValue(1.0);
     this->ScaleThumbWheel[cc]->SetResolution(0.001);
@@ -501,7 +501,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->ScaleThumbWheel[cc]->SetBalloonHelpString(
       "Scale the geometry relative to the size of the dataset.");
 
-    this->OrientationScale[cc]->SetParent(this->ControlFrame->GetFrame());
+    this->OrientationScale[cc]->SetParent(this->ControlFrame);
     this->OrientationScale[cc]->PopupScaleOn();
     this->OrientationScale[cc]->Create(this->GetApplication(), 0);
     this->OrientationScale[cc]->SetRange(0, 360);
@@ -553,13 +553,13 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* )
     this->OrientationLabel->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
-    this->ControlFrame->GetFrame()->GetWidgetName());
+    this->ControlFrame->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-    this->ControlFrame->GetFrame()->GetWidgetName());
+    this->ControlFrame->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-    this->ControlFrame->GetFrame()->GetWidgetName());
+    this->ControlFrame->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-    this->ControlFrame->GetFrame()->GetWidgetName());
+    this->ControlFrame->GetWidgetName());
 
   this->Script("pack %s -fill x -expand t -pady 2",
     this->ControlFrame->GetWidgetName());

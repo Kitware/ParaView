@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.33");
+vtkCxxRevisionMacro(vtkKWExtent, "1.34");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -457,20 +457,9 @@ void vtkKWExtent::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->XRange)
-    {
-    this->XRange->SetEnabled(this->Enabled);
-    }
-
-  if (this->YRange)
-    {
-    this->YRange->SetEnabled(this->Enabled);
-    }
-
-  if (this->ZRange)
-    {
-    this->ZRange->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->XRange);
+  this->PropagateEnableState(this->YRange);
+  this->PropagateEnableState(this->ZRange);
 }
 
 //----------------------------------------------------------------------------

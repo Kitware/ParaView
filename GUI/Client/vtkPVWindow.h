@@ -160,10 +160,6 @@ public:
   vtkPVSource *GetPVSource(const char* listname, const char* sourcename);
 
   // Description:
-  // This method is called when error icon is clicked.
-  void ProcessErrorClick();
-    
-  // Description:
   // Access methods to ParaView specific menus.
   vtkGetObjectMacro(SelectMenu, vtkKWMenu);
   vtkGetObjectMacro(GlyphMenu, vtkKWMenu);
@@ -490,7 +486,7 @@ public:
   
   // Description:
   // Update the toolbar aspect once the toolbar settings have been changed
-  virtual void UpdateToolbarAspect();
+  virtual void UpdateToolbarState();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -501,6 +497,7 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
   virtual void UpdateMenuState();
+  virtual int GetEnabled();
 
   // Description:
   // Set the progress. All progresses 0 or 100 will be ignored.
@@ -583,6 +580,10 @@ public:
   // Get the trace helper framework.
   vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
 
+  // Description:
+  // This method is called when error icon is clicked.
+  void ErrorIconCallback();
+    
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

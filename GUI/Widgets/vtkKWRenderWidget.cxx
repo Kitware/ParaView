@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.85");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.86");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -374,7 +374,7 @@ void vtkKWRenderWidget::AddInteractionBindings()
 
   // If we are disabled, don't do anything
 
-  if (!this->Enabled)
+  if (!this->GetEnabled())
     {
     return;
     }
@@ -1337,7 +1337,7 @@ void vtkKWRenderWidget::UpdateEnableState()
 
   // If enabled back, set up the bindings, otherwise remove
 
-  if (this->Enabled)
+  if (this->GetEnabled())
     {
     this->AddInteractionBindings();
     }

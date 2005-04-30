@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -274,15 +274,8 @@ void vtkKWVolumeMaterialPropertyWidget::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->ComponentSelectionWidget)
-    {
-    this->ComponentSelectionWidget->SetEnabled(this->Enabled);
-    }
-
-  if (this->EnableShadingCheckButton)
-    {
-    this->EnableShadingCheckButton->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->ComponentSelectionWidget);
+  this->PropagateEnableState(this->EnableShadingCheckButton);
 }
 
 //----------------------------------------------------------------------------

@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.29");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.30");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -707,7 +707,7 @@ void vtkKWApplicationSettingsInterface::FlatFrameCallback()
 
   if (this->Window)
     {
-    this->Window->UpdateToolbarAspect();
+    this->Window->UpdateToolbarState();
     }
 }
 
@@ -726,7 +726,7 @@ void vtkKWApplicationSettingsInterface::FlatButtonsCallback()
 
   if (this->Window)
     {
-    this->Window->UpdateToolbarAspect();
+    this->Window->UpdateToolbarState();
     }
 }
 
@@ -739,66 +739,66 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
 
   if (this->InterfaceSettingsFrame)
     {
-    this->InterfaceSettingsFrame->SetEnabled(this->Enabled);
+    this->InterfaceSettingsFrame->SetEnabled(this->GetEnabled());
     }
 
   if (this->ConfirmExitCheckButton)
     {
-    this->ConfirmExitCheckButton->SetEnabled(this->Enabled);
+    this->ConfirmExitCheckButton->SetEnabled(this->GetEnabled());
     }
 
   if (this->SaveWindowGeometryCheckButton)
     {
-    this->SaveWindowGeometryCheckButton->SetEnabled(this->Enabled);
+    this->SaveWindowGeometryCheckButton->SetEnabled(this->GetEnabled());
     }
 
   if (this->ShowSplashScreenCheckButton)
     {
-    this->ShowSplashScreenCheckButton->SetEnabled(this->Enabled);
+    this->ShowSplashScreenCheckButton->SetEnabled(this->GetEnabled());
     }
 
   if (this->ShowBalloonHelpCheckButton)
     {
-    this->ShowBalloonHelpCheckButton->SetEnabled(this->Enabled);
+    this->ShowBalloonHelpCheckButton->SetEnabled(this->GetEnabled());
     }
 
   if (this->ShowMostRecentPanelsCheckButton)
     {
-    this->ShowMostRecentPanelsCheckButton->SetEnabled(this->Enabled);
+    this->ShowMostRecentPanelsCheckButton->SetEnabled(this->GetEnabled());
     }
 
   // Interface customization
 
   if (this->InterfaceCustomizationFrame)
     {
-    this->InterfaceCustomizationFrame->SetEnabled(this->Enabled);
+    this->InterfaceCustomizationFrame->SetEnabled(this->GetEnabled());
     }
 
   if (this->EnableDragAndDropCheckButton)
     {
-    this->EnableDragAndDropCheckButton->SetEnabled(this->Enabled);
+    this->EnableDragAndDropCheckButton->SetEnabled(this->GetEnabled());
     }
 
   if (this->ResetDragAndDropButton)
     {
-    this->ResetDragAndDropButton->SetEnabled(this->Enabled);
+    this->ResetDragAndDropButton->SetEnabled(this->GetEnabled());
     }
 
   // Toolbar settings
 
   if (this->ToolbarSettingsFrame)
     {
-    this->ToolbarSettingsFrame->SetEnabled(this->Enabled);
+    this->ToolbarSettingsFrame->SetEnabled(this->GetEnabled());
     }
 
   if (this->FlatFrameCheckButton)
     {
-    this->FlatFrameCheckButton->SetEnabled(this->Enabled);
+    this->FlatFrameCheckButton->SetEnabled(this->GetEnabled());
     }
 
   if (this->FlatButtonsCheckButton)
     {
-    this->FlatButtonsCheckButton->SetEnabled(this->Enabled);
+    this->FlatButtonsCheckButton->SetEnabled(this->GetEnabled());
     }
 }
 

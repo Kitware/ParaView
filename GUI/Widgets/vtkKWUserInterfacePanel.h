@@ -148,9 +148,9 @@ protected:
 
   char *Name;
 
-  int Enabled;
-
 private:
+
+  int Enabled;
 
   vtkKWUserInterfacePanel(const vtkKWUserInterfacePanel&); // Not implemented
   void operator=(const vtkKWUserInterfacePanel&); // Not Implemented

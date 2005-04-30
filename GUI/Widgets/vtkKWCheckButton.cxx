@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.31");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.32");
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -127,7 +127,7 @@ void vtkKWCheckButton::SetState(int s)
 {
   if (this->IsCreated())
     {
-    int was_disabled = !this->Enabled;
+    int was_disabled = !this->GetEnabled();
     if (was_disabled)
       {
       this->SetEnabled(1);
@@ -250,7 +250,7 @@ void vtkKWCheckButton::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->SetStateOption(this->Enabled);
+  this->SetStateOption(this->GetEnabled());
 }
 
 //----------------------------------------------------------------------------

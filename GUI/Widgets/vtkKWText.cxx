@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.29");
+vtkCxxRevisionMacro(vtkKWText, "1.30");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -402,7 +402,8 @@ void vtkKWText::UpdateEnableState()
 
   if (this->TextWidget)
     {
-    this->TextWidget->SetStateOption(this->EditableText ? this->Enabled : 0);
+    this->TextWidget->SetStateOption(
+      this->EditableText ? this->GetEnabled() : 0);
     }
 }
 

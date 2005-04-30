@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.76");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.77");
 
 //----------------------------------------------------------------------------
 class vtkPVVectorEntryInternals
@@ -660,10 +660,7 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVVectorEntry::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
-  if ( this->LabelWidget )
-    {
-    this->LabelWidget->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->LabelWidget);
 
   vtkPVVectorEntryInternals::EntriesContainerIterator it = 
     this->Internals->Entries.begin();
@@ -671,7 +668,7 @@ void vtkPVVectorEntry::UpdateEnableState()
     this->Internals->Entries.end();
   for (; it != end; ++it)
     {
-    (*it)->SetEnabled(this->Enabled);
+    (*it)->SetEnabled(this->GetEnabled());
     }
 }
 

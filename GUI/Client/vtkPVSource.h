@@ -27,6 +27,7 @@
 
 class vtkCollection;
 class vtkKWFrame;
+class vtkKWFrameWithScrollbar;
 class vtkPVSourceNotebook;
 class vtkKWView;
 class vtkPVApplication;
@@ -282,7 +283,6 @@ public:
   // I shall want to get rid of this.
   void SetView(vtkKWView* view);
   vtkGetObjectMacro(View, vtkKWView);
-  vtkKWView *View;
 
   // Desription:
   // This is just a flag that is used to mark that the source has been saved
@@ -495,6 +495,8 @@ protected:
   vtkPVSource();
   ~vtkPVSource();
 
+  vtkKWView *View;
+
   // Description:
   // Setups up the displays for this source
   virtual void SetupDisplays();
@@ -533,7 +535,7 @@ protected:
   // visibility is the value "visibility and PointLabelVisibility".
   int PointLabelVisibility;
 
-  vtkKWFrame *ParameterFrame;
+  vtkKWFrameWithScrollbar *ParameterFrame;
   vtkSMDisplayProxy* DisplayProxy;
 
   // Description:

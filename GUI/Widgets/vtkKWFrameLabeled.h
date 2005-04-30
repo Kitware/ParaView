@@ -28,10 +28,6 @@ class vtkKWIcon;
 class vtkKWLabel;
 class vtkKWLabelLabeled;
 
-#define VTK_KW_LABEL_CASE_USER_SPECIFIED 0
-#define VTK_KW_LABEL_CASE_UPPERCASE_FIRST 1
-#define VTK_KW_LABEL_CASE_LOWERCASE_FIRST 2
-
 class VTK_EXPORT vtkKWFrameLabeled : public vtkKWWidget
 {
 public:
@@ -84,14 +80,25 @@ public:
   // Description:
   // Globally override the case of the label to ensure GUI consistency.
   // This will change the label when SetLabelText() is called.
+  //BTX
+  enum
+  {
+    LABEL_CASE_USER_SPECIFIED = 0,
+    LABEL_CASE_UPPERCASE_FIRST,
+    LABEL_CASE_LOWERCASE_FIRST
+  };
+  //ETX
   static void SetLabelCase(int v);
   static int GetLabelCase();
   static void SetLabelCaseToUserSpecified() 
-    { vtkKWFrameLabeled::SetLabelCase(VTK_KW_LABEL_CASE_USER_SPECIFIED);};
+    { vtkKWFrameLabeled::SetLabelCase(
+      vtkKWFrameLabeled::LABEL_CASE_USER_SPECIFIED);};
   static void SetLabelCaseToUppercaseFirst() 
-    {vtkKWFrameLabeled::SetLabelCase(VTK_KW_LABEL_CASE_UPPERCASE_FIRST);};
+    {vtkKWFrameLabeled::SetLabelCase(
+      vtkKWFrameLabeled::LABEL_CASE_UPPERCASE_FIRST);};
   static void SetLabelCaseToLowercaseFirst() 
-    {vtkKWFrameLabeled::SetLabelCase(VTK_KW_LABEL_CASE_LOWERCASE_FIRST);};
+    {vtkKWFrameLabeled::SetLabelCase(
+      vtkKWFrameLabeled::LABEL_CASE_LOWERCASE_FIRST);};
 
   // Description:
   // Globally enable or disable bold label.

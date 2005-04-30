@@ -36,6 +36,7 @@ SET( KWWidgets_SRCS
   vtkKWEventMap.cxx
   vtkKWExtent.cxx 
   vtkKWFrame.cxx
+  vtkKWFrameWithScrollbar.cxx
   vtkKWFrameLabeled.cxx 
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWHSVColorSelector.cxx

@@ -31,6 +31,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkPVCornerAnnotationEditor.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWLabel.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
@@ -139,7 +140,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.372");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.373");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -842,7 +843,7 @@ void vtkPVRenderView::SwitchBackAndForthToViewProperties()
     return;
     }
 
-  vtkKWMenu *viewmenu = win->GetMenuView();
+  vtkKWMenu *viewmenu = win->GetViewMenu();
   if (!viewmenu)
     {
     return;
@@ -952,7 +953,8 @@ void vtkPVRenderView::CreateViewProperties()
 
   // Render parameters
 
-  this->RenderParametersFrame->SetParent(this->GeneralProperties->GetFrame());
+  this->RenderParametersFrame->SetParent(
+    this->GeneralPropertiesFrame->GetFrame());
   this->RenderParametersFrame->ShowHideFrameOn();
   this->RenderParametersFrame->Create(this->GetApplication(),0);
   this->RenderParametersFrame->SetLabelText("Advanced Render Parameters");
@@ -1047,7 +1049,7 @@ void vtkPVRenderView::CreateViewProperties()
     {
     this->RenderModuleUI = rmuio;
     this->RenderModuleUI->SetRenderModuleProxy(this->RenderModuleProxy);
-    this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
+    this->RenderModuleUI->SetParent(this->GeneralPropertiesFrame->GetFrame());
     this->RenderModuleUI->Create(this->GetApplication(),0);
     this->RenderModuleUI->GetTraceHelper()->SetReferenceHelper(
       this->GetTraceHelper());
@@ -1067,7 +1069,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   // Interface settings
 
-  this->InterfaceSettingsFrame->SetParent(this->GeneralProperties->GetFrame());
+  this->InterfaceSettingsFrame->SetParent(this->GeneralPropertiesFrame->GetFrame());
   this->InterfaceSettingsFrame->ShowHideFrameOn();
   this->InterfaceSettingsFrame->Create(this->GetApplication(),0);
   this->InterfaceSettingsFrame->SetLabelText("3D Interface Settings");
@@ -1110,7 +1112,7 @@ void vtkPVRenderView::CreateViewProperties()
   // Light Parameter frame
   // 
   // Setup the frame
-  this->LightParameterFrame->SetParent(this->GeneralProperties->GetFrame());
+  this->LightParameterFrame->SetParent(this->GeneralPropertiesFrame->GetFrame());
   this->LightParameterFrame->ShowHideFrameOn();
   this->LightParameterFrame->Create(this->GetApplication(),0);
   this->LightParameterFrame->SetLabelText("Light Kit Parameter");
@@ -1363,7 +1365,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   // Orientation axes settings
   
-  this->OrientationAxesFrame->SetParent(this->AnnotationProperties->GetFrame());
+  this->OrientationAxesFrame->SetParent(this->AnnotationPropertiesFrame->GetFrame());
   this->OrientationAxesFrame->ShowHideFrameOn();
   this->OrientationAxesFrame->Create(this->GetApplication(), 0);
   this->OrientationAxesFrame->SetLabelText("Orientation Axes");
@@ -1507,9 +1509,8 @@ void vtkPVRenderView::CreateViewProperties()
                           "Camera and viewing navigation properties page");
   vtkKWWidget* page = this->Notebook->GetFrame("Camera");
 
-  vtkKWFrame* frame = vtkKWFrame::New();
+  vtkKWFrameWithScrollbar* frame = vtkKWFrameWithScrollbar::New();
   frame->SetParent(page);
-  frame->ScrollableOn();
   frame->Create(this->GetApplication(),0);
   this->Script("pack %s -fill both -expand yes", frame->GetWidgetName());
 

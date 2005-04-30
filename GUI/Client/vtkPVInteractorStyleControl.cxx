@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.46");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -542,13 +542,13 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
 
   for ( cc = 0; cc < 6; cc ++ )
     {
-    this->Labels[cc]->SetParent(this->OuterFrame->GetFrame());
+    this->Labels[cc]->SetParent(this->OuterFrame);
     this->Labels[cc]->Create(app, "");
     }
 
   for ( cc = 0; cc < 9; cc ++ )
     {
-    this->Menus[cc]->SetParent(this->OuterFrame->GetFrame());
+    this->Menus[cc]->SetParent(this->OuterFrame);
     this->Menus[cc]->Create(app, "-anchor w");
     }
 
@@ -585,13 +585,13 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
                grid_settings);
                
   this->Script("grid columnconfigure %s 0 -weight 0", 
-               this->OuterFrame->GetFrame()->GetWidgetName());
+               this->OuterFrame->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-               this->OuterFrame->GetFrame()->GetWidgetName());
+               this->OuterFrame->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-               this->OuterFrame->GetFrame()->GetWidgetName());
+               this->OuterFrame->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-               this->OuterFrame->GetFrame()->GetWidgetName());
+               this->OuterFrame->GetWidgetName());
   
 
   this->Script("pack %s -expand true -fill both -side top", 
@@ -821,7 +821,7 @@ void vtkPVInteractorStyleControl::UpdateEnableState()
     it != this->Internals->Widgets.end();
     ++it )
     {
-    it->second->SetEnabled(this->Enabled);
+    it->second->SetEnabled(this->GetEnabled());
     }
   this->PropagateEnableState(this->OuterFrame);
 }

@@ -20,7 +20,7 @@
 #include "vtkKWLabel.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.8");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.9");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -177,10 +177,7 @@ void vtkKWScalarComponentSelectionWidget::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->SelectedComponentOptionMenu)
-    {
-    this->SelectedComponentOptionMenu->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->SelectedComponentOptionMenu);
 }
 
 //----------------------------------------------------------------------------

@@ -17,6 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWLabel.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDataInformation.h"
@@ -48,7 +49,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.142");
+vtkCxxRevisionMacro(vtkPVProbe, "1.143");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -65,17 +66,19 @@ vtkPVProbe::vtkPVProbe()
   this->SelectedPointFrame = vtkKWWidget::New();
   this->SelectedPointLabel = vtkKWLabel::New();
   this->PointDataLabel = vtkKWLabel::New();
- 
+  
   this->ShowXYPlotToggle = vtkKWCheckButton::New();
 
+  
   this->ProbeFrame = vtkKWWidget::New();
-
+  
+  
   this->ReplaceInputOff();
 
   // Special ivar in vtkPVSource just for this subclass.
   // We cannot process inputs that have more than one part.
   this->RequiredNumberOfInputParts = 1;
- 
+  
   this->PlotDisplayProxy = 0; 
   this->PlotDisplayProxyName = 0;
   this->CanShowPlot = 0;

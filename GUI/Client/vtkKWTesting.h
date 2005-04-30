@@ -33,9 +33,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWTesting - a frame with a scroll bar
+// .NAME vtkKWTesting - a testing widget
 // .SECTION Description
-// The ScrollableFrame creates a frame with an attached scrollbar
+// Somebody fill that description.
 
 
 #ifndef __vtkKWTesting_h

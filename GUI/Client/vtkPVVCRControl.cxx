@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.6");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.7");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -333,38 +333,68 @@ void vtkPVVCRControl::InvokeCommand(const char *command)
 void vtkPVVCRControl::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
-  if (!this->IsCreated())
-    {
-    return;
-    }
-  int enabled = this->Enabled;
 
-  //These widgets are always off except when playing.
-  this->Enabled = this->GetInPlay();
-  this->PropagateEnableState(this->StopButton);
+  // These widgets are always off except when playing.
+
+  int enabled = this->GetInPlay();
+  if (this->StopButton)
+    {
+    this->StopButton->SetEnabled(enabled);
+    }
 
   // These widgets are only enabled when recording.
-  this->Enabled = this->GetRecordCheckButtonState();
-  this->PropagateEnableState(this->RecordStateButton);
 
-  //These widgets are on when playing or when GUI is enabled.
-  this->Enabled = this->GetInPlay() || enabled;
-  this->PropagateEnableState(this->LoopCheckButton);
+  enabled = this->GetRecordCheckButtonState();
+  if (this->RecordStateButton)
+    {
+    this->RecordStateButton->SetEnabled(enabled);
+    }
+
+  // These widgets are on when playing or when GUI is enabled.
+
+  enabled = this->GetInPlay() || this->GetEnabled();
+  if (this->LoopCheckButton)
+    {
+    this->LoopCheckButton->SetEnabled(enabled);
+    }
 
   //These widgets are on when recording or when gui is enabled and not playing.
-  this->Enabled = (enabled && !this->GetInPlay() ) || this->GetRecordCheckButtonState();
-  this->PropagateEnableState(this->RecordCheckButton);
+
+  enabled = (this->GetEnabled() && !this->GetInPlay()) || 
+    this->GetRecordCheckButtonState();
+  if (this->RecordCheckButton)
+    {
+    this->RecordCheckButton->SetEnabled(enabled);
+    }
 
   //These widgets are disabled when playing or recording.
-  this->Enabled = enabled && !this->GetInPlay() && !this->GetRecordCheckButtonState();
-  this->PropagateEnableState(this->PlayButton);
-  this->PropagateEnableState(this->GoToBeginningButton);
-  this->PropagateEnableState(this->GoToEndButton);
-  this->PropagateEnableState(this->GoToPreviousButton);
-  this->PropagateEnableState(this->GoToNextButton);
-  this->PropagateEnableState(this->SaveAnimationButton);
-  
-  this->Enabled = enabled;
+
+  enabled = (this->GetEnabled() && !this->GetInPlay()) && 
+    !this->GetRecordCheckButtonState();
+  if (this->PlayButton)
+    {
+    this->PlayButton->SetEnabled(enabled);
+    }
+  if (this->GoToBeginningButton)
+    {
+    this->GoToBeginningButton->SetEnabled(enabled);
+    }
+  if (this->GoToEndButton)
+    {
+    this->GoToEndButton->SetEnabled(enabled);
+    }
+  if (this->GoToPreviousButton)
+    {
+    this->GoToPreviousButton->SetEnabled(enabled);
+    }
+  if (this->GoToNextButton)
+    {
+    this->GoToNextButton->SetEnabled(enabled);
+    }
+  if (this->SaveAnimationButton)
+    {
+    this->SaveAnimationButton->SetEnabled(enabled);
+    }
 }
 
 //-----------------------------------------------------------------------------

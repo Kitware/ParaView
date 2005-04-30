@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.4");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.5");
 
 int vtkKWWidgetSetCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -167,10 +167,7 @@ void vtkKWWidgetSet::UpdateEnableState()
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
-    if (it->Widget)
-      {
-      it->Widget->SetEnabled(this->Enabled);
-      }
+    this->PropagateEnableState(it->Widget);
     }
 }
 
@@ -200,7 +197,7 @@ vtkKWWidget* vtkKWWidgetSet::AddWidgetInternal(int id)
   vtkKWWidgetSetInternals::WidgetSlot widget_slot;
   widget_slot.Id = id;
   widget_slot.Widget = this->AllocateAndCreateWidget();
-  widget_slot.Widget->SetEnabled(this->Enabled);
+  this->PropagateEnableState(widget_slot.Widget);
 
   this->Internals->Widgets.push_back(widget_slot);
 

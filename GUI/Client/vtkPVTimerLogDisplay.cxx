@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.26");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.27");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -535,7 +535,10 @@ void vtkPVTimerLogDisplay::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  this->PropagateEnableState(this->MasterWindow);
+  // DO NOT DO THAT ! this is evil, Update the state of the children, 
+  // not the parents (the master window is the vtkPVWindow, which itself
+  // update the state of this object, etc.)
+  // this->PropagateEnableState(this->MasterWindow);
 
   this->PropagateEnableState(this->ControlFrame);
   this->PropagateEnableState(this->SaveButton);

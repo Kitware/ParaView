@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.4");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.5");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -286,6 +286,20 @@ void vtkKWTopLevel::InstallMenu(vtkKWMenu *menu)
     this->Script("%s configure -menu %s", 
                  this->GetWidgetName(),
                  menu->GetWidgetName());  
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTopLevel::SetDeleteWindowProtocolCommand(
+  vtkKWObject *obj, const char *command)
+{ 
+  if (this->IsCreated())
+    {
+    char *objcmd = NULL;
+    this->SetObjectMethodCommand(&objcmd, obj, command);
+    this->Script("wm protocol %s WM_DELETE_WINDOW {%s}",
+                 this->GetWidgetName(), objcmd);
+    delete [] objcmd;
     }
 }
 

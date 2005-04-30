@@ -46,7 +46,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.6");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.7");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -1127,75 +1127,20 @@ void vtkKWVolumePropertyWidget::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->EditorFrame)
-    {
-    this->EditorFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->ComponentSelectionWidget)
-    {
-    this->ComponentSelectionWidget->SetEnabled(this->Enabled);
-    }
-
-  if (this->InterpolationTypeOptionMenu)
-    {
-    this->InterpolationTypeOptionMenu->SetEnabled(this->Enabled);
-    }
-
-  if (this->InteractiveApplyCheckButton)
-    {
-    this->InteractiveApplyCheckButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->ScalarOpacityFunctionEditor)
-    {
-    this->ScalarOpacityFunctionEditor->SetEnabled(this->Enabled);
-    }
-
-  if (this->ScalarOpacityUnitDistanceScale)
-    {
-    this->ScalarOpacityUnitDistanceScale->SetEnabled(this->Enabled);
-    }
-
-  if (this->EnableShadingCheckButton)
-    {
-    this->EnableShadingCheckButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->MaterialPropertyWidget)
-    {
-    this->MaterialPropertyWidget->SetEnabled(this->Enabled);
-    }
-
-  if (this->LockOpacityAndColorCheckButton)
-    {
-    this->LockOpacityAndColorCheckButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->ScalarColorFunctionEditor)
-    {
-    this->ScalarColorFunctionEditor->SetEnabled(this->Enabled);
-    }
-
-  if (this->EnableGradientOpacityOptionMenu)
-    {
-    this->EnableGradientOpacityOptionMenu->SetEnabled(this->Enabled);
-    }
-
-  if (this->GradientOpacityFunctionEditor)
-    {
-    this->GradientOpacityFunctionEditor->SetEnabled(this->Enabled);
-    }
-
-  if (this->ComponentWeightScaleSet)
-    {
-    this->ComponentWeightScaleSet->SetEnabled(this->Enabled);
-    }
-
-  if (this->HSVColorSelector)
-    {
-    this->HSVColorSelector->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->EditorFrame);
+  this->PropagateEnableState(this->ComponentSelectionWidget);
+  this->PropagateEnableState(this->InterpolationTypeOptionMenu);
+  this->PropagateEnableState(this->InteractiveApplyCheckButton);
+  this->PropagateEnableState(this->ScalarOpacityFunctionEditor);
+  this->PropagateEnableState(this->ScalarOpacityUnitDistanceScale);
+  this->PropagateEnableState(this->EnableShadingCheckButton);
+  this->PropagateEnableState(this->MaterialPropertyWidget);
+  this->PropagateEnableState(this->LockOpacityAndColorCheckButton);
+  this->PropagateEnableState(this->ScalarColorFunctionEditor);
+  this->PropagateEnableState(this->EnableGradientOpacityOptionMenu);
+  this->PropagateEnableState(this->GradientOpacityFunctionEditor);
+  this->PropagateEnableState(this->ComponentWeightScaleSet);
+  this->PropagateEnableState(this->HSVColorSelector);
 }
 
 //----------------------------------------------------------------------------

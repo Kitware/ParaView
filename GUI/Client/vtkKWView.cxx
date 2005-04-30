@@ -28,6 +28,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithScrollbar.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWFrameLabeled.h"
@@ -88,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.9");
+vtkCxxRevisionMacro(vtkKWView, "1.10");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -140,7 +141,7 @@ vtkKWView::vtkKWView()
   this->ProgressGauge = vtkKWSegmentedProgressGauge::New();
   this->ProgressGauge->SetParent(this->Frame2);
 
-  this->AnnotationProperties = vtkKWFrame::New();
+  this->AnnotationPropertiesFrame = vtkKWFrameWithScrollbar::New();
   this->CornerAnnotation = vtkPVCornerAnnotationEditor::New();
   this->CornerAnnotation->GetTraceHelper()->SetReferenceHelper(
     this->GetTraceHelper());
@@ -154,7 +155,7 @@ vtkKWView::vtkKWView()
   this->RenderMode = VTK_KW_STILL_RENDER;
   this->RenderState = 1;
 
-  this->GeneralProperties = vtkKWFrame::New();
+  this->GeneralPropertiesFrame = vtkKWFrameWithScrollbar::New();
 
   this->ColorsFrame = vtkKWFrameLabeled::New();
   this->RendererBackgroundColor = vtkKWChangeColorButton::New();
@@ -192,13 +193,17 @@ vtkKWView::~vtkKWView()
     this->Script("bind %s <KeyPress> {}",wname);
     this->Script("bind %s <Enter> {}",wname);
     }
-  this->GeneralProperties->Delete();
+  this->GeneralPropertiesFrame->Delete();
   this->ColorsFrame->Delete();
   this->RendererBackgroundColor->Delete();
 
-  this->AnnotationProperties->Delete();
+  this->AnnotationPropertiesFrame->Delete();
 
-  this->CornerAnnotation->Delete();
+  if (this->CornerAnnotation)
+    {
+    this->CornerAnnotation->Delete();
+    this->CornerAnnotation = NULL;
+    }
   
   this->Notebook->SetParent(NULL);
   this->Notebook->Delete();
@@ -332,7 +337,7 @@ void vtkKWView::SetStillUpdateRates( int count, float *rates )
 //----------------------------------------------------------------------------
 void vtkKWView::Close()
 {
-  if (this->PropertiesCreated)
+  if (this->PropertiesCreated && this->CornerAnnotation)
     {
     this->CornerAnnotation->Close();
     }
@@ -355,17 +360,17 @@ void vtkKWView::CreateViewProperties()
     "Annotate", "Set the corner annotation", ico);
   ico->Delete();
   
-  this->AnnotationProperties->SetParent(this->Notebook->GetFrame("Annotate"));
-  this->AnnotationProperties->ScrollableOn();
-  this->AnnotationProperties->Create(app,0);
+  this->AnnotationPropertiesFrame->SetParent(this->Notebook->GetFrame("Annotate"));
+  this->AnnotationPropertiesFrame->Create(app,0);
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
-               this->AnnotationProperties->GetWidgetName());
+               this->AnnotationPropertiesFrame->GetWidgetName());
   this->Notebook->Raise("Annotate");
   
   // create the anno widgets
-  this->CornerAnnotation->SetParent(this->AnnotationProperties->GetFrame());
+  this->CornerAnnotation->SetParent(
+    this->AnnotationPropertiesFrame->GetFrame());
   this->CornerAnnotation->SetView(this);
   this->CornerAnnotation->GetFrame()->ShowHideFrameOn();
   this->CornerAnnotation->Create(app, "");
@@ -373,15 +378,15 @@ void vtkKWView::CreateViewProperties()
   this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
                this->CornerAnnotation->GetWidgetName());
 
-  this->GeneralProperties->SetParent(this->Notebook->GetFrame("General"));
-  this->GeneralProperties->ScrollableOn();
-  this->GeneralProperties->Create(app,0);
+  this->GeneralPropertiesFrame->SetParent(this->Notebook->GetFrame("General"));
+  this->GeneralPropertiesFrame->Create(app,0);
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
   this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
-               this->GeneralProperties->GetWidgetName());  
+               this->GeneralPropertiesFrame->GetWidgetName());  
 
-  this->ColorsFrame->SetParent( this->GeneralProperties->GetFrame() );
+  this->ColorsFrame->SetParent(
+    this->GeneralPropertiesFrame->GetFrame());
   this->ColorsFrame->ShowHideFrameOn();
   this->ColorsFrame->Create( app,0 );
   this->ColorsFrame->SetLabelText("Colors");
@@ -480,8 +485,8 @@ void vtkKWView::ShowViewProperties()
   if (this->MenuEntryName)
     {
     // make sure the variable is set, otherwise set it
-    this->ParentWindow->GetMenuView()->CheckRadioButton(
-      this->ParentWindow->GetMenuView(), "Radio", VTK_KW_VIEW_MENU_INDEX);
+    this->ParentWindow->GetViewMenu()->CheckRadioButton(
+      this->ParentWindow->GetViewMenu(), "Radio", VTK_KW_VIEW_MENU_INDEX);
     }
 
   // unpack any current children
@@ -931,10 +936,10 @@ void vtkKWView::Select(vtkKWWindow *pw)
     {
     // now add property options
     char *rbv = 
-      pw->GetMenuView()->CreateRadioButtonVariable(
-        pw->GetMenuView(),"Radio");
+      pw->GetViewMenu()->CreateRadioButtonVariable(
+        pw->GetViewMenu(),"Radio");
 
-    pw->GetMenuView()->AddRadioButton(VTK_KW_VIEW_MENU_INDEX, 
+    pw->GetViewMenu()->AddRadioButton(VTK_KW_VIEW_MENU_INDEX, 
                                       this->MenuEntryName, 
                                       rbv, 
                                       this, 
@@ -950,12 +955,12 @@ void vtkKWView::Select(vtkKWWindow *pw)
   if ( this->SupportSaveAsImage )
     {
     // add the save as image option
-    pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
+    pw->GetFileMenu()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
                                      "Save View Image",
                                      this, 
                                      "SaveAsImage", 8,
                                      "Save an image of the current view contents");
-    pw->GetMenuFile()->InsertSeparator(this->ParentWindow->GetFileMenuIndex());
+    pw->GetFileMenu()->InsertSeparator(this->ParentWindow->GetFileMenuIndex());
     }
   
   if ( this->SupportPrint )
@@ -963,22 +968,22 @@ void vtkKWView::Select(vtkKWWindow *pw)
     // add the Print option
     // If there is a "Page Setup" menu, insert below
     int clidx;
-    if (pw->GetMenuFile()->HasItem(VTK_KW_PAGE_SETUP_MENU_LABEL))
+    if (pw->GetFileMenu()->HasItem(VTK_KW_PAGE_SETUP_MENU_LABEL))
       {
-      clidx = pw->GetMenuFile()->GetIndex(VTK_KW_PAGE_SETUP_MENU_LABEL) + 1;  
+      clidx = pw->GetFileMenu()->GetIndex(VTK_KW_PAGE_SETUP_MENU_LABEL) + 1;  
       }
     else
       {
       clidx = this->ParentWindow->GetFileMenuIndex();  
       }
-    pw->GetMenuFile()->InsertCommand(clidx, "Print", this, "PrintView", 0);
+    pw->GetFileMenu()->InsertCommand(clidx, "Print", this, "PrintView", 0);
     }
   
   if ( this->SupportCopy )
     {
 #ifdef _WIN32
   // add the edit copy option
-  pw->GetMenuEdit()->AddCommand("Copy View Image",this,"EditCopy", "Copy an image of current view contents to the clipboard");
+  pw->GetEditMenu()->AddCommand("Copy View Image",this,"EditCopy", "Copy an image of current view contents to the clipboard");
 #endif
     }
   
@@ -990,8 +995,8 @@ void vtkKWView::Select(vtkKWWindow *pw)
   if (this->SharedPropertiesParent && this->MenuEntryName)
     {
     // if the window prop is empty then pack this one
-    if (this->ParentWindow->GetMenuView()->GetRadioButtonValue(
-      this->ParentWindow->GetMenuView(), "Radio") >= VTK_KW_VIEW_MENU_INDEX)
+    if (this->ParentWindow->GetViewMenu()->GetRadioButtonValue(
+      this->ParentWindow->GetViewMenu(), "Radio") >= VTK_KW_VIEW_MENU_INDEX)
       {
       this->Script("pack %s -side left -anchor nw -fill y",
                    this->PropertiesParent->GetWidgetName());
@@ -1007,24 +1012,24 @@ void vtkKWView::Deselect(vtkKWWindow *pw)
 {
   if (this->MenuEntryName)
     {
-    pw->GetMenuView()->DeleteMenuItem(this->MenuEntryName);
+    pw->GetViewMenu()->DeleteMenuItem(this->MenuEntryName);
     }
       
   if ( this->SupportPrint )
     {
-    pw->GetMenuFile()->DeleteMenuItem("Print");
+    pw->GetFileMenu()->DeleteMenuItem("Print");
     }
   
   if ( this->SupportSaveAsImage )
     {
-    pw->GetMenuFile()->DeleteMenuItem("Save Image");
+    pw->GetFileMenu()->DeleteMenuItem("Save Image");
     }
   
   if ( this->SupportCopy )
     {
 #ifdef _WIN32
   // add the edit copy option
-  pw->GetMenuEdit()->DeleteMenuItem("Copy");
+  pw->GetEditMenu()->DeleteMenuItem("Copy");
 #endif
     }
   
@@ -1121,6 +1126,12 @@ void vtkKWView::SetupBindings()
 //----------------------------------------------------------------------------
 void vtkKWView::UnRegister(vtkObjectBase *o)
 {
+  // Have reference to this object
+  // this->Frame2 (Parent of)
+  // vtkPVWindow::LowerFrame->GetFrame1() (Child of)
+  // this->CornerAnnotation (View of)
+  // (vtkPVRenderView)this->CameraIcons[] * 6 (RenderView of)
+
   // Delete the children if we are about to be deleted
   // the last extra '1' is for the CornerAnnotation ref
 
@@ -1298,8 +1309,8 @@ void vtkKWView::UpdateEnableState()
   this->PropagateEnableState(this->Frame);
   this->PropagateEnableState(this->Frame2);
   this->PropagateEnableState(this->ControlFrame);
-  this->PropagateEnableState(this->AnnotationProperties);
-  this->PropagateEnableState(this->GeneralProperties);
+  this->PropagateEnableState(this->AnnotationPropertiesFrame);
+  this->PropagateEnableState(this->GeneralPropertiesFrame);
   this->PropagateEnableState(this->ColorsFrame);
   this->PropagateEnableState(this->RendererBackgroundColor);
 }

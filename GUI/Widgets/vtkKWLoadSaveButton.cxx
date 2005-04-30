@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.7");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.8");
 
 int vtkKWLoadSaveButtonCommand(ClientData cd, Tcl_Interp *interp,
                                int argc, char *argv[]);
@@ -203,10 +203,7 @@ void vtkKWLoadSaveButton::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->LoadSaveDialog)
-    {
-    this->LoadSaveDialog->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->LoadSaveDialog);
 }
 
 //----------------------------------------------------------------------------

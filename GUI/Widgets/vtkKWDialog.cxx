@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.45");
+vtkCxxRevisionMacro(vtkKWDialog, "1.46");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -174,8 +174,7 @@ void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
 
   this->Superclass::Create(app, args);
 
-  this->Script("wm protocol %s WM_DELETE_WINDOW {%s Cancel}",
-               this->GetWidgetName(), this->GetTclName());
+  this->SetDeleteWindowProtocolCommand(this, "Cancel");
 }
 
 //----------------------------------------------------------------------------

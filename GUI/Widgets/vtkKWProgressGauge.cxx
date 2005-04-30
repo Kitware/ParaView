@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.24");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.25");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -82,7 +82,7 @@ void vtkKWProgressGauge::SetValue(int value)
     {
     return;
     }
-  int enabled = this->Enabled;
+  int enabled = this->GetEnabled();
   if ( !enabled )
     {
     this->EnabledOn();

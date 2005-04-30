@@ -15,6 +15,7 @@
 #include "vtkPVInformationGUI.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSource.h"
+#include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWLabel.h"
 #include "vtkKWBoundsDisplay.h"
@@ -23,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.4");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.5");
 
 int vtkPVInformationGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);

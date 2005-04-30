@@ -63,7 +63,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.37");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.38");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -961,21 +961,20 @@ void vtkPVAnimationManager::SetCurrentTime(double ntime)
 void vtkPVAnimationManager::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->VAnimationInterface);
+  this->PropagateEnableState(this->AnimationScene);
+  
   int inPlay = 0;
   if (this->AnimationScene && this->AnimationScene->IsInPlay())
     {
     inPlay = 1;
     }
-  this->PropagateEnableState(this->VAnimationInterface);
-  this->PropagateEnableState(this->AnimationScene);
-  
-  int enabled = this->Enabled;
-  if (inPlay)
+
+  if (this->HAnimationInterface)
     {
-    this->Enabled = 0;
+    this->HAnimationInterface->SetEnabled(inPlay ? 0 : this->GetEnabled());
     }
-  this->PropagateEnableState(this->HAnimationInterface);
-  this->Enabled = enabled;
 }
 
 //-----------------------------------------------------------------------------

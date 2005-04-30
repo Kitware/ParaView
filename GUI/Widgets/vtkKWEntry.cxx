@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.57");
+vtkCxxRevisionMacro(vtkKWEntry, "1.58");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -97,10 +97,10 @@ void vtkKWEntry::UpdateEnableState()
 
   if (this->Entry)
     {
-    this->Entry->SetStateOption(this->Enabled);
+    this->Entry->SetStateOption(this->GetEnabled());
     if (this->Entry != this)
       {
-      this->Entry->SetEnabled(this->Enabled);
+      this->PropagateEnableState(this->Entry);
       }
     }
 
@@ -132,7 +132,7 @@ void vtkKWEntry::SetValue(const char *s)
     ro = 1;
     }
 
-  int was_disabled = !this->Enabled;
+  int was_disabled = !this->GetEnabled();
   if (was_disabled)
     {
     this->SetEnabled(1);

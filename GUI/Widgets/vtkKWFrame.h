@@ -11,16 +11,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWFrame - a frame with a scroll bar
+// .NAME vtkKWFrame - a simple frame
 // .SECTION Description
-// The ScrollableFrame creates a frame with an attached scrollbar
+// The core frame
 
 
 #ifndef __vtkKWFrame_h
 #define __vtkKWFrame_h
 
 #include "vtkKWWidget.h"
-class vtkKWApplication;
 
 class VTK_EXPORT vtkKWFrame : public vtkKWWidget
 {
@@ -30,19 +29,8 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
+  // Create a the widget
   virtual void Create(vtkKWApplication *app, const char* args);
-
-  // Description:
-  // Get the vtkKWWidget for the internal frame.
-  vtkKWWidget *GetFrame() {return this->Frame;};
-
-  // Description:
-  // By default this is a simple frame. BY turning Scrollable on it becomes
-  // a scrolled frame. This must be set prior to creation.
-  vtkSetMacro(Scrollable,int);
-  vtkGetMacro(Scrollable,int);
-  vtkBooleanMacro(Scrollable,int);
 
   // Description:
   // Convenience method to set the width/height of a frame.
@@ -50,25 +38,10 @@ public:
   virtual void SetWidth(int);
   virtual void SetHeight(int);
   
-  // Description:
-  // Update the "enable" state of the object and its internal parts.
-  // Depending on different Ivars (this->Enabled, the application's 
-  // Limited Edition Mode, etc.), the "enable" state of the object is updated
-  // and propagated to its internal parts/subwidgets. This will, for example,
-  // enable/disable parts of the widget UI, enable/disable the visibility
-  // of 3D widgets, etc.
-  virtual void UpdateEnableState();
- 
 protected:
-  vtkKWFrame();
-  ~vtkKWFrame();
+  vtkKWFrame() {};
+  ~vtkKWFrame() {};
 
-  vtkKWWidget *Frame;
-  vtkKWWidget *ScrollFrame;
-
-  char* FrameId;
-  int Scrollable;
-  
 private:
   vtkKWFrame(const vtkKWFrame&); // Not implemented
   void operator=(const vtkKWFrame&); // Not implemented

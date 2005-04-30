@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameLabeled );
-vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.6");
+vtkCxxRevisionMacro(vtkKWFrameLabeled, "1.7");
 
 int vtkKWFrameLabeledCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -91,7 +91,8 @@ void vtkKWFrameLabeled::SetLabelText(const char *text)
     return;
     }
 
-  if (vtkKWFrameLabeled::LabelCase == VTK_KW_LABEL_CASE_USER_SPECIFIED)
+  if (vtkKWFrameLabeled::LabelCase == 
+      vtkKWFrameLabeled::LABEL_CASE_USER_SPECIFIED)
     {
     this->GetLabel()->SetText(text);
     }
@@ -100,10 +101,10 @@ void vtkKWFrameLabeled::SetLabelText(const char *text)
     kwsys_stl::string res;
     switch (vtkKWFrameLabeled::LabelCase)
       {
-      case VTK_KW_LABEL_CASE_UPPERCASE_FIRST:
+      case vtkKWFrameLabeled::LABEL_CASE_UPPERCASE_FIRST:
         res = kwsys::SystemTools::CapitalizedWords(text);
         break;
-      case VTK_KW_LABEL_CASE_LOWERCASE_FIRST:
+      case vtkKWFrameLabeled::LABEL_CASE_LOWERCASE_FIRST:
         res = kwsys::SystemTools::UnCapitalizedWords(text);
         break;
       }
@@ -346,7 +347,7 @@ void vtkKWFrameLabeled::UpdateEnableState()
   int limited = (this->GetApplication() && 
                  this->GetApplication()->GetLimitedEditionMode());
   
-  if (limited && this->ShowIconInLimitedEditionMode && !this->Enabled)
+  if (limited && this->ShowIconInLimitedEditionMode && !this->GetEnabled())
     {
     this->Label->ShowLabelOn();
     }

@@ -63,9 +63,14 @@ public:
   int IsMapped();
   
   // Description:
-  // Get the name of the underlying tk widget being used
-  // the parent should be set before calling this method.
+  // Get the name of the underlying Tk widget being used.
+  // The parent should be set before calling this method, as it uses
+  // the parent's widget name and appends a number.
+  // Note that setting the widget name manually is *not* recommended, use
+  // this method only if you know what you are doing, say, for example, if
+  // you have to map a external pure Tk widget to a vtkKWWidget object.
   const char *GetWidgetName();
+  vtkSetStringMacro(WidgetName);
 
   // Description:
   // Set/Get the parent widget for this widget
@@ -280,12 +285,7 @@ protected:
   vtkKWWidget();
   ~vtkKWWidget();
 
-  //BTX
-  friend class vtkKWFrame;
-  //ETX
-
   char        *WidgetName;
-  vtkSetStringMacro(WidgetName);
 
   vtkKWWidget *Parent;
 
@@ -293,8 +293,6 @@ protected:
 
   char  *BalloonHelpString;
   
-  int Enabled;
-
   // Encoding methods
   static const char* GetTclCharacterEncodingAsString(int);
 
@@ -322,6 +320,7 @@ private:
   vtkKWDragAndDropTargetSet* DragAndDropTargetSet;
 
   int WidgetIsCreated;
+  int Enabled;
 
   vtkKWWidget(const vtkKWWidget&); // Not implemented
   void operator=(const vtkKWWidget&); // Not implemented

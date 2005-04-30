@@ -28,7 +28,6 @@ class vtkKWRadioButton;
 class vtkKWFrameLabeled;
 class vtkKWScale;
 class vtkKWCheckButton;
-class vtkKWSplitFrame;
 class vtkLabeledFrame;
 class vtkMultiProcessController;
 class vtkPVApplication;

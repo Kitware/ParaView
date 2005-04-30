@@ -24,12 +24,15 @@
 #define __vtkPVHorizontalAnimationInterface_h
 
 #include "vtkPVTracedWidget.h"
-class vtkKWApplication;
-class vtkKWSplitFrame;
+
 class vtkCollection;
 class vtkCollectionIterator;
-class vtkPVAnimationCueTree;
+class vtkKWApplication;
+class vtkKWFrame;
+class vtkKWFrameWithScrollbar;
+class vtkKWSplitFrame;
 class vtkPVAnimationCue;
+class vtkPVAnimationCueTree;
 
 class VTK_EXPORT vtkPVHorizontalAnimationInterface : public vtkPVTracedWidget
 {
@@ -89,7 +92,7 @@ protected:
   vtkKWSplitFrame* SplitFrame;
   vtkKWFrame* TimeLineFrame;
   vtkKWFrame* PropertiesFrame;
-  vtkKWFrame* ScrollFrame;
+  vtkKWFrameWithScrollbar* ScrollFrame;
 
   vtkCollection* AnimationEntries;
   vtkCollectionIterator* AnimationEntriesIterator;

@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.56");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.57");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -568,17 +568,17 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     }
 
   this->SetFrameLabel("Plane Widget");
-  this->Labels[0]->SetParent(this->Frame->GetFrame());
+  this->Labels[0]->SetParent(this->Frame);
   this->Labels[0]->Create(pvApp, "");
   this->Labels[0]->SetText("Center");
-  this->Labels[1]->SetParent(this->Frame->GetFrame());
+  this->Labels[1]->SetParent(this->Frame);
   this->Labels[1]->Create(pvApp, "");
   this->Labels[1]->SetText("Normal");
 
   int i;
   for (i=0; i<3; i++)
     {
-    this->CoordinateLabel[i]->SetParent(this->Frame->GetFrame());
+    this->CoordinateLabel[i]->SetParent(this->Frame);
     this->CoordinateLabel[i]->Create(pvApp, "");
     char buffer[3];
     sprintf(buffer, "%c", "xyz"[i]);
@@ -586,25 +586,25 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     }
   for (i=0; i<3; i++)
     {
-    this->CenterEntry[i]->SetParent(this->Frame->GetFrame());
+    this->CenterEntry[i]->SetParent(this->Frame);
     this->CenterEntry[i]->Create(pvApp, "");
     }
 
   for (i=0; i<3; i++)    
     {
-    this->NormalEntry[i]->SetParent(this->Frame->GetFrame());
+    this->NormalEntry[i]->SetParent(this->Frame);
     this->NormalEntry[i]->Create(pvApp, "");
     }
 
-  this->OffsetLabel->SetParent(this->Frame->GetFrame());
+  this->OffsetLabel->SetParent(this->Frame);
   this->OffsetLabel->SetText("Offset");
   this->OffsetLabel->Create(pvApp, "");
 
-  this->OffsetEntry->SetParent(this->Frame->GetFrame());
+  this->OffsetEntry->SetParent(this->Frame);
   this->OffsetEntry->Create(pvApp, "");
 
   this->Script("grid propagate %s 1",
-    this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetWidgetName());
 
   this->Script("grid x %s %s %s -sticky ew",
     this->CoordinateLabel[0]->GetWidgetName(),
@@ -625,13 +625,13 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     this->OffsetEntry->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
-    this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-    this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-    this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-    this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
@@ -659,14 +659,14 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
                this->GetTclName(),
                this->GetTclName());
 
-  this->CenterResetButton->SetParent(this->Frame->GetFrame());
+  this->CenterResetButton->SetParent(this->Frame);
   this->CenterResetButton->Create(pvApp, "");
   this->CenterResetButton->SetText("Set Plane Center to Center of Bounds");
   this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 
   this->Script("grid %s - - - - -sticky ew", 
     this->CenterResetButton->GetWidgetName());
 
-  this->NormalButtonFrame->SetParent(this->Frame->GetFrame());
+  this->NormalButtonFrame->SetParent(this->Frame);
   this->NormalButtonFrame->Create(pvApp, "frame", "");
   this->Script("grid %s - - - - -sticky ew", 
     this->NormalButtonFrame->GetWidgetName());

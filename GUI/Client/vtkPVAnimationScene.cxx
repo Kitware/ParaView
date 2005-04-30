@@ -72,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.29");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.30");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -942,26 +942,51 @@ void vtkPVAnimationScene::UpdateEnableState()
     {
     return;
     }
-  int enabled = this->Enabled;
-  // These widgets are always off except when playing.
-  this->Enabled = this->IsInPlay();
-  
 
   // These widgets are on when playing or when gui is enabled.
-  this->Enabled = this->IsInPlay() || enabled;
-  this->PropagateEnableState(this->VCRControl);
- 
+
+  int enabled = this->IsInPlay() || this->GetEnabled();
+  if (this->VCRControl)
+    {
+    this->VCRControl->SetEnabled(enabled);
+    }
+
   // These widgets are disabled when playing.
-  this->Enabled = enabled && !this->IsInPlay();
-  this->PropagateEnableState(this->FrameRateLabel);
-  this->PropagateEnableState(this->FrameRateThumbWheel);
-  this->PropagateEnableState(this->DurationLabel);
-  this->PropagateEnableState(this->DurationThumbWheel);
-  this->PropagateEnableState(this->PlayModeLabel);
-  this->PropagateEnableState(this->PlayModeMenuButton);
-  this->PropagateEnableState(this->TimeLabel);
-  this->PropagateEnableState(this->TimeScale);
-  this->Enabled = enabled;
+
+  enabled = !this->IsInPlay() && this->GetEnabled();
+
+  if (this->FrameRateLabel)
+    {
+    this->FrameRateLabel->SetEnabled(enabled);
+    }
+  if (this->FrameRateThumbWheel)
+    {
+    this->FrameRateThumbWheel->SetEnabled(enabled);
+    }
+  if (this->DurationLabel)
+    {
+    this->DurationLabel->SetEnabled(enabled);
+    }
+  if (this->DurationThumbWheel)
+    {
+    this->DurationThumbWheel->SetEnabled(enabled);
+    }
+  if (this->PlayModeLabel)
+    {
+    this->PlayModeLabel->SetEnabled(enabled);
+    }
+  if (this->PlayModeMenuButton)
+    {
+    this->PlayModeMenuButton->SetEnabled(enabled);
+    }
+  if (this->TimeLabel)
+    {
+    this->TimeLabel->SetEnabled(enabled);
+    }
+  if (this->TimeScale)
+    {
+    this->TimeScale->SetEnabled(enabled);
+    }
 }
 
 //-----------------------------------------------------------------------------

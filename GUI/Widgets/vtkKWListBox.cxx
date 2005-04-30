@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWListBox);
-vtkCxxRevisionMacro(vtkKWListBox, "1.33");
+vtkCxxRevisionMacro(vtkKWListBox, "1.34");
 
 
 //----------------------------------------------------------------------------
@@ -67,7 +67,7 @@ int vtkKWListBox::GetNumberOfItems()
 //----------------------------------------------------------------------------
 void vtkKWListBox::DeleteRange(int start, int end)
 {
-  int enabled = this->Enabled;
+  int enabled = this->GetEnabled();
   this->SetEnabled(1);
   this->Script("%s delete %d %d", this->Listbox->GetWidgetName(), start, end);
   this->SetEnabled(enabled);
@@ -143,7 +143,7 @@ void vtkKWListBox::SetSelectState(int idx, int state)
     return;
     }
 
-  int was_disabled = !this->Enabled;
+  int was_disabled = !this->GetEnabled();
   if (was_disabled)
     {
     this->SetEnabled(1);
@@ -199,7 +199,7 @@ void vtkKWListBox::InsertEntry(int index, const char *name)
     {
     return;
     }
-  int enabled = this->Enabled;
+  int enabled = this->GetEnabled();
   if ( !enabled )
     {
     this->SetEnabled(1);
@@ -343,7 +343,7 @@ void vtkKWListBox::UpdateEnableState()
   this->PropagateEnableState(this->Listbox);
   if (this->Listbox)
     {
-    this->Listbox->SetStateOption(this->Enabled);
+    this->Listbox->SetStateOption(this->GetEnabled());
     }
 }
 //----------------------------------------------------------------------------

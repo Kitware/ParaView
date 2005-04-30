@@ -46,7 +46,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.61");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.62");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -434,17 +434,17 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
     }
 
   this->SetFrameLabel("Sphere Widget");
-  this->Labels[0]->SetParent(this->Frame->GetFrame());
+  this->Labels[0]->SetParent(this->Frame);
   this->Labels[0]->Create(pvApp, "");
   this->Labels[0]->SetText("Center");
-  this->Labels[1]->SetParent(this->Frame->GetFrame());
+  this->Labels[1]->SetParent(this->Frame);
   this->Labels[1]->Create(pvApp, "");
   this->Labels[1]->SetText("Radius");
 
   int i;
   for (i=0; i<3; i++)
     {
-    this->CoordinateLabel[i]->SetParent(this->Frame->GetFrame());
+    this->CoordinateLabel[i]->SetParent(this->Frame);
     this->CoordinateLabel[i]->Create(pvApp, "");
     char buffer[3];
     sprintf(buffer, "%c", "xyz"[i]);
@@ -452,14 +452,14 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
     }
   for (i=0; i<3; i++)
     {
-    this->CenterEntry[i]->SetParent(this->Frame->GetFrame());
+    this->CenterEntry[i]->SetParent(this->Frame);
     this->CenterEntry[i]->Create(pvApp, "");
     }
-  this->RadiusEntry->SetParent(this->Frame->GetFrame());
+  this->RadiusEntry->SetParent(this->Frame);
   this->RadiusEntry->Create(pvApp, "");
 
   this->Script("grid propagate %s 1",
-    this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetWidgetName());
 
   this->Script("grid x %s %s %s -sticky ew",
     this->CoordinateLabel[0]->GetWidgetName(),
@@ -475,13 +475,13 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
     this->RadiusEntry->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
-    this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-    this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-    this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-    this->Frame->GetFrame()->GetWidgetName());
+    this->Frame->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
@@ -504,7 +504,7 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
   this->Script("bind %s <KeyPress-Return> {%s SetRadius}",
     this->RadiusEntry->GetWidgetName(),
     this->GetTclName());
-  this->CenterResetButton->SetParent(this->Frame->GetFrame());
+  this->CenterResetButton->SetParent(this->Frame);
   this->CenterResetButton->Create(pvApp, "");
   this->CenterResetButton->SetText("Set Sphere Center to Center of Bounds");
   this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 

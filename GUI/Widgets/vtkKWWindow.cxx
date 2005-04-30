@@ -40,7 +40,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.227");
+vtkCxxRevisionMacro(vtkKWWindow, "1.228");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -55,13 +55,13 @@ vtkKWWindow::vtkKWWindow()
   this->PropertiesParent      = NULL;
 
   this->Menu                  = vtkKWMenu::New();
-  this->MenuFile              = vtkKWMenu::New();
-  this->MenuHelp              = vtkKWMenu::New();
+  this->FileMenu              = vtkKWMenu::New();
+  this->HelpMenu              = vtkKWMenu::New();
   this->PageMenu              = vtkKWMenu::New();
 
-  this->MenuEdit              = NULL;
-  this->MenuView              = NULL;
-  this->MenuWindow            = NULL;
+  this->EditMenu              = NULL;
+  this->ViewMenu              = NULL;
+  this->WindowMenu            = NULL;
 
   this->Toolbars              = vtkKWToolbarSet::New();
   this->ToolbarsMenu          = NULL; 
@@ -91,7 +91,7 @@ vtkKWWindow::vtkKWWindow()
 
   this->PrintTargetDPI        = 100;
   this->SupportHelp           = 1;
-  this->SupportPrint           = 1;
+  this->SupportPrint          = 1;
   this->PromptBeforeClose     = 1;
   this->ScriptExtension       = 0;
   this->ScriptType            = 0;
@@ -129,8 +129,8 @@ vtkKWWindow::~vtkKWWindow()
 
   this->Menu->Delete();
   this->PageMenu->Delete();
-  this->MenuFile->Delete();
-  this->MenuHelp->Delete();
+  this->FileMenu->Delete();
+  this->HelpMenu->Delete();
   this->Toolbars->Delete();
   this->MenuBarSeparatorFrame->Delete();
   this->ViewFrame->Delete();
@@ -144,17 +144,17 @@ vtkKWWindow::~vtkKWWindow()
   this->TrayFrame->Delete();
   this->TrayImageError->Delete();
   
-  if (this->MenuEdit)
+  if (this->EditMenu)
     {
-    this->MenuEdit->Delete();
+    this->EditMenu->Delete();
     }
-  if (this->MenuView)
+  if (this->ViewMenu)
     {
-    this->MenuView->Delete();
+    this->ViewMenu->Delete();
     }
-  if (this->MenuWindow)
+  if (this->WindowMenu)
     {
-    this->MenuWindow->Delete();
+    this->WindowMenu->Delete();
     }
   if (this->ToolbarsMenu)
     {
@@ -196,13 +196,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   // Menu : File
 
-  this->MenuFile->SetParent(this->Menu);
-  this->MenuFile->SetTearOff(0);
-  this->MenuFile->Create(app, "");
+  this->FileMenu->SetParent(this->Menu);
+  this->FileMenu->SetTearOff(0);
+  this->FileMenu->Create(app, "");
 
   // Menu : Print quality
 
-  this->PageMenu->SetParent(this->MenuFile);
+  this->PageMenu->SetParent(this->FileMenu);
   this->PageMenu->SetTearOff(0);
   this->PageMenu->Create(app, "");
 
@@ -217,53 +217,48 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   // Menu : File (cont.)
 
-  this->Menu->AddCascade("File", this->MenuFile, 0);
+  this->Menu->AddCascade("File", this->FileMenu, 0);
 
   if (this->SupportPrint)
     {
-    this->MenuFile->AddCascade(
+    this->FileMenu->AddCascade(
       VTK_KW_PAGE_SETUP_MENU_LABEL, this->PageMenu, 8);
-    this->MenuFile->AddSeparator();
+    this->FileMenu->AddSeparator();
     }
 
-  this->MenuFile->AddCommand("Close", this, "Close", 0);
-  this->MenuFile->AddCommand("Exit", this, "Exit", 1);
+  this->FileMenu->AddCommand("Close", this, "Close", 0);
+  this->FileMenu->AddCommand("Exit", this->GetApplication(), "Exit", 1);
 
   this->MostRecentFilesManager->SetApplication(app);
 
   // Menu : Window : Properties panel
 
-  this->GetMenuWindow()->AddCommand(VTK_KW_HIDE_PROPERTIES_LABEL, this,
+  this->GetWindowMenu()->AddCommand(VTK_KW_HIDE_PROPERTIES_LABEL, this,
                                     "TogglePropertiesVisibilityCallback", 1 );
 
   // Help menu
 
-  this->MenuHelp->SetParent(this->Menu);
-  this->MenuHelp->SetTearOff(0);
-  this->MenuHelp->Create(app, "");
+  this->HelpMenu->SetParent(this->Menu);
+  this->HelpMenu->SetTearOff(0);
+  this->HelpMenu->Create(app, "");
 
   if (this->SupportHelp)
     {
-    this->Menu->AddCascade("Help", this->MenuHelp, 0);
+    this->Menu->AddCascade("Help", this->HelpMenu, 0);
     }
-  kwsys_stl::string help_command = "DisplayHelp ";
-  help_command +=  this->GetTclName();
-  this->MenuHelp->AddCommand(
-    "Help", this->GetApplication(), help_command.c_str(), 0);
+  this->HelpMenu->AddCommand("Help", this->GetApplication(), "DisplayHelpDialog", 0);
 
   if (app->HasCheckForUpdates())
     {
-    this->MenuHelp->AddCommand("Check For Updates", app, "CheckForUpdates", 0);
+    this->HelpMenu->AddCommand("Check For Updates", app, "CheckForUpdates", 0);
     }
 
-  this->MenuHelp->AddSeparator();
-
-  kwsys_stl::string about_label = "About ";
-  about_label +=  app->GetPrettyName();
-  kwsys_stl::string about_command = "DisplayAbout ";
-  about_command +=  this->GetTclName();
-  this->MenuHelp->AddCommand(
-    about_label.c_str(), this->GetApplication(), about_command.c_str(), 0);
+  this->HelpMenu->AddSeparator();
+  ostrstream about_label;
+  about_label << "About " << app->GetPrettyName() << ends;
+  this->HelpMenu->AddCommand(
+    about_label.str(), this->GetApplication(), "DisplayAboutDialog", 0);
+  about_label.rdbuf()->freeze(0);
 
   // Menubar separator
 
@@ -402,7 +397,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERRORRED);
   
-  this->TrayImageError->SetBind(this, "<Button-1>", "ProcessErrorClick");
+  this->TrayImageError->SetBind(this, "<Button-1>", "ErrorIconCallback");
 
   // If we have a User Interface Manager, it's time to create it
 
@@ -440,6 +435,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Udpate the enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+vtkKWFrame* vtkKWWindow::GetViewFrame()
+{
+  return this->ViewFrame;
+  //return this->MiddleFrame ? this->MiddleFrame->GetFrame2() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -598,11 +600,11 @@ const char *vtkKWWindow::GetStatusText()
 }
 
 //----------------------------------------------------------------------------
-vtkKWMenu *vtkKWWindow::GetMenuEdit()
+vtkKWMenu *vtkKWWindow::GetEditMenu()
 {
-  if (this->MenuEdit)
+  if (this->EditMenu)
     {
-    return this->MenuEdit;
+    return this->EditMenu;
     }
 
   if ( !this->IsCreated() )
@@ -610,21 +612,21 @@ vtkKWMenu *vtkKWWindow::GetMenuEdit()
     return 0;
     }
   
-  this->MenuEdit = vtkKWMenu::New();
-  this->MenuEdit->SetParent(this->GetMenu());
-  this->MenuEdit->SetTearOff(0);
-  this->MenuEdit->Create(this->GetApplication(),"");
+  this->EditMenu = vtkKWMenu::New();
+  this->EditMenu->SetParent(this->GetMenu());
+  this->EditMenu->SetTearOff(0);
+  this->EditMenu->Create(this->GetApplication(),"");
   // Make sure Edit menu is next to file menu
-  this->Menu->InsertCascade(1, "Edit", this->MenuEdit, 0);
-  return this->MenuEdit;
+  this->Menu->InsertCascade(1, "Edit", this->EditMenu, 0);
+  return this->EditMenu;
 }
 
 //----------------------------------------------------------------------------
-vtkKWMenu *vtkKWWindow::GetMenuView()
+vtkKWMenu *vtkKWWindow::GetViewMenu()
 {
-  if (this->MenuView)
+  if (this->ViewMenu)
     {
-    return this->MenuView;
+    return this->ViewMenu;
     }
 
   if ( !this->IsCreated() )
@@ -632,21 +634,21 @@ vtkKWMenu *vtkKWWindow::GetMenuView()
     return 0;
     }
 
-  this->MenuView = vtkKWMenu::New();
-  this->MenuView->SetParent(this->GetMenu());
-  this->MenuView->SetTearOff(0);
-  this->MenuView->Create(this->GetApplication(), "");
+  this->ViewMenu = vtkKWMenu::New();
+  this->ViewMenu->SetParent(this->GetMenu());
+  this->ViewMenu->SetTearOff(0);
+  this->ViewMenu->Create(this->GetApplication(), "");
   // make sure Help menu is on the right
-  if (this->MenuEdit)
+  if (this->EditMenu)
     { 
-    this->Menu->InsertCascade(2, "View", this->MenuView, 0);
+    this->Menu->InsertCascade(2, "View", this->ViewMenu, 0);
     }
   else
     {
-    this->Menu->InsertCascade(1, "View", this->MenuView, 0);
+    this->Menu->InsertCascade(1, "View", this->ViewMenu, 0);
     }
   
-  return this->MenuView;
+  return this->ViewMenu;
 }
 
 //----------------------------------------------------------------------------
@@ -681,10 +683,10 @@ void vtkKWWindow::AddToolbarToMenu(vtkKWToolbar*, const char* name,
   if (!this->ToolbarsMenu)
     {
     this->ToolbarsMenu = vtkKWMenu::New();
-    this->ToolbarsMenu->SetParent(this->GetMenuWindow());
+    this->ToolbarsMenu->SetParent(this->GetWindowMenu());
     this->ToolbarsMenu->SetTearOff(0);
     this->ToolbarsMenu->Create(this->GetApplication(), "");
-    this->GetMenuWindow()->InsertCascade(2, " Toolbars", this->ToolbarsMenu, 1,
+    this->GetWindowMenu()->InsertCascade(2, " Toolbars", this->ToolbarsMenu, 1,
       "Customize Toolbars");
     }
   char *rbv = this->ToolbarsMenu->CreateCheckButtonVariable(this, name);
@@ -729,7 +731,7 @@ void vtkKWWindow::SetToolbarVisibilityInternal(vtkKWToolbar* ,
   this->GetApplication()->SetRegistryValue(2, "RunTime", reg_key.str(),
     "%d", flag);
   reg_key.rdbuf()->freeze(0); 
-  this->UpdateToolbarAspect();
+  this->UpdateToolbarState();
 }
 
 //----------------------------------------------------------------------------
@@ -744,11 +746,11 @@ void vtkKWWindow::ToggleToolbarVisibility(int id, const char* name)
   this->SetToolbarVisibility(toolbar, name, new_visibility);
 }
 //----------------------------------------------------------------------------
-vtkKWMenu *vtkKWWindow::GetMenuWindow()
+vtkKWMenu *vtkKWWindow::GetWindowMenu()
 {
-  if (this->MenuWindow)
+  if (this->WindowMenu)
     {
-    return this->MenuWindow;
+    return this->WindowMenu;
     }
 
   if ( !this->IsCreated() )
@@ -756,21 +758,21 @@ vtkKWMenu *vtkKWWindow::GetMenuWindow()
     return 0;
     }
 
-  this->MenuWindow = vtkKWMenu::New();
-  this->MenuWindow->SetParent(this->GetMenu());
-  this->MenuWindow->SetTearOff(0);
-  this->MenuWindow->Create(this->GetApplication(), "");
+  this->WindowMenu = vtkKWMenu::New();
+  this->WindowMenu->SetParent(this->GetMenu());
+  this->WindowMenu->SetTearOff(0);
+  this->WindowMenu->Create(this->GetApplication(), "");
   // make sure Help menu is on the right
-  if (this->MenuEdit)
+  if (this->EditMenu)
     { 
-    this->Menu->InsertCascade(1, "Window", this->MenuWindow, 0);
+    this->Menu->InsertCascade(1, "Window", this->WindowMenu, 0);
     }
   else
     {
-    this->Menu->InsertCascade(2, "Window", this->MenuWindow, 0);
+    this->Menu->InsertCascade(2, "Window", this->WindowMenu, 0);
     }
   
-  return this->MenuWindow;
+  return this->WindowMenu;
 }
 
 //----------------------------------------------------------------------------
@@ -805,7 +807,7 @@ void vtkKWWindow::SetPropertiesVisiblity(int arg)
       {
       this->MiddleFrame->Frame1VisibilityOn();
       this->Script("%s entryconfigure 0 -label {%s}",
-                   this->GetMenuWindow()->GetWidgetName(),
+                   this->GetWindowMenu()->GetWidgetName(),
                    VTK_KW_HIDE_PROPERTIES_LABEL);
       }
     }
@@ -815,7 +817,7 @@ void vtkKWWindow::SetPropertiesVisiblity(int arg)
       {
       this->MiddleFrame->Frame1VisibilityOff();
       this->Script("%s entryconfigure 0 -label {%s}",
-                   this->GetMenuWindow()->GetWidgetName(),
+                   this->GetWindowMenu()->GetWidgetName(),
                    VTK_KW_SHOW_PROPERTIES_LABEL);
       }
     }
@@ -876,52 +878,55 @@ void vtkKWWindow::ShowMostRecentPanels(int arg)
 //----------------------------------------------------------------------------
 void vtkKWWindow::LoadScript()
 {
-  vtkKWLoadSaveDialog* loadScriptDialog = vtkKWLoadSaveDialog::New();
-  this->RetrieveLastPath(loadScriptDialog, "LoadScriptLastPath");
-  loadScriptDialog->SetParent(this);
-  loadScriptDialog->Create(this->GetApplication(),"");
-  loadScriptDialog->SaveDialogOff();
-  loadScriptDialog->SetTitle("Load Script");
-  loadScriptDialog->SetDefaultExtension(this->ScriptExtension);
-  ostrstream filetypes;
-  filetypes << "{{" << this->ScriptType << " Scripts} {" 
-            << this->ScriptExtension << "}} {{All Files} {.*}}" << ends;
-  loadScriptDialog->SetFileTypes(filetypes.str());
-  filetypes.rdbuf()->freeze(0);
+  vtkKWLoadSaveDialog* load_dialog = vtkKWLoadSaveDialog::New();
+  this->RetrieveLastPath(load_dialog, "LoadScriptLastPath");
+  load_dialog->SetParent(this);
+  load_dialog->Create(this->GetApplication(), NULL);
+  load_dialog->SaveDialogOff();
+  load_dialog->SetTitle("Load Script");
+  load_dialog->SetDefaultExtension(this->ScriptExtension);
+
+  kwsys_stl::string filetypes;
+  filetypes += "{{";
+  filetypes += this->ScriptType;
+  filetypes += " Scripts} {";
+  filetypes += this->ScriptExtension;
+  filetypes += "}} {{All Files} {.*}}";
+  load_dialog->SetFileTypes(filetypes.c_str());
 
   int enabled = this->GetEnabled();
   this->SetEnabled(0);
-  if (loadScriptDialog->Invoke() && 
-      loadScriptDialog->GetFileName() && 
-      strlen(loadScriptDialog->GetFileName()) > 0)
+
+  if (load_dialog->Invoke() && 
+      load_dialog->GetFileName() && 
+      strlen(load_dialog->GetFileName()) > 0)
     {
-    FILE *fin = fopen(loadScriptDialog->GetFileName(), "r");
-    if (!fin)
+    if (!kwsys::SystemTools::FileExists(load_dialog->GetFileName()))
       {
       vtkWarningMacro("Unable to open script file!");
       }
     else
       {
-      this->SaveLastPath(loadScriptDialog, "LoadScriptLastPath");
-      this->GetApplication()->LoadScript(loadScriptDialog->GetFileName());
+      this->SaveLastPath(load_dialog, "LoadScriptLastPath");
+      this->LoadScript(load_dialog->GetFileName());
       }
     }
+
   this->SetEnabled(enabled);
-  loadScriptDialog->Delete();
+  load_dialog->Delete();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::LoadScript(const char *path)
+void vtkKWWindow::LoadScript(const char *filename)
 {
-  this->Script("set InitialWindow %s", this->GetTclName());
-  this->GetApplication()->LoadScript(path);
+  this->GetApplication()->LoadScript(filename);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWWindow::AddRecentFilesMenu(
   const char *menuEntry, vtkKWObject *target, const char *label, int underline)
 {
-  if (!this->IsCreated() || !label || !this->MenuFile || 
+  if (!this->IsCreated() || !label || !this->FileMenu || 
       !this->MostRecentFilesManager)
     {
     return;
@@ -932,7 +937,7 @@ void vtkKWWindow::AddRecentFilesMenu(
   vtkKWMenu *mrf_menu = this->MostRecentFilesManager->GetMenu();
   if (!mrf_menu->IsCreated())
     {
-    mrf_menu->SetParent(this->MenuFile);
+    mrf_menu->SetParent(this->FileMenu);
     mrf_menu->SetTearOff(0);
     mrf_menu->Create(this->GetApplication(), NULL);
     }
@@ -940,23 +945,23 @@ void vtkKWWindow::AddRecentFilesMenu(
   // Remove the menu if already there (in case that function was used to
   // move the menu)
 
-  if (this->MenuFile->HasItem(label))
+  if (this->FileMenu->HasItem(label))
     {
-    this->MenuFile->DeleteMenuItem(label);
+    this->FileMenu->DeleteMenuItem(label);
     }
 
   // Find where to insert
 
   int insert_idx;
-  if (!menuEntry || !this->MenuFile->HasItem(menuEntry))
+  if (!menuEntry || !this->FileMenu->HasItem(menuEntry))
     {
     insert_idx = this->GetFileMenuIndex();
     }
   else
     {
-    insert_idx = this->MenuFile->GetIndex(menuEntry) - 1;
+    insert_idx = this->FileMenu->GetIndex(menuEntry) - 1;
     }
-  this->MenuFile->InsertCascade(insert_idx, label, mrf_menu, underline);
+  this->FileMenu->InsertCascade(insert_idx, label, mrf_menu, underline);
 
   // Fill the recent files vector with recent files stored in registry
   // this will also update the menu
@@ -987,21 +992,21 @@ int vtkKWWindow::GetFileMenuIndex()
 
   // First find the print-related menu commands
 
-  if (this->GetMenuFile()->HasItem(VTK_KW_PAGE_SETUP_MENU_LABEL))
+  if (this->GetFileMenu()->HasItem(VTK_KW_PAGE_SETUP_MENU_LABEL))
     {
-    return this->GetMenuFile()->GetIndex(VTK_KW_PAGE_SETUP_MENU_LABEL);
+    return this->GetFileMenu()->GetIndex(VTK_KW_PAGE_SETUP_MENU_LABEL);
     }
 
   // Otherwise find Close or Exit if Close was removed
 
   int clidx;
-  if (this->GetMenuFile()->HasItem("Close"))
+  if (this->GetFileMenu()->HasItem("Close"))
     {
-    clidx = this->GetMenuFile()->GetIndex("Close");  
+    clidx = this->GetFileMenu()->GetIndex("Close");  
     }
   else
     {
-    clidx = this->GetMenuFile()->GetIndex("Exit");  
+    clidx = this->GetFileMenu()->GetIndex("Exit");  
     }
 
   return clidx;  
@@ -1017,12 +1022,12 @@ int vtkKWWindow::GetHelpMenuIndex()
 
   // Find about
 
-  if (this->MenuHelp->HasItem("About*"))
+  if (this->HelpMenu->HasItem("About*"))
     {
-    return this->MenuHelp->GetIndex("About*") - 1;
+    return this->HelpMenu->GetIndex("About*") - 1;
     }
 
-  return this->MenuHelp->GetNumberOfItems();
+  return this->HelpMenu->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
@@ -1147,7 +1152,7 @@ void vtkKWWindow::WarningMessage(const char* message)
   vtkKWMessageDialog::PopupMessage(
     this->GetApplication(), this, "Warning",
     message, vtkKWMessageDialog::WarningIcon);
-  this->SetErrorIcon(2);
+  this->SetErrorIcon(vtkKWWindow::ERROR_ICON_RED);
   this->InvokeEvent(vtkKWEvent::WarningMessageEvent, (void*)message);
 }
 
@@ -1157,22 +1162,27 @@ void vtkKWWindow::ErrorMessage(const char* message)
   vtkKWMessageDialog::PopupMessage(
     this->GetApplication(), this, "Error",
     message, vtkKWMessageDialog::ErrorIcon);
-  this->SetErrorIcon(2);
+  this->SetErrorIcon(vtkKWWindow::ERROR_ICON_RED);
   this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, (void*)message);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWWindow::SetErrorIcon(int s)
 {
-  if (s) 
+  if (!this->TrayImageError || !this->TrayImageError->IsCreated())
+    {
+    return;
+    }
+
+  if (s > vtkKWWindow::ERROR_ICON_NONE) 
     {
     this->Script("pack %s -fill both -ipadx 4 -expand yes", 
                  this->TrayImageError->GetWidgetName());
-    if ( s > 1 )
+    if (s == vtkKWWindow::ERROR_ICON_RED)
       {
       this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERRORRED);
       }
-    else
+    else if (s == vtkKWWindow::ERROR_ICON_BLACK)
       {
       this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERROR);
       }
@@ -1184,9 +1194,9 @@ void vtkKWWindow::SetErrorIcon(int s)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::ProcessErrorClick()
+void vtkKWWindow::ErrorIconCallback()
 {
-  this->SetErrorIcon(1);
+  this->SetErrorIcon(vtkKWWindow::ERROR_ICON_BLACK);
 }
 
 //----------------------------------------------------------------------------
@@ -1245,7 +1255,7 @@ void vtkKWWindow::InternalProcessEvent(vtkObject*, unsigned long,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::UpdateToolbarAspect()
+void vtkKWWindow::UpdateToolbarState()
 {
   if (!this->Toolbars)
     {
@@ -1307,44 +1317,48 @@ void vtkKWWindow::UpdateEnableState()
 
   // Update the toolbars
 
-  this->PropagateEnableState(this->Toolbars);
+  if (this->Toolbars)
+    {
+    this->PropagateEnableState(this->Toolbars);
+    this->UpdateToolbarState();
+    }
 
   // Update the notebook
 
   this->PropagateEnableState(this->Notebook);
 
+  // Update all the user interface panels
+
+  if (this->GetUserInterfaceManager())
+    {
+    this->GetUserInterfaceManager()->SetEnabled(this->GetEnabled());
+    // As a side effect, SetEnabled() call an Update() on the panel, 
+    // which will call an UpdateEnableState() too,
+    // this->GetUserInterfaceManager()->UpdateEnableState();
+    // this->GetUserInterfaceManager()->Update();
+    }
+
   // Update the Tcl interactor
 
   this->PropagateEnableState(this->TclInteractor);
 
+  // Update the window element
+
   this->PropagateEnableState(this->MiddleFrame);
   this->PropagateEnableState(this->StatusFrame);
-  //this->PropagateEnableState(this->StatusLabel);
   this->PropagateEnableState(this->PropertiesParent);
-  this->PropagateEnableState(this->ViewFrame);
   this->PropagateEnableState(this->MenuBarSeparatorFrame);
 
   // Do not disable the status image, it has not functionality attached 
   // anyway, and is used to display the application logo: disabling it 
-  // makes it look ugly.
-  //this->PropagateEnableState(this->StatusImage);
+  // only makes it look fairly ugly/dithered.
+  // this->PropagateEnableState(this->StatusImage);
 
   // Given the state, can we close or not ?
 
-  if (this->IsCreated())
-    {
-    if (this->Enabled)
-      {
-      this->Script("wm protocol %s WM_DELETE_WINDOW {%s Close}",
-                   this->GetWidgetName(), this->GetTclName());
-      }
-    else
-      {
-      this->Script("wm protocol %s WM_DELETE_WINDOW "
-                   "{%s SetStatusText \"Can not close while UI is disabled\"}",
-                   this->GetWidgetName(), this->GetTclName());
-      }
-    }
+  this->SetDeleteWindowProtocolCommand(
+    this, this->GetEnabled() ? 
+    "Close" : "SetStatusText \"Can not close while UI is disabled\"");
 
   // Update the menus
 
@@ -1354,37 +1368,46 @@ void vtkKWWindow::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkKWWindow::UpdateMenuState()
 {
-  int menu_enabled = this->Enabled ? vtkKWMenu::Normal : vtkKWMenu::Disabled;
-
+  this->PropagateEnableState(this->Menu);
+  /*
   if (this->Menu)
     {
-    this->Menu->SetEnabled(this->Enabled);
-    this->Menu->SetState(menu_enabled);
+    this->Menu->SetState(
+    this->GetEnabled() ? vtkKWMenu::Normal : vtkKWMenu::Disabled);
     }
+  */
+
+  this->PropagateEnableState(this->FileMenu);
+  this->PropagateEnableState(this->EditMenu);
+  this->PropagateEnableState(this->ViewMenu);
+  this->PropagateEnableState(this->WindowMenu);
+  this->PropagateEnableState(this->HelpMenu);
+  this->PropagateEnableState(this->PageMenu);
+  this->PropagateEnableState(this->ToolbarsMenu);
 
   // Most Recent Files
 
   if (this->MostRecentFilesManager)
     {
-    this->MostRecentFilesManager->GetMenu()->SetEnabled(this->Enabled);
+    this->PropagateEnableState(this->MostRecentFilesManager->GetMenu());
     this->MostRecentFilesManager->UpdateMenuStateInParent();
     }
 
   // Update the About entry, since the pretty name also depends on the
   // limited edition mode
 
-  if (this->MenuHelp)
+  if (this->HelpMenu)
     {
     kwsys_stl::string about_command = "DisplayAbout ";
     about_command +=  this->GetTclName();
-    int pos = this->MenuHelp->GetIndexOfCommand(
+    int pos = this->HelpMenu->GetIndexOfCommand(
       this->GetApplication(), about_command.c_str());
     if (pos >= 0)
       {
       ostrstream label;
       label << "-label {About " 
             << this->GetApplication()->GetPrettyName() << "}"<<ends;
-      this->MenuHelp->ConfigureItem(pos, label.str());
+      this->HelpMenu->ConfigureItem(pos, label.str());
       label.rdbuf()->freeze(0);
       }
     }
@@ -1394,8 +1417,9 @@ void vtkKWWindow::UpdateMenuState()
 void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
   os << indent << "Menu: " << this->GetMenu() << endl;
-  os << indent << "MenuFile: " << this->GetMenuFile() << endl;
+  os << indent << "FileMenu: " << this->GetFileMenu() << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "PrintTargetDPI: " << this->GetPrintTargetDPI() << endl;
   os << indent << "ProgressGauge: " << this->GetProgressGauge() << endl;

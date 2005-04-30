@@ -31,6 +31,7 @@ class vtkKWCheckButton;
 class vtkKWCheckButton;
 class vtkKWEntry;
 class vtkKWFrame;
+class vtkKWFrameWithScrollbar;
 class vtkKWLabel;
 class vtkKWFrameLabeled;
 class vtkKWOptionMenu;
@@ -270,7 +271,7 @@ public:
   // Access to these objects from a script
   vtkGetObjectMacro(ResetCameraButton, vtkKWPushButton);
   vtkGetObjectMacro(ActorControlFrame, vtkKWFrameLabeled);
-  vtkGetObjectMacro(MainFrame, vtkKWFrame);
+  vtkGetObjectMacro(MainFrame, vtkKWFrameWithScrollbar);
 
 protected:
   vtkPVDisplayGUI();
@@ -309,7 +310,7 @@ protected:
   // This flag is set when the data set type is unknown.
   int ShouldReinitialize;
 
-  vtkKWFrame *MainFrame;
+  vtkKWFrameWithScrollbar *MainFrame;
 
   vtkKWFrameLabeled *ColorFrame;
   vtkKWFrameLabeled *VolumeAppearanceFrame;

@@ -49,7 +49,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.44");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.45");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -199,7 +199,7 @@ void vtkKWToolbar::AddWidget(vtkKWWidget *widget)
   this->Internals->Widgets.push_back(widget);
 
   widget->Register(this);
-  widget->SetEnabled(this->Enabled);
+  this->PropagateEnableState(widget);
 
   this->UpdateWidgets();
 }
@@ -233,7 +233,7 @@ void vtkKWToolbar::InsertWidget(vtkKWWidget *location, vtkKWWidget *widget)
     }
 
   widget->Register(this);
-  widget->SetEnabled(this->Enabled);
+  this->PropagateEnableState(widget);
 
   this->UpdateWidgets();
 }
@@ -775,10 +775,7 @@ void vtkKWToolbar::UpdateEnableState()
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
-    if ((*it))
-      {
-      (*it)->SetEnabled(this->Enabled);
-      }
+    this->PropagateEnableState(*it);
     }
 }
 

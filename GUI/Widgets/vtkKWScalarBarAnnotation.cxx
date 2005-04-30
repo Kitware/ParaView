@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.17");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.18");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -826,60 +826,17 @@ void vtkKWScalarBarAnnotation::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->ComponentSelectionWidget)
-    {
-    this->ComponentSelectionWidget->SetEnabled(this->Enabled);
-    }
-
-  if (this->TitleFrame)
-    {
-    this->TitleFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->TitleEntry)
-    {
-    this->TitleEntry->SetEnabled(this->Enabled);
-    }
-
-  if (this->TitleTextPropertyWidget)
-    {
-    this->TitleTextPropertyWidget->SetEnabled(this->Enabled);
-    }
-
-  if (this->TitleTextPropertyPopupButton)
-    {
-    this->TitleTextPropertyPopupButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->LabelFrame)
-    {
-    this->LabelFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->LabelFormatEntry)
-    {
-    this->LabelFormatEntry->SetEnabled(this->Enabled);
-    }
-
-  if (this->LabelTextPropertyWidget)
-    {
-    this->LabelTextPropertyWidget->SetEnabled(this->Enabled);
-    }
-
-  if (this->LabelTextPropertyPopupButton)
-    {
-    this->LabelTextPropertyPopupButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->MaximumNumberOfColorsThumbWheel)
-    {
-    this->MaximumNumberOfColorsThumbWheel->SetEnabled(this->Enabled);
-    }
-
-  if (this->NumberOfLabelsScale)
-    {
-    this->NumberOfLabelsScale->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->ComponentSelectionWidget);
+  this->PropagateEnableState(this->TitleFrame);
+  this->PropagateEnableState(this->TitleEntry);
+  this->PropagateEnableState(this->TitleTextPropertyWidget);
+  this->PropagateEnableState(this->TitleTextPropertyPopupButton);
+  this->PropagateEnableState(this->LabelFrame);
+  this->PropagateEnableState(this->LabelFormatEntry);
+  this->PropagateEnableState(this->LabelTextPropertyWidget);
+  this->PropagateEnableState(this->LabelTextPropertyPopupButton);
+  this->PropagateEnableState(this->MaximumNumberOfColorsThumbWheel);
+  this->PropagateEnableState(this->NumberOfLabelsScale);
 }
 
 //----------------------------------------------------------------------------

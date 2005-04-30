@@ -13,10 +13,11 @@
 =========================================================================*/
 #include "vtkKWApplication.h"
 #include "vtkKWSplitFrame.h"
+#include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWSplitFrame );
-vtkCxxRevisionMacro(vtkKWSplitFrame, "1.23");
+vtkCxxRevisionMacro(vtkKWSplitFrame, "1.24");
 
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -26,11 +27,11 @@ vtkKWSplitFrame::vtkKWSplitFrame()
 {
   this->CommandFunction = vtkKWSplitFrameCommand;
 
-  this->Frame1 = vtkKWWidget::New();
+  this->Frame1 = vtkKWFrame::New();
   this->Frame1->SetParent(this);
-  this->Separator = vtkKWWidget::New();
+  this->Separator = vtkKWFrame::New();
   this->Separator->SetParent(this);
-  this->Frame2 = vtkKWWidget::New();
+  this->Frame2 = vtkKWFrame::New();
   this->Frame2->SetParent(this);
 
   this->Frame1Size = 100;
@@ -52,12 +53,23 @@ vtkKWSplitFrame::vtkKWSplitFrame()
 //----------------------------------------------------------------------------
 vtkKWSplitFrame::~vtkKWSplitFrame()
 {
-  this->Frame1->Delete();
-  this->Frame1 = NULL;
-  this->Separator->Delete();
-  this->Separator = NULL;
-  this->Frame2->Delete();
-  this->Frame2 = NULL;
+  this->RemoveBindings();
+
+  if (this->Frame1)
+    {
+    this->Frame1->Delete();
+    this->Frame1 = NULL;
+    }
+  if (this->Separator)
+    {
+    this->Separator->Delete();
+    this->Separator = NULL;
+    }
+  if (this->Frame2)
+    {
+    this->Frame2->Delete();
+    this->Frame2 = NULL;
+    }
 }
 
 
@@ -86,16 +98,13 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
     return;
     }
 
-  this->Frame1->Create(app,"frame","-bd 0 -relief flat");
-  this->Separator->Create(app,"frame","-bd 2 -relief raised");
-  this->Frame2->Create(app,"frame","-bd 0 -relief flat");
+  this->Frame1->Create(app, NULL);
+  this->Separator->Create(app, "-bd 2 -relief raised");
+  this->Frame2->Create(app, NULL);
   
   this->Update();
 
-  this->Script("bind %s <B1-Motion> {%s DragCallback}",
-               this->Separator->GetWidgetName(), this->GetTclName());
-  this->Script("bind %s <Configure> {%s ConfigureCallback}",
-               this->GetWidgetName(), this->GetTclName());
+  this->AddBindings();
 
   // Setup the cursor to indication an action associatyed with the separator. 
 #ifdef _WIN32
@@ -125,6 +134,38 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::AddBindings()
+{
+  if (this->Separator && this->Separator->IsCreated())
+    {
+    this->Script("bind %s <B1-Motion> {%s DragCallback}",
+                 this->Separator->GetWidgetName(), this->GetTclName());
+    }
+
+  if (this->IsCreated())
+    {
+    this->Script("bind %s <Configure> {%s ConfigureCallback}",
+                 this->GetWidgetName(), this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::RemoveBindings()
+{
+  if (this->Separator && this->Separator->IsCreated())
+    {
+    this->Script("bind %s <B1-Motion> {}",
+                 this->Separator->GetWidgetName(), this->GetTclName());
+    }
+
+  if (this->IsCreated())
+    {
+    this->Script("bind %s <Configure> {}",
+                 this->GetWidgetName(), this->GetTclName());
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrame );
-vtkCxxRevisionMacro(vtkKWPopupFrame, "1.6");
+vtkCxxRevisionMacro(vtkKWPopupFrame, "1.7");
 
 int vtkKWPopupFrameCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -106,15 +106,8 @@ void vtkKWPopupFrame::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->PopupButton)
-    {
-    this->PopupButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->Frame)
-    {
-    this->Frame->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->PopupButton);
+  this->PropagateEnableState(this->Frame);
 }
 
 //----------------------------------------------------------------------------

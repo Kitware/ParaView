@@ -493,9 +493,9 @@ void vtkPVApplication::CreateSplashScreen()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::ConfigureAbout()
+void vtkPVApplication::ConfigureAboutDialog()
 {
-  this->Superclass::ConfigureAbout();
+  this->Superclass::ConfigureAboutDialog();
 
   if (!this->SaveRuntimeInfoButton)
     {

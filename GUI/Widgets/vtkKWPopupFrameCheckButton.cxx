@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrameCheckButton );
-vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.4");
+vtkCxxRevisionMacro(vtkKWPopupFrameCheckButton, "1.5");
 
 int vtkKWPopupFrameCheckButtonCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);
@@ -124,7 +124,7 @@ void vtkKWPopupFrameCheckButton::Update()
       this->CheckButton->IsCreated())
     {
     this->PopupButton->SetEnabled(
-      this->CheckButton->GetState() ? this->Enabled : 0);
+      this->CheckButton->GetState() ? this->GetEnabled() : 0);
     }
 }
 
@@ -156,7 +156,7 @@ void vtkKWPopupFrameCheckButton::UpdateEnableState()
 
   if (this->CheckButton)
     {
-    this->CheckButton->SetEnabled(this->Enabled);
+    this->CheckButton->SetEnabled(this->GetEnabled());
     }
 }
 

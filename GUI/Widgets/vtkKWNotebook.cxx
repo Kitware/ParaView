@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.73");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.74");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -575,7 +575,7 @@ vtkKWWidget *vtkKWNotebook::GetFrame(int id)
   vtkKWNotebook::Page *page = this->GetPage(id);
   if (page)
     {
-    return page->Frame->GetFrame();
+    return page->Frame;
     }
   return NULL;
 }
@@ -588,7 +588,7 @@ vtkKWWidget *vtkKWNotebook::GetFrame(const char *title)
   vtkKWNotebook::Page *page = this->GetPage(title);
   if (page)
     {
-    return page->Frame->GetFrame();
+    return page->Frame;
     }
   return NULL;
 }
@@ -601,7 +601,7 @@ vtkKWWidget *vtkKWNotebook::GetFrame(const char *title, int tag)
   vtkKWNotebook::Page *page = this->GetPage(title, tag);
   if (page)
     {
-    return page->Frame->GetFrame();
+    return page->Frame;
     }
   return NULL;
 }
@@ -738,8 +738,8 @@ int vtkKWNotebook::AddPage(const char *title,
   this->Script(cmd.str());
   cmd.rdbuf()->freeze(0);
 
-  page->SetEnabled(this->Enabled);
-  if (this->Enabled)
+  page->SetEnabled(this->GetEnabled());
+  if (this->GetEnabled())
     {
     this->BindPage(page);
     }
@@ -2658,20 +2658,9 @@ void vtkKWNotebook::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->TabsFrame)
-    {
-    this->TabsFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->Body)
-    {
-    this->Body->SetEnabled(this->Enabled);
-    }
-
-  if (this->Mask)
-    {
-    this->Mask->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->TabsFrame);
+  this->PropagateEnableState(this->Body);
+  this->PropagateEnableState(this->Mask);
 
   if (this->Internals)
     {
@@ -2683,8 +2672,8 @@ void vtkKWNotebook::UpdateEnableState()
       {
       if (*it)
         {
-        (*it)->SetEnabled(this->Enabled);
-        if (this->Enabled)
+        (*it)->SetEnabled(this->GetEnabled());
+        if (this->GetEnabled())
           {
           this->BindPage(*it);
           }

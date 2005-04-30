@@ -21,7 +21,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.34");
+vtkCxxRevisionMacro(vtkKWLabel, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -235,7 +235,7 @@ void vtkKWLabel::UpdateEnableState()
 
   if (this->LineType != vtkKWLabel::MultiLine)
     {
-    this->SetStateOption(this->Enabled);
+    this->SetStateOption(this->GetEnabled());
     }
 }
 

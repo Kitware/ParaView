@@ -24,7 +24,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.41");
+vtkCxxRevisionMacro(vtkKWRange, "1.42");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -229,7 +229,7 @@ void vtkKWRange::CreateEntries()
       this->Entries[i]->SetParent(this);
       this->Entries[i]->Create(this->GetApplication(), "");
       this->Entries[i]->SetWidth(this->EntriesWidth);
-      this->Entries[i]->SetEnabled(this->Enabled);
+      this->PropagateEnableState(this->Entries[i]);
       this->Script("bind %s <Return> {%s EntriesUpdateCallback %d}",
                    this->Entries[i]->GetWidgetName(), this->GetTclName(), i);
       this->Script("bind %s <FocusOut> {%s EntriesUpdateCallback %d}",
@@ -1311,25 +1311,15 @@ void vtkKWRange::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->CanvasFrame)
-    {
-    this->CanvasFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->Canvas)
-    {
-    this->Canvas->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->CanvasFrame);
+  this->PropagateEnableState(this->Canvas);
 
   for (int i = 0; i < VTK_KW_RANGE_NB_ENTRIES; i++)
     {
-    if (this->Entries[i])
-      {
-      this->Entries[i]->SetEnabled(this->Enabled);
-      }
+    this->PropagateEnableState(this->Entries[i]);
     }
 
-  if (this->Enabled)
+  if (this->GetEnabled())
     {
     this->Bind();
     }

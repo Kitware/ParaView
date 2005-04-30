@@ -19,6 +19,7 @@
 #include "vtkCollectionIterator.h"
 #include "vtkPVApplication.h"
 #include "vtkKWFrame.h"
+#include "vtkKWFrameWithScrollbar.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVScale.h"
 #include "vtkPVProcessModule.h"
@@ -35,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.63");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.64");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

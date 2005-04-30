@@ -30,7 +30,7 @@
 #include <kwsys/stl/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.25");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.26");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -406,7 +406,7 @@ void vtkKWColorTransferFunctionEditor::UpdatePointEntries(
   for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
     {
     this->ValueEntries[i]->SetEnabled(
-      this->FunctionPointValueIsLocked(id) ? 0 : this->Enabled);
+      this->FunctionPointValueIsLocked(id) ? 0 : this->GetEnabled());
     }
 
   // Get the values in the right color space
@@ -724,23 +724,14 @@ void vtkKWColorTransferFunctionEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->ColorSpaceOptionMenu)
-    {
-    this->ColorSpaceOptionMenu->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->ColorSpaceOptionMenu);
 
   for (int i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
     {
-    if (this->ValueEntries[i])
-      {
-      this->ValueEntries[i]->SetEnabled(this->Enabled);
-      }
+    this->PropagateEnableState(this->ValueEntries[i]);
     }
 
-  if (this->ColorRamp)
-    {
-    this->ColorRamp->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->ColorRamp);
 }
 
 //----------------------------------------------------------------------------

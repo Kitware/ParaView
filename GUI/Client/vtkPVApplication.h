@@ -168,7 +168,7 @@ public:
   // Description:
   // Display the on-line help and about dialog for this application.
   // Over-writing vtkKWApplication defaults.
-  void DisplayHelp(vtkKWWindow* master);
+  void DisplayHelpDialog(vtkKWWindow* master);
 
   // Description:
   // Tells the process modules whether to start the main
@@ -308,7 +308,7 @@ protected:
   ~vtkPVApplication();
 
   virtual void CreateSplashScreen();
-  virtual void ConfigureAbout();
+  virtual void ConfigureAboutDialog();
   virtual void AddAboutText(ostream &);
 
   vtkKWPushButton *SaveRuntimeInfoButton;

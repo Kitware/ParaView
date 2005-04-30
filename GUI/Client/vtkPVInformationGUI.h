@@ -22,17 +22,18 @@
 #define __vtkPVInformationGUI_h
 
 
-#include "vtkKWFrame.h"
+#include "vtkKWFrameWithScrollbar.h"
+
 class vtkPVSource;
 class vtkKWFrameLabeled;
 class vtkKWLabel;
 class vtkKWBoundsDisplay;
 
-class VTK_EXPORT vtkPVInformationGUI : public vtkKWFrame
+class VTK_EXPORT vtkPVInformationGUI : public vtkKWFrameWithScrollbar
 {
 public:
   static vtkPVInformationGUI* New();
-  vtkTypeRevisionMacro(vtkPVInformationGUI, vtkKWFrame);
+  vtkTypeRevisionMacro(vtkPVInformationGUI, vtkKWFrameWithScrollbar);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

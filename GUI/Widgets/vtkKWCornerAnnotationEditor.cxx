@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.2");
+vtkCxxRevisionMacro(vtkKWCornerAnnotationEditor, "1.3");
 
 int vtkKWCornerAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -598,39 +598,18 @@ void vtkKWCornerAnnotationEditor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->CornerFrame)
-    {
-    this->CornerFrame->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->CornerFrame);
 
   int i;
   for (i = 0; i < 4; i++)
     {
-    if (this->CornerText[i])
-      {
-      this->CornerText[i]->SetEnabled(this->Enabled);
-      }
+    this->PropagateEnableState(this->CornerText[i]);
     }
 
-  if (this->PropertiesFrame)
-    {
-    this->PropertiesFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->MaximumLineHeightScale)
-    {
-    this->MaximumLineHeightScale->SetEnabled(this->Enabled);
-    }
-
-  if (this->TextPropertyWidget)
-    {
-    this->TextPropertyWidget->SetEnabled(this->Enabled);
-    }
-
-  if (this->TextPropertyPopupButton)
-    {
-    this->TextPropertyPopupButton->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->PropertiesFrame);
+  this->PropagateEnableState(this->MaximumLineHeightScale);
+  this->PropagateEnableState(this->TextPropertyWidget);
+  this->PropagateEnableState(this->TextPropertyPopupButton);
 }
 
 //----------------------------------------------------------------------------

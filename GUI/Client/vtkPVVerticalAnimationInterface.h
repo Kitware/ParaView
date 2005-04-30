@@ -22,6 +22,7 @@
 #include "vtkPVTracedWidget.h"
 
 class vtkKWFrame;
+class vtkKWFrameWithScrollbar;
 class vtkKWFrameLabeled;
 class vtkKWLabel;
 class vtkPVAnimationCue;
@@ -95,7 +96,7 @@ protected:
   ~vtkPVVerticalAnimationInterface();
 
   vtkPVAnimationManager* AnimationManager;
-  vtkKWFrame* TopFrame;
+  vtkKWFrameWithScrollbar* TopFrame;
   vtkKWFrameLabeled* ScenePropertiesFrame;
   vtkKWFrameLabeled* KeyFramePropertiesFrame;
   vtkKWLabel* TitleLabelLabel;

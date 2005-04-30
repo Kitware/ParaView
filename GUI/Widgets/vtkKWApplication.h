@@ -257,17 +257,17 @@ public:
   // Description:
   // Display the on-line help for this application.
   // Optionally provide a master window this dialog should be the slave of.
-  virtual void DisplayHelp(vtkKWWindow *master);
+  virtual void DisplayHelpDialog(vtkKWWindow *master);
 
   // Description:
   // Set/Get the the on-line help starting page
-  vtkGetStringMacro(DisplayHelpStartingPage);
-  vtkSetStringMacro(DisplayHelpStartingPage);
+  vtkGetStringMacro(HelpDialogStartingPage);
+  vtkSetStringMacro(HelpDialogStartingPage);
 
   // Description:
   // Display the about dialog for this application.
   // Optionally provide a master window this dialog should be the slave of.
-  virtual void DisplayAbout(vtkKWWindow *master);
+  virtual void DisplayAboutDialog(vtkKWWindow *master);
 
   // Description:
   // Return the Balloon Help helper object. 
@@ -325,10 +325,6 @@ protected:
   virtual void DoOneTclEvent();
 
   // Description:
-  // Cleanup everything before exiting.
-  virtual void Cleanup() { };
-
-  // Description:
   // Application name and version
   char *Name;
   char *VersionName;
@@ -353,7 +349,7 @@ protected:
 
   // Description:
   // On-line help starting page
-  char *DisplayHelpStartingPage;
+  char *HelpDialogStartingPage;
 
   // Description:
   // Value that is set after exit (status), flag stating that 
@@ -390,7 +386,7 @@ protected:
   // About dialog, add text and copyrights to the about dialog.
   // Override this function in subclasses (and/or call the superclass) to
   // add more information.
-  virtual void ConfigureAbout();
+  virtual void ConfigureAboutDialog();
   virtual void AddAboutText(ostream &);
   virtual void AddAboutCopyrights(ostream &);
   vtkKWMessageDialog *AboutDialog;

@@ -35,7 +35,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.51");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.52");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -265,13 +265,13 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
     }
   
   this->SetFrameLabel("Point Widget");
-  this->Labels[0]->SetParent(this->Frame->GetFrame());
+  this->Labels[0]->SetParent(this->Frame);
   this->Labels[0]->Create(pvApp, "");
   this->Labels[0]->SetText("Position");
 
   for (i=0; i<3; i++)
     {
-    this->CoordinateLabel[i]->SetParent(this->Frame->GetFrame());
+    this->CoordinateLabel[i]->SetParent(this->Frame);
     this->CoordinateLabel[i]->Create(pvApp, "");
     char buffer[3];
     sprintf(buffer, "%c", "xyz"[i]);
@@ -279,12 +279,12 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
     }
   for (i=0; i<3; i++)
     {
-    this->PositionEntry[i]->SetParent(this->Frame->GetFrame());
+    this->PositionEntry[i]->SetParent(this->Frame);
     this->PositionEntry[i]->Create(pvApp, "");
     }
 
   this->Script("grid propagate %s 1",
-               this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetWidgetName());
 
   this->Script("grid x %s %s %s -sticky ew",
                this->CoordinateLabel[0]->GetWidgetName(),
@@ -297,13 +297,13 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
                this->PositionEntry[2]->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
-               this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-               this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
@@ -317,7 +317,7 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
                  this->PositionEntry[i]->GetWidgetName(),
                  this->GetTclName());
     }
-  this->PositionResetButton->SetParent(this->Frame->GetFrame());
+  this->PositionResetButton->SetParent(this->Frame);
   this->PositionResetButton->Create(pvApp, "");
   this->PositionResetButton->SetText("Set Point Position to Center of Bounds");
   this->PositionResetButton->SetCommand(this, "PositionResetCallback"); 

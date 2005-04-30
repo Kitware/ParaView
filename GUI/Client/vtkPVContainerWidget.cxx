@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.34");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -450,10 +450,7 @@ void vtkPVContainerWidget::UpdateEnableState()
     it->GoToNextItem() )
     {
     vtkPVWidget* widget = vtkPVWidget::SafeDownCast(it->GetCurrentObject());
-    if (widget)
-      {
-      widget->SetEnabled(this->Enabled);
-      }
+    this->PropagateEnableState(widget);
     }
   it->Delete();
 }

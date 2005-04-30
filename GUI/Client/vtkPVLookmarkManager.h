@@ -42,6 +42,7 @@ class vtkPVLookmark;
 class vtkXMLDataElement;
 class vtkKWIcon;
 class vtkKWFrame;
+class vtkKWFrameWithScrollbar;
 class vtkKWPushButton;
 class vtkPVApplication;
 class vtkPVSource;
@@ -310,9 +311,9 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
   vtkVector<vtkKWLookmarkFolder*> *LmkFolderWidgets;
 //ETX
   
-  vtkKWFrame *LmkPanelFrame;
-  vtkKWFrame *LmkScrollFrame;
-  vtkKWFrame *SeparatorFrame;
+  vtkKWFrame              *LmkPanelFrame;
+  vtkKWFrameWithScrollbar *LmkScrollFrame;
+  vtkKWFrame              *SeparatorFrame;
 
   vtkKWFrame *TopDragAndDropTarget;
   vtkKWFrame *BottomDragAndDropTarget;

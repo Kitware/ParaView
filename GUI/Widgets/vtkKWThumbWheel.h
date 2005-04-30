@@ -27,11 +27,6 @@ class vtkKWEntry;
 class vtkKWPushButton;
 class vtkKWTopLevel;
 
-#define VTK_KW_TW_MODE_NONE                    0
-#define VTK_KW_TW_MODE_LINEAR_MOTION           1
-#define VTK_KW_TW_MODE_NONLINEAR_MOTION        2
-#define VTK_KW_TW_MODE_TOGGLE_CENTER_INDICATOR 3
-
 class VTK_EXPORT vtkKWThumbWheel : public vtkKWWidget
 {
 public:
@@ -73,18 +68,32 @@ public:
   vtkGetMacro(Resolution, double);
   
   // Description:
-  // Set the interaction modes (mode 0 is left button, 1 is middle, 2 is right). 
+  // Set the interaction modes (mode 0 is left button, 1 is middle, 
+  // 2 is right). 
   // Note: set it before setting the balloon help string.
+  //BTX
+  enum
+  {
+    INTERACTION_MODE_NONE = 0,
+    INTERACTION_MODE_LINEAR_MOTION,
+    INTERACTION_MODE_NONLINEAR_MOTION,
+    INTERACTION_MODE_TOGGLE_CENTER_INDICATOR
+  };
+  //ETX
   virtual void SetInteractionMode(int mode, int v);
   virtual int GetInteractionMode(int mode);
   virtual void SetInteractionModeToNone(int mode) 
-    { this->SetInteractionMode(mode, VTK_KW_TW_MODE_NONE); };
+    { this->SetInteractionMode(
+      mode, vtkKWThumbWheel::INTERACTION_MODE_NONE); };
   virtual void SetInteractionModeToLinear(int mode) 
-    { this->SetInteractionMode(mode, VTK_KW_TW_MODE_LINEAR_MOTION); };
+    { this->SetInteractionMode(
+      mode, vtkKWThumbWheel::INTERACTION_MODE_LINEAR_MOTION); };
   virtual void SetInteractionModeToNonLinear(int mode) 
-    { this->SetInteractionMode(mode, VTK_KW_TW_MODE_NONLINEAR_MOTION); };
+    { this->SetInteractionMode(
+      mode, vtkKWThumbWheel::INTERACTION_MODE_NONLINEAR_MOTION); };
   virtual void SetInteractionModeToToggleCenterIndicator(int mode) 
-    { this->SetInteractionMode(mode, VTK_KW_TW_MODE_TOGGLE_CENTER_INDICATOR); };
+    { this->SetInteractionMode(
+      mode, vtkKWThumbWheel::INTERACTION_MODE_TOGGLE_CENTER_INDICATOR); };
   virtual char *GetInteractionModeAsString(int mode);
 
   // Description:

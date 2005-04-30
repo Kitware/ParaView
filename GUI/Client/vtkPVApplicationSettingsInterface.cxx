@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.21");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.22");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -403,17 +403,17 @@ void vtkPVApplicationSettingsInterface::UpdateEnableState()
 
   if (this->ShowSourcesDescriptionCheckButton)
     {
-    this->ShowSourcesDescriptionCheckButton->SetEnabled(this->Enabled);
+    this->ShowSourcesDescriptionCheckButton->SetEnabled(this->GetEnabled());
     }
 
   if (this->ShowSourcesNameCheckButton)
     {
-    this->ShowSourcesNameCheckButton->SetEnabled(this->Enabled);
+    this->ShowSourcesNameCheckButton->SetEnabled(this->GetEnabled());
     }
 
   if (this->ShowTraceFilesCheckButton)
     {
-    this->ShowTraceFilesCheckButton->SetEnabled(this->Enabled);
+    this->ShowTraceFilesCheckButton->SetEnabled(this->GetEnabled());
     }
 }
 

@@ -21,7 +21,7 @@
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.6");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.7");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2
@@ -498,27 +498,12 @@ void vtkKWHSVColorSelector::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->HueSatWheelCanvas)
-    {
-    this->HueSatWheelCanvas->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->HueSatWheelCanvas);
+  this->PropagateEnableState(this->ValueBoxCanvas);
+  this->PropagateEnableState(this->HueSatLabel);
+  this->PropagateEnableState(this->ValueLabel);
 
-  if (this->ValueBoxCanvas)
-    {
-    this->ValueBoxCanvas->SetEnabled(this->Enabled);
-    }
-
-  if (this->HueSatLabel)
-    {
-    this->HueSatLabel->SetEnabled(this->Enabled);
-    }
-
-  if (this->ValueLabel)
-    {
-    this->ValueLabel->SetEnabled(this->Enabled);
-    }
-
-  if (this->Enabled)
+  if (this->GetEnabled())
     {
     this->Bind();
     }

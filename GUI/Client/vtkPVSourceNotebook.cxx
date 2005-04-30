@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.18");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.19");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -225,14 +225,12 @@ void vtkPVSourceNotebook::Create(vtkKWApplication* app, const char* args)
   // Create the easiest (modular) pages first
   // Create the display GUI.
   this->DisplayGUI->SetParent(this->Notebook->GetFrame("Display"));
-  this->DisplayGUI->GetMainFrame()->ScrollableOn();
   this->DisplayGUI->Create(app, 0);
   this->Script("pack %s -fill both -expand yes -side top",
                 this->DisplayGUI->GetWidgetName());
   // Create the information page.
   this->InformationGUI->SetParent(
         this->Notebook->GetFrame("Information"));
-  this->InformationGUI->ScrollableOn();
   this->InformationGUI->Create(app, 0);
   this->Script("pack %s -fill both -expand yes -side top",
                this->InformationGUI->GetWidgetName());

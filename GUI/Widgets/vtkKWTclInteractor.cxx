@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.30");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.31");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -246,35 +246,12 @@ void vtkKWTclInteractor::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->ButtonFrame)
-    {
-    this->ButtonFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->DismissButton)
-    {
-    this->DismissButton->SetEnabled(this->Enabled);
-    }
-
-  if (this->CommandFrame)
-    {
-    this->CommandFrame->SetEnabled(this->Enabled);
-    }
-
-  if (this->CommandLabel)
-    {
-    this->CommandLabel->SetEnabled(this->Enabled);
-    }
-
-  if (this->CommandEntry)
-    {
-    this->CommandEntry->SetEnabled(this->Enabled);
-    }
-
-  if (this->DisplayText)
-    {
-    this->DisplayText->SetEnabled(this->Enabled);
-    }
+  this->PropagateEnableState(this->ButtonFrame);
+  this->PropagateEnableState(this->DismissButton);
+  this->PropagateEnableState(this->CommandFrame);
+  this->PropagateEnableState(this->CommandLabel);
+  this->PropagateEnableState(this->CommandEntry);
+  this->PropagateEnableState(this->DisplayText);
 }
 
 //----------------------------------------------------------------------------
