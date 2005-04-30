@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrameWithScrollbar );
-vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.1");
+vtkCxxRevisionMacro(vtkKWFrameWithScrollbar, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWFrameWithScrollbar::vtkKWFrameWithScrollbar()
@@ -46,7 +46,7 @@ void vtkKWFrameWithScrollbar::Create(vtkKWApplication *app, const char* args)
 {
   // Call the superclass to set the appropriate flags then create manually
 
-#if 0
+#if 1
   if (!this->Superclass::Create(app, NULL, NULL))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
