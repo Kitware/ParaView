@@ -64,7 +64,7 @@ $pvWindow ChangeInteractorStyle 2
 $pvWindow ChangeInteractorStyle 4
 $pvWindow ChangeInteractorStyle 1
 
-$pvWindow ProcessErrorClick
+$pvWindow ErrorIconCallback
 $pvWindow DisplayCommandPrompt
 $pvWindow ShowTimerLog
 

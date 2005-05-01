@@ -40,7 +40,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.228");
+vtkCxxRevisionMacro(vtkKWWindow, "1.229");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -1420,6 +1420,7 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Menu: " << this->GetMenu() << endl;
   os << indent << "FileMenu: " << this->GetFileMenu() << endl;
+  os << indent << "HelpMenu: " << this->GetHelpMenu() << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "PrintTargetDPI: " << this->GetPrintTargetDPI() << endl;
   os << indent << "ProgressGauge: " << this->GetProgressGauge() << endl;

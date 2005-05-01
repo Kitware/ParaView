@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.120");
+vtkCxxRevisionMacro(vtkKWWidget, "1.121");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -1184,6 +1184,16 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "None" << endl;
     }
+  os << indent << "WidgetName: ";
+  if (this->WidgetName)
+    {
+    os << this->WidgetName << endl;
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+
   os << indent << "IsCreated: " << (this->IsCreated() ? "Yes" : "No") << endl;
 }
 
