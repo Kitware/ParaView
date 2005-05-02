@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.691");
+vtkCxxRevisionMacro(vtkPVWindow, "1.692");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4787,8 +4787,21 @@ void vtkPVWindow::UpdateToolbarState()
 {
   this->Superclass::UpdateToolbarState();
   
-  this->DisableToolbarButtons();
-  this->EnableToolbarButtons();
+  //this->DisableToolbarButtons();
+  //  this->EnableToolbarButtons();
+
+  // If not enabled, source grabbed or recording, disable toolbar button
+
+  if (!this->GetEnabled() ||
+      (this->CurrentPVSource && this->CurrentPVSource->GetSourceGrabbed()) ||
+      (this->AnimationManager && this->AnimationManager->GetInRecording()))
+    {
+    this->DisableToolbarButtons();
+    }
+  else
+    {
+    this->EnableToolbarButtons();
+    }
 
   if (!this->LowerToolbars)
     {
@@ -4948,19 +4961,6 @@ void vtkPVWindow::UpdateEnableState()
     it->GoToNextItem();
     }
   it->Delete();
-
-  // If not enabled, source grabbed or recording, disable toolbar button
-
-  if (!this->GetEnabled() ||
-      (this->CurrentPVSource && this->CurrentPVSource->GetSourceGrabbed()) ||
-      (this->AnimationManager && this->AnimationManager->GetInRecording()))
-    {
-    this->DisableToolbarButtons();
-    }
-  else
-    {
-    this->EnableToolbarButtons();
-    }
 }
 
 //----------------------------------------------------------------------------
