@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.74");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.75");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -251,11 +251,16 @@ void vtkPVArrayMenu::Initialize()
     }
 
   this->Update();
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::ResetInternal()
 {
+  if (!this->ModifiedFlag)
+    {
+    return;
+    }
   this->Initialize();
   this->ModifiedFlag = 0;
 }
