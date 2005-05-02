@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.692");
+vtkCxxRevisionMacro(vtkPVWindow, "1.693");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4898,7 +4898,18 @@ void vtkPVWindow::UpdateEnableState()
   this->PropagateEnableState(this->CenterYEntry);
   this->PropagateEnableState(this->CenterZEntry);
 
-  this->PropagateEnableState(this->CurrentPVSource);
+  if ( this->ReaderList )
+    {
+    int cc;
+    for ( cc = 0; cc < this->ReaderList->GetNumberOfItems(); cc ++ )
+      {
+      vtkPVReaderModule* rm = 0;
+      if ( this->ReaderList->GetItem(cc, rm) == VTK_OK && rm)
+        {
+        this->PropagateEnableState(rm);
+        }
+      }
+    }
 
   if ( this->SourceLists )
     {
@@ -4921,6 +4932,7 @@ void vtkPVWindow::UpdateEnableState()
         }
       }
     }
+
   if ( this->SourceLists )
     {
     const char* sourcelists[] = { 
@@ -4939,18 +4951,6 @@ void vtkPVWindow::UpdateEnableState()
         }
       }
     }
-  if ( this->ReaderList )
-    {
-    int cc;
-    for ( cc = 0; cc < this->ReaderList->GetNumberOfItems(); cc ++ )
-      {
-      vtkPVReaderModule* rm = 0;
-      if ( this->ReaderList->GetItem(cc, rm) == VTK_OK && rm )
-        {
-        this->PropagateEnableState(rm);
-        }
-      }
-    }
 
   vtkCollectionIterator* it = this->PVColorMaps->NewIterator();
   it->InitTraversal();
@@ -4961,6 +4961,8 @@ void vtkPVWindow::UpdateEnableState()
     it->GoToNextItem();
     }
   it->Delete();
+
+  this->PropagateEnableState(this->CurrentPVSource);
 }
 
 //----------------------------------------------------------------------------
@@ -5098,9 +5100,11 @@ void vtkPVWindow::EndProgress(int enabled)
   if ( !enabled || this->GetEnabled() )
     {
     this->UpdateEnableState();
-    return;
     }
-  this->EnabledOn();
+  else
+    {
+    this->EnabledOn();
+    }
 }
 
 //-----------------------------------------------------------------------------
