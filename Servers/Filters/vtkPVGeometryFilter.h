@@ -98,7 +98,7 @@ protected:
                       int doCommunicate);
   void GenericDataSetExecute(vtkGenericDataSet* input, vtkPolyData* output,
                              int doCommunicate);
-  void ImageDataExecute(vtkImageData* input, vtkPolyData* output);
+  void ImageDataExecute(vtkImageData* input, vtkPolyData* output, int doCommunicate);
   void StructuredGridExecute(vtkStructuredGrid* input, vtkPolyData* output);
   void RectilinearGridExecute(vtkRectilinearGrid* input, vtkPolyData* output);
   void UnstructuredGridExecute(

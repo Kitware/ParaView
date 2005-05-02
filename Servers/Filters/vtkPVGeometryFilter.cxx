@@ -46,7 +46,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkGenericDataSet.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.51");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.52");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -162,7 +162,7 @@ void vtkPVGeometryFilter::ExecuteBlock(
 {
   if (input->IsA("vtkImageData"))
     {
-    this->ImageDataExecute(static_cast<vtkImageData*>(input), output);
+    this->ImageDataExecute(static_cast<vtkImageData*>(input), output, doCommunicate);
     this->ExecuteCellNormals(output, doCommunicate);
     return;
     }
@@ -570,14 +570,24 @@ void vtkPVGeometryFilter::DataSetSurfaceExecute(vtkDataSet* input,
 
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
-                                           vtkPolyData* output)
+                                           vtkPolyData* output,
+                                           int doCommunicate)
 {
   double *spacing;
   double *origin;
   int *ext;
   double bounds[6];
 
-  ext = input->GetWholeExtent();
+  // If doCommunicate is false, use extent because the block is
+  // entirely contained in this process.
+  if (doCommunicate)
+    {
+    ext = input->GetWholeExtent();
+    }
+  else
+    {
+    ext = input->GetExtent();
+    }
 
   // If 2d then default to superclass behavior.
 //  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5] ||
@@ -594,7 +604,7 @@ void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input,
   // Otherwise, let OutlineSource do all the work
   //
   
-  if (output->GetUpdatePiece() == 0)
+  if (output->GetUpdatePiece() == 0 || !doCommunicate)
     {
     spacing = input->GetSpacing();
     origin = input->GetOrigin();
