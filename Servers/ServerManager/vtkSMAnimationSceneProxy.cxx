@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.8");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -325,13 +325,9 @@ int vtkSMAnimationSceneProxy::SaveGeometry(const char* filename)
     {
     vtkSMSimpleDisplayProxy* sDisp = vtkSMSimpleDisplayProxy::SafeDownCast(
       proxyIter->GetProxy());
-    if (!sDisp)
-      {
-      // only displays which sink geometry  as saved.
-      // (i.e. the part displays).
-      continue;
-      }
-    if (sDisp->GetVisibilityCM())
+    // only displays which sink geometry  as saved.
+    // (i.e. the part displays).
+    if (sDisp && sDisp->GetVisibilityCM())
       {
       sDisp->SetInputAsGeometryFilter(animWriter);
       }
