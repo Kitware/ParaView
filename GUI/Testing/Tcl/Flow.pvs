@@ -195,7 +195,7 @@ $pv(vtkTemp423) SetValue 16
 $pv(vtkTemp406) AcceptCallback
 
 update
-
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc

@@ -49,6 +49,8 @@ $kw(vtkTemp1190) ColorByArray {phi} 3
 
 $kw(vtkTemp18) SetCameraState 10.542 21.511 -16.692  4.000 4.000 4.000  0.972 -0.153 0.178
 
+[[$Application GetMainWindow] GetMainView] ForceRender
+
 source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc
 
