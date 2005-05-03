@@ -26,7 +26,7 @@
 #include "vtkClientServerStream.h"
 
 vtkStandardNewMacro(vtkSMCompositeRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMCompositeRenderModuleProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMCompositeRenderModuleProxy::vtkSMCompositeRenderModuleProxy()
 {
@@ -338,12 +338,6 @@ void vtkSMCompositeRenderModuleProxy::ComputeReductionFactor()
 
 }
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void vtkSMCompositeRenderModuleProxy::SetUseCompositing(vtkSMProxy* p, int flag)
 {
