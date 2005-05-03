@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkLightCollection.h"
 #include "vtkCallbackCommand.h"
 #include "vtkMultiProcessController.h"
+#include "vtkSquirtCompressor.h"
 
 static void SatelliteStartRender(vtkObject *caller,
                                  unsigned long vtkNotUsed(event),
@@ -40,7 +41,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                                        unsigned long vtkNotUsed(event),
                                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.17");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.18");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 //----------------------------------------------------------------------------
@@ -433,61 +434,12 @@ void vtkDesktopDeliveryServer::LocalComputeVisiblePropBounds(vtkRenderer *ren,
 void vtkDesktopDeliveryServer::SquirtCompress(vtkUnsignedCharArray *in,
                                               vtkUnsignedCharArray *out)
 {
-  if (in->GetNumberOfComponents() != 4)
-    {
-    vtkErrorMacro("Squirt only works with RGBA");
-    return;
-    }
-  int count=0;
-  int index=0;
-  int comp_index=0;
-  int end_index;
-  unsigned int current_color;
-  unsigned char compress_masks[6][4] = { {0xFF, 0xFF, 0xFF, 0xFF},
-                                         {0xFE, 0xFF, 0xFE, 0xFF},
-                                         {0xFC, 0xFE, 0xFC, 0xFF},
-                                         {0xF8, 0xFC, 0xF8, 0xFF},
-                                         {0xF0, 0xF8, 0xF0, 0xFF},
-                                         {0xE0, 0xF0, 0xE0, 0xFF} };
-
-  // Set bitmask based on compress_level
-  unsigned int compress_mask
-    = *((unsigned int *)(compress_masks[this->SquirtCompressionLevel]));
-
-  // Access raw arrays directly
-  unsigned int *_rawColorBuffer;
-  unsigned int *_rawCompressedBuffer;
-  int numPixels = in->GetNumberOfTuples();
-  _rawColorBuffer = (unsigned int *)in->GetPointer(0);
-  _rawCompressedBuffer = (unsigned int *)out->WritePointer(0,numPixels*4);
-  end_index = numPixels;
-
-  // Go through color buffer and put RLE format into compressed buffer
-  while((index < end_index) && (comp_index < end_index))
-    {
-
-    // Record color
-    current_color = _rawCompressedBuffer[comp_index] =_rawColorBuffer[index];
-    index++;
-
-    // Compute Run
-    while(  (  (current_color & compress_mask) == (_rawColorBuffer[index] & compress_mask))
-            && (index < end_index) && (count < 255))
-      {
-      index++;
-      count++;
-      }
-
-    // Record Run length
-    ((unsigned char*)(_rawCompressedBuffer+comp_index))[3]=(unsigned char)count;
-    comp_index++;
-
-    count = 0;
-    }
-
-  // Back to vtk arrays :)
-  out->SetNumberOfComponents(4);
-  out->SetNumberOfTuples(comp_index);
+  vtkSquirtCompressor *compressor = vtkSquirtCompressor::New();
+  compressor->SetInput(in);
+  compressor->SetSquirtLevel(this->SquirtCompressionLevel);
+  compressor->SetOutput(out);
+  compressor->Compress();
+  compressor->Delete();
 }
 
 //----------------------------------------------------------------------------

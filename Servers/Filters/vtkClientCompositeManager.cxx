@@ -47,6 +47,7 @@
 #include "vtkActor.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkBMPWriter.h"
+#include "vtkSquirtCompressor.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -55,7 +56,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.43");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.44");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -803,7 +804,7 @@ void vtkClientCompositeManager::SatelliteEndRender()
     if (! this->UseRGB && this->SquirtLevel)
       {
       this->SquirtCompress(static_cast<vtkUnsignedCharArray*>(this->PData),
-                           this->SquirtArray, this->SquirtLevel);
+                           this->SquirtArray, this->SquirtLevel - 1);
       length = this->SquirtArray->GetMaxId() + 1;
       winSize[2] = length;
       this->ClientController->Send(winSize, 3, 1, 123450);
@@ -1142,111 +1143,24 @@ void vtkClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
                                                vtkUnsignedCharArray *out,
                                                int compress_level)
 {
-
-  if (in->GetNumberOfComponents() != 4)
-    {
-    vtkErrorMacro("Squirt only works with RGBA");
-    return;
-    }
-
-  int count=0;
-  int index=0;
-  int comp_index=0;
-  int end_index;
-  unsigned int current_color;
-  unsigned char compress_masks[6][4] = {  {0xFF, 0xFF, 0xFF, 0xFF},
-                                          {0xFE, 0xFF, 0xFE, 0xFF},
-                                          {0xFC, 0xFE, 0xFC, 0xFF},
-                                          {0xF8, 0xFC, 0xF8, 0xFF},
-                                          {0xF0, 0xF8, 0xF0, 0xFF},
-                                          {0xE0, 0xF0, 0xE0, 0xFF}};
-  if (compress_level < 1 || compress_level > 6)
-    {
-    vtkErrorMacro("Squirt compression level (" << compress_level 
-                  << ") is out of range [1,6].");
-    compress_level = 1;
-    }
-
-  // Set bitmask based on compress_level
-  unsigned int compress_mask;
-  // I shifted the level by one so that 0 means no compression.
-  memcpy(&compress_mask, &compress_masks[compress_level-1], 4);
-
-  // Access raw arrays directly
-  unsigned int* _rawColorBuffer;
-  unsigned int* _rawCompressedBuffer;
-  int numPixels = in->GetNumberOfTuples();
-  _rawColorBuffer = (unsigned int*)in->GetPointer(0);
-  _rawCompressedBuffer = (unsigned int*)out->WritePointer(0,numPixels*4);
-  end_index = numPixels;
-
-  // Go through color buffer and put RLE format into compressed buffer
-  while((index < end_index) && (comp_index < end_index)) 
-    {
-                
-    // Record color
-    current_color = _rawCompressedBuffer[comp_index] =_rawColorBuffer[index];
-    index++;
-
-    // Compute Run
-    while(((current_color&compress_mask) == (_rawColorBuffer[index]&compress_mask)) &&
-          (index<end_index) && (count<255))
-      { 
-      index++; count++;   
-      }
-
-    // Record Run length
-    *((unsigned char*)_rawCompressedBuffer+comp_index*4+3) =(unsigned char)count;
-    comp_index++;
-
-    count = 0;
-    
-    }
-
-    // Back to vtk arrays :)
-    out->SetNumberOfTuples(comp_index);
- 
+  
+  vtkSquirtCompressor *compressor = vtkSquirtCompressor::New();
+  compressor->SetInput(in);
+  compressor->SetSquirtLevel(compress_level);
+  compressor->SetOutput(out);
+  compressor->Compress();
+  compressor->Delete();
 }
 
 //------------------------------------------------------------
 void vtkClientCompositeManager::SquirtDecompress(vtkUnsignedCharArray *in,
                                                   vtkUnsignedCharArray *out)
 {
-  int count=0;
-  int index=0;
-  unsigned int current_color;
-  unsigned int* _rawColorBuffer;
-  unsigned int* _rawCompressedBuffer;
-
-  // Get compressed buffer size
-  int CompSize = in->GetNumberOfTuples();
-
-  // Access raw arrays directly
-  _rawColorBuffer = (unsigned int*)out->GetPointer(0);
-  _rawCompressedBuffer = (unsigned int*)in->GetPointer(0);
-
-  // Go through compress buffer and extract RLE format into color buffer
-  for(int i=0; i<CompSize; i++)
-    {
-    // Get color and count
-    current_color = _rawCompressedBuffer[i];
-
-    // Get run length count;
-    count = *((unsigned char*)&current_color+3);
-
-    // Fixed Alpha
-    *((unsigned char*)&current_color+3) = 0xFF;
-
-    // Set color
-    _rawColorBuffer[index++] = current_color;
-
-    // Blast color into color buffer
-    for(int j=0; j< count; j++)
-      _rawColorBuffer[index++] = current_color;
-    }
-
-    // Save out compression stats.
-    vtkTimerLog::FormatAndMarkEvent("Squirt ratio: %f", (float)CompSize/(float)index);
+  vtkSquirtCompressor *compressor = vtkSquirtCompressor::New();
+  compressor->SetInput(in);
+  compressor->SetOutput(out);
+  compressor->Decompress();
+  compressor->Delete();
 }
 
 

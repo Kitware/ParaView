@@ -27,8 +27,10 @@ SET(Filters_SRCS
   vtkDesktopDeliveryServer.cxx
   vtkGroup.cxx
   vtkHDF5RawImageReader.cxx
+  vtkImageCompressor.cxx
   vtkIntegrateAttributes.cxx
   vtkIntegrateFlowThroughSurface.cxx
+  vtkMPICompositeManager.cxx
   vtkMPIDuplicatePolyData.cxx
   vtkMPIDuplicateUnstructuredGrid.cxx
   vtkMPIMoveData.cxx
@@ -73,6 +75,7 @@ SET(Filters_SRCS
   vtkStreamingTessellator.cxx
   vtkSubdivisionAlgorithm.cxx
   vtkSurfaceVectors.cxx
+  vtkSquirtCompressor.cxx
   vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
   vtkTiledDisplaySchedule.cxx
   vtkUpdateSuppressorPipeline.cxx
@@ -93,6 +96,7 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSubdivisionAlgorithm.cxx 
   vtkPVRenderViewProxy.cxx
   vtkVisibilitySort.cxx
+  vtkImageCompressor.cxx
   ABSTRACT)
 
 IF(VTK_USE_MPI)

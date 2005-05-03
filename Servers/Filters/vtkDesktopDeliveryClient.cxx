@@ -30,8 +30,9 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkMultiProcessController.h"
 #include "vtkDoubleArray.h"
+#include "vtkSquirtCompressor.h"
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.23");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.24");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 //----------------------------------------------------------------------------
@@ -292,44 +293,11 @@ void vtkDesktopDeliveryClient::SetImageReductionFactorForUpdateRate(double desir
 void vtkDesktopDeliveryClient::SquirtDecompress(vtkUnsignedCharArray *in,
                                                 vtkUnsignedCharArray *out)
 {
-  int count=0;
-  int index=0;
-  unsigned int current_color;
-  unsigned int *_rawColorBuffer;
-  unsigned int *_rawCompressedBuffer;
-
-  // Get compressed buffer size
-  int compSize = in->GetNumberOfTuples();
-
-  // Access raw arrays directly
-  _rawColorBuffer = (unsigned int *)out->GetPointer(0);
-  _rawCompressedBuffer = (unsigned int *)in->GetPointer(0);
-
-  // Go through compress buffer and extract RLE format into color buffer
-  for(int i=0; i<compSize; i++)
-    {
-    // Get color and count
-    current_color = _rawCompressedBuffer[i];
-
-    // Get run length count;
-    count = ((unsigned char *)(&current_color))[3];
-
-    // Fixed Alpha
-    ((unsigned char *)(&current_color))[3] = 0xFF;
-
-    // Set color
-    _rawColorBuffer[index++] = current_color;
-
-    // Blast color into color buffer
-    for(int j=0; j < count; j++)
-      {
-      _rawColorBuffer[index++] = current_color;
-      }
-    }
-
-  // Save out compression stats.
-  vtkTimerLog::FormatAndMarkEvent("Squirt ratio: %f",
-                  (float)compSize/(float)index);
+  vtkSquirtCompressor *compressor = vtkSquirtCompressor::New();
+  compressor->SetInput(in);
+  compressor->SetOutput(out);
+  compressor->Decompress();
+  compressor->Delete();
 }
 
 //----------------------------------------------------------------------------

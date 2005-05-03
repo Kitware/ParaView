@@ -70,6 +70,7 @@
 #include "vtkXMLCollectionReader.h"
 #include "vtkXMLPVAnimationWriter.h"
 #include "vtkXMLPVDWriter.h"
+#include "vtkSquirtCompressor.h"
 
 #ifdef VTK_USE_MPI
 # include "vtkAllToNRedistributePolyData.h"
@@ -148,6 +149,7 @@ int main(int , char *[])
   c = vtkXMLCollectionReader::New(); c->Print(cout); c->Delete();
   c = vtkXMLPVAnimationWriter::New(); c->Print(cout); c->Delete();
   c = vtkXMLPVDWriter::New(); c->Print(cout); c->Delete();
+  c = vtkSquirtCompressor::New(); c->Print(cout); c->Delete();
 
 #ifdef VTK_USE_MPI
   c = vtkAllToNRedistributePolyData::New(); c->Print(cout); c->Delete();
