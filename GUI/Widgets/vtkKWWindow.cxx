@@ -40,7 +40,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.229");
+vtkCxxRevisionMacro(vtkKWWindow, "1.230");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -246,7 +246,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
     {
     this->Menu->AddCascade("Help", this->HelpMenu, 0);
     }
-  this->HelpMenu->AddCommand("Help", this->GetApplication(), "DisplayHelpDialog", 0);
+  ostrstream helpCmd;
+  helpCmd << "DisplayHelpDialog " << this->GetTclName() << ends;
+  this->HelpMenu->AddCommand("Help", this->GetApplication(), helpCmd.str(), 0);
+  helpCmd.rdbuf()->freeze(0);
 
   if (app->HasCheckForUpdates())
     {
@@ -256,9 +259,12 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->HelpMenu->AddSeparator();
   ostrstream about_label;
   about_label << "About " << app->GetPrettyName() << ends;
+  ostrstream aboutCmd;
+  aboutCmd << "DisplayAboutDialog " << this->GetTclName() << ends;
   this->HelpMenu->AddCommand(
-    about_label.str(), this->GetApplication(), "DisplayAboutDialog", 0);
+    about_label.str(), this->GetApplication(), aboutCmd.str(), 0);
   about_label.rdbuf()->freeze(0);
+  aboutCmd.rdbuf()->freeze(0);
 
   // Menubar separator
 
