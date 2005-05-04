@@ -26,7 +26,6 @@
 #include "vtkPVSelectionList.h"
 #include "vtkKWLabel.h"
 #include "vtkKWThumbWheel.h"
-#include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkCommand.h"
 #include "vtkPVApplication.h"
@@ -46,7 +45,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.13");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.14");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -301,16 +300,7 @@ void vtkPVKeyFrame::CreateValueWidget()
     }
   else
     {
-    if (bd)
-      {
-      // Widget is check box.
-      vtkKWCheckButton* kwCB = vtkKWCheckButton::New();
-      kwCB->SetParent(this);
-      kwCB->Create(this->GetApplication(), 0);
-      kwCB->SetCommand(this, "ValueChangedCallback");
-      this->ValueWidget = kwCB;
-      }
-    else if (ed || sld)
+    if (bd || ed || sld)
       {
       vtkPVSelectionList* pvList = vtkPVSelectionList::New();
       pvList->SetParent(this);
@@ -502,7 +492,13 @@ void vtkPVKeyFrame::UpdateDomain()
   if (bd)
     {
     // Domain does not change for boolean.
-    // Nothing to do.
+    vtkPVSelectionList* pvList = vtkPVSelectionList::SafeDownCast(this->ValueWidget);
+    if (pvList->GetNumberOfItems() != 2)
+      {
+      pvList->RemoveAllItems();
+      pvList->AddItem("Off", 0);
+      pvList->AddItem("On", 1);
+      }
     }
   else if (ed)
     {
@@ -627,11 +623,6 @@ void vtkPVKeyFrame::ValueChangedCallback()
     this->SetKeyValue(static_cast<double>(
       vtkPVSelectionList::SafeDownCast(this->ValueWidget)->GetCurrentValue()));
     }
-  else if (vtkKWCheckButton::SafeDownCast(this->ValueWidget))
-    {
-    this->SetKeyValue(static_cast<double>(
-        vtkKWCheckButton::SafeDownCast(this->ValueWidget)->GetState()));
-    }
   else if (vtkKWThumbWheel::SafeDownCast(this->ValueWidget))
     {
     this->SetKeyValue(
@@ -659,11 +650,6 @@ void vtkPVKeyFrame::UpdateValuesFromProxy()
   if (vtkPVSelectionList::SafeDownCast(this->ValueWidget))
     {
     vtkPVSelectionList::SafeDownCast(this->ValueWidget)->SetCurrentValue(
-      static_cast<int>(keyvalue));
-    }
-  else if (vtkKWCheckButton::SafeDownCast(this->ValueWidget))
-    {
-    vtkKWCheckButton::SafeDownCast(this->ValueWidget)->SetState(
       static_cast<int>(keyvalue));
     }
   else if (vtkKWThumbWheel::SafeDownCast(this->ValueWidget))
