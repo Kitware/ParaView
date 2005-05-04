@@ -42,7 +42,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.16");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.17");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -165,6 +165,8 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
       char* text = this->AnimationCue->GetTextRepresentation();
       this->TitleLabel->SetText(text);
       delete []text;
+      this->Update(); // so that the currently selected keyframe
+        // is shown in the GUI.
       }
     }
 }

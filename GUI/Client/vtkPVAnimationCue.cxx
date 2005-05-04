@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.25");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.26");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -1076,11 +1076,8 @@ void vtkPVAnimationCue::GetSelfFocus()
   // TODO: change color
   vtkKWTkUtilities::ChangeFontWeightToBold(
     this->GetApplication()->GetMainInterp(), this->Label->GetWidgetName());
-  this->InvokeEvent(vtkKWEvent::FocusInEvent);
-  // The event is invoked before the timeline gets focus, so that
-  // when the timeline get's focus and sets the selected key frame,
-  // the VAnimation interface will also show that key frame.
   this->TimeLine->GetFocus();
+  this->InvokeEvent(vtkKWEvent::FocusInEvent);
 }
 
 //-----------------------------------------------------------------------------
