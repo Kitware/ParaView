@@ -72,7 +72,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.30");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.31");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -158,8 +158,6 @@ vtkPVAnimationScene::vtkPVAnimationScene()
 
   this->TimeLabel = vtkKWLabel::New();
   this->TimeScale = vtkKWScale::New();
-  this->FrameRateLabel = vtkKWLabel::New();
-  this->FrameRateThumbWheel = vtkKWThumbWheel::New();
   this->DurationLabel = vtkKWLabel::New();
   this->DurationThumbWheel = vtkKWThumbWheel::New();
   this->PlayModeMenuButton = vtkKWMenuButton::New();
@@ -195,8 +193,6 @@ vtkPVAnimationScene::~vtkPVAnimationScene()
 
   this->TimeLabel->Delete();
   this->TimeScale->Delete();
-  this->FrameRateLabel->Delete();
-  this->FrameRateThumbWheel->Delete();
   this->DurationLabel->Delete();
   this->DurationThumbWheel->Delete();
   this->PlayModeMenuButton->Delete();
@@ -359,35 +355,6 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
     this->DurationLabel->GetWidgetName(),
     this->DurationThumbWheel->GetWidgetName());
 
-  // Animation Control: Frame rate
-  this->FrameRateLabel->SetParent(this);
-  this->FrameRateLabel->Create(app, 0);
-  this->FrameRateLabel->SetText("Frame Rate:");
-    
-  this->FrameRateThumbWheel->SetParent(this);
-  this->FrameRateThumbWheel->PopupModeOn();
-  this->FrameRateThumbWheel->SetResolution(0.01);
-  this->FrameRateThumbWheel->SetMinimumValue(0.0);
-  this->FrameRateThumbWheel->ClampMinimumValueOn();
-  this->FrameRateThumbWheel->SetValue(this->AnimationSceneProxy->GetFrameRate());
-  this->FrameRateThumbWheel->Create(app, NULL);
-  this->FrameRateThumbWheel->DisplayEntryOn();
-  this->FrameRateThumbWheel->DisplayLabelOff();
-  this->FrameRateThumbWheel->DisplayEntryAndLabelOnTopOff();
-  this->FrameRateThumbWheel->ExpandEntryOn();
-  this->FrameRateThumbWheel->SetEntryCommand(this, "FrameRateChangedCallback");
-  this->FrameRateThumbWheel->SetEndCommand(this, "FrameRateChangedCallback");
-  this->FrameRateThumbWheel->GetEntry()->BindCommand(this,
-    "FrameRateChangedCallback");
-  this->FrameRateThumbWheel->GetEntry()->SetBind("<KeyRelease>", this->GetTclName(),
-    "FrameRateChangedKeyReleaseCallback");
-  this->FrameRateThumbWheel->SetBalloonHelpString("Adjust the frame rate for the "
-    "animation.");
-  this->Script("grid %s %s -sticky ew",
-    this->FrameRateLabel->GetWidgetName(),
-    this->FrameRateThumbWheel->GetWidgetName());
-  this->SetFrameRate(15.0);
-
   // Animation Control: Play Mode
   this->PlayModeLabel->SetParent(this);
   this->PlayModeLabel->Create(app, 0);
@@ -456,6 +423,7 @@ void vtkPVAnimationScene::CreateProxy()
   DoubleVectPropertySetElement(this->AnimationSceneProxy,"EndTime", 60.0);
   DoubleVectPropertySetElement(this->AnimationSceneProxy,"TimeMode",
     VTK_ANIMATION_CUE_TIMEMODE_RELATIVE);
+  DoubleVectPropertySetElement(this->AnimationSceneProxy, "FrameRate", 1.0);
 
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
     this->AnimationSceneProxy->GetProperty("RenderModule"));
@@ -466,11 +434,12 @@ void vtkPVAnimationScene::CreateProxy()
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext, 
-  int width, int height, int aspectRatio)
+  int width, int height, double framerate)
 {
-  this->GetTraceHelper()->AddEntry("$kw(%s) SaveImages \"%s\" \"%s\" %d %d %d",
-    this->GetTclName(), fileRoot, ext, width, height, aspectRatio);
-  int savefailed = this->AnimationSceneProxy->SaveImages(fileRoot, ext, width, height);
+  this->GetTraceHelper()->AddEntry("$kw(%s) SaveImages \"%s\" \"%s\" %d %d %f",
+    this->GetTclName(), fileRoot, ext, width, height, framerate);
+  int savefailed = this->AnimationSceneProxy->SaveImages(fileRoot, ext, 
+    width, height, framerate);
   
   if (savefailed)
     {
@@ -529,16 +498,6 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
     break;
     }
   this->Script("update");
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationScene::FrameRateChangedKeyReleaseCallback()
-{
-  double fps =  this->FrameRateThumbWheel->GetEntry()->GetValueAsFloat();
-  if (fps > 0)
-    {
-    this->SetFrameRate(fps);
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -686,6 +645,8 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
   case VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE:
     this->PlayModeMenuButton->SetButtonText(VTK_PV_PLAYMODE_SEQUENCE_TITLE);
     this->AnimationManager->EnableCacheCheck();
+    // Change the time scale increment to 1.
+    this->TimeScale->SetResolution(1);
     break;
   case VTK_ANIMATION_SCENE_PLAYMODE_REALTIME:
     this->PlayModeMenuButton->SetButtonText(VTK_PV_PLAYMODE_REALTIME_TITLE);
@@ -693,6 +654,7 @@ void vtkPVAnimationScene::SetPlayMode(int mode)
       // disable cahce check when in real time mode.
       // Note that when we switch the mode to realtime,
       // the AnimationSceneProxy disables cacheing.
+    this->TimeScale->SetResolution(0.01);
     break;
   default:
     vtkErrorMacro("Invalid play mode " << mode);
@@ -779,12 +741,6 @@ void vtkPVAnimationScene::RecordState()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationScene::FrameRateChangedCallback()
-{
-  this->SetFrameRate(this->FrameRateThumbWheel->GetEntry()->GetValueAsFloat());
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetFrameRate(double fps)
 {
   if (this->GetFrameRate() == fps)
@@ -797,7 +753,6 @@ void vtkPVAnimationScene::SetFrameRate(double fps)
     }
   DoubleVectPropertySetElement(this->AnimationSceneProxy, "FrameRate", fps);
   this->AnimationSceneProxy->UpdateVTKObjects();
-  this->FrameRateThumbWheel->SetValue(fps);
   this->InvalidateAllGeometries();
   this->GetTraceHelper()->AddEntry("$kw(%s) SetFrameRate %f", this->GetTclName(), fps);
 }
@@ -854,6 +809,11 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
     {
     vtkErrorMacro("Scene has not been created yet.");
     return;
+    }
+  //Firstly, if the time resolution is 1, we round the time the time value.
+  if (this->TimeScale->GetResolution() == 1)
+    {
+    time = (int)(time + 0.5);
     }
   DoubleVectPropertySetElement(this->AnimationSceneProxy, "CurrentTime", time);
   this->AnimationSceneProxy->UpdateVTKObjects();
@@ -955,14 +915,6 @@ void vtkPVAnimationScene::UpdateEnableState()
 
   enabled = !this->IsInPlay() && this->GetEnabled();
 
-  if (this->FrameRateLabel)
-    {
-    this->FrameRateLabel->SetEnabled(enabled);
-    }
-  if (this->FrameRateThumbWheel)
-    {
-    this->FrameRateThumbWheel->SetEnabled(enabled);
-    }
   if (this->DurationLabel)
     {
     this->DurationLabel->SetEnabled(enabled);

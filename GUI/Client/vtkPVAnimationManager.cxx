@@ -63,7 +63,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.39");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.40");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1067,7 +1067,7 @@ void vtkPVAnimationManager::SaveAnimation()
     if (isMPEG)
       {
       dlg->SetText(
-        "Specify the width and height of the mpeg to be saved from this "
+        "Specify the width, height and frame rate of the mpeg to be saved from this "
         "animation. The width must be a multiple of 32 and the height a "
         "multiple of 8. Each will be resized to the next smallest multiple "
         "if it does not meet this criterion. The maximum size allowed is "
@@ -1100,8 +1100,19 @@ void vtkPVAnimationManager::SaveAnimation()
     heightEntry->Create(this->GetApplication(), "");
     heightEntry->GetWidget()->SetValue(origHeight);
 
+    vtkKWEntryLabeled *framerateEntry = vtkKWEntryLabeled::New();
+    framerateEntry->GetLabel()->SetText("Frame Rate:");
+    framerateEntry->SetParent(frame);
+    framerateEntry->Create(this->GetApplication(), "");
+    framerateEntry->GetWidget()->SetValue(15);
+
     this->Script("pack %s %s -side left -fill both -expand t",
       widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
+    if (isMPEG)
+      {
+      this->Script("pack %s -side left -fill both -expand t",
+        framerateEntry->GetWidgetName());
+      }
     this->Script("pack %s -side top -pady 5", frame->GetWidgetName());
 
     dlg->Invoke();
@@ -1109,7 +1120,12 @@ void vtkPVAnimationManager::SaveAnimation()
     int width = widthEntry->GetWidget()->GetValueAsInt();
     int height = origHeight;
     height = heightEntry->GetWidget()->GetValueAsInt();
-
+    double framerate = (isMPEG)?
+      framerateEntry->GetWidget()->GetValueAsFloat() : 1.0;
+    if (!framerate) 
+      {
+      framerate = 1.0;
+      }
     // For now, the image size for the animations cannot be larger than
     // the size of the render window. The problem is that tiling doesn't
     // work with multiple processes.
@@ -1163,10 +1179,11 @@ void vtkPVAnimationManager::SaveAnimation()
 
     widthEntry->Delete();
     heightEntry->Delete();
+    framerateEntry->Delete();
     frame->Delete();
     dlg->Delete();
 
-    this->AnimationScene->SaveImages(fileRoot.c_str(), ext, width, height, 0);
+    this->AnimationScene->SaveImages(fileRoot.c_str(), ext, width, height, framerate);
     view->SetRenderWindowSize(origWidth, origHeight);
     }
 

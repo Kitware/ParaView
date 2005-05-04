@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.24");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.25");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -903,7 +903,6 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event, void* 
         {
         double param = this->TimeLine->GetParameterCursorPosition();
         pvAM->SetCurrentTime(param);
-        pvAM->SetTimeMarker(param);
         }
       }
     }

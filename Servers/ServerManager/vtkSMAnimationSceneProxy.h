@@ -87,7 +87,7 @@ public:
   // Saves the animation as a sequence of images or a movie file.
   // The method is not accessible using property interface.
   // Return 0 on success.
-  int SaveImages(const char* fileRoot, const char* ext, int width, int height);
+  int SaveImages(const char* fileRoot, const char* ext, int width, int height, double framerate);
 
   // Description:
   // Save the geometry of the animation.

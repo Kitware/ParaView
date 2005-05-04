@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.8");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.9");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -164,15 +164,16 @@ void vtkSMAnimationSceneProxy::SaveImages()
 
 //----------------------------------------------------------------------------
 int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot, const char* ext,
-  int width, int height)
+  int width, int height, double framerate)
 {
-  this->SetCurrentTime(0);
+
   if (this->WindowToImageFilter || this->ImageWriter || this->MovieWriter 
     || !this->RenderModuleProxy)
     {
     vtkErrorMacro("Incosistent state. Save aborted.");
     return 1;
     }
+  this->SetCurrentTime(0);
 
   this->RenderModuleProxy->UpdateInformation();
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
@@ -248,9 +249,12 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot, const char* ext,
 
   // Play the animation.
   int oldMode = this->GetPlayMode();
+  double old_framerate = this->GetFrameRate();
   this->SetPlayMode(VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE);
+  this->SetFrameRate(framerate);
   this->Play();
   this->SetPlayMode(oldMode);
+  this->SetFrameRate(old_framerate);
 
   this->WindowToImageFilter->Delete();
   this->WindowToImageFilter = NULL;

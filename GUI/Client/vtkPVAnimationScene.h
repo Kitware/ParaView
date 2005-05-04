@@ -55,8 +55,6 @@ public:
   void LoopCheckButtonCallback();
   void ToolbarLoopCheckButtonCallback();
   void TimeScaleCallback();
-  void FrameRateChangedCallback();
-  void FrameRateChangedKeyReleaseCallback();
   void ToolbarRecordCheckButtonCallback();
   void RecordCheckCallback();
   void SaveAnimationCallback();
@@ -152,7 +150,7 @@ public:
 
 
   void SaveImages(const char* fileRoot, const char* ext, int width, int height, 
-                                         int aspectRatio);
+                                         double framerate);
   void SaveGeometry(const char* filename);
 
   void InvalidateAllGeometries();
@@ -183,9 +181,6 @@ protected:
 
   vtkKWLabel* TimeLabel;
   vtkKWScale* TimeScale;
-
-  vtkKWLabel* FrameRateLabel;
-  vtkKWThumbWheel* FrameRateThumbWheel; 
 
   vtkKWLabel* DurationLabel;
   vtkKWThumbWheel* DurationThumbWheel; 
