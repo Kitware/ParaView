@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.351");
+vtkCxxRevisionMacro(vtkPVApplication, "1.352");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1397,7 +1397,7 @@ void vtkPVApplication::SetSourcesBrowserAlwaysShowName(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::CloseWindow(vtkKWWindow *win)
+int vtkPVApplication::RemoveWindow(vtkKWWindow *win)
 {
   if (this->GetNumberOfWindows() == 1)
     {
@@ -1405,51 +1405,50 @@ void vtkPVApplication::CloseWindow(vtkKWWindow *win)
     this->SetRenderModuleProxy(0);
     }
 
-  this->Superclass::CloseWindow(win);
+  return this->Superclass::RemoveWindow(win);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::DestroyGUI()
 {  
-  this->vtkKWApplication::Exit();
+  this->Superclass::Exit();
   this->InExit = 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::Exit()
+int vtkPVApplication::Exit()
 {  
-  // Avoid recursive exit calls during window destruction.
-  if (this->InExit)
-    {
-    return;
-    }
-  
   // If errors were reported to the output window, return a bad
   // status.
-  if(vtkPVOutputWindow* w =
-     vtkPVOutputWindow::SafeDownCast(vtkOutputWindow::GetInstance()))
+
+  if (vtkPVOutputWindow* w =
+      vtkPVOutputWindow::SafeDownCast(vtkOutputWindow::GetInstance()))
     {
-    if(w->GetErrorOccurred())
+    if (w->GetErrorOccurred())
       {
       this->SetExitStatus(1);
       }
     }
-  
 
-  this->vtkKWApplication::Exit();
+  if (!this->Superclass::Exit())
+    {
+    return 0;
+    }
 
-  if ( this->ProcessModule )
+  if (this->ProcessModule)
     {
     this->ProcessModule->Exit();
     }
 
   // This is a normal exit.  Close trace file here and delete it.
+
   if (this->TraceFile)
     {
     this->TraceFile->close();
     delete this->TraceFile;
     this->TraceFile = NULL;
     }
+
   if (this->TraceFileName)
     {
     unlink(this->TraceFileName);
@@ -1459,8 +1458,8 @@ void vtkPVApplication::Exit()
     this->SaveRuntimeInfoButton->Delete();
     this->SaveRuntimeInfoButton = 0;
     }
+  return 1;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::StartRecordingScript(char *filename)

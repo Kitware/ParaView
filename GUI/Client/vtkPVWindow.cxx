@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.694");
+vtkCxxRevisionMacro(vtkPVWindow, "1.695");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -334,9 +334,22 @@ vtkPVWindow::~vtkPVWindow()
       pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT, stream);
       }
     }
-  this->SetInteractor(0);
 
   this->PrepareForDelete();
+
+  if (this->TraceHelper)
+    {
+    this->TraceHelper->Delete();
+    this->TraceHelper = NULL;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::PrepareForDelete()
+{
+  this->Superclass::PrepareForDelete();
+
+  this->SetInteractor(NULL);
 
   // First delete the interface panels
 
@@ -445,103 +458,7 @@ vtkPVWindow::~vtkPVWindow()
     this->CenterAxesProxy = NULL;
     }
 
-  if (this->TimerLogDisplay)
-    {
-    this->TimerLogDisplay->Delete();
-    this->TimerLogDisplay = NULL;
-    }
-
-  if (this->ErrorLogDisplay)
-    {
-    this->ErrorLogDisplay->Delete();
-    this->ErrorLogDisplay = NULL;
-    }
-
-    if (this->PVColorMaps)
-    {
-    this->PVColorMaps->Delete();
-    this->PVColorMaps = NULL;
-    }
-  
-  if ( this->VolumeAppearanceEditor )
-    {
-    this->VolumeAppearanceEditor->Delete();
-    this->VolumeAppearanceEditor = NULL;
-    }
-
-#ifdef PARAVIEW_USE_LOOKMARKS
-  if(this->PVLookmarkManager)
-    {
-    this->PVLookmarkManager->Delete();
-    this->PVLookmarkManager = NULL;
-    }
-#endif
-
-  if (this->TraceHelper)
-    {
-    this->TraceHelper->Delete();
-    this->TraceHelper = NULL;
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::UnRegister(vtkObjectBase *o)
-{
-  int nb_children = this->GetNumberOfChildren();
-  if (nb_children && 
-      this->ReferenceCount == nb_children + 1 + 1 &&
-      this->MainView != o &&
-      !this->HasChild((vtkKWWidget*)(o)))
-    {
-    this->RemoveAllChildren();
-    this->MainView->SetParentWindow(NULL);
-    }
-  
-  this->vtkKWWidget::UnRegister(o);
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CloseNoPrompt()
-{
-  if (this->TimerLogDisplay )
-    {
-    this->TimerLogDisplay->SetMasterWindow(NULL);
-    this->TimerLogDisplay->Delete();
-    this->TimerLogDisplay = NULL;
-    }
-
-  if (this->ErrorLogDisplay )
-    {
-    this->ErrorLogDisplay->SetMasterWindow(NULL);
-    this->ErrorLogDisplay->Delete();
-    this->ErrorLogDisplay = NULL;
-    }
-
-#ifdef PARAVIEW_USE_LOOKMARKS
-  if (this->PVLookmarkManager )
-    {
-    this->PVLookmarkManager->SetMasterWindow(NULL);
-    this->PVLookmarkManager->Delete();
-    this->PVLookmarkManager = NULL;
-    }
-#endif
-
-  this->MainView->Close();
-  this->vtkKWWindow::CloseNoPrompt();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::PrepareForDelete()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = 0;
-  if(pvApp)
-    {
-    pm = pvApp->GetProcessModule();
-    }
-  
-  if (pvApp)
+  if (this->GetApplication())
     {
     int state;
     if (this->ResetCameraButton)
@@ -699,7 +616,17 @@ void vtkPVWindow::PrepareForDelete()
 
   if (this->MainView)
     {
+    this->MainView->Close();
+    this->MainView->SetParentWindow(NULL);
     this->MainView->Delete();
+    //this->MainView = NULL;
+    }
+
+  this->DeleteAllSources();
+  if (this->SourceLists)
+    {
+    this->SourceLists->Delete();
+    this->SourceLists = NULL;
     }
 
   if (this->GetApplication())
@@ -745,19 +672,29 @@ void vtkPVWindow::PrepareForDelete()
     this->LowerToolbars = NULL;
     }
 
-  if (this->SourceLists)
+  if (this->TimerLogDisplay )
     {
-    this->SourceLists->Delete();
-    this->SourceLists = 0;
+    this->TimerLogDisplay->SetMasterWindow(NULL);
+    this->TimerLogDisplay->Delete();
+    this->TimerLogDisplay = NULL;
     }
 
-  if (this->TraceHelper)
+  if (this->ErrorLogDisplay )
     {
-    this->TraceHelper->Delete();
-    this->TraceHelper = NULL;
+    this->ErrorLogDisplay->SetMasterWindow(NULL);
+    this->ErrorLogDisplay->Delete();
+    this->ErrorLogDisplay = NULL;
     }
+
+#ifdef PARAVIEW_USE_LOOKMARKS
+  if (this->PVLookmarkManager )
+    {
+    this->PVLookmarkManager->SetMasterWindow(NULL);
+    this->PVLookmarkManager->Delete();
+    this->PVLookmarkManager = NULL;
+    }
+#endif
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
@@ -4851,7 +4788,6 @@ void vtkPVWindow::UpdateToolbarState()
       this->LowerToolbars->Unpack();
       }
     }
-
 }
 
 //----------------------------------------------------------------------------

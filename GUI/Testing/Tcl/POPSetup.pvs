@@ -1,4 +1,5 @@
 $Application ExitAfterLoadScriptOn
+$Application PromptBeforeExitOff
 
     if {[info exists argc]} { 
         set argcm1 [expr $argc - 1]

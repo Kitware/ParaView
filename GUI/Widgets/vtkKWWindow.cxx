@@ -40,14 +40,14 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.230");
+vtkCxxRevisionMacro(vtkKWWindow, "1.231");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
 
 int vtkKWWindowCommand(ClientData cd, Tcl_Interp *interp,
-                             int argc, char *argv[]);
+                       int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkKWWindow::vtkKWWindow()
@@ -67,7 +67,6 @@ vtkKWWindow::vtkKWWindow()
   this->ToolbarsMenu          = NULL; 
   this->MenuBarSeparatorFrame = vtkKWFrame::New();
   this->MiddleFrame           = vtkKWSplitFrame::New();
-  this->ViewFrame             = vtkKWFrame::New();
 
   this->StatusFrameSeparator  = vtkKWFrame::New();
   this->StatusFrame           = vtkKWFrame::New();
@@ -83,8 +82,6 @@ vtkKWWindow::vtkKWWindow()
 
   this->Notebook              = vtkKWNotebook::New();
 
-  this->ExitDialogWidget      = NULL;
-
   this->TclInteractor         = NULL;
 
   this->CommandFunction       = vtkKWWindowCommand;
@@ -92,30 +89,23 @@ vtkKWWindow::vtkKWWindow()
   this->PrintTargetDPI        = 100;
   this->SupportHelp           = 1;
   this->SupportPrint          = 1;
-  this->PromptBeforeClose     = 1;
-  this->ScriptExtension       = 0;
-  this->ScriptType            = 0;
-
-  this->InExit                = 0;
+  this->PromptBeforeClose     = 0;
 
   this->MostRecentFilesManager = vtkKWMostRecentFilesManager::New();
 
   this->SetWindowClass("KitwareWidget");
+
+  this->ScriptExtension       = NULL;
   this->SetScriptExtension(".tcl");
+
+  this->ScriptType            = NULL;
   this->SetScriptType("Tcl");
 }
 
 //----------------------------------------------------------------------------
 vtkKWWindow::~vtkKWWindow()
 {
-  if (this->TclInteractor)
-    {
-    this->TclInteractor->Delete();
-    this->TclInteractor = NULL;
-    }
-
-  this->Notebook->Delete();
-  this->SetPropertiesParent(NULL);
+  this->PrepareForDelete();
 
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION <= 2)
   // This "hack" is here to get around a Tk bug ( Bug: 3402 )
@@ -127,44 +117,143 @@ vtkKWWindow::~vtkKWWindow()
     }
 #endif
 
-  this->Menu->Delete();
-  this->PageMenu->Delete();
-  this->FileMenu->Delete();
-  this->HelpMenu->Delete();
-  this->Toolbars->Delete();
-  this->MenuBarSeparatorFrame->Delete();
-  this->ViewFrame->Delete();
-  this->MiddleFrame->Delete();
-  this->StatusFrameSeparator->Delete();
-  this->StatusFrame->Delete();
-  this->StatusImage->Delete();
-  this->StatusLabel->Delete();
-  this->ProgressFrame->Delete();
-  this->ProgressGauge->Delete();
-  this->TrayFrame->Delete();
-  this->TrayImageError->Delete();
-  
+  if (this->TclInteractor)
+    {
+    this->TclInteractor->Delete();
+    this->TclInteractor = NULL;
+    }
+
+  if (this->Notebook)
+    {
+    this->Notebook->Delete();
+    this->Notebook = NULL;
+    }
+
+  this->SetPropertiesParent(NULL);
+
+  if (this->Menu)
+    {
+    this->Menu->Delete();
+    this->Menu = NULL;
+    }
+
+  if (this->PageMenu)
+    {
+    this->PageMenu->Delete();
+    this->PageMenu = NULL;
+    }
+
+  if (this->FileMenu)
+    {
+    this->FileMenu->Delete();
+    this->FileMenu = NULL;
+    }
+
+  if (this->HelpMenu)
+    {
+    this->HelpMenu->Delete();
+    this->HelpMenu = NULL;
+    }
+
+  if (this->Toolbars)
+    {
+    this->Toolbars->Delete();
+    this->Toolbars = NULL;
+    }
+
+  if (this->MenuBarSeparatorFrame)
+    {
+    this->MenuBarSeparatorFrame->Delete();
+    this->MenuBarSeparatorFrame = NULL;
+    }
+
+  if (this->MiddleFrame)
+    {
+    this->MiddleFrame->Delete();
+    this->MiddleFrame = NULL;
+    }
+
+  if (this->StatusFrameSeparator)
+    {
+    this->StatusFrameSeparator->Delete();
+    this->StatusFrameSeparator = NULL;
+    }
+
+  if (this->StatusFrame)
+    {
+    this->StatusFrame->Delete();
+    this->StatusFrame = NULL;
+    }
+
+  if (this->StatusImage)
+    {
+    this->StatusImage->Delete();
+    this->StatusImage = NULL;
+    }
+
+  if (this->StatusLabel)
+    {
+    this->StatusLabel->Delete();
+    this->StatusLabel = NULL;
+    }
+
+  if (this->ProgressFrame)
+    {
+    this->ProgressFrame->Delete();
+    this->ProgressFrame = NULL;
+    }
+
+  if (this->ProgressGauge)
+    {
+    this->ProgressGauge->Delete();
+    this->ProgressGauge = NULL;
+    }
+
+  if (this->TrayFrame)
+    {
+    this->TrayFrame->Delete();
+    this->TrayFrame = NULL;
+    }
+
+  if (this->TrayImageError)
+    {
+    this->TrayImageError->Delete();
+    this->TrayImageError = NULL;
+    }
+
   if (this->EditMenu)
     {
     this->EditMenu->Delete();
+    this->EditMenu = NULL;
     }
+
   if (this->ViewMenu)
     {
     this->ViewMenu->Delete();
+    this->ViewMenu = NULL;
     }
+
   if (this->WindowMenu)
     {
     this->WindowMenu->Delete();
+    this->WindowMenu = NULL;
     }
+
   if (this->ToolbarsMenu)
     {
     this->ToolbarsMenu->Delete();
     this->ToolbarsMenu = NULL;
     }
-  this->SetStatusImageName(0);
-  this->SetScriptExtension(0);
-  this->SetScriptType(0);
-  this->MostRecentFilesManager->Delete();
+
+  if (this->MostRecentFilesManager)
+    {
+    this->MostRecentFilesManager->Delete();
+    this->MostRecentFilesManager = NULL;
+    }
+
+  this->SetStatusImageName(NULL);
+  this->SetScriptExtension(NULL);
+  this->SetScriptType(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -291,14 +380,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->Script("pack %s -side top -fill both -expand t",
                this->MiddleFrame->GetWidgetName());
-
-  // Split frame : view frame
-
-  this->ViewFrame->SetParent(this->MiddleFrame->GetFrame2());
-  this->ViewFrame->Create(app, "");
-
-  this->Script("pack %s -side right -fill both -expand yes",
-               this->ViewFrame->GetWidgetName());
 
   // Restore Window Geometry
 
@@ -444,10 +525,28 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWWindow::PrepareForDelete()
+{
+  // Have reference to this object:
+  // this->Menu
+  // this->MenuBarSeparatorFrame
+  // this->Toolbars
+  // this->MiddleFrame
+  // this->StatusFrameSeparator
+  // this->StatusFrame
+
+  if (this->TclInteractor )
+    {
+    this->TclInteractor->SetMasterWindow(NULL);
+    this->TclInteractor->Delete();
+    this->TclInteractor = NULL;
+    }
+}
+
+//----------------------------------------------------------------------------
 vtkKWFrame* vtkKWWindow::GetViewFrame()
 {
-  return this->ViewFrame;
-  //return this->MiddleFrame ? this->MiddleFrame->GetFrame2() : NULL;
+  return this->MiddleFrame ? this->MiddleFrame->GetFrame2() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -470,59 +569,42 @@ void vtkKWWindow::CreateDefaultPropertiesParent()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::Exit()
-{  
-  if (this->GetApplication()->GetDialogUp())
-    {
-    this->Script("bell");
-    return;
-    }
-  if (!this->InExit)
-    {
-    this->InExit = 1;
-    }
-  else
-    {
-    return;
-    }
-  if ( this->ExitDialog() )
-    {
-    this->PromptBeforeClose = 0;
-    this->GetApplication()->Exit();
-    }
-  else
-    {
-    this->InExit = 0;
-    }
+int vtkKWWindow::DisplayCloseDialog()
+{
+  vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
+  dialog->SetStyleToYesNo();
+  dialog->SetMasterWindow(this);
+  dialog->SetOptions(
+    vtkKWMessageDialog::QuestionIcon | 
+    vtkKWMessageDialog::Beep | 
+    vtkKWMessageDialog::YesDefault);
+  dialog->Create(this->GetApplication(), NULL);
+  dialog->SetText("Are you sure you want to close this window?");
+  dialog->SetTitle("Close");
+  int ret = dialog->Invoke();
+  dialog->Delete();
+  return ret;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::Close()
+int vtkKWWindow::Close()
 {
+  // If a dialog is still up, complain and bail
+  // This should be fixed, since we don't know here if the dialog that is
+  // up is something that was created by this instance, and not by another
+  // window instance (in the later case, it would be safe to close)
+
   if (this->GetApplication()->GetDialogUp())
     {
     this->Script("bell");
-    return;
+    return 0;
     }
-  if (this->PromptBeforeClose &&
-      this->GetApplication()->GetNumberOfWindows() <= 1)
-    {
-    if ( !this->ExitDialog() )
-      {
-      return;
-      }
-    }
-  this->CloseNoPrompt();
-}
 
-//----------------------------------------------------------------------------
-void vtkKWWindow::CloseNoPrompt()
-{
-  if (this->TclInteractor )
+  // Prompt confirmation if needed
+
+  if (this->PromptBeforeClose && !this->DisplayCloseDialog())
     {
-    this->TclInteractor->SetMasterWindow(NULL);
-    this->TclInteractor->Delete();
-    this->TclInteractor = NULL;
+    return 0;
     }
 
   // Save its geometry
@@ -532,9 +614,10 @@ void vtkKWWindow::CloseNoPrompt()
     this->SaveWindowGeometry();
     }
 
-  // Close this window in the application. The
-  // application will exit if there are no more windows.
-  this->GetApplication()->CloseWindow(this);
+  // Remove this window from the application. 
+  // It is likely that the application will exit if there are no more windows.
+
+  return this->GetApplication()->RemoveWindow(this);
 }
 
 //----------------------------------------------------------------------------
@@ -1037,49 +1120,6 @@ int vtkKWWindow::GetHelpMenuIndex()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWindow::ExitDialog()
-{
-  //this->GetApplication()->GetBalloonHelpWidget(0);
-  if ( this->ExitDialogWidget )
-    {
-    return 1;
-    }
-  ostrstream title;
-  title << "Exit " << this->GetApplication()->GetPrettyName() 
-        << ends;
-  ostrstream str;
-  str << "Are you sure you want to exit " 
-      << this->GetApplication()->GetPrettyName() << "?" << ends;
-  
-  vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
-  this->ExitDialogWidget = dlg2;
-  dlg2->SetStyleToYesNo();
-  dlg2->SetMasterWindow(this);
-  dlg2->SetOptions(
-     vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
-     vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault );
-  dlg2->SetDialogName(VTK_KW_EXIT_DIALOG_NAME);
-  dlg2->Create(this->GetApplication(),"");
-  dlg2->SetText( str.str() );
-  dlg2->SetTitle( title.str() );
-  int ret = dlg2->Invoke();
-  this->ExitDialogWidget = 0;
-  dlg2->Delete();
-
-  str.rdbuf()->freeze(0);
-  title.rdbuf()->freeze(0);
- 
-  vtkKWApplicationSettingsInterface *asi =  
-    this->GetApplicationSettingsInterface();
-  if (asi)
-    {
-    asi->Update();
-    }
- 
-  return ret;
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWindow::SaveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
 {
   //  "OpenDirectory"
@@ -1261,6 +1301,23 @@ void vtkKWWindow::InternalProcessEvent(vtkObject*, unsigned long,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWWindow::Update()
+{
+  // Update the whole interface
+
+  if (this->GetUserInterfaceManager())
+    {
+    // Redundant Update() here, since we call UpdateEnableState(), which as 
+    // a side effect will update each panel (see UpdateEnableState())
+    // this->GetUserInterfaceManager()->Update();
+    }
+
+  // Make sure everything is enable/disable accordingly
+
+  this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWindow::UpdateToolbarState()
 {
   if (!this->Toolbars)
@@ -1438,7 +1495,6 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SupportHelp: " << this->GetSupportHelp() << endl;
   os << indent << "SupportPrint: " << this->GetSupportPrint() << endl;
   os << indent << "StatusFrame: " << this->GetStatusFrame() << endl;
-  os << indent << "ViewFrame: " << this->GetViewFrame() << endl;
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
   os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
   os << indent << "Toolbars: " << this->GetToolbars() << endl;

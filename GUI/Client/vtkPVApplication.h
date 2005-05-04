@@ -50,7 +50,7 @@ public:
   static vtkPVApplication* New();
   vtkTypeRevisionMacro(vtkPVApplication,vtkKWApplication);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
   // Description:
   // Parses the command line arguments and modifies the applications
   // ivars appropriately.
@@ -108,12 +108,15 @@ public:
   int AcceptEvaluation();
 
   // Description:
-  // This method is invoked when a window closes
-  virtual void CloseWindow(vtkKWWindow *);
+  // Add/Close a window to/of this application.
+  // Return 1 if successful, 0 otherwise
+  virtual int RemoveWindow(vtkKWWindow *);
 
   // Description:
-  // We need to kill the slave processes
-  virtual void Exit();
+  // This method is invoked when the user exits the app
+  // Return 1 if the app exited successfully, 0 otherwise (for example,
+  // if some dialogs are still up, or the user did not confirm, etc).
+  virtual int Exit();
 
   // Description:
   // Destroy the main window and associated objects without exiting.

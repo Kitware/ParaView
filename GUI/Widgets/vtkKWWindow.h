@@ -54,15 +54,20 @@ public:
   // Create the window
   virtual void Create(vtkKWApplication *app, const char *args);
 
-  // Description::
-  // Exit this application closing all windows.
-  virtual void Exit();
+  // Description:
+  // Close this window, possibly prompting the user.
+  // Note that the current vtkKWApplication implementation will
+  // exit the application if no more windows are open.
+  // Return 1 if the window closed successfully, 0 otherwise (for example,
+  // if some dialogs are still up, or the user did not confirm, etc).
+  virtual int Close();
 
-  // Description::
-  // Close this window, possibly exiting the application if no more
-  // windows are open.
-  virtual void Close();
-  virtual void CloseNoPrompt();
+  // Description:
+  // Set/Get if a confirmation dialog should be displayed before a
+  // window is closed. Default to false.
+  vtkSetMacro(PromptBeforeClose, int);
+  vtkGetMacro(PromptBeforeClose, int);
+  vtkBooleanMacro(PromptBeforeClose, int);
 
   // Description:
   // Load and evaluate a Tcl based script. 
@@ -223,11 +228,6 @@ public:
   // Override superclass to use app name if the title was not set
   virtual char* GetTitle();
 
-  //Description:
-  // Set/Get PromptBeforeClose
-  vtkSetMacro(PromptBeforeClose, int);
-  vtkGetMacro(PromptBeforeClose, int);
-
   // Description:
   // The extension used in LoadScript. Default is .tcl.
   vtkSetStringMacro(ScriptExtension);
@@ -288,9 +288,16 @@ public:
   static void ProcessEvent(vtkObject *, unsigned long, void *, void *);
 
   // Description:
+  // Update the UI. This will call:
+  //   UpdateToolbarState
+  //   UpdateEnableState 
+  //   UpdateMenuState
+  //   Update on all panels belonging to the GetUserInterfaceManager, if any
+  virtual void Update();
+
+  // Description:
   // Update the toolbar state
   virtual void UpdateToolbarState();
-
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -303,8 +310,10 @@ public:
   virtual void UpdateMenuState();
 
   // Description:
-  // Get rid of all references we own.
-  virtual void PrepareForDelete() {}
+  // Deallocate/delete/reparent some internal objects in order to solve
+  // reference loops that would prevent this instance from being deleted.
+  virtual void PrepareForDelete();
+
   // Description:
   // Callbacks.
   // Process the click on the error icon.
@@ -316,6 +325,11 @@ protected:
   ~vtkKWWindow();
 
   // Description:
+  // Display the close dialog.
+  // Return 1 if the user wants to close the window, 0 otherwise
+  virtual int DisplayCloseDialog();
+
+  // Description:
   // Add the toolbar to the menu alone.
   void AddToolbarToMenu(vtkKWToolbar* toolbar, const char* name, 
     vtkKWWidget* target, const char* command);
@@ -325,10 +339,6 @@ protected:
   // Recent files
 
   vtkKWMostRecentFilesManager *MostRecentFilesManager;
-
-  // Description:
-  // Display the exit dialog.
-  int ExitDialog();
 
   // Description:
   // Process events
@@ -370,12 +380,10 @@ protected:
   virtual void CreateStatusImage() {};
 
   vtkKWWidget *PropertiesParent;
-  vtkKWFrame *ViewFrame;
   vtkKWToolbarSet *Toolbars;
 
   vtkKWFrame *MenuBarSeparatorFrame;
 
-  vtkKWMessageDialog *ExitDialogWidget;
 
   float PrintTargetDPI;
   char  *ScriptExtension;
@@ -383,7 +391,6 @@ protected:
   int   SupportHelp;
   int   SupportPrint;
   int   PromptBeforeClose;
-  int   InExit;
 
   vtkKWTclInteractor *TclInteractor;
 

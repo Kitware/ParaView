@@ -1,5 +1,3 @@
-$Application ExitAfterLoadScriptOn
-
 set kw(vtkTemp5) [$Application GetMainWindow]
 set kw(vtkTemp24) [$kw(vtkTemp5) GetMainView]
 

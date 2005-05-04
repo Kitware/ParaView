@@ -1,4 +1,5 @@
 $Application ExitAfterLoadScriptOn
+$Application PromptBeforeExitOff
 
 proc ParseCommandLine {view argv argc} {
    global DataDir rmui TempDir

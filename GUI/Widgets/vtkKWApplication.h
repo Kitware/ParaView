@@ -35,6 +35,8 @@ class vtkKWWindow;
 class vtkKWText;
 class vtkKWApplicationInternals;
 
+#define VTK_KW_EXIT_DIALOG_NAME           "ExitApplication"
+
 class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
 public:
@@ -57,7 +59,16 @@ public:
 
   // Description:
   // This method is invoked when the user exits the app
-  virtual void Exit();
+  // Return 1 if the app exited successfully, 0 otherwise (for example,
+  // if some dialogs are still up, or the user did not confirm, etc).
+  virtual int Exit();
+
+  // Description:
+  // Set/Get if a confirmation dialog should be displayed before the
+  // application is exited.
+  vtkSetMacro(PromptBeforeExit, int);
+  vtkGetMacro(PromptBeforeExit, int);
+  vtkBooleanMacro(PromptBeforeExit, int);
 
   // Description:
   // Set/Get the value returned by the application at exit.
@@ -70,12 +81,13 @@ public:
   vtkGetMacro(InExit, int);
 
   // Description:
-  // Add/Close a window to this application.
+  // Add/Close a window to/of this application.
   // Note that AddWindow() will increase the reference count of the window
-  // that is added, CloseWindow() will decrease it. Once the last window is
+  // that is added, RemoveWindow() will decrease it. Once the last window is
   // closed, Exit() is called.
-  virtual void AddWindow(vtkKWWindow *w);
-  virtual void CloseWindow(vtkKWWindow *);
+  // Return 1 if successful, 0 otherwise
+  virtual int AddWindow(vtkKWWindow *w);
+  virtual int RemoveWindow(vtkKWWindow *);
 
   // Description:
   // Get the number of windows, retrieve a window
@@ -352,11 +364,18 @@ protected:
   char *HelpDialogStartingPage;
 
   // Description:
+  // Display the exit dialog.
+  // Optionally provide a master window this dialog should be the slave of.
+  // Return 1 if the user wants to exit, 0 otherwise
+  virtual int DisplayExitDialog(vtkKWWindow *master);
+
+  // Description:
   // Value that is set after exit (status), flag stating that 
   // Exit was called, flag stating if application should exit after load script
   int ExitStatus;
   int InExit;
   int ExitAfterLoadScript;
+  int PromptBeforeExit;
 
   // Description:
   // Number of dialog that are up. See Un/RegisterDialogUp().
@@ -418,6 +437,11 @@ protected:
   // Try to find the path to the online updater (for example, WiseUpdt.exe)
   // and output that path to the ostream passed as parameter.
   virtual int GetCheckForUpdatesPath(ostream &path);
+
+  // Description:
+  // Deallocate/delete/reparent some internal objects in order to solve
+  // reference loops that would prevent this instance from being deleted.
+  virtual void PrepareForDelete();
 
   // PIMPL Encapsulation for STL containers
 

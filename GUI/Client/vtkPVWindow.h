@@ -558,10 +558,6 @@ public:
   void ShowHorizontalPane() { this->SetHorizontalPaneVisibility(1); }
   void ToggleHorizontalPaneVisibilityCallback();
 
-  // Description::
-  // Override Unregister since widgets have loops.
-  virtual void UnRegister(vtkObjectBase *o);
-
   // Description:
   // Access to the vtkKWToolbarSet for the Lower toolbars.
   vtkGetObjectMacro(LowerToolbars, vtkKWToolbarSet);
@@ -654,8 +650,10 @@ protected:
   // Separating out creation of the main view.
   void CreateMainView(vtkPVApplication *pvApp);
   
-  // Get rid of all references we own.
-  void PrepareForDelete();
+  // Description:
+  // Deallocate/delete/reparent some internal objects in order to solve
+  // reference loops that would prevent this instance from being deleted.
+  virtual void PrepareForDelete();
 
   vtkPVSource *CurrentPVSource;
 
@@ -671,11 +669,6 @@ protected:
 
   vtkPVTimerLogDisplay *TimerLogDisplay;
   vtkPVErrorLogDisplay *ErrorLogDisplay;
-
-  // Description:
-  // This method gives the window an opportunity to get rid
-  // of circular references before closing.
-  virtual void CloseNoPrompt();
 
   // Extensions of files that loaded readers recognize.
   char *FileExtensions;

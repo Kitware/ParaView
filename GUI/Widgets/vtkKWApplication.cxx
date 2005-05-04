@@ -56,7 +56,7 @@ EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.199");
+vtkCxxRevisionMacro(vtkKWApplication, "1.200");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -112,6 +112,7 @@ vtkKWApplication::vtkKWApplication()
   this->InExit     = 0;
   this->ExitStatus = 0;
   this->ExitAfterLoadScript = 0;
+  this->PromptBeforeExit = 1;
 
   this->DialogUp = 0;
 
@@ -156,39 +157,21 @@ vtkKWApplication::vtkKWApplication()
 //----------------------------------------------------------------------------
 vtkKWApplication::~vtkKWApplication()
 {
+  this->PrepareForDelete();
+
   delete this->Internals;
-
-  this->SetLimitedEditionModeName(NULL);
-
-  if (this->AboutDialogImage)
-    {
-    this->AboutDialogImage->Delete();
-    this->AboutDialogImage = NULL;
-    }
-
-  if (this->AboutRuntimeInfo)
-    {
-    this->AboutRuntimeInfo->Delete();
-    this->AboutRuntimeInfo = NULL;
-    }
-
-  if (this->AboutDialog)
-    {
-    this->AboutDialog->Delete();
-    this->AboutDialog = NULL;
-    }
+  this->Internals = NULL;
 
   this->MainInterp = NULL;
   vtkObjectFactory::UnRegisterAllFactories();
 
+  this->SetLimitedEditionModeName(NULL);
   this->SetName(NULL);
   this->SetVersionName(NULL);
   this->SetReleaseName(NULL);
   this->SetPrettyName(NULL);
   this->SetInstallationDirectory(NULL);
-
   this->SetEmailFeedbackAddress(NULL);
-
   this->SetHelpDialogStartingPage(NULL);
 
   if (this->RegistryHelper )
@@ -196,79 +179,11 @@ vtkKWApplication::~vtkKWApplication()
     this->RegistryHelper->Delete();
     this->RegistryHelper = NULL;
     }
-
-  if (this->BalloonHelpManager )
-    {
-    this->BalloonHelpManager->Delete();
-    this->BalloonHelpManager = NULL;
-    }
-}
-    
-//----------------------------------------------------------------------------
-void vtkKWApplication::SetApplication(vtkKWApplication*) 
-{ 
-  vtkErrorMacro( << "Do not set the Application on an Application" << endl); 
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::AddWindow(vtkKWWindow *win)
+void vtkKWApplication::PrepareForDelete()
 {
-  if (this->Internals)
-    {
-    this->Internals->Windows.push_back(win);
-    win->Register(this);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::CloseWindow(vtkKWWindow *win)
-{
-  if (this->Internals && win)
-    {
-    win->PrepareForDelete();
-    this->Internals->Windows.erase(
-      kwsys_stl::find(this->Internals->Windows.begin(),
-                      this->Internals->Windows.end(),
-                      win));
-    win->UnRegister(this);
-    if (this->GetNumberOfWindows() < 1)
-      {
-      this->Exit();
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-vtkKWWindow* vtkKWApplication::GetNthWindow(int rank)
-{
-  if (this->Internals && rank >= 0 && rank < this->GetNumberOfWindows())
-    {
-    return this->Internals->Windows[rank];
-    }
-  return NULL;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWApplication::GetNumberOfWindows()
-{
-  if (this->Internals)
-    {
-    return this->Internals->Windows.size();
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWApplication::Exit()
-{
-  // Avoid a recursive exit.
-
-  if (this->InExit)
-    {
-    return;
-    }
-  this->InExit = 1;
-
   if (this->AboutDialogImage)
     {
     this->AboutDialogImage->Delete();
@@ -298,8 +213,110 @@ void vtkKWApplication::Exit()
     this->BalloonHelpManager->Delete();
     this->BalloonHelpManager = NULL;
     }
+}
+    
+//----------------------------------------------------------------------------
+void vtkKWApplication::SetApplication(vtkKWApplication*) 
+{ 
+  vtkErrorMacro( << "Do not set the Application on an Application" << endl); 
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::AddWindow(vtkKWWindow *win)
+{
+  if (this->Internals)
+    {
+    this->Internals->Windows.push_back(win);
+    win->Register(this);
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::RemoveWindow(vtkKWWindow *win)
+{
+  // If this is the last window, go straight to Exit.
+  // This will give the app a chance to ask the user for confirmation.
+  // It is likely that this method has been called by vtkKWWindow::Close().
+  // In that case, Exit() will call vtkKWWindow::Close() *again*, and we
+  // will be back here, but this won't infinite loop since this->Exit()
+  // will return false (as we are already "exiting", check this->InExit)
+
+  if (this->GetNumberOfWindows() <= 1 && this->Exit())
+    {
+    return 1;
+    }
+
+  if (this->Internals && win)
+    {
+    win->PrepareForDelete();
+
+    vtkKWApplicationInternals::WindowsContainerIterator it = 
+      kwsys_stl::find(this->Internals->Windows.begin(),
+                      this->Internals->Windows.end(),
+                      win);
+    win->UnRegister(this);
+    this->Internals->Windows.erase(it);
+    return 1;
+    }
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkKWWindow* vtkKWApplication::GetNthWindow(int rank)
+{
+  if (this->Internals && rank >= 0 && rank < this->GetNumberOfWindows())
+    {
+    return this->Internals->Windows[rank];
+    }
+  return NULL;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::GetNumberOfWindows()
+{
+  if (this->Internals)
+    {
+    return this->Internals->Windows.size();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::Exit()
+{
+  // Avoid a recursive exit.
+
+  if (this->InExit)
+    {
+    return 0;
+    }
+
+  // If a dialog is still up, complain and bail
+
+  if (this->GetDialogUp())
+    {
+    this->Script("bell");
+    return 0;
+    }
+
+  // Prompt confirmation if needed
+
+  if (this->PromptBeforeExit && !this->DisplayExitDialog(NULL))
+    {
+    return 0;
+    }
+
+  this->InExit = 1;
+
+  this->PrepareForDelete();
 
   // Close all windows
+  // This loop might be a little dangerous if a window never closes...
+  // We could loop over the given number of window, and test if there
+  // are still windows left at the end (= error)
 
   while (this->GetNumberOfWindows())
     {
@@ -311,7 +328,7 @@ void vtkKWApplication::Exit()
       }
     }
 
-  return;
+  return 1;
 }
     
 //----------------------------------------------------------------------------
@@ -580,6 +597,43 @@ void vtkKWApplication::GetApplicationSettingsFromRegistry()
 void vtkKWApplication::DoOneTclEvent()
 {
   Tcl_DoOneEvent(0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::DisplayExitDialog(vtkKWWindow *master)
+{
+  kwsys_stl::string title = "Exit ";
+  title += this->GetPrettyName();
+
+  kwsys_stl::string msg = "Are you sure you want to exit ";
+  msg += this->GetPrettyName();
+  msg += "?";
+  
+  vtkKWMessageDialog *dialog = vtkKWMessageDialog::New();
+  dialog->SetStyleToYesNo();
+  dialog->SetMasterWindow(master);
+  dialog->SetOptions(
+    vtkKWMessageDialog::QuestionIcon | 
+    vtkKWMessageDialog::RememberYes |
+    vtkKWMessageDialog::Beep | 
+    vtkKWMessageDialog::YesDefault);
+  dialog->SetDialogName(VTK_KW_EXIT_DIALOG_NAME);
+  dialog->Create(this, NULL);
+  dialog->SetText(msg.c_str());
+  dialog->SetTitle(title.c_str());
+
+  int ret = dialog->Invoke();
+  dialog->Delete();
+
+  // This UI interface usually displays a checkbox offering the choice
+  // to prompt for exit or not. Update that UI.
+
+  for (int i = 0; i < this->GetNumberOfWindows(); i++)
+    {
+    this->GetNthWindow(i)->Update();
+    }
+
+  return ret;
 }
 
 //----------------------------------------------------------------------------
@@ -935,6 +989,7 @@ int vtkKWApplication::LoadScript(const char* filename)
     }
   if (this->ExitAfterLoadScript)
     {
+    this->SetPromptBeforeExit(0);
     this->Exit();
     }
   return res;
@@ -1427,6 +1482,7 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "HasSplashScreen: " << (this->HasSplashScreen ? "on":"off") << endl;
   os << indent << "ShowSplashScreen: " << (this->ShowSplashScreen ? "on":"off") << endl;
+  os << indent << "PromptBeforeExit: " << (this->GetPromptBeforeExit() ? "on":"off") << endl;
   os << indent << "InstallationDirectory: " 
      << (this->InstallationDirectory ? InstallationDirectory : "None") << endl;
   os << indent << "SaveWindowGeometry: " 
