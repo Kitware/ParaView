@@ -42,7 +42,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.15");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.16");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -115,6 +115,7 @@ vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
 
   this->TitleLabelLabel = vtkKWLabel::New();
   this->TitleLabel = vtkKWLabel::New();
+  this->InterpolationValid = 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -238,12 +239,12 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->TypeImage->SetParent(this->PropertiesFrame);
   this->TypeImage->Create(app, "-relief flat");
   this->TypeImage->SetBalloonHelpString("Specify the type of interpolation "
-    "following the active key frame.");
+    "starting at the active key frame.");
   
   this->TypeMenuButton->SetParent(this->PropertiesFrame);
   this->TypeMenuButton->Create(app, "-image PVToolbarPullDownArrow -relief flat");
   this->TypeMenuButton->SetBalloonHelpString("Specify the type of interpolation "
-    "following the active key frame.");
+    "starting at the active key frame.");
   this->TypeMenuButton->IndicatorOff();
 
   this->BuildTypeMenu();
@@ -561,6 +562,11 @@ void vtkPVVerticalAnimationInterface::ShowKeyFrame(int id)
       {
       pvKeyFrame->SetTimeMaximumBound(next->GetKeyTime());
       }
+    this->InterpolationValid = 1;
+    }
+  else
+    {
+    this->InterpolationValid = 0;// last key frame does not use Interpolation.
     }
   pvKeyFrame->PrepareForDisplay();
   this->UpdateTypeImage(pvKeyFrame);
@@ -623,7 +629,10 @@ void vtkPVVerticalAnimationInterface::UpdateEnableState()
     this->CacheGeometryCheck->SetEnabled(
       !this->EnableCacheCheckButton ? 0 : this->GetEnabled());
     }
-}
+  this->TypeMenuButton->SetEnabled(
+    !this->InterpolationValid ? 0 : this->GetEnabled());
+  this->TypeImage->SetEnabled(
+    !this->InterpolationValid ? 0 : this->GetEnabled());}
 
 //-----------------------------------------------------------------------------
 void vtkPVVerticalAnimationInterface::SaveState(ofstream* )

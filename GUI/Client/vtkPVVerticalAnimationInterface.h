@@ -121,6 +121,9 @@ protected:
 
   int EnableCacheCheckButton;
   int CacheGeometry;
+  int InterpolationValid; 
+    // flag indicating if the Interpolation should be enabled for the
+    // current key frame. It is disabled for the last key frame.
 
   //BTX
   friend class vtkPVVerticalAnimationInterfaceObserver;
