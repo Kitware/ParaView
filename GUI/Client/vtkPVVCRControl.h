@@ -14,7 +14,11 @@
 =========================================================================*/
 // .NAME vtkPVVCRControl - Toolbar for the VCR control.
 // .SECTION Description
-// Toolbar for the vcr buttons.
+// Toolbar for the vcr buttons. This control has 3 modes.
+// PLAYBACK :- only buttons for playback are shown.
+// RECORD:- only buttons for recording are shown.
+// BOTH:- both playback and recording buttons are shown.
+// Note that the mode must be set before calling Create.
 
 #ifndef __vtkPVVCRControl_h
 #define __vtkPVVCRControl_h
@@ -30,7 +34,9 @@ public:
   static vtkPVVCRControl* New();
   vtkTypeRevisionMacro(vtkPVVCRControl, vtkKWToolbar);
   void PrintSelf(ostream& os, vtkIndent indent);
- 
+
+  // Description:
+  // Set the callbacks.
   void SetPlayCommand(vtkKWObject* calledObject, const char* commandString);
   void SetStopCommand(vtkKWObject* calledObject, const char* commandString);
   void SetGoToBeginningCommand(vtkKWObject* calledObject, const char* commandString);
@@ -45,6 +51,8 @@ public:
   virtual void Create(vtkKWApplication* app);
   virtual void UpdateEnableState();
 
+  // Description:
+  // Get/Set if animation is Playing.
   vtkSetMacro(InPlay, int);
   vtkGetMacro(InPlay, int);
 
@@ -54,6 +62,8 @@ public:
   void SetRecordCheckButtonState(int state);
   int GetRecordCheckButtonState();
     
+  // Description:
+  // Internal callbacks for the buttons.
   void PlayCallback();
   void StopCallback();
   void GoToBeginningCallback();
@@ -65,6 +75,23 @@ public:
   void RecordStateCallback();
   void SaveAnimationCallback();
 
+  // Description:
+  // VCR Control can have 3 modes,
+  // PLAYBACK, RECORD, BOTH.
+  // The mode must be set before calling Create.
+  vtkSetMacro(Mode, int);
+  vtkGetMacro(Mode, int);
+  void SetModeToPlayBack() { this->SetMode(vtkPVVCRControl::PLAYBACK); }
+  void SetModeToRecord() { this->SetMode(vtkPVVCRControl::RECORD); }
+  void SetModeToBoth() { this->SetMode(vtkPVVCRControl::BOTH); }
+//BTX
+  enum {
+    PLAYBACK,
+    RECORD,
+    BOTH
+  };
+//ETX
+  
 protected:
   vtkPVVCRControl();
   ~vtkPVVCRControl();
@@ -91,6 +118,8 @@ protected:
   char* RecordCheckCommand;
   char* RecordStateCommand;
   char* SaveAnimationCommand;
+
+  int Mode;
 
   vtkSetStringMacro(PlayCommand);
   vtkSetStringMacro(StopCommand);

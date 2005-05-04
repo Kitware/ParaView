@@ -54,7 +54,6 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSource.h"
 #include "vtkErrorCode.h"
-#include "vtkPVVCRControl.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkPVTraceHelper.h"
 
@@ -72,7 +71,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.31");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.32");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -281,6 +280,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
     this->GetWidgetName());
  
   this->VCRControl->SetParent(this);
+//  this->VCRControl->SetMode(vtkPVVCRControl::PLAYBACK);
   this->VCRControl->Create(app);
   this->VCRControl->SetPlayCommand(this, "Play");
   this->VCRControl->SetStopCommand(this, "Stop");
