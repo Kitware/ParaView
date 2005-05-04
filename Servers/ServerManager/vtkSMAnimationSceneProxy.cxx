@@ -46,7 +46,7 @@
 # include <io.h> /* unlink */
 #endif
 
-vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.9");
+vtkCxxRevisionMacro(vtkSMAnimationSceneProxy, "1.10");
 vtkStandardNewMacro(vtkSMAnimationSceneProxy);
 
 //----------------------------------------------------------------------------
@@ -250,11 +250,14 @@ int vtkSMAnimationSceneProxy::SaveImages(const char* fileRoot, const char* ext,
   // Play the animation.
   int oldMode = this->GetPlayMode();
   double old_framerate = this->GetFrameRate();
+  int old_loop = this->GetLoop();
   this->SetPlayMode(VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE);
   this->SetFrameRate(framerate);
+  this->SetLoop(0);
   this->Play();
   this->SetPlayMode(oldMode);
   this->SetFrameRate(old_framerate);
+  this->SetLoop(old_loop);
 
   this->WindowToImageFilter->Delete();
   this->WindowToImageFilter = NULL;
@@ -344,9 +347,12 @@ int vtkSMAnimationSceneProxy::SaveGeometry(const char* filename)
 
   // Play the animation.
   int oldMode = this->GetPlayMode();
+  int old_loop = this->GetLoop();
+  this->SetLoop(0);
   this->SetPlayMode(VTK_ANIMATION_SCENE_PLAYMODE_SEQUENCE);
   this->Play();
   this->SetPlayMode(oldMode);
+  this->SetLoop(old_loop);
  
   p = animWriter->GetProperty("Finish");
   p->Modified();
