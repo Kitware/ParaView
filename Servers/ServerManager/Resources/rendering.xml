@@ -1515,6 +1515,9 @@
       base_proxygroup="rendermodules" base_proxyname="IceTDesktopRenderModule">
     </IceTRenderModuleProxy>
 
+    <CaveRenderModuleProxy name="CaveRenderModule"
+      base_proxygroup="rendermodules" base_proxyname="CompositeRenderModule">
+    </CaveRenderModuleProxy>
   </ProxyGroup>
   
   <ProxyGroup name="interactors">
@@ -1798,6 +1801,10 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <Property
+        name="InitializeRMIs"
+        command="InitializeRMIs">
+      </Property>
     </Proxy>
   </ProxyGroup>
   
