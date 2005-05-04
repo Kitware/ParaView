@@ -18,7 +18,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkCommand.h"
 
-vtkCxxRevisionMacro(vtkImageCompressor, "1.1");
+vtkCxxRevisionMacro(vtkImageCompressor, "1.2");
 vtkCxxSetObjectMacro(vtkImageCompressor, Output, vtkUnsignedCharArray);
 vtkCxxSetObjectMacro(vtkImageCompressor, Input, vtkUnsignedCharArray);
 //-----------------------------------------------------------------------------
@@ -78,5 +78,7 @@ int vtkImageCompressor::Decompress()
 void vtkImageCompressor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "Input: " << this->Input << endl;
+  os << indent << "Output: " << this->Output << endl;
 }
 
