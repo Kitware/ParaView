@@ -58,7 +58,6 @@ $kw(vtkTemp659) AcceptCallback
 $kw(vtkTemp481) RecordState
 
 $kw(vtkTemp481) StopRecording
-$kw(vtkTemp481) SetFrameRate 3
 $kw(vtkTemp481) SetCurrentTime 0.000000
 $kw(vtkTemp481) Play
 $kw(vtkTemp481) SetCurrentTime 0.000000
