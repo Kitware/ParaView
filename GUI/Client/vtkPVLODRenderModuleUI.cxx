@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.18");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.18.4.1");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -237,7 +237,7 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
     "This slider determines whether to use decimated models "
     "during interaction.  Threshold critera is based on size "
     "of geometry in mega bytes.  "
-    "Left: Always use full resolution. Right: Always use decimated models.");    
+    "Left: Always use decimated models. Right: Always use full resolution.");
 
   int row = 0;
 
