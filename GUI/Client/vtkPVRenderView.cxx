@@ -85,6 +85,7 @@
 #include <vtkstd/string>
 #include "vtkSMRenderModuleProxy.h"
 #include "vtkSMIntVectorProperty.h"
+#include <kwsys/SystemTools.hxx>
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -140,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.373");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.374");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2594,92 +2595,32 @@ void vtkPVRenderView::RestoreCurrentCamera(int position)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SaveAsImage(const char* filename) 
 {
-  this->GetRenderWindow()->SwapBuffersOff();
-  this->ForceRender();
+  const char* writerName = 0;
+
+  kwsys_stl::string ext_stl = kwsys::SystemTools::GetFilenameLastExtension(filename);
+  if (ext_stl == ".bmp")
+    {
+    writerName = "vtkBMPWriter";
+    }
+  else if (ext_stl == ".tif")
+    {
+    writerName = "vtkTIFFWriter";
+    }
+  else if (ext_stl == ".ppm")
+    {
+    writerName = "vtkPNMWriter";
+    }
+  else if (ext_stl == ".png")
+    {
+    writerName = "vtkPNGWriter";
+    }
+  else if (ext_stl == ".jpg" || ext_stl == ".jpeg")
+    {
+    writerName = "vtkJPEGWriter";
+    }
   this->Script("update");
-
-  if ( !filename || !*filename )
-    {
-    vtkErrorMacro("Filename not specified");
-    return;
-    }
-  
-  // first get the file name
-  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
-  w2i->SetInput(this->GetRenderWindow());
-  w2i->ReadFrontBufferOff();
-  w2i->ShouldRerenderOff();
-  w2i->Update();
-  
-  this->GetRenderWindow()->SwapBuffersOn();
-  this->GetRenderWindow()->Frame();
-
-  int success = 1;
-  
-  if (!strcmp(filename + strlen(filename) - 4,".bmp"))
-    {
-    vtkBMPWriter *bmp = vtkBMPWriter::New();
-    bmp->SetInput(w2i->GetOutput());
-    bmp->SetFileName((char *)filename);
-    bmp->Write();
-    if (bmp->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
-      {
-      success = 0;
-      }
-    bmp->Delete();
-    }
-  else if (!strcmp(filename + strlen(filename) - 4,".tif"))
-    {
-    vtkTIFFWriter *tif = vtkTIFFWriter::New();
-    tif->SetInput(w2i->GetOutput());
-    tif->SetFileName((char *)filename);
-    tif->Write();
-    if (tif->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
-      {
-      success = 0;
-      }
-    tif->Delete();
-    }
-  else if (!strcmp(filename + strlen(filename) - 4,".ppm"))
-    {
-    vtkPNMWriter *pnm = vtkPNMWriter::New();
-    pnm->SetInput(w2i->GetOutput());
-    pnm->SetFileName((char *)filename);
-    pnm->Write();
-    if (pnm->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
-      {
-      success = 0;
-      }
-    pnm->Delete();
-    }
-  else if (!strcmp(filename + strlen(filename) - 4,".png"))
-    {
-    vtkPNGWriter *png = vtkPNGWriter::New();
-    png->SetInput(w2i->GetOutput());
-    png->SetFileName((char *)filename);
-    png->Write();
-    if (png->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
-      {
-      success = 0;
-      }
-    png->Delete();
-    }
-  else if (!strcmp(filename + strlen(filename) - 4,".jpg"))
-    {
-    vtkJPEGWriter *jpg = vtkJPEGWriter::New();
-    jpg->SetInput(w2i->GetOutput());
-    jpg->SetFileName((char *)filename);
-    jpg->Write();
-    if (jpg->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
-      {
-      success = 0;
-      }
-    jpg->Delete();
-    }
-
-  w2i->Delete();
-  
-  if (!success)
+  if (this->RenderModuleProxy->WriteImage(filename, writerName) 
+    == vtkErrorCode::OutOfDiskSpaceError)
     {
     vtkKWMessageDialog::PopupMessage(
       this->GetApplication(), this->ParentWindow, "Write Error",

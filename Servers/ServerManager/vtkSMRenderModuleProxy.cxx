@@ -42,8 +42,9 @@
 #include "vtkImageWriter.h"
 #include "vtkInstantiator.h"
 #include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkErrorCode.h"
 
-vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.6");
+vtkCxxRevisionMacro(vtkSMRenderModuleProxy, "1.7");
 //-----------------------------------------------------------------------------
 // This is a bit of a pain.  I do ResetCameraClippingRange as a call back
 // because the PVInteractorStyles call ResetCameraClippingRange 
@@ -943,14 +944,28 @@ void vtkSMRenderModuleProxy::SaveInBatchScript(ofstream* file)
 }
 
 //-----------------------------------------------------------------------------
-void vtkSMRenderModuleProxy::WriteImage(const char* filename,
+int vtkSMRenderModuleProxy::WriteImage(const char* filename,
   const char* writerName)
 {
   if (!filename || !writerName)
     {
-    return;
+    return vtkErrorCode::UnknownError;
     }
 
+  vtkObject* object = vtkInstantiator::CreateInstance(writerName);
+  if (!object)
+    {
+    vtkErrorMacro("Failed to create Writer " << writerName);
+    return vtkErrorCode::UnknownError;
+    }
+  vtkImageWriter* writer = vtkImageWriter::SafeDownCast(object);
+  if (!writer)
+    {
+    vtkErrorMacro("Object is not a vtkImageWriter: " << object->GetClassName());
+    object->Delete();
+    return vtkErrorCode::UnknownError;
+    }
+ 
   // I am using the vtkPVRenderView approach for saving the image.
   // instead of vtkSMDisplayWindowProxy approach of creating a proxy.
   this->GetRenderWindow()->SwapBuffersOff();
@@ -965,24 +980,16 @@ void vtkSMRenderModuleProxy::WriteImage(const char* filename,
   this->GetRenderWindow()->SwapBuffersOn();
   this->GetRenderWindow()->Frame();
   
-  vtkObject* object = vtkInstantiator::CreateInstance(writerName);
-  if (!object)
-    {
-    vtkErrorMacro("Failed to create Writer " << writerName);
-    return;
-    }
-  vtkImageWriter* writer = vtkImageWriter::SafeDownCast(object);
-  if (!writer)
-    {
-    vtkErrorMacro("Object is not a vtkImageWriter: " << object->GetClassName());
-    object->Delete();
-    return;
-    }
+
   writer->SetInput(w2i->GetOutput());
   writer->SetFileName(filename);
   writer->Write();
+  int error_code = writer->GetErrorCode();
+
   writer->Delete();
   w2i->Delete();
+  
+  return error_code;
 }
 
 //-----------------------------------------------------------------------------

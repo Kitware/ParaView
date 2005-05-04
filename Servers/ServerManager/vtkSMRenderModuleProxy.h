@@ -129,7 +129,7 @@ public:
   // Description:
   // Generate a screenshot from the render window.
   // Mostly here for batch mode testing.
-  void WriteImage(const char* filename, const char* writerName);
+  int WriteImage(const char* filename, const char* writerName);
 
   // Description:
   // Enable/Disable the LightKit.
