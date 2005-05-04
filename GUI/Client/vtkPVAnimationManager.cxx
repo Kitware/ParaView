@@ -63,7 +63,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.38");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.39");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1038,8 +1038,18 @@ void vtkPVAnimationManager::SaveAnimation()
     {
     this->GetWindow()->SaveLastPath(saveDialog, "SaveAnimationFile2");
     const char* filename = saveDialog->GetFileName();  
-    kwsys_stl::string fileRoot = kwsys::SystemTools::GetFilenameName(filename);
-    kwsys_stl::string ext_stl = kwsys::SystemTools::GetFilenameExtension(filename);
+    kwsys_stl::string filename_stl = filename;
+    kwsys_stl::string ext_stl = kwsys::SystemTools::GetFilenameLastExtension(filename);
+    kwsys_stl::string::size_type dot_pos = filename_stl.rfind(".");
+    kwsys_stl::string fileRoot;
+    if (dot_pos != kwsys_stl::string::npos)
+      {
+      fileRoot = filename_stl.substr(0, dot_pos);
+      }
+    else
+      {
+      fileRoot = filename_stl;
+      }
     if (ext_stl.size() >= 1)
       {
       ext_stl.erase(0,1); // Get rid of the "." GetFilenameExtension returns.
