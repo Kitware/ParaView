@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.47");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.48");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -766,6 +766,42 @@ int vtkKWTkUtilities::GetPhotoHeight(vtkKWApplication *app,
     }
   return vtkKWTkUtilities::GetPhotoHeight(
     app->GetMainInterp(), photo_name);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetPhotoHeight(vtkKWWidget *widget)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+
+  Tcl_Interp *interp = widget->GetApplication()->GetMainInterp();
+
+  // Retrieve -image option
+
+  kwsys_stl::string cmd;
+  cmd += widget->GetWidgetName();
+  cmd += " cget -image";
+  
+  if (Tcl_GlobalEval(interp, cmd.c_str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(
+      << "Unable to get -image option: " << interp->result);
+    return 0;
+    }
+
+  // No -image ?
+
+  if (!interp->result || !*interp->result)
+    {
+    return 0;
+    }
+
+  // Get size
+
+  kwsys_stl::string image_name(interp->result);
+  return vtkKWTkUtilities::GetPhotoHeight(interp, image_name.c_str());
 }
 
 //----------------------------------------------------------------------------

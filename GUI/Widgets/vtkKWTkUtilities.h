@@ -209,8 +209,11 @@ public:
   // If the photo does not exist, return 0 and issue a warning.
   // A convenience method is provided to specify the vtkKWApplication this
   // photo belongs to, instead of the Tcl interpreter.
+  // A convenience method is provided to specify a vtkKWWidget this photo
+  // has been assigned to using the -image Tk option.
   static int GetPhotoHeight(Tcl_Interp *interp, const char *photo_name);
   static int GetPhotoHeight(vtkKWApplication *app, const char *photo_name);
+  static int GetPhotoHeight(vtkKWWidget *widget);
 
   // Description:
   // Get the width of a Tk photo given by its name 'photo_name'.
