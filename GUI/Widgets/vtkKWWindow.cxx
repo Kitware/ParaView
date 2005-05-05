@@ -40,7 +40,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.231");
+vtkCxxRevisionMacro(vtkKWWindow, "1.232");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 //----------------------------------------------------------------------------
@@ -54,25 +54,31 @@ vtkKWWindow::vtkKWWindow()
 {
   this->PropertiesParent      = NULL;
 
-  this->Menu                  = vtkKWMenu::New();
+  // Menus
+
   this->FileMenu              = vtkKWMenu::New();
   this->HelpMenu              = vtkKWMenu::New();
   this->PageMenu              = vtkKWMenu::New();
-
   this->EditMenu              = NULL;
   this->ViewMenu              = NULL;
   this->WindowMenu            = NULL;
 
+  // Toolbars
+
   this->Toolbars              = vtkKWToolbarSet::New();
   this->ToolbarsMenu          = NULL; 
   this->MenuBarSeparatorFrame = vtkKWFrame::New();
+
+  // Main split panel
+
   this->MiddleFrame           = vtkKWSplitFrame::New();
+
+  // Status frame
 
   this->StatusFrameSeparator  = vtkKWFrame::New();
   this->StatusFrame           = vtkKWFrame::New();
   this->StatusLabel           = vtkKWLabel::New();
   this->StatusImage           = vtkKWLabel::New();
-  this->StatusImageName       = NULL;
 
   this->ProgressFrame         = vtkKWFrame::New();
   this->ProgressGauge         = vtkKWProgressGauge::New();
@@ -130,12 +136,6 @@ vtkKWWindow::~vtkKWWindow()
     }
 
   this->SetPropertiesParent(NULL);
-
-  if (this->Menu)
-    {
-    this->Menu->Delete();
-    this->Menu = NULL;
-    }
 
   if (this->PageMenu)
     {
@@ -251,7 +251,6 @@ vtkKWWindow::~vtkKWWindow()
     this->MostRecentFilesManager = NULL;
     }
 
-  this->SetStatusImageName(NULL);
   this->SetScriptExtension(NULL);
   this->SetScriptType(NULL);
 }
@@ -275,17 +274,9 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->Script("wm iconname %s {%s}", wname, app->GetPrettyName());
 
-  // Set up standard menus
-
-  this->Menu->SetParent(this);
-  this->Menu->SetTearOff(0);
-  this->Menu->Create(app, "");
-
-  this->InstallMenu(this->Menu);
-
   // Menu : File
 
-  this->FileMenu->SetParent(this->Menu);
+  this->FileMenu->SetParent(this->GetMenu());
   this->FileMenu->SetTearOff(0);
   this->FileMenu->Create(app, "");
 
@@ -306,7 +297,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   // Menu : File (cont.)
 
-  this->Menu->AddCascade("File", this->FileMenu, 0);
+  this->GetMenu()->AddCascade("File", this->FileMenu, 0);
 
   if (this->SupportPrint)
     {
@@ -327,13 +318,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   // Help menu
 
-  this->HelpMenu->SetParent(this->Menu);
+  this->HelpMenu->SetParent(this->GetMenu());
   this->HelpMenu->SetTearOff(0);
   this->HelpMenu->Create(app, "");
 
   if (this->SupportHelp)
     {
-    this->Menu->AddCascade("Help", this->HelpMenu, 0);
+    this->GetMenu()->AddCascade("Help", this->HelpMenu, 0);
     }
   ostrstream helpCmd;
   helpCmd << "DisplayHelpDialog " << this->GetTclName() << ends;
@@ -426,17 +417,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   
   // Status frame : image
 
-  this->SetStatusImageName(this->Script("image create photo"));
-  this->CreateStatusImage();
-
   this->StatusImage->SetParent(this->StatusFrame);
   this->StatusImage->Create(app, "-relief sunken -bd 1");
 
-  this->Script("%s configure -image %s -fg white -bg white "
-               "-highlightbackground white -highlightcolor white "
-               "-highlightthickness 0 -padx 0 -pady 0", 
-               this->StatusImage->GetWidgetName(),
-               this->StatusImageName);
+  this->UpdateStatusImage();
 
   this->Script("pack %s -side left -anchor c -ipadx 1 -ipady 1 -fill y", 
                this->StatusImage->GetWidgetName());
@@ -462,7 +446,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->ProgressGauge->SetParent(this->ProgressFrame);
   this->ProgressGauge->SetLength(200);
   this->ProgressGauge->SetHeight(
-    vtkKWTkUtilities::GetPhotoHeight(app, this->StatusImageName) - 4);
+    vtkKWTkUtilities::GetPhotoHeight(this->StatusImage) - 4);
   this->ProgressGauge->Create(app, "");
 
   this->Script("pack %s -side right -padx 2 -pady 2",
@@ -706,7 +690,7 @@ vtkKWMenu *vtkKWWindow::GetEditMenu()
   this->EditMenu->SetTearOff(0);
   this->EditMenu->Create(this->GetApplication(),"");
   // Make sure Edit menu is next to file menu
-  this->Menu->InsertCascade(1, "Edit", this->EditMenu, 0);
+  this->GetMenu()->InsertCascade(1, "Edit", this->EditMenu, 0);
   return this->EditMenu;
 }
 
@@ -730,11 +714,11 @@ vtkKWMenu *vtkKWWindow::GetViewMenu()
   // make sure Help menu is on the right
   if (this->EditMenu)
     { 
-    this->Menu->InsertCascade(2, "View", this->ViewMenu, 0);
+    this->GetMenu()->InsertCascade(2, "View", this->ViewMenu, 0);
     }
   else
     {
-    this->Menu->InsertCascade(1, "View", this->ViewMenu, 0);
+    this->GetMenu()->InsertCascade(1, "View", this->ViewMenu, 0);
     }
   
   return this->ViewMenu;
@@ -854,11 +838,11 @@ vtkKWMenu *vtkKWWindow::GetWindowMenu()
   // make sure Help menu is on the right
   if (this->EditMenu)
     { 
-    this->Menu->InsertCascade(1, "Window", this->WindowMenu, 0);
+    this->GetMenu()->InsertCascade(1, "Window", this->WindowMenu, 0);
     }
   else
     {
-    this->Menu->InsertCascade(2, "Window", this->WindowMenu, 0);
+    this->GetMenu()->InsertCascade(2, "Window", this->WindowMenu, 0);
     }
   
   return this->WindowMenu;
@@ -1301,6 +1285,33 @@ void vtkKWWindow::InternalProcessEvent(vtkObject*, unsigned long,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWWindow::UpdateStatusImage()
+{
+  if (!this->StatusImage || !this->StatusImage->IsCreated())
+    {
+    return;
+    }
+
+  // Create an empty image for now. It will be modified later on
+
+  kwsys_stl::string image_name(
+    this->Script("%s cget -image", this->StatusImage->GetWidgetName()));
+  if (!image_name.size() || !*image_name.c_str())
+    {
+    image_name = this->Script("image create photo");
+    }
+
+  this->Script("%s configure "
+               "-image %s "
+               "-fg white -bg white "
+               "-highlightbackground white -highlightcolor white "
+               "-highlightthickness 0 "
+               "-padx 0 -pady 0", 
+               this->StatusImage->GetWidgetName(),
+               image_name.c_str());
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWindow::Update()
 {
   // Update the whole interface
@@ -1431,15 +1442,6 @@ void vtkKWWindow::UpdateEnableState()
 //----------------------------------------------------------------------------
 void vtkKWWindow::UpdateMenuState()
 {
-  this->PropagateEnableState(this->Menu);
-  /*
-  if (this->Menu)
-    {
-    this->Menu->SetState(
-    this->GetEnabled() ? vtkKWMenu::Normal : vtkKWMenu::Disabled);
-    }
-  */
-
   this->PropagateEnableState(this->FileMenu);
   this->PropagateEnableState(this->EditMenu);
   this->PropagateEnableState(this->ViewMenu);

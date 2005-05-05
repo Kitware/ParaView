@@ -730,7 +730,9 @@ protected:
 
   int InteractiveRenderEnabled;
 
-  virtual void CreateStatusImage();
+  // Description:
+  // Update the image in the status frame. Usually a logo of some sort.
+  virtual void UpdateStatusImage();
 
   // To avoid disabling menus multiple times.
   int MenusDisabled;

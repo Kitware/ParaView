@@ -113,10 +113,10 @@ public:
   vtkBooleanMacro(HideDecoration, int);
 
   // Description:
-  // Install a menu bar into this toplevel.
-  // Note that it has no effect before a call to Create().
-  // The menu has to be Create()'ed too.
-  virtual void InstallMenu(vtkKWMenu *menu);
+  // Get the menu associated to this toplevel.
+  // Note that this menu is created on the fly to lower the footprint
+  // of this object. 
+  vtkKWMenu *GetMenu();
 
   // Description:
   // Convenience method to set the command used to manage window manage 
@@ -128,12 +128,22 @@ public:
   virtual void SetDeleteWindowProtocolCommand(
     vtkKWObject *obj, const char *command);
 
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
 protected:
 
   vtkKWTopLevel();
   ~vtkKWTopLevel();
 
-  vtkKWWidget* MasterWindow;
+  vtkKWWidget *MasterWindow;
+  vtkKWMenu   *Menu;
 
   char *Title;
   char *WindowClass;

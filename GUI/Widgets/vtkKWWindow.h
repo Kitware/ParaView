@@ -78,17 +78,27 @@ public:
   virtual void LoadScript(const char *filename);
 
   // Description:
-  // Convenience methods to popup a warning/error message.
-  // This can be overriden in a subclass to redirect errors and warnings
-  // to log files or more elaborate log windows.
-  virtual void WarningMessage(const char* message);
-  virtual void ErrorMessage(const char* message);
+  // The extension used in LoadScript. Default is .tcl.
+  vtkSetStringMacro(ScriptExtension);
+  vtkGetStringMacro(ScriptExtension);
+
+  // Description:
+  // The type name used in LoadScript. Default is Tcl.
+  vtkSetStringMacro(ScriptType);
+  vtkGetStringMacro(ScriptType);
 
   // Description:
   // Set the text for the status bar of this window.
   virtual void SetStatusText(const char *);
   virtual const char *GetStatusText();
   
+  // Description:
+  // Convenience methods to popup a warning/error message.
+  // This can be overriden in a subclass to redirect errors and warnings
+  // to log files or more elaborate log windows.
+  virtual void WarningMessage(const char* message);
+  virtual void ErrorMessage(const char* message);
+
   // Description:
   // Show or hide the error / warning icon in the tray.
   //BTX
@@ -103,8 +113,6 @@ public:
 
   // Description:
   // Get the various menu objects.
-  // 'Menu' is the root menu, posted on top of the window (i.e. a menu bar).
-  vtkGetObjectMacro(Menu,vtkKWMenu);
   vtkGetObjectMacro(FileMenu,vtkKWMenu);
   vtkGetObjectMacro(HelpMenu,vtkKWMenu);
   vtkKWMenu *GetEditMenu();
@@ -229,16 +237,6 @@ public:
   virtual char* GetTitle();
 
   // Description:
-  // The extension used in LoadScript. Default is .tcl.
-  vtkSetStringMacro(ScriptExtension);
-  vtkGetStringMacro(ScriptExtension);
-
-  // Description:
-  // The type name used in LoadScript. Default is Tcl.
-  vtkSetStringMacro(ScriptType);
-  vtkGetStringMacro(ScriptType);
-
-  // Description:
   // Call render on all views
   virtual void Render();
 
@@ -330,6 +328,10 @@ protected:
   virtual int DisplayCloseDialog();
 
   // Description:
+  // Update the image in the status frame. Usually a logo of some sort.
+  virtual void UpdateStatusImage();
+
+  // Description:
   // Add the toolbar to the menu alone.
   void AddToolbarToMenu(vtkKWToolbar* toolbar, const char* name, 
     vtkKWWidget* target, const char* command);
@@ -352,9 +354,8 @@ protected:
 
   vtkKWNotebook *Notebook;
 
-  vtkKWSplitFrame     *MiddleFrame; // Contains view frame & properties parent.
+  vtkKWSplitFrame *MiddleFrame;
 
-  vtkKWMenu *Menu;
   vtkKWMenu *FileMenu;
   vtkKWMenu *EditMenu;
   vtkKWMenu *ViewMenu;
@@ -366,18 +367,13 @@ protected:
   vtkKWFrame *StatusFrameSeparator;
   vtkKWFrame *StatusFrame;
   vtkKWLabel *StatusImage;
+  vtkKWLabel *StatusLabel;
 
-  vtkKWProgressGauge *ProgressGauge;
   vtkKWFrame         *ProgressFrame;
+  vtkKWProgressGauge *ProgressGauge;
 
   vtkKWFrame      *TrayFrame;
   vtkKWLabel      *TrayImageError;
-
-  vtkKWLabel *StatusLabel;
-  char       *StatusImageName;
-  vtkSetStringMacro(StatusImageName);
-
-  virtual void CreateStatusImage() {};
 
   vtkKWWidget *PropertiesParent;
   vtkKWToolbarSet *Toolbars;

@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.695");
+vtkCxxRevisionMacro(vtkPVWindow, "1.696");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -835,7 +835,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // (i.e. glyphs) data objects/sources)
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->GetApplication(), "-tearoff 0");
-  this->Menu->InsertCascade(2, VTK_PV_SELECT_SOURCE_MENU_LABEL, this->SelectMenu, 0);
+  this->GetMenu()->InsertCascade(2, VTK_PV_SELECT_SOURCE_MENU_LABEL, this->SelectMenu, 0);
   
   // Create the menu for selecting the glyphs.  
   this->GlyphMenu->SetParent(this->SelectMenu);
@@ -846,7 +846,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Create the menu for creating data sources.  
   this->SourceMenu->SetParent(this->GetMenu());
   this->SourceMenu->Create(this->GetApplication(), "-tearoff 0");
-  this->Menu->InsertCascade(3, VTK_PV_VTK_SOURCES_MENU_LABEL, 
+  this->GetMenu()->InsertCascade(3, VTK_PV_VTK_SOURCES_MENU_LABEL, 
                             this->SourceMenu, 0,
                             "Choose a source from a list of "
                             "VTK sources");  
@@ -854,7 +854,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Create the menu for creating data sources (filters).  
   this->FilterMenu->SetParent(this->GetMenu());
   this->FilterMenu->Create(this->GetApplication(), "-tearoff 0");
-  this->Menu->InsertCascade(4, VTK_PV_VTK_FILTERS_MENU_LABEL, 
+  this->GetMenu()->InsertCascade(4, VTK_PV_VTK_FILTERS_MENU_LABEL, 
                             this->FilterMenu, 2,
                             "Choose a filter from a list of "
                             "VTK filters");  
@@ -1167,8 +1167,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // Update gauge height to match status image
   
   this->ProgressGauge->SetHeight(
-    vtkKWTkUtilities::GetPhotoHeight(this->GetApplication()->GetMainInterp(), 
-                                     this->StatusImageName) - 4);
+    vtkKWTkUtilities::GetPhotoHeight(this->StatusImage) - 4);
 
   // Init menus
 
@@ -1563,35 +1562,30 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::CreateStatusImage()
+void vtkPVWindow::UpdateStatusImage()
 {
-  // Tcl/Tk 8.3 seems to have a bug if you update a photo that already
-  // contains pixels. Let's create a second photo and replace the existing
-  // one.
+  if (!this->StatusImage || !this->StatusImage->IsCreated())
+    {
+    return;
+    }
 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
-  this->SetStatusImageName(this->Script("image create photo"));
-  this->Script("%s configure -image %s", 
-               this->StatusImage->GetWidgetName(),
-               this->StatusImageName);
-#endif
+  this->Superclass::UpdateStatusImage();
+
+  kwsys_stl::string image_name(
+    this->Script("%s cget -image", this->StatusImage->GetWidgetName()));
 
   // Update status image
   
-  if (this->StatusImageName && this->GetPVApplication())
+  if (!vtkKWTkUtilities::UpdatePhoto(
+        this->StatusImage->GetApplication(),
+        image_name.c_str(),
+        image_PVLogoSmall, 
+        image_PVLogoSmall_width, 
+        image_PVLogoSmall_height,
+        image_PVLogoSmall_pixel_size,
+        image_PVLogoSmall_buffer_length))
     {
-    if (!vtkKWTkUtilities::UpdatePhoto(
-      this->GetPVApplication()->GetMainInterp(),
-      this->StatusImageName,
-      image_PVLogoSmall, 
-      image_PVLogoSmall_width, 
-      image_PVLogoSmall_height,
-      image_PVLogoSmall_pixel_size,
-      image_PVLogoSmall_buffer_length))
-      {
-      vtkWarningMacro("Error updating status image!" << this->StatusImageName);
-      return;
-      }
+    vtkWarningMacro("Error updating status image!" << image_name.c_str());
     }
 }
 //-----------------------------------------------------------------------------
@@ -3283,12 +3277,12 @@ void vtkPVWindow::UpdateSourceMenu()
   // If there are no filters, disable the menu.
   if (numSources > 0)
     {
-    this->Menu->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
+    this->GetMenu()->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
                          vtkKWMenu::Normal);
     }
   else
     {
-    this->Menu->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
+    this->GetMenu()->SetState(VTK_PV_VTK_SOURCES_MENU_LABEL, 
                          vtkKWMenu::Disabled);
     }
 }
@@ -4899,17 +4893,17 @@ void vtkPVWindow::UpdateMenuState()
 
   if (source_grabbed || in_recording)
     {
-    if (this->Menu)
+    if (this->GetMenu())
       {
-      this->Menu->SetEnabled(0);
+      this->GetMenu()->SetEnabled(0);
       }
     }
 
   if (!source_grabbed)
     {
-    this->Menu->SetState("View",  menu_state);
-    this->Menu->SetState("Window",  menu_state);
-    this->Menu->SetState("Help",  menu_state);
+    this->GetMenu()->SetState("View",  menu_state);
+    this->GetMenu()->SetState("Window",  menu_state);
+    this->GetMenu()->SetState("Help",  menu_state);
     }
 
   // Disable or enable the select menu. Checks if there are any valid
@@ -4924,7 +4918,7 @@ void vtkPVWindow::UpdateMenuState()
     {
     this->SelectMenu->SetEnabled(no_sources ? 0 : this->GetEnabled());
     }
-  this->Menu->SetState(
+  this->GetMenu()->SetState(
     VTK_PV_SELECT_SOURCE_MENU_LABEL, 
     no_sources || source_grabbed ? vtkKWMenu::Disabled : menu_state);
   if (this->ViewMenu)
@@ -4937,7 +4931,7 @@ void vtkPVWindow::UpdateMenuState()
   // Handle the filter menu
 
   this->UpdateFilterMenu();
-  this->Menu->SetState(
+  this->GetMenu()->SetState(
     VTK_PV_VTK_FILTERS_MENU_LABEL,  
     !this->FilterMenu->GetEnabled() || source_grabbed 
     ? vtkKWMenu::Disabled : menu_state);

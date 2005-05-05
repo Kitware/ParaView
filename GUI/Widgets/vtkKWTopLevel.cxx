@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.5");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.6");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -34,6 +34,7 @@ vtkKWTopLevel::vtkKWTopLevel()
   this->Title           = NULL;
   this->WindowClass     = NULL;
   this->MasterWindow    = NULL;
+  this->Menu            = NULL;
   this->HasBeenMapped   = 0;
   this->HideDecoration  = 0;
 }
@@ -44,6 +45,12 @@ vtkKWTopLevel::~vtkKWTopLevel()
   this->SetTitle(NULL);
   this->SetMasterWindow(NULL);
   this->SetWindowClass(0);
+
+  if (this->Menu)
+    {
+    this->Menu->Delete();
+    this->Menu = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -279,14 +286,25 @@ int vtkKWTopLevel::GetSize(int *w, int *h)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWTopLevel::InstallMenu(vtkKWMenu *menu)
-{ 
-  if (menu && menu->IsCreated() && this->IsCreated())
+vtkKWMenu *vtkKWTopLevel::GetMenu()
+{
+  if (!this->Menu)
     {
+    this->Menu = vtkKWMenu::New();
+    }
+
+  if (!this->Menu->IsCreated() && this->IsCreated())
+    {
+    this->Menu->SetParent(this);
+    this->Menu->SetTearOff(0);
+    this->Menu->Create(this->GetApplication(), NULL);
+
     this->Script("%s configure -menu %s", 
                  this->GetWidgetName(),
-                 menu->GetWidgetName());  
+                 this->Menu->GetWidgetName());
     }
+
+  return this->Menu;
 }
 
 //----------------------------------------------------------------------------
@@ -304,9 +322,18 @@ void vtkKWTopLevel::SetDeleteWindowProtocolCommand(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTopLevel::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Menu);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTopLevel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
   os << indent << "Title: ";
   if (this->GetTitle())
     {
