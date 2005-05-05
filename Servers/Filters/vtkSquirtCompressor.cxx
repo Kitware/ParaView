@@ -18,7 +18,7 @@
 #include "vtkImageData.h"
 
 vtkStandardNewMacro(vtkSquirtCompressor);
-vtkCxxRevisionMacro(vtkSquirtCompressor, "1.2");
+vtkCxxRevisionMacro(vtkSquirtCompressor, "1.3");
 //-----------------------------------------------------------------------------
 vtkSquirtCompressor::vtkSquirtCompressor()
 {
@@ -98,6 +98,7 @@ int vtkSquirtCompressor::CompressData()
     }
 
   // Back to vtk arrays :)
+  this->Output->SetNumberOfComponents(4);
   this->Output->SetNumberOfTuples(comp_index);
   return VTK_OK;
 }
