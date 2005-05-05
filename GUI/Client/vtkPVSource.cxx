@@ -60,7 +60,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.438");
+vtkCxxRevisionMacro(vtkPVSource, "1.439");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
@@ -1817,8 +1817,7 @@ void vtkPVSource::Reset()
     {
     pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     // Do not try to reset the widget if it is not initialized
-    if (pvw && (pvw->GetModifiedFlag() || !this->Initialized) || 
-        !this->DataInformationValid)
+    if (pvw && (pvw->GetModifiedFlag() || !this->DataInformationValid))
       {
       pvw->Reset();
       }
