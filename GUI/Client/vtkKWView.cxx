@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.10");
+vtkCxxRevisionMacro(vtkKWView, "1.11");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -438,16 +438,13 @@ vtkKWWidget *vtkKWView::GetPropertiesParent()
     }
   
   // if the window has defined one then use it
-  if (this->ParentWindow && 
-      this->ParentWindow->GetPropertiesParent())
-    {
-    // if the views props have not been defined the define them now
-    this->PropertiesParent = vtkKWWidget::New();
-    this->PropertiesParent->SetParent
-      (this->ParentWindow->GetPropertiesParent());
-    this->PropertiesParent->Create(this->GetApplication(),"frame","-bd 0");
-    this->SharedPropertiesParent = 1;
-    }
+
+  this->PropertiesParent = vtkKWWidget::New();
+  this->PropertiesParent->SetParent
+    (this->ParentWindow->GetMainPanelFrame());
+  this->PropertiesParent->Create(this->GetApplication(),"frame","-bd 0");
+  this->SharedPropertiesParent = 1;
+
   return this->PropertiesParent;
 }
 
@@ -474,7 +471,7 @@ void vtkKWView::CreateDefaultPropertiesParent()
 //----------------------------------------------------------------------------
 void vtkKWView::ShowViewProperties()
 {
-  this->ParentWindow->ShowProperties();
+  this->ParentWindow->SetMainPanelVisibility(1);
   
   // make sure we have an applicaiton
   if (!this->GetApplication())

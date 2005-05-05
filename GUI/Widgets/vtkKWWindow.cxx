@@ -14,7 +14,6 @@
 #include "vtkKWWindow.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
@@ -36,12 +35,11 @@
 
 #include <kwsys/SystemTools.hxx>
 
-#define VTK_KW_HIDE_PROPERTIES_LABEL "Hide Left Panel" 
-#define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
+#define VTK_KW_HIDE_MAIN_PANEL_LABEL "Hide Left Panel" 
+#define VTK_KW_SHOW_MAIN_PANEL_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.232");
-vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
+vtkCxxRevisionMacro(vtkKWWindow, "1.233");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -52,8 +50,6 @@ int vtkKWWindowCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkKWWindow::vtkKWWindow()
 {
-  this->PropertiesParent      = NULL;
-
   // Menus
 
   this->FileMenu              = vtkKWMenu::New();
@@ -71,7 +67,7 @@ vtkKWWindow::vtkKWWindow()
 
   // Main split panel
 
-  this->MiddleFrame           = vtkKWSplitFrame::New();
+  this->MainSplitFrame           = vtkKWSplitFrame::New();
 
   // Status frame
 
@@ -86,7 +82,7 @@ vtkKWWindow::vtkKWWindow()
   this->TrayFrame             = vtkKWFrame::New();
   this->TrayImageError        = vtkKWLabel::New();
 
-  this->Notebook              = vtkKWNotebook::New();
+  this->MainNotebook              = vtkKWNotebook::New();
 
   this->TclInteractor         = NULL;
 
@@ -129,13 +125,11 @@ vtkKWWindow::~vtkKWWindow()
     this->TclInteractor = NULL;
     }
 
-  if (this->Notebook)
+  if (this->MainNotebook)
     {
-    this->Notebook->Delete();
-    this->Notebook = NULL;
+    this->MainNotebook->Delete();
+    this->MainNotebook = NULL;
     }
-
-  this->SetPropertiesParent(NULL);
 
   if (this->PageMenu)
     {
@@ -167,10 +161,10 @@ vtkKWWindow::~vtkKWWindow()
     this->MenuBarSeparatorFrame = NULL;
     }
 
-  if (this->MiddleFrame)
+  if (this->MainSplitFrame)
     {
-    this->MiddleFrame->Delete();
-    this->MiddleFrame = NULL;
+    this->MainSplitFrame->Delete();
+    this->MainSplitFrame = NULL;
     }
 
   if (this->StatusFrameSeparator)
@@ -311,10 +305,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->MostRecentFilesManager->SetApplication(app);
 
-  // Menu : Window : Properties panel
+  // Menu : Window : main panel
 
-  this->GetWindowMenu()->AddCommand(VTK_KW_HIDE_PROPERTIES_LABEL, this,
-                                    "TogglePropertiesVisibilityCallback", 1 );
+  this->GetWindowMenu()->AddCommand(VTK_KW_HIDE_MAIN_PANEL_LABEL, this,
+                                    "MainPanelVisibilityCallback", 1 );
 
   // Help menu
 
@@ -366,11 +360,11 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
 
   // Split frame
-  this->MiddleFrame->SetParent(this);
-  this->MiddleFrame->Create(app);
+  this->MainSplitFrame->SetParent(this);
+  this->MainSplitFrame->Create(app);
 
   this->Script("pack %s -side top -fill both -expand t",
-               this->MiddleFrame->GetWidgetName());
+               this->MainSplitFrame->GetWidgetName());
 
   // Restore Window Geometry
 
@@ -384,15 +378,11 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
                  this->GetWidgetName(), VTK_KW_WINDOW_DEFAULT_GEOMETRY);
     }
 
-  // Window properties / Application settings (leading to preferences)
-
-  this->CreateDefaultPropertiesParent();
-
   // Create the notebook
 
-  this->Notebook->SetParent(this->GetPropertiesParent());
-  this->Notebook->Create(app, "");
-  this->Notebook->AlwaysShowTabsOn();
+  this->MainNotebook->SetParent(this->GetMainPanelFrame());
+  this->MainNotebook->Create(app, "");
+  this->MainNotebook->AlwaysShowTabsOn();
 
   // Status frame separator
 
@@ -478,18 +468,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
     uim->Create(app);
     }
 
-  if (this->GetApplication()->HasRegistryValue(
-        2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY) &&
-      !this->GetApplication()->GetIntRegistryValue(
-        2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY))
-    {
-    this->ShowMostRecentPanels(0);
-    }
-  else
-    {
-    this->ShowMostRecentPanels(1);
-    }
-
   vtkKWUserInterfaceNotebookManager *uim_nb = 
     vtkKWUserInterfaceNotebookManager::SafeDownCast(uim);
   if (uim_nb)
@@ -515,7 +493,7 @@ void vtkKWWindow::PrepareForDelete()
   // this->Menu
   // this->MenuBarSeparatorFrame
   // this->Toolbars
-  // this->MiddleFrame
+  // this->MainSplitFrame
   // this->StatusFrameSeparator
   // this->StatusFrame
 
@@ -528,28 +506,15 @@ void vtkKWWindow::PrepareForDelete()
 }
 
 //----------------------------------------------------------------------------
-vtkKWFrame* vtkKWWindow::GetViewFrame()
+vtkKWFrame* vtkKWWindow::GetMainPanelFrame()
 {
-  return this->MiddleFrame ? this->MiddleFrame->GetFrame2() : NULL;
+  return this->MainSplitFrame ? this->MainSplitFrame->GetFrame1() : NULL;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::CreateDefaultPropertiesParent()
+vtkKWFrame* vtkKWWindow::GetViewFrame()
 {
-  if (!this->PropertiesParent)
-    {
-    vtkKWWidget *pp = vtkKWWidget::New();
-    pp->SetParent(this->MiddleFrame->GetFrame1());
-    pp->Create(this->GetApplication(),"frame","-bd 0");
-    this->Script("pack %s -side left -fill both -expand t -anchor nw",
-                 pp->GetWidgetName());
-    this->SetPropertiesParent(pp);
-    pp->Delete();
-    }
-  else
-    {
-    vtkDebugMacro("Properties Parent already set for Window");
-    }
+  return this->MainSplitFrame ? this->MainSplitFrame->GetFrame2() : NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -617,7 +582,7 @@ void vtkKWWindow::SaveWindowGeometry()
 
     this->GetApplication()->SetRegistryValue(
       2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY, "%d", 
-      this->MiddleFrame->GetFrame1Size());
+      this->MainSplitFrame->GetFrame1Size());
     }
 }
 
@@ -647,9 +612,9 @@ void vtkKWWindow::RestoreWindowGeometry()
       {
       int reg_size = this->GetApplication()->GetIntRegistryValue(
         2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY);
-      if (reg_size >= this->MiddleFrame->GetFrame1MinimumSize())
+      if (reg_size >= this->MainSplitFrame->GetFrame1MinimumSize())
         {
-        this->MiddleFrame->SetFrame1Size(reg_size);
+        this->MainSplitFrame->SetFrame1Size(reg_size);
         }
       }
     }
@@ -835,6 +800,7 @@ vtkKWMenu *vtkKWWindow::GetWindowMenu()
   this->WindowMenu->SetParent(this->GetMenu());
   this->WindowMenu->SetTearOff(0);
   this->WindowMenu->Create(this->GetApplication(), "");
+
   // make sure Help menu is on the right
   if (this->EditMenu)
     { 
@@ -866,86 +832,35 @@ void vtkKWWindow::OnPrint(int propagate, int res)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWindow::GetPropertiesVisiblity()
+int vtkKWWindow::GetMainPanelVisibility()
 {
-  return (this->MiddleFrame && this->MiddleFrame->GetFrame1Visibility() ? 1 : 0);
+  return 
+    (this->MainSplitFrame && this->MainSplitFrame->GetFrame1Visibility() ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::SetPropertiesVisiblity(int arg)
+void vtkKWWindow::SetMainPanelVisibility(int arg)
 {
-  if (arg)
+  if (arg == this->GetMainPanelVisibility())
     {
-    if (!this->GetPropertiesVisiblity())
-      {
-      this->MiddleFrame->Frame1VisibilityOn();
-      this->Script("%s entryconfigure 0 -label {%s}",
-                   this->GetWindowMenu()->GetWidgetName(),
-                   VTK_KW_HIDE_PROPERTIES_LABEL);
-      }
+    return;
     }
-  else
+
+  if (this->MainSplitFrame)
     {
-    if (this->GetPropertiesVisiblity())
-      {
-      this->MiddleFrame->Frame1VisibilityOff();
-      this->Script("%s entryconfigure 0 -label {%s}",
-                   this->GetWindowMenu()->GetWidgetName(),
-                   VTK_KW_SHOW_PROPERTIES_LABEL);
-      }
+    this->MainSplitFrame->SetFrame1Visibility(arg);
     }
+
+  this->UpdateMenuState();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::TogglePropertiesVisibilityCallback()
+void vtkKWWindow::MainPanelVisibilityCallback()
 {
-  int arg = !this->GetPropertiesVisiblity();
-  this->SetPropertiesVisiblity(arg);
+  int arg = !this->GetMainPanelVisibility();
+  this->SetMainPanelVisibility(arg);
   float farg = arg;
   this->InvokeEvent(vtkKWEvent::UserInterfaceVisibilityChangedEvent, &farg);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::ShowWindowProperties()
-{
-  this->ShowProperties();
-  
-  // Forget current props and pack the notebook
-
-  this->Notebook->UnpackSiblings();
-
-  this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
-               this->Notebook->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWindow::ShowApplicationSettingsInterface()
-{
-  if (this->GetApplicationSettingsInterface())
-    {
-    this->ShowWindowProperties();
-    return this->GetApplicationSettingsInterface()->Raise();
-    }
-
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::ShowMostRecentPanels(int arg)
-{
-  if (arg)
-    {
-    this->Notebook->ShowAllPagesWithSameTagOff();
-    this->Notebook->ShowOnlyPagesWithSameTagOff();
-    this->Notebook->SetNumberOfMostRecentPages(4);
-    this->Notebook->ShowOnlyMostRecentPagesOn();
-    }
-  else
-    {
-    this->Notebook->ShowAllPagesWithSameTagOff();
-    this->Notebook->ShowOnlyMostRecentPagesOff();
-    this->Notebook->ShowOnlyPagesWithSameTagOn();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -1399,7 +1314,7 @@ void vtkKWWindow::UpdateEnableState()
 
   // Update the notebook
 
-  this->PropagateEnableState(this->Notebook);
+  this->PropagateEnableState(this->MainNotebook);
 
   // Update all the user interface panels
 
@@ -1418,9 +1333,8 @@ void vtkKWWindow::UpdateEnableState()
 
   // Update the window element
 
-  this->PropagateEnableState(this->MiddleFrame);
+  this->PropagateEnableState(this->MainSplitFrame);
   this->PropagateEnableState(this->StatusFrame);
-  this->PropagateEnableState(this->PropertiesParent);
   this->PropagateEnableState(this->MenuBarSeparatorFrame);
 
   // Do not disable the status image, it has not functionality attached 
@@ -1469,12 +1383,20 @@ void vtkKWWindow::UpdateMenuState()
       this->GetApplication(), about_command.c_str());
     if (pos >= 0)
       {
-      ostrstream label;
-      label << "-label {About " 
-            << this->GetApplication()->GetPrettyName() << "}"<<ends;
-      this->HelpMenu->ConfigureItem(pos, label.str());
-      label.rdbuf()->freeze(0);
+      kwsys_stl::string label("-label {About ");
+      label += this->GetApplication()->GetPrettyName();
+      label += "}";
+      this->HelpMenu->ConfigureItem(pos, label.c_str());
       }
+    }
+
+  if (this->WindowMenu)
+    {
+    kwsys_stl::string label("-label {");
+    label += this->GetMainPanelVisibility()
+      ? VTK_KW_HIDE_MAIN_PANEL_LABEL : VTK_KW_SHOW_MAIN_PANEL_LABEL;
+    label += "}";
+    this->WindowMenu->ConfigureItem(0, label.c_str());
     }
 }
 
@@ -1486,12 +1408,12 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Menu: " << this->GetMenu() << endl;
   os << indent << "FileMenu: " << this->GetFileMenu() << endl;
   os << indent << "HelpMenu: " << this->GetHelpMenu() << endl;
-  os << indent << "Notebook: " << this->GetNotebook() << endl;
+  os << indent << "MainNotebook: " << this->GetMainNotebook() << endl;
+  os << indent << "MainSplitFrame: " << this->GetMainSplitFrame() << endl;
   os << indent << "PrintTargetDPI: " << this->GetPrintTargetDPI() << endl;
   os << indent << "ProgressGauge: " << this->GetProgressGauge() << endl;
   os << indent << "PromptBeforeClose: " << this->GetPromptBeforeClose() 
      << endl;
-  os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
   os << indent << "ScriptExtension: " << this->GetScriptExtension() << endl;
   os << indent << "ScriptType: " << this->GetScriptType() << endl;
   os << indent << "SupportHelp: " << this->GetSupportHelp() << endl;

@@ -461,8 +461,9 @@ public:
   virtual vtkKWUserInterfaceManager* GetUserInterfaceManager();
 
   // Description:
-  // Get the Application Settings Interface. 
-  virtual vtkKWApplicationSettingsInterface *GetApplicationSettingsInterface();
+  // Get/Show the Application Settings Interface. 
+  virtual vtkPVApplicationSettingsInterface *GetApplicationSettingsInterface();
+  int ShowApplicationSettingsInterface();
 
   //BTX
   // Description:

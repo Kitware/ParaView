@@ -45,7 +45,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVComparativeVisManager);
-vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.6");
+vtkCxxRevisionMacro(vtkPVComparativeVisManager, "1.7");
 
 vtkCxxSetObjectMacro(
   vtkPVComparativeVisManager, Application, vtkPVApplication);
@@ -186,7 +186,7 @@ void vtkPVComparativeVisManager::Process()
   window->ChangeInteractorStyle(2);
   window->GetInteractor()->SetInteractorStyle(this->IStyle);
   window->SetCurrentPVSource(0);
-  window->SetPropertiesVisiblity(0);
+  window->SetMainPanelVisibility(0);
   window->SetToolbarVisibility("tools", 0);
   window->SetToolbarVisibility("camera", 0);
   window->SetToolbarVisibility("interaction", 0);

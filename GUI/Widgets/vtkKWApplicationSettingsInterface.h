@@ -23,19 +23,6 @@
 
 #include "vtkKWUserInterfacePanel.h"
 
-//----------------------------------------------------------------------------
-
-#define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY        "SaveWindowGeometry"
-#define VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY          "ShowSplashScreen"
-#define VTK_KW_SHOW_TOOLTIPS_REG_KEY               "ShowBalloonHelp"
-#define VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY     "ShowMostRecentPanels"
-#define VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY    "EnableGUIDragAndDrop"
-
-#define VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY      "ToolbarFlatFrame"
-#define VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY    "ToolbarFlatButtons"
-
-//----------------------------------------------------------------------------
-
 class vtkKWCheckButton;
 class vtkKWFrame;
 class vtkKWFrameLabeled;
@@ -70,7 +57,6 @@ public:
   virtual void SaveWindowGeometryCallback();
   virtual void ShowSplashScreenCallback();
   virtual void ShowBalloonHelpCallback();
-  virtual void ShowMostRecentPanelsCallback();
   virtual void EnableDragAndDropCallback();
   virtual void ResetDragAndDropCallback();
   virtual void FlatFrameCallback();
@@ -99,7 +85,6 @@ protected:
   vtkKWCheckButton  *SaveWindowGeometryCheckButton;
   vtkKWCheckButton  *ShowSplashScreenCheckButton;
   vtkKWCheckButton  *ShowBalloonHelpCheckButton;
-  vtkKWCheckButton  *ShowMostRecentPanelsCheckButton;
 
   // Interface customization
 

@@ -22,7 +22,6 @@
 #include "vtkKWTopLevel.h"
 
 class vtkKWApplication;
-class vtkKWApplicationSettingsInterface;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWLoadSaveDialog;
@@ -37,11 +36,14 @@ class vtkKWToolbar;
 class vtkKWUserInterfaceManager;
 class vtkKWMostRecentFilesManager;
 
-#define VTK_KW_PAGE_SETUP_MENU_LABEL      "Page Setup"
-#define VTK_KW_RECENT_FILES_MENU_LABEL    "Open Recent File"
-#define VTK_KW_EXIT_DIALOG_NAME           "ExitApplication"
-#define VTK_KW_WINDOW_GEOMETRY_REG_KEY    "WindowGeometry"
-#define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
+#define VTK_KW_PAGE_SETUP_MENU_LABEL            "Page Setup"
+#define VTK_KW_RECENT_FILES_MENU_LABEL          "Open Recent File"
+
+#define VTK_KW_WINDOW_GEOMETRY_REG_KEY          "WindowGeometry"
+#define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY       "WindowFrame1Size"
+#define VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY "EnableGUIDragAndDrop"
+#define VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY       "ToolbarFlatFrame"
+#define VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY     "ToolbarFlatButtons"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWTopLevel
 {
@@ -112,40 +114,33 @@ public:
   virtual void SetErrorIcon(int);
 
   // Description:
-  // Get the various menu objects.
+  // The window is divided into two parts (1 and 2) by the MainSplitFrame.
+  // The first part is called the "main panel" area, and it
+  // can be hidden or shown by setting its visibility flag.
+  // A convenience method GetMainPanelFrame() can be used to retrive that
+  // "main panel area".
+  // The MainNotebook element is packed in the main panel and is used to
+  // display interface elements organized as pages inside panels.
+  vtkGetObjectMacro(MainSplitFrame, vtkKWSplitFrame);
+  virtual vtkKWFrame* GetMainPanelFrame();
+  int GetMainPanelVisibility();
+  void SetMainPanelVisibility(int);
+  vtkGetObjectMacro(MainNotebook, vtkKWNotebook);
+
+  // Description:
+  // A convenience method to retrieve a pointer to the large frame available 
+  // for viewing. In this implementation it defaults to the frame on
+  // the right of the split bar (MainSplitFrame).
+  virtual vtkKWFrame* GetViewFrame();
+
+  // Description:
+  // Get the menu objects.
   vtkGetObjectMacro(FileMenu,vtkKWMenu);
   vtkGetObjectMacro(HelpMenu,vtkKWMenu);
   vtkKWMenu *GetEditMenu();
   vtkKWMenu *GetViewMenu();
   vtkKWMenu *GetWindowMenu();
   
-  // Description:
-  // Get the view frame. This is a convenience method to retrieve a
-  // pointer to the large frame available for viewing. In this implementation
-  // it defaults to the frame on the right of the split bar.
-  virtual vtkKWFrame* GetViewFrame();
-  
-  // Description:
-  // Proiperties may be bound to the window or view or
-  // something else. The CreateDefaultPropertiesParent method
-  // will create an attachment point for the properties at
-  // the window level.
-  vtkGetObjectMacro(PropertiesParent,vtkKWWidget);
-  void SetPropertiesParent(vtkKWWidget*);
-  void CreateDefaultPropertiesParent();
-
-  // Description:
-  // Provide hide/show functionality of properties
-  int GetPropertiesVisiblity();
-  void SetPropertiesVisiblity(int);
-  void HideProperties() { this->SetPropertiesVisiblity(0); };
-  void ShowProperties() { this->SetPropertiesVisiblity(1); };
-  void TogglePropertiesVisibilityCallback();
-  
-  // Description:
-  // Callback to display window properties (usually, application settings)
-  void ShowWindowProperties();
-
   // Description::
   // Add a "Recent Files" sub-menu to the File menu and fill it with the
   // most recent files stored in the registry.
@@ -180,11 +175,6 @@ public:
   void OnPrint(int propagate, int resolution);
   vtkGetMacro(PrintTargetDPI,float);
   
-  // Description:
-  // Allow access to the notebook object.
-  vtkGetObjectMacro(Notebook,vtkKWNotebook);
-  virtual void ShowMostRecentPanels(int);
-
   // Description:
   // The toolbar container.
   vtkGetObjectMacro(Toolbars, vtkKWToolbarSet);
@@ -262,12 +252,6 @@ public:
     { return 0; };
 
   // Description:
-  // Get/Show the Application Settings Interface. 
-  virtual vtkKWApplicationSettingsInterface* GetApplicationSettingsInterface() 
-    { return 0; };
-  int ShowApplicationSettingsInterface();
-
-  // Description:
   // Display the tcl interactor.
   void DisplayCommandPrompt();
   
@@ -317,6 +301,7 @@ public:
   // Process the click on the error icon.
   // Override it in subclasses to popup more elaborate log/error dialog.
   virtual void ErrorIconCallback();
+  virtual void MainPanelVisibilityCallback();
 
 protected:
   vtkKWWindow();
@@ -352,9 +337,9 @@ protected:
   virtual void SaveWindowGeometry();
   virtual void RestoreWindowGeometry();
 
-  vtkKWNotebook *Notebook;
+  vtkKWNotebook *MainNotebook;
 
-  vtkKWSplitFrame *MiddleFrame;
+  vtkKWSplitFrame *MainSplitFrame;
 
   vtkKWMenu *FileMenu;
   vtkKWMenu *EditMenu;
@@ -375,7 +360,6 @@ protected:
   vtkKWFrame      *TrayFrame;
   vtkKWLabel      *TrayImageError;
 
-  vtkKWWidget *PropertiesParent;
   vtkKWToolbarSet *Toolbars;
 
   vtkKWFrame *MenuBarSeparatorFrame;

@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWApplication.h"
 
-#include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWBWidgets.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -56,7 +55,7 @@ EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.200");
+vtkCxxRevisionMacro(vtkKWApplication, "1.201");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);

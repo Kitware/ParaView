@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.30");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.31");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -52,7 +52,6 @@ vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
   this->SaveWindowGeometryCheckButton = 0;
   this->ShowSplashScreenCheckButton = 0;
   this->ShowBalloonHelpCheckButton = 0;
-  this->ShowMostRecentPanelsCheckButton = 0;
 
   // Interface customization
 
@@ -102,12 +101,6 @@ vtkKWApplicationSettingsInterface::~vtkKWApplicationSettingsInterface()
     {
     this->ShowBalloonHelpCheckButton->Delete();
     this->ShowBalloonHelpCheckButton = NULL;
-    }
-
-  if (this->ShowMostRecentPanelsCheckButton)
-    {
-    this->ShowMostRecentPanelsCheckButton->Delete();
-    this->ShowMostRecentPanelsCheckButton = NULL;
     }
 
   // Interface customization
@@ -285,26 +278,6 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
-  // Interface settings : show most recent panels
-
-  if (!this->ShowMostRecentPanelsCheckButton)
-    {
-    this->ShowMostRecentPanelsCheckButton = vtkKWCheckButton::New();
-    }
-
-  this->ShowMostRecentPanelsCheckButton->SetParent(frame);
-  this->ShowMostRecentPanelsCheckButton->Create(app, 0);
-  this->ShowMostRecentPanelsCheckButton->SetText(
-    "Show most recent panels");
-  this->ShowMostRecentPanelsCheckButton->SetCommand(
-    this, "ShowMostRecentPanelsCallback");
-  this->ShowMostRecentPanelsCheckButton->SetBalloonHelpString(
-    "Show (and maintain) the most recent panels visited by the user.");
-
-  tk_cmd << "pack " << this->ShowMostRecentPanelsCheckButton->GetWidgetName()
-         << "  -side top -anchor w -expand no -fill none" << endl;
-
-  // --------------------------------------------------------------
   // Interface customization : main frame
 
   if (!this->InterfaceCustomizationFrame)
@@ -475,32 +448,11 @@ void vtkKWApplicationSettingsInterface::Update()
       this->GetApplication()->GetBalloonHelpManager()->GetShow());
     }
 
-  // Interface settings : show most recent panels
+  // Interface customization : Drag & Drop : Enable
 
   vtkKWUserInterfaceNotebookManager *uim_nb = 
     vtkKWUserInterfaceNotebookManager::SafeDownCast(
       this->Window->GetUserInterfaceManager());
-
-  if (this->ShowMostRecentPanelsCheckButton)
-    {
-    if (this->GetApplication()->HasRegistryValue(
-          2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY))
-      {
-      this->ShowMostRecentPanelsCheckButton->SetState(
-        this->GetApplication()->GetIntRegistryValue(
-          2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY));
-      }
-    else
-      {
-      this->ShowMostRecentPanelsCheckButton->SetState(1);
-      }
-    if (!uim_nb)
-      {
-      this->ShowMostRecentPanelsCheckButton->SetEnabled(0);
-      }
-    }
-
-  // Interface customization : Drag & Drop : Enable
 
   if (this->EnableDragAndDropCheckButton)
     {
@@ -635,21 +587,6 @@ void vtkKWApplicationSettingsInterface::ShowBalloonHelpCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplicationSettingsInterface::ShowMostRecentPanelsCallback()
-{
-  if (this->IsCreated())
-    {
-    int flag = this->ShowMostRecentPanelsCheckButton->GetState() ? 1 : 0;
-    this->GetApplication()->SetRegistryValue(
-      2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY, "%d", flag);
-    if (this->Window)
-      {
-      this->Window->ShowMostRecentPanels(flag);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::EnableDragAndDropCallback()
 {
   if (this->IsCreated())
@@ -760,11 +697,6 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
   if (this->ShowBalloonHelpCheckButton)
     {
     this->ShowBalloonHelpCheckButton->SetEnabled(this->GetEnabled());
-    }
-
-  if (this->ShowMostRecentPanelsCheckButton)
-    {
-    this->ShowMostRecentPanelsCheckButton->SetEnabled(this->GetEnabled());
     }
 
   // Interface customization

@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.698");
+vtkCxxRevisionMacro(vtkPVWindow, "1.699");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1119,10 +1119,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // Set the left panel size (Frame1) for this app. Do it now before
   // the superclass eventually restores the size from the registry
 
-  this->MiddleFrame->SetFrame1MinimumSize(200);
-  this->MiddleFrame->SetFrame2MinimumSize(200);
-  this->MiddleFrame->SetFrame1Size(380);
-  this->MiddleFrame->SetSeparatorSize(5);
+  this->MainSplitFrame->SetFrame1MinimumSize(200);
+  this->MainSplitFrame->SetFrame2MinimumSize(200);
+  this->MainSplitFrame->SetFrame1Size(380);
+  this->MainSplitFrame->SetSeparatorSize(5);
 
   // Invoke super method
 
@@ -1380,7 +1380,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // Interface for the animation tool.
   this->AnimationManager->SetParent(this);
   this->AnimationManager->SetHorizantalParent(this->LowerFrame->GetFrame2());
-  this->AnimationManager->SetVerticalParent(this->GetPropertiesParent());
+  this->AnimationManager->SetVerticalParent(this->GetMainPanelFrame());
   this->AnimationManager->Create(app, "-relief flat");
   this->AnimationManager->ShowHAnimationInterface();
   
@@ -1969,7 +1969,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   view = vtkPVRenderView::New();
   this->MainView = view;
   this->MainView->SetParent(this->LowerFrame->GetFrame1());
-  this->MainView->SetPropertiesParent(this->GetPropertiesParent());
+  this->MainView->SetPropertiesParent(this->GetMainPanelFrame());
   this->MainView->SetParentWindow(this);
   this->MainView->Create(this->GetApplication(),"-width 200 -height 200");
   this->MainView->CreateRenderObjects(pvApp);
@@ -2089,24 +2089,28 @@ void vtkPVWindow::OpenCallback()
   delete [] openFileName;
 }
 
+//----------------------------------------------------------------------------
 vtkKWUserInterfaceManager* vtkPVWindow::GetUserInterfaceManager()
 {
   if (!this->UserInterfaceManager)
     {
     this->UserInterfaceManager = vtkKWUserInterfaceNotebookManager::New();
-    this->UserInterfaceManager->SetNotebook(this->Notebook);
+    this->UserInterfaceManager->SetNotebook(this->GetMainNotebook());
     }
   return this->UserInterfaceManager;
 }
 
-vtkKWApplicationSettingsInterface* vtkPVWindow::GetApplicationSettingsInterface()
+//----------------------------------------------------------------------------
+vtkPVApplicationSettingsInterface* 
+vtkPVWindow::GetApplicationSettingsInterface()
 {
   // If not created, create the application settings interface, connect it
   // to the current window, and manage it with the current interface manager.
 
   if (!this->ApplicationSettingsInterface)
     {
-    this->ApplicationSettingsInterface= vtkPVApplicationSettingsInterface::New();
+    this->ApplicationSettingsInterface = 
+      vtkPVApplicationSettingsInterface::New();
     this->ApplicationSettingsInterface->SetWindow(this);
 
     vtkKWUserInterfaceManager *uim = this->GetUserInterfaceManager();
@@ -2116,6 +2120,26 @@ vtkKWApplicationSettingsInterface* vtkPVWindow::GetApplicationSettingsInterface(
       }
     }
   return this->ApplicationSettingsInterface;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVWindow::ShowApplicationSettingsInterface()
+{
+  if (this->GetApplicationSettingsInterface())
+    {
+    this->SetMainPanelVisibility(1);
+    
+    // Forget current props and pack the notebook
+    
+    this->MainNotebook->UnpackSiblings();
+    
+    this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
+               this->MainNotebook->GetWidgetName());
+
+    return this->GetApplicationSettingsInterface()->Raise();
+    }
+
+  return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -3778,10 +3802,9 @@ void vtkPVWindow::ShowCurrentSourcePropertiesCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourceProperties()
 {
-
   // Bring up the properties panel
   
-  this->ShowProperties();
+  this->SetMainPanelVisibility(1);
 
   if ( !this->GetViewMenu() )
     {
@@ -3814,7 +3837,7 @@ void vtkPVWindow::ShowAnimationPanes()
     this->GetTclName());
   
   //Bring up the properties panel.
-  this->ShowProperties();
+  this->SetMainPanelVisibility(1);
   this->ShowHorizontalPane();
   
   // We need to update the properties-menu radio button too!

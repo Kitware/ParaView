@@ -35,7 +35,11 @@ class vtkKWWindow;
 class vtkKWText;
 class vtkKWApplicationInternals;
 
-#define VTK_KW_EXIT_DIALOG_NAME           "ExitApplication"
+#define VTK_KW_EXIT_DIALOG_NAME                 "ExitApplication"
+
+#define VTK_KW_SHOW_TOOLTIPS_REG_KEY            "ShowBalloonHelp"
+#define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY     "SaveWindowGeometry"
+#define VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY       "ShowSplashScreen"
 
 class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {

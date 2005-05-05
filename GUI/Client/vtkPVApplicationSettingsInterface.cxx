@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.22");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.23");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -226,14 +226,6 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   tk_cmd << "pack " << this->CreateLogFilesCheckButton->GetWidgetName()
     << "  -side top -anchor w -expand no -fill none" << endl;
-
-  // --------------------------------------------------------------
-  // Interface settings : show most recent panels
-
-  // Not really supported by ParaView... (only in App Settings notebook)
-
-  tk_cmd << "pack forget " 
-         << this->ShowMostRecentPanelsCheckButton->GetWidgetName() << endl;
 
   // --------------------------------------------------------------
   // Interface customization
