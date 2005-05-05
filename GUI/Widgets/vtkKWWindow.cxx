@@ -39,7 +39,7 @@
 #define VTK_KW_SHOW_MAIN_PANEL_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.233");
+vtkCxxRevisionMacro(vtkKWWindow, "1.234");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -82,7 +82,7 @@ vtkKWWindow::vtkKWWindow()
   this->TrayFrame             = vtkKWFrame::New();
   this->TrayImageError        = vtkKWLabel::New();
 
-  this->MainNotebook              = vtkKWNotebook::New();
+  this->MainNotebook          = vtkKWNotebook::New();
 
   this->TclInteractor         = NULL;
 
@@ -382,6 +382,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->MainNotebook->SetParent(this->GetMainPanelFrame());
   this->MainNotebook->Create(app, "");
+
+  this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
+               this->MainNotebook->GetWidgetName());
+
   this->MainNotebook->AlwaysShowTabsOn();
 
   // Status frame separator
