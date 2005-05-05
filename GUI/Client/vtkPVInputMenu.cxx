@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.71");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.72");
 
 
 //----------------------------------------------------------------------------
@@ -172,6 +172,7 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
     {
     return 0;
     }
+  ip->RemoveAllUncheckedProxies();
 
   char methodAndArgs[1024];
   sprintf(methodAndArgs, "MenuEntryCallback %s", pvs->GetTclName());
