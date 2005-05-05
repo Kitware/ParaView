@@ -503,7 +503,7 @@ public:
   // Set the progress. All progresses 0 or 100 will be ignored.
   void SetProgress(const char* text, int val);
   void StartProgress();
-  void EndProgress(int enabled);
+  void EndProgress();
 
   // Description:
   // The following methods are needed for mouse interaction tracing.

@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.697");
+vtkCxxRevisionMacro(vtkPVWindow, "1.698");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4978,7 +4978,7 @@ void vtkPVWindow::StartProgress()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::EndProgress(int enabled)
+void vtkPVWindow::EndProgress()
 {
   this->ExpectProgress = 0;
   this->GetProgressGauge()->SetValue(0);

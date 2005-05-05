@@ -23,7 +23,7 @@
 #include "vtkPVWindow.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.15");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.16");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -164,8 +164,7 @@ void vtkPVProcessModuleGUIHelper::SendCleanupPendingProgress()
     {
     return;
     }
-  this->PVApplication->GetMainWindow()->EndProgress(
-    this->ProcessModule->GetProgressEnabled());
+  this->PVApplication->GetMainWindow()->EndProgress();
 }
 
 
