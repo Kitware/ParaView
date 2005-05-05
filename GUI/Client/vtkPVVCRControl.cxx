@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.8");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.9");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -419,4 +419,5 @@ void vtkPVVCRControl::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "InPlay: " << this->InPlay << endl;
+  os << indent << "Mode: " << this->Mode << endl;
 }
