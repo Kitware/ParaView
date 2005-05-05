@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.27");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.28");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -49,6 +49,7 @@ vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
   this->ControlFrame = vtkKWWidget::New();
   this->SaveButton = vtkKWPushButton::New();
   this->ClearButton = vtkKWPushButton::New();
+  this->RefreshButton = vtkKWPushButton::New();
   this->ThresholdLabel = vtkKWLabel::New();
   this->ThresholdMenu = vtkKWOptionMenu::New();
   this->BufferLengthLabel = vtkKWLabel::New();
@@ -84,6 +85,8 @@ vtkPVTimerLogDisplay::~vtkPVTimerLogDisplay()
   this->SaveButton = NULL;
   this->ClearButton->Delete();
   this->ClearButton = NULL;
+  this->RefreshButton->Delete();
+  this->RefreshButton = NULL;
   this->ThresholdLabel->Delete();
   this->ThresholdLabel = NULL;
   this->ThresholdMenu->Delete();
@@ -179,8 +182,8 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
     
   this->DisplayText->SetParent(this);
   this->DisplayText->Create(app, "-setgrid true");
-  this->DisplayText->SetWidth(60);
-  this->DisplayText->SetHeight(8);
+  this->DisplayText->SetWidth(100);
+  this->DisplayText->SetHeight(40);
   this->DisplayText->SetWrapToWord();
   this->DisplayText->EditableTextOff();
   this->DisplayText->UseVerticalScrollbarOn();
@@ -204,6 +207,12 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->ClearButton->SetText("Clear");
   this->Script("pack %s -side left -expand 0 -fill none",
                this->ClearButton->GetWidgetName());
+  this->RefreshButton->SetParent(this->ControlFrame);
+  this->RefreshButton->Create(app, "");
+  this->RefreshButton->SetCommand(this, "Update");
+  this->RefreshButton->SetText("Refresh");
+  this->Script("pack %s -side left -expand 0 -fill none",
+               this->RefreshButton->GetWidgetName());
 
   this->ThresholdLabel->SetParent(this->ControlFrame);
   this->ThresholdLabel->Create(app, "");
@@ -211,6 +220,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->ThresholdLabel->SetBalloonHelpString("This option filters out short duration events.");
   this->ThresholdMenu->SetParent(this->ControlFrame);
   this->ThresholdMenu->Create(app, "");
+  this->ThresholdMenu->AddEntryWithCommand("0.0", this, "SetThreshold 0.001");
   this->ThresholdMenu->AddEntryWithCommand("0.001", this, "SetThreshold 0.001");
   this->ThresholdMenu->AddEntryWithCommand("0.01", this, "SetThreshold 0.01");
   this->ThresholdMenu->AddEntryWithCommand("0.1", this, "SetThreshold 0.1");
@@ -231,6 +241,7 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->BufferLengthMenu->AddEntryWithCommand("100", this, "SetBufferLength 100");
   this->BufferLengthMenu->AddEntryWithCommand("500", this, "SetBufferLength 500");
   this->BufferLengthMenu->AddEntryWithCommand("1000", this, "SetBufferLength 1000");
+  this->BufferLengthMenu->AddEntryWithCommand("5000", this, "SetBufferLength 5000");
   this->BufferLengthMenu->SetCurrentEntry("500");
   this->SetBufferLength(500);
   this->BufferLengthMenu->SetBalloonHelpString("Set how many entries the log can have.");
@@ -260,7 +271,6 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 void vtkPVTimerLogDisplay::Display()
 {   
   this->Script("wm deiconify %s", this->GetWidgetName());
-  this->Script("grab %s", this->GetWidgetName());
 
   this->Update();
 }
@@ -289,7 +299,7 @@ void vtkPVTimerLogDisplay::SetThreshold(float val)
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::SetBufferLength(int length)
 {
-  if (length == vtkTimerLog::GetMaxEntries())
+  if (length == vtkTimerLog::GetMaxEntries()/2)
     {
     return;
     }
@@ -299,7 +309,7 @@ void vtkPVTimerLogDisplay::SetBufferLength(int length)
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream stream;
   stream << vtkClientServerStream::Invoke 
-         << pm->GetProcessModuleID() << "SetLogBufferLength" << length
+         << pm->GetProcessModuleID() << "SetLogBufferLength" << 2*length
          << vtkClientServerStream::End;
   pm->SendStream(
     vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
@@ -455,7 +465,7 @@ void vtkPVTimerLogDisplay::DisplayLog()
   int id;
  
   numLogs = this->TimerInformation->GetNumberOfLogs();
-  
+
   this->DisplayText->SetValue("");
   for (id = 0; id < numLogs; ++id)
     {
@@ -543,6 +553,7 @@ void vtkPVTimerLogDisplay::UpdateEnableState()
   this->PropagateEnableState(this->ControlFrame);
   this->PropagateEnableState(this->SaveButton);
   this->PropagateEnableState(this->ClearButton);
+  this->PropagateEnableState(this->RefreshButton);
   this->PropagateEnableState(this->ThresholdLabel);
   this->PropagateEnableState(this->ThresholdMenu);
   this->PropagateEnableState(this->BufferLengthLabel);

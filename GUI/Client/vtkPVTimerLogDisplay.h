@@ -102,12 +102,15 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Update the display copying the new log information.
+  virtual void Update();
  
 protected:
   vtkPVTimerLogDisplay();
   ~vtkPVTimerLogDisplay();
 
-  virtual void Update();
   void DisplayLog();
 
   void Append(const char*);
@@ -117,6 +120,7 @@ protected:
   vtkKWWidget*      ControlFrame;
   vtkKWPushButton*  SaveButton;
   vtkKWPushButton*  ClearButton;
+  vtkKWPushButton*  RefreshButton;
   vtkKWLabel*       ThresholdLabel;
   vtkKWOptionMenu*  ThresholdMenu;
   vtkKWLabel*       BufferLengthLabel;
