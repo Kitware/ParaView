@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.696");
+vtkCxxRevisionMacro(vtkPVWindow, "1.697");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4964,16 +4964,14 @@ void vtkPVWindow::SetProgress(const char* text, int val)
     text += 3;
     }
   this->ModifiedEnableState = 1;
-  this->SetEnabled(0);
   this->SetStatusText(text);
   this->GetProgressGauge()->SetValue(val);
-  this->Script("update");
+  this->Script("update idletasks");
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::StartProgress()
 {
-  this->MainView->StartBlockingRender();
   this->ExpectProgress = 1;
   this->ModifiedEnableState = 0;
   this->LastProgress = vtkTimerLog::GetUniversalTime();
@@ -4987,22 +4985,12 @@ void vtkPVWindow::EndProgress(int enabled)
   this->LastProgress = vtkTimerLog::GetUniversalTime();
   this->SetStatusText("");
 
-  this->MainView->EndBlockingRender();
-
   if (!this->ModifiedEnableState)
     {
     return;
     }
 
   this->ModifiedEnableState = 0;
-  if ( !enabled || this->GetEnabled() )
-    {
-    this->UpdateEnableState();
-    }
-  else
-    {
-    this->EnabledOn();
-    }
 }
 
 //-----------------------------------------------------------------------------
