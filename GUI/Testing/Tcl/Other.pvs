@@ -1,5 +1,5 @@
-$Application ExitAfterLoadScriptOn
-$Application PromptBeforeExitOff
+#$Application ExitAfterLoadScriptOn
+#$Application PromptBeforeExitOff
 
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
@@ -41,8 +41,8 @@ $Application AcceptEvaluation
 $pvWindow DisableToolbarButtons
 $pvWindow EnableToolbarButtons
 
-$pvWindow HideProperties
-$pvWindow ShowProperties
+$pvWindow MainPanelVisibilityOff
+$pvWindow MainPanelVisibilityOn
 
 $pvWindow CenterEntryOpenCallback
 $pvWindow CenterEntryCloseCallback

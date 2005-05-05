@@ -123,8 +123,9 @@ public:
   // display interface elements organized as pages inside panels.
   vtkGetObjectMacro(MainSplitFrame, vtkKWSplitFrame);
   virtual vtkKWFrame* GetMainPanelFrame();
-  int GetMainPanelVisibility();
-  void SetMainPanelVisibility(int);
+  virtual int GetMainPanelVisibility();
+  virtual void SetMainPanelVisibility(int);
+  vtkBooleanMacro(MainPanelVisibility, int );
   vtkGetObjectMacro(MainNotebook, vtkKWNotebook);
 
   // Description:

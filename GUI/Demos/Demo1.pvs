@@ -1582,7 +1582,7 @@ proc iso_run {} {
   }
   DemoAfter 2000
 
-  $iso(vtkTemp1) HideProperties
+  $iso(vtkTemp1) MainPanelVisibilityOff
   $iso(vtkTemp24) SetCameraState 1.736 3.553 6.396  1.474 -0.089 0.457  -0.006 0.881 -0.472
 
   $iso(vtkTemp739) SetVisibility 1
@@ -1621,7 +1621,7 @@ proc iso_run {} {
   $iso(vtkTemp790) RemoveAllKeyFrames
   DemoAfter 1000
 
-  $iso(vtkTemp1) ShowProperties
+  $iso(vtkTemp1) MainPanelVisibilityOn
 
   $iso(vtkTemp674) SetVisibility 0
   $iso(vtkTemp565) SetVisibility 0
@@ -4434,7 +4434,7 @@ proc threshold_run {} {
     $threshold(vtkTemp384) SetVisibility 1
     $threshold(vtkTemp482) SetVisibility 1
 
-    $threshold(vtkTemp1) HideProperties
+    $threshold(vtkTemp1) MainPanelVisibilityOff
 
     $threshold(vtkTemp24) SetCameraState -19.320 29.194 60.286  0.000 0.000 0.000  0.073 0.907 -0.416
     ForceRender
@@ -4457,7 +4457,7 @@ proc threshold_run {} {
     $threshold(vtkTemp482) SetVisibility 0
     ForceRender
 
-    $threshold(vtkTemp1) ShowProperties
+    $threshold(vtkTemp1) MainPanelVisibilityOn
 }
 
 proc warp_init {} {
