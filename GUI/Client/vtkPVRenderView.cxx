@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.374");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.375");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -514,7 +514,6 @@ void PVRenderViewAbortCheck(vtkObject*, unsigned long, void* arg, void*)
     }
   if (abort == 2)
     {
-    //("Abort 2");
     me->GetRenderWindow()->SetAbortRender(2);
     }
 }
@@ -1826,6 +1825,11 @@ void vtkPVRenderView::ForceRender()
   vtkPVApplication *pvApp = this->GetPVApplication();
   if ( pvApp )
     {
+    if (this->TimerToken)
+      {
+      Tcl_DeleteTimerHandler( this->TimerToken );
+      this->TimerToken = NULL;
+      }
     this->CornerAnnotation->UpdateCornerText();
     pvApp->GetProcessModule()->SetGlobalLODFlag(0);
     this->RenderModuleProxy->StillRender();
