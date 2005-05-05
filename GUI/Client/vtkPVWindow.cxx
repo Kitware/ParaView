@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.699");
+vtkCxxRevisionMacro(vtkPVWindow, "1.700");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1861,7 +1861,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
 void vtkPVWindow::MouseAction(int action,int button, 
                               int x,int y, int shift,int control)
 {
-  if ( !this->MainView->GetEnabled()  )
+  if ( !this->MainView->GetEnabled() || !this->Interactor )
     {
     return;
     }
