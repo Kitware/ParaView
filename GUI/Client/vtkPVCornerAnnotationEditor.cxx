@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotationEditor );
-vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.1");
+vtkCxxRevisionMacro(vtkPVCornerAnnotationEditor, "1.2");
 
 int vtkPVCornerAnnotationEditorCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -273,7 +273,7 @@ void vtkPVCornerAnnotationEditor::Update()
     this->TextPropertyWidget->Update();
     }
 
-  if (this->CheckButton)
+  if (this->CheckButton && this->CornerAnnotation)
     {
     this->CheckButton->SetState(this->CornerAnnotation->GetVisibility());
     }
