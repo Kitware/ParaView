@@ -20,7 +20,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkRenderWindow.h"
 vtkStandardNewMacro(vtkMPICompositeManager);
-vtkCxxRevisionMacro(vtkMPICompositeManager, "1.1");
+vtkCxxRevisionMacro(vtkMPICompositeManager, "1.2");
 
 //-----------------------------------------------------------------------------
 static void vtkMPICompositeManagerGatherZBufferValueRMI(void *local, void *pArg, 
@@ -163,6 +163,39 @@ void vtkMPICompositeManager::InitializeRMIs()
 }
 
 //-----------------------------------------------------------------------------
+void vtkMPICompositeManager::StartRender()
+{
+  if (!this->ParallelRendering)
+    {
+    // Make adjustments for window size.
+    int *tilesize = this->RenderWindow->GetSize();
+    // To me, it seems dangerous for RenderWindow to return a size bigger
+    // than it actually supports or for GetSize to not return the same values
+    // as SetSize.  Yet this is the case when tile rendering is established
+    // in RenderWindow.  Correct for this.
+    int size[2];
+    int *tilescale;
+    tilescale = this->RenderWindow->GetTileScale();
+    size[0] = tilesize[0]/tilescale[0];  size[1] = tilesize[1]/tilescale[1];
+    if ((size[0] == 0) || (size[1] == 0))
+      {
+      // It helps to have a real window size.
+      vtkDebugMacro("Resetting window size to 300x300");
+      size[0] = size[1] = 300;
+      this->RenderWindow->SetSize(size[0], size[1]);
+      }
+    this->FullImageSize[0] = size[0];
+    this->FullImageSize[1] = size[1];
+    
+    //Round up.
+    this->ReducedImageSize[0] =
+      (int)((size[0]+this->ImageReductionFactor-1)/this->ImageReductionFactor);
+    this->ReducedImageSize[1] =
+      (int)((size[1]+this->ImageReductionFactor-1)/this->ImageReductionFactor);
+    }
+  this->Superclass::StartRender();
+}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

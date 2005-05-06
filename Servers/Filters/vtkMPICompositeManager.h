@@ -48,6 +48,11 @@ public:
     Z_TAG=88771
   };
 //ETX
+
+  // Description:
+  // Overridden to set the Image Size when ParallelRendering is off.
+  virtual void StartRender();
+
 protected:
   vtkMPICompositeManager();
   ~vtkMPICompositeManager();
