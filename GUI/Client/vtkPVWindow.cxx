@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.700");
+vtkCxxRevisionMacro(vtkPVWindow, "1.701");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4741,16 +4741,15 @@ void vtkPVWindow::UpdateToolbarState()
 {
   this->Superclass::UpdateToolbarState();
   
-  //this->DisableToolbarButtons();
-  //  this->EnableToolbarButtons();
-
   // If not enabled, source grabbed or recording, disable toolbar button
+  // First disable all, then re-enable some (don't ask me)
 
+  this->DisableToolbarButtons();
   if (!this->GetEnabled() ||
       (this->CurrentPVSource && this->CurrentPVSource->GetSourceGrabbed()) ||
       (this->AnimationManager && this->AnimationManager->GetInRecording()))
     {
-    this->DisableToolbarButtons();
+    //this->DisableToolbarButtons();
     }
   else
     {
