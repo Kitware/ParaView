@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.352");
+vtkCxxRevisionMacro(vtkPVApplication, "1.353");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -529,6 +529,11 @@ int vtkPVApplication::SetupRenderModule()
   const char* renderModuleName = 0;
 
   renderModuleName = pm->GetOptions()->GetRenderModuleName();
+  if (!renderModuleName)
+    {
+    renderModuleName = pm->GetServerInformation()->GetRenderModuleName();
+    }
+  
   if (!renderModuleName)
     {
     // User didn't specify the render module to use.

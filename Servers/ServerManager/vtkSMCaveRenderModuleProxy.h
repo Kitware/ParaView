@@ -23,6 +23,8 @@
 
 #include "vtkSMCompositeRenderModuleProxy.h"
 
+class vtkPVServerOptionsInternals;
+
 class VTK_EXPORT vtkSMCaveRenderModuleProxy : public vtkSMCompositeRenderModuleProxy
 {
 public:
@@ -46,6 +48,7 @@ protected:
   virtual void InitializeCompositingPipeline();
 
   void LoadConfigurationFile(int numDisplays);
+  void ConfigureFromServerInformation();
 
   // Description:
   // For Cave composition is always collect.
@@ -53,6 +56,8 @@ protected:
 private:
   vtkSMCaveRenderModuleProxy(const vtkSMCaveRenderModuleProxy&); // Not implemented.
   void operator=(const vtkSMCaveRenderModuleProxy&); // Not implemented.
+
+  vtkPVServerOptionsInternals* CaveInternals;
 };
 
 #endif

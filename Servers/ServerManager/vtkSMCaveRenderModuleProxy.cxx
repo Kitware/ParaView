@@ -25,9 +25,10 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkRenderWindow.h"
 #include "vtkSMProxyManager.h"
+#include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -144,9 +145,14 @@ void vtkSMCaveRenderModuleProxy::LoadConfigurationFile(int numDisplays)
   ifstream *File = 0;
   if(!fileName)
     {
-    vtkErrorMacro("Missing configuration file.");
+    this->ConfigureFromServerInformation();
     return;
-    } 
+    }
+
+  vtkWarningMacro("Cave parameters should be specified in the XML "
+                  "configuration file. The --cave-configuration (and -cc) "
+                  "command-line arguments will be removed in the next "
+                  "ParaView release.");
   
   // Open the new file
   struct stat fs;
@@ -219,6 +225,26 @@ void vtkSMCaveRenderModuleProxy::LoadConfigurationFile(int numDisplays)
   delete File;
 }
 
+//-----------------------------------------------------------------------------
+void vtkSMCaveRenderModuleProxy::ConfigureFromServerInformation()
+{
+  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(
+    vtkProcessModule::GetProcessModule());
+  vtkPVServerInformation* serverInfo = pm->GetServerInformation();
+  vtkCaveRenderManager* crm = 
+    vtkCaveRenderManager::SafeDownCast(pm->GetObjectFromID(
+        this->CompositeManagerProxy->GetID(0)));
+
+  unsigned int idx;
+  unsigned int numDisplays = serverInfo->GetNumberOfDisplays();
+  for (idx = 0; idx < numDisplays; idx++)
+    {
+    pm->SetProcessEnvironmentVariable(idx, serverInfo->GetEnvironment(idx));
+    crm->DefineDisplay(idx, serverInfo->GetLowerLeft(idx),
+                       serverInfo->GetLowerRight(idx),
+                       serverInfo->GetUpperLeft(idx));
+    }
+}
 
 //-----------------------------------------------------------------------------
 int vtkSMCaveRenderModuleProxy::GetLocalRenderDecision(unsigned long,
