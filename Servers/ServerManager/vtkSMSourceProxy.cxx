@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.27");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.28");
 
 struct vtkSMSourceProxyInternals
 {
@@ -192,6 +192,7 @@ void vtkSMSourceProxy::CreateVTKObjects(int numObjects)
       stream << vtkClientServerStream::Invoke 
              << sourceID << "AddObserver" << "EndEvent" << end
              << vtkClientServerStream::End;
+      pm->DeleteStreamObject(execId, stream);
       }
 
 
