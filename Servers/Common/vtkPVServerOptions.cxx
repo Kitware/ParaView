@@ -13,79 +13,11 @@
 =========================================================================*/
 #include "vtkPVServerOptions.h"
 #include "vtkObjectFactory.h"
-#include <vtkstd/vector>
-#include <vtkstd/string>
+#include "vtkPVServerOptionsInternals.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerOptions);
-vtkCxxRevisionMacro(vtkPVServerOptions, "1.2");
-class vtkPVServerOptionsInternals
-{
-public:
-  // The MachineInformation struct is used
-  // to store information about each machine.
-  // These are stored in a vector one for each node in the process.
-  struct MachineInformation
-  {
-  public:
-    MachineInformation()
-      {
-        for(int i =0; i < 3; ++i)
-          {
-          this->LowerLeft[i] = 0.0;
-          this->LowerRight[i] = 0.0;
-          this->UpperLeft[i] = 0.0;
-          }
-        this->CaveBoundsSet = 0;
-      }
-    
-    vtkstd::string Name;  // what is the name of the machine
-    vtkstd::string Environment; // what environment variables should be set
-    int CaveBoundsSet;  // have the cave bounds been set
-    // store the cave bounds  all 0.0 if not set
-    double LowerLeft[3];
-    double LowerRight[3];
-    double UpperLeft[3];
-  };
-  void PrintSelf(ostream& os, vtkIndent indent)
-    {
-      os << indent << "Machine Information :\n";
-      vtkIndent ind = indent.GetNextIndent();
-      for(unsigned int i =0; i < this->MachineInformationVector.size(); ++i)
-        {
-        MachineInformation& minfo = this->MachineInformationVector[i];
-        os << ind << "Node: " << i << "\n";
-        vtkIndent ind2 = ind.GetNextIndent();
-        os << ind2 << "Name: " << minfo.Name.c_str() << "\n";
-        os << ind2 << "Environment: " << minfo.Environment.c_str() << "\n";
-        if(minfo.CaveBoundsSet)
-          {
-          int j;
-          os << ind2 << "LowerLeft: ";
-          for(j=0; j < 3; ++j)
-            {
-            os << minfo.LowerLeft[j] << " ";
-            }
-          os << "\n" << ind2 << "LowerRight: ";
-          for(j=0; j < 3; ++j)
-            {
-            os << minfo.LowerRight[j] << " ";
-            }
-          os << "\n" << ind2 << "UpperLeft: ";
-          for(j=0; j < 3; ++j)
-            {
-            os << minfo.UpperLeft[j] << " ";
-            }
-          os << "\n";
-          }
-        else
-          {
-          os << ind2 << "No Cave Options\n";
-          }
-        }
-    }
-  vtkstd::vector<MachineInformation> MachineInformationVector; // store the vector of machines
-};
+vtkCxxRevisionMacro(vtkPVServerOptions, "1.2.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVServerOptions::vtkPVServerOptions()
@@ -102,7 +34,7 @@ vtkPVServerOptions::~vtkPVServerOptions()
 //----------------------------------------------------------------------------
 void vtkPVServerOptions::Initialize()
 {
-  Superclass::Initialize();
+  this->Superclass::Initialize();
 }
 
 //----------------------------------------------------------------------------
@@ -174,6 +106,53 @@ int vtkPVServerOptions::ParseExtraXMLTag(const char* name, const char** atts)
     return this->AddMachineInformation(atts);
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkPVServerOptions::GetNumberOfDisplays()
+{
+  return this->Internals->MachineInformationVector.size();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVServerOptions::GetDisplayName(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+    {
+    return 0;
+    }
+
+  return this->Internals->MachineInformationVector[idx].Environment.c_str();
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVServerOptions::GetLowerLeft(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+    {
+    return 0;
+    }
+  return this->Internals->MachineInformationVector[idx].LowerLeft;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVServerOptions::GetLowerRight(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+    {
+    return 0;
+    }
+  return this->Internals->MachineInformationVector[idx].LowerRight;
+}
+
+//----------------------------------------------------------------------------
+double* vtkPVServerOptions::GetUpperLeft(unsigned int idx)
+{
+  if (idx >= this->Internals->MachineInformationVector.size())
+    {
+    return 0;
+    }
+  return this->Internals->MachineInformationVector[idx].UpperLeft;
 }
 
 //----------------------------------------------------------------------------

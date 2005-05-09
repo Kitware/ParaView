@@ -40,6 +40,15 @@ public:
   // Pass in the name and the attributes for all tags that are not Options.
   // If it returns 1, then it is successful, and 0 if it failed.
   virtual int ParseExtraXMLTag(const char* name, const char** atts);
+
+  // Description:
+  // Get information about displays used in a cave setup.
+  unsigned int GetNumberOfDisplays();
+  const char* GetDisplayName(unsigned int idx);
+  double* GetLowerLeft(unsigned int idx);
+  double* GetLowerRight(unsigned int idx);
+  double* GetUpperLeft(unsigned int idx);
+
 protected: 
   // Description:
   // Add machine information from the xml tag <Machine ....>

@@ -27,6 +27,7 @@
 #include "vtkPVInformation.h"
 
 class vtkClientServerStream;
+class vtkPVServerOptionsInternals;
 
 class VTK_EXPORT vtkPVServerInformation : public vtkPVInformation
 {
@@ -73,6 +74,38 @@ public:
   vtkSetMacro(UseIceT, int);
   vtkGetMacro(UseIceT, int);
 
+  // Description:
+  // Name of render module to use.
+  vtkSetStringMacro(RenderModuleName);
+  vtkGetStringMacro(RenderModuleName);
+
+  // Description:
+  // Number of displays to use in cave
+  // Setting the number of displays has the side effect of wiping out any
+  // cave display parameters previously set.
+  void SetNumberOfDisplays(unsigned int num);
+  unsigned int GetNumberOfDisplays() const;
+
+  // Description:
+  // Value of DISPLAY environment variable for this cave node
+  void SetEnvironment(unsigned int idx, const char* name);
+  const char* GetEnvironment(unsigned int idx) const;
+
+  // Description:
+  // Coordinates of lower left corner of this cave display
+  void SetLowerLeft(unsigned int idx, double coord[3]);
+  double* GetLowerLeft(unsigned int idx) const;
+
+  // Description:
+  // Coordinates of lower right corner of this cave display
+  void SetLowerRight(unsigned int idx, double coord[3]);
+  double* GetLowerRight(unsigned int idx) const;
+
+  // Description:
+  // Coordinates of lower left corner of this cave display
+  void SetUpperLeft(unsigned int idx, double coord[3]);
+  double* GetUpperLeft(unsigned int idx) const;
+
 protected:
   vtkPVServerInformation();
   ~vtkPVServerInformation();
@@ -81,6 +114,9 @@ protected:
   int TileDimensions[2];
   int UseOffscreenRendering;
   int UseIceT;
+  char* RenderModuleName;
+
+  vtkPVServerOptionsInternals* CaveInternals;
 
   vtkPVServerInformation(const vtkPVServerInformation&); // Not implemented
   void operator=(const vtkPVServerInformation&); // Not implemented

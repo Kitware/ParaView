@@ -47,6 +47,7 @@ protected:
   ~vtkPVCaveRenderModule();
 
   void LoadConfigurationFile(int numDisplays);
+  void ConfigureFromServerInformation();
 
   vtkPVCaveRenderModule(const vtkPVCaveRenderModule&); // Not implemented
   void operator=(const vtkPVCaveRenderModule&); // Not implemented

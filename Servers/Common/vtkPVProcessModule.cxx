@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.26.2.1");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.26.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -489,6 +489,12 @@ int vtkPVProcessModule::SetupRenderModule()
     }
 
   const char *renderModuleName = this->Options->GetRenderModuleName();
+  if (renderModuleName == NULL)
+    {
+    renderModuleName = this->ServerInformation->GetRenderModuleName();
+    this->Options->SetRenderModuleName(renderModuleName);
+    }
+  
   if (renderModuleName == NULL)
     {
     // If we are in client/server mode, the server options determine the
