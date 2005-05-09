@@ -20,7 +20,7 @@
 #include "vtkMultiProcessController.h"
 #include "vtkRenderWindow.h"
 vtkStandardNewMacro(vtkMPICompositeManager);
-vtkCxxRevisionMacro(vtkMPICompositeManager, "1.2");
+vtkCxxRevisionMacro(vtkMPICompositeManager, "1.3");
 
 //-----------------------------------------------------------------------------
 static void vtkMPICompositeManagerGatherZBufferValueRMI(void *local, void *pArg, 
@@ -52,7 +52,7 @@ static void vtkMPICompositeManagerGatherZBufferValueRMI(void *local, void *pArg,
 //-----------------------------------------------------------------------------
 vtkMPICompositeManager::vtkMPICompositeManager()
 {
-
+  this->WriteBackImages = 0;
 }
 
 //-----------------------------------------------------------------------------
