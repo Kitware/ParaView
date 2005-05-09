@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.10");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.11");
 vtkCxxSetObjectMacro(vtkPVRenderModuleUI, RenderModuleProxy, vtkSMRenderModuleProxy);
 //----------------------------------------------------------------------------
 
@@ -39,6 +39,12 @@ vtkPVRenderModuleUI::vtkPVRenderModuleUI()
 
 //----------------------------------------------------------------------------
 vtkPVRenderModuleUI::~vtkPVRenderModuleUI()
+{
+  this->SetRenderModuleProxy(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderModuleUI::PrepareForDelete()
 {
   this->SetRenderModuleProxy(0);
 }

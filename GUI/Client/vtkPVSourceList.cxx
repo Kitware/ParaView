@@ -29,7 +29,7 @@
 #include <kwsys/SystemTools.hxx>
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.39");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.40");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -247,8 +247,7 @@ void vtkPVSourceList::ToggleVisibility(int compIdx, char* id, int )
     
     this->UpdateVisibility(comp, id);
 
-    vtkPVRenderView* renderView 
-      = vtkPVRenderView::SafeDownCast(comp->GetView());
+    vtkPVRenderView* renderView = comp->GetPVRenderView();
     if ( renderView )
       {
       renderView->EventuallyRender();

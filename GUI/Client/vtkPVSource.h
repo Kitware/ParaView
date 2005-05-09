@@ -280,10 +280,6 @@ public:
   void SetNotebook(vtkPVSourceNotebook* notebook);
   vtkGetObjectMacro(Notebook, vtkPVSourceNotebook);
 
-  // I shall want to get rid of this.
-  void SetView(vtkKWView* view);
-  vtkGetObjectMacro(View, vtkKWView);
-
   // Desription:
   // This is just a flag that is used to mark that the source has been saved
   // into the tcl script (visited) during the recursive saving process.
@@ -494,8 +490,6 @@ public:
 protected:
   vtkPVSource();
   ~vtkPVSource();
-
-  vtkKWView *View;
 
   // Description:
   // Setups up the displays for this source

@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.353");
+vtkCxxRevisionMacro(vtkPVApplication, "1.354");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -466,7 +466,6 @@ vtkPVApplication::~vtkPVApplication()
   // still be displayed.
   vtkOutputWindow::SetInstance(0);
 
-  this->SetProcessModule(NULL);
   if (this->TraceFile)
     {
     this->TraceFile->close();
@@ -480,13 +479,13 @@ vtkPVApplication::~vtkPVApplication()
   this->Observer->Delete();
   this->Observer = 0;
 
+  this->SetProcessModule(NULL);
   if (this->SMApplication)
     {
     this->SMApplication->Finalize();
     this->SMApplication->Delete();
     this->SMApplication = NULL;
     }
-
   if (this->SaveRuntimeInfoButton)
     {
     this->SaveRuntimeInfoButton->Delete();

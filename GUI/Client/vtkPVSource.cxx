@@ -60,14 +60,13 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.439");
+vtkCxxRevisionMacro(vtkPVSource, "1.440");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
 
-vtkCxxSetObjectMacro(vtkPVSource, View, vtkKWView);
 vtkCxxSetObjectMacro(vtkPVSource, Proxy, vtkSMSourceProxy);
 
 //----------------------------------------------------------------------------
@@ -107,8 +106,6 @@ vtkPVSource::vtkPVSource()
   this->Widgets = vtkPVWidgetCollection::New();
     
   this->ReplaceInput = 1;
-
-  this->View = NULL;
 
   this->VisitedFlag = 0;
 
@@ -197,8 +194,6 @@ vtkPVSource::~vtkPVSource()
   this->ParameterFrame = NULL;
   this->Widgets->Delete();
   this->Widgets = NULL;
-
-  this->SetView(NULL);
 
   this->SetSourceClassName(0);
  
@@ -1081,7 +1076,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
                                     0.5*(bds[2]+bds[3]),
                                     0.5*(bds[4]+bds[5]));
         window->ResetCenterCallback();
-        window->GetMainView()->GetRenderer()->ResetCamera(
+        this->GetPVRenderView()->GetRenderer()->ResetCamera(
           bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
         }
       }
@@ -1743,7 +1738,7 @@ void vtkPVSource::DeleteCallback()
     if (prev == NULL)
       {
       // Show the 3D View settings
-      window->GetMainView()->ShowViewProperties();
+      this->GetPVRenderView()->ShowViewProperties();
       }
     }
         
@@ -2437,7 +2432,12 @@ vtkPVWidget* vtkPVSource::GetPVWidget(const char *name)
 //----------------------------------------------------------------------------
 vtkPVRenderView* vtkPVSource::GetPVRenderView()
 {
-  return vtkPVRenderView::SafeDownCast(this->View);
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  if (pvApp)
+    {
+    return pvApp->GetMainView();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -2505,7 +2505,7 @@ void vtkPVSource::RegisterProxy(const char* sourceList, vtkPVSource* clone)
     {
     if (strcmp(sourceList, "GlyphSources") == 0)
       {
-        module_group = "glyph_sources";
+      module_group = "glyph_sources";
       }
     else
       {
@@ -2637,8 +2637,6 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 
   // Force the proxy to create numSources objects
   pvs->Proxy->GetID(numSources-1);
-
-  pvs->SetView(this->GetPVWindow()->GetMainView());
 
   pvs->PrototypeInstanceCount = this->PrototypeInstanceCount;
   this->PrototypeInstanceCount++;
@@ -2775,7 +2773,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfPVInputs: " << this->GetNumberOfPVInputs() << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
   os << indent << "ReplaceInput: " << this->GetReplaceInput() << endl;
-  os << indent << "View: " << this->GetView() << endl;
   os << indent << "VisitedFlag: " << this->GetVisitedFlag() << endl;
   os << indent << "Widgets: " << this->GetWidgets() << endl;
   os << indent << "IsPermanent: " << this->IsPermanent << endl;

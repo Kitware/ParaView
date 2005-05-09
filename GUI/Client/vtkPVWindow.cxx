@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.701");
+vtkCxxRevisionMacro(vtkPVWindow, "1.702");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -619,7 +619,7 @@ void vtkPVWindow::PrepareForDelete()
     this->MainView->Close();
     this->MainView->SetParentWindow(NULL);
     this->MainView->Delete();
-    //this->MainView = NULL;
+    this->MainView = NULL;
     }
 
   this->DeleteAllSources();
@@ -1964,10 +1964,7 @@ vtkPVSource *vtkPVWindow::GetPVSource(const char* listname, const char* sourcena
 //-----------------------------------------------------------------------------
 void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
 {
-  vtkPVRenderView *view;
-  
-  view = vtkPVRenderView::New();
-  this->MainView = view;
+  this->MainView = vtkPVRenderView::New();
   this->MainView->SetParent(this->LowerFrame->GetFrame1());
   this->MainView->SetPropertiesParent(this->GetMainPanelFrame());
   this->MainView->SetParentWindow(this);
@@ -1977,15 +1974,16 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->MainView->Select(this);
   this->MainView->ShowViewProperties();
   this->MainView->SetupBindings();
-  this->MainView->Register(this);
   
   this->CameraStyle3D->SetCurrentRenderer(this->MainView->GetRenderer());
   this->CameraStyle2D->SetCurrentRenderer(this->MainView->GetRenderer());
   
-  vtkPVInteractorStyleControl *iscontrol3D = view->GetManipulatorControl3D();
+  vtkPVInteractorStyleControl *iscontrol3D = 
+    this->MainView->GetManipulatorControl3D();
   iscontrol3D->SetManipulatorCollection(
     this->CameraStyle3D->GetCameraManipulators());
-  vtkPVInteractorStyleControl *iscontrol2D = view->GetManipulatorControl2D();
+  vtkPVInteractorStyleControl *iscontrol2D = 
+    this->MainView->GetManipulatorControl2D();
   iscontrol2D->SetManipulatorCollection(
     this->CameraStyle2D->GetCameraManipulators());
   

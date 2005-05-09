@@ -22,7 +22,7 @@
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWView.h"
+#include "vtkPVRenderView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDataInformation.h"
@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.57");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.58");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -155,7 +155,7 @@ void vtkPVImplicitPlaneWidget::NormalCameraCallback()
     return;
     }
 
-  view = this->PVSource->GetView();
+  view = this->PVSource->GetPVRenderView();
   if (view == NULL)
     {
     vtkErrorMacro("Could not get the view/camera to set the normal.");

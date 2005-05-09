@@ -60,6 +60,11 @@ public:
   // used for unstructured grid.  The units of this value are numer of cells.
   vtkGetMacro(OutlineThreshold, float);
 
+  // Description:
+  // This method Sets all IVars to NULL and unregisters
+  // vtk objects.  This should eliminate circular references.
+  void PrepareForDelete();
+
 protected:
   vtkPVRenderModuleUI();
   ~vtkPVRenderModuleUI();

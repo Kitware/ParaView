@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.375");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.376");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -359,12 +359,6 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registry)
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
-  if (this->RenderModuleProxy)
-    {
-    this->RenderModuleProxy->UnRegister(this);
-    this->RenderModuleProxy = 0;
-    }
-
   this->InterfaceSettingsFrame->Delete();
   this->Display3DWidgets->Delete();
   this->Display3DWidgets = NULL;
@@ -408,12 +402,6 @@ vtkPVRenderView::~vtkPVRenderView()
   this->NavigationWindow->Delete();
   this->NavigationWindow = NULL;
 
-  if (this->RenderModuleUI)
-    {
-    this->RenderModuleUI->Delete();
-    this->RenderModuleUI = NULL;
-    }
-  
   // undo the binding we set up
   if ( this->IsCreated() )
     {
@@ -573,8 +561,18 @@ void vtkPVRenderView::PrepareForDelete()
       }
     }
 
-  // We must call prepare for delete on the RenderModule !!!!!!!
-
+  if (this->RenderModuleUI)
+    {
+    this->RenderModuleUI->PrepareForDelete();
+    this->RenderModuleUI->Delete();
+    this->RenderModuleUI = NULL;
+    }
+  
+  if (this->RenderModuleProxy)
+    {
+    this->RenderModuleProxy->UnRegister(this);
+    this->RenderModuleProxy = 0;
+    }
 
   // Circular reference.
   if ( this->ManipulatorControl2D )
@@ -608,9 +606,9 @@ void vtkPVRenderView::PrepareForDelete()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Close()
 {
-  this->PrepareForDelete();
   this->SourceNotebook->Close();
   vtkKWView::Close();
+  this->PrepareForDelete();
 }  
 
 
