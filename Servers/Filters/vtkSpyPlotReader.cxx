@@ -31,6 +31,8 @@
 #include "vtkImageData.h"
 #include "vtkRectilinearGrid.h"
 
+#include "vtkExtractCTHPart.h" // for the BOUNDS key
+
 #include <vtkstd/map>
 #include <vtkstd/set>
 #include <vtkstd/vector>
@@ -45,7 +47,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.10");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.11");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -853,7 +855,7 @@ int vtkSpyPlotReader::RequestData(
 
 #if 1 // skip loading for valgrind test
   
-  double dsBounds[6]; // only for removing wrong ghost cells
+//  double dsBounds[6]; // only for removing wrong ghost cells
   int firstBlock=1;
   
   blockIterator->Start();
@@ -919,7 +921,7 @@ int vtkSpyPlotReader::RequestData(
       int cc=0;
       while(cc<6)
         {
-        dsBounds[cc]=realBounds[cc];
+        this->Bounds[cc]=realBounds[cc];
         ++cc;
         }
       firstBlock=0;
@@ -929,13 +931,13 @@ int vtkSpyPlotReader::RequestData(
       int cc=0;
       while(cc<3)
         {
-        if(realBounds[2*cc]<dsBounds[2*cc])
+        if(realBounds[2*cc]<this->Bounds[2*cc])
           {
-          dsBounds[2*cc]=realBounds[2*cc];
+          this->Bounds[2*cc]=realBounds[2*cc];
           }
-        if(realBounds[2*cc+1]>dsBounds[2*cc+1])
+        if(realBounds[2*cc+1]>this->Bounds[2*cc+1])
           {
-          dsBounds[2*cc+1]=realBounds[2*cc+1];
+          this->Bounds[2*cc+1]=realBounds[2*cc+1];
           }
         ++cc;
         }
@@ -976,7 +978,7 @@ int vtkSpyPlotReader::RequestData(
         int cc=0;
         while(cc<6)
           {
-          dsBounds[cc]=otherBounds[cc];
+          this->Bounds[cc]=otherBounds[cc];
           ++cc;
           }
         firstBlock=0;
@@ -986,13 +988,13 @@ int vtkSpyPlotReader::RequestData(
         int cc=0;
         while(cc<3)
           {
-          if(otherBounds[2*cc]<dsBounds[2*cc])
+          if(otherBounds[2*cc]<this->Bounds[2*cc])
             {
-            dsBounds[2*cc]=otherBounds[2*cc];
+            this->Bounds[2*cc]=otherBounds[2*cc];
             }
-          if(otherBounds[2*cc+1]>dsBounds[2*cc+1])
+          if(otherBounds[2*cc+1]>this->Bounds[2*cc+1])
             {
-            dsBounds[2*cc+1]=otherBounds[2*cc+1];
+            this->Bounds[2*cc+1]=otherBounds[2*cc+1];
             }
           ++cc;
           }
@@ -1013,7 +1015,7 @@ int vtkSpyPlotReader::RequestData(
           int cc=0;
           while(cc<6)
             {
-            dsBounds[cc]=otherBounds[cc];
+            this->Bounds[cc]=otherBounds[cc];
             ++cc;
             }
           firstBlock=0;
@@ -1023,13 +1025,13 @@ int vtkSpyPlotReader::RequestData(
           int cc=0;
           while(cc<3)
             {
-            if(otherBounds[2*cc]<dsBounds[2*cc])
+            if(otherBounds[2*cc]<this->Bounds[2*cc])
               {
-              dsBounds[2*cc]=otherBounds[2*cc];
+              this->Bounds[2*cc]=otherBounds[2*cc];
               }
-            if(otherBounds[2*cc+1]>dsBounds[2*cc+1])
+            if(otherBounds[2*cc+1]>this->Bounds[2*cc+1])
               {
-              dsBounds[2*cc+1]=otherBounds[2*cc+1];
+              this->Bounds[2*cc+1]=otherBounds[2*cc+1];
               }
             ++cc;
             }
@@ -1046,16 +1048,17 @@ int vtkSpyPlotReader::RequestData(
                            VTK_MSG_SPY_READER_HAS_BOUNDS);
     if(hasBounds)
       {
-      this->Controller->Send(dsBounds, 6, parent,
+      this->Controller->Send(this->Bounds, 6, parent,
                              VTK_MSG_SPY_READER_LOCAL_BOUNDS);
       
-      this->Controller->Receive(dsBounds, 6, parent,
+      this->Controller->Receive(this->Bounds, 6, parent,
                                 VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
       }
     }
   
   if(firstBlock) // empty, no bounds, nothing to do
     {
+    info->Set(vtkExtractCTHPart::BOUNDS(),this->Bounds,6);
     delete blockIterator;
     return 1;
     }
@@ -1065,22 +1068,23 @@ int vtkSpyPlotReader::RequestData(
     {
     if(leftHasBounds)
       {
-      this->Controller->Send(dsBounds, 6, left,
+      this->Controller->Send(this->Bounds, 6, left,
                              VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
       }
     if(right<numProcessors)
       {
       if(rightHasBounds)
         {
-        this->Controller->Send(dsBounds, 6, right,
+        this->Controller->Send(this->Bounds, 6, right,
                                VTK_MSG_SPY_READER_GLOBAL_BOUNDS);
         }
       }
     }
   
   // At this point, the global bounds is set in each processor.
+  info->Set(vtkExtractCTHPart::BOUNDS(),this->Bounds,6);
   
-  cout<<processNumber<<" bounds="<<dsBounds[0]<<"; "<<dsBounds[1]<<"; "<<dsBounds[2]<<"; "<<dsBounds[3]<<"; "<<dsBounds[4]<<"; "<<dsBounds[5]<<endl;
+  cout<<processNumber<<" bounds="<<this->Bounds[0]<<"; "<<this->Bounds[1]<<"; "<<this->Bounds[2]<<"; "<<this->Bounds[3]<<"; "<<this->Bounds[4]<<"; "<<this->Bounds[5]<<endl;
   
   // Read all files
   
@@ -1108,10 +1112,10 @@ int vtkSpyPlotReader::RequestData(
         {
         extents[2*cc+1]=0;
         }
-        else
-          {
-          extents[2*cc+1]=dims[cc];
-          }
+      else
+        {
+        extents[2*cc+1]=dims[cc];
+        }
       ++cc;
       }
     vtkCellData* cd;
@@ -1154,7 +1158,7 @@ int vtkSpyPlotReader::RequestData(
         {
         if(dims[cc]>1)
           {
-          if(bounds[2*cc]<dsBounds[2*cc])
+          if(bounds[2*cc]<this->Bounds[2*cc])
             {
             realExtents[2*cc]=1;
             --extents[2*cc+1];
@@ -1165,7 +1169,7 @@ int vtkSpyPlotReader::RequestData(
             {
             realExtents[2*cc]=0;
             }
-          if(bounds[2*cc+1]>dsBounds[2*cc+1])
+          if(bounds[2*cc+1]>this->Bounds[2*cc+1])
             {
             realExtents[2*cc+1]=dims[cc]-1;
             --extents[2*cc+1];
@@ -1228,7 +1232,7 @@ int vtkSpyPlotReader::RequestData(
         {
         if(dims[cc]>1)
           {
-          if(bounds[2*cc]<dsBounds[2*cc])
+          if(bounds[2*cc]<this->Bounds[2*cc])
             {
             realExtents[2*cc]=1;
             --extents[2*cc+1];
@@ -1238,7 +1242,7 @@ int vtkSpyPlotReader::RequestData(
             {
             realExtents[2*cc]=0;
             }
-          if(bounds[2*cc+1]>dsBounds[2*cc+1])
+          if(bounds[2*cc+1]>this->Bounds[2*cc+1])
             {
             realExtents[2*cc+1]=dims[cc]-1;
             --extents[2*cc+1];
@@ -1542,92 +1546,7 @@ int vtkSpyPlotReader::RequestData(
   // They have to exchange the blocks they have get a unique id for
   // each block over the all dataset.
   
- #if 0
-  // Remove the bad ghost cells from each block
-  // Bad ghost cells are ghost cells out of the bounding box of the dataset.
-  
-  unsigned int numberOfLevels=hb->GetNumberOfLevels();
-  unsigned int level=0;
-  while(level<numberOfLevels)
-    {
-    int numberOfDataSets=hb->GetNumberOfDataSets(level);
-    int i=0;
-    while(i<numberOfDataSets)
-      {
-      vtkDataObject *do=hb->GetDataSet(level,i);
-      vtkUniformGrid *ug=dynamic_cast<vtkUniformGrid *>(do);
-      if(ug!=0)
-        {
-        // Mark the bounding cells as ghost cells of level 1.
-        vtkUnsignedCharArray *ghostArray=vtkUnsignedCharArray::New();
-        ghostArray->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
-        ghostArray->SetName("vtkGhostLevels"); //("vtkGhostLevels");
-        cd->AddArray(ghostArray);
-        ghostArray->Delete();
-        unsigned char *ptr =static_cast<unsigned char*>(ghostArray->GetVoidPointer(0));
-        
-        int k=0;
-        while(k<dims[2])
-          {
-          int kIsGhost;
-          if(dims[2]==1)
-            {
-            kIsGhost=0;
-            }
-          else
-            {
-            kIsGhost=k==0 || (k==dims[2]-1);
-            }
-          
-          int j=0;
-          while(j<dims[1])
-            {
-            int jIsGhost=kIsGhost;
-            if(!jIsGhost)
-              {
-              if(dims[1]>1)
-                {
-                jIsGhost=j==0 || (j==dims[1]-1);
-                }
-              }
-            
-            int i=0;
-            while(i<dims[0])
-              {
-              int isGhost=jIsGhost;
-              if(!isGhost)
-                {
-                if(dims[0]>1)
-                  {
-                  isGhost=i==0 || (i==dims[0]-1);
-                  }
-                }
-              if(isGhost)
-                {
-                (*ptr)=1;
-                }
-              else
-                {
-                (*ptr)=0;
-                }
-              ++ptr;
-              ++i;
-              }
-            ++j;
-            }
-          ++k;
-          }
-        }
-      else // rectilinear grid case
-        {
-        vtkRectilinearGrid *rg=dynamic_cast<vtkRectilinearGrid *>(ds);
-        }
-      ++i;
-      }
-    ++level;
-    }
-#endif
-  
+
   // Update the number of levels.
   unsigned int numberOfLevels=hb->GetNumberOfLevels();
   

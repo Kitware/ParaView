@@ -194,6 +194,8 @@ protected:
   
   int DistributeFiles;
   
+  double Bounds[6]; // bounds of the hierarchy without the bad ghostcells.
+  
 private:
   vtkSpyPlotReader(const vtkSpyPlotReader&);  // Not implemented.
   void operator=(const vtkSpyPlotReader&);  // Not implemented.
