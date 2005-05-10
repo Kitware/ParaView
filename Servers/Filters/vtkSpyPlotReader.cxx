@@ -47,7 +47,7 @@
    )
 
 
-vtkCxxRevisionMacro(vtkSpyPlotReader, "1.11");
+vtkCxxRevisionMacro(vtkSpyPlotReader, "1.12");
 vtkStandardNewMacro(vtkSpyPlotReader);
 vtkCxxSetObjectMacro(vtkSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -958,8 +958,8 @@ int vtkSpyPlotReader::RequestData(
     }
   
   double otherBounds[6];
-  int leftHasBounds;
-  int rightHasBounds;
+  int leftHasBounds=0; // init is not useful, just for compiler warnings
+  int rightHasBounds=0; // init is not useful, just for compiler warnings
   
   if(left<numProcessors)
     {
