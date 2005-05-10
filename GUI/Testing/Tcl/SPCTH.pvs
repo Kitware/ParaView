@@ -1,0 +1,63 @@
+set kw(vtkTemp2) [$Application GetMainWindow]
+set kw(vtkTemp23) [$kw(vtkTemp2) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp23) $argv $argc
+
+
+set kw(vtkTemp781) [$kw(vtkTemp2) InitializeReadCustom "spcthreader" "$DataDir/Data/SPCTH/ball_and_box.spcth"]
+$kw(vtkTemp2) ReadFileInformation $kw(vtkTemp781) "$DataDir/Data/SPCTH/ball_and_box.spcth"
+$kw(vtkTemp2) FinalizeRead $kw(vtkTemp781) "$DataDir/Data/SPCTH/ball_and_box.spcth"
+set kw(vtkTemp791) [$kw(vtkTemp781) GetPVWidget {Filename}]
+$kw(vtkTemp791) SetValue "$DataDir/Data/SPCTH/ball_and_box.spcth"
+set kw(vtkTemp782) [$kw(vtkTemp781) GetPVWidget {file_flag}]
+$kw(vtkTemp782) SetState 1
+set kw(vtkTemp784) [$kw(vtkTemp781) GetPVWidget {TimeStep}]
+$kw(vtkTemp784) SetValue 0
+set kw(vtkTemp790) [$kw(vtkTemp781) GetPVWidget {CellArrays}]
+$kw(vtkTemp790) SetArrayStatus {M - 0} 1
+$kw(vtkTemp790) SetArrayStatus {M - 1} 1
+$kw(vtkTemp790) SetArrayStatus {VX} 1
+$kw(vtkTemp790) SetArrayStatus {VZ} 1
+$kw(vtkTemp790) SetArrayStatus {P} 1
+$kw(vtkTemp790) SetArrayStatus {VOLM - 0} 1
+$kw(vtkTemp790) SetArrayStatus {VOLM - 1} 1
+$kw(vtkTemp2) SetCenterOfRotation -0.000000 0.000000 0.000000
+$kw(vtkTemp2) SetCenterOfRotation -0.000000 0.000000 0.000000
+$kw(vtkTemp781) AcceptCallback
+$kw(vtkTemp23) SetCameraState -16.792 6.208 17.928  -0.000 0.000 0.000  0.103 0.966 -0.238
+set kw(vtkTemp819) [$kw(vtkTemp2) CreatePVSource CTHPart]
+$kw(vtkTemp23) SetCameraState -16.792 6.208 17.928  -0.000 0.000 0.000  0.103 0.966 -0.238
+set kw(vtkTemp820) [$kw(vtkTemp819) GetPVWidget {Input}]
+$kw(vtkTemp820) SetCurrentValue $kw(vtkTemp781)
+set kw(vtkTemp823) [$kw(vtkTemp819) GetPVWidget {ArraySelection}]
+$kw(vtkTemp823) ClearAllSelections
+$kw(vtkTemp823) SetSelectState {VOLM - 0} 1
+$kw(vtkTemp823) SetSelectState {VOLM - 1} 1
+set kw(vtkTemp839) [$kw(vtkTemp819) GetPVWidget {Clipping}]
+set kw(vtkTemp832) [$kw(vtkTemp839) GetPVWidget {On}]
+$kw(vtkTemp832) SetCenter -1.0431e-07 2.9802e-08 1.4901e-08
+$kw(vtkTemp832) SetNormal -0.19466 0.10478 0.97526
+$kw(vtkTemp839) SetCurrentValue {On}
+$kw(vtkTemp832) SetCenter -1.0431e-07 2.9802e-08 1.4901e-08
+$kw(vtkTemp832) SetNormal -0.19466 0.10478 0.97526
+set kw(vtkTemp867) [$kw(vtkTemp2) GetPVColorMap {Part Index} 1]
+$kw(vtkTemp867) SetScalarBarTitle {Part Index}
+$kw(vtkTemp819) AcceptCallback
+$kw(vtkTemp23) SetCameraState -9.442 -8.657 -21.859  -0.000 0.000 0.000  0.133 0.901 -0.414
+
+# Retrace
+update
+$Application StopRecordingScript
+[ $Application GetMainWindow ] DeleteAllSources
+#Source the trace to regenerate the sources.
+if {[catch {set channel [open test.tmp w]}] == 0 } {
+   close $channel
+   file delete -force test.tmp
+   source "[$Application GetTraceFileName]"
+}
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit
