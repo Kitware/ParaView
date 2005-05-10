@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.4");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -195,12 +195,16 @@ void vtkSMSimpleDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
   this->CreateVTKObjects(num);
 
   vtkSMInputProperty* ip;
-  
+ 
+  input->UpdateVTKObjects();
   ip = vtkSMInputProperty::SafeDownCast(
     this->GeometryFilterProxy->GetProperty("Input"));
   ip->RemoveAllProxies();
   ip->AddProxy(input);
-  // this->GeometryFilterProxy->UpdateVTKObjects() not needed.
+  if (!ip->GetImmediateUpdate())
+    {
+    this->GeometryFilterProxy->UpdateVTKObjects();
+    }
 
   if (this->HasVolumePipeline)
     {
@@ -208,7 +212,10 @@ void vtkSMSimpleDisplayProxy::SetInputInternal(vtkSMSourceProxy* input)
       this->VolumeFilterProxy->GetProperty("Input"));
     ip->RemoveAllProxies();
     ip->AddProxy(input);
-    //this->VolumeFilterProxy->UpdateVTKObjects() not needed.
+    if (!ip->GetImmediateUpdate())
+      {
+      this->VolumeFilterProxy->UpdateVTKObjects();
+      }
     }
  
   if (input)
