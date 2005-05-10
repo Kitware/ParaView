@@ -113,6 +113,11 @@ public:
   // Description:
   // Reset camera to the given bounds.
   void ResetCamera(double bds[6]);
+
+  // Description:
+  // Reset camera. Interally calls ComputeVisiblePropBounds
+  // to obtain the bounds.
+  void ResetCamera();
   
   // Description:
   // Save the display in batch script. This will eventually get 

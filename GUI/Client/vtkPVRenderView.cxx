@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.376");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.377");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1758,12 +1758,7 @@ void vtkPVRenderView::Configured()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCamera()
 {
-  double bds[6];
-  this->RenderModuleProxy->ComputeVisiblePropBounds(bds);
-  if (bds[0] <= bds[1] && bds[2] <= bds[3] && bds[4] <= bds[5])
-    {
-    this->RenderModuleProxy->ResetCamera(bds);
-    }
+  this->RenderModuleProxy->ResetCamera();
 }
 
 //----------------------------------------------------------------------------
