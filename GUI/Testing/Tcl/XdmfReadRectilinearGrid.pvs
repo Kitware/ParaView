@@ -1,0 +1,53 @@
+set kw(vtkTemp2) [$Application GetMainWindow]
+set kw(vtkTemp23) [$kw(vtkTemp2) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp23) $argv $argc
+
+set kw(vtkTemp782) [$kw(vtkTemp2) InitializeReadCustom "XdmfReader" "${DataDir}/Data/Iron Xdmf/Iron_Protein.RectilinearGrid.xmf"]
+$kw(vtkTemp782) SetDomain IronStructProtein
+$kw(vtkTemp782) EnableGrid {Iron00}
+$kw(vtkTemp782) EnableGrid {Iron01}
+$kw(vtkTemp782) EnableGrid {Iron02}
+$kw(vtkTemp782) EnableGrid {Iron03}
+$kw(vtkTemp782) EnableGrid {Iron04}
+$kw(vtkTemp782) EnableGrid {Iron05}
+$kw(vtkTemp782) EnableGrid {Iron06}
+$kw(vtkTemp782) EnableGrid {Iron07}
+$kw(vtkTemp2) ReadFileInformation $kw(vtkTemp782) "${DataDir}/Data/Iron Xdmf/Iron_Protein.RectilinearGrid.xmf"
+$kw(vtkTemp2) FinalizeRead $kw(vtkTemp782) "${DataDir}/Data/Iron Xdmf/Iron_Protein.RectilinearGrid.xmf"
+set kw(vtkTemp801) [$kw(vtkTemp782) GetPVWidget {Filename}]
+$kw(vtkTemp801) SetValue "${DataDir}/Data/Iron Xdmf/Iron_Protein.RectilinearGrid.xmf"
+set kw(vtkTemp792) [$kw(vtkTemp782) GetPVWidget {cell_array_sel}]
+set kw(vtkTemp796) [$kw(vtkTemp782) GetPVWidget {point_array_sel}]
+$kw(vtkTemp796) SetArrayStatus {scalars} 1
+$kw(vtkTemp796) SetArrayStatus {UnnamedNodeArray0} 1
+set kw(vtkTemp797) [$kw(vtkTemp782) GetPVWidget {stride}]
+$kw(vtkTemp797) SetValue 1 1 1
+set kw(vtkTemp808) [$kw(vtkTemp782) GetPVWidget {xdmf_parameters}]
+$kw(vtkTemp2) SetCenterOfRotation 33.500000 33.500000 33.500000
+$kw(vtkTemp2) SetCenterOfRotation 33.500000 33.500000 33.500000
+set kw(vtkTemp813) [$kw(vtkTemp2) GetPVColorMap {scalars} 1]
+$kw(vtkTemp813) SetScalarBarTitle {scalars}
+$kw(vtkTemp782) AcceptCallback
+set kw(vtkTemp886) [$kw(vtkTemp2) CreatePVSource Contour]
+set kw(vtkTemp887) [$kw(vtkTemp886) GetPVWidget {Input}]
+$kw(vtkTemp887) SetCurrentValue $kw(vtkTemp782)
+set kw(vtkTemp890) [$kw(vtkTemp886) GetPVWidget {Scalars}]
+$kw(vtkTemp890) SetValue {scalars}
+set kw(vtkTemp893) [$kw(vtkTemp886) GetPVWidget {Contour Values}]
+$kw(vtkTemp893) RemoveAllValues
+$kw(vtkTemp893) AddValue 127.5
+set kw(vtkTemp922) [$kw(vtkTemp886) GetPVWidget {Compute Normals}]
+$kw(vtkTemp922) SetState 1
+set kw(vtkTemp924) [$kw(vtkTemp886) GetPVWidget {Compute Gradients}]
+$kw(vtkTemp924) SetState 0
+set kw(vtkTemp926) [$kw(vtkTemp886) GetPVWidget {Compute Scalars}]
+$kw(vtkTemp926) SetState 0
+$kw(vtkTemp886) AcceptCallback
+$kw(vtkTemp23) SetCameraState -57.690 178.828 177.804  33.500 33.500 33.500  0.210 0.752 -0.625
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit
