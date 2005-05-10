@@ -1778,6 +1778,12 @@
         default_values="0">
         <BooleanDomain name="bool" />
       </IntVectorProperty>
+      <IntVectorProperty
+        name="TileWindows"
+        number_of_elements="3"
+        command="TileWindows"
+        default_values="0 0 1">
+      </IntVectorProperty>
     </Proxy>
     <Proxy name="CaveRenderManager" class="vtkCaveRenderManager">
       <ProxyProperty
