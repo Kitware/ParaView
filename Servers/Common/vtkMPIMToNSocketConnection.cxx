@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.3");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.4");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -92,7 +92,13 @@ void vtkMPIMToNSocketConnection::LoadMachinesFile()
   if(!this->MachinesFileName)
     {
     return;
-    } 
+    }
+
+  vtkWarningMacro("The names of the machines making up this server should "
+                  "be specified in the XML configuration file. The --machines "
+                  "(and -m) command-line arguments have been deprecated and "
+                  "will be removed in the next ParaView release.");
+
   FILE* file = fopen(this->MachinesFileName, "r");
   char machinename[1024];
   if(!file)
@@ -118,6 +124,21 @@ void vtkMPIMToNSocketConnection::LoadMachinesFile()
   fclose(file);
 }
 
+void vtkMPIMToNSocketConnection::SetMachineName(unsigned int idx,
+                                                const char* name)
+{
+  if (name && strlen(name) > 0)
+    {
+    if (idx >= this->Internals->MachineNames.size())
+      {
+      this->Internals->MachineNames.push_back(name);
+      }
+    else
+      {
+      this->Internals->MachineNames[idx] = name;
+      }
+    }
+}
 
 void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
 {
@@ -129,7 +150,7 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
   unsigned int myId = this->Controller->GetLocalProcessId();
   if(myId >= (unsigned int)this->NumberOfConnections)
     {
-      return;
+    return;
     }
   this->SocketCommunicator = vtkSocketCommunicator::New();
   // open a socket on a random port

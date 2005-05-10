@@ -28,7 +28,7 @@
 #include "vtkPVServerInformation.h"
 
 vtkStandardNewMacro(vtkSMCaveRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMCaveRenderModuleProxy, "1.5");
 //-----------------------------------------------------------------------------
 vtkSMCaveRenderModuleProxy::vtkSMCaveRenderModuleProxy()
 {
@@ -151,8 +151,8 @@ void vtkSMCaveRenderModuleProxy::LoadConfigurationFile(int numDisplays)
 
   vtkWarningMacro("Cave parameters should be specified in the XML "
                   "configuration file. The --cave-configuration (and -cc) "
-                  "command-line arguments will be removed in the next "
-                  "ParaView release.");
+                  "command-line arguments have been deprecated and will be "
+                  "removed in the next ParaView release.");
   
   // Open the new file
   struct stat fs;
@@ -236,8 +236,8 @@ void vtkSMCaveRenderModuleProxy::ConfigureFromServerInformation()
         this->CompositeManagerProxy->GetID(0)));
 
   unsigned int idx;
-  unsigned int numDisplays = serverInfo->GetNumberOfDisplays();
-  for (idx = 0; idx < numDisplays; idx++)
+  unsigned int numMachines = serverInfo->GetNumberOfMachines();
+  for (idx = 0; idx < numMachines; idx++)
     {
     pm->SetProcessEnvironmentVariable(idx, serverInfo->GetEnvironment(idx));
     crm->DefineDisplay(idx, serverInfo->GetLowerLeft(idx),
