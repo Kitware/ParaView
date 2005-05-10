@@ -152,6 +152,8 @@ static const char *vtkKWEventStrings[] =
   "SplineSurfaceColorChangedEvent",
   "SplineSurfaceLineWidthChangedEvent",
   "SplineSurfaceNumberOfHandlesChangedEvent",
+  "SplineSurfaceHandleChangedEvent",
+  "SplineSurface2DHandleChangedEvent",
   "SplineSurfaceOpacityChangedEvent",
   "SplineSurfacePropertyChangedEvent",
   "SplineSurfaceQualityChangedEvent",
@@ -160,6 +162,7 @@ static const char *vtkKWEventStrings[] =
   "SplineSurfaceRepresentationChangedEvent",
   "SplineSurfaceVisibilityChangedEvent",
   "SplineSurfaceHandlePositionChangedEvent",
+  "SplineSurface2DHandlePositionChangedEvent",
   "StandardInteractivityChangedEvent",
   "SurfacePropertyChangedEvent",
   "SurfacePropertyChangingEvent",
@@ -210,7 +213,6 @@ static const char *vtkKWEventStrings[] =
   "InitializeTraceEvent",
   "ManipulatorModifiedEvent",
   "WarningMessageEvent",
-  "WidgetModifiedEvent",
   //
   "FinalBogusNotUsedEvent",
   0
