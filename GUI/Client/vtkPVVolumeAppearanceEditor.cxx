@@ -33,6 +33,9 @@
 #include "vtkKWPiecewiseFunctionEditor.h"
 #include "vtkKWColorTransferFunctionEditor.h"
 #include "vtkPVTraceHelper.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkCommand.h"
+#include "vtkKWEvent.h"
 
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -40,10 +43,44 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.29");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.30");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
+
+class vtkPVVolumeAppearanceEditorObserver : public vtkCommand
+{
+public:
+  static vtkPVVolumeAppearanceEditorObserver* New() 
+    {return new vtkPVVolumeAppearanceEditorObserver;};
+
+  vtkPVVolumeAppearanceEditorObserver()
+    {
+    this->PVVolumeAppearanceEditor = 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+                       void* calldata)
+    {
+      if ( this->PVVolumeAppearanceEditor )
+        {
+        switch(event)
+          {
+          case vtkKWEvent::VolumePropertyChangedEvent:
+            this->PVVolumeAppearanceEditor->VolumePropertyChangedCallback();
+            this->PVVolumeAppearanceEditor->RenderView();
+            break;
+          case vtkKWEvent::VolumePropertyChangingEvent:
+            this->PVVolumeAppearanceEditor->VolumePropertyChangingCallback();
+            // We don't call EventuallyRender since that leads to non-smooth movement.
+            this->PVVolumeAppearanceEditor->PVRenderView->GetPVWindow()->GetInteractor()->Render();
+            break;
+          }
+        }
+    }
+
+  vtkPVVolumeAppearanceEditor* PVVolumeAppearanceEditor;
+};
 
 //----------------------------------------------------------------------------
 vtkPVVolumeAppearanceEditor::vtkPVVolumeAppearanceEditor()
@@ -60,11 +97,18 @@ vtkPVVolumeAppearanceEditor::vtkPVVolumeAppearanceEditor()
 
   this->VolumePropertyWidget         = NULL;
   this->InternalVolumeProperty       = NULL;
+  this->VolumeAppearanceObserver = vtkPVVolumeAppearanceEditorObserver::New();
+  this->VolumeAppearanceObserver->PVVolumeAppearanceEditor = this;
 }
 
 //----------------------------------------------------------------------------
 vtkPVVolumeAppearanceEditor::~vtkPVVolumeAppearanceEditor()
 {
+  if (this->VolumeAppearanceObserver)
+    {
+    this->VolumeAppearanceObserver->Delete();
+    this->VolumeAppearanceObserver = NULL;
+    }
   if ( this->BackButton )
     {
     this->BackButton->Delete();
@@ -127,10 +171,10 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   this->VolumePropertyWidget->ShowComponentWeightsOff();
   this->VolumePropertyWidget->GetScalarOpacityFunctionEditor()->ShowWindowLevelModeButtonOff();
   this->VolumePropertyWidget->Create(pvApp, 0);
-  this->VolumePropertyWidget->SetVolumePropertyChangedCommand(
-    this, "VolumePropertyChangedCallback");
-  this->VolumePropertyWidget->SetVolumePropertyChangingCommand(
-    this, "VolumePropertyChangingCallback");
+  this->VolumePropertyWidget->AddObserver(
+    vtkKWEvent::VolumePropertyChangedEvent, this->VolumeAppearanceObserver);
+  this->VolumePropertyWidget->AddObserver(
+    vtkKWEvent::VolumePropertyChangingEvent, this->VolumeAppearanceObserver);
 
   this->Script("pack %s %s -side top -anchor n -fill x -padx 2 -pady 2", 
                this->VolumePropertyWidget->GetWidgetName(),
@@ -220,7 +264,6 @@ void vtkPVVolumeAppearanceEditor::VolumePropertyInternalCallback()
   //5. ColorSpace.
   this->SetColorSpace( color->GetColorSpace() );
   pDisp->UpdateVTKObjects();
-  this->RenderView();
   this->GetTraceHelper()->AddEntry("$kw(%s) RefreshGUI", this->GetTclName());
 }
 
@@ -295,6 +338,7 @@ void vtkPVVolumeAppearanceEditor::VolumePropertyChangedCallback()
 //----------------------------------------------------------------------------
 void vtkPVVolumeAppearanceEditor::VolumePropertyChangingCallback()
 {
+  //this->PVRenderView->SetRenderModeToInteractive();
   this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOff();
   this->VolumePropertyInternalCallback();
 }

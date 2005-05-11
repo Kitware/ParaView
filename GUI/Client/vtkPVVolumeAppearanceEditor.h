@@ -29,6 +29,7 @@ class vtkPVSource;
 class vtkPVArrayInformation;
 class vtkPVVolumePropertyWidget;
 class vtkVolumeProperty; //FIXME: Need a proxy/property instead
+class vtkPVVolumeAppearanceEditorObserver;
 
 class VTK_EXPORT vtkPVVolumeAppearanceEditor : public vtkPVTracedWidget
 {
@@ -130,6 +131,11 @@ protected:
 
   // Update the widget from Display proxy.
   void UpdateFromProxy();
+
+  vtkPVVolumeAppearanceEditorObserver* VolumeAppearanceObserver;
+  //BTX
+  friend class vtkPVVolumeAppearanceEditorObserver;
+  //ETX
 
 private:
   vtkPVVolumeAppearanceEditor(const vtkPVVolumeAppearanceEditor&); // Not implemented
