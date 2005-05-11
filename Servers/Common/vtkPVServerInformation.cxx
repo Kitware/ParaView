@@ -23,7 +23,7 @@
 #include "vtkToolkits.h"
 
 vtkStandardNewMacro(vtkPVServerInformation);
-vtkCxxRevisionMacro(vtkPVServerInformation, "1.4.2.1");
+vtkCxxRevisionMacro(vtkPVServerInformation, "1.4.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::vtkPVServerInformation()
@@ -37,14 +37,14 @@ vtkPVServerInformation::vtkPVServerInformation()
   this->UseIceT = 0;
 #endif
   this->RenderModuleName = NULL;
-  this->CaveInternals = new vtkPVServerOptionsInternals;
+  this->MachinesInternals = new vtkPVServerOptionsInternals;
 }
 
 //----------------------------------------------------------------------------
 vtkPVServerInformation::~vtkPVServerInformation()
 {
   this->SetRenderModuleName(NULL);
-  delete this->CaveInternals;
+  delete this->MachinesInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -68,9 +68,9 @@ void vtkPVServerInformation::DeepCopy(vtkPVServerInformation *info)
   this->UseOffscreenRendering = info->GetUseOffscreenRendering();
   this->UseIceT = info->GetUseIceT();
   this->SetRenderModuleName(info->GetRenderModuleName());
-  this->SetNumberOfDisplays(info->GetNumberOfDisplays());
+  this->SetNumberOfMachines(info->GetNumberOfMachines());
   unsigned int idx;
-  for (idx = 0; idx < info->GetNumberOfDisplays(); idx++)
+  for (idx = 0; idx < info->GetNumberOfMachines(); idx++)
     {
     this->SetEnvironment(idx, info->GetEnvironment(idx));
     this->SetLowerLeft(idx, info->GetLowerLeft(idx));
@@ -96,9 +96,9 @@ void vtkPVServerInformation::CopyFromObject(vtkObject* obj)
   options->GetTileDimensions(this->TileDimensions);
   this->UseOffscreenRendering = options->GetUseOffscreenRendering();
   this->SetRenderModuleName(options->GetRenderModuleName());
-  this->SetNumberOfDisplays(options->GetNumberOfDisplays());
+  this->SetNumberOfMachines(options->GetNumberOfMachines());
   unsigned int idx;
-  for (idx = 0; idx < options->GetNumberOfDisplays(); idx++)
+  for (idx = 0; idx < options->GetNumberOfMachines(); idx++)
     {
     this->SetEnvironment(idx, options->GetDisplayName(idx));
     this->SetLowerLeft(idx, options->GetLowerLeft(idx));
@@ -131,9 +131,9 @@ void vtkPVServerInformation::AddInformation(vtkPVInformation* info)
     // ICE-T either is there or is not.
     this->UseIceT = serverInfo->GetUseIceT();
     this->SetRenderModuleName(serverInfo->GetRenderModuleName());
-    this->SetNumberOfDisplays(serverInfo->GetNumberOfDisplays());
+    this->SetNumberOfMachines(serverInfo->GetNumberOfMachines());
     unsigned int idx;
-    for (idx = 0; idx < serverInfo->GetNumberOfDisplays(); idx++)
+    for (idx = 0; idx < serverInfo->GetNumberOfMachines(); idx++)
       {
       this->SetEnvironment(idx, serverInfo->GetEnvironment(idx));
       this->SetLowerLeft(idx, serverInfo->GetLowerLeft(idx));
@@ -153,9 +153,9 @@ void vtkPVServerInformation::CopyToStream(vtkClientServerStream* css) const
   *css << this->UseOffscreenRendering;
   *css << this->UseIceT;
   *css << this->RenderModuleName;
-  *css << this->GetNumberOfDisplays();
+  *css << this->GetNumberOfMachines();
   unsigned int idx;
-  for (idx = 0; idx < this->GetNumberOfDisplays(); idx++)
+  for (idx = 0; idx < this->GetNumberOfMachines(); idx++)
     {
     *css << this->GetEnvironment(idx);
     *css << this->GetLowerLeft(idx)[0] << this->GetLowerLeft(idx)[1]
@@ -199,49 +199,49 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
     return;
     }
   this->SetRenderModuleName(rmName);
-  unsigned int numDisplays;
-  if (!css->GetArgument(0, 6, &numDisplays))
+  unsigned int numMachines;
+  if (!css->GetArgument(0, 6, &numMachines))
     {
-    vtkErrorMacro("Error parsing number of displays from message.");
+    vtkErrorMacro("Error parsing number of machines from message.");
     return;
     }
-  this->SetNumberOfDisplays(numDisplays);
+  this->SetNumberOfMachines(numMachines);
   unsigned int idx;
   const char* env;
-  for (idx = 0; idx < numDisplays; idx++)
+  for (idx = 0; idx < numMachines; idx++)
     {
     if (!css->GetArgument(0, 7 + idx*10, &env))
       {
       vtkErrorMacro("Error parsing display environment from message.");
       return;
       }
-    this->CaveInternals->MachineInformationVector[idx].Environment = env;
+    this->MachinesInternals->MachineInformationVector[idx].Environment = env;
     if (!css->GetArgument(0, 8 + idx*10,
-                          &this->CaveInternals->MachineInformationVector[idx].LowerLeft[0]) ||
+                          &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[0]) ||
         !css->GetArgument(0, 9 + idx*10,
-                          &this->CaveInternals->MachineInformationVector[idx].LowerLeft[1]) ||
+                          &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[1]) ||
         !css->GetArgument(0, 10 + idx*10,
-                          &this->CaveInternals->MachineInformationVector[idx].LowerLeft[2]))
+                          &this->MachinesInternals->MachineInformationVector[idx].LowerLeft[2]))
       {
       vtkErrorMacro("Error parsing lower left coordinate from message.");
       return;
       }
     if (!css->GetArgument(0, 11 + idx*10,
-                          &this->CaveInternals->MachineInformationVector[idx].LowerRight[0]) ||
+                          &this->MachinesInternals->MachineInformationVector[idx].LowerRight[0]) ||
         !css->GetArgument(0, 12 + idx*10,
-                          &this->CaveInternals->MachineInformationVector[idx].LowerRight[1]) ||
+                          &this->MachinesInternals->MachineInformationVector[idx].LowerRight[1]) ||
         !css->GetArgument(0, 13 + idx*10,
-                          &this->CaveInternals->MachineInformationVector[idx].LowerRight[2]))
+                          &this->MachinesInternals->MachineInformationVector[idx].LowerRight[2]))
       {
       vtkErrorMacro("Error parsing lower right coordinate from message.");
       return;
       }
     if (!css->GetArgument(0, 14 + idx*10,
-                          &this->CaveInternals->MachineInformationVector[idx].UpperLeft[0]) ||
+                          &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[0]) ||
         !css->GetArgument(0, 15 + idx*10,
-                          &this->CaveInternals->MachineInformationVector[idx].UpperLeft[1]) ||
+                          &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[1]) ||
         !css->GetArgument(0, 16 + idx*10,
-                          &this->CaveInternals->MachineInformationVector[idx].UpperLeft[2]))
+                          &this->MachinesInternals->MachineInformationVector[idx].UpperLeft[2]))
       {
       vtkErrorMacro("Error parsing upper left coordinate from message.");
       return;
@@ -250,131 +250,131 @@ void vtkPVServerInformation::CopyFromStream(const vtkClientServerStream* css)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVServerInformation::SetNumberOfDisplays(unsigned int num)
+void vtkPVServerInformation::SetNumberOfMachines(unsigned int num)
 {
-  delete this->CaveInternals;
-  this->CaveInternals = new vtkPVServerOptionsInternals;
+  delete this->MachinesInternals;
+  this->MachinesInternals = new vtkPVServerOptionsInternals;
   unsigned int idx;
   vtkPVServerOptionsInternals::MachineInformation info;
   for (idx = 0; idx < num; idx++)
     {
-    this->CaveInternals->MachineInformationVector.push_back(info);
+    this->MachinesInternals->MachineInformationVector.push_back(info);
     }
 }
 
 //----------------------------------------------------------------------------
-unsigned int vtkPVServerInformation::GetNumberOfDisplays() const
+unsigned int vtkPVServerInformation::GetNumberOfMachines() const
 {
-  return this->CaveInternals->MachineInformationVector.size();
+  return this->MachinesInternals->MachineInformationVector.size();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVServerInformation::SetEnvironment(unsigned int idx,
                                             const char* name)
 {
-  if (idx >= this->GetNumberOfDisplays())
+  if (idx >= this->GetNumberOfMachines())
     {
     unsigned int i;
     vtkPVServerOptionsInternals::MachineInformation info;
-    for (i = this->GetNumberOfDisplays(); i <= idx; i++)
+    for (i = this->GetNumberOfMachines(); i <= idx; i++)
       {
-      this->CaveInternals->MachineInformationVector.push_back(info);
+      this->MachinesInternals->MachineInformationVector.push_back(info);
       }
     }
 
-  this->CaveInternals->MachineInformationVector[idx].Environment = name;
+  this->MachinesInternals->MachineInformationVector[idx].Environment = name;
 }
 
 //----------------------------------------------------------------------------
 const char* vtkPVServerInformation::GetEnvironment(unsigned int idx) const
 {
-  if (idx >= this->GetNumberOfDisplays())
+  if (idx >= this->GetNumberOfMachines())
     {
     return NULL;
     }
-  return this->CaveInternals->MachineInformationVector[idx].Environment.c_str();
+  return this->MachinesInternals->MachineInformationVector[idx].Environment.c_str();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVServerInformation::SetLowerLeft(unsigned int idx, double coord[3])
 {
-  if (idx >= this->GetNumberOfDisplays())
+  if (idx >= this->GetNumberOfMachines())
     {
     unsigned int i;
     vtkPVServerOptionsInternals::MachineInformation info;
-    for (i = this->GetNumberOfDisplays(); i <= idx; i++)
+    for (i = this->GetNumberOfMachines(); i <= idx; i++)
       {
-      this->CaveInternals->MachineInformationVector.push_back(info);
+      this->MachinesInternals->MachineInformationVector.push_back(info);
       }
     }
 
-  this->CaveInternals->MachineInformationVector[idx].LowerLeft[0] = coord[0];
-  this->CaveInternals->MachineInformationVector[idx].LowerLeft[1] = coord[1];
-  this->CaveInternals->MachineInformationVector[idx].LowerLeft[2] = coord[2];
+  this->MachinesInternals->MachineInformationVector[idx].LowerLeft[0] = coord[0];
+  this->MachinesInternals->MachineInformationVector[idx].LowerLeft[1] = coord[1];
+  this->MachinesInternals->MachineInformationVector[idx].LowerLeft[2] = coord[2];
 }
 
 //----------------------------------------------------------------------------
 double* vtkPVServerInformation::GetLowerLeft(unsigned int idx) const
 {
-  if (idx >= this->GetNumberOfDisplays())
+  if (idx >= this->GetNumberOfMachines())
     {
     return NULL;
     }
-  return this->CaveInternals->MachineInformationVector[idx].LowerLeft;
+  return this->MachinesInternals->MachineInformationVector[idx].LowerLeft;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVServerInformation::SetLowerRight(unsigned int idx, double coord[3])
 {
-  if (idx >= this->GetNumberOfDisplays())
+  if (idx >= this->GetNumberOfMachines())
     {
     unsigned int i;
     vtkPVServerOptionsInternals::MachineInformation info;
-    for (i = this->GetNumberOfDisplays(); i <= idx; i++)
+    for (i = this->GetNumberOfMachines(); i <= idx; i++)
       {
-      this->CaveInternals->MachineInformationVector.push_back(info);
+      this->MachinesInternals->MachineInformationVector.push_back(info);
       }
     }
 
-  this->CaveInternals->MachineInformationVector[idx].LowerRight[0] = coord[0];
-  this->CaveInternals->MachineInformationVector[idx].LowerRight[1] = coord[1];
-  this->CaveInternals->MachineInformationVector[idx].LowerRight[2] = coord[2];
+  this->MachinesInternals->MachineInformationVector[idx].LowerRight[0] = coord[0];
+  this->MachinesInternals->MachineInformationVector[idx].LowerRight[1] = coord[1];
+  this->MachinesInternals->MachineInformationVector[idx].LowerRight[2] = coord[2];
 }
 
 //----------------------------------------------------------------------------
 double* vtkPVServerInformation::GetLowerRight(unsigned int idx) const
 {
-  if (idx >= this->GetNumberOfDisplays())
+  if (idx >= this->GetNumberOfMachines())
     {
     return NULL;
     }
-  return this->CaveInternals->MachineInformationVector[idx].LowerRight;
+  return this->MachinesInternals->MachineInformationVector[idx].LowerRight;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVServerInformation::SetUpperLeft(unsigned int idx, double coord[3])
 {
-  if (idx >= this->GetNumberOfDisplays())
+  if (idx >= this->GetNumberOfMachines())
     {
     unsigned int i;
     vtkPVServerOptionsInternals::MachineInformation info;
-    for (i = this->GetNumberOfDisplays(); i <= idx; i++)
+    for (i = this->GetNumberOfMachines(); i <= idx; i++)
       {
-      this->CaveInternals->MachineInformationVector.push_back(info);
+      this->MachinesInternals->MachineInformationVector.push_back(info);
       }
     }
 
-  this->CaveInternals->MachineInformationVector[idx].UpperLeft[0] = coord[0];
-  this->CaveInternals->MachineInformationVector[idx].UpperLeft[1] = coord[1];
-  this->CaveInternals->MachineInformationVector[idx].UpperLeft[2] = coord[2];
+  this->MachinesInternals->MachineInformationVector[idx].UpperLeft[0] = coord[0];
+  this->MachinesInternals->MachineInformationVector[idx].UpperLeft[1] = coord[1];
+  this->MachinesInternals->MachineInformationVector[idx].UpperLeft[2] = coord[2];
 }
 
 //----------------------------------------------------------------------------
 double* vtkPVServerInformation::GetUpperLeft(unsigned int idx) const
 {
-  if (idx >= this->GetNumberOfDisplays())
+  if (idx >= this->GetNumberOfMachines())
     {
     return NULL;
     }
-  return this->CaveInternals->MachineInformationVector[idx].UpperLeft;
+  return this->MachinesInternals->MachineInformationVector[idx].UpperLeft;
 }

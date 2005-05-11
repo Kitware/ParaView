@@ -81,6 +81,11 @@ public:
   // Description:
   // Set port to use, if the value is 0, then the system will pick the port.
   vtkSetMacro(PortNumber,int);
+
+  // Description:
+  // Add a machine name.
+  void SetMachineName(unsigned int idx, const char* name);
+
 protected:
   void LoadMachinesFile();
   virtual void SetController(vtkMultiProcessController*);

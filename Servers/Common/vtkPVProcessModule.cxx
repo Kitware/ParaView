@@ -40,7 +40,7 @@
 #include "vtkProcessModuleGUIHelper.h"
 #include "vtkPVServerInformation.h"
 #include "vtkInstantiator.h"
-#include "vtkPVOptions.h"
+#include "vtkPVServerOptions.h"
 
 #include "vtkPVDemoPaths.h"
 
@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.26.2.2");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.26.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -457,6 +457,28 @@ int vtkPVProcessModule::GetClientMode()
     return 0;
     }
   return this->Options->GetClientMode();
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkPVProcessModule::GetNumberOfMachines()
+{
+  vtkPVServerOptions *opt = vtkPVServerOptions::SafeDownCast(this->Options);
+  if (!opt)
+    {
+    return 0;
+    }
+  return opt->GetNumberOfMachines();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVProcessModule::GetMachineName(unsigned int idx)
+{
+  vtkPVServerOptions *opt = vtkPVServerOptions::SafeDownCast(this->Options);
+  if (!opt)
+    {
+    return NULL;
+    }
+  return opt->GetMachineName(idx);
 }
 
 //----------------------------------------------------------------------------

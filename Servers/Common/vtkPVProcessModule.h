@@ -169,6 +169,8 @@ public:
   int GetRenderNodePort();
   char* GetMachinesFileName();
   int GetClientMode();
+  unsigned int GetNumberOfMachines();
+  const char* GetMachineName(unsigned int idx);
 
   // Description:
   // Get and Set the application installation directory

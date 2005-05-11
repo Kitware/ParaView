@@ -42,8 +42,9 @@ public:
   virtual int ParseExtraXMLTag(const char* name, const char** atts);
 
   // Description:
-  // Get information about displays used in a cave setup.
-  unsigned int GetNumberOfDisplays();
+  // Get information about machines used in a data or render server.
+  unsigned int GetNumberOfMachines();
+  const char* GetMachineName(unsigned int idx);
   const char* GetDisplayName(unsigned int idx);
   double* GetLowerLeft(unsigned int idx);
   double* GetLowerRight(unsigned int idx);

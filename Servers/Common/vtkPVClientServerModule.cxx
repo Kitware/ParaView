@@ -150,7 +150,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.26");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.26.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -808,7 +808,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
   
   // now initilaize the waiting server and have it set up the connections
   stream << vtkClientServerStream::Invoke
-    << this->GetProcessModuleID() << "GetRenderNodePort" 
+         << this->GetProcessModuleID() << "GetRenderNodePort" 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke 
          << id << "SetPortNumber" << vtkClientServerStream::LastResult
@@ -819,6 +819,23 @@ void vtkPVClientServerModule::InitializeRenderServer()
   stream << vtkClientServerStream::Invoke 
          << id << "SetMachinesFileName" << vtkClientServerStream::LastResult
          << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke
+         << this->GetProcessModuleID() << "GetNumberOfMachines"
+         << vtkClientServerStream::End;
+  this->SendStream(waitingServer, stream);
+  unsigned int numMachines = 0;
+  this->GetLastResult(waitingServer).GetArgument(0, 0, &numMachines);
+  unsigned int idx;
+  for (idx = 0; idx < numMachines; idx++)
+    {
+    stream << vtkClientServerStream::Invoke
+           << this->GetProcessModuleID() << "GetMachineName" << idx
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << id << "SetMachineName" << idx
+           << vtkClientServerStream::LastResult
+           << vtkClientServerStream::End;
+    }
   stream << vtkClientServerStream::Invoke 
          << id << "SetupWaitForConnection"
          << vtkClientServerStream::End;

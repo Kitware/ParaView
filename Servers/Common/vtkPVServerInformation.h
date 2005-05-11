@@ -80,11 +80,11 @@ public:
   vtkGetStringMacro(RenderModuleName);
 
   // Description:
-  // Number of displays to use in cave
-  // Setting the number of displays has the side effect of wiping out any
-  // cave display parameters previously set.
-  void SetNumberOfDisplays(unsigned int num);
-  unsigned int GetNumberOfDisplays() const;
+  // Number of machines to use in data or render server
+  // Setting the number of machines has the side effect of wiping out any
+  // machine parameters previously set.
+  void SetNumberOfMachines(unsigned int num);
+  unsigned int GetNumberOfMachines() const;
 
   // Description:
   // Value of DISPLAY environment variable for this cave node
@@ -116,7 +116,7 @@ protected:
   int UseIceT;
   char* RenderModuleName;
 
-  vtkPVServerOptionsInternals* CaveInternals;
+  vtkPVServerOptionsInternals* MachinesInternals;
 
   vtkPVServerInformation(const vtkPVServerInformation&); // Not implemented
   void operator=(const vtkPVServerInformation&); // Not implemented
