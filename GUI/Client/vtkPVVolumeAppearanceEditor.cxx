@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.30");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.31");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -59,8 +59,7 @@ public:
     this->PVVolumeAppearanceEditor = 0;
     }
 
-  virtual void Execute(vtkObject* wdg, unsigned long event,  
-                       void* calldata)
+  virtual void Execute(vtkObject* , unsigned long event, void* )
     {
       if ( this->PVVolumeAppearanceEditor )
         {
@@ -72,8 +71,10 @@ public:
             break;
           case vtkKWEvent::VolumePropertyChangingEvent:
             this->PVVolumeAppearanceEditor->VolumePropertyChangingCallback();
-            // We don't call EventuallyRender since that leads to non-smooth movement.
-            this->PVVolumeAppearanceEditor->PVRenderView->GetPVWindow()->GetInteractor()->Render();
+            // We don't call EventuallyRender since that leads to 
+            // non-smooth movement.
+            this->PVVolumeAppearanceEditor->PVRenderView->
+              GetPVWindow()->GetInteractor()->Render();
             break;
           }
         }
