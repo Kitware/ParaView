@@ -77,6 +77,10 @@ public:
                                "render server");
         return 0;
         }
+      if (serverId == DATA_SERVER_ROOT || serverId == RENDER_SERVER_ROOT)
+        {
+        return serverId;
+        }
       if (serverId == CLIENT)
         {
         return CLIENT;
