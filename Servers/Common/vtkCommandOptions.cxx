@@ -42,7 +42,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCommandOptions);
-vtkCxxRevisionMacro(vtkCommandOptions, "1.1");
+vtkCxxRevisionMacro(vtkCommandOptions, "1.2");
 
 //----------------------------------------------------------------------------
 vtkCommandOptions::vtkCommandOptions()
@@ -53,6 +53,8 @@ vtkCommandOptions::vtkCommandOptions()
   this->Internals->CMD.SetUnknownArgumentCallback(vtkCommandOptions::UnknownArgumentHandler);
   this->Internals->CMD.SetClientData(this);
   this->UnknownArgument = 0;
+  this->HelpSelected = 0;
+  
   this->ErrorMessage = 0;
   this->Argc = 0;
   this->Argv = 0;
