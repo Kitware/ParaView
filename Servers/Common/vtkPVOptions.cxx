@@ -21,47 +21,19 @@
 
 
 //----------------------------------------------------------------------------
-//****************************************************************************
-class vtkPVOptionsInternal
-{
-public:
-  vtkPVOptionsInternal(vtkPVOptions* p)
-    {
-      this->XMLParser = vtkPVOptionsXMLParser::New();
-      this->XMLParser->SetPVOptions(p);
-    }
-  ~vtkPVOptionsInternal()
-    {
-      this->XMLParser->Delete();
-    }
-  vtkPVOptionsXMLParser* XMLParser;
-  kwsys::CommandLineArguments CMD;
-};
-//****************************************************************************
-//----------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.29");
+vtkCxxRevisionMacro(vtkPVOptions, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
 {
-  this->ProcessType = ALLPROCESS;
+  this->SetProcessType(ALLPROCESS);
   // Initialize kwsys::CommandLineArguments
-  this->Internals = new vtkPVOptionsInternal(this);
-  this->Internals->CMD.SetUnknownArgumentCallback(vtkPVOptions::UnknownArgumentHandler);
-  this->Internals->CMD.SetClientData(this);
-  this->UnknownArgument = 0;
-  this->ErrorMessage = 0;
-  this->Argc = 0;
-  this->Argv = 0;
   this->CaveConfigurationFileName = 0;
   this->MachinesFileName = 0;
   this->RenderModuleName = NULL;
   this->UseRenderingGroup = 0;
   this->GroupFileName = 0;
-  this->XMLConfigFile = 0;
   this->ParaViewDataName = 0;
   
   this->ClientRenderServer = 0;
@@ -96,14 +68,12 @@ vtkPVOptions::vtkPVOptions()
   this->UseStereoRendering = 0;
   this->UseOffscreenRendering = 0;
   this->DisableComposite = 0;
-  this->HelpSelected = 0;
   this->ConnectID = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVOptions::~vtkPVOptions()
 {
-  this->SetXMLConfigFile(0);
   this->SetRenderModuleName(0);
   this->SetCaveConfigurationFileName(NULL);
   this->SetGroupFileName(0);
@@ -112,27 +82,6 @@ vtkPVOptions::~vtkPVOptions()
   this->SetRenderServerHostName(0);
   this->SetClientHostName(0);
   this->SetMachinesFileName(0);
-  
-  // Remove internals
-  this->SetUnknownArgument(0);
-  this->SetErrorMessage(0);
-  this->CleanArgcArgv();
-  delete this->Internals;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkPVOptions::GetHelp()
-{
-  int width = kwsys::SystemTools::GetTerminalWidth();
-  if ( width < 9 )
-    {
-    width = 80;
-    }
-
-  this->Internals->CMD.SetLineLength(width);
-  this->Internals->CMD.SetLineLength(300);
-
-  return this->Internals->CMD.GetHelp();
 }
 
 //----------------------------------------------------------------------------
@@ -291,213 +240,19 @@ int vtkPVOptions::PostProcess(int, const char* const*)
 //----------------------------------------------------------------------------
 int vtkPVOptions::WrongArgument(const char* argument)
 {
-  // if the unknown file is a config file then it is OK
-  if(this->XMLConfigFile && strcmp(argument, this->XMLConfigFile) == 0)
-    {
-    // if the UnknownArgument is the XMLConfigFile then set the 
-    // UnknownArgument to null as it really is not Unknown anymore.
-    if(this->UnknownArgument && 
-       (strcmp(this->UnknownArgument, this->XMLConfigFile) == 0))
-      {
-      this->SetUnknownArgument(0);
-      }
-    return 1;
-    }
   if(kwsys::SystemTools::GetFilenameLastExtension(argument) == ".pvb")
     {
     this->SetErrorMessage("Batch file argument to ParaView executable is deprecated. Please use \"pvbatch\".");
     return 0;
     }
 
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-const char* vtkPVOptions::GetArgv0()
-{
-  return this->Internals->CMD.GetArgv0();
-}
-
-//----------------------------------------------------------------------------
-int vtkPVOptions::LoadXMLConfigFile(const char* fname)
-{
-  this->Internals->XMLParser->SetFileName(fname);
-  this->Internals->XMLParser->Parse();
-  this->SetXMLConfigFile(fname);
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVOptions::Parse(int argc, const char* const argv[])
-{
-  this->Internals->CMD.Initialize(argc, argv);
-  this->Initialize();
-  this->AddBooleanArgument("--help", "/?", &this->HelpSelected, 
-                           "Displays available command line arguments.",
-                           ALLPROCESS);
-
-  // First get options from the xml file
-  for(int i =0; i < argc; ++i)
-    {
-    vtkstd::string arg = argv[i];
-    if(arg.size() > 4 && arg.find(".pvx") == (arg.size() -4))
-      {
-      if(!this->LoadXMLConfigFile(arg.c_str()))
-        {
-        return 0;
-        }
-      }
-    }
-  // now get options from the command line
-  int res1 = this->Internals->CMD.Parse();
-  int res2 = this->PostProcess(argc, argv);
-  //cout << "Res1: " << res1 << " Res2: " << res2 << endl;
-  this->CleanArgcArgv();
-  this->Internals->CMD.GetRemainingArguments(&this->Argc, &this->Argv);
-
-  return res1 && res2;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVOptions::CleanArgcArgv()
-{
-  int cc;
-  if ( this->Argv )
-    {
-    for ( cc = 0; cc < this->Argc; cc ++ )
-      {
-      delete [] this->Argv[cc];
-      }
-    delete [] this->Argv;
-    this->Argv = 0;
-    }
-}
-//----------------------------------------------------------------------------
-void vtkPVOptions::AddDeprecatedArgument(const char* longarg, const char* shortarg,
-                                         const char* help, int type)
-{
-  // if it is for xml or not for the current process do nothing
-  if((type == XMLONLY) || !(type & this->ProcessType))
-    {
-    return;
-    }
-  // Add a callback for the deprecated argument handling
-  this->Internals->CMD.AddCallback(longarg, kwsys::CommandLineArguments::NO_ARGUMENT,
-                                   vtkPVOptions::DeprecatedArgumentHandler, this, help);
-  if(shortarg)
-    {
-    this->Internals->CMD.AddCallback(shortarg, kwsys::CommandLineArguments::NO_ARGUMENT,
-                                     vtkPVOptions::DeprecatedArgumentHandler, this, help);
-    }
+  return this->Superclass::WrongArgument(argument);
 }
 
 //----------------------------------------------------------------------------
 int vtkPVOptions::DeprecatedArgument(const char* argument)
 {
-  ostrstream str;
-  str << "  " << this->Internals->CMD.GetHelp(argument);
-  str << ends;
-  this->SetErrorMessage(str.str());
-  delete [] str.str();
-  return 0;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVOptions::AddBooleanArgument(const char* longarg, const char* shortarg,
-                                      int* var, const char* help, int type)
-{
-  // add the argument to the XML parser
-  this->Internals->XMLParser->AddBooleanArgument(longarg, var, type);
-  if(type == XMLONLY)
-    {
-    return;
-    }
-  // if the process type matches then add the argument to the command line
-  if(type & this->ProcessType)
-    {
-    this->Internals->CMD.AddBooleanArgument(longarg, var, help);
-    if ( shortarg )
-      {
-      this->Internals->CMD.AddBooleanArgument(shortarg, var, longarg);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVOptions::AddArgument(const char* longarg, const char* shortarg, int* var, const char* help, int type)
-{
-  this->Internals->XMLParser->AddArgument(longarg, var, type);
-  if(type == XMLONLY)
-    {
-    return;
-    }
-  if(type & this->ProcessType)
-    {
-    typedef kwsys::CommandLineArguments argT;
-    this->Internals->CMD.AddArgument(longarg, argT::EQUAL_ARGUMENT, var, help);
-    if ( shortarg )
-      {
-      this->Internals->CMD.AddArgument(shortarg, argT::EQUAL_ARGUMENT, var, longarg);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVOptions::AddArgument(const char* longarg, const char* shortarg, char** var, const char* help, int type)
-{
-  this->Internals->XMLParser->AddArgument(longarg, var, type);
-  if(type == XMLONLY)
-    {
-    return;
-    }
-  if(type & this->ProcessType)
-    {
-    typedef kwsys::CommandLineArguments argT;
-    this->Internals->CMD.AddArgument(longarg, argT::EQUAL_ARGUMENT, var, help);
-    if ( shortarg )
-      {
-      this->Internals->CMD.AddArgument(shortarg, argT::EQUAL_ARGUMENT, var, longarg);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-int vtkPVOptions::UnknownArgumentHandler(const char* argument, void* call_data)
-{
-  vtkPVOptions* self = static_cast<vtkPVOptions*>(call_data);
-  if ( self )
-    {
-    self->SetUnknownArgument(argument);
-    return self->WrongArgument(argument);
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVOptions::DeprecatedArgumentHandler(const char* argument, 
-                                            const char* , void* call_data)
-{
-  //cout << "UnknownArgumentHandler: " << argument << endl;
-  vtkPVOptions* self = static_cast<vtkPVOptions*>(call_data);
-  if ( self )
-    {
-    return self->DeprecatedArgument(argument);
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVOptions::GetRemainingArguments(int* argc, char*** argv)
-{
-  *argc = this->Argc;
-  *argv = this->Argv;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVOptions::GetLastArgument()
-{
-  return this->Internals->CMD.GetLastArgument();
+  return this->Superclass::DeprecatedArgument(argument);
 }
 
 //----------------------------------------------------------------------------
@@ -505,10 +260,6 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "ParaViewDataName: " << (this->ParaViewDataName?this->ParaViewDataName:"(none)") << endl;
-  os << indent << "XMLConfigFile: " << (this->XMLConfigFile?this->XMLConfigFile:"(none)") << endl;
-  os << indent << "UnknownArgument: " << (this->UnknownArgument?this->UnknownArgument:"(none)") << endl;
-  os << indent << "ErrorMessage: " << (this->ErrorMessage?this->ErrorMessage:"(none)") << endl;
-  os << indent << "HelpSelected: " << this->HelpSelected << endl;
   os << indent << "GroupFileName: " << (this->GroupFileName?this->GroupFileName:"(none)") << endl;
 
   // Everything after this line will be showned in Help/About dialog
