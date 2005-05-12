@@ -33,10 +33,11 @@
 #include "vtkPVVolumePropertyWidget.h"
 #include "vtkKWPiecewiseFunctionEditor.h"
 #include "vtkKWColorTransferFunctionEditor.h"
+#include "vtkDataSet.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.26");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.26.2.1");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);
@@ -116,13 +117,13 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
 
   this->VolumePropertyWidget = vtkPVVolumePropertyWidget::New();
   this->VolumePropertyWidget->SetParent(this);
-  this->VolumePropertyWidget->Create(pvApp, 0);
   this->VolumePropertyWidget->ShowComponentSelectionOff();
   this->VolumePropertyWidget->ShowInterpolationTypeOff();
   this->VolumePropertyWidget->ShowMaterialPropertyOff();
   this->VolumePropertyWidget->ShowGradientOpacityFunctionOff();
   this->VolumePropertyWidget->ShowComponentWeightsOff();
   this->VolumePropertyWidget->GetScalarOpacityFunctionEditor()->ShowWindowLevelModeButtonOff();
+  this->VolumePropertyWidget->Create(pvApp, 0);
   this->VolumePropertyWidget->SetVolumePropertyChangedCommand(
     this, "VolumePropertyChangedCallback");
   this->VolumePropertyWidget->SetVolumePropertyChangingCommand(
@@ -164,21 +165,22 @@ void vtkPVVolumeAppearanceEditor::VolumePropertyInternalCallback()
     vtkColorTransferFunction* color = kwcolor->GetColorTransferFunction();
     double *rgb = color->GetDataPointer();
 
-      // 1. ScalarOpacity
-      for(int j=0; j<func->GetSize(); j++)
-        {
-        // Copy points one by one from the vtkPiecewiseFunction:
-        this->AddScalarOpacityPoint(points[2*j], points[2*j+1]);
-        }
+    // 1. ScalarOpacity
+    for(int j=0; j<func->GetSize(); j++)
+      {
+      // Copy points one by one from the vtkPiecewiseFunction:
+      this->AddScalarOpacityPoint(points[2*j], points[2*j+1]);
+      }
 
-      //2. ScalarOpacityUnitDistance
-      this->SetScalarOpacityUnitDistance( unitDistance );
+    //2. ScalarOpacityUnitDistance
+    this->SetScalarOpacityUnitDistance( unitDistance );
 
-      //3. Color Ramp, similar to ScalarOpacity
-      for(int k=0; k<color->GetSize(); k++)
-        {
-        this->AddColorPoint(rgb[4*k],rgb[4*k+1],rgb[4*k+2],rgb[4*k+3]);
-        }
+    //3. Color Ramp, similar to ScalarOpacity
+    for(int k=0; k<color->GetSize(); k++)
+      {
+      this->AddColorPoint(rgb[4*k],rgb[4*k+1],rgb[4*k+2],rgb[4*k+3]);
+      }
+
     this->RenderView();
     }
 }
@@ -298,7 +300,7 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
         pvApp->GetProcessModule()->
         GetObjectFromID(this->PVSource->GetPartDisplay()->
                         GetVolumePropertyProxy()->GetID(0)));
-
+ 
     // It would be nicer if there would be a VolumeProperty proxy:
     if (!this->InternalVolumeProperty)
       {
@@ -311,7 +313,22 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
     this->InternalVolumeProperty->SetScalarOpacity(opacityFunc);
     this->InternalVolumeProperty->SetColor(colorFunc);
 
-    this->VolumePropertyWidget->SetDataInformation(dataInfo);
+  // Create the VolumeProperty/OpacityFunction/ColorTransferFuntion
+  // that will be manipulated by the widget.
+
+  this->VolumePropertyWidget->SetDataInformation(dataInfo);
+  this->VolumePropertyWidget->SetArrayName(this->ArrayInfo->GetName());
+  if (this->PVSource->GetPartDisplay()->GetColorField() == 
+    vtkDataSet::POINT_DATA_FIELD)
+    {
+    this->VolumePropertyWidget->SetScalarModeToUsePointFieldData();
+    }
+  else if (this->PVSource->GetPartDisplay()->GetColorField() == 
+    vtkDataSet::CELL_DATA_FIELD)
+    {
+    this->VolumePropertyWidget->SetScalarModeToUseCellFieldData();
+    }
+
 
     this->VolumePropertyWidget->GetScalarOpacityUnitDistanceScale()->
       SetResolution(soud_res);
