@@ -77,9 +77,9 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.26");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.27");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
-
+vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 //***************************************************************************
 class vtkPVAnimationCueObserver : public vtkCommand
 {
@@ -257,13 +257,6 @@ void vtkPVAnimationCue::SetVirtual(int v)
     }
   this->Virtual = v;
   this->Modified();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationCue::SetPVSource(vtkPVSource* src)
-{
-  //Should not be reference counted to avoid cycles.
-  this->PVSource = src;
 }
 
 //-----------------------------------------------------------------------------
@@ -505,6 +498,38 @@ int vtkPVAnimationCue::AddNewKeyFrame(double time)
 }
 
 //-----------------------------------------------------------------------------
+int vtkPVAnimationCue::CanDeleteSelectedKeyFrame()
+{
+  if (this->Virtual)
+    {
+    return 0;
+    }
+  int id = this->TimeLine->GetSelectedPoint();
+  return this->TimeLine->CanRemoveFunctionPoint(id);
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVAnimationCue::AppendNewKeyFrame()
+{
+  // First determine time.
+  double step = 0.25;
+  double curbounds[2];
+  this->GetTimeBounds(curbounds);
+
+  if (curbounds[1] + step > 1.0)
+    {
+    curbounds[1] -= step;
+    this->SetTimeBounds(curbounds, 1);
+    }
+  int id = this->AddNewKeyFrame(1.0);
+  if (id != -1)
+    {
+    this->TimeLine->SelectPoint(id);
+    }
+  return id;
+}
+
+//-----------------------------------------------------------------------------
 int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
 {
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
@@ -601,6 +626,12 @@ int vtkPVAnimationCue::AddKeyFrame(vtkPVKeyFrame* keyframe)
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->KeyFrameManipulatorProxy->GetProperty("LastAddedKeyFrameIndex"));
   return ivp->GetElement(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCue::DeleteKeyFrame(int id)
+{
+  this->TimeLine->RemovePoint(id);
 }
 
 //-----------------------------------------------------------------------------

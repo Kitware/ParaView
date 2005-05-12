@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.703");
+vtkCxxRevisionMacro(vtkPVWindow, "1.704");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3838,7 +3838,7 @@ void vtkPVWindow::ShowAnimationPanes()
   
   //Bring up the properties panel.
   this->SetMainPanelVisibility(1);
-  this->ShowHorizontalPane();
+//  this->ShowHorizontalPane();
   
   // We need to update the properties-menu radio button too!
   this->GetViewMenu()->CheckRadioButton(

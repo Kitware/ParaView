@@ -133,15 +133,37 @@ public:
   // key frame already exists at the specified time. 
   int CreateAndAddKeyFrame(double time, int type);
 
+  // Description:
+  // Determine a time to append a new keyframe (the old keyframes in this cue may get
+  // shrunk to accomadate the new keyframe) and calls AddNewKeyFrame.
+  int AppendNewKeyFrame();
  
   // Description:
   // Removes a particular key frame from the cue.
+  // This method merely removes the keyframe. It does not
+  // lead to changing of the selection on the timeline and raising of
+  // appriate events. For all  that to happen one must use 
+  // DeleteKeyFrame.
   void RemoveKeyFrame(vtkPVKeyFrame* keyframe);
 
   // Description:
   // Removes a keyframe at the given id from the cue.
+  // This method merely removes the keyframe. It does not
+  // lead to changing of the selection on the timeline and raising of
+  // appriate events. For all  that to happen one must use 
+  // DeleteKeyFrame.
   int RemoveKeyFrame(int id);
 
+  // Description:
+  // Deletes the keyframe at given index. If the deleted key frame is the
+  // currenly selected keyframe, it changes the selection and the timeline is
+  // updated.
+  void DeleteKeyFrame(int id);
+
+  // Description:
+  // Returns true if the selected keyframe can be deleted.
+  int CanDeleteSelectedKeyFrame();
+  
   // Description:
   // Returns a key frame at the given id in the cue.
   vtkPVKeyFrame* GetKeyFrame(int id);

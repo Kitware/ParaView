@@ -96,6 +96,9 @@ public:
   // Get the trace helper framework.
   vtkGetObjectMacro(TraceHelper, vtkPVTraceHelper);
 
+  // Description:
+  // Indicates if the function point can be removed.
+  int CanRemoveFunctionPoint(int id);
 protected:
   vtkPVTimeLine();
   ~vtkPVTimeLine();

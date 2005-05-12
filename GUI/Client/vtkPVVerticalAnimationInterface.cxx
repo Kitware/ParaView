@@ -42,7 +42,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.17");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.18");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -55,6 +55,7 @@ vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFr
 #define VTK_PV_SINUSOID_LABEL "Sinusoid"
 
 #define VTK_PV_KEYFRAME_PROPERTIES_DEFAULT_LABEL "Active Key Frame Properties"
+#define VTK_PV_SELECTOR_DEFAULT_LABEL "Tracks" 
 
 //*****************************************************************************
 class vtkPVVerticalAnimationInterfaceObserver : public vtkCommand
@@ -96,8 +97,12 @@ vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
   this->TypeImage = vtkKWPushButton::New();
   this->TypeLabel = vtkKWLabel::New();
   this->TypeMenuButton = vtkKWMenuButton::New();
-  
+  this->AddKeyFrameButton = vtkKWPushButton::New();
+  this->DeleteKeyFrameButton = vtkKWPushButton::New();
+
   this->RecordAllButton = vtkKWCheckButton::New();
+
+  this->SelectorFrame = vtkKWFrameLabeled::New();
 
   this->SaveFrame = vtkKWFrameLabeled::New();
   this->CacheGeometryCheck = vtkKWCheckButton::New();
@@ -135,8 +140,13 @@ vtkPVVerticalAnimationInterface::~vtkPVVerticalAnimationInterface()
   this->TypeMenuButton->Delete();
   this->SetAnimationManager(NULL);
   this->IndexScale->Delete();
-  
+
+  this->AddKeyFrameButton->Delete();
+  this->DeleteKeyFrameButton->Delete();
+ 
   this->RecordAllButton->Delete();
+
+  this->SelectorFrame->Delete();
 
   this->SaveFrame->Delete();
   this->CacheGeometryCheck->Delete();
@@ -165,9 +175,9 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
       char* text = this->AnimationCue->GetTextRepresentation();
       this->TitleLabel->SetText(text);
       delete []text;
-      this->Update(); // so that the currently selected keyframe
-        // is shown in the GUI.
       }
+    this->Update(); // so that the currently selected keyframe
+    // is shown in the GUI.
     }
 }
 
@@ -200,14 +210,23 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->Script(
     "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", // 
     this->ScenePropertiesFrame->GetWidgetName());
- 
+
+  // SELECTOR FRAME
+  this->SelectorFrame->SetParent(this->TopFrame->GetFrame());
+  this->SelectorFrame->ShowHideFrameOn();
+  this->SelectorFrame->Create(app, 0);
+  this->SelectorFrame->SetLabelText(VTK_PV_SELECTOR_DEFAULT_LABEL); 
+  this->Script(
+    "pack %s -side top -anchor nw  -fill x -expand y -padx 2 -pady 2",
+    this->SelectorFrame->GetWidgetName());
+  
   // KEYFRAME PROPERTIES FRAME
   this->KeyFramePropertiesFrame->SetParent(this->TopFrame->GetFrame());
   this->KeyFramePropertiesFrame->ShowHideFrameOn();
   this->KeyFramePropertiesFrame->Create(app, 0);
   this->KeyFramePropertiesFrame->SetLabelText(VTK_PV_KEYFRAME_PROPERTIES_DEFAULT_LABEL);
   this->Script(
-    "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", // 
+    "pack %s  -side top -anchor nw -fill x -expand t -padx 2 -pady 2", 
     this->KeyFramePropertiesFrame->GetWidgetName());
 
   this->TitleLabelLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
@@ -233,7 +252,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->IndexScale->SetEndCommand(this, "IndexChangedCallback");
   this->IndexScale->SetBalloonHelpString("Select a key frame at a particular index in the "
     "current track");
-  
+ 
   this->TypeLabel->SetParent(this->PropertiesFrame);
   this->TypeLabel->Create(app, 0);
   this->TypeLabel->SetText("Interpolation:");
@@ -250,7 +269,19 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->TypeMenuButton->IndicatorOff();
 
   this->BuildTypeMenu();
-    
+
+  this->AddKeyFrameButton->SetParent(this->KeyFramePropertiesFrame->GetFrame());
+  this->AddKeyFrameButton->Create(app, 0);
+  this->AddKeyFrameButton->SetBalloonHelpString("Append a new key frame");
+  this->AddKeyFrameButton->SetText("Add KeyFrame");
+  this->AddKeyFrameButton->SetCommand(this, "AddKeyFrameButtonCallback");
+ 
+  this->DeleteKeyFrameButton->SetParent(this->KeyFramePropertiesFrame->GetFrame());
+  this->DeleteKeyFrameButton->Create(app, 0);
+  this->DeleteKeyFrameButton->SetBalloonHelpString("Delete active key frame");
+  this->DeleteKeyFrameButton->SetText("Delete KeyFrame");
+  this->DeleteKeyFrameButton->SetCommand(this, "DeleteKeyFrameButtonCallback");
+  
   this->SelectKeyFrameLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
   this->SelectKeyFrameLabel->SetText("Select or Add a key frame in the Animation Tracks "
     "window to show its properties.");
@@ -264,7 +295,9 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
     this->TypeImage->GetWidgetName(),
     this->TypeMenuButton->GetWidgetName());
 
+
   this->Script("grid columnconfigure %s 2 -weight 2", this->PropertiesFrame->GetWidgetName());
+
 
   // SAVE FRAME
   this->SaveFrame->SetParent(this->TopFrame->GetFrame());
@@ -312,6 +345,31 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->Script("grid columnconfigure %s 1 -weight 2",
     this->KeyFramePropertiesFrame->GetFrame()->GetWidgetName());
 
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVerticalAnimationInterface::SetAddDeleteButtonVisibility(int visible)
+{
+  if (visible)
+    {
+    this->Script("grid %s x -row 3 -sticky w",
+      this->AddKeyFrameButton->GetWidgetName());
+    }
+  else
+    {
+    this->Script("grid forget %s", this->AddKeyFrameButton->GetWidgetName());
+    }
+
+  if (visible)
+    {
+    this->Script("grid x %s -row 3 -sticky e",
+      this->DeleteKeyFrameButton->GetWidgetName());
+    }
+  else
+    {
+    this->Script("grid forget %s", this->DeleteKeyFrameButton->GetWidgetName());
+    }
+  this->UpdateEnableState(); // so that delete buttons enable state is set properly.
 }
 
 //-----------------------------------------------------------------------------
@@ -406,6 +464,17 @@ vtkKWFrame* vtkPVVerticalAnimationInterface::GetScenePropertiesFrame()
     return NULL;
     }
   return this->ScenePropertiesFrame->GetFrame();
+}
+
+//-----------------------------------------------------------------------------
+vtkKWFrame* vtkPVVerticalAnimationInterface::GetSelectorFrame()
+{
+  if (!this->IsCreated())
+    {
+    vtkErrorMacro("Widget not created yet!");
+    return NULL;
+    }
+  return this->SelectorFrame->GetFrame();
 }
 
 //-----------------------------------------------------------------------------
@@ -521,16 +590,20 @@ void vtkPVVerticalAnimationInterface::Update()
     this->Script("grid forget %s", this->SelectKeyFrameLabel->GetWidgetName());
     this->Script("grid %s - -row 1 -sticky ew", this->PropertiesFrame->GetWidgetName());
     }
+  
   if (this->AnimationCue == NULL)
     {
     this->Script("grid forget %s", this->TitleLabel->GetWidgetName());
     this->Script("grid forget %s", this->TitleLabelLabel->GetWidgetName());
+    this->SetAddDeleteButtonVisibility(0);
     }
   else
     
     {
     this->Script("grid %s %s -row 0 -sticky w", this->TitleLabelLabel->GetWidgetName(),
       this->TitleLabel->GetWidgetName());
+    this->SetAddDeleteButtonVisibility(!this->AnimationCue->GetVirtual());
+      
     }
 }
 
@@ -615,6 +688,35 @@ void vtkPVVerticalAnimationInterface::RecordAllChangedCallback()
 
 
 //-----------------------------------------------------------------------------
+void vtkPVVerticalAnimationInterface::AddKeyFrameButtonCallback()
+{
+  if (!this->AnimationCue || this->AnimationCue->GetVirtual())
+    {
+    vtkErrorMacro("Cannot delete any keyframe!");
+    return;
+    }
+  this->AnimationCue->AppendNewKeyFrame();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVerticalAnimationInterface::DeleteKeyFrameButtonCallback()
+{
+  if (!this->AnimationCue || this->AnimationCue->GetVirtual())
+    {
+    vtkErrorMacro("Cannot delete any keyframe!");
+    return;
+    }
+ 
+  int id = this->AnimationCue->GetTimeLine()->GetSelectedPoint();
+  if (id==-1)
+    {
+    vtkErrorMacro("No keyframe active. Cannot delete.");
+    return;
+    }
+  this->AnimationCue->DeleteKeyFrame(id);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVVerticalAnimationInterface::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
@@ -626,11 +728,24 @@ void vtkPVVerticalAnimationInterface::UpdateEnableState()
   this->PropagateEnableState(this->KeyFramePropertiesFrame);
   this->PropagateEnableState(this->SelectKeyFrameLabel);
   this->PropagateEnableState(this->ActiveKeyFrame);
+  this->PropagateEnableState(this->AddKeyFrameButton);
+  
   if (this->CacheGeometryCheck)
     {
     this->CacheGeometryCheck->SetEnabled(
       !this->EnableCacheCheckButton ? 0 : this->GetEnabled());
     }
+
+  if (this->AnimationCue && 
+    this->AnimationCue->CanDeleteSelectedKeyFrame())
+    {
+    this->PropagateEnableState(this->DeleteKeyFrameButton);
+    }
+  else
+    {
+    this->DeleteKeyFrameButton->SetEnabled(0);
+    }
+
   this->TypeMenuButton->SetEnabled(
     !this->InterpolationValid ? 0 : this->GetEnabled());
   this->TypeImage->SetEnabled(
@@ -639,6 +754,7 @@ void vtkPVVerticalAnimationInterface::UpdateEnableState()
 //-----------------------------------------------------------------------------
 void vtkPVVerticalAnimationInterface::SaveState(ofstream* )
 {
+  // Nothing to save
 }
 
 //-----------------------------------------------------------------------------

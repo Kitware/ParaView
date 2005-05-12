@@ -22,7 +22,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.7");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.8");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
@@ -192,9 +192,22 @@ int vtkPVTimeLine::SetFunctionPoint(int id, double parameter,
 }
 
 //----------------------------------------------------------------------------
+int vtkPVTimeLine::CanRemoveFunctionPoint(int id)
+{
+  if (id < 0 || id >=this->GetFunctionSize()) 
+    {
+    return 0;
+    }
+  return this->FunctionPointCanBeRemoved(id);
+}
+
+//----------------------------------------------------------------------------
 int vtkPVTimeLine::RemoveFunctionPoint(int id)
 {
-  if (id < 0 || id >=this->GetFunctionSize()) {return 0;}
+  if (!this->CanRemoveFunctionPoint(id)) 
+    {
+    return 0;
+    }
   return this->AnimationCue->RemoveKeyFrame(id);
 }
 

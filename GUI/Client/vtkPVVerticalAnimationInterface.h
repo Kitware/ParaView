@@ -58,14 +58,28 @@ public:
   // Frame for the Animation Control and where the scene properties
   // are shown.
   vtkKWFrame* GetScenePropertiesFrame();
+
+  // Description:
+  // Frame for the Selection interface. This contains the widget 
+  // allowing the user to choose the active track to animate 
+  // without using the tracks interface.
+  vtkKWFrame* GetSelectorFrame();
+  
+  // Description:
+  // Set the type of the active Key frame. If the present type of the keyframe
+  // is different than the one specified, the keyframe gets replaced 
+  // with a keyframe of the specified type.
   void SetKeyFrameType(int type);
 
   void SetAnimationManager(vtkPVAnimationManager* am) { this->AnimationManager = am;}
 
+  // Callbacks for GUI elements.
   void IndexChangedCallback();
   void RecordAllChangedCallback();
   void CacheGeometryCheckCallback();
   void AdvancedAnimationViewCallback();
+  void AddKeyFrameButtonCallback();
+  void DeleteKeyFrameButtonCallback();
 
   void SetAdvancedAnimationView(int advanced);
 
@@ -98,6 +112,7 @@ protected:
   vtkPVAnimationManager* AnimationManager;
   vtkKWFrameWithScrollbar* TopFrame;
   vtkKWFrameLabeled* ScenePropertiesFrame;
+  vtkKWFrameLabeled* SelectorFrame;
   vtkKWFrameLabeled* KeyFramePropertiesFrame;
   vtkKWLabel* TitleLabelLabel;
   vtkKWLabel* TitleLabel; // label to show the cue text representation.
@@ -105,6 +120,8 @@ protected:
   vtkKWFrame* TypeFrame; //frame containing the selection for differnt types of waveforms.
   vtkKWPushButton* TypeImage;
   vtkKWMenuButton* TypeMenuButton;
+  vtkKWPushButton* AddKeyFrameButton;
+  vtkKWPushButton* DeleteKeyFrameButton;
   vtkKWLabel* TypeLabel;
   vtkKWScale* IndexScale;
   vtkKWLabel* SelectKeyFrameLabel;
@@ -137,6 +154,7 @@ protected:
   void UpdateTypeImage(vtkPVKeyFrame*);
   void ShowKeyFrame(int id);
 
+  void SetAddDeleteButtonVisibility(int visible);
 private:
   vtkPVVerticalAnimationInterface(const vtkPVVerticalAnimationInterface&); // Not implemented.
   void operator=(const vtkPVVerticalAnimationInterface&); // Not implemented.

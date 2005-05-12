@@ -67,6 +67,7 @@ SET( ParaViewClient_SRCS
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
   vtkPVTimeLine.cxx
+  vtkPVActiveTrackSelector.cxx
   vtkPVAnimationScene.cxx
   vtkPVAnimationCue.cxx
   vtkPVAnimationCueTree.cxx

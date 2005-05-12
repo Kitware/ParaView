@@ -73,6 +73,7 @@ class vtkPVAnimationCue;
 class vtkPVSource;
 class vtkPVKeyFrame;
 class vtkSMStringVectorProperty;
+class vtkPVActiveTrackSelector;
 
 class VTK_EXPORT vtkPVAnimationManager : public vtkPVTracedWidget
 {
@@ -256,6 +257,7 @@ protected:
   vtkPVVerticalAnimationInterface* VAnimationInterface;
   vtkPVHorizontalAnimationInterface* HAnimationInterface;
   vtkPVAnimationScene* AnimationScene;
+  vtkPVActiveTrackSelector* ActiveTrackSelector;
 
   vtkPVAnimationManagerInternals* Internals;
 

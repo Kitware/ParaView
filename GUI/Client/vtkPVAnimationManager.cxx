@@ -21,6 +21,7 @@
 #include "vtkPVVerticalAnimationInterface.h"
 #include "vtkPVHorizontalAnimationInterface.h"
 #include "vtkPVAnimationScene.h"
+#include "vtkPVActiveTrackSelector.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkSMProxyIterator.h"
@@ -63,7 +64,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.40");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.41");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -130,6 +131,12 @@ vtkPVAnimationManager::vtkPVAnimationManager()
   this->AnimationScene->GetTraceHelper()->SetReferenceCommand(
     "GetAnimationScene");
 
+  this->ActiveTrackSelector = vtkPVActiveTrackSelector::New();
+  this->ActiveTrackSelector->GetTraceHelper()->SetReferenceHelper(
+    this->GetTraceHelper());
+  this->ActiveTrackSelector->GetTraceHelper()->SetReferenceCommand(
+    "GetActiveTrackSelector");
+
   this->ProxyIterator = vtkSMProxyIterator::New();
   this->Internals = new vtkPVAnimationManagerInternals;
   this->Observer = vtkPVAnimationManagerObserver::New();
@@ -146,9 +153,10 @@ vtkPVAnimationManager::~vtkPVAnimationManager()
 {
   this->SetVerticalParent(0);
   this->SetHorizantalParent(0);
+  this->AnimationScene->Delete();
+  this->ActiveTrackSelector->Delete();
   this->VAnimationInterface->Delete();
   this->HAnimationInterface->Delete();
-  this->AnimationScene->Delete();
   this->ProxyIterator->Delete();
   delete this->Internals;
   this->Observer->Delete();
@@ -195,6 +203,12 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
   this->Script("pack %s -anchor n -side top -expand t -fill both",
     this->AnimationScene->GetWidgetName());
 
+  this->ActiveTrackSelector->SetParent(
+    this->VAnimationInterface->GetSelectorFrame());
+  this->ActiveTrackSelector->SetAnimationManager(this);
+  this->ActiveTrackSelector->Create(app, "-relief flat");
+  this->Script("pack %s -anchor n -side top -expand t -fill both",
+    this->ActiveTrackSelector->GetWidgetName());
 }
 
 //-----------------------------------------------------------------------------
@@ -221,7 +235,7 @@ void vtkPVAnimationManager::ShowAnimationInterfaces()
 {
   this->Update();
   this->ShowVAnimationInterface();
-  this->ShowHAnimationInterface();
+//  this->ShowHAnimationInterface();
 }
 
 //-----------------------------------------------------------------------------
@@ -309,6 +323,7 @@ void vtkPVAnimationManager::ValidateOldSources()
         vtkPVAnimationCueTree* pvCueTree = vtkPVAnimationCueTree::SafeDownCast(
           iter->second);
         this->HAnimationInterface->RemoveAnimationCueTree(pvCueTree);
+        this->ActiveTrackSelector->RemoveSource(pvCueTree);
         //deletes all the subsources as well.
         }
       // if it is a subsource, then it will get deleted when the parent will be deleted.
@@ -451,6 +466,7 @@ void vtkPVAnimationManager::AddNewSources()
       pvCue->SetName(proxyname);
       pvCue->SetPVSource(pvSource);
       this->HAnimationInterface->AddAnimationCueTree(pvCue);
+      this->ActiveTrackSelector->AddSource(pvCue);
       }
 
     this->InitializeObservers(pvCue);
@@ -759,10 +775,12 @@ void vtkPVAnimationManager::ExecuteEvent(vtkObject* obj, unsigned long event,
       if (cue == this->VAnimationInterface->GetAnimationCue())
         {
         this->VAnimationInterface->SetAnimationCue(NULL);
+        this->ActiveTrackSelector->SelectCue(NULL);
         }
       break;
     case vtkKWEvent::FocusInEvent:
       this->VAnimationInterface->SetAnimationCue(cue);
+      this->ActiveTrackSelector->SelectCue(cue);
       break;
       }
     }
