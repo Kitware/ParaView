@@ -33,31 +33,52 @@
 #ifndef __vtkPVLookmark_h
 #define __vtkPVLookmark_h
 
-#include "vtkObject.h"
+#include "vtkKWLookmark.h"
 
 class vtkKWApplication;
 class vtkPVSource;
 class vtkPVSourceCollection;
+class vtkRenderWindow;
+class vtkPVApplication;
+class vtkPVRenderView;
+class vtkPVLookmarkManager;
 
-class VTK_EXPORT vtkPVLookmark : public vtkObject
+class VTK_EXPORT vtkPVLookmark : public vtkKWLookmark
 {
 public:
 
   static vtkPVLookmark* New();
-  vtkTypeRevisionMacro(vtkPVLookmark,vtkObject);
+  vtkTypeRevisionMacro(vtkPVLookmark,vtkKWLookmark);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // The name of the lookmark. Always the same as the one displayed in the lookmark widget.
-  vtkGetStringMacro(Name);
-  vtkSetStringMacro(Name);
+  // Description: 
+  // It is called when the user clicks on a lookmark's thumbnail
+  // If "Lock to Dataset" is ON, it tries to find/open the lookmark's dataset and apply the pipeline
+  // to it. Otherwise, the lookmark is applied to the currently selected source's dataset, maintaining
+  // the current camera view and timestep. 
+  // The reader is initialized using the attributes in the lookmark's state script. The rest of the
+  // script is then executed.
+  void View();
 
   // Description:
-  // This is only allocated and written to right before a lookmark is about to be written to a lookmark file.
-  // The newlines contained herein are encoded to '~' before writing because they are lost when the ->SetObject(vtkPVLookmark) method is called
-  vtkGetStringMacro(Comments);
-  vtkSetStringMacro(Comments);
-  
+  // Updates the lookmark's icon and state while maintaining any existing name, comments, etc.
+  void Update();
+
+  // Description:
+  // Converts the image in the render window to a vtkKWIcon stored with the lookmark
+  void CreateIconFromMainView();
+
+  // Description:
+  // Given an encoded string of raw image data, set up the lookmark's icon
+  void CreateIconFromImageData();
+
+  // Description:
+  // Called from Add and Update. 
+  // Turns vtkPVWindow->SaveVisibleSourcesOnlyFlag ON before the call to SaveState and OFF afterwards.
+  // This ensures that only those sources that are visible, and all of their inputs leading up to the reader, are saved.
+  // Writes out the current session state and stores in lmk.
+  void StoreStateScript();
+
   //Description:
   // This is simply a 'dump' of the current session state script at the time the lookmark is created. However, it should only contain the state information
   // for the vtkPVSources that 'contribute' to the view, meaning visible 'leaf' node filters and any visible or nonvisible sources between it and the reader.
@@ -75,10 +96,25 @@ public:
   vtkSetVector3Macro(CenterOfRotation,float); 
 
   // Description:
-  // The full path to the lookmark's 'default dataset'. This is originally just set to the dataset from which the lookmark was created but can later be set to 
-  // a different one by turning 'Use default dataset' option OFF in the loookmark manager and setting the 'use as default dataset' option in the dialog box
-  vtkGetStringMacro(Dataset);
-  vtkSetStringMacro(Dataset);
+  // The value represents this lookmark widget's packing location among sibling lmk widgets and lmk containers.
+  // Used for moving widget.
+  vtkGetMacro(Location,int);
+  vtkSetMacro(Location,int);
+
+  // Description:
+  // A hack to make sure the scrollbar in the lookmark manager is enabled after import operations
+  // need to find a better way.
+  void EnableScrollBar();
+
+protected:
+
+  vtkPVLookmark();
+  ~vtkPVLookmark();
+
+  // convenience methods
+  vtkPVApplication *GetPVApplication();
+  vtkPVRenderView* GetPVRenderView(); 
+  vtkPVLookmarkManager* GetPVLookmarkManager(); 
 
   // Description:
   // When a lookmark is recreated/viewed and the stored state script is parsed, each filter that is created gets stored in this object's vtkPVSourceCOllection
@@ -89,18 +125,52 @@ public:
   // Of course if one of these filters have been set as input to another one it cannot and will not be deleted. This helps in cleaning up the Source window.
   int DeletePVSources();
 
-protected:
+  // called when lookmark's thumbnail is pressed and "Lock to dataset" is OFF
+  void ViewLookmarkWithCurrentDataset();
 
-  vtkPVLookmark();
-  ~vtkPVLookmark();
-  
-  char* Name;
-  char* Comments;
+  // Description:
+  // An added or updated lookmark widgets uses the return value of this to setup its thumbnail
+  vtkKWIcon *GetIconOfRenderWindow(vtkRenderWindow *window);
+
+  // Description:
+  // performs a base64 encoding on the raw image data of the kwicon
+  char *GetEncodedImageData(vtkKWIcon *lmkIcon);
+
+  // Description:
+  // Assigns the vtkKWIcon to the lookmark's vtkKWLabel
+  void SetLookmarkImage(vtkKWIcon *icon);
+
+  void SetLookmarkIconCommand();
+  void UnsetLookmarkIconCommand();
+
+  // Description:
+  // helper functions for ViewLookmarkCalllback
+  void TurnFiltersOff();
+  vtkPVSource *SearchForDefaultDatasetInSourceList();
+  // Description:
+  // This is a big function because I'm triying to do it all in one pass
+  // parses the reader portion of the state file and uses it to initialize the reader module (both parameter and display settings)
+  // the rest of the script is then executed, adding created filters to the lmk's collection as we go, and saving the visibility of 
+  // the filters so that we can go back and set reset them at the end
+  void ParseAndExecuteStateScript(vtkPVSource *reader, char *state, int useDatasetFlag);
+  // Description: 
+  // helper functions when parsing
+  int GetArrayStatus(char *name, char *line);
+  int GetIntegerScalarWidgetValue(char *line);
+  double GetDoubleScalarWidgetValue(char *line);
+  void GetDoubleVectorWidgetValue(char *line,double *x,double *y, double *z);
+  char *GetReaderTclName(char *line);
+  char *GetFieldName(char *line);
+  char *GetFieldNameAndValue(char *line, int *val);
+  char *GetStringEntryValue(char *line);
+  char *GetStringValue(char *line);
+  char *GetVectorEntryValue(char *line);
+
   char* StateScript;
   char* ImageData;
-  char* Dataset;
   float* CenterOfRotation;
   vtkPVSourceCollection* Sources;
+  int Location;
 
 private:
   vtkPVLookmark(const vtkPVLookmark&); // Not implemented

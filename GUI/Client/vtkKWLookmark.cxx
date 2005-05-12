@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.6");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.7");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -45,7 +45,6 @@ vtkKWLookmark::vtkKWLookmark()
 {
   this->CommandFunction = vtkKWLookmarkCommand;
 
-//  this->LmkIcon= vtkPVCameraIcon::New();
   this->LmkIcon= vtkKWLabel::New();
   this->Checkbox= vtkKWCheckButton::New();
   this->LmkLeftFrame= vtkKWFrame::New();
@@ -60,14 +59,17 @@ vtkKWLookmark::vtkKWLookmark()
   this->LmkNameField = vtkKWText::New();
   this->SeparatorFrame = vtkKWFrame::New();
 
+  this->Name = NULL;
+  this->Comments = NULL;
   this->Dataset = NULL;
-
   this->Width = this->Height = 48; 
+  this->PixelSize = 3;
 }
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::~vtkKWLookmark()
 {
+
   if(this->LmkIcon)
     {
     this->LmkIcon->Delete();
@@ -142,6 +144,16 @@ vtkKWLookmark::~vtkKWLookmark()
     {
     delete [] this->Dataset;
     this->Dataset = NULL;
+    }
+  if(this->Name)
+    {
+    delete [] this->Name;
+    this->Name = NULL;
+    }
+  if(this->Comments)
+    {
+    delete [] this->Comments;
+    this->Comments = NULL;
     }
 }
 
@@ -253,6 +265,32 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->UpdateEnableState();
 }
 
+
+void vtkKWLookmark::UpdateWidgetValues()
+{
+  this->LmkCommentsText->SetValue(this->Comments);
+  this->LmkMainFrame->SetLabelText(this->Name);
+
+  char *ptr = this->Dataset;
+  ptr+=strlen(ptr)-1;
+  while(*ptr!='/' && *ptr!='\\')
+    ptr--;
+  ptr++;
+  char *datasetLabel = new char[15+strlen(ptr)];
+  strcpy(datasetLabel,"Dataset: ");
+  strcat(datasetLabel,ptr);
+  this->LmkDatasetLabel->SetText(datasetLabel);
+  delete [] datasetLabel;
+
+}
+
+void vtkKWLookmark::UpdateVariableValues()
+{
+  this->SetComments(this->LmkCommentsText->GetValue());
+  this->SetName(this->LmkMainFrame->GetLabel()->GetText());
+}
+
+
 //----------------------------------------------------------------------------
 void vtkKWLookmark::DragAndDropPerformCommand(int x, int y, vtkKWWidget *vtkNotUsed(widget), vtkKWWidget *vtkNotUsed(anchor))
 {
@@ -314,58 +352,6 @@ void vtkKWLookmark::ChangeLookmarkName()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLookmark::SetLookmarkName(char *name)
-{
-  this->LmkMainFrame->SetLabelText(name);
-}
-
-char *vtkKWLookmark::GetComments()
-{
-  if(this->LmkCommentsText)
-    return this->LmkCommentsText->GetValue();
-  else
-    return 0;
-}
-
-
-//----------------------------------------------------------------------------
-char *vtkKWLookmark::GetLookmarkName()
-{
-  return this->LmkMainFrame->GetLabel()->GetText();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWLookmark::SetComments(char *comm)
-{
-  this->LmkCommentsText->SetValue(comm);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWLookmark::SetDataset(char *dsetName)
-{
-  char *ptr = dsetName;
-  ptr+=strlen(dsetName)-1;
-  while(*ptr!='/' && *ptr!='\\')
-    ptr--;
-  ptr++;
-  if(this->Dataset)
-    delete [] this->Dataset;
-  this->Dataset = new char[15+strlen(ptr)];
-  strcpy(this->Dataset,"Dataset: ");
-  strcat(this->Dataset,ptr);
-  this->LmkDatasetLabel->SetText(this->Dataset);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWLookmark::SetLookmarkImage(vtkKWIcon *icon)
-{
-  if(this->LmkIcon)
-    {
-    this->LmkIcon->SetImageOption(icon);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWLookmark::SetSelectionState(int flag)
 {
   this->Checkbox->SetState(flag);
@@ -423,7 +409,6 @@ void vtkKWLookmark::Pack()
 void vtkKWLookmark::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Location: " << this->Location << endl;
   os << indent << "SeparatorFrame: " << this->SeparatorFrame << endl;
   os << indent << "LmkMainFrame: " << this->LmkMainFrame << endl;
   os << indent << "LmkIcon: " << this->LmkIcon << endl;

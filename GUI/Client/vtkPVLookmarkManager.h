@@ -70,7 +70,7 @@ public:
   // Description:
   // Close/Display the window
   void Display();
-  void CloseCallback();
+  void Close();
 
   // Description:
   // Set the window to which the dialog will be slave.
@@ -84,7 +84,8 @@ public:
   // Description:
   // Called from File --> Import --> Replace/Append
   // Takes the user specified .lmk file and parses it to populate the panel with its contents
-  void ImportLookmarksCallback();
+  void ImportCallback();
+  void Import(char *path, int appendFlag);
 
   // Description:
   // Invoked from either the push button in the panel or via Edit --> Create Lookmark.
@@ -94,24 +95,14 @@ public:
   // then moved back in front.
   void CreateLookmarkCallback();
 
-  // Description: 
-  // This should be moved into vtkPVLookmark
-  // It is called when the user clicks on a lookmark's thumbnail
-  // If "Lock to Dataset" is ON, it tries to find/open the lookmark's dataset and apply the pipeline
-  // to it. Otherwise, the lookmark is applied to the currently selected source's dataset, maintaining
-  // the current camera view and timestep. 
-  // The reader is initialized using the attributes in the lookmark's state script. The rest of the
-  // script is then executed.
-  void ViewLookmarkCallback(vtkIdType i);
-
   // Description:
   // This saves the current state of the lookmark manager, hierarchy and all to the user specified .lmk file
-  void SaveLookmarksCallback();
+  void SaveAllCallback();
 
   // Description: 
   // This is called when File --> Export Folder is selected
   // Only one folder can be selected (except for folders nested in the selected folder)
-  void SaveFolderCallback();
+  void ExportFolderCallback();
 
   // Description: 
   // This updates the lookmark's thumbnail, statescript, and dataset, while maintaining its name,
@@ -125,7 +116,7 @@ public:
   // Description:
   // Add an empty folder to the bottom of the lookmark manager named "New Folder"
   // You can then drag items into it
-  void NewFolderCallback();
+  void CreateFolderCallback();
 
   // Description:
   // Check/Uncheck the boxes of all lookmarks and folders
@@ -165,76 +156,43 @@ protected:
   ~vtkPVLookmarkManager();
 
   // convenience methods
-  vtkGetObjectMacro(PVApplication,vtkPVApplication);
+  vtkPVApplication* GetPVApplication();
   vtkPVRenderView* GetPVRenderView(); 
 
   // Help menu helper functions
   virtual void ConfigureQuickStartGuide();
   virtual void ConfigureUsersTutorial();
 
-  // The following methods should be moved to vtkPVLookmark:
-
-  // called when lookmark's thumbnail is pressed and "Lock to dataset" is OFF
-  void ViewLookmarkWithCurrentDataset(vtkPVLookmark *lmk);
-  void SetLookmarkIconCommand(vtkKWLookmark *lmk, vtkIdType index);
-  void UnsetLookmarkIconCommand(vtkKWLookmark *lmk);
-  // Description:
-  // helper functions for ViewLookmarkCalllback
-  void TurnFiltersOff();
-  vtkPVSource *SearchForDefaultDatasetInSourceList(char *datasetName);
-  // Description:
-  // This is a big function because I'm triying to do it all in one pass
-  // parses the reader portion of the state file and uses it to initialize the reader module (both parameter and display settings)
-  // the rest of the script is then executed, adding created filters to the lmk's collection as we go, and saving the visibility of 
-  // the filters so that we can go back and set reset them at the end
-  void ParseAndExecuteStateScript(vtkPVSource *reader, char *state, vtkPVLookmark *lmk, int useDatasetFlag);
-  // Description: 
-  // helper functions when parsing
-  int GetArrayStatus(char *name, char *line);
-  int GetIntegerScalarWidgetValue(char *line);
-  double GetDoubleScalarWidgetValue(char *line);
-  void GetDoubleVectorWidgetValue(char *line,double *x,double *y, double *z);
-  char *GetReaderTclName(char *line);
-  char *GetFieldName(char *line);
-  char *GetFieldNameAndValue(char *line, int *val);
-  char *GetStringEntryValue(char *line);
-  char *GetStringValue(char *line);
-  char *GetVectorEntryValue(char *line);
-  // Description:
-  // An added or updated lookmark widgets uses the return value of this to setup its thumbnail
-  vtkKWIcon *GetIconOfRenderWindow(vtkRenderWindow *window);
-  // Description:
-  // performs a base64 encoding on the raw image data of the kwicon
-  char *GetEncodedImageData(vtkKWIcon *lmkIcon);
-  // Description:
-  // Called from Add and Update
-  // writes out the current session state and stores in lmk
-  void StoreStateScript(vtkPVLookmark *lmk);
-
   // The following are drag-and-drop functions
 
   // Description:
   // Sets up the drag and drop targets for each lookmark and folder in manager. Often called after a change to the lookmark manager (such as Add, Remove, etc.)
   void ResetDragAndDropTargetSetAndCallbacks();
+
   // Description:
   // Perform the actual D&D given a widget and its target location.
   // It will call AddDragAndDropEntry() and pack the widget to its new location
   virtual int DragAndDropWidget( vtkKWWidget *widget, vtkKWWidget *destAfterWidget);
+
   // Description:
   // When a lookmark or folder is deleted need to remove it as a target for all other widgets
   void RemoveItemAsDragAndDropTarget(vtkKWWidget *removedTarget);
+
   // Description
   // Helper functions for drag and drop capability
   void MoveCheckedChildren(vtkKWWidget *recursiveWidget, vtkKWWidget *frameToPackLmkItemInto);
   void DestroyUnusedLmkWidgets(vtkKWWidget *widget);
   int GetNumberOfChildLmkItems(vtkKWWidget *prnt);
+
   // Description:
   // These methods reassign the stored location values for all child lmk widgets or 
   // containers that are siblings in the lookmark manager hierarchy
   // depending on whether we are inserting or removing a lmk item
   // used in conjunction with Move and Remove callbacks
+
   void DecrementHigherSiblingLmkItemLocationIndices(vtkKWWidget *parent, int location);
   void IncrementHigherSiblingLmkItemLocationIndices(vtkKWWidget *parent, int location);
+
   // Description:
   // Just what the name implies - pack the child lmk items at a certain level in the hierarchy using their location values
   void PackChildrenBasedOnLocation(vtkKWWidget *parent);
@@ -245,7 +203,7 @@ protected:
 
   // Description:
   // Recursively visit each xml element of the lookmark file, creating, packing, and storing vtkKWLookmark, vtkPVLookmark, and vtkKWLookmarkFolders as appropriate
-  void ImportLookmarksInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWWidget *parentWidget);
+  void ImportInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *recursiveXmlElement, vtkKWWidget *parentWidget);
 
   // Description:
   // Convenience method for creating a Load/Save dialog box and returning the filename chosen by the user
@@ -283,9 +241,6 @@ protected:
   // of the form: "LookmarkN" where 'N' is an integer between 0 and numberOfLookmarks
   char* GetUnusedLookmarkName();
 
-  // Description:
-  // Updates the lookmark at lmkIndex location in array
-  void UpdateLookmarkInternal(vtkIdType lmkIndex);
 
   // Description:
   // Check to see if lmkItem is a descendant of container
@@ -307,7 +262,6 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
 
 //BTX
   vtkVector<vtkPVLookmark*> *PVLookmarks;
-  vtkVector<vtkKWLookmark*> *KWLookmarks;
   vtkVector<vtkKWLookmarkFolder*> *LmkFolderWidgets;
 //ETX
   
@@ -330,8 +284,6 @@ void operator=(const vtkPVLookmarkManager&); // Not implemented
   vtkKWText *QuickStartGuideTxt;
   vtkKWMessageDialog *UsersTutorialDialog;
   vtkKWText *UsersTutorialTxt;
-
-  vtkPVApplication *PVApplication;
 
   char *Title;
   vtkKWWindow* MasterWindow;

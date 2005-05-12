@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.702");
+vtkCxxRevisionMacro(vtkPVWindow, "1.703");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -349,6 +349,14 @@ void vtkPVWindow::PrepareForDelete()
 {
   this->Superclass::PrepareForDelete();
 
+  // I was getting intermittent crashes in Configure so make sure that after the Interactor is released, Configure cannot be called
+  // Configure
+  if(this->MainView)
+    {
+//    this->Script("bind %s <Configure> {}", 
+//                this->MainView->GetVTKWidget()->GetWidgetName(), this->GetTclName());
+    }
+
   this->SetInteractor(NULL);
 
   // First delete the interface panels
@@ -383,12 +391,6 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->TranslateCameraButton->Delete();
     this->TranslateCameraButton = NULL;
-    }
-
-  if (this->SourceLists)
-    {
-    this->SourceLists->Delete();
-    this->SourceLists = 0;
     }
 
   if (this->ToolbarButtons)
@@ -614,19 +616,19 @@ void vtkPVWindow::PrepareForDelete()
     this->LowerFrame = NULL;
     }
 
+  this->DeleteAllSources();
+  if (this->SourceLists)
+    {
+    this->SourceLists->Delete();
+    this->SourceLists = NULL;
+    }
+
   if (this->MainView)
     {
     this->MainView->Close();
     this->MainView->SetParentWindow(NULL);
     this->MainView->Delete();
     this->MainView = NULL;
-    }
-
-  this->DeleteAllSources();
-  if (this->SourceLists)
-    {
-    this->SourceLists->Delete();
-    this->SourceLists = NULL;
     }
 
   if (this->GetApplication())
@@ -3896,6 +3898,10 @@ void vtkPVWindow::DisplayLookmarkManager()
   if ( ! this->PVLookmarkManager )
     {
     this->PVLookmarkManager = vtkPVLookmarkManager::New();
+//    char str[512];
+//    this->PVLookmarkManager->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
+//    sprintf(str, "GetPVLookmarkManager");
+//    this->PVLookmarkManager->GetTraceHelper()->SetReferenceCommand(str);
     this->PVLookmarkManager->SetMasterWindow(this);
     this->PVLookmarkManager->Create(this->GetApplication());
     }

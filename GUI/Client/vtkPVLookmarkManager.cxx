@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.24");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.25");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -120,7 +120,6 @@ vtkPVLookmarkManager::vtkPVLookmarkManager()
   this->CommandFunction = vtkPVLookmarkManagerCommand;
 
   this->PVLookmarks = vtkVector<vtkPVLookmark*>::New();
-  this->KWLookmarks = vtkVector<vtkKWLookmark*>::New();
   this->LmkFolderWidgets = vtkVector<vtkKWLookmarkFolder*>::New();
 
   this->LmkPanelFrame = vtkKWFrame::New();
@@ -190,21 +189,21 @@ vtkPVLookmarkManager::~vtkPVLookmarkManager()
     this->UsersTutorialDialog = NULL;
     }
 
-  if(this->KWLookmarks)
+  if(this->PVLookmarks)
     {
-    vtkVectorIterator<vtkKWLookmark *> *it = this->KWLookmarks->NewIterator();
+    vtkVectorIterator<vtkPVLookmark *> *it = this->PVLookmarks->NewIterator();
     while (!it->IsDoneWithTraversal())
       {
-      vtkKWLookmark *lmkWidget = 0;
-      if (it->GetData(lmkWidget) == VTK_OK && lmkWidget)
+      vtkPVLookmark *lmk = 0;
+      if (it->GetData(lmk) == VTK_OK && lmk)
         {
-//        lmkWidget->GetLookmark()->Delete();
-        lmkWidget->Delete();
+        lmk->Delete();
         }
       it->GoToNextItem();
       }
     it->Delete();
-    this->KWLookmarks->Delete();
+    this->PVLookmarks->Delete();
+    this->PVLookmarks = 0;
     }
 
   if(this->LmkFolderWidgets)
@@ -221,23 +220,7 @@ vtkPVLookmarkManager::~vtkPVLookmarkManager()
       }
     it->Delete();
     this->LmkFolderWidgets->Delete();
-    }
-
-  if(this->PVLookmarks)
-    {
-    vtkPVLookmark *lmk = 0;
-    vtkVectorIterator<vtkPVLookmark *> *it = this->PVLookmarks->NewIterator();
-    while (!it->IsDoneWithTraversal())
-      {
-      if (it->GetData(lmk) == VTK_OK)
-        {
-        lmk->Delete();
-        }
-      it->GoToNextItem();
-      }
-    it->Delete();
-    this->PVLookmarks->Delete();
-    this->PVLookmarks = 0;
+    this->LmkFolderWidgets = 0;
     }
 
   this->LmkScrollFrame->Delete();
@@ -280,6 +263,12 @@ void vtkPVLookmarkManager::SetMasterWindow(vtkKWWindow* win)
     }
 }
 
+//----------------------------------------------------------------------------
+vtkPVApplication* vtkPVLookmarkManager::GetPVApplication()
+{
+  return vtkPVApplication::SafeDownCast(this->GetApplication());
+}
+
 
 
 //----------------------------------------------------------------------------
@@ -291,8 +280,6 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->PVApplication = vtkPVApplication::SafeDownCast(this->vtkKWObject::GetApplication());
 
   const char *wname = this->GetWidgetName();
   if (this->MasterWindow)
@@ -338,15 +325,15 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   char* rbv = 
     this->MenuImport->CreateRadioButtonVariable(this, "Import");
   this->Script( "set %s 0", rbv );
-  this->MenuImport->AddRadioButton(0, "Append", rbv, this, "ImportLookmarksCallback", 0);
-  this->MenuImport->AddRadioButton(1, "Replace", rbv, this, "ImportLookmarksCallback", 1);
+  this->MenuImport->AddRadioButton(0, "Append", rbv, this, "ImportCallback", 0);
+  this->MenuImport->AddRadioButton(1, "Replace", rbv, this, "ImportCallback", 1);
   delete [] rbv;
 
   this->Menu->AddCascade("File", this->MenuFile, 0);
   this->MenuFile->AddCascade("Import", this->MenuImport,0);
-  this->MenuFile->AddCommand("Save As", this, "SaveLookmarksCallback");
-  this->MenuFile->AddCommand("Export Folder", this, "SaveFolderCallback");
-  this->MenuFile->AddCommand("Close", this, "CloseCallback");
+  this->MenuFile->AddCommand("Save As", this, "SaveAllCallback");
+  this->MenuFile->AddCommand("Export Folder", this, "ExportFolderCallback");
+  this->MenuFile->AddCommand("Close", this, "Close");
 
   // Menu : Edit
 
@@ -360,7 +347,7 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
   this->MenuEdit->AddCommand("Update Lookmark", this, "UpdateLookmarkCallback");
   this->MenuEdit->AddCommand("Rename Lookmark", this, "RenameLookmarkCallback");
   this->MenuEdit->AddSeparator();
-  this->MenuEdit->AddCommand("Create Folder", this, "NewFolderCallback");
+  this->MenuEdit->AddCommand("Create Folder", this, "CreateFolderCallback");
   this->MenuEdit->AddCommand("Rename Folder", this, "RenameFolderCallback");
   this->MenuEdit->AddSeparator();
   this->MenuEdit->AddCommand("Remove Item(s)", this, "RemoveCallback");
@@ -414,20 +401,46 @@ void vtkPVLookmarkManager::Create(vtkKWApplication *app)
 
   this->Script("set commandList \"\"");
 
-  this->UndoCallback();
+  // Import the lookmark file stored in the user's home directory if there is one
+  ostrstream str;
+  #ifndef _WIN32
+  if ( getenv("HOME") )
+    {
+    return;
+    }
+  str << getenv("HOME") << "/.ParaViewlmk" << ends;
+  #else
+  if ( !getenv("HOMEPATH") )
+    {
+    return;
+    }
+  str << "C:" << getenv("HOMEPATH") << "\\#ParaViewlmk#" << ends;
+  #endif
+  ifstream infile(str.str());
+  if ( !infile.fail())
+    {
+    this->Import(str.str(),0);
+    }
+
 
   this->Script("wm withdraw %s", wname);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::CloseCallback()
+void vtkPVLookmarkManager::Close()
 {
+//  this->GetTraceHelper()->AddEntry("$kw(%s) Close",
+//                      this->GetTclName());
+
   this->Script("wm withdraw %s", this->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::Display()
 {
+//  this->GetTraceHelper()->AddEntry("$kw(%s) Display",
+//                      this->GetTclName());
+
   this->Script("wm deiconify %s", this->GetWidgetName());
 }
 
@@ -610,6 +623,7 @@ void vtkPVLookmarkManager::SetButtonFrameState(int state)
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::Checkpoint()
 {
+
   ostrstream str;
 
   #ifdef _WIN32
@@ -639,6 +653,9 @@ void vtkPVLookmarkManager::Checkpoint()
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::UndoCallback()
 {
+//  this->GetTraceHelper()->AddEntry("$kw(%s) UndoCallback",
+//                      this->GetTclName());
+
   ostrstream str;
 
   // Get the path to the checkpointed file
@@ -665,37 +682,8 @@ void vtkPVLookmarkManager::UndoCallback()
 
   if ( !infile.fail())
     {
-    vtkXMLDataParser *parser;
-    vtkXMLDataElement *root;
-
-    //parse the .lmk xml file and get the root node for traversing
-    parser = vtkXMLDataParser::New();
-    parser->SetStream(&infile);
-    parser->Parse();
-    root = parser->GetRootElement();
-
-    // Check and then remove all lookmarks and folders currently in display
-    this->RemoveCheckedChildren(this->LmkScrollFrame->GetFrame(),1);
-
-    this->ImportLookmarksInternal(0,root,this->LmkScrollFrame->GetFrame());
-    
-    // after all the widgets are generated, go back thru and add d&d targets for each of them
-    this->ResetDragAndDropTargetSetAndCallbacks();
-
-    // this is needed to enable the scrollbar in the lmk mgr
-    vtkKWLookmark *lookmarkWidget;
-    this->KWLookmarks->GetItem(0,lookmarkWidget);
-    if(lookmarkWidget)
-      {
-      this->GetPVApplication()->GetMainView()->ForceRender();
-      lookmarkWidget->GetLmkMainFrame()->PerformShowHideFrame();
-      this->GetPVApplication()->GetMainView()->ForceRender();
-      lookmarkWidget->GetLmkMainFrame()->PerformShowHideFrame();
-      this->GetPVApplication()->GetMainView()->ForceRender();
-      }
-
-    infile.close();
-    parser->Delete();
+    this->Checkpoint();
+    this->Import(str.str(),0);
     }
   this->MenuEdit->SetState("Undo",2);
 
@@ -706,13 +694,13 @@ void vtkPVLookmarkManager::UndoCallback()
 void vtkPVLookmarkManager::AllOnOffCallback(int state)
 {
   vtkIdType i,numberOfLookmarkWidgets, numberOfLookmarkFolders;
-  vtkKWLookmark *lookmarkWidget;
+  vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
 
-  numberOfLookmarkWidgets = this->KWLookmarks->GetNumberOfItems();
+  numberOfLookmarkWidgets = this->PVLookmarks->GetNumberOfItems();
   for(i=numberOfLookmarkWidgets-1;i>=0;i--)
     {
-    this->KWLookmarks->GetItem(i,lookmarkWidget);
+    this->PVLookmarks->GetItem(i,lookmarkWidget);
     lookmarkWidget->SetSelectionState(state);
     }
   numberOfLookmarkFolders = this->LmkFolderWidgets->GetNumberOfItems();
@@ -724,12 +712,9 @@ void vtkPVLookmarkManager::AllOnOffCallback(int state)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::ImportLookmarksCallback()
+void vtkPVLookmarkManager::ImportCallback()
 {
   char *filename;
-  vtkXMLDataParser *parser;
-  vtkXMLDataElement *root;
-  vtkKWLookmark *lookmarkWidget;
 
   this->SetButtonFrameState(0);
 
@@ -744,9 +729,28 @@ void vtkPVLookmarkManager::ImportLookmarksCallback()
     }
 
   this->SetButtonFrameState(1);
-  
-  ifstream infile(filename);
 
+  this->Checkpoint();
+
+  // If "Replace" is selected we remove all preexisting lmks and containers first
+  if(this->MenuImport->GetRadioButtonValue(this,"Import") )
+    {
+    this->Import(filename,0);
+    }
+  else if(this->MenuImport->GetRadioButtonValue(this,"Append")) 
+    {
+    this->Import(filename,1);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLookmarkManager::Import(char *filename, int appendFlag)
+{
+  vtkXMLDataParser *parser;
+  vtkXMLDataElement *root;
+  vtkPVLookmark *lookmarkWidget;
+
+  ifstream infile(filename);
   if ( infile.fail())
     {
     vtkKWMessageDialog::PopupMessage(
@@ -758,8 +762,13 @@ void vtkPVLookmarkManager::ImportLookmarksCallback()
     return;
     }
 
-  this->Script("[winfo toplevel %s] config -cursor watch", 
-                this->GetWidgetName());
+//  this->GetTraceHelper()->AddEntry("$kw(%s) Import \"%s\" %d",
+//                      this->GetTclName(),filename,appendFlag);
+
+  if(appendFlag==0 && this->PVLookmarks->GetNumberOfItems()>0 || this->LmkFolderWidgets->GetNumberOfItems()>0)
+    {
+    this->RemoveCheckedChildren(this->LmkScrollFrame->GetFrame(),1);
+    }
 
   //parse the .lmk xml file and get the root node for traversing
   parser = vtkXMLDataParser::New();
@@ -767,30 +776,13 @@ void vtkPVLookmarkManager::ImportLookmarksCallback()
   parser->Parse();
   root = parser->GetRootElement();
 
-  // If "Replace" is selected we remove all preexisting lmks and containers first
-  if(this->MenuImport->GetRadioButtonValue(this,"Import") && (this->KWLookmarks->GetNumberOfItems()>0 || this->LmkFolderWidgets->GetNumberOfItems()>0))
-    {
-    this->RemoveCheckedChildren(this->LmkScrollFrame->GetFrame(),1);
+  this->Script("[winfo toplevel %s] config -cursor watch", 
+                this->GetWidgetName());
 
-    }
-
-  this->Checkpoint();
-
-  this->ImportLookmarksInternal(this->GetNumberOfChildLmkItems(this->LmkScrollFrame->GetFrame()),root,this->LmkScrollFrame->GetFrame());
+  this->ImportInternal(this->GetNumberOfChildLmkItems(this->LmkScrollFrame->GetFrame()),root,this->LmkScrollFrame->GetFrame());
   
   // after all the widgets are generated, go back thru and add d&d targets for each of them
   this->ResetDragAndDropTargetSetAndCallbacks();
-
-  // this is needed to enable the scrollbar in the lmk mgr
-  this->KWLookmarks->GetItem(0,lookmarkWidget);
-  if(lookmarkWidget)
-    {
-    this->GetPVApplication()->GetMainView()->ForceRender();
-    lookmarkWidget->GetLmkMainFrame()->PerformShowHideFrame();
-    this->GetPVApplication()->GetMainView()->ForceRender();
-    lookmarkWidget->GetLmkMainFrame()->PerformShowHideFrame();
-    this->GetPVApplication()->GetMainView()->ForceRender();
-    }
 
   this->Script("[winfo toplevel %s] config -cursor {}", 
                 this->GetWidgetName());
@@ -798,11 +790,19 @@ void vtkPVLookmarkManager::ImportLookmarksCallback()
   this->Script("%s yview moveto 0",
                this->LmkScrollFrame->GetFrame()->GetParent()->GetWidgetName());
 
+  // this is needed to enable the scrollbar in the lmk mgr
+  this->PVLookmarks->GetItem(0,lookmarkWidget);
+  if(lookmarkWidget)
+    {
+    this->Script("update");
+    lookmarkWidget->EnableScrollBar();
+    }
+
   infile.close();
   parser->Delete();
-
-  return;
 }
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::DragAndDropPerformCommand(int x, int y, vtkKWWidget *vtkNotUsed(widget), vtkKWWidget *vtkNotUsed(anchor))
@@ -823,18 +823,18 @@ void vtkPVLookmarkManager::DragAndDropPerformCommand(int x, int y, vtkKWWidget *
 // attempt at making the after widget lookmark the target instead of the pane its packed in
 void vtkPVLookmarkManager::ResetDragAndDropTargetSetAndCallbacks()
 {
-  vtkIdType numberOfLookmarkWidgets = this->KWLookmarks->GetNumberOfItems();
+  vtkIdType numberOfLookmarkWidgets = this->PVLookmarks->GetNumberOfItems();
   vtkIdType numberOfLookmarkFolders = this->LmkFolderWidgets->GetNumberOfItems();
   vtkKWLookmarkFolder *targetLmkFolder;
   vtkKWLookmarkFolder *lmkFolderWidget;
-  vtkKWLookmark *lookmarkWidget;
-  vtkKWLookmark *targetLmkWidget;
+  vtkPVLookmark *lookmarkWidget;
+  vtkPVLookmark *targetLmkWidget;
   vtkIdType i=0;
   vtkIdType j=0;
 
   for(i=numberOfLookmarkWidgets-1;i>=0;i--)
     {
-    this->KWLookmarks->GetItem(i,lookmarkWidget);
+    this->PVLookmarks->GetItem(i,lookmarkWidget);
     lookmarkWidget->GetDragAndDropTargetSet()->SetEnable(1);
     // for each lmk container
     for(j=numberOfLookmarkFolders-1;j>=0;j--)
@@ -867,7 +867,7 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetSetAndCallbacks()
     // add lmk widgets as targets to this lookmark as well, they will become the "after widgets"
     for(j=numberOfLookmarkWidgets-1;j>=0;j--)
       {
-      this->KWLookmarks->GetItem(j,targetLmkWidget);
+      this->PVLookmarks->GetItem(j,targetLmkWidget);
       if(targetLmkWidget != lookmarkWidget)
         {
         if(!lookmarkWidget->GetDragAndDropTargetSet()->HasTarget(targetLmkWidget->GetSeparatorFrame()))
@@ -926,7 +926,7 @@ void vtkPVLookmarkManager::ResetDragAndDropTargetSetAndCallbacks()
     // add lmk widgets as targets to this lookmark as well, they will become the "after widgets"
     for(j=numberOfLookmarkWidgets-1;j>=0;j--)
       {
-      this->KWLookmarks->GetItem(j,targetLmkWidget);
+      this->PVLookmarks->GetItem(j,targetLmkWidget);
       if(!this->IsWidgetInsideFolder(lmkFolderWidget,targetLmkWidget))
         {
         if(!lmkFolderWidget->GetDragAndDropTargetSet()->HasTarget(targetLmkWidget->GetSeparatorFrame()))
@@ -983,7 +983,7 @@ void vtkPVLookmarkManager::DragAndDropEndCommand( int vtkNotUsed(x), int vtkNotU
 
   // enhancement: take the x,y, coords, loop through lookmarks and folders, and see which contain them
 
-  vtkKWLookmark *lmkWidget;
+  vtkPVLookmark *lmkWidget;
   vtkKWLookmarkFolder *lmkFolder;
 
   // the target will always be a vtkKWFrame but it might be after the lmkitems label frame or nested within the its internal frame if the lmkitem is a lmkcontainer
@@ -1001,7 +1001,7 @@ void vtkPVLookmarkManager::DragAndDropEndCommand( int vtkNotUsed(x), int vtkNotU
     this->PackChildrenBasedOnLocation(lmkFolder->GetLabelFrame()->GetFrame());
     lmkFolder->RemoveDragAndDropTargetCues();
     }
-  else if( (lmkWidget = vtkKWLookmark::SafeDownCast(target->GetParent())))
+  else if( (lmkWidget = vtkPVLookmark::SafeDownCast(target->GetParent())))
     {
     this->DragAndDropWidget(widget, lmkWidget);
     this->PackChildrenBasedOnLocation(lmkWidget->GetParent());
@@ -1020,7 +1020,7 @@ void vtkPVLookmarkManager::DragAndDropEndCommand( int vtkNotUsed(x), int vtkNotU
   this->ResetDragAndDropTargetSetAndCallbacks();
 
   // this is needed to enable the scrollbar in the lmk mgr
-  this->KWLookmarks->GetItem(0,lmkWidget);
+  this->PVLookmarks->GetItem(0,lmkWidget);
   if(lmkWidget)
     {
     this->GetPVApplication()->GetMainView()->ForceRender();
@@ -1046,18 +1046,17 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
   // renumber location vars of siblings widget is leaving
   // handle case when moving within same level
   int oldLoc;
-  vtkKWLookmark *lmkWidget;
-  vtkKWLookmark *afterLmkWidget;
+  vtkPVLookmark *lmkWidget;
+  vtkPVLookmark *afterLmkWidget;
   vtkKWLookmarkFolder *afterLmkFolder;
   vtkKWLookmarkFolder *lmkFolder;
-  vtkPVLookmark *lookmark;
   vtkKWWidget *dstPrnt;
   vtkIdType loc;
   int ret = 0;
 
-  if((lmkWidget = vtkKWLookmark::SafeDownCast(widget)))
+  if((lmkWidget = vtkPVLookmark::SafeDownCast(widget)))
     {
-    if(!this->KWLookmarks->IsItemPresent(lmkWidget))
+    if(!this->PVLookmarks->IsItemPresent(lmkWidget))
       return 0;
 
     oldLoc = lmkWidget->GetLocation();
@@ -1065,7 +1064,7 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     this->DecrementHigherSiblingLmkItemLocationIndices(widget->GetParent(),oldLoc);
 
     int newLoc;
-    if((afterLmkWidget = vtkKWLookmark::SafeDownCast(AfterWidget)))
+    if((afterLmkWidget = vtkPVLookmark::SafeDownCast(AfterWidget)))
       {
       newLoc = afterLmkWidget->GetLocation()+1;
       this->IncrementHigherSiblingLmkItemLocationIndices(AfterWidget->GetParent(),newLoc);
@@ -1084,35 +1083,30 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
       dstPrnt = AfterWidget->GetParent();
       }
 
-    vtkKWLookmark *newLmkWidget = vtkKWLookmark::New();
+    vtkPVLookmark *newLmkWidget = vtkPVLookmark::New();
     newLmkWidget->SetParent(dstPrnt);
     newLmkWidget->Create(this->GetPVApplication());
-    this->Script("pack %s -fill both -expand yes -padx 8",newLmkWidget->GetWidgetName());
-    ret = this->KWLookmarks->FindItem(lmkWidget,loc);
-    this->PVLookmarks->GetItem(loc,lookmark);
-    newLmkWidget->SetLookmarkName(lmkWidget->GetLookmarkName());
-    newLmkWidget->SetDataset(lookmark->GetDataset());
-    this->SetLookmarkIconCommand(newLmkWidget,loc);
-//    newLmkWidget->SetLookmark(lookmark);
+    newLmkWidget->SetName(lmkWidget->GetName());
+    newLmkWidget->SetDataset(lmkWidget->GetDataset());
     newLmkWidget->SetLocation(newLoc);
     newLmkWidget->SetComments(lmkWidget->GetComments());
+    newLmkWidget->SetImageData(lmkWidget->GetImageData());
+    newLmkWidget->CreateIconFromImageData();
+/*
+    this->SetImageWidth(lmkIcon->GetWidth());
+    this->SetImageHeight(lmkIcon->GetHeight());
+    this->SetImagePixelSize(lmkIcon->GetPixelSize());
+*/
+    newLmkWidget->SetStateScript(lmkWidget->GetStateScript());
+    newLmkWidget->UpdateWidgetValues();
+    this->Script("pack %s -fill both -expand yes -padx 8",newLmkWidget->GetWidgetName());
 
-    unsigned char *decodedImageData = new unsigned char[9216];
-    vtkBase64Utilities *decoder = vtkBase64Utilities::New();
-    decoder->Decode((unsigned char*)lookmark->GetImageData(),9216,decodedImageData);
-    vtkKWIcon *icon = vtkKWIcon::New();
-    icon->SetImage(decodedImageData,48,48,4,9216);
-    newLmkWidget->SetLookmarkImage(icon);
-    delete [] decodedImageData;
-    decoder->Delete();
-    icon->Delete();
-
-    this->KWLookmarks->RemoveItem(loc);
-    this->KWLookmarks->InsertItem(loc,newLmkWidget);
+    this->PVLookmarks->FindItem(lmkWidget,loc);
+    this->PVLookmarks->RemoveItem(loc);
+    this->PVLookmarks->InsertItem(loc,newLmkWidget);
 
     this->RemoveItemAsDragAndDropTarget(lmkWidget);
     this->Script("destroy %s", lmkWidget->GetWidgetName());
-//    lmkWidget->GetLookmark()->Delete();
     lmkWidget->Delete();
     }
   else if((lmkFolder = vtkKWLookmarkFolder::SafeDownCast(widget)))
@@ -1124,7 +1118,7 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
     lmkFolder->SetLocation(-1);
     this->DecrementHigherSiblingLmkItemLocationIndices(widget->GetParent(),oldLoc);
     int newLoc;
-    if((afterLmkWidget = vtkKWLookmark::SafeDownCast(AfterWidget)))
+    if((afterLmkWidget = vtkPVLookmark::SafeDownCast(AfterWidget)))
       {
       newLoc = afterLmkWidget->GetLocation()+1;
       this->IncrementHigherSiblingLmkItemLocationIndices(AfterWidget->GetParent(),newLoc);
@@ -1176,11 +1170,9 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
 
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::ImportLookmarksInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *lmkElement, vtkKWWidget *parent)
+void vtkPVLookmarkManager::ImportInternal(int locationOfLmkItemAmongSiblings, vtkXMLDataElement *lmkElement, vtkKWWidget *parent)
 {
-  char *tempname;
-  vtkKWLookmark *lookmarkWidget;
-  vtkPVLookmark *newLookmark;
+  vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
   vtkIdType j,numLmks, numFolders;
 
@@ -1202,7 +1194,7 @@ void vtkPVLookmarkManager::ImportLookmarksInternal(int locationOfLmkItemAmongSib
     // for each xml element (either lookmark or lookmark container) recursively call import with the appropriate location and vtkXMLDataElement
     for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
       {
-      ImportLookmarksInternal(j,lmkElement->GetNestedElement(j),lmkFolderWidget->GetLabelFrame()->GetFrame());
+      ImportInternal(j,lmkElement->GetNestedElement(j),lmkFolderWidget->GetLabelFrame()->GetFrame());
       }
     }
   else if(!strcmp("LmkFile",lmkElement->GetName()))
@@ -1211,7 +1203,7 @@ void vtkPVLookmarkManager::ImportLookmarksInternal(int locationOfLmkItemAmongSib
     // the parent is the lookmark manager's label frame
     for(j=0; j<lmkElement->GetNumberOfNestedElements(); j++)
       {
-      ImportLookmarksInternal(j+locationOfLmkItemAmongSiblings,lmkElement->GetNestedElement(j),this->LmkScrollFrame->GetFrame());
+      ImportInternal(j+locationOfLmkItemAmongSiblings,lmkElement->GetNestedElement(j),this->LmkScrollFrame->GetFrame());
       }
     }
   else if(!strcmp("Lmk",lmkElement->GetName()))
@@ -1219,64 +1211,20 @@ void vtkPVLookmarkManager::ImportLookmarksInternal(int locationOfLmkItemAmongSib
     // note that in the case of a lookmark, no recursion is done
 
     // this uses a vtkXMLLookmarkElement to create a vtkPVLookmark object
-    newLookmark = this->GetPVLookmark(lmkElement);
-    tempname = newLookmark->GetName();
-
     // create lookmark widget
-    lookmarkWidget = vtkKWLookmark::New();
+    lookmarkWidget = this->GetPVLookmark(lmkElement);
     lookmarkWidget->SetParent(parent);
- //   lookmarkWidget->SetParent(this->LmkScrollFrame->GetFrame());
     lookmarkWidget->Create(this->GetPVApplication());
+    lookmarkWidget->UpdateWidgetValues();
     this->Script("pack %s -fill both -expand yes -padx 8",lookmarkWidget->GetWidgetName());
 
-    // initialize lookmark widget attributes
-    lookmarkWidget->SetLookmarkName(tempname);
-    lookmarkWidget->SetDataset(newLookmark->GetDataset());
+    lookmarkWidget->CreateIconFromImageData();
+//    lookmarkWidget->SetImageData(lmkElement->GetAttribute("ImageData"));
     lookmarkWidget->SetLocation(locationOfLmkItemAmongSiblings);
-    if(lmkElement->GetAttribute("Comments"))
-      lookmarkWidget->SetComments(newLookmark->GetComments());
-    numLmks = this->KWLookmarks->GetNumberOfItems();
-    this->SetLookmarkIconCommand(lookmarkWidget,numLmks);
-//    lookmarkWidget->SetLookmark(newLookmark);
 
-    // convert raw image data stored in file to a thumbnail in the lookmark widget
-    unsigned char *decodedImageData = new unsigned char[9216];
-    vtkBase64Utilities *decoder = vtkBase64Utilities::New();
-    unsigned char *sourceImage = (unsigned char*)lmkElement->GetAttribute("ImageData");
-    decoder->Decode(sourceImage,9216,decodedImageData);
-    vtkKWIcon *icon = vtkKWIcon::New();
-    icon->SetImage(decodedImageData,48,48,4,9216);
-    lookmarkWidget->SetLookmarkImage(icon);
-    char *lmkImageData = new char[12889];
-    strncpy(lmkImageData,lmkElement->GetAttribute("ImageData"),12888);
-    lmkImageData[12888] = '\0';
-    newLookmark->SetImageData(lmkImageData);
-    decoder->Delete();
-    icon->Delete();
-    delete [] decodedImageData;
-    delete [] lmkImageData;
-
-    this->KWLookmarks->InsertItem(numLmks,lookmarkWidget);
-    this->PVLookmarks->InsertItem(numLmks,newLookmark);
+    numLmks = this->PVLookmarks->GetNumberOfItems();
+    this->PVLookmarks->InsertItem(numLmks,lookmarkWidget);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::SetLookmarkIconCommand(vtkKWLookmark *lmkWidget, vtkIdType index)
-{
-  ostrstream viewCallback;
-  viewCallback << "ViewLookmarkCallback " << index << ends;
-  lmkWidget->GetLmkIcon()->UnsetBind("<Button-1>");
-  lmkWidget->GetLmkIcon()->UnsetBind("<Double-1>");
-  lmkWidget->GetLmkIcon()->SetBind(this, "<Button-1>", viewCallback.str());
-  lmkWidget->GetLmkIcon()->SetBind(this, "<Double-1>", viewCallback.str());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::UnsetLookmarkIconCommand(vtkKWLookmark *lmkWidget)
-{
-  lmkWidget->GetLmkIcon()->UnsetBind("<Button-1>");
-  lmkWidget->GetLmkIcon()->UnsetBind("<Double-1>");
 }
 
 
@@ -1355,6 +1303,14 @@ vtkPVLookmark *vtkPVLookmarkManager::GetPVLookmark(vtkXMLDataElement *elem)
     delete [] lookmarkDataset;
     }
  
+  if(elem->GetAttribute("ImageData"))
+    {
+    char *lookmarkImage = new char[strlen(elem->GetAttribute("ImageData"))+1];
+    strcpy(lookmarkImage,elem->GetAttribute("ImageData"));
+    lmk->SetImageData(lookmarkImage);
+    delete [] lookmarkImage;
+    }
+ 
   double centerOfRotation[3];
   elem->GetScalarAttribute("XCenterOfRotation",centerOfRotation[0]);
   elem->GetScalarAttribute("YCenterOfRotation",centerOfRotation[1]);
@@ -1396,19 +1352,18 @@ void vtkPVLookmarkManager::DecodeNewlines(char *string)
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::UpdateLookmarkCallback()
 {
-  vtkPVLookmark *lookmark;
-  vtkKWLookmark *lookmarkWidget;
+  vtkPVLookmark *lookmarkWidget;
   vtkIdType numLmkWidgets,lmkIndex;
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
   int numChecked = 0;
 
   // called before any change to the lookmark manager
 
-  numLmkWidgets = this->KWLookmarks->GetNumberOfItems();
+  numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
 
   for(lmkIndex=0; lmkIndex<numLmkWidgets; lmkIndex++)
     {
-    this->KWLookmarks->GetItem(lmkIndex,lookmarkWidget);
+    this->PVLookmarks->GetItem(lmkIndex,lookmarkWidget);
     if(lookmarkWidget->GetSelectionState())
       numChecked++;
     }
@@ -1439,66 +1394,28 @@ void vtkPVLookmarkManager::UpdateLookmarkCallback()
   // if more than one are selected, ask which one
   for(lmkIndex=0; lmkIndex<numLmkWidgets; lmkIndex++)
     {
-    this->PVLookmarks->GetItem(lmkIndex,lookmark);
-    this->KWLookmarks->GetItem(lmkIndex,lookmarkWidget);
+    this->PVLookmarks->GetItem(lmkIndex,lookmarkWidget);
 
     if(lookmarkWidget->GetSelectionState())
       {
-      this->UpdateLookmarkInternal(lmkIndex);
+      lookmarkWidget->Update();
       lookmarkWidget->SetSelectionState(0);
       break;
       }
     }
 }
 
-void vtkPVLookmarkManager::UpdateLookmarkInternal(vtkIdType index)
-{
-  vtkPVLookmark *lookmark;
-  vtkKWLookmark *lookmarkWidget;
-  vtkKWIcon *lmkIcon;
-  this->PVLookmarks->GetItem(index,lookmark);
-  this->KWLookmarks->GetItem(index,lookmarkWidget);
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
-
-  //create and store a new session state file
-  this->StoreStateScript(lookmark);
-
-  // withdraw the pane so that the lookmark will be added corrrectly
-  this->Script("wm withdraw %s", this->GetWidgetName());
-  if(win->GetTclInteractor())
-    this->Script("wm withdraw %s", win->GetTclInteractor()->GetWidgetName());
-  this->Script("focus %s",win->GetWidgetName());
-  for(int i=0;i<4;i++)
-    {
-    this->Script("update");
-    this->GetPVRenderView()->ForceRender();
-    }
-
-  //update the thumbnail to reflect view in data window
-  lmkIcon = this->GetIconOfRenderWindow(this->GetPVRenderView()->GetRenderWindow());
-  this->GetPVRenderView()->ForceRender();
-  this->Display();
-  lookmarkWidget->SetLookmarkImage(lmkIcon);
-  lookmark->SetImageData(this->GetEncodedImageData(lmkIcon));
-  lmkIcon->Delete();
-  lookmark->SetCenterOfRotation(this->PVApplication->GetMainWindow()->GetCenterOfRotationStyle()->GetCenter());
-}
 
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::CreateLookmarkCallback()
 {
-  vtkIdType numLmkWidgets = this->KWLookmarks->GetNumberOfItems();
-  vtkKWLookmark *lookmarkWidget;
+  vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
   vtkPVLookmark *newLookmark;
   vtkPVReaderModule *mod;
   vtkPVSource *reader;
   vtkPVSource *temp;
   vtkPVSource *src;
-  char *lmkname;
-  char *datasetLabel;
-  char *datasetName;
   int indexOfNewLmkWidget;
-  vtkKWIcon *lmkIcon;
   vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
 
   // if the pipeline is empty, don't add
@@ -1513,8 +1430,8 @@ void vtkPVLookmarkManager::CreateLookmarkCallback()
     return;
     }
 
- // this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark",
- //                     this->GetTclName());
+//  this->GetTraceHelper()->AddEntry("$kw(%s) CreateLookmark",
+//                      this->GetTclName());
 
   // what if the main window is not maximized in screen? 
 
@@ -1542,52 +1459,22 @@ void vtkPVLookmarkManager::CreateLookmarkCallback()
 
   // create and initialize pvlookmark:
   newLookmark = vtkPVLookmark::New();
-  lmkname = this->GetUnusedLookmarkName();
-  newLookmark->SetName(lmkname);
-  newLookmark->SetCenterOfRotation(win->GetCenterOfRotationStyle()->GetCenter());
-  datasetLabel = (char *)mod->GetFileEntry()->GetValue();
-  datasetName = new char[strlen(datasetLabel)+1];
-  strcpy(datasetName,datasetLabel);
-  newLookmark->SetDataset(datasetName);
-  delete [] datasetName;
-  this->StoreStateScript(newLookmark);
-
-  // create and initialize kwlookmark:
-  lookmarkWidget = vtkKWLookmark::New();
   // all new lmk widgets get appended to end of lmk mgr thus its parent is the LmkListingFrame:
-  lookmarkWidget->SetParent(this->LmkScrollFrame->GetFrame());
-  lookmarkWidget->Create(this->GetPVApplication());
-  this->Script("pack %s -fill both -expand yes -padx 8",lookmarkWidget->GetWidgetName());
-  lookmarkWidget->SetLookmarkName(newLookmark->GetName());
-  lookmarkWidget->SetDataset(newLookmark->GetDataset());
-  this->SetLookmarkIconCommand(lookmarkWidget,numLmkWidgets);
+  newLookmark->SetParent(this->LmkScrollFrame->GetFrame());
+  newLookmark->Create(this->GetPVApplication());
+  newLookmark->SetName(this->GetUnusedLookmarkName());
+  newLookmark->SetCenterOfRotation(win->GetCenterOfRotationStyle()->GetCenter());
+  newLookmark->SetDataset((char *)mod->GetFileEntry()->GetValue());
+  newLookmark->StoreStateScript();
+  newLookmark->UpdateWidgetValues();
+  this->Script("pack %s -fill both -expand yes -padx 8",newLookmark->GetWidgetName());
+
   // since the direct children of the LmkListingFrame will always be either lmk widgets or containers
   // counting them will give us the appropriate location to assign the new lmk:
   indexOfNewLmkWidget = this->GetNumberOfChildLmkItems(this->LmkScrollFrame->GetFrame());
-  lookmarkWidget->SetLocation(indexOfNewLmkWidget);
-  // necessary for widget to know about lmk obj for renaming
-//  lookmarkWidget->SetLookmark(newLookmark);
+  newLookmark->SetLocation(indexOfNewLmkWidget);
+  newLookmark->CreateIconFromMainView();
 
-  // withdraw the pane so that the lookmark will be added corrrectly
-  this->Script("wm withdraw %s", this->GetWidgetName());
-  if(win->GetTclInteractor())
-    this->Script("wm withdraw %s", win->GetTclInteractor()->GetWidgetName());
-  this->Script("focus %s",win->GetWidgetName());
-  for(int i=0;i<4;i++)
-    {
-    this->Script("update");
-    this->GetPVRenderView()->ForceRender();
-    }
-
-  lmkIcon = this->GetIconOfRenderWindow(this->GetPVRenderView()->GetRenderWindow());
-  this->GetPVRenderView()->ForceRender();
-  this->Display();
-  lookmarkWidget->SetLookmarkImage(lmkIcon);
-  newLookmark->SetImageData(this->GetEncodedImageData(lmkIcon));
-  lmkIcon->Delete();
-
-  // store objs
-  this->KWLookmarks->InsertItem(numLmkWidgets,lookmarkWidget);
   this->PVLookmarks->InsertItem(numLmkWidgets,newLookmark);
 
   this->ResetDragAndDropTargetSetAndCallbacks();
@@ -1601,124 +1488,7 @@ void vtkPVLookmarkManager::CreateLookmarkCallback()
 }
 
 //----------------------------------------------------------------------------
-vtkKWIcon *vtkPVLookmarkManager::GetIconOfRenderWindow(vtkRenderWindow *renderWindow)
-{
-
-  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
-  w2i->SetInput(renderWindow);
-  w2i->ShouldRerenderOff();
-  w2i->Update();
-
-  this->GetPVRenderView()->GetRenderWindow()->SwapBuffersOn();
-  this->GetPVRenderView()->GetRenderWindow()->Frame();
-
-  int* dim = w2i->GetOutput()->GetDimensions();
-  float width = dim[0];
-  float height = dim[1];
-
-  int *extent = w2i->GetOutput()->GetExtent();
-  int extentW = extent[1] - extent[0] + 1;
-  int extentH = extent[3] - extent[2] + 1;
-  float extentN = 0;
-
-  vtkImageClip *iclip = vtkImageClip::New();
-  if(width>height)
-    {
-    int extentD = extentW - extentH;
-    extentN = extentH;
-    int arg1 = extent[0]+ extentD/2;
-    int arg2 = extent[1]-extentD/2;
-    iclip->SetOutputWholeExtent(arg1,arg2,extent[2],extent[3],extent[4],extent[5]);
-    }
-  else if(width<height)
-    {
-    int extentD = extentH - extentW;
-    extentN = extentW;
-    int arg1 = extent[2]+extentD/2;
-    int arg2 = extent[3]-extentD/2;
-    iclip->SetOutputWholeExtent(extent[0],extent[1],arg1,arg2,extent[4],extent[5]);
-    }
-  else
-    {
-    extentN = extentW;
-    iclip->SetOutputWholeExtent(extent[0],extent[1],extent[2],extent[3],extent[4],extent[5]);
-    }
-  iclip->SetInput(w2i->GetOutput());
-  iclip->Update();
-
-//  int scaledW = width/20;
-//  int scaledH = height/20;
-
-  vtkImageResample *resample = vtkImageResample::New();
-  resample->SetAxisMagnificationFactor(0,48/extentN);
-  resample->SetAxisMagnificationFactor(1,48/extentN);
-  resample->SetInput(iclip->GetOutput());
-  resample->Update();
-
-  vtkImageData *img_data = resample->GetOutput();
-  int *wext = img_data->GetWholeExtent();
-
-  vtkKWIcon* icon = vtkKWIcon::New();
-  icon->SetImage(
-    static_cast<unsigned char*>(img_data->GetScalarPointer()), 
-    wext[1] - wext[0] + 1,
-    wext[3] - wext[2] + 1,
-    img_data->GetNumberOfScalarComponents(),
-    0,
-    vtkKWIcon::IMAGE_OPTION_FLIP_V);
-
-  w2i->Delete();
-  resample->Delete();
-  iclip->Delete();
-
-  return icon;
-}
-
-//----------------------------------------------------------------------------
-char *vtkPVLookmarkManager::GetEncodedImageData(vtkKWIcon *icon)
-{
-  const unsigned char *imageData = icon->GetData();
-  unsigned char *encodedImageData = new unsigned char[12289];
-  vtkBase64Utilities *encoder = vtkBase64Utilities::New();
-  unsigned long size = encoder->Encode(imageData,9216,encodedImageData);
-  encodedImageData[size] = '\0';
-  encoder->Delete();
-
-  return (char *)encodedImageData;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::StoreStateScript(vtkPVLookmark *lmk)
-{
-  FILE *lookmarkScript;
-  char *buf = new char[300];
-  char *stateScript;
-  ostrstream state;
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
-
-  win->SetSaveVisibleSourcesOnlyFlag(1);
-  win->SaveState("tempLookmarkState.pvs");
-  win->SetSaveVisibleSourcesOnlyFlag(0);
-
-  //read the session state file in to a new vtkPVLookmark
-  if((lookmarkScript = fopen("tempLookmarkState.pvs","r")) != NULL)
-    {
-    while(fgets(buf,300,lookmarkScript))
-      state << buf;
-    }
-  state << ends;
-  fclose(lookmarkScript);
-  delete [] buf;
-  stateScript = new char[strlen(state.str())+1];
-  strcpy(stateScript,state.str());
-  lmk->SetStateScript(stateScript);
-  delete [] stateScript;
-
-  remove("tempLookmarkState.pvs");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::SaveLookmarksCallback()
+void vtkPVLookmarkManager::SaveAllCallback()
 {
   char *filename;
   ostrstream str;
@@ -1761,11 +1531,11 @@ void vtkPVLookmarkManager::SaveLookmarksCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::SaveFolderCallback()
+void vtkPVLookmarkManager::ExportFolderCallback()
 {
   char *filename;
   ostrstream str;
-  vtkKWLookmark *lookmarkWidget;
+  vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
   vtkIdType i;
   int numChecked = 0;
@@ -1875,10 +1645,10 @@ void vtkPVLookmarkManager::SaveFolderCallback()
   if(rootFolder)
     {
     //make sure all selected lookmarks are inside folder, if so, we can rename this folder
-    vtkIdType numLmkWidgets = this->KWLookmarks->GetNumberOfItems();
+    vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
     for(i=numLmkWidgets-1;i>=0;i--)
       {
-      this->KWLookmarks->GetItem(i,lookmarkWidget);
+      this->PVLookmarks->GetItem(i,lookmarkWidget);
       if(lookmarkWidget->GetSelectionState()==1)
         {
         if(!this->IsWidgetInsideFolder(rootFolder,lookmarkWidget))
@@ -1900,10 +1670,10 @@ void vtkPVLookmarkManager::SaveFolderCallback()
   this->SetButtonFrameState(1);
 
   vtkIdType numberOfLookmarkWidgets, numberOfLookmarkFolders;
-  numberOfLookmarkWidgets = this->KWLookmarks->GetNumberOfItems();
+  numberOfLookmarkWidgets = this->PVLookmarks->GetNumberOfItems();
   for(i=numberOfLookmarkWidgets-1;i>=0;i--)
     {
-    this->KWLookmarks->GetItem(i,lookmarkWidget);
+    this->PVLookmarks->GetItem(i,lookmarkWidget);
     lookmarkWidget->SetSelectionState(0);
     }
   numberOfLookmarkFolders = this->LmkFolderWidgets->GetNumberOfItems();
@@ -2072,7 +1842,7 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
 
 //  this->CreateNestedXMLElements(folder->GetLabelFrame()->GetFrame()->GetFrame(),root);
 
-  vtkKWLookmark *lookmarkWidget;
+  vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
 
   int nextLmkItemIndex=0;
@@ -2095,8 +1865,8 @@ void vtkPVLookmarkManager::SaveFolderInternal(char *filename, vtkKWLookmarkFolde
       vtkKWWidget *child = parent->GetNthChild(i);
       if(child->IsA("vtkKWLookmark"))
         {
-        lookmarkWidget = vtkKWLookmark::SafeDownCast(child);
-        if(this->KWLookmarks->IsItemPresent(lookmarkWidget))
+        lookmarkWidget = vtkPVLookmark::SafeDownCast(child);
+        if(this->PVLookmarks->IsItemPresent(lookmarkWidget))
           {
           if(lookmarkWidget->GetLocation()==nextLmkItemIndex)
             {
@@ -2247,7 +2017,7 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
         folder->SetAttribute("Name",oldLmkFolder->GetLabelFrame()->GetLabel()->GetText());
         dest->AddNestedElement(folder);
 
-        vtkKWLookmark *lookmarkWidget;
+        vtkPVLookmark *lookmarkWidget;
         vtkKWLookmarkFolder *lmkFolderWidget;
 
         int nextLmkItemIndex=0;
@@ -2271,8 +2041,8 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
             vtkKWWidget *child = parent->GetNthChild(i);
             if(child->IsA("vtkKWLookmark"))
               {
-              lookmarkWidget = vtkKWLookmark::SafeDownCast(child);
-              if(this->KWLookmarks->IsItemPresent(lookmarkWidget))
+              lookmarkWidget = vtkPVLookmark::SafeDownCast(child);
+              if(this->PVLookmarks->IsItemPresent(lookmarkWidget))
                 {
                 if(lookmarkWidget->GetLocation()==nextLmkItemIndex)
                   {
@@ -2308,7 +2078,7 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
 
       vtkKWWidget *parent = lmkItem;
       
-      vtkKWLookmark *lookmarkWidget;
+      vtkPVLookmark *lookmarkWidget;
       vtkKWLookmarkFolder *lmkFolderWidget;
 
       int nextLmkItemIndex=0;
@@ -2329,8 +2099,8 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
           vtkKWWidget *child = parent->GetNthChild(i);
           if(child->IsA("vtkKWLookmark"))
             {
-            lookmarkWidget = vtkKWLookmark::SafeDownCast(child);
-            if(this->KWLookmarks->IsItemPresent(lookmarkWidget))
+            lookmarkWidget = vtkPVLookmark::SafeDownCast(child);
+            if(this->PVLookmarks->IsItemPresent(lookmarkWidget))
               {
               if(lookmarkWidget->GetLocation()==nextLmkItemIndex)
                 {
@@ -2360,51 +2130,42 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
     }
   else if(lmkItem->IsA("vtkKWLookmark"))
     {
-    vtkIdType lmkIndex;
-    vtkKWLookmark *lookmarkWidget = vtkKWLookmark::SafeDownCast(lmkItem);
-    vtkPVLookmark *lookmark;
+    vtkPVLookmark *lookmarkWidget = vtkPVLookmark::SafeDownCast(lmkItem);
 
-    if(this->KWLookmarks->IsItemPresent(lookmarkWidget))
+    if(this->PVLookmarks->IsItemPresent(lookmarkWidget))
       {
-      this->KWLookmarks->FindItem(lookmarkWidget,lmkIndex);
-      this->PVLookmarks->GetItem(lmkIndex,lookmark);
-      if(lookmark)
-        {
-        char* lookmarkComments = new char[strlen(lookmarkWidget->GetComments())+1];
-        strcpy(lookmarkComments,lookmarkWidget->GetComments());
-        lookmarkComments[strlen(lookmarkWidget->GetComments())] = '\0';
-        this->EncodeNewlines(lookmarkComments);
-        lookmark->SetComments(lookmarkComments);
+      lookmarkWidget->UpdateVariableValues();
 
-        //need to convert newlines in script and image data to encoded character before writing to xml file
-        char *stateScript = lookmark->GetStateScript();
-        this->EncodeNewlines(stateScript);
+      this->EncodeNewlines(lookmarkWidget->GetComments());
 
-        vtkXMLLookmarkElement *elem = vtkXMLLookmarkElement::New();
-        elem->SetName("Lmk");
-        elem->SetAttribute("Name",lookmarkWidget->GetLookmarkName());
-        elem->SetAttribute("Comments", lookmark->GetComments());
-        elem->SetAttribute("StateScript", lookmark->GetStateScript());
-        elem->SetAttribute("ImageData", lookmark->GetImageData());
-        elem->SetAttribute("Dataset", lookmark->GetDataset());
-        
-        float *temp2;
-        temp2 = lookmark->GetCenterOfRotation();
-        elem->SetFloatAttribute("XCenterOfRotation", temp2[0]);
-        elem->SetFloatAttribute("YCenterOfRotation", temp2[1]);
-        elem->SetFloatAttribute("ZCenterOfRotation", temp2[2]);
- 
-        dest->AddNestedElement(elem);
+      //need to convert newlines in script and image data to encoded character before writing to xml file
+      char *stateScript = lookmarkWidget->GetStateScript();
+      this->EncodeNewlines(stateScript);
+
+      vtkXMLLookmarkElement *elem = vtkXMLLookmarkElement::New();
+      elem->SetName("Lmk");
+      elem->SetAttribute("Name",lookmarkWidget->GetName());
+      elem->SetAttribute("Comments", lookmarkWidget->GetComments());
+      elem->SetAttribute("StateScript", lookmarkWidget->GetStateScript());
+      elem->SetAttribute("ImageData", lookmarkWidget->GetImageData());
+      elem->SetAttribute("Dataset", lookmarkWidget->GetDataset());
+      
+      float *temp2;
+      temp2 = lookmarkWidget->GetCenterOfRotation();
+      elem->SetFloatAttribute("XCenterOfRotation", temp2[0]);
+      elem->SetFloatAttribute("YCenterOfRotation", temp2[1]);
+      elem->SetFloatAttribute("ZCenterOfRotation", temp2[2]);
+
+      dest->AddNestedElement(elem);
 
 //        writer->SetObject(lookmark);
 //        writer->CreateInElement(dest);
 
-        this->DecodeNewlines(stateScript);
-        delete [] lookmarkComments;
-        lookmark->SetComments(NULL);
+      this->DecodeNewlines(stateScript);
+      lookmarkWidget->SetComments(NULL);
 
-        elem->Delete();
-        }
+      elem->Delete();
+
       }
     }
   else
@@ -2426,7 +2187,7 @@ void vtkPVLookmarkManager::CreateNestedXMLElements(vtkKWWidget *lmkItem, vtkXMLD
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::RenameLookmarkCallback()
 {
-  vtkKWLookmark *lookmarkWidget;
+  vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
   vtkIdType i;
   int numChecked =0;
@@ -2451,11 +2212,11 @@ void vtkPVLookmarkManager::RenameLookmarkCallback()
 
   // no folders selected
   // only allow one lookmark to be selected now
-  vtkKWLookmark *selectedLookmark = NULL;
-  vtkIdType numLmkWidgets = this->KWLookmarks->GetNumberOfItems();
+  vtkPVLookmark *selectedLookmark = NULL;
+  vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
   for(i=numLmkWidgets-1;i>=0;i--)
     {
-    this->KWLookmarks->GetItem(i,lookmarkWidget);
+    this->PVLookmarks->GetItem(i,lookmarkWidget);
     if(lookmarkWidget->GetSelectionState()==1)
       {
       selectedLookmark = lookmarkWidget;
@@ -2492,7 +2253,7 @@ void vtkPVLookmarkManager::RenameLookmarkCallback()
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::RenameFolderCallback()
 {
-  vtkKWLookmark *lookmarkWidget;
+  vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
   vtkIdType i;
   vtkKWLookmarkFolder *rootFolder = NULL;
@@ -2542,10 +2303,10 @@ void vtkPVLookmarkManager::RenameFolderCallback()
   if(rootFolder)
     {
     //make sure all selected lookmarks are inside folder, if so, we can rename this folder
-    vtkIdType numLmkWidgets = this->KWLookmarks->GetNumberOfItems();
+    vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
     for(i=numLmkWidgets-1;i>=0;i--)
       {
-      this->KWLookmarks->GetItem(i,lookmarkWidget);
+      this->PVLookmarks->GetItem(i,lookmarkWidget);
       if(lookmarkWidget->GetSelectionState()==1)
         {
         if(!this->IsWidgetInsideFolder(rootFolder,lookmarkWidget))
@@ -2580,16 +2341,16 @@ void vtkPVLookmarkManager::RenameFolderCallback()
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::RemoveCallback()
 {
-  vtkKWLookmark *lookmarkWidget;
+  vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
   vtkIdType i;
   int numChecked = 0;
 
 
-  vtkIdType numLmkWidgets = this->KWLookmarks->GetNumberOfItems();
+  vtkIdType numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
   for(i=numLmkWidgets-1;i>=0;i--)
     {
-    this->KWLookmarks->GetItem(i,lookmarkWidget);
+    this->PVLookmarks->GetItem(i,lookmarkWidget);
     if(lookmarkWidget->GetSelectionState()==1)
       {
       numChecked++;
@@ -2629,11 +2390,10 @@ void vtkPVLookmarkManager::RemoveCallback()
   this->RemoveCheckedChildren(this->LmkScrollFrame->GetFrame(),0);
 
   // update the callbacks to the thumbnails
-  numLmkWidgets = this->KWLookmarks->GetNumberOfItems();
+  numLmkWidgets = this->PVLookmarks->GetNumberOfItems();
   for(i=0;i<numLmkWidgets;i++)
     {
-    this->KWLookmarks->GetItem(i,lookmarkWidget);
-    this->SetLookmarkIconCommand(lookmarkWidget,i);
+    this->PVLookmarks->GetItem(i,lookmarkWidget);
     }
 
   this->Script("%s yview moveto 0",
@@ -2646,12 +2406,12 @@ void vtkPVLookmarkManager::RemoveCallback()
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::RemoveItemAsDragAndDropTarget(vtkKWWidget *target)
 {
-  vtkIdType numberOfLookmarkWidgets = this->KWLookmarks->GetNumberOfItems();
+  vtkIdType numberOfLookmarkWidgets = this->PVLookmarks->GetNumberOfItems();
   vtkIdType numberOfLookmarkFolders = this->LmkFolderWidgets->GetNumberOfItems();
   vtkKWLookmarkFolder *targetLmkFolder;
   vtkKWLookmarkFolder *lmkFolderWidget;
-  vtkKWLookmark *lookmarkWidget;
-  vtkKWLookmark *targetLmkWidget;
+  vtkPVLookmark *lookmarkWidget;
+  vtkPVLookmark *targetLmkWidget;
   vtkIdType j=0;
 
   for(j=numberOfLookmarkFolders-1;j>=0;j--)
@@ -2659,7 +2419,7 @@ void vtkPVLookmarkManager::RemoveItemAsDragAndDropTarget(vtkKWWidget *target)
     this->LmkFolderWidgets->GetItem(j,lmkFolderWidget);
     if(target != lmkFolderWidget)
       {
-      targetLmkWidget = vtkKWLookmark::SafeDownCast(target);
+      targetLmkWidget = vtkPVLookmark::SafeDownCast(target);
       if(targetLmkWidget)
         lmkFolderWidget->GetDragAndDropTargetSet()->RemoveTarget(targetLmkWidget->GetSeparatorFrame());
       targetLmkFolder = vtkKWLookmarkFolder::SafeDownCast(target);
@@ -2674,10 +2434,10 @@ void vtkPVLookmarkManager::RemoveItemAsDragAndDropTarget(vtkKWWidget *target)
 
   for(j=numberOfLookmarkWidgets-1;j>=0;j--)
     {
-    this->KWLookmarks->GetItem(j,lookmarkWidget);
+    this->PVLookmarks->GetItem(j,lookmarkWidget);
     if(target != lookmarkWidget)
       {
-      targetLmkWidget = vtkKWLookmark::SafeDownCast(target);
+      targetLmkWidget = vtkPVLookmark::SafeDownCast(target);
       if(targetLmkWidget)
         lookmarkWidget->GetDragAndDropTargetSet()->RemoveTarget(targetLmkWidget->GetSeparatorFrame());
       targetLmkFolder = vtkKWLookmarkFolder::SafeDownCast(target);
@@ -2694,7 +2454,7 @@ void vtkPVLookmarkManager::RemoveItemAsDragAndDropTarget(vtkKWWidget *target)
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::DecrementHigherSiblingLmkItemLocationIndices(vtkKWWidget *parent, int locationOfLmkItemBeingRemoved)
 {
-  vtkKWLookmark *lookmarkWidget;
+  vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
   int siblingLocation=0;
 
@@ -2704,7 +2464,7 @@ void vtkPVLookmarkManager::DecrementHigherSiblingLmkItemLocationIndices(vtkKWWid
     vtkKWWidget *sibling = parent->GetNthChild(i);
     if(sibling->IsA("vtkKWLookmark"))
       {
-      lookmarkWidget = vtkKWLookmark::SafeDownCast(sibling);
+      lookmarkWidget = vtkPVLookmark::SafeDownCast(sibling);
       if(lookmarkWidget)
         {
         siblingLocation = lookmarkWidget->GetLocation();
@@ -2728,7 +2488,7 @@ void vtkPVLookmarkManager::DecrementHigherSiblingLmkItemLocationIndices(vtkKWWid
 //----------------------------------------------------------------------------
 void vtkPVLookmarkManager::IncrementHigherSiblingLmkItemLocationIndices(vtkKWWidget *parent, int locationOfLmkItemBeingInserted)
 {
-  vtkKWLookmark *lookmarkWidget;
+  vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
   int siblingLocation=0;
 
@@ -2738,7 +2498,7 @@ void vtkPVLookmarkManager::IncrementHigherSiblingLmkItemLocationIndices(vtkKWWid
     vtkKWWidget *sibling = parent->GetNthChild(i);
     if(sibling->IsA("vtkKWLookmark"))
       {
-      lookmarkWidget = vtkKWLookmark::SafeDownCast(sibling);
+      lookmarkWidget = vtkPVLookmark::SafeDownCast(sibling);
       siblingLocation = lookmarkWidget->GetLocation();
       if(siblingLocation>=locationOfLmkItemBeingInserted)
         lookmarkWidget->SetLocation(siblingLocation+1); 
@@ -2757,7 +2517,7 @@ void vtkPVLookmarkManager::IncrementHigherSiblingLmkItemLocationIndices(vtkKWWid
 void vtkPVLookmarkManager::PackChildrenBasedOnLocation(vtkKWWidget *parent)
 {
   parent->UnpackChildren();
-  vtkKWLookmark *lookmarkWidget;
+  vtkPVLookmark *lookmarkWidget;
   vtkKWLookmarkFolder *lmkFolderWidget;
 
   // pack the nested frame if inside a folder, otherwise we are in the top level and we need to pack the top frame first
@@ -2786,8 +2546,8 @@ void vtkPVLookmarkManager::PackChildrenBasedOnLocation(vtkKWWidget *parent)
       vtkKWWidget *child = parent->GetNthChild(i);
       if(child->IsA("vtkKWLookmark"))
         {
-        lookmarkWidget = vtkKWLookmark::SafeDownCast(child);
-        if(this->KWLookmarks->IsItemPresent(lookmarkWidget))
+        lookmarkWidget = vtkPVLookmark::SafeDownCast(child);
+        if(this->PVLookmarks->IsItemPresent(lookmarkWidget))
           {
           if(lookmarkWidget->GetLocation()==nextLmkItemIndex)
             {
@@ -2821,20 +2581,20 @@ void vtkPVLookmarkManager::PackChildrenBasedOnLocation(vtkKWWidget *parent)
 char *vtkPVLookmarkManager::GetUnusedLookmarkName()
 {
   char *name = new char[50];
-  vtkKWLookmark *lmkWidget;
+  vtkPVLookmark *lmkWidget;
   vtkIdType k,numberOfItems;
   int i=0;
-  numberOfItems = this->KWLookmarks->GetNumberOfItems();
+  numberOfItems = this->PVLookmarks->GetNumberOfItems();
   
   while(i<=numberOfItems)
     {
     sprintf(name,"Lookmark%d",i);
     k=0;
-    this->KWLookmarks->GetItem(k,lmkWidget);
-    while(k<numberOfItems && strcmp(name,lmkWidget->GetLookmarkName()))
+    this->PVLookmarks->GetItem(k,lmkWidget);
+    while(k<numberOfItems && strcmp(name,lmkWidget->GetName()))
       {
       k++;
-      this->KWLookmarks->GetItem(k,lmkWidget);
+      this->PVLookmarks->GetItem(k,lmkWidget);
       }
     if(k==numberOfItems)
       break;  //there was not match so this lmkname is valid
@@ -2845,894 +2605,8 @@ char *vtkPVLookmarkManager::GetUnusedLookmarkName()
 }
 
 
-
 //----------------------------------------------------------------------------
-void vtkPVLookmarkManager::ViewLookmarkWithCurrentDataset(vtkPVLookmark *oldLookmark)
-{
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
-
-  this->Checkpoint();
-
-  // execute state script stored with this lookmark except
-  // don't use reader assigned to lookmark, use the current one
-  vtkPVSource *src, *temp;
-  src = win->GetCurrentPVSource();
-  while((temp = src->GetPVInput(0)))
-    src = temp;
-  if(src->IsA("vtkPVReaderModule"))
-    {
-    char *temp_script = new char[strlen(oldLookmark->GetStateScript())+1];
-    strcpy(temp_script,oldLookmark->GetStateScript());
-    // get the camera props to restore after
-    vtkCamera *cam = this->GetPVRenderView()->GetRenderer()->GetActiveCamera();
-    vtkCamera *camera = cam->NewInstance();
-    camera->SetParallelScale(cam->GetParallelScale());
-    camera->SetViewAngle(cam->GetViewAngle());
-    camera->SetClippingRange(cam->GetClippingRange());
-    camera->SetFocalPoint(cam->GetFocalPoint());
-    camera->SetPosition(cam->GetPosition());
-    camera->SetViewUp(cam->GetViewUp());
-
-    this->ParseAndExecuteStateScript(src,temp_script,oldLookmark,0);
-//    this->CreateLookmarkCallback();
-
-    // copy the parameters of the current camera for this class
-    // into the active camera on the client and server
-    vtkSMProxy* renderModuleProxy = this->GetPVApplication()->
-      GetRenderModuleProxy();
-    vtkSMDoubleVectorProperty* dvp;
- 
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      renderModuleProxy->GetProperty("CameraPosition"));
-    if (dvp)
-      {
-      dvp->SetElements(camera->GetPosition());
-      }
-    else
-      {
-      vtkErrorMacro("Failed to find property CameraPosition.");
-      }
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      renderModuleProxy->GetProperty("CameraFocalPoint"));
-    if (dvp)
-      {
-      dvp->SetElements(camera->GetFocalPoint());
-      }
-    else
-      {
-      vtkErrorMacro("Failed to find property CameraFocalPoint.");
-      }
-  
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      renderModuleProxy->GetProperty("CameraViewUp"));
-    if (dvp)
-      {
-      dvp->SetElements(camera->GetViewUp());
-      }
-    else
-      {
-      vtkErrorMacro("Failed to find property CameraFocalPoint.");
-      }
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      renderModuleProxy->GetProperty("CameraViewAngle"));
-    if (dvp)
-      {
-      dvp->SetElement(0, camera->GetViewAngle());
-      }
-    else
-      {
-      vtkErrorMacro("Failed to find property CameraViewAngle.");
-      }
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      renderModuleProxy->GetProperty("CameraClippingRange"));
-    if (dvp)
-      {
-      dvp->SetElements(camera->GetClippingRange());
-      }
-    else
-      {
-      vtkErrorMacro("Failed to find property CameraClippingRange.");
-      }
-
-    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
-      renderModuleProxy->GetProperty("CameraParallelScale"));
-    if (dvp)
-      {
-      dvp->SetElement(0, camera->GetParallelScale());
-      }
-    else
-      {
-      vtkErrorMacro("Failed to find property CameraParallelScale.");
-      }
-    renderModuleProxy->UpdateVTKObjects(); 
-    this->GetPVRenderView()->EventuallyRender();
-    camera->Delete();
-    }
-
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::ViewLookmarkCallback(vtkIdType lmkItemIndex)
-{
-  vtkPVWindow *win = this->GetPVApplication()->GetMainWindow();
-  vtkPVSource *pvs;
-  vtkPVLookmark *lookmark;
-  this->PVLookmarks->GetItem(lmkItemIndex,lookmark);
-  vtkKWLookmark *lookmarkWidget;
-  this->KWLookmarks->GetItem(lmkItemIndex,lookmarkWidget);
-  vtkPVSource *reader;
-  vtkPVSource *currentSource = win->GetCurrentPVSource();
-
-
-  this->UnsetLookmarkIconCommand(lookmarkWidget);
-
-  //try to delete preexisting filters belonging to this lookmark - for when lmk has been visited before in this session
-  lookmark->DeletePVSources();
-
-  // this prevents other filters' visibility from disturbing the lookmark view
-  this->TurnFiltersOff();
-
-  if(lookmarkWidget->IsLockedToDataset()==0)
-    {
-    this->ViewLookmarkWithCurrentDataset(lookmark);
-    this->SetLookmarkIconCommand(lookmarkWidget,lmkItemIndex);
-    return;
-    }
-
-
-  //  If the lookmark is clicked and this checkbox is checked
-  //    and the dataset is currently loaded - same behavior as now
-  //    and the dataset is not loaded but exists on disk at the stored path - load the dataset into paraview without prompting the user
-  //    and the dataset is not loaded and does not exist on disk at the stored path - prompt the user for dataset; perhaps have an "update dataset path" option
-  //    ignores that fact that there might be other datasets loaded in paraview at the moment
-
-  if(!(reader = this->SearchForDefaultDatasetInSourceList(lookmark->GetDataset())))
-    {
-    FILE *file;
-    if( (file = fopen(lookmark->GetDataset(),"r")) != NULL)
-      {
-      fclose(file);
-      //look for dataset at stored path and open automatically if found
-      if(win->Open(lookmark->GetDataset()) == VTK_OK)
-        {
-        reader = win->GetCurrentPVSource();
-        reader->AcceptCallback();
-        }
-      else
-        {
-        this->SetLookmarkIconCommand(lookmarkWidget,lmkItemIndex);
-        return;
-        }
-      }
-    else
-      {
-      //ask user for dataset
-      vtkKWMessageDialog::PopupMessage(
-        this->GetPVApplication(), win, "Could Not Find Default Data Set", 
-        "You will now be asked to select a different data set.", 
-        vtkKWMessageDialog::ErrorIcon);
-
-      win->OpenCallback();
-      reader = win->GetCurrentPVSource();
-      if(reader==currentSource || !reader->IsA("vtkPVReaderModule"))
-        {
-        this->SetLookmarkIconCommand(lookmarkWidget,lmkItemIndex);
-        return;
-        }
-      reader->AcceptCallback();
-
-      this->Script("focus %s",this->GetWidgetName());
-
-      vtkPVReaderModule *rm = vtkPVReaderModule::SafeDownCast(reader);
-      lookmarkWidget->SetDataset((char *)rm->GetFileEntry()->GetValue());
-      lookmark->SetDataset(rm->GetFileEntry()->GetValue());
-      }
-    }
-
-  // needed? since done in Parse method?
-  //set the reader to the current pv source so that the input will automatically be set to the reader
-  win->SetCurrentPVSource(reader);
-
-  char *temp_script = new char[strlen(lookmark->GetStateScript())+1];
-  strcpy(temp_script,lookmark->GetStateScript());
-
-  this->ParseAndExecuteStateScript(reader,temp_script,lookmark,1);
-
-
-  // this is needed to update the eyeballs based on recent changes to visibility of filters
-  // handle case where there is no source in the source window
-  pvs = win->GetCurrentPVSource();
-  if(pvs && pvs->GetNotebook())
-    this->GetPVRenderView()->UpdateNavigationWindow(pvs,0);
-
-  this->SetLookmarkIconCommand(lookmarkWidget,lmkItemIndex);
-  win->SetCenterOfRotation(lookmark->GetCenterOfRotation());
-
-  delete [] temp_script;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::TurnFiltersOff()
-{
-  //turn all sources invisible
-  vtkPVSource *pvs;
-  vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
-  if (col == NULL)
-    {
-    return;
-    }
-  vtkCollectionIterator *it = col->NewIterator();
-  it->InitTraversal();
-  while ( !it->IsDoneWithTraversal() )
-    {
-    pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
-    pvs->SetVisibility(0);
-    it->GoToNextItem();
-    }
-  it->Delete();
-}
-
-vtkPVSource *vtkPVLookmarkManager::SearchForDefaultDatasetInSourceList(char *defaultName)
-{
-  vtkPVSource *pvs;
-  vtkPVSource *reader = NULL;
-  char *targetName;
-  vtkPVReaderModule *mod;
-
-  vtkPVSourceCollection *col = this->GetPVApplication()->GetMainWindow()->GetSourceList("Sources");
-  if (col == NULL)
-    {
-    return NULL;
-    }
-  vtkCollectionIterator *it = col->NewIterator();
-  it->InitTraversal();
-  while ( !it->IsDoneWithTraversal() )
-    {
-    pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
-    pvs->SetVisibility(0);
-    if(pvs->IsA("vtkPVReaderModule"))
-      {
-      mod = vtkPVReaderModule::SafeDownCast(pvs);
-      targetName = (char *)mod->GetFileEntry()->GetValue();
-      if(!strcmp(targetName,defaultName))
-        {
-        reader = pvs;
-        }
-      }
-    it->GoToNextItem();
-    }
-  it->Delete();
-
-  return reader;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *script, vtkPVLookmark *lmk, int useDatasetFlag)
-{
-  vtkPVScale *scale;
-  vtkPVArraySelection *arraySelection;
-  vtkPVLabeledToggle *labeledToggle;
-  vtkPVFileEntry *fileEntry;
-  vtkPVSelectTimeSet *selectTimeSet;
-  vtkPVVectorEntry *vectorEntry;
-  vtkPVSelectionList *selectionList;
-  vtkPVStringEntry *stringEntry;
-  vtkPVSelectWidget *selectWidget;
-  vtkPVMinMax *minMaxWidget;
-#ifdef PARAVIEW_USE_EXODUS
-  vtkPVBasicDSPFilterWidget *dspWidget;
-#endif
-  vtkPVSource *src;
-  vtkPVWidget *pvWidget;
-  float tvalue=0;
-  char *ptr2;
-  char *field;
-  double fval,xval,yval,zval; 
-  int i=0;
-  char *name = new char[50];
-  char *data = new char[50];
-  char *tok;
-  int val;
-  char *readername=NULL; 
-  char *ptr1;
-  char *ptr;
-  char cmd[200];
-
-  this->Script("[winfo toplevel %s] config -cursor watch", 
-                this->GetWidgetName());
-
-  this->GetPVRenderView()->StartBlockingRender();
-
-  ptr = strtok(script,"\r\n");
-
-  while(ptr)
-    {
-    if(!readername && !strstr(ptr,"InitializeReadCustom"))
-      {
-      this->Script(ptr);
-      ptr = strtok(NULL,"\r\n");
-      }
-    else if(strstr(ptr,"InitializeReadCustom"))
-      {
-      ptr1 = this->GetReaderTclName(ptr);
-      readername = new char[25];
-      strcpy(readername,ptr1);
-      ptr = strtok(NULL,"\r\n");
-      }
-    else if(strstr(ptr,"GetPVWidget"))
-      {
-      //loop through collection till found, operate accordingly leaving else statement with ptr one line past 
-      vtkCollectionIterator *it = reader->GetWidgets()->NewIterator();
-      it->InitTraversal();
- 
-      for (i = 0; i < reader->GetWidgets()->GetNumberOfItems(); i++)
-        {
-        pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
-        if(strstr(ptr,pvWidget->GetTraceHelper()->GetObjectName()))
-          {
-          if((scale = vtkPVScale::SafeDownCast(pvWidget)) && useDatasetFlag==1)
-            {
-            ptr = strtok(NULL,"\r\n");
-            tok = strstr(ptr,"SetValue");
-            tok+=9;
-            tvalue = atof(tok);
-            scale->SetValue(tvalue);
-            ptr = strtok(NULL,"\r\n");
-            }
-          else if((arraySelection = vtkPVArraySelection::SafeDownCast(pvWidget)))
-            { 
-            ptr = strtok(NULL,"\r\n");
-            while(strstr(ptr,"SetArrayStatus"))
-              {
-              val = this->GetArrayStatus(name,ptr);
-              //only turn the variable on, not off, because some other filter might be using the variable
-              if(val)
-                arraySelection->SetArrayStatus(name,val);
-              ptr = strtok(NULL,"\r\n");  
-              }
-            arraySelection->Accept();
-            arraySelection->ModifiedCallback();
-            }
-          else if((labeledToggle = vtkPVLabeledToggle::SafeDownCast(pvWidget)))
-            {
-            ptr = strtok(NULL,"\r\n");
-            val = this->GetIntegerScalarWidgetValue(ptr);
-            labeledToggle->SetState(val);
-//            labeledToggle->Accept();
-            labeledToggle->ModifiedCallback();
-            ptr = strtok(NULL,"\r\n");
-            }
-          else if((selectWidget = vtkPVSelectWidget::SafeDownCast(pvWidget)))
-            {
-            //get the third token of the next line and take off brackets which will give you the value of select widget:
-            ptr = strtok(NULL,"\r\n");
-            tok = this->GetFieldName(ptr);
-            selectWidget->SetCurrentValue(tok); 
-            //ignore next line
-            ptr = strtok(NULL,"\r\n");
-            ptr = strtok(NULL,"\r\n");
-            tok = this->GetFieldName(ptr);
-            arraySelection = vtkPVArraySelection::SafeDownCast(selectWidget->GetPVWidget(tok));
-            ptr = strtok(NULL,"\r\n");
-            while(strstr(ptr,"SetArrayStatus"))
-              {
-              val = this->GetArrayStatus(name,ptr);
-              arraySelection->SetArrayStatus(name,val);
-              ptr = strtok(NULL,"\r\n"); 
-              }
-            arraySelection->Accept();
-            arraySelection->ModifiedCallback();
-            } 
-          else if((selectTimeSet = vtkPVSelectTimeSet::SafeDownCast(pvWidget)))
-            {
-            ptr = strtok(NULL,"\r\n");
-            selectTimeSet->SetTimeValueCallback(this->GetStringEntryValue(ptr));
-            selectTimeSet->ModifiedCallback();
-            ptr = strtok(NULL,"\r\n");
-            }
-          else if((vectorEntry = vtkPVVectorEntry::SafeDownCast(pvWidget)))
-            {
-            ptr = strtok(NULL,"\r\n");
-            vectorEntry->SetValue(this->GetVectorEntryValue(ptr));
-            vectorEntry->ModifiedCallback();
-            ptr = strtok(NULL,"\r\n");
-            }
-          else if((fileEntry = vtkPVFileEntry::SafeDownCast(pvWidget)))
-            {
-            ptr = strtok(NULL,"\r\n");
-            ptr = strtok(NULL,"\r\n");
-            }
-          else if((selectionList = vtkPVSelectionList::SafeDownCast(pvWidget)))
-            {
-            ptr = strtok(NULL,"\r\n");
-            val = this->GetIntegerScalarWidgetValue(ptr);
-            selectionList->SetCurrentValue(val);
-            selectionList->ModifiedCallback();
-            ptr = strtok(NULL,"\r\n");
-            }
-          else if((stringEntry = vtkPVStringEntry::SafeDownCast(pvWidget)))
-            {
-            //  This widget is used
-            ptr = strtok(NULL,"\r\n");
-            ptr = strtok(NULL,"\r\n");
-            }
-          else if((minMaxWidget = vtkPVMinMax::SafeDownCast(pvWidget)))
-            {
-            ptr = strtok(NULL,"\r\n");
-            minMaxWidget->SetMaxValue(this->GetIntegerScalarWidgetValue(ptr));
-            ptr = strtok(NULL,"\r\n");
-            minMaxWidget->SetMinValue(this->GetIntegerScalarWidgetValue(ptr));
-            ptr = strtok(NULL,"\r\n");
-            }
-#ifdef PARAVIEW_USE_EXODUS
-          else if((dspWidget = vtkPVBasicDSPFilterWidget::SafeDownCast(pvWidget)))
-            {
-            ptr = strtok(NULL,"\r\n");
-            dspWidget->ChangeDSPFilterMode(this->GetStringValue(ptr));
-            ptr = strtok(NULL,"\r\n");
-            dspWidget->ChangeCutoffFreq(this->GetStringValue(ptr));
-            ptr = strtok(NULL,"\r\n");
-            dspWidget->SetFilterLength(atoi(this->GetStringValue(ptr)));
-            ptr = strtok(NULL,"\r\n");
-            }
-#endif
-          else   //if we do not support this widget yet, advance and break loop
-            {
-            ptr = strtok(NULL,"\r\n");
-            }
-          break;
-          }
-        it->GoToNextItem();
-        }
-      //widget in state file is not in widget collection
-      if(i==reader->GetWidgets()->GetNumberOfItems())
-        {
-        ptr = strtok(NULL,"\r\n");
-        }
-      it->Delete();
-      }
-    else if(strstr(ptr,"AcceptCallback"))
-      {
-      //update Display page
-      reader->AcceptCallback();
-
-      // next line will either contain "ColorByProperty" "ColorByPointField" or "ColorByCellField"
-      vtkPVDisplayGUI *pvData = reader->GetPVOutput(); 
-      ptr = strtok(NULL,"\r\n");
-
-      if(strstr(ptr,"ColorByCellField"))
-        {
-        field = this->GetFieldNameAndValue(ptr,&val);
-        //pvData->ColorByCellField(field,val);
-        pvData->ColorByArray(field, vtkSMDisplayProxy::CELL_FIELD_DATA);
-        }
-      else if(strstr(ptr,"ColorByPointField"))
-        {
-        field = this->GetFieldNameAndValue(ptr,&val);
-        //pvData->ColorByPointField(field,val);
-        pvData->ColorByArray(field, vtkSMDisplayProxy::POINT_FIELD_DATA);
-        
-        }
-      else if(strstr(ptr,"ColorByProperty"))
-        {
-        pvData->ColorByProperty();
-        }
-
-      ptr = strtok(NULL,"\r\n");
-
-      if(strstr(ptr,"DrawVolume"))
-        {
-        pvData->DrawVolume();
-        ptr = strtok(NULL,"\r\n");
-        if(strstr(ptr,"VolumeRenderPointField"))
-          {
-          field = this->GetFieldNameAndValue(ptr,&val);
-          //pvData->VolumeRenderPointField(field,val);
-          pvData->VolumeRenderByArray(field, vtkSMDisplayProxy::POINT_FIELD_DATA);
-          }
-        else if(strstr(ptr,"VolumeRenderCellField"))
-          {
-          field = this->GetFieldNameAndValue(ptr,&val);
-          //pvData->VolumeRenderCellField(field,val);
-          pvData->VolumeRenderByArray(field, vtkSMDisplayProxy::CELL_FIELD_DATA);
-          }
-        ptr = strtok(NULL,"\r\n");
-        }
-      // this line sets the partdisplay variable
-      ptr+=4;
-      ptr2 = ptr;
-      while(*ptr2!=' ')
-        ptr2++;
-      *ptr2='\0';
-      strcpy(data,ptr);
-
-      vtkSMDisplayProxy *display = reader->GetDisplayProxy();
-      ptr = strtok(NULL,"\r\n");
-      while(strstr(ptr,data)) 
-        {
-        if(strstr(ptr,"SetColor"))
-          {
-          this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->SetColorCM(xval,yval,zval);
-          }
-        else if(strstr(ptr,"SetRepresentation"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetRepresentationCM(val); 
-          }
-        else if(strstr(ptr,"SetUseImmediateMode"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetImmediateModeRenderingCM(val); 
-          }
-        else if(strstr(ptr,"SetScalarVisibility"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetScalarVisibilityCM(val); 
-          }
-        else if(strstr(ptr,"SetDirectColorFlag"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          // when DirectColorFlag = 0,
-          // color mode is Default (=1).
-          // when DirectColorFlag = 1
-          // color mode is MapScalars (=0).
-          display->SetColorModeCM(!val); 
-          }
-        else if(strstr(ptr,"SetInterpolateColorsFlag"))
-          {
-          // This is "InterpolateColors" while property
-          // "InterpolateColorsBeforeMapping". 
-          // These are opposite concepts.
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetInterpolateScalarsBeforeMappingCM(val); 
-          }
-        else if(strstr(ptr,"SetInterpolation"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetInterpolationCM(val); 
-          }
-        else if(strstr(ptr,"SetPointSize"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetPointSizeCM(val); 
-          }
-        else if(strstr(ptr,"SetLineWidth"))
-          {
-          val = this->GetIntegerScalarWidgetValue(ptr);
-          display->SetLineWidthCM(val); 
-          }
-        else if(strstr(ptr,"SetOpacity"))
-          {
-          fval = this->GetDoubleScalarWidgetValue(ptr);
-          display->SetOpacityCM(fval); 
-          }
-        else if(strstr(ptr,"SetTranslate"))
-          {
-          this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->SetPositionCM(xval,yval,zval); 
-          }
-        else if(strstr(ptr,"SetScale"))
-          {
-          this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->SetScaleCM(xval,yval,zval); 
-          }
-        else if(strstr(ptr,"SetOrigin"))
-          {
-          this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->SetOriginCM(xval,yval,zval); 
-          }
-        else if(strstr(ptr,"SetOrientation"))
-          {
-          this->GetDoubleVectorWidgetValue(ptr,&xval,&yval,&zval);
-          display->SetOrientationCM(xval,yval,zval); 
-          }   
-        ptr = strtok(NULL,"\r\n");
-        }
-      break;
-      }
-    else
-      {
-      ptr = strtok(NULL,"\r\n");
-      }
-    }
-
-  if(strstr(ptr,readername) && strstr(ptr,"SetCubeAxesVisibility"))
-    {
-    val = this->GetIntegerScalarWidgetValue(ptr);
-    reader->SetCubeAxesVisibility(val);
-    ptr = strtok(NULL,"\r\n");
-    }
-  if(strstr(ptr,readername) && strstr(ptr,"SetPointLabelVisibility"))
-    {
-    val = this->GetIntegerScalarWidgetValue(ptr);
-    reader->SetPointLabelVisibility(val);
-    ptr = strtok(NULL,"\r\n");
-    }
-
-  reader->GetPVOutput()->Update();
-
-  while(ptr)
-    {
-
-    // want to set the reader as the current source before this line executes (this way if the reader is the input source in the script 
-    // it will be set as the input of this newly created source by default without explicitly setting it as input - which we can't do since we don't want to use its Tcl name)
-    if(strstr(ptr,"CreatePVSource"))
-      {
-      this->GetPVApplication()->GetMainWindow()->SetCurrentPVSource(reader);
-      }
-
-    if(strstr(ptr,"AcceptCallback"))
-      {
-      // the current source would be the filter just created
-      src = this->GetPVApplication()->GetMainWindow()->GetCurrentPVSource();
-
-      // append the lookmark name to its filter name : strip off any characters after '-' because a lookmark name could already have been appended to this filter name
-      char *srcLabel = new char[100];
-      strcpy(srcLabel,src->GetLabel());
-      if(strstr(srcLabel,"-"))
-        {
-        ptr1 = srcLabel;
-        while(*ptr1!='-')
-          ptr1++;
-        ptr1++;
-        *ptr1 = '\0';
-        }
-      else
-        {
-        strcat(srcLabel,"-");
-        }    
-      vtkKWLookmark *lmkWidget;
-      vtkIdType k;
-      this->PVLookmarks->FindItem(lmk,k);
-      this->KWLookmarks->GetItem(k,lmkWidget);
-    
-      strcat(srcLabel,lmkWidget->GetLookmarkName());
-      src->SetLabel(srcLabel);
-
-      //add all pvsources created by this lmk to its collection
-      lmk->AddPVSource(src);
-      delete [] srcLabel;
-      }
-
-    if(strstr(ptr,"SetVisibility") && strstr(ptr,readername))
-      {
-      val = this->GetIntegerScalarWidgetValue(ptr);
-      reader->SetVisibility(val);
-      }
-
-    if(strstr(ptr,readername) || (useDatasetFlag==0 && strstr(ptr,"SetCameraState")))
-      {
-      ptr = strtok(NULL,"\r\n");
-      continue;
-      }
-
-    // encode special '%' character with a preceeding '%' for printf cmd in call to Script()
-    if(strstr(ptr,"%"))
-      {
-      ptr1 = ptr;
-      i = 0;
-      while(*ptr1)
-        {
-        if(*ptr1=='%')
-          {
-          cmd[i] = *ptr1;
-          i++;
-          }
-        cmd[i] = *ptr1;
-        ptr1++;
-        i++;
-        }      
-      cmd[i] = '\0';
-      ptr = cmd;
-      }
-
-    this->Script(ptr);
-
-  
-
-    ptr = strtok(NULL,"\r\n");
-    }
-
-  this->Script("[winfo toplevel %s] config -cursor {}", 
-                this->GetWidgetName());
-
-  this->GetPVRenderView()->EndBlockingRender();
-
-
-  delete [] name;
-  delete [] data;
-  delete [] readername;
-}
-
-
-
-//----------------------------------------------------------------------------
-char* vtkPVLookmarkManager::GetVectorEntryValue(char *line)
-{
-  char *tok;
-  
-  if((tok = strstr(line,"SetValue")))
-    {
-    tok+=9;
-    }
-  
-  return tok; 
-}
-
-//----------------------------------------------------------------------------
-char* vtkPVLookmarkManager::GetStringEntryValue(char *line)
-{
-  char *tok;
-  char *ptr;
-
-  
-  if((tok = strstr(line,"{")))
-    {
-    tok++;
-    ptr = tok;
-    while(*ptr!='}')
-      {
-      ptr++;
-      }
-    *ptr = '\0';
-    }
-  else if((tok = strstr(line,"\"")))
-    {
-    tok++;
-    ptr = tok;
-    while(*ptr!='"')
-      {
-      ptr++;
-      }
-    *ptr = '\0';
-    }
-  
-  return tok; 
-}
-
-//----------------------------------------------------------------------------
-char* vtkPVLookmarkManager::GetStringValue(char *line)
-{
-  char *ptr;
-  
-  ptr = line;
-  ptr+=strlen(line);
-  while(*ptr!=' ')
-    {
-    ptr--;
-    }
-  ptr++;
-
-  return ptr;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVLookmarkManager::GetArrayStatus(char *name, char *line)
-{
-  char *tok;
-  char *ptr;
-
-  tok = strstr(line,"{");
-  tok++;
-  ptr = tok;
-  int i=0;
-  while(*ptr!='}')
-    {
-    name[i++] = *ptr;
-    ptr++;
-    }
-  name[i] = '\0';
-  ptr+=2;
-  
-  return atoi(ptr); 
-}
-
-//----------------------------------------------------------------------------
-int vtkPVLookmarkManager::GetIntegerScalarWidgetValue(char *ptr)
-{
-  char *ptr2 = ptr;
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  return atoi(ptr2);
-}
-
-//----------------------------------------------------------------------------
-double vtkPVLookmarkManager::GetDoubleScalarWidgetValue(char *ptr)
-{
-  char *ptr2 = ptr;
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  return atof(ptr2);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::GetDoubleVectorWidgetValue(char *ptr,double *xval,double *yval,double *zval)
-{
-  char *ptr2 = ptr;
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  *xval = atof(ptr2);
-
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  *yval = atof(ptr2);
-
-  while(*ptr2!=' ')
-    ptr2++;
-  ptr2++;
-  *zval = atof(ptr2);
-}
-
-//----------------------------------------------------------------------------
-char* vtkPVLookmarkManager::GetReaderTclName(char *ptr)
-{
-  char *ptr1;
-  char *ptr2;
-  ptr1 = ptr;
-  ptr1+=4;
-  ptr2 = ptr1;
-  while(*ptr2!=' ')
-    ptr2++;
-  *ptr2 = '\0';
-  return ptr1;
-}
-
-//----------------------------------------------------------------------------
-char *vtkPVLookmarkManager::GetFieldName(char *ptr)
-{
-  char *field;
-  char *ptr2;
-  ptr2 = ptr;
-  while(*ptr2!='{')
-    ptr2++;
-  ptr2++;
-  field = ptr2;
-  while(*ptr2!='}')
-    ptr2++;
-  *ptr2 = '\0';
-  return field;
-}
-
-//----------------------------------------------------------------------------
-char *vtkPVLookmarkManager::GetFieldNameAndValue(char *ptr, int *val)
-{
-  char *field;
-  char *ptr2;
-  ptr2 = ptr;
-  while(*ptr2!='{')
-    ptr2++;
-  ptr2++;
-  field = ptr2;
-  while(*ptr2!='}')
-    ptr2++;
-  *ptr2 = '\0';
-  ptr2+=2;
-  *val = atoi(ptr2);
-  return field;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVLookmarkManager::NewFolderCallback()
+void vtkPVLookmarkManager::CreateFolderCallback()
 {
   vtkIdType numFolders, numItems;
   vtkKWLookmarkFolder *lmkFolderWidget;
@@ -3769,7 +2643,7 @@ void vtkPVLookmarkManager::NewFolderCallback()
 int vtkPVLookmarkManager::GetNumberOfChildLmkItems(vtkKWWidget *parentFrame)
 {
   int location = 0;
-  vtkKWLookmark *lmkWidget;
+  vtkPVLookmark *lmkWidget;
   vtkKWLookmarkFolder *lmkFolder;
 
   int nb_children = parentFrame->GetNumberOfChildren();
@@ -3778,8 +2652,8 @@ int vtkPVLookmarkManager::GetNumberOfChildLmkItems(vtkKWWidget *parentFrame)
     vtkKWWidget *widget = parentFrame->GetNthChild(i);
     if(widget->IsA("vtkKWLookmark"))
       {
-      lmkWidget = vtkKWLookmark::SafeDownCast(widget);
-      if(this->KWLookmarks->IsItemPresent(lmkWidget))
+      lmkWidget = vtkPVLookmark::SafeDownCast(widget);
+      if(this->PVLookmarks->IsItemPresent(lmkWidget))
         location++;
       }
     else if(widget->IsA("vtkKWLookmarkFolder"))
@@ -3872,41 +2746,29 @@ void vtkPVLookmarkManager::MoveCheckedChildren(vtkKWWidget *nestedWidget, vtkKWW
     }
   else if(nestedWidget->IsA("vtkKWLookmark"))
     {
-    vtkPVLookmark *lookmark;
-    vtkKWLookmark *oldLmkWidget = vtkKWLookmark::SafeDownCast(nestedWidget);
+    vtkPVLookmark *oldLmkWidget = vtkPVLookmark::SafeDownCast(nestedWidget);
   
-    if(this->KWLookmarks->IsItemPresent(oldLmkWidget))
+    if(this->PVLookmarks->IsItemPresent(oldLmkWidget))
       {
-      vtkKWLookmark *newLmkWidget = vtkKWLookmark::New();
+      vtkPVLookmark *newLmkWidget = vtkPVLookmark::New();
       newLmkWidget->SetParent(packingFrame);
       newLmkWidget->Create(this->GetPVApplication());
-      this->Script("pack %s -fill both -expand yes -padx 8",newLmkWidget->GetWidgetName());
-
-      this->KWLookmarks->FindItem(oldLmkWidget,loc);
-      this->PVLookmarks->GetItem(loc,lookmark);
-      newLmkWidget->SetLookmarkName(oldLmkWidget->GetLookmarkName());
-      newLmkWidget->SetDataset(lookmark->GetDataset());
-      this->SetLookmarkIconCommand(newLmkWidget,loc);
-//      newLmkWidget->SetLookmark(lookmark);
+      newLmkWidget->SetName(oldLmkWidget->GetName());
+      newLmkWidget->SetDataset(oldLmkWidget->GetDataset());
       newLmkWidget->SetLocation(oldLmkWidget->GetLocation());
       newLmkWidget->SetComments(oldLmkWidget->GetComments());
+      newLmkWidget->SetImageData(oldLmkWidget->GetImageData());
+      newLmkWidget->CreateIconFromImageData();
+      newLmkWidget->SetStateScript(oldLmkWidget->GetStateScript());
+      newLmkWidget->UpdateWidgetValues();
+      this->Script("pack %s -fill both -expand yes -padx 8",newLmkWidget->GetWidgetName());
 
-      unsigned char *decodedImageData = new unsigned char[9216];
-      vtkBase64Utilities *decoder = vtkBase64Utilities::New();
-      decoder->Decode((unsigned char*)lookmark->GetImageData(),9216,decodedImageData);
-      vtkKWIcon *icon = vtkKWIcon::New();
-      icon->SetImage(decodedImageData,48,48,4,9216);
-      newLmkWidget->SetLookmarkImage(icon);
-      delete [] decodedImageData;
-      decoder->Delete();
-      icon->Delete();
-
-      this->KWLookmarks->RemoveItem(loc);
-      this->KWLookmarks->InsertItem(loc,newLmkWidget);
+      this->PVLookmarks->FindItem(oldLmkWidget,loc);
+      this->PVLookmarks->RemoveItem(loc);
+      this->PVLookmarks->InsertItem(loc,newLmkWidget);
 
       this->RemoveItemAsDragAndDropTarget(oldLmkWidget);
       this->Script("destroy %s", oldLmkWidget->GetWidgetName());
-//      oldLmkWidget->GetLookmark()->Delete();
       oldLmkWidget->Delete();
       }
     }
@@ -3976,26 +2838,20 @@ void vtkPVLookmarkManager::RemoveCheckedChildren(vtkKWWidget *nestedWidget,
     }
   else if(nestedWidget->IsA("vtkKWLookmark"))
     {
-    vtkPVLookmark *lookmark;
-    vtkKWLookmark *oldLmkWidget = vtkKWLookmark::SafeDownCast(nestedWidget);
+    vtkPVLookmark *oldLmkWidget = vtkPVLookmark::SafeDownCast(nestedWidget);
   
-    if(this->KWLookmarks->IsItemPresent(oldLmkWidget))
+    if(this->PVLookmarks->IsItemPresent(oldLmkWidget))
       {
       if(oldLmkWidget->GetSelectionState() || forceRemoveFlag)
         {
         this->RemoveItemAsDragAndDropTarget(oldLmkWidget);
         this->DecrementHigherSiblingLmkItemLocationIndices(
           oldLmkWidget->GetParent(),oldLmkWidget->GetLocation());
-        this->KWLookmarks->FindItem(oldLmkWidget,loc);
-        this->PVLookmarks->GetItem(loc,lookmark);
-        this->KWLookmarks->RemoveItem(loc);
+        this->PVLookmarks->FindItem(oldLmkWidget,loc);
         this->PVLookmarks->RemoveItem(loc);
         this->Script("destroy %s", oldLmkWidget->GetWidgetName());
-//        oldLmkWidget->GetLookmark()->Delete();
         oldLmkWidget->Delete();
         oldLmkWidget = NULL;
-        lookmark->Delete();
-        lookmark = NULL; 
         }
       }
     }

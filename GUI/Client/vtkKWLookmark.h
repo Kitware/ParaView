@@ -54,21 +54,32 @@ public:
   // Create a Tk widget
   virtual void Create(vtkKWApplication *app);
 
-  // Description: 
-  // Methods that manipulate and query the underlying vtkKWWidgets that make the lookmark widget. 
-  // Would it be better to just provide other classes full access to the underlying widgets since
-  // do so for a few of them in the following section?
-  void SetLookmarkName(char *lmkName);
-  char *GetLookmarkName();
-  char *GetComments();
-  void SetComments(char *);
-  void SetDataset(char *);
-  // In a sense convert from a vtkKWIcon to a vtkPVCameraIcon:
-  void SetLookmarkImage(vtkKWIcon* icon);
+  // Description:
+  // The name of the lookmark. Always the same as the one displayed in the lookmark widget.
+  vtkGetStringMacro(Name);
+  vtkSetStringMacro(Name);
+
+  // Description:
+  // This is only allocated and written to right before a lookmark is about to be written to a lookmark file.
+  // The newlines contained herein are encoded to '~' before writing because they are lost when the ->SetObject(vtkPVLookmark) method is called
+  vtkGetStringMacro(Comments);
+  vtkSetStringMacro(Comments);
+
+  // Description:
+  // The full path to the lookmark's 'default dataset'. This is originally just set to the dataset from which the lookmark was created but can later be set to 
+  // a different one by turning 'Use default dataset' option OFF in the loookmark manager and setting the 'use as default dataset' option in the dialog box
+  vtkGetStringMacro(Dataset);
+  vtkSetStringMacro(Dataset);
+
+  // Description:
+  // Access to the state of the checkbutton
   void SetSelectionState(int state);
   int GetSelectionState();
 
   vtkGetObjectMacro(LmkMainFrame,vtkKWFrameLabeled);
+
+  // Description:
+  // Made available for vtkPVLookmarkManager's management of drag-and-drop targets
   vtkGetObjectMacro(SeparatorFrame,vtkKWFrame);
 
 //  void DragAndDropStartCallback(int x, int y);
@@ -78,17 +89,12 @@ public:
   vtkGetObjectMacro(LmkIcon,vtkKWLabel);
 
   // Description:
-  // The value represents this lookmark widget's packing location among sibling lmk widgets and lmk containers.
-  // Used for moving widget.
-  vtkGetMacro(Location,int);
-  vtkSetMacro(Location,int);
-
-  // Description:
   // If TRUE, use the default dataset when loading lookmark, else use the currently selected one in source list
   int IsLockedToDataset();
   
   // Description:
-  // Callback to double-clicking the lookmark widget label. Pressing 'Return' then calls ChangeLookmarkName
+  // When EditLookmarkCallback is called, an editable text widget appears in place of the label and contains the old name.
+  // The user edits this as appropriate and pressing 'Return' then calls ChangeLookmarkName
   void EditLookmarkCallback();
   void ChangeLookmarkName();
 
@@ -99,6 +105,18 @@ public:
 
   void DragAndDropPerformCommand(int x, int y, vtkKWWidget *widget, vtkKWWidget *anchor);
   void RemoveDragAndDropTargetCues();
+
+  vtkSetMacro(PixelSize,int);
+  vtkGetMacro(PixelSize,int);
+  vtkSetMacro(Width,int);
+  vtkGetMacro(Width,int);
+  vtkSetMacro(Height,int);
+  vtkGetMacro(Height,int);
+
+  // Description:
+  // Uses the name and comments widget values (which may have been modified) to initialize LookmarkName and Comments variables
+  void UpdateVariableValues();
+  void UpdateWidgetValues();
 
   virtual void UpdateEnableState();
 
@@ -121,10 +139,13 @@ protected:
   vtkKWFrame *SeparatorFrame;
   vtkKWCheckButton *Checkbox;
 
-  int Location;
+  char* Dataset;
+  char* Name;
+  char* Comments;
   int Width;
   int Height;
-  char *Dataset;
+  int PixelSize;
+
   int SelectionFlag;
 
 private:

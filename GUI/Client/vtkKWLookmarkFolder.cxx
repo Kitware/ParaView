@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.7");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.8");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -50,11 +50,6 @@ vtkKWLookmarkFolder::vtkKWLookmarkFolder()
   this->NestedSeparatorFrame = vtkKWFrame::New();
   this->NameField = vtkKWText::New();
   this->Checkbox = vtkKWCheckButton::New();
-
-  this->GetDragAndDropTargetSet()->SetStartCommand(
-    this, "DragAndDropStartCallback");
-  this->GetDragAndDropTargetSet()->SetEndCommand(
-    this, "DragAndDropEndCallback");
 }
 
 //----------------------------------------------------------------------------
@@ -141,6 +136,10 @@ void vtkKWLookmarkFolder::Create(vtkKWApplication *app)
 //  this->LabelFrame->GetLabel()->SetBind(this, "<Double-1>", "EditCallback");
   this->Script("pack %s -fill x -expand t -side left", this->LabelFrame->GetWidgetName());
 
+  this->GetDragAndDropTargetSet()->SetStartCommand(
+    this, "DragAndDropStartCallback");
+  this->GetDragAndDropTargetSet()->SetEndCommand(
+    this, "DragAndDropEndCallback");
   this->GetDragAndDropTargetSet()->SetSourceAnchor(
     this->LabelFrame->GetLabel());
 
@@ -336,7 +335,13 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
   vtkKWLookmark *lmkWidget;
   vtkKWLookmarkFolder *lmkFolder;
 
-  if(widget->IsA("vtkKWLookmark") && widget->IsPacked())
+ 
+  if(!widget)
+    {
+    return;
+    }
+
+  if( widget->IsA("vtkKWLookmark") && widget->IsPacked())
     {
     lmkWidget = vtkKWLookmark::SafeDownCast(widget);
     if(lmkWidget)
@@ -350,7 +355,7 @@ void vtkKWLookmarkFolder::ToggleNestedLabels(vtkKWWidget *widget, int onoff)
       anchor->SetBackgroundColor(fr, fg, fb);
       }
     }
-  else if(widget->IsA("vtkKWLookmarkFolder") && widget->IsPacked())
+  else if( widget->IsA("vtkKWLookmarkFolder") && widget->IsPacked())
     {
     lmkFolder = vtkKWLookmarkFolder::SafeDownCast(widget);
     if(lmkFolder)

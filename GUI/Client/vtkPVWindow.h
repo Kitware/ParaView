@@ -530,9 +530,7 @@ public:
   vtkSetMacro(SaveVisibleSourcesOnlyFlag,int);
 
 #ifdef PARAVIEW_USE_LOOKMARKS
-  //BTX
   vtkGetObjectMacro(PVLookmarkManager, vtkPVLookmarkManager);
-  //ETX
 #endif
 
   // Description:
@@ -758,13 +756,13 @@ protected:
 
   vtkPVTraceHelper* TraceHelper;
 
-private:
-
   int SaveVisibleSourcesOnlyFlag;
 
 #ifdef PARAVIEW_USE_LOOKMARKS
   vtkPVLookmarkManager *PVLookmarkManager;
 #endif
+
+private:
 
   vtkPVWindow(const vtkPVWindow&); // Not implemented
   void operator=(const vtkPVWindow&); // Not implemented
