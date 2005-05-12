@@ -87,7 +87,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.31");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.32");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -281,46 +281,6 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   this->ResetCameraButton = NULL;
 }
 
-
-//----------------------------------------------------------------------------
-// Legacy for old scripts.
-void vtkPVDisplayGUI::SetVisibility(int v)
-{
-  this->PVSource->SetVisibility(v);
-}
-void vtkPVDisplayGUI::SetCubeAxesVisibility(int v)
-{
-  this->PVSource->SetCubeAxesVisibility(v);
-}
-void vtkPVDisplayGUI::SetPointLabelVisibility(int v)
-{
-  this->PVSource->SetPointLabelVisibility(v);
-}
-void vtkPVDisplayGUI::SetScalarBarVisibility(int v)
-{
-  if (this->PVSource && this->PVSource->GetPVColorMap())
-    {
-    this->PVSource->GetPVColorMap()->SetScalarBarVisibility(v);
-    }
-}
-vtkPVColorMap* vtkPVDisplayGUI::GetPVColorMap()
-{
-  if (this->PVSource)
-    {
-    return this->PVSource->GetPVColorMap();
-    }
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDisplayGUI::Close()
-{
-  if (this->VolumeAppearanceEditor)
-    {
-    this->VolumeAppearanceEditor->Close();
-    }
-}
-
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::SetVolumeAppearanceEditor(vtkPVVolumeAppearanceEditor *appearanceEditor)
 {
@@ -342,6 +302,14 @@ void vtkPVDisplayGUI::SetVolumeAppearanceEditor(vtkPVVolumeAppearanceEditor *app
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::Close()
+{
+  if (this->VolumeAppearanceEditor)
+    {
+    this->VolumeAppearanceEditor->Close();
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::DeleteCallback()
@@ -2543,4 +2511,38 @@ void vtkPVDisplayGUI::UpdateEnableState()
     }
   
 }
+
+#ifndef VTK_LEGACY_REMOVE
+//----------------------------------------------------------------------------
+// Legacy for old scripts.
+void vtkPVDisplayGUI::SetVisibility(int v)
+{
+  this->PVSource->SetVisibility(v);
+}
+void vtkPVDisplayGUI::SetCubeAxesVisibility(int v)
+{
+  this->PVSource->SetCubeAxesVisibility(v);
+}
+void vtkPVDisplayGUI::SetPointLabelVisibility(int v)
+{
+  this->PVSource->SetPointLabelVisibility(v);
+}
+void vtkPVDisplayGUI::SetScalarBarVisibility(int v)
+{
+  if (this->PVSource && this->PVSource->GetPVColorMap())
+    {
+    this->PVSource->GetPVColorMap()->SetScalarBarVisibility(v);
+    }
+}
+vtkPVColorMap* vtkPVDisplayGUI::GetPVColorMap()
+{
+  if (this->PVSource)
+    {
+    return this->PVSource->GetPVColorMap();
+    }
+  return 0;
+}
+#endif
+
+
 

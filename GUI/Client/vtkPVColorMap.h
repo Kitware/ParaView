@@ -92,13 +92,6 @@ public:
   const char* GetScalarBarLabelFormat();
 
   // Description:
-  // Just like in vtk data objects, this method makes a data object
-  // that is of the same type as the original.  It is used for creating
-  // the output pvData in pvDataSetToDataSetFilters.
-  virtual vtkPVColorMap *MakeObject()
-    { vtkErrorMacro("No MakeObject"); return NULL;}
-      
-  // Description:
   // This method should be called immediately after the object is constructed.
   // It create VTK objects which have to exist on all processes.
   void CreateParallelTclObjects(vtkPVApplication *pvApp);

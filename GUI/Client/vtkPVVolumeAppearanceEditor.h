@@ -43,13 +43,6 @@ public:
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Just like in vtk data objects, this method makes a data object
-  // that is of the same type as the original.  It is used for creating
-  // the output pvData in pvDataSetToDataSetFilters.
-  virtual vtkPVVolumeAppearanceEditor *MakeObject()
-    { vtkErrorMacro("No MakeObject"); return NULL;}
-      
-  // Description:
   // This method returns the user to the source page.
   // I would eventually like to replace this by 
   // a more general back/forward ParaView navigation.

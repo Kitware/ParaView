@@ -58,12 +58,10 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
-  //BTX
   // Description:
   // Called when the Accept button is pressed. It moves the widget state to
   // the SM property.
   virtual void Accept();
-  //ETX
 
   // Description:
   // This method resets the widget values from the VTK filter.
@@ -79,6 +77,8 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  void PartSelectionCallback();
+
 protected:
   vtkPVExtractPartsWidget();
   ~vtkPVExtractPartsWidget();

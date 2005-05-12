@@ -24,6 +24,7 @@
 
 
 #include "vtkPVTracedWidget.h"
+
 class vtkCollection;
 class vtkKWBoundsDisplay;
 class vtkKWChangeColorButton;
@@ -47,7 +48,6 @@ class vtkPVVolumeAppearanceEditor;
 class vtkPVColorSelectionWidget;
 
 // Try to eliminate this !!!!
-class vtkData;
 class vtkPVColorMap;
 
 class VTK_EXPORT vtkPVDisplayGUI : public vtkPVTracedWidget
@@ -58,19 +58,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // Leagacy method for old scripts.
-  void SetVisibility(int v);
-  void SetCubeAxesVisibility(int v);
-  void SetPointLabelVisibility(int v);
-  void SetScalarBarVisibility(int v);
-  vtkPVColorMap* GetPVColorMap();
-  void Close();
-  
+  // Legacy method for old scripts.
+  VTK_LEGACY(void SetVisibility(int v));
+  VTK_LEGACY(void SetCubeAxesVisibility(int v));
+  VTK_LEGACY(void SetPointLabelVisibility(int v));
+  VTK_LEGACY(void SetScalarBarVisibility(int v));
+  VTK_LEGACY(vtkPVColorMap* GetPVColorMap());
+
   // Description:
-  // Just like in vtk data objects, this method makes a data object
-  // that is of the same type as the original.  It is used for creating
-  // the output pvData in pvDataSetToDataSetFilters.
-  virtual vtkPVDisplayGUI *MakeObject(){vtkErrorMacro("No MakeObject");return NULL;}
+  // Properly close tk widget
+  void Close();
   
   // Description:
   // This is set when the source is selected as the current source.

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.27");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.28");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -99,19 +99,29 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
                this->AllOffButton->GetWidgetName());
 
   this->PartSelectionList->SetParent(this);
+  this->PartSelectionList->Create(app, "");
+  this->PartSelectionList->SetSingleClickCallback(this, "PartSelectionCallback");
   this->PartSelectionList->ScrollbarOff();
-  this->PartSelectionList->Create(app, "-selectmode extended");
+  this->PartSelectionList->GetListbox()->
+    ConfigureOptions("-selectmode extended -exportselection 0");
+  this->PartSelectionList->SetSelectState(0,1); //By default take first one
   this->PartSelectionList->SetHeight(0);
   // I assume we need focus for control and alt modifiers.
-  this->Script("bind %s <Enter> {focus %s}",
-               this->PartSelectionList->GetWidgetName(),
-               this->PartSelectionList->GetWidgetName());
+//  this->Script("bind %s <Enter> {focus %s}",
+//               this->PartSelectionList->GetWidgetName(),
+//               this->PartSelectionList->GetWidgetName());
 
   this->Script("pack %s -side top -fill both -expand t",
                this->PartSelectionList->GetWidgetName());
 
   // There is no current way to get a modified call back, so assume
   // the user will change the list.  This widget will only be used once anyway.
+  //this->ModifiedCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVExtractPartsWidget::PartSelectionCallback()
+{
   this->ModifiedCallback();
 }
 
@@ -206,7 +216,7 @@ void vtkPVExtractPartsWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVExtractPartsWidget::CommonInit()
 {
-    vtkPVSource *input;
+  vtkPVSource *input;
   vtkSMPart *part;
   int num, idx;
 
@@ -234,8 +244,6 @@ void vtkPVExtractPartsWidget::CommonInit()
     this->PartSelectionList->SetSelectState(
       idx, ivp->GetElement(idx));
     }
-
-
 }
 
 //----------------------------------------------------------------------------
