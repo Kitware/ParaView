@@ -39,7 +39,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkCaveRenderManager, "1.2");
+vtkCxxRevisionMacro(vtkCaveRenderManager, "1.2.4.1");
 vtkStandardNewMacro(vtkCaveRenderManager);
 
 // Structures to communicate render info.
@@ -428,7 +428,7 @@ void vtkCaveRenderManager::DefineDisplayRMI()
                            vtkCaveRenderManager::DEFINE_DISPLAY_INFO_TAG);
     if (info.DisplayIndex != 0)
       { // Pass display info to appropriate satellite.
-      this->Controller->TriggerRMI(1, NULL, 0, 
+      this->Controller->TriggerRMI(static_cast<int>(info.DisplayIndex), NULL, 0, 
                        vtkCaveRenderManager::DEFINE_DISPLAY_RMI_TAG);
       this->Controller->Send((double*)(&info), 
                        sizeof(vtkPVCaveDisplayInfo)/sizeof(double), 

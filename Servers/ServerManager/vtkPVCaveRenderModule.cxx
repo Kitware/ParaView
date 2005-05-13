@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCaveRenderModule);
-vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.7.2.2");
+vtkCxxRevisionMacro(vtkPVCaveRenderModule, "1.7.2.3");
 
 
 
@@ -177,14 +177,16 @@ void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
   vtkCaveRenderManager* crm = 
     vtkCaveRenderManager::SafeDownCast(this->ProcessModule->GetObjectFromID(this->CompositeID));
 
+  vtkClientServerStream stream;
+
   for (idx = 0; idx < numDisplays; ++idx)
     { // Just a test case.  Configuration file later.
-    char displayName[256];
+    char line[256];
     double o[3];
     double x[3];
     double y[3];
 
-    File->getline(displayName,256);
+    File->getline(line,256);
     if (File->fail())
       {
       File->close();
@@ -192,19 +194,22 @@ void vtkPVCaveRenderModule::LoadConfigurationFile(int numDisplays)
       vtkErrorMacro(<< "Could not read display " << idx);
       return;
       }
-    this->ProcessModule->SetProcessEnvironmentVariable(idx, displayName); 
 
-    *File >> o[0];
-    *File >> o[1];
-    *File >> o[2];
-
-    *File >> x[0];
-    *File >> x[1];
-    *File >> x[2];
-
-    *File >> y[0];
-    *File >> y[1];
-    *File >> y[2];
+    stream << vtkClientServerStream::Invoke
+           << this->ProcessModule->GetProcessModuleID()
+           << "SetProcessEnvironmentVariable"
+           << idx << line
+           << vtkClientServerStream::End;
+    this->ProcessModule->SendStream(vtkProcessModule::RENDER_SERVER, stream);
+     
+    File->getline(line,256);
+    sscanf(line, "%lf %lf %lf",o , o+1, o+2);
+ 
+    File->getline(line,256);
+    sscanf(line, "%lf %lf %lf",x , x+1, x+2);
+ 
+    File->getline(line,256);
+    sscanf(line, "%lf %lf %lf",y , y+1, y+2);
 
     if (File->fail())
       {
