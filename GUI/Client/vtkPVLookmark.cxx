@@ -67,7 +67,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.3");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -467,7 +467,8 @@ char *vtkPVLookmark::GetEncodedImageData(vtkKWIcon *icon)
 {
   const unsigned char *imageData = icon->GetData();
   int imageSize = this->Width*this->Height*this->PixelSize;
-  unsigned char *encodedImageData = new unsigned char[1.5*imageSize];
+  int encodedImageSize = imageSize*1.5;
+  unsigned char *encodedImageData = new unsigned char[encodedImageSize];
   vtkBase64Utilities *encoder = vtkBase64Utilities::New();
   unsigned long size = encoder->Encode(imageData,imageSize,encodedImageData);
   encodedImageData[size] = '\0';

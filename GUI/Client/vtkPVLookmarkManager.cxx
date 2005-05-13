@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.25");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.26");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -1052,7 +1052,6 @@ int vtkPVLookmarkManager::DragAndDropWidget(vtkKWWidget *widget,vtkKWWidget *Aft
   vtkKWLookmarkFolder *lmkFolder;
   vtkKWWidget *dstPrnt;
   vtkIdType loc;
-  int ret = 0;
 
   if((lmkWidget = vtkPVLookmark::SafeDownCast(widget)))
     {
