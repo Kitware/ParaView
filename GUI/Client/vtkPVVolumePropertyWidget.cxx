@@ -20,11 +20,12 @@
 #include "vtkPVDataSetAttributesInformation.h"
 
 vtkStandardNewMacro(vtkPVVolumePropertyWidget);
-vtkCxxRevisionMacro(vtkPVVolumePropertyWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVVolumePropertyWidget, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVVolumePropertyWidget, DataInformation,
                      vtkPVDataInformation);
 
+// ---------------------------------------------------------------------------
 vtkPVVolumePropertyWidget::vtkPVVolumePropertyWidget()
 {
   this->DataInformation = NULL;
@@ -116,23 +117,6 @@ int vtkPVVolumePropertyWidget::GetDataSetAdjustedScalarRange(
       {
       vtkPVArrayInformation *arrayInfo = pdInfo->GetArrayInformation (this->ArrayName);
       arrayInfo->GetComponentRange (comp, range);
-      switch( arrayInfo->GetDataType() )
-        {
-        case VTK_UNSIGNED_CHAR:
-          arrayInfo->GetDataTypeRange(range);
-          break;
-        case VTK_UNSIGNED_SHORT:
-          if( range[1] <= 4095.0 )
-            {
-            arrayInfo->GetDataTypeRange(range);
-            range[1] = 4095.0;
-            }
-          else
-            {
-            arrayInfo->GetDataTypeRange(range);
-            }
-          break;
-        }
       return 1;
       }
     }
