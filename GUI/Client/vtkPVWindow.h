@@ -529,9 +529,11 @@ public:
   // When on and SaveState() is called, only sources that "contribute to the view" are saved to the session script.
   vtkSetMacro(SaveVisibleSourcesOnlyFlag,int);
 
+//BTX
 #ifdef PARAVIEW_USE_LOOKMARKS
   vtkGetObjectMacro(PVLookmarkManager, vtkPVLookmarkManager);
 #endif
+//ETX
 
   // Description:
   // Method to change toolbar state in tcl scripts.
