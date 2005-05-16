@@ -26,7 +26,7 @@
 TAG="ParaView-2-0-1"
 VERSION="2.0.1"
 PARAVIEW_VERSION="2.0"
-RELEASE="1"
+RELEASE="2"
 
 # Project configuration.
 PROJECT="paraview"
