@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.26");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.27");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -1023,11 +1023,7 @@ void vtkPVLookmarkManager::DragAndDropEndCommand( int vtkNotUsed(x), int vtkNotU
   this->PVLookmarks->GetItem(0,lmkWidget);
   if(lmkWidget)
     {
-    this->GetPVApplication()->GetMainView()->ForceRender();
-    lmkWidget->GetLmkMainFrame()->PerformShowHideFrame();
-    this->GetPVApplication()->GetMainView()->ForceRender();
-    lmkWidget->GetLmkMainFrame()->PerformShowHideFrame();
-    this->GetPVApplication()->GetMainView()->ForceRender();
+    lmkWidget->EnableScrollBar();
     }
 }
 
@@ -2879,5 +2875,7 @@ void vtkPVLookmarkManager::UpdateEnableState()
 void vtkPVLookmarkManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "Title: " << (this->Title ? this->Title : "(none)") << endl;
 }
 

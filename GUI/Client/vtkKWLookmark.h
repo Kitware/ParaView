@@ -76,17 +76,9 @@ public:
   void SetSelectionState(int state);
   int GetSelectionState();
 
-  vtkGetObjectMacro(LmkMainFrame,vtkKWFrameLabeled);
-
   // Description:
   // Made available for vtkPVLookmarkManager's management of drag-and-drop targets
   vtkGetObjectMacro(SeparatorFrame,vtkKWFrame);
-
-//  void DragAndDropStartCallback(int x, int y);
-//  void DragAndDropEndCallback(int x, int y);
-
-  // Set/Get methods called from vtkPVLookmarkManager
-  vtkGetObjectMacro(LmkIcon,vtkKWLabel);
 
   // Description:
   // If TRUE, use the default dataset when loading lookmark, else use the currently selected one in source list

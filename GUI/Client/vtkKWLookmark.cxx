@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.7");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.8");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -409,7 +409,11 @@ void vtkKWLookmark::Pack()
 void vtkKWLookmark::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "SeparatorFrame: " << this->SeparatorFrame << endl;
-  os << indent << "LmkMainFrame: " << this->LmkMainFrame << endl;
-  os << indent << "LmkIcon: " << this->LmkIcon << endl;
+  os << indent << "Name: " << this->GetName() << endl;
+  os << indent << "Comments: " << this->GetComments() << endl;
+  os << indent << "Dataset: " << this->GetDataset() << endl;
+  os << indent << "Width: " << this->GetWidth() << endl;
+  os << indent << "Height: " << this->GetHeight() << endl;
+  os << indent << "PixelSize: " << this->GetPixelSize() << endl;
+  os << indent << "SeparatorFrame: " << this->GetSeparatorFrame() << endl;
 }

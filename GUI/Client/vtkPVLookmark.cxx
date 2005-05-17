@@ -67,7 +67,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVLookmark );
-vtkCxxRevisionMacro(vtkPVLookmark, "1.4");
+vtkCxxRevisionMacro(vtkPVLookmark, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVLookmark::vtkPVLookmark()
@@ -467,7 +467,7 @@ char *vtkPVLookmark::GetEncodedImageData(vtkKWIcon *icon)
 {
   const unsigned char *imageData = icon->GetData();
   int imageSize = this->Width*this->Height*this->PixelSize;
-  int encodedImageSize = imageSize*1.5;
+  int encodedImageSize = imageSize*2;
   unsigned char *encodedImageData = new unsigned char[encodedImageSize];
   vtkBase64Utilities *encoder = vtkBase64Utilities::New();
   unsigned long size = encoder->Encode(imageData,imageSize,encodedImageData);
@@ -1230,4 +1230,5 @@ void vtkPVLookmark::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ImageData: " << this->GetImageData() << endl;
   os << indent << "CenterOfRotation: " << this->GetCenterOfRotation() << endl;
   os << indent << "Dataset: " << this->GetDataset() << endl;
+  os << indent << "Location: " << this->GetLocation() << endl;
 }
