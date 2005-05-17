@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.704");
+vtkCxxRevisionMacro(vtkPVWindow, "1.705");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2064,7 +2064,7 @@ void vtkPVWindow::OpenCallback()
   loadDialog->Create(this->GetApplication(),0);
   loadDialog->SetParent(this);
   loadDialog->SetTitle("Open ParaView File");
-  loadDialog->SetDefaultExtension(".vtp");
+
   loadDialog->SetFileTypes(str.str());
   str.rdbuf()->freeze(0);  
   int enabled = this->GetEnabled();
