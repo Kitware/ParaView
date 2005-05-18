@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.354");
+vtkCxxRevisionMacro(vtkPVApplication, "1.355");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -894,7 +894,7 @@ int vtkPVApplication::CheckForTraceFile(char* name, unsigned int maxlen)
 void vtkPVApplication::SaveTraceFile(const char* fname)
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
-  this->GetMainWindow()->RetrieveLastPath(exportDialog, "SaveTracePath");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveTracePath");
   exportDialog->SetParent(this->GetMainWindow());
   exportDialog->Create(this, 0);
   exportDialog->SaveDialogOn();
@@ -914,7 +914,7 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
       }
     else
       {
-      this->GetMainWindow()->SaveLastPath(exportDialog, "SaveTracePath");
+      this->SaveDialogLastPathRegistryValue(exportDialog, "SaveTracePath");
       }
     }
   exportDialog->Delete();

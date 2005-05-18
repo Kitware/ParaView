@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.706");
+vtkCxxRevisionMacro(vtkPVWindow, "1.707");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2057,7 +2057,7 @@ void vtkPVWindow::OpenCallback()
       << this->FileDescriptions << " {{All Files} {*}}" << ends;
 
   vtkKWLoadSaveDialog* loadDialog = this->GetPVApplication()->NewLoadSaveDialog();
-  this->RetrieveLastPath(loadDialog, "OpenPath");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(loadDialog, "OpenPath");
   loadDialog->Create(this->GetApplication(),0);
   loadDialog->SetParent(this);
   loadDialog->SetTitle("Open ParaView File");
@@ -2078,7 +2078,7 @@ void vtkPVWindow::OpenCallback()
     {
     if  (this->Open(openFileName, 1) == VTK_OK)
       {
-      this->SaveLastPath(loadDialog, "OpenPath");
+      this->GetApplication()->SaveDialogLastPathRegistryValue(loadDialog, "OpenPath");
       }
     }
   
@@ -2536,7 +2536,7 @@ void vtkPVWindow::WriteData()
   
   vtkKWLoadSaveDialog* saveDialog = this->GetPVApplication()->NewLoadSaveDialog();
   
-  this->RetrieveLastPath(saveDialog, "SaveDataFile");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(saveDialog, "SaveDataFile");
   saveDialog->SaveDialogOn();
   saveDialog->SetParent(this);
   saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
@@ -2588,7 +2588,7 @@ void vtkPVWindow::WriteData()
   
     // Write the file.
     this->WriteVTKFile(filename, ghostLevel, timeSeries);
-    this->SaveLastPath(saveDialog, "SaveDataFile");
+    this->GetApplication()->SaveDialogLastPathRegistryValue(saveDialog, "SaveDataFile");
     }
   this->SetEnabled(enabled);
   saveDialog->Delete();
@@ -2653,7 +2653,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
 void vtkPVWindow::SaveSMState()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
-  this->RetrieveLastPath(exportDialog, "SaveSMStatePath");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveSMStatePath");
   exportDialog->SetParent(this);
   exportDialog->Create(this->GetApplication(),0);
   exportDialog->SaveDialogOn();
@@ -2667,7 +2667,7 @@ void vtkPVWindow::SaveSMState()
        strlen(exportDialog->GetFileName())>0)
     {
     this->SaveSMState(exportDialog->GetFileName());
-    this->SaveLastPath(exportDialog, "SaveSMStatePath");
+    this->GetApplication()->SaveDialogLastPathRegistryValue(exportDialog, "SaveSMStatePath");
     }
   this->SetEnabled(enabled);
   exportDialog->Delete();
@@ -2684,7 +2684,7 @@ void vtkPVWindow::SaveSMState(const char *filename)
 void vtkPVWindow::SaveBatchScript()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
-  this->RetrieveLastPath(exportDialog, "SaveBatchLastPath");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveBatchLastPath");
   exportDialog->SetParent(this);
   exportDialog->Create(this->GetApplication(),0);
   exportDialog->SaveDialogOn();
@@ -2698,7 +2698,7 @@ void vtkPVWindow::SaveBatchScript()
        strlen(exportDialog->GetFileName())>0)
     {
     this->SaveBatchScript(exportDialog->GetFileName());
-    this->SaveLastPath(exportDialog, "SaveBatchLastPath");
+    this->GetApplication()->SaveDialogLastPathRegistryValue(exportDialog, "SaveBatchLastPath");
     }
   this->SetEnabled(enabled);
   exportDialog->Delete();
@@ -3037,7 +3037,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 void vtkPVWindow::SaveState()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
-  this->RetrieveLastPath(exportDialog, "SaveStateLastPath");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveStateLastPath");
   exportDialog->SetParent(this);
   exportDialog->Create(this->GetApplication(),0);
   exportDialog->SaveDialogOn();
@@ -3051,7 +3051,7 @@ void vtkPVWindow::SaveState()
        strlen(exportDialog->GetFileName())>0)
     {
     this->SaveState(exportDialog->GetFileName());
-    this->SaveLastPath(exportDialog, "SaveStateLastPath");
+    this->GetApplication()->SaveDialogLastPathRegistryValue(exportDialog, "SaveStateLastPath");
     }
   this->SetEnabled(enabled);
   exportDialog->Delete();
@@ -3943,7 +3943,7 @@ void vtkPVWindow::CreateErrorLogDisplay()
 void vtkPVWindow::SaveTrace()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
-  this->RetrieveLastPath(exportDialog, "SaveTracePath");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(exportDialog, "SaveTracePath");
   exportDialog->SetParent(this);
   exportDialog->Create(this->GetApplication(),0);
   exportDialog->SaveDialogOn();
@@ -3957,7 +3957,7 @@ void vtkPVWindow::SaveTrace()
        strlen(exportDialog->GetFileName())>0 &&
        this->SaveTrace(exportDialog->GetFileName()) )
     {
-    this->SaveLastPath(exportDialog, "SaveTracePath");
+    this->GetApplication()->SaveDialogLastPathRegistryValue(exportDialog, "SaveTracePath");
     }
   this->SetEnabled(enabled);
   exportDialog->Delete();
@@ -4146,7 +4146,7 @@ int vtkPVWindow::OpenPackage()
 {
   int res = 0;
   vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
-  this->RetrieveLastPath(loadDialog, "PackagePath");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(loadDialog, "PackagePath");
   loadDialog->SetParent(this);
   loadDialog->Create(this->GetApplication(),0);
   loadDialog->SetTitle("Open ParaView Package");
@@ -4156,7 +4156,7 @@ int vtkPVWindow::OpenPackage()
   this->SetEnabled(0);
   if ( loadDialog->Invoke() && this->OpenPackage(loadDialog->GetFileName()) )
     {
-    this->SaveLastPath(loadDialog, "PackagePath");
+    this->GetApplication()->SaveDialogLastPathRegistryValue(loadDialog, "PackagePath");
     res = 1;
     }
   this->SetEnabled(enabled);

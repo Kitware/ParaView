@@ -28,6 +28,7 @@
 #include "vtkOutputWindow.h"
 #include "vtkKWText.h"
 #include "vtkTclUtil.h"
+#include "vtkKWLoadSaveDialog.h"
 
 #include <stdarg.h>
 
@@ -55,7 +56,7 @@ EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.201");
+vtkCxxRevisionMacro(vtkKWApplication, "1.202");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -967,6 +968,62 @@ int vtkKWApplication::GetBooleanRegistryValue(
       }
     }
   return allset;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::SaveColorRegistryValue(
+  int level, const char* key, double rgb[3])
+{
+  this->SetRegistryValue(
+    level, "Colors", key, "Color: %lf %lf %lf", rgb[0], rgb[1], rgb[2]);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::RetrieveColorRegistryValue(
+  int level, const char* key, double rgb[3])
+{
+  char buffer[1024];
+  rgb[0] = -1;
+  rgb[1] = -1;
+  rgb[2] = -1;
+
+  int ok = 0;
+  if (this->GetRegistryValue(
+        level, "Colors", key, buffer) )
+    {
+    if (*buffer)
+      {      
+      sscanf(buffer, "Color: %lf %lf %lf", rgb, rgb+1, rgb+2);
+      ok = 1;
+      }
+    }
+  return ok;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::SaveDialogLastPathRegistryValue(
+  vtkKWLoadSaveDialog *dialog, const char* key)
+{
+  if (dialog && dialog->GetLastPath())
+    {
+    this->GetApplication()->SetRegistryValue(
+      1, "RunTime", key, dialog->GetLastPath());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::RetrieveDialogLastPathRegistryValue(
+  vtkKWLoadSaveDialog *dialog, const char* key)
+{
+  if (dialog)
+    {
+    char buffer[1024];
+    if (this->GetApplication()->GetRegistryValue(1, "RunTime", key, buffer) &&
+        *buffer)
+      {
+      dialog->SetLastPath(buffer);
+      }  
+    }
 }
 
 //----------------------------------------------------------------------------

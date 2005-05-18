@@ -156,6 +156,13 @@ public:
   int GetHelpMenuInsertPosition();
 
   // Description:
+  // Does the window support help (if false, no help entries 
+  // should be added to the  menus)
+  vtkSetClampMacro(SupportHelp, int, 0, 1);
+  vtkGetMacro(SupportHelp, int);
+  vtkBooleanMacro(SupportHelp, int);
+
+  // Description:
   // Insert a "Recent Files" sub-menu to the File menu at position 'pos'
   // and fill it with the most recent files stored in the registry.
   // The 'target' parameter is the object against which the command
@@ -177,7 +184,8 @@ public:
     const char *filename, vtkKWObject *target, const char *command);
   
   // Description:
-  // Will the window add print entries in the file menu?
+  // Does the window support print (if false, no print entries 
+  // should be added to the  menus)
   vtkSetClampMacro(SupportPrint, int, 0, 1);
   vtkGetMacro(SupportPrint, int);
   vtkBooleanMacro(SupportPrint, int);
@@ -213,42 +221,22 @@ public:
   void ToggleToolbarVisibility(int id, const char* name);
   
   // Description:
-  // The status frame.
+  // Get the status frame object.
   vtkGetObjectMacro(StatusFrame, vtkKWFrame);
 
   // Description:
   // Get the progress gauge widget.  The progress gauge is displayed
-  // in the Status frame on the bottom right of the window.
+  // in the Status frame on the bottom right corner of the window.
   vtkGetObjectMacro(ProgressGauge, vtkKWProgressGauge);
  
-  // Description:
-  // Will the window add a help menu?
-  vtkSetClampMacro( SupportHelp, int, 0, 1 );
-  vtkGetMacro( SupportHelp, int );
-  vtkBooleanMacro( SupportHelp, int );
-
   // Description:
   // Get title of window.
   // Override superclass to use app name if the title was not set
   virtual char* GetTitle();
 
   // Description:
-  // Call render on all views
+  // Call render on all widgets and elements that support that functionality
   virtual void Render();
-
-  // Description:
-  // Save or retrieve color from registry. If color does not 
-  // exist, it will retrieve -1, -1 ,-1 and return 0 (1 if success).
-  void SaveColor(int level, const char*, float rgb[3]);
-  void SaveColor(int level, const char*, double rgb[3]);
-  int RetrieveColor(int level, const char*, float rgb[3]);
-  int RetrieveColor(int level, const char*, double rgb[3]);
-
-  // Description:
-  // Save or retrieve the last path of the dialog to the registry.
-  // The string argument is the registry key.
-  void SaveLastPath(vtkKWLoadSaveDialog *, const char*);
-  void RetrieveLastPath(vtkKWLoadSaveDialog *, const char*);
 
   // Description:
   // Get the User Interface Manager.
@@ -262,16 +250,6 @@ public:
   // Description:
   // Access to the Tcl interactor.
   vtkGetObjectMacro(TclInteractor, vtkKWTclInteractor);
-
-  // Description:
-  // Check if the application needs to abort.
-  virtual int CheckForOtherAbort() { return 0; }
-  
-  // Description:
-  // Static method that processes the event. First argument is  
-  // the calling object, second is event id, third is a pointer to
-  // the windows and last is the arguments of the event.
-  static void ProcessEvent(vtkObject *, unsigned long, void *, void *);
 
   // Description:
   // Update the UI. This will call:
@@ -331,11 +309,6 @@ protected:
   // Recent files
 
   vtkKWMostRecentFilesManager *MostRecentFilesManager;
-
-  // Description:
-  // Process events
-  virtual void InternalProcessEvent(
-    vtkObject *, unsigned long, float *, void *);
 
   // Description:
   // Save/Restore window geometry

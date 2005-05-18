@@ -39,7 +39,7 @@
 #define VTK_KW_SHOW_MAIN_PANEL_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.235");
+vtkCxxRevisionMacro(vtkKWWindow, "1.236");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -836,7 +836,7 @@ void vtkKWWindow::MainPanelVisibilityCallback()
 void vtkKWWindow::LoadScript()
 {
   vtkKWLoadSaveDialog* load_dialog = vtkKWLoadSaveDialog::New();
-  this->RetrieveLastPath(load_dialog, "LoadScriptLastPath");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(load_dialog, "LoadScriptLastPath");
   load_dialog->SetParent(this);
   load_dialog->Create(this->GetApplication(), NULL);
   load_dialog->SaveDialogOff();
@@ -864,7 +864,8 @@ void vtkKWWindow::LoadScript()
       }
     else
       {
-      this->SaveLastPath(load_dialog, "LoadScriptLastPath");
+      this->GetApplication()->SaveDialogLastPathRegistryValue(
+        load_dialog, "LoadScriptLastPath");
       this->LoadScript(load_dialog->GetFileName());
       }
     }
@@ -977,79 +978,6 @@ int vtkKWWindow::GetHelpMenuInsertPosition()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::SaveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
-{
-  //  "OpenDirectory"
-  if ( dialog->GetLastPath() )
-    {
-    this->GetApplication()->SetRegistryValue(
-      1, "RunTime", key, dialog->GetLastPath());
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::RetrieveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
-{
-  char buffer[1024];
-  if ( this->GetApplication()->GetRegistryValue(1, "RunTime", key, buffer) )
-    {
-    if ( *buffer )
-      {
-      dialog->SetLastPath( buffer );
-      }  
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::SaveColor(int level, const char* key, double rgb[3])
-{
-  this->GetApplication()->SetRegistryValue(
-    level, "Colors", key, "Color: %lf %lf %lf", rgb[0], rgb[1], rgb[2]);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::SaveColor(int level, const char* key, float rgb[3])
-{
-  double drgb[3];
-  drgb[0] = rgb[0];
-  drgb[1] = rgb[1];
-  drgb[2] = rgb[2];
-  this->SaveColor(level, key, drgb);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWindow::RetrieveColor(int level, const char* key, double rgb[3])
-{
-  char buffer[1024];
-  rgb[0] = -1;
-  rgb[1] = -1;
-  rgb[2] = -1;
-
-  int ok = 0;
-  if (this->GetApplication()->GetRegistryValue(
-        level, "Colors", key, buffer) )
-    {
-    if (*buffer)
-      {      
-      sscanf(buffer, "Color: %lf %lf %lf", rgb, rgb+1, rgb+2);
-      ok = 1;
-      }
-    }
-  return ok;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
-{
-  double drgb[3];
-  int res = this->RetrieveColor(level, key, drgb);
-  rgb[0] = drgb[0];
-  rgb[1] = drgb[1];
-  rgb[2] = drgb[2];
-  return res;
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWindow::WarningMessage(const char* message)
 {
   vtkKWMessageDialog::PopupMessage(
@@ -1133,28 +1061,6 @@ void vtkKWWindow::DisplayCommandPrompt()
     }
   
   this->TclInteractor->Display();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::ProcessEvent( vtkObject* object,
-                                unsigned long event, 
-                                void *clientdata, void *calldata)
-{   
-  float *fArgs = 0;
-  if (calldata)
-    {    
-    fArgs = reinterpret_cast<float *>(calldata);
-    }
-
-  vtkKWWindow *self = reinterpret_cast<vtkKWWindow *>(clientdata);
-  self->InternalProcessEvent(object, event, fArgs, calldata);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::InternalProcessEvent(vtkObject*, unsigned long, 
-                                       float *, void *)
-{
-  // No implementation
 }
 
 //----------------------------------------------------------------------------

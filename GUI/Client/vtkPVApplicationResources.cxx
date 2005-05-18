@@ -521,7 +521,7 @@ void vtkPVApplication::SaveRuntimeInformation()
 {
   vtkKWWindow *window = this->GetMainWindow();
   vtkKWLoadSaveDialog *dialog = vtkKWLoadSaveDialog::New();
-  window->RetrieveLastPath(dialog, "RuntimeInformationPath");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(dialog, "RuntimeInformationPath");
   dialog->SaveDialogOn();
   dialog->SetParent(this->AboutDialog);
   dialog->SetTitle("Save Runtime Information");
@@ -543,7 +543,7 @@ void vtkPVApplication::SaveRuntimeInformation()
     this->AddAboutText(file);
     file << endl;
     this->AddAboutCopyrights(file);
-    window->SaveLastPath(dialog, "RuntimeInformationPath");
+    this->GetApplication()->SaveDialogLastPathRegistryValue(dialog, "RuntimeInformationPath");
     }
   dialog->Delete();
 }

@@ -34,6 +34,7 @@ class vtkKWWidget;
 class vtkKWWindow;
 class vtkKWText;
 class vtkKWApplicationInternals;
+class vtkKWLoadSaveDialog;
 
 #define VTK_KW_EXIT_DIALOG_NAME                 "ExitApplication"
 
@@ -224,6 +225,25 @@ public:
   virtual int GetBooleanRegistryValue(
     int level, const char* subkey, const char* key, const char* trueval);
   
+  // Description:
+  // Convenience methods to save/retrieve color to/from the registry. 
+  // If the color does not exist, it will retrieve -1, -1 ,-1 and return 0
+  // (1 if success).
+  // Note that the subkey used here is "Colors".
+  virtual void SaveColorRegistryValue(
+    int level, const char *key, double rgb[3]);
+  virtual int RetrieveColorRegistryValue(
+    int level, const char *key, double rgb[3]);
+
+  // Description:
+  // Convenience methods to save/retrieve the last path of a dialog
+  // to/from the registry.
+  // Note that the subkey used here is "RunTime".
+  virtual void SaveDialogLastPathRegistryValue(
+    vtkKWLoadSaveDialog *dlg, const char *key);
+  virtual void RetrieveDialogLastPathRegistryValue(
+    vtkKWLoadSaveDialog *dlg, const char *key);
+
   // Descrition:
   // Get the application settings that are stored in the registry.
   // Do not call that method before the application name is known and the

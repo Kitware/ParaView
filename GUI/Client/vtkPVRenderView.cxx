@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.378");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.379");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -940,7 +940,7 @@ void vtkPVRenderView::CreateViewProperties()
   // I also think it belongs here.
   // Don't you think that save and retrieve color should really be in
   // the class vtkPVApplication?
-  pvwindow->RetrieveColor(2, "RenderViewBG", rgb); 
+  pvapp->RetrieveColorRegistryValue(2, "RenderViewBG", rgb); 
   if (rgb[0] == -1)
     {
     rgb[0] = 0.33;
@@ -1426,7 +1426,7 @@ void vtkPVRenderView::CreateViewProperties()
     "Choose the color of the outline for resizing the orientation axes.");
   if (pvapp && pvwindow)
     {
-    pvwindow->RetrieveColor(2, "OrientationAxesOutline", rgb);
+    pvapp->RetrieveColorRegistryValue(2, "OrientationAxesOutline", rgb);
     if (rgb[0] == -1)
       {
       rgb[0] = 1.0;
@@ -1453,7 +1453,7 @@ void vtkPVRenderView::CreateViewProperties()
     "Choose the color of the X, Y, Z labels of the orientation axes.");
   if (pvapp && pvwindow)
     {
-    pvwindow->RetrieveColor(2, "OrientationAxesText", rgb);
+    pvapp->RetrieveColorRegistryValue(2, "OrientationAxesText", rgb);
     if (rgb[0] == -1)
       {
       rgb[0] = 1.0;
@@ -1706,7 +1706,7 @@ void vtkPVRenderView::SetRendererBackgroundColor(double r, double g, double b)
   // the renderer was destructing before the vtkPVWindow.
   double rgb[3];
   rgb[0] = r; rgb[1] = g; rgb[2] = b;
-  this->GetPVWindow()->SaveColor(2, "RenderViewBG", rgb); 
+  this->GetApplication()->SaveColorRegistryValue(2, "RenderViewBG", rgb); 
  
   // Set the color of the interface button.
   this->RendererBackgroundColor->SetColor(r, g, b);
@@ -2788,8 +2788,8 @@ void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double 
   this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesOutlineColor %lf %lf %lf",
                       this->GetTclName(), r, g, b);
   this->OrientationAxes->SetOutlineColor(r, g, b);
-  this->GetPVWindow()->SaveColor(2, "OrientationAxesOutline",
-                                 this->OrientationAxes->GetOutlineColor());
+  this->GetApplication()->SaveColorRegistryValue(
+    2, "OrientationAxesOutline", this->OrientationAxes->GetOutlineColor());
 }
 
 //----------------------------------------------------------------------------
@@ -2803,8 +2803,8 @@ void vtkPVRenderView::SetOrientationAxesTextColor(double r, double g, double b)
   this->GetTraceHelper()->AddEntry("$kw(%s) SetOrientationAxesTextColor %lf %lf %lf",
                       this->GetTclName(), r, g, b);
   this->OrientationAxes->SetAxisLabelColor(r, g, b);
-  this->GetPVWindow()->SaveColor(2, "OrientationAxesText",
-                                 this->OrientationAxes->GetAxisLabelColor());
+  this->GetApplication()->SaveColorRegistryValue(
+    2, "OrientationAxesText", this->OrientationAxes->GetAxisLabelColor());
   this->EventuallyRender();
 }
 
