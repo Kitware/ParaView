@@ -36,14 +36,15 @@ class vtkKWToolbar;
 class vtkKWUserInterfaceManager;
 class vtkKWMostRecentFilesManager;
 
-#define VTK_KW_PAGE_SETUP_MENU_LABEL            "Page Setup"
-#define VTK_KW_RECENT_FILES_MENU_LABEL          "Open Recent File"
+#define VTK_KW_PRINT_OPTIONS_MENU_LABEL         "Print options..."
+#define VTK_KW_OPEN_RECENT_FILE_MENU_LABEL      "Open Recent File"
 
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY          "WindowGeometry"
-#define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY       "WindowFrame1Size"
+#define VTK_KW_MAIN_PANEL_SIZE_REG_KEY          "MainPanelSize"
 #define VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY "EnableGUIDragAndDrop"
 #define VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY       "ToolbarFlatFrame"
 #define VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY     "ToolbarFlatButtons"
+#define VTK_KW_PRINT_TARGET_DPI_REG_KEY         "PrintTargetDPI"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWTopLevel
 {
@@ -114,24 +115,22 @@ public:
   virtual void SetErrorIcon(int);
 
   // Description:
-  // The window is divided into two parts (1 and 2) by the MainSplitFrame.
+  // The window is divided into two parts by the MainSplitFrame.
   // The first part is called the "main panel" area, and it
   // can be hidden or shown by setting its visibility flag.
-  // A convenience method GetMainPanelFrame() can be used to retrive that
+  // A convenience method GetMainPanelFrame can be used to retrieve that
   // "main panel area".
   // The MainNotebook element is packed in the main panel and is used to
   // display interface elements organized as pages inside panels.
+  // The second part of the split frame is called the "view frame".
+  // A convenience method GetViewFrame can be used to retrieve a pointer to
+  // this large frame usually available for viewing. 
   vtkGetObjectMacro(MainSplitFrame, vtkKWSplitFrame);
   virtual vtkKWFrame* GetMainPanelFrame();
   virtual int GetMainPanelVisibility();
   virtual void SetMainPanelVisibility(int);
   vtkBooleanMacro(MainPanelVisibility, int );
   vtkGetObjectMacro(MainNotebook, vtkKWNotebook);
-
-  // Description:
-  // A convenience method to retrieve a pointer to the large frame available 
-  // for viewing. In this implementation it defaults to the frame on
-  // the right of the split bar (MainSplitFrame).
   virtual vtkKWFrame* GetViewFrame();
 
   // Description:
@@ -142,39 +141,51 @@ public:
   vtkKWMenu *GetViewMenu();
   vtkKWMenu *GetWindowMenu();
   
-  // Description::
-  // Add a "Recent Files" sub-menu to the File menu and fill it with the
-  // most recent files stored in the registry.
-  // - menuEntry is the name of the menu entry in the File menu above which 
-  //   the sub-menu will be inserted. If NULL (or not found), the sub-menu
-  //   will be inserted before the last entry in the File menu 
-  //   (see GetFileMenuIndex)
-  // - target is the object against which the command associated to a most
-  //   recent file will be executed.
-  // - label is an optional label that will be used for the sub-menu
-  virtual void AddRecentFilesMenu(
-    const char *menuEntry, 
+  // Description:
+  // Convenience method that return the position where to safely insert 
+  // entries in the file menu without interferring with entries that should
+  // stay at the end of the menu (at the moment, it checks for the 'close',
+  // 'exit' or 'print setup' commands).
+  int GetFileMenuInsertPosition();
+
+  // Description:
+  // Convenience method that return the position where to safely insert 
+  // entries in the help menu without interferring with entries that should
+  // stay at the end of the menu (at the moment, it checks for the 'about'
+  // commands).
+  int GetHelpMenuInsertPosition();
+
+  // Description:
+  // Insert a "Recent Files" sub-menu to the File menu at position 'pos'
+  // and fill it with the most recent files stored in the registry.
+  // The 'target' parameter is the object against which the command
+  // associated to a most recent file will be executed (usually the instance).
+  // The 'label' parameter is an optional label that will be used for
+  // the sub-menu label.
+  virtual void InsertRecentFilesMenu(
+    int pos, 
     vtkKWObject *target, 
-    const char *label = VTK_KW_RECENT_FILES_MENU_LABEL,
+    const char *label = VTK_KW_OPEN_RECENT_FILE_MENU_LABEL,
     int underline = 6);
 
   // Description::
-  // Add a file to the Recent File list.
+  // Add a file to the Recent File list, and save the whole list to
+  // the registry.
+  // If the "Recent files" sub-menu has been inserted at that point (see
+  // the InsertRecentFilesMenu method), it will be updated as well.
   virtual void AddRecentFile(
     const char *filename, vtkKWObject *target, const char *command);
   
   // Description:
-  // Return the index of the entry above the last entry in the file menu.
-  int GetFileMenuIndex();
+  // Will the window add print entries in the file menu?
+  vtkSetClampMacro(SupportPrint, int, 0, 1);
+  vtkGetMacro(SupportPrint, int);
+  vtkBooleanMacro(SupportPrint, int);
 
   // Description:
-  // Return the index of the entry above the "About" entry in the help menu.
-  int GetHelpMenuIndex();
-
-  // Description:
-  // Callbacks used to set the print quality.
-  void OnPrint(int propagate, int resolution);
-  vtkGetMacro(PrintTargetDPI,float);
+  // Set/Get the print quality.
+  vtkGetMacro(PrintTargetDPI, double);
+  vtkSetMacro(PrintTargetDPI, double);
   
   // Description:
   // The toolbar container.
@@ -217,12 +228,6 @@ public:
   vtkBooleanMacro( SupportHelp, int );
 
   // Description:
-  // Will the window add print entries in the file menu?
-  vtkSetClampMacro( SupportPrint, int, 0, 1 );
-  vtkGetMacro( SupportPrint, int );
-  vtkBooleanMacro( SupportPrint, int );
-
-  // Description:
   // Get title of window.
   // Override superclass to use app name if the title was not set
   virtual char* GetTitle();
@@ -245,8 +250,6 @@ public:
   void SaveLastPath(vtkKWLoadSaveDialog *, const char*);
   void RetrieveLastPath(vtkKWLoadSaveDialog *, const char*);
 
-//ETX
-  
   // Description:
   // Get the User Interface Manager.
   virtual vtkKWUserInterfaceManager* GetUserInterfaceManager()
@@ -303,6 +306,7 @@ public:
   // Override it in subclasses to popup more elaborate log/error dialog.
   virtual void ErrorIconCallback();
   virtual void MainPanelVisibilityCallback();
+  virtual void PrintOptionsCallback() {};
 
 protected:
   vtkKWWindow();
@@ -347,7 +351,6 @@ protected:
   vtkKWMenu *ViewMenu;
   vtkKWMenu *WindowMenu;
   vtkKWMenu *HelpMenu;
-  vtkKWMenu *PageMenu;
   vtkKWMenu *ToolbarsMenu;
 
   vtkKWFrame *StatusFrameSeparator;
@@ -366,7 +369,7 @@ protected:
   vtkKWFrame *MenuBarSeparatorFrame;
 
 
-  float PrintTargetDPI;
+  double PrintTargetDPI;
   char  *ScriptExtension;
   char  *ScriptType;
   int   SupportHelp;

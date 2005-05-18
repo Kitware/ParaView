@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.86");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.87");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -806,7 +806,7 @@ void vtkKWRenderWidget::SetupPrint(RECT &rcDest, HDC ghdc,
                                    float scaleX, float scaleY,
                                    int screenSizeX, int screenSizeY)
 {
-  float scale;
+  double scale;
   int cxDIB = screenSizeX;         // Size of DIB - x
   int cyDIB = screenSizeY;         // Size of DIB - y
   

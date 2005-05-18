@@ -28,6 +28,7 @@ class vtkKWFrame;
 class vtkKWFrameLabeled;
 class vtkKWPushButton;
 class vtkKWWindow;
+class vtkKWOptionMenuLabeled;
 
 class VTK_EXPORT vtkKWApplicationSettingsInterface : public vtkKWUserInterfacePanel
 {
@@ -61,6 +62,7 @@ public:
   virtual void ResetDragAndDropCallback();
   virtual void FlatFrameCallback();
   virtual void FlatButtonsCallback();
+  virtual void DPICallback(double dpi);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -97,6 +99,11 @@ protected:
   vtkKWFrameLabeled *ToolbarSettingsFrame;
   vtkKWCheckButton  *FlatFrameCheckButton;
   vtkKWCheckButton  *FlatButtonsCheckButton;
+
+  // Print settings
+
+  vtkKWFrameLabeled      *PrintSettingsFrame;
+  vtkKWOptionMenuLabeled *DPIOptionMenu;
 
 private:
   vtkKWApplicationSettingsInterface(const vtkKWApplicationSettingsInterface&); // Not implemented

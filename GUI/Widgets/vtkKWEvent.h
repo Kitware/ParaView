@@ -138,7 +138,6 @@ class VTK_EXPORT vtkKWEvent
     PluginFilterRemoveMeshEvent,
     PluginFilterSelectEvent,
     PluginFilterUndoEvent,
-    PrinterDPIChangedEvent,
     ProbeInformationChangedEvent,
     ProbeInformationOffEvent,
     ProjectionTypeChangedEvent,

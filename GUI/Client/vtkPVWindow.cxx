@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.705");
+vtkCxxRevisionMacro(vtkPVWindow, "1.706");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -758,7 +758,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   this->FileMenu->DeleteMenuItem("Close");
 
-  int clidx = this->GetFileMenuIndex();
+  int clidx = this->GetFileMenuInsertPosition();
 
   // Open a data file. Can support multiple file formats (see Open()).
 
@@ -815,12 +815,9 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     "a series of .vtp files.");
   
   this->FileMenu->InsertSeparator(clidx++);
-
   
-  this->AddRecentFilesMenu(NULL, this);
+  this->InsertRecentFilesMenu(clidx++, this);
   
-  clidx = this->GetFileMenuIndex();
-
   this->FileMenu->InsertSeparator(clidx++);
 
   /*
@@ -1992,7 +1989,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 
-  int menu_idx = this->GetHelpMenuIndex();
+  int menu_idx = this->GetHelpMenuInsertPosition();
   this->HelpMenu->InsertSeparator(menu_idx++);
   this->HelpMenu->InsertCommand(
     menu_idx, "Play Demo", this, "PlayDemo", 0);
@@ -4457,6 +4454,12 @@ void vtkPVWindow::ErrorIconCallback()
 {
   this->Superclass::ErrorIconCallback();
   this->ShowErrorLog();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::PrintOptionsCallback()
+{
+  this->ShowApplicationSettingsInterface();
 }
 
 //-----------------------------------------------------------------------------

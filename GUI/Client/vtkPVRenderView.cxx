@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.377");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.378");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2883,7 +2883,7 @@ void vtkPVRenderView::PrintView()
 #else
   
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
-  float DPI=0;
+  double DPI=0;
   if (this->GetParentWindow())
     {
     // Is this right? Should DPI be int or float?

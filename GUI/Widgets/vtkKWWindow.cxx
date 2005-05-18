@@ -39,7 +39,7 @@
 #define VTK_KW_SHOW_MAIN_PANEL_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.234");
+vtkCxxRevisionMacro(vtkKWWindow, "1.235");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -54,7 +54,6 @@ vtkKWWindow::vtkKWWindow()
 
   this->FileMenu              = vtkKWMenu::New();
   this->HelpMenu              = vtkKWMenu::New();
-  this->PageMenu              = vtkKWMenu::New();
   this->EditMenu              = NULL;
   this->ViewMenu              = NULL;
   this->WindowMenu            = NULL;
@@ -88,7 +87,7 @@ vtkKWWindow::vtkKWWindow()
 
   this->CommandFunction       = vtkKWWindowCommand;
 
-  this->PrintTargetDPI        = 100;
+  this->PrintTargetDPI        = 100.0;
   this->SupportHelp           = 1;
   this->SupportPrint          = 1;
   this->PromptBeforeClose     = 0;
@@ -109,16 +108,6 @@ vtkKWWindow::~vtkKWWindow()
 {
   this->PrepareForDelete();
 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION <= 2)
-  // This "hack" is here to get around a Tk bug ( Bug: 3402 )
-  // in tkMenu.c
-  vtkKWMenu* menuparent = vtkKWMenu::SafeDownCast(this->PageMenu->GetParent());
-  if (menuparent)
-    {
-    menuparent->DeleteMenuItem(VTK_KW_PAGE_SETUP_MENU_LABEL);
-    }
-#endif
-
   if (this->TclInteractor)
     {
     this->TclInteractor->Delete();
@@ -129,12 +118,6 @@ vtkKWWindow::~vtkKWWindow()
     {
     this->MainNotebook->Delete();
     this->MainNotebook = NULL;
-    }
-
-  if (this->PageMenu)
-    {
-    this->PageMenu->Delete();
-    this->PageMenu = NULL;
     }
 
   if (this->FileMenu)
@@ -274,29 +257,12 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->FileMenu->SetTearOff(0);
   this->FileMenu->Create(app, "");
 
-  // Menu : Print quality
-
-  this->PageMenu->SetParent(this->FileMenu);
-  this->PageMenu->SetTearOff(0);
-  this->PageMenu->Create(app, "");
-
-  char* rbv = 
-    this->PageMenu->CreateRadioButtonVariable(this, "PageSetup");
-
-  this->Script( "set %s 0", rbv );
-  this->PageMenu->AddRadioButton(0, "100 DPI", rbv, this, "OnPrint 1 0", 0);
-  this->PageMenu->AddRadioButton(1, "150 DPI", rbv, this, "OnPrint 1 1", 1);
-  this->PageMenu->AddRadioButton(2, "300 DPI", rbv, this, "OnPrint 1 2", 0);
-  delete [] rbv;
-
-  // Menu : File (cont.)
-
   this->GetMenu()->AddCascade("File", this->FileMenu, 0);
 
   if (this->SupportPrint)
     {
-    this->FileMenu->AddCascade(
-      VTK_KW_PAGE_SETUP_MENU_LABEL, this->PageMenu, 8);
+    this->FileMenu->AddCommand(
+      VTK_KW_PRINT_OPTIONS_MENU_LABEL, this, "PrintOptionsCallback", 4);
     this->FileMenu->AddSeparator();
     }
 
@@ -464,6 +430,16 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   
   this->TrayImageError->SetBind(this, "<Button-1>", "ErrorIconCallback");
 
+  // Printer settings
+
+  if (this->GetApplication()->HasRegistryValue(
+        2, "RunTime", VTK_KW_PRINT_TARGET_DPI_REG_KEY))
+    {
+    this->SetPrintTargetDPI(
+      this->GetApplication()->GetFloatRegistryValue(
+        2, "RunTime", VTK_KW_PRINT_TARGET_DPI_REG_KEY));
+    }
+  
   // If we have a User Interface Manager, it's time to create it
 
   vtkKWUserInterfaceManager *uim = this->GetUserInterfaceManager();
@@ -567,6 +543,12 @@ int vtkKWWindow::Close()
     this->SaveWindowGeometry();
     }
 
+  // Save print settings
+
+  this->GetApplication()->SetRegistryValue(
+    2, "RunTime", VTK_KW_PRINT_TARGET_DPI_REG_KEY, "%lf", 
+    this->PrintTargetDPI);
+
   // Remove this window from the application. 
   // It is likely that the application will exit if there are no more windows.
 
@@ -585,7 +567,7 @@ void vtkKWWindow::SaveWindowGeometry()
       res);
 
     this->GetApplication()->SetRegistryValue(
-      2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY, "%d", 
+      2, "Geometry", VTK_KW_MAIN_PANEL_SIZE_REG_KEY, "%d", 
       this->MainSplitFrame->GetFrame1Size());
     }
 }
@@ -612,10 +594,10 @@ void vtkKWWindow::RestoreWindowGeometry()
       }
 
     if (this->GetApplication()->HasRegistryValue(
-          2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY))
+          2, "Geometry", VTK_KW_MAIN_PANEL_SIZE_REG_KEY))
       {
       int reg_size = this->GetApplication()->GetIntRegistryValue(
-        2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY);
+        2, "Geometry", VTK_KW_MAIN_PANEL_SIZE_REG_KEY);
       if (reg_size >= this->MainSplitFrame->GetFrame1MinimumSize())
         {
         this->MainSplitFrame->SetFrame1Size(reg_size);
@@ -819,23 +801,6 @@ vtkKWMenu *vtkKWWindow::GetWindowMenu()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::OnPrint(int propagate, int res)
-{
-  int dpis[] = { 100, 150, 300 };
-  this->PrintTargetDPI = dpis[res];
-  if ( propagate )
-    {
-    float dpi = res;
-    this->InvokeEvent(vtkKWEvent::PrinterDPIChangedEvent, &dpi);
-    }
-  else
-    {
-    char array[][20] = { "100 DPI", "150 DPI", "300 DPI" };
-    this->PageMenu->Invoke( this->PageMenu->GetIndex(array[res]) );
-    }
-}
-
-//----------------------------------------------------------------------------
 int vtkKWWindow::GetMainPanelVisibility()
 {
   return 
@@ -915,8 +880,8 @@ void vtkKWWindow::LoadScript(const char *filename)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::AddRecentFilesMenu(
-  const char *menuEntry, vtkKWObject *target, const char *label, int underline)
+void vtkKWWindow::InsertRecentFilesMenu(
+  int pos, vtkKWObject *target, const char *label, int underline)
 {
   if (!this->IsCreated() || !label || !this->FileMenu || 
       !this->MostRecentFilesManager)
@@ -924,7 +889,7 @@ void vtkKWWindow::AddRecentFilesMenu(
     return;
     }
 
-  // Create the menu if not done already
+  // Create the sub-menu if not done already
 
   vtkKWMenu *mrf_menu = this->MostRecentFilesManager->GetMenu();
   if (!mrf_menu->IsCreated())
@@ -942,18 +907,7 @@ void vtkKWWindow::AddRecentFilesMenu(
     this->FileMenu->DeleteMenuItem(label);
     }
 
-  // Find where to insert
-
-  int insert_idx;
-  if (!menuEntry || !this->FileMenu->HasItem(menuEntry))
-    {
-    insert_idx = this->GetFileMenuIndex();
-    }
-  else
-    {
-    insert_idx = this->FileMenu->GetIndex(menuEntry) - 1;
-    }
-  this->FileMenu->InsertCascade(insert_idx, label, mrf_menu, underline);
+  this->FileMenu->InsertCascade(pos, label, mrf_menu, underline);
 
   // Fill the recent files vector with recent files stored in registry
   // this will also update the menu
@@ -975,37 +929,37 @@ void vtkKWWindow::AddRecentFile(const char *name,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWindow::GetFileMenuIndex()
+int vtkKWWindow::GetFileMenuInsertPosition()
 {
-  if ( !this->IsCreated() )
+  if (!this->IsCreated())
     {
     return 0;
     }
 
   // First find the print-related menu commands
 
-  if (this->GetFileMenu()->HasItem(VTK_KW_PAGE_SETUP_MENU_LABEL))
+  if (this->GetFileMenu()->HasItem(VTK_KW_PRINT_OPTIONS_MENU_LABEL))
     {
-    return this->GetFileMenu()->GetIndex(VTK_KW_PAGE_SETUP_MENU_LABEL);
+    return this->GetFileMenu()->GetIndex(VTK_KW_PRINT_OPTIONS_MENU_LABEL);
     }
 
   // Otherwise find Close or Exit if Close was removed
 
-  int clidx;
   if (this->GetFileMenu()->HasItem("Close"))
     {
-    clidx = this->GetFileMenu()->GetIndex("Close");  
-    }
-  else
-    {
-    clidx = this->GetFileMenu()->GetIndex("Exit");  
+    return this->GetFileMenu()->GetIndex("Close");  
     }
 
-  return clidx;  
+  if (this->GetFileMenu()->HasItem("Exit"))
+    {
+    return this->GetFileMenu()->GetIndex("Exit");  
+    }
+
+  return this->HelpMenu->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWindow::GetHelpMenuIndex()
+int vtkKWWindow::GetHelpMenuInsertPosition()
 {
   if (!this->IsCreated())
     {
@@ -1365,7 +1319,6 @@ void vtkKWWindow::UpdateMenuState()
   this->PropagateEnableState(this->ViewMenu);
   this->PropagateEnableState(this->WindowMenu);
   this->PropagateEnableState(this->HelpMenu);
-  this->PropagateEnableState(this->PageMenu);
   this->PropagateEnableState(this->ToolbarsMenu);
 
   // Most Recent Files

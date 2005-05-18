@@ -15,25 +15,29 @@
 #include "vtkKWApplicationSettingsInterface.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWBalloonHelpManager.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWFrameLabeled.h"
+#include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWOptionMenuLabeled.h"
+#include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWBalloonHelpManager.h"
 
 //----------------------------------------------------------------------------
 
 #define VTK_KW_APPLICATION_SETTINGS_UIP_LABEL "Application Settings"
+#define VTK_KW_APPLICATION_SETTINGS_DPI_FORMAT "%.1lf"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.31");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.32");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -64,6 +68,11 @@ vtkKWApplicationSettingsInterface::vtkKWApplicationSettingsInterface()
   this->ToolbarSettingsFrame = 0;
   this->FlatFrameCheckButton = 0;
   this->FlatButtonsCheckButton = 0;
+
+  // Print settings
+
+  this->PrintSettingsFrame = 0;
+  this->DPIOptionMenu = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -141,6 +150,20 @@ vtkKWApplicationSettingsInterface::~vtkKWApplicationSettingsInterface()
     {
     this->FlatButtonsCheckButton->Delete();
     this->FlatButtonsCheckButton = NULL;
+    }
+
+  // Print settings
+
+  if (this->PrintSettingsFrame)
+    {
+    this->PrintSettingsFrame->Delete();
+    this->PrintSettingsFrame = NULL;
+    }
+
+  if (this->DPIOptionMenu)
+    {
+    this->DPIOptionMenu->Delete();
+    this->DPIOptionMenu = NULL;
     }
 }
 
@@ -394,6 +417,50 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
          << "  -side top -anchor w -expand no -fill none" << endl;
 
   // --------------------------------------------------------------
+  // Print settings : main frame
+
+  if (!this->PrintSettingsFrame)
+    {
+    this->PrintSettingsFrame = vtkKWFrameLabeled::New();
+    }
+
+  this->PrintSettingsFrame->SetParent(this->GetPagesParentWidget());
+  this->PrintSettingsFrame->ShowHideFrameOn();
+  this->PrintSettingsFrame->Create(app, 0);
+  this->PrintSettingsFrame->SetLabelText("Print Settings");
+    
+  tk_cmd << "pack " << this->PrintSettingsFrame->GetWidgetName()
+         << " -side top -anchor w -expand y -fill x -padx 2 -pady 2 "  
+         << " -in " << page->GetWidgetName() << endl;
+  
+  frame = this->PrintSettingsFrame->GetFrame();
+
+  // Print settings : DPI
+
+  if (!this->DPIOptionMenu)
+    {
+    this->DPIOptionMenu = vtkKWOptionMenuLabeled::New();
+    }
+
+  this->DPIOptionMenu->SetParent(frame);
+  this->DPIOptionMenu->Create(app);
+
+  this->DPIOptionMenu->GetLabel()->SetText("DPI:");
+
+  double dpis[] = { 100.0, 150.0, 300.0, 600.0 };
+  for (int i = 0; i < sizeof(dpis) / sizeof(double); i++)
+    {
+    char label[128], command[128];
+    sprintf(command, "DPICallback %lf", dpis[i]);
+    sprintf(label, VTK_KW_APPLICATION_SETTINGS_DPI_FORMAT, dpis[i]);
+    this->DPIOptionMenu->GetWidget()->AddEntryWithCommand(
+      label, this, command);
+    }
+
+  tk_cmd << "pack " << this->DPIOptionMenu->GetWidgetName()
+         << " -side top -anchor w -padx 2 -pady 2" << endl;
+
+  // --------------------------------------------------------------
   // Pack 
 
   tk_cmd << ends;
@@ -517,6 +584,16 @@ void vtkKWApplicationSettingsInterface::Update()
       {
       this->FlatButtonsCheckButton->SetEnabled(0);
       }
+    }
+
+  // Print settings
+
+  if (this->DPIOptionMenu && this->DPIOptionMenu->GetWidget() && this->Window)
+    {
+    char buffer[128];
+    sprintf(buffer, VTK_KW_APPLICATION_SETTINGS_DPI_FORMAT, 
+            this->Window->GetPrintTargetDPI());
+    this->DPIOptionMenu->GetWidget()->SetCurrentEntry(buffer);
     }
 }
 
@@ -667,6 +744,15 @@ void vtkKWApplicationSettingsInterface::FlatButtonsCallback()
     }
 }
 
+//---------------------------------------------------------------------------
+void vtkKWApplicationSettingsInterface::DPICallback(double dpi)
+{
+  if (this->Window)
+    {
+    this->Window->SetPrintTargetDPI(dpi);
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkKWApplicationSettingsInterface::UpdateEnableState()
 {
@@ -731,6 +817,18 @@ void vtkKWApplicationSettingsInterface::UpdateEnableState()
   if (this->FlatButtonsCheckButton)
     {
     this->FlatButtonsCheckButton->SetEnabled(this->GetEnabled());
+    }
+
+  // Print settings
+
+  if (this->PrintSettingsFrame)
+    {
+    this->PrintSettingsFrame->SetEnabled(this->GetEnabled());
+    }
+
+  if (this->DPIOptionMenu)
+    {
+    this->DPIOptionMenu->SetEnabled(this->GetEnabled());
     }
 }
 

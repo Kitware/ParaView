@@ -580,6 +580,7 @@ public:
   // Description:
   // This method is called when error icon is clicked.
   void ErrorIconCallback();
+  virtual void PrintOptionsCallback();
     
 protected:
   vtkPVWindow();

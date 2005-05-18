@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.11");
+vtkCxxRevisionMacro(vtkKWView, "1.12");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -593,7 +593,7 @@ void vtkKWView::PrintView()
 #else
 
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
-  float DPI=0;
+  double DPI=0;
   if (this->GetParentWindow())
     {
     // Is this right? Should DPI be int or float?
@@ -671,7 +671,7 @@ void vtkKWView::Print(HDC ghdc, HDC,
   this->SetupPrint(rcDest, ghdc, printerPageSizeX, printerPageSizeY,
                    printerDPIX, printerDPIY,
                    scaleX, scaleY, size[0], size[1]);
-  float scale;
+  double scale;
   // target DPI specified here
   if (this->GetParentWindow())
     {
@@ -701,7 +701,7 @@ void vtkKWView::SetupPrint(RECT &rcDest, HDC ghdc,
                            float scaleX, float scaleY,
                            int screenSizeX, int screenSizeY)
 {
-  float scale;
+  double scale;
   int cxDIB = screenSizeX;         // Size of DIB - x
   int cyDIB = screenSizeY;         // Size of DIB - y
   
@@ -952,12 +952,12 @@ void vtkKWView::Select(vtkKWWindow *pw)
   if ( this->SupportSaveAsImage )
     {
     // add the save as image option
-    pw->GetFileMenu()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
+    pw->GetFileMenu()->InsertCommand(this->ParentWindow->GetFileMenuInsertPosition(),
                                      "Save View Image",
                                      this, 
                                      "SaveAsImage", 8,
                                      "Save an image of the current view contents");
-    pw->GetFileMenu()->InsertSeparator(this->ParentWindow->GetFileMenuIndex());
+    pw->GetFileMenu()->InsertSeparator(this->ParentWindow->GetFileMenuInsertPosition());
     }
   
   if ( this->SupportPrint )
@@ -965,13 +965,13 @@ void vtkKWView::Select(vtkKWWindow *pw)
     // add the Print option
     // If there is a "Page Setup" menu, insert below
     int clidx;
-    if (pw->GetFileMenu()->HasItem(VTK_KW_PAGE_SETUP_MENU_LABEL))
+    if (pw->GetFileMenu()->HasItem(VTK_KW_PRINT_OPTIONS_MENU_LABEL))
       {
-      clidx = pw->GetFileMenu()->GetIndex(VTK_KW_PAGE_SETUP_MENU_LABEL) + 1;  
+      clidx = pw->GetFileMenu()->GetIndex(VTK_KW_PRINT_OPTIONS_MENU_LABEL) + 1;  
       }
     else
       {
-      clidx = this->ParentWindow->GetFileMenuIndex();  
+      clidx = this->ParentWindow->GetFileMenuInsertPosition();  
       }
     pw->GetFileMenu()->InsertCommand(clidx, "Print", this, "PrintView", 0);
     }
