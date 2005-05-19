@@ -64,7 +64,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.42");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.43");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1213,8 +1213,6 @@ void vtkPVAnimationManager::SaveAnimation()
 void vtkPVAnimationManager::SaveGeometry()
 {
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
-  vtkPVWindow* pvWin = pvApp->GetMainWindow();
-  
   vtkKWLoadSaveDialog* saveDialog = pvApp->NewLoadSaveDialog();
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(saveDialog, "SaveGeometryFile");
   saveDialog->SetParent(this);

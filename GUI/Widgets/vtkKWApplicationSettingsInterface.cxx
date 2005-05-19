@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.32");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.33");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -448,7 +448,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->DPIOptionMenu->GetLabel()->SetText("DPI:");
 
   double dpis[] = { 100.0, 150.0, 300.0, 600.0 };
-  for (int i = 0; i < sizeof(dpis) / sizeof(double); i++)
+  for (unsigned int i = 0; i < sizeof(dpis) / sizeof(double); i++)
     {
     char label[128], command[128];
     sprintf(command, "DPICallback %lf", dpis[i]);

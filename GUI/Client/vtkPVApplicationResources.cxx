@@ -519,7 +519,6 @@ void vtkPVApplication::ConfigureAboutDialog()
 //----------------------------------------------------------------------------
 void vtkPVApplication::SaveRuntimeInformation()
 {
-  vtkKWWindow *window = this->GetMainWindow();
   vtkKWLoadSaveDialog *dialog = vtkKWLoadSaveDialog::New();
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(dialog, "RuntimeInformationPath");
   dialog->SaveDialogOn();
