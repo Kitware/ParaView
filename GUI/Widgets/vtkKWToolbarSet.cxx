@@ -27,11 +27,12 @@
 #endif
 
 #include <kwsys/stl/list>
+#include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.12");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.13");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -475,7 +476,11 @@ void vtkKWToolbarSet::SaveToolbarVisibilityToRegistry(
       toolbar_slot->Toolbar && 
       toolbar_slot->Toolbar->GetName())
     {
-    kwsys_stl::string key(toolbar_slot->Toolbar->GetName());
+    char *clean_name = kwsys::SystemTools::RemoveChars(
+      toolbar_slot->Toolbar->GetName(), " ");
+    kwsys_stl::string key(clean_name);
+    delete [] clean_name;
+
     key += "Visibility";
     this->GetApplication()->SetRegistryValue(
       2, "Toolbars", key.c_str(), "%d", toolbar_slot->Visibility);
@@ -491,7 +496,11 @@ void vtkKWToolbarSet::RestoreToolbarVisibilityFromRegistry(
       toolbar_slot->Toolbar && 
       toolbar_slot->Toolbar->GetName())
     {
-    kwsys_stl::string key(toolbar_slot->Toolbar->GetName());
+    char *clean_name = kwsys::SystemTools::RemoveChars(
+      toolbar_slot->Toolbar->GetName(), " ");
+    kwsys_stl::string key(clean_name);
+    delete [] clean_name;
+    
     key += "Visibility";
     if (this->GetApplication()->HasRegistryValue(
           2, "Toolbars", key.c_str()))
