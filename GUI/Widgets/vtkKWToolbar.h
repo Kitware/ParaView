@@ -35,12 +35,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
+  // Create a the widget
   virtual void Create(vtkKWApplication *app);
 
   // Description:
-  // Returns the main frame of the toolbar. Put all the widgets
-  // in the main frame.
+  // Returns the main frame of the toolbar. 
+  // This should be used as the parent of all the widgets in the toolbar.
   vtkGetObjectMacro(Frame, vtkKWFrame);
 
   // Description:
@@ -50,11 +50,24 @@ public:
   vtkBooleanMacro(Resizable, int);
 
   // Description:
+  // Set/Get the name of the toolbar. This is optional but certainly
+  // useful if this toolbar is meant to be added to a vtkKWToolbarSet
+  vtkGetStringMacro(Name);
+  vtkSetStringMacro(Name);
+
+  // Description:
   // Add a widget to the toolbar, insert a widget before 'location' (or at
-  // beginning of list if 'location' is not found), remove widget.
+  // beginning of list if 'location' is not found)
   virtual void AddWidget(vtkKWWidget* widget);
   virtual void InsertWidget(vtkKWWidget* location, vtkKWWidget* widget);
+
+  // Description:
+  // Remove a widget from the toolbar
   virtual void RemoveWidget(vtkKWWidget* widget);
+
+  // Description:
+  // Convenience method to retrieve a widget given its name. The name is
+  // looked up in common Tk options like -label, -text, -image, -selectimage
   virtual vtkKWWidget* GetWidget(const char *name);
 
   // Description:
@@ -88,6 +101,8 @@ public:
 
   // Description:
   // Set/Get the flat aspect of the toolbar (flat or 3D GUI style)
+  // The static GlobalFlatAspect member can be set so that all toolbars
+  // are rendered using the same aspect.
   virtual void SetFlatAspect(int);
   vtkBooleanMacro(FlatAspect, int);
   vtkGetMacro(FlatAspect, int);
@@ -100,6 +115,8 @@ public:
 
   // Description:
   // Set/Get the flat aspect of the widgets (flat or 3D GUI style)
+  // The static GlobalWidgetsFlatAspect member can be set so that all widgets
+  // are rendered using the same aspect.
   virtual void SetWidgetsFlatAspect(int);
   vtkBooleanMacro(WidgetsFlatAspect, int);
   vtkGetMacro(WidgetsFlatAspect, int);
@@ -150,7 +167,6 @@ protected:
   vtkKWToolbar();
   ~vtkKWToolbar();
 
-  // Height stuf is not working (ask ken)
   int Expanding;
 
   vtkKWFrame *Frame;
@@ -179,6 +195,8 @@ protected:
   int Resizable;
 
   vtkKWRadioButton *DefaultOptionsWidget;
+
+  char *Name;
 
 private:
   vtkKWToolbar(const vtkKWToolbar&); // Not implemented

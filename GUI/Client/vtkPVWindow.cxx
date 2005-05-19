@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.707");
+vtkCxxRevisionMacro(vtkPVWindow, "1.708");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -184,6 +184,7 @@ vtkPVWindow::vtkPVWindow()
   // This toolbar contains buttons for modifying user interaction
   // mode
   this->InteractorToolbar = vtkKWToolbar::New();
+  this->InteractorToolbar->SetName(VTK_PV_TOOLBARS_INTERACTION_LABEL);
 
   this->ResetCameraButton = vtkKWPushButtonWithMenu::New();
   
@@ -192,6 +193,7 @@ vtkPVWindow::vtkPVWindow()
    
   // This toolbar contains buttons for instantiating new modules
   this->Toolbar = vtkKWToolbar::New();
+  this->Toolbar->SetName(VTK_PV_TOOLBARS_TOOLS_LABEL);
 
   // Keep a list of the toolbar buttons so that they can be 
   // disabled/enabled in certain situations.
@@ -205,6 +207,7 @@ vtkPVWindow::vtkPVWindow()
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
 
   this->PickCenterToolbar = vtkKWToolbar::New();
+  this->PickCenterToolbar->SetName(VTK_PV_TOOLBARS_CAMERA_LABEL);
 
   this->PickCenterButton = vtkKWPushButton::New();
   this->ResetCenterButton = vtkKWPushButton::New();
@@ -903,38 +906,36 @@ void vtkPVWindow::SetToolbarVisibility(const char* identifier, int state)
 {
   if (!strcmp(identifier, "tools"))
     {
-    this->Superclass::SetToolbarVisibility(this->Toolbar, 
-      VTK_PV_TOOLBARS_TOOLS_LABEL, state);
+    this->Toolbars->SetToolbarVisibility(this->Toolbar, state);
     }
   else if(!strcmp(identifier, "camera"))
     {
-    this->Superclass::SetToolbarVisibility(this->PickCenterToolbar,
-      VTK_PV_TOOLBARS_CAMERA_LABEL, state);
+    this->Toolbars->SetToolbarVisibility(this->PickCenterToolbar, state);
     }
   else if (!strcmp(identifier, "interaction"))
     {
-    this->Superclass::SetToolbarVisibility(this->InteractorToolbar, 
-      VTK_PV_TOOLBARS_INTERACTION_LABEL, state);
+    this->Toolbars->SetToolbarVisibility(this->InteractorToolbar, state);
     }
 }
 //-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
 {
-  this->AddToolbar(this->InteractorToolbar, VTK_PV_TOOLBARS_INTERACTION_LABEL);
-  this->AddToolbar(this->Toolbar, VTK_PV_TOOLBARS_TOOLS_LABEL);
-  this->AddToolbar(this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL);
-
   this->InteractorToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->InteractorToolbar->Create(app);
 
   this->Toolbar->SetParent(this->Toolbars->GetToolbarsFrame());
   this->Toolbar->Create(app);
   this->Toolbar->ResizableOn();
+
   //this->ToolbarMenuButton->SetParent(this->Toolbar->GetFrame());
   this->ToolbarMenuButton->SetParent(this->Toolbar);
-  this->ToolbarMenuButton->Create(app, 
-                                 "-image PVToolbarPullDownArrow -relief flat");
+  this->ToolbarMenuButton->Create(
+    app,  "-image PVToolbarPullDownArrow -relief flat");
   this->ToolbarMenuButton->IndicatorOff();
+
+  this->Toolbars->AddToolbar(this->InteractorToolbar);
+  this->Toolbars->AddToolbar(this->Toolbar);
+  this->Toolbars->AddToolbar(this->PickCenterToolbar);
 }
 
 //-----------------------------------------------------------------------------
@@ -1138,6 +1139,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->LowerToolbars->SetParent(this->GetViewFrame());
   this->LowerToolbars->Create(app,0);
   this->LowerToolbars->ShowBottomSeparatorOff();
+  this->LowerToolbars->SynchronizeToolbarsVisibilityWithRegistryOn();
+  this->LowerToolbars->SetToolbarVisibilityChangedCommand(
+    this, "ToolbarVisibilityChangedCallback");
+  this->LowerToolbars->SetNumberOfToolbarsChangedCommand(
+    this, "NumberOfToolbarsChangedCallback");
 
   this->LowerFrame->Frame2VisibilityOff();
 
@@ -1851,8 +1857,8 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
       break;
     }
 
-  this->Superclass::SetToolbarVisibility(
-    this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL, pick_toolbar_vis);
+  this->Toolbars->SetToolbarVisibility(
+    this->PickCenterToolbar, pick_toolbar_vis);
   this->MainView->EventuallyRender();
 }
 
@@ -5076,48 +5082,21 @@ void vtkPVWindow::RestorePVWindowGeometry()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::AddLowerToolbar(vtkKWToolbar* toolbar, const char* name, 
-  int visibility/*=1*/)
+void vtkPVWindow::NumberOfToolbarsChangedCallback()
 {
-  if (!this->LowerToolbars->AddToolbar(toolbar))
-    {
-    return;
-    }
-  int id = this->LowerToolbars->GetNumberOfToolbars() - 1; 
-  ostrstream command;
-  command << "ToggleLowerToolbarVisibility " << id << " " << name << ends;
-  this->AddToolbarToMenu(toolbar, name, this, command.str());
-  command.rdbuf()->freeze(0);
+  this->Superclass::NumberOfToolbarsChangedCallback();
 
-  // Restore state from registry.
-  ostrstream reg_key;
-  reg_key << name << "_ToolbarVisibility" << ends;
-  if (this->GetApplication()->GetRegistryValue(2, "RunTime", reg_key.str(), 0))
-    {
-    visibility = this->GetApplication()->GetIntRegistryValue(2, "RunTime", reg_key.str());
-    }
-  this->SetLowerToolbarVisibility(toolbar, name, visibility);
-  reg_key.rdbuf()->freeze(0);
+  this->LowerToolbars->PopulateToolbarsVisibilityMenu(
+    this->GetToolbarsVisibilityMenu());
 }
   
-//-----------------------------------------------------------------------------
-void vtkPVWindow::ToggleLowerToolbarVisibility(int id, const char* name)
+//----------------------------------------------------------------------------
+void vtkPVWindow::ToolbarVisibilityChangedCallback()
 {
-  vtkKWToolbar* toolbar = this->LowerToolbars->GetToolbar(id);
-  if (!toolbar)
-    {
-    return;
-    }
-  int new_visibility = this->LowerToolbars->IsToolbarVisible(toolbar)? 0 : 1;
-  this->SetLowerToolbarVisibility(toolbar, name, new_visibility);
-}
+  this->Superclass::ToolbarVisibilityChangedCallback();
 
-//-----------------------------------------------------------------------------
-void vtkPVWindow::SetLowerToolbarVisibility(vtkKWToolbar* toolbar,
-  const char* name, int flag)
-{
-  this->LowerToolbars->SetToolbarVisibility(toolbar, flag);
-  this->SetToolbarVisibilityInternal(toolbar, name, flag);
+  this->LowerToolbars->UpdateToolbarsVisibilityMenu(
+    this->GetToolbarsVisibilityMenu());
 }
 
 //-----------------------------------------------------------------------------

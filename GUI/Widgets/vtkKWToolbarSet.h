@@ -24,6 +24,7 @@ class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWToolbar;
 class vtkKWToolbarSetInternals;
+class vtkKWMenu;
 
 class VTK_EXPORT vtkKWToolbarSet : public vtkKWWidget
 {
@@ -42,14 +43,16 @@ public:
 
   // Description:
   // Add a toolbar to the set.
+  // The default_visibility parameter sets the visibility of the toolbar
+  // in the set once it is added.
   // Return 1 on success, 0 otherwise.
-  int AddToolbar(vtkKWToolbar *toolbar);
-  int HasToolbar(vtkKWToolbar *toolbar);
+  virtual int AddToolbar(vtkKWToolbar *toolbar, int default_visibility = 1);
+  virtual int HasToolbar(vtkKWToolbar *toolbar);
   
   // Description:
   // Return a toolbar at a particular index.
-  vtkKWToolbar* GetToolbar(int index);
-  vtkIdType GetNumberOfToolbars();
+  virtual vtkKWToolbar* GetToolbar(int index);
+  virtual int GetNumberOfToolbars();
 
   // Description:
   // Set/Get the flat aspect of the toolbars
@@ -61,16 +64,59 @@ public:
 
   // Description:
   // Convenience method to hide/show a toolbar
-  void HideToolbar(vtkKWToolbar *toolbar);
-  void ShowToolbar(vtkKWToolbar *toolbar);
-  void SetToolbarVisibility(vtkKWToolbar *toolbar, int flag);
+  virtual void HideToolbar(vtkKWToolbar *toolbar);
+  virtual void ShowToolbar(vtkKWToolbar *toolbar);
+  virtual void SetToolbarVisibility(vtkKWToolbar *toolbar, int flag);
+  virtual int GetToolbarVisibility(vtkKWToolbar *toolbar);
+  virtual void ToggleToolbarVisibility(vtkKWToolbar *toolbar);
 
   // Description:
-  // Indicates if the given toolbar is visible in 
-  // the toolset.
-  int IsToolbarVisible(vtkKWToolbar *toolbar);
-  
-  vtkIdType GetNumberOfVisibleToolbars();
+  // Return the number of visible toolbars
+  virtual int GetNumberOfVisibleToolbars();
+
+  // Description:
+  // Save/Restore the visibility flag of one/all toolbars to/from the registry
+  // Note that the name of each toolbar to save/restore should have been set
+  // for this method to work (see vtkKWToolbar).
+  virtual void SaveToolbarVisibilityToRegistry(vtkKWToolbar *toolbar);
+  virtual void RestoreToolbarVisibilityFromRegistry(vtkKWToolbar *toolbar);
+  virtual void SaveToolbarsVisibilityToRegistry();
+  virtual void RestoreToolbarsVisibilityFromRegistry();
+
+  // Description:
+  // Set/Get if the visibility flag of the toolbars should be saved
+  // or restored to the registry automatically.
+  // It is restored when the toolbar is added, and saved when the visibility
+  // flag is changed.
+  vtkBooleanMacro(SynchronizeToolbarsVisibilityWithRegistry, int); 
+  vtkGetMacro(SynchronizeToolbarsVisibilityWithRegistry, int); 
+  vtkSetMacro(SynchronizeToolbarsVisibilityWithRegistry, int); 
+
+  // Description:
+  // Convenience method to create and update a menu that can be used to control
+  // the visibility of all toolbars.
+  // The Populate...() method will repopulate the menu (note that it does 
+  // *not* remove all entries, so that this menu can be used for several
+  // toolbar sets).
+  // The Update...() method will update the state of the entries according
+  // to the toolbarsvisibility (the first one will call the second one
+  // automatically).
+  virtual void PopulateToolbarsVisibilityMenu(vtkKWMenu *menu);
+  virtual void UpdateToolbarsVisibilityMenu(vtkKWMenu *menu);
+
+  // Description:
+  // Set/Get the command/callback that will be called when the visibility
+  // of a toolbar is changed.
+  virtual void SetToolbarVisibilityChangedCommand(
+    vtkKWObject* object,const char *method);
+  virtual void InvokeToolbarVisibilityChangedCommand();
+
+  // Description:
+  // Set/Get the command/callback that will be called when the number of
+  // toolbar has changed (added or removed).
+  virtual void SetNumberOfToolbarsChangedCommand(
+    vtkKWObject* object,const char *method);
+  virtual void InvokeNumberOfToolbarsChangedCommand();
 
   // Description:
   // Show or hide a separator at the bottom of the set
@@ -105,6 +151,10 @@ protected:
   vtkKWFrame *BottomSeparatorFrame;
 
   int ShowBottomSeparator;
+  int SynchronizeToolbarsVisibilityWithRegistry;
+
+  char *ToolbarVisibilityChangedCommand;
+  char *NumberOfToolbarsChangedCommand;
 
   //BTX
 

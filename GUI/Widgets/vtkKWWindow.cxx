@@ -39,7 +39,7 @@
 #define VTK_KW_SHOW_MAIN_PANEL_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.236");
+vtkCxxRevisionMacro(vtkKWWindow, "1.237");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -61,7 +61,7 @@ vtkKWWindow::vtkKWWindow()
   // Toolbars
 
   this->Toolbars              = vtkKWToolbarSet::New();
-  this->ToolbarsMenu          = NULL; 
+  this->ToolbarsVisibilityMenu          = NULL; 
   this->MenuBarSeparatorFrame = vtkKWFrame::New();
 
   // Main split panel
@@ -216,10 +216,10 @@ vtkKWWindow::~vtkKWWindow()
     this->WindowMenu = NULL;
     }
 
-  if (this->ToolbarsMenu)
+  if (this->ToolbarsVisibilityMenu)
     {
-    this->ToolbarsMenu->Delete();
-    this->ToolbarsMenu = NULL;
+    this->ToolbarsVisibilityMenu->Delete();
+    this->ToolbarsVisibilityMenu = NULL;
     }
 
   if (this->MostRecentFilesManager)
@@ -323,9 +323,14 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->Toolbars->SetParent(this);  
   this->Toolbars->Create(app, "");
   this->Toolbars->ShowBottomSeparatorOn();
-
+  this->Toolbars->SynchronizeToolbarsVisibilityWithRegistryOn();
+  this->Toolbars->SetToolbarVisibilityChangedCommand(
+    this, "ToolbarVisibilityChangedCallback");
+  this->Toolbars->SetNumberOfToolbarsChangedCommand(
+    this, "NumberOfToolbarsChangedCallback");
 
   // Split frame
+
   this->MainSplitFrame->SetParent(this);
   this->MainSplitFrame->Create(app);
 
@@ -626,178 +631,99 @@ const char *vtkKWWindow::GetStatusText()
 //----------------------------------------------------------------------------
 vtkKWMenu *vtkKWWindow::GetEditMenu()
 {
-  if (this->EditMenu)
+  if (!this->EditMenu)
     {
-    return this->EditMenu;
+    this->EditMenu = vtkKWMenu::New();
     }
 
-  if ( !this->IsCreated() )
+  if (!this->EditMenu->IsCreated() && this->GetMenu() && this->IsCreated())
     {
-    return 0;
+    this->EditMenu->SetParent(this->GetMenu());
+    this->EditMenu->SetTearOff(0);
+    this->EditMenu->Create(this->GetApplication(), NULL);
+    this->GetMenu()->InsertCascade(1, "Edit", this->EditMenu, 0);
     }
   
-  this->EditMenu = vtkKWMenu::New();
-  this->EditMenu->SetParent(this->GetMenu());
-  this->EditMenu->SetTearOff(0);
-  this->EditMenu->Create(this->GetApplication(),"");
-  // Make sure Edit menu is next to file menu
-  this->GetMenu()->InsertCascade(1, "Edit", this->EditMenu, 0);
   return this->EditMenu;
 }
 
 //----------------------------------------------------------------------------
 vtkKWMenu *vtkKWWindow::GetViewMenu()
 {
-  if (this->ViewMenu)
+  if (!this->ViewMenu)
     {
-    return this->ViewMenu;
+    this->ViewMenu = vtkKWMenu::New();
     }
 
-  if ( !this->IsCreated() )
+  if (!this->ViewMenu->IsCreated() && this->GetMenu() && this->IsCreated())
     {
-    return 0;
+    this->ViewMenu->SetParent(this->GetMenu());
+    this->ViewMenu->SetTearOff(0);
+    this->ViewMenu->Create(this->GetApplication(), NULL);
+    this->GetMenu()->InsertCascade(
+      1 + (this->EditMenu ? 1 : 0), "View", this->ViewMenu, 0);
     }
 
-  this->ViewMenu = vtkKWMenu::New();
-  this->ViewMenu->SetParent(this->GetMenu());
-  this->ViewMenu->SetTearOff(0);
-  this->ViewMenu->Create(this->GetApplication(), "");
-  // make sure Help menu is on the right
-  if (this->EditMenu)
-    { 
-    this->GetMenu()->InsertCascade(2, "View", this->ViewMenu, 0);
-    }
-  else
-    {
-    this->GetMenu()->InsertCascade(1, "View", this->ViewMenu, 0);
-    }
-  
   return this->ViewMenu;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::AddToolbar(vtkKWToolbar* toolbar, const char* name,
-  int visibility /*=1*/)
-{
-  if (!this->Toolbars->AddToolbar(toolbar))
-    {
-    return;
-    }
-  int id = this->Toolbars->GetNumberOfToolbars() - 1; 
-  ostrstream command;
-  command << "ToggleToolbarVisibility " << id << " " << name << ends;
-  this->AddToolbarToMenu(toolbar, name, this, command.str());
-  command.rdbuf()->freeze(0);
-
-  // Restore state from registry.
-  ostrstream reg_key;
-  reg_key << name << "_ToolbarVisibility" << ends;
-  if (this->GetApplication()->GetRegistryValue(2, "RunTime", reg_key.str(), 0))
-    {
-    visibility = this->GetApplication()->GetIntRegistryValue(2, "RunTime", reg_key.str());
-    }
-  this->SetToolbarVisibility(toolbar, name, visibility);
-  reg_key.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::AddToolbarToMenu(vtkKWToolbar*, const char* name,
-  vtkKWWidget* target, const char* command)
-{
-  if (!this->ToolbarsMenu)
-    {
-    this->ToolbarsMenu = vtkKWMenu::New();
-    this->ToolbarsMenu->SetParent(this->GetWindowMenu());
-    this->ToolbarsMenu->SetTearOff(0);
-    this->ToolbarsMenu->Create(this->GetApplication(), "");
-    this->GetWindowMenu()->InsertCascade(2, " Toolbars", this->ToolbarsMenu, 1,
-      "Customize Toolbars");
-    }
-  char *rbv = this->ToolbarsMenu->CreateCheckButtonVariable(this, name);
-
-  this->ToolbarsMenu->AddCheckButton(
-    name, rbv, target, command, "Show/Hide this toolbar");
-
-  delete [] rbv;
-  
-  this->ToolbarsMenu->CheckCheckButton(this, name, 1); 
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::HideToolbar(vtkKWToolbar* toolbar, const char* name)
-{
-  this->SetToolbarVisibility(toolbar, name, 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::ShowToolbar(vtkKWToolbar* toolbar, const char* name)
-{
-  this->SetToolbarVisibility(toolbar, name, 1);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::SetToolbarVisibility(vtkKWToolbar* toolbar, const char* name, int flag)
-{
-  this->Toolbars->SetToolbarVisibility(toolbar, flag);
-  this->SetToolbarVisibilityInternal(toolbar, name, flag); 
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::SetToolbarVisibilityInternal(vtkKWToolbar* ,
-  const char* name, int flag)
-{
-  if (this->ToolbarsMenu)
-    {
-    this->ToolbarsMenu->CheckCheckButton(this, name, flag);
-    }
-  ostrstream reg_key;
-  reg_key << name << "_ToolbarVisibility" << ends;
-  this->GetApplication()->SetRegistryValue(2, "RunTime", reg_key.str(),
-    "%d", flag);
-  reg_key.rdbuf()->freeze(0); 
-  this->UpdateToolbarState();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::ToggleToolbarVisibility(int id, const char* name)
-{
-  vtkKWToolbar* toolbar = this->Toolbars->GetToolbar(id);
-  if (!toolbar)
-    {
-    return;
-    }
-  int new_visibility = (this->Toolbars->IsToolbarVisible(toolbar))? 0 : 1;
-  this->SetToolbarVisibility(toolbar, name, new_visibility);
-}
-//----------------------------------------------------------------------------
 vtkKWMenu *vtkKWWindow::GetWindowMenu()
 {
-  if (this->WindowMenu)
+  if (!this->WindowMenu)
     {
-    return this->WindowMenu;
+    this->WindowMenu = vtkKWMenu::New();
     }
 
-  if ( !this->IsCreated() )
+  if (!this->WindowMenu->IsCreated() && this->GetMenu() && this->IsCreated())
     {
-    return 0;
-    }
-
-  this->WindowMenu = vtkKWMenu::New();
-  this->WindowMenu->SetParent(this->GetMenu());
-  this->WindowMenu->SetTearOff(0);
-  this->WindowMenu->Create(this->GetApplication(), "");
-
-  // make sure Help menu is on the right
-  if (this->EditMenu)
-    { 
-    this->GetMenu()->InsertCascade(1, "Window", this->WindowMenu, 0);
-    }
-  else
-    {
-    this->GetMenu()->InsertCascade(2, "Window", this->WindowMenu, 0);
+    this->WindowMenu->SetParent(this->GetMenu());
+    this->WindowMenu->SetTearOff(0);
+    this->WindowMenu->Create(this->GetApplication(), NULL);
+    this->GetMenu()->InsertCascade(
+      1 + (!this->EditMenu ? 1 : 0), "Window", this->WindowMenu, 0);
     }
   
   return this->WindowMenu;
+}
+
+//----------------------------------------------------------------------------
+vtkKWMenu *vtkKWWindow::GetToolbarsVisibilityMenu()
+{
+  if (!this->ToolbarsVisibilityMenu)
+    {
+    this->ToolbarsVisibilityMenu = vtkKWMenu::New();
+    }
+
+  if (!this->ToolbarsVisibilityMenu->IsCreated() && 
+      this->GetWindowMenu() &&
+      this->IsCreated())
+    {
+    this->ToolbarsVisibilityMenu->SetParent(this->GetWindowMenu());
+    this->ToolbarsVisibilityMenu->SetTearOff(0);
+    this->ToolbarsVisibilityMenu->Create(this->GetApplication(), NULL);
+    this->GetWindowMenu()->InsertCascade(
+      2, " Toolbars", this->ToolbarsVisibilityMenu, 1, 
+      "Set Toolbars Visibility");
+    }
+  
+  return this->ToolbarsVisibilityMenu;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::NumberOfToolbarsChangedCallback()
+{
+  this->Toolbars->PopulateToolbarsVisibilityMenu(
+    this->GetToolbarsVisibilityMenu());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ToolbarVisibilityChangedCallback()
+{
+  this->Toolbars->UpdateToolbarsVisibilityMenu(
+    this->GetToolbarsVisibilityMenu());
+
+  this->UpdateToolbarState();
 }
 
 //----------------------------------------------------------------------------
@@ -1225,7 +1151,7 @@ void vtkKWWindow::UpdateMenuState()
   this->PropagateEnableState(this->ViewMenu);
   this->PropagateEnableState(this->WindowMenu);
   this->PropagateEnableState(this->HelpMenu);
-  this->PropagateEnableState(this->ToolbarsMenu);
+  this->PropagateEnableState(this->ToolbarsVisibilityMenu);
 
   // Most Recent Files
 

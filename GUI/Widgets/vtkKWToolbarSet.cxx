@@ -16,6 +16,7 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
+#include "vtkKWMenu.h"
 #include "vtkKWToolbar.h"
 #include "vtkObjectFactory.h"
 
@@ -30,7 +31,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.11");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.12");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -50,6 +51,10 @@ public:
 vtkKWToolbarSet::vtkKWToolbarSet()
 {
   this->ShowBottomSeparator  = 1;
+  this->SynchronizeToolbarsVisibilityWithRegistry  = 0;
+
+  this->ToolbarVisibilityChangedCommand  = NULL;
+  this->NumberOfToolbarsChangedCommand  = NULL;
 
   this->ToolbarsFrame        = vtkKWFrame::New();
   this->BottomSeparatorFrame = vtkKWFrame::New();
@@ -83,6 +88,18 @@ vtkKWToolbarSet::~vtkKWToolbarSet()
         }
       }
     delete this->Internals;
+    }
+
+  if (this->ToolbarVisibilityChangedCommand)
+    {
+    delete [] this->ToolbarVisibilityChangedCommand;
+    this->ToolbarVisibilityChangedCommand = NULL;
+    }
+
+  if (this->NumberOfToolbarsChangedCommand)
+    {
+    delete [] this->NumberOfToolbarsChangedCommand;
+    this->NumberOfToolbarsChangedCommand = NULL;
     }
 }
 
@@ -263,7 +280,7 @@ int vtkKWToolbarSet::HasToolbar(vtkKWToolbar *toolbar)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar)
+int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar, int default_visibility)
 {
   // Check if the new toolbar is already in
 
@@ -282,23 +299,29 @@ int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar)
 
   // Create the toolbar
 
-  toolbar_slot->Visibility = 1;
-
   toolbar_slot->Toolbar = toolbar;
   this->PropagateEnableState(toolbar_slot->Toolbar);
 
   toolbar_slot->SeparatorFrame = vtkKWFrame::New();
   this->PropagateEnableState(toolbar_slot->SeparatorFrame);
 
+  toolbar_slot->Visibility = default_visibility;
+  if (this->SynchronizeToolbarsVisibilityWithRegistry)
+    {
+    this->RestoreToolbarVisibilityFromRegistry(toolbar_slot->Toolbar);
+    }
+
   // Pack the toolbars
 
   this->PackToolbars();
+
+  this->InvokeNumberOfToolbarsChangedCommand();
 
   return 1;
 }
 
 // ----------------------------------------------------------------------------
-vtkIdType vtkKWToolbarSet::GetNumberOfToolbars()
+int vtkKWToolbarSet::GetNumberOfToolbars()
 {
   return this->Internals->Toolbars.size();
 }
@@ -316,6 +339,13 @@ void vtkKWToolbarSet::ShowToolbar(vtkKWToolbar *toolbar)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWToolbarSet::ToggleToolbarVisibility(vtkKWToolbar *toolbar)
+{
+  this->SetToolbarVisibility(
+    toolbar, this->GetToolbarVisibility(toolbar) ? 0 : 1);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWToolbarSet::SetToolbarVisibility(
   vtkKWToolbar *toolbar, int flag)
 {
@@ -324,19 +354,24 @@ void vtkKWToolbarSet::SetToolbarVisibility(
   if (toolbar_slot && toolbar_slot->Visibility != flag)
     {
     toolbar_slot->Visibility = flag;
+    if (this->SynchronizeToolbarsVisibilityWithRegistry)
+      {
+      this->SaveToolbarVisibilityToRegistry(toolbar_slot->Toolbar);
+      }
     this->PackToolbars();
+    this->InvokeToolbarVisibilityChangedCommand();
     }
 }
 
 //----------------------------------------------------------------------------
-int vtkKWToolbarSet::IsToolbarVisible(vtkKWToolbar* toolbar)
+int vtkKWToolbarSet::GetToolbarVisibility(vtkKWToolbar* toolbar)
 {
   vtkKWToolbarSet::ToolbarSlot *toolbar_slot = this->GetToolbarSlot(toolbar);
   return (toolbar_slot && toolbar_slot->Visibility)? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkKWToolbarSet::GetNumberOfVisibleToolbars()
+int vtkKWToolbarSet::GetNumberOfVisibleToolbars()
 {
   int count = 0;
 
@@ -432,6 +467,177 @@ vtkKWToolbar* vtkKWToolbarSet::GetToolbar(int index)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWToolbarSet::SaveToolbarVisibilityToRegistry(
+  vtkKWToolbar *toolbar)
+{
+  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = this->GetToolbarSlot(toolbar);
+  if (toolbar_slot && 
+      toolbar_slot->Toolbar && 
+      toolbar_slot->Toolbar->GetName())
+    {
+    kwsys_stl::string key(toolbar_slot->Toolbar->GetName());
+    key += "Visibility";
+    this->GetApplication()->SetRegistryValue(
+      2, "Toolbars", key.c_str(), "%d", toolbar_slot->Visibility);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::RestoreToolbarVisibilityFromRegistry(
+  vtkKWToolbar *toolbar)
+{
+  vtkKWToolbarSet::ToolbarSlot *toolbar_slot = this->GetToolbarSlot(toolbar);
+  if (toolbar_slot && 
+      toolbar_slot->Toolbar && 
+      toolbar_slot->Toolbar->GetName())
+    {
+    kwsys_stl::string key(toolbar_slot->Toolbar->GetName());
+    key += "Visibility";
+    if (this->GetApplication()->HasRegistryValue(
+          2, "Toolbars", key.c_str()))
+      {
+      this->SetToolbarVisibility(
+        toolbar_slot->Toolbar,
+        this->GetApplication()->GetIntRegistryValue(
+          2, "Toolbars", key.c_str()));
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::SaveToolbarsVisibilityToRegistry()
+{
+  if (this->Internals)
+    {
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
+      {
+      if (*it)
+        {
+        this->SaveToolbarVisibilityToRegistry((*it)->Toolbar);
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::RestoreToolbarsVisibilityFromRegistry()
+{
+  if (this->Internals)
+    {
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
+      {
+      if (*it)
+        {
+        this->RestoreToolbarVisibilityFromRegistry((*it)->Toolbar);
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::PopulateToolbarsVisibilityMenu(vtkKWMenu *menu)
+{
+  if (this->Internals && menu)
+    {
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
+      {
+      if (*it && 
+          (*it)->Toolbar && 
+          (*it)->Toolbar->GetName() && 
+          (*it)->Toolbar->IsCreated())
+        {
+        if (!menu->HasItem((*it)->Toolbar->GetName()))
+          {
+          char *rbv = menu->CreateCheckButtonVariable(
+            menu, (*it)->Toolbar->GetName());
+
+          kwsys_stl::string command("ToggleToolbarVisibility ");
+          command += (*it)->Toolbar->GetTclName();
+
+          kwsys_stl::string help("Show/Hide the ");
+          help += (*it)->Toolbar->GetName();
+          help += " toolbar";
+        
+          menu->AddCheckButton(
+            (*it)->Toolbar->GetName(), rbv, 
+            this, command.c_str(), help.c_str());
+          delete [] rbv;
+          }
+        }
+      }
+    this->UpdateToolbarsVisibilityMenu(menu);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::UpdateToolbarsVisibilityMenu(vtkKWMenu *menu)
+{
+  if (this->Internals && menu)
+    {
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator it = 
+      this->Internals->Toolbars.begin();
+    vtkKWToolbarSetInternals::ToolbarsContainerIterator end = 
+      this->Internals->Toolbars.end();
+    for (; it != end; ++it)
+      {
+      if (*it && (*it)->Toolbar && (*it)->Toolbar->GetName())
+        {
+        menu->CheckCheckButton(
+          menu, (*it)->Toolbar->GetName(), (*it)->Visibility);
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::InvokeToolbarVisibilityChangedCommand()
+{
+  if (this->ToolbarVisibilityChangedCommand && 
+      *this->ToolbarVisibilityChangedCommand)
+    {
+    this->Script("eval %s", this->ToolbarVisibilityChangedCommand);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::SetToolbarVisibilityChangedCommand(
+  vtkKWObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(
+    &this->ToolbarVisibilityChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::InvokeNumberOfToolbarsChangedCommand()
+{
+  if (this->NumberOfToolbarsChangedCommand && 
+      *this->NumberOfToolbarsChangedCommand)
+    {
+    this->Script("eval %s", this->NumberOfToolbarsChangedCommand);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbarSet::SetNumberOfToolbarsChangedCommand(
+  vtkKWObject *object, const char *method)
+{
+  this->SetObjectMethodCommand(
+    &this->NumberOfToolbarsChangedCommand, object, method);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWToolbarSet::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
@@ -461,5 +667,8 @@ void vtkKWToolbarSet::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ToolbarsFrame: " << this->ToolbarsFrame << endl;
   os << indent << "ShowBottomSeparator: " 
      << (this->ShowBottomSeparator ? "On" : "Off") << endl;
+  os << indent << "SynchronizeToolbarsVisibilityWithRegistry: " 
+     << (this->SynchronizeToolbarsVisibilityWithRegistry ? "On" : "Off") 
+     << endl;
 }
 

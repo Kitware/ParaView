@@ -119,7 +119,7 @@ public:
   // The first part is called the "main panel" area, and it
   // can be hidden or shown by setting its visibility flag.
   // A convenience method GetMainPanelFrame can be used to retrieve that
-  // "main panel area".
+  // "main panel area" (where the main notebook already is).
   // The MainNotebook element is packed in the main panel and is used to
   // display interface elements organized as pages inside panels.
   // The second part of the split frame is called the "view frame".
@@ -140,6 +140,7 @@ public:
   vtkKWMenu *GetEditMenu();
   vtkKWMenu *GetViewMenu();
   vtkKWMenu *GetWindowMenu();
+  vtkKWMenu *GetToolbarsVisibilityMenu();
   
   // Description:
   // Convenience method that return the position where to safely insert 
@@ -184,8 +185,8 @@ public:
     const char *filename, vtkKWObject *target, const char *command);
   
   // Description:
-  // Does the window support print (if false, no print entries 
-  // should be added to the  menus)
+  // Does the window support print (if false, no print-related entries 
+  // will/should be added to the  menus)
   vtkSetClampMacro(SupportPrint, int, 0, 1);
   vtkGetMacro(SupportPrint, int);
   vtkBooleanMacro(SupportPrint, int);
@@ -199,27 +200,6 @@ public:
   // The toolbar container.
   vtkGetObjectMacro(Toolbars, vtkKWToolbarSet);
 
-  // Description:
-  // Add a toolbar to the window. Do not directly add the toolbar to
-  // the vtkKWToolbarSet instance if
-  // it must be made availble in the View | Toolbars menu to
-  // toggle visibility. Also, 
-  // use HideToolbar / ShowToolbar / SetToolbarVisibility methods
-  // alone to change the visibility of the toolbar.
-  // visibility is the default toolbar visibility used
-  // if there is not rehistry entry for that toolbar.
-  void AddToolbar(vtkKWToolbar* toolbar, const char* name, int visibility=1);
-
-  // Description:
-  // Change the visibility of a toolbar.
-  void HideToolbar(vtkKWToolbar* toolbar, const char* name);
-  void ShowToolbar(vtkKWToolbar* toolbar, const char* name);
-  void SetToolbarVisibility(vtkKWToolbar* toolbar, const char* name, int flag);
-
-  // Description:;
-  // Callback to toggle toolbar visibility
-  void ToggleToolbarVisibility(int id, const char* name);
-  
   // Description:
   // Get the status frame object.
   vtkGetObjectMacro(StatusFrame, vtkKWFrame);
@@ -285,6 +265,8 @@ public:
   virtual void ErrorIconCallback();
   virtual void MainPanelVisibilityCallback();
   virtual void PrintOptionsCallback() {};
+  virtual void ToolbarVisibilityChangedCallback();
+  virtual void NumberOfToolbarsChangedCallback();
 
 protected:
   vtkKWWindow();
@@ -298,13 +280,6 @@ protected:
   // Description:
   // Update the image in the status frame. Usually a logo of some sort.
   virtual void UpdateStatusImage();
-
-  // Description:
-  // Add the toolbar to the menu alone.
-  void AddToolbarToMenu(vtkKWToolbar* toolbar, const char* name, 
-    vtkKWWidget* target, const char* command);
-
-  void SetToolbarVisibilityInternal(vtkKWToolbar* toolbar,const char* name, int flag);
 
   // Recent files
 
@@ -324,7 +299,7 @@ protected:
   vtkKWMenu *ViewMenu;
   vtkKWMenu *WindowMenu;
   vtkKWMenu *HelpMenu;
-  vtkKWMenu *ToolbarsMenu;
+  vtkKWMenu *ToolbarsVisibilityMenu;
 
   vtkKWFrame *StatusFrameSeparator;
   vtkKWFrame *StatusFrame;

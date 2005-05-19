@@ -544,13 +544,6 @@ public:
   void SetToolbarVisibility(const char* identifier, int state);
 
   // Description:
-  // Adds a toolbar to the under the View window.
-  void AddLowerToolbar(vtkKWToolbar* toolbar, const char* name, int visibility=1);
-  void SetLowerToolbarVisibility(vtkKWToolbar* toolbar, const char* name, int flag);
-  void ToggleLowerToolbarVisibility(int id, const char* name);
-    
-
-  // Description:
   // This changes the visibility of the Horizontal pane.
   // Animation key frames are shown in the Horizontal pane.
   int GetHorizontalPaneVisibility();
@@ -581,6 +574,8 @@ public:
   // This method is called when error icon is clicked.
   void ErrorIconCallback();
   virtual void PrintOptionsCallback();
+  virtual void ToolbarVisibilityChangedCallback();
+  virtual void NumberOfToolbarsChangedCallback();
     
 protected:
   vtkPVWindow();

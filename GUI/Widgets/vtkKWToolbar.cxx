@@ -49,7 +49,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.45");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.46");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -96,6 +96,8 @@ vtkKWToolbar::vtkKWToolbar()
   // Internal structs
 
   this->Internals = new vtkKWToolbarInternals;
+
+  this->Name = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -134,6 +136,8 @@ vtkKWToolbar::~vtkKWToolbar()
       }
     delete this->Internals;
     }
+
+  this->SetName(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -791,5 +795,6 @@ void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PadY: " << this->PadY << endl;
   os << indent << "WidgetsFlatAdditionalPadX: " << this->WidgetsFlatAdditionalPadX << endl;
   os << indent << "WidgetsFlatAdditionalPadY: " << this->WidgetsFlatAdditionalPadY << endl;
+  os << indent << "Name: " << (this->Name ? this->Name : "None") << endl;
 }
 
