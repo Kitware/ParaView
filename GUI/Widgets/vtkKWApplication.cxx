@@ -56,7 +56,7 @@ EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.202");
+vtkCxxRevisionMacro(vtkKWApplication, "1.203");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -243,9 +243,19 @@ int vtkKWApplication::RemoveWindow(vtkKWWindow *win)
   // will be back here, but this won't infinite loop since this->Exit()
   // will return false (as we are already "exiting", check this->InExit)
 
-  if (this->GetNumberOfWindows() <= 1 && this->Exit())
+  if (this->GetNumberOfWindows() <= 1)
     {
-    return 1;
+    // We managed to exit right away
+    if (this->Exit())
+      {
+      return 1;
+      }
+    // we could not exit, but not because we were already exiting, but
+    // because of other factors like errors or user not confirming
+    if (!this->InExit) 
+      {
+      return 0;
+      }
     }
 
   if (this->Internals && win)
