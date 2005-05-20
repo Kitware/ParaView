@@ -62,6 +62,7 @@ SET(PROJECT_TESTS
   ScalarRangeLabel
   ScalarSelection
   ScalarsSphereClip
+  SPCTH
   TestDemo
   TestPackage
   Threshold
