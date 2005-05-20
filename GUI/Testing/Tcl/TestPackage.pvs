@@ -18,10 +18,10 @@ if { [catch {
   set cone [ $pvWindow CreatePVSource testConeSource]
   $cone AcceptCallback
   [ $cone GetPVOutput ] CenterCamera
-  [ $cone GetPVOutput ] SetCubeAxesVisibility 0
-  [ $cone GetPVOutput ] SetCubeAxesVisibility 1
-  [ $cone GetPVOutput ] SetCubeAxesVisibility 0
-  [ $cone GetPVOutput ] SetCubeAxesVisibility 1
+  $cone SetCubeAxesVisibility 0
+  $cone SetCubeAxesVisibility 1
+  $cone SetCubeAxesVisibility 0
+  $cone SetCubeAxesVisibility 1
   [ [ $cone GetPVOutput ] GetCubeAxesCheck ] SetState 1
   [ $cone GetPVOutput ] CubeAxesCheckCallback
   # Cone has no attributes to color by!

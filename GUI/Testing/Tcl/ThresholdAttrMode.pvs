@@ -28,8 +28,7 @@ set pv(vtkTemp304) [$pv(vtkTemp1) CreatePVSource DataSetTriangleFilter]
 $pv(vtkTemp304) AcceptCallback
 [$pv(vtkTemp304) GetPVOutput] SetInterpolateColorsFlag 1
 [$pv(vtkTemp304) GetPVOutput] DrawSurface
-set pv(vtkTemp321) [$pv(vtkTemp304) GetPVOutput]
-$pv(vtkTemp321) SetVisibility 0
+$pv(vtkTemp304) SetVisibility 0
 set pv(vtkTemp158) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 set pv(vtkTemp164) [$pv(vtkTemp158) GetPVWidget {Input}]
 $pv(vtkTemp164) SetCurrentValue $pv(vtkTemp129)

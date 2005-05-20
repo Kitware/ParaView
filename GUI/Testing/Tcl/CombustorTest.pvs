@@ -76,7 +76,7 @@ $pvExtract AcceptCallback
 set MainView [[$Application GetMainWindow] GetMainView]
 $MainView SetRenderWindowSize 300 300
 
-[$pvExtract GetPVOutput] SetVisibility 0
+$pvExtract SetVisibility 0
 
 set pvGlyph [$pvWindow CreatePVSource Glyph]
 $pvGlyph AcceptCallback
@@ -86,7 +86,7 @@ set GlyphOrientScale [$pvGlyph GetPVWidget {OrientScale}]
 $GlyphOrientScale SetScaleMode Scalar
 $GlyphOrientScale SetScaleFactor 3.0
 $pvGlyph AcceptCallback
-[$pvGlyph GetPVOutput] SetVisibility 0
+$pvGlyph SetVisibility 0
 
 
 set MainView [[$Application GetMainWindow] GetMainView]
@@ -111,7 +111,7 @@ AdjustContourValue $cInt 0.3
 $pvWindow SetCurrentPVSource $cInt
 set cntOutput [$cInt GetPVOutput]
 $cntOutput ColorByArray {Momentum} 3
-$cntOutput SetScalarBarVisibility 1
+[$cInt GetPVColorMap] SetScalarBarVisibility 1
 $cInt Reset
 
 set MainView [[$Application GetMainWindow] GetMainView]
@@ -124,7 +124,7 @@ for {set i 0} {$i < 1} {incr i 1} {
 }
 
 $cInt SetVisibility 0
-$cntOutput SetScalarBarVisibility 0
+[$cInt GetPVColorMap] SetScalarBarVisibility 0
 
 # Here goes cut-plane (see end of this file)
 
@@ -135,10 +135,10 @@ $pvWindow SetCurrentPVSource $pvExtract
 $VOIEntry SetValue 0 56 0 32 0 0 
 $pvExtract AcceptCallback
 
-[$pvExtract GetPVOutput] SetVisibility 1
+$pvExtract SetVisibility 1
 
 $pvWindow SetCurrentPVSource $pvGlyph
-[$pvGlyph GetPVOutput] SetVisibility 1
+$pvGlyph SetVisibility 1
 [$pvGlyph GetPVOutput] ColorByProperty
 
 $MainView SetCameraState 36.8437 -0.196199 53.7392 -5.92921 -0.324064 18.022 -0.639592 -0.0625532 0.766165
@@ -150,7 +150,7 @@ $pvExtract AcceptCallback
 
 set extOutput [$pvExtract GetPVOutput]
 $extOutput ColorByArray {Density} 3
-$extOutput SetScalarBarVisibility 1
+[$pvExtract GetPVColorMap] SetScalarBarVisibility 1
 
 $pvWindow SetCurrentPVSource $pvExtract
 for {set i 55} {$i < 56} {incr i 1} {

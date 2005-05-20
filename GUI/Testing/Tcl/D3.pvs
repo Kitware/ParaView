@@ -32,7 +32,7 @@ $kw(vtkTemp247) AcceptCallback
 set kw(vtkTemp293) [$kw(vtkTemp247) GetPVOutput]
 $kw(vtkTemp293) ColorByArray {RTData} 3
 $kw(vtkTemp293) DrawOutline
-$kw(vtkTemp293) SetVisibility 0
+$kw(vtkTemp247) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp247)
 set kw(vtkTemp479) [$kw(vtkTemp1) CreatePVSource Clip]
 set kw(vtkTemp573) [$kw(vtkTemp479) GetPVWidget {Input}]
@@ -55,7 +55,7 @@ $kw(vtkTemp479) AcceptCallback
 set kw(vtkTemp579) [$kw(vtkTemp479) GetPVOutput]
 $kw(vtkTemp579) ColorByArray {RTData} 3
 $kw(vtkTemp579) DrawSurface
-$kw(vtkTemp579) SetVisibility 0
+$kw(vtkTemp479) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp479)
 set kw(vtkTemp690) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
 set kw(vtkTemp716) [$kw(vtkTemp690) GetPVWidget {Input}]
@@ -70,7 +70,7 @@ $kw(vtkTemp690) AcceptCallback
 set kw(vtkTemp720) [$kw(vtkTemp690) GetPVOutput]
 $kw(vtkTemp720) ColorByArray {Elevation} 3
 $kw(vtkTemp720) DrawSurface
-$kw(vtkTemp720) SetVisibility 0
+$kw(vtkTemp690) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp690)
 set kw(vtkTemp887) [$kw(vtkTemp1) CreatePVSource Calculator]
 set kw(vtkTemp908) [$kw(vtkTemp887) GetPVWidget {Input}]
@@ -85,7 +85,7 @@ $kw(vtkTemp887) AcceptCallback
 set kw(vtkTemp912) [$kw(vtkTemp887) GetPVOutput]
 $kw(vtkTemp912) ColorByArray {Elevation} 3
 $kw(vtkTemp912) DrawSurface
-$kw(vtkTemp912) SetVisibility 0
+$kw(vtkTemp887) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp887)
 set kw(vtkTemp1119) [$kw(vtkTemp1) CreatePVSource WarpVector]
 set kw(vtkTemp1131) [$kw(vtkTemp1119) GetPVWidget {Input}]
@@ -98,7 +98,7 @@ $kw(vtkTemp1119) AcceptCallback
 set kw(vtkTemp1136) [$kw(vtkTemp1119) GetPVOutput]
 $kw(vtkTemp1136) ColorByArray {Elevation} 3
 $kw(vtkTemp1136) DrawSurface
-$kw(vtkTemp1136) SetVisibility 0
+$kw(vtkTemp1119) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1119)
 set kw(vtkTemp1247) [$kw(vtkTemp1) CreatePVSource D3]
 set kw(vtkTemp1264) [$kw(vtkTemp1247) GetPVWidget {Input}]
@@ -113,7 +113,7 @@ $kw(vtkTemp1247) AcceptCallback
 set kw(vtkTemp1268) [$kw(vtkTemp1247) GetPVOutput]
 $kw(vtkTemp1268) ColorByArray {Elevation} 3
 $kw(vtkTemp1268) DrawSurface
-$kw(vtkTemp1268) SetVisibility 0
+$kw(vtkTemp1247) SetVisibility 0
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp1247)
 set kw(vtkTemp1379) [$kw(vtkTemp1) CreatePVSource PieceScalars]
 set kw(vtkTemp1389) [$kw(vtkTemp1379) GetPVWidget {Input}]
@@ -124,7 +124,7 @@ $kw(vtkTemp1379) AcceptCallback
 set kw(vtkTemp1393) [$kw(vtkTemp1379) GetPVOutput]
 $kw(vtkTemp1393) ColorByArray {Piece} 3
 $kw(vtkTemp1393) DrawSurface
-$kw(vtkTemp1393) SetVisibility 1
+$kw(vtkTemp1379) SetVisibility 1
 set kw(vtkTemp426) [$kw(vtkTemp1) GetPVColorMap {RTData} 1]
 $kw(vtkTemp426) SetScalarRange 47.1256 265.206
 $kw(vtkTemp426) SetStartHSV 0.6667 1 1

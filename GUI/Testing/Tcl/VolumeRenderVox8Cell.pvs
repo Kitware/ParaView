@@ -44,7 +44,7 @@ $kw(vtkTemp1422) AcceptCallback
 
 $kw(vtkTemp5) SetCurrentPVSourceCallback $kw(vtkTemp1176)
 set kw(vtkTemp1187) [$kw(vtkTemp1176) GetPVOutput]
-$kw(vtkTemp1187) SetVisibility 1
+$kw(vtkTemp1176) SetVisibility 1
 
 $kw(vtkTemp1187) DrawVolume
 $kw(vtkTemp24) SetCameraState -2.443 -3.984 4.451  1.000 1.000 1.000  -0.384 0.690 0.613

@@ -1342,7 +1342,7 @@ proc extract_run {} {
   $extract(vtkTemp480) SetCurrentTime 0
   $extract(vtkTemp480) Play
 
-  
+
   $extract(vtkTemp598) SetVisibility 0
   if $pvDemoShouldStop {
     return
@@ -1361,7 +1361,7 @@ proc extract_run {} {
   $extract(vtkTemp480) SetLoop 0
   $extract(vtkTemp480) SetCurrentTime 0
   $extract(vtkTemp480) Play
- 
+
   $extract(vtkTemp780) SetVisibility 0
   $extract(vtkTemp830) RemoveAllKeyFrames
 
@@ -4480,7 +4480,7 @@ proc warp_init {} {
     if $pvDemoShouldStop {
         return
     }
-    $warp(vtkTemp469) SetVisibility 0
+    $warp(vtkTemp450) SetVisibility 0
     $warp(vtkTemp24) EventuallyRender
 }
 
@@ -4544,7 +4544,7 @@ proc warp_run {} {
 
     DemoAfter 2000 
 
-    $warp(vtkTemp469) SetVisibility 0
+    $warp(vtkTemp450) SetVisibility 0
 }
 
 if ![info exists DemoDir] {

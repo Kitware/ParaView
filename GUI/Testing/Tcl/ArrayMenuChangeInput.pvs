@@ -45,16 +45,15 @@ set kw(vtkTemp491) [$kw(vtkTemp482) GetPVWidget {Scalars}]
 $kw(vtkTemp491) SetValue {resultArray}
 update
 $kw(vtkTemp482) AcceptCallback
-set kw(vtkTemp452) [$kw(vtkTemp428) GetPVOutput]
-$kw(vtkTemp452) SetVisibility 1
+$kw(vtkTemp428) SetVisibility 1
 set kw(vtkTemp506) [$kw(vtkTemp482) GetPVWidget {Input}]
 $kw(vtkTemp506) SetCurrentValue $kw(vtkTemp381)
 $kw(vtkTemp491) SetValue {Elevation}
 update
 $kw(vtkTemp482) AcceptCallback
+$kw(vtkTemp482) SetVisibility 0
+$kw(vtkTemp482) SetVisibility 1
 set kw(vtkTemp509) [$kw(vtkTemp482) GetPVOutput]
-$kw(vtkTemp509) SetVisibility 0
-$kw(vtkTemp509) SetVisibility 1
 $kw(vtkTemp509) ColorByProperty
 
 
@@ -62,7 +61,7 @@ $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp273)
 set kw(vtkTemp309) [$kw(vtkTemp273) GetPVOutput]
 #$kw(vtkTemp309) ColorByPointField {Normals} 3
 $kw(vtkTemp309) ColorByArray {Normals} 3
-set kw(vtkTemp310) [$kw(vtkTemp309) GetPVColorMap]
+set kw(vtkTemp310) [$kw(vtkTemp273) GetPVColorMap]
 $kw(vtkTemp310) VectorModeComponentCallback
 $kw(vtkTemp310) VectorComponentCallback 0
 $kw(vtkTemp310) ResetScalarRange

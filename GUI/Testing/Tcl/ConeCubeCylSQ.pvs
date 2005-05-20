@@ -57,7 +57,7 @@ $pv(vtkTemp486) AcceptCallback
 set pv(vtkTemp536) [$pv(vtkTemp1) CreatePVSource OutlineCornerFilter]
 $pv(vtkTemp536) AcceptCallback
 
-[$pv(vtkTemp486) GetPVOutput] SetVisibility 1
+$pv(vtkTemp486) SetVisibility 1
 $pv(vtkTemp1) ResetCameraCallback
 
 # Retrace

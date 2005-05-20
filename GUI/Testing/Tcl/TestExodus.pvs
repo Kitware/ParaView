@@ -56,7 +56,7 @@ $kw(vtkTemp1162) ColorByArray {disp} 3
 $kw(vtkTemp1162) SetMapScalarsFlag 1
 $kw(vtkTemp1162) SetInterpolateColorsFlag 0
 $kw(vtkTemp1162) DrawSurface
-$kw(vtkTemp1162) SetVisibility 1
+$kw(vtkTemp1076) SetVisibility 1
 set kw(vtkTemp1277) [$kw(vtkTemp4) GetPVColorMap {BlockId} 1]
 $kw(vtkTemp1277) SetScalarRange 1 1.001
 $kw(vtkTemp1277) SetStartHSV 0.6667 1 1
