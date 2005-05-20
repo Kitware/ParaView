@@ -20,16 +20,20 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkPVOptions.h"
+#include "vtkCollection.h"
+#include "vtkSMIceTMultiDisplayProxy.h"
 
 vtkStandardNewMacro(vtkSMIceTRenderModuleProxy);
-vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMIceTRenderModuleProxy, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkSMIceTRenderModuleProxy::vtkSMIceTRenderModuleProxy()
 {
-  this->SetDisplayXMLName("MultiDisplay");
-  this->RemoteDisplay = 0;
+  this->SetDisplayXMLName("IceTMultiDisplay");
   // don't send locally rendered images back to the client.
+  this->RemoteDisplay = 0;
+
+  this->CollectGeometryThreshold = 100.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -77,6 +81,21 @@ void vtkSMIceTRenderModuleProxy::InitializeCompositingPipeline()
   this->CompositeManagerProxy->UpdateVTKObjects();
 }
 
+//-----------------------------------------------------------------------------
+
+void vtkSMIceTRenderModuleProxy::InteractiveRender()
+{
+  this->ChooseSuppressGeometryCollection();
+  this->Superclass::InteractiveRender();
+}
+
+//-----------------------------------------------------------------------------
+
+void vtkSMIceTRenderModuleProxy::StillRender()
+{
+  this->ChooseSuppressGeometryCollection();
+  this->Superclass::StillRender();
+}
 
 //-----------------------------------------------------------------------------
 void vtkSMIceTRenderModuleProxy::BeginStillRender()
@@ -134,7 +153,39 @@ int vtkSMIceTRenderModuleProxy::GetLocalRenderDecision(unsigned long mem,
 }
 
 //-----------------------------------------------------------------------------
+int vtkSMIceTRenderModuleProxy::GetSuppressGeometryCollectionDecision()
+{
+  if (  this->GetTotalVisibleGeometryMemorySize()
+      < this->CollectGeometryThreshold*1000)
+    {
+    return 0;
+    }
+  return 1;
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMIceTRenderModuleProxy::ChooseSuppressGeometryCollection()
+{
+  int decision = this->GetSuppressGeometryCollectionDecision();
+
+  this->Displays->InitTraversal();
+  while (vtkObject *obj = this->Displays->GetNextItemAsObject())
+    {
+    vtkSMIceTMultiDisplayProxy *pDisp
+      = vtkSMIceTMultiDisplayProxy::SafeDownCast(obj);
+    if (pDisp && pDisp->GetVisibilityCM())
+      {
+      // Just setting locally is fine.  Don't need to use properties.
+      pDisp->SetSuppressGeometryCollection(decision);
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkSMIceTRenderModuleProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "CollectGeometryThreshold: "
+     << this->CollectGeometryThreshold << endl;
 }

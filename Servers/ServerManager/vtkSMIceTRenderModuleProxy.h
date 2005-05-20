@@ -28,9 +28,16 @@ public:
   vtkTypeRevisionMacro(vtkSMIceTRenderModuleProxy, vtkSMIceTDesktopRenderModuleProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Select the threshold at which any geometry is collected on the client.
+  vtkSetMacro(CollectGeometryThreshold, double);
+  vtkGetMacro(CollectGeometryThreshold, double);
+
 protected:
   vtkSMIceTRenderModuleProxy();
   ~vtkSMIceTRenderModuleProxy();
+
+  double CollectGeometryThreshold;
 
   // Description:
   // Subclasses should override this method to intialize the Composite Manager.
@@ -43,6 +50,9 @@ protected:
   // else it's 0 (for InteractiveRender);
   virtual int GetLocalRenderDecision(unsigned long totalMemory, int stillRender);
 
+  virtual void InteractiveRender();
+  virtual void StillRender();
+
   // Description:
   // Method called before/after Still Render is called.
   // Can be used to set GlobalLODFlag.
@@ -51,6 +61,17 @@ protected:
 
   virtual void BeginInteractiveRender();
   virtual void EndInteractiveRender();
+
+  // Description:
+  // Indicates if geometry should be collected on the client.  If the data is
+  // really big, sometimes even a decimated version of it does not fit on
+  // the client well.
+  int GetSuppressGeometryCollectionDecision();
+
+  // Description:
+  // Convenience method for synchronizing the SuppressGeometryCollection flag on
+  // all the display proxies.
+  void ChooseSuppressGeometryCollection();
 
 private:
   vtkSMIceTRenderModuleProxy(const vtkSMIceTRenderModuleProxy&); // Not implemented.

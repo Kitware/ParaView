@@ -14,11 +14,7 @@
 =========================================================================*/
 // .NAME vtkPVIceTRenderModuleUI - UI for MPI and Client server.
 // .SECTION Description
-// For the moment, This subclass does nothing.
-// I will specialize the UI in the future.
-// We need a class of this name because of the way 
-// RenderModuleName is used to create the classes.
-// In the future, we will use XML ...
+// This render module user interface controls ICE-T tile display compositing.
 
 
 #ifndef __vtkPVIceTRenderModuleUI_h
@@ -35,9 +31,26 @@ public:
   vtkTypeRevisionMacro(vtkPVIceTRenderModuleUI,vtkPVMultiDisplayRenderModuleUI);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  void Create(vtkKWApplication *app, const char *);
+
+  // Description:
+  // Threshold for collecting geometry to the client (vs. showing the outline
+  // on the client).
+  void CollectCheckCallback();
+  void CollectThresholdScaleCallback();
+  void CollectThresholdLabelCallback();
+  void SetCollectThreshold(float val);
+  vtkGetMacro(CollectThreshold, float);
+
 protected:
   vtkPVIceTRenderModuleUI();
   ~vtkPVIceTRenderModuleUI();
+
+  vtkKWLabel       *CollectLabel;
+  vtkKWCheckButton *CollectCheck;
+  vtkKWScale       *CollectThresholdScale;
+  vtkKWLabel       *CollectThresholdLabel;
+  float             CollectThreshold;
 
   vtkPVIceTRenderModuleUI(const vtkPVIceTRenderModuleUI&); // Not implemented
   void operator=(const vtkPVIceTRenderModuleUI&); // Not implemented

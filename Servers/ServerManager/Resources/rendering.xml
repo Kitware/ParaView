@@ -1524,6 +1524,14 @@
       
     <IceTRenderModuleProxy name="IceTRenderModule"
       base_proxygroup="rendermodules" base_proxyname="IceTDesktopRenderModule">
+      <DoubleVectorProperty
+        name="CollectGeometryThreshold"
+        command="SetCollectGeometryThreshold"
+        number_of_elements="1"
+        default_values="0"
+        update_self="1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
     </IceTRenderModuleProxy>
 
     <CaveRenderModuleProxy name="CaveRenderModule"
@@ -2284,6 +2292,36 @@
       base_proxygroup="displays" base_proxyname="CompositeDisplay">
       <!-- nothing new here -->
     </MultiDisplayProxy>
+
+    <IceTMultiDisplayProxy name="IceTMultiDisplay"
+      base_proxygroup="displays" base_proxyname="MultiDisplay">
+      <SubProxy>
+        <Proxy name="OutlineFilter" 
+          proxygroup="filters" proxyname="OutlineFilter" />
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="OutlineCollect"
+           proxygroup="filters" proxyname="MPIMoveData">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="OutlineUpdateSuppressor" 
+          proxygroup="filters" proxyname="UpdateSuppressor" />
+        <ShareProperties subproxy="UpdateSuppressor">
+          <Exception name="Input" />
+        </ShareProperties>
+      </SubProxy>
+      <IntVectorProperty
+        name="SuppressGeometryCollection"
+        command="SetSuppressGeometryCollection"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0"
+        animateable="0"
+        saveable="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+    </IceTMultiDisplayProxy>
   </ProxyGroup>
 
 </ServerManagerConfiguration>

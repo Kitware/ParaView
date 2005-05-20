@@ -29,7 +29,7 @@ public:
 
   // Description:
   // Enables or disables the collection filter.
-  void SetCollectionDecision(int val);
+  virtual void SetCollectionDecision(int val);
   vtkGetMacro(CollectionDecision, int);
   virtual void SetLODCollectionDecision(int val);
   vtkGetMacro(LODCollectionDecision, int);

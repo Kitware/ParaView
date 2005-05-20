@@ -48,6 +48,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMFieldDataDomain.cxx
   vtkSMFixedTypeDomain.cxx
   vtkSMIceTDesktopRenderModuleProxy.cxx
+  vtkSMIceTMultiDisplayProxy.cxx
   vtkSMIceTRenderModuleProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneProxy.cxx
