@@ -272,11 +272,13 @@ public:
     }
 
   // Description:
-  // The name of a cue depends on the PVSource's name. 
+  // The name of a cue for a PVSource depends on the PVSource's name. 
   // For trace to work reliably, the cue's name must be 
-  // constructed on using the PVSource (not it's name).
+  // constructed on using the PVSource (not it's name, since the name may change
+  // when the trace is run).
   // This returns the tcl script/string that evaluates the
-  // name correctly at runtime.
+  // name correctly at runtime. For non-source cues (.i.e. cues for things like Camera
+  // or the property cues), this is same as the name of the cue.
   const char* GetTclNameCommand();
 
   // Description:

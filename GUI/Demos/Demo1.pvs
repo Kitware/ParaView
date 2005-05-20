@@ -1204,9 +1204,9 @@ proc extract_run {} {
   set extract(vtkTemp447) [$extract(vtkTemp1055) GetHAnimationInterface]
   set extract(vtkTemp450) [$extract(vtkTemp447) GetParentTree]
   set extract(vtkTemp814) [$extract(vtkTemp450) GetChild "Sources.[$extract(vtkTemp478) GetName]"]
-  set extract(vtkTemp824) [$extract(vtkTemp814) GetChild "Sources.[$extract(vtkTemp478) GetName].VOI"]
+  set extract(vtkTemp824) [$extract(vtkTemp814) GetChild "VOI"]
   $extract(vtkTemp824) GetFocus
-  set extract(vtkTemp826) [$extract(vtkTemp824) GetChild "Sources.[$extract(vtkTemp478) GetName].VOI.VOI.0"]
+  set extract(vtkTemp826) [$extract(vtkTemp824) GetChild "VOI.0"]
   $extract(vtkTemp826) RemoveAllKeyFrames
   #Add 1st Key frame.
   set tempid [$extract(vtkTemp826) CreateAndAddKeyFrame 0 0]
@@ -1244,7 +1244,7 @@ proc extract_run {} {
   $extract(vtkTemp478) AcceptCallback
 
   #Create next cue.
-  set extract(vtkTemp830) [$extract(vtkTemp824) GetChild "Sources.[$extract(vtkTemp478) GetName].VOI.VOI.2"]
+  set extract(vtkTemp830) [$extract(vtkTemp824) GetChild "VOI.2"]
   $extract(vtkTemp830) RemoveAllKeyFrames
   #Add 1st Key frame.
   set tempid [$extract(vtkTemp830) CreateAndAddKeyFrame 0 0]
@@ -1278,7 +1278,7 @@ proc extract_run {} {
   $extract(vtkTemp478) AcceptCallback
   
    #Create next cue.
-  set extract(vtkTemp830) [$extract(vtkTemp824) GetChild "Sources.[$extract(vtkTemp478) GetName].VOI.VOI.4"]
+  set extract(vtkTemp830) [$extract(vtkTemp824) GetChild "VOI.4"]
   $extract(vtkTemp830) RemoveAllKeyFrames
   #Add 1st Key frame.
   set tempid [$extract(vtkTemp830) CreateAndAddKeyFrame 0 0]
@@ -1317,7 +1317,7 @@ proc extract_run {} {
   $extract(vtkTemp923) RemoveAllKeyFrames
   set extract(vtkTemp929) [$extract(vtkTemp923) GetChild "Sources.[$extract(vtkTemp598) GetName].Plane"]
   $extract(vtkTemp929) SetExpanded 0
-  set extract(vtkTemp830) [$extract(vtkTemp929) GetChild "Sources.[$extract(vtkTemp598) GetName].Plane.Offset.0"]
+  set extract(vtkTemp830) [$extract(vtkTemp929) GetChild "Offset.0"]
   $extract(vtkTemp830) RemoveAllKeyFrames
   
   #Add 1st Key frame.
@@ -1508,7 +1508,7 @@ proc iso_run {} {
 
   set iso(vtkTemp450) [$iso(vtkTemp447) GetParentTree]
   set iso(vtkTemp782) [$iso(vtkTemp450) GetChild "Sources.[$iso(vtkTemp449) GetName]"]
-  set iso(vtkTemp790) [$iso(vtkTemp782) GetChild "Sources.[$iso(vtkTemp449) GetName].ContourValues.-1"]
+  set iso(vtkTemp790) [$iso(vtkTemp782) GetChild "ContourValues.-1"]
   $iso(vtkTemp790) GetFocus
   $iso(vtkTemp790) RemoveAllKeyFrames
 
@@ -1594,8 +1594,8 @@ proc iso_run {} {
   }
 
   set iso(vtkTemp782) [$iso(vtkTemp450) GetChild "Sources.[$iso(vtkTemp739) GetName]"]
-  set iso(vtkTemp1006) [$iso(vtkTemp782) GetChild "Sources.[$iso(vtkTemp739) GetName].VOI"]
-  set iso(vtkTemp790) [$iso(vtkTemp1006) GetChild "Sources.[$iso(vtkTemp739) GetName].VOI.VOI.2"]
+  set iso(vtkTemp1006) [$iso(vtkTemp782) GetChild "VOI"]
+  set iso(vtkTemp790) [$iso(vtkTemp1006) GetChild "VOI.2"]
   $iso(vtkTemp790) GetFocus
   $iso(vtkTemp790) RemoveAllKeyFrames
 

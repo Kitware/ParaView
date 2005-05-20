@@ -77,7 +77,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.27");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.28");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
 //***************************************************************************
@@ -1367,9 +1367,15 @@ void vtkPVAnimationCue::UpdateEnableState()
 //-----------------------------------------------------------------------------
 const char* vtkPVAnimationCue::GetTclNameCommand()
 {
-  this->SetTclNameCommand(0);
-  if (!this->Name || !this->PVSource)
+  if (this->TclNameCommand)
     {
+    return this->TclNameCommand;
+    }
+
+  this->SetTclNameCommand(0);
+  if (!this->Name | !this->PVSource)
+    {
+    this->SetTclNameCommand(this->Name);
     return this->TclNameCommand;
     }
 
@@ -1377,7 +1383,7 @@ const char* vtkPVAnimationCue::GetTclNameCommand()
   vtkstd::string::size_type sindex = str.find(this->PVSource->GetName());
   if (sindex == vtkstd::string::npos)
     {
-    vtkErrorMacro("Cue name does not have source name in it!");
+    this->SetTclNameCommand(this->Name);
     return this->TclNameCommand;
     }
 

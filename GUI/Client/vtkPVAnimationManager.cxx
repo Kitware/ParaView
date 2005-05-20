@@ -64,7 +64,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.43");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.44");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -541,7 +541,7 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
       cueTree->SetLabelText(property->GetXMLName());
       //create tree name.
       ostrstream cueTreeName;
-      cueTreeName << pvCueTree->GetName() << "." << property->GetXMLName() << ends;
+      cueTreeName /*<< pvCueTree->GetName() << "."*/ << property->GetXMLName() << ends;
       cueTree->SetName(cueTreeName.str());
       cueTree->SetPVSource(pvSource);
       cueTreeName.rdbuf()->freeze(0);
@@ -637,7 +637,7 @@ void vtkPVAnimationManager::SetupCue(vtkPVSource* pvSource, vtkPVAnimationCueTre
   else
     {
     ostrstream str;
-    str << parent->GetName() << "." << propertyname << "." << element << ends;
+    str /*<< parent->GetName() << "." */<< propertyname << "." << element << ends;
     cue->SetName(str.str());
     str.rdbuf()->freeze(0);
     }
@@ -657,10 +657,9 @@ void vtkPVAnimationManager::SetupCue(vtkPVSource* pvSource, vtkPVAnimationCueTre
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::ValidateAndAddSpecialCues()
 {
-  /*
   // this is the place to add camera cue.
   ostrstream str;
-  str << "_dont_validate_;" << "camera" << ends;
+  str << "_dont_validate_." << "camera" << ends;
 
   ostrstream name;
   name << "_Scene_" << "." << str << ends;
@@ -682,7 +681,6 @@ void vtkPVAnimationManager::ValidateAndAddSpecialCues()
   
   name.rdbuf()->freeze(0);
   str.rdbuf()->freeze(0); 
-  */
 }
 
 //-----------------------------------------------------------------------------
