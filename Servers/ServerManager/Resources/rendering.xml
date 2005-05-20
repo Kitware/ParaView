@@ -903,7 +903,18 @@
           </RequiredProperties>
         </ArrayListDomain>
       </StringVectorProperty>
+      <ProxyProperty name="RayCastFunction" command="SetRayCastFunction">
+        <ProxyGroupDomain name="groups">
+          <Group name="ugrid_raycast_functions"/>
+        </ProxyGroupDomain>
+      </ProxyProperty>
     </SourceProxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="ugrid_raycast_functions">
+    <Proxy name="BunykRayCastFunction"
+           class="vtkUnstructuredGridBunykRayCastFunction">
+    </Proxy>
   </ProxyGroup>
 
   <ProxyGroup name="props">
