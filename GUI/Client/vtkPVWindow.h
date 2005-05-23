@@ -661,7 +661,6 @@ protected:
 
   // Initialization methods called from create.
   void InitializeMenus(vtkKWApplication* app);
-  void InitializeToolbars(vtkKWApplication* app);
   void InitializeInteractorInterfaces(vtkKWApplication* app);
 
   vtkPVTimerLogDisplay *TimerLogDisplay;

@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.709");
+vtkCxxRevisionMacro(vtkPVWindow, "1.710");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -917,26 +917,6 @@ void vtkPVWindow::SetToolbarVisibility(const char* identifier, int state)
     this->Toolbars->SetToolbarVisibility(this->InteractorToolbar, state);
     }
 }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
-{
-  this->InteractorToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
-  this->InteractorToolbar->Create(app);
-
-  this->Toolbar->SetParent(this->Toolbars->GetToolbarsFrame());
-  this->Toolbar->Create(app);
-  this->Toolbar->ResizableOn();
-
-  //this->ToolbarMenuButton->SetParent(this->Toolbar->GetFrame());
-  this->ToolbarMenuButton->SetParent(this->Toolbar);
-  this->ToolbarMenuButton->Create(
-    app,  "-image PVToolbarPullDownArrow -relief flat");
-  this->ToolbarMenuButton->IndicatorOff();
-
-  this->Toolbars->AddToolbar(this->InteractorToolbar);
-  this->Toolbars->AddToolbar(this->Toolbar);
-  this->Toolbars->AddToolbar(this->PickCenterToolbar);
-}
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
@@ -1191,6 +1171,20 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (toolbars)...");
     }
 
+  this->InteractorToolbar->SetParent(this->Toolbars->GetToolbarsFrame());
+  this->InteractorToolbar->Create(app);
+  this->Toolbars->AddToolbar(this->InteractorToolbar);
+
+  this->Toolbar->SetParent(this->Toolbars->GetToolbarsFrame());
+  this->Toolbar->Create(app);
+  this->Toolbar->ResizableOn();
+  this->Toolbars->AddToolbar(this->Toolbar);
+
+  this->ToolbarMenuButton->SetParent(this->Toolbar);
+  this->ToolbarMenuButton->Create(
+    app,  "-image PVToolbarPullDownArrow -relief flat");
+  this->ToolbarMenuButton->IndicatorOff();
+
   this->SetInteractor(vtkPVGenericRenderWindowInteractor::SafeDownCast(
       this->GetPVApplication()->GetRenderModuleProxy()->GetInteractor()));
 
@@ -1332,7 +1326,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   proxy->Delete();
   this->ChangeInteractorStyle(1);
 
-  this->InitializeToolbars(app);
+  this->Toolbars->AddToolbar(this->PickCenterToolbar);
 
   // Configure the window, i.e. setup the interactors
   // We need this update or the window size will be invalid.
