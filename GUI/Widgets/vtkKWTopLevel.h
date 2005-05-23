@@ -95,6 +95,17 @@ public:
   virtual int GetSize(int *w, int *h);
 
   // Description:
+  // Convenience method to set/get the window size and position in screen pixel
+  // coordinates as a geometry format wxh+x+y (ex: 800x700+20+50). 
+  // No effect if called before Create()
+  // SetGeometry will return 1 on success, 0 otherwise.
+  // GetGeometry will return the geometry in a temporary buffer on success
+  // (copy the value to another string buffer as soon as possible), or NULL
+  // otherwise
+  virtual int SetGeometry(const char *);
+  virtual const char* GetGeometry();
+
+  // Description:
   // Convenience method to guess the width/height of the toplevel.
   virtual int GetWidth();
   virtual int GetHeight();
@@ -127,6 +138,11 @@ public:
   // in string form.
   virtual void SetDeleteWindowProtocolCommand(
     vtkKWObject *obj, const char *command);
+
+  // Description:
+  // Convenience method to set the name inside the icon associated to this
+  // window/toplevel.
+  virtual void SetIconName(const char *name);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.

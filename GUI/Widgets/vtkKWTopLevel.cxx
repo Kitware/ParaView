@@ -22,7 +22,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTopLevel );
-vtkCxxRevisionMacro(vtkKWTopLevel, "1.6");
+vtkCxxRevisionMacro(vtkKWTopLevel, "1.7");
 
 int vtkKWTopLevelCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
@@ -286,6 +286,27 @@ int vtkKWTopLevel::GetSize(int *w, int *h)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWTopLevel::SetGeometry(const char *geometry)
+{
+  if (!this->IsCreated() && geometry)
+    {
+    return 0;
+    }
+  this->Script("wm geometry %s {%s}", this->GetWidgetName(), geometry);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWTopLevel::GetGeometry()
+{
+  if (!this->IsCreated())
+    {
+    return NULL;
+    }
+  return this->Script("wm geometry %s", this->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
 vtkKWMenu *vtkKWTopLevel::GetMenu()
 {
   if (!this->Menu)
@@ -318,6 +339,16 @@ void vtkKWTopLevel::SetDeleteWindowProtocolCommand(
     this->Script("wm protocol %s WM_DELETE_WINDOW {%s}",
                  this->GetWidgetName(), objcmd);
     delete [] objcmd;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTopLevel::SetIconName(const char *name)
+{ 
+  if (this->IsCreated())
+    {
+    this->Script("wm iconname %s {%s}",
+                 this->GetWidgetName(), name ? name : NULL);
     }
 }
 
