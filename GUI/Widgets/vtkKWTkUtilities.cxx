@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.48");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.49");
 
 //----------------------------------------------------------------------------
 const char* vtkKWTkUtilities::EvaluateString(
@@ -281,7 +281,7 @@ int vtkKWTkUtilities::GetGeometry(Tcl_Interp *interp,
     }
 
   ostrstream geometry;
-  geometry << "wm geometry " << widget << ends;
+  geometry << "winfo geometry " << widget << ends;
   int res = Tcl_GlobalEval(interp, geometry.str());
   geometry.rdbuf()->freeze(0);
   if (res != TCL_OK)
