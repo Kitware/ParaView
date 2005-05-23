@@ -56,7 +56,7 @@ EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.203");
+vtkCxxRevisionMacro(vtkKWApplication, "1.204");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -99,9 +99,9 @@ vtkKWApplication::vtkKWApplication()
 
   this->LimitedEditionMode = 0;
   this->LimitedEditionModeName = NULL;
-  char name[1024];
-  sprintf(name, "%s Limited Edition", this->Name);
-  this->SetLimitedEditionModeName(name);
+  kwsys_stl::string lename(this->Name);
+  lename += " Limited Edition";
+  this->SetLimitedEditionModeName(lename.c_str());
 
   this->HelpDialogStartingPage = 
     kwsys::SystemTools::DuplicateString("Introduction.htm");
