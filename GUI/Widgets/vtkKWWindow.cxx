@@ -40,7 +40,7 @@
 #define VTK_KW_WINDOW_DEFAULT_WIDTH 900
 #define VTK_KW_WINDOW_DEFAULT_HEIGHT 700
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.239");
+vtkCxxRevisionMacro(vtkKWWindow, "1.240");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -331,15 +331,17 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->Toolbars->SetNumberOfToolbarsChangedCommand(
     this, "NumberOfToolbarsChangedCallback");
 
+  this->Script(
+    "pack %s -padx 0 -pady 0 -side top -fill x -expand no",
+    this->Toolbars->GetWidgetName());
+
   // Split frame
 
   this->MainSplitFrame->SetParent(this);
   this->MainSplitFrame->Create(app);
 
-#if 1
   this->Script("pack %s -side top -fill both -expand t",
                this->MainSplitFrame->GetWidgetName());
-#endif
 
   // Restore Window Geometry
 
@@ -369,7 +371,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   
   this->Script("pack %s -side bottom -fill x -pady 0",
                this->StatusFrame->GetWidgetName());
-  
+
   // Status frame separator
 
   this->StatusFrameSeparator->SetParent(this);
@@ -1065,26 +1067,6 @@ void vtkKWWindow::UpdateToolbarState()
 
   this->Toolbars->SetToolbarsFlatAspect(flat_frame);
   this->Toolbars->SetToolbarsWidgetsFlatAspect(flat_buttons);
-
-  // The split frame packing mechanism is so weird that I will have
-  // to unpack the toolbar frame myself in case it's empty, otherwise
-  // the middle frame won't claim the space used by the toolbar frame
-
-  if (this->Toolbars->IsCreated())
-    {
-    if (this->Toolbars->GetNumberOfVisibleToolbars())
-      {
-      this->Script(
-        "pack %s -padx 0 -pady 0 -side top -fill x -expand no -after %s",
-        this->Toolbars->GetWidgetName(),
-        this->MenuBarSeparatorFrame->GetWidgetName());
-      this->Toolbars->PackToolbars();
-      }
-    else
-      {
-      this->Toolbars->Unpack();
-      }
-    }
 }
 
 //----------------------------------------------------------------------------

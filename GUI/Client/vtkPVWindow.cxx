@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.710");
+vtkCxxRevisionMacro(vtkPVWindow, "1.711");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1124,6 +1124,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     this, "ToolbarVisibilityChangedCallback");
   this->LowerToolbars->SetNumberOfToolbarsChangedCommand(
     this, "NumberOfToolbarsChangedCallback");
+  this->Script(
+    "pack %s -padx 0 -pady 0 -side bottom -fill x -expand no ",
+    this->LowerToolbars->GetWidgetName());
 
   this->LowerFrame->Frame2VisibilityOff();
 
@@ -4796,22 +4799,6 @@ void vtkPVWindow::UpdateToolbarState()
 
   this->LowerToolbars->SetToolbarsFlatAspect(flat_frame);
   this->LowerToolbars->SetToolbarsWidgetsFlatAspect(flat_buttons);
-
-  // Decide if the lower toolbars frame should be shown
-  if (this->LowerToolbars->IsCreated())
-    {
-    if (this->LowerToolbars->GetNumberOfVisibleToolbars())
-      {
-      this->Script(
-        "pack %s -padx 0 -pady 0 -side bottom -fill x -expand no ",
-        this->LowerToolbars->GetWidgetName());
-      this->LowerToolbars->PackToolbars();
-      }
-    else
-      {
-      this->LowerToolbars->Unpack();
-      }
-    }
 }
 
 //----------------------------------------------------------------------------
