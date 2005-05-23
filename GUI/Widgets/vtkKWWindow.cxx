@@ -38,9 +38,9 @@
 #define VTK_KW_HIDE_MAIN_PANEL_LABEL "Hide Left Panel" 
 #define VTK_KW_SHOW_MAIN_PANEL_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_WIDTH 900
-#define VTK_KW_WINDOW_DEFAULT_HEIGHT 800
+#define VTK_KW_WINDOW_DEFAULT_HEIGHT 700
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.238");
+vtkCxxRevisionMacro(vtkKWWindow, "1.239");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -336,8 +336,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->MainSplitFrame->SetParent(this);
   this->MainSplitFrame->Create(app);
 
+#if 1
   this->Script("pack %s -side top -fill both -expand t",
                this->MainSplitFrame->GetWidgetName());
+#endif
 
   // Restore Window Geometry
 
@@ -360,6 +362,14 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->MainNotebook->AlwaysShowTabsOn();
 
+  // Status frame
+
+  this->StatusFrame->SetParent(this);
+  this->StatusFrame->Create(app, NULL);
+  
+  this->Script("pack %s -side bottom -fill x -pady 0",
+               this->StatusFrame->GetWidgetName());
+  
   // Status frame separator
 
   this->StatusFrameSeparator->SetParent(this);
@@ -370,16 +380,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->StatusFrameSeparator->ConfigureOptions("-relief sunken");
 #endif
 
-  this->Script("pack %s -side top -fill x -pady 2",
+  this->Script("pack %s -side bottom -fill x -pady 2",
                this->StatusFrameSeparator->GetWidgetName());
-  
-  // Status frame
-
-  this->StatusFrame->SetParent(this);
-  this->StatusFrame->Create(app, NULL);
-  
-  this->Script("pack %s -side top -fill x -pady 0",
-               this->StatusFrame->GetWidgetName());
   
   // Status frame : image
 
