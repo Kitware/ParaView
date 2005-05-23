@@ -19,6 +19,7 @@
 #include "vtkKWMenu.h"
 #include "vtkKWToolbar.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWTkUtilities.h"
 
 #if defined(_WIN32)
 #define VTK_KW_TOOLBAR_RELIEF_SEP "groove"
@@ -32,7 +33,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWToolbarSet);
-vtkCxxRevisionMacro(vtkKWToolbarSet, "1.13");
+vtkCxxRevisionMacro(vtkKWToolbarSet, "1.14");
 
 int vtkvtkKWToolbarSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -140,7 +141,7 @@ void vtkKWToolbarSet::Create(vtkKWApplication *app, const char *args)
   // Create the toolbars frame container
 
   this->ToolbarsFrame->SetParent(this);  
-  this->ToolbarsFrame->Create(app, "");
+  this->ToolbarsFrame->Create(app, NULL);
 
   // Bottom separator
 
@@ -169,14 +170,35 @@ void vtkKWToolbarSet::Update()
 // ----------------------------------------------------------------------------
 void vtkKWToolbarSet::Pack()
 {
-  if (this->IsCreated())
-    {
-    this->Script("pack %s -side top -fill both -expand y -padx 0 -pady 0",
-                 this->ToolbarsFrame->GetWidgetName());
-    }
-
   this->PackToolbars();
   this->PackBottomSeparator();
+
+  // This is a hack. I tried hard to solve the problem, without success.
+  // It seems that no matter what, if you pack the toolbar set, show
+  // some toolbars, them hide all of them, the toolbarset frame does not
+  // collapse automatically to "nothing", but keeps its previous height, even
+  // if all the widgets packed around are setup to reclaim the space that 
+  // would have been left by an empty toolbar set.
+  // This is annoying. One solution would to add a method to allow the
+  // user to have a callback invoked each time the number of visible toolbars
+  // change. This callback could in turn pack/unpack the whole toolbarset
+  // if no toolbars are available. This put the burden on the users, and I
+  // would rather have that class solves its own problems.
+  // So here is the hack. If nothing is visible, and the height is higher
+  // than 1, and it is likely we did not collapse correctly, then we
+  // should manually configure the height to be 1 (sadly, it can not be 0:
+  // "if this option is less "than or equal to zero then the window 
+  // will not request any size at all").
+
+  if (!this->GetNumberOfVisibleToolbars() && this->IsMapped())
+    {
+    int height = 0;
+    vtkKWTkUtilities::GetGeometry(this, NULL, &height, NULL, NULL);
+    if (height > 1)
+      {
+      this->ConfigureOptions("-height 1");
+      }
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -187,12 +209,11 @@ void vtkKWToolbarSet::PackBottomSeparator()
     return;
     }
 
-  if (this->ShowBottomSeparator)
+  if (this->ShowBottomSeparator && this->GetNumberOfVisibleToolbars())
     {
     this->Script(
-      "pack %s -side top -fill x -expand y -padx 0 -pady 2 -after %s",
-      this->BottomSeparatorFrame->GetWidgetName(),
-      this->ToolbarsFrame->GetWidgetName());
+      "pack %s -side top -fill x -expand y -padx 0 -pady 2",
+      this->BottomSeparatorFrame->GetWidgetName());
     }
   else
     {
@@ -208,14 +229,18 @@ void vtkKWToolbarSet::PackToolbars()
     return;
     }
 
-  this->ToolbarsFrame->UnpackChildren();
-
   if (!this->GetNumberOfVisibleToolbars())
     {
+    this->ToolbarsFrame->Unpack();
     return;
     }
 
+  this->ToolbarsFrame->UnpackChildren();
+
   ostrstream tk_cmd;
+
+  tk_cmd << "pack " << this->ToolbarsFrame->GetWidgetName() 
+         << " -side top -fill both -expand y -padx 0 -pady 0" << endl;
 
   vtkKWToolbar *previous = NULL;
 
@@ -314,7 +339,7 @@ int vtkKWToolbarSet::AddToolbar(vtkKWToolbar *toolbar, int default_visibility)
 
   // Pack the toolbars
 
-  this->PackToolbars();
+  this->Pack();
 
   this->InvokeNumberOfToolbarsChangedCommand();
 
@@ -359,7 +384,7 @@ void vtkKWToolbarSet::SetToolbarVisibility(
       {
       this->SaveToolbarVisibilityToRegistry(toolbar_slot->Toolbar);
       }
-    this->PackToolbars();
+    this->Pack();
     this->InvokeToolbarVisibilityChangedCommand();
     }
 }
