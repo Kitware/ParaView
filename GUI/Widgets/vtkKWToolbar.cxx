@@ -49,7 +49,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.46");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.47");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -283,10 +283,10 @@ vtkKWWidget* vtkKWToolbar::GetWidget(const char *name)
         {
         for (int i = 0; i < 4; i++)
           {
-          if ((*it)->HasConfigurationOption(options[i]))
+          if ((*it)->HasConfigurationOption(options[i]) && (*it)->IsCreated())
             {
             const char *option = 
-              this->Script("%s cget %s", (*it)->GetWidgetName(), options[i]);
+              (*it)->Script("%s cget %s", (*it)->GetWidgetName(), options[i]);
             if (!strcmp(name, option))
               {
               return (*it);
@@ -409,7 +409,7 @@ vtkKWWidget* vtkKWToolbar::AddCheckButtonImage(const char *image_name,
 //----------------------------------------------------------------------------
 void vtkKWToolbar::ScheduleResize()
 {  
-  if (this->Expanding)
+  if (this->Expanding || !this->IsCreated())
     {
     return;
     }
@@ -427,7 +427,8 @@ void vtkKWToolbar::Resize()
 //----------------------------------------------------------------------------
 void vtkKWToolbar::UpdateWidgetsAspect()
 {
-  if (!this->Internals || this->Internals->Widgets.size() <= 0)
+  if (!this->IsCreated() || 
+      !this->Internals || this->Internals->Widgets.size() <= 0)
     {
     return;
     }
@@ -518,7 +519,8 @@ void vtkKWToolbar::UpdateWidgetsAspect()
 //----------------------------------------------------------------------------
 void vtkKWToolbar::ConstrainWidgetsLayout()
 {
-  if (!this->Internals || this->Internals->Widgets.size() <= 0)
+  if (!this->IsCreated() || 
+      !this->Internals || this->Internals->Widgets.size() <= 0)
     {
     return;
     }
