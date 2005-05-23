@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.708");
+vtkCxxRevisionMacro(vtkPVWindow, "1.709");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -867,7 +867,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   this->GetWindowMenu()->InsertCommand(
     4, "Command Prompt", this,
-    "DisplayCommandPrompt", 8,
+    "DisplayTclInteractor", 8,
     "Display a prompt to interact with the ParaView engine");
 
   // Log stuff (not traced)
@@ -1190,7 +1190,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (toolbars)...");
     }
-  this->InitializeToolbars(app);
 
   this->SetInteractor(vtkPVGenericRenderWindowInteractor::SafeDownCast(
       this->GetPVApplication()->GetRenderModuleProxy()->GetInteractor()));
@@ -1332,6 +1331,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->Interactor->SetPVRenderView(proxy);
   proxy->Delete();
   this->ChangeInteractorStyle(1);
+
+  this->InitializeToolbars(app);
 
   // Configure the window, i.e. setup the interactors
   // We need this update or the window size will be invalid.
