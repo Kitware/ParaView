@@ -37,9 +37,10 @@
 
 #define VTK_KW_HIDE_MAIN_PANEL_LABEL "Hide Left Panel" 
 #define VTK_KW_SHOW_MAIN_PANEL_LABEL "Show Left Panel"
-#define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
+#define VTK_KW_WINDOW_DEFAULT_WIDTH 900
+#define VTK_KW_WINDOW_DEFAULT_HEIGHT 800
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.237");
+vtkCxxRevisionMacro(vtkKWWindow, "1.238");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -60,13 +61,13 @@ vtkKWWindow::vtkKWWindow()
 
   // Toolbars
 
-  this->Toolbars              = vtkKWToolbarSet::New();
-  this->ToolbarsVisibilityMenu          = NULL; 
-  this->MenuBarSeparatorFrame = vtkKWFrame::New();
+  this->Toolbars               = vtkKWToolbarSet::New();
+  this->ToolbarsVisibilityMenu = NULL; 
+  this->MenuBarSeparatorFrame  = vtkKWFrame::New();
 
   // Main split panel
 
-  this->MainSplitFrame           = vtkKWSplitFrame::New();
+  this->MainSplitFrame        = vtkKWSplitFrame::New();
 
   // Status frame
 
@@ -248,14 +249,16 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->Superclass::Create(app, args);
 
   const char *wname = this->GetWidgetName();
-
-  this->Script("wm iconname %s {%s}", wname, app->GetPrettyName());
+  kwsys_stl::string cmd;
+  kwsys_stl::string label;
+  
+  this->SetIconName(app->GetPrettyName());
 
   // Menu : File
 
   this->FileMenu->SetParent(this->GetMenu());
   this->FileMenu->SetTearOff(0);
-  this->FileMenu->Create(app, "");
+  this->FileMenu->Create(app, NULL);
 
   this->GetMenu()->AddCascade("File", this->FileMenu, 0);
 
@@ -271,25 +274,26 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->MostRecentFilesManager->SetApplication(app);
 
-  // Menu : Window : main panel
+  // Menu : Window
 
-  this->GetWindowMenu()->AddCommand(VTK_KW_HIDE_MAIN_PANEL_LABEL, this,
-                                    "MainPanelVisibilityCallback", 1 );
+  this->GetWindowMenu()->AddCommand(
+    VTK_KW_HIDE_MAIN_PANEL_LABEL, this, "MainPanelVisibilityCallback", 1);
 
-  // Help menu
+  // Menu : Help
 
   this->HelpMenu->SetParent(this->GetMenu());
   this->HelpMenu->SetTearOff(0);
-  this->HelpMenu->Create(app, "");
+  this->HelpMenu->Create(app, NULL);
 
   if (this->SupportHelp)
     {
     this->GetMenu()->AddCascade("Help", this->HelpMenu, 0);
     }
-  ostrstream helpCmd;
-  helpCmd << "DisplayHelpDialog " << this->GetTclName() << ends;
-  this->HelpMenu->AddCommand("Help", this->GetApplication(), helpCmd.str(), 0);
-  helpCmd.rdbuf()->freeze(0);
+
+  cmd = "DisplayHelpDialog ";
+  cmd += this->GetTclName();
+  this->HelpMenu->AddCommand(
+    "Help", this->GetApplication(), cmd.c_str(), 0);
 
   if (app->HasCheckForUpdates())
     {
@@ -297,14 +301,12 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
     }
 
   this->HelpMenu->AddSeparator();
-  ostrstream about_label;
-  about_label << "About " << app->GetPrettyName() << ends;
-  ostrstream aboutCmd;
-  aboutCmd << "DisplayAboutDialog " << this->GetTclName() << ends;
+  label = "About ";
+  label += app->GetPrettyName();
+  cmd = "DisplayAboutDialog ";
+  cmd += this->GetTclName();
   this->HelpMenu->AddCommand(
-    about_label.str(), this->GetApplication(), aboutCmd.str(), 0);
-  about_label.rdbuf()->freeze(0);
-  aboutCmd.rdbuf()->freeze(0);
+    label.c_str(), this->GetApplication(), cmd.c_str(), 0);
 
   // Menubar separator
 
@@ -318,10 +320,10 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->Script("pack %s -side top -fill x -pady 2",
                this->MenuBarSeparatorFrame->GetWidgetName());
 
-  // Toolbar frame
+  // Toolbars
 
   this->Toolbars->SetParent(this);  
-  this->Toolbars->Create(app, "");
+  this->Toolbars->Create(app, NULL);
   this->Toolbars->ShowBottomSeparatorOn();
   this->Toolbars->SynchronizeToolbarsVisibilityWithRegistryOn();
   this->Toolbars->SetToolbarVisibilityChangedCommand(
@@ -345,14 +347,13 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
     }
   else
     {
-    this->Script("wm geometry %s %s", 
-                 this->GetWidgetName(), VTK_KW_WINDOW_DEFAULT_GEOMETRY);
+    this->SetSize(VTK_KW_WINDOW_DEFAULT_WIDTH, VTK_KW_WINDOW_DEFAULT_HEIGHT);
     }
 
   // Create the notebook
 
   this->MainNotebook->SetParent(this->GetMainPanelFrame());
-  this->MainNotebook->Create(app, "");
+  this->MainNotebook->Create(app, NULL);
 
   this->Script("pack %s -pady 0 -padx 0 -fill both -expand yes -anchor n",
                this->MainNotebook->GetWidgetName());
@@ -412,7 +413,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   this->ProgressGauge->SetLength(200);
   this->ProgressGauge->SetHeight(
     vtkKWTkUtilities::GetPhotoHeight(this->StatusImage) - 4);
-  this->ProgressGauge->Create(app, "");
+  this->ProgressGauge->Create(app, NULL);
 
   this->Script("pack %s -side right -padx 2 -pady 2",
                this->ProgressGauge->GetWidgetName());
@@ -429,7 +430,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Status frame : tray frame : error image
 
   this->TrayImageError->SetParent(this->TrayFrame);
-  this->TrayImageError->Create(app, "");
+  this->TrayImageError->Create(app, NULL);
 
   this->TrayImageError->SetImageOption(vtkKWIcon::ICON_SMALLERRORRED);
   
@@ -565,11 +566,9 @@ void vtkKWWindow::SaveWindowGeometry()
 {
   if (this->IsCreated())
     {
-    const char *res = this->Script("wm geometry %s", this->GetWidgetName());
-
+    kwsys_stl::string geometry = this->GetGeometry();
     this->GetApplication()->SetRegistryValue(
-      2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", 
-      res);
+      2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, "%s", geometry.c_str());
 
     this->GetApplication()->SetRegistryValue(
       2, "Geometry", VTK_KW_MAIN_PANEL_SIZE_REG_KEY, "%d", 
@@ -589,13 +588,12 @@ void vtkKWWindow::RestoreWindowGeometry()
       if (this->GetApplication()->GetRegistryValue(
             2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY, geometry))
         {
-        this->Script("wm geometry %s %s", this->GetWidgetName(), geometry);
+        this->SetGeometry(geometry);
         }
       }
     else
       {
-      this->Script("wm geometry %s %s", 
-                   this->GetWidgetName(), VTK_KW_WINDOW_DEFAULT_GEOMETRY);
+      this->SetSize(VTK_KW_WINDOW_DEFAULT_WIDTH, VTK_KW_WINDOW_DEFAULT_HEIGHT);
       }
 
     if (this->GetApplication()->HasRegistryValue(
@@ -729,8 +727,8 @@ void vtkKWWindow::ToolbarVisibilityChangedCallback()
 //----------------------------------------------------------------------------
 int vtkKWWindow::GetMainPanelVisibility()
 {
-  return 
-    (this->MainSplitFrame && this->MainSplitFrame->GetFrame1Visibility() ? 1 : 0);
+  return (this->MainSplitFrame && 
+          this->MainSplitFrame->GetFrame1Visibility() ? 1 : 0);
 }
 
 //----------------------------------------------------------------------------
@@ -752,17 +750,15 @@ void vtkKWWindow::SetMainPanelVisibility(int arg)
 //----------------------------------------------------------------------------
 void vtkKWWindow::MainPanelVisibilityCallback()
 {
-  int arg = !this->GetMainPanelVisibility();
-  this->SetMainPanelVisibility(arg);
-  float farg = arg;
-  this->InvokeEvent(vtkKWEvent::UserInterfaceVisibilityChangedEvent, &farg);
+  this->SetMainPanelVisibility(!this->GetMainPanelVisibility());
 }
 
 //----------------------------------------------------------------------------
 void vtkKWWindow::LoadScript()
 {
   vtkKWLoadSaveDialog* load_dialog = vtkKWLoadSaveDialog::New();
-  this->GetApplication()->RetrieveDialogLastPathRegistryValue(load_dialog, "LoadScriptLastPath");
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(
+    load_dialog, "LoadScriptLastPath");
   load_dialog->SetParent(this);
   load_dialog->Create(this->GetApplication(), NULL);
   load_dialog->SaveDialogOff();
@@ -969,19 +965,19 @@ char* vtkKWWindow::GetTitle()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::DisplayCommandPrompt()
+void vtkKWWindow::DisplayTclInteractor()
 {
   if ( ! this->TclInteractor )
     {
     this->TclInteractor = vtkKWTclInteractor::New();
-    ostrstream title;
+    kwsys_stl::string title;
     if (this->GetTitle())
       {
-      title << this->GetTitle() << " : ";
+      title += this->GetTitle();
+      title += " : ";
       }
-    title << "Command Prompt" << ends;
-    this->TclInteractor->SetTitle(title.str());
-    title.rdbuf()->freeze(0);
+    title += "Command Prompt";
+    this->TclInteractor->SetTitle(title.c_str());
     this->TclInteractor->SetMasterWindow(this);
     this->TclInteractor->Create(this->GetApplication(), NULL);
     }

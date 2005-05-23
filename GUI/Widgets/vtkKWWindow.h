@@ -164,19 +164,6 @@ public:
   vtkBooleanMacro(SupportHelp, int);
 
   // Description:
-  // Insert a "Recent Files" sub-menu to the File menu at position 'pos'
-  // and fill it with the most recent files stored in the registry.
-  // The 'target' parameter is the object against which the command
-  // associated to a most recent file will be executed (usually the instance).
-  // The 'label' parameter is an optional label that will be used for
-  // the sub-menu label.
-  virtual void InsertRecentFilesMenu(
-    int pos, 
-    vtkKWObject *target, 
-    const char *label = VTK_KW_OPEN_RECENT_FILE_MENU_LABEL,
-    int underline = 6);
-
-  // Description::
   // Add a file to the Recent File list, and save the whole list to
   // the registry.
   // If the "Recent files" sub-menu has been inserted at that point (see
@@ -197,7 +184,7 @@ public:
   vtkSetMacro(PrintTargetDPI, double);
   
   // Description:
-  // The toolbar container.
+  // Get the toolbar set.
   vtkGetObjectMacro(Toolbars, vtkKWToolbarSet);
 
   // Description:
@@ -211,7 +198,7 @@ public:
  
   // Description:
   // Get title of window.
-  // Override superclass to use app name if the title was not set
+  // Override the superclass to use app name if the title was not set
   virtual char* GetTitle();
 
   // Description:
@@ -225,10 +212,10 @@ public:
 
   // Description:
   // Display the tcl interactor.
-  void DisplayCommandPrompt();
+  virtual void DisplayTclInteractor();
   
   // Description:
-  // Access to the Tcl interactor.
+  // Get the Tcl interactor object.
   vtkGetObjectMacro(TclInteractor, vtkKWTclInteractor);
 
   // Description:
@@ -273,6 +260,19 @@ protected:
   ~vtkKWWindow();
 
   // Description:
+  // Insert a "Recent Files" sub-menu to the File menu at position 'pos'
+  // and fill it with the most recent files stored in the registry.
+  // The 'target' parameter is the object against which the command
+  // associated to a most recent file will be executed (usually the instance).
+  // The 'label' parameter is an optional label that will be used for
+  // the sub-menu label.
+  virtual void InsertRecentFilesMenu(
+    int pos, 
+    vtkKWObject *target, 
+    const char *label = VTK_KW_OPEN_RECENT_FILE_MENU_LABEL,
+    int underline = 6);
+
+  // Description:
   // Display the close dialog.
   // Return 1 if the user wants to close the window, 0 otherwise
   virtual int DisplayCloseDialog();
@@ -281,8 +281,8 @@ protected:
   // Update the image in the status frame. Usually a logo of some sort.
   virtual void UpdateStatusImage();
 
-  // Recent files
-
+  // Description:
+  // Recent files manager
   vtkKWMostRecentFilesManager *MostRecentFilesManager;
 
   // Description:
@@ -290,16 +290,17 @@ protected:
   virtual void SaveWindowGeometry();
   virtual void RestoreWindowGeometry();
 
-  vtkKWNotebook *MainNotebook;
-
-  vtkKWSplitFrame *MainSplitFrame;
-
   vtkKWMenu *FileMenu;
   vtkKWMenu *EditMenu;
   vtkKWMenu *ViewMenu;
   vtkKWMenu *WindowMenu;
   vtkKWMenu *HelpMenu;
   vtkKWMenu *ToolbarsVisibilityMenu;
+
+  vtkKWNotebook *MainNotebook;
+  vtkKWSplitFrame *MainSplitFrame;
+
+  vtkKWFrame *MenuBarSeparatorFrame;
 
   vtkKWFrame *StatusFrameSeparator;
   vtkKWFrame *StatusFrame;
@@ -313,9 +314,6 @@ protected:
   vtkKWLabel      *TrayImageError;
 
   vtkKWToolbarSet *Toolbars;
-
-  vtkKWFrame *MenuBarSeparatorFrame;
-
 
   double PrintTargetDPI;
   char  *ScriptExtension;
