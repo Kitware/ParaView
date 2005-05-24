@@ -40,7 +40,7 @@
 #define VTK_KW_WINDOW_DEFAULT_WIDTH 900
 #define VTK_KW_WINDOW_DEFAULT_HEIGHT 700
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.240");
+vtkCxxRevisionMacro(vtkKWWindow, "1.241");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -248,7 +248,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->Superclass::Create(app, args);
 
-  const char *wname = this->GetWidgetName();
   kwsys_stl::string cmd;
   kwsys_stl::string label;
   
