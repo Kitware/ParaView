@@ -19,11 +19,6 @@
 
 /*
   TODO:
-   - VTK_CHAR corresponds to char, but it should be signed char.
-   - Define standard type values for 64-bit integer types
-     (VTK_TYPE_UINT64 and VTK_TYPE_INT64).
-   - Flip direction of type enumeration names.  VTK_TYPE_* macros
-     should enumerate what VTK_(type) macros do now.
    - Define mapping from VTK_TYPE_* value to type:
        template <int> vtkTypeFromValue;
 */
@@ -41,7 +36,11 @@ typedef signed char   vtkTypeInt8;
 # define VTK_TYPE_FORMAT_UINT8 "hhu"
 # define VTK_TYPE_FORMAT_INT8 "hhd"
 # define VTK_TYPE_UINT8 VTK_UNSIGNED_CHAR
-# define VTK_TYPE_INT8 VTK_CHAR
+# if VTK_TYPE_CHAR_IS_SIGNED
+#  define VTK_TYPE_INT8 VTK_CHAR
+# else
+#  define VTK_TYPE_INT8 VTK_SIGNED_CHAR
+# endif
 #else
 # error "No native data type can represent an 8-bit integer."
 #endif
@@ -120,22 +119,20 @@ typedef signed long   vtkTypeInt64;
 # define VTK_TYPE_FORMAT_INT64 "ld"
 # define VTK_TYPE_UINT64 VTK_UNSIGNED_LONG
 # define VTK_TYPE_INT64 VTK_LONG
-#elif defined(VTK_SIZEOF_LONG_LONG) && VTK_SIZEOF_LONG_LONG == 8
-# define VTK_TYPE_INT64_NOT_STANDARD
+#elif defined(VTK_TYPE_USE_LONG_LONG) && VTK_SIZEOF_LONG_LONG == 8
 typedef unsigned long long vtkTypeUInt64;
 typedef signed long long   vtkTypeInt64;
 # define VTK_TYPE_FORMAT_UINT64 "llu"
 # define VTK_TYPE_FORMAT_INT64 "lld"
-/* # define VTK_TYPE_UINT64 ??? */
-/* # define VTK_TYPE_INT64 ??? */
-#elif defined(VTK_SIZEOF___INT64) && VTK_SIZEOF___INT64 == 8
-# define VTK_TYPE_INT64_NOT_STANDARD
-# define VTK_TYPE_FORMAT_UINT64 "I64u"
-# define VTK_TYPE_FORMAT_INT64 "I64d"
+# define VTK_TYPE_UINT64 VTK_UNSIGNED_LONG_LONG
+# define VTK_TYPE_INT64 VTK_LONG_LONG
+#elif defined(VTK_TYPE_USE___INT64) && VTK_SIZEOF___INT64 == 8
 typedef unsigned __int64 vtkTypeUInt64;
 typedef signed __int64   vtkTypeInt64;
-/* # define VTK_TYPE_UINT64 ??? */
-/* # define VTK_TYPE_INT64 ??? */
+# define VTK_TYPE_FORMAT_UINT64 "I64u"
+# define VTK_TYPE_FORMAT_INT64 "I64d"
+# define VTK_TYPE_UINT64 VTK_UNSIGNED___INT64
+# define VTK_TYPE_INT64 VTK___INT64
 #else
 # error "No native data type can represent a 64-bit integer."
 #endif

@@ -123,12 +123,13 @@ public:
   int GetArgument(int message, int argument, unsigned long* value) const;
   int GetArgument(int message, int argument, float* value) const;
   int GetArgument(int message, int argument, double* value) const;
-#if defined(VTK_SIZEOF___INT64) && !defined(VTK_TYPE_SAME_LONG_AND___INT64)
-  int GetArgument(int message, int argument, __int64* value) const;
-  int GetArgument(int message, int argument, unsigned __int64* value) const;
-#elif defined(VTK_SIZEOF_LONG_LONG)
+#if defined(VTK_TYPE_USE_LONG_LONG)
   int GetArgument(int message, int argument, long long* value) const;
   int GetArgument(int message, int argument, unsigned long long* value) const;
+#endif
+#if defined(VTK_TYPE_USE___INT64)
+  int GetArgument(int message, int argument, __int64* value) const;
+  int GetArgument(int message, int argument, unsigned __int64* value) const;
 #endif
   int GetArgument(int message, int argument, signed char* value, vtkTypeUInt32 length) const;
   int GetArgument(int message, int argument, char* value, vtkTypeUInt32 length) const;
@@ -141,12 +142,13 @@ public:
   int GetArgument(int message, int argument, unsigned long* value, vtkTypeUInt32 length) const;
   int GetArgument(int message, int argument, float* value, vtkTypeUInt32 length) const;
   int GetArgument(int message, int argument, double* value, vtkTypeUInt32 length) const;
-#if defined(VTK_SIZEOF___INT64) && !defined(VTK_TYPE_SAME_LONG_AND___INT64)
-  int GetArgument(int message, int argument, __int64* value, vtkTypeUInt32 length) const;
-  int GetArgument(int message, int argument, unsigned __int64* value, vtkTypeUInt32 length) const;
-#elif defined(VTK_SIZEOF_LONG_LONG)
+#if defined(VTK_TYPE_USE_LONG_LONG)
   int GetArgument(int message, int argument, long long* value, vtkTypeUInt32 length) const;
   int GetArgument(int message, int argument, unsigned long long* value, vtkTypeUInt32 length) const;
+#endif
+#if defined(VTK_TYPE_USE___INT64)
+  int GetArgument(int message, int argument, __int64* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, unsigned __int64* value, vtkTypeUInt32 length) const;
 #endif
   int GetArgument(int message, int argument, const char** value) const;
   int GetArgument(int message, int argument, char** value) const;
@@ -224,12 +226,13 @@ public:
   vtkClientServerStream& operator << (unsigned short value);
   vtkClientServerStream& operator << (unsigned int value);
   vtkClientServerStream& operator << (unsigned long value);
-#if defined(VTK_SIZEOF___INT64) && !defined(VTK_TYPE_SAME_LONG_AND___INT64)
-  vtkClientServerStream& operator << (__int64 value);
-  vtkClientServerStream& operator << (unsigned __int64 value);
-#elif defined(VTK_SIZEOF_LONG_LONG)
+#if defined(VTK_TYPE_USE_LONG_LONG)
   vtkClientServerStream& operator << (long long value);
   vtkClientServerStream& operator << (unsigned long long value);
+#endif
+#if defined(VTK_TYPE_USE___INT64)
+  vtkClientServerStream& operator << (__int64 value);
+  vtkClientServerStream& operator << (unsigned __int64 value);
 #endif
   vtkClientServerStream& operator << (float value);
   vtkClientServerStream& operator << (double value);
@@ -246,12 +249,13 @@ public:
   static vtkClientServerStream::Array InsertArray(const unsigned short*, int);
   static vtkClientServerStream::Array InsertArray(const unsigned int*, int);
   static vtkClientServerStream::Array InsertArray(const unsigned long*, int);
-#if defined(VTK_SIZEOF___INT64) && !defined(VTK_TYPE_SAME_LONG_AND___INT64)
-  static vtkClientServerStream::Array InsertArray(const __int64*, int);
-  static vtkClientServerStream::Array InsertArray(const unsigned __int64*, int);
-#elif defined(VTK_SIZEOF_LONG_LONG) && (VTK_SIZEOF_LONG_LONG == 8)
+#if defined(VTK_TYPE_USE_LONG_LONG)
   static vtkClientServerStream::Array InsertArray(const long long*, int);
   static vtkClientServerStream::Array InsertArray(const unsigned long long*, int);
+#endif
+#if defined(VTK_TYPE_USE___INT64)
+  static vtkClientServerStream::Array InsertArray(const __int64*, int);
+  static vtkClientServerStream::Array InsertArray(const unsigned __int64*, int);
 #endif
   static vtkClientServerStream::Array InsertArray(const float*, int);
   static vtkClientServerStream::Array InsertArray(const double*, int);
