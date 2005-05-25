@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBalloonHelpManager );
-vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.2");
+vtkCxxRevisionMacro(vtkKWBalloonHelpManager, "1.3");
 
 int vtkKWBalloonHelpManagerCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -38,7 +38,7 @@ vtkKWBalloonHelpManager::vtkKWBalloonHelpManager()
   this->TopLevel = NULL;
   this->Label = NULL;
 
-  this->Delay = 2;
+  this->Delay = 1;
   this->Show = 1;
 }
 
