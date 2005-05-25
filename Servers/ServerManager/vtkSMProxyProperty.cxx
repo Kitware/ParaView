@@ -29,7 +29,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.16");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.17");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -283,6 +283,10 @@ void vtkSMProxyProperty::AddUncheckedProxy(vtkSMProxy* proxy)
 //---------------------------------------------------------------------------
 void vtkSMProxyProperty::SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy)
 {
+  if (this->PPInternals->UncheckedProxies.size() <= idx)
+    {
+    this->PPInternals->UncheckedProxies.resize(idx+1);
+    }
   this->PPInternals->UncheckedProxies[idx] = proxy;
 }
 
