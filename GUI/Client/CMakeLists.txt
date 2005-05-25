@@ -156,6 +156,7 @@ SET( ParaViewClient_SRCS
   vtkPVSelectWidget.cxx
   vtkPVSelectionList.cxx
   vtkPVServerFileDialog.cxx
+  vtkPVSimpleAnimationCue.cxx
   vtkPVSource.cxx
   vtkPVSourceCollection.cxx
   vtkPVSourceList.cxx
@@ -175,6 +176,7 @@ SET( ParaViewClient_SRCS
   vtkPVTrackballRoll.cxx
   vtkPVTrackballRotate.cxx
   vtkPVTrackballZoom.cxx
+  vtkPVTrackEditor.cxx
   vtkPVValueList.cxx
   vtkPVVCRControl.cxx
   vtkPVVectorEntry.cxx

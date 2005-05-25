@@ -77,35 +77,9 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.28");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.29");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationCue, PVSource, vtkPVSource);
-//***************************************************************************
-class vtkPVAnimationCueObserver : public vtkCommand
-{
-public:
-  static vtkPVAnimationCueObserver* New()
-    {return new vtkPVAnimationCueObserver;}
-
-  void SetAnimationCue(vtkPVAnimationCue* proxy)
-    {
-    this->AnimationCue = proxy;
-    }
-  virtual void Execute(vtkObject* wdg, unsigned long event,
-    void* calldata)
-    {
-    if (this->AnimationCue)
-      {
-      this->AnimationCue->ExecuteEvent(wdg, event, calldata);
-      }
-    }
-protected:
-  vtkPVAnimationCueObserver()
-    {
-    this->AnimationCue = 0;
-    }
-  vtkPVAnimationCue* AnimationCue;
-};
 
 //***************************************************************************
 //Helper methods to down cast the property and set value.
@@ -150,8 +124,6 @@ inline static int IntVectPropertySetElement(vtkSMProxy *proxy,
 //-----------------------------------------------------------------------------
 vtkPVAnimationCue::vtkPVAnimationCue()
 {
-  this->Observer = vtkPVAnimationCueObserver::New();
-  this->Observer->SetAnimationCue(this);
   this->TimeLineParent = NULL;
   this->TimeLineContainer = vtkKWFrame::New();
   this->Label = vtkKWLabel::New();
@@ -165,30 +137,13 @@ vtkPVAnimationCue::vtkPVAnimationCue()
   this->TimeLineFrame = vtkKWFrame::New();
   this->ShowTimeLine = 1;
   this->Focus = 0;
-  this->Virtual = 0;
-  this->NumberOfPoints = 0;
-  this->PointParameters[0] = this->PointParameters[1] = 0.0;
-
-  this->CueProxy = 0;
-  this->CueProxyName = 0;
-  this->KeyFrameManipulatorProxy = 0;
-  this->KeyFrameManipulatorProxyName = 0;
-
-  this->PVKeyFrames = vtkCollection::New();
-  this->PVKeyFramesIterator = this->PVKeyFrames->NewIterator();
 
   this->PVAnimationScene = NULL;
   this->PVSource = NULL;
-  this->ProxiesRegistered = 0;
 
-  this->PropertyStatusManager = NULL;
   this->Name = NULL;
   this->TclNameCommand = 0;
   this->CueVisibility = 1;
-  this->InRecording = 0;
-  this->KeyFramesCreatedCount = 0;
-
-  this->ParentCue = 0;
 }
 
 
@@ -198,8 +153,6 @@ vtkPVAnimationCue::~vtkPVAnimationCue()
   this->SetPVSource(NULL);
   //  this->UnregisterProxies();
 
-  this->Observer->SetAnimationCue(NULL);
-  this->Observer->Delete();
   this->SetTimeLineParent(0);
   this->TimeLineContainer->Delete();
   this->Label->Delete();
@@ -207,57 +160,20 @@ vtkPVAnimationCue::~vtkPVAnimationCue()
   this->Image->Delete();
   this->Frame->Delete();
   this->TimeLineFrame->Delete();
-  this->PVKeyFrames->Delete();
-  this->PVKeyFramesIterator->Delete();
 
-  this->SetCueProxyName(0);
-  if (this->CueProxy)
-    {
-    this->CueProxy->Delete();
-    this->CueProxy = 0;
-    }
-
-  this->SetKeyFrameManipulatorProxyName(0);
-  if (this->KeyFrameManipulatorProxy)
-    {
-    this->KeyFrameManipulatorProxy->Delete();
-    this->KeyFrameManipulatorProxy = 0;
-    }
   this->SetAnimationScene(NULL);
 
-  if (this->PropertyStatusManager)
-    {
-    this->PropertyStatusManager->Delete();
-    this->PropertyStatusManager = NULL;
-    }
   this->SetName(NULL);
   this->SetTclNameCommand(0);
-  this->SetParentAnimationCue(0);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::SetLabelText(const char* label)
 {
+  this->Superclass::SetLabelText(label);
   this->Label->SetText(label);
 }
 
-//-----------------------------------------------------------------------------
-const char* vtkPVAnimationCue::GetLabelText()
-{
-  return this->Label->GetText();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationCue::SetVirtual(int v)
-{
-  if (this->IsCreated())
-    {
-    vtkErrorMacro("Virtual state can only be changed before creation.");
-    return;
-    }
-  this->Virtual = v;
-  this->Modified();
-}
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::SetAnimationScene(vtkPVAnimationScene* scene)
@@ -266,55 +182,35 @@ void vtkPVAnimationCue::SetAnimationScene(vtkPVAnimationScene* scene)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCue::SetParentAnimationCue(vtkPVAnimationCue* parent)
-{
-  this->ParentCue = parent;
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVAnimationCue::RegisterProxies()
 {
-  if (this->Virtual || !this->CueProxyName || !this->KeyFrameManipulatorProxyName)
-    {
-    return;
-    }
-
   if (this->ProxiesRegistered)
     {
     return;
-    }
-  vtkSMObject::GetProxyManager()->RegisterProxy("animation",
-    this->CueProxyName, this->CueProxy);
-  vtkSMObject::GetProxyManager()->RegisterProxy("animation_manipulators",
-    this->KeyFrameManipulatorProxyName, this->KeyFrameManipulatorProxy);
 
-  if (this->PVAnimationScene)
-    {
-    this->PVAnimationScene->AddAnimationCue(this);
     }
-  this->ProxiesRegistered = 1;
+  this->Superclass::RegisterProxies();
+  if (this->ProxiesRegistered)
+    {
+    if (this->PVAnimationScene)
+      {
+      this->PVAnimationScene->AddAnimationCue(this);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::UnregisterProxies()
 {
-  if (this->Virtual || !this->CueProxyName || !this->KeyFrameManipulatorProxyName)
-    {
-    return;
-    }
   if (!this->ProxiesRegistered)
     {
     return;
     }
-  vtkSMObject::GetProxyManager()->UnRegisterProxy("animation",
-    this->CueProxyName);
-  vtkSMObject::GetProxyManager()->UnRegisterProxy("animation_manipulators",
-    this->KeyFrameManipulatorProxyName);
+  this->Superclass::UnregisterProxies();
   if (this->PVAnimationScene)
     {
     this->PVAnimationScene->RemoveAnimationCue(this);
     }
-  this->ProxiesRegistered = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -324,340 +220,9 @@ void vtkPVAnimationCue::SetEnableZoom(int zoom)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCue::CreateProxy()
-{
-  if (!this->Virtual)
-    {
-    vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-    static int proxyNum = 0;
-    this->CueProxy = vtkSMAnimationCueProxy::SafeDownCast(
-      pxm->NewProxy("animation","AnimationCue"));
-    if (!this->CueProxy)
-      {
-      vtkErrorMacro("Failed to create proxy " << "AnimationCue");
-      return;
-      }
-    ostrstream str;
-    str << "vtkPVTimeLine_AnimationCue" << proxyNum << ends;
-    this->SetCueProxyName(str.str());
-
-    this->KeyFrameManipulatorProxy = vtkSMKeyFrameAnimationCueManipulatorProxy::
-      SafeDownCast(pxm->NewProxy("animation_manipulators",
-          "KeyFrameAnimationCueManipulator"));
-    if (!this->KeyFrameManipulatorProxy)
-      {
-      vtkErrorMacro("Failed to create proxy KeyFrameAnimationCueManipulator");
-      return;
-      }
-    ostrstream str1;
-    str1 << "vtkPVTimeLine_KeyFrameAnimationCueManipulator" << proxyNum << ends;
-    this->SetKeyFrameManipulatorProxyName(str1.str());
-
-    proxyNum++;
-    str.rdbuf()->freeze(0);
-    str1.rdbuf()->freeze(0);
-
-
-    this->KeyFrameManipulatorProxy->UpdateVTKObjects();
-
-    vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-      this->CueProxy->GetProperty("Manipulator"));
-    if (pp)
-      {
-      pp->RemoveAllProxies();
-      pp->AddProxy(this->KeyFrameManipulatorProxy);
-      }
-    IntVectPropertySetElement(this->CueProxy, "TimeMode", 
-      VTK_ANIMATION_CUE_TIMEMODE_NORMALIZED);
-    DoubleVectPropertySetElement(this->CueProxy, "StartTime", 0.0);
-    DoubleVectPropertySetElement(this->CueProxy, "EndTime", 1.0);
-    this->CueProxy->UpdateVTKObjects(); //calls CreateVTKObjects(1) internally.
-    this->KeyFrameManipulatorProxy->AddObserver(
-      vtkCommand::ModifiedEvent, this->Observer);
-    }
-}
-
-//-----------------------------------------------------------------------------
-unsigned long vtkPVAnimationCue::GetKeyFramesMTime()
-{
-  return (this->Virtual)? this->GetMTime() :
-      this->KeyFrameManipulatorProxy->GetMTime();
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVAnimationCue::GetNumberOfKeyFrames()
-{
-  return (this->Virtual)? this->NumberOfPoints :
-    this->KeyFrameManipulatorProxy->GetNumberOfKeyFrames();
-}
-
-//-----------------------------------------------------------------------------
-double vtkPVAnimationCue::GetKeyFrameTime(int id)
-{
-  if (id < 0 || id >= this->GetNumberOfKeyFrames())
-    {
-    vtkErrorMacro("Id beyond range");
-    return 0.0;
-    }
-  if (this->Virtual)
-    {
-    return this->PointParameters[id];
-    }
-  else
-    {
-    vtkSMKeyFrameProxy* keyframe = this->KeyFrameManipulatorProxy->
-      GetKeyFrameAtIndex(id);
-    if (!keyframe)
-      {
-      vtkErrorMacro("Failed to get keyframe for index " << id );
-      return 0.0;
-      }
-    return keyframe->GetKeyTime();
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationCue::SetKeyFrameTime(int id, double time)
-{
-  if (id < 0 || id >= this->GetNumberOfKeyFrames())
-    {
-    vtkErrorMacro("Id beyond range: " << id << ", " << time);
-    return;
-    }
-  if (this->Virtual)
-    {
-    this->PointParameters[id] = time;
-    this->Modified(); // Since the function modifed time in Virtual mode is
-                      // PVCue modified time.
-    this->InvokeEvent(vtkPVAnimationCue::KeysModifiedEvent);
-    }
-  else
-    {
-    vtkSMKeyFrameProxy* keyframe = this->KeyFrameManipulatorProxy->
-      GetKeyFrameAtIndex(id);
-     if (!keyframe)
-      {
-      vtkErrorMacro("Failed to get keyframe for index " << id );
-      return;
-      }
-     keyframe->SetKeyTime(time);
-    }
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVAnimationCue::AddNewKeyFrame(double time)
-{
-  int id = -1;
-  if (this->Virtual)
-    {
-    if (this->NumberOfPoints >= 2)
-      {
-      vtkErrorMacro("When PVCue doesn't have a proxy associated with it "
-        "it can only have two points.");
-      return id;
-      }
-    this->PointParameters[this->NumberOfPoints] = time;
-    id = this->NumberOfPoints;
-    this->NumberOfPoints++;
-    this->Modified(); // Since the function modifed time in Virtual mode is
-                      // PVCue modified time.
-    this->InvokeEvent(vtkPVAnimationCue::KeysModifiedEvent);
-    }
-  else
-    {
-    int numOfKeyFrames = this->GetNumberOfKeyFrames();
-    if (numOfKeyFrames == 0 && time != 0)
-      {
-      // This stuff is to add the a keyframe at the start of the animation (let's call it
-      // pilot key frame). Note that vtkPVAnimationCue::RecordState has the additional 
-      // responsibility to initialize the pilot keyframe value propertly.
-      // Actually, vtkPVAnimationCue::AddNewKeyFrame gives up any gurantees about the
-      // key frames values in recording mode (only that it will be the properties
-      // current value) and the RecordState should init all the keyframes the way it wants.
-      if (this->AddNewKeyFrame(0.0) == -1) 
-        {
-        vtkErrorMacro("Failed to add Pilot keyframe!");
-        return -1;
-        }
-      }
-    id = this->CreateAndAddKeyFrame(time, vtkPVAnimationManager::RAMP);
-    vtkPVKeyFrame* keyframe = this->GetKeyFrame(id);
-    if (!this->InRecording)
-      {
-      if (id == 0)
-        {
-        keyframe->SetValueToMinimum();
-        }
-      else if (id == this->GetNumberOfKeyFrames()-1)
-        {
-        keyframe->SetValueToMaximum();
-        }
-      }
-    }
-  return id;
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVAnimationCue::CanDeleteSelectedKeyFrame()
-{
-  if (this->Virtual)
-    {
-    return 0;
-    }
-  int id = this->TimeLine->GetSelectedPoint();
-  return this->TimeLine->CanRemoveFunctionPoint(id);
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVAnimationCue::AppendNewKeyFrame()
-{
-  // First determine time.
-  double step = 0.25;
-  double curbounds[2];
-  this->GetTimeBounds(curbounds);
-
-  if (curbounds[1] + step > 1.0)
-    {
-    curbounds[1] -= step;
-    this->SetTimeBounds(curbounds, 1);
-    }
-  int id = this->AddNewKeyFrame(1.0);
-  if (id != -1)
-    {
-    this->TimeLine->SelectPoint(id);
-    }
-  return id;
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
-{
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
-    this->GetApplication());
-  vtkPVWindow* pvWin = pvApp->GetMainWindow();
-  vtkPVAnimationManager* pvAM = pvWin->GetAnimationManager(); 
-
-  // First, synchronize the system state to the keyframe time to get proper
-  // domain and property values.
-  if (!this->InRecording)
-    {
-    // Don't do this since it disturbs the entire system.
-    // Issues with domain sync are as such not addressed fully by doing this.
-    // pvAM->SetCurrentTime(time);
-    }
-  
-  ostrstream str ;
-  str << "KeyFrameName_" << this->KeyFramesCreatedCount++ << ends;
-  
-  vtkPVKeyFrame* keyframe = pvAM->NewKeyFrame(type);
-  keyframe->SetName(str.str());
-  str.rdbuf()->freeze(0);
-  
-  keyframe->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
-  ostrstream sCommand;
-  sCommand << "GetKeyFrame \"" << keyframe->GetName() << "\"" << ends;
-  keyframe->GetTraceHelper()->SetReferenceCommand(sCommand.str());
-  sCommand.rdbuf()->freeze(0);
-
-  keyframe->SetAnimationCue(this); // provide a pointer to cue, so that the interace
-  // can be in accordance with the animated proeprty.
-  keyframe->Create(this->GetApplication(),NULL);
-  keyframe->SetKeyTime(time);
-  keyframe->SetKeyValue(0);
-  int id = this->AddKeyFrame(keyframe);
-  keyframe->Delete();
-
-  this->InitializeKeyFrameUsingCurrentState(keyframe);
-/*  if (!this->InRecording)
-    {
-    if (id == 0)
-      {
-      keyframe->SetValueToMinimum();
-      }
-    else if (id == this->GetNumberOfKeyFrames()-1)
-      {
-      keyframe->SetValueToMaximum();
-      }
-    }
-*/
-//  this->TimeLine->SelectPoint(id);
-  return id;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationCue::InitializeKeyFrameUsingCurrentState(vtkPVKeyFrame* keyframe)
-{
-  keyframe->InitializeKeyValueDomainUsingCurrentState();
-  keyframe->InitializeKeyValueUsingCurrentState();
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVAnimationCue::AddKeyFrame(vtkPVKeyFrame* keyframe)
-{
-  if (this->Virtual)
-    {
-    vtkErrorMacro("Attempt to added keyframe to a Virtual Cue");
-    return -1;
-    }
-  if (!keyframe)
-    {
-    return -1;
-    }
-  if (this->PVKeyFrames->IsItemPresent(keyframe))
-    {
-    vtkErrorMacro("Key frame already exists");
-    return -1;
-    }
-
-  this->PVKeyFrames->AddItem(keyframe);
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->KeyFrameManipulatorProxy->GetProperty("KeyFrames"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property KeyFrames on "
-      "KeyFrameManipulatorProxy.");
-    return -1;
-    }
-  pp->AddProxy(keyframe->GetKeyFrameProxy());
-  this->KeyFrameManipulatorProxy->UpdateVTKObjects();
-  
-  // I hate this...but what can I do, I need the index returned by the manipulator.
-  this->KeyFrameManipulatorProxy->UpdateInformation();
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
-    this->KeyFrameManipulatorProxy->GetProperty("LastAddedKeyFrameIndex"));
-  return ivp->GetElement(0);
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVAnimationCue::DeleteKeyFrame(int id)
 {
   this->TimeLine->RemovePoint(id);
-}
-
-//-----------------------------------------------------------------------------
-int vtkPVAnimationCue::RemoveKeyFrame(int id)
-{
-  if (id < 0 || id >= this->GetNumberOfKeyFrames())
-    {
-    return 0;
-    }
-  if (this->Virtual)
-    {
-    if (id == 0)
-      {
-      this->PointParameters[0] = this->PointParameters[1];
-      }
-    this->NumberOfPoints--;
-    this->Modified(); // Since the function modifed time in Virtual mode is
-                      // PVCue modified time.
-    this->InvokeEvent(vtkPVAnimationCue::KeysModifiedEvent);
-    }
-  else
-    {
-    vtkPVKeyFrame* keyframe = this->GetKeyFrame(id);
-    this->RemoveKeyFrame(keyframe);
-    }
-  return 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -673,33 +238,6 @@ double vtkPVAnimationCue::GetTimeMarker()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCue::RemoveKeyFrame(vtkPVKeyFrame* keyframe)
-{
-  if (this->Virtual)
-    {
-    vtkErrorMacro("Cue has no actual keyframes.");
-    return;
-    }
-  if (!keyframe)
-    {
-    return;
-    }
-  keyframe->SetParent(NULL);
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->KeyFrameManipulatorProxy->GetProperty("KeyFrames"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property KeyFrames on "
-      "KeyFrameManipulatorProxy.");
-    return;
-    }
-  pp->RemoveProxy(keyframe->GetKeyFrameProxy());
-  this->KeyFrameManipulatorProxy->UpdateVTKObjects();
-
-  this->PVKeyFrames->RemoveItem(keyframe);
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVAnimationCue::ReplaceKeyFrame(vtkPVKeyFrame* oldFrame, 
   vtkPVKeyFrame* newFrame)
 {
@@ -711,83 +249,8 @@ void vtkPVAnimationCue::ReplaceKeyFrame(vtkPVKeyFrame* oldFrame,
   // Removing a point can change its selection. So, we save the current 
   // selection and restore it.
   int selection_id = this->TimeLine->GetSelectedPoint();
-  
-  newFrame->SetName(oldFrame->GetName());
-  newFrame->GetTraceHelper()->SetReferenceHelper(this->GetTraceHelper());
-  ostrstream sCommand;
-  sCommand << "GetKeyFrame \"" << newFrame->GetName() << "\"" << ends;
-  newFrame->GetTraceHelper()->SetReferenceCommand(sCommand.str());
-  sCommand.rdbuf()->freeze(0);
-
-  this->InitializeKeyFrameUsingCurrentState(newFrame);
-  newFrame->SetKeyTime(oldFrame->GetKeyTime());
-  newFrame->SetKeyValue(oldFrame->GetKeyValue());
-  
-  
-  this->RemoveKeyFrame(oldFrame);
-  this->AddKeyFrame(newFrame);
+  this->Superclass::ReplaceKeyFrame(oldFrame, newFrame);  
   this->TimeLine->SelectPoint(selection_id);
-}
-
-//-----------------------------------------------------------------------------
-vtkPVKeyFrame* vtkPVAnimationCue::GetKeyFrame(const char* name)
-{
-  if (this->Virtual)
-    {
-    vtkErrorMacro("Cue has no actual keyframes");
-    return NULL;
-    }
-  if (name == NULL)
-    {
-    return NULL;
-    }
-  vtkCollectionIterator* iter = this->PVKeyFramesIterator;
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
-    iter->GoToNextItem())
-    {
-    vtkPVKeyFrame* pvKeyFrame = vtkPVKeyFrame::SafeDownCast(
-      iter->GetCurrentObject());
-    const char* framename = pvKeyFrame->GetName();
-    if (framename && strcmp(framename, name)==0)
-      {
-      return pvKeyFrame;
-      }
-    }
-  return NULL;
-}
-
-//-----------------------------------------------------------------------------
-vtkPVKeyFrame* vtkPVAnimationCue::GetKeyFrame(int id)
-{
-  if (id < 0 || id >= this->GetNumberOfKeyFrames())
-    {
-    vtkErrorMacro("Id out of range");
-    return NULL;
-    }
-  if (this->Virtual)
-    {
-    vtkErrorMacro("Cue has no actual keyframes");
-    return NULL;
-    }
-  vtkSMKeyFrameProxy* kfProxy = this->KeyFrameManipulatorProxy->
-    GetKeyFrameAtIndex(id);
-  if (!kfProxy)
-    {
-    vtkErrorMacro("Cannot find keyframe at index " << id );
-    return NULL;
-    }
-  vtkCollectionIterator* iter = this->PVKeyFramesIterator;
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); 
-    iter->GoToNextItem())
-    {
-    vtkPVKeyFrame* pvKeyFrame = vtkPVKeyFrame::SafeDownCast(
-      iter->GetCurrentObject());
-    if (pvKeyFrame->GetKeyFrameProxy() == kfProxy)
-      {
-      return pvKeyFrame;
-      }
-    }
-  return NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -805,8 +268,6 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
     return;
     }
   this->Superclass::Create(app, "frame", args);
-
-  this->CreateProxy();
   
   this->TimeLineContainer->SetParent(this->TimeLineParent);
   this->TimeLineContainer->Create(app, NULL);
@@ -859,28 +320,21 @@ void vtkPVAnimationCue::Create(vtkKWApplication* app, const char* args)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::InitializeObservers(vtkObject* object)
 {
-  object->AddObserver(
-    vtkKWParameterValueFunctionEditor::PointMovedEvent, this->Observer);
-  object->AddObserver(
-    vtkKWParameterValueFunctionEditor::PointMovingEvent, this->Observer);
-
-  object->AddObserver(
-    vtkKWParameterValueFunctionEditor::SelectionChangedEvent, this->Observer);
-  object->AddObserver(vtkKWEvent::FocusInEvent, this->Observer);
-  object->AddObserver(vtkKWEvent::FocusOutEvent, this->Observer);
-  object->AddObserver(vtkPVAnimationCue::KeysModifiedEvent, this->Observer);
-
+  this->Observe(object, vtkKWParameterValueFunctionEditor::PointMovedEvent);
+  this->Observe(object, vtkKWParameterValueFunctionEditor::PointMovingEvent);
+  this->Observe(object, vtkKWParameterValueFunctionEditor::SelectionChangedEvent);
+  this->Observe(object, vtkKWEvent::FocusInEvent);
+  this->Observe(object, vtkKWEvent::FocusOutEvent);
+  this->Observe(object, vtkPVSimpleAnimationCue::KeysModifiedEvent);
+  this->Observe(object, vtkKWParameterValueFunctionEditor::ParameterCursorMovedEvent);
+  this->Observe(object, vtkKWParameterValueFunctionEditor::ParameterCursorMovingEvent);
   if (this->TimeLine->GetShowParameterRange())
     {
-    object->AddObserver(vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedEvent,
-      this->Observer);
-    object->AddObserver(vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingEvent,
-      this->Observer);
+    this->Observe(object, 
+      vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangedEvent);
+    this->Observe(object,
+      vtkKWParameterValueFunctionEditor::VisibleParameterRangeChangingEvent);
     }
-  object->AddObserver(vtkKWParameterValueFunctionEditor::ParameterCursorMovedEvent,
-    this->Observer);
-  object->AddObserver(vtkKWParameterValueFunctionEditor::ParameterCursorMovingEvent,
-    this->Observer);
 }
 
 //-----------------------------------------------------------------------------
@@ -921,7 +375,9 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event, void* 
       // raise this event on this cue, so that the VAnimationInterface (if
       // it is listening) will know that selection has changed and will
       // update to show the right key frame.
-      this->InvokeEvent(event, calldata);
+      //this->InvokeEvent(event, calldata);
+      
+      this->SelectKeyFrameInternal(this->TimeLine->GetSelectedPoint());
       return;
 
     case vtkKWParameterValueFunctionEditor::ParameterCursorMovingEvent:
@@ -948,18 +404,10 @@ void vtkPVAnimationCue::ExecuteEvent(vtkObject* wdg, unsigned long event, void* 
         {
         this->PVAnimationScene->InvalidateAllGeometries();
         }
-      if (this->GetNumberOfKeyFrames() >= 2 )
-        {
-        this->RegisterProxies();
-        }
-      if (this->GetNumberOfKeyFrames() < 2)
-        {
-        this->UnregisterProxies();
-        }
-      this->InvokeEvent(vtkPVAnimationCue::KeysModifiedEvent);
-      return;
+      break;
       }
     }
+  this->Superclass::ExecuteEvent(wdg, event, calldata);
 }
 
 //-----------------------------------------------------------------------------
@@ -1076,7 +524,6 @@ void vtkPVAnimationCue::SetImageType(int type)
     }
   this->ImageType = type;
 }
-
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::SetTimeBounds(double bounds[2], int enable_scaling)
 {
@@ -1132,96 +579,17 @@ void vtkPVAnimationCue::RemoveSelfFocus()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCue::SetAnimatedProxy(vtkSMProxy *proxy)
-{
-  if (this->Virtual)
-    {
-    vtkErrorMacro("Cue does not have any actual proxies associated with it.");
-    return;
-    }
-  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
-    this->CueProxy->GetProperty("AnimatedProxy"));
-  if (!pp)
-    {
-    vtkErrorMacro("Failed to find property AnimatedProxy.");
-    return;
-    }
-  pp->RemoveAllProxies();
-  pp->AddProxy(proxy);
-  this->CueProxy->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationCue::SetAnimatedPropertyName(const char* name)
-{
-  if (this->Virtual)
-    {
-    vtkErrorMacro("Cue does not have any actual proxies associated with it.");
-    return;
-    }
-  StringVectPropertySetElement(this->CueProxy, "AnimatedPropertyName", name);
-  this->CueProxy->UpdateVTKObjects();
-  if (!this->PropertyStatusManager)
-    {
-    this->PropertyStatusManager = vtkSMPropertyStatusManager::New();
-    }
-  this->PropertyStatusManager->UnregisterAllProperties();
-  this->PropertyStatusManager->RegisterProperty(
-    vtkSMVectorProperty::SafeDownCast(this->CueProxy->GetAnimatedProperty()));
-  this->PropertyStatusManager->InitializeStatus();
-}
-
-//-----------------------------------------------------------------------------
-const char* vtkPVAnimationCue::GetAnimatedPropertyName()
-{
-  if (this->Virtual)
-    {
-    return NULL;
-    }
-  return this->CueProxy->GetAnimatedPropertyName();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationCue::SetAnimatedDomainName(const char* name)
-{
-  if (this->Virtual)
-    {
-    vtkErrorMacro("Cue does not have any actual proxies associated with it.");
-    return;
-    }
-  StringVectPropertySetElement(this->CueProxy, "AnimatedDomainName", name);
-  this->CueProxy->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationCue::SetAnimatedElement(int index)
-{
-  if (this->Virtual)
-    {
-    vtkErrorMacro("Cue does not have any actual proxies associated with it.");
-    return;
-    }
-  IntVectPropertySetElement(this->CueProxy,"AnimatedElement", index);
-  this->CueProxy->UpdateVTKObjects();
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVAnimationCue::StartRecording()
 {
   if (this->InRecording)
     {
     return;
     }
-  if (this->PropertyStatusManager)
-    {
-    this->PropertyStatusManager->InitializeStatus();
-    }
-  this->InRecording = 1;
+  this->Superclass::StartRecording();
   if (!this->Virtual)
     {
     this->TimeLine->DisableAddAndRemoveOn();
     }
-  this->PreviousStepKeyFrameAdded = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1231,7 +599,9 @@ void vtkPVAnimationCue::StopRecording()
     {
     return;
     }
-  this->InRecording = 0;
+
+  this->Superclass::StopRecording();
+
   if (!this->Virtual)
     {
     this->TimeLine->SetDisableAddAndRemove(0);
@@ -1248,58 +618,14 @@ void vtkPVAnimationCue::RecordState(double ntime, double offset,
     return;
     }
   
-  if (this->Virtual || !this->PropertyStatusManager || 
-    (onlyFocus && !this->HasFocus()))
+  if (onlyFocus && !this->HasFocus())
     {
     return;
     }
 
-  vtkSMProperty* property = this->CueProxy->GetAnimatedProperty();
-  int index = this->CueProxy->GetAnimatedElement();
-  
-  if (!this->PropertyStatusManager->HasPropertyChanged(
-      vtkSMVectorProperty::SafeDownCast(property), index ))
-    {
-    this->PreviousStepKeyFrameAdded = 0;
-    return;
-    }
-  // animated property has changed.
-  // add a keyframe at ntime.
   this->TimeLine->DisableAddAndRemoveOff();
-  int old_numOfKeyFrames = this->GetNumberOfKeyFrames();
-  
-  if (!this->PreviousStepKeyFrameAdded)
-    {
-    int id = this->AddNewKeyFrame(ntime);
-    if (id == -1)
-      {
-      vtkErrorMacro("Failed to add new key frame");
-      return;
-      }
-    this->GetKeyFrame(id)->InitializeKeyValueUsingProperty(
-      this->PropertyStatusManager->GetInternalProperty(vtkSMVectorProperty::SafeDownCast(property)),
-      index);
-    
-    if (old_numOfKeyFrames == 0)
-      {
-      //Pilot keyframe also needs to be initilaized.
-      this->GetKeyFrame(0)->InitializeKeyValueUsingProperty(
-        this->PropertyStatusManager->GetInternalProperty(vtkSMVectorProperty::SafeDownCast(property)),
-        index);
-      }
-    }
-  int id2 = this->AddNewKeyFrame(ntime + offset);
-  if (id2 == -1)
-    {
-    vtkErrorMacro("Failed to add new key frame");
-    return;
-    }
-  this->PreviousStepKeyFrameAdded = 1;
+  this->Superclass::RecordState(ntime, offset); 
   this->TimeLine->DisableAddAndRemoveOn();
-  if (this->PropertyStatusManager)
-    {
-    this->PropertyStatusManager->InitializeStatus();
-    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1324,6 +650,15 @@ void vtkPVAnimationCue::RemoveAllKeyFrames()
   // Don;t directly remove the keyframes...instead pretend that 
   // the timeline nodes are being deleted.
   this->TimeLine->RemoveAll();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCue::SelectKeyFrame(int id)
+{
+  this->TimeLine->SelectPoint(id);
+//  this->Superclass::SelectKeyFrame(id); don't call Superclass::SelectKeyFrame
+//  it will get called as a result of 
+//  vtkKWParameterValueFunctionEditor::SelectionChangedEvent
 }
 
 //-----------------------------------------------------------------------------
@@ -1354,7 +689,7 @@ void vtkPVAnimationCue::UpdateCueVisibility(int advanced)
 void vtkPVAnimationCue::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
-
+  
   this->PropagateEnableState(this->TimeLineParent);
   this->PropagateEnableState(this->Label);
   this->PropagateEnableState(this->Image);
@@ -1437,24 +772,6 @@ void vtkPVAnimationCue::SaveState(ofstream* file)
 }
 
 //-----------------------------------------------------------------------------
-char* vtkPVAnimationCue::GetTextRepresentation()
-{
-  ostrstream str;
-  if (this->ParentCue)
-    {
-    char * ptext = this->ParentCue->GetTextRepresentation();
-    if (ptext)
-      {
-      str <<  ptext << " : ";
-      delete [] ptext;
-      }
-    str << this->GetLabelText() << ends;
-    return str.str();
-    }
-  return 0;
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVAnimationCue::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -1462,19 +779,6 @@ void vtkPVAnimationCue::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ImageType: " << this->ImageType << endl;
   os << indent << "ShowTimeLine: " << this->ShowTimeLine << endl;
   os << indent << "Focus: " << this->Focus << endl;
-  os << indent << "Virtual: " << this->Virtual << endl;
-  os << indent << "ProxiesRegistered: " << this->ProxiesRegistered << endl;
-  os << indent << "NumberOfPoints: " << this->NumberOfPoints << endl;
-  os << indent << "PointParameters: " << this->PointParameters[0] <<
-    ", " << this->PointParameters[1] << endl;
-  os << indent << "CueProxyName: " << 
-    ((this->CueProxyName)? this->CueProxyName : "NULL") << endl;
-  os << indent << "CueProxy: " << this->CueProxy << endl;
-  os << indent << "KeyFrameManipulatorProxyName: " <<
-    ((this->KeyFrameManipulatorProxyName)? 
-     this->KeyFrameManipulatorProxyName : "NULL") << endl;
-  os << indent << "KeyFrameManipulatorProxy: " << 
-    this->KeyFrameManipulatorProxy << endl;
   os << indent << "PVAnimationScene: " << this->PVAnimationScene << endl;
   os << indent << "PVSource: " << this->PVSource << endl;
   os << indent << "TimeLine: " << this->TimeLine << endl;

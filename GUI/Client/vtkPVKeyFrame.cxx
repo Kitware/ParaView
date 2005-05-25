@@ -32,7 +32,6 @@
 #include "vtkPVWindow.h"
 #include "vtkPVAnimationManager.h"
 #include "vtkPVAnimationScene.h"
-#include "vtkPVAnimationCue.h"
 #include "vtkSMAnimationCueProxy.h"
 #include "vtkSMArrayListDomain.h"
 #include "vtkSMStringListDomain.h"
@@ -45,7 +44,7 @@
 #include "vtkPVTraceHelper.h"
 #include "vtkPVContourEntry.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.14");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.15");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -114,7 +113,7 @@ vtkPVKeyFrame::vtkPVKeyFrame()
   this->TimeBounds[0] = -0.1;
   this->TimeBounds[1] = 1.1;
   this->ValueWidget = NULL;
-  this->AnimationCue = NULL;
+  this->AnimationCueProxy = NULL;
   this->Name = NULL;
   this->MinButton = vtkKWPushButton::New();
   this->MaxButton = vtkKWPushButton::New();
@@ -143,7 +142,7 @@ vtkPVKeyFrame::~vtkPVKeyFrame()
     this->ValueWidget->Delete();
     this->ValueWidget = NULL;
     }
-  this->SetAnimationCue(NULL);
+  this->SetAnimationCueProxy(NULL);
   this->SetKeyFrameProxyXMLName(0);
 
   this->TimeLabel->Delete();
@@ -163,9 +162,9 @@ void vtkPVKeyFrame::Create(vtkKWApplication* app, const char* args)
     return;
     }
 
-  if (!this->AnimationCue)
+  if (!this->AnimationCueProxy)
     {
-    vtkErrorMacro("AnimationCue must be set before calling Create");
+    vtkErrorMacro("AnimationCueProxy must be set before calling Create");
     return;
     }
   
@@ -263,7 +262,7 @@ void vtkPVKeyFrame::ChildCreate(vtkKWApplication* app)
 //-----------------------------------------------------------------------------
 void vtkPVKeyFrame::CreateValueWidget()
 {
-  vtkSMAnimationCueProxy* cueProxy = this->AnimationCue->GetCueProxy();
+  vtkSMAnimationCueProxy* cueProxy = this->AnimationCueProxy;
   vtkSMProperty* property = cueProxy->GetAnimatedProperty();
   vtkSMDomain* domain = cueProxy->GetAnimatedDomain();
   int animated_element = cueProxy->GetAnimatedElement();
@@ -420,7 +419,7 @@ void vtkPVKeyFrame::InitializeKeyValueUsingProperty(vtkSMProperty* property, int
     {
     vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
       property);
-    vtkSMAnimationCueProxy* cueProxy = this->AnimationCue->GetCueProxy();
+    vtkSMAnimationCueProxy* cueProxy = this->AnimationCueProxy;
     vtkSMDomain* domain = cueProxy->GetAnimatedDomain();
     vtkSMXDMFPropertyDomain* xdmfd = 
       vtkSMXDMFPropertyDomain::SafeDownCast(domain);
@@ -470,7 +469,7 @@ void vtkPVKeyFrame::UpdateDomain()
     return;
     }
   
-  vtkSMAnimationCueProxy* cueProxy = this->AnimationCue->GetCueProxy();
+  vtkSMAnimationCueProxy* cueProxy = this->AnimationCueProxy;
   vtkSMDomain* domain = cueProxy->GetAnimatedDomain();
   int index = cueProxy->GetAnimatedElement();
   
@@ -597,7 +596,7 @@ void vtkPVKeyFrame::InitializeKeyValueUsingCurrentState()
     {
     return;
     }
-  vtkSMAnimationCueProxy* cueProxy = this->AnimationCue->GetCueProxy();
+  vtkSMAnimationCueProxy* cueProxy = this->AnimationCueProxy;
   vtkSMProperty* property = cueProxy->GetAnimatedProperty();
   int index = cueProxy->GetAnimatedElement();
   this->InitializeKeyValueUsingProperty(property, index);
@@ -817,6 +816,6 @@ void vtkPVKeyFrame::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "KeyFrameProxyName: " << (this->KeyFrameProxyName?
     this->KeyFrameProxyName : "NULL") << endl;
   os << indent << "KeyFrameProxy: " << this->KeyFrameProxy << endl;
-  os << indent << "AnimationCue: " << this->AnimationCue << endl;
+  os << indent << "AnimationCueProxy: " << this->AnimationCueProxy << endl;
 }
 

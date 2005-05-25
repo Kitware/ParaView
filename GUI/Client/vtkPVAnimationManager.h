@@ -74,6 +74,7 @@ class vtkPVSource;
 class vtkPVKeyFrame;
 class vtkSMStringVectorProperty;
 class vtkPVActiveTrackSelector;
+class vtkPVSimpleAnimationCue;
 
 class VTK_EXPORT vtkPVAnimationManager : public vtkPVTracedWidget
 {
@@ -140,7 +141,7 @@ public:
   // Creates a new key frame of the sepecified type and adds it to the cue.
   // If replaceFrame is specified, the new key frame replaces that frame in the cue.
   // Basic properties from replaceFrame are copied over to the newly created frame.
-  vtkPVKeyFrame* ReplaceKeyFrame(vtkPVAnimationCue* pvCue, int type, 
+  vtkPVKeyFrame* ReplaceKeyFrame(vtkPVSimpleAnimationCue* pvCue, int type, 
     vtkPVKeyFrame* replaceFrame = NULL);
 
 

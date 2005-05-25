@@ -64,7 +64,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.44");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.45");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -657,6 +657,7 @@ void vtkPVAnimationManager::SetupCue(vtkPVSource* pvSource, vtkPVAnimationCueTre
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::ValidateAndAddSpecialCues()
 {
+  /*
   // this is the place to add camera cue.
   ostrstream str;
   str << "_dont_validate_." << "camera" << ends;
@@ -681,6 +682,7 @@ void vtkPVAnimationManager::ValidateAndAddSpecialCues()
   
   name.rdbuf()->freeze(0);
   str.rdbuf()->freeze(0); 
+  */
 }
 
 //-----------------------------------------------------------------------------
@@ -770,7 +772,7 @@ void vtkPVAnimationManager::ExecuteEvent(vtkObject* obj, unsigned long event,
     switch (event)
       {
     case vtkKWEvent::FocusOutEvent:
-      if (cue == this->VAnimationInterface->GetAnimationCue())
+//      if (cue == this->VAnimationInterface->GetAnimationCue())
         {
         this->VAnimationInterface->SetAnimationCue(NULL);
         this->ActiveTrackSelector->SelectCue(NULL);
@@ -833,7 +835,7 @@ int vtkPVAnimationManager::GetKeyFrameType(vtkPVKeyFrame* kf)
 }
 
 //-----------------------------------------------------------------------------
-vtkPVKeyFrame* vtkPVAnimationManager::ReplaceKeyFrame(vtkPVAnimationCue* pvCue, 
+vtkPVKeyFrame* vtkPVAnimationManager::ReplaceKeyFrame(vtkPVSimpleAnimationCue* pvCue, 
   int type, vtkPVKeyFrame* replaceFrame)
 {
   if (this->GetKeyFrameType(replaceFrame) == type)
@@ -846,7 +848,7 @@ vtkPVKeyFrame* vtkPVAnimationManager::ReplaceKeyFrame(vtkPVAnimationCue* pvCue,
     {
     return NULL;
     }
-  keyFrame->SetAnimationCue(pvCue);
+  keyFrame->SetAnimationCueProxy(pvCue->GetCueProxy());
   keyFrame->Create(this->GetApplication(), 0);
   pvCue->ReplaceKeyFrame(replaceFrame, keyFrame);
   keyFrame->Delete();

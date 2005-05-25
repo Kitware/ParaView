@@ -34,7 +34,7 @@
 #include "vtkPVTraceHelper.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.17");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.18");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -109,7 +109,8 @@ void vtkPVHorizontalAnimationInterface::Create(vtkKWApplication* app, const char
     vtkKWParameterValueFunctionEditor::ParameterRangePositionTop);
   this->ParentTree->GetTimeLine()->SetCanvasOutlineStyle(
     vtkKWParameterValueFunctionEditor::CanvasOutlineStyleAllSides);
- this->ParentTree->SetBalloonHelpString("Animation Tracks list the properties that can be animated, "
+ this->ParentTree->
+   SetBalloonHelpString("Animation Tracks list the properties that can be animated, "
     "grouped under the source or filter to which they belong. "
     "Expand the Source which you are interested in animating, and locate the property "
     "to be animated over time. "
@@ -286,7 +287,7 @@ void vtkPVHorizontalAnimationInterface::UpdateEnableState()
   this->PropagateEnableState(this->SplitFrame);
   this->PropagateEnableState(this->TimeLineFrame);
   this->PropagateEnableState(this->PropertiesFrame);
-  this->PropagateEnableState(this->ParentTree);
+//  this->PropagateEnableState(this->ParentTree);
 }
 
 //-----------------------------------------------------------------------------

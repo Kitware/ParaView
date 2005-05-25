@@ -28,7 +28,7 @@ public:
 //----------------------------------------------------------------------------
 
 
-vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.4");
 vtkStandardNewMacro(vtkSMKeyFrameProxy);
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
@@ -58,6 +58,7 @@ void vtkSMKeyFrameProxy::SetKeyValue(unsigned int index, double value)
     this->SetNumberOfKeyValues(index+1);
     }
   this->Internals->KeyValues[index] = value;
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------

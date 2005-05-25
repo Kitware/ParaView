@@ -26,7 +26,7 @@ class vtkPVWidget;
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkPVKeyFrameObserver;
-class vtkPVAnimationCue;
+class vtkSMAnimationCueProxy;
 class vtkSMProperty;
 
 class VTK_EXPORT vtkPVKeyFrame : public vtkPVTracedWidget
@@ -88,11 +88,13 @@ public:
   virtual void PrepareForDisplay();
  
   // Description:
-  // A pointer to the vtkPVAnimationCue is need so that the keyframe
+  // A pointer to the AnimationCueProxy is need so that the keyframe
   // can obtain information about the animated property. Must be set before
-  // calling create and should not be changed thereafter.
-  void SetAnimationCue(vtkPVAnimationCue* cue) { this->AnimationCue = cue; }
-  vtkGetObjectMacro(AnimationCue, vtkPVAnimationCue);
+  // calling create and should not be changed thereafter. Note that it is not 
+  // reference counted for fear of loops.
+  void SetAnimationCueProxy(vtkSMAnimationCueProxy* cueproxy) 
+    { this->AnimationCueProxy = cueproxy; }
+  vtkGetObjectMacro(AnimationCueProxy, vtkSMAnimationCueProxy);
 
   virtual void SaveState(ofstream* file);
 
@@ -122,8 +124,8 @@ protected:
   vtkKWWidget* ValueWidget; // the type of this widget will be decided at runtime.
   vtkKWPushButton* MinButton;
   vtkKWPushButton* MaxButton;
- 
-  vtkPVAnimationCue* AnimationCue;
+
+  vtkSMAnimationCueProxy* AnimationCueProxy;
   char* Name;
 //BTX
   friend class vtkPVKeyFrameObserver;

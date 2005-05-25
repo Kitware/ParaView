@@ -33,6 +33,7 @@ class vtkKWCheckButton;
 class vtkPVKeyFrame;
 class vtkPVAnimationManager;
 class vtkKWScale;
+class vtkPVTrackEditor;
 class VTK_EXPORT vtkPVVerticalAnimationInterface : public vtkPVTracedWidget
 {
 public:
@@ -48,7 +49,6 @@ public:
   // Set active PVAnimationCue.
   // The interface shows the details about the active PVAnimationCue.
   void SetAnimationCue(vtkPVAnimationCue*);
-  vtkGetObjectMacro(AnimationCue, vtkPVAnimationCue);
 
   // Description:
   // This is the frame to which key frame properties are to be added.
@@ -64,22 +64,17 @@ public:
   // allowing the user to choose the active track to animate 
   // without using the tracks interface.
   vtkKWFrame* GetSelectorFrame();
-  
-  // Description:
-  // Set the type of the active Key frame. If the present type of the keyframe
-  // is different than the one specified, the keyframe gets replaced 
-  // with a keyframe of the specified type.
-  void SetKeyFrameType(int type);
 
+  // Description:
+  // For trace, to get the TrackEditor.
+  vtkGetObjectMacro(TrackEditor, vtkPVTrackEditor);
+  
   void SetAnimationManager(vtkPVAnimationManager* am) { this->AnimationManager = am;}
 
   // Callbacks for GUI elements.
-  void IndexChangedCallback();
   void RecordAllChangedCallback();
   void CacheGeometryCheckCallback();
   void AdvancedAnimationViewCallback();
-  void AddKeyFrameButtonCallback();
-  void DeleteKeyFrameButtonCallback();
 
   void SetAdvancedAnimationView(int advanced);
 
@@ -90,9 +85,9 @@ public:
   void SetCacheGeometry(int cache);
   vtkGetMacro(CacheGeometry, int);
 
-  void SetKeyFrameIndex(int index);
-
-  // Update the display.
+  // Description:
+  // Update the GUI. Internally calls Update on
+  // vtkPVTrackEditor.
   void Update();
 
   // Description:
@@ -110,21 +105,11 @@ protected:
   ~vtkPVVerticalAnimationInterface();
 
   vtkPVAnimationManager* AnimationManager;
+  vtkPVTrackEditor* TrackEditor;
+
   vtkKWFrameWithScrollbar* TopFrame;
   vtkKWFrameLabeled* ScenePropertiesFrame;
   vtkKWFrameLabeled* SelectorFrame;
-  vtkKWFrameLabeled* KeyFramePropertiesFrame;
-  vtkKWLabel* TitleLabelLabel;
-  vtkKWLabel* TitleLabel; // label to show the cue text representation.
-  vtkKWFrame* PropertiesFrame;
-  vtkKWFrame* TypeFrame; //frame containing the selection for differnt types of waveforms.
-  vtkKWPushButton* TypeImage;
-  vtkKWMenuButton* TypeMenuButton;
-  vtkKWPushButton* AddKeyFrameButton;
-  vtkKWPushButton* DeleteKeyFrameButton;
-  vtkKWLabel* TypeLabel;
-  vtkKWScale* IndexScale;
-  vtkKWLabel* SelectKeyFrameLabel;
 
   vtkKWCheckButton* RecordAllButton;
 
@@ -132,29 +117,10 @@ protected:
   vtkKWCheckButton* CacheGeometryCheck;
   vtkKWCheckButton* AdvancedAnimationCheck;
   
-  vtkPVAnimationCue* AnimationCue;
-  vtkPVKeyFrame* ActiveKeyFrame;
-  void SetActiveKeyFrame(vtkPVKeyFrame*);
-
   int EnableCacheCheckButton;
   int CacheGeometry;
-  int InterpolationValid; 
-    // flag indicating if the Interpolation should be enabled for the
-    // current key frame. It is disabled for the last key frame.
 
-  //BTX
-  friend class vtkPVVerticalAnimationInterfaceObserver;
-  vtkPVVerticalAnimationInterfaceObserver* Observer;
-  //ETX
-  void ExecuteEvent(vtkObject* obj, unsigned long event, void* calldata);
-  void InitializeObservers(vtkPVAnimationCue* cue);
-  void RemoveObservers(vtkPVAnimationCue* cue);
 
-  void BuildTypeMenu();
-  void UpdateTypeImage(vtkPVKeyFrame*);
-  void ShowKeyFrame(int id);
-
-  void SetAddDeleteButtonVisibility(int visible);
 private:
   vtkPVVerticalAnimationInterface(const vtkPVVerticalAnimationInterface&); // Not implemented.
   void operator=(const vtkPVVerticalAnimationInterface&); // Not implemented.
