@@ -64,7 +64,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.45");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.46");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -641,7 +641,7 @@ void vtkPVAnimationManager::SetupCue(vtkPVSource* pvSource, vtkPVAnimationCueTre
     cue->SetName(str.str());
     str.rdbuf()->freeze(0);
     }
-    
+  cue->SetKeyFrameParent(this->VAnimationInterface->GetPropertiesFrame());
   cue->SetAnimationScene(this->AnimationScene);
   cue->SetLabelText(label);
   cue->SetPVSource(pvSource);
@@ -808,7 +808,6 @@ vtkPVKeyFrame* vtkPVAnimationManager::NewKeyFrame(int type)
     vtkErrorMacro("Unknown type of keyframe requested: " << type);
     return NULL;
     }
-  keyframe->SetParent(this->VAnimationInterface->GetPropertiesFrame());
   return keyframe;
 }
 

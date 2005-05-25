@@ -36,8 +36,8 @@
 #include "vtkSMPropertyStatusManager.h"
 
 vtkStandardNewMacro(vtkPVSimpleAnimationCue);
-vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.1");
-
+vtkCxxRevisionMacro(vtkPVSimpleAnimationCue,"1.2");
+vtkCxxSetObjectMacro(vtkPVSimpleAnimationCue, KeyFrameParent, vtkKWWidget);
 //***************************************************************************
 class vtkPVSimpleAnimationCueObserver : public vtkCommand
 {
@@ -130,11 +130,14 @@ vtkPVSimpleAnimationCue::vtkPVSimpleAnimationCue()
 
   this->Observer = vtkPVSimpleAnimationCueObserver::New();
   this->Observer->SetTarget(this);
+
+  this->KeyFrameParent = 0;
 }
 
 //-----------------------------------------------------------------------------
 vtkPVSimpleAnimationCue::~vtkPVSimpleAnimationCue()
 {
+  this->SetKeyFrameParent(0);
   this->Observer->SetTarget(0);
   this->Observer->Delete();
 
@@ -176,6 +179,10 @@ void vtkPVSimpleAnimationCue::Create(vtkKWApplication* app, const char* type,
   if (!this->Superclass::Create(app, type, args))
     {
     return;
+    }
+  if (!this->KeyFrameParent)
+    {
+    vtkDebugMacro("KeyFrameParent must be set to be able to create KeyFrames");
     }
   this->CreateProxy();
 }
@@ -572,6 +579,12 @@ void vtkPVSimpleAnimationCue::SetTimeBounds(double bounds[2], int enable_scaling
 //-----------------------------------------------------------------------------
 int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
 {
+  if (!this->KeyFrameParent)
+    {
+    vtkErrorMacro("KeyFrameParent not set! Cannot create Keyframes");
+    return -1;
+    }
+
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
     this->GetApplication());
   vtkPVWindow* pvWin = pvApp->GetMainWindow();
@@ -590,6 +603,7 @@ int vtkPVSimpleAnimationCue::CreateAndAddKeyFrame(double time, int type)
   str << "KeyFrameName_" << this->KeyFramesCreatedCount++ << ends;
   
   vtkPVKeyFrame* keyframe = pvAM->NewKeyFrame(type);
+  keyframe->SetParent(this->KeyFrameParent);
   keyframe->SetName(str.str());
   str.rdbuf()->freeze(0);
   

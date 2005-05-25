@@ -209,6 +209,11 @@ public:
   virtual void SetTimeBounds(double bounds[2], int enable_scaling=0);
   virtual int GetTimeBounds(double* bounds);
 
+  // Description:
+  // This is the parent frame which will contain the Keyframes.
+  // Typically, this is an instance of vtkPVTrackEditor.
+  void SetKeyFrameParent(vtkKWWidget* kfParent);
+
 protected:
   vtkPVSimpleAnimationCue();
   ~vtkPVSimpleAnimationCue();
@@ -229,6 +234,7 @@ protected:
   int AddKeyFrame(vtkPVKeyFrame* keyframe);
 
 
+  vtkKWWidget* KeyFrameParent;
   vtkCollection* PVKeyFrames;
   vtkCollectionIterator* PVKeyFramesIterator;
 
