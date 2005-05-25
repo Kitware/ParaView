@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWHistogramSet);
-vtkCxxRevisionMacro(vtkKWHistogramSet, "1.3");
+vtkCxxRevisionMacro(vtkKWHistogramSet, "1.4");
 
 //----------------------------------------------------------------------------
 class vtkKWHistogramSetInternals
@@ -46,8 +46,8 @@ public:
   virtual void Execute(vtkObject *caller, unsigned long event, void *calldata);
   
   vtkKWHistogramSet *Self;
-  float StartProgressValue;
-  float SpanProgressValue;
+  double StartProgressValue;
+  double SpanProgressValue;
 
 protected:
   vtkKWHistogramCallback();
@@ -63,11 +63,11 @@ vtkKWHistogramCallback::vtkKWHistogramCallback()
 void vtkKWHistogramCallback::Execute(
   vtkObject *vtkNotUsed(caller), unsigned long event, void *calldata)
 {
-  float progress = 0.0;
+  double progress = 0.0;
   switch (event)
     {
     case vtkCommand::ProgressEvent:
-      progress = *(static_cast<float *>(calldata)) * this->SpanProgressValue +
+      progress = *(static_cast<double *>(calldata)) * this->SpanProgressValue +
         this->StartProgressValue;
       this->Self->InvokeEvent(event, &progress);
       break;
@@ -385,8 +385,8 @@ int vtkKWHistogramSet::AddHistograms(
     vtkKWHistogramCallback *callback = vtkKWHistogramCallback::New();
     callback->Self = this;
     callback->StartProgressValue = 
-      (float)(nb_components_processed - 1) / (float)nb_histograms;
-    callback->SpanProgressValue = 1.0 / (float)nb_histograms;
+      (double)(nb_components_processed - 1) / (double)nb_histograms;
+    callback->SpanProgressValue = 1.0 / (double)nb_histograms;
     
     if (nb_components_processed == 1)
       {

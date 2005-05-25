@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.2");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.3");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -388,7 +388,7 @@ void vtkKWHistogram::UpdateHistogram(vtkDataArray *scalars,
       }
     }
 
-  float progress = 0.2;
+  double progress = 0.2;
   this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
 
   // Loop over the data and fill in the bins
@@ -516,7 +516,7 @@ void vtkKWHistogram::UpdateHistogram(vtkDataArray *scalars,
         return;
       }
 
-    progress = 0.2 + ((float)start_tuple / (float)nb_of_tuples) * 0.8;
+    progress = 0.2 + ((double)start_tuple / (double)nb_of_tuples) * 0.8;
     this->InvokeEvent(vtkCommand::ProgressEvent, &progress);
 
     start_tuple += inc_tuple;
