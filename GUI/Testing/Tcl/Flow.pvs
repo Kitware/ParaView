@@ -201,12 +201,3 @@ source [file join [file dirname [info script]] Compare.tcl]
 Compare $Application $argv $argc
 
 $Application Exit
-
-
-
-
-
-
-
-
-
