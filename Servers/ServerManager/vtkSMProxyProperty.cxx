@@ -29,7 +29,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.17");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.18");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -457,10 +457,7 @@ void vtkSMProxyProperty::SaveState(
       
       if (dom && dom->IsInDomain(proxy))
         {
-        ostrstream str;
-        str << "pvTemp" << this->GetProxy(idx)->GetSelfID() << ends;
-        proxies.push_back(str.str());
-        str.rdbuf()->freeze(0);
+        proxies.push_back(proxy->GetName());
         }
       this->DomainIterator->Next();
       }

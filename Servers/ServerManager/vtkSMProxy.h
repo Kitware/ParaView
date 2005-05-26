@@ -92,7 +92,7 @@
 //     Note that exposed property restrictions only work when 
 //     using the GetProperty on the container proxy (in this case Alpha) or
 //     using the PropertyIterator obtained from the container proxy. If one
-//     is to some how obtain a pointer to the subproxy and call's GetProperty on it,
+//     is to some how obtain a pointer to the subproxy and call GetProperty on it,
 //     the properties exposed by the container class are no longer applicable.
 // .SECTION See Also
 // vtkSMProxyManager vtkSMProperty vtkSMSourceProxy vtkSMPropertyIterator
@@ -117,6 +117,14 @@ public:
   static vtkSMProxy* New();
   vtkTypeRevisionMacro(vtkSMProxy, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // A proxy can be assigned a name. The name is used to
+  // indentify the proxy when saving ServerManager state.
+  // By default the name is set to pvTemp{%d} where {%d} 
+  // gets substituted by the SelfID of the proxy.
+  vtkSetStringMacro(Name);
+  vtkGetStringMacro(Name);
 
   // Description:
   // Add a property with the given key (name). The name can then
@@ -448,6 +456,7 @@ protected:
   int CreateSubProxiesAndProperties(vtkSMProxyManager* pm, 
     vtkPVXMLElement *element);
 
+  char* Name;
   char* VTKClassName;
   char* XMLGroup;
   char* XMLName;

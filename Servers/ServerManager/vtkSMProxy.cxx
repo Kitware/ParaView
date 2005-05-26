@@ -32,7 +32,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.38");
+vtkCxxRevisionMacro(vtkSMProxy, "1.39");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -93,6 +93,7 @@ vtkSMProxy::vtkSMProxy()
   this->Internals = new vtkSMProxyInternals;
   // By default, all objects are created on data server.
   this->Servers = vtkProcessModule::DATA_SERVER;
+  this->Name = 0;
   this->VTKClassName = 0;
   this->XMLGroup = 0;
   this->XMLName = 0;
@@ -128,11 +129,17 @@ vtkSMProxy::vtkSMProxy()
     }
   this->InUpdateVTKObjects = 0;
   this->SelfPropertiesModified = 0;
+
+  ostrstream str;
+  str << "pvTemp" << this->SelfID << ends;
+  this->SetName(str.str());
+  str.rdbuf()->freeze(0);
 }
 
 //---------------------------------------------------------------------------
 vtkSMProxy::~vtkSMProxy()
 {
+  this->SetName(0);
   if (this->ObjectsCreated)
     {
     this->UnRegisterVTKObjects();
@@ -1225,7 +1232,7 @@ void vtkSMProxy::SaveState(const char* vtkNotUsed(name), ostream* file, vtkInden
         << "<Proxy group=\"" 
         << this->XMLGroup << "\" type=\"" 
         << this->XMLName << "\" id=\""
-        << "pvTemp" << this->SelfID << "\">" << endl;
+        << this->Name << "\">" << endl;
 
   vtkSMPropertyIterator* iter = this->NewPropertyIterator();
 
@@ -1234,7 +1241,7 @@ void vtkSMProxy::SaveState(const char* vtkNotUsed(name), ostream* file, vtkInden
     if (iter->GetProperty()->GetSaveable())
       {
       ostrstream propID;
-      propID << "pvTemp" << this->SelfID << "." << iter->GetKey() << ends;
+      propID << this->Name << "." << iter->GetKey() << ends;
       iter->GetProperty()->SaveState(propID.str(), file, indent.GetNextIndent());
       delete [] propID.str();
       }
@@ -1335,7 +1342,10 @@ vtkSMProperty* vtkSMProxy::GetExposedProperty(const char* name)
 void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  
+ 
+  os << indent << "Name: " 
+     << (this->Name ? this->Name : "(null)")
+     << endl;
   os << indent << "VTKClassName: " 
      << (this->VTKClassName ? this->VTKClassName : "(null)")
      << endl;
