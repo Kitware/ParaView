@@ -39,10 +39,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWSimpleEntryDialog.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
-#include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkWindows.h"
+#include "vtkKWWindowBase.h"
 
 // Readers / Writers
 
@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.15");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.16");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -95,8 +95,6 @@ public:
 vtkKWSelectionFrameLayoutManager::vtkKWSelectionFrameLayoutManager()
 {
   this->Internals = new vtkKWSelectionFrameLayoutManagerInternals;
-
-  this->Window = NULL;
 
   this->Resolution[0] = 0;
   this->Resolution[1] = 0;
@@ -131,18 +129,6 @@ vtkKWSelectionFrameLayoutManager::~vtkKWSelectionFrameLayoutManager()
     this->ResolutionEntriesToolbar->Delete();
     this->ResolutionEntriesToolbar = NULL;
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWSelectionFrameLayoutManager::SetWindow(vtkKWWindow *arg)
-{
-  if (this->Window == arg)
-    {
-    return;
-    }
-
-  this->Window = arg;
-  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -1238,7 +1224,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
   // Create a dialog to ask for a new title
 
   vtkKWSimpleEntryDialog *dlg = vtkKWSimpleEntryDialog::New();
-  dlg->SetMasterWindow(this->Window);
+  dlg->SetMasterWindow(this->GetWindow());
   dlg->InvokeAtPointerOn();
   dlg->SetTitle("Change frame title");
   dlg->SetStyleToOkCancel();
@@ -1254,7 +1240,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
     if (!ok)
       {
       vtkKWMessageDialog::PopupMessage(
-        this->GetApplication(), this->Window, "Change frame title - Error",
+        this->GetApplication(), this->GetWindow(), "Change frame title - Error",
         "There was a problem with the new title you provided.\n",
         vtkKWMessageDialog::ErrorIcon);
       }
@@ -1482,13 +1468,13 @@ int vtkKWSelectionFrameLayoutManager::AppendSelectedWidgetToImageData(
 //---------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets()
 {
-  if (!this->Window || !this->IsCreated())
+  if (!this->GetWindow() || !this->IsCreated())
     {
     return 0;
     }
 
   vtkKWSaveImageDialog *save_dialog = vtkKWSaveImageDialog::New();
-  save_dialog->SetParent(this->Window);
+  save_dialog->SetParent(this->GetWindow());
   save_dialog->Create(this->GetApplication(), NULL);
   save_dialog->SetTitle("Save Screenshot");
   this->GetApplication()->RetrieveDialogLastPathRegistryValue(
@@ -1603,7 +1589,7 @@ int vtkKWSelectionFrameLayoutManager::SaveScreenshotAllWidgets(
   if (!success)
     {
     vtkKWMessageDialog::PopupMessage(
-      this->GetApplication(), this->Window, "Write Error",
+      this->GetApplication(), this->GetWindow(), "Write Error",
       "There was a problem writing the image file.\n"
       "Please check the location and make sure you have write\n"
       "permissions and enough disk space.",
@@ -1908,9 +1894,10 @@ int vtkKWSelectionFrameLayoutManager::PrintWidgets(
 //----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::PrintAllWidgets()
 {
-  if (this->Window)
+  if (this->GetApplication())
     {
-    return this->PrintAllWidgets(this->Window->GetPrintTargetDPI());
+    return this->PrintAllWidgets(
+      this->GetApplication()->GetPrintTargetDPI());
     }
   return 0;
 }
@@ -1924,9 +1911,10 @@ int vtkKWSelectionFrameLayoutManager::PrintAllWidgets(double dpi)
 //----------------------------------------------------------------------------
 int vtkKWSelectionFrameLayoutManager::PrintSelectedWidget()
 {
-  if (this->Window)
+  if (this->GetApplication())
     {
-    return this->PrintSelectedWidget(this->Window->GetPrintTargetDPI());
+    return this->PrintSelectedWidget(
+      this->GetApplication()->GetPrintTargetDPI());
     }
   return 0;
 }
@@ -1941,8 +1929,6 @@ int vtkKWSelectionFrameLayoutManager::PrintSelectedWidget(double dpi)
 void vtkKWSelectionFrameLayoutManager::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-
-  os << indent << "Window: " << this->Window << endl;
 
   os << indent << "Resolution: " << this->Resolution[0] << " x " 
      << this->Resolution[1] << endl;

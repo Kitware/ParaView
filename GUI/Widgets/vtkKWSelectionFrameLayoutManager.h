@@ -35,7 +35,6 @@ class vtkKWRenderWidget;
 class vtkImageData;
 class vtkKWMenu;
 class vtkKWToolbar;
-class vtkKWWindow;
 
 class VTK_EXPORT vtkKWSelectionFrameLayoutManager : public vtkKWWidget
 {
@@ -43,12 +42,6 @@ public:
   static vtkKWSelectionFrameLayoutManager* New();
   vtkTypeRevisionMacro(vtkKWSelectionFrameLayoutManager, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Set/Get the (parent) window (do not ref count it since the window
-  // will ref count this widget).
-  vtkGetObjectMacro(Window, vtkKWWindow);
-  virtual void SetWindow(vtkKWWindow*);
 
   // Description:
   // Create the widget
@@ -125,8 +118,8 @@ public:
 
   // Description:
   // Save all widgets into an image (as a screenshot) or into the 
-  // clipboard (win32). If no filename, the user is prompted for one (the
-  // Window Ivar has to be set).
+  // clipboard (win32). If no filename, the user is prompted for one
+  // (provided that this widget is part of a window).
   // Return 1 on success, 0 otherwise
   // GetVisibleRenderWidget() need to be implemented accordingly.
   virtual int SaveScreenshotAllWidgets();
@@ -191,8 +184,6 @@ public:
 protected:
   vtkKWSelectionFrameLayoutManager();
   ~vtkKWSelectionFrameLayoutManager();
-
-  vtkKWWindow *Window;
 
   int Resolution[2];
   vtkKWMenu    *ResolutionEntriesMenu;
