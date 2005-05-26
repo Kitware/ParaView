@@ -14,39 +14,48 @@
 #include "vtkKWProgressGauge.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWCanvas.h"
 #include "vtkObjectFactory.h"
 
 #include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.25");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.26");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
 
-
+//----------------------------------------------------------------------------
 vtkKWProgressGauge::vtkKWProgressGauge()
 { 
   this->CommandFunction = vtkKWProgressGaugeCommand;
-  this->Length = 100;
-  this->Height = 20;
-  this->Value = 0;
-  this->BarColor = kwsys::SystemTools::DuplicateString("blue");
+  this->Width = 100;
+  this->Height = 5;
+  this->Value = 0.0;
+  this->BarColor[0] = 0.0;
+  this->BarColor[1] = 0.0;
+  this->BarColor[2] = 1.0;
+  this->Canvas = NULL;
+  this->ExpandHeight = 0;
 }
 
-
+//----------------------------------------------------------------------------
 vtkKWProgressGauge::~vtkKWProgressGauge()
-{
-  delete [] this->BarColor;
-  this->BarColor = NULL;
+{ 
+  if (this->Canvas)
+    {
+    this->Canvas->Delete();
+    this->Canvas = NULL;
+    }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWProgressGauge::Create(vtkKWApplication *app, const char *args)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", NULL))
+  if (!this->Superclass::Create(app, "frame", args))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -54,105 +63,49 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app, const char *args)
 
   const char *wname = this->GetWidgetName();
 
-  this->Script("canvas %s.display -bd 0  -highlightthickness 0 -width %d -height %d %s",
-               wname, this->Length, this->Height, (args ? args : ""));
+  this->Canvas = vtkKWCanvas::New();
+  this->Canvas->SetParent(this);
+  this->Canvas->Create(app, "-bd 0  -highlightthickness 0 -width 0 -height 0");
 
-  this->Script("pack %s.display -expand yes", wname);
+  this->Script("bind %s <Configure> {%s ConfigureCallback}",
+               this->Canvas->GetWidgetName(), this->GetTclName());
 
-  // initialize the bar color to the background so it does
-  // not show up until used
+  // Create the progress bar and text
 
-  this->Script(
-    "%s.display create rectangle 0 0 0 0 -outline \"\"  -tags bar", 
-    wname);
+  this->Script("%s create rectangle 0 0 0 0 -outline \"\" -tags bar", 
+               this->Canvas->GetWidgetName());
 
-  this->Script(
-    "%s.display create text [expr 0.5 * %d] [expr 0.5 * %d] "
-    "-anchor c -text \"\" -tags value",
-    wname, this->Length, this->Height);
+  this->Script("%s create text 0 0 -anchor c -text \"\" -tags value",
+               this->Canvas->GetWidgetName());
+
+  this->Script("pack %s -fill both -expand yes", 
+               this->Canvas->GetWidgetName());
 
   // Update enable state
 
   this->UpdateEnableState();
 }
 
-void vtkKWProgressGauge::SetValue(int value)
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::SetValue(double value)
 {
-  if (!this->IsMapped())
+  if(value < 0.0)
+    {
+    value = 0.0;
+    }
+  if(value > 100.0)
+    {
+    value = 100.0;
+    }
+  if (this->Value == value)
     {
     return;
     }
-  int enabled = this->GetEnabled();
-  if ( !enabled )
-    {
-    this->EnabledOn();
-    }
-
-  const char* wname = this->GetWidgetName();
 
   this->Value = value;
+  this->Modified();
 
-  if(this->Value < 0)
-    {
-    this->Value = 0;
-    }
-  if(this->Value > 100)
-    {
-    this->Value = 100;
-    }
-
-  ostrstream tk_cmd;
-
-  if(this->Value == 0)
-    {
-    // if the Value is 0, set the text to nothing and the color
-    // of the bar to the background (0 0 0 0) rectangles show
-    // up as a pixel...
-    
-    tk_cmd << wname << ".display itemconfigure value -text {}" << endl
-           << wname << ".display coords bar 0 0 0 0" << endl
-           << wname << ".display itemconfigure bar -fill {}" << endl;
-    }
-  else
-    {
-    // if the Value is not 0 then use the BarColor for the bar
-
-    tk_cmd << wname << ".display itemconfigure bar -fill " 
-           << this->BarColor << endl;
-
-    // Set the text to the percent done
-
-    const char* textcolor = "-fill black";
-    if(this->Value > 50)
-      {
-      textcolor = "-fill white";
-      }
-    
-    char buffer[5];
-    sprintf(buffer, "%3.0d", this->Value);
-
-    tk_cmd << wname << ".display itemconfigure value -text {" << buffer 
-           << "%%} " << textcolor << endl;
-
-    // Draw the correct rectangle
-
-    tk_cmd << wname << ".display coords bar 0 0 [expr 0.01 * " << this->Value 
-           << " * [winfo width " << wname << ".display]] [winfo height "
-           << wname << ".display]" << endl;
-    }
-
-  // Do an update
-
-  tk_cmd << "update idletasks" << endl;
-
-  tk_cmd << ends;
-  this->Script(tk_cmd.str());
-  tk_cmd.rdbuf()->freeze(0);
-
-  if ( !enabled )
-    {
-    this->EnabledOff();
-    }
+  this->Redraw();
 }
 
 //----------------------------------------------------------------------------
@@ -166,15 +119,149 @@ void vtkKWProgressGauge::SetHeight(int height)
   this->Height = height;
   this->Modified();
 
-  //  Change gauge height, move text
+  this->Redraw();
+}
 
-  if (this->IsCreated())
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::SetWidth(int width)
+{
+  if (this->Width == width)
     {
-    this->Script("%s.display config -height %d", 
-                 this->GetWidgetName(), this->Height);
+    return;
+    }
 
-    this->Script("%s.display coords value [expr 0.5 * %d] [expr 0.5 * %d]", 
-                 this->GetWidgetName(), this->Length, this->Height);
+  this->Width = width;
+  this->Modified();
+
+  this->Redraw();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::SetBarColor(double r, double g, double b)
+{
+  double *color = this->GetBarColor();
+  if (!color || (color[0] == r && color[1] == g && color[2] == b))
+    {
+    return;
+    }
+
+  this->BarColor[0] = r;
+  this->BarColor[1] = g;
+  this->BarColor[2] = b;
+  this->Modified();
+
+  this->Redraw();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::SetExpandHeight(int arg)
+{
+  if (this->ExpandHeight == arg)
+    {
+    return;
+    }
+
+  this->ExpandHeight = arg;
+
+  this->Modified();
+
+  this->Redraw();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::ConfigureCallback()
+{
+  this->Redraw();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWProgressGauge::Redraw()
+{
+  if (!this->Canvas || !this->Canvas->IsCreated())
+    {
+    return;
+    }
+
+  int enabled = this->GetEnabled();
+  if (!enabled)
+    {
+    this->EnabledOn();
+    }
+
+  const char* wname = this->Canvas->GetWidgetName();
+
+  ostrstream tk_cmd;
+
+  // Resize the canvas
+
+  tk_cmd << wname << " config -width " << this->Width << endl;
+
+  int height = this->Height;
+  if (this->ExpandHeight)
+    {
+    height = atoi(this->Script("winfo height %s", wname));
+    }
+  else
+    {
+    tk_cmd << wname << " config -height " << height << endl;
+    }
+
+  // If the Value is 0, set the text to nothing and the color
+  // of the bar to the background (0 0 0 0) rectangles show
+  // up as a pixel...
+  // Otherwise use the BarColor for the bar
+
+  if (this->Value <= 0.0)
+    {
+    tk_cmd << wname << " itemconfigure value -text {}" << endl
+           << wname << " coords bar 0 0 0 0" << endl
+           << wname << " itemconfigure bar -fill {}" << endl;
+    }
+  else
+    {
+    tk_cmd << wname << " coords value " 
+           << this->Width * 0.5 << " " << height * 0.5 << endl;
+
+    char color[10];
+    sprintf(color, "#%02x%02x%02x", 
+            (int)(this->BarColor[0] * 255.0),
+            (int)(this->BarColor[1] * 255.0),
+            (int)(this->BarColor[2] * 255.0));
+
+    tk_cmd << wname << " itemconfigure bar -fill " << color << endl;
+
+    // Set the text to the percent done
+
+    const char *textcolor = "-fill black";
+    if(this->Value > 50.0)
+      {
+      textcolor = "-fill white";
+      }
+    
+    char buffer[5];
+    sprintf(buffer, "%3.0lf", this->Value);
+
+    tk_cmd << wname << " itemconfigure value -text {" << buffer 
+           << "%%} " << textcolor << endl;
+
+    // Draw the correct rectangle
+
+    tk_cmd << wname << " coords bar 0 0 [expr 0.01 * " << this->Value 
+           << " * [winfo width " << wname << "]] [winfo height "
+           << wname << "]" << endl;
+    }
+
+  // Do an update
+
+  tk_cmd << "update idletasks" << endl;
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+
+  if (!enabled)
+    {
+    this->EnabledOff();
     }
 }
 
@@ -182,9 +269,10 @@ void vtkKWProgressGauge::SetHeight(int height)
 void vtkKWProgressGauge::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "BarColor: " << (this->BarColor?this->BarColor:"none") 
-     << endl;
+  os << indent << "BarColor: (" << this->BarColor[0] << ", " 
+    << this->BarColor[1] << ", " << this->BarColor[2] << ")\n";
   os << indent << "Height: " << this->GetHeight() << endl;
-  os << indent << "Length: " << this->GetLength() << endl;
+  os << indent << "Width: " << this->GetWidth() << endl;
+  os << indent << "ExpandHeight: "
+     << (this->ExpandHeight ? "On" : "Off") << endl;
 }
-
