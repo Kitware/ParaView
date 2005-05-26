@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.87");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.88");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -811,9 +811,9 @@ void vtkKWRenderWidget::SetupPrint(RECT &rcDest, HDC ghdc,
   int cyDIB = screenSizeY;         // Size of DIB - y
   
   // target DPI specified here
-  if (this->GetParentWindow())
+  if (this->GetApplication())
     {
-    scale = printerDPIX/this->GetParentWindow()->GetPrintTargetDPI();
+    scale = printerDPIX/this->GetApplication()->GetPrintTargetDPI();
     }
   else
     {
