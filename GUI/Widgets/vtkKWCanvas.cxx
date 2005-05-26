@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCanvas );
-vtkCxxRevisionMacro(vtkKWCanvas, "1.4");
+vtkCxxRevisionMacro(vtkKWCanvas, "1.5");
 
 //----------------------------------------------------------------------------
 void vtkKWCanvas::Create(vtkKWApplication *app, const char *args)
@@ -55,6 +55,24 @@ void vtkKWCanvas::Create(vtkKWApplication *app, const char *args)
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCanvas::SetHeight(int height)
+{
+  if (this->IsCreated())
+    {
+    this->Script("%s config -height %d", this->GetWidgetName(), height);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCanvas::SetWidth(int width)
+{
+  if (this->IsCreated())
+    {
+    this->Script("%s config -width %d", this->GetWidgetName(), width);
+    }
 }
 
 //----------------------------------------------------------------------------

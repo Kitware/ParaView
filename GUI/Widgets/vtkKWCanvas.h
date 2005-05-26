@@ -41,9 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWCanvas_h
 
 #include "vtkKWWidget.h"
-class vtkKWApplication;
 
-class VTK_EXPORT vtkKWCanvas : public vtkKWWidget
+class KWWIDGETS_EXPORT vtkKWCanvas : public vtkKWWidget
 {
 public:
   static vtkKWCanvas* New();
@@ -53,6 +52,12 @@ public:
   // Description:
   // Create the widget
   virtual void Create(vtkKWApplication *app, const char *args);
+
+  // Description:
+  // Convenience function to set the width and height of the canvas
+  // No effect before Create() is called.
+  virtual void SetWidth(int width);
+  virtual void SetHeight(int height);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
