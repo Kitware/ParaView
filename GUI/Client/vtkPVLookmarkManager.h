@@ -50,6 +50,7 @@ class vtkPVRenderView;
 class vtkRenderWindow;
 class vtkKWMenu;
 class vtkKWMessageDialog;
+class vtkKWWindow;
 class vtkKWText;
 
 //BTX
