@@ -15,13 +15,13 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
-#include "vtkKWWindow.h"
+#include "vtkKWWindowBase.h"
 
 #include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.63");
+vtkCxxRevisionMacro(vtkKWMenu, "1.64");
 
 
 
@@ -90,7 +90,7 @@ void vtkKWMenu::DisplayHelp(const char* widget)
     tname, tname, widget, tname, tname, tname );
   if(res)
     {
-    vtkKWWindow* window = this->GetWindow();
+    vtkKWWindowBase* window = this->GetWindow();
     if ( window )
       {
       window->SetStatusText(res);

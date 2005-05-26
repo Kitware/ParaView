@@ -119,17 +119,17 @@ public:
   // title is a title string of the dialog. name is the dialog name
   // used for the registry. message is the text message displayed
   // in the dialog.
-  static void PopupMessage(vtkKWApplication *app, vtkKWWindow *masterWin,
+  static void PopupMessage(vtkKWApplication *app, vtkKWWindowBase *masterWin,
                            const char* title, 
                            const char* message, int options = 0);
-  static int PopupYesNo(vtkKWApplication *app,  vtkKWWindow *masterWin,
+  static int PopupYesNo(vtkKWApplication *app,  vtkKWWindowBase *masterWin,
                         const char* title, 
                         const char* message, int options = 0);
-  static int PopupYesNo(vtkKWApplication *app,  vtkKWWindow *masterWin, 
+  static int PopupYesNo(vtkKWApplication *app,  vtkKWWindowBase *masterWin, 
                         const char* name, 
                         const char* title, const char* message, 
                         int options = 0);
-  static int PopupOkCancel(vtkKWApplication *app, vtkKWWindow *masterWin,
+  static int PopupOkCancel(vtkKWApplication *app, vtkKWWindowBase *masterWin,
                            const char* title, 
                            const char* message, int options = 0);
 
@@ -167,9 +167,9 @@ public:
   // 'dialogname' is the name of a dialog (most likely its DialogName ivar).
   // The 'response' is arbitrary but most likely the value returned by a
   // call to Invoke() on the dialog.
-  static int GetMessageDialogResponseFromRegistry(
+  static int RestoreMessageDialogResponseFromRegistry(
     vtkKWApplication *app, const char *dialogname);
-  static void StoreMessageDialogResponseInRegistry(
+  static void SaveMessageDialogResponseToRegistry(
     vtkKWApplication *app, const char *dialogname, int response);
 
 protected:

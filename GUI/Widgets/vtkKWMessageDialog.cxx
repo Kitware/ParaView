@@ -22,11 +22,11 @@
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWRegistryHelper.h"
-#include "vtkKWWindow.h"
+#include "vtkKWWindowBase.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.70");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.71");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -307,7 +307,7 @@ int vtkKWMessageDialog::Invoke()
 
   if ( this->DialogName )
     {
-    int res = this->GetMessageDialogResponseFromRegistry(
+    int res = this->RestoreMessageDialogResponseFromRegistry(
       this->GetApplication(), this->DialogName);
     if ( res == 1 )
       {
@@ -368,7 +368,7 @@ int vtkKWMessageDialog::Invoke()
         ires = -1;
         }
       }
-    this->StoreMessageDialogResponseInRegistry(
+    this->SaveMessageDialogResponseToRegistry(
       this->GetApplication(), this->DialogName, ires);
     }
 
@@ -406,7 +406,7 @@ void vtkKWMessageDialog::SetIcon()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,
+void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindowBase *win,
                                       const char* title, 
                                       const char*message, int options)
 {
@@ -424,7 +424,7 @@ void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
+int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindowBase *win,
                                    const char* name, 
                                    const char* title, const char* message,
                                    int options)
@@ -446,7 +446,7 @@ int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
+int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindowBase *win,
                                    const char* title, 
                                    const char*message, int options)
 {
@@ -455,7 +455,7 @@ int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindow *win,
+int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindowBase *win,
                                       const char* title, 
                                       const char*message, int options)
 {
@@ -577,7 +577,7 @@ int vtkKWMessageDialog::GetHeight()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWMessageDialog::GetMessageDialogResponseFromRegistry(
+int vtkKWMessageDialog::RestoreMessageDialogResponseFromRegistry(
   vtkKWApplication *app,
   const char* dialogname)
 {
@@ -592,7 +592,7 @@ int vtkKWMessageDialog::GetMessageDialogResponseFromRegistry(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMessageDialog::StoreMessageDialogResponseInRegistry(
+void vtkKWMessageDialog::SaveMessageDialogResponseToRegistry(
   vtkKWApplication *app,
   const char* dialogname, 
   int response)

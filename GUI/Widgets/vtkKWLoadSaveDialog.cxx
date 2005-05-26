@@ -14,14 +14,14 @@
 #include "vtkKWLoadSaveDialog.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWWindow.h"
+#include "vtkKWWindowBase.h"
 #include "vtkObjectFactory.h"
 
 #include <kwsys/SystemTools.hxx>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.38");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.39");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -107,7 +107,7 @@ int vtkKWLoadSaveDialog::Invoke()
             << (this->FileTypes ? this->FileTypes : "") << "}";
     }
   
-  vtkKWWindow* window = this->GetWindow();
+  vtkKWWindowBase* window = this->GetWindow();
   if (window)
     {
     command << " -parent " << window->GetWidgetName();
