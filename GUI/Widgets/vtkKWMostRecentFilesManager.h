@@ -17,9 +17,9 @@
 // most recent files.
 // It provides methods to manipulate them, load/save them from/to the
 // registry, and display them as entries in a menu.
-// An instance of this class is created in vtkKWWindow
+// An instance of this class is created in vtkKWWindowBase
 // .SECTION See Also
-// vtkKWWindow
+// vtkKWWindowBase
 
 #ifndef __vtkKWMostRecentFilesManager_h
 #define __vtkKWMostRecentFilesManager_h
@@ -69,9 +69,9 @@ public:
   // MaximumNumberOfFilesInRegistry as 'max_nb'.
   // Only the filename and target command are saved. When entries are loaded
   // make sure DefaultTargetObject is set to a valid object.
-  virtual void LoadFilesFromRegistry();
+  virtual void RestoreFilesListFromRegistry();
   virtual void SaveFilesToRegistry();
-  virtual void LoadFilesFromRegistry(
+  virtual void RestoreFilesListFromRegistry(
     const char *reg_key, int max_nb);
   virtual void SaveFilesToRegistry(
     const char *reg_key, int max_nb);

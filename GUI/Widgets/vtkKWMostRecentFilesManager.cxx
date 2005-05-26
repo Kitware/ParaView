@@ -21,7 +21,7 @@
 #include <kwsys/stl/list>
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.2");
+vtkCxxRevisionMacro(vtkKWMostRecentFilesManager, "1.3");
 vtkStandardNewMacro(vtkKWMostRecentFilesManager );
 
 int vtkKWMostRecentFilesManagerCommand(ClientData cd, Tcl_Interp *interp,
@@ -291,15 +291,15 @@ void vtkKWMostRecentFilesManager::SaveFilesToRegistry(
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesManager::LoadFilesFromRegistry()
+void vtkKWMostRecentFilesManager::RestoreFilesListFromRegistry()
 {
-  this->LoadFilesFromRegistry(
+  this->RestoreFilesListFromRegistry(
     this->RegistryKey, 
     this->MaximumNumberOfFilesInRegistry);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMostRecentFilesManager::LoadFilesFromRegistry(
+void vtkKWMostRecentFilesManager::RestoreFilesListFromRegistry(
   const char *reg_key, int max_nb)
 {
   if (!this->GetApplication())
