@@ -129,10 +129,10 @@ public:
   // Description:
   // Get the menu objects.
   vtkGetObjectMacro(FileMenu,vtkKWMenu);
-  vtkGetObjectMacro(HelpMenu,vtkKWMenu);
   vtkKWMenu *GetEditMenu();
   vtkKWMenu *GetViewMenu();
   vtkKWMenu *GetWindowMenu();
+  vtkKWMenu *GetHelpMenu();
   vtkKWMenu *GetToolbarsVisibilityMenu();
   
   // Description:

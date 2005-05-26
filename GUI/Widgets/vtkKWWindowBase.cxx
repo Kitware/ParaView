@@ -40,7 +40,7 @@ const char* vtkKWWindowBase::GetPrintOptionsMenuLabel()
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.2");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.3");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -560,6 +560,7 @@ vtkKWMenu *vtkKWWindowBase::GetEditMenu()
     this->EditMenu->SetParent(this->GetMenu());
     this->EditMenu->SetTearOff(0);
     this->EditMenu->Create(this->GetApplication(), NULL);
+    // Usually after the File Menu (i.e., pos 1)
     this->GetMenu()->InsertCascade(1, "Edit", this->EditMenu, 0);
     }
   
@@ -579,6 +580,7 @@ vtkKWMenu *vtkKWWindowBase::GetViewMenu()
     this->ViewMenu->SetParent(this->GetMenu());
     this->ViewMenu->SetTearOff(0);
     this->ViewMenu->Create(this->GetApplication(), NULL);
+    // Usually after the Edit Menu
     this->GetMenu()->InsertCascade(
       1 + (this->EditMenu ? 1 : 0), "View", this->ViewMenu, 0);
     }
@@ -599,11 +601,33 @@ vtkKWMenu *vtkKWWindowBase::GetWindowMenu()
     this->WindowMenu->SetParent(this->GetMenu());
     this->WindowMenu->SetTearOff(0);
     this->WindowMenu->Create(this->GetApplication(), NULL);
+    // Usually after the View Menu
     this->GetMenu()->InsertCascade(
-      1 + (!this->EditMenu ? 1 : 0), "Window", this->WindowMenu, 0);
+      1 + (this->EditMenu ? 1 : 0) + (this->ViewMenu ? 1 : 0), 
+      "Window", this->WindowMenu, 0);
     }
   
   return this->WindowMenu;
+}
+
+//----------------------------------------------------------------------------
+vtkKWMenu *vtkKWWindowBase::GetHelpMenu()
+{
+  if (!this->HelpMenu)
+    {
+    this->HelpMenu = vtkKWMenu::New();
+    }
+
+  if (!this->HelpMenu->IsCreated() && this->GetMenu() && this->IsCreated())
+    {
+    this->HelpMenu->SetParent(this->GetMenu());
+    this->HelpMenu->SetTearOff(0);
+    this->HelpMenu->Create(this->GetApplication(), NULL);
+    // Usually at the end
+    this->GetMenu()->AddCascade("Help", this->HelpMenu, 0);
+    }
+  
+  return this->HelpMenu;
 }
 
 //----------------------------------------------------------------------------
@@ -627,71 +651,6 @@ vtkKWMenu *vtkKWWindowBase::GetToolbarsVisibilityMenu()
     }
   
   return this->ToolbarsVisibilityMenu;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindowBase::NumberOfToolbarsChangedCallback()
-{
-  this->Toolbars->PopulateToolbarsVisibilityMenu(
-    this->GetToolbarsVisibilityMenu());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindowBase::ToolbarVisibilityChangedCallback()
-{
-  this->Toolbars->UpdateToolbarsVisibilityMenu(
-    this->GetToolbarsVisibilityMenu());
-
-  this->UpdateToolbarState();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindowBase::LoadScript()
-{
-  vtkKWLoadSaveDialog* load_dialog = vtkKWLoadSaveDialog::New();
-  this->GetApplication()->RetrieveDialogLastPathRegistryValue(
-    load_dialog, "LoadScriptLastPath");
-  load_dialog->SetParent(this);
-  load_dialog->Create(this->GetApplication(), NULL);
-  load_dialog->SaveDialogOff();
-  load_dialog->SetTitle("Load Script");
-  load_dialog->SetDefaultExtension(this->ScriptExtension);
-
-  kwsys_stl::string filetypes;
-  filetypes += "{{";
-  filetypes += this->ScriptType;
-  filetypes += " Scripts} {";
-  filetypes += this->ScriptExtension;
-  filetypes += "}} {{All Files} {.*}}";
-  load_dialog->SetFileTypes(filetypes.c_str());
-
-  int enabled = this->GetEnabled();
-  this->SetEnabled(0);
-
-  if (load_dialog->Invoke() && 
-      load_dialog->GetFileName() && 
-      strlen(load_dialog->GetFileName()) > 0)
-    {
-    if (!kwsys::SystemTools::FileExists(load_dialog->GetFileName()))
-      {
-      vtkWarningMacro("Unable to open script file!");
-      }
-    else
-      {
-      this->GetApplication()->SaveDialogLastPathRegistryValue(
-        load_dialog, "LoadScriptLastPath");
-      this->LoadScript(load_dialog->GetFileName());
-      }
-    }
-
-  this->SetEnabled(enabled);
-  load_dialog->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindowBase::LoadScript(const char *filename)
-{
-  this->GetApplication()->LoadScript(filename);
 }
 
 //----------------------------------------------------------------------------
@@ -789,6 +748,71 @@ int vtkKWWindowBase::GetHelpMenuInsertPosition()
     }
 
   return this->HelpMenu->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::NumberOfToolbarsChangedCallback()
+{
+  this->Toolbars->PopulateToolbarsVisibilityMenu(
+    this->GetToolbarsVisibilityMenu());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::ToolbarVisibilityChangedCallback()
+{
+  this->Toolbars->UpdateToolbarsVisibilityMenu(
+    this->GetToolbarsVisibilityMenu());
+
+  this->UpdateToolbarState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::LoadScript()
+{
+  vtkKWLoadSaveDialog* load_dialog = vtkKWLoadSaveDialog::New();
+  this->GetApplication()->RetrieveDialogLastPathRegistryValue(
+    load_dialog, "LoadScriptLastPath");
+  load_dialog->SetParent(this);
+  load_dialog->Create(this->GetApplication(), NULL);
+  load_dialog->SaveDialogOff();
+  load_dialog->SetTitle("Load Script");
+  load_dialog->SetDefaultExtension(this->ScriptExtension);
+
+  kwsys_stl::string filetypes;
+  filetypes += "{{";
+  filetypes += this->ScriptType;
+  filetypes += " Scripts} {";
+  filetypes += this->ScriptExtension;
+  filetypes += "}} {{All Files} {.*}}";
+  load_dialog->SetFileTypes(filetypes.c_str());
+
+  int enabled = this->GetEnabled();
+  this->SetEnabled(0);
+
+  if (load_dialog->Invoke() && 
+      load_dialog->GetFileName() && 
+      strlen(load_dialog->GetFileName()) > 0)
+    {
+    if (!kwsys::SystemTools::FileExists(load_dialog->GetFileName()))
+      {
+      vtkWarningMacro("Unable to open script file!");
+      }
+    else
+      {
+      this->GetApplication()->SaveDialogLastPathRegistryValue(
+        load_dialog, "LoadScriptLastPath");
+      this->LoadScript(load_dialog->GetFileName());
+      }
+    }
+
+  this->SetEnabled(enabled);
+  load_dialog->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindowBase::LoadScript(const char *filename)
+{
+  this->GetApplication()->LoadScript(filename);
 }
 
 //----------------------------------------------------------------------------
