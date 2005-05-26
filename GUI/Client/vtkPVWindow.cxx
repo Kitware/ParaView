@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.712");
+vtkCxxRevisionMacro(vtkPVWindow, "1.713");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1150,11 +1150,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   sprintf(version,"Version %d.%d", this->GetPVApplication()->GetMajorVersion(),
           this->GetPVApplication()->GetMinorVersion());
   this->SetStatusText(version);
-
-  // Update gauge height to match status image
-  
-  this->ProgressGauge->SetHeight(
-    vtkKWTkUtilities::GetPhotoHeight(this->StatusImage) - 4);
 
   // Init menus
 

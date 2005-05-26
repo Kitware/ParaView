@@ -33,14 +33,10 @@
 
 const char *vtkKWWindowBase::PrintOptionsMenuLabel = "Print options...";
 const char *vtkKWWindowBase::WindowGeometryRegKey = "WindowGeometry";
-
-const char* vtkKWWindowBase::GetPrintOptionsMenuLabel()
-{ return vtkKWWindowBase::PrintOptionsMenuLabel; }
-
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.3");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.4");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -387,14 +383,14 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
                this->ProgressFrame->GetWidgetName());
 
   // Status frame : progress frame : gauge
+  // Set the height to 0 so that it auto-expands to the right height
 
   this->ProgressGauge->SetParent(this->ProgressFrame);
-  this->ProgressGauge->SetLength(200);
-  this->ProgressGauge->SetHeight(
-    vtkKWTkUtilities::GetPhotoHeight(this->StatusImage) - 4);
+  this->ProgressGauge->SetWidth(200);
+  this->ProgressGauge->ExpandHeightOn();
   this->ProgressGauge->Create(app, NULL);
 
-  this->Script("pack %s -side right -padx 2 -pady 2",
+  this->Script("pack %s -side right -padx 2 -pady 2 -expand y -fill y",
                this->ProgressGauge->GetWidgetName());
 
   // Status frame : tray frame
@@ -403,8 +399,8 @@ void vtkKWWindowBase::Create(vtkKWApplication *app, const char *args)
   this->TrayFrame->Create(app, "-relief sunken -bd 1");
 
   this->Script(
-   "pack %s -side left -ipadx 0 -ipady 0 -padx 0 -pady 0 -fill both",
-   this->TrayFrame->GetWidgetName());
+    "pack %s -side left -ipadx 0 -ipady 0 -padx 0 -pady 0 -fill both",
+    this->TrayFrame->GetWidgetName());
 
   // Status frame : tray frame : error image
 
