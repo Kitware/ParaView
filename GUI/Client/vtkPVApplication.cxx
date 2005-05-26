@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.355");
+vtkCxxRevisionMacro(vtkPVApplication, "1.356");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -239,7 +239,7 @@ public:
 #endif
     if ( this->Application && this->Application->GetNumberOfWindows())
       {
-      vtkKWWindow *win = this->Application->GetNthWindow(
+      vtkKWWindowBase *win = this->Application->GetNthWindow(
         this->Application->GetNumberOfWindows() - 1);
       const char *message = strstr(t, "): ");
       char type[1024], file[1024];
@@ -324,7 +324,7 @@ public:
       ostrstream str;
       this->FlushErrors(str);
       str << ends;
-      vtkKWWindow *win = this->Application->GetNthWindow(
+      vtkKWWindowBase *win = this->Application->GetNthWindow(
         this->Application->GetNumberOfWindows() - 1);
       if (win)
         {
@@ -1324,9 +1324,9 @@ void vtkPVApplication::Start(int argc, char*argv[])
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::GetApplicationSettingsFromRegistry()
+void vtkPVApplication::RestoreApplicationSettingsFromRegistry()
 { 
-  this->Superclass::GetApplicationSettingsFromRegistry();
+  this->Superclass::RestoreApplicationSettingsFromRegistry();
 
   // Show sources description ?
 
@@ -1401,7 +1401,7 @@ void vtkPVApplication::SetSourcesBrowserAlwaysShowName(int v)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVApplication::RemoveWindow(vtkKWWindow *win)
+int vtkPVApplication::RemoveWindow(vtkKWWindowBase *win)
 {
   if (this->GetNumberOfWindows() == 1)
     {
@@ -1508,7 +1508,7 @@ void vtkPVApplication::StopRecordingScript()
 // Make instances of sources.
 //============================================================================
 
-void vtkPVApplication::DisplayHelpDialog(vtkKWWindow* master)
+void vtkPVApplication::DisplayHelpDialog(vtkKWWindowBase* master)
 {
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");

@@ -110,7 +110,7 @@ public:
   // Description:
   // Add/Close a window to/of this application.
   // Return 1 if successful, 0 otherwise
-  virtual int RemoveWindow(vtkKWWindow *);
+  virtual int RemoveWindow(vtkKWWindowBase *);
 
   // Description:
   // This method is invoked when the user exits the app
@@ -171,7 +171,7 @@ public:
   // Description:
   // Display the on-line help and about dialog for this application.
   // Over-writing vtkKWApplication defaults.
-  void DisplayHelpDialog(vtkKWWindow* master);
+  void DisplayHelpDialog(vtkKWWindowBase* master);
 
   // Description:
   // Tells the process modules whether to start the main
@@ -232,7 +232,7 @@ public:
   // Get those application settings that are stored in the registry
   // Should be called once the application name is known (and the registry
   // level set).
-  virtual void GetApplicationSettingsFromRegistry();
+  virtual void RestoreApplicationSettingsFromRegistry();
 
   // Description:
   // Enable or disable test errors. This refers to wether errors make test fail
