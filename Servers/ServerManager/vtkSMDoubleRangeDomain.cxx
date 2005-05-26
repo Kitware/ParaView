@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleRangeDomain);
-vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.12");
+vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.13");
 
 struct vtkSMDoubleRangeDomainInternals
 {
@@ -292,7 +292,8 @@ void vtkSMDoubleRangeDomain::SaveState(
   const char* name, ostream* file, vtkIndent indent)
 {
   *file << indent 
-        << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
+        << "<Domain name=\"" << 
+        ( this->XMLName? this->XMLName : "(null)") << "\" id=\"" << name << "\">"
         << endl;
   unsigned int size = this->GetNumberOfEntries();
   unsigned int i;
