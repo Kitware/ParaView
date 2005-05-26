@@ -23,12 +23,13 @@
 #include "vtkKWSplashScreen.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetsConfigure.h"
-#include "vtkKWWindow.h"
+#include "vtkKWWindowBase.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkKWText.h"
 #include "vtkTclUtil.h"
 #include "vtkKWLoadSaveDialog.h"
+#include "vtkKWToolbar.h"
 
 #include <stdarg.h>
 
@@ -54,9 +55,15 @@ static Tcl_Interp *Et_Interp = 0;
 EXTERN Tcl_Obj* TclGetLibraryPath _ANSI_ARGS_((void));
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
 
+const char *vtkKWApplication::ExitDialogName = "ExitApplication";
+const char *vtkKWApplication::ShowBalloonHelpRegKey = "ShowBalloonHelp";
+const char *vtkKWApplication::SaveUserInterfaceGeometryRegKey = "SaveUserInterfaceGeometry";
+const char *vtkKWApplication::ShowSplashScreenRegKey = "ShowSplashScreen";
+const char *vtkKWApplication::PrintTargetDPIRegKey = "PrintTargetDPI";
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.204");
+vtkCxxRevisionMacro(vtkKWApplication, "1.205");
 
 extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -68,8 +75,8 @@ int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
 class vtkKWApplicationInternals
 {
 public:
-  typedef kwsys_stl::vector<vtkKWWindow*> WindowsContainer;
-  typedef kwsys_stl::vector<vtkKWWindow*>::iterator WindowsContainerIterator;
+  typedef kwsys_stl::vector<vtkKWWindowBase*> WindowsContainer;
+  typedef kwsys_stl::vector<vtkKWWindowBase*>::iterator WindowsContainerIterator;
 
   WindowsContainer Windows;
 };
@@ -116,7 +123,7 @@ vtkKWApplication::vtkKWApplication()
 
   this->DialogUp = 0;
 
-  this->SaveWindowGeometry = 1;
+  this->SaveUserInterfaceGeometry = 1;
 
   this->RegistryHelper = NULL;
   this->RegistryLevel = 10;
@@ -148,6 +155,8 @@ vtkKWApplication::vtkKWApplication()
       "initialized properly...");
     return;
     }
+
+  this->PrintTargetDPI        = 100.0;
 
   // As a convenience, set the 'Application' Tcl variable to ourself
 
@@ -222,7 +231,7 @@ void vtkKWApplication::SetApplication(vtkKWApplication*)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::AddWindow(vtkKWWindow *win)
+int vtkKWApplication::AddWindow(vtkKWWindowBase *win)
 {
   if (this->Internals)
     {
@@ -234,12 +243,12 @@ int vtkKWApplication::AddWindow(vtkKWWindow *win)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::RemoveWindow(vtkKWWindow *win)
+int vtkKWApplication::RemoveWindow(vtkKWWindowBase *win)
 {
   // If this is the last window, go straight to Exit.
   // This will give the app a chance to ask the user for confirmation.
-  // It is likely that this method has been called by vtkKWWindow::Close().
-  // In that case, Exit() will call vtkKWWindow::Close() *again*, and we
+  // It is likely that this method has been called by vtkKWWindowBase::Close().
+  // In that case, Exit() will call vtkKWWindowBase::Close() *again*, and we
   // will be back here, but this won't infinite loop since this->Exit()
   // will return false (as we are already "exiting", check this->InExit)
 
@@ -275,7 +284,7 @@ int vtkKWApplication::RemoveWindow(vtkKWWindow *win)
 }
 
 //----------------------------------------------------------------------------
-vtkKWWindow* vtkKWApplication::GetNthWindow(int rank)
+vtkKWWindowBase* vtkKWApplication::GetNthWindow(int rank)
 {
   if (this->Internals && rank >= 0 && rank < this->GetNumberOfWindows())
     {
@@ -321,6 +330,16 @@ int vtkKWApplication::Exit()
 
   this->InExit = 1;
 
+
+  // I guess it does not hurt to save the application settings now
+  // In order to restore them, the RestoreApplicationSettingsFromRegistry()
+  // method should be called before the Start() method is invoked.
+  // It can not be called in the constructore since the application name
+  // is required. It also should probably be called after any command
+  // line argument parsing that would change the registry level.
+
+  this->SaveApplicationSettingsToRegistry();
+
   this->PrepareForDelete();
 
   // Close all windows
@@ -330,7 +349,7 @@ int vtkKWApplication::Exit()
 
   while (this->GetNumberOfWindows())
     {
-    vtkKWWindow *win = this->GetNthWindow(0);
+    vtkKWWindowBase *win = this->GetNthWindow(0);
     if (win)
       {
       win->SetPromptBeforeClose(0);
@@ -566,41 +585,108 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::GetApplicationSettingsFromRegistry()
+void vtkKWApplication::RestoreApplicationSettingsFromRegistry()
 { 
   // Show balloon help ?
 
   if (this->HasRegistryValue(
-    2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY))
+    2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey))
     {
     this->GetBalloonHelpManager()->SetShow(
       this->GetIntRegistryValue(
-        2, "RunTime", VTK_KW_SHOW_TOOLTIPS_REG_KEY));
+        2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey));
     }
 
-  // Save window geometry ?
+  // Save user interface geometry ?
 
   if (this->HasRegistryValue(
-    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
+    2, "Geometry", vtkKWApplication::SaveUserInterfaceGeometryRegKey))
     {
-    this->SaveWindowGeometry = this->GetIntRegistryValue(
-      2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY);
+    this->SaveUserInterfaceGeometry = this->GetIntRegistryValue(
+      2, "Geometry", vtkKWApplication::SaveUserInterfaceGeometryRegKey);
     }
 
   // Show splash screen ?
 
   if (this->HasRegistryValue(
-    2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY))
+    2, "RunTime", vtkKWApplication::ShowSplashScreenRegKey))
     {
     this->ShowSplashScreen = this->GetIntRegistryValue(
-      2, "RunTime", VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY);
+      2, "RunTime", vtkKWApplication::ShowSplashScreenRegKey);
     }
 
   if (this->RegistryLevel <= 0)
     {
     this->ShowSplashScreen = 0;
-    this->SaveWindowGeometry = 0;
+    this->SaveUserInterfaceGeometry = 0;
     }
+
+  // Printer settings
+
+  if (this->HasRegistryValue(
+        2, "RunTime", vtkKWApplication::PrintTargetDPIRegKey))
+    {
+    this->SetPrintTargetDPI(
+      this->GetFloatRegistryValue(
+        2, "RunTime", vtkKWApplication::PrintTargetDPIRegKey));
+    }
+
+  // Toolbar settings
+
+  if (this->HasRegistryValue(
+        2, "RunTime", vtkKWToolbar::FlatAspectRegKey))
+    {
+    vtkKWToolbar::SetGlobalFlatAspect(
+      this->GetApplication()->GetIntRegistryValue(
+        2, "RunTime", vtkKWToolbar::FlatAspectRegKey));
+    }
+
+  if (this->GetApplication()->HasRegistryValue(
+        2, "RunTime", vtkKWToolbar::WidgetsFlatAspectRegKey))
+    {
+    vtkKWToolbar::SetGlobalWidgetsFlatAspect(
+      this->GetApplication()->GetIntRegistryValue(
+        2, "RunTime", vtkKWToolbar::WidgetsFlatAspectRegKey));
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::SaveApplicationSettingsToRegistry()
+{ 
+  // Show balloon help ?
+
+  this->SetRegistryValue(
+    2, "RunTime", vtkKWApplication::ShowBalloonHelpRegKey, "%d", 
+    this->GetBalloonHelpManager()->GetShow());
+  
+  // Save user interface geometry ?
+
+  this->SetRegistryValue(
+    2, "Geometry", vtkKWApplication::SaveUserInterfaceGeometryRegKey, "%d", 
+    this->GetSaveUserInterfaceGeometry());
+  
+  // Show splash screen ?
+
+  this->SetRegistryValue(
+    2, "RunTime", vtkKWApplication::ShowSplashScreenRegKey, "%d", 
+    this->GetShowSplashScreen());
+
+  // Printer settings
+
+  this->SetRegistryValue(
+    2, "RunTime", vtkKWApplication::PrintTargetDPIRegKey, "%lf", 
+    this->PrintTargetDPI);
+
+  // Toolbar settings
+
+  this->SetRegistryValue(
+    2, "RunTime", vtkKWToolbar::FlatAspectRegKey, "%d", 
+    vtkKWToolbar::GetGlobalFlatAspect());
+
+  this->SetRegistryValue(
+    2, "RunTime", vtkKWToolbar::WidgetsFlatAspectRegKey, "%d", 
+    vtkKWToolbar::GetGlobalWidgetsFlatAspect()); 
+
 }
 
 //----------------------------------------------------------------------------
@@ -610,7 +696,7 @@ void vtkKWApplication::DoOneTclEvent()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::DisplayExitDialog(vtkKWWindow *master)
+int vtkKWApplication::DisplayExitDialog(vtkKWWindowBase *master)
 {
   kwsys_stl::string title = "Exit ";
   title += this->GetPrettyName();
@@ -627,7 +713,7 @@ int vtkKWApplication::DisplayExitDialog(vtkKWWindow *master)
     vtkKWMessageDialog::RememberYes |
     vtkKWMessageDialog::Beep | 
     vtkKWMessageDialog::YesDefault);
-  dialog->SetDialogName(VTK_KW_EXIT_DIALOG_NAME);
+  dialog->SetDialogName(vtkKWApplication::ExitDialogName);
   dialog->Create(this, NULL);
   dialog->SetText(msg.c_str());
   dialog->SetTitle(title.c_str());
@@ -647,7 +733,7 @@ int vtkKWApplication::DisplayExitDialog(vtkKWWindow *master)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::DisplayHelpDialog(vtkKWWindow* master)
+void vtkKWApplication::DisplayHelpDialog(vtkKWWindowBase* master)
 {
 #ifdef _WIN32
   ostrstream temp;
@@ -689,7 +775,7 @@ void vtkKWApplication::DisplayHelpDialog(vtkKWWindow* master)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::DisplayAboutDialog(vtkKWWindow* master)
+void vtkKWApplication::DisplayAboutDialog(vtkKWWindowBase* master)
 {
   if (this->InExit)
     {
@@ -864,7 +950,7 @@ int vtkKWApplication::SetRegistryValue(int level, const char* subkey,
   int res = 0;
   char buffer[REG_KEY_NAME_SIZE_MAX];
   char value[REG_KEY_VALUE_SIZE_MAX];
-  sprintf(buffer, "%s\\%s", this->GetApplication()->GetVersionName(), subkey);
+  sprintf(buffer, "%s\\%s", this->GetVersionName(), subkey);
   va_list var_args;
   va_start(var_args, format);
   vsprintf(value, format, var_args);
@@ -880,8 +966,7 @@ int vtkKWApplication::SetRegistryValue(int level, const char* subkey,
 int vtkKWApplication::GetRegistryValue(int level, const char* subkey, 
                                        const char* key, char* value)
 {
-  if (!this->GetApplication() || 
-      this->GetRegistryLevel() < 0 || this->GetRegistryLevel() < level)
+  if (this->GetRegistryLevel() < 0 || this->GetRegistryLevel() < level)
     {
     return 0;
     }
@@ -1016,7 +1101,7 @@ void vtkKWApplication::SaveDialogLastPathRegistryValue(
 {
   if (dialog && dialog->GetLastPath())
     {
-    this->GetApplication()->SetRegistryValue(
+    this->SetRegistryValue(
       1, "RunTime", key, dialog->GetLastPath());
     }
 }
@@ -1028,7 +1113,7 @@ void vtkKWApplication::RetrieveDialogLastPathRegistryValue(
   if (dialog)
     {
     char buffer[1024];
-    if (this->GetApplication()->GetRegistryValue(1, "RunTime", key, buffer) &&
+    if (this->GetRegistryValue(1, "RunTime", key, buffer) &&
         *buffer)
       {
       dialog->SetLastPath(buffer);
@@ -1551,12 +1636,13 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PromptBeforeExit: " << (this->GetPromptBeforeExit() ? "on":"off") << endl;
   os << indent << "InstallationDirectory: " 
      << (this->InstallationDirectory ? InstallationDirectory : "None") << endl;
-  os << indent << "SaveWindowGeometry: " 
-     << (this->SaveWindowGeometry ? "On" : "Off") << endl;
+  os << indent << "SaveUserInterfaceGeometry: " 
+     << (this->SaveUserInterfaceGeometry ? "On" : "Off") << endl;
   os << indent << "LimitedEditionMode: " 
      << (this->LimitedEditionMode ? "On" : "Off") << endl;
   os << indent << "CharacterEncoding: " << this->CharacterEncoding << "\n";
   os << indent << "LimitedEditionModeName: " 
      << (this->LimitedEditionModeName ? this->LimitedEditionModeName
          : "None") << endl;
+  os << indent << "PrintTargetDPI: " << this->GetPrintTargetDPI() << endl;
 }

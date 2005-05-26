@@ -89,7 +89,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 #endif
 
 vtkStandardNewMacro( vtkKWView );
-vtkCxxRevisionMacro(vtkKWView, "1.12");
+vtkCxxRevisionMacro(vtkKWView, "1.13");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -597,7 +597,7 @@ void vtkKWView::PrintView()
   if (this->GetParentWindow())
     {
     // Is this right? Should DPI be int or float?
-    DPI = this->GetParentWindow()->GetPrintTargetDPI();
+    DPI = this->GetApplication()->GetPrintTargetDPI();
     }
   if (DPI >= 150.0)
     {
@@ -675,7 +675,7 @@ void vtkKWView::Print(HDC ghdc, HDC,
   // target DPI specified here
   if (this->GetParentWindow())
     {
-    scale = printerDPIX/this->GetParentWindow()->GetPrintTargetDPI();
+    scale = printerDPIX/this->GetApplication()->GetPrintTargetDPI();
     }
   else
     {
@@ -708,7 +708,7 @@ void vtkKWView::SetupPrint(RECT &rcDest, HDC ghdc,
   // target DPI specified here
   if (this->GetParentWindow())
     {
-    scale = printerDPIX/this->GetParentWindow()->GetPrintTargetDPI();
+    scale = printerDPIX/this->GetApplication()->GetPrintTargetDPI();
     }
   else
     {
@@ -749,7 +749,7 @@ void vtkKWView::SaveAsImage()
 {
   char *path = 0;
   
-  vtkKWWindow* window = this->GetWindow();
+  vtkKWWindowBase* window = this->GetWindow();
 
   // first get the file name
   vtkKWSaveImageDialog *dlg = vtkKWSaveImageDialog::New();
@@ -965,9 +965,11 @@ void vtkKWView::Select(vtkKWWindow *pw)
     // add the Print option
     // If there is a "Page Setup" menu, insert below
     int clidx;
-    if (pw->GetFileMenu()->HasItem(VTK_KW_PRINT_OPTIONS_MENU_LABEL))
+    if (pw->GetFileMenu()->HasItem(
+          vtkKWWindowBase::GetPrintOptionsMenuLabel()))
       {
-      clidx = pw->GetFileMenu()->GetIndex(VTK_KW_PRINT_OPTIONS_MENU_LABEL) + 1;  
+      clidx = pw->GetFileMenu()->GetIndex(
+        vtkKWWindowBase::GetPrintOptionsMenuLabel()) + 1;  
       }
     else
       {

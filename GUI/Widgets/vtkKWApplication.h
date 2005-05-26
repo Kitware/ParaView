@@ -14,7 +14,7 @@
 // .NAME vtkKWApplication - an application class
 // .SECTION Description
 // vtkKWApplication is the overall class that represents the entire 
-// application. It is also responsible for managing the vtkKWWindow(s) 
+// application. It is also responsible for managing the vtkKWWindowBase(s) 
 // associated to the application.
 
 #ifndef __vtkKWApplication_h
@@ -31,16 +31,10 @@ class vtkKWRegistryHelper;
 class vtkKWBalloonHelpManager;
 class vtkKWSplashScreen;
 class vtkKWWidget;
-class vtkKWWindow;
+class vtkKWWindowBase;
 class vtkKWText;
 class vtkKWApplicationInternals;
 class vtkKWLoadSaveDialog;
-
-#define VTK_KW_EXIT_DIALOG_NAME                 "ExitApplication"
-
-#define VTK_KW_SHOW_TOOLTIPS_REG_KEY            "ShowBalloonHelp"
-#define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY     "SaveWindowGeometry"
-#define VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY       "ShowSplashScreen"
 
 class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
@@ -91,13 +85,13 @@ public:
   // that is added, RemoveWindow() will decrease it. Once the last window is
   // closed, Exit() is called.
   // Return 1 if successful, 0 otherwise
-  virtual int AddWindow(vtkKWWindow *w);
-  virtual int RemoveWindow(vtkKWWindow *);
+  virtual int AddWindow(vtkKWWindowBase *w);
+  virtual int RemoveWindow(vtkKWWindowBase *);
 
   // Description:
   // Get the number of windows, retrieve a window
   virtual int GetNumberOfWindows();
-  virtual vtkKWWindow* GetNthWindow(int rank);
+  virtual vtkKWWindowBase* GetNthWindow(int rank);
 
   // Description:
   // Set/Get the application name.
@@ -180,6 +174,11 @@ public:
   vtkGetMacro(ExitAfterLoadScript, int);
 
   // Description:
+  // Set/Get the print quality.
+  vtkGetMacro(PrintTargetDPI, double);
+  vtkSetMacro(PrintTargetDPI, double);
+  
+  // Description:
   // Get the Registry object.
   //BTX
   vtkKWRegistryHelper *GetRegistryHelper();
@@ -245,10 +244,11 @@ public:
     vtkKWLoadSaveDialog *dlg, const char *key);
 
   // Descrition:
-  // Get the application settings that are stored in the registry.
+  // Save/Retrieve the application settings to/from registry.
   // Do not call that method before the application name is known and the
   // proper registry level set (if any).
-  virtual void GetApplicationSettingsFromRegistry();
+  virtual void RestoreApplicationSettingsFromRegistry();
+  virtual void SaveApplicationSettingsToRegistry();
 
   // Description:
   // Query if this application supports a splash screen
@@ -265,10 +265,14 @@ public:
   virtual vtkKWSplashScreen* GetSplashScreen();
 
   // Description:
-  // Set/Get if the windows geometry should be saved (to registry).
-  vtkGetMacro(SaveWindowGeometry, int);
-  vtkSetMacro(SaveWindowGeometry, int);
-  vtkBooleanMacro(SaveWindowGeometry, int);
+  // Set/Get if the user interface geometry should be saved (to the registry,
+  // for example).
+  // This is more like a hint that many widgets can query to check if
+  // they should save their own geometry (and restore it on startup). 
+  // See vtkKWWindowBase for example.
+  vtkGetMacro(SaveUserInterfaceGeometry, int);
+  vtkSetMacro(SaveUserInterfaceGeometry, int);
+  vtkBooleanMacro(SaveUserInterfaceGeometry, int);
 
   // Description:
   // Get/Set the internal character encoding of the application.
@@ -293,7 +297,7 @@ public:
   // Description:
   // Display the on-line help for this application.
   // Optionally provide a master window this dialog should be the slave of.
-  virtual void DisplayHelpDialog(vtkKWWindow *master);
+  virtual void DisplayHelpDialog(vtkKWWindowBase *master);
 
   // Description:
   // Set/Get the the on-line help starting page
@@ -303,7 +307,7 @@ public:
   // Description:
   // Display the about dialog for this application.
   // Optionally provide a master window this dialog should be the slave of.
-  virtual void DisplayAboutDialog(vtkKWWindow *master);
+  virtual void DisplayAboutDialog(vtkKWWindowBase *master);
 
   // Description:
   // Return the Balloon Help helper object. 
@@ -348,6 +352,16 @@ public:
   virtual void UnRegisterDialogUp(vtkKWWidget *ptr);
   vtkGetMacro(DialogUp, int);
   
+  // Description:
+  // Some constants
+  //BTX
+  static const char *ExitDialogName;
+  static const char *ShowBalloonHelpRegKey;
+  static const char *SaveUserInterfaceGeometryRegKey;
+  static const char *ShowSplashScreenRegKey;
+  static const char *PrintTargetDPIRegKey;
+  //ETX
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -391,7 +405,7 @@ protected:
   // Display the exit dialog.
   // Optionally provide a master window this dialog should be the slave of.
   // Return 1 if the user wants to exit, 0 otherwise
-  virtual int DisplayExitDialog(vtkKWWindow *master);
+  virtual int DisplayExitDialog(vtkKWWindowBase *master);
 
   // Description:
   // Value that is set after exit (status), flag stating that 
@@ -422,8 +436,8 @@ protected:
   virtual void CreateSplashScreen() {};
 
   // Description:
-  // Flag stating if the window geometry should be saved before exiting
-  int SaveWindowGeometry;
+  // Flag stating if the UI geometry should be saved before exiting
+  int SaveUserInterfaceGeometry;
 
   // Description:
   // About dialog, add text and copyrights to the about dialog.
@@ -439,6 +453,10 @@ protected:
   // Description:
   // Character encoding (is passed to Tcl)
   int CharacterEncoding;
+
+  // Description:
+  // Print DPI
+  double PrintTargetDPI;
 
   // Description:
   // Check for an argument (example: --foo, /C, -bar, etc).
