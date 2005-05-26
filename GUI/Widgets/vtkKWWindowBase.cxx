@@ -40,7 +40,7 @@ const char* vtkKWWindowBase::GetPrintOptionsMenuLabel()
 const unsigned int vtkKWWindowBase::DefaultWidth = 900;
 const unsigned int vtkKWWindowBase::DefaultHeight = 700;
 
-vtkCxxRevisionMacro(vtkKWWindowBase, "1.1");
+vtkCxxRevisionMacro(vtkKWWindowBase, "1.2");
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindowBase );
@@ -716,13 +716,13 @@ void vtkKWWindowBase::InsertRecentFilesMenu(
   // Remove the menu if already there (in case that function was used to
   // move the menu)
 
-  if (this->FileMenu->HasItem(vtkKWWindowBase::PrintOptionsMenuLabel))
+  const char *label = "Open Recent File";
+  if (this->FileMenu->HasItem(label))
     {
-    this->FileMenu->DeleteMenuItem(vtkKWWindowBase::PrintOptionsMenuLabel);
+    this->FileMenu->DeleteMenuItem(label);
     }
 
-  this->FileMenu->InsertCascade(
-    pos, vtkKWWindowBase::PrintOptionsMenuLabel, mrf_menu, 6);
+  this->FileMenu->InsertCascade(pos, label, mrf_menu, 6);
 
   // Fill the recent files vector with recent files stored in registry
   // this will also update the menu
