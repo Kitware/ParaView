@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.711");
+vtkCxxRevisionMacro(vtkPVWindow, "1.712");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1144,7 +1144,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->SetHorizontalPaneVisibility(hvisibility);
   
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pvApp->GetBalloonHelpManager()->SetDelay(1);
 
   // Put the version in the status bar.
   char version[128];
@@ -1391,7 +1390,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   // AddFileType() enables this entry.
   this->FileMenu->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Disabled);
 
-  if (app->GetSaveWindowGeometry())
+  if (app->GetSaveUserInterfaceGeometry())
     {
     this->RestorePVWindowGeometry();
     }
@@ -1930,13 +1929,19 @@ void vtkPVWindow::KeyAction(char keyCode, int x, int y)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::Configure(int vtkNotUsed(width), int vtkNotUsed(height))
 {
-  this->MainView->Configured();
-  // The above Configured call could have changed the size of the render
-  // window, so get the size from there instead of using the input width and
-  // height.
-  int *size = this->MainView->GetRenderWindowSize();
-  this->Interactor->UpdateSize(size[0], size[1]);
-  this->Interactor->ConfigureEvent();
+  if (this->MainView)
+    {
+    this->MainView->Configured();
+    // The above Configured call could have changed the size of the render
+    // window, so get the size from there instead of using the input width and
+    // height.
+    int *size = this->MainView->GetRenderWindowSize();
+    if (this->Interactor)
+      {
+      this->Interactor->UpdateSize(size[0], size[1]);
+      this->Interactor->ConfigureEvent();
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -4767,38 +4772,13 @@ void vtkPVWindow::UpdateToolbarState()
     this->EnableToolbarButtons();
     }
 
-  if (!this->LowerToolbars)
+  if (this->LowerToolbars)
     {
-    return;
+    this->LowerToolbars->SetToolbarsFlatAspect(
+      vtkKWToolbar::GetGlobalFlatAspect());
+    this->LowerToolbars->SetToolbarsWidgetsFlatAspect(
+      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
     }
-  
-  // Decide the properties of the toolbars.
-  int flat_frame;
-  if (this->GetApplication()->HasRegistryValue(
-    2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY))
-    {
-    flat_frame = this->GetApplication()->GetIntRegistryValue(
-      2, "RunTime", VTK_KW_TOOLBAR_FLAT_FRAME_REG_KEY);
-    }
-  else
-    {
-    flat_frame = vtkKWToolbar::GetGlobalFlatAspect();
-    }
-
-  int flat_buttons;
-  if (this->GetApplication()->HasRegistryValue(
-    2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY))
-    {
-    flat_buttons = this->GetApplication()->GetIntRegistryValue(
-      2, "RunTime", VTK_KW_TOOLBAR_FLAT_BUTTONS_REG_KEY);
-    }
-  else
-    {
-    flat_buttons = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
-    }
-
-  this->LowerToolbars->SetToolbarsFlatAspect(flat_frame);
-  this->LowerToolbars->SetToolbarsWidgetsFlatAspect(flat_buttons);
 }
 
 //----------------------------------------------------------------------------
@@ -5027,9 +5007,10 @@ void vtkPVWindow::InvokeInteractorEvent(const char *event)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::SaveWindowGeometry()
+void vtkPVWindow::SaveWindowGeometryToRegistry()
 {
-  this->Superclass::SaveWindowGeometry();
+  this->Superclass::SaveWindowGeometryToRegistry();
+
   if (this->IsCreated())
     {
     this->GetApplication()->SetRegistryValue(
@@ -5038,7 +5019,7 @@ void vtkPVWindow::SaveWindowGeometry()
 
     if (this->AnimationManager)
       {
-      this->AnimationManager->SaveWindowGeometry();
+      this->AnimationManager->SaveWindowGeometryToRegistry();
       }
     }
   
@@ -5059,7 +5040,7 @@ void vtkPVWindow::RestorePVWindowGeometry()
     }
   if (this->AnimationManager)
     {
-    this->AnimationManager->RestoreWindowGeometry();
+    this->AnimationManager->RestoreWindowGeometryFromRegistry();
     }
 }
 

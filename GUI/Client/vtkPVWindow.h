@@ -586,7 +586,7 @@ protected:
                                     const char *fileName);
   // Description:
   // Save/Restore window geometry
-  virtual void SaveWindowGeometry();
+  virtual void SaveWindowGeometryToRegistry();
 
   // Description:
   // Restore the PVWindow geometry alone.
