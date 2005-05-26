@@ -15,12 +15,11 @@
 
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
-#include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.46");
+vtkCxxRevisionMacro(vtkKWDialog, "1.47");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -33,7 +32,7 @@ vtkKWDialog::vtkKWDialog()
   this->Beep = 0;
   this->BeepType = 0;
   this->InvokeAtPointer = 0;
-  this->GrabDialog = 1;
+  this->Modal = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -98,33 +97,21 @@ int vtkKWDialog::Invoke()
 
   this->SetPosition(x, y);
 
-  this->DeIconify();
-  this->Raise();
-  this->Focus();
+  this->Display();
 
-  this->Script("update idletasks");
-
-  if (this->GrabDialog)
-    {
-    this->Grab();
-    }
-
-  if ( this->Beep )
+  if (this->Beep)
     {
     this->Script("bell");
     }
 
-  // do a grab
-  // wait for the end
+  // Wait for the end
+
   while (!this->Done)
     {
     Tcl_DoOneEvent(0);    
     }
 
-  if (this->GrabDialog)
-    {
-    this->ReleaseGrab();
-    }
+  this->Withdraw();
 
   this->GetApplication()->UnRegisterDialogUp(this);
 
@@ -135,27 +122,18 @@ int vtkKWDialog::Invoke()
 void vtkKWDialog::Display()
 {
   this->Done = 0;
-
   this->Superclass::Display();
-
-  this->Grab();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWDialog::Cancel()
 {
-  this->Withdraw();
-  this->ReleaseGrab();
-
   this->Done = 1;  
 }
 
 //----------------------------------------------------------------------------
 void vtkKWDialog::OK()
 {
-  this->Withdraw();
-  this->ReleaseGrab();
-
   this->Done = 2;  
 }
 
